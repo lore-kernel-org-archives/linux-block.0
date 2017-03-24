@@ -1,141 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:32884 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932434AbdCXMgr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Mar 2017 08:36:47 -0400
-Received: by mail-pg0-f67.google.com with SMTP id 79so235035pgf.0
-        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2017 05:36:46 -0700 (PDT)
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 3/4] block: rename blk_mq_freeze_queue_start()
-Date: Fri, 24 Mar 2017 20:36:20 +0800
-Message-Id: <20170324123621.5227-4-tom.leiming@gmail.com>
-In-Reply-To: <20170324123621.5227-1-tom.leiming@gmail.com>
-References: <20170324123621.5227-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>, linux-fsdevel@vger.kernel.org
+References: <20170315215107.5628-1-rgoldwyn@suse.de>
+ <20170315215107.5628-6-rgoldwyn@suse.de>
+ <eee4683d-9f44-434f-b97f-b0b24c7b3dab@kernel.dk>
+ <47d742e9-1343-ef5b-f7d4-29a6e22bef84@suse.de>
+Cc: jack@suse.com, hch@infradead.org, linux-block@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org, sagi@grimberg.me, avi@scylladb.com,
+ linux-api@vger.kernel.org, willy@infradead.org,
+ Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <65504798-90c0-6abe-30ea-2faf3824eed8@kernel.dk>
+Date: Fri, 24 Mar 2017 08:39:42 -0600
+MIME-Version: 1.0
+In-Reply-To: <47d742e9-1343-ef5b-f7d4-29a6e22bef84@suse.de>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-As the .q_usage_counter is used by both legacy and
-mq path, we need to block new I/O if queue becomes
-dead in blk_queue_enter().
+On 03/24/2017 05:32 AM, Goldwyn Rodrigues wrote:
+> 
+> 
+> On 03/16/2017 09:33 AM, Jens Axboe wrote:
+>> On 03/15/2017 03:51 PM, Goldwyn Rodrigues wrote:
+>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>> index 0eeb99e..2e5cba2 100644
+>>> --- a/block/blk-core.c
+>>> +++ b/block/blk-core.c
+>>> @@ -2014,7 +2019,7 @@ blk_qc_t generic_make_request(struct bio *bio)
+>>>  	do {
+>>>  		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+>>>  
+>>> -		if (likely(blk_queue_enter(q, false) == 0)) {
+>>> +		if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NOWAIT)) == 0)) {
+>>>  			struct bio_list hold;
+>>>  			struct bio_list lower, same;
+>>>  
+>>> @@ -2040,7 +2045,10 @@ blk_qc_t generic_make_request(struct bio *bio)
+>>>  			bio_list_merge(&bio_list_on_stack, &same);
+>>>  			bio_list_merge(&bio_list_on_stack, &hold);
+>>>  		} else {
+>>> -			bio_io_error(bio);
+>>> +			if (unlikely(bio_flagged(bio, BIO_NOWAIT)))
+>>> +				bio_wouldblock_error(bio);
+>>> +			else
+>>> +				bio_io_error(bio);
+>>
+>> This doesn't look right. What if the queue is dying, and BIO_NOWAIT just
+>> happened to be set?
+>>
+> 
+> Yes, I need to add a condition here to check for blk_queue_dying(). Thanks.
+> 
+>> And you're missing wbt_wait() as well as a blocking point. Ditto in
+>> blk-mq.
+> 
+> wbt_wait() does not apply to WRITE_ODIRECT
 
-So rename it and we can use this function in both
-pathes.
+It doesn't _currently_ block for it, but that could change. It should
+have an explicit check.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/blk-core.c                  |  2 +-
- block/blk-mq.c                    | 10 +++++-----
- drivers/block/mtip32xx/mtip32xx.c |  2 +-
- drivers/nvme/host/core.c          |  2 +-
- include/linux/blk-mq.h            |  2 +-
- 5 files changed, 9 insertions(+), 9 deletions(-)
+Additionally, the more weird assumptions you make, the more half assed
+this will be. The other assumption made here is that only direct IO
+would set nonblock. We have to assume that any IO can have NONBLOCK set,
+and not make any assumptions about the caller.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 44eed17319c0..5901133d105f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -670,7 +670,7 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
- 			return -EBUSY;
- 
- 		/*
--		 * read pair of barrier in blk_mq_freeze_queue_start(),
-+		 * read pair of barrier in blk_freeze_queue_start(),
- 		 * we need to order reading DEAD flag of .q_usage_counter
- 		 * and reading .mq_freeze_depth, otherwise the following
- 		 * wait may never return if the two read are reordered.
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b36f0481ba0e..5370b4f750ff 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -68,7 +68,7 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- 	sbitmap_clear_bit(&hctx->ctx_map, ctx->index_hw);
- }
- 
--void blk_mq_freeze_queue_start(struct request_queue *q)
-+void blk_freeze_queue_start(struct request_queue *q)
- {
- 	int freeze_depth;
- 
-@@ -78,7 +78,7 @@ void blk_mq_freeze_queue_start(struct request_queue *q)
- 		blk_mq_run_hw_queues(q, false);
- 	}
- }
--EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
-+EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
- 
- void blk_mq_freeze_queue_wait(struct request_queue *q)
- {
-@@ -108,7 +108,7 @@ void blk_freeze_queue(struct request_queue *q)
- 	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
- 	 * exported to drivers as the only user for unfreeze is blk_mq.
- 	 */
--	blk_mq_freeze_queue_start(q);
-+	blk_freeze_queue_start(q);
- 	blk_mq_freeze_queue_wait(q);
- }
- 
-@@ -746,7 +746,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	 * percpu_ref_tryget directly, because we need to be able to
- 	 * obtain a reference even in the short window between the queue
- 	 * starting to freeze, by dropping the first reference in
--	 * blk_mq_freeze_queue_start, and the moment the last request is
-+	 * blk_freeze_queue_start, and the moment the last request is
- 	 * consumed, marked by the instant q_usage_counter reaches
- 	 * zero.
- 	 */
-@@ -2376,7 +2376,7 @@ static void blk_mq_queue_reinit_work(void)
- 	 * take place in parallel.
- 	 */
- 	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_freeze_queue_start(q);
-+		blk_freeze_queue_start(q);
- 	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_freeze_queue_wait(q);
- 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f96ab717534c..c96c35ab39df 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -4162,7 +4162,7 @@ static int mtip_block_remove(struct driver_data *dd)
- 		dev_info(&dd->pdev->dev, "device %s surprise removal\n",
- 						dd->disk->disk_name);
- 
--	blk_mq_freeze_queue_start(dd->queue);
-+	blk_freeze_queue_start(dd->queue);
- 	blk_mq_stop_hw_queues(dd->queue);
- 	blk_mq_tagset_busy_iter(&dd->tags, mtip_no_dev_cleanup, dd);
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9b3b57fef446..4a6d7f408769 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2386,7 +2386,7 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_freeze_queue_start(ns->queue);
-+		blk_freeze_queue_start(ns->queue);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_start_freeze);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 5b3e201c8d4f..ea2e9dcd3aef 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -243,7 +243,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
--void blk_mq_freeze_queue_start(struct request_queue *q);
-+void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
 -- 
-2.9.3
+Jens Axboe
