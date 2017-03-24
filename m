@@ -1,62 +1,45 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 20/23] block: stop using discards for zeroing
-Date: Thu, 23 Mar 2017 10:33:38 -0400
-Message-Id: <20170323143341.31549-21-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <ebiggers3@gmail.com>
+Return-Path: <ebiggers3@gmail.com>
+Date: Fri, 24 Mar 2017 14:40:15 -0700
+From: Eric Biggers <ebiggers3@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH] block: remove outdated part of blkdev_issue_flush()
+ comment
+Message-ID: <20170324214015.GD4986@gmail.com>
+References: <20170123194321.51596-1-ebiggers3@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170123194321.51596-1-ebiggers3@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that we have REQ_OP_WRITE_ZEROES implemented for all devices that
-support efficient zeroing of devices we can remove the call to
-blkdev_issue_discard.  This means we only have two ways of zeroing left
-and can simply the code.
+On Mon, Jan 23, 2017 at 11:43:21AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> blkdev_issue_flush() is now always synchronous, and it no longer has a
+> flags argument.  So remove the part of the comment about the WAIT flag.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  block/blk-flush.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 20b7c7a02f1c..3c0ab7361e46 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -490,8 +490,7 @@ void blk_insert_flush(struct request *rq)
+>   * Description:
+>   *    Issue a flush for the block device in question. Caller can supply
+>   *    room for storing the error offset in case of a flush error, if they
+> - *    wish to. If WAIT flag is not passed then caller may check only what
+> - *    request was pushed in some internal queue for later handling.
+> + *    wish to.
+>   */
+>  int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask,
+>  		sector_t *error_sector)
+> -- 
+> 2.11.0.483.g087da7b7c-goog
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-lib.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 33c5bf373b7f..153ca59393a7 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -279,6 +279,11 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
-  *  Zero-fill a block range, either using hardware offload or by explicitly
-  *  writing zeroes to the device.
-  *
-+ *  Note that this function may fail with -EOPNOTSUPP if the driver supports
-+ *  efficient zeroing operation, but the device capabilities can only be
-+ *  discovered by trial and error.  In this case the caller should call the
-+ *  function again, and it will use the fallback path.
-+ *
-  *  If a device is using logical block provisioning, the underlying space will
-  *  only be release if %flags contains BLKDEV_ZERO_UNMAP.
-  *
-@@ -349,12 +354,6 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 	struct bio *bio = NULL;
- 	struct blk_plug plug;
- 
--	if (flags & BLKDEV_ZERO_UNMAP) {
--		if (!blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask,
--				BLKDEV_DISCARD_ZERO))
--			return 0;
--	}
--
- 	blk_start_plug(&plug);
- 	ret = __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
- 			&bio, flags);
--- 
-2.11.0
+Ping?
