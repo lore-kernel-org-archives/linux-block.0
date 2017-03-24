@@ -1,54 +1,52 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
-Subject: [PATCH rfc 06/10] IB/cq: Don't force IB_POLL_DIRECT poll context for
- ib_process_cq_direct
-Date: Thu,  9 Mar 2017 15:16:38 +0200
-Message-Id: <1489065402-14757-7-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:65075 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753736AbdCXRpb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Mar 2017 13:45:31 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: "tj@kernel.org" <tj@kernel.org>, "hare@suse.de" <hare@suse.de>
+Subject: Re: [PATCH v2 4/4] block: block new I/O just after queue is set as
+ dying
+Date: Fri, 24 Mar 2017 17:45:09 +0000
+Message-ID: <1490377493.3312.11.camel@sandisk.com>
+References: <20170324123621.5227-1-tom.leiming@gmail.com>
+         <20170324123621.5227-5-tom.leiming@gmail.com>
+In-Reply-To: <20170324123621.5227-5-tom.leiming@gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-polling the completion queue directly does not interfere
-with the existing polling logic, hence drop the requirement.
+On Fri, 2017-03-24 at 20:36 +0800, Ming Lei wrote:=20
+> +	/* block new I/O coming */
+> +	blk_freeze_queue_start(q);
 
-This can be used for polling mode ULPs.
+As I have already mentioned two times, the comment above
+blk_freeze_queue_start() should be made more clear. It should mention that
+without that call blk_queue_enter() won't check the "dying" flag after it
+has been set. If that is not mentioned in a comment the next person who
+reads the blk_set_queue_dying() function will wonder why the
+blk_freeze_queue_start() call is really needed and whether it can be remove=
+d.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/infiniband/core/cq.c | 2 --
- 1 file changed, 2 deletions(-)
+>  		/*
+>  		 * read pair of barrier in blk_freeze_queue_start(),
+>  		 * we need to order reading DEAD flag of .q_usage_counter
+> -		 * and reading .mq_freeze_depth, otherwise the following
+> -		 * wait may never return if the two read are reordered.
+> +		 * and reading .mq_freeze_depth or dying flag, otherwise
+> +		 * the following wait may never return if the two read
+> +		 * are reordered.
+>  		 */
+>  		smp_rmb();
 
-diff --git a/drivers/infiniband/core/cq.c b/drivers/infiniband/core/cq.c
-index 21d1a38af489..7f6ae0ecb0c5 100644
---- a/drivers/infiniband/core/cq.c
-+++ b/drivers/infiniband/core/cq.c
-@@ -64,8 +64,6 @@ static int __ib_process_cq(struct ib_cq *cq, int budget)
-  */
- int ib_process_cq_direct(struct ib_cq *cq, int budget)
- {
--	WARN_ON_ONCE(cq->poll_ctx != IB_POLL_DIRECT);
--
- 	return __ib_process_cq(cq, budget);
- }
- EXPORT_SYMBOL(ib_process_cq_direct);
--- 
-2.7.4
+Please fix the spelling in the above comment ("two read").
 
+Thanks,
 
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Bart.
