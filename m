@@ -1,53 +1,46 @@
-Return-Path: <sbates130272@gmail.com>
-Return-Path: <sbates130272@gmail.com>
-From: sbates@raithlin.com
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Damien.LeMoal@wdc.com,
-	osandov@osandov.com,
-	sbates@raithlin.com
-Subject: [PATCH 0/2] blk-stat: Add ability to not bucket IO, add this to IO poling.
-Date: Sat, 25 Mar 2017 20:18:10 -0600
-Message-Id: <1490494692-2416-1-git-send-email-sbates@raithlin.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-vk0-f50.google.com ([209.85.213.50]:35948 "EHLO
+        mail-vk0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932872AbdCXRwS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Mar 2017 13:52:18 -0400
+Received: by mail-vk0-f50.google.com with SMTP id s68so11578569vke.3
+        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2017 10:52:03 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1490376549.3312.3.camel@sandisk.com>
+References: <20170324123621.5227-1-tom.leiming@gmail.com> <20170324123621.5227-4-tom.leiming@gmail.com>
+ <1490376549.3312.3.camel@sandisk.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Sat, 25 Mar 2017 01:52:02 +0800
+Message-ID: <CACVXFVPAJsChTvDRvS8=PiciNVOXU1U=zOm9y=cgk8Ujo6Vr3g@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] block: rename blk_mq_freeze_queue_start()
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>, "hare@suse.de" <hare@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Stephen Bates <sbates@raithlin.com>
+On Sat, Mar 25, 2017 at 1:29 AM, Bart Van Assche
+<Bart.VanAssche@sandisk.com> wrote:
+> On Fri, 2017-03-24 at 20:36 +0800, Ming Lei wrote:
+>> As the .q_usage_counter is used by both legacy and
+>> mq path, we need to block new I/O if queue becomes
+>> dead in blk_queue_enter().
+>>
+>> So rename it and we can use this function in both
+>> pathes.
+>
+> Should "pathes" be changed into "paths" in the commit message? Additionally,
+> this patch breaks the symmetry the comment in blk_mq_freeze_queue() refers
+> to. Anyway:
 
-Omar recently developed some patches for block layer stats that use
-callbacks to determine which bucket an IO should be considered for. At
-the same time there was discussion at LSF/MM that we might not want to
-consider all IO when generating stats for certain algorithms (e.g. IO
-completion polling).
+Really? Is there one function named as blk_mq_freeze_queue_end()?
 
-This set does two things. It makes the bucket callback for stats
-signed so we can now ignore IO that cause a negative to be returned
-from the bucket function. It then uses this new functionality to
-filter IO for the IO completion polling algorithms.
+The comment means blk_mq_freeze_queue() vs. blk_mq_unfreeze_queue(), which can't
+be affected by this patch.
 
-This patchset applies cleanly on a83b576c9c25cf (block: fix stacked
-driver stats init and free) in Jens' for-next tree.
 
-I've lightly tested this using QEMU and a real NVMe low-latency
-device. I do not have performance number yet. Feedback would be
-appreciated!
-
-[BTW this is my first submission for an all new setup so apologies if
-this does not come through correctly!]
-
-Cc: Damien.LeMoal@wdc.com
-Cc: osandov@osandov.com
-
-Stephen Bates (2):
-  blk-stat: convert blk-stat bucket callback to signed
-  blk-stat: add a poll_size value to the request_queue struct
-
- block/blk-mq.c         | 17 +++++++++++++++--
- block/blk-stat.c       |  8 +++++---
- block/blk-stat.h       |  9 +++++----
- block/blk-sysfs.c      | 30 ++++++++++++++++++++++++++++++
- include/linux/blkdev.h |  1 +
- 5 files changed, 56 insertions(+), 9 deletions(-)
-
--- 
-2.7.4
+Thanks,
+Ming Lei
