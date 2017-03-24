@@ -1,63 +1,70 @@
-Return-Path: <axboe@kernel.dk>
-Received: from [192.168.1.154] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id k66sm57859itg.8.2017.03.14.07.57.51
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 14 Mar 2017 07:57:51 -0700 (PDT)
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-mq-sched: don't run the queue async from
- blk_mq_try_issue_directly()
-Message-ID: <3ac4f49e-3bc0-7fc6-e93a-db9ec7ad21cf@kernel.dk>
-Date: Tue, 14 Mar 2017 08:57:50 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	nbd-general@lists.sourceforge.net,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 2/4] nbd: set rq->errors to actual error code
+Date: Fri, 24 Mar 2017 14:08:27 -0400
+Message-Id: <1490378909-4056-3-git-send-email-josef@toxicpanda.com>
+In-Reply-To: <1490378909-4056-1-git-send-email-josef@toxicpanda.com>
+References: <1490378909-4056-1-git-send-email-josef@toxicpanda.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If we have scheduling enabled, we jump directly to insert-and-run.
-That's fine, but we run the queue async and we don't pass in information
-on whether we can block from this context or not. Fixup both these
-cases.
+From: Josef Bacik <jbacik@fb.com>
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+We've been relying on the block layer to assume rq->errors being set
+translates into -EIO.  I noticed in testing that sometimes this isn't
+true, and really there's not much of a reason to have a counter instead
+of just using -EIO.  So set it properly so we don't leak random numbers
+to unsuspecting victims.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 159187a28d66..4196d6bee92d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1434,7 +1434,8 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
- }
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 3d1fc37a..dbc22f4 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -192,7 +192,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
  
--static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie)
-+static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
-+				      bool can_block)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
-@@ -1475,7 +1476,7 @@ static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie)
+ 	dev_err(nbd_to_dev(nbd), "Connection timed out, shutting down connection\n");
+ 	set_bit(NBD_TIMEDOUT, &nbd->runtime_flags);
+-	req->errors++;
++	req->errors = -EIO;
+ 
+ 	mutex_lock(&nbd->config_lock);
+ 	sock_shutdown(nbd);
+@@ -432,7 +432,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 	if (ntohl(reply.error)) {
+ 		dev_err(disk_to_dev(nbd->disk), "Other side returned error (%d)\n",
+ 			ntohl(reply.error));
+-		req->errors++;
++		req->errors = -EIO;
+ 		return cmd;
  	}
  
- insert:
--	blk_mq_sched_insert_request(rq, false, true, true, false);
-+	blk_mq_sched_insert_request(rq, false, true, false, can_block);
+@@ -448,7 +448,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 			if (result <= 0) {
+ 				dev_err(disk_to_dev(nbd->disk), "Receive data failed (result %d)\n",
+ 					result);
+-				req->errors++;
++				req->errors = -EIO;
+ 				return cmd;
+ 			}
+ 			dev_dbg(nbd_to_dev(nbd), "request %p: got %d bytes data\n",
+@@ -518,7 +518,7 @@ static void nbd_clear_req(struct request *req, void *data, bool reserved)
+ 	if (!blk_mq_request_started(req))
+ 		return;
+ 	cmd = blk_mq_rq_to_pdu(req);
+-	req->errors++;
++	req->errors = -EIO;
+ 	nbd_end_request(cmd);
  }
  
- /*
-@@ -1569,11 +1570,11 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 		if (!(data.hctx->flags & BLK_MQ_F_BLOCKING)) {
- 			rcu_read_lock();
--			blk_mq_try_issue_directly(old_rq, &cookie);
-+			blk_mq_try_issue_directly(old_rq, &cookie, false);
- 			rcu_read_unlock();
- 		} else {
- 			srcu_idx = srcu_read_lock(&data.hctx->queue_rq_srcu);
--			blk_mq_try_issue_directly(old_rq, &cookie);
-+			blk_mq_try_issue_directly(old_rq, &cookie, true);
- 			srcu_read_unlock(&data.hctx->queue_rq_srcu, srcu_idx);
- 		}
- 		goto done;
-
 -- 
-Jens Axboe
+2.7.4
