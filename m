@@ -1,91 +1,68 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [RFC PATCH 00/28] INFINIBAND NETWORK BLOCK DEVICE (IBNBD)
-To: Jack Wang <jinpu.wang@profitbricks.com>, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-Cc: dledford@redhat.com, axboe@kernel.dk, hch@lst.de, mail@fholler.de,
- Milind.dumbare@gmail.com, yun.wang@profitbricks.com
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <cfde9eab-a52a-8888-7d32-4f6fc9f9640a@grimberg.me>
-Date: Mon, 27 Mar 2017 05:20:25 +0300
+Return-Path: <jinpu.wang@profitbricks.com>
 MIME-Version: 1.0
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <03bc01d2a4a9$b8b69f10$2a23dd30$@opengridcomputing.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com> <03bc01d2a4a9$b8b69f10$2a23dd30$@opengridcomputing.com>
+From: Jinpu Wang <jinpu.wang@profitbricks.com>
+Date: Fri, 24 Mar 2017 15:37:02 +0100
+Message-ID: <CAMGffEmhPj4dz4vAR4p2u8=vt+j4gkLRGLpsCgM2mgQ0jYAcww@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/28] INFINIBAND NETWORK BLOCK DEVICE (IBNBD)
+To: Steve Wise <swise@opengridcomputing.com>
+Cc: linux-block@vger.kernel.org,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Doug Ledford <dledford@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, hch <hch@lst.de>, Fabian Holler <mail@fholler.de>,
+	Milind Dumbare <Milind.dumbare@gmail.com>, Michael Wang <yun.wang@profitbricks.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-
-> This series introduces IBNBD/IBTRS kernel modules.
+On Fri, Mar 24, 2017 at 3:20 PM, Steve Wise <swise@opengridcomputing.com> w=
+rote:
+>>
+>> From: Jack Wang <jinpu.wang@profitbricks.com>
+>>
+>> This series introduces IBNBD/IBTRS kernel modules.
+>>
+>> IBNBD (InfiniBand network block device) allows for an RDMA transfer of b=
+lock
+> IO
+>> over InfiniBand network. The driver presents itself as a block device on
+> client
+>> side and transmits the block requests in a zero-copy fashion to the
+> server-side
+>> via InfiniBand. The server part of the driver converts the incoming buff=
+ers
+> back
+>> into BIOs and hands them down to the underlying block device. As soon as=
+ IO
+>> responses come back from the drive, they are being transmitted back to t=
+he
+>> client.
 >
-> IBNBD (InfiniBand network block device) allows for an RDMA transfer of block IO
-> over InfiniBand network. The driver presents itself as a block device on client
-> side and transmits the block requests in a zero-copy fashion to the server-side
-> via InfiniBand. The server part of the driver converts the incoming buffers back
-> into BIOs and hands them down to the underlying block device. As soon as IO
-> responses come back from the drive, they are being transmitted back to the
-> client.
+> Hey Jack, why is this IB specific?  Can it work over iWARP transports as =
+well?
+>
+> Steve.
+>
+>
+>
+Hi Steve,
 
-Hi Jack, Danil and Roman,
+Because we only use IB in our production, as I replied to Bart, sorry, not =
+yet.
 
-I met Danil and Roman last week at Vault, and I think you guys
-are awesome, thanks a lot for open-sourcing your work! However,
-I have a couple of issues here, some are related to the code and
-some are fundamental actually.
+Regards,
+--=20
+Jack Wang
+Linux Kernel Developer
 
-- Is there room for this ibnbd? If we were to take every block driver
-   that was submitted without sufficient justification, it'd be very
-   hard to maintain. What advantage (if any) does this buy anyone over
-   existing rdma based protocols (srp, iser, nvmf)? I'm really (*really*)
-   not sold on this one...
+ProfitBricks GmbH
+Greifswalder Str. 207
+D - 10405 Berlin
 
-- To me, the fundamental design that the client side owns a pool of
-   buffers that it issues writes too, seems inferior than the
-   one taken in iser/nvmf (immediate data). IMO, the ibnbd design has
-   scalability issues both in terms of server side resources, client
-   side contention and network congestion (on infiniband the latter is
-   less severe).
+Tel:       +49 30 577 008  042
+Fax:      +49 30 577 008 299
+Email:    jinpu.wang@profitbricks.com
+URL:      https://www.profitbricks.de
 
-- I suggest that for your next post, you provide a real-life use-case
-   where each of the existing drivers can't suffice, and by can't
-   suffice I mean that it has a fundamental issue with it, not something
-   that requires a fix. With that our feedback can be much more concrete
-   and (at least on my behalf) more open to accept it.
-
-- I'm not exactly sure why you would suggest that your implementation
-   supports only infiniband if you use rdma_cm for address resolution,
-   nor I understand why you emphasize feature (2) below, nor why even
-   in the presence of rdma_cm you have ibtrs_ib_path? (confused...)
-   iWARP needs a bit more attention if you don't use the new generic
-   interfaces though...
-
-- I honestly do not understand why you need *19057* LOC to implement
-   a rdma based block driver. Thats almost larger than all of our
-   existing block drivers combined... First glance at the code provides
-   some explanations, (1) you have some strange code that has no business
-   in a block driver like ibtrs_malloc/ibtrs_zalloc (yikes) or
-   open-coding various existing logging routines, (2) you are for some
-   reason adding a second tag allocation scheme (why?), (3) you are open
-   coding a lot of stuff that we added to the stack in the past months...
-   (4) you seem to over-layer your code for reasons that I do not
-   really understand. And I didn't really look deep at all into the
-   code, just to get the feel of it, and it seems like it needs a lot
-   of work before it can even be considered upstream ready.
-
-> We design and implement this solution based on our need for Cloud Computing,
-> the key features are:
-> - High throughput and low latency due to:
-> 1) Only two rdma messages per IO
-
-Where exactly did you witnessed latency that was meaningful by having
-another rdma message on the wire? That's only for writes, anyway, and
-we have first data bursts for that..
-
-> 2) Simplified client side server memory management
-> 3) Eliminated SCSI sublayer
-
-That's hardly an advantage given all we are losing without it...
-
-...
-
-Cheers,
-Sagi.
+Sitz der Gesellschaft: Berlin
+Registergericht: Amtsgericht Charlottenburg, HRB 125506 B
+Gesch=C3=A4ftsf=C3=BChrer: Achim Weiss
