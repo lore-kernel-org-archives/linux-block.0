@@ -1,386 +1,430 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:32799 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755138AbdCPQOq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:46 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 12/14] md: raid10: don't use bio's vec table to manage resync pages
-Date: Fri, 17 Mar 2017 00:12:33 +0800
-Message-Id: <20170316161235.27110-13-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jinpu.wang@profitbricks.com>
+Return-Path: <jinpu.wang@profitbricks.com>
+From: Jack Wang <jinpu.wang@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: dledford@redhat.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	mail@fholler.de,
+	Milind.dumbare@gmail.com,
+	yun.wang@profitbricks.com,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Kleber Souza <kleber.souza@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH 25/28] ibnbd_srv: add sysfs interface
+Date: Fri, 24 Mar 2017 11:45:40 +0100
+Message-Id: <1490352343-20075-26-git-send-email-jinpu.wangl@profitbricks.com>
+In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Now we allocate one page array for managing resync pages, instead
-of using bio's vec table to do that, and the old way is very hacky
-and won't work any more if multipage bvec is enabled.
+From: Jack Wang <jinpu.wang@profitbricks.com>
 
-The introduced cost is that we need to allocate (128 + 16) * copies
-bytes per r10_bio, and it is fine because the inflight r10_bio for
-resync shouldn't be much, as pointed by Shaohua.
-
-Also bio_reset() in raid10_sync_request() and reshape_request()
-are removed because all bios are freshly new now in these functions
-and not necessary to reset any more.
-
-This patch can be thought as cleanup too.
-
-Suggested-by: Shaohua Li <shli@kernel.org>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
 ---
- drivers/md/raid10.c | 134 ++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 82 insertions(+), 52 deletions(-)
+ drivers/block/ibnbd_server/ibnbd_srv_sysfs.c | 317 +++++++++++++++++++++++++++
+ drivers/block/ibnbd_server/ibnbd_srv_sysfs.h |  64 ++++++
+ 2 files changed, 381 insertions(+)
+ create mode 100644 drivers/block/ibnbd_server/ibnbd_srv_sysfs.c
+ create mode 100644 drivers/block/ibnbd_server/ibnbd_srv_sysfs.h
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 98e53f39b66e..d2cb68971486 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -110,6 +110,24 @@ static void end_reshape(struct r10conf *conf);
- #define raid10_log(md, fmt, args...)				\
- 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid10 " fmt, ##args); } while (0)
- 
+diff --git a/drivers/block/ibnbd_server/ibnbd_srv_sysfs.c b/drivers/block/ibnbd_server/ibnbd_srv_sysfs.c
+new file mode 100644
+index 0000000..8774abe
+--- /dev/null
++++ b/drivers/block/ibnbd_server/ibnbd_srv_sysfs.c
+@@ -0,0 +1,317 @@
 +/*
-+ * 'strct resync_pages' stores actual pages used for doing the resync
-+ *  IO, and it is per-bio, so make .bi_private points to it.
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
 + */
-+static inline struct resync_pages *get_resync_pages(struct bio *bio)
++
++#include <uapi/linux/limits.h>
++#include <linux/kobject.h>
++#include <linux/sysfs.h>
++#include <linux/stat.h>
++#include <linux/genhd.h>
++#include <linux/list.h>
++
++#include "../ibnbd_inc/ibnbd.h"
++#include "ibnbd_srv.h"
++#include "ibnbd_srv_log.h"
++#include "ibnbd_srv_sysfs.h"
++
++static struct kobject *ibnbd_srv_kobj;
++static struct kobject *ibnbd_srv_devices_kobj;
++#define IBNBD_SYSFS_DIR "ibnbd"
++static char ibnbd_sysfs_dir[64] = IBNBD_SYSFS_DIR;
++
++static ssize_t ibnbd_srv_revalidate_dev_show(struct kobject *kobj,
++					     struct kobj_attribute *attr,
++					     char *page)
 +{
-+	return bio->bi_private;
++	return scnprintf(page, PAGE_SIZE,
++			 "Usage: echo 1 > %s\n", attr->attr.name);
 +}
 +
-+/*
-+ * for resync bio, r10bio pointer can be retrieved from the per-bio
-+ * 'struct resync_pages'.
-+ */
-+static inline struct r10bio *get_resync_r10bio(struct bio *bio)
++static ssize_t ibnbd_srv_revalidate_dev_store(struct kobject *kobj,
++					      struct kobj_attribute *attr,
++					      const char *buf, size_t count)
 +{
-+	return get_resync_pages(bio)->raid_bio;
++	int ret;
++	struct ibnbd_srv_dev *dev = container_of(kobj, struct ibnbd_srv_dev,
++						 dev_kobj);
++
++	if (!sysfs_streq(buf, "1")) {
++		ERR_NP("%s: invalid value: '%s'\n", attr->attr.name, buf);
++		return -EINVAL;
++	}
++	ret = ibnbd_srv_revalidate_dev(dev);
++	if (ret)
++		return ret;
++
++	return count;
 +}
 +
- static void * r10bio_pool_alloc(gfp_t gfp_flags, void *data)
- {
- 	struct r10conf *conf = data;
-@@ -140,11 +158,11 @@ static void r10bio_pool_free(void *r10_bio, void *data)
- static void * r10buf_pool_alloc(gfp_t gfp_flags, void *data)
- {
- 	struct r10conf *conf = data;
--	struct page *page;
- 	struct r10bio *r10_bio;
- 	struct bio *bio;
--	int i, j;
--	int nalloc;
-+	int j;
-+	int nalloc, nalloc_rp;
-+	struct resync_pages *rps;
- 
- 	r10_bio = r10bio_pool_alloc(gfp_flags, conf);
- 	if (!r10_bio)
-@@ -156,6 +174,15 @@ static void * r10buf_pool_alloc(gfp_t gfp_flags, void *data)
- 	else
- 		nalloc = 2; /* recovery */
- 
-+	/* allocate once for all bios */
-+	if (!conf->have_replacement)
-+		nalloc_rp = nalloc;
-+	else
-+		nalloc_rp = nalloc * 2;
-+	rps = kmalloc(sizeof(struct resync_pages) * nalloc_rp, gfp_flags);
-+	if (!rps)
-+		goto out_free_r10bio;
++static struct kobj_attribute ibnbd_srv_revalidate_dev_attr =
++					__ATTR(revalidate,
++					       0644,
++					       ibnbd_srv_revalidate_dev_show,
++					       ibnbd_srv_revalidate_dev_store);
 +
- 	/*
- 	 * Allocate bios.
- 	 */
-@@ -175,36 +202,40 @@ static void * r10buf_pool_alloc(gfp_t gfp_flags, void *data)
- 	 * Allocate RESYNC_PAGES data pages and attach them
- 	 * where needed.
- 	 */
--	for (j = 0 ; j < nalloc; j++) {
-+	for (j = 0; j < nalloc; j++) {
- 		struct bio *rbio = r10_bio->devs[j].repl_bio;
-+		struct resync_pages *rp, *rp_repl;
++static struct attribute *ibnbd_srv_default_dev_attrs[] = {
++	&ibnbd_srv_revalidate_dev_attr.attr,
++	NULL,
++};
 +
-+		rp = &rps[j];
-+		if (rbio)
-+			rp_repl = &rps[nalloc + j];
++static struct attribute_group ibnbd_srv_default_dev_attr_group = {
++	.attrs = ibnbd_srv_default_dev_attrs,
++};
 +
- 		bio = r10_bio->devs[j].bio;
--		for (i = 0; i < RESYNC_PAGES; i++) {
--			if (j > 0 && !test_bit(MD_RECOVERY_SYNC,
--					       &conf->mddev->recovery)) {
--				/* we can share bv_page's during recovery
--				 * and reshape */
--				struct bio *rbio = r10_bio->devs[0].bio;
--				page = rbio->bi_io_vec[i].bv_page;
--				get_page(page);
--			} else
--				page = alloc_page(gfp_flags);
--			if (unlikely(!page))
++static ssize_t ibnbd_srv_attr_show(struct kobject *kobj, struct attribute *attr,
++				   char *page)
++{
++	struct kobj_attribute *kattr;
++	int ret = -EIO;
 +
-+		if (!j || test_bit(MD_RECOVERY_SYNC,
-+				   &conf->mddev->recovery)) {
-+			if (resync_alloc_pages(rp, gfp_flags))
- 				goto out_free_pages;
-+		} else {
-+			memcpy(rp, &rps[0], sizeof(*rp));
-+			resync_get_all_pages(rp);
-+		}
- 
--			bio->bi_io_vec[i].bv_page = page;
--			if (rbio)
--				rbio->bi_io_vec[i].bv_page = page;
-+		rp->idx = 0;
-+		rp->raid_bio = r10_bio;
-+		bio->bi_private = rp;
-+		if (rbio) {
-+			memcpy(rp_repl, rp, sizeof(*rp));
-+			rbio->bi_private = rp_repl;
- 		}
- 	}
- 
- 	return r10_bio;
- 
- out_free_pages:
--	for ( ; i > 0 ; i--)
--		safe_put_page(bio->bi_io_vec[i-1].bv_page);
--	while (j--)
--		for (i = 0; i < RESYNC_PAGES ; i++)
--			safe_put_page(r10_bio->devs[j].bio->bi_io_vec[i].bv_page);
-+	while (--j >= 0)
-+		resync_free_pages(&rps[j * 2]);
++	kattr = container_of(attr, struct kobj_attribute, attr);
++	if (kattr->show)
++		ret = kattr->show(kobj, kattr, page);
++	return ret;
++}
 +
- 	j = 0;
- out_free_bio:
- 	for ( ; j < nalloc; j++) {
-@@ -213,30 +244,34 @@ static void * r10buf_pool_alloc(gfp_t gfp_flags, void *data)
- 		if (r10_bio->devs[j].repl_bio)
- 			bio_put(r10_bio->devs[j].repl_bio);
- 	}
-+	kfree(rps);
-+out_free_r10bio:
- 	r10bio_pool_free(r10_bio, conf);
- 	return NULL;
- }
- 
- static void r10buf_pool_free(void *__r10_bio, void *data)
- {
--	int i;
- 	struct r10conf *conf = data;
- 	struct r10bio *r10bio = __r10_bio;
- 	int j;
-+	struct resync_pages *rp = NULL;
- 
--	for (j=0; j < conf->copies; j++) {
-+	for (j = conf->copies; j--; ) {
- 		struct bio *bio = r10bio->devs[j].bio;
--		if (bio) {
--			for (i = 0; i < RESYNC_PAGES; i++) {
--				safe_put_page(bio->bi_io_vec[i].bv_page);
--				bio->bi_io_vec[i].bv_page = NULL;
--			}
--			bio_put(bio);
--		}
++static ssize_t ibnbd_srv_attr_store(struct kobject *kobj,
++				    struct attribute *attr,
++				    const char *page, size_t length)
++{
++	struct kobj_attribute *kattr;
++	int ret = -EIO;
 +
-+		rp = get_resync_pages(bio);
-+		resync_free_pages(rp);
-+		bio_put(bio);
++	kattr = container_of(attr, struct kobj_attribute, attr);
++	if (kattr->store)
++		ret = kattr->store(kobj, kattr, page, length);
++	return ret;
++}
 +
- 		bio = r10bio->devs[j].repl_bio;
- 		if (bio)
- 			bio_put(bio);
- 	}
++static const struct sysfs_ops ibnbd_srv_sysfs_ops = {
++	.show	= ibnbd_srv_attr_show,
++	.store	= ibnbd_srv_attr_store,
++};
 +
-+	/* resync pages array stored in the 1st bio's .bi_private */
-+	kfree(rp);
++static struct kobj_type ibnbd_srv_dev_ktype = {
++	.sysfs_ops	= &ibnbd_srv_sysfs_ops,
++};
 +
- 	r10bio_pool_free(r10bio, conf);
- }
- 
-@@ -1937,7 +1972,7 @@ static void __end_sync_read(struct r10bio *r10_bio, struct bio *bio, int d)
- 
- static void end_sync_read(struct bio *bio)
- {
--	struct r10bio *r10_bio = bio->bi_private;
-+	struct r10bio *r10_bio = get_resync_r10bio(bio);
- 	struct r10conf *conf = r10_bio->mddev->private;
- 	int d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
- 
-@@ -1946,6 +1981,7 @@ static void end_sync_read(struct bio *bio)
- 
- static void end_reshape_read(struct bio *bio)
- {
-+	/* reshape read bio isn't allocated from r10buf_pool */
- 	struct r10bio *r10_bio = bio->bi_private;
- 
- 	__end_sync_read(r10_bio, bio, r10_bio->read_slot);
-@@ -1980,7 +2016,7 @@ static void end_sync_request(struct r10bio *r10_bio)
- 
- static void end_sync_write(struct bio *bio)
- {
--	struct r10bio *r10_bio = bio->bi_private;
-+	struct r10bio *r10_bio = get_resync_r10bio(bio);
- 	struct mddev *mddev = r10_bio->mddev;
- 	struct r10conf *conf = mddev->private;
- 	int d;
-@@ -2060,6 +2096,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 	for (i=0 ; i < conf->copies ; i++) {
- 		int  j, d;
- 		struct md_rdev *rdev;
-+		struct resync_pages *rp;
- 
- 		tbio = r10_bio->devs[i].bio;
- 
-@@ -2101,11 +2138,13 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 		 * First we need to fixup bv_offset, bv_len and
- 		 * bi_vecs, as the read request might have corrupted these
- 		 */
-+		rp = get_resync_pages(tbio);
- 		bio_reset(tbio);
- 
- 		tbio->bi_vcnt = vcnt;
- 		tbio->bi_iter.bi_size = fbio->bi_iter.bi_size;
--		tbio->bi_private = r10_bio;
-+		rp->raid_bio = r10_bio;
-+		tbio->bi_private = rp;
- 		tbio->bi_iter.bi_sector = r10_bio->devs[i].addr;
- 		tbio->bi_end_io = end_sync_write;
- 		bio_set_op_attrs(tbio, REQ_OP_WRITE, 0);
-@@ -3173,10 +3212,8 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 					}
- 				}
- 				bio = r10_bio->devs[0].bio;
--				bio_reset(bio);
- 				bio->bi_next = biolist;
- 				biolist = bio;
--				bio->bi_private = r10_bio;
- 				bio->bi_end_io = end_sync_read;
- 				bio_set_op_attrs(bio, REQ_OP_READ, 0);
- 				if (test_bit(FailFast, &rdev->flags))
-@@ -3200,10 +3237,8 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 
- 				if (!test_bit(In_sync, &mrdev->flags)) {
- 					bio = r10_bio->devs[1].bio;
--					bio_reset(bio);
- 					bio->bi_next = biolist;
- 					biolist = bio;
--					bio->bi_private = r10_bio;
- 					bio->bi_end_io = end_sync_write;
- 					bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
- 					bio->bi_iter.bi_sector = to_addr
-@@ -3228,10 +3263,8 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 				if (mreplace == NULL || bio == NULL ||
- 				    test_bit(Faulty, &mreplace->flags))
- 					break;
--				bio_reset(bio);
- 				bio->bi_next = biolist;
- 				biolist = bio;
--				bio->bi_private = r10_bio;
- 				bio->bi_end_io = end_sync_write;
- 				bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
- 				bio->bi_iter.bi_sector = to_addr +
-@@ -3353,7 +3386,6 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 				r10_bio->devs[i].repl_bio->bi_end_io = NULL;
- 
- 			bio = r10_bio->devs[i].bio;
--			bio_reset(bio);
- 			bio->bi_error = -EIO;
- 			rcu_read_lock();
- 			rdev = rcu_dereference(conf->mirrors[d].rdev);
-@@ -3378,7 +3410,6 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			atomic_inc(&r10_bio->remaining);
- 			bio->bi_next = biolist;
- 			biolist = bio;
--			bio->bi_private = r10_bio;
- 			bio->bi_end_io = end_sync_read;
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
- 			if (test_bit(FailFast, &conf->mirrors[d].rdev->flags))
-@@ -3397,13 +3428,11 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 
- 			/* Need to set up for writing to the replacement */
- 			bio = r10_bio->devs[i].repl_bio;
--			bio_reset(bio);
- 			bio->bi_error = -EIO;
- 
- 			sector = r10_bio->devs[i].addr;
- 			bio->bi_next = biolist;
- 			biolist = bio;
--			bio->bi_private = r10_bio;
- 			bio->bi_end_io = end_sync_write;
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
- 			if (test_bit(FailFast, &conf->mirrors[d].rdev->flags))
-@@ -3442,7 +3471,8 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		if (len == 0)
- 			break;
- 		for (bio= biolist ; bio ; bio=bio->bi_next) {
--			page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
-+			struct resync_pages *rp = get_resync_pages(bio);
-+			page = resync_fetch_page(rp, rp->idx++);
- 			/*
- 			 * won't fail because the vec table is big enough
- 			 * to hold all these pages
-@@ -3451,7 +3481,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		}
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
--	} while (biolist->bi_vcnt < RESYNC_PAGES);
-+	} while (get_resync_pages(biolist)->idx < RESYNC_PAGES);
- 	r10_bio->sectors = nr_sectors;
- 
- 	while (biolist) {
-@@ -3459,7 +3489,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		biolist = biolist->bi_next;
- 
- 		bio->bi_next = NULL;
--		r10_bio = bio->bi_private;
-+		r10_bio = get_resync_r10bio(bio);
- 		r10_bio->sectors = nr_sectors;
- 
- 		if (bio->bi_end_io == end_sync_read) {
-@@ -4354,6 +4384,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 	struct bio *blist;
- 	struct bio *bio, *read_bio;
- 	int sectors_done = 0;
-+	struct page **pages;
- 
- 	if (sector_nr == 0) {
- 		/* If restarting in the middle, skip the initial sectors */
-@@ -4504,11 +4535,9 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 		if (!rdev2 || test_bit(Faulty, &rdev2->flags))
- 			continue;
- 
--		bio_reset(b);
- 		b->bi_bdev = rdev2->bdev;
- 		b->bi_iter.bi_sector = r10_bio->devs[s/2].addr +
- 			rdev2->new_data_offset;
--		b->bi_private = r10_bio;
- 		b->bi_end_io = end_reshape_write;
- 		bio_set_op_attrs(b, REQ_OP_WRITE, 0);
- 		b->bi_next = blist;
-@@ -4518,8 +4547,9 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 	/* Now add as many pages as possible to all of these bios. */
- 
- 	nr_sectors = 0;
-+	pages = get_resync_pages(r10_bio->devs[0].bio)->pages;
- 	for (s = 0 ; s < max_sectors; s += PAGE_SIZE >> 9) {
--		struct page *page = r10_bio->devs[0].bio->bi_io_vec[s/(PAGE_SIZE>>9)].bv_page;
-+		struct page *page = pages[s / (PAGE_SIZE >> 9)];
- 		int len = (max_sectors - s) << 9;
- 		if (len > PAGE_SIZE)
- 			len = PAGE_SIZE;
-@@ -4703,7 +4733,7 @@ static int handle_reshape_read_error(struct mddev *mddev,
- 
- static void end_reshape_write(struct bio *bio)
- {
--	struct r10bio *r10_bio = bio->bi_private;
-+	struct r10bio *r10_bio = get_resync_r10bio(bio);
- 	struct mddev *mddev = r10_bio->mddev;
- 	struct r10conf *conf = mddev->private;
- 	int d;
++static struct kobj_type ibnbd_srv_dev_clients_ktype = {
++	.sysfs_ops	= &ibnbd_srv_sysfs_ops,
++};
++
++int ibnbd_srv_create_dev_sysfs(struct ibnbd_srv_dev *dev,
++			       struct block_device *bdev,
++			       const char *dir_name)
++{
++	struct kobject *bdev_kobj;
++	int ret;
++
++	ret = kobject_init_and_add(&dev->dev_kobj, &ibnbd_srv_dev_ktype,
++				   ibnbd_srv_devices_kobj, dir_name);
++	if (ret)
++		return ret;
++
++	ret = kobject_init_and_add(&dev->dev_clients_kobj,
++				   &ibnbd_srv_dev_clients_ktype,
++				   &dev->dev_kobj, "clients");
++	if (ret)
++		goto err;
++
++	ret = sysfs_create_group(&dev->dev_kobj,
++				 &ibnbd_srv_default_dev_attr_group);
++	if (ret)
++		goto err2;
++
++	bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
++	ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
++	if (ret)
++		goto err3;
++
++	return 0;
++
++err3:
++	sysfs_remove_group(&dev->dev_kobj,
++			   &ibnbd_srv_default_dev_attr_group);
++err2:
++	kobject_del(&dev->dev_clients_kobj);
++	kobject_put(&dev->dev_clients_kobj);
++err:
++	kobject_del(&dev->dev_kobj);
++	kobject_put(&dev->dev_kobj);
++	return ret;
++}
++
++void ibnbd_srv_destroy_dev_sysfs(struct ibnbd_srv_dev *dev)
++{
++	sysfs_remove_link(&dev->dev_kobj, "block_dev");
++	sysfs_remove_group(&dev->dev_kobj, &ibnbd_srv_default_dev_attr_group);
++	kobject_del(&dev->dev_clients_kobj);
++	kobject_put(&dev->dev_clients_kobj);
++	kobject_del(&dev->dev_kobj);
++	kobject_put(&dev->dev_kobj);
++}
++
++static ssize_t ibnbd_srv_dev_client_ro_show(struct kobject *kobj,
++					    struct kobj_attribute *attr,
++					    char *page)
++{
++	struct ibnbd_srv_sess_dev *sess_dev;
++
++	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n",
++			 (sess_dev->open_flags & FMODE_WRITE) ? "0" : "1");
++}
++
++static struct kobj_attribute ibnbd_srv_dev_client_ro_attr =
++					__ATTR(read_only, 0444,
++					       ibnbd_srv_dev_client_ro_show,
++					       NULL);
++
++static ssize_t ibnbd_srv_dev_client_mapping_path_show(
++						struct kobject *kobj,
++						struct kobj_attribute *attr,
++						char *page)
++{
++	struct ibnbd_srv_sess_dev *sess_dev;
++
++	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n", sess_dev->pathname);
++}
++
++static struct kobj_attribute ibnbd_srv_dev_client_mapping_path_attr =
++				__ATTR(mapping_path, 0444,
++				       ibnbd_srv_dev_client_mapping_path_show,
++				       NULL);
++
++static struct attribute *ibnbd_srv_default_dev_clients_attrs[] = {
++	&ibnbd_srv_dev_client_ro_attr.attr,
++	&ibnbd_srv_dev_client_mapping_path_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibnbd_srv_default_dev_client_attr_group = {
++	.attrs = ibnbd_srv_default_dev_clients_attrs,
++};
++
++void ibnbd_srv_destroy_dev_client_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
++{
++	struct completion sysfs_compl;
++
++	sysfs_remove_group(&sess_dev->kobj,
++			   &ibnbd_srv_default_dev_client_attr_group);
++
++	init_completion(&sysfs_compl);
++	sess_dev->sysfs_release_compl = &sysfs_compl;
++	kobject_del(&sess_dev->kobj);
++	kobject_put(&sess_dev->kobj);
++	wait_for_completion(&sysfs_compl);
++}
++
++static void ibnbd_srv_sess_dev_release(struct kobject *kobj)
++{
++	struct ibnbd_srv_sess_dev *sess_dev;
++
++	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
++	if (sess_dev->sysfs_release_compl)
++		complete_all(sess_dev->sysfs_release_compl);
++}
++
++static struct kobj_type ibnbd_srv_sess_dev_ktype = {
++	.sysfs_ops	= &ibnbd_srv_sysfs_ops,
++	.release	= ibnbd_srv_sess_dev_release,
++};
++
++int ibnbd_srv_create_dev_client_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
++{
++	int ret;
++
++	ret = kobject_init_and_add(&sess_dev->kobj, &ibnbd_srv_sess_dev_ktype,
++				   &sess_dev->dev->dev_clients_kobj, "%s",
++				   sess_dev->sess->str_addr);
++	if (ret)
++		return ret;
++
++	ret = sysfs_create_group(&sess_dev->kobj,
++				 &ibnbd_srv_default_dev_client_attr_group);
++	if (ret)
++		goto err;
++
++	return 0;
++
++err:
++	kobject_del(&sess_dev->kobj);
++	kobject_put(&sess_dev->kobj);
++	return ret;
++}
++
++int ibnbd_srv_create_sysfs_files(void)
++{
++	int err;
++
++	ibnbd_srv_kobj = kobject_create_and_add(ibnbd_sysfs_dir, kernel_kobj);
++	if (!ibnbd_srv_kobj)
++		return -ENOMEM;
++
++	ibnbd_srv_devices_kobj = kobject_create_and_add("devices",
++							ibnbd_srv_kobj);
++	if (!ibnbd_srv_devices_kobj) {
++		err = -ENOMEM;
++		goto err;
++	}
++
++	return 0;
++
++err:
++	kobject_put(ibnbd_srv_kobj);
++	return err;
++}
++
++void ibnbd_srv_destroy_sysfs_files(void)
++{
++	kobject_put(ibnbd_srv_devices_kobj);
++	kobject_put(ibnbd_srv_kobj);
++}
+diff --git a/drivers/block/ibnbd_server/ibnbd_srv_sysfs.h b/drivers/block/ibnbd_server/ibnbd_srv_sysfs.h
+new file mode 100644
+index 0000000..1df232a
+--- /dev/null
++++ b/drivers/block/ibnbd_server/ibnbd_srv_sysfs.h
+@@ -0,0 +1,64 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#ifndef _IBNBD_SRV_SYFS_H
++#define _IBNBD_SRV_SYFS_H
++
++int ibnbd_srv_create_dev_sysfs(struct ibnbd_srv_dev *dev,
++			       struct block_device *bdev,
++			       const char *dir_name);
++
++void ibnbd_srv_destroy_dev_sysfs(struct ibnbd_srv_dev *dev);
++
++int ibnbd_srv_create_dev_client_sysfs(struct ibnbd_srv_sess_dev *sess_dev);
++
++void ibnbd_srv_destroy_dev_client_sysfs(struct ibnbd_srv_sess_dev *sess_dev);
++
++int ibnbd_srv_create_sysfs_files(void);
++
++void ibnbd_srv_destroy_sysfs_files(void);
++
++#endif
 -- 
-2.9.3
+2.7.4
