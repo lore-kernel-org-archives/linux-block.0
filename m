@@ -1,177 +1,218 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Date: Mon, 27 Mar 2017 10:17:03 +1100
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>, "open list\:SOFTWARE RAID \(Multiple Disks\) SUPPORT" <linux-raid@vger.kernel.org>, "open list\:DEVICE-MAPPER \(LVM\)" <dm-devel@redhat.com>, Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>, Shaohua Li <shli@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3] block: trace completion of all bios.
-In-Reply-To: <CACVXFVNC=-_f1jYo5bYw7X6TT8-g7UThw3zzzfrMaKVarnJvSQ@mail.gmail.com>
-References: <877f3iave6.fsf@notabene.neil.brown.name> <20170322125149.GA29606@infradead.org> <87shm4a4lt.fsf@notabene.neil.brown.name> <20170323104331.GA16903@ming.t460p> <87fui3a65o.fsf@notabene.neil.brown.name> <CACVXFVNC=-_f1jYo5bYw7X6TT8-g7UThw3zzzfrMaKVarnJvSQ@mail.gmail.com>
-Message-ID: <87inmv8w7k.fsf@notabene.neil.brown.name>
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <87fui3a65o.fsf@notabene.neil.brown.name>
+References: <877f3iave6.fsf@notabene.neil.brown.name> <20170322125149.GA29606@infradead.org>
+ <87shm4a4lt.fsf@notabene.neil.brown.name> <20170323104331.GA16903@ming.t460p> <87fui3a65o.fsf@notabene.neil.brown.name>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Fri, 24 Mar 2017 14:47:41 +0800
+Message-ID: <CACVXFVNC=-_f1jYo5bYw7X6TT8-g7UThw3zzzfrMaKVarnJvSQ@mail.gmail.com>
+Subject: Re: [PATCH v3] block: trace completion of all bios.
+To: NeilBrown <neilb@suse.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block <linux-block@vger.kernel.org>,
+	"open list:SOFTWARE RAID (Multiple Disks) SUPPORT" <linux-raid@vger.kernel.org>,
+	"open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>, Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+	Shaohua Li <shli@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Mar 24 2017, Ming Lei wrote:
-
-> On Fri, Mar 24, 2017 at 8:07 AM, NeilBrown <neilb@suse.com> wrote:
-...
->> @@ -102,6 +102,8 @@ struct bio {
->>  #define BIO_REFFED     8       /* bio has elevated ->bi_cnt */
->>  #define BIO_THROTTLED  9       /* This bio has already been subjected to
->>                                  * throttling rules. Don't do it again. =
-*/
->> +#define BIO_TRACE_COMPLETION 10        /* bio_endio() should trace the =
-final completion
->> +                                * of this bio. */
+On Fri, Mar 24, 2017 at 8:07 AM, NeilBrown <neilb@suse.com> wrote:
 >
-> This may not be a good idea, since the flag space is quite small(12).
+> Currently only dm and md/raid5 bios trigger
+> trace_block_bio_complete().  Now that we have bio_chain() and
+> bio_inc_remaining(), it is not possible, in general, for a driver to
+> know when the bio is really complete.  Only bio_endio() knows that.
+>
+> So move the trace_block_bio_complete() call to bio_endio().
+>
+> Now trace_block_bio_complete() pairs with trace_block_bio_queue().
+> Any bio for which a 'queue' event is traced, will subsequently
+> generate a 'complete' event.
+>
+> There are a few cases where completion tracing is not wanted.
+> 1/ If blk_update_request() has already generated a completion
+>    trace event at the 'request' level, there is no point generating
+>    one at the bio level too.  In this case the bi_sector and bi_size
+>    will have changed, so the bio level event would be wrong
+>
+> 2/ If the bio hasn't actually been queued yet, but is being aborted
+>    early, then a trace event could be confusing.  Some filesystems
+>    call bio_endio() but do not want tracing.
+>
+> 3/ The bio_integrity code interposes itself by replacing bi_end_io,
+>    then restoring it and calling bio_endio() again.  This would produce
+>    two identical trace events if left like that.
+>
+> To handle these, we introduce a flag BIO_TRACE_COMPLETION and only
+> produce the trace event when this is set.
+> We address point 1 above by clearing the flag in blk_update_request().
+> We address point 2 above by only setting the flag when
+> generic_make_request() is called.
+> We address point 3 above by clearing the flag after generating a
+> completion event.
+>
+> When bio_split() is used on a bio, particularly in blk_queue_split(),
+> there is an extra complication.  A new bio is split off the front, and
+> may be handle directly without going through generic_make_request().
+> The old bio, which has been advanced, is passed to
+> generic_make_request(), so it will trigger a trace event a second
+> time.
+> Probably the best result when a split happens is to see a single
+> 'queue' event for the whole bio, then multiple 'complete' events - one
+> for each component.  To achieve this was can:
+> - copy the BIO_TRACE_COMPLETION flag to the new bio in bio_split()
+> - avoid generating a 'queue' event if BIO_TRACE_COMPLETION is already set.
+> This way, the split-off bio won't create a queue event, the original
+> won't either even if it re-submitted to generic_make_request(),
+> but both will produce completion events, each for their own range.
+>
+> So if generic_make_request() is called (which generates a QUEUED
+> event), then bi_endio() will create a single COMPLETE event for each
+> range that the bio is split into, unless the driver has explicitly
+> requested it not to.
+>
+> Signed-off-by: NeilBrown <neilb@suse.com>
+> ---
+>  block/bio.c               | 13 +++++++++++++
+>  block/blk-core.c          | 10 +++++++++-
+>  drivers/md/dm.c           |  1 -
+>  drivers/md/raid5.c        |  8 --------
+>  include/linux/blk_types.h |  4 +++-
+>  5 files changed, 25 insertions(+), 11 deletions(-)
+>
+> diff --git a/block/bio.c b/block/bio.c
+> index 5eec5e08417f..c1272986133e 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1818,6 +1818,11 @@ static inline bool bio_remaining_done(struct bio *bio)
+>   *   bio_endio() will end I/O on the whole bio. bio_endio() is the preferred
+>   *   way to end I/O on a bio. No one should call bi_end_io() directly on a
+>   *   bio unless they own it and thus know that it has an end_io function.
+> + *
+> + *   bio_endio() can be called several times on a bio that has been chained
+> + *   using bio_chain().  The ->bi_end_io() function will only be call the
+> + *   last time.  At this point the BLK_TA_COMPLETE tracing event will be
+> + *   generated if BIO_TRACE_COMPLETION is set.
+>   **/
+>  void bio_endio(struct bio *bio)
+>  {
+> @@ -1838,6 +1843,11 @@ void bio_endio(struct bio *bio)
+>                 goto again;
+>         }
+>
+> +       if (bio->bi_bdev && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+> +               trace_block_bio_complete(bdev_get_queue(bio->bi_bdev),
+> +                                        bio, bio->bi_error);
+> +               bio_clear_flag(bio, BIO_TRACE_COMPLETION);
+> +       }
+>         if (bio->bi_end_io)
+>                 bio->bi_end_io(bio);
+>  }
+> @@ -1876,6 +1886,9 @@ struct bio *bio_split(struct bio *bio, int sectors,
+>
+>         bio_advance(bio, split->bi_iter.bi_size);
+>
+> +       if (bio_flagged(bio, BIO_TRACE_COMPLETION))
+> +               bio_set_flag(bio, BIO_TRACE_COMPLETION);
+> +
+>         return split;
+>  }
+>  EXPORT_SYMBOL(bio_split);
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 0eeb99ef654f..b34b5b1b1bbf 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1936,7 +1936,13 @@ generic_make_request_checks(struct bio *bio)
+>         if (!blkcg_bio_issue_check(q, bio))
+>                 return false;
+>
+> -       trace_block_bio_queue(q, bio);
+> +       if (!bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+> +               trace_block_bio_queue(q, bio);
+> +               /* Now that enqueuing has been traced, we need to trace
+> +                * completion as well.
+> +                */
+> +               bio_set_flag(bio, BIO_TRACE_COMPLETION);
+> +       }
+>         return true;
+>
+>  not_supported:
+> @@ -2595,6 +2601,8 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
+>                 if (bio_bytes == bio->bi_iter.bi_size)
+>                         req->bio = bio->bi_next;
+>
+> +               /* Completion has already been traced */
+> +               bio_clear_flag(bio, BIO_TRACE_COMPLETION);
+>                 req_bio_endio(req, bio, bio_bytes, error);
+>
+>                 total_bytes += bio_bytes;
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index f4ffd1eb8f44..f5f09ace690a 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -810,7 +810,6 @@ static void dec_pending(struct dm_io *io, int error)
+>                         queue_io(md, bio);
+>                 } else {
+>                         /* done with normal IO or empty flush */
+> -                       trace_block_bio_complete(md->queue, bio, io_error);
+>                         bio->bi_error = io_error;
+>                         bio_endio(bio);
+>                 }
+> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+> index 9a3b7da34137..f684cb566721 100644
+> --- a/drivers/md/raid5.c
+> +++ b/drivers/md/raid5.c
+> @@ -5141,8 +5141,6 @@ static void raid5_align_endio(struct bio *bi)
+>         rdev_dec_pending(rdev, conf->mddev);
+>
+>         if (!error) {
+> -               trace_block_bio_complete(bdev_get_queue(raid_bi->bi_bdev),
+> -                                        raid_bi, 0);
+>                 bio_endio(raid_bi);
+>                 if (atomic_dec_and_test(&conf->active_aligned_reads))
+>                         wake_up(&conf->wait_for_quiescent);
+> @@ -5727,10 +5725,6 @@ static void raid5_make_request(struct mddev *mddev, struct bio * bi)
+>                 md_write_end(mddev);
+>         remaining = raid5_dec_bi_active_stripes(bi);
+>         if (remaining == 0) {
+> -
+> -
+> -               trace_block_bio_complete(bdev_get_queue(bi->bi_bdev),
+> -                                        bi, 0);
+>                 bio_endio(bi);
+>         }
+>  }
+> @@ -6138,8 +6132,6 @@ static int  retry_aligned_read(struct r5conf *conf, struct bio *raid_bio)
+>         }
+>         remaining = raid5_dec_bi_active_stripes(raid_bio);
+>         if (remaining == 0) {
+> -               trace_block_bio_complete(bdev_get_queue(raid_bio->bi_bdev),
+> -                                        raid_bio, 0);
+>                 bio_endio(raid_bio);
+>         }
+>         if (atomic_dec_and_test(&conf->active_aligned_reads))
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index d703acb55d0f..db7a57ee0e58 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -29,7 +29,7 @@ struct bio {
+>                                                  * top bits REQ_OP. Use
+>                                                  * accessors.
+>                                                  */
+> -       unsigned short          bi_flags;       /* status, command, etc */
+> +       unsigned short          bi_flags;       /* status, etc */
+>         unsigned short          bi_ioprio;
+>
+>         struct bvec_iter        bi_iter;
+> @@ -102,6 +102,8 @@ struct bio {
+>  #define BIO_REFFED     8       /* bio has elevated ->bi_cnt */
+>  #define BIO_THROTTLED  9       /* This bio has already been subjected to
+>                                  * throttling rules. Don't do it again. */
+> +#define BIO_TRACE_COMPLETION 10        /* bio_endio() should trace the final completion
+> +                                * of this bio. */
 
-which means there are 2 unused bits and I only want to use 1.  It should
-fit.
-I'm a bit perplexed why 4 bits a reserved for the BVEC_POOL number which
-ranges from 0 to 7....
-
-But if these bits really are a scarce resource, we should stop wasting
-them.
-The patch below makes bit 7 (BIO_CHAIN) available.  We could probably make
-bit 8 (BIO_REFFED) available using a similar technique.
-BIO_QUIET is only relevant if bi_error is non-zero and bi_error has a
-limited range, so a bit in there could be used instead. In fact,
-MAX_ERRNO is 4096, so bi_error could be a 'short'.  That could save 2
-whole bytes ... or make 16 more flag bits available.
-
-So I don't think you concern about a shortage of spare flag bits is valid.
+This may not be a good idea, since the flag space is quite small(12).
 
 Thanks,
-NeilBrown
-
-diff --git a/block/bio.c b/block/bio.c
-index c1272986133e..1703786a206a 100644
-=2D-- a/block/bio.c
-+++ b/block/bio.c
-@@ -274,7 +274,7 @@ void bio_init(struct bio *bio, struct bio_vec *table,
- 	      unsigned short max_vecs)
- {
- 	memset(bio, 0, sizeof(*bio));
-=2D	atomic_set(&bio->__bi_remaining, 1);
-+	atomic_set(&bio->__bi_remaining, 0);
- 	atomic_set(&bio->__bi_cnt, 1);
-=20
- 	bio->bi_io_vec =3D table;
-@@ -300,7 +300,7 @@ void bio_reset(struct bio *bio)
-=20
- 	memset(bio, 0, BIO_RESET_BYTES);
- 	bio->bi_flags =3D flags;
-=2D	atomic_set(&bio->__bi_remaining, 1);
-+	atomic_set(&bio->__bi_remaining, 0);
- }
- EXPORT_SYMBOL(bio_reset);
-=20
-@@ -1794,20 +1794,15 @@ EXPORT_SYMBOL(bio_flush_dcache_pages);
- static inline bool bio_remaining_done(struct bio *bio)
- {
- 	/*
-=2D	 * If we're not chaining, then ->__bi_remaining is always 1 and
-+	 * If we're not chaining, then ->__bi_remaining is always 0 and
- 	 * we always end io on the first invocation.
- 	 */
-=2D	if (!bio_flagged(bio, BIO_CHAIN))
-+	if (atomic_read(&bio->__bi_remaining) =3D=3D 0)
- 		return true;
-=20
- 	BUG_ON(atomic_read(&bio->__bi_remaining) <=3D 0);
-=20
-=2D	if (atomic_dec_and_test(&bio->__bi_remaining)) {
-=2D		bio_clear_flag(bio, BIO_CHAIN);
-=2D		return true;
-=2D	}
-=2D
-=2D	return false;
-+	return atomic_dec_and_test(&bio->__bi_remaining);
- }
-=20
- /**
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8e521194f6fc..d15245544111 100644
-=2D-- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -664,13 +664,19 @@ static inline struct bio *bio_list_get(struct bio_lis=
-t *bl)
- }
-=20
- /*
-=2D * Increment chain count for the bio. Make sure the CHAIN flag update
-=2D * is visible before the raised count.
-+ * Increment chain count for the bio.
-  */
- static inline void bio_inc_remaining(struct bio *bio)
- {
-=2D	bio_set_flag(bio, BIO_CHAIN);
-=2D	smp_mb__before_atomic();
-+	/*
-+	 * Calls to bio_inc_remaining() cannot race
-+	 * with the final call to bio_end_io(), and
-+	 * the first call cannot race with other calls,
-+	 * so if __bi_remaining appears to be zero, there
-+	 * can be no race which might change it.
-+	 */
-+	if (atomic_read(&bio->__bi_remaining) =3D=3D 0)
-+		atomic_set(&bio->__bi_remaining, 1);
- 	atomic_inc(&bio->__bi_remaining);
- }
-=20
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index db7a57ee0e58..2deea4501d14 100644
-=2D-- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -46,6 +46,15 @@ struct bio {
- 	unsigned int		bi_seg_front_size;
- 	unsigned int		bi_seg_back_size;
-=20
-+	/* __bi_remaining records the number of completion events
-+	 * (i.e. calls to bi_end_io()) that need to happen before this
-+	 * bio is truly complete.
-+	 * A value of '0' means that there will only ever be one completion
-+	 * event, so there will be no racing and no need for an atomic operation
-+	 * to detect the last event.
-+	 * Any other value represents a simple count subject to atomic_inc() and
-+	 * atomic_dec_and_test().
-+	 */
- 	atomic_t		__bi_remaining;
-=20
- 	bio_end_io_t		*bi_end_io;
-@@ -98,7 +107,7 @@ struct bio {
- #define BIO_USER_MAPPED 4	/* contains user pages */
- #define BIO_NULL_MAPPED 5	/* contains invalid user pages */
- #define BIO_QUIET	6	/* Make BIO Quiet */
-=2D#define BIO_CHAIN	7	/* chained bio, ->bi_remaining in effect */
-+/* 7 unused */
- #define BIO_REFFED	8	/* bio has elevated ->bi_cnt */
- #define BIO_THROTTLED	9	/* This bio has already been subjected to
- 				 * throttling rules. Don't do it again. */
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAljYS/AACgkQOeye3VZi
-gbnMBA//UYL0lw/q6Ie/nnOe5ROKIYdSsSdhbPrVX0EvoSlhwI0V8Mv8QceyMAv9
-jgpqgHYez5o/IuUyDuRrOooeeFdz3Abf39tRPLBQ8gHNVtdihnctWG/ZtJj6rzVD
-FtWYIE+dE00qr4FdNemG4OfkHc6xnkNnYmXHpMW64bAzMOMs7P92BqtqSwv7+JBz
-jDjbAUzdxOhE7d5f4yRN1MoKovI+euQA+s5nth18H3CTPoh/wLa3Yze7e8wt2eDo
-0bD9Ap5MQDJmbhwsYHfaKBsDe41Z2okAwFASIu75z9ZyJpxYsNoSw6m58fIZsM/p
-UOPUKaTCbrmPzn2mwu66O/5T9ihPmP+cCQmWi0wDuHZtDTs1cBRjAZQ5vOKC19H7
-xZHGx5aYeyKPtcT8Mhvl0J8GMueuQSWD2MckzANvY7WasDoKalAnrFidiMjoWsKO
-G0uJFdU+Ba+3nSmKtEHtFAGFXZ2V/6i+ZgQn3D4sJgucm3ANfW6cBoACw1UeMCMn
-7P7FpnikIi6ewdGCZHj5HiRadFLPZx7grGbSgjQ+76yAl5qulE4tCz8pBoNLL6Ry
-jSIuNyJBJBp0eN/8r8L8e3qk1f5/H8z8atFwl3Tqhb9bMmzXn/hsPk1f8E60Wz/V
-igajc5Kd0s15o+/1FudyOMYxzzT2T1mtU2D7zqk4wXH8Pk+bJAE=
-=IOXf
------END PGP SIGNATURE-----
---=-=-=--
+Ming
