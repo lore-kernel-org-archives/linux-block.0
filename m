@@ -1,41 +1,61 @@
-Return-Path: <swise@opengridcomputing.com>
-From: "Steve Wise" <swise@opengridcomputing.com>
-To: "'Jack Wang'" <jinpu.wang@profitbricks.com>,
-	<linux-block@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>
-Cc: <dledford@redhat.com>,
-	<axboe@kernel.dk>,
-	<hch@lst.de>,
-	<mail@fholler.de>,
-	<Milind.dumbare@gmail.com>,
-	<yun.wang@profitbricks.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "jthumshirn@suse.de" <jthumshirn@suse.de>, "jinpu.wang@profitbricks.com"
+	<jinpu.wang@profitbricks.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "mail@fholler.de"
+	<mail@fholler.de>, "yun.wang@profitbricks.com" <yun.wang@profitbricks.com>,
+	"hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"Milind.dumbare@gmail.com" <Milind.dumbare@gmail.com>, "dledford@redhat.com"
+	<dledford@redhat.com>
+Subject: Re: [RFC PATCH 00/28] INFINIBAND NETWORK BLOCK DEVICE (IBNBD)
+Date: Fri, 24 Mar 2017 13:31:27 +0000
+Message-ID: <1490362271.2516.4.camel@sandisk.com>
 References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-Subject: RE: [RFC PATCH 00/28] INFINIBAND NETWORK BLOCK DEVICE (IBNBD)
-Date: Fri, 24 Mar 2017 09:20:00 -0500
-Message-ID: <03bc01d2a4a9$b8b69f10$2a23dd30$@opengridcomputing.com>
+	 <20170324121526.GF3571@linux-x5ow.site>
+	 <CAMGffE=CitFGj11NhFKPL2MNiOVVyb-ggRe-MhewcobGY0-u5A@mail.gmail.com>
+In-Reply-To: <CAMGffE=CitFGj11NhFKPL2MNiOVVyb-ggRe-MhewcobGY0-u5A@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-> 
-> From: Jack Wang <jinpu.wang@profitbricks.com>
-> 
-> This series introduces IBNBD/IBTRS kernel modules.
-> 
-> IBNBD (InfiniBand network block device) allows for an RDMA transfer of block
-IO
-> over InfiniBand network. The driver presents itself as a block device on
-client
-> side and transmits the block requests in a zero-copy fashion to the
-server-side
-> via InfiniBand. The server part of the driver converts the incoming buffers
-back
-> into BIOs and hands them down to the underlying block device. As soon as IO
-> responses come back from the drive, they are being transmitted back to the
-> client.
+On Fri, 2017-03-24 at 13:46 +0100, Jinpu Wang wrote:
+> Our IBNBD project was started 3 years ago based on our need for Cloud
+> Computing, NVMeOF is a bit younger.
+> - IBNBD is one of our components, part of our software defined storage so=
+lution.
+> - As I listed in features, IBNBD has it's own features
+>=20
+> We're planning to look more into NVMeOF, but it's not a replacement for I=
+BNBD.
 
-Hey Jack, why is this IB specific?  Can it work over iWARP transports as well?
+Hello Jack, Danil and Roman,
 
-Steve.
+Thanks for having taken the time to open source this work and to travel to
+Boston to present this work at the Vault conference. However, my
+understanding of IBNBD is that this driver has several shortcomings neither
+NVMeOF nor iSER nor SRP have:
+* Doesn't scale in terms of number of CPUs submitting I/O. The graphs shown
+  during the Vault talk clearly illustrate this. This is probably the resul=
+t
+  of sharing a data structure across all client CPUs, maybe the bitmap that
+  tracks which parts of the target buffer space are in use.
+* Supports IB but none of the other RDMA transports (RoCE / iWARP).
+
+We also need performance numbers that compare IBNBD against SRP and/or
+NVMeOF with memory registration disabled to see whether and how much faster
+IBNBD is compared to these two protocols.
+
+The fact that IBNBD only needs to messages per I/O is an advantage it has
+today over SRP but not over NVMeOF nor over iSER. The upstream initiator
+drivers for the latter two protocols already support inline data.
+
+Another question I have is whether integration with multipathd is supported=
+?
+If multipathd tries to run scsi_id against an IBNBD client device that will
+fail.
+
+Thanks,
+
+Bart.=
