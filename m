@@ -1,35 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:39153 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751640AbdC0JP5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2017 05:15:57 -0400
-Date: Mon, 27 Mar 2017 02:15:53 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Shaohua Li <shli@kernel.org>
-Cc: NeilBrown <neilb@suse.com>, Ming Lei <tom.leiming@gmail.com>,
-        Jens Axboe <axboe@fb.com>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Received: from mail.kernel.org ([198.145.29.136]:35856 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S936445AbdCXQxv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Mar 2017 12:53:51 -0400
+Date: Fri, 24 Mar 2017 09:53:25 -0700
+From: Shaohua Li <shli@kernel.org>
+To: NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
 Subject: Re: [PATCH v3 02/14] md: move two macros into md.h
-Message-ID: <20170327091553.GF6879@infradead.org>
+Message-ID: <20170324165325.nek4kb4yezz2xmow@kernel.org>
 References: <20170316161235.27110-1-tom.leiming@gmail.com>
  <20170316161235.27110-3-tom.leiming@gmail.com>
  <87tw6j8be6.fsf@notabene.neil.brown.name>
- <20170324165325.nek4kb4yezz2xmow@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170324165325.nek4kb4yezz2xmow@kernel.org>
+In-Reply-To: <87tw6j8be6.fsf@notabene.neil.brown.name>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Mar 24, 2017 at 09:53:25AM -0700, Shaohua Li wrote:
+On Fri, Mar 24, 2017 at 04:57:37PM +1100, Neil Brown wrote:
+> On Fri, Mar 17 2017, Ming Lei wrote:
 > 
-> I had the same concern when I looked at this patch firstly. The number for
-> raid1/10 doesn't need to be the same. But if we don't move the number to a
-> generic header, the third patch will become a little more complicated. I
-> eventually ignored this issue. If we really need different number for raid1/10,
-> lets do it at that time.
+> > Both raid1 and raid10 share common resync
+> > block size and page count, so move them into md.h.
+> 
+> I don't think this is necessary.
+> These are just "magic" numbers.  They don't have any real
+> meaning and so don't belong in md.h, or and .h file.
+> 
+> Possibly we should find more meaningful numbers, or make them auto-size
+> or something.  I'm also happy for them to stay as they are for now.
+> But I don't think we should pretend that they are meaningful.
 
-Which brings up my usual queastion:  Is is really that benefitical for
-us to keep the raid1.c code around instead of making it a special short
-cut case in raid10.c?
+I had the same concern when I looked at this patch firstly. The number for
+raid1/10 doesn't need to be the same. But if we don't move the number to a
+generic header, the third patch will become a little more complicated. I
+eventually ignored this issue. If we really need different number for raid1/10,
+lets do it at that time.
+
+I think your suggestion that moving the number to raid1-10.h makes sense, and
+add a comment declaring the number isn't required to be the same for raid1/10.
+
+Thanks,
+Shaohua
