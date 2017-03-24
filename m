@@ -1,83 +1,108 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.11-rc2
-Message-ID: <2faede4d-81ff-9f64-399b-51b328e2425b@kernel.dk>
-Date: Thu, 9 Mar 2017 09:02:24 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <jinpu.wang@profitbricks.com>
+Return-Path: <jinpu.wang@profitbricks.com>
+From: Jack Wang <jinpu.wang@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: dledford@redhat.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	mail@fholler.de,
+	Milind.dumbare@gmail.com,
+	yun.wang@profitbricks.com,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Kleber Souza <kleber.souza@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>
+Subject: [PATCH 24/28] ibnbd_srv: add log helpers
+Date: Fri, 24 Mar 2017 11:45:39 +0100
+Message-Id: <1490352343-20075-25-git-send-email-jinpu.wangl@profitbricks.com>
+In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+From: Jack Wang <jinpu.wang@profitbricks.com>
 
-Sending this a bit sooner than I otherwise would have, as a fix in the
-merge window had some unfortunate issues and side effects for some
-folks.
+Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+---
+ drivers/block/ibnbd_server/ibnbd_srv_log.h | 69 ++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
+ create mode 100644 drivers/block/ibnbd_server/ibnbd_srv_log.h
 
-This pull request contains:
-
-- Fixes from Jan for the bdi registration/unregistration. These have
-  been tested by the various parties reporting issues, and should be
-  solid at this point.
-
-- Also from Jan, fix for axonram gendisk registration.
-
-- A stable fix for zram from Johannes.
-
-- A small series from Ming, fixing up some long standing issues with
-  blk-mq hardware queue kobject initialization and registration.
-
-- A fix for sed opal from Jon, fixing a nonsensical range check and some
-  set-but-not-used variables.
-
-- A fix from Neil for a long standing deadlock issue for stacking device
-  drivers. With this in place, dm/md don't have to work around the issue
-  anymore, and can be properly fixed up.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Jan Kara (5):
-      block: Allow bdi re-registration
-      bdi: Fix use-after-free in wb_congested_put()
-      block: Make del_gendisk() safer for disks without queues
-      Revert "scsi, block: fix duplicate bdi name registration crashes"
-      axonram: Fix gendisk handling
-
-Johannes Thumshirn (1):
-      zram: set physical queue limits to avoid array out of bounds accesses
-
-Jon Derrick (1):
-      block/sed: Fix opal user range check and unused variables
-
-Ming Lei (4):
-      blk-mq: initialize mq kobjects in blk_mq_init_allocated_queue()
-      blk-mq: make lifetime consitent between q/ctx and its kobject
-      blk-mq: make lifetime consistent between hctx and its kobject
-      blk-mq: free hctx->cpumask in release handler of hctx's kobject
-
-NeilBrown (1):
-      blk: improve order of bio handling in generic_make_request()
-
- arch/powerpc/sysdev/axonram.c |  5 ++++-
- block/blk-core.c              | 27 +++++++++++++++++++++------
- block/blk-mq-sysfs.c          | 40 +++++++++++++++++++++++++---------------
- block/blk-mq.c                | 28 ++++++++++------------------
- block/blk-mq.h                |  2 ++
- block/genhd.c                 | 37 ++++++++++---------------------------
- block/sed-opal.c              | 10 ++--------
- drivers/block/zram/zram_drv.c |  2 ++
- drivers/scsi/sd.c             | 41 ++++++++---------------------------------
- include/linux/blkdev.h        |  1 -
- include/linux/genhd.h         |  8 --------
- mm/backing-dev.c              | 43 ++++++++++++++++++++++++++++---------------
- 12 files changed, 112 insertions(+), 132 deletions(-)
-
+diff --git a/drivers/block/ibnbd_server/ibnbd_srv_log.h b/drivers/block/ibnbd_server/ibnbd_srv_log.h
+new file mode 100644
+index 0000000..9217804
+--- /dev/null
++++ b/drivers/block/ibnbd_server/ibnbd_srv_log.h
+@@ -0,0 +1,69 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#ifndef __IBNBD_SRV_LOG_H__
++#define __IBNBD_SRV_LOG_H__
++
++#include "../ibnbd_inc/log.h"
++
++#define ERR(dev, fmt, ...) pr_err("ibnbd L%d <%s@%s> ERR: " fmt, \
++				__LINE__, dev->pathname, ibnbd_prefix(dev),\
++				##__VA_ARGS__)
++#define ERR_RL(dev, fmt, ...) pr_err_ratelimited("ibnbd L%d <%s@%s> ERR: " fmt,\
++				__LINE__, dev->pathname, ibnbd_prefix(dev),\
++				##__VA_ARGS__)
++#define WRN(dev, fmt, ...) pr_warn("ibnbd L%d <%s@%s> WARN: " fmt,\
++				__LINE__, dev->pathname, ibnbd_prefix(dev),\
++				##__VA_ARGS__)
++#define WRN_RL(dev, fmt, ...) pr_warn_ratelimited("ibnbd L%d <%s@%s> WARN: " \
++			fmt, __LINE__, dev->pathname, ibnbd_prefix(dev),\
++			##__VA_ARGS__)
++#define INFO(dev, fmt, ...) pr_info("ibnbd <%s@%s>: " \
++			fmt, dev->pathname, ibnbd_prefix(dev), ##__VA_ARGS__)
++#define INFO_RL(dev, fmt, ...) pr_info_ratelimited("ibnbd <%s@%s>: " \
++			fmt, dev->pathname, ibnbd_prefix(dev), ##__VA_ARGS__)
++
++#endif /*__IBNBD_SRV_LOG_H__*/
 -- 
-Jens Axboe
+2.7.4
