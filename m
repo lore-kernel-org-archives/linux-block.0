@@ -1,61 +1,42 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "jthumshirn@suse.de" <jthumshirn@suse.de>, "jinpu.wang@profitbricks.com"
-	<jinpu.wang@profitbricks.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "mail@fholler.de"
-	<mail@fholler.de>, "yun.wang@profitbricks.com" <yun.wang@profitbricks.com>,
-	"hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"Milind.dumbare@gmail.com" <Milind.dumbare@gmail.com>, "dledford@redhat.com"
-	<dledford@redhat.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Fri, 24 Mar 2017 13:48:39 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Jinpu Wang <jinpu.wang@profitbricks.com>
+Cc: linux-block@vger.kernel.org,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Doug Ledford <dledford@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	hch <hch@lst.de>, Fabian Holler <mail@fholler.de>,
+	Milind Dumbare <Milind.dumbare@gmail.com>,
+	Michael Wang <yun.wang@profitbricks.com>
 Subject: Re: [RFC PATCH 00/28] INFINIBAND NETWORK BLOCK DEVICE (IBNBD)
-Date: Fri, 24 Mar 2017 13:31:27 +0000
-Message-ID: <1490362271.2516.4.camel@sandisk.com>
+Message-ID: <20170324124839.GH3571@linux-x5ow.site>
 References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-	 <20170324121526.GF3571@linux-x5ow.site>
-	 <CAMGffE=CitFGj11NhFKPL2MNiOVVyb-ggRe-MhewcobGY0-u5A@mail.gmail.com>
-In-Reply-To: <CAMGffE=CitFGj11NhFKPL2MNiOVVyb-ggRe-MhewcobGY0-u5A@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170324121526.GF3571@linux-x5ow.site>
+ <CAMGffE=CitFGj11NhFKPL2MNiOVVyb-ggRe-MhewcobGY0-u5A@mail.gmail.com>
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAMGffE=CitFGj11NhFKPL2MNiOVVyb-ggRe-MhewcobGY0-u5A@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2017-03-24 at 13:46 +0100, Jinpu Wang wrote:
+On Fri, Mar 24, 2017 at 01:46:02PM +0100, Jinpu Wang wrote:
+> Hi Johnnes,
+> 
 > Our IBNBD project was started 3 years ago based on our need for Cloud
 > Computing, NVMeOF is a bit younger.
-> - IBNBD is one of our components, part of our software defined storage so=
-lution.
+> - IBNBD is one of our components, part of our software defined storage solution.
 > - As I listed in features, IBNBD has it's own features
->=20
-> We're planning to look more into NVMeOF, but it's not a replacement for I=
-BNBD.
+> 
+> We're planning to look more into NVMeOF, but it's not a replacement for IBNBD.
 
-Hello Jack, Danil and Roman,
+Ok thanks for the clarification.
 
-Thanks for having taken the time to open source this work and to travel to
-Boston to present this work at the Vault conference. However, my
-understanding of IBNBD is that this driver has several shortcomings neither
-NVMeOF nor iSER nor SRP have:
-* Doesn't scale in terms of number of CPUs submitting I/O. The graphs shown
-  during the Vault talk clearly illustrate this. This is probably the resul=
-t
-  of sharing a data structure across all client CPUs, maybe the bitmap that
-  tracks which parts of the target buffer space are in use.
-* Supports IB but none of the other RDMA transports (RoCE / iWARP).
+Byte,
+	Johannes
 
-We also need performance numbers that compare IBNBD against SRP and/or
-NVMeOF with memory registration disabled to see whether and how much faster
-IBNBD is compared to these two protocols.
-
-The fact that IBNBD only needs to messages per I/O is an advantage it has
-today over SRP but not over NVMeOF nor over iSER. The upstream initiator
-drivers for the latter two protocols already support inline data.
-
-Another question I have is whether integration with multipathd is supported=
-?
-If multipathd tries to run scsi_id against an IBNBD client device that will
-fail.
-
-Thanks,
-
-Bart.=
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
