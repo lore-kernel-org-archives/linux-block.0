@@ -1,61 +1,129 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
+Return-Path: <jinpu.wang@profitbricks.com>
+Return-Path: <jinpu.wang@profitbricks.com>
+From: Jack Wang <jinpu.wang@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: dledford@redhat.com,
 	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org
-Subject: [PATCH 0/8 v3] No wait AIO
-Date: Wed, 15 Mar 2017 16:50:59 -0500
-Message-Id: <20170315215107.5628-1-rgoldwyn@suse.de>
+	hch@lst.de,
+	mail@fholler.de,
+	Milind.dumbare@gmail.com,
+	yun.wang@profitbricks.com,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Kleber Souza <kleber.souza@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH 02/28] ibtrs: add header for log MICROs shared between ibtrs_client and ibtrs_server
+Date: Fri, 24 Mar 2017 11:45:17 +0100
+Message-Id: <1490352343-20075-3-git-send-email-jinpu.wangl@profitbricks.com>
+In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Formerly known as non-blocking AIO.
+From: Jack Wang <jinpu.wang@profitbricks.com>
 
-This series adds nonblocking feature to asynchronous I/O writes.
-io_submit() can be delayed because of a number of reason:
- - Block allocation for files
- - Data writebacks for direct I/O
- - Sleeping because of waiting to acquire i_rwsem
- - Congested block device
+Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+---
+ include/rdma/ibtrs_log.h | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
+ create mode 100644 include/rdma/ibtrs_log.h
 
-The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
-any of these conditions are met. This way userspace can push most
-of the write()s to the kernel to the best of its ability to complete
-and if it returns -EAGAIN, can defer it to another thread.
-
-In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
-uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
-IOCB_NOWAIT for struct iocb, BIO_NOWAIT for bio and IOMAP_NOWAIT for
-iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
-not use aio_flags because it is not currently checked for invalidity
-in the kernel.
-
-This feature is provided for direct I/O of asynchronous I/O only. I have
-tested it against xfs, ext4, and btrfs.
-
-Changes since v1:
- + changed name from _NONBLOCKING to *_NOWAIT
- + filemap_range_has_page call moved to closer to (just before) calling filemap_write_and_wait_range().
- + BIO_NOWAIT limited to get_request()
- + XFS fixes 
-	- included reflink 
-	- use of xfs_ilock_nowait() instead of a XFS_IOLOCK_NONBLOCKING flag
-	- Translate the flag through IOMAP_NOWAIT (iomap) to check for
-	  block allocation for the file.
- + ext4 coding style
-
-Changes since v2:
- + Using aio_reserved1 as aio_rw_flags instead of aio_flags
- + blk-mq support
- + xfs uptodate with kernel and reflink changes
-
+diff --git a/include/rdma/ibtrs_log.h b/include/rdma/ibtrs_log.h
+new file mode 100644
+index 0000000..28ff5b4
+--- /dev/null
++++ b/include/rdma/ibtrs_log.h
+@@ -0,0 +1,88 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#ifndef __IBTRS_LOG_H__
++#define __IBTRS_LOG_H__
++#include "ibtrs.h"
++
++#define DEB(fmt, ...) pr_debug("ibtrs L%d " fmt, __LINE__, ##__VA_ARGS__)
++#define DEB_RL(fmt, ...) pr_debug_ratelimited("ibtrs L%d " fmt, \
++					      __LINE__, ##__VA_ARGS__)
++static inline void ibtrs_deb_msg_hdr(const char *prep,
++				     const struct ibtrs_msg_hdr *hdr)
++{
++	DEB("%sibtrs msg hdr:\n"
++	    "\ttype: %d\n"
++	    "\ttsize: %d\n", prep, hdr->type, hdr->tsize);
++}
++
++#define ERR_NP(fmt, ...) pr_err("ibtrs L%d ERR: " fmt, \
++				__LINE__, ##__VA_ARGS__)
++
++#define WRN_NP(fmt, ...) pr_warn("ibtrs L%d WARN: " fmt, \
++				__LINE__, ##__VA_ARGS__)
++#define INFO_NP(fmt, ...)  pr_info("ibtrs: " fmt, ##__VA_ARGS__)
++
++#define INFO_NP_RL(fmt, ...) pr_info_ratelimited("ibtrs: " fmt, ##__VA_ARGS__)
++
++#define ibtrs_prefix(sess) ((sess->hostname[0] != '\0') ? sess->hostname : \
++							  sess->addr)
++
++#define ERR(sess, fmt, ...) pr_err("ibtrs L%d <%s> ERR: " fmt, \
++				__LINE__, ibtrs_prefix(sess), ##__VA_ARGS__)
++#define ERR_RL(sess, fmt, ...) pr_err_ratelimited("ibtrs L%d <%s> ERR: " fmt, \
++				__LINE__, ibtrs_prefix(sess), ##__VA_ARGS__)
++
++#define WRN(sess, fmt, ...) pr_warn("ibtrs L%d <%s> WARN: " fmt, \
++				__LINE__, ibtrs_prefix(sess), ##__VA_ARGS__)
++#define WRN_RL(sess, fmt, ...) pr_warn_ratelimited("ibtrs L%d <%s> WARN: " \
++			fmt, __LINE__, ibtrs_prefix(sess), ##__VA_ARGS__)
++
++#define INFO(sess, fmt, ...) pr_info("ibtrs <%s>: " fmt, \
++				    ibtrs_prefix(sess), ##__VA_ARGS__)
++#define INFO_RL(sess, fmt, ...) pr_info_ratelimited("ibtrs <%s>: " fmt, \
++					ibtrs_prefix(sess), ##__VA_ARGS__)
++#endif /*__IBTRS_LOG_H__*/
 -- 
-Goldwyn
+2.7.4
