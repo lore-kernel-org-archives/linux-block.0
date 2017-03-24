@@ -1,77 +1,401 @@
-Return-Path: <BATV+90a41d470eb0ea9eda9a+4959+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@sandisk.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 4/5] blk-mq: split the plug and sync cases in blk_mq_make_request
-Date: Wed, 22 Mar 2017 15:01:52 -0400
-Message-Id: <20170322190153.12217-5-hch@lst.de>
-In-Reply-To: <20170322190153.12217-1-hch@lst.de>
-References: <20170322190153.12217-1-hch@lst.de>
+Return-Path: <jinpu.wang@profitbricks.com>
+Return-Path: <jinpu.wang@profitbricks.com>
+From: Jack Wang <jinpu.wang@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: dledford@redhat.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	mail@fholler.de,
+	Milind.dumbare@gmail.com,
+	yun.wang@profitbricks.com,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Kleber Souza <kleber.souza@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH 15/28] ibnbd: add shared library functions
+Date: Fri, 24 Mar 2017 11:45:30 +0100
+Message-Id: <1490352343-20075-16-git-send-email-jinpu.wangl@profitbricks.com>
+In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that we have a nice direct issue heper this helps simplifying
-the code a bit, and also gets rid of the old_rq variable.
+From: Jack Wang <jinpu.wang@profitbricks.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
 ---
- block/blk-mq.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+ drivers/block/ibnbd_lib/ibnbd-proto.c | 244 ++++++++++++++++++++++++++++++++++
+ drivers/block/ibnbd_lib/ibnbd.c       | 108 +++++++++++++++
+ 2 files changed, 352 insertions(+)
+ create mode 100644 drivers/block/ibnbd_lib/ibnbd-proto.c
+ create mode 100644 drivers/block/ibnbd_lib/ibnbd.c
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e82e1a9c7d5e..a9d2e02a8e02 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1569,32 +1569,32 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 		list_add_tail(&rq->queuelist, &plug->mq_list);
- 		goto done;
--	} else if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
--		struct request *old_rq = NULL;
--
-+	} else if (plug && !blk_queue_nomerges(q)) {
- 		blk_mq_bio_to_request(rq, bio);
- 
- 		/*
- 		 * We do limited plugging. If the bio can be merged, do that.
- 		 * Otherwise the existing request in the plug list will be
- 		 * issued. So the plug list will have one request at most
-+		 * The plug list might get flushed before this. If that happens,
-+		 * the plug list is empty, and same_queue_rq is invalid.
- 		 */
--		if (plug) {
--			/*
--			 * The plug list might get flushed before this. If that
--			 * happens, same_queue_rq is invalid and plug list is
--			 * empty
--			 */
--			if (same_queue_rq && !list_empty(&plug->mq_list)) {
--				old_rq = same_queue_rq;
--				list_del_init(&old_rq->queuelist);
--			}
--			list_add_tail(&rq->queuelist, &plug->mq_list);
--		} else /* is_sync */
--			old_rq = rq;
-+		if (list_empty(&plug->mq_list))
-+			same_queue_rq = NULL;
-+		if (same_queue_rq)
-+			list_del_init(&same_queue_rq->queuelist);
-+		list_add_tail(&rq->queuelist, &plug->mq_list);
+diff --git a/drivers/block/ibnbd_lib/ibnbd-proto.c b/drivers/block/ibnbd_lib/ibnbd-proto.c
+new file mode 100644
+index 0000000..c6d83f2
+--- /dev/null
++++ b/drivers/block/ibnbd_lib/ibnbd-proto.c
+@@ -0,0 +1,244 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
 +
-+		blk_mq_put_ctx(data.ctx);
-+		if (same_queue_rq)
-+			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
-+					&cookie);
-+		goto done;
-+	} else if (is_sync) {
-+		blk_mq_bio_to_request(rq, bio);
++#include "../ibnbd_inc/ibnbd-proto.h"
++#include "../ibnbd_inc/log.h"
 +
- 		blk_mq_put_ctx(data.ctx);
--		if (old_rq)
--			blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
-+		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
- 		goto done;
- 	}
- 
++static int ibnbd_validate_msg_sess_info(const struct ibnbd_msg_sess_info *msg,
++					size_t len)
++{
++	if (unlikely(len != sizeof(*msg))) {
++		ERR_NP("Sess info message with unexpected length received"
++		       " %lu instead of %lu\n", len, sizeof(*msg));
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int
++ibnbd_validate_msg_sess_info_rsp(const struct ibnbd_msg_sess_info_rsp *msg,
++				 size_t len)
++{
++	if (unlikely(len != sizeof(*msg))) {
++		ERR_NP("Sess info message with unexpected length received"
++		       " %lu instead of %lu\n", len, sizeof(*msg));
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int ibnbd_validate_msg_open_resp(const struct ibnbd_msg_open_rsp *msg,
++					size_t len)
++{
++	if (unlikely(msg->result))
++		return 0;
++
++	if (unlikely(len != sizeof(*msg))) {
++		ERR_NP("Open Response msg received with unexpected length"
++		       " %zuB instead of %luB\n", len, sizeof(*msg));
++		return -EINVAL;
++	}
++
++	if (unlikely(!msg->logical_block_size)) {
++		ERR_NP("Open Resp msg received with unexpected with"
++		       " invalid logical_block_size value %d\n",
++		       msg->logical_block_size);
++		return -EINVAL;
++	}
++
++	if (unlikely(!msg->physical_block_size)) {
++		ERR_NP("Open Resp msg received with invalid"
++		       " physical_block_size value %d\n",
++		       msg->physical_block_size);
++		return -EINVAL;
++	}
++
++	if (unlikely(!msg->max_hw_sectors)) {
++		ERR_NP("Open Resp msg received with invalid"
++		       " max_hw_sectors value %d\n", msg->max_hw_sectors);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int ibnbd_validate_msg_revalidate(const struct ibnbd_msg_revalidate *msg,
++					 size_t len)
++{
++	if (unlikely(len != sizeof(*msg))) {
++		ERR_NP("Device resize message with unexpected length received"
++		       " %lu instead of %lu\n", len, sizeof(*msg));
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int ibnbd_validate_msg_open(const struct ibnbd_msg_open *msg,
++				   size_t len)
++{
++	if (len != sizeof(*msg)) {
++		ERR_NP("Open msg received with unexpected length"
++		       " %zuB instead of %luB\n", len, sizeof(*msg));
++		return -EINVAL;
++	}
++	if (msg->dev_name[strnlen(msg->dev_name, NAME_MAX)] != '\0') {
++		ERR_NP("Open msg received with invalid dev_name value,"
++		       " null terminator missing\n");
++		return -EINVAL;
++	}
++
++	if (unlikely(msg->access_mode != IBNBD_ACCESS_RO &&
++		     msg->access_mode != IBNBD_ACCESS_RW &&
++		     msg->access_mode != IBNBD_ACCESS_MIGRATION)) {
++		ERR_NP("Open msg received with invalid access_mode value %d\n",
++		       msg->access_mode);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int ibnbd_validate_msg_close(const struct ibnbd_msg_close *msg, size_t
++				    len)
++{
++	if (unlikely(len != sizeof(*msg))) {
++		ERR_NP("Close msg received with unexpected length %lu instead"
++		       " of %lu\n", len, sizeof(*msg));
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int ibnbd_validate_msg_close_rsp(const struct ibnbd_msg_close_rsp *msg,
++					size_t len)
++{
++	if (unlikely(len != sizeof(*msg))) {
++		ERR_NP("Close_rsp msg received with unexpected length %lu"
++		       " instead of %lu\n", len, sizeof(*msg));
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++int ibnbd_validate_message(const void *data, size_t len)
++{
++	const struct ibnbd_msg_hdr *hdr = data;
++
++	switch (hdr->type) {
++	case IBNBD_MSG_SESS_INFO: {
++		const struct ibnbd_msg_sess_info *msg = data;
++
++		return ibnbd_validate_msg_sess_info(msg, len);
++	}
++	case IBNBD_MSG_SESS_INFO_RSP: {
++		const struct ibnbd_msg_sess_info_rsp *msg = data;
++
++		return ibnbd_validate_msg_sess_info_rsp(msg, len);
++	}
++	case IBNBD_MSG_OPEN_RSP: {
++		const struct ibnbd_msg_open_rsp *msg = data;
++
++		return ibnbd_validate_msg_open_resp(msg, len);
++	}
++	case IBNBD_MSG_REVAL: {
++		const struct ibnbd_msg_revalidate *msg = data;
++
++		return ibnbd_validate_msg_revalidate(msg, len);
++	}
++	case IBNBD_MSG_OPEN: {
++		const struct ibnbd_msg_open *msg = data;
++
++		return ibnbd_validate_msg_open(msg, len);
++	}
++	case IBNBD_MSG_CLOSE: {
++		const struct ibnbd_msg_close *msg = data;
++
++		return ibnbd_validate_msg_close(msg, len);
++	}
++	case IBNBD_MSG_CLOSE_RSP: {
++		const struct ibnbd_msg_close_rsp *msg = data;
++
++		return ibnbd_validate_msg_close_rsp(msg, len);
++	}
++	default:
++		ERR_NP("Ignoring received message with unknown type %d\n",
++		       hdr->type);
++		return -EINVAL;
++	}
++}
++
++const char *ibnbd_io_mode_str(enum ibnbd_io_mode mode)
++{
++	switch (mode) {
++	case IBNBD_FILEIO:
++		return "fileio";
++	case IBNBD_BLOCKIO:
++		return "blockio";
++	case IBNBD_AUTOIO:
++		return "autoio";
++	default:
++		return "unknown";
++	}
++}
++
++const char *ibnbd_access_mode_str(enum ibnbd_access_mode mode)
++{
++	switch (mode) {
++	case IBNBD_ACCESS_RO:
++		return "ro";
++	case IBNBD_ACCESS_RW:
++		return "rw";
++	case IBNBD_ACCESS_MIGRATION:
++		return "migration";
++	default:
++		return "unknown";
++	}
++}
+diff --git a/drivers/block/ibnbd_lib/ibnbd.c b/drivers/block/ibnbd_lib/ibnbd.c
+new file mode 100644
+index 0000000..1ba4777
+--- /dev/null
++++ b/drivers/block/ibnbd_lib/ibnbd.c
+@@ -0,0 +1,108 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#include <linux/ctype.h>
++#include "../ibnbd_inc/ibnbd.h"
++#include "../ibnbd_inc/ibnbd-proto.h"
++
++u32 ibnbd_io_flags_to_bi_rw(u32 flags)
++{
++	u32 result = 0;
++
++	if (flags == 0)
++		return result;
++
++	if (flags & IBNBD_RW_REQ_WRITE)
++		result |= WRITE;
++
++	if (flags & IBNBD_RW_REQ_SYNC)
++		result |= REQ_SYNC;
++
++	if (flags & IBNBD_RW_REQ_DISCARD)
++		result |= REQ_OP_DISCARD;
++
++	if (flags & IBNBD_RW_REQ_SECURE)
++		result |= REQ_OP_SECURE_ERASE;
++
++	if (flags & IBNBD_RW_REQ_WRITE_SAME)
++		result |= REQ_OP_WRITE_SAME;
++
++	if (flags & IBNBD_RW_REQ_FUA)
++		result |= REQ_FUA;
++
++	if (flags & IBNBD_RW_REQ_FLUSH)
++		result |= REQ_OP_FLUSH | REQ_PREFLUSH;
++
++	return result;
++}
++
++u32 rq_cmd_to_ibnbd_io_flags(struct request *rq)
++{
++	u32 result = 0;
++
++	if (req_op(rq) == REQ_OP_WRITE)
++		result |= IBNBD_RW_REQ_WRITE;
++
++	if (rq_is_sync(rq))
++		result |= IBNBD_RW_REQ_SYNC;
++
++	if (req_op(rq) == REQ_OP_DISCARD)
++		result |= IBNBD_RW_REQ_DISCARD;
++
++	if (req_op(rq) == REQ_OP_SECURE_ERASE)
++		result |= IBNBD_RW_REQ_SECURE;
++
++	if (req_op(rq) == REQ_OP_WRITE_SAME)
++		result |= IBNBD_RW_REQ_WRITE_SAME;
++
++	if (rq->cmd_flags & REQ_FUA)
++		result |= IBNBD_RW_REQ_FUA;
++
++	if (req_op(rq) == REQ_OP_FLUSH)
++		result |= IBNBD_RW_REQ_FLUSH;
++
++	return result;
++}
 -- 
-2.11.0
+2.7.4
