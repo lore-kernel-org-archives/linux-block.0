@@ -1,88 +1,409 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57018 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752945AbdCWAhM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2017 20:37:12 -0400
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        Tejun Heo <tj@kernel.org>, Tahsin Erdogan <tahsin@google.com>,
-        Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 10/10] block: Fix oops scsi_disk_get()
-Date: Thu, 23 Mar 2017 01:37:02 +0100
-Message-Id: <20170323003702.27571-11-jack@suse.cz>
-In-Reply-To: <20170323003702.27571-1-jack@suse.cz>
-References: <20170323003702.27571-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jinpu.wang@profitbricks.com>
+Return-Path: <jinpu.wang@profitbricks.com>
+From: Jack Wang <jinpu.wang@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: dledford@redhat.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	mail@fholler.de,
+	Milind.dumbare@gmail.com,
+	yun.wang@profitbricks.com,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Kleber Souza <kleber.souza@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH 12/28] ibtrs_srv: add sysfs interface
+Date: Fri, 24 Mar 2017 11:45:27 +0100
+Message-Id: <1490352343-20075-13-git-send-email-jinpu.wangl@profitbricks.com>
+In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When device open races with device shutdown, we can get the following
-oops in scsi_disk_get():
+From: Jack Wang <jinpu.wang@profitbricks.com>
 
-[11863.044351] general protection fault: 0000 [#1] SMP
-[11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
-[11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
-[11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
-[11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
-[11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
-[11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
-[11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
-[11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
-[11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
-[11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
-[11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
-[11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
-[11863.059217] Call Trace:
-[11863.059217]  ? disk_get_part+0x22/0x1f0
-[11863.059217]  sd_open+0x39/0x130
-[11863.059217]  __blkdev_get+0x69/0x430
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? bd_acquire+0x96/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_get+0x126/0x350
-[11863.059217]  ? _raw_spin_unlock+0x2b/0x40
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_open+0x65/0x80
-...
-
-As you can see RAX value is already poisoned showing that gendisk we got
-is already freed. The problem is that get_gendisk() looks up device
-number in ext_devt_idr and then does get_disk() which does kobject_get()
-on the disks kobject. However the disk gets removed from ext_devt_idr
-only in disk_release() (through blk_free_devt()) at which moment it has
-already 0 refcount and is already on its way to be freed. Indeed we've
-got a warning from kobject_get() about 0 refcount shortly before the
-oops.
-
-We fix the problem by using kobject_get_unless_zero() in get_disk() so
-that get_disk() cannot get reference on a disk that is already being
-freed.
-
-Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
 ---
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.c  | 301 +++++++++++++++++++++
+ .../infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.h  |  59 ++++
+ 2 files changed, 360 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.h
 
-diff --git a/block/genhd.c b/block/genhd.c
-index a9c516a8b37d..510aac1486cb 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1352,7 +1352,7 @@ struct kobject *get_disk(struct gendisk *disk)
- 	owner = disk->fops->owner;
- 	if (owner && !try_module_get(owner))
- 		return NULL;
--	kobj = kobject_get(&disk_to_dev(disk)->kobj);
-+	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
- 	if (kobj == NULL) {
- 		module_put(owner);
- 		return NULL;
+diff --git a/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.c b/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.c
+new file mode 100644
+index 0000000..c95a124
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.c
+@@ -0,0 +1,301 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#include "ibtrs_srv_sysfs.h"
++#include "ibtrs_srv_internal.h"
++#include <rdma/ibtrs_srv.h>
++#include <rdma/ibtrs.h>
++#include <rdma/ibtrs_log.h>
++
++static struct kobject *ibtrs_srv_kobj;
++static struct kobject *ibtrs_srv_sessions_kobj;
++
++static ssize_t ibtrs_srv_hb_timeout_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%u\n", sess->heartbeat.timeout_ms);
++}
++
++static ssize_t ibtrs_srv_hb_timeout_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	int ret;
++	u32 timeout_ms;
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	ret = kstrtouint(buf, 0, &timeout_ms);
++	if (ret)
++		return ret;
++
++	ret = ibtrs_heartbeat_timeout_validate(timeout_ms);
++	if (ret)
++		return ret;
++
++	INFO(sess, "%s: changing value from %u to %u\n", attr->attr.name,
++	     sess->heartbeat.timeout_ms, timeout_ms);
++	ibtrs_set_heartbeat_timeout(&sess->heartbeat, timeout_ms);
++	return count;
++}
++
++static struct kobj_attribute ibtrs_srv_heartbeat_timeout_ms_attr =
++	__ATTR(heartbeat_timeout_ms, 0644,
++	       ibtrs_srv_hb_timeout_show, ibtrs_srv_hb_timeout_store);
++
++static ssize_t ibtrs_srv_disconnect_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_srv_disconnect_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	if (!sysfs_streq(buf, "1")) {
++		ERR(sess, "%s: invalid value: '%s'\n", attr->attr.name, buf);
++		return -EINVAL;
++	}
++
++	INFO(sess, "%s: Session disconnect requested\n", attr->attr.name);
++	ibtrs_srv_queue_close(sess);
++
++	return count;
++}
++
++static struct kobj_attribute disconnect_attr =
++	__ATTR(disconnect, 0644,
++	       ibtrs_srv_disconnect_show, ibtrs_srv_disconnect_store);
++
++static ssize_t ibtrs_srv_current_hca_port_show(struct kobject *kobj,
++					       struct kobj_attribute *attr,
++					       char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++	return ibtrs_srv_current_hca_port_to_str(sess, page, PAGE_SIZE);
++}
++
++static struct kobj_attribute current_hca_port_attr =
++	__ATTR(current_hca_port, 0444, ibtrs_srv_current_hca_port_show,
++	       NULL);
++
++static ssize_t ibtrs_srv_hca_name_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n",
++			 ibtrs_srv_get_sess_hca_name(sess));
++}
++
++static struct kobj_attribute hca_name_attr =
++	__ATTR(hca_name, 0444, ibtrs_srv_hca_name_show, NULL);
++
++static ssize_t hostname_show(struct kobject *kobj,
++			     struct kobj_attribute *attr, char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++	return sprintf(page, "%s\n", sess->hostname);
++}
++
++static struct kobj_attribute hostname_attr =
++		__ATTR(hostname, 0444, hostname_show, NULL);
++
++static struct attribute *default_sess_attrs[] = {
++	&hca_name_attr.attr,
++	&hostname_attr.attr,
++	&current_hca_port_attr.attr,
++	&disconnect_attr.attr,
++	&ibtrs_srv_heartbeat_timeout_ms_attr.attr,
++	NULL,
++};
++
++static struct attribute_group default_sess_attr_group = {
++	.attrs = default_sess_attrs,
++};
++
++static void ibtrs_srv_sess_release(struct kobject *kobj)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	ibtrs_srv_sess_put(sess);
++}
++
++static struct kobj_type ibtrs_srv_sess_ktype = {
++	.sysfs_ops	= &kobj_sysfs_ops,
++	.release	= ibtrs_srv_sess_release,
++};
++
++STAT_ATTR(rdma, ibtrs_srv_stats_rdma_to_str, ibtrs_srv_reset_rdma_stats);
++
++STAT_ATTR(user_ib_messages, ibtrs_srv_stats_user_ib_msgs_to_str,
++	  ibtrs_srv_reset_user_ib_msgs_stats);
++
++STAT_ATTR(wc_completion, ibtrs_srv_stats_wc_completion_to_str,
++	  ibtrs_srv_reset_wc_completion_stats);
++
++STAT_ATTR(reset_all, ibtrs_srv_reset_all_help, ibtrs_srv_reset_all_stats);
++
++static struct attribute *ibtrs_srv_default_stats_attrs[] = {
++	&rdma_attr.attr,
++	&user_ib_messages_attr.attr,
++	&wc_completion_attr.attr,
++	&reset_all_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_srv_default_stats_attr_group = {
++	.attrs = ibtrs_srv_default_stats_attrs,
++};
++
++static struct kobj_type ibtrs_stats_ktype = {
++	.sysfs_ops = &kobj_sysfs_ops,
++};
++
++static int ibtrs_srv_create_stats_files(struct ibtrs_session *sess)
++{
++	int ret;
++
++	ret = kobject_init_and_add(&sess->kobj_stats, &ibtrs_stats_ktype,
++				   &sess->kobj, "stats");
++	if (ret) {
++		ERR(sess,
++		    "Failed to init and add sysfs directory for session stats,"
++		    " errno: %d\n", ret);
++		return ret;
++	}
++
++	ret = sysfs_create_group(&sess->kobj_stats,
++				 &ibtrs_srv_default_stats_attr_group);
++	if (ret) {
++		ERR(sess, "Failed to create sysfs group for session stats,"
++		    " errno: %d\n", ret);
++		goto err;
++	}
++
++	return 0;
++
++err:
++	kobject_put(&sess->kobj_stats);
++
++	return ret;
++}
++
++int ibtrs_srv_create_sess_files(struct ibtrs_session *sess)
++{
++	int ret;
++
++	DEB("creating sysfs files for sess %s\n", sess->addr);
++
++	if (WARN_ON(!ibtrs_srv_sess_get(sess)))
++		return -EINVAL;
++
++	ret = kobject_init_and_add(&sess->kobj, &ibtrs_srv_sess_ktype,
++				   ibtrs_srv_sessions_kobj, "%s", sess->addr);
++	if (ret) {
++		ERR(sess, "Failed to init and add sysfs directory for session,"
++		    " errno: %d\n", ret);
++		ibtrs_srv_sess_put(sess);
++		return ret;
++	}
++
++	ret = sysfs_create_group(&sess->kobj, &default_sess_attr_group);
++	if (ret) {
++		ERR(sess, "Failed to create sysfs group for session,"
++		    " errno: %d\n", ret);
++		goto err;
++	}
++
++	ret = ibtrs_srv_create_stats_files(sess);
++	if (ret)
++		goto err1;
++
++	return 0;
++
++err1:
++	sysfs_remove_group(&sess->kobj, &default_sess_attr_group);
++err:
++	kobject_put(&sess->kobj);
++
++	return ret;
++}
++
++int ibtrs_srv_create_sysfs_files(void)
++{
++	ibtrs_srv_kobj = kobject_create_and_add("ibtrs", kernel_kobj);
++	if (!ibtrs_srv_kobj)
++		return -ENOMEM;
++
++	ibtrs_srv_sessions_kobj = kobject_create_and_add("sessions",
++							 ibtrs_srv_kobj);
++	if (!ibtrs_srv_sessions_kobj) {
++		kobject_put(ibtrs_srv_kobj);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++void ibtrs_srv_destroy_sysfs_files(void)
++{
++	kobject_put(ibtrs_srv_sessions_kobj);
++	kobject_put(ibtrs_srv_kobj);
++}
+diff --git a/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.h b/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.h
+new file mode 100644
+index 0000000..e5dfa62
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_sysfs.h
+@@ -0,0 +1,59 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#ifndef _IBTRS_SRV_SYFS_H
++#define _IBTRS_SRV_SYFS_H
++
++#include <linux/kobject.h>
++#include "ibtrs_srv_internal.h"
++
++int ibtrs_srv_create_sysfs_files(void);
++
++void ibtrs_srv_destroy_sysfs_files(void);
++
++int ibtrs_srv_create_sess_files(struct ibtrs_session *sess);
++
++#endif
 -- 
-2.10.2
+2.7.4
