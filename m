@@ -1,314 +1,242 @@
-Return-Path: <prvs=425928092f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
-        <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 09/18] blk-throttle: make throtl_slice tunable
-Date: Mon, 27 Mar 2017 10:51:37 -0700
-Message-ID: <0c1c990f15fff70b4c0a5a50984f3803420db3f3.1490634565.git.shli@fb.com>
-In-Reply-To: <cover.1490634565.git.shli@fb.com>
-References: <cover.1490634565.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <jinpu.wang@profitbricks.com>
+Return-Path: <jinpu.wang@profitbricks.com>
+From: Jack Wang <jinpu.wang@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: dledford@redhat.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	mail@fholler.de,
+	Milind.dumbare@gmail.com,
+	yun.wang@profitbricks.com,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Kleber Souza <kleber.souza@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH 11/28] ibtrs_srv: add header shared in ibtrs_server
+Date: Fri, 24 Mar 2017 11:45:26 +0100
+Message-Id: <1490352343-20075-12-git-send-email-jinpu.wangl@profitbricks.com>
+In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-throtl_slice is important for blk-throttling. It's called slice
-internally but it really is a time window blk-throttling samples data.
-blk-throttling will make decision based on the samplings. An example is
-bandwidth measurement. A cgroup's bandwidth is measured in the time
-interval of throtl_slice.
+From: Jack Wang <jinpu.wang@profitbricks.com>
 
-A small throtl_slice meanse cgroups have smoother throughput but burn
-more CPUs. It has 100ms default value, which is not appropriate for all
-disks. A fast SSD can dispatch a lot of IOs in 100ms. This patch makes
-it tunable.
-
-Since throtl_slice isn't a time slice, the sysfs name
-'throttle_sample_time' reflects its character better.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
 ---
- Documentation/block/queue-sysfs.txt |  6 +++
- block/blk-sysfs.c                   | 11 ++++++
- block/blk-throttle.c                | 79 ++++++++++++++++++++++++++-----------
- block/blk.h                         |  5 +++
- 4 files changed, 79 insertions(+), 22 deletions(-)
+ .../ulp/ibtrs_server/ibtrs_srv_internal.h          | 201 +++++++++++++++++++++
+ 1 file changed, 201 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_internal.h
 
-diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
-index c0a3bb5..b7f6bdc 100644
---- a/Documentation/block/queue-sysfs.txt
-+++ b/Documentation/block/queue-sysfs.txt
-@@ -192,5 +192,11 @@ scaling back writes. Writing a value of '0' to this file disables the
- feature. Writing a value of '-1' to this file resets the value to the
- default setting.
- 
-+throttle_sample_time (RW)
-+-------------------------
-+This is the time window that blk-throttle samples data, in millisecond.
-+blk-throttle makes decision based on the samplings. Lower time means cgroups
-+have more smooth throughput, but higher CPU overhead. This exists only when
-+CONFIG_BLK_DEV_THROTTLING_LOW is enabled.
- 
- Jens Axboe <jens.axboe@oracle.com>, February 2009
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index fa831cb..b315e62 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -677,6 +677,14 @@ static struct queue_sysfs_entry queue_wb_lat_entry = {
- 	.store = queue_wb_lat_store,
- };
- 
-+#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
-+static struct queue_sysfs_entry throtl_sample_time_entry = {
-+	.attr = {.name = "throttle_sample_time", .mode = S_IRUGO | S_IWUSR },
-+	.show = blk_throtl_sample_time_show,
-+	.store = blk_throtl_sample_time_store,
+diff --git a/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_internal.h b/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_internal.h
+new file mode 100644
+index 0000000..79130a1
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs_server/ibtrs_srv_internal.h
+@@ -0,0 +1,201 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#ifndef _IBTRS_SRV_INTERNAL_H
++#define _IBTRS_SRV_INTERNAL_H
++
++#include <rdma/ibtrs.h>
++
++enum ssm_state {
++	SSM_STATE_IDLE,
++	SSM_STATE_CONNECTED,
++	SSM_STATE_CLOSING,
++	SSM_STATE_CLOSED
 +};
++
++/*
++ * Describes the rdma buffer managed by client and used for his rdma writes
++ * Rdma info has to be sent in OPEN_RESP message to the client.
++ */
++struct ibtrs_rcv_buf {
++	dma_addr_t	rdma_addr;
++	void		*buf;
++};
++
++/* to indicate that memory chunk was not allocated from a N-order contiguous
++ * pages area
++ */
++#define IBTRS_MEM_CHUNK_NOORDER -1
++
++struct ibtrs_mem_chunk {
++	struct list_head	list;
++	int			order;
++	void			*addr;
++};
++
++struct ibtrs_rcv_buf_pool {
++	struct list_head	list;
++	struct list_head	chunk_list;
++	struct ibtrs_rcv_buf	*rcv_bufs;
++};
++
++struct ibtrs_stats_wc_comp {
++	atomic_t	max_wc_cnt;
++	atomic64_t	calls;
++	atomic64_t	total_wc_cnt;
++};
++
++struct ibtrs_srv_stats_rdma_stats {
++	atomic64_t	cnt_read;
++	atomic64_t	size_total_read;
++	atomic64_t	cnt_write;
++	atomic64_t	size_total_write;
++
++	atomic_t	inflight;
++	atomic64_t	inflight_total;
++};
++
++struct ibtrs_srv_stats_user_ib_msgs {
++	atomic64_t recv_msg_cnt;
++	atomic64_t sent_msg_cnt;
++	atomic64_t recv_size;
++	atomic64_t sent_size;
++};
++
++struct ibtrs_srv_stats {
++	struct ibtrs_srv_stats_rdma_stats	rdma_stats;
++	struct ibtrs_srv_stats_user_ib_msgs	user_ib_msgs;
++	atomic_t				apm_cnt;
++	struct ibtrs_stats_wc_comp		wc_comp;
++};
++
++struct ibtrs_session {
++	struct list_head	list;
++	enum ssm_state		state;
++	struct kref		kref;
++	struct workqueue_struct *sm_wq;	/* event processing */
++	struct workqueue_struct *msg_wq;
++	struct ibtrs_device	*dev; /* ib dev with mempool */
++	struct rdma_cm_id	*cm_id;	/* cm_id used to create the session */
++	struct mutex            lock; /* to protect con_list */
++	int			cur_cq_vector;
++	struct list_head        con_list;
++	struct ibtrs_iu		*rdma_info_iu;
++	struct ibtrs_iu		*dummy_rx_iu;
++	struct ibtrs_iu		**usr_rx_ring;
++	struct ibtrs_ops_id	**ops_ids;
++	/* lock for tx_bufs */
++	spinlock_t              tx_bufs_lock ____cacheline_aligned;
++	struct list_head	tx_bufs;
++	u16			tx_bufs_used;
++	unsigned int		est_cnt; /* number of established connections */
++	unsigned int		active_cnt; /* number of active (not closed)
++					     * connections
++					     */
++	u8			con_cnt;
++	u8			ver;
++	bool			state_in_sysfs;
++	bool			session_announced_to_user;
++	struct ibtrs_rcv_buf_pool *rcv_buf_pool;
++	wait_queue_head_t	bufs_wait;
++	u8			off_len; /* number of bits for offset in
++					  * one client buffer.
++					  * 32 - ilog2(sess->queue_depth)
++					  */
++	u32			off_mask; /* mask to get offset in client buf
++					   * out of the imm field
++					   */
++	u16			queue_depth;
++	u16			wq_size;
++	u8			uuid[IBTRS_UUID_SIZE];
++	struct ibtrs_heartbeat	heartbeat;
++	struct delayed_work	check_heartbeat_dwork;
++	struct delayed_work	send_heartbeat_dwork;
++	void			*priv;
++	struct kobject		kobj;
++	struct kobject		kobj_stats;
++	char			addr[IBTRS_ADDRLEN]; /* client address */
++	char			hostname[MAXHOSTNAMELEN];
++	u8			primary_port_num;
++	struct ibtrs_srv_stats	stats;
++	wait_queue_head_t	mu_iu_wait_q;
++	wait_queue_head_t	mu_buf_wait_q;
++	atomic_t		peer_usr_msg_bufs;
++};
++
++void ibtrs_srv_queue_close(struct ibtrs_session *sess);
++
++u8 ibtrs_srv_get_sess_primary_port_num(struct ibtrs_session *sess);
++
++int ibtrs_srv_current_hca_port_to_str(struct ibtrs_session *sess,
++				      char *buf, size_t len);
++int ibtrs_srv_failover_hca_port_to_str(struct ibtrs_session *sess,
++				       char *buf, size_t len);
++const char *ibtrs_srv_get_sess_hca_name(struct ibtrs_session *sess);
++int ibtrs_srv_migrate(struct ibtrs_session *sess, u8 port_num);
++int ibtrs_srv_reset_rdma_stats(struct ibtrs_session *sess, bool enable);
++ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_session *sess,
++				    char *page, size_t len);
++int ibtrs_srv_reset_user_ib_msgs_stats(struct ibtrs_session *sess, bool enable);
++int ibtrs_srv_stats_user_ib_msgs_to_str(struct ibtrs_session *sess, char *buf,
++					size_t len);
++int ibtrs_srv_reset_apm_stats(struct ibtrs_session *sess, bool enable);
++int ibtrs_srv_stats_apm_to_str(struct ibtrs_session *sess, char *buf,
++			       size_t len);
++int ibtrs_srv_reset_wc_completion_stats(struct ibtrs_session *sess,
++					bool enable);
++int ibtrs_srv_stats_wc_completion_to_str(struct ibtrs_session *sess, char *buf,
++					 size_t len);
++int ibtrs_srv_reset_all_stats(struct ibtrs_session *sess, bool enable);
++ssize_t ibtrs_srv_reset_all_help(struct ibtrs_session *sess,
++				 char *page, size_t len);
++int heartbeat_timeout_validate(int timeout);
++
++int ibtrs_srv_sess_get(struct ibtrs_session *sess);
++
++void ibtrs_srv_sess_put(struct ibtrs_session *sess);
++
 +#endif
-+
- static struct attribute *default_attrs[] = {
- 	&queue_requests_entry.attr,
- 	&queue_ra_entry.attr,
-@@ -710,6 +718,9 @@ static struct attribute *default_attrs[] = {
- 	&queue_dax_entry.attr,
- 	&queue_wb_lat_entry.attr,
- 	&queue_poll_delay_entry.attr,
-+#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
-+	&throtl_sample_time_entry.attr,
-+#endif
- 	NULL,
- };
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 2073b48..93841da 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -19,7 +19,8 @@ static int throtl_grp_quantum = 8;
- static int throtl_quantum = 32;
- 
- /* Throttling is performed over 100ms slice and after that slice is renewed */
--static unsigned long throtl_slice = HZ/10;	/* 100 ms */
-+#define DFL_THROTL_SLICE (HZ / 10)
-+#define MAX_THROTL_SLICE (HZ)
- 
- static struct blkcg_policy blkcg_policy_throtl;
- 
-@@ -162,6 +163,8 @@ struct throtl_data
- 	/* Total Number of queued bios on READ and WRITE lists */
- 	unsigned int nr_queued[2];
- 
-+	unsigned int throtl_slice;
-+
- 	/* Work for dispatching throttled bios */
- 	struct work_struct dispatch_work;
- 	unsigned int limit_index;
-@@ -590,7 +593,7 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
--	unsigned long max_expire = jiffies + 8 * throtl_slice;
-+	unsigned long max_expire = jiffies + 8 * sq_to_tg(sq)->td->throtl_slice;
- 
- 	/*
- 	 * Since we are adjusting the throttle limit dynamically, the sleep
-@@ -658,7 +661,7 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 	if (time_after_eq(start, tg->slice_start[rw]))
- 		tg->slice_start[rw] = start;
- 
--	tg->slice_end[rw] = jiffies + throtl_slice;
-+	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice with credit start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -670,7 +673,7 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
- 	tg->slice_start[rw] = jiffies;
--	tg->slice_end[rw] = jiffies + throtl_slice;
-+	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -680,13 +683,13 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
- static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
- 					unsigned long jiffy_end)
- {
--	tg->slice_end[rw] = roundup(jiffy_end, throtl_slice);
-+	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
- }
- 
- static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
- 				       unsigned long jiffy_end)
- {
--	tg->slice_end[rw] = roundup(jiffy_end, throtl_slice);
-+	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
- 	throtl_log(&tg->service_queue,
- 		   "[%c] extend slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -726,19 +729,20 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	 * is bad because it does not allow new slice to start.
- 	 */
- 
--	throtl_set_slice_end(tg, rw, jiffies + throtl_slice);
-+	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
- 
- 	time_elapsed = jiffies - tg->slice_start[rw];
- 
--	nr_slices = time_elapsed / throtl_slice;
-+	nr_slices = time_elapsed / tg->td->throtl_slice;
- 
- 	if (!nr_slices)
- 		return;
--	tmp = tg_bps_limit(tg, rw) * throtl_slice * nr_slices;
-+	tmp = tg_bps_limit(tg, rw) * tg->td->throtl_slice * nr_slices;
- 	do_div(tmp, HZ);
- 	bytes_trim = tmp;
- 
--	io_trim = (tg_iops_limit(tg, rw) * throtl_slice * nr_slices) / HZ;
-+	io_trim = (tg_iops_limit(tg, rw) * tg->td->throtl_slice * nr_slices) /
-+		HZ;
- 
- 	if (!bytes_trim && !io_trim)
- 		return;
-@@ -753,7 +757,7 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	else
- 		tg->io_disp[rw] = 0;
- 
--	tg->slice_start[rw] += nr_slices * throtl_slice;
-+	tg->slice_start[rw] += nr_slices * tg->td->throtl_slice;
- 
- 	throtl_log(&tg->service_queue,
- 		   "[%c] trim slice nr=%lu bytes=%llu io=%lu start=%lu end=%lu jiffies=%lu",
-@@ -773,9 +777,9 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	/* Slice has just started. Consider one slice interval */
- 	if (!jiffy_elapsed)
--		jiffy_elapsed_rnd = throtl_slice;
-+		jiffy_elapsed_rnd = tg->td->throtl_slice;
- 
--	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
- 
- 	/*
- 	 * jiffy_elapsed_rnd should not be a big value as minimum iops can be
-@@ -822,9 +826,9 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	/* Slice has just started. Consider one slice interval */
- 	if (!jiffy_elapsed)
--		jiffy_elapsed_rnd = throtl_slice;
-+		jiffy_elapsed_rnd = tg->td->throtl_slice;
- 
--	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
- 
- 	tmp = tg_bps_limit(tg, rw) * jiffy_elapsed_rnd;
- 	do_div(tmp, HZ);
-@@ -890,8 +894,10 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
- 		throtl_start_new_slice(tg, rw);
- 	else {
--		if (time_before(tg->slice_end[rw], jiffies + throtl_slice))
--			throtl_extend_slice(tg, rw, jiffies + throtl_slice);
-+		if (time_before(tg->slice_end[rw],
-+		    jiffies + tg->td->throtl_slice))
-+			throtl_extend_slice(tg, rw,
-+				jiffies + tg->td->throtl_slice);
- 	}
- 
- 	if (tg_with_in_bps_limit(tg, bio, &bps_wait) &&
-@@ -1632,7 +1638,7 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	if (td->limit_index != LIMIT_LOW)
- 		return false;
- 
--	if (time_before(jiffies, td->low_downgrade_time + throtl_slice))
-+	if (time_before(jiffies, td->low_downgrade_time + td->throtl_slice))
- 		return false;
- 
- 	rcu_read_lock();
-@@ -1689,8 +1695,9 @@ static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
- 	 * If cgroup is below low limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
--	if (time_after_eq(now, td->low_upgrade_time + throtl_slice) &&
--	    time_after_eq(now, tg_last_low_overflow_time(tg) + throtl_slice))
-+	if (time_after_eq(now, td->low_upgrade_time + td->throtl_slice) &&
-+	    time_after_eq(now, tg_last_low_overflow_time(tg) +
-+					td->throtl_slice))
- 		return true;
- 	return false;
- }
-@@ -1719,13 +1726,14 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 		return;
- 	if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
- 		return;
--	if (time_after(tg->last_check_time + throtl_slice, now))
-+	if (time_after(tg->last_check_time + tg->td->throtl_slice, now))
- 		return;
- 
- 	elapsed_time = now - tg->last_check_time;
- 	tg->last_check_time = now;
- 
--	if (time_before(now, tg_last_low_overflow_time(tg) + throtl_slice))
-+	if (time_before(now, tg_last_low_overflow_time(tg) +
-+			tg->td->throtl_slice))
- 		return;
- 
- 	if (tg->bps[READ][LIMIT_LOW]) {
-@@ -1953,6 +1961,7 @@ int blk_throtl_init(struct request_queue *q)
- 
- 	q->td = td;
- 	td->queue = q;
-+	td->throtl_slice = DFL_THROTL_SLICE;
- 
- 	td->limit_valid[LIMIT_MAX] = true;
- 	td->limit_index = LIMIT_MAX;
-@@ -1973,6 +1982,32 @@ void blk_throtl_exit(struct request_queue *q)
- 	kfree(q->td);
- }
- 
-+#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
-+ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page)
-+{
-+	if (!q->td)
-+		return -EINVAL;
-+	return sprintf(page, "%u\n", jiffies_to_msecs(q->td->throtl_slice));
-+}
-+
-+ssize_t blk_throtl_sample_time_store(struct request_queue *q,
-+	const char *page, size_t count)
-+{
-+	unsigned long v;
-+	unsigned long t;
-+
-+	if (!q->td)
-+		return -EINVAL;
-+	if (kstrtoul(page, 10, &v))
-+		return -EINVAL;
-+	t = msecs_to_jiffies(v);
-+	if (t == 0 || t > MAX_THROTL_SLICE)
-+		return -EINVAL;
-+	q->td->throtl_slice = t;
-+	return count;
-+}
-+#endif
-+
- static int __init throtl_init(void)
- {
- 	kthrotld_workqueue = alloc_workqueue("kthrotld", WQ_MEM_RECLAIM, 0);
-diff --git a/block/blk.h b/block/blk.h
-index d1ea4bd9..bcd3de6 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -324,5 +324,10 @@ static inline void blk_throtl_drain(struct request_queue *q) { }
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- #endif /* CONFIG_BLK_DEV_THROTTLING */
-+#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
-+extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
-+extern ssize_t blk_throtl_sample_time_store(struct request_queue *q,
-+	const char *page, size_t count);
-+#endif
- 
- #endif /* BLK_INTERNAL_H */
 -- 
-2.9.3
+2.7.4
