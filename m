@@ -1,71 +1,523 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:52786 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753610AbdCTW7C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Mar 2017 18:59:02 -0400
-From: Ming Lin <mlin@kernel.org>
-To: nbd-general@lists.sourceforge.net, Josef Bacik <jbacik@fb.com>,
-        Ratna Manoj Bolla <manoj.br@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jianshu.ljs@alibaba-inc.com, xiongwei.jiang@alibaba-inc.com,
-        james.liu@alibaba-inc.com, Markus Pargmann <mpa@pengutronix.de>
-Subject: [RFC PATCH 0/1] nbd: fix crash when unmaping nbd device with fs still mounted
-Date: Mon, 20 Mar 2017 15:58:48 -0700
-Message-Id: <1490050729-3578-1-git-send-email-mlin@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jinpu.wang@profitbricks.com>
+Return-Path: <jinpu.wang@profitbricks.com>
+From: Jack Wang <jinpu.wang@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: dledford@redhat.com,
+	axboe@kernel.dk,
+	hch@lst.de,
+	mail@fholler.de,
+	Milind.dumbare@gmail.com,
+	yun.wang@profitbricks.com,
+	Jack Wang <jinpu.wang@profitbricks.com>,
+	Kleber Souza <kleber.souza@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>
+Subject: [PATCH 07/28] ibtrs_clt: add files for sysfs interface
+Date: Fri, 24 Mar 2017 11:45:22 +0100
+Message-Id: <1490352343-20075-8-git-send-email-jinpu.wangl@profitbricks.com>
+In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+From: Jack Wang <jinpu.wang@profitbricks.com>
 
-I run into a BUG_ON(!buffer_mapped(bh)) crash with below script.
+Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+---
+ .../infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.c  | 412 +++++++++++++++++++++
+ .../infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.h  |  62 ++++
+ 2 files changed, 474 insertions(+)
+ create mode 100644 drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.c
+ create mode 100644 drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.h
 
- $ rbd-nbd map mypool/myimg
- $ mkfs.ext4 /dev/nbd0
- $ mount /dev/nbd0 /mnt/
- $ rbd-nbd unmap /dev/nbd0
- $ umount /mnt
-
-[ 1248.870131] kernel BUG at /home/mlin/linux/fs/buffer.c:3103!
-[ 1248.871214] invalid opcode: 0000 [#1] SMP
-[ 1248.879468] CPU: 0 PID: 2450 Comm: umount Tainted: G            E   4.11.0-rc2+ #2
-[ 1248.896579] Call Trace:
-[ 1248.897056]  __sync_dirty_buffer+0x6e/0xe0
-[ 1248.897870]  ext4_commit_super+0x1eb/0x290 [ext4]
-[ 1248.898795]  ext4_put_super+0x2fa/0x3c0 [ext4]
-[ 1248.899662]  generic_shutdown_super+0x6f/0x100
-[ 1248.900525]  kill_block_super+0x27/0x70
-[ 1248.901257]  deactivate_locked_super+0x43/0x70
-[ 1248.902112]  deactivate_super+0x46/0x60
-[ 1248.902869]  cleanup_mnt+0x3f/0x80
-[ 1248.903526]  __cleanup_mnt+0x12/0x20
-[ 1248.904218]  task_work_run+0x83/0xb0
-[ 1248.904941]  exit_to_usermode_loop+0x59/0x7b
-[ 1248.905769]  do_syscall_64+0x165/0x180
-[ 1248.907603]  entry_SYSCALL64_slow_path+0x25/0x25
-
-Last year, Ratna posted a patch to fix it.
-https://lkml.org/lkml/2016/4/20/257
-
-Ratna's script to reproduce the bug.
-
- $ qemu-img create -f qcow2 f.img 1G
- $ mkfs.ext4 f.img
- $ qemu-nbd -c /dev/nbd0 f.img
- $ mount /dev/nbd0 dir
- $ killall -KILL qemu-nbd
- $ sleep 1
- $ ls dir
- $ umount dir
-
-I ported Rantna's patch to 4.11-rc2 and confirmed that it fixes the crash.
-
-Jan Kara had some comments about this bug:
-http://www.kernelhub.org/?p=2&msg=361407
-
-I hope to fix this bug in the upstream kernel first and then back port it to 
-our production system.
-
-Please see "PATCH 1/1" for detail.
-
-Thanks,
-Ming
+diff --git a/drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.c b/drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.c
+new file mode 100644
+index 0000000..d430af0
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.c
+@@ -0,0 +1,412 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#include <linux/types.h>
++#include "ibtrs_clt_internal.h"
++#include <rdma/ibtrs_clt.h>
++#include "ibtrs_clt_sysfs.h"
++#include <rdma/ibtrs.h>
++#include <rdma/ibtrs_log.h>
++#include <rdma/ib.h>
++
++static struct kobject *sessions_kobj;
++static struct kobject *ibtrs_kobj;
++
++#define MIN_MAX_RECONN_ATT -1
++#define MAX_MAX_RECONN_ATT 9999
++
++static ssize_t ibtrs_clt_max_reconn_attempts_show(struct kobject *kobj,
++						  struct kobj_attribute *attr,
++						  char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	return sprintf(page, "%d\n",
++		       ibtrs_clt_get_max_reconnect_attempts(sess));
++}
++
++static ssize_t ibtrs_clt_max_reconn_attempts_store(struct kobject *kobj,
++						   struct kobj_attribute *attr,
++						   const char *buf,
++						   size_t count)
++{
++	int ret;
++	s16 value;
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	ret = kstrtos16(buf, 10, &value);
++	if (unlikely(ret)) {
++		ERR(sess, "%s: failed to convert string '%s' to int\n",
++		    attr->attr.name, buf);
++		return ret;
++	}
++	if (unlikely(value > MAX_MAX_RECONN_ATT ||
++		     value < MIN_MAX_RECONN_ATT)) {
++		ERR(sess, "%s: invalid range"
++		    " (provided: '%s', accepted: min: %d, max: %d)\n",
++		    attr->attr.name, buf, MIN_MAX_RECONN_ATT,
++		    MAX_MAX_RECONN_ATT);
++		return -EINVAL;
++	}
++
++	INFO(sess, "%s: changing value from %d to %d\n", attr->attr.name,
++	     ibtrs_clt_get_max_reconnect_attempts(sess), value);
++	ibtrs_clt_set_max_reconnect_attempts(sess, value);
++	return count;
++}
++
++static struct kobj_attribute max_ibtrs_clt_reconnect_attempts_attr =
++		__ATTR(max_reconnect_attempts, 0644,
++		       ibtrs_clt_max_reconn_attempts_show,
++		       ibtrs_clt_max_reconn_attempts_store);
++
++static ssize_t ibtrs_clt_hb_timeout_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%u\n", sess->heartbeat.timeout_ms);
++}
++
++static ssize_t ibtrs_clt_hb_timeout_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	int ret;
++	u32 timeout_ms;
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++
++	ret = kstrtouint(buf, 0, &timeout_ms);
++	if (ret) {
++		ERR(sess,
++		    "%s: failed to convert string '%s' to unsigned int\n",
++		    attr->attr.name, buf);
++		return ret;
++	}
++
++	ret = ibtrs_heartbeat_timeout_validate(timeout_ms);
++	if (ret)
++		return ret;
++
++	INFO(sess, "%s: changing value from %u to %u\n", attr->attr.name,
++	     sess->heartbeat.timeout_ms, timeout_ms);
++	ibtrs_set_heartbeat_timeout(&sess->heartbeat, timeout_ms);
++	return count;
++}
++
++static struct kobj_attribute ibtrs_clt_heartbeat_timeout_ms_attr =
++		__ATTR(heartbeat_timeout_ms, 0644,
++		       ibtrs_clt_hb_timeout_show, ibtrs_clt_hb_timeout_store);
++
++static ssize_t ibtrs_clt_state_show(struct kobject *kobj,
++				    struct kobj_attribute *attr, char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++	if (ibtrs_clt_sess_is_connected(sess))
++		return sprintf(page, "connected\n");
++
++	return sprintf(page, "disconnected\n");
++}
++
++static struct kobj_attribute ibtrs_clt_state_attr = __ATTR(state, 0444,
++							   ibtrs_clt_state_show,
++							   NULL);
++
++static ssize_t ibtrs_clt_hostname_show(struct kobject *kobj,
++				       struct kobj_attribute *attr, char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++	return sprintf(page, "%s\n", sess->hostname);
++}
++
++static struct kobj_attribute ibtrs_clt_hostname_attr =
++		__ATTR(hostname, 0444, ibtrs_clt_hostname_show, NULL);
++
++static ssize_t ibtrs_clt_reconnect_show(struct kobject *kobj,
++					struct kobj_attribute *attr, char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_clt_reconnect_store(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 const char *buf, size_t count)
++{
++	struct ibtrs_session *sess;
++	int ret;
++
++	sess = container_of(kobj, struct ibtrs_session, kobj);
++
++	if (!sysfs_streq(buf, "1")) {
++		ERR(sess, "%s: unknown value: '%s'\n", attr->attr.name, buf);
++		return -EINVAL;
++	}
++
++	ret = ibtrs_clt_reconnect(sess);
++	if (ret) {
++		ERR(sess, "%s: failed to reconnect session, errno: %d\n",
++		    attr->attr.name, ret);
++		return ret;
++	}
++	return count;
++}
++
++static struct kobj_attribute ibtrs_clt_reconnect_attr =
++		__ATTR(reconnect, 0644, ibtrs_clt_reconnect_show,
++		       ibtrs_clt_reconnect_store);
++
++static ssize_t ibtrs_clt_queue_show(struct kobject *kobj,
++				    struct kobj_attribute *attr, char *page)
++{
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++	return scnprintf(page, PAGE_SIZE, "%d\n",
++			 ibtrs_clt_get_user_queue_depth(sess));
++}
++
++static ssize_t ibtrs_clt_queue_store(struct kobject *kobj,
++				     struct kobj_attribute *attr,
++				     const char *buf, size_t count)
++{
++	int res;
++	u16 old_queue_depth, queue_depth;
++	struct ibtrs_session *sess = container_of(kobj, struct ibtrs_session,
++						  kobj);
++	res = kstrtou16(buf, 0, &queue_depth);
++	if (res) {
++		ERR(sess,
++		    "%s: failed to convert string '%s' to unsigned int\n",
++		    attr->attr.name, buf);
++		return res;
++	}
++
++	old_queue_depth = ibtrs_clt_get_user_queue_depth(sess);
++	res = ibtrs_clt_set_user_queue_depth(sess, queue_depth);
++	if (!res) {
++		INFO(sess, "%s: changed value from %u to %u\n",
++		     attr->attr.name, old_queue_depth, queue_depth);
++	} else {
++		ERR(sess, "%s: failed to set queue depth, errno: %d\n",
++		    attr->attr.name, res);
++		return res;
++	}
++	return count;
++}
++
++STAT_ATTR(cpu_migration, ibtrs_clt_stats_migration_cnt_to_str,
++	  ibtrs_clt_reset_cpu_migr_stats);
++
++STAT_ATTR(sg_entries, ibtrs_clt_stats_sg_list_distr_to_str,
++	  ibtrs_clt_reset_sg_list_distr_stats);
++
++STAT_ATTR(reconnects, ibtrs_clt_stats_reconnects_to_str,
++	  ibtrs_clt_reset_reconnects_stat);
++
++STAT_ATTR(rdma_lat, ibtrs_clt_stats_rdma_lat_distr_to_str,
++	  ibtrs_clt_reset_rdma_lat_distr_stats);
++
++STAT_ATTR(user_ib_messages, ibtrs_clt_stats_user_ib_msgs_to_str,
++	  ibtrs_clt_reset_user_ib_msgs_stats);
++
++STAT_ATTR(wc_completion, ibtrs_clt_stats_wc_completion_to_str,
++	  ibtrs_clt_reset_wc_comp_stats);
++
++STAT_ATTR(rdma, ibtrs_clt_stats_rdma_to_str,
++	  ibtrs_clt_reset_rdma_stats);
++
++STAT_ATTR(reset_all, ibtrs_clt_reset_all_help, ibtrs_clt_reset_all_stats);
++
++static struct attribute *ibtrs_clt_default_stats_attrs[] = {
++	&sg_entries_attr.attr,
++	&cpu_migration_attr.attr,
++	&reconnects_attr.attr,
++	&rdma_lat_attr.attr,
++	&user_ib_messages_attr.attr,
++	&wc_completion_attr.attr,
++	&rdma_attr.attr,
++	&reset_all_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_clt_default_stats_attr_group = {
++	.attrs = ibtrs_clt_default_stats_attrs,
++};
++
++static struct kobj_type ibtrs_stats_ktype = {
++	.sysfs_ops = &kobj_sysfs_ops,
++};
++
++static int ibtrs_clt_create_stats_files(struct kobject *kobj,
++					struct kobject *kobj_stats)
++{
++	int ret;
++
++	ret = kobject_init_and_add(kobj_stats, &ibtrs_stats_ktype, kobj,
++				   "stats");
++	if (ret) {
++		ERR_NP("Failed to init and add stats kobject, errno: %d\n",
++		       ret);
++		return ret;
++	}
++
++	ret = sysfs_create_group(kobj_stats,
++				 &ibtrs_clt_default_stats_attr_group);
++	if (ret) {
++		ERR_NP("failed to create stats sysfs group, errno: %d\n", ret);
++		goto err;
++	}
++
++	return 0;
++
++err:
++	kobject_del(kobj_stats);
++	kobject_put(kobj_stats);
++
++	return ret;
++}
++
++static struct kobj_attribute ibtrs_clt_queue_depth_attr =
++		__ATTR(queue_depth, 0644, ibtrs_clt_queue_show,
++		       ibtrs_clt_queue_store);
++
++static struct attribute *ibtrs_clt_default_sess_attrs[] = {
++	&max_ibtrs_clt_reconnect_attempts_attr.attr,
++	&ibtrs_clt_heartbeat_timeout_ms_attr.attr,
++	&ibtrs_clt_state_attr.attr,
++	&ibtrs_clt_hostname_attr.attr,
++	&ibtrs_clt_reconnect_attr.attr,
++	&ibtrs_clt_queue_depth_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_clt_default_sess_attr_group = {
++	.attrs = ibtrs_clt_default_sess_attrs,
++};
++
++static struct kobj_type ibtrs_session_ktype = {
++	.sysfs_ops = &kobj_sysfs_ops,
++};
++
++int ibtrs_clt_create_sess_files(struct kobject *kobj,
++				struct kobject *kobj_stats, const char *ip)
++{
++	int ret;
++
++	ret = kobject_init_and_add(kobj, &ibtrs_session_ktype, sessions_kobj,
++				   "%s", ip);
++	if (ret) {
++		ERR_NP("Failed to create session kobject, errno: %d\n", ret);
++		return ret;
++	}
++
++	ret = sysfs_create_group(kobj, &ibtrs_clt_default_sess_attr_group);
++	if (ret) {
++		ERR_NP("Failed to create session sysfs group, errno: %d\n",
++		       ret);
++		goto err;
++	}
++
++	ret = ibtrs_clt_create_stats_files(kobj, kobj_stats);
++	if (ret) {
++		ERR_NP("Failed to create stats files, errno: %d\n", ret);
++		goto err1;
++	}
++
++	return 0;
++
++err1:
++	sysfs_remove_group(kobj, &ibtrs_clt_default_sess_attr_group);
++err:
++	kobject_del(kobj);
++	kobject_put(kobj);
++
++	return ret;
++}
++
++void ibtrs_clt_destroy_sess_files(struct kobject *kobj,
++				  struct kobject *kobj_stats)
++{
++	if (kobj->state_in_sysfs) {
++		kobject_del(kobj_stats);
++		kobject_put(kobj_stats);
++		kobject_del(kobj);
++		kobject_put(kobj);
++	}
++}
++
++int ibtrs_clt_create_sysfs_files(void)
++{
++	ibtrs_kobj = kobject_create_and_add("ibtrs", kernel_kobj);
++	if (!ibtrs_kobj) {
++		ERR_NP("Failed to create 'ibtrs' kobject\n");
++		return -ENOMEM;
++	}
++
++	sessions_kobj = kobject_create_and_add("sessions", ibtrs_kobj);
++	if (!sessions_kobj) {
++		ERR_NP("Failed to create 'sessions' kobject\n");
++		kobject_del(ibtrs_kobj);
++		kobject_put(ibtrs_kobj);
++		return -ENOMEM;
++	}
++	return 0;
++}
++
++void ibtrs_clt_destroy_sysfs_files(void)
++{
++	kobject_del(sessions_kobj);
++	kobject_del(ibtrs_kobj);
++	kobject_put(sessions_kobj);
++	kobject_put(ibtrs_kobj);
++}
+diff --git a/drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.h b/drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.h
+new file mode 100644
+index 0000000..d3ae563
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs_client/ibtrs_clt_sysfs.h
+@@ -0,0 +1,62 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler < mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *   	    Kleber Souza <kleber.souza@profitbricks.com>
++ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
++ *   	    Roman Pen <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
++ *    substantially similar to the "NO WARRANTY" disclaimer below
++ *    ("Disclaimer") and any redistribution must be conditioned upon
++ *    including a substantially similar Disclaimer requirement for further
++ *    binary redistribution.
++ * 3. Neither the names of the above-listed copyright holders nor the names
++ *    of any contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * Alternatively, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") version 2 as published by the Free
++ * Software Foundation.
++ *
++ * NO WARRANTY
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
++ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGES.
++ *
++ */
++
++#ifndef _IBTRS_CLT_SYFS_H
++#define _IBTRS_CLT_SYFS_H
++
++#include <linux/kobject.h>
++
++int ibtrs_clt_create_sysfs_files(void);
++
++void ibtrs_clt_destroy_sysfs_files(void);
++
++int ibtrs_clt_create_sess_files(struct kobject *kobj, struct kobject *kobj_sess,
++				const char *ip);
++
++void ibtrs_clt_destroy_sess_files(struct kobject *kobj,
++				  struct kobject *kobj_sess);
++
++#endif
+-- 
+2.7.4
