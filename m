@@ -1,15 +1,24 @@
-Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@sandisk.com,
-	linux-block@vger.kernel.org
-Subject: unify and streamline the blk-mq make_request implementations V2
-Date: Mon, 20 Mar 2017 16:39:26 -0400
-Message-Id: <20170320203930.12533-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: constify struct blk_integrity_profile
+To: Eric Biggers <ebiggers3@gmail.com>, linux-block@vger.kernel.org
+References: <20170325010348.74421-1-ebiggers3@gmail.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Eric Biggers <ebiggers@google.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d2047e25-0c33-2153-1c54-c862f9a235fc@kernel.dk>
+Date: Fri, 24 Mar 2017 20:35:16 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170325010348.74421-1-ebiggers3@gmail.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-A bunch of cleanups to get us a nice I/O submission path.
+On 03/24/2017 07:03 PM, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> blk_integrity_profile's are never modified, so mark them 'const' so that
+> they are placed in .rodata and benefit from memory protection.
 
-Changes since V1:
- - rebase on top of the recent blk_mq_try_issue_directly changes
- - incorporate comments from Bart
+Thanks, that's a nice change. Applied for 4.12.
+
+-- 
+Jens Axboe
