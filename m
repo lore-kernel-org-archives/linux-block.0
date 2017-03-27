@@ -1,58 +1,70 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f46.google.com ([74.125.83.46]:33685 "EHLO
-        mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757074AbdCUP5H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2017 11:57:07 -0400
-Received: by mail-pg0-f46.google.com with SMTP id n190so95800365pga.0
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2017 08:57:06 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 0/4] block: callback-based statistics
-Date: Tue, 21 Mar 2017 08:56:04 -0700
-Message-Id: <cover.1490110621.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+Subject: Re: [PATCH 5/7] block: add a max_discard_segment_size queue limit
+Date: Mon, 27 Mar 2017 23:09:56 +0000
+Message-ID: <1490656182.7897.17.camel@sandisk.com>
+References: <20170320204319.12628-1-hch@lst.de>
+	 <20170320204319.12628-6-hch@lst.de>
+In-Reply-To: <20170320204319.12628-6-hch@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Mon, 2017-03-20 at 16:43 -0400, Christoph Hellwig wrote:
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 5a7da607ca04..3b3bd646f580 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -333,6 +333,7 @@ struct queue_limits {
+>  	unsigned short		max_segments;
+>  	unsigned short		max_integrity_segments;
+>  	unsigned short		max_discard_segments;
+> +	unsigned int		max_discard_segment_size;
+> =20
+>  	unsigned char		misaligned;
+>  	unsigned char		discard_misaligned;
+> @@ -1150,6 +1151,8 @@ extern void blk_queue_max_segments(struct request_q=
+ueue *, unsigned short);
+>  extern void blk_queue_max_discard_segments(struct request_queue *,
+>  		unsigned short);
+>  extern void blk_queue_max_segment_size(struct request_queue *, unsigned =
+int);
+> +extern void blk_queue_max_discard_segment_size(struct request_queue *,
+> +		unsigned int);
+>  extern void blk_queue_max_discard_sectors(struct request_queue *q,
+>  		unsigned int max_discard_sectors);
+>  extern void blk_queue_max_write_same_sectors(struct request_queue *q,
+> @@ -1415,6 +1418,11 @@ static inline unsigned int queue_max_segment_size(=
+struct request_queue *q)
+>  	return q->limits.max_segment_size;
+>  }
+> =20
+> +static inline unsigned int queue_max_discard_segment_size(struct request=
+_queue *q)
+> +{
+> +	return q->limits.max_discard_segment_size;
+> +}
+> +
+>  static inline unsigned short queue_logical_block_size(struct request_que=
+ue *q)
+>  {
+>  	int retval =3D 512;
 
-This patchset generalizes the blk-stats infrastructure to allow users to
-register a callback to be called at a given time with the statistics of
-requests completed during that window. Writeback throttling and hybrid
-polling are converted to the new infrastructure. The new Kyber I/O
-scheduler uses this, as well (but it needs to be rebased on this v2).
+Hello Christoph,
 
-The details are in patch 4, which is the actual conversion. Patches 1-3
-are preparation cleanups.
+It's probably a good idea to add a comment somewhere that the unit of
+max_discard_segment_size is one byte.
 
-Changes since v1:
+Additionally, should it be mentioned in the commit message that this
+patch limits the maximum discard segment size to 4 GB?
 
-- Now the user can subdivide stats into arbitrary buckets. Both in-tree
-  users just do reads vs. writes, but we can extend poll based on
-  request size in the future
-- blk_stat_arm_callback() became blk_stat_activate_msecs() and
-  blk_stat_activate_nsecs()
-- The poll statistics are exposed in debugfs
+Thanks,
 
-Omar Sandoval (4):
-  block: remove extra calls to wbt_exit()
-  blk-stat: use READ and WRITE instead of BLK_STAT_{READ,WRITE}
-  blk-stat: move BLK_RQ_STAT_BATCH definition to blk-stat.c
-  blk-stat: convert to callback-based statistics reporting
-
- block/blk-core.c          |   7 +-
- block/blk-mq-debugfs.c    |  99 +++++++--------
- block/blk-mq.c            |  78 ++++++++----
- block/blk-mq.h            |   1 -
- block/blk-stat.c          | 315 ++++++++++++++++++++++------------------------
- block/blk-stat.h          | 182 ++++++++++++++++++++++++---
- block/blk-sysfs.c         |  31 +----
- block/blk-wbt.c           |  61 ++++-----
- block/blk-wbt.h           |   2 +-
- include/linux/blk_types.h |   3 -
- include/linux/blkdev.h    |  10 +-
- 11 files changed, 454 insertions(+), 335 deletions(-)
-
--- 
-2.12.0
+Bart.=
