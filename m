@@ -1,136 +1,297 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 04/23] md: support REQ_OP_WRITE_ZEROES
-Date: Thu, 23 Mar 2017 10:33:22 -0400
-Message-Id: <20170323143341.31549-5-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH V7 02/18] blk-throttle: prepare support multiple limits
+Date: Mon, 27 Mar 2017 10:51:30 -0700
+Message-ID: <fbc2878357f298a209935b0ca28db3f1a39d4dfd.1490634565.git.shli@fb.com>
+In-Reply-To: <cover.1490634565.git.shli@fb.com>
+References: <cover.1490634565.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Copy & paste from the REQ_OP_WRITE_SAME code.
+We are going to support low/max limit, each cgroup will have 2 limits
+after that. This patch prepares for the multiple limits change.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/md/linear.c    | 1 +
- drivers/md/md.h        | 7 +++++++
- drivers/md/multipath.c | 1 +
- drivers/md/raid0.c     | 2 ++
- drivers/md/raid1.c     | 4 +++-
- drivers/md/raid10.c    | 1 +
- drivers/md/raid5.c     | 1 +
- 7 files changed, 16 insertions(+), 1 deletion(-)
+ block/blk-throttle.c | 110 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 70 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/md/linear.c b/drivers/md/linear.c
-index 3e38e0207a3e..377a8a3672e3 100644
---- a/drivers/md/linear.c
-+++ b/drivers/md/linear.c
-@@ -293,6 +293,7 @@ static void linear_make_request(struct mddev *mddev, struct bio *bio)
- 						      split, disk_devt(mddev->gendisk),
- 						      bio_sector);
- 			mddev_check_writesame(mddev, split);
-+			mddev_check_write_zeroes(mddev, split);
- 			generic_make_request(split);
- 		}
- 	} while (split != bio);
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index dde8ecb760c8..1e76d64ce180 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -709,4 +709,11 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
- 	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_same_sectors)
- 		mddev->queue->limits.max_write_same_sectors = 0;
- }
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 0d5d85b..1da9f30 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -83,6 +83,11 @@ enum tg_state_flags {
+ 
+ #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
+ 
++enum {
++	LIMIT_MAX,
++	LIMIT_CNT,
++};
 +
-+static inline void mddev_check_write_zeroes(struct mddev *mddev, struct bio *bio)
-+{
-+	if (bio_op(bio) == REQ_OP_WRITE_ZEROES &&
-+	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_zeroes_sectors)
-+		mddev->queue->limits.max_write_zeroes_sectors = 0;
-+}
- #endif /* _MD_MD_H */
-diff --git a/drivers/md/multipath.c b/drivers/md/multipath.c
-index 79a12b59250b..e95d521d93e9 100644
---- a/drivers/md/multipath.c
-+++ b/drivers/md/multipath.c
-@@ -139,6 +139,7 @@ static void multipath_make_request(struct mddev *mddev, struct bio * bio)
- 	mp_bh->bio.bi_end_io = multipath_end_request;
- 	mp_bh->bio.bi_private = mp_bh;
- 	mddev_check_writesame(mddev, &mp_bh->bio);
-+	mddev_check_write_zeroes(mddev, &mp_bh->bio);
- 	generic_make_request(&mp_bh->bio);
- 	return;
+ struct throtl_grp {
+ 	/* must be the first member */
+ 	struct blkg_policy_data pd;
+@@ -120,10 +125,10 @@ struct throtl_grp {
+ 	bool has_rules[2];
+ 
+ 	/* bytes per second rate limits */
+-	uint64_t bps[2];
++	uint64_t bps[2][LIMIT_CNT];
+ 
+ 	/* IOPS limits */
+-	unsigned int iops[2];
++	unsigned int iops[2][LIMIT_CNT];
+ 
+ 	/* Number of bytes disptached in current slice */
+ 	uint64_t bytes_disp[2];
+@@ -147,6 +152,8 @@ struct throtl_data
+ 
+ 	/* Work for dispatching throttled bios */
+ 	struct work_struct dispatch_work;
++	unsigned int limit_index;
++	bool limit_valid[LIMIT_CNT];
+ };
+ 
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -198,6 +205,16 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ 		return container_of(sq, struct throtl_data, service_queue);
  }
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index 93347ca7c7a6..ce7a6a56cf73 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -383,6 +383,7 @@ static int raid0_run(struct mddev *mddev)
  
- 		blk_queue_max_hw_sectors(mddev->queue, mddev->chunk_sectors);
- 		blk_queue_max_write_same_sectors(mddev->queue, mddev->chunk_sectors);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, mddev->chunk_sectors);
- 		blk_queue_max_discard_sectors(mddev->queue, mddev->chunk_sectors);
++static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
++{
++	return tg->bps[rw][tg->td->limit_index];
++}
++
++static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
++{
++	return tg->iops[rw][tg->td->limit_index];
++}
++
+ /**
+  * throtl_log - log debug message via blktrace
+  * @sq: the service_queue being reported
+@@ -334,10 +351,10 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
+ 	}
  
- 		blk_queue_io_min(mddev->queue, mddev->chunk_sectors << 9);
-@@ -504,6 +505,7 @@ static void raid0_make_request(struct mddev *mddev, struct bio *bio)
- 						      split, disk_devt(mddev->gendisk),
- 						      bio_sector);
- 			mddev_check_writesame(mddev, split);
-+			mddev_check_write_zeroes(mddev, split);
- 			generic_make_request(split);
- 		}
- 	} while (split != bio);
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index a34f58772022..b59cc100320a 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -3177,8 +3177,10 @@ static int raid1_run(struct mddev *mddev)
- 	if (IS_ERR(conf))
- 		return PTR_ERR(conf);
+ 	RB_CLEAR_NODE(&tg->rb_node);
+-	tg->bps[READ] = U64_MAX;
+-	tg->bps[WRITE] = U64_MAX;
+-	tg->iops[READ] = UINT_MAX;
+-	tg->iops[WRITE] = UINT_MAX;
++	tg->bps[READ][LIMIT_MAX] = U64_MAX;
++	tg->bps[WRITE][LIMIT_MAX] = U64_MAX;
++	tg->iops[READ][LIMIT_MAX] = UINT_MAX;
++	tg->iops[WRITE][LIMIT_MAX] = UINT_MAX;
  
--	if (mddev->queue)
-+	if (mddev->queue) {
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
-+	}
+ 	return &tg->pd;
+ }
+@@ -376,11 +393,14 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
+ static void tg_update_has_rules(struct throtl_grp *tg)
+ {
+ 	struct throtl_grp *parent_tg = sq_to_tg(tg->service_queue.parent_sq);
++	struct throtl_data *td = tg->td;
+ 	int rw;
  
- 	rdev_for_each(rdev, mddev) {
- 		if (!mddev->gendisk)
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index e89a8d78a9ed..28ec3a93acee 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3749,6 +3749,7 @@ static int raid10_run(struct mddev *mddev)
- 		blk_queue_max_discard_sectors(mddev->queue,
- 					      mddev->chunk_sectors);
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
- 		blk_queue_io_min(mddev->queue, chunk_size);
- 		if (conf->geo.raid_disks % conf->geo.near_copies)
- 			blk_queue_io_opt(mddev->queue, chunk_size * conf->geo.raid_disks);
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index ed5cd705b985..8cf1f86dcd05 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7272,6 +7272,7 @@ static int raid5_run(struct mddev *mddev)
- 		mddev->queue->limits.discard_zeroes_data = 0;
+ 	for (rw = READ; rw <= WRITE; rw++)
+ 		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
+-			(tg->bps[rw] != U64_MAX || tg->iops[rw] != UINT_MAX);
++			(td->limit_valid[td->limit_index] &&
++			 (tg_bps_limit(tg, rw) != U64_MAX ||
++			  tg_iops_limit(tg, rw) != UINT_MAX));
+ }
  
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
+ static void throtl_pd_online(struct blkg_policy_data *pd)
+@@ -632,11 +652,11 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
  
- 		rdev_for_each(rdev, mddev) {
- 			disk_stack_limits(mddev->gendisk, rdev->bdev,
+ 	if (!nr_slices)
+ 		return;
+-	tmp = tg->bps[rw] * throtl_slice * nr_slices;
++	tmp = tg_bps_limit(tg, rw) * throtl_slice * nr_slices;
+ 	do_div(tmp, HZ);
+ 	bytes_trim = tmp;
+ 
+-	io_trim = (tg->iops[rw] * throtl_slice * nr_slices)/HZ;
++	io_trim = (tg_iops_limit(tg, rw) * throtl_slice * nr_slices) / HZ;
+ 
+ 	if (!bytes_trim && !io_trim)
+ 		return;
+@@ -682,7 +702,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 	 * have been trimmed.
+ 	 */
+ 
+-	tmp = (u64)tg->iops[rw] * jiffy_elapsed_rnd;
++	tmp = (u64)tg_iops_limit(tg, rw) * jiffy_elapsed_rnd;
+ 	do_div(tmp, HZ);
+ 
+ 	if (tmp > UINT_MAX)
+@@ -697,7 +717,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 	}
+ 
+ 	/* Calc approx time to dispatch */
+-	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ)/tg->iops[rw] + 1;
++	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ) / tg_iops_limit(tg, rw) + 1;
+ 
+ 	if (jiffy_wait > jiffy_elapsed)
+ 		jiffy_wait = jiffy_wait - jiffy_elapsed;
+@@ -724,7 +744,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 
+ 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
+ 
+-	tmp = tg->bps[rw] * jiffy_elapsed_rnd;
++	tmp = tg_bps_limit(tg, rw) * jiffy_elapsed_rnd;
+ 	do_div(tmp, HZ);
+ 	bytes_allowed = tmp;
+ 
+@@ -736,7 +756,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 
+ 	/* Calc approx time to dispatch */
+ 	extra_bytes = tg->bytes_disp[rw] + bio->bi_iter.bi_size - bytes_allowed;
+-	jiffy_wait = div64_u64(extra_bytes * HZ, tg->bps[rw]);
++	jiffy_wait = div64_u64(extra_bytes * HZ, tg_bps_limit(tg, rw));
+ 
+ 	if (!jiffy_wait)
+ 		jiffy_wait = 1;
+@@ -771,7 +791,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ 
+ 	/* If tg->bps = -1, then BW is unlimited */
+-	if (tg->bps[rw] == U64_MAX && tg->iops[rw] == UINT_MAX) {
++	if (tg_bps_limit(tg, rw) == U64_MAX &&
++	    tg_iops_limit(tg, rw) == UINT_MAX) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -1150,8 +1171,8 @@ static void tg_conf_updated(struct throtl_grp *tg)
+ 
+ 	throtl_log(&tg->service_queue,
+ 		   "limit change rbps=%llu wbps=%llu riops=%u wiops=%u",
+-		   tg->bps[READ], tg->bps[WRITE],
+-		   tg->iops[READ], tg->iops[WRITE]);
++		   tg_bps_limit(tg, READ), tg_bps_limit(tg, WRITE),
++		   tg_iops_limit(tg, READ), tg_iops_limit(tg, WRITE));
+ 
+ 	/*
+ 	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
+@@ -1228,25 +1249,25 @@ static ssize_t tg_set_conf_uint(struct kernfs_open_file *of,
+ static struct cftype throtl_legacy_files[] = {
+ 	{
+ 		.name = "throttle.read_bps_device",
+-		.private = offsetof(struct throtl_grp, bps[READ]),
++		.private = offsetof(struct throtl_grp, bps[READ][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_u64,
+ 		.write = tg_set_conf_u64,
+ 	},
+ 	{
+ 		.name = "throttle.write_bps_device",
+-		.private = offsetof(struct throtl_grp, bps[WRITE]),
++		.private = offsetof(struct throtl_grp, bps[WRITE][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_u64,
+ 		.write = tg_set_conf_u64,
+ 	},
+ 	{
+ 		.name = "throttle.read_iops_device",
+-		.private = offsetof(struct throtl_grp, iops[READ]),
++		.private = offsetof(struct throtl_grp, iops[READ][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_uint,
+ 		.write = tg_set_conf_uint,
+ 	},
+ 	{
+ 		.name = "throttle.write_iops_device",
+-		.private = offsetof(struct throtl_grp, iops[WRITE]),
++		.private = offsetof(struct throtl_grp, iops[WRITE][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_uint,
+ 		.write = tg_set_conf_uint,
+ 	},
+@@ -1272,18 +1293,25 @@ static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
+ 
+ 	if (!dname)
+ 		return 0;
+-	if (tg->bps[READ] == U64_MAX && tg->bps[WRITE] == U64_MAX &&
+-	    tg->iops[READ] == UINT_MAX && tg->iops[WRITE] == UINT_MAX)
++
++	if (tg->bps[READ][LIMIT_MAX] == U64_MAX &&
++	    tg->bps[WRITE][LIMIT_MAX] == U64_MAX &&
++	    tg->iops[READ][LIMIT_MAX] == UINT_MAX &&
++	    tg->iops[WRITE][LIMIT_MAX] == UINT_MAX)
+ 		return 0;
+ 
+-	if (tg->bps[READ] != U64_MAX)
+-		snprintf(bufs[0], sizeof(bufs[0]), "%llu", tg->bps[READ]);
+-	if (tg->bps[WRITE] != U64_MAX)
+-		snprintf(bufs[1], sizeof(bufs[1]), "%llu", tg->bps[WRITE]);
+-	if (tg->iops[READ] != UINT_MAX)
+-		snprintf(bufs[2], sizeof(bufs[2]), "%u", tg->iops[READ]);
+-	if (tg->iops[WRITE] != UINT_MAX)
+-		snprintf(bufs[3], sizeof(bufs[3]), "%u", tg->iops[WRITE]);
++	if (tg->bps[READ][LIMIT_MAX] != U64_MAX)
++		snprintf(bufs[0], sizeof(bufs[0]), "%llu",
++			tg->bps[READ][LIMIT_MAX]);
++	if (tg->bps[WRITE][LIMIT_MAX] != U64_MAX)
++		snprintf(bufs[1], sizeof(bufs[1]), "%llu",
++			tg->bps[WRITE][LIMIT_MAX]);
++	if (tg->iops[READ][LIMIT_MAX] != UINT_MAX)
++		snprintf(bufs[2], sizeof(bufs[2]), "%u",
++			tg->iops[READ][LIMIT_MAX]);
++	if (tg->iops[WRITE][LIMIT_MAX] != UINT_MAX)
++		snprintf(bufs[3], sizeof(bufs[3]), "%u",
++			tg->iops[WRITE][LIMIT_MAX]);
+ 
+ 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
+ 		   dname, bufs[0], bufs[1], bufs[2], bufs[3]);
+@@ -1312,10 +1340,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 
+ 	tg = blkg_to_tg(ctx.blkg);
+ 
+-	v[0] = tg->bps[READ];
+-	v[1] = tg->bps[WRITE];
+-	v[2] = tg->iops[READ];
+-	v[3] = tg->iops[WRITE];
++	v[0] = tg->bps[READ][LIMIT_MAX];
++	v[1] = tg->bps[WRITE][LIMIT_MAX];
++	v[2] = tg->iops[READ][LIMIT_MAX];
++	v[3] = tg->iops[WRITE][LIMIT_MAX];
+ 
+ 	while (true) {
+ 		char tok[27];	/* wiops=18446744073709551616 */
+@@ -1352,10 +1380,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 			goto out_finish;
+ 	}
+ 
+-	tg->bps[READ] = v[0];
+-	tg->bps[WRITE] = v[1];
+-	tg->iops[READ] = v[2];
+-	tg->iops[WRITE] = v[3];
++	tg->bps[READ][LIMIT_MAX] = v[0];
++	tg->bps[WRITE][LIMIT_MAX] = v[1];
++	tg->iops[READ][LIMIT_MAX] = v[2];
++	tg->iops[WRITE][LIMIT_MAX] = v[3];
+ 
+ 	tg_conf_updated(tg);
+ 	ret = 0;
+@@ -1453,8 +1481,9 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	/* out-of-limit, queue to @tg */
+ 	throtl_log(sq, "[%c] bio. bdisp=%llu sz=%u bps=%llu iodisp=%u iops=%u queued=%d/%d",
+ 		   rw == READ ? 'R' : 'W',
+-		   tg->bytes_disp[rw], bio->bi_iter.bi_size, tg->bps[rw],
+-		   tg->io_disp[rw], tg->iops[rw],
++		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
++		   tg_bps_limit(tg, rw),
++		   tg->io_disp[rw], tg_iops_limit(tg, rw),
+ 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
+ 
+ 	bio_associate_current(bio);
+@@ -1565,6 +1594,7 @@ int blk_throtl_init(struct request_queue *q)
+ 	q->td = td;
+ 	td->queue = q;
+ 
++	td->limit_valid[LIMIT_MAX] = true;
+ 	/* activate policy */
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
+ 	if (ret)
 -- 
-2.11.0
+2.9.3
