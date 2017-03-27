@@ -1,84 +1,95 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	Tahsin Erdogan <tahsin@google.com>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/11] block: Fix race of bdev open with gendisk shutdown
-Date: Mon, 13 Mar 2017 16:14:01 +0100
-Message-Id: <20170313151410.5586-3-jack@suse.cz>
-In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
-References: <20170313151410.5586-1-jack@suse.cz>
+Return-Path: <paulmck@linux.vnet.ibm.com>
+Date: Mon, 27 Mar 2017 11:17:11 -0700
+From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
+To: Jeffrey Hugo <jhugo@codeaurora.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        pprakash@codeaurora.org, Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Richard Cochran <rcochran@linutronix.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Richard Weinberger <richard@nod.at>
+Subject: Re: [BUG] Deadlock due due to interactions of block, RCU, and cpu
+ offline
+Reply-To: paulmck@linux.vnet.ibm.com
+References: <db9c91f6-1b17-6136-84f0-03c3c2581ab4@codeaurora.org>
+ <20170326232843.GA3637@linux.vnet.ibm.com>
+ <d23f3f77-8158-24a4-727d-123ec526dffa@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <d23f3f77-8158-24a4-727d-123ec526dffa@codeaurora.org>
+Message-Id: <20170327181711.GF3637@linux.vnet.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-blkdev_open() may race with gendisk shutdown in two different ways.
-Either del_gendisk() has already unhashed block device inode (and thus
-bd_acquire() will end up creating new block device inode) however
-gen_gendisk() will still return the gendisk that is being destroyed.
-Or bdev returned by bd_acquire() will get unhashed and gendisk destroyed
-before we get to get_gendisk() and get_gendisk() will return new gendisk
-that got allocated for device that reused the device number.
+On Mon, Mar 27, 2017 at 12:02:27PM -0600, Jeffrey Hugo wrote:
+> Hi Paul.
+> 
+> Thanks for the quick reply.
+> 
+> On 3/26/2017 5:28 PM, Paul E. McKenney wrote:
+> >On Sun, Mar 26, 2017 at 05:10:40PM -0600, Jeffrey Hugo wrote:
+> 
+> >>It is a race between this work running, and the cpu offline processing.
+> >
+> >One quick way to test this assumption is to build a kernel with Kconfig
+> >options CONFIG_RCU_NOCB_CPU=y and CONFIG_RCU_NOCB_CPU_ALL=y.  This will
+> >cause call_rcu_sched() to queue the work to a kthread, which can migrate
+> >to some other CPU.  If your analysis is correct, this should avoid
+> >the deadlock.  (Note that the deadlock should be fixed in any case,
+> >just a diagnostic assumption-check procedure.)
+> 
+> I enabled CONFIG_RCU_EXPERT=y, CONFIG_RCU_NOCB_CPU=y,
+> CONFIG_RCU_NOCB_CPU_ALL=y in my build.  I've only had time so far to
+> do one test run however the issue reproduced, but it took a fair bit
+> longer to do so.  An initial look at the data indicates that the
+> work is still not running.  An odd observation, the two threads are
+> no longer blocked on the same queue, but different ones.
 
-In both cases this will result in possible inconsistencies between
-bdev->bd_disk and bdev->bd_bdi (in the first case after gendisk gets
-destroyed and device number reused, in the second case immediately).
+I was afraid of that...
 
-Fix the problem by checking whether the gendisk is still alive and inode
-hashed when associating bdev inode with it and its bdi. That way we are
-sure that we will not associate bdev inode with disk that got past
-blk_unregister_region() in del_gendisk() (and thus device number can get
-reused). Similarly, we will not associate bdev that was once associated
-with gendisk that is going away (and thus the corresponding bdev inode
-will get unhashed in del_gendisk()) with a new gendisk that is just
-reusing the device number.
+> Let me look at this more and see what is going on now.
 
-Also add a warning that will tell us about unexpected inconsistencies
-between bdi associated with the bdev inode and bdi associated with the
-disk.
+Another thing to try would be to affinity the "rcuo" kthreads to
+some CPU that is never taken offline, just in case that kthread is
+sometimes somehow getting stuck during the CPU-hotplug operation.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/block_dev.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+> >>What is the opinion of the domain experts?
+> >
+> >I do hope that we can come up with a better fix.  No offense intended,
+> >as coming up with -any- fix in the CPU-hotplug domain is not to be
+> >denigrated, but this looks to be at vest quite fragile.
+> >
+> >							Thanx, Paul
+> >
+> 
+> None taken.  I'm not particularly attached to the current fix.  I
+> agree, it does appear to be quite fragile.
+> 
+> I'm still not sure what a better solution would be though.  Maybe
+> the RCU framework flushes the work somehow during cpu offline?  It
+> would need to ensure further work is not queued after that point,
+> which seems like it might be tricky to synchronize.  I don't know
+> enough about the working of RCU to even attempt to implement that.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 53e2389ae4d4..5ec8750f5332 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1560,7 +1560,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 		if (!partno) {
- 			ret = -ENXIO;
- 			bdev->bd_part = disk_get_part(disk, partno);
--			if (!bdev->bd_part)
-+			if (!(disk->flags & GENHD_FL_UP) || !bdev->bd_part ||
-+			    inode_unhashed(bdev->bd_inode))
- 				goto out_clear;
- 
- 			ret = 0;
-@@ -1614,7 +1615,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 			bdev->bd_contains = whole;
- 			bdev->bd_part = disk_get_part(disk, partno);
- 			if (!(disk->flags & GENHD_FL_UP) ||
--			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
-+			    !bdev->bd_part || !bdev->bd_part->nr_sects ||
-+			    inode_unhashed(bdev->bd_inode)) {
- 				ret = -ENXIO;
- 				goto out_clear;
- 			}
-@@ -1623,6 +1625,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 
- 		if (bdev->bd_bdi == &noop_backing_dev_info)
- 			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
-+		else
-+			WARN_ON_ONCE(bdev->bd_bdi !=
-+				     disk->queue->backing_dev_info);
- 	} else {
- 		if (bdev->bd_contains == bdev) {
- 			ret = 0;
--- 
-2.10.2
+There are some ways that RCU might be able to shrink the window during
+which the outgoing CPU's callbacks are in limbo, but they are not free
+of risk, so we really need to compleetly understand what is going on
+before making any possibly ill-conceived changes.  ;-)
+
+> In any case, it seem like some more analysis is needed based on the
+> latest data.
+
+Looking forward to hearing about you find!
+
+							Thanx, Paul
+
+> -- 
+> Jeffrey Hugo
+> Qualcomm Datacenter Technologies as an affiliate of Qualcomm
+> Technologies, Inc.
+> Qualcomm Technologies, Inc. is a member of the
+> Code Aurora Forum, a Linux Foundation Collaborative Project.
+> 
