@@ -3,11 +3,11 @@ From: Shaohua Li <shli@fb.com>
 To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
         <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH 3/3] blk-throttle: add latency target support
-Date: Mon, 27 Mar 2017 15:19:43 -0700
-Message-ID: <81425b424868c7054893cf34eb6106ecaa09c6a6.1490651903.git.shli@fb.com>
-In-Reply-To: <cover.1490651903.git.shli@fb.com>
-References: <567d5361-7d6b-c53e-8ada-a2966e48dc54@fb.com> <cover.1490651903.git.shli@fb.com>
+Subject: [PATCH V7 18/18] blk-throttle: add latency target support
+Date: Mon, 27 Mar 2017 10:51:46 -0700
+Message-ID: <0d512d4589e1d188a27fea1afd60e5611f1533c9.1490634565.git.shli@fb.com>
+In-Reply-To: <cover.1490634565.git.shli@fb.com>
+References: <cover.1490634565.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
@@ -34,10 +34,10 @@ Signed-off-by: Shaohua Li <shli@fb.com>
  1 file changed, 35 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 140da29..c82bf9b 100644
+index 4b9c6a1..e506d94 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -165,6 +165,10 @@ struct throtl_grp {
+@@ -170,6 +170,10 @@ struct throtl_grp {
  	unsigned long checked_last_finish_time; /* ns / 1024 */
  	unsigned long avg_idletime; /* ns / 1024 */
  	unsigned long idletime_threshold; /* us */
@@ -48,7 +48,7 @@ index 140da29..c82bf9b 100644
  };
  
  /* We measure latency for request size from <= 4k to >= 1M */
-@@ -1720,12 +1724,15 @@ static bool throtl_tg_is_idle(struct throtl_grp *tg)
+@@ -1725,12 +1729,15 @@ static bool throtl_tg_is_idle(struct throtl_grp *tg)
  	 * - single idle is too long, longer than a fixed value (in case user
  	 *   configure a too big threshold) or 4 times of slice
  	 * - average think time is more than threshold
@@ -65,20 +65,20 @@ index 140da29..c82bf9b 100644
  }
  
  static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
-@@ -2194,12 +2201,36 @@ void blk_throtl_bio_endio(struct bio *bio)
+@@ -2211,12 +2218,36 @@ void blk_throtl_bio_endio(struct bio *bio)
  
- 	start_time = blk_stat_time(&bio->bi_issue_stat) >> 10;
- 	finish_time = __blk_stat_time(finish_time_ns) >> 10;
+ 	start_time = THROTL_STAT_TIME(bio->bi_throtl_stat) >> 10;
+ 	finish_time = THROTL_STAT_TIME(finish_time_ns) >> 10;
+-	if (start_time && finish_time > start_time &&
+-	    !(bio->bi_throtl_stat & THROTL_SKIP_LAT)) {
+-		lat = finish_time - start_time;
 +	if (!start_time || finish_time <= start_time)
 +		return;
 +
 +	lat = finish_time - start_time;
- 	/* this is only for bio based driver */
--	if (start_time && finish_time > start_time &&
--	    !(bio->bi_issue_stat.stat & SKIP_LATENCY)) {
--		lat = finish_time - start_time;
-+	if (!(bio->bi_issue_stat.stat & SKIP_LATENCY))
- 		throtl_track_latency(tg->td, blk_stat_size(&bio->bi_issue_stat),
++	if (!(bio->bi_throtl_stat & THROTL_SKIP_LAT))
+ 		throtl_track_latency(tg->td,
+ 			THROTL_STAT_SIZE(bio->bi_throtl_stat),
  			bio_op(bio), lat);
 +
 +	if (tg->latency_target) {
@@ -86,7 +86,7 @@ index 140da29..c82bf9b 100644
 +		unsigned int threshold;
 +
 +		bucket = request_bucket_index(
-+			blk_stat_size(&bio->bi_issue_stat));
++			THROTL_STAT_SIZE(bio->bi_throtl_stat));
 +		threshold = tg->td->avg_buckets[bucket].latency +
 +			tg->latency_target;
 +		if (lat > threshold)
