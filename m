@@ -1,136 +1,86 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 05/25] md: support REQ_OP_WRITE_ZEROES
-Date: Fri, 31 Mar 2017 18:32:53 +0200
-Message-Id: <20170331163313.31821-6-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2865 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751385AbdC0Ptk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Mar 2017 11:49:40 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: "tj@kernel.org" <tj@kernel.org>, "hare@suse.de" <hare@suse.de>
+Subject: Re: [PATCH v3 4/4] block: block new I/O just after queue is set as
+ dying
+Date: Mon, 27 Mar 2017 15:49:10 +0000
+Message-ID: <1490629737.2461.10.camel@sandisk.com>
+References: <20170327120658.29864-1-tom.leiming@gmail.com>
+         <20170327120658.29864-5-tom.leiming@gmail.com>
+In-Reply-To: <20170327120658.29864-5-tom.leiming@gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Copy & paste from the REQ_OP_WRITE_SAME code.
+On Mon, 2017-03-27 at 20:06 +0800, Ming Lei wrote:
+> Before commit 780db2071a(blk-mq: decouble blk-mq freezing
+> from generic bypassing), the dying flag is checked before
+> entering queue, and Tejun converts the checking into .mq_freeze_depth,
+> and assumes the counter is increased just after dying flag
+> is set. Unfortunately we doesn't do that in blk_set_queue_dying().
+>=20
+> This patch calls blk_freeze_queue_start() in blk_set_queue_dying(),
+> so that we can block new I/O coming once the queue is set as dying.
+>=20
+> Given blk_set_queue_dying() is always called in remove path
+> of block device, and queue will be cleaned up later, we don't
+> need to worry about undoing the counter.
+>=20
+> Cc: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  block/blk-core.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 60f364e1d36b..e22c4ea002ec 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -500,6 +500,13 @@ void blk_set_queue_dying(struct request_queue *q)
+>  	queue_flag_set(QUEUE_FLAG_DYING, q);
+>  	spin_unlock_irq(q->queue_lock);
+> =20
+> +	/*
+> +	 * When queue DYING flag is set, we need to block new req
+> +	 * entering queue, so we call blk_freeze_queue_start() to
+> +	 * prevent I/O from crossing blk_queue_enter().
+> +	 */
+> +	blk_freeze_queue_start(q);
+>
+> 	if (q->mq_ops)
+>  		blk_mq_wake_waiters(q);
+>  	else {
+> @@ -672,9 +679,9 @@ int blk_queue_enter(struct request_queue *q, bool now=
+ait)
+>  		/*
+>  		 * read pair of barrier in blk_freeze_queue_start(),
+>  		 * we need to order reading __PERCPU_REF_DEAD flag of
+> -		 * .q_usage_counter and reading .mq_freeze_depth,
+> -		 * otherwise the following wait may never return if the
+> -		 * two reads are reordered.
+> +		 * .q_usage_counter and reading .mq_freeze_depth or
+> +		 * queue dying flag, otherwise the following wait may
+> +		 * never return if the two reads are reordered.
+>  		 */
+>  		smp_rmb();
+> =20
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/linear.c    | 1 +
- drivers/md/md.h        | 7 +++++++
- drivers/md/multipath.c | 1 +
- drivers/md/raid0.c     | 2 ++
- drivers/md/raid1.c     | 4 +++-
- drivers/md/raid10.c    | 1 +
- drivers/md/raid5.c     | 1 +
- 7 files changed, 16 insertions(+), 1 deletion(-)
+An explanation of why that crossing can happen is still missing above the
+blk_freeze_queue_start() call. Additionally, I'm still wondering whether
+or not we need "Cc: stable" tags for the patches in this series. But since
+the code looks fine:
 
-diff --git a/drivers/md/linear.c b/drivers/md/linear.c
-index 3e38e0207a3e..377a8a3672e3 100644
---- a/drivers/md/linear.c
-+++ b/drivers/md/linear.c
-@@ -293,6 +293,7 @@ static void linear_make_request(struct mddev *mddev, struct bio *bio)
- 						      split, disk_devt(mddev->gendisk),
- 						      bio_sector);
- 			mddev_check_writesame(mddev, split);
-+			mddev_check_write_zeroes(mddev, split);
- 			generic_make_request(split);
- 		}
- 	} while (split != bio);
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index dde8ecb760c8..1e76d64ce180 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -709,4 +709,11 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
- 	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_same_sectors)
- 		mddev->queue->limits.max_write_same_sectors = 0;
- }
-+
-+static inline void mddev_check_write_zeroes(struct mddev *mddev, struct bio *bio)
-+{
-+	if (bio_op(bio) == REQ_OP_WRITE_ZEROES &&
-+	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_zeroes_sectors)
-+		mddev->queue->limits.max_write_zeroes_sectors = 0;
-+}
- #endif /* _MD_MD_H */
-diff --git a/drivers/md/multipath.c b/drivers/md/multipath.c
-index 79a12b59250b..e95d521d93e9 100644
---- a/drivers/md/multipath.c
-+++ b/drivers/md/multipath.c
-@@ -139,6 +139,7 @@ static void multipath_make_request(struct mddev *mddev, struct bio * bio)
- 	mp_bh->bio.bi_end_io = multipath_end_request;
- 	mp_bh->bio.bi_private = mp_bh;
- 	mddev_check_writesame(mddev, &mp_bh->bio);
-+	mddev_check_write_zeroes(mddev, &mp_bh->bio);
- 	generic_make_request(&mp_bh->bio);
- 	return;
- }
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index 93347ca7c7a6..ce7a6a56cf73 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -383,6 +383,7 @@ static int raid0_run(struct mddev *mddev)
- 
- 		blk_queue_max_hw_sectors(mddev->queue, mddev->chunk_sectors);
- 		blk_queue_max_write_same_sectors(mddev->queue, mddev->chunk_sectors);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, mddev->chunk_sectors);
- 		blk_queue_max_discard_sectors(mddev->queue, mddev->chunk_sectors);
- 
- 		blk_queue_io_min(mddev->queue, mddev->chunk_sectors << 9);
-@@ -504,6 +505,7 @@ static void raid0_make_request(struct mddev *mddev, struct bio *bio)
- 						      split, disk_devt(mddev->gendisk),
- 						      bio_sector);
- 			mddev_check_writesame(mddev, split);
-+			mddev_check_write_zeroes(mddev, split);
- 			generic_make_request(split);
- 		}
- 	} while (split != bio);
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index a34f58772022..b59cc100320a 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -3177,8 +3177,10 @@ static int raid1_run(struct mddev *mddev)
- 	if (IS_ERR(conf))
- 		return PTR_ERR(conf);
- 
--	if (mddev->queue)
-+	if (mddev->queue) {
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
-+	}
- 
- 	rdev_for_each(rdev, mddev) {
- 		if (!mddev->gendisk)
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index e89a8d78a9ed..28ec3a93acee 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3749,6 +3749,7 @@ static int raid10_run(struct mddev *mddev)
- 		blk_queue_max_discard_sectors(mddev->queue,
- 					      mddev->chunk_sectors);
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
- 		blk_queue_io_min(mddev->queue, chunk_size);
- 		if (conf->geo.raid_disks % conf->geo.near_copies)
- 			blk_queue_io_opt(mddev->queue, chunk_size * conf->geo.raid_disks);
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index ed5cd705b985..8cf1f86dcd05 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7272,6 +7272,7 @@ static int raid5_run(struct mddev *mddev)
- 		mddev->queue->limits.discard_zeroes_data = 0;
- 
- 		blk_queue_max_write_same_sectors(mddev->queue, 0);
-+		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
- 
- 		rdev_for_each(rdev, mddev) {
- 			disk_stack_limits(mddev->gendisk, rdev->bdev,
--- 
-2.11.0
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> =
