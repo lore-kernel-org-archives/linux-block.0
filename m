@@ -1,131 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:36770 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755098AbdCPQOj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:39 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 08/14] block: introduce bio_copy_data_partial
-Date: Fri, 17 Mar 2017 00:12:29 +0800
-Message-Id: <20170316161235.27110-9-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:50486 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751751AbdC0MPc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Mar 2017 08:15:32 -0400
+Date: Mon, 27 Mar 2017 14:15:06 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v3 3/4] block: rename blk_mq_freeze_queue_start()
+Message-ID: <20170327121506.GC7237@linux-x5ow.site>
+References: <20170327120658.29864-1-tom.leiming@gmail.com>
+ <20170327120658.29864-4-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170327120658.29864-4-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Turns out we can use bio_copy_data in raid1's write behind,
-and we can make alloc_behind_pages() more clean/efficient,
-but we need to partial version of bio_copy_data().
+On Mon, Mar 27, 2017 at 08:06:57PM +0800, Ming Lei wrote:
+> As the .q_usage_counter is used by both legacy and
+> mq path, we need to block new I/O if queue becomes
+> dead in blk_queue_enter().
+> 
+> So rename it and we can use this function in both
+> paths.
+> 
+> Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/bio.c         | 60 +++++++++++++++++++++++++++++++++++++++++------------
- include/linux/bio.h |  2 ++
- 2 files changed, 49 insertions(+), 13 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index e75878f8b14a..1ccff0dace89 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1025,19 +1025,8 @@ int bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
- }
- EXPORT_SYMBOL(bio_alloc_pages);
- 
--/**
-- * bio_copy_data - copy contents of data buffers from one chain of bios to
-- * another
-- * @src: source bio list
-- * @dst: destination bio list
-- *
-- * If @src and @dst are single bios, bi_next must be NULL - otherwise, treats
-- * @src and @dst as linked lists of bios.
-- *
-- * Stops when it reaches the end of either @src or @dst - that is, copies
-- * min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of bios).
-- */
--void bio_copy_data(struct bio *dst, struct bio *src)
-+static void __bio_copy_data(struct bio *dst, struct bio *src,
-+			    int offset, int size)
- {
- 	struct bvec_iter src_iter, dst_iter;
- 	struct bio_vec src_bv, dst_bv;
-@@ -1047,6 +1036,12 @@ void bio_copy_data(struct bio *dst, struct bio *src)
- 	src_iter = src->bi_iter;
- 	dst_iter = dst->bi_iter;
- 
-+	/* for supporting partial copy */
-+	if (offset || size != src->bi_iter.bi_size) {
-+		bio_advance_iter(src, &src_iter, offset);
-+		src_iter.bi_size = size;
-+	}
-+
- 	while (1) {
- 		if (!src_iter.bi_size) {
- 			src = src->bi_next;
-@@ -1083,8 +1078,47 @@ void bio_copy_data(struct bio *dst, struct bio *src)
- 		bio_advance_iter(dst, &dst_iter, bytes);
- 	}
- }
-+
-+/**
-+ * bio_copy_data - copy contents of data buffers from one chain of bios to
-+ * another
-+ * @src: source bio list
-+ * @dst: destination bio list
-+ *
-+ * If @src and @dst are single bios, bi_next must be NULL - otherwise, treats
-+ * @src and @dst as linked lists of bios.
-+ *
-+ * Stops when it reaches the end of either @src or @dst - that is, copies
-+ * min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of bios).
-+ */
-+void bio_copy_data(struct bio *dst, struct bio *src)
-+{
-+	__bio_copy_data(dst, src, 0, src->bi_iter.bi_size);
-+}
- EXPORT_SYMBOL(bio_copy_data);
- 
-+/**
-+ * bio_copy_data_partial - copy partial contents of data buffers from one
-+ * chain of bios to another
-+ * @dst: destination bio list
-+ * @src: source bio list
-+ * @offset: starting copy from the offset
-+ * @size: how many bytes to copy
-+ *
-+ * If @src and @dst are single bios, bi_next must be NULL - otherwise, treats
-+ * @src and @dst as linked lists of bios.
-+ *
-+ * Stops when it reaches the end of either @src or @dst - that is, copies
-+ * min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of bios).
-+ */
-+void bio_copy_data_partial(struct bio *dst, struct bio *src,
-+			   int offset, int size)
-+{
-+	__bio_copy_data(dst, src, offset, size);
-+
-+}
-+EXPORT_SYMBOL(bio_copy_data_partial);
-+
- struct bio_map_data {
- 	int is_our_pages;
- 	struct iov_iter iter;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8e521194f6fc..42b62a0288b0 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -468,6 +468,8 @@ static inline void bio_flush_dcache_pages(struct bio *bi)
- #endif
- 
- extern void bio_copy_data(struct bio *dst, struct bio *src);
-+extern void bio_copy_data_partial(struct bio *dst, struct bio *src,
-+				  int offset, int size);
- extern int bio_alloc_pages(struct bio *bio, gfp_t gfp);
- extern void bio_free_pages(struct bio *bio);
- 
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.9.3
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
