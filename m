@@ -1,158 +1,175 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f45.google.com ([74.125.83.45]:35956 "EHLO
-        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753925AbdC1G3w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2017 02:29:52 -0400
-Received: by mail-pg0-f45.google.com with SMTP id g2so62646692pge.3
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2017 23:29:51 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, Vivek Goyal <vgoyal@redhat.com>,
-        linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Tim Waugh <tim@cyberelk.net>
-Subject: [PATCH 4/6] parport/pf: stop sharing request queue across multiple gendisks
-Date: Mon, 27 Mar 2017 23:28:45 -0700
-Message-Id: <627567bd2a1a08ca9f8e625c8ac451e023dc2d7f.1490681910.git.osandov@fb.com>
-In-Reply-To: <cover.1490681910.git.osandov@fb.com>
-References: <cover.1490681910.git.osandov@fb.com>
-In-Reply-To: <cover.1490681910.git.osandov@fb.com>
-References: <cover.1490681910.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH 1/3] block: track request size in blk_issue_stat
+Date: Mon, 27 Mar 2017 15:19:41 -0700
+Message-ID: <d7e635142006dd93f831d1cef136c6fb6a8e5b22.1490651903.git.shli@fb.com>
+In-Reply-To: <cover.1490651903.git.shli@fb.com>
+References: <567d5361-7d6b-c53e-8ada-a2966e48dc54@fb.com> <cover.1490651903.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Currently there is no way to know the request size when the request is
+finished. Next patch will need this info. We could add extra field to
+record the size, but blk_issue_stat has enough space to record it, so
+this patch just overloads blk_issue_stat. With this, we will have 49bits
+to track time, which still is very long time.
 
-Compile-tested only.
-
-Cc: Tim Waugh <tim@cyberelk.net>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/block/paride/pf.c | 57 +++++++++++++++++++++++++++++++----------------
- 1 file changed, 38 insertions(+), 19 deletions(-)
+ block/blk-core.c          |  2 +-
+ block/blk-mq.c            |  2 +-
+ block/blk-stat.h          | 41 ++++++++++++++++++++++++++++++-----------
+ block/blk-wbt.h           | 10 +++++-----
+ include/linux/blk_types.h |  2 +-
+ 5 files changed, 38 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
-index 14c5d32f5d8b..f24ca7315ddc 100644
---- a/drivers/block/paride/pf.c
-+++ b/drivers/block/paride/pf.c
-@@ -287,6 +287,12 @@ static void __init pf_init_units(void)
- 		struct gendisk *disk = alloc_disk(1);
- 		if (!disk)
- 			continue;
-+		disk->queue = blk_init_queue(do_pf_request, &pf_spin_lock);
-+		if (!disk->queue) {
-+			put_disk(disk);
-+			return;
-+		}
-+		blk_queue_max_segments(disk->queue, cluster);
- 		pf->disk = disk;
- 		pf->pi = &pf->pia;
- 		pf->media_status = PF_NM;
-@@ -772,7 +778,28 @@ static int pf_ready(void)
- 	return (((status_reg(pf_current) & (STAT_BUSY | pf_mask)) == pf_mask));
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ad388d5e..4234332 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2483,7 +2483,7 @@ void blk_start_request(struct request *req)
+ 	blk_dequeue_request(req);
  
--static struct request_queue *pf_queue;
-+static int pf_queue;
-+
-+static int set_next_request(void)
-+{
-+	struct pf_unit *pf;
-+	struct request_queue *q;
-+	int old_pos = pf_queue;
-+
-+	do {
-+		pf = &units[pf_queue];
-+		q = pf->present ? pf->disk->queue : NULL;
-+		if (++pf_queue == PF_UNITS)
-+			pf_queue = 0;
-+		if (q) {
-+			pf_req = blk_fetch_request(q);
-+			if (pf_req)
-+				break;
-+		}
-+	} while (pf_queue != old_pos);
-+
-+	return pf_req != NULL;
-+}
- 
- static void pf_end_request(int err)
- {
-@@ -780,16 +807,13 @@ static void pf_end_request(int err)
- 		pf_req = NULL;
- }
- 
--static void do_pf_request(struct request_queue * q)
-+static void pf_request(void)
- {
- 	if (pf_busy)
- 		return;
- repeat:
--	if (!pf_req) {
--		pf_req = blk_fetch_request(q);
--		if (!pf_req)
--			return;
--	}
-+	if (!pf_req && !set_next_request())
-+		return;
- 
- 	pf_current = pf_req->rq_disk->private_data;
- 	pf_block = blk_rq_pos(pf_req);
-@@ -817,6 +841,11 @@ static void do_pf_request(struct request_queue * q)
+ 	if (test_bit(QUEUE_FLAG_STATS, &req->q->queue_flags)) {
+-		blk_stat_set_issue_time(&req->issue_stat);
++		blk_stat_set_issue(&req->issue_stat, blk_rq_sectors(req));
+ 		req->rq_flags |= RQF_STATS;
+ 		wbt_issue(req->q->rq_wb, &req->issue_stat);
  	}
- }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 45b9beb..caef6ee 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -488,7 +488,7 @@ void blk_mq_start_request(struct request *rq)
+ 	trace_block_rq_issue(q, rq);
  
-+static void do_pf_request(struct request_queue *q)
-+{
-+	pf_request();
-+}
-+
- static int pf_next_buf(void)
- {
- 	unsigned long saved_flags;
-@@ -846,7 +875,7 @@ static inline void next_request(int err)
- 	spin_lock_irqsave(&pf_spin_lock, saved_flags);
- 	pf_end_request(err);
- 	pf_busy = 0;
--	do_pf_request(pf_queue);
-+	pf_request();
- 	spin_unlock_irqrestore(&pf_spin_lock, saved_flags);
- }
- 
-@@ -972,15 +1001,6 @@ static int __init pf_init(void)
- 			put_disk(pf->disk);
- 		return -EBUSY;
+ 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+-		blk_stat_set_issue_time(&rq->issue_stat);
++		blk_stat_set_issue(&rq->issue_stat, blk_rq_sectors(rq));
+ 		rq->rq_flags |= RQF_STATS;
+ 		wbt_issue(q->rq_wb, &rq->issue_stat);
  	}
--	pf_queue = blk_init_queue(do_pf_request, &pf_spin_lock);
--	if (!pf_queue) {
--		unregister_blkdev(major, name);
--		for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++)
--			put_disk(pf->disk);
--		return -ENOMEM;
--	}
+diff --git a/block/blk-stat.h b/block/blk-stat.h
+index 6ad5b8c..ee47f81 100644
+--- a/block/blk-stat.h
++++ b/block/blk-stat.h
+@@ -8,12 +8,19 @@
+ #include <linux/timer.h>
+ 
+ /*
+- * Upper 3 bits can be used elsewhere
++ * from upper:
++ * 3 bits: reserved for other usage
++ * 12 bits: size
++ * 49 bits: time
+  */
+ #define BLK_STAT_RES_BITS	3
+-#define BLK_STAT_SHIFT		(64 - BLK_STAT_RES_BITS)
+-#define BLK_STAT_TIME_MASK	((1ULL << BLK_STAT_SHIFT) - 1)
+-#define BLK_STAT_MASK		~BLK_STAT_TIME_MASK
++#define BLK_STAT_SIZE_BITS	12
++#define BLK_STAT_RES_SHIFT	(64 - BLK_STAT_RES_BITS)
++#define BLK_STAT_SIZE_SHIFT	(BLK_STAT_RES_SHIFT - BLK_STAT_SIZE_BITS)
++#define BLK_STAT_TIME_MASK	((1ULL << BLK_STAT_SIZE_SHIFT) - 1)
++#define BLK_STAT_SIZE_MASK	\
++	(((1ULL << BLK_STAT_SIZE_BITS) - 1) << BLK_STAT_SIZE_SHIFT)
++#define BLK_STAT_RES_MASK	(~((1ULL << BLK_STAT_RES_SHIFT) - 1))
+ 
+ /**
+  * struct blk_stat_callback - Block statistics callback.
+@@ -73,12 +80,6 @@ void blk_free_queue_stats(struct blk_queue_stats *);
+ 
+ void blk_stat_add(struct request *);
+ 
+-static inline void blk_stat_set_issue_time(struct blk_issue_stat *stat)
+-{
+-	stat->time = ((stat->time & BLK_STAT_MASK) |
+-		      (ktime_to_ns(ktime_get()) & BLK_STAT_TIME_MASK));
+-}
 -
--	blk_queue_max_segments(pf_queue, cluster);
+ static inline u64 __blk_stat_time(u64 time)
+ {
+ 	return time & BLK_STAT_TIME_MASK;
+@@ -86,7 +87,25 @@ static inline u64 __blk_stat_time(u64 time)
  
- 	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
- 		struct gendisk *disk = pf->disk;
-@@ -988,7 +1008,6 @@ static int __init pf_init(void)
- 		if (!pf->present)
- 			continue;
- 		disk->private_data = pf;
--		disk->queue = pf_queue;
- 		add_disk(disk);
- 	}
- 	return 0;
-@@ -1003,10 +1022,10 @@ static void __exit pf_exit(void)
- 		if (!pf->present)
- 			continue;
- 		del_gendisk(pf->disk);
-+		blk_cleanup_queue(pf->disk->queue);
- 		put_disk(pf->disk);
- 		pi_release(pf->pi);
- 	}
--	blk_cleanup_queue(pf_queue);
+ static inline u64 blk_stat_time(struct blk_issue_stat *stat)
+ {
+-	return __blk_stat_time(stat->time);
++	return __blk_stat_time(stat->stat);
++}
++
++static inline sector_t blk_capped_size(sector_t size)
++{
++	return size & ((1ULL << BLK_STAT_SIZE_BITS) - 1);
++}
++
++static inline sector_t blk_stat_size(struct blk_issue_stat *stat)
++{
++	return (stat->stat & BLK_STAT_SIZE_MASK) >> BLK_STAT_SIZE_SHIFT;
++}
++
++static inline void blk_stat_set_issue(struct blk_issue_stat *stat,
++	sector_t size)
++{
++	stat->stat = (stat->stat & BLK_STAT_RES_MASK) |
++		(ktime_to_ns(ktime_get()) & BLK_STAT_TIME_MASK) |
++		(((u64)blk_capped_size(size)) << BLK_STAT_SIZE_SHIFT);
  }
  
- MODULE_LICENSE("GPL");
+ /*
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index 591ff2f..ad6c785 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -32,27 +32,27 @@ enum {
+ 
+ static inline void wbt_clear_state(struct blk_issue_stat *stat)
+ {
+-	stat->time &= BLK_STAT_TIME_MASK;
++	stat->stat &= ~BLK_STAT_RES_MASK;
+ }
+ 
+ static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
+ {
+-	return (stat->time & BLK_STAT_MASK) >> BLK_STAT_SHIFT;
++	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
+ }
+ 
+ static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags wb_acct)
+ {
+-	stat->time |= ((u64) wb_acct) << BLK_STAT_SHIFT;
++	stat->stat |= ((u64) wb_acct) << BLK_STAT_RES_SHIFT;
+ }
+ 
+ static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
+ {
+-	return (stat->time >> BLK_STAT_SHIFT) & WBT_TRACKED;
++	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
+ }
+ 
+ static inline bool wbt_is_read(struct blk_issue_stat *stat)
+ {
+-	return (stat->time >> BLK_STAT_SHIFT) & WBT_READ;
++	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
+ }
+ 
+ struct rq_wait {
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 07a9e96..3ad5673 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -287,7 +287,7 @@ static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
+ }
+ 
+ struct blk_issue_stat {
+-	u64 time;
++	u64 stat;
+ };
+ 
+ struct blk_rq_stat {
 -- 
-2.12.1
+2.9.3
