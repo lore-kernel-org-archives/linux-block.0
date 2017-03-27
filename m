@@ -1,90 +1,65 @@
-Return-Path: <linus.walleij@linaro.org>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+Subject: Re: [PATCH 7/7] sd: use ZERO_PAGE for WRITE_SAME payloads
+Date: Mon, 27 Mar 2017 23:40:12 +0000
+Message-ID: <1490657999.7897.21.camel@sandisk.com>
+References: <20170320204319.12628-1-hch@lst.de>
+	 <20170320204319.12628-8-hch@lst.de>
+In-Reply-To: <20170320204319.12628-8-hch@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <00989e26-cdb9-48d7-2e46-ae6ef66e59a7@intel.com>
-References: <20170209153403.9730-1-linus.walleij@linaro.org>
- <20170209153403.9730-7-linus.walleij@linaro.org> <00989e26-cdb9-48d7-2e46-ae6ef66e59a7@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 9 Mar 2017 23:49:19 +0100
-Message-ID: <CACRpkdYOyEs8vxmPt1kGiKJrw8+16DyD8Nn=ke6mgxPaCQynCw@mail.gmail.com>
-Subject: Re: [PATCH 06/16] mmc: core: replace waitqueue with worker
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-	Paolo Valente <paolo.valente@linaro.org>, Chunyan Zhang <zhang.chunyan@linaro.org>,
-	Baolin Wang <baolin.wang@linaro.org>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Feb 22, 2017 at 2:29 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
-> On 09/02/17 17:33, Linus Walleij wrote:
->> The waitqueue in the host context is there to signal back from
->> mmc_request_done() through mmc_wait_data_done() that the hardware
->> is done with a command, and when the wait is over, the core
->> will typically submit the next asynchronous request that is pending
->> just waiting for the hardware to be available.
->>
->> This is in the way for letting the mmc_request_done() trigger the
->> report up to the block layer that a block request is finished.
->>
->> Re-jig this as a first step, remvoving the waitqueue and introducing
->> a work that will run after a completed asynchronous request,
->> finalizing that request, including retransmissions, and eventually
->> reporting back with a completion and a status code to the
->> asynchronous issue method.
->>
->> This had the upside that we can remove the MMC_BLK_NEW_REQUEST
->> status code and the "new_request" state in the request queue
->> that is only there to make the state machine spin out
->> the first time we send a request.
->>
->> Introduce a workqueue in the host for handling just this, and
->> then a work and completion in the asynchronous request to deal
->> with this mechanism.
->>
->> This is a central change that let us do many other changes since
->> we have broken the submit and complete code paths in two, and we
->> can potentially remove the NULL flushing of the asynchronous
->> pipeline and report block requests as finished directly from
->> the worker.
->
-> This needs more thought.  The completion should go straight to the mmc block
-> driver from the ->done() callback.  And from there straight back to the
-> block layer if recovery is not needed.  We want to stop using
-> mmc_start_areq() altogether because we never want to wait - we always want
-> to issue (if possible) and return.
+On Mon, 2017-03-20 at 16:43 -0400, Christoph Hellwig wrote:
+> We're never touching the contents of the page, so save a memory
+> allocation for these cases.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/sd.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> index c18fe9ff1f8f..af632e350ab4 100644
+> --- a/drivers/scsi/sd.c
+> +++ b/drivers/scsi/sd.c
+> @@ -756,7 +756,7 @@ static int sd_setup_write_same16_cmnd(struct scsi_cmn=
+d *cmd)
+>  	u32 nr_sectors =3D blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
+>  	u32 data_len =3D sdp->sector_size;
+> =20
+> -	rq->special_vec.bv_page =3D alloc_page(GFP_ATOMIC | __GFP_ZERO);
+> +	rq->special_vec.bv_page =3D ZERO_PAGE(0);
+>  	if (!rq->special_vec.bv_page)
+>  		return BLKPREP_DEFER;
+>  	rq->special_vec.bv_offset =3D 0;
+> @@ -785,7 +785,7 @@ static int sd_setup_write_same10_cmnd(struct scsi_cmn=
+d *cmd, bool unmap)
+>  	u32 nr_sectors =3D blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
+>  	u32 data_len =3D sdp->sector_size;
+> =20
+> -	rq->special_vec.bv_page =3D alloc_page(GFP_ATOMIC | __GFP_ZERO);
+> +	rq->special_vec.bv_page =3D ZERO_PAGE(0);
+>  	if (!rq->special_vec.bv_page)
+>  		return BLKPREP_DEFER;
+>  	rq->special_vec.bv_offset =3D 0;
+> @@ -1256,7 +1256,8 @@ static void sd_uninit_command(struct scsi_cmnd *SCp=
+nt)
+>  {
+>  	struct request *rq =3D SCpnt->request;
+> =20
+> -	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+> +	if ((rq->rq_flags & RQF_SPECIAL_PAYLOAD) &&
+> +	    rq->special_vec.bv_page !=3D ZERO_PAGE(0))
+>  		__free_page(rq->special_vec.bv_page);
+> =20
+>  	if (SCpnt->cmnd !=3D scsi_req(rq)->cmd) {
 
-I don't quite follow this. Isn't what you request exactly what
-patch 15/16 "mmc: queue: issue requests in massive parallel"
-is doing?
-
-The whole patch series leads up to that.
-
-> The core API to use is __mmc_start_req() but the block driver should
-> populate mrq->done with its own handler. i.e. change __mmc_start_req()
->
-> -       mrq->done = mmc_wait_done;
-> +       if (!mrq->done)
-> +               mrq->done = mmc_wait_done;
->
-> mrq->done() would complete the request (e.g. via blk_complete_request()) if
-> it has no errors (and doesn't need polling), and wake up the queue thread to
-> finish up everything else and start the next request.
-
-I think this is what it does at the end of the patch series, patch 15/16.
-I have to split it somehow...
-
-> For the blk-mq port, the queue thread should also be retained, partly
-> because it solves some synchronization problems, but mostly because, at this
-> stage, we anyway don't have solutions for all the different ways the driver
-> can block.
-> (as listed here https://marc.info/?l=linux-mmc&m=148336571720463&w=2 )
-
-Essentially I take out that thread and replace it with this one worker
-introduced in this very patch. I agree the driver can block in many ways
-and that is why I need to have it running in process context, and this
-is what the worker introduced here provides.
-
-Maybe I'm getting something backwards, sorry then :/
-
-Yours,
-Linus Walleij
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
