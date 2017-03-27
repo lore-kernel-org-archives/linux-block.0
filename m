@@ -1,26 +1,39 @@
-Return-Path: <prvs=526004f015=axboe@fb.com>
-Subject: Re: [PATCH 0/3] blk-throttle: add .low limit fix
-To: Shaohua Li <shli@fb.com>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>
-References: <567d5361-7d6b-c53e-8ada-a2966e48dc54@fb.com>
- <cover.1490651903.git.shli@fb.com>
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
         <jmoyer@redhat.com>, <Kernel-team@fb.com>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <a03455d1-270d-85e7-d351-3efd90aa36d2@fb.com>
-Date: Tue, 28 Mar 2017 09:58:02 -0600
+Subject: [PATCH 0/3] blk-throttle: add .low limit fix
+Date: Mon, 27 Mar 2017 15:19:40 -0700
+Message-ID: <cover.1490651903.git.shli@fb.com>
+In-Reply-To: <567d5361-7d6b-c53e-8ada-a2966e48dc54@fb.com>
+References: <567d5361-7d6b-c53e-8ada-a2966e48dc54@fb.com>
 MIME-Version: 1.0
-In-Reply-To: <cover.1490651903.git.shli@fb.com>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 03/27/2017 04:19 PM, Shaohua Li wrote:
-> Jens,
-> 
-> The 3 patches replace the last two patches (patch 17/18) of the series I sent
-> out today. The new patch overloads blk stat as you suggested.
+Jens,
 
-Thanks! With that, I've queued it up for 4.12.
+The 3 patches replace the last two patches (patch 17/18) of the series I sent
+out today. The new patch overloads blk stat as you suggested.
+
+Thanks,
+Shaohua
+
+Shaohua Li (3):
+  block: track request size in blk_issue_stat
+  blk-throttle: add a mechanism to estimate IO latency
+  blk-throttle: add latency target support
+
+ block/blk-core.c          |   2 +-
+ block/blk-mq.c            |   2 +-
+ block/blk-stat.c          |  15 +++-
+ block/blk-stat.h          |  44 +++++++---
+ block/blk-throttle.c      | 199 ++++++++++++++++++++++++++++++++++++++++++++--
+ block/blk-wbt.h           |  10 +--
+ block/blk.h               |   2 +
+ include/linux/blk_types.h |   9 ++-
+ 8 files changed, 254 insertions(+), 29 deletions(-)
 
 -- 
-Jens Axboe
+2.9.3
