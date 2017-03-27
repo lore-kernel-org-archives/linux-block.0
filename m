@@ -1,112 +1,98 @@
-Return-Path: <dm-devel@lists.ewheeler.net>
-Date: Fri, 10 Mar 2017 17:08:48 -0800 (PST)
-From: Eric Wheeler <dm-devel@lists.ewheeler.net>
-To: Mike Snitzer <snitzer@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
-    linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-    Mikulas Patocka <mpatocka@redhat.com>, Alasdair Kergon <agk@redhat.com>,
-    Shaohua Li <shli@kernel.org>, kent.overstreet@gmail.com,
-    Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: [dm-devel] dm-crypt: fix lost ioprio when queuing crypto bios
- from task with ioprio
-In-Reply-To: <20170105165518.GA7376@redhat.com>
-Message-ID: <alpine.LRH.2.11.1703101651490.21446@mail.ewheeler.net>
-References: <alpine.LRH.2.11.1612141049250.13402@mail.ewheeler.net> <alpine.LRH.2.11.1612161414280.9898@mail.ewheeler.net> <20161217155800.GA6580@redhat.com> <alpine.LRH.2.11.1612291856160.20227@mail.ewheeler.net> <20170105165518.GA7376@redhat.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+Subject: Re: [PATCH 6/7] sd: support multi-range TRIM for ATA disks
+Date: Mon, 27 Mar 2017 23:38:59 +0000
+Message-ID: <1490657921.7897.20.camel@sandisk.com>
+References: <20170320204319.12628-1-hch@lst.de>
+	 <20170320204319.12628-7-hch@lst.de>
+In-Reply-To: <20170320204319.12628-7-hch@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 5 Jan 2017, Mike Snitzer wrote:
+On Mon, 2017-03-20 at 16:43 -0400, Christoph Hellwig wrote:
+> @@ -698,13 +698,19 @@ static void sd_config_discard(struct scsi_disk *sdk=
+p, unsigned int mode)
+>  		break;
+> =20
+>  	case SD_LBP_ATA_TRIM:
+> -		max_blocks =3D 65535 * (512 / sizeof(__le64));
+> +		max_ranges =3D 512 / sizeof(__le64);
+> +		max_range_size =3D USHRT_MAX;
+> +		max_blocks =3D max_ranges * max_range_size;
+>  		if (sdkp->device->ata_trim_zeroes_data)
+>  			q->limits.discard_zeroes_data =3D 1;
+>  		break;
+>  	}
+> =20
+>  	blk_queue_max_discard_sectors(q, max_blocks * (logical_block_size >> 9)=
+);
+> +	if (max_ranges)
+> +		blk_queue_max_discard_segments(q, max_ranges);
+> +	if (max_range_size)
+> +		blk_queue_max_discard_segment_size(q, max_range_size);
+>  	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+>  }
 
-> On Thu, Dec 29 2016 at 11:08pm -0500,
-> Eric Wheeler <dm-devel@lists.ewheeler.net> wrote:
-> 
-> > On Sat, 17 Dec 2016, Mike Snitzer wrote:
-> > > On Fri, Dec 16 2016 at  5:29pm -0500,
-> > > Eric Wheeler <dm-devel@lists.ewheeler.net> wrote:
-> > > > On Wed, 14 Dec 2016, Eric Wheeler wrote:
-> > > > > Since dm-crypt queues writes (and sometimes reads) to a different kernel
-> > > > > thread (workqueue), the bios will dispatch from tasks with different
-> > > > > io_context->ioprio settings than the submitting task, thus giving
-> > > > > incorrect ioprio hints to the io scheduler.
-> > > > 
-> > > > The motivation of this patch is for ioprio-driven writebackup/bypass 
-> > > > hinting inside bcache when bcache is under dm-crypt which Jens is picking 
-> > > > up for 4.10:
-> > > >   https://lkml.org/lkml/2016/12/6/607
-> > > 
-> > > I now see your commits:
-> > > b71de4659fba4e42c7 bcache: introduce per-process ioprio-based bypass/writeback hints
-> > > 82e7192711c3855038 bcache: documentation for ioprio cache hinting
-> > > 
-> > > You'd think this is the type of thing that you'd have proposed to a
-> > > wider audience.  
-> > 
-> > ( Its not really relevant to this bugfix, but please see this thread since 
-> >   you were curious about a wider audience discussion: 
-> >   https://www.redhat.com/archives/dm-devel/2016-July/msg00556.html )
-> > 
-> > The note above in the previous email was intended to explain how we 
-> > discovered the dm-crypt problem, purely as an example use case.  The 
-> > stable commit note discusses the real issue: lost elevator hints.
-> > 
-> > This commit fixes elevator ioprio hints passing through dm-crypt and is 
-> > not intended to address dm-cache, nor enable a bcache feature.
-> > 
-> > All impementations using ioprio hints beneath dm-crypt would 
-> > benefit---most importantly, _CFQ_ !
-> >   
-> > As it is, all ioprio hints passing through dm-crypt are lost to the 
-> > elevator; the elevator looses those useful bits because of queuing to 
-> > another thread for crypto operations.
-> 
-> How did you test the change?
+Hello Christoph,
 
-We discovered this by noticing that bcache never receives bios marked with 
-ioprios that were submitted for writing by dm-crypt, but this seems to be 
-an issue with dm-crypt specifically. Bcache gets ioprio information from 
-upper-level drivers submitting from the original process context just 
-fine. If the information is lost to bcache, it is certainly lost to the IO 
-scheduler. Of course if ioprios are mapped between processes in some other 
-way that I am missing, then please point that out for me.
+Does blk_queue_max_discard_segment_size() expect a second argument that is =
+a
+number of bytes? Is max_range_size a number of logical blocks that each hav=
+e
+a size 1 << sector_shift?
 
-Interestingly, before bio_ioprio was split out from bi_rw in about 
-4.2-4.4, dm-crypt reads were marked fine because they do not usually get 
-punted to another thread and complete from the submitting process. After 
-splitting bi_ioprio out of bi_rw, reads broke because the simple cloning 
-assignment of dst_bio->bi_rw = src_bio->bi_rw loses the priority bits. Of 
-course this continues now that bi_rw has been pulled and changed into 
-bi_opf.
+> @@ -826,14 +832,21 @@ static int sd_setup_ata_trim_cmnd(struct scsi_cmnd =
+*cmd)
+>  	cmd->cmnd[8] =3D data_len;
+> =20
+>  	buf =3D page_address(rq->special_vec.bv_page);
+> -	for (i =3D 0; i < (data_len >> 3); i++) {
+> -		u64 n =3D min(nr_sectors, 0xffffu);
+> +	__rq_for_each_bio(bio, rq) {
+> +		u64 sector =3D bio->bi_iter.bi_sector >> (sector_shift - 9);
+> +		u32 nr_sectors =3D bio->bi_iter.bi_size >> sector_shift;
+> =20
+> -		buf[i] =3D cpu_to_le64(sector | (n << 48));
+> -		if (nr_sectors <=3D 0xffff)
+> -			break;
+> -		sector +=3D 0xffff;
+> -		nr_sectors -=3D 0xffff;
+> +		do {
+> +			u64 n =3D min(nr_sectors, 0xffffu);
+> +
+> +			buf[i] =3D cpu_to_le64(sector | (n << 48));
+> +			if (nr_sectors <=3D 0xffff)
+> +				break;
+> +			sector +=3D 0xffff;
+> +			nr_sectors -=3D 0xffff;
+> +			i++;
+> +
+> +		} while (!WARN_ON_ONCE(i >=3D data_len >> 3));
+>  	}
+> =20
+>  	cmd->allowed =3D SD_MAX_RETRIES;
 
-I suspect there are other places where bi_rw assignments lost bi_ioprio 
-assignments long ago, and this probably needs some research and 
-fixup---but that is a separate issue from the dm-crypt issue.
- 
-> Or put differently: what is the easiest test to run against a dm-crypt
-> device to verify that ioprio is being passed through?
+It's unfortunate that the loop-end test occurs twice (i < data_len >> 3).
+Please consider using put_unaligned_le64() instead of cpu_to_le64() such
+that the data type of buf can be changed from __le64* into void *. With
+that change and by introducing e.g. the following:
 
-You would probably need to modify dm-crypt just before it calls 
-generic_make_request on the way out of writing bio's after encrypting 
-either in kcryptd_crypt_write_io_submit or dmcrypt_write and calling 
-something like WARN_ONCE if ioprio_valid(bio_prio(bio)).
+void *end;
+[ ... ]
+end =3D (void *)buf + data_len;
 
-Then set your IO priority using ionice on some process writing with direct 
-IO to the mapper device and see if you get any warnings:
-	ionice -c3 dd bs=1 of=/dev/mapper/cryptotest if=/dev/zero oflag=direct count=1
+the loop variable 'i' can be eliminated. If buf[i++] =3D ... would be
+changed into *buf++ =3D ... then that would allow to change the two
+occurrences of (i < data_len >> 3) into (buf < end).
 
-My guess is that you will not since bios are cloned without copying ioprio 
-information and submitted from processes different from those of the 
-calling thread.
+Thanks,
 
-I am curious what you find on your end, please let me know if you have any 
-questions and thank you for your help!
-
---
-Eric Wheeler
-
- 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
-> 
+Bart.=
