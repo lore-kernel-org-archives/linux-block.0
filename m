@@ -1,29 +1,37 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@infradead.org" <hch@infradead.org>, "snitzer@redhat.com"
-	<snitzer@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"agk@redhat.com" <agk@redhat.com>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"philipp.reisner@linbit.com" <philipp.reisner@linbit.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>, "shli@kernel.org"
-	<shli@kernel.org>, "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [Drbd-dev] RFC: always use REQ_OP_WRITE_ZEROES for zeroing
- offload
-Date: Mon, 27 Mar 2017 15:08:16 +0000
-Message-ID: <1490627281.2461.4.camel@sandisk.com>
-References: <20170323143341.31549-1-hch@lst.de>
-	 <20170323155410.GD1138@soda.linbit> <20170327091056.GB6879@infradead.org>
-	 <20170327140307.GA13020@redhat.com>
-In-Reply-To: <20170327140307.GA13020@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Return-Path: <hch@lst.de>
+Date: Mon, 27 Mar 2017 16:57:40 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Christoph Hellwig <hch@lst.de>,
+	axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
+	shli@kernel.org, philipp.reisner@linbit.com,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com, dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: Re: RFC: always use REQ_OP_WRITE_ZEROES for zeroing offload
+Message-ID: <20170327145740.GB24952@lst.de>
+References: <20170323143341.31549-1-hch@lst.de> <20170323155410.GD1138@soda.linbit> <20170327091056.GB6879@infradead.org> <20170327140307.GA13020@redhat.com>
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170327140307.GA13020@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2017-03-27 at 10:03 -0400, Mike Snitzer wrote:
+On Mon, Mar 27, 2017 at 10:03:07AM -0400, Mike Snitzer wrote:
+> By "you" I assume you're referring to Lars?
+
+Yes.
+
+> Lars' approach for discard,
+> when drbd is layered on dm-thinp, feels over-engineered.  Not his fault,
+> the way discard and zeroing got conflated certainly lends itself to
+> these ugly hacks.  SO I do appreciate that for anything to leverage
+> discard_zeroes_data it needs to be reliable.  Which runs counter to how
+> discard was implemented (discard may get silently dropped!)  But that is
+> why dm-thinp doesn't advertise dzd.  Anyway...
+
+That's exactly what this series does - remove discard_zeroes_data and
+use the new REQ_OP_WRITE_ZEROES for anything that wants zeroing offload.
+
 > As for the blkdev_issue_zeroout() resorting to manually zeroing the
 > range, if the discard fails or dzd not supported, that certainly
 > requires DM thinp to implement manual zeroing of the head and tail of
@@ -31,9 +39,4 @@ On Mon, 2017-03-27 at 10:03 -0400, Mike Snitzer wrote:
 > there.  It is probably something that is best left to Joe or myself to
 > tackle.  But I'll gladly accept patches ;)
 
-Some time ago I posted a patch series for the block layer that zeroes
-start and tail for nonaligned discard requests if dzd has been set. See
-also "[PATCH v3 0/5] Make blkdev_issue_discard() submit aligned discard
-requests" (https://www.spinics.net/lists/linux-block/msg02360.html).
-
-Bart.=
+Ok, I'll happily leave this to the two of you..
