@@ -1,52 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:33180 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752292AbdC0PoK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2017 11:44:10 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
-        "axboe@fb.com" <axboe@fb.com>
-CC: "hare@suse.de" <hare@suse.de>,
-        "jthumshirn@suse.de" <jthumshirn@suse.de>
+Received: from mx2.suse.de ([195.135.220.15]:52804 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751813AbdC0Mds (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Mar 2017 08:33:48 -0400
+Date: Mon, 27 Mar 2017 14:14:13 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.de>
 Subject: Re: [PATCH v3 2/4] block: add a read barrier in blk_queue_enter()
-Date: Mon, 27 Mar 2017 15:44:00 +0000
-Message-ID: <1490629427.2461.8.camel@sandisk.com>
+Message-ID: <20170327121413.GB7237@linux-x5ow.site>
 References: <20170327120658.29864-1-tom.leiming@gmail.com>
-         <20170327120658.29864-3-tom.leiming@gmail.com>
-In-Reply-To: <20170327120658.29864-3-tom.leiming@gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170327120658.29864-3-tom.leiming@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170327120658.29864-3-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, 2017-03-27 at 20:06 +0800, Ming Lei wrote:
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index ad388d5e309a..5e8963bc98d9 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -669,6 +669,15 @@ int blk_queue_enter(struct request_queue *q, bool no=
-wait)
->  		if (nowait)
->  			return -EBUSY;
-> =20
-> +		/*
-> +		 * read pair of barrier in blk_mq_freeze_queue_start(),
-> +		 * we need to order reading __PERCPU_REF_DEAD flag of
-> +		 * .q_usage_counter and reading .mq_freeze_depth,
-> +		 * otherwise the following wait may never return if the
-> +		 * two reads are reordered.
-> +		 */
-> +		smp_rmb();
-> +
->  		ret =3D wait_event_interruptible(q->mq_freeze_wq,
->  				!atomic_read(&q->mq_freeze_depth) ||
->  				blk_queue_dying(q));
+On Mon, Mar 27, 2017 at 08:06:56PM +0800, Ming Lei wrote:
+> Without the barrier, reading DEAD flag of .q_usage_counter
+> and reading .mq_freeze_depth may be reordered, then the
+> following wait_event_interruptible() may never return.
+> 
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
 
-Since patch 4/4 modifies the comment introduced by this patch, I would have
-preferred that patches 2/4 and 4/4 would have been combined into a single
-patch. Anyway:
-
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
