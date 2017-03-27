@@ -1,91 +1,105 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: dledford@redhat.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	mail@fholler.de,
-	Milind.dumbare@gmail.com,
-	yun.wang@profitbricks.com,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 20/28] ibnbd_clt: add Makefile and Kconfig
-Date: Fri, 24 Mar 2017 11:45:35 +0100
-Message-Id: <1490352343-20075-21-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH V7 10/18] blk-throttle: choose a small throtl_slice for SSD
+Date: Mon, 27 Mar 2017 10:51:38 -0700
+Message-ID: <0d0d41ceac055019992db08ac152f41c3726a585.1490634565.git.shli@fb.com>
+In-Reply-To: <cover.1490634565.git.shli@fb.com>
+References: <cover.1490634565.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+The throtl_slice is 100ms by default. This is a long time for SSD, a lot
+of IO can run. To make cgroups have smoother throughput, we choose a
+small value (20ms) for SSD.
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/block/Kconfig               |  2 ++
- drivers/block/Makefile              |  1 +
- drivers/block/ibnbd_client/Kconfig  | 16 ++++++++++++++++
- drivers/block/ibnbd_client/Makefile |  5 +++++
- 4 files changed, 24 insertions(+)
- create mode 100644 drivers/block/ibnbd_client/Kconfig
- create mode 100644 drivers/block/ibnbd_client/Makefile
+ block/blk-sysfs.c    |  2 ++
+ block/blk-throttle.c | 23 ++++++++++++++++++++---
+ block/blk.h          |  2 ++
+ 3 files changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index f744de7..c309e57 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -275,6 +275,8 @@ config BLK_DEV_CRYPTOLOOP
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index b315e62..7f090dd 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -906,6 +906,8 @@ int blk_register_queue(struct gendisk *disk)
  
- source "drivers/block/drbd/Kconfig"
+ 	blk_wb_init(q);
  
-+source "drivers/block/ibnbd_client/Kconfig"
++	blk_throtl_register_queue(q);
 +
- config BLK_DEV_NBD
- 	tristate "Network block device support"
- 	depends on NET
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index 1e9661e..7da1813 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -34,6 +34,7 @@ obj-$(CONFIG_BLK_DEV_HD)	+= hd.o
+ 	if (q->request_fn || (q->mq_ops && q->elevator)) {
+ 		ret = elv_register_queue(q);
+ 		if (ret) {
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 93841da..d00c1c1 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -18,8 +18,9 @@ static int throtl_grp_quantum = 8;
+ /* Total max dispatch from all groups in one round */
+ static int throtl_quantum = 32;
  
- obj-$(CONFIG_XEN_BLKDEV_FRONTEND)	+= xen-blkfront.o
- obj-$(CONFIG_XEN_BLKDEV_BACKEND)	+= xen-blkback/
-+obj-$(CONFIG_BLK_DEV_IBNBD_CLT)	+= ibnbd_client/
- obj-$(CONFIG_BLK_DEV_DRBD)     += drbd/
- obj-$(CONFIG_BLK_DEV_RBD)     += rbd.o
- obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
-diff --git a/drivers/block/ibnbd_client/Kconfig b/drivers/block/ibnbd_client/Kconfig
-new file mode 100644
-index 0000000..162e4e1
---- /dev/null
-+++ b/drivers/block/ibnbd_client/Kconfig
-@@ -0,0 +1,16 @@
-+config BLK_DEV_IBNBD_CLT
-+	tristate "Network block device over Infiniband client support"
-+	depends on INFINIBAND_IBTRS_CLT
-+	---help---
-+	  Saying Y here will allow your computer to be a client for network
-+	  block devices over Infiniband, i.e. it will be able to use block
-+	  devices exported by
-+	  servers (mount file systems on them etc.). Communication between
-+	  client and server works over Infiniband networking, but to the client
-+	  program this is hidden: it looks like a regular local file access to
-+	  a block device special file such as /dev/ibnbd0.
+-/* Throttling is performed over 100ms slice and after that slice is renewed */
+-#define DFL_THROTL_SLICE (HZ / 10)
++/* Throttling is performed over a slice and after that slice is renewed */
++#define DFL_THROTL_SLICE_HD (HZ / 10)
++#define DFL_THROTL_SLICE_SSD (HZ / 50)
+ #define MAX_THROTL_SLICE (HZ)
+ 
+ static struct blkcg_policy blkcg_policy_throtl;
+@@ -1961,7 +1962,6 @@ int blk_throtl_init(struct request_queue *q)
+ 
+ 	q->td = td;
+ 	td->queue = q;
+-	td->throtl_slice = DFL_THROTL_SLICE;
+ 
+ 	td->limit_valid[LIMIT_MAX] = true;
+ 	td->limit_index = LIMIT_MAX;
+@@ -1982,6 +1982,23 @@ void blk_throtl_exit(struct request_queue *q)
+ 	kfree(q->td);
+ }
+ 
++void blk_throtl_register_queue(struct request_queue *q)
++{
++	struct throtl_data *td;
 +
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called ibnbd_client.
++	td = q->td;
++	BUG_ON(!td);
 +
-+	  If unsure, say N.
-diff --git a/drivers/block/ibnbd_client/Makefile b/drivers/block/ibnbd_client/Makefile
-new file mode 100644
-index 0000000..bbf211f
---- /dev/null
-+++ b/drivers/block/ibnbd_client/Makefile
-@@ -0,0 +1,5 @@
++	if (blk_queue_nonrot(q))
++		td->throtl_slice = DFL_THROTL_SLICE_SSD;
++	else
++		td->throtl_slice = DFL_THROTL_SLICE_HD;
++#ifndef CONFIG_BLK_DEV_THROTTLING_LOW
++	/* if no low limit, use previous default */
++	td->throtl_slice = DFL_THROTL_SLICE_HD;
++#endif
++}
 +
-+obj-$(CONFIG_BLK_DEV_IBNBD_CLT)	+= ibnbd_client.o
-+
-+ibnbd_client-y 	:= ibnbd_clt.o ibnbd_clt_sysfs.o ../ibnbd_lib/ibnbd.o \
-+			   ../ibnbd_lib/ibnbd-proto.o
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page)
+ {
+diff --git a/block/blk.h b/block/blk.h
+index bcd3de6..13070c3 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -319,10 +319,12 @@ static inline struct io_context *create_io_context(gfp_t gfp_mask, int node)
+ extern void blk_throtl_drain(struct request_queue *q);
+ extern int blk_throtl_init(struct request_queue *q);
+ extern void blk_throtl_exit(struct request_queue *q);
++extern void blk_throtl_register_queue(struct request_queue *q);
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ static inline void blk_throtl_drain(struct request_queue *q) { }
+ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
+ static inline void blk_throtl_exit(struct request_queue *q) { }
++static inline void blk_throtl_register_queue(struct request_queue *q) { }
+ #endif /* CONFIG_BLK_DEV_THROTTLING */
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
 -- 
-2.7.4
+2.9.3
