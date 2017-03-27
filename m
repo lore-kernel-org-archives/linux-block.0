@@ -1,319 +1,261 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: dledford@redhat.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	mail@fholler.de,
-	Milind.dumbare@gmail.com,
-	yun.wang@profitbricks.com,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 27/28] ibnbd: add doc for how to use ibnbd and sysfs interface
-Date: Fri, 24 Mar 2017 11:45:42 +0100
-Message-Id: <1490352343-20075-28-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH V7 07/18] blk-throttle: add downgrade logic
+Date: Mon, 27 Mar 2017 10:51:35 -0700
+Message-ID: <d3a11011e8d35d416b534248b7211f51e879a9f9.1490634565.git.shli@fb.com>
+In-Reply-To: <cover.1490634565.git.shli@fb.com>
+References: <cover.1490634565.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+When queue state machine is in LIMIT_MAX state, but a cgroup is below
+its low limit for some time, the queue should be downgraded to lower
+state as one cgroup's low limit isn't met.
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- Documentation/IBNBD.txt | 284 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 284 insertions(+)
- create mode 100644 Documentation/IBNBD.txt
+ block/blk-throttle.c | 156 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 156 insertions(+)
 
-diff --git a/Documentation/IBNBD.txt b/Documentation/IBNBD.txt
-new file mode 100644
-index 0000000..f7f490a
---- /dev/null
-+++ b/Documentation/IBNBD.txt
-@@ -0,0 +1,284 @@
-+Infiniband Network Block Device (IBNBD)
-+=======================================
-+
-+Introduction
-+------------
-+
-+IBNBD (InfiniBand Network Block Device) is a pair of kernel modules (client and
-+server) that allows to access a remote storage device on the server from
-+clients via an InfiniBand network.
-+Mapped storage devices appear transparent for the client, acting as any other
-+regular storage devices.
-+
-+The data transport between client and server over the InfiniBand network
-+is performed by the IBTRS (InfiniBand Transport) kernel modules.
-+
-+The administration of these modules is done via sysfs. A Command-line tool
-+(ibnbd-cli) is also available for a more user-friendly experience.
-+
-+Requirements
-+------------
-+  - IBTRS kernel modules (available as git-submodule)
-+
-+Quick Start
-+-----------
-+Server:
-+  # insmod ibtrs/ibtrs_server/ibtrs_server.ko
-+  # insmod ibnbd_server/ibnbd_server.ko
-+
-+Client:
-+  # insmod ibtrs/ibtrs_client/ibtrs_client.ko
-+  # insmod ibnbd_client/ibnbd_client.ko
-+  # echo "server=<SERVER-ADDRESS> device_path=<DEV-PATH-ON-SERVER>" > /sys/kernel/ibnbd/map_device
-+
-+The block device <DEV-PATH-ON-SERVER> will become available on the client as
-+/dev/ibnbd<NR>. It can be used like a local block device.
-+
-+Client Userspace Interface
-+--------------------------
-+This chapter describes only the most important files of Userspace Interface.
-+A full documentation can be found in the Architecture Documentation.
-+
-+All sysfs files that are not read-only will return a usage information if they
-+are read.
-+
-+example:
-+  $ cat /sys/kernel/ibnbd/map_device
-+
-+
-+/sys/kernel/ibnbd/ entries
-+~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+map_device (RW)
-+^^^^^^^^^^^^^^^
-+To map a volume on the client, information about the device has to be written
-+to:
-+  /sys/kernel/ibnbd/map_device
-+
-+The format of the input is:
-+  "server=<server-address> device_path=<relative-path-to-device-on-server>
-+   [access_mode=<ro|rw|migration] [input_mode=(mq|rq)]
-+   [io_mode=fileio|blockio]"
-+
-+Server Parameter
-+++++++++++++++++
-+A server address has to be in one of the following formats:
-+ - ip:<IPv6>
-+ - ip:<IPv4>
-+ - gid:<GID>
-+
-+device_path Parameter
-++++++++++++++++++++++++++++++++
-+A device can be mapped by specifying its relative path to the configured
-+dev_search_path on the server side.
-+The ibnbd_server prepends the configured dev_search_path to the passed
-+device_path from the mapped operation and tries to open a block device with the
-+path dev_search_path/device_path:
-+On success, a /dev/ibnbd<NR> device file, a /sys/block/ibnbd/ibnbd<NR>/
-+directory and a entry in /sys/kernel/ibnbd/devices will be created.
-+
-+access_mode Parameter
-++++++++++++++++++++++
-+The access_mode parameter specifies if the device is to be mapped as read-only
-+or read-write. The "migration" access mode has the same effect as "rw" and
-+should be used during a VM migration scenario by the client where the VM is
-+being migrated to.
-+If not specified, 'rw' is used.
-+
-+input_mode Parameter
-+++++++++++++++++++++
-+The input_mode parameter specifies the internal I/O processing mode of the
-+network block device on the client.
-+If not specified, 'mq' mode is used.
-+
-+io_mode Parameter
-++++++++++++++++++
-+The io_mode parameter specifies if the device on the server will be opened as
-+block device (blockio) or as file (fileio).
-+When the device is opened as file, the VFS page cache is used for read I/O
-+operations, write I/O operations bypass the page cache and go directly to disk
-+(except meta updates, like file access time).
-+When the device is opened as block device, the block device is accessed
-+directly, no VFS page cache is used.
-+If not specified, 'fileio' mode is used.
-+
-+Exit Codes
-+++++++++++
-+If the device is already mapped it will fail with EEXIST. If the input has an
-+invalid format it will return EINVAL. If the device path cannot be found on the
-+server, it will fail with ENOENT.
-+
-+Examples
-+++++++++
-+  # echo "server=ip:10.50.100.64 device_path=/dev/ram1" input_mode=mq > /sys/kernel/ibnbd/map_device
-+  # echo "server=ip:10.50.100.64 device_path=3F2504E0-4F89-41D3-9A0C-0305E82C3301" > /sys/kernel/ibnbd/map_device
-+
-+Finding device file after mapping
-++++++++++++++++++++++++++++++++++
-+After mapping, the device file can be found by:
-+1.) The symlink /sys/kernel/ibnbd/devices/<device_id> points to
-+    /sys/block/<dev-name>.
-+    The last part of the symlink destination is the same than the device name.
-+    By extracting the last part of the path the path to the device
-+    /dev/<dev-name> can be build.
-+2.) /dev/block/$(cat /sys/kernel/ibnbd/devices/<device_id>/dev)
-+
-+How to find the <device_id> of the device is described on the next chapter
-+(devices/ directory).
-+
-+devices/ (DIRECTORY)
-+^^^^^^^^^^^^^^^^^^^^
-+For each device mapped on the client a new symbolic link is created as
-+/sys/kernel/ibnbd/devices/<device_id>, which points to the block device created
-+by ibnbd (/sys/block/ibnbd<NR>/). The <device_id> of each device is created as
-+follows:
-+
-+- If the 'device_path' provided during mapping contains slashes ("/"), they are
-+  replaced by exclamation mark ("!") and used as as the <device_id>. Otherwise,
-+  the <device_id> will be the same as the 'device_path' provided.
-+
-+
-+Examples
-+++++++++
-+    /sys/kernel/ibnbd/devices/3F2504E0-4F89-41D3-9A0C-0305E82C3301 -> /sys/block/ibnbd1/
-+    /sys/kernel/ibnbd/devices/!dev!ram1 -> /sys/block/ibnbd0/
-+
-+
-+/sys/block/ibnbd<NR>/ibnbd/ entries
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+unmap_device (RW)
-+^^^^^^^^^^^^^^^^^
-+To unmap a volume, 'normal' or 'force' has to be written to:
-+  /sys/block/ibnbd<NR>/ibnbd/unmap_device
-+
-+When 'normal' is used, the operation will fail with EBUSY if any process is
-+using the device.
-+When 'force' is used, the device is also unmapped when device is in use.
-+All I/Os that are in progress will fail. It can happen that the device
-+file (/dev/ibnbdx) still exists after the unmapping. The kernel
-+couldn't remove the file because it was in use but it's marked as unused.
-+The device file will be freed when no process refer to it.
-+
-+In a following IBNBD mapping the remote device can be reused, but
-+ibnbd may generate different device file for it.
-+
-+Examples
-+++++++++
-+   # echo "normal" > /sys/block/ibnbd0/ibnbd/unmap_device
-+
-+state (RO)
-+^^^^^^^^^^
-+The file contains the current state of the block device. The state file returns
-+'open' when the device is successfully mapped from the server and accepting I/O
-+requests. When the connection to the server gets disconnected in case of an
-+error (e.g. link failure), the state file returns 'closed' and all I/O requests
-+will fail with -EIO.
-+
-+session (RO)
-+^^^^^^^^^^^^
-+IBNBD uses IBTRS session to transport the data between client and server.
-+The file 'session' contains the address of the server, that was used to
-+establish the IBTRS session.
-+It's the same address that was passed as server parameter to the map_device
-+file.
-+
-+mapping_path (RO)
-+^^^^^^^^^^^^^^^^^
-+Contains the path that was passed as device_path to the map_device operation.
-+
-+/sys/kernel/ibtrs/sessions/ entries
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+The connections to the servers are created and destroyed on demand. When the
-+first device is mapped from a server, an IBTRS connection will be created with
-+this server and the following directory will be created:
-+
-+/sys/kernel/ibtrs/sessions/<server-address>/
-+
-+If the connection establishment fails, detailed error information can be found
-+in the kernel log (dmesg).
-+
-+When the last device is unmapped from a server, the connection will be closed
-+and the directory will be deleted.
-+
-+
-+Server Userspace Interface
-+--------------------------
-+
-+/sys/kernel/ibnbd/ entries
-+~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+/sys/kernel/ibnbd/devices/ entries
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+When a Pserver maps a device, a directory entry with the name of the block
-+device is created under /sys/kernel/ibnbd/devices/. If the device path provided
-+by the client is a symbolic link to a block device, the target block device name
-+is used instead of the mapping path name.
-+
-+block_dev
-+^^^^^^^^^
-+block_dev is a symlink to the sysfs entry of the exported device
-+
-+Examples
-+++++++++
-+  block_dev -> ../../../../devices/virtual/block/nullb1
-+
-+revalidate
-+^^^^^^^^^^
-+When the size of a exported block device changes on the server, the clients
-+have to be notified so they can resize the mapped device.
-+
-+Notification of the clients about a device change is triggered by writing '1'
-+to the revalidate file.
-+
-+Examples
-+++++++++
-+ # echo 1 > /sys/kernel/ibnbd/devices/nullb1/revalidate
-+
-+/sys/kernel/ibnbd/devices/<device_name>/clients entries
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+When the device is mapped from a client, the following directory will be
-+created:
-+
-+/sys/kernel/ibnbd/devices/<device_name>/clients/<client-address> entries
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+When the device is unmapped, the directory will be removed.
-+
-+read_only
-+^^^^^^^^^
-+Contains '1' if device is mapped read-only, otherwise '0'.
-+
-+mapping_path
-+^^^^^^^^^^^^
-+Contains the relative device path provided by the user during mapping.
-+
-+
-+IBNBD-Server Module Parameters
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+dev_search_path
-+^^^^^^^^^^^^^^^
-+When a device is mapped from the client, the server generates the path to the
-+block device on the server side by concatenating dev_search_path and the
-+device_path that was specified in the map_device operation.
-+
-+The format of the input is
-+  path ::= Absolute linux path name,
-+           Max. length depends on PATH_MAX define (usually 4095 chars)
-+
-+The default dev_search_path is: "/".
-+
-+Example
-++++++++
-+
-+Configured dev_search_path on server is: /dev/storage/
-+client maps device by::
-+  # echo "server=ip:10.50.100.64 device_path=3F2504E0-4F89-41D3-9A0C-0305E82C3301" > /sys/kernel/ibnbd/map_device
-+
-+The server tries to open a block device with the path:
-+  /dev/storage/3F2504E0-4F89-41D3-9A0C-0305E82C3301
-+
-+
-+Contact
-+-------
-+Mailing list: ibnbd@profitbricks.com
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index dd382d8..7878ec1 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -140,6 +140,13 @@ struct throtl_grp {
+ 	/* Number of bio's dispatched in current slice */
+ 	unsigned int io_disp[2];
+ 
++	unsigned long last_low_overflow_time[2];
++
++	uint64_t last_bytes_disp[2];
++	unsigned int last_io_disp[2];
++
++	unsigned long last_check_time;
++
+ 	/* When did we start a new slice */
+ 	unsigned long slice_start[2];
+ 	unsigned long slice_end[2];
+@@ -159,6 +166,9 @@ struct throtl_data
+ 	struct work_struct dispatch_work;
+ 	unsigned int limit_index;
+ 	bool limit_valid[LIMIT_CNT];
++
++	unsigned long low_upgrade_time;
++	unsigned long low_downgrade_time;
+ };
+ 
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -898,6 +908,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	/* Charge the bio to the group */
+ 	tg->bytes_disp[rw] += bio->bi_iter.bi_size;
+ 	tg->io_disp[rw]++;
++	tg->last_bytes_disp[rw] += bio->bi_iter.bi_size;
++	tg->last_io_disp[rw]++;
+ 
+ 	/*
+ 	 * BIO_THROTTLED is used to prevent the same bio to be throttled
+@@ -1527,6 +1539,45 @@ static struct blkcg_policy blkcg_policy_throtl = {
+ 	.pd_free_fn		= throtl_pd_free,
+ };
+ 
++static unsigned long __tg_last_low_overflow_time(struct throtl_grp *tg)
++{
++	unsigned long rtime = jiffies, wtime = jiffies;
++
++	if (tg->bps[READ][LIMIT_LOW] || tg->iops[READ][LIMIT_LOW])
++		rtime = tg->last_low_overflow_time[READ];
++	if (tg->bps[WRITE][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW])
++		wtime = tg->last_low_overflow_time[WRITE];
++	return min(rtime, wtime);
++}
++
++/* tg should not be an intermediate node */
++static unsigned long tg_last_low_overflow_time(struct throtl_grp *tg)
++{
++	struct throtl_service_queue *parent_sq;
++	struct throtl_grp *parent = tg;
++	unsigned long ret = __tg_last_low_overflow_time(tg);
++
++	while (true) {
++		parent_sq = parent->service_queue.parent_sq;
++		parent = sq_to_tg(parent_sq);
++		if (!parent)
++			break;
++
++		/*
++		 * The parent doesn't have low limit, it always reaches low
++		 * limit. Its overflow time is useless for children
++		 */
++		if (!parent->bps[READ][LIMIT_LOW] &&
++		    !parent->iops[READ][LIMIT_LOW] &&
++		    !parent->bps[WRITE][LIMIT_LOW] &&
++		    !parent->iops[WRITE][LIMIT_LOW])
++			continue;
++		if (time_after(__tg_last_low_overflow_time(parent), ret))
++			ret = __tg_last_low_overflow_time(parent);
++	}
++	return ret;
++}
++
+ static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
+ {
+ 	struct throtl_service_queue *sq = &tg->service_queue;
+@@ -1570,6 +1621,9 @@ static bool throtl_can_upgrade(struct throtl_data *td,
+ 	if (td->limit_index != LIMIT_LOW)
+ 		return false;
+ 
++	if (time_before(jiffies, td->low_downgrade_time + throtl_slice))
++		return false;
++
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -1593,6 +1647,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 	struct blkcg_gq *blkg;
+ 
+ 	td->limit_index = LIMIT_MAX;
++	td->low_upgrade_time = jiffies;
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -1608,6 +1663,99 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 	queue_work(kthrotld_workqueue, &td->dispatch_work);
+ }
+ 
++static void throtl_downgrade_state(struct throtl_data *td, int new)
++{
++	td->limit_index = new;
++	td->low_downgrade_time = jiffies;
++}
++
++static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
++{
++	struct throtl_data *td = tg->td;
++	unsigned long now = jiffies;
++
++	/*
++	 * If cgroup is below low limit, consider downgrade and throttle other
++	 * cgroups
++	 */
++	if (time_after_eq(now, td->low_upgrade_time + throtl_slice) &&
++	    time_after_eq(now, tg_last_low_overflow_time(tg) + throtl_slice))
++		return true;
++	return false;
++}
++
++static bool throtl_hierarchy_can_downgrade(struct throtl_grp *tg)
++{
++	while (true) {
++		if (!throtl_tg_can_downgrade(tg))
++			return false;
++		tg = sq_to_tg(tg->service_queue.parent_sq);
++		if (!tg || !tg_to_blkg(tg)->parent)
++			break;
++	}
++	return true;
++}
++
++static void throtl_downgrade_check(struct throtl_grp *tg)
++{
++	uint64_t bps;
++	unsigned int iops;
++	unsigned long elapsed_time;
++	unsigned long now = jiffies;
++
++	if (tg->td->limit_index != LIMIT_MAX ||
++	    !tg->td->limit_valid[LIMIT_LOW])
++		return;
++	if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
++		return;
++	if (time_after(tg->last_check_time + throtl_slice, now))
++		return;
++
++	elapsed_time = now - tg->last_check_time;
++	tg->last_check_time = now;
++
++	if (time_before(now, tg_last_low_overflow_time(tg) + throtl_slice))
++		return;
++
++	if (tg->bps[READ][LIMIT_LOW]) {
++		bps = tg->last_bytes_disp[READ] * HZ;
++		do_div(bps, elapsed_time);
++		if (bps >= tg->bps[READ][LIMIT_LOW])
++			tg->last_low_overflow_time[READ] = now;
++	}
++
++	if (tg->bps[WRITE][LIMIT_LOW]) {
++		bps = tg->last_bytes_disp[WRITE] * HZ;
++		do_div(bps, elapsed_time);
++		if (bps >= tg->bps[WRITE][LIMIT_LOW])
++			tg->last_low_overflow_time[WRITE] = now;
++	}
++
++	if (tg->iops[READ][LIMIT_LOW]) {
++		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
++		if (iops >= tg->iops[READ][LIMIT_LOW])
++			tg->last_low_overflow_time[READ] = now;
++	}
++
++	if (tg->iops[WRITE][LIMIT_LOW]) {
++		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
++		if (iops >= tg->iops[WRITE][LIMIT_LOW])
++			tg->last_low_overflow_time[WRITE] = now;
++	}
++
++	/*
++	 * If cgroup is below low limit, consider downgrade and throttle other
++	 * cgroups
++	 */
++	if (throtl_hierarchy_can_downgrade(tg))
++		throtl_downgrade_state(tg->td, LIMIT_LOW);
++
++	tg->last_bytes_disp[READ] = 0;
++	tg->last_bytes_disp[WRITE] = 0;
++	tg->last_io_disp[READ] = 0;
++	tg->last_io_disp[WRITE] = 0;
++}
++
+ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		    struct bio *bio)
+ {
+@@ -1632,12 +1780,16 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ again:
+ 	while (true) {
++		if (tg->last_low_overflow_time[rw] == 0)
++			tg->last_low_overflow_time[rw] = jiffies;
++		throtl_downgrade_check(tg);
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
+ 
+ 		/* if above limits, break to queue */
+ 		if (!tg_may_dispatch(tg, bio, NULL)) {
++			tg->last_low_overflow_time[rw] = jiffies;
+ 			if (throtl_can_upgrade(tg->td, tg)) {
+ 				throtl_upgrade_state(tg->td);
+ 				goto again;
+@@ -1681,6 +1833,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		   tg->io_disp[rw], tg_iops_limit(tg, rw),
+ 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
+ 
++	tg->last_low_overflow_time[rw] = jiffies;
++
+ 	bio_associate_current(bio);
+ 	tg->td->nr_queued[rw]++;
+ 	throtl_add_bio_tg(bio, qn, tg);
+@@ -1791,6 +1945,8 @@ int blk_throtl_init(struct request_queue *q)
+ 
+ 	td->limit_valid[LIMIT_MAX] = true;
+ 	td->limit_index = LIMIT_MAX;
++	td->low_upgrade_time = jiffies;
++	td->low_downgrade_time = jiffies;
+ 	/* activate policy */
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
+ 	if (ret)
 -- 
-2.7.4
+2.9.3
