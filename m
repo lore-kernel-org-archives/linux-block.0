@@ -1,215 +1,171 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 23/25] drbd: make intelligent use of blkdev_issue_zeroout
-Date: Fri, 31 Mar 2017 18:33:11 +0200
-Message-Id: <20170331163313.31821-24-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH V7 12/18] blk-throttle: make bandwidth change smooth
+Date: Mon, 27 Mar 2017 10:51:40 -0700
+Message-ID: <ea951e025b27c14c399a24d38002316365638196.1490634565.git.shli@fb.com>
+In-Reply-To: <cover.1490634565.git.shli@fb.com>
+References: <cover.1490634565.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-drbd always wants its discard wire operations to zero the blocks, so
-use blkdev_issue_zeroout with the BLKDEV_ZERO_UNMAP flag instead of
-reinventing it poorly.
+When cgroups all reach low limit, cgroups can dispatch more IO. This
+could make some cgroups dispatch more IO but others not, and even some
+cgroups could dispatch less IO than their low limit. For example, cg1
+low limit 10MB/s, cg2 limit 80MB/s, assume disk maximum bandwidth is
+120M/s for the workload. Their bps could something like this:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+cg1/cg2 bps: T1: 10/80 -> T2: 60/60 -> T3: 10/80
+
+At T1, all cgroups reach low limit, so they can dispatch more IO later.
+Then cg1 dispatch more IO and cg2 has no room to dispatch enough IO. At
+T2, cg2 only dispatches 60M/s. Since We detect cg2 dispatches less IO
+than its low limit 80M/s, we downgrade the queue from LIMIT_MAX to
+LIMIT_LOW, then all cgroups are throttled to their low limit (T3). cg2
+will have bandwidth below its low limit at most time.
+
+The big problem here is we don't know the maximum bandwidth of the
+workload, so we can't make smart decision to avoid the situation. This
+patch makes cgroup bandwidth change smooth. After disk upgrades from
+LIMIT_LOW to LIMIT_MAX, we don't allow cgroups use all bandwidth upto
+their max limit immediately. Their bandwidth limit will be increased
+gradually to avoid above situation. So above example will became
+something like:
+
+cg1/cg2 bps: 10/80 -> 15/105 -> 20/100 -> 25/95 -> 30/90 -> 35/85 -> 40/80
+-> 45/75 -> 22/98
+
+In this way cgroups bandwidth will be above their limit in majority
+time, this still doesn't fully utilize disk bandwidth, but that's
+something we pay for sharing.
+
+Scale up is linear. The limit scales up 1/2 .low limit every
+throtl_slice after upgrade. The scale up will stop if the adjusted limit
+hits .max limit. Scale down is exponential. We cut the scale value half
+if a cgroup doesn't hit its .low limit. If the scale becomes 0, we then
+fully downgrade the queue to LIMIT_LOW state.
+
+Note this doesn't completely avoid cgroup running under its low limit.
+The best way to guarantee cgroup doesn't run under its limit is to set
+max limit. For example, if we set cg1 max limit to 40, cg2 will never
+run under its low limit.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/block/drbd/drbd_debugfs.c  |   3 --
- drivers/block/drbd/drbd_int.h      |   6 ---
- drivers/block/drbd/drbd_receiver.c | 102 ++-----------------------------------
- drivers/block/drbd/drbd_req.c      |   6 +--
- 4 files changed, 7 insertions(+), 110 deletions(-)
+ block/blk-throttle.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 54 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
-index de5c3ee8a790..494837e59f23 100644
---- a/drivers/block/drbd/drbd_debugfs.c
-+++ b/drivers/block/drbd/drbd_debugfs.c
-@@ -236,9 +236,6 @@ static void seq_print_peer_request_flags(struct seq_file *m, struct drbd_peer_re
- 	seq_print_rq_state_bit(m, f & EE_CALL_AL_COMPLETE_IO, &sep, "in-AL");
- 	seq_print_rq_state_bit(m, f & EE_SEND_WRITE_ACK, &sep, "C");
- 	seq_print_rq_state_bit(m, f & EE_MAY_SET_IN_SYNC, &sep, "set-in-sync");
--
--	if (f & EE_IS_TRIM)
--		__seq_print_rq_state_bit(m, f & EE_IS_TRIM_USE_ZEROOUT, &sep, "zero-out", "trim");
- 	seq_print_rq_state_bit(m, f & EE_WRITE_SAME, &sep, "write-same");
- 	seq_putc(m, '\n');
- }
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index 724d1c50fc52..d5da45bb03a6 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -437,9 +437,6 @@ enum {
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 014b2e9..62984fc 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -175,6 +175,8 @@ struct throtl_data
  
- 	/* is this a TRIM aka REQ_DISCARD? */
- 	__EE_IS_TRIM,
--	/* our lower level cannot handle trim,
--	 * and we want to fall back to zeroout instead */
--	__EE_IS_TRIM_USE_ZEROOUT,
- 
- 	/* In case a barrier failed,
- 	 * we need to resubmit without the barrier flag. */
-@@ -482,7 +479,6 @@ enum {
- #define EE_CALL_AL_COMPLETE_IO (1<<__EE_CALL_AL_COMPLETE_IO)
- #define EE_MAY_SET_IN_SYNC     (1<<__EE_MAY_SET_IN_SYNC)
- #define EE_IS_TRIM             (1<<__EE_IS_TRIM)
--#define EE_IS_TRIM_USE_ZEROOUT (1<<__EE_IS_TRIM_USE_ZEROOUT)
- #define EE_RESUBMITTED         (1<<__EE_RESUBMITTED)
- #define EE_WAS_ERROR           (1<<__EE_WAS_ERROR)
- #define EE_HAS_DIGEST          (1<<__EE_HAS_DIGEST)
-@@ -1561,8 +1557,6 @@ extern void start_resync_timer_fn(unsigned long data);
- extern void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req);
- 
- /* drbd_receiver.c */
--extern int drbd_issue_discard_or_zero_out(struct drbd_device *device,
--		sector_t start, unsigned int nr_sectors, bool discard);
- extern int drbd_receiver(struct drbd_thread *thi);
- extern int drbd_ack_receiver(struct drbd_thread *thi);
- extern void drbd_send_ping_wf(struct work_struct *ws);
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index dc9a6dcd431c..bc1d296581f9 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -1448,108 +1448,14 @@ void drbd_bump_write_ordering(struct drbd_resource *resource, struct drbd_backin
- 		drbd_info(resource, "Method to ensure write ordering: %s\n", write_ordering_str[resource->write_ordering]);
- }
- 
--/*
-- * We *may* ignore the discard-zeroes-data setting, if so configured.
-- *
-- * Assumption is that it "discard_zeroes_data=0" is only because the backend
-- * may ignore partial unaligned discards.
-- *
-- * LVM/DM thin as of at least
-- *   LVM version:     2.02.115(2)-RHEL7 (2015-01-28)
-- *   Library version: 1.02.93-RHEL7 (2015-01-28)
-- *   Driver version:  4.29.0
-- * still behaves this way.
-- *
-- * For unaligned (wrt. alignment and granularity) or too small discards,
-- * we zero-out the initial (and/or) trailing unaligned partial chunks,
-- * but discard all the aligned full chunks.
-- *
-- * At least for LVM/DM thin, the result is effectively "discard_zeroes_data=1".
-- */
--int drbd_issue_discard_or_zero_out(struct drbd_device *device, sector_t start, unsigned int nr_sectors, bool discard)
--{
--	struct block_device *bdev = device->ldev->backing_bdev;
--	struct request_queue *q = bdev_get_queue(bdev);
--	sector_t tmp, nr;
--	unsigned int max_discard_sectors, granularity;
--	int alignment;
--	int err = 0;
--
--	if (!discard)
--		goto zero_out;
--
--	/* Zero-sector (unknown) and one-sector granularities are the same.  */
--	granularity = max(q->limits.discard_granularity >> 9, 1U);
--	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
--
--	max_discard_sectors = min(q->limits.max_discard_sectors, (1U << 22));
--	max_discard_sectors -= max_discard_sectors % granularity;
--	if (unlikely(!max_discard_sectors))
--		goto zero_out;
--
--	if (nr_sectors < granularity)
--		goto zero_out;
--
--	tmp = start;
--	if (sector_div(tmp, granularity) != alignment) {
--		if (nr_sectors < 2*granularity)
--			goto zero_out;
--		/* start + gran - (start + gran - align) % gran */
--		tmp = start + granularity - alignment;
--		tmp = start + granularity - sector_div(tmp, granularity);
--
--		nr = tmp - start;
--		err |= blkdev_issue_zeroout(bdev, start, nr, GFP_NOIO,
--				BLKDEV_ZERO_NOUNMAP);
--		nr_sectors -= nr;
--		start = tmp;
--	}
--	while (nr_sectors >= granularity) {
--		nr = min_t(sector_t, nr_sectors, max_discard_sectors);
--		err |= blkdev_issue_discard(bdev, start, nr, GFP_NOIO,
--				BLKDEV_ZERO_NOUNMAP);
--		nr_sectors -= nr;
--		start += nr;
--	}
-- zero_out:
--	if (nr_sectors) {
--		err |= blkdev_issue_zeroout(bdev, start, nr_sectors, GFP_NOIO,
--				BLKDEV_ZERO_NOUNMAP);
--	}
--	return err != 0;
--}
--
--static bool can_do_reliable_discards(struct drbd_device *device)
--{
--	struct request_queue *q = bdev_get_queue(device->ldev->backing_bdev);
--	struct disk_conf *dc;
--	bool can_do;
--
--	if (!blk_queue_discard(q))
--		return false;
--
--	if (q->limits.discard_zeroes_data)
--		return true;
--
--	rcu_read_lock();
--	dc = rcu_dereference(device->ldev->disk_conf);
--	can_do = dc->discard_zeroes_if_aligned;
--	rcu_read_unlock();
--	return can_do;
--}
--
- static void drbd_issue_peer_discard(struct drbd_device *device, struct drbd_peer_request *peer_req)
- {
--	/* If the backend cannot discard, or does not guarantee
--	 * read-back zeroes in discarded ranges, we fall back to
--	 * zero-out.  Unless configuration specifically requested
--	 * otherwise. */
--	if (!can_do_reliable_discards(device))
--		peer_req->flags |= EE_IS_TRIM_USE_ZEROOUT;
-+	struct block_device *bdev = device->ldev->backing_bdev;
- 
--	if (drbd_issue_discard_or_zero_out(device, peer_req->i.sector,
--	    peer_req->i.size >> 9, !(peer_req->flags & EE_IS_TRIM_USE_ZEROOUT)))
-+	if (blkdev_issue_zeroout(bdev, peer_req->i.sector, peer_req->i.size >> 9,
-+			GFP_NOIO, 0))
- 		peer_req->flags |= EE_WAS_ERROR;
+ 	unsigned long low_upgrade_time;
+ 	unsigned long low_downgrade_time;
 +
- 	drbd_endio_write_sec_final(peer_req);
++	unsigned int scale;
+ };
+ 
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -226,29 +228,70 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ 		return container_of(sq, struct throtl_data, service_queue);
  }
  
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 652114ae1a8a..6da9ea8c48b6 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -1148,10 +1148,10 @@ static int drbd_process_write_request(struct drbd_request *req)
- 
- static void drbd_process_discard_req(struct drbd_request *req)
++/*
++ * cgroup's limit in LIMIT_MAX is scaled if low limit is set. This scale is to
++ * make the IO dispatch more smooth.
++ * Scale up: linearly scale up according to lapsed time since upgrade. For
++ *           every throtl_slice, the limit scales up 1/2 .low limit till the
++ *           limit hits .max limit
++ * Scale down: exponentially scale down if a cgroup doesn't hit its .low limit
++ */
++static uint64_t throtl_adjusted_limit(uint64_t low, struct throtl_data *td)
++{
++	/* arbitrary value to avoid too big scale */
++	if (td->scale < 4096 && time_after_eq(jiffies,
++	    td->low_upgrade_time + td->scale * td->throtl_slice))
++		td->scale = (jiffies - td->low_upgrade_time) / td->throtl_slice;
++
++	return low + (low >> 1) * td->scale;
++}
++
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
  {
--	int err = drbd_issue_discard_or_zero_out(req->device,
--				req->i.sector, req->i.size >> 9, true);
-+	struct block_device *bdev = req->device->ldev->backing_bdev;
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	uint64_t ret;
  
--	if (err)
-+	if (blkdev_issue_zeroout(bdev, req->i.sector, req->i.size >> 9,
-+			GFP_NOIO, 0))
- 		req->private_bio->bi_error = -EIO;
- 	bio_endio(req->private_bio);
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return U64_MAX;
+-	ret = tg->bps[rw][tg->td->limit_index];
+-	if (ret == 0 && tg->td->limit_index == LIMIT_LOW)
++
++	td = tg->td;
++	ret = tg->bps[rw][td->limit_index];
++	if (ret == 0 && td->limit_index == LIMIT_LOW)
+ 		return tg->bps[rw][LIMIT_MAX];
++
++	if (td->limit_index == LIMIT_MAX && tg->bps[rw][LIMIT_LOW] &&
++	    tg->bps[rw][LIMIT_LOW] != tg->bps[rw][LIMIT_MAX]) {
++		uint64_t adjusted;
++
++		adjusted = throtl_adjusted_limit(tg->bps[rw][LIMIT_LOW], td);
++		ret = min(tg->bps[rw][LIMIT_MAX], adjusted);
++	}
+ 	return ret;
+ }
+ 
+ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	unsigned int ret;
+ 
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return UINT_MAX;
+-	ret = tg->iops[rw][tg->td->limit_index];
++	td = tg->td;
++	ret = tg->iops[rw][td->limit_index];
+ 	if (ret == 0 && tg->td->limit_index == LIMIT_LOW)
+ 		return tg->iops[rw][LIMIT_MAX];
++
++	if (td->limit_index == LIMIT_MAX && tg->iops[rw][LIMIT_LOW] &&
++	    tg->iops[rw][LIMIT_LOW] != tg->iops[rw][LIMIT_MAX]) {
++		uint64_t adjusted;
++
++		adjusted = throtl_adjusted_limit(tg->iops[rw][LIMIT_LOW], td);
++		if (adjusted > UINT_MAX)
++			adjusted = UINT_MAX;
++		ret = min_t(unsigned int, tg->iops[rw][LIMIT_MAX], adjusted);
++	}
+ 	return ret;
+ }
+ 
+@@ -1677,6 +1720,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 
+ 	td->limit_index = LIMIT_MAX;
+ 	td->low_upgrade_time = jiffies;
++	td->scale = 0;
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -1694,6 +1738,13 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 
+ static void throtl_downgrade_state(struct throtl_data *td, int new)
+ {
++	td->scale /= 2;
++
++	if (td->scale) {
++		td->low_upgrade_time = jiffies - td->scale * td->throtl_slice;
++		return;
++	}
++
+ 	td->limit_index = new;
+ 	td->low_downgrade_time = jiffies;
  }
 -- 
-2.11.0
+2.9.3
