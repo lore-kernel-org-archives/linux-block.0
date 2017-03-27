@@ -3,11 +3,11 @@ From: Shaohua Li <shli@fb.com>
 To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
         <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH 2/3] blk-throttle: add a mechanism to estimate IO latency
-Date: Mon, 27 Mar 2017 15:19:42 -0700
-Message-ID: <4a0c7bb001f72cd787235cad32fdf14c84e00394.1490651903.git.shli@fb.com>
-In-Reply-To: <cover.1490651903.git.shli@fb.com>
-References: <567d5361-7d6b-c53e-8ada-a2966e48dc54@fb.com> <cover.1490651903.git.shli@fb.com>
+Subject: [PATCH V7 17/18] blk-throttle: add a mechanism to estimate IO latency
+Date: Mon, 27 Mar 2017 10:51:45 -0700
+Message-ID: <597ac00ccebbe91b6fc636334b164fa8301526ee.1490634565.git.shli@fb.com>
+In-Reply-To: <cover.1490634565.git.shli@fb.com>
+References: <cover.1490634565.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
@@ -43,101 +43,77 @@ can use a fixed threshold like 4ms for hard disk though.
 
 Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-stat.c          |  15 ++++-
- block/blk-stat.h          |   3 +
- block/blk-throttle.c      | 166 ++++++++++++++++++++++++++++++++++++++++++++--
- block/blk.h               |   2 +
- include/linux/blk_types.h |   9 +--
- 5 files changed, 185 insertions(+), 10 deletions(-)
+ block/blk-core.c          |   4 +
+ block/blk-mq.c            |   4 +
+ block/blk-throttle.c      | 181 ++++++++++++++++++++++++++++++++++++++++++++--
+ block/blk.h               |   4 +
+ include/linux/blk_types.h |   1 +
+ include/linux/blkdev.h    |   3 +
+ 6 files changed, 192 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 188b535..e77ec52 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -9,12 +9,14 @@
- 
- #include "blk-stat.h"
- #include "blk-mq.h"
-+#include "blk.h"
- 
- #define BLK_RQ_STAT_BATCH	64
- 
- struct blk_queue_stats {
- 	struct list_head callbacks;
- 	spinlock_t lock;
-+	bool enable_accounting;
- };
- 
- unsigned int blk_stat_rq_ddir(const struct request *rq)
-@@ -96,6 +98,8 @@ void blk_stat_add(struct request *rq)
- 
- 	value = now - blk_stat_time(&rq->issue_stat);
- 
-+	blk_throtl_stat_add(rq, value);
-+
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(cb, &q->stats->callbacks, list) {
- 		if (blk_stat_is_active(cb)) {
-@@ -190,7 +194,7 @@ void blk_stat_remove_callback(struct request_queue *q,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ad388d5e..d5b5169 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2482,6 +2482,8 @@ void blk_start_request(struct request *req)
  {
- 	spin_lock(&q->stats->lock);
- 	list_del_rcu(&cb->list);
--	if (list_empty(&q->stats->callbacks))
-+	if (list_empty(&q->stats->callbacks) && !q->stats->enable_accounting)
- 		clear_bit(QUEUE_FLAG_STATS, &q->queue_flags);
- 	spin_unlock(&q->stats->lock);
+ 	blk_dequeue_request(req);
  
-@@ -215,6 +219,14 @@ void blk_stat_free_callback(struct blk_stat_callback *cb)
- }
- EXPORT_SYMBOL_GPL(blk_stat_free_callback);
- 
-+void blk_stat_enable_accounting(struct request_queue *q)
-+{
-+	spin_lock(&q->stats->lock);
-+	q->stats->enable_accounting = true;
-+	set_bit(QUEUE_FLAG_STATS, &q->queue_flags);
-+	spin_unlock(&q->stats->lock);
-+}
++	blk_throtl_start_request(req);
 +
- struct blk_queue_stats *blk_alloc_queue_stats(void)
+ 	if (test_bit(QUEUE_FLAG_STATS, &req->q->queue_flags)) {
+ 		blk_stat_set_issue_time(&req->issue_stat);
+ 		req->rq_flags |= RQF_STATS;
+@@ -2703,6 +2705,8 @@ void blk_finish_request(struct request *req, int error)
  {
- 	struct blk_queue_stats *stats;
-@@ -225,6 +237,7 @@ struct blk_queue_stats *blk_alloc_queue_stats(void)
+ 	struct request_queue *q = req->q;
  
- 	INIT_LIST_HEAD(&stats->callbacks);
- 	spin_lock_init(&stats->lock);
-+	stats->enable_accounting = false;
- 
- 	return stats;
- }
-diff --git a/block/blk-stat.h b/block/blk-stat.h
-index ee47f81..53f08a6 100644
---- a/block/blk-stat.h
-+++ b/block/blk-stat.h
-@@ -108,6 +108,9 @@ static inline void blk_stat_set_issue(struct blk_issue_stat *stat,
- 		(((u64)blk_capped_size(size)) << BLK_STAT_SIZE_SHIFT);
- }
- 
-+/* record time/size info in request but not add a callback */
-+void blk_stat_enable_accounting(struct request_queue *q);
++	blk_throtl_finish_request(req);
 +
- /*
-  * blk_stat_rq_ddir() - Bucket callback function for the request data direction.
-  * @rq: Request.
+ 	if (req->rq_flags & RQF_STATS)
+ 		blk_stat_add(req);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 45b9beb..b04a564 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -434,6 +434,8 @@ static void blk_mq_ipi_complete_request(struct request *rq)
+ 
+ static void blk_mq_stat_add(struct request *rq)
+ {
++	blk_throtl_finish_request(rq);
++
+ 	if (rq->rq_flags & RQF_STATS) {
+ 		blk_mq_poll_stats_start(rq->q);
+ 		blk_stat_add(rq);
+@@ -487,6 +489,8 @@ void blk_mq_start_request(struct request *rq)
+ 
+ 	trace_block_rq_issue(q, rq);
+ 
++	blk_throtl_start_request(rq);
++
+ 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+ 		blk_stat_set_issue_time(&rq->issue_stat);
+ 		rq->rq_flags |= RQF_STATS;
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 6e1c298..140da29 100644
+index 6e1c298..4b9c6a1 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -28,6 +28,8 @@ static int throtl_quantum = 32;
+@@ -28,6 +28,13 @@ static int throtl_quantum = 32;
  /* default latency target is 0, eg, guarantee IO latency by default */
  #define DFL_LATENCY_TARGET (0)
  
-+#define SKIP_LATENCY (((u64)1) << BLK_STAT_RES_SHIFT)
++#define THROTL_STAT(time, size) \
++	(((u64)time & (((u64)1 << 48) - 1)) | \
++	 (((u64)size & (((u64)1 << 12) - 1)) << 48))
++#define THROTL_SKIP_LAT ((u64)1 << 63)
++#define THROTL_STAT_TIME(stat) (stat & (((u64)1 << 48) - 1))
++#define THROTL_STAT_SIZE(stat) ((stat >> 48) & (((u64)1 << 12) - 1))
 +
  static struct blkcg_policy blkcg_policy_throtl;
  
  /* A workqueue to queue throttle related work */
-@@ -165,6 +167,19 @@ struct throtl_grp {
+@@ -165,6 +172,19 @@ struct throtl_grp {
  	unsigned long idletime_threshold; /* us */
  };
  
@@ -157,7 +133,7 @@ index 6e1c298..140da29 100644
  struct throtl_data
  {
  	/* service tree for active throtl groups */
-@@ -188,6 +203,13 @@ struct throtl_data
+@@ -188,6 +208,13 @@ struct throtl_data
  	unsigned long low_downgrade_time;
  
  	unsigned int scale;
@@ -171,7 +147,7 @@ index 6e1c298..140da29 100644
  };
  
  static void throtl_pending_timer_fn(unsigned long arg);
-@@ -306,6 +328,9 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+@@ -306,6 +333,9 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
  	return ret;
  }
  
@@ -181,7 +157,7 @@ index 6e1c298..140da29 100644
  /**
   * throtl_log - log debug message via blktrace
   * @sq: the service_queue being reported
-@@ -1931,6 +1956,73 @@ static void blk_throtl_update_idletime(struct throtl_grp *tg)
+@@ -1931,6 +1961,73 @@ static void blk_throtl_update_idletime(struct throtl_grp *tg)
  	tg->checked_last_finish_time = last_finish_time;
  }
  
@@ -255,7 +231,7 @@ index 6e1c298..140da29 100644
  bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  		    struct bio *bio)
  {
-@@ -1939,6 +2031,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+@@ -1939,6 +2036,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  	struct throtl_service_queue *sq;
  	bool rw = bio_data_dir(bio);
  	bool throttled = false;
@@ -263,7 +239,7 @@ index 6e1c298..140da29 100644
  	int ret;
  
  	WARN_ON_ONCE(!rcu_read_lock_held());
-@@ -1949,6 +2042,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+@@ -1949,6 +2047,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  
  	spin_lock_irq(q->queue_lock);
  
@@ -272,15 +248,15 @@ index 6e1c298..140da29 100644
  	if (unlikely(blk_queue_bypass(q)))
  		goto out_unlock;
  
-@@ -1956,6 +2051,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+@@ -1956,6 +2056,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
  	if (ret == 0 || ret == -EBUSY)
  		bio->bi_cg_private = tg;
-+	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
++	bio->bi_throtl_stat = THROTL_STAT(ktime_get_ns(), bio_sectors(bio));
  #endif
  	blk_throtl_update_idletime(tg);
  
-@@ -1974,8 +2070,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+@@ -1974,8 +2075,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  		/* if above limits, break to queue */
  		if (!tg_may_dispatch(tg, bio, NULL)) {
  			tg->last_low_overflow_time[rw] = jiffies;
@@ -291,7 +267,7 @@ index 6e1c298..140da29 100644
  				goto again;
  			}
  			break;
-@@ -2019,7 +2115,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+@@ -2019,7 +2120,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  
  	tg->last_low_overflow_time[rw] = jiffies;
  
@@ -300,14 +276,14 @@ index 6e1c298..140da29 100644
  	throtl_add_bio_tg(bio, qn, tg);
  	throttled = true;
  
-@@ -2044,20 +2140,67 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+@@ -2044,20 +2145,79 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  	 */
  	if (!throttled)
  		bio_clear_flag(bio, BIO_THROTTLED);
 +
 +#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
 +	if (throttled || !td->track_bio_latency)
-+		bio->bi_issue_stat.stat |= SKIP_LATENCY;
++		bio->bi_throtl_stat |= THROTL_SKIP_LAT;
 +#endif
  	return throttled;
  }
@@ -331,12 +307,24 @@ index 6e1c298..140da29 100644
 +	put_cpu_ptr(td->latency_buckets);
 +}
 +
-+void blk_throtl_stat_add(struct request *rq, u64 time_ns)
++void blk_throtl_start_request(struct request *rq)
++{
++	rq->throtl_stat = THROTL_STAT(ktime_get_ns(),
++		blk_rq_sectors(rq));
++}
++
++void blk_throtl_finish_request(struct request *rq)
 +{
 +	struct request_queue *q = rq->q;
 +	struct throtl_data *td = q->td;
++	u64 finish_time = THROTL_STAT_TIME(ktime_get_ns());
++	u64 time_ns;
 +
-+	throtl_track_latency(td, blk_stat_size(&rq->issue_stat),
++	if (finish_time < THROTL_STAT_TIME(rq->throtl_stat))
++		return;
++	time_ns = finish_time - THROTL_STAT_TIME(rq->throtl_stat);
++
++	throtl_track_latency(td, THROTL_STAT_SIZE(rq->throtl_stat),
 +		req_op(rq), time_ns >> 10);
 +}
 +
@@ -357,19 +345,19 @@ index 6e1c298..140da29 100644
 +	finish_time_ns = ktime_get_ns();
 +	tg->last_finish_time = finish_time_ns >> 10;
 +
-+	start_time = blk_stat_time(&bio->bi_issue_stat) >> 10;
-+	finish_time = __blk_stat_time(finish_time_ns) >> 10;
-+	/* this is only for bio based driver */
++	start_time = THROTL_STAT_TIME(bio->bi_throtl_stat) >> 10;
++	finish_time = THROTL_STAT_TIME(finish_time_ns) >> 10;
 +	if (start_time && finish_time > start_time &&
-+	    !(bio->bi_issue_stat.stat & SKIP_LATENCY)) {
++	    !(bio->bi_throtl_stat & THROTL_SKIP_LAT)) {
 +		lat = finish_time - start_time;
-+		throtl_track_latency(tg->td, blk_stat_size(&bio->bi_issue_stat),
++		throtl_track_latency(tg->td,
++			THROTL_STAT_SIZE(bio->bi_throtl_stat),
 +			bio_op(bio), lat);
 +	}
  }
  #endif
  
-@@ -2133,6 +2276,12 @@ int blk_throtl_init(struct request_queue *q)
+@@ -2133,6 +2293,12 @@ int blk_throtl_init(struct request_queue *q)
  	td = kzalloc_node(sizeof(*td), GFP_KERNEL, q->node);
  	if (!td)
  		return -ENOMEM;
@@ -382,7 +370,7 @@ index 6e1c298..140da29 100644
  
  	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
  	throtl_service_queue_init(&td->service_queue);
-@@ -2147,8 +2296,10 @@ int blk_throtl_init(struct request_queue *q)
+@@ -2147,8 +2313,10 @@ int blk_throtl_init(struct request_queue *q)
  
  	/* activate policy */
  	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
@@ -394,7 +382,7 @@ index 6e1c298..140da29 100644
  	return ret;
  }
  
-@@ -2157,6 +2308,7 @@ void blk_throtl_exit(struct request_queue *q)
+@@ -2157,6 +2325,7 @@ void blk_throtl_exit(struct request_queue *q)
  	BUG_ON(!q->td);
  	throtl_shutdown_wq(q);
  	blkcg_deactivate_policy(q, &blkcg_policy_throtl);
@@ -402,65 +390,57 @@ index 6e1c298..140da29 100644
  	kfree(q->td);
  }
  
-@@ -2181,6 +2333,10 @@ void blk_throtl_register_queue(struct request_queue *q)
+@@ -2181,6 +2350,8 @@ void blk_throtl_register_queue(struct request_queue *q)
  	td->throtl_slice = DFL_THROTL_SLICE_HD;
  #endif
  
 +	td->track_bio_latency = !q->mq_ops && !q->request_fn;
-+	if (!td->track_bio_latency)
-+		blk_stat_enable_accounting(q);
 +
  	/*
  	 * some tg are created before queue is fully initialized, eg, nonrot
  	 * isn't initialized yet
 diff --git a/block/blk.h b/block/blk.h
-index 3ac833e..07d3751 100644
+index 3ac833e..fa5610e 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -331,8 +331,10 @@ extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
+@@ -331,8 +331,12 @@ extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
  extern ssize_t blk_throtl_sample_time_store(struct request_queue *q,
  	const char *page, size_t count);
  extern void blk_throtl_bio_endio(struct bio *bio);
-+extern void blk_throtl_stat_add(struct request *rq, u64 time);
++extern void blk_throtl_start_request(struct request *rq);
++extern void blk_throtl_finish_request(struct request *rq);
  #else
  static inline void blk_throtl_bio_endio(struct bio *bio) { }
-+static inline void blk_throtl_stat_add(struct request *rq, u64 time) { }
++static inline void blk_throtl_start_request(struct request *rq) { }
++static inline void blk_throtl_finish_request(struct request *rq) { }
  #endif
  
  #endif /* BLK_INTERNAL_H */
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 3ad5673..67bcf8a 100644
+index 07a9e96..112fd26 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -17,6 +17,10 @@ struct io_context;
- struct cgroup_subsys_state;
- typedef void (bio_end_io_t) (struct bio *);
- 
-+struct blk_issue_stat {
-+	u64 stat;
-+};
-+
- /*
-  * main unit of I/O for the block layer and lower layers (ie drivers and
-  * stacking drivers)
-@@ -60,6 +64,7 @@ struct bio {
+@@ -60,6 +60,7 @@ struct bio {
  	struct cgroup_subsys_state *bi_css;
  #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
  	void			*bi_cg_private;
-+	struct blk_issue_stat	bi_issue_stat;
++	u64			bi_throtl_stat;
  #endif
  #endif
  	union {
-@@ -286,10 +291,6 @@ static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
- 	return (cookie & BLK_QC_T_INTERNAL) != 0;
- }
- 
--struct blk_issue_stat {
--	u64 stat;
--};
--
- struct blk_rq_stat {
- 	s64 mean;
- 	u64 min;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1a7dc42..b14ae55 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -204,6 +204,9 @@ struct request {
+ 	struct request_list *rl;		/* rl this rq is alloced from */
+ 	unsigned long long start_time_ns;
+ 	unsigned long long io_start_time_ns;    /* when passed to hardware */
++#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
++	u64 throtl_stat;
++#endif
+ #endif
+ 	/* Number of scatter-gather DMA addr+len pairs after
+ 	 * physical address coalescing is performed.
 -- 
 2.9.3
