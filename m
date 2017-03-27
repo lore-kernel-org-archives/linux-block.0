@@ -1,132 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:34248 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752357AbdCPQOO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:14 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+Received: from mx2.suse.de ([195.135.220.15]:33372 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753102AbdC0JyB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Mar 2017 05:54:01 -0400
+From: NeilBrown <neilb@suse.com>
+To: Christoph Hellwig <hch@infradead.org>, Shaohua Li <shli@kernel.org>
+Date: Mon, 27 Mar 2017 20:52:24 +1100
+Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
         linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 01/14] md: raid1/raid10: don't handle failure of bio_add_page()
-Date: Fri, 17 Mar 2017 00:12:22 +0800
-Message-Id: <20170316161235.27110-2-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Subject: Re: [PATCH v3 02/14] md: move two macros into md.h
+In-Reply-To: <20170327091553.GF6879@infradead.org>
+References: <20170316161235.27110-1-tom.leiming@gmail.com> <20170316161235.27110-3-tom.leiming@gmail.com> <87tw6j8be6.fsf@notabene.neil.brown.name> <20170324165325.nek4kb4yezz2xmow@kernel.org> <20170327091553.GF6879@infradead.org>
+Message-ID: <87wpbb6o87.fsf@notabene.neil.brown.name>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-All bio_add_page() is for adding one page into resync bio,
-which is big enough to hold RESYNC_PAGES pages, and
-the current bio_add_page() doesn't check queue limit any more,
-so it won't fail at all.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c  | 21 ++++++---------------
- drivers/md/raid10.c | 41 ++++++++++-------------------------------
- 2 files changed, 16 insertions(+), 46 deletions(-)
+On Mon, Mar 27 2017, Christoph Hellwig wrote:
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index fbc2d7851b49..4a0b2ad5025e 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2917,21 +2917,12 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			bio = r1_bio->bios[i];
- 			if (bio->bi_end_io) {
- 				page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
--				if (bio_add_page(bio, page, len, 0) == 0) {
--					/* stop here */
--					bio->bi_io_vec[bio->bi_vcnt].bv_page = page;
--					while (i > 0) {
--						i--;
--						bio = r1_bio->bios[i];
--						if (bio->bi_end_io==NULL)
--							continue;
--						/* remove last page from this bio */
--						bio->bi_vcnt--;
--						bio->bi_iter.bi_size -= len;
--						bio_clear_flag(bio, BIO_SEG_VALID);
--					}
--					goto bio_full;
--				}
-+
-+				/*
-+				 * won't fail because the vec table is big
-+				 * enough to hold all these pages
-+				 */
-+				bio_add_page(bio, page, len, 0);
- 			}
- 		}
- 		nr_sectors += len>>9;
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 0536658c9d40..b4a56a488668 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3437,27 +3437,16 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		if (len == 0)
- 			break;
- 		for (bio= biolist ; bio ; bio=bio->bi_next) {
--			struct bio *bio2;
- 			page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
--			if (bio_add_page(bio, page, len, 0))
--				continue;
--
--			/* stop here */
--			bio->bi_io_vec[bio->bi_vcnt].bv_page = page;
--			for (bio2 = biolist;
--			     bio2 && bio2 != bio;
--			     bio2 = bio2->bi_next) {
--				/* remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
--				bio_clear_flag(bio2, BIO_SEG_VALID);
--			}
--			goto bio_full;
-+			/*
-+			 * won't fail because the vec table is big enough
-+			 * to hold all these pages
-+			 */
-+			bio_add_page(bio, page, len, 0);
- 		}
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
- 	} while (biolist->bi_vcnt < RESYNC_PAGES);
-- bio_full:
- 	r10_bio->sectors = nr_sectors;
- 
- 	while (biolist) {
-@@ -4530,25 +4519,15 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 		if (len > PAGE_SIZE)
- 			len = PAGE_SIZE;
- 		for (bio = blist; bio ; bio = bio->bi_next) {
--			struct bio *bio2;
--			if (bio_add_page(bio, page, len, 0))
--				continue;
--
--			/* Didn't fit, must stop */
--			for (bio2 = blist;
--			     bio2 && bio2 != bio;
--			     bio2 = bio2->bi_next) {
--				/* Remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
--				bio_clear_flag(bio2, BIO_SEG_VALID);
--			}
--			goto bio_full;
-+			/*
-+			 * won't fail because the vec table is big enough
-+			 * to hold all these pages
-+			 */
-+			bio_add_page(bio, page, len, 0);
- 		}
- 		sector_nr += len >> 9;
- 		nr_sectors += len >> 9;
- 	}
--bio_full:
- 	rcu_read_unlock();
- 	r10_bio->sectors = nr_sectors;
- 
--- 
-2.9.3
+> On Fri, Mar 24, 2017 at 09:53:25AM -0700, Shaohua Li wrote:
+>>=20
+>> I had the same concern when I looked at this patch firstly. The number f=
+or
+>> raid1/10 doesn't need to be the same. But if we don't move the number to=
+ a
+>> generic header, the third patch will become a little more complicated. I
+>> eventually ignored this issue. If we really need different number for ra=
+id1/10,
+>> lets do it at that time.
+>
+> Which brings up my usual queastion:  Is is really that benefitical for
+> us to keep the raid1.c code around instead of making it a special short
+> cut case in raid10.c?
+
+Patches welcome.
+
+They would need to handle write-mostly and write-behind.  They would
+also need to avoid the assumption of a chunk size for RAID1.
+Undoubtedly do-able.  Hard to say how beneficial it would be, or how much
+it would cost.
+
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAljY4NkACgkQOeye3VZi
+gbmpVxAAqKNg+kIzJKQ41rcH8t7TAe9n0SXc223FGYgxY+bEpkLmEUrPIE5rhijj
+CkfmNko7+JuJcmdHxf7p42iWGngfJvULpqZ4g/SWD3G0bUyOwvaSEg3ayJYoyj5H
+tMY7QGyAgS9xAdfOwRem0Z35paLJEw9AFZcoRR/CBtpZY9D6QfLeiqhHEhkbhedW
+YHxbbBPbB441mxf57h4Ap7duKDXD6XGmgjKGCpwI2Css8PMsvzA3uitpvTjcX8px
+x727GdeKwa+uWt6ag9fqFBAHPrz37RVPRhOrD2Ew88ZwQEWbgwjOS9Kas02jw9VY
+p5npEpybzvjcT3ZzqMTWgIac7ZFojLAeaqDsRBW2MHoJjM/w17qlcmc47/F3vJcb
+KALHxj7ji0rG4IbrNZa9QoAd+zvXdQs4S/r9AsEajRf+vg9lqCrw9HqJlJPzXgac
+AwSCOF/B/aKBf7vm5dBnot7xU87wTlRSM0jQ8uyx9uTAHv5hefAFGo86c1r3Z1IQ
+b3pIyhQiq+QWIMFsiz6eaHNfZrkBR0zreOwQbmn4BqC03KVdxkTdiNOoD3MdLMvR
+AdvXRmKYAr2BTIaz8WRIVxldbtGnoNbNHUbB/BrXqrR0bkXsYxdZzvPZTdXJSTnZ
+jqSnaLVyZvbbBYuzsZRTbjB/4PYkcahARe/FmZ2GhkP+vOiTOng=
+=hQbl
+-----END PGP SIGNATURE-----
+--=-=-=--
