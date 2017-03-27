@@ -3,118 +3,93 @@ From: Shaohua Li <shli@fb.com>
 To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
         <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 01/18] blk-throttle: use U64_MAX/UINT_MAX to replace -1
-Date: Mon, 27 Mar 2017 10:51:29 -0700
-Message-ID: <9f7123ea1ba65e09dc1cb488132bff67ddf8d923.1490634565.git.shli@fb.com>
+Subject: [PATCH V7 11/18] blk-throttle: detect completed idle cgroup
+Date: Mon, 27 Mar 2017 10:51:39 -0700
+Message-ID: <b644f21f62ae79d87a07d58908728d04c43d46e9.1490634565.git.shli@fb.com>
 In-Reply-To: <cover.1490634565.git.shli@fb.com>
 References: <cover.1490634565.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-clean up the code to avoid using -1
+cgroup could be assigned a limit, but doesn't dispatch enough IO, eg the
+cgroup is idle. When this happens, the cgroup doesn't hit its limit, so
+we can't move the state machine to higher level and all cgroups will be
+throttled to their lower limit, so we waste bandwidth. Detecting idle
+cgroup is hard. This patch handles a simple case, a cgroup doesn't
+dispatch any IO. We ignore such cgroup's limit, so other cgroups can use
+the bandwidth.
+
+Please note this will be replaced with a more sophisticated algorithm
+later, but this demonstrates the idea how we handle idle cgroups, so I
+leave it here.
 
 Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-throttle.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ block/blk-throttle.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8fab716..0d5d85b 100644
+index d00c1c1..014b2e9 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -334,10 +334,10 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
- 	}
+@@ -149,6 +149,8 @@ struct throtl_grp {
  
- 	RB_CLEAR_NODE(&tg->rb_node);
--	tg->bps[READ] = -1;
--	tg->bps[WRITE] = -1;
--	tg->iops[READ] = -1;
--	tg->iops[WRITE] = -1;
-+	tg->bps[READ] = U64_MAX;
-+	tg->bps[WRITE] = U64_MAX;
-+	tg->iops[READ] = UINT_MAX;
-+	tg->iops[WRITE] = UINT_MAX;
+ 	unsigned long last_check_time;
  
- 	return &tg->pd;
- }
-@@ -380,7 +380,7 @@ static void tg_update_has_rules(struct throtl_grp *tg)
- 
- 	for (rw = READ; rw <= WRITE; rw++)
- 		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
--				    (tg->bps[rw] != -1 || tg->iops[rw] != -1);
-+			(tg->bps[rw] != U64_MAX || tg->iops[rw] != UINT_MAX);
- }
++	unsigned long last_dispatch_time[2];
++
+ 	/* When did we start a new slice */
+ 	unsigned long slice_start[2];
+ 	unsigned long slice_end[2];
+@@ -445,11 +447,14 @@ static void tg_update_has_rules(struct throtl_grp *tg)
  
  static void throtl_pd_online(struct blkg_policy_data *pd)
-@@ -771,7 +771,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ {
++	struct throtl_grp *tg = pd_to_tg(pd);
+ 	/*
+ 	 * We don't want new groups to escape the limits of its ancestors.
+ 	 * Update has_rules[] after a new group is brought online.
+ 	 */
+-	tg_update_has_rules(pd_to_tg(pd));
++	tg_update_has_rules(tg);
++	tg->last_dispatch_time[READ] = jiffies;
++	tg->last_dispatch_time[WRITE] = jiffies;
+ }
  
- 	/* If tg->bps = -1, then BW is unlimited */
--	if (tg->bps[rw] == -1 && tg->iops[rw] == -1) {
-+	if (tg->bps[rw] == U64_MAX && tg->iops[rw] == UINT_MAX) {
- 		if (wait)
- 			*wait = 0;
+ static void blk_throtl_update_limit_valid(struct throtl_data *td)
+@@ -1615,6 +1620,12 @@ static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
+ 	if (write_limit && sq->nr_queued[WRITE] &&
+ 	    (!read_limit || sq->nr_queued[READ]))
  		return true;
-@@ -1112,7 +1112,7 @@ static u64 tg_prfill_conf_u64(struct seq_file *sf, struct blkg_policy_data *pd,
- 	struct throtl_grp *tg = pd_to_tg(pd);
- 	u64 v = *(u64 *)((void *)tg + off);
- 
--	if (v == -1)
-+	if (v == U64_MAX)
- 		return 0;
- 	return __blkg_prfill_u64(sf, pd, v);
++
++	if (time_after_eq(jiffies,
++	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
++	    time_after_eq(jiffies,
++	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
++		return true;
+ 	return false;
  }
-@@ -1123,7 +1123,7 @@ static u64 tg_prfill_conf_uint(struct seq_file *sf, struct blkg_policy_data *pd,
- 	struct throtl_grp *tg = pd_to_tg(pd);
- 	unsigned int v = *(unsigned int *)((void *)tg + off);
  
--	if (v == -1)
-+	if (v == UINT_MAX)
- 		return 0;
- 	return __blkg_prfill_u64(sf, pd, v);
- }
-@@ -1197,7 +1197,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 	if (sscanf(ctx.body, "%llu", &v) != 1)
- 		goto out_finish;
- 	if (!v)
--		v = -1;
-+		v = U64_MAX;
+@@ -1692,6 +1703,11 @@ static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
+ 	struct throtl_data *td = tg->td;
+ 	unsigned long now = jiffies;
  
- 	tg = blkg_to_tg(ctx.blkg);
++	if (time_after_eq(now, tg->last_dispatch_time[READ] +
++					td->throtl_slice) &&
++	    time_after_eq(now, tg->last_dispatch_time[WRITE] +
++					td->throtl_slice))
++		return false;
+ 	/*
+ 	 * If cgroup is below low limit, consider downgrade and throttle other
+ 	 * cgroups
+@@ -1800,6 +1816,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  
-@@ -1272,17 +1272,17 @@ static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
- 
- 	if (!dname)
- 		return 0;
--	if (tg->bps[READ] == -1 && tg->bps[WRITE] == -1 &&
--	    tg->iops[READ] == -1 && tg->iops[WRITE] == -1)
-+	if (tg->bps[READ] == U64_MAX && tg->bps[WRITE] == U64_MAX &&
-+	    tg->iops[READ] == UINT_MAX && tg->iops[WRITE] == UINT_MAX)
- 		return 0;
- 
--	if (tg->bps[READ] != -1)
-+	if (tg->bps[READ] != U64_MAX)
- 		snprintf(bufs[0], sizeof(bufs[0]), "%llu", tg->bps[READ]);
--	if (tg->bps[WRITE] != -1)
-+	if (tg->bps[WRITE] != U64_MAX)
- 		snprintf(bufs[1], sizeof(bufs[1]), "%llu", tg->bps[WRITE]);
--	if (tg->iops[READ] != -1)
-+	if (tg->iops[READ] != UINT_MAX)
- 		snprintf(bufs[2], sizeof(bufs[2]), "%u", tg->iops[READ]);
--	if (tg->iops[WRITE] != -1)
-+	if (tg->iops[WRITE] != UINT_MAX)
- 		snprintf(bufs[3], sizeof(bufs[3]), "%u", tg->iops[WRITE]);
- 
- 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
-@@ -1320,7 +1320,7 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ again:
  	while (true) {
- 		char tok[27];	/* wiops=18446744073709551616 */
- 		char *p;
--		u64 val = -1;
-+		u64 val = U64_MAX;
- 		int len;
- 
- 		if (sscanf(ctx.body, "%26s%n", tok, &len) != 1)
++		tg->last_dispatch_time[rw] = jiffies;
+ 		if (tg->last_low_overflow_time[rw] == 0)
+ 			tg->last_low_overflow_time[rw] = jiffies;
+ 		throtl_downgrade_check(tg);
 -- 
 2.9.3
