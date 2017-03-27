@@ -1,148 +1,55 @@
-Return-Path: <sbates130272@gmail.com>
-Return-Path: <sbates130272@gmail.com>
-From: sbates@raithlin.com
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Damien.LeMoal@wdc.com,
-	osandov@osandov.com,
-	sbates@raithlin.com
-Subject: [PATCH 2/2] blk-stat: add a poll_size value to the request_queue struct
-Date: Sat, 25 Mar 2017 20:18:12 -0600
-Message-Id: <1490494692-2416-3-git-send-email-sbates@raithlin.com>
-In-Reply-To: <1490494692-2416-1-git-send-email-sbates@raithlin.com>
-References: <1490494692-2416-1-git-send-email-sbates@raithlin.com>
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH V7 08/18] blk-throttle: make sure expire time isn't too big
+Date: Mon, 27 Mar 2017 10:51:36 -0700
+Message-ID: <6bab8d46094d0076e9adda080d80c7ca0b9947f6.1490634565.git.shli@fb.com>
+In-Reply-To: <cover.1490634565.git.shli@fb.com>
+References: <cover.1490634565.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Stephen Bates <sbates@raithlin.com>
+cgroup could be throttled to a limit but when all cgroups cross high
+limit, queue enters a higher state and so the group should be throttled
+to a higher limit. It's possible the cgroup is sleeping because of
+throttle and other cgroups don't dispatch IO any more. In this case,
+nobody can trigger current downgrade/upgrade logic. To fix this issue,
+we could either set up a timer to wakeup the cgroup if other cgroups are
+idle or make sure this cgroup doesn't sleep too long. Setting up a timer
+means we must change the timer very frequently. This patch chooses the
+latter. Making cgroup sleep time not too big wouldn't change cgroup
+bps/iops, but could make it wakeup more frequently, which isn't a big
+issue because throtl_slice * 8 is already quite big.
 
-In order to bucket IO for the polling algorithm we use a sysfs entry
-to set the filter value. It is signed and we will use that as follows:
-
- 0   : No filtering. All IO are considered in stat generation
- > 0 : Filtering based on IO of exactly this size only.
- < 0 : Filtering based on IO less than or equal to -1 time this value.
-
-Use this member to implement a new bucket function for the io polling
-stats.
-
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq.c         | 17 +++++++++++++++--
- block/blk-sysfs.c      | 30 ++++++++++++++++++++++++++++++
- include/linux/blkdev.h |  1 +
- 3 files changed, 46 insertions(+), 2 deletions(-)
+ block/blk-throttle.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5ff66f2..5ea9481 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2327,6 +2327,18 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	blk_mq_sysfs_register(q);
- }
- 
-+int blk_mq_poll_stats_bucket(const struct request *rq)
-+{
-+	int val = rq->q->poll_size;
-+
-+	if ((val == 0) ||
-+	    (val > 0 && blk_rq_bytes(rq) == val) ||
-+	    (val < 0 && blk_rq_bytes(rq) <= -val))
-+		return (int)rq_data_dir(rq);
-+
-+	return -1;
-+}
-+
- struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 						  struct request_queue *q)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 7878ec1..2073b48 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -590,6 +590,17 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
+ static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
+ 					  unsigned long expires)
  {
-@@ -2338,7 +2350,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		goto err_exit;
- 
- 	q->poll_cb = blk_stat_alloc_callback(blk_mq_poll_stats_fn,
--					     blk_stat_rq_ddir, 2, q);
-+					     blk_mq_poll_stats_bucket, 2, q);
- 	if (!q->poll_cb)
- 		goto err_exit;
- 
-@@ -2387,9 +2399,10 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	q->nr_requests = set->queue_depth;
- 
- 	/*
--	 * Default to classic polling
-+	 * Default to classic polling. Default to considering all IO.
- 	 */
- 	q->poll_nsec = -1;
-+	q->poll_size = 0;
- 
- 	if (set->ops->complete)
- 		blk_queue_softirq_done(q, set->ops->complete);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index fa831cb..000d5db 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -394,6 +394,29 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
- 	return count;
- }
- 
-+static ssize_t queue_poll_size_show(struct request_queue *q, char *page)
-+{
-+	return sprintf(page, "%d\n", q->poll_size);
-+}
++	unsigned long max_expire = jiffies + 8 * throtl_slice;
 +
-+static ssize_t queue_poll_size_store(struct request_queue *q, const char *page,
-+				     size_t count)
-+{
-+	int err, val;
-+
-+	if (!q->mq_ops || !q->mq_ops->poll)
-+		return -EINVAL;
-+
-+	err = kstrtoint(page, 10, &val);
-+	if (err < 0)
-+		return err;
-+
-+	q->poll_size = val;
-+
-+	return count;
-+}
-+
-+
- static ssize_t queue_poll_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show(test_bit(QUEUE_FLAG_POLL, &q->queue_flags), page);
-@@ -654,6 +677,12 @@ static struct queue_sysfs_entry queue_poll_entry = {
- 	.store = queue_poll_store,
- };
- 
-+static struct queue_sysfs_entry queue_poll_size_entry = {
-+	.attr = {.name = "io_poll_size", .mode = S_IRUGO | S_IWUSR },
-+	.show = queue_poll_size_show,
-+	.store = queue_poll_size_store,
-+};
-+
- static struct queue_sysfs_entry queue_poll_delay_entry = {
- 	.attr = {.name = "io_poll_delay", .mode = S_IRUGO | S_IWUSR },
- 	.show = queue_poll_delay_show,
-@@ -710,6 +739,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_dax_entry.attr,
- 	&queue_wb_lat_entry.attr,
- 	&queue_poll_delay_entry.attr,
-+	&queue_poll_size_entry.attr,
- 	NULL,
- };
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1a7dc42..7ff5388 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -517,6 +517,7 @@ struct request_queue {
- 
- 	unsigned int		rq_timeout;
- 	int			poll_nsec;
-+	int			poll_size;
- 
- 	struct blk_stat_callback	*poll_cb;
- 	struct blk_rq_stat	poll_stat[2];
++	/*
++	 * Since we are adjusting the throttle limit dynamically, the sleep
++	 * time calculated according to previous limit might be invalid. It's
++	 * possible the cgroup sleep time is very long and no other cgroups
++	 * have IO running so notify the limit changes. Make sure the cgroup
++	 * doesn't sleep too long to avoid the missed notification.
++	 */
++	if (time_after(expires, max_expire))
++		expires = max_expire;
+ 	mod_timer(&sq->pending_timer, expires);
+ 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
+ 		   expires - jiffies, jiffies);
 -- 
-2.7.4
+2.9.3
