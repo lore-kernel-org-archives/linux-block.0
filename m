@@ -1,47 +1,109 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:36467 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934024AbdC3Ntz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2017 09:49:55 -0400
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 1/8] Guard bvec iteration logic
-Date: Thu, 30 Mar 2017 17:49:29 +0400
-Message-Id: <1490881776-28735-2-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1490881776-28735-1-git-send-email-dmonakhov@openvz.org>
-References: <1490881776-28735-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=425928092f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH 3/3] blk-throttle: add latency target support
+Date: Mon, 27 Mar 2017 15:19:43 -0700
+Message-ID: <81425b424868c7054893cf34eb6106ecaa09c6a6.1490651903.git.shli@fb.com>
+In-Reply-To: <cover.1490651903.git.shli@fb.com>
+References: <567d5361-7d6b-c53e-8ada-a2966e48dc54@fb.com> <cover.1490651903.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-If some one try to attempt advance bvec beyond it's size we simply
-dump WARN_ONCE and continue to iterate beyond bvec array boundaries.
-This simply means that we endup dereferencing/corrupting random memory
-region.
+One hard problem adding .low limit is to detect idle cgroup. If one
+cgroup doesn't dispatch enough IO against its low limit, we must have a
+mechanism to determine if other cgroups dispatch more IO. We added the
+think time detection mechanism before, but it doesn't work for all
+workloads. Here we add a latency based approach.
 
-Code was added long time ago here 4550dd6c, luckily no one hit it
-in real life :)
+We already have mechanism to calculate latency threshold for each IO
+size. For every IO dispatched from a cgorup, we compare its latency
+against its threshold and record the info. If most IO latency is below
+threshold (in the code I use 75%), the cgroup could be treated idle and
+other cgroups can dispatch more IO.
 
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+Currently this latency target check is only for SSD as we can't
+calcualte the latency target for hard disk. And this is only for cgroup
+leaf node so far.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- include/linux/bvec.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/blk-throttle.c | 39 +++++++++++++++++++++++++++++++++++----
+ 1 file changed, 35 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 89b65b8..86b914f 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -70,8 +70,7 @@ static inline void bvec_iter_advance(const struct bio_vec *bv,
- 				     struct bvec_iter *iter,
- 				     unsigned bytes)
- {
--	WARN_ONCE(bytes > iter->bi_size,
--		  "Attempted to advance past end of bvec iter\n");
-+	BUG_ON(bytes > iter->bi_size);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 140da29..c82bf9b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -165,6 +165,10 @@ struct throtl_grp {
+ 	unsigned long checked_last_finish_time; /* ns / 1024 */
+ 	unsigned long avg_idletime; /* ns / 1024 */
+ 	unsigned long idletime_threshold; /* us */
++
++	unsigned int bio_cnt; /* total bios */
++	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
++	unsigned long bio_cnt_reset_time;
+ };
  
- 	while (bytes) {
- 		unsigned iter_len = bvec_iter_len(bv, *iter);
+ /* We measure latency for request size from <= 4k to >= 1M */
+@@ -1720,12 +1724,15 @@ static bool throtl_tg_is_idle(struct throtl_grp *tg)
+ 	 * - single idle is too long, longer than a fixed value (in case user
+ 	 *   configure a too big threshold) or 4 times of slice
+ 	 * - average think time is more than threshold
++	 * - IO latency is largely below threshold
+ 	 */
+ 	unsigned long time = jiffies_to_usecs(4 * tg->td->throtl_slice);
+ 
+ 	time = min_t(unsigned long, MAX_IDLE_TIME, time);
+ 	return (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
+-	       tg->avg_idletime > tg->idletime_threshold;
++	       tg->avg_idletime > tg->idletime_threshold ||
++	       (tg->latency_target && tg->bio_cnt &&
++		tg->bad_bio_cnt * 5 < tg->bio_cnt);
+ }
+ 
+ static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
+@@ -2194,12 +2201,36 @@ void blk_throtl_bio_endio(struct bio *bio)
+ 
+ 	start_time = blk_stat_time(&bio->bi_issue_stat) >> 10;
+ 	finish_time = __blk_stat_time(finish_time_ns) >> 10;
++	if (!start_time || finish_time <= start_time)
++		return;
++
++	lat = finish_time - start_time;
+ 	/* this is only for bio based driver */
+-	if (start_time && finish_time > start_time &&
+-	    !(bio->bi_issue_stat.stat & SKIP_LATENCY)) {
+-		lat = finish_time - start_time;
++	if (!(bio->bi_issue_stat.stat & SKIP_LATENCY))
+ 		throtl_track_latency(tg->td, blk_stat_size(&bio->bi_issue_stat),
+ 			bio_op(bio), lat);
++
++	if (tg->latency_target) {
++		int bucket;
++		unsigned int threshold;
++
++		bucket = request_bucket_index(
++			blk_stat_size(&bio->bi_issue_stat));
++		threshold = tg->td->avg_buckets[bucket].latency +
++			tg->latency_target;
++		if (lat > threshold)
++			tg->bad_bio_cnt++;
++		/*
++		 * Not race free, could get wrong count, which means cgroups
++		 * will be throttled
++		 */
++		tg->bio_cnt++;
++	}
++
++	if (time_after(jiffies, tg->bio_cnt_reset_time) || tg->bio_cnt > 1024) {
++		tg->bio_cnt_reset_time = tg->td->throtl_slice + jiffies;
++		tg->bio_cnt /= 2;
++		tg->bad_bio_cnt /= 2;
+ 	}
+ }
+ #endif
 -- 
 2.9.3
