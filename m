@@ -1,47 +1,35 @@
-Return-Path: <prvs=425928092f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
-        <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 03/18] blk-throttle: add configure option for new .low interface
-Date: Mon, 27 Mar 2017 10:51:31 -0700
-Message-ID: <e3d3888887f9c89e32314961a0e06434b4c79944.1490634565.git.shli@fb.com>
-In-Reply-To: <cover.1490634565.git.shli@fb.com>
-References: <cover.1490634565.git.shli@fb.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Date: Tue, 28 Mar 2017 15:07:57 -0600
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Vivek Goyal <vgoyal@redhat.com>, linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: Re: [PATCH 0/6] block: convert remaining drivers which share a
+ request queue
+Message-ID: <20170328210757.GA28778@kernel.dk>
+References: <cover.1490681910.git.osandov@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <cover.1490681910.git.osandov@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-As discussed in LSF, add configure option for the interface and mark it
-as experimental, so people can try/test.
+On Mon, Mar 27 2017, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> This is clearly the pinnacle of my career: converting all remaining
+> block drivers which share a request queue across gendisks to use a
+> separate request queue per gendisk. These are all compile tested (but
+> the last two platform-specific ones involved hacking the Kconfig and
+> commenting out a bunch of arch-dependent code to get the rest to
+> compile), no runtime testing at all.
+> 
+> Let me know if I missed any. Even better, let me know if we can just
+> delete some of these entirely.
+> 
+It's all downhill from here, Omar, I don't see how you are ever going to
+top this in terms of impact.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/Kconfig | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Applied for 4.12!
 
-diff --git a/block/Kconfig b/block/Kconfig
-index e9f780f..89cd28f 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -115,6 +115,18 @@ config BLK_DEV_THROTTLING
- 
- 	See Documentation/cgroups/blkio-controller.txt for more information.
- 
-+config BLK_DEV_THROTTLING_LOW
-+	bool "Block throttling .low limit interface support (EXPERIMENTAL)"
-+	depends on BLK_DEV_THROTTLING
-+	default n
-+	---help---
-+	Add .low limit interface for block throttling. The low limit is a best
-+	effort limit to prioritize cgroups. Depending on the setting, the limit
-+	can be used to protect cgroups in terms of bandwidth/iops and better
-+	utilize disk resource.
-+
-+	Note, this is an experimental interface and could be changed someday.
-+
- config BLK_CMDLINE_PARSER
- 	bool "Block device command line partition parser"
- 	default n
 -- 
-2.9.3
+Jens Axboe
