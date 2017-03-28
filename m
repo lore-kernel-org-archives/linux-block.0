@@ -1,58 +1,197 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.11-rc
-Message-ID: <1352f555-5243-718b-0407-339b61bfa564@kernel.dk>
-Date: Fri, 24 Mar 2017 08:12:15 -0600
+Return-Path: <roman.penyaev@profitbricks.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAMGffEmgsP9GjQQp63matwxpzJT+SZu+VPU+Co-h99b8D5g5Zw@mail.gmail.com>
+References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+ <cfde9eab-a52a-8888-7d32-4f6fc9f9640a@grimberg.me> <CAMGffEmgsP9GjQQp63matwxpzJT+SZu+VPU+Co-h99b8D5g5Zw@mail.gmail.com>
+From: Roman Penyaev <roman.penyaev@profitbricks.com>
+Date: Tue, 28 Mar 2017 16:17:14 +0200
+Message-ID: <CAJrWOzBgswNC8z+XMCiHycPx0O-ejYeHwnBahSGNSgX7FfuoyA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/28] INFINIBAND NETWORK BLOCK DEVICE (IBNBD)
+To: Jinpu Wang <jinpu.wang@profitbricks.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Doug Ledford <dledford@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, hch <hch@lst.de>, Fabian Holler <mail@fholler.de>,
+	Milind Dumbare <Milind.dumbare@gmail.com>, Michael Wang <yun.wang@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Hi Bart and Sagi,
 
-A few fixes for the current series that should go into -rc4. This pull
-request contains:
+Thanks for warm welcome and early feedback.  I will respond both of you
+but here, on Jack's email, since I am not in CC in the first cover letter
+(what a bummer).  Sorry for mess.
 
-- A fix for a potential corruption of un-started requests from Ming.
+Sagi Grimberg <sagi@grimberg.me> wrote:
 
-- A blk-stat fix from Omar, ensuring we flush the stat batch before
-  checking nr_samples.
+> - Is there room for this ibnbd? If we were to take every block driver
+>   that was submitted without sufficient justification, it'd be very
+>   hard to maintain. What advantage (if any) does this buy anyone over
+>   existing rdma based protocols (srp, iser, nvmf)? I'm really (*really*)
+>   not sold on this one...
 
-- A set of fixes from Sagi for the nvmeof family.
+It seems that better to start from the history.  IBNBD project, as it was
+presented, is not only the block device (which supposed to be thin), but
+mainly it is an rdma transport, client and server logic, which is called
+IBTRS in our terms.  IBTRS was the starter, the main idea for us, which is
+planned to bind our own replicated storage solution via infiniband.
 
-Please pull!
+We wanted clear transport interface, which should not be very much different
+from what normal bsd sockets provide, e.g.:
+
+  ibtrs_clt_open()               - Opens a session to a server.
+  ibtrs_clt_rdma_write()         - WRITE, i.e transfer data to server.
+  ibtrs_clt_request_rdma_write() - READ, i.e. request data transfer from server.
+
+We did not want to rely, depend and embed any existent commands sets and
+protocols (e.g. SCSI) inside our transport.  IBTRS should stay apart from
+any storage knowledge and should be able to do only two things:
+
+  1. establish connection to a server (accept connections from clients)
+  2. read/write any data
+
+Thinking about transport as a layer, IBNBD is just a user of that layer,
+thin block device with only 4 commands, which establishes one connection
+to the server and maps N block devices thru that connection.
+
+I pretty well realize, that I've described obvious things with this
+layering, but again, what we wanted and achieved is an independent
+IB transport, which is planned to be used for replication and in that
+project IBNBD won't exist.
+
+> - To me, the fundamental design that the client side owns a pool of
+>   buffers that it issues writes too, seems inferior than the
+>   one taken in iser/nvmf (immediate data).
+
+That of course discussable, since we consider that as a feature :)
+But indeed, we never tested against nvmf.  And of course, I am open
+to any surprises.
+
+>   IMO, the ibnbd design has
+>   scalability issues both in terms of server side resources,
+
+Each client connection eats ~64Mb of memory on server side for the IO
+buffer pool.  Since we are talking about hundreds of connections this
+is reasonable trade off (memory is considerably cheap) to avoid any
+allocations on IO path and make it completely lockless.
+
+>   client side contention
+
+We do not have any noticeable contentions.  What we have is a single
+queue of buffers for all devices mapped on a client per connection
+(session) and I can consider that as a single point of resource, where
+each device have to fight in order to get an empty bit from a bitmap.
+In practice all benchmarks we did (I have to say, that this was a pretty
+old 4.4 kernel, and fresh data - is the amount of work which obviously
+should be done) show that even we share a queue a bottleneck is always
+an infiniband.
+
+>   and network congestion (on infiniband the latter is
+>   less severe).
+
+We rely on IB flow control and if a server side did not respond
+with
+
+  ib_post_recv()
+
+we do not reach the wire from a client.  That should be enough.
+
+> - I honestly do not understand why you need *19057* LOC to implement
+>   a rdma based block driver. Thats almost larger than all of our
+>   existing block drivers combined...
+
+Oh, those LOC numbers :)  IBNBD client (block device) itself is around
+2800 lines with all sysfs handy things.  What is really bloated is a
+transport client and server sides, which pretend to be smart and cover:
+
+  o reconnects
+  o heartbeats
+  o quite huge FSM implementation for each connection (session)
+
+True, this code can be split on common parts and deflated.
+
+>   First glance at the code provides
+>   some explanations,
+> (1) you have some strange code that has no business
+>   in a block driver like ibtrs_malloc/ibtrs_zalloc (yikes)
+
+Indeed, that is crap which is left from those times, when we tried
+to cover all generic kernel calls in order to do fault injection.
+
+>   open-coding various existing logging routines,
+
+No excuses, will be vanished.
+
+> (2) you are for some
+>   reason adding a second tag allocation scheme (why?)
+
+Several reasons.  a) We share single queue of buffers for mapped devices
+per client connection and we still support RQ mode.  b) MQ shared tags
+indeed are shared, but not between different hctxs.  I.e. because of
+our single queue for N devices per connection we are not able to create
+M hctxs and share this single queue between them.  Sometimes we need to
+do blk_mq_stop_hw_queue() in order to stop the hw queue and then restart
+it from a completion.  Obviously, simplest approach is to equally share
+static number of buffers in queue between N devices.  But that won't work
+since with big N we finish with very small queue depth per device.
+
+Of course, would be nice if along with BLK_MQ_F_TAG_SHARED another flag
+exists, say, BLK_MQ_F_TAG_GLOBALLY_SHARED.  Unfortunately with our design
+MQ does not help us a lot with current shared tags implementation.
+
+> (3) you are open
+>   coding a lot of stuff that we added to the stack in the past months...
+
+Could you please point precisely in the code what do you mean?
+
+If you are saying that you added a lot to nvmf, I would like to take a
+pause and postpone nvmf discussion till we have fresh numbers and more
+understanding.
+
+>   (4) you seem to over-layer your code for reasons that I do not
+>   really understand.
+
+Frankly, I did not get this.  Here 'over-layer code' sounds very abstract
+to me.
+
+>   And I didn't really look deep at all into the
+>   code, just to get the feel of it, and it seems like it needs a lot
+>   of work before it can even be considered upstream ready.
+
+Definetly.
 
 
-  git://git.kernel.dk/linux-block.git for-linus
+
+Bart Van Assche <Bart.VanAssche@sandisk.com> wrote:
+
+> * Doesn't scale in terms of number of CPUs submitting I/O. The graphs shown
+>   during the Vault talk clearly illustrate this. This is probably the result
+>   of sharing a data structure across all client CPUs, maybe the bitmap that
+>   tracks which parts of the target buffer space are in use.
+
+Probably that was not clear from the presentation, but that exactly what
+was fixed by CPU affinity (next slide after those hapless graphs).  What
+is left unclear to us is the NUMA effect, which is not related to distances,
+reported by numactl.
+
+But still your advice to run everything against perf and check cache misses
+is more than valid.  Thanks.
+
+> * Supports IB but none of the other RDMA transports (RoCE / iWARP).
+
+We did a lot of experiments with SoftRoCe and virtualized environment
+in order to have quick testing results on one host without hardware.
+That works quite well (despite SoftRoCe bugs which were fixed locally).
+So should not be a big deal to cover iWARP.
+
+> We also need performance numbers that compare IBNBD against SRP and/or
+> NVMeOF with memory registration disabled to see whether and how much faster
+> IBNBD is compared to these two protocols.
+
+Indeed, we've never tested against nvmf and that is a must.
 
 
-----------------------------------------------------------------
-Jens Axboe (1):
-      Merge branch 'nvme-4.11-rc' of git://git.infradead.org/nvme into for-linus
+Thanks.
 
-Ming Lei (1):
-      blk-mq: don't complete un-started request in timeout handler
-
-Omar Sandoval (1):
-      blk-stat: fix blk_stat_sum() if all samples are batched
-
-Sagi Grimberg (5):
-      nvme-loop: fix a possible use-after-free when destroying the admin queue
-      nvmet: confirm sq percpu has scheduled and switched to atomic
-      nvmet-rdma: Fix a possible uninitialized variable dereference
-      nvme-rdma: handle cpu unplug when re-establishing the controller
-      nvme-loop: handle cpu unplug when re-establishing the controller
-
- block/blk-mq.c              | 11 +-----
- block/blk-stat.c            |  4 +-
- drivers/nvme/host/rdma.c    | 28 +++++++-------
- drivers/nvme/target/core.c  | 11 +++++-
- drivers/nvme/target/loop.c  | 90 +++++++++++++++++++++++++--------------------
- drivers/nvme/target/nvmet.h |  1 +
- drivers/nvme/target/rdma.c  |  8 ++--
- 7 files changed, 82 insertions(+), 71 deletions(-)
-
--- 
-Jens Axboe
+--
+Roman
