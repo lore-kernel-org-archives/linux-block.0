@@ -1,33 +1,156 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Sagi Grimberg <sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>, "osandov@osandov.com"
-	<osandov@osandov.com>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
 Subject: Re: [PATCH 2/2] blk-stat: add a poll_size value to the request_queue
  struct
-Date: Tue, 28 Mar 2017 19:38:33 +0000
-Message-ID: <25CE7F43-DD1B-42D6-A891-A3D916BD0877@raithlin.com>
+To: sbates@raithlin.com, axboe@kernel.dk
 References: <1490494692-2416-1-git-send-email-sbates@raithlin.com>
  <1490494692-2416-3-git-send-email-sbates@raithlin.com>
- <44296e0a-fb04-888b-aa00-a9b01709e1b8@grimberg.me>
-In-Reply-To: <44296e0a-fb04-888b-aa00-a9b01709e1b8@grimberg.me>
-Content-Type: text/plain; charset="utf-8"
+Cc: linux-block@vger.kernel.org, Damien.LeMoal@wdc.com, osandov@osandov.com,
+ linux-nvme@lists.infradead.org
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <44296e0a-fb04-888b-aa00-a9b01709e1b8@grimberg.me>
+Date: Tue, 28 Mar 2017 13:50:16 +0300
 MIME-Version: 1.0
+In-Reply-To: <1490494692-2416-3-git-send-email-sbates@raithlin.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Pj4NCj4+ICBJbiBvcmRlciB0byBidWNrZXQgSU8gZm9yIHRoZSBwb2xsaW5nIGFsZ29yaXRobSB3
-ZSB1c2UgYSBzeXNmcyBlbnRyeQ0KPj4gIHRvIHNldCB0aGUgZmlsdGVyIHZhbHVlLiBJdCBpcyBz
-aWduZWQgYW5kIHdlIHdpbGwgdXNlIHRoYXQgYXMgZm9sbG93czoNCj4+DQo+PiAgIDAgICA6IE5v
-IGZpbHRlcmluZy4gQWxsIElPIGFyZSBjb25zaWRlcmVkIGluIHN0YXQgZ2VuZXJhdGlvbg0KPj4g
-ICA+IDAgOiBGaWx0ZXJpbmcgYmFzZWQgb24gSU8gb2YgZXhhY3RseSB0aGlzIHNpemUgb25seS4N
-Cj4+ICAgPCAwIDogRmlsdGVyaW5nIGJhc2VkIG9uIElPIGxlc3MgdGhhbiBvciBlcXVhbCB0byAt
-MSB0aW1lIHRoaXMgdmFsdWUuPg0KPg0KPiBJJ2Qgc2F5IHRoYXQgdGhpcyBpcyBhIGZhaXJseSBu
-b24tdHJpdmlhbCBzZW1hbnRpYyBtZWFubmluZyB0byB0aGlzLi4uDQo+DQo+IElzIHRoZXJlIGFu
-eSB1c2UgZm9yIHRoZSBzaXplIGV4YWN0IG1hdGNoIGZpbHRlcj8gSWYgbm90IHRoZW4NCj4gSSBz
-dWdnZXN0IHdlIGFsd2F5cyBtYWtlIGl0ICg8PSkgaW4gaXRzIHNlbWFudGljcy4uLg0KDQpUaGFu
-a3MgZm9yIHRoZSByZXZpZXcgU2FnaS4gSeKAmWQgYmUgT0sgZ29pbmcgd2l0aCA8PTAgYXMgdGhl
-IGV4YWN0IG1hdGNoIHdvdWxkIG5vcm1hbGx5IGJlIGZvciBtaW5pbWFsIElPIHNpemVzICh3aGVy
-ZSA8PSBhbmQgPSBhcmUgdGhlIHNhbWUgdGhpbmcpLiBJIHdpbGwgc2VlIHdoYXQgb3RoZXIgZmVl
-ZGJhY2sgSSBnZXQgYW5kIGFpbSB0byBkbyBhIHJlc3BpbiBzb29u4oCmDQoNClN0ZXBoZW4NCg0K
+
+
+On 26/03/17 05:18, sbates@raithlin.com wrote:
+> From: Stephen Bates <sbates@raithlin.com>
+>
+> In order to bucket IO for the polling algorithm we use a sysfs entry
+> to set the filter value. It is signed and we will use that as follows:
+>
+>  0   : No filtering. All IO are considered in stat generation
+>  > 0 : Filtering based on IO of exactly this size only.
+>  < 0 : Filtering based on IO less than or equal to -1 time this value.
+
+I'd say that this is a fairly non-trivial semantic meanning to this...
+
+Is there any use for the size exact match filter? If not then
+I suggest we always make it (<=) in its semantics...
+
+> Use this member to implement a new bucket function for the io polling
+> stats.
+>
+> Signed-off-by: Stephen Bates <sbates@raithlin.com>
+> ---
+>  block/blk-mq.c         | 17 +++++++++++++++--
+>  block/blk-sysfs.c      | 30 ++++++++++++++++++++++++++++++
+>  include/linux/blkdev.h |  1 +
+>  3 files changed, 46 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 5ff66f2..5ea9481 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2327,6 +2327,18 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  	blk_mq_sysfs_register(q);
+>  }
+>
+> +int blk_mq_poll_stats_bucket(const struct request *rq)
+> +{
+> +	int val = rq->q->poll_size;
+> +
+> +	if ((val == 0) ||
+> +	    (val > 0 && blk_rq_bytes(rq) == val) ||
+> +	    (val < 0 && blk_rq_bytes(rq) <= -val))
+> +		return (int)rq_data_dir(rq);
+> +
+> +	return -1;
+> +}
+> +
+>  struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>  						  struct request_queue *q)
+>  {
+> @@ -2338,7 +2350,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>  		goto err_exit;
+>
+>  	q->poll_cb = blk_stat_alloc_callback(blk_mq_poll_stats_fn,
+> -					     blk_stat_rq_ddir, 2, q);
+> +					     blk_mq_poll_stats_bucket, 2, q);
+>  	if (!q->poll_cb)
+>  		goto err_exit;
+>
+> @@ -2387,9 +2399,10 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>  	q->nr_requests = set->queue_depth;
+>
+>  	/*
+> -	 * Default to classic polling
+> +	 * Default to classic polling. Default to considering all IO.
+>  	 */
+>  	q->poll_nsec = -1;
+> +	q->poll_size = 0;
+>
+>  	if (set->ops->complete)
+>  		blk_queue_softirq_done(q, set->ops->complete);
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index fa831cb..000d5db 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -394,6 +394,29 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
+>  	return count;
+>  }
+>
+> +static ssize_t queue_poll_size_show(struct request_queue *q, char *page)
+> +{
+> +	return sprintf(page, "%d\n", q->poll_size);
+> +}
+> +
+> +static ssize_t queue_poll_size_store(struct request_queue *q, const char *page,
+> +				     size_t count)
+> +{
+> +	int err, val;
+> +
+> +	if (!q->mq_ops || !q->mq_ops->poll)
+> +		return -EINVAL;
+> +
+> +	err = kstrtoint(page, 10, &val);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	q->poll_size = val;
+> +
+> +	return count;
+> +}
+> +
+> +
+>  static ssize_t queue_poll_show(struct request_queue *q, char *page)
+>  {
+>  	return queue_var_show(test_bit(QUEUE_FLAG_POLL, &q->queue_flags), page);
+> @@ -654,6 +677,12 @@ static struct queue_sysfs_entry queue_poll_entry = {
+>  	.store = queue_poll_store,
+>  };
+>
+> +static struct queue_sysfs_entry queue_poll_size_entry = {
+> +	.attr = {.name = "io_poll_size", .mode = S_IRUGO | S_IWUSR },
+> +	.show = queue_poll_size_show,
+> +	.store = queue_poll_size_store,
+> +};
+> +
+>  static struct queue_sysfs_entry queue_poll_delay_entry = {
+>  	.attr = {.name = "io_poll_delay", .mode = S_IRUGO | S_IWUSR },
+>  	.show = queue_poll_delay_show,
+> @@ -710,6 +739,7 @@ static struct attribute *default_attrs[] = {
+>  	&queue_dax_entry.attr,
+>  	&queue_wb_lat_entry.attr,
+>  	&queue_poll_delay_entry.attr,
+> +	&queue_poll_size_entry.attr,
+>  	NULL,
+>  };
+>
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 1a7dc42..7ff5388 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -517,6 +517,7 @@ struct request_queue {
+>
+>  	unsigned int		rq_timeout;
+>  	int			poll_nsec;
+> +	int			poll_size;
+>
+>  	struct blk_stat_callback	*poll_cb;
+>  	struct blk_rq_stat	poll_stat[2];
+>
