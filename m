@@ -1,143 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:33163 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752008AbdC0MH3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2017 08:07:29 -0400
-Received: by mail-pg0-f68.google.com with SMTP id 79so12401391pgf.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2017 05:07:28 -0700 (PDT)
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 3/4] block: rename blk_mq_freeze_queue_start()
-Date: Mon, 27 Mar 2017 20:06:57 +0800
-Message-Id: <20170327120658.29864-4-tom.leiming@gmail.com>
-In-Reply-To: <20170327120658.29864-1-tom.leiming@gmail.com>
-References: <20170327120658.29864-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>, "osandov@osandov.com"
+	<osandov@osandov.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH 2/2] blk-stat: add a poll_size value to the request_queue
+ struct
+Date: Tue, 28 Mar 2017 21:52:57 +0000
+Message-ID: <1F36E393-1469-4808-8A8F-62337A2DD048@raithlin.com>
+References: <1490494692-2416-1-git-send-email-sbates@raithlin.com>
+ <1490494692-2416-3-git-send-email-sbates@raithlin.com>
+ <44296e0a-fb04-888b-aa00-a9b01709e1b8@grimberg.me>
+ <25CE7F43-DD1B-42D6-A891-A3D916BD0877@raithlin.com>
+ <88815dc6-04b2-0915-597d-1e335b6d2ba2@kernel.dk>
+ <C52E2CE3-0F92-40EA-902F-A9B70B145F1A@raithlin.com>
+ <fd49a447-153e-cad9-63ca-216ab6db7fb8@kernel.dk>
+In-Reply-To: <fd49a447-153e-cad9-63ca-216ab6db7fb8@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-As the .q_usage_counter is used by both legacy and
-mq path, we need to block new I/O if queue becomes
-dead in blk_queue_enter().
-
-So rename it and we can use this function in both
-paths.
-
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/blk-core.c                  |  2 +-
- block/blk-mq.c                    | 10 +++++-----
- drivers/block/mtip32xx/mtip32xx.c |  2 +-
- drivers/nvme/host/core.c          |  2 +-
- include/linux/blk-mq.h            |  2 +-
- 5 files changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5e8963bc98d9..60f364e1d36b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -670,7 +670,7 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
- 			return -EBUSY;
- 
- 		/*
--		 * read pair of barrier in blk_mq_freeze_queue_start(),
-+		 * read pair of barrier in blk_freeze_queue_start(),
- 		 * we need to order reading __PERCPU_REF_DEAD flag of
- 		 * .q_usage_counter and reading .mq_freeze_depth,
- 		 * otherwise the following wait may never return if the
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b36f0481ba0e..5370b4f750ff 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -68,7 +68,7 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- 	sbitmap_clear_bit(&hctx->ctx_map, ctx->index_hw);
- }
- 
--void blk_mq_freeze_queue_start(struct request_queue *q)
-+void blk_freeze_queue_start(struct request_queue *q)
- {
- 	int freeze_depth;
- 
-@@ -78,7 +78,7 @@ void blk_mq_freeze_queue_start(struct request_queue *q)
- 		blk_mq_run_hw_queues(q, false);
- 	}
- }
--EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
-+EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
- 
- void blk_mq_freeze_queue_wait(struct request_queue *q)
- {
-@@ -108,7 +108,7 @@ void blk_freeze_queue(struct request_queue *q)
- 	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
- 	 * exported to drivers as the only user for unfreeze is blk_mq.
- 	 */
--	blk_mq_freeze_queue_start(q);
-+	blk_freeze_queue_start(q);
- 	blk_mq_freeze_queue_wait(q);
- }
- 
-@@ -746,7 +746,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	 * percpu_ref_tryget directly, because we need to be able to
- 	 * obtain a reference even in the short window between the queue
- 	 * starting to freeze, by dropping the first reference in
--	 * blk_mq_freeze_queue_start, and the moment the last request is
-+	 * blk_freeze_queue_start, and the moment the last request is
- 	 * consumed, marked by the instant q_usage_counter reaches
- 	 * zero.
- 	 */
-@@ -2376,7 +2376,7 @@ static void blk_mq_queue_reinit_work(void)
- 	 * take place in parallel.
- 	 */
- 	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_freeze_queue_start(q);
-+		blk_freeze_queue_start(q);
- 	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_freeze_queue_wait(q);
- 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f96ab717534c..c96c35ab39df 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -4162,7 +4162,7 @@ static int mtip_block_remove(struct driver_data *dd)
- 		dev_info(&dd->pdev->dev, "device %s surprise removal\n",
- 						dd->disk->disk_name);
- 
--	blk_mq_freeze_queue_start(dd->queue);
-+	blk_freeze_queue_start(dd->queue);
- 	blk_mq_stop_hw_queues(dd->queue);
- 	blk_mq_tagset_busy_iter(&dd->tags, mtip_no_dev_cleanup, dd);
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9b3b57fef446..4a6d7f408769 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2386,7 +2386,7 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_freeze_queue_start(ns->queue);
-+		blk_freeze_queue_start(ns->queue);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_start_freeze);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 5b3e201c8d4f..ea2e9dcd3aef 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -243,7 +243,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
--void blk_mq_freeze_queue_start(struct request_queue *q);
-+void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
--- 
-2.9.3
+W1JldHJ5aW5nIGFzIG15IG5ldyBzZXR1cCBzZWNyZXRseSBjb252ZXJ0ZWQgdG8gaHRtbCBmb3Jt
+YXQgd2l0aG91dCB0ZWxsaW5nIG1lLiBBcG9sb2dpZXMgZm9yIHRoZSByZXNlbmQuXQ0KDQo+Pj4g
+DQo+Pj4gVGhhbmtzIGZvciB0aGUgcmV2aWV3IFNhZ2kuIEnigJlkIGJlIE9LIGdvaW5nIHdpdGgg
+PD0wIGFzIHRoZSBleGFjdA0KPj4+IG1hdGNoIHdvdWxkIG5vcm1hbGx5IGJlIGZvciBtaW5pbWFs
+IElPIHNpemVzICh3aGVyZSA8PSBhbmQgPSBhcmUgdGhlDQo+Pj4gc2FtZSB0aGluZykuIEkgd2ls
+bCBzZWUgd2hhdCBvdGhlciBmZWVkYmFjayBJIGdldCBhbmQgYWltIHRvIGRvIGENCj4+PiByZXNw
+aW4gc29vbuKApg0KPj4gDQo+PiBObyB0dW5hYmxlcyBmb3IgdGhpcywgcGxlYXNlLiBUaGVyZSdz
+IGFic29sdXRlbHkgbm8gcmVhc29uIHdoeSB3ZSBzaG91bGQNCj4+IG5lZWQgaXQuDQo+DQo+IEpl
+bnMg4oCTIGJ5IHRoaXMgeW91IG1lYW4geW91IHdhbnQgdG8gb25seSBidWNrZXQgSU8gdGhhdCBh
+cmUgZXhhY3RseQ0KPiB0aGUgbWluaW11bSBibG9jayBzaXplIHN1cHBvcnRlZCBieSB0aGUgdW5k
+ZXJseWluZyBibG9jayBkZXZpY2U/IEkgd2FzDQo+IGVudmlzaW9uaW5nIHdlIG1pZ2h0IHdhbnQg
+dG8gcmVsYXggdGhhdCBpbiBjZXJ0YWluIGNhc2VzIChlLmcuIGJ1Y2tldA0KPiA0S0IgYW5kIGJl
+bG93IGdvaW5nIHRvIGEgNTEyQiBkZXZpY2UpLg0KIA0KPiBTb3JyeSwgdGhlIGFib3ZlIHdhcyBh
+IGJpdCB0ZXJzZS4gSSB0aGluayBhIG11Y2ggYmV0dGVyIHNvbHV0aW9uIHdvdWxkDQo+IGJlIHRv
+IGNyZWF0ZSBhIG51bWJlciBvZiBidWNrZXRzIChwZXIgZGF0YSBkaXJlY3Rpb24pIGFuZCBkbyBz
+dGF0cyBvbg0KPiBhbGwgb2YgdGhlbS4gVGhlIGJ1Y2tldHMgd291bGQgY292ZXIgYSByZWFzb25h
+YmxlIHJhbmdlIG9mIHJlcXVlc3QNCj4gc2l6ZXMuIFRoZW4gd2hlbiB5b3UgcG9sbCBmb3IgYSBn
+aXZlbiByZXF1ZXN0LCB3ZSBjYW4gYmFzZSBvdXIgdGltZWQNCj4gbnVtYmVyIG9uIHRoZSBkYXRh
+IGRpcmVjdGlvbiBBTkQgc2l6ZSBvZiBpdC4gWW91IGNhbiBnZXQgcHJldHR5IGZhciB3aXRoDQo+
+IGEgZmV3IGJ1Y2tldHM6DQo+IA0KPiA1MTJiDQo+IDRrDQo+IDhrDQo+IDE2aw0KPiAzMmsNCj4g
+NjRrDQo+IDEyOGsNCj4gDQo+IGFuZCB5b3UgY291bGQgZXZlbiBoYXZlIHlvdXIgdGltZSBlc3Rp
+bWF0aW9uIGZ1bmN0aW9uIHR1cm4gdGhlc2UgaW50bw0KPiBzb21ldGhpbmcgc2FuZS4gT3IganVz
+dCB1c2UgYSBjb21wb3NpdGUgb2YgYnVja2V0cywgaWYgeW91IHdpc2guDQogDQpJIGRpZCBnbyBk
+b3duIHRoaXMgcGF0aCBpbml0aWFsbHkgYnV0IHRoZW4gbW92ZWQgYXdheSBmcm9tIGl0IHNpbmNl
+IHdlIHdlcmUgZm9jdXNpbmcgb25seSBvbiB0aGUgc21hbGxlciBJTyBzaXplLiBIb3dldmVyIEkg
+Y2FuIGRlZmluaXRlbHkgdGFrZSBhIGxvb2sgYXQgdGhpcyBhZ2FpbiBhcyBJIGFncmVlIHRoYXQg
+aXQgY291bGQgYmUgbW9yZSB1c2VmdWwgaW4gdGhlIGxvbmcgcnVuLg0KIA0KSSB3b3VsZCBsaWtl
+IHRvIGtlZXAgbXkgZmlyc3QgcGF0Y2ggaW4gdGhpcyBzZXJpZXMgYWxpdmUgc2luY2UgSSBkbyB0
+aGluayBoYXZpbmcgdGhlIG9wdGlvbiB0byBub3QgYnVja2V0IGFuIElPIGlzIGEgdXNlZnVsIHRo
+aW5nIHRvIGhhdmUuDQogDQpJ4oCZbGwgdGFrZSBhbGwgdGhlIGZlZWRiYWNrIHRvIGRhdGUgYW5k
+IHdvcmsgb24gYSB2Mi4gVGhhbmtzIQ0KIA0KU3RlcGhlbg0KDQoNCg0K
