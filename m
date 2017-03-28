@@ -1,52 +1,73 @@
-Return-Path: <BATV+b8442eb9fd62b0a9e465+4950+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/4] blk-mq: remove BLK_MQ_F_DEFER_ISSUE
-Date: Mon, 13 Mar 2017 09:48:30 -0600
-Message-Id: <20170313154833.14165-2-hch@lst.de>
-In-Reply-To: <20170313154833.14165-1-hch@lst.de>
-References: <20170313154833.14165-1-hch@lst.de>
+Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <a3216031-0801-45e2-320c-bfc88fa742b4@kernel.dk>
+References: <20170209153403.9730-1-linus.walleij@linaro.org>
+ <20170209153403.9730-7-linus.walleij@linaro.org> <00989e26-cdb9-48d7-2e46-ae6ef66e59a7@intel.com>
+ <CACRpkdYOyEs8vxmPt1kGiKJrw8+16DyD8Nn=ke6mgxPaCQynCw@mail.gmail.com>
+ <3fc89f9f-fbcf-113d-3644-b6c9dae003f0@intel.com> <8f1f3d4c-410c-2632-c776-4ced363bdb0d@kernel.dk>
+ <e4b2c4bc-8627-2234-354d-c986f69b220f@intel.com> <97f2a4ea-0802-9f23-6ac7-b9d6c6afbfcc@kernel.dk>
+ <a3571278-b30d-c3cb-bea6-d1776eb53025@intel.com> <a3216031-0801-45e2-320c-bfc88fa742b4@kernel.dk>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 28 Mar 2017 09:47:51 +0200
+Message-ID: <CACRpkdYAY8CcWb5obz2Awh9_QoHeoN=aWjDsVKeftsQy0Y5MJg@mail.gmail.com>
+Subject: Re: [PATCH 06/16] mmc: core: replace waitqueue with worker
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Adrian Hunter <adrian.hunter@intel.com>,
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Paolo Valente <paolo.valente@linaro.org>, Chunyan Zhang <zhang.chunyan@linaro.org>,
+	Baolin Wang <baolin.wang@linaro.org>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-This flag was never used since it was introduced.
+On Tue, Mar 14, 2017 at 3:36 PM, Jens Axboe <axboe@kernel.dk> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c         | 8 +-------
- include/linux/blk-mq.h | 1 -
- 2 files changed, 1 insertion(+), 8 deletions(-)
+> There's one case that doesn't look like it was converted properly, but
+> that's a mistake. The general insert-and-run cases run inline if we can,
+> but the direct-issue needs a fixup, see below.
+>
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 159187a28d66..4196d6bee92d 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1434,7 +1434,8 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+>         return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+>  }
+>
+> -static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie)
+> +static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
+> +                                     bool can_block)
+>  {
+>         struct request_queue *q = rq->q;
+>         struct blk_mq_queue_data bd = {
+> @@ -1475,7 +1476,7 @@ static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie)
+>         }
+>
+>  insert:
+> -       blk_mq_sched_insert_request(rq, false, true, true, false);
+> +       blk_mq_sched_insert_request(rq, false, true, false, can_block);
+>  }
+>
+>  /*
+> @@ -1569,11 +1570,11 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>
+>                 if (!(data.hctx->flags & BLK_MQ_F_BLOCKING)) {
+>                         rcu_read_lock();
+> -                       blk_mq_try_issue_directly(old_rq, &cookie);
+> +                       blk_mq_try_issue_directly(old_rq, &cookie, false);
+>                         rcu_read_unlock();
+>                 } else {
+>                         srcu_idx = srcu_read_lock(&data.hctx->queue_rq_srcu);
+> -                       blk_mq_try_issue_directly(old_rq, &cookie);
+> +                       blk_mq_try_issue_directly(old_rq, &cookie, true);
+>                         srcu_read_unlock(&data.hctx->queue_rq_srcu, srcu_idx);
+>                 }
+>                 goto done;
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 159187a28d66..acf0ddf4af52 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1534,13 +1534,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	}
- 
- 	plug = current->plug;
--	/*
--	 * If the driver supports defer issued based on 'last', then
--	 * queue it up like normal since we can potentially save some
--	 * CPU this way.
--	 */
--	if (((plug && !blk_queue_nomerges(q)) || is_sync) &&
--	    !(data.hctx->flags & BLK_MQ_F_DEFER_ISSUE)) {
-+	if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
- 		struct request *old_rq = NULL;
- 
- 		blk_mq_bio_to_request(rq, bio);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b296a9006117..5b3e201c8d4f 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -152,7 +152,6 @@ enum {
- 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
- 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
- 	BLK_MQ_F_SG_MERGE	= 1 << 2,
--	BLK_MQ_F_DEFER_ISSUE	= 1 << 4,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
--- 
-2.11.0
+Jens do you have this in your patch queue or is it something you want
+us to test and
+submit back to you?
+
+Yours,
+Linus Walleij
