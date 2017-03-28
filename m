@@ -1,120 +1,56 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: dledford@redhat.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	mail@fholler.de,
-	Milind.dumbare@gmail.com,
-	yun.wang@profitbricks.com,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Kleber Souza <kleber.souza@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH 19/28] ibnbd_clt: add log helpers
-Date: Fri, 24 Mar 2017 11:45:34 +0100
-Message-Id: <1490352343-20075-20-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:34488 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753757AbdC1CoA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Mar 2017 22:44:00 -0400
+Received: by mail-pg0-f66.google.com with SMTP id o123so14833629pga.1
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2017 19:43:59 -0700 (PDT)
+Date: Tue, 28 Mar 2017 10:43:54 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [PATCH 1/2] blk-mq: fix leak of q->stats
+Message-ID: <20170328024351.GA23217@ming.t460p>
+References: <de751892a392533e8e26fffbf72ba7904cfda468.1490636543.git.osandov@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <de751892a392533e8e26fffbf72ba7904cfda468.1490636543.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+On Mon, Mar 27, 2017 at 10:43:58AM -0700, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> blk_alloc_queue_node() already allocates q->stats, so
+> blk_mq_init_allocated_queue() is overwriting it with a new allocation.
+> 
+> Fixes: a83b576c9c25 ("block: fix stacked driver stats init and free")
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c212b9644a9f..9c6b39bd8358 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2212,10 +2212,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>  	/* mark the queue as mq asap */
+>  	q->mq_ops = set->ops;
+>  
+> -	q->stats = blk_alloc_queue_stats();
+> -	if (!q->stats)
+> -		goto err_exit;
+> -
+>  	q->poll_cb = blk_stat_alloc_callback(blk_mq_poll_stats_fn,
+>  					     blk_stat_rq_ddir, 2, q);
+>  	if (!q->poll_cb)
+> -- 
+> 2.12.1
+> 
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
-Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
----
- drivers/block/ibnbd_client/ibnbd_clt_log.h | 79 ++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
- create mode 100644 drivers/block/ibnbd_client/ibnbd_clt_log.h
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-diff --git a/drivers/block/ibnbd_client/ibnbd_clt_log.h b/drivers/block/ibnbd_client/ibnbd_clt_log.h
-new file mode 100644
-index 0000000..b3184b7
---- /dev/null
-+++ b/drivers/block/ibnbd_client/ibnbd_clt_log.h
-@@ -0,0 +1,79 @@
-+/*
-+ * InfiniBand Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler < mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *   	    Kleber Souza <kleber.souza@profitbricks.com>
-+ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *   	    Roman Pen <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions, and the following disclaimer,
-+ *    without modification.
-+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
-+ *    substantially similar to the "NO WARRANTY" disclaimer below
-+ *    ("Disclaimer") and any redistribution must be conditioned upon
-+ *    including a substantially similar Disclaimer requirement for further
-+ *    binary redistribution.
-+ * 3. Neither the names of the above-listed copyright holders nor the names
-+ *    of any contributors may be used to endorse or promote products derived
-+ *    from this software without specific prior written permission.
-+ *
-+ * Alternatively, this software may be distributed under the terms of the
-+ * GNU General Public License ("GPL") version 2 as published by the Free
-+ * Software Foundation.
-+ *
-+ * NO WARRANTY
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-+ * POSSIBILITY OF SUCH DAMAGES.
-+ *
-+ */
-+
-+#ifndef __IBNBD_CLT_LOG_H__
-+#define __IBNBD_CLT_LOG_H__
-+
-+#include "../ibnbd_inc/log.h"
-+
-+#define blkdev_name(dev) ((dev->gd == NULL) ? "<no dev>" : dev->gd->disk_name)
-+
-+#define ERR(dev, fmt, ...) pr_err("ibnbd L%d <%s@%s> %s ERR: " fmt,\
-+				__LINE__, dev->pathname, ibnbd_prefix(dev),\
-+				blkdev_name(dev), ##__VA_ARGS__)
-+
-+#define ERR_RL(dev, fmt, ...) pr_err_ratelimited("ibnbd L%d <%s@%s> %s ERR: "\
-+				fmt, __LINE__, dev->pathname,\
-+				ibnbd_prefix(dev), blkdev_name(dev),\
-+				##__VA_ARGS__)
-+
-+#define WRN(dev, fmt, ...) pr_warn("ibnbd L%d <%s@%s> %s WARN: " fmt,\
-+				__LINE__, dev->pathname, ibnbd_prefix(dev),\
-+				blkdev_name(dev), ##__VA_ARGS__)
-+
-+#define WRN_RL(dev, fmt, ...) pr_warn_ratelimited("ibnbd L%d <%s@%s> %s WARN: "\
-+			fmt, __LINE__, dev->pathname, ibnbd_prefix(dev),\
-+			blkdev_name(dev), ##__VA_ARGS__)
-+
-+#define INFO(dev, fmt, ...) pr_info("ibnbd <%s@%s> %s: " \
-+			fmt, dev->pathname, ibnbd_prefix(dev),\
-+			blkdev_name(dev), ##__VA_ARGS__)
-+
-+#define INFO_RL(dev, fmt, ...) pr_info_ratelimited("ibnbd <%s@%s> %s: " \
-+			fmt, dev->pathname, ibnbd_prefix(dev),\
-+			blkdev_name(dev), ##__VA_ARGS__)
-+
-+#endif /*__IBNBD_CLT_LOG_H__*/
 -- 
-2.7.4
+Ming
