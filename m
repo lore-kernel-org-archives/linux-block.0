@@ -1,61 +1,50 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Jens Axboe <axboe@fb.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Christoph Hellwig <hch@lst.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Cc: Marc MERLIN <marc@merlins.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 2/3] blk-mq: Provide freeze queue timeout
-Date: Wed,  1 Mar 2017 14:22:11 -0500
-Message-Id: <1488396132-11369-3-git-send-email-keith.busch@intel.com>
-In-Reply-To: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
-References: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f45.google.com ([74.125.83.45]:34764 "EHLO
+        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932088AbdC1XNk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Mar 2017 19:13:40 -0400
+Received: by mail-pg0-f45.google.com with SMTP id 21so85758699pgg.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2017 16:13:20 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v2 2/3] blk-mq: fix leak of q->stats
+Date: Tue, 28 Mar 2017 16:12:16 -0700
+Message-Id: <0c03f37f5c643eda28a3f1368425c55e407e3ffd.1490742717.git.osandov@fb.com>
+In-Reply-To: <91d938665e5386f10f8756ee8c7ef3e6496ea260.1490742717.git.osandov@fb.com>
+References: <91d938665e5386f10f8756ee8c7ef3e6496ea260.1490742717.git.osandov@fb.com>
+In-Reply-To: <91d938665e5386f10f8756ee8c7ef3e6496ea260.1490742717.git.osandov@fb.com>
+References: <91d938665e5386f10f8756ee8c7ef3e6496ea260.1490742717.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A driver may wish to take corrective action if queued requests do not
-complete within a set time.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+blk_alloc_queue_node() already allocates q->stats, so
+blk_mq_init_allocated_queue() is overwriting it with a new allocation.
+
+Fixes: a83b576c9c25 ("block: fix stacked driver stats init and free")
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-mq.c         | 9 +++++++++
- include/linux/blk-mq.h | 2 ++
- 2 files changed, 11 insertions(+)
+ block/blk-mq.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8da2c04..a5e66a7 100644
+index 7df9dbfab022..00eeef31db30 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -81,6 +81,15 @@ void blk_mq_freeze_queue_wait(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait);
+@@ -2212,10 +2212,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	/* mark the queue as mq asap */
+ 	q->mq_ops = set->ops;
  
-+int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
-+				     unsigned long timeout)
-+{
-+	return wait_event_timeout(q->mq_freeze_wq,
-+					percpu_ref_is_zero(&q->q_usage_counter),
-+					timeout);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait_timeout);
-+
- /*
-  * Guarantee no request is in use, so we can change any data structure of
-  * the queue afterward.
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8dacf68..b296a90 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -246,6 +246,8 @@ void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_mq_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
-+int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
-+				     unsigned long timeout);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
- int blk_mq_map_queues(struct blk_mq_tag_set *set);
+-	q->stats = blk_alloc_queue_stats();
+-	if (!q->stats)
+-		goto err_exit;
+-
+ 	q->poll_cb = blk_stat_alloc_callback(blk_mq_poll_stats_fn,
+ 					     blk_stat_rq_ddir, 2, q);
+ 	if (!q->poll_cb)
 -- 
-2.5.5
+2.12.1
