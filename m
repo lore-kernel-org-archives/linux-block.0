@@ -1,94 +1,150 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
-Subject: [PATCH rfc 00/10] non selective polling block interface
-Date: Thu,  9 Mar 2017 15:16:32 +0200
-Message-Id: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f52.google.com ([74.125.83.52]:34937 "EHLO
+        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753925AbdC1G3x (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Mar 2017 02:29:53 -0400
+Received: by mail-pg0-f52.google.com with SMTP id 81so48594290pgh.2
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2017 23:29:52 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, Vivek Goyal <vgoyal@redhat.com>,
+        linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, "David S . Miller" <davem@davemloft.net>
+Subject: [PATCH 6/6] jsflash: stop sharing request queue across multiple gendisks
+Date: Mon, 27 Mar 2017 23:28:47 -0700
+Message-Id: <177c67289c6878fa56c273a92f9c0069ee0f113f.1490681910.git.osandov@fb.com>
+In-Reply-To: <cover.1490681910.git.osandov@fb.com>
+References: <cover.1490681910.git.osandov@fb.com>
+In-Reply-To: <cover.1490681910.git.osandov@fb.com>
+References: <cover.1490681910.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Today, our only polling interface is selective in the sense that
-it polls for a specific tag (cookie). blk_mq_poll will not complete
-until the specific tag has completed (given that the block driver
-implements it obviously).
+From: Omar Sandoval <osandov@fb.com>
 
-target mode drivers like our nvme and scsi target, can benefit
-from opportunistically polling the block device when we submit
-a bio to it, but it doesn't make sense to use a selective
-polling interface (like nvmet does at the moment) for it
-because we don't care about specific I/O for the time being.
+Compile-tested only (by hacking it to compile on x86).
 
-Instead, allow to poll for batch of completions and return if
-we don't have any completions or we exhausted our budget (batch).
+Cc: David S. Miller <davem@davemloft.net>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ drivers/sbus/char/jsflash.c | 50 ++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 36 insertions(+), 14 deletions(-)
 
-This set also adds poll_batch support for nvme-pci and nvme-rdma,
-and converts nvmet and scsi target to use it. Note that I couldn't
-come up with a hero value for the batch size, so I left it at
-magic 4 for now, perhaps someone can have a better idea for this.
-
-In addition, I'd like to see if we can hook this with frontend
-context (nvmet-rdma, srpt or isert) to avoid scheduling for interrupt
-if we have pending block IO that we can poll for.
-
-I would also like to somehow allow aio-dio user-space reap to also have
-access to this in the future, but I have yet to come up with something
-good for it.
-
-I experimented with this code on nvmet-rdma with a strong initiator
-bombarding small 512B IOs (4k block size saturates my network) against
-a 4 cpu-core nvmet-rdma target system.
-
-Without this patchset I got:
-590K/590K read/write IOPs
-
-With this patchset applied I got:
-680K/680K read/write IOPs
-
-The canonical read latency (QD=1) did not have a noticeable
-change (29-30 usec).
-
-Hopefully if this is appealing, people can experiment with this
-and report back their results.
-
-Sagi Grimberg (10):
-  nvme-pci: Split __nvme_process_cq to poll and handle
-  nvme-pci: Add budget to __nvme_process_cq
-  nvme-pci: open-code polling logic in nvme_poll
-  block: Add a non-selective polling interface
-  nvme-pci: Support blk_poll_batch
-  IB/cq: Don't force IB_POLL_DIRECT poll context for
-    ib_process_cq_direct
-  nvme-rdma: Don't rearm the CQ when polling directly
-  nvme-rdma: Support blk_poll_batch
-  nvmet: Use non-selective polling
-  target: Use non-selective polling
-
- block/blk-mq.c                      |  14 ++++
- drivers/infiniband/core/cq.c        |   2 -
- drivers/nvme/host/pci.c             | 146 +++++++++++++++++++++++-------------
- drivers/nvme/host/rdma.c            |   9 ++-
- drivers/nvme/target/io-cmd.c        |   8 +-
- drivers/target/target_core_iblock.c |   1 +
- include/linux/blk-mq.h              |   2 +
- include/linux/blkdev.h              |   1 +
- 8 files changed, 125 insertions(+), 58 deletions(-)
-
+diff --git a/drivers/sbus/char/jsflash.c b/drivers/sbus/char/jsflash.c
+index 6ff61dad5e21..62fed9dc893e 100644
+--- a/drivers/sbus/char/jsflash.c
++++ b/drivers/sbus/char/jsflash.c
+@@ -183,11 +183,33 @@ static void jsfd_read(char *buf, unsigned long p, size_t togo) {
+ 	}
+ }
+ 
+-static void jsfd_do_request(struct request_queue *q)
++static int jsfd_queue;
++
++static struct request *jsfd_next_request(void)
++{
++	struct request_queue *q;
++	struct request *rq;
++	int old_pos = jsfd_queue;
++
++	do {
++		q = jsfd_disk[jsfd_queue]->queue;
++		if (++jsfd_queue == JSF_MAX)
++			jsfd_queue = 0;
++		if (q) {
++			rq = blk_fetch_request(q);
++			if (rq)
++				return rq;
++		}
++	} while (jsfd_queue != old_pos);
++
++	return NULL;
++}
++
++static void jsfd_request(void)
+ {
+ 	struct request *req;
+ 
+-	req = blk_fetch_request(q);
++	req = jsfd_next_request();
+ 	while (req) {
+ 		struct jsfd_part *jdp = req->rq_disk->private_data;
+ 		unsigned long offset = blk_rq_pos(req) << 9;
+@@ -211,10 +233,15 @@ static void jsfd_do_request(struct request_queue *q)
+ 		err = 0;
+ 	end:
+ 		if (!__blk_end_request_cur(req, err))
+-			req = blk_fetch_request(q);
++			req = jsfd_next_request();
+ 	}
+ }
+ 
++static void jsfd_do_request(struct request_queue *q)
++{
++	jsfd_request();
++}
++
+ /*
+  * The memory devices use the full 32/64 bits of the offset, and so we cannot
+  * check against negative addresses: they are ok. The return value is weird,
+@@ -544,8 +571,6 @@ static int jsflash_init(void)
+ 	return 0;
+ }
+ 
+-static struct request_queue *jsf_queue;
+-
+ static int jsfd_init(void)
+ {
+ 	static DEFINE_SPINLOCK(lock);
+@@ -562,6 +587,11 @@ static int jsfd_init(void)
+ 		struct gendisk *disk = alloc_disk(1);
+ 		if (!disk)
+ 			goto out;
++		disk->queue = blk_init_queue(jsfd_do_request, &lock);
++		if (!disk->queue) {
++			put_disk(disk);
++			goto out;
++		}
+ 		jsfd_disk[i] = disk;
+ 	}
+ 
+@@ -570,13 +600,6 @@ static int jsfd_init(void)
+ 		goto out;
+ 	}
+ 
+-	jsf_queue = blk_init_queue(jsfd_do_request, &lock);
+-	if (!jsf_queue) {
+-		err = -ENOMEM;
+-		unregister_blkdev(JSFD_MAJOR, "jsfd");
+-		goto out;
+-	}
+-
+ 	for (i = 0; i < JSF_MAX; i++) {
+ 		struct gendisk *disk = jsfd_disk[i];
+ 		if ((i & JSF_PART_MASK) >= JSF_NPART) continue;
+@@ -589,7 +612,6 @@ static int jsfd_init(void)
+ 		disk->fops = &jsfd_fops;
+ 		set_capacity(disk, jdp->dsize >> 9);
+ 		disk->private_data = jdp;
+-		disk->queue = jsf_queue;
+ 		add_disk(disk);
+ 		set_disk_ro(disk, 1);
+ 	}
+@@ -619,6 +641,7 @@ static void __exit jsflash_cleanup_module(void)
+ 	for (i = 0; i < JSF_MAX; i++) {
+ 		if ((i & JSF_PART_MASK) >= JSF_NPART) continue;
+ 		del_gendisk(jsfd_disk[i]);
++		blk_cleanup_queue(jsfd_disk[i]->queue);
+ 		put_disk(jsfd_disk[i]);
+ 	}
+ 	if (jsf0.busy)
+@@ -628,7 +651,6 @@ static void __exit jsflash_cleanup_module(void)
+ 
+ 	misc_deregister(&jsf_dev);
+ 	unregister_blkdev(JSFD_MAJOR, "jsfd");
+-	blk_cleanup_queue(jsf_queue);
+ }
+ 
+ module_init(jsflash_init_module);
 -- 
-2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.12.1
