@@ -1,116 +1,141 @@
-Return-Path: <ebiggers3@gmail.com>
-Return-Path: <ebiggers3@gmail.com>
-From: Eric Biggers <ebiggers3@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Eric Biggers <ebiggers@google.com>
-Subject: [PATCH] block: constify struct blk_integrity_profile
-Date: Fri, 24 Mar 2017 18:03:48 -0700
-Message-Id: <20170325010348.74421-1-ebiggers3@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f41.google.com ([74.125.83.41]:33348 "EHLO
+        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753925AbdC1G3z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Mar 2017 02:29:55 -0400
+Received: by mail-pg0-f41.google.com with SMTP id n5so55446574pgh.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2017 23:29:49 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, Vivek Goyal <vgoyal@redhat.com>,
+        linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Tim Waugh <tim@cyberelk.net>
+Subject: [PATCH 2/6] parport/pd: stop sharing request queue across multiple gendisks
+Date: Mon, 27 Mar 2017 23:28:43 -0700
+Message-Id: <70d4d7b67848ee2fdcbfcf6b1accc89ac7a1659c.1490681910.git.osandov@fb.com>
+In-Reply-To: <cover.1490681910.git.osandov@fb.com>
+References: <cover.1490681910.git.osandov@fb.com>
+In-Reply-To: <cover.1490681910.git.osandov@fb.com>
+References: <cover.1490681910.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+From: Omar Sandoval <osandov@fb.com>
 
-blk_integrity_profile's are never modified, so mark them 'const' so that
-they are placed in .rodata and benefit from memory protection.
+Compile-tested only.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Cc: Tim Waugh <tim@cyberelk.net>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-integrity.c  |  2 +-
- block/t10-pi.c         |  8 ++++----
- include/linux/genhd.h  | 10 +++++-----
- include/linux/t10-pi.h |  8 ++++----
- 4 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/block/paride/pd.c | 50 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 34 insertions(+), 16 deletions(-)
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 9f0ff5ba4f84..b3622cb00fc2 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -389,7 +389,7 @@ static int blk_integrity_nop_fn(struct blk_integrity_iter *iter)
+diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
+index 9cfd2e06a649..b05e151c9b38 100644
+--- a/drivers/block/paride/pd.c
++++ b/drivers/block/paride/pd.c
+@@ -381,12 +381,33 @@ static enum action do_pd_write_start(void);
+ static enum action do_pd_read_drq(void);
+ static enum action do_pd_write_done(void);
+ 
+-static struct request_queue *pd_queue;
++static int pd_queue;
+ static int pd_claimed;
+ 
+ static struct pd_unit *pd_current; /* current request's drive */
+ static PIA *pi_current; /* current request's PIA */
+ 
++static int set_next_request(void)
++{
++	struct gendisk *disk;
++	struct request_queue *q;
++	int old_pos = pd_queue;
++
++	do {
++		disk = pd[pd_queue].gd;
++		q = disk ? disk->queue : NULL;
++		if (++pd_queue == PD_UNITS)
++			pd_queue = 0;
++		if (q) {
++			pd_req = blk_fetch_request(q);
++			if (pd_req)
++				break;
++		}
++	} while (pd_queue != old_pos);
++
++	return pd_req != NULL;
++}
++
+ static void run_fsm(void)
+ {
+ 	while (1) {
+@@ -418,8 +439,7 @@ static void run_fsm(void)
+ 				spin_lock_irqsave(&pd_lock, saved_flags);
+ 				if (!__blk_end_request_cur(pd_req,
+ 						res == Ok ? 0 : -EIO)) {
+-					pd_req = blk_fetch_request(pd_queue);
+-					if (!pd_req)
++					if (!set_next_request())
+ 						stop = 1;
+ 				}
+ 				spin_unlock_irqrestore(&pd_lock, saved_flags);
+@@ -839,7 +859,13 @@ static void pd_probe_drive(struct pd_unit *disk)
+ 	p->first_minor = (disk - pd) << PD_BITS;
+ 	disk->gd = p;
+ 	p->private_data = disk;
+-	p->queue = pd_queue;
++	p->queue = blk_init_queue(do_pd_request, &pd_lock);
++	if (!p->queue) {
++		disk->gd = NULL;
++		put_disk(p);
++		return;
++	}
++	blk_queue_max_hw_sectors(p->queue, cluster);
+ 
+ 	if (disk->drive == -1) {
+ 		for (disk->drive = 0; disk->drive <= 1; disk->drive++)
+@@ -919,26 +945,18 @@ static int __init pd_init(void)
+ 	if (disable)
+ 		goto out1;
+ 
+-	pd_queue = blk_init_queue(do_pd_request, &pd_lock);
+-	if (!pd_queue)
+-		goto out1;
+-
+-	blk_queue_max_hw_sectors(pd_queue, cluster);
+-
+ 	if (register_blkdev(major, name))
+-		goto out2;
++		goto out1;
+ 
+ 	printk("%s: %s version %s, major %d, cluster %d, nice %d\n",
+ 	       name, name, PD_VERSION, major, cluster, nice);
+ 	if (!pd_detect())
+-		goto out3;
++		goto out2;
+ 
  	return 0;
+ 
+-out3:
+-	unregister_blkdev(major, name);
+ out2:
+-	blk_cleanup_queue(pd_queue);
++	unregister_blkdev(major, name);
+ out1:
+ 	return -ENODEV;
+ }
+@@ -953,11 +971,11 @@ static void __exit pd_exit(void)
+ 		if (p) {
+ 			disk->gd = NULL;
+ 			del_gendisk(p);
++			blk_cleanup_queue(p->queue);
+ 			put_disk(p);
+ 			pi_release(disk->pi);
+ 		}
+ 	}
+-	blk_cleanup_queue(pd_queue);
  }
  
--static struct blk_integrity_profile nop_profile = {
-+static const struct blk_integrity_profile nop_profile = {
- 	.name = "nop",
- 	.generate_fn = blk_integrity_nop_fn,
- 	.verify_fn = blk_integrity_nop_fn,
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 2c97912335a9..680c6d636298 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -160,28 +160,28 @@ static int t10_pi_type3_verify_ip(struct blk_integrity_iter *iter)
- 	return t10_pi_verify(iter, t10_pi_ip_fn, 3);
- }
- 
--struct blk_integrity_profile t10_pi_type1_crc = {
-+const struct blk_integrity_profile t10_pi_type1_crc = {
- 	.name			= "T10-DIF-TYPE1-CRC",
- 	.generate_fn		= t10_pi_type1_generate_crc,
- 	.verify_fn		= t10_pi_type1_verify_crc,
- };
- EXPORT_SYMBOL(t10_pi_type1_crc);
- 
--struct blk_integrity_profile t10_pi_type1_ip = {
-+const struct blk_integrity_profile t10_pi_type1_ip = {
- 	.name			= "T10-DIF-TYPE1-IP",
- 	.generate_fn		= t10_pi_type1_generate_ip,
- 	.verify_fn		= t10_pi_type1_verify_ip,
- };
- EXPORT_SYMBOL(t10_pi_type1_ip);
- 
--struct blk_integrity_profile t10_pi_type3_crc = {
-+const struct blk_integrity_profile t10_pi_type3_crc = {
- 	.name			= "T10-DIF-TYPE3-CRC",
- 	.generate_fn		= t10_pi_type3_generate_crc,
- 	.verify_fn		= t10_pi_type3_verify_crc,
- };
- EXPORT_SYMBOL(t10_pi_type3_crc);
- 
--struct blk_integrity_profile t10_pi_type3_ip = {
-+const struct blk_integrity_profile t10_pi_type3_ip = {
- 	.name			= "T10-DIF-TYPE3-IP",
- 	.generate_fn		= t10_pi_type3_generate_ip,
- 	.verify_fn		= t10_pi_type3_verify_ip,
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 76f39754e7b0..9e11082c7f9b 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -159,11 +159,11 @@ struct badblocks;
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- 
- struct blk_integrity {
--	struct blk_integrity_profile	*profile;
--	unsigned char			flags;
--	unsigned char			tuple_size;
--	unsigned char			interval_exp;
--	unsigned char			tag_size;
-+	const struct blk_integrity_profile	*profile;
-+	unsigned char				flags;
-+	unsigned char				tuple_size;
-+	unsigned char				interval_exp;
-+	unsigned char				tag_size;
- };
- 
- #endif	/* CONFIG_BLK_DEV_INTEGRITY */
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 9fba9dd33544..9375d23a24e7 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -34,9 +34,9 @@ struct t10_pi_tuple {
- };
- 
- 
--extern struct blk_integrity_profile t10_pi_type1_crc;
--extern struct blk_integrity_profile t10_pi_type1_ip;
--extern struct blk_integrity_profile t10_pi_type3_crc;
--extern struct blk_integrity_profile t10_pi_type3_ip;
-+extern const struct blk_integrity_profile t10_pi_type1_crc;
-+extern const struct blk_integrity_profile t10_pi_type1_ip;
-+extern const struct blk_integrity_profile t10_pi_type3_crc;
-+extern const struct blk_integrity_profile t10_pi_type3_ip;
- 
- #endif
+ MODULE_LICENSE("GPL");
 -- 
-2.12.1.578.ge9c3154ca4-goog
+2.12.1
