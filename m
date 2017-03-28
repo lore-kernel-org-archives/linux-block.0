@@ -1,152 +1,155 @@
-Return-Path: <prvs=425928092f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
-        <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 16/18] blk-throttle: add interface for per-cgroup target latency
-Date: Mon, 27 Mar 2017 10:51:44 -0700
-Message-ID: <2b83be1e6eb0fc1640ed094752ef218813f50935.1490634565.git.shli@fb.com>
-In-Reply-To: <cover.1490634565.git.shli@fb.com>
-References: <cover.1490634565.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f53.google.com ([74.125.83.53]:33367 "EHLO
+        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754306AbdC1G36 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Mar 2017 02:29:58 -0400
+Received: by mail-pg0-f53.google.com with SMTP id n5so55447567pgh.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2017 23:29:52 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, Vivek Goyal <vgoyal@redhat.com>,
+        linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH 5/6] swim: stop sharing request queue across multiple gendisks
+Date: Mon, 27 Mar 2017 23:28:46 -0700
+Message-Id: <6edfbcdd4cdc1e1225819b2412eff15c9074df45.1490681910.git.osandov@fb.com>
+In-Reply-To: <cover.1490681910.git.osandov@fb.com>
+References: <cover.1490681910.git.osandov@fb.com>
+In-Reply-To: <cover.1490681910.git.osandov@fb.com>
+References: <cover.1490681910.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Here we introduce per-cgroup latency target. The target determines how a
-cgroup can afford latency increasement. We will use the target latency
-to calculate a threshold and use it to schedule IO for cgroups. If a
-cgroup's bandwidth is below its low limit but its average latency is
-below the threshold, other cgroups can safely dispatch more IO even
-their bandwidth is higher than their low limits. On the other hand, if
-the first cgroup's latency is higher than the threshold, other cgroups
-are throttled to their low limits. So the target latency determines how
-we efficiently utilize free disk resource without sacifice of worload's
-IO latency.
+From: Omar Sandoval <osandov@fb.com>
 
-For example, assume 4k IO average latency is 50us when disk isn't
-congested. A cgroup sets the target latency to 30us. Then the cgroup can
-accept 50+30=80us IO latency. If the cgroupt's average IO latency is
-90us and its bandwidth is below low limit, other cgroups are throttled
-to their low limit. If the cgroup's average IO latency is 60us, other
-cgroups are allowed to dispatch more IO. When other cgroups dispatch
-more IO, the first cgroup's IO latency will increase. If it increases to
-81us, we then throttle other cgroups.
+Compile-tested only (by hacking it to compile on x86).
 
-User will configure the interface in this way:
-echo "8:16 rbps=2097152 wbps=max latency=100 idle=200" > io.low
-
-latency is in microsecond unit
-
-By default, latency target is 0, which means to guarantee IO latency.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-throttle.c | 28 ++++++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+ drivers/block/swim.c | 55 ++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 36 insertions(+), 19 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0ea8698..6e1c298 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -25,6 +25,8 @@ static int throtl_quantum = 32;
- #define DFL_IDLE_THRESHOLD_SSD (1000L) /* 1 ms */
- #define DFL_IDLE_THRESHOLD_HD (100L * 1000) /* 100 ms */
- #define MAX_IDLE_TIME (5L * 1000 * 1000) /* 5 s */
-+/* default latency target is 0, eg, guarantee IO latency by default */
-+#define DFL_LATENCY_TARGET (0)
- 
- static struct blkcg_policy blkcg_policy_throtl;
- 
-@@ -152,6 +154,7 @@ struct throtl_grp {
- 
- 	unsigned long last_check_time;
- 
-+	unsigned long latency_target; /* us */
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -449,6 +452,8 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
- 	tg->iops_conf[WRITE][LIMIT_MAX] = UINT_MAX;
- 	/* LIMIT_LOW will have default value 0 */
- 
-+	tg->latency_target = DFL_LATENCY_TARGET;
-+
- 	return &tg->pd;
- }
- 
-@@ -1445,6 +1450,7 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- 	u64 bps_dft;
- 	unsigned int iops_dft;
- 	char idle_time[26] = "";
-+	char latency_time[26] = "";
- 
- 	if (!dname)
- 		return 0;
-@@ -1461,8 +1467,9 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- 	    tg->bps_conf[WRITE][off] == bps_dft &&
- 	    tg->iops_conf[READ][off] == iops_dft &&
- 	    tg->iops_conf[WRITE][off] == iops_dft &&
--	    (off != LIMIT_LOW || tg->idletime_threshold ==
--				  tg->td->dft_idletime_threshold))
-+	    (off != LIMIT_LOW ||
-+	     (tg->idletime_threshold == tg->td->dft_idletime_threshold &&
-+	      tg->latency_target == DFL_LATENCY_TARGET)))
- 		return 0;
- 
- 	if (tg->bps_conf[READ][off] != bps_dft)
-@@ -1483,10 +1490,17 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- 		else
- 			snprintf(idle_time, sizeof(idle_time), " idle=%lu",
- 				tg->idletime_threshold);
-+
-+		if (tg->latency_target == ULONG_MAX)
-+			strcpy(latency_time, " latency=max");
-+		else
-+			snprintf(latency_time, sizeof(latency_time),
-+				" latency=%lu", tg->latency_target);
- 	}
- 
--	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s%s\n",
--		   dname, bufs[0], bufs[1], bufs[2], bufs[3], idle_time);
-+	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s%s%s\n",
-+		   dname, bufs[0], bufs[1], bufs[2], bufs[3], idle_time,
-+		   latency_time);
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index b5afd495d482..3064be6cf375 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -211,7 +211,7 @@ enum head {
+ struct swim_priv {
+ 	struct swim __iomem *base;
+ 	spinlock_t lock;
+-	struct request_queue *queue;
++	int fdc_queue;
+ 	int floppy_count;
+ 	struct floppy_state unit[FD_MAX_UNIT];
+ };
+@@ -525,12 +525,33 @@ static int floppy_read_sectors(struct floppy_state *fs,
  	return 0;
  }
  
-@@ -1505,6 +1519,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	struct throtl_grp *tg;
- 	u64 v[4];
- 	unsigned long idle_time;
-+	unsigned long latency_time;
- 	int ret;
- 	int index = of_cft(of)->private;
+-static void redo_fd_request(struct request_queue *q)
++static struct request *swim_next_request(struct swim_priv *swd)
+ {
++	struct request_queue *q;
++	struct request *rq;
++	int old_pos = swd->fdc_queue;
++
++	do {
++		q = swd->unit[swd->fdc_queue].disk->queue;
++		if (++swd->fdc_queue == swd->floppy_count)
++			swd->fdc_queue = 0;
++		if (q) {
++			rq = blk_fetch_request(q);
++			if (rq)
++				return rq;
++		}
++	} while (swd->fdc_queue != old_pos);
++
++	return NULL;
++}
++
++static void do_fd_request(struct request_queue *q)
++{
++	struct swim_priv *swd = q->queuedata;
+ 	struct request *req;
+ 	struct floppy_state *fs;
  
-@@ -1520,6 +1535,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	v[3] = tg->iops_conf[WRITE][index];
+-	req = blk_fetch_request(q);
++	req = swim_next_request(swd);
+ 	while (req) {
+ 		int err = -EIO;
  
- 	idle_time = tg->idletime_threshold;
-+	latency_time = tg->latency_target;
- 	while (true) {
- 		char tok[27];	/* wiops=18446744073709551616 */
- 		char *p;
-@@ -1553,6 +1569,8 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 			v[3] = min_t(u64, val, UINT_MAX);
- 		else if (off == LIMIT_LOW && !strcmp(tok, "idle"))
- 			idle_time = val;
-+		else if (off == LIMIT_LOW && !strcmp(tok, "latency"))
-+			latency_time = val;
- 		else
- 			goto out_finish;
+@@ -554,15 +575,10 @@ static void redo_fd_request(struct request_queue *q)
+ 		}
+ 	done:
+ 		if (!__blk_end_request_cur(req, err))
+-			req = blk_fetch_request(q);
++			req = swim_next_request(swd);
  	}
-@@ -1583,6 +1601,8 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 			tg->td->limit_index = LIMIT_LOW;
- 		tg->idletime_threshold = (idle_time == ULONG_MAX) ?
- 			ULONG_MAX : idle_time;
-+		tg->latency_target = (latency_time == ULONG_MAX) ?
-+			ULONG_MAX : latency_time;
+ }
+ 
+-static void do_fd_request(struct request_queue *q)
+-{
+-	redo_fd_request(q);
+-}
+-
+ static struct floppy_struct floppy_type[4] = {
+ 	{    0,  0, 0,  0, 0, 0x00, 0x00, 0x00, 0x00, NULL }, /* no testing   */
+ 	{  720,  9, 1, 80, 0, 0x2A, 0x02, 0xDF, 0x50, NULL }, /* 360KB SS 3.5"*/
+@@ -833,22 +849,25 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 		return -EBUSY;
  	}
- 	tg_conf_updated(tg);
- 	ret = 0;
+ 
++	spin_lock_init(&swd->lock);
++
+ 	for (drive = 0; drive < swd->floppy_count; drive++) {
+ 		swd->unit[drive].disk = alloc_disk(1);
+ 		if (swd->unit[drive].disk == NULL) {
+ 			err = -ENOMEM;
+ 			goto exit_put_disks;
+ 		}
++		swd->unit[drive].disk->queue = blk_init_queue(do_fd_request,
++							      &swd->lock);
++		if (!swd->unit[drive].disk->queue) {
++			err = -ENOMEM;
++			put_disk(swd->unit[drive].disk);
++			goto exit_put_disks;
++		}
++		swd->unit[drive].disk->queue->queuedata = swd;
+ 		swd->unit[drive].swd = swd;
+ 	}
+ 
+-	spin_lock_init(&swd->lock);
+-	swd->queue = blk_init_queue(do_fd_request, &swd->lock);
+-	if (!swd->queue) {
+-		err = -ENOMEM;
+-		goto exit_put_disks;
+-	}
+-
+ 	for (drive = 0; drive < swd->floppy_count; drive++) {
+ 		swd->unit[drive].disk->flags = GENHD_FL_REMOVABLE;
+ 		swd->unit[drive].disk->major = FLOPPY_MAJOR;
+@@ -856,7 +875,6 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 		sprintf(swd->unit[drive].disk->disk_name, "fd%d", drive);
+ 		swd->unit[drive].disk->fops = &floppy_fops;
+ 		swd->unit[drive].disk->private_data = &swd->unit[drive];
+-		swd->unit[drive].disk->queue = swd->queue;
+ 		set_capacity(swd->unit[drive].disk, 2880);
+ 		add_disk(swd->unit[drive].disk);
+ 	}
+@@ -943,13 +961,12 @@ static int swim_remove(struct platform_device *dev)
+ 
+ 	for (drive = 0; drive < swd->floppy_count; drive++) {
+ 		del_gendisk(swd->unit[drive].disk);
++		blk_cleanup_queue(swd->unit[drive].disk->queue);
+ 		put_disk(swd->unit[drive].disk);
+ 	}
+ 
+ 	unregister_blkdev(FLOPPY_MAJOR, "fd");
+ 
+-	blk_cleanup_queue(swd->queue);
+-
+ 	/* eject floppies */
+ 
+ 	for (drive = 0; drive < swd->floppy_count; drive++)
 -- 
-2.9.3
+2.12.1
