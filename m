@@ -1,62 +1,33 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 29 Mar 2017 10:06:08 -0700
+From: Omar Sandoval <osandov@osandov.com>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>, Hannes Reinecke
-	<hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 3/3] scsi: Ensure that scsi_run_queue() runs all hardware queues
-Date: Fri, 31 Mar 2017 16:12:05 -0700
-Message-ID: <20170331231205.16640-4-bart.vanassche@sandisk.com>
-In-Reply-To: <20170331231205.16640-1-bart.vanassche@sandisk.com>
-References: <20170331231205.16640-1-bart.vanassche@sandisk.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [PATCH v2 1/3] block: warn if sharing request queue across
+ gendisks
+Message-ID: <20170329170608.GA19015@vader>
+References: <91d938665e5386f10f8756ee8c7ef3e6496ea260.1490742717.git.osandov@fb.com>
+ <20170329141035.GB8461@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170329141035.GB8461@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-commit 52d7f1b5c2f3 ("blk-mq: Avoid that requeueing starts stopped
-queues") removed the blk_mq_stop_hw_queue() call from scsi_queue_rq()
-for the BLK_MQ_RQ_QUEUE_BUSY case. blk_mq_start_stopped_hw_queues()
-only runs queues that had been stopped. Hence change the
-blk_mq_start_stopped_hw_queues() call in scsi_run_queue() into
-blk_mq_run_hw_queues(). Remove the blk_mq_start_stopped_hw_queues()
-call from scsi_end_request() because __blk_mq_finish_request()
-already runs all hardware queues if needed.
+On Wed, Mar 29, 2017 at 08:10:35AM -0600, Jens Axboe wrote:
+> On Tue, Mar 28 2017, Omar Sandoval wrote:
+> > From: Omar Sandoval <osandov@fb.com>
+> > 
+> > Now that the remaining drivers have been converted to one request queue
+> > per gendisk, let's warn if a request queue gets registered more than
+> > once. This will catch future drivers which might do it inadvertently or
+> > any old drivers that I may have missed.
+> 
+> Added 1-3 for 4.12, thanks. Final nail in the coffin for shared queues.
 
-Fixes: commit 52d7f1b5c2f3 ("blk-mq: Avoid that requeueing starts stopped queues")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/scsi/scsi_lib.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Thanks!
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 1d804e33971a..3323878423ac 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -496,7 +496,7 @@ static void scsi_run_queue(struct request_queue *q)
- 		scsi_starved_list_run(sdev->host);
- 
- 	if (q->mq_ops)
--		blk_mq_start_stopped_hw_queues(q, false);
-+		blk_mq_run_hw_queues(q, false);
- 	else
- 		blk_run_queue(q);
- }
-@@ -681,8 +681,6 @@ static bool scsi_end_request(struct request *req, int error,
- 		if (scsi_target(sdev)->single_lun ||
- 		    !list_empty(&sdev->host->starved_list))
- 			kblockd_schedule_work(&sdev->requeue_work);
--		else
--			blk_mq_start_stopped_hw_queues(q, true);
- 	} else {
- 		unsigned long flags;
- 
--- 
-2.12.0
+> BTW, can you include a cover letter when it's more than one patch? Makes
+> the flow a bit more straight forward.
+
+Yeah, I'll make sure to do that in the future.
