@@ -1,179 +1,148 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33812 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932159AbdC2K4e (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2017 06:56:34 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>, Miklos Szeredi <miklos@szeredi.hu>
-Subject: [PATCH 16/25] fuse: Convert to separately allocated bdi
-Date: Wed, 29 Mar 2017 12:56:14 +0200
-Message-Id: <20170329105623.18241-17-jack@suse.cz>
+        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH 08/25] btrfs: Convert to separately allocated bdi
+Date: Wed, 29 Mar 2017 12:56:06 +0200
+Message-Id: <20170329105623.18241-9-jack@suse.cz>
 In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
 References: <20170329105623.18241-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+inside superblock. This unifies handling of bdi among users.
 
-CC: Miklos Szeredi <miklos@szeredi.hu>
-CC: linux-fsdevel@vger.kernel.org
-Acked-by: Miklos Szeredi <mszeredi@redhat.com>
+CC: Chris Mason <clm@fb.com>
+CC: Josef Bacik <jbacik@fb.com>
+CC: David Sterba <dsterba@suse.com>
+CC: linux-btrfs@vger.kernel.org
+Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
+Reviewed-by: David Sterba <dsterba@suse.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/fuse/dev.c    |  8 ++++----
- fs/fuse/fuse_i.h |  3 ---
- fs/fuse/inode.c  | 42 +++++++++++++-----------------------------
- 3 files changed, 17 insertions(+), 36 deletions(-)
+ fs/btrfs/ctree.h   |  1 -
+ fs/btrfs/disk-io.c | 36 +++++++-----------------------------
+ fs/btrfs/super.c   |  7 +++++++
+ 3 files changed, 14 insertions(+), 30 deletions(-)
 
-diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
-index b681b43c766e..78887f68ee6a 100644
---- a/fs/fuse/dev.c
-+++ b/fs/fuse/dev.c
-@@ -383,8 +383,8 @@ static void request_end(struct fuse_conn *fc, struct fuse_req *req)
- 
- 		if (fc->num_background == fc->congestion_threshold &&
- 		    fc->connected && fc->bdi_initialized) {
--			clear_bdi_congested(&fc->bdi, BLK_RW_SYNC);
--			clear_bdi_congested(&fc->bdi, BLK_RW_ASYNC);
-+			clear_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
-+			clear_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
- 		}
- 		fc->num_background--;
- 		fc->active_background--;
-@@ -575,8 +575,8 @@ void fuse_request_send_background_locked(struct fuse_conn *fc,
- 		fc->blocked = 1;
- 	if (fc->num_background == fc->congestion_threshold &&
- 	    fc->bdi_initialized) {
--		set_bdi_congested(&fc->bdi, BLK_RW_SYNC);
--		set_bdi_congested(&fc->bdi, BLK_RW_ASYNC);
-+		set_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
-+		set_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
- 	}
- 	list_add_tail(&req->list, &fc->bg_queue);
- 	flush_bg_queue(fc);
-diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
-index 32ac2c9b09c0..0e7c79a390e0 100644
---- a/fs/fuse/fuse_i.h
-+++ b/fs/fuse/fuse_i.h
-@@ -631,9 +631,6 @@ struct fuse_conn {
- 	/** Negotiated minor version */
- 	unsigned minor;
- 
--	/** Backing dev info */
+diff --git a/fs/btrfs/ctree.h b/fs/btrfs/ctree.h
+index 29b7fc28c607..f6019ce20035 100644
+--- a/fs/btrfs/ctree.h
++++ b/fs/btrfs/ctree.h
+@@ -810,7 +810,6 @@ struct btrfs_fs_info {
+ 	struct btrfs_super_block *super_for_commit;
+ 	struct super_block *sb;
+ 	struct inode *btree_inode;
 -	struct backing_dev_info bdi;
--
- 	/** Entry on the fuse_conn_list */
- 	struct list_head entry;
- 
-diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-index 6fe6a88ecb4a..90bacbc87fb3 100644
---- a/fs/fuse/inode.c
-+++ b/fs/fuse/inode.c
-@@ -386,12 +386,6 @@ static void fuse_send_destroy(struct fuse_conn *fc)
- 	}
+ 	struct mutex tree_log_mutex;
+ 	struct mutex transaction_kthread_mutex;
+ 	struct mutex cleaner_mutex;
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index 08b74daf35d0..a7d8c342f604 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -1808,21 +1808,6 @@ static int btrfs_congested_fn(void *congested_data, int bdi_bits)
+ 	return ret;
  }
  
--static void fuse_bdi_destroy(struct fuse_conn *fc)
+-static int setup_bdi(struct btrfs_fs_info *info, struct backing_dev_info *bdi)
 -{
--	if (fc->bdi_initialized)
--		bdi_destroy(&fc->bdi);
--}
+-	int err;
 -
- static void fuse_put_super(struct super_block *sb)
- {
- 	struct fuse_conn *fc = get_fuse_conn_super(sb);
-@@ -403,7 +397,6 @@ static void fuse_put_super(struct super_block *sb)
- 	list_del(&fc->entry);
- 	fuse_ctl_remove_conn(fc);
- 	mutex_unlock(&fuse_mutex);
--	fuse_bdi_destroy(fc);
- 
- 	fuse_conn_put(fc);
- }
-@@ -928,7 +921,8 @@ static void process_init_reply(struct fuse_conn *fc, struct fuse_req *req)
- 			fc->no_flock = 1;
- 		}
- 
--		fc->bdi.ra_pages = min(fc->bdi.ra_pages, ra_pages);
-+		fc->sb->s_bdi->ra_pages =
-+				min(fc->sb->s_bdi->ra_pages, ra_pages);
- 		fc->minor = arg->minor;
- 		fc->max_write = arg->minor < 5 ? 4096 : arg->max_write;
- 		fc->max_write = max_t(unsigned, 4096, fc->max_write);
-@@ -944,7 +938,7 @@ static void fuse_send_init(struct fuse_conn *fc, struct fuse_req *req)
- 
- 	arg->major = FUSE_KERNEL_VERSION;
- 	arg->minor = FUSE_KERNEL_MINOR_VERSION;
--	arg->max_readahead = fc->bdi.ra_pages * PAGE_SIZE;
-+	arg->max_readahead = fc->sb->s_bdi->ra_pages * PAGE_SIZE;
- 	arg->flags |= FUSE_ASYNC_READ | FUSE_POSIX_LOCKS | FUSE_ATOMIC_O_TRUNC |
- 		FUSE_EXPORT_SUPPORT | FUSE_BIG_WRITES | FUSE_DONT_MASK |
- 		FUSE_SPLICE_WRITE | FUSE_SPLICE_MOVE | FUSE_SPLICE_READ |
-@@ -976,27 +970,20 @@ static void fuse_free_conn(struct fuse_conn *fc)
- static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
- {
- 	int err;
-+	char *suffix = "";
- 
--	fc->bdi.name = "fuse";
--	fc->bdi.ra_pages = (VM_MAX_READAHEAD * 1024) / PAGE_SIZE;
--	/* fuse does it's own writeback accounting */
--	fc->bdi.capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
--
--	err = bdi_init(&fc->bdi);
-+	if (sb->s_bdev)
-+		suffix = "-fuseblk";
-+	err = super_setup_bdi_name(sb, "%u:%u%s", MAJOR(fc->dev),
-+				   MINOR(fc->dev), suffix);
- 	if (err)
- 		return err;
- 
--	fc->bdi_initialized = 1;
--
--	if (sb->s_bdev) {
--		err =  bdi_register(&fc->bdi, NULL, "%u:%u-fuseblk",
--				    MAJOR(fc->dev), MINOR(fc->dev));
--	} else {
--		err = bdi_register_dev(&fc->bdi, fc->dev);
--	}
-+	sb->s_bdi->ra_pages = (VM_MAX_READAHEAD * 1024) / PAGE_SIZE;
-+	/* fuse does it's own writeback accounting */
-+	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
- 
+-	err = bdi_setup_and_register(bdi, "btrfs");
 -	if (err)
 -		return err;
-+	fc->bdi_initialized = 1;
- 
- 	/*
- 	 * For a single fuse filesystem use max 1% of dirty +
-@@ -1010,7 +997,7 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
- 	 *
- 	 *    /sys/class/bdi/<bdi>/max_ratio
- 	 */
--	bdi_set_max_ratio(&fc->bdi, 1);
-+	bdi_set_max_ratio(sb->s_bdi, 1);
- 
- 	return 0;
- }
-@@ -1113,8 +1100,6 @@ static int fuse_fill_super(struct super_block *sb, void *data, int silent)
- 	if (err)
- 		goto err_dev_free;
- 
--	sb->s_bdi = &fc->bdi;
 -
- 	/* Handle umasking inside the fuse code */
- 	if (sb->s_flags & MS_POSIXACL)
- 		fc->dont_mask = 1;
-@@ -1182,7 +1167,6 @@ static int fuse_fill_super(struct super_block *sb, void *data, int silent)
-  err_dev_free:
- 	fuse_dev_free(fud);
-  err_put_conn:
--	fuse_bdi_destroy(fc);
- 	fuse_conn_put(fc);
-  err_fput:
- 	fput(file);
+-	bdi->ra_pages = VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
+-	bdi->congested_fn	= btrfs_congested_fn;
+-	bdi->congested_data	= info;
+-	bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
+-	return 0;
+-}
+-
+ /*
+  * called by the kthread helper functions to finally call the bio end_io
+  * functions.  This is where read checksum verification actually happens
+@@ -2601,16 +2586,10 @@ int open_ctree(struct super_block *sb,
+ 		goto fail;
+ 	}
+ 
+-	ret = setup_bdi(fs_info, &fs_info->bdi);
+-	if (ret) {
+-		err = ret;
+-		goto fail_srcu;
+-	}
+-
+ 	ret = percpu_counter_init(&fs_info->dirty_metadata_bytes, 0, GFP_KERNEL);
+ 	if (ret) {
+ 		err = ret;
+-		goto fail_bdi;
++		goto fail_srcu;
+ 	}
+ 	fs_info->dirty_metadata_batch = PAGE_SIZE *
+ 					(1 + ilog2(nr_cpu_ids));
+@@ -2718,7 +2697,6 @@ int open_ctree(struct super_block *sb,
+ 
+ 	sb->s_blocksize = 4096;
+ 	sb->s_blocksize_bits = blksize_bits(4096);
+-	sb->s_bdi = &fs_info->bdi;
+ 
+ 	btrfs_init_btree_inode(fs_info);
+ 
+@@ -2915,9 +2893,12 @@ int open_ctree(struct super_block *sb,
+ 		goto fail_sb_buffer;
+ 	}
+ 
+-	fs_info->bdi.ra_pages *= btrfs_super_num_devices(disk_super);
+-	fs_info->bdi.ra_pages = max(fs_info->bdi.ra_pages,
+-				    SZ_4M / PAGE_SIZE);
++	sb->s_bdi->congested_fn = btrfs_congested_fn;
++	sb->s_bdi->congested_data = fs_info;
++	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
++	sb->s_bdi->ra_pages = VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
++	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
++	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
+ 
+ 	sb->s_blocksize = sectorsize;
+ 	sb->s_blocksize_bits = blksize_bits(sectorsize);
+@@ -3285,8 +3266,6 @@ int open_ctree(struct super_block *sb,
+ 	percpu_counter_destroy(&fs_info->delalloc_bytes);
+ fail_dirty_metadata_bytes:
+ 	percpu_counter_destroy(&fs_info->dirty_metadata_bytes);
+-fail_bdi:
+-	bdi_destroy(&fs_info->bdi);
+ fail_srcu:
+ 	cleanup_srcu_struct(&fs_info->subvol_srcu);
+ fail:
+@@ -4007,7 +3986,6 @@ void close_ctree(struct btrfs_fs_info *fs_info)
+ 	percpu_counter_destroy(&fs_info->dirty_metadata_bytes);
+ 	percpu_counter_destroy(&fs_info->delalloc_bytes);
+ 	percpu_counter_destroy(&fs_info->bio_counter);
+-	bdi_destroy(&fs_info->bdi);
+ 	cleanup_srcu_struct(&fs_info->subvol_srcu);
+ 
+ 	btrfs_free_stripe_hash_table(fs_info);
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index da687dc79cce..e0a7503ab31e 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -1133,6 +1133,13 @@ static int btrfs_fill_super(struct super_block *sb,
+ #endif
+ 	sb->s_flags |= MS_I_VERSION;
+ 	sb->s_iflags |= SB_I_CGROUPWB;
++
++	err = super_setup_bdi(sb);
++	if (err) {
++		btrfs_err(fs_info, "super_setup_bdi failed");
++		return err;
++	}
++
+ 	err = open_ctree(sb, fs_devices, (char *)data);
+ 	if (err) {
+ 		btrfs_err(fs_info, "open_ctree failed");
 -- 
 2.10.2
