@@ -2,106 +2,165 @@ Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>, Steve French <sfrench@samba.org>,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH 10/25] cifs: Convert to separately allocated bdi
-Date: Wed, 29 Mar 2017 12:56:08 +0200
-Message-Id: <20170329105623.18241-11-jack@suse.cz>
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 24/25] block: Remove unused functions
+Date: Wed, 29 Mar 2017 12:56:22 +0200
+Message-Id: <20170329105623.18241-25-jack@suse.cz>
 In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
 References: <20170329105623.18241-1-jack@suse.cz>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside superblock. This unifies handling of bdi among users.
+Now that all backing_dev_info structure are allocated separately, we can
+drop some unused functions.
 
-CC: Steve French <sfrench@samba.org>
-CC: linux-cifs@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/cifs/cifs_fs_sb.h |  1 -
- fs/cifs/cifsfs.c     |  7 ++++++-
- fs/cifs/connect.c    | 10 ----------
- 3 files changed, 6 insertions(+), 12 deletions(-)
+ include/linux/backing-dev.h |  5 ----
+ mm/backing-dev.c            | 56 +++++----------------------------------------
+ 2 files changed, 6 insertions(+), 55 deletions(-)
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 07ed81cf1552..cbd216b57239 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -68,7 +68,6 @@ struct cifs_sb_info {
- 	umode_t	mnt_dir_mode;
- 	unsigned int mnt_cifs_flags;
- 	char   *mountdata; /* options received at mount time or via DFS refs */
--	struct backing_dev_info bdi;
- 	struct delayed_work prune_tlinks;
- 	struct rcu_head rcu;
- 	char *prepath;
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 15e1db8738ae..502eab6bdbc4 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -138,7 +138,12 @@ cifs_read_super(struct super_block *sb)
- 	sb->s_magic = CIFS_MAGIC_NUMBER;
- 	sb->s_op = &cifs_super_ops;
- 	sb->s_xattr = cifs_xattr_handlers;
--	sb->s_bdi = &cifs_sb->bdi;
-+	rc = super_setup_bdi(sb);
-+	if (rc)
-+		goto out_no_root;
-+	/* tune readahead according to rsize */
-+	sb->s_bdi->ra_pages = cifs_sb->rsize / PAGE_SIZE;
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 47a98e6e2a65..aaeb2ec5d33c 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -17,8 +17,6 @@
+ #include <linux/backing-dev-defs.h>
+ #include <linux/slab.h>
+ 
+-int __must_check bdi_init(struct backing_dev_info *bdi);
+-
+ static inline struct backing_dev_info *bdi_get(struct backing_dev_info *bdi)
+ {
+ 	kref_get(&bdi->refcnt);
+@@ -32,12 +30,9 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+ 		const char *fmt, ...);
+ int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
+ 		const char *fmt, va_list args);
+-int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
+ int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
+ void bdi_unregister(struct backing_dev_info *bdi);
+ 
+-int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
+-void bdi_destroy(struct backing_dev_info *bdi);
+ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
+ static inline struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
+ {
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 3dd175986390..4dcd56947f2a 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -12,8 +12,6 @@
+ #include <linux/device.h>
+ #include <trace/events/writeback.h>
+ 
+-static atomic_long_t bdi_seq = ATOMIC_LONG_INIT(0);
+-
+ struct backing_dev_info noop_backing_dev_info = {
+ 	.name		= "noop",
+ 	.capabilities	= BDI_CAP_NO_ACCT_AND_WRITEBACK,
+@@ -242,6 +240,8 @@ static __init int bdi_class_init(void)
+ }
+ postcore_initcall(bdi_class_init);
+ 
++static int bdi_init(struct backing_dev_info *bdi);
 +
- 	sb->s_blocksize = CIFS_MAX_MSGSIZE;
- 	sb->s_blocksize_bits = 14;	/* default 2**14 = CIFS_MAX_MSGSIZE */
- 	inode = cifs_root_iget(sb);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 9ae695ae3ed7..7f50c8949401 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3683,10 +3683,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- 	int referral_walks_count = 0;
- #endif
+ static int __init default_bdi_init(void)
+ {
+ 	int err;
+@@ -820,7 +820,7 @@ static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
  
--	rc = bdi_setup_and_register(&cifs_sb->bdi, "cifs");
--	if (rc)
--		return rc;
+ #endif	/* CONFIG_CGROUP_WRITEBACK */
+ 
+-int bdi_init(struct backing_dev_info *bdi)
++static int bdi_init(struct backing_dev_info *bdi)
+ {
+ 	int ret;
+ 
+@@ -838,7 +838,6 @@ int bdi_init(struct backing_dev_info *bdi)
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL(bdi_init);
+ 
+ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
+ {
+@@ -897,12 +896,6 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+ }
+ EXPORT_SYMBOL(bdi_register);
+ 
+-int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev)
+-{
+-	return bdi_register(bdi, NULL, "%u:%u", MAJOR(dev), MINOR(dev));
+-}
+-EXPORT_SYMBOL(bdi_register_dev);
 -
- #ifdef CONFIG_CIFS_DFS_UPCALL
- try_mount_again:
- 	/* cleanup activities if we're chasing a referral */
-@@ -3714,7 +3710,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- 	server = cifs_get_tcp_session(volume_info);
- 	if (IS_ERR(server)) {
- 		rc = PTR_ERR(server);
--		bdi_destroy(&cifs_sb->bdi);
- 		goto out;
+ int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
+ {
+ 	int rc;
+@@ -950,13 +943,6 @@ void bdi_unregister(struct backing_dev_info *bdi)
  	}
- 	if ((volume_info->max_credits < 20) ||
-@@ -3768,9 +3763,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- 	cifs_sb->wsize = server->ops->negotiate_wsize(tcon, volume_info);
- 	cifs_sb->rsize = server->ops->negotiate_rsize(tcon, volume_info);
+ }
  
--	/* tune readahead according to rsize */
--	cifs_sb->bdi.ra_pages = cifs_sb->rsize / PAGE_SIZE;
+-static void bdi_exit(struct backing_dev_info *bdi)
+-{
+-	WARN_ON_ONCE(bdi->dev);
+-	wb_exit(&bdi->wb);
+-	cgwb_bdi_exit(bdi);
+-}
 -
- remote_path_check:
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	/*
-@@ -3887,7 +3879,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- 			cifs_put_smb_ses(ses);
- 		else
- 			cifs_put_tcp_session(server, 0);
--		bdi_destroy(&cifs_sb->bdi);
- 	}
+ static void release_bdi(struct kref *ref)
+ {
+ 	struct backing_dev_info *bdi =
+@@ -964,7 +950,9 @@ static void release_bdi(struct kref *ref)
  
- out:
-@@ -4090,7 +4081,6 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
- 	}
- 	spin_unlock(&cifs_sb->tlink_tree_lock);
+ 	if (test_bit(WB_registered, &bdi->wb.state))
+ 		bdi_unregister(bdi);
+-	bdi_exit(bdi);
++	WARN_ON_ONCE(bdi->dev);
++	wb_exit(&bdi->wb);
++	cgwb_bdi_exit(bdi);
+ 	kfree(bdi);
+ }
  
--	bdi_destroy(&cifs_sb->bdi);
- 	kfree(cifs_sb->mountdata);
- 	kfree(cifs_sb->prepath);
- 	call_rcu(&cifs_sb->rcu, delayed_free);
+@@ -974,38 +962,6 @@ void bdi_put(struct backing_dev_info *bdi)
+ }
+ EXPORT_SYMBOL(bdi_put);
+ 
+-void bdi_destroy(struct backing_dev_info *bdi)
+-{
+-	bdi_unregister(bdi);
+-	bdi_exit(bdi);
+-}
+-EXPORT_SYMBOL(bdi_destroy);
+-
+-/*
+- * For use from filesystems to quickly init and register a bdi associated
+- * with dirty writeback
+- */
+-int bdi_setup_and_register(struct backing_dev_info *bdi, char *name)
+-{
+-	int err;
+-
+-	bdi->name = name;
+-	bdi->capabilities = 0;
+-	err = bdi_init(bdi);
+-	if (err)
+-		return err;
+-
+-	err = bdi_register(bdi, NULL, "%.28s-%ld", name,
+-			   atomic_long_inc_return(&bdi_seq));
+-	if (err) {
+-		bdi_destroy(bdi);
+-		return err;
+-	}
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL(bdi_setup_and_register);
+-
+ static wait_queue_head_t congestion_wqh[2] = {
+ 		__WAIT_QUEUE_HEAD_INITIALIZER(congestion_wqh[0]),
+ 		__WAIT_QUEUE_HEAD_INITIALIZER(congestion_wqh[1])
 -- 
 2.10.2
