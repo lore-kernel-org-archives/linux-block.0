@@ -1,86 +1,247 @@
-Return-Path: <houtao1@huawei.com>
-From: Hou Tao <houtao1@huawei.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, <jmoyer@redhat.com>, <stable@vger.kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH v2] cfq-iosched: fix the delay of cfq_group's vdisktime under iops mode
-Date: Wed, 8 Mar 2017 20:16:55 +0800
-Message-ID: <1488975415-40417-1-git-send-email-houtao1@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+To: <linux-fsdevel@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jan Kara <jack@suse.cz>,
+        Trond Myklebust <trond.myklebust@primarydata.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        linux-nfs@vger.kernel.org
+Subject: [PATCH 21/25] nfs: Convert to separately allocated bdi
+Date: Wed, 29 Mar 2017 12:56:19 +0200
+Message-Id: <20170329105623.18241-22-jack@suse.cz>
+In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
+References: <20170329105623.18241-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-When adding a cfq_group into the cfq service tree, we use CFQ_IDLE_DELAY
-as the delay of cfq_group's vdisktime if there have been other cfq_groups
-already.
+Allocate struct backing_dev_info separately instead of embedding it
+inside the superblock. This unifies handling of bdi among users.
 
-When cfq is under iops mode, commit 9a7f38c42c2b ("cfq-iosched: Convert
-from jiffies to nanoseconds") could result in a large iops delay and
-lead to an abnormal io schedule delay for the added cfq_group. To fix
-it, we just need to revert to the old CFQ_IDLE_DELAY value: HZ / 5
-when iops mode is enabled.
-
-Despite having the same value, the delay of a cfq_queue in idle class
-and the delay of cfq_queue are different things, so I define two new
-macros for the delay of a cfq_group under time-slice mode and IOPs mode.
-
-Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
-Cc: <stable@vger.kernel.org> # 4.8+
-Signed-off-by: Hou Tao <houtao1@huawei.com>
+CC: Trond Myklebust <trond.myklebust@primarydata.com>
+CC: Anna Schumaker <anna.schumaker@netapp.com>
+CC: linux-nfs@vger.kernel.org
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/cfq-iosched.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ fs/nfs/client.c           | 10 ----------
+ fs/nfs/internal.h         |  6 +++---
+ fs/nfs/super.c            | 34 +++++++++++++++++++---------------
+ fs/nfs/write.c            | 13 ++++++-------
+ include/linux/nfs_fs_sb.h |  1 -
+ 5 files changed, 28 insertions(+), 36 deletions(-)
 
-v2:
-- use constant instead of "nsecs_to_jiffies64(CFQ_IDLE_DELAY)"
-  as suggested by Jan Kara
-
-v1:
-https://www.spinics.net/lists/stable/msg160580.html
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 440b95e..69754e8 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -38,9 +38,13 @@ static const u64 cfq_target_latency = (u64)NSEC_PER_SEC * 3/10; /* 300 ms */
- static const int cfq_hist_divisor = 4;
+diff --git a/fs/nfs/client.c b/fs/nfs/client.c
+index 390ada8741bc..04d15a0045e3 100644
+--- a/fs/nfs/client.c
++++ b/fs/nfs/client.c
+@@ -761,9 +761,6 @@ static void nfs_server_set_fsinfo(struct nfs_server *server,
+ 		server->rsize = NFS_MAX_FILE_IO_SIZE;
+ 	server->rpages = (server->rsize + PAGE_SIZE - 1) >> PAGE_SHIFT;
  
- /*
-- * offset from end of service tree
-+ * offset from end of queue service tree for idle class
-  */
- #define CFQ_IDLE_DELAY		(NSEC_PER_SEC / 5)
-+/* offset from end of group service tree under time slice mode */
-+#define CFQ_SLICE_MODE_GROUP_DELAY (NSEC_PER_SEC / 5)
-+/* offset from end of group service under IOPS mode */
-+#define CFQ_IOPS_MODE_GROUP_DELAY (200)
+-	server->backing_dev_info.name = "nfs";
+-	server->backing_dev_info.ra_pages = server->rpages * NFS_MAX_READAHEAD;
+-
+ 	if (server->wsize > max_rpc_payload)
+ 		server->wsize = max_rpc_payload;
+ 	if (server->wsize > NFS_MAX_FILE_IO_SIZE)
+@@ -917,12 +914,6 @@ struct nfs_server *nfs_alloc_server(void)
+ 		return NULL;
+ 	}
  
- /*
-  * below this threshold, we consider thinktime immediate
-@@ -1362,6 +1366,14 @@ cfq_group_service_tree_add(struct cfq_rb_root *st, struct cfq_group *cfqg)
- 	cfqg->vfraction = max_t(unsigned, vfr, 1);
+-	if (bdi_init(&server->backing_dev_info)) {
+-		nfs_free_iostats(server->io_stats);
+-		kfree(server);
+-		return NULL;
+-	}
+-
+ 	ida_init(&server->openowner_id);
+ 	ida_init(&server->lockowner_id);
+ 	pnfs_init_server(server);
+@@ -953,7 +944,6 @@ void nfs_free_server(struct nfs_server *server)
+ 	ida_destroy(&server->lockowner_id);
+ 	ida_destroy(&server->openowner_id);
+ 	nfs_free_iostats(server->io_stats);
+-	bdi_destroy(&server->backing_dev_info);
+ 	kfree(server);
+ 	nfs_release_automount_timer();
+ 	dprintk("<-- nfs_free_server()\n");
+diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
+index 7b38fedb7e03..9dc65d7ae754 100644
+--- a/fs/nfs/internal.h
++++ b/fs/nfs/internal.h
+@@ -139,7 +139,7 @@ struct nfs_mount_request {
+ };
+ 
+ struct nfs_mount_info {
+-	void (*fill_super)(struct super_block *, struct nfs_mount_info *);
++	int (*fill_super)(struct super_block *, struct nfs_mount_info *);
+ 	int (*set_security)(struct super_block *, struct dentry *, struct nfs_mount_info *);
+ 	struct nfs_parsed_mount_data *parsed;
+ 	struct nfs_clone_mount *cloned;
+@@ -407,7 +407,7 @@ struct dentry *nfs_fs_mount(struct file_system_type *, int, const char *, void *
+ struct dentry * nfs_xdev_mount_common(struct file_system_type *, int,
+ 		const char *, struct nfs_mount_info *);
+ void nfs_kill_super(struct super_block *);
+-void nfs_fill_super(struct super_block *, struct nfs_mount_info *);
++int nfs_fill_super(struct super_block *, struct nfs_mount_info *);
+ 
+ extern struct rpc_stat nfs_rpcstat;
+ 
+@@ -458,7 +458,7 @@ extern void nfs_read_prepare(struct rpc_task *task, void *calldata);
+ extern void nfs_pageio_reset_read_mds(struct nfs_pageio_descriptor *pgio);
+ 
+ /* super.c */
+-void nfs_clone_super(struct super_block *, struct nfs_mount_info *);
++int nfs_clone_super(struct super_block *, struct nfs_mount_info *);
+ void nfs_umount_begin(struct super_block *);
+ int  nfs_statfs(struct dentry *, struct kstatfs *);
+ int  nfs_show_options(struct seq_file *, struct dentry *);
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index 54e0f9f2dd94..8d97aa70407e 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -2315,18 +2315,17 @@ inline void nfs_initialise_sb(struct super_block *sb)
+ 		sb->s_blocksize = nfs_block_bits(server->wsize,
+ 						 &sb->s_blocksize_bits);
+ 
+-	sb->s_bdi = &server->backing_dev_info;
+-
+ 	nfs_super_set_maxbytes(sb, server->maxfilesize);
  }
  
-+static inline u64 cfq_get_cfqg_vdisktime_delay(struct cfq_data *cfqd)
-+{
-+	if (!iops_mode(cfqd))
-+		return CFQ_SLICE_MODE_GROUP_DELAY;
-+	else
-+		return CFQ_IOPS_MODE_GROUP_DELAY;
-+}
-+
- static void
- cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
+ /*
+  * Finish setting up an NFS2/3 superblock
+  */
+-void nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
++int nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
  {
-@@ -1381,7 +1393,8 @@ cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
- 	n = rb_last(&st->rb);
- 	if (n) {
- 		__cfqg = rb_entry_cfqg(n);
--		cfqg->vdisktime = __cfqg->vdisktime + CFQ_IDLE_DELAY;
-+		cfqg->vdisktime = __cfqg->vdisktime +
-+			cfq_get_cfqg_vdisktime_delay(cfqd);
- 	} else
- 		cfqg->vdisktime = st->min_vdisktime;
- 	cfq_group_service_tree_add(st, cfqg);
+ 	struct nfs_parsed_mount_data *data = mount_info->parsed;
+ 	struct nfs_server *server = NFS_SB(sb);
++	int ret;
+ 
+ 	sb->s_blocksize_bits = 0;
+ 	sb->s_blocksize = 0;
+@@ -2344,13 +2343,21 @@ void nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+ 	}
+ 
+  	nfs_initialise_sb(sb);
++
++	ret = super_setup_bdi_name(sb, "%u:%u", MAJOR(server->s_dev),
++				   MINOR(server->s_dev));
++	if (ret)
++		return ret;
++	sb->s_bdi->ra_pages = server->rpages * NFS_MAX_READAHEAD;
++	return 0;
++
+ }
+ EXPORT_SYMBOL_GPL(nfs_fill_super);
+ 
+ /*
+  * Finish setting up a cloned NFS2/3/4 superblock
+  */
+-void nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
++int nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+ {
+ 	const struct super_block *old_sb = mount_info->cloned->sb;
+ 	struct nfs_server *server = NFS_SB(sb);
+@@ -2370,6 +2377,11 @@ void nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+ 	}
+ 
+  	nfs_initialise_sb(sb);
++
++	sb->s_bdi = bdi_get(old_sb->s_bdi);
++	sb->s_iflags |= SB_I_DYNBDI;
++
++	return 0;
+ }
+ 
+ static int nfs_compare_mount_options(const struct super_block *s, const struct nfs_server *b, int flags)
+@@ -2522,11 +2534,6 @@ static void nfs_get_cache_cookie(struct super_block *sb,
+ }
+ #endif
+ 
+-static int nfs_bdi_register(struct nfs_server *server)
+-{
+-	return bdi_register_dev(&server->backing_dev_info, server->s_dev);
+-}
+-
+ int nfs_set_sb_security(struct super_block *s, struct dentry *mntroot,
+ 			struct nfs_mount_info *mount_info)
+ {
+@@ -2594,17 +2601,14 @@ struct dentry *nfs_fs_mount_common(struct nfs_server *server,
+ 		nfs_free_server(server);
+ 		server = NULL;
+ 	} else {
+-		error = nfs_bdi_register(server);
+-		if (error) {
+-			mntroot = ERR_PTR(error);
+-			goto error_splat_super;
+-		}
+ 		server->super = s;
+ 	}
+ 
+ 	if (!s->s_root) {
+ 		/* initial superblock/root creation */
+-		mount_info->fill_super(s, mount_info);
++		error = mount_info->fill_super(s, mount_info);
++		if (error)
++			goto error_splat_super;
+ 		nfs_get_cache_cookie(s, mount_info->parsed, mount_info->cloned);
+ 	}
+ 
+diff --git a/fs/nfs/write.c b/fs/nfs/write.c
+index abb2c8a3be42..cc341fc7fd44 100644
+--- a/fs/nfs/write.c
++++ b/fs/nfs/write.c
+@@ -263,16 +263,15 @@ int nfs_congestion_kb;
+ 
+ static void nfs_set_page_writeback(struct page *page)
+ {
+-	struct nfs_server *nfss = NFS_SERVER(page_file_mapping(page)->host);
++	struct inode *inode = page_file_mapping(page)->host;
++	struct nfs_server *nfss = NFS_SERVER(inode);
+ 	int ret = test_set_page_writeback(page);
+ 
+ 	WARN_ON_ONCE(ret != 0);
+ 
+ 	if (atomic_long_inc_return(&nfss->writeback) >
+-			NFS_CONGESTION_ON_THRESH) {
+-		set_bdi_congested(&nfss->backing_dev_info,
+-					BLK_RW_ASYNC);
+-	}
++			NFS_CONGESTION_ON_THRESH)
++		set_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
+ }
+ 
+ static void nfs_end_page_writeback(struct nfs_page *req)
+@@ -285,7 +284,7 @@ static void nfs_end_page_writeback(struct nfs_page *req)
+ 
+ 	end_page_writeback(req->wb_page);
+ 	if (atomic_long_dec_return(&nfss->writeback) < NFS_CONGESTION_OFF_THRESH)
+-		clear_bdi_congested(&nfss->backing_dev_info, BLK_RW_ASYNC);
++		clear_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
+ }
+ 
+ 
+@@ -1808,7 +1807,7 @@ static void nfs_commit_release_pages(struct nfs_commit_data *data)
+ 	}
+ 	nfss = NFS_SERVER(data->inode);
+ 	if (atomic_long_read(&nfss->writeback) < NFS_CONGESTION_OFF_THRESH)
+-		clear_bdi_congested(&nfss->backing_dev_info, BLK_RW_ASYNC);
++		clear_bdi_congested(inode_to_bdi(data->inode), BLK_RW_ASYNC);
+ 
+ 	nfs_init_cinfo(&cinfo, data->inode, data->dreq);
+ 	nfs_commit_end(cinfo.mds);
+diff --git a/include/linux/nfs_fs_sb.h b/include/linux/nfs_fs_sb.h
+index b34097c67848..e1502c55741e 100644
+--- a/include/linux/nfs_fs_sb.h
++++ b/include/linux/nfs_fs_sb.h
+@@ -133,7 +133,6 @@ struct nfs_server {
+ 	struct rpc_clnt *	client_acl;	/* ACL RPC client handle */
+ 	struct nlm_host		*nlm_host;	/* NLM client handle */
+ 	struct nfs_iostats __percpu *io_stats;	/* I/O statistics */
+-	struct backing_dev_info	backing_dev_info;
+ 	atomic_long_t		writeback;	/* number of writeback pages */
+ 	int			flags;		/* various flags */
+ 	unsigned int		caps;		/* server capabilities */
 -- 
-2.5.0
+2.10.2
