@@ -1,62 +1,47 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "agk@redhat.com" <agk@redhat.com>, "lars.ellenberg@linbit.com"
-	<lars.ellenberg@linbit.com>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "philipp.reisner@linbit.com"
-	<philipp.reisner@linbit.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "shli@kernel.org"
-	<shli@kernel.org>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>, "drbd-dev@lists.linbit.com"
-	<drbd-dev@lists.linbit.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>
+Return-Path: <paolo.bonzini@gmail.com>
+Return-Path: <paolo.bonzini@gmail.com>
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 Subject: Re: [PATCH 03/23] sd: implement REQ_OP_WRITE_ZEROES
-Date: Wed, 29 Mar 2017 16:28:01 +0000
-Message-ID: <1490804856.3551.3.camel@sandisk.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+ "agk@redhat.com" <agk@redhat.com>,
+ "lars.ellenberg@linbit.com" <lars.ellenberg@linbit.com>,
+ "snitzer@redhat.com" <snitzer@redhat.com>, "hch@lst.de" <hch@lst.de>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "philipp.reisner@linbit.com" <philipp.reisner@linbit.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>, "shli@kernel.org" <shli@kernel.org>
 References: <20170323143341.31549-1-hch@lst.de>
-	 <20170323143341.31549-4-hch@lst.de> <1490726988.2573.16.camel@sandisk.com>
-	 <e19ca1bf-0908-1eb0-cb04-cd306692f216@redhat.com>
-In-Reply-To: <e19ca1bf-0908-1eb0-cb04-cd306692f216@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170323143341.31549-4-hch@lst.de> <1490726988.2573.16.camel@sandisk.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "dm-devel@redhat.com" <dm-devel@redhat.com>,
+ "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e19ca1bf-0908-1eb0-cb04-cd306692f216@redhat.com>
+Date: Wed, 29 Mar 2017 16:51:50 +0200
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <1490726988.2573.16.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2017-03-29 at 16:51 +0200, Paolo Bonzini wrote:
-> On 28/03/2017 20:50, Bart Van Assche wrote:
-> > This means that just like the start and end of a discard must be aligne=
-d on a
-> > discard_granularity boundary, WRITE SAME commands with the UNMAP bit se=
-t must
-> > also respect that granularity. I think this means that either
-> > __blkdev_issue_zeroout() has to be modified such that it rejects unalig=
-ned
-> > REQ_OP_WRITE_ZEROES operations or that blk_bio_write_same_split() has t=
-o be
-> > modified such that it generates REQ_OP_WRITEs for the unaligned start a=
-nd tail.
->=20
-> I don't think this is the case.
 
-Hello Paolo,
 
-Can you cite the section(s) from the SCSI specs that support your view? I
-reread the "5.49 WRITE SAME (10) command" and "4.7.3.4.4 WRITE SAME command
-and unmap operations" sections but I have not found any explicit statement
-that specifies the behavior for unaligned WRITE SAME commands with the UNMA=
-P
-bit set. It seems to me like=A0the OPTIMAL UNMAP GRANULARITY parameter was
-overlooked when both sections were written. Should we ask the T10 committee
-for a clarification?
+On 28/03/2017 20:50, Bart Van Assche wrote:
+> 
+> This means that just like the start and end of a discard must be aligned on a
+> discard_granularity boundary, WRITE SAME commands with the UNMAP bit set must
+> also respect that granularity. I think this means that either
+> __blkdev_issue_zeroout() has to be modified such that it rejects unaligned
+> REQ_OP_WRITE_ZEROES operations or that blk_bio_write_same_split() has to be
+> modified such that it generates REQ_OP_WRITEs for the unaligned start and tail.
 
-Another question is, if the specification of WRITE SAME + UNMAP would be
-made unambiguous in the SBC document, whether or not we should take the ris=
-k
-to trigger behavior that is not what we expect by sending unaligned WRITE
-SAME + UNMAP commands to SCSI devices?
+I don't think this is the case.
 
-Thanks,
+Rather, Linux should try to align the WRITE SAME commands to the optimal
+unmap granularity if the zeroed area requires performing more than one
+WRITE SAME command (i.e. > maximum write same length or too large to fit
+in the CDB).  However, even in that case it can use WRITE SAME with
+UNMAP for the unaligned start and tail.  Unlike the UNMAP command, the
+SCSI standard does guarantee that zeroes are written in the unaligned parts.
 
-Bart.=
+Paolo
