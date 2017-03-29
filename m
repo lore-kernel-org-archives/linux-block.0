@@ -1,121 +1,86 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:33831 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756041AbdC2K4b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Mar 2017 06:56:31 -0400
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 25/25] bdi: Drop 'parent' argument from bdi_register[_va]()
-Date: Wed, 29 Mar 2017 12:56:23 +0200
-Message-Id: <20170329105623.18241-26-jack@suse.cz>
+        Jan Kara <jack@suse.cz>, Petr Vandrovec <petr@vandrovec.name>
+Subject: [PATCH 20/25] ncpfs: Convert to separately allocated bdi
+Date: Wed, 29 Mar 2017 12:56:18 +0200
+Message-Id: <20170329105623.18241-21-jack@suse.cz>
 In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
 References: <20170329105623.18241-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Drop 'parent' argument of bdi_register() and bdi_register_va().  It is
-always NULL.
+Allocate struct backing_dev_info separately instead of embedding it
+inside the superblock. This unifies handling of bdi among users.
 
+CC: Petr Vandrovec <petr@vandrovec.name>
+Acked-by: Petr Vandrovec <petr@vandrovec.name>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/mtd/mtdcore.c       |  2 +-
- fs/super.c                  |  2 +-
- include/linux/backing-dev.h |  9 ++++-----
- mm/backing-dev.c            | 13 +++++--------
- 4 files changed, 11 insertions(+), 15 deletions(-)
+ fs/ncpfs/inode.c     | 8 ++------
+ fs/ncpfs/ncp_fs_sb.h | 1 -
+ 2 files changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/mtd/mtdcore.c b/drivers/mtd/mtdcore.c
-index 23e2e56ca54e..1517da3ddd7d 100644
---- a/drivers/mtd/mtdcore.c
-+++ b/drivers/mtd/mtdcore.c
-@@ -1782,7 +1782,7 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
- 	 * We put '-0' suffix to the name to get the same name format as we
- 	 * used to get. Since this is called only once, we get a unique name. 
- 	 */
--	ret = bdi_register(bdi, NULL, "%.28s-0", name);
-+	ret = bdi_register(bdi, "%.28s-0", name);
- 	if (ret)
- 		bdi_put(bdi);
+diff --git a/fs/ncpfs/inode.c b/fs/ncpfs/inode.c
+index d5606099712a..6d0f14c86099 100644
+--- a/fs/ncpfs/inode.c
++++ b/fs/ncpfs/inode.c
+@@ -554,12 +554,11 @@ static int ncp_fill_super(struct super_block *sb, void *raw_data, int silent)
+ 	sb->s_magic = NCP_SUPER_MAGIC;
+ 	sb->s_op = &ncp_sops;
+ 	sb->s_d_op = &ncp_dentry_operations;
+-	sb->s_bdi = &server->bdi;
  
-diff --git a/fs/super.c b/fs/super.c
-index 8444d26926ef..adb0c0de428c 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1272,7 +1272,7 @@ int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
- 	bdi->name = sb->s_type->name;
+ 	server = NCP_SBP(sb);
+ 	memset(server, 0, sizeof(*server));
  
- 	va_start(args, fmt);
--	err = bdi_register_va(bdi, NULL, fmt, args);
-+	err = bdi_register_va(bdi, fmt, args);
- 	va_end(args);
- 	if (err) {
- 		bdi_put(bdi);
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index aaeb2ec5d33c..557d84063934 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -25,11 +25,10 @@ static inline struct backing_dev_info *bdi_get(struct backing_dev_info *bdi)
+-	error = bdi_setup_and_register(&server->bdi, "ncpfs");
++	error = super_setup_bdi(sb);
+ 	if (error)
+ 		goto out_fput;
  
- void bdi_put(struct backing_dev_info *bdi);
+@@ -568,7 +567,7 @@ static int ncp_fill_super(struct super_block *sb, void *raw_data, int silent)
+ 	if (data.info_fd != -1) {
+ 		struct socket *info_sock = sockfd_lookup(data.info_fd, &error);
+ 		if (!info_sock)
+-			goto out_bdi;
++			goto out_fput;
+ 		server->info_sock = info_sock;
+ 		error = -EBADFD;
+ 		if (info_sock->type != SOCK_STREAM)
+@@ -746,8 +745,6 @@ static int ncp_fill_super(struct super_block *sb, void *raw_data, int silent)
+ out_fput2:
+ 	if (server->info_sock)
+ 		sockfd_put(server->info_sock);
+-out_bdi:
+-	bdi_destroy(&server->bdi);
+ out_fput:
+ 	sockfd_put(sock);
+ out:
+@@ -788,7 +785,6 @@ static void ncp_put_super(struct super_block *sb)
+ 	kill_pid(server->m.wdog_pid, SIGTERM, 1);
+ 	put_pid(server->m.wdog_pid);
  
--__printf(3, 4)
--int bdi_register(struct backing_dev_info *bdi, struct device *parent,
--		const char *fmt, ...);
--int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
--		const char *fmt, va_list args);
-+__printf(2, 3)
-+int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...);
-+int bdi_register_va(struct backing_dev_info *bdi, const char *fmt,
-+		    va_list args);
- int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
- void bdi_unregister(struct backing_dev_info *bdi);
+-	bdi_destroy(&server->bdi);
+ 	kfree(server->priv.data);
+ 	kfree(server->auth.object_name);
+ 	vfree(server->rxbuf);
+diff --git a/fs/ncpfs/ncp_fs_sb.h b/fs/ncpfs/ncp_fs_sb.h
+index 55e26fd80886..366fd63cc506 100644
+--- a/fs/ncpfs/ncp_fs_sb.h
++++ b/fs/ncpfs/ncp_fs_sb.h
+@@ -143,7 +143,6 @@ struct ncp_server {
+ 		size_t len;
+ 		__u8 data[128];
+ 	} unexpected_packet;
+-	struct backing_dev_info bdi;
+ };
  
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 4dcd56947f2a..f028a9a472fd 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -856,15 +856,14 @@ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
- }
- EXPORT_SYMBOL(bdi_alloc_node);
- 
--int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
--		const char *fmt, va_list args)
-+int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
- {
- 	struct device *dev;
- 
- 	if (bdi->dev)	/* The driver needs to use separate queues per device */
- 		return 0;
- 
--	dev = device_create_vargs(bdi_class, parent, MKDEV(0, 0), bdi, fmt, args);
-+	dev = device_create_vargs(bdi_class, NULL, MKDEV(0, 0), bdi, fmt, args);
- 	if (IS_ERR(dev))
- 		return PTR_ERR(dev);
- 
-@@ -883,14 +882,13 @@ int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
- }
- EXPORT_SYMBOL(bdi_register_va);
- 
--int bdi_register(struct backing_dev_info *bdi, struct device *parent,
--		const char *fmt, ...)
-+int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...)
- {
- 	va_list args;
- 	int ret;
- 
- 	va_start(args, fmt);
--	ret = bdi_register_va(bdi, parent, fmt, args);
-+	ret = bdi_register_va(bdi, fmt, args);
- 	va_end(args);
- 	return ret;
- }
-@@ -900,8 +898,7 @@ int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
- {
- 	int rc;
- 
--	rc = bdi_register(bdi, NULL, "%u:%u", MAJOR(owner->devt),
--			MINOR(owner->devt));
-+	rc = bdi_register(bdi, "%u:%u", MAJOR(owner->devt), MINOR(owner->devt));
- 	if (rc)
- 		return rc;
- 	/* Leaking owner reference... */
+ extern void ncp_tcp_rcv_proc(struct work_struct *work);
 -- 
 2.10.2
