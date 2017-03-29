@@ -1,44 +1,41 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 01/23] block: renumber REQ_OP_WRITE_ZEROES
-Date: Thu, 23 Mar 2017 10:33:19 -0400
-Message-Id: <20170323143341.31549-2-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Date: Wed, 29 Mar 2017 08:00:25 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v3 0/4] block: misc changes
+Message-ID: <20170329140025.GA8461@kernel.dk>
+References: <20170327120658.29864-1-tom.leiming@gmail.com>
+ <20170329021136.GA4625@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170329021136.GA4625@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-Make life easy for implementations that needs to send a data buffer
-to the device (e.g. SCSI) by numbering it as a data out command.
+On Wed, Mar 29 2017, Ming Lei wrote:
+> On Mon, Mar 27, 2017 at 08:06:54PM +0800, Ming Lei wrote:
+> > Hi,
+> > 
+> > The 1st  patch add comments on blk-mq races with timeout handler.
+> > 
+> > The other 3 patches improves handling for dying queue:
+> > 	- the 2nd one adds one barrier in blk_queue_enter() for
+> > 	avoiding hanging caused by out-of-order
+> > 	- the 3rd and 4th patches block new I/O entering queue
+> > 	after queue is set as dying
+> > 
+> > V3:
+> > 	- tweak comments as suggested by Bart Van Assche
+> 
+> Hi Jens,
+> 
+> This patchset has been posted several times without real code change
+> for a while, could you consider it for v4.12?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk_types.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+We can queue it up now. I do agree that patch 2+4 should have been
+folded into one, but that's not a huge deal.
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d703acb55d0f..6393c13a6498 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -160,7 +160,7 @@ enum req_opf {
- 	/* write the same sector many times */
- 	REQ_OP_WRITE_SAME	= 7,
- 	/* write the zero filled sector many times */
--	REQ_OP_WRITE_ZEROES	= 8,
-+	REQ_OP_WRITE_ZEROES	= 9,
- 
- 	/* SCSI passthrough using struct scsi_request */
- 	REQ_OP_SCSI_IN		= 32,
 -- 
-2.11.0
+Jens Axboe
