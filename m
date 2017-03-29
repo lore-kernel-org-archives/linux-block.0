@@ -1,64 +1,47 @@
-Return-Path: <jack@suse.cz>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 01/11] block: Fix bdi assignment to bdev inode when racing with disk delete
-Date: Mon,  6 Mar 2017 17:33:54 +0100
-Message-Id: <20170306163404.1238-2-jack@suse.cz>
-In-Reply-To: <20170306163404.1238-1-jack@suse.cz>
-References: <20170306163404.1238-1-jack@suse.cz>
+To: <linux-fsdevel@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 05/25] fs: Get proper reference for s_bdi
+Date: Wed, 29 Mar 2017 12:56:03 +0200
+Message-Id: <20170329105623.18241-6-jack@suse.cz>
+In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
+References: <20170329105623.18241-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-When disk->fops->open() in __blkdev_get() returns -ERESTARTSYS, we
-restart the process of opening the block device. However we forget to
-switch bdev->bd_bdi back to noop_backing_dev_info and as a result bdev
-inode will be pointing to a stale bdi. Fix the problem by setting
-bdev->bd_bdi later when __blkdev_get() is already guaranteed to succeed.
+So far we just relied on block device to hold a bdi reference for us
+while the filesystem is mounted. While that works perfectly fine, it is
+a bit awkward that we have a pointer to a refcounted structure in the
+superblock without proper reference. So make s_bdi hold a proper
+reference to block device's BDI. No filesystem using mount_bdev()
+actually changes s_bdi so this is safe and will make bdev filesystems
+work the same way as filesystems needing to set up their private bdi.
 
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/block_dev.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ fs/super.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 2eca00ec4370..53e2389ae4d4 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1556,8 +1556,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 		bdev->bd_disk = disk;
- 		bdev->bd_queue = disk->queue;
- 		bdev->bd_contains = bdev;
--		if (bdev->bd_bdi == &noop_backing_dev_info)
--			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
+diff --git a/fs/super.c b/fs/super.c
+index 0f51a437c269..e267d3a00144 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1054,12 +1054,9 @@ static int set_bdev_super(struct super_block *s, void *data)
+ {
+ 	s->s_bdev = data;
+ 	s->s_dev = s->s_bdev->bd_dev;
++	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
++	s->s_iflags |= SB_I_DYNBDI;
  
- 		if (!partno) {
- 			ret = -ENXIO;
-@@ -1622,6 +1620,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 			}
- 			bd_set_size(bdev, (loff_t)bdev->bd_part->nr_sects << 9);
- 		}
-+
-+		if (bdev->bd_bdi == &noop_backing_dev_info)
-+			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
- 	} else {
- 		if (bdev->bd_contains == bdev) {
- 			ret = 0;
-@@ -1653,8 +1654,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	bdev->bd_disk = NULL;
- 	bdev->bd_part = NULL;
- 	bdev->bd_queue = NULL;
--	bdi_put(bdev->bd_bdi);
--	bdev->bd_bdi = &noop_backing_dev_info;
- 	if (bdev != bdev->bd_contains)
- 		__blkdev_put(bdev->bd_contains, mode, 1);
- 	bdev->bd_contains = NULL;
+-	/*
+-	 * We set the bdi here to the queue backing, file systems can
+-	 * overwrite this in ->fill_super()
+-	 */
+-	s->s_bdi = bdev_get_queue(s->s_bdev)->backing_dev_info;
+ 	return 0;
+ }
+ 
 -- 
 2.10.2
