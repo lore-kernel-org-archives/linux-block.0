@@ -2,88 +2,108 @@ Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
-        linux-afs@lists.infradead.org
-Subject: [PATCH 12/25] afs: Convert to separately allocated bdi
-Date: Wed, 29 Mar 2017 12:56:10 +0200
-Message-Id: <20170329105623.18241-13-jack@suse.cz>
+        Jan Kara <jack@suse.cz>, Oleg Drokin <oleg.drokin@intel.com>,
+        Andreas Dilger <andreas.dilger@intel.com>,
+        James Simmons <jsimmons@infradead.org>,
+        lustre-devel@lists.lustre.org
+Subject: [PATCH 06/25] lustre: Convert to separately allocated bdi
+Date: Wed, 29 Mar 2017 12:56:04 +0200
+Message-Id: <20170329105623.18241-7-jack@suse.cz>
 In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
 References: <20170329105623.18241-1-jack@suse.cz>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
 Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+inside superblock. This unifies handling of bdi among users.
 
-CC: David Howells <dhowells@redhat.com>
-CC: linux-afs@lists.infradead.org
+CC: Oleg Drokin <oleg.drokin@intel.com>
+CC: Andreas Dilger <andreas.dilger@intel.com>
+CC: James Simmons <jsimmons@infradead.org>
+CC: lustre-devel@lists.lustre.org
+Reviewed-by: Andreas Dilger <andreas.dilger@intel.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/afs/internal.h | 1 -
- fs/afs/super.c    | 5 ++++-
- fs/afs/volume.c   | 8 --------
- 3 files changed, 4 insertions(+), 10 deletions(-)
+ .../staging/lustre/lustre/include/lustre_disk.h    |  4 ----
+ drivers/staging/lustre/lustre/llite/llite_lib.c    | 24 +++-------------------
+ 2 files changed, 3 insertions(+), 25 deletions(-)
 
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index a6901360fb81..393672997cc2 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -318,7 +318,6 @@ struct afs_volume {
- 	unsigned short		rjservers;	/* number of servers discarded due to -ENOMEDIUM */
- 	struct afs_server	*servers[8];	/* servers on which volume resides (ordered) */
- 	struct rw_semaphore	server_sem;	/* lock for accessing current server */
--	struct backing_dev_info	bdi;
+diff --git a/drivers/staging/lustre/lustre/include/lustre_disk.h b/drivers/staging/lustre/lustre/include/lustre_disk.h
+index 8886458748c1..a676bccabd43 100644
+--- a/drivers/staging/lustre/lustre/include/lustre_disk.h
++++ b/drivers/staging/lustre/lustre/include/lustre_disk.h
+@@ -133,13 +133,9 @@ struct lustre_sb_info {
+ 	struct obd_export	 *lsi_osd_exp;
+ 	char			  lsi_osd_type[16];
+ 	char			  lsi_fstype[16];
+-	struct backing_dev_info   lsi_bdi;     /* each client mountpoint needs
+-						* own backing_dev_info
+-						*/
  };
  
- /*
-diff --git a/fs/afs/super.c b/fs/afs/super.c
-index fbdb022b75a2..c79633e5cfd8 100644
---- a/fs/afs/super.c
-+++ b/fs/afs/super.c
-@@ -319,7 +319,10 @@ static int afs_fill_super(struct super_block *sb,
- 	sb->s_blocksize_bits	= PAGE_SHIFT;
- 	sb->s_magic		= AFS_FS_MAGIC;
- 	sb->s_op		= &afs_super_ops;
--	sb->s_bdi		= &as->volume->bdi;
-+	ret = super_setup_bdi(sb);
-+	if (ret)
-+		return ret;
-+	sb->s_bdi->ra_pages	= VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
- 	strlcpy(sb->s_id, as->volume->vlocation->vldb.name, sizeof(sb->s_id));
+ #define LSI_UMOUNT_FAILOVER	      0x00200000
+-#define LSI_BDI_INITIALIZED	      0x00400000
  
- 	/* allocate the root inode and dentry */
-diff --git a/fs/afs/volume.c b/fs/afs/volume.c
-index 546f9d01710b..db73d6dad02b 100644
---- a/fs/afs/volume.c
-+++ b/fs/afs/volume.c
-@@ -106,11 +106,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
- 	volume->cell		= params->cell;
- 	volume->vid		= vlocation->vldb.vid[params->type];
+ #define     s2lsi(sb)	((struct lustre_sb_info *)((sb)->s_fs_info))
+ #define     s2lsi_nocast(sb) ((sb)->s_fs_info)
+diff --git a/drivers/staging/lustre/lustre/llite/llite_lib.c b/drivers/staging/lustre/lustre/llite/llite_lib.c
+index b229cbc7bb33..d483c44aafe5 100644
+--- a/drivers/staging/lustre/lustre/llite/llite_lib.c
++++ b/drivers/staging/lustre/lustre/llite/llite_lib.c
+@@ -863,15 +863,6 @@ void ll_lli_init(struct ll_inode_info *lli)
+ 	mutex_init(&lli->lli_layout_mutex);
+ }
  
--	volume->bdi.ra_pages	= VM_MAX_READAHEAD*1024/PAGE_SIZE; 
--	ret = bdi_setup_and_register(&volume->bdi, "afs");
--	if (ret)
--		goto error_bdi;
+-static inline int ll_bdi_register(struct backing_dev_info *bdi)
+-{
+-	static atomic_t ll_bdi_num = ATOMIC_INIT(0);
 -
- 	init_rwsem(&volume->server_sem);
+-	bdi->name = "lustre";
+-	return bdi_register(bdi, NULL, "lustre-%d",
+-			    atomic_inc_return(&ll_bdi_num));
+-}
+-
+ int ll_fill_super(struct super_block *sb, struct vfsmount *mnt)
+ {
+ 	struct lustre_profile *lprof = NULL;
+@@ -881,6 +872,7 @@ int ll_fill_super(struct super_block *sb, struct vfsmount *mnt)
+ 	char  *profilenm = get_profile_name(sb);
+ 	struct config_llog_instance *cfg;
+ 	int    err;
++	static atomic_t ll_bdi_num = ATOMIC_INIT(0);
  
- 	/* look up all the applicable server records */
-@@ -156,8 +151,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
- 	return ERR_PTR(ret);
+ 	CDEBUG(D_VFSTRACE, "VFS Op: sb %p\n", sb);
  
- error_discard:
--	bdi_destroy(&volume->bdi);
--error_bdi:
- 	up_write(&params->cell->vl_sem);
+@@ -903,16 +895,11 @@ int ll_fill_super(struct super_block *sb, struct vfsmount *mnt)
+ 	if (err)
+ 		goto out_free;
  
- 	for (loop = volume->nservers - 1; loop >= 0; loop--)
-@@ -207,7 +200,6 @@ void afs_put_volume(struct afs_volume *volume)
- 	for (loop = volume->nservers - 1; loop >= 0; loop--)
- 		afs_put_server(volume->servers[loop]);
+-	err = bdi_init(&lsi->lsi_bdi);
+-	if (err)
+-		goto out_free;
+-	lsi->lsi_flags |= LSI_BDI_INITIALIZED;
+-	lsi->lsi_bdi.capabilities = 0;
+-	err = ll_bdi_register(&lsi->lsi_bdi);
++	err = super_setup_bdi_name(sb, "lustre-%d",
++				   atomic_inc_return(&ll_bdi_num));
+ 	if (err)
+ 		goto out_free;
  
--	bdi_destroy(&volume->bdi);
- 	kfree(volume);
+-	sb->s_bdi = &lsi->lsi_bdi;
+ 	/* kernel >= 2.6.38 store dentry operations in sb->s_d_op. */
+ 	sb->s_d_op = &ll_d_ops;
  
- 	_leave(" [destroyed]");
+@@ -1033,11 +1020,6 @@ void ll_put_super(struct super_block *sb)
+ 	if (profilenm)
+ 		class_del_profile(profilenm);
+ 
+-	if (lsi->lsi_flags & LSI_BDI_INITIALIZED) {
+-		bdi_destroy(&lsi->lsi_bdi);
+-		lsi->lsi_flags &= ~LSI_BDI_INITIALIZED;
+-	}
+-
+ 	ll_free_sbi(sb);
+ 	lsi->lsi_llsbi = NULL;
+ 
 -- 
 2.10.2
