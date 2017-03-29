@@ -2,147 +2,88 @@ Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH 08/25] btrfs: Convert to separately allocated bdi
-Date: Wed, 29 Mar 2017 12:56:06 +0200
-Message-Id: <20170329105623.18241-9-jack@suse.cz>
+        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
+        linux-afs@lists.infradead.org
+Subject: [PATCH 12/25] afs: Convert to separately allocated bdi
+Date: Wed, 29 Mar 2017 12:56:10 +0200
+Message-Id: <20170329105623.18241-13-jack@suse.cz>
 In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
 References: <20170329105623.18241-1-jack@suse.cz>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
 Allocate struct backing_dev_info separately instead of embedding it
-inside superblock. This unifies handling of bdi among users.
+inside the superblock. This unifies handling of bdi among users.
 
-CC: Chris Mason <clm@fb.com>
-CC: Josef Bacik <jbacik@fb.com>
-CC: David Sterba <dsterba@suse.com>
-CC: linux-btrfs@vger.kernel.org
-Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
-Reviewed-by: David Sterba <dsterba@suse.com>
+CC: David Howells <dhowells@redhat.com>
+CC: linux-afs@lists.infradead.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/btrfs/ctree.h   |  1 -
- fs/btrfs/disk-io.c | 36 +++++++-----------------------------
- fs/btrfs/super.c   |  7 +++++++
- 3 files changed, 14 insertions(+), 30 deletions(-)
+ fs/afs/internal.h | 1 -
+ fs/afs/super.c    | 5 ++++-
+ fs/afs/volume.c   | 8 --------
+ 3 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/fs/btrfs/ctree.h b/fs/btrfs/ctree.h
-index 29b7fc28c607..f6019ce20035 100644
---- a/fs/btrfs/ctree.h
-+++ b/fs/btrfs/ctree.h
-@@ -810,7 +810,6 @@ struct btrfs_fs_info {
- 	struct btrfs_super_block *super_for_commit;
- 	struct super_block *sb;
- 	struct inode *btree_inode;
--	struct backing_dev_info bdi;
- 	struct mutex tree_log_mutex;
- 	struct mutex transaction_kthread_mutex;
- 	struct mutex cleaner_mutex;
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 08b74daf35d0..a7d8c342f604 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -1808,21 +1808,6 @@ static int btrfs_congested_fn(void *congested_data, int bdi_bits)
- 	return ret;
- }
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index a6901360fb81..393672997cc2 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -318,7 +318,6 @@ struct afs_volume {
+ 	unsigned short		rjservers;	/* number of servers discarded due to -ENOMEDIUM */
+ 	struct afs_server	*servers[8];	/* servers on which volume resides (ordered) */
+ 	struct rw_semaphore	server_sem;	/* lock for accessing current server */
+-	struct backing_dev_info	bdi;
+ };
  
--static int setup_bdi(struct btrfs_fs_info *info, struct backing_dev_info *bdi)
--{
--	int err;
--
--	err = bdi_setup_and_register(bdi, "btrfs");
--	if (err)
--		return err;
--
--	bdi->ra_pages = VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
--	bdi->congested_fn	= btrfs_congested_fn;
--	bdi->congested_data	= info;
--	bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
--	return 0;
--}
--
  /*
-  * called by the kthread helper functions to finally call the bio end_io
-  * functions.  This is where read checksum verification actually happens
-@@ -2601,16 +2586,10 @@ int open_ctree(struct super_block *sb,
- 		goto fail;
- 	}
+diff --git a/fs/afs/super.c b/fs/afs/super.c
+index fbdb022b75a2..c79633e5cfd8 100644
+--- a/fs/afs/super.c
++++ b/fs/afs/super.c
+@@ -319,7 +319,10 @@ static int afs_fill_super(struct super_block *sb,
+ 	sb->s_blocksize_bits	= PAGE_SHIFT;
+ 	sb->s_magic		= AFS_FS_MAGIC;
+ 	sb->s_op		= &afs_super_ops;
+-	sb->s_bdi		= &as->volume->bdi;
++	ret = super_setup_bdi(sb);
++	if (ret)
++		return ret;
++	sb->s_bdi->ra_pages	= VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
+ 	strlcpy(sb->s_id, as->volume->vlocation->vldb.name, sizeof(sb->s_id));
  
--	ret = setup_bdi(fs_info, &fs_info->bdi);
--	if (ret) {
--		err = ret;
--		goto fail_srcu;
--	}
+ 	/* allocate the root inode and dentry */
+diff --git a/fs/afs/volume.c b/fs/afs/volume.c
+index 546f9d01710b..db73d6dad02b 100644
+--- a/fs/afs/volume.c
++++ b/fs/afs/volume.c
+@@ -106,11 +106,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
+ 	volume->cell		= params->cell;
+ 	volume->vid		= vlocation->vldb.vid[params->type];
+ 
+-	volume->bdi.ra_pages	= VM_MAX_READAHEAD*1024/PAGE_SIZE; 
+-	ret = bdi_setup_and_register(&volume->bdi, "afs");
+-	if (ret)
+-		goto error_bdi;
 -
- 	ret = percpu_counter_init(&fs_info->dirty_metadata_bytes, 0, GFP_KERNEL);
- 	if (ret) {
- 		err = ret;
--		goto fail_bdi;
-+		goto fail_srcu;
- 	}
- 	fs_info->dirty_metadata_batch = PAGE_SIZE *
- 					(1 + ilog2(nr_cpu_ids));
-@@ -2718,7 +2697,6 @@ int open_ctree(struct super_block *sb,
+ 	init_rwsem(&volume->server_sem);
  
- 	sb->s_blocksize = 4096;
- 	sb->s_blocksize_bits = blksize_bits(4096);
--	sb->s_bdi = &fs_info->bdi;
+ 	/* look up all the applicable server records */
+@@ -156,8 +151,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
+ 	return ERR_PTR(ret);
  
- 	btrfs_init_btree_inode(fs_info);
+ error_discard:
+-	bdi_destroy(&volume->bdi);
+-error_bdi:
+ 	up_write(&params->cell->vl_sem);
  
-@@ -2915,9 +2893,12 @@ int open_ctree(struct super_block *sb,
- 		goto fail_sb_buffer;
- 	}
+ 	for (loop = volume->nservers - 1; loop >= 0; loop--)
+@@ -207,7 +200,6 @@ void afs_put_volume(struct afs_volume *volume)
+ 	for (loop = volume->nservers - 1; loop >= 0; loop--)
+ 		afs_put_server(volume->servers[loop]);
  
--	fs_info->bdi.ra_pages *= btrfs_super_num_devices(disk_super);
--	fs_info->bdi.ra_pages = max(fs_info->bdi.ra_pages,
--				    SZ_4M / PAGE_SIZE);
-+	sb->s_bdi->congested_fn = btrfs_congested_fn;
-+	sb->s_bdi->congested_data = fs_info;
-+	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
-+	sb->s_bdi->ra_pages = VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
-+	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
-+	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
+-	bdi_destroy(&volume->bdi);
+ 	kfree(volume);
  
- 	sb->s_blocksize = sectorsize;
- 	sb->s_blocksize_bits = blksize_bits(sectorsize);
-@@ -3285,8 +3266,6 @@ int open_ctree(struct super_block *sb,
- 	percpu_counter_destroy(&fs_info->delalloc_bytes);
- fail_dirty_metadata_bytes:
- 	percpu_counter_destroy(&fs_info->dirty_metadata_bytes);
--fail_bdi:
--	bdi_destroy(&fs_info->bdi);
- fail_srcu:
- 	cleanup_srcu_struct(&fs_info->subvol_srcu);
- fail:
-@@ -4007,7 +3986,6 @@ void close_ctree(struct btrfs_fs_info *fs_info)
- 	percpu_counter_destroy(&fs_info->dirty_metadata_bytes);
- 	percpu_counter_destroy(&fs_info->delalloc_bytes);
- 	percpu_counter_destroy(&fs_info->bio_counter);
--	bdi_destroy(&fs_info->bdi);
- 	cleanup_srcu_struct(&fs_info->subvol_srcu);
- 
- 	btrfs_free_stripe_hash_table(fs_info);
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index da687dc79cce..e0a7503ab31e 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -1133,6 +1133,13 @@ static int btrfs_fill_super(struct super_block *sb,
- #endif
- 	sb->s_flags |= MS_I_VERSION;
- 	sb->s_iflags |= SB_I_CGROUPWB;
-+
-+	err = super_setup_bdi(sb);
-+	if (err) {
-+		btrfs_err(fs_info, "super_setup_bdi failed");
-+		return err;
-+	}
-+
- 	err = open_ctree(sb, fs_devices, (char *)data);
- 	if (err) {
- 		btrfs_err(fs_info, "open_ctree failed");
+ 	_leave(" [destroyed]");
 -- 
 2.10.2
