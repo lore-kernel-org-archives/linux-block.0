@@ -1,63 +1,122 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ua0-f195.google.com ([209.85.217.195]:35811 "EHLO
-        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753601AbdCBCkC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Mar 2017 21:40:02 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170228234627.3h6tospuz33yhdig@kernel.org>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
- <1488296503-4987-14-git-send-email-tom.leiming@gmail.com> <20170228234627.3h6tospuz33yhdig@kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Thu, 2 Mar 2017 10:37:49 +0800
-Message-ID: <CACVXFVN8aE_Cd=ssBuhmVRK5YYRe2q4+jXoxsfztFLZiimH_xA@mail.gmail.com>
-Subject: Re: [PATCH v2 13/13] md: raid10: avoid direct access to bvec table in handle_reshape_read_error
-To: Shaohua Li <shli@kernel.org>
-Cc: Jens Axboe <axboe@fb.com>,
-        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
-        <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+To: <linux-fsdevel@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 23/25] fs: Remove SB_I_DYNBDI flag
+Date: Wed, 29 Mar 2017 12:56:21 +0200
+Message-Id: <20170329105623.18241-24-jack@suse.cz>
+In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
+References: <20170329105623.18241-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Shaohua,
+Now that all bdi structures filesystems use are properly refcounted, we
+can remove the SB_I_DYNBDI flag.
 
-On Wed, Mar 1, 2017 at 7:46 AM, Shaohua Li <shli@kernel.org> wrote:
-> On Tue, Feb 28, 2017 at 11:41:43PM +0800, Ming Lei wrote:
->> The cost is 128bytes(8*16) stack space in kernel thread context, and
->> just use the bio helper to retrieve pages from bio.
->>
->> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
->> ---
->>  drivers/md/raid10.c | 12 ++++++++++--
->>  1 file changed, 10 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
->> index 0b97631e3905..6ffb64ab45f8 100644
->> --- a/drivers/md/raid10.c
->> +++ b/drivers/md/raid10.c
->> @@ -4670,7 +4670,15 @@ static int handle_reshape_read_error(struct mddev *mddev,
->>       struct r10bio *r10b = &on_stack.r10_bio;
->>       int slot = 0;
->>       int idx = 0;
->> -     struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
->> +     struct bio_vec *bvl;
->> +     struct page *pages[RESYNC_PAGES];
->> +
->> +     /*
->> +      * This bio is allocated in reshape_request(), and size
->> +      * is still RESYNC_PAGES
->> +      */
->> +     bio_for_each_segment_all(bvl, r10_bio->master_bio, idx)
->> +             pages[idx] = bvl->bv_page;
->
-> The reshape bio is doing IO against the memory we allocated for r10_bio, I'm
-> wondering why we can't get the pages from r10_bio. In this way, we don't need
-> access the bio_vec any more.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/mtd/mtdsuper.c | 1 -
+ fs/gfs2/ops_fstype.c   | 1 -
+ fs/nfs/super.c         | 1 -
+ fs/nilfs2/super.c      | 1 -
+ fs/super.c             | 5 +----
+ include/linux/fs.h     | 3 ---
+ 6 files changed, 1 insertion(+), 11 deletions(-)
 
-Reshap read is special and the bio(r10_bio->master_bio) isn't allocated from
-.r10buf_pool, please see reshape_request().
-
-Thanks,
-Ming Lei
+diff --git a/drivers/mtd/mtdsuper.c b/drivers/mtd/mtdsuper.c
+index e69e7855e31f..e43fea896d1e 100644
+--- a/drivers/mtd/mtdsuper.c
++++ b/drivers/mtd/mtdsuper.c
+@@ -53,7 +53,6 @@ static int get_sb_mtd_set(struct super_block *sb, void *_mtd)
+ 	sb->s_mtd = mtd;
+ 	sb->s_dev = MKDEV(MTD_BLOCK_MAJOR, mtd->index);
+ 	sb->s_bdi = bdi_get(mtd_bdi);
+-	sb->s_iflags |= SB_I_DYNBDI;
+ 
+ 	return 0;
+ }
+diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
+index e6b6f97d0fc1..ed67548b286c 100644
+--- a/fs/gfs2/ops_fstype.c
++++ b/fs/gfs2/ops_fstype.c
+@@ -1224,7 +1224,6 @@ static int set_gfs2_super(struct super_block *s, void *data)
+ 	s->s_bdev = data;
+ 	s->s_dev = s->s_bdev->bd_dev;
+ 	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
+-	s->s_iflags |= SB_I_DYNBDI;
+ 	return 0;
+ }
+ 
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index 8d97aa70407e..dc69314d455e 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -2379,7 +2379,6 @@ int nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+  	nfs_initialise_sb(sb);
+ 
+ 	sb->s_bdi = bdi_get(old_sb->s_bdi);
+-	sb->s_iflags |= SB_I_DYNBDI;
+ 
+ 	return 0;
+ }
+diff --git a/fs/nilfs2/super.c b/fs/nilfs2/super.c
+index feb796a38b8d..926682981d61 100644
+--- a/fs/nilfs2/super.c
++++ b/fs/nilfs2/super.c
+@@ -1069,7 +1069,6 @@ nilfs_fill_super(struct super_block *sb, void *data, int silent)
+ 	sb->s_max_links = NILFS_LINK_MAX;
+ 
+ 	sb->s_bdi = bdi_get(sb->s_bdev->bd_bdi);
+-	sb->s_iflags |= SB_I_DYNBDI;
+ 
+ 	err = load_nilfs(nilfs, sb);
+ 	if (err)
+diff --git a/fs/super.c b/fs/super.c
+index e267d3a00144..8444d26926ef 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -446,10 +446,9 @@ void generic_shutdown_super(struct super_block *sb)
+ 	hlist_del_init(&sb->s_instances);
+ 	spin_unlock(&sb_lock);
+ 	up_write(&sb->s_umount);
+-	if (sb->s_iflags & SB_I_DYNBDI) {
++	if (sb->s_bdi != &noop_backing_dev_info) {
+ 		bdi_put(sb->s_bdi);
+ 		sb->s_bdi = &noop_backing_dev_info;
+-		sb->s_iflags &= ~SB_I_DYNBDI;
+ 	}
+ }
+ 
+@@ -1055,7 +1054,6 @@ static int set_bdev_super(struct super_block *s, void *data)
+ 	s->s_bdev = data;
+ 	s->s_dev = s->s_bdev->bd_dev;
+ 	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
+-	s->s_iflags |= SB_I_DYNBDI;
+ 
+ 	return 0;
+ }
+@@ -1282,7 +1280,6 @@ int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
+ 	}
+ 	WARN_ON(sb->s_bdi != &noop_backing_dev_info);
+ 	sb->s_bdi = bdi;
+-	sb->s_iflags |= SB_I_DYNBDI;
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 98cf14ea78c0..30e5c14bd743 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1272,9 +1272,6 @@ struct mm_struct;
+ /* sb->s_iflags to limit user namespace mounts */
+ #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
+ 
+-/* Temporary flag until all filesystems are converted to dynamic bdis */
+-#define SB_I_DYNBDI	0x00000100
+-
+ /* Possible states of 'frozen' field */
+ enum {
+ 	SB_UNFROZEN = 0,		/* FS is unfrozen */
+-- 
+2.10.2
