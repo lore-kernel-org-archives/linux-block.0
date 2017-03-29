@@ -2,94 +2,106 @@ Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 01/25] bdi: Provide bdi_register_va() and bdi_alloc()
-Date: Wed, 29 Mar 2017 12:55:59 +0200
-Message-Id: <20170329105623.18241-2-jack@suse.cz>
+        Jan Kara <jack@suse.cz>, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH 10/25] cifs: Convert to separately allocated bdi
+Date: Wed, 29 Mar 2017 12:56:08 +0200
+Message-Id: <20170329105623.18241-11-jack@suse.cz>
 In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
 References: <20170329105623.18241-1-jack@suse.cz>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Add function that registers bdi and takes va_list instead of variable
-number of arguments.
+Allocate struct backing_dev_info separately instead of embedding it
+inside superblock. This unifies handling of bdi among users.
 
-Add bdi_alloc() as simple wrapper for NUMA-unaware users allocating BDI.
-
+CC: Steve French <sfrench@samba.org>
+CC: linux-cifs@vger.kernel.org
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- include/linux/backing-dev.h |  6 ++++++
- mm/backing-dev.c            | 20 +++++++++++++++-----
- 2 files changed, 21 insertions(+), 5 deletions(-)
+ fs/cifs/cifs_fs_sb.h |  1 -
+ fs/cifs/cifsfs.c     |  7 ++++++-
+ fs/cifs/connect.c    | 10 ----------
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index c52a48cb9a66..47a98e6e2a65 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -30,6 +30,8 @@ void bdi_put(struct backing_dev_info *bdi);
- __printf(3, 4)
- int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 		const char *fmt, ...);
-+int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, va_list args);
- int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
- int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
- void bdi_unregister(struct backing_dev_info *bdi);
-@@ -37,6 +39,10 @@ void bdi_unregister(struct backing_dev_info *bdi);
- int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
- void bdi_destroy(struct backing_dev_info *bdi);
- struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
-+static inline struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
-+{
-+	return bdi_alloc_node(gfp_mask, NUMA_NO_NODE);
-+}
- 
- void wb_start_writeback(struct bdi_writeback *wb, long nr_pages,
- 			bool range_cyclic, enum wb_reason reason);
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 3ea3bbd921d6..e5e0972bdd6f 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -856,18 +856,15 @@ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
- 	return bdi;
- }
- 
--int bdi_register(struct backing_dev_info *bdi, struct device *parent,
--		const char *fmt, ...)
-+int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, va_list args)
- {
--	va_list args;
- 	struct device *dev;
- 
- 	if (bdi->dev)	/* The driver needs to use separate queues per device */
- 		return 0;
- 
--	va_start(args, fmt);
- 	dev = device_create_vargs(bdi_class, parent, MKDEV(0, 0), bdi, fmt, args);
--	va_end(args);
- 	if (IS_ERR(dev))
- 		return PTR_ERR(dev);
- 
-@@ -884,6 +881,19 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 	trace_writeback_bdi_register(bdi);
- 	return 0;
- }
-+EXPORT_SYMBOL(bdi_register_va);
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 07ed81cf1552..cbd216b57239 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -68,7 +68,6 @@ struct cifs_sb_info {
+ 	umode_t	mnt_dir_mode;
+ 	unsigned int mnt_cifs_flags;
+ 	char   *mountdata; /* options received at mount time or via DFS refs */
+-	struct backing_dev_info bdi;
+ 	struct delayed_work prune_tlinks;
+ 	struct rcu_head rcu;
+ 	char *prepath;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 15e1db8738ae..502eab6bdbc4 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -138,7 +138,12 @@ cifs_read_super(struct super_block *sb)
+ 	sb->s_magic = CIFS_MAGIC_NUMBER;
+ 	sb->s_op = &cifs_super_ops;
+ 	sb->s_xattr = cifs_xattr_handlers;
+-	sb->s_bdi = &cifs_sb->bdi;
++	rc = super_setup_bdi(sb);
++	if (rc)
++		goto out_no_root;
++	/* tune readahead according to rsize */
++	sb->s_bdi->ra_pages = cifs_sb->rsize / PAGE_SIZE;
 +
-+int bdi_register(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, ...)
-+{
-+	va_list args;
-+	int ret;
-+
-+	va_start(args, fmt);
-+	ret = bdi_register_va(bdi, parent, fmt, args);
-+	va_end(args);
-+	return ret;
-+}
- EXPORT_SYMBOL(bdi_register);
+ 	sb->s_blocksize = CIFS_MAX_MSGSIZE;
+ 	sb->s_blocksize_bits = 14;	/* default 2**14 = CIFS_MAX_MSGSIZE */
+ 	inode = cifs_root_iget(sb);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 9ae695ae3ed7..7f50c8949401 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3683,10 +3683,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 	int referral_walks_count = 0;
+ #endif
  
- int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev)
+-	rc = bdi_setup_and_register(&cifs_sb->bdi, "cifs");
+-	if (rc)
+-		return rc;
+-
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ try_mount_again:
+ 	/* cleanup activities if we're chasing a referral */
+@@ -3714,7 +3710,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 	server = cifs_get_tcp_session(volume_info);
+ 	if (IS_ERR(server)) {
+ 		rc = PTR_ERR(server);
+-		bdi_destroy(&cifs_sb->bdi);
+ 		goto out;
+ 	}
+ 	if ((volume_info->max_credits < 20) ||
+@@ -3768,9 +3763,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 	cifs_sb->wsize = server->ops->negotiate_wsize(tcon, volume_info);
+ 	cifs_sb->rsize = server->ops->negotiate_rsize(tcon, volume_info);
+ 
+-	/* tune readahead according to rsize */
+-	cifs_sb->bdi.ra_pages = cifs_sb->rsize / PAGE_SIZE;
+-
+ remote_path_check:
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	/*
+@@ -3887,7 +3879,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 			cifs_put_smb_ses(ses);
+ 		else
+ 			cifs_put_tcp_session(server, 0);
+-		bdi_destroy(&cifs_sb->bdi);
+ 	}
+ 
+ out:
+@@ -4090,7 +4081,6 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
+ 	}
+ 	spin_unlock(&cifs_sb->tlink_tree_lock);
+ 
+-	bdi_destroy(&cifs_sb->bdi);
+ 	kfree(cifs_sb->mountdata);
+ 	kfree(cifs_sb->prepath);
+ 	call_rcu(&cifs_sb->rcu, delayed_free);
 -- 
 2.10.2
