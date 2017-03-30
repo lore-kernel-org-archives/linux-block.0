@@ -1,88 +1,81 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: dledford@redhat.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	mail@fholler.de,
-	Milind.dumbare@gmail.com,
-	yun.wang@profitbricks.com,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 26/28] ibnbd_srv: add Makefile and Kconfig
-Date: Fri, 24 Mar 2017 11:45:41 +0100
-Message-Id: <1490352343-20075-27-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:34459 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933002AbdC3Nts (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Mar 2017 09:49:48 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 3/8] bio-integrity: save original iterator for verify stage
+Date: Thu, 30 Mar 2017 17:49:31 +0400
+Message-Id: <1490881776-28735-4-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1490881776-28735-1-git-send-email-dmonakhov@openvz.org>
+References: <1490881776-28735-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+In order to perform verification we need to know original data vector
+But, after bio traverse io-stack it may be advanced, splited and relocated
+many times so it is hard to guess original data vector.
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+In fact currently ->verify_fn not woks at all because at the moment
+it is called bio->bi_iter.bi_size == 0
+
+The simplest way to fix that is to save original data vector and treat is
+as immutable.
+
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- drivers/block/Kconfig               |  1 +
- drivers/block/Makefile              |  1 +
- drivers/block/ibnbd_server/Kconfig  | 16 ++++++++++++++++
- drivers/block/ibnbd_server/Makefile |  3 +++
- 4 files changed, 21 insertions(+)
- create mode 100644 drivers/block/ibnbd_server/Kconfig
- create mode 100644 drivers/block/ibnbd_server/Makefile
+ block/bio-integrity.c | 6 ++++--
+ include/linux/bio.h   | 1 +
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index c309e57..e4823c4 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -276,6 +276,7 @@ config BLK_DEV_CRYPTOLOOP
- source "drivers/block/drbd/Kconfig"
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index b5009a8..43a4476 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -238,10 +238,10 @@ static int bio_integrity_process(struct bio *bio,
  
- source "drivers/block/ibnbd_client/Kconfig"
-+source "drivers/block/ibnbd_server/Kconfig"
+ 	iter.disk_name = bio->bi_bdev->bd_disk->disk_name;
+ 	iter.interval = 1 << bi->interval_exp;
+-	iter.seed = bip_get_seed(bip);
++	iter.seed = bip->bip_verify_iter.bi_sector;
+ 	iter.prot_buf = prot_buf;
  
- config BLK_DEV_NBD
- 	tristate "Network block device support"
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index 7da1813..cd20888 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -35,6 +35,7 @@ obj-$(CONFIG_BLK_DEV_HD)	+= hd.o
- obj-$(CONFIG_XEN_BLKDEV_FRONTEND)	+= xen-blkfront.o
- obj-$(CONFIG_XEN_BLKDEV_BACKEND)	+= xen-blkback/
- obj-$(CONFIG_BLK_DEV_IBNBD_CLT)	+= ibnbd_client/
-+obj-$(CONFIG_BLK_DEV_IBNBD_SRV)	+= ibnbd_server/
- obj-$(CONFIG_BLK_DEV_DRBD)     += drbd/
- obj-$(CONFIG_BLK_DEV_RBD)     += rbd.o
- obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
-diff --git a/drivers/block/ibnbd_server/Kconfig b/drivers/block/ibnbd_server/Kconfig
-new file mode 100644
-index 0000000..943e1b2
---- /dev/null
-+++ b/drivers/block/ibnbd_server/Kconfig
-@@ -0,0 +1,16 @@
-+config BLK_DEV_IBNBD_SRV
-+	tristate "Network block device over Infiniband server support"
-+	depends on INFINIBAND_IBTRS_SRV
-+	---help---
-+	  Saying Y here will allow your computer to be a server for network
-+	  block devices over Infiniband, i.e. it will be able to use block
-+	  devices exported by servers (mount file systems on them etc.).
-+	  Communication between client and server works over Infiniband
-+	  networking, but to the client program this is hidden:
-+	  it looks like a regular local file access to a block device
-+	  special file such as /dev/ibnbd0.
-+
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called ibnbd_client.
-+
-+	  If unsure, say N.
-diff --git a/drivers/block/ibnbd_server/Makefile b/drivers/block/ibnbd_server/Makefile
-new file mode 100644
-index 0000000..e66860f
---- /dev/null
-+++ b/drivers/block/ibnbd_server/Makefile
-@@ -0,0 +1,3 @@
-+obj-$(CONFIG_BLK_DEV_IBNBD_SRV) += ibnbd_server.o
-+ibnbd_server-objs 	:= ibnbd_srv.o ibnbd_srv_sysfs.o ibnbd_dev.o \
-+	../ibnbd_lib/ibnbd.o ../ibnbd_lib/ibnbd-proto.o
+-	bio_for_each_segment(bv, bio, bviter) {
++	__bio_for_each_segment(bv, bio, bviter, bip->bip_verify_iter) {
+ 		void *kaddr = kmap_atomic(bv.bv_page);
+ 
+ 		iter.data_buf = kaddr + bv.bv_offset;
+@@ -310,6 +310,7 @@ int bio_integrity_prep(struct bio *bio)
+ 	bip->bip_flags |= BIP_BLOCK_INTEGRITY;
+ 	bip->bip_iter.bi_size = len;
+ 	bip_set_seed(bip, bio->bi_iter.bi_sector);
++	bip->bip_verify_iter = bio->bi_iter;
+ 
+ 	if (bi->flags & BLK_INTEGRITY_IP_CHECKSUM)
+ 		bip->bip_flags |= BIP_IP_CHECKSUM;
+@@ -476,6 +477,7 @@ int bio_integrity_clone(struct bio *bio, struct bio *bio_src,
+ 
+ 	bip->bip_vcnt = bip_src->bip_vcnt;
+ 	bip->bip_iter = bip_src->bip_iter;
++	bip->bip_verify_iter = bip_src->bip_verify_iter;
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 8e52119..00b086a 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -308,6 +308,7 @@ struct bio_integrity_payload {
+ 	struct bio		*bip_bio;	/* parent bio */
+ 
+ 	struct bvec_iter	bip_iter;
++	struct bvec_iter	bip_verify_iter;/* saved orig data iterator */
+ 
+ 	bio_end_io_t		*bip_end_io;	/* saved I/O completion fn */
+ 
 -- 
-2.7.4
+2.9.3
