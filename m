@@ -1,67 +1,24 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 17/25] loop: implement REQ_OP_WRITE_ZEROES
-Date: Fri, 31 Mar 2017 18:33:05 +0200
-Message-Id: <20170331163313.31821-18-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
+Subject: Re: [PATCH] block: do not put mq context in blk_mq_alloc_request_hctx
+To: Minchan Kim <minchan@kernel.org>
+References: <1490851245-32245-1-git-send-email-minchan@kernel.org>
+Cc: kernel-team@lge.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+ Omar Sandoval <osandov@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <8787097b-7da5-3ae7-7896-cd08f5376018@fb.com>
+Date: Thu, 30 Mar 2017 08:12:28 -0600
+MIME-Version: 1.0
+In-Reply-To: <1490851245-32245-1-git-send-email-minchan@kernel.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-It's identical to discard as hole punches will always leave us with
-zeroes on reads.
+On 03/29/2017 11:20 PM, Minchan Kim wrote:
+> In blk_mq_alloc_request_hctx, blk_mq_sched_get_request doesn't
+> get sw context so we don't need to put the context with
+> blk_mq_put_ctx. Unless, we will see preempt counter underflow.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Good catch, that's definitely a bug. I have applied your patch
+for 4.11.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0ecb6461ed81..265cd2e33ff0 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -528,6 +528,7 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
- 	case REQ_OP_FLUSH:
- 		return lo_req_flush(lo, rq);
- 	case REQ_OP_DISCARD:
-+	case REQ_OP_WRITE_ZEROES:
- 		return lo_discard(lo, rq, pos);
- 	case REQ_OP_WRITE:
- 		if (lo->transfer)
-@@ -826,6 +827,7 @@ static void loop_config_discard(struct loop_device *lo)
- 		q->limits.discard_granularity = 0;
- 		q->limits.discard_alignment = 0;
- 		blk_queue_max_discard_sectors(q, 0);
-+		blk_queue_max_write_zeroes_sectors(q, 0);
- 		q->limits.discard_zeroes_data = 0;
- 		queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, q);
- 		return;
-@@ -834,6 +836,7 @@ static void loop_config_discard(struct loop_device *lo)
- 	q->limits.discard_granularity = inode->i_sb->s_blocksize;
- 	q->limits.discard_alignment = 0;
- 	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-+	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
- 	q->limits.discard_zeroes_data = 1;
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
- }
-@@ -1660,6 +1663,7 @@ static int loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	switch (req_op(cmd->rq)) {
- 	case REQ_OP_FLUSH:
- 	case REQ_OP_DISCARD:
-+	case REQ_OP_WRITE_ZEROES:
- 		cmd->use_aio = false;
- 		break;
- 	default:
 -- 
-2.11.0
+Jens Axboe
