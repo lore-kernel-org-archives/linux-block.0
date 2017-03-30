@@ -1,49 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:36740 "EHLO
-        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754234AbdC1Uhz (ORCPT
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:47879 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934103AbdC3PXZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2017 16:37:55 -0400
-Received: by mail-qk0-f196.google.com with SMTP id r142so10359449qke.3
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2017 13:37:54 -0700 (PDT)
-From: Josef Bacik <josef@toxicpanda.com>
-To: linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: [PATCH] block-mq: don't re-queue if we get a queue error
-Date: Tue, 28 Mar 2017 16:37:52 -0400
-Message-Id: <1490733472-3088-1-git-send-email-jbacik@fb.com>
+        Thu, 30 Mar 2017 11:23:25 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@fb.com" <axboe@fb.com>
+CC: "osandov@fb.com" <osandov@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] blk-mq: Export queue state through
+ /sys/kernel/debug/block/*/state
+Date: Thu, 30 Mar 2017 15:23:15 +0000
+Message-ID: <1490887381.2753.5.camel@sandisk.com>
+References: <1D08B61A9CF0974AA09887BE32D889DA12B851@ULS-OP-MBXIP03.sdcorp.global.sandisk.com>
+         <824697ce-3fe4-f7ab-e23b-237b280196fb@suse.de>
+         <1490886955.2753.3.camel@sandisk.com>
+         <fe04eba2-a67d-9e02-83f4-1f519f79ed4b@fb.com>
+In-Reply-To: <fe04eba2-a67d-9e02-83f4-1f519f79ed4b@fb.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When try to issue a request directly and we fail we will requeue the
-request, but call blk_mq_end_request() as well.  This leads to the
-completed request being on a queuelist and getting ended twice, which
-causes list corruption in schedulers and other shenanigans.
+On Thu, 2017-03-30 at 09:19 -0600, Jens Axboe wrote:
+> On 03/30/2017 09:16 AM, Bart Van Assche wrote:
+> > On Thu, 2017-03-30 at 07:50 +0200, Hannes Reinecke wrote:
+> > > On 03/29/2017 10:20 PM, Bart Van Assche wrote:
+> > > > Make it possible to check whether or not a block layer queue has
+> > > > been stopped. Make it possible to run a blk-mq queue from user
+> > > > space.
+> > > >=20
+> > > > Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> > > > Cc: Omar Sandoval <osandov@fb.com>
+> > > > Cc: Hannes Reinecke <hare@suse.com>
+> > > > ---
+> > > >  block/blk-mq-debugfs.c | 84 ++++++++++++++++++++++++++++++++++++++=
+++++++++++++
+> > > >  1 file changed, 84 insertions(+)
+> > > >=20
+> > >=20
+> > > About bloody time :-)
+> > >=20
+> > > Reviewed-by: Hannes Reinecke <hare@suse.com>
+> >=20
+> > Hello Hannes,
+> >=20
+> > Thanks for the review :-) However, had you noticed that I had already
+> > posted a v2 of this patch? Anyway, since I have improved v2 further
+> > after I had posted it, I will post a v3 today.
+>=20
+> I didn't see a v2 posting?
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- block/blk-mq.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Hello Jens,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 08a49c6..c5a6985 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1457,8 +1457,6 @@ static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
- 		return;
- 	}
- 
--	__blk_mq_requeue_request(rq);
--
- 	if (ret == BLK_MQ_RQ_QUEUE_ERROR) {
- 		*cookie = BLK_QC_T_NONE;
- 		rq->errors = -EIO;
-@@ -1466,6 +1464,7 @@ static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
- 		return;
- 	}
- 
-+	__blk_mq_requeue_request(rq);
- insert:
- 	blk_mq_sched_insert_request(rq, false, true, false, may_sleep);
- }
--- 
-2.7.4
+The label "v2" was missing from the subject, maybe that's why it didn't get
+noticed. Anyway, v2 is available e.g. at URL
+http://marc.info/?l=3Dlinux-block&m=3D149082319230648.
+
+Bart.=
