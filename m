@@ -1,47 +1,153 @@
-Subject: Re: [PATCH] zram: set physical queue limits to avoid array out of
- bounds accesses
-To: Minchan Kim <minchan@kernel.org>, Johannes Thumshirn <jthumshirn@suse.de>
-References: <20170306102335.9180-1-jthumshirn@suse.de>
- <20170307052242.GA29458@bbox> <95c31a93-32cd-ad06-6cc0-e11b42ec2f68@suse.de>
- <CAEwNFnAb4x+sm6=vWd1W4Xj7Snp1V_LtRRx9ORFKpm1b-58kyw@mail.gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:34500 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933206AbdC3PII (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Mar 2017 11:08:08 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170309052829.GA854@bbox>
+References: <20170306102335.9180-1-jthumshirn@suse.de> <20170307052242.GA29458@bbox>
+ <95c31a93-32cd-ad06-6cc0-e11b42ec2f68@suse.de> <CAEwNFnAb4x+sm6=vWd1W4Xj7Snp1V_LtRRx9ORFKpm1b-58kyw@mail.gmail.com>
  <ed4d83a1-9bdd-9e24-7768-ba5e85429110@suse.de> <20170307085545.GA538@bbox>
  <10a2335c-0ed0-43de-1cbd-625845301aef@suse.de> <20170308051118.GA11206@bbox>
  <1073055f-e71b-bb07-389a-53b60ccdee20@suse.de> <20170309052829.GA854@bbox>
- <CAEwNFnBnEObVdjqNdvh_-Dc0ryDjeW3c1qVdfOCbbyQREaDdqA@mail.gmail.com>
+From: Minchan Kim <minchan@kernel.org>
+Date: Fri, 31 Mar 2017 00:08:05 +0900
+Message-ID: <CAEwNFnBnEObVdjqNdvh_-Dc0ryDjeW3c1qVdfOCbbyQREaDdqA@mail.gmail.com>
+Subject: Re: [PATCH] zram: set physical queue limits to avoid array out of
+ bounds accesses
+To: Johannes Thumshirn <jthumshirn@suse.de>, Jens Axboe <axboe@fb.com>
 Cc: Hannes Reinecke <hare@suse.de>, Nitin Gupta <ngupta@vflare.org>,
- Christoph Hellwig <hch@lst.de>,
- Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>, yizhan@redhat.com,
- Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
- Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <d5ad0aeb-0a8f-5ebd-f788-c6f6d92b76cf@fb.com>
-Date: Thu, 30 Mar 2017 09:35:56 -0600
-MIME-Version: 1.0
-In-Reply-To: <CAEwNFnBnEObVdjqNdvh_-Dc0ryDjeW3c1qVdfOCbbyQREaDdqA@mail.gmail.com>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+        Christoph Hellwig <hch@lst.de>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        yizhan@redhat.com,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 03/30/2017 09:08 AM, Minchan Kim wrote:
-> Hi Jens,
-> 
-> It seems you miss this.
-> Could you handle this?
+Hi Jens,
 
-I can, but I'm a little confused. The comment talks about replacing
-the one I merged with this one, I can't do that. I'm assuming you
-are talking about this commit:
+It seems you miss this.
+Could you handle this?
 
-commit 0bc315381fe9ed9fb91db8b0e82171b645ac008f
-Author: Johannes Thumshirn <jthumshirn@suse.de>
-Date:   Mon Mar 6 11:23:35 2017 +0100
+Thanks.
 
-    zram: set physical queue limits to avoid array out of bounds accesses
+On Thu, Mar 9, 2017 at 2:28 PM, Minchan Kim <minchan@kernel.org> wrote:
 
-which is in mainline. The patch still applies, though.
+< snip>
 
-Do we really REALLY need this for 4.11, or can we queue for 4.12 and
-mark it stable?
+> Jens, Could you replace the one merged with this? And I don't want
+> to add stable mark in this patch because I feel it need enough
+> testing in 64K page system I don't have. ;(
+>
+> From bb73e75ab0e21016f60858fd61e7dc6a6813e359 Mon Sep 17 00:00:00 2001
+> From: Minchan Kim <minchan@kernel.org>
+> Date: Thu, 9 Mar 2017 14:00:40 +0900
+> Subject: [PATCH] zram: handle multiple pages attached bio's bvec
+>
+> Johannes Thumshirn reported system goes the panic when using NVMe over
+> Fabrics loopback target with zram.
+>
+> The reason is zram expects each bvec in bio contains a single page
+> but nvme can attach a huge bulk of pages attached to the bio's bvec
+> so that zram's index arithmetic could be wrong so that out-of-bound
+> access makes panic.
+>
+> This patch solves the problem via removing the limit(a bvec should
+> contains a only single page).
+>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Reported-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Tested-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Signed-off-by: Minchan Kim <minchan@kernel.org>
+> ---
+> I don't add stable mark intentionally because I think it's rather risky
+> without enough testing on 64K page system(ie, partial IO part).
+>
+> Thanks for the help, Johannes and Hannes!!
+>
+>  drivers/block/zram/zram_drv.c | 37 ++++++++++---------------------------
+>  1 file changed, 10 insertions(+), 27 deletions(-)
+>
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index 01944419b1f3..fefdf260503a 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -137,8 +137,7 @@ static inline bool valid_io_request(struct zram *zram,
+>
+>  static void update_position(u32 *index, int *offset, struct bio_vec *bvec)
+>  {
+> -       if (*offset + bvec->bv_len >= PAGE_SIZE)
+> -               (*index)++;
+> +       *index  += (*offset + bvec->bv_len) / PAGE_SIZE;
+>         *offset = (*offset + bvec->bv_len) % PAGE_SIZE;
+>  }
+>
+> @@ -838,34 +837,20 @@ static void __zram_make_request(struct zram *zram, struct bio *bio)
+>         }
+>
+>         bio_for_each_segment(bvec, bio, iter) {
+> -               int max_transfer_size = PAGE_SIZE - offset;
+> -
+> -               if (bvec.bv_len > max_transfer_size) {
+> -                       /*
+> -                        * zram_bvec_rw() can only make operation on a single
+> -                        * zram page. Split the bio vector.
+> -                        */
+> -                       struct bio_vec bv;
+> -
+> -                       bv.bv_page = bvec.bv_page;
+> -                       bv.bv_len = max_transfer_size;
+> -                       bv.bv_offset = bvec.bv_offset;
+> +               struct bio_vec bv = bvec;
+> +               unsigned int remained = bvec.bv_len;
+>
+> +               do {
+> +                       bv.bv_len = min_t(unsigned int, PAGE_SIZE, remained);
+>                         if (zram_bvec_rw(zram, &bv, index, offset,
+> -                                        op_is_write(bio_op(bio))) < 0)
+> +                                       op_is_write(bio_op(bio))) < 0)
+>                                 goto out;
+>
+> -                       bv.bv_len = bvec.bv_len - max_transfer_size;
+> -                       bv.bv_offset += max_transfer_size;
+> -                       if (zram_bvec_rw(zram, &bv, index + 1, 0,
+> -                                        op_is_write(bio_op(bio))) < 0)
+> -                               goto out;
+> -               } else
+> -                       if (zram_bvec_rw(zram, &bvec, index, offset,
+> -                                        op_is_write(bio_op(bio))) < 0)
+> -                               goto out;
+> +                       bv.bv_offset += bv.bv_len;
+> +                       remained -= bv.bv_len;
+>
+> -               update_position(&index, &offset, &bvec);
+> +                       update_position(&index, &offset, &bv);
+> +               } while (remained);
+>         }
+>
+>         bio_endio(bio);
+> @@ -882,8 +867,6 @@ static blk_qc_t zram_make_request(struct request_queue *queue, struct bio *bio)
+>  {
+>         struct zram *zram = queue->queuedata;
+>
+> -       blk_queue_split(queue, &bio, queue->bio_split);
+> -
+>         if (!valid_io_request(zram, bio->bi_iter.bi_sector,
+>                                         bio->bi_iter.bi_size)) {
+>                 atomic64_inc(&zram->stats.invalid_io);
+> --
+> 2.7.4
+>
+>
+
+
 
 -- 
-Jens Axboe
+Kind regards,
+Minchan Kim
