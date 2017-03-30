@@ -1,90 +1,67 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH 2/2] blk-mq: Show symbolic names for hctx state and flags
-Date: Thu, 30 Mar 2017 11:21:27 -0700
-Message-ID: <20170330182127.24288-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170330182127.24288-1-bart.vanassche@sandisk.com>
-References: <20170330182127.24288-1-bart.vanassche@sandisk.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "agk\@redhat.com" <agk@redhat.com>,
+        "lars.ellenberg\@linbit.com" <lars.ellenberg@linbit.com>,
+        "snitzer\@redhat.com" <snitzer@redhat.com>, "hch\@lst.de" <hch@lst.de>,
+        "martin.petersen\@oracle.com" <martin.petersen@oracle.com>,
+        "philipp.reisner\@linbit.com" <philipp.reisner@linbit.com>,
+        "axboe\@kernel.dk" <axboe@kernel.dk>,
+        "shli\@kernel.org" <shli@kernel.org>,
+        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel\@redhat.com" <dm-devel@redhat.com>,
+        "drbd-dev\@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-raid\@vger.kernel.org" <linux-raid@vger.kernel.org>
+Subject: Re: [PATCH 03/23] sd: implement REQ_OP_WRITE_ZEROES
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170323143341.31549-1-hch@lst.de>
+	<20170323143341.31549-4-hch@lst.de>
+	<1490726988.2573.16.camel@sandisk.com>
+Date: Wed, 29 Mar 2017 22:25:33 -0400
+In-Reply-To: <1490726988.2573.16.camel@sandisk.com> (Bart Van Assche's message
+	of "Tue, 28 Mar 2017 18:50:01 +0000")
+Message-ID: <yq1o9wj4i1u.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of showing the hctx state and flags as numbers, show the
-names of the flags.
+Bart Van Assche <Bart.VanAssche@sandisk.com> writes:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
+Hi Bart,
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 9e86056d47cd..91d09f58a596 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -183,11 +183,19 @@ static const struct file_operations queue_poll_stat_fops = {
- 	.release	= single_release,
- };
- 
-+static const char *const hctx_state_name[] = {
-+	[BLK_MQ_S_STOPPED]	 = "STOPPED",
-+	[BLK_MQ_S_TAG_ACTIVE]	 = "TAG_ACTIVE",
-+	[BLK_MQ_S_SCHED_RESTART] = "SCHED_RESTART",
-+	[BLK_MQ_S_TAG_WAITING]	 = "TAG_WAITING",
-+
-+};
- static int hctx_state_show(struct seq_file *m, void *v)
- {
- 	struct blk_mq_hw_ctx *hctx = m->private;
- 
--	seq_printf(m, "0x%lx\n", hctx->state);
-+	blk_flags_show(m, hctx->state, hctx_state_name,
-+		       ARRAY_SIZE(hctx_state_name));
- 	return 0;
- }
- 
-@@ -203,11 +211,34 @@ static const struct file_operations hctx_state_fops = {
- 	.release	= single_release,
- };
- 
-+static const char *const alloc_policy_name[] = {
-+	[BLK_TAG_ALLOC_FIFO]	= "fifo",
-+	[BLK_TAG_ALLOC_RR]	= "rr",
-+};
-+
-+static const char *const hctx_flag_name[] = {
-+	[ilog2(BLK_MQ_F_SHOULD_MERGE)]	= "SHOULD_MERGE",
-+	[ilog2(BLK_MQ_F_TAG_SHARED)]	= "TAG_SHARED",
-+	[ilog2(BLK_MQ_F_SG_MERGE)]	= "SG_MERGE",
-+	[ilog2(BLK_MQ_F_BLOCKING)]	= "BLOCKING",
-+	[ilog2(BLK_MQ_F_NO_SCHED)]	= "NO_SCHED",
-+};
-+
- static int hctx_flags_show(struct seq_file *m, void *v)
- {
- 	struct blk_mq_hw_ctx *hctx = m->private;
--
--	seq_printf(m, "0x%lx\n", hctx->flags);
-+	const int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(hctx->flags);
-+
-+	seq_puts(m, "alloc_policy=");
-+	if (alloc_policy < ARRAY_SIZE(alloc_policy_name) &&
-+	    alloc_policy_name[alloc_policy])
-+		seq_puts(m, alloc_policy_name[alloc_policy]);
-+	else
-+		seq_printf(m, "%d", alloc_policy);
-+	seq_puts(m, " ");
-+	blk_flags_show(m,
-+		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
-+		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
- 	return 0;
- }
- 
+> A quote from SBC: "An OPTIMAL UNMAP GRANULARITY field set to a
+> non-zero value indicates the optimal granularity in logical blocks for
+> unmap requests (e.g., an UNMAP command or a WRITE SAME (16) command
+> with the UNMAP bit set to one).  An unmap request with a number of
+> logical blocks that is not a multiple of this value may result in
+> unmap operations on fewer LBAs than requested."
+
+Indeed. Fewer LBAs than requested may be *unmapped*. That does not imply
+that they are not *written*.
+
+> This means that just like the start and end of a discard must be
+> aligned on a discard_granularity boundary, WRITE SAME commands with
+> the UNMAP bit set must also respect that granularity. I think this
+> means that either __blkdev_issue_zeroout() has to be modified such
+> that it rejects unaligned REQ_OP_WRITE_ZEROES operations or that
+> blk_bio_write_same_split() has to be modified such that it generates
+> REQ_OP_WRITEs for the unaligned start and tail.
+
+No, that's not correct. SBC states:
+
+"a) if the Data-Out Buffer of the WRITE SAME command is the same as the
+   logical block data returned by a read operation from that LBA while
+   in the unmapped state, then:
+
+   1) the device server performs the actions described in table 6
+      [unmap]; and
+
+   2) if an unmap operation is not performed in step 1), then the device
+      server shall perform the specified write operation to that LBA;"
+
+I.e. With WRITE SAME it is the responsibility of the device server to
+write any LBAs described by the command that were not successfully
+unmapped.
+
 -- 
-2.12.0
+Martin K. Petersen	Oracle Linux Engineering
