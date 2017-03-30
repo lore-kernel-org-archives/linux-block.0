@@ -1,68 +1,33 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 08/16] block, bfq: preserve a low latency also with NCQ-capable drives
-Date: Fri, 31 Mar 2017 14:47:35 +0200
-Message-Id: <20170331124743.3530-9-paolo.valente@linaro.org>
-In-Reply-To: <20170331124743.3530-1-paolo.valente@linaro.org>
-References: <20170331124743.3530-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:36362 "EHLO
+        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933002AbdC3Nto (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Mar 2017 09:49:44 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 0/8] block: T10/DIF Fixes and cleanups
+Date: Thu, 30 Mar 2017 17:49:28 +0400
+Message-Id: <1490881776-28735-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-I/O schedulers typically allow NCQ-capable drives to prefetch I/O
-requests, as NCQ boosts the throughput exactly by prefetching and
-internally reordering requests.
+This patch set fix various problems spotted during T10/DIF integrity machinery testing.
 
-Unfortunately, as discussed in detail and shown experimentally in [1],
-this may cause fairness and latency guarantees to be violated. The
-main problem is that the internal scheduler of an NCQ-capable drive
-may postpone the service of some unlucky (prefetched) requests as long
-as it deems serving other requests more appropriate to boost the
-throughput.
+TOC:
+## General bulletproof protection for block layer
+0001 Guard bvec iteration logic
+## Fix various bugs in T10/DIF/DIX infrastructure
+0002 bio integrity: Do not allocate integrity context for 
+0003 bio integrity: save original iterator for verify stag
+0004 bio integrity: bio_trim should truncate integrity vec
+0005 bio integrity: fix interface for bio_integrity_trim
+## Cleanup T10/DIF/DIX infrastructure
+0006 bio integrity add bio_integrity_setup helper
+0007 T10 Move opencoded contants to common header
+## Fix tcm_fileio info leak
+0008 tcm_fileio: Prevent information leak for short reads
 
-This patch addresses this issue by not disabling device idling for
-weight-raised queues, even if the device supports NCQ. This allows BFQ
-to start serving a new queue, and therefore allows the drive to
-prefetch new requests, only after the idling timeout expires. At that
-time, all the outstanding requests of the expired queue have been most
-certainly served.
-
-[1] P. Valente and M. Andreolini, "Improving Application
-    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
-    the 5th Annual International Systems and Storage Conference
-    (SYSTOR '12), June 2012.
-    Slightly extended version:
-    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
-							results.pdf
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
----
- block/bfq-iosched.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 9994962..c43a737 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6233,7 +6233,8 @@ static void bfq_update_idle_window(struct bfq_data *bfqd,
- 
- 	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
- 	    bfqd->bfq_slice_idle == 0 ||
--		(bfqd->hw_tag && BFQQ_SEEKY(bfqq)))
-+		(bfqd->hw_tag && BFQQ_SEEKY(bfqq) &&
-+			bfqq->wr_coeff == 1))
- 		enable_idle = 0;
- 	else if (bfq_sample_valid(bfqq->ttime.ttime_samples)) {
- 		if (bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle &&
--- 
-2.10.0
+Testcase: http://marc.info/?l=linux-scsi&m=149087997013452&w=2
