@@ -1,82 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45469 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751242AbdCMPOR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Mar 2017 11:14:17 -0400
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        Tejun Heo <tj@kernel.org>, Tahsin Erdogan <tahsin@google.com>,
-        Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 09/11] block: Fix oops in locked_inode_to_wb_and_lock_list()
-Date: Mon, 13 Mar 2017 16:14:08 +0100
-Message-Id: <20170313151410.5586-10-jack@suse.cz>
-In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
-References: <20170313151410.5586-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Thu, 30 Mar 2017 10:49:43 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: Bart Van Assche <Bart.VanAssche@sandisk.com>, "hch@lst.de" <hch@lst.de>,
+	"tj@kernel.org" <tj@kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+Subject: Re: [PATCH 1/7] =?utf-8?B?0ZVk?=
+	=?utf-8?Q?=3A?= split sd_setup_discard_cmnd
+Message-ID: <20170330084943.GA12015@lst.de>
+References: <20170320204319.12628-1-hch@lst.de> <20170320204319.12628-2-hch@lst.de> <1490653474.7897.13.camel@sandisk.com> <20170328140509.GA27578@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170328140509.GA27578@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-When block device is closed, we call inode_detach_wb() in __blkdev_put()
-which sets inode->i_wb to NULL. That is contrary to expectations that
-inode->i_wb stays valid once set during the whole inode's lifetime and
-leads to oops in wb_get() in locked_inode_to_wb_and_lock_list() because
-inode_to_wb() returned NULL.
+On Tue, Mar 28, 2017 at 08:05:09AM -0600, axboe@kernel.dk wrote:
+> > Although I know this is an issue in the existing code and not something
+> > introduced by you: please consider using logical_to_sectors() instead of
+> > open-coding this function. Otherwise this patch looks fine to me.
+> 
+> The downside of doing that is that we still call ilog2() twice, which
+> sucks. Would be faster to cache ilog2(sector_size) and use that in the
+> shift calculation.
 
-The reason why we called inode_detach_wb() is not valid anymore though.
-BDI is guaranteed to stay along until we call bdi_put() from
-bdev_evict_inode() so we can postpone calling inode_detach_wb() to that
-moment.
-
-Also add a warning to catch if someone uses inode_detach_wb() in a
-dangerous way.
-
-Reported-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/block_dev.c            | 8 ++------
- include/linux/writeback.h | 1 +
- 2 files changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 5ec8750f5332..c66f5dd4a02a 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -885,6 +885,8 @@ static void bdev_evict_inode(struct inode *inode)
- 	spin_lock(&bdev_lock);
- 	list_del_init(&bdev->bd_list);
- 	spin_unlock(&bdev_lock);
-+	/* Detach inode from wb early as bdi_put() may free bdi->wb */
-+	inode_detach_wb(inode);
- 	if (bdev->bd_bdi != &noop_backing_dev_info) {
- 		bdi_put(bdev->bd_bdi);
- 		bdev->bd_bdi = &noop_backing_dev_info;
-@@ -1880,12 +1882,6 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
- 		kill_bdev(bdev);
- 
- 		bdev_write_inode(bdev);
--		/*
--		 * Detaching bdev inode from its wb in __destroy_inode()
--		 * is too late: the queue which embeds its bdi (along with
--		 * root wb) can be gone as soon as we put_disk() below.
--		 */
--		inode_detach_wb(bdev->bd_inode);
- 	}
- 	if (bdev->bd_contains == bdev) {
- 		if (disk->fops->release)
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index a3c0cbd7c888..d5815794416c 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -237,6 +237,7 @@ static inline void inode_attach_wb(struct inode *inode, struct page *page)
- static inline void inode_detach_wb(struct inode *inode)
- {
- 	if (inode->i_wb) {
-+		WARN_ON_ONCE(!(inode->i_state & I_CLEAR));
- 		wb_put(inode->i_wb);
- 		inode->i_wb = NULL;
- 	}
--- 
-2.10.2
+I suspect that gcc is smart enough to optimize it away.  That beeing said
+while this looks like a nice cleanup this patch is just supposed to move
+code, so I'd rather not add the change here and leave it for a separate
+submission.
