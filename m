@@ -1,55 +1,71 @@
-Return-Path: <prvs=425928092f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
-        <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 08/18] blk-throttle: make sure expire time isn't too big
-Date: Mon, 27 Mar 2017 10:51:36 -0700
-Message-ID: <6bab8d46094d0076e9adda080d80c7ca0b9947f6.1490634565.git.shli@fb.com>
-In-Reply-To: <cover.1490634565.git.shli@fb.com>
-References: <cover.1490634565.git.shli@fb.com>
+Return-Path: <helgaas@kernel.org>
+Date: Thu, 30 Mar 2017 16:06:17 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Cc: Linux Media Mailing List <linux-media@vger.kernel.org>,
+	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+	Mauro Carvalho Chehab <mchehab@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>, Bjorn Helgaas <bhelgaas@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	James Morris <james.l.morris@oracle.com>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Jan Kara <jack@suse.cz>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Mel Gorman <mgorman@techsingularity.net>,
+	Michal Hocko <mhocko@suse.com>,
+	Hillf Danton <hillf.zj@alibaba-inc.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>, zijun_hu <zijun_hu@htc.com>,
+	Chris Wilson <chris@chris-wilson.co.uk>,
+	Andrey Ryabinin <aryabinin@virtuozzo.com>,
+	linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-mm@kvack.org,
+	linux-security-module@vger.kernel.org
+Subject: Re: [PATCH 9/9] kernel-api.rst: fix a series of errors when parsing
+ C files
+Message-ID: <20170330210617.GA28207@bhelgaas-glaptop.roam.corp.google.com>
+References: <cover.1490904090.git.mchehab@s-opensource.com>
+ <5c39bc852b201759de4cf901f7e9ad04715285d9.1490904090.git.mchehab@s-opensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5c39bc852b201759de4cf901f7e9ad04715285d9.1490904090.git.mchehab@s-opensource.com>
 List-ID: <linux-block@vger.kernel.org>
 
-cgroup could be throttled to a limit but when all cgroups cross high
-limit, queue enters a higher state and so the group should be throttled
-to a higher limit. It's possible the cgroup is sleeping because of
-throttle and other cgroups don't dispatch IO any more. In this case,
-nobody can trigger current downgrade/upgrade logic. To fix this issue,
-we could either set up a timer to wakeup the cgroup if other cgroups are
-idle or make sure this cgroup doesn't sleep too long. Setting up a timer
-means we must change the timer very frequently. This patch chooses the
-latter. Making cgroup sleep time not too big wouldn't change cgroup
-bps/iops, but could make it wakeup more frequently, which isn't a big
-issue because throtl_slice * 8 is already quite big.
+On Thu, Mar 30, 2017 at 05:11:36PM -0300, Mauro Carvalho Chehab wrote:
+> ./lib/string.c:134: WARNING: Inline emphasis start-string without end-string.
+> ./mm/filemap.c:522: WARNING: Inline interpreted text or phrase reference start-string without end-string.
+> ./mm/filemap.c:1283: ERROR: Unexpected indentation.
+> ./mm/filemap.c:3003: WARNING: Inline interpreted text or phrase reference start-string without end-string.
+> ./mm/vmalloc.c:1544: WARNING: Inline emphasis start-string without end-string.
+> ./mm/page_alloc.c:4245: ERROR: Unexpected indentation.
+> ./ipc/util.c:676: ERROR: Unexpected indentation.
+> ./drivers/pci/irq.c:35: WARNING: Block quote ends without a blank line; unexpected unindent.
+> ./security/security.c:109: ERROR: Unexpected indentation.
+> ./security/security.c:110: WARNING: Definition list ends without a blank line; unexpected unindent.
+> ./block/genhd.c:275: WARNING: Inline strong start-string without end-string.
+> ./block/genhd.c:283: WARNING: Inline strong start-string without end-string.
+> ./include/linux/clk.h:134: WARNING: Inline emphasis start-string without end-string.
+> ./include/linux/clk.h:134: WARNING: Inline emphasis start-string without end-string.
+> ./ipc/util.c:477: ERROR: Unknown target name: "s".
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab@s-opensource.com>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>	# for drivers/pci/irq.c
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 7878ec1..2073b48 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -590,6 +590,17 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
-+	unsigned long max_expire = jiffies + 8 * throtl_slice;
-+
-+	/*
-+	 * Since we are adjusting the throttle limit dynamically, the sleep
-+	 * time calculated according to previous limit might be invalid. It's
-+	 * possible the cgroup sleep time is very long and no other cgroups
-+	 * have IO running so notify the limit changes. Make sure the cgroup
-+	 * doesn't sleep too long to avoid the missed notification.
-+	 */
-+	if (time_after(expires, max_expire))
-+		expires = max_expire;
- 	mod_timer(&sq->pending_timer, expires);
- 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
- 		   expires - jiffies, jiffies);
--- 
-2.9.3
+> diff --git a/drivers/pci/irq.c b/drivers/pci/irq.c
+> index 6684f153ab57..f9f2a0324ecc 100644
+> --- a/drivers/pci/irq.c
+> +++ b/drivers/pci/irq.c
+> @@ -31,7 +31,7 @@ static void pci_note_irq_problem(struct pci_dev *pdev, const char *reason)
+>   * driver).
+>   *
+>   * Returns:
+> - *  a suggestion for fixing it (although the driver is not required to
+> + * a suggestion for fixing it (although the driver is not required to
+>   * act on this).
+>   */
+>  enum pci_lost_interrupt_reason pci_lost_interrupt(struct pci_dev *pdev)
