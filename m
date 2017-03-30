@@ -1,49 +1,23 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO11.lge.com ([156.147.23.51]:58681 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932196AbdC3FUu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2017 01:20:50 -0400
-From: Minchan Kim <minchan@kernel.org>
-To: Jens Axboe <axboe@fb.com>
-Cc: kernel-team@lge.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Minchan Kim <minchan@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] block: do not put mq context in blk_mq_alloc_request_hctx
-Date: Thu, 30 Mar 2017 14:20:45 +0900
-Message-Id: <1490851245-32245-1-git-send-email-minchan@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: fix schedule-under-preempt for blocking drivers
+To: Christoph Hellwig <hch@lst.de>
+References: <b298fcf4-47bc-b2e1-7c8f-b4affe347501@kernel.dk>
+ <20170330182825.GA25277@lst.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Josef Bacik <josef@toxicpanda.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <99c16b2f-53a8-12c3-f590-bdc4d2abb3ed@kernel.dk>
+Date: Thu, 30 Mar 2017 12:30:10 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170330182825.GA25277@lst.de>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-In blk_mq_alloc_request_hctx, blk_mq_sched_get_request doesn't
-get sw context so we don't need to put the context with
-blk_mq_put_ctx. Unless, we will see preempt counter underflow.
+On 03/30/2017 12:28 PM, Christoph Hellwig wrote:
+> Oh, I need to add one of the blocking drivers to my test runs..
 
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Jens Axboe <axboe@fb.com>
-Signed-off-by: Minchan Kim <minchan@kernel.org>
----
+I was just thinking that too. The easiest would be to add a BLOCKING
+mode to null_blk.
 
-Maybe, it would be fixed by someone but I have noticed preempt counter
-undeflow problem a few weeks ago and still see the problem with
-linux-next.
-
- block/blk-mq.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a4546f060e80..a6f3998dc4ee 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -321,7 +321,6 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- 
- 	rq = blk_mq_sched_get_request(q, NULL, rw, &alloc_data);
- 
--	blk_mq_put_ctx(alloc_data.ctx);
- 	blk_queue_exit(q);
- 
- 	if (!rq)
 -- 
-2.7.4
+Jens Axboe
