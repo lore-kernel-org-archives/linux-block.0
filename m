@@ -1,78 +1,74 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>, Miklos Szeredi <miklos@szeredi.hu>
-Subject: [PATCH 17/25] fuse: Get rid of bdi_initialized
-Date: Wed, 29 Mar 2017 12:56:15 +0200
-Message-Id: <20170329105623.18241-18-jack@suse.cz>
-In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
-References: <20170329105623.18241-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:34455 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933964AbdC3Ntr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Mar 2017 09:49:47 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 2/8] bio-integrity: Do not allocate integrity context for bio w/o data
+Date: Thu, 30 Mar 2017 17:49:30 +0400
+Message-Id: <1490881776-28735-3-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1490881776-28735-1-git-send-email-dmonakhov@openvz.org>
+References: <1490881776-28735-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is not needed anymore since bdi is initialized whenever superblock
-exists.
+If bio has no data, such as ones from blkdev_issue_flush(),
+then we have nothing to protect.
 
-CC: Miklos Szeredi <miklos@szeredi.hu>
-CC: linux-fsdevel@vger.kernel.org
-Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
+This patch prevent bugon like follows:
+
+kfree_debugcheck: out of range ptr ac1fa1d106742a5ah
+kernel BUG at mm/slab.c:2773!
+invalid opcode: 0000 [#1] SMP
+Modules linked in: bcache
+CPU: 0 PID: 4428 Comm: xfs_io Tainted: G        W       4.11.0-rc4-ext4-00041-g2ef0043-dirty #43
+Hardware name: Virtuozzo KVM, BIOS seabios-1.7.5-11.vz7.4 04/01/2014
+task: ffff880137786440 task.stack: ffffc90000ba8000
+RIP: 0010:kfree_debugcheck+0x25/0x2a
+RSP: 0018:ffffc90000babde0 EFLAGS: 00010082
+RAX: 0000000000000034 RBX: ac1fa1d106742a5a RCX: 0000000000000007
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88013f3ccb40
+RBP: ffffc90000babde8 R08: 0000000000000000 R09: 0000000000000000
+R10: 00000000fcb76420 R11: 00000000725172ed R12: 0000000000000282
+R13: ffffffff8150e766 R14: ffff88013a145e00 R15: 0000000000000001
+FS:  00007fb09384bf40(0000) GS:ffff88013f200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd0172f9e40 CR3: 0000000137fa9000 CR4: 00000000000006f0
+Call Trace:
+ kfree+0xc8/0x1b3
+ bio_integrity_free+0xc3/0x16b
+ bio_free+0x25/0x66
+ bio_put+0x14/0x26
+ blkdev_issue_flush+0x7a/0x85
+ blkdev_fsync+0x35/0x42
+ vfs_fsync_range+0x8e/0x9f
+ vfs_fsync+0x1c/0x1e
+ do_fsync+0x31/0x4a
+ SyS_fsync+0x10/0x14
+ entry_SYSCALL_64_fastpath+0x1f/0xc2
+
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- fs/fuse/dev.c    | 5 ++---
- fs/fuse/fuse_i.h | 3 ---
- fs/fuse/inode.c  | 2 --
- 3 files changed, 2 insertions(+), 8 deletions(-)
+ block/bio-integrity.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
-index 78887f68ee6a..c2d7f3a92679 100644
---- a/fs/fuse/dev.c
-+++ b/fs/fuse/dev.c
-@@ -382,7 +382,7 @@ static void request_end(struct fuse_conn *fc, struct fuse_req *req)
- 			wake_up(&fc->blocked_waitq);
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 5384713..b5009a8 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -175,6 +175,9 @@ bool bio_integrity_enabled(struct bio *bio)
+ 	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
+ 		return false;
  
- 		if (fc->num_background == fc->congestion_threshold &&
--		    fc->connected && fc->bdi_initialized) {
-+		    fc->connected && fc->sb) {
- 			clear_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
- 			clear_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
- 		}
-@@ -573,8 +573,7 @@ void fuse_request_send_background_locked(struct fuse_conn *fc,
- 	fc->num_background++;
- 	if (fc->num_background == fc->max_background)
- 		fc->blocked = 1;
--	if (fc->num_background == fc->congestion_threshold &&
--	    fc->bdi_initialized) {
-+	if (fc->num_background == fc->congestion_threshold && fc->sb) {
- 		set_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
- 		set_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
- 	}
-diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
-index 0e7c79a390e0..f33341d9501a 100644
---- a/fs/fuse/fuse_i.h
-+++ b/fs/fuse/fuse_i.h
-@@ -527,9 +527,6 @@ struct fuse_conn {
- 	/** Filesystem supports NFS exporting.  Only set in INIT */
- 	unsigned export_support:1;
- 
--	/** Set if bdi is valid */
--	unsigned bdi_initialized:1;
--
- 	/** write-back cache policy (default is write-through) */
- 	unsigned writeback_cache:1;
- 
-diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-index 90bacbc87fb3..73cf05135252 100644
---- a/fs/fuse/inode.c
-+++ b/fs/fuse/inode.c
-@@ -983,8 +983,6 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
- 	/* fuse does it's own writeback accounting */
- 	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
- 
--	fc->bdi_initialized = 1;
--
- 	/*
- 	 * For a single fuse filesystem use max 1% of dirty +
- 	 * writeback threshold.
++	if (!bio_sectors(bio))
++		return false;
++
+ 	/* Already protected? */
+ 	if (bio_integrity(bio))
+ 		return false;
 -- 
-2.10.2
+2.9.3
