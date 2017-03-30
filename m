@@ -1,39 +1,42 @@
-Return-Path: <martin.petersen@oracle.com>
-To: "hch\@lst.de" <hch@lst.de>
-Cc: Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        "agk\@redhat.com" <agk@redhat.com>,
-        "lars.ellenberg\@linbit.com" <lars.ellenberg@linbit.com>,
-        "snitzer\@redhat.com" <snitzer@redhat.com>,
-        "martin.petersen\@oracle.com" <martin.petersen@oracle.com>,
-        "philipp.reisner\@linbit.com" <philipp.reisner@linbit.com>,
-        "axboe\@kernel.dk" <axboe@kernel.dk>,
-        "shli\@kernel.org" <shli@kernel.org>,
-        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "dm-devel\@redhat.com" <dm-devel@redhat.com>,
-        "drbd-dev\@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-raid\@vger.kernel.org" <linux-raid@vger.kernel.org>
+Return-Path: <hch@lst.de>
+Date: Thu, 30 Mar 2017 11:06:55 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "agk@redhat.com" <agk@redhat.com>,
+	"lars.ellenberg@linbit.com" <lars.ellenberg@linbit.com>,
+	"snitzer@redhat.com" <snitzer@redhat.com>,
+	"hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"philipp.reisner@linbit.com" <philipp.reisner@linbit.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"shli@kernel.org" <shli@kernel.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>,
+	"drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>
 Subject: Re: [PATCH 23/23] block: remove the discard_zeroes_data flag
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20170323143341.31549-1-hch@lst.de>
-	<20170323143341.31549-24-hch@lst.de>
-	<1490720411.2573.11.camel@sandisk.com> <20170330090655.GF12015@lst.de>
-Date: Thu, 30 Mar 2017 11:29:29 -0400
-In-Reply-To: <20170330090655.GF12015@lst.de> (hch@lst.de's message of "Thu, 30
-	Mar 2017 11:06:55 +0200")
-Message-ID: <yq1d1cy3hra.fsf@oracle.com>
+Message-ID: <20170330090655.GF12015@lst.de>
+References: <20170323143341.31549-1-hch@lst.de> <20170323143341.31549-24-hch@lst.de> <1490720411.2573.11.camel@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1490720411.2573.11.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-"hch@lst.de" <hch@lst.de> writes:
+On Tue, Mar 28, 2017 at 05:00:48PM +0000, Bart Van Assche wrote:
+> 
+> It seems to me like the documentation in Documentation/ABI/testing/sysfs-block
+> and the above code are not in sync. I think the above code will cause reading
+> from the discard_zeroes_data attribute to return an empty string ("") instead
+> of "0\n".
 
-> Jens, any opinion?  I'd like to remove it too, but I fear it might
-> break things.  We could deprecate it first with a warning when read
-> and then remove it a few releases down the road.
+Thanks, fine with me.
 
-I know of several apps that check this variable (as opposed to the
-ioctl).
+> 
+> BTW, my personal preference is to remove this attribute entirely because keeping
+> it will cause confusion, no matter how well we document the behavior of this
+> attribute.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens, any opinion?  I'd like to remove it too, but I fear it might
+break things.  We could deprecate it first with a warning when read
+and then remove it a few releases down the road.
