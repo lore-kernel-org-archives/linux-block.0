@@ -1,4 +1,4 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
 To: axboe@kernel.dk,
 	martin.petersen@oracle.com,
@@ -12,43 +12,33 @@ Cc: linux-block@vger.kernel.org,
 	drbd-dev@lists.linbit.com,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
-Subject: [PATCH 06/23] dm-kcopyd: switch to use REQ_OP_WRITE_ZEROES
-Date: Thu, 23 Mar 2017 10:33:24 -0400
-Message-Id: <20170323143341.31549-7-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Subject: [PATCH 21/25] mmc: remove the discard_zeroes_data flag
+Date: Fri, 31 Mar 2017 18:33:09 +0200
+Message-Id: <20170331163313.31821-22-hch@lst.de>
+In-Reply-To: <20170331163313.31821-1-hch@lst.de>
+References: <20170331163313.31821-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-It seems like the code currently passes whatever it was using for writes
-to WRITE SAME.  Just switch it to WRITE ZEROES, although that doesn't
-need any payload.
+mmc only supports discarding on large alignments, so the zeroing code
+would always fall back to explicit writings of zeroes.
 
-Untested, and confused by the code, maybe someone who understands it
-better than me can help..
-
-Not-yet-signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/dm-kcopyd.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/mmc/core/queue.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/md/dm-kcopyd.c b/drivers/md/dm-kcopyd.c
-index 9e9d04cb7d51..f85846741d50 100644
---- a/drivers/md/dm-kcopyd.c
-+++ b/drivers/md/dm-kcopyd.c
-@@ -733,11 +733,11 @@ int dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
- 		job->pages = &zero_page_list;
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 493eb10ce580..4c54ad34e17a 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -167,8 +167,6 @@ static void mmc_queue_setup_discard(struct request_queue *q,
  
- 		/*
--		 * Use WRITE SAME to optimize zeroing if all dests support it.
-+		 * Use WRITE ZEROES to optimize zeroing if all dests support it.
- 		 */
--		job->rw = REQ_OP_WRITE_SAME;
-+		job->rw = REQ_OP_WRITE_ZEROES;
- 		for (i = 0; i < job->num_dests; i++)
--			if (!bdev_write_same(job->dests[i].bdev)) {
-+			if (!bdev_write_zeroes_sectors(job->dests[i].bdev)) {
- 				job->rw = WRITE;
- 				break;
- 			}
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+ 	blk_queue_max_discard_sectors(q, max_discard);
+-	if (card->erased_byte == 0 && !mmc_can_discard(card))
+-		q->limits.discard_zeroes_data = 1;
+ 	q->limits.discard_granularity = card->pref_erase << 9;
+ 	/* granularity must not be greater than max. discard */
+ 	if (card->pref_erase > max_discard)
 -- 
 2.11.0
