@@ -1,247 +1,108 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>,
-        Trond Myklebust <trond.myklebust@primarydata.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        linux-nfs@vger.kernel.org
-Subject: [PATCH 21/25] nfs: Convert to separately allocated bdi
-Date: Wed, 29 Mar 2017 12:56:19 +0200
-Message-Id: <20170329105623.18241-22-jack@suse.cz>
-In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
-References: <20170329105623.18241-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V2 00/16] Introduce the BFQ I/O scheduler
+Date: Fri, 31 Mar 2017 14:47:27 +0200
+Message-Id: <20170331124743.3530-1-paolo.valente@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+Hi,
+with respect to the previous submission [1], these new patch series:
+- contains all the changes suggested by Jens and Bart [1], apart from
+  those for which I raised doubts that either have been acknowledged,
+  or have not received a reply yet (I will of course apply also the
+  latter changes if those threads restart);
+- contains a fix to the bug causing the failure reported by Jens [2].
 
-CC: Trond Myklebust <trond.myklebust@primarydata.com>
-CC: Anna Schumaker <anna.schumaker@netapp.com>
-CC: linux-nfs@vger.kernel.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/nfs/client.c           | 10 ----------
- fs/nfs/internal.h         |  6 +++---
- fs/nfs/super.c            | 34 +++++++++++++++++++---------------
- fs/nfs/write.c            | 13 ++++++-------
- include/linux/nfs_fs_sb.h |  1 -
- 5 files changed, 28 insertions(+), 36 deletions(-)
+As for major changes, this patch series:
+- solves the nesting problem between scheduler and io-context locks, by
+  not taking any reference to io contexts anymore [3];
+- splits the original, single source file into three files.
 
-diff --git a/fs/nfs/client.c b/fs/nfs/client.c
-index 390ada8741bc..04d15a0045e3 100644
---- a/fs/nfs/client.c
-+++ b/fs/nfs/client.c
-@@ -761,9 +761,6 @@ static void nfs_server_set_fsinfo(struct nfs_server *server,
- 		server->rsize = NFS_MAX_FILE_IO_SIZE;
- 	server->rpages = (server->rsize + PAGE_SIZE - 1) >> PAGE_SHIFT;
- 
--	server->backing_dev_info.name = "nfs";
--	server->backing_dev_info.ra_pages = server->rpages * NFS_MAX_READAHEAD;
--
- 	if (server->wsize > max_rpc_payload)
- 		server->wsize = max_rpc_payload;
- 	if (server->wsize > NFS_MAX_FILE_IO_SIZE)
-@@ -917,12 +914,6 @@ struct nfs_server *nfs_alloc_server(void)
- 		return NULL;
- 	}
- 
--	if (bdi_init(&server->backing_dev_info)) {
--		nfs_free_iostats(server->io_stats);
--		kfree(server);
--		return NULL;
--	}
--
- 	ida_init(&server->openowner_id);
- 	ida_init(&server->lockowner_id);
- 	pnfs_init_server(server);
-@@ -953,7 +944,6 @@ void nfs_free_server(struct nfs_server *server)
- 	ida_destroy(&server->lockowner_id);
- 	ida_destroy(&server->openowner_id);
- 	nfs_free_iostats(server->io_stats);
--	bdi_destroy(&server->backing_dev_info);
- 	kfree(server);
- 	nfs_release_automount_timer();
- 	dprintk("<-- nfs_free_server()\n");
-diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
-index 7b38fedb7e03..9dc65d7ae754 100644
---- a/fs/nfs/internal.h
-+++ b/fs/nfs/internal.h
-@@ -139,7 +139,7 @@ struct nfs_mount_request {
- };
- 
- struct nfs_mount_info {
--	void (*fill_super)(struct super_block *, struct nfs_mount_info *);
-+	int (*fill_super)(struct super_block *, struct nfs_mount_info *);
- 	int (*set_security)(struct super_block *, struct dentry *, struct nfs_mount_info *);
- 	struct nfs_parsed_mount_data *parsed;
- 	struct nfs_clone_mount *cloned;
-@@ -407,7 +407,7 @@ struct dentry *nfs_fs_mount(struct file_system_type *, int, const char *, void *
- struct dentry * nfs_xdev_mount_common(struct file_system_type *, int,
- 		const char *, struct nfs_mount_info *);
- void nfs_kill_super(struct super_block *);
--void nfs_fill_super(struct super_block *, struct nfs_mount_info *);
-+int nfs_fill_super(struct super_block *, struct nfs_mount_info *);
- 
- extern struct rpc_stat nfs_rpcstat;
- 
-@@ -458,7 +458,7 @@ extern void nfs_read_prepare(struct rpc_task *task, void *calldata);
- extern void nfs_pageio_reset_read_mds(struct nfs_pageio_descriptor *pgio);
- 
- /* super.c */
--void nfs_clone_super(struct super_block *, struct nfs_mount_info *);
-+int nfs_clone_super(struct super_block *, struct nfs_mount_info *);
- void nfs_umount_begin(struct super_block *);
- int  nfs_statfs(struct dentry *, struct kstatfs *);
- int  nfs_show_options(struct seq_file *, struct dentry *);
-diff --git a/fs/nfs/super.c b/fs/nfs/super.c
-index 54e0f9f2dd94..8d97aa70407e 100644
---- a/fs/nfs/super.c
-+++ b/fs/nfs/super.c
-@@ -2315,18 +2315,17 @@ inline void nfs_initialise_sb(struct super_block *sb)
- 		sb->s_blocksize = nfs_block_bits(server->wsize,
- 						 &sb->s_blocksize_bits);
- 
--	sb->s_bdi = &server->backing_dev_info;
--
- 	nfs_super_set_maxbytes(sb, server->maxfilesize);
- }
- 
- /*
-  * Finish setting up an NFS2/3 superblock
-  */
--void nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
-+int nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
- {
- 	struct nfs_parsed_mount_data *data = mount_info->parsed;
- 	struct nfs_server *server = NFS_SB(sb);
-+	int ret;
- 
- 	sb->s_blocksize_bits = 0;
- 	sb->s_blocksize = 0;
-@@ -2344,13 +2343,21 @@ void nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
- 	}
- 
-  	nfs_initialise_sb(sb);
-+
-+	ret = super_setup_bdi_name(sb, "%u:%u", MAJOR(server->s_dev),
-+				   MINOR(server->s_dev));
-+	if (ret)
-+		return ret;
-+	sb->s_bdi->ra_pages = server->rpages * NFS_MAX_READAHEAD;
-+	return 0;
-+
- }
- EXPORT_SYMBOL_GPL(nfs_fill_super);
- 
- /*
-  * Finish setting up a cloned NFS2/3/4 superblock
-  */
--void nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
-+int nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
- {
- 	const struct super_block *old_sb = mount_info->cloned->sb;
- 	struct nfs_server *server = NFS_SB(sb);
-@@ -2370,6 +2377,11 @@ void nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
- 	}
- 
-  	nfs_initialise_sb(sb);
-+
-+	sb->s_bdi = bdi_get(old_sb->s_bdi);
-+	sb->s_iflags |= SB_I_DYNBDI;
-+
-+	return 0;
- }
- 
- static int nfs_compare_mount_options(const struct super_block *s, const struct nfs_server *b, int flags)
-@@ -2522,11 +2534,6 @@ static void nfs_get_cache_cookie(struct super_block *sb,
- }
- #endif
- 
--static int nfs_bdi_register(struct nfs_server *server)
--{
--	return bdi_register_dev(&server->backing_dev_info, server->s_dev);
--}
--
- int nfs_set_sb_security(struct super_block *s, struct dentry *mntroot,
- 			struct nfs_mount_info *mount_info)
- {
-@@ -2594,17 +2601,14 @@ struct dentry *nfs_fs_mount_common(struct nfs_server *server,
- 		nfs_free_server(server);
- 		server = NULL;
- 	} else {
--		error = nfs_bdi_register(server);
--		if (error) {
--			mntroot = ERR_PTR(error);
--			goto error_splat_super;
--		}
- 		server->super = s;
- 	}
- 
- 	if (!s->s_root) {
- 		/* initial superblock/root creation */
--		mount_info->fill_super(s, mount_info);
-+		error = mount_info->fill_super(s, mount_info);
-+		if (error)
-+			goto error_splat_super;
- 		nfs_get_cache_cookie(s, mount_info->parsed, mount_info->cloned);
- 	}
- 
-diff --git a/fs/nfs/write.c b/fs/nfs/write.c
-index abb2c8a3be42..cc341fc7fd44 100644
---- a/fs/nfs/write.c
-+++ b/fs/nfs/write.c
-@@ -263,16 +263,15 @@ int nfs_congestion_kb;
- 
- static void nfs_set_page_writeback(struct page *page)
- {
--	struct nfs_server *nfss = NFS_SERVER(page_file_mapping(page)->host);
-+	struct inode *inode = page_file_mapping(page)->host;
-+	struct nfs_server *nfss = NFS_SERVER(inode);
- 	int ret = test_set_page_writeback(page);
- 
- 	WARN_ON_ONCE(ret != 0);
- 
- 	if (atomic_long_inc_return(&nfss->writeback) >
--			NFS_CONGESTION_ON_THRESH) {
--		set_bdi_congested(&nfss->backing_dev_info,
--					BLK_RW_ASYNC);
--	}
-+			NFS_CONGESTION_ON_THRESH)
-+		set_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
- }
- 
- static void nfs_end_page_writeback(struct nfs_page *req)
-@@ -285,7 +284,7 @@ static void nfs_end_page_writeback(struct nfs_page *req)
- 
- 	end_page_writeback(req->wb_page);
- 	if (atomic_long_dec_return(&nfss->writeback) < NFS_CONGESTION_OFF_THRESH)
--		clear_bdi_congested(&nfss->backing_dev_info, BLK_RW_ASYNC);
-+		clear_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
- }
- 
- 
-@@ -1808,7 +1807,7 @@ static void nfs_commit_release_pages(struct nfs_commit_data *data)
- 	}
- 	nfss = NFS_SERVER(data->inode);
- 	if (atomic_long_read(&nfss->writeback) < NFS_CONGESTION_OFF_THRESH)
--		clear_bdi_congested(&nfss->backing_dev_info, BLK_RW_ASYNC);
-+		clear_bdi_congested(inode_to_bdi(data->inode), BLK_RW_ASYNC);
- 
- 	nfs_init_cinfo(&cinfo, data->inode, data->dreq);
- 	nfs_commit_end(cinfo.mds);
-diff --git a/include/linux/nfs_fs_sb.h b/include/linux/nfs_fs_sb.h
-index b34097c67848..e1502c55741e 100644
---- a/include/linux/nfs_fs_sb.h
-+++ b/include/linux/nfs_fs_sb.h
-@@ -133,7 +133,6 @@ struct nfs_server {
- 	struct rpc_clnt *	client_acl;	/* ACL RPC client handle */
- 	struct nlm_host		*nlm_host;	/* NLM client handle */
- 	struct nfs_iostats __percpu *io_stats;	/* I/O statistics */
--	struct backing_dev_info	backing_dev_info;
- 	atomic_long_t		writeback;	/* number of writeback pages */
- 	int			flags;		/* various flags */
- 	unsigned int		caps;		/* server capabilities */
--- 
-2.10.2
+These last two contributions are provided by two additional patches in
+the series. I've not merged these changes into the other patches for
+the following reasons:
+
+- Merging these changes would have implied splitting them into further
+  smaller pieces, applying each piece to the right previous patch, and
+  solving all the conflicts generated by each per-patch
+  modification. This would have taken really a lot of time, and would
+  have implied a certain probability of introducing subtle errors (I
+  have tried for a few days, and then abandoned this solution).
+
+- The removal of extra io-context references is a non-trivial change
+  to code that has worked the other way, for probably about a decade,
+  in CFQ.  The change seems to be fine, but in case of errors, it is
+  probably much easier to find and clearly fix them, if they are
+  confined in a single commit.
+
+- A dedicated commit for the removal of extra io-context references
+  also documents how it has been obtained, and what assumptions have
+  been made.
+
+- Similarly, an explicit split of the srouce file shows where each
+  piece has gone, instead of exposing only the result of the split,
+  with possible mistakes buried in it.
+
+I have run all the tests I could.
+
+Some patch still generates WARNINGS with checkpatch.pl, but these
+WARNINGS seem to be either unavoidable for the involved pieces of code
+(which the patch just extends), or false positives.
+
+Thanks,
+Paolo
+
+[1] https://lkml.org/lkml/2017/3/4/148
+[2] https://lkml.org/lkml/2017/3/6/887
+[3] https://lkml.org/lkml/2017/3/18/34
+Arianna Avanzini (4):
+  block, bfq: add full hierarchical scheduling and cgroups support
+  block, bfq: add Early Queue Merge (EQM)
+  block, bfq: reduce idling only in symmetric scenarios
+  block, bfq: handle bursts of queue activations
+
+Paolo Valente (12):
+  block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler
+  block, bfq: improve throughput boosting
+  block, bfq: modify the peak-rate estimator
+  block, bfq: add more fairness with writes and slow processes
+  block, bfq: improve responsiveness
+  block, bfq: reduce I/O latency for soft real-time applications
+  block, bfq: preserve a low latency also with NCQ-capable drives
+  block, bfq: reduce latency during request-pool saturation
+  block, bfq: boost the throughput on NCQ-capable flash-based devices
+  block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
+  block, bfq: remove all get and put of I/O contexts
+  block, bfq: split bfq-iosched.c into multiple source files
+
+ Documentation/block/00-INDEX        |    2 +
+ Documentation/block/bfq-iosched.txt |  531 ++++
+ block/Kconfig.iosched               |   21 +
+ block/Makefile                      |    1 +
+ block/bfq-cgroup.c                  | 1139 ++++++++
+ block/bfq-iosched.c                 | 5030 +++++++++++++++++++++++++++++++++++
+ block/bfq-iosched.h                 |  942 +++++++
+ block/bfq-wf2q.c                    | 1616 +++++++++++
+ include/linux/blkdev.h              |    2 +-
+ 9 files changed, 9283 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/block/bfq-iosched.txt
+ create mode 100644 block/bfq-cgroup.c
+ create mode 100644 block/bfq-iosched.c
+ create mode 100644 block/bfq-iosched.h
+ create mode 100644 block/bfq-wf2q.c
+
+--
+2.10.0
