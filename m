@@ -1,332 +1,181 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f45.google.com ([74.125.83.45]:34165 "EHLO
-        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757127AbdCUP5J (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2017 11:57:09 -0400
-Received: by mail-pg0-f45.google.com with SMTP id 21so62554798pgg.1
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2017 08:57:08 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH v2 2/4] blk-stat: use READ and WRITE instead of BLK_STAT_{READ,WRITE}
-Date: Tue, 21 Mar 2017 08:56:06 -0700
-Message-Id: <2923a6150e86b5949b0dfa8f984c9b2d4a3bde0d.1490110621.git.osandov@fb.com>
-In-Reply-To: <cover.1490110621.git.osandov@fb.com>
-References: <cover.1490110621.git.osandov@fb.com>
-In-Reply-To: <cover.1490110621.git.osandov@fb.com>
-References: <cover.1490110621.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V2 09/16] block, bfq: reduce latency during request-pool saturation
+Date: Fri, 31 Mar 2017 14:47:36 +0200
+Message-Id: <20170331124743.3530-10-paolo.valente@linaro.org>
+In-Reply-To: <20170331124743.3530-1-paolo.valente@linaro.org>
+References: <20170331124743.3530-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+This patch introduces an heuristic that reduces latency when the
+I/O-request pool is saturated. This goal is achieved by disabling
+device idling, for non-weight-raised queues, when there are weight-
+raised queues with pending or in-flight requests. In fact, as
+explained in more detail in the comment on the function
+bfq_bfqq_may_idle(), this reduces the rate at which processes
+associated with non-weight-raised queues grab requests from the pool,
+thereby increasing the probability that processes associated with
+weight-raised queues get a request immediately (or at least soon) when
+they need one. Along the same line, if there are weight-raised queues,
+then this patch halves the service rate of async (write) requests for
+non-weight-raised queues.
 
-The stats buckets will become generic soon, so make the existing users
-use the common READ and WRITE definitions instead of one internal to
-blk-stat.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- block/blk-mq-debugfs.c | 12 ++++----
- block/blk-mq.c         | 12 ++++----
- block/blk-stat.c       | 80 ++++++++++++++++++++++++--------------------------
- block/blk-stat.h       |  5 ----
- block/blk-sysfs.c      |  4 +--
- block/blk-wbt.c        | 12 ++++----
- 6 files changed, 59 insertions(+), 66 deletions(-)
+ block/bfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index f6d917977b33..48c88723944a 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -333,17 +333,17 @@ static int hctx_stats_show(struct seq_file *m, void *v)
- 	struct blk_mq_hw_ctx *hctx = m->private;
- 	struct blk_rq_stat stat[2];
- 
--	blk_stat_init(&stat[BLK_STAT_READ]);
--	blk_stat_init(&stat[BLK_STAT_WRITE]);
-+	blk_stat_init(&stat[READ]);
-+	blk_stat_init(&stat[WRITE]);
- 
- 	blk_hctx_stat_get(hctx, stat);
- 
- 	seq_puts(m, "read: ");
--	print_stat(m, &stat[BLK_STAT_READ]);
-+	print_stat(m, &stat[READ]);
- 	seq_puts(m, "\n");
- 
- 	seq_puts(m, "write: ");
--	print_stat(m, &stat[BLK_STAT_WRITE]);
-+	print_stat(m, &stat[WRITE]);
- 	seq_puts(m, "\n");
- 	return 0;
- }
-@@ -362,8 +362,8 @@ static ssize_t hctx_stats_write(struct file *file, const char __user *buf,
- 	int i;
- 
- 	hctx_for_each_ctx(hctx, ctx, i) {
--		blk_stat_init(&ctx->stat[BLK_STAT_READ]);
--		blk_stat_init(&ctx->stat[BLK_STAT_WRITE]);
-+		blk_stat_init(&ctx->stat[READ]);
-+		blk_stat_init(&ctx->stat[WRITE]);
- 	}
- 	return count;
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 534f49a90e3a..559e5363bb2c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2040,8 +2040,8 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- 		spin_lock_init(&__ctx->lock);
- 		INIT_LIST_HEAD(&__ctx->rq_list);
- 		__ctx->queue = q;
--		blk_stat_init(&__ctx->stat[BLK_STAT_READ]);
--		blk_stat_init(&__ctx->stat[BLK_STAT_WRITE]);
-+		blk_stat_init(&__ctx->stat[READ]);
-+		blk_stat_init(&__ctx->stat[WRITE]);
- 
- 		/* If the cpu isn't online, the cpu is mapped to first hctx */
- 		if (!cpu_online(i))
-@@ -2769,10 +2769,10 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
- 	 * important on devices where the completion latencies are longer
- 	 * than ~10 usec.
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index c43a737..7536b8a 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -420,6 +420,8 @@ struct bfq_data {
+ 	 * queue in service, even if it is idling).
  	 */
--	if (req_op(rq) == REQ_OP_READ && stat[BLK_STAT_READ].nr_samples)
--		ret = (stat[BLK_STAT_READ].mean + 1) / 2;
--	else if (req_op(rq) == REQ_OP_WRITE && stat[BLK_STAT_WRITE].nr_samples)
--		ret = (stat[BLK_STAT_WRITE].mean + 1) / 2;
-+	if (req_op(rq) == REQ_OP_READ && stat[READ].nr_samples)
-+		ret = (stat[READ].mean + 1) / 2;
-+	else if (req_op(rq) == REQ_OP_WRITE && stat[WRITE].nr_samples)
-+		ret = (stat[WRITE].mean + 1) / 2;
+ 	int busy_queues;
++	/* number of weight-raised busy @bfq_queues */
++	int wr_busy_queues;
+ 	/* number of queued requests */
+ 	int queued;
+ 	/* number of requests dispatched and waiting for completion */
+@@ -2490,6 +2492,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  
- 	return ret;
+ 	bfqd->busy_queues--;
+ 
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues--;
++
+ 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
+ 
+ 	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
+@@ -2506,6 +2511,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues++;
++
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues++;
  }
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 186fcb981e9b..f80582be5344 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -55,8 +55,8 @@ static void blk_mq_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
- 	uint64_t latest = 0;
- 	int i, j, nr;
  
--	blk_stat_init(&dst[BLK_STAT_READ]);
--	blk_stat_init(&dst[BLK_STAT_WRITE]);
-+	blk_stat_init(&dst[READ]);
-+	blk_stat_init(&dst[WRITE]);
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+@@ -3779,7 +3787,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
+ 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
+ 		return blk_rq_sectors(rq);
  
- 	nr = 0;
- 	do {
-@@ -64,16 +64,16 @@ static void blk_mq_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
+-	return blk_rq_sectors(rq) * bfq_async_charge_factor;
++	/*
++	 * If there are no weight-raised queues, then amplify service
++	 * by just the async charge factor; otherwise amplify service
++	 * by twice the async charge factor, to further reduce latency
++	 * for weight-raised queues.
++	 */
++	if (bfqq->bfqd->wr_busy_queues == 0)
++		return blk_rq_sectors(rq) * bfq_async_charge_factor;
++
++	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
+ }
  
- 		queue_for_each_hw_ctx(q, hctx, i) {
- 			hctx_for_each_ctx(hctx, ctx, j) {
--				blk_stat_flush_batch(&ctx->stat[BLK_STAT_READ]);
--				blk_stat_flush_batch(&ctx->stat[BLK_STAT_WRITE]);
-+				blk_stat_flush_batch(&ctx->stat[READ]);
-+				blk_stat_flush_batch(&ctx->stat[WRITE]);
+ /**
+@@ -4234,6 +4251,7 @@ static void bfq_add_request(struct request *rq)
+ 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
+ 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
  
--				if (!ctx->stat[BLK_STAT_READ].nr_samples &&
--				    !ctx->stat[BLK_STAT_WRITE].nr_samples)
-+				if (!ctx->stat[READ].nr_samples &&
-+				    !ctx->stat[WRITE].nr_samples)
- 					continue;
--				if (ctx->stat[BLK_STAT_READ].time > newest)
--					newest = ctx->stat[BLK_STAT_READ].time;
--				if (ctx->stat[BLK_STAT_WRITE].time > newest)
--					newest = ctx->stat[BLK_STAT_WRITE].time;
-+				if (ctx->stat[READ].time > newest)
-+					newest = ctx->stat[READ].time;
-+				if (ctx->stat[WRITE].time > newest)
-+					newest = ctx->stat[WRITE].time;
- 			}
++			bfqd->wr_busy_queues++;
+ 			bfqq->entity.prio_changed = 1;
  		}
+ 		if (prev != bfqq->next_rq)
+@@ -4474,6 +4492,8 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
+ /* Must be called with bfqq != NULL */
+ static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
+ {
++	if (bfq_bfqq_busy(bfqq))
++		bfqq->bfqd->wr_busy_queues--;
+ 	bfqq->wr_coeff = 1;
+ 	bfqq->wr_cur_max_time = 0;
+ 	bfqq->last_wr_start_finish = jiffies;
+@@ -5497,7 +5517,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+-	bool idling_boosts_thr, asymmetric_scenario;
++	bool idling_boosts_thr, idling_boosts_thr_without_issues,
++		asymmetric_scenario;
  
-@@ -88,14 +88,14 @@ static void blk_mq_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
+ 	if (bfqd->strict_guarantees)
+ 		return true;
+@@ -5520,6 +5541,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
  
- 		queue_for_each_hw_ctx(q, hctx, i) {
- 			hctx_for_each_ctx(hctx, ctx, j) {
--				if (ctx->stat[BLK_STAT_READ].time == newest) {
--					blk_stat_sum(&dst[BLK_STAT_READ],
--						     &ctx->stat[BLK_STAT_READ]);
-+				if (ctx->stat[READ].time == newest) {
-+					blk_stat_sum(&dst[READ],
-+						     &ctx->stat[READ]);
- 					nr++;
- 				}
--				if (ctx->stat[BLK_STAT_WRITE].time == newest) {
--					blk_stat_sum(&dst[BLK_STAT_WRITE],
--						     &ctx->stat[BLK_STAT_WRITE]);
-+				if (ctx->stat[WRITE].time == newest) {
-+					blk_stat_sum(&dst[WRITE],
-+						     &ctx->stat[WRITE]);
- 					nr++;
- 				}
- 			}
-@@ -106,7 +106,7 @@ static void blk_mq_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
- 		 */
- 	} while (!nr);
- 
--	dst[BLK_STAT_READ].time = dst[BLK_STAT_WRITE].time = latest;
-+	dst[READ].time = dst[WRITE].time = latest;
- }
- 
- void blk_queue_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
-@@ -114,12 +114,12 @@ void blk_queue_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
- 	if (q->mq_ops)
- 		blk_mq_stat_get(q, dst);
- 	else {
--		blk_stat_flush_batch(&q->rq_stats[BLK_STAT_READ]);
--		blk_stat_flush_batch(&q->rq_stats[BLK_STAT_WRITE]);
--		memcpy(&dst[BLK_STAT_READ], &q->rq_stats[BLK_STAT_READ],
--				sizeof(struct blk_rq_stat));
--		memcpy(&dst[BLK_STAT_WRITE], &q->rq_stats[BLK_STAT_WRITE],
--				sizeof(struct blk_rq_stat));
-+		blk_stat_flush_batch(&q->rq_stats[READ]);
-+		blk_stat_flush_batch(&q->rq_stats[WRITE]);
-+		memcpy(&dst[READ], &q->rq_stats[READ],
-+		       sizeof(struct blk_rq_stat));
-+		memcpy(&dst[WRITE], &q->rq_stats[WRITE],
-+		       sizeof(struct blk_rq_stat));
- 	}
- }
- 
-@@ -133,31 +133,29 @@ void blk_hctx_stat_get(struct blk_mq_hw_ctx *hctx, struct blk_rq_stat *dst)
- 		uint64_t newest = 0;
- 
- 		hctx_for_each_ctx(hctx, ctx, i) {
--			blk_stat_flush_batch(&ctx->stat[BLK_STAT_READ]);
--			blk_stat_flush_batch(&ctx->stat[BLK_STAT_WRITE]);
-+			blk_stat_flush_batch(&ctx->stat[READ]);
-+			blk_stat_flush_batch(&ctx->stat[WRITE]);
- 
--			if (!ctx->stat[BLK_STAT_READ].nr_samples &&
--			    !ctx->stat[BLK_STAT_WRITE].nr_samples)
-+			if (!ctx->stat[READ].nr_samples &&
-+			    !ctx->stat[WRITE].nr_samples)
- 				continue;
- 
--			if (ctx->stat[BLK_STAT_READ].time > newest)
--				newest = ctx->stat[BLK_STAT_READ].time;
--			if (ctx->stat[BLK_STAT_WRITE].time > newest)
--				newest = ctx->stat[BLK_STAT_WRITE].time;
-+			if (ctx->stat[READ].time > newest)
-+				newest = ctx->stat[READ].time;
-+			if (ctx->stat[WRITE].time > newest)
-+				newest = ctx->stat[WRITE].time;
- 		}
- 
- 		if (!newest)
- 			break;
- 
- 		hctx_for_each_ctx(hctx, ctx, i) {
--			if (ctx->stat[BLK_STAT_READ].time == newest) {
--				blk_stat_sum(&dst[BLK_STAT_READ],
--						&ctx->stat[BLK_STAT_READ]);
-+			if (ctx->stat[READ].time == newest) {
-+				blk_stat_sum(&dst[READ], &ctx->stat[READ]);
- 				nr++;
- 			}
--			if (ctx->stat[BLK_STAT_WRITE].time == newest) {
--				blk_stat_sum(&dst[BLK_STAT_WRITE],
--						&ctx->stat[BLK_STAT_WRITE]);
-+			if (ctx->stat[WRITE].time == newest) {
-+				blk_stat_sum(&dst[WRITE], &ctx->stat[WRITE]);
- 				nr++;
- 			}
- 		}
-@@ -226,13 +224,13 @@ void blk_stat_clear(struct request_queue *q)
- 
- 		queue_for_each_hw_ctx(q, hctx, i) {
- 			hctx_for_each_ctx(hctx, ctx, j) {
--				blk_stat_init(&ctx->stat[BLK_STAT_READ]);
--				blk_stat_init(&ctx->stat[BLK_STAT_WRITE]);
-+				blk_stat_init(&ctx->stat[READ]);
-+				blk_stat_init(&ctx->stat[WRITE]);
- 			}
- 		}
- 	} else {
--		blk_stat_init(&q->rq_stats[BLK_STAT_READ]);
--		blk_stat_init(&q->rq_stats[BLK_STAT_WRITE]);
-+		blk_stat_init(&q->rq_stats[READ]);
-+		blk_stat_init(&q->rq_stats[WRITE]);
- 	}
- }
- 
-diff --git a/block/blk-stat.h b/block/blk-stat.h
-index a2050a0a5314..34384328b46b 100644
---- a/block/blk-stat.h
-+++ b/block/blk-stat.h
-@@ -15,11 +15,6 @@
- #define BLK_STAT_TIME_MASK	((1ULL << BLK_STAT_SHIFT) - 1)
- #define BLK_STAT_MASK		~BLK_STAT_TIME_MASK
- 
--enum {
--	BLK_STAT_READ	= 0,
--	BLK_STAT_WRITE,
--};
--
- void blk_stat_add(struct blk_rq_stat *, struct request *);
- void blk_hctx_stat_get(struct blk_mq_hw_ctx *, struct blk_rq_stat *);
- void blk_queue_stat_get(struct request_queue *, struct blk_rq_stat *);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index c44b321335f3..fdb45fd0db0b 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -518,8 +518,8 @@ static ssize_t queue_stats_show(struct request_queue *q, char *page)
- 
- 	blk_queue_stat_get(q, stat);
- 
--	ret = print_stat(page, &stat[BLK_STAT_READ], "read :");
--	ret += print_stat(page + ret, &stat[BLK_STAT_WRITE], "write:");
-+	ret = print_stat(page, &stat[READ], "read :");
-+	ret += print_stat(page + ret, &stat[WRITE], "write:");
- 	return ret;
- }
- 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 1aedb1f7ee0c..aafe5b551224 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -255,8 +255,8 @@ static inline bool stat_sample_valid(struct blk_rq_stat *stat)
- 	 * that it's writes impacting us, and not just some sole read on
- 	 * a device that is in a lower power state.
- 	 */
--	return stat[BLK_STAT_READ].nr_samples >= 1 &&
--		stat[BLK_STAT_WRITE].nr_samples >= RWB_MIN_WRITE_SAMPLES;
-+	return (stat[READ].nr_samples >= 1 &&
-+		stat[WRITE].nr_samples >= RWB_MIN_WRITE_SAMPLES);
- }
- 
- static u64 rwb_sync_issue_lat(struct rq_wb *rwb)
-@@ -293,7 +293,7 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- 	 */
- 	thislat = rwb_sync_issue_lat(rwb);
- 	if (thislat > rwb->cur_win_nsec ||
--	    (thislat > rwb->min_lat_nsec && !stat[BLK_STAT_READ].nr_samples)) {
-+	    (thislat > rwb->min_lat_nsec && !stat[READ].nr_samples)) {
- 		trace_wbt_lat(bdi, thislat);
- 		return LAT_EXCEEDED;
- 	}
-@@ -308,7 +308,7 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- 		 * waited or still has writes in flights, consider us doing
- 		 * just writes as well.
- 		 */
--		if ((stat[BLK_STAT_WRITE].nr_samples && blk_stat_is_current(stat)) ||
-+		if ((stat[WRITE].nr_samples && blk_stat_is_current(stat)) ||
- 		    wb_recent_wait(rwb) || wbt_inflight(rwb))
- 			return LAT_UNKNOWN_WRITES;
- 		return LAT_UNKNOWN;
-@@ -317,8 +317,8 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
  	/*
- 	 * If the 'min' latency exceeds our target, step down.
++	 * The value of the next variable,
++	 * idling_boosts_thr_without_issues, is equal to that of
++	 * idling_boosts_thr, unless a special case holds. In this
++	 * special case, described below, idling may cause problems to
++	 * weight-raised queues.
++	 *
++	 * When the request pool is saturated (e.g., in the presence
++	 * of write hogs), if the processes associated with
++	 * non-weight-raised queues ask for requests at a lower rate,
++	 * then processes associated with weight-raised queues have a
++	 * higher probability to get a request from the pool
++	 * immediately (or at least soon) when they need one. Thus
++	 * they have a higher probability to actually get a fraction
++	 * of the device throughput proportional to their high
++	 * weight. This is especially true with NCQ-capable drives,
++	 * which enqueue several requests in advance, and further
++	 * reorder internally-queued requests.
++	 *
++	 * For this reason, we force to false the value of
++	 * idling_boosts_thr_without_issues if there are weight-raised
++	 * busy queues. In this case, and if bfqq is not weight-raised,
++	 * this guarantees that the device is not idled for bfqq (if,
++	 * instead, bfqq is weight-raised, then idling will be
++	 * guaranteed by another variable, see below). Combined with
++	 * the timestamping rules of BFQ (see [1] for details), this
++	 * behavior causes bfqq, and hence any sync non-weight-raised
++	 * queue, to get a lower number of requests served, and thus
++	 * to ask for a lower number of requests from the request
++	 * pool, before the busy weight-raised queues get served
++	 * again. This often mitigates starvation problems in the
++	 * presence of heavy write workloads and NCQ, thereby
++	 * guaranteeing a higher application and system responsiveness
++	 * in these hostile scenarios.
++	 */
++	idling_boosts_thr_without_issues = idling_boosts_thr &&
++		bfqd->wr_busy_queues == 0;
++
++	/*
+ 	 * There is then a case where idling must be performed not for
+ 	 * throughput concerns, but to preserve service guarantees. To
+ 	 * introduce it, we can note that allowing the drive to
+@@ -5593,7 +5652,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 *    is necessary to preserve service guarantees.
  	 */
--	if (stat[BLK_STAT_READ].min > rwb->min_lat_nsec) {
--		trace_wbt_lat(bdi, stat[BLK_STAT_READ].min);
-+	if (stat[READ].min > rwb->min_lat_nsec) {
-+		trace_wbt_lat(bdi, stat[READ].min);
- 		trace_wbt_stat(bdi, stat);
- 		return LAT_EXCEEDED;
- 	}
+ 	return bfq_bfqq_sync(bfqq) &&
+-		(idling_boosts_thr || asymmetric_scenario);
++		(idling_boosts_thr_without_issues || asymmetric_scenario);
+ }
+ 
+ /*
+@@ -6801,6 +6860,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 					      * high-definition compressed
+ 					      * video.
+ 					      */
++	bfqd->wr_busy_queues = 0;
+ 
+ 	/*
+ 	 * Begin by assuming, optimistically, that the device is a
 -- 
-2.12.0
+2.10.0
