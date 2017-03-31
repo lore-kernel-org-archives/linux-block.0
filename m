@@ -1,56 +1,135 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
-Subject: [PATCH rfc 10/10] target: Use non-selective polling
-Date: Thu,  9 Mar 2017 15:16:42 +0200
-Message-Id: <1489065402-14757-11-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 04/25] sd: implement REQ_OP_WRITE_ZEROES
+Date: Fri, 31 Mar 2017 18:32:52 +0200
+Message-Id: <20170331163313.31821-5-hch@lst.de>
+In-Reply-To: <20170331163313.31821-1-hch@lst.de>
+References: <20170331163313.31821-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-It doesn't really make sense to do selective polling
-because we never care about specific IOs. Non selective
-polling can actually help by doing some useful work
-while we're submitting a command.
-
-We ask for a batch of (magic) 4 completions which looks
-like a decent network<->backend proportion, if less are
-available we'll see less.
-
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/target/target_core_iblock.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/scsi/sd.c     | 31 ++++++++++++++++++++++++++-----
+ drivers/scsi/sd_zbc.c |  1 +
+ 2 files changed, 27 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index d316ed537d59..00726b6e51c4 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -757,6 +757,7 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 	}
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index b853f91fb3da..d8d9c0bdd93c 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -735,7 +735,7 @@ static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
+ 	return scsi_init_io(cmd);
+ }
  
- 	iblock_submit_bios(&list);
-+	blk_mq_poll_batch(bdev_get_queue(IBLOCK_DEV(dev)->ibd_bd), 4);
- 	iblock_complete_cmd(cmd);
- 	return 0;
+-static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd)
++static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd, bool unmap)
+ {
+ 	struct scsi_device *sdp = cmd->device;
+ 	struct request *rq = cmd->request;
+@@ -752,13 +752,14 @@ static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd)
+ 
+ 	cmd->cmd_len = 16;
+ 	cmd->cmnd[0] = WRITE_SAME_16;
+-	cmd->cmnd[1] = 0x8; /* UNMAP */
++	if (unmap)
++		cmd->cmnd[1] = 0x8; /* UNMAP */
+ 	put_unaligned_be64(sector, &cmd->cmnd[2]);
+ 	put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
+ 
+ 	cmd->allowed = SD_MAX_RETRIES;
+ 	cmd->transfersize = data_len;
+-	rq->timeout = SD_TIMEOUT;
++	rq->timeout = unmap ? SD_TIMEOUT : SD_WRITE_SAME_TIMEOUT;
+ 	scsi_req(rq)->resid_len = data_len;
+ 
+ 	return scsi_init_io(cmd);
+@@ -788,12 +789,27 @@ static int sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd, bool unmap)
+ 
+ 	cmd->allowed = SD_MAX_RETRIES;
+ 	cmd->transfersize = data_len;
+-	rq->timeout = SD_TIMEOUT;
++	rq->timeout = unmap ? SD_TIMEOUT : SD_WRITE_SAME_TIMEOUT;
+ 	scsi_req(rq)->resid_len = data_len;
+ 
+ 	return scsi_init_io(cmd);
+ }
+ 
++static int sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
++{
++	struct request *rq = cmd->request;
++	struct scsi_device *sdp = cmd->device;
++	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
++	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
++	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
++
++	if (sdp->no_write_same)
++		return BLKPREP_INVALID;
++	if (sdkp->ws16 || sector > 0xffffffff || nr_sectors > 0xffff)
++		return sd_setup_write_same16_cmnd(cmd, false);
++	return sd_setup_write_same10_cmnd(cmd, false);
++}
++
+ static void sd_config_write_same(struct scsi_disk *sdkp)
+ {
+ 	struct request_queue *q = sdkp->disk->queue;
+@@ -823,6 +839,8 @@ static void sd_config_write_same(struct scsi_disk *sdkp)
+ out:
+ 	blk_queue_max_write_same_sectors(q, sdkp->max_ws_blocks *
+ 					 (logical_block_size >> 9));
++	blk_queue_max_write_zeroes_sectors(q, sdkp->max_ws_blocks *
++					 (logical_block_size >> 9));
+ }
+ 
+ /**
+@@ -1163,7 +1181,7 @@ static int sd_init_command(struct scsi_cmnd *cmd)
+ 		case SD_LBP_UNMAP:
+ 			return sd_setup_unmap_cmnd(cmd);
+ 		case SD_LBP_WS16:
+-			return sd_setup_write_same16_cmnd(cmd);
++			return sd_setup_write_same16_cmnd(cmd, true);
+ 		case SD_LBP_WS10:
+ 			return sd_setup_write_same10_cmnd(cmd, true);
+ 		case SD_LBP_ZERO:
+@@ -1171,6 +1189,8 @@ static int sd_init_command(struct scsi_cmnd *cmd)
+ 		default:
+ 			return BLKPREP_INVALID;
+ 		}
++	case REQ_OP_WRITE_ZEROES:
++		return sd_setup_write_zeroes_cmnd(cmd);
+ 	case REQ_OP_WRITE_SAME:
+ 		return sd_setup_write_same_cmnd(cmd);
+ 	case REQ_OP_FLUSH:
+@@ -1810,6 +1830,7 @@ static int sd_done(struct scsi_cmnd *SCpnt)
+ 
+ 	switch (req_op(req)) {
+ 	case REQ_OP_DISCARD:
++	case REQ_OP_WRITE_ZEROES:
+ 	case REQ_OP_WRITE_SAME:
+ 	case REQ_OP_ZONE_RESET:
+ 		if (!result) {
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 92620c8ea8ad..1994f7799fce 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -329,6 +329,7 @@ void sd_zbc_complete(struct scsi_cmnd *cmd,
+ 
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_WRITE:
++	case REQ_OP_WRITE_ZEROES:
+ 	case REQ_OP_WRITE_SAME:
+ 	case REQ_OP_ZONE_RESET:
  
 -- 
-2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.11.0
