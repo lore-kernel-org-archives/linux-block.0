@@ -12,59 +12,23 @@ Cc: linux-block@vger.kernel.org,
 	drbd-dev@lists.linbit.com,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
-Subject: [PATCH 12/25] block: add a new BLKDEV_ZERO_NOFALLBACK flag
-Date: Fri, 31 Mar 2017 18:33:00 +0200
-Message-Id: <20170331163313.31821-13-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
+Subject: always use REQ_OP_WRITE_ZEROES for zeroing offload
+Date: Fri, 31 Mar 2017 18:32:48 +0200
+Message-Id: <20170331163313.31821-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This avoids fallbacks to explicit zeroing in (__)blkdev_issue_zeroout if
-the caller doesn't want them.
+This series makes REQ_OP_WRITE_ZEROES the only zeroing offload
+supported by the block layer, and switches existing implementations
+of REQ_OP_DISCARD that correctly set discard_zeroes_data to it,
+removes incorrect discard_zeroes_data, and also switches WRITE SAME
+based zeroing in SCSI to this new method.
 
-Also clean up the convoluted check for the return condition that this
-new flag is added to.
+The series is against the block for-next tree.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-lib.c        | 5 ++++-
- include/linux/blkdev.h | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+A git tree is also avaiable at:
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 2f6d2cb2e1a2..2f882e22890b 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -281,6 +281,9 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
-  *
-  *  If a device is using logical block provisioning, the underlying space will
-  *  not be released if %flags contains BLKDEV_ZERO_NOUNMAP.
-+ *
-+ *  If %flags contains BLKDEV_ZERO_NOFALLBACK, the function will return
-+ *  -EOPNOTSUPP if no explicit hardware offload for zeroing is provided.
-  */
- int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
-@@ -298,7 +301,7 @@ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 
- 	ret = __blkdev_issue_write_zeroes(bdev, sector, nr_sects, gfp_mask,
- 			biop, flags);
--	if (ret == 0 || (ret && ret != -EOPNOTSUPP))
-+	if (ret != -EOPNOTSUPP || (flags & BLKDEV_ZERO_NOFALLBACK))
- 		goto out;
- 
- 	ret = 0;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e7513ce3dbde..a5055d760661 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1351,6 +1351,7 @@ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		struct bio **biop);
- 
- #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
-+#define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
- 
- extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
--- 
-2.11.0
+    git://git.infradead.org/users/hch/block.git discard-rework
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/discard-rework
