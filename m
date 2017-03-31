@@ -1,246 +1,251 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 12/16] block, bfq: boost the throughput on NCQ-capable flash-based devices
-Date: Fri, 31 Mar 2017 14:47:39 +0200
-Message-Id: <20170331124743.3530-13-paolo.valente@linaro.org>
-In-Reply-To: <20170331124743.3530-1-paolo.valente@linaro.org>
-References: <20170331124743.3530-1-paolo.valente@linaro.org>
+Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 10/25] block: add a flags argument to (__)blkdev_issue_zeroout
+Date: Fri, 31 Mar 2017 18:32:58 +0200
+Message-Id: <20170331163313.31821-11-hch@lst.de>
+In-Reply-To: <20170331163313.31821-1-hch@lst.de>
+References: <20170331163313.31821-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch boosts the throughput on NCQ-capable flash-based devices,
-while still preserving latency guarantees for interactive and soft
-real-time applications. The throughput is boosted by just not idling
-the device when the in-service queue remains empty, even if the queue
-is sync and has a non-null idle window. This helps to keep the drive's
-internal queue full, which is necessary to achieve maximum
-performance. This solution to boost the throughput is a port of
-commits a68bbdd and f7d7b7a for CFQ.
+Turn the existin discard flag into a new BLKDEV_ZERO_UNMAP flag with
+similar semantics, but without referring to diѕcard.
 
-As already highlighted in a previous patch, allowing the device to
-prefetch and internally reorder requests trivially causes loss of
-control on the request service order, and hence on service guarantees.
-Fortunately, as discussed in detail in the comments on the function
-bfq_bfqq_may_idle(), if every process has to receive the same
-fraction of the throughput, then the service order enforced by the
-internal scheduler of a flash-based device is relatively close to that
-enforced by BFQ. In particular, it is close enough to let service
-guarantees be substantially preserved.
-
-Things change in an asymmetric scenario, i.e., if not every process
-has to receive the same fraction of the throughput. In this case, to
-guarantee the desired throughput distribution, the device must be
-prevented from prefetching requests. This is exactly what this patch
-does in asymmetric scenarios.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bfq-iosched.c | 154 ++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 106 insertions(+), 48 deletions(-)
+ block/blk-lib.c                    | 31 ++++++++++++++-----------------
+ block/ioctl.c                      |  2 +-
+ drivers/block/drbd/drbd_receiver.c |  9 ++++++---
+ drivers/nvme/target/io-cmd.c       |  2 +-
+ fs/block_dev.c                     |  2 +-
+ fs/dax.c                           |  2 +-
+ fs/xfs/xfs_bmap_util.c             |  2 +-
+ include/linux/blkdev.h             | 16 ++++++++++------
+ 8 files changed, 35 insertions(+), 31 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ec87cff..ca1ae24 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6426,15 +6426,25 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * The value of the variable is computed considering that
- 	 * idling is usually beneficial for the throughput if:
- 	 * (a) the device is not NCQ-capable, or
--	 * (b) regardless of the presence of NCQ, the request pattern
--	 *     for bfqq is I/O-bound (possible throughput losses
--	 *     caused by granting idling to seeky queues are mitigated
--	 *     by the fact that, in all scenarios where boosting
--	 *     throughput is the best thing to do, i.e., in all
--	 *     symmetric scenarios, only a minimal idle time is
--	 *     allowed to seeky queues).
-+	 * (b) regardless of the presence of NCQ, the device is rotational
-+	 *     and the request pattern for bfqq is I/O-bound (possible
-+	 *     throughput losses caused by granting idling to seeky queues
-+	 *     are mitigated by the fact that, in all scenarios where
-+	 *     boosting throughput is the best thing to do, i.e., in all
-+	 *     symmetric scenarios, only a minimal idle time is allowed to
-+	 *     seeky queues).
-+	 *
-+	 * Secondly, and in contrast to the above item (b), idling an
-+	 * NCQ-capable flash-based device would not boost the
-+	 * throughput even with intense I/O; rather it would lower
-+	 * the throughput in proportion to how fast the device
-+	 * is. Accordingly, the next variable is true if any of the
-+	 * above conditions (a) and (b) is true, and, in particular,
-+	 * happens to be false if bfqd is an NCQ-capable flash-based
-+	 * device.
- 	 */
--	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
-+	idling_boosts_thr = !bfqd->hw_tag ||
-+		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq));
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 2a8d638544a7..f9f24ec69c27 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -282,14 +282,18 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+  * @nr_sects:	number of sectors to write
+  * @gfp_mask:	memory allocation flags (for bio_alloc)
+  * @biop:	pointer to anchor bio
+- * @discard:	discard flag
++ * @flags:	controls detailed behavior
+  *
+  * Description:
+- *  Generate and issue number of bios with zerofiled pages.
++ *  Zero-fill a block range, either using hardware offload or by explicitly
++ *  writing zeroes to the device.
++ *
++ *  If a device is using logical block provisioning, the underlying space will
++ *  not be released if %flags contains BLKDEV_ZERO_NOUNMAP.
+  */
+ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
+-		bool discard)
++		unsigned flags)
+ {
+ 	int ret;
+ 	int bi_size = 0;
+@@ -337,28 +341,21 @@ EXPORT_SYMBOL(__blkdev_issue_zeroout);
+  * @sector:	start sector
+  * @nr_sects:	number of sectors to write
+  * @gfp_mask:	memory allocation flags (for bio_alloc)
+- * @discard:	whether to discard the block range
++ * @flags:	controls detailed behavior
+  *
+  * Description:
+- *  Zero-fill a block range.  If the discard flag is set and the block
+- *  device guarantees that subsequent READ operations to the block range
+- *  in question will return zeroes, the blocks will be discarded. Should
+- *  the discard request fail, if the discard flag is not set, or if
+- *  discard_zeroes_data is not supported, this function will resort to
+- *  zeroing the blocks manually, thus provisioning (allocating,
+- *  anchoring) them. If the block device supports WRITE ZEROES or WRITE SAME
+- *  command(s), blkdev_issue_zeroout() will use it to optimize the process of
+- *  clearing the block range. Otherwise the zeroing will be performed
+- *  using regular WRITE calls.
++ *  Zero-fill a block range, either using hardware offload or by explicitly
++ *  writing zeroes to the device.  See __blkdev_issue_zeroout() for the
++ *  valid values for %flags.
+  */
+ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+-			 sector_t nr_sects, gfp_t gfp_mask, bool discard)
++		sector_t nr_sects, gfp_t gfp_mask, unsigned flags)
+ {
+ 	int ret;
+ 	struct bio *bio = NULL;
+ 	struct blk_plug plug;
  
- 	/*
- 	 * The value of the next variable,
-@@ -6475,14 +6485,16 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 		bfqd->wr_busy_queues == 0;
+-	if (discard) {
++	if (!(flags & BLKDEV_ZERO_NOUNMAP)) {
+ 		if (!blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask,
+ 				BLKDEV_DISCARD_ZERO))
+ 			return 0;
+@@ -366,7 +363,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
  
- 	/*
--	 * There is then a case where idling must be performed not for
--	 * throughput concerns, but to preserve service guarantees. To
--	 * introduce it, we can note that allowing the drive to
--	 * enqueue more than one request at a time, and hence
-+	 * There is then a case where idling must be performed not
-+	 * for throughput concerns, but to preserve service
-+	 * guarantees.
-+	 *
-+	 * To introduce this case, we can note that allowing the drive
-+	 * to enqueue more than one request at a time, and hence
- 	 * delegating de facto final scheduling decisions to the
--	 * drive's internal scheduler, causes loss of control on the
-+	 * drive's internal scheduler, entails loss of control on the
- 	 * actual request service order. In particular, the critical
--	 * situation is when requests from different processes happens
-+	 * situation is when requests from different processes happen
- 	 * to be present, at the same time, in the internal queue(s)
- 	 * of the drive. In such a situation, the drive, by deciding
- 	 * the service order of the internally-queued requests, does
-@@ -6493,51 +6505,97 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * the service distribution enforced by the drive's internal
- 	 * scheduler is likely to coincide with the desired
- 	 * device-throughput distribution only in a completely
--	 * symmetric scenario where: (i) each of these processes must
--	 * get the same throughput as the others; (ii) all these
--	 * processes have the same I/O pattern (either sequential or
--	 * random).  In fact, in such a scenario, the drive will tend
--	 * to treat the requests of each of these processes in about
--	 * the same way as the requests of the others, and thus to
--	 * provide each of these processes with about the same
--	 * throughput (which is exactly the desired throughput
--	 * distribution). In contrast, in any asymmetric scenario,
--	 * device idling is certainly needed to guarantee that bfqq
--	 * receives its assigned fraction of the device throughput
--	 * (see [1] for details).
-+	 * symmetric scenario where:
-+	 * (i)  each of these processes must get the same throughput as
-+	 *      the others;
-+	 * (ii) all these processes have the same I/O pattern
-+		(either sequential or random).
-+	 * In fact, in such a scenario, the drive will tend to treat
-+	 * the requests of each of these processes in about the same
-+	 * way as the requests of the others, and thus to provide
-+	 * each of these processes with about the same throughput
-+	 * (which is exactly the desired throughput distribution). In
-+	 * contrast, in any asymmetric scenario, device idling is
-+	 * certainly needed to guarantee that bfqq receives its
-+	 * assigned fraction of the device throughput (see [1] for
-+	 * details).
-+	 *
-+	 * We address this issue by controlling, actually, only the
-+	 * symmetry sub-condition (i), i.e., provided that
-+	 * sub-condition (i) holds, idling is not performed,
-+	 * regardless of whether sub-condition (ii) holds. In other
-+	 * words, only if sub-condition (i) holds, then idling is
-+	 * allowed, and the device tends to be prevented from queueing
-+	 * many requests, possibly of several processes. The reason
-+	 * for not controlling also sub-condition (ii) is that we
-+	 * exploit preemption to preserve guarantees in case of
-+	 * symmetric scenarios, even if (ii) does not hold, as
-+	 * explained in the next two paragraphs.
-+	 *
-+	 * Even if a queue, say Q, is expired when it remains idle, Q
-+	 * can still preempt the new in-service queue if the next
-+	 * request of Q arrives soon (see the comments on
-+	 * bfq_bfqq_update_budg_for_activation). If all queues and
-+	 * groups have the same weight, this form of preemption,
-+	 * combined with the hole-recovery heuristic described in the
-+	 * comments on function bfq_bfqq_update_budg_for_activation,
-+	 * are enough to preserve a correct bandwidth distribution in
-+	 * the mid term, even without idling. In fact, even if not
-+	 * idling allows the internal queues of the device to contain
-+	 * many requests, and thus to reorder requests, we can rather
-+	 * safely assume that the internal scheduler still preserves a
-+	 * minimum of mid-term fairness. The motivation for using
-+	 * preemption instead of idling is that, by not idling,
-+	 * service guarantees are preserved without minimally
-+	 * sacrificing throughput. In other words, both a high
-+	 * throughput and its desired distribution are obtained.
-+	 *
-+	 * More precisely, this preemption-based, idleless approach
-+	 * provides fairness in terms of IOPS, and not sectors per
-+	 * second. This can be seen with a simple example. Suppose
-+	 * that there are two queues with the same weight, but that
-+	 * the first queue receives requests of 8 sectors, while the
-+	 * second queue receives requests of 1024 sectors. In
-+	 * addition, suppose that each of the two queues contains at
-+	 * most one request at a time, which implies that each queue
-+	 * always remains idle after it is served. Finally, after
-+	 * remaining idle, each queue receives very quickly a new
-+	 * request. It follows that the two queues are served
-+	 * alternatively, preempting each other if needed. This
-+	 * implies that, although both queues have the same weight,
-+	 * the queue with large requests receives a service that is
-+	 * 1024/8 times as high as the service received by the other
-+	 * queue.
- 	 *
--	 * As for sub-condition (i), actually we check only whether
--	 * bfqq is being weight-raised. In fact, if bfqq is not being
--	 * weight-raised, we have that:
--	 * - if the process associated with bfqq is not I/O-bound, then
--	 *   it is not either latency- or throughput-critical; therefore
--	 *   idling is not needed for bfqq;
--	 * - if the process asociated with bfqq is I/O-bound, then
--	 *   idling is already granted with bfqq (see the comments on
--	 *   idling_boosts_thr).
-+	 * On the other hand, device idling is performed, and thus
-+	 * pure sector-domain guarantees are provided, for the
-+	 * following queues, which are likely to need stronger
-+	 * throughput guarantees: weight-raised queues, and queues
-+	 * with a higher weight than other queues. When such queues
-+	 * are active, sub-condition (i) is false, which triggers
-+	 * device idling.
- 	 *
--	 * We do not check sub-condition (ii) at all, i.e., the next
--	 * variable is true if and only if bfqq is being
--	 * weight-raised. We do not need to control sub-condition (ii)
--	 * for the following reason:
--	 * - if bfqq is being weight-raised, then idling is already
--	 *   guaranteed to bfqq by sub-condition (i);
--	 * - if bfqq is not being weight-raised, then idling is
--	 *   already guaranteed to bfqq (only) if it matters, i.e., if
--	 *   bfqq is associated to a currently I/O-bound process (see
--	 *   the above comment on sub-condition (i)).
-+	 * According to the above considerations, the next variable is
-+	 * true (only) if sub-condition (i) holds. To compute the
-+	 * value of this variable, we not only use the return value of
-+	 * the function bfq_symmetric_scenario(), but also check
-+	 * whether bfqq is being weight-raised, because
-+	 * bfq_symmetric_scenario() does not take into account also
-+	 * weight-raised queues (see comments on
-+	 * bfq_weights_tree_add()).
- 	 *
- 	 * As a side note, it is worth considering that the above
- 	 * device-idling countermeasures may however fail in the
- 	 * following unlucky scenario: if idling is (correctly)
--	 * disabled in a time period during which the symmetry
--	 * sub-condition holds, and hence the device is allowed to
-+	 * disabled in a time period during which all symmetry
-+	 * sub-conditions hold, and hence the device is allowed to
- 	 * enqueue many requests, but at some later point in time some
- 	 * sub-condition stops to hold, then it may become impossible
- 	 * to let requests be served in the desired order until all
- 	 * the requests already queued in the device have been served.
- 	 */
--	asymmetric_scenario = bfqq->wr_coeff > 1;
-+	asymmetric_scenario = bfqq->wr_coeff > 1 ||
-+		!bfq_symmetric_scenario(bfqd);
+ 	blk_start_plug(&plug);
+ 	ret = __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
+-			&bio, discard);
++			&bio, flags);
+ 	if (ret == 0 && bio) {
+ 		ret = submit_bio_wait(bio);
+ 		bio_put(bio);
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 7b88820b93d9..8ea00a41be01 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -255,7 +255,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
+ 	truncate_inode_pages_range(mapping, start, end);
  
- 	/*
- 	 * We have now all the components we need to compute the return
+ 	return blkdev_issue_zeroout(bdev, start >> 9, len >> 9, GFP_KERNEL,
+-				    false);
++			BLKDEV_ZERO_NOUNMAP);
+ }
+ 
+ static int put_ushort(unsigned long arg, unsigned short val)
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index aa6bf9692eff..dc9a6dcd431c 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -1499,19 +1499,22 @@ int drbd_issue_discard_or_zero_out(struct drbd_device *device, sector_t start, u
+ 		tmp = start + granularity - sector_div(tmp, granularity);
+ 
+ 		nr = tmp - start;
+-		err |= blkdev_issue_zeroout(bdev, start, nr, GFP_NOIO, 0);
++		err |= blkdev_issue_zeroout(bdev, start, nr, GFP_NOIO,
++				BLKDEV_ZERO_NOUNMAP);
+ 		nr_sectors -= nr;
+ 		start = tmp;
+ 	}
+ 	while (nr_sectors >= granularity) {
+ 		nr = min_t(sector_t, nr_sectors, max_discard_sectors);
+-		err |= blkdev_issue_discard(bdev, start, nr, GFP_NOIO, 0);
++		err |= blkdev_issue_discard(bdev, start, nr, GFP_NOIO,
++				BLKDEV_ZERO_NOUNMAP);
+ 		nr_sectors -= nr;
+ 		start += nr;
+ 	}
+  zero_out:
+ 	if (nr_sectors) {
+-		err |= blkdev_issue_zeroout(bdev, start, nr_sectors, GFP_NOIO, 0);
++		err |= blkdev_issue_zeroout(bdev, start, nr_sectors, GFP_NOIO,
++				BLKDEV_ZERO_NOUNMAP);
+ 	}
+ 	return err != 0;
+ }
+diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
+index 4195115c7e54..7206f9cda575 100644
+--- a/drivers/nvme/target/io-cmd.c
++++ b/drivers/nvme/target/io-cmd.c
+@@ -184,7 +184,7 @@ static void nvmet_execute_write_zeroes(struct nvmet_req *req)
+ 		(req->ns->blksize_shift - 9)) + 1;
+ 
+ 	if (__blkdev_issue_zeroout(req->ns->bdev, sector, nr_sector,
+-				GFP_KERNEL, &bio, true))
++				GFP_KERNEL, &bio, 0))
+ 		status = NVME_SC_INTERNAL | NVME_SC_DNR;
+ 
+ 	if (bio) {
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index f2d59f143ef4..2f704c3a816f 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -2105,7 +2105,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	case FALLOC_FL_ZERO_RANGE:
+ 	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
+ 		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+-					    GFP_KERNEL, false);
++					    GFP_KERNEL, BLKDEV_ZERO_NOUNMAP);
+ 		break;
+ 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
+ 		/* Only punch if the device can do zeroing discard. */
+diff --git a/fs/dax.c b/fs/dax.c
+index de622d4282a6..2bfbcd726047 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -982,7 +982,7 @@ int __dax_zero_page_range(struct block_device *bdev, sector_t sector,
+ 		sector_t start_sector = dax.sector + (offset >> 9);
+ 
+ 		return blkdev_issue_zeroout(bdev, start_sector,
+-				length >> 9, GFP_NOFS, true);
++				length >> 9, GFP_NOFS, 0);
+ 	} else {
+ 		if (dax_map_atomic(bdev, &dax) < 0)
+ 			return PTR_ERR(dax.addr);
+diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
+index 8b75dcea5966..142bbbe06114 100644
+--- a/fs/xfs/xfs_bmap_util.c
++++ b/fs/xfs/xfs_bmap_util.c
+@@ -81,7 +81,7 @@ xfs_zero_extent(
+ 	return blkdev_issue_zeroout(xfs_find_bdev_for_inode(VFS_I(ip)),
+ 		block << (mp->m_super->s_blocksize_bits - 9),
+ 		count_fsb << (mp->m_super->s_blocksize_bits - 9),
+-		GFP_NOFS, true);
++		GFP_NOFS, 0);
+ }
+ 
+ int
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index a2dc6b390d48..e7513ce3dbde 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1337,23 +1337,27 @@ static inline struct request *blk_map_queue_find_tag(struct blk_queue_tag *bqt,
+ 	return bqt->tag_index[tag];
+ }
+ 
++extern int blkdev_issue_flush(struct block_device *, gfp_t, sector_t *);
++extern int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
++		sector_t nr_sects, gfp_t gfp_mask, struct page *page);
+ 
+ #define BLKDEV_DISCARD_SECURE	(1 << 0)	/* issue a secure erase */
+ #define BLKDEV_DISCARD_ZERO	(1 << 1)	/* must reliably zero data */
+ 
+-extern int blkdev_issue_flush(struct block_device *, gfp_t, sector_t *);
+ extern int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, unsigned long flags);
+ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, int flags,
+ 		struct bio **biop);
+-extern int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+-		sector_t nr_sects, gfp_t gfp_mask, struct page *page);
++
++#define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
++
+ extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
+-		bool discard);
++		unsigned flags);
+ extern int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+-		sector_t nr_sects, gfp_t gfp_mask, bool discard);
++		sector_t nr_sects, gfp_t gfp_mask, unsigned flags);
++
+ static inline int sb_issue_discard(struct super_block *sb, sector_t block,
+ 		sector_t nr_blocks, gfp_t gfp_mask, unsigned long flags)
+ {
+@@ -1367,7 +1371,7 @@ static inline int sb_issue_zeroout(struct super_block *sb, sector_t block,
+ 	return blkdev_issue_zeroout(sb->s_bdev,
+ 				    block << (sb->s_blocksize_bits - 9),
+ 				    nr_blocks << (sb->s_blocksize_bits - 9),
+-				    gfp_mask, true);
++				    gfp_mask, 0);
+ }
+ 
+ extern int blk_verify_command(unsigned char *cmd, fmode_t has_write_perm);
 -- 
-2.10.0
+2.11.0
