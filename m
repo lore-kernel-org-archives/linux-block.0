@@ -1,121 +1,124 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH 1/3] blk-mq: Introduce blk_mq_ops.restart_queues
-Date: Fri, 31 Mar 2017 16:12:03 -0700
-Message-ID: <20170331231205.16640-2-bart.vanassche@sandisk.com>
-In-Reply-To: <20170331231205.16640-1-bart.vanassche@sandisk.com>
-References: <20170331231205.16640-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 18/25] brd: remove discard support
+Date: Fri, 31 Mar 2017 18:33:06 +0200
+Message-Id: <20170331163313.31821-19-hch@lst.de>
+In-Reply-To: <20170331163313.31821-1-hch@lst.de>
+References: <20170331163313.31821-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-If a tag set is shared among multiple request queues, leave
-it to the block driver to restart queues. Hence remove
-QUEUE_FLAG_RESTART and introduce blk_mq_ops.restart_queues.
-Remove blk_mq_sched_mark_restart_queue() because this
-function has no callers.
+It's just a in-driver reimplementation of writing zeroes to the pages,
+which fails if the discards aren't page aligned.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-sched.c   | 11 +++--------
- block/blk-mq-sched.h   | 14 --------------
- include/linux/blk-mq.h |  4 ++++
- include/linux/blkdev.h |  1 -
- 4 files changed, 7 insertions(+), 23 deletions(-)
+ drivers/block/brd.c | 54 -----------------------------------------------------
+ 1 file changed, 54 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 09af8ff18719..ed9942ee0146 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -329,16 +329,11 @@ static void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
--	unsigned int i;
- 
--	if (test_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
--		if (test_and_clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
--			queue_for_each_hw_ctx(q, hctx, i)
--				blk_mq_sched_restart_hctx(hctx);
--		}
--	} else {
-+	if (q->mq_ops->restart_queues)
-+		q->mq_ops->restart_queues(q);
-+	else
- 		blk_mq_sched_restart_hctx(hctx);
--	}
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 3adc32a3153b..4ec84d504780 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -134,28 +134,6 @@ static struct page *brd_insert_page(struct brd_device *brd, sector_t sector)
+ 	return page;
  }
  
- /*
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index a75b16b123f7..fe62b1eccf4c 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -131,20 +131,6 @@ static inline void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
- }
- 
--/*
-- * Mark a hardware queue and the request queue it belongs to as needing a
-- * restart.
-- */
--static inline void blk_mq_sched_mark_restart_queue(struct blk_mq_hw_ctx *hctx)
+-static void brd_free_page(struct brd_device *brd, sector_t sector)
 -{
--	struct request_queue *q = hctx->queue;
+-	struct page *page;
+-	pgoff_t idx;
 -
--	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
--		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
--	if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
--		set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
+-	spin_lock(&brd->brd_lock);
+-	idx = sector >> PAGE_SECTORS_SHIFT;
+-	page = radix_tree_delete(&brd->brd_pages, idx);
+-	spin_unlock(&brd->brd_lock);
+-	if (page)
+-		__free_page(page);
 -}
 -
- static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
- {
- 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index ea2e9dcd3aef..75160e9470cb 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -86,6 +86,7 @@ struct blk_mq_queue_data {
- };
+-static void brd_zero_page(struct brd_device *brd, sector_t sector)
+-{
+-	struct page *page;
+-
+-	page = brd_lookup_page(brd, sector);
+-	if (page)
+-		clear_highpage(page);
+-}
+-
+ /*
+  * Free all backing store pages and radix tree. This must only be called when
+  * there are no other users of the device.
+@@ -212,24 +190,6 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
+ 	return 0;
+ }
  
- typedef int (queue_rq_fn)(struct blk_mq_hw_ctx *, const struct blk_mq_queue_data *);
-+typedef void (restart_fn)(struct request_queue *q);
- typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
- typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
- typedef void (exit_hctx_fn)(struct blk_mq_hw_ctx *, unsigned int);
-@@ -108,6 +109,9 @@ struct blk_mq_ops {
+-static void discard_from_brd(struct brd_device *brd,
+-			sector_t sector, size_t n)
+-{
+-	while (n >= PAGE_SIZE) {
+-		/*
+-		 * Don't want to actually discard pages here because
+-		 * re-allocating the pages can result in writeback
+-		 * deadlocks under heavy load.
+-		 */
+-		if (0)
+-			brd_free_page(brd, sector);
+-		else
+-			brd_zero_page(brd, sector);
+-		sector += PAGE_SIZE >> SECTOR_SHIFT;
+-		n -= PAGE_SIZE;
+-	}
+-}
+-
+ /*
+  * Copy n bytes from src to the brd starting at sector. Does not sleep.
+  */
+@@ -338,14 +298,6 @@ static blk_qc_t brd_make_request(struct request_queue *q, struct bio *bio)
+ 	if (bio_end_sector(bio) > get_capacity(bdev->bd_disk))
+ 		goto io_error;
+ 
+-	if (unlikely(bio_op(bio) == REQ_OP_DISCARD)) {
+-		if (sector & ((PAGE_SIZE >> SECTOR_SHIFT) - 1) ||
+-		    bio->bi_iter.bi_size & ~PAGE_MASK)
+-			goto io_error;
+-		discard_from_brd(brd, sector, bio->bi_iter.bi_size);
+-		goto out;
+-	}
+-
+ 	bio_for_each_segment(bvec, bio, iter) {
+ 		unsigned int len = bvec.bv_len;
+ 		int err;
+@@ -357,7 +309,6 @@ static blk_qc_t brd_make_request(struct request_queue *q, struct bio *bio)
+ 		sector += len >> SECTOR_SHIFT;
+ 	}
+ 
+-out:
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+ io_error:
+@@ -464,11 +415,6 @@ static struct brd_device *brd_alloc(int i)
+ 	 *  is harmless)
  	 */
- 	queue_rq_fn		*queue_rq;
- 
-+	/* Called upon request completion to rerun all queues */
-+	restart_fn		*restart_queues;
-+
- 	/*
- 	 * Called on request timeout
- 	 */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a2dc6b390d48..a80543ec8be7 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -615,7 +615,6 @@ struct request_queue {
- #define QUEUE_FLAG_FLUSH_NQ    25	/* flush not queueuable */
- #define QUEUE_FLAG_DAX         26	/* device supports DAX */
- #define QUEUE_FLAG_STATS       27	/* track rq completion times */
--#define QUEUE_FLAG_RESTART     28	/* queue needs restart at completion */
- #define QUEUE_FLAG_POLL_STATS  29	/* collecting stats for hybrid polling */
- #define QUEUE_FLAG_REGISTERED  30	/* queue has been registered to a disk */
- 
+ 	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
+-
+-	brd->brd_queue->limits.discard_granularity = PAGE_SIZE;
+-	blk_queue_max_discard_sectors(brd->brd_queue, UINT_MAX);
+-	brd->brd_queue->limits.discard_zeroes_data = 1;
+-	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, brd->brd_queue);
+ #ifdef CONFIG_BLK_DEV_RAM_DAX
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
+ #endif
 -- 
-2.12.0
+2.11.0
