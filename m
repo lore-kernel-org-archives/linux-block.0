@@ -1,124 +1,226 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33864 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932214AbdC2K4e (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2017 06:56:34 -0400
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>, Richard Weinberger <richard@nod.at>,
-        Artem Bityutskiy <dedekind1@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        linux-mtd@lists.infradead.org
-Subject: [PATCH 22/25] ubifs: Convert to separately allocated bdi
-Date: Wed, 29 Mar 2017 12:56:20 +0200
-Message-Id: <20170329105623.18241-23-jack@suse.cz>
-In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
-References: <20170329105623.18241-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 01/25] =?UTF-8?q?=D1=95d:=20split=20sd=5Fsetup=5Fdiscard?= =?UTF-8?q?=5Fcmnd?=
+Date: Fri, 31 Mar 2017 18:32:49 +0200
+Message-Id: <20170331163313.31821-2-hch@lst.de>
+In-Reply-To: <20170331163313.31821-1-hch@lst.de>
+References: <20170331163313.31821-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+Split sd_setup_discard_cmnd into one function per provisioning type.  While
+this creates some very slight duplication of boilerplate code it keeps the
+code modular for additions of new provisioning types, and for reusing the
+write same functions for the upcoming scsi implementation of the Write Zeroes
+operation.
 
-CC: Richard Weinberger <richard@nod.at>
-CC: Artem Bityutskiy <dedekind1@gmail.com>
-CC: Adrian Hunter <adrian.hunter@intel.com>
-CC: linux-mtd@lists.infradead.org
-Acked-by: Richard Weinberger <richard@nod.at>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/ubifs/super.c | 25 +++++++++----------------
- fs/ubifs/ubifs.h |  3 ---
- 2 files changed, 9 insertions(+), 19 deletions(-)
+ drivers/scsi/sd.c | 153 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 84 insertions(+), 69 deletions(-)
 
-diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
-index b73811bd7676..cf4cc99b75b5 100644
---- a/fs/ubifs/super.c
-+++ b/fs/ubifs/super.c
-@@ -1827,7 +1827,6 @@ static void ubifs_put_super(struct super_block *sb)
- 	}
- 
- 	ubifs_umount(c);
--	bdi_destroy(&c->bdi);
- 	ubi_close_volume(c->ubi);
- 	mutex_unlock(&c->umount_mutex);
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index fcfeddc79331..b853f91fb3da 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -701,93 +701,97 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
  }
-@@ -2019,29 +2018,25 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
- 		goto out;
- 	}
  
-+	err = ubifs_parse_options(c, data, 0);
-+	if (err)
-+		goto out_close;
-+
- 	/*
- 	 * UBIFS provides 'backing_dev_info' in order to disable read-ahead. For
- 	 * UBIFS, I/O is not deferred, it is done immediately in readpage,
- 	 * which means the user would have to wait not just for their own I/O
- 	 * but the read-ahead I/O as well i.e. completely pointless.
- 	 *
--	 * Read-ahead will be disabled because @c->bdi.ra_pages is 0.
-+	 * Read-ahead will be disabled because @sb->s_bdi->ra_pages is 0. Also
-+	 * @sb->s_bdi->capabilities are initialized to 0 so there won't be any
-+	 * writeback happening.
- 	 */
--	c->bdi.name = "ubifs",
--	c->bdi.capabilities = 0;
--	err  = bdi_init(&c->bdi);
-+	err = super_setup_bdi_name(sb, "ubifs_%d_%d", c->vi.ubi_num,
-+				   c->vi.vol_id);
- 	if (err)
- 		goto out_close;
--	err = bdi_register(&c->bdi, NULL, "ubifs_%d_%d",
--			   c->vi.ubi_num, c->vi.vol_id);
--	if (err)
--		goto out_bdi;
+-/**
+- * sd_setup_discard_cmnd - unmap blocks on thinly provisioned device
+- * @sdp: scsi device to operate on
+- * @rq: Request to prepare
+- *
+- * Will issue either UNMAP or WRITE SAME(16) depending on preference
+- * indicated by target device.
+- **/
+-static int sd_setup_discard_cmnd(struct scsi_cmnd *cmd)
++static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
+ {
+-	struct request *rq = cmd->request;
+ 	struct scsi_device *sdp = cmd->device;
+-	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
+-	sector_t sector = blk_rq_pos(rq);
+-	unsigned int nr_sectors = blk_rq_sectors(rq);
+-	unsigned int len;
+-	int ret;
++	struct request *rq = cmd->request;
++	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
++	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
++	unsigned int data_len = 24;
+ 	char *buf;
+-	struct page *page;
+ 
+-	sector >>= ilog2(sdp->sector_size) - 9;
+-	nr_sectors >>= ilog2(sdp->sector_size) - 9;
 -
--	err = ubifs_parse_options(c, data, 0);
--	if (err)
--		goto out_bdi;
+-	page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
+-	if (!page)
++	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
++	if (!rq->special_vec.bv_page)
+ 		return BLKPREP_DEFER;
++	rq->special_vec.bv_offset = 0;
++	rq->special_vec.bv_len = data_len;
++	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
  
--	sb->s_bdi = &c->bdi;
- 	sb->s_fs_info = c;
- 	sb->s_magic = UBIFS_SUPER_MAGIC;
- 	sb->s_blocksize = UBIFS_BLOCK_SIZE;
-@@ -2080,8 +2075,6 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
- 	ubifs_umount(c);
- out_unlock:
- 	mutex_unlock(&c->umount_mutex);
--out_bdi:
--	bdi_destroy(&c->bdi);
- out_close:
- 	ubi_close_volume(c->ubi);
- out:
-diff --git a/fs/ubifs/ubifs.h b/fs/ubifs/ubifs.h
-index 4d57e488038e..4da10a6d702a 100644
---- a/fs/ubifs/ubifs.h
-+++ b/fs/ubifs/ubifs.h
-@@ -972,7 +972,6 @@ struct ubifs_debug_info;
-  * struct ubifs_info - UBIFS file-system description data structure
-  * (per-superblock).
-  * @vfs_sb: VFS @struct super_block object
-- * @bdi: backing device info object to make VFS happy and disable read-ahead
-  *
-  * @highest_inum: highest used inode number
-  * @max_sqnum: current global sequence number
-@@ -1220,7 +1219,6 @@ struct ubifs_debug_info;
-  */
- struct ubifs_info {
- 	struct super_block *vfs_sb;
--	struct backing_dev_info bdi;
+-	switch (sdkp->provisioning_mode) {
+-	case SD_LBP_UNMAP:
+-		buf = page_address(page);
+-
+-		cmd->cmd_len = 10;
+-		cmd->cmnd[0] = UNMAP;
+-		cmd->cmnd[8] = 24;
+-
+-		put_unaligned_be16(6 + 16, &buf[0]);
+-		put_unaligned_be16(16, &buf[2]);
+-		put_unaligned_be64(sector, &buf[8]);
+-		put_unaligned_be32(nr_sectors, &buf[16]);
++	cmd->cmd_len = 10;
++	cmd->cmnd[0] = UNMAP;
++	cmd->cmnd[8] = 24;
  
- 	ino_t highest_inum;
- 	unsigned long long max_sqnum;
-@@ -1461,7 +1459,6 @@ extern const struct inode_operations ubifs_file_inode_operations;
- extern const struct file_operations ubifs_dir_operations;
- extern const struct inode_operations ubifs_dir_inode_operations;
- extern const struct inode_operations ubifs_symlink_inode_operations;
--extern struct backing_dev_info ubifs_backing_dev_info;
- extern struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
+-		len = 24;
+-		break;
++	buf = page_address(rq->special_vec.bv_page);
++	put_unaligned_be16(6 + 16, &buf[0]);
++	put_unaligned_be16(16, &buf[2]);
++	put_unaligned_be64(sector, &buf[8]);
++	put_unaligned_be32(nr_sectors, &buf[16]);
  
- /* io.c */
+-	case SD_LBP_WS16:
+-		cmd->cmd_len = 16;
+-		cmd->cmnd[0] = WRITE_SAME_16;
+-		cmd->cmnd[1] = 0x8; /* UNMAP */
+-		put_unaligned_be64(sector, &cmd->cmnd[2]);
+-		put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
++	cmd->allowed = SD_MAX_RETRIES;
++	cmd->transfersize = data_len;
++	rq->timeout = SD_TIMEOUT;
++	scsi_req(rq)->resid_len = data_len;
+ 
+-		len = sdkp->device->sector_size;
+-		break;
++	return scsi_init_io(cmd);
++}
+ 
+-	case SD_LBP_WS10:
+-	case SD_LBP_ZERO:
+-		cmd->cmd_len = 10;
+-		cmd->cmnd[0] = WRITE_SAME;
+-		if (sdkp->provisioning_mode == SD_LBP_WS10)
+-			cmd->cmnd[1] = 0x8; /* UNMAP */
+-		put_unaligned_be32(sector, &cmd->cmnd[2]);
+-		put_unaligned_be16(nr_sectors, &cmd->cmnd[7]);
++static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd)
++{
++	struct scsi_device *sdp = cmd->device;
++	struct request *rq = cmd->request;
++	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
++	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
++	u32 data_len = sdp->sector_size;
+ 
+-		len = sdkp->device->sector_size;
+-		break;
++	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
++	if (!rq->special_vec.bv_page)
++		return BLKPREP_DEFER;
++	rq->special_vec.bv_offset = 0;
++	rq->special_vec.bv_len = data_len;
++	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
+ 
+-	default:
+-		ret = BLKPREP_INVALID;
+-		goto out;
+-	}
++	cmd->cmd_len = 16;
++	cmd->cmnd[0] = WRITE_SAME_16;
++	cmd->cmnd[1] = 0x8; /* UNMAP */
++	put_unaligned_be64(sector, &cmd->cmnd[2]);
++	put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
+ 
++	cmd->allowed = SD_MAX_RETRIES;
++	cmd->transfersize = data_len;
+ 	rq->timeout = SD_TIMEOUT;
++	scsi_req(rq)->resid_len = data_len;
+ 
+-	cmd->transfersize = len;
+-	cmd->allowed = SD_MAX_RETRIES;
++	return scsi_init_io(cmd);
++}
+ 
+-	rq->special_vec.bv_page = page;
+-	rq->special_vec.bv_offset = 0;
+-	rq->special_vec.bv_len = len;
++static int sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd, bool unmap)
++{
++	struct scsi_device *sdp = cmd->device;
++	struct request *rq = cmd->request;
++	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
++	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
++	u32 data_len = sdp->sector_size;
+ 
++	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
++	if (!rq->special_vec.bv_page)
++		return BLKPREP_DEFER;
++	rq->special_vec.bv_offset = 0;
++	rq->special_vec.bv_len = data_len;
+ 	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
+-	scsi_req(rq)->resid_len = len;
+ 
+-	ret = scsi_init_io(cmd);
+-out:
+-	if (ret != BLKPREP_OK)
+-		__free_page(page);
+-	return ret;
++	cmd->cmd_len = 10;
++	cmd->cmnd[0] = WRITE_SAME;
++	if (unmap)
++		cmd->cmnd[1] = 0x8; /* UNMAP */
++	put_unaligned_be32(sector, &cmd->cmnd[2]);
++	put_unaligned_be16(nr_sectors, &cmd->cmnd[7]);
++
++	cmd->allowed = SD_MAX_RETRIES;
++	cmd->transfersize = data_len;
++	rq->timeout = SD_TIMEOUT;
++	scsi_req(rq)->resid_len = data_len;
++
++	return scsi_init_io(cmd);
+ }
+ 
+ static void sd_config_write_same(struct scsi_disk *sdkp)
+@@ -1155,7 +1159,18 @@ static int sd_init_command(struct scsi_cmnd *cmd)
+ 
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_DISCARD:
+-		return sd_setup_discard_cmnd(cmd);
++		switch (scsi_disk(rq->rq_disk)->provisioning_mode) {
++		case SD_LBP_UNMAP:
++			return sd_setup_unmap_cmnd(cmd);
++		case SD_LBP_WS16:
++			return sd_setup_write_same16_cmnd(cmd);
++		case SD_LBP_WS10:
++			return sd_setup_write_same10_cmnd(cmd, true);
++		case SD_LBP_ZERO:
++			return sd_setup_write_same10_cmnd(cmd, false);
++		default:
++			return BLKPREP_INVALID;
++		}
+ 	case REQ_OP_WRITE_SAME:
+ 		return sd_setup_write_same_cmnd(cmd);
+ 	case REQ_OP_FLUSH:
 -- 
-2.10.2
+2.11.0
