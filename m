@@ -1,66 +1,35 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>, Tyler Hicks <tyhicks@canonical.com>,
-        ecryptfs@vger.kernel.org
-Subject: [PATCH 11/25] ecryptfs: Convert to separately allocated bdi
-Date: Wed, 29 Mar 2017 12:56:09 +0200
-Message-Id: <20170329105623.18241-12-jack@suse.cz>
-In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
-References: <20170329105623.18241-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "tj@kernel.org" <tj@kernel.org>, "paolo.valente@linaro.org"
+	<paolo.valente@linaro.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"samuele.zecchini92@gmail.com" <samuele.zecchini92@gmail.com>,
+	"fchecconi@gmail.com" <fchecconi@gmail.com>, "linus.walleij@linaro.org"
+	<linus.walleij@linaro.org>, "avanzini.arianna@gmail.com"
+	<avanzini.arianna@gmail.com>, "broonie@kernel.org" <broonie@kernel.org>,
+	"riccardo.pizzetti@gmail.com" <riccardo.pizzetti@gmail.com>,
+	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
+Subject: Re: [PATCH V2 11/16] block, bfq: reduce idling only in symmetric
+ scenarios
+Date: Fri, 31 Mar 2017 15:20:29 +0000
+Message-ID: <1490973609.2587.3.camel@sandisk.com>
+References: <20170331124743.3530-1-paolo.valente@linaro.org>
+	 <20170331124743.3530-12-paolo.valente@linaro.org>
+In-Reply-To: <20170331124743.3530-12-paolo.valente@linaro.org>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+On Fri, 2017-03-31 at 14:47 +0200, Paolo Valente wrote:
+> +=A0=A0=A0=A0=A0=A0=A0entity->weight_counter =3D kzalloc(sizeof(struct bf=
+q_weight_counter),
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GFP_ATOMIC);
+> +=A0=A0=A0=A0=A0=A0=A0entity->weight_counter->weight =3D entity->weight;
 
-CC: Tyler Hicks <tyhicks@canonical.com>
-CC: ecryptfs@vger.kernel.org
-Acked-by: Tyler Hicks <tyhicks@canonical.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/ecryptfs/ecryptfs_kernel.h | 1 -
- fs/ecryptfs/main.c            | 4 +---
- 2 files changed, 1 insertion(+), 4 deletions(-)
+GFP_ATOMIC allocations are more likely to fail than GFP_KERNEL allocations.
+What will happen if kzalloc() returns NULL?
 
-diff --git a/fs/ecryptfs/ecryptfs_kernel.h b/fs/ecryptfs/ecryptfs_kernel.h
-index 95c1c8d34539..9c351bf757b2 100644
---- a/fs/ecryptfs/ecryptfs_kernel.h
-+++ b/fs/ecryptfs/ecryptfs_kernel.h
-@@ -349,7 +349,6 @@ struct ecryptfs_mount_crypt_stat {
- struct ecryptfs_sb_info {
- 	struct super_block *wsi_sb;
- 	struct ecryptfs_mount_crypt_stat mount_crypt_stat;
--	struct backing_dev_info bdi;
- };
- 
- /* file private data. */
-diff --git a/fs/ecryptfs/main.c b/fs/ecryptfs/main.c
-index 151872dcc1f4..9014479d0160 100644
---- a/fs/ecryptfs/main.c
-+++ b/fs/ecryptfs/main.c
-@@ -519,12 +519,11 @@ static struct dentry *ecryptfs_mount(struct file_system_type *fs_type, int flags
- 		goto out;
- 	}
- 
--	rc = bdi_setup_and_register(&sbi->bdi, "ecryptfs");
-+	rc = super_setup_bdi(s);
- 	if (rc)
- 		goto out1;
- 
- 	ecryptfs_set_superblock_private(s, sbi);
--	s->s_bdi = &sbi->bdi;
- 
- 	/* ->kill_sb() will take care of sbi after that point */
- 	sbi = NULL;
-@@ -633,7 +632,6 @@ static void ecryptfs_kill_block_super(struct super_block *sb)
- 	if (!sb_info)
- 		return;
- 	ecryptfs_destroy_mount_crypt_stat(&sb_info->mount_crypt_stat);
--	bdi_destroy(&sb_info->bdi);
- 	kmem_cache_free(ecryptfs_sb_info_cache, sb_info);
- }
- 
--- 
-2.10.2
+Bart.=
