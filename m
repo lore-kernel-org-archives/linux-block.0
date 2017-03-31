@@ -1,137 +1,106 @@
-Return-Path: <BATV+b8442eb9fd62b0a9e465+4950+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 4/4] blk-mq: streamline blk_mq_make_request
-Date: Mon, 13 Mar 2017 09:48:33 -0600
-Message-Id: <20170313154833.14165-5-hch@lst.de>
-In-Reply-To: <20170313154833.14165-1-hch@lst.de>
-References: <20170313154833.14165-1-hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 11/25] block: add a REQ_UNMAP flag for REQ_OP_WRITE_ZEROES
+Date: Fri, 31 Mar 2017 18:32:59 +0200
+Message-Id: <20170331163313.31821-12-hch@lst.de>
+In-Reply-To: <20170331163313.31821-1-hch@lst.de>
+References: <20170331163313.31821-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Turn the different ways of merging or issuing I/O into a series of if/else
-statements instead of the current maze of gotos.  Note that this means we
-pin the CPU a little longer for some cases as the CTX put is moved to
-common code at the end of the function.
+If this flag is set logical provisioning capable device should
+release space for the zeroed blocks if possible, if it is not set
+devices should keep the blocks anchored.
+
+Also remove an out of sync kerneldoc comment for a static function
+that would have become even more out of data with this change.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 67 +++++++++++++++++++++++-----------------------------------
- 1 file changed, 27 insertions(+), 40 deletions(-)
+ block/blk-lib.c           | 19 +++++--------------
+ include/linux/blk_types.h |  6 ++++++
+ 2 files changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 48748cb799ed..18e449cc832f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1534,16 +1534,17 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 	cookie = request_to_qc_t(data.hctx, rq);
- 
-+	plug = current->plug;
- 	if (unlikely(is_flush_fua)) {
--		if (q->elevator)
--			goto elv_insert;
- 		blk_mq_bio_to_request(rq, bio);
--		blk_insert_flush(rq);
--		goto run_queue;
--	}
--
--	plug = current->plug;
--	if (plug && q->nr_hw_queues == 1) {
-+		if (q->elevator) {
-+			blk_mq_sched_insert_request(rq, false, true,
-+						!is_sync || is_flush_fua, true);
-+		} else {
-+			blk_insert_flush(rq);
-+			blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
-+		}
-+	} else if (plug && q->nr_hw_queues == 1) {
- 		struct request *last = NULL;
- 
- 		blk_mq_bio_to_request(rq, bio);
-@@ -1562,8 +1563,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		else
- 			last = list_entry_rq(plug->mq_list.prev);
- 
--		blk_mq_put_ctx(data.ctx);
--
- 		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
- 		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
- 			blk_flush_plug_list(plug, false);
-@@ -1571,56 +1570,44 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		}
- 
- 		list_add_tail(&rq->queuelist, &plug->mq_list);
--		goto done;
--	} else if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
--		struct request *old_rq = NULL;
--
-+	} else if (plug && !blk_queue_nomerges(q)) {
- 		blk_mq_bio_to_request(rq, bio);
- 
- 		/*
- 		 * We do limited plugging. If the bio can be merged, do that.
- 		 * Otherwise the existing request in the plug list will be
- 		 * issued. So the plug list will have one request at most
-+		 *
-+		 * The plug list might get flushed before this. If that happens,
-+		 * the plug list is emptry and same_queue_rq is invalid.
- 		 */
--		if (plug) {
--			/*
--			 * The plug list might get flushed before this. If that
--			 * happens, same_queue_rq is invalid and plug list is
--			 * empty
--			 */
--			if (same_queue_rq && !list_empty(&plug->mq_list)) {
--				old_rq = same_queue_rq;
--				list_del_init(&old_rq->queuelist);
--			}
--			list_add_tail(&rq->queuelist, &plug->mq_list);
--		} else /* is_sync */
--			old_rq = rq;
--		blk_mq_put_ctx(data.ctx);
--		if (old_rq)
--			blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
--		goto done;
--	}
-+		if (!list_empty(&plug->mq_list))
-+			list_del_init(&same_queue_rq->queuelist);
-+		else
-+			same_queue_rq = NULL;
- 
--	if (q->elevator) {
--elv_insert:
--		blk_mq_put_ctx(data.ctx);
-+		list_add_tail(&rq->queuelist, &plug->mq_list);
-+		if (same_queue_rq)
-+			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
-+					&cookie);
-+	} else if (is_sync) {
-+		blk_mq_bio_to_request(rq, bio);
-+		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-+	} else if (q->elevator) {
- 		blk_mq_bio_to_request(rq, bio);
- 		blk_mq_sched_insert_request(rq, false, true,
- 						!is_sync || is_flush_fua, true);
--		goto done;
--	}
--	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
-+	} else if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
- 		/*
- 		 * For a SYNC request, send it to the hardware immediately. For
- 		 * an ASYNC request, just ensure that we run it later on. The
- 		 * latter allows for merging opportunities and more efficient
- 		 * dispatching.
- 		 */
--run_queue:
- 		blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
- 	}
-+
- 	blk_mq_put_ctx(data.ctx);
--done:
- 	return cookie;
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index f9f24ec69c27..2f6d2cb2e1a2 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -226,20 +226,9 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
  }
+ EXPORT_SYMBOL(blkdev_issue_write_same);
+ 
+-/**
+- * __blkdev_issue_write_zeroes - generate number of bios with WRITE ZEROES
+- * @bdev:	blockdev to issue
+- * @sector:	start sector
+- * @nr_sects:	number of sectors to write
+- * @gfp_mask:	memory allocation flags (for bio_alloc)
+- * @biop:	pointer to anchor bio
+- *
+- * Description:
+- *  Generate and issue number of bios(REQ_OP_WRITE_ZEROES) with zerofiled pages.
+- */
+ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+-		struct bio **biop)
++		struct bio **biop, unsigned flags)
+ {
+ 	struct bio *bio = *biop;
+ 	unsigned int max_write_zeroes_sectors;
+@@ -258,7 +247,9 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		bio = next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio->bi_bdev = bdev;
+-		bio_set_op_attrs(bio, REQ_OP_WRITE_ZEROES, 0);
++		bio->bi_opf = REQ_OP_WRITE_ZEROES;
++		if (flags & BLKDEV_ZERO_NOUNMAP)
++			bio->bi_opf |= REQ_NOUNMAP;
+ 
+ 		if (nr_sects > max_write_zeroes_sectors) {
+ 			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
+@@ -306,7 +297,7 @@ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 		return -EINVAL;
+ 
+ 	ret = __blkdev_issue_write_zeroes(bdev, sector, nr_sects, gfp_mask,
+-			biop);
++			biop, flags);
+ 	if (ret == 0 || (ret && ret != -EOPNOTSUPP))
+ 		goto out;
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 4eae30bfbfca..8eaa7dca7057 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -195,6 +195,10 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++
++	/* command specific flags for REQ_OP_WRITE_ZEROES: */
++	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
++
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -212,6 +216,8 @@ enum req_flag_bits {
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+ 
++#define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
++
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
  
 -- 
 2.11.0
