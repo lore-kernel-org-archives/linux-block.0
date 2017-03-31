@@ -1,153 +1,68 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 22/23] drbd: implement REQ_OP_WRITE_ZEROES
-Date: Thu, 23 Mar 2017 10:33:40 -0400
-Message-Id: <20170323143341.31549-23-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V2 08/16] block, bfq: preserve a low latency also with NCQ-capable drives
+Date: Fri, 31 Mar 2017 14:47:35 +0200
+Message-Id: <20170331124743.3530-9-paolo.valente@linaro.org>
+In-Reply-To: <20170331124743.3530-1-paolo.valente@linaro.org>
+References: <20170331124743.3530-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-It seems like DRBD assumes its on the wire TRIM request always zeroes data.
-Use that fact to implement REQ_OP_WRITE_ZEROES.
+I/O schedulers typically allow NCQ-capable drives to prefetch I/O
+requests, as NCQ boosts the throughput exactly by prefetching and
+internally reordering requests.
 
-XXX: will need a careful audit from the drbd team!
+Unfortunately, as discussed in detail and shown experimentally in [1],
+this may cause fairness and latency guarantees to be violated. The
+main problem is that the internal scheduler of an NCQ-capable drive
+may postpone the service of some unlucky (prefetched) requests as long
+as it deems serving other requests more appropriate to boost the
+throughput.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+This patch addresses this issue by not disabling device idling for
+weight-raised queues, even if the device supports NCQ. This allows BFQ
+to start serving a new queue, and therefore allows the drive to
+prefetch new requests, only after the idling timeout expires. At that
+time, all the outstanding requests of the expired queue have been most
+certainly served.
+
+[1] P. Valente and M. Andreolini, "Improving Application
+    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
+    the 5th Annual International Systems and Storage Conference
+    (SYSTOR '12), June 2012.
+    Slightly extended version:
+    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
+							results.pdf
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- drivers/block/drbd/drbd_main.c     | 3 ++-
- drivers/block/drbd/drbd_nl.c       | 2 ++
- drivers/block/drbd/drbd_receiver.c | 6 +++---
- drivers/block/drbd/drbd_req.c      | 7 +++++--
- drivers/block/drbd/drbd_worker.c   | 4 +++-
- 5 files changed, 15 insertions(+), 7 deletions(-)
+ block/bfq-iosched.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 92c60cbd04ee..8e62d9f65510 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -1668,7 +1668,8 @@ static u32 bio_flags_to_wire(struct drbd_connection *connection,
- 			(bio->bi_opf & REQ_FUA ? DP_FUA : 0) |
- 			(bio->bi_opf & REQ_PREFLUSH ? DP_FLUSH : 0) |
- 			(bio_op(bio) == REQ_OP_WRITE_SAME ? DP_WSAME : 0) |
--			(bio_op(bio) == REQ_OP_DISCARD ? DP_DISCARD : 0);
-+			(bio_op(bio) == REQ_OP_DISCARD ? DP_DISCARD : 0) |
-+			(bio_op(bio) == REQ_OP_WRITE_ZEROES ? DP_DISCARD : 0);
- 	else
- 		return bio->bi_opf & REQ_SYNC ? DP_RW_SYNC : 0;
- }
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index 908c704e20aa..e4516d3b971d 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1217,10 +1217,12 @@ static void decide_on_discard_support(struct drbd_device *device,
- 		blk_queue_discard_granularity(q, 512);
- 		q->limits.max_discard_sectors = drbd_max_discard_sectors(connection);
- 		queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
-+		q->limits.max_write_zeroes_sectors = drbd_max_discard_sectors(connection);
- 	} else {
- 		queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, q);
- 		blk_queue_discard_granularity(q, 0);
- 		q->limits.max_discard_sectors = 0;
-+		q->limits.max_write_zeroes_sectors = 0;
- 	}
- }
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 9994962..c43a737 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6233,7 +6233,8 @@ static void bfq_update_idle_window(struct bfq_data *bfqd,
  
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 8641776f043a..e64e01ca4d1a 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -2285,7 +2285,7 @@ static unsigned long wire_flags_to_bio_flags(u32 dpf)
- static unsigned long wire_flags_to_bio_op(u32 dpf)
- {
- 	if (dpf & DP_DISCARD)
--		return REQ_OP_DISCARD;
-+		return REQ_OP_WRITE_ZEROES;
- 	else
- 		return REQ_OP_WRITE;
- }
-@@ -2476,7 +2476,7 @@ static int receive_Data(struct drbd_connection *connection, struct packet_info *
- 	op_flags = wire_flags_to_bio_flags(dp_flags);
- 	if (pi->cmd == P_TRIM) {
- 		D_ASSERT(peer_device, peer_req->i.size > 0);
--		D_ASSERT(peer_device, op == REQ_OP_DISCARD);
-+		D_ASSERT(peer_device, op == REQ_OP_WRITE_ZEROES);
- 		D_ASSERT(peer_device, peer_req->pages == NULL);
- 	} else if (peer_req->pages == NULL) {
- 		D_ASSERT(device, peer_req->i.size == 0);
-@@ -4789,7 +4789,7 @@ static int receive_rs_deallocated(struct drbd_connection *connection, struct pac
- 
- 	if (get_ldev(device)) {
- 		struct drbd_peer_request *peer_req;
--		const int op = REQ_OP_DISCARD;
-+		const int op = REQ_OP_WRITE_ZEROES;
- 
- 		peer_req = drbd_alloc_peer_req(peer_device, ID_SYNCER, sector,
- 					       size, 0, GFP_NOIO);
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index bdd42b8360cc..d76ee53ce528 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -59,6 +59,7 @@ static struct drbd_request *drbd_req_new(struct drbd_device *device, struct bio
- 	drbd_req_make_private_bio(req, bio_src);
- 	req->rq_state = (bio_data_dir(bio_src) == WRITE ? RQ_WRITE : 0)
- 		      | (bio_op(bio_src) == REQ_OP_WRITE_SAME ? RQ_WSAME : 0)
-+		      | (bio_op(bio_src) == REQ_OP_WRITE_ZEROES ? RQ_UNMAP : 0)
- 		      | (bio_op(bio_src) == REQ_OP_DISCARD ? RQ_UNMAP : 0);
- 	req->device = device;
- 	req->master_bio = bio_src;
-@@ -1180,7 +1181,8 @@ drbd_submit_req_private_bio(struct drbd_request *req)
- 	if (get_ldev(device)) {
- 		if (drbd_insert_fault(device, type))
- 			bio_io_error(bio);
--		else if (bio_op(bio) == REQ_OP_DISCARD)
-+		else if (bio_op(bio) == REQ_OP_WRITE_ZEROES ||
-+			 bio_op(bio) == REQ_OP_DISCARD)
- 			drbd_process_discard_req(req);
- 		else
- 			generic_make_request(bio);
-@@ -1234,7 +1236,8 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio, unsigned long
- 	_drbd_start_io_acct(device, req);
- 
- 	/* process discards always from our submitter thread */
--	if (bio_op(bio) & REQ_OP_DISCARD)
-+	if ((bio_op(bio) & REQ_OP_WRITE_ZEROES) ||
-+	    (bio_op(bio) & REQ_OP_DISCARD))
- 		goto queue_for_submitter_thread;
- 
- 	if (rw == WRITE && req->private_bio && req->i.size
-diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-index 3bff33f21435..1afcb4e02d8d 100644
---- a/drivers/block/drbd/drbd_worker.c
-+++ b/drivers/block/drbd/drbd_worker.c
-@@ -174,7 +174,8 @@ void drbd_peer_request_endio(struct bio *bio)
- 	struct drbd_peer_request *peer_req = bio->bi_private;
- 	struct drbd_device *device = peer_req->peer_device->device;
- 	bool is_write = bio_data_dir(bio) == WRITE;
--	bool is_discard = !!(bio_op(bio) == REQ_OP_DISCARD);
-+	bool is_discard = bio_op(bio) == REQ_OP_WRITE_ZEROES ||
-+			  bio_op(bio) == REQ_OP_DISCARD;
- 
- 	if (bio->bi_error && __ratelimit(&drbd_ratelimit_state))
- 		drbd_warn(device, "%s: error=%d s=%llus\n",
-@@ -249,6 +250,7 @@ void drbd_request_endio(struct bio *bio)
- 	/* to avoid recursion in __req_mod */
- 	if (unlikely(bio->bi_error)) {
- 		switch (bio_op(bio)) {
-+		case REQ_OP_WRITE_ZEROES:
- 		case REQ_OP_DISCARD:
- 			if (bio->bi_error == -EOPNOTSUPP)
- 				what = DISCARD_COMPLETED_NOTSUPP;
+ 	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
+ 	    bfqd->bfq_slice_idle == 0 ||
+-		(bfqd->hw_tag && BFQQ_SEEKY(bfqq)))
++		(bfqd->hw_tag && BFQQ_SEEKY(bfqq) &&
++			bfqq->wr_coeff == 1))
+ 		enable_idle = 0;
+ 	else if (bfq_sample_valid(bfqq->ttime.ttime_samples)) {
+ 		if (bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle &&
 -- 
-2.11.0
+2.10.0
