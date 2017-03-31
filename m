@@ -1,34 +1,39 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: always use REQ_OP_WRITE_ZEROES for zeroing offload
-Date: Fri, 31 Mar 2017 18:32:48 +0200
-Message-Id: <20170331163313.31821-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga07.intel.com ([134.134.136.100]:63294 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755451AbdCaVAc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 31 Mar 2017 17:00:32 -0400
+Date: Fri, 31 Mar 2017 17:09:00 -0400
+From: Keith Busch <keith.busch@intel.com>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Josef Bacik <jbacik@fb.com>,
+        kernel-team@fb.com
+Subject: Re: [PATCH v3] blk-mq: remap queues when adding/removing hardware
+ queues
+Message-ID: <20170331210900.GN20181@localhost.localdomain>
+References: <20170331204603.GB11462@vader>
+ <9753ebd0c51a9d49f110a6d0d00888170905d97a.1490993257.git.osandov@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9753ebd0c51a9d49f110a6d0d00888170905d97a.1490993257.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series makes REQ_OP_WRITE_ZEROES the only zeroing offload
-supported by the block layer, and switches existing implementations
-of REQ_OP_DISCARD that correctly set discard_zeroes_data to it,
-removes incorrect discard_zeroes_data, and also switches WRITE SAME
-based zeroing in SCSI to this new method.
+On Fri, Mar 31, 2017 at 01:48:35PM -0700, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> blk_mq_update_nr_hw_queues() used to remap hardware queues, which is the
+> behavior that drivers expect. However, commit 4e68a011428a changed
+> blk_mq_queue_reinit() to not remap queues for the case of CPU
+> hotplugging, inadvertently making blk_mq_update_nr_hw_queues() not remap
+> queues as well. This breaks, for example, NBD's multi-connection mode,
+> leaving the added hardware queues unused. Fix it by making
+> blk_mq_update_nr_hw_queues() explicitly remap the queues.
+> 
+> Fixes: 4e68a011428a ("blk-mq: don't redistribute hardware queues on a CPU hotplug event")
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
 
-The series is against the block for-next tree.
+This looks good to me. 
 
-A git tree is also avaiable at:
-
-    git://git.infradead.org/users/hch/block.git discard-rework
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/discard-rework
+Reviewed-by: Keith Busch <keith.busch@intel.com>
