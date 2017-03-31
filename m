@@ -1,69 +1,151 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f54.google.com ([74.125.83.54]:33770 "EHLO
-        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753312AbdC1XNU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2017 19:13:20 -0400
-Received: by mail-pg0-f54.google.com with SMTP id x125so1240248pgb.0
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2017 16:13:19 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 1/3] block: warn if sharing request queue across gendisks
-Date: Tue, 28 Mar 2017 16:12:15 -0700
-Message-Id: <91d938665e5386f10f8756ee8c7ef3e6496ea260.1490742717.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 24/25] drbd: implement REQ_OP_WRITE_ZEROES
+Date: Fri, 31 Mar 2017 18:33:12 +0200
+Message-Id: <20170331163313.31821-25-hch@lst.de>
+In-Reply-To: <20170331163313.31821-1-hch@lst.de>
+References: <20170331163313.31821-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+It seems like DRBD assumes its on the wire TRIM request always zeroes data.
+Use that fact to implement REQ_OP_WRITE_ZEROES.
 
-Now that the remaining drivers have been converted to one request queue
-per gendisk, let's warn if a request queue gets registered more than
-once. This will catch future drivers which might do it inadvertently or
-any old drivers that I may have missed.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-sysfs.c      | 7 +++++++
- include/linux/blkdev.h | 1 +
- 2 files changed, 8 insertions(+)
+ drivers/block/drbd/drbd_main.c     | 3 ++-
+ drivers/block/drbd/drbd_nl.c       | 2 ++
+ drivers/block/drbd/drbd_receiver.c | 6 +++---
+ drivers/block/drbd/drbd_req.c      | 7 +++++--
+ drivers/block/drbd/drbd_worker.c   | 4 +++-
+ 5 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 7f090dd15ca6..833fb7f9ce9d 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -871,6 +871,11 @@ int blk_register_queue(struct gendisk *disk)
- 	if (WARN_ON(!q))
- 		return -ENXIO;
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 92c60cbd04ee..8e62d9f65510 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -1668,7 +1668,8 @@ static u32 bio_flags_to_wire(struct drbd_connection *connection,
+ 			(bio->bi_opf & REQ_FUA ? DP_FUA : 0) |
+ 			(bio->bi_opf & REQ_PREFLUSH ? DP_FLUSH : 0) |
+ 			(bio_op(bio) == REQ_OP_WRITE_SAME ? DP_WSAME : 0) |
+-			(bio_op(bio) == REQ_OP_DISCARD ? DP_DISCARD : 0);
++			(bio_op(bio) == REQ_OP_DISCARD ? DP_DISCARD : 0) |
++			(bio_op(bio) == REQ_OP_WRITE_ZEROES ? DP_DISCARD : 0);
+ 	else
+ 		return bio->bi_opf & REQ_SYNC ? DP_RW_SYNC : 0;
+ }
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index 908c704e20aa..e4516d3b971d 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1217,10 +1217,12 @@ static void decide_on_discard_support(struct drbd_device *device,
+ 		blk_queue_discard_granularity(q, 512);
+ 		q->limits.max_discard_sectors = drbd_max_discard_sectors(connection);
+ 		queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
++		q->limits.max_write_zeroes_sectors = drbd_max_discard_sectors(connection);
+ 	} else {
+ 		queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, q);
+ 		blk_queue_discard_granularity(q, 0);
+ 		q->limits.max_discard_sectors = 0;
++		q->limits.max_write_zeroes_sectors = 0;
+ 	}
+ }
  
-+	WARN_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags),
-+		  "%s is registering an already registered queue\n",
-+		  kobject_name(&dev->kobj));
-+	queue_flag_set_unlocked(QUEUE_FLAG_REGISTERED, q);
-+
- 	/*
- 	 * SCSI probing may synchronously create and destroy a lot of
- 	 * request_queues for non-existent devices.  Shutting down a fully
-@@ -931,6 +936,8 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (WARN_ON(!q))
- 		return;
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index bc1d296581f9..1b0a2be24f39 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -2285,7 +2285,7 @@ static unsigned long wire_flags_to_bio_flags(u32 dpf)
+ static unsigned long wire_flags_to_bio_op(u32 dpf)
+ {
+ 	if (dpf & DP_DISCARD)
+-		return REQ_OP_DISCARD;
++		return REQ_OP_WRITE_ZEROES;
+ 	else
+ 		return REQ_OP_WRITE;
+ }
+@@ -2476,7 +2476,7 @@ static int receive_Data(struct drbd_connection *connection, struct packet_info *
+ 	op_flags = wire_flags_to_bio_flags(dp_flags);
+ 	if (pi->cmd == P_TRIM) {
+ 		D_ASSERT(peer_device, peer_req->i.size > 0);
+-		D_ASSERT(peer_device, op == REQ_OP_DISCARD);
++		D_ASSERT(peer_device, op == REQ_OP_WRITE_ZEROES);
+ 		D_ASSERT(peer_device, peer_req->pages == NULL);
+ 	} else if (peer_req->pages == NULL) {
+ 		D_ASSERT(device, peer_req->i.size == 0);
+@@ -4789,7 +4789,7 @@ static int receive_rs_deallocated(struct drbd_connection *connection, struct pac
  
-+	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
-+
- 	if (q->mq_ops)
- 		blk_mq_unregister_dev(disk_to_dev(disk), q);
+ 	if (get_ldev(device)) {
+ 		struct drbd_peer_request *peer_req;
+-		const int op = REQ_OP_DISCARD;
++		const int op = REQ_OP_WRITE_ZEROES;
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1a7dc42a8918..a2dc6b390d48 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -617,6 +617,7 @@ struct request_queue {
- #define QUEUE_FLAG_STATS       27	/* track rq completion times */
- #define QUEUE_FLAG_RESTART     28	/* queue needs restart at completion */
- #define QUEUE_FLAG_POLL_STATS  29	/* collecting stats for hybrid polling */
-+#define QUEUE_FLAG_REGISTERED  30	/* queue has been registered to a disk */
+ 		peer_req = drbd_alloc_peer_req(peer_device, ID_SYNCER, sector,
+ 					       size, 0, GFP_NOIO);
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 6da9ea8c48b6..b5730e17b455 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -59,6 +59,7 @@ static struct drbd_request *drbd_req_new(struct drbd_device *device, struct bio
+ 	drbd_req_make_private_bio(req, bio_src);
+ 	req->rq_state = (bio_data_dir(bio_src) == WRITE ? RQ_WRITE : 0)
+ 		      | (bio_op(bio_src) == REQ_OP_WRITE_SAME ? RQ_WSAME : 0)
++		      | (bio_op(bio_src) == REQ_OP_WRITE_ZEROES ? RQ_UNMAP : 0)
+ 		      | (bio_op(bio_src) == REQ_OP_DISCARD ? RQ_UNMAP : 0);
+ 	req->device = device;
+ 	req->master_bio = bio_src;
+@@ -1180,7 +1181,8 @@ drbd_submit_req_private_bio(struct drbd_request *req)
+ 	if (get_ldev(device)) {
+ 		if (drbd_insert_fault(device, type))
+ 			bio_io_error(bio);
+-		else if (bio_op(bio) == REQ_OP_DISCARD)
++		else if (bio_op(bio) == REQ_OP_WRITE_ZEROES ||
++			 bio_op(bio) == REQ_OP_DISCARD)
+ 			drbd_process_discard_req(req);
+ 		else
+ 			generic_make_request(bio);
+@@ -1234,7 +1236,8 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio, unsigned long
+ 	_drbd_start_io_acct(device, req);
  
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
+ 	/* process discards always from our submitter thread */
+-	if (bio_op(bio) & REQ_OP_DISCARD)
++	if ((bio_op(bio) & REQ_OP_WRITE_ZEROES) ||
++	    (bio_op(bio) & REQ_OP_DISCARD))
+ 		goto queue_for_submitter_thread;
+ 
+ 	if (rw == WRITE && req->private_bio && req->i.size
+diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
+index 3bff33f21435..1afcb4e02d8d 100644
+--- a/drivers/block/drbd/drbd_worker.c
++++ b/drivers/block/drbd/drbd_worker.c
+@@ -174,7 +174,8 @@ void drbd_peer_request_endio(struct bio *bio)
+ 	struct drbd_peer_request *peer_req = bio->bi_private;
+ 	struct drbd_device *device = peer_req->peer_device->device;
+ 	bool is_write = bio_data_dir(bio) == WRITE;
+-	bool is_discard = !!(bio_op(bio) == REQ_OP_DISCARD);
++	bool is_discard = bio_op(bio) == REQ_OP_WRITE_ZEROES ||
++			  bio_op(bio) == REQ_OP_DISCARD;
+ 
+ 	if (bio->bi_error && __ratelimit(&drbd_ratelimit_state))
+ 		drbd_warn(device, "%s: error=%d s=%llus\n",
+@@ -249,6 +250,7 @@ void drbd_request_endio(struct bio *bio)
+ 	/* to avoid recursion in __req_mod */
+ 	if (unlikely(bio->bi_error)) {
+ 		switch (bio_op(bio)) {
++		case REQ_OP_WRITE_ZEROES:
+ 		case REQ_OP_DISCARD:
+ 			if (bio->bi_error == -EOPNOTSUPP)
+ 				what = DISCARD_COMPLETED_NOTSUPP;
 -- 
-2.12.1
+2.11.0
