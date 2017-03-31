@@ -1,55 +1,67 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: null_blk: add blocking mode
-Message-ID: <9a2b8d7e-1b04-4c94-2c79-c16fa8134f9d@kernel.dk>
-Date: Thu, 30 Mar 2017 12:53:05 -0600
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, James Bottomley
+	<James.Bottomley@HansenPartnership.com>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>, Hannes Reinecke
+	<hare@suse.com>
+Subject: [PATCH 2/3] scsi: Add scsi_restart_queues()
+Date: Fri, 31 Mar 2017 16:12:04 -0700
+Message-ID: <20170331231205.16640-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170331231205.16640-1-bart.vanassche@sandisk.com>
+References: <20170331231205.16640-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-This adds a new module parameter to null_blk, blocking. If set, null_blk
-will set the BLK_MQ_F_BLOCKING flag, indicating that it sometimes/always
-needs to block in its ->queue_rq() function.  The intent is to help find
-regressions in blocking drivers, since not many of them exist.
+This patch avoids that if multiple SCSI devices are associated with
+a SCSI host that a queue can get stuck if scsi_queue_rq() returns
+"busy".
 
-If null_blk is loaded with submit_queues > 1 and blocking=1, this
-shows the regression recently fixed by bf4907c05e61.
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+---
+ drivers/scsi/scsi_lib.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
-
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 6f2e565..d95635f 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -117,6 +117,10 @@ static bool use_lightnvm;
- module_param(use_lightnvm, bool, S_IRUGO);
- MODULE_PARM_DESC(use_lightnvm, "Register as a LightNVM device");
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index c1519660824b..1d804e33971a 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -555,6 +555,21 @@ void scsi_run_host_queues(struct Scsi_Host *shost)
+ 		scsi_run_queue(sdev->request_queue);
+ }
  
-+static bool blocking;
-+module_param(blocking, bool, S_IRUGO);
-+MODULE_PARM_DESC(blocking, "Register as a blocking blk-mq driver device");
++static void scsi_restart_queues(struct request_queue *q)
++{
++	struct scsi_device *sdev = q->queuedata;
++	struct Scsi_Host *shost = sdev->host;
++	unsigned long flags;
 +
- static int irqmode = NULL_IRQ_SOFTIRQ;
- 
- static int null_set_irqmode(const char *str, const struct kernel_param *kp)
-@@ -357,6 +361,8 @@ static int null_queue_rq(struct blk_mq_hw_ctx *hctx,
++	spin_lock_irqsave(shost->host_lock, flags);
++	__shost_for_each_device(sdev, shost) {
++		q = sdev->request_queue;
++		if (q->mq_ops && !blk_queue_dying(q))
++			blk_mq_run_hw_queues(q, true);
++	}
++	spin_unlock_irqrestore(shost->host_lock, flags);
++}
++
+ static void scsi_uninit_cmd(struct scsi_cmnd *cmd)
  {
- 	struct nullb_cmd *cmd = blk_mq_rq_to_pdu(bd->rq);
+ 	if (!blk_rq_is_passthrough(cmd->request)) {
+@@ -2156,6 +2171,7 @@ struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
  
-+	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
-+
- 	if (irqmode == NULL_IRQ_TIMER) {
- 		hrtimer_init(&cmd->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
- 		cmd->timer.function = null_cmd_timer_expired;
-@@ -724,6 +730,9 @@ static int null_add_dev(void)
- 		nullb->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
- 		nullb->tag_set.driver_data = nullb;
- 
-+		if (blocking)
-+			nullb->tag_set.flags |= BLK_MQ_F_BLOCKING;
-+
- 		rv = blk_mq_alloc_tag_set(&nullb->tag_set);
- 		if (rv)
- 			goto out_cleanup_queues;
+ static const struct blk_mq_ops scsi_mq_ops = {
+ 	.queue_rq	= scsi_queue_rq,
++	.restart_queues	= scsi_restart_queues,
+ 	.complete	= scsi_softirq_done,
+ 	.timeout	= scsi_timeout,
+ 	.init_request	= scsi_init_request,
+-- 
+2.12.0
