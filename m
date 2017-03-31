@@ -1,66 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34954 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755068AbdCPQO2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:28 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 04/14] md: raid1: simplify r1buf_pool_free()
-Date: Fri, 17 Mar 2017 00:12:25 +0800
-Message-Id: <20170316161235.27110-5-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "tj@kernel.org" <tj@kernel.org>, "paolo.valente@linaro.org"
+	<paolo.valente@linaro.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"fchecconi@gmail.com" <fchecconi@gmail.com>, "avanzini.arianna@gmail.com"
+	<avanzini.arianna@gmail.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linus.walleij@linaro.org"
+	<linus.walleij@linaro.org>, "broonie@kernel.org" <broonie@kernel.org>
+Subject: Re: [PATCH V2 04/16] block, bfq: modify the peak-rate estimator
+Date: Fri, 31 Mar 2017 15:31:44 +0000
+Message-ID: <1490974279.2587.5.camel@sandisk.com>
+References: <20170331124743.3530-1-paolo.valente@linaro.org>
+	 <20170331124743.3530-5-paolo.valente@linaro.org>
+In-Reply-To: <20170331124743.3530-5-paolo.valente@linaro.org>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-This patch gets each page's reference of each bio for resync,
-then r1buf_pool_free() gets simplified a lot.
+On Fri, 2017-03-31 at 14:47 +0200, Paolo Valente wrote:
+> -static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue=
+ *bfqq,
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 bool compensate)
+> +static bool bfq_bfqq_is_slow(struct bfq_data *bfqd, struct bfq_queue *bf=
+qq,
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 bool compensate, enum bfqq_expiration reason,
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 unsigned long *delta_ms)
+> =A0{
+> -=A0=A0=A0=A0=A0=A0=A0u64 bw, usecs, expected, timeout;
+> -=A0=A0=A0=A0=A0=A0=A0ktime_t delta;
+> -=A0=A0=A0=A0=A0=A0=A0int update =3D 0;
+> +=A0=A0=A0=A0=A0=A0=A0ktime_t delta_ktime;
+> +=A0=A0=A0=A0=A0=A0=A0u32 delta_usecs;
+> +=A0=A0=A0=A0=A0=A0=A0bool slow =3D BFQQ_SEEKY(bfqq); /* if delta too sho=
+rt, use seekyness */
+> =A0
+> -=A0=A0=A0=A0=A0=A0=A0if (!bfq_bfqq_sync(bfqq) || bfq_bfqq_budget_new(bfq=
+q))
+> +=A0=A0=A0=A0=A0=A0=A0if (!bfq_bfqq_sync(bfqq))
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return false;
+> =A0
+> =A0=A0=A0=A0=A0=A0=A0=A0if (compensate)
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0delta =3D bfqd->last_idling=
+_start;
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0delta_ktime =3D bfqd->last_=
+idling_start;
+> =A0=A0=A0=A0=A0=A0=A0=A0else
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0delta =3D ktime_get();
+> -=A0=A0=A0=A0=A0=A0=A0delta =3D ktime_sub(delta, bfqd->last_budget_start)=
+;
+> -=A0=A0=A0=A0=A0=A0=A0usecs =3D ktime_to_us(delta);
+> -
+> -=A0=A0=A0=A0=A0=A0=A0/* Don't trust short/unrealistic values. */
+> -=A0=A0=A0=A0=A0=A0=A0if (usecs < 100 || usecs >=3D LONG_MAX)
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return false;
+> -
+> -=A0=A0=A0=A0=A0=A0=A0/*
+> -=A0=A0=A0=A0=A0=A0=A0 * Calculate the bandwidth for the last slice.=A0 W=
+e use a 64 bit
+> -=A0=A0=A0=A0=A0=A0=A0 * value to store the peak rate, in sectors per use=
+c in fixed
+> -=A0=A0=A0=A0=A0=A0=A0 * point math.=A0 We do so to have enough precision=
+ in the estimate
+> -=A0=A0=A0=A0=A0=A0=A0 * and to avoid overflows.
+> -=A0=A0=A0=A0=A0=A0=A0 */
+> -=A0=A0=A0=A0=A0=A0=A0bw =3D (u64)bfqq->entity.service << BFQ_RATE_SHIFT;
+> -=A0=A0=A0=A0=A0=A0=A0do_div(bw, (unsigned long)usecs);
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0delta_ktime =3D ktime_get()=
+;
+> +=A0=A0=A0=A0=A0=A0=A0delta_ktime =3D ktime_sub(delta_ktime, bfqd->last_b=
+udget_start);
+> +=A0=A0=A0=A0=A0=A0=A0delta_usecs =3D ktime_to_us(delta_ktime);
+> +
 
-The same policy has been taken in raid10's buf pool allocation/free
-too.
+This patch changes the type of the variable in which the result of ktime_to=
+_us()
+is stored from u64 into u32 and next compares that result with LONG_MAX. Si=
+nce
+ktime_to_us() returns a signed 64-bit number, are you sure you want to stor=
+e that
+result in a 32-bit variable? If ktime_to_us() would e.g. return 0xffffffff0=
+0000100
+or 0x100000100 then the assignment will truncate these numbers to 0x100.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 908e2caeb704..e30d89690109 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -142,9 +142,12 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- 	/* If not user-requests, copy the page pointers to all bios */
- 	if (!test_bit(MD_RECOVERY_REQUESTED, &pi->mddev->recovery)) {
- 		for (i=0; i<RESYNC_PAGES ; i++)
--			for (j=1; j<pi->raid_disks; j++)
--				r1_bio->bios[j]->bi_io_vec[i].bv_page =
-+			for (j=1; j<pi->raid_disks; j++) {
-+				struct page *page =
- 					r1_bio->bios[0]->bi_io_vec[i].bv_page;
-+				get_page(page);
-+				r1_bio->bios[j]->bi_io_vec[i].bv_page = page;
-+			}
- 	}
- 
- 	r1_bio->master_bio = NULL;
-@@ -169,12 +172,8 @@ static void r1buf_pool_free(void *__r1_bio, void *data)
- 	struct r1bio *r1bio = __r1_bio;
- 
- 	for (i = 0; i < RESYNC_PAGES; i++)
--		for (j = pi->raid_disks; j-- ;) {
--			if (j == 0 ||
--			    r1bio->bios[j]->bi_io_vec[i].bv_page !=
--			    r1bio->bios[0]->bi_io_vec[i].bv_page)
--				safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
--		}
-+		for (j = pi->raid_disks; j-- ;)
-+			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
- 	for (i=0 ; i < pi->raid_disks; i++)
- 		bio_put(r1bio->bios[i]);
- 
--- 
-2.9.3
+Bart.=
