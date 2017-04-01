@@ -1,195 +1,51 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 5/5] block, scsi: move the retries field to struct scsi_request
-Date: Wed,  5 Apr 2017 16:18:56 +0200
-Message-Id: <20170405141856.1862-6-hch@lst.de>
-In-Reply-To: <20170405141856.1862-1-hch@lst.de>
-References: <20170405141856.1862-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:31796 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751737AbdDAXaF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Apr 2017 19:30:05 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "osandov@osandov.com" <osandov@osandov.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: "kernel-team@fb.com" <kernel-team@fb.com>
+Subject: Re: [PATCH] blk-mq: add random early detection I/O scheduler
+Date: Sat, 1 Apr 2017 23:29:55 +0000
+Message-ID: <1491089381.9734.2.camel@sandisk.com>
+References: <e9c15e2066177c3efdfe6d134cf9c80b5e8f8d1b.1491076459.git.osandov@fb.com>
+         <cea23aca-e7b2-f35d-f064-d5e44a479977@fb.com>
+In-Reply-To: <cea23aca-e7b2-f35d-f064-d5e44a479977@fb.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Instead of bloating the generic struct request with it.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/scsi_ioctl.c                 | 8 ++++----
- drivers/scsi/osd/osd_initiator.c   | 2 +-
- drivers/scsi/osst.c                | 2 +-
- drivers/scsi/scsi_error.c          | 2 +-
- drivers/scsi/scsi_lib.c            | 4 ++--
- drivers/scsi/sg.c                  | 2 +-
- drivers/scsi/st.c                  | 2 +-
- drivers/target/target_core_pscsi.c | 2 +-
- include/linux/blkdev.h             | 1 -
- include/scsi/scsi_request.h        | 1 +
- 10 files changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 2a2fc768b27a..82a43bb19967 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -362,7 +362,7 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
- 		goto out_free_cdb;
- 
- 	bio = rq->bio;
--	rq->retries = 0;
-+	req->retries = 0;
- 
- 	start_time = jiffies;
- 
-@@ -476,13 +476,13 @@ int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
- 		goto error;
- 
- 	/* default.  possible overriden later */
--	rq->retries = 5;
-+	req->retries = 5;
- 
- 	switch (opcode) {
- 	case SEND_DIAGNOSTIC:
- 	case FORMAT_UNIT:
- 		rq->timeout = FORMAT_UNIT_TIMEOUT;
--		rq->retries = 1;
-+		req->retries = 1;
- 		break;
- 	case START_STOP:
- 		rq->timeout = START_STOP_TIMEOUT;
-@@ -495,7 +495,7 @@ int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
- 		break;
- 	case READ_DEFECT_DATA:
- 		rq->timeout = READ_DEFECT_DATA_TIMEOUT;
--		rq->retries = 1;
-+		req->retries = 1;
- 		break;
- 	default:
- 		rq->timeout = BLK_DEFAULT_SG_TIMEOUT;
-diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
-index 6903f03c88af..9d0727b2bdec 100644
---- a/drivers/scsi/osd/osd_initiator.c
-+++ b/drivers/scsi/osd/osd_initiator.c
-@@ -1602,7 +1602,7 @@ static int _init_blk_request(struct osd_request *or,
- 	req->rq_flags |= RQF_QUIET;
- 
- 	req->timeout = or->timeout;
--	req->retries = or->retries;
-+	scsi_req(req)->retries = or->retries;
- 
- 	if (has_out) {
- 		or->out.req = req;
-diff --git a/drivers/scsi/osst.c b/drivers/scsi/osst.c
-index c47f4b349bac..41bc1d64bf86 100644
---- a/drivers/scsi/osst.c
-+++ b/drivers/scsi/osst.c
-@@ -414,7 +414,7 @@ static int osst_execute(struct osst_request *SRpnt, const unsigned char *cmd,
- 	memset(rq->cmd, 0, BLK_MAX_CDB); /* ATAPI hates garbage after CDB */
- 	memcpy(rq->cmd, cmd, rq->cmd_len);
- 	req->timeout = timeout;
--	req->retries = retries;
-+	rq->retries = retries;
- 	req->end_io_data = SRpnt;
- 
- 	blk_execute_rq_nowait(req->q, NULL, req, 1, osst_end_async);
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index f2cafae150bc..2db412dd4b44 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -1988,7 +1988,7 @@ static void scsi_eh_lock_door(struct scsi_device *sdev)
- 
- 	req->rq_flags |= RQF_QUIET;
- 	req->timeout = 10 * HZ;
--	req->retries = 5;
-+	rq->retries = 5;
- 
- 	blk_execute_rq_nowait(req->q, NULL, req, 1, eh_lock_door_done);
- }
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index c1519660824b..11972d1075f1 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -256,7 +256,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 
- 	rq->cmd_len = COMMAND_SIZE(cmd[0]);
- 	memcpy(rq->cmd, cmd, rq->cmd_len);
--	req->retries = retries;
-+	rq->retries = retries;
- 	req->timeout = timeout;
- 	req->cmd_flags |= flags;
- 	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
-@@ -1177,7 +1177,7 @@ static int scsi_setup_scsi_cmnd(struct scsi_device *sdev, struct request *req)
- 	cmd->cmd_len = scsi_req(req)->cmd_len;
- 	cmd->cmnd = scsi_req(req)->cmd;
- 	cmd->transfersize = blk_rq_bytes(req);
--	cmd->allowed = req->retries;
-+	cmd->allowed = scsi_req(req)->retries;
- 	return BLKPREP_OK;
- }
- 
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 225abaad4d1c..c5aaceea8d77 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1718,7 +1718,7 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
- 
- 	srp->rq = rq;
- 	rq->end_io_data = srp;
--	rq->retries = SG_DEFAULT_RETRIES;
-+	req->retries = SG_DEFAULT_RETRIES;
- 
- 	if ((dxfer_len <= 0) || (dxfer_dir == SG_DXFER_NONE))
- 		return 0;
-diff --git a/drivers/scsi/st.c b/drivers/scsi/st.c
-index e5ef78a6848e..5408643431bb 100644
---- a/drivers/scsi/st.c
-+++ b/drivers/scsi/st.c
-@@ -579,7 +579,7 @@ static int st_scsi_execute(struct st_request *SRpnt, const unsigned char *cmd,
- 	memset(rq->cmd, 0, BLK_MAX_CDB);
- 	memcpy(rq->cmd, cmd, rq->cmd_len);
- 	req->timeout = timeout;
--	req->retries = retries;
-+	rq->retries = retries;
- 	req->end_io_data = SRpnt;
- 
- 	blk_execute_rq_nowait(req->q, NULL, req, 1, st_scsi_execute_end);
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index 94cda7991e80..c7fa372c527a 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -1008,7 +1008,7 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- 		req->timeout = PS_TIMEOUT_DISK;
- 	else
- 		req->timeout = PS_TIMEOUT_OTHER;
--	req->retries = PS_RETRY;
-+	scsi_req(req)->retries = PS_RETRY;
- 
- 	blk_execute_rq_nowait(pdv->pdv_sd->request_queue, NULL, req,
- 			(cmd->sam_task_attr == TCM_HEAD_TAG),
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a2dc6b390d48..ce6f9a6534c9 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -224,7 +224,6 @@ struct request {
- 	unsigned long deadline;
- 	struct list_head timeout_list;
- 	unsigned int timeout;
--	int retries;
- 
- 	/*
- 	 * completion callback.
-diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
-index ba0aeb980f7e..7c583a0f363a 100644
---- a/include/scsi/scsi_request.h
-+++ b/include/scsi/scsi_request.h
-@@ -11,6 +11,7 @@ struct scsi_request {
- 	unsigned short	cmd_len;
- 	unsigned int	sense_len;
- 	unsigned int	resid_len;	/* residual count */
-+	int		retries;
- 	void		*sense;
- };
- 
--- 
-2.11.0
+T24gU2F0LCAyMDE3LTA0LTAxIGF0IDE2OjA3IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAwNC8wMS8yMDE3IDAxOjU1IFBNLCBPbWFyIFNhbmRvdmFsIHdyb3RlOg0KPiA+IEZyb206IE9t
+YXIgU2FuZG92YWwgPG9zYW5kb3ZAZmIuY29tPg0KPiA+IA0KPiA+IFRoaXMgcGF0Y2ggaW50cm9k
+dWNlcyBhIG5ldyBJL08gc2NoZWR1bGVyIGJhc2VkIG9uIHRoZSBjbGFzc2ljIHJhbmRvbQ0KPiA+
+IGVhcmx5IGRldGVjdGlvbiBhY3RpdmUgcXVldWUgbWFuYWdlbWVudCBhbGdvcml0aG0gWzFdLiBS
+YW5kb20gZWFybHkNCj4gPiBkZXRlY3Rpb24gaXMgb25lIG9mIHRoZSBzaW1wbGVzdCBhbmQgbW9z
+dCBzdHVkaWVkIEFRTSBhbGdvcml0aG1zIGZvcg0KPiA+IG5ldHdvcmtpbmcsIGJ1dCB1bnRpbCBu
+b3csIGl0IGhhc24ndCBiZWVuIGFwcGxpZWQgdG8gZGlzayBJL08NCj4gPiBzY2hlZHVsaW5nLg0K
+PiA+IA0KPiA+IFdoZW4gYXBwbGllZCB0byBuZXR3b3JrIHJvdXRlcnMsIFJFRCBwcm9iYWJpbGlz
+dGljYWxseSBlaXRoZXIgbWFya3MNCj4gPiBwYWNrZXRzIHdpdGggRUNOIG9yIGRyb3BzIHRoZW0s
+IGRlcGVuZGluZyBvbiB0aGUgY29uZmlndXJhdGlvbi4gV2hlbg0KPiA+IGRlYWxpbmcgd2l0aCBk
+aXNrIEkvTywgUE9TSVggZG9lcyBub3QgaGF2ZSBhbnkgbWVjaGFuaXNtIHdpdGggd2hpY2ggdG8N
+Cj4gPiBub3RpZnkgdGhlIGNhbGxlciB0aGF0IHRoZSBkaXNrIGlzIGNvbmdlc3RlZCwgc28gd2Ug
+aW5zdGVhZCBvbmx5IHByb3ZpZGUNCj4gPiB0aGUgbGF0dGVyIHN0cmF0ZWd5LiBJbmNsdWRlZCBp
+biB0aGlzIHBhdGNoIGlzIGEgbWlub3IgY2hhbmdlIHRvIHRoZQ0KPiA+IGJsay1tcSB0byBzdXBw
+b3J0IHRoaXMuDQo+IA0KPiBUaGlzIGlzIGdyZWF0IHdvcmsuIElmIHdlIGNvbWJpbmUgdGhpcyB3
+aXRoIGEgdGhpbiBwcm92aXNpb25pbmcgdGFyZ2V0LA0KPiB3ZSBjYW4gZXZlbiB1c2UgdGhpcyB0
+byBzYXZlIHNwYWNlIG9uIHRoZSBiYWNrZW5kLiBCZXR0ZXIgbGF0ZW5jaWVzLA0KPiBBTkQgbG93
+ZXIgZGlzayB1dGlsaXphdGlvbi4NCj4gDQo+IEknbSB0ZW1wdGVkIHRvIGp1c3QgcXVldWUgdGhp
+cyB1cCBmb3IgdGhpcyBjeWNsZSBhbmQgbWFrZSBpdCB0aGUgZGVmYXVsdC4NCg0KSGVsbG8gSmVu
+cywNCg0KRGlkIHlvdSBtZWFuIG1ha2luZyB0aGlzIHRoZSBkZWZhdWx0IHNjaGVkdWxlciBmb3Ig
+U1NEcyBvbmx5IG9yIGZvciBhbGwgdHlwZXMNCm9mIGJsb2NrIGRldmljZXM/IE91ciAoV2VzdGVy
+biBEaWdpdGFsKSBleHBlcmllbmNlIGlzIHRoYXQgYW55IEkvTyBzY2hlZHVsZXINCnRoYXQgbGlt
+aXRzIHRoZSBxdWV1ZSBkZXB0aCByZWR1Y2VzIHRocm91Z2hwdXQgZm9yIGF0IGxlYXN0IGRhdGEt
+Y2VudGVyIHN0eWxlDQp3b3JrbG9hZHMgd2hlbiB1c2luZyBoYXJkIGRpc2tzLiBUaGlzIGlzIHdo
+eSBBZGFtIGlzIHdvcmtpbmcgb24gaW1wcm92aW5nIEkvTw0KcHJpb3JpdHkgc3VwcG9ydCBmb3Ig
+dGhlIExpbnV4IGJsb2NrIGxheWVyLiBUaGF0IGFwcHJvYWNoIG5hbWVseSBhbGxvd3MgdG8NCnJl
+ZHVjZSBsYXRlbmN5IG9mIGNlcnRhaW4gcmVxdWVzdHMgd2l0aG91dCBzaWduaWZpY2FudGx5IGlt
+cGFjdGluZyBhdmVyYWdlDQpsYXRlbmN5IGFuZCB0aHJvdWdocHV0Lg0KDQpCYXJ0Lg==
