@@ -1,38 +1,79 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:50406 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751020AbdDDGeq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Apr 2017 02:34:46 -0400
-Date: Tue, 4 Apr 2017 08:34:44 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@mellanox.com>,
+Received: from bombadil.infradead.org ([65.50.211.133]:44265 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751536AbdDBNmK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2017 09:42:10 -0400
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@mellanox.com>,
         Or Gerlitz <ogerlitz@mellanox.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH rfc 6/6] nvme-rdma: use intelligent affinity based
-        queue mappings
-Message-ID: <20170404063444.GF8978@lst.de>
-References: <1491140492-25703-1-git-send-email-sagi@grimberg.me> <1491140492-25703-7-git-send-email-sagi@grimberg.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1491140492-25703-7-git-send-email-sagi@grimberg.me>
+Subject: [PATCH rfc 6/6] nvme-rdma: use intelligent affinity based queue mappings
+Date: Sun,  2 Apr 2017 16:41:32 +0300
+Message-Id: <1491140492-25703-7-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
+References: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sun, Apr 02, 2017 at 04:41:32PM +0300, Sagi Grimberg wrote:
-> Use the geneic block layer affinity mapping helper. Also,
+Use the geneic block layer affinity mapping helper. Also,
+limit nr_hw_queues to the rdma device number of irq vectors
+as we don't really need more.
 
-          generic
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/rdma.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
->  	nr_io_queues = min(opts->nr_io_queues, num_online_cpus());
-> +	nr_io_queues = min_t(unsigned int, nr_io_queues,
-> +				ibdev->num_comp_vectors);
-> +
-
-Add a comment here?
-
-Otherwise looks fine:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 4aae363943e3..81ee5b1207c8 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -19,6 +19,7 @@
+ #include <linux/string.h>
+ #include <linux/atomic.h>
+ #include <linux/blk-mq.h>
++#include <linux/blk-mq-rdma.h>
+ #include <linux/types.h>
+ #include <linux/list.h>
+ #include <linux/mutex.h>
+@@ -645,10 +646,14 @@ static int nvme_rdma_connect_io_queues(struct nvme_rdma_ctrl *ctrl)
+ static int nvme_rdma_init_io_queues(struct nvme_rdma_ctrl *ctrl)
+ {
+ 	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
++	struct ib_device *ibdev = ctrl->device->dev;
+ 	unsigned int nr_io_queues;
+ 	int i, ret;
+ 
+ 	nr_io_queues = min(opts->nr_io_queues, num_online_cpus());
++	nr_io_queues = min_t(unsigned int, nr_io_queues,
++				ibdev->num_comp_vectors);
++
+ 	ret = nvme_set_queue_count(&ctrl->ctrl, &nr_io_queues);
+ 	if (ret)
+ 		return ret;
+@@ -1523,6 +1528,13 @@ static void nvme_rdma_complete_rq(struct request *rq)
+ 	nvme_complete_rq(rq);
+ }
+ 
++static int nvme_rdma_map_queues(struct blk_mq_tag_set *set)
++{
++	struct nvme_rdma_ctrl *ctrl = set->driver_data;
++
++	return blk_mq_rdma_map_queues(set, ctrl->device->dev, 0);
++}
++
+ static const struct blk_mq_ops nvme_rdma_mq_ops = {
+ 	.queue_rq	= nvme_rdma_queue_rq,
+ 	.complete	= nvme_rdma_complete_rq,
+@@ -1532,6 +1544,7 @@ static const struct blk_mq_ops nvme_rdma_mq_ops = {
+ 	.init_hctx	= nvme_rdma_init_hctx,
+ 	.poll		= nvme_rdma_poll,
+ 	.timeout	= nvme_rdma_timeout,
++	.map_queues	= nvme_rdma_map_queues,
+ };
+ 
+ static const struct blk_mq_ops nvme_rdma_admin_mq_ops = {
+-- 
+2.7.4
