@@ -1,24 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:58092 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750926AbdDDHBl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 03:01:41 -0400
-Date: Tue, 4 Apr 2017 00:01:41 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Dmitry Monakhov <dmonakhov@openvz.org>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:35146 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751667AbdDCHXw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2017 03:23:52 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         martin.petersen@oracle.com
-Subject: Re: [PATCH 3/7] bio-integrity: bio_trim should truncate integrity
- vector accordingly
-Message-ID: <20170404070141.GD12008@infradead.org>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 3/7] bio-integrity: bio_trim should truncate integrity vector accordingly
+Date: Mon,  3 Apr 2017 11:23:28 +0400
+Message-Id: <1491204212-9952-4-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
 References: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
- <1491204212-9952-4-git-send-email-dmonakhov@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1491204212-9952-4-git-send-email-dmonakhov@openvz.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good,
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+---
+ block/bio.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/bio.c b/block/bio.c
+index e75878f..fa84323 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1907,6 +1907,10 @@ void bio_trim(struct bio *bio, int offset, int size)
+ 	bio_advance(bio, offset << 9);
+ 
+ 	bio->bi_iter.bi_size = size;
++
++	if (bio_integrity(bio))
++		bio_integrity_trim(bio, 0, size);
++
+ }
+ EXPORT_SYMBOL_GPL(bio_trim);
+ 
+-- 
+2.9.3
