@@ -1,29 +1,53 @@
-Return-Path: <BATV+d06792d33419b921eada+4978+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	target-devel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com
-Subject: RFC: remove REQ_OP_WRITE_SAME
-Date: Mon, 10 Apr 2017 18:07:59 +0200
-Message-Id: <20170410160807.23674-1-hch@lst.de>
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 2/8] nowait aio: Return if cannot get hold of i_rwsem
+Date: Mon,  3 Apr 2017 13:53:01 -0500
+Message-Id: <20170403185307.6243-3-rgoldwyn@suse.de>
+In-Reply-To: <20170403185307.6243-1-rgoldwyn@suse.de>
+References: <20170403185307.6243-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that we are using REQ_OP_WRITE_ZEROES for all zeroing needs in the
-kernel there is very little use left for REQ_OP_WRITE_SAME.  We only
-have two callers left, and both just export optional protocol features
-to remote systems: DRBD and the target code.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Do we have any major users of those?  If not removing it will clean up
-a few warts in the block layer.
+A failure to lock i_rwsem would mean there is I/O being performed
+by another thread. So, let's bail.
 
-    git://git.infradead.org/users/hch/block.git delete-write-same
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ mm/filemap.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/delete-write-same
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 1694623..e08f3b9 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2982,7 +2982,12 @@ ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	struct inode *inode = file->f_mapping->host;
+ 	ssize_t ret;
+ 
+-	inode_lock(inode);
++	if (!inode_trylock(inode)) {
++		/* Don't sleep on inode rwsem */
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		inode_lock(inode);
++	}
+ 	ret = generic_write_checks(iocb, from);
+ 	if (ret > 0)
+ 		ret = __generic_file_write_iter(iocb, from);
+-- 
+2.10.2
