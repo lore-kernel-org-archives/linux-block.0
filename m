@@ -1,75 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:52369 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756941AbdDQTPW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2017 15:15:22 -0400
-Subject: [resend PATCH v2 09/33] block: kill bdev_dax_capable()
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-kernel@vger.kernel.org, hch@lst.de
-Date: Mon, 17 Apr 2017 12:09:38 -0700
-Message-ID: <149245617829.10206.728860403459694493.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 4/8] nowait-aio: Introduce IOMAP_NOWAIT
+Date: Mon,  3 Apr 2017 13:53:03 -0500
+Message-Id: <20170403185307.6243-5-rgoldwyn@suse.de>
+In-Reply-To: <20170403185307.6243-1-rgoldwyn@suse.de>
+References: <20170403185307.6243-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This is leftover dead code that has since been replaced by
-bdev_dax_supported().
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
+This is used by XFS in the XFS patch.
 ---
- fs/block_dev.c         |   24 ------------------------
- include/linux/blkdev.h |    1 -
- 2 files changed, 25 deletions(-)
+ fs/iomap.c            | 2 ++
+ include/linux/iomap.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 2eca00ec4370..7f40ea2f0875 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -807,30 +807,6 @@ int bdev_dax_supported(struct super_block *sb, int blocksize)
- }
- EXPORT_SYMBOL_GPL(bdev_dax_supported);
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 141c3cd..d1c8175 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -885,6 +885,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 	} else {
+ 		dio->flags |= IOMAP_DIO_WRITE;
+ 		flags |= IOMAP_WRITE;
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			flags |= IOMAP_NOWAIT;
+ 	}
  
--/**
-- * bdev_dax_capable() - Return if the raw device is capable for dax
-- * @bdev: The device for raw block device access
-- */
--bool bdev_dax_capable(struct block_device *bdev)
--{
--	struct blk_dax_ctl dax = {
--		.size = PAGE_SIZE,
--	};
--
--	if (!IS_ENABLED(CONFIG_FS_DAX))
--		return false;
--
--	dax.sector = 0;
--	if (bdev_direct_access(bdev, &dax) < 0)
--		return false;
--
--	dax.sector = bdev->bd_part->nr_sects - (PAGE_SIZE / 512);
--	if (bdev_direct_access(bdev, &dax) < 0)
--		return false;
--
--	return true;
--}
--
- /*
-  * pseudo-fs
-  */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5a7da607ca04..f72708399b83 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1958,7 +1958,6 @@ extern int bdev_write_page(struct block_device *, sector_t, struct page *,
- 						struct writeback_control *);
- extern long bdev_direct_access(struct block_device *, struct blk_dax_ctl *);
- extern int bdev_dax_supported(struct super_block *, int);
--extern bool bdev_dax_capable(struct block_device *);
- #else /* CONFIG_BLOCK */
+ 	if (mapping->nrpages) {
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 7291810..53f6af8 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -51,6 +51,7 @@ struct iomap {
+ #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
+ #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
+ #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
++#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
  
- struct block_device;
+ struct iomap_ops {
+ 	/*
+-- 
+2.10.2
