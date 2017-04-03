@@ -1,40 +1,137 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 7/7] Guard bvec iteration logic v2
-To: Dmitry Monakhov <dmonakhov@openvz.org>, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, martin.petersen@oracle.com
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:35174 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751919AbdDCHYH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2017 03:24:07 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 7/7] Guard bvec iteration logic v2
+Date: Mon,  3 Apr 2017 11:23:32 +0400
+Message-Id: <1491204212-9952-8-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
 References: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
- <1491204212-9952-8-git-send-email-dmonakhov@openvz.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c5328f91-79ec-f4f8-a9d1-bdf467e8c5f4@kernel.dk>
-Date: Mon, 3 Apr 2017 08:34:28 -0600
-MIME-Version: 1.0
-In-Reply-To: <1491204212-9952-8-git-send-email-dmonakhov@openvz.org>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 04/03/2017 01:23 AM, Dmitry Monakhov wrote:
-> @@ -66,12 +67,15 @@ struct bvec_iter {
->  	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
->  })
->  
-> -static inline void bvec_iter_advance(const struct bio_vec *bv,
-> +static inline int bvec_iter_advance(const struct bio_vec *bv,
->  				     struct bvec_iter *iter,
->  				     unsigned bytes)
->  {
-> -	WARN_ONCE(bytes > iter->bi_size,
-> -		  "Attempted to advance past end of bvec iter\n");
-> +	if(unlikely(bytes > iter->bi_size)) {
-> +		WARN(1, "Attempted to advance past end of bvec iter\n");
-> +		iter->bi_size = 0;
-> +		return -EINVAL;
-> +	}
+Currently if some one try to advance bvec beyond it's size we simply
+dump WARN_ONCE and continue to iterate beyond bvec array boundaries.
+This simply means that we endup dereferencing/corrupting random memory
+region.
 
-	if (WARN_ONCE(bytes > iter->bi_size,
-			"Attempted to advance past end of bvec iter\n")) {
-		...
+Sane reaction would be to propagate error back to calling context
+But bvec_iter_advance's calling context is not always good for error
+handling. For safity reason let truncate iterator size to zero which
+will break external iteration loop which prevent us from unpredictable
+memory range corruption. And even it caller ignores an error, it will
+corrupt it's own bvecs, not others.
 
-would be cleaner.
+This patch does:
+- Return error back to caller with hope that it will react on this
+- Truncate iterator size
 
+Code was added long time ago here 4550dd6c, luckily no one hit it
+in real life :)
+
+changes since V1:
+ - Replace  BUG_ON with error logic.
+
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+---
+ drivers/nvdimm/blk.c |  4 +++-
+ drivers/nvdimm/btt.c |  4 +++-
+ include/linux/bio.h  |  8 ++++++--
+ include/linux/bvec.h | 11 ++++++++---
+ 4 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
+index 1edb3f3..04c3075 100644
+--- a/drivers/nvdimm/blk.c
++++ b/drivers/nvdimm/blk.c
+@@ -106,7 +106,9 @@ static int nd_blk_rw_integrity(struct nd_namespace_blk *nsblk,
+ 
+ 		len -= cur_len;
+ 		dev_offset += cur_len;
+-		bvec_iter_advance(bip->bip_vec, &bip->bip_iter, cur_len);
++		err = bvec_iter_advance(bip->bip_vec, &bip->bip_iter, cur_len);
++		if (err)
++			return err;
+ 	}
+ 
+ 	return err;
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 03ded8d..3f3aa7b 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -942,7 +942,9 @@ static int btt_rw_integrity(struct btt *btt, struct bio_integrity_payload *bip,
+ 
+ 		len -= cur_len;
+ 		meta_nsoff += cur_len;
+-		bvec_iter_advance(bip->bip_vec, &bip->bip_iter, cur_len);
++		ret = bvec_iter_advance(bip->bip_vec, &bip->bip_iter, cur_len);
++		if (ret)
++			return ret;
+ 	}
+ 
+ 	return ret;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 0c1c95c..8bf1564 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -168,8 +168,12 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ 
+ 	if (bio_no_advance_iter(bio))
+ 		iter->bi_size -= bytes;
+-	else
+-		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++	else {
++		int err;
++		err = bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		if (unlikely(err))
++			bio->bi_error = err;
++	}
+ }
+ 
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 89b65b8..c117f1a 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -22,6 +22,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/bug.h>
++#include <linux/errno.h>
+ 
+ /*
+  * was unsigned short, but we might as well be ready for > 64kB I/O pages
+@@ -66,12 +67,15 @@ struct bvec_iter {
+ 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
+ })
+ 
+-static inline void bvec_iter_advance(const struct bio_vec *bv,
++static inline int bvec_iter_advance(const struct bio_vec *bv,
+ 				     struct bvec_iter *iter,
+ 				     unsigned bytes)
+ {
+-	WARN_ONCE(bytes > iter->bi_size,
+-		  "Attempted to advance past end of bvec iter\n");
++	if(unlikely(bytes > iter->bi_size)) {
++		WARN(1, "Attempted to advance past end of bvec iter\n");
++		iter->bi_size = 0;
++		return -EINVAL;
++	}
+ 
+ 	while (bytes) {
+ 		unsigned iter_len = bvec_iter_len(bv, *iter);
+@@ -86,6 +90,7 @@ static inline void bvec_iter_advance(const struct bio_vec *bv,
+ 			iter->bi_idx++;
+ 		}
+ 	}
++	return 0;
+ }
+ 
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
 -- 
-Jens Axboe
+2.9.3
