@@ -1,59 +1,61 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Omar Sandoval <osandov@fb.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart van Assche <bart.vanassche@sandisk.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 2/2] scsi: Add template flag 'host_tagset'
-Date: Tue,  4 Apr 2017 14:07:45 +0200
-Message-Id: <1491307665-47656-3-git-send-email-hare@suse.de>
-In-Reply-To: <1491307665-47656-1-git-send-email-hare@suse.de>
-References: <1491307665-47656-1-git-send-email-hare@suse.de>
+CC: <linux-block@vger.kernel.org>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, James Bottomley
+	<James.Bottomley@HansenPartnership.com>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v2 5/5] scsi: Ensure that scsi_run_queue() runs all hardware queues
+Date: Mon, 3 Apr 2017 16:22:28 -0700
+Message-ID: <20170403232228.11208-6-bart.vanassche@sandisk.com>
+In-Reply-To: <20170403232228.11208-1-bart.vanassche@sandisk.com>
+References: <20170403232228.11208-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Add a host template flag 'host_tagset' to enable the use of a
-global tagmap for block-mq.
+commit 52d7f1b5c2f3 ("blk-mq: Avoid that requeueing starts stopped
+queues") removed the blk_mq_stop_hw_queue() call from scsi_queue_rq()
+for the BLK_MQ_RQ_QUEUE_BUSY case. blk_mq_start_stopped_hw_queues()
+only runs queues that had been stopped. Hence change the
+blk_mq_start_stopped_hw_queues() call in scsi_run_queue() into
+blk_mq_run_hw_queues(). Remove the blk_mq_start_stopped_hw_queues()
+call from scsi_end_request() because __blk_mq_finish_request()
+already runs all hardware queues if needed.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Fixes: commit 52d7f1b5c2f3 ("blk-mq: Avoid that requeueing starts stopped queues")
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/scsi_lib.c  | 2 ++
- include/scsi/scsi_host.h | 5 +++++
- 2 files changed, 7 insertions(+)
+ drivers/scsi/scsi_lib.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index ba22866..00036cb 100644
+index 0e240aebc150..4459b18f62a1 100644
 --- a/drivers/scsi/scsi_lib.c
 +++ b/drivers/scsi/scsi_lib.c
-@@ -2193,6 +2193,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
- 	shost->tag_set.cmd_size = cmd_size;
- 	shost->tag_set.numa_node = NUMA_NO_NODE;
- 	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
-+	if (shost->hostt->host_tagset)
-+		shost->tag_set.flags |= BLK_MQ_F_GLOBAL_TAGS;
- 	shost->tag_set.flags |=
- 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
- 	shost->tag_set.driver_data = shost;
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 3cd8c3b..dff3ec1 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -457,6 +457,11 @@ struct scsi_host_template {
- 	unsigned no_async_abort:1;
+@@ -496,7 +496,7 @@ static void scsi_run_queue(struct request_queue *q)
+ 		scsi_starved_list_run(sdev->host);
  
- 	/*
-+	 * True if the host supports a host-wide tagspace
-+	 */
-+	unsigned host_tagset:1;
-+
-+	/*
- 	 * Countdown for host blocking with no commands outstanding.
- 	 */
- 	unsigned int max_host_blocked;
+ 	if (q->mq_ops)
+-		blk_mq_start_stopped_hw_queues(q, false);
++		blk_mq_run_hw_queues(q, false);
+ 	else
+ 		blk_run_queue(q);
+ }
+@@ -681,8 +681,6 @@ static bool scsi_end_request(struct request *req, int error,
+ 		if (scsi_target(sdev)->single_lun ||
+ 		    !list_empty(&sdev->host->starved_list))
+ 			kblockd_schedule_work(&sdev->requeue_work);
+-		else
+-			blk_mq_start_stopped_hw_queues(q, true);
+ 	} else {
+ 		unsigned long flags;
+ 
 -- 
-1.8.5.6
+2.12.0
