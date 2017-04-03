@@ -1,47 +1,46 @@
-Return-Path: <hare@suse.de>
-Subject: Re: always use REQ_OP_WRITE_ZEROES for zeroing offload
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
- martin.petersen@oracle.com, agk@redhat.com, snitzer@redhat.com,
- shli@kernel.org, philipp.reisner@linbit.com, lars.ellenberg@linbit.com
-References: <20170331163313.31821-1-hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- drbd-dev@lists.linbit.com, dm-devel@redhat.com, linux-raid@vger.kernel.org
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <83c79b9c-362a-c12c-8a75-7e42947a77da@suse.de>
-Date: Mon, 3 Apr 2017 08:06:27 +0200
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:40368 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751282AbdDCVMu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2017 17:12:50 -0400
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Subject: Re: [PATCH 0/7] block: T10/DIF Fixes and cleanups v2
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
+Date: Mon, 03 Apr 2017 17:12:42 -0400
+In-Reply-To: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org> (Dmitry
+        Monakhov's message of "Mon, 3 Apr 2017 11:23:25 +0400")
+Message-ID: <yq1mvbxw5yt.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 03/31/2017 06:32 PM, Christoph Hellwig wrote:
-> This series makes REQ_OP_WRITE_ZEROES the only zeroing offload
-> supported by the block layer, and switches existing implementations
-> of REQ_OP_DISCARD that correctly set discard_zeroes_data to it,
-> removes incorrect discard_zeroes_data, and also switches WRITE SAME
-> based zeroing in SCSI to this new method.
-> 
-> The series is against the block for-next tree.
-> 
-> A git tree is also avaiable at:
-> 
->     git://git.infradead.org/users/hch/block.git discard-rework
-> 
-> Gitweb:
-> 
->     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/discard-rework
-Thank you for doing this.
+Dmitry Monakhov <dmonakhov@openvz.org> writes:
 
-For this series:
+Dmitry,
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+> This patch set fix various problems spotted during T10/DIF integrity
+> machinery testing.
+>
+> TOC:
+> ## Fix various bugs in T10/DIF/DIX infrastructure
+> 0001-bio-integrity-Do-not-allocate-integrity-context-for-fsync
+> 0002-bio-integrity-save-original-iterator-for-verify-stage
+> 0003-bio-integrity-bio_trim-should-truncate-integrity-vec
+> 0004-bio-integrity-fix-interface-for-bio_integrity_trim
+> ## Cleanup T10/DIF/DIX infrastructure
+> 0005-bio-integrity-add-bio_integrity_setup-helper
+> 0006-T10-Move-opencoded-contants-to-common-header
+> ## General bulletproof protection for block layer
+> 0007-Guard-bvec-iteration-logic-v2
 
-Cheers,
+Looks like a nice cleanup of some of the things that have rotted a bit
+as a result of the immutable bvec efforts. No major objections from
+here. I'll try your series on my qual setup tomorrow to make sure
+everything is working correctly.
 
-Hannes
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+Martin K. Petersen	Oracle Linux Engineering
