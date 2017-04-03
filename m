@@ -1,114 +1,121 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v5 08/10] blk-mq: Show operation, cmd_flags and rq_flags names
-Date: Tue, 25 Apr 2017 13:37:43 -0700
-Message-ID: <20170425203745.19946-9-bart.vanassche@sandisk.com>
-In-Reply-To: <20170425203745.19946-1-bart.vanassche@sandisk.com>
-References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f47.google.com ([74.125.83.47]:32800 "EHLO
+        mail-pg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751649AbdDCVnH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2017 17:43:07 -0400
+Received: by mail-pg0-f47.google.com with SMTP id x125so132434444pgb.0
+        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2017 14:43:07 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH 2/5] blk-mq-sched: set up scheduler tags when bringing up new queues
+Date: Mon,  3 Apr 2017 14:42:02 -0700
+Message-Id: <1ed3d9bdcfc855a9546b05fa59bb23dc3f85f726.1491254827.git.osandov@fb.com>
+In-Reply-To: <cover.1491254827.git.osandov@fb.com>
+References: <cover.1491254827.git.osandov@fb.com>
+In-Reply-To: <cover.1491254827.git.osandov@fb.com>
+References: <cover.1491254827.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Show the operation name, .cmd_flags and .rq_flags as names instead
-of numbers.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+If a new hardware queue is added at runtime, we don't allocate scheduler
+tags for it, leading to a crash. This hooks up the scheduler framework
+to blk_mq_{init,exit}_hctx() to make sure everything gets properly
+initialized/freed.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-mq-debugfs.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 69 insertions(+), 3 deletions(-)
+ block/blk-mq-sched.c | 22 ++++++++++++++++++++++
+ block/blk-mq-sched.h |  5 +++++
+ block/blk-mq.c       |  9 ++++++++-
+ 3 files changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ccc7b0f71230..ac39093c4ef7 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -253,13 +253,79 @@ static const struct file_operations hctx_flags_fops = {
- 	.release	= single_release,
- };
- 
-+static const char *const op_name[] = {
-+	[REQ_OP_READ]		= "READ",
-+	[REQ_OP_WRITE]		= "WRITE",
-+	[REQ_OP_FLUSH]		= "FLUSH",
-+	[REQ_OP_DISCARD]	= "DISCARD",
-+	[REQ_OP_ZONE_REPORT]	= "ZONE_REPORT",
-+	[REQ_OP_SECURE_ERASE]	= "SECURE_ERASE",
-+	[REQ_OP_ZONE_RESET]	= "ZONE_RESET",
-+	[REQ_OP_WRITE_SAME]	= "WRITE_SAME",
-+	[REQ_OP_WRITE_ZEROES]	= "WRITE_ZEROES",
-+	[REQ_OP_SCSI_IN]	= "SCSI_IN",
-+	[REQ_OP_SCSI_OUT]	= "SCSI_OUT",
-+	[REQ_OP_DRV_IN]		= "DRV_IN",
-+	[REQ_OP_DRV_OUT]	= "DRV_OUT",
-+};
-+
-+static const char *const cmd_flag_name[] = {
-+	[__REQ_FAILFAST_DEV]		= "FAILFAST_DEV",
-+	[__REQ_FAILFAST_TRANSPORT]	= "FAILFAST_TRANSPORT",
-+	[__REQ_FAILFAST_DRIVER]		= "FAILFAST_DRIVER",
-+	[__REQ_SYNC]			= "SYNC",
-+	[__REQ_META]			= "META",
-+	[__REQ_PRIO]			= "PRIO",
-+	[__REQ_NOMERGE]			= "NOMERGE",
-+	[__REQ_IDLE]			= "IDLE",
-+	[__REQ_INTEGRITY]		= "INTEGRITY",
-+	[__REQ_FUA]			= "FUA",
-+	[__REQ_PREFLUSH]		= "PREFLUSH",
-+	[__REQ_RAHEAD]			= "RAHEAD",
-+	[__REQ_BACKGROUND]		= "BACKGROUND",
-+	[__REQ_NR_BITS]			= "NR_BITS",
-+};
-+
-+static const char *const rqf_name[] = {
-+	[ilog2((__force u32)RQF_SORTED)]		= "SORTED",
-+	[ilog2((__force u32)RQF_STARTED)]		= "STARTED",
-+	[ilog2((__force u32)RQF_QUEUED)]		= "QUEUED",
-+	[ilog2((__force u32)RQF_SOFTBARRIER)]		= "SOFTBARRIER",
-+	[ilog2((__force u32)RQF_FLUSH_SEQ)]		= "FLUSH_SEQ",
-+	[ilog2((__force u32)RQF_MIXED_MERGE)]		= "MIXED_MERGE",
-+	[ilog2((__force u32)RQF_MQ_INFLIGHT)]		= "MQ_INFLIGHT",
-+	[ilog2((__force u32)RQF_DONTPREP)]		= "DONTPREP",
-+	[ilog2((__force u32)RQF_PREEMPT)]		= "PREEMPT",
-+	[ilog2((__force u32)RQF_COPY_USER)]		= "COPY_USER",
-+	[ilog2((__force u32)RQF_FAILED)]		= "FAILED",
-+	[ilog2((__force u32)RQF_QUIET)]			= "QUIET",
-+	[ilog2((__force u32)RQF_ELVPRIV)]		= "ELVPRIV",
-+	[ilog2((__force u32)RQF_IO_STAT)]		= "IO_STAT",
-+	[ilog2((__force u32)RQF_ALLOCED)]		= "ALLOCED",
-+	[ilog2((__force u32)RQF_PM)]			= "PM",
-+	[ilog2((__force u32)RQF_HASHED)]		= "HASHED",
-+	[ilog2((__force u32)RQF_STATS)]			= "STATS",
-+	[ilog2((__force u32)RQF_SPECIAL_PAYLOAD)]	= "SPECIAL_PAYLOAD",
-+};
-+
- static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- {
- 	struct request *rq = list_entry_rq(v);
-+	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
- 
--	seq_printf(m, "%p {.cmd_flags=0x%x, .rq_flags=0x%x, .tag=%d, .internal_tag=%d}\n",
--		   rq, rq->cmd_flags, (__force unsigned int)rq->rq_flags,
--		   rq->tag, rq->internal_tag);
-+	seq_printf(m, "%p {.op=", rq);
-+	if (op < ARRAY_SIZE(op_name) && op_name[op])
-+		seq_printf(m, "%s", op_name[op]);
-+	else
-+		seq_printf(m, "%d", op);
-+	seq_puts(m, ", .cmd_flags=");
-+	blk_flags_show(m, rq->cmd_flags & ~REQ_OP_MASK, cmd_flag_name,
-+		       ARRAY_SIZE(cmd_flag_name));
-+	seq_puts(m, ", .rq_flags=");
-+	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
-+		       ARRAY_SIZE(rqf_name));
-+	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
-+		   rq->internal_tag);
- 	return 0;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index e08ba915343e..3fd918bb13a2 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -460,6 +460,28 @@ void blk_mq_sched_teardown(struct request_queue *q)
+ 		blk_mq_sched_free_tags(set, hctx, i);
  }
  
++int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
++			   unsigned int hctx_idx)
++{
++	struct elevator_queue *e = q->elevator;
++
++	if (!e)
++		return 0;
++
++	return blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
++}
++
++void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
++			    unsigned int hctx_idx)
++{
++	struct elevator_queue *e = q->elevator;
++
++	if (!e)
++		return;
++
++	blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
++}
++
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 873f9af5a35b..19db25e0c95a 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -35,6 +35,11 @@ void blk_mq_sched_move_to_dispatch(struct blk_mq_hw_ctx *hctx,
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
+ void blk_mq_sched_teardown(struct request_queue *q);
+ 
++int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
++			   unsigned int hctx_idx);
++void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
++			    unsigned int hctx_idx);
++
+ int blk_mq_sched_init(struct request_queue *q);
+ 
+ static inline bool
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 061fc2cc88d3..ac830cb488d7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1839,6 +1839,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 				       hctx->fq->flush_rq, hctx_idx,
+ 				       flush_start_tag + hctx_idx);
+ 
++	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
++
+ 	if (set->ops->exit_hctx)
+ 		set->ops->exit_hctx(hctx, hctx_idx);
+ 
+@@ -1905,9 +1907,12 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
+ 		goto free_bitmap;
+ 
++	if (blk_mq_sched_init_hctx(q, hctx, hctx_idx))
++		goto exit_hctx;
++
+ 	hctx->fq = blk_alloc_flush_queue(q, hctx->numa_node, set->cmd_size);
+ 	if (!hctx->fq)
+-		goto exit_hctx;
++		goto sched_exit_hctx;
+ 
+ 	if (set->ops->init_request &&
+ 	    set->ops->init_request(set->driver_data,
+@@ -1922,6 +1927,8 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 
+  free_fq:
+ 	kfree(hctx->fq);
++ sched_exit_hctx:
++	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
+  exit_hctx:
+ 	if (set->ops->exit_hctx)
+ 		set->ops->exit_hctx(hctx, hctx_idx);
 -- 
 2.12.2
