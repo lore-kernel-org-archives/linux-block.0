@@ -1,86 +1,87 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH v2 1/5] blk-mq: Export blk_mq_sched_restart_hctx()
-Date: Mon, 3 Apr 2017 16:22:24 -0700
-Message-ID: <20170403232228.11208-2-bart.vanassche@sandisk.com>
-In-Reply-To: <20170403232228.11208-1-bart.vanassche@sandisk.com>
-References: <20170403232228.11208-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from LGEAMRELO13.lge.com ([156.147.23.53]:34601 "EHLO
+        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751058AbdDCFLQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2017 01:11:16 -0400
+Date: Mon, 3 Apr 2017 14:11:13 +0900
+From: Minchan Kim <minchan@kernel.org>
+To: Jens Axboe <axboe@fb.com>
+CC: Johannes Thumshirn <jthumshirn@suse.de>,
+        Hannes Reinecke <hare@suse.de>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        <yizhan@redhat.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] zram: set physical queue limits to avoid array out of
+ bounds accesses
+Message-ID: <20170403051113.GA7096@bbox>
+References: <ed4d83a1-9bdd-9e24-7768-ba5e85429110@suse.de>
+ <20170307085545.GA538@bbox>
+ <10a2335c-0ed0-43de-1cbd-625845301aef@suse.de>
+ <20170308051118.GA11206@bbox>
+ <1073055f-e71b-bb07-389a-53b60ccdee20@suse.de>
+ <20170309052829.GA854@bbox>
+ <CAEwNFnBnEObVdjqNdvh_-Dc0ryDjeW3c1qVdfOCbbyQREaDdqA@mail.gmail.com>
+ <d5ad0aeb-0a8f-5ebd-f788-c6f6d92b76cf@fb.com>
+ <20170330234554.GC5807@bbox>
+ <17796bb7-6657-46d9-9731-d4c0656e6200@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <17796bb7-6657-46d9-9731-d4c0656e6200@fb.com>
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Since a later patch will add a call to this function from the
-SCSI core, export this function. Move the BLK_MQ_S_SCHED_RESTART
-bit test from blk_mq_sched_restart_hctx() into the callers of
-this function. This leads to some code duplication but that will
-be addressed in another patch in this series.
+Hi Jens,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
----
- block/blk-mq-sched.c   | 17 +++++++++--------
- include/linux/blk-mq.h |  1 +
- 2 files changed, 10 insertions(+), 8 deletions(-)
+On Thu, Mar 30, 2017 at 07:38:26PM -0600, Jens Axboe wrote:
+> On 03/30/2017 05:45 PM, Minchan Kim wrote:
+> > On Thu, Mar 30, 2017 at 09:35:56AM -0600, Jens Axboe wrote:
+> >> On 03/30/2017 09:08 AM, Minchan Kim wrote:
+> >>> Hi Jens,
+> >>>
+> >>> It seems you miss this.
+> >>> Could you handle this?
+> >>
+> >> I can, but I'm a little confused. The comment talks about replacing
+> >> the one I merged with this one, I can't do that. I'm assuming you
+> >> are talking about this commit:
+> > 
+> > Right.
+> > 
+> >>
+> >> commit 0bc315381fe9ed9fb91db8b0e82171b645ac008f
+> >> Author: Johannes Thumshirn <jthumshirn@suse.de>
+> >> Date:   Mon Mar 6 11:23:35 2017 +0100
+> >>
+> >>     zram: set physical queue limits to avoid array out of bounds accesses
+> >>
+> >> which is in mainline. The patch still applies, though.
+> > 
+> > You mean it's already in mainline so you cannot replace but can revert.
+> > Right?
+> > If so, please revert it and merge this one.
+> 
+> Let's please fold it into the other patch. That's cleaner and it makes
+> logical sense.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 09af8ff18719..414ed4b3d266 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -317,14 +317,13 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
- 	return true;
- }
- 
--static void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
-+void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- {
--	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state)) {
--		clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
--		if (blk_mq_hctx_has_pending(hctx))
--			blk_mq_run_hw_queue(hctx, true);
--	}
-+	clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
-+	if (blk_mq_hctx_has_pending(hctx))
-+		blk_mq_run_hw_queue(hctx, true);
- }
-+EXPORT_SYMBOL(blk_mq_sched_restart_hctx);
- 
- void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
- {
-@@ -334,9 +333,11 @@ void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
- 	if (test_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
- 		if (test_and_clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
- 			queue_for_each_hw_ctx(q, hctx, i)
--				blk_mq_sched_restart_hctx(hctx);
-+				if (test_bit(BLK_MQ_S_SCHED_RESTART,
-+					     &hctx->state))
-+					blk_mq_sched_restart_hctx(hctx);
- 		}
--	} else {
-+	} else if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state)) {
- 		blk_mq_sched_restart_hctx(hctx);
- 	}
- }
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index ea2e9dcd3aef..f62f3ce2dc65 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -237,6 +237,7 @@ void blk_mq_stop_hw_queues(struct request_queue *q);
- void blk_mq_start_hw_queues(struct request_queue *q);
- void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
-+void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
--- 
-2.12.0
+Understood.
+
+> 
+> >> Do we really REALLY need this for 4.11, or can we queue for 4.12 and
+> >> mark it stable?
+> > 
+> > Not urgent because one in mainline fixes the problem so I'm okay
+> > with 4.12 but I don't want mark it as -stable.
+> 
+> OK good, please resend with the two-line revert in your current
+> patch, and I'll get it queued up for 4.12.
+
+Yeb. If so, now that I think about it, it would be better to handle
+it via Andrew's tree because Andrew have been handled zram's patches
+and I have several pending patches based on it.
+So, I will send new patchset with it to Andrew.
+
+Thanks!
