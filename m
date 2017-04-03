@@ -1,81 +1,42 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 2/3] scsi: Add scsi_restart_queues()
+To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
+References: <20170331231205.16640-1-bart.vanassche@sandisk.com>
+ <20170331231205.16640-3-bart.vanassche@sandisk.com>
 Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 27/27] scsi: sd: Remove LBPRZ dependency for discards
-Date: Wed,  5 Apr 2017 19:21:25 +0200
-Message-Id: <20170405172125.22600-28-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <4534bda9-5c0f-2121-d996-ac55d09e90cb@suse.de>
+Date: Mon, 3 Apr 2017 08:10:58 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170331231205.16640-3-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+On 04/01/2017 01:12 AM, Bart Van Assche wrote:
+> This patch avoids that if multiple SCSI devices are associated with
+> a SCSI host that a queue can get stuck if scsi_queue_rq() returns
+> "busy".
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/scsi_lib.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Separating discards and zeroout operations allows us to remove the LBPRZ
-block zeroing constraints from discards and honor the device preferences
-for UNMAP commands.
+Cheers,
 
-If supported by the device, we'll also choose UNMAP over one of the
-WRITE SAME variants for discards.
-
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/sd.c | 25 ++++++-------------------
- 1 file changed, 6 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index acf9d17b05d8..8cf34a8e3eea 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -685,24 +685,11 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
- 	unsigned int logical_block_size = sdkp->device->sector_size;
- 	unsigned int max_blocks = 0;
- 
--	/*
--	 * When LBPRZ is reported, discard alignment and granularity
--	 * must be fixed to the logical block size. Otherwise the block
--	 * layer will drop misaligned portions of the request which can
--	 * lead to data corruption. If LBPRZ is not set, we honor the
--	 * device preference.
--	 */
--	if (sdkp->lbprz) {
--		q->limits.discard_alignment = 0;
--		q->limits.discard_granularity = logical_block_size;
--	} else {
--		q->limits.discard_alignment = sdkp->unmap_alignment *
--			logical_block_size;
--		q->limits.discard_granularity =
--			max(sdkp->physical_block_size,
--			    sdkp->unmap_granularity * logical_block_size);
--	}
--
-+	q->limits.discard_alignment =
-+		sdkp->unmap_alignment * logical_block_size;
-+	q->limits.discard_granularity =
-+		max(sdkp->physical_block_size,
-+		    sdkp->unmap_granularity * logical_block_size);
- 	sdkp->provisioning_mode = mode;
- 
- 	switch (mode) {
-@@ -2842,7 +2829,7 @@ static void sd_read_block_limits(struct scsi_disk *sdkp)
- 				sd_config_discard(sdkp, SD_LBP_WS16);
- 
- 		} else {	/* LBP VPD page tells us what to use */
--			if (sdkp->lbpu && sdkp->max_unmap_blocks && !sdkp->lbprz)
-+			if (sdkp->lbpu && sdkp->max_unmap_blocks)
- 				sd_config_discard(sdkp, SD_LBP_UNMAP);
- 			else if (sdkp->lbpws)
- 				sd_config_discard(sdkp, SD_LBP_WS16);
+Hannes
 -- 
-2.11.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
