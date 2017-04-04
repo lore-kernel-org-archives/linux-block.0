@@ -1,29 +1,41 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: Ming Lei <tom.leiming@gmail.com>, Hannes Reinecke <hare@suse.de>
-CC: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>, "Martin K.
- Petersen" <martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Christoph Hellwig <hch@lst.de>,
-	linux-block <linux-block@vger.kernel.org>, Linux SCSI List
-	<linux-scsi@vger.kernel.org>
-Subject: Re: [RFC PATCH 0/2] block,scsi: support host-wide tagset
-Date: Tue, 4 Apr 2017 16:25:29 +0000
-Message-ID: <BY1PR0401MB153254F95E5227D93D197BDD810B0@BY1PR0401MB1532.namprd04.prod.outlook.com>
-References: <1491307665-47656-1-git-send-email-hare@suse.de>
- <CACVXFVPyWL8XyFKC9uT7r4q+QT1+_RvnvJnOskCO3aSnUEVY1w@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <1491307665-47656-1-git-send-email-hare@suse.de>
+References: <1491307665-47656-1-git-send-email-hare@suse.de>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 4 Apr 2017 23:59:58 +0800
+Message-ID: <CACVXFVPyWL8XyFKC9uT7r4q+QT1+_RvnvJnOskCO3aSnUEVY1w@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/2] block,scsi: support host-wide tagset
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>, Christoph Hellwig <hch@lst.de>,
+	Bart van Assche <bart.vanassche@sandisk.com>, linux-block <linux-block@vger.kernel.org>,
+	Linux SCSI List <linux-scsi@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/04/2017 09:00 AM, Ming Lei wrote:=0A=
-> Just be curious, why is multi hard queue used for this case? Are there=0A=
-> some real cases in SCSI?=0A=
-=0A=
-Hello Ming,=0A=
-=0A=
-Yes, there is a real need for this. Background information is available=0A=
-in the following e-mail thread: Arun Easi, "scsi-mq - tag# and=0A=
-can_queue, performance", April 2, 2017, linux-scsi=0A=
-(http://www.spinics.net/lists/linux-scsi/msg106853.html).=0A=
-=0A=
-Bart.=0A=
+On Tue, Apr 4, 2017 at 8:07 PM, Hannes Reinecke <hare@suse.de> wrote:
+> Hi all,
+>
+> as discussed recently most existing HBAs have a host-wide tagset which
+> does not map easily onto the per-queue tagset model of block mq.
+> This patchset implements a flag BLK_MQ_F_GLOBAL_TAGS for block-mq, which
+> enables the use of a shared tagset for all hardware queues.
+> The second patch adds a flag 'host_tagset' to the SCSI host template,
+> which allows drivers to enable the use of the global tagset.
+>
+> This patchset probably has some performance implications as
+> there is a quite high probability of cache-bouncing when allocating
+> tags. Also I'm not quite sure if the implemented tagset sharing
+> is the correct way to handle things.
+> So this can be considered an RFC.
+>
+> As usual, comments and reviews are welcome.
+
+Just be curious, why is multi hard queue used for this case? Are there
+some real cases in SCSI?
+
+
+Thanks,
+Ming Lei
