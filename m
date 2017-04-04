@@ -1,51 +1,302 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44216 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753447AbdDEGhH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Apr 2017 02:37:07 -0400
-Subject: Re: [PATCH 5/9] bio-integrity: fold bio_integrity_enabled to
- bio_integrity_prep
-To: Dmitry Monakhov <dmonakhov@openvz.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:35993 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755555AbdDDS5F (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 14:57:05 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         martin.petersen@oracle.com
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 5/9] bio-integrity: fold bio_integrity_enabled to bio_integrity_prep
+Date: Tue,  4 Apr 2017 22:56:37 +0400
+Message-Id: <1491332201-26926-6-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
 References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
- <1491332201-26926-6-git-send-email-dmonakhov@openvz.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <14063093-89ea-4a1e-957f-eb0dfa3a9cf3@suse.de>
-Date: Wed, 5 Apr 2017 08:37:05 +0200
-MIME-Version: 1.0
-In-Reply-To: <1491332201-26926-6-git-send-email-dmonakhov@openvz.org>
-Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 04/04/2017 08:56 PM, Dmitry Monakhov wrote:
-> Currently all integrity prep hooks are open-coded, and if prepare fails
-> we ignore it's code and fail bio with EIO. Let's return real error to
-> upper layer, so later caller may react accordingly.
-> 
-> In fact no one want to use bio_integrity_prep() w/o bio_integrity_enabled,
-> so it is reasonable to fold it in to one function.
-> 
-> Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-> ---
->  Documentation/block/data-integrity.txt |  3 --
->  block/bio-integrity.c                  | 88 ++++++++++++++++++----------------
->  block/blk-core.c                       |  5 +-
->  block/blk-mq.c                         |  8 +---
->  drivers/nvdimm/blk.c                   | 13 +----
->  drivers/nvdimm/btt.c                   | 13 +----
->  include/linux/bio.h                    |  6 ---
->  7 files changed, 55 insertions(+), 81 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Currently all integrity prep hooks are open-coded, and if prepare fails
+we ignore it's code and fail bio with EIO. Let's return real error to
+upper layer, so later caller may react accordingly.
 
-Cheers,
+In fact no one want to use bio_integrity_prep() w/o bio_integrity_enabled,
+so it is reasonable to fold it in to one function.
 
-Hannes
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+---
+ Documentation/block/data-integrity.txt |  3 --
+ block/bio-integrity.c                  | 88 ++++++++++++++++++----------------
+ block/blk-core.c                       |  5 +-
+ block/blk-mq.c                         |  8 +---
+ drivers/nvdimm/blk.c                   | 13 +----
+ drivers/nvdimm/btt.c                   | 13 +----
+ include/linux/bio.h                    |  6 ---
+ 7 files changed, 55 insertions(+), 81 deletions(-)
+
+diff --git a/Documentation/block/data-integrity.txt b/Documentation/block/data-integrity.txt
+index f56ec97..37ac837 100644
+--- a/Documentation/block/data-integrity.txt
++++ b/Documentation/block/data-integrity.txt
+@@ -202,9 +202,6 @@ will require extra work due to the application tag.
+       added.  It is up to the caller to ensure that the bio does not
+       change while I/O is in progress.
+ 
+-      bio_integrity_prep() should only be called if
+-      bio_integrity_enabled() returned 1.
+-
+ 
+ 5.3 PASSING EXISTING INTEGRITY METADATA
+ 
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 6170dad..f2b9f09 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -160,44 +160,6 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
+ EXPORT_SYMBOL(bio_integrity_add_page);
+ 
+ /**
+- * bio_integrity_enabled - Check whether integrity can be passed
+- * @bio:	bio to check
+- *
+- * Description: Determines whether bio_integrity_prep() can be called
+- * on this bio or not.	bio data direction and target device must be
+- * set prior to calling.  The functions honors the write_generate and
+- * read_verify flags in sysfs.
+- */
+-bool bio_integrity_enabled(struct bio *bio)
+-{
+-	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+-
+-	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
+-		return false;
+-
+-	if (!bio_sectors(bio))
+-		return false;
+-
+-	/* Already protected? */
+-	if (bio_integrity(bio))
+-		return false;
+-
+-	if (bi == NULL)
+-		return false;
+-
+-	if (bio_data_dir(bio) == READ && bi->profile->verify_fn != NULL &&
+-	    (bi->flags & BLK_INTEGRITY_VERIFY))
+-		return true;
+-
+-	if (bio_data_dir(bio) == WRITE && bi->profile->generate_fn != NULL &&
+-	    (bi->flags & BLK_INTEGRITY_GENERATE))
+-		return true;
+-
+-	return false;
+-}
+-EXPORT_SYMBOL(bio_integrity_enabled);
+-
+-/**
+  * bio_integrity_intervals - Return number of integrity intervals for a bio
+  * @bi:		blk_integrity profile for device
+  * @sectors:	Size of the bio in 512-byte sectors
+@@ -259,7 +221,7 @@ static int bio_integrity_process(struct bio *bio,
+ }
+ 
+ /**
+- * bio_integrity_prep - Prepare bio for integrity I/O
++ * bio_integrity_setup - Prepare bio for integrity I/O
+  * @bio:	bio to prepare
+  *
+  * Description: Allocates a buffer for integrity metadata, maps the
+@@ -269,7 +231,7 @@ static int bio_integrity_process(struct bio *bio,
+  * block device's integrity function.  In the READ case, the buffer
+  * will be prepared for DMA and a suitable end_io handler set up.
+  */
+-int bio_integrity_prep(struct bio *bio)
++static int bio_integrity_setup(struct bio *bio)
+ {
+ 	struct bio_integrity_payload *bip;
+ 	struct blk_integrity *bi;
+@@ -352,6 +314,52 @@ int bio_integrity_prep(struct bio *bio)
+ 
+ 	return 0;
+ }
++/**
++ * bio_integrity_prep - Prepare bio for integrity I/O
++ * @bio:	bio to prepare
++ *
++ * Description:  Checks if the bio already has an integrity payload attached.
++ * If it does, the payload has been generated by another kernel subsystem,
++ * and we just pass it through. Otherwise allocates integrity payload.
++ */
++
++int bio_integrity_prep(struct bio *bio)
++{
++	int err;
++	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
++
++	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
++		return 0;
++
++	if (!bio_sectors(bio))
++		return 0;
++
++	/* Already protected? */
++	if (bio_integrity(bio))
++		return 0;
++
++	if (bi == NULL)
++		return 0;
++
++	if (bio_data_dir(bio) == READ && bi->profile->verify_fn != NULL &&
++	    (bi->flags & BLK_INTEGRITY_VERIFY))
++		goto need_prep;
++
++	if (bio_data_dir(bio) == WRITE && bi->profile->generate_fn != NULL &&
++	    (bi->flags & BLK_INTEGRITY_GENERATE))
++		goto need_prep;
++
++	return 0;
++need_prep:
++	err = bio_integrity_setup(bio);
++	if (err) {
++		bio->bi_error = err;
++		bio_endio(bio);
++	}
++	return err;
++}
++
++
+ EXPORT_SYMBOL(bio_integrity_prep);
+ 
+ /**
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d772c22..275c1e4 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1637,11 +1637,8 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 
+ 	blk_queue_split(q, &bio, q->bio_split);
+ 
+-	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+-		bio->bi_error = -EIO;
+-		bio_endio(bio);
++	if (bio_integrity_prep(bio))
+ 		return BLK_QC_T_NONE;
+-	}
+ 
+ 	if (op_is_flush(bio->bi_opf)) {
+ 		spin_lock_irq(q->queue_lock);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 08a49c6..b19cd92 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1489,10 +1489,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	blk_queue_bounce(q, &bio);
+ 
+-	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+-		bio_io_error(bio);
++	if (bio_integrity_prep(bio))
+ 		return BLK_QC_T_NONE;
+-	}
+ 
+ 	blk_queue_split(q, &bio, q->bio_split);
+ 
+@@ -1611,10 +1609,8 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	blk_queue_bounce(q, &bio);
+ 
+-	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+-		bio_io_error(bio);
++	if (bio_integrity_prep(bio))
+ 		return BLK_QC_T_NONE;
+-	}
+ 
+ 	blk_queue_split(q, &bio, q->bio_split);
+ 
+diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
+index 9faaa96..0b49336 100644
+--- a/drivers/nvdimm/blk.c
++++ b/drivers/nvdimm/blk.c
+@@ -179,16 +179,8 @@ static blk_qc_t nd_blk_make_request(struct request_queue *q, struct bio *bio)
+ 	int err = 0, rw;
+ 	bool do_acct;
+ 
+-	/*
+-	 * bio_integrity_enabled also checks if the bio already has an
+-	 * integrity payload attached. If it does, we *don't* do a
+-	 * bio_integrity_prep here - the payload has been generated by
+-	 * another kernel subsystem, and we just pass it through.
+-	 */
+-	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+-		bio->bi_error = -EIO;
+-		goto out;
+-	}
++	if (bio_integrity_prep(bio))
++		return BLK_QC_T_NONE;
+ 
+ 	bip = bio_integrity(bio);
+ 	nsblk = q->queuedata;
+@@ -212,7 +204,6 @@ static blk_qc_t nd_blk_make_request(struct request_queue *q, struct bio *bio)
+ 	if (do_acct)
+ 		nd_iostat_end(bio, start);
+ 
+- out:
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+ }
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 368795a..3d7a9fe 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1158,16 +1158,8 @@ static blk_qc_t btt_make_request(struct request_queue *q, struct bio *bio)
+ 	int err = 0;
+ 	bool do_acct;
+ 
+-	/*
+-	 * bio_integrity_enabled also checks if the bio already has an
+-	 * integrity payload attached. If it does, we *don't* do a
+-	 * bio_integrity_prep here - the payload has been generated by
+-	 * another kernel subsystem, and we just pass it through.
+-	 */
+-	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+-		bio->bi_error = -EIO;
+-		goto out;
+-	}
++	if (bio_integrity_prep(bio))
++		return BLK_QC_T_NONE;
+ 
+ 	do_acct = nd_iostat_start(bio, &start);
+ 	bio_for_each_segment(bvec, bio, iter) {
+@@ -1194,7 +1186,6 @@ static blk_qc_t btt_make_request(struct request_queue *q, struct bio *bio)
+ 	if (do_acct)
+ 		nd_iostat_end(bio, start);
+ 
+-out:
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+ }
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 7f7bf37..65445c0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -727,7 +727,6 @@ struct biovec_slab {
+ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
+ extern void bio_integrity_free(struct bio *);
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
+-extern bool bio_integrity_enabled(struct bio *bio);
+ extern int bio_integrity_prep(struct bio *);
+ extern void bio_integrity_endio(struct bio *);
+ extern void bio_integrity_advance(struct bio *, unsigned int);
+@@ -744,11 +743,6 @@ static inline void *bio_integrity(struct bio *bio)
+ 	return NULL;
+ }
+ 
+-static inline bool bio_integrity_enabled(struct bio *bio)
+-{
+-	return false;
+-}
+-
+ static inline int bioset_integrity_create(struct bio_set *bs, int pool_size)
+ {
+ 	return 0;
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.9.3
