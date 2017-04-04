@@ -1,145 +1,81 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 15/23] xen-blkfront: don't use req->errors
-Date: Thu, 20 Apr 2017 16:03:08 +0200
-Message-Id: <20170420140316.6546-16-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
+Return-Path: <mchehab@s-opensource.com>
+Date: Tue, 4 Apr 2017 09:34:25 -0300
+From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Linux Media Mailing List <linux-media@vger.kernel.org>, Linux Doc
+ Mailing List <linux-doc@vger.kernel.org>, Mauro Carvalho Chehab
+ <mchehab@infradead.org>, Noam Camus <noamca@mellanox.com>, James Morris
+ <james.l.morris@oracle.com>, zijun_hu <zijun_hu@htc.com>, Markus Heiser
+ <markus.heiser@darmarit.de>, linux-clk@vger.kernel.org, Jani Nikula
+ <jani.nikula@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Jens
+ Axboe <axboe@kernel.dk>, Nicholas Piggin <npiggin@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, linux-block@vger.kernel.org, "Kirill A. Shutemov"
+ <kirill.shutemov@linux.intel.com>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Ingo Molnar
+ <mingo@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, "Serge E. Hallyn"
+ <serge@hallyn.com>, Michal Hocko <mhocko@suse.com>, Ross Zwisler
+ <ross.zwisler@linux.intel.com>, Chris Wilson <chris@chris-wilson.co.uk>,
+ linux-mm@kvack.org, linux-security-module@vger.kernel.org, Silvio Fricke
+ <silvio.fricke@gmail.com>, Takashi Iwai <tiwai@suse.de>, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Jan Kara <jack@suse.cz>, Vlastimil Babka
+ <vbabka@suse.cz>, linux-pci@vger.kernel.org, Matt Fleming
+ <matt@codeblueprint.co.uk>, Johannes Weiner <hannes@cmpxchg.org>, Andrey
+ Ryabinin <aryabinin@virtuozzo.com>, Andy Lutomirski <luto@kernel.org>, Mel
+ Gorman <mgorman@techsingularity.net>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Alexey Dobriyan <adobriyan@gmail.com>,
+ Hillf Danton <hillf.zj@alibaba-inc.com>
+Subject: Re: [PATCH 0/9] convert genericirq.tmpl and kernel-api.tmpl to
+ DocBook
+Message-ID: <20170404093425.54da2050@vento.lan>
+In-Reply-To: <20170402143418.3de75239@lwn.net>
+References: <cover.1490904090.git.mchehab@s-opensource.com>
+	<20170402143418.3de75239@lwn.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-xen-blkfron is the last users using rq->errros for passing back error to
-blk-mq, and I'd like to get rid of that.  In the longer run the driver
-should be moving more of the completion processing into .complete, but
-this is the minimal change to move forward for now.
+Em Sun, 2 Apr 2017 14:34:18 -0600
+Jonathan Corbet <corbet@lwn.net> escreveu:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Roger Pau Monné <roger.pau@citrix.com>
-Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
----
- drivers/block/xen-blkfront.c | 36 +++++++++++++++++++++++++-----------
- 1 file changed, 25 insertions(+), 11 deletions(-)
+> On Thu, 30 Mar 2017 17:11:27 -0300
+> Mauro Carvalho Chehab <mchehab@s-opensource.com> wrote:
+> 
+> > This series converts just two documents, adding them to the
+> > core-api.rst book. It addresses the errors/warnings that popup
+> > after the conversion.
+> > 
+> > I had to add two fixes to scripts/kernel-doc, in order to solve
+> > some of the issues.  
+> 
+> I've applied the set, including the add-on to move some stuff to
+> driver-api - thanks.
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index abed296ce605..57866355c060 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -115,6 +115,15 @@ struct split_bio {
- 	atomic_t pending;
- };
- 
-+struct blkif_req {
-+	int	error;
-+};
-+
-+static inline struct blkif_req *blkif_req(struct request *rq)
-+{
-+	return blk_mq_rq_to_pdu(rq);
-+}
-+
- static DEFINE_MUTEX(blkfront_mutex);
- static const struct block_device_operations xlvbd_block_fops;
- 
-@@ -907,8 +916,14 @@ static int blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_MQ_RQ_QUEUE_BUSY;
- }
- 
-+static void blkif_complete_rq(struct request *rq)
-+{
-+	blk_mq_end_request(rq, blkif_req(rq)->error);
-+}
-+
- static const struct blk_mq_ops blkfront_mq_ops = {
- 	.queue_rq = blkif_queue_rq,
-+	.complete = blkif_complete_rq,
- };
- 
- static void blkif_set_queue_limits(struct blkfront_info *info)
-@@ -969,7 +984,7 @@ static int xlvbd_init_blk_queue(struct gendisk *gd, u16 sector_size,
- 		info->tag_set.queue_depth = BLK_RING_SIZE(info);
- 	info->tag_set.numa_node = NUMA_NO_NODE;
- 	info->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
--	info->tag_set.cmd_size = 0;
-+	info->tag_set.cmd_size = sizeof(struct blkif_req);
- 	info->tag_set.driver_data = info;
- 
- 	if (blk_mq_alloc_tag_set(&info->tag_set))
-@@ -1543,7 +1558,6 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 	unsigned long flags;
- 	struct blkfront_ring_info *rinfo = (struct blkfront_ring_info *)dev_id;
- 	struct blkfront_info *info = rinfo->dev_info;
--	int error;
- 
- 	if (unlikely(info->connected != BLKIF_STATE_CONNECTED))
- 		return IRQ_HANDLED;
-@@ -1587,37 +1601,36 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 			continue;
- 		}
- 
--		error = (bret->status == BLKIF_RSP_OKAY) ? 0 : -EIO;
-+		blkif_req(req)->error = (bret->status == BLKIF_RSP_OKAY) ? 0 : -EIO;
- 		switch (bret->operation) {
- 		case BLKIF_OP_DISCARD:
- 			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
- 				struct request_queue *rq = info->rq;
- 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
- 					   info->gd->disk_name, op_name(bret->operation));
--				error = -EOPNOTSUPP;
-+				blkif_req(req)->error = -EOPNOTSUPP;
- 				info->feature_discard = 0;
- 				info->feature_secdiscard = 0;
- 				queue_flag_clear(QUEUE_FLAG_DISCARD, rq);
- 				queue_flag_clear(QUEUE_FLAG_SECERASE, rq);
- 			}
--			blk_mq_complete_request(req, error);
- 			break;
- 		case BLKIF_OP_FLUSH_DISKCACHE:
- 		case BLKIF_OP_WRITE_BARRIER:
- 			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
- 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
- 				       info->gd->disk_name, op_name(bret->operation));
--				error = -EOPNOTSUPP;
-+				blkif_req(req)->error = -EOPNOTSUPP;
- 			}
- 			if (unlikely(bret->status == BLKIF_RSP_ERROR &&
- 				     rinfo->shadow[id].req.u.rw.nr_segments == 0)) {
- 				printk(KERN_WARNING "blkfront: %s: empty %s op failed\n",
- 				       info->gd->disk_name, op_name(bret->operation));
--				error = -EOPNOTSUPP;
-+				blkif_req(req)->error = -EOPNOTSUPP;
- 			}
--			if (unlikely(error)) {
--				if (error == -EOPNOTSUPP)
--					error = 0;
-+			if (unlikely(blkif_req(req)->error)) {
-+				if (blkif_req(req)->error == -EOPNOTSUPP)
-+					blkif_req(req)->error = 0;
- 				info->feature_fua = 0;
- 				info->feature_flush = 0;
- 				xlvbd_flush(info);
-@@ -1629,11 +1642,12 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
- 					"request: %x\n", bret->status);
- 
--			blk_mq_complete_request(req, error);
- 			break;
- 		default:
- 			BUG();
- 		}
-+
-+		blk_mq_complete_request(req, 0);
- 	}
- 
- 	rinfo->ring.rsp_cons = i;
--- 
-2.11.0
+Thanks!
+
+> For whatever reason, I had a hard time applying a few of these; "git am"
+> would tell me this:
+> 
+> > Applying: docs-rst: core_api: move driver-specific stuff to drivers_api
+> > fatal: sha1 information is lacking or useless (Documentation/driver-api/index.rst).
+> > Patch failed at 0001 docs-rst: core_api: move driver-specific stuff to drivers_api
+> > The copy of the patch that failed is found in: .git/rebase-apply/patch  
+> 
+> I was able to get around this, but it took some hand work.  How are you
+> generating these?
+
+That's weird. I'm using this to generate the patches:
+
+	git format-patch -o $tmp_dir --stat --summary --patience --signoff --thread=shallow
+
+plus some scripting that runs scripts/get_maintainers.
+
+After that, I run:
+
+	git send-email $tmp_dir
+
+Then, exim sends the patches to a smart SMTP server (currently,
+infradead.org, but I'm switching to s-opensource.org, as I'm getting
+some troubles because the IP doesn't match the From: line).
+
+Thanks,
+Mauro
