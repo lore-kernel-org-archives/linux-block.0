@@ -1,67 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:33532 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752046AbdDNIBI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2017 04:01:08 -0400
-Received: by mail-pg0-f42.google.com with SMTP id x125so41109445pgb.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2017 01:01:08 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v4 3/5] blk-mq: export helpers
-Date: Fri, 14 Apr 2017 01:00:00 -0700
-Message-Id: <45c2de5dc43bfefddbefaab32f203bf6795ffe9d.1492156558.git.osandov@fb.com>
-In-Reply-To: <cover.1492156558.git.osandov@fb.com>
-References: <cover.1492156558.git.osandov@fb.com>
-In-Reply-To: <cover.1492156558.git.osandov@fb.com>
-References: <cover.1492156558.git.osandov@fb.com>
+Received: from mail-vk0-f52.google.com ([209.85.213.52]:33339 "EHLO
+        mail-vk0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753575AbdDDP4Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 11:56:25 -0400
+MIME-Version: 1.0
+In-Reply-To: <871st8kxnk.fsf@dmlp.sw.ru>
+References: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
+ <1491204212-9952-8-git-send-email-dmonakhov@openvz.org> <CACVXFVPWe0ABh5CsXryqXi7Umtvvzcq=jp2n+t=JDRWSZJsbFA@mail.gmail.com>
+ <871st8kxnk.fsf@dmlp.sw.ru>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 4 Apr 2017 23:56:23 +0800
+Message-ID: <CACVXFVN3LmbtyAa95dpzFit5johAG+WizPNk21=7KcbLM1E5_g@mail.gmail.com>
+Subject: Re: [PATCH 7/7] Guard bvec iteration logic v2
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On Tue, Apr 4, 2017 at 11:19 PM, Dmitry Monakhov <dmonakhov@openvz.org> wrote:
+> Ming Lei <tom.leiming@gmail.com> writes:
+>
+>> On Mon, Apr 3, 2017 at 3:23 PM, Dmitry Monakhov <dmonakhov@openvz.org> wrote:
+>>> Currently if some one try to advance bvec beyond it's size we simply
+>>> dump WARN_ONCE and continue to iterate beyond bvec array boundaries.
+>>> This simply means that we endup dereferencing/corrupting random memory
+>>> region.
+>>>
+>>> Sane reaction would be to propagate error back to calling context
+>>> But bvec_iter_advance's calling context is not always good for error
+>>> handling. For safity reason let truncate iterator size to zero which
+>>
+>> IMO, we can avoid continuing to iterate by checking the return value,
+>> and looks it is rude to just set iterator size as 0.
+> But situation itself is horrible already. IMHO this is BUG_ON situation,
 
-blk_mq_finish_request() is required for schedulers that define their own
-put_request(). blk_mq_run_hw_queue() is required for schedulers that
-hold back requests to be run later.
+Not sure it is a real BUG_ON() since corrupt bvec array shouldn't happen
+because we usually don't modify bvec array directly and just copy to local
+variable for further access, but dereferencing random memory might happen.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq.c         | 2 ++
- include/linux/blk-mq.h | 1 +
- 2 files changed, 3 insertions(+)
+> but since Linus hate bugons, I try to replace with something loud, but
+> very safe. Since there is no guarantee that caller will ignore an error
+> and try to dereference bvec the only safe thing we can to is to clamp
+> iterator to zero to prevent any possible usage in future.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e536dacfae4c..7138cd98146e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -368,6 +368,7 @@ void blk_mq_finish_request(struct request *rq)
- {
- 	blk_mq_finish_hctx_request(blk_mq_map_queue(rq->q, rq->mq_ctx->cpu), rq);
- }
-+EXPORT_SYMBOL_GPL(blk_mq_finish_request);
- 
- void blk_mq_free_request(struct request *rq)
- {
-@@ -1183,6 +1184,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
- }
-+EXPORT_SYMBOL(blk_mq_run_hw_queue);
- 
- void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b90c3d5766cd..d75de612845d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -238,6 +238,7 @@ void blk_mq_start_hw_queues(struct request_queue *q);
- void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
-+void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
--- 
-2.12.2
+Since you prevent the case from happening, no dereference invalid bvec
+can happen any more, but may cause dead loop. Setting iterator size as
+zero can break the dead loop, but the driver still may not know this error
+and continue to do its following work.
+
+Don't have a better idea now, and looks it is fine to set iter.bi_size as
+zero at the beginning of guarding bvec iteration.
+
+
+
+Thanks,
+Ming Lei
