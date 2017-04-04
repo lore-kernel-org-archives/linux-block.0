@@ -1,76 +1,55 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V4 13/16] block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
-Date: Wed, 12 Apr 2017 18:23:19 +0200
-Message-Id: <20170412162322.11139-14-paolo.valente@linaro.org>
-In-Reply-To: <20170412162322.11139-1-paolo.valente@linaro.org>
-References: <20170412162322.11139-1-paolo.valente@linaro.org>
+Return-Path: <hare@suse.de>
+Subject: Re: [RFC PATCH 0/2] block,scsi: support host-wide tagset
+To: Ming Lei <tom.leiming@gmail.com>
+References: <1491307665-47656-1-git-send-email-hare@suse.de>
+ <CACVXFVPyWL8XyFKC9uT7r4q+QT1+_RvnvJnOskCO3aSnUEVY1w@mail.gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <james.bottomley@hansenpartnership.com>,
+ Christoph Hellwig <hch@lst.de>, Bart van Assche
+ <bart.vanassche@sandisk.com>, linux-block <linux-block@vger.kernel.org>,
+ Linux SCSI List <linux-scsi@vger.kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <ba1253cd-c437-0fb5-c450-91847390fa2d@suse.de>
+Date: Tue, 4 Apr 2017 19:10:00 +0200
+MIME-Version: 1.0
+In-Reply-To: <CACVXFVPyWL8XyFKC9uT7r4q+QT1+_RvnvJnOskCO3aSnUEVY1w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This patch is basically the counterpart, for NCQ-capable rotational
-devices, of the previous patch. Exactly as the previous patch does on
-flash-based devices and for any workload, this patch disables device
-idling on rotational devices, but only for random I/O. In fact, only
-with these queues disabling idling boosts the throughput on
-NCQ-capable rotational devices. To not break service guarantees,
-idling is disabled for NCQ-enabled rotational devices only when the
-same symmetry conditions considered in the previous patches hold.
+On 04/04/2017 05:59 PM, Ming Lei wrote:
+> On Tue, Apr 4, 2017 at 8:07 PM, Hannes Reinecke <hare@suse.de> wrote:
+>> Hi all,
+>>
+>> as discussed recently most existing HBAs have a host-wide tagset which
+>> does not map easily onto the per-queue tagset model of block mq.
+>> This patchset implements a flag BLK_MQ_F_GLOBAL_TAGS for block-mq, which
+>> enables the use of a shared tagset for all hardware queues.
+>> The second patch adds a flag 'host_tagset' to the SCSI host template,
+>> which allows drivers to enable the use of the global tagset.
+>>
+>> This patchset probably has some performance implications as
+>> there is a quite high probability of cache-bouncing when allocating
+>> tags. Also I'm not quite sure if the implemented tagset sharing
+>> is the correct way to handle things.
+>> So this can be considered an RFC.
+>>
+>> As usual, comments and reviews are welcome.
+>
+> Just be curious, why is multi hard queue used for this case? Are there
+> some real cases in SCSI?
+>
+Yes.
+This is required by basically every driver in drivers/scsi which would 
+in theory be able to support scsi-mq (ie lpfc, qla2xxx, mpt3sas, and 
+possibly fnic). Each of them support several submission/completion 
+queues, but every one of them has a host-wide tag map, too.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
----
- block/bfq-iosched.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+Cheers,
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 2081784..549f030 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6439,20 +6439,15 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * The next variable takes into account the cases where idling
- 	 * boosts the throughput.
- 	 *
--	 * The value of the variable is computed considering that
--	 * idling is usually beneficial for the throughput if:
-+	 * The value of the variable is computed considering, first, that
-+	 * idling is virtually always beneficial for the throughput if:
- 	 * (a) the device is not NCQ-capable, or
- 	 * (b) regardless of the presence of NCQ, the device is rotational
--	 *     and the request pattern for bfqq is I/O-bound (possible
--	 *     throughput losses caused by granting idling to seeky queues
--	 *     are mitigated by the fact that, in all scenarios where
--	 *     boosting throughput is the best thing to do, i.e., in all
--	 *     symmetric scenarios, only a minimal idle time is allowed to
--	 *     seeky queues).
-+	 *     and the request pattern for bfqq is I/O-bound and sequential.
- 	 *
- 	 * Secondly, and in contrast to the above item (b), idling an
- 	 * NCQ-capable flash-based device would not boost the
--	 * throughput even with intense I/O; rather it would lower
-+	 * throughput even with sequential I/O; rather it would lower
- 	 * the throughput in proportion to how fast the device
- 	 * is. Accordingly, the next variable is true if any of the
- 	 * above conditions (a) and (b) is true, and, in particular,
-@@ -6460,7 +6455,8 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * device.
- 	 */
- 	idling_boosts_thr = !bfqd->hw_tag ||
--		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq));
-+		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq) &&
-+		 bfq_bfqq_idle_window(bfqq));
- 
- 	/*
- 	 * The value of the next variable,
+Hannes
 -- 
-2.10.0
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
