@@ -1,72 +1,22 @@
-Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 07/25] virtio_blk: don't use req->errors
-Date: Thu,  6 Apr 2017 17:39:26 +0200
-Message-Id: <20170406153944.10058-8-hch@lst.de>
-In-Reply-To: <20170406153944.10058-1-hch@lst.de>
-References: <20170406153944.10058-1-hch@lst.de>
+Return-Path: <BATV+d3eb45c623920cebad2c+4972+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 3 Apr 2017 23:49:34 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	sagi@grimberg.me, avi@scylladb.com, axboe@kernel.dk,
+	linux-api@vger.kernel.org, willy@infradead.org,
+	tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
+Message-ID: <20170404064934.GC21942@infradead.org>
+References: <20170403185307.6243-1-rgoldwyn@suse.de>
+ <20170403185307.6243-6-rgoldwyn@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170403185307.6243-6-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Remove passing req->errors (which at that point is always 0) to
-blk_mq_complete_requestq, and rely on the virtio status code for the
-serial number passthrough request.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/virtio_blk.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index dbc4e80680b1..8378ad480f77 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -175,19 +175,15 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
- static inline void virtblk_request_done(struct request *req)
- {
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
--	int error = virtblk_result(vbr);
- 
- 	switch (req_op(req)) {
- 	case REQ_OP_SCSI_IN:
- 	case REQ_OP_SCSI_OUT:
- 		virtblk_scsi_request_done(req);
- 		break;
--	case REQ_OP_DRV_IN:
--		req->errors = (error != 0);
--		break;
- 	}
- 
--	blk_mq_end_request(req, error);
-+	blk_mq_end_request(req, virtblk_result(vbr));
- }
- 
- static void virtblk_done(struct virtqueue *vq)
-@@ -205,7 +201,7 @@ static void virtblk_done(struct virtqueue *vq)
- 		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
- 			struct request *req = blk_mq_rq_from_pdu(vbr);
- 
--			blk_mq_complete_request(req, req->errors);
-+			blk_mq_complete_request(req, 0);
- 			req_done = true;
- 		}
- 		if (unlikely(virtqueue_is_broken(vq)))
-@@ -311,7 +307,7 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
- 		goto out;
- 
- 	blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
--	err = req->errors ? -EIO : 0;
-+	err = virtblk_result(blk_mq_rq_to_pdu(req));
- out:
- 	blk_put_request(req);
- 	return err;
--- 
-2.11.0
+Please make this a REQ_* flag so that it can be passed in the bio,
+the request and as an argument to the get_request functions instead
+of testing for a bio.
