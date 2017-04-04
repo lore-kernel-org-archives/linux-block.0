@@ -1,34 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:51168 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752689AbdDLIRr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2017 04:17:47 -0400
-Date: Wed, 12 Apr 2017 01:17:46 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>,
-        linux-nilfs@vger.kernel.org
-Subject: Re: [PATCH 19/25] nilfs2: Convert to properly refcounting bdi
-Message-ID: <20170412081746.GS9830@infradead.org>
-References: <20170329105623.18241-1-jack@suse.cz>
- <20170329105623.18241-20-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170329105623.18241-20-jack@suse.cz>
+Received: from mail-pg0-f52.google.com ([74.125.83.52]:36542 "EHLO
+        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754209AbdDDQvK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 12:51:10 -0400
+Received: by mail-pg0-f52.google.com with SMTP id g2so155821894pge.3
+        for <linux-block@vger.kernel.org>; Tue, 04 Apr 2017 09:51:10 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v2 4/5] blk-mq: export blk_mq_finish_request()
+Date: Tue,  4 Apr 2017 09:49:57 -0700
+Message-Id: <7b169ea3fc51fff8d9244eb2e3cdbfb168c7fb41.1491324365.git.osandov@fb.com>
+In-Reply-To: <cover.1491324365.git.osandov@fb.com>
+References: <cover.1491324365.git.osandov@fb.com>
+In-Reply-To: <cover.1491324365.git.osandov@fb.com>
+References: <cover.1491324365.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Mar 29, 2017 at 12:56:17PM +0200, Jan Kara wrote:
-> Similarly to set_bdev_super() NILFS2 just used block device reference to
-> bdi. Convert it to properly getting bdi reference. The reference will
-> get automatically dropped on superblock destruction.
+From: Omar Sandoval <osandov@fb.com>
 
-I really wish we could get rid of this open coding in block based
-file systems..
+This is required for schedulers that define their own put_request().
 
-Otherwise looks fine:
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ block/blk-mq.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3dbfed6d0e5b..e75fa7a1a653 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -368,6 +368,7 @@ void blk_mq_finish_request(struct request *rq)
+ {
+ 	blk_mq_finish_hctx_request(blk_mq_map_queue(rq->q, rq->mq_ctx->cpu), rq);
+ }
++EXPORT_SYMBOL_GPL(blk_mq_finish_request);
+ 
+ void blk_mq_free_request(struct request *rq)
+ {
+-- 
+2.12.2
