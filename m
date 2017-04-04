@@ -1,24 +1,24 @@
 Return-Path: <hare@suse.de>
 Subject: Re: [RFC PATCH 0/2] block,scsi: support host-wide tagset
-To: Ming Lei <tom.leiming@gmail.com>
+To: Omar Sandoval <osandov@osandov.com>
 References: <1491307665-47656-1-git-send-email-hare@suse.de>
- <CACVXFVPyWL8XyFKC9uT7r4q+QT1+_RvnvJnOskCO3aSnUEVY1w@mail.gmail.com>
+ <20170404153234.GA3234@vader>
 Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
  "Martin K. Petersen" <martin.petersen@oracle.com>,
  James Bottomley <james.bottomley@hansenpartnership.com>,
  Christoph Hellwig <hch@lst.de>, Bart van Assche
- <bart.vanassche@sandisk.com>, linux-block <linux-block@vger.kernel.org>,
- Linux SCSI List <linux-scsi@vger.kernel.org>
+ <bart.vanassche@sandisk.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org
 From: Hannes Reinecke <hare@suse.de>
-Message-ID: <ba1253cd-c437-0fb5-c450-91847390fa2d@suse.de>
-Date: Tue, 4 Apr 2017 19:10:00 +0200
+Message-ID: <567966a3-0eca-da86-7a9e-abd933fc4771@suse.de>
+Date: Tue, 4 Apr 2017 19:06:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVPyWL8XyFKC9uT7r4q+QT1+_RvnvJnOskCO3aSnUEVY1w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170404153234.GA3234@vader>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/04/2017 05:59 PM, Ming Lei wrote:
-> On Tue, Apr 4, 2017 at 8:07 PM, Hannes Reinecke <hare@suse.de> wrote:
+On 04/04/2017 05:32 PM, Omar Sandoval wrote:
+> On Tue, Apr 04, 2017 at 02:07:43PM +0200, Hannes Reinecke wrote:
 >> Hi all,
 >>
 >> as discussed recently most existing HBAs have a host-wide tagset which
@@ -36,14 +36,19 @@ On 04/04/2017 05:59 PM, Ming Lei wrote:
 >>
 >> As usual, comments and reviews are welcome.
 >
-> Just be curious, why is multi hard queue used for this case? Are there
-> some real cases in SCSI?
+> Hi, Hannes,
 >
-Yes.
-This is required by basically every driver in drivers/scsi which would 
-in theory be able to support scsi-mq (ie lpfc, qla2xxx, mpt3sas, and 
-possibly fnic). Each of them support several submission/completion 
-queues, but every one of them has a host-wide tag map, too.
+> blk-mq already supports a shared tagset, and scsi-mq already uses that.
+> When we initialize a request queue, we add it to a tagset with
+> blk_mq_add_queue_set(), where we automatically mark the tagset as shared
+> if there is more than one queue using it. What does this do that
+> BLK_MQ_F_TAG_SHARED doesn't cover?
+>
+This is orthogonal to the BLK_MQ_F_TAG_SHARED flag.
+That flag is covering the case for several block devices sharing the 
+same tagset.
+My new flag is covering the case where several _hardware_ queues are 
+sharing the same tagset.
 
 Cheers,
 
@@ -51,5 +56,5 @@ Hannes
 -- 
 Dr. Hannes Reinecke		      zSeries & Storage
 hare@suse.de			      +49 911 74053 688
-SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
