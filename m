@@ -1,98 +1,34 @@
-Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 15/25] mtip32xx: add a status field to struct mtip_cmd
-Date: Thu,  6 Apr 2017 17:39:34 +0200
-Message-Id: <20170406153944.10058-16-hch@lst.de>
-In-Reply-To: <20170406153944.10058-1-hch@lst.de>
-References: <20170406153944.10058-1-hch@lst.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: Christoph Hellwig <hch@lst.de>
+CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, James Bottomley
+	<James.Bottomley@HansenPartnership.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH v2 2/5] blk-mq: Make it safe to use RCU to iterate over
+ blk_mq_tag_set.tag_list
+Date: Tue, 4 Apr 2017 15:55:44 +0000
+Message-ID: <BY1PR0401MB1532593CCC571410AD79918B810B0@BY1PR0401MB1532.namprd04.prod.outlook.com>
+References: <20170403232228.11208-1-bart.vanassche@sandisk.com>
+ <20170403232228.11208-3-bart.vanassche@sandisk.com>
+ <20170404064038.GB9168@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of using req->errors, which will go away.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/mtip32xx/mtip32xx.c | 16 +++++++++-------
- drivers/block/mtip32xx/mtip32xx.h |  1 +
- 2 files changed, 10 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 30076e7753bc..ec998e80cfaf 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -241,7 +241,8 @@ static void mtip_async_complete(struct mtip_port *port,
- 
- 	rq = mtip_rq_from_tag(dd, tag);
- 
--	blk_mq_complete_request(rq, status);
-+	cmd->status = status;
-+	blk_mq_complete_request(rq, 0);
- }
- 
- /*
-@@ -2910,18 +2911,19 @@ static void mtip_softirq_done_fn(struct request *rq)
- 	if (unlikely(cmd->unaligned))
- 		up(&dd->port->cmd_slot_unal);
- 
--	blk_mq_end_request(rq, rq->errors);
-+	blk_mq_end_request(rq, cmd->status);
- }
- 
- static void mtip_abort_cmd(struct request *req, void *data,
- 							bool reserved)
- {
-+	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
- 	struct driver_data *dd = data;
- 
- 	dbg_printk(MTIP_DRV_NAME " Aborting request, tag = %d\n", req->tag);
- 
- 	clear_bit(req->tag, dd->port->cmds_to_issue);
--	req->errors = -EIO;
-+	cmd->status = -EIO;
- 	mtip_softirq_done_fn(req);
- }
- 
-@@ -3816,7 +3818,6 @@ static int mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (likely(!ret))
- 		return BLK_MQ_RQ_QUEUE_OK;
- 
--	rq->errors = ret;
- 	return BLK_MQ_RQ_QUEUE_ERROR;
- }
- 
-@@ -4107,9 +4108,10 @@ static void mtip_no_dev_cleanup(struct request *rq, void *data, bool reserv)
- 	struct driver_data *dd = (struct driver_data *)data;
- 	struct mtip_cmd *cmd;
- 
--	if (likely(!reserv))
--		blk_mq_complete_request(rq, -ENODEV);
--	else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
-+	if (likely(!reserv)) {
-+		cmd->status = -ENODEV;
-+		blk_mq_complete_request(rq, 0);
-+	} else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
- 
- 		cmd = mtip_cmd_from_tag(dd, MTIP_TAG_INTERNAL);
- 		if (cmd->comp_func)
-diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-index 7617888f7944..57b41528a824 100644
---- a/drivers/block/mtip32xx/mtip32xx.h
-+++ b/drivers/block/mtip32xx/mtip32xx.h
-@@ -352,6 +352,7 @@ struct mtip_cmd {
- 	int retries; /* The number of retries left for this command. */
- 
- 	int direction; /* Data transfer direction */
-+	int status;
- };
- 
- /* Structure used to describe a port. */
--- 
-2.11.0
+On 04/03/2017 11:40 PM, Christoph Hellwig wrote:=0A=
+> On Mon, Apr 03, 2017 at 04:22:25PM -0700, Bart Van Assche wrote:=0A=
+>> A later patch in this series will namely use RCU to iterate over=0A=
+>> this list.=0A=
+> =0A=
+> It also adds a couple lockdep_assert_held calls, which might be worth=0A=
+> mentioning.=0A=
+> =0A=
+> Otherwise looks good:=0A=
+> =0A=
+> Reviewed-by: Christoph Hellwig <hch@lst.de>=0A=
+=0A=
+Thanks for the review. I will update the patch description.=0A=
+=0A=
+Bart.=0A=
+=0A=
