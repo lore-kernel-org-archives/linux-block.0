@@ -1,61 +1,51 @@
-Return-Path: <yun.wang@profitbricks.com>
-Return-Path: <yun.wang@profitbricks.com>
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@kernel.org>,
- NeilBrown <neilb@suse.com>, Jinpu Wang <jinpu.wang@profitbricks.com>
-From: Michael Wang <yun.wang@profitbricks.com>
-Subject: [RFC PATCH] blk: reset 'bi_next' when bio is done inside request
-Message-ID: <9505ff12-7307-7dec-76b5-2a233a592634@profitbricks.com>
-Date: Mon, 3 Apr 2017 14:05:16 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qk0-f175.google.com ([209.85.220.175]:35548 "EHLO
+        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753226AbdDDRJz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 13:09:55 -0400
+Received: by mail-qk0-f175.google.com with SMTP id g195so75382721qke.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Apr 2017 10:09:54 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: [PATCH 0/5] blk-mq: scheduler and hw queue initialization
+ fixes/enhancements
+From: Josef Bacik <josef@toxicpanda.com>
+In-Reply-To: <cover.1491254827.git.osandov@fb.com>
+Date: Tue, 4 Apr 2017 13:09:50 -0400
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+Message-Id: <78AB53B3-941B-4108-8474-80D88581C0F7@toxicpanda.com>
+References: <cover.1491254827.git.osandov@fb.com>
+To: Omar Sandoval <osandov@osandov.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 
-blk_attempt_plug_merge() try to merge bio into request and chain them
-by 'bi_next', while after the bio is done inside request, we forgot to
-reset the 'bi_next'.
+> On Apr 3, 2017, at 5:42 PM, Omar Sandoval <osandov@osandov.com> wrote:
+> 
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> Hi, Jens,
+> 
+> This series has some fixes and enhancements for blk-mq:
+> 
+> - Patch 1 is a cleanup in preparation for the rest of the series
+> - Patch 2 is a fix necessary for patch 4 when scheduling is enabled,
+>  making sure we bring up new hardware queues with scheduler tags
+> - Patch 3 makes error handling in elevator_switch() more robust, making
+>  us fall back to none like you recommended last time
+> - Patch 4 is the remap fix from last week
+> - Patch 5 is an extension of patch 2 for multiqueue schedulers that
+>  allocate per-hctx data. Nothing in-tree needs it, but Kyber will.
+> 
+> Let me know if you'd prefer deferring this to 4.12 or want to apply 1-4
+> for 4.11. These are based on block/for-next, so the latter might require
+> a respin.
 
-This lead into BUG while removing all the underlying devices from md-raid1,
-the bio once go through:
+Tested with nbd, didn't crash, you can add
 
-  md_do_sync()
-    sync_request()
-      generic_make_request()
-        blk_queue_bio()
-          blk_attempt_plug_merge()
-            CHAINED HERE
+Tested-by: Josef Bacik <jbacik@fb.com>
 
-will keep chained and reused by:
+Thanks,
 
-  raid1d()
-    sync_request_write()
-      generic_make_request()
-        BUG_ON(bio->bi_next)
-
-After reset the 'bi_next' this can no longer happen.
-
-Signed-off-by: Michael Wang <yun.wang@profitbricks.com>
----
- block/blk-core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 43b7d06..91223b2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2619,8 +2619,10 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
-                struct bio *bio = req->bio;
-                unsigned bio_bytes = min(bio->bi_iter.bi_size, nr_bytes);
-
--               if (bio_bytes == bio->bi_iter.bi_size)
-+               if (bio_bytes == bio->bi_iter.bi_size) {
-                        req->bio = bio->bi_next;
-+                       bio->bi_next = NULL;
-+               }
-
-                req_bio_endio(req, bio, bio_bytes, error);
-
--- 
-2.5.0
+Josef
