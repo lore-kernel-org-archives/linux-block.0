@@ -1,48 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:32791 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751662AbdDFI3R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 04:29:17 -0400
-Subject: Re: [PATCH rfc 2/6] mlx5: move affinity hints assignments to generic
- code
-To: Christoph Hellwig <hch@lst.de>
-References: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
- <1491140492-25703-3-git-send-email-sagi@grimberg.me>
- <20170404063213.GB8978@lst.de>
+Received: from verein.lst.de ([213.95.11.211]:50381 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751005AbdDDGcP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Apr 2017 02:32:15 -0400
+Date: Tue, 4 Apr 2017 08:32:13 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Sagi Grimberg <sagi@grimberg.me>
 Cc: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, netdev@vger.kernel.org,
         Saeed Mahameed <saeedm@mellanox.com>,
-        Or Gerlitz <ogerlitz@mellanox.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <2b915d44-e37f-d261-aa23-0944ddaf58a2@grimberg.me>
-Date: Thu, 6 Apr 2017 11:29:12 +0300
+        Or Gerlitz <ogerlitz@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH rfc 2/6] mlx5: move affinity hints assignments to
+        generic code
+Message-ID: <20170404063213.GB8978@lst.de>
+References: <1491140492-25703-1-git-send-email-sagi@grimberg.me> <1491140492-25703-3-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20170404063213.GB8978@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1491140492-25703-3-git-send-email-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
->>  static int mlx5e_get_cpu(struct mlx5e_priv *priv, int ix)
->>  {
->> -	return cpumask_first(priv->mdev->priv.irq_info[ix].mask);
->> +	return cpumask_first(pci_irq_get_affinity(priv->mdev->pdev,
->> +			MLX5_EQ_VEC_COMP_BASE + ix));
->
-> This looks ok for now, but if we look at the callers we'd probably
-> want to make direct use of pci_irq_get_node and pci_irq_get_affinity for
-> the uses directly in mlx5e_open_channel as well as the stored away
-> ->cpu field.  But maybe that should be left for another patch after
-> this one.
+> @@ -1375,7 +1375,8 @@ static void mlx5e_close_cq(struct mlx5e_cq *cq)
+>  
+>  static int mlx5e_get_cpu(struct mlx5e_priv *priv, int ix)
+>  {
+> -	return cpumask_first(priv->mdev->priv.irq_info[ix].mask);
+> +	return cpumask_first(pci_irq_get_affinity(priv->mdev->pdev,
+> +			MLX5_EQ_VEC_COMP_BASE + ix));
 
-Its small enough to fold it in.
+This looks ok for now, but if we look at the callers we'd probably
+want to make direct use of pci_irq_get_node and pci_irq_get_affinity for
+the uses directly in mlx5e_open_channel as well as the stored away
+->cpu field.  But maybe that should be left for another patch after
+this one.
 
->> +	struct irq_affinity irqdesc = { .pre_vectors = MLX5_EQ_VEC_COMP_BASE, };
->
-> I usually move assignments inside structures onto a separate line to make
-> it more readable, e.g.
->
-> 	struct irq_affinity irqdesc = {
-> 		.pre_vectors = MLX5_EQ_VEC_COMP_BASE,
-> 	};
+> +	struct irq_affinity irqdesc = { .pre_vectors = MLX5_EQ_VEC_COMP_BASE, };
 
-Will do.
+I usually move assignments inside structures onto a separate line to make
+it more readable, e.g.
+
+	struct irq_affinity irqdesc = {
+		.pre_vectors = MLX5_EQ_VEC_COMP_BASE,
+	};
+
+Otherwise this looks fine:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
