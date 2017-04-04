@@ -1,38 +1,19 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: Adam Manzanares <Adam.Manzanares@wdc.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@infradead.org" <hch@infradead.org>
 Subject: Re: [PATCH] Block SQ/MQ Request Priority
-To: adam.manzanares@wdc.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Date: Tue, 4 Apr 2017 15:31:26 +0000
+Message-ID: <1491319885.2513.3.camel@sandisk.com>
 References: <1491319514-6671-1-git-send-email-adam.manzanares@wdc.com>
-Cc: hch@infradead.org, Bart.VanAssche@sandisk.com
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <0ee226a2-0be5-0832-e92d-785ee8a480e1@kernel.dk>
-Date: Tue, 4 Apr 2017 15:40:27 -0600
-MIME-Version: 1.0
 In-Reply-To: <1491319514-6671-1-git-send-email-adam.manzanares@wdc.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/04/2017 09:25 AM, adam.manzanares@wdc.com wrote:
-> From: Adam Manzanares <adam.manzanares@wdc.com>
-> 
-> In 4.10 I introduced a patch that associates the ioc priority with
-> each request in the block layer. This work was done in the single queue
-> block layer code. This patch unifies ioc priority to request mapping across
-> the single/multi queue block layers.
-> 
-> I have tested this patch with the null block device driver with the following
-> parameters.
-> 
-> null_blk queue_mode=2 irqmode=0 use_per_node_hctx=1 nr_devices=1
-> 
-> I have not seen a performance regression with this patch and I would appreciate
-> any feedback or additional testing.
-> 
-> I have also verified that io priorities are passed to the device when using
-> the SQ and MQ path to a SATA HDD that supports io priorities.
+On Tue, 2017-04-04 at 08:25 -0700, adam.manzanares@wdc.com wrote:
+>=20
 
-Applied, with an updated subject line, it didn't really describe what
-the patch does. Thanks.
-
--- 
-Jens Axboe
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
