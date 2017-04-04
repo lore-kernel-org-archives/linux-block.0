@@ -1,75 +1,25 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com
-Subject: [PATCH 0/8 v4] No wait AIO
-Date: Mon,  3 Apr 2017 13:52:59 -0500
-Message-Id: <20170403185307.6243-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:50391 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751166AbdDDGdJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Apr 2017 02:33:09 -0400
+Date: Tue, 4 Apr 2017 08:33:07 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Or Gerlitz <ogerlitz@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH rfc 4/6] mlx5: support ->get_vector_affinity
+Message-ID: <20170404063307.GD8978@lst.de>
+References: <1491140492-25703-1-git-send-email-sagi@grimberg.me> <1491140492-25703-5-git-send-email-sagi@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1491140492-25703-5-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Formerly known as non-blocking AIO.
+Looks good,
 
-This series adds nonblocking feature to asynchronous I/O writes.
-io_submit() can be delayed because of a number of reason:
- - Block allocation for files
- - Data writebacks for direct I/O
- - Sleeping because of waiting to acquire i_rwsem
- - Congested block device
-
-The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
-any of these conditions are met. This way userspace can push most
-of the write()s to the kernel to the best of its ability to complete
-and if it returns -EAGAIN, can defer it to another thread.
-
-In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
-uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
-IOCB_NOWAIT for struct iocb, BIO_NOWAIT for bio and IOMAP_NOWAIT for
-iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
-not use aio_flags because it is not currently checked for invalidity
-in the kernel.
-
-This feature is provided for direct I/O of asynchronous I/O only. I have
-tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
-Same with QUEUE_FLAG_NOWAIT, which is currently set for sd and virtio devices.
-This is primarily to block md/dm devices which may wait in places such as
-recovery/sync/suspend. In the future, I intend to add support to
-these devices as well. Applications will have to check supportability
-by sending a async direct write and any other error besides -EAGAIN
-would mean it is not supported.
-
-Changes since v1:
- + changed name from _NONBLOCKING to *_NOWAIT
- + filemap_range_has_page call moved to closer to (just before) calling filemap_write_and_wait_range().
- + BIO_NOWAIT limited to get_request()
- + XFS fixes 
-	- included reflink 
-	- use of xfs_ilock_nowait() instead of a XFS_IOLOCK_NONBLOCKING flag
-	- Translate the flag through IOMAP_NOWAIT (iomap) to check for
-	  block allocation for the file.
- + ext4 coding style
-
-Changes since v2:
- + Using aio_reserved1 as aio_rw_flags instead of aio_flags
- + blk-mq support
- + xfs uptodate with kernel and reflink changes
-
- Changes since v3:
-  + Added FS_NOWAIT, which is set if the filesystem supports NOWAIT feature.
-  + Checks in generic_make_request() to make sure BIO_NOWAIT comes in
-    for async direct writes only.
-  + Added QUEUE_FLAG_NOWAIT, which is set if the device supports BIO_NOWAIT.
-    This is added (rather not set) to block devices such as dm/md currently.
-
--- 
-Goldwyn
+Reviewed-by: Christoph Hellwig <hch@lst.de>
