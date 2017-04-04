@@ -1,62 +1,82 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56078 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751098AbdDEE1q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Apr 2017 00:27:46 -0400
-From: NeilBrown <neilb@suse.com>
-To: Christoph Hellwig <hch@infradead.org>
-Date: Wed, 05 Apr 2017 14:27:02 +1000
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] loop: Add PF_LESS_THROTTLE to block/loop device thread.
-In-Reply-To: <20170404071033.GA25855@infradead.org>
-References: <871staffus.fsf@notabene.neil.brown.name> <20170404071033.GA25855@infradead.org>
-Message-ID: <8760ijiind.fsf@notabene.neil.brown.name>
+Received: from mail-yw0-f195.google.com ([209.85.161.195]:33352 "EHLO
+        mail-yw0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753037AbdDDOYN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 10:24:13 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <871staffus.fsf@notabene.neil.brown.name>
+References: <871staffus.fsf@notabene.neil.brown.name>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 4 Apr 2017 22:24:12 +0800
+Message-ID: <CACVXFVO54OseKKpZXEju9a+GWYkTFRt9qHT22zzcTjOqGnanmw@mail.gmail.com>
+Subject: Re: [PATCH] loop: Add PF_LESS_THROTTLE to block/loop device thread.
+To: NeilBrown <neilb@suse.com>
+Cc: Jens Axboe <axboe@fb.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
-
-On Tue, Apr 04 2017, Christoph Hellwig wrote:
-
-> Looks fine,
+On Mon, Apr 3, 2017 at 9:18 AM, NeilBrown <neilb@suse.com> wrote:
 >
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> When a filesystem is mounted from a loop device, writes are
+> throttled by balance_dirty_pages() twice: once when writing
+> to the filesystem and once when the loop_handle_cmd() writes
+> to the backing file.  This double-throttling can trigger
+> positive feedback loops that create significant delays.  The
+> throttling at the lower level is seen by the upper level as
+> a slow device, so it throttles extra hard.
 >
-> But if you actually care about performance in any way I'd suggest
-> to use the loop device in direct I/O mode..
+> The PF_LESS_THROTTLE flag was created to handle exactly this
+> circumstance, though with an NFS filesystem mounted from a
+> local NFS server.  It reduces the throttling on the lower
+> layer so that it can proceed largely unthrottled.
+>
+> To demonstrate this, create a filesystem on a loop device
+> and write (e.g. with dd) several large files which combine
+> to consume significantly more than the limit set by
+> /proc/sys/vm/dirty_ratio or dirty_bytes.  Measure the total
+> time taken.
+>
+> When I do this directly on a device (no loop device) the
+> total time for several runs (mkfs, mount, write 200 files,
+> umount) is fairly stable: 28-35 seconds.
+> When I do this over a loop device the times are much worse
+> and less stable.  52-460 seconds.  Half below 100seconds,
+> half above.
+> When I apply this patch, the times become stable again,
+> though not as fast as the no-loop-back case: 53-72 seconds.
+>
+> There may be room for further improvement as the total overhead still
+> seems too high, but this is a big improvement.
+>
+> Signed-off-by: NeilBrown <neilb@suse.com>
+> ---
+>  drivers/block/loop.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 0ecb6461ed81..a7e1dd215fc2 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1694,8 +1694,11 @@ static void loop_queue_work(struct kthread_work *work)
+>  {
+>         struct loop_cmd *cmd =
+>                 container_of(work, struct loop_cmd, work);
+> +       int oldflags = current->flags & PF_LESS_THROTTLE;
+>
+> +       current->flags |= PF_LESS_THROTTLE;
+>         loop_handle_cmd(cmd);
+> +       current->flags = (current->flags & ~PF_LESS_THROTTLE) | oldflags;
+>  }
 
-The losetup on my test VM is too old to support that :-(
-I guess it might be time to upgraded.
+You can do it against 'lo->worker_task' instead of doing it in each
+loop_queue_work(),
+and this flag needn't to be restored because the kernel thread is loop
+specialized.
 
-It seems that there is not "mount -o direct_loop" or similar, so you
-have to do the losetup and the mount separately.  Any thoughts on
-whether that should be changed ?
 
-Thanks,
-NeilBrown
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAljkchYACgkQOeye3VZi
-gbnNyA/8CYbI2TclJYsIDY6t3ChgU5qXSUw9k7WCj+Y1Je5xqxKiHDFkmTZIET+G
-bmyzVT+J3I+sWSqX42ptGSYHSaxNJHazLsnBg2Gm/pChuNy5QlQm5EVclUEjWDJs
-nU3eGbOQbFb4/uQpSdnonr91ODRGD9jFNS23NvTR5jkAORI6LS45Ex5Eg4zKiMH/
-B/LcP4RKwHGKYHNoy/F5RyrObYM7kXsl0JNgNXPh/EZpkyXk0jSaqVpZ0a6P+z7e
-nW8O9GbmxpmdEkS04nQ69BQ2Dq9Quf6GIuQRXUmeNWVUG2wnYTE1Ly7G50bWM+16
-UKLpsCGHgKTAl1fdood4J+V+P8VFMMnsu5nbpMwkVq0nQw5B8g5M0pzl9ojF8bDe
-w/3+yQoVfpu1waE+rqKsDEA+hszeq1T9qHAA2FZn/jAdDIUE4dnOT/e2rHmMN9P9
-Tsfh92n5nFI0PvE61tEi7n/eHlw5e+nCGrBfxG/bHS/+eIDnP3zGborT31fa6C65
-fV3VcwD244e9TVtM400qgHt6aUs2H3GzzedFDTt0TGE+4V5zON4DGdJ4gDwoyk4a
-9NDpJoYWEkxyosxU8U9huKkeE1LIlEOJpGFi2f+KM0zNwVoU+m1R1dizQGLkb+/P
-ANtntKix8d6qEYvgtfWB3pt61wFkd3wLWXPXpjFbwI2USfs68Oc=
-=o4IH
------END PGP SIGNATURE-----
---=-=-=--
+thanks,
+Ming Lei
