@@ -1,52 +1,125 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44005 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752944AbdDEGgC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Apr 2017 02:36:02 -0400
-Subject: Re: [PATCH 4/9] bio-integrity: fix interface for bio_integrity_trim
- v2
-To: Dmitry Monakhov <dmonakhov@openvz.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:35063 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754730AbdDDS4x (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 14:56:53 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         martin.petersen@oracle.com
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 4/9] bio-integrity: fix interface for bio_integrity_trim v2
+Date: Tue,  4 Apr 2017 22:56:36 +0400
+Message-Id: <1491332201-26926-5-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
 References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
- <1491332201-26926-5-git-send-email-dmonakhov@openvz.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <aa53b744-e931-bb1f-11be-d130903ba4b4@suse.de>
-Date: Wed, 5 Apr 2017 08:36:01 +0200
-MIME-Version: 1.0
-In-Reply-To: <1491332201-26926-5-git-send-email-dmonakhov@openvz.org>
-Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 04/04/2017 08:56 PM, Dmitry Monakhov wrote:
-> bio_integrity_trim inherent it's interface from bio_trim and accept
-> offset and size, but this API is error prone because data offset
-> must always be insync with bio's data offset. That is why we have
-> integrity update hook in bio_advance()
-> 
-> So only meaningful values are: offset == 0, sectors == bio_sectors(bio)
-> Let's just remove them completely.
-> 
-> changes from v1:
->  - remove 'sectors' arguments
-> 
-> Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-> ---
->  block/bio-integrity.c | 11 ++---------
->  block/bio.c           |  4 ++--
->  drivers/md/dm.c       |  2 +-
->  include/linux/bio.h   |  5 ++---
->  4 files changed, 7 insertions(+), 15 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+bio_integrity_trim inherent it's interface from bio_trim and accept
+offset and size, but this API is error prone because data offset
+must always be insync with bio's data offset. That is why we have
+integrity update hook in bio_advance()
 
-Cheers,
+So only meaningful values are: offset == 0, sectors == bio_sectors(bio)
+Let's just remove them completely.
 
-Hannes
+changes from v1:
+ - remove 'sectors' arguments
+
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+---
+ block/bio-integrity.c | 11 ++---------
+ block/bio.c           |  4 ++--
+ drivers/md/dm.c       |  2 +-
+ include/linux/bio.h   |  5 ++---
+ 4 files changed, 7 insertions(+), 15 deletions(-)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 82a6ffb..6170dad 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -433,22 +433,15 @@ EXPORT_SYMBOL(bio_integrity_advance);
+ /**
+  * bio_integrity_trim - Trim integrity vector
+  * @bio:	bio whose integrity vector to update
+- * @offset:	offset to first data sector
+- * @sectors:	number of data sectors
+  *
+  * Description: Used to trim the integrity vector in a cloned bio.
+- * The ivec will be advanced corresponding to 'offset' data sectors
+- * and the length will be truncated corresponding to 'len' data
+- * sectors.
+  */
+-void bio_integrity_trim(struct bio *bio, unsigned int offset,
+-			unsigned int sectors)
++void bio_integrity_trim(struct bio *bio)
+ {
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+ 
+-	bio_integrity_advance(bio, offset << 9);
+-	bip->bip_iter.bi_size = bio_integrity_bytes(bi, sectors);
++	bip->bip_iter.bi_size = bio_integrity_bytes(bi, bio_sectors(bio));
+ }
+ EXPORT_SYMBOL(bio_integrity_trim);
+ 
+diff --git a/block/bio.c b/block/bio.c
+index fa84323..65da4c9 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1878,7 +1878,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
+ 	split->bi_iter.bi_size = sectors << 9;
+ 
+ 	if (bio_integrity(split))
+-		bio_integrity_trim(split, 0, sectors);
++		bio_integrity_trim(split);
+ 
+ 	bio_advance(bio, split->bi_iter.bi_size);
+ 
+@@ -1909,7 +1909,7 @@ void bio_trim(struct bio *bio, int offset, int size)
+ 	bio->bi_iter.bi_size = size;
+ 
+ 	if (bio_integrity(bio))
+-		bio_integrity_trim(bio, 0, size);
++		bio_integrity_trim(bio);
+ 
+ }
+ EXPORT_SYMBOL_GPL(bio_trim);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index dfb7597..25c5a8b 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1102,7 +1102,7 @@ static int clone_bio(struct dm_target_io *tio, struct bio *bio,
+ 	clone->bi_iter.bi_size = to_bytes(len);
+ 
+ 	if (bio_integrity(bio))
+-		bio_integrity_trim(clone, 0, len);
++		bio_integrity_trim(clone);
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 8e52119..7f7bf37 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -731,7 +731,7 @@ extern bool bio_integrity_enabled(struct bio *bio);
+ extern int bio_integrity_prep(struct bio *);
+ extern void bio_integrity_endio(struct bio *);
+ extern void bio_integrity_advance(struct bio *, unsigned int);
+-extern void bio_integrity_trim(struct bio *, unsigned int, unsigned int);
++extern void bio_integrity_trim(struct bio *);
+ extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
+ extern int bioset_integrity_create(struct bio_set *, int);
+ extern void bioset_integrity_free(struct bio_set *);
+@@ -781,8 +781,7 @@ static inline void bio_integrity_advance(struct bio *bio,
+ 	return;
+ }
+ 
+-static inline void bio_integrity_trim(struct bio *bio, unsigned int offset,
+-				      unsigned int sectors)
++static inline void bio_integrity_trim(struct bio *bio)
+ {
+ 	return;
+ }
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.9.3
