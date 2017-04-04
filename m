@@ -1,59 +1,61 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 4/8] nowait-aio: Introduce IOMAP_NOWAIT
-Date: Mon,  3 Apr 2017 13:53:03 -0500
-Message-Id: <20170403185307.6243-5-rgoldwyn@suse.de>
-In-Reply-To: <20170403185307.6243-1-rgoldwyn@suse.de>
-References: <20170403185307.6243-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:34804 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752822AbdDDQvE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 12:51:04 -0400
+Received: by mail-pg0-f51.google.com with SMTP id 21so158018277pgg.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Apr 2017 09:51:03 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v2 2/5] blk-mq: add shallow depth option for blk_mq_get_tag()
+Date: Tue,  4 Apr 2017 09:49:55 -0700
+Message-Id: <ccfba8f58e09a5454892ca72a53867c522d4c02c.1491324365.git.osandov@fb.com>
+In-Reply-To: <cover.1491324365.git.osandov@fb.com>
+References: <cover.1491324365.git.osandov@fb.com>
+In-Reply-To: <cover.1491324365.git.osandov@fb.com>
+References: <cover.1491324365.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Omar Sandoval <osandov@fb.com>
 
-IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
-This is used by XFS in the XFS patch.
+Wire up the sbitmap_get_shallow() operation to the tag code so that a
+caller can limit the number of tags available to it.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- fs/iomap.c            | 2 ++
- include/linux/iomap.h | 1 +
- 2 files changed, 3 insertions(+)
+ block/blk-mq-tag.c | 5 ++++-
+ block/blk-mq.h     | 1 +
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 141c3cd..d1c8175 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -885,6 +885,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	} else {
- 		dio->flags |= IOMAP_DIO_WRITE;
- 		flags |= IOMAP_WRITE;
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			flags |= IOMAP_NOWAIT;
- 	}
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 9d97bfc4d465..d0be72ccb091 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -96,7 +96,10 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+ 	    !hctx_may_queue(data->hctx, bt))
+ 		return -1;
+-	return __sbitmap_queue_get(bt);
++	if (data->shallow_depth)
++		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
++	else
++		return __sbitmap_queue_get(bt);
+ }
  
- 	if (mapping->nrpages) {
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 7291810..53f6af8 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -51,6 +51,7 @@ struct iomap {
- #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
- #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
- #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
-+#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
+ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 8d49c06fc520..77ec66369f21 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -141,6 +141,7 @@ struct blk_mq_alloc_data {
+ 	/* input parameter */
+ 	struct request_queue *q;
+ 	unsigned int flags;
++	unsigned int shallow_depth;
  
- struct iomap_ops {
- 	/*
+ 	/* input & output parameter */
+ 	struct blk_mq_ctx *ctx;
 -- 
-2.10.2
+2.12.2
