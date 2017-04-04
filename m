@@ -1,28 +1,67 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-db5eur01on0078.outbound.protection.outlook.com ([104.47.2.78]:41555
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751094AbdDDHrK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Apr 2017 03:47:10 -0400
-Subject: Re: [PATCH rfc 5/6] block: Add rdma affinity based queue mapping
- helper
-To: Sagi Grimberg <sagi@grimberg.me>, <linux-rdma@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>
-References: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
- <1491140492-25703-6-git-send-email-sagi@grimberg.me>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@mellanox.com>,
+Received: from verein.lst.de ([213.95.11.211]:50393 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751066AbdDDGdn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Apr 2017 02:33:43 -0400
+Date: Tue, 4 Apr 2017 08:33:41 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        Saeed Mahameed <saeedm@mellanox.com>,
         Or Gerlitz <ogerlitz@mellanox.com>,
         Christoph Hellwig <hch@lst.de>
-From: Max Gurtovoy <maxg@mellanox.com>
-Message-ID: <becb84ac-7819-a207-56b1-70f16cb80e42@mellanox.com>
-Date: Tue, 4 Apr 2017 10:46:54 +0300
+Subject: Re: [PATCH rfc 5/6] block: Add rdma affinity based queue mapping
+        helper
+Message-ID: <20170404063341.GE8978@lst.de>
+References: <1491140492-25703-1-git-send-email-sagi@grimberg.me> <1491140492-25703-6-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1491140492-25703-6-git-send-email-sagi@grimberg.me>
-Content-Type: text/plain; charset="windows-1255"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
+On Sun, Apr 02, 2017 at 04:41:31PM +0300, Sagi Grimberg wrote:
+> Like pci and virtio, we add a rdma helper for affinity
+> spreading. This achieves optimal mq affinity assignments
+> according to the underlying rdma device affinity maps.
+> 
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  block/Kconfig               |  5 ++++
+>  block/Makefile              |  1 +
+>  block/blk-mq-rdma.c         | 56 +++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/blk-mq-rdma.h | 10 ++++++++
+>  4 files changed, 72 insertions(+)
+>  create mode 100644 block/blk-mq-rdma.c
+>  create mode 100644 include/linux/blk-mq-rdma.h
+> 
+> diff --git a/block/Kconfig b/block/Kconfig
+> index 89cd28f8d051..3ab42bbb06d5 100644
+> --- a/block/Kconfig
+> +++ b/block/Kconfig
+> @@ -206,4 +206,9 @@ config BLK_MQ_VIRTIO
+>  	depends on BLOCK && VIRTIO
+>  	default y
+>  
+> +config BLK_MQ_RDMA
+> +	bool
+> +	depends on BLOCK && INFINIBAND
+> +	default y
+> +
+>  source block/Kconfig.iosched
+> diff --git a/block/Makefile b/block/Makefile
+> index 081bb680789b..4498603dbc83 100644
+> --- a/block/Makefile
+> +++ b/block/Makefile
+> @@ -26,6 +26,7 @@ obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
+>  obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o
+>  obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
+>  obj-$(CONFIG_BLK_MQ_VIRTIO)	+= blk-mq-virtio.o
+> +obj-$(CONFIG_BLK_MQ_RDMA)	+= blk-mq-rdma.o
+>  obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
+>  obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
+>  obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
 > diff --git a/block/blk-mq-rdma.c b/block/blk-mq-rdma.c
 > new file mode 100644
 > index 000000000000..d402f7c93528
@@ -41,19 +80,11 @@ List-Id: linux-block@vger.kernel.org
 > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 > + * more details.
 > + */
-
-shouldn't you include  <linux/kobject.h> and <linux/blkdev.h> like in 
-commit 8ec2ef2b66ea2f that fixes blk-mq-pci.c ?
-
 > +#include <linux/blk-mq.h>
 > +#include <linux/blk-mq-rdma.h>
 > +#include <rdma/ib_verbs.h>
 > +#include <linux/module.h>
 > +#include "blk-mq.h"
-
-Is this include needed ?
-
-
 > +
 > +/**
 > + * blk_mq_rdma_map_queues - provide a default queue mapping for rdma device
@@ -78,27 +109,9 @@ Is this include needed ?
 > +
 > +	if (set->nr_hw_queues > dev->num_comp_vectors)
 > +		goto fallback;
-> +
-> +	for (queue = 0; queue < set->nr_hw_queues; queue++) {
-> +		mask = ib_get_vector_affinity(dev, first_vec + queue);
-> +		if (!mask)
-> +			goto fallback;
 
-Christoph,
-we can use fallback also in the blk-mq-pci.c in case 
-pci_irq_get_affinity fails, right ?
+maybe print a warning here?
 
-> +
-> +		for_each_cpu(cpu, mask)
-> +			set->mq_map[cpu] = queue;
-> +	}
-> +
-> +	return 0;
-> +fallback:
-> +	return blk_mq_map_queues(set);
-> +}
-> +EXPORT_SYMBOL_GPL(blk_mq_rdma_map_queues);
+Otherwise looks fine:
 
-Otherwise, Looks good.
-
-Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
