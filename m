@@ -1,44 +1,137 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f41.google.com ([74.125.83.41]:33540 "EHLO
-        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756046AbdDETC5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 15:02:57 -0400
-Received: by mail-pg0-f41.google.com with SMTP id x125so12936313pgb.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 12:02:57 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v3 8/8] blk-mq: use true instead of 1 for blk_mq_queue_data.last
-Date: Wed,  5 Apr 2017 12:01:36 -0700
-Message-Id: <78a868e8cbebc63525fe9aedc226c971a89d8186.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 05/27] md: support REQ_OP_WRITE_ZEROES
+Date: Wed,  5 Apr 2017 19:21:03 +0200
+Message-Id: <20170405172125.22600-6-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Copy & paste from the REQ_OP_WRITE_SAME code.
 
-Trivial cleanup.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/linear.c    | 1 +
+ drivers/md/md.h        | 7 +++++++
+ drivers/md/multipath.c | 1 +
+ drivers/md/raid0.c     | 2 ++
+ drivers/md/raid1.c     | 4 +++-
+ drivers/md/raid10.c    | 1 +
+ drivers/md/raid5.c     | 1 +
+ 7 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index de57e7727c52..c82fcb923ff8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1435,7 +1435,7 @@ static void __blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
- 		.rq = rq,
--		.last = 1
-+		.last = true,
- 	};
- 	struct blk_mq_hw_ctx *hctx;
- 	blk_qc_t new_cookie;
+diff --git a/drivers/md/linear.c b/drivers/md/linear.c
+index 3e38e0207a3e..377a8a3672e3 100644
+--- a/drivers/md/linear.c
++++ b/drivers/md/linear.c
+@@ -293,6 +293,7 @@ static void linear_make_request(struct mddev *mddev, struct bio *bio)
+ 						      split, disk_devt(mddev->gendisk),
+ 						      bio_sector);
+ 			mddev_check_writesame(mddev, split);
++			mddev_check_write_zeroes(mddev, split);
+ 			generic_make_request(split);
+ 		}
+ 	} while (split != bio);
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index dde8ecb760c8..1e76d64ce180 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -709,4 +709,11 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
+ 	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_same_sectors)
+ 		mddev->queue->limits.max_write_same_sectors = 0;
+ }
++
++static inline void mddev_check_write_zeroes(struct mddev *mddev, struct bio *bio)
++{
++	if (bio_op(bio) == REQ_OP_WRITE_ZEROES &&
++	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_zeroes_sectors)
++		mddev->queue->limits.max_write_zeroes_sectors = 0;
++}
+ #endif /* _MD_MD_H */
+diff --git a/drivers/md/multipath.c b/drivers/md/multipath.c
+index 79a12b59250b..e95d521d93e9 100644
+--- a/drivers/md/multipath.c
++++ b/drivers/md/multipath.c
+@@ -139,6 +139,7 @@ static void multipath_make_request(struct mddev *mddev, struct bio * bio)
+ 	mp_bh->bio.bi_end_io = multipath_end_request;
+ 	mp_bh->bio.bi_private = mp_bh;
+ 	mddev_check_writesame(mddev, &mp_bh->bio);
++	mddev_check_write_zeroes(mddev, &mp_bh->bio);
+ 	generic_make_request(&mp_bh->bio);
+ 	return;
+ }
+diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
+index 93347ca7c7a6..ce7a6a56cf73 100644
+--- a/drivers/md/raid0.c
++++ b/drivers/md/raid0.c
+@@ -383,6 +383,7 @@ static int raid0_run(struct mddev *mddev)
+ 
+ 		blk_queue_max_hw_sectors(mddev->queue, mddev->chunk_sectors);
+ 		blk_queue_max_write_same_sectors(mddev->queue, mddev->chunk_sectors);
++		blk_queue_max_write_zeroes_sectors(mddev->queue, mddev->chunk_sectors);
+ 		blk_queue_max_discard_sectors(mddev->queue, mddev->chunk_sectors);
+ 
+ 		blk_queue_io_min(mddev->queue, mddev->chunk_sectors << 9);
+@@ -504,6 +505,7 @@ static void raid0_make_request(struct mddev *mddev, struct bio *bio)
+ 						      split, disk_devt(mddev->gendisk),
+ 						      bio_sector);
+ 			mddev_check_writesame(mddev, split);
++			mddev_check_write_zeroes(mddev, split);
+ 			generic_make_request(split);
+ 		}
+ 	} while (split != bio);
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index a34f58772022..b59cc100320a 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -3177,8 +3177,10 @@ static int raid1_run(struct mddev *mddev)
+ 	if (IS_ERR(conf))
+ 		return PTR_ERR(conf);
+ 
+-	if (mddev->queue)
++	if (mddev->queue) {
+ 		blk_queue_max_write_same_sectors(mddev->queue, 0);
++		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
++	}
+ 
+ 	rdev_for_each(rdev, mddev) {
+ 		if (!mddev->gendisk)
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index e89a8d78a9ed..28ec3a93acee 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -3749,6 +3749,7 @@ static int raid10_run(struct mddev *mddev)
+ 		blk_queue_max_discard_sectors(mddev->queue,
+ 					      mddev->chunk_sectors);
+ 		blk_queue_max_write_same_sectors(mddev->queue, 0);
++		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
+ 		blk_queue_io_min(mddev->queue, chunk_size);
+ 		if (conf->geo.raid_disks % conf->geo.near_copies)
+ 			blk_queue_io_opt(mddev->queue, chunk_size * conf->geo.raid_disks);
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index ed5cd705b985..8cf1f86dcd05 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -7272,6 +7272,7 @@ static int raid5_run(struct mddev *mddev)
+ 		mddev->queue->limits.discard_zeroes_data = 0;
+ 
+ 		blk_queue_max_write_same_sectors(mddev->queue, 0);
++		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
+ 
+ 		rdev_for_each(rdev, mddev) {
+ 			disk_stack_limits(mddev->gendisk, rdev->bdev,
 -- 
-2.12.2
+2.11.0
