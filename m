@@ -1,121 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f50.google.com ([74.125.83.50]:36276 "EHLO
-        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932546AbdDES3Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 14:29:25 -0400
-Received: by mail-pg0-f50.google.com with SMTP id g2so12042280pge.3
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 11:29:24 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 3/8] blk-mq-sched: set up scheduler tags when bringing up new queues
-Date: Wed,  5 Apr 2017 11:28:15 -0700
-Message-Id: <87ed08fb7afa0e431c6c39777fad5c50f05a132a.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 02/27] block: renumber REQ_OP_WRITE_ZEROES
+Date: Wed,  5 Apr 2017 19:21:00 +0200
+Message-Id: <20170405172125.22600-3-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Make life easy for implementations that needs to send a data buffer
+to the device (e.g. SCSI) by numbering it as a data out command.
 
-If a new hardware queue is added at runtime, we don't allocate scheduler
-tags for it, leading to a crash. This hooks up the scheduler framework
-to blk_mq_{init,exit}_hctx() to make sure everything gets properly
-initialized/freed.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq-sched.c | 22 ++++++++++++++++++++++
- block/blk-mq-sched.h |  5 +++++
- block/blk-mq.c       |  9 ++++++++-
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ include/linux/blk_types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 6bd1758ea29b..0bb13bb51daa 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -461,6 +461,28 @@ void blk_mq_sched_teardown(struct request_queue *q)
- 		blk_mq_sched_free_tags(set, hctx, i);
- }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 67bcf8a5326e..4eae30bfbfca 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -168,7 +168,7 @@ enum req_opf {
+ 	/* write the same sector many times */
+ 	REQ_OP_WRITE_SAME	= 7,
+ 	/* write the zero filled sector many times */
+-	REQ_OP_WRITE_ZEROES	= 8,
++	REQ_OP_WRITE_ZEROES	= 9,
  
-+int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			   unsigned int hctx_idx)
-+{
-+	struct elevator_queue *e = q->elevator;
-+
-+	if (!e)
-+		return 0;
-+
-+	return blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
-+}
-+
-+void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx)
-+{
-+	struct elevator_queue *e = q->elevator;
-+
-+	if (!e)
-+		return;
-+
-+	blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
-+}
-+
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 873f9af5a35b..19db25e0c95a 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -35,6 +35,11 @@ void blk_mq_sched_move_to_dispatch(struct blk_mq_hw_ctx *hctx,
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
- void blk_mq_sched_teardown(struct request_queue *q);
- 
-+int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			   unsigned int hctx_idx);
-+void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx);
-+
- int blk_mq_sched_init(struct request_queue *q);
- 
- static inline bool
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6c1bedc23b5a..cf158a6fc997 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1840,6 +1840,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 				       hctx->fq->flush_rq, hctx_idx,
- 				       flush_start_tag + hctx_idx);
- 
-+	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
-+
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
- 
-@@ -1906,9 +1908,12 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
- 		goto free_bitmap;
- 
-+	if (blk_mq_sched_init_hctx(q, hctx, hctx_idx))
-+		goto exit_hctx;
-+
- 	hctx->fq = blk_alloc_flush_queue(q, hctx->numa_node, set->cmd_size);
- 	if (!hctx->fq)
--		goto exit_hctx;
-+		goto sched_exit_hctx;
- 
- 	if (set->ops->init_request &&
- 	    set->ops->init_request(set->driver_data,
-@@ -1923,6 +1928,8 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 
-  free_fq:
- 	kfree(hctx->fq);
-+ sched_exit_hctx:
-+	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
-  exit_hctx:
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
+ 	/* SCSI passthrough using struct scsi_request */
+ 	REQ_OP_SCSI_IN		= 32,
 -- 
-2.12.2
+2.11.0
