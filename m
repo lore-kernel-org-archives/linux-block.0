@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:34221 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751694AbdDETCy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 15:02:54 -0400
-Received: by mail-pg0-f42.google.com with SMTP id 21so12954256pgg.1
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 12:02:53 -0700 (PDT)
+Received: from mail-pg0-f43.google.com ([74.125.83.43]:33932 "EHLO
+        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932888AbdDES3Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 14:29:25 -0400
+Received: by mail-pg0-f43.google.com with SMTP id 21so12200075pgg.1
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 11:29:25 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: kernel-team@fb.com
-Subject: [PATCH v3 4/8] blk-mq-sched: fix crash in switch error path
-Date: Wed,  5 Apr 2017 12:01:32 -0700
-Message-Id: <9612973dd0c7454113d8592f62b00e356fcf6def.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
+Subject: [PATCH v2 4/8] blk-mq-sched: fix crash in switch error path
+Date: Wed,  5 Apr 2017 11:28:16 -0700
+Message-Id: <26ea4ecafcfd2f1f4bfb7d9a744f5ae973075603.1491416593.git.osandov@fb.com>
+In-Reply-To: <cover.1491416593.git.osandov@fb.com>
+References: <cover.1491416593.git.osandov@fb.com>
+In-Reply-To: <cover.1491416593.git.osandov@fb.com>
+References: <cover.1491416593.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -84,10 +84,10 @@ index 19db25e0c95a..e704956e0862 100644
  int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
  			   unsigned int hctx_idx);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 672430c8c342..147cc53134d8 100644
+index cf158a6fc997..53c5c6097be9 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2137,8 +2137,6 @@ void blk_mq_release(struct request_queue *q)
+@@ -2154,8 +2154,6 @@ void blk_mq_release(struct request_queue *q)
  	struct blk_mq_hw_ctx *hctx;
  	unsigned int i;
  
