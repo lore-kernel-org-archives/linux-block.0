@@ -1,18 +1,59 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 1/5] nvme: move ->retries setup to nvme_setup_cmd
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <keith.busch@intel.com>
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 1/5] nvme: move ->retries setup to nvme_setup_cmd
+Date: Wed,  5 Apr 2017 19:18:08 +0200
+Message-Id: <20170405171812.19911-2-hch@lst.de>
+In-Reply-To: <20170405171812.19911-1-hch@lst.de>
 References: <20170405171812.19911-1-hch@lst.de>
- <20170405171812.19911-2-hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-nvme@lists.infradead.org
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <11026648-8ec0-6dd1-67b3-3e58e0bed207@grimberg.me>
-Date: Wed, 5 Apr 2017 20:32:51 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170405171812.19911-2-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+->retries is counting the number of times a command is resubmitted, and
+be cleared on the first time we see the command.  We currently don't do
+that for non-PCIe command, which is easily fixed by moving the setup
+to common code.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 5 +++++
+ drivers/nvme/host/pci.c  | 4 ----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 3c908e1bc903..0437f44d00f9 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -350,6 +350,11 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ {
+ 	int ret = BLK_MQ_RQ_QUEUE_OK;
+ 
++	if (!(req->rq_flags & RQF_DONTPREP)) {
++		req->retries = 0;
++		req->rq_flags |= RQF_DONTPREP;
++	}
++
+ 	switch (req_op(req)) {
+ 	case REQ_OP_DRV_IN:
+ 	case REQ_OP_DRV_OUT:
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 9e686a67d93b..3818ab15a26e 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -326,10 +326,6 @@ static int nvme_init_iod(struct request *rq, struct nvme_dev *dev)
+ 	iod->nents = 0;
+ 	iod->length = size;
+ 
+-	if (!(rq->rq_flags & RQF_DONTPREP)) {
+-		rq->retries = 0;
+-		rq->rq_flags |= RQF_DONTPREP;
+-	}
+ 	return BLK_MQ_RQ_QUEUE_OK;
+ }
+ 
+-- 
+2.11.0
