@@ -1,184 +1,279 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:48161 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757284AbdDQTQM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2017 15:16:12 -0400
-Subject: [resend PATCH v2 18/33] x86, dax,
- pmem: remove indirection around memcpy_from_pmem()
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Tony Luck <tony.luck@intel.com>, Jan Kara <jack@suse.cz>,
-        dm-devel@redhat.com, Matthew Wilcox <mawilcox@microsoft.com>,
-        x86@kernel.org, linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-fsdevel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Mon, 17 Apr 2017 12:10:27 -0700
-Message-ID: <149245622727.10206.9207175325089032123.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-pg0-f42.google.com ([74.125.83.42]:34221 "EHLO
+        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751694AbdDETCy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 15:02:54 -0400
+Received: by mail-pg0-f42.google.com with SMTP id 21so12954256pgg.1
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 12:02:53 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v3 4/8] blk-mq-sched: fix crash in switch error path
+Date: Wed,  5 Apr 2017 12:01:32 -0700
+Message-Id: <9612973dd0c7454113d8592f62b00e356fcf6def.1491418411.git.osandov@fb.com>
+In-Reply-To: <cover.1491418411.git.osandov@fb.com>
+References: <cover.1491418411.git.osandov@fb.com>
+In-Reply-To: <cover.1491418411.git.osandov@fb.com>
+References: <cover.1491418411.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-memcpy_from_pmem() maps directly to memcpy_mcsafe(). The wrapper
-serves no real benefit aside from affording a more generic function name
-than the x86-specific 'mcsafe'. However this would not be the first time
-that x86 terminology leaked into the global namespace. For lack of
-better name, just use memcpy_mcsafe() directly.
+From: Omar Sandoval <osandov@fb.com>
 
-This conversion also catches a place where we should have been using
-plain memcpy, acpi_nfit_blk_single_io().
+In elevator_switch(), if blk_mq_init_sched() fails, we attempt to fall
+back to the original scheduler. However, at this point, we've already
+torn down the original scheduler's tags, so this causes a crash. Doing
+the fallback like the legacy elevator path is much harder for mq, so fix
+it by just falling back to none, instead.
 
-Cc: <x86@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Tony Luck <tony.luck@intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- arch/x86/include/asm/pmem.h      |    5 -----
- arch/x86/include/asm/string_64.h |    1 +
- drivers/acpi/nfit/core.c         |    3 +--
- drivers/nvdimm/claim.c           |    2 +-
- drivers/nvdimm/pmem.c            |    2 +-
- include/linux/pmem.h             |   23 -----------------------
- include/linux/string.h           |    8 ++++++++
- 7 files changed, 12 insertions(+), 32 deletions(-)
+ block/blk-mq-sched.c     | 13 +++++--
+ block/blk-mq-sched.h     |  2 +-
+ block/blk-mq.c           |  2 --
+ block/blk-sysfs.c        |  2 +-
+ block/elevator.c         | 94 +++++++++++++++++++++++++++---------------------
+ include/linux/elevator.h |  2 +-
+ 6 files changed, 67 insertions(+), 48 deletions(-)
 
-diff --git a/arch/x86/include/asm/pmem.h b/arch/x86/include/asm/pmem.h
-index 529bb4a6487a..d5a22bac9988 100644
---- a/arch/x86/include/asm/pmem.h
-+++ b/arch/x86/include/asm/pmem.h
-@@ -44,11 +44,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
- 		BUG();
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 0bb13bb51daa..e8c2ed654ef0 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -451,7 +451,7 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
+ 	return ret;
  }
  
--static inline int arch_memcpy_from_pmem(void *dst, const void *src, size_t n)
--{
--	return memcpy_mcsafe(dst, src, n);
--}
+-void blk_mq_sched_teardown(struct request_queue *q)
++static void blk_mq_sched_tags_teardown(struct request_queue *q)
+ {
+ 	struct blk_mq_tag_set *set = q->tag_set;
+ 	struct blk_mq_hw_ctx *hctx;
+@@ -513,10 +513,19 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 	return 0;
+ 
+ err:
+-	blk_mq_sched_teardown(q);
++	blk_mq_sched_tags_teardown(q);
++	q->elevator = NULL;
+ 	return ret;
+ }
+ 
++void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
++{
++	if (e->type->ops.mq.exit_sched)
++		e->type->ops.mq.exit_sched(e);
++	blk_mq_sched_tags_teardown(q);
++	q->elevator = NULL;
++}
++
+ int blk_mq_sched_init(struct request_queue *q)
+ {
+ 	int ret;
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 19db25e0c95a..e704956e0862 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -33,7 +33,7 @@ void blk_mq_sched_move_to_dispatch(struct blk_mq_hw_ctx *hctx,
+ 			struct request *(*get_rq)(struct blk_mq_hw_ctx *));
+ 
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
+-void blk_mq_sched_teardown(struct request_queue *q);
++void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
+ 
+ int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+ 			   unsigned int hctx_idx);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 672430c8c342..147cc53134d8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2137,8 +2137,6 @@ void blk_mq_release(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned int i;
+ 
+-	blk_mq_sched_teardown(q);
 -
- /**
-  * arch_wb_cache_pmem - write back a cache range with CLWB
-  * @vaddr:	virtual start address
-diff --git a/arch/x86/include/asm/string_64.h b/arch/x86/include/asm/string_64.h
-index a164862d77e3..733bae07fb29 100644
---- a/arch/x86/include/asm/string_64.h
-+++ b/arch/x86/include/asm/string_64.h
-@@ -79,6 +79,7 @@ int strcmp(const char *cs, const char *ct);
- #define memset(s, c, n) __memset(s, c, n)
- #endif
+ 	/* hctx kobj stays in hctx */
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (!hctx)
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 45854266e398..c47db43a40cc 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -803,7 +803,7 @@ static void blk_release_queue(struct kobject *kobj)
  
-+#define __HAVE_ARCH_MEMCPY_MCSAFE 1
- __must_check int memcpy_mcsafe_unrolled(void *dst, const void *src, size_t cnt);
- DECLARE_STATIC_KEY_FALSE(mcsafe_key);
- 
-diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
-index c8ea9d698cd0..d0c07b2344e4 100644
---- a/drivers/acpi/nfit/core.c
-+++ b/drivers/acpi/nfit/core.c
-@@ -1783,8 +1783,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
- 				mmio_flush_range((void __force *)
- 					mmio->addr.aperture + offset, c);
- 
--			memcpy_from_pmem(iobuf + copied,
--					mmio->addr.aperture + offset, c);
-+			memcpy(iobuf + copied, mmio->addr.aperture + offset, c);
- 		}
- 
- 		copied += c;
-diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
-index ca6d572c48fc..3a35e8028b9c 100644
---- a/drivers/nvdimm/claim.c
-+++ b/drivers/nvdimm/claim.c
-@@ -239,7 +239,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 	if (rw == READ) {
- 		if (unlikely(is_bad_pmem(&nsio->bb, sector, sz_align)))
- 			return -EIO;
--		return memcpy_from_pmem(buf, nsio->addr + offset, size);
-+		return memcpy_mcsafe(buf, nsio->addr + offset, size);
+ 	if (q->elevator) {
+ 		ioc_clear_queue(q);
+-		elevator_exit(q->elevator);
++		elevator_exit(q, q->elevator);
  	}
  
- 	if (unlikely(is_bad_pmem(&nsio->bb, sector, sz_align))) {
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 85b85633d674..3b3dab73d741 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -89,7 +89,7 @@ static int read_pmem(struct page *page, unsigned int off,
- 	int rc;
- 	void *mem = kmap_atomic(page);
- 
--	rc = memcpy_from_pmem(mem + off, pmem_addr, len);
-+	rc = memcpy_mcsafe(mem + off, pmem_addr, len);
- 	kunmap_atomic(mem);
- 	if (rc)
- 		return -EIO;
-diff --git a/include/linux/pmem.h b/include/linux/pmem.h
-index e856c2cb0fe8..71ecf3d46aac 100644
---- a/include/linux/pmem.h
-+++ b/include/linux/pmem.h
-@@ -31,12 +31,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
- 	BUG();
+ 	blk_free_queue_stats(q->stats);
+diff --git a/block/elevator.c b/block/elevator.c
+index f236ef1d2be9..dbeecf7be719 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -252,11 +252,11 @@ int elevator_init(struct request_queue *q, char *name)
  }
+ EXPORT_SYMBOL(elevator_init);
  
--static inline int arch_memcpy_from_pmem(void *dst, const void *src, size_t n)
--{
--	BUG();
--	return -EFAULT;
--}
--
- static inline size_t arch_copy_from_iter_pmem(void *addr, size_t bytes,
- 		struct iov_iter *i)
+-void elevator_exit(struct elevator_queue *e)
++void elevator_exit(struct request_queue *q, struct elevator_queue *e)
  {
-@@ -65,23 +59,6 @@ static inline bool arch_has_pmem_api(void)
- 	return IS_ENABLED(CONFIG_ARCH_HAS_PMEM_API);
+ 	mutex_lock(&e->sysfs_lock);
+ 	if (e->uses_mq && e->type->ops.mq.exit_sched)
+-		e->type->ops.mq.exit_sched(e);
++		blk_mq_exit_sched(q, e);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_exit_fn)
+ 		e->type->ops.sq.elevator_exit_fn(e);
+ 	mutex_unlock(&e->sysfs_lock);
+@@ -941,6 +941,45 @@ void elv_unregister(struct elevator_type *e)
  }
+ EXPORT_SYMBOL_GPL(elv_unregister);
  
--/*
-- * memcpy_from_pmem - read from persistent memory with error handling
-- * @dst: destination buffer
-- * @src: source buffer
-- * @size: transfer length
-- *
-- * Returns 0 on success negative error code on failure.
-- */
--static inline int memcpy_from_pmem(void *dst, void const *src, size_t size)
--{
--	if (arch_has_pmem_api())
--		return arch_memcpy_from_pmem(dst, src, size);
--	else
--		memcpy(dst, src, size);
--	return 0;
--}
--
- /**
-  * memcpy_to_pmem - copy data to persistent memory
-  * @dst: destination buffer for the copy
-diff --git a/include/linux/string.h b/include/linux/string.h
-index 26b6f6a66f83..9d6f189157e2 100644
---- a/include/linux/string.h
-+++ b/include/linux/string.h
-@@ -114,6 +114,14 @@ extern int memcmp(const void *,const void *,__kernel_size_t);
- #ifndef __HAVE_ARCH_MEMCHR
- extern void * memchr(const void *,int,__kernel_size_t);
- #endif
-+#ifndef __HAVE_ARCH_MEMCPY_MCSAFE
-+static inline __must_check int memcpy_mcsafe(void *dst, const void *src,
-+		size_t cnt)
++static int elevator_switch_mq(struct request_queue *q,
++			      struct elevator_type *new_e)
 +{
-+	memcpy(dst, src, cnt);
-+	return 0;
++	int ret;
++
++	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
++
++	if (q->elevator) {
++		if (q->elevator->registered)
++			elv_unregister_queue(q);
++		ioc_clear_queue(q);
++		elevator_exit(q, q->elevator);
++	}
++
++	ret = blk_mq_init_sched(q, new_e);
++	if (ret)
++		goto out;
++
++	if (new_e) {
++		ret = elv_register_queue(q);
++		if (ret) {
++			elevator_exit(q, q->elevator);
++			goto out;
++		}
++	}
++
++	if (new_e)
++		blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
++	else
++		blk_add_trace_msg(q, "elv switch: none");
++
++out:
++	blk_mq_unfreeze_queue(q);
++	blk_mq_start_stopped_hw_queues(q, true);
++	return ret;
++
 +}
-+#endif
- void *memchr_inv(const void *s, int c, size_t n);
- char *strreplace(char *s, char old, char new);
++
+ /*
+  * switch to new_e io scheduler. be careful not to introduce deadlocks -
+  * we don't free the old io scheduler, before we have allocated what we
+@@ -953,10 +992,8 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+ 	bool old_registered = false;
+ 	int err;
  
+-	if (q->mq_ops) {
+-		blk_mq_freeze_queue(q);
+-		blk_mq_quiesce_queue(q);
+-	}
++	if (q->mq_ops)
++		return elevator_switch_mq(q, new_e);
+ 
+ 	/*
+ 	 * Turn on BYPASS and drain all requests w/ elevator private data.
+@@ -968,11 +1005,7 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+ 	if (old) {
+ 		old_registered = old->registered;
+ 
+-		if (old->uses_mq)
+-			blk_mq_sched_teardown(q);
+-
+-		if (!q->mq_ops)
+-			blk_queue_bypass_start(q);
++		blk_queue_bypass_start(q);
+ 
+ 		/* unregister and clear all auxiliary data of the old elevator */
+ 		if (old_registered)
+@@ -982,53 +1015,32 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+ 	}
+ 
+ 	/* allocate, init and register new elevator */
+-	if (q->mq_ops)
+-		err = blk_mq_init_sched(q, new_e);
+-	else
+-		err = new_e->ops.sq.elevator_init_fn(q, new_e);
++	err = new_e->ops.sq.elevator_init_fn(q, new_e);
+ 	if (err)
+ 		goto fail_init;
+ 
+-	if (new_e) {
+-		err = elv_register_queue(q);
+-		if (err)
+-			goto fail_register;
+-	}
++	err = elv_register_queue(q);
++	if (err)
++		goto fail_register;
+ 
+ 	/* done, kill the old one and finish */
+ 	if (old) {
+-		elevator_exit(old);
+-		if (!q->mq_ops)
+-			blk_queue_bypass_end(q);
++		elevator_exit(q, old);
++		blk_queue_bypass_end(q);
+ 	}
+ 
+-	if (q->mq_ops) {
+-		blk_mq_unfreeze_queue(q);
+-		blk_mq_start_stopped_hw_queues(q, true);
+-	}
+-
+-	if (new_e)
+-		blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
+-	else
+-		blk_add_trace_msg(q, "elv switch: none");
++	blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
+ 
+ 	return 0;
+ 
+ fail_register:
+-	if (q->mq_ops)
+-		blk_mq_sched_teardown(q);
+-	elevator_exit(q->elevator);
++	elevator_exit(q, q->elevator);
+ fail_init:
+ 	/* switch failed, restore and re-register old elevator */
+ 	if (old) {
+ 		q->elevator = old;
+ 		elv_register_queue(q);
+-		if (!q->mq_ops)
+-			blk_queue_bypass_end(q);
+-	}
+-	if (q->mq_ops) {
+-		blk_mq_unfreeze_queue(q);
+-		blk_mq_start_stopped_hw_queues(q, true);
++		blk_queue_bypass_end(q);
+ 	}
+ 
+ 	return err;
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index aebecc4ed088..22d39e8d4de1 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -211,7 +211,7 @@ extern ssize_t elv_iosched_show(struct request_queue *, char *);
+ extern ssize_t elv_iosched_store(struct request_queue *, const char *, size_t);
+ 
+ extern int elevator_init(struct request_queue *, char *);
+-extern void elevator_exit(struct elevator_queue *);
++extern void elevator_exit(struct request_queue *, struct elevator_queue *);
+ extern int elevator_change(struct request_queue *, const char *);
+ extern bool elv_bio_merge_ok(struct request *, struct bio *);
+ extern struct elevator_queue *elevator_alloc(struct request_queue *,
+-- 
+2.12.2
