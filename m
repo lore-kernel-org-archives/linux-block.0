@@ -1,100 +1,53 @@
-Return-Path: <sbates130272@gmail.com>
-Return-Path: <sbates130272@gmail.com>
-From: sbates@raithlin.com
-To: axboe@kernel.dk
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
 Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Damien.LeMoal@wdc.com,
-	osandov@osandov.com,
-	sbates@raithlin.com,
-	sagi@grimberg.me
-Subject: [PATCH v2 1/2] blk-stat: convert blk-stat bucket callback to signed
-Date: Wed,  5 Apr 2017 11:39:16 -0600
-Message-Id: <1491413957-30885-2-git-send-email-sbates@raithlin.com>
-In-Reply-To: <1491413957-30885-1-git-send-email-sbates@raithlin.com>
-References: <1491413957-30885-1-git-send-email-sbates@raithlin.com>
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 14/27] sd: implement unmapping Write Zeroes
+Date: Wed,  5 Apr 2017 19:21:12 +0200
+Message-Id: <20170405172125.22600-15-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Stephen Bates <sbates@raithlin.com>
+Try to use a write same with unmap bit variant if the device supports it
+and the caller allows for it.
 
-In order to allow for filtering of IO based on some other properties
-of the request than direction we allow the bucket function to return
-an int.
-
-If the bucket callback returns a negative do no count it in the stats
-accumulation.
-
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-stat.c | 6 ++++--
- block/blk-stat.h | 9 +++++----
- 2 files changed, 9 insertions(+), 6 deletions(-)
+ drivers/scsi/sd.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index e77ec52..dde9d39 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -19,7 +19,7 @@ struct blk_queue_stats {
- 	bool enable_accounting;
- };
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index d8d9c0bdd93c..001593ed0444 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -803,6 +803,15 @@ static int sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
+ 	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
+ 	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
  
--unsigned int blk_stat_rq_ddir(const struct request *rq)
-+int blk_stat_rq_ddir(const struct request *rq)
- {
- 	return rq_data_dir(rq);
- }
-@@ -104,6 +104,8 @@ void blk_stat_add(struct request *rq)
- 	list_for_each_entry_rcu(cb, &q->stats->callbacks, list) {
- 		if (blk_stat_is_active(cb)) {
- 			bucket = cb->bucket_fn(rq);
-+			if (bucket < 0)
-+				continue;
- 			stat = &this_cpu_ptr(cb->cpu_stat)[bucket];
- 			__blk_stat_add(stat, value);
- 		}
-@@ -135,7 +137,7 @@ static void blk_stat_timer_fn(unsigned long data)
- 
- struct blk_stat_callback *
- blk_stat_alloc_callback(void (*timer_fn)(struct blk_stat_callback *),
--			unsigned int (*bucket_fn)(const struct request *),
-+			int (*bucket_fn)(const struct request *),
- 			unsigned int buckets, void *data)
- {
- 	struct blk_stat_callback *cb;
-diff --git a/block/blk-stat.h b/block/blk-stat.h
-index 53f08a6..622a62c 100644
---- a/block/blk-stat.h
-+++ b/block/blk-stat.h
-@@ -48,9 +48,10 @@ struct blk_stat_callback {
- 
- 	/**
- 	 * @bucket_fn: Given a request, returns which statistics bucket it
--	 * should be accounted under.
-+	 * should be accounted under. Return -1 for no bucket for this
-+	 * request.
- 	 */
--	unsigned int (*bucket_fn)(const struct request *);
-+	int (*bucket_fn)(const struct request *);
- 
- 	/**
- 	 * @buckets: Number of statistics buckets.
-@@ -120,7 +121,7 @@ void blk_stat_enable_accounting(struct request_queue *q);
-  *
-  * Return: Data direction of the request, either READ or WRITE.
-  */
--unsigned int blk_stat_rq_ddir(const struct request *rq);
-+int blk_stat_rq_ddir(const struct request *rq);
- 
- /**
-  * blk_stat_alloc_callback() - Allocate a block statistics callback.
-@@ -135,7 +136,7 @@ unsigned int blk_stat_rq_ddir(const struct request *rq);
-  */
- struct blk_stat_callback *
- blk_stat_alloc_callback(void (*timer_fn)(struct blk_stat_callback *),
--			unsigned int (*bucket_fn)(const struct request *),
-+			int (*bucket_fn)(const struct request *),
- 			unsigned int buckets, void *data);
- 
- /**
++	if (!(rq->cmd_flags & REQ_NOUNMAP)) {
++		switch (sdkp->provisioning_mode) {
++		case SD_LBP_WS16:
++			return sd_setup_write_same16_cmnd(cmd, true);
++		case SD_LBP_WS10:
++			return sd_setup_write_same10_cmnd(cmd, true);
++		}
++	}
++
+ 	if (sdp->no_write_same)
+ 		return BLKPREP_INVALID;
+ 	if (sdkp->ws16 || sector > 0xffffffff || nr_sectors > 0xffff)
 -- 
-2.7.4
+2.11.0
