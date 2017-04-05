@@ -1,51 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754147AbdDOS4Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2017 14:56:16 -0400
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [GIT PULL 01/19] lightnvm: Fix error handling
-Date: Sat, 15 Apr 2017 20:55:35 +0200
-Message-ID: <20170415185553.16098-2-matias@cnexlabs.com>
-In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
-References: <20170415185553.16098-1-matias@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 06/27] dm io: discards don't take a payload
+Date: Wed,  5 Apr 2017 19:21:04 +0200
+Message-Id: <20170405172125.22600-7-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Fix up do_region to not allocate a bio_vec for discards.  We've
+got rid of the discard payload allocated by the caller years ago.
 
-According to error handling in this function, it is likely that going to
-'out' was expected here.
+Obviously this wasn't actually harmful given how long it's been
+there, but it's still good to avoid the pointless allocation.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/lightnvm/rrpc.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/md/dm-io.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index e00b1d7..e68efbc 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -1275,8 +1275,10 @@ static int rrpc_bb_discovery(struct nvm_tgt_dev *dev, struct rrpc_lun *rlun)
- 	}
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 03940bf36f6c..b808cbe22678 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -328,11 +328,17 @@ static void do_region(int op, int op_flags, unsigned region,
+ 		/*
+ 		 * Allocate a suitably sized-bio.
+ 		 */
+-		if ((op == REQ_OP_DISCARD) || (op == REQ_OP_WRITE_SAME))
++		switch (op) {
++		case REQ_OP_DISCARD:
++			num_bvecs = 0;
++			break;
++		case REQ_OP_WRITE_SAME:
+ 			num_bvecs = 1;
+-		else
++			break;
++		default:
+ 			num_bvecs = min_t(int, BIO_MAX_PAGES,
+ 					  dm_sector_div_up(remaining, (PAGE_SIZE >> SECTOR_SHIFT)));
++		}
  
- 	nr_blks = nvm_bb_tbl_fold(dev->parent, blks, nr_blks);
--	if (nr_blks < 0)
--		return nr_blks;
-+	if (nr_blks < 0) {
-+		ret = nr_blks;
-+		goto out;
-+	}
- 
- 	for (i = 0; i < nr_blks; i++) {
- 		if (blks[i] == NVM_BLK_T_FREE)
+ 		bio = bio_alloc_bioset(GFP_NOIO, num_bvecs, io->client->bios);
+ 		bio->bi_iter.bi_sector = where->sector + (where->count - remaining);
 -- 
-2.9.3
+2.11.0
