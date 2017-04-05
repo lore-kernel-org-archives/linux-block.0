@@ -12,97 +12,114 @@ Cc: linux-block@vger.kernel.org,
 	drbd-dev@lists.linbit.com,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
-Subject: [PATCH 15/27] nvme: implement REQ_OP_WRITE_ZEROES
-Date: Wed,  5 Apr 2017 16:21:53 +0200
-Message-Id: <20170405142205.6477-16-hch@lst.de>
-In-Reply-To: <20170405142205.6477-1-hch@lst.de>
-References: <20170405142205.6477-1-hch@lst.de>
+Subject: [PATCH 18/27] brd: remove discard support
+Date: Wed,  5 Apr 2017 19:21:16 +0200
+Message-Id: <20170405172125.22600-19-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-But now for the real NVMe Write Zeroes yet, just to get rid of the
-discard abuse for zeroing.  Also rename the quirk flag to be a bit
-more self-explanatory.
+It's just a in-driver reimplementation of writing zeroes to the pages,
+which fails if the discards aren't page aligned.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/nvme/host/core.c | 10 +++++-----
- drivers/nvme/host/nvme.h |  6 +++---
- drivers/nvme/host/pci.c  |  6 +++---
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ drivers/block/brd.c | 54 -----------------------------------------------------
+ 1 file changed, 54 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 3c908e1bc903..26d5129a640a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -358,6 +358,8 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 	case REQ_OP_FLUSH:
- 		nvme_setup_flush(ns, cmd);
- 		break;
-+	case REQ_OP_WRITE_ZEROES:
-+		/* currently only aliased to deallocate for a few ctrls: */
- 	case REQ_OP_DISCARD:
- 		ret = nvme_setup_discard(ns, req, cmd);
- 		break;
-@@ -923,16 +925,14 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct nvme_dsm_range) <
- 			NVME_DSM_MAX_RANGES);
- 
--	if (ctrl->quirks & NVME_QUIRK_DISCARD_ZEROES)
--		ns->queue->limits.discard_zeroes_data = 1;
--	else
--		ns->queue->limits.discard_zeroes_data = 0;
--
- 	ns->queue->limits.discard_alignment = logical_block_size;
- 	ns->queue->limits.discard_granularity = logical_block_size;
- 	blk_queue_max_discard_sectors(ns->queue, UINT_MAX);
- 	blk_queue_max_discard_segments(ns->queue, NVME_DSM_MAX_RANGES);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, ns->queue);
-+
-+	if (ctrl->quirks & NVME_QUIRK_DEALLOCATE_ZEROES)
-+		blk_queue_max_write_zeroes_sectors(ns->queue, UINT_MAX);
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 3adc32a3153b..4ec84d504780 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -134,28 +134,6 @@ static struct page *brd_insert_page(struct brd_device *brd, sector_t sector)
+ 	return page;
  }
  
- static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 227f281482db..f903726eeb68 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -68,10 +68,10 @@ enum nvme_quirks {
- 	NVME_QUIRK_IDENTIFY_CNS			= (1 << 1),
+-static void brd_free_page(struct brd_device *brd, sector_t sector)
+-{
+-	struct page *page;
+-	pgoff_t idx;
+-
+-	spin_lock(&brd->brd_lock);
+-	idx = sector >> PAGE_SECTORS_SHIFT;
+-	page = radix_tree_delete(&brd->brd_pages, idx);
+-	spin_unlock(&brd->brd_lock);
+-	if (page)
+-		__free_page(page);
+-}
+-
+-static void brd_zero_page(struct brd_device *brd, sector_t sector)
+-{
+-	struct page *page;
+-
+-	page = brd_lookup_page(brd, sector);
+-	if (page)
+-		clear_highpage(page);
+-}
+-
+ /*
+  * Free all backing store pages and radix tree. This must only be called when
+  * there are no other users of the device.
+@@ -212,24 +190,6 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
+ 	return 0;
+ }
  
- 	/*
--	 * The controller deterministically returns O's on reads to discarded
--	 * logical blocks.
-+	 * The controller deterministically returns O's on reads to
-+	 * logical blocks that deallocate was called on.
+-static void discard_from_brd(struct brd_device *brd,
+-			sector_t sector, size_t n)
+-{
+-	while (n >= PAGE_SIZE) {
+-		/*
+-		 * Don't want to actually discard pages here because
+-		 * re-allocating the pages can result in writeback
+-		 * deadlocks under heavy load.
+-		 */
+-		if (0)
+-			brd_free_page(brd, sector);
+-		else
+-			brd_zero_page(brd, sector);
+-		sector += PAGE_SIZE >> SECTOR_SHIFT;
+-		n -= PAGE_SIZE;
+-	}
+-}
+-
+ /*
+  * Copy n bytes from src to the brd starting at sector. Does not sleep.
+  */
+@@ -338,14 +298,6 @@ static blk_qc_t brd_make_request(struct request_queue *q, struct bio *bio)
+ 	if (bio_end_sector(bio) > get_capacity(bdev->bd_disk))
+ 		goto io_error;
+ 
+-	if (unlikely(bio_op(bio) == REQ_OP_DISCARD)) {
+-		if (sector & ((PAGE_SIZE >> SECTOR_SHIFT) - 1) ||
+-		    bio->bi_iter.bi_size & ~PAGE_MASK)
+-			goto io_error;
+-		discard_from_brd(brd, sector, bio->bi_iter.bi_size);
+-		goto out;
+-	}
+-
+ 	bio_for_each_segment(bvec, bio, iter) {
+ 		unsigned int len = bvec.bv_len;
+ 		int err;
+@@ -357,7 +309,6 @@ static blk_qc_t brd_make_request(struct request_queue *q, struct bio *bio)
+ 		sector += len >> SECTOR_SHIFT;
+ 	}
+ 
+-out:
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+ io_error:
+@@ -464,11 +415,6 @@ static struct brd_device *brd_alloc(int i)
+ 	 *  is harmless)
  	 */
--	NVME_QUIRK_DISCARD_ZEROES		= (1 << 2),
-+	NVME_QUIRK_DEALLOCATE_ZEROES		= (1 << 2),
- 
- 	/*
- 	 * The controller needs a delay before starts checking the device
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 9e686a67d93b..cb530a6bef3f 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2113,13 +2113,13 @@ static const struct pci_error_handlers nvme_err_handler = {
- static const struct pci_device_id nvme_id_table[] = {
- 	{ PCI_VDEVICE(INTEL, 0x0953),
- 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
--				NVME_QUIRK_DISCARD_ZEROES, },
-+				NVME_QUIRK_DEALLOCATE_ZEROES, },
- 	{ PCI_VDEVICE(INTEL, 0x0a53),
- 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
--				NVME_QUIRK_DISCARD_ZEROES, },
-+				NVME_QUIRK_DEALLOCATE_ZEROES, },
- 	{ PCI_VDEVICE(INTEL, 0x0a54),
- 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
--				NVME_QUIRK_DISCARD_ZEROES, },
-+				NVME_QUIRK_DEALLOCATE_ZEROES, },
- 	{ PCI_VDEVICE(INTEL, 0x5845),	/* Qemu emulated controller */
- 		.driver_data = NVME_QUIRK_IDENTIFY_CNS, },
- 	{ PCI_DEVICE(0x1c58, 0x0003),	/* HGST adapter */
+ 	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
+-
+-	brd->brd_queue->limits.discard_granularity = PAGE_SIZE;
+-	blk_queue_max_discard_sectors(brd->brd_queue, UINT_MAX);
+-	brd->brd_queue->limits.discard_zeroes_data = 1;
+-	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, brd->brd_queue);
+ #ifdef CONFIG_BLK_DEV_RAM_DAX
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
+ #endif
 -- 
 2.11.0
