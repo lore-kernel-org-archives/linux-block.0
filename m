@@ -1,61 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f51.google.com ([74.125.83.51]:34804 "EHLO
-        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752822AbdDDQvE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 12:51:04 -0400
-Received: by mail-pg0-f51.google.com with SMTP id 21so158018277pgg.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Apr 2017 09:51:03 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 2/5] blk-mq: add shallow depth option for blk_mq_get_tag()
-Date: Tue,  4 Apr 2017 09:49:55 -0700
-Message-Id: <ccfba8f58e09a5454892ca72a53867c522d4c02c.1491324365.git.osandov@fb.com>
-In-Reply-To: <cover.1491324365.git.osandov@fb.com>
-References: <cover.1491324365.git.osandov@fb.com>
-In-Reply-To: <cover.1491324365.git.osandov@fb.com>
-References: <cover.1491324365.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
+        snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 12/25] block: add a new BLKDEV_ZERO_NOFALLBACK flag
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170331163313.31821-1-hch@lst.de>
+	<20170331163313.31821-13-hch@lst.de>
+Date: Wed, 05 Apr 2017 07:47:39 -0400
+In-Reply-To: <20170331163313.31821-13-hch@lst.de> (Christoph Hellwig's message
+	of "Fri, 31 Mar 2017 18:33:00 +0200")
+Message-ID: <yq1wpazrs84.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Christoph Hellwig <hch@lst.de> writes:
 
-Wire up the sbitmap_get_shallow() operation to the tag code so that a
-caller can limit the number of tags available to it.
+> This avoids fallbacks to explicit zeroing in (__)blkdev_issue_zeroout
+> if the caller doesn't want them.
+>
+> Also clean up the convoluted check for the return condition that this
+> new flag is added to.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-tag.c | 5 ++++-
- block/blk-mq.h     | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 9d97bfc4d465..d0be72ccb091 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -96,7 +96,10 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
- 	    !hctx_may_queue(data->hctx, bt))
- 		return -1;
--	return __sbitmap_queue_get(bt);
-+	if (data->shallow_depth)
-+		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
-+	else
-+		return __sbitmap_queue_get(bt);
- }
- 
- unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 8d49c06fc520..77ec66369f21 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -141,6 +141,7 @@ struct blk_mq_alloc_data {
- 	/* input parameter */
- 	struct request_queue *q;
- 	unsigned int flags;
-+	unsigned int shallow_depth;
- 
- 	/* input & output parameter */
- 	struct blk_mq_ctx *ctx;
 -- 
-2.12.2
+Martin K. Petersen	Oracle Linux Engineering
