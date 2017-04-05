@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f49.google.com ([74.125.83.49]:34232 "EHLO
-        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756046AbdDETCz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 15:02:55 -0400
-Received: by mail-pg0-f49.google.com with SMTP id 21so12954887pgg.1
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 12:02:55 -0700 (PDT)
+Received: from mail-pg0-f46.google.com ([74.125.83.46]:35809 "EHLO
+        mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932546AbdDES31 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 14:29:27 -0400
+Received: by mail-pg0-f46.google.com with SMTP id 81so12175385pgh.2
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 11:29:27 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: kernel-team@fb.com
-Subject: [PATCH v3 6/8] blk-mq-sched: provide hooks for initializing hardware queue data
-Date: Wed,  5 Apr 2017 12:01:34 -0700
-Message-Id: <07fff316fa01c2be4fa6c45f510f18ca1b79fa5a.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
+Subject: [PATCH v2 6/8] blk-mq-sched: provide hooks for initializing hardware queue data
+Date: Wed,  5 Apr 2017 11:28:18 -0700
+Message-Id: <5607bb2bf235433919b41c61d5484c454dbe67f6.1491416593.git.osandov@fb.com>
+In-Reply-To: <cover.1491416593.git.osandov@fb.com>
+References: <cover.1491416593.git.osandov@fb.com>
+In-Reply-To: <cover.1491416593.git.osandov@fb.com>
+References: <cover.1491416593.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
