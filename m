@@ -1,53 +1,18 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 2/8] nowait aio: Return if cannot get hold of i_rwsem
-Date: Mon,  3 Apr 2017 13:53:01 -0500
-Message-Id: <20170403185307.6243-3-rgoldwyn@suse.de>
-In-Reply-To: <20170403185307.6243-1-rgoldwyn@suse.de>
-References: <20170403185307.6243-1-rgoldwyn@suse.de>
+	linux-scsi@vger.kernel.org
+Subject: ->retries fixups
+Date: Wed,  5 Apr 2017 16:18:51 +0200
+Message-Id: <20170405141856.1862-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-
-A failure to lock i_rwsem would mean there is I/O being performed
-by another thread. So, let's bail.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- mm/filemap.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 1694623..e08f3b9 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2982,7 +2982,12 @@ ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct inode *inode = file->f_mapping->host;
- 	ssize_t ret;
- 
--	inode_lock(inode);
-+	if (!inode_trylock(inode)) {
-+		/* Don't sleep on inode rwsem */
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		inode_lock(inode);
-+	}
- 	ret = generic_write_checks(iocb, from);
- 	if (ret > 0)
- 		ret = __generic_file_write_iter(iocb, from);
--- 
-2.10.2
+This series fixes a few lose bits in terms of how nvme uses ->retries,
+including fixing it for non-PCIe transports.  While at it I noticed that
+nvme and scsi use the field in entirely different ways, and no other
+driver uses it at all.  So I decided to move it into the nvme_request and
+scsi_request structures instead.
