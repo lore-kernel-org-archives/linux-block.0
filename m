@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f41.google.com ([74.125.83.41]:34211 "EHLO
-        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755814AbdDETCy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 15:02:54 -0400
-Received: by mail-pg0-f41.google.com with SMTP id 21so12953801pgg.1
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 12:02:52 -0700 (PDT)
+Received: from mail-pg0-f50.google.com ([74.125.83.50]:36276 "EHLO
+        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932546AbdDES3Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 14:29:25 -0400
+Received: by mail-pg0-f50.google.com with SMTP id g2so12042280pge.3
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 11:29:24 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: kernel-team@fb.com
-Subject: [PATCH v3 3/8] blk-mq-sched: set up scheduler tags when bringing up new queues
-Date: Wed,  5 Apr 2017 12:01:31 -0700
-Message-Id: <138eeb30ef2533cefa165a4c621abf26a1989604.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
-In-Reply-To: <cover.1491418411.git.osandov@fb.com>
-References: <cover.1491418411.git.osandov@fb.com>
+Subject: [PATCH v2 3/8] blk-mq-sched: set up scheduler tags when bringing up new queues
+Date: Wed,  5 Apr 2017 11:28:15 -0700
+Message-Id: <87ed08fb7afa0e431c6c39777fad5c50f05a132a.1491416593.git.osandov@fb.com>
+In-Reply-To: <cover.1491416593.git.osandov@fb.com>
+References: <cover.1491416593.git.osandov@fb.com>
+In-Reply-To: <cover.1491416593.git.osandov@fb.com>
+References: <cover.1491416593.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -82,10 +82,10 @@ index 873f9af5a35b..19db25e0c95a 100644
  
  static inline bool
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 09cff6d1ba76..672430c8c342 100644
+index 6c1bedc23b5a..cf158a6fc997 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1823,6 +1823,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+@@ -1840,6 +1840,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
  				       hctx->fq->flush_rq, hctx_idx,
  				       flush_start_tag + hctx_idx);
  
@@ -94,7 +94,7 @@ index 09cff6d1ba76..672430c8c342 100644
  	if (set->ops->exit_hctx)
  		set->ops->exit_hctx(hctx, hctx_idx);
  
-@@ -1889,9 +1891,12 @@ static int blk_mq_init_hctx(struct request_queue *q,
+@@ -1906,9 +1908,12 @@ static int blk_mq_init_hctx(struct request_queue *q,
  	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
  		goto free_bitmap;
  
@@ -108,7 +108,7 @@ index 09cff6d1ba76..672430c8c342 100644
  
  	if (set->ops->init_request &&
  	    set->ops->init_request(set->driver_data,
-@@ -1906,6 +1911,8 @@ static int blk_mq_init_hctx(struct request_queue *q,
+@@ -1923,6 +1928,8 @@ static int blk_mq_init_hctx(struct request_queue *q,
  
   free_fq:
  	kfree(hctx->fq);
