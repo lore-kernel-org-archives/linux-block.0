@@ -1,39 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:35146 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751667AbdDCHXw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2017 03:23:52 -0400
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 3/7] bio-integrity: bio_trim should truncate integrity vector accordingly
-Date: Mon,  3 Apr 2017 11:23:28 +0400
-Message-Id: <1491204212-9952-4-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
-References: <1491204212-9952-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 13/27] block_dev: use blkdev_issue_zerout for hole punches
+Date: Wed,  5 Apr 2017 19:21:11 +0200
+Message-Id: <20170405172125.22600-14-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+This gets us support for non-discard efficient write of zeroes (e.g. NVMe)
+and prepares for removing the discard_zeroes_data flag.
+
+Also remove a pointless discard support check, which is done in
+blkdev_issue_discard already.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/bio.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ fs/block_dev.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index e75878f..fa84323 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1907,6 +1907,10 @@ void bio_trim(struct bio *bio, int offset, int size)
- 	bio_advance(bio, offset << 9);
- 
- 	bio->bi_iter.bi_size = size;
-+
-+	if (bio_integrity(bio))
-+		bio_integrity_trim(bio, 0, size);
-+
- }
- EXPORT_SYMBOL_GPL(bio_trim);
- 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 2f704c3a816f..e405d8e58e31 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -2069,7 +2069,6 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 			     loff_t len)
+ {
+ 	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
+-	struct request_queue *q = bdev_get_queue(bdev);
+ 	struct address_space *mapping;
+ 	loff_t end = start + len - 1;
+ 	loff_t isize;
+@@ -2108,15 +2107,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 					    GFP_KERNEL, BLKDEV_ZERO_NOUNMAP);
+ 		break;
+ 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
+-		/* Only punch if the device can do zeroing discard. */
+-		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
+-			return -EOPNOTSUPP;
+-		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+-					     GFP_KERNEL, 0);
++		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
++					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
+ 		break;
+ 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
+-		if (!blk_queue_discard(q))
+-			return -EOPNOTSUPP;
+ 		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+ 					     GFP_KERNEL, 0);
+ 		break;
 -- 
-2.9.3
+2.11.0
