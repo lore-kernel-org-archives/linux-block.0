@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 07/27] dm: support REQ_OP_WRITE_ZEROES
-Date: Wed,  5 Apr 2017 19:21:05 +0200
-Message-Id: <20170405172125.22600-8-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:45 +0200
+Message-Id: <20170405142205.6477-8-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Copy & paste from the REQ_OP_WRITE_SAME code.
