@@ -1,100 +1,194 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>,
-	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>, Adam Manzanares
-	<adam.manzanares@wdc.com>
-Subject: [PATCH 1/5] block: Export blk_init_request_from_bio()
-Date: Tue, 18 Apr 2017 16:10:33 -0700
-Message-ID: <20170418231037.3968-2-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418231037.3968-1-bart.vanassche@sandisk.com>
-References: <20170418231037.3968-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f49.google.com ([74.125.83.49]:34232 "EHLO
+        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756046AbdDETCz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 15:02:55 -0400
+Received: by mail-pg0-f49.google.com with SMTP id 21so12954887pgg.1
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 12:02:55 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v3 6/8] blk-mq-sched: provide hooks for initializing hardware queue data
+Date: Wed,  5 Apr 2017 12:01:34 -0700
+Message-Id: <07fff316fa01c2be4fa6c45f510f18ca1b79fa5a.1491418411.git.osandov@fb.com>
+In-Reply-To: <cover.1491418411.git.osandov@fb.com>
+References: <cover.1491418411.git.osandov@fb.com>
+In-Reply-To: <cover.1491418411.git.osandov@fb.com>
+References: <cover.1491418411.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Export this function such that it becomes available to block
-drivers.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Matias Bjørling <m@bjorling.me>
-Cc: Adam Manzanares <adam.manzanares@wdc.com>
+Schedulers need to be informed when a hardware queue is added or removed
+at runtime so they can allocate/free per-hardware queue data. So,
+replace the blk_mq_sched_init_hctx_data() helper, which only makes sense
+at init time, with .init_hctx() and .exit_hctx() hooks.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-core.c       | 5 +++--
- block/blk-mq.c         | 2 +-
- block/blk.h            | 1 -
- include/linux/blkdev.h | 1 +
- 4 files changed, 5 insertions(+), 4 deletions(-)
+ block/blk-mq-sched.c     | 81 +++++++++++++++++++++++++-----------------------
+ block/blk-mq-sched.h     |  4 ---
+ include/linux/elevator.h |  2 ++
+ 3 files changed, 45 insertions(+), 42 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ab1ecf71cb27..c274aed2ca3f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1633,7 +1633,7 @@ unsigned int blk_plug_queued_count(struct request_queue *q)
- 	return ret;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index e8c2ed654ef0..9d7f6d6ca693 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -30,43 +30,6 @@ void blk_mq_sched_free_hctx_data(struct request_queue *q,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_free_hctx_data);
+ 
+-int blk_mq_sched_init_hctx_data(struct request_queue *q, size_t size,
+-				int (*init)(struct blk_mq_hw_ctx *),
+-				void (*exit)(struct blk_mq_hw_ctx *))
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int ret;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i) {
+-		hctx->sched_data = kmalloc_node(size, GFP_KERNEL, hctx->numa_node);
+-		if (!hctx->sched_data) {
+-			ret = -ENOMEM;
+-			goto error;
+-		}
+-
+-		if (init) {
+-			ret = init(hctx);
+-			if (ret) {
+-				/*
+-				 * We don't want to give exit() a partially
+-				 * initialized sched_data. init() must clean up
+-				 * if it fails.
+-				 */
+-				kfree(hctx->sched_data);
+-				hctx->sched_data = NULL;
+-				goto error;
+-			}
+-		}
+-	}
+-
+-	return 0;
+-error:
+-	blk_mq_sched_free_hctx_data(q, exit);
+-	return ret;
+-}
+-EXPORT_SYMBOL_GPL(blk_mq_sched_init_hctx_data);
+-
+ static void __blk_mq_sched_assign_ioc(struct request_queue *q,
+ 				      struct request *rq,
+ 				      struct bio *bio,
+@@ -465,11 +428,24 @@ int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+ 			   unsigned int hctx_idx)
+ {
+ 	struct elevator_queue *e = q->elevator;
++	int ret;
+ 
+ 	if (!e)
+ 		return 0;
+ 
+-	return blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
++	ret = blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
++	if (ret)
++		return ret;
++
++	if (e->type->ops.mq.init_hctx) {
++		ret = e->type->ops.mq.init_hctx(hctx, hctx_idx);
++		if (ret) {
++			blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
++			return ret;
++		}
++	}
++
++	return 0;
  }
  
--void init_request_from_bio(struct request *req, struct bio *bio)
-+void blk_init_request_from_bio(struct request *req, struct bio *bio)
- {
- 	if (bio->bi_opf & REQ_RAHEAD)
- 		req->cmd_flags |= REQ_FAILFAST_MASK;
-@@ -1645,6 +1645,7 @@ void init_request_from_bio(struct request *req, struct bio *bio)
- 		req->ioprio = bio_prio(bio);
- 	blk_rq_bio_prep(req->q, req, bio);
+ void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+@@ -480,12 +456,18 @@ void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+ 	if (!e)
+ 		return;
+ 
++	if (e->type->ops.mq.exit_hctx && hctx->sched_data) {
++		e->type->ops.mq.exit_hctx(hctx, hctx_idx);
++		hctx->sched_data = NULL;
++	}
++
+ 	blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
  }
-+EXPORT_SYMBOL(blk_init_request_from_bio);
  
- static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
  {
-@@ -1735,7 +1736,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * We don't worry about that case for efficiency. It won't happen
- 	 * often, and the elevators are able to handle it.
- 	 */
--	init_request_from_bio(req, bio);
-+	blk_init_request_from_bio(req, bio);
+ 	struct blk_mq_hw_ctx *hctx;
++	struct elevator_queue *eq;
+ 	unsigned int i;
+ 	int ret;
  
- 	if (test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags))
- 		req->cpu = raw_smp_processor_id();
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4d8368f657ac..a3a2e9c40453 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1410,7 +1410,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+@@ -510,6 +492,18 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 	if (ret)
+ 		goto err;
  
- static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
++	if (e->ops.mq.init_hctx) {
++		queue_for_each_hw_ctx(q, hctx, i) {
++			ret = e->ops.mq.init_hctx(hctx, i);
++			if (ret) {
++				eq = q->elevator;
++				blk_mq_exit_sched(q, eq);
++				kobject_put(&eq->kobj);
++				return ret;
++			}
++		}
++	}
++
+ 	return 0;
+ 
+ err:
+@@ -520,6 +514,17 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 
+ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
  {
--	init_request_from_bio(rq, bio);
-+	blk_init_request_from_bio(rq, bio);
++	struct blk_mq_hw_ctx *hctx;
++	unsigned int i;
++
++	if (e->type->ops.mq.exit_hctx) {
++		queue_for_each_hw_ctx(q, hctx, i) {
++			if (hctx->sched_data) {
++				e->type->ops.mq.exit_hctx(hctx, i);
++				hctx->sched_data = NULL;
++			}
++		}
++	}
+ 	if (e->type->ops.mq.exit_sched)
+ 		e->type->ops.mq.exit_sched(e);
+ 	blk_mq_sched_tags_teardown(q);
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index e704956e0862..c6e760df0fb4 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -4,10 +4,6 @@
+ #include "blk-mq.h"
+ #include "blk-mq-tag.h"
  
- 	blk_account_io_start(rq, true);
- }
-diff --git a/block/blk.h b/block/blk.h
-index 07d375183f31..cc8e61cdc229 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -60,7 +60,6 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
- int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 		gfp_t gfp_mask);
- void blk_exit_rl(struct request_list *rl);
--void init_request_from_bio(struct request *req, struct bio *bio);
- void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
- 			struct bio *bio);
- void blk_queue_bypass_start(struct request_queue *q);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 7cadaa0cc0b9..e1ea875ec048 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -924,6 +924,7 @@ extern int blk_register_queue(struct gendisk *disk);
- extern void blk_unregister_queue(struct gendisk *disk);
- extern blk_qc_t generic_make_request(struct bio *bio);
- extern void blk_rq_init(struct request_queue *q, struct request *rq);
-+extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
- extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
+-int blk_mq_sched_init_hctx_data(struct request_queue *q, size_t size,
+-				int (*init)(struct blk_mq_hw_ctx *),
+-				void (*exit)(struct blk_mq_hw_ctx *));
+-
+ void blk_mq_sched_free_hctx_data(struct request_queue *q,
+ 				 void (*exit)(struct blk_mq_hw_ctx *));
+ 
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 22d39e8d4de1..b7ec315ee7e7 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -93,6 +93,8 @@ struct blk_mq_hw_ctx;
+ struct elevator_mq_ops {
+ 	int (*init_sched)(struct request_queue *, struct elevator_type *);
+ 	void (*exit_sched)(struct elevator_queue *);
++	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
++	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
+ 
+ 	bool (*allow_merge)(struct request_queue *, struct request *, struct bio *);
+ 	bool (*bio_merge)(struct blk_mq_hw_ctx *, struct bio *);
 -- 
 2.12.2
