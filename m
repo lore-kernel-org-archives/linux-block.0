@@ -1,30 +1,56 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 5 Apr 2017 16:43:34 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 1/5] nvme: move ->retries setup to nvme_setup_cmd
-Message-ID: <20170405144334.GO3941@linux-x5ow.site>
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 1/5] nvme: move ->retries setup to nvme_setup_cmd
+Date: Wed,  5 Apr 2017 16:18:52 +0200
+Message-Id: <20170405141856.1862-2-hch@lst.de>
+In-Reply-To: <20170405141856.1862-1-hch@lst.de>
 References: <20170405141856.1862-1-hch@lst.de>
- <20170405141856.1862-2-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170405141856.1862-2-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Apr 05, 2017 at 04:18:52PM +0200, Christoph Hellwig wrote:
-> This way we get the behavior right for the non-PCIe transports.
+This way we get the behavior right for the non-PCIe transports.
 
-Could you please share a bit of your minds inner workings for us mere mortals?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 5 +++++
+ drivers/nvme/host/pci.c  | 4 ----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-Thanks,
-	Johannes
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 3c908e1bc903..0437f44d00f9 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -350,6 +350,11 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ {
+ 	int ret = BLK_MQ_RQ_QUEUE_OK;
+ 
++	if (!(req->rq_flags & RQF_DONTPREP)) {
++		req->retries = 0;
++		req->rq_flags |= RQF_DONTPREP;
++	}
++
+ 	switch (req_op(req)) {
+ 	case REQ_OP_DRV_IN:
+ 	case REQ_OP_DRV_OUT:
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 9e686a67d93b..3818ab15a26e 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -326,10 +326,6 @@ static int nvme_init_iod(struct request *rq, struct nvme_dev *dev)
+ 	iod->nents = 0;
+ 	iod->length = size;
+ 
+-	if (!(rq->rq_flags & RQF_DONTPREP)) {
+-		rq->retries = 0;
+-		rq->rq_flags |= RQF_DONTPREP;
+-	}
+ 	return BLK_MQ_RQ_QUEUE_OK;
+ }
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
