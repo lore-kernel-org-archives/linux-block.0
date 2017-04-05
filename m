@@ -1,32 +1,31 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-db5eur01on0092.outbound.protection.outlook.com ([104.47.2.92]:45420
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933452AbdDELjZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Apr 2017 07:39:25 -0400
-Subject: Re: [PATCH 1/4] mm: prevent potential recursive reclaim due to
- clearing PF_MEMALLOC
-To: Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20170405074700.29871-1-vbabka@suse.cz>
- <20170405074700.29871-2-vbabka@suse.cz>
-CC: <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        Michal Hocko <mhocko@kernel.org>,
+Received: from mx2.suse.de ([195.135.220.15]:49497 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933279AbdDELVJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Apr 2017 07:21:09 -0400
+Date: Wed, 5 Apr 2017 13:21:04 +0200
+From: Michal Hocko <mhocko@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
         Mel Gorman <mgorman@techsingularity.net>,
         Johannes Weiner <hannes@cmpxchg.org>,
-        <linux-block@vger.kernel.org>, <nbd-general@lists.sourceforge.net>,
-        <open-iscsi@googlegroups.com>, <linux-scsi@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <stable@vger.kernel.org>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <1f26f654-abaf-3878-6abb-5e27ff3a289e@virtuozzo.com>
-Date: Wed, 5 Apr 2017 14:40:43 +0300
+        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
+        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
+        netdev@vger.kernel.org, stable@vger.kernel.org,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>
+Subject: Re: [PATCH 1/4] mm: prevent potential recursive reclaim due to
+ clearing PF_MEMALLOC
+Message-ID: <20170405112104.GJ6035@dhcp22.suse.cz>
+References: <20170405074700.29871-1-vbabka@suse.cz>
+ <20170405074700.29871-2-vbabka@suse.cz>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170405074700.29871-2-vbabka@suse.cz>
-Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 04/05/2017 10:46 AM, Vlastimil Babka wrote:
+On Wed 05-04-17 09:46:57, Vlastimil Babka wrote:
 > The function __alloc_pages_direct_compact() sets PF_MEMALLOC to prevent
 > deadlock during page migration by lock_page() (see the comment in
 > __unmap_and_move()). Then it unconditionally clears the flag, which can clear a
@@ -38,8 +37,6 @@ On 04/05/2017 10:46 AM, Vlastimil Babka wrote:
 > Even now it's only a theoretical issue, as the new callsite of
 > __alloc_pages_direct_compact() is reached only for costly orders and when
 > gfp_pfmemalloc_allowed() is true, which means either __GFP_NOMEMALLOC is in
-                           is false			
-
 > gfp_flags or in_interrupt() is true. There is no such known context, but let's
 > play it safe and make __alloc_pages_direct_compact() robust for cases where
 > PF_MEMALLOC is already set.
@@ -48,6 +45,9 @@ On 04/05/2017 10:46 AM, Vlastimil Babka wrote:
 > Reported-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 > Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
 > Cc: <stable@vger.kernel.org>
+
+Acked-by: Michal Hocko <mhocko@suse.com>
+
 > ---
 >  mm/page_alloc.c | 3 ++-
 >  1 file changed, 2 insertions(+), 1 deletion(-)
@@ -70,13 +70,12 @@ On 04/05/2017 10:46 AM, Vlastimil Babka wrote:
 >  									prio);
 > -	current->flags &= ~PF_MEMALLOC;
 > +	current->flags = (current->flags & ~PF_MEMALLOC) | noreclaim_flag;
-
-Perhaps this would look better:
-
-	tsk_restore_flags(current, noreclaim_flag, PF_MEMALLOC);
-
-?
-
+>  
 >  	if (*compact_result <= COMPACT_INACTIVE)
 >  		return NULL;
-> 
+> -- 
+> 2.12.2
+
+-- 
+Michal Hocko
+SUSE Labs
