@@ -1,29 +1,32 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Reply-To: "Hillf Danton" <hillf.zj@alibaba-inc.com>
-From: "Hillf Danton" <hillf.zj@alibaba-inc.com>
-To: "'Vlastimil Babka'" <vbabka@suse.cz>,
-        "'Andrew Morton'" <akpm@linux-foundation.org>
-Cc: <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        "'Michal Hocko'" <mhocko@kernel.org>,
-        "'Mel Gorman'" <mgorman@techsingularity.net>,
-        "'Johannes Weiner'" <hannes@cmpxchg.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-db5eur01on0092.outbound.protection.outlook.com ([104.47.2.92]:45420
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933452AbdDELjZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Apr 2017 07:39:25 -0400
+Subject: Re: [PATCH 1/4] mm: prevent potential recursive reclaim due to
+ clearing PF_MEMALLOC
+To: Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>
+References: <20170405074700.29871-1-vbabka@suse.cz>
+ <20170405074700.29871-2-vbabka@suse.cz>
+CC: <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Johannes Weiner <hannes@cmpxchg.org>,
         <linux-block@vger.kernel.org>, <nbd-general@lists.sourceforge.net>,
         <open-iscsi@googlegroups.com>, <linux-scsi@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <stable@vger.kernel.org>,
-        "'Andrey Ryabinin'" <aryabinin@virtuozzo.com>
-References: <20170405074700.29871-1-vbabka@suse.cz> <20170405074700.29871-2-vbabka@suse.cz>
-In-Reply-To: <20170405074700.29871-2-vbabka@suse.cz>
-Subject: Re: [PATCH 1/4] mm: prevent potential recursive reclaim due to clearing PF_MEMALLOC
-Date: Fri, 07 Apr 2017 15:33:03 +0800
-Message-ID: <092301d2af71$31c97fe0$955c7fa0$@alibaba-inc.com>
+        <netdev@vger.kernel.org>, <stable@vger.kernel.org>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <1f26f654-abaf-3878-6abb-5e27ff3a289e@virtuozzo.com>
+Date: Wed, 5 Apr 2017 14:40:43 +0300
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="us-ascii"
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170405074700.29871-2-vbabka@suse.cz>
+Content-Type: text/plain; charset="windows-1252"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On April 05, 2017 3:47 PM Vlastimil Babka wrote: 
-> 
+On 04/05/2017 10:46 AM, Vlastimil Babka wrote:
 > The function __alloc_pages_direct_compact() sets PF_MEMALLOC to prevent
 > deadlock during page migration by lock_page() (see the comment in
 > __unmap_and_move()). Then it unconditionally clears the flag, which can clear a
@@ -35,6 +38,8 @@ On April 05, 2017 3:47 PM Vlastimil Babka wrote:
 > Even now it's only a theoretical issue, as the new callsite of
 > __alloc_pages_direct_compact() is reached only for costly orders and when
 > gfp_pfmemalloc_allowed() is true, which means either __GFP_NOMEMALLOC is in
+                           is false			
+
 > gfp_flags or in_interrupt() is true. There is no such known context, but let's
 > play it safe and make __alloc_pages_direct_compact() robust for cases where
 > PF_MEMALLOC is already set.
@@ -44,8 +49,6 @@ On April 05, 2017 3:47 PM Vlastimil Babka wrote:
 > Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
 > Cc: <stable@vger.kernel.org>
 > ---
-Acked-by: Hillf Danton <hillf.zj@alibaba-inc.com>
-
 >  mm/page_alloc.c | 3 ++-
 >  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
@@ -58,7 +61,7 @@ Acked-by: Hillf Danton <hillf.zj@alibaba-inc.com>
 >  {
 >  	struct page *page;
 > +	unsigned int noreclaim_flag = current->flags & PF_MEMALLOC;
-> 
+>  
 >  	if (!order)
 >  		return NULL;
 > @@ -3295,7 +3296,7 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
@@ -67,8 +70,13 @@ Acked-by: Hillf Danton <hillf.zj@alibaba-inc.com>
 >  									prio);
 > -	current->flags &= ~PF_MEMALLOC;
 > +	current->flags = (current->flags & ~PF_MEMALLOC) | noreclaim_flag;
-> 
+
+Perhaps this would look better:
+
+	tsk_restore_flags(current, noreclaim_flag, PF_MEMALLOC);
+
+?
+
 >  	if (*compact_result <= COMPACT_INACTIVE)
 >  		return NULL;
-> --
-> 2.12.2
+> 
