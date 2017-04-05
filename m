@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 13/27] block_dev: use blkdev_issue_zerout for hole punches
-Date: Wed,  5 Apr 2017 19:21:11 +0200
-Message-Id: <20170405172125.22600-14-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:51 +0200
+Message-Id: <20170405142205.6477-14-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 This gets us support for non-discard efficient write of zeroes (e.g. NVMe)
