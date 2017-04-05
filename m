@@ -1,31 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:21887 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S939867AbdDTCed (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2017 22:34:33 -0400
-To: Dmitry Monakhov <dmonakhov@openvz.org>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+Received: from mx2.suse.de ([195.135.220.15]:43622 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752938AbdDEGcd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Apr 2017 02:32:33 -0400
+Subject: Re: [PATCH 1/9] bio-integrity: Do not allocate integrity context for
+ bio w/o data
+To: Dmitry Monakhov <dmonakhov@openvz.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         martin.petersen@oracle.com
-Subject: Re: [PATCH 1/9] bio-integrity: Do not allocate integrity context for bio w/o data
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
-        <1491332201-26926-2-git-send-email-dmonakhov@openvz.org>
-Date: Wed, 19 Apr 2017 22:34:25 -0400
-In-Reply-To: <1491332201-26926-2-git-send-email-dmonakhov@openvz.org> (Dmitry
-        Monakhov's message of "Tue, 4 Apr 2017 22:56:33 +0400")
-Message-ID: <yq1pog7q026.fsf@oracle.com>
+ <1491332201-26926-2-git-send-email-dmonakhov@openvz.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <062accdf-a6c4-7cdf-db87-262c8410465e@suse.de>
+Date: Wed, 5 Apr 2017 08:32:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1491332201-26926-2-git-send-email-dmonakhov@openvz.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Dmitry Monakhov <dmonakhov@openvz.org> writes:
-
+On 04/04/2017 08:56 PM, Dmitry Monakhov wrote:
 > If bio has no data, such as ones from blkdev_issue_flush(),
 > then we have nothing to protect.
+> 
+> This patch prevent bugon like follows:
+> 
+> kfree_debugcheck: out of range ptr ac1fa1d106742a5ah
+> kernel BUG at mm/slab.c:2773!
+> invalid opcode: 0000 [#1] SMP
+> Modules linked in: bcache
+> CPU: 0 PID: 4428 Comm: xfs_io Tainted: G        W       4.11.0-rc4-ext4-00041-g2ef0043-dirty #43
+> Hardware name: Virtuozzo KVM, BIOS seabios-1.7.5-11.vz7.4 04/01/2014
+> task: ffff880137786440 task.stack: ffffc90000ba8000
+> RIP: 0010:kfree_debugcheck+0x25/0x2a
+> RSP: 0018:ffffc90000babde0 EFLAGS: 00010082
+> RAX: 0000000000000034 RBX: ac1fa1d106742a5a RCX: 0000000000000007
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88013f3ccb40
+> RBP: ffffc90000babde8 R08: 0000000000000000 R09: 0000000000000000
+> R10: 00000000fcb76420 R11: 00000000725172ed R12: 0000000000000282
+> R13: ffffffff8150e766 R14: ffff88013a145e00 R15: 0000000000000001
+> FS:  00007fb09384bf40(0000) GS:ffff88013f200000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fd0172f9e40 CR3: 0000000137fa9000 CR4: 00000000000006f0
+> Call Trace:
+>  kfree+0xc8/0x1b3
+>  bio_integrity_free+0xc3/0x16b
+>  bio_free+0x25/0x66
+>  bio_put+0x14/0x26
+>  blkdev_issue_flush+0x7a/0x85
+>  blkdev_fsync+0x35/0x42
+>  vfs_fsync_range+0x8e/0x9f
+>  vfs_fsync+0x1c/0x1e
+>  do_fsync+0x31/0x4a
+>  SyS_fsync+0x10/0x14
+>  entry_SYSCALL_64_fastpath+0x1f/0xc2
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+> ---
+>  block/bio-integrity.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index 5384713..b5009a8 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -175,6 +175,9 @@ bool bio_integrity_enabled(struct bio *bio)
+>  	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
+>  		return false;
+>  
+> +	if (!bio_sectors(bio))
+> +		return false;
+> +
+>  	/* Already protected? */
+>  	if (bio_integrity(bio))
+>  		return false;
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Cheers,
 
+Hannes
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
