@@ -1,79 +1,108 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, "Christoph
- Hellwig" <hch@lst.de>, Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v3 3/5] blk-mq: Clarify comments in blk_mq_dispatch_rq_list()
-Date: Thu, 6 Apr 2017 11:10:48 -0700
-Message-ID: <20170406181050.12137-4-bart.vanassche@sandisk.com>
-In-Reply-To: <20170406181050.12137-1-bart.vanassche@sandisk.com>
-References: <20170406181050.12137-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 15/27] nvme: implement REQ_OP_WRITE_ZEROES
+Date: Wed,  5 Apr 2017 19:21:13 +0200
+Message-Id: <20170405172125.22600-16-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The blk_mq_dispatch_rq_list() implementation got modified several
-times but the comments in that function were not updated every
-time. Since it is nontrivial what is going on, update the comments
-in blk_mq_dispatch_rq_list().
+But now for the real NVMe Write Zeroes yet, just to get rid of the
+discard abuse for zeroing.  Also rename the quirk flag to be a bit
+more self-explanatory.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ drivers/nvme/host/core.c | 10 +++++-----
+ drivers/nvme/host/nvme.h |  6 +++---
+ drivers/nvme/host/pci.c  |  6 +++---
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index dc83aec338d9..4db48ad76878 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1063,8 +1063,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 	 */
- 	if (!list_empty(list)) {
- 		/*
--		 * If we got a driver tag for the next request already,
--		 * free it again.
-+		 * If an I/O scheduler has been configured and we got a driver
-+		 * tag for the next request already, free it again.
- 		 */
- 		rq = list_first_entry(list, struct request, queuelist);
- 		blk_mq_put_driver_tag(rq);
-@@ -1074,16 +1074,24 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 		spin_unlock(&hctx->lock);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 3c908e1bc903..26d5129a640a 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -358,6 +358,8 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 	case REQ_OP_FLUSH:
+ 		nvme_setup_flush(ns, cmd);
+ 		break;
++	case REQ_OP_WRITE_ZEROES:
++		/* currently only aliased to deallocate for a few ctrls: */
+ 	case REQ_OP_DISCARD:
+ 		ret = nvme_setup_discard(ns, req, cmd);
+ 		break;
+@@ -923,16 +925,14 @@ static void nvme_config_discard(struct nvme_ns *ns)
+ 	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct nvme_dsm_range) <
+ 			NVME_DSM_MAX_RANGES);
  
- 		/*
--		 * the queue is expected stopped with BLK_MQ_RQ_QUEUE_BUSY, but
--		 * it's possible the queue is stopped and restarted again
--		 * before this. Queue restart will dispatch requests. And since
--		 * requests in rq_list aren't added into hctx->dispatch yet,
--		 * the requests in rq_list might get lost.
-+		 * If SCHED_RESTART was set by the caller of this function and
-+		 * it is no longer set that means that it was cleared by another
-+		 * thread and hence that a queue rerun is needed.
- 		 *
--		 * blk_mq_run_hw_queue() already checks the STOPPED bit
-+		 * If TAG_WAITING is set that means that an I/O scheduler has
-+		 * been configured and another thread is waiting for a driver
-+		 * tag. To guarantee fairness, do not rerun this hardware queue
-+		 * but let the other thread grab the driver tag.
- 		 *
--		 * If RESTART or TAG_WAITING is set, then let completion restart
--		 * the queue instead of potentially looping here.
-+		 * If no I/O scheduler has been configured it is possible that
-+		 * the hardware queue got stopped and restarted before requests
-+		 * were pushed back onto the dispatch list. Rerun the queue to
-+		 * avoid starvation. Notes:
-+		 * - blk_mq_run_hw_queue() checks whether or not a queue has
-+		 *   been stopped before rerunning a queue.
-+		 * - Some but not all block drivers stop a queue before
-+		 *   returning BLK_MQ_RQ_QUEUE_BUSY. Two exceptions are scsi-mq
-+		 *   and dm-rq.
- 		 */
- 		if (!blk_mq_sched_needs_restart(hctx) &&
- 		    !test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state))
+-	if (ctrl->quirks & NVME_QUIRK_DISCARD_ZEROES)
+-		ns->queue->limits.discard_zeroes_data = 1;
+-	else
+-		ns->queue->limits.discard_zeroes_data = 0;
+-
+ 	ns->queue->limits.discard_alignment = logical_block_size;
+ 	ns->queue->limits.discard_granularity = logical_block_size;
+ 	blk_queue_max_discard_sectors(ns->queue, UINT_MAX);
+ 	blk_queue_max_discard_segments(ns->queue, NVME_DSM_MAX_RANGES);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, ns->queue);
++
++	if (ctrl->quirks & NVME_QUIRK_DEALLOCATE_ZEROES)
++		blk_queue_max_write_zeroes_sectors(ns->queue, UINT_MAX);
+ }
+ 
+ static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 227f281482db..f903726eeb68 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -68,10 +68,10 @@ enum nvme_quirks {
+ 	NVME_QUIRK_IDENTIFY_CNS			= (1 << 1),
+ 
+ 	/*
+-	 * The controller deterministically returns O's on reads to discarded
+-	 * logical blocks.
++	 * The controller deterministically returns O's on reads to
++	 * logical blocks that deallocate was called on.
+ 	 */
+-	NVME_QUIRK_DISCARD_ZEROES		= (1 << 2),
++	NVME_QUIRK_DEALLOCATE_ZEROES		= (1 << 2),
+ 
+ 	/*
+ 	 * The controller needs a delay before starts checking the device
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 9e686a67d93b..cb530a6bef3f 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2113,13 +2113,13 @@ static const struct pci_error_handlers nvme_err_handler = {
+ static const struct pci_device_id nvme_id_table[] = {
+ 	{ PCI_VDEVICE(INTEL, 0x0953),
+ 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
+-				NVME_QUIRK_DISCARD_ZEROES, },
++				NVME_QUIRK_DEALLOCATE_ZEROES, },
+ 	{ PCI_VDEVICE(INTEL, 0x0a53),
+ 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
+-				NVME_QUIRK_DISCARD_ZEROES, },
++				NVME_QUIRK_DEALLOCATE_ZEROES, },
+ 	{ PCI_VDEVICE(INTEL, 0x0a54),
+ 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
+-				NVME_QUIRK_DISCARD_ZEROES, },
++				NVME_QUIRK_DEALLOCATE_ZEROES, },
+ 	{ PCI_VDEVICE(INTEL, 0x5845),	/* Qemu emulated controller */
+ 		.driver_data = NVME_QUIRK_IDENTIFY_CNS, },
+ 	{ PCI_DEVICE(0x1c58, 0x0003),	/* HGST adapter */
 -- 
-2.12.0
+2.11.0
