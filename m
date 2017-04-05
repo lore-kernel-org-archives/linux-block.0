@@ -1,160 +1,108 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: [resend PATCH v2 27/33] x86, libnvdimm,
- pmem: move arch_invalidate_pmem() to libnvdimm
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
-        Matthew Wilcox <mawilcox@microsoft.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-fsdevel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Mon, 17 Apr 2017 12:11:15 -0700
-Message-ID: <149245627582.10206.4676887763028572565.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 11/27] block: add a REQ_NOUNMAP flag for REQ_OP_WRITE_ZEROES
+Date: Wed,  5 Apr 2017 19:21:09 +0200
+Message-Id: <20170405172125.22600-12-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Kill this globally defined wrapper and move to libnvdimm so that we can
-ultimately remove the public pmem api.
+If this flag is set logical provisioning capable device should
+release space for the zeroed blocks if possible, if it is not set
+devices should keep the blocks anchored.
 
-Cc: <x86@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Also remove an out of sync kerneldoc comment for a static function
+that would have become even more out of data with this change.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- arch/x86/include/asm/pmem.h |    4 ----
- drivers/nvdimm/claim.c      |    3 ++-
- drivers/nvdimm/pmem.c       |    2 +-
- drivers/nvdimm/pmem.h       |    4 ++++
- drivers/nvdimm/x86.c        |    6 ++++++
- include/linux/pmem.h        |   19 -------------------
- 6 files changed, 13 insertions(+), 25 deletions(-)
+ block/blk-lib.c           | 19 +++++--------------
+ include/linux/blk_types.h |  6 ++++++
+ 2 files changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/include/asm/pmem.h b/arch/x86/include/asm/pmem.h
-index 4759a179aa52..ded2541a7ba9 100644
---- a/arch/x86/include/asm/pmem.h
-+++ b/arch/x86/include/asm/pmem.h
-@@ -44,9 +44,5 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
- 		BUG();
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index f9f24ec69c27..2f6d2cb2e1a2 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -226,20 +226,9 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
  }
+ EXPORT_SYMBOL(blkdev_issue_write_same);
  
--static inline void arch_invalidate_pmem(void *addr, size_t size)
--{
--	clflush_cache_range(addr, size);
--}
- #endif /* CONFIG_ARCH_HAS_PMEM_API */
- #endif /* __ASM_X86_PMEM_H__ */
-diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
-index 3a35e8028b9c..1e13a196ce4b 100644
---- a/drivers/nvdimm/claim.c
-+++ b/drivers/nvdimm/claim.c
-@@ -14,6 +14,7 @@
- #include <linux/sizes.h>
- #include <linux/pmem.h>
- #include "nd-core.h"
-+#include "pmem.h"
- #include "pfn.h"
- #include "btt.h"
- #include "nd.h"
-@@ -261,7 +262,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
- 				cleared /= 512;
- 				badblocks_clear(&nsio->bb, sector, cleared);
- 			}
--			invalidate_pmem(nsio->addr + offset, size);
-+			arch_invalidate_pmem(nsio->addr + offset, size);
- 		} else
- 			rc = -EIO;
- 	}
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index c77a3a757729..769a510c20e8 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -69,7 +69,7 @@ static int pmem_clear_poison(struct pmem_device *pmem, phys_addr_t offset,
- 		badblocks_clear(&pmem->bb, sector, cleared);
- 	}
- 
--	invalidate_pmem(pmem->virt_addr + offset, len);
-+	arch_invalidate_pmem(pmem->virt_addr + offset, len);
- 
- 	return rc;
- }
-diff --git a/drivers/nvdimm/pmem.h b/drivers/nvdimm/pmem.h
-index c4b3371c7f88..00005900c1b7 100644
---- a/drivers/nvdimm/pmem.h
-+++ b/drivers/nvdimm/pmem.h
-@@ -7,10 +7,14 @@
- 
- #ifdef CONFIG_ARCH_HAS_PMEM_API
- void arch_wb_cache_pmem(void *addr, size_t size);
-+void arch_invalidate_pmem(void *addr, size_t size);
- #else
- static inline void arch_wb_cache_pmem(void *addr, size_t size)
- {
- }
-+static inline void arch_invalidate_pmem(void *addr, size_t size)
-+{
-+}
- #endif
- 
- /* this definition is in it's own header for tools/testing/nvdimm to consume */
-diff --git a/drivers/nvdimm/x86.c b/drivers/nvdimm/x86.c
-index 79d7267da4d2..07478ed7ce97 100644
---- a/drivers/nvdimm/x86.c
-+++ b/drivers/nvdimm/x86.c
-@@ -34,3 +34,9 @@ void arch_wb_cache_pmem(void *addr, size_t size)
- 		clwb(p);
- }
- EXPORT_SYMBOL_GPL(arch_wb_cache_pmem);
-+
-+void arch_invalidate_pmem(void *addr, size_t size)
-+{
-+	clflush_cache_range(addr, size);
-+}
-+EXPORT_SYMBOL_GPL(arch_invalidate_pmem);
-diff --git a/include/linux/pmem.h b/include/linux/pmem.h
-index 33ae761f010a..559c00848583 100644
---- a/include/linux/pmem.h
-+++ b/include/linux/pmem.h
-@@ -30,11 +30,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
- {
- 	BUG();
- }
--
--static inline void arch_invalidate_pmem(void *addr, size_t size)
--{
--	BUG();
--}
- #endif
- 
- static inline bool arch_has_pmem_api(void)
-@@ -61,18 +56,4 @@ static inline void memcpy_to_pmem(void *dst, const void *src, size_t n)
- 	else
- 		memcpy(dst, src, n);
- }
--
 -/**
-- * invalidate_pmem - flush a pmem range from the cache hierarchy
-- * @addr:	virtual start address
-- * @size:	bytes to invalidate (internally aligned to cache line size)
+- * __blkdev_issue_write_zeroes - generate number of bios with WRITE ZEROES
+- * @bdev:	blockdev to issue
+- * @sector:	start sector
+- * @nr_sects:	number of sectors to write
+- * @gfp_mask:	memory allocation flags (for bio_alloc)
+- * @biop:	pointer to anchor bio
 - *
-- * For platforms that support clearing poison this flushes any poisoned
-- * ranges out of the cache
+- * Description:
+- *  Generate and issue number of bios(REQ_OP_WRITE_ZEROES) with zerofiled pages.
 - */
--static inline void invalidate_pmem(void *addr, size_t size)
--{
--	if (arch_has_pmem_api())
--		arch_invalidate_pmem(addr, size);
--}
- #endif /* __PMEM_H__ */
+ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+-		struct bio **biop)
++		struct bio **biop, unsigned flags)
+ {
+ 	struct bio *bio = *biop;
+ 	unsigned int max_write_zeroes_sectors;
+@@ -258,7 +247,9 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		bio = next_bio(bio, 0, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio->bi_bdev = bdev;
+-		bio_set_op_attrs(bio, REQ_OP_WRITE_ZEROES, 0);
++		bio->bi_opf = REQ_OP_WRITE_ZEROES;
++		if (flags & BLKDEV_ZERO_NOUNMAP)
++			bio->bi_opf |= REQ_NOUNMAP;
+ 
+ 		if (nr_sects > max_write_zeroes_sectors) {
+ 			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
+@@ -306,7 +297,7 @@ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 		return -EINVAL;
+ 
+ 	ret = __blkdev_issue_write_zeroes(bdev, sector, nr_sects, gfp_mask,
+-			biop);
++			biop, flags);
+ 	if (ret == 0 || (ret && ret != -EOPNOTSUPP))
+ 		goto out;
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 4eae30bfbfca..8eaa7dca7057 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -195,6 +195,10 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++
++	/* command specific flags for REQ_OP_WRITE_ZEROES: */
++	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
++
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -212,6 +216,8 @@ enum req_flag_bits {
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+ 
++#define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
++
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ 
+-- 
+2.11.0
