@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 06/27] dm io: discards don't take a payload
-Date: Wed,  5 Apr 2017 19:21:04 +0200
-Message-Id: <20170405172125.22600-7-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:44 +0200
+Message-Id: <20170405142205.6477-7-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Fix up do_region to not allocate a bio_vec for discards.  We've
