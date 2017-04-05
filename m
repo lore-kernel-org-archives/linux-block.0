@@ -1,74 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:34710 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753852AbdDDS4t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 14:56:49 -0400
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 1/9] bio-integrity: Do not allocate integrity context for bio w/o data
-Date: Tue,  4 Apr 2017 22:56:33 +0400
-Message-Id: <1491332201-26926-2-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
-References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 08/27] dm kcopyd: switch to use REQ_OP_WRITE_ZEROES
+Date: Wed,  5 Apr 2017 19:21:06 +0200
+Message-Id: <20170405172125.22600-9-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-If bio has no data, such as ones from blkdev_issue_flush(),
-then we have nothing to protect.
+It seems like the code currently passes whatever it was using for writes
+to WRITE SAME.  Just switch it to WRITE ZEROES, although that doesn't
+need any payload.
 
-This patch prevent bugon like follows:
+Untested, and confused by the code, maybe someone who understands it
+better than me can help..
 
-kfree_debugcheck: out of range ptr ac1fa1d106742a5ah
-kernel BUG at mm/slab.c:2773!
-invalid opcode: 0000 [#1] SMP
-Modules linked in: bcache
-CPU: 0 PID: 4428 Comm: xfs_io Tainted: G        W       4.11.0-rc4-ext4-00041-g2ef0043-dirty #43
-Hardware name: Virtuozzo KVM, BIOS seabios-1.7.5-11.vz7.4 04/01/2014
-task: ffff880137786440 task.stack: ffffc90000ba8000
-RIP: 0010:kfree_debugcheck+0x25/0x2a
-RSP: 0018:ffffc90000babde0 EFLAGS: 00010082
-RAX: 0000000000000034 RBX: ac1fa1d106742a5a RCX: 0000000000000007
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88013f3ccb40
-RBP: ffffc90000babde8 R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000fcb76420 R11: 00000000725172ed R12: 0000000000000282
-R13: ffffffff8150e766 R14: ffff88013a145e00 R15: 0000000000000001
-FS:  00007fb09384bf40(0000) GS:ffff88013f200000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd0172f9e40 CR3: 0000000137fa9000 CR4: 00000000000006f0
-Call Trace:
- kfree+0xc8/0x1b3
- bio_integrity_free+0xc3/0x16b
- bio_free+0x25/0x66
- bio_put+0x14/0x26
- blkdev_issue_flush+0x7a/0x85
- blkdev_fsync+0x35/0x42
- vfs_fsync_range+0x8e/0x9f
- vfs_fsync+0x1c/0x1e
- do_fsync+0x31/0x4a
- SyS_fsync+0x10/0x14
- entry_SYSCALL_64_fastpath+0x1f/0xc2
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/bio-integrity.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/md/dm-kcopyd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 5384713..b5009a8 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -175,6 +175,9 @@ bool bio_integrity_enabled(struct bio *bio)
- 	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
- 		return false;
+diff --git a/drivers/md/dm-kcopyd.c b/drivers/md/dm-kcopyd.c
+index 9e9d04cb7d51..f85846741d50 100644
+--- a/drivers/md/dm-kcopyd.c
++++ b/drivers/md/dm-kcopyd.c
+@@ -733,11 +733,11 @@ int dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
+ 		job->pages = &zero_page_list;
  
-+	if (!bio_sectors(bio))
-+		return false;
-+
- 	/* Already protected? */
- 	if (bio_integrity(bio))
- 		return false;
+ 		/*
+-		 * Use WRITE SAME to optimize zeroing if all dests support it.
++		 * Use WRITE ZEROES to optimize zeroing if all dests support it.
+ 		 */
+-		job->rw = REQ_OP_WRITE_SAME;
++		job->rw = REQ_OP_WRITE_ZEROES;
+ 		for (i = 0; i < job->num_dests; i++)
+-			if (!bdev_write_same(job->dests[i].bdev)) {
++			if (!bdev_write_zeroes_sectors(job->dests[i].bdev)) {
+ 				job->rw = WRITE;
+ 				break;
+ 			}
 -- 
-2.9.3
+2.11.0
