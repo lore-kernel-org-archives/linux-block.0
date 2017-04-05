@@ -1,64 +1,192 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from latin.grep.be ([46.4.76.168]:42917 "EHLO latin.grep.be"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756256AbdDFGi2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Apr 2017 02:38:28 -0400
-Date: Thu, 6 Apr 2017 08:38:10 +0200
-From: Wouter Verhelst <w@uter.be>
-To: Michal Hocko <mhocko@kernel.org>
-Cc: Vlastimil Babka <vbabka@suse.cz>,
-        nbd-general@lists.sourceforge.net, Chris Leech <cleech@redhat.com>,
-        linux-scsi@vger.kernel.org, Josef Bacik <jbacik@fb.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        Eric Dumazet <edumazet@google.com>,
-        Lee Duncan <lduncan@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        open-iscsi@googlegroups.com,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Wed, 5 Apr 2017 13:30:31 +0200
+From: Michal Hocko <mhocko@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
         Mel Gorman <mgorman@techsingularity.net>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [Nbd] [PATCH 3/4] treewide: convert PF_MEMALLOC manipulations to
- new helpers
-Message-ID: <20170406063810.dmv4fg2irsqgdvyq@grep.be>
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
+        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
+        netdev@vger.kernel.org, Josef Bacik <jbacik@fb.com>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH 3/4] treewide: convert PF_MEMALLOC manipulations to new
+ helpers
+Message-ID: <20170405113030.GL6035@dhcp22.suse.cz>
 References: <20170405074700.29871-1-vbabka@suse.cz>
  <20170405074700.29871-4-vbabka@suse.cz>
- <20170405113030.GL6035@dhcp22.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170405113030.GL6035@dhcp22.suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170405074700.29871-4-vbabka@suse.cz>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Apr 05, 2017 at 01:30:31PM +0200, Michal Hocko wrote:
-> On Wed 05-04-17 09:46:59, Vlastimil Babka wrote:
-> > We now have memalloc_noreclaim_{save,restore} helpers for robust setting and
-> > clearing of PF_MEMALLOC. Let's convert the code which was using the generic
-> > tsk_restore_flags(). No functional change.
+On Wed 05-04-17 09:46:59, Vlastimil Babka wrote:
+> We now have memalloc_noreclaim_{save,restore} helpers for robust setting and
+> clearing of PF_MEMALLOC. Let's convert the code which was using the generic
+> tsk_restore_flags(). No functional change.
+
+It would be really great to revisit why those places outside of the mm
+proper really need this flag. I know this is a painful exercise but I
+wouldn't be surprised if there were abusers there.
+
+> Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+> Cc: Josef Bacik <jbacik@fb.com>
+> Cc: Lee Duncan <lduncan@suse.com>
+> Cc: Chris Leech <cleech@redhat.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+
+Acked-by: Michal Hocko <mhocko@suse.com>
+
+> ---
+>  drivers/block/nbd.c      | 7 ++++---
+>  drivers/scsi/iscsi_tcp.c | 7 ++++---
+>  net/core/dev.c           | 7 ++++---
+>  net/core/sock.c          | 7 ++++---
+>  4 files changed, 16 insertions(+), 12 deletions(-)
 > 
-> It would be really great to revisit why those places outside of the mm
-> proper really need this flag. I know this is a painful exercise but I
-> wouldn't be surprised if there were abusers there.
-[...]
-> > ---
-> >  drivers/block/nbd.c      | 7 ++++---
-> >  drivers/scsi/iscsi_tcp.c | 7 ++++---
-> >  net/core/dev.c           | 7 ++++---
-> >  net/core/sock.c          | 7 ++++---
-> >  4 files changed, 16 insertions(+), 12 deletions(-)
-
-These were all done to make swapping over network safe. The idea is that
-if a socket has SOCK_MEMALLOC set, incoming packets for that socket can
-access PFMEMALLOC reserves (whereas other sockets cannot); this all in
-the hope that one packe destined to that socket will contain the TCP ACK
-that confirms the swapout was successful and we can now release RAM
-pages for other processes.
-
-I don't know whether they need the PF_MEMALLOC flag specifically (not a
-kernel hacker), but they do need to interact with it at any rate.
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 03ae72985c79..929fc548c7fb 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/module.h>
+>  #include <linux/init.h>
+>  #include <linux/sched.h>
+> +#include <linux/sched/mm.h>
+>  #include <linux/fs.h>
+>  #include <linux/bio.h>
+>  #include <linux/stat.h>
+> @@ -210,7 +211,7 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send,
+>  	struct socket *sock = nbd->socks[index]->sock;
+>  	int result;
+>  	struct msghdr msg;
+> -	unsigned long pflags = current->flags;
+> +	unsigned int noreclaim_flag;
+>  
+>  	if (unlikely(!sock)) {
+>  		dev_err_ratelimited(disk_to_dev(nbd->disk),
+> @@ -221,7 +222,7 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send,
+>  
+>  	msg.msg_iter = *iter;
+>  
+> -	current->flags |= PF_MEMALLOC;
+> +	noreclaim_flag = memalloc_noreclaim_save();
+>  	do {
+>  		sock->sk->sk_allocation = GFP_NOIO | __GFP_MEMALLOC;
+>  		msg.msg_name = NULL;
+> @@ -244,7 +245,7 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send,
+>  			*sent += result;
+>  	} while (msg_data_left(&msg));
+>  
+> -	tsk_restore_flags(current, pflags, PF_MEMALLOC);
+> +	memalloc_noreclaim_restore(noreclaim_flag);
+>  
+>  	return result;
+>  }
+> diff --git a/drivers/scsi/iscsi_tcp.c b/drivers/scsi/iscsi_tcp.c
+> index 4228aba1f654..4842fc0e809d 100644
+> --- a/drivers/scsi/iscsi_tcp.c
+> +++ b/drivers/scsi/iscsi_tcp.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/types.h>
+>  #include <linux/inet.h>
+>  #include <linux/slab.h>
+> +#include <linux/sched/mm.h>
+>  #include <linux/file.h>
+>  #include <linux/blkdev.h>
+>  #include <linux/delay.h>
+> @@ -371,10 +372,10 @@ static inline int iscsi_sw_tcp_xmit_qlen(struct iscsi_conn *conn)
+>  static int iscsi_sw_tcp_pdu_xmit(struct iscsi_task *task)
+>  {
+>  	struct iscsi_conn *conn = task->conn;
+> -	unsigned long pflags = current->flags;
+> +	unsigned int noreclaim_flag;
+>  	int rc = 0;
+>  
+> -	current->flags |= PF_MEMALLOC;
+> +	noreclaim_flag = memalloc_noreclaim_save();
+>  
+>  	while (iscsi_sw_tcp_xmit_qlen(conn)) {
+>  		rc = iscsi_sw_tcp_xmit(conn);
+> @@ -387,7 +388,7 @@ static int iscsi_sw_tcp_pdu_xmit(struct iscsi_task *task)
+>  		rc = 0;
+>  	}
+>  
+> -	tsk_restore_flags(current, pflags, PF_MEMALLOC);
+> +	memalloc_noreclaim_restore(noreclaim_flag);
+>  	return rc;
+>  }
+>  
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index fde8b3f7136b..e0705a126b24 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -81,6 +81,7 @@
+>  #include <linux/hash.h>
+>  #include <linux/slab.h>
+>  #include <linux/sched.h>
+> +#include <linux/sched/mm.h>
+>  #include <linux/mutex.h>
+>  #include <linux/string.h>
+>  #include <linux/mm.h>
+> @@ -4227,7 +4228,7 @@ static int __netif_receive_skb(struct sk_buff *skb)
+>  	int ret;
+>  
+>  	if (sk_memalloc_socks() && skb_pfmemalloc(skb)) {
+> -		unsigned long pflags = current->flags;
+> +		unsigned int noreclaim_flag;
+>  
+>  		/*
+>  		 * PFMEMALLOC skbs are special, they should
+> @@ -4238,9 +4239,9 @@ static int __netif_receive_skb(struct sk_buff *skb)
+>  		 * Use PF_MEMALLOC as this saves us from propagating the allocation
+>  		 * context down to all allocation sites.
+>  		 */
+> -		current->flags |= PF_MEMALLOC;
+> +		noreclaim_flag = memalloc_noreclaim_save();
+>  		ret = __netif_receive_skb_core(skb, true);
+> -		tsk_restore_flags(current, pflags, PF_MEMALLOC);
+> +		memalloc_noreclaim_restore(noreclaim_flag);
+>  	} else
+>  		ret = __netif_receive_skb_core(skb, false);
+>  
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 392f9b6f96e2..0b2d06b4c308 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -102,6 +102,7 @@
+>  #include <linux/proc_fs.h>
+>  #include <linux/seq_file.h>
+>  #include <linux/sched.h>
+> +#include <linux/sched/mm.h>
+>  #include <linux/timer.h>
+>  #include <linux/string.h>
+>  #include <linux/sockios.h>
+> @@ -372,14 +373,14 @@ EXPORT_SYMBOL_GPL(sk_clear_memalloc);
+>  int __sk_backlog_rcv(struct sock *sk, struct sk_buff *skb)
+>  {
+>  	int ret;
+> -	unsigned long pflags = current->flags;
+> +	unsigned int noreclaim_flag;
+>  
+>  	/* these should have been dropped before queueing */
+>  	BUG_ON(!sock_flag(sk, SOCK_MEMALLOC));
+>  
+> -	current->flags |= PF_MEMALLOC;
+> +	noreclaim_flag = memalloc_noreclaim_save();
+>  	ret = sk->sk_backlog_rcv(sk, skb);
+> -	tsk_restore_flags(current, pflags, PF_MEMALLOC);
+> +	memalloc_noreclaim_restore(noreclaim_flag);
+>  
+>  	return ret;
+>  }
+> -- 
+> 2.12.2
 
 -- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+Michal Hocko
+SUSE Labs
