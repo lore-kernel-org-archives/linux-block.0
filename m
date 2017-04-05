@@ -1,41 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:45370 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755136AbdDMTcz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Apr 2017 15:32:55 -0400
-Date: Thu, 13 Apr 2017 22:32:42 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Matias Bjorling <mb@lightnvm.io>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] lightnvm: pblk-gc: fix an error pointer dereference in init
-Message-ID: <20170413193241.GA591@mwanda>
+Return-Path: <martin.petersen@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
+        snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 14/25] sd: implement unmapping Write Zeroes
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170331163313.31821-1-hch@lst.de>
+	<20170331163313.31821-15-hch@lst.de>
+Date: Wed, 05 Apr 2017 07:48:51 -0400
+In-Reply-To: <20170331163313.31821-15-hch@lst.de> (Christoph Hellwig's message
+	of "Fri, 31 Mar 2017 18:33:02 +0200")
+Message-ID: <yq1o9wbrs64.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-These labels are reversed so we could end up dereferencing an error
-pointer or leaking.
+Christoph Hellwig <hch@lst.de> writes:
 
-Fixes: 7f347ba6bb3a ("lightnvm: physical block device (pblk) target")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Try to use a write same with unmap bit variant if the device supports it
+> and the caller allows for it.
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 9b147cfd8a41..f173fd4ea947 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -527,10 +527,10 @@ int pblk_gc_init(struct pblk *pblk)
- 
- 	return 0;
- 
--fail_free_main_kthread:
--	kthread_stop(gc->gc_ts);
- fail_free_writer_kthread:
- 	kthread_stop(gc->gc_writer_ts);
-+fail_free_main_kthread:
-+	kthread_stop(gc->gc_ts);
- 
- 	return ret;
- }
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
