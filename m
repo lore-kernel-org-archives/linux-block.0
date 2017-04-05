@@ -1,29 +1,72 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
-        snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 13/25] block_dev: use blkdev_issue_zerout for hole punches
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20170331163313.31821-1-hch@lst.de>
-	<20170331163313.31821-14-hch@lst.de>
-Date: Wed, 05 Apr 2017 07:48:24 -0400
-In-Reply-To: <20170331163313.31821-14-hch@lst.de> (Christoph Hellwig's message
-	of "Fri, 31 Mar 2017 18:33:01 +0200")
-Message-ID: <yq1shlnrs6v.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 16/27] zram: implement REQ_OP_WRITE_ZEROES
+Date: Wed,  5 Apr 2017 19:21:14 +0200
+Message-Id: <20170405172125.22600-17-hch@lst.de>
+In-Reply-To: <20170405172125.22600-1-hch@lst.de>
+References: <20170405172125.22600-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Christoph Hellwig <hch@lst.de> writes:
+Just the same as discard if the block size equals the system page size.
 
-> This gets us support for non-discard efficient write of zeroes
-> (e.g. NVMe) and prepare for removing the discard_zeroes_data flag.
-                         s
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ drivers/block/zram/zram_drv.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index dceb5edd1e54..1710b06f04a7 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -829,10 +829,14 @@ static void __zram_make_request(struct zram *zram, struct bio *bio)
+ 	offset = (bio->bi_iter.bi_sector &
+ 		  (SECTORS_PER_PAGE - 1)) << SECTOR_SHIFT;
+ 
+-	if (unlikely(bio_op(bio) == REQ_OP_DISCARD)) {
++	switch (bio_op(bio)) {
++	case REQ_OP_DISCARD:
++	case REQ_OP_WRITE_ZEROES:
+ 		zram_bio_discard(zram, index, offset, bio);
+ 		bio_endio(bio);
+ 		return;
++	default:
++		break;
+ 	}
+ 
+ 	bio_for_each_segment(bvec, bio, iter) {
+@@ -1192,6 +1196,8 @@ static int zram_add(void)
+ 	zram->disk->queue->limits.max_sectors = SECTORS_PER_PAGE;
+ 	zram->disk->queue->limits.chunk_sectors = 0;
+ 	blk_queue_max_discard_sectors(zram->disk->queue, UINT_MAX);
++	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, zram->disk->queue);
++
+ 	/*
+ 	 * zram_bio_discard() will clear all logical blocks if logical block
+ 	 * size is identical with physical block size(PAGE_SIZE). But if it is
+@@ -1201,10 +1207,7 @@ static int zram_add(void)
+ 	 * zeroed.
+ 	 */
+ 	if (ZRAM_LOGICAL_BLOCK_SIZE == PAGE_SIZE)
+-		zram->disk->queue->limits.discard_zeroes_data = 1;
+-	else
+-		zram->disk->queue->limits.discard_zeroes_data = 0;
+-	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, zram->disk->queue);
++		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
+ 
+ 	add_disk(zram->disk);
+ 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.11.0
