@@ -1,99 +1,51 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 8/9] nowait aio: btrfs
-Date: Tue, 11 Apr 2017 09:26:18 -0500
-Message-Id: <20170411142619.27205-9-rgoldwyn@suse.de>
-In-Reply-To: <20170411142619.27205-1-rgoldwyn@suse.de>
-References: <20170411142619.27205-1-rgoldwyn@suse.de>
+Return-Path: <martin.petersen@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
+        snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org
+Subject: Re: [PATCH 22/25] block: stop using discards for zeroing
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170331163313.31821-1-hch@lst.de>
+	<20170331163313.31821-23-hch@lst.de>
+Date: Wed, 05 Apr 2017 07:55:39 -0400
+In-Reply-To: <20170331163313.31821-23-hch@lst.de> (Christoph Hellwig's message
+	of "Fri, 31 Mar 2017 18:33:10 +0200")
+Message-ID: <yq1fuhnrrus.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Christoph Hellwig <hch@lst.de> writes:
 
-Return EAGAIN if any of the following checks fail
- + i_rwsem is not lockable
- + NODATACOW or PREALLOC is not set
- + Cannot nocow at the desired location
- + Writing beyond end of file which is not allocated
+> Now that we have REQ_OP_WRITE_ZEROES implemented for all devices that
+> support efficient zeroing of devices we can remove the call to
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
- fs/btrfs/inode.c |  3 +++
- 2 files changed, 23 insertions(+), 5 deletions(-)
+s/of devices/
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 520cb7230b2d..a870e5dd2b4d 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1823,12 +1823,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	ssize_t num_written = 0;
- 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
- 	ssize_t err;
--	loff_t pos;
--	size_t count;
-+	loff_t pos = iocb->ki_pos;
-+	size_t count = iov_iter_count(from);
- 	loff_t oldsize;
- 	int clean_page = 0;
- 
--	inode_lock(inode);
-+	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-+			(iocb->ki_flags & IOCB_DIRECT)) {
-+		/* Don't sleep on inode rwsem */
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+		/*
-+		 * We will allocate space in case nodatacow is not set,
-+		 * so bail
-+		 */
-+		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
-+					      BTRFS_INODE_PREALLOC)) ||
-+		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
-+			inode_unlock(inode);
-+			return -EAGAIN;
-+		}
-+	} else
-+		inode_lock(inode);
-+
- 	err = generic_write_checks(iocb, from);
- 	if (err <= 0) {
- 		inode_unlock(inode);
-@@ -1862,8 +1879,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	 */
- 	update_time_for_write(inode);
- 
--	pos = iocb->ki_pos;
--	count = iov_iter_count(from);
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
- 	if (start_pos > oldsize) {
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index a18510be76c1..d91b21a76d6d 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8627,6 +8627,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			dio_data.overwrite = 1;
- 			inode_unlock(inode);
- 			relock = true;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
- 		}
- 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
- 		if (ret)
+> blkdev_issue_discard.  This means we only have two ways of zeroing
+> left and can simply the code.
+
+simplify
+
+> + *  Note that this function may fail with -EOPNOTSUPP if the driver supports
+> + *  efficient zeroing operation, but the device capabilities can only be
+> + *  discovered by trial and error.  In this case the caller should call the
+> + *  function again, and it will use the fallback path.
+
+Maybe:
+
+"Note that this function may fail with -EOPNOTSUPP if the driver signals
+zeroing offload support but the device fails to process the command (for
+some devices there is no non-destructive way to verify whether this
+operation is actually supported). If -EOPNOTSUPP is returned, the caller
+should retry the blkdev_issue_zeroout() and the fallback path will be
+used."
+
+Otherwise OK.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.12.0
+Martin K. Petersen	Oracle Linux Engineering
