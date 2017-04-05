@@ -1,80 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:35329 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1426672AbdDUXdE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 19:33:04 -0400
-Received: by mail-wm0-f54.google.com with SMTP id w64so25874876wma.0
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2017 16:33:04 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 4/5] lightnvm: pblk: free metadata on line alloc failure
-Date: Sat, 22 Apr 2017 01:32:48 +0200
-Message-Id: <1492817569-13532-5-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
-References: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <sbates130272@gmail.com>
+Return-Path: <sbates130272@gmail.com>
+From: sbates@raithlin.com
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Damien.LeMoal@wdc.com,
+	osandov@osandov.com,
+	sbates@raithlin.com,
+	sagi@grimberg.me
+Subject: [PATCH v2 0/2] blk-stat: Add ability to not bucket IO; improve IO polling.
+Date: Wed,  5 Apr 2017 11:39:15 -0600
+Message-Id: <1491413957-30885-1-git-send-email-sbates@raithlin.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When a line allocation fails, for example, due to having too many bad
-blocks, free its metadata correctly.
+From: Stephen Bates <sbates@raithlin.com>
 
-Fixes: a4bd217b4326 "lightnvm: physical block device (pblk) target"
+Omar recently developed some patches for block layer stats that use
+callbacks to determine which bucket an IO should be considered for. At
+the same time there was discussion at LSF/MM that we might not want to
+consider all IO when generating stats for certain algorithms (e.g. IO
+completion polling) or to bucket them in a more optimal fashion.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+This set does two things. It makes the bucket callback for stats
+signed so we can now ignore IO that cause a negative to be returned
+from the bucket function. It then improves the IO polling latency
+estimations by bucketing stats based on IO size and direction.
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 7eb62ec..ac3742b 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1127,6 +1127,7 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
- 	spin_lock(&l_mg->free_lock);
- 	retry_line = pblk_line_get(pblk);
- 	if (!retry_line) {
-+		l_mg->data_line = NULL;
- 		spin_unlock(&l_mg->free_lock);
- 		return NULL;
- 	}
-@@ -1134,18 +1135,17 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
- 	retry_line->smeta = line->smeta;
- 	retry_line->emeta = line->emeta;
- 	retry_line->meta_line = line->meta_line;
--	retry_line->map_bitmap = line->map_bitmap;
--	retry_line->invalid_bitmap = line->invalid_bitmap;
- 
--	line->map_bitmap = NULL;
--	line->invalid_bitmap = NULL;
--	line->smeta = NULL;
--	line->emeta = NULL;
-+	pblk_line_free(pblk, line);
- 	l_mg->data_line = retry_line;
- 	spin_unlock(&l_mg->free_lock);
- 
--	if (pblk_line_erase(pblk, retry_line))
-+	if (pblk_line_erase(pblk, retry_line)) {
-+		spin_lock(&l_mg->free_lock);
-+		l_mg->data_line = NULL;
-+		spin_unlock(&l_mg->free_lock);
- 		return NULL;
-+	}
- 
- 	pblk_rl_free_lines_dec(&pblk->rl, retry_line);
- 
-@@ -1299,6 +1299,8 @@ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
- 
- 	line->map_bitmap = NULL;
- 	line->invalid_bitmap = NULL;
-+	line->smeta = NULL;
-+	line->emeta = NULL;
- }
- 
- void pblk_line_put(struct kref *ref)
+This patchset applies cleanly on 6809ef67eb7b4b68d (Merge branch
+'for-4.12/block' into for-next) in Jens' for-next tree.
+
+I've lightly tested this using QEMU and a real NVMe low-latency
+device. I do not have performance number yet. Feedback would be
+appreciated! I am not *super* happy with how the bucketing by size is
+done. Any suggestions on how to improve this would be appreciated!
+
+Cc: Damien.LeMoal@wdc.com
+Cc: osandov@osandov.com
+
+Changes since v1:
+  Dropped the cast in blk_stat_rq_ddir() as per Omar's suggestion.
+  Moved to an array of buckets based on IO size rather than a filter
+  as suggested by Jens and Damien.
+
+Stephen Bates (2):
+  blk-stat: convert blk-stat bucket callback to signed
+  blk-mq: Add a polling specific stats function
+
+ block/blk-mq.c   | 54 ++++++++++++++++++++++++++++++++++++++++++++----------
+ block/blk-stat.c |  6 ++++--
+ block/blk-stat.h |  9 +++++----
+ 3 files changed, 53 insertions(+), 16 deletions(-)
+
 -- 
 2.7.4
