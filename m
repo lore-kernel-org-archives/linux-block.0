@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 04/27] sd: implement REQ_OP_WRITE_ZEROES
-Date: Wed,  5 Apr 2017 19:21:02 +0200
-Message-Id: <20170405172125.22600-5-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:42 +0200
+Message-Id: <20170405142205.6477-5-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
