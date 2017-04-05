@@ -1,69 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:58359 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934141AbdDFLnu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 07:43:50 -0400
-Date: Thu, 6 Apr 2017 04:43:49 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Dmitry Monakhov <dmonakhov@openvz.org>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com
+Received: from mx2.suse.de ([195.135.220.15]:44216 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753447AbdDEGhH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Apr 2017 02:37:07 -0400
 Subject: Re: [PATCH 5/9] bio-integrity: fold bio_integrity_enabled to
  bio_integrity_prep
-Message-ID: <20170406114349.GC9312@infradead.org>
+To: Dmitry Monakhov <dmonakhov@openvz.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
 References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
  <1491332201-26926-6-git-send-email-dmonakhov@openvz.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <14063093-89ea-4a1e-957f-eb0dfa3a9cf3@suse.de>
+Date: Wed, 5 Apr 2017 08:37:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1491332201-26926-6-git-send-email-dmonakhov@openvz.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> --- a/Documentation/block/data-integrity.txt
-> +++ b/Documentation/block/data-integrity.txt
-> @@ -202,9 +202,6 @@ will require extra work due to the application tag.
->        added.  It is up to the caller to ensure that the bio does not
->        change while I/O is in progress.
->  
-> -      bio_integrity_prep() should only be called if
-> -      bio_integrity_enabled() returned 1.
-> -
+On 04/04/2017 08:56 PM, Dmitry Monakhov wrote:
+> Currently all integrity prep hooks are open-coded, and if prepare fails
+> we ignore it's code and fail bio with EIO. Let's return real error to
+> upper layer, so later caller may react accordingly.
+> 
+> In fact no one want to use bio_integrity_prep() w/o bio_integrity_enabled,
+> so it is reasonable to fold it in to one function.
+> 
+> Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+> ---
+>  Documentation/block/data-integrity.txt |  3 --
+>  block/bio-integrity.c                  | 88 ++++++++++++++++++----------------
+>  block/blk-core.c                       |  5 +-
+>  block/blk-mq.c                         |  8 +---
+>  drivers/nvdimm/blk.c                   | 13 +----
+>  drivers/nvdimm/btt.c                   | 13 +----
+>  include/linux/bio.h                    |  6 ---
+>  7 files changed, 55 insertions(+), 81 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-This should grow a blurb that bio_integrity_prep will complete the bio
-if an error occurs.
+Cheers,
 
->  /**
-> - * bio_integrity_prep - Prepare bio for integrity I/O
-> + * bio_integrity_setup - Prepare bio for integrity I/O
->   * @bio:	bio to prepare
->   *
->   * Description: Allocates a buffer for integrity metadata, maps the
-> @@ -269,7 +231,7 @@ static int bio_integrity_process(struct bio *bio,
->   * block device's integrity function.  In the READ case, the buffer
->   * will be prepared for DMA and a suitable end_io handler set up.
->   */
-> -int bio_integrity_prep(struct bio *bio)
-> +static int bio_integrity_setup(struct bio *bio)
-
-Instead of renaming the function I'd suggest simply merging the two,
-the end result will be smaller and more readable.
-
-> +	if (bio_data_dir(bio) == READ && bi->profile->verify_fn != NULL &&
-> +	    (bi->flags & BLK_INTEGRITY_VERIFY))
-> +		goto need_prep;
-> +
-> +	if (bio_data_dir(bio) == WRITE && bi->profile->generate_fn != NULL &&
-> +	    (bi->flags & BLK_INTEGRITY_GENERATE))
-> +		goto need_prep;
-
-I'd invert the conditions to avoid the goto:
-
-	if (bio_data_dir(bio) == READ) {
-		if (!bi->profile->verify_fn ||
-		    !(bi->flags & BLK_INTEGRITY_VERIFY))
-			return 0;
-	} else {
-		if (!bi->profile->generate_fn ||
-		    !(bi->flags & BLK_INTEGRITY_GENERATE))
-			return 0;
-	}
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
