@@ -1,35 +1,83 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 5 Apr 2017 16:45:56 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 4/5] nvme: move the retries count to struct nvme_request
-Message-ID: <20170405144556.GQ3941@linux-x5ow.site>
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 4/5] nvme: move the retries count to struct nvme_request
+Date: Wed,  5 Apr 2017 16:18:55 +0200
+Message-Id: <20170405141856.1862-5-hch@lst.de>
+In-Reply-To: <20170405141856.1862-1-hch@lst.de>
 References: <20170405141856.1862-1-hch@lst.de>
- <20170405141856.1862-5-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170405141856.1862-5-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Apr 05, 2017 at 04:18:55PM +0200, Christoph Hellwig wrote:
-> The way NVMe uses this field is entirely different from the older
-> SCSI/BLOCK_PC usage, so move it into struct nvme_request.
-> 
-> Also reduce the size of the file to a unsigned char so that we leave space
-> for additional smaller fields that will appear soon.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+The way NVMe uses this field is entirely different from the older
+SCSI/BLOCK_PC usage, so move it into struct nvme_request.
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Also reduce the size of the file to a unsigned char so that we leave space
+for additional smaller fields that will appear soon.
 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 10 +++++-----
+ drivers/nvme/host/nvme.h |  1 +
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 933e67c60e33..dc05f41c3992 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -49,8 +49,8 @@ unsigned char shutdown_timeout = 5;
+ module_param(shutdown_timeout, byte, 0644);
+ MODULE_PARM_DESC(shutdown_timeout, "timeout in seconds for controller shutdown");
+ 
+-static unsigned int nvme_max_retries = 5;
+-module_param_named(max_retries, nvme_max_retries, uint, 0644);
++static u8 nvme_max_retries = 5;
++module_param_named(max_retries, nvme_max_retries, byte, 0644);
+ MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
+ 
+ static int nvme_char_major;
+@@ -74,7 +74,7 @@ static inline bool nvme_req_needs_retry(struct request *req)
+ 		return false;
+ 	if (jiffies - req->start_time >= req->timeout)
+ 		return false;
+-	if (req->retries >= nvme_max_retries)
++	if (nvme_req(req)->retries >= nvme_max_retries)
+ 		return false;
+ 	return true;
+ }
+@@ -85,7 +85,7 @@ void nvme_complete_rq(struct request *req)
+ 
+ 	if (unlikely(req->errors)) {
+ 		if (nvme_req_needs_retry(req)) {
+-			req->retries++;
++			nvme_req(req)->retries++;
+ 			blk_mq_requeue_request(req,
+ 					!blk_mq_queue_stopped(req->q));
+ 			return;
+@@ -356,7 +356,7 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 	int ret = BLK_MQ_RQ_QUEUE_OK;
+ 
+ 	if (!(req->rq_flags & RQF_DONTPREP)) {
+-		req->retries = 0;
++		nvme_req(req)->retries = 0;
+ 		req->rq_flags |= RQF_DONTPREP;
+ 	}
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 82ba9a305301..b667be9546a1 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -89,6 +89,7 @@ enum nvme_quirks {
+  */
+ struct nvme_request {
+ 	struct nvme_command	*cmd;
++	u8			retries;
+ 	union nvme_result	result;
+ };
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
