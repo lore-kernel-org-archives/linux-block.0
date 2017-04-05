@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 16/27] zram: implement REQ_OP_WRITE_ZEROES
-Date: Wed,  5 Apr 2017 19:21:14 +0200
-Message-Id: <20170405172125.22600-17-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:54 +0200
+Message-Id: <20170405142205.6477-17-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Just the same as discard if the block size equals the system page size.
