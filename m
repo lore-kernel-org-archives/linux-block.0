@@ -1,52 +1,80 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:38826 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753388AbdDKOTF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2017 10:19:05 -0400
-Received: by mail-wm0-f52.google.com with SMTP id t189so2200742wmt.1
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2017 07:19:05 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 1/3] lightnvm: clean unused variable
-Date: Tue, 11 Apr 2017 16:18:55 +0200
-Message-Id: <1491920338-2348-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1491920338-2348-1-git-send-email-javier@cnexlabs.com>
-References: <1491920338-2348-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-pg0-f53.google.com ([74.125.83.53]:33521 "EHLO
+        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756049AbdDETCy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 15:02:54 -0400
+Received: by mail-pg0-f53.google.com with SMTP id x125so12935376pgb.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 12:02:54 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v3 5/8] blk-mq: remap queues when adding/removing hardware queues
+Date: Wed,  5 Apr 2017 12:01:33 -0700
+Message-Id: <aedb4a65bbafba23d564bd413e3919ab08e854ec.1491418411.git.osandov@fb.com>
+In-Reply-To: <cover.1491418411.git.osandov@fb.com>
+References: <cover.1491418411.git.osandov@fb.com>
+In-Reply-To: <cover.1491418411.git.osandov@fb.com>
+References: <cover.1491418411.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Clean unused variable on lightnvm core.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+blk_mq_update_nr_hw_queues() used to remap hardware queues, which is the
+behavior that drivers expect. However, commit 4e68a011428a changed
+blk_mq_queue_reinit() to not remap queues for the case of CPU
+hotplugging, inadvertently making blk_mq_update_nr_hw_queues() not remap
+queues as well. This breaks, for example, NBD's multi-connection mode,
+leaving the added hardware queues unused. Fix it by making
+blk_mq_update_nr_hw_queues() explicitly remap the queues.
+
+Fixes: 4e68a011428a ("blk-mq: don't redistribute hardware queues on a CPU hotplug event")
+Reviewed-by: Keith Busch <keith.busch@intel.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/lightnvm/core.c | 3 ---
- 1 file changed, 3 deletions(-)
+ block/blk-mq.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index eb9ab1a..258007a 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -501,7 +501,6 @@ void nvm_part_to_tgt(struct nvm_dev *dev, sector_t *entries,
- 		int *lun_roffs;
- 		struct ppa_addr gaddr;
- 		u64 pba = le64_to_cpu(entries[i]);
--		int off;
- 		u64 diff;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 147cc53134d8..39e9af3498ac 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2467,6 +2467,14 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ 	return 0;
+ }
  
- 		if (!pba)
-@@ -511,8 +510,6 @@ void nvm_part_to_tgt(struct nvm_dev *dev, sector_t *entries,
- 		ch_rmap = &dev_rmap->chnls[gaddr.g.ch];
- 		lun_roffs = ch_rmap->lun_offs;
++static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
++{
++	if (set->ops->map_queues)
++		return set->ops->map_queues(set);
++	else
++		return blk_mq_map_queues(set);
++}
++
+ /*
+  * Alloc a tag set to be associated with one or more request queues.
+  * May fail with EINVAL for various error conditions. May adjust the
+@@ -2521,10 +2529,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	if (!set->mq_map)
+ 		goto out_free_tags;
  
--		off = gaddr.g.ch * geo->luns_per_chnl + gaddr.g.lun;
--
- 		diff = ((ch_rmap->ch_off * geo->luns_per_chnl) +
- 				(lun_roffs[gaddr.g.lun])) * geo->sec_per_lun;
+-	if (set->ops->map_queues)
+-		ret = set->ops->map_queues(set);
+-	else
+-		ret = blk_mq_map_queues(set);
++	ret = blk_mq_update_queue_map(set);
+ 	if (ret)
+ 		goto out_free_mq_map;
  
+@@ -2616,6 +2621,7 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+ 		blk_mq_freeze_queue(q);
+ 
+ 	set->nr_hw_queues = nr_hw_queues;
++	blk_mq_update_queue_map(set);
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_realloc_hw_ctxs(set, q);
+ 		blk_mq_queue_reinit(q, cpu_online_mask);
 -- 
-2.7.4
+2.12.2
