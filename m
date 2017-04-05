@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 12/27] block: add a new BLKDEV_ZERO_NOFALLBACK flag
-Date: Wed,  5 Apr 2017 19:21:10 +0200
-Message-Id: <20170405172125.22600-13-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:50 +0200
+Message-Id: <20170405142205.6477-13-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 This avoids fallbacks to explicit zeroing in (__)blkdev_issue_zeroout if
