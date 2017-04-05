@@ -1,27 +1,58 @@
-Return-Path: <konrad.wilk@oracle.com>
-Date: Tue, 18 Apr 2017 14:31:23 -0400
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To: linux-block@vger.kernel.org, axboe@kernel.dk,
-        xen-devel@lists.xensource.com, linux-kernel@vger.kernel.org
-Subject: [GIT PULL] (xen) stable/for-jens-4.12
-Message-ID: <20170418183123.GA26293@char.us.oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:51326 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753701AbdDEHrK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Apr 2017 03:47:10 -0400
+From: Vlastimil Babka <vbabka@suse.cz>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
+        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
+        netdev@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Chris Leech <cleech@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Josef Bacik <jbacik@fb.com>, Lee Duncan <lduncan@suse.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Richard Weinberger <richard@nod.at>, stable@vger.kernel.org
+Subject: [PATCH 0/4] more robust PF_MEMALLOC handling
+Date: Wed,  5 Apr 2017 09:46:56 +0200
+Message-Id: <20170405074700.29871-1-vbabka@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hey Jens,
+Hi,
 
-Please git pull the following branch:
+this series aims to unify the setting and clearing of PF_MEMALLOC, which
+prevents recursive reclaim. There are some places that clear the flag
+unconditionally from current->flags, which may result in clearing a
+pre-existing flag. This already resulted in a bug report that Patch 1 fixes
+(without the new helpers, to make backporting easier). Patch 2 introduces the
+new helpers, modelled after existing memalloc_noio_* and memalloc_nofs_*
+helpers, and converts mm core to use them. Patches 3 and 4 convert non-mm code.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git stable/for-jens-4.12
+Based on next-20170404.
 
-which is based on your 'for-4.12/block' branch. It has one fix - to emit an
-uevent whenever the size of the guest disk image changes.
+Vlastimil Babka (4):
+  mm: prevent potential recursive reclaim due to clearing PF_MEMALLOC
+  mm: introduce memalloc_noreclaim_{save,restore}
+  treewide: convert PF_MEMALLOC manipulations to new helpers
+  mtd: nand: nandsim: convert to memalloc_noreclaim_*()
 
-Please pull!
+ drivers/block/nbd.c        |  7 ++++---
+ drivers/mtd/nand/nandsim.c | 29 +++++++++--------------------
+ drivers/scsi/iscsi_tcp.c   |  7 ++++---
+ include/linux/sched/mm.h   | 12 ++++++++++++
+ mm/page_alloc.c            | 10 ++++++----
+ mm/vmscan.c                | 17 +++++++++++------
+ net/core/dev.c             |  7 ++++---
+ net/core/sock.c            |  7 ++++---
+ 8 files changed, 54 insertions(+), 42 deletions(-)
 
- drivers/block/xen-blkfront.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-Marc Olson (1):
-      blkfront: add uevent for size change
+-- 
+2.12.2
