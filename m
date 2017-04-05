@@ -1,61 +1,33 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 5/5] scsi: Ensure that scsi_run_queue() runs all hardware queues
-Date: Mon, 3 Apr 2017 16:22:28 -0700
-Message-ID: <20170403232228.11208-6-bart.vanassche@sandisk.com>
-In-Reply-To: <20170403232228.11208-1-bart.vanassche@sandisk.com>
-References: <20170403232228.11208-1-bart.vanassche@sandisk.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 5 Apr 2017 16:42:41 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 2/5] nvme: cleanup nvme_req_needs_retry
+Message-ID: <20170405144241.GN3941@linux-x5ow.site>
+References: <20170405141856.1862-1-hch@lst.de>
+ <20170405141856.1862-3-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170405141856.1862-3-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-commit 52d7f1b5c2f3 ("blk-mq: Avoid that requeueing starts stopped
-queues") removed the blk_mq_stop_hw_queue() call from scsi_queue_rq()
-for the BLK_MQ_RQ_QUEUE_BUSY case. blk_mq_start_stopped_hw_queues()
-only runs queues that had been stopped. Hence change the
-blk_mq_start_stopped_hw_queues() call in scsi_run_queue() into
-blk_mq_run_hw_queues(). Remove the blk_mq_start_stopped_hw_queues()
-call from scsi_end_request() because __blk_mq_finish_request()
-already runs all hardware queues if needed.
+On Wed, Apr 05, 2017 at 04:18:53PM +0200, Christoph Hellwig wrote:
+> Don't pass the status explicitly but derive it from the requeust,
+> and unwind the complex condition to be more readable.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Fixes: commit 52d7f1b5c2f3 ("blk-mq: Avoid that requeueing starts stopped queues")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/scsi_lib.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 0e240aebc150..4459b18f62a1 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -496,7 +496,7 @@ static void scsi_run_queue(struct request_queue *q)
- 		scsi_starved_list_run(sdev->host);
- 
- 	if (q->mq_ops)
--		blk_mq_start_stopped_hw_queues(q, false);
-+		blk_mq_run_hw_queues(q, false);
- 	else
- 		blk_run_queue(q);
- }
-@@ -681,8 +681,6 @@ static bool scsi_end_request(struct request *req, int error,
- 		if (scsi_target(sdev)->single_lun ||
- 		    !list_empty(&sdev->host->starved_list))
- 			kblockd_schedule_work(&sdev->requeue_work);
--		else
--			blk_mq_start_stopped_hw_queues(q, true);
- 	} else {
- 		unsigned long flags;
- 
 -- 
-2.12.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
