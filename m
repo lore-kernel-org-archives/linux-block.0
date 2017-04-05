@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 10/27] block: add a flags argument to (__)blkdev_issue_zeroout
-Date: Wed,  5 Apr 2017 19:21:08 +0200
-Message-Id: <20170405172125.22600-11-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:48 +0200
+Message-Id: <20170405142205.6477-11-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
