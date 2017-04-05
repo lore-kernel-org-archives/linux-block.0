@@ -1,28 +1,52 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 5 Apr 2017 16:44:22 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 3/5] nvme: mark nvme_max_retries static
-Message-ID: <20170405144422.GP3941@linux-x5ow.site>
+Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH 3/5] nvme: mark nvme_max_retries static
+Date: Wed,  5 Apr 2017 16:18:54 +0200
+Message-Id: <20170405141856.1862-4-hch@lst.de>
+In-Reply-To: <20170405141856.1862-1-hch@lst.de>
 References: <20170405141856.1862-1-hch@lst.de>
- <20170405141856.1862-4-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170405141856.1862-4-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Apr 05, 2017 at 04:18:54PM +0200, Christoph Hellwig wrote:
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 3 +--
+ drivers/nvme/host/nvme.h | 2 --
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index b225aacf4b89..933e67c60e33 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -49,10 +49,9 @@ unsigned char shutdown_timeout = 5;
+ module_param(shutdown_timeout, byte, 0644);
+ MODULE_PARM_DESC(shutdown_timeout, "timeout in seconds for controller shutdown");
+ 
+-unsigned int nvme_max_retries = 5;
++static unsigned int nvme_max_retries = 5;
+ module_param_named(max_retries, nvme_max_retries, uint, 0644);
+ MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
+-EXPORT_SYMBOL_GPL(nvme_max_retries);
+ 
+ static int nvme_char_major;
+ module_param(nvme_char_major, int, 0);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 227f281482db..82ba9a305301 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -43,8 +43,6 @@ extern unsigned char shutdown_timeout;
+ #define NVME_DEFAULT_KATO	5
+ #define NVME_KATO_GRACE		10
+ 
+-extern unsigned int nvme_max_retries;
+-
+ enum {
+ 	NVME_NS_LBA		= 0,
+ 	NVME_NS_LIGHTNVM	= 1,
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
