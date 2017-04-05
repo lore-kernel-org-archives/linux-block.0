@@ -1,91 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47467 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751298AbdDEHTb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Apr 2017 03:19:31 -0400
-Date: Wed, 5 Apr 2017 09:19:27 +0200
-From: Michal Hocko <mhocko@kernel.org>
-To: NeilBrown <neilb@suse.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Ming Lei <tom.leiming@gmail.com>
-Subject: Re: [PATCH v2] loop: Add PF_LESS_THROTTLE to block/loop device
- thread.
-Message-ID: <20170405071927.GA7258@dhcp22.suse.cz>
-References: <871staffus.fsf@notabene.neil.brown.name>
- <87wpazh3rl.fsf@notabene.neil.brown.name>
+Received: from mail-vk0-f54.google.com ([209.85.213.54]:35684 "EHLO
+        mail-vk0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752038AbdDEFNZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 01:13:25 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <87wpazh3rl.fsf@notabene.neil.brown.name>
+In-Reply-To: <8760ijiind.fsf@notabene.neil.brown.name>
+References: <871staffus.fsf@notabene.neil.brown.name> <20170404071033.GA25855@infradead.org>
+ <8760ijiind.fsf@notabene.neil.brown.name>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 5 Apr 2017 13:13:23 +0800
+Message-ID: <CACVXFVN8tTYjidbdSJsEpnWcUccvyd-xsvCpJ9vDMtvs+ciCzQ@mail.gmail.com>
+Subject: Re: [PATCH] loop: Add PF_LESS_THROTTLE to block/loop device thread.
+To: NeilBrown <neilb@suse.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed 05-04-17 14:33:50, NeilBrown wrote:
-> 
-> When a filesystem is mounted from a loop device, writes are
-> throttled by balance_dirty_pages() twice: once when writing
-> to the filesystem and once when the loop_handle_cmd() writes
-> to the backing file.  This double-throttling can trigger
-> positive feedback loops that create significant delays.  The
-> throttling at the lower level is seen by the upper level as
-> a slow device, so it throttles extra hard.
-> 
-> The PF_LESS_THROTTLE flag was created to handle exactly this
-> circumstance, though with an NFS filesystem mounted from a
-> local NFS server.  It reduces the throttling on the lower
-> layer so that it can proceed largely unthrottled.
-> 
-> To demonstrate this, create a filesystem on a loop device
-> and write (e.g. with dd) several large files which combine
-> to consume significantly more than the limit set by
-> /proc/sys/vm/dirty_ratio or dirty_bytes.  Measure the total
-> time taken.
-> 
-> When I do this directly on a device (no loop device) the
-> total time for several runs (mkfs, mount, write 200 files,
-> umount) is fairly stable: 28-35 seconds.
-> When I do this over a loop device the times are much worse
-> and less stable.  52-460 seconds.  Half below 100seconds,
-> half above.
-> When I apply this patch, the times become stable again,
-> though not as fast as the no-loop-back case: 53-72 seconds.
-> 
-> There may be room for further improvement as the total overhead still
-> seems too high, but this is a big improvement.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Michal Hocko <mhocko@suse.com>
-> Signed-off-by: NeilBrown <neilb@suse.com>
-> ---
-> 
-> I moved where the flag is set, thanks to suggestion from
-> Ming Lei.
-> I've preserved the *-by: tags I was offered despite the code
-> being different, as the concept is identical.
-> 
-> Thanks,
-> NeilBrown
-> 
-> 
->  drivers/block/loop.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 0ecb6461ed81..44b3506fd086 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -852,6 +852,7 @@ static int loop_prepare_queue(struct loop_device *lo)
->  	if (IS_ERR(lo->worker_task))
->  		return -ENOMEM;
->  	set_user_nice(lo->worker_task, MIN_NICE);
-> +	lo->worker_task->flags |= PF_LESS_THROTTLE;
->  	return 0;
+On Wed, Apr 5, 2017 at 12:27 PM, NeilBrown <neilb@suse.com> wrote:
+> On Tue, Apr 04 2017, Christoph Hellwig wrote:
+>
+>> Looks fine,
+>>
+>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>
+>> But if you actually care about performance in any way I'd suggest
+>> to use the loop device in direct I/O mode..
+>
+> The losetup on my test VM is too old to support that :-(
+> I guess it might be time to upgraded.
+>
+> It seems that there is not "mount -o direct_loop" or similar, so you
+> have to do the losetup and the mount separately.  Any thoughts on
 
-As mentioned elsewhere, PF flags should be updated only on the current
-task otherwise there is potential rmw race. Is this safe? The code runs
-concurrently with the worker thread.
+I guess the 'direct_loop' can be added into 'mount' directly? but not familiar
+with mount utility.
+
+> whether that should be changed ?
+
+There was sysfs interface for controling direct IO in the initial
+submission, but
+looks it was reviewed out, :-)
 
 
--- 
-Michal Hocko
-SUSE Labs
+Thanks,
+Ming Lei
