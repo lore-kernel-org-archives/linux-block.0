@@ -13,10 +13,10 @@ Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
 Subject: [PATCH 01/27] sd: split sd_setup_discard_cmnd
-Date: Wed,  5 Apr 2017 19:20:59 +0200
-Message-Id: <20170405172125.22600-2-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+Date: Wed,  5 Apr 2017 16:21:39 +0200
+Message-Id: <20170405142205.6477-2-hch@lst.de>
+In-Reply-To: <20170405142205.6477-1-hch@lst.de>
+References: <20170405142205.6477-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Split sd_setup_discard_cmnd into one function per provisioning type.  While
