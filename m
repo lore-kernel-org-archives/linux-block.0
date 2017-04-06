@@ -1,71 +1,150 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:38750 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751556AbdDBNmM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2017 09:42:12 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@mellanox.com>,
-        Or Gerlitz <ogerlitz@mellanox.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH rfc 3/6] RDMA/core: expose affinity mappings per completion vector
-Date: Sun,  2 Apr 2017 16:41:29 +0300
-Message-Id: <1491140492-25703-4-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
-References: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:35844 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933187AbdDFNTS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 09:19:18 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: fstests@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 2/6] add: blockdev/001 check page-cache coherency after BLKDISCARD
+Date: Thu,  6 Apr 2017 17:19:06 +0400
+Message-Id: <1491484750-9164-3-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
+References: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This will allow ULPs to intelligently locate threads based
-on completion vector cpu affinity mappings. In case the
-driver does not expose a get_vector_affinity callout, return
-NULL so the caller can maintain a fallback logic.
+Regression test for fix https://lkml.org/lkml/2017/3/22/789
+Page cache should be dropped after successful discard
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- include/rdma/ib_verbs.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ common/config          |  1 +
+ tests/blockdev/001     | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/blockdev/001.out |  7 +++++
+ tests/blockdev/group   |  6 ++++
+ 4 files changed, 88 insertions(+)
+ create mode 100755 tests/blockdev/001
+ create mode 100644 tests/blockdev/001.out
+ create mode 100644 tests/blockdev/group
 
-diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
-index 0f1813c13687..d44b62791c64 100644
---- a/include/rdma/ib_verbs.h
-+++ b/include/rdma/ib_verbs.h
-@@ -2150,6 +2150,8 @@ struct ib_device {
- 	 */
- 	int (*get_port_immutable)(struct ib_device *, u8, struct ib_port_immutable *);
- 	void (*get_dev_fw_str)(struct ib_device *, char *str, size_t str_len);
-+	const struct cpumask *(*get_vector_affinity)(struct ib_device *ibdev,
-+						     int comp_vector);
- };
- 
- struct ib_client {
-@@ -3377,4 +3379,26 @@ void ib_drain_qp(struct ib_qp *qp);
- 
- int ib_resolve_eth_dmac(struct ib_device *device,
- 			struct ib_ah_attr *ah_attr);
+diff --git a/common/config b/common/config
+index cfe7913..aef842c 100644
+--- a/common/config
++++ b/common/config
+@@ -199,6 +199,7 @@ export LOGGER_PROG="`set_prog_path logger`"
+ export DBENCH_PROG="`set_prog_path dbench`"
+ export DMSETUP_PROG="`set_prog_path dmsetup`"
+ export WIPEFS_PROG="`set_prog_path wipefs`"
++export BLKDISCARD_PROG="`set_prog_path blkdiscard`"
+ export DUMP_PROG="`set_prog_path dump`"
+ export RESTORE_PROG="`set_prog_path restore`"
+ export LVM_PROG="`set_prog_path lvm`"
+diff --git a/tests/blockdev/001 b/tests/blockdev/001
+new file mode 100755
+index 0000000..53b0664
+--- /dev/null
++++ b/tests/blockdev/001
+@@ -0,0 +1,74 @@
++#! /bin/bash
++# FS QA Test 001
++#
++# Regression test for fix https://lkml.org/lkml/2017/3/22/789
++# Page cache should be dropped after successful discard
++#
++#-----------------------------------------------------------------------
++# Copyright (c) 2017 Dmitry Monakhov <dmonakhov@openvz.org>
++# All Rights Reserved.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it would be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write the Free Software Foundation,
++# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#-----------------------------------------------------------------------
++#
 +
-+/**
-+ * ib_get_vector_affinity - Get the affinity mappings of a given completion
-+ *   vector
-+ * @device:         the rdma device
-+ * @comp_vector:    index of completion vector
-+ *
-+ * Returns NULL on failure, otherwise a corresponding cpu map of the
-+ * completion vector (returns all-cpus map if the device driver doesn't
-+ * implement get_vector_affinity).
-+ */
-+static inline const struct cpumask *
-+ib_get_vector_affinity(struct ib_device *device, int comp_vector)
++seq=`basename $0`
++seqres=$RESULT_DIR/$seq
++echo "QA output created by $seq"
++
++here=`pwd`
++tmp=/tmp/$$
++status=1	# failure is the default!
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++
++_cleanup()
 +{
-+	if (comp_vector > device->num_comp_vectors ||
-+	    !device->get_vector_affinity)
-+		return NULL;
-+
-+	return device->get_vector_affinity(device, comp_vector);
-+
++	cd /
++	rm -f $tmp.*
 +}
 +
- #endif /* IB_VERBS_H */
++# get standard environment, filters and checks
++. ./common/rc
++. ./common/filter
++. ./common/scsi_debug
++
++# remove previous $seqres.full before test
++rm -f $seqres.full
++
++# real QA test starts here
++_supported_fs generic
++_supported_os Linux
++_require_scsi_debug
++_require_command $BLKDISCARD_PROG blkdiscard
++
++
++# Create virtual device with unmap_zeroes_data support
++dev=$(_get_scsi_debug_dev 512 512 0 32 "lbpws=1 lbpws10=1")
++
++# Initialize data with known pattern
++$XFS_IO_PROG -c "pwrite -S 0xaa -b 2M 0 32M -w" -d $dev >>$seqres.full 2>&1 || \
++    _fail "pwrite failed"
++
++# Fill page cache with dirty data
++$XFS_IO_PROG -c "pwrite -S 0xbb -b 2M 2M 10M" -f $dev >>$seqres.full 2>&1 || \
++    _fail "pwrite failed"
++
++$BLKDISCARD_PROG $dev
++# After device was fully discarded, read sould return all zeroes
++dd if=$dev bs=4k  2>>$seqres.full | hexdump
++dd if=$dev bs=4M iflag=direct 2>>$seqres.full | hexdump
++# success, all done
++status=0
++exit
+diff --git a/tests/blockdev/001.out b/tests/blockdev/001.out
+new file mode 100644
+index 0000000..0f81a92
+--- /dev/null
++++ b/tests/blockdev/001.out
+@@ -0,0 +1,7 @@
++QA output created by 001
++0000000 0000 0000 0000 0000 0000 0000 0000 0000
++*
++2000000
++0000000 0000 0000 0000 0000 0000 0000 0000 0000
++*
++2000000
+diff --git a/tests/blockdev/group b/tests/blockdev/group
+new file mode 100644
+index 0000000..bdfdcb9
+--- /dev/null
++++ b/tests/blockdev/group
+@@ -0,0 +1,6 @@
++# QA groups control file
++# Defines test groups and nominal group owners
++# - do not start group names with a digit
++# - comment line before each group is "new" description
++#
++001 rw blockdev
 -- 
-2.7.4
+2.9.3
