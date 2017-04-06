@@ -1,39 +1,72 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 6 Apr 2017 20:55:42 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
 	James Smart <james.smart@broadcom.com>,
 	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH 07/25] virtio_blk: don't use req->errors
-Message-ID: <20170406185541.GE8673@linux-x5ow.site>
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 07/25] virtio_blk: don't use req->errors
+Date: Thu,  6 Apr 2017 17:39:26 +0200
+Message-Id: <20170406153944.10058-8-hch@lst.de>
+In-Reply-To: <20170406153944.10058-1-hch@lst.de>
 References: <20170406153944.10058-1-hch@lst.de>
- <20170406153944.10058-8-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170406153944.10058-8-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 06, 2017 at 05:39:26PM +0200, Christoph Hellwig wrote:
-> Remove passing req->errors (which at that point is always 0) to
-> blk_mq_complete_requestq, and rely on the virtio status code for the
-blk_mq_complete_request ^
+Remove passing req->errors (which at that point is always 0) to
+blk_mq_complete_requestq, and rely on the virtio status code for the
+serial number passthrough request.
 
-> serial number passthrough request.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/virtio_blk.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-Otherwise looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index dbc4e80680b1..8378ad480f77 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -175,19 +175,15 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
+ static inline void virtblk_request_done(struct request *req)
+ {
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+-	int error = virtblk_result(vbr);
+ 
+ 	switch (req_op(req)) {
+ 	case REQ_OP_SCSI_IN:
+ 	case REQ_OP_SCSI_OUT:
+ 		virtblk_scsi_request_done(req);
+ 		break;
+-	case REQ_OP_DRV_IN:
+-		req->errors = (error != 0);
+-		break;
+ 	}
+ 
+-	blk_mq_end_request(req, error);
++	blk_mq_end_request(req, virtblk_result(vbr));
+ }
+ 
+ static void virtblk_done(struct virtqueue *vq)
+@@ -205,7 +201,7 @@ static void virtblk_done(struct virtqueue *vq)
+ 		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
+ 			struct request *req = blk_mq_rq_from_pdu(vbr);
+ 
+-			blk_mq_complete_request(req, req->errors);
++			blk_mq_complete_request(req, 0);
+ 			req_done = true;
+ 		}
+ 		if (unlikely(virtqueue_is_broken(vq)))
+@@ -311,7 +307,7 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ 		goto out;
+ 
+ 	blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
+-	err = req->errors ? -EIO : 0;
++	err = virtblk_result(blk_mq_rq_to_pdu(req));
+ out:
+ 	blk_put_request(req);
+ 	return err;
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
