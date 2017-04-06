@@ -1,20 +1,16 @@
-Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:43281 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753861AbdDFL2y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 07:28:54 -0400
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 01/25] remove the mg_disk driver
-Date: Thu,  6 Apr 2017 17:39:20 +0200
-Message-Id: <20170406153944.10058-2-hch@lst.de>
-In-Reply-To: <20170406153944.10058-1-hch@lst.de>
-References: <20170406153944.10058-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+To: axboe@fb.com, donari75@gmail.com
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH] remove the mg_disk driver
+Date: Thu,  6 Apr 2017 13:28:46 +0200
+Message-Id: <20170406112846.31078-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 This drivers was added in 2008, but as far as a I can tell we never had a
 single platform that actually registered resources for the platform driver.
