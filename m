@@ -1,22 +1,22 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49818 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:60325 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755379AbdDFInn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Apr 2017 04:43:43 -0400
-Date: Thu, 6 Apr 2017 16:43:18 +0800
-From: Ming Lei <minlei@redhat.com>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: linux-block@vger.kernel.org, kernel-team@fb.com
+        id S933036AbdDFJEa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Apr 2017 05:04:30 -0400
 Subject: Re: [RFC PATCH] loop: set queue logical block size
-Message-ID: <20170406084313.GA4197@ming.t460p>
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
 References: <07d6b9266284b98aa3a4706062bd135275220d38.1491466688.git.osandov@fb.com>
+Cc: Ming Lei <minlei@redhat.com>, kernel-team@fb.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <ba593363-672f-9d8b-986f-4eb9a11ab135@suse.de>
+Date: Thu, 6 Apr 2017 10:52:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <07d6b9266284b98aa3a4706062bd135275220d38.1491466688.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Apr 06, 2017 at 01:19:45AM -0700, Omar Sandoval wrote:
+On 04/06/2017 10:19 AM, Omar Sandoval wrote:
 > From: Omar Sandoval <osandov@fb.com>
 > 
 > The request queue created when we create a loop device has the default
@@ -49,10 +49,22 @@ On Thu, Apr 06, 2017 at 01:19:45AM -0700, Omar Sandoval wrote:
 >  	set_blocksize(bdev, lo_blocksize);
 >  
 >  	lo->lo_state = Lo_bound;
+> 
+Gnaa.
 
-Looks fine!
+I've tried so change exactly this by my patchset titled 'loop: enable
+different logical blocksizes'.
+And I even got agreement from Jens to merge it once it got another
+review. Which, of course, no-one did.
 
-Reviewed-by: Ming Lei <minlei@redhat.com>
+Care to review that instead so that it finally can go in?
 
-Thanks,
-Ming
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
