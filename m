@@ -1,234 +1,261 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd-general@lists.sourceforge.net,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 10/12] nbd: add a status netlink command
-Date: Thu,  6 Apr 2017 17:02:05 -0400
-Message-Id: <1491512527-4286-11-git-send-email-jbacik@fb.com>
-In-Reply-To: <1491512527-4286-1-git-send-email-jbacik@fb.com>
-References: <1491512527-4286-1-git-send-email-jbacik@fb.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:33751 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756093AbdDFNTU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 09:19:20 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: fstests@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 4/6] new: blockdev/003 basic blockdev T10-DIF-TYPE1 integrity checks
+Date: Thu,  6 Apr 2017 17:19:08 +0400
+Message-Id: <1491484750-9164-5-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
+References: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Allow users to query the status of existing nbd devices.  Right now this
-only returns whether or not the device is connected, but could be
-extended in the future to include more information.
+Test create virtual block device via lio-targed infastructure and
+perform basic IO operations with data corruption detection.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Temprorally mark is as dangerous, because currently it trigger BUG_ON
+inside blkdev_issue_flush
+
+BTW: I use 'dd' to test read from corrupted image instead of xfs_io
+because even if pread failed, xfs_io still exit with success, BUG?
+
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- drivers/block/nbd.c              | 108 +++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/nbd-netlink.h |  25 +++++++++
- 2 files changed, 133 insertions(+)
+ tests/blockdev/003     | 164 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/blockdev/003.out |  39 ++++++++++++
+ tests/blockdev/group   |   1 +
+ 3 files changed, 204 insertions(+)
+ create mode 100755 tests/blockdev/003
+ create mode 100644 tests/blockdev/003.out
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fd3d535..e1289d0 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -45,6 +45,7 @@
- 
- static DEFINE_IDR(nbd_index_idr);
- static DEFINE_MUTEX(nbd_index_mutex);
-+static int nbd_total_devices = 0;
- 
- struct nbd_sock {
- 	struct socket *sock;
-@@ -130,6 +131,7 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd);
- static void nbd_dev_dbg_close(struct nbd_device *nbd);
- static void nbd_config_put(struct nbd_device *nbd);
- static void nbd_connect_reply(struct genl_info *info, int index);
-+static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info);
- static void nbd_dead_link_work(struct work_struct *work);
- 
- static inline struct device *nbd_to_dev(struct nbd_device *nbd)
-@@ -1458,6 +1460,7 @@ static int nbd_dev_add(int index)
- 	sprintf(disk->disk_name, "nbd%d", index);
- 	nbd_reset(nbd);
- 	add_disk(disk);
-+	nbd_total_devices++;
- 	return index;
- 
- out_free_tags:
-@@ -1494,12 +1497,22 @@ static struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
- 	[NBD_ATTR_CLIENT_FLAGS]		=	{ .type = NLA_U64 },
- 	[NBD_ATTR_SOCKETS]		=	{ .type = NLA_NESTED},
- 	[NBD_ATTR_DEAD_CONN_TIMEOUT]	=	{ .type = NLA_U64 },
-+	[NBD_ATTR_DEVICE_LIST]		=	{ .type = NLA_NESTED},
- };
- 
- static struct nla_policy nbd_sock_policy[NBD_SOCK_MAX + 1] = {
- 	[NBD_SOCK_FD]			=	{ .type = NLA_U32 },
- };
- 
-+/* We don't use this right now since we don't parse the incoming list, but we
-+ * still want it here so userspace knows what to expect.
-+ */
-+static struct nla_policy __attribute__((unused))
-+nbd_device_policy[NBD_DEVICE_ATTR_MAX + 1] = {
-+	[NBD_DEVICE_INDEX]		=	{ .type = NLA_U32 },
-+	[NBD_DEVICE_CONNECTED]		=	{ .type = NLA_U8 },
-+};
+diff --git a/tests/blockdev/003 b/tests/blockdev/003
+new file mode 100755
+index 0000000..8f31f0d
+--- /dev/null
++++ b/tests/blockdev/003
+@@ -0,0 +1,164 @@
++#! /bin/bash
++# FS QA Test 003
++#
++# Check basic T10-DIF integrity features for a block device
++#
++# DIF/DIX TYPE: T10-DIF-TYPE1-CRC
++# Kernel docs: Documentation/blockdev/data-integrity.txt
++#-----------------------------------------------------------------------
++# Copyright (c) 2017 Dmitry Monakhov <dmonakhov@openvz.org>
++# All Rights Reserved.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it would be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write the Free Software Foundation,
++# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#-----------------------------------------------------------------------
++#
 +
- static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nbd_device *nbd = NULL;
-@@ -1765,6 +1778,11 @@ static const struct genl_ops nbd_connect_genl_ops[] = {
- 		.policy	= nbd_attr_policy,
- 		.doit	= nbd_genl_reconfigure,
- 	},
-+	{
-+		.cmd	= NBD_CMD_STATUS,
-+		.policy	= nbd_attr_policy,
-+		.doit	= nbd_genl_status,
-+	},
- };
- 
- static const struct genl_multicast_group nbd_mcast_grps[] = {
-@@ -1783,6 +1801,96 @@ static struct genl_family nbd_genl_family __ro_after_init = {
- 	.n_mcgrps	= ARRAY_SIZE(nbd_mcast_grps),
- };
- 
-+static int populate_nbd_status(struct nbd_device *nbd, struct sk_buff *reply)
++seq=`basename $0`
++seqres=$RESULT_DIR/$seq
++echo "QA output created by $seq"
++
++here=`pwd`
++tmp=/tmp/$$
++status=1	# failure is the default!
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++
++_cleanup()
 +{
-+	struct nlattr *dev_opt;
-+	u8 connected = 0;
-+	int ret;
-+
-+	/* This is a little racey, but for status it's ok.  The
-+	 * reason we don't take a ref here is because we can't
-+	 * take a ref in the index == -1 case as we would need
-+	 * to put under the nbd_index_mutex, which could
-+	 * deadlock if we are configured to remove ourselves
-+	 * once we're disconnected.
-+	 */
-+	if (refcount_read(&nbd->config_refs))
-+		connected = 1;
-+	dev_opt = nla_nest_start(reply, NBD_DEVICE_ITEM);
-+	if (!dev_opt)
-+		return -EMSGSIZE;
-+	ret = nla_put_u32(reply, NBD_DEVICE_INDEX, nbd->index);
-+	if (ret)
-+		return -EMSGSIZE;
-+	ret = nla_put_u8(reply, NBD_DEVICE_CONNECTED,
-+			 connected);
-+	if (ret)
-+		return -EMSGSIZE;
-+	nla_nest_end(reply, dev_opt);
-+	return 0;
++	cd /
++	rm -f $tmp.*
++	_liotgt_cleanup
++	rm -rf $TEST_DIR/$$
 +}
 +
-+static int status_cb(int id, void *ptr, void *data)
++# get standard environment, filters and checks
++. ./common/rc
++. ./common/filter
++. ./common/liotarget
++
++# remove previous $seqres.full before test
++rm -f $seqres.full
++
++# real QA test starts here
++
++# Modify as appropriate.
++_supported_fs generic
++_supported_os Linux
++_require_test
++_require_liotarget
++
++mkdir -p $TEST_DIR/$$ || _fail "Can not make test dir"
++
++# One full test suite
++_run_one()
 +{
-+	struct nbd_device *nbd = ptr;
-+	return populate_nbd_status(nbd, (struct sk_buff *)data);
++	local img_name=$1
++
++	echo "Run: $img_name"
++	echo "T0: Test basic IO"
++	$XFS_IO_PROG -c "pwrite -S 0xa0 -b 4M 0 16M" -d $dev >>$seqres.full 2>&1 || \
++	    _fail "pwrite failed"
++
++	$XFS_IO_PROG -c "pwrite -S 0xa3 -b 1k -V8  20M 32k" -d $dev >>$seqres.full 2>&1 || \
++	    _fail "pwrite failed"
++
++	$XFS_IO_PROG -c "pwrite -S 0xa2 -b 1k -V8  2M 32k" -f $dev >>$seqres.full 2>&1 || \
++	    _fail "pwrite failed"
++
++	$XFS_IO_PROG -c "pwrite -S 0xa1 -b 4k  1536000 8k" -f $dev >>$seqres.full 2>&1 || \
++	    _fail "pwrite failed"
++
++	$XFS_IO_PROG -c "fsync" -d $dev >>$seqres.full 2>&1 || _fail "fsync failed"
++
++	echo "Check that buffered IO"
++	dd if=$dev bs=4k  2>>$seqres.full | md5sum
++	echo "Check that direct IO"
++	# Small requests will not being splitted
++	dd if=$dev bs=64k iflag=direct 2>>$seqres.full | md5sum
++	# Big requests may be splitted on flight, but result MUST be the same.
++	dd if=$dev bs=4M iflag=direct 2>>$seqres.full | md5sum
++
++	echo "Check csum corruption detection"
++	# LIO-fileio store t10 DIF data in separate file ${IMG}.protection
++	# struct t10_pi_tuple {
++	#	__be16 guard_tag;       /* Checksum */
++	#       __be16 app_tag;         /* Opaque storage */
++	#       __be32 ref_tag;         /* Target LBA or indirect LBA */
++	#}
++	# Play with 3000'th sector -> t10_pi_tuple offset == 3000 * 8 == 24000
++	#
++	echo "T1: Corrupt guard_tag, next read should fail"
++	$XFS_IO_PROG -c "pwrite -S 0xde -b2 24000 2 -w" \
++		     -f $TEST_DIR/$$/$img_name.protection >>$seqres.full 2>&1
++	dd if=$dev of=/dev/null bs=1M count=2 iflag=direct >>$seqres.full 2>&1 &&
++	    _fail "read should fail on 3000'th sector"
++
++	echo "T2: Check that unaffected blocks are still readable"
++	dd if=$dev of=/dev/null bs=1M count=1 iflag=direct >>$seqres.full 2>&1 || _fail "read failed"
++
++	echo "T3: Rewrite corrupted sector and check that read works"
++	$XFS_IO_PROG -c "pwrite -S 0xa1 -b 4k 1536000 4k" -d $dev >>$seqres.full 2>&1 || \
++	    _fail "pwrite failed"
++	dd if=$dev bs=2M count=1 iflag=direct >>$seqres.full 2>&1 || _fail "read failed"
++
++	echo "T4: Corrupt app_tag, should not affect read"
++	$XFS_IO_PROG -c "pwrite -S 0xde -b2 24002 2 -w" \
++		     -f $TEST_DIR/$$/$img_name.protection >>$seqres.full 2>&1
++	dd if=$dev bs=2M count=1 iflag=direct >>$seqres.full 2>&1 || _fail "read failed"
++
++	echo "T5: Corrupt ref_tag, next read should fail"
++	$XFS_IO_PROG -c "pwrite -S 0xde -b4 24004 4 -w"  \
++		     $TEST_DIR/$$/$img_name.protection  >>$seqres.full 2>&1
++	dd if=$dev of=/dev/null bs=1M count=2 iflag=direct >>$seqres.full 2>&1 &&
++	    _fail "read should fail on 3000'th sector"
++
++	echo "T6: Check that unaffected blocks are still readable"
++	dd if=$dev of=/dev/null bs=1M count=1 iflag=direct >>$seqres.full 2>&1 || _fail "read failed"
++
++	echo "T7: Rewrite corrupted sector and check that read works"
++	$XFS_IO_PROG -c "pwrite -S 0xa1 -b 4k 1536000 4k" -d $dev >>$seqres.full 2>&1 || \
++	    _fail "pwrite failed"
++
++	echo "Check that buffered and direct read works"
++	dd if=$dev bs=4k  2>>$seqres.full | md5sum
++	# Small requests will not being splitted
++	dd if=$dev bs=64k iflag=direct 2>>$seqres.full | md5sum
++	# Big requests may be splitted on flight, but result MUST be the same.
++	dd if=$dev bs=4M iflag=direct 2>>$seqres.full | md5sum
 +}
 +
-+static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct nlattr *dev_list;
-+	struct sk_buff *reply;
-+	void *reply_head;
-+	size_t msg_size;
-+	int index = -1;
-+	int ret = -ENOMEM;
++# Create virtual scsi target with internal csum verification
++name=dif-type1-w
++cfg_path=$(_liotgt_create_fileio $name $TEST_DIR/$$/$name 32M)
 +
-+	if (info->attrs[NBD_ATTR_INDEX])
-+		index = nla_get_u32(info->attrs[NBD_ATTR_INDEX]);
++_liotgt_set_attribute $cfg_path  pi_prot_type 1
++_liotgt_set_attribute $cfg_path  pi_prot_format 1
++_liotgt_set_attribute $cfg_path  pi_prot_verify 1
++dev=$(_liotgt_attach_target /backstores/fileio/$name)
++_run_one $name
 +
-+	mutex_lock(&nbd_index_mutex);
++# Create virtual scsi target w/o internal csum verification,
++# check that core blk_integrity_profile->verify_fn works
++#
++name=dif-type1-wo
++cfg_path=$(_liotgt_create_fileio $name $TEST_DIR/$$/$name 32M)
 +
-+	msg_size = nla_total_size(nla_attr_size(sizeof(u32)) +
-+				  nla_attr_size(sizeof(u8)));
-+	msg_size *= (index == -1) ? nbd_total_devices : 1;
++_liotgt_set_attribute $cfg_path  pi_prot_type 1
++_liotgt_set_attribute $cfg_path  pi_prot_format 1
++_liotgt_set_attribute $cfg_path  pi_prot_verify 0
++dev=$(_liotgt_attach_target /backstores/fileio/$name)
++_run_one $name
 +
-+	reply = genlmsg_new(msg_size, GFP_KERNEL);
-+	if (!reply)
-+		goto out;
-+	reply_head = genlmsg_put_reply(reply, info, &nbd_genl_family, 0,
-+				       NBD_CMD_STATUS);
-+	if (!reply_head) {
-+		nlmsg_free(reply);
-+		goto out;
-+	}
-+
-+	dev_list = nla_nest_start(reply, NBD_ATTR_DEVICE_LIST);
-+	if (index == -1) {
-+		ret = idr_for_each(&nbd_index_idr, &status_cb, reply);
-+		if (ret) {
-+			nlmsg_free(reply);
-+			goto out;
-+		}
-+	} else {
-+		struct nbd_device *nbd;
-+		nbd = idr_find(&nbd_index_idr, index);
-+		if (nbd) {
-+			ret = populate_nbd_status(nbd, reply);
-+			if (ret) {
-+				nlmsg_free(reply);
-+				goto out;
-+			}
-+		}
-+	}
-+	nla_nest_end(reply, dev_list);
-+	genlmsg_end(reply, reply_head);
-+	genlmsg_reply(reply, info);
-+	ret = 0;
-+out:
-+	mutex_unlock(&nbd_index_mutex);
-+	return ret;
-+}
-+
- static void nbd_connect_reply(struct genl_info *info, int index)
- {
- 	struct sk_buff *skb;
-diff --git a/include/uapi/linux/nbd-netlink.h b/include/uapi/linux/nbd-netlink.h
-index c2209c75..6f7ca3d 100644
---- a/include/uapi/linux/nbd-netlink.h
-+++ b/include/uapi/linux/nbd-netlink.h
-@@ -33,11 +33,35 @@ enum {
- 	NBD_ATTR_CLIENT_FLAGS,
- 	NBD_ATTR_SOCKETS,
- 	NBD_ATTR_DEAD_CONN_TIMEOUT,
-+	NBD_ATTR_DEVICE_LIST,
- 	__NBD_ATTR_MAX,
- };
- #define NBD_ATTR_MAX (__NBD_ATTR_MAX - 1)
- 
- /*
-+ * This is the format for multiple devices with NBD_ATTR_DEVICE_LIST
-+ *
-+ * [NBD_ATTR_DEVICE_LIST]
-+ *   [NBD_DEVICE_ITEM]
-+ *     [NBD_DEVICE_INDEX]
-+ *     [NBD_DEVICE_CONNECTED]
-+ */
-+enum {
-+	NBD_DEVICE_ITEM_UNSPEC,
-+	NBD_DEVICE_ITEM,
-+	__NBD_DEVICE_ITEM_MAX,
-+};
-+#define NBD_DEVICE_ITEM_MAX (__NBD_DEVICE_ITEM_MAX - 1)
-+
-+enum {
-+	NBD_DEVICE_UNSPEC,
-+	NBD_DEVICE_INDEX,
-+	NBD_DEVICE_CONNECTED,
-+	__NBD_DEVICE_MAX,
-+};
-+#define NBD_DEVICE_ATTR_MAX (__NBD_DEVICE_MAX - 1)
-+
-+/*
-  * This is the format for multiple sockets with NBD_ATTR_SOCKETS
-  *
-  * [NBD_ATTR_SOCKETS]
-@@ -66,6 +90,7 @@ enum {
- 	NBD_CMD_DISCONNECT,
- 	NBD_CMD_RECONFIGURE,
- 	NBD_CMD_LINK_DEAD,
-+	NBD_CMD_STATUS,
- 	__NBD_CMD_MAX,
- };
- #define NBD_CMD_MAX	(__NBD_CMD_MAX - 1)
++status=0
++exit
+diff --git a/tests/blockdev/003.out b/tests/blockdev/003.out
+new file mode 100644
+index 0000000..be2efbb
+--- /dev/null
++++ b/tests/blockdev/003.out
+@@ -0,0 +1,39 @@
++QA output created by 003
++Run: dif-type1-w
++T0: Test basic IO
++Check that buffered IO
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++Check that direct IO
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++Check csum corruption detection
++T1: Corrupt guard_tag, next read should fail
++T2: Check that unaffected blocks are still readable
++T3: Rewrite corrupted sector and check that read works
++T4: Corrupt app_tag, should not affect read
++T5: Corrupt ref_tag, next read should fail
++T6: Check that unaffected blocks are still readable
++T7: Rewrite corrupted sector and check that read works
++Check that buffered and direct read works
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++Run: dif-type1-wo
++T0: Test basic IO
++Check that buffered IO
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++Check that direct IO
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++Check csum corruption detection
++T1: Corrupt guard_tag, next read should fail
++T2: Check that unaffected blocks are still readable
++T3: Rewrite corrupted sector and check that read works
++T4: Corrupt app_tag, should not affect read
++T5: Corrupt ref_tag, next read should fail
++T6: Check that unaffected blocks are still readable
++T7: Rewrite corrupted sector and check that read works
++Check that buffered and direct read works
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++f18a6c9b9d69ff8ed61daa62dfab4341  -
++f18a6c9b9d69ff8ed61daa62dfab4341  -
+diff --git a/tests/blockdev/group b/tests/blockdev/group
+index 0b511f3..e5ce864 100644
+--- a/tests/blockdev/group
++++ b/tests/blockdev/group
+@@ -5,3 +5,4 @@
+ #
+ 001 rw blockdev
+ 002 rw blockdev liotarget
++003 rw blockdev liotarget integrity dangerous
 -- 
-2.7.4
+2.9.3
