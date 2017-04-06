@@ -1,64 +1,50 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v5 07/10] blk-mq: Make blk_flags_show() callers append a newline character
-Date: Tue, 25 Apr 2017 13:37:42 -0700
-Message-ID: <20170425203745.19946-8-bart.vanassche@sandisk.com>
-In-Reply-To: <20170425203745.19946-1-bart.vanassche@sandisk.com>
-References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 20/25] floppy: switch from req->errors to req->error_count
+Date: Thu,  6 Apr 2017 17:39:39 +0200
+Message-Id: <20170406153944.10058-21-hch@lst.de>
+In-Reply-To: <20170406153944.10058-1-hch@lst.de>
+References: <20170406153944.10058-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes it possible
-to produce a single line of output with multiple flag-to-name
-translations.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-debugfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/block/floppy.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 1132be4e9c1c..ccc7b0f71230 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -60,7 +60,6 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 		else
- 			seq_printf(m, "%d", i);
- 	}
--	seq_puts(m, "\n");
- 	return 0;
- }
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index ce102ec47ef2..60d4c7653178 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -2805,8 +2805,10 @@ static int set_next_request(void)
+ 			fdc_queue = 0;
+ 		if (q) {
+ 			current_req = blk_fetch_request(q);
+-			if (current_req)
++			if (current_req) {
++				current_req->error_count = 0;
+ 				break;
++			}
+ 		}
+ 	} while (fdc_queue != old_pos);
  
-@@ -102,6 +101,7 @@ static int blk_queue_flags_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, q->queue_flags, blk_queue_flag_name,
- 		       ARRAY_SIZE(blk_queue_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -193,6 +193,7 @@ static int hctx_state_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, hctx->state, hctx_state_name,
- 		       ARRAY_SIZE(hctx_state_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -236,6 +237,7 @@ static int hctx_flags_show(struct seq_file *m, void *v)
- 	blk_flags_show(m,
- 		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
- 		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
+@@ -2866,7 +2868,7 @@ static void redo_fd_request(void)
+ 		_floppy = floppy_type + DP->autodetect[DRS->probed_format];
+ 	} else
+ 		probing = 0;
+-	errors = &(current_req->errors);
++	errors = &(current_req->error_count);
+ 	tmp = make_raw_rw_request();
+ 	if (tmp < 2) {
+ 		request_done(tmp);
 -- 
-2.12.2
+2.11.0
