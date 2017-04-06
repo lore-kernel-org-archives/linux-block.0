@@ -1,52 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:43706 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753722AbdDFPlC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 11:41:02 -0400
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 6 Apr 2017 11:22:52 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-        James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 23/25] pd: remove bogus check for req->errors
-Date: Thu,  6 Apr 2017 17:39:42 +0200
-Message-Id: <20170406153944.10058-24-hch@lst.de>
-In-Reply-To: <20170406153944.10058-1-hch@lst.de>
-References: <20170406153944.10058-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+	Eric Sandeen <sandeen@sandeen.net>,
+	Christoph Hellwig <hch@infradead.org>,
+	Dmitry Monakhov <dmonakhov@openvz.org>, fstests@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/6] RFC add blkdev tests v2
+Message-ID: <20170406182252.GA31688@infradead.org>
+References: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
+ <20170406135524.GA12230@infradead.org>
+ <74f90aa0-bb3f-ba74-cdbc-d6e96be51376@kernel.dk>
+ <20170406144741.GA27776@infradead.org>
+ <bb45e36c-93af-9565-1dc0-a4850aec393c@kernel.dk>
+ <20170406152000.GF3768@linux-x5ow.site>
+ <b7b785ef-21a6-19f6-07c6-5dcc3053f274@sandeen.net>
+ <20170406181555.GA8215@linux-x5ow.site>
+ <b58871ff-2b34-acce-318c-479dccf4d596@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b58871ff-2b34-acce-318c-479dccf4d596@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-The driver never sets req->errors
----
- drivers/block/paride/pd.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+On Thu, Apr 06, 2017 at 12:19:46PM -0600, Jens Axboe wrote:
+> We share that goal. The block related tests will have _fewer_ dependencies.
+> And it'll also be Linux only, so we don't have to worry about cross platform.
 
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index 82c6d02193ae..3b0ab214fe74 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -739,7 +739,6 @@ static int pd_special_command(struct pd_unit *disk,
- 		      enum action (*func)(struct pd_unit *disk))
- {
- 	struct request *rq;
--	int err = 0;
- 
- 	rq = blk_get_request(disk->gd->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
- 	if (IS_ERR(rq))
-@@ -748,10 +747,9 @@ static int pd_special_command(struct pd_unit *disk,
- 	rq->special = func;
- 
- 	blk_execute_rq(disk->gd->queue, disk->gd, rq, 0);
--	err = req->errors ? -EIO : 0;
- 
- 	blk_put_request(rq);
--	return err;
-+	return 0;
- }
- 
- /* kernel glue structures */
--- 
-2.11.0
+xfstests effectively has been Linux-only for many years.  We've just
+been to lazy to remove the remaining IRIX bits..
