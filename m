@@ -1,35 +1,70 @@
-Return-Path: <dledford@redhat.com>
-Message-ID: <1493419685.3041.174.camel@redhat.com>
-Subject: Re: [PATCH v2 3/6] RDMA/core: expose affinity mappings per
- completion vector
-From: Doug Ledford <dledford@redhat.com>
-To: Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+Return-Path: <sagi@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
 	linux-rdma@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>, Or Gerlitz <ogerlitz@mellanox.com>,
-	Saeed Mahameed <saeedm@mellanox.com>, Leon Romanovsky <leonro@mellanox.com>
-Date: Fri, 28 Apr 2017 18:48:05 -0400
-In-Reply-To: <1491474998-16423-4-git-send-email-sagi@grimberg.me>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Saeed Mahameed <saeedm@mellanox.com>,
+	Leon Romanovsky <leonro@mellanox.com>
+Subject: [PATCH v2 3/6] RDMA/core: expose affinity mappings per completion vector
+Date: Thu,  6 Apr 2017 13:36:35 +0300
+Message-Id: <1491474998-16423-4-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
 References: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
-	 <1491474998-16423-4-git-send-email-sagi@grimberg.me>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-04-06 at 13:36 +0300, Sagi Grimberg wrote:
-> This will allow ULPs to intelligently locate threads based
-> on completion vector cpu affinity mappings. In case the
-> driver does not expose a get_vector_affinity callout, return
-> NULL so the caller can maintain a fallback logic.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-> 
+This will allow ULPs to intelligently locate threads based
+on completion vector cpu affinity mappings. In case the
+driver does not expose a get_vector_affinity callout, return
+NULL so the caller can maintain a fallback logic.
 
-Acked-by: Doug Ledford <dledford@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ include/rdma/ib_verbs.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
+diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
+index 0f1813c13687..d44b62791c64 100644
+--- a/include/rdma/ib_verbs.h
++++ b/include/rdma/ib_verbs.h
+@@ -2150,6 +2150,8 @@ struct ib_device {
+ 	 */
+ 	int (*get_port_immutable)(struct ib_device *, u8, struct ib_port_immutable *);
+ 	void (*get_dev_fw_str)(struct ib_device *, char *str, size_t str_len);
++	const struct cpumask *(*get_vector_affinity)(struct ib_device *ibdev,
++						     int comp_vector);
+ };
+ 
+ struct ib_client {
+@@ -3377,4 +3379,26 @@ void ib_drain_qp(struct ib_qp *qp);
+ 
+ int ib_resolve_eth_dmac(struct ib_device *device,
+ 			struct ib_ah_attr *ah_attr);
++
++/**
++ * ib_get_vector_affinity - Get the affinity mappings of a given completion
++ *   vector
++ * @device:         the rdma device
++ * @comp_vector:    index of completion vector
++ *
++ * Returns NULL on failure, otherwise a corresponding cpu map of the
++ * completion vector (returns all-cpus map if the device driver doesn't
++ * implement get_vector_affinity).
++ */
++static inline const struct cpumask *
++ib_get_vector_affinity(struct ib_device *device, int comp_vector)
++{
++	if (comp_vector > device->num_comp_vectors ||
++	    !device->get_vector_affinity)
++		return NULL;
++
++	return device->get_vector_affinity(device, comp_vector);
++
++}
++
+ #endif /* IB_VERBS_H */
 -- 
-Doug Ledford <dledford@redhat.com>
-    GPG KeyID: B826A3330E572FDD
-   
-Key fingerprint = AE6B 1BDA 122B 23B4 265B  1274 B826 A333 0E57 2FDD
+2.7.4
