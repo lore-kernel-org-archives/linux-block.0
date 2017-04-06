@@ -1,46 +1,94 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:50797 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752494AbdDFSvG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Apr 2017 14:51:06 -0400
-Date: Thu, 6 Apr 2017 20:50:53 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
-        James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH 03/25] nvme-fc: fix status code handling in
- nvme_fc_fcpio_done
-Message-ID: <20170406185053.GC8673@linux-x5ow.site>
+Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 03/25] nvme-fc: fix status code handling in nvme_fc_fcpio_done
+Date: Thu,  6 Apr 2017 17:39:22 +0200
+Message-Id: <20170406153944.10058-4-hch@lst.de>
+In-Reply-To: <20170406153944.10058-1-hch@lst.de>
 References: <20170406153944.10058-1-hch@lst.de>
- <20170406153944.10058-4-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170406153944.10058-4-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 06, 2017 at 05:39:22PM +0200, Christoph Hellwig wrote:
-> nvme_complete_async_event expects the little endian status code
-> including the phase bit, and a new completion handler I plan to
-> introduce will do so as well.
-> 
-> Change the status variable into the little endian format with the
-> phase bit used in the NVMe CQE to fix / enable this.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+nvme_complete_async_event expects the little endian status code
+including the phase bit, and a new completion handler I plan to
+introduce will do so as well.
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Change the status variable into the little endian format with the
+phase bit used in the NVMe CQE to fix / enable this.
 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/fc.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index fc42172c796a..aad7f9c0be32 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1147,7 +1147,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 	struct nvme_fc_ctrl *ctrl = op->ctrl;
+ 	struct nvme_fc_queue *queue = op->queue;
+ 	struct nvme_completion *cqe = &op->rsp_iu.cqe;
+-	u16 status = NVME_SC_SUCCESS;
++	__le16 status = cpu_to_le16(NVME_SC_SUCCESS << 1);
+ 
+ 	/*
+ 	 * WARNING:
+@@ -1182,9 +1182,9 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 				sizeof(op->rsp_iu), DMA_FROM_DEVICE);
+ 
+ 	if (atomic_read(&op->state) == FCPOP_STATE_ABORTED)
+-		status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
++		status = cpu_to_le16((NVME_SC_ABORT_REQ | NVME_SC_DNR) << 1);
+ 	else if (freq->status)
+-		status = NVME_SC_FC_TRANSPORT_ERROR;
++		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 
+ 	/*
+ 	 * For the linux implementation, if we have an unsuccesful
+@@ -1212,7 +1212,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 		 */
+ 		if (freq->transferred_length !=
+ 			be32_to_cpu(op->cmd_iu.data_len)) {
+-			status = NVME_SC_FC_TRANSPORT_ERROR;
++			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
+ 		}
+ 		op->nreq.result.u64 = 0;
+@@ -1229,15 +1229,15 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 					freq->transferred_length ||
+ 			     op->rsp_iu.status_code ||
+ 			     op->rqno != le16_to_cpu(cqe->command_id))) {
+-			status = NVME_SC_FC_TRANSPORT_ERROR;
++			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
+ 		}
+ 		op->nreq.result = cqe->result;
+-		status = le16_to_cpu(cqe->status) >> 1;
++		status = cqe->status;
+ 		break;
+ 
+ 	default:
+-		status = NVME_SC_FC_TRANSPORT_ERROR;
++		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 		goto done;
+ 	}
+ 
+@@ -1249,7 +1249,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 		return;
+ 	}
+ 
+-	blk_mq_complete_request(rq, status);
++	blk_mq_complete_request(rq, le16_to_cpu(status) >> 1);
+ }
+ 
+ static int
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
