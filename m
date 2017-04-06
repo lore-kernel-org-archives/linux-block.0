@@ -1,276 +1,132 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:15285 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754506AbdDQTPj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2017 15:15:39 -0400
-Subject: [resend PATCH v2 12/33] dm: teach dm-targets to use a dax_device +
- dax_operations
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Mike Snitzer <snitzer@redhat.com>, Toshi Kani <toshi.kani@hpe.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-fsdevel@vger.kernel.org, hch@lst.de
-Date: Mon, 17 Apr 2017 12:09:54 -0700
-Message-ID: <149245619411.10206.663478007606647587.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:35863 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933835AbdDFNTW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 09:19:22 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: fstests@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 5/6] new: blockdev/004 Check that live fs survives blkdev page truncation
+Date: Thu,  6 Apr 2017 17:19:09 +0400
+Message-Id: <1491484750-9164-6-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
+References: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Arrange for dm to lookup the dax services available from member devices.
-Update the dax-capable targets, linear and stripe, to route dax
-operations to the underlying device. Changes the target-internal
-->direct_access() method to more closely align with the dax_operations
-->direct_access() calling convention.
-
-Cc: Toshi Kani <toshi.kani@hpe.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- drivers/md/dm-linear.c        |   27 +++++++++++++--------------
- drivers/md/dm-snap.c          |    6 +++---
- drivers/md/dm-stripe.c        |   29 ++++++++++++++---------------
- drivers/md/dm-target.c        |    6 +++---
- drivers/md/dm.c               |   16 ++++++----------
- include/linux/device-mapper.h |    7 ++++---
- 6 files changed, 43 insertions(+), 48 deletions(-)
+ tests/blockdev/004     | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/blockdev/004.out |  2 ++
+ tests/blockdev/group   |  1 +
+ 3 files changed, 84 insertions(+)
+ create mode 100755 tests/blockdev/004
+ create mode 100644 tests/blockdev/004.out
 
-diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-index 4788b0b989a9..c5a52f4dae81 100644
---- a/drivers/md/dm-linear.c
-+++ b/drivers/md/dm-linear.c
-@@ -9,6 +9,7 @@
- #include <linux/init.h>
- #include <linux/blkdev.h>
- #include <linux/bio.h>
-+#include <linux/dax.h>
- #include <linux/slab.h>
- #include <linux/device-mapper.h>
- 
-@@ -141,22 +142,20 @@ static int linear_iterate_devices(struct dm_target *ti,
- 	return fn(ti, lc->dev, lc->start, ti->len, data);
- }
- 
--static long linear_direct_access(struct dm_target *ti, sector_t sector,
--				 void **kaddr, pfn_t *pfn, long size)
-+static long linear_dax_direct_access(struct dm_target *ti, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn)
- {
-+	long ret;
- 	struct linear_c *lc = ti->private;
- 	struct block_device *bdev = lc->dev->bdev;
--	struct blk_dax_ctl dax = {
--		.sector = linear_map_sector(ti, sector),
--		.size = size,
--	};
--	long ret;
--
--	ret = bdev_direct_access(bdev, &dax);
--	*kaddr = dax.addr;
--	*pfn = dax.pfn;
--
--	return ret;
-+	struct dax_device *dax_dev = lc->dev->dax_dev;
-+	sector_t dev_sector, sector = pgoff * PAGE_SECTORS;
+diff --git a/tests/blockdev/004 b/tests/blockdev/004
+new file mode 100755
+index 0000000..decb4ad
+--- /dev/null
++++ b/tests/blockdev/004
+@@ -0,0 +1,81 @@
++#! /bin/bash
++# FS QA Test 004
++#
++# Check that live filesystem survives blockdev pagecache truncation.
++# blkdev page cache can be truncated due to various reasons
++# 1)ioctl: BLKDISCARD
++# 2)blkdev: falloc{ FALLOC_FL_ZERO_RANGE, FALLOC_FL_PUNCH_HOLE }
++# 3)nbd: NBD_CLEAR_SOCK
++#
++#-----------------------------------------------------------------------
++# Copyright (c) 2017 Dmitry Monakhov <dmonakhov@openvz.org>
++# All Rights Reserved.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it would be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write the Free Software Foundation,
++# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#-----------------------------------------------------------------------
++#
 +
-+	dev_sector = linear_map_sector(ti, sector);
-+	ret = bdev_dax_pgoff(bdev, dev_sector, nr_pages * PAGE_SIZE, &pgoff);
-+	if (ret)
-+		return ret;
-+	return dax_direct_access(dax_dev, pgoff, nr_pages, kaddr, pfn);
- }
- 
- static struct target_type linear_target = {
-@@ -169,7 +168,7 @@ static struct target_type linear_target = {
- 	.status = linear_status,
- 	.prepare_ioctl = linear_prepare_ioctl,
- 	.iterate_devices = linear_iterate_devices,
--	.direct_access = linear_direct_access,
-+	.direct_access = linear_dax_direct_access,
- };
- 
- int __init dm_linear_init(void)
-diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
-index c65feeada864..e152d9817c81 100644
---- a/drivers/md/dm-snap.c
-+++ b/drivers/md/dm-snap.c
-@@ -2302,8 +2302,8 @@ static int origin_map(struct dm_target *ti, struct bio *bio)
- 	return do_origin(o->dev, bio);
- }
- 
--static long origin_direct_access(struct dm_target *ti, sector_t sector,
--		void **kaddr, pfn_t *pfn, long size)
-+static long origin_dax_direct_access(struct dm_target *ti, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn)
- {
- 	DMWARN("device does not support dax.");
- 	return -EIO;
-@@ -2368,7 +2368,7 @@ static struct target_type origin_target = {
- 	.postsuspend = origin_postsuspend,
- 	.status  = origin_status,
- 	.iterate_devices = origin_iterate_devices,
--	.direct_access = origin_direct_access,
-+	.direct_access = origin_dax_direct_access,
- };
- 
- static struct target_type snapshot_target = {
-diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
-index 28193a57bf47..cb4b1e9e16ab 100644
---- a/drivers/md/dm-stripe.c
-+++ b/drivers/md/dm-stripe.c
-@@ -11,6 +11,7 @@
- #include <linux/init.h>
- #include <linux/blkdev.h>
- #include <linux/bio.h>
-+#include <linux/dax.h>
- #include <linux/slab.h>
- #include <linux/log2.h>
- 
-@@ -308,27 +309,25 @@ static int stripe_map(struct dm_target *ti, struct bio *bio)
- 	return DM_MAPIO_REMAPPED;
- }
- 
--static long stripe_direct_access(struct dm_target *ti, sector_t sector,
--				 void **kaddr, pfn_t *pfn, long size)
-+static long stripe_dax_direct_access(struct dm_target *ti, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn)
- {
-+	sector_t dev_sector, sector = pgoff * PAGE_SECTORS;
- 	struct stripe_c *sc = ti->private;
--	uint32_t stripe;
-+	struct dax_device *dax_dev;
- 	struct block_device *bdev;
--	struct blk_dax_ctl dax = {
--		.size = size,
--	};
-+	uint32_t stripe;
- 	long ret;
- 
--	stripe_map_sector(sc, sector, &stripe, &dax.sector);
--
--	dax.sector += sc->stripe[stripe].physical_start;
-+	stripe_map_sector(sc, sector, &stripe, &dev_sector);
-+	dev_sector += sc->stripe[stripe].physical_start;
-+	dax_dev = sc->stripe[stripe].dev->dax_dev;
- 	bdev = sc->stripe[stripe].dev->bdev;
- 
--	ret = bdev_direct_access(bdev, &dax);
--	*kaddr = dax.addr;
--	*pfn = dax.pfn;
--
--	return ret;
-+	ret = bdev_dax_pgoff(bdev, dev_sector, nr_pages * PAGE_SIZE, &pgoff);
-+	if (ret)
-+		return ret;
-+	return dax_direct_access(dax_dev, pgoff, nr_pages, kaddr, pfn);
- }
- 
- /*
-@@ -448,7 +447,7 @@ static struct target_type stripe_target = {
- 	.status = stripe_status,
- 	.iterate_devices = stripe_iterate_devices,
- 	.io_hints = stripe_io_hints,
--	.direct_access = stripe_direct_access,
-+	.direct_access = stripe_dax_direct_access,
- };
- 
- int __init dm_stripe_init(void)
-diff --git a/drivers/md/dm-target.c b/drivers/md/dm-target.c
-index 43d3445b121d..6a7968f93f3c 100644
---- a/drivers/md/dm-target.c
-+++ b/drivers/md/dm-target.c
-@@ -142,8 +142,8 @@ static void io_err_release_clone_rq(struct request *clone)
- {
- }
- 
--static long io_err_direct_access(struct dm_target *ti, sector_t sector,
--				 void **kaddr, pfn_t *pfn, long size)
-+static long io_err_dax_direct_access(struct dm_target *ti, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn)
- {
- 	return -EIO;
- }
-@@ -157,7 +157,7 @@ static struct target_type error_target = {
- 	.map  = io_err_map,
- 	.clone_and_map_rq = io_err_clone_and_map_rq,
- 	.release_clone_rq = io_err_release_clone_rq,
--	.direct_access = io_err_direct_access,
-+	.direct_access = io_err_dax_direct_access,
- };
- 
- int __init dm_target_init(void)
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index bd56dfe43a99..ef4c6f8cad47 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -630,6 +630,7 @@ static int open_table_device(struct table_device *td, dev_t dev,
- 	}
- 
- 	td->dm_dev.bdev = bdev;
-+	td->dm_dev.dax_dev = dax_get_by_host(bdev->bd_disk->disk_name);
- 	return 0;
- }
- 
-@@ -643,7 +644,9 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
- 
- 	bd_unlink_disk_holder(td->dm_dev.bdev, dm_disk(md));
- 	blkdev_put(td->dm_dev.bdev, td->dm_dev.mode | FMODE_EXCL);
-+	put_dax(td->dm_dev.dax_dev);
- 	td->dm_dev.bdev = NULL;
-+	td->dm_dev.dax_dev = NULL;
- }
- 
- static struct table_device *find_table_device(struct list_head *l, dev_t dev,
-@@ -945,16 +948,9 @@ static long dm_dax_direct_access(struct dax_device *dax_dev, pgoff_t pgoff,
- 	if (len < 1)
- 		goto out;
- 	nr_pages = min(len, nr_pages);
--	if (ti->type->direct_access) {
--		ret = ti->type->direct_access(ti, sector, kaddr, pfn,
--				nr_pages * PAGE_SIZE);
--		/*
--		 * FIXME: convert ti->type->direct_access to return
--		 * nr_pages directly.
--		 */
--		if (ret >= 0)
--			ret /= PAGE_SIZE;
--	}
-+	if (ti->type->direct_access)
-+		ret = ti->type->direct_access(ti, pgoff, nr_pages, kaddr, pfn);
++seq=`basename $0`
++seqres=$RESULT_DIR/$seq
++echo "QA output created by $seq"
 +
-  out:
- 	dm_put_live_table(md, srcu_idx);
- 
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index bcba4d89089c..df830d167892 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -128,14 +128,15 @@ typedef int (*dm_busy_fn) (struct dm_target *ti);
-  *  < 0 : error
-  * >= 0 : the number of bytes accessible at the address
-  */
--typedef long (*dm_direct_access_fn) (struct dm_target *ti, sector_t sector,
--				     void **kaddr, pfn_t *pfn, long size);
-+typedef long (*dm_dax_direct_access_fn) (struct dm_target *ti, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn);
- #define PAGE_SECTORS (PAGE_SIZE / 512)
- 
- void dm_error(const char *message);
- 
- struct dm_dev {
- 	struct block_device *bdev;
-+	struct dax_device *dax_dev;
- 	fmode_t mode;
- 	char name[16];
- };
-@@ -177,7 +178,7 @@ struct target_type {
- 	dm_busy_fn busy;
- 	dm_iterate_devices_fn iterate_devices;
- 	dm_io_hints_fn io_hints;
--	dm_direct_access_fn direct_access;
-+	dm_dax_direct_access_fn direct_access;
- 
- 	/* For internal device-mapper use. */
- 	struct list_head list;
++here=`pwd`
++tmp=/tmp/$$
++status=1	# failure is the default!
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++_cleanup()
++{
++	$UMOUNT_PROG $fs_mnt
++	_destroy_loop_device $loop_dev
++	cd /
++	rm -rf $TEST_DIR/$$
++	rm -f $tmp.*
++}
++
++# get standard environment, filters and checks
++. ./common/rc
++. ./common/filter
++
++rm -f $seqres.full
++
++# real QA test starts here
++_supported_fs generic
++_supported_os Linux
++_require_loop
++
++# create the fs image and mount point
++
++mkdir -p $TEST_DIR/$$ || _fail "Can not make test dir"
++fs_img=$TEST_DIR/$$/fs.img
++fs_mnt=$TEST_DIR/$$/mnt
++$XFS_IO_PROG -fc "truncate 1g" $fs_img >>$seqres.full 2>&1
++mkdir -p $fs_mnt
++loop_dev=$(_create_loop_device $fs_img)
++_mkfs_dev $loop_dev
++_mount $loop_dev $fs_mnt
++
++# Issue zeroout on block device, this act just a giant hammer for fs,
++# A lot of complains are expected, bug_on/panic is not.
++$XFS_IO_PROG -c "fzero -k 0 1G" -f $loop_dev >>$seqres.full 2>&1
++# Try IO on corrupted fs
++for ((i=0;i<1000;i++));do
++	$XFS_IO_PROG -fc "pwrite -S $i 0 16k" $fs_mnt/test-$i >>$seqres.full 2>&1
++done
++$XFS_IO_PROG -fc "fsync" $fs_mnt/test-0 >>$seqres.full 2>&1
++
++# success, all done
++echo "Silence is golden"
++status=0
++exit
+diff --git a/tests/blockdev/004.out b/tests/blockdev/004.out
+new file mode 100644
+index 0000000..af8614a
+--- /dev/null
++++ b/tests/blockdev/004.out
+@@ -0,0 +1,2 @@
++QA output created by 004
++Silence is golden
+diff --git a/tests/blockdev/group b/tests/blockdev/group
+index e5ce864..d100c85 100644
+--- a/tests/blockdev/group
++++ b/tests/blockdev/group
+@@ -6,3 +6,4 @@
+ 001 rw blockdev
+ 002 rw blockdev liotarget
+ 003 rw blockdev liotarget integrity dangerous
++004 rw blockdev dangerous zero
+-- 
+2.9.3
