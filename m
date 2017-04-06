@@ -1,132 +1,102 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
+Return-Path: <sagi@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 1/8] nowait aio: Introduce IOCB_RW_FLAG_NOWAIT
-Date: Mon,  3 Apr 2017 13:53:00 -0500
-Message-Id: <20170403185307.6243-2-rgoldwyn@suse.de>
-In-Reply-To: <20170403185307.6243-1-rgoldwyn@suse.de>
-References: <20170403185307.6243-1-rgoldwyn@suse.de>
+	linux-rdma@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Saeed Mahameed <saeedm@mellanox.com>,
+	Leon Romanovsky <leonro@mellanox.com>
+Subject: [PATCH v2 6/6] nvme-rdma: use intelligent affinity based queue mappings
+Date: Thu,  6 Apr 2017 13:36:38 +0300
+Message-Id: <1491474998-16423-7-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
+References: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Use the generic block layer affinity mapping helper. Also,
+limit nr_hw_queues to the rdma device number of irq vectors
+as we don't really need more.
 
-This flag informs kernel to bail out if an AIO request will block
-for reasons such as file allocations, or a writeback triggered,
-or would block while allocating requests while performing
-direct I/O.
-
-Unfortunately, aio_flags is not checked for validity, which would
-break existing applications which have it set to anything besides zero
-or IOCB_FLAG_RESFD. So, we are using aio_reserved1 and renaming it
-to aio_rw_flags.
-
-IOCB_RW_FLAG_NOWAIT is translated to IOCB_NOWAIT for
-iocb->ki_flags.
-
-Added FS_NOWAIT to make sure VFS knows that the filesystem is capable
-of performing direct-AIO with IOCB_RW_FLAG_NOWAIT.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- fs/aio.c                     | 15 ++++++++++++++-
- include/linux/fs.h           |  2 ++
- include/uapi/linux/aio_abi.h |  9 ++++++++-
- 3 files changed, 24 insertions(+), 2 deletions(-)
+ drivers/nvme/host/rdma.c | 29 ++++++++++++++++++++++-------
+ 1 file changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index f52d925..25ae59b 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1541,11 +1541,16 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 	ssize_t ret;
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 4aae363943e3..22334b6e8fc3 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -19,6 +19,7 @@
+ #include <linux/string.h>
+ #include <linux/atomic.h>
+ #include <linux/blk-mq.h>
++#include <linux/blk-mq-rdma.h>
+ #include <linux/types.h>
+ #include <linux/list.h>
+ #include <linux/mutex.h>
+@@ -496,14 +497,10 @@ static int nvme_rdma_create_queue_ib(struct nvme_rdma_queue *queue,
+ 	queue->device = dev;
  
- 	/* enforce forwards compatibility on users */
--	if (unlikely(iocb->aio_reserved1 || iocb->aio_reserved2)) {
-+	if (unlikely(iocb->aio_reserved2)) {
- 		pr_debug("EINVAL: reserve field set\n");
- 		return -EINVAL;
- 	}
+ 	/*
+-	 * The admin queue is barely used once the controller is live, so don't
+-	 * bother to spread it out.
++	 * Spread I/O queues completion vectors according their queue index.
++	 * Admin queues can always go on completion vector 0.
+ 	 */
+-	if (idx == 0)
+-		comp_vector = 0;
+-	else
+-		comp_vector = idx % ibdev->num_comp_vectors;
+-
++	comp_vector = idx == 0 ? idx : idx - 1;
  
-+	if (unlikely(iocb->aio_rw_flags & ~IOCB_RW_FLAG_NOWAIT)) {
-+		pr_debug("EINVAL: aio_rw_flags set with incompatible flags\n");
-+		return -EINVAL;
-+	}
+ 	/* +1 for ib_stop_cq */
+ 	queue->ib_cq = ib_alloc_cq(dev->dev, queue,
+@@ -645,10 +642,20 @@ static int nvme_rdma_connect_io_queues(struct nvme_rdma_ctrl *ctrl)
+ static int nvme_rdma_init_io_queues(struct nvme_rdma_ctrl *ctrl)
+ {
+ 	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
++	struct ib_device *ibdev = ctrl->device->dev;
+ 	unsigned int nr_io_queues;
+ 	int i, ret;
+ 
+ 	nr_io_queues = min(opts->nr_io_queues, num_online_cpus());
 +
- 	/* prevent overflows */
- 	if (unlikely(
- 	    (iocb->aio_buf != (unsigned long)iocb->aio_buf) ||
-@@ -1586,6 +1591,14 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		req->common.ki_flags |= IOCB_EVENTFD;
- 	}
- 
-+	if (iocb->aio_rw_flags & IOCB_RW_FLAG_NOWAIT) {
-+		if (!(file->f_inode->i_sb->s_type->fs_flags & FS_NOWAIT)) {
-+			ret = -EOPNOTSUPP;
-+			goto out_put_req;
-+		}
-+		req->common.ki_flags |= IOCB_NOWAIT;
-+	}
++	/*
++	 * we map queues according to the device irq vectors for
++	 * optimal locality so we don't need more queues than
++	 * completion vectors.
++	 */
++	nr_io_queues = min_t(unsigned int, nr_io_queues,
++				ibdev->num_comp_vectors);
 +
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 7251f7b..802cfe2 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -270,6 +270,7 @@ struct writeback_control;
- #define IOCB_DSYNC		(1 << 4)
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
-+#define IOCB_NOWAIT		(1 << 7)
+ 	ret = nvme_set_queue_count(&ctrl->ctrl, &nr_io_queues);
+ 	if (ret)
+ 		return ret;
+@@ -1523,6 +1530,13 @@ static void nvme_rdma_complete_rq(struct request *rq)
+ 	nvme_complete_rq(rq);
+ }
  
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -2020,6 +2021,7 @@ struct file_system_type {
- #define FS_HAS_SUBTYPE		4
- #define FS_USERNS_MOUNT		8	/* Can be mounted by userns root */
- #define FS_RENAME_DOES_D_MOVE	32768	/* FS will handle d_move() during rename() internally. */
-+#define FS_NOWAIT		65536	/* FS supports nowait direct AIO */
- 	struct dentry *(*mount) (struct file_system_type *, int,
- 		       const char *, void *);
- 	void (*kill_sb) (struct super_block *);
-diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
-index bb2554f..6d98cbe 100644
---- a/include/uapi/linux/aio_abi.h
-+++ b/include/uapi/linux/aio_abi.h
-@@ -54,6 +54,13 @@ enum {
-  */
- #define IOCB_FLAG_RESFD		(1 << 0)
- 
-+/*
-+ * Flags for aio_rw_flags member of "struct iocb".
-+ * IOCB_RW_FLAG_NOWAIT - Set if the user wants the iocb to fail if it
-+ *			would block for operations such as disk allocation.
-+ */
-+#define IOCB_RW_FLAG_NOWAIT	(1 << 1)
++static int nvme_rdma_map_queues(struct blk_mq_tag_set *set)
++{
++	struct nvme_rdma_ctrl *ctrl = set->driver_data;
 +
- /* read() from /dev/aio returns these structures. */
- struct io_event {
- 	__u64		data;		/* the data field from the iocb */
-@@ -79,7 +86,7 @@ struct io_event {
- struct iocb {
- 	/* these are internal to the kernel/libc. */
- 	__u64	aio_data;	/* data to be returned in event's data */
--	__u32	PADDED(aio_key, aio_reserved1);
-+	__u32	PADDED(aio_key, aio_rw_flags);
- 				/* the kernel sets aio_key to the req # */
++	return blk_mq_rdma_map_queues(set, ctrl->device->dev, 0);
++}
++
+ static const struct blk_mq_ops nvme_rdma_mq_ops = {
+ 	.queue_rq	= nvme_rdma_queue_rq,
+ 	.complete	= nvme_rdma_complete_rq,
+@@ -1532,6 +1546,7 @@ static const struct blk_mq_ops nvme_rdma_mq_ops = {
+ 	.init_hctx	= nvme_rdma_init_hctx,
+ 	.poll		= nvme_rdma_poll,
+ 	.timeout	= nvme_rdma_timeout,
++	.map_queues	= nvme_rdma_map_queues,
+ };
  
- 	/* common fields */
+ static const struct blk_mq_ops nvme_rdma_admin_mq_ops = {
 -- 
-2.10.2
+2.7.4
