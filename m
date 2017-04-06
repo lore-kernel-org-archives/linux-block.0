@@ -1,40 +1,174 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v3 2/5] blk-mq: Restart a single queue if tag sets are
- shared
-To: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>, Hannes Reinecke
+	<hare@suse.com>
+Subject: [PATCH v3 2/5] blk-mq: Restart a single queue if tag sets are shared
+Date: Thu, 6 Apr 2017 11:10:47 -0700
+Message-ID: <20170406181050.12137-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170406181050.12137-1-bart.vanassche@sandisk.com>
 References: <20170406181050.12137-1-bart.vanassche@sandisk.com>
- <20170406181050.12137-3-bart.vanassche@sandisk.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <4f5ecfba-f2c9-8b54-f879-86b84f407599@kernel.dk>
-Date: Thu, 6 Apr 2017 13:12:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170406181050.12137-3-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/06/2017 12:10 PM, Bart Van Assche wrote:
-> +		for (i = 0; i < queue->nr_hw_queues; i++) {
-> +			j = (i + hctx->queue_num + 1) % queue->nr_hw_queues;
-> +			h = queue->queue_hw_ctx[j];
-> +			if (h->tags == tags && blk_mq_sched_restart_hctx(h))
-> +				break;
+To improve scalability, if hardware queues are shared, restart
+a single hardware queue in round-robin fashion. Rename
+blk_mq_sched_restart_queues() to reflect the new semantics.
+Remove blk_mq_sched_mark_restart_queue() because this function
+has no callers. Remove flag QUEUE_FLAG_RESTART because this
+patch removes the code that uses this flag.
 
-I'm pretty sure that doing:
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-mq-sched.c   | 60 +++++++++++++++++++++++++++++++++++++++++---------
+ block/blk-mq-sched.h   | 16 +-------------
+ block/blk-mq.c         |  2 +-
+ include/linux/blkdev.h |  1 -
+ 4 files changed, 52 insertions(+), 27 deletions(-)
 
-	j = i + hctx->queue_num + 1;;
-	for (i = 0; i < queue->nr_hw_queues; i++, j++) {
-		if (j == queue->nr_hw_queues)
-			j = 0;
-		h = queue->queue_hw_ctx[j];
-		if (h->tags == tags && blk_mq_sched_restart_hctx(h))
-			break;
-	}
-
-would be considerably more efficient than a modulo for each loop. And
-let's rename 'h' to 'hctx', readability is much better that way.
-Especially since you have both i and j as iterators.
-
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 09af8ff18719..8f553775d3ed 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -317,25 +317,65 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+ 	return true;
+ }
+ 
+-static void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
++static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ {
+ 	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state)) {
+ 		clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+-		if (blk_mq_hctx_has_pending(hctx))
++		if (blk_mq_hctx_has_pending(hctx)) {
+ 			blk_mq_run_hw_queue(hctx, true);
++			return true;
++		}
+ 	}
++	return false;
+ }
+ 
+-void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
++/**
++ * list_for_each_entry_rcu_rr - iterate in a round-robin fashion over rcu list
++ * @pos:    loop cursor.
++ * @skip:   the list element that will not be examined. Iteration starts at
++ *          @skip->next.
++ * @head:   head of the list to examine. This list must have at least one
++ *          element, namely @skip.
++ * @member: name of the list_head structure within typeof(*pos).
++ */
++#define list_for_each_entry_rcu_rr(pos, skip, head, member)		\
++	for ((pos) = (skip);						\
++	     (pos = (pos)->member.next != (head) ? list_entry_rcu(	\
++			(pos)->member.next, typeof(*pos), member) :	\
++	      list_entry_rcu((pos)->member.next->next, typeof(*pos), member)), \
++	     (pos) != (skip); )
++
++/**
++ * Called after a driver tag has been freed to check whether a hctx needs to
++ * be restarted. Restarts @hctx if its tag set is not shared. Restarts hardware
++ * queues in a round-robin fashion if the tag set of @hctx is shared with other
++ * hardware queues.
++ */
++void blk_mq_sched_restart(struct blk_mq_hw_ctx *const hctx)
+ {
+-	struct request_queue *q = hctx->queue;
+-	unsigned int i;
+-
+-	if (test_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
+-		if (test_and_clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
+-			queue_for_each_hw_ctx(q, hctx, i)
+-				blk_mq_sched_restart_hctx(hctx);
++	struct blk_mq_tags *const tags = hctx->tags;
++	struct blk_mq_tag_set *const set = hctx->queue->tag_set;
++	struct request_queue *const queue = hctx->queue, *q;
++	struct blk_mq_hw_ctx *h;
++	unsigned int i, j;
++
++	if (set->flags & BLK_MQ_F_TAG_SHARED) {
++		rcu_read_lock();
++		list_for_each_entry_rcu_rr(q, queue, &set->tag_list,
++					   tag_set_list) {
++			queue_for_each_hw_ctx(q, h, i)
++				if (h->tags == tags &&
++				    blk_mq_sched_restart_hctx(h))
++					goto done;
++		}
++		for (i = 0; i < queue->nr_hw_queues; i++) {
++			j = (i + hctx->queue_num + 1) % queue->nr_hw_queues;
++			h = queue->queue_hw_ctx[j];
++			if (h->tags == tags && blk_mq_sched_restart_hctx(h))
++				break;
+ 		}
++done:
++		rcu_read_unlock();
+ 	} else {
+ 		blk_mq_sched_restart_hctx(hctx);
+ 	}
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index a75b16b123f7..4e3fc2a40207 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -19,7 +19,7 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ 				struct request **merged_request);
+ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio);
+ bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq);
+-void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx);
++void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 				 bool run_queue, bool async, bool can_block);
+@@ -131,20 +131,6 @@ static inline void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ }
+ 
+-/*
+- * Mark a hardware queue and the request queue it belongs to as needing a
+- * restart.
+- */
+-static inline void blk_mq_sched_mark_restart_queue(struct blk_mq_hw_ctx *hctx)
+-{
+-	struct request_queue *q = hctx->queue;
+-
+-	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+-		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+-	if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
+-		set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
+-}
+-
+ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+ {
+ 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b5580b09b4a5..dc83aec338d9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -351,7 +351,7 @@ void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
+ 	if (sched_tag != -1)
+ 		blk_mq_sched_completed_request(hctx, rq);
+-	blk_mq_sched_restart_queues(hctx);
++	blk_mq_sched_restart(hctx);
+ 	blk_queue_exit(q);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 3cf241b0814d..dc6c8d39d462 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -615,7 +615,6 @@ struct request_queue {
+ #define QUEUE_FLAG_FLUSH_NQ    25	/* flush not queueuable */
+ #define QUEUE_FLAG_DAX         26	/* device supports DAX */
+ #define QUEUE_FLAG_STATS       27	/* track rq completion times */
+-#define QUEUE_FLAG_RESTART     28	/* queue needs restart at completion */
+ #define QUEUE_FLAG_POLL_STATS  29	/* collecting stats for hybrid polling */
+ #define QUEUE_FLAG_REGISTERED  30	/* queue has been registered to a disk */
+ 
 -- 
-Jens Axboe
+2.12.0
