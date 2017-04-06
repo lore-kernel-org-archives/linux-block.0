@@ -1,68 +1,224 @@
-Return-Path: <leonro@mellanox.com>
-Date: Thu, 6 Apr 2017 17:27:01 +0300
-From: Leon Romanovsky <leonro@mellanox.com>
-To: Sagi Grimberg <sagi@grimberg.me>
-CC: Jens Axboe <axboe@kernel.dk>, <linux-nvme@lists.infradead.org>,
-	<linux-block@vger.kernel.org>, <linux-rdma@vger.kernel.org>, Saeed Mahameed
-	<saeedm@mellanox.com>, Or Gerlitz <ogerlitz@mellanox.com>, Christoph Hellwig
-	<hch@lst.de>
-Subject: Re: [PATCH v2 2/6] mlx5: move affinity hints assignments to generic
- code
-Message-ID: <20170406142701.GL2269@mtr-leonro.local>
+Return-Path: <sagi@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Saeed Mahameed <saeedm@mellanox.com>,
+	Leon Romanovsky <leonro@mellanox.com>
+Subject: [PATCH v2 2/6] mlx5: move affinity hints assignments to generic code
+Date: Thu,  6 Apr 2017 13:36:34 +0300
+Message-Id: <1491474998-16423-3-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
 References: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
- <1491474998-16423-3-git-send-email-sagi@grimberg.me>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XjbSsFHOHxvQpKib"
-In-Reply-To: <1491474998-16423-3-git-send-email-sagi@grimberg.me>
-Return-Path: leonro@mellanox.com
 List-ID: <linux-block@vger.kernel.org>
 
---XjbSsFHOHxvQpKib
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+generic api takes care of spreading affinity similar to
+what mlx5 open coded (and even handles better asymmetric
+configurations). Ask the generic API to spread affinity
+for us, and feed him pre_vectors that do not participate
+in affinity settings (which is an improvement to what we
+had before).
 
-On Thu, Apr 06, 2017 at 01:36:34PM +0300, Sagi Grimberg wrote:
-> generic api takes care of spreading affinity similar to
-> what mlx5 open coded (and even handles better asymmetric
-> configurations). Ask the generic API to spread affinity
-> for us, and feed him pre_vectors that do not participate
-> in affinity settings (which is an improvement to what we
-> had before).
->
-> The affinity assignments should match what mlx5 tried to
-> do earlier but now we do not set affinity to async, cmd
-> and pages dedicated vectors.
->
-> Also, remove mlx5e_get_cpu routine as we have generic helpers
-> to get cpumask and node given a irq vector, so use them
-> directly.
->
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-> ---
+The affinity assignments should match what mlx5 tried to
+do earlier but now we do not set affinity to async, cmd
+and pages dedicated vectors.
 
-Thanks,
-Acked-by: Leon Romanovsky <leonro@mellanox.com>
+Also, remove mlx5e_get_cpu routine as we have generic helpers
+to get cpumask and node given a irq vector, so use them
+directly.
 
---XjbSsFHOHxvQpKib
-Content-Type: application/pgp-signature; name="signature.asc"
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 12 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/main.c    | 83 ++---------------------
+ include/linux/mlx5/driver.h                       |  1 -
+ 3 files changed, 10 insertions(+), 86 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEkhr/r4Op1/04yqaB5GN7iDZyWKcFAljmUDQACgkQ5GN7iDZy
-WKdDMxAAljeXK4d5Mgw37HndwWrXVYNYFqNbp/tyGfOU4uKrUB0a0Nozl8HTmxRK
-9WzsnXG2Txd9rKW9Nq9OMTP5DSmfYeCm4QpK5H9uM4WCLQ1/QZ/wsNMGDw6YEOZ5
-vNuT9uGg+NrqU2zeSTkvweaPRobYT3Pb6nfRFTMcp+Z64+Q2WaHURNAfPlyWv5Eg
-yRRsqKYookbVKuMC71zoRF1i/6Kefi9Pz6jyK8zKUA63YOkeiN7kukteqDo8BwzC
-6/X8ur3Qmtmv0G7tyy/HAm5AYDRp7V3RgRlkCW/svhPL/cn93NjURLWUnAWinGom
-5ppkqHX0eaJKMUexUEh10+7wq1jKfDwlrVkdpVk5wng6oOcwlAvR5TqRV8ZZdYID
-YJlRruuv88lO1RE6BZYTuzI6pQr7lwPwHU2AihLRxpHIbdprcIf7DDWIy3rFKWGi
-j0TtBjiAjMak4E6K0KXusGZj3+9+3JqClcV1+fCyLqTqxfQht4zirafRLud2dQLU
-LPy5TsAzBJaMQX/ve+pzwqP7pMR2Tmr0vvUQMQY9OAn/mfbfHs4MoewUjKHcsLr+
-+jy1FfTBNFzTmY8df+wPXUOY6DQ/m477xChC8AqgStRb9RGTU/iFtq+Rt1TleTgy
-VdHKu2YddT00O0Zz/RZm9pHFE9JZa2xtmSSJPszPjOI4W9GSNMo=
-=fhTn
------END PGP SIGNATURE-----
-
---XjbSsFHOHxvQpKib--
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index eec0d172761e..a51399c54c62 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -1373,11 +1373,6 @@ static void mlx5e_close_cq(struct mlx5e_cq *cq)
+ 	mlx5e_destroy_cq(cq);
+ }
+ 
+-static int mlx5e_get_cpu(struct mlx5e_priv *priv, int ix)
+-{
+-	return cpumask_first(priv->mdev->priv.irq_info[ix].mask);
+-}
+-
+ static int mlx5e_open_tx_cqs(struct mlx5e_channel *c,
+ 			     struct mlx5e_channel_param *cparam)
+ {
+@@ -1535,19 +1530,20 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
+ 	struct mlx5e_cq_moder icosq_cq_moder = {0, 0};
+ 	struct net_device *netdev = priv->netdev;
+ 	struct mlx5e_cq_moder rx_cq_profile;
+-	int cpu = mlx5e_get_cpu(priv, ix);
+ 	struct mlx5e_channel *c;
+ 	struct mlx5e_sq *sq;
+ 	int err;
+ 	int i;
+ 
+-	c = kzalloc_node(sizeof(*c), GFP_KERNEL, cpu_to_node(cpu));
++	c = kzalloc_node(sizeof(*c), GFP_KERNEL,
++		pci_irq_get_node(priv->mdev->pdev, MLX5_EQ_VEC_COMP_BASE + ix));
+ 	if (!c)
+ 		return -ENOMEM;
+ 
+ 	c->priv     = priv;
+ 	c->ix       = ix;
+-	c->cpu      = cpu;
++	c->cpu      = cpumask_first(pci_irq_get_affinity(priv->mdev->pdev,
++			MLX5_EQ_VEC_COMP_BASE + ix));
+ 	c->pdev     = &priv->mdev->pdev->dev;
+ 	c->netdev   = priv->netdev;
+ 	c->mkey_be  = cpu_to_be32(priv->mdev->mlx5e_res.mkey.key);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+index 7c8672cbb369..0c2d8e22d94a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+@@ -312,6 +312,9 @@ static int mlx5_alloc_irq_vectors(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_priv *priv = &dev->priv;
+ 	struct mlx5_eq_table *table = &priv->eq_table;
++	struct irq_affinity irqdesc = {
++		.pre_vectors = MLX5_EQ_VEC_COMP_BASE,
++	};
+ 	int num_eqs = 1 << MLX5_CAP_GEN(dev, log_max_eq);
+ 	int nvec;
+ 
+@@ -325,9 +328,10 @@ static int mlx5_alloc_irq_vectors(struct mlx5_core_dev *dev)
+ 	if (!priv->irq_info)
+ 		goto err_free_msix;
+ 
+-	nvec = pci_alloc_irq_vectors(dev->pdev,
++	nvec = pci_alloc_irq_vectors_affinity(dev->pdev,
+ 			MLX5_EQ_VEC_COMP_BASE + 1, nvec,
+-			PCI_IRQ_MSIX);
++			PCI_IRQ_MSIX | PCI_IRQ_AFFINITY,
++			&irqdesc);
+ 	if (nvec < 0)
+ 		return nvec;
+ 
+@@ -600,71 +604,6 @@ u64 mlx5_read_internal_timer(struct mlx5_core_dev *dev)
+ 	return (u64)timer_l | (u64)timer_h1 << 32;
+ }
+ 
+-static int mlx5_irq_set_affinity_hint(struct mlx5_core_dev *mdev, int i)
+-{
+-	struct mlx5_priv *priv  = &mdev->priv;
+-	int irq = pci_irq_vector(mdev->pdev, MLX5_EQ_VEC_COMP_BASE + i);
+-	int err;
+-
+-	if (!zalloc_cpumask_var(&priv->irq_info[i].mask, GFP_KERNEL)) {
+-		mlx5_core_warn(mdev, "zalloc_cpumask_var failed");
+-		return -ENOMEM;
+-	}
+-
+-	cpumask_set_cpu(cpumask_local_spread(i, priv->numa_node),
+-			priv->irq_info[i].mask);
+-
+-	err = irq_set_affinity_hint(irq, priv->irq_info[i].mask);
+-	if (err) {
+-		mlx5_core_warn(mdev, "irq_set_affinity_hint failed,irq 0x%.4x",
+-			       irq);
+-		goto err_clear_mask;
+-	}
+-
+-	return 0;
+-
+-err_clear_mask:
+-	free_cpumask_var(priv->irq_info[i].mask);
+-	return err;
+-}
+-
+-static void mlx5_irq_clear_affinity_hint(struct mlx5_core_dev *mdev, int i)
+-{
+-	struct mlx5_priv *priv  = &mdev->priv;
+-	int irq = pci_irq_vector(mdev->pdev, MLX5_EQ_VEC_COMP_BASE + i);
+-
+-	irq_set_affinity_hint(irq, NULL);
+-	free_cpumask_var(priv->irq_info[i].mask);
+-}
+-
+-static int mlx5_irq_set_affinity_hints(struct mlx5_core_dev *mdev)
+-{
+-	int err;
+-	int i;
+-
+-	for (i = 0; i < mdev->priv.eq_table.num_comp_vectors; i++) {
+-		err = mlx5_irq_set_affinity_hint(mdev, i);
+-		if (err)
+-			goto err_out;
+-	}
+-
+-	return 0;
+-
+-err_out:
+-	for (i--; i >= 0; i--)
+-		mlx5_irq_clear_affinity_hint(mdev, i);
+-
+-	return err;
+-}
+-
+-static void mlx5_irq_clear_affinity_hints(struct mlx5_core_dev *mdev)
+-{
+-	int i;
+-
+-	for (i = 0; i < mdev->priv.eq_table.num_comp_vectors; i++)
+-		mlx5_irq_clear_affinity_hint(mdev, i);
+-}
+-
+ int mlx5_vector2eqn(struct mlx5_core_dev *dev, int vector, int *eqn,
+ 		    unsigned int *irqn)
+ {
+@@ -1116,12 +1055,6 @@ static int mlx5_load_one(struct mlx5_core_dev *dev, struct mlx5_priv *priv,
+ 		goto err_stop_eqs;
+ 	}
+ 
+-	err = mlx5_irq_set_affinity_hints(dev);
+-	if (err) {
+-		dev_err(&pdev->dev, "Failed to alloc affinity hint cpumask\n");
+-		goto err_affinity_hints;
+-	}
+-
+ 	err = mlx5_init_fs(dev);
+ 	if (err) {
+ 		dev_err(&pdev->dev, "Failed to init flow steering\n");
+@@ -1165,9 +1098,6 @@ static int mlx5_load_one(struct mlx5_core_dev *dev, struct mlx5_priv *priv,
+ 	mlx5_cleanup_fs(dev);
+ 
+ err_fs:
+-	mlx5_irq_clear_affinity_hints(dev);
+-
+-err_affinity_hints:
+ 	free_comp_eqs(dev);
+ 
+ err_stop_eqs:
+@@ -1234,7 +1164,6 @@ static int mlx5_unload_one(struct mlx5_core_dev *dev, struct mlx5_priv *priv,
+ 	mlx5_eswitch_detach(dev->priv.eswitch);
+ #endif
+ 	mlx5_cleanup_fs(dev);
+-	mlx5_irq_clear_affinity_hints(dev);
+ 	free_comp_eqs(dev);
+ 	mlx5_stop_eqs(dev);
+ 	mlx5_put_uars_page(dev, priv->uar);
+diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
+index a9891df94ce0..4c7cf4dfb024 100644
+--- a/include/linux/mlx5/driver.h
++++ b/include/linux/mlx5/driver.h
+@@ -527,7 +527,6 @@ struct mlx5_core_sriov {
+ };
+ 
+ struct mlx5_irq_info {
+-	cpumask_var_t mask;
+ 	char name[MLX5_MAX_IRQ_NAME];
+ };
+ 
+-- 
+2.7.4
