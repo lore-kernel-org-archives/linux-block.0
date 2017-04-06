@@ -1,51 +1,47 @@
-Return-Path: <longli@microsoft.com>
-From: Long Li <longli@microsoft.com>
-To: KY Srinivasan <kys@microsoft.com>, Bart Van Assche
-	<Bart.VanAssche@sandisk.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-sn1nam01on0091.outbound.protection.outlook.com ([104.47.32.91]:35170
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755667AbdDFEVE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Apr 2017 00:21:04 -0400
+From: KY Srinivasan <kys@microsoft.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Long Li <longli@microsoft.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
 CC: Stephen Hemminger <sthemmin@microsoft.com>
 Subject: RE: [PATCH] block-mq: set both block queue and hardware queue restart
  bit for restart
-Date: Thu, 6 Apr 2017 05:38:10 +0000
-Message-ID: <CO2PR03MB2230865504BF560409A0606FCE0D0@CO2PR03MB2230.namprd03.prod.outlook.com>
+Date: Thu, 6 Apr 2017 04:21:01 +0000
+Message-ID: <DM5PR03MB2490E70D9B18A701A81005C8A00D0@DM5PR03MB2490.namprd03.prod.outlook.com>
 References: <1491437781-3565-1-git-send-email-longli@exchange.microsoft.com>
-	 <1491438735.2787.18.camel@sandisk.com>
-	 <BN3PR03MB2227E6DBCAE0365A013B7972CE0D0@BN3PR03MB2227.namprd03.prod.outlook.com>
+         <1491438735.2787.18.camel@sandisk.com>
+         <BN3PR03MB2227E6DBCAE0365A013B7972CE0D0@BN3PR03MB2227.namprd03.prod.outlook.com>
  <1491450335.8994.1.camel@sandisk.com>
- <DM5PR03MB2490E70D9B18A701A81005C8A00D0@DM5PR03MB2490.namprd03.prod.outlook.com>
-In-Reply-To: <DM5PR03MB2490E70D9B18A701A81005C8A00D0@DM5PR03MB2490.namprd03.prod.outlook.com>
+In-Reply-To: <1491450335.8994.1.camel@sandisk.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS1kgU3Jpbml2YXNhbg0K
-PiBTZW50OiBXZWRuZXNkYXksIEFwcmlsIDUsIDIwMTcgOToyMSBQTQ0KPiBUbzogQmFydCBWYW4g
-QXNzY2hlIDxCYXJ0LlZhbkFzc2NoZUBzYW5kaXNrLmNvbT47IGxpbnV4LQ0KPiBrZXJuZWxAdmdl
-ci5rZXJuZWwub3JnOyBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmc7IExvbmcgTGkNCj4gPGxv
-bmdsaUBtaWNyb3NvZnQuY29tPjsgYXhib2VAa2VybmVsLmRrDQo+IENjOiBTdGVwaGVuIEhlbW1p
-bmdlciA8c3RoZW1taW5AbWljcm9zb2Z0LmNvbT4NCj4gU3ViamVjdDogUkU6IFtQQVRDSF0gYmxv
-Y2stbXE6IHNldCBib3RoIGJsb2NrIHF1ZXVlIGFuZCBoYXJkd2FyZSBxdWV1ZQ0KPiByZXN0YXJ0
-IGJpdCBmb3IgcmVzdGFydA0KPiANCj4gDQo+IA0KPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQo+ID4gRnJvbTogQmFydCBWYW4gQXNzY2hlIFttYWlsdG86QmFydC5WYW5Bc3NjaGVAc2Fu
-ZGlzay5jb21dDQo+ID4gU2VudDogV2VkbmVzZGF5LCBBcHJpbCA1LCAyMDE3IDg6NDYgUE0NCj4g
-PiBUbzogbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgbGludXgtYmxvY2tAdmdlci5rZXJu
-ZWwub3JnOyBMb25nIExpDQo+ID4gPGxvbmdsaUBtaWNyb3NvZnQuY29tPjsgYXhib2VAa2VybmVs
-LmRrDQo+ID4gQ2M6IFN0ZXBoZW4gSGVtbWluZ2VyIDxzdGhlbW1pbkBtaWNyb3NvZnQuY29tPjsg
-S1kgU3Jpbml2YXNhbg0KPiA+IDxreXNAbWljcm9zb2Z0LmNvbT4NCj4gPiBTdWJqZWN0OiBSZTog
-W1BBVENIXSBibG9jay1tcTogc2V0IGJvdGggYmxvY2sgcXVldWUgYW5kIGhhcmR3YXJlIHF1ZXVl
-DQo+ID4gcmVzdGFydCBiaXQgZm9yIHJlc3RhcnQNCj4gPg0KPiA+IE9uIFRodSwgMjAxNy0wNC0w
-NiBhdCAwMzozOCArMDAwMCwgTG9uZyBMaSB3cm90ZToNCj4gPiA+ID4gLS0tLS1PcmlnaW5hbCBN
-ZXNzYWdlLS0tLS0NCj4gPiA+ID4gRnJvbTogQmFydCBWYW4gQXNzY2hlIFttYWlsdG86QmFydC5W
-YW5Bc3NjaGVAc2FuZGlzay5jb21dDQo+ID4gPiA+DQo+ID4gPiA+IFBsZWFzZSBkcm9wIHRoaXMg
-cGF0Y2guIEknbSB3b3JraW5nIG9uIGEgYmV0dGVyIHNvbHV0aW9uLg0KPiA+ID4NCj4gPiA+IFRo
-YW5rIHlvdS4gTG9va2luZyBmb3J3YXJkIHRvIHlvdXIgcGF0Y2guDQo+ID4NCj4gPiBIZWxsbyBM
-b25nLA0KPiA+DQo+ID4gSXQgd291bGQgaGVscCBpZiB5b3UgY291bGQgc2hhcmUgdGhlIG5hbWUg
-b2YgdGhlIGJsb2NrIG9yIFNDU0kgZHJpdmVyDQo+ID4gd2l0aCB3aGljaCB5b3UgcmFuIGludG8g
-dGhhdCBsb2NrdXAgYW5kIGFsc28gaWYgeW91IGNvdWxkIHNoYXJlIHRoZQ0KPiA+IG5hbWUgb2Yg
-dGhlIEkvTyBzY2hlZHVsZXIgdXNlZCBpbiB5b3VyIHRlc3QuDQo+IA0KPiBUaGUgdGVzdHMgdGhh
-dCBpbmRpY2F0ZWQgdGhlIGlzc3VlIHdlcmUgcnVuIEh5cGVyLVYuIFRoZSBkcml2ZXIgaXMNCj4g
-c3RvcnZzY19kcnYuYyBUaGUgSS9PIHNjaGVkdWxlciB3YXMgSSB0aGluayBub29wLg0KDQpZZXMs
-IHdlIHNlZSBJL08gaHVuZyBvbiBzY2hlZHVsZXIgbm9uZS4gQWxzbyB0cmllZCBvbiBtcS1kZWFk
-bGluZSwgc2FtZSBodW5nIHdpdGggdGhlIHNhbWUgY2F1c2UuDQoNCj4gDQo+IEsuIFkNCj4gPg0K
-PiA+IFRoYW5rcywNCj4gPg0KPiA+IEJhcnQuDQo=
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQmFydCBWYW4gQXNzY2hl
+IFttYWlsdG86QmFydC5WYW5Bc3NjaGVAc2FuZGlzay5jb21dDQo+IFNlbnQ6IFdlZG5lc2RheSwg
+QXByaWwgNSwgMjAxNyA4OjQ2IFBNDQo+IFRvOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
+OyBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmc7IExvbmcgTGkNCj4gPGxvbmdsaUBtaWNyb3Nv
+ZnQuY29tPjsgYXhib2VAa2VybmVsLmRrDQo+IENjOiBTdGVwaGVuIEhlbW1pbmdlciA8c3RoZW1t
+aW5AbWljcm9zb2Z0LmNvbT47IEtZIFNyaW5pdmFzYW4NCj4gPGt5c0BtaWNyb3NvZnQuY29tPg0K
+PiBTdWJqZWN0OiBSZTogW1BBVENIXSBibG9jay1tcTogc2V0IGJvdGggYmxvY2sgcXVldWUgYW5k
+IGhhcmR3YXJlIHF1ZXVlDQo+IHJlc3RhcnQgYml0IGZvciByZXN0YXJ0DQo+IA0KPiBPbiBUaHUs
+IDIwMTctMDQtMDYgYXQgMDM6MzggKzAwMDAsIExvbmcgTGkgd3JvdGU6DQo+ID4gPiAtLS0tLU9y
+aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gRnJvbTogQmFydCBWYW4gQXNzY2hlIFttYWlsdG86
+QmFydC5WYW5Bc3NjaGVAc2FuZGlzay5jb21dDQo+ID4gPg0KPiA+ID4gUGxlYXNlIGRyb3AgdGhp
+cyBwYXRjaC4gSSdtIHdvcmtpbmcgb24gYSBiZXR0ZXIgc29sdXRpb24uDQo+ID4NCj4gPiBUaGFu
+ayB5b3UuIExvb2tpbmcgZm9yd2FyZCB0byB5b3VyIHBhdGNoLg0KPiANCj4gSGVsbG8gTG9uZywN
+Cj4gDQo+IEl0IHdvdWxkIGhlbHAgaWYgeW91IGNvdWxkIHNoYXJlIHRoZSBuYW1lIG9mIHRoZSBi
+bG9jayBvciBTQ1NJIGRyaXZlciB3aXRoDQo+IHdoaWNoIHlvdSByYW4gaW50byB0aGF0IGxvY2t1
+cCBhbmQgYWxzbyBpZiB5b3UgY291bGQgc2hhcmUgdGhlIG5hbWUgb2YgdGhlDQo+IEkvTyBzY2hl
+ZHVsZXIgdXNlZCBpbiB5b3VyIHRlc3QuDQoNClRoZSB0ZXN0cyB0aGF0IGluZGljYXRlZCB0aGUg
+aXNzdWUgd2VyZSBydW4gSHlwZXItVi4gVGhlIGRyaXZlciBpcyBzdG9ydnNjX2Rydi5jDQpUaGUg
+SS9PIHNjaGVkdWxlciB3YXMgSSB0aGluayBub29wLg0KDQpLLiBZDQo+IA0KPiBUaGFua3MsDQo+
+IA0KPiBCYXJ0Lg0K
