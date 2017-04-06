@@ -1,158 +1,79 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:35158 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933785AbdDFNTX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 09:19:23 -0400
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: fstests@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 6/6] new: blockdev/005 Check that busy fs survives blkdev page truncation
-Date: Thu,  6 Apr 2017 17:19:10 +0400
-Message-Id: <1491484750-9164-7-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
-References: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, "Christoph
+ Hellwig" <hch@lst.de>, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH v3 3/5] blk-mq: Clarify comments in blk_mq_dispatch_rq_list()
+Date: Thu, 6 Apr 2017 11:10:48 -0700
+Message-ID: <20170406181050.12137-4-bart.vanassche@sandisk.com>
+In-Reply-To: <20170406181050.12137-1-bart.vanassche@sandisk.com>
+References: <20170406181050.12137-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-same as blockdev/004 but with add more stress on corrupted fs.
+The blk_mq_dispatch_rq_list() implementation got modified several
+times but the comments in that function were not updated every
+time. Since it is nontrivial what is going on, update the comments
+in blk_mq_dispatch_rq_list().
 
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
 ---
- tests/blockdev/005     | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/blockdev/005.out |  2 ++
- tests/blockdev/group   |  1 +
- tests/generic/390      |  1 +
- 4 files changed, 96 insertions(+)
- create mode 100755 tests/blockdev/005
- create mode 100644 tests/blockdev/005.out
+ block/blk-mq.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/tests/blockdev/005 b/tests/blockdev/005
-new file mode 100755
-index 0000000..fa3eadc
---- /dev/null
-+++ b/tests/blockdev/005
-@@ -0,0 +1,92 @@
-+#! /bin/bash
-+# FS QA Test 005
-+#
-+# Check that busy filesystem survives blockdev pagecache truncation.
-+# blkdev page cache can be truncated due to various reasons
-+# 1)ioctl: BLKDISCARD
-+# 2)blkdev: falloc{ FALLOC_FL_ZERO_RANGE, FALLOC_FL_PUNCH_HOLE }
-+# 3)nbd: NBD_CLEAR_SOCK
-+# test is similar blockdev/004 but push more stress on filesystem.
-+#
-+#-----------------------------------------------------------------------
-+# Copyright (c) 2017 Dmitry Monakhov <dmonakhov@openvz.org>
-+# All Rights Reserved.
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License as
-+# published by the Free Software Foundation.
-+#
-+# This program is distributed in the hope that it would be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write the Free Software Foundation,
-+# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+#-----------------------------------------------------------------------
-+#
-+
-+seq=`basename $0`
-+seqres=$RESULT_DIR/$seq
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+tmp=/tmp/$$
-+status=1	# failure is the default!
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+_cleanup()
-+{
-+	$UMOUNT_PROG $fs_mnt
-+	_destroy_loop_device $loop_dev
-+	cd /
-+	rm -rf $TEST_DIR/$$
-+	rm -f $tmp.*
-+}
-+
-+# get standard environment, filters and checks
-+. ./common/rc
-+. ./common/filter
-+
-+rm -f $seqres.full
-+
-+# real QA test starts here
-+_supported_fs generic
-+_supported_os Linux
-+_require_loop
-+#_require_xfs_io_command "fzero"
-+
-+# create the fs image and mount point
-+
-+mkdir -p $TEST_DIR/$$ || _fail "Can not make test dir"
-+fs_img=$TEST_DIR/$$/fs.img
-+fs_mnt=$TEST_DIR/$$/mnt
-+$XFS_IO_PROG -fc "truncate 1g" $fs_img >>$seqres.full 2>&1
-+mkdir -p $fs_mnt
-+loop_dev=$(_create_loop_device $fs_img)
-+_mkfs_dev $loop_dev
-+_mount $loop_dev $fs_mnt
-+
-+stress_dir="$fs_mnt/stress"
-+mkdir "$stress_dir"
-+# Disable all sync operations to get higher load
-+FSSTRESS_AVOID="$FSSTRESS_AVOID -ffsync=0 -fsync=0 -ffdatasync=0"
-+fsstress_args=`_scale_fsstress_args -d $stress_dir -p4 -n9999999 $FSSTRESS_AVOID`
-+$FSSTRESS_PROG $fsstress_args > /dev/null 2>&1 &
-+fsstress_pid=$!
-+# Warm-up
-+sleep 3
-+
-+# Issue zeroout on block device, this act just a giant hammer for fs,
-+# A lot of complains are expected, bug_on/panic is not.
-+$XFS_IO_PROG -c "fzero -k 0 1G" -f $loop_dev >>$seqres.full 2>&1
-+# Force sync operation in order to flush data to screwed disk.
-+$XFS_IO_PROG -c "pwrite 0 4k" -c "syncfs" -f $fs_mnt/check_ro >>$seqres.full 2>&1
-+sleep 3
-+$KILLALL_PROG -q $FSSTRESS_PROG
-+wait $pid
-+# success, all done
-+echo "Silence is golden"
-+status=0
-+exit
-diff --git a/tests/blockdev/005.out b/tests/blockdev/005.out
-new file mode 100644
-index 0000000..a5027f1
---- /dev/null
-+++ b/tests/blockdev/005.out
-@@ -0,0 +1,2 @@
-+QA output created by 005
-+Silence is golden
-diff --git a/tests/blockdev/group b/tests/blockdev/group
-index d100c85..445b97c 100644
---- a/tests/blockdev/group
-+++ b/tests/blockdev/group
-@@ -7,3 +7,4 @@
- 002 rw blockdev liotarget
- 003 rw blockdev liotarget integrity dangerous
- 004 rw blockdev dangerous zero
-+005 rw blockdev dangerous zero
-diff --git a/tests/generic/390 b/tests/generic/390
-index 473015a..a717888 100755
---- a/tests/generic/390
-+++ b/tests/generic/390
-@@ -55,6 +55,7 @@ _supported_os Linux
- _require_scratch
- _require_freeze
- _require_test_program "feature"
-+_require_command "$KILLALL_PROG" killall
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index dc83aec338d9..4db48ad76878 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1063,8 +1063,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+ 	 */
+ 	if (!list_empty(list)) {
+ 		/*
+-		 * If we got a driver tag for the next request already,
+-		 * free it again.
++		 * If an I/O scheduler has been configured and we got a driver
++		 * tag for the next request already, free it again.
+ 		 */
+ 		rq = list_first_entry(list, struct request, queuelist);
+ 		blk_mq_put_driver_tag(rq);
+@@ -1074,16 +1074,24 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+ 		spin_unlock(&hctx->lock);
  
- _scratch_mkfs >>$seqres.full 2>&1
- # We don't want to freeze/unfreeze root fs if mount scratch dev failed
+ 		/*
+-		 * the queue is expected stopped with BLK_MQ_RQ_QUEUE_BUSY, but
+-		 * it's possible the queue is stopped and restarted again
+-		 * before this. Queue restart will dispatch requests. And since
+-		 * requests in rq_list aren't added into hctx->dispatch yet,
+-		 * the requests in rq_list might get lost.
++		 * If SCHED_RESTART was set by the caller of this function and
++		 * it is no longer set that means that it was cleared by another
++		 * thread and hence that a queue rerun is needed.
+ 		 *
+-		 * blk_mq_run_hw_queue() already checks the STOPPED bit
++		 * If TAG_WAITING is set that means that an I/O scheduler has
++		 * been configured and another thread is waiting for a driver
++		 * tag. To guarantee fairness, do not rerun this hardware queue
++		 * but let the other thread grab the driver tag.
+ 		 *
+-		 * If RESTART or TAG_WAITING is set, then let completion restart
+-		 * the queue instead of potentially looping here.
++		 * If no I/O scheduler has been configured it is possible that
++		 * the hardware queue got stopped and restarted before requests
++		 * were pushed back onto the dispatch list. Rerun the queue to
++		 * avoid starvation. Notes:
++		 * - blk_mq_run_hw_queue() checks whether or not a queue has
++		 *   been stopped before rerunning a queue.
++		 * - Some but not all block drivers stop a queue before
++		 *   returning BLK_MQ_RQ_QUEUE_BUSY. Two exceptions are scsi-mq
++		 *   and dm-rq.
+ 		 */
+ 		if (!blk_mq_sched_needs_restart(hctx) &&
+ 		    !test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state))
 -- 
-2.9.3
+2.12.0
