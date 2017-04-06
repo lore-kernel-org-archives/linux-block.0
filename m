@@ -1,40 +1,40 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
+Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/25] block: Unregister bdi on last reference drop
-Date: Wed, 12 Apr 2017 12:24:26 +0200
-Message-Id: <20170412102449.16901-3-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 22/25] swim3: remove (commented out) printing of req->errors
+Date: Thu,  6 Apr 2017 17:39:41 +0200
+Message-Id: <20170406153944.10058-23-hch@lst.de>
+In-Reply-To: <20170406153944.10058-1-hch@lst.de>
+References: <20170406153944.10058-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Most users will want to unregister bdi when dropping last reference to a
-bdi. Only a few users (like block devices) want to play more complex
-tricks with bdi registration and unregistration. So unregister bdi when
-the last reference to bdi is dropped and just make sure we don't
-unregister the bdi the second time if it is already unregistered.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- mm/backing-dev.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/block/swim3.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index e5e0972bdd6f..164ccc93690f 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -961,6 +961,8 @@ static void release_bdi(struct kref *ref)
- 	struct backing_dev_info *bdi =
- 			container_of(ref, struct backing_dev_info, refcnt);
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index 61b3ffa4f458..ba4809c9bdba 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -343,8 +343,8 @@ static void start_request(struct floppy_state *fs)
+ 			  req->rq_disk->disk_name, req->cmd,
+ 			  (long)blk_rq_pos(req), blk_rq_sectors(req),
+ 			  bio_data(req->bio));
+-		swim3_dbg("           errors=%d current_nr_sectors=%u\n",
+-			  req->errors, blk_rq_cur_sectors(req));
++		swim3_dbg("           current_nr_sectors=%u\n",
++			  blk_rq_cur_sectors(req));
+ #endif
  
-+	if (test_bit(WB_registered, &bdi->wb.state))
-+		bdi_unregister(bdi);
- 	bdi_exit(bdi);
- 	kfree(bdi);
- }
+ 		if (blk_rq_pos(req) >= fs->total_secs) {
 -- 
-2.12.0
+2.11.0
