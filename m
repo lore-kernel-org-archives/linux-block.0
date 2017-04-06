@@ -1,46 +1,68 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH v4 05/10] blk-mq: Unregister debugfs attributes earlier
-Date: Fri, 21 Apr 2017 16:40:21 -0700
-Message-ID: <20170421234026.18970-6-bart.vanassche@sandisk.com>
-In-Reply-To: <20170421234026.18970-1-bart.vanassche@sandisk.com>
-References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+Return-Path: <leonro@mellanox.com>
+Date: Thu, 6 Apr 2017 17:27:01 +0300
+From: Leon Romanovsky <leonro@mellanox.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+CC: Jens Axboe <axboe@kernel.dk>, <linux-nvme@lists.infradead.org>,
+	<linux-block@vger.kernel.org>, <linux-rdma@vger.kernel.org>, Saeed Mahameed
+	<saeedm@mellanox.com>, Or Gerlitz <ogerlitz@mellanox.com>, Christoph Hellwig
+	<hch@lst.de>
+Subject: Re: [PATCH v2 2/6] mlx5: move affinity hints assignments to generic
+ code
+Message-ID: <20170406142701.GL2269@mtr-leonro.local>
+References: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
+ <1491474998-16423-3-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="XjbSsFHOHxvQpKib"
+In-Reply-To: <1491474998-16423-3-git-send-email-sagi@grimberg.me>
+Return-Path: leonro@mellanox.com
 List-ID: <linux-block@vger.kernel.org>
 
-One of the debugfs attributes allows to run a queue. Since running
-a queue after a queue has entered the "dead" state is not allowed
-and even can cause a kernel crash, unregister the debugfs attributes
-before a queue reaches the "dead" state.
+--XjbSsFHOHxvQpKib
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+On Thu, Apr 06, 2017 at 01:36:34PM +0300, Sagi Grimberg wrote:
+> generic api takes care of spreading affinity similar to
+> what mlx5 open coded (and even handles better asymmetric
+> configurations). Ask the generic API to spread affinity
+> for us, and feed him pre_vectors that do not participate
+> in affinity settings (which is an improvement to what we
+> had before).
+>
+> The affinity assignments should match what mlx5 tried to
+> do earlier but now we do not set affinity to async, cmd
+> and pages dedicated vectors.
+>
+> Also, remove mlx5e_get_cpu routine as we have generic helpers
+> to get cpumask and node given a irq vector, so use them
+> directly.
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a49b0830aaaf..33c91a4bee97 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -566,6 +566,11 @@ void blk_cleanup_queue(struct request_queue *q)
- 	spin_lock_irq(lock);
- 	if (!q->mq_ops)
- 		__blk_drain_queue(q, true);
-+	spin_unlock_irq(lock);
-+
-+	blk_mq_debugfs_unregister_mq(q);
-+
-+	spin_lock_irq(lock);
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
- 
--- 
-2.12.2
+Thanks,
+Acked-by: Leon Romanovsky <leonro@mellanox.com>
+
+--XjbSsFHOHxvQpKib
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEkhr/r4Op1/04yqaB5GN7iDZyWKcFAljmUDQACgkQ5GN7iDZy
+WKdDMxAAljeXK4d5Mgw37HndwWrXVYNYFqNbp/tyGfOU4uKrUB0a0Nozl8HTmxRK
+9WzsnXG2Txd9rKW9Nq9OMTP5DSmfYeCm4QpK5H9uM4WCLQ1/QZ/wsNMGDw6YEOZ5
+vNuT9uGg+NrqU2zeSTkvweaPRobYT3Pb6nfRFTMcp+Z64+Q2WaHURNAfPlyWv5Eg
+yRRsqKYookbVKuMC71zoRF1i/6Kefi9Pz6jyK8zKUA63YOkeiN7kukteqDo8BwzC
+6/X8ur3Qmtmv0G7tyy/HAm5AYDRp7V3RgRlkCW/svhPL/cn93NjURLWUnAWinGom
+5ppkqHX0eaJKMUexUEh10+7wq1jKfDwlrVkdpVk5wng6oOcwlAvR5TqRV8ZZdYID
+YJlRruuv88lO1RE6BZYTuzI6pQr7lwPwHU2AihLRxpHIbdprcIf7DDWIy3rFKWGi
+j0TtBjiAjMak4E6K0KXusGZj3+9+3JqClcV1+fCyLqTqxfQht4zirafRLud2dQLU
+LPy5TsAzBJaMQX/ve+pzwqP7pMR2Tmr0vvUQMQY9OAn/mfbfHs4MoewUjKHcsLr+
++jy1FfTBNFzTmY8df+wPXUOY6DQ/m477xChC8AqgStRb9RGTU/iFtq+Rt1TleTgy
+VdHKu2YddT00O0Zz/RZm9pHFE9JZa2xtmSSJPszPjOI4W9GSNMo=
+=fhTn
+-----END PGP SIGNATURE-----
+
+--XjbSsFHOHxvQpKib--
