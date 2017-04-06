@@ -1,65 +1,60 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH 3/6] blk-mq: Make blk_flags_show() callers append a newline character
-Date: Tue, 11 Apr 2017 13:58:39 -0700
-Message-ID: <20170411205842.28137-4-bart.vanassche@sandisk.com>
-In-Reply-To: <20170411205842.28137-1-bart.vanassche@sandisk.com>
-References: <20170411205842.28137-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-eopbgr20044.outbound.protection.outlook.com ([40.107.2.44]:18528
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S935163AbdDFOah (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Apr 2017 10:30:37 -0400
+Date: Thu, 6 Apr 2017 17:30:47 +0300
+From: Leon Romanovsky <leonro@mellanox.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+CC: Jens Axboe <axboe@kernel.dk>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Or Gerlitz <ogerlitz@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 4/6] mlx5: support ->get_vector_affinity
+Message-ID: <20170406143047.GM2269@mtr-leonro.local>
+References: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
+ <1491474998-16423-5-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="EEx6GiKZGZ1wKUra"
+In-Reply-To: <1491474998-16423-5-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality but makes it possible
-to produce a single line of output with multiple flag-to-name
-translations.
+--EEx6GiKZGZ1wKUra
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On Thu, Apr 06, 2017 at 01:36:36PM +0300, Sagi Grimberg wrote:
+> Simply refer to the generic affinity mask helper.
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 564470d4af52..aae4b7c7b7b0 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -60,7 +60,6 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 		else
- 			seq_printf(m, "%d", i);
- 	}
--	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -102,6 +101,7 @@ static int blk_queue_flags_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, q->queue_flags, blk_queue_flag_name,
- 		       ARRAY_SIZE(blk_queue_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -198,6 +198,7 @@ static int hctx_state_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, hctx->state, hctx_state_name,
- 		       ARRAY_SIZE(hctx_state_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -241,6 +242,7 @@ static int hctx_flags_show(struct seq_file *m, void *v)
- 	blk_flags_show(m,
- 		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
- 		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
--- 
-2.12.0
+Thanks,
+Acked-by: Leon Romanovsky <leonro@mellanox.com>
+
+--EEx6GiKZGZ1wKUra
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEkhr/r4Op1/04yqaB5GN7iDZyWKcFAljmURcACgkQ5GN7iDZy
+WKeHYA/+NGK3b9pn+BkHs5GfiXjvVyKdFrOil9NVz4InIr0NLVbFdFXYTpcN6/+v
+8s1fh0FCh3EeH8wWYy10m7yMKmtIXBkdT0g8fIGXLwoK2yBegzDRjtUWdZ5SdJyN
+aF8BvwdW7meV7eknp9+mXZglY34wTz5l4xAjV8tmyXXwlrBYHoryNowPS4BHhGQF
+rtZh+0RnhFGRVjtfNgBhmoSITkQSo5UiRvPljgcXtj3f7NKvVYDMU68cXL5M009T
+iXbvT1Ph77qYjjgacw1syUJop4SZQMLDW7UrYq5vQdHxcLsALeChpuI2CiKbiT6A
+5PVy9yikTjg/n0tMR7ZDygkkoFT6g0vHj8n6TovoyuM1b+Btiv2CdlfFNsdhho6P
+OLKnacf4f79Cuoa9owYHEq9LDiFg3bErP2b5gqzbbCzgbfsoVy70NDG3H1O/lgGb
+IStjdSWYdR+uZzHQIYC/LdVhWzGknryUypHyWTW9mXencPX1+JL6DrjCS5jNo0XV
+jGbzRLy0uoO7p0UVKRO9d2bJxI0/e0DJFmPE0UcOVhBnwiThUBYLkgexueIfpCor
+4NJbIRPOOEGxH8vJW3KqQv7lr91J3ItP57oi3ksMfNivzxuvvgNLPNEHS5oZ6FiX
+FFN4D361JyBYm3lunJNVYVbFyCJgffbpbdg+BhoW0vEsZHVFrWw=
+=Ajf+
+-----END PGP SIGNATURE-----
+
+--EEx6GiKZGZ1wKUra--
