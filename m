@@ -1,25 +1,34 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 7 Apr 2017 09:11:24 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <jbacik@fb.com>, James Smart <james.smart@broadcom.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, dm-devel@redhat.com
+Return-Path: <konrad.wilk@oracle.com>
+Date: Thu, 6 Apr 2017 16:00:24 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+        James Smart <james.smart@broadcom.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
 Subject: Re: kill req->errors
-Message-ID: <20170407071124.GA26481@lst.de>
-References: <20170406153944.10058-1-hch@lst.de> <20170406200024.GC6140@localhost.localdomain>
+Message-ID: <20170406200024.GC6140@localhost.localdomain>
+References: <20170406153944.10058-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170406200024.GC6140@localhost.localdomain>
+In-Reply-To: <20170406153944.10058-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 06, 2017 at 04:00:24PM -0400, Konrad Rzeszutek Wilk wrote:
-> You wouldn't have a git tree to easily test it? Thanks.
+On Thu, Apr 06, 2017 at 05:39:19PM +0200, Christoph Hellwig wrote:
+> Currently the request structure has an errors field that is used in
+> various different ways.  The oldest drivers use it as an error count,
+> blk-mq and the generic timeout code assume that it holds a Linux
+> errno for block completions, and various drivers use it for internal
+> status values, often overwriting them with Linux errnos later,
+> that is unless they are processing passthrough requests in which
+> case they'll leave their errors in it.
+> 
+> This series kills the ->errors field and replaced it with new fields
+> in the drivers (or an odd hack in a union in struct request for
+> two bitrotting old drivers).
+> 
+> Note that this series expects that the patch to remove the mg_disk
+> driver has been applied already on top of the block for-next tree.
 
-git://git.infradead.org/users/hch/block.git request-errors
-
-Gitweb:
-
-http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/request-errors
+You wouldn't have a git tree to easily test it? Thanks.
