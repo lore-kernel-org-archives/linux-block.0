@@ -1,47 +1,38 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "roger.pau@citrix.com"
-	<roger.pau@citrix.com>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "jbacik@fb.com" <jbacik@fb.com>,
-	"james.smart@broadcom.com" <james.smart@broadcom.com>, "dm-devel@redhat.com"
-	<dm-devel@redhat.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 6 Apr 2017 20:38:10 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, dm-devel@redhat.com
 Subject: Re: [PATCH 02/25] block: remove the blk_execute_rq return value
-Date: Thu, 13 Apr 2017 20:03:22 +0000
-Message-ID: <1492113800.24345.9.camel@sandisk.com>
+Message-ID: <20170406183808.GA8673@linux-x5ow.site>
 References: <20170406153944.10058-1-hch@lst.de>
-	 <20170406153944.10058-3-hch@lst.de>
-In-Reply-To: <20170406153944.10058-3-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170406153944.10058-3-hch@lst.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170406153944.10058-3-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-04-06 at 17:39 +0200, Christoph Hellwig wrote:
-> diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
-> index 92b4b41d19d2..4b72fdf67548 100644
-> --- a/fs/nfsd/blocklayout.c
-> +++ b/fs/nfsd/blocklayout.c
-> @@ -242,8 +242,8 @@ static int nfsd4_scsi_identify_device(struct block_de=
-vice *bdev,
->  	req->cmd[4] =3D bufflen & 0xff;
->  	req->cmd_len =3D COMMAND_SIZE(INQUIRY);
-> =20
-> -	error =3D blk_execute_rq(rq->q, NULL, rq, 1);
-> -	if (error) {
-> +	blk_execute_rq(rq->q, NULL, rq, 1);
-> +	if (rq->errors) {
->  		pr_err("pNFS: INQUIRY 0x83 failed with: %x\n",
->  			rq->errors);
->  		goto out_put_request;
+On Thu, Apr 06, 2017 at 05:39:21PM +0200, Christoph Hellwig wrote:
+> The function only returns -EIO if rq->errors is non-zero, which is not
+> very useful and lets a large number of callers ignore the return value.
+> 
+> Just let the callers figure out their error themselves.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Hello Christoph,
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-That blk_execute_rq() call can only be reached if a few lines above 0 was
-assigned to the "error" variable. Since nfsd4_scsi_identify_device() return=
-s
-the value of the "error" variable I think -EIO should be assigned to that
-variable before the "goto out_put_request" statement is reached.
-
-Bart.=
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
