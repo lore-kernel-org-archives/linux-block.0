@@ -1,61 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:38836 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753456AbdDKOTG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2017 10:19:06 -0400
-Received: by mail-wm0-f41.google.com with SMTP id t189so2201134wmt.1
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2017 07:19:06 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: convert sprintf into strlcpy
-Date: Tue, 11 Apr 2017 16:18:56 +0200
-Message-Id: <1491920338-2348-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1491920338-2348-1-git-send-email-javier@cnexlabs.com>
-References: <1491920338-2348-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 6 Apr 2017 10:55:16 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 1/5] nvme: move ->retries setup to nvme_setup_cmd
+Message-ID: <20170406085513.GC3768@linux-x5ow.site>
+References: <20170405171812.19911-1-hch@lst.de>
+ <20170405171812.19911-2-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170405171812.19911-2-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Convert sprintf calls to strlcpy in order to make possible buffer
-overflow more obvious.
+On Wed, Apr 05, 2017 at 07:18:08PM +0200, Christoph Hellwig wrote:
+> ->retries is counting the number of times a command is resubmitted, and
+> be cleared on the first time we see the command.  We currently don't do
+> that for non-PCIe command, which is easily fixed by moving the setup
+> to common code.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Thanks a lot.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 258007a..2c26af3 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -273,7 +273,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		goto err_disk;
- 	blk_queue_make_request(tqueue, tt->make_rq);
- 
--	sprintf(tdisk->disk_name, "%s", create->tgtname);
-+	strlcpy(tdisk->disk_name, create->tgtname, sizeof(tdisk->disk_name));
- 	tdisk->flags = GENHD_FL_EXT_DEVT;
- 	tdisk->major = 0;
- 	tdisk->first_minor = 0;
-@@ -1198,13 +1198,13 @@ static long nvm_ioctl_get_devices(struct file *file, void __user *arg)
- 	list_for_each_entry(dev, &nvm_devices, devices) {
- 		struct nvm_ioctl_device_info *info = &devices->info[i];
- 
--		sprintf(info->devname, "%s", dev->name);
-+		strlcpy(info->devname, dev->name, sizeof(info->devname));
- 
- 		/* kept for compatibility */
- 		info->bmversion[0] = 1;
- 		info->bmversion[1] = 0;
- 		info->bmversion[2] = 0;
--		sprintf(info->bmname, "%s", "gennvm");
-+		strlcpy(info->bmname, "gennvm", sizeof(info->bmname));
- 		i++;
- 
- 		if (i > 31) {
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
