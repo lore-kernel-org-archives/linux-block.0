@@ -1,181 +1,138 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51305 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753700AbdDEHrK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Apr 2017 03:47:10 -0400
-From: Vlastimil Babka <vbabka@suse.cz>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
-        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
-        Josef Bacik <jbacik@fb.com>, Lee Duncan <lduncan@suse.com>,
-        Chris Leech <cleech@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>
-Subject: [PATCH 3/4] treewide: convert PF_MEMALLOC manipulations to new helpers
-Date: Wed,  5 Apr 2017 09:46:59 +0200
-Message-Id: <20170405074700.29871-4-vbabka@suse.cz>
-In-Reply-To: <20170405074700.29871-1-vbabka@suse.cz>
-References: <20170405074700.29871-1-vbabka@suse.cz>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:33745 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757082AbdDFNTU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2017 09:19:20 -0400
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: fstests@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 3/6] new: blockdev/002 check information leak for lio-fileio
+Date: Thu,  6 Apr 2017 17:19:07 +0400
+Message-Id: <1491484750-9164-4-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
+References: <1491484750-9164-1-git-send-email-dmonakhov@openvz.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We now have memalloc_noreclaim_{save,restore} helpers for robust setting and
-clearing of PF_MEMALLOC. Let's convert the code which was using the generic
-tsk_restore_flags(). No functional change.
-
-Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Lee Duncan <lduncan@suse.com>
-Cc: Chris Leech <cleech@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- drivers/block/nbd.c      | 7 ++++---
- drivers/scsi/iscsi_tcp.c | 7 ++++---
- net/core/dev.c           | 7 ++++---
- net/core/sock.c          | 7 ++++---
- 4 files changed, 16 insertions(+), 12 deletions(-)
+ tests/blockdev/002     | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/blockdev/002.out | 12 ++++++++
+ tests/blockdev/group   |  1 +
+ 3 files changed, 90 insertions(+)
+ create mode 100755 tests/blockdev/002
+ create mode 100644 tests/blockdev/002.out
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 03ae72985c79..929fc548c7fb 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -18,6 +18,7 @@
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/sched.h>
-+#include <linux/sched/mm.h>
- #include <linux/fs.h>
- #include <linux/bio.h>
- #include <linux/stat.h>
-@@ -210,7 +211,7 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send,
- 	struct socket *sock = nbd->socks[index]->sock;
- 	int result;
- 	struct msghdr msg;
--	unsigned long pflags = current->flags;
-+	unsigned int noreclaim_flag;
- 
- 	if (unlikely(!sock)) {
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
-@@ -221,7 +222,7 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send,
- 
- 	msg.msg_iter = *iter;
- 
--	current->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 	do {
- 		sock->sk->sk_allocation = GFP_NOIO | __GFP_MEMALLOC;
- 		msg.msg_name = NULL;
-@@ -244,7 +245,7 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send,
- 			*sent += result;
- 	} while (msg_data_left(&msg));
- 
--	tsk_restore_flags(current, pflags, PF_MEMALLOC);
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 
- 	return result;
- }
-diff --git a/drivers/scsi/iscsi_tcp.c b/drivers/scsi/iscsi_tcp.c
-index 4228aba1f654..4842fc0e809d 100644
---- a/drivers/scsi/iscsi_tcp.c
-+++ b/drivers/scsi/iscsi_tcp.c
-@@ -30,6 +30,7 @@
- #include <linux/types.h>
- #include <linux/inet.h>
- #include <linux/slab.h>
-+#include <linux/sched/mm.h>
- #include <linux/file.h>
- #include <linux/blkdev.h>
- #include <linux/delay.h>
-@@ -371,10 +372,10 @@ static inline int iscsi_sw_tcp_xmit_qlen(struct iscsi_conn *conn)
- static int iscsi_sw_tcp_pdu_xmit(struct iscsi_task *task)
- {
- 	struct iscsi_conn *conn = task->conn;
--	unsigned long pflags = current->flags;
-+	unsigned int noreclaim_flag;
- 	int rc = 0;
- 
--	current->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 
- 	while (iscsi_sw_tcp_xmit_qlen(conn)) {
- 		rc = iscsi_sw_tcp_xmit(conn);
-@@ -387,7 +388,7 @@ static int iscsi_sw_tcp_pdu_xmit(struct iscsi_task *task)
- 		rc = 0;
- 	}
- 
--	tsk_restore_flags(current, pflags, PF_MEMALLOC);
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 	return rc;
- }
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index fde8b3f7136b..e0705a126b24 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -81,6 +81,7 @@
- #include <linux/hash.h>
- #include <linux/slab.h>
- #include <linux/sched.h>
-+#include <linux/sched/mm.h>
- #include <linux/mutex.h>
- #include <linux/string.h>
- #include <linux/mm.h>
-@@ -4227,7 +4228,7 @@ static int __netif_receive_skb(struct sk_buff *skb)
- 	int ret;
- 
- 	if (sk_memalloc_socks() && skb_pfmemalloc(skb)) {
--		unsigned long pflags = current->flags;
-+		unsigned int noreclaim_flag;
- 
- 		/*
- 		 * PFMEMALLOC skbs are special, they should
-@@ -4238,9 +4239,9 @@ static int __netif_receive_skb(struct sk_buff *skb)
- 		 * Use PF_MEMALLOC as this saves us from propagating the allocation
- 		 * context down to all allocation sites.
- 		 */
--		current->flags |= PF_MEMALLOC;
-+		noreclaim_flag = memalloc_noreclaim_save();
- 		ret = __netif_receive_skb_core(skb, true);
--		tsk_restore_flags(current, pflags, PF_MEMALLOC);
-+		memalloc_noreclaim_restore(noreclaim_flag);
- 	} else
- 		ret = __netif_receive_skb_core(skb, false);
- 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 392f9b6f96e2..0b2d06b4c308 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -102,6 +102,7 @@
- #include <linux/proc_fs.h>
- #include <linux/seq_file.h>
- #include <linux/sched.h>
-+#include <linux/sched/mm.h>
- #include <linux/timer.h>
- #include <linux/string.h>
- #include <linux/sockios.h>
-@@ -372,14 +373,14 @@ EXPORT_SYMBOL_GPL(sk_clear_memalloc);
- int __sk_backlog_rcv(struct sock *sk, struct sk_buff *skb)
- {
- 	int ret;
--	unsigned long pflags = current->flags;
-+	unsigned int noreclaim_flag;
- 
- 	/* these should have been dropped before queueing */
- 	BUG_ON(!sock_flag(sk, SOCK_MEMALLOC));
- 
--	current->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 	ret = sk->sk_backlog_rcv(sk, skb);
--	tsk_restore_flags(current, pflags, PF_MEMALLOC);
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 
- 	return ret;
- }
+diff --git a/tests/blockdev/002 b/tests/blockdev/002
+new file mode 100755
+index 0000000..71867d1
+--- /dev/null
++++ b/tests/blockdev/002
+@@ -0,0 +1,77 @@
++#! /bin/bash
++# FS QA Test 002
++#
++# Regression test for  information leak for lio-fileio target
++# BUG: If image  file is less than virtual blockdev then read() may return
++#      unitilized data.
++#
++#-----------------------------------------------------------------------
++# Copyright (c) 2017 Dmitry Monakhov <dmonakhov@openvz.org>
++# All Rights Reserved.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it would be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write the Free Software Foundation,
++# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#-----------------------------------------------------------------------
++#
++
++seq=`basename $0`
++seqres=$RESULT_DIR/$seq
++echo "QA output created by $seq"
++
++here=`pwd`
++tmp=/tmp/$$
++status=1	# failure is the default!
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++
++_cleanup()
++{
++	cd /
++	rm -f $tmp.*
++	_liotgt_cleanup
++	rm -rf $TEST_DIR/$$
++}
++
++# get standard environment, filters and checks
++. ./common/rc
++. ./common/filter
++. ./common/liotarget
++
++# remove previous $seqres.full before test
++rm -f $seqres.full
++
++# real QA test starts here
++
++# Modify as appropriate.
++_supported_fs generic
++_supported_os Linux
++_require_test
++_require_liotarget
++
++mkdir -p $TEST_DIR/$$ || _fail "Can not make test dir"
++
++cfg_path=$(_liotgt_create_fileio  002-test.img $TEST_DIR/$$/002-test.img 128M)
++dev=$(_liotgt_attach_target /backstores/fileio/002-test.img)
++
++$XFS_IO_PROG -f -c "truncate 1M" $TEST_DIR/$$/002-test.img >> $seqres.full
++
++$XFS_IO_PROG -c "pwrite -S 0xa0 -b 512 512 1k" -d $dev >>$seqres.full 2>&1 || \
++    _fail "pwrite failed"
++
++$XFS_IO_PROG -c "pwrite -S 0xab -b 512 2M 1k" -d $dev >>$seqres.full 2>&1 || \
++    _fail "pwrite failed"
++
++dd if=$dev bs=4k  2>>$seqres.full | hexdump
++# success, all done
++status=0
++exit
+diff --git a/tests/blockdev/002.out b/tests/blockdev/002.out
+new file mode 100644
+index 0000000..e761c06
+--- /dev/null
++++ b/tests/blockdev/002.out
+@@ -0,0 +1,12 @@
++QA output created by 002
++0000000 0000 0000 0000 0000 0000 0000 0000 0000
++*
++0000200 a0a0 a0a0 a0a0 a0a0 a0a0 a0a0 a0a0 a0a0
++*
++0000600 0000 0000 0000 0000 0000 0000 0000 0000
++*
++0200000 abab abab abab abab abab abab abab abab
++*
++0200400 0000 0000 0000 0000 0000 0000 0000 0000
++*
++8000000
+diff --git a/tests/blockdev/group b/tests/blockdev/group
+index bdfdcb9..0b511f3 100644
+--- a/tests/blockdev/group
++++ b/tests/blockdev/group
+@@ -4,3 +4,4 @@
+ # - comment line before each group is "new" description
+ #
+ 001 rw blockdev
++002 rw blockdev liotarget
 -- 
-2.12.2
+2.9.3
