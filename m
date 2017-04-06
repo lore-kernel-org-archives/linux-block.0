@@ -1,101 +1,52 @@
-Return-Path: <BATV+d57f7b82a529b7e9747b+4995+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/5] nvme-rdma: merge init_request and exit_request methods
-Date: Thu, 27 Apr 2017 19:44:59 +0200
-Message-Id: <20170427174501.18965-4-hch@lst.de>
-In-Reply-To: <20170427174501.18965-1-hch@lst.de>
-References: <20170427174501.18965-1-hch@lst.de>
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	nbd-general@lists.sourceforge.net,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Subject: [PATCH 08/12] nbd: only clear the queue on device teardown
+Date: Thu,  6 Apr 2017 17:02:03 -0400
+Message-Id: <1491512527-4286-9-git-send-email-jbacik@fb.com>
+In-Reply-To: <1491512527-4286-1-git-send-email-jbacik@fb.com>
+References: <1491512527-4286-1-git-send-email-jbacik@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that we get the tagset passed we can have a single implementation for
-the I/O and admin queues.
+When running a disconnect torture test I noticed that sometimes we would
+crash with a negative ref count on our queue.  This was because we were
+ending the same request twice.  Turns out we were racing with
+NBD_CLEAR_SOCK clearing the requests as well as the teardown of the
+device clearing the requests.  So instead make the ioctl only shutdown
+the sockets and make it so that we only ever run nbd_clear_que from the
+device teardown.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Josef Bacik <jbacik@fb.com>
 ---
- drivers/nvme/host/rdma.c | 43 +++++++++++--------------------------------
- 1 file changed, 11 insertions(+), 32 deletions(-)
+ drivers/block/nbd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index dd1c6deef82f..960b171218c5 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -301,10 +301,12 @@ static int nvme_rdma_reinit_request(void *data, struct request *rq)
- 	return ret;
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 911e36c..70c5e75 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -616,7 +616,9 @@ static void nbd_clear_req(struct request *req, void *data, bool reserved)
+ 
+ static void nbd_clear_que(struct nbd_device *nbd)
+ {
++	blk_mq_stop_hw_queues(nbd->disk->queue);
+ 	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_clear_req, NULL);
++	blk_mq_start_hw_queues(nbd->disk->queue);
+ 	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
  }
  
--static void __nvme_rdma_exit_request(struct nvme_rdma_ctrl *ctrl,
--		struct request *rq, unsigned int queue_idx)
-+static void nvme_rdma_exit_request(struct blk_mq_tag_set *set,
-+		struct request *rq, unsigned int hctx_idx)
+@@ -1041,7 +1043,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+ static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
+ 				 struct block_device *bdev)
  {
-+	struct nvme_rdma_ctrl *ctrl = set->driver_data;
- 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
-+	int queue_idx = (set == &ctrl->tag_set) ? hctx_idx + 1 : 0;
- 	struct nvme_rdma_queue *queue = &ctrl->queues[queue_idx];
- 	struct nvme_rdma_device *dev = queue->device;
- 
-@@ -315,22 +317,13 @@ static void __nvme_rdma_exit_request(struct nvme_rdma_ctrl *ctrl,
- 			DMA_TO_DEVICE);
- }
- 
--static void nvme_rdma_exit_request(struct blk_mq_tag_set *set,
--		struct request *rq, unsigned int hctx_idx)
--{
--	return __nvme_rdma_exit_request(set->driver_data, rq, hctx_idx + 1);
--}
--
--static void nvme_rdma_exit_admin_request(struct blk_mq_tag_set *set,
--		struct request *rq, unsigned int hctx_idx)
--{
--	return __nvme_rdma_exit_request(set->driver_data, rq, 0);
--}
--
--static int __nvme_rdma_init_request(struct nvme_rdma_ctrl *ctrl,
--		struct request *rq, unsigned int queue_idx)
-+static int nvme_rdma_init_request(struct blk_mq_tag_set *set,
-+		struct request *rq, unsigned int hctx_idx,
-+		unsigned int numa_node)
- {
-+	struct nvme_rdma_ctrl *ctrl = set->driver_data;
- 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
-+	int queue_idx = (set == &ctrl->tag_set) ? hctx_idx + 1 : 0;
- 	struct nvme_rdma_queue *queue = &ctrl->queues[queue_idx];
- 	struct nvme_rdma_device *dev = queue->device;
- 	struct ib_device *ibdev = dev->dev;
-@@ -358,20 +351,6 @@ static int __nvme_rdma_init_request(struct nvme_rdma_ctrl *ctrl,
- 	return -ENOMEM;
- }
- 
--static int nvme_rdma_init_request(struct blk_mq_tag_set *set,
--		struct request *rq, unsigned int hctx_idx,
--		unsigned int numa_node)
--{
--	return __nvme_rdma_init_request(set->driver_data, rq, hctx_idx + 1);
--}
--
--static int nvme_rdma_init_admin_request(struct blk_mq_tag_set *set,
--		struct request *rq, unsigned int hctx_idx,
--		unsigned int numa_node)
--{
--	return __nvme_rdma_init_request(set->driver_data, rq, 0);
--}
--
- static int nvme_rdma_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
- 		unsigned int hctx_idx)
- {
-@@ -1536,8 +1515,8 @@ static const struct blk_mq_ops nvme_rdma_mq_ops = {
- static const struct blk_mq_ops nvme_rdma_admin_mq_ops = {
- 	.queue_rq	= nvme_rdma_queue_rq,
- 	.complete	= nvme_rdma_complete_rq,
--	.init_request	= nvme_rdma_init_admin_request,
--	.exit_request	= nvme_rdma_exit_admin_request,
-+	.init_request	= nvme_rdma_init_request,
-+	.exit_request	= nvme_rdma_exit_request,
- 	.reinit_request	= nvme_rdma_reinit_request,
- 	.init_hctx	= nvme_rdma_init_admin_hctx,
- 	.timeout	= nvme_rdma_timeout,
+-	nbd_clear_sock(nbd);
++	sock_shutdown(nbd);
+ 	kill_bdev(bdev);
+ 	nbd_bdev_reset(bdev);
+ 	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
 -- 
-2.11.0
+2.7.4
