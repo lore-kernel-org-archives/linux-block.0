@@ -1,125 +1,41 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
 	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 18/27] brd: remove discard support
-Date: Wed,  5 Apr 2017 19:21:16 +0200
-Message-Id: <20170405172125.22600-19-hch@lst.de>
-In-Reply-To: <20170405172125.22600-1-hch@lst.de>
-References: <20170405172125.22600-1-hch@lst.de>
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 13/25] dm mpath: don't check for req->errors
+Date: Thu,  6 Apr 2017 17:39:32 +0200
+Message-Id: <20170406153944.10058-14-hch@lst.de>
+In-Reply-To: <20170406153944.10058-1-hch@lst.de>
+References: <20170406153944.10058-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-It's just a in-driver reimplementation of writing zeroes to the pages,
-which fails if the discards aren't page aligned.
+We'll get all proper errors reported through ->end_io and ->errors will
+go away soon.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/block/brd.c | 54 -----------------------------------------------------
- 1 file changed, 54 deletions(-)
+ drivers/md/dm-mpath.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 3adc32a3153b..4ec84d504780 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -134,28 +134,6 @@ static struct page *brd_insert_page(struct brd_device *brd, sector_t sector)
- 	return page;
- }
- 
--static void brd_free_page(struct brd_device *brd, sector_t sector)
--{
--	struct page *page;
--	pgoff_t idx;
--
--	spin_lock(&brd->brd_lock);
--	idx = sector >> PAGE_SECTORS_SHIFT;
--	page = radix_tree_delete(&brd->brd_pages, idx);
--	spin_unlock(&brd->brd_lock);
--	if (page)
--		__free_page(page);
--}
--
--static void brd_zero_page(struct brd_device *brd, sector_t sector)
--{
--	struct page *page;
--
--	page = brd_lookup_page(brd, sector);
--	if (page)
--		clear_highpage(page);
--}
--
- /*
-  * Free all backing store pages and radix tree. This must only be called when
-  * there are no other users of the device.
-@@ -212,24 +190,6 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
- 	return 0;
- }
- 
--static void discard_from_brd(struct brd_device *brd,
--			sector_t sector, size_t n)
--{
--	while (n >= PAGE_SIZE) {
--		/*
--		 * Don't want to actually discard pages here because
--		 * re-allocating the pages can result in writeback
--		 * deadlocks under heavy load.
--		 */
--		if (0)
--			brd_free_page(brd, sector);
--		else
--			brd_zero_page(brd, sector);
--		sector += PAGE_SIZE >> SECTOR_SHIFT;
--		n -= PAGE_SIZE;
--	}
--}
--
- /*
-  * Copy n bytes from src to the brd starting at sector. Does not sleep.
-  */
-@@ -338,14 +298,6 @@ static blk_qc_t brd_make_request(struct request_queue *q, struct bio *bio)
- 	if (bio_end_sector(bio) > get_capacity(bdev->bd_disk))
- 		goto io_error;
- 
--	if (unlikely(bio_op(bio) == REQ_OP_DISCARD)) {
--		if (sector & ((PAGE_SIZE >> SECTOR_SHIFT) - 1) ||
--		    bio->bi_iter.bi_size & ~PAGE_MASK)
--			goto io_error;
--		discard_from_brd(brd, sector, bio->bi_iter.bi_size);
--		goto out;
--	}
--
- 	bio_for_each_segment(bvec, bio, iter) {
- 		unsigned int len = bvec.bv_len;
- 		int err;
-@@ -357,7 +309,6 @@ static blk_qc_t brd_make_request(struct request_queue *q, struct bio *bio)
- 		sector += len >> SECTOR_SHIFT;
- 	}
- 
--out:
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
- io_error:
-@@ -464,11 +415,6 @@ static struct brd_device *brd_alloc(int i)
- 	 *  is harmless)
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 7f223dbed49f..4aa1b865e66e 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -1491,7 +1491,7 @@ static int do_end_io(struct multipath *m, struct request *clone,
  	 */
- 	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
--
--	brd->brd_queue->limits.discard_granularity = PAGE_SIZE;
--	blk_queue_max_discard_sectors(brd->brd_queue, UINT_MAX);
--	brd->brd_queue->limits.discard_zeroes_data = 1;
--	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, brd->brd_queue);
- #ifdef CONFIG_BLK_DEV_RAM_DAX
- 	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
- #endif
+ 	int r = DM_ENDIO_REQUEUE;
+ 
+-	if (!error && !clone->errors)
++	if (!error)
+ 		return 0;	/* I/O complete */
+ 
+ 	if (noretry_error(error))
 -- 
 2.11.0
