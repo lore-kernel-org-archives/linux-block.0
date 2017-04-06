@@ -1,194 +1,122 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f46.google.com ([74.125.83.46]:35809 "EHLO
-        mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932546AbdDES31 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 14:29:27 -0400
-Received: by mail-pg0-f46.google.com with SMTP id 81so12175385pgh.2
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 11:29:27 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 6/8] blk-mq-sched: provide hooks for initializing hardware queue data
-Date: Wed,  5 Apr 2017 11:28:18 -0700
-Message-Id: <5607bb2bf235433919b41c61d5484c454dbe67f6.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 24/25] blktrace: remove the unused block_rq_abort tracepoint
+Date: Thu,  6 Apr 2017 17:39:43 +0200
+Message-Id: <20170406153944.10058-25-hch@lst.de>
+In-Reply-To: <20170406153944.10058-1-hch@lst.de>
+References: <20170406153944.10058-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
-
-Schedulers need to be informed when a hardware queue is added or removed
-at runtime so they can allocate/free per-hardware queue data. So,
-replace the blk_mq_sched_init_hctx_data() helper, which only makes sense
-at init time, with .init_hctx() and .exit_hctx() hooks.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-sched.c     | 81 +++++++++++++++++++++++++-----------------------
- block/blk-mq-sched.h     |  4 ---
- include/linux/elevator.h |  2 ++
- 3 files changed, 45 insertions(+), 42 deletions(-)
+ include/trace/events/block.h | 44 ++++++++++----------------------------------
+ kernel/trace/blktrace.c      |  9 ---------
+ 2 files changed, 10 insertions(+), 43 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index e8c2ed654ef0..9d7f6d6ca693 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -30,43 +30,6 @@ void blk_mq_sched_free_hctx_data(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(blk_mq_sched_free_hctx_data);
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index a88ed13446ff..99ed69fad041 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -61,7 +61,16 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
+ 	TP_ARGS(bh)
+ );
  
--int blk_mq_sched_init_hctx_data(struct request_queue *q, size_t size,
--				int (*init)(struct blk_mq_hw_ctx *),
--				void (*exit)(struct blk_mq_hw_ctx *))
+-DECLARE_EVENT_CLASS(block_rq_with_error,
++/**
++ * block_rq_requeue - place block IO request back on a queue
++ * @q: queue holding operation
++ * @rq: block IO operation request
++ *
++ * The block operation request @rq is being placed back into queue
++ * @q.  For some reason the request was not completed and needs to be
++ * put back in the queue.
++ */
++TRACE_EVENT(block_rq_requeue,
+ 
+ 	TP_PROTO(struct request_queue *q, struct request *rq),
+ 
+@@ -94,39 +103,6 @@ DECLARE_EVENT_CLASS(block_rq_with_error,
+ );
+ 
+ /**
+- * block_rq_abort - abort block operation request
+- * @q: queue containing the block operation request
+- * @rq: block IO operation request
+- *
+- * Called immediately after pending block IO operation request @rq in
+- * queue @q is aborted. The fields in the operation request @rq
+- * can be examined to determine which device and sectors the pending
+- * operation would access.
+- */
+-DEFINE_EVENT(block_rq_with_error, block_rq_abort,
+-
+-	TP_PROTO(struct request_queue *q, struct request *rq),
+-
+-	TP_ARGS(q, rq)
+-);
+-
+-/**
+- * block_rq_requeue - place block IO request back on a queue
+- * @q: queue holding operation
+- * @rq: block IO operation request
+- *
+- * The block operation request @rq is being placed back into queue
+- * @q.  For some reason the request was not completed and needs to be
+- * put back in the queue.
+- */
+-DEFINE_EVENT(block_rq_with_error, block_rq_requeue,
+-
+-	TP_PROTO(struct request_queue *q, struct request *rq),
+-
+-	TP_ARGS(q, rq)
+-);
+-
+-/**
+  * block_rq_complete - block IO operation completed by device driver
+  * @q: queue containing the block operation request
+  * @rq: block operations request
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index b2058a7f94bd..9f3624dadb09 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -716,12 +716,6 @@ static void blk_add_trace_rq(struct request_queue *q, struct request *rq,
+ 			rq->cmd_flags, what, rq->errors, 0, NULL);
+ }
+ 
+-static void blk_add_trace_rq_abort(void *ignore,
+-				   struct request_queue *q, struct request *rq)
 -{
--	struct blk_mq_hw_ctx *hctx;
--	int ret;
--	int i;
--
--	queue_for_each_hw_ctx(q, hctx, i) {
--		hctx->sched_data = kmalloc_node(size, GFP_KERNEL, hctx->numa_node);
--		if (!hctx->sched_data) {
--			ret = -ENOMEM;
--			goto error;
--		}
--
--		if (init) {
--			ret = init(hctx);
--			if (ret) {
--				/*
--				 * We don't want to give exit() a partially
--				 * initialized sched_data. init() must clean up
--				 * if it fails.
--				 */
--				kfree(hctx->sched_data);
--				hctx->sched_data = NULL;
--				goto error;
--			}
--		}
--	}
--
--	return 0;
--error:
--	blk_mq_sched_free_hctx_data(q, exit);
--	return ret;
+-	blk_add_trace_rq(q, rq, blk_rq_bytes(rq), BLK_TA_ABORT);
 -}
--EXPORT_SYMBOL_GPL(blk_mq_sched_init_hctx_data);
 -
- static void __blk_mq_sched_assign_ioc(struct request_queue *q,
- 				      struct request *rq,
- 				      struct bio *bio,
-@@ -465,11 +428,24 @@ int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- 			   unsigned int hctx_idx)
+ static void blk_add_trace_rq_insert(void *ignore,
+ 				    struct request_queue *q, struct request *rq)
  {
- 	struct elevator_queue *e = q->elevator;
-+	int ret;
- 
- 	if (!e)
- 		return 0;
- 
--	return blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
-+	ret = blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
-+	if (ret)
-+		return ret;
-+
-+	if (e->type->ops.mq.init_hctx) {
-+		ret = e->type->ops.mq.init_hctx(hctx, hctx_idx);
-+		if (ret) {
-+			blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
- }
- 
- void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-@@ -480,12 +456,18 @@ void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- 	if (!e)
- 		return;
- 
-+	if (e->type->ops.mq.exit_hctx && hctx->sched_data) {
-+		e->type->ops.mq.exit_hctx(hctx, hctx_idx);
-+		hctx->sched_data = NULL;
-+	}
-+
- 	blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
- }
- 
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+@@ -974,8 +968,6 @@ static void blk_register_tracepoints(void)
  {
- 	struct blk_mq_hw_ctx *hctx;
-+	struct elevator_queue *eq;
- 	unsigned int i;
  	int ret;
  
-@@ -510,6 +492,18 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 	if (ret)
- 		goto err;
+-	ret = register_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
+-	WARN_ON(ret);
+ 	ret = register_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
+ 	WARN_ON(ret);
+ 	ret = register_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
+@@ -1028,7 +1020,6 @@ static void blk_unregister_tracepoints(void)
+ 	unregister_trace_block_rq_requeue(blk_add_trace_rq_requeue, NULL);
+ 	unregister_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
+ 	unregister_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
+-	unregister_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
  
-+	if (e->ops.mq.init_hctx) {
-+		queue_for_each_hw_ctx(q, hctx, i) {
-+			ret = e->ops.mq.init_hctx(hctx, i);
-+			if (ret) {
-+				eq = q->elevator;
-+				blk_mq_exit_sched(q, eq);
-+				kobject_put(&eq->kobj);
-+				return ret;
-+			}
-+		}
-+	}
-+
- 	return 0;
- 
- err:
-@@ -520,6 +514,17 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 
- void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
- {
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned int i;
-+
-+	if (e->type->ops.mq.exit_hctx) {
-+		queue_for_each_hw_ctx(q, hctx, i) {
-+			if (hctx->sched_data) {
-+				e->type->ops.mq.exit_hctx(hctx, i);
-+				hctx->sched_data = NULL;
-+			}
-+		}
-+	}
- 	if (e->type->ops.mq.exit_sched)
- 		e->type->ops.mq.exit_sched(e);
- 	blk_mq_sched_tags_teardown(q);
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index e704956e0862..c6e760df0fb4 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -4,10 +4,6 @@
- #include "blk-mq.h"
- #include "blk-mq-tag.h"
- 
--int blk_mq_sched_init_hctx_data(struct request_queue *q, size_t size,
--				int (*init)(struct blk_mq_hw_ctx *),
--				void (*exit)(struct blk_mq_hw_ctx *));
--
- void blk_mq_sched_free_hctx_data(struct request_queue *q,
- 				 void (*exit)(struct blk_mq_hw_ctx *));
- 
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 22d39e8d4de1..b7ec315ee7e7 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -93,6 +93,8 @@ struct blk_mq_hw_ctx;
- struct elevator_mq_ops {
- 	int (*init_sched)(struct request_queue *, struct elevator_type *);
- 	void (*exit_sched)(struct elevator_queue *);
-+	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
-+	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
- 
- 	bool (*allow_merge)(struct request_queue *, struct request *, struct bio *);
- 	bool (*bio_merge)(struct blk_mq_hw_ctx *, struct bio *);
+ 	tracepoint_synchronize_unregister();
+ }
 -- 
-2.12.2
+2.11.0
