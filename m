@@ -1,47 +1,45 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=iso-8859-1
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH V2 11/16] block, bfq: reduce idling only in symmetric scenarios
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1490973609.2587.3.camel@sandisk.com>
-Date: Fri, 7 Apr 2017 09:47:53 +0200
-Cc: "tj@kernel.org" <tj@kernel.org>,
- "axboe@kernel.dk" <axboe@kernel.dk>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "samuele.zecchini92@gmail.com" <samuele.zecchini92@gmail.com>,
- "fchecconi@gmail.com" <fchecconi@gmail.com>,
- "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
- Arianna Avanzini <avanzini.arianna@gmail.com>,
- "broonie@kernel.org" <broonie@kernel.org>,
- "riccardo.pizzetti@gmail.com" <riccardo.pizzetti@gmail.com>,
- "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
-Message-Id: <2F5C851A-CE28-4159-AC60-8D42884E6EF1@linaro.org>
-References: <20170331124743.3530-1-paolo.valente@linaro.org> <20170331124743.3530-12-paolo.valente@linaro.org> <1490973609.2587.3.camel@sandisk.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out0-224.mail.aliyun.com ([140.205.0.224]:55770 "EHLO
+        out0-224.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752023AbdDGHjL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2017 03:39:11 -0400
+Reply-To: "Hillf Danton" <hillf.zj@alibaba-inc.com>
+From: "Hillf Danton" <hillf.zj@alibaba-inc.com>
+To: "'Vlastimil Babka'" <vbabka@suse.cz>,
+        "'Andrew Morton'" <akpm@linux-foundation.org>
+Cc: <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
+        "'Michal Hocko'" <mhocko@kernel.org>,
+        "'Mel Gorman'" <mgorman@techsingularity.net>,
+        "'Johannes Weiner'" <hannes@cmpxchg.org>,
+        <linux-block@vger.kernel.org>, <nbd-general@lists.sourceforge.net>,
+        <open-iscsi@googlegroups.com>, <linux-scsi@vger.kernel.org>,
+        <netdev@vger.kernel.org>, "'Michal Hocko'" <mhocko@suse.com>
+References: <20170405074700.29871-1-vbabka@suse.cz> <20170405074700.29871-3-vbabka@suse.cz>
+In-Reply-To: <20170405074700.29871-3-vbabka@suse.cz>
+Subject: Re: [PATCH 2/4] mm: introduce memalloc_noreclaim_{save,restore}
+Date: Fri, 07 Apr 2017 15:38:43 +0800
+Message-ID: <092401d2af71$fc320ef0$f4962cd0$@alibaba-inc.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 
-> Il giorno 31 mar 2017, alle ore 17:20, Bart Van Assche =
-<bart.vanassche@sandisk.com> ha scritto:
->=20
-> On Fri, 2017-03-31 at 14:47 +0200, Paolo Valente wrote:
->> +       entity->weight_counter =3D kzalloc(sizeof(struct =
-bfq_weight_counter),
->> +                                        GFP_ATOMIC);
->> +       entity->weight_counter->weight =3D entity->weight;
->=20
-> GFP_ATOMIC allocations are more likely to fail than GFP_KERNEL =
-allocations.
-> What will happen if kzalloc() returns NULL?
->=20
+On April 05, 2017 3:47 PM Vlastimil Babka wrote: 
+> 
+> The previous patch has shown that simply setting and clearing PF_MEMALLOC in
+> current->flags can result in wrongly clearing a pre-existing PF_MEMALLOC flag
+> and potentially lead to recursive reclaim. Let's introduce helpers that support
+> proper nesting by saving the previous stat of the flag, similar to the existing
+> memalloc_noio_* and memalloc_nofs_* helpers. Convert existing setting/clearing
+> of PF_MEMALLOC within mm to the new helpers.
+> 
+> There are no known issues with the converted code, but the change makes it more
+> robust.
+> 
+> Suggested-by: Michal Hocko <mhocko@suse.com>
+> Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+> ---
 
-A plain crash :( I'm adding the simple handling of this forgotten =
-exception. If I don't get other reviews in the next days, I'll post a V3 =
-addressing this and the other issue you highlighted.
-
-Thanks,
-Paolo
-
-> Bart.
+Acked-by: Hillf Danton <hillf.zj@alibaba-inc.com>
