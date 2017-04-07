@@ -1,87 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36546 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755120AbdDGJVt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Apr 2017 05:21:49 -0400
-Subject: Re: [PATCH 1/4] mm: prevent potential recursive reclaim due to
- clearing PF_MEMALLOC
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20170405074700.29871-1-vbabka@suse.cz>
- <20170405074700.29871-2-vbabka@suse.cz>
- <1f26f654-abaf-3878-6abb-5e27ff3a289e@virtuozzo.com>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
-        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org
-From: Vlastimil Babka <vbabka@suse.cz>
-Message-ID: <9c6ff585-f22f-3f90-fce7-793c56485019@suse.cz>
-Date: Fri, 7 Apr 2017 11:21:45 +0200
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Reply-To: "Hillf Danton" <hillf.zj@alibaba-inc.com>
+From: "Hillf Danton" <hillf.zj@alibaba-inc.com>
+To: "'Vlastimil Babka'" <vbabka@suse.cz>,
+        "'Andrew Morton'" <akpm@linux-foundation.org>
+Cc: <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
+        "'Michal Hocko'" <mhocko@kernel.org>,
+        "'Mel Gorman'" <mgorman@techsingularity.net>,
+        "'Johannes Weiner'" <hannes@cmpxchg.org>,
+        <linux-block@vger.kernel.org>, <nbd-general@lists.sourceforge.net>,
+        <open-iscsi@googlegroups.com>, <linux-scsi@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <stable@vger.kernel.org>,
+        "'Andrey Ryabinin'" <aryabinin@virtuozzo.com>
+References: <20170405074700.29871-1-vbabka@suse.cz> <20170405074700.29871-2-vbabka@suse.cz>
+In-Reply-To: <20170405074700.29871-2-vbabka@suse.cz>
+Subject: Re: [PATCH 1/4] mm: prevent potential recursive reclaim due to clearing PF_MEMALLOC
+Date: Fri, 07 Apr 2017 15:33:03 +0800
+Message-ID: <092301d2af71$31c97fe0$955c7fa0$@alibaba-inc.com>
 MIME-Version: 1.0
-In-Reply-To: <1f26f654-abaf-3878-6abb-5e27ff3a289e@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain;
+        charset="us-ascii"
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 04/05/2017 01:40 PM, Andrey Ryabinin wrote:
-> On 04/05/2017 10:46 AM, Vlastimil Babka wrote:
->> The function __alloc_pages_direct_compact() sets PF_MEMALLOC to prevent
->> deadlock during page migration by lock_page() (see the comment in
->> __unmap_and_move()). Then it unconditionally clears the flag, which can clear a
->> pre-existing PF_MEMALLOC flag and result in recursive reclaim. This was not a
->> problem until commit a8161d1ed609 ("mm, page_alloc: restructure direct
->> compaction handling in slowpath"), because direct compation was called only
->> after direct reclaim, which was skipped when PF_MEMALLOC flag was set.
->> 
->> Even now it's only a theoretical issue, as the new callsite of
->> __alloc_pages_direct_compact() is reached only for costly orders and when
->> gfp_pfmemalloc_allowed() is true, which means either __GFP_NOMEMALLOC is in
->                            is false			
+On April 05, 2017 3:47 PM Vlastimil Babka wrote: 
 > 
->> gfp_flags or in_interrupt() is true. There is no such known context, but let's
->> play it safe and make __alloc_pages_direct_compact() robust for cases where
->> PF_MEMALLOC is already set.
->> 
->> Fixes: a8161d1ed609 ("mm, page_alloc: restructure direct compaction handling in slowpath")
->> Reported-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
->> Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
->> Cc: <stable@vger.kernel.org>
->> ---
->>  mm/page_alloc.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->> index 3589f8be53be..b84e6ffbe756 100644
->> --- a/mm/page_alloc.c
->> +++ b/mm/page_alloc.c
->> @@ -3288,6 +3288,7 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
->>  		enum compact_priority prio, enum compact_result *compact_result)
->>  {
->>  	struct page *page;
->> +	unsigned int noreclaim_flag = current->flags & PF_MEMALLOC;
->>  
->>  	if (!order)
->>  		return NULL;
->> @@ -3295,7 +3296,7 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
->>  	current->flags |= PF_MEMALLOC;
->>  	*compact_result = try_to_compact_pages(gfp_mask, order, alloc_flags, ac,
->>  									prio);
->> -	current->flags &= ~PF_MEMALLOC;
->> +	current->flags = (current->flags & ~PF_MEMALLOC) | noreclaim_flag;
+> The function __alloc_pages_direct_compact() sets PF_MEMALLOC to prevent
+> deadlock during page migration by lock_page() (see the comment in
+> __unmap_and_move()). Then it unconditionally clears the flag, which can clear a
+> pre-existing PF_MEMALLOC flag and result in recursive reclaim. This was not a
+> problem until commit a8161d1ed609 ("mm, page_alloc: restructure direct
+> compaction handling in slowpath"), because direct compation was called only
+> after direct reclaim, which was skipped when PF_MEMALLOC flag was set.
 > 
-> Perhaps this would look better:
+> Even now it's only a theoretical issue, as the new callsite of
+> __alloc_pages_direct_compact() is reached only for costly orders and when
+> gfp_pfmemalloc_allowed() is true, which means either __GFP_NOMEMALLOC is in
+> gfp_flags or in_interrupt() is true. There is no such known context, but let's
+> play it safe and make __alloc_pages_direct_compact() robust for cases where
+> PF_MEMALLOC is already set.
 > 
-> 	tsk_restore_flags(current, noreclaim_flag, PF_MEMALLOC);
-> 
-> ?
+> Fixes: a8161d1ed609 ("mm, page_alloc: restructure direct compaction handling in slowpath")
+> Reported-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+> Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+> Cc: <stable@vger.kernel.org>
+> ---
+Acked-by: Hillf Danton <hillf.zj@alibaba-inc.com>
 
-Well, I didn't care much considering this is for stable only, and patch 2/4
-rewrites this to the new api.
-
->>  	if (*compact_result <= COMPACT_INACTIVE)
->>  		return NULL;
->> 
+>  mm/page_alloc.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index 3589f8be53be..b84e6ffbe756 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -3288,6 +3288,7 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
+>  		enum compact_priority prio, enum compact_result *compact_result)
+>  {
+>  	struct page *page;
+> +	unsigned int noreclaim_flag = current->flags & PF_MEMALLOC;
+> 
+>  	if (!order)
+>  		return NULL;
+> @@ -3295,7 +3296,7 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
+>  	current->flags |= PF_MEMALLOC;
+>  	*compact_result = try_to_compact_pages(gfp_mask, order, alloc_flags, ac,
+>  									prio);
+> -	current->flags &= ~PF_MEMALLOC;
+> +	current->flags = (current->flags & ~PF_MEMALLOC) | noreclaim_flag;
+> 
+>  	if (*compact_result <= COMPACT_INACTIVE)
+>  		return NULL;
+> --
+> 2.12.2
