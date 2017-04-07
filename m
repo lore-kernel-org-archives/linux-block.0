@@ -1,29 +1,63 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v4 0/6] Avoid that scsi-mq and dm-mq queue processing
- stalls sporadically
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-References: <20170407181654.27836-1-bart.vanassche@sandisk.com>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <78b80b12-a764-a793-f8a1-7a941dc84ee5@kernel.dk>
-Date: Fri, 7 Apr 2017 12:23:54 -0600
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>
+Subject: [PATCH v4 0/6] Avoid that scsi-mq and dm-mq queue processing stalls sporadically
+Date: Fri, 7 Apr 2017 11:16:48 -0700
+Message-ID: <20170407181654.27836-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-In-Reply-To: <20170407181654.27836-1-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/07/2017 12:16 PM, Bart Van Assche wrote:
-> Hello Jens,
-> 
-> The six patches in this patch series fix the queue lockup I reported
-> recently on the linux-block mailing list. Please consider these patches
-> for inclusion in the upstream kernel.
+Hello Jens,
 
-Some of this we need in 4.11, but not all of it. I can't be applying patches
-that "improve scalability" at this point.
+The six patches in this patch series fix the queue lockup I reported
+recently on the linux-block mailing list. Please consider these patches
+for inclusion in the upstream kernel.
 
-4-6 looks like what we want for 4.11, I'll see if those apply directly. Then
-we can put 1-3 on top in 4.12, with the others pulled in first.
+Thanks,
+
+Bart.
+
+Changes between v3 and v4:
+- Addressed the review comments on version three of this series about the
+  patch that makes it safe to use RCU to iterate over .tag_list and also
+  about the runtime performance and use of short variable names in patch 2/5.
+- Clarified the description of the patch that fixes the scsi-mq stall.
+- Added a patch to fix a dm-mq queue stall.
+  
+Changes between v2 and v3:
+- Removed the blk_mq_ops.restart_hctx function pointer again.
+- Modified blk_mq_sched_restart_queues() such that only a single hardware
+  queue is restarted instead of multiple if hardware queues are shared.
+- Introduced a new function in the block layer, namely
+  blk_mq_delay_run_hw_queue().  
+
+Changes between v1 and v2:
+- Reworked scsi_restart_queues() such that it no longer takes the SCSI
+  host lock.
+- Added two patches - one for exporting blk_mq_sched_restart_hctx() and
+  another one to make iterating with RCU over blk_mq_tag_set.tag_list safe.
+
+Bart Van Assche (6):
+  blk-mq: Make it safe to use RCU to iterate over
+    blk_mq_tag_set.tag_list
+  blk-mq: Restart a single queue if tag sets are shared
+  blk-mq: Clarify comments in blk_mq_dispatch_rq_list()
+  blk-mq: Introduce blk_mq_delay_run_hw_queue()
+  scsi: Avoid that SCSI queues get stuck
+  dm rq: Avoid that request processing stalls sporadically
+
+ block/blk-mq-sched.c    | 63 +++++++++++++++++++++++++++++++++++-------
+ block/blk-mq-sched.h    | 16 +----------
+ block/blk-mq.c          | 73 +++++++++++++++++++++++++++++++++++++++----------
+ drivers/md/dm-rq.c      |  1 +
+ drivers/scsi/scsi_lib.c |  6 ++--
+ include/linux/blk-mq.h  |  2 ++
+ include/linux/blkdev.h  |  1 -
+ 7 files changed, 118 insertions(+), 44 deletions(-)
 
 -- 
-Jens Axboe
+2.12.0
