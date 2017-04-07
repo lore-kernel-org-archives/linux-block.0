@@ -1,251 +1,188 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V3 05/16] block, bfq: add more fairness with writes and slow processes
-Date: Tue, 11 Apr 2017 15:43:04 +0200
-Message-Id: <20170411134315.44135-6-paolo.valente@linaro.org>
-In-Reply-To: <20170411134315.44135-1-paolo.valente@linaro.org>
-References: <20170411134315.44135-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:54958 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932703AbdDGBLo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Apr 2017 21:11:44 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Fri, 07 Apr 2017 11:10:44 +1000
+Subject: [PATCH 2/2] block: trace completion of all bios.
+Cc: linux-raid@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Alasdair Kergon <agk@redhat.com>
+Message-ID: <149152744466.17489.12941899591178733530.stgit@noble>
+In-Reply-To: <149152735878.17489.16036848644242802943.stgit@noble>
+References: <149152735878.17489.16036848644242802943.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch deals with two sources of unfairness, which can also cause
-high latencies and throughput loss. The first source is related to
-write requests. Write requests tend to starve read requests, basically
-because, on one side, writes are slower than reads, whereas, on the
-other side, storage devices confuse schedulers by deceptively
-signaling the completion of write requests immediately after receiving
-them. This patch addresses this issue by just throttling writes. In
-particular, after a write request is dispatched for a queue, the
-budget of the queue is decremented by the number of sectors to write,
-multiplied by an (over)charge coefficient. The value of the
-coefficient is the result of our tuning with different devices.
+Currently only dm and md/raid5 bios trigger
+trace_block_bio_complete().  Now that we have bio_chain() and
+bio_inc_remaining(), it is not possible, in general, for a driver to
+know when the bio is really complete.  Only bio_endio() knows that.
 
-The second source of unfairness has to do with slowness detection:
-when the in-service queue is expired, BFQ also controls whether the
-queue has been "too slow", i.e., has consumed its last-assigned budget
-at such a low rate that it would have been impossible to consume all
-of this budget within the maximum time slice T_max (Subsec. 3.5 in
-[1]). In this case, the queue is always (over)charged the whole
-budget, to reduce its utilization of the device. Both this overcharge
-and the slowness-detection criterion may cause unfairness.
+So move the trace_block_bio_complete() call to bio_endio().
 
-First, always charging a full budget to a slow queue is too coarse. It
-is much more accurate, and this patch lets BFQ do so, to charge an
-amount of service 'equivalent' to the amount of time during which the
-queue has been in service. As explained in more detail in the comments
-on the code, this enables BFQ to provide time fairness among slow
-queues.
+Now trace_block_bio_complete() pairs with trace_block_bio_queue().
+Any bio for which a 'queue' event is traced, will subsequently
+generate a 'complete' event.
 
-Secondly, because of ZBR, a queue may be deemed as slow when its
-associated process is performing I/O on the slowest zones of a
-disk. However, unless the process is truly too slow, not reducing the
-disk utilization of the queue is more profitable in terms of disk
-throughput than the opposite. A similar problem is caused by logical
-block mapping on non-rotational devices. For this reason, this patch
-lets a queue be charged time, and not budget, only if the queue has
-consumed less than 2/3 of its assigned budget. As an additional,
-important benefit, this tolerance allows BFQ to preserve enough
-elasticity to still perform bandwidth, and not time, distribution with
-little unlucky or quasi-sequential processes.
+There are a few cases where completion tracing is not wanted.
+1/ If blk_update_request() has already generated a completion
+   trace event at the 'request' level, there is no point generating
+   one at the bio level too.  In this case the bi_sector and bi_size
+   will have changed, so the bio level event would be wrong
 
-Finally, for the same reasons as above, this patch makes slowness
-detection itself much less harsh: a queue is deemed slow only if it
-has consumed its budget at less than half of the peak rate.
+2/ If the bio hasn't actually been queued yet, but is being aborted
+   early, then a trace event could be confusing.  Some filesystems
+   call bio_endio() but do not want tracing.
 
-[1] P. Valente and M. Andreolini, "Improving Application
-    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
-    the 5th Annual International Systems and Storage Conference
-    (SYSTOR '12), June 2012.
-    Slightly extended version:
-    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
-							results.pdf
+3/ The bio_integrity code interposes itself by replacing bi_end_io,
+   then restoring it and calling bio_endio() again.  This would produce
+   two identical trace events if left like that.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+To handle these, we introduce a flag BIO_TRACE_COMPLETION and only
+produce the trace event when this is set.
+We address point 1 above by clearing the flag in blk_update_request().
+We address point 2 above by only setting the flag when
+generic_make_request() is called.
+We address point 3 above by clearing the flag after generating a
+completion event.
+
+When bio_split() is used on a bio, particularly in blk_queue_split(),
+there is an extra complication.  A new bio is split off the front, and
+may be handle directly without going through generic_make_request().
+The old bio, which has been advanced, is passed to
+generic_make_request(), so it will trigger a trace event a second
+time.
+Probably the best result when a split happens is to see a single
+'queue' event for the whole bio, then multiple 'complete' events - one
+for each component.  To achieve this was can:
+- copy the BIO_TRACE_COMPLETION flag to the new bio in bio_split()
+- avoid generating a 'queue' event if BIO_TRACE_COMPLETION is already set.
+This way, the split-off bio won't create a queue event, the original
+won't either even if it re-submitted to generic_make_request(),
+but both will produce completion events, each for their own range.
+
+So if generic_make_request() is called (which generates a QUEUED
+event), then bi_endio() will create a single COMPLETE event for each
+range that the bio is split into, unless the driver has explicitly
+requested it not to.
+
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- block/bfq-iosched.c | 120 +++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 85 insertions(+), 35 deletions(-)
+ block/bio.c               |   13 +++++++++++++
+ block/blk-core.c          |   10 +++++++++-
+ drivers/md/dm.c           |    1 -
+ drivers/md/raid5.c        |    2 --
+ include/linux/blk_types.h |    2 ++
+ 5 files changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 61d880b..dce273b 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -753,6 +753,13 @@ static const int bfq_stats_min_budgets = 194;
- /* Default maximum budget values, in sectors and number of requests. */
- static const int bfq_default_max_budget = 16 * 1024;
- 
-+/*
-+ * Async to sync throughput distribution is controlled as follows:
-+ * when an async request is served, the entity is charged the number
-+ * of sectors of the request, multiplied by the factor below
-+ */
-+static const int bfq_async_charge_factor = 10;
-+
- /* Default timeout values, in jiffies, approximating CFQ defaults. */
- static const int bfq_timeout = HZ / 8;
- 
-@@ -1571,22 +1578,52 @@ static void bfq_bfqq_served(struct bfq_queue *bfqq, int served)
- }
- 
- /**
-- * bfq_bfqq_charge_full_budget - set the service to the entity budget.
-+ * bfq_bfqq_charge_time - charge an amount of service equivalent to the length
-+ *			  of the time interval during which bfqq has been in
-+ *			  service.
-+ * @bfqd: the device
-  * @bfqq: the queue that needs a service update.
-+ * @time_ms: the amount of time during which the queue has received service
-  *
-- * When it's not possible to be fair in the service domain, because
-- * a queue is not consuming its budget fast enough (the meaning of
-- * fast depends on the timeout parameter), we charge it a full
-- * budget.  In this way we should obtain a sort of time-domain
-- * fairness among all the seeky/slow queues.
-+ * If a queue does not consume its budget fast enough, then providing
-+ * the queue with service fairness may impair throughput, more or less
-+ * severely. For this reason, queues that consume their budget slowly
-+ * are provided with time fairness instead of service fairness. This
-+ * goal is achieved through the BFQ scheduling engine, even if such an
-+ * engine works in the service, and not in the time domain. The trick
-+ * is charging these queues with an inflated amount of service, equal
-+ * to the amount of service that they would have received during their
-+ * service slot if they had been fast, i.e., if their requests had
-+ * been dispatched at a rate equal to the estimated peak rate.
+diff --git a/block/bio.c b/block/bio.c
+index 12c2837c4277..3db98fc3ee87 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1789,6 +1789,11 @@ static inline bool bio_remaining_done(struct bio *bio)
+  *   bio_endio() will end I/O on the whole bio. bio_endio() is the preferred
+  *   way to end I/O on a bio. No one should call bi_end_io() directly on a
+  *   bio unless they own it and thus know that it has an end_io function.
 + *
-+ * It is worth noting that time fairness can cause important
-+ * distortions in terms of bandwidth distribution, on devices with
-+ * internal queueing. The reason is that I/O requests dispatched
-+ * during the service slot of a queue may be served after that service
-+ * slot is finished, and may have a total processing time loosely
-+ * correlated with the duration of the service slot. This is
-+ * especially true for short service slots.
-  */
--static void bfq_bfqq_charge_full_budget(struct bfq_queue *bfqq)
-+static void bfq_bfqq_charge_time(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-+				 unsigned long time_ms)
++ *   bio_endio() can be called several times on a bio that has been chained
++ *   using bio_chain().  The ->bi_end_io() function will only be called the
++ *   last time.  At this point the BLK_TA_COMPLETE tracing event will be
++ *   generated if BIO_TRACE_COMPLETION is set.
+  **/
+ void bio_endio(struct bio *bio)
  {
- 	struct bfq_entity *entity = &bfqq->entity;
-+	int tot_serv_to_charge = entity->service;
-+	unsigned int timeout_ms = jiffies_to_msecs(bfq_timeout);
-+
-+	if (time_ms > 0 && time_ms < timeout_ms)
-+		tot_serv_to_charge =
-+			(bfqd->bfq_max_budget * time_ms) / timeout_ms;
+@@ -1809,6 +1814,11 @@ void bio_endio(struct bio *bio)
+ 		goto again;
+ 	}
  
--	bfq_log_bfqq(bfqq->bfqd, bfqq, "charge_full_budget");
-+	if (tot_serv_to_charge < entity->service)
-+		tot_serv_to_charge = entity->service;
- 
--	bfq_bfqq_served(bfqq, entity->budget - entity->service);
-+	/* Increase budget to avoid inconsistencies */
-+	if (tot_serv_to_charge > entity->budget)
-+		entity->budget = tot_serv_to_charge;
-+
-+	bfq_bfqq_served(bfqq,
-+			max_t(int, 0, tot_serv_to_charge - entity->service));
++	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
++		trace_block_bio_complete(bdev_get_queue(bio->bi_bdev),
++					 bio, bio->bi_error);
++		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
++	}
+ 	if (bio->bi_end_io)
+ 		bio->bi_end_io(bio);
  }
+@@ -1847,6 +1857,9 @@ struct bio *bio_split(struct bio *bio, int sectors,
  
- static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
-@@ -3572,10 +3609,14 @@ static struct request *bfq_find_next_rq(struct bfq_data *bfqd,
- 	return bfq_choose_req(bfqd, next, prev, blk_rq_pos(last));
- }
+ 	bio_advance(bio, split->bi_iter.bi_size);
  
-+/* see the definition of bfq_async_charge_factor for details */
- static unsigned long bfq_serv_to_charge(struct request *rq,
- 					struct bfq_queue *bfqq)
- {
--	return blk_rq_sectors(rq);
-+	if (bfq_bfqq_sync(bfqq))
-+		return blk_rq_sectors(rq);
++	if (bio_flagged(bio, BIO_TRACE_COMPLETION))
++		bio_set_flag(bio, BIO_TRACE_COMPLETION);
 +
-+	return blk_rq_sectors(rq) * bfq_async_charge_factor;
+ 	return split;
  }
+ EXPORT_SYMBOL(bio_split);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d772c221cc17..2a7993063a7e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1936,7 +1936,13 @@ generic_make_request_checks(struct bio *bio)
+ 	if (!blkcg_bio_issue_check(q, bio))
+ 		return false;
  
- /**
-@@ -4676,28 +4717,24 @@ static unsigned long bfq_smallest_from_now(void)
-  * @compensate: if true, compensate for the time spent idling.
-  * @reason: the reason causing the expiration.
-  *
-+ * If the process associated with bfqq does slow I/O (e.g., because it
-+ * issues random requests), we charge bfqq with the time it has been
-+ * in service instead of the service it has received (see
-+ * bfq_bfqq_charge_time for details on how this goal is achieved). As
-+ * a consequence, bfqq will typically get higher timestamps upon
-+ * reactivation, and hence it will be rescheduled as if it had
-+ * received more service than what it has actually received. In the
-+ * end, bfqq receives less service in proportion to how slowly its
-+ * associated process consumes its budgets (and hence how seriously it
-+ * tends to lower the throughput). In addition, this time-charging
-+ * strategy guarantees time fairness among slow processes. In
-+ * contrast, if the process associated with bfqq is not slow, we
-+ * charge bfqq exactly with the service it has received.
-  *
-- * If the process associated with the queue is slow (i.e., seeky), or
-- * in case of budget timeout, or, finally, if it is async, we
-- * artificially charge it an entire budget (independently of the
-- * actual service it received). As a consequence, the queue will get
-- * higher timestamps than the correct ones upon reactivation, and
-- * hence it will be rescheduled as if it had received more service
-- * than what it actually received. In the end, this class of processes
-- * will receive less service in proportion to how slowly they consume
-- * their budgets (and hence how seriously they tend to lower the
-- * throughput).
-- *
-- * In contrast, when a queue expires because it has been idling for
-- * too much or because it exhausted its budget, we do not touch the
-- * amount of service it has received. Hence when the queue will be
-- * reactivated and its timestamps updated, the latter will be in sync
-- * with the actual service received by the queue until expiration.
-- *
-- * Charging a full budget to the first type of queues and the exact
-- * service to the others has the effect of using the WF2Q+ policy to
-- * schedule the former on a timeslice basis, without violating the
-- * service domain guarantees of the latter.
-+ * Charging time to the first type of queues and the exact service to
-+ * the other has the effect of using the WF2Q+ policy to schedule the
-+ * former on a timeslice basis, without violating service domain
-+ * guarantees among the latter.
-  */
- static void bfq_bfqq_expire(struct bfq_data *bfqd,
- 			    struct bfq_queue *bfqq,
-@@ -4715,11 +4752,24 @@ static void bfq_bfqq_expire(struct bfq_data *bfqd,
- 	slow = bfq_bfqq_is_slow(bfqd, bfqq, compensate, reason, &delta);
+-	trace_block_bio_queue(q, bio);
++	if (!bio_flagged(bio, BIO_TRACE_COMPLETION)) {
++		trace_block_bio_queue(q, bio);
++		/* Now that enqueuing has been traced, we need to trace
++		 * completion as well.
++		 */
++		bio_set_flag(bio, BIO_TRACE_COMPLETION);
++	}
+ 	return true;
  
- 	/*
--	 * As above explained, 'punish' slow (i.e., seeky), timed-out
--	 * and async queues, to favor sequential sync workloads.
-+	 * As above explained, charge slow (typically seeky) and
-+	 * timed-out queues with the time and not the service
-+	 * received, to favor sequential workloads.
-+	 *
-+	 * Processes doing I/O in the slower disk zones will tend to
-+	 * be slow(er) even if not seeky. Therefore, since the
-+	 * estimated peak rate is actually an average over the disk
-+	 * surface, these processes may timeout just for bad luck. To
-+	 * avoid punishing them, do not charge time to processes that
-+	 * succeeded in consuming at least 2/3 of their budget. This
-+	 * allows BFQ to preserve enough elasticity to still perform
-+	 * bandwidth, and not time, distribution with little unlucky
-+	 * or quasi-sequential processes.
- 	 */
--	if (slow || reason == BFQQE_BUDGET_TIMEOUT)
--		bfq_bfqq_charge_full_budget(bfqq);
-+	if (slow ||
-+	    (reason == BFQQE_BUDGET_TIMEOUT &&
-+	     bfq_bfqq_budget_left(bfqq) >=  entity->budget / 3))
-+		bfq_bfqq_charge_time(bfqd, bfqq, delta);
+ not_supported:
+@@ -2601,6 +2607,8 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
+ 		if (bio_bytes == bio->bi_iter.bi_size)
+ 			req->bio = bio->bi_next;
  
- 	if (reason == BFQQE_TOO_IDLE &&
- 	    entity->service <= 2 * entity->budget / 10)
--- 
-2.10.0
++		/* Completion has already been traced */
++		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
+ 		req_bio_endio(req, bio, bio_bytes, error);
+ 
+ 		total_bytes += bio_bytes;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index dfb75979e455..cd93a3b9ceca 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -810,7 +810,6 @@ static void dec_pending(struct dm_io *io, int error)
+ 			queue_io(md, bio);
+ 		} else {
+ 			/* done with normal IO or empty flush */
+-			trace_block_bio_complete(md->queue, bio, io_error);
+ 			bio->bi_error = io_error;
+ 			bio_endio(bio);
+ 		}
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index d8bd25f235dc..14557259dd69 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -5138,8 +5138,6 @@ static void raid5_align_endio(struct bio *bi)
+ 	rdev_dec_pending(rdev, conf->mddev);
+ 
+ 	if (!error) {
+-		trace_block_bio_complete(bdev_get_queue(raid_bi->bi_bdev),
+-					 raid_bi, 0);
+ 		bio_endio(raid_bi);
+ 		if (atomic_dec_and_test(&conf->active_aligned_reads))
+ 			wake_up(&conf->wait_for_quiescent);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index ff07d891f38f..56c2a8180ce1 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -102,6 +102,8 @@ struct bio {
+ #define BIO_REFFED	8	/* bio has elevated ->bi_cnt */
+ #define BIO_THROTTLED	9	/* This bio has already been subjected to
+ 				 * throttling rules. Don't do it again. */
++#define BIO_TRACE_COMPLETION 10	/* bio_endio() should trace the final completion
++				 * of this bio. */
+ /* See BVEC_POOL_OFFSET below before adding new flags */
+ 
+ /*
