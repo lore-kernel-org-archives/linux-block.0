@@ -1,154 +1,131 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59216 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751461AbdDKCNA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2017 22:13:00 -0400
-Date: Tue, 11 Apr 2017 10:12:49 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: Ming Lei <minlei@redhat.com>, Omar Sandoval <osandov@osandov.com>,
-        linux-block@vger.kernel.org, kernel-team@fb.com
 Subject: Re: [PATCH v3 1/8] blk-mq: use the right hctx when getting a driver
  tag fails
-Message-ID: <20170411021248.GA21237@ming.t460p>
+To: Ming Lei <minlei@redhat.com>
 References: <cover.1491418411.git.osandov@fb.com>
  <d1b5da71a5cba1f17d4eaafb207547a4651f81a9.1491418411.git.osandov@fb.com>
- <20170406043108.GA29955@ming.t460p>
- <20170406075751.GA15461@vader>
+ <20170406043108.GA29955@ming.t460p> <20170406075751.GA15461@vader>
  <20170406082330.GA3863@ming.t460p>
  <000e804d-fa00-d248-a3ce-dcbebc34cda9@fb.com>
  <20170407032309.GA10976@ming.t460p>
- <0abe8d48-49f0-3cf5-917a-f27a65d81507@fb.com>
+Cc: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org,
+ kernel-team@fb.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <0abe8d48-49f0-3cf5-917a-f27a65d81507@fb.com>
+Date: Fri, 7 Apr 2017 08:45:41 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <0abe8d48-49f0-3cf5-917a-f27a65d81507@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170407032309.GA10976@ming.t460p>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Apr 07, 2017 at 08:45:41AM -0600, Jens Axboe wrote:
-> On 04/06/2017 09:23 PM, Ming Lei wrote:
-> > Hi Jens,
-> > 
-> > Thanks for your comment!
-> > 
-> > On Thu, Apr 06, 2017 at 01:29:26PM -0600, Jens Axboe wrote:
-> >> On 04/06/2017 02:23 AM, Ming Lei wrote:
-> >>> On Thu, Apr 06, 2017 at 12:57:51AM -0700, Omar Sandoval wrote:
-> >>>> On Thu, Apr 06, 2017 at 12:31:18PM +0800, Ming Lei wrote:
-> >>>>> On Wed, Apr 05, 2017 at 12:01:29PM -0700, Omar Sandoval wrote:
-> >>>>>> From: Omar Sandoval <osandov@fb.com>
-> >>>>>>
-> >>>>>> While dispatching requests, if we fail to get a driver tag, we mark the
-> >>>>>> hardware queue as waiting for a tag and put the requests on a
-> >>>>>> hctx->dispatch list to be run later when a driver tag is freed. However,
-> >>>>>> blk_mq_dispatch_rq_list() may dispatch requests from multiple hardware
-> >>>>>> queues if using a single-queue scheduler with a multiqueue device. If
-> >>>>>
-> >>>>> It can't perform well by using a SQ scheduler on a MQ device, so just be
-> >>>>> curious why someone wants to do that in this way,:-)
-> >>>>
-> >>>> I don't know why anyone would want to, but it has to work :) The only
-> >>>> reason we noticed this is because when the NBD device is created, it
-> >>>> only has a single queue, so we automatically assign mq-deadline to it.
-> >>>> Later, we update the number of queues, but it's still using mq-deadline.
-> >>>>
-> >>>>> I guess you mean that ops.mq.dispatch_request() may dispatch requests
-> >>>>> from other hardware queues in blk_mq_sched_dispatch_requests() instead
-> >>>>> of current hctx.
-> >>>>
-> >>>> Yup, that's right. It's weird, and I talked to Jens about just forcing
-> >>>> the MQ device into an SQ mode when using an SQ scheduler, but this way
-> >>>> works fine more or less.
-> >>>
-> >>> Or just switch the elevator to the MQ default one when the device becomes
-> >>> MQ? Or let mq-deadline's .dispatch_request() just return reqs in current
-> >>> hctx?
-> >>
-> >> No, that would be a really bad idea imho. First of all, I don't want
-> >> kernel driven scheduler changes. Secondly, the framework should work
-> >> with a non-direct mapping between hardware dispatch queues and
-> >> scheduling queues.
-> >>
-> >> While we could force a single queue usage to make that a 1:1 mapping
-> >> always, that loses big benefits on eg nbd, which uses multiple hardware
-> >> queues to up the bandwidth. Similarly on nvme, for example, we still
-> >> scale better with N submission queues and 1 scheduling queue compared to
-> >> having just 1 submission queue.
-> > 
-> > Looks that isn't what I meant. And my 2nd point is to make
-> > mq-deadline's dispatch_request(hctx) just returns requests mapped to
-> > the hw queue of 'hctx', then we can avoid to mess up blk-mq.c and
-> > blk-mq-sched.c.
+On 04/06/2017 09:23 PM, Ming Lei wrote:
+> Hi Jens,
 > 
-> That would indeed be better. But let's assume that we have 4 hardware
-> queues, we're asked to run queue X. But the FIFO dictates that the first
-> request that should run is on queue Y, since it's expired. What do we
-> do? Then we'd have to abort dispatching on queue X, and run queue Y
-> appropriately.
-
-The previous rule is to run queue Y on the CPUs(sw queues) mapped to
-queue Y, and that should still work by following this rule. But this
-patch is starting to break the rule, :-(
-
+> Thanks for your comment!
 > 
-> This shuffle can happen all the time. I think it'd be worthwhile to work
-> towards the goal of improving mq-deadline to deal with this, and
-> subsequently cleaning up the interface. It would be a cleaner
-> implementation, though efficiency might suffer further.
+> On Thu, Apr 06, 2017 at 01:29:26PM -0600, Jens Axboe wrote:
+>> On 04/06/2017 02:23 AM, Ming Lei wrote:
+>>> On Thu, Apr 06, 2017 at 12:57:51AM -0700, Omar Sandoval wrote:
+>>>> On Thu, Apr 06, 2017 at 12:31:18PM +0800, Ming Lei wrote:
+>>>>> On Wed, Apr 05, 2017 at 12:01:29PM -0700, Omar Sandoval wrote:
+>>>>>> From: Omar Sandoval <osandov@fb.com>
+>>>>>>
+>>>>>> While dispatching requests, if we fail to get a driver tag, we mark the
+>>>>>> hardware queue as waiting for a tag and put the requests on a
+>>>>>> hctx->dispatch list to be run later when a driver tag is freed. However,
+>>>>>> blk_mq_dispatch_rq_list() may dispatch requests from multiple hardware
+>>>>>> queues if using a single-queue scheduler with a multiqueue device. If
+>>>>>
+>>>>> It can't perform well by using a SQ scheduler on a MQ device, so just be
+>>>>> curious why someone wants to do that in this way,:-)
+>>>>
+>>>> I don't know why anyone would want to, but it has to work :) The only
+>>>> reason we noticed this is because when the NBD device is created, it
+>>>> only has a single queue, so we automatically assign mq-deadline to it.
+>>>> Later, we update the number of queues, but it's still using mq-deadline.
+>>>>
+>>>>> I guess you mean that ops.mq.dispatch_request() may dispatch requests
+>>>>> from other hardware queues in blk_mq_sched_dispatch_requests() instead
+>>>>> of current hctx.
+>>>>
+>>>> Yup, that's right. It's weird, and I talked to Jens about just forcing
+>>>> the MQ device into an SQ mode when using an SQ scheduler, but this way
+>>>> works fine more or less.
+>>>
+>>> Or just switch the elevator to the MQ default one when the device becomes
+>>> MQ? Or let mq-deadline's .dispatch_request() just return reqs in current
+>>> hctx?
+>>
+>> No, that would be a really bad idea imho. First of all, I don't want
+>> kernel driven scheduler changes. Secondly, the framework should work
+>> with a non-direct mapping between hardware dispatch queues and
+>> scheduling queues.
+>>
+>> While we could force a single queue usage to make that a 1:1 mapping
+>> always, that loses big benefits on eg nbd, which uses multiple hardware
+>> queues to up the bandwidth. Similarly on nvme, for example, we still
+>> scale better with N submission queues and 1 scheduling queue compared to
+>> having just 1 submission queue.
 > 
-> >>>>> If that is true, it looks like a issue in usage of I/O scheduler, since
-> >>>>> the mq-deadline scheduler just queues requests in one per-request_queue
-> >>>>> linked list, for MQ device, the scheduler queue should have been per-hctx.
-> >>>>
-> >>>> That's an option, but that's a different scheduling policy. Again, I
-> >>>> agree that it's strange, but it's reasonable behavior.
-> >>>
-> >>> IMO, the current mq-deadline isn't good/ready for MQ device, and it
-> >>> doesn't make sense to use it for MQ.
-> >>
-> >> I don't think that's true at all. I do agree that it's somewhat quirky
-> >> since it does introduce scheduling dependencies between the hardware
-> >> queues, and we have to work at making that well understood and explicit,
-> >> as not to introduce bugs due to that. But in reality, all multiqueue
-> >> hardware we are deadling with are mapped to a single resource. As such,
-> >> it makes a lot of sense to schedule it as such. Hence I don't think that
-> >> a single queue deadline approach is necessarily a bad idea for even fast
-> >> storage.
-> > 
-> > When we map all mq into one single deadline queue, it can't scale well, for
-> > example, I just run a simple write test(libaio, dio, bs:4k, 4jobs) over one
-> > commodity NVMe in a dual-socket(four cores) system:
-> > 	
-> > 	IO scheduler|	CPU utilization
-> > 	-------------------------------
-> > 	none		|   60%
-> > 	-------------------------------
-> > 	mq-deadline |	100%
-> > 	-------------------------------
-> > 
-> > And IO throughput is basically same in two cases.
-> > 
-> That's a given, for low blocksize and high iops, we'll be hitting the
-> deadline lock pretty hard. We dispatch single requests at the time, to
-> optimize for rotational storage, since it improves merging a lot. If we
-> modified e->type->ops.mq.dispatch_request() to take a "dump this many
-> requests" parameter and ramped up the depth quickly, then we could
-> drastically reduce the overhead for your case. The initial version
-> dumped the whole thing. It had lower overhead on flash, but didn't reach
-> the performance of old deadline on !mq since we continually emptied the
-> queue and eliminated merging opportunities.
+> Looks that isn't what I meant. And my 2nd point is to make
+> mq-deadline's dispatch_request(hctx) just returns requests mapped to
+> the hw queue of 'hctx', then we can avoid to mess up blk-mq.c and
+> blk-mq-sched.c.
+
+That would indeed be better. But let's assume that we have 4 hardware
+queues, we're asked to run queue X. But the FIFO dictates that the first
+request that should run is on queue Y, since it's expired. What do we
+do? Then we'd have to abort dispatching on queue X, and run queue Y
+appropriately.
+
+This shuffle can happen all the time. I think it'd be worthwhile to work
+towards the goal of improving mq-deadline to deal with this, and
+subsequently cleaning up the interface. It would be a cleaner
+implementation, though efficiency might suffer further.
+
+>>>>> If that is true, it looks like a issue in usage of I/O scheduler, since
+>>>>> the mq-deadline scheduler just queues requests in one per-request_queue
+>>>>> linked list, for MQ device, the scheduler queue should have been per-hctx.
+>>>>
+>>>> That's an option, but that's a different scheduling policy. Again, I
+>>>> agree that it's strange, but it's reasonable behavior.
+>>>
+>>> IMO, the current mq-deadline isn't good/ready for MQ device, and it
+>>> doesn't make sense to use it for MQ.
+>>
+>> I don't think that's true at all. I do agree that it's somewhat quirky
+>> since it does introduce scheduling dependencies between the hardware
+>> queues, and we have to work at making that well understood and explicit,
+>> as not to introduce bugs due to that. But in reality, all multiqueue
+>> hardware we are deadling with are mapped to a single resource. As such,
+>> it makes a lot of sense to schedule it as such. Hence I don't think that
+>> a single queue deadline approach is necessarily a bad idea for even fast
+>> storage.
 > 
-> blk_mq_sched_dispatch_requests() could add logic that brought back the
-> old behavior if NONROT is set.
+> When we map all mq into one single deadline queue, it can't scale well, for
+> example, I just run a simple write test(libaio, dio, bs:4k, 4jobs) over one
+> commodity NVMe in a dual-socket(four cores) system:
+> 	
+> 	IO scheduler|	CPU utilization
+> 	-------------------------------
+> 	none		|   60%
+> 	-------------------------------
+> 	mq-deadline |	100%
+> 	-------------------------------
+> 
+> And IO throughput is basically same in two cases.
+> 
+That's a given, for low blocksize and high iops, we'll be hitting the
+deadline lock pretty hard. We dispatch single requests at the time, to
+optimize for rotational storage, since it improves merging a lot. If we
+modified e->type->ops.mq.dispatch_request() to take a "dump this many
+requests" parameter and ramped up the depth quickly, then we could
+drastically reduce the overhead for your case. The initial version
+dumped the whole thing. It had lower overhead on flash, but didn't reach
+the performance of old deadline on !mq since we continually emptied the
+queue and eliminated merging opportunities.
 
->From my further test, looks the issue is related with the single
-mq-deadline queue(includes the single lock) which need to be accessed
-from different NUMA nodes.
+blk_mq_sched_dispatch_requests() could add logic that brought back the
+old behavior if NONROT is set.
 
-The following tree implements per-hctx mq-deadline queue, and basically
-makes q->last_merge, elevator_queue->hash and 'struct deadline_data'
-defined as per-hctx. With this patches, the issue disappered.
-
-
-Thanks
-Ming
+-- 
+Jens Axboe
