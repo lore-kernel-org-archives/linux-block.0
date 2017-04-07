@@ -1,48 +1,117 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v2 2/2] blk-mq: Add a polling specific stats function
-To: Stephen Bates <sbates@raithlin.com>
-References: <1491413957-30885-1-git-send-email-sbates@raithlin.com>
- <1491413957-30885-3-git-send-email-sbates@raithlin.com>
- <370c8854-1735-b0e7-089f-4b04068ca4f1@kernel.dk>
- <2AD7D1E1-3906-4ABA-A301-E15DABAF443C@raithlin.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>,
- "osandov@osandov.com" <osandov@osandov.com>,
- "sagi@grimberg.me" <sagi@grimberg.me>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <bb76465b-d708-f5df-e2ec-c99d052e9b27@kernel.dk>
-Date: Fri, 7 Apr 2017 08:01:45 -0600
-MIME-Version: 1.0
-In-Reply-To: <2AD7D1E1-3906-4ABA-A301-E15DABAF443C@raithlin.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <sbates130272@gmail.com>
+Return-Path: <sbates130272@gmail.com>
+From: sbates@raithlin.com
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Damien.LeMoal@wdc.com,
+	osandov@osandov.com,
+	sbates@raithlin.com,
+	sagi@grimberg.me
+Subject: [PATCH v3 2/2] blk-mq: Add a polling specific stats function
+Date: Fri,  7 Apr 2017 06:24:03 -0600
+Message-Id: <1491567843-26190-3-git-send-email-sbates@raithlin.com>
+In-Reply-To: <1491567843-26190-1-git-send-email-sbates@raithlin.com>
+References: <1491567843-26190-1-git-send-email-sbates@raithlin.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/07/2017 06:11 AM, Stephen  Bates wrote:
-> On 2017-04-05, 7:14 PM, "Jens Axboe" <axboe@kernel.dk> wrote:
-> 
->> Why not just have 8 buckets, and make it:
->>
->> 	bucket = ddir + ilog2(bytes) - 9;
->>
->> and cap it at MAX_BUCKET (8) and put all those above into the top
->> bucket.
-> 
-> Thanks. However, that equation does not differentiate between
-> direction and size. Instead we can use
-> 
-> bucket = ddir + 2*(ilog2(bytes) - 9);
+From: Stephen Bates <sbates@raithlin.com>
 
-It would be cleaner to just embed the fact that we have 2 sets of
-identical buckets, and return 
+Rather than bucketing IO statisics based on direction only we also
+bucket based on the IO size. This leads to improved polling
+performance. Update the bucket callback function and use it in the
+polling latency estimation.
 
-	bucket = ilog2(bytes) - 9;
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
+---
+ block/blk-mq.c | 45 +++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 35 insertions(+), 10 deletions(-)
 
-and have poll_stat be indexed by:
-
-	->poll_stat[ddir][bucket];
-
-instead.
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 061fc2c..5fd376b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -42,6 +42,25 @@ static LIST_HEAD(all_q_list);
+ static void blk_mq_poll_stats_start(struct request_queue *q);
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+ 
++/* Must be consisitent with function below */
++#define BLK_MQ_POLL_STATS_BKTS 16
++static int blk_mq_poll_stats_bkt(const struct request *rq)
++{
++	int ddir, bytes, bucket;
++
++	ddir = blk_stat_rq_ddir(rq);
++	bytes = blk_rq_bytes(rq);
++
++	bucket = ddir + 2*(ilog2(bytes) - 9);
++
++	if (bucket < 0)
++		return -1;
++	else if (bucket >= BLK_MQ_POLL_STATS_BKTS)
++		return ddir + BLK_MQ_POLL_STATS_BKTS - 2;
++
++	return bucket;
++}
++
+ /*
+  * Check if any of the ctx's have pending work in this hardware queue
+  */
+@@ -2245,7 +2264,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	q->mq_ops = set->ops;
+ 
+ 	q->poll_cb = blk_stat_alloc_callback(blk_mq_poll_stats_fn,
+-					     blk_stat_rq_ddir, 2, q);
++					     blk_mq_poll_stats_bkt,
++					     BLK_MQ_POLL_STATS_BKTS, q);
+ 	if (!q->poll_cb)
+ 		goto err_exit;
+ 
+@@ -2663,11 +2683,12 @@ static void blk_mq_poll_stats_start(struct request_queue *q)
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
+ {
+ 	struct request_queue *q = cb->data;
++	int bucket;
+ 
+-	if (cb->stat[READ].nr_samples)
+-		q->poll_stat[READ] = cb->stat[READ];
+-	if (cb->stat[WRITE].nr_samples)
+-		q->poll_stat[WRITE] = cb->stat[WRITE];
++	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
++		if (cb->stat[bucket].nr_samples)
++			q->poll_stat[bucket] = cb->stat[bucket];
++	}
+ }
+ 
+ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+@@ -2675,6 +2696,7 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+ 				       struct request *rq)
+ {
+ 	unsigned long ret = 0;
++	int bucket;
+ 
+ 	/*
+ 	 * If stats collection isn't on, don't sleep but turn it on for
+@@ -2689,12 +2711,15 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+ 	 * For instance, if the completion latencies are tight, we can
+ 	 * get closer than just half the mean. This is especially
+ 	 * important on devices where the completion latencies are longer
+-	 * than ~10 usec.
++	 * than ~10 usec. We do use the stats for the relevant IO size
++	 * if available which does lead to better estimates.
+ 	 */
+-	if (req_op(rq) == REQ_OP_READ && q->poll_stat[READ].nr_samples)
+-		ret = (q->poll_stat[READ].mean + 1) / 2;
+-	else if (req_op(rq) == REQ_OP_WRITE && q->poll_stat[WRITE].nr_samples)
+-		ret = (q->poll_stat[WRITE].mean + 1) / 2;
++	bucket = blk_mq_poll_stats_bkt(rq);
++	if (bucket < 0)
++		return ret;
++
++	if (q->poll_stat[bucket].nr_samples)
++		ret = (q->poll_stat[bucket].mean + 1) / 2;
+ 
+ 	return ret;
+ }
 -- 
-Jens Axboe
+2.7.4
