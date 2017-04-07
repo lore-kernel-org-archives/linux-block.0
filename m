@@ -1,45 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f53.google.com ([74.125.83.53]:33425 "EHLO
-        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932546AbdDES33 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 14:29:29 -0400
-Received: by mail-pg0-f53.google.com with SMTP id x125so12191495pgb.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 11:29:29 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 8/8] blk-mq: clean up direct issue blk_mq_queue_data initialization
-Date: Wed,  5 Apr 2017 11:28:20 -0700
-Message-Id: <e0eac74e541e9f85403fd4cf887a7f288768f00e.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Omar Sandoval <osandov@fb.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCHv7 1/2] loop: Remove unused 'bdev' argument from loop_set_capacity
+Date: Fri,  7 Apr 2017 12:50:56 +0200
+Message-Id: <1491562257-82574-2-git-send-email-hare@suse.de>
+In-Reply-To: <1491562257-82574-1-git-send-email-hare@suse.de>
+References: <1491562257-82574-1-git-send-email-hare@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
-
-Trivial cleanup.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/loop.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 71dc8608f3a8..779249a5999b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1451,8 +1451,7 @@ static void __blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
- 		.rq = rq,
--		.list = NULL,
--		.last = 1
-+		.last = true,
- 	};
- 	struct blk_mq_hw_ctx *hctx;
- 	blk_qc_t new_cookie;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cc981f3..81b3900 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1307,7 +1307,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	return err;
+ }
+ 
+-static int loop_set_capacity(struct loop_device *lo, struct block_device *bdev)
++static int loop_set_capacity(struct loop_device *lo)
+ {
+ 	if (unlikely(lo->lo_state != Lo_bound))
+ 		return -ENXIO;
+@@ -1370,7 +1370,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case LOOP_SET_CAPACITY:
+ 		err = -EPERM;
+ 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+-			err = loop_set_capacity(lo, bdev);
++			err = loop_set_capacity(lo);
+ 		break;
+ 	case LOOP_SET_DIRECT_IO:
+ 		err = -EPERM;
 -- 
-2.12.2
+1.8.5.6
