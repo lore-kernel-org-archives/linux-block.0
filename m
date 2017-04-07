@@ -2,12 +2,12 @@ Return-Path: <hare@suse.de>
 From: Hannes Reinecke <hare@suse.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Omar Sandoval <osandov@fb.com>,
-	Ming Lei <ming.lei@redhat.com>,
+	Ming Lei <tom.leiming@gmail.com>,
 	linux-block@vger.kernel.org,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv7 0/2] loop: enable different logical blocksizes
-Date: Fri,  7 Apr 2017 12:50:55 +0200
-Message-Id: <1491562257-82574-1-git-send-email-hare@suse.de>
+Subject: [PATCHv6 0/2] loop: enable different logical blocksizes
+Date: Fri,  7 Apr 2017 08:58:56 +0200
+Message-Id: <1491548338-71005-1-git-send-email-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Currently the loop driver just simulates 512-byte blocks. When
@@ -35,17 +35,15 @@ Changes to v4:
 - Add LO_INFO_BLOCKSIZE definition
 Changes to v5:
 - Rediff to latest upstream
-Changes to v6:
-- Include review from Ming Lei
 
 Hannes Reinecke (2):
   loop: Remove unused 'bdev' argument from loop_set_capacity
   loop: support 4k physical blocksize
 
- drivers/block/loop.c      | 44 +++++++++++++++++++++++++++++++++++++-------
+ drivers/block/loop.c      | 40 +++++++++++++++++++++++++++++++++-------
  drivers/block/loop.h      |  1 +
  include/uapi/linux/loop.h |  3 +++
- 3 files changed, 41 insertions(+), 7 deletions(-)
+ 3 files changed, 37 insertions(+), 7 deletions(-)
 
 -- 
 1.8.5.6
