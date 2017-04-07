@@ -1,61 +1,91 @@
-Return-Path: <BATV+d06792d33419b921eada+4978+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	target-devel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com
-Subject: [PATCH 7/8] block: remove bio_no_advance_iter
-Date: Mon, 10 Apr 2017 18:08:06 +0200
-Message-Id: <20170410160807.23674-8-hch@lst.de>
-In-Reply-To: <20170410160807.23674-1-hch@lst.de>
-References: <20170410160807.23674-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:54943 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932684AbdDGBLf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Apr 2017 21:11:35 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Fri, 07 Apr 2017 11:10:44 +1000
+Subject: [PATCH 1/2] block: simple improvements for bio->flags
+Cc: linux-raid@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Alasdair Kergon <agk@redhat.com>
+Message-ID: <149152744444.17489.7959643077115840287.stgit@noble>
+In-Reply-To: <149152735878.17489.16036848644242802943.stgit@noble>
+References: <149152735878.17489.16036848644242802943.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now that we don't have to support the odd Write Same special case
-we can simply increment the iter if the bio has data, else just
-manipulate bi_size directly.
+The comment for the 'flags' field of 'bio' mentions
+"command" which is no longer stored there, and doesn't
+mention the bvec pool number, which is.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+BIO_RESET_BITS is set in such a way that it would need to be
+updated if new bits were added, which is easy to miss.
+
+BVEC_POOL_BITS is larger than needed.  The BVEC_POOL_IDX()
+ranges from 0 to 6, so 3 bits are sufficient.
+
+This patch make improvements in each of these areas.
+
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- include/linux/bio.h | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ include/linux/blk_types.h |   22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 96a20afb8575..7a24a1a24967 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -83,13 +83,6 @@ static inline bool bio_has_data(struct bio *bio)
- 	return false;
- }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d703acb55d0f..ff07d891f38f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -29,7 +29,7 @@ struct bio {
+ 						 * top bits REQ_OP. Use
+ 						 * accessors.
+ 						 */
+-	unsigned short		bi_flags;	/* status, command, etc */
++	unsigned short		bi_flags;	/* status, etc and bvec pool number */
+ 	unsigned short		bi_ioprio;
  
--static inline bool bio_no_advance_iter(struct bio *bio)
--{
--	return bio_op(bio) == REQ_OP_DISCARD ||
--	       bio_op(bio) == REQ_OP_SECURE_ERASE ||
--	       bio_op(bio) == REQ_OP_WRITE_ZEROES;
--}
+ 	struct bvec_iter	bi_iter;
+@@ -102,12 +102,7 @@ struct bio {
+ #define BIO_REFFED	8	/* bio has elevated ->bi_cnt */
+ #define BIO_THROTTLED	9	/* This bio has already been subjected to
+ 				 * throttling rules. Don't do it again. */
 -
- static inline bool bio_mergeable(struct bio *bio)
- {
- 	if (bio->bi_opf & REQ_NOMERGE_FLAGS)
-@@ -165,10 +158,10 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- {
- 	iter->bi_sector += bytes >> 9;
+-/*
+- * Flags starting here get preserved by bio_reset() - this includes
+- * BVEC_POOL_IDX()
+- */
+-#define BIO_RESET_BITS	10
++/* See BVEC_POOL_OFFSET below before adding new flags */
  
--	if (bio_no_advance_iter(bio))
--		iter->bi_size -= bytes;
--	else
-+	if (bio_has_data(bio))
- 		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-+	else
-+		iter->bi_size -= bytes;
- }
+ /*
+  * We support 6 different bvec pools, the last one is magic in that it
+@@ -117,13 +112,22 @@ struct bio {
+ #define BVEC_POOL_MAX		(BVEC_POOL_NR - 1)
  
- #define __bio_for_each_segment(bvl, bio, iter, start)			\
--- 
-2.11.0
+ /*
+- * Top 4 bits of bio flags indicate the pool the bvecs came from.  We add
++ * Top 3 bits of bio flags indicate the pool the bvecs came from.  We add
+  * 1 to the actual index so that 0 indicates that there are no bvecs to be
+  * freed.
+  */
+-#define BVEC_POOL_BITS		(4)
++#define BVEC_POOL_BITS		(3)
+ #define BVEC_POOL_OFFSET	(16 - BVEC_POOL_BITS)
+ #define BVEC_POOL_IDX(bio)	((bio)->bi_flags >> BVEC_POOL_OFFSET)
++#if (1<< BVEC_POOL_BITS) < (BVEC_POOL_NR+1)
++# error "BVEC_POOL_BITS is too small"
++#endif
++
++/*
++ * Flags starting here get preserved by bio_reset() - this includes
++ * only BVEC_POOL_IDX()
++ */
++#define BIO_RESET_BITS	BVEC_POOL_OFFSET
+ 
+ /*
+  * Operations and flags common to the bio and request structures.
