@@ -1,45 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34336 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757645AbdDSAcP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2017 20:32:15 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Omar Sandoval <osandov@fb.com>,
-        Jozef Mikovic <jmikovic@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/3] mtip32xx: assign driver tag
-Date: Wed, 19 Apr 2017 08:31:41 +0800
-Message-Id: <20170419003142.9581-3-ming.lei@redhat.com>
-In-Reply-To: <20170419003142.9581-1-ming.lei@redhat.com>
-References: <20170419003142.9581-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <darrick.wong@oracle.com>
+Date: Fri, 7 Apr 2017 08:08:51 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+        jack@suse.com, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, sagi@grimberg.me, avi@scylladb.com,
+        axboe@kernel.dk, linux-api@vger.kernel.org, willy@infradead.org,
+        tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 7/8] nowait aio: xfs
+Message-ID: <20170407150851.GC4853@birch.djwong.org>
+References: <20170403185307.6243-1-rgoldwyn@suse.de>
+ <20170403185307.6243-8-rgoldwyn@suse.de>
+ <20170404065211.GD21942@infradead.org>
+ <20170406225415.GC4864@birch.djwong.org>
+ <6cc69b0c-7af4-879e-1012-aae8ba5358bd@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6cc69b0c-7af4-879e-1012-aae8ba5358bd@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Assign driver tag for internal command, so that we
-can avoid kernel oops[1] trigered in blk_mq_tag_to_rq().
+On Fri, Apr 07, 2017 at 06:34:28AM -0500, Goldwyn Rodrigues wrote:
+> 
+> 
+> On 04/06/2017 05:54 PM, Darrick J. Wong wrote:
+> > On Mon, Apr 03, 2017 at 11:52:11PM -0700, Christoph Hellwig wrote:
+> >>> +	if (unaligned_io) {
+> >>> +		/* If we are going to wait for other DIO to finish, bail */
+> >>> +		if ((iocb->ki_flags & IOCB_NOWAIT) &&
+> >>> +		     atomic_read(&inode->i_dio_count))
+> >>> +			return -EAGAIN;
+> >>>  		inode_dio_wait(inode);
+> >>
+> >> This checks i_dio_count twice in the nowait case, I think it should be:
+> >>
+> >> 	if (iocb->ki_flags & IOCB_NOWAIT) {
+> >> 		if (atomic_read(&inode->i_dio_count))
+> >> 			return -EAGAIN;
+> >> 	} else {
+> >> 		inode_dio_wait(inode);
+> >> 	}
+> >>
+> >>>  	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
+> >>>  		if (flags & IOMAP_DIRECT) {
+> >>> +			/* A reflinked inode will result in CoW alloc */
+> >>> +			if (flags & IOMAP_NOWAIT) {
+> >>> +				error = -EAGAIN;
+> >>> +				goto out_unlock;
+> >>> +			}
+> >>
+> >> This is a bit pessimistic - just because the inode has any shared
+> >> extents we could still write into unshared ones.  For now I think this
+> >> pessimistic check is fine, but the comment should be corrected.
+> > 
+> > Consider what happens in both _reflink_{allocate,reserve}_cow.  If there
+> > is already an existing reservation in the CoW fork then we'll have to
+> > CoW and therefore can't satisfy the NOWAIT flag.  If there isn't already
+> > anything in the CoW fork, then we have to see if there are shared blocks
+> > by calling _reflink_trim_around_shared.  That performs a refcountbt
+> > lookup, which involves locking the AGF, so we also can't satisfy NOWAIT.
+> > 
+> > IOWs, I think this hunk has to move outside the IOMAP_DIRECT check to
+> > cover both write-to-reflinked-file cases.
+> > 
+> 
+> IOMAP_NOWAIT is set only with IOMAP_DIRECT since the nowait feature is
+> for direct-IO only. This is checked early on, when we are checking for
 
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=195429
+Ah, ok.  Disregard what I said about moving it then.
 
-Reported-by: Jozef Mikovic <jmikovic@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 2 ++
- 1 file changed, 2 insertions(+)
+--D
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f96ab717534c..8cfe5a6edb05 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -180,6 +180,8 @@ static struct mtip_cmd *mtip_get_int_command(struct driver_data *dd)
- 	if (IS_ERR(rq))
- 		return NULL;
- 
-+	WARN_ON(!blk_mq_get_driver_tag(rq, NULL, true));
-+
- 	return blk_mq_rq_to_pdu(rq);
- }
- 
--- 
-2.9.3
+> user-passed flags, and if not, -EINVAL is returned.
+> 
+> 
+> -- 
+> Goldwyn
