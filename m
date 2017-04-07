@@ -1,69 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46572 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752164AbdDLKzp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2017 06:55:45 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v3CAsDdd110171
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2017 06:55:44 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 29rxx3uk69-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2017 06:55:44 -0400
-Received: from localhost
-        by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <bblock@linux.vnet.ibm.com>;
-        Wed, 12 Apr 2017 11:55:42 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id v3CAtdjP13304264
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2017 10:55:39 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C855611C058
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2017 11:54:56 +0100 (BST)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD00911C06E
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2017 11:54:56 +0100 (BST)
-Received: from bblock-ThinkPad-W530 (unknown [9.152.212.79])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2017 11:54:56 +0100 (BST)
-Date: Wed, 12 Apr 2017 12:55:38 +0200
-From: Benjamin Block <bblock@linux.vnet.ibm.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v4 0/6] Avoid that scsi-mq and dm-mq queue processing
  stalls sporadically
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
 References: <20170407181654.27836-1-bart.vanassche@sandisk.com>
+ <78b80b12-a764-a793-f8a1-7a941dc84ee5@kernel.dk>
+ <1491590023.2559.18.camel@sandisk.com> <1491590377.2559.22.camel@sandisk.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <97a0b03e-a1f2-4033-9dd3-c0a9c70d7bdc@kernel.dk>
+Date: Fri, 7 Apr 2017 12:51:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170407181654.27836-1-bart.vanassche@sandisk.com>
-Message-Id: <20170412105538.GB22576@bblock-ThinkPad-W530>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1491590377.2559.22.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Apr 07, 2017 at 11:16:48AM -0700, Bart Van Assche wrote:
+On 04/07/2017 12:39 PM, Bart Van Assche wrote:
+> On Fri, 2017-04-07 at 11:33 -0700, Bart Van Assche wrote:
+>> On Fri, 2017-04-07 at 12:23 -0600, Jens Axboe wrote:
+>>> On 04/07/2017 12:16 PM, Bart Van Assche wrote:
+>>>> Hello Jens,
+>>>>
+>>>> The six patches in this patch series fix the queue lockup I reported
+>>>> recently on the linux-block mailing list. Please consider these patches
+>>>> for inclusion in the upstream kernel.
+>>>
+>>> Some of this we need in 4.11, but not all of it. I can't be applying patches
+>>> that "improve scalability" at this point.
+>>>
+>>> 4-6 looks like what we want for 4.11, I'll see if those apply directly. Then
+>>> we can put 1-3 on top in 4.12, with the others pulled in first.
+>>
+>> Hello Jens,
+>>
+>> Please note that patch 2/6 is a bug fix. The current implementation of
+>> blk_mq_sched_restart_queues() only considers hardware queues associated with
+>> the same request queue as the hardware queue that has been passed as an
+>> argument. If a tag set is shared across request queues - as is the case for
+>> SCSI - then all request queues that share a tag set with the hctx argument
+>> must be considered.
+> 
+> (replying to my own e-mail)
+> 
 > Hello Jens,
 > 
-> The six patches in this patch series fix the queue lockup I reported
-> recently on the linux-block mailing list. Please consider these patches
-> for inclusion in the upstream kernel.
-> 
+> If you want I can split that patch into two patches - one that runs all hardware
+> queues with which the tag set is shared and one that switches from rerunning
+> all hardware queues to one hardware queue.
 
-Hey Bart,
+I already put it in, but this is getting very awkward. We're at -rc5 time, patches
+going into mainline should be TINY. And now I'm sitting on this, that I have to
+justify:
 
-just out of curiosity. Is this maybe related to similar stuff happening
-when CPUs are hot plugged - at least in that the stack gets stuck? Like
-in this thread here:
-https://www.mail-archive.com/linux-block@vger.kernel.org/msg06057.html
+ 15 files changed, 281 insertions(+), 164 deletions(-)
 
-Would be interesting, because we recently saw similar stuff happening.
+and where one of the patches reads like it's a performance improvement, when
+in reality it's fixing a hang. So yes, the patch should have been split in
+two, and the series should have been ordered so that the first patches could
+go into 4.11, and the rest on top of that in 4.12. Did we really need a
+patch clarifying comments in that series? Probably not.
 
-
-                                                    Beste Gr��e / Best regards,
-                                                      - Benjamin Block
 -- 
-Linux on z Systems Development         /         IBM Systems & Technology Group
-		  IBM Deutschland Research & Development GmbH 
-Vorsitz. AufsR.: Martina Koederitz     /        Gesch�ftsf�hrung: Dirk Wittkopp
-Sitz der Gesellschaft: B�blingen / Registergericht: AmtsG Stuttgart, HRB 243294
+Jens Axboe
