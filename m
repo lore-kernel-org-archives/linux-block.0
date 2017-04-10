@@ -1,167 +1,67 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 24/25] block: Remove unused functions
-Date: Wed, 12 Apr 2017 12:24:48 +0200
-Message-Id: <20170412102449.16901-25-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f45.google.com ([74.125.83.45]:33945 "EHLO
+        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751864AbdDJGwU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Apr 2017 02:52:20 -0400
+Received: by mail-pg0-f45.google.com with SMTP id 21so101101359pgg.1
+        for <linux-block@vger.kernel.org>; Sun, 09 Apr 2017 23:52:20 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v3 3/5] blk-mq: export helpers
+Date: Sun,  9 Apr 2017 23:51:11 -0700
+Message-Id: <45c2de5dc43bfefddbefaab32f203bf6795ffe9d.1491806249.git.osandov@fb.com>
+In-Reply-To: <cover.1491806249.git.osandov@fb.com>
+References: <cover.1491806249.git.osandov@fb.com>
+In-Reply-To: <cover.1491806249.git.osandov@fb.com>
+References: <cover.1491806249.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now that all backing_dev_info structure are allocated separately, we can
-drop some unused functions.
+From: Omar Sandoval <osandov@fb.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
+blk_mq_finish_request() is required for schedulers that define their own
+put_request(). blk_mq_run_hw_queue() is required for schedulers that
+hold back requests to be run later.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- include/linux/backing-dev.h |  5 ----
- mm/backing-dev.c            | 56 +++++----------------------------------------
- 2 files changed, 6 insertions(+), 55 deletions(-)
+ block/blk-mq.c         | 2 ++
+ include/linux/blk-mq.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 47a98e6e2a65..aaeb2ec5d33c 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -17,8 +17,6 @@
- #include <linux/backing-dev-defs.h>
- #include <linux/slab.h>
- 
--int __must_check bdi_init(struct backing_dev_info *bdi);
--
- static inline struct backing_dev_info *bdi_get(struct backing_dev_info *bdi)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e536dacfae4c..7138cd98146e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -368,6 +368,7 @@ void blk_mq_finish_request(struct request *rq)
  {
- 	kref_get(&bdi->refcnt);
-@@ -32,12 +30,9 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 		const char *fmt, ...);
- int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
- 		const char *fmt, va_list args);
--int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
- int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
- void bdi_unregister(struct backing_dev_info *bdi);
- 
--int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
--void bdi_destroy(struct backing_dev_info *bdi);
- struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
- static inline struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
- {
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 3dd175986390..4dcd56947f2a 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -12,8 +12,6 @@
- #include <linux/device.h>
- #include <trace/events/writeback.h>
- 
--static atomic_long_t bdi_seq = ATOMIC_LONG_INIT(0);
--
- struct backing_dev_info noop_backing_dev_info = {
- 	.name		= "noop",
- 	.capabilities	= BDI_CAP_NO_ACCT_AND_WRITEBACK,
-@@ -242,6 +240,8 @@ static __init int bdi_class_init(void)
+ 	blk_mq_finish_hctx_request(blk_mq_map_queue(rq->q, rq->mq_ctx->cpu), rq);
  }
- postcore_initcall(bdi_class_init);
++EXPORT_SYMBOL_GPL(blk_mq_finish_request);
  
-+static int bdi_init(struct backing_dev_info *bdi);
-+
- static int __init default_bdi_init(void)
+ void blk_mq_free_request(struct request *rq)
  {
- 	int err;
-@@ -820,7 +820,7 @@ static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
- 
- #endif	/* CONFIG_CGROUP_WRITEBACK */
- 
--int bdi_init(struct backing_dev_info *bdi)
-+static int bdi_init(struct backing_dev_info *bdi)
+@@ -1183,6 +1184,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
  {
- 	int ret;
- 
-@@ -838,7 +838,6 @@ int bdi_init(struct backing_dev_info *bdi)
- 
- 	return ret;
+ 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
  }
--EXPORT_SYMBOL(bdi_init);
++EXPORT_SYMBOL(blk_mq_run_hw_queue);
  
- struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
  {
-@@ -897,12 +896,6 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- }
- EXPORT_SYMBOL(bdi_register);
- 
--int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev)
--{
--	return bdi_register(bdi, NULL, "%u:%u", MAJOR(dev), MINOR(dev));
--}
--EXPORT_SYMBOL(bdi_register_dev);
--
- int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
- {
- 	int rc;
-@@ -950,13 +943,6 @@ void bdi_unregister(struct backing_dev_info *bdi)
- 	}
- }
- 
--static void bdi_exit(struct backing_dev_info *bdi)
--{
--	WARN_ON_ONCE(bdi->dev);
--	wb_exit(&bdi->wb);
--	cgwb_bdi_exit(bdi);
--}
--
- static void release_bdi(struct kref *ref)
- {
- 	struct backing_dev_info *bdi =
-@@ -964,7 +950,9 @@ static void release_bdi(struct kref *ref)
- 
- 	if (test_bit(WB_registered, &bdi->wb.state))
- 		bdi_unregister(bdi);
--	bdi_exit(bdi);
-+	WARN_ON_ONCE(bdi->dev);
-+	wb_exit(&bdi->wb);
-+	cgwb_bdi_exit(bdi);
- 	kfree(bdi);
- }
- 
-@@ -974,38 +962,6 @@ void bdi_put(struct backing_dev_info *bdi)
- }
- EXPORT_SYMBOL(bdi_put);
- 
--void bdi_destroy(struct backing_dev_info *bdi)
--{
--	bdi_unregister(bdi);
--	bdi_exit(bdi);
--}
--EXPORT_SYMBOL(bdi_destroy);
--
--/*
-- * For use from filesystems to quickly init and register a bdi associated
-- * with dirty writeback
-- */
--int bdi_setup_and_register(struct backing_dev_info *bdi, char *name)
--{
--	int err;
--
--	bdi->name = name;
--	bdi->capabilities = 0;
--	err = bdi_init(bdi);
--	if (err)
--		return err;
--
--	err = bdi_register(bdi, NULL, "%.28s-%ld", name,
--			   atomic_long_inc_return(&bdi_seq));
--	if (err) {
--		bdi_destroy(bdi);
--		return err;
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL(bdi_setup_and_register);
--
- static wait_queue_head_t congestion_wqh[2] = {
- 		__WAIT_QUEUE_HEAD_INITIALIZER(congestion_wqh[0]),
- 		__WAIT_QUEUE_HEAD_INITIALIZER(congestion_wqh[1])
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index b90c3d5766cd..d75de612845d 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -238,6 +238,7 @@ void blk_mq_start_hw_queues(struct request_queue *q);
+ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
++void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
 -- 
-2.12.0
+2.12.2
