@@ -1,45 +1,34 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:38735 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1426665AbdDUXdB (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:51951 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1754389AbdDJP4P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 19:33:01 -0400
-Received: by mail-wm0-f50.google.com with SMTP id r190so27942476wme.1
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2017 16:33:01 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 0/5] lightnvm: pblk extra patches for 4.12
-Date: Sat, 22 Apr 2017 01:32:44 +0200
-Message-Id: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
+        Mon, 10 Apr 2017 11:56:15 -0400
+From: Jens Axboe <axboe@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <osandov@fb.com>, <hch@lst.de>, <bart.vanassche@sandisk.com>
+Subject: [PATCH 0/3] blk-mq: unify hardware queue run handlers
+Date: Mon, 10 Apr 2017 09:54:53 -0600
+Message-ID: <1491839696-24783-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Matias,
+We currently have three of them, one normal work queue item, and two
+delayed work queue items. The two delayed items differ in that one of
+them only runs the queue it was previously stopped, that's it. The
+non-delayed one is identical to the non stopped checking delayed
+variant.
 
-This is a couple of bug fixes for the pblk release patch.
+Sending this out for early review, as I'll be heading on vacation
+shortly. This is untested, just compiled.
 
-Thanks,
-Javier
+This shrinks the size of a hardware queue from 832 bytes (13 cachelines)
+to 704 bytes (11 cachelines) on my setup. That's quite a substantial
+win.
 
-Javier González (5):
-  lightnvm: pblk: fix race condition on line retry
-  lightnvm: pblk: fix bad error check
-  lightnvm: pblk: fix memory leak on error path
-  lightnvm: pblk: free metadata on line alloc failure
-  lightnvm: pblk: fix erase counters on error fail
-
- drivers/lightnvm/pblk-core.c  | 60 ++++++++++++++++++++++++++-----------------
- drivers/lightnvm/pblk-gc.c    |  2 +-
- drivers/lightnvm/pblk-init.c  |  9 ++++---
- drivers/lightnvm/pblk-map.c   |  4 +--
- drivers/lightnvm/pblk-rl.c    |  6 +++--
- drivers/lightnvm/pblk-write.c |  7 +++--
- drivers/lightnvm/pblk.h       |  6 ++---
- 7 files changed, 57 insertions(+), 37 deletions(-)
+Patches are against my 4.12 branch.
 
 -- 
-2.7.4
+Jens Axboe
