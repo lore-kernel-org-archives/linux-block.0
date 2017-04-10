@@ -1,379 +1,322 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+d06792d33419b921eada+4978+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	target-devel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
 	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
 	dm-devel@redhat.com
-Subject: [PATCH 04/23] nvme: split nvme status from block req->errors
-Date: Thu, 20 Apr 2017 16:02:57 +0200
-Message-Id: <20170420140316.6546-5-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
+Subject: [PATCH 1/8] drbd: drop REQ_OP_WRITE_SAME support
+Date: Mon, 10 Apr 2017 18:08:00 +0200
+Message-Id: <20170410160807.23674-2-hch@lst.de>
+In-Reply-To: <20170410160807.23674-1-hch@lst.de>
+References: <20170410160807.23674-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-We want our own clearly defined error field for NVMe passthrough commands,
-and the request errors field is going away in its current form.
-
-Just store the status and result field in the nvme_request field from
-hardirq completion context (using a new helper) and then generate a
-Linux errno for the block layer only when we actually need it.
-
-Because we can't overload the status value with a negative error code
-for cancelled command we now have a flags filed in struct nvme_request
-that contains a bit for this condition.
+Linux only used it for zeroing, for which we have better methods now.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/nvme/host/core.c     | 50 +++++++++++++++++++++++++++-----------------
- drivers/nvme/host/fc.c       | 10 ++++-----
- drivers/nvme/host/lightnvm.c |  9 +++++---
- drivers/nvme/host/nvme.h     | 33 +++++++++++++----------------
- drivers/nvme/host/pci.c      | 11 +++++-----
- drivers/nvme/host/rdma.c     |  5 ++---
- drivers/nvme/target/loop.c   |  7 ++-----
- 7 files changed, 65 insertions(+), 60 deletions(-)
+ drivers/block/drbd/drbd_main.c     | 28 ++----------------
+ drivers/block/drbd/drbd_nl.c       | 60 --------------------------------------
+ drivers/block/drbd/drbd_receiver.c | 38 +++---------------------
+ drivers/block/drbd/drbd_req.c      |  1 -
+ drivers/block/drbd/drbd_worker.c   |  4 ---
+ 5 files changed, 7 insertions(+), 124 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index d33f829c3ab7..c6f256d74b6b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -66,11 +66,24 @@ static DEFINE_SPINLOCK(dev_list_lock);
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 84455c365f57..183468e0b959 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -931,7 +931,7 @@ void assign_p_sizes_qlim(struct drbd_device *device, struct p_sizes *p, struct r
+ 		p->qlim->io_min = cpu_to_be32(queue_io_min(q));
+ 		p->qlim->io_opt = cpu_to_be32(queue_io_opt(q));
+ 		p->qlim->discard_enabled = blk_queue_discard(q);
+-		p->qlim->write_same_capable = !!q->limits.max_write_same_sectors;
++		p->qlim->write_same_capable = 0;
+ 	} else {
+ 		q = device->rq_queue;
+ 		p->qlim->physical_block_size = cpu_to_be32(queue_physical_block_size(q));
+@@ -1610,9 +1610,6 @@ static int _drbd_send_bio(struct drbd_peer_device *peer_device, struct bio *bio)
+ 					 ? 0 : MSG_MORE);
+ 		if (err)
+ 			return err;
+-		/* REQ_OP_WRITE_SAME has only one segment */
+-		if (bio_op(bio) == REQ_OP_WRITE_SAME)
+-			break;
+ 	}
+ 	return 0;
+ }
+@@ -1631,9 +1628,6 @@ static int _drbd_send_zc_bio(struct drbd_peer_device *peer_device, struct bio *b
+ 				      bio_iter_last(bvec, iter) ? 0 : MSG_MORE);
+ 		if (err)
+ 			return err;
+-		/* REQ_OP_WRITE_SAME has only one segment */
+-		if (bio_op(bio) == REQ_OP_WRITE_SAME)
+-			break;
+ 	}
+ 	return 0;
+ }
+@@ -1665,7 +1659,6 @@ static u32 bio_flags_to_wire(struct drbd_connection *connection,
+ 		return  (bio->bi_opf & REQ_SYNC ? DP_RW_SYNC : 0) |
+ 			(bio->bi_opf & REQ_FUA ? DP_FUA : 0) |
+ 			(bio->bi_opf & REQ_PREFLUSH ? DP_FLUSH : 0) |
+-			(bio_op(bio) == REQ_OP_WRITE_SAME ? DP_WSAME : 0) |
+ 			(bio_op(bio) == REQ_OP_DISCARD ? DP_DISCARD : 0) |
+ 			(bio_op(bio) == REQ_OP_WRITE_ZEROES ? DP_DISCARD : 0);
+ 	else
+@@ -1680,7 +1673,6 @@ int drbd_send_dblock(struct drbd_peer_device *peer_device, struct drbd_request *
+ 	struct drbd_device *device = peer_device->device;
+ 	struct drbd_socket *sock;
+ 	struct p_data *p;
+-	struct p_wsame *wsame = NULL;
+ 	void *digest_out;
+ 	unsigned int dp_flags = 0;
+ 	int digest_size;
+@@ -1717,27 +1709,13 @@ int drbd_send_dblock(struct drbd_peer_device *peer_device, struct drbd_request *
+ 		err = __send_command(peer_device->connection, device->vnr, sock, P_TRIM, sizeof(*t), NULL, 0);
+ 		goto out;
+ 	}
+-	if (dp_flags & DP_WSAME) {
+-		/* this will only work if DRBD_FF_WSAME is set AND the
+-		 * handshake agreed that all nodes and backend devices are
+-		 * WRITE_SAME capable and agree on logical_block_size */
+-		wsame = (struct p_wsame*)p;
+-		digest_out = wsame + 1;
+-		wsame->size = cpu_to_be32(req->i.size);
+-	} else
+-		digest_out = p + 1;
++	digest_out = p + 1;
  
- static struct class *nvme_class;
+ 	/* our digest is still only over the payload.
+ 	 * TRIM does not carry any payload. */
+ 	if (digest_size)
+ 		drbd_csum_bio(peer_device->connection->integrity_tfm, req->master_bio, digest_out);
+-	if (wsame) {
+-		err =
+-		    __send_command(peer_device->connection, device->vnr, sock, P_WSAME,
+-				   sizeof(*wsame) + digest_size, NULL,
+-				   bio_iovec(req->master_bio).bv_len);
+-	} else
+-		err =
++	err =
+ 		    __send_command(peer_device->connection, device->vnr, sock, P_DATA,
+ 				   sizeof(*p) + digest_size, NULL, req->i.size);
+ 	if (!err) {
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index 02255a0d68b9..53aeed040eb4 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1234,65 +1234,6 @@ static void fixup_discard_if_not_supported(struct request_queue *q)
+ 	}
+ }
  
-+int nvme_error_status(struct request *req)
-+{
-+	switch (nvme_req(req)->status & 0x7ff) {
-+	case NVME_SC_SUCCESS:
-+		return 0;
-+	case NVME_SC_CAP_EXCEEDED:
-+		return -ENOSPC;
-+	default:
-+		return -EIO;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(nvme_error_status);
-+
- static inline bool nvme_req_needs_retry(struct request *req)
- {
- 	if (blk_noretry_request(req))
- 		return false;
--	if (req->errors & NVME_SC_DNR)
-+	if (nvme_req(req)->status & NVME_SC_DNR)
- 		return false;
- 	if (jiffies - req->start_time >= req->timeout)
- 		return false;
-@@ -81,23 +94,13 @@ static inline bool nvme_req_needs_retry(struct request *req)
- 
- void nvme_complete_rq(struct request *req)
- {
--	int error = 0;
+-static void decide_on_write_same_support(struct drbd_device *device,
+-			struct request_queue *q,
+-			struct request_queue *b, struct o_qlim *o)
+-{
+-	struct drbd_peer_device *peer_device = first_peer_device(device);
+-	struct drbd_connection *connection = peer_device->connection;
+-	bool can_do = b ? b->limits.max_write_same_sectors : true;
 -
--	if (unlikely(req->errors)) {
--		if (nvme_req_needs_retry(req)) {
--			nvme_req(req)->retries++;
--			blk_mq_requeue_request(req,
--					!blk_mq_queue_stopped(req->q));
--			return;
+-	if (can_do && connection->cstate >= C_CONNECTED && !(connection->agreed_features & DRBD_FF_WSAME)) {
+-		can_do = false;
+-		drbd_info(peer_device, "peer does not support WRITE_SAME\n");
+-	}
+-
+-	if (o) {
+-		/* logical block size; queue_logical_block_size(NULL) is 512 */
+-		unsigned int peer_lbs = be32_to_cpu(o->logical_block_size);
+-		unsigned int me_lbs_b = queue_logical_block_size(b);
+-		unsigned int me_lbs = queue_logical_block_size(q);
+-
+-		if (me_lbs_b != me_lbs) {
+-			drbd_warn(device,
+-				"logical block size of local backend does not match (drbd:%u, backend:%u); was this a late attach?\n",
+-				me_lbs, me_lbs_b);
+-			/* rather disable write same than trigger some BUG_ON later in the scsi layer. */
+-			can_do = false;
 -		}
+-		if (me_lbs_b != peer_lbs) {
+-			drbd_warn(peer_device, "logical block sizes do not match (me:%u, peer:%u); this may cause problems.\n",
+-				me_lbs, peer_lbs);
+-			if (can_do) {
+-				drbd_dbg(peer_device, "logical block size mismatch: WRITE_SAME disabled.\n");
+-				can_do = false;
+-			}
+-			me_lbs = max(me_lbs, me_lbs_b);
+-			/* We cannot change the logical block size of an in-use queue.
+-			 * We can only hope that access happens to be properly aligned.
+-			 * If not, the peer will likely produce an IO error, and detach. */
+-			if (peer_lbs > me_lbs) {
+-				if (device->state.role != R_PRIMARY) {
+-					blk_queue_logical_block_size(q, peer_lbs);
+-					drbd_warn(peer_device, "logical block size set to %u\n", peer_lbs);
+-				} else {
+-					drbd_warn(peer_device,
+-						"current Primary must NOT adjust logical block size (%u -> %u); hope for the best.\n",
+-						me_lbs, peer_lbs);
+-				}
+-			}
+-		}
+-		if (can_do && !o->write_same_capable) {
+-			/* If we introduce an open-coded write-same loop on the receiving side,
+-			 * the peer would present itself as "capable". */
+-			drbd_dbg(peer_device, "WRITE_SAME disabled (peer device not capable)\n");
+-			can_do = false;
+-		}
+-	}
 -
--		if (blk_rq_is_passthrough(req))
--			error = req->errors;
--		else
--			error = nvme_error_status(req->errors);
-+	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
-+		nvme_req(req)->retries++;
-+		blk_mq_requeue_request(req, !blk_mq_queue_stopped(req->q));
-+		return;
- 	}
- 
--	blk_mq_end_request(req, error);
-+	blk_mq_end_request(req, nvme_error_status(req));
- }
- EXPORT_SYMBOL_GPL(nvme_complete_rq);
- 
-@@ -114,7 +117,9 @@ void nvme_cancel_request(struct request *req, void *data, bool reserved)
- 	status = NVME_SC_ABORT_REQ;
- 	if (blk_queue_dying(req->q))
- 		status |= NVME_SC_DNR;
--	blk_mq_complete_request(req, status);
-+	nvme_req(req)->status = status;
-+	blk_mq_complete_request(req, 0);
-+
- }
- EXPORT_SYMBOL_GPL(nvme_cancel_request);
- 
-@@ -357,6 +362,7 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 
- 	if (!(req->rq_flags & RQF_DONTPREP)) {
- 		nvme_req(req)->retries = 0;
-+		nvme_req(req)->flags = 0;
- 		req->rq_flags |= RQF_DONTPREP;
- 	}
- 
-@@ -413,7 +419,10 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 	blk_execute_rq(req->q, NULL, req, at_head);
- 	if (result)
- 		*result = nvme_req(req)->result;
--	ret = req->errors;
-+	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-+		ret = -EINTR;
-+	else
-+		ret = nvme_req(req)->status;
-  out:
- 	blk_mq_free_request(req);
- 	return ret;
-@@ -498,7 +507,10 @@ int __nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
- 	}
-  submit:
- 	blk_execute_rq(req->q, disk, req, 0);
--	ret = req->errors;
-+	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-+		ret = -EINTR;
-+	else
-+		ret = nvme_req(req)->status;
- 	if (result)
- 		*result = le32_to_cpu(nvme_req(req)->result.u32);
- 	if (meta && !ret && !write) {
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index aad7f9c0be32..450733c8cd24 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -1148,6 +1148,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 	struct nvme_fc_queue *queue = op->queue;
- 	struct nvme_completion *cqe = &op->rsp_iu.cqe;
- 	__le16 status = cpu_to_le16(NVME_SC_SUCCESS << 1);
-+	union nvme_result result;
- 
- 	/*
- 	 * WARNING:
-@@ -1215,7 +1216,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 			goto done;
- 		}
--		op->nreq.result.u64 = 0;
-+		result.u64 = 0;
- 		break;
- 
- 	case sizeof(struct nvme_fc_ersp_iu):
-@@ -1232,7 +1233,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 			goto done;
- 		}
--		op->nreq.result = cqe->result;
-+		result = cqe->result;
- 		status = cqe->status;
- 		break;
- 
-@@ -1243,13 +1244,12 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 
- done:
- 	if (!queue->qnum && op->rqno >= AEN_CMDID_BASE) {
--		nvme_complete_async_event(&queue->ctrl->ctrl, status,
--					&op->nreq.result);
-+		nvme_complete_async_event(&queue->ctrl->ctrl, status, &result);
- 		nvme_fc_ctrl_put(ctrl);
- 		return;
- 	}
- 
--	blk_mq_complete_request(rq, le16_to_cpu(status) >> 1);
-+	nvme_end_request(rq, status, result);
- }
- 
- static int
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index b76e2e36fef4..cb599b3fc12c 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -484,7 +484,7 @@ static void nvme_nvm_end_io(struct request *rq, int error)
- 	struct nvm_rq *rqd = rq->end_io_data;
- 
- 	rqd->ppa_status = nvme_req(rq)->result.u64;
--	rqd->error = error;
-+	rqd->error = nvme_req(rq)->status;
- 	nvm_end_io(rqd);
- 
- 	kfree(nvme_req(rq)->cmd);
-@@ -665,9 +665,12 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 
- 	wait_for_completion_io(&wait);
- 
--	ret = nvme_error_status(rq->errors);
-+	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
-+		ret = -EINTR;
-+	else
-+		ret = nvme_error_status(rq);
- 	if (result)
--		*result = rq->errors & 0x7ff;
-+		*result = nvme_req(rq)->status & 0x7ff;
- 	if (status)
- 		*status = le64_to_cpu(nvme_req(rq)->result.u64);
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a317461c21d3..d7330f75632d 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -21,16 +21,6 @@
- #include <linux/lightnvm.h>
- #include <linux/sed-opal.h>
- 
--enum {
--	/*
--	 * Driver internal status code for commands that were cancelled due
--	 * to timeouts or controller shutdown.  The value is negative so
--	 * that it a) doesn't overlap with the unsigned hardware error codes,
--	 * and b) can easily be tested for.
--	 */
--	NVME_SC_CANCELLED		= -EINTR,
--};
+-	blk_queue_max_write_same_sectors(q, can_do ? DRBD_MAX_BBIO_SECTORS : 0);
+-}
 -
- extern unsigned char nvme_io_timeout;
- #define NVME_IO_TIMEOUT	(nvme_io_timeout * HZ)
+ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backing_dev *bdev,
+ 				   unsigned int max_bio_size, struct o_qlim *o)
+ {
+@@ -1321,7 +1262,6 @@ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backi
+ 	blk_queue_max_segments(q, max_segments ? max_segments : BLK_MAX_SEGMENTS);
+ 	blk_queue_segment_boundary(q, PAGE_SIZE-1);
+ 	decide_on_discard_support(device, q, b, discard_zeroes_if_aligned);
+-	decide_on_write_same_support(device, q, b, o);
  
-@@ -91,6 +81,12 @@ struct nvme_request {
- 	struct nvme_command	*cmd;
- 	union nvme_result	result;
- 	u8			retries;
-+	u8			flags;
-+	u16			status;
-+};
-+
-+enum {
-+	NVME_REQ_CANCELLED		= (1 << 0),
+ 	if (b) {
+ 		blk_queue_stack_limits(q, b);
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 1b0a2be24f39..980d53793007 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -1459,18 +1459,6 @@ static void drbd_issue_peer_discard(struct drbd_device *device, struct drbd_peer
+ 	drbd_endio_write_sec_final(peer_req);
+ }
+ 
+-static void drbd_issue_peer_wsame(struct drbd_device *device,
+-				  struct drbd_peer_request *peer_req)
+-{
+-	struct block_device *bdev = device->ldev->backing_bdev;
+-	sector_t s = peer_req->i.sector;
+-	sector_t nr = peer_req->i.size >> 9;
+-	if (blkdev_issue_write_same(bdev, s, nr, GFP_NOIO, peer_req->pages))
+-		peer_req->flags |= EE_WAS_ERROR;
+-	drbd_endio_write_sec_final(peer_req);
+-}
+-
+-
+ /**
+  * drbd_submit_peer_request()
+  * @device:	DRBD device.
+@@ -1508,7 +1496,7 @@ int drbd_submit_peer_request(struct drbd_device *device,
+ 	 * Correctness first, performance later.  Next step is to code an
+ 	 * asynchronous variant of the same.
+ 	 */
+-	if (peer_req->flags & (EE_IS_TRIM|EE_WRITE_SAME)) {
++	if (peer_req->flags & EE_IS_TRIM) {
+ 		/* wait for all pending IO completions, before we start
+ 		 * zeroing things out. */
+ 		conn_wait_active_ee_empty(peer_req->peer_device->connection);
+@@ -1527,8 +1515,6 @@ int drbd_submit_peer_request(struct drbd_device *device,
+ 
+ 		if (peer_req->flags & EE_IS_TRIM)
+ 			drbd_issue_peer_discard(device, peer_req);
+-		else /* EE_WRITE_SAME */
+-			drbd_issue_peer_wsame(device, peer_req);
+ 		return 0;
+ 	}
+ 
+@@ -1723,7 +1709,6 @@ read_in_block(struct drbd_peer_device *peer_device, u64 id, sector_t sector,
+ 	void *dig_vv = peer_device->connection->int_dig_vv;
+ 	unsigned long *data;
+ 	struct p_trim *trim = (pi->cmd == P_TRIM) ? pi->data : NULL;
+-	struct p_trim *wsame = (pi->cmd == P_WSAME) ? pi->data : NULL;
+ 
+ 	digest_size = 0;
+ 	if (!trim && peer_device->connection->peer_integrity_tfm) {
+@@ -1738,29 +1723,17 @@ read_in_block(struct drbd_peer_device *peer_device, u64 id, sector_t sector,
+ 		data_size -= digest_size;
+ 	}
+ 
+-	/* assume request_size == data_size, but special case trim and wsame. */
++	/* assume request_size == data_size, but special case trim. */
+ 	ds = data_size;
+ 	if (trim) {
+ 		if (!expect(data_size == 0))
+ 			return NULL;
+ 		ds = be32_to_cpu(trim->size);
+-	} else if (wsame) {
+-		if (data_size != queue_logical_block_size(device->rq_queue)) {
+-			drbd_err(peer_device, "data size (%u) != drbd logical block size (%u)\n",
+-				data_size, queue_logical_block_size(device->rq_queue));
+-			return NULL;
+-		}
+-		if (data_size != bdev_logical_block_size(device->ldev->backing_bdev)) {
+-			drbd_err(peer_device, "data size (%u) != backend logical block size (%u)\n",
+-				data_size, bdev_logical_block_size(device->ldev->backing_bdev));
+-			return NULL;
+-		}
+-		ds = be32_to_cpu(wsame->size);
+ 	}
+ 
+ 	if (!expect(IS_ALIGNED(ds, 512)))
+ 		return NULL;
+-	if (trim || wsame) {
++	if (trim) {
+ 		if (!expect(ds <= (DRBD_MAX_BBIO_SECTORS << 9)))
+ 			return NULL;
+ 	} else if (!expect(ds <= DRBD_MAX_BIO_SIZE))
+@@ -1788,8 +1761,6 @@ read_in_block(struct drbd_peer_device *peer_device, u64 id, sector_t sector,
+ 		peer_req->flags |= EE_IS_TRIM;
+ 		return peer_req;
+ 	}
+-	if (wsame)
+-		peer_req->flags |= EE_WRITE_SAME;
+ 
+ 	/* receive payload size bytes into page chain */
+ 	ds = data_size;
+@@ -2545,7 +2516,7 @@ static int receive_Data(struct drbd_connection *connection, struct packet_info *
+ 	 * we wait for all pending requests, respectively wait for
+ 	 * active_ee to become empty in drbd_submit_peer_request();
+ 	 * better not add ourselves here. */
+-	if ((peer_req->flags & (EE_IS_TRIM|EE_WRITE_SAME)) == 0)
++	if ((peer_req->flags & EE_IS_TRIM) == 0)
+ 		list_add_tail(&peer_req->w.list, &device->active_ee);
+ 	spin_unlock_irq(&device->resource->req_lock);
+ 
+@@ -4869,7 +4840,6 @@ static struct data_cmd drbd_cmd_handler[] = {
+ 	[P_PROTOCOL_UPDATE] = { 1, sizeof(struct p_protocol), receive_protocol },
+ 	[P_TRIM]	    = { 0, sizeof(struct p_trim), receive_Data },
+ 	[P_RS_DEALLOCATED]  = { 0, sizeof(struct p_block_desc), receive_rs_deallocated },
+-	[P_WSAME]	    = { 1, sizeof(struct p_wsame), receive_Data },
  };
  
- static inline struct nvme_request *nvme_req(struct request *req)
-@@ -248,18 +244,17 @@ static inline void nvme_cleanup_cmd(struct request *req)
+ static void drbdd(struct drbd_connection *connection)
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index b5730e17b455..3d3fba937a92 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -58,7 +58,6 @@ static struct drbd_request *drbd_req_new(struct drbd_device *device, struct bio
+ 
+ 	drbd_req_make_private_bio(req, bio_src);
+ 	req->rq_state = (bio_data_dir(bio_src) == WRITE ? RQ_WRITE : 0)
+-		      | (bio_op(bio_src) == REQ_OP_WRITE_SAME ? RQ_WSAME : 0)
+ 		      | (bio_op(bio_src) == REQ_OP_WRITE_ZEROES ? RQ_UNMAP : 0)
+ 		      | (bio_op(bio_src) == REQ_OP_DISCARD ? RQ_UNMAP : 0);
+ 	req->device = device;
+diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
+index 1afcb4e02d8d..9fad03491250 100644
+--- a/drivers/block/drbd/drbd_worker.c
++++ b/drivers/block/drbd/drbd_worker.c
+@@ -330,10 +330,6 @@ void drbd_csum_bio(struct crypto_ahash *tfm, struct bio *bio, void *digest)
+ 		sg_set_page(&sg, bvec.bv_page, bvec.bv_len, bvec.bv_offset);
+ 		ahash_request_set_crypt(req, &sg, NULL, sg.length);
+ 		crypto_ahash_update(req);
+-		/* REQ_OP_WRITE_SAME has only one segment,
+-		 * checksum the payload only once. */
+-		if (bio_op(bio) == REQ_OP_WRITE_SAME)
+-			break;
  	}
- }
- 
--static inline int nvme_error_status(u16 status)
-+static inline void nvme_end_request(struct request *req, __le16 status,
-+		union nvme_result result)
- {
--	switch (status & 0x7ff) {
--	case NVME_SC_SUCCESS:
--		return 0;
--	case NVME_SC_CAP_EXCEEDED:
--		return -ENOSPC;
--	default:
--		return -EIO;
--	}
-+	struct nvme_request *rq = nvme_req(req);
-+
-+	rq->status = le16_to_cpu(status) >> 1;
-+	rq->result = result;
-+	blk_mq_complete_request(req, 0);
- }
- 
-+int nvme_error_status(struct request *req);
- void nvme_complete_rq(struct request *req);
- void nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index f7a9f3fb5fdb..d9e2bd07ed56 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -679,8 +679,7 @@ static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag)
- 		}
- 
- 		req = blk_mq_tag_to_rq(*nvmeq->tags, cqe.command_id);
--		nvme_req(req)->result = cqe.result;
--		blk_mq_complete_request(req, le16_to_cpu(cqe.status) >> 1);
-+		nvme_end_request(req, cqe.status, cqe.result);
- 	}
- 
- 	if (head == nvmeq->cq_head && phase == nvmeq->cq_phase)
-@@ -817,9 +816,9 @@ static void abort_endio(struct request *req, int error)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct nvme_queue *nvmeq = iod->nvmeq;
--	u16 status = req->errors;
- 
--	dev_warn(nvmeq->dev->ctrl.device, "Abort status: 0x%x", status);
-+	dev_warn(nvmeq->dev->ctrl.device,
-+		 "Abort status: 0x%x", nvme_req(req)->status);
- 	atomic_inc(&nvmeq->dev->ctrl.abort_limit);
- 	blk_mq_free_request(req);
- }
-@@ -843,7 +842,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 			 "I/O %d QID %d timeout, disable controller\n",
- 			 req->tag, nvmeq->qid);
- 		nvme_dev_disable(dev, false);
--		req->errors = NVME_SC_CANCELLED;
-+		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
- 		return BLK_EH_HANDLED;
- 	}
- 
-@@ -863,7 +862,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		 * Mark the request as handled, since the inline shutdown
- 		 * forces all outstanding requests to complete.
- 		 */
--		req->errors = NVME_SC_CANCELLED;
-+		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
- 		return BLK_EH_HANDLED;
- 	}
- 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 4aae363943e3..53b611f9ba5d 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1178,8 +1178,7 @@ static int nvme_rdma_process_nvme_rsp(struct nvme_rdma_queue *queue,
- 	    wc->ex.invalidate_rkey == req->mr->rkey)
- 		req->mr->need_inval = false;
- 
--	req->req.result = cqe->result;
--	blk_mq_complete_request(rq, le16_to_cpu(cqe->status) >> 1);
-+	nvme_end_request(rq, cqe->status, cqe->result);
- 	return ret;
- }
- 
-@@ -1416,7 +1415,7 @@ nvme_rdma_timeout(struct request *rq, bool reserved)
- 	nvme_rdma_error_recovery(req->queue->ctrl);
- 
- 	/* fail with DNR on cmd timeout */
--	rq->errors = NVME_SC_ABORT_REQ | NVME_SC_DNR;
-+	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
- 
- 	return BLK_EH_HANDLED;
- }
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 33b431e4eec3..8260ee1f8e48 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -124,7 +124,6 @@ static void nvme_loop_queue_response(struct nvmet_req *req)
- 				&cqe->result);
- 	} else {
- 		struct request *rq;
--		struct nvme_loop_iod *iod;
- 
- 		rq = blk_mq_tag_to_rq(nvme_loop_tagset(queue), cqe->command_id);
- 		if (!rq) {
-@@ -134,9 +133,7 @@ static void nvme_loop_queue_response(struct nvmet_req *req)
- 			return;
- 		}
- 
--		iod = blk_mq_rq_to_pdu(rq);
--		iod->nvme_req.result = cqe->result;
--		blk_mq_complete_request(rq, le16_to_cpu(cqe->status) >> 1);
-+		nvme_end_request(rq, cqe->status, cqe->result);
- 	}
- }
- 
-@@ -157,7 +154,7 @@ nvme_loop_timeout(struct request *rq, bool reserved)
- 	schedule_work(&iod->queue->ctrl->reset_work);
- 
- 	/* fail with DNR on admin cmd timeout */
--	rq->errors = NVME_SC_ABORT_REQ | NVME_SC_DNR;
-+	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
- 
- 	return BLK_EH_HANDLED;
- }
+ 	ahash_request_set_crypt(req, NULL, digest, 0);
+ 	crypto_ahash_final(req);
 -- 
 2.11.0
