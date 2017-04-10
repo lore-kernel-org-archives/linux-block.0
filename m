@@ -1,60 +1,37 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 2/5] nvme: cleanup nvme_req_needs_retry
-Date: Wed,  5 Apr 2017 16:18:53 +0200
-Message-Id: <20170405141856.1862-3-hch@lst.de>
-In-Reply-To: <20170405141856.1862-1-hch@lst.de>
-References: <20170405141856.1862-1-hch@lst.de>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Mon, 10 Apr 2017 13:21:57 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] Export more queue state information through debugfs
+Message-ID: <20170410202157.GB18846@vader.DHCP.thefacebook.com>
+References: <20170330182127.24288-1-bart.vanassche@sandisk.com>
+ <826af944-2316-8352-118c-91887d747eca@kernel.dk>
+ <51f5cd27-4ae4-0a21-63e2-c7a2ec95e257@sandisk.com>
+ <20170410200045.GA18846@vader.DHCP.thefacebook.com>
+ <1491855119.4199.21.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1491855119.4199.21.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Don't pass the status explicitly but derive it from the requeust,
-and unwind the complex condition to be more readable.
+On Mon, Apr 10, 2017 at 08:12:00PM +0000, Bart Van Assche wrote:
+> On Mon, 2017-04-10 at 13:00 -0700, Omar Sandoval wrote:
+> > Can you just move blk_queue_flags_fops to blk_mq_debugfs_queue_attrs
+> > instead of adding blk_queue_attrs?
+> 
+> Hello Omar,
+> 
+> Are you aware that that change will move the "state" attribute one level
+> down in the hierarchy? blk_mq_debugfs_queue_attrs attributes are created
+> under "mq" while blk_queue_flags_fops attributes are created at the same
+> level as the "mq" attribute. I had added blk_queue_flags_fops because the
+> "state" attribute is not related to blk-mq. That attribute is also relevant
+> for single-queue block layer queues.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 0437f44d00f9..b225aacf4b89 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -67,11 +67,17 @@ static DEFINE_SPINLOCK(dev_list_lock);
- 
- static struct class *nvme_class;
- 
--static inline bool nvme_req_needs_retry(struct request *req, u16 status)
-+static inline bool nvme_req_needs_retry(struct request *req)
- {
--	return !(status & NVME_SC_DNR || blk_noretry_request(req)) &&
--		(jiffies - req->start_time) < req->timeout &&
--		req->retries < nvme_max_retries;
-+	if (blk_noretry_request(req))
-+		return false;
-+	if (req->errors & NVME_SC_DNR)
-+		return false;
-+	if (jiffies - req->start_time >= req->timeout)
-+		return false;
-+	if (req->retries >= nvme_max_retries)
-+		return false;
-+	return true;
- }
- 
- void nvme_complete_rq(struct request *req)
-@@ -79,7 +85,7 @@ void nvme_complete_rq(struct request *req)
- 	int error = 0;
- 
- 	if (unlikely(req->errors)) {
--		if (nvme_req_needs_retry(req, req->errors)) {
-+		if (nvme_req_needs_retry(req)) {
- 			req->retries++;
- 			blk_mq_requeue_request(req,
- 					!blk_mq_queue_stopped(req->q));
--- 
-2.11.0
+Yes, I am aware of that. We don't set up debugfs for single-queue queues
+anyways, so the top-level directory is really just for blktrace. It
+simplifies the lifetime and cleanup to have everything under mq, so
+please move it there.
