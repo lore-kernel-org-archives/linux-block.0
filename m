@@ -1,66 +1,19 @@
-Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <hch@lst.de>
+Date: Mon, 10 Apr 2017 09:10:36 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 21/25] ataflop: switch from req->errors to req->error_count
-Date: Thu,  6 Apr 2017 17:39:40 +0200
-Message-Id: <20170406153944.10058-22-hch@lst.de>
-In-Reply-To: <20170406153944.10058-1-hch@lst.de>
-References: <20170406153944.10058-1-hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH v4 1/6] blk-mq: Make it safe to use RCU to iterate over
+	blk_mq_tag_set.tag_list
+Message-ID: <20170410071036.GA5559@lst.de>
+References: <20170407181654.27836-1-bart.vanassche@sandisk.com> <20170407181654.27836-2-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170407181654.27836-2-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/ataflop.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Looks good,
 
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index 2104b1b4ccda..fa69ecd52cb5 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -617,12 +617,12 @@ static void fd_error( void )
- 	if (!fd_request)
- 		return;
- 
--	fd_request->errors++;
--	if (fd_request->errors >= MAX_ERRORS) {
-+	fd_request->error_count++;
-+	if (fd_request->error_count >= MAX_ERRORS) {
- 		printk(KERN_ERR "fd%d: too many errors.\n", SelectedDrive );
- 		fd_end_request_cur(-EIO);
- 	}
--	else if (fd_request->errors == RECALIBRATE_ERRORS) {
-+	else if (fd_request->error_count == RECALIBRATE_ERRORS) {
- 		printk(KERN_WARNING "fd%d: recalibrating\n", SelectedDrive );
- 		if (SelectedDrive != -1)
- 			SUD.track = -1;
-@@ -1386,7 +1386,7 @@ static void setup_req_params( int drive )
- 	ReqData = ReqBuffer + 512 * ReqCnt;
- 
- 	if (UseTrackbuffer)
--		read_track = (ReqCmd == READ && fd_request->errors == 0);
-+		read_track = (ReqCmd == READ && fd_request->error_count == 0);
- 	else
- 		read_track = 0;
- 
-@@ -1409,8 +1409,10 @@ static struct request *set_next_request(void)
- 			fdc_queue = 0;
- 		if (q) {
- 			rq = blk_fetch_request(q);
--			if (rq)
-+			if (rq) {
-+				rq->error_count = 0;
- 				break;
-+			}
- 		}
- 	} while (fdc_queue != old_pos);
- 
--- 
-2.11.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
