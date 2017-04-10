@@ -1,165 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:36240 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1034984AbdDUD4Z (ORCPT
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:33598 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751588AbdDJGwU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2017 23:56:25 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH 03/10] dm-table: Check block devices zone model compatibility
-Date: Fri, 21 Apr 2017 12:55:51 +0900
-Message-Id: <20170421035558.2657-4-damien.lemoal@wdc.com>
-In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
-References: <20170421035558.2657-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Mon, 10 Apr 2017 02:52:20 -0400
+Received: by mail-pg0-f51.google.com with SMTP id x125so101053194pgb.0
+        for <linux-block@vger.kernel.org>; Sun, 09 Apr 2017 23:52:19 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v3 2/5] blk-mq: add shallow depth option for blk_mq_get_tag()
+Date: Sun,  9 Apr 2017 23:51:10 -0700
+Message-Id: <21ada8d490f8b662fd0866e651622f2dd64e73fb.1491806249.git.osandov@fb.com>
+In-Reply-To: <cover.1491806249.git.osandov@fb.com>
+References: <cover.1491806249.git.osandov@fb.com>
+In-Reply-To: <cover.1491806249.git.osandov@fb.com>
+References: <cover.1491806249.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+From: Omar Sandoval <osandov@fb.com>
 
-When setting the dm device queue limits, several possibilities exists
-for zoned block devices:
-1) The dm target driver may want to expose a different zone model (e.g.
-host-managed device emulation or regular block device on top of
-host-managed zoned block devices)
-2) Expose the underlying zone model of the devices as is
+Wire up the sbitmap_get_shallow() operation to the tag code so that a
+caller can limit the number of tags available to it.
 
-To allow both cases, the underlying block device zone model must be set
-in the target limits in dm_set_device_limits() and the compatibility of
-all devices checked similarly to the logical block size alignment. For
-this last check, introduce the function validate_hardware_zone_model()
-to check that all targets of a table have the same zone model and that
-the zone size of the target devices are equal.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/md/dm-table.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+ block/blk-mq-tag.c | 5 ++++-
+ block/blk-mq.h     | 1 +
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 6947f0f..4683cb6 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -505,6 +505,8 @@ static int dm_set_device_limits(struct dm_target *ti, struct dm_dev *dev,
- 		       q->limits.alignment_offset,
- 		       (unsigned long long) start << SECTOR_SHIFT);
- 
-+	limits->zoned = bdev_zoned_model(bdev);
-+
- 	return 0;
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 9d97bfc4d465..d0be72ccb091 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -96,7 +96,10 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
+ 	    !hctx_may_queue(data->hctx, bt))
+ 		return -1;
+-	return __sbitmap_queue_get(bt);
++	if (data->shallow_depth)
++		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
++	else
++		return __sbitmap_queue_get(bt);
  }
  
-@@ -720,6 +722,96 @@ static int validate_hardware_logical_block_alignment(struct dm_table *table,
- 	return 0;
- }
+ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 7e6f2e467696..524f44742816 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -141,6 +141,7 @@ struct blk_mq_alloc_data {
+ 	/* input parameter */
+ 	struct request_queue *q;
+ 	unsigned int flags;
++	unsigned int shallow_depth;
  
-+/*
-+ * Check a devices's table for compatibility between zoned devices used by
-+ * the table targets. The zone model may come directly from a target block
-+ * device or may have been set by the target using the io_hints method.
-+ * Overall, if any of the table device targets is advertized as a zoned
-+ * block device, then all targets devices should also be advertized as
-+ * using the same model and the devices zone size all equal.
-+ */
-+static int validate_hardware_zone_model(struct dm_table *table,
-+					struct queue_limits *limits)
-+{
-+	struct dm_target *ti;
-+	struct queue_limits ti_limits;
-+	unsigned int zone_sectors = limits->chunk_sectors;
-+	unsigned int num_targets = dm_table_get_num_targets(table);
-+	int zone_model = -1;
-+	unsigned int i = 0;
-+
-+	if (!num_targets)
-+		return 0;
-+
-+	/*
-+	 * Check each entry in the table in turn.
-+	 */
-+	while (i < num_targets) {
-+
-+		ti = dm_table_get_target(table, i);
-+
-+		/* Get the target device limits */
-+		blk_set_stacking_limits(&ti_limits);
-+		if (ti->type->iterate_devices)
-+			ti->type->iterate_devices(ti, dm_set_device_limits,
-+						  &ti_limits);
-+
-+		/*
-+		 * Let the target driver change the hardware limits, and
-+		 * in particular the zone model if needed.
-+		 */
-+		if (ti->type->io_hints)
-+			ti->type->io_hints(ti, &ti_limits);
-+
-+		/* Check zone model compatibility */
-+		if (zone_model == -1)
-+			zone_model = ti_limits.zoned;
-+		if (ti_limits.zoned != zone_model) {
-+			zone_model = -1;
-+			break;
-+		}
-+
-+		if (zone_model != BLK_ZONED_NONE) {
-+			/* Check zone size validity and compatibility */
-+			if (!zone_sectors ||
-+			    !is_power_of_2(zone_sectors))
-+				break;
-+			if (ti_limits.chunk_sectors != zone_sectors) {
-+				zone_sectors = ti_limits.chunk_sectors;
-+				break;
-+			}
-+		}
-+
-+		i++;
-+
-+	}
-+
-+	if (i < num_targets) {
-+		if (zone_model == -1)
-+			DMWARN("%s: table line %u (start sect %llu len %llu) "
-+			       "has an incompatible zone model",
-+			       dm_device_name(table->md), i,
-+			       (unsigned long long) ti->begin,
-+			       (unsigned long long) ti->len);
-+		else
-+			DMWARN("%s: table line %u (start sect %llu len %llu) "
-+			       "has an incompatible zone size %u",
-+			       dm_device_name(table->md), i,
-+			       (unsigned long long) ti->begin,
-+			       (unsigned long long) ti->len,
-+			       zone_sectors);
-+		return -EINVAL;
-+	}
-+
-+	if (zone_model == BLK_ZONED_HA ||
-+	    zone_model == BLK_ZONED_HM) {
-+		limits->zoned = zone_model;
-+		limits->chunk_sectors = zone_sectors;
-+	}
-+
-+	return 0;
-+}
-+
- int dm_table_add_target(struct dm_table *t, const char *type,
- 			sector_t start, sector_t len, char *params)
- {
-@@ -1432,6 +1524,9 @@ int dm_calculate_queue_limits(struct dm_table *table,
- 			       (unsigned long long) ti->len);
- 	}
- 
-+	if (validate_hardware_zone_model(table, limits))
-+		return -EINVAL;
-+
- 	return validate_hardware_logical_block_alignment(table, limits);
- }
- 
+ 	/* input & output parameter */
+ 	struct blk_mq_ctx *ctx;
 -- 
-2.9.3
+2.12.2
