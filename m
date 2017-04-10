@@ -1,38 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:33217 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754293AbdDDS4w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 14:56:52 -0400
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 3/9] bio-integrity:  bio_integrity_advance must update integrity seed
-Date: Tue,  4 Apr 2017 22:56:35 +0400
-Message-Id: <1491332201-26926-4-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
-References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Mon, 10 Apr 2017 17:13:59 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jan Kara <jack@suse.cz>, Goldwyn Rodrigues <rgoldwyn@suse.de>,
+	linux-fsdevel@vger.kernel.org, jack@suse.com,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	sagi@grimberg.me, avi@scylladb.com, axboe@kernel.dk,
+	linux-api@vger.kernel.org, willy@infradead.org,
+	tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 6/8] nowait aio: ext4
+Message-ID: <20170410151359.GH3224@quack2.suse.cz>
+References: <20170403185307.6243-1-rgoldwyn@suse.de>
+ <20170403185307.6243-7-rgoldwyn@suse.de>
+ <20170404075853.GB28522@quack2.suse.cz>
+ <20170404084122.GA10252@infradead.org>
+ <d6dac6ec-c71c-0082-972f-61e7299ed418@suse.de>
+ <20170410074539.GA18250@infradead.org>
+ <20170410123750.GE3224@quack2.suse.cz>
+ <20170410143943.GA2930@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170410143943.GA2930@infradead.org>
+List-ID: <linux-block@vger.kernel.org>
 
-SCSI drivers do care about bip_seed so we must update it accordingly.
+On Mon 10-04-17 07:39:43, Christoph Hellwig wrote:
+> On Mon, Apr 10, 2017 at 02:37:50PM +0200, Jan Kara wrote:
+> > I don't understand here. Do you want that all filesystems support NOWAIT
+> > direct IO?
+> 
+> No.  Per-file_system_type is way to coarse grained.  All feature flag
+> needs to be per-file_operation at least for cases like ext4 with our
+> without extents (or journal) XFS v4 vs v5, different NFS versions, etc.
 
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
----
- block/bio-integrity.c | 1 +
- 1 file changed, 1 insertion(+)
+Ah, I see your point now. Thanks for patience. I think we could make this
+work by making generic_file_write/read_iter() refuse NOWAIT IO with
+EOPNOTSUPP and then only modify those few filesystems that implement their
+own iter helpers and will not initially support NOWAIT IO. Sounds easy
+enough.
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index b5009a8..82a6ffb 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -425,6 +425,7 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
- 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
- 	unsigned bytes = bio_integrity_bytes(bi, bytes_done >> 9);
- 
-+	bip->bip_iter.bi_sector += bytes_done >> 9;
- 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
- }
- EXPORT_SYMBOL(bio_integrity_advance);
+								Honza
 -- 
-2.9.3
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
