@@ -1,73 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:35427 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752359AbdDKOlt (ORCPT
+Received: from mail-lf0-f45.google.com ([209.85.215.45]:32773 "EHLO
+        mail-lf0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751587AbdDJRrd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2017 10:41:49 -0400
-Received: by mail-wm0-f42.google.com with SMTP id w64so65624723wma.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2017 07:41:48 -0700 (PDT)
-Subject: Re: [PATCH v5] lightnvm: physical block device (pblk) target
-To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
-References: <1491921077-9377-1-git-send-email-javier@cnexlabs.com>
- <1491921077-9377-2-git-send-email-javier@cnexlabs.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bart.VanAssche@sandisk.com,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+        Mon, 10 Apr 2017 13:47:33 -0400
+Received: by mail-lf0-f45.google.com with SMTP id h125so74721174lfe.0
+        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2017 10:47:32 -0700 (PDT)
+Subject: Re: [PATCH v3] lightnvm: physical block device (pblk) target
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        "jg@lightnvm.io" <jg@lightnvm.io>
+References: <1491591015-7554-1-git-send-email-javier@cnexlabs.com>
+ <1491591015-7554-2-git-send-email-javier@cnexlabs.com>
+ <CY1PR0401MB1536AD7F70C960D62DCA6983810F0@CY1PR0401MB1536.namprd04.prod.outlook.com>
+ <E42A544D-D09C-4DDB-800A-9FCED4CBBD28@lightnvm.io>
+ <1491839741.4199.7.camel@sandisk.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <c2f1bccd-5b1e-b51e-a236-5d2186159e32@lightnvm.io>
-Date: Tue, 11 Apr 2017 16:41:46 +0200
+Message-ID: <7f8a2c0c-8a06-1036-164f-168924ec2a3f@lightnvm.io>
+Date: Mon, 10 Apr 2017 19:47:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <1491921077-9377-2-git-send-email-javier@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1491839741.4199.7.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 04/11/2017 04:31 PM, Javier González wrote:
-> This patch introduces pblk, a host-side translation layer for
-> Open-Channel SSDs to expose them like block devices. The translation
-> layer allows data placement decisions, and I/O scheduling to be
-> managed by the host, enabling users to optimize the SSD for their
-> specific workloads.
+On 04/10/2017 05:55 PM, Bart Van Assche wrote:
+> On Sun, 2017-04-09 at 11:15 +0200, Javier Gonz�lez wrote:
+>> On 8 Apr 2017, at 22.56, Bart Van Assche <bart.vanassche@sandisk.com> wrote:
+>>> On 04/07/17 11:50, Javier Gonz�lez wrote:
+>> struct ppa_addr, which is the physical address format is not affected,
+>> but pblk's internal L2P address representation (pblk_addr) is. You can
+>> see that the type either represents struct ppa_addr or ppa_addr_32. How
+>> would you define a type that can either be u64 or u32 with different bit
+>> offsets at run-time? Note that address conversions to this type is in
+>> the fast path and this format allows us to only use bit shifts.
 >
-> An open-channel SSD has a set of LUNs (parallel units) and a
-> collection of blocks. Each block can be read in any order, but
-> writes must be sequential. Writes may also fail, and if a block
-> requires it, must also be reset before new writes can be
-> applied.
+> Selecting the appropriate representation at run-time would require to pass
+> pblk_addr by reference instead of by value to any function that expects a
+> pblk_addr. It would also require to have two versions of every data structure
+> that depends on pblk_addr and to use casts to convert to the appropritate
+> version. However, this approach is probably only worth to be implemented if
+> it doesn't introduce too much additional complexity.
 >
-> To manage the constraints, pblk maintains a logical to
-> physical address (L2P) table,  write cache, garbage
-> collection logic, recovery scheme, and logic to rate-limit
-> user I/Os versus garbage collection I/Os.
->
-> The L2P table is fully-associative and manages sectors at a
-> 4KB granularity. Pblk stores the L2P table in two places, in
-> the out-of-band area of the media and on the last page of a
-> line. In the cause of a power failure, pblk will perform a
-> scan to recover the L2P table.
->
-> The user data is organized into lines. A line is data
-> striped across blocks and LUNs. The lines enable the host to
-> reduce the amount of metadata to maintain besides the user
-> data and makes it easier to implement RAID or erasure coding
-> in the future.
->
-> pblk implements multi-tenant support and can be instantiated
-> multiple times on the same drive. Each instance owns a
-> portion of the SSD - both regarding I/O bandwidth and
-> capacity - providing I/O isolation for each case.
->
-> Finally, pblk also exposes a sysfs interface that allows
-> user-space to peek into the internals of pblk. The interface
-> is available at /dev/block/*/pblk/ where * is the block
-> device name exposed.
->
-> This work also contains contributions from:
->   Matias Bjørling <matias@cnexlabs.com>
->   Simon A. F. Lund <slund@cnexlabs.com>
->   Young Tack Jin <youngtack.jin@gmail.com>
->   Huaicheng Li <huaicheng@cs.uchicago.edu>
->
-> Signed-off-by: Javier González <javier@cnexlabs.com>
 
-Awesome. Applied for 4.12.
+Hi Bart, thanks for the feedback!
+
+I've spent the time today to implement it such that 32bit entries are 
+used if the device addressing can fit. We do see a slight overhead, 
+however not enough to be a deal-breaker. We'll post an updated version 
+with the flag removed.
+
+>>>> +#ifdef CONFIG_NVM_DEBUG
+>>>> +	atomic_add(nr_entries, &pblk->inflight_writes);
+>>>> +	atomic_add(nr_entries, &pblk->req_writes);
+>>>> +#endif
+>>>
+>>> Has it been considered to use the "static key" feature such that
+>>> consistency checks can be enabled at run-time instead of having to
+>>> rebuild the kernel to enable CONFIG_NVM_DEBUG?
+>>
+>> I haven't considered it. I'll look into it. I would like to have this
+>> counters and the corresponding sysfs entry only available on debug mode
+>> since it allows us to have a good picture of the FTL state.
+>
+> If there are sysfs entries that depend on CONFIG_NVM_DEBUG then the static
+> key mechanism is probably not a good alternative for CONFIG_NVM_DEBUG.
+>
+>>> Has it been considered to add support for keeping a subset of the L2P
+>>> translation table in memory instead of keeping it in memory in its entirety?
+>>
+>> Yes. L2P caching is on our roadmap and will be included in the future.
+>
+> That's great. This will also help with reducing the time between discovery of
+> a lightnvm device and the time at which I/O can start since the L2P table must
+> be available before I/O can start.
+
+Definitely. I would love if one could jump in and implement it. We have 
+a bunch of features that we want in before implementing a translation cache.
+>
+> Bart.
+>
