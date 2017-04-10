@@ -1,67 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f45.google.com ([74.125.83.45]:33945 "EHLO
-        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751864AbdDJGwU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2017 02:52:20 -0400
-Received: by mail-pg0-f45.google.com with SMTP id 21so101101359pgg.1
-        for <linux-block@vger.kernel.org>; Sun, 09 Apr 2017 23:52:20 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v3 3/5] blk-mq: export helpers
-Date: Sun,  9 Apr 2017 23:51:11 -0700
-Message-Id: <45c2de5dc43bfefddbefaab32f203bf6795ffe9d.1491806249.git.osandov@fb.com>
-In-Reply-To: <cover.1491806249.git.osandov@fb.com>
-References: <cover.1491806249.git.osandov@fb.com>
-In-Reply-To: <cover.1491806249.git.osandov@fb.com>
-References: <cover.1491806249.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+d06792d33419b921eada+4978+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	target-devel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com
+Subject: [PATCH 7/8] block: remove bio_no_advance_iter
+Date: Mon, 10 Apr 2017 18:08:06 +0200
+Message-Id: <20170410160807.23674-8-hch@lst.de>
+In-Reply-To: <20170410160807.23674-1-hch@lst.de>
+References: <20170410160807.23674-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Now that we don't have to support the odd Write Same special case
+we can simply increment the iter if the bio has data, else just
+manipulate bi_size directly.
 
-blk_mq_finish_request() is required for schedulers that define their own
-put_request(). blk_mq_run_hw_queue() is required for schedulers that
-hold back requests to be run later.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c         | 2 ++
- include/linux/blk-mq.h | 1 +
- 2 files changed, 3 insertions(+)
+ include/linux/bio.h | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e536dacfae4c..7138cd98146e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -368,6 +368,7 @@ void blk_mq_finish_request(struct request *rq)
- {
- 	blk_mq_finish_hctx_request(blk_mq_map_queue(rq->q, rq->mq_ctx->cpu), rq);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 96a20afb8575..7a24a1a24967 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -83,13 +83,6 @@ static inline bool bio_has_data(struct bio *bio)
+ 	return false;
  }
-+EXPORT_SYMBOL_GPL(blk_mq_finish_request);
  
- void blk_mq_free_request(struct request *rq)
+-static inline bool bio_no_advance_iter(struct bio *bio)
+-{
+-	return bio_op(bio) == REQ_OP_DISCARD ||
+-	       bio_op(bio) == REQ_OP_SECURE_ERASE ||
+-	       bio_op(bio) == REQ_OP_WRITE_ZEROES;
+-}
+-
+ static inline bool bio_mergeable(struct bio *bio)
  {
-@@ -1183,6 +1184,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ 	if (bio->bi_opf & REQ_NOMERGE_FLAGS)
+@@ -165,10 +158,10 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
  {
- 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
+ 	iter->bi_sector += bytes >> 9;
+ 
+-	if (bio_no_advance_iter(bio))
+-		iter->bi_size -= bytes;
+-	else
++	if (bio_has_data(bio))
+ 		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++	else
++		iter->bi_size -= bytes;
  }
-+EXPORT_SYMBOL(blk_mq_run_hw_queue);
  
- void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b90c3d5766cd..d75de612845d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -238,6 +238,7 @@ void blk_mq_start_hw_queues(struct request_queue *q);
- void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
-+void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
 -- 
-2.12.2
+2.11.0
