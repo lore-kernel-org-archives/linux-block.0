@@ -1,181 +1,99 @@
-Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a1yJJ33R9EPPcErLUO2enFGrSJzWmVRwHdHP+3_2iP7ow@mail.gmail.com>
-References: <CACRpkdbZrkAqEdP1-QqDww0ZuFcY47Jgj9dPqkG_whrx7pwC-w@mail.gmail.com>
- <CAK8P3a1CGtj5VSVoMM34VWn781WpS8ZcHpq6n0UfNOWWYEq=QQ@mail.gmail.com>
- <CAPDyKFqiyEcScuWLVXE9kAa2yQyJCZfbXyAdAQOb081nLjyvvw@mail.gmail.com> <CAK8P3a1yJJ33R9EPPcErLUO2enFGrSJzWmVRwHdHP+3_2iP7ow@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 13 Apr 2017 15:22:09 +0200
-Message-ID: <CACRpkdYsWnXLZEpZr74pLB8zjTV4Q=sdAfX+sz0n_E46SaJa9Q@mail.gmail.com>
-Subject: Re: Outstanding MQ questions from MMC
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 8/9] nowait aio: btrfs
+Date: Tue, 11 Apr 2017 09:26:18 -0500
+Message-Id: <20170411142619.27205-9-rgoldwyn@suse.de>
+In-Reply-To: <20170411142619.27205-1-rgoldwyn@suse.de>
+References: <20170411142619.27205-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Mar 31, 2017 at 10:43 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Thu, Mar 30, 2017 at 6:39 PM, Ulf Hansson <ulf.hansson@linaro.org> wrote:
->> On 30 March 2017 at 14:42, Arnd Bergmann <arnd@arndb.de> wrote:
->>> On Wed, Mar 29, 2017 at 5:09 AM, Linus Walleij <linus.walleij@linaro.org> wrote:
->
->>>> In MQ, I have simply locked the host on the first request and then I never
->>>> release it. Clearly this does not work. I am uncertain on how to handle this
->>>> and whether MQ has a way to tell us that the queue is empty so we may release
->>>> the host. I toyed with the idea to just set up a timer, but a "queue
->>>> empty" callback
->>>> from the block layer is what would be ideal.
->>>
->>> Would it be possible to change the userspace code to go through
->>> the block layer instead and queue a request there, to avoid having
->>> to lock the card at all?
->>
->> That would be good from an I/O scheduling point of view, as it would
->> avoid one side being able to starve the other.
->>
->> However, we would still need a lock, as we also have card detect work
->> queue, which also needs to claim the host when it polls for removable
->> cards.
->
-> Hmm, In theory the card-detect work queue should not be active
-> at the same time as any I/O, but I see you point. Could the card-detect
-> wq perhaps also use the blk queue for sending a special request that
-> triggers the detection logic?
->
-> Alternatively, I had this idea that we could translate blk requests into
-> mmc commands and then have a (short fixed length) set of outstanding
-> mmc commands in the device that always get done in order. The card
-> detect and the user space I/O would then directly put mmc commands
-> onto the command queue, as would the blk-mq scheduler. You
-> still need a lock to access that command queue, but the mmc host
-> would just always pick the next command off the list when one
-> command completes.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-I looked into this.
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
 
-The block layer queue can wrap and handle custom device commands
-using REQ_OP_DRV_IN/OUT, and that seems to be the best way
-to play with the block layer IMO.
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-The card detect work is a special case because it is also used by
-SDIO which does not use the block layer. But that could maybe be
-solved by a separate host lock just for the SDIO case, letting
-devices accessed as block devices use the method of inserting
-custom commands.
-
-I looked at how e.g. IDE and SCSI does this, drivers/ide/ide-ioctls.c
-looks like this nowadays:
-
-static int generic_drive_reset(ide_drive_t *drive)
-{
-        struct request *rq;
-        int ret = 0;
-
-        rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-        scsi_req_init(rq);
-        ide_req(rq)->type = ATA_PRIV_MISC;
-        scsi_req(rq)->cmd_len = 1;
-        scsi_req(rq)->cmd[0] = REQ_DRIVE_RESET;
-        if (blk_execute_rq(drive->queue, NULL, rq, 1))
-                ret = rq->errors;
-        blk_put_request(rq);
-        return ret;
-}
-
-So it creates a custom REQ_OP_DRV_IN request, then scsi_req_init()
-sets up the special command, in this case
-ATA_PRIV_MISC/REQ_DRIVE_RESET and toss this into the block
-queue like everything else.
-
-We could do the same, especially the RPMB operations should
-probably have been done like this from the beginning. But due to
-historical factors they were not.
-
-It is a bit hairy and the whole thing is in a bit of flux because Christoph
-is heavily refactoring this and cleaning up the old block devices as
-we speak (I bet) so it is a bit hard to do the right thing.
-
-I easily get confused here ... for example there is custom
-per-request data access by this simple:
-
-scsi_req_init(rq)
-
-which does
-
-struct scsi_request *req = scsi_req(rq);
-
-which does
-
-static inline struct scsi_request *scsi_req(struct request *rq)
-{
-        return blk_mq_rq_to_pdu(rq);
-}
-
-Oohps blk_mq_* namespace? You would assume this means that
-you have to use blk-mq? Nah, I think not, because all it does is:
-
-static inline void *blk_mq_rq_to_pdu(struct request *rq)
-{
-        return rq + 1;
-}
-
-So while we have to #include <linux/blk-mq.h> this is one of these
-mixed semantics that just give you a pointer to something behind
-the request, a method that is simple and natural in blk-mq but which
-is (I guess) set up by some other mechanism in the !mq case,
-albeit access by this inline.
-
-And I have to do this with the old block layer to get to a point
-where we can start using blk-mq, sigh.
-
-The border between blk and blk-mq is a bit blurry right now.
-
-With blk-mq I do this:
-
-mq->tag_set.cmd_size = sizeof(foo_cmd);
-blk_mq_alloc_tag_set(...)
-
-To do this with the old blk layer I may need some help to figure
-out how to set up per-request additional data in a way that works
-with the old layer.
-
-scsi_lib.c scsi_alloc_queue() does this:
-
-q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
-if (!q)
-      return NULL;
-q->cmd_size = sizeof(foo_cmd);
-
-And this means there will be sizeof(foo_cmd) after the request
-that can be dereferenced by blk_mq_rq_to_pdu(rq);...
-
-Yeah I'll try it.
-
-Just trying to give a picture of why it's a bit in flux here.
-Or documenting it for myself :D
-
-> This also lets you integrate packed commands: if the next outstanding
-> command is the same type as the request coming in from blk-mq,
-> you can merge it into a single mmc command to be submitted
-> together, otherwise it gets deferred.
-
-Essentially the heavy lifting that needs to happen is:
-
-1. Start allocating per-request PDU (extra data) in the MMC case
-   this will then be struct mmc_queue_req request items.
-
-2. Turn RPMB and other ioctl() MMC operations into mmc_queue_req
-   things and funnel them into the block scheduler
-   using REQ_OP_DRV_IN/OUT requests.
-
-3. Turn the card detect into an mmc_queue_req as well
-
-4. We can kill the big MMC host lock for block devices and
-   split off an SDIO-only host lock.
-
-I'm onto it ... I guess.
-
-Yours,
-Linus Walleij
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index 520cb7230b2d..a870e5dd2b4d 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1823,12 +1823,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
+ 
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
++		}
++	} else
++		inode_lock(inode);
++
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1862,8 +1879,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	 */
+ 	update_time_for_write(inode);
+ 
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index a18510be76c1..d91b21a76d6d 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8627,6 +8627,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			dio_data.overwrite = 1;
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
+-- 
+2.12.0
