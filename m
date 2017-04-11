@@ -1,1132 +1,4913 @@
-Return-Path: <fengguang.wu@intel.com>
-Date: Thu, 13 Apr 2017 04:19:22 +0800
-From: kbuild test robot <lkp@intel.com>
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: kbuild-all@01.org, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Fabio Checconi <fchecconi@gmail.com>,
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
 	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org, linus.walleij@linaro.org,
-	broonie@kernel.org, Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: [PATCH V3 01/16] block, bfq: introduce the BFQ-v0 I/O scheduler
- as an extra scheduler
-Message-ID: <201704130449.OPGovLKq%fengguang.wu@intel.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="vtzGhvizbBRQ85DL"
-In-Reply-To: <20170411134315.44135-2-paolo.valente@linaro.org>
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V3 01/16] block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler
+Date: Tue, 11 Apr 2017 15:43:00 +0200
+Message-Id: <20170411134315.44135-2-paolo.valente@linaro.org>
+In-Reply-To: <20170411134315.44135-1-paolo.valente@linaro.org>
+References: <20170411134315.44135-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
+We tag as v0 the version of BFQ containing only BFQ's engine plus
+hierarchical support. BFQ's engine is introduced by this commit, while
+hierarchical support is added by next commit. We use the v0 tag to
+distinguish this minimal version of BFQ from the versions containing
+also the features and the improvements added by next commits. BFQ-v0
+coincides with the version of BFQ submitted a few years ago [1], apart
+from the introduction of preemption, described below.
 
---vtzGhvizbBRQ85DL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+BFQ is a proportional-share I/O scheduler, whose general structure,
+plus a lot of code, are borrowed from CFQ.
 
-Hi Paolo,
+- Each process doing I/O on a device is associated with a weight and a
+  (bfq_)queue.
 
-[auto build test ERROR on block/for-next]
-[also build test ERROR on v4.11-rc6 next-20170412]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+- BFQ grants exclusive access to the device, for a while, to one queue
+  (process) at a time, and implements this service model by
+  associating every queue with a budget, measured in number of
+  sectors.
 
-url:    https://github.com/0day-ci/linux/commits/Paolo-Valente/Introduce-the-BFQ-I-O-scheduler/20170412-021320
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: blackfin-allyesconfig (attached as .config)
-compiler: bfin-uclinux-gcc (GCC) 6.2.0
-reproduce:
-        wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # save the attached .config to linux build tree
-        make.cross ARCH=blackfin 
+  - After a queue is granted access to the device, the budget of the
+    queue is decremented, on each request dispatch, by the size of the
+    request.
 
-Note: the linux-review/Paolo-Valente/Introduce-the-BFQ-I-O-scheduler/20170412-021320 HEAD 36eb6533f8b6705991185201f75e98880cd223f7 builds fine.
-      It only hurts bisectibility.
+  - The in-service queue is expired, i.e., its service is suspended,
+    only if one of the following events occurs: 1) the queue finishes
+    its budget, 2) the queue empties, 3) a "budget timeout" fires.
 
-All error/warnings (new ones prefixed by >>):
+    - The budget timeout prevents processes doing random I/O from
+      holding the device for too long and dramatically reducing
+      throughput.
 
-   block/bfq-iosched.c: In function 'bfq_update_peak_rate':
->> block/bfq-iosched.c:2674:6: error: 'delta_usecs' undeclared (first use in this function)
-     if (delta_usecs < 1000) {
-         ^~~~~~~~~~~
-   block/bfq-iosched.c:2674:6: note: each undeclared identifier is reported only once for each function it appears in
->> block/bfq-iosched.c:2739:22: error: invalid storage class for function 'bfq_smallest_from_now'
-    static unsigned long bfq_smallest_from_now(void)
-                         ^~~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:2739:1: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-    static unsigned long bfq_smallest_from_now(void)
-    ^~~~~~
->> block/bfq-iosched.c:2774:13: error: invalid storage class for function 'bfq_bfqq_expire'
-    static void bfq_bfqq_expire(struct bfq_data *bfqd,
-                ^~~~~~~~~~~~~~~
->> block/bfq-iosched.c:2823:13: error: invalid storage class for function 'bfq_bfqq_budget_timeout'
-    static bool bfq_bfqq_budget_timeout(struct bfq_queue *bfqq)
-                ^~~~~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:2839:13: error: invalid storage class for function 'bfq_may_expire_for_budg_timeout'
-    static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:2858:13: error: invalid storage class for function 'bfq_bfqq_may_idle'
-    static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
-                ^~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:2901:13: error: invalid storage class for function 'bfq_bfqq_must_idle'
-    static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
-                ^~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:2913:26: error: invalid storage class for function 'bfq_select_queue'
-    static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
-                             ^~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:3012:24: error: invalid storage class for function 'bfq_dispatch_rq_from_bfqq'
-    static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
-                           ^~~~~~~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:3044:13: error: invalid storage class for function 'bfq_has_work'
-    static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
-                ^~~~~~~~~~~~
->> block/bfq-iosched.c:3056:24: error: invalid storage class for function '__bfq_dispatch_request'
-    static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
-                           ^~~~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:3141:24: error: invalid storage class for function 'bfq_dispatch_request'
-    static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
-                           ^~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:3160:13: error: invalid storage class for function 'bfq_put_queue'
-    static void bfq_put_queue(struct bfq_queue *bfqq)
-                ^~~~~~~~~~~~~
->> block/bfq-iosched.c:3173:13: error: invalid storage class for function 'bfq_exit_bfqq'
-    static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
-                ^~~~~~~~~~~~~
->> block/bfq-iosched.c:3185:13: error: invalid storage class for function 'bfq_exit_icq_bfqq'
-    static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync)
-                ^~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:3203:13: error: invalid storage class for function 'bfq_exit_icq'
-    static void bfq_exit_icq(struct io_cq *icq)
-                ^~~~~~~~~~~~
->> block/bfq-iosched.c:3216:1: error: invalid storage class for function 'bfq_set_next_ioprio_data'
-    bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
-    ^~~~~~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:3262:13: error: invalid storage class for function 'bfq_check_ioprio_change'
-    static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
-                ^~~~~~~~~~~~~~~~~~~~~~~
->> block/bfq-iosched.c:3290:13: error: invalid storage class for function 'bfq_init_bfqq'
-    static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-                ^~~~~~~~~~~~~
+    - Actually, as in CFQ, a queue associated with a process issuing
+      sync requests may not be expired immediately when it empties. In
+      contrast, BFQ may idle the device for a short time interval,
+      giving the process the chance to go on being served if it issues
+      a new request in time. Device idling typically boosts the
+      throughput on rotational devices, if processes do synchronous
+      and sequential I/O. In addition, under BFQ, device idling is
+      also instrumental in guaranteeing the desired throughput
+      fraction to processes issuing sync requests (see [2] for
+      details).
 
-vim +/delta_usecs +2674 block/bfq-iosched.c
+      - With respect to idling for service guarantees, if several
+        processes are competing for the device at the same time, but
+        all processes (and groups, after the following commit) have
+        the same weight, then BFQ guarantees the expected throughput
+        distribution without ever idling the device. Throughput is
+        thus as high as possible in this common scenario.
 
-  2668		else
-  2669			delta = ktime_get();
-  2670		delta = ktime_sub(delta, bfqd->last_budget_start);
-  2671		usecs = ktime_to_us(delta);
-  2672	
-  2673		/* don't use too short time intervals */
-> 2674		if (delta_usecs < 1000) {
-  2675			return false;
-  2676	
-  2677		/*
-  2678		 * Calculate the bandwidth for the last slice.  We use a 64 bit
-  2679		 * value to store the peak rate, in sectors per usec in fixed
-  2680		 * point math.  We do so to have enough precision in the estimate
-  2681		 * and to avoid overflows.
-  2682		 */
-  2683		bw = (u64)bfqq->entity.service << BFQ_RATE_SHIFT;
-  2684		do_div(bw, (unsigned long)usecs);
-  2685	
-  2686		timeout = jiffies_to_msecs(bfqd->bfq_timeout);
-  2687	
-  2688		/*
-  2689		 * Use only long (> 20ms) intervals to filter out spikes for
-  2690		 * the peak rate estimation.
-  2691		 */
-  2692		if (usecs > 20000) {
-  2693			if (bw > bfqd->peak_rate) {
-  2694				bfqd->peak_rate = bw;
-  2695				update = 1;
-  2696				bfq_log(bfqd, "new peak_rate=%llu", bw);
-  2697			}
-  2698	
-  2699			update |= bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES - 1;
-  2700	
-  2701			if (bfqd->peak_rate_samples < BFQ_PEAK_RATE_SAMPLES)
-  2702				bfqd->peak_rate_samples++;
-  2703	
-  2704			if (bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES &&
-  2705			    update && bfqd->bfq_user_max_budget == 0) {
-  2706				bfqd->bfq_max_budget =
-  2707					bfq_calc_max_budget(bfqd->peak_rate,
-  2708							    timeout);
-  2709				bfq_log(bfqd, "new max_budget=%d",
-  2710					bfqd->bfq_max_budget);
-  2711			}
-  2712		}
-  2713	
-  2714		/*
-  2715		 * A process is considered ``slow'' (i.e., seeky, so that we
-  2716		 * cannot treat it fairly in the service domain, as it would
-  2717		 * slow down too much the other processes) if, when a slice
-  2718		 * ends for whatever reason, it has received service at a
-  2719		 * rate that would not be high enough to complete the budget
-  2720		 * before the budget timeout expiration.
-  2721		 */
-  2722		expected = bw * 1000 * timeout >> BFQ_RATE_SHIFT;
-  2723	
-  2724		/*
-  2725		 * Caveat: processes doing IO in the slower disk zones will
-  2726		 * tend to be slow(er) even if not seeky. And the estimated
-  2727		 * peak rate will actually be an average over the disk
-  2728		 * surface. Hence, to not be too harsh with unlucky processes,
-  2729		 * we keep a budget/3 margin of safety before declaring a
-  2730		 * process slow.
-  2731		 */
-  2732		return expected > (4 * bfqq->entity.budget) / 3;
-  2733	}
-  2734	
-  2735	/*
-  2736	 * Return the farthest past time instant according to jiffies
-  2737	 * macros.
-  2738	 */
-> 2739	static unsigned long bfq_smallest_from_now(void)
-  2740	{
-  2741		return jiffies - MAX_JIFFY_OFFSET;
-  2742	}
-  2743	
-  2744	/**
-  2745	 * bfq_bfqq_expire - expire a queue.
-  2746	 * @bfqd: device owning the queue.
-  2747	 * @bfqq: the queue to expire.
-  2748	 * @compensate: if true, compensate for the time spent idling.
-  2749	 * @reason: the reason causing the expiration.
-  2750	 *
-  2751	 *
-  2752	 * If the process associated with the queue is slow (i.e., seeky), or
-  2753	 * in case of budget timeout, or, finally, if it is async, we
-  2754	 * artificially charge it an entire budget (independently of the
-  2755	 * actual service it received). As a consequence, the queue will get
-  2756	 * higher timestamps than the correct ones upon reactivation, and
-  2757	 * hence it will be rescheduled as if it had received more service
-  2758	 * than what it actually received. In the end, this class of processes
-  2759	 * will receive less service in proportion to how slowly they consume
-  2760	 * their budgets (and hence how seriously they tend to lower the
-  2761	 * throughput).
-  2762	 *
-  2763	 * In contrast, when a queue expires because it has been idling for
-  2764	 * too much or because it exhausted its budget, we do not touch the
-  2765	 * amount of service it has received. Hence when the queue will be
-  2766	 * reactivated and its timestamps updated, the latter will be in sync
-  2767	 * with the actual service received by the queue until expiration.
-  2768	 *
-  2769	 * Charging a full budget to the first type of queues and the exact
-  2770	 * service to the others has the effect of using the WF2Q+ policy to
-  2771	 * schedule the former on a timeslice basis, without violating the
-  2772	 * service domain guarantees of the latter.
-  2773	 */
-> 2774	static void bfq_bfqq_expire(struct bfq_data *bfqd,
-  2775				    struct bfq_queue *bfqq,
-  2776				    bool compensate,
-  2777				    enum bfqq_expiration reason)
-  2778	{
-  2779		bool slow;
-  2780		int ref;
-  2781	
-  2782		/*
-  2783		 * Update device peak rate for autotuning and check whether the
-  2784		 * process is slow (see bfq_update_peak_rate).
-  2785		 */
-  2786		slow = bfq_update_peak_rate(bfqd, bfqq, compensate);
-  2787	
-  2788		/*
-  2789		 * As above explained, 'punish' slow (i.e., seeky), timed-out
-  2790		 * and async queues, to favor sequential sync workloads.
-  2791		 */
-  2792		if (slow || reason == BFQQE_BUDGET_TIMEOUT)
-  2793			bfq_bfqq_charge_full_budget(bfqq);
-  2794	
-  2795		if (reason == BFQQE_TOO_IDLE &&
-  2796		    bfqq->entity.service <= 2 * bfqq->entity.budget / 10)
-  2797			bfq_clear_bfqq_IO_bound(bfqq);
-  2798	
-  2799		bfq_log_bfqq(bfqd, bfqq,
-  2800			"expire (%d, slow %d, num_disp %d, idle_win %d)", reason,
-  2801			slow, bfqq->dispatched, bfq_bfqq_idle_window(bfqq));
-  2802	
-  2803		/*
-  2804		 * Increase, decrease or leave budget unchanged according to
-  2805		 * reason.
-  2806		 */
-  2807		__bfq_bfqq_recalc_budget(bfqd, bfqq, reason);
-  2808		ref = bfqq->ref;
-  2809		__bfq_bfqq_expire(bfqd, bfqq);
-  2810	
-  2811		/* mark bfqq as waiting a request only if a bic still points to it */
-  2812		if (ref > 1 && !bfq_bfqq_busy(bfqq) &&
-  2813		    reason != BFQQE_BUDGET_TIMEOUT &&
-  2814		    reason != BFQQE_BUDGET_EXHAUSTED)
-  2815			bfq_mark_bfqq_non_blocking_wait_rq(bfqq);
-  2816	}
-  2817	
-  2818	/*
-  2819	 * Budget timeout is not implemented through a dedicated timer, but
-  2820	 * just checked on request arrivals and completions, as well as on
-  2821	 * idle timer expirations.
-  2822	 */
-> 2823	static bool bfq_bfqq_budget_timeout(struct bfq_queue *bfqq)
-  2824	{
-  2825		if (bfq_bfqq_budget_new(bfqq) ||
-  2826		    time_is_after_jiffies(bfqq->budget_timeout))
-  2827			return false;
-  2828		return true;
-  2829	}
-  2830	
-  2831	/*
-  2832	 * If we expire a queue that is actively waiting (i.e., with the
-  2833	 * device idled) for the arrival of a new request, then we may incur
-  2834	 * the timestamp misalignment problem described in the body of the
-  2835	 * function __bfq_activate_entity. Hence we return true only if this
-  2836	 * condition does not hold, or if the queue is slow enough to deserve
-  2837	 * only to be kicked off for preserving a high throughput.
-  2838	 */
-> 2839	static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
-  2840	{
-  2841		bfq_log_bfqq(bfqq->bfqd, bfqq,
-  2842			"may_budget_timeout: wait_request %d left %d timeout %d",
-  2843			bfq_bfqq_wait_request(bfqq),
-  2844				bfq_bfqq_budget_left(bfqq) >=  bfqq->entity.budget / 3,
-  2845			bfq_bfqq_budget_timeout(bfqq));
-  2846	
-  2847		return (!bfq_bfqq_wait_request(bfqq) ||
-  2848			bfq_bfqq_budget_left(bfqq) >=  bfqq->entity.budget / 3)
-  2849			&&
-  2850			bfq_bfqq_budget_timeout(bfqq);
-  2851	}
-  2852	
-  2853	/*
-  2854	 * For a queue that becomes empty, device idling is allowed only if
-  2855	 * this function returns true for the queue. And this function returns
-  2856	 * true only if idling is beneficial for throughput.
-  2857	 */
-> 2858	static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
-  2859	{
-  2860		struct bfq_data *bfqd = bfqq->bfqd;
-  2861		bool idling_boosts_thr;
+  - Queues are scheduled according to a variant of WF2Q+, named
+    B-WF2Q+, and implemented using an augmented rb-tree to preserve an
+    O(log N) overall complexity.  See [2] for more details. B-WF2Q+ is
+    also ready for hierarchical scheduling. However, for a cleaner
+    logical breakdown, the code that enables and completes
+    hierarchical support is provided in the next commit, which focuses
+    exactly on this feature.
 
+  - B-WF2Q+ guarantees a tight deviation with respect to an ideal,
+    perfectly fair, and smooth service. In particular, B-WF2Q+
+    guarantees that each queue receives a fraction of the device
+    throughput proportional to its weight, even if the throughput
+    fluctuates, and regardless of: the device parameters, the current
+    workload and the budgets assigned to the queue.
+
+  - The last, budget-independence, property (although probably
+    counterintuitive in the first place) is definitely beneficial, for
+    the following reasons:
+
+    - First, with any proportional-share scheduler, the maximum
+      deviation with respect to an ideal service is proportional to
+      the maximum budget (slice) assigned to queues. As a consequence,
+      BFQ can keep this deviation tight not only because of the
+      accurate service of B-WF2Q+, but also because BFQ *does not*
+      need to assign a larger budget to a queue to let the queue
+      receive a higher fraction of the device throughput.
+
+    - Second, BFQ is free to choose, for every process (queue), the
+      budget that best fits the needs of the process, or best
+      leverages the I/O pattern of the process. In particular, BFQ
+      updates queue budgets with a simple feedback-loop algorithm that
+      allows a high throughput to be achieved, while still providing
+      tight latency guarantees to time-sensitive applications. When
+      the in-service queue expires, this algorithm computes the next
+      budget of the queue so as to:
+
+      - Let large budgets be eventually assigned to the queues
+        associated with I/O-bound applications performing sequential
+        I/O: in fact, the longer these applications are served once
+        got access to the device, the higher the throughput is.
+
+      - Let small budgets be eventually assigned to the queues
+        associated with time-sensitive applications (which typically
+        perform sporadic and short I/O), because, the smaller the
+        budget assigned to a queue waiting for service is, the sooner
+        B-WF2Q+ will serve that queue (Subsec 3.3 in [2]).
+
+- Weights can be assigned to processes only indirectly, through I/O
+  priorities, and according to the relation:
+  weight = 10 * (IOPRIO_BE_NR - ioprio).
+  The next patch provides, instead, a cgroups interface through which
+  weights can be assigned explicitly.
+
+- If several processes are competing for the device at the same time,
+  but all processes and groups have the same weight, then BFQ
+  guarantees the expected throughput distribution without ever idling
+  the device. It uses preemption instead. Throughput is then much
+  higher in this common scenario.
+
+- ioprio classes are served in strict priority order, i.e.,
+  lower-priority queues are not served as long as there are
+  higher-priority queues.  Among queues in the same class, the
+  bandwidth is distributed in proportion to the weight of each
+  queue. A very thin extra bandwidth is however guaranteed to the Idle
+  class, to prevent it from starving.
+
+- If the strict_guarantees parameter is set (default: unset), then BFQ
+     - always performs idling when the in-service queue becomes empty;
+     - forces the device to serve one I/O request at a time, by
+       dispatching a new request only if there is no outstanding
+       request.
+  In the presence of differentiated weights or I/O-request sizes,
+  both the above conditions are needed to guarantee that every
+  queue receives its allotted share of the bandwidth (see
+  Documentation/block/bfq-iosched.txt for more details). Setting
+  strict_guarantees may evidently affect throughput.
+
+[1] https://lkml.org/lkml/2008/4/1/234
+    https://lkml.org/lkml/2008/11/11/148
+
+[2] P. Valente and M. Andreolini, "Improving Application
+    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
+    the 5th Annual International Systems and Storage Conference
+    (SYSTOR '12), June 2012.
+    Slightly extended version:
+    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
+							results.pdf
+
+Signed-off-by: Fabio Checconi <fchecconi@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ Documentation/block/00-INDEX        |    2 +
+ Documentation/block/bfq-iosched.txt |  517 +++++
+ block/Kconfig.iosched               |   11 +
+ block/Makefile                      |    1 +
+ block/bfq-iosched.c                 | 4166 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 4697 insertions(+)
+ create mode 100644 Documentation/block/bfq-iosched.txt
+ create mode 100644 block/bfq-iosched.c
 
---vtzGhvizbBRQ85DL
-Content-Type: application/gzip
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
-
-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
-AgA=
-
---vtzGhvizbBRQ85DL--
+diff --git a/Documentation/block/00-INDEX b/Documentation/block/00-INDEX
+index e55103a..8d55b4b 100644
+--- a/Documentation/block/00-INDEX
++++ b/Documentation/block/00-INDEX
+@@ -1,5 +1,7 @@
+ 00-INDEX
+ 	- This file
++bfq-iosched.txt
++	- BFQ IO scheduler and its tunables
+ biodoc.txt
+ 	- Notes on the Generic Block Layer Rewrite in Linux 2.5
+ biovecs.txt
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+new file mode 100644
+index 0000000..cbf85f6f
+--- /dev/null
++++ b/Documentation/block/bfq-iosched.txt
+@@ -0,0 +1,517 @@
++BFQ (Budget Fair Queueing)
++==========================
++
++BFQ is a proportional-share I/O scheduler, with some extra
++low-latency capabilities. In addition to cgroups support (blkio or io
++controllers), BFQ's main features are:
++- BFQ guarantees a high system and application responsiveness, and a
++  low latency for time-sensitive applications, such as audio or video
++  players;
++- BFQ distributes bandwidth, and not just time, among processes or
++  groups (switching back to time distribution when needed to keep
++  throughput high).
++
++On average CPUs, the current version of BFQ can handle devices
++performing at most ~30K IOPS; at most ~50 KIOPS on faster CPUs. As a
++reference, 30-50 KIOPS correspond to very high bandwidths with
++sequential I/O (e.g., 8-12 GB/s if I/O requests are 256 KB large), and
++to 120-200 MB/s with 4KB random I/O. BFQ has not yet been tested on
++multi-queue devices.
++
++The table of contents follow. Impatients can just jump to Section 3.
++
++CONTENTS
++
++1. When may BFQ be useful?
++ 1-1 Personal systems
++ 1-2 Server systems
++2. How does BFQ work?
++3. What are BFQ's tunable?
++4. BFQ group scheduling
++ 4-1 Service guarantees provided
++ 4-2 Interface
++
++1. When may BFQ be useful?
++==========================
++
++BFQ provides the following benefits on personal and server systems.
++
++1-1 Personal systems
++--------------------
++
++Low latency for interactive applications
++
++Regardless of the actual background workload, BFQ guarantees that, for
++interactive tasks, the storage device is virtually as responsive as if
++it was idle. For example, even if one or more of the following
++background workloads are being executed:
++- one or more large files are being read, written or copied,
++- a tree of source files is being compiled,
++- one or more virtual machines are performing I/O,
++- a software update is in progress,
++- indexing daemons are scanning filesystems and updating their
++  databases,
++starting an application or loading a file from within an application
++takes about the same time as if the storage device was idle. As a
++comparison, with CFQ, NOOP or DEADLINE, and in the same conditions,
++applications experience high latencies, or even become unresponsive
++until the background workload terminates (also on SSDs).
++
++Low latency for soft real-time applications
++
++Also soft real-time applications, such as audio and video
++players/streamers, enjoy a low latency and a low drop rate, regardless
++of the background I/O workload. As a consequence, these applications
++do not suffer from almost any glitch due to the background workload.
++
++Higher speed for code-development tasks
++
++If some additional workload happens to be executed in parallel, then
++BFQ executes the I/O-related components of typical code-development
++tasks (compilation, checkout, merge, ...) much more quickly than CFQ,
++NOOP or DEADLINE.
++
++High throughput
++
++On hard disks, BFQ achieves up to 30% higher throughput than CFQ, and
++up to 150% higher throughput than DEADLINE and NOOP, with all the
++sequential workloads considered in our tests. With random workloads,
++and with all the workloads on flash-based devices, BFQ achieves,
++instead, about the same throughput as the other schedulers.
++
++Strong fairness, bandwidth and delay guarantees
++
++BFQ distributes the device throughput, and not just the device time,
++among I/O-bound applications in proportion their weights, with any
++workload and regardless of the device parameters. From these bandwidth
++guarantees, it is possible to compute tight per-I/O-request delay
++guarantees by a simple formula. If not configured for strict service
++guarantees, BFQ switches to time-based resource sharing (only) for
++applications that would otherwise cause a throughput loss.
++
++1-2 Server systems
++------------------
++
++Most benefits for server systems follow from the same service
++properties as above. In particular, regardless of whether additional,
++possibly heavy workloads are being served, BFQ guarantees:
++
++. audio and video-streaming with zero or very low jitter and drop
++  rate;
++
++. fast retrieval of WEB pages and embedded objects;
++
++. real-time recording of data in live-dumping applications (e.g.,
++  packet logging);
++
++. responsiveness in local and remote access to a server.
++
++
++2. How does BFQ work?
++=====================
++
++BFQ is a proportional-share I/O scheduler, whose general structure,
++plus a lot of code, are borrowed from CFQ.
++
++- Each process doing I/O on a device is associated with a weight and a
++  (bfq_)queue.
++
++- BFQ grants exclusive access to the device, for a while, to one queue
++  (process) at a time, and implements this service model by
++  associating every queue with a budget, measured in number of
++  sectors.
++
++  - After a queue is granted access to the device, the budget of the
++    queue is decremented, on each request dispatch, by the size of the
++    request.
++
++  - The in-service queue is expired, i.e., its service is suspended,
++    only if one of the following events occurs: 1) the queue finishes
++    its budget, 2) the queue empties, 3) a "budget timeout" fires.
++
++    - The budget timeout prevents processes doing random I/O from
++      holding the device for too long and dramatically reducing
++      throughput.
++
++    - Actually, as in CFQ, a queue associated with a process issuing
++      sync requests may not be expired immediately when it empties. In
++      contrast, BFQ may idle the device for a short time interval,
++      giving the process the chance to go on being served if it issues
++      a new request in time. Device idling typically boosts the
++      throughput on rotational devices, if processes do synchronous
++      and sequential I/O. In addition, under BFQ, device idling is
++      also instrumental in guaranteeing the desired throughput
++      fraction to processes issuing sync requests (see the description
++      of the slice_idle tunable in this document, or [1, 2], for more
++      details).
++
++      - With respect to idling for service guarantees, if several
++	processes are competing for the device at the same time, but
++	all processes (and groups, after the following commit) have
++	the same weight, then BFQ guarantees the expected throughput
++	distribution without ever idling the device. Throughput is
++	thus as high as possible in this common scenario.
++
++  - If low-latency mode is enabled (default configuration), BFQ
++    executes some special heuristics to detect interactive and soft
++    real-time applications (e.g., video or audio players/streamers),
++    and to reduce their latency. The most important action taken to
++    achieve this goal is to give to the queues associated with these
++    applications more than their fair share of the device
++    throughput. For brevity, we call just "weight-raising" the whole
++    sets of actions taken by BFQ to privilege these queues. In
++    particular, BFQ provides a milder form of weight-raising for
++    interactive applications, and a stronger form for soft real-time
++    applications.
++
++  - BFQ automatically deactivates idling for queues born in a burst of
++    queue creations. In fact, these queues are usually associated with
++    the processes of applications and services that benefit mostly
++    from a high throughput. Examples are systemd during boot, or git
++    grep.
++
++  - As CFQ, BFQ merges queues performing interleaved I/O, i.e.,
++    performing random I/O that becomes mostly sequential if
++    merged. Differently from CFQ, BFQ achieves this goal with a more
++    reactive mechanism, called Early Queue Merge (EQM). EQM is so
++    responsive in detecting interleaved I/O (cooperating processes),
++    that it enables BFQ to achieve a high throughput, by queue
++    merging, even for queues for which CFQ needs a different
++    mechanism, preemption, to get a high throughput. As such EQM is a
++    unified mechanism to achieve a high throughput with interleaved
++    I/O.
++
++  - Queues are scheduled according to a variant of WF2Q+, named
++    B-WF2Q+, and implemented using an augmented rb-tree to preserve an
++    O(log N) overall complexity.  See [2] for more details. B-WF2Q+ is
++    also ready for hierarchical scheduling. However, for a cleaner
++    logical breakdown, the code that enables and completes
++    hierarchical support is provided in the next commit, which focuses
++    exactly on this feature.
++
++  - B-WF2Q+ guarantees a tight deviation with respect to an ideal,
++    perfectly fair, and smooth service. In particular, B-WF2Q+
++    guarantees that each queue receives a fraction of the device
++    throughput proportional to its weight, even if the throughput
++    fluctuates, and regardless of: the device parameters, the current
++    workload and the budgets assigned to the queue.
++
++  - The last, budget-independence, property (although probably
++    counterintuitive in the first place) is definitely beneficial, for
++    the following reasons:
++
++    - First, with any proportional-share scheduler, the maximum
++      deviation with respect to an ideal service is proportional to
++      the maximum budget (slice) assigned to queues. As a consequence,
++      BFQ can keep this deviation tight not only because of the
++      accurate service of B-WF2Q+, but also because BFQ *does not*
++      need to assign a larger budget to a queue to let the queue
++      receive a higher fraction of the device throughput.
++
++    - Second, BFQ is free to choose, for every process (queue), the
++      budget that best fits the needs of the process, or best
++      leverages the I/O pattern of the process. In particular, BFQ
++      updates queue budgets with a simple feedback-loop algorithm that
++      allows a high throughput to be achieved, while still providing
++      tight latency guarantees to time-sensitive applications. When
++      the in-service queue expires, this algorithm computes the next
++      budget of the queue so as to:
++
++      - Let large budgets be eventually assigned to the queues
++	associated with I/O-bound applications performing sequential
++	I/O: in fact, the longer these applications are served once
++	got access to the device, the higher the throughput is.
++
++      - Let small budgets be eventually assigned to the queues
++	associated with time-sensitive applications (which typically
++	perform sporadic and short I/O), because, the smaller the
++	budget assigned to a queue waiting for service is, the sooner
++	B-WF2Q+ will serve that queue (Subsec 3.3 in [2]).
++
++- If several processes are competing for the device at the same time,
++  but all processes and groups have the same weight, then BFQ
++  guarantees the expected throughput distribution without ever idling
++  the device. It uses preemption instead. Throughput is then much
++  higher in this common scenario.
++
++- ioprio classes are served in strict priority order, i.e.,
++  lower-priority queues are not served as long as there are
++  higher-priority queues.  Among queues in the same class, the
++  bandwidth is distributed in proportion to the weight of each
++  queue. A very thin extra bandwidth is however guaranteed to
++  the Idle class, to prevent it from starving.
++
++
++3. What are BFQ's tunable?
++==========================
++
++The tunables back_seek-max, back_seek_penalty, fifo_expire_async and
++fifo_expire_sync below are the same as in CFQ. Their description is
++just copied from that for CFQ. Some considerations in the description
++of slice_idle are copied from CFQ too.
++
++per-process ioprio and weight
++-----------------------------
++
++Unless the cgroups interface is used, weights can be assigned to
++processes only indirectly, through I/O priorities, and according to
++the relation: weight = (IOPRIO_BE_NR - ioprio) * 10.
++
++slice_idle
++----------
++
++This parameter specifies how long BFQ should idle for next I/O
++request, when certain sync BFQ queues become empty. By default
++slice_idle is a non-zero value. Idling has a double purpose: boosting
++throughput and making sure that the desired throughput distribution is
++respected (see the description of how BFQ works, and, if needed, the
++papers referred there).
++
++As for throughput, idling can be very helpful on highly seeky media
++like single spindle SATA/SAS disks where we can cut down on overall
++number of seeks and see improved throughput.
++
++Setting slice_idle to 0 will remove all the idling on queues and one
++should see an overall improved throughput on faster storage devices
++like multiple SATA/SAS disks in hardware RAID configuration.
++
++So depending on storage and workload, it might be useful to set
++slice_idle=0.  In general for SATA/SAS disks and software RAID of
++SATA/SAS disks keeping slice_idle enabled should be useful. For any
++configurations where there are multiple spindles behind single LUN
++(Host based hardware RAID controller or for storage arrays), setting
++slice_idle=0 might end up in better throughput and acceptable
++latencies.
++
++Idling is however necessary to have service guarantees enforced in
++case of differentiated weights or differentiated I/O-request lengths.
++To see why, suppose that a given BFQ queue A must get several I/O
++requests served for each request served for another queue B. Idling
++ensures that, if A makes a new I/O request slightly after becoming
++empty, then no request of B is dispatched in the middle, and thus A
++does not lose the possibility to get more than one request dispatched
++before the next request of B is dispatched. Note that idling
++guarantees the desired differentiated treatment of queues only in
++terms of I/O-request dispatches. To guarantee that the actual service
++order then corresponds to the dispatch order, the strict_guarantees
++tunable must be set too.
++
++There is an important flipside for idling: apart from the above cases
++where it is beneficial also for throughput, idling can severely impact
++throughput. One important case is random workload. Because of this
++issue, BFQ tends to avoid idling as much as possible, when it is not
++beneficial also for throughput. As a consequence of this behavior, and
++of further issues described for the strict_guarantees tunable,
++short-term service guarantees may be occasionally violated. And, in
++some cases, these guarantees may be more important than guaranteeing
++maximum throughput. For example, in video playing/streaming, a very
++low drop rate may be more important than maximum throughput. In these
++cases, consider setting the strict_guarantees parameter.
++
++strict_guarantees
++-----------------
++
++If this parameter is set (default: unset), then BFQ
++
++- always performs idling when the in-service queue becomes empty;
++
++- forces the device to serve one I/O request at a time, by dispatching a
++  new request only if there is no outstanding request.
++
++In the presence of differentiated weights or I/O-request sizes, both
++the above conditions are needed to guarantee that every BFQ queue
++receives its allotted share of the bandwidth. The first condition is
++needed for the reasons explained in the description of the slice_idle
++tunable.  The second condition is needed because all modern storage
++devices reorder internally-queued requests, which may trivially break
++the service guarantees enforced by the I/O scheduler.
++
++Setting strict_guarantees may evidently affect throughput.
++
++back_seek_max
++-------------
++
++This specifies, given in Kbytes, the maximum "distance" for backward seeking.
++The distance is the amount of space from the current head location to the
++sectors that are backward in terms of distance.
++
++This parameter allows the scheduler to anticipate requests in the "backward"
++direction and consider them as being the "next" if they are within this
++distance from the current head location.
++
++back_seek_penalty
++-----------------
++
++This parameter is used to compute the cost of backward seeking. If the
++backward distance of request is just 1/back_seek_penalty from a "front"
++request, then the seeking cost of two requests is considered equivalent.
++
++So scheduler will not bias toward one or the other request (otherwise scheduler
++will bias toward front request). Default value of back_seek_penalty is 2.
++
++fifo_expire_async
++-----------------
++
++This parameter is used to set the timeout of asynchronous requests. Default
++value of this is 248ms.
++
++fifo_expire_sync
++----------------
++
++This parameter is used to set the timeout of synchronous requests. Default
++value of this is 124ms. In case to favor synchronous requests over asynchronous
++one, this value should be decreased relative to fifo_expire_async.
++
++low_latency
++-----------
++
++This parameter is used to enable/disable BFQ's low latency mode. By
++default, low latency mode is enabled. If enabled, interactive and soft
++real-time applications are privileged and experience a lower latency,
++as explained in more detail in the description of how BFQ works.
++
++timeout_sync
++------------
++
++Maximum amount of device time that can be given to a task (queue) once
++it has been selected for service. On devices with costly seeks,
++increasing this time usually increases maximum throughput. On the
++opposite end, increasing this time coarsens the granularity of the
++short-term bandwidth and latency guarantees, especially if the
++following parameter is set to zero.
++
++max_budget
++----------
++
++Maximum amount of service, measured in sectors, that can be provided
++to a BFQ queue once it is set in service (of course within the limits
++of the above timeout). According to what said in the description of
++the algorithm, larger values increase the throughput in proportion to
++the percentage of sequential I/O requests issued. The price of larger
++values is that they coarsen the granularity of short-term bandwidth
++and latency guarantees.
++
++The default value is 0, which enables auto-tuning: BFQ sets max_budget
++to the maximum number of sectors that can be served during
++timeout_sync, according to the estimated peak rate.
++
++weights
++-------
++
++Read-only parameter, used to show the weights of the currently active
++BFQ queues.
++
++
++wr_ tunables
++------------
++
++BFQ exports a few parameters to control/tune the behavior of
++low-latency heuristics.
++
++wr_coeff
++
++Factor by which the weight of a weight-raised queue is multiplied. If
++the queue is deemed soft real-time, then the weight is further
++multiplied by an additional, constant factor.
++
++wr_max_time
++
++Maximum duration of a weight-raising period for an interactive task
++(ms). If set to zero (default value), then this value is computed
++automatically, as a function of the peak rate of the device. In any
++case, when the value of this parameter is read, it always reports the
++current duration, regardless of whether it has been set manually or
++computed automatically.
++
++wr_max_softrt_rate
++
++Maximum service rate below which a queue is deemed to be associated
++with a soft real-time application, and is then weight-raised
++accordingly (sectors/sec).
++
++wr_min_idle_time
++
++Minimum idle period after which interactive weight-raising may be
++reactivated for a queue (in ms).
++
++wr_rt_max_time
++
++Maximum weight-raising duration for soft real-time queues (in ms). The
++start time from which this duration is considered is automatically
++moved forward if the queue is detected to be still soft real-time
++before the current soft real-time weight-raising period finishes.
++
++wr_min_inter_arr_async
++
++Minimum period between I/O request arrivals after which weight-raising
++may be reactivated for an already busy async queue (in ms).
++
++
++4. Group scheduling with BFQ
++============================
++
++BFQ supports both cgroup-v1 and cgroup-v2 io controllers, namely blkio
++and io. In particular, BFQ supports weight-based proportional
++share.
++
++4-1 Service guarantees provided
++-------------------------------
++
++With BFQ, proportional share means true proportional share of the
++device bandwidth, according to group weights. For example, a group
++with weight 200 gets twice the bandwidth, and not just twice the time,
++of a group with weight 100.
++
++BFQ supports hierarchies (group trees) of any depth. Bandwidth is
++distributed among groups and processes in the expected way: for each
++group, the children of the group share the whole bandwidth of the
++group in proportion to their weights. In particular, this implies
++that, for each leaf group, every process of the group receives the
++same share of the whole group bandwidth, unless the ioprio of the
++process is modified.
++
++The resource-sharing guarantee for a group may partially or totally
++switch from bandwidth to time, if providing bandwidth guarantees to
++the group lowers the throughput too much. This switch occurs on a
++per-process basis: if a process of a leaf group causes throughput loss
++if served in such a way to receive its share of the bandwidth, then
++BFQ switches back to just time-based proportional share for that
++process.
++
++4-2 Interface
++-------------
++
++To get proportional sharing of bandwidth with BFQ for a given device,
++BFQ must of course be the active scheduler for that device.
++
++Within each group directory, the names of the files associated with
++BFQ-specific cgroup parameters and stats begin with the "bfq."
++prefix. So, with cgroups-v1 or cgroups-v2, the full prefix for
++BFQ-specific files is "blkio.bfq." or "io.bfq." For example, the group
++parameter to set the weight of a group with BFQ is blkio.bfq.weight
++or io.bfq.weight.
++
++Parameters to set
++-----------------
++
++For each group, there is only the following parameter to set.
++
++weight (namely blkio.bfq.weight or io.bfq-weight): the weight of the
++group inside its parent. Available values: 1..10000 (default 100). The
++linear mapping between ioprio and weights, described at the beginning
++of the tunable section, is still valid, but all weights higher than
++IOPRIO_BE_NR*10 are mapped to ioprio 0.
++
++
++[1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
++    Scheduler", Proceedings of the First Workshop on Mobile System
++    Technologies (MST-2015), May 2015.
++    http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
++
++[2] P. Valente and M. Andreolini, "Improving Application
++    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
++    the 5th Annual International Systems and Storage Conference
++    (SYSTOR '12), June 2012.
++    Slightly extended version:
++    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
++							results.pdf
+diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+index 58fc868..562e30e 100644
+--- a/block/Kconfig.iosched
++++ b/block/Kconfig.iosched
+@@ -69,6 +69,17 @@ config MQ_IOSCHED_DEADLINE
+ 	---help---
+ 	  MQ version of the deadline IO scheduler.
+ 
++config IOSCHED_BFQ
++	tristate "BFQ I/O scheduler"
++	default n
++	---help---
++	BFQ I/O scheduler for BLK-MQ. BFQ distributes the bandwidth of
++	of the device among all processes according to their weights,
++	regardless of the device parameters and with any workload. It
++	also guarantees a low latency to interactive and soft
++	real-time applications.  Details in
++	Documentation/block/bfq-iosched.txt
++
+ endmenu
+ 
+ endif
+diff --git a/block/Makefile b/block/Makefile
+index 081bb68..91869f2 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -20,6 +20,7 @@ obj-$(CONFIG_IOSCHED_NOOP)	+= noop-iosched.o
+ obj-$(CONFIG_IOSCHED_DEADLINE)	+= deadline-iosched.o
+ obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
+ obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
++obj-$(CONFIG_IOSCHED_BFQ)	+= bfq-iosched.o
+ 
+ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
+ obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+new file mode 100644
+index 0000000..56a59fe
+--- /dev/null
++++ b/block/bfq-iosched.c
+@@ -0,0 +1,4166 @@
++/*
++ * Budget Fair Queueing (BFQ) I/O scheduler.
++ *
++ * Based on ideas and code from CFQ:
++ * Copyright (C) 2003 Jens Axboe <axboe@kernel.dk>
++ *
++ * Copyright (C) 2008 Fabio Checconi <fabio@gandalf.sssup.it>
++ *		      Paolo Valente <paolo.valente@unimore.it>
++ *
++ * Copyright (C) 2010 Paolo Valente <paolo.valente@unimore.it>
++ *                    Arianna Avanzini <avanzini@google.com>
++ *
++ * Copyright (C) 2017 Paolo Valente <paolo.valente@linaro.org>
++ *
++ *  This program is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU General Public License as
++ *  published by the Free Software Foundation; either version 2 of the
++ *  License, or (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  General Public License for more details.
++ *
++ * BFQ is a proportional-share I/O scheduler, with some extra
++ * low-latency capabilities. BFQ also supports full hierarchical
++ * scheduling through cgroups. Next paragraphs provide an introduction
++ * on BFQ inner workings. Details on BFQ benefits, usage and
++ * limitations can be found in Documentation/block/bfq-iosched.txt.
++ *
++ * BFQ is a proportional-share storage-I/O scheduling algorithm based
++ * on the slice-by-slice service scheme of CFQ. But BFQ assigns
++ * budgets, measured in number of sectors, to processes instead of
++ * time slices. The device is not granted to the in-service process
++ * for a given time slice, but until it has exhausted its assigned
++ * budget. This change from the time to the service domain enables BFQ
++ * to distribute the device throughput among processes as desired,
++ * without any distortion due to throughput fluctuations, or to device
++ * internal queueing. BFQ uses an ad hoc internal scheduler, called
++ * B-WF2Q+, to schedule processes according to their budgets. More
++ * precisely, BFQ schedules queues associated with processes. Each
++ * process/queue is assigned a user-configurable weight, and B-WF2Q+
++ * guarantees that each queue receives a fraction of the throughput
++ * proportional to its weight. Thanks to the accurate policy of
++ * B-WF2Q+, BFQ can afford to assign high budgets to I/O-bound
++ * processes issuing sequential requests (to boost the throughput),
++ * and yet guarantee a low latency to interactive and soft real-time
++ * applications.
++ *
++ * In particular, to provide these low-latency guarantees, BFQ
++ * explicitly privileges the I/O of two classes of time-sensitive
++ * applications: interactive and soft real-time. This feature enables
++ * BFQ to provide applications in these classes with a very low
++ * latency. Finally, BFQ also features additional heuristics for
++ * preserving both a low latency and a high throughput on NCQ-capable,
++ * rotational or flash-based devices, and to get the job done quickly
++ * for applications consisting in many I/O-bound processes.
++ *
++ * BFQ is described in [1], where also a reference to the initial, more
++ * theoretical paper on BFQ can be found. The interested reader can find
++ * in the latter paper full details on the main algorithm, as well as
++ * formulas of the guarantees and formal proofs of all the properties.
++ * With respect to the version of BFQ presented in these papers, this
++ * implementation adds a few more heuristics, such as the one that
++ * guarantees a low latency to soft real-time applications, and a
++ * hierarchical extension based on H-WF2Q+.
++ *
++ * B-WF2Q+ is based on WF2Q+, which is described in [2], together with
++ * H-WF2Q+, while the augmented tree used here to implement B-WF2Q+
++ * with O(log N) complexity derives from the one introduced with EEVDF
++ * in [3].
++ *
++ * [1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
++ *     Scheduler", Proceedings of the First Workshop on Mobile System
++ *     Technologies (MST-2015), May 2015.
++ *     http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
++ *
++ * [2] Jon C.R. Bennett and H. Zhang, "Hierarchical Packet Fair Queueing
++ *     Algorithms", IEEE/ACM Transactions on Networking, 5(5):675-689,
++ *     Oct 1997.
++ *
++ * http://www.cs.cmu.edu/~hzhang/papers/TON-97-Oct.ps.gz
++ *
++ * [3] I. Stoica and H. Abdel-Wahab, "Earliest Eligible Virtual Deadline
++ *     First: A Flexible and Accurate Mechanism for Proportional Share
++ *     Resource Allocation", technical report.
++ *
++ * http://www.cs.berkeley.edu/~istoica/papers/eevdf-tr-95.pdf
++ */
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/blkdev.h>
++#include <linux/elevator.h>
++#include <linux/ktime.h>
++#include <linux/rbtree.h>
++#include <linux/ioprio.h>
++#include <linux/sbitmap.h>
++#include <linux/delay.h>
++
++#include "blk.h"
++#include "blk-mq.h"
++#include "blk-mq-tag.h"
++#include "blk-mq-sched.h"
++#include <linux/blktrace_api.h>
++#include <linux/hrtimer.h>
++#include <linux/blk-cgroup.h>
++
++#define BFQ_IOPRIO_CLASSES	3
++#define BFQ_CL_IDLE_TIMEOUT	(HZ/5)
++
++#define BFQ_MIN_WEIGHT			1
++#define BFQ_MAX_WEIGHT			1000
++#define BFQ_WEIGHT_CONVERSION_COEFF	10
++
++#define BFQ_DEFAULT_QUEUE_IOPRIO	4
++
++#define BFQ_DEFAULT_GRP_WEIGHT	10
++#define BFQ_DEFAULT_GRP_IOPRIO	0
++#define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
++
++struct bfq_entity;
++
++/**
++ * struct bfq_service_tree - per ioprio_class service tree.
++ *
++ * Each service tree represents a B-WF2Q+ scheduler on its own.  Each
++ * ioprio_class has its own independent scheduler, and so its own
++ * bfq_service_tree.  All the fields are protected by the queue lock
++ * of the containing bfqd.
++ */
++struct bfq_service_tree {
++	/* tree for active entities (i.e., those backlogged) */
++	struct rb_root active;
++	/* tree for idle entities (i.e., not backlogged, with V <= F_i)*/
++	struct rb_root idle;
++
++	/* idle entity with minimum F_i */
++	struct bfq_entity *first_idle;
++	/* idle entity with maximum F_i */
++	struct bfq_entity *last_idle;
++
++	/* scheduler virtual time */
++	u64 vtime;
++	/* scheduler weight sum; active and idle entities contribute to it */
++	unsigned long wsum;
++};
++
++/**
++ * struct bfq_sched_data - multi-class scheduler.
++ *
++ * bfq_sched_data is the basic scheduler queue.  It supports three
++ * ioprio_classes, and can be used either as a toplevel queue or as
++ * an intermediate queue on a hierarchical setup.
++ * @next_in_service points to the active entity of the sched_data
++ * service trees that will be scheduled next.
++ *
++ * The supported ioprio_classes are the same as in CFQ, in descending
++ * priority order, IOPRIO_CLASS_RT, IOPRIO_CLASS_BE, IOPRIO_CLASS_IDLE.
++ * Requests from higher priority queues are served before all the
++ * requests from lower priority queues; among requests of the same
++ * queue requests are served according to B-WF2Q+.
++ * All the fields are protected by the queue lock of the containing bfqd.
++ */
++struct bfq_sched_data {
++	/* entity in service */
++	struct bfq_entity *in_service_entity;
++	/* head-of-the-line entity in the scheduler */
++	struct bfq_entity *next_in_service;
++	/* array of service trees, one per ioprio_class */
++	struct bfq_service_tree service_tree[BFQ_IOPRIO_CLASSES];
++};
++
++/**
++ * struct bfq_entity - schedulable entity.
++ *
++ * A bfq_entity is used to represent a bfq_queue (leaf node in the upper
++ * level scheduler). Each entity belongs to the sched_data of the parent
++ * group hierarchy. Non-leaf entities have also their own sched_data,
++ * stored in @my_sched_data.
++ *
++ * Each entity stores independently its priority values; this would
++ * allow different weights on different devices, but this
++ * functionality is not exported to userspace by now.  Priorities and
++ * weights are updated lazily, first storing the new values into the
++ * new_* fields, then setting the @prio_changed flag.  As soon as
++ * there is a transition in the entity state that allows the priority
++ * update to take place the effective and the requested priority
++ * values are synchronized.
++ *
++ * The weight value is calculated from the ioprio to export the same
++ * interface as CFQ.  When dealing with  ``well-behaved'' queues (i.e.,
++ * queues that do not spend too much time to consume their budget
++ * and have true sequential behavior, and when there are no external
++ * factors breaking anticipation) the relative weights at each level
++ * of the hierarchy should be guaranteed.  All the fields are
++ * protected by the queue lock of the containing bfqd.
++ */
++struct bfq_entity {
++	/* service_tree member */
++	struct rb_node rb_node;
++
++	/*
++	 * flag, true if the entity is on a tree (either the active or
++	 * the idle one of its service_tree).
++	 */
++	int on_st;
++
++	/* B-WF2Q+ start and finish timestamps [sectors/weight] */
++	u64 start, finish;
++
++	/* tree the entity is enqueued into; %NULL if not on a tree */
++	struct rb_root *tree;
++
++	/*
++	 * minimum start time of the (active) subtree rooted at this
++	 * entity; used for O(log N) lookups into active trees
++	 */
++	u64 min_start;
++
++	/* amount of service received during the last service slot */
++	int service;
++
++	/* budget, used also to calculate F_i: F_i = S_i + @budget / @weight */
++	int budget;
++
++	/* weight of the queue */
++	int weight;
++	/* next weight if a change is in progress */
++	int new_weight;
++
++	/* original weight, used to implement weight boosting */
++	int orig_weight;
++
++	/* parent entity, for hierarchical scheduling */
++	struct bfq_entity *parent;
++
++	/*
++	 * For non-leaf nodes in the hierarchy, the associated
++	 * scheduler queue, %NULL on leaf nodes.
++	 */
++	struct bfq_sched_data *my_sched_data;
++	/* the scheduler queue this entity belongs to */
++	struct bfq_sched_data *sched_data;
++
++	/* flag, set to request a weight, ioprio or ioprio_class change  */
++	int prio_changed;
++};
++
++/**
++ * struct bfq_ttime - per process thinktime stats.
++ */
++struct bfq_ttime {
++	/* completion time of the last request */
++	u64 last_end_request;
++
++	/* total process thinktime */
++	u64 ttime_total;
++	/* number of thinktime samples */
++	unsigned long ttime_samples;
++	/* average process thinktime */
++	u64 ttime_mean;
++};
++
++/**
++ * struct bfq_queue - leaf schedulable entity.
++ *
++ * A bfq_queue is a leaf request queue; it can be associated with an
++ * io_context or more, if it is async.
++ */
++struct bfq_queue {
++	/* reference counter */
++	int ref;
++	/* parent bfq_data */
++	struct bfq_data *bfqd;
++
++	/* current ioprio and ioprio class */
++	unsigned short ioprio, ioprio_class;
++	/* next ioprio and ioprio class if a change is in progress */
++	unsigned short new_ioprio, new_ioprio_class;
++
++	/* sorted list of pending requests */
++	struct rb_root sort_list;
++	/* if fifo isn't expired, next request to serve */
++	struct request *next_rq;
++	/* number of sync and async requests queued */
++	int queued[2];
++	/* number of requests currently allocated */
++	int allocated;
++	/* number of pending metadata requests */
++	int meta_pending;
++	/* fifo list of requests in sort_list */
++	struct list_head fifo;
++
++	/* entity representing this queue in the scheduler */
++	struct bfq_entity entity;
++
++	/* maximum budget allowed from the feedback mechanism */
++	int max_budget;
++	/* budget expiration (in jiffies) */
++	unsigned long budget_timeout;
++
++	/* number of requests on the dispatch list or inside driver */
++	int dispatched;
++
++	/* status flags */
++	unsigned long flags;
++
++	/* node for active/idle bfqq list inside parent bfqd */
++	struct list_head bfqq_list;
++
++	/* associated @bfq_ttime struct */
++	struct bfq_ttime ttime;
++
++	/* bit vector: a 1 for each seeky requests in history */
++	u32 seek_history;
++	/* position of the last request enqueued */
++	sector_t last_request_pos;
++
++	/* Number of consecutive pairs of request completion and
++	 * arrival, such that the queue becomes idle after the
++	 * completion, but the next request arrives within an idle
++	 * time slice; used only if the queue's IO_bound flag has been
++	 * cleared.
++	 */
++	unsigned int requests_within_timer;
++
++	/* pid of the process owning the queue, used for logging purposes */
++	pid_t pid;
++};
++
++/**
++ * struct bfq_io_cq - per (request_queue, io_context) structure.
++ */
++struct bfq_io_cq {
++	/* associated io_cq structure */
++	struct io_cq icq; /* must be the first member */
++	/* array of two process queues, the sync and the async */
++	struct bfq_queue *bfqq[2];
++	/* per (request_queue, blkcg) ioprio */
++	int ioprio;
++};
++
++/**
++ * struct bfq_data - per-device data structure.
++ *
++ * All the fields are protected by @lock.
++ */
++struct bfq_data {
++	/* device request queue */
++	struct request_queue *queue;
++	/* dispatch queue */
++	struct list_head dispatch;
++
++	/* root @bfq_sched_data for the device */
++	struct bfq_sched_data sched_data;
++
++	/*
++	 * Number of bfq_queues containing requests (including the
++	 * queue in service, even if it is idling).
++	 */
++	int busy_queues;
++	/* number of queued requests */
++	int queued;
++	/* number of requests dispatched and waiting for completion */
++	int rq_in_driver;
++
++	/*
++	 * Maximum number of requests in driver in the last
++	 * @hw_tag_samples completed requests.
++	 */
++	int max_rq_in_driver;
++	/* number of samples used to calculate hw_tag */
++	int hw_tag_samples;
++	/* flag set to one if the driver is showing a queueing behavior */
++	int hw_tag;
++
++	/* number of budgets assigned */
++	int budgets_assigned;
++
++	/*
++	 * Timer set when idling (waiting) for the next request from
++	 * the queue in service.
++	 */
++	struct hrtimer idle_slice_timer;
++
++	/* bfq_queue in service */
++	struct bfq_queue *in_service_queue;
++	/* bfq_io_cq (bic) associated with the @in_service_queue */
++	struct bfq_io_cq *in_service_bic;
++
++	/* on-disk position of the last served request */
++	sector_t last_position;
++
++	/* beginning of the last budget */
++	ktime_t last_budget_start;
++	/* beginning of the last idle slice */
++	ktime_t last_idling_start;
++	/* number of samples used to calculate @peak_rate */
++	int peak_rate_samples;
++	/*
++	 * Peak read/write rate, observed during the service of a
++	 * budget [BFQ_RATE_SHIFT * sectors/usec]. The value is
++	 * left-shifted by BFQ_RATE_SHIFT to increase precision in
++	 * fixed-point calculations.
++	 */
++	u64 peak_rate;
++	/* maximum budget allotted to a bfq_queue before rescheduling */
++	int bfq_max_budget;
++
++	/* list of all the bfq_queues active on the device */
++	struct list_head active_list;
++	/* list of all the bfq_queues idle on the device */
++	struct list_head idle_list;
++
++	/*
++	 * Timeout for async/sync requests; when it fires, requests
++	 * are served in fifo order.
++	 */
++	u64 bfq_fifo_expire[2];
++	/* weight of backward seeks wrt forward ones */
++	unsigned int bfq_back_penalty;
++	/* maximum allowed backward seek */
++	unsigned int bfq_back_max;
++	/* maximum idling time */
++	u32 bfq_slice_idle;
++	/* last time CLASS_IDLE was served */
++	u64 bfq_class_idle_last_service;
++
++	/* user-configured max budget value (0 for auto-tuning) */
++	int bfq_user_max_budget;
++	/*
++	 * Timeout for bfq_queues to consume their budget; used to
++	 * prevent seeky queues from imposing long latencies to
++	 * sequential or quasi-sequential ones (this also implies that
++	 * seeky queues cannot receive guarantees in the service
++	 * domain; after a timeout they are charged for the time they
++	 * have been in service, to preserve fairness among them, but
++	 * without service-domain guarantees).
++	 */
++	unsigned int bfq_timeout;
++
++	/*
++	 * Number of consecutive requests that must be issued within
++	 * the idle time slice to set again idling to a queue which
++	 * was marked as non-I/O-bound (see the definition of the
++	 * IO_bound flag for further details).
++	 */
++	unsigned int bfq_requests_within_timer;
++
++	/*
++	 * Force device idling whenever needed to provide accurate
++	 * service guarantees, without caring about throughput
++	 * issues. CAVEAT: this may even increase latencies, in case
++	 * of useless idling for processes that did stop doing I/O.
++	 */
++	bool strict_guarantees;
++
++	/* fallback dummy bfqq for extreme OOM conditions */
++	struct bfq_queue oom_bfqq;
++
++	spinlock_t lock;
++
++	/*
++	 * bic associated with the task issuing current bio for
++	 * merging. This and the next field are used as a support to
++	 * be able to perform the bic lookup, needed by bio-merge
++	 * functions, before the scheduler lock is taken, and thus
++	 * avoid taking the request-queue lock while the scheduler
++	 * lock is being held.
++	 */
++	struct bfq_io_cq *bio_bic;
++	/* bfqq associated with the task issuing current bio for merging */
++	struct bfq_queue *bio_bfqq;
++};
++
++enum bfqq_state_flags {
++	BFQQF_busy = 0,		/* has requests or is in service */
++	BFQQF_wait_request,	/* waiting for a request */
++	BFQQF_non_blocking_wait_rq, /*
++				     * waiting for a request
++				     * without idling the device
++				     */
++	BFQQF_fifo_expire,	/* FIFO checked in this slice */
++	BFQQF_idle_window,	/* slice idling enabled */
++	BFQQF_sync,		/* synchronous queue */
++	BFQQF_budget_new,	/* no completion with this budget */
++	BFQQF_IO_bound,		/*
++				 * bfqq has timed-out at least once
++				 * having consumed at most 2/10 of
++				 * its budget
++				 */
++};
++
++#define BFQ_BFQQ_FNS(name)						\
++static void bfq_mark_bfqq_##name(struct bfq_queue *bfqq)		\
++{									\
++	__set_bit(BFQQF_##name, &(bfqq)->flags);			\
++}									\
++static void bfq_clear_bfqq_##name(struct bfq_queue *bfqq)		\
++{									\
++	__clear_bit(BFQQF_##name, &(bfqq)->flags);		\
++}									\
++static int bfq_bfqq_##name(const struct bfq_queue *bfqq)		\
++{									\
++	return test_bit(BFQQF_##name, &(bfqq)->flags);		\
++}
++
++BFQ_BFQQ_FNS(busy);
++BFQ_BFQQ_FNS(wait_request);
++BFQ_BFQQ_FNS(non_blocking_wait_rq);
++BFQ_BFQQ_FNS(fifo_expire);
++BFQ_BFQQ_FNS(idle_window);
++BFQ_BFQQ_FNS(sync);
++BFQ_BFQQ_FNS(budget_new);
++BFQ_BFQQ_FNS(IO_bound);
++#undef BFQ_BFQQ_FNS
++
++/* Logging facilities. */
++#define bfq_log_bfqq(bfqd, bfqq, fmt, args...) \
++	blk_add_trace_msg((bfqd)->queue, "bfq%d " fmt, (bfqq)->pid, ##args)
++
++#define bfq_log(bfqd, fmt, args...) \
++	blk_add_trace_msg((bfqd)->queue, "bfq " fmt, ##args)
++
++/* Expiration reasons. */
++enum bfqq_expiration {
++	BFQQE_TOO_IDLE = 0,		/*
++					 * queue has been idling for
++					 * too long
++					 */
++	BFQQE_BUDGET_TIMEOUT,	/* budget took too long to be used */
++	BFQQE_BUDGET_EXHAUSTED,	/* budget consumed */
++	BFQQE_NO_MORE_REQUESTS,	/* the queue has no more requests */
++	BFQQE_PREEMPTED		/* preemption in progress */
++};
++
++static struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity);
++
++static struct bfq_service_tree *
++bfq_entity_service_tree(struct bfq_entity *entity)
++{
++	struct bfq_sched_data *sched_data = entity->sched_data;
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	unsigned int idx = bfqq ? bfqq->ioprio_class - 1 :
++				  BFQ_DEFAULT_GRP_CLASS - 1;
++
++	return sched_data->service_tree + idx;
++}
++
++static struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync)
++{
++	return bic->bfqq[is_sync];
++}
++
++static void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq,
++			 bool is_sync)
++{
++	bic->bfqq[is_sync] = bfqq;
++}
++
++static struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic)
++{
++	return bic->icq.q->elevator->elevator_data;
++}
++
++static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio);
++static void bfq_put_queue(struct bfq_queue *bfqq);
++static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
++				       struct bio *bio, bool is_sync,
++				       struct bfq_io_cq *bic);
++static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq);
++
++/*
++ * Array of async queues for all the processes, one queue
++ * per ioprio value per ioprio_class.
++ */
++struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
++/* Async queue for the idle class (ioprio is ignored) */
++struct bfq_queue *async_idle_bfqq;
++
++/* Expiration time of sync (0) and async (1) requests, in ns. */
++static const u64 bfq_fifo_expire[2] = { NSEC_PER_SEC / 4, NSEC_PER_SEC / 8 };
++
++/* Maximum backwards seek (magic number lifted from CFQ), in KiB. */
++static const int bfq_back_max = 16 * 1024;
++
++/* Penalty of a backwards seek, in number of sectors. */
++static const int bfq_back_penalty = 2;
++
++/* Idling period duration, in ns. */
++static u64 bfq_slice_idle = NSEC_PER_SEC / 125;
++
++/* Minimum number of assigned budgets for which stats are safe to compute. */
++static const int bfq_stats_min_budgets = 194;
++
++/* Default maximum budget values, in sectors and number of requests. */
++static const int bfq_default_max_budget = 16 * 1024;
++
++/* Default timeout values, in jiffies, approximating CFQ defaults. */
++static const int bfq_timeout = HZ / 8;
++
++static struct kmem_cache *bfq_pool;
++
++/* Below this threshold (in ms), we consider thinktime immediate. */
++#define BFQ_MIN_TT		(2 * NSEC_PER_MSEC)
++
++/* hw_tag detection: parallel requests threshold and min samples needed. */
++#define BFQ_HW_QUEUE_THRESHOLD	4
++#define BFQ_HW_QUEUE_SAMPLES	32
++
++#define BFQQ_SEEK_THR		(sector_t)(8 * 100)
++#define BFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
++#define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
++#define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
++
++/* Budget feedback step. */
++#define BFQ_BUDGET_STEP         128
++
++/* Min samples used for peak rate estimation (for autotuning). */
++#define BFQ_PEAK_RATE_SAMPLES	32
++
++/* Shift used for peak rate fixed precision calculations. */
++#define BFQ_RATE_SHIFT		16
++
++#define BFQ_SERVICE_TREE_INIT	((struct bfq_service_tree)		\
++				{ RB_ROOT, RB_ROOT, NULL, NULL, 0, 0 })
++
++#define RQ_BIC(rq)		((struct bfq_io_cq *) (rq)->elv.priv[0])
++#define RQ_BFQQ(rq)		((rq)->elv.priv[1])
++
++/**
++ * icq_to_bic - convert iocontext queue structure to bfq_io_cq.
++ * @icq: the iocontext queue.
++ */
++static struct bfq_io_cq *icq_to_bic(struct io_cq *icq)
++{
++	/* bic->icq is the first member, %NULL will convert to %NULL */
++	return container_of(icq, struct bfq_io_cq, icq);
++}
++
++/**
++ * bfq_bic_lookup - search into @ioc a bic associated to @bfqd.
++ * @bfqd: the lookup key.
++ * @ioc: the io_context of the process doing I/O.
++ * @q: the request queue.
++ */
++static struct bfq_io_cq *bfq_bic_lookup(struct bfq_data *bfqd,
++					struct io_context *ioc,
++					struct request_queue *q)
++{
++	if (ioc) {
++		unsigned long flags;
++		struct bfq_io_cq *icq;
++
++		spin_lock_irqsave(q->queue_lock, flags);
++		icq = icq_to_bic(ioc_lookup_icq(ioc, q));
++		spin_unlock_irqrestore(q->queue_lock, flags);
++
++		return icq;
++	}
++
++	return NULL;
++}
++
++/*
++ * Next two macros are just fake loops for the moment. They will
++ * become true loops in the cgroups-enabled variant of the code. Such
++ * a variant, in its turn, will be introduced by next commit.
++ */
++#define for_each_entity(entity)	\
++	for (; entity ; entity = NULL)
++
++#define for_each_entity_safe(entity, parent) \
++	for (parent = NULL; entity ; entity = parent)
++
++static int bfq_update_next_in_service(struct bfq_sched_data *sd)
++{
++	return 0;
++}
++
++static void bfq_check_next_in_service(struct bfq_sched_data *sd,
++				      struct bfq_entity *entity)
++{
++}
++
++static void bfq_update_budget(struct bfq_entity *next_in_service)
++{
++}
++
++/*
++ * Shift for timestamp calculations.  This actually limits the maximum
++ * service allowed in one timestamp delta (small shift values increase it),
++ * the maximum total weight that can be used for the queues in the system
++ * (big shift values increase it), and the period of virtual time
++ * wraparounds.
++ */
++#define WFQ_SERVICE_SHIFT	22
++
++/**
++ * bfq_gt - compare two timestamps.
++ * @a: first ts.
++ * @b: second ts.
++ *
++ * Return @a > @b, dealing with wrapping correctly.
++ */
++static int bfq_gt(u64 a, u64 b)
++{
++	return (s64)(a - b) > 0;
++}
++
++static struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = NULL;
++
++	if (!entity->my_sched_data)
++		bfqq = container_of(entity, struct bfq_queue, entity);
++
++	return bfqq;
++}
++
++
++/**
++ * bfq_delta - map service into the virtual time domain.
++ * @service: amount of service.
++ * @weight: scale factor (weight of an entity or weight sum).
++ */
++static u64 bfq_delta(unsigned long service, unsigned long weight)
++{
++	u64 d = (u64)service << WFQ_SERVICE_SHIFT;
++
++	do_div(d, weight);
++	return d;
++}
++
++/**
++ * bfq_calc_finish - assign the finish time to an entity.
++ * @entity: the entity to act upon.
++ * @service: the service to be charged to the entity.
++ */
++static void bfq_calc_finish(struct bfq_entity *entity, unsigned long service)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	entity->finish = entity->start +
++		bfq_delta(service, entity->weight);
++
++	if (bfqq) {
++		bfq_log_bfqq(bfqq->bfqd, bfqq,
++			"calc_finish: serv %lu, w %d",
++			service, entity->weight);
++		bfq_log_bfqq(bfqq->bfqd, bfqq,
++			"calc_finish: start %llu, finish %llu, delta %llu",
++			entity->start, entity->finish,
++			bfq_delta(service, entity->weight));
++	}
++}
++
++/**
++ * bfq_entity_of - get an entity from a node.
++ * @node: the node field of the entity.
++ *
++ * Convert a node pointer to the relative entity.  This is used only
++ * to simplify the logic of some functions and not as the generic
++ * conversion mechanism because, e.g., in the tree walking functions,
++ * the check for a %NULL value would be redundant.
++ */
++static struct bfq_entity *bfq_entity_of(struct rb_node *node)
++{
++	struct bfq_entity *entity = NULL;
++
++	if (node)
++		entity = rb_entry(node, struct bfq_entity, rb_node);
++
++	return entity;
++}
++
++/**
++ * bfq_extract - remove an entity from a tree.
++ * @root: the tree root.
++ * @entity: the entity to remove.
++ */
++static void bfq_extract(struct rb_root *root, struct bfq_entity *entity)
++{
++	entity->tree = NULL;
++	rb_erase(&entity->rb_node, root);
++}
++
++/**
++ * bfq_idle_extract - extract an entity from the idle tree.
++ * @st: the service tree of the owning @entity.
++ * @entity: the entity being removed.
++ */
++static void bfq_idle_extract(struct bfq_service_tree *st,
++			     struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct rb_node *next;
++
++	if (entity == st->first_idle) {
++		next = rb_next(&entity->rb_node);
++		st->first_idle = bfq_entity_of(next);
++	}
++
++	if (entity == st->last_idle) {
++		next = rb_prev(&entity->rb_node);
++		st->last_idle = bfq_entity_of(next);
++	}
++
++	bfq_extract(&st->idle, entity);
++
++	if (bfqq)
++		list_del(&bfqq->bfqq_list);
++}
++
++/**
++ * bfq_insert - generic tree insertion.
++ * @root: tree root.
++ * @entity: entity to insert.
++ *
++ * This is used for the idle and the active tree, since they are both
++ * ordered by finish time.
++ */
++static void bfq_insert(struct rb_root *root, struct bfq_entity *entity)
++{
++	struct bfq_entity *entry;
++	struct rb_node **node = &root->rb_node;
++	struct rb_node *parent = NULL;
++
++	while (*node) {
++		parent = *node;
++		entry = rb_entry(parent, struct bfq_entity, rb_node);
++
++		if (bfq_gt(entry->finish, entity->finish))
++			node = &parent->rb_left;
++		else
++			node = &parent->rb_right;
++	}
++
++	rb_link_node(&entity->rb_node, parent, node);
++	rb_insert_color(&entity->rb_node, root);
++
++	entity->tree = root;
++}
++
++/**
++ * bfq_update_min - update the min_start field of a entity.
++ * @entity: the entity to update.
++ * @node: one of its children.
++ *
++ * This function is called when @entity may store an invalid value for
++ * min_start due to updates to the active tree.  The function  assumes
++ * that the subtree rooted at @node (which may be its left or its right
++ * child) has a valid min_start value.
++ */
++static void bfq_update_min(struct bfq_entity *entity, struct rb_node *node)
++{
++	struct bfq_entity *child;
++
++	if (node) {
++		child = rb_entry(node, struct bfq_entity, rb_node);
++		if (bfq_gt(entity->min_start, child->min_start))
++			entity->min_start = child->min_start;
++	}
++}
++
++/**
++ * bfq_update_active_node - recalculate min_start.
++ * @node: the node to update.
++ *
++ * @node may have changed position or one of its children may have moved,
++ * this function updates its min_start value.  The left and right subtrees
++ * are assumed to hold a correct min_start value.
++ */
++static void bfq_update_active_node(struct rb_node *node)
++{
++	struct bfq_entity *entity = rb_entry(node, struct bfq_entity, rb_node);
++
++	entity->min_start = entity->start;
++	bfq_update_min(entity, node->rb_right);
++	bfq_update_min(entity, node->rb_left);
++}
++
++/**
++ * bfq_update_active_tree - update min_start for the whole active tree.
++ * @node: the starting node.
++ *
++ * @node must be the deepest modified node after an update.  This function
++ * updates its min_start using the values held by its children, assuming
++ * that they did not change, and then updates all the nodes that may have
++ * changed in the path to the root.  The only nodes that may have changed
++ * are the ones in the path or their siblings.
++ */
++static void bfq_update_active_tree(struct rb_node *node)
++{
++	struct rb_node *parent;
++
++up:
++	bfq_update_active_node(node);
++
++	parent = rb_parent(node);
++	if (!parent)
++		return;
++
++	if (node == parent->rb_left && parent->rb_right)
++		bfq_update_active_node(parent->rb_right);
++	else if (parent->rb_left)
++		bfq_update_active_node(parent->rb_left);
++
++	node = parent;
++	goto up;
++}
++
++/**
++ * bfq_active_insert - insert an entity in the active tree of its
++ *                     group/device.
++ * @st: the service tree of the entity.
++ * @entity: the entity being inserted.
++ *
++ * The active tree is ordered by finish time, but an extra key is kept
++ * per each node, containing the minimum value for the start times of
++ * its children (and the node itself), so it's possible to search for
++ * the eligible node with the lowest finish time in logarithmic time.
++ */
++static void bfq_active_insert(struct bfq_service_tree *st,
++			      struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct rb_node *node = &entity->rb_node;
++
++	bfq_insert(&st->active, entity);
++
++	if (node->rb_left)
++		node = node->rb_left;
++	else if (node->rb_right)
++		node = node->rb_right;
++
++	bfq_update_active_tree(node);
++
++	if (bfqq)
++		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
++}
++
++/**
++ * bfq_ioprio_to_weight - calc a weight from an ioprio.
++ * @ioprio: the ioprio value to convert.
++ */
++static unsigned short bfq_ioprio_to_weight(int ioprio)
++{
++	return (IOPRIO_BE_NR - ioprio) * BFQ_WEIGHT_CONVERSION_COEFF;
++}
++
++/**
++ * bfq_weight_to_ioprio - calc an ioprio from a weight.
++ * @weight: the weight value to convert.
++ *
++ * To preserve as much as possible the old only-ioprio user interface,
++ * 0 is used as an escape ioprio value for weights (numerically) equal or
++ * larger than IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF.
++ */
++static unsigned short bfq_weight_to_ioprio(int weight)
++{
++	return max_t(int, 0,
++		     IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF - weight);
++}
++
++static void bfq_get_entity(struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	if (bfqq) {
++		bfqq->ref++;
++		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
++			     bfqq, bfqq->ref);
++	}
++}
++
++/**
++ * bfq_find_deepest - find the deepest node that an extraction can modify.
++ * @node: the node being removed.
++ *
++ * Do the first step of an extraction in an rb tree, looking for the
++ * node that will replace @node, and returning the deepest node that
++ * the following modifications to the tree can touch.  If @node is the
++ * last node in the tree return %NULL.
++ */
++static struct rb_node *bfq_find_deepest(struct rb_node *node)
++{
++	struct rb_node *deepest;
++
++	if (!node->rb_right && !node->rb_left)
++		deepest = rb_parent(node);
++	else if (!node->rb_right)
++		deepest = node->rb_left;
++	else if (!node->rb_left)
++		deepest = node->rb_right;
++	else {
++		deepest = rb_next(node);
++		if (deepest->rb_right)
++			deepest = deepest->rb_right;
++		else if (rb_parent(deepest) != node)
++			deepest = rb_parent(deepest);
++	}
++
++	return deepest;
++}
++
++/**
++ * bfq_active_extract - remove an entity from the active tree.
++ * @st: the service_tree containing the tree.
++ * @entity: the entity being removed.
++ */
++static void bfq_active_extract(struct bfq_service_tree *st,
++			       struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct rb_node *node;
++
++	node = bfq_find_deepest(&entity->rb_node);
++	bfq_extract(&st->active, entity);
++
++	if (node)
++		bfq_update_active_tree(node);
++
++	if (bfqq)
++		list_del(&bfqq->bfqq_list);
++}
++
++/**
++ * bfq_idle_insert - insert an entity into the idle tree.
++ * @st: the service tree containing the tree.
++ * @entity: the entity to insert.
++ */
++static void bfq_idle_insert(struct bfq_service_tree *st,
++			    struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct bfq_entity *first_idle = st->first_idle;
++	struct bfq_entity *last_idle = st->last_idle;
++
++	if (!first_idle || bfq_gt(first_idle->finish, entity->finish))
++		st->first_idle = entity;
++	if (!last_idle || bfq_gt(entity->finish, last_idle->finish))
++		st->last_idle = entity;
++
++	bfq_insert(&st->idle, entity);
++
++	if (bfqq)
++		list_add(&bfqq->bfqq_list, &bfqq->bfqd->idle_list);
++}
++
++/**
++ * bfq_forget_entity - do not consider entity any longer for scheduling
++ * @st: the service tree.
++ * @entity: the entity being removed.
++ * @is_in_service: true if entity is currently the in-service entity.
++ *
++ * Forget everything about @entity. In addition, if entity represents
++ * a queue, and the latter is not in service, then release the service
++ * reference to the queue (the one taken through bfq_get_entity). In
++ * fact, in this case, there is really no more service reference to
++ * the queue, as the latter is also outside any service tree. If,
++ * instead, the queue is in service, then __bfq_bfqd_reset_in_service
++ * will take care of putting the reference when the queue finally
++ * stops being served.
++ */
++static void bfq_forget_entity(struct bfq_service_tree *st,
++			      struct bfq_entity *entity,
++			      bool is_in_service)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	entity->on_st = 0;
++	st->wsum -= entity->weight;
++	if (bfqq && !is_in_service)
++		bfq_put_queue(bfqq);
++}
++
++/**
++ * bfq_put_idle_entity - release the idle tree ref of an entity.
++ * @st: service tree for the entity.
++ * @entity: the entity being released.
++ */
++static void bfq_put_idle_entity(struct bfq_service_tree *st,
++				struct bfq_entity *entity)
++{
++	bfq_idle_extract(st, entity);
++	bfq_forget_entity(st, entity,
++			  entity == entity->sched_data->in_service_entity);
++}
++
++/**
++ * bfq_forget_idle - update the idle tree if necessary.
++ * @st: the service tree to act upon.
++ *
++ * To preserve the global O(log N) complexity we only remove one entry here;
++ * as the idle tree will not grow indefinitely this can be done safely.
++ */
++static void bfq_forget_idle(struct bfq_service_tree *st)
++{
++	struct bfq_entity *first_idle = st->first_idle;
++	struct bfq_entity *last_idle = st->last_idle;
++
++	if (RB_EMPTY_ROOT(&st->active) && last_idle &&
++	    !bfq_gt(last_idle->finish, st->vtime)) {
++		/*
++		 * Forget the whole idle tree, increasing the vtime past
++		 * the last finish time of idle entities.
++		 */
++		st->vtime = last_idle->finish;
++	}
++
++	if (first_idle && !bfq_gt(first_idle->finish, st->vtime))
++		bfq_put_idle_entity(st, first_idle);
++}
++
++static struct bfq_service_tree *
++__bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
++			 struct bfq_entity *entity)
++{
++	struct bfq_service_tree *new_st = old_st;
++
++	if (entity->prio_changed) {
++		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++		unsigned short prev_weight, new_weight;
++		struct bfq_data *bfqd = NULL;
++
++		if (bfqq)
++			bfqd = bfqq->bfqd;
++
++		old_st->wsum -= entity->weight;
++
++		if (entity->new_weight != entity->orig_weight) {
++			if (entity->new_weight < BFQ_MIN_WEIGHT ||
++			    entity->new_weight > BFQ_MAX_WEIGHT) {
++				pr_crit("update_weight_prio: new_weight %d\n",
++					entity->new_weight);
++				if (entity->new_weight < BFQ_MIN_WEIGHT)
++					entity->new_weight = BFQ_MIN_WEIGHT;
++				else
++					entity->new_weight = BFQ_MAX_WEIGHT;
++			}
++			entity->orig_weight = entity->new_weight;
++			if (bfqq)
++				bfqq->ioprio =
++				  bfq_weight_to_ioprio(entity->orig_weight);
++		}
++
++		if (bfqq)
++			bfqq->ioprio_class = bfqq->new_ioprio_class;
++		entity->prio_changed = 0;
++
++		/*
++		 * NOTE: here we may be changing the weight too early,
++		 * this will cause unfairness.  The correct approach
++		 * would have required additional complexity to defer
++		 * weight changes to the proper time instants (i.e.,
++		 * when entity->finish <= old_st->vtime).
++		 */
++		new_st = bfq_entity_service_tree(entity);
++
++		prev_weight = entity->weight;
++		new_weight = entity->orig_weight;
++		entity->weight = new_weight;
++
++		new_st->wsum += entity->weight;
++
++		if (new_st != old_st)
++			entity->start = new_st->vtime;
++	}
++
++	return new_st;
++}
++
++/**
++ * bfq_bfqq_served - update the scheduler status after selection for
++ *                   service.
++ * @bfqq: the queue being served.
++ * @served: bytes to transfer.
++ *
++ * NOTE: this can be optimized, as the timestamps of upper level entities
++ * are synchronized every time a new bfqq is selected for service.  By now,
++ * we keep it to better check consistency.
++ */
++static void bfq_bfqq_served(struct bfq_queue *bfqq, int served)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++	struct bfq_service_tree *st;
++
++	for_each_entity(entity) {
++		st = bfq_entity_service_tree(entity);
++
++		entity->service += served;
++
++		st->vtime += bfq_delta(served, st->wsum);
++		bfq_forget_idle(st);
++	}
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "bfqq_served %d secs", served);
++}
++
++/**
++ * bfq_bfqq_charge_full_budget - set the service to the entity budget.
++ * @bfqq: the queue that needs a service update.
++ *
++ * When it's not possible to be fair in the service domain, because
++ * a queue is not consuming its budget fast enough (the meaning of
++ * fast depends on the timeout parameter), we charge it a full
++ * budget.  In this way we should obtain a sort of time-domain
++ * fairness among all the seeky/slow queues.
++ */
++static void bfq_bfqq_charge_full_budget(struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "charge_full_budget");
++
++	bfq_bfqq_served(bfqq, entity->budget - entity->service);
++}
++
++/**
++ * __bfq_activate_entity - activate an entity.
++ * @entity: the entity being activated.
++ * @non_blocking_wait_rq: true if this entity was waiting for a request
++ *
++ * Called whenever an entity is activated, i.e., it is not active and one
++ * of its children receives a new request, or has to be reactivated due to
++ * budget exhaustion.  It uses the current budget of the entity (and the
++ * service received if @entity is active) of the queue to calculate its
++ * timestamps.
++ */
++static void __bfq_activate_entity(struct bfq_entity *entity,
++				  bool non_blocking_wait_rq)
++{
++	struct bfq_sched_data *sd = entity->sched_data;
++	struct bfq_service_tree *st = bfq_entity_service_tree(entity);
++	bool backshifted = false;
++
++	if (entity == sd->in_service_entity) {
++		/*
++		 * If we are requeueing the current entity we have
++		 * to take care of not charging to it service it has
++		 * not received.
++		 */
++		bfq_calc_finish(entity, entity->service);
++		entity->start = entity->finish;
++		sd->in_service_entity = NULL;
++	} else if (entity->tree == &st->active) {
++		/*
++		 * Requeueing an entity due to a change of some
++		 * next_in_service entity below it.  We reuse the
++		 * old start time.
++		 */
++		bfq_active_extract(st, entity);
++	} else {
++		unsigned long long min_vstart;
++
++		/* See comments on bfq_fqq_update_budg_for_activation */
++		if (non_blocking_wait_rq && bfq_gt(st->vtime, entity->finish)) {
++			backshifted = true;
++			min_vstart = entity->finish;
++		} else
++			min_vstart = st->vtime;
++
++		if (entity->tree == &st->idle) {
++			/*
++			 * Must be on the idle tree, bfq_idle_extract() will
++			 * check for that.
++			 */
++			bfq_idle_extract(st, entity);
++			entity->start = bfq_gt(min_vstart, entity->finish) ?
++				min_vstart : entity->finish;
++		} else {
++			/*
++			 * The finish time of the entity may be invalid, and
++			 * it is in the past for sure, otherwise the queue
++			 * would have been on the idle tree.
++			 */
++			entity->start = min_vstart;
++			st->wsum += entity->weight;
++			/*
++			 * entity is about to be inserted into a service tree,
++			 * and then set in service: get a reference to make
++			 * sure entity does not disappear until it is no
++			 * longer in service or scheduled for service.
++			 */
++			bfq_get_entity(entity);
++
++			entity->on_st = 1;
++		}
++	}
++
++	st = __bfq_entity_update_weight_prio(st, entity);
++	bfq_calc_finish(entity, entity->budget);
++
++	/*
++	 * If some queues enjoy backshifting for a while, then their
++	 * (virtual) finish timestamps may happen to become lower and
++	 * lower than the system virtual time.	In particular, if
++	 * these queues often happen to be idle for short time
++	 * periods, and during such time periods other queues with
++	 * higher timestamps happen to be busy, then the backshifted
++	 * timestamps of the former queues can become much lower than
++	 * the system virtual time. In fact, to serve the queues with
++	 * higher timestamps while the ones with lower timestamps are
++	 * idle, the system virtual time may be pushed-up to much
++	 * higher values than the finish timestamps of the idle
++	 * queues. As a consequence, the finish timestamps of all new
++	 * or newly activated queues may end up being much larger than
++	 * those of lucky queues with backshifted timestamps. The
++	 * latter queues may then monopolize the device for a lot of
++	 * time. This would simply break service guarantees.
++	 *
++	 * To reduce this problem, push up a little bit the
++	 * backshifted timestamps of the queue associated with this
++	 * entity (only a queue can happen to have the backshifted
++	 * flag set): just enough to let the finish timestamp of the
++	 * queue be equal to the current value of the system virtual
++	 * time. This may introduce a little unfairness among queues
++	 * with backshifted timestamps, but it does not break
++	 * worst-case fairness guarantees.
++	 */
++	if (backshifted && bfq_gt(st->vtime, entity->finish)) {
++		unsigned long delta = st->vtime - entity->finish;
++
++		entity->start += delta;
++		entity->finish += delta;
++	}
++
++	bfq_active_insert(st, entity);
++}
++
++/**
++ * bfq_activate_entity - activate an entity and its ancestors if necessary.
++ * @entity: the entity to activate.
++ * @non_blocking_wait_rq: true if this entity was waiting for a request
++ *
++ * Activate @entity and all the entities on the path from it to the root.
++ */
++static void bfq_activate_entity(struct bfq_entity *entity,
++				bool non_blocking_wait_rq)
++{
++	struct bfq_sched_data *sd;
++
++	for_each_entity(entity) {
++		__bfq_activate_entity(entity, non_blocking_wait_rq);
++
++		sd = entity->sched_data;
++		if (!bfq_update_next_in_service(sd))
++			/*
++			 * No need to propagate the activation to the
++			 * upper entities, as they will be updated when
++			 * the in-service entity is rescheduled.
++			 */
++			break;
++	}
++}
++
++/**
++ * __bfq_deactivate_entity - deactivate an entity from its service tree.
++ * @entity: the entity to deactivate.
++ * @requeue: if false, the entity will not be put into the idle tree.
++ *
++ * Deactivate an entity, independently from its previous state.  If the
++ * entity was not on a service tree just return, otherwise if it is on
++ * any scheduler tree, extract it from that tree, and if necessary
++ * and if the caller did not specify @requeue, put it on the idle tree.
++ *
++ * Return %1 if the caller should update the entity hierarchy, i.e.,
++ * if the entity was in service or if it was the next_in_service for
++ * its sched_data; return %0 otherwise.
++ */
++static int __bfq_deactivate_entity(struct bfq_entity *entity, int requeue)
++{
++	struct bfq_sched_data *sd = entity->sched_data;
++	struct bfq_service_tree *st = bfq_entity_service_tree(entity);
++	int is_in_service = entity == sd->in_service_entity;
++	int ret = 0;
++
++	if (!entity->on_st)
++		return 0;
++
++	if (is_in_service) {
++		bfq_calc_finish(entity, entity->service);
++		sd->in_service_entity = NULL;
++	} else if (entity->tree == &st->active)
++		bfq_active_extract(st, entity);
++	else if (entity->tree == &st->idle)
++		bfq_idle_extract(st, entity);
++
++	if (is_in_service || sd->next_in_service == entity)
++		ret = bfq_update_next_in_service(sd);
++
++	if (!requeue || !bfq_gt(entity->finish, st->vtime))
++		bfq_forget_entity(st, entity, is_in_service);
++	else
++		bfq_idle_insert(st, entity);
++
++	return ret;
++}
++
++/**
++ * bfq_deactivate_entity - deactivate an entity.
++ * @entity: the entity to deactivate.
++ * @requeue: true if the entity can be put on the idle tree
++ */
++static void bfq_deactivate_entity(struct bfq_entity *entity, int requeue)
++{
++	struct bfq_sched_data *sd;
++	struct bfq_entity *parent = NULL;
++
++	for_each_entity_safe(entity, parent) {
++		sd = entity->sched_data;
++
++		if (!__bfq_deactivate_entity(entity, requeue))
++			/*
++			 * The parent entity is still backlogged, and
++			 * we don't need to update it as it is still
++			 * in service.
++			 */
++			break;
++
++		if (sd->next_in_service)
++			/*
++			 * The parent entity is still backlogged and
++			 * the budgets on the path towards the root
++			 * need to be updated.
++			 */
++			goto update;
++
++		/*
++		 * If we get here, then the parent is no more backlogged and
++		 * we want to propagate the deactivation upwards.
++		 */
++		requeue = 1;
++	}
++
++	return;
++
++update:
++	entity = parent;
++	for_each_entity(entity) {
++		__bfq_activate_entity(entity, false);
++
++		sd = entity->sched_data;
++		if (!bfq_update_next_in_service(sd))
++			break;
++	}
++}
++
++/**
++ * bfq_update_vtime - update vtime if necessary.
++ * @st: the service tree to act upon.
++ *
++ * If necessary update the service tree vtime to have at least one
++ * eligible entity, skipping to its start time.  Assumes that the
++ * active tree of the device is not empty.
++ *
++ * NOTE: this hierarchical implementation updates vtimes quite often,
++ * we may end up with reactivated processes getting timestamps after a
++ * vtime skip done because we needed a ->first_active entity on some
++ * intermediate node.
++ */
++static void bfq_update_vtime(struct bfq_service_tree *st)
++{
++	struct bfq_entity *entry;
++	struct rb_node *node = st->active.rb_node;
++
++	entry = rb_entry(node, struct bfq_entity, rb_node);
++	if (bfq_gt(entry->min_start, st->vtime)) {
++		st->vtime = entry->min_start;
++		bfq_forget_idle(st);
++	}
++}
++
++/**
++ * bfq_first_active_entity - find the eligible entity with
++ *                           the smallest finish time
++ * @st: the service tree to select from.
++ *
++ * This function searches the first schedulable entity, starting from the
++ * root of the tree and going on the left every time on this side there is
++ * a subtree with at least one eligible (start >= vtime) entity. The path on
++ * the right is followed only if a) the left subtree contains no eligible
++ * entities and b) no eligible entity has been found yet.
++ */
++static struct bfq_entity *bfq_first_active_entity(struct bfq_service_tree *st)
++{
++	struct bfq_entity *entry, *first = NULL;
++	struct rb_node *node = st->active.rb_node;
++
++	while (node) {
++		entry = rb_entry(node, struct bfq_entity, rb_node);
++left:
++		if (!bfq_gt(entry->start, st->vtime))
++			first = entry;
++
++		if (node->rb_left) {
++			entry = rb_entry(node->rb_left,
++					 struct bfq_entity, rb_node);
++			if (!bfq_gt(entry->min_start, st->vtime)) {
++				node = node->rb_left;
++				goto left;
++			}
++		}
++		if (first)
++			break;
++		node = node->rb_right;
++	}
++
++	return first;
++}
++
++/**
++ * __bfq_lookup_next_entity - return the first eligible entity in @st.
++ * @st: the service tree.
++ *
++ * Update the virtual time in @st and return the first eligible entity
++ * it contains.
++ */
++static struct bfq_entity *__bfq_lookup_next_entity(struct bfq_service_tree *st,
++						   bool force)
++{
++	struct bfq_entity *entity, *new_next_in_service = NULL;
++
++	if (RB_EMPTY_ROOT(&st->active))
++		return NULL;
++
++	bfq_update_vtime(st);
++	entity = bfq_first_active_entity(st);
++
++	/*
++	 * If the chosen entity does not match with the sched_data's
++	 * next_in_service and we are forcedly serving the IDLE priority
++	 * class tree, bubble up budget update.
++	 */
++	if (unlikely(force && entity != entity->sched_data->next_in_service)) {
++		new_next_in_service = entity;
++		for_each_entity(new_next_in_service)
++			bfq_update_budget(new_next_in_service);
++	}
++
++	return entity;
++}
++
++/**
++ * bfq_lookup_next_entity - return the first eligible entity in @sd.
++ * @sd: the sched_data.
++ * @extract: if true the returned entity will be also extracted from @sd.
++ *
++ * NOTE: since we cache the next_in_service entity at each level of the
++ * hierarchy, the complexity of the lookup can be decreased with
++ * absolutely no effort just returning the cached next_in_service value;
++ * we prefer to do full lookups to test the consistency of the data
++ * structures.
++ */
++static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
++						 int extract,
++						 struct bfq_data *bfqd)
++{
++	struct bfq_service_tree *st = sd->service_tree;
++	struct bfq_entity *entity;
++	int i = 0;
++
++	/*
++	 * Choose from idle class, if needed to guarantee a minimum
++	 * bandwidth to this class. This should also mitigate
++	 * priority-inversion problems in case a low priority task is
++	 * holding file system resources.
++	 */
++	if (bfqd &&
++	    jiffies - bfqd->bfq_class_idle_last_service >
++	    BFQ_CL_IDLE_TIMEOUT) {
++		entity = __bfq_lookup_next_entity(st + BFQ_IOPRIO_CLASSES - 1,
++						  true);
++		if (entity) {
++			i = BFQ_IOPRIO_CLASSES - 1;
++			bfqd->bfq_class_idle_last_service = jiffies;
++			sd->next_in_service = entity;
++		}
++	}
++	for (; i < BFQ_IOPRIO_CLASSES; i++) {
++		entity = __bfq_lookup_next_entity(st + i, false);
++		if (entity) {
++			if (extract) {
++				bfq_check_next_in_service(sd, entity);
++				bfq_active_extract(st + i, entity);
++				sd->in_service_entity = entity;
++				sd->next_in_service = NULL;
++			}
++			break;
++		}
++	}
++
++	return entity;
++}
++
++static bool next_queue_may_preempt(struct bfq_data *bfqd)
++{
++	struct bfq_sched_data *sd = &bfqd->sched_data;
++
++	return sd->next_in_service != sd->in_service_entity;
++}
++
++
++/*
++ * Get next queue for service.
++ */
++static struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
++{
++	struct bfq_entity *entity = NULL;
++	struct bfq_sched_data *sd;
++	struct bfq_queue *bfqq;
++
++	if (bfqd->busy_queues == 0)
++		return NULL;
++
++	sd = &bfqd->sched_data;
++	for (; sd ; sd = entity->my_sched_data) {
++		entity = bfq_lookup_next_entity(sd, 1, bfqd);
++		entity->service = 0;
++	}
++
++	bfqq = bfq_entity_to_bfqq(entity);
++
++	return bfqq;
++}
++
++static void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
++{
++	struct bfq_queue *in_serv_bfqq = bfqd->in_service_queue;
++	struct bfq_entity *in_serv_entity = &in_serv_bfqq->entity;
++
++	if (bfqd->in_service_bic) {
++		put_io_context(bfqd->in_service_bic->icq.ioc);
++		bfqd->in_service_bic = NULL;
++	}
++
++	bfq_clear_bfqq_wait_request(in_serv_bfqq);
++	hrtimer_try_to_cancel(&bfqd->idle_slice_timer);
++	bfqd->in_service_queue = NULL;
++
++	/*
++	 * in_serv_entity is no longer in service, so, if it is in no
++	 * service tree either, then release the service reference to
++	 * the queue it represents (taken with bfq_get_entity).
++	 */
++	if (!in_serv_entity->on_st)
++		bfq_put_queue(in_serv_bfqq);
++}
++
++static void bfq_deactivate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++				int requeue)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	bfq_deactivate_entity(entity, requeue);
++}
++
++static void bfq_activate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	bfq_activate_entity(entity, bfq_bfqq_non_blocking_wait_rq(bfqq));
++	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
++}
++
++/*
++ * Called when the bfqq no longer has requests pending, remove it from
++ * the service tree.
++ */
++static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			      int requeue)
++{
++	bfq_log_bfqq(bfqd, bfqq, "del from busy");
++
++	bfq_clear_bfqq_busy(bfqq);
++
++	bfqd->busy_queues--;
++
++	bfq_deactivate_bfqq(bfqd, bfqq, requeue);
++}
++
++/*
++ * Called when an inactive queue receives a new request.
++ */
++static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	bfq_log_bfqq(bfqd, bfqq, "add to busy");
++
++	bfq_activate_bfqq(bfqd, bfqq);
++
++	bfq_mark_bfqq_busy(bfqq);
++	bfqd->busy_queues++;
++}
++
++static void bfq_init_entity(struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	entity->weight = entity->new_weight;
++	entity->orig_weight = entity->new_weight;
++
++	bfqq->ioprio = bfqq->new_ioprio;
++	bfqq->ioprio_class = bfqq->new_ioprio_class;
++
++	entity->sched_data = &bfqq->bfqd->sched_data;
++}
++
++#define bfq_class_idle(bfqq)	((bfqq)->ioprio_class == IOPRIO_CLASS_IDLE)
++#define bfq_class_rt(bfqq)	((bfqq)->ioprio_class == IOPRIO_CLASS_RT)
++
++#define bfq_sample_valid(samples)	((samples) > 80)
++
++/*
++ * Scheduler run of queue, if there are requests pending and no one in the
++ * driver that will restart queueing.
++ */
++static void bfq_schedule_dispatch(struct bfq_data *bfqd)
++{
++	if (bfqd->queued != 0) {
++		bfq_log(bfqd, "schedule dispatch");
++		blk_mq_run_hw_queues(bfqd->queue, true);
++	}
++}
++
++/*
++ * Lifted from AS - choose which of rq1 and rq2 that is best served now.
++ * We choose the request that is closesr to the head right now.  Distance
++ * behind the head is penalized and only allowed to a certain extent.
++ */
++static struct request *bfq_choose_req(struct bfq_data *bfqd,
++				      struct request *rq1,
++				      struct request *rq2,
++				      sector_t last)
++{
++	sector_t s1, s2, d1 = 0, d2 = 0;
++	unsigned long back_max;
++#define BFQ_RQ1_WRAP	0x01 /* request 1 wraps */
++#define BFQ_RQ2_WRAP	0x02 /* request 2 wraps */
++	unsigned int wrap = 0; /* bit mask: requests behind the disk head? */
++
++	if (!rq1 || rq1 == rq2)
++		return rq2;
++	if (!rq2)
++		return rq1;
++
++	if (rq_is_sync(rq1) && !rq_is_sync(rq2))
++		return rq1;
++	else if (rq_is_sync(rq2) && !rq_is_sync(rq1))
++		return rq2;
++	if ((rq1->cmd_flags & REQ_META) && !(rq2->cmd_flags & REQ_META))
++		return rq1;
++	else if ((rq2->cmd_flags & REQ_META) && !(rq1->cmd_flags & REQ_META))
++		return rq2;
++
++	s1 = blk_rq_pos(rq1);
++	s2 = blk_rq_pos(rq2);
++
++	/*
++	 * By definition, 1KiB is 2 sectors.
++	 */
++	back_max = bfqd->bfq_back_max * 2;
++
++	/*
++	 * Strict one way elevator _except_ in the case where we allow
++	 * short backward seeks which are biased as twice the cost of a
++	 * similar forward seek.
++	 */
++	if (s1 >= last)
++		d1 = s1 - last;
++	else if (s1 + back_max >= last)
++		d1 = (last - s1) * bfqd->bfq_back_penalty;
++	else
++		wrap |= BFQ_RQ1_WRAP;
++
++	if (s2 >= last)
++		d2 = s2 - last;
++	else if (s2 + back_max >= last)
++		d2 = (last - s2) * bfqd->bfq_back_penalty;
++	else
++		wrap |= BFQ_RQ2_WRAP;
++
++	/* Found required data */
++
++	/*
++	 * By doing switch() on the bit mask "wrap" we avoid having to
++	 * check two variables for all permutations: --> faster!
++	 */
++	switch (wrap) {
++	case 0: /* common case for CFQ: rq1 and rq2 not wrapped */
++		if (d1 < d2)
++			return rq1;
++		else if (d2 < d1)
++			return rq2;
++
++		if (s1 >= s2)
++			return rq1;
++		else
++			return rq2;
++
++	case BFQ_RQ2_WRAP:
++		return rq1;
++	case BFQ_RQ1_WRAP:
++		return rq2;
++	case BFQ_RQ1_WRAP|BFQ_RQ2_WRAP: /* both rqs wrapped */
++	default:
++		/*
++		 * Since both rqs are wrapped,
++		 * start with the one that's further behind head
++		 * (--> only *one* back seek required),
++		 * since back seek takes more time than forward.
++		 */
++		if (s1 <= s2)
++			return rq1;
++		else
++			return rq2;
++	}
++}
++
++/*
++ * Return expired entry, or NULL to just start from scratch in rbtree.
++ */
++static struct request *bfq_check_fifo(struct bfq_queue *bfqq,
++				      struct request *last)
++{
++	struct request *rq;
++
++	if (bfq_bfqq_fifo_expire(bfqq))
++		return NULL;
++
++	bfq_mark_bfqq_fifo_expire(bfqq);
++
++	rq = rq_entry_fifo(bfqq->fifo.next);
++
++	if (rq == last || ktime_get_ns() < rq->fifo_time)
++		return NULL;
++
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "check_fifo: returned %p", rq);
++	return rq;
++}
++
++static struct request *bfq_find_next_rq(struct bfq_data *bfqd,
++					struct bfq_queue *bfqq,
++					struct request *last)
++{
++	struct rb_node *rbnext = rb_next(&last->rb_node);
++	struct rb_node *rbprev = rb_prev(&last->rb_node);
++	struct request *next, *prev = NULL;
++
++	/* Follow expired path, else get first next available. */
++	next = bfq_check_fifo(bfqq, last);
++	if (next)
++		return next;
++
++	if (rbprev)
++		prev = rb_entry_rq(rbprev);
++
++	if (rbnext)
++		next = rb_entry_rq(rbnext);
++	else {
++		rbnext = rb_first(&bfqq->sort_list);
++		if (rbnext && rbnext != &last->rb_node)
++			next = rb_entry_rq(rbnext);
++	}
++
++	return bfq_choose_req(bfqd, next, prev, blk_rq_pos(last));
++}
++
++static unsigned long bfq_serv_to_charge(struct request *rq,
++					struct bfq_queue *bfqq)
++{
++	return blk_rq_sectors(rq);
++}
++
++/**
++ * bfq_updated_next_req - update the queue after a new next_rq selection.
++ * @bfqd: the device data the queue belongs to.
++ * @bfqq: the queue to update.
++ *
++ * If the first request of a queue changes we make sure that the queue
++ * has enough budget to serve at least its first request (if the
++ * request has grown).  We do this because if the queue has not enough
++ * budget for its first request, it has to go through two dispatch
++ * rounds to actually get it dispatched.
++ */
++static void bfq_updated_next_req(struct bfq_data *bfqd,
++				 struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++	struct request *next_rq = bfqq->next_rq;
++	unsigned long new_budget;
++
++	if (!next_rq)
++		return;
++
++	if (bfqq == bfqd->in_service_queue)
++		/*
++		 * In order not to break guarantees, budgets cannot be
++		 * changed after an entity has been selected.
++		 */
++		return;
++
++	new_budget = max_t(unsigned long, bfqq->max_budget,
++			   bfq_serv_to_charge(next_rq, bfqq));
++	if (entity->budget != new_budget) {
++		entity->budget = new_budget;
++		bfq_log_bfqq(bfqd, bfqq, "updated next rq: new budget %lu",
++					 new_budget);
++		bfq_activate_bfqq(bfqd, bfqq);
++	}
++}
++
++static int bfq_bfqq_budget_left(struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	return entity->budget - entity->service;
++}
++
++/*
++ * If enough samples have been computed, return the current max budget
++ * stored in bfqd, which is dynamically updated according to the
++ * estimated disk peak rate; otherwise return the default max budget
++ */
++static int bfq_max_budget(struct bfq_data *bfqd)
++{
++	if (bfqd->budgets_assigned < bfq_stats_min_budgets)
++		return bfq_default_max_budget;
++	else
++		return bfqd->bfq_max_budget;
++}
++
++/*
++ * Return min budget, which is a fraction of the current or default
++ * max budget (trying with 1/32)
++ */
++static int bfq_min_budget(struct bfq_data *bfqd)
++{
++	if (bfqd->budgets_assigned < bfq_stats_min_budgets)
++		return bfq_default_max_budget / 32;
++	else
++		return bfqd->bfq_max_budget / 32;
++}
++
++static void bfq_bfqq_expire(struct bfq_data *bfqd,
++			    struct bfq_queue *bfqq,
++			    bool compensate,
++			    enum bfqq_expiration reason);
++
++/*
++ * The next function, invoked after the input queue bfqq switches from
++ * idle to busy, updates the budget of bfqq. The function also tells
++ * whether the in-service queue should be expired, by returning
++ * true. The purpose of expiring the in-service queue is to give bfqq
++ * the chance to possibly preempt the in-service queue, and the reason
++ * for preempting the in-service queue is to achieve the following
++ * goal: guarantee to bfqq its reserved bandwidth even if bfqq has
++ * expired because it has remained idle.
++ *
++ * In particular, bfqq may have expired for one of the following two
++ * reasons:
++ *
++ * - BFQQE_NO_MORE_REQUESTS bfqq did not enjoy any device idling
++ *   and did not make it to issue a new request before its last
++ *   request was served;
++ *
++ * - BFQQE_TOO_IDLE bfqq did enjoy device idling, but did not issue
++ *   a new request before the expiration of the idling-time.
++ *
++ * Even if bfqq has expired for one of the above reasons, the process
++ * associated with the queue may be however issuing requests greedily,
++ * and thus be sensitive to the bandwidth it receives (bfqq may have
++ * remained idle for other reasons: CPU high load, bfqq not enjoying
++ * idling, I/O throttling somewhere in the path from the process to
++ * the I/O scheduler, ...). But if, after every expiration for one of
++ * the above two reasons, bfqq has to wait for the service of at least
++ * one full budget of another queue before being served again, then
++ * bfqq is likely to get a much lower bandwidth or resource time than
++ * its reserved ones. To address this issue, two countermeasures need
++ * to be taken.
++ *
++ * First, the budget and the timestamps of bfqq need to be updated in
++ * a special way on bfqq reactivation: they need to be updated as if
++ * bfqq did not remain idle and did not expire. In fact, if they are
++ * computed as if bfqq expired and remained idle until reactivation,
++ * then the process associated with bfqq is treated as if, instead of
++ * being greedy, it stopped issuing requests when bfqq remained idle,
++ * and restarts issuing requests only on this reactivation. In other
++ * words, the scheduler does not help the process recover the "service
++ * hole" between bfqq expiration and reactivation. As a consequence,
++ * the process receives a lower bandwidth than its reserved one. In
++ * contrast, to recover this hole, the budget must be updated as if
++ * bfqq was not expired at all before this reactivation, i.e., it must
++ * be set to the value of the remaining budget when bfqq was
++ * expired. Along the same line, timestamps need to be assigned the
++ * value they had the last time bfqq was selected for service, i.e.,
++ * before last expiration. Thus timestamps need to be back-shifted
++ * with respect to their normal computation (see [1] for more details
++ * on this tricky aspect).
++ *
++ * Secondly, to allow the process to recover the hole, the in-service
++ * queue must be expired too, to give bfqq the chance to preempt it
++ * immediately. In fact, if bfqq has to wait for a full budget of the
++ * in-service queue to be completed, then it may become impossible to
++ * let the process recover the hole, even if the back-shifted
++ * timestamps of bfqq are lower than those of the in-service queue. If
++ * this happens for most or all of the holes, then the process may not
++ * receive its reserved bandwidth. In this respect, it is worth noting
++ * that, being the service of outstanding requests unpreemptible, a
++ * little fraction of the holes may however be unrecoverable, thereby
++ * causing a little loss of bandwidth.
++ *
++ * The last important point is detecting whether bfqq does need this
++ * bandwidth recovery. In this respect, the next function deems the
++ * process associated with bfqq greedy, and thus allows it to recover
++ * the hole, if: 1) the process is waiting for the arrival of a new
++ * request (which implies that bfqq expired for one of the above two
++ * reasons), and 2) such a request has arrived soon. The first
++ * condition is controlled through the flag non_blocking_wait_rq,
++ * while the second through the flag arrived_in_time. If both
++ * conditions hold, then the function computes the budget in the
++ * above-described special way, and signals that the in-service queue
++ * should be expired. Timestamp back-shifting is done later in
++ * __bfq_activate_entity.
++ */
++static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
++						struct bfq_queue *bfqq,
++						bool arrived_in_time)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	if (bfq_bfqq_non_blocking_wait_rq(bfqq) && arrived_in_time) {
++		/*
++		 * We do not clear the flag non_blocking_wait_rq here, as
++		 * the latter is used in bfq_activate_bfqq to signal
++		 * that timestamps need to be back-shifted (and is
++		 * cleared right after).
++		 */
++
++		/*
++		 * In next assignment we rely on that either
++		 * entity->service or entity->budget are not updated
++		 * on expiration if bfqq is empty (see
++		 * __bfq_bfqq_recalc_budget). Thus both quantities
++		 * remain unchanged after such an expiration, and the
++		 * following statement therefore assigns to
++		 * entity->budget the remaining budget on such an
++		 * expiration. For clarity, entity->service is not
++		 * updated on expiration in any case, and, in normal
++		 * operation, is reset only when bfqq is selected for
++		 * service (see bfq_get_next_queue).
++		 */
++		entity->budget = min_t(unsigned long,
++				       bfq_bfqq_budget_left(bfqq),
++				       bfqq->max_budget);
++
++		return true;
++	}
++
++	entity->budget = max_t(unsigned long, bfqq->max_budget,
++			       bfq_serv_to_charge(bfqq->next_rq, bfqq));
++	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
++	return false;
++}
++
++static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
++					     struct bfq_queue *bfqq,
++					     struct request *rq)
++{
++	bool bfqq_wants_to_preempt,
++		/*
++		 * See the comments on
++		 * bfq_bfqq_update_budg_for_activation for
++		 * details on the usage of the next variable.
++		 */
++		arrived_in_time =  ktime_get_ns() <=
++			bfqq->ttime.last_end_request +
++			bfqd->bfq_slice_idle * 3;
++
++	/*
++	 * Update budget and check whether bfqq may want to preempt
++	 * the in-service queue.
++	 */
++	bfqq_wants_to_preempt =
++		bfq_bfqq_update_budg_for_activation(bfqd, bfqq,
++						    arrived_in_time);
++
++	if (!bfq_bfqq_IO_bound(bfqq)) {
++		if (arrived_in_time) {
++			bfqq->requests_within_timer++;
++			if (bfqq->requests_within_timer >=
++			    bfqd->bfq_requests_within_timer)
++				bfq_mark_bfqq_IO_bound(bfqq);
++		} else
++			bfqq->requests_within_timer = 0;
++	}
++
++	bfq_add_bfqq_busy(bfqd, bfqq);
++
++	/*
++	 * Expire in-service queue only if preemption may be needed
++	 * for guarantees. In this respect, the function
++	 * next_queue_may_preempt just checks a simple, necessary
++	 * condition, and not a sufficient condition based on
++	 * timestamps. In fact, for the latter condition to be
++	 * evaluated, timestamps would need first to be updated, and
++	 * this operation is quite costly (see the comments on the
++	 * function bfq_bfqq_update_budg_for_activation).
++	 */
++	if (bfqd->in_service_queue && bfqq_wants_to_preempt &&
++	    next_queue_may_preempt(bfqd))
++		bfq_bfqq_expire(bfqd, bfqd->in_service_queue,
++				false, BFQQE_PREEMPTED);
++}
++
++static void bfq_add_request(struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++	struct bfq_data *bfqd = bfqq->bfqd;
++	struct request *next_rq, *prev;
++
++	bfq_log_bfqq(bfqd, bfqq, "add_request %d", rq_is_sync(rq));
++	bfqq->queued[rq_is_sync(rq)]++;
++	bfqd->queued++;
++
++	elv_rb_add(&bfqq->sort_list, rq);
++
++	/*
++	 * Check if this request is a better next-serve candidate.
++	 */
++	prev = bfqq->next_rq;
++	next_rq = bfq_choose_req(bfqd, bfqq->next_rq, rq, bfqd->last_position);
++	bfqq->next_rq = next_rq;
++
++	if (!bfq_bfqq_busy(bfqq)) /* switching to busy ... */
++		bfq_bfqq_handle_idle_busy_switch(bfqd, bfqq, rq);
++	else if (prev != bfqq->next_rq)
++		bfq_updated_next_req(bfqd, bfqq);
++}
++
++static struct request *bfq_find_rq_fmerge(struct bfq_data *bfqd,
++					  struct bio *bio,
++					  struct request_queue *q)
++{
++	struct bfq_queue *bfqq = bfqd->bio_bfqq;
++
++
++	if (bfqq)
++		return elv_rb_find(&bfqq->sort_list, bio_end_sector(bio));
++
++	return NULL;
++}
++
++#if 0 /* Still not clear if we can do without next two functions */
++static void bfq_activate_request(struct request_queue *q, struct request *rq)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++
++	bfqd->rq_in_driver++;
++	bfqd->last_position = blk_rq_pos(rq) + blk_rq_sectors(rq);
++	bfq_log(bfqd, "activate_request: new bfqd->last_position %llu",
++		(unsigned long long)bfqd->last_position);
++}
++
++static void bfq_deactivate_request(struct request_queue *q, struct request *rq)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++
++	bfqd->rq_in_driver--;
++}
++#endif
++
++static void bfq_remove_request(struct request_queue *q,
++			       struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++	struct bfq_data *bfqd = bfqq->bfqd;
++	const int sync = rq_is_sync(rq);
++
++	if (bfqq->next_rq == rq) {
++		bfqq->next_rq = bfq_find_next_rq(bfqd, bfqq, rq);
++		bfq_updated_next_req(bfqd, bfqq);
++	}
++
++	if (rq->queuelist.prev != &rq->queuelist)
++		list_del_init(&rq->queuelist);
++	bfqq->queued[sync]--;
++	bfqd->queued--;
++	elv_rb_del(&bfqq->sort_list, rq);
++
++	elv_rqhash_del(q, rq);
++	if (q->last_merge == rq)
++		q->last_merge = NULL;
++
++	if (RB_EMPTY_ROOT(&bfqq->sort_list)) {
++		bfqq->next_rq = NULL;
++
++		if (bfq_bfqq_busy(bfqq) && bfqq != bfqd->in_service_queue) {
++			bfq_del_bfqq_busy(bfqd, bfqq, 1);
++			/*
++			 * bfqq emptied. In normal operation, when
++			 * bfqq is empty, bfqq->entity.service and
++			 * bfqq->entity.budget must contain,
++			 * respectively, the service received and the
++			 * budget used last time bfqq emptied. These
++			 * facts do not hold in this case, as at least
++			 * this last removal occurred while bfqq is
++			 * not in service. To avoid inconsistencies,
++			 * reset both bfqq->entity.service and
++			 * bfqq->entity.budget, if bfqq has still a
++			 * process that may issue I/O requests to it.
++			 */
++			bfqq->entity.budget = bfqq->entity.service = 0;
++		}
++	}
++
++	if (rq->cmd_flags & REQ_META)
++		bfqq->meta_pending--;
++}
++
++static bool bfq_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
++{
++	struct request_queue *q = hctx->queue;
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	struct request *free = NULL;
++	/*
++	 * bfq_bic_lookup grabs the queue_lock: invoke it now and
++	 * store its return value for later use, to avoid nesting
++	 * queue_lock inside the bfqd->lock. We assume that the bic
++	 * returned by bfq_bic_lookup does not go away before
++	 * bfqd->lock is taken.
++	 */
++	struct bfq_io_cq *bic = bfq_bic_lookup(bfqd, current->io_context, q);
++	bool ret;
++
++	spin_lock_irq(&bfqd->lock);
++
++	if (bic)
++		bfqd->bio_bfqq = bic_to_bfqq(bic, op_is_sync(bio->bi_opf));
++	else
++		bfqd->bio_bfqq = NULL;
++	bfqd->bio_bic = bic;
++
++	ret = blk_mq_sched_try_merge(q, bio, &free);
++
++	if (free)
++		blk_mq_free_request(free);
++	spin_unlock_irq(&bfqd->lock);
++
++	return ret;
++}
++
++static int bfq_request_merge(struct request_queue *q, struct request **req,
++			     struct bio *bio)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	struct request *__rq;
++
++	__rq = bfq_find_rq_fmerge(bfqd, bio, q);
++	if (__rq && elv_bio_merge_ok(__rq, bio)) {
++		*req = __rq;
++		return ELEVATOR_FRONT_MERGE;
++	}
++
++	return ELEVATOR_NO_MERGE;
++}
++
++static void bfq_request_merged(struct request_queue *q, struct request *req,
++			       enum elv_merge type)
++{
++	if (type == ELEVATOR_FRONT_MERGE &&
++	    rb_prev(&req->rb_node) &&
++	    blk_rq_pos(req) <
++	    blk_rq_pos(container_of(rb_prev(&req->rb_node),
++				    struct request, rb_node))) {
++		struct bfq_queue *bfqq = RQ_BFQQ(req);
++		struct bfq_data *bfqd = bfqq->bfqd;
++		struct request *prev, *next_rq;
++
++		/* Reposition request in its sort_list */
++		elv_rb_del(&bfqq->sort_list, req);
++		elv_rb_add(&bfqq->sort_list, req);
++
++		/* Choose next request to be served for bfqq */
++		prev = bfqq->next_rq;
++		next_rq = bfq_choose_req(bfqd, bfqq->next_rq, req,
++					 bfqd->last_position);
++		bfqq->next_rq = next_rq;
++		/*
++		 * If next_rq changes, update the queue's budget to fit
++		 * the new request.
++		 */
++		if (prev != bfqq->next_rq)
++			bfq_updated_next_req(bfqd, bfqq);
++	}
++}
++
++static void bfq_requests_merged(struct request_queue *q, struct request *rq,
++				struct request *next)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq), *next_bfqq = RQ_BFQQ(next);
++
++	if (!RB_EMPTY_NODE(&rq->rb_node))
++		return;
++	spin_lock_irq(&bfqq->bfqd->lock);
++
++	/*
++	 * If next and rq belong to the same bfq_queue and next is older
++	 * than rq, then reposition rq in the fifo (by substituting next
++	 * with rq). Otherwise, if next and rq belong to different
++	 * bfq_queues, never reposition rq: in fact, we would have to
++	 * reposition it with respect to next's position in its own fifo,
++	 * which would most certainly be too expensive with respect to
++	 * the benefits.
++	 */
++	if (bfqq == next_bfqq &&
++	    !list_empty(&rq->queuelist) && !list_empty(&next->queuelist) &&
++	    next->fifo_time < rq->fifo_time) {
++		list_del_init(&rq->queuelist);
++		list_replace_init(&next->queuelist, &rq->queuelist);
++		rq->fifo_time = next->fifo_time;
++	}
++
++	if (bfqq->next_rq == next)
++		bfqq->next_rq = rq;
++
++	bfq_remove_request(q, next);
++
++	spin_unlock_irq(&bfqq->bfqd->lock);
++}
++
++static bool bfq_allow_bio_merge(struct request_queue *q, struct request *rq,
++				struct bio *bio)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	bool is_sync = op_is_sync(bio->bi_opf);
++	struct bfq_queue *bfqq = bfqd->bio_bfqq;
++
++	/*
++	 * Disallow merge of a sync bio into an async request.
++	 */
++	if (is_sync && !rq_is_sync(rq))
++		return false;
++
++	/*
++	 * Lookup the bfqq that this bio will be queued with. Allow
++	 * merge only if rq is queued there.
++	 */
++	if (!bfqq)
++		return false;
++
++	return bfqq == RQ_BFQQ(rq);
++}
++
++static void __bfq_set_in_service_queue(struct bfq_data *bfqd,
++				       struct bfq_queue *bfqq)
++{
++	if (bfqq) {
++		bfq_mark_bfqq_budget_new(bfqq);
++		bfq_clear_bfqq_fifo_expire(bfqq);
++
++		bfqd->budgets_assigned = (bfqd->budgets_assigned * 7 + 256) / 8;
++
++		bfq_log_bfqq(bfqd, bfqq,
++			     "set_in_service_queue, cur-budget = %d",
++			     bfqq->entity.budget);
++	}
++
++	bfqd->in_service_queue = bfqq;
++}
++
++/*
++ * Get and set a new queue for service.
++ */
++static struct bfq_queue *bfq_set_in_service_queue(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq = bfq_get_next_queue(bfqd);
++
++	__bfq_set_in_service_queue(bfqd, bfqq);
++	return bfqq;
++}
++
++/*
++ * bfq_default_budget - return the default budget for @bfqq on @bfqd.
++ * @bfqd: the device descriptor.
++ * @bfqq: the queue to consider.
++ *
++ * We use 3/4 of the @bfqd maximum budget as the default value
++ * for the max_budget field of the queues.  This lets the feedback
++ * mechanism to start from some middle ground, then the behavior
++ * of the process will drive the heuristics towards high values, if
++ * it behaves as a greedy sequential reader, or towards small values
++ * if it shows a more intermittent behavior.
++ */
++static unsigned long bfq_default_budget(struct bfq_data *bfqd,
++					struct bfq_queue *bfqq)
++{
++	unsigned long budget;
++
++	/*
++	 * When we need an estimate of the peak rate we need to avoid
++	 * to give budgets that are too short due to previous
++	 * measurements.  So, in the first 10 assignments use a
++	 * ``safe'' budget value. For such first assignment the value
++	 * of bfqd->budgets_assigned happens to be lower than 194.
++	 * See __bfq_set_in_service_queue for the formula by which
++	 * this field is computed.
++	 */
++	if (bfqd->budgets_assigned < 194 && bfqd->bfq_user_max_budget == 0)
++		budget = bfq_default_max_budget;
++	else
++		budget = bfqd->bfq_max_budget;
++
++	return budget - budget / 4;
++}
++
++static void bfq_arm_slice_timer(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq = bfqd->in_service_queue;
++	struct bfq_io_cq *bic;
++	u32 sl;
++
++	/* Processes have exited, don't wait. */
++	bic = bfqd->in_service_bic;
++	if (!bic || atomic_read(&bic->icq.ioc->active_ref) == 0)
++		return;
++
++	bfq_mark_bfqq_wait_request(bfqq);
++
++	/*
++	 * We don't want to idle for seeks, but we do want to allow
++	 * fair distribution of slice time for a process doing back-to-back
++	 * seeks. So allow a little bit of time for him to submit a new rq.
++	 */
++	sl = bfqd->bfq_slice_idle;
++	/*
++	 * Grant only minimum idle time if the queue is seeky.
++	 */
++	if (BFQQ_SEEKY(bfqq))
++		sl = min_t(u64, sl, BFQ_MIN_TT);
++
++	bfqd->last_idling_start = ktime_get();
++	hrtimer_start(&bfqd->idle_slice_timer, ns_to_ktime(sl),
++		      HRTIMER_MODE_REL);
++}
++
++/*
++ * Set the maximum time for the in-service queue to consume its
++ * budget. This prevents seeky processes from lowering the disk
++ * throughput (always guaranteed with a time slice scheme as in CFQ).
++ */
++static void bfq_set_budget_timeout(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq = bfqd->in_service_queue;
++	unsigned int timeout_coeff = bfqq->entity.weight /
++				     bfqq->entity.orig_weight;
++
++	bfqd->last_budget_start = ktime_get();
++
++	bfq_clear_bfqq_budget_new(bfqq);
++	bfqq->budget_timeout = jiffies +
++		bfqd->bfq_timeout * timeout_coeff;
++
++	bfq_log_bfqq(bfqd, bfqq, "set budget_timeout %u",
++		jiffies_to_msecs(bfqd->bfq_timeout * timeout_coeff));
++}
++
++/*
++ * Remove request from internal lists.
++ */
++static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++
++	/*
++	 * For consistency, the next instruction should have been
++	 * executed after removing the request from the queue and
++	 * dispatching it.  We execute instead this instruction before
++	 * bfq_remove_request() (and hence introduce a temporary
++	 * inconsistency), for efficiency.  In fact, should this
++	 * dispatch occur for a non in-service bfqq, this anticipated
++	 * increment prevents two counters related to bfqq->dispatched
++	 * from risking to be, first, uselessly decremented, and then
++	 * incremented again when the (new) value of bfqq->dispatched
++	 * happens to be taken into account.
++	 */
++	bfqq->dispatched++;
++
++	bfq_remove_request(q, rq);
++}
++
++static void __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	__bfq_bfqd_reset_in_service(bfqd);
++
++	if (RB_EMPTY_ROOT(&bfqq->sort_list))
++		bfq_del_bfqq_busy(bfqd, bfqq, 1);
++	else
++		bfq_activate_bfqq(bfqd, bfqq);
++}
++
++/**
++ * __bfq_bfqq_recalc_budget - try to adapt the budget to the @bfqq behavior.
++ * @bfqd: device data.
++ * @bfqq: queue to update.
++ * @reason: reason for expiration.
++ *
++ * Handle the feedback on @bfqq budget at queue expiration.
++ * See the body for detailed comments.
++ */
++static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
++				     struct bfq_queue *bfqq,
++				     enum bfqq_expiration reason)
++{
++	struct request *next_rq;
++	int budget, min_budget;
++
++	budget = bfqq->max_budget;
++	min_budget = bfq_min_budget(bfqd);
++
++	bfq_log_bfqq(bfqd, bfqq, "recalc_budg: last budg %d, budg left %d",
++		bfqq->entity.budget, bfq_bfqq_budget_left(bfqq));
++	bfq_log_bfqq(bfqd, bfqq, "recalc_budg: last max_budg %d, min budg %d",
++		budget, bfq_min_budget(bfqd));
++	bfq_log_bfqq(bfqd, bfqq, "recalc_budg: sync %d, seeky %d",
++		bfq_bfqq_sync(bfqq), BFQQ_SEEKY(bfqd->in_service_queue));
++
++	if (bfq_bfqq_sync(bfqq)) {
++		switch (reason) {
++		/*
++		 * Caveat: in all the following cases we trade latency
++		 * for throughput.
++		 */
++		case BFQQE_TOO_IDLE:
++			if (budget > min_budget + BFQ_BUDGET_STEP)
++				budget -= BFQ_BUDGET_STEP;
++			else
++				budget = min_budget;
++			break;
++		case BFQQE_BUDGET_TIMEOUT:
++			budget = bfq_default_budget(bfqd, bfqq);
++			break;
++		case BFQQE_BUDGET_EXHAUSTED:
++			/*
++			 * The process still has backlog, and did not
++			 * let either the budget timeout or the disk
++			 * idling timeout expire. Hence it is not
++			 * seeky, has a short thinktime and may be
++			 * happy with a higher budget too. So
++			 * definitely increase the budget of this good
++			 * candidate to boost the disk throughput.
++			 */
++			budget = min(budget + 8 * BFQ_BUDGET_STEP,
++				     bfqd->bfq_max_budget);
++			break;
++		case BFQQE_NO_MORE_REQUESTS:
++			/*
++			 * For queues that expire for this reason, it
++			 * is particularly important to keep the
++			 * budget close to the actual service they
++			 * need. Doing so reduces the timestamp
++			 * misalignment problem described in the
++			 * comments in the body of
++			 * __bfq_activate_entity. In fact, suppose
++			 * that a queue systematically expires for
++			 * BFQQE_NO_MORE_REQUESTS and presents a
++			 * new request in time to enjoy timestamp
++			 * back-shifting. The larger the budget of the
++			 * queue is with respect to the service the
++			 * queue actually requests in each service
++			 * slot, the more times the queue can be
++			 * reactivated with the same virtual finish
++			 * time. It follows that, even if this finish
++			 * time is pushed to the system virtual time
++			 * to reduce the consequent timestamp
++			 * misalignment, the queue unjustly enjoys for
++			 * many re-activations a lower finish time
++			 * than all newly activated queues.
++			 *
++			 * The service needed by bfqq is measured
++			 * quite precisely by bfqq->entity.service.
++			 * Since bfqq does not enjoy device idling,
++			 * bfqq->entity.service is equal to the number
++			 * of sectors that the process associated with
++			 * bfqq requested to read/write before waiting
++			 * for request completions, or blocking for
++			 * other reasons.
++			 */
++			budget = max_t(int, bfqq->entity.service, min_budget);
++			break;
++		default:
++			return;
++		}
++	} else {
++		/*
++		 * Async queues get always the maximum possible
++		 * budget, as for them we do not care about latency
++		 * (in addition, their ability to dispatch is limited
++		 * by the charging factor).
++		 */
++		budget = bfqd->bfq_max_budget;
++	}
++
++	bfqq->max_budget = budget;
++
++	if (bfqd->budgets_assigned >= bfq_stats_min_budgets &&
++	    !bfqd->bfq_user_max_budget)
++		bfqq->max_budget = min(bfqq->max_budget, bfqd->bfq_max_budget);
++
++	/*
++	 * If there is still backlog, then assign a new budget, making
++	 * sure that it is large enough for the next request.  Since
++	 * the finish time of bfqq must be kept in sync with the
++	 * budget, be sure to call __bfq_bfqq_expire() *after* this
++	 * update.
++	 *
++	 * If there is no backlog, then no need to update the budget;
++	 * it will be updated on the arrival of a new request.
++	 */
++	next_rq = bfqq->next_rq;
++	if (next_rq)
++		bfqq->entity.budget = max_t(unsigned long, bfqq->max_budget,
++					    bfq_serv_to_charge(next_rq, bfqq));
++
++	bfq_log_bfqq(bfqd, bfqq, "head sect: %u, new budget %d",
++			next_rq ? blk_rq_sectors(next_rq) : 0,
++			bfqq->entity.budget);
++}
++
++static unsigned long bfq_calc_max_budget(u64 peak_rate, u64 timeout)
++{
++	unsigned long max_budget;
++
++	/*
++	 * The max_budget calculated when autotuning is equal to the
++	 * amount of sectors transferred in timeout at the estimated
++	 * peak rate. To get this value, peak_rate is, first,
++	 * multiplied by 1000, because timeout is measured in ms,
++	 * while peak_rate is measured in sectors/usecs. Then the
++	 * result of this multiplication is right-shifted by
++	 * BFQ_RATE_SHIFT, because peak_rate is equal to the value of
++	 * the peak rate left-shifted by BFQ_RATE_SHIFT.
++	 */
++	max_budget = (unsigned long)(peak_rate * 1000 *
++				     timeout >> BFQ_RATE_SHIFT);
++
++	return max_budget;
++}
++
++/*
++ * In addition to updating the peak rate, checks whether the process
++ * is "slow", and returns 1 if so. This slow flag is used, in addition
++ * to the budget timeout, to reduce the amount of service provided to
++ * seeky processes, and hence reduce their chances to lower the
++ * throughput. See the code for more details.
++ */
++static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++				 bool compensate)
++{
++	u64 bw, usecs, expected, timeout;
++	ktime_t delta;
++	int update = 0;
++
++	if (!bfq_bfqq_sync(bfqq) || bfq_bfqq_budget_new(bfqq))
++		return false;
++
++	if (compensate)
++		delta = bfqd->last_idling_start;
++	else
++		delta = ktime_get();
++	delta = ktime_sub(delta, bfqd->last_budget_start);
++	usecs = ktime_to_us(delta);
++
++	/* don't use too short time intervals */
++	if (delta_usecs < 1000) {
++		return false;
++
++	/*
++	 * Calculate the bandwidth for the last slice.  We use a 64 bit
++	 * value to store the peak rate, in sectors per usec in fixed
++	 * point math.  We do so to have enough precision in the estimate
++	 * and to avoid overflows.
++	 */
++	bw = (u64)bfqq->entity.service << BFQ_RATE_SHIFT;
++	do_div(bw, (unsigned long)usecs);
++
++	timeout = jiffies_to_msecs(bfqd->bfq_timeout);
++
++	/*
++	 * Use only long (> 20ms) intervals to filter out spikes for
++	 * the peak rate estimation.
++	 */
++	if (usecs > 20000) {
++		if (bw > bfqd->peak_rate) {
++			bfqd->peak_rate = bw;
++			update = 1;
++			bfq_log(bfqd, "new peak_rate=%llu", bw);
++		}
++
++		update |= bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES - 1;
++
++		if (bfqd->peak_rate_samples < BFQ_PEAK_RATE_SAMPLES)
++			bfqd->peak_rate_samples++;
++
++		if (bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES &&
++		    update && bfqd->bfq_user_max_budget == 0) {
++			bfqd->bfq_max_budget =
++				bfq_calc_max_budget(bfqd->peak_rate,
++						    timeout);
++			bfq_log(bfqd, "new max_budget=%d",
++				bfqd->bfq_max_budget);
++		}
++	}
++
++	/*
++	 * A process is considered ``slow'' (i.e., seeky, so that we
++	 * cannot treat it fairly in the service domain, as it would
++	 * slow down too much the other processes) if, when a slice
++	 * ends for whatever reason, it has received service at a
++	 * rate that would not be high enough to complete the budget
++	 * before the budget timeout expiration.
++	 */
++	expected = bw * 1000 * timeout >> BFQ_RATE_SHIFT;
++
++	/*
++	 * Caveat: processes doing IO in the slower disk zones will
++	 * tend to be slow(er) even if not seeky. And the estimated
++	 * peak rate will actually be an average over the disk
++	 * surface. Hence, to not be too harsh with unlucky processes,
++	 * we keep a budget/3 margin of safety before declaring a
++	 * process slow.
++	 */
++	return expected > (4 * bfqq->entity.budget) / 3;
++}
++
++/*
++ * Return the farthest past time instant according to jiffies
++ * macros.
++ */
++static unsigned long bfq_smallest_from_now(void)
++{
++	return jiffies - MAX_JIFFY_OFFSET;
++}
++
++/**
++ * bfq_bfqq_expire - expire a queue.
++ * @bfqd: device owning the queue.
++ * @bfqq: the queue to expire.
++ * @compensate: if true, compensate for the time spent idling.
++ * @reason: the reason causing the expiration.
++ *
++ *
++ * If the process associated with the queue is slow (i.e., seeky), or
++ * in case of budget timeout, or, finally, if it is async, we
++ * artificially charge it an entire budget (independently of the
++ * actual service it received). As a consequence, the queue will get
++ * higher timestamps than the correct ones upon reactivation, and
++ * hence it will be rescheduled as if it had received more service
++ * than what it actually received. In the end, this class of processes
++ * will receive less service in proportion to how slowly they consume
++ * their budgets (and hence how seriously they tend to lower the
++ * throughput).
++ *
++ * In contrast, when a queue expires because it has been idling for
++ * too much or because it exhausted its budget, we do not touch the
++ * amount of service it has received. Hence when the queue will be
++ * reactivated and its timestamps updated, the latter will be in sync
++ * with the actual service received by the queue until expiration.
++ *
++ * Charging a full budget to the first type of queues and the exact
++ * service to the others has the effect of using the WF2Q+ policy to
++ * schedule the former on a timeslice basis, without violating the
++ * service domain guarantees of the latter.
++ */
++static void bfq_bfqq_expire(struct bfq_data *bfqd,
++			    struct bfq_queue *bfqq,
++			    bool compensate,
++			    enum bfqq_expiration reason)
++{
++	bool slow;
++	int ref;
++
++	/*
++	 * Update device peak rate for autotuning and check whether the
++	 * process is slow (see bfq_update_peak_rate).
++	 */
++	slow = bfq_update_peak_rate(bfqd, bfqq, compensate);
++
++	/*
++	 * As above explained, 'punish' slow (i.e., seeky), timed-out
++	 * and async queues, to favor sequential sync workloads.
++	 */
++	if (slow || reason == BFQQE_BUDGET_TIMEOUT)
++		bfq_bfqq_charge_full_budget(bfqq);
++
++	if (reason == BFQQE_TOO_IDLE &&
++	    bfqq->entity.service <= 2 * bfqq->entity.budget / 10)
++		bfq_clear_bfqq_IO_bound(bfqq);
++
++	bfq_log_bfqq(bfqd, bfqq,
++		"expire (%d, slow %d, num_disp %d, idle_win %d)", reason,
++		slow, bfqq->dispatched, bfq_bfqq_idle_window(bfqq));
++
++	/*
++	 * Increase, decrease or leave budget unchanged according to
++	 * reason.
++	 */
++	__bfq_bfqq_recalc_budget(bfqd, bfqq, reason);
++	ref = bfqq->ref;
++	__bfq_bfqq_expire(bfqd, bfqq);
++
++	/* mark bfqq as waiting a request only if a bic still points to it */
++	if (ref > 1 && !bfq_bfqq_busy(bfqq) &&
++	    reason != BFQQE_BUDGET_TIMEOUT &&
++	    reason != BFQQE_BUDGET_EXHAUSTED)
++		bfq_mark_bfqq_non_blocking_wait_rq(bfqq);
++}
++
++/*
++ * Budget timeout is not implemented through a dedicated timer, but
++ * just checked on request arrivals and completions, as well as on
++ * idle timer expirations.
++ */
++static bool bfq_bfqq_budget_timeout(struct bfq_queue *bfqq)
++{
++	if (bfq_bfqq_budget_new(bfqq) ||
++	    time_is_after_jiffies(bfqq->budget_timeout))
++		return false;
++	return true;
++}
++
++/*
++ * If we expire a queue that is actively waiting (i.e., with the
++ * device idled) for the arrival of a new request, then we may incur
++ * the timestamp misalignment problem described in the body of the
++ * function __bfq_activate_entity. Hence we return true only if this
++ * condition does not hold, or if the queue is slow enough to deserve
++ * only to be kicked off for preserving a high throughput.
++ */
++static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
++{
++	bfq_log_bfqq(bfqq->bfqd, bfqq,
++		"may_budget_timeout: wait_request %d left %d timeout %d",
++		bfq_bfqq_wait_request(bfqq),
++			bfq_bfqq_budget_left(bfqq) >=  bfqq->entity.budget / 3,
++		bfq_bfqq_budget_timeout(bfqq));
++
++	return (!bfq_bfqq_wait_request(bfqq) ||
++		bfq_bfqq_budget_left(bfqq) >=  bfqq->entity.budget / 3)
++		&&
++		bfq_bfqq_budget_timeout(bfqq);
++}
++
++/*
++ * For a queue that becomes empty, device idling is allowed only if
++ * this function returns true for the queue. And this function returns
++ * true only if idling is beneficial for throughput.
++ */
++static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++	bool idling_boosts_thr;
++
++	if (bfqd->strict_guarantees)
++		return true;
++
++	/*
++	 * The value of the next variable is computed considering that
++	 * idling is usually beneficial for the throughput if:
++	 * (a) the device is not NCQ-capable, or
++	 * (b) regardless of the presence of NCQ, the request pattern
++	 *     for bfqq is I/O-bound (possible throughput losses
++	 *     caused by granting idling to seeky queues are mitigated
++	 *     by the fact that, in all scenarios where boosting
++	 *     throughput is the best thing to do, i.e., in all
++	 *     symmetric scenarios, only a minimal idle time is
++	 *     allowed to seeky queues).
++	 */
++	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
++
++	/*
++	 * We have now the components we need to compute the return
++	 * value of the function, which is true only if both the
++	 * following conditions hold:
++	 * 1) bfqq is sync, because idling make sense only for sync queues;
++	 * 2) idling boosts the throughput.
++	 */
++	return bfq_bfqq_sync(bfqq) && idling_boosts_thr;
++}
++
++/*
++ * If the in-service queue is empty but the function bfq_bfqq_may_idle
++ * returns true, then:
++ * 1) the queue must remain in service and cannot be expired, and
++ * 2) the device must be idled to wait for the possible arrival of a new
++ *    request for the queue.
++ * See the comments on the function bfq_bfqq_may_idle for the reasons
++ * why performing device idling is the best choice to boost the throughput
++ * and preserve service guarantees when bfq_bfqq_may_idle itself
++ * returns true.
++ */
++static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++
++	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfqd->bfq_slice_idle != 0 &&
++	       bfq_bfqq_may_idle(bfqq);
++}
++
++/*
++ * Select a queue for service.  If we have a current queue in service,
++ * check whether to continue servicing it, or retrieve and set a new one.
++ */
++static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq;
++	struct request *next_rq;
++	enum bfqq_expiration reason = BFQQE_BUDGET_TIMEOUT;
++
++	bfqq = bfqd->in_service_queue;
++	if (!bfqq)
++		goto new_queue;
++
++	bfq_log_bfqq(bfqd, bfqq, "select_queue: already in-service queue");
++
++	if (bfq_may_expire_for_budg_timeout(bfqq) &&
++	    !bfq_bfqq_wait_request(bfqq) &&
++	    !bfq_bfqq_must_idle(bfqq))
++		goto expire;
++
++check_queue:
++	/*
++	 * This loop is rarely executed more than once. Even when it
++	 * happens, it is much more convenient to re-execute this loop
++	 * than to return NULL and trigger a new dispatch to get a
++	 * request served.
++	 */
++	next_rq = bfqq->next_rq;
++	/*
++	 * If bfqq has requests queued and it has enough budget left to
++	 * serve them, keep the queue, otherwise expire it.
++	 */
++	if (next_rq) {
++		if (bfq_serv_to_charge(next_rq, bfqq) >
++			bfq_bfqq_budget_left(bfqq)) {
++			/*
++			 * Expire the queue for budget exhaustion,
++			 * which makes sure that the next budget is
++			 * enough to serve the next request, even if
++			 * it comes from the fifo expired path.
++			 */
++			reason = BFQQE_BUDGET_EXHAUSTED;
++			goto expire;
++		} else {
++			/*
++			 * The idle timer may be pending because we may
++			 * not disable disk idling even when a new request
++			 * arrives.
++			 */
++			if (bfq_bfqq_wait_request(bfqq)) {
++				/*
++				 * If we get here: 1) at least a new request
++				 * has arrived but we have not disabled the
++				 * timer because the request was too small,
++				 * 2) then the block layer has unplugged
++				 * the device, causing the dispatch to be
++				 * invoked.
++				 *
++				 * Since the device is unplugged, now the
++				 * requests are probably large enough to
++				 * provide a reasonable throughput.
++				 * So we disable idling.
++				 */
++				bfq_clear_bfqq_wait_request(bfqq);
++				hrtimer_try_to_cancel(&bfqd->idle_slice_timer);
++			}
++			goto keep_queue;
++		}
++	}
++
++	/*
++	 * No requests pending. However, if the in-service queue is idling
++	 * for a new request, or has requests waiting for a completion and
++	 * may idle after their completion, then keep it anyway.
++	 */
++	if (bfq_bfqq_wait_request(bfqq) ||
++	    (bfqq->dispatched != 0 && bfq_bfqq_may_idle(bfqq))) {
++		bfqq = NULL;
++		goto keep_queue;
++	}
++
++	reason = BFQQE_NO_MORE_REQUESTS;
++expire:
++	bfq_bfqq_expire(bfqd, bfqq, false, reason);
++new_queue:
++	bfqq = bfq_set_in_service_queue(bfqd);
++	if (bfqq) {
++		bfq_log_bfqq(bfqd, bfqq, "select_queue: checking new queue");
++		goto check_queue;
++	}
++keep_queue:
++	if (bfqq)
++		bfq_log_bfqq(bfqd, bfqq, "select_queue: returned this queue");
++	else
++		bfq_log(bfqd, "select_queue: no queue returned");
++
++	return bfqq;
++}
++
++/*
++ * Dispatch next request from bfqq.
++ */
++static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
++						 struct bfq_queue *bfqq)
++{
++	struct request *rq = bfqq->next_rq;
++	unsigned long service_to_charge;
++
++	service_to_charge = bfq_serv_to_charge(rq, bfqq);
++
++	bfq_bfqq_served(bfqq, service_to_charge);
++
++	bfq_dispatch_remove(bfqd->queue, rq);
++
++	if (!bfqd->in_service_bic) {
++		atomic_long_inc(&RQ_BIC(rq)->icq.ioc->refcount);
++		bfqd->in_service_bic = RQ_BIC(rq);
++	}
++
++	/*
++	 * Expire bfqq, pretending that its budget expired, if bfqq
++	 * belongs to CLASS_IDLE and other queues are waiting for
++	 * service.
++	 */
++	if (bfqd->busy_queues > 1 && bfq_class_idle(bfqq))
++		goto expire;
++
++	return rq;
++
++expire:
++	bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
++	return rq;
++}
++
++static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
++{
++	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
++
++	/*
++	 * Avoiding lock: a race on bfqd->busy_queues should cause at
++	 * most a call to dispatch for nothing
++	 */
++	return !list_empty_careful(&bfqd->dispatch) ||
++		bfqd->busy_queues > 0;
++}
++
++static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
++{
++	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
++	struct request *rq = NULL;
++	struct bfq_queue *bfqq = NULL;
++
++	if (!list_empty(&bfqd->dispatch)) {
++		rq = list_first_entry(&bfqd->dispatch, struct request,
++				      queuelist);
++		list_del_init(&rq->queuelist);
++
++		bfqq = RQ_BFQQ(rq);
++
++		if (bfqq) {
++			/*
++			 * Increment counters here, because this
++			 * dispatch does not follow the standard
++			 * dispatch flow (where counters are
++			 * incremented)
++			 */
++			bfqq->dispatched++;
++
++			goto inc_in_driver_start_rq;
++		}
++
++		/*
++		 * We exploit the put_rq_private hook to decrement
++		 * rq_in_driver, but put_rq_private will not be
++		 * invoked on this request. So, to avoid unbalance,
++		 * just start this request, without incrementing
++		 * rq_in_driver. As a negative consequence,
++		 * rq_in_driver is deceptively lower than it should be
++		 * while this request is in service. This may cause
++		 * bfq_schedule_dispatch to be invoked uselessly.
++		 *
++		 * As for implementing an exact solution, the
++		 * put_request hook, if defined, is probably invoked
++		 * also on this request. So, by exploiting this hook,
++		 * we could 1) increment rq_in_driver here, and 2)
++		 * decrement it in put_request. Such a solution would
++		 * let the value of the counter be always accurate,
++		 * but it would entail using an extra interface
++		 * function. This cost seems higher than the benefit,
++		 * being the frequency of non-elevator-private
++		 * requests very low.
++		 */
++		goto start_rq;
++	}
++
++	bfq_log(bfqd, "dispatch requests: %d busy queues", bfqd->busy_queues);
++
++	if (bfqd->busy_queues == 0)
++		goto exit;
++
++	/*
++	 * Force device to serve one request at a time if
++	 * strict_guarantees is true. Forcing this service scheme is
++	 * currently the ONLY way to guarantee that the request
++	 * service order enforced by the scheduler is respected by a
++	 * queueing device. Otherwise the device is free even to make
++	 * some unlucky request wait for as long as the device
++	 * wishes.
++	 *
++	 * Of course, serving one request at at time may cause loss of
++	 * throughput.
++	 */
++	if (bfqd->strict_guarantees && bfqd->rq_in_driver > 0)
++		goto exit;
++
++	bfqq = bfq_select_queue(bfqd);
++	if (!bfqq)
++		goto exit;
++
++	rq = bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
++
++	if (rq) {
++inc_in_driver_start_rq:
++		bfqd->rq_in_driver++;
++start_rq:
++		rq->rq_flags |= RQF_STARTED;
++	}
++exit:
++	return rq;
++}
++
++static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
++{
++	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
++	struct request *rq;
++
++	spin_lock_irq(&bfqd->lock);
++	rq = __bfq_dispatch_request(hctx);
++	spin_unlock_irq(&bfqd->lock);
++
++	return rq;
++}
++
++/*
++ * Task holds one reference to the queue, dropped when task exits.  Each rq
++ * in-flight on this queue also holds a reference, dropped when rq is freed.
++ *
++ * Scheduler lock must be held here. Recall not to use bfqq after calling
++ * this function on it.
++ */
++static void bfq_put_queue(struct bfq_queue *bfqq)
++{
++	if (bfqq->bfqd)
++		bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d",
++			     bfqq, bfqq->ref);
++
++	bfqq->ref--;
++	if (bfqq->ref)
++		return;
++
++	kmem_cache_free(bfq_pool, bfqq);
++}
++
++static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	if (bfqq == bfqd->in_service_queue) {
++		__bfq_bfqq_expire(bfqd, bfqq);
++		bfq_schedule_dispatch(bfqd);
++	}
++
++	bfq_log_bfqq(bfqd, bfqq, "exit_bfqq: %p, %d", bfqq, bfqq->ref);
++
++	bfq_put_queue(bfqq); /* release process reference */
++}
++
++static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync)
++{
++	struct bfq_queue *bfqq = bic_to_bfqq(bic, is_sync);
++	struct bfq_data *bfqd;
++
++	if (bfqq)
++		bfqd = bfqq->bfqd; /* NULL if scheduler already exited */
++
++	if (bfqq && bfqd) {
++		unsigned long flags;
++
++		spin_lock_irqsave(&bfqd->lock, flags);
++		bfq_exit_bfqq(bfqd, bfqq);
++		bic_set_bfqq(bic, NULL, is_sync);
++		spin_unlock_irq(&bfqd->lock);
++	}
++}
++
++static void bfq_exit_icq(struct io_cq *icq)
++{
++	struct bfq_io_cq *bic = icq_to_bic(icq);
++
++	bfq_exit_icq_bfqq(bic, true);
++	bfq_exit_icq_bfqq(bic, false);
++}
++
++/*
++ * Update the entity prio values; note that the new values will not
++ * be used until the next (re)activation.
++ */
++static void
++bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
++{
++	struct task_struct *tsk = current;
++	int ioprio_class;
++	struct bfq_data *bfqd = bfqq->bfqd;
++
++	if (!bfqd)
++		return;
++
++	ioprio_class = IOPRIO_PRIO_CLASS(bic->ioprio);
++	switch (ioprio_class) {
++	default:
++		dev_err(bfqq->bfqd->queue->backing_dev_info->dev,
++			"bfq: bad prio class %d\n", ioprio_class);
++	case IOPRIO_CLASS_NONE:
++		/*
++		 * No prio set, inherit CPU scheduling settings.
++		 */
++		bfqq->new_ioprio = task_nice_ioprio(tsk);
++		bfqq->new_ioprio_class = task_nice_ioclass(tsk);
++		break;
++	case IOPRIO_CLASS_RT:
++		bfqq->new_ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++		bfqq->new_ioprio_class = IOPRIO_CLASS_RT;
++		break;
++	case IOPRIO_CLASS_BE:
++		bfqq->new_ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++		bfqq->new_ioprio_class = IOPRIO_CLASS_BE;
++		break;
++	case IOPRIO_CLASS_IDLE:
++		bfqq->new_ioprio_class = IOPRIO_CLASS_IDLE;
++		bfqq->new_ioprio = 7;
++		bfq_clear_bfqq_idle_window(bfqq);
++		break;
++	}
++
++	if (bfqq->new_ioprio >= IOPRIO_BE_NR) {
++		pr_crit("bfq_set_next_ioprio_data: new_ioprio %d\n",
++			bfqq->new_ioprio);
++		bfqq->new_ioprio = IOPRIO_BE_NR;
++	}
++
++	bfqq->entity.new_weight = bfq_ioprio_to_weight(bfqq->new_ioprio);
++	bfqq->entity.prio_changed = 1;
++}
++
++static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
++{
++	struct bfq_data *bfqd = bic_to_bfqd(bic);
++	struct bfq_queue *bfqq;
++	int ioprio = bic->icq.ioc->ioprio;
++
++	/*
++	 * This condition may trigger on a newly created bic, be sure to
++	 * drop the lock before returning.
++	 */
++	if (unlikely(!bfqd) || likely(bic->ioprio == ioprio))
++		return;
++
++	bic->ioprio = ioprio;
++
++	bfqq = bic_to_bfqq(bic, false);
++	if (bfqq) {
++		/* release process reference on this queue */
++		bfq_put_queue(bfqq);
++		bfqq = bfq_get_queue(bfqd, bio, BLK_RW_ASYNC, bic);
++		bic_set_bfqq(bic, bfqq, false);
++	}
++
++	bfqq = bic_to_bfqq(bic, true);
++	if (bfqq)
++		bfq_set_next_ioprio_data(bfqq, bic);
++}
++
++static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			  struct bfq_io_cq *bic, pid_t pid, int is_sync)
++{
++	RB_CLEAR_NODE(&bfqq->entity.rb_node);
++	INIT_LIST_HEAD(&bfqq->fifo);
++
++	bfqq->ref = 0;
++	bfqq->bfqd = bfqd;
++
++	if (bic)
++		bfq_set_next_ioprio_data(bfqq, bic);
++
++	if (is_sync) {
++		if (!bfq_class_idle(bfqq))
++			bfq_mark_bfqq_idle_window(bfqq);
++		bfq_mark_bfqq_sync(bfqq);
++	} else
++		bfq_clear_bfqq_sync(bfqq);
++
++	/* set end request to minus infinity from now */
++	bfqq->ttime.last_end_request = ktime_get_ns() + 1;
++
++	bfq_mark_bfqq_IO_bound(bfqq);
++
++	bfqq->pid = pid;
++
++	/* Tentative initial value to trade off between thr and lat */
++	bfqq->max_budget = bfq_default_budget(bfqd, bfqq);
++	bfqq->budget_timeout = bfq_smallest_from_now();
++	bfqq->pid = pid;
++
++	/* first request is almost certainly seeky */
++	bfqq->seek_history = 1;
++}
++
++static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
++					       int ioprio_class, int ioprio)
++{
++	switch (ioprio_class) {
++	case IOPRIO_CLASS_RT:
++		return &async_bfqq[0][ioprio];
++	case IOPRIO_CLASS_NONE:
++		ioprio = IOPRIO_NORM;
++		/* fall through */
++	case IOPRIO_CLASS_BE:
++		return &async_bfqq[1][ioprio];
++	case IOPRIO_CLASS_IDLE:
++		return &async_idle_bfqq;
++	default:
++		return NULL;
++	}
++}
++
++static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
++				       struct bio *bio, bool is_sync,
++				       struct bfq_io_cq *bic)
++{
++	const int ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++	const int ioprio_class = IOPRIO_PRIO_CLASS(bic->ioprio);
++	struct bfq_queue **async_bfqq = NULL;
++	struct bfq_queue *bfqq;
++
++	rcu_read_lock();
++
++	if (!is_sync) {
++		async_bfqq = bfq_async_queue_prio(bfqd, ioprio_class,
++						  ioprio);
++		bfqq = *async_bfqq;
++		if (bfqq)
++			goto out;
++	}
++
++	bfqq = kmem_cache_alloc_node(bfq_pool,
++				     GFP_NOWAIT | __GFP_ZERO | __GFP_NOWARN,
++				     bfqd->queue->node);
++
++	if (bfqq) {
++		bfq_init_bfqq(bfqd, bfqq, bic, current->pid,
++			      is_sync);
++		bfq_init_entity(&bfqq->entity);
++		bfq_log_bfqq(bfqd, bfqq, "allocated");
++	} else {
++		bfqq = &bfqd->oom_bfqq;
++		bfq_log_bfqq(bfqd, bfqq, "using oom bfqq");
++		goto out;
++	}
++
++	/*
++	 * Pin the queue now that it's allocated, scheduler exit will
++	 * prune it.
++	 */
++	if (async_bfqq) {
++		bfqq->ref++;
++		bfq_log_bfqq(bfqd, bfqq,
++			     "get_queue, bfqq not in async: %p, %d",
++			     bfqq, bfqq->ref);
++		*async_bfqq = bfqq;
++	}
++
++out:
++	bfqq->ref++; /* get a process reference to this queue */
++	bfq_log_bfqq(bfqd, bfqq, "get_queue, at end: %p, %d", bfqq, bfqq->ref);
++	rcu_read_unlock();
++	return bfqq;
++}
++
++static void bfq_update_io_thinktime(struct bfq_data *bfqd,
++				    struct bfq_queue *bfqq)
++{
++	struct bfq_ttime *ttime = &bfqq->ttime;
++	u64 elapsed = ktime_get_ns() - bfqq->ttime.last_end_request;
++
++	elapsed = min_t(u64, elapsed, 2ULL * bfqd->bfq_slice_idle);
++
++	ttime->ttime_samples = (7*bfqq->ttime.ttime_samples + 256) / 8;
++	ttime->ttime_total = div_u64(7*ttime->ttime_total + 256*elapsed,  8);
++	ttime->ttime_mean = div64_ul(ttime->ttime_total + 128,
++				     ttime->ttime_samples);
++}
++
++static void
++bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++		       struct request *rq)
++{
++	sector_t sdist = 0;
++
++	if (bfqq->last_request_pos) {
++		if (bfqq->last_request_pos < blk_rq_pos(rq))
++			sdist = blk_rq_pos(rq) - bfqq->last_request_pos;
++		else
++			sdist = bfqq->last_request_pos - blk_rq_pos(rq);
++	}
++
++	bfqq->seek_history <<= 1;
++	bfqq->seek_history |= sdist > BFQQ_SEEK_THR &&
++		(!blk_queue_nonrot(bfqd->queue) ||
++		 blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT);
++}
++
++/*
++ * Disable idle window if the process thinks too long or seeks so much that
++ * it doesn't matter.
++ */
++static void bfq_update_idle_window(struct bfq_data *bfqd,
++				   struct bfq_queue *bfqq,
++				   struct bfq_io_cq *bic)
++{
++	int enable_idle;
++
++	/* Don't idle for async or idle io prio class. */
++	if (!bfq_bfqq_sync(bfqq) || bfq_class_idle(bfqq))
++		return;
++
++	enable_idle = bfq_bfqq_idle_window(bfqq);
++
++	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
++	    bfqd->bfq_slice_idle == 0 ||
++		(bfqd->hw_tag && BFQQ_SEEKY(bfqq)))
++		enable_idle = 0;
++	else if (bfq_sample_valid(bfqq->ttime.ttime_samples)) {
++		if (bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle)
++			enable_idle = 0;
++		else
++			enable_idle = 1;
++	}
++	bfq_log_bfqq(bfqd, bfqq, "update_idle_window: enable_idle %d",
++		enable_idle);
++
++	if (enable_idle)
++		bfq_mark_bfqq_idle_window(bfqq);
++	else
++		bfq_clear_bfqq_idle_window(bfqq);
++}
++
++/*
++ * Called when a new fs request (rq) is added to bfqq.  Check if there's
++ * something we should do about it.
++ */
++static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			    struct request *rq)
++{
++	struct bfq_io_cq *bic = RQ_BIC(rq);
++
++	if (rq->cmd_flags & REQ_META)
++		bfqq->meta_pending++;
++
++	bfq_update_io_thinktime(bfqd, bfqq);
++	bfq_update_io_seektime(bfqd, bfqq, rq);
++	if (bfqq->entity.service > bfq_max_budget(bfqd) / 8 ||
++	    !BFQQ_SEEKY(bfqq))
++		bfq_update_idle_window(bfqd, bfqq, bic);
++
++	bfq_log_bfqq(bfqd, bfqq,
++		     "rq_enqueued: idle_window=%d (seeky %d)",
++		     bfq_bfqq_idle_window(bfqq), BFQQ_SEEKY(bfqq));
++
++	bfqq->last_request_pos = blk_rq_pos(rq) + blk_rq_sectors(rq);
++
++	if (bfqq == bfqd->in_service_queue && bfq_bfqq_wait_request(bfqq)) {
++		bool small_req = bfqq->queued[rq_is_sync(rq)] == 1 &&
++				 blk_rq_sectors(rq) < 32;
++		bool budget_timeout = bfq_bfqq_budget_timeout(bfqq);
++
++		/*
++		 * There is just this request queued: if the request
++		 * is small and the queue is not to be expired, then
++		 * just exit.
++		 *
++		 * In this way, if the device is being idled to wait
++		 * for a new request from the in-service queue, we
++		 * avoid unplugging the device and committing the
++		 * device to serve just a small request. On the
++		 * contrary, we wait for the block layer to decide
++		 * when to unplug the device: hopefully, new requests
++		 * will be merged to this one quickly, then the device
++		 * will be unplugged and larger requests will be
++		 * dispatched.
++		 */
++		if (small_req && !budget_timeout)
++			return;
++
++		/*
++		 * A large enough request arrived, or the queue is to
++		 * be expired: in both cases disk idling is to be
++		 * stopped, so clear wait_request flag and reset
++		 * timer.
++		 */
++		bfq_clear_bfqq_wait_request(bfqq);
++		hrtimer_try_to_cancel(&bfqd->idle_slice_timer);
++
++		/*
++		 * The queue is not empty, because a new request just
++		 * arrived. Hence we can safely expire the queue, in
++		 * case of budget timeout, without risking that the
++		 * timestamps of the queue are not updated correctly.
++		 * See [1] for more details.
++		 */
++		if (budget_timeout)
++			bfq_bfqq_expire(bfqd, bfqq, false,
++					BFQQE_BUDGET_TIMEOUT);
++	}
++}
++
++static void __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++
++	bfq_add_request(rq);
++
++	rq->fifo_time = ktime_get_ns() + bfqd->bfq_fifo_expire[rq_is_sync(rq)];
++	list_add_tail(&rq->queuelist, &bfqq->fifo);
++
++	bfq_rq_enqueued(bfqd, bfqq, rq);
++}
++
++static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
++			       bool at_head)
++{
++	struct request_queue *q = hctx->queue;
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++
++	spin_lock_irq(&bfqd->lock);
++	if (blk_mq_sched_try_insert_merge(q, rq)) {
++		spin_unlock_irq(&bfqd->lock);
++		return;
++	}
++
++	spin_unlock_irq(&bfqd->lock);
++
++	blk_mq_sched_request_inserted(rq);
++
++	spin_lock_irq(&bfqd->lock);
++	if (at_head || blk_rq_is_passthrough(rq)) {
++		if (at_head)
++			list_add(&rq->queuelist, &bfqd->dispatch);
++		else
++			list_add_tail(&rq->queuelist, &bfqd->dispatch);
++	} else {
++		__bfq_insert_request(bfqd, rq);
++
++		if (rq_mergeable(rq)) {
++			elv_rqhash_add(q, rq);
++			if (!q->last_merge)
++				q->last_merge = rq;
++		}
++	}
++
++	spin_unlock_irq(&bfqd->lock);
++}
++
++static void bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
++				struct list_head *list, bool at_head)
++{
++	while (!list_empty(list)) {
++		struct request *rq;
++
++		rq = list_first_entry(list, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		bfq_insert_request(hctx, rq, at_head);
++	}
++}
++
++static void bfq_update_hw_tag(struct bfq_data *bfqd)
++{
++	bfqd->max_rq_in_driver = max_t(int, bfqd->max_rq_in_driver,
++				       bfqd->rq_in_driver);
++
++	if (bfqd->hw_tag == 1)
++		return;
++
++	/*
++	 * This sample is valid if the number of outstanding requests
++	 * is large enough to allow a queueing behavior.  Note that the
++	 * sum is not exact, as it's not taking into account deactivated
++	 * requests.
++	 */
++	if (bfqd->rq_in_driver + bfqd->queued < BFQ_HW_QUEUE_THRESHOLD)
++		return;
++
++	if (bfqd->hw_tag_samples++ < BFQ_HW_QUEUE_SAMPLES)
++		return;
++
++	bfqd->hw_tag = bfqd->max_rq_in_driver > BFQ_HW_QUEUE_THRESHOLD;
++	bfqd->max_rq_in_driver = 0;
++	bfqd->hw_tag_samples = 0;
++}
++
++static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
++{
++	bfq_update_hw_tag(bfqd);
++
++	bfqd->rq_in_driver--;
++	bfqq->dispatched--;
++
++	bfqq->ttime.last_end_request = ktime_get_ns();
++
++	/*
++	 * If this is the in-service queue, check if it needs to be expired,
++	 * or if we want to idle in case it has no pending requests.
++	 */
++	if (bfqd->in_service_queue == bfqq) {
++		if (bfq_bfqq_budget_new(bfqq))
++			bfq_set_budget_timeout(bfqd);
++
++		if (bfq_bfqq_must_idle(bfqq)) {
++			bfq_arm_slice_timer(bfqd);
++			return;
++		} else if (bfq_may_expire_for_budg_timeout(bfqq))
++			bfq_bfqq_expire(bfqd, bfqq, false,
++					BFQQE_BUDGET_TIMEOUT);
++		else if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
++			 (bfqq->dispatched == 0 ||
++			  !bfq_bfqq_may_idle(bfqq)))
++			bfq_bfqq_expire(bfqd, bfqq, false,
++					BFQQE_NO_MORE_REQUESTS);
++	}
++}
++
++static void bfq_put_rq_priv_body(struct bfq_queue *bfqq)
++{
++	bfqq->allocated--;
++
++	bfq_put_queue(bfqq);
++}
++
++static void bfq_put_rq_private(struct request_queue *q, struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++	struct bfq_data *bfqd = bfqq->bfqd;
++
++
++	if (likely(rq->rq_flags & RQF_STARTED)) {
++		unsigned long flags;
++
++		spin_lock_irqsave(&bfqd->lock, flags);
++
++		bfq_completed_request(bfqq, bfqd);
++		bfq_put_rq_priv_body(bfqq);
++
++		spin_unlock_irqrestore(&bfqd->lock, flags);
++	} else {
++		/*
++		 * Request rq may be still/already in the scheduler,
++		 * in which case we need to remove it. And we cannot
++		 * defer such a check and removal, to avoid
++		 * inconsistencies in the time interval from the end
++		 * of this function to the start of the deferred work.
++		 * This situation seems to occur only in process
++		 * context, as a consequence of a merge. In the
++		 * current version of the code, this implies that the
++		 * lock is held.
++		 */
++
++		if (!RB_EMPTY_NODE(&rq->rb_node))
++			bfq_remove_request(q, rq);
++		bfq_put_rq_priv_body(bfqq);
++	}
++
++	rq->elv.priv[0] = NULL;
++	rq->elv.priv[1] = NULL;
++}
++
++/*
++ * Allocate bfq data structures associated with this request.
++ */
++static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
++			      struct bio *bio)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	struct bfq_io_cq *bic = icq_to_bic(rq->elv.icq);
++	const int is_sync = rq_is_sync(rq);
++	struct bfq_queue *bfqq;
++
++	spin_lock_irq(&bfqd->lock);
++
++	bfq_check_ioprio_change(bic, bio);
++
++	if (!bic)
++		goto queue_fail;
++
++	bfqq = bic_to_bfqq(bic, is_sync);
++	if (!bfqq || bfqq == &bfqd->oom_bfqq) {
++		if (bfqq)
++			bfq_put_queue(bfqq);
++		bfqq = bfq_get_queue(bfqd, bio, is_sync, bic);
++		bic_set_bfqq(bic, bfqq, is_sync);
++	}
++
++	bfqq->allocated++;
++	bfqq->ref++;
++	bfq_log_bfqq(bfqd, bfqq, "get_request %p: bfqq %p, %d",
++		     rq, bfqq, bfqq->ref);
++
++	rq->elv.priv[0] = bic;
++	rq->elv.priv[1] = bfqq;
++
++	spin_unlock_irq(&bfqd->lock);
++
++	return 0;
++
++queue_fail:
++	spin_unlock_irq(&bfqd->lock);
++
++	return 1;
++}
++
++static void bfq_idle_slice_timer_body(struct bfq_queue *bfqq)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++	enum bfqq_expiration reason;
++	unsigned long flags;
++
++	spin_lock_irqsave(&bfqd->lock, flags);
++	bfq_clear_bfqq_wait_request(bfqq);
++
++	if (bfqq != bfqd->in_service_queue) {
++		spin_unlock_irqrestore(&bfqd->lock, flags);
++		return;
++	}
++
++	if (bfq_bfqq_budget_timeout(bfqq))
++		/*
++		 * Also here the queue can be safely expired
++		 * for budget timeout without wasting
++		 * guarantees
++		 */
++		reason = BFQQE_BUDGET_TIMEOUT;
++	else if (bfqq->queued[0] == 0 && bfqq->queued[1] == 0)
++		/*
++		 * The queue may not be empty upon timer expiration,
++		 * because we may not disable the timer when the
++		 * first request of the in-service queue arrives
++		 * during disk idling.
++		 */
++		reason = BFQQE_TOO_IDLE;
++	else
++		goto schedule_dispatch;
++
++	bfq_bfqq_expire(bfqd, bfqq, true, reason);
++
++schedule_dispatch:
++	spin_unlock_irqrestore(&bfqd->lock, flags);
++	bfq_schedule_dispatch(bfqd);
++}
++
++/*
++ * Handler of the expiration of the timer running if the in-service queue
++ * is idling inside its time slice.
++ */
++static enum hrtimer_restart bfq_idle_slice_timer(struct hrtimer *timer)
++{
++	struct bfq_data *bfqd = container_of(timer, struct bfq_data,
++					     idle_slice_timer);
++	struct bfq_queue *bfqq = bfqd->in_service_queue;
++
++	/*
++	 * Theoretical race here: the in-service queue can be NULL or
++	 * different from the queue that was idling if a new request
++	 * arrives for the current queue and there is a full dispatch
++	 * cycle that changes the in-service queue.  This can hardly
++	 * happen, but in the worst case we just expire a queue too
++	 * early.
++	 */
++	if (bfqq)
++		bfq_idle_slice_timer_body(bfqq);
++
++	return HRTIMER_NORESTART;
++}
++
++static void __bfq_put_async_bfqq(struct bfq_data *bfqd,
++				 struct bfq_queue **bfqq_ptr)
++{
++	struct bfq_queue *bfqq = *bfqq_ptr;
++
++	bfq_log(bfqd, "put_async_bfqq: %p", bfqq);
++	if (bfqq) {
++		bfq_log_bfqq(bfqd, bfqq, "put_async_bfqq: putting %p, %d",
++			     bfqq, bfqq->ref);
++		bfq_put_queue(bfqq);
++		*bfqq_ptr = NULL;
++	}
++}
++
++/*
++ * Release the extra reference of the async queues as the device
++ * goes away.
++ */
++static void bfq_put_async_queues(struct bfq_data *bfqd)
++{
++	int i, j;
++
++	for (i = 0; i < 2; i++)
++		for (j = 0; j < IOPRIO_BE_NR; j++)
++			__bfq_put_async_bfqq(bfqd, &async_bfqq[i][j]);
++
++	__bfq_put_async_bfqq(bfqd, &async_idle_bfqq);
++}
++
++static void bfq_exit_queue(struct elevator_queue *e)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	struct bfq_queue *bfqq, *n;
++
++	hrtimer_cancel(&bfqd->idle_slice_timer);
++
++	spin_lock_irq(&bfqd->lock);
++	list_for_each_entry_safe(bfqq, n, &bfqd->idle_list, bfqq_list)
++		bfq_deactivate_bfqq(bfqd, bfqq, false);
++	bfq_put_async_queues(bfqd);
++	spin_unlock_irq(&bfqd->lock);
++
++	hrtimer_cancel(&bfqd->idle_slice_timer);
++
++	kfree(bfqd);
++}
++
++static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
++{
++	struct bfq_data *bfqd;
++	struct elevator_queue *eq;
++	int i;
++
++	eq = elevator_alloc(q, e);
++	if (!eq)
++		return -ENOMEM;
++
++	bfqd = kzalloc_node(sizeof(*bfqd), GFP_KERNEL, q->node);
++	if (!bfqd) {
++		kobject_put(&eq->kobj);
++		return -ENOMEM;
++	}
++	eq->elevator_data = bfqd;
++
++	/*
++	 * Our fallback bfqq if bfq_find_alloc_queue() runs into OOM issues.
++	 * Grab a permanent reference to it, so that the normal code flow
++	 * will not attempt to free it.
++	 */
++	bfq_init_bfqq(bfqd, &bfqd->oom_bfqq, NULL, 1, 0);
++	bfqd->oom_bfqq.ref++;
++	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
++	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
++	bfqd->oom_bfqq.entity.new_weight =
++		bfq_ioprio_to_weight(bfqd->oom_bfqq.new_ioprio);
++	/*
++	 * Trigger weight initialization, according to ioprio, at the
++	 * oom_bfqq's first activation. The oom_bfqq's ioprio and ioprio
++	 * class won't be changed any more.
++	 */
++	bfqd->oom_bfqq.entity.prio_changed = 1;
++
++	bfqd->queue = q;
++
++	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++)
++		bfqd->sched_data.service_tree[i] = BFQ_SERVICE_TREE_INIT;
++
++	hrtimer_init(&bfqd->idle_slice_timer, CLOCK_MONOTONIC,
++		     HRTIMER_MODE_REL);
++	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
++
++	INIT_LIST_HEAD(&bfqd->active_list);
++	INIT_LIST_HEAD(&bfqd->idle_list);
++
++	bfqd->hw_tag = -1;
++
++	bfqd->bfq_max_budget = bfq_default_max_budget;
++
++	bfqd->bfq_fifo_expire[0] = bfq_fifo_expire[0];
++	bfqd->bfq_fifo_expire[1] = bfq_fifo_expire[1];
++	bfqd->bfq_back_max = bfq_back_max;
++	bfqd->bfq_back_penalty = bfq_back_penalty;
++	bfqd->bfq_slice_idle = bfq_slice_idle;
++	bfqd->bfq_class_idle_last_service = 0;
++	bfqd->bfq_timeout = bfq_timeout;
++
++	bfqd->bfq_requests_within_timer = 120;
++
++	spin_lock_init(&bfqd->lock);
++	INIT_LIST_HEAD(&bfqd->dispatch);
++
++	q->elevator = eq;
++
++	return 0;
++}
++
++static void bfq_slab_kill(void)
++{
++	kmem_cache_destroy(bfq_pool);
++}
++
++static int __init bfq_slab_setup(void)
++{
++	bfq_pool = KMEM_CACHE(bfq_queue, 0);
++	if (!bfq_pool)
++		return -ENOMEM;
++	return 0;
++}
++
++static ssize_t bfq_var_show(unsigned int var, char *page)
++{
++	return sprintf(page, "%u\n", var);
++}
++
++static ssize_t bfq_var_store(unsigned long *var, const char *page,
++			     size_t count)
++{
++	unsigned long new_val;
++	int ret = kstrtoul(page, 10, &new_val);
++
++	if (ret == 0)
++		*var = new_val;
++
++	return count;
++}
++
++#define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
++static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	u64 __data = __VAR;						\
++	if (__CONV == 1)						\
++		__data = jiffies_to_msecs(__data);			\
++	else if (__CONV == 2)						\
++		__data = div_u64(__data, NSEC_PER_MSEC);		\
++	return bfq_var_show(__data, (page));				\
++}
++SHOW_FUNCTION(bfq_fifo_expire_sync_show, bfqd->bfq_fifo_expire[1], 2);
++SHOW_FUNCTION(bfq_fifo_expire_async_show, bfqd->bfq_fifo_expire[0], 2);
++SHOW_FUNCTION(bfq_back_seek_max_show, bfqd->bfq_back_max, 0);
++SHOW_FUNCTION(bfq_back_seek_penalty_show, bfqd->bfq_back_penalty, 0);
++SHOW_FUNCTION(bfq_slice_idle_show, bfqd->bfq_slice_idle, 2);
++SHOW_FUNCTION(bfq_max_budget_show, bfqd->bfq_user_max_budget, 0);
++SHOW_FUNCTION(bfq_timeout_sync_show, bfqd->bfq_timeout, 1);
++SHOW_FUNCTION(bfq_strict_guarantees_show, bfqd->strict_guarantees, 0);
++#undef SHOW_FUNCTION
++
++#define USEC_SHOW_FUNCTION(__FUNC, __VAR)				\
++static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	u64 __data = __VAR;						\
++	__data = div_u64(__data, NSEC_PER_USEC);			\
++	return bfq_var_show(__data, (page));				\
++}
++USEC_SHOW_FUNCTION(bfq_slice_idle_us_show, bfqd->bfq_slice_idle);
++#undef USEC_SHOW_FUNCTION
++
++#define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			\
++static ssize_t								\
++__FUNC(struct elevator_queue *e, const char *page, size_t count)	\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	unsigned long uninitialized_var(__data);			\
++	int ret = bfq_var_store(&__data, (page), count);		\
++	if (__data < (MIN))						\
++		__data = (MIN);						\
++	else if (__data > (MAX))					\
++		__data = (MAX);						\
++	if (__CONV == 1)						\
++		*(__PTR) = msecs_to_jiffies(__data);			\
++	else if (__CONV == 2)						\
++		*(__PTR) = (u64)__data * NSEC_PER_MSEC;			\
++	else								\
++		*(__PTR) = __data;					\
++	return ret;							\
++}
++STORE_FUNCTION(bfq_fifo_expire_sync_store, &bfqd->bfq_fifo_expire[1], 1,
++		INT_MAX, 2);
++STORE_FUNCTION(bfq_fifo_expire_async_store, &bfqd->bfq_fifo_expire[0], 1,
++		INT_MAX, 2);
++STORE_FUNCTION(bfq_back_seek_max_store, &bfqd->bfq_back_max, 0, INT_MAX, 0);
++STORE_FUNCTION(bfq_back_seek_penalty_store, &bfqd->bfq_back_penalty, 1,
++		INT_MAX, 0);
++STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, INT_MAX, 2);
++#undef STORE_FUNCTION
++
++#define USEC_STORE_FUNCTION(__FUNC, __PTR, MIN, MAX)			\
++static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	unsigned long uninitialized_var(__data);			\
++	int ret = bfq_var_store(&__data, (page), count);		\
++	if (__data < (MIN))						\
++		__data = (MIN);						\
++	else if (__data > (MAX))					\
++		__data = (MAX);						\
++	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
++	return ret;							\
++}
++USEC_STORE_FUNCTION(bfq_slice_idle_us_store, &bfqd->bfq_slice_idle, 0,
++		    UINT_MAX);
++#undef USEC_STORE_FUNCTION
++
++static unsigned long bfq_estimated_max_budget(struct bfq_data *bfqd)
++{
++	u64 timeout = jiffies_to_msecs(bfqd->bfq_timeout);
++
++	if (bfqd->peak_rate_samples >= BFQ_PEAK_RATE_SAMPLES)
++		return bfq_calc_max_budget(bfqd->peak_rate, timeout);
++	else
++		return bfq_default_max_budget;
++}
++
++static ssize_t bfq_max_budget_store(struct elevator_queue *e,
++				    const char *page, size_t count)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	unsigned long uninitialized_var(__data);
++	int ret = bfq_var_store(&__data, (page), count);
++
++	if (__data == 0)
++		bfqd->bfq_max_budget = bfq_estimated_max_budget(bfqd);
++	else {
++		if (__data > INT_MAX)
++			__data = INT_MAX;
++		bfqd->bfq_max_budget = __data;
++	}
++
++	bfqd->bfq_user_max_budget = __data;
++
++	return ret;
++}
++
++/*
++ * Leaving this name to preserve name compatibility with cfq
++ * parameters, but this timeout is used for both sync and async.
++ */
++static ssize_t bfq_timeout_sync_store(struct elevator_queue *e,
++				      const char *page, size_t count)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	unsigned long uninitialized_var(__data);
++	int ret = bfq_var_store(&__data, (page), count);
++
++	if (__data < 1)
++		__data = 1;
++	else if (__data > INT_MAX)
++		__data = INT_MAX;
++
++	bfqd->bfq_timeout = msecs_to_jiffies(__data);
++	if (bfqd->bfq_user_max_budget == 0)
++		bfqd->bfq_max_budget = bfq_estimated_max_budget(bfqd);
++
++	return ret;
++}
++
++static ssize_t bfq_strict_guarantees_store(struct elevator_queue *e,
++				     const char *page, size_t count)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	unsigned long uninitialized_var(__data);
++	int ret = bfq_var_store(&__data, (page), count);
++
++	if (__data > 1)
++		__data = 1;
++	if (!bfqd->strict_guarantees && __data == 1
++	    && bfqd->bfq_slice_idle < 8 * NSEC_PER_MSEC)
++		bfqd->bfq_slice_idle = 8 * NSEC_PER_MSEC;
++
++	bfqd->strict_guarantees = __data;
++
++	return ret;
++}
++
++#define BFQ_ATTR(name) \
++	__ATTR(name, 0644, bfq_##name##_show, bfq_##name##_store)
++
++static struct elv_fs_entry bfq_attrs[] = {
++	BFQ_ATTR(fifo_expire_sync),
++	BFQ_ATTR(fifo_expire_async),
++	BFQ_ATTR(back_seek_max),
++	BFQ_ATTR(back_seek_penalty),
++	BFQ_ATTR(slice_idle),
++	BFQ_ATTR(slice_idle_us),
++	BFQ_ATTR(max_budget),
++	BFQ_ATTR(timeout_sync),
++	BFQ_ATTR(strict_guarantees),
++	__ATTR_NULL
++};
++
++static struct elevator_type iosched_bfq_mq = {
++	.ops.mq = {
++		.get_rq_priv		= bfq_get_rq_private,
++		.put_rq_priv		= bfq_put_rq_private,
++		.exit_icq		= bfq_exit_icq,
++		.insert_requests	= bfq_insert_requests,
++		.dispatch_request	= bfq_dispatch_request,
++		.next_request		= elv_rb_latter_request,
++		.former_request		= elv_rb_former_request,
++		.allow_merge		= bfq_allow_bio_merge,
++		.bio_merge		= bfq_bio_merge,
++		.request_merge		= bfq_request_merge,
++		.requests_merged	= bfq_requests_merged,
++		.request_merged		= bfq_request_merged,
++		.has_work		= bfq_has_work,
++		.init_sched		= bfq_init_queue,
++		.exit_sched		= bfq_exit_queue,
++	},
++
++	.uses_mq =		true,
++	.icq_size =		sizeof(struct bfq_io_cq),
++	.icq_align =		__alignof__(struct bfq_io_cq),
++	.elevator_attrs =	bfq_attrs,
++	.elevator_name =	"bfq",
++	.elevator_owner =	THIS_MODULE,
++};
++
++static int __init bfq_init(void)
++{
++	int ret;
++
++	ret = -ENOMEM;
++	if (bfq_slab_setup())
++		goto err_pol_unreg;
++
++	ret = elv_register(&iosched_bfq_mq);
++	if (ret)
++		goto err_pol_unreg;
++
++	return 0;
++
++err_pol_unreg:
++	return ret;
++}
++
++static void __exit bfq_exit(void)
++{
++	elv_unregister(&iosched_bfq_mq);
++	bfq_slab_kill();
++}
++
++module_init(bfq_init);
++module_exit(bfq_exit);
++
++MODULE_AUTHOR("Paolo Valente");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("MQ Budget Fair Queueing I/O Scheduler");
+-- 
+2.10.0
