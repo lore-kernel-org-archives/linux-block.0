@@ -1,69 +1,122 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51288 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753661AbdDEHrJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Apr 2017 03:47:09 -0400
-From: Vlastimil Babka <vbabka@suse.cz>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
-        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
-        stable@vger.kernel.org, Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH 1/4] mm: prevent potential recursive reclaim due to clearing PF_MEMALLOC
-Date: Wed,  5 Apr 2017 09:46:57 +0200
-Message-Id: <20170405074700.29871-2-vbabka@suse.cz>
-In-Reply-To: <20170405074700.29871-1-vbabka@suse.cz>
-References: <20170405074700.29871-1-vbabka@suse.cz>
+Received: from mail-pg0-f45.google.com ([74.125.83.45]:34392 "EHLO
+        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752040AbdDKGbR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Apr 2017 02:31:17 -0400
+Received: by mail-pg0-f45.google.com with SMTP id 21so117621983pgg.1
+        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2017 23:31:17 -0700 (PDT)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <02F6CCFF-07AD-401E-BD93-CD7F25497F7A@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_F5EB1D3E-7C60-408E-8687-B25422162493";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 1/3] lightnvm: convert sprintf into snprintf
+Date: Tue, 11 Apr 2017 08:31:12 +0200
+In-Reply-To: <1491850565.4199.19.camel@sandisk.com>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+References: <1491850297-18235-1-git-send-email-javier@cnexlabs.com>
+ <1491850565.4199.19.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The function __alloc_pages_direct_compact() sets PF_MEMALLOC to prevent
-deadlock during page migration by lock_page() (see the comment in
-__unmap_and_move()). Then it unconditionally clears the flag, which can clear a
-pre-existing PF_MEMALLOC flag and result in recursive reclaim. This was not a
-problem until commit a8161d1ed609 ("mm, page_alloc: restructure direct
-compaction handling in slowpath"), because direct compation was called only
-after direct reclaim, which was skipped when PF_MEMALLOC flag was set.
 
-Even now it's only a theoretical issue, as the new callsite of
-__alloc_pages_direct_compact() is reached only for costly orders and when
-gfp_pfmemalloc_allowed() is true, which means either __GFP_NOMEMALLOC is in
-gfp_flags or in_interrupt() is true. There is no such known context, but let's
-play it safe and make __alloc_pages_direct_compact() robust for cases where
-PF_MEMALLOC is already set.
+--Apple-Mail=_F5EB1D3E-7C60-408E-8687-B25422162493
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Fixes: a8161d1ed609 ("mm, page_alloc: restructure direct compaction handling in slowpath")
-Reported-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
-Cc: <stable@vger.kernel.org>
----
- mm/page_alloc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> On 10 Apr 2017, at 20.56, Bart Van Assche <Bart.VanAssche@sandisk.com> =
+wrote:
+>=20
+> On Mon, 2017-04-10 at 20:51 +0200, Javier Gonz=C3=A1lez wrote:
+>> Convert sprintf calls to snprintf in order to make possible buffer
+>> overflow more obvious.
+>>=20
+>> Signed-off-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+>> ---
+>> drivers/lightnvm/core.c | 7 ++++---
+>> 1 file changed, 4 insertions(+), 3 deletions(-)
+>>=20
+>> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+>> index c3340ef..bdbb333 100644
+>> --- a/drivers/lightnvm/core.c
+>> +++ b/drivers/lightnvm/core.c
+>> @@ -272,7 +272,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, =
+struct nvm_ioctl_create *create)
+>> 		goto err_disk;
+>> 	blk_queue_make_request(tqueue, tt->make_rq);
+>>=20
+>> -	sprintf(tdisk->disk_name, "%s", create->tgtname);
+>> +	snprintf(tdisk->disk_name, sizeof(tdisk->disk_name), "%s",
+>> +							=
+create->tgtname);
+>> 	tdisk->flags =3D GENHD_FL_EXT_DEVT;
+>> 	tdisk->major =3D 0;
+>> 	tdisk->first_minor =3D 0;
+>> @@ -1195,13 +1196,13 @@ static long nvm_ioctl_get_devices(struct file =
+*file, void __user *arg)
+>> 	list_for_each_entry(dev, &nvm_devices, devices) {
+>> 		struct nvm_ioctl_device_info *info =3D =
+&devices->info[i];
+>>=20
+>> -		sprintf(info->devname, "%s", dev->name);
+>> +		snprintf(info->devname, sizeof(info->devname), "%s", =
+dev->name);
+>>=20
+>> 		/* kept for compatibility */
+>> 		info->bmversion[0] =3D 1;
+>> 		info->bmversion[1] =3D 0;
+>> 		info->bmversion[2] =3D 0;
+>> -		sprintf(info->bmname, "%s", "gennvm");
+>> +		snprintf(info->bmname, sizeof(info->bmname), "%s", =
+"gennvm");
+>> 		i++;
+>>=20
+>> 		if (i > 31) {
+>=20
+> Hello Javier,
+>=20
+> Although the above changes look fine to me, have you considered to use =
+strlcpy()
+> instead of snprintf() for these string copy operations?
 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 3589f8be53be..b84e6ffbe756 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -3288,6 +3288,7 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
- 		enum compact_priority prio, enum compact_result *compact_result)
- {
- 	struct page *page;
-+	unsigned int noreclaim_flag = current->flags & PF_MEMALLOC;
- 
- 	if (!order)
- 		return NULL;
-@@ -3295,7 +3296,7 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
- 	current->flags |= PF_MEMALLOC;
- 	*compact_result = try_to_compact_pages(gfp_mask, order, alloc_flags, ac,
- 									prio);
--	current->flags &= ~PF_MEMALLOC;
-+	current->flags = (current->flags & ~PF_MEMALLOC) | noreclaim_flag;
- 
- 	if (*compact_result <= COMPACT_INACTIVE)
- 		return NULL;
--- 
-2.12.2
+You're right. It is a better way of doing it.
+
+Thanks!
+
+>=20
+> Bart.
+
+Javier
+
+--Apple-Mail=_F5EB1D3E-7C60-408E-8687-B25422162493
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJY7HgwAAoJEGMfBTt1mRjKpjoP/jKuSkoSFWty+e9VRhnr/HiB
+tTyZTttlBhmt+F4CCjikpzqmOSkZkeyhNBYh2nzN6KEF+psDALUvzwponSIumM/G
+i9vX+OCeEM2uAF/dJbwNTMWtPvA4cCf1A30GvxWR4lqW0ieEaWEPp7vu7bf7cF9z
+2SimmA3pF0buIodw2cFxhC6sRtFHyHPEytDUeacV/WTaLOnZ2ex+/tYYuX0yxQ1M
+siInqXbkgo1O3Xs+0/8Y2Ko5T3YU9+TKV26L6zvYQPCtrV62qAITfVLJ07YlN2DK
+RXrU4yJk2MuS5wQ5LyrM3k8NgFS/Dok06GfUiQjDLTj+FMNuv9KLKhD2saXj42Qv
+EfH+1Md0dv0K150ny/PC8KOvl7QyP6Dhmo5kHZI+LetVysFTKZaFW+b5XqJT4uF/
+iDlKojm5/ETSXv4MdfjZwjpNU32TDBoGaOJahOeDVTz/D8s91gPp7XIBjajAN0Gy
+aa32khmmQqVSXDtkXpe3FYwVlVAl+cdwAbYMeTQc4rxTX0Yj5w9F/URFFSv8UYKf
+VaEvNa3mpGWzTGvVuSBbOWbkxNJjHshIuDxxrjiUBHEXXMyf3volvkhR0Gtl3p/P
+cGlj7jJBu9TynoXPOiQVDDMu0wNJgGd2Q9tDTVWLY15aIn55QIxJcKMGopsWfvef
+8jrUSS2a+YceImVHEKj9
+=F9bp
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_F5EB1D3E-7C60-408E-8687-B25422162493--
