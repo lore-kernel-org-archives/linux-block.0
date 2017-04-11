@@ -1,39 +1,55 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: always use REQ_OP_WRITE_ZEROES for zeroing offload V2
-Date: Wed,  5 Apr 2017 16:21:38 +0200
-Message-Id: <20170405142205.6477-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:35830 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752988AbdDKOfq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Apr 2017 10:35:46 -0400
+Received: by mail-wm0-f53.google.com with SMTP id w64so65465172wma.0
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2017 07:35:45 -0700 (PDT)
+Subject: Re: [PATCH 2/3] lightnvm: fix type checks on rrpc
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
+References: <1491920338-2348-1-git-send-email-javier@cnexlabs.com>
+ <1491920338-2348-4-git-send-email-javier@cnexlabs.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <d38a984e-e9e3-1dfe-fc39-4c2f7c7ad0a1@lightnvm.io>
+Date: Tue, 11 Apr 2017 16:35:29 +0200
+MIME-Version: 1.0
+In-Reply-To: <1491920338-2348-4-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series makes REQ_OP_WRITE_ZEROES the only zeroing offload
-supported by the block layer, and switches existing implementations
-of REQ_OP_DISCARD that correctly set discard_zeroes_data to it,
-removes incorrect discard_zeroes_data, and also switches WRITE SAME
-based zeroing in SCSI to this new method.
-
-The series is against the block for-next tree.
-
-A git tree is also avaiable at:
-
-    git://git.infradead.org/users/hch/block.git discard-rework.2
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/discard-rework.2
-
-Changes since V2:
- - various spelling fixes
- - various reviews captured
- - two new patches from Martin at the end
+On 04/11/2017 04:18 PM, Javier González wrote:
+> sector_t is always unsigned, therefore avoid < 0 checks on it.
+>
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>  drivers/lightnvm/rrpc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+> index 5dba544..cf0e28a 100644
+> --- a/drivers/lightnvm/rrpc.c
+> +++ b/drivers/lightnvm/rrpc.c
+> @@ -817,7 +817,7 @@ static int rrpc_read_ppalist_rq(struct rrpc *rrpc, struct bio *bio,
+>
+>  	for (i = 0; i < npages; i++) {
+>  		/* We assume that mapping occurs at 4KB granularity */
+> -		BUG_ON(!(laddr + i >= 0 && laddr + i < rrpc->nr_sects));
+> +		BUG_ON(!(laddr + i < rrpc->nr_sects));
+>  		gp = &rrpc->trans_map[laddr + i];
+>
+>  		if (gp->rblk) {
+> @@ -846,7 +846,7 @@ static int rrpc_read_rq(struct rrpc *rrpc, struct bio *bio, struct nvm_rq *rqd,
+>  	if (!is_gc && rrpc_lock_rq(rrpc, bio, rqd))
+>  		return NVM_IO_REQUEUE;
+>
+> -	BUG_ON(!(laddr >= 0 && laddr < rrpc->nr_sects));
+> +	BUG_ON(!(laddr < rrpc->nr_sects));
+>  	gp = &rrpc->trans_map[laddr];
+>
+>  	if (gp->rblk) {
+>
+Thanks. Applied for 4.12.
