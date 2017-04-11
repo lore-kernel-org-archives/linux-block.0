@@ -1,83 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:38009 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755116AbdDGSbW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2017 14:31:22 -0400
-Received: by mail-wm0-f51.google.com with SMTP id t189so13753583wmt.1
-        for <linux-block@vger.kernel.org>; Fri, 07 Apr 2017 11:31:21 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 1/4] lightnvm: double-clear of dev->lun_map on target init error
-Date: Fri,  7 Apr 2017 20:31:11 +0200
-Message-Id: <1491589874-26818-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 4/9] nowait-aio: Introduce IOMAP_NOWAIT
+Date: Tue, 11 Apr 2017 09:26:14 -0500
+Message-Id: <20170411142619.27205-5-rgoldwyn@suse.de>
+In-Reply-To: <20170411142619.27205-1-rgoldwyn@suse.de>
+References: <20170411142619.27205-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-The dev->lun_map bits are cleared twice if an target init error occurs.
-First in the target clean routine, and then next in the nvm_tgt_create
-error function. Make sure that it is only cleared once by extending
-nvm_remove_tgt_devi() with a clear bit, such that clearing of bits can
-ignored when cleaning up a successful initialized target.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
+This is used by XFS in the XFS patch.
 ---
- drivers/lightnvm/core.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ fs/iomap.c            | 2 ++
+ include/linux/iomap.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 2122922..da4c082 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -89,7 +89,7 @@ static void nvm_release_luns_err(struct nvm_dev *dev, int lun_begin,
- 		WARN_ON(!test_and_clear_bit(i, dev->lun_map));
- }
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 141c3cd55a8b..d1c81753d411 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -885,6 +885,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 	} else {
+ 		dio->flags |= IOMAP_DIO_WRITE;
+ 		flags |= IOMAP_WRITE;
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			flags |= IOMAP_NOWAIT;
+ 	}
  
--static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev)
-+static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev, int clear)
- {
- 	struct nvm_dev *dev = tgt_dev->parent;
- 	struct nvm_dev_map *dev_map = tgt_dev->map;
-@@ -100,11 +100,13 @@ static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev)
- 		int *lun_offs = ch_map->lun_offs;
- 		int ch = i + ch_map->ch_off;
+ 	if (mapping->nrpages) {
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 7291810067eb..53f6af89c625 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -51,6 +51,7 @@ struct iomap {
+ #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
+ #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
+ #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
++#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
  
--		for (j = 0; j < ch_map->nr_luns; j++) {
--			int lun = j + lun_offs[j];
--			int lunid = (ch * dev->geo.luns_per_chnl) + lun;
-+		if (clear) {
-+			for (j = 0; j < ch_map->nr_luns; j++) {
-+				int lun = j + lun_offs[j];
-+				int lunid = (ch * dev->geo.luns_per_chnl) + lun;
- 
--			WARN_ON(!test_and_clear_bit(lunid, dev->lun_map));
-+				WARN_ON(!test_and_clear_bit(lunid, dev->lun_map));
-+			}
- 		}
- 
- 		kfree(ch_map->lun_offs);
-@@ -309,7 +311,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- err_queue:
- 	blk_cleanup_queue(tqueue);
- err_dev:
--	nvm_remove_tgt_dev(tgt_dev);
-+	nvm_remove_tgt_dev(tgt_dev, 0);
- err_t:
- 	kfree(t);
- err_reserve:
-@@ -332,7 +334,7 @@ static void __nvm_remove_target(struct nvm_target *t)
- 	if (tt->exit)
- 		tt->exit(tdisk->private_data);
- 
--	nvm_remove_tgt_dev(t->dev);
-+	nvm_remove_tgt_dev(t->dev, 1);
- 	put_disk(tdisk);
- 
- 	list_del(&t->list);
+ struct iomap_ops {
+ 	/*
 -- 
-2.7.4
+2.12.0
