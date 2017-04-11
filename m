@@ -1,179 +1,211 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Vlastimil Babka <vbabka@suse.cz>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
-        open-iscsi@googlegroups.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
-        Michal Hocko <mhocko@suse.com>
-Subject: [PATCH 2/4] mm: introduce memalloc_noreclaim_{save,restore}
-Date: Wed,  5 Apr 2017 09:46:58 +0200
-Message-Id: <20170405074700.29871-3-vbabka@suse.cz>
-In-Reply-To: <20170405074700.29871-1-vbabka@suse.cz>
-References: <20170405074700.29871-1-vbabka@suse.cz>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V3 03/16] block, bfq: improve throughput boosting
+Date: Tue, 11 Apr 2017 15:43:02 +0200
+Message-Id: <20170411134315.44135-4-paolo.valente@linaro.org>
+In-Reply-To: <20170411134315.44135-1-paolo.valente@linaro.org>
+References: <20170411134315.44135-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-The previous patch has shown that simply setting and clearing PF_MEMALLOC in
-current->flags can result in wrongly clearing a pre-existing PF_MEMALLOC flag
-and potentially lead to recursive reclaim. Let's introduce helpers that support
-proper nesting by saving the previous stat of the flag, similar to the existing
-memalloc_noio_* and memalloc_nofs_* helpers. Convert existing setting/clearing
-of PF_MEMALLOC within mm to the new helpers.
+The feedback-loop algorithm used by BFQ to compute queue (process)
+budgets is basically a set of three update rules, one for each of the
+main reasons why a queue may be expired. If many processes suddenly
+switch from sporadic I/O to greedy and sequential I/O, then these
+rules are quite slow to assign large budgets to these processes, and
+hence to achieve a high throughput. On the opposite side, BFQ assigns
+the maximum possible budget B_max to a just-created queue. This allows
+a high throughput to be achieved immediately if the associated process
+is I/O-bound and performs sequential I/O from the beginning. But it
+also increases the worst-case latency experienced by the first
+requests issued by the process, because the larger the budget of a
+queue waiting for service is, the later the queue will be served by
+B-WF2Q+ (Subsec 3.3 in [1]). This is detrimental for an interactive or
+soft real-time application.
 
-There are no known issues with the converted code, but the change makes it more
-robust.
+To tackle these throughput and latency problems, on one hand this
+patch changes the initial budget value to B_max/2. On the other hand,
+it re-tunes the three rules, adopting a more aggressive,
+multiplicative increase/linear decrease scheme. This scheme trades
+latency for throughput more than before, and tends to assign large
+budgets quickly to processes that are or become I/O-bound. For two of
+the expiration reasons, the new version of the rules also contains
+some more little improvements, briefly described below.
 
-Suggested-by: Michal Hocko <mhocko@suse.com>
-Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+*No more backlog.* In this case, the budget was larger than the number
+of sectors actually read/written by the process before it stopped
+doing I/O. Hence, to reduce latency for the possible future I/O
+requests of the process, the old rule simply set the next budget to
+the number of sectors actually consumed by the process. However, if
+there are still outstanding requests, then the process may have not
+yet issued its next request just because it is still waiting for the
+completion of some of the still outstanding ones. If this sub-case
+holds true, then the new rule, instead of decreasing the budget,
+doubles it, proactively, in the hope that: 1) a larger budget will fit
+the actual needs of the process, and 2) the process is sequential and
+hence a higher throughput will be achieved by serving the process
+longer after granting it access to the device.
+
+*Budget timeout*. The original rule set the new budget to the maximum
+value B_max, to maximize throughput and let all processes experiencing
+budget timeouts receive the same share of the device time. In our
+experiments we verified that this sudden jump to B_max did not provide
+sensible benefits; rather it increased the latency of processes
+performing sporadic and short I/O. The new rule only doubles the
+budget.
+
+[1] P. Valente and M. Andreolini, "Improving Application
+    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
+    the 5th Annual International Systems and Storage Conference
+    (SYSTOR '12), June 2012.
+    Slightly extended version:
+    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
+							results.pdf
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- include/linux/sched/mm.h | 12 ++++++++++++
- mm/page_alloc.c          | 11 ++++++-----
- mm/vmscan.c              | 17 +++++++++++------
- 3 files changed, 29 insertions(+), 11 deletions(-)
+ block/bfq-iosched.c | 87 +++++++++++++++++++++++++----------------------------
+ 1 file changed, 41 insertions(+), 46 deletions(-)
 
-diff --git a/include/linux/sched/mm.h b/include/linux/sched/mm.h
-index 9daabe138c99..2b24a6974847 100644
---- a/include/linux/sched/mm.h
-+++ b/include/linux/sched/mm.h
-@@ -191,4 +191,16 @@ static inline void memalloc_nofs_restore(unsigned int flags)
- 	current->flags = (current->flags & ~PF_MEMALLOC_NOFS) | flags;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 800048fa..553aee1 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -752,9 +752,6 @@ static struct kmem_cache *bfq_pool;
+ #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
+ #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
+ 
+-/* Budget feedback step. */
+-#define BFQ_BUDGET_STEP         128
+-
+ /* Min samples used for peak rate estimation (for autotuning). */
+ #define BFQ_PEAK_RATE_SAMPLES	32
+ 
+@@ -4074,40 +4071,6 @@ static struct bfq_queue *bfq_set_in_service_queue(struct bfq_data *bfqd)
+ 	return bfqq;
  }
  
-+static inline unsigned int memalloc_noreclaim_save(void)
-+{
-+	unsigned int flags = current->flags & PF_MEMALLOC;
-+	current->flags |= PF_MEMALLOC;
-+	return flags;
-+}
-+
-+static inline void memalloc_noreclaim_restore(unsigned int flags)
-+{
-+	current->flags = (current->flags & ~PF_MEMALLOC) | flags;
-+}
-+
- #endif /* _LINUX_SCHED_MM_H */
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index b84e6ffbe756..037e32dccd7a 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -3288,15 +3288,15 @@ __alloc_pages_direct_compact(gfp_t gfp_mask, unsigned int order,
- 		enum compact_priority prio, enum compact_result *compact_result)
+-/*
+- * bfq_default_budget - return the default budget for @bfqq on @bfqd.
+- * @bfqd: the device descriptor.
+- * @bfqq: the queue to consider.
+- *
+- * We use 3/4 of the @bfqd maximum budget as the default value
+- * for the max_budget field of the queues.  This lets the feedback
+- * mechanism to start from some middle ground, then the behavior
+- * of the process will drive the heuristics towards high values, if
+- * it behaves as a greedy sequential reader, or towards small values
+- * if it shows a more intermittent behavior.
+- */
+-static unsigned long bfq_default_budget(struct bfq_data *bfqd,
+-					struct bfq_queue *bfqq)
+-{
+-	unsigned long budget;
+-
+-	/*
+-	 * When we need an estimate of the peak rate we need to avoid
+-	 * to give budgets that are too short due to previous
+-	 * measurements.  So, in the first 10 assignments use a
+-	 * ``safe'' budget value. For such first assignment the value
+-	 * of bfqd->budgets_assigned happens to be lower than 194.
+-	 * See __bfq_set_in_service_queue for the formula by which
+-	 * this field is computed.
+-	 */
+-	if (bfqd->budgets_assigned < 194 && bfqd->bfq_user_max_budget == 0)
+-		budget = bfq_default_max_budget;
+-	else
+-		budget = bfqd->bfq_max_budget;
+-
+-	return budget - budget / 4;
+-}
+-
+ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
  {
- 	struct page *page;
--	unsigned int noreclaim_flag = current->flags & PF_MEMALLOC;
-+	unsigned int noreclaim_flag;
+ 	struct bfq_queue *bfqq = bfqd->in_service_queue;
+@@ -4232,13 +4195,47 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
+ 		 * for throughput.
+ 		 */
+ 		case BFQQE_TOO_IDLE:
+-			if (budget > min_budget + BFQ_BUDGET_STEP)
+-				budget -= BFQ_BUDGET_STEP;
+-			else
+-				budget = min_budget;
++			/*
++			 * This is the only case where we may reduce
++			 * the budget: if there is no request of the
++			 * process still waiting for completion, then
++			 * we assume (tentatively) that the timer has
++			 * expired because the batch of requests of
++			 * the process could have been served with a
++			 * smaller budget.  Hence, betting that
++			 * process will behave in the same way when it
++			 * becomes backlogged again, we reduce its
++			 * next budget.  As long as we guess right,
++			 * this budget cut reduces the latency
++			 * experienced by the process.
++			 *
++			 * However, if there are still outstanding
++			 * requests, then the process may have not yet
++			 * issued its next request just because it is
++			 * still waiting for the completion of some of
++			 * the still outstanding ones.  So in this
++			 * subcase we do not reduce its budget, on the
++			 * contrary we increase it to possibly boost
++			 * the throughput, as discussed in the
++			 * comments to the BUDGET_TIMEOUT case.
++			 */
++			if (bfqq->dispatched > 0) /* still outstanding reqs */
++				budget = min(budget * 2, bfqd->bfq_max_budget);
++			else {
++				if (budget > 5 * min_budget)
++					budget -= 4 * min_budget;
++				else
++					budget = min_budget;
++			}
+ 			break;
+ 		case BFQQE_BUDGET_TIMEOUT:
+-			budget = bfq_default_budget(bfqd, bfqq);
++			/*
++			 * We double the budget here because it gives
++			 * the chance to boost the throughput if this
++			 * is not a seeky process (and has bumped into
++			 * this timeout because of, e.g., ZBR).
++			 */
++			budget = min(budget * 2, bfqd->bfq_max_budget);
+ 			break;
+ 		case BFQQE_BUDGET_EXHAUSTED:
+ 			/*
+@@ -4250,8 +4247,7 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
+ 			 * definitely increase the budget of this good
+ 			 * candidate to boost the disk throughput.
+ 			 */
+-			budget = min(budget + 8 * BFQ_BUDGET_STEP,
+-				     bfqd->bfq_max_budget);
++			budget = min(budget * 4, bfqd->bfq_max_budget);
+ 			break;
+ 		case BFQQE_NO_MORE_REQUESTS:
+ 			/*
+@@ -5025,9 +5021,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	bfqq->pid = pid;
  
- 	if (!order)
- 		return NULL;
+ 	/* Tentative initial value to trade off between thr and lat */
+-	bfqq->max_budget = bfq_default_budget(bfqd, bfqq);
++	bfqq->max_budget = (2 * bfq_max_budget(bfqd)) / 3;
+ 	bfqq->budget_timeout = bfq_smallest_from_now();
+-	bfqq->pid = pid;
  
--	current->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 	*compact_result = try_to_compact_pages(gfp_mask, order, alloc_flags, ac,
- 									prio);
--	current->flags = (current->flags & ~PF_MEMALLOC) | noreclaim_flag;
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 
- 	if (*compact_result <= COMPACT_INACTIVE)
- 		return NULL;
-@@ -3443,12 +3443,13 @@ __perform_reclaim(gfp_t gfp_mask, unsigned int order,
- {
- 	struct reclaim_state reclaim_state;
- 	int progress;
-+	unsigned int noreclaim_flag;
- 
- 	cond_resched();
- 
- 	/* We now go into synchronous reclaim */
- 	cpuset_memory_pressure_bump();
--	current->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 	lockdep_set_current_reclaim_state(gfp_mask);
- 	reclaim_state.reclaimed_slab = 0;
- 	current->reclaim_state = &reclaim_state;
-@@ -3458,7 +3459,7 @@ __perform_reclaim(gfp_t gfp_mask, unsigned int order,
- 
- 	current->reclaim_state = NULL;
- 	lockdep_clear_current_reclaim_state();
--	current->flags &= ~PF_MEMALLOC;
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 
- 	cond_resched();
- 
-diff --git a/mm/vmscan.c b/mm/vmscan.c
-index 58615bb27f2f..ff63b91a0f48 100644
---- a/mm/vmscan.c
-+++ b/mm/vmscan.c
-@@ -2992,6 +2992,7 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
- 	struct zonelist *zonelist;
- 	unsigned long nr_reclaimed;
- 	int nid;
-+	unsigned int noreclaim_flag;
- 	struct scan_control sc = {
- 		.nr_to_reclaim = max(nr_pages, SWAP_CLUSTER_MAX),
- 		.gfp_mask = (current_gfp_context(gfp_mask) & GFP_RECLAIM_MASK) |
-@@ -3018,9 +3019,9 @@ unsigned long try_to_free_mem_cgroup_pages(struct mem_cgroup *memcg,
- 					    sc.gfp_mask,
- 					    sc.reclaim_idx);
- 
--	current->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 	nr_reclaimed = do_try_to_free_pages(zonelist, &sc);
--	current->flags &= ~PF_MEMALLOC;
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 
- 	trace_mm_vmscan_memcg_reclaim_end(nr_reclaimed);
- 
-@@ -3544,8 +3545,9 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
- 	struct zonelist *zonelist = node_zonelist(numa_node_id(), sc.gfp_mask);
- 	struct task_struct *p = current;
- 	unsigned long nr_reclaimed;
-+	unsigned int noreclaim_flag;
- 
--	p->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 	lockdep_set_current_reclaim_state(sc.gfp_mask);
- 	reclaim_state.reclaimed_slab = 0;
- 	p->reclaim_state = &reclaim_state;
-@@ -3554,7 +3556,7 @@ unsigned long shrink_all_memory(unsigned long nr_to_reclaim)
- 
- 	p->reclaim_state = NULL;
- 	lockdep_clear_current_reclaim_state();
--	p->flags &= ~PF_MEMALLOC;
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 
- 	return nr_reclaimed;
- }
-@@ -3719,6 +3721,7 @@ static int __node_reclaim(struct pglist_data *pgdat, gfp_t gfp_mask, unsigned in
- 	struct task_struct *p = current;
- 	struct reclaim_state reclaim_state;
- 	int classzone_idx = gfp_zone(gfp_mask);
-+	unsigned int noreclaim_flag;
- 	struct scan_control sc = {
- 		.nr_to_reclaim = max(nr_pages, SWAP_CLUSTER_MAX),
- 		.gfp_mask = (gfp_mask = current_gfp_context(gfp_mask)),
-@@ -3736,7 +3739,8 @@ static int __node_reclaim(struct pglist_data *pgdat, gfp_t gfp_mask, unsigned in
- 	 * and we also need to be able to write out pages for RECLAIM_WRITE
- 	 * and RECLAIM_UNMAP.
- 	 */
--	p->flags |= PF_MEMALLOC | PF_SWAPWRITE;
-+	noreclaim_flag = memalloc_noreclaim_save();
-+	p->flags |= PF_SWAPWRITE;
- 	lockdep_set_current_reclaim_state(gfp_mask);
- 	reclaim_state.reclaimed_slab = 0;
- 	p->reclaim_state = &reclaim_state;
-@@ -3752,7 +3756,8 @@ static int __node_reclaim(struct pglist_data *pgdat, gfp_t gfp_mask, unsigned in
- 	}
- 
- 	p->reclaim_state = NULL;
--	current->flags &= ~(PF_MEMALLOC | PF_SWAPWRITE);
-+	current->flags &= ~PF_SWAPWRITE;
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 	lockdep_clear_current_reclaim_state();
- 	return sc.nr_reclaimed >= nr_pages;
- }
+ 	/* first request is almost certainly seeky */
+ 	bfqq->seek_history = 1;
 -- 
-2.12.2
+2.10.0
