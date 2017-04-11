@@ -1,28 +1,28 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f43.google.com ([209.85.215.43]:33069 "EHLO
-        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752851AbdDLU5d (ORCPT
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:35427 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752359AbdDKOlt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2017 16:57:33 -0400
-Received: by mail-lf0-f43.google.com with SMTP id h125so20533295lfe.0
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2017 13:57:33 -0700 (PDT)
-Subject: Re: [PATCH v6] lightnvm: physical block device (pblk) target
+        Tue, 11 Apr 2017 10:41:49 -0400
+Received: by mail-wm0-f42.google.com with SMTP id w64so65624723wma.0
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2017 07:41:48 -0700 (PDT)
+Subject: Re: [PATCH v5] lightnvm: physical block device (pblk) target
 To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
-References: <1492003155-19320-1-git-send-email-javier@cnexlabs.com>
- <1492003155-19320-2-git-send-email-javier@cnexlabs.com>
+References: <1491921077-9377-1-git-send-email-javier@cnexlabs.com>
+ <1491921077-9377-2-git-send-email-javier@cnexlabs.com>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Bart.VanAssche@sandisk.com,
         =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
 From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <0167c816-9955-8fcc-3b53-b8965fef41f1@lightnvm.io>
-Date: Wed, 12 Apr 2017 22:57:30 +0200
+Message-ID: <c2f1bccd-5b1e-b51e-a236-5d2186159e32@lightnvm.io>
+Date: Tue, 11 Apr 2017 16:41:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <1492003155-19320-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1491921077-9377-2-git-send-email-javier@cnexlabs.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 04/12/2017 03:19 PM, Javier González wrote:
+On 04/11/2017 04:31 PM, Javier González wrote:
 > This patch introduces pblk, a host-side translation layer for
 > Open-Channel SSDs to expose them like block devices. The translation
 > layer allows data placement decisions, and I/O scheduling to be
@@ -69,6 +69,5 @@ On 04/12/2017 03:19 PM, Javier González wrote:
 >   Huaicheng Li <huaicheng@cs.uchicago.edu>
 >
 > Signed-off-by: Javier González <javier@cnexlabs.com>
-> ---
 
-Thanks Javier. Applied to 4.12, and replaced the v5 version.
+Awesome. Applied for 4.12.
