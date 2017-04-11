@@ -1,118 +1,103 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: [resend PATCH v2 19/33] dax,
- pmem: introduce 'copy_from_iter' dax operation
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org,
-        Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
-Date: Mon, 17 Apr 2017 12:10:32 -0700
-Message-ID: <149245623288.10206.11548740991639475206.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 2/9] nowait aio: Introduce RWF_NOWAIT
+Date: Tue, 11 Apr 2017 09:26:12 -0500
+Message-Id: <20170411142619.27205-3-rgoldwyn@suse.de>
+In-Reply-To: <20170411142619.27205-1-rgoldwyn@suse.de>
+References: <20170411142619.27205-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The direct-I/O write path for a pmem device must ensure that data is
-flushed to a power-fail safe zone when the operation is complete.
-However, other dax capable block devices, like brd, do not have this
-requirement.  Introduce a 'copy_from_iter' dax operation so that pmem
-can inject cache management without imposing this overhead on other dax
-capable block_device drivers.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-This is also a first step of moving all architecture-specific
-pmem-operations to the pmem driver.
+This flag informs kernel to bail out if an AIO request will block
+for reasons such as file allocations, or a writeback triggered,
+or would block while allocating requests while performing
+direct I/O.
 
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Unfortunately, aio_flags is not checked for validity, which would
+break existing applications which have it set to anything besides zero
+or IOCB_FLAG_RESFD. So, we are using aio_reserved1 and renaming it
+to aio_rw_flags.
+
+RWF_NOWAIT is translated to IOCB_NOWAIT for iocb->ki_flags.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/nvdimm/pmem.c |   43 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/dax.h   |    3 +++
- 2 files changed, 46 insertions(+)
+ fs/aio.c                | 12 ++++++++++--
+ include/linux/fs.h      |  1 +
+ include/uapi/linux/fs.h |  1 +
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 3b3dab73d741..e501df4ab4b4 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -220,6 +220,48 @@ __weak long __pmem_direct_access(struct pmem_device *pmem, pgoff_t pgoff,
- 	return PHYS_PFN(pmem->size - pmem->pfn_pad - offset);
- }
+diff --git a/fs/aio.c b/fs/aio.c
+index 7cd1443ad1c8..948af3729d69 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1546,12 +1546,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		return -EINVAL;
+ 	}
  
-+static size_t pmem_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff,
-+		void *addr, size_t bytes, struct iov_iter *i)
-+{
-+	size_t len;
-+
-+	/* TODO: skip the write-back by always using non-temporal stores */
-+	len = copy_from_iter_nocache(addr, bytes, i);
-+
-+	/*
-+	 * In the iovec case on x86_64 copy_from_iter_nocache() uses
-+	 * non-temporal stores for the bulk of the transfer, but we need
-+	 * to manually flush if the transfer is unaligned. A cached
-+	 * memory copy is used when destination or size is not naturally
-+	 * aligned. That is:
-+	 *   - Require 8-byte alignment when size is 8 bytes or larger.
-+	 *   - Require 4-byte alignment when size is 4 bytes.
-+	 *
-+	 * In the non-iovec case the entire destination needs to be
-+	 * flushed.
-+	 */
-+	if (iter_is_iovec(i)) {
-+		unsigned long flushed, dest = (unsigned long) addr;
-+
-+		if (bytes < 8) {
-+			if (!IS_ALIGNED(dest, 4) || (bytes != 4))
-+				wb_cache_pmem(addr, 1);
-+		} else {
-+			if (!IS_ALIGNED(dest, 8)) {
-+				dest = ALIGN(dest, boot_cpu_data.x86_clflush_size);
-+				wb_cache_pmem(addr, 1);
-+			}
-+
-+			flushed = dest - (unsigned long) addr;
-+			if (bytes > flushed && !IS_ALIGNED(bytes - flushed, 8))
-+				wb_cache_pmem(addr + bytes - 1, 1);
+-	if (unlikely(iocb->aio_rw_flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))) {
++	if (unlikely(iocb->aio_rw_flags &
++		     ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT))) {
+ 		pr_debug("EINVAL: aio_rw_flags set with incompatible flags\n");
+ 		return -EINVAL;
+ 	}
+ 
+-
+ 	/* prevent overflows */
+ 	if (unlikely(
+ 	    (iocb->aio_buf != (unsigned long)iocb->aio_buf) ||
+@@ -1598,6 +1598,14 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		req->common.ki_flags |= IOCB_DSYNC;
+ 	if (iocb->aio_rw_flags & RWF_SYNC)
+ 		req->common.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	if (iocb->aio_rw_flags & RWF_NOWAIT) {
++		if (!(iocb->aio_lio_opcode & IOCB_CMD_PWRITE) ||
++		    !(req->common.ki_flags & IOCB_DIRECT)) {
++			ret = -EINVAL;
++			goto out_put_req;
 +		}
-+	} else
-+		wb_cache_pmem(addr, bytes);
-+
-+	return len;
-+}
-+
- static const struct block_device_operations pmem_fops = {
- 	.owner =		THIS_MODULE,
- 	.rw_page =		pmem_rw_page,
-@@ -236,6 +278,7 @@ static long pmem_dax_direct_access(struct dax_device *dax_dev,
++		req->common.ki_flags |= IOCB_NOWAIT;
++	}
  
- static const struct dax_operations pmem_dax_ops = {
- 	.direct_access = pmem_dax_direct_access,
-+	.copy_from_iter = pmem_copy_from_iter,
- };
+ 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
+ 	if (unlikely(ret)) {
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 7251f7bb45e8..e8d93462529c 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -270,6 +270,7 @@ struct writeback_control;
+ #define IOCB_DSYNC		(1 << 4)
+ #define IOCB_SYNC		(1 << 5)
+ #define IOCB_WRITE		(1 << 6)
++#define IOCB_NOWAIT		(1 << 7)
  
- static void pmem_release_queue(void *q)
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index d3158e74a59e..156f067d4db5 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -16,6 +16,9 @@ struct dax_operations {
- 	 */
- 	long (*direct_access)(struct dax_device *, pgoff_t, long,
- 			void **, pfn_t *);
-+	/* copy_from_iter: dax-driver override for default copy_from_iter */
-+	size_t (*copy_from_iter)(struct dax_device *, pgoff_t, void *, size_t,
-+			struct iov_iter *);
- };
+ struct kiocb {
+ 	struct file		*ki_filp;
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 048a85e9f017..7bcaef101876 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -347,5 +347,6 @@ struct fscrypt_policy {
+ #define RWF_HIPRI			0x00000001 /* high priority request, poll if possible */
+ #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
+ #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
++#define RWF_NOWAIT			0x00000008 /* per-IO, return -EAGAIN if operation would block */
  
- int dax_read_lock(void);
+ #endif /* _UAPI_LINUX_FS_H */
+-- 
+2.12.0
