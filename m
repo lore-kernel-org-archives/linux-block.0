@@ -1,18 +1,18 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:37232 "EHLO
-        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753484AbdDKOTI (ORCPT
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:38836 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753456AbdDKOTG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2017 10:19:08 -0400
-Received: by mail-wm0-f47.google.com with SMTP id u2so2022547wmu.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2017 07:19:08 -0700 (PDT)
+        Tue, 11 Apr 2017 10:19:06 -0400
+Received: by mail-wm0-f41.google.com with SMTP id t189so2201134wmt.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2017 07:19:06 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 3/3] lightnvm: convert sprintf into strlcpy
-Date: Tue, 11 Apr 2017 16:18:58 +0200
-Message-Id: <1491920338-2348-5-git-send-email-javier@cnexlabs.com>
+Subject: [PATCH] lightnvm: convert sprintf into strlcpy
+Date: Tue, 11 Apr 2017 16:18:56 +0200
+Message-Id: <1491920338-2348-3-git-send-email-javier@cnexlabs.com>
 In-Reply-To: <1491920338-2348-1-git-send-email-javier@cnexlabs.com>
 References: <1491920338-2348-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
