@@ -1,148 +1,181 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd-general@lists.sourceforge.net,
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
 	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH 12/12] nbd: add a flag to destroy an nbd device on disconnect
-Date: Thu,  6 Apr 2017 17:02:07 -0400
-Message-Id: <1491512527-4286-13-git-send-email-jbacik@fb.com>
-In-Reply-To: <1491512527-4286-1-git-send-email-jbacik@fb.com>
-References: <1491512527-4286-1-git-send-email-jbacik@fb.com>
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V3 09/16] block, bfq: reduce latency during request-pool saturation
+Date: Tue, 11 Apr 2017 15:43:08 +0200
+Message-Id: <20170411134315.44135-10-paolo.valente@linaro.org>
+In-Reply-To: <20170411134315.44135-1-paolo.valente@linaro.org>
+References: <20170411134315.44135-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-For ease of management it would be nice for users to specify that the
-device node for a nbd device is destroyed once it is disconnected and
-there are no more users.  Add a client flag and enable this operation to
-happen.
+This patch introduces an heuristic that reduces latency when the
+I/O-request pool is saturated. This goal is achieved by disabling
+device idling, for non-weight-raised queues, when there are weight-
+raised queues with pending or in-flight requests. In fact, as
+explained in more detail in the comment on the function
+bfq_bfqq_may_idle(), this reduces the rate at which processes
+associated with non-weight-raised queues grab requests from the pool,
+thereby increasing the probability that processes associated with
+weight-raised queues get a request immediately (or at least soon) when
+they need one. Along the same line, if there are weight-raised queues,
+then this patch halves the service rate of async (write) requests for
+non-weight-raised queues.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- drivers/block/nbd.c      | 30 ++++++++++++++++++++++++++++++
- include/uapi/linux/nbd.h |  6 +++++-
- 2 files changed, 35 insertions(+), 1 deletion(-)
+ block/bfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index b33014a..d220045 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -74,6 +74,7 @@ struct link_dead_args {
- #define NBD_HAS_PID_FILE		3
- #define NBD_HAS_CONFIG_REF		4
- #define NBD_BOUND			5
-+#define NBD_DESTROY_ON_DISCONNECT	6
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 574a5f6..deb1f21c 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -420,6 +420,8 @@ struct bfq_data {
+ 	 * queue in service, even if it is idling).
+ 	 */
+ 	int busy_queues;
++	/* number of weight-raised busy @bfq_queues */
++	int wr_busy_queues;
+ 	/* number of queued requests */
+ 	int queued;
+ 	/* number of requests dispatched and waiting for completion */
+@@ -2490,6 +2492,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  
- struct nbd_config {
- 	u32 flags;
-@@ -174,6 +175,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 		del_gendisk(disk);
- 		blk_cleanup_queue(disk->queue);
- 		blk_mq_free_tag_set(&nbd->tag_set);
-+		disk->private_data = NULL;
- 		put_disk(disk);
- 	}
- 	kfree(nbd);
-@@ -1028,6 +1030,7 @@ static void nbd_config_put(struct nbd_device *nbd)
- 			kfree(config->socks);
+ 	bfqd->busy_queues--;
+ 
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues--;
++
+ 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
+ 
+ 	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
+@@ -2506,6 +2511,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues++;
++
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues++;
+ }
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+@@ -3779,7 +3787,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
+ 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
+ 		return blk_rq_sectors(rq);
+ 
+-	return blk_rq_sectors(rq) * bfq_async_charge_factor;
++	/*
++	 * If there are no weight-raised queues, then amplify service
++	 * by just the async charge factor; otherwise amplify service
++	 * by twice the async charge factor, to further reduce latency
++	 * for weight-raised queues.
++	 */
++	if (bfqq->bfqd->wr_busy_queues == 0)
++		return blk_rq_sectors(rq) * bfq_async_charge_factor;
++
++	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
+ }
+ 
+ /**
+@@ -4234,6 +4251,7 @@ static void bfq_add_request(struct request *rq)
+ 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
+ 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
+ 
++			bfqd->wr_busy_queues++;
+ 			bfqq->entity.prio_changed = 1;
  		}
- 		nbd_reset(nbd);
-+
- 		mutex_unlock(&nbd->config_lock);
- 		nbd_put(nbd);
- 		module_put(THIS_MODULE);
-@@ -1540,6 +1543,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	struct nbd_config *config;
- 	int index = -1;
- 	int ret;
-+	bool put_dev = false;
+ 		if (prev != bfqq->next_rq)
+@@ -4474,6 +4492,8 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
+ /* Must be called with bfqq != NULL */
+ static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
+ {
++	if (bfq_bfqq_busy(bfqq))
++		bfqq->bfqd->wr_busy_queues--;
+ 	bfqq->wr_coeff = 1;
+ 	bfqq->wr_cur_max_time = 0;
+ 	bfqq->last_wr_start_finish = jiffies;
+@@ -5497,7 +5517,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+-	bool idling_boosts_thr, asymmetric_scenario;
++	bool idling_boosts_thr, idling_boosts_thr_without_issues,
++		asymmetric_scenario;
  
- 	if (!netlink_capable(skb, CAP_SYS_ADMIN))
- 		return -EPERM;
-@@ -1634,6 +1638,15 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	if (info->attrs[NBD_ATTR_SERVER_FLAGS])
- 		config->flags =
- 			nla_get_u64(info->attrs[NBD_ATTR_SERVER_FLAGS]);
-+	if (info->attrs[NBD_ATTR_CLIENT_FLAGS]) {
-+		u64 flags = nla_get_u64(info->attrs[NBD_ATTR_CLIENT_FLAGS]);
-+		if (flags & NBD_CFLAG_DESTROY_ON_DISCONNECT) {
-+			set_bit(NBD_DESTROY_ON_DISCONNECT,
-+				&config->runtime_flags);
-+			put_dev = true;
-+		}
-+	}
+ 	if (bfqd->strict_guarantees)
+ 		return true;
+@@ -5520,6 +5541,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
+ 
+ 	/*
++	 * The value of the next variable,
++	 * idling_boosts_thr_without_issues, is equal to that of
++	 * idling_boosts_thr, unless a special case holds. In this
++	 * special case, described below, idling may cause problems to
++	 * weight-raised queues.
++	 *
++	 * When the request pool is saturated (e.g., in the presence
++	 * of write hogs), if the processes associated with
++	 * non-weight-raised queues ask for requests at a lower rate,
++	 * then processes associated with weight-raised queues have a
++	 * higher probability to get a request from the pool
++	 * immediately (or at least soon) when they need one. Thus
++	 * they have a higher probability to actually get a fraction
++	 * of the device throughput proportional to their high
++	 * weight. This is especially true with NCQ-capable drives,
++	 * which enqueue several requests in advance, and further
++	 * reorder internally-queued requests.
++	 *
++	 * For this reason, we force to false the value of
++	 * idling_boosts_thr_without_issues if there are weight-raised
++	 * busy queues. In this case, and if bfqq is not weight-raised,
++	 * this guarantees that the device is not idled for bfqq (if,
++	 * instead, bfqq is weight-raised, then idling will be
++	 * guaranteed by another variable, see below). Combined with
++	 * the timestamping rules of BFQ (see [1] for details), this
++	 * behavior causes bfqq, and hence any sync non-weight-raised
++	 * queue, to get a lower number of requests served, and thus
++	 * to ask for a lower number of requests from the request
++	 * pool, before the busy weight-raised queues get served
++	 * again. This often mitigates starvation problems in the
++	 * presence of heavy write workloads and NCQ, thereby
++	 * guaranteeing a higher application and system responsiveness
++	 * in these hostile scenarios.
++	 */
++	idling_boosts_thr_without_issues = idling_boosts_thr &&
++		bfqd->wr_busy_queues == 0;
 +
- 	if (info->attrs[NBD_ATTR_SOCKETS]) {
- 		struct nlattr *attr;
- 		int rem, fd;
-@@ -1671,6 +1684,8 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 		nbd_connect_reply(info, nbd->index);
- 	}
- 	nbd_config_put(nbd);
-+	if (put_dev)
-+		nbd_put(nbd);
- 	return ret;
++	/*
+ 	 * There is then a case where idling must be performed not for
+ 	 * throughput concerns, but to preserve service guarantees. To
+ 	 * introduce it, we can note that allowing the drive to
+@@ -5593,7 +5652,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 *    is necessary to preserve service guarantees.
+ 	 */
+ 	return bfq_bfqq_sync(bfqq) &&
+-		(idling_boosts_thr || asymmetric_scenario);
++		(idling_boosts_thr_without_issues || asymmetric_scenario);
  }
  
-@@ -1723,6 +1738,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 	struct nbd_config *config;
- 	int index;
- 	int ret = -EINVAL;
-+	bool put_dev = false;
+ /*
+@@ -6801,6 +6860,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 					      * high-definition compressed
+ 					      * video.
+ 					      */
++	bfqd->wr_busy_queues = 0;
  
- 	if (!netlink_capable(skb, CAP_SYS_ADMIN))
- 		return -EPERM;
-@@ -1774,6 +1790,18 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 			nla_get_u64(info->attrs[NBD_ATTR_DEAD_CONN_TIMEOUT]);
- 		config->dead_conn_timeout *= HZ;
- 	}
-+	if (info->attrs[NBD_ATTR_CLIENT_FLAGS]) {
-+		u64 flags = nla_get_u64(info->attrs[NBD_ATTR_CLIENT_FLAGS]);
-+		if (flags & NBD_CFLAG_DESTROY_ON_DISCONNECT) {
-+			if (!test_and_set_bit(NBD_DESTROY_ON_DISCONNECT,
-+					      &config->runtime_flags))
-+				put_dev = true;
-+		} else {
-+			if (test_and_clear_bit(NBD_DESTROY_ON_DISCONNECT,
-+					       &config->runtime_flags))
-+				refcount_inc(&nbd->refs);
-+		}
-+	}
- 
- 	if (info->attrs[NBD_ATTR_SOCKETS]) {
- 		struct nlattr *attr;
-@@ -1811,6 +1839,8 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 	mutex_unlock(&nbd->config_lock);
- 	nbd_config_put(nbd);
- 	nbd_put(nbd);
-+	if (put_dev)
-+		nbd_put(nbd);
- 	return ret;
- }
- 
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index c91c642..155e33f 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -37,7 +37,7 @@ enum {
- 	NBD_CMD_TRIM = 4
- };
- 
--/* values for flags field */
-+/* values for flags field, these are server interaction specific. */
- #define NBD_FLAG_HAS_FLAGS	(1 << 0) /* nbd-server supports flags */
- #define NBD_FLAG_READ_ONLY	(1 << 1) /* device is read-only */
- #define NBD_FLAG_SEND_FLUSH	(1 << 2) /* can flush writeback cache */
-@@ -45,6 +45,10 @@ enum {
- #define NBD_FLAG_SEND_TRIM	(1 << 5) /* send trim/discard */
- #define NBD_FLAG_CAN_MULTI_CONN	(1 << 8)	/* Server supports multiple connections per export. */
- 
-+/* These are client behavior specific flags. */
-+#define NBD_CFLAG_DESTROY_ON_DISCONNECT	(1 << 0) /* delete the nbd device on
-+						    disconnect. */
-+
- /* userspace doesn't need the nbd_device structure */
- 
- /* These are sent over the network in the request/reply magic fields */
+ 	/*
+ 	 * Begin by assuming, optimistically, that the device is a
 -- 
-2.7.4
+2.10.0
