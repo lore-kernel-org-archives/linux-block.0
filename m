@@ -1,51 +1,28 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: [resend PATCH v2 30/33] libnvdimm, pmem: fix persistence warning
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, linux-fsdevel@vger.kernel.org,
-        Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
-Date: Mon, 17 Apr 2017 12:11:32 -0700
-Message-ID: <149245629217.10206.5073008164111171947.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <mchristi@redhat.com>
+Subject: Re: RFC: remove REQ_OP_WRITE_SAME
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+ martin.petersen@oracle.com, philipp.reisner@linbit.com,
+ lars.ellenberg@linbit.com, target-devel@vger.kernel.org
+References: <20170410160807.23674-1-hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ drbd-dev@lists.linbit.com, dm-devel@redhat.com
+From: Mike Christie <mchristi@redhat.com>
+Message-ID: <58ED092A.5080901@redhat.com>
+Date: Tue, 11 Apr 2017 11:49:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
+In-Reply-To: <20170410160807.23674-1-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-The pmem driver assumes if platform firmware describes the memory
-devices associated with a persistent memory range and
-CONFIG_ARCH_HAS_PMEM_API=y that it has all the mechanism necessary to
-flush data to a power-fail safe zone. We warn if the firmware does not
-describe memory devices, but we also need to warn if the architecture
-does not claim pmem support.
+On 04/10/2017 11:07 AM, Christoph Hellwig wrote:
+> Now that we are using REQ_OP_WRITE_ZEROES for all zeroing needs in the
+> kernel there is very little use left for REQ_OP_WRITE_SAME.  We only
+> have two callers left, and both just export optional protocol features
+> to remote systems: DRBD and the target code.
+> 
+> Do we have any major users of those?  If not removing it will clean up
+> a few warts in the block layer.
 
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- drivers/nvdimm/region_devs.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index 307a48060aa3..5976f6c0407f 100644
---- a/drivers/nvdimm/region_devs.c
-+++ b/drivers/nvdimm/region_devs.c
-@@ -970,8 +970,9 @@ int nvdimm_has_flush(struct nd_region *nd_region)
- 	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
- 	int i;
- 
--	/* no nvdimm == flushing capability unknown */
--	if (nd_region->ndr_mappings == 0)
-+	/* no nvdimm or pmem api == flushing capability unknown */
-+	if (nd_region->ndr_mappings == 0
-+			|| !IS_ENABLED(CONFIG_ARCH_HAS_PMEM_API))
- 		return -ENXIO;
- 
- 	for (i = 0; i < nd_region->ndr_mappings; i++)
+I added the iblock write same support because for RBD/ceph we were going
+to pass it from rbd down to the OSD. We are using tcmu right now, so we
+no longer need iblock support.
