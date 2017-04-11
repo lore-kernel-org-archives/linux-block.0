@@ -1,24 +1,66 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "tj@kernel.org" <tj@kernel.org>, "paolo.valente@linaro.org"
-	<paolo.valente@linaro.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"fchecconi@gmail.com" <fchecconi@gmail.com>, "avanzini.arianna@gmail.com"
-	<avanzini.arianna@gmail.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linus.walleij@linaro.org"
-	<linus.walleij@linaro.org>, "broonie@kernel.org" <broonie@kernel.org>
-Subject: Re: [PATCH V3 00/16] Introduce the BFQ I/O scheduler
-Date: Tue, 11 Apr 2017 14:37:15 +0000
-Message-ID: <1491921434.2540.1.camel@sandisk.com>
-References: <20170411134315.44135-1-paolo.valente@linaro.org>
-In-Reply-To: <20170411134315.44135-1-paolo.valente@linaro.org>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V3 00/16] Introduce the BFQ I/O scheduler
+Date: Tue, 11 Apr 2017 15:42:59 +0200
+Message-Id: <20170411134315.44135-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTA0LTExIGF0IDE1OjQyICswMjAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
-PiBuZXcgcGF0Y2ggc2VyaWVzLCBhZGRyZXNzaW5nIChib3RoKSBpc3N1ZXMgcmFpc2VkIGJ5IEJh
-cnQgWzFdLg0KDQpIZWxsbyBQYW9sbywNCg0KSXMgdGhlcmUgYSBnaXQgdHJlZSBhdmFpbGFibGUg
-c29tZXdoZXJlIHdpdGggdGhlc2UgcGF0Y2hlcyBhbmQgd2l0aG91dA0KdGhlIHNpbmdsZSBxdWV1
-ZSBCRlEgc2NoZWR1bGVyPw0KDQpUaGFua3MsDQoNCkJhcnQu
+Hi,
+new patch series, addressing (both) issues raised by Bart [1].
+
+Thanks,
+Paolo
+
+[1] https://lkml.org/lkml/2017/3/31/393
+
+Arianna Avanzini (4):
+  block, bfq: add full hierarchical scheduling and cgroups support
+  block, bfq: add Early Queue Merge (EQM)
+  block, bfq: reduce idling only in symmetric scenarios
+  block, bfq: handle bursts of queue activations
+
+Paolo Valente (12):
+  block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler
+  block, bfq: improve throughput boosting
+  block, bfq: modify the peak-rate estimator
+  block, bfq: add more fairness with writes and slow processes
+  block, bfq: improve responsiveness
+  block, bfq: reduce I/O latency for soft real-time applications
+  block, bfq: preserve a low latency also with NCQ-capable drives
+  block, bfq: reduce latency during request-pool saturation
+  block, bfq: boost the throughput on NCQ-capable flash-based devices
+  block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
+  block, bfq: remove all get and put of I/O contexts
+  block, bfq: split bfq-iosched.c into multiple source files
+
+ Documentation/block/00-INDEX        |    2 +
+ Documentation/block/bfq-iosched.txt |  531 ++++
+ block/Kconfig.iosched               |   21 +
+ block/Makefile                      |    1 +
+ block/bfq-cgroup.c                  | 1139 ++++++++
+ block/bfq-iosched.c                 | 5047 +++++++++++++++++++++++++++++++++++
+ block/bfq-iosched.h                 |  942 +++++++
+ block/bfq-wf2q.c                    | 1616 +++++++++++
+ include/linux/blkdev.h              |    2 +-
+ 9 files changed, 9300 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/block/bfq-iosched.txt
+ create mode 100644 block/bfq-cgroup.c
+ create mode 100644 block/bfq-iosched.c
+ create mode 100644 block/bfq-iosched.h
+ create mode 100644 block/bfq-wf2q.c
+
+--
+2.10.0
