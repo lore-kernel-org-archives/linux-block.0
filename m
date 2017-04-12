@@ -1,63 +1,48 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>
-Subject: [PATCH v4 0/6] Avoid that scsi-mq and dm-mq queue processing stalls sporadically
-Date: Fri, 7 Apr 2017 11:16:48 -0700
-Message-ID: <20170407181654.27836-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Cc: <linux-block@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 05/25] fs: Get proper reference for s_bdi
+Date: Wed, 12 Apr 2017 12:24:29 +0200
+Message-Id: <20170412102449.16901-6-jack@suse.cz>
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
+References: <20170412102449.16901-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+So far we just relied on block device to hold a bdi reference for us
+while the filesystem is mounted. While that works perfectly fine, it is
+a bit awkward that we have a pointer to a refcounted structure in the
+superblock without proper reference. So make s_bdi hold a proper
+reference to block device's BDI. No filesystem using mount_bdev()
+actually changes s_bdi so this is safe and will make bdev filesystems
+work the same way as filesystems needing to set up their private bdi.
 
-The six patches in this patch series fix the queue lockup I reported
-recently on the linux-block mailing list. Please consider these patches
-for inclusion in the upstream kernel.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/super.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Thanks,
-
-Bart.
-
-Changes between v3 and v4:
-- Addressed the review comments on version three of this series about the
-  patch that makes it safe to use RCU to iterate over .tag_list and also
-  about the runtime performance and use of short variable names in patch 2/5.
-- Clarified the description of the patch that fixes the scsi-mq stall.
-- Added a patch to fix a dm-mq queue stall.
-  
-Changes between v2 and v3:
-- Removed the blk_mq_ops.restart_hctx function pointer again.
-- Modified blk_mq_sched_restart_queues() such that only a single hardware
-  queue is restarted instead of multiple if hardware queues are shared.
-- Introduced a new function in the block layer, namely
-  blk_mq_delay_run_hw_queue().  
-
-Changes between v1 and v2:
-- Reworked scsi_restart_queues() such that it no longer takes the SCSI
-  host lock.
-- Added two patches - one for exporting blk_mq_sched_restart_hctx() and
-  another one to make iterating with RCU over blk_mq_tag_set.tag_list safe.
-
-Bart Van Assche (6):
-  blk-mq: Make it safe to use RCU to iterate over
-    blk_mq_tag_set.tag_list
-  blk-mq: Restart a single queue if tag sets are shared
-  blk-mq: Clarify comments in blk_mq_dispatch_rq_list()
-  blk-mq: Introduce blk_mq_delay_run_hw_queue()
-  scsi: Avoid that SCSI queues get stuck
-  dm rq: Avoid that request processing stalls sporadically
-
- block/blk-mq-sched.c    | 63 +++++++++++++++++++++++++++++++++++-------
- block/blk-mq-sched.h    | 16 +----------
- block/blk-mq.c          | 73 +++++++++++++++++++++++++++++++++++++++----------
- drivers/md/dm-rq.c      |  1 +
- drivers/scsi/scsi_lib.c |  6 ++--
- include/linux/blk-mq.h  |  2 ++
- include/linux/blkdev.h  |  1 -
- 7 files changed, 118 insertions(+), 44 deletions(-)
-
+diff --git a/fs/super.c b/fs/super.c
+index 0f51a437c269..e267d3a00144 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1054,12 +1054,9 @@ static int set_bdev_super(struct super_block *s, void *data)
+ {
+ 	s->s_bdev = data;
+ 	s->s_dev = s->s_bdev->bd_dev;
++	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
++	s->s_iflags |= SB_I_DYNBDI;
+ 
+-	/*
+-	 * We set the bdi here to the queue backing, file systems can
+-	 * overwrite this in ->fill_super()
+-	 */
+-	s->s_bdi = bdev_get_queue(s->s_bdev)->backing_dev_info;
+ 	return 0;
+ }
+ 
 -- 
 2.12.0
