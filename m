@@ -1,179 +1,79 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:28822 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756760AbdDQTPR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2017 15:15:17 -0400
-Subject: [resend PATCH v2 07/33] brd: add dax_operations support
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-kernel@vger.kernel.org, hch@lst.de
-Date: Mon, 17 Apr 2017 12:09:27 -0700
-Message-ID: <149245616744.10206.871365891826305046.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Miklos Szeredi <miklos@szeredi.hu>
+Subject: [PATCH 17/25] fuse: Get rid of bdi_initialized
+Date: Wed, 12 Apr 2017 12:24:41 +0200
+Message-Id: <20170412102449.16901-18-jack@suse.cz>
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
+References: <20170412102449.16901-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Setup a dax_inode to have the same lifetime as the brd block device and
-add a ->direct_access() method that is equivalent to
-brd_direct_access(). Once fs/dax.c has been converted to use
-dax_operations the old brd_direct_access() will be removed.
+It is not needed anymore since bdi is initialized whenever superblock
+exists.
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+CC: Miklos Szeredi <miklos@szeredi.hu>
+CC: linux-fsdevel@vger.kernel.org
+Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/Kconfig |    1 +
- drivers/block/brd.c   |   65 +++++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 55 insertions(+), 11 deletions(-)
+ fs/fuse/dev.c    | 5 ++---
+ fs/fuse/fuse_i.h | 3 ---
+ fs/fuse/inode.c  | 2 --
+ 3 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index f744de7a0f9b..e66956fc2c88 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -339,6 +339,7 @@ config BLK_DEV_SX8
+diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
+index 78887f68ee6a..c2d7f3a92679 100644
+--- a/fs/fuse/dev.c
++++ b/fs/fuse/dev.c
+@@ -382,7 +382,7 @@ static void request_end(struct fuse_conn *fc, struct fuse_req *req)
+ 			wake_up(&fc->blocked_waitq);
  
- config BLK_DEV_RAM
- 	tristate "RAM block device support"
-+	select DAX if BLK_DEV_RAM_DAX
- 	---help---
- 	  Saying Y here will allow you to use a portion of your RAM memory as
- 	  a block device, so that you can make file systems on it, read and
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 3adc32a3153b..60f3193c9ce2 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -21,6 +21,7 @@
- #include <linux/slab.h>
- #ifdef CONFIG_BLK_DEV_RAM_DAX
- #include <linux/pfn_t.h>
-+#include <linux/dax.h>
- #endif
+ 		if (fc->num_background == fc->congestion_threshold &&
+-		    fc->connected && fc->bdi_initialized) {
++		    fc->connected && fc->sb) {
+ 			clear_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
+ 			clear_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
+ 		}
+@@ -573,8 +573,7 @@ void fuse_request_send_background_locked(struct fuse_conn *fc,
+ 	fc->num_background++;
+ 	if (fc->num_background == fc->max_background)
+ 		fc->blocked = 1;
+-	if (fc->num_background == fc->congestion_threshold &&
+-	    fc->bdi_initialized) {
++	if (fc->num_background == fc->congestion_threshold && fc->sb) {
+ 		set_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
+ 		set_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
+ 	}
+diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
+index 0e7c79a390e0..f33341d9501a 100644
+--- a/fs/fuse/fuse_i.h
++++ b/fs/fuse/fuse_i.h
+@@ -527,9 +527,6 @@ struct fuse_conn {
+ 	/** Filesystem supports NFS exporting.  Only set in INIT */
+ 	unsigned export_support:1;
  
- #include <linux/uaccess.h>
-@@ -41,6 +42,9 @@ struct brd_device {
- 
- 	struct request_queue	*brd_queue;
- 	struct gendisk		*brd_disk;
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	struct dax_device	*dax_dev;
-+#endif
- 	struct list_head	brd_list;
- 
- 	/*
-@@ -375,30 +379,53 @@ static int brd_rw_page(struct block_device *bdev, sector_t sector,
- }
- 
- #ifdef CONFIG_BLK_DEV_RAM_DAX
--static long brd_direct_access(struct block_device *bdev, sector_t sector,
--			void **kaddr, pfn_t *pfn, long size)
-+static long __brd_direct_access(struct brd_device *brd, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn)
- {
--	struct brd_device *brd = bdev->bd_disk->private_data;
- 	struct page *page;
- 
- 	if (!brd)
- 		return -ENODEV;
--	page = brd_insert_page(brd, sector);
-+	page = brd_insert_page(brd, PFN_PHYS(pgoff) / 512);
- 	if (!page)
- 		return -ENOSPC;
- 	*kaddr = page_address(page);
- 	*pfn = page_to_pfn_t(page);
- 
--	return PAGE_SIZE;
-+	return 1;
-+}
-+
-+static long brd_blk_direct_access(struct block_device *bdev, sector_t sector,
-+			void **kaddr, pfn_t *pfn, long size)
-+{
-+	struct brd_device *brd = bdev->bd_disk->private_data;
-+	long nr_pages = __brd_direct_access(brd, PHYS_PFN(sector * 512),
-+			PHYS_PFN(size), kaddr, pfn);
-+
-+	if (nr_pages < 0)
-+		return nr_pages;
-+	return nr_pages * PAGE_SIZE;
-+}
-+
-+static long brd_dax_direct_access(struct dax_device *dax_dev,
-+		pgoff_t pgoff, long nr_pages, void **kaddr, pfn_t *pfn)
-+{
-+	struct brd_device *brd = dax_get_private(dax_dev);
-+
-+	return __brd_direct_access(brd, pgoff, nr_pages, kaddr, pfn);
- }
-+
-+static const struct dax_operations brd_dax_ops = {
-+	.direct_access = brd_dax_direct_access,
-+};
- #else
--#define brd_direct_access NULL
-+#define brd_blk_direct_access NULL
- #endif
- 
- static const struct block_device_operations brd_fops = {
- 	.owner =		THIS_MODULE,
- 	.rw_page =		brd_rw_page,
--	.direct_access =	brd_direct_access,
-+	.direct_access =	brd_blk_direct_access,
- };
- 
- /*
-@@ -441,7 +468,9 @@ static struct brd_device *brd_alloc(int i)
- {
- 	struct brd_device *brd;
- 	struct gendisk *disk;
+-	/** Set if bdi is valid */
+-	unsigned bdi_initialized:1;
 -
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	struct dax_device *dax_dev;
-+#endif
- 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
- 	if (!brd)
- 		goto out;
-@@ -469,9 +498,6 @@ static struct brd_device *brd_alloc(int i)
- 	blk_queue_max_discard_sectors(brd->brd_queue, UINT_MAX);
- 	brd->brd_queue->limits.discard_zeroes_data = 1;
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, brd->brd_queue);
--#ifdef CONFIG_BLK_DEV_RAM_DAX
--	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
--#endif
- 	disk = brd->brd_disk = alloc_disk(max_part);
- 	if (!disk)
- 		goto out_free_queue;
-@@ -484,8 +510,21 @@ static struct brd_device *brd_alloc(int i)
- 	sprintf(disk->disk_name, "ram%d", i);
- 	set_capacity(disk, rd_size * 2);
+ 	/** write-back cache policy (default is write-through) */
+ 	unsigned writeback_cache:1;
  
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
-+	dax_dev = alloc_dax(brd, disk->disk_name, &brd_dax_ops);
-+	if (!dax_dev)
-+		goto out_free_inode;
-+#endif
-+
-+
- 	return brd;
+diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
+index 90bacbc87fb3..73cf05135252 100644
+--- a/fs/fuse/inode.c
++++ b/fs/fuse/inode.c
+@@ -983,8 +983,6 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
+ 	/* fuse does it's own writeback accounting */
+ 	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
  
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+out_free_inode:
-+	kill_dax(dax_dev);
-+	put_dax(dax_dev);
-+#endif
- out_free_queue:
- 	blk_cleanup_queue(brd->brd_queue);
- out_free_dev:
-@@ -525,6 +564,10 @@ static struct brd_device *brd_init_one(int i, bool *new)
- static void brd_del_one(struct brd_device *brd)
- {
- 	list_del(&brd->brd_list);
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	kill_dax(brd->dax_dev);
-+	put_dax(brd->dax_dev);
-+#endif
- 	del_gendisk(brd->brd_disk);
- 	brd_free(brd);
- }
+-	fc->bdi_initialized = 1;
+-
+ 	/*
+ 	 * For a single fuse filesystem use max 1% of dirty +
+ 	 * writeback threshold.
+-- 
+2.12.0
