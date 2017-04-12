@@ -1,241 +1,284 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: [resend PATCH v2 26/33] x86, dax,
- libnvdimm: move wb_cache_pmem() to libnvdimm
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
-        Matthew Wilcox <mawilcox@microsoft.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-fsdevel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Mon, 17 Apr 2017 12:11:10 -0700
-Message-ID: <149245627028.10206.369315439901964176.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+4e9b246676c62bade7ff+4980+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	target-devel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com
+Subject: [PATCH 5/8] dm: remove write same support
+Date: Wed, 12 Apr 2017 10:48:06 +0200
+Message-Id: <20170412084809.8245-6-hch@lst.de>
+In-Reply-To: <20170412084809.8245-1-hch@lst.de>
+References: <20170412084809.8245-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-With all calls to this routine re-directed through the pmem driver, we
-can kill the pmem api indirection. arch_wb_cache_pmem() is now
-optionally supplied by an arch specific extension to libnvdimm.  Same as
-before, pmem flushing is only defined for x86_64, but it is
-straightforward to add other archs in the future.
-
-Cc: <x86@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Oliver O'Halloran <oohall@gmail.com>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- arch/x86/include/asm/pmem.h |   21 ---------------------
- drivers/nvdimm/Makefile     |    1 +
- drivers/nvdimm/pmem.c       |   14 +++++---------
- drivers/nvdimm/pmem.h       |    8 ++++++++
- drivers/nvdimm/x86.c        |   36 ++++++++++++++++++++++++++++++++++++
- include/linux/pmem.h        |   19 -------------------
- tools/testing/nvdimm/Kbuild |    1 +
- 7 files changed, 51 insertions(+), 49 deletions(-)
- create mode 100644 drivers/nvdimm/x86.c
+ drivers/md/dm-core.h          |  1 -
+ drivers/md/dm-io.c            | 21 +--------------------
+ drivers/md/dm-linear.c        |  1 -
+ drivers/md/dm-mpath.c         |  1 -
+ drivers/md/dm-rq.c            |  3 ---
+ drivers/md/dm-stripe.c        |  4 +---
+ drivers/md/dm-table.c         | 29 -----------------------------
+ drivers/md/dm.c               | 23 -----------------------
+ include/linux/device-mapper.h |  6 ------
+ 9 files changed, 2 insertions(+), 87 deletions(-)
 
-diff --git a/arch/x86/include/asm/pmem.h b/arch/x86/include/asm/pmem.h
-index f4c119d253f3..4759a179aa52 100644
---- a/arch/x86/include/asm/pmem.h
-+++ b/arch/x86/include/asm/pmem.h
-@@ -44,27 +44,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
- 		BUG();
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index fea5bd52ada8..d661801d72e7 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -131,7 +131,6 @@ struct mapped_device {
+ void dm_init_md_queue(struct mapped_device *md);
+ void dm_init_normal_md_queue(struct mapped_device *md);
+ int md_in_flight(struct mapped_device *md);
+-void disable_write_same(struct mapped_device *md);
+ void disable_write_zeroes(struct mapped_device *md);
+ 
+ static inline struct completion *dm_get_completion_from_kobject(struct kobject *kobj)
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 3702e502466d..105e68dabd3e 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -303,7 +303,6 @@ static void do_region(int op, int op_flags, unsigned region,
+ 	unsigned num_bvecs;
+ 	sector_t remaining = where->count;
+ 	struct request_queue *q = bdev_get_queue(where->bdev);
+-	unsigned short logical_block_size = queue_logical_block_size(q);
+ 	sector_t num_sectors;
+ 	unsigned int uninitialized_var(special_cmd_max_sectors);
+ 
+@@ -314,10 +313,7 @@ static void do_region(int op, int op_flags, unsigned region,
+ 		special_cmd_max_sectors = q->limits.max_discard_sectors;
+ 	else if (op == REQ_OP_WRITE_ZEROES)
+ 		special_cmd_max_sectors = q->limits.max_write_zeroes_sectors;
+-	else if (op == REQ_OP_WRITE_SAME)
+-		special_cmd_max_sectors = q->limits.max_write_same_sectors;
+-	if ((op == REQ_OP_DISCARD || op == REQ_OP_WRITE_ZEROES ||
+-	     op == REQ_OP_WRITE_SAME)  &&
++	if ((op == REQ_OP_DISCARD || op == REQ_OP_WRITE_ZEROES) &&
+ 	    special_cmd_max_sectors == 0) {
+ 		dec_count(io, region, -EOPNOTSUPP);
+ 		return;
+@@ -336,9 +332,6 @@ static void do_region(int op, int op_flags, unsigned region,
+ 		case REQ_OP_WRITE_ZEROES:
+ 			num_bvecs = 0;
+ 			break;
+-		case REQ_OP_WRITE_SAME:
+-			num_bvecs = 1;
+-			break;
+ 		default:
+ 			num_bvecs = min_t(int, BIO_MAX_PAGES,
+ 					  dm_sector_div_up(remaining, (PAGE_SIZE >> SECTOR_SHIFT)));
+@@ -355,18 +348,6 @@ static void do_region(int op, int op_flags, unsigned region,
+ 			num_sectors = min_t(sector_t, special_cmd_max_sectors, remaining);
+ 			bio->bi_iter.bi_size = num_sectors << SECTOR_SHIFT;
+ 			remaining -= num_sectors;
+-		} else if (op == REQ_OP_WRITE_SAME) {
+-			/*
+-			 * WRITE SAME only uses a single page.
+-			 */
+-			dp->get_page(dp, &page, &len, &offset);
+-			bio_add_page(bio, page, logical_block_size, offset);
+-			num_sectors = min_t(sector_t, special_cmd_max_sectors, remaining);
+-			bio->bi_iter.bi_size = num_sectors << SECTOR_SHIFT;
+-
+-			offset = 0;
+-			remaining -= num_sectors;
+-			dp->next_page(dp);
+ 		} else while (remaining) {
+ 			/*
+ 			 * Try and add as many pages as possible.
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index e17fd44ceef5..f928f7e9ee4a 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -58,7 +58,6 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 
+ 	ti->num_flush_bios = 1;
+ 	ti->num_discard_bios = 1;
+-	ti->num_write_same_bios = 1;
+ 	ti->num_write_zeroes_bios = 1;
+ 	ti->private = lc;
+ 	return 0;
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index ab55955ed704..ece53947b99d 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -1102,7 +1102,6 @@ static int multipath_ctr(struct dm_target *ti, unsigned argc, char **argv)
+ 
+ 	ti->num_flush_bios = 1;
+ 	ti->num_discard_bios = 1;
+-	ti->num_write_same_bios = 1;
+ 	ti->num_write_zeroes_bios = 1;
+ 	if (m->queue_mode == DM_TYPE_BIO_BASED)
+ 		ti->per_io_data_size = multipath_per_bio_data_size();
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index e60f1b6845be..6f8dc99685f2 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -299,9 +299,6 @@ static void dm_done(struct request *clone, int error, bool mapped)
+ 	}
+ 
+ 	if (unlikely(r == -EREMOTEIO)) {
+-		if (req_op(clone) == REQ_OP_WRITE_SAME &&
+-		    !clone->q->limits.max_write_same_sectors)
+-			disable_write_same(tio->md);
+ 		if (req_op(clone) == REQ_OP_WRITE_ZEROES &&
+ 		    !clone->q->limits.max_write_zeroes_sectors)
+ 			disable_write_zeroes(tio->md);
+diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
+index 5ef49c121d99..cc5a00f2e2de 100644
+--- a/drivers/md/dm-stripe.c
++++ b/drivers/md/dm-stripe.c
+@@ -168,7 +168,6 @@ static int stripe_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 
+ 	ti->num_flush_bios = stripes;
+ 	ti->num_discard_bios = stripes;
+-	ti->num_write_same_bios = stripes;
+ 	ti->num_write_zeroes_bios = stripes;
+ 
+ 	sc->chunk_size = chunk_size;
+@@ -294,8 +293,7 @@ static int stripe_map(struct dm_target *ti, struct bio *bio)
+ 		return DM_MAPIO_REMAPPED;
+ 	}
+ 	if (unlikely(bio_op(bio) == REQ_OP_DISCARD) ||
+-	    unlikely(bio_op(bio) == REQ_OP_WRITE_ZEROES) ||
+-	    unlikely(bio_op(bio) == REQ_OP_WRITE_SAME)) {
++	    unlikely(bio_op(bio) == REQ_OP_WRITE_ZEROES)) {
+ 		target_bio_nr = dm_bio_get_target_bio_nr(bio);
+ 		BUG_ON(target_bio_nr >= sc->stripes);
+ 		return stripe_map_range(sc, bio, target_bio_nr);
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 958275aca008..8bbc3d57fcc7 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1490,33 +1490,6 @@ static bool dm_table_all_devices_attribute(struct dm_table *t,
+ 	return true;
  }
  
--/**
-- * arch_wb_cache_pmem - write back a cache range with CLWB
-- * @vaddr:	virtual start address
-- * @size:	number of bytes to write back
-- *
-- * Write back a cache range using the CLWB (cache line write back)
-- * instruction. Note that @size is internally rounded up to be cache
-- * line size aligned.
-- */
--static inline void arch_wb_cache_pmem(void *addr, size_t size)
+-static int device_not_write_same_capable(struct dm_target *ti, struct dm_dev *dev,
+-					 sector_t start, sector_t len, void *data)
 -{
--	u16 x86_clflush_size = boot_cpu_data.x86_clflush_size;
--	unsigned long clflush_mask = x86_clflush_size - 1;
--	void *vend = addr + size;
--	void *p;
+-	struct request_queue *q = bdev_get_queue(dev->bdev);
 -
--	for (p = (void *)((unsigned long)addr & ~clflush_mask);
--	     p < vend; p += x86_clflush_size)
--		clwb(p);
+-	return q && !q->limits.max_write_same_sectors;
 -}
 -
- static inline void arch_invalidate_pmem(void *addr, size_t size)
+-static bool dm_table_supports_write_same(struct dm_table *t)
+-{
+-	struct dm_target *ti;
+-	unsigned i = 0;
+-
+-	while (i < dm_table_get_num_targets(t)) {
+-		ti = dm_table_get_target(t, i++);
+-
+-		if (!ti->num_write_same_bios)
+-			return false;
+-
+-		if (!ti->type->iterate_devices ||
+-		    ti->type->iterate_devices(ti, device_not_write_same_capable, NULL))
+-			return false;
+-	}
+-
+-	return true;
+-}
+-
+ static int device_not_write_zeroes_capable(struct dm_target *ti, struct dm_dev *dev,
+ 					   sector_t start, sector_t len, void *data)
  {
- 	clflush_cache_range(addr, size);
-diff --git a/drivers/nvdimm/Makefile b/drivers/nvdimm/Makefile
-index 909554c3f955..9eafb1dd2876 100644
---- a/drivers/nvdimm/Makefile
-+++ b/drivers/nvdimm/Makefile
-@@ -24,3 +24,4 @@ libnvdimm-$(CONFIG_ND_CLAIM) += claim.o
- libnvdimm-$(CONFIG_BTT) += btt_devs.o
- libnvdimm-$(CONFIG_NVDIMM_PFN) += pfn_devs.o
- libnvdimm-$(CONFIG_NVDIMM_DAX) += dax_devs.o
-+libnvdimm-$(CONFIG_X86_64) += x86.o
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 822b85fb3365..c77a3a757729 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -245,19 +245,19 @@ static size_t pmem_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff,
+@@ -1610,8 +1583,6 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	else
+ 		queue_flag_clear_unlocked(QUEUE_FLAG_NONROT, q);
  
- 		if (bytes < 8) {
- 			if (!IS_ALIGNED(dest, 4) || (bytes != 4))
--				wb_cache_pmem(addr, 1);
-+				arch_wb_cache_pmem(addr, 1);
- 		} else {
- 			if (!IS_ALIGNED(dest, 8)) {
- 				dest = ALIGN(dest, boot_cpu_data.x86_clflush_size);
--				wb_cache_pmem(addr, 1);
-+				arch_wb_cache_pmem(addr, 1);
- 			}
+-	if (!dm_table_supports_write_same(t))
+-		q->limits.max_write_same_sectors = 0;
+ 	if (!dm_table_supports_write_zeroes(t))
+ 		q->limits.max_write_zeroes_sectors = 0;
  
- 			flushed = dest - (unsigned long) addr;
- 			if (bytes > flushed && !IS_ALIGNED(bytes - flushed, 8))
--				wb_cache_pmem(addr + bytes - 1, 1);
-+				arch_wb_cache_pmem(addr + bytes - 1, 1);
- 		}
- 	} else
--		wb_cache_pmem(addr, bytes);
-+		arch_wb_cache_pmem(addr, bytes);
- 
- 	return len;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 8bf397729bbd..8259aa76839e 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -816,14 +816,6 @@ static void dec_pending(struct dm_io *io, int error)
+ 	}
  }
-@@ -279,11 +279,7 @@ static long pmem_dax_direct_access(struct dax_device *dax_dev,
- static void pmem_dax_flush(struct dax_device *dax_dev, pgoff_t pgoff,
- 		void *addr, size_t size)
+ 
+-void disable_write_same(struct mapped_device *md)
+-{
+-	struct queue_limits *limits = dm_get_queue_limits(md);
+-
+-	/* device doesn't really support WRITE SAME, disable it */
+-	limits->max_write_same_sectors = 0;
+-}
+-
+ void disable_write_zeroes(struct mapped_device *md)
  {
--	/*
--	 * TODO: move arch specific cache management into the driver
--	 * directly.
+ 	struct queue_limits *limits = dm_get_queue_limits(md);
+@@ -859,9 +851,6 @@ static void clone_endio(struct bio *bio)
+ 	}
+ 
+ 	if (unlikely(r == -EREMOTEIO)) {
+-		if (bio_op(bio) == REQ_OP_WRITE_SAME &&
+-		    !bdev_get_queue(bio->bi_bdev)->limits.max_write_same_sectors)
+-			disable_write_same(md);
+ 		if (bio_op(bio) == REQ_OP_WRITE_ZEROES &&
+ 		    !bdev_get_queue(bio->bi_bdev)->limits.max_write_zeroes_sectors)
+ 			disable_write_zeroes(md);
+@@ -1209,11 +1198,6 @@ static unsigned get_num_discard_bios(struct dm_target *ti)
+ 	return ti->num_discard_bios;
+ }
+ 
+-static unsigned get_num_write_same_bios(struct dm_target *ti)
+-{
+-	return ti->num_write_same_bios;
+-}
+-
+ static unsigned get_num_write_zeroes_bios(struct dm_target *ti)
+ {
+ 	return ti->num_write_zeroes_bios;
+@@ -1268,11 +1252,6 @@ static int __send_discard(struct clone_info *ci)
+ 					   is_split_required_for_discard);
+ }
+ 
+-static int __send_write_same(struct clone_info *ci)
+-{
+-	return __send_changing_extent_only(ci, get_num_write_same_bios, NULL);
+-}
+-
+ static int __send_write_zeroes(struct clone_info *ci)
+ {
+ 	return __send_changing_extent_only(ci, get_num_write_zeroes_bios, NULL);
+@@ -1290,8 +1269,6 @@ static int __split_and_process_non_flush(struct clone_info *ci)
+ 
+ 	if (unlikely(bio_op(bio) == REQ_OP_DISCARD))
+ 		return __send_discard(ci);
+-	else if (unlikely(bio_op(bio) == REQ_OP_WRITE_SAME))
+-		return __send_write_same(ci);
+ 	else if (unlikely(bio_op(bio) == REQ_OP_WRITE_ZEROES))
+ 		return __send_write_zeroes(ci);
+ 
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index c7ea33e38fb9..58f451ba9b75 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -249,12 +249,6 @@ struct dm_target {
+ 	unsigned num_discard_bios;
+ 
+ 	/*
+-	 * The number of WRITE SAME bios that will be submitted to the target.
+-	 * The bio number can be accessed with dm_bio_get_target_bio_nr.
 -	 */
--	wb_cache_pmem(addr, size);
-+	arch_wb_cache_pmem(addr, size);
- }
- 
- static const struct dax_operations pmem_dax_ops = {
-diff --git a/drivers/nvdimm/pmem.h b/drivers/nvdimm/pmem.h
-index 7f4dbd72a90a..c4b3371c7f88 100644
---- a/drivers/nvdimm/pmem.h
-+++ b/drivers/nvdimm/pmem.h
-@@ -5,6 +5,14 @@
- #include <linux/pfn_t.h>
- #include <linux/fs.h>
- 
-+#ifdef CONFIG_ARCH_HAS_PMEM_API
-+void arch_wb_cache_pmem(void *addr, size_t size);
-+#else
-+static inline void arch_wb_cache_pmem(void *addr, size_t size)
-+{
-+}
-+#endif
-+
- /* this definition is in it's own header for tools/testing/nvdimm to consume */
- struct pmem_device {
- 	/* One contiguous memory region per device */
-diff --git a/drivers/nvdimm/x86.c b/drivers/nvdimm/x86.c
-new file mode 100644
-index 000000000000..79d7267da4d2
---- /dev/null
-+++ b/drivers/nvdimm/x86.c
-@@ -0,0 +1,36 @@
-+/*
-+ * Copyright(c) 2015 - 2017 Intel Corporation. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ */
-+#include <asm/cacheflush.h>
-+#include <asm/cpufeature.h>
-+#include <asm/special_insns.h>
-+
-+/**
-+ * arch_wb_cache_pmem - write back a cache range with CLWB
-+ * @vaddr:	virtual start address
-+ * @size:	number of bytes to write back
-+ *
-+ * Write back a cache range using the CLWB (cache line write back)
-+ * instruction.
-+ */
-+void arch_wb_cache_pmem(void *addr, size_t size)
-+{
-+	u16 x86_clflush_size = boot_cpu_data.x86_clflush_size;
-+	unsigned long clflush_mask = x86_clflush_size - 1;
-+	void *vend = addr + size;
-+	void *p;
-+
-+	for (p = (void *)((unsigned long)addr & ~clflush_mask);
-+	     p < vend; p += x86_clflush_size)
-+		clwb(p);
-+}
-+EXPORT_SYMBOL_GPL(arch_wb_cache_pmem);
-diff --git a/include/linux/pmem.h b/include/linux/pmem.h
-index 772bd02a5b52..33ae761f010a 100644
---- a/include/linux/pmem.h
-+++ b/include/linux/pmem.h
-@@ -31,11 +31,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
- 	BUG();
- }
- 
--static inline void arch_wb_cache_pmem(void *addr, size_t size)
--{
--	BUG();
--}
+-	unsigned num_write_same_bios;
 -
- static inline void arch_invalidate_pmem(void *addr, size_t size)
- {
- 	BUG();
-@@ -80,18 +75,4 @@ static inline void invalidate_pmem(void *addr, size_t size)
- 	if (arch_has_pmem_api())
- 		arch_invalidate_pmem(addr, size);
- }
--
--/**
-- * wb_cache_pmem - write back processor cache for PMEM memory range
-- * @addr:	virtual start address
-- * @size:	number of bytes to write back
-- *
-- * Write back the processor cache range starting at 'addr' for 'size' bytes.
-- * See blkdev_issue_flush() note for memcpy_to_pmem().
-- */
--static inline void wb_cache_pmem(void *addr, size_t size)
--{
--	if (arch_has_pmem_api())
--		arch_wb_cache_pmem(addr, size);
--}
- #endif /* __PMEM_H__ */
-diff --git a/tools/testing/nvdimm/Kbuild b/tools/testing/nvdimm/Kbuild
-index 2033ad03b8cd..0e0c444737e9 100644
---- a/tools/testing/nvdimm/Kbuild
-+++ b/tools/testing/nvdimm/Kbuild
-@@ -72,6 +72,7 @@ libnvdimm-$(CONFIG_ND_CLAIM) += $(NVDIMM_SRC)/claim.o
- libnvdimm-$(CONFIG_BTT) += $(NVDIMM_SRC)/btt_devs.o
- libnvdimm-$(CONFIG_NVDIMM_PFN) += $(NVDIMM_SRC)/pfn_devs.o
- libnvdimm-$(CONFIG_NVDIMM_DAX) += $(NVDIMM_SRC)/dax_devs.o
-+libnvdimm-$(CONFIG_X86_64) += $(NVDIMM_SRC)/x86.o
- libnvdimm-y += config_check.o
- 
- obj-m += test/
+-	/*
+ 	 * The number of WRITE ZEROES bios that will be submitted to the target.
+ 	 * The bio number can be accessed with dm_bio_get_target_bio_nr.
+ 	 */
+-- 
+2.11.0
