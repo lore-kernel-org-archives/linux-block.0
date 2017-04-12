@@ -1,95 +1,186 @@
-Return-Path: <BATV+245451ebeca5033ceab8+4986+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@bombadil.infradead.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	Christoph Hellwig <hch@lst.de>
-Subject: nvme: make nvme_error_status private
-Date: Tue, 18 Apr 2017 08:52:10 -0700
-Message-Id: <20170418155229.5977-5-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: Christoph Hellwig <hch@infradead.org>
+Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Ilya Dryomov <idryomov@gmail.com>,
+        "Yan, Zheng" <zyan@redhat.com>, Sage Weil <sage@redhat.com>,
+        ceph-devel@vger.kernel.org
+Subject: [PATCH 09/25] ceph: Convert to separately allocated bdi
+Date: Wed, 12 Apr 2017 12:24:33 +0200
+Message-Id: <20170412102449.16901-10-jack@suse.cz>
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
+References: <20170412102449.16901-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+Allocate struct backing_dev_info separately instead of embedding it
+inside client structure. This unifies handling of bdi among users.
 
-Currently it's used by the lighnvm passthrough ioctl, but we'd like to make
-it private in preparation of block layer specific error code.  Lighnvm already
-returns the real NVMe status anyway, so I think we can just limit it to
-returning -EIO for any status set.
-
-This will need a careful audit from the lightnvm folks, though.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+CC: Ilya Dryomov <idryomov@gmail.com>
+CC: "Yan, Zheng" <zyan@redhat.com>
+CC: Sage Weil <sage@redhat.com>
+CC: ceph-devel@vger.kernel.org
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/nvme/host/core.c     | 3 +--
- drivers/nvme/host/lightnvm.c | 6 +++---
- drivers/nvme/host/nvme.h     | 1 -
- 3 files changed, 4 insertions(+), 6 deletions(-)
+ fs/ceph/addr.c    |  6 +++---
+ fs/ceph/debugfs.c |  2 +-
+ fs/ceph/super.c   | 35 +++++++++++++----------------------
+ fs/ceph/super.h   |  2 --
+ 4 files changed, 17 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index c6f256d74b6b..805f250315ec 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -66,7 +66,7 @@ static DEFINE_SPINLOCK(dev_list_lock);
+diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+index 1a3e1b40799a..9ecb2fd348cb 100644
+--- a/fs/ceph/addr.c
++++ b/fs/ceph/addr.c
+@@ -578,7 +578,7 @@ static int writepage_nounlock(struct page *page, struct writeback_control *wbc)
+ 	writeback_stat = atomic_long_inc_return(&fsc->writeback_count);
+ 	if (writeback_stat >
+ 	    CONGESTION_ON_THRESH(fsc->mount_options->congestion_kb))
+-		set_bdi_congested(&fsc->backing_dev_info, BLK_RW_ASYNC);
++		set_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
  
- static struct class *nvme_class;
+ 	set_page_writeback(page);
+ 	err = ceph_osdc_writepages(osdc, ceph_vino(inode),
+@@ -700,7 +700,7 @@ static void writepages_finish(struct ceph_osd_request *req)
+ 			if (atomic_long_dec_return(&fsc->writeback_count) <
+ 			     CONGESTION_OFF_THRESH(
+ 					fsc->mount_options->congestion_kb))
+-				clear_bdi_congested(&fsc->backing_dev_info,
++				clear_bdi_congested(inode_to_bdi(inode),
+ 						    BLK_RW_ASYNC);
  
--int nvme_error_status(struct request *req)
-+static int nvme_error_status(struct request *req)
+ 			if (rc < 0)
+@@ -979,7 +979,7 @@ static int ceph_writepages_start(struct address_space *mapping,
+ 			if (atomic_long_inc_return(&fsc->writeback_count) >
+ 			    CONGESTION_ON_THRESH(
+ 				    fsc->mount_options->congestion_kb)) {
+-				set_bdi_congested(&fsc->backing_dev_info,
++				set_bdi_congested(inode_to_bdi(inode),
+ 						  BLK_RW_ASYNC);
+ 			}
+ 
+diff --git a/fs/ceph/debugfs.c b/fs/ceph/debugfs.c
+index f2ae393e2c31..3ef11bc8d728 100644
+--- a/fs/ceph/debugfs.c
++++ b/fs/ceph/debugfs.c
+@@ -251,7 +251,7 @@ int ceph_fs_debugfs_init(struct ceph_fs_client *fsc)
+ 		goto out;
+ 
+ 	snprintf(name, sizeof(name), "../../bdi/%s",
+-		 dev_name(fsc->backing_dev_info.dev));
++		 dev_name(fsc->sb->s_bdi->dev));
+ 	fsc->debugfs_bdi =
+ 		debugfs_create_symlink("bdi",
+ 				       fsc->client->debugfs_dir,
+diff --git a/fs/ceph/super.c b/fs/ceph/super.c
+index 0ec8d0114e57..a8c81b2052ca 100644
+--- a/fs/ceph/super.c
++++ b/fs/ceph/super.c
+@@ -579,10 +579,6 @@ static struct ceph_fs_client *create_fs_client(struct ceph_mount_options *fsopt,
+ 
+ 	atomic_long_set(&fsc->writeback_count, 0);
+ 
+-	err = bdi_init(&fsc->backing_dev_info);
+-	if (err < 0)
+-		goto fail_client;
+-
+ 	err = -ENOMEM;
+ 	/*
+ 	 * The number of concurrent works can be high but they don't need
+@@ -590,7 +586,7 @@ static struct ceph_fs_client *create_fs_client(struct ceph_mount_options *fsopt,
+ 	 */
+ 	fsc->wb_wq = alloc_workqueue("ceph-writeback", 0, 1);
+ 	if (fsc->wb_wq == NULL)
+-		goto fail_bdi;
++		goto fail_client;
+ 	fsc->pg_inv_wq = alloc_workqueue("ceph-pg-invalid", 0, 1);
+ 	if (fsc->pg_inv_wq == NULL)
+ 		goto fail_wb_wq;
+@@ -624,8 +620,6 @@ static struct ceph_fs_client *create_fs_client(struct ceph_mount_options *fsopt,
+ 	destroy_workqueue(fsc->pg_inv_wq);
+ fail_wb_wq:
+ 	destroy_workqueue(fsc->wb_wq);
+-fail_bdi:
+-	bdi_destroy(&fsc->backing_dev_info);
+ fail_client:
+ 	ceph_destroy_client(fsc->client);
+ fail:
+@@ -643,8 +637,6 @@ static void destroy_fs_client(struct ceph_fs_client *fsc)
+ 	destroy_workqueue(fsc->pg_inv_wq);
+ 	destroy_workqueue(fsc->trunc_wq);
+ 
+-	bdi_destroy(&fsc->backing_dev_info);
+-
+ 	mempool_destroy(fsc->wb_pagevec_pool);
+ 
+ 	destroy_mount_options(fsc->mount_options);
+@@ -937,33 +929,32 @@ static int ceph_compare_super(struct super_block *sb, void *data)
+  */
+ static atomic_long_t bdi_seq = ATOMIC_LONG_INIT(0);
+ 
+-static int ceph_register_bdi(struct super_block *sb,
+-			     struct ceph_fs_client *fsc)
++static int ceph_setup_bdi(struct super_block *sb, struct ceph_fs_client *fsc)
  {
- 	switch (nvme_req(req)->status & 0x7ff) {
- 	case NVME_SC_SUCCESS:
-@@ -77,7 +77,6 @@ int nvme_error_status(struct request *req)
- 		return -EIO;
- 	}
- }
--EXPORT_SYMBOL_GPL(nvme_error_status);
+ 	int err;
  
- static inline bool nvme_req_needs_retry(struct request *req)
- {
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index f85e6e57d641..7f407d5f0095 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -599,7 +599,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 	__le64 *metadata = NULL;
- 	dma_addr_t metadata_dma;
- 	DECLARE_COMPLETION_ONSTACK(wait);
--	int ret;
-+	int ret = 0;
++	err = super_setup_bdi_name(sb, "ceph-%ld",
++				   atomic_long_inc_return(&bdi_seq));
++	if (err)
++		return err;
++
+ 	/* set ra_pages based on rasize mount option? */
+ 	if (fsc->mount_options->rasize >= PAGE_SIZE)
+-		fsc->backing_dev_info.ra_pages =
++		sb->s_bdi->ra_pages =
+ 			(fsc->mount_options->rasize + PAGE_SIZE - 1)
+ 			>> PAGE_SHIFT;
+ 	else
+-		fsc->backing_dev_info.ra_pages =
+-			VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
++		sb->s_bdi->ra_pages = VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
  
- 	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
- 			NVME_QID_ANY);
-@@ -671,8 +671,8 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	if (fsc->mount_options->rsize > fsc->mount_options->rasize &&
+ 	    fsc->mount_options->rsize >= PAGE_SIZE)
+-		fsc->backing_dev_info.io_pages =
++		sb->s_bdi->io_pages =
+ 			(fsc->mount_options->rsize + PAGE_SIZE - 1)
+ 			>> PAGE_SHIFT;
+ 	else if (fsc->mount_options->rsize == 0)
+-		fsc->backing_dev_info.io_pages = ULONG_MAX;
++		sb->s_bdi->io_pages = ULONG_MAX;
  
- 	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
- 		ret = -EINTR;
--	else
--		ret = nvme_error_status(rq);
-+	else if (nvme_req(rq)->status & 0x7ff)
-+		ret = -EIO;
- 	if (result)
- 		*result = nvme_req(rq)->status & 0x7ff;
- 	if (status)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index d7330f75632d..550037f5efea 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -254,7 +254,6 @@ static inline void nvme_end_request(struct request *req, __le16 status,
- 	blk_mq_complete_request(req, 0);
+-	err = bdi_register(&fsc->backing_dev_info, NULL, "ceph-%ld",
+-			   atomic_long_inc_return(&bdi_seq));
+-	if (!err)
+-		sb->s_bdi = &fsc->backing_dev_info;
+-	return err;
++	return 0;
  }
  
--int nvme_error_status(struct request *req);
- void nvme_complete_rq(struct request *req);
- void nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+ static struct dentry *ceph_mount(struct file_system_type *fs_type,
+@@ -1018,7 +1009,7 @@ static struct dentry *ceph_mount(struct file_system_type *fs_type,
+ 		dout("get_sb got existing client %p\n", fsc);
+ 	} else {
+ 		dout("get_sb using new client %p\n", fsc);
+-		err = ceph_register_bdi(sb, fsc);
++		err = ceph_setup_bdi(sb, fsc);
+ 		if (err < 0) {
+ 			res = ERR_PTR(err);
+ 			goto out_splat;
+diff --git a/fs/ceph/super.h b/fs/ceph/super.h
+index fe6b9cfc4013..176186b12457 100644
+--- a/fs/ceph/super.h
++++ b/fs/ceph/super.h
+@@ -92,8 +92,6 @@ struct ceph_fs_client {
+ 	struct workqueue_struct *trunc_wq;
+ 	atomic_long_t writeback_count;
+ 
+-	struct backing_dev_info backing_dev_info;
+-
+ #ifdef CONFIG_DEBUG_FS
+ 	struct dentry *debugfs_dentry_lru, *debugfs_caps;
+ 	struct dentry *debugfs_congestion_kb;
 -- 
-2.11.0
+2.12.0
