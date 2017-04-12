@@ -1,87 +1,110 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40280 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752866AbdDLKZI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2017 06:25:08 -0400
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, Petr Vandrovec <petr@vandrovec.name>
-Subject: [PATCH 20/25] ncpfs: Convert to separately allocated bdi
-Date: Wed, 12 Apr 2017 12:24:44 +0200
-Message-Id: <20170412102449.16901-21-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+4e9b246676c62bade7ff+4980+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	target-devel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com
+Subject: [PATCH 8/8] block: use bio_has_data to check if a bio has bvecs
+Date: Wed, 12 Apr 2017 10:48:09 +0200
+Message-Id: <20170412084809.8245-9-hch@lst.de>
+In-Reply-To: <20170412084809.8245-1-hch@lst.de>
+References: <20170412084809.8245-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+Now that Write Same is gone and discard bios never have a payload we
+can simply use bio_has_data as an indicator that the bio has bvecs
+that need to be handled.
 
-CC: Petr Vandrovec <petr@vandrovec.name>
-Acked-by: Petr Vandrovec <petr@vandrovec.name>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/ncpfs/inode.c     | 8 ++------
- fs/ncpfs/ncp_fs_sb.h | 1 -
- 2 files changed, 2 insertions(+), 7 deletions(-)
+ block/bio.c         |  8 +-------
+ block/blk-merge.c   |  9 +--------
+ include/linux/bio.h | 21 +++++----------------
+ 3 files changed, 7 insertions(+), 31 deletions(-)
 
-diff --git a/fs/ncpfs/inode.c b/fs/ncpfs/inode.c
-index d5606099712a..6d0f14c86099 100644
---- a/fs/ncpfs/inode.c
-+++ b/fs/ncpfs/inode.c
-@@ -554,12 +554,11 @@ static int ncp_fill_super(struct super_block *sb, void *raw_data, int silent)
- 	sb->s_magic = NCP_SUPER_MAGIC;
- 	sb->s_op = &ncp_sops;
- 	sb->s_d_op = &ncp_dentry_operations;
--	sb->s_bdi = &server->bdi;
+diff --git a/block/bio.c b/block/bio.c
+index b310e7ef3fbf..1c9f04c30ba9 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -679,15 +679,9 @@ static struct bio *__bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+ 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
+ 	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
  
- 	server = NCP_SBP(sb);
- 	memset(server, 0, sizeof(*server));
+-	switch (bio_op(bio)) {
+-	case REQ_OP_DISCARD:
+-	case REQ_OP_SECURE_ERASE:
+-	case REQ_OP_WRITE_ZEROES:
+-		break;
+-	default:
++	if (bio_has_data(bio)) {
+ 		__bio_for_each_segment(bv, bio_src, iter, iter_src)
+ 			bio->bi_io_vec[bio->bi_vcnt++] = bv;
+-		break;
+ 	}
  
--	error = bdi_setup_and_register(&server->bdi, "ncpfs");
-+	error = super_setup_bdi(sb);
- 	if (error)
- 		goto out_fput;
+ 	if (bio_integrity(bio_src)) {
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index d6c86bfc5722..549d060097f1 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -232,16 +232,9 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	struct bio *fbio, *bbio;
+ 	struct bvec_iter iter;
  
-@@ -568,7 +567,7 @@ static int ncp_fill_super(struct super_block *sb, void *raw_data, int silent)
- 	if (data.info_fd != -1) {
- 		struct socket *info_sock = sockfd_lookup(data.info_fd, &error);
- 		if (!info_sock)
--			goto out_bdi;
-+			goto out_fput;
- 		server->info_sock = info_sock;
- 		error = -EBADFD;
- 		if (info_sock->type != SOCK_STREAM)
-@@ -746,8 +745,6 @@ static int ncp_fill_super(struct super_block *sb, void *raw_data, int silent)
- out_fput2:
- 	if (server->info_sock)
- 		sockfd_put(server->info_sock);
--out_bdi:
--	bdi_destroy(&server->bdi);
- out_fput:
- 	sockfd_put(sock);
- out:
-@@ -788,7 +785,6 @@ static void ncp_put_super(struct super_block *sb)
- 	kill_pid(server->m.wdog_pid, SIGTERM, 1);
- 	put_pid(server->m.wdog_pid);
+-	if (!bio)
++	if (!bio || !bio_has_data(bio))
+ 		return 0;
  
--	bdi_destroy(&server->bdi);
- 	kfree(server->priv.data);
- 	kfree(server->auth.object_name);
- 	vfree(server->rxbuf);
-diff --git a/fs/ncpfs/ncp_fs_sb.h b/fs/ncpfs/ncp_fs_sb.h
-index 55e26fd80886..366fd63cc506 100644
---- a/fs/ncpfs/ncp_fs_sb.h
-+++ b/fs/ncpfs/ncp_fs_sb.h
-@@ -143,7 +143,6 @@ struct ncp_server {
- 		size_t len;
- 		__u8 data[128];
- 	} unexpected_packet;
--	struct backing_dev_info bdi;
- };
+-	switch (bio_op(bio)) {
+-	case REQ_OP_DISCARD:
+-	case REQ_OP_SECURE_ERASE:
+-	case REQ_OP_WRITE_ZEROES:
+-		return 0;
+-	}
+-
+ 	fbio = bio;
+ 	cluster = blk_queue_cluster(q);
+ 	seg_size = 0;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 7a24a1a24967..86bf531f97aa 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -178,26 +178,15 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ static inline unsigned __bio_segments(struct bio *bio, struct bvec_iter *bvec)
+ {
+ 	unsigned segs = 0;
+-	struct bio_vec bv;
+-	struct bvec_iter iter;
  
- extern void ncp_tcp_rcv_proc(struct work_struct *work);
+-	/*
+-	 * We special case discard/write same/write zeroes, because they
+-	 * interpret bi_size differently:
+-	 */
++	if (bio_has_data(bio)) {
++		struct bio_vec bv;
++		struct bvec_iter iter;
+ 
+-	switch (bio_op(bio)) {
+-	case REQ_OP_DISCARD:
+-	case REQ_OP_SECURE_ERASE:
+-	case REQ_OP_WRITE_ZEROES:
+-		return 0;
+-	default:
+-		break;
++		__bio_for_each_segment(bv, bio, iter, *bvec)
++			segs++;
+ 	}
+ 
+-	__bio_for_each_segment(bv, bio, iter, *bvec)
+-		segs++;
+-
+ 	return segs;
+ }
+ 
 -- 
-2.12.0
+2.11.0
