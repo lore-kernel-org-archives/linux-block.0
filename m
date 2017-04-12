@@ -1,68 +1,57 @@
 Return-Path: <paolo.valente@linaro.org>
 Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH V3 00/16] Introduce the BFQ I/O scheduler
 From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V4 00/16] Introduce the BFQ I/O scheduler
-Date: Wed, 12 Apr 2017 18:23:06 +0200
-Message-Id: <20170412162322.11139-1-paolo.valente@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1492011029.2764.3.camel@sandisk.com>
+Date: Wed, 12 Apr 2017 18:08:02 +0200
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "fchecconi@gmail.com" <fchecconi@gmail.com>,
+ "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>,
+ "broonie@kernel.org" <broonie@kernel.org>,
+ "tj@kernel.org" <tj@kernel.org>,
+ "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
+Message-Id: <0E4AC836-F950-4849-BFF7-B055FC318916@linaro.org>
+References: <20170411134315.44135-1-paolo.valente@linaro.org> <1491921434.2540.1.camel@sandisk.com> <17A56264-D096-4F6E-8E66-50030A10B331@linaro.org> <1491935512.2654.16.camel@sandisk.com> <17416A05-8401-4B03-B46C-78A8976C5B8E@linaro.org> <1492011029.2764.3.camel@sandisk.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
-new patch series, addressing (both) issues raised by Bart [1], and
-with block/Makefile fixed as suggested by Bart [2].
+
+> Il giorno 12 apr 2017, alle ore 17:30, Bart Van Assche =
+<Bart.VanAssche@sandisk.com> ha scritto:
+>=20
+> On Wed, 2017-04-12 at 08:01 +0200, Paolo Valente wrote:
+>> Where is my mistake?
+>=20
+> I think in the Makefile. How about the patch below? Please note that =
+I'm no
+> Kbuild expert.
+>=20
+
+Thank you very much for finding and fixing the bug.  I was working
+exactly on that, and had got to the same solution (which I guess is
+the only correct one).  I'll apply these changes and resubmit.
 
 Thanks,
 Paolo
 
-[1] https://lkml.org/lkml/2017/3/31/393
-[2] https://lkml.org/lkml/2017/4/12/502
-
-Arianna Avanzini (4):
-  block, bfq: add full hierarchical scheduling and cgroups support
-  block, bfq: add Early Queue Merge (EQM)
-  block, bfq: reduce idling only in symmetric scenarios
-  block, bfq: handle bursts of queue activations
-
-Paolo Valente (12):
-  block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler
-  block, bfq: improve throughput boosting
-  block, bfq: modify the peak-rate estimator
-  block, bfq: add more fairness with writes and slow processes
-  block, bfq: improve responsiveness
-  block, bfq: reduce I/O latency for soft real-time applications
-  block, bfq: preserve a low latency also with NCQ-capable drives
-  block, bfq: reduce latency during request-pool saturation
-  block, bfq: boost the throughput on NCQ-capable flash-based devices
-  block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
-  block, bfq: remove all get and put of I/O contexts
-  block, bfq: split bfq-iosched.c into multiple source files
-
- Documentation/block/00-INDEX        |    2 +
- Documentation/block/bfq-iosched.txt |  531 ++++
- block/Kconfig.iosched               |   21 +
- block/Makefile                      |    2 +
- block/bfq-cgroup.c                  | 1139 ++++++++
- block/bfq-iosched.c                 | 5047 +++++++++++++++++++++++++++++++++++
- block/bfq-iosched.h                 |  942 +++++++
- block/bfq-wf2q.c                    | 1616 +++++++++++
- include/linux/blkdev.h              |    2 +-
- 9 files changed, 9301 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/block/bfq-iosched.txt
- create mode 100644 block/bfq-cgroup.c
- create mode 100644 block/bfq-iosched.c
- create mode 100644 block/bfq-iosched.h
- create mode 100644 block/bfq-wf2q.c
-
---
-2.10.0
+> diff --git a/block/Makefile b/block/Makefile
+> index 546066ee7fa6..b3711af6b637 100644
+> --- a/block/Makefile
+> +++ b/block/Makefile
+> @@ -20,7 +20,8 @@ obj-$(CONFIG_IOSCHED_NOOP)    +=3D noop-iosched.o
+>  obj-$(CONFIG_IOSCHED_DEADLINE) +=3D deadline-iosched.o
+>  obj-$(CONFIG_IOSCHED_CFQ)      +=3D cfq-iosched.o
+>  obj-$(CONFIG_MQ_IOSCHED_DEADLINE)      +=3D mq-deadline.o
+> -obj-$(CONFIG_IOSCHED_BFQ)      +=3D bfq-iosched.o bfq-wf2q.o =
+bfq-cgroup.o
+> +bfq-y                          :=3D bfq-iosched.o bfq-wf2q.o =
+bfq-cgroup.o
+> +obj-$(CONFIG_IOSCHED_BFQ)      +=3D bfq.o
+>    obj-$(CONFIG_BLOCK_COMPAT)     +=3D compat_ioctl.o
+>  obj-$(CONFIG_BLK_CMDLINE_PARSER)       +=3D cmdline-parser.o
+>=20
