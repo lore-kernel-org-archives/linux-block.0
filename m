@@ -1,31 +1,25 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: ooo@electrozaur.com, martin.petersen@oracle.com,
-        trond.myklebust@primarydata.com, axboe@kernel.dk, osd-dev@open-osd.org,
-        linux-nfs@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: RFC: drop the T10 OSD code and its users
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20170412160109.10598-1-hch@lst.de>
-Date: Thu, 13 Apr 2017 22:27:38 -0400
-In-Reply-To: <20170412160109.10598-1-hch@lst.de> (Christoph Hellwig's message
-	of "Wed, 12 Apr 2017 18:01:05 +0200")
-Message-ID: <yq1inm7wwo5.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <BATV+4e9b246676c62bade7ff+4980+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: ooo@electrozaur.com,
+	martin.petersen@oracle.com,
+	trond.myklebust@primarydata.com,
+	axboe@kernel.dk
+Cc: osd-dev@open-osd.org,
+	linux-nfs@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: RFC: drop the T10 OSD code and its users
+Date: Wed, 12 Apr 2017 18:01:05 +0200
+Message-Id: <20170412160109.10598-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
+The only real user of the T10 OSD protocol, the pNFS object layout
+driver never went to the point of having shipping products, and the
+other two users (osdblk and exofs) were simple example of it's usage.
 
-Christoph,
+The code has been mostly unmaintained for years and is getting in the
+way of block / SCSI changes, so I think it's finally time to drop it.
 
-> The only real user of the T10 OSD protocol, the pNFS object layout
-> driver never went to the point of having shipping products, and the
-> other two users (osdblk and exofs) were simple example of it's usage.
->
-> The code has been mostly unmaintained for years and is getting in the
-> way of block / SCSI changes, so I think it's finally time to drop it.
-
-No particular objections from me.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+These patches are against Jens' block for-next tree as that already
+has various modifications of the SCSI code.
