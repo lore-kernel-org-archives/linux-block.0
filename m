@@ -1,44 +1,26 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Shaohua Li <shli@fb.com>
-Subject: [PATCH] blk-throttle: Suppress a compiler warning
-Date: Wed, 19 Apr 2017 16:55:04 -0700
-Message-ID: <20170419235504.5463-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:56750 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753364AbdDLIOT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Apr 2017 04:14:19 -0400
+Date: Wed, 12 Apr 2017 01:14:18 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+        codalist@coda.cs.cmu.edu
+Subject: Re: [PATCH 14/25] coda: Convert to separately allocated bdi
+Message-ID: <20170412081418.GN9830@infradead.org>
+References: <20170329105623.18241-1-jack@suse.cz>
+ <20170329105623.18241-15-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170329105623.18241-15-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid that the following warning is reported when building with
-W=1 and with CONFIG_BLK_DEV_THROTTLING_LOW=n:
+Looks good,
 
-block/blk-throttle.c: In function ‘blk_throtl_bio’:
-block/blk-throttle.c:2042:6: warning: variable ‘ret’ set but not used [-Wunused-but-set-variable]
-  int ret;
-      ^~~
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index c82bf9b1fe72..9081ed9a5345 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2059,6 +2059,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	if (ret == 0 || ret == -EBUSY)
- 		bio->bi_cg_private = tg;
- 	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
-+#else
-+	/* Avoid that the compiler complains about not using ret */
-+	if (ret) {
-+	}
- #endif
- 	blk_throtl_update_idletime(tg);
- 
--- 
-2.12.2
+Reviewed-by: Christoph Hellwig <hch@lst.de>
