@@ -1,180 +1,248 @@
-Return-Path: <trondmy@primarydata.com>
-From: Trond Myklebust <trondmy@primarydata.com>
-To: "jack@suse.cz" <jack@suse.cz>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "anna.schumaker@netapp.com" <anna.schumaker@netapp.com>, Trond Myklebust
-	<trondmy@primarydata.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-nfs@vger.kernel.org"
-	<linux-nfs@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 21/25] nfs: Convert to separately allocated bdi
-Date: Thu, 20 Apr 2017 18:06:07 +0000
-Message-ID: <1492711564.82584.1.camel@primarydata.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>,
+        Trond Myklebust <trond.myklebust@primarydata.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        linux-nfs@vger.kernel.org
+Subject: [PATCH 21/25] nfs: Convert to separately allocated bdi
+Date: Wed, 12 Apr 2017 12:24:45 +0200
+Message-Id: <20170412102449.16901-22-jack@suse.cz>
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
 References: <20170412102449.16901-1-jack@suse.cz>
-	 <20170412102449.16901-22-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-22-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTA0LTEyIGF0IDEyOjI0ICswMjAwLCBKYW4gS2FyYSB3cm90ZToNCj4gQWxs
-b2NhdGUgc3RydWN0IGJhY2tpbmdfZGV2X2luZm8gc2VwYXJhdGVseSBpbnN0ZWFkIG9mIGVtYmVk
-ZGluZyBpdA0KPiBpbnNpZGUgdGhlIHN1cGVyYmxvY2suIFRoaXMgdW5pZmllcyBoYW5kbGluZyBv
-ZiBiZGkgYW1vbmcgdXNlcnMuDQo+IA0KPiBDQzogVHJvbmQgTXlrbGVidXN0IDx0cm9uZC5teWts
-ZWJ1c3RAcHJpbWFyeWRhdGEuY29tPg0KPiBDQzogQW5uYSBTY2h1bWFrZXIgPGFubmEuc2NodW1h
-a2VyQG5ldGFwcC5jb20+DQo+IENDOiBsaW51eC1uZnNAdmdlci5rZXJuZWwub3JnDQo+IFJldmll
-d2VkLWJ5OiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT4NCj4gU2lnbmVkLW9mZi1ieTog
-SmFuIEthcmEgPGphY2tAc3VzZS5jej4NCj4gLS0tDQo+IMKgZnMvbmZzL2NsaWVudC5jwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoHwgMTAgLS0tLS0tLS0tLQ0KPiDCoGZzL25mcy9pbnRlcm5hbC5owqDC
-oMKgwqDCoMKgwqDCoMKgfMKgwqA2ICsrKy0tLQ0KPiDCoGZzL25mcy9zdXBlci5jwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgfCAzNCArKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tDQo+
-IMKgZnMvbmZzL3dyaXRlLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB8IDEzICsrKysrKy0tLS0t
-LS0NCj4gwqBpbmNsdWRlL2xpbnV4L25mc19mc19zYi5oIHzCoMKgMSAtDQo+IMKgNSBmaWxlcyBj
-aGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCAzNiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1n
-aXQgYS9mcy9uZnMvY2xpZW50LmMgYi9mcy9uZnMvY2xpZW50LmMNCj4gaW5kZXggMzkwYWRhODc0
-MWJjLi4wNGQxNWEwMDQ1ZTMgMTAwNjQ0DQo+IC0tLSBhL2ZzL25mcy9jbGllbnQuYw0KPiArKysg
-Yi9mcy9uZnMvY2xpZW50LmMNCj4gQEAgLTc2MSw5ICs3NjEsNiBAQCBzdGF0aWMgdm9pZCBuZnNf
-c2VydmVyX3NldF9mc2luZm8oc3RydWN0DQo+IG5mc19zZXJ2ZXIgKnNlcnZlciwNCj4gwqAJCXNl
-cnZlci0+cnNpemUgPSBORlNfTUFYX0ZJTEVfSU9fU0laRTsNCj4gwqAJc2VydmVyLT5ycGFnZXMg
-PSAoc2VydmVyLT5yc2l6ZSArIFBBR0VfU0laRSAtIDEpID4+DQo+IFBBR0VfU0hJRlQ7DQo+IMKg
-DQo+IC0Jc2VydmVyLT5iYWNraW5nX2Rldl9pbmZvLm5hbWUgPSAibmZzIjsNCj4gLQlzZXJ2ZXIt
-PmJhY2tpbmdfZGV2X2luZm8ucmFfcGFnZXMgPSBzZXJ2ZXItPnJwYWdlcyAqDQo+IE5GU19NQVhf
-UkVBREFIRUFEOw0KPiAtDQo+IMKgCWlmIChzZXJ2ZXItPndzaXplID4gbWF4X3JwY19wYXlsb2Fk
-KQ0KPiDCoAkJc2VydmVyLT53c2l6ZSA9IG1heF9ycGNfcGF5bG9hZDsNCj4gwqAJaWYgKHNlcnZl
-ci0+d3NpemUgPiBORlNfTUFYX0ZJTEVfSU9fU0laRSkNCj4gQEAgLTkxNywxMiArOTE0LDYgQEAg
-c3RydWN0IG5mc19zZXJ2ZXIgKm5mc19hbGxvY19zZXJ2ZXIodm9pZCkNCj4gwqAJCXJldHVybiBO
-VUxMOw0KPiDCoAl9DQo+IMKgDQo+IC0JaWYgKGJkaV9pbml0KCZzZXJ2ZXItPmJhY2tpbmdfZGV2
-X2luZm8pKSB7DQo+IC0JCW5mc19mcmVlX2lvc3RhdHMoc2VydmVyLT5pb19zdGF0cyk7DQo+IC0J
-CWtmcmVlKHNlcnZlcik7DQo+IC0JCXJldHVybiBOVUxMOw0KPiAtCX0NCj4gLQ0KPiDCoAlpZGFf
-aW5pdCgmc2VydmVyLT5vcGVub3duZXJfaWQpOw0KPiDCoAlpZGFfaW5pdCgmc2VydmVyLT5sb2Nr
-b3duZXJfaWQpOw0KPiDCoAlwbmZzX2luaXRfc2VydmVyKHNlcnZlcik7DQo+IEBAIC05NTMsNyAr
-OTQ0LDYgQEAgdm9pZCBuZnNfZnJlZV9zZXJ2ZXIoc3RydWN0IG5mc19zZXJ2ZXIgKnNlcnZlcikN
-Cj4gwqAJaWRhX2Rlc3Ryb3koJnNlcnZlci0+bG9ja293bmVyX2lkKTsNCj4gwqAJaWRhX2Rlc3Ry
-b3koJnNlcnZlci0+b3Blbm93bmVyX2lkKTsNCj4gwqAJbmZzX2ZyZWVfaW9zdGF0cyhzZXJ2ZXIt
-PmlvX3N0YXRzKTsNCj4gLQliZGlfZGVzdHJveSgmc2VydmVyLT5iYWNraW5nX2Rldl9pbmZvKTsN
-Cj4gwqAJa2ZyZWUoc2VydmVyKTsNCj4gwqAJbmZzX3JlbGVhc2VfYXV0b21vdW50X3RpbWVyKCk7
-DQo+IMKgCWRwcmludGsoIjwtLSBuZnNfZnJlZV9zZXJ2ZXIoKVxuIik7DQo+IGRpZmYgLS1naXQg
-YS9mcy9uZnMvaW50ZXJuYWwuaCBiL2ZzL25mcy9pbnRlcm5hbC5oDQo+IGluZGV4IDdiMzhmZWRi
-N2UwMy4uOWRjNjVkN2FlNzU0IDEwMDY0NA0KPiAtLS0gYS9mcy9uZnMvaW50ZXJuYWwuaA0KPiAr
-KysgYi9mcy9uZnMvaW50ZXJuYWwuaA0KPiBAQCAtMTM5LDcgKzEzOSw3IEBAIHN0cnVjdCBuZnNf
-bW91bnRfcmVxdWVzdCB7DQo+IMKgfTsNCj4gwqANCj4gwqBzdHJ1Y3QgbmZzX21vdW50X2luZm8g
-ew0KPiAtCXZvaWQgKCpmaWxsX3N1cGVyKShzdHJ1Y3Qgc3VwZXJfYmxvY2sgKiwgc3RydWN0DQo+
-IG5mc19tb3VudF9pbmZvICopOw0KPiArCWludCAoKmZpbGxfc3VwZXIpKHN0cnVjdCBzdXBlcl9i
-bG9jayAqLCBzdHJ1Y3QNCj4gbmZzX21vdW50X2luZm8gKik7DQo+IMKgCWludCAoKnNldF9zZWN1
-cml0eSkoc3RydWN0IHN1cGVyX2Jsb2NrICosIHN0cnVjdCBkZW50cnkgKiwNCj4gc3RydWN0IG5m
-c19tb3VudF9pbmZvICopOw0KPiDCoAlzdHJ1Y3QgbmZzX3BhcnNlZF9tb3VudF9kYXRhICpwYXJz
-ZWQ7DQo+IMKgCXN0cnVjdCBuZnNfY2xvbmVfbW91bnQgKmNsb25lZDsNCj4gQEAgLTQwNyw3ICs0
-MDcsNyBAQCBzdHJ1Y3QgZGVudHJ5ICpuZnNfZnNfbW91bnQoc3RydWN0DQo+IGZpbGVfc3lzdGVt
-X3R5cGUgKiwgaW50LCBjb25zdCBjaGFyICosIHZvaWQgKg0KPiDCoHN0cnVjdCBkZW50cnkgKiBu
-ZnNfeGRldl9tb3VudF9jb21tb24oc3RydWN0IGZpbGVfc3lzdGVtX3R5cGUgKiwNCj4gaW50LA0K
-PiDCoAkJY29uc3QgY2hhciAqLCBzdHJ1Y3QgbmZzX21vdW50X2luZm8gKik7DQo+IMKgdm9pZCBu
-ZnNfa2lsbF9zdXBlcihzdHJ1Y3Qgc3VwZXJfYmxvY2sgKik7DQo+IC12b2lkIG5mc19maWxsX3N1
-cGVyKHN0cnVjdCBzdXBlcl9ibG9jayAqLCBzdHJ1Y3QgbmZzX21vdW50X2luZm8gKik7DQo+ICtp
-bnQgbmZzX2ZpbGxfc3VwZXIoc3RydWN0IHN1cGVyX2Jsb2NrICosIHN0cnVjdCBuZnNfbW91bnRf
-aW5mbyAqKTsNCj4gwqANCj4gwqBleHRlcm4gc3RydWN0IHJwY19zdGF0IG5mc19ycGNzdGF0Ow0K
-PiDCoA0KPiBAQCAtNDU4LDcgKzQ1OCw3IEBAIGV4dGVybiB2b2lkIG5mc19yZWFkX3ByZXBhcmUo
-c3RydWN0IHJwY190YXNrDQo+ICp0YXNrLCB2b2lkICpjYWxsZGF0YSk7DQo+IMKgZXh0ZXJuIHZv
-aWQgbmZzX3BhZ2Vpb19yZXNldF9yZWFkX21kcyhzdHJ1Y3QgbmZzX3BhZ2Vpb19kZXNjcmlwdG9y
-DQo+ICpwZ2lvKTsNCj4gwqANCj4gwqAvKiBzdXBlci5jICovDQo+IC12b2lkIG5mc19jbG9uZV9z
-dXBlcihzdHJ1Y3Qgc3VwZXJfYmxvY2sgKiwgc3RydWN0IG5mc19tb3VudF9pbmZvICopOw0KPiAr
-aW50IG5mc19jbG9uZV9zdXBlcihzdHJ1Y3Qgc3VwZXJfYmxvY2sgKiwgc3RydWN0IG5mc19tb3Vu
-dF9pbmZvICopOw0KPiDCoHZvaWQgbmZzX3Vtb3VudF9iZWdpbihzdHJ1Y3Qgc3VwZXJfYmxvY2sg
-Kik7DQo+IMKgaW50wqDCoG5mc19zdGF0ZnMoc3RydWN0IGRlbnRyeSAqLCBzdHJ1Y3Qga3N0YXRm
-cyAqKTsNCj4gwqBpbnTCoMKgbmZzX3Nob3dfb3B0aW9ucyhzdHJ1Y3Qgc2VxX2ZpbGUgKiwgc3Ry
-dWN0IGRlbnRyeSAqKTsNCj4gZGlmZiAtLWdpdCBhL2ZzL25mcy9zdXBlci5jIGIvZnMvbmZzL3N1
-cGVyLmMNCj4gaW5kZXggNTRlMGY5ZjJkZDk0Li44ZDk3YWE3MDQwN2UgMTAwNjQ0DQo+IC0tLSBh
-L2ZzL25mcy9zdXBlci5jDQo+ICsrKyBiL2ZzL25mcy9zdXBlci5jDQo+IEBAIC0yMzE1LDE4ICsy
-MzE1LDE3IEBAIGlubGluZSB2b2lkIG5mc19pbml0aWFsaXNlX3NiKHN0cnVjdA0KPiBzdXBlcl9i
-bG9jayAqc2IpDQo+IMKgCQlzYi0+c19ibG9ja3NpemUgPSBuZnNfYmxvY2tfYml0cyhzZXJ2ZXIt
-PndzaXplLA0KPiDCoAkJCQkJCcKgJnNiLQ0KPiA+c19ibG9ja3NpemVfYml0cyk7DQo+IMKgDQo+
-IC0Jc2ItPnNfYmRpID0gJnNlcnZlci0+YmFja2luZ19kZXZfaW5mbzsNCj4gLQ0KPiDCoAluZnNf
-c3VwZXJfc2V0X21heGJ5dGVzKHNiLCBzZXJ2ZXItPm1heGZpbGVzaXplKTsNCj4gwqB9DQo+IMKg
-DQo+IMKgLyoNCj4gwqAgKiBGaW5pc2ggc2V0dGluZyB1cCBhbiBORlMyLzMgc3VwZXJibG9jaw0K
-PiDCoCAqLw0KPiAtdm9pZCBuZnNfZmlsbF9zdXBlcihzdHJ1Y3Qgc3VwZXJfYmxvY2sgKnNiLCBz
-dHJ1Y3QgbmZzX21vdW50X2luZm8NCj4gKm1vdW50X2luZm8pDQo+ICtpbnQgbmZzX2ZpbGxfc3Vw
-ZXIoc3RydWN0IHN1cGVyX2Jsb2NrICpzYiwgc3RydWN0IG5mc19tb3VudF9pbmZvDQo+ICptb3Vu
-dF9pbmZvKQ0KPiDCoHsNCj4gwqAJc3RydWN0IG5mc19wYXJzZWRfbW91bnRfZGF0YSAqZGF0YSA9
-IG1vdW50X2luZm8tPnBhcnNlZDsNCj4gwqAJc3RydWN0IG5mc19zZXJ2ZXIgKnNlcnZlciA9IE5G
-U19TQihzYik7DQo+ICsJaW50IHJldDsNCj4gwqANCj4gwqAJc2ItPnNfYmxvY2tzaXplX2JpdHMg
-PSAwOw0KPiDCoAlzYi0+c19ibG9ja3NpemUgPSAwOw0KPiBAQCAtMjM0NCwxMyArMjM0MywyMSBA
-QCB2b2lkIG5mc19maWxsX3N1cGVyKHN0cnVjdCBzdXBlcl9ibG9jayAqc2IsDQo+IHN0cnVjdCBu
-ZnNfbW91bnRfaW5mbyAqbW91bnRfaW5mbykNCj4gwqAJfQ0KPiDCoA0KPiDCoMKgCW5mc19pbml0
-aWFsaXNlX3NiKHNiKTsNCj4gKw0KPiArCXJldCA9IHN1cGVyX3NldHVwX2JkaV9uYW1lKHNiLCAi
-JXU6JXUiLCBNQUpPUihzZXJ2ZXItDQo+ID5zX2RldiksDQo+ICsJCQkJwqDCoMKgTUlOT1Ioc2Vy
-dmVyLT5zX2RldikpOw0KPiArCWlmIChyZXQpDQo+ICsJCXJldHVybiByZXQ7DQo+ICsJc2ItPnNf
-YmRpLT5yYV9wYWdlcyA9IHNlcnZlci0+cnBhZ2VzICogTkZTX01BWF9SRUFEQUhFQUQ7DQo+ICsJ
-cmV0dXJuIDA7DQo+ICsNCj4gwqB9DQo+IMKgRVhQT1JUX1NZTUJPTF9HUEwobmZzX2ZpbGxfc3Vw
-ZXIpOw0KPiDCoA0KPiDCoC8qDQo+IMKgICogRmluaXNoIHNldHRpbmcgdXAgYSBjbG9uZWQgTkZT
-Mi8zLzQgc3VwZXJibG9jaw0KPiDCoCAqLw0KPiAtdm9pZCBuZnNfY2xvbmVfc3VwZXIoc3RydWN0
-IHN1cGVyX2Jsb2NrICpzYiwgc3RydWN0IG5mc19tb3VudF9pbmZvDQo+ICptb3VudF9pbmZvKQ0K
-PiAraW50IG5mc19jbG9uZV9zdXBlcihzdHJ1Y3Qgc3VwZXJfYmxvY2sgKnNiLCBzdHJ1Y3QgbmZz
-X21vdW50X2luZm8NCj4gKm1vdW50X2luZm8pDQo+IMKgew0KPiDCoAljb25zdCBzdHJ1Y3Qgc3Vw
-ZXJfYmxvY2sgKm9sZF9zYiA9IG1vdW50X2luZm8tPmNsb25lZC0+c2I7DQo+IMKgCXN0cnVjdCBu
-ZnNfc2VydmVyICpzZXJ2ZXIgPSBORlNfU0Ioc2IpOw0KPiBAQCAtMjM3MCw2ICsyMzc3LDExIEBA
-IHZvaWQgbmZzX2Nsb25lX3N1cGVyKHN0cnVjdCBzdXBlcl9ibG9jayAqc2IsDQo+IHN0cnVjdCBu
-ZnNfbW91bnRfaW5mbyAqbW91bnRfaW5mbykNCj4gwqAJfQ0KPiDCoA0KPiDCoMKgCW5mc19pbml0
-aWFsaXNlX3NiKHNiKTsNCj4gKw0KPiArCXNiLT5zX2JkaSA9IGJkaV9nZXQob2xkX3NiLT5zX2Jk
-aSk7DQo+ICsJc2ItPnNfaWZsYWdzIHw9IFNCX0lfRFlOQkRJOw0KPiArDQo+ICsJcmV0dXJuIDA7
-DQo+IMKgfQ0KPiDCoA0KPiDCoHN0YXRpYyBpbnQgbmZzX2NvbXBhcmVfbW91bnRfb3B0aW9ucyhj
-b25zdCBzdHJ1Y3Qgc3VwZXJfYmxvY2sgKnMsDQo+IGNvbnN0IHN0cnVjdCBuZnNfc2VydmVyICpi
-LCBpbnQgZmxhZ3MpDQo+IEBAIC0yNTIyLDExICsyNTM0LDYgQEAgc3RhdGljIHZvaWQgbmZzX2dl
-dF9jYWNoZV9jb29raWUoc3RydWN0DQo+IHN1cGVyX2Jsb2NrICpzYiwNCj4gwqB9DQo+IMKgI2Vu
-ZGlmDQo+IMKgDQo+IC1zdGF0aWMgaW50IG5mc19iZGlfcmVnaXN0ZXIoc3RydWN0IG5mc19zZXJ2
-ZXIgKnNlcnZlcikNCj4gLXsNCj4gLQlyZXR1cm4gYmRpX3JlZ2lzdGVyX2Rldigmc2VydmVyLT5i
-YWNraW5nX2Rldl9pbmZvLCBzZXJ2ZXItDQo+ID5zX2Rldik7DQo+IC19DQo+IC0NCj4gwqBpbnQg
-bmZzX3NldF9zYl9zZWN1cml0eShzdHJ1Y3Qgc3VwZXJfYmxvY2sgKnMsIHN0cnVjdCBkZW50cnkN
-Cj4gKm1udHJvb3QsDQo+IMKgCQkJc3RydWN0IG5mc19tb3VudF9pbmZvICptb3VudF9pbmZvKQ0K
-PiDCoHsNCj4gQEAgLTI1OTQsMTcgKzI2MDEsMTQgQEAgc3RydWN0IGRlbnRyeSAqbmZzX2ZzX21v
-dW50X2NvbW1vbihzdHJ1Y3QNCj4gbmZzX3NlcnZlciAqc2VydmVyLA0KPiDCoAkJbmZzX2ZyZWVf
-c2VydmVyKHNlcnZlcik7DQo+IMKgCQlzZXJ2ZXIgPSBOVUxMOw0KPiDCoAl9IGVsc2Ugew0KPiAt
-CQllcnJvciA9IG5mc19iZGlfcmVnaXN0ZXIoc2VydmVyKTsNCj4gLQkJaWYgKGVycm9yKSB7DQo+
-IC0JCQltbnRyb290ID0gRVJSX1BUUihlcnJvcik7DQo+IC0JCQlnb3RvIGVycm9yX3NwbGF0X3N1
-cGVyOw0KPiAtCQl9DQo+IMKgCQlzZXJ2ZXItPnN1cGVyID0gczsNCj4gwqAJfQ0KPiDCoA0KPiDC
-oAlpZiAoIXMtPnNfcm9vdCkgew0KPiDCoAkJLyogaW5pdGlhbCBzdXBlcmJsb2NrL3Jvb3QgY3Jl
-YXRpb24gKi8NCj4gLQkJbW91bnRfaW5mby0+ZmlsbF9zdXBlcihzLCBtb3VudF9pbmZvKTsNCj4g
-KwkJZXJyb3IgPSBtb3VudF9pbmZvLT5maWxsX3N1cGVyKHMsIG1vdW50X2luZm8pOw0KPiArCQlp
-ZiAoZXJyb3IpDQo+ICsJCQlnb3RvIGVycm9yX3NwbGF0X3N1cGVyOw0KPiDCoAkJbmZzX2dldF9j
-YWNoZV9jb29raWUocywgbW91bnRfaW5mby0+cGFyc2VkLA0KPiBtb3VudF9pbmZvLT5jbG9uZWQp
-Ow0KPiDCoAl9DQo+IMKgDQo+IGRpZmYgLS1naXQgYS9mcy9uZnMvd3JpdGUuYyBiL2ZzL25mcy93
-cml0ZS5jDQo+IGluZGV4IGFiYjJjOGEzYmU0Mi4uY2MzNDFmYzdmZDQ0IDEwMDY0NA0KPiAtLS0g
-YS9mcy9uZnMvd3JpdGUuYw0KPiArKysgYi9mcy9uZnMvd3JpdGUuYw0KPiBAQCAtMjYzLDE2ICsy
-NjMsMTUgQEAgaW50IG5mc19jb25nZXN0aW9uX2tiOw0KPiDCoA0KPiDCoHN0YXRpYyB2b2lkIG5m
-c19zZXRfcGFnZV93cml0ZWJhY2soc3RydWN0IHBhZ2UgKnBhZ2UpDQo+IMKgew0KPiAtCXN0cnVj
-dCBuZnNfc2VydmVyICpuZnNzID0NCj4gTkZTX1NFUlZFUihwYWdlX2ZpbGVfbWFwcGluZyhwYWdl
-KS0+aG9zdCk7DQo+ICsJc3RydWN0IGlub2RlICppbm9kZSA9IHBhZ2VfZmlsZV9tYXBwaW5nKHBh
-Z2UpLT5ob3N0Ow0KPiArCXN0cnVjdCBuZnNfc2VydmVyICpuZnNzID0gTkZTX1NFUlZFUihpbm9k
-ZSk7DQo+IMKgCWludCByZXQgPSB0ZXN0X3NldF9wYWdlX3dyaXRlYmFjayhwYWdlKTsNCj4gwqAN
-Cj4gwqAJV0FSTl9PTl9PTkNFKHJldCAhPSAwKTsNCj4gwqANCj4gwqAJaWYgKGF0b21pY19sb25n
-X2luY19yZXR1cm4oJm5mc3MtPndyaXRlYmFjaykgPg0KPiAtCQkJTkZTX0NPTkdFU1RJT05fT05f
-VEhSRVNIKSB7DQo+IC0JCXNldF9iZGlfY29uZ2VzdGVkKCZuZnNzLT5iYWNraW5nX2Rldl9pbmZv
-LA0KPiAtCQkJCQlCTEtfUldfQVNZTkMpOw0KPiAtCX0NCj4gKwkJCU5GU19DT05HRVNUSU9OX09O
-X1RIUkVTSCkNCj4gKwkJc2V0X2JkaV9jb25nZXN0ZWQoaW5vZGVfdG9fYmRpKGlub2RlKSwNCj4g
-QkxLX1JXX0FTWU5DKTsNCj4gwqB9DQo+IMKgDQo+IMKgc3RhdGljIHZvaWQgbmZzX2VuZF9wYWdl
-X3dyaXRlYmFjayhzdHJ1Y3QgbmZzX3BhZ2UgKnJlcSkNCj4gQEAgLTI4NSw3ICsyODQsNyBAQCBz
-dGF0aWMgdm9pZCBuZnNfZW5kX3BhZ2Vfd3JpdGViYWNrKHN0cnVjdA0KPiBuZnNfcGFnZSAqcmVx
-KQ0KPiDCoA0KPiDCoAllbmRfcGFnZV93cml0ZWJhY2socmVxLT53Yl9wYWdlKTsNCj4gwqAJaWYg
-KGF0b21pY19sb25nX2RlY19yZXR1cm4oJm5mc3MtPndyaXRlYmFjaykgPA0KPiBORlNfQ09OR0VT
-VElPTl9PRkZfVEhSRVNIKQ0KPiAtCQljbGVhcl9iZGlfY29uZ2VzdGVkKCZuZnNzLT5iYWNraW5n
-X2Rldl9pbmZvLA0KPiBCTEtfUldfQVNZTkMpOw0KPiArCQljbGVhcl9iZGlfY29uZ2VzdGVkKGlu
-b2RlX3RvX2JkaShpbm9kZSksDQo+IEJMS19SV19BU1lOQyk7DQo+IMKgfQ0KPiDCoA0KPiDCoA0K
-PiBAQCAtMTgwOCw3ICsxODA3LDcgQEAgc3RhdGljIHZvaWQgbmZzX2NvbW1pdF9yZWxlYXNlX3Bh
-Z2VzKHN0cnVjdA0KPiBuZnNfY29tbWl0X2RhdGEgKmRhdGEpDQo+IMKgCX0NCj4gwqAJbmZzcyA9
-IE5GU19TRVJWRVIoZGF0YS0+aW5vZGUpOw0KPiDCoAlpZiAoYXRvbWljX2xvbmdfcmVhZCgmbmZz
-cy0+d3JpdGViYWNrKSA8DQo+IE5GU19DT05HRVNUSU9OX09GRl9USFJFU0gpDQo+IC0JCWNsZWFy
-X2JkaV9jb25nZXN0ZWQoJm5mc3MtPmJhY2tpbmdfZGV2X2luZm8sDQo+IEJMS19SV19BU1lOQyk7
-DQo+ICsJCWNsZWFyX2JkaV9jb25nZXN0ZWQoaW5vZGVfdG9fYmRpKGRhdGEtPmlub2RlKSwNCj4g
-QkxLX1JXX0FTWU5DKTsNCj4gwqANCj4gwqAJbmZzX2luaXRfY2luZm8oJmNpbmZvLCBkYXRhLT5p
-bm9kZSwgZGF0YS0+ZHJlcSk7DQo+IMKgCW5mc19jb21taXRfZW5kKGNpbmZvLm1kcyk7DQo+IGRp
-ZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L25mc19mc19zYi5oIGIvaW5jbHVkZS9saW51eC9uZnNf
-ZnNfc2IuaA0KPiBpbmRleCBiMzQwOTdjNjc4NDguLmUxNTAyYzU1NzQxZSAxMDA2NDQNCj4gLS0t
-IGEvaW5jbHVkZS9saW51eC9uZnNfZnNfc2IuaA0KPiArKysgYi9pbmNsdWRlL2xpbnV4L25mc19m
-c19zYi5oDQo+IEBAIC0xMzMsNyArMTMzLDYgQEAgc3RydWN0IG5mc19zZXJ2ZXIgew0KPiDCoAlz
-dHJ1Y3QgcnBjX2NsbnQgKgljbGllbnRfYWNsOwkvKiBBQ0wgUlBDDQo+IGNsaWVudCBoYW5kbGUg
-Ki8NCj4gwqAJc3RydWN0IG5sbV9ob3N0CQkqbmxtX2hvc3Q7CS8qIE5MTQ0KPiBjbGllbnQgaGFu
-ZGxlICovDQo+IMKgCXN0cnVjdCBuZnNfaW9zdGF0cyBfX3BlcmNwdSAqaW9fc3RhdHM7CS8qIEkv
-Tw0KPiBzdGF0aXN0aWNzICovDQo+IC0Jc3RydWN0IGJhY2tpbmdfZGV2X2luZm8JYmFja2luZ19k
-ZXZfaW5mbzsNCj4gwqAJYXRvbWljX2xvbmdfdAkJd3JpdGViYWNrOwkvKiBudW1iZXIgb2YNCj4g
-d3JpdGViYWNrIHBhZ2VzICovDQo+IMKgCWludAkJCWZsYWdzOwkJLyogdmFyaW91cw0KPiBmbGFn
-cyAqLw0KPiDCoAl1bnNpZ25lZCBpbnQJCWNhcHM7CQkvKiBzZXJ2ZXINCj4gY2FwYWJpbGl0aWVz
-ICovDQoNCkFja2VkLWJ5OiBUcm9uZCBNeWtsZWJ1c3QgPHRyb25kLm15a2xlYnVzdEBwcmltYXJ5
-ZGF0YS5jb20+DQoNCi0tIA0KVHJvbmQgTXlrbGVidXN0DQpMaW51eCBORlMgY2xpZW50IG1haW50
-YWluZXIsIFByaW1hcnlEYXRhDQp0cm9uZC5teWtsZWJ1c3RAcHJpbWFyeWRhdGEuY29tDQo=
+Allocate struct backing_dev_info separately instead of embedding it
+inside the superblock. This unifies handling of bdi among users.
+
+CC: Trond Myklebust <trond.myklebust@primarydata.com>
+CC: Anna Schumaker <anna.schumaker@netapp.com>
+CC: linux-nfs@vger.kernel.org
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/nfs/client.c           | 10 ----------
+ fs/nfs/internal.h         |  6 +++---
+ fs/nfs/super.c            | 34 +++++++++++++++++++---------------
+ fs/nfs/write.c            | 13 ++++++-------
+ include/linux/nfs_fs_sb.h |  1 -
+ 5 files changed, 28 insertions(+), 36 deletions(-)
+
+diff --git a/fs/nfs/client.c b/fs/nfs/client.c
+index 390ada8741bc..04d15a0045e3 100644
+--- a/fs/nfs/client.c
++++ b/fs/nfs/client.c
+@@ -761,9 +761,6 @@ static void nfs_server_set_fsinfo(struct nfs_server *server,
+ 		server->rsize = NFS_MAX_FILE_IO_SIZE;
+ 	server->rpages = (server->rsize + PAGE_SIZE - 1) >> PAGE_SHIFT;
+ 
+-	server->backing_dev_info.name = "nfs";
+-	server->backing_dev_info.ra_pages = server->rpages * NFS_MAX_READAHEAD;
+-
+ 	if (server->wsize > max_rpc_payload)
+ 		server->wsize = max_rpc_payload;
+ 	if (server->wsize > NFS_MAX_FILE_IO_SIZE)
+@@ -917,12 +914,6 @@ struct nfs_server *nfs_alloc_server(void)
+ 		return NULL;
+ 	}
+ 
+-	if (bdi_init(&server->backing_dev_info)) {
+-		nfs_free_iostats(server->io_stats);
+-		kfree(server);
+-		return NULL;
+-	}
+-
+ 	ida_init(&server->openowner_id);
+ 	ida_init(&server->lockowner_id);
+ 	pnfs_init_server(server);
+@@ -953,7 +944,6 @@ void nfs_free_server(struct nfs_server *server)
+ 	ida_destroy(&server->lockowner_id);
+ 	ida_destroy(&server->openowner_id);
+ 	nfs_free_iostats(server->io_stats);
+-	bdi_destroy(&server->backing_dev_info);
+ 	kfree(server);
+ 	nfs_release_automount_timer();
+ 	dprintk("<-- nfs_free_server()\n");
+diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
+index 7b38fedb7e03..9dc65d7ae754 100644
+--- a/fs/nfs/internal.h
++++ b/fs/nfs/internal.h
+@@ -139,7 +139,7 @@ struct nfs_mount_request {
+ };
+ 
+ struct nfs_mount_info {
+-	void (*fill_super)(struct super_block *, struct nfs_mount_info *);
++	int (*fill_super)(struct super_block *, struct nfs_mount_info *);
+ 	int (*set_security)(struct super_block *, struct dentry *, struct nfs_mount_info *);
+ 	struct nfs_parsed_mount_data *parsed;
+ 	struct nfs_clone_mount *cloned;
+@@ -407,7 +407,7 @@ struct dentry *nfs_fs_mount(struct file_system_type *, int, const char *, void *
+ struct dentry * nfs_xdev_mount_common(struct file_system_type *, int,
+ 		const char *, struct nfs_mount_info *);
+ void nfs_kill_super(struct super_block *);
+-void nfs_fill_super(struct super_block *, struct nfs_mount_info *);
++int nfs_fill_super(struct super_block *, struct nfs_mount_info *);
+ 
+ extern struct rpc_stat nfs_rpcstat;
+ 
+@@ -458,7 +458,7 @@ extern void nfs_read_prepare(struct rpc_task *task, void *calldata);
+ extern void nfs_pageio_reset_read_mds(struct nfs_pageio_descriptor *pgio);
+ 
+ /* super.c */
+-void nfs_clone_super(struct super_block *, struct nfs_mount_info *);
++int nfs_clone_super(struct super_block *, struct nfs_mount_info *);
+ void nfs_umount_begin(struct super_block *);
+ int  nfs_statfs(struct dentry *, struct kstatfs *);
+ int  nfs_show_options(struct seq_file *, struct dentry *);
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index 54e0f9f2dd94..8d97aa70407e 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -2315,18 +2315,17 @@ inline void nfs_initialise_sb(struct super_block *sb)
+ 		sb->s_blocksize = nfs_block_bits(server->wsize,
+ 						 &sb->s_blocksize_bits);
+ 
+-	sb->s_bdi = &server->backing_dev_info;
+-
+ 	nfs_super_set_maxbytes(sb, server->maxfilesize);
+ }
+ 
+ /*
+  * Finish setting up an NFS2/3 superblock
+  */
+-void nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
++int nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+ {
+ 	struct nfs_parsed_mount_data *data = mount_info->parsed;
+ 	struct nfs_server *server = NFS_SB(sb);
++	int ret;
+ 
+ 	sb->s_blocksize_bits = 0;
+ 	sb->s_blocksize = 0;
+@@ -2344,13 +2343,21 @@ void nfs_fill_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+ 	}
+ 
+  	nfs_initialise_sb(sb);
++
++	ret = super_setup_bdi_name(sb, "%u:%u", MAJOR(server->s_dev),
++				   MINOR(server->s_dev));
++	if (ret)
++		return ret;
++	sb->s_bdi->ra_pages = server->rpages * NFS_MAX_READAHEAD;
++	return 0;
++
+ }
+ EXPORT_SYMBOL_GPL(nfs_fill_super);
+ 
+ /*
+  * Finish setting up a cloned NFS2/3/4 superblock
+  */
+-void nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
++int nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+ {
+ 	const struct super_block *old_sb = mount_info->cloned->sb;
+ 	struct nfs_server *server = NFS_SB(sb);
+@@ -2370,6 +2377,11 @@ void nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
+ 	}
+ 
+  	nfs_initialise_sb(sb);
++
++	sb->s_bdi = bdi_get(old_sb->s_bdi);
++	sb->s_iflags |= SB_I_DYNBDI;
++
++	return 0;
+ }
+ 
+ static int nfs_compare_mount_options(const struct super_block *s, const struct nfs_server *b, int flags)
+@@ -2522,11 +2534,6 @@ static void nfs_get_cache_cookie(struct super_block *sb,
+ }
+ #endif
+ 
+-static int nfs_bdi_register(struct nfs_server *server)
+-{
+-	return bdi_register_dev(&server->backing_dev_info, server->s_dev);
+-}
+-
+ int nfs_set_sb_security(struct super_block *s, struct dentry *mntroot,
+ 			struct nfs_mount_info *mount_info)
+ {
+@@ -2594,17 +2601,14 @@ struct dentry *nfs_fs_mount_common(struct nfs_server *server,
+ 		nfs_free_server(server);
+ 		server = NULL;
+ 	} else {
+-		error = nfs_bdi_register(server);
+-		if (error) {
+-			mntroot = ERR_PTR(error);
+-			goto error_splat_super;
+-		}
+ 		server->super = s;
+ 	}
+ 
+ 	if (!s->s_root) {
+ 		/* initial superblock/root creation */
+-		mount_info->fill_super(s, mount_info);
++		error = mount_info->fill_super(s, mount_info);
++		if (error)
++			goto error_splat_super;
+ 		nfs_get_cache_cookie(s, mount_info->parsed, mount_info->cloned);
+ 	}
+ 
+diff --git a/fs/nfs/write.c b/fs/nfs/write.c
+index abb2c8a3be42..cc341fc7fd44 100644
+--- a/fs/nfs/write.c
++++ b/fs/nfs/write.c
+@@ -263,16 +263,15 @@ int nfs_congestion_kb;
+ 
+ static void nfs_set_page_writeback(struct page *page)
+ {
+-	struct nfs_server *nfss = NFS_SERVER(page_file_mapping(page)->host);
++	struct inode *inode = page_file_mapping(page)->host;
++	struct nfs_server *nfss = NFS_SERVER(inode);
+ 	int ret = test_set_page_writeback(page);
+ 
+ 	WARN_ON_ONCE(ret != 0);
+ 
+ 	if (atomic_long_inc_return(&nfss->writeback) >
+-			NFS_CONGESTION_ON_THRESH) {
+-		set_bdi_congested(&nfss->backing_dev_info,
+-					BLK_RW_ASYNC);
+-	}
++			NFS_CONGESTION_ON_THRESH)
++		set_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
+ }
+ 
+ static void nfs_end_page_writeback(struct nfs_page *req)
+@@ -285,7 +284,7 @@ static void nfs_end_page_writeback(struct nfs_page *req)
+ 
+ 	end_page_writeback(req->wb_page);
+ 	if (atomic_long_dec_return(&nfss->writeback) < NFS_CONGESTION_OFF_THRESH)
+-		clear_bdi_congested(&nfss->backing_dev_info, BLK_RW_ASYNC);
++		clear_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
+ }
+ 
+ 
+@@ -1808,7 +1807,7 @@ static void nfs_commit_release_pages(struct nfs_commit_data *data)
+ 	}
+ 	nfss = NFS_SERVER(data->inode);
+ 	if (atomic_long_read(&nfss->writeback) < NFS_CONGESTION_OFF_THRESH)
+-		clear_bdi_congested(&nfss->backing_dev_info, BLK_RW_ASYNC);
++		clear_bdi_congested(inode_to_bdi(data->inode), BLK_RW_ASYNC);
+ 
+ 	nfs_init_cinfo(&cinfo, data->inode, data->dreq);
+ 	nfs_commit_end(cinfo.mds);
+diff --git a/include/linux/nfs_fs_sb.h b/include/linux/nfs_fs_sb.h
+index b34097c67848..e1502c55741e 100644
+--- a/include/linux/nfs_fs_sb.h
++++ b/include/linux/nfs_fs_sb.h
+@@ -133,7 +133,6 @@ struct nfs_server {
+ 	struct rpc_clnt *	client_acl;	/* ACL RPC client handle */
+ 	struct nlm_host		*nlm_host;	/* NLM client handle */
+ 	struct nfs_iostats __percpu *io_stats;	/* I/O statistics */
+-	struct backing_dev_info	backing_dev_info;
+ 	atomic_long_t		writeback;	/* number of writeback pages */
+ 	int			flags;		/* various flags */
+ 	unsigned int		caps;		/* server capabilities */
+-- 
+2.12.0
