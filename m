@@ -1,31 +1,95 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 13 Apr 2017 10:20:51 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/3] block: remove blk_end_request_err and
- __blk_end_request_err
-Message-ID: <20170413082051.GA6734@linux-x5ow.site>
+Return-Path: <BATV+4e9b246676c62bade7ff+4980+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 1/3] block: remove blk_end_request_err and __blk_end_request_err
+Date: Wed, 12 Apr 2017 12:13:57 +0200
+Message-Id: <20170412101359.7633-2-hch@lst.de>
+In-Reply-To: <20170412101359.7633-1-hch@lst.de>
 References: <20170412101359.7633-1-hch@lst.de>
- <20170412101359.7633-2-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170412101359.7633-2-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Apr 12, 2017 at 12:13:57PM +0200, Christoph Hellwig wrote:
-> Both functions are entirely unused.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Both functions are entirely unused.
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c       | 39 ---------------------------------------
+ include/linux/blkdev.h |  2 --
+ 2 files changed, 41 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 4f95bdaa1e16..8aee417c1e4f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2856,25 +2856,6 @@ bool blk_end_request_cur(struct request *rq, int error)
+ EXPORT_SYMBOL(blk_end_request_cur);
+ 
+ /**
+- * blk_end_request_err - Finish a request till the next failure boundary.
+- * @rq: the request to finish till the next failure boundary for
+- * @error: must be negative errno
+- *
+- * Description:
+- *     Complete @rq till the next failure boundary.
+- *
+- * Return:
+- *     %false - we are done with this request
+- *     %true  - still buffers pending for this request
+- */
+-bool blk_end_request_err(struct request *rq, int error)
+-{
+-	WARN_ON(error >= 0);
+-	return blk_end_request(rq, error, blk_rq_err_bytes(rq));
+-}
+-EXPORT_SYMBOL_GPL(blk_end_request_err);
+-
+-/**
+  * __blk_end_request - Helper function for drivers to complete the request.
+  * @rq:       the request being processed
+  * @error:    %0 for success, < %0 for error
+@@ -2933,26 +2914,6 @@ bool __blk_end_request_cur(struct request *rq, int error)
+ }
+ EXPORT_SYMBOL(__blk_end_request_cur);
+ 
+-/**
+- * __blk_end_request_err - Finish a request till the next failure boundary.
+- * @rq: the request to finish till the next failure boundary for
+- * @error: must be negative errno
+- *
+- * Description:
+- *     Complete @rq till the next failure boundary.  Must be called
+- *     with queue lock held.
+- *
+- * Return:
+- *     %false - we are done with this request
+- *     %true  - still buffers pending for this request
+- */
+-bool __blk_end_request_err(struct request *rq, int error)
+-{
+-	WARN_ON(error >= 0);
+-	return __blk_end_request(rq, error, blk_rq_err_bytes(rq));
+-}
+-EXPORT_SYMBOL_GPL(__blk_end_request_err);
+-
+ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 		     struct bio *bio)
+ {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f912ddc39020..3b6201b1cd0e 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1128,12 +1128,10 @@ extern bool blk_end_request(struct request *rq, int error,
+ 			    unsigned int nr_bytes);
+ extern void blk_end_request_all(struct request *rq, int error);
+ extern bool blk_end_request_cur(struct request *rq, int error);
+-extern bool blk_end_request_err(struct request *rq, int error);
+ extern bool __blk_end_request(struct request *rq, int error,
+ 			      unsigned int nr_bytes);
+ extern void __blk_end_request_all(struct request *rq, int error);
+ extern bool __blk_end_request_cur(struct request *rq, int error);
+-extern bool __blk_end_request_err(struct request *rq, int error);
+ 
+ extern void blk_complete_request(struct request *);
+ extern void __blk_complete_request(struct request *);
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
