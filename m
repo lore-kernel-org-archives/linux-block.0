@@ -1,66 +1,21 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 20/23] ataflop: switch from req->errors to req->error_count
-Date: Wed, 19 Apr 2017 21:27:05 +0200
-Message-Id: <20170419192708.22098-21-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 12 Apr 2017 01:12:10 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        David Howells <dhowells@redhat.com>,
+        linux-afs@lists.infradead.org
+Subject: Re: [PATCH 12/25] afs: Convert to separately allocated bdi
+Message-ID: <20170412081210.GL9830@infradead.org>
+References: <20170329105623.18241-1-jack@suse.cz>
+ <20170329105623.18241-13-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170329105623.18241-13-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/ataflop.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Looks fine,
 
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index 2104b1b4ccda..fa69ecd52cb5 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -617,12 +617,12 @@ static void fd_error( void )
- 	if (!fd_request)
- 		return;
- 
--	fd_request->errors++;
--	if (fd_request->errors >= MAX_ERRORS) {
-+	fd_request->error_count++;
-+	if (fd_request->error_count >= MAX_ERRORS) {
- 		printk(KERN_ERR "fd%d: too many errors.\n", SelectedDrive );
- 		fd_end_request_cur(-EIO);
- 	}
--	else if (fd_request->errors == RECALIBRATE_ERRORS) {
-+	else if (fd_request->error_count == RECALIBRATE_ERRORS) {
- 		printk(KERN_WARNING "fd%d: recalibrating\n", SelectedDrive );
- 		if (SelectedDrive != -1)
- 			SUD.track = -1;
-@@ -1386,7 +1386,7 @@ static void setup_req_params( int drive )
- 	ReqData = ReqBuffer + 512 * ReqCnt;
- 
- 	if (UseTrackbuffer)
--		read_track = (ReqCmd == READ && fd_request->errors == 0);
-+		read_track = (ReqCmd == READ && fd_request->error_count == 0);
- 	else
- 		read_track = 0;
- 
-@@ -1409,8 +1409,10 @@ static struct request *set_next_request(void)
- 			fdc_queue = 0;
- 		if (q) {
- 			rq = blk_fetch_request(q);
--			if (rq)
-+			if (rq) {
-+				rq->error_count = 0;
- 				break;
-+			}
- 		}
- 	} while (fdc_queue != old_pos);
- 
--- 
-2.11.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
