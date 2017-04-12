@@ -1,96 +1,114 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.11-rc6
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Omar Sandoval <osandov@osandov.com>
-Message-ID: <737cfc73-ff01-cce6-bab9-cdb81612886b@kernel.dk>
-Date: Sat, 8 Apr 2017 11:50:19 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:40265 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753032AbdDLKZL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Apr 2017 06:25:11 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, Oleg Drokin <oleg.drokin@intel.com>,
+        Andreas Dilger <andreas.dilger@intel.com>,
+        James Simmons <jsimmons@infradead.org>,
+        lustre-devel@lists.lustre.org
+Subject: [PATCH 06/25] lustre: Convert to separately allocated bdi
+Date: Wed, 12 Apr 2017 12:24:30 +0200
+Message-Id: <20170412102449.16901-7-jack@suse.cz>
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
+References: <20170412102449.16901-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+Allocate struct backing_dev_info separately instead of embedding it
+inside superblock. This unifies handling of bdi among users.
 
-Here's a pull request for 4.11-rc, fixing a set of issues mostly
-centered around the new scheduling framework. These have been brewing
-for a while, but split up into what we absolutely need in 4.11, and what
-we can defer until 4.12. These are well tested, on both single queue and
-multiqueue setups, and with and without shared tags. They fix several
-hangs that have happened in testing. This is obviously larger than I
-would have preferred at this point in time, but I don't think we can
-shave much off this and still get the desired results.
+CC: Oleg Drokin <oleg.drokin@intel.com>
+CC: Andreas Dilger <andreas.dilger@intel.com>
+CC: James Simmons <jsimmons@infradead.org>
+CC: lustre-devel@lists.lustre.org
+Reviewed-by: Andreas Dilger <andreas.dilger@intel.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ .../staging/lustre/lustre/include/lustre_disk.h    |  4 ----
+ drivers/staging/lustre/lustre/llite/llite_lib.c    | 24 +++-------------------
+ 2 files changed, 3 insertions(+), 25 deletions(-)
 
-In detail, this pull request contains:
-
-- Set of 5 fixes for NVMe, mostly from Christoph and one from Roland.
-
-- A series from Bart, fixing issues with dm-mq and SCSI shared tags and
-  scheduling. Note that one of those patches commit messages may read
-  like an optimization, but it is in fact an important fix for queue
-  restarts in particular.
-
-- A series from Omar, most importantly fixing a hang with multiple
-  hardware queues when we fail to get a driver tag. Another important
-  fix in there is for resizing hardware queues, which nbd does when
-  handling multiple sockets for one connection.
-
-- Fixing an imbalance in putting the ctx for hctx request allocations
-  from Minchan.
-
-Please pull for -rc6! Note that I'll be sporadically available the next
-10 days. Omar is standing by as the point of contact, until I return.
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Bart Van Assche (4):
-      blk-mq: Introduce blk_mq_delay_run_hw_queue()
-      scsi: Avoid that SCSI queues get stuck
-      dm rq: Avoid that request processing stalls sporadically
-      blk-mq: Restart a single queue if tag sets are shared
-
-Christoph Hellwig (4):
-      nvme: add missing byte swap in nvme_setup_discard
-      nvmet: add missing byte swap in nvmet_get_smart_log
-      nvmet: fix byte swap in nvmet_execute_write_zeroes
-      nvmet: fix byte swap in nvmet_parse_io_cmd
-
-Jens Axboe (1):
-      Merge branch 'nvme-4.11-rc' of git://git.infradead.org/nvme into for-linus
-
-Minchan Kim (1):
-      block: do not put mq context in blk_mq_alloc_request_hctx
-
-Omar Sandoval (5):
-      blk-mq: use the right hctx when getting a driver tag fails
-      blk-mq-sched: refactor scheduler initialization
-      blk-mq-sched: set up scheduler tags when bringing up new queues
-      blk-mq-sched: fix crash in switch error path
-      blk-mq: remap queues when adding/removing hardware queues
-
-Roland Dreier (1):
-      nvme: Correct NVMF enum values to match NVMe-oF rev 1.0
-
- block/blk-mq-sched.c            | 181 +++++++++++++++++++++++++++++-----------
- block/blk-mq-sched.h            |  25 ++----
- block/blk-mq.c                  |  85 ++++++++++++++-----
- block/blk-mq.h                  |   2 +-
- block/blk-sysfs.c               |   2 +-
- block/elevator.c                | 114 +++++++++++++------------
- drivers/md/dm-rq.c              |   1 +
- drivers/nvme/host/core.c        |   2 +-
- drivers/nvme/target/admin-cmd.c |   2 +-
- drivers/nvme/target/io-cmd.c    |   4 +-
- drivers/scsi/scsi_lib.c         |   6 +-
- include/linux/blk-mq.h          |   2 +
- include/linux/blkdev.h          |   1 -
- include/linux/elevator.h        |   2 +-
- include/linux/nvme.h            |  16 ++--
- 15 files changed, 281 insertions(+), 164 deletions(-)
-
+diff --git a/drivers/staging/lustre/lustre/include/lustre_disk.h b/drivers/staging/lustre/lustre/include/lustre_disk.h
+index 8886458748c1..a676bccabd43 100644
+--- a/drivers/staging/lustre/lustre/include/lustre_disk.h
++++ b/drivers/staging/lustre/lustre/include/lustre_disk.h
+@@ -133,13 +133,9 @@ struct lustre_sb_info {
+ 	struct obd_export	 *lsi_osd_exp;
+ 	char			  lsi_osd_type[16];
+ 	char			  lsi_fstype[16];
+-	struct backing_dev_info   lsi_bdi;     /* each client mountpoint needs
+-						* own backing_dev_info
+-						*/
+ };
+ 
+ #define LSI_UMOUNT_FAILOVER	      0x00200000
+-#define LSI_BDI_INITIALIZED	      0x00400000
+ 
+ #define     s2lsi(sb)	((struct lustre_sb_info *)((sb)->s_fs_info))
+ #define     s2lsi_nocast(sb) ((sb)->s_fs_info)
+diff --git a/drivers/staging/lustre/lustre/llite/llite_lib.c b/drivers/staging/lustre/lustre/llite/llite_lib.c
+index b229cbc7bb33..d483c44aafe5 100644
+--- a/drivers/staging/lustre/lustre/llite/llite_lib.c
++++ b/drivers/staging/lustre/lustre/llite/llite_lib.c
+@@ -863,15 +863,6 @@ void ll_lli_init(struct ll_inode_info *lli)
+ 	mutex_init(&lli->lli_layout_mutex);
+ }
+ 
+-static inline int ll_bdi_register(struct backing_dev_info *bdi)
+-{
+-	static atomic_t ll_bdi_num = ATOMIC_INIT(0);
+-
+-	bdi->name = "lustre";
+-	return bdi_register(bdi, NULL, "lustre-%d",
+-			    atomic_inc_return(&ll_bdi_num));
+-}
+-
+ int ll_fill_super(struct super_block *sb, struct vfsmount *mnt)
+ {
+ 	struct lustre_profile *lprof = NULL;
+@@ -881,6 +872,7 @@ int ll_fill_super(struct super_block *sb, struct vfsmount *mnt)
+ 	char  *profilenm = get_profile_name(sb);
+ 	struct config_llog_instance *cfg;
+ 	int    err;
++	static atomic_t ll_bdi_num = ATOMIC_INIT(0);
+ 
+ 	CDEBUG(D_VFSTRACE, "VFS Op: sb %p\n", sb);
+ 
+@@ -903,16 +895,11 @@ int ll_fill_super(struct super_block *sb, struct vfsmount *mnt)
+ 	if (err)
+ 		goto out_free;
+ 
+-	err = bdi_init(&lsi->lsi_bdi);
+-	if (err)
+-		goto out_free;
+-	lsi->lsi_flags |= LSI_BDI_INITIALIZED;
+-	lsi->lsi_bdi.capabilities = 0;
+-	err = ll_bdi_register(&lsi->lsi_bdi);
++	err = super_setup_bdi_name(sb, "lustre-%d",
++				   atomic_inc_return(&ll_bdi_num));
+ 	if (err)
+ 		goto out_free;
+ 
+-	sb->s_bdi = &lsi->lsi_bdi;
+ 	/* kernel >= 2.6.38 store dentry operations in sb->s_d_op. */
+ 	sb->s_d_op = &ll_d_ops;
+ 
+@@ -1033,11 +1020,6 @@ void ll_put_super(struct super_block *sb)
+ 	if (profilenm)
+ 		class_del_profile(profilenm);
+ 
+-	if (lsi->lsi_flags & LSI_BDI_INITIALIZED) {
+-		bdi_destroy(&lsi->lsi_bdi);
+-		lsi->lsi_flags &= ~LSI_BDI_INITIALIZED;
+-	}
+-
+ 	ll_free_sbi(sb);
+ 	lsi->lsi_llsbi = NULL;
+ 
 -- 
-Jens Axboe
+2.12.0
