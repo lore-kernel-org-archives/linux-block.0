@@ -1,240 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f178.google.com ([209.85.192.178]:36825 "EHLO
-        mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751998AbdDNIBH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2017 04:01:07 -0400
-Received: by mail-pf0-f178.google.com with SMTP id o126so38481593pfb.3
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2017 01:01:07 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v4 1/5] sbitmap: add sbitmap_get_shallow() operation
-Date: Fri, 14 Apr 2017 00:59:58 -0700
-Message-Id: <b53a802150d4d05180b44bb7ca1711927f10e905.1492156558.git.osandov@fb.com>
-In-Reply-To: <cover.1492156558.git.osandov@fb.com>
-References: <cover.1492156558.git.osandov@fb.com>
-In-Reply-To: <cover.1492156558.git.osandov@fb.com>
-References: <cover.1492156558.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 01/25] bdi: Provide bdi_register_va() and bdi_alloc()
+Date: Wed, 12 Apr 2017 12:24:25 +0200
+Message-Id: <20170412102449.16901-2-jack@suse.cz>
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
+References: <20170412102449.16901-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Add function that registers bdi and takes va_list instead of variable
+number of arguments.
 
-This operation supports the use case of limiting the number of bits that
-can be allocated for a given operation. Rather than setting aside some
-bits at the end of the bitmap, we can set aside bits in each word of the
-bitmap. This means we can keep the allocation hints spread out and
-support sbitmap_resize() nicely at the cost of lower granularity for the
-allowed depth.
+Add bdi_alloc() as simple wrapper for NUMA-unaware users allocating BDI.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- include/linux/sbitmap.h | 55 ++++++++++++++++++++++++++++++++++++
- lib/sbitmap.c           | 75 ++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 123 insertions(+), 7 deletions(-)
+ include/linux/backing-dev.h |  6 ++++++
+ mm/backing-dev.c            | 20 +++++++++++++++-----
+ 2 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index d4e0a204c118..a1904aadbc45 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -176,6 +176,25 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
- int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin);
- 
- /**
-+ * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
-+ * limiting the depth used from each word.
-+ * @sb: Bitmap to allocate from.
-+ * @alloc_hint: Hint for where to start searching for a free bit.
-+ * @shallow_depth: The maximum number of bits to allocate from a single word.
-+ *
-+ * This rather specific operation allows for having multiple users with
-+ * different allocation limits. E.g., there can be a high-priority class that
-+ * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
-+ * with a @shallow_depth of (1 << (@sb->shift - 1)). Then, the low-priority
-+ * class can only allocate half of the total bits in the bitmap, preventing it
-+ * from starving out the high-priority class.
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+int sbitmap_get_shallow(struct sbitmap *sb, unsigned int alloc_hint,
-+			unsigned long shallow_depth);
-+
-+/**
-  * sbitmap_any_bit_set() - Check for a set bit in a &struct sbitmap.
-  * @sb: Bitmap to check.
-  *
-@@ -326,6 +345,19 @@ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth);
- int __sbitmap_queue_get(struct sbitmap_queue *sbq);
- 
- /**
-+ * __sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
-+ * sbitmap_queue, limiting the depth used from each word, with preemption
-+ * already disabled.
-+ * @sbq: Bitmap queue to allocate from.
-+ * @shallow_depth: The maximum number of bits to allocate from a single word.
-+ * See sbitmap_get_shallow().
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+				unsigned int shallow_depth);
-+
-+/**
-  * sbitmap_queue_get() - Try to allocate a free bit from a &struct
-  * sbitmap_queue.
-  * @sbq: Bitmap queue to allocate from.
-@@ -346,6 +378,29 @@ static inline int sbitmap_queue_get(struct sbitmap_queue *sbq,
- }
- 
- /**
-+ * sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
-+ * sbitmap_queue, limiting the depth used from each word.
-+ * @sbq: Bitmap queue to allocate from.
-+ * @cpu: Output parameter; will contain the CPU we ran on (e.g., to be passed to
-+ *       sbitmap_queue_clear()).
-+ * @shallow_depth: The maximum number of bits to allocate from a single word.
-+ * See sbitmap_get_shallow().
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+static inline int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+					    unsigned int *cpu,
-+					    unsigned int shallow_depth)
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index c52a48cb9a66..47a98e6e2a65 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -30,6 +30,8 @@ void bdi_put(struct backing_dev_info *bdi);
+ __printf(3, 4)
+ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+ 		const char *fmt, ...);
++int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
++		const char *fmt, va_list args);
+ int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
+ int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
+ void bdi_unregister(struct backing_dev_info *bdi);
+@@ -37,6 +39,10 @@ void bdi_unregister(struct backing_dev_info *bdi);
+ int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
+ void bdi_destroy(struct backing_dev_info *bdi);
+ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
++static inline struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
 +{
-+	int nr;
-+
-+	*cpu = get_cpu();
-+	nr = __sbitmap_queue_get_shallow(sbq, shallow_depth);
-+	put_cpu();
-+	return nr;
++	return bdi_alloc_node(gfp_mask, NUMA_NO_NODE);
 +}
-+
-+/**
-  * sbitmap_queue_clear() - Free an allocated bit and wake up waiters on a
-  * &struct sbitmap_queue.
-  * @sbq: Bitmap to free from.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 60e800e0b5a0..80aa8d5463fa 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -79,15 +79,15 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
- }
- EXPORT_SYMBOL_GPL(sbitmap_resize);
  
--static int __sbitmap_get_word(struct sbitmap_word *word, unsigned int hint,
--			      bool wrap)
-+static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
-+			      unsigned int hint, bool wrap)
+ void wb_start_writeback(struct bdi_writeback *wb, long nr_pages,
+ 			bool range_cyclic, enum wb_reason reason);
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 3ea3bbd921d6..e5e0972bdd6f 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -856,18 +856,15 @@ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
+ 	return bdi;
+ }
+ 
+-int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+-		const char *fmt, ...)
++int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
++		const char *fmt, va_list args)
  {
- 	unsigned int orig_hint = hint;
- 	int nr;
+-	va_list args;
+ 	struct device *dev;
  
- 	while (1) {
--		nr = find_next_zero_bit(&word->word, word->depth, hint);
--		if (unlikely(nr >= word->depth)) {
-+		nr = find_next_zero_bit(word, depth, hint);
-+		if (unlikely(nr >= depth)) {
- 			/*
- 			 * We started with an offset, and we didn't reset the
- 			 * offset to 0 in a failure case, so start from 0 to
-@@ -100,11 +100,11 @@ static int __sbitmap_get_word(struct sbitmap_word *word, unsigned int hint,
- 			return -1;
- 		}
+ 	if (bdi->dev)	/* The driver needs to use separate queues per device */
+ 		return 0;
  
--		if (!test_and_set_bit(nr, &word->word))
-+		if (!test_and_set_bit(nr, word))
- 			break;
+-	va_start(args, fmt);
+ 	dev = device_create_vargs(bdi_class, parent, MKDEV(0, 0), bdi, fmt, args);
+-	va_end(args);
+ 	if (IS_ERR(dev))
+ 		return PTR_ERR(dev);
  
- 		hint = nr + 1;
--		if (hint >= word->depth - 1)
-+		if (hint >= depth - 1)
- 			hint = 0;
- 	}
- 
-@@ -119,7 +119,8 @@ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin)
- 	index = SB_NR_TO_INDEX(sb, alloc_hint);
- 
- 	for (i = 0; i < sb->map_nr; i++) {
--		nr = __sbitmap_get_word(&sb->map[index],
-+		nr = __sbitmap_get_word(&sb->map[index].word,
-+					sb->map[index].depth,
- 					SB_NR_TO_BIT(sb, alloc_hint),
- 					!round_robin);
- 		if (nr != -1) {
-@@ -141,6 +142,37 @@ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin)
+@@ -884,6 +881,19 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+ 	trace_writeback_bdi_register(bdi);
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(sbitmap_get);
- 
-+int sbitmap_get_shallow(struct sbitmap *sb, unsigned int alloc_hint,
-+			unsigned long shallow_depth)
++EXPORT_SYMBOL(bdi_register_va);
++
++int bdi_register(struct backing_dev_info *bdi, struct device *parent,
++		const char *fmt, ...)
 +{
-+	unsigned int i, index;
-+	int nr = -1;
++	va_list args;
++	int ret;
 +
-+	index = SB_NR_TO_INDEX(sb, alloc_hint);
-+
-+	for (i = 0; i < sb->map_nr; i++) {
-+		nr = __sbitmap_get_word(&sb->map[index].word,
-+					min(sb->map[index].depth, shallow_depth),
-+					SB_NR_TO_BIT(sb, alloc_hint), true);
-+		if (nr != -1) {
-+			nr += index << sb->shift;
-+			break;
-+		}
-+
-+		/* Jump to next index. */
-+		index++;
-+		alloc_hint = index << sb->shift;
-+
-+		if (index >= sb->map_nr) {
-+			index = 0;
-+			alloc_hint = 0;
-+		}
-+	}
-+
-+	return nr;
++	va_start(args, fmt);
++	ret = bdi_register_va(bdi, parent, fmt, args);
++	va_end(args);
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(sbitmap_get_shallow);
-+
- bool sbitmap_any_bit_set(const struct sbitmap *sb)
- {
- 	unsigned int i;
-@@ -342,6 +374,35 @@ int __sbitmap_queue_get(struct sbitmap_queue *sbq)
- }
- EXPORT_SYMBOL_GPL(__sbitmap_queue_get);
+ EXPORT_SYMBOL(bdi_register);
  
-+int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+				unsigned int shallow_depth)
-+{
-+	unsigned int hint, depth;
-+	int nr;
-+
-+	hint = this_cpu_read(*sbq->alloc_hint);
-+	depth = READ_ONCE(sbq->sb.depth);
-+	if (unlikely(hint >= depth)) {
-+		hint = depth ? prandom_u32() % depth : 0;
-+		this_cpu_write(*sbq->alloc_hint, hint);
-+	}
-+	nr = sbitmap_get_shallow(&sbq->sb, hint, shallow_depth);
-+
-+	if (nr == -1) {
-+		/* If the map is full, a hint won't do us much good. */
-+		this_cpu_write(*sbq->alloc_hint, 0);
-+	} else if (nr == hint || unlikely(sbq->round_robin)) {
-+		/* Only update the hint if we used it. */
-+		hint = nr + 1;
-+		if (hint >= depth - 1)
-+			hint = 0;
-+		this_cpu_write(*sbq->alloc_hint, hint);
-+	}
-+
-+	return nr;
-+}
-+EXPORT_SYMBOL_GPL(__sbitmap_queue_get_shallow);
-+
- static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- {
- 	int i, wake_index;
+ int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev)
 -- 
-2.12.2
+2.12.0
