@@ -1,96 +1,112 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 01/25] bdi: Provide bdi_register_va() and bdi_alloc()
-Date: Wed, 12 Apr 2017 12:24:25 +0200
-Message-Id: <20170412102449.16901-2-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 12 Apr 2017 18:24:35 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [PATCH 10/25] loop: zero-fill bio on the submitting cpu
+Message-ID: <20170412102434.GB8835@ming.t460p>
+References: <20170406153944.10058-1-hch@lst.de>
+ <20170406153944.10058-11-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170406153944.10058-11-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Add function that registers bdi and takes va_list instead of variable
-number of arguments.
+On Thu, Apr 06, 2017 at 05:39:29PM +0200, Christoph Hellwig wrote:
+> In thruth I've just audited which blk-mq drivers don't currently have a
+> complete callback, but I think this change is at least borderline useful.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/loop.c | 30 ++++++++++++++----------------
+>  drivers/block/loop.h |  1 +
+>  2 files changed, 15 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index cc981f34e017..6924ec611a49 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -445,32 +445,27 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
+>  	return ret;
+>  }
+>  
+> -static inline void handle_partial_read(struct loop_cmd *cmd, long bytes)
+> +static void lo_complete_rq(struct request *rq)
+>  {
+> -	if (bytes < 0 || op_is_write(req_op(cmd->rq)))
+> -		return;
+> +	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+>  
+> -	if (unlikely(bytes < blk_rq_bytes(cmd->rq))) {
+> +	if (unlikely(req_op(cmd->rq) == REQ_OP_READ && cmd->use_aio &&
+> +		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(cmd->rq))) {
+>  		struct bio *bio = cmd->rq->bio;
+>  
+> -		bio_advance(bio, bytes);
+> +		bio_advance(bio, cmd->ret);
+>  		zero_fill_bio(bio);
+>  	}
+> +
+> +	blk_mq_end_request(rq, cmd->ret < 0 ? -EIO : 0);
+>  }
+>  
+>  static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
+>  {
+>  	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+> -	struct request *rq = cmd->rq;
+> -
+> -	handle_partial_read(cmd, ret);
+>  
+> -	if (ret > 0)
+> -		ret = 0;
+> -	else if (ret < 0)
+> -		ret = -EIO;
+> -
+> -	blk_mq_complete_request(rq, ret);
+> +	cmd->ret = ret;
+> +	blk_mq_complete_request(cmd->rq, 0);
+>  }
+>  
+>  static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+> @@ -1686,8 +1681,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+>  	ret = do_req_filebacked(lo, cmd->rq);
+>   failed:
+>  	/* complete non-aio request */
+> -	if (!cmd->use_aio || ret)
+> -		blk_mq_complete_request(cmd->rq, ret ? -EIO : 0);
+> +	if (!cmd->use_aio || ret) {
+> +		cmd->ret = ret ? -EIO : 0;
+> +		blk_mq_complete_request(cmd->rq, 0);
+> +	}
+>  }
+>  
+>  static void loop_queue_work(struct kthread_work *work)
+> @@ -1713,6 +1710,7 @@ static int loop_init_request(void *data, struct request *rq,
+>  static const struct blk_mq_ops loop_mq_ops = {
+>  	.queue_rq       = loop_queue_rq,
+>  	.init_request	= loop_init_request,
+> +	.complete	= lo_complete_rq,
+>  };
+>  
+>  static int loop_add(struct loop_device **l, int i)
+> diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+> index fb2237c73e61..fecd3f97ef8c 100644
+> --- a/drivers/block/loop.h
+> +++ b/drivers/block/loop.h
+> @@ -70,6 +70,7 @@ struct loop_cmd {
+>  	struct request *rq;
+>  	struct list_head list;
+>  	bool use_aio;           /* use AIO interface to handle I/O */
+> +	long ret;
+>  	struct kiocb iocb;
+>  };
 
-Add bdi_alloc() as simple wrapper for NUMA-unaware users allocating BDI.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/backing-dev.h |  6 ++++++
- mm/backing-dev.c            | 20 +++++++++++++++-----
- 2 files changed, 21 insertions(+), 5 deletions(-)
-
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index c52a48cb9a66..47a98e6e2a65 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -30,6 +30,8 @@ void bdi_put(struct backing_dev_info *bdi);
- __printf(3, 4)
- int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 		const char *fmt, ...);
-+int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, va_list args);
- int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
- int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
- void bdi_unregister(struct backing_dev_info *bdi);
-@@ -37,6 +39,10 @@ void bdi_unregister(struct backing_dev_info *bdi);
- int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
- void bdi_destroy(struct backing_dev_info *bdi);
- struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
-+static inline struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
-+{
-+	return bdi_alloc_node(gfp_mask, NUMA_NO_NODE);
-+}
- 
- void wb_start_writeback(struct bdi_writeback *wb, long nr_pages,
- 			bool range_cyclic, enum wb_reason reason);
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 3ea3bbd921d6..e5e0972bdd6f 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -856,18 +856,15 @@ struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
- 	return bdi;
- }
- 
--int bdi_register(struct backing_dev_info *bdi, struct device *parent,
--		const char *fmt, ...)
-+int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, va_list args)
- {
--	va_list args;
- 	struct device *dev;
- 
- 	if (bdi->dev)	/* The driver needs to use separate queues per device */
- 		return 0;
- 
--	va_start(args, fmt);
- 	dev = device_create_vargs(bdi_class, parent, MKDEV(0, 0), bdi, fmt, args);
--	va_end(args);
- 	if (IS_ERR(dev))
- 		return PTR_ERR(dev);
- 
-@@ -884,6 +881,19 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 	trace_writeback_bdi_register(bdi);
- 	return 0;
- }
-+EXPORT_SYMBOL(bdi_register_va);
-+
-+int bdi_register(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, ...)
-+{
-+	va_list args;
-+	int ret;
-+
-+	va_start(args, fmt);
-+	ret = bdi_register_va(bdi, parent, fmt, args);
-+	va_end(args);
-+	return ret;
-+}
- EXPORT_SYMBOL(bdi_register);
- 
- int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev)
--- 
-2.12.0
+Thanks,
+Ming
