@@ -1,62 +1,140 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f54.google.com ([74.125.83.54]:35210 "EHLO
-        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752028AbdDNIBH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2017 04:01:07 -0400
-Received: by mail-pg0-f54.google.com with SMTP id 72so32637091pge.2
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2017 01:01:07 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v4 2/5] blk-mq: add shallow depth option for blk_mq_get_tag()
-Date: Fri, 14 Apr 2017 00:59:59 -0700
-Message-Id: <21ada8d490f8b662fd0866e651622f2dd64e73fb.1492156558.git.osandov@fb.com>
-In-Reply-To: <cover.1492156558.git.osandov@fb.com>
-References: <cover.1492156558.git.osandov@fb.com>
-In-Reply-To: <cover.1492156558.git.osandov@fb.com>
-References: <cover.1492156558.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+4e9b246676c62bade7ff+4980+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	target-devel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com
+Subject: [PATCH 3/8] sd: remove write same support
+Date: Wed, 12 Apr 2017 10:48:04 +0200
+Message-Id: <20170412084809.8245-4-hch@lst.de>
+In-Reply-To: <20170412084809.8245-1-hch@lst.de>
+References: <20170412084809.8245-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+There are no more end-users of REQ_OP_WRITE_SAME left, so we can start
+deleting it.
 
-Wire up the sbitmap_get_shallow() operation to the tag code so that a
-caller can limit the number of tags available to it.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-tag.c | 5 ++++-
- block/blk-mq.h     | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ drivers/scsi/sd.c     | 70 ---------------------------------------------------
+ drivers/scsi/sd_zbc.c |  1 -
+ 2 files changed, 71 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 9d97bfc4d465..d0be72ccb091 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -96,7 +96,10 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
- 	    !hctx_may_queue(data->hctx, bt))
- 		return -1;
--	return __sbitmap_queue_get(bt);
-+	if (data->shallow_depth)
-+		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
-+	else
-+		return __sbitmap_queue_get(bt);
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 8cf34a8e3eea..a905802e927e 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -878,77 +878,10 @@ static void sd_config_write_same(struct scsi_disk *sdkp)
+ 		sdkp->zeroing_mode = SD_ZERO_WRITE;
+ 
+ out:
+-	blk_queue_max_write_same_sectors(q, sdkp->max_ws_blocks *
+-					 (logical_block_size >> 9));
+ 	blk_queue_max_write_zeroes_sectors(q, sdkp->max_ws_blocks *
+ 					 (logical_block_size >> 9));
  }
  
- unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 7e6f2e467696..524f44742816 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -141,6 +141,7 @@ struct blk_mq_alloc_data {
- 	/* input parameter */
- 	struct request_queue *q;
- 	unsigned int flags;
-+	unsigned int shallow_depth;
+-/**
+- * sd_setup_write_same_cmnd - write the same data to multiple blocks
+- * @cmd: command to prepare
+- *
+- * Will issue either WRITE SAME(10) or WRITE SAME(16) depending on
+- * preference indicated by target device.
+- **/
+-static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
+-{
+-	struct request *rq = cmd->request;
+-	struct scsi_device *sdp = cmd->device;
+-	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
+-	struct bio *bio = rq->bio;
+-	sector_t sector = blk_rq_pos(rq);
+-	unsigned int nr_sectors = blk_rq_sectors(rq);
+-	unsigned int nr_bytes = blk_rq_bytes(rq);
+-	int ret;
+-
+-	if (sdkp->device->no_write_same)
+-		return BLKPREP_INVALID;
+-
+-	BUG_ON(bio_offset(bio) || bio_iovec(bio).bv_len != sdp->sector_size);
+-
+-	if (sd_is_zoned(sdkp)) {
+-		ret = sd_zbc_setup_write_cmnd(cmd);
+-		if (ret != BLKPREP_OK)
+-			return ret;
+-	}
+-
+-	sector >>= ilog2(sdp->sector_size) - 9;
+-	nr_sectors >>= ilog2(sdp->sector_size) - 9;
+-
+-	rq->timeout = SD_WRITE_SAME_TIMEOUT;
+-
+-	if (sdkp->ws16 || sector > 0xffffffff || nr_sectors > 0xffff) {
+-		cmd->cmd_len = 16;
+-		cmd->cmnd[0] = WRITE_SAME_16;
+-		put_unaligned_be64(sector, &cmd->cmnd[2]);
+-		put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
+-	} else {
+-		cmd->cmd_len = 10;
+-		cmd->cmnd[0] = WRITE_SAME;
+-		put_unaligned_be32(sector, &cmd->cmnd[2]);
+-		put_unaligned_be16(nr_sectors, &cmd->cmnd[7]);
+-	}
+-
+-	cmd->transfersize = sdp->sector_size;
+-	cmd->allowed = SD_MAX_RETRIES;
+-
+-	/*
+-	 * For WRITE SAME the data transferred via the DATA OUT buffer is
+-	 * different from the amount of data actually written to the target.
+-	 *
+-	 * We set up __data_len to the amount of data transferred via the
+-	 * DATA OUT buffer so that blk_rq_map_sg sets up the proper S/G list
+-	 * to transfer a single sector of data first, but then reset it to
+-	 * the amount of data to be written right after so that the I/O path
+-	 * knows how much to actually write.
+-	 */
+-	rq->__data_len = sdp->sector_size;
+-	ret = scsi_init_io(cmd);
+-	rq->__data_len = nr_bytes;
+-	return ret;
+-}
+-
+ static int sd_setup_flush_cmnd(struct scsi_cmnd *cmd)
+ {
+ 	struct request *rq = cmd->request;
+@@ -1232,8 +1165,6 @@ static int sd_init_command(struct scsi_cmnd *cmd)
+ 		}
+ 	case REQ_OP_WRITE_ZEROES:
+ 		return sd_setup_write_zeroes_cmnd(cmd);
+-	case REQ_OP_WRITE_SAME:
+-		return sd_setup_write_same_cmnd(cmd);
+ 	case REQ_OP_FLUSH:
+ 		return sd_setup_flush_cmnd(cmd);
+ 	case REQ_OP_READ:
+@@ -1872,7 +1803,6 @@ static int sd_done(struct scsi_cmnd *SCpnt)
+ 	switch (req_op(req)) {
+ 	case REQ_OP_DISCARD:
+ 	case REQ_OP_WRITE_ZEROES:
+-	case REQ_OP_WRITE_SAME:
+ 	case REQ_OP_ZONE_RESET:
+ 		if (!result) {
+ 			good_bytes = blk_rq_bytes(req);
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 1994f7799fce..8af6c9cd30ca 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -330,7 +330,6 @@ void sd_zbc_complete(struct scsi_cmnd *cmd,
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_WRITE:
+ 	case REQ_OP_WRITE_ZEROES:
+-	case REQ_OP_WRITE_SAME:
+ 	case REQ_OP_ZONE_RESET:
  
- 	/* input & output parameter */
- 	struct blk_mq_ctx *ctx;
+ 		/* Unlock the zone */
 -- 
-2.12.2
+2.11.0
