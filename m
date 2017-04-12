@@ -1,62 +1,94 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:40268 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752737AbdDLKZH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Apr 2017 06:25:07 -0400
+From: Jan Kara <jack@suse.cz>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH 2/6] blk-mq: Move the "state" debugfs attribute one level down
-Date: Tue, 11 Apr 2017 13:58:38 -0700
-Message-ID: <20170411205842.28137-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170411205842.28137-1-bart.vanassche@sandisk.com>
-References: <20170411205842.28137-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
+        linux-afs@lists.infradead.org
+Subject: [PATCH 12/25] afs: Convert to separately allocated bdi
+Date: Wed, 12 Apr 2017 12:24:36 +0200
+Message-Id: <20170412102449.16901-13-jack@suse.cz>
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
+References: <20170412102449.16901-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Move the "state" attribute from the top level to the "mq" directory
-as requested by Omar.
+Allocate struct backing_dev_info separately instead of embedding it
+inside the superblock. This unifies handling of bdi among users.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+CC: David Howells <dhowells@redhat.com>
+CC: linux-afs@lists.infradead.org
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq-debugfs.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ fs/afs/internal.h | 1 -
+ fs/afs/super.c    | 5 ++++-
+ fs/afs/volume.c   | 8 --------
+ 3 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index a1ce823578c7..564470d4af52 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -149,11 +149,6 @@ static const struct file_operations blk_queue_flags_fops = {
- 	.write		= blk_queue_flags_store,
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index a6901360fb81..393672997cc2 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -318,7 +318,6 @@ struct afs_volume {
+ 	unsigned short		rjservers;	/* number of servers discarded due to -ENOMEDIUM */
+ 	struct afs_server	*servers[8];	/* servers on which volume resides (ordered) */
+ 	struct rw_semaphore	server_sem;	/* lock for accessing current server */
+-	struct backing_dev_info	bdi;
  };
  
--static const struct blk_mq_debugfs_attr blk_queue_attrs[] = {
--	{"state", 0600, &blk_queue_flags_fops},
--	{},
--};
+ /*
+diff --git a/fs/afs/super.c b/fs/afs/super.c
+index fbdb022b75a2..c79633e5cfd8 100644
+--- a/fs/afs/super.c
++++ b/fs/afs/super.c
+@@ -319,7 +319,10 @@ static int afs_fill_super(struct super_block *sb,
+ 	sb->s_blocksize_bits	= PAGE_SHIFT;
+ 	sb->s_magic		= AFS_FS_MAGIC;
+ 	sb->s_op		= &afs_super_ops;
+-	sb->s_bdi		= &as->volume->bdi;
++	ret = super_setup_bdi(sb);
++	if (ret)
++		return ret;
++	sb->s_bdi->ra_pages	= VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
+ 	strlcpy(sb->s_id, as->volume->vlocation->vldb.name, sizeof(sb->s_id));
+ 
+ 	/* allocate the root inode and dentry */
+diff --git a/fs/afs/volume.c b/fs/afs/volume.c
+index 546f9d01710b..db73d6dad02b 100644
+--- a/fs/afs/volume.c
++++ b/fs/afs/volume.c
+@@ -106,11 +106,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
+ 	volume->cell		= params->cell;
+ 	volume->vid		= vlocation->vldb.vid[params->type];
+ 
+-	volume->bdi.ra_pages	= VM_MAX_READAHEAD*1024/PAGE_SIZE; 
+-	ret = bdi_setup_and_register(&volume->bdi, "afs");
+-	if (ret)
+-		goto error_bdi;
 -
- static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
- {
- 	if (stat->nr_samples) {
-@@ -762,6 +757,7 @@ static const struct file_operations ctx_completed_fops = {
+ 	init_rwsem(&volume->server_sem);
  
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, &queue_poll_stat_fops},
-+	{"state", 0600, &blk_queue_flags_fops},
- 	{},
- };
+ 	/* look up all the applicable server records */
+@@ -156,8 +151,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
+ 	return ERR_PTR(ret);
  
-@@ -877,9 +873,6 @@ int blk_mq_debugfs_register_hctxs(struct request_queue *q)
- 	if (!q->debugfs_dir)
- 		return -ENOENT;
+ error_discard:
+-	bdi_destroy(&volume->bdi);
+-error_bdi:
+ 	up_write(&params->cell->vl_sem);
  
--	if (!debugfs_create_files(q->debugfs_dir, q, blk_queue_attrs))
--		goto err;
--
- 	q->mq_debugfs_dir = debugfs_create_dir("mq", q->debugfs_dir);
- 	if (!q->mq_debugfs_dir)
- 		goto err;
+ 	for (loop = volume->nservers - 1; loop >= 0; loop--)
+@@ -207,7 +200,6 @@ void afs_put_volume(struct afs_volume *volume)
+ 	for (loop = volume->nservers - 1; loop >= 0; loop--)
+ 		afs_put_server(volume->servers[loop]);
+ 
+-	bdi_destroy(&volume->bdi);
+ 	kfree(volume);
+ 
+ 	_leave(" [destroyed]");
 -- 
 2.12.0
