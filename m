@@ -1,6752 +1,4913 @@
-Return-Path: <BATV+4e9b246676c62bade7ff+4980+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: ooo@electrozaur.com,
-	martin.petersen@oracle.com,
-	trond.myklebust@primarydata.com,
-	axboe@kernel.dk
-Cc: osd-dev@open-osd.org,
-	linux-nfs@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] fs: remove exofs
-Date: Wed, 12 Apr 2017 18:01:07 +0200
-Message-Id: <20170412160109.10598-3-hch@lst.de>
-In-Reply-To: <20170412160109.10598-1-hch@lst.de>
-References: <20170412160109.10598-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V4 01/16] block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler
+Date: Wed, 12 Apr 2017 18:23:07 +0200
+Message-Id: <20170412162322.11139-2-paolo.valente@linaro.org>
+In-Reply-To: <20170412162322.11139-1-paolo.valente@linaro.org>
+References: <20170412162322.11139-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This was an example for using the SCSI OSD protocol, which we're trying
-to remove.
+We tag as v0 the version of BFQ containing only BFQ's engine plus
+hierarchical support. BFQ's engine is introduced by this commit, while
+hierarchical support is added by next commit. We use the v0 tag to
+distinguish this minimal version of BFQ from the versions containing
+also the features and the improvements added by next commits. BFQ-v0
+coincides with the version of BFQ submitted a few years ago [1], apart
+from the introduction of preemption, described below.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+BFQ is a proportional-share I/O scheduler, whose general structure,
+plus a lot of code, are borrowed from CFQ.
+
+- Each process doing I/O on a device is associated with a weight and a
+  (bfq_)queue.
+
+- BFQ grants exclusive access to the device, for a while, to one queue
+  (process) at a time, and implements this service model by
+  associating every queue with a budget, measured in number of
+  sectors.
+
+  - After a queue is granted access to the device, the budget of the
+    queue is decremented, on each request dispatch, by the size of the
+    request.
+
+  - The in-service queue is expired, i.e., its service is suspended,
+    only if one of the following events occurs: 1) the queue finishes
+    its budget, 2) the queue empties, 3) a "budget timeout" fires.
+
+    - The budget timeout prevents processes doing random I/O from
+      holding the device for too long and dramatically reducing
+      throughput.
+
+    - Actually, as in CFQ, a queue associated with a process issuing
+      sync requests may not be expired immediately when it empties. In
+      contrast, BFQ may idle the device for a short time interval,
+      giving the process the chance to go on being served if it issues
+      a new request in time. Device idling typically boosts the
+      throughput on rotational devices, if processes do synchronous
+      and sequential I/O. In addition, under BFQ, device idling is
+      also instrumental in guaranteeing the desired throughput
+      fraction to processes issuing sync requests (see [2] for
+      details).
+
+      - With respect to idling for service guarantees, if several
+        processes are competing for the device at the same time, but
+        all processes (and groups, after the following commit) have
+        the same weight, then BFQ guarantees the expected throughput
+        distribution without ever idling the device. Throughput is
+        thus as high as possible in this common scenario.
+
+  - Queues are scheduled according to a variant of WF2Q+, named
+    B-WF2Q+, and implemented using an augmented rb-tree to preserve an
+    O(log N) overall complexity.  See [2] for more details. B-WF2Q+ is
+    also ready for hierarchical scheduling. However, for a cleaner
+    logical breakdown, the code that enables and completes
+    hierarchical support is provided in the next commit, which focuses
+    exactly on this feature.
+
+  - B-WF2Q+ guarantees a tight deviation with respect to an ideal,
+    perfectly fair, and smooth service. In particular, B-WF2Q+
+    guarantees that each queue receives a fraction of the device
+    throughput proportional to its weight, even if the throughput
+    fluctuates, and regardless of: the device parameters, the current
+    workload and the budgets assigned to the queue.
+
+  - The last, budget-independence, property (although probably
+    counterintuitive in the first place) is definitely beneficial, for
+    the following reasons:
+
+    - First, with any proportional-share scheduler, the maximum
+      deviation with respect to an ideal service is proportional to
+      the maximum budget (slice) assigned to queues. As a consequence,
+      BFQ can keep this deviation tight not only because of the
+      accurate service of B-WF2Q+, but also because BFQ *does not*
+      need to assign a larger budget to a queue to let the queue
+      receive a higher fraction of the device throughput.
+
+    - Second, BFQ is free to choose, for every process (queue), the
+      budget that best fits the needs of the process, or best
+      leverages the I/O pattern of the process. In particular, BFQ
+      updates queue budgets with a simple feedback-loop algorithm that
+      allows a high throughput to be achieved, while still providing
+      tight latency guarantees to time-sensitive applications. When
+      the in-service queue expires, this algorithm computes the next
+      budget of the queue so as to:
+
+      - Let large budgets be eventually assigned to the queues
+        associated with I/O-bound applications performing sequential
+        I/O: in fact, the longer these applications are served once
+        got access to the device, the higher the throughput is.
+
+      - Let small budgets be eventually assigned to the queues
+        associated with time-sensitive applications (which typically
+        perform sporadic and short I/O), because, the smaller the
+        budget assigned to a queue waiting for service is, the sooner
+        B-WF2Q+ will serve that queue (Subsec 3.3 in [2]).
+
+- Weights can be assigned to processes only indirectly, through I/O
+  priorities, and according to the relation:
+  weight = 10 * (IOPRIO_BE_NR - ioprio).
+  The next patch provides, instead, a cgroups interface through which
+  weights can be assigned explicitly.
+
+- If several processes are competing for the device at the same time,
+  but all processes and groups have the same weight, then BFQ
+  guarantees the expected throughput distribution without ever idling
+  the device. It uses preemption instead. Throughput is then much
+  higher in this common scenario.
+
+- ioprio classes are served in strict priority order, i.e.,
+  lower-priority queues are not served as long as there are
+  higher-priority queues.  Among queues in the same class, the
+  bandwidth is distributed in proportion to the weight of each
+  queue. A very thin extra bandwidth is however guaranteed to the Idle
+  class, to prevent it from starving.
+
+- If the strict_guarantees parameter is set (default: unset), then BFQ
+     - always performs idling when the in-service queue becomes empty;
+     - forces the device to serve one I/O request at a time, by
+       dispatching a new request only if there is no outstanding
+       request.
+  In the presence of differentiated weights or I/O-request sizes,
+  both the above conditions are needed to guarantee that every
+  queue receives its allotted share of the bandwidth (see
+  Documentation/block/bfq-iosched.txt for more details). Setting
+  strict_guarantees may evidently affect throughput.
+
+[1] https://lkml.org/lkml/2008/4/1/234
+    https://lkml.org/lkml/2008/11/11/148
+
+[2] P. Valente and M. Andreolini, "Improving Application
+    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
+    the 5th Annual International Systems and Storage Conference
+    (SYSTOR '12), June 2012.
+    Slightly extended version:
+    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
+							results.pdf
+
+Signed-off-by: Fabio Checconi <fchecconi@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- Documentation/filesystems/00-INDEX  |    2 -
- Documentation/filesystems/exofs.txt |  185 -----
- Documentation/scsi/osd.txt          |    5 -
- MAINTAINERS                         |    1 -
- fs/Kconfig                          |    3 -
- fs/Makefile                         |    1 -
- fs/exofs/BUGS                       |    3 -
- fs/exofs/Kbuild                     |   20 -
- fs/exofs/Kconfig                    |   13 -
- fs/exofs/Kconfig.ore                |   14 -
- fs/exofs/common.h                   |  262 ------
- fs/exofs/dir.c                      |  661 ---------------
- fs/exofs/exofs.h                    |  241 ------
- fs/exofs/file.c                     |   83 --
- fs/exofs/inode.c                    | 1514 -----------------------------------
- fs/exofs/namei.c                    |  323 --------
- fs/exofs/ore.c                      | 1164 ---------------------------
- fs/exofs/ore_raid.c                 |  721 -----------------
- fs/exofs/ore_raid.h                 |   62 --
- fs/exofs/super.c                    | 1049 ------------------------
- fs/exofs/sys.c                      |  205 -----
- 21 files changed, 6532 deletions(-)
- delete mode 100644 Documentation/filesystems/exofs.txt
- delete mode 100644 fs/exofs/BUGS
- delete mode 100644 fs/exofs/Kbuild
- delete mode 100644 fs/exofs/Kconfig
- delete mode 100644 fs/exofs/Kconfig.ore
- delete mode 100644 fs/exofs/common.h
- delete mode 100644 fs/exofs/dir.c
- delete mode 100644 fs/exofs/exofs.h
- delete mode 100644 fs/exofs/file.c
- delete mode 100644 fs/exofs/inode.c
- delete mode 100644 fs/exofs/namei.c
- delete mode 100644 fs/exofs/ore.c
- delete mode 100644 fs/exofs/ore_raid.c
- delete mode 100644 fs/exofs/ore_raid.h
- delete mode 100644 fs/exofs/super.c
- delete mode 100644 fs/exofs/sys.c
+ Documentation/block/00-INDEX        |    2 +
+ Documentation/block/bfq-iosched.txt |  517 +++++
+ block/Kconfig.iosched               |   11 +
+ block/Makefile                      |    1 +
+ block/bfq-iosched.c                 | 4166 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 4697 insertions(+)
+ create mode 100644 Documentation/block/bfq-iosched.txt
+ create mode 100644 block/bfq-iosched.c
 
-diff --git a/Documentation/filesystems/00-INDEX b/Documentation/filesystems/00-INDEX
-index b7bd6c9009cc..b3c6b9b1d716 100644
---- a/Documentation/filesystems/00-INDEX
-+++ b/Documentation/filesystems/00-INDEX
-@@ -51,8 +51,6 @@ ecryptfs.txt
- 	- docs on eCryptfs: stacked cryptographic filesystem for Linux.
- efivarfs.txt
- 	- info for the efivarfs filesystem.
--exofs.txt
--	- info, usage, mount options, design about EXOFS.
- ext2.txt
- 	- info, mount options and specifications for the Ext2 filesystem.
- ext3.txt
-diff --git a/Documentation/filesystems/exofs.txt b/Documentation/filesystems/exofs.txt
-deleted file mode 100644
-index 23583a136975..000000000000
---- a/Documentation/filesystems/exofs.txt
-+++ /dev/null
-@@ -1,185 +0,0 @@
--===============================================================================
--WHAT IS EXOFS?
--===============================================================================
--
--exofs is a file system that uses an OSD and exports the API of a normal Linux
--file system. Users access exofs like any other local file system, and exofs
--will in turn issue commands to the local OSD initiator.
--
--OSD is a new T10 command set that views storage devices not as a large/flat
--array of sectors but as a container of objects, each having a length, quota,
--time attributes and more. Each object is addressed by a 64bit ID, and is
--contained in a 64bit ID partition. Each object has associated attributes
--attached to it, which are integral part of the object and provide metadata about
--the object. The standard defines some common obligatory attributes, but user
--attributes can be added as needed.
--
--===============================================================================
--ENVIRONMENT
--===============================================================================
--
--To use this file system, you need to have an object store to run it on.  You
--may download a target from:
--http://open-osd.org
--
--See Documentation/scsi/osd.txt for how to setup a working osd environment.
--
--===============================================================================
--USAGE
--===============================================================================
--
--1. Download and compile exofs and open-osd initiator:
--  You need an external Kernel source tree or kernel headers from your
--  distribution. (anything based on 2.6.26 or later).
--
--  a. download open-osd including exofs source using:
--     [parent-directory]$ git clone git://git.open-osd.org/open-osd.git
--
--  b. Build the library module like this:
--     [parent-directory]$ make -C KSRC=$(KER_DIR) open-osd
--
--     This will build both the open-osd initiator as well as the exofs kernel
--     module. Use whatever parameters you compiled your Kernel with and
--     $(KER_DIR) above pointing to the Kernel you compile against. See the file
--     open-osd/top-level-Makefile for an example.
--
--2. Get the OSD initiator and target set up properly, and login to the target.
--  See Documentation/scsi/osd.txt for farther instructions. Also see ./do-osd
--  for example script that does all these steps.
--
--3. Insmod the exofs.ko module:
--   [exofs]$ insmod exofs.ko
--
--4. Make sure the directory where you want to mount exists. If not, create it.
--   (For example, mkdir /mnt/exofs)
--
--5. At first run you will need to invoke the mkfs.exofs application
--
--   As an example, this will create the file system on:
--   /dev/osd0 partition ID 65536
--
--   mkfs.exofs --pid=65536 --format /dev/osd0
--
--   The --format is optional. If not specified, no OSD_FORMAT will be
--   performed and a clean file system will be created in the specified pid,
--   in the available space of the target. (Use --format=size_in_meg to limit
--   the total LUN space available)
--
--   If pid already exists, it will be deleted and a new one will be created in
--   its place. Be careful.
--
--   An exofs lives inside a single OSD partition. You can create multiple exofs
--   filesystems on the same device using multiple pids.
--
--   (run mkfs.exofs without any parameters for usage help message)
--
--6. Mount the file system.
--
--   For example, to mount /dev/osd0, partition ID 0x10000 on /mnt/exofs:
--
--	mount -t exofs -o pid=65536 /dev/osd0 /mnt/exofs/
--
--7. For reference (See do-exofs example script):
--	do-exofs start - an example of how to perform the above steps.
--	do-exofs stop - an example of how to unmount the file system.
--	do-exofs format - an example of how to format and mkfs a new exofs.
--
--8. Extra compilation flags (uncomment in fs/exofs/Kbuild):
--	CONFIG_EXOFS_DEBUG - for debug messages and extra checks.
--
--===============================================================================
--exofs mount options
--===============================================================================
--Similar to any mount command:
--	mount -t exofs -o exofs_options /dev/osdX mount_exofs_directory
--
--Where:
--    -t exofs: specifies the exofs file system
--
--    /dev/osdX: X is a decimal number. /dev/osdX was created after a successful
--               login into an OSD target.
--
--    mount_exofs_directory: The directory to mount the file system on
--
--    exofs specific options: Options are separated by commas (,)
--		pid=<integer> - The partition number to mount/create as
--                                container of the filesystem.
--                                This option is mandatory. integer can be
--                                Hex by pre-pending an 0x to the number.
--		osdname=<id>  - Mount by a device's osdname.
--                                osdname is usually a 36 character uuid of the
--                                form "d2683732-c906-4ee1-9dbd-c10c27bb40df".
--                                It is one of the device's uuid specified in the
--                                mkfs.exofs format command.
--                                If this option is specified then the /dev/osdX
--                                above can be empty and is ignored.
--                to=<integer>  - Timeout in ticks for a single command.
--                                default is (60 * HZ) [for debugging only]
--
--===============================================================================
--DESIGN
--===============================================================================
--
--* The file system control block (AKA on-disk superblock) resides in an object
--  with a special ID (defined in common.h).
--  Information included in the file system control block is used to fill the
--  in-memory superblock structure at mount time. This object is created before
--  the file system is used by mkexofs.c. It contains information such as:
--	- The file system's magic number
--	- The next inode number to be allocated
--
--* Each file resides in its own object and contains the data (and it will be
--  possible to extend the file over multiple objects, though this has not been
--  implemented yet).
--
--* A directory is treated as a file, and essentially contains a list of <file
--  name, inode #> pairs for files that are found in that directory. The object
--  IDs correspond to the files' inode numbers and will be allocated according to
--  a bitmap (stored in a separate object). Now they are allocated using a
--  counter.
--
--* Each file's control block (AKA on-disk inode) is stored in its object's
--  attributes. This applies to both regular files and other types (directories,
--  device files, symlinks, etc.).
--
--* Credentials are generated per object (inode and superblock) when they are
--  created in memory (read from disk or created). The credential works for all
--  operations and is used as long as the object remains in memory.
--
--* Async OSD operations are used whenever possible, but the target may execute
--  them out of order. The operations that concern us are create, delete,
--  readpage, writepage, update_inode, and truncate. The following pairs of
--  operations should execute in the order written, and we need to prevent them
--  from executing in reverse order:
--	- The following are handled with the OBJ_CREATED and OBJ_2BCREATED
--	  flags. OBJ_CREATED is set when we know the object exists on the OSD -
--	  in create's callback function, and when we successfully do a
--	  read_inode.
--	  OBJ_2BCREATED is set in the beginning of the create function, so we
--	  know that we should wait.
--		- create/delete: delete should wait until the object is created
--		  on the OSD.
--		- create/readpage: readpage should be able to return a page
--		  full of zeroes in this case. If there was a write already
--		  en-route (i.e. create, writepage, readpage) then the page
--		  would be locked, and so it would really be the same as
--		  create/writepage.
--		- create/writepage: if writepage is called for a sync write, it
--		  should wait until the object is created on the OSD.
--		  Otherwise, it should just return.
--		- create/truncate: truncate should wait until the object is
--		  created on the OSD.
--		- create/update_inode: update_inode should wait until the
--		  object is created on the OSD.
--	- Handled by VFS locks:
--		- readpage/delete: shouldn't happen because of page lock.
--		- writepage/delete: shouldn't happen because of page lock.
--		- readpage/writepage: shouldn't happen because of page lock.
--
--===============================================================================
--LICENSE/COPYRIGHT
--===============================================================================
--The exofs file system is based on ext2 v0.5b (distributed with the Linux kernel
--version 2.6.10).  All files include the original copyrights, and the license
--is GPL version 2 (only version 2, as is true for the Linux kernel).  The
--Linux kernel can be downloaded from www.kernel.org.
-diff --git a/Documentation/scsi/osd.txt b/Documentation/scsi/osd.txt
-index 5a9879bad073..2bc2ab06b0c0 100644
---- a/Documentation/scsi/osd.txt
-+++ b/Documentation/scsi/osd.txt
-@@ -24,11 +24,6 @@ osd-uld:
- platform, both for the in-kernel initiator as well as connected targets. It
- currently has no useful user-mode API, though it could have if need be.
+diff --git a/Documentation/block/00-INDEX b/Documentation/block/00-INDEX
+index e55103a..8d55b4b 100644
+--- a/Documentation/block/00-INDEX
++++ b/Documentation/block/00-INDEX
+@@ -1,5 +1,7 @@
+ 00-INDEX
+ 	- This file
++bfq-iosched.txt
++	- BFQ IO scheduler and its tunables
+ biodoc.txt
+ 	- Notes on the Generic Block Layer Rewrite in Linux 2.5
+ biovecs.txt
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+new file mode 100644
+index 0000000..cbf85f6f
+--- /dev/null
++++ b/Documentation/block/bfq-iosched.txt
+@@ -0,0 +1,517 @@
++BFQ (Budget Fair Queueing)
++==========================
++
++BFQ is a proportional-share I/O scheduler, with some extra
++low-latency capabilities. In addition to cgroups support (blkio or io
++controllers), BFQ's main features are:
++- BFQ guarantees a high system and application responsiveness, and a
++  low latency for time-sensitive applications, such as audio or video
++  players;
++- BFQ distributes bandwidth, and not just time, among processes or
++  groups (switching back to time distribution when needed to keep
++  throughput high).
++
++On average CPUs, the current version of BFQ can handle devices
++performing at most ~30K IOPS; at most ~50 KIOPS on faster CPUs. As a
++reference, 30-50 KIOPS correspond to very high bandwidths with
++sequential I/O (e.g., 8-12 GB/s if I/O requests are 256 KB large), and
++to 120-200 MB/s with 4KB random I/O. BFQ has not yet been tested on
++multi-queue devices.
++
++The table of contents follow. Impatients can just jump to Section 3.
++
++CONTENTS
++
++1. When may BFQ be useful?
++ 1-1 Personal systems
++ 1-2 Server systems
++2. How does BFQ work?
++3. What are BFQ's tunable?
++4. BFQ group scheduling
++ 4-1 Service guarantees provided
++ 4-2 Interface
++
++1. When may BFQ be useful?
++==========================
++
++BFQ provides the following benefits on personal and server systems.
++
++1-1 Personal systems
++--------------------
++
++Low latency for interactive applications
++
++Regardless of the actual background workload, BFQ guarantees that, for
++interactive tasks, the storage device is virtually as responsive as if
++it was idle. For example, even if one or more of the following
++background workloads are being executed:
++- one or more large files are being read, written or copied,
++- a tree of source files is being compiled,
++- one or more virtual machines are performing I/O,
++- a software update is in progress,
++- indexing daemons are scanning filesystems and updating their
++  databases,
++starting an application or loading a file from within an application
++takes about the same time as if the storage device was idle. As a
++comparison, with CFQ, NOOP or DEADLINE, and in the same conditions,
++applications experience high latencies, or even become unresponsive
++until the background workload terminates (also on SSDs).
++
++Low latency for soft real-time applications
++
++Also soft real-time applications, such as audio and video
++players/streamers, enjoy a low latency and a low drop rate, regardless
++of the background I/O workload. As a consequence, these applications
++do not suffer from almost any glitch due to the background workload.
++
++Higher speed for code-development tasks
++
++If some additional workload happens to be executed in parallel, then
++BFQ executes the I/O-related components of typical code-development
++tasks (compilation, checkout, merge, ...) much more quickly than CFQ,
++NOOP or DEADLINE.
++
++High throughput
++
++On hard disks, BFQ achieves up to 30% higher throughput than CFQ, and
++up to 150% higher throughput than DEADLINE and NOOP, with all the
++sequential workloads considered in our tests. With random workloads,
++and with all the workloads on flash-based devices, BFQ achieves,
++instead, about the same throughput as the other schedulers.
++
++Strong fairness, bandwidth and delay guarantees
++
++BFQ distributes the device throughput, and not just the device time,
++among I/O-bound applications in proportion their weights, with any
++workload and regardless of the device parameters. From these bandwidth
++guarantees, it is possible to compute tight per-I/O-request delay
++guarantees by a simple formula. If not configured for strict service
++guarantees, BFQ switches to time-based resource sharing (only) for
++applications that would otherwise cause a throughput loss.
++
++1-2 Server systems
++------------------
++
++Most benefits for server systems follow from the same service
++properties as above. In particular, regardless of whether additional,
++possibly heavy workloads are being served, BFQ guarantees:
++
++. audio and video-streaming with zero or very low jitter and drop
++  rate;
++
++. fast retrieval of WEB pages and embedded objects;
++
++. real-time recording of data in live-dumping applications (e.g.,
++  packet logging);
++
++. responsiveness in local and remote access to a server.
++
++
++2. How does BFQ work?
++=====================
++
++BFQ is a proportional-share I/O scheduler, whose general structure,
++plus a lot of code, are borrowed from CFQ.
++
++- Each process doing I/O on a device is associated with a weight and a
++  (bfq_)queue.
++
++- BFQ grants exclusive access to the device, for a while, to one queue
++  (process) at a time, and implements this service model by
++  associating every queue with a budget, measured in number of
++  sectors.
++
++  - After a queue is granted access to the device, the budget of the
++    queue is decremented, on each request dispatch, by the size of the
++    request.
++
++  - The in-service queue is expired, i.e., its service is suspended,
++    only if one of the following events occurs: 1) the queue finishes
++    its budget, 2) the queue empties, 3) a "budget timeout" fires.
++
++    - The budget timeout prevents processes doing random I/O from
++      holding the device for too long and dramatically reducing
++      throughput.
++
++    - Actually, as in CFQ, a queue associated with a process issuing
++      sync requests may not be expired immediately when it empties. In
++      contrast, BFQ may idle the device for a short time interval,
++      giving the process the chance to go on being served if it issues
++      a new request in time. Device idling typically boosts the
++      throughput on rotational devices, if processes do synchronous
++      and sequential I/O. In addition, under BFQ, device idling is
++      also instrumental in guaranteeing the desired throughput
++      fraction to processes issuing sync requests (see the description
++      of the slice_idle tunable in this document, or [1, 2], for more
++      details).
++
++      - With respect to idling for service guarantees, if several
++	processes are competing for the device at the same time, but
++	all processes (and groups, after the following commit) have
++	the same weight, then BFQ guarantees the expected throughput
++	distribution without ever idling the device. Throughput is
++	thus as high as possible in this common scenario.
++
++  - If low-latency mode is enabled (default configuration), BFQ
++    executes some special heuristics to detect interactive and soft
++    real-time applications (e.g., video or audio players/streamers),
++    and to reduce their latency. The most important action taken to
++    achieve this goal is to give to the queues associated with these
++    applications more than their fair share of the device
++    throughput. For brevity, we call just "weight-raising" the whole
++    sets of actions taken by BFQ to privilege these queues. In
++    particular, BFQ provides a milder form of weight-raising for
++    interactive applications, and a stronger form for soft real-time
++    applications.
++
++  - BFQ automatically deactivates idling for queues born in a burst of
++    queue creations. In fact, these queues are usually associated with
++    the processes of applications and services that benefit mostly
++    from a high throughput. Examples are systemd during boot, or git
++    grep.
++
++  - As CFQ, BFQ merges queues performing interleaved I/O, i.e.,
++    performing random I/O that becomes mostly sequential if
++    merged. Differently from CFQ, BFQ achieves this goal with a more
++    reactive mechanism, called Early Queue Merge (EQM). EQM is so
++    responsive in detecting interleaved I/O (cooperating processes),
++    that it enables BFQ to achieve a high throughput, by queue
++    merging, even for queues for which CFQ needs a different
++    mechanism, preemption, to get a high throughput. As such EQM is a
++    unified mechanism to achieve a high throughput with interleaved
++    I/O.
++
++  - Queues are scheduled according to a variant of WF2Q+, named
++    B-WF2Q+, and implemented using an augmented rb-tree to preserve an
++    O(log N) overall complexity.  See [2] for more details. B-WF2Q+ is
++    also ready for hierarchical scheduling. However, for a cleaner
++    logical breakdown, the code that enables and completes
++    hierarchical support is provided in the next commit, which focuses
++    exactly on this feature.
++
++  - B-WF2Q+ guarantees a tight deviation with respect to an ideal,
++    perfectly fair, and smooth service. In particular, B-WF2Q+
++    guarantees that each queue receives a fraction of the device
++    throughput proportional to its weight, even if the throughput
++    fluctuates, and regardless of: the device parameters, the current
++    workload and the budgets assigned to the queue.
++
++  - The last, budget-independence, property (although probably
++    counterintuitive in the first place) is definitely beneficial, for
++    the following reasons:
++
++    - First, with any proportional-share scheduler, the maximum
++      deviation with respect to an ideal service is proportional to
++      the maximum budget (slice) assigned to queues. As a consequence,
++      BFQ can keep this deviation tight not only because of the
++      accurate service of B-WF2Q+, but also because BFQ *does not*
++      need to assign a larger budget to a queue to let the queue
++      receive a higher fraction of the device throughput.
++
++    - Second, BFQ is free to choose, for every process (queue), the
++      budget that best fits the needs of the process, or best
++      leverages the I/O pattern of the process. In particular, BFQ
++      updates queue budgets with a simple feedback-loop algorithm that
++      allows a high throughput to be achieved, while still providing
++      tight latency guarantees to time-sensitive applications. When
++      the in-service queue expires, this algorithm computes the next
++      budget of the queue so as to:
++
++      - Let large budgets be eventually assigned to the queues
++	associated with I/O-bound applications performing sequential
++	I/O: in fact, the longer these applications are served once
++	got access to the device, the higher the throughput is.
++
++      - Let small budgets be eventually assigned to the queues
++	associated with time-sensitive applications (which typically
++	perform sporadic and short I/O), because, the smaller the
++	budget assigned to a queue waiting for service is, the sooner
++	B-WF2Q+ will serve that queue (Subsec 3.3 in [2]).
++
++- If several processes are competing for the device at the same time,
++  but all processes and groups have the same weight, then BFQ
++  guarantees the expected throughput distribution without ever idling
++  the device. It uses preemption instead. Throughput is then much
++  higher in this common scenario.
++
++- ioprio classes are served in strict priority order, i.e.,
++  lower-priority queues are not served as long as there are
++  higher-priority queues.  Among queues in the same class, the
++  bandwidth is distributed in proportion to the weight of each
++  queue. A very thin extra bandwidth is however guaranteed to
++  the Idle class, to prevent it from starving.
++
++
++3. What are BFQ's tunable?
++==========================
++
++The tunables back_seek-max, back_seek_penalty, fifo_expire_async and
++fifo_expire_sync below are the same as in CFQ. Their description is
++just copied from that for CFQ. Some considerations in the description
++of slice_idle are copied from CFQ too.
++
++per-process ioprio and weight
++-----------------------------
++
++Unless the cgroups interface is used, weights can be assigned to
++processes only indirectly, through I/O priorities, and according to
++the relation: weight = (IOPRIO_BE_NR - ioprio) * 10.
++
++slice_idle
++----------
++
++This parameter specifies how long BFQ should idle for next I/O
++request, when certain sync BFQ queues become empty. By default
++slice_idle is a non-zero value. Idling has a double purpose: boosting
++throughput and making sure that the desired throughput distribution is
++respected (see the description of how BFQ works, and, if needed, the
++papers referred there).
++
++As for throughput, idling can be very helpful on highly seeky media
++like single spindle SATA/SAS disks where we can cut down on overall
++number of seeks and see improved throughput.
++
++Setting slice_idle to 0 will remove all the idling on queues and one
++should see an overall improved throughput on faster storage devices
++like multiple SATA/SAS disks in hardware RAID configuration.
++
++So depending on storage and workload, it might be useful to set
++slice_idle=0.  In general for SATA/SAS disks and software RAID of
++SATA/SAS disks keeping slice_idle enabled should be useful. For any
++configurations where there are multiple spindles behind single LUN
++(Host based hardware RAID controller or for storage arrays), setting
++slice_idle=0 might end up in better throughput and acceptable
++latencies.
++
++Idling is however necessary to have service guarantees enforced in
++case of differentiated weights or differentiated I/O-request lengths.
++To see why, suppose that a given BFQ queue A must get several I/O
++requests served for each request served for another queue B. Idling
++ensures that, if A makes a new I/O request slightly after becoming
++empty, then no request of B is dispatched in the middle, and thus A
++does not lose the possibility to get more than one request dispatched
++before the next request of B is dispatched. Note that idling
++guarantees the desired differentiated treatment of queues only in
++terms of I/O-request dispatches. To guarantee that the actual service
++order then corresponds to the dispatch order, the strict_guarantees
++tunable must be set too.
++
++There is an important flipside for idling: apart from the above cases
++where it is beneficial also for throughput, idling can severely impact
++throughput. One important case is random workload. Because of this
++issue, BFQ tends to avoid idling as much as possible, when it is not
++beneficial also for throughput. As a consequence of this behavior, and
++of further issues described for the strict_guarantees tunable,
++short-term service guarantees may be occasionally violated. And, in
++some cases, these guarantees may be more important than guaranteeing
++maximum throughput. For example, in video playing/streaming, a very
++low drop rate may be more important than maximum throughput. In these
++cases, consider setting the strict_guarantees parameter.
++
++strict_guarantees
++-----------------
++
++If this parameter is set (default: unset), then BFQ
++
++- always performs idling when the in-service queue becomes empty;
++
++- forces the device to serve one I/O request at a time, by dispatching a
++  new request only if there is no outstanding request.
++
++In the presence of differentiated weights or I/O-request sizes, both
++the above conditions are needed to guarantee that every BFQ queue
++receives its allotted share of the bandwidth. The first condition is
++needed for the reasons explained in the description of the slice_idle
++tunable.  The second condition is needed because all modern storage
++devices reorder internally-queued requests, which may trivially break
++the service guarantees enforced by the I/O scheduler.
++
++Setting strict_guarantees may evidently affect throughput.
++
++back_seek_max
++-------------
++
++This specifies, given in Kbytes, the maximum "distance" for backward seeking.
++The distance is the amount of space from the current head location to the
++sectors that are backward in terms of distance.
++
++This parameter allows the scheduler to anticipate requests in the "backward"
++direction and consider them as being the "next" if they are within this
++distance from the current head location.
++
++back_seek_penalty
++-----------------
++
++This parameter is used to compute the cost of backward seeking. If the
++backward distance of request is just 1/back_seek_penalty from a "front"
++request, then the seeking cost of two requests is considered equivalent.
++
++So scheduler will not bias toward one or the other request (otherwise scheduler
++will bias toward front request). Default value of back_seek_penalty is 2.
++
++fifo_expire_async
++-----------------
++
++This parameter is used to set the timeout of asynchronous requests. Default
++value of this is 248ms.
++
++fifo_expire_sync
++----------------
++
++This parameter is used to set the timeout of synchronous requests. Default
++value of this is 124ms. In case to favor synchronous requests over asynchronous
++one, this value should be decreased relative to fifo_expire_async.
++
++low_latency
++-----------
++
++This parameter is used to enable/disable BFQ's low latency mode. By
++default, low latency mode is enabled. If enabled, interactive and soft
++real-time applications are privileged and experience a lower latency,
++as explained in more detail in the description of how BFQ works.
++
++timeout_sync
++------------
++
++Maximum amount of device time that can be given to a task (queue) once
++it has been selected for service. On devices with costly seeks,
++increasing this time usually increases maximum throughput. On the
++opposite end, increasing this time coarsens the granularity of the
++short-term bandwidth and latency guarantees, especially if the
++following parameter is set to zero.
++
++max_budget
++----------
++
++Maximum amount of service, measured in sectors, that can be provided
++to a BFQ queue once it is set in service (of course within the limits
++of the above timeout). According to what said in the description of
++the algorithm, larger values increase the throughput in proportion to
++the percentage of sequential I/O requests issued. The price of larger
++values is that they coarsen the granularity of short-term bandwidth
++and latency guarantees.
++
++The default value is 0, which enables auto-tuning: BFQ sets max_budget
++to the maximum number of sectors that can be served during
++timeout_sync, according to the estimated peak rate.
++
++weights
++-------
++
++Read-only parameter, used to show the weights of the currently active
++BFQ queues.
++
++
++wr_ tunables
++------------
++
++BFQ exports a few parameters to control/tune the behavior of
++low-latency heuristics.
++
++wr_coeff
++
++Factor by which the weight of a weight-raised queue is multiplied. If
++the queue is deemed soft real-time, then the weight is further
++multiplied by an additional, constant factor.
++
++wr_max_time
++
++Maximum duration of a weight-raising period for an interactive task
++(ms). If set to zero (default value), then this value is computed
++automatically, as a function of the peak rate of the device. In any
++case, when the value of this parameter is read, it always reports the
++current duration, regardless of whether it has been set manually or
++computed automatically.
++
++wr_max_softrt_rate
++
++Maximum service rate below which a queue is deemed to be associated
++with a soft real-time application, and is then weight-raised
++accordingly (sectors/sec).
++
++wr_min_idle_time
++
++Minimum idle period after which interactive weight-raising may be
++reactivated for a queue (in ms).
++
++wr_rt_max_time
++
++Maximum weight-raising duration for soft real-time queues (in ms). The
++start time from which this duration is considered is automatically
++moved forward if the queue is detected to be still soft real-time
++before the current soft real-time weight-raising period finishes.
++
++wr_min_inter_arr_async
++
++Minimum period between I/O request arrivals after which weight-raising
++may be reactivated for an already busy async queue (in ms).
++
++
++4. Group scheduling with BFQ
++============================
++
++BFQ supports both cgroup-v1 and cgroup-v2 io controllers, namely blkio
++and io. In particular, BFQ supports weight-based proportional
++share.
++
++4-1 Service guarantees provided
++-------------------------------
++
++With BFQ, proportional share means true proportional share of the
++device bandwidth, according to group weights. For example, a group
++with weight 200 gets twice the bandwidth, and not just twice the time,
++of a group with weight 100.
++
++BFQ supports hierarchies (group trees) of any depth. Bandwidth is
++distributed among groups and processes in the expected way: for each
++group, the children of the group share the whole bandwidth of the
++group in proportion to their weights. In particular, this implies
++that, for each leaf group, every process of the group receives the
++same share of the whole group bandwidth, unless the ioprio of the
++process is modified.
++
++The resource-sharing guarantee for a group may partially or totally
++switch from bandwidth to time, if providing bandwidth guarantees to
++the group lowers the throughput too much. This switch occurs on a
++per-process basis: if a process of a leaf group causes throughput loss
++if served in such a way to receive its share of the bandwidth, then
++BFQ switches back to just time-based proportional share for that
++process.
++
++4-2 Interface
++-------------
++
++To get proportional sharing of bandwidth with BFQ for a given device,
++BFQ must of course be the active scheduler for that device.
++
++Within each group directory, the names of the files associated with
++BFQ-specific cgroup parameters and stats begin with the "bfq."
++prefix. So, with cgroups-v1 or cgroups-v2, the full prefix for
++BFQ-specific files is "blkio.bfq." or "io.bfq." For example, the group
++parameter to set the weight of a group with BFQ is blkio.bfq.weight
++or io.bfq.weight.
++
++Parameters to set
++-----------------
++
++For each group, there is only the following parameter to set.
++
++weight (namely blkio.bfq.weight or io.bfq-weight): the weight of the
++group inside its parent. Available values: 1..10000 (default 100). The
++linear mapping between ioprio and weights, described at the beginning
++of the tunable section, is still valid, but all weights higher than
++IOPRIO_BE_NR*10 are mapped to ioprio 0.
++
++
++[1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
++    Scheduler", Proceedings of the First Workshop on Mobile System
++    Technologies (MST-2015), May 2015.
++    http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
++
++[2] P. Valente and M. Andreolini, "Improving Application
++    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
++    the 5th Annual International Systems and Storage Conference
++    (SYSTOR '12), June 2012.
++    Slightly extended version:
++    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
++							results.pdf
+diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+index 58fc868..562e30e 100644
+--- a/block/Kconfig.iosched
++++ b/block/Kconfig.iosched
+@@ -69,6 +69,17 @@ config MQ_IOSCHED_DEADLINE
+ 	---help---
+ 	  MQ version of the deadline IO scheduler.
  
--exofs:
--  Is an OSD based Linux file system. It uses the osd-initiator and osd-uld,
--to export a usable file system for users.
--See Documentation/filesystems/exofs.txt for more details
--
- osd target:
-   There are no current plans for an OSD target implementation in kernel. For all
- needs, a user-mode target that is based on the scsi tgt target framework is
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 882ea01b4efe..0ffaf69becce 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9395,7 +9395,6 @@ T:	git git://git.open-osd.org/open-osd.git
- S:	Maintained
- F:	drivers/scsi/osd/
- F:	include/scsi/osd_*
--F:	fs/exofs/
++config IOSCHED_BFQ
++	tristate "BFQ I/O scheduler"
++	default n
++	---help---
++	BFQ I/O scheduler for BLK-MQ. BFQ distributes the bandwidth of
++	of the device among all processes according to their weights,
++	regardless of the device parameters and with any workload. It
++	also guarantees a low latency to interactive and soft
++	real-time applications.  Details in
++	Documentation/block/bfq-iosched.txt
++
+ endmenu
  
- OVERLAY FILESYSTEM
- M:	Miklos Szeredi <miklos@szeredi.hu>
-diff --git a/fs/Kconfig b/fs/Kconfig
-index 83eab52fb3f6..abee7e4468c6 100644
---- a/fs/Kconfig
-+++ b/fs/Kconfig
-@@ -247,12 +247,9 @@ source "fs/romfs/Kconfig"
- source "fs/pstore/Kconfig"
- source "fs/sysv/Kconfig"
- source "fs/ufs/Kconfig"
--source "fs/exofs/Kconfig"
+ endif
+diff --git a/block/Makefile b/block/Makefile
+index 081bb68..91869f2 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -20,6 +20,7 @@ obj-$(CONFIG_IOSCHED_NOOP)	+= noop-iosched.o
+ obj-$(CONFIG_IOSCHED_DEADLINE)	+= deadline-iosched.o
+ obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
+ obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
++obj-$(CONFIG_IOSCHED_BFQ)	+= bfq-iosched.o
  
- endif # MISC_FILESYSTEMS
- 
--source "fs/exofs/Kconfig.ore"
--
- menuconfig NETWORK_FILESYSTEMS
- 	bool "Network File Systems"
- 	default y
-diff --git a/fs/Makefile b/fs/Makefile
-index 7bbaca9c67b1..58ae3c3e6792 100644
---- a/fs/Makefile
-+++ b/fs/Makefile
-@@ -124,7 +124,6 @@ obj-$(CONFIG_OCFS2_FS)		+= ocfs2/
- obj-$(CONFIG_BTRFS_FS)		+= btrfs/
- obj-$(CONFIG_GFS2_FS)           += gfs2/
- obj-$(CONFIG_F2FS_FS)		+= f2fs/
--obj-y				+= exofs/ # Multiple modules
- obj-$(CONFIG_CEPH_FS)		+= ceph/
- obj-$(CONFIG_PSTORE)		+= pstore/
- obj-$(CONFIG_EFIVAR_FS)		+= efivarfs/
-diff --git a/fs/exofs/BUGS b/fs/exofs/BUGS
-deleted file mode 100644
-index 1b2d4c63a579..000000000000
---- a/fs/exofs/BUGS
-+++ /dev/null
-@@ -1,3 +0,0 @@
--- Out-of-space may cause a severe problem if the object (and directory entry)
--  were written, but the inode attributes failed. Then if the filesystem was
--  unmounted and mounted the kernel can get into an endless loop doing a readdir.
-diff --git a/fs/exofs/Kbuild b/fs/exofs/Kbuild
-deleted file mode 100644
-index a364fd0965ec..000000000000
---- a/fs/exofs/Kbuild
-+++ /dev/null
-@@ -1,20 +0,0 @@
--#
--# Kbuild for the EXOFS module
--#
--# Copyright (C) 2008 Panasas Inc.  All rights reserved.
--#
--# Authors:
--#   Boaz Harrosh <ooo@electrozaur.com>
--#
--# This program is free software; you can redistribute it and/or modify
--# it under the terms of the GNU General Public License version 2
--#
--# Kbuild - Gets included from the Kernels Makefile and build system
--#
--
--# ore module library
--libore-y := ore.o ore_raid.o
--obj-$(CONFIG_ORE) += libore.o
--
--exofs-y := inode.o file.o namei.o dir.o super.o sys.o
--obj-$(CONFIG_EXOFS_FS) += exofs.o
-diff --git a/fs/exofs/Kconfig b/fs/exofs/Kconfig
-deleted file mode 100644
-index 86194b2f799d..000000000000
---- a/fs/exofs/Kconfig
-+++ /dev/null
-@@ -1,13 +0,0 @@
--config EXOFS_FS
--	tristate "exofs: OSD based file system support"
--	depends on SCSI_OSD_ULD
--	help
--	  EXOFS is a file system that uses an OSD storage device,
--	  as its backing storage.
--
--# Debugging-related stuff
--config EXOFS_DEBUG
--	bool "Enable debugging"
--	depends on EXOFS_FS
--	help
--	  This option enables EXOFS debug prints.
-diff --git a/fs/exofs/Kconfig.ore b/fs/exofs/Kconfig.ore
-deleted file mode 100644
-index 2daf2329c28d..000000000000
---- a/fs/exofs/Kconfig.ore
-+++ /dev/null
-@@ -1,14 +0,0 @@
--# ORE - Objects Raid Engine (libore.ko)
--#
--# Note ORE needs to "select ASYNC_XOR". So Not to force multiple selects
--# for every ORE user we do it like this. Any user should add itself here
--# at the "depends on EXOFS_FS || ..." with an ||. The dependencies are
--# selected here, and we default to "ON". So in effect it is like been
--# selected by any of the users.
--config ORE
--	tristate
--	depends on EXOFS_FS || PNFS_OBJLAYOUT
--	select ASYNC_XOR
--	select RAID6_PQ
--	select ASYNC_PQ
--	default SCSI_OSD_ULD
-diff --git a/fs/exofs/common.h b/fs/exofs/common.h
-deleted file mode 100644
-index 7d88ef566213..000000000000
---- a/fs/exofs/common.h
-+++ /dev/null
-@@ -1,262 +0,0 @@
--/*
-- * common.h - Common definitions for both Kernel and user-mode utilities
-- *
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * Copyrights for code taken from ext2:
-- *     Copyright (C) 1992, 1993, 1994, 1995
-- *     Remy Card (card@masi.ibp.fr)
-- *     Laboratoire MASI - Institut Blaise Pascal
-- *     Universite Pierre et Marie Curie (Paris VI)
-- *     from
-- *     linux/fs/minix/inode.c
-- *     Copyright (C) 1991, 1992  Linus Torvalds
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--
--#ifndef __EXOFS_COM_H__
--#define __EXOFS_COM_H__
--
--#include <linux/types.h>
--
--#include <scsi/osd_attributes.h>
--#include <scsi/osd_initiator.h>
--#include <scsi/osd_sec.h>
--
--/****************************************************************************
-- * Object ID related defines
-- * NOTE: inode# = object ID - EXOFS_OBJ_OFF
-- ****************************************************************************/
--#define EXOFS_MIN_PID   0x10000	/* Smallest partition ID */
--#define EXOFS_OBJ_OFF	0x10000	/* offset for objects */
--#define EXOFS_SUPER_ID	0x10000	/* object ID for on-disk superblock */
--#define EXOFS_DEVTABLE_ID 0x10001 /* object ID for on-disk device table */
--#define EXOFS_ROOT_ID	0x10002	/* object ID for root directory */
--
--/* exofs Application specific page/attribute */
--/* Inode attrs */
--# define EXOFS_APAGE_FS_DATA	(OSD_APAGE_APP_DEFINED_FIRST + 3)
--# define EXOFS_ATTR_INODE_DATA	1
--# define EXOFS_ATTR_INODE_FILE_LAYOUT	2
--# define EXOFS_ATTR_INODE_DIR_LAYOUT	3
--/* Partition attrs */
--# define EXOFS_APAGE_SB_DATA	(0xF0000000U + 3)
--# define EXOFS_ATTR_SB_STATS	1
--
--/*
-- * The maximum number of files we can have is limited by the size of the
-- * inode number.  This is the largest object ID that the file system supports.
-- * Object IDs 0, 1, and 2 are always in use (see above defines).
-- */
--enum {
--	EXOFS_MAX_INO_ID = (sizeof(ino_t) * 8 == 64) ? ULLONG_MAX :
--					(1ULL << (sizeof(ino_t) * 8ULL - 1ULL)),
--	EXOFS_MAX_ID	 = (EXOFS_MAX_INO_ID - 1 - EXOFS_OBJ_OFF),
--};
--
--/****************************************************************************
-- * Misc.
-- ****************************************************************************/
--#define EXOFS_BLKSHIFT	12
--#define EXOFS_BLKSIZE	(1UL << EXOFS_BLKSHIFT)
--
--/****************************************************************************
-- * superblock-related things
-- ****************************************************************************/
--#define EXOFS_SUPER_MAGIC	0x5DF5
--
--/*
-- * The file system control block - stored in object EXOFS_SUPER_ID's data.
-- * This is where the in-memory superblock is stored on disk.
-- */
--enum {EXOFS_FSCB_VER = 1, EXOFS_DT_VER = 1};
--struct exofs_fscb {
--	__le64  s_nextid;	/* Only used after mkfs */
--	__le64  s_numfiles;	/* Only used after mkfs */
--	__le32	s_version;	/* == EXOFS_FSCB_VER */
--	__le16  s_magic;	/* Magic signature */
--	__le16  s_newfs;	/* Non-zero if this is a new fs */
--
--	/* From here on it's a static part, only written by mkexofs */
--	__le64	s_dev_table_oid;   /* Resurved, not used */
--	__le64	s_dev_table_count; /* == 0 means no dev_table */
--} __packed;
--
--/*
-- * This struct is set on the FS partition's attributes.
-- * [EXOFS_APAGE_SB_DATA, EXOFS_ATTR_SB_STATS] and is written together
-- * with the create command, to atomically persist the sb writeable information.
-- */
--struct exofs_sb_stats {
--	__le64  s_nextid;	/* Highest object ID used */
--	__le64  s_numfiles;	/* Number of files on fs */
--} __packed;
--
--/*
-- * Describes the raid used in the FS. It is part of the device table.
-- * This here is taken from the pNFS-objects definition. In exofs we
-- * use one raid policy through-out the filesystem. (NOTE: the funny
-- * alignment at beginning. We take care of it at exofs_device_table.
-- */
--struct exofs_dt_data_map {
--	__le32	cb_num_comps;
--	__le64	cb_stripe_unit;
--	__le32	cb_group_width;
--	__le32	cb_group_depth;
--	__le32	cb_mirror_cnt;
--	__le32	cb_raid_algorithm;
--} __packed;
--
--/*
-- * This is an osd device information descriptor. It is a single entry in
-- * the exofs device table. It describes an osd target lun which
-- * contains data belonging to this FS. (Same partition_id on all devices)
-- */
--struct exofs_dt_device_info {
--	__le32	systemid_len;
--	u8	systemid[OSD_SYSTEMID_LEN];
--	__le64	long_name_offset;	/* If !0 then offset-in-file */
--	__le32	osdname_len;		/* */
--	u8	osdname[44];		/* Embbeded, Usually an asci uuid */
--} __packed;
--
--/*
-- * The EXOFS device table - stored in object EXOFS_DEVTABLE_ID's data.
-- * It contains the raid used for this multy-device FS and an array of
-- * participating devices.
-- */
--struct exofs_device_table {
--	__le32				dt_version;	/* == EXOFS_DT_VER */
--	struct exofs_dt_data_map	dt_data_map;	/* Raid policy to use */
--
--	/* Resurved space For future use. Total includeing this:
--	 * (8 * sizeof(le64))
--	 */
--	__le64				__Resurved[4];
--
--	__le64				dt_num_devices;	/* Array size */
--	struct exofs_dt_device_info	dt_dev_table[];	/* Array of devices */
--} __packed;
--
--/****************************************************************************
-- * inode-related things
-- ****************************************************************************/
--#define EXOFS_IDATA		5
--
--/*
-- * The file control block - stored in an object's attributes.  This is where
-- * the in-memory inode is stored on disk.
-- */
--struct exofs_fcb {
--	__le64  i_size;			/* Size of the file */
--	__le16  i_mode;         	/* File mode */
--	__le16  i_links_count;  	/* Links count */
--	__le32  i_uid;          	/* Owner Uid */
--	__le32  i_gid;          	/* Group Id */
--	__le32  i_atime;        	/* Access time */
--	__le32  i_ctime;        	/* Creation time */
--	__le32  i_mtime;        	/* Modification time */
--	__le32  i_flags;        	/* File flags (unused for now)*/
--	__le32  i_generation;   	/* File version (for NFS) */
--	__le32  i_data[EXOFS_IDATA];	/* Short symlink names and device #s */
--};
--
--#define EXOFS_INO_ATTR_SIZE	sizeof(struct exofs_fcb)
--
--/* This is the Attribute the fcb is stored in */
--static const struct __weak osd_attr g_attr_inode_data = ATTR_DEF(
--	EXOFS_APAGE_FS_DATA,
--	EXOFS_ATTR_INODE_DATA,
--	EXOFS_INO_ATTR_SIZE);
--
--/****************************************************************************
-- * dentry-related things
-- ****************************************************************************/
--#define EXOFS_NAME_LEN	255
--
--/*
-- * The on-disk directory entry
-- */
--struct exofs_dir_entry {
--	__le64		inode_no;		/* inode number           */
--	__le16		rec_len;		/* directory entry length */
--	u8		name_len;		/* name length            */
--	u8		file_type;		/* umm...file type        */
--	char		name[EXOFS_NAME_LEN];	/* file name              */
--};
--
--enum {
--	EXOFS_FT_UNKNOWN,
--	EXOFS_FT_REG_FILE,
--	EXOFS_FT_DIR,
--	EXOFS_FT_CHRDEV,
--	EXOFS_FT_BLKDEV,
--	EXOFS_FT_FIFO,
--	EXOFS_FT_SOCK,
--	EXOFS_FT_SYMLINK,
--	EXOFS_FT_MAX
--};
--
--#define EXOFS_DIR_PAD			4
--#define EXOFS_DIR_ROUND			(EXOFS_DIR_PAD - 1)
--#define EXOFS_DIR_REC_LEN(name_len) \
--	(((name_len) + offsetof(struct exofs_dir_entry, name)  + \
--	  EXOFS_DIR_ROUND) & ~EXOFS_DIR_ROUND)
--
--/*
-- * The on-disk (optional) layout structure.
-- * sits in an EXOFS_ATTR_INODE_FILE_LAYOUT or EXOFS_ATTR_INODE_DIR_LAYOUT
-- * attribute, attached to any inode, usually to a directory.
-- */
--
--enum exofs_inode_layout_gen_functions {
--	LAYOUT_MOVING_WINDOW = 0,
--	LAYOUT_IMPLICT = 1,
--};
--
--struct exofs_on_disk_inode_layout {
--	__le16 gen_func; /* One of enum exofs_inode_layout_gen_functions */
--	__le16 pad;
--	union {
--		/* gen_func == LAYOUT_MOVING_WINDOW (default) */
--		struct exofs_layout_sliding_window {
--			__le32 num_devices; /* first n devices in global-table*/
--		} sliding_window __packed;
--
--		/* gen_func == LAYOUT_IMPLICT */
--		struct exofs_layout_implict_list {
--			struct exofs_dt_data_map data_map;
--			/* Variable array of size data_map.cb_num_comps. These
--			 * are device indexes of the devices in the global table
--			 */
--			__le32 dev_indexes[];
--		} implict __packed;
--	};
--} __packed;
--
--static inline size_t exofs_on_disk_inode_layout_size(unsigned max_devs)
--{
--	return sizeof(struct exofs_on_disk_inode_layout) +
--		max_devs * sizeof(__le32);
--}
--
--#endif /*ifndef __EXOFS_COM_H__*/
-diff --git a/fs/exofs/dir.c b/fs/exofs/dir.c
-deleted file mode 100644
-index 42f9a0a0c4ca..000000000000
---- a/fs/exofs/dir.c
-+++ /dev/null
-@@ -1,661 +0,0 @@
--/*
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * Copyrights for code taken from ext2:
-- *     Copyright (C) 1992, 1993, 1994, 1995
-- *     Remy Card (card@masi.ibp.fr)
-- *     Laboratoire MASI - Institut Blaise Pascal
-- *     Universite Pierre et Marie Curie (Paris VI)
-- *     from
-- *     linux/fs/minix/inode.c
-- *     Copyright (C) 1991, 1992  Linus Torvalds
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--
--#include "exofs.h"
--
--static inline unsigned exofs_chunk_size(struct inode *inode)
--{
--	return inode->i_sb->s_blocksize;
--}
--
--static inline void exofs_put_page(struct page *page)
--{
--	kunmap(page);
--	put_page(page);
--}
--
--static unsigned exofs_last_byte(struct inode *inode, unsigned long page_nr)
--{
--	loff_t last_byte = inode->i_size;
--
--	last_byte -= page_nr << PAGE_SHIFT;
--	if (last_byte > PAGE_SIZE)
--		last_byte = PAGE_SIZE;
--	return last_byte;
--}
--
--static int exofs_commit_chunk(struct page *page, loff_t pos, unsigned len)
--{
--	struct address_space *mapping = page->mapping;
--	struct inode *dir = mapping->host;
--	int err = 0;
--
--	dir->i_version++;
--
--	if (!PageUptodate(page))
--		SetPageUptodate(page);
--
--	if (pos+len > dir->i_size) {
--		i_size_write(dir, pos+len);
--		mark_inode_dirty(dir);
--	}
--	set_page_dirty(page);
--
--	if (IS_DIRSYNC(dir))
--		err = write_one_page(page, 1);
--	else
--		unlock_page(page);
--
--	return err;
--}
--
--static bool exofs_check_page(struct page *page)
--{
--	struct inode *dir = page->mapping->host;
--	unsigned chunk_size = exofs_chunk_size(dir);
--	char *kaddr = page_address(page);
--	unsigned offs, rec_len;
--	unsigned limit = PAGE_SIZE;
--	struct exofs_dir_entry *p;
--	char *error;
--
--	/* if the page is the last one in the directory */
--	if ((dir->i_size >> PAGE_SHIFT) == page->index) {
--		limit = dir->i_size & ~PAGE_MASK;
--		if (limit & (chunk_size - 1))
--			goto Ebadsize;
--		if (!limit)
--			goto out;
--	}
--	for (offs = 0; offs <= limit - EXOFS_DIR_REC_LEN(1); offs += rec_len) {
--		p = (struct exofs_dir_entry *)(kaddr + offs);
--		rec_len = le16_to_cpu(p->rec_len);
--
--		if (rec_len < EXOFS_DIR_REC_LEN(1))
--			goto Eshort;
--		if (rec_len & 3)
--			goto Ealign;
--		if (rec_len < EXOFS_DIR_REC_LEN(p->name_len))
--			goto Enamelen;
--		if (((offs + rec_len - 1) ^ offs) & ~(chunk_size-1))
--			goto Espan;
--	}
--	if (offs != limit)
--		goto Eend;
--out:
--	SetPageChecked(page);
--	return true;
--
--Ebadsize:
--	EXOFS_ERR("ERROR [exofs_check_page]: "
--		"size of directory(0x%lx) is not a multiple of chunk size\n",
--		dir->i_ino
--	);
--	goto fail;
--Eshort:
--	error = "rec_len is smaller than minimal";
--	goto bad_entry;
--Ealign:
--	error = "unaligned directory entry";
--	goto bad_entry;
--Enamelen:
--	error = "rec_len is too small for name_len";
--	goto bad_entry;
--Espan:
--	error = "directory entry across blocks";
--	goto bad_entry;
--bad_entry:
--	EXOFS_ERR(
--		"ERROR [exofs_check_page]: bad entry in directory(0x%lx): %s - "
--		"offset=%lu, inode=0x%llx, rec_len=%d, name_len=%d\n",
--		dir->i_ino, error, (page->index<<PAGE_SHIFT)+offs,
--		_LLU(le64_to_cpu(p->inode_no)),
--		rec_len, p->name_len);
--	goto fail;
--Eend:
--	p = (struct exofs_dir_entry *)(kaddr + offs);
--	EXOFS_ERR("ERROR [exofs_check_page]: "
--		"entry in directory(0x%lx) spans the page boundary"
--		"offset=%lu, inode=0x%llx\n",
--		dir->i_ino, (page->index<<PAGE_SHIFT)+offs,
--		_LLU(le64_to_cpu(p->inode_no)));
--fail:
--	SetPageError(page);
--	return false;
--}
--
--static struct page *exofs_get_page(struct inode *dir, unsigned long n)
--{
--	struct address_space *mapping = dir->i_mapping;
--	struct page *page = read_mapping_page(mapping, n, NULL);
--
--	if (!IS_ERR(page)) {
--		kmap(page);
--		if (unlikely(!PageChecked(page))) {
--			if (PageError(page) || !exofs_check_page(page))
--				goto fail;
--		}
--	}
--	return page;
--
--fail:
--	exofs_put_page(page);
--	return ERR_PTR(-EIO);
--}
--
--static inline int exofs_match(int len, const unsigned char *name,
--					struct exofs_dir_entry *de)
--{
--	if (len != de->name_len)
--		return 0;
--	if (!de->inode_no)
--		return 0;
--	return !memcmp(name, de->name, len);
--}
--
--static inline
--struct exofs_dir_entry *exofs_next_entry(struct exofs_dir_entry *p)
--{
--	return (struct exofs_dir_entry *)((char *)p + le16_to_cpu(p->rec_len));
--}
--
--static inline unsigned
--exofs_validate_entry(char *base, unsigned offset, unsigned mask)
--{
--	struct exofs_dir_entry *de = (struct exofs_dir_entry *)(base + offset);
--	struct exofs_dir_entry *p =
--			(struct exofs_dir_entry *)(base + (offset&mask));
--	while ((char *)p < (char *)de) {
--		if (p->rec_len == 0)
--			break;
--		p = exofs_next_entry(p);
--	}
--	return (char *)p - base;
--}
--
--static unsigned char exofs_filetype_table[EXOFS_FT_MAX] = {
--	[EXOFS_FT_UNKNOWN]	= DT_UNKNOWN,
--	[EXOFS_FT_REG_FILE]	= DT_REG,
--	[EXOFS_FT_DIR]		= DT_DIR,
--	[EXOFS_FT_CHRDEV]	= DT_CHR,
--	[EXOFS_FT_BLKDEV]	= DT_BLK,
--	[EXOFS_FT_FIFO]		= DT_FIFO,
--	[EXOFS_FT_SOCK]		= DT_SOCK,
--	[EXOFS_FT_SYMLINK]	= DT_LNK,
--};
--
--#define S_SHIFT 12
--static unsigned char exofs_type_by_mode[S_IFMT >> S_SHIFT] = {
--	[S_IFREG >> S_SHIFT]	= EXOFS_FT_REG_FILE,
--	[S_IFDIR >> S_SHIFT]	= EXOFS_FT_DIR,
--	[S_IFCHR >> S_SHIFT]	= EXOFS_FT_CHRDEV,
--	[S_IFBLK >> S_SHIFT]	= EXOFS_FT_BLKDEV,
--	[S_IFIFO >> S_SHIFT]	= EXOFS_FT_FIFO,
--	[S_IFSOCK >> S_SHIFT]	= EXOFS_FT_SOCK,
--	[S_IFLNK >> S_SHIFT]	= EXOFS_FT_SYMLINK,
--};
--
--static inline
--void exofs_set_de_type(struct exofs_dir_entry *de, struct inode *inode)
--{
--	umode_t mode = inode->i_mode;
--	de->file_type = exofs_type_by_mode[(mode & S_IFMT) >> S_SHIFT];
--}
--
--static int
--exofs_readdir(struct file *file, struct dir_context *ctx)
--{
--	loff_t pos = ctx->pos;
--	struct inode *inode = file_inode(file);
--	unsigned int offset = pos & ~PAGE_MASK;
--	unsigned long n = pos >> PAGE_SHIFT;
--	unsigned long npages = dir_pages(inode);
--	unsigned chunk_mask = ~(exofs_chunk_size(inode)-1);
--	int need_revalidate = (file->f_version != inode->i_version);
--
--	if (pos > inode->i_size - EXOFS_DIR_REC_LEN(1))
--		return 0;
--
--	for ( ; n < npages; n++, offset = 0) {
--		char *kaddr, *limit;
--		struct exofs_dir_entry *de;
--		struct page *page = exofs_get_page(inode, n);
--
--		if (IS_ERR(page)) {
--			EXOFS_ERR("ERROR: bad page in directory(0x%lx)\n",
--				  inode->i_ino);
--			ctx->pos += PAGE_SIZE - offset;
--			return PTR_ERR(page);
--		}
--		kaddr = page_address(page);
--		if (unlikely(need_revalidate)) {
--			if (offset) {
--				offset = exofs_validate_entry(kaddr, offset,
--								chunk_mask);
--				ctx->pos = (n<<PAGE_SHIFT) + offset;
--			}
--			file->f_version = inode->i_version;
--			need_revalidate = 0;
--		}
--		de = (struct exofs_dir_entry *)(kaddr + offset);
--		limit = kaddr + exofs_last_byte(inode, n) -
--							EXOFS_DIR_REC_LEN(1);
--		for (; (char *)de <= limit; de = exofs_next_entry(de)) {
--			if (de->rec_len == 0) {
--				EXOFS_ERR("ERROR: "
--				     "zero-length entry in directory(0x%lx)\n",
--				     inode->i_ino);
--				exofs_put_page(page);
--				return -EIO;
--			}
--			if (de->inode_no) {
--				unsigned char t;
--
--				if (de->file_type < EXOFS_FT_MAX)
--					t = exofs_filetype_table[de->file_type];
--				else
--					t = DT_UNKNOWN;
--
--				if (!dir_emit(ctx, de->name, de->name_len,
--						le64_to_cpu(de->inode_no),
--						t)) {
--					exofs_put_page(page);
--					return 0;
--				}
--			}
--			ctx->pos += le16_to_cpu(de->rec_len);
--		}
--		exofs_put_page(page);
--	}
--	return 0;
--}
--
--struct exofs_dir_entry *exofs_find_entry(struct inode *dir,
--			struct dentry *dentry, struct page **res_page)
--{
--	const unsigned char *name = dentry->d_name.name;
--	int namelen = dentry->d_name.len;
--	unsigned reclen = EXOFS_DIR_REC_LEN(namelen);
--	unsigned long start, n;
--	unsigned long npages = dir_pages(dir);
--	struct page *page = NULL;
--	struct exofs_i_info *oi = exofs_i(dir);
--	struct exofs_dir_entry *de;
--
--	if (npages == 0)
--		goto out;
--
--	*res_page = NULL;
--
--	start = oi->i_dir_start_lookup;
--	if (start >= npages)
--		start = 0;
--	n = start;
--	do {
--		char *kaddr;
--		page = exofs_get_page(dir, n);
--		if (!IS_ERR(page)) {
--			kaddr = page_address(page);
--			de = (struct exofs_dir_entry *) kaddr;
--			kaddr += exofs_last_byte(dir, n) - reclen;
--			while ((char *) de <= kaddr) {
--				if (de->rec_len == 0) {
--					EXOFS_ERR("ERROR: zero-length entry in "
--						  "directory(0x%lx)\n",
--						  dir->i_ino);
--					exofs_put_page(page);
--					goto out;
--				}
--				if (exofs_match(namelen, name, de))
--					goto found;
--				de = exofs_next_entry(de);
--			}
--			exofs_put_page(page);
--		}
--		if (++n >= npages)
--			n = 0;
--	} while (n != start);
--out:
--	return NULL;
--
--found:
--	*res_page = page;
--	oi->i_dir_start_lookup = n;
--	return de;
--}
--
--struct exofs_dir_entry *exofs_dotdot(struct inode *dir, struct page **p)
--{
--	struct page *page = exofs_get_page(dir, 0);
--	struct exofs_dir_entry *de = NULL;
--
--	if (!IS_ERR(page)) {
--		de = exofs_next_entry(
--				(struct exofs_dir_entry *)page_address(page));
--		*p = page;
--	}
--	return de;
--}
--
--ino_t exofs_parent_ino(struct dentry *child)
--{
--	struct page *page;
--	struct exofs_dir_entry *de;
--	ino_t ino;
--
--	de = exofs_dotdot(d_inode(child), &page);
--	if (!de)
--		return 0;
--
--	ino = le64_to_cpu(de->inode_no);
--	exofs_put_page(page);
--	return ino;
--}
--
--ino_t exofs_inode_by_name(struct inode *dir, struct dentry *dentry)
--{
--	ino_t res = 0;
--	struct exofs_dir_entry *de;
--	struct page *page;
--
--	de = exofs_find_entry(dir, dentry, &page);
--	if (de) {
--		res = le64_to_cpu(de->inode_no);
--		exofs_put_page(page);
--	}
--	return res;
--}
--
--int exofs_set_link(struct inode *dir, struct exofs_dir_entry *de,
--			struct page *page, struct inode *inode)
--{
--	loff_t pos = page_offset(page) +
--			(char *) de - (char *) page_address(page);
--	unsigned len = le16_to_cpu(de->rec_len);
--	int err;
--
--	lock_page(page);
--	err = exofs_write_begin(NULL, page->mapping, pos, len,
--				AOP_FLAG_UNINTERRUPTIBLE, &page, NULL);
--	if (err)
--		EXOFS_ERR("exofs_set_link: exofs_write_begin FAILED => %d\n",
--			  err);
--
--	de->inode_no = cpu_to_le64(inode->i_ino);
--	exofs_set_de_type(de, inode);
--	if (likely(!err))
--		err = exofs_commit_chunk(page, pos, len);
--	exofs_put_page(page);
--	dir->i_mtime = dir->i_ctime = current_time(dir);
--	mark_inode_dirty(dir);
--	return err;
--}
--
--int exofs_add_link(struct dentry *dentry, struct inode *inode)
--{
--	struct inode *dir = d_inode(dentry->d_parent);
--	const unsigned char *name = dentry->d_name.name;
--	int namelen = dentry->d_name.len;
--	unsigned chunk_size = exofs_chunk_size(dir);
--	unsigned reclen = EXOFS_DIR_REC_LEN(namelen);
--	unsigned short rec_len, name_len;
--	struct page *page = NULL;
--	struct exofs_sb_info *sbi = inode->i_sb->s_fs_info;
--	struct exofs_dir_entry *de;
--	unsigned long npages = dir_pages(dir);
--	unsigned long n;
--	char *kaddr;
--	loff_t pos;
--	int err;
--
--	for (n = 0; n <= npages; n++) {
--		char *dir_end;
--
--		page = exofs_get_page(dir, n);
--		err = PTR_ERR(page);
--		if (IS_ERR(page))
--			goto out;
--		lock_page(page);
--		kaddr = page_address(page);
--		dir_end = kaddr + exofs_last_byte(dir, n);
--		de = (struct exofs_dir_entry *)kaddr;
--		kaddr += PAGE_SIZE - reclen;
--		while ((char *)de <= kaddr) {
--			if ((char *)de == dir_end) {
--				name_len = 0;
--				rec_len = chunk_size;
--				de->rec_len = cpu_to_le16(chunk_size);
--				de->inode_no = 0;
--				goto got_it;
--			}
--			if (de->rec_len == 0) {
--				EXOFS_ERR("ERROR: exofs_add_link: "
--				      "zero-length entry in directory(0x%lx)\n",
--				      inode->i_ino);
--				err = -EIO;
--				goto out_unlock;
--			}
--			err = -EEXIST;
--			if (exofs_match(namelen, name, de))
--				goto out_unlock;
--			name_len = EXOFS_DIR_REC_LEN(de->name_len);
--			rec_len = le16_to_cpu(de->rec_len);
--			if (!de->inode_no && rec_len >= reclen)
--				goto got_it;
--			if (rec_len >= name_len + reclen)
--				goto got_it;
--			de = (struct exofs_dir_entry *) ((char *) de + rec_len);
--		}
--		unlock_page(page);
--		exofs_put_page(page);
--	}
--
--	EXOFS_ERR("exofs_add_link: BAD dentry=%p or inode=0x%lx\n",
--		  dentry, inode->i_ino);
--	return -EINVAL;
--
--got_it:
--	pos = page_offset(page) +
--		(char *)de - (char *)page_address(page);
--	err = exofs_write_begin(NULL, page->mapping, pos, rec_len, 0,
--							&page, NULL);
--	if (err)
--		goto out_unlock;
--	if (de->inode_no) {
--		struct exofs_dir_entry *de1 =
--			(struct exofs_dir_entry *)((char *)de + name_len);
--		de1->rec_len = cpu_to_le16(rec_len - name_len);
--		de->rec_len = cpu_to_le16(name_len);
--		de = de1;
--	}
--	de->name_len = namelen;
--	memcpy(de->name, name, namelen);
--	de->inode_no = cpu_to_le64(inode->i_ino);
--	exofs_set_de_type(de, inode);
--	err = exofs_commit_chunk(page, pos, rec_len);
--	dir->i_mtime = dir->i_ctime = current_time(dir);
--	mark_inode_dirty(dir);
--	sbi->s_numfiles++;
--
--out_put:
--	exofs_put_page(page);
--out:
--	return err;
--out_unlock:
--	unlock_page(page);
--	goto out_put;
--}
--
--int exofs_delete_entry(struct exofs_dir_entry *dir, struct page *page)
--{
--	struct address_space *mapping = page->mapping;
--	struct inode *inode = mapping->host;
--	struct exofs_sb_info *sbi = inode->i_sb->s_fs_info;
--	char *kaddr = page_address(page);
--	unsigned from = ((char *)dir - kaddr) & ~(exofs_chunk_size(inode)-1);
--	unsigned to = ((char *)dir - kaddr) + le16_to_cpu(dir->rec_len);
--	loff_t pos;
--	struct exofs_dir_entry *pde = NULL;
--	struct exofs_dir_entry *de = (struct exofs_dir_entry *) (kaddr + from);
--	int err;
--
--	while (de < dir) {
--		if (de->rec_len == 0) {
--			EXOFS_ERR("ERROR: exofs_delete_entry:"
--				  "zero-length entry in directory(0x%lx)\n",
--				  inode->i_ino);
--			err = -EIO;
--			goto out;
--		}
--		pde = de;
--		de = exofs_next_entry(de);
--	}
--	if (pde)
--		from = (char *)pde - (char *)page_address(page);
--	pos = page_offset(page) + from;
--	lock_page(page);
--	err = exofs_write_begin(NULL, page->mapping, pos, to - from, 0,
--							&page, NULL);
--	if (err)
--		EXOFS_ERR("exofs_delete_entry: exofs_write_begin FAILED => %d\n",
--			  err);
--	if (pde)
--		pde->rec_len = cpu_to_le16(to - from);
--	dir->inode_no = 0;
--	if (likely(!err))
--		err = exofs_commit_chunk(page, pos, to - from);
--	inode->i_ctime = inode->i_mtime = current_time(inode);
--	mark_inode_dirty(inode);
--	sbi->s_numfiles--;
--out:
--	exofs_put_page(page);
--	return err;
--}
--
--/* kept aligned on 4 bytes */
--#define THIS_DIR ".\0\0"
--#define PARENT_DIR "..\0"
--
--int exofs_make_empty(struct inode *inode, struct inode *parent)
--{
--	struct address_space *mapping = inode->i_mapping;
--	struct page *page = grab_cache_page(mapping, 0);
--	unsigned chunk_size = exofs_chunk_size(inode);
--	struct exofs_dir_entry *de;
--	int err;
--	void *kaddr;
--
--	if (!page)
--		return -ENOMEM;
--
--	err = exofs_write_begin(NULL, page->mapping, 0, chunk_size, 0,
--							&page, NULL);
--	if (err) {
--		unlock_page(page);
--		goto fail;
--	}
--
--	kaddr = kmap_atomic(page);
--	de = (struct exofs_dir_entry *)kaddr;
--	de->name_len = 1;
--	de->rec_len = cpu_to_le16(EXOFS_DIR_REC_LEN(1));
--	memcpy(de->name, THIS_DIR, sizeof(THIS_DIR));
--	de->inode_no = cpu_to_le64(inode->i_ino);
--	exofs_set_de_type(de, inode);
--
--	de = (struct exofs_dir_entry *)(kaddr + EXOFS_DIR_REC_LEN(1));
--	de->name_len = 2;
--	de->rec_len = cpu_to_le16(chunk_size - EXOFS_DIR_REC_LEN(1));
--	de->inode_no = cpu_to_le64(parent->i_ino);
--	memcpy(de->name, PARENT_DIR, sizeof(PARENT_DIR));
--	exofs_set_de_type(de, inode);
--	kunmap_atomic(kaddr);
--	err = exofs_commit_chunk(page, 0, chunk_size);
--fail:
--	put_page(page);
--	return err;
--}
--
--int exofs_empty_dir(struct inode *inode)
--{
--	struct page *page = NULL;
--	unsigned long i, npages = dir_pages(inode);
--
--	for (i = 0; i < npages; i++) {
--		char *kaddr;
--		struct exofs_dir_entry *de;
--		page = exofs_get_page(inode, i);
--
--		if (IS_ERR(page))
--			continue;
--
--		kaddr = page_address(page);
--		de = (struct exofs_dir_entry *)kaddr;
--		kaddr += exofs_last_byte(inode, i) - EXOFS_DIR_REC_LEN(1);
--
--		while ((char *)de <= kaddr) {
--			if (de->rec_len == 0) {
--				EXOFS_ERR("ERROR: exofs_empty_dir: "
--					  "zero-length directory entry"
--					  "kaddr=%p, de=%p\n", kaddr, de);
--				goto not_empty;
--			}
--			if (de->inode_no != 0) {
--				/* check for . and .. */
--				if (de->name[0] != '.')
--					goto not_empty;
--				if (de->name_len > 2)
--					goto not_empty;
--				if (de->name_len < 2) {
--					if (le64_to_cpu(de->inode_no) !=
--					    inode->i_ino)
--						goto not_empty;
--				} else if (de->name[1] != '.')
--					goto not_empty;
--			}
--			de = exofs_next_entry(de);
--		}
--		exofs_put_page(page);
--	}
--	return 1;
--
--not_empty:
--	exofs_put_page(page);
--	return 0;
--}
--
--const struct file_operations exofs_dir_operations = {
--	.llseek		= generic_file_llseek,
--	.read		= generic_read_dir,
--	.iterate_shared	= exofs_readdir,
--};
-diff --git a/fs/exofs/exofs.h b/fs/exofs/exofs.h
-deleted file mode 100644
-index 2e86086bc940..000000000000
---- a/fs/exofs/exofs.h
-+++ /dev/null
-@@ -1,241 +0,0 @@
--/*
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * Copyrights for code taken from ext2:
-- *     Copyright (C) 1992, 1993, 1994, 1995
-- *     Remy Card (card@masi.ibp.fr)
-- *     Laboratoire MASI - Institut Blaise Pascal
-- *     Universite Pierre et Marie Curie (Paris VI)
-- *     from
-- *     linux/fs/minix/inode.c
-- *     Copyright (C) 1991, 1992  Linus Torvalds
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--#ifndef __EXOFS_H__
--#define __EXOFS_H__
--
--#include <linux/fs.h>
--#include <linux/time.h>
--#include <linux/backing-dev.h>
--#include <scsi/osd_ore.h>
--
--#include "common.h"
--
--#define EXOFS_ERR(fmt, a...) printk(KERN_ERR "exofs: " fmt, ##a)
--
--#ifdef CONFIG_EXOFS_DEBUG
--#define EXOFS_DBGMSG(fmt, a...) \
--	printk(KERN_NOTICE "exofs @%s:%d: " fmt, __func__, __LINE__, ##a)
--#else
--#define EXOFS_DBGMSG(fmt, a...) \
--	do { if (0) printk(fmt, ##a); } while (0)
--#endif
--
--/* u64 has problems with printk this will cast it to unsigned long long */
--#define _LLU(x) (unsigned long long)(x)
--
--struct exofs_dev {
--	struct ore_dev ored;
--	unsigned did;
--	unsigned urilen;
--	uint8_t *uri;
--	struct kobject ed_kobj;
--};
--/*
-- * our extension to the in-memory superblock
-- */
--struct exofs_sb_info {
--	struct backing_dev_info bdi;		/* register our bdi with VFS  */
--	struct exofs_sb_stats s_ess;		/* Written often, pre-allocate*/
--	int		s_timeout;		/* timeout for OSD operations */
--	uint64_t	s_nextid;		/* highest object ID used     */
--	uint32_t	s_numfiles;		/* number of files on fs      */
--	spinlock_t	s_next_gen_lock;	/* spinlock for gen # update  */
--	u32		s_next_generation;	/* next gen # to use          */
--	atomic_t	s_curr_pending;		/* number of pending commands */
--
--	struct ore_layout	layout;		/* Default files layout       */
--	struct ore_comp one_comp;		/* id & cred of partition id=0*/
--	struct ore_components oc;		/* comps for the partition    */
--	struct kobject	s_kobj;			/* holds per-sbi kobject      */
--};
--
--/*
-- * our extension to the in-memory inode
-- */
--struct exofs_i_info {
--	struct inode   vfs_inode;          /* normal in-memory inode          */
--	wait_queue_head_t i_wq;            /* wait queue for inode            */
--	unsigned long  i_flags;            /* various atomic flags            */
--	uint32_t       i_data[EXOFS_IDATA];/*short symlink names and device #s*/
--	uint32_t       i_dir_start_lookup; /* which page to start lookup      */
--	uint64_t       i_commit_size;      /* the object's written length     */
--	struct ore_comp one_comp;	   /* same component for all devices  */
--	struct ore_components oc;	   /* inode view of the device table  */
--};
--
--static inline osd_id exofs_oi_objno(struct exofs_i_info *oi)
--{
--	return oi->vfs_inode.i_ino + EXOFS_OBJ_OFF;
--}
--
--/*
-- * our inode flags
-- */
--#define OBJ_2BCREATED	0	/* object will be created soon*/
--#define OBJ_CREATED	1	/* object has been created on the osd*/
--
--static inline int obj_2bcreated(struct exofs_i_info *oi)
--{
--	return test_bit(OBJ_2BCREATED, &oi->i_flags);
--}
--
--static inline void set_obj_2bcreated(struct exofs_i_info *oi)
--{
--	set_bit(OBJ_2BCREATED, &oi->i_flags);
--}
--
--static inline int obj_created(struct exofs_i_info *oi)
--{
--	return test_bit(OBJ_CREATED, &oi->i_flags);
--}
--
--static inline void set_obj_created(struct exofs_i_info *oi)
--{
--	set_bit(OBJ_CREATED, &oi->i_flags);
--}
--
--int __exofs_wait_obj_created(struct exofs_i_info *oi);
--static inline int wait_obj_created(struct exofs_i_info *oi)
--{
--	if (likely(obj_created(oi)))
--		return 0;
--
--	return __exofs_wait_obj_created(oi);
--}
--
--/*
-- * get to our inode from the vfs inode
-- */
--static inline struct exofs_i_info *exofs_i(struct inode *inode)
--{
--	return container_of(inode, struct exofs_i_info, vfs_inode);
--}
--
--/*
-- * Maximum count of links to a file
-- */
--#define EXOFS_LINK_MAX           32000
--
--/*************************
-- * function declarations *
-- *************************/
--
--/* inode.c               */
--unsigned exofs_max_io_pages(struct ore_layout *layout,
--			    unsigned expected_pages);
--int exofs_setattr(struct dentry *, struct iattr *);
--int exofs_write_begin(struct file *file, struct address_space *mapping,
--		loff_t pos, unsigned len, unsigned flags,
--		struct page **pagep, void **fsdata);
--extern struct inode *exofs_iget(struct super_block *, unsigned long);
--struct inode *exofs_new_inode(struct inode *, umode_t);
--extern int exofs_write_inode(struct inode *, struct writeback_control *wbc);
--extern void exofs_evict_inode(struct inode *);
--
--/* dir.c:                */
--int exofs_add_link(struct dentry *, struct inode *);
--ino_t exofs_inode_by_name(struct inode *, struct dentry *);
--int exofs_delete_entry(struct exofs_dir_entry *, struct page *);
--int exofs_make_empty(struct inode *, struct inode *);
--struct exofs_dir_entry *exofs_find_entry(struct inode *, struct dentry *,
--					 struct page **);
--int exofs_empty_dir(struct inode *);
--struct exofs_dir_entry *exofs_dotdot(struct inode *, struct page **);
--ino_t exofs_parent_ino(struct dentry *child);
--int exofs_set_link(struct inode *, struct exofs_dir_entry *, struct page *,
--		    struct inode *);
--
--/* super.c               */
--void exofs_make_credential(u8 cred_a[OSD_CAP_LEN],
--			   const struct osd_obj_id *obj);
--int exofs_sbi_write_stats(struct exofs_sb_info *sbi);
--
--/* sys.c                 */
--int exofs_sysfs_init(void);
--void exofs_sysfs_uninit(void);
--int exofs_sysfs_sb_add(struct exofs_sb_info *sbi,
--		       struct exofs_dt_device_info *dt_dev);
--void exofs_sysfs_sb_del(struct exofs_sb_info *sbi);
--int exofs_sysfs_odev_add(struct exofs_dev *edev,
--			 struct exofs_sb_info *sbi);
--void exofs_sysfs_dbg_print(void);
--
--/*********************
-- * operation vectors *
-- *********************/
--/* dir.c:            */
--extern const struct file_operations exofs_dir_operations;
--
--/* file.c            */
--extern const struct inode_operations exofs_file_inode_operations;
--extern const struct file_operations exofs_file_operations;
--
--/* inode.c           */
--extern const struct address_space_operations exofs_aops;
--
--/* namei.c           */
--extern const struct inode_operations exofs_dir_inode_operations;
--extern const struct inode_operations exofs_special_inode_operations;
--
--/* exofs_init_comps will initialize an ore_components device array
-- * pointing to a single ore_comp struct, and a round-robin view
-- * of the device table.
-- * The first device of each inode is the [inode->ino % num_devices]
-- * and the rest of the devices sequentially following where the
-- * first device is after the last device.
-- * It is assumed that the global device array at @sbi is twice
-- * bigger and that the device table repeats twice.
-- * See: exofs_read_lookup_dev_table()
-- */
--static inline void exofs_init_comps(struct ore_components *oc,
--				    struct ore_comp *one_comp,
--				    struct exofs_sb_info *sbi, osd_id oid)
--{
--	unsigned dev_mod = (unsigned)oid, first_dev;
--
--	one_comp->obj.partition = sbi->one_comp.obj.partition;
--	one_comp->obj.id = oid;
--	exofs_make_credential(one_comp->cred, &one_comp->obj);
--
--	oc->first_dev = 0;
--	oc->numdevs = sbi->layout.group_width * sbi->layout.mirrors_p1 *
--							sbi->layout.group_count;
--	oc->single_comp = EC_SINGLE_COMP;
--	oc->comps = one_comp;
--
--	/* Round robin device view of the table */
--	first_dev = (dev_mod * sbi->layout.mirrors_p1) % sbi->oc.numdevs;
--	oc->ods = &sbi->oc.ods[first_dev];
--}
--
--#endif
-diff --git a/fs/exofs/file.c b/fs/exofs/file.c
-deleted file mode 100644
-index 28645f0640f7..000000000000
---- a/fs/exofs/file.c
-+++ /dev/null
-@@ -1,83 +0,0 @@
--/*
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * Copyrights for code taken from ext2:
-- *     Copyright (C) 1992, 1993, 1994, 1995
-- *     Remy Card (card@masi.ibp.fr)
-- *     Laboratoire MASI - Institut Blaise Pascal
-- *     Universite Pierre et Marie Curie (Paris VI)
-- *     from
-- *     linux/fs/minix/inode.c
-- *     Copyright (C) 1991, 1992  Linus Torvalds
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--#include "exofs.h"
--
--static int exofs_release_file(struct inode *inode, struct file *filp)
--{
--	return 0;
--}
--
--/* exofs_file_fsync - flush the inode to disk
-- *
-- *   Note, in exofs all metadata is written as part of inode, regardless.
-- *   The writeout is synchronous
-- */
--static int exofs_file_fsync(struct file *filp, loff_t start, loff_t end,
--			    int datasync)
--{
--	struct inode *inode = filp->f_mapping->host;
--	int ret;
--
--	ret = filemap_write_and_wait_range(inode->i_mapping, start, end);
--	if (ret)
--		return ret;
--
--	inode_lock(inode);
--	ret = sync_inode_metadata(filp->f_mapping->host, 1);
--	inode_unlock(inode);
--	return ret;
--}
--
--static int exofs_flush(struct file *file, fl_owner_t id)
--{
--	int ret = vfs_fsync(file, 0);
--	/* TODO: Flush the OSD target */
--	return ret;
--}
--
--const struct file_operations exofs_file_operations = {
--	.llseek		= generic_file_llseek,
--	.read_iter	= generic_file_read_iter,
--	.write_iter	= generic_file_write_iter,
--	.mmap		= generic_file_mmap,
--	.open		= generic_file_open,
--	.release	= exofs_release_file,
--	.fsync		= exofs_file_fsync,
--	.flush		= exofs_flush,
--	.splice_read	= generic_file_splice_read,
--	.splice_write	= iter_file_splice_write,
--};
--
--const struct inode_operations exofs_file_inode_operations = {
--	.setattr	= exofs_setattr,
--};
-diff --git a/fs/exofs/inode.c b/fs/exofs/inode.c
-deleted file mode 100644
-index 0ac62811b341..000000000000
---- a/fs/exofs/inode.c
-+++ /dev/null
-@@ -1,1514 +0,0 @@
--/*
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * Copyrights for code taken from ext2:
-- *     Copyright (C) 1992, 1993, 1994, 1995
-- *     Remy Card (card@masi.ibp.fr)
-- *     Laboratoire MASI - Institut Blaise Pascal
-- *     Universite Pierre et Marie Curie (Paris VI)
-- *     from
-- *     linux/fs/minix/inode.c
-- *     Copyright (C) 1991, 1992  Linus Torvalds
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--
--#include <linux/slab.h>
--
--#include "exofs.h"
--
--#define EXOFS_DBGMSG2(M...) do {} while (0)
--
--unsigned exofs_max_io_pages(struct ore_layout *layout,
--			    unsigned expected_pages)
--{
--	unsigned pages = min_t(unsigned, expected_pages,
--			       layout->max_io_length / PAGE_SIZE);
--
--	return pages;
--}
--
--struct page_collect {
--	struct exofs_sb_info *sbi;
--	struct inode *inode;
--	unsigned expected_pages;
--	struct ore_io_state *ios;
--
--	struct page **pages;
--	unsigned alloc_pages;
--	unsigned nr_pages;
--	unsigned long length;
--	loff_t pg_first; /* keep 64bit also in 32-arches */
--	bool read_4_write; /* This means two things: that the read is sync
--			    * And the pages should not be unlocked.
--			    */
--	struct page *that_locked_page;
--};
--
--static void _pcol_init(struct page_collect *pcol, unsigned expected_pages,
--		       struct inode *inode)
--{
--	struct exofs_sb_info *sbi = inode->i_sb->s_fs_info;
--
--	pcol->sbi = sbi;
--	pcol->inode = inode;
--	pcol->expected_pages = expected_pages;
--
--	pcol->ios = NULL;
--	pcol->pages = NULL;
--	pcol->alloc_pages = 0;
--	pcol->nr_pages = 0;
--	pcol->length = 0;
--	pcol->pg_first = -1;
--	pcol->read_4_write = false;
--	pcol->that_locked_page = NULL;
--}
--
--static void _pcol_reset(struct page_collect *pcol)
--{
--	pcol->expected_pages -= min(pcol->nr_pages, pcol->expected_pages);
--
--	pcol->pages = NULL;
--	pcol->alloc_pages = 0;
--	pcol->nr_pages = 0;
--	pcol->length = 0;
--	pcol->pg_first = -1;
--	pcol->ios = NULL;
--	pcol->that_locked_page = NULL;
--
--	/* this is probably the end of the loop but in writes
--	 * it might not end here. don't be left with nothing
--	 */
--	if (!pcol->expected_pages)
--		pcol->expected_pages =
--				exofs_max_io_pages(&pcol->sbi->layout, ~0);
--}
--
--static int pcol_try_alloc(struct page_collect *pcol)
--{
--	unsigned pages;
--
--	/* TODO: easily support bio chaining */
--	pages =  exofs_max_io_pages(&pcol->sbi->layout, pcol->expected_pages);
--
--	for (; pages; pages >>= 1) {
--		pcol->pages = kmalloc(pages * sizeof(struct page *),
--				      GFP_KERNEL);
--		if (likely(pcol->pages)) {
--			pcol->alloc_pages = pages;
--			return 0;
--		}
--	}
--
--	EXOFS_ERR("Failed to kmalloc expected_pages=%u\n",
--		  pcol->expected_pages);
--	return -ENOMEM;
--}
--
--static void pcol_free(struct page_collect *pcol)
--{
--	kfree(pcol->pages);
--	pcol->pages = NULL;
--
--	if (pcol->ios) {
--		ore_put_io_state(pcol->ios);
--		pcol->ios = NULL;
--	}
--}
--
--static int pcol_add_page(struct page_collect *pcol, struct page *page,
--			 unsigned len)
--{
--	if (unlikely(pcol->nr_pages >= pcol->alloc_pages))
--		return -ENOMEM;
--
--	pcol->pages[pcol->nr_pages++] = page;
--	pcol->length += len;
--	return 0;
--}
--
--enum {PAGE_WAS_NOT_IN_IO = 17};
--static int update_read_page(struct page *page, int ret)
--{
--	switch (ret) {
--	case 0:
--		/* Everything is OK */
--		SetPageUptodate(page);
--		if (PageError(page))
--			ClearPageError(page);
--		break;
--	case -EFAULT:
--		/* In this case we were trying to read something that wasn't on
--		 * disk yet - return a page full of zeroes.  This should be OK,
--		 * because the object should be empty (if there was a write
--		 * before this read, the read would be waiting with the page
--		 * locked */
--		clear_highpage(page);
--
--		SetPageUptodate(page);
--		if (PageError(page))
--			ClearPageError(page);
--		EXOFS_DBGMSG("recovered read error\n");
--		/* fall through */
--	case PAGE_WAS_NOT_IN_IO:
--		ret = 0; /* recovered error */
--		break;
--	default:
--		SetPageError(page);
--	}
--	return ret;
--}
--
--static void update_write_page(struct page *page, int ret)
--{
--	if (unlikely(ret == PAGE_WAS_NOT_IN_IO))
--		return; /* don't pass start don't collect $200 */
--
--	if (ret) {
--		mapping_set_error(page->mapping, ret);
--		SetPageError(page);
--	}
--	end_page_writeback(page);
--}
--
--/* Called at the end of reads, to optionally unlock pages and update their
-- * status.
-- */
--static int __readpages_done(struct page_collect *pcol)
--{
--	int i;
--	u64 good_bytes;
--	u64 length = 0;
--	int ret = ore_check_io(pcol->ios, NULL);
--
--	if (likely(!ret)) {
--		good_bytes = pcol->length;
--		ret = PAGE_WAS_NOT_IN_IO;
--	} else {
--		good_bytes = 0;
--	}
--
--	EXOFS_DBGMSG2("readpages_done(0x%lx) good_bytes=0x%llx"
--		     " length=0x%lx nr_pages=%u\n",
--		     pcol->inode->i_ino, _LLU(good_bytes), pcol->length,
--		     pcol->nr_pages);
--
--	for (i = 0; i < pcol->nr_pages; i++) {
--		struct page *page = pcol->pages[i];
--		struct inode *inode = page->mapping->host;
--		int page_stat;
--
--		if (inode != pcol->inode)
--			continue; /* osd might add more pages at end */
--
--		if (likely(length < good_bytes))
--			page_stat = 0;
--		else
--			page_stat = ret;
--
--		EXOFS_DBGMSG2("    readpages_done(0x%lx, 0x%lx) %s\n",
--			  inode->i_ino, page->index,
--			  page_stat ? "bad_bytes" : "good_bytes");
--
--		ret = update_read_page(page, page_stat);
--		if (!pcol->read_4_write)
--			unlock_page(page);
--		length += PAGE_SIZE;
--	}
--
--	pcol_free(pcol);
--	EXOFS_DBGMSG2("readpages_done END\n");
--	return ret;
--}
--
--/* callback of async reads */
--static void readpages_done(struct ore_io_state *ios, void *p)
--{
--	struct page_collect *pcol = p;
--
--	__readpages_done(pcol);
--	atomic_dec(&pcol->sbi->s_curr_pending);
--	kfree(pcol);
--}
--
--static void _unlock_pcol_pages(struct page_collect *pcol, int ret, int rw)
--{
--	int i;
--
--	for (i = 0; i < pcol->nr_pages; i++) {
--		struct page *page = pcol->pages[i];
--
--		if (rw == READ)
--			update_read_page(page, ret);
--		else
--			update_write_page(page, ret);
--
--		unlock_page(page);
--	}
--}
--
--static int _maybe_not_all_in_one_io(struct ore_io_state *ios,
--	struct page_collect *pcol_src, struct page_collect *pcol)
--{
--	/* length was wrong or offset was not page aligned */
--	BUG_ON(pcol_src->nr_pages < ios->nr_pages);
--
--	if (pcol_src->nr_pages > ios->nr_pages) {
--		struct page **src_page;
--		unsigned pages_less = pcol_src->nr_pages - ios->nr_pages;
--		unsigned long len_less = pcol_src->length - ios->length;
--		unsigned i;
--		int ret;
--
--		/* This IO was trimmed */
--		pcol_src->nr_pages = ios->nr_pages;
--		pcol_src->length = ios->length;
--
--		/* Left over pages are passed to the next io */
--		pcol->expected_pages += pages_less;
--		pcol->nr_pages = pages_less;
--		pcol->length = len_less;
--		src_page = pcol_src->pages + pcol_src->nr_pages;
--		pcol->pg_first = (*src_page)->index;
--
--		ret = pcol_try_alloc(pcol);
--		if (unlikely(ret))
--			return ret;
--
--		for (i = 0; i < pages_less; ++i)
--			pcol->pages[i] = *src_page++;
--
--		EXOFS_DBGMSG("Length was adjusted nr_pages=0x%x "
--			"pages_less=0x%x expected_pages=0x%x "
--			"next_offset=0x%llx next_len=0x%lx\n",
--			pcol_src->nr_pages, pages_less, pcol->expected_pages,
--			pcol->pg_first * PAGE_SIZE, pcol->length);
--	}
--	return 0;
--}
--
--static int read_exec(struct page_collect *pcol)
--{
--	struct exofs_i_info *oi = exofs_i(pcol->inode);
--	struct ore_io_state *ios;
--	struct page_collect *pcol_copy = NULL;
--	int ret;
--
--	if (!pcol->pages)
--		return 0;
--
--	if (!pcol->ios) {
--		int ret = ore_get_rw_state(&pcol->sbi->layout, &oi->oc, true,
--					     pcol->pg_first << PAGE_SHIFT,
--					     pcol->length, &pcol->ios);
--
--		if (ret)
--			return ret;
--	}
--
--	ios = pcol->ios;
--	ios->pages = pcol->pages;
--
--	if (pcol->read_4_write) {
--		ore_read(pcol->ios);
--		return __readpages_done(pcol);
--	}
--
--	pcol_copy = kmalloc(sizeof(*pcol_copy), GFP_KERNEL);
--	if (!pcol_copy) {
--		ret = -ENOMEM;
--		goto err;
--	}
--
--	*pcol_copy = *pcol;
--	ios->done = readpages_done;
--	ios->private = pcol_copy;
--
--	/* pages ownership was passed to pcol_copy */
--	_pcol_reset(pcol);
--
--	ret = _maybe_not_all_in_one_io(ios, pcol_copy, pcol);
--	if (unlikely(ret))
--		goto err;
--
--	EXOFS_DBGMSG2("read_exec(0x%lx) offset=0x%llx length=0x%llx\n",
--		pcol->inode->i_ino, _LLU(ios->offset), _LLU(ios->length));
--
--	ret = ore_read(ios);
--	if (unlikely(ret))
--		goto err;
--
--	atomic_inc(&pcol->sbi->s_curr_pending);
--
--	return 0;
--
--err:
--	if (!pcol_copy) /* Failed before ownership transfer */
--		pcol_copy = pcol;
--	_unlock_pcol_pages(pcol_copy, ret, READ);
--	pcol_free(pcol_copy);
--	kfree(pcol_copy);
--
--	return ret;
--}
--
--/* readpage_strip is called either directly from readpage() or by the VFS from
-- * within read_cache_pages(), to add one more page to be read. It will try to
-- * collect as many contiguous pages as posible. If a discontinuity is
-- * encountered, or it runs out of resources, it will submit the previous segment
-- * and will start a new collection. Eventually caller must submit the last
-- * segment if present.
-- */
--static int readpage_strip(void *data, struct page *page)
--{
--	struct page_collect *pcol = data;
--	struct inode *inode = pcol->inode;
--	struct exofs_i_info *oi = exofs_i(inode);
--	loff_t i_size = i_size_read(inode);
--	pgoff_t end_index = i_size >> PAGE_SHIFT;
--	size_t len;
--	int ret;
--
--	BUG_ON(!PageLocked(page));
--
--	/* FIXME: Just for debugging, will be removed */
--	if (PageUptodate(page))
--		EXOFS_ERR("PageUptodate(0x%lx, 0x%lx)\n", pcol->inode->i_ino,
--			  page->index);
--
--	pcol->that_locked_page = page;
--
--	if (page->index < end_index)
--		len = PAGE_SIZE;
--	else if (page->index == end_index)
--		len = i_size & ~PAGE_MASK;
--	else
--		len = 0;
--
--	if (!len || !obj_created(oi)) {
--		/* this will be out of bounds, or doesn't exist yet.
--		 * Current page is cleared and the request is split
--		 */
--		clear_highpage(page);
--
--		SetPageUptodate(page);
--		if (PageError(page))
--			ClearPageError(page);
--
--		if (!pcol->read_4_write)
--			unlock_page(page);
--		EXOFS_DBGMSG("readpage_strip(0x%lx) empty page len=%zx "
--			     "read_4_write=%d index=0x%lx end_index=0x%lx "
--			     "splitting\n", inode->i_ino, len,
--			     pcol->read_4_write, page->index, end_index);
--
--		return read_exec(pcol);
--	}
--
--try_again:
--
--	if (unlikely(pcol->pg_first == -1)) {
--		pcol->pg_first = page->index;
--	} else if (unlikely((pcol->pg_first + pcol->nr_pages) !=
--		   page->index)) {
--		/* Discontinuity detected, split the request */
--		ret = read_exec(pcol);
--		if (unlikely(ret))
--			goto fail;
--		goto try_again;
--	}
--
--	if (!pcol->pages) {
--		ret = pcol_try_alloc(pcol);
--		if (unlikely(ret))
--			goto fail;
--	}
--
--	if (len != PAGE_SIZE)
--		zero_user(page, len, PAGE_SIZE - len);
--
--	EXOFS_DBGMSG2("    readpage_strip(0x%lx, 0x%lx) len=0x%zx\n",
--		     inode->i_ino, page->index, len);
--
--	ret = pcol_add_page(pcol, page, len);
--	if (ret) {
--		EXOFS_DBGMSG2("Failed pcol_add_page pages[i]=%p "
--			  "this_len=0x%zx nr_pages=%u length=0x%lx\n",
--			  page, len, pcol->nr_pages, pcol->length);
--
--		/* split the request, and start again with current page */
--		ret = read_exec(pcol);
--		if (unlikely(ret))
--			goto fail;
--
--		goto try_again;
--	}
--
--	return 0;
--
--fail:
--	/* SetPageError(page); ??? */
--	unlock_page(page);
--	return ret;
--}
--
--static int exofs_readpages(struct file *file, struct address_space *mapping,
--			   struct list_head *pages, unsigned nr_pages)
--{
--	struct page_collect pcol;
--	int ret;
--
--	_pcol_init(&pcol, nr_pages, mapping->host);
--
--	ret = read_cache_pages(mapping, pages, readpage_strip, &pcol);
--	if (ret) {
--		EXOFS_ERR("read_cache_pages => %d\n", ret);
--		return ret;
--	}
--
--	ret = read_exec(&pcol);
--	if (unlikely(ret))
--		return ret;
--
--	return read_exec(&pcol);
--}
--
--static int _readpage(struct page *page, bool read_4_write)
--{
--	struct page_collect pcol;
--	int ret;
--
--	_pcol_init(&pcol, 1, page->mapping->host);
--
--	pcol.read_4_write = read_4_write;
--	ret = readpage_strip(&pcol, page);
--	if (ret) {
--		EXOFS_ERR("_readpage => %d\n", ret);
--		return ret;
--	}
--
--	return read_exec(&pcol);
--}
--
--/*
-- * We don't need the file
-- */
--static int exofs_readpage(struct file *file, struct page *page)
--{
--	return _readpage(page, false);
--}
--
--/* Callback for osd_write. All writes are asynchronous */
--static void writepages_done(struct ore_io_state *ios, void *p)
--{
--	struct page_collect *pcol = p;
--	int i;
--	u64  good_bytes;
--	u64  length = 0;
--	int ret = ore_check_io(ios, NULL);
--
--	atomic_dec(&pcol->sbi->s_curr_pending);
--
--	if (likely(!ret)) {
--		good_bytes = pcol->length;
--		ret = PAGE_WAS_NOT_IN_IO;
--	} else {
--		good_bytes = 0;
--	}
--
--	EXOFS_DBGMSG2("writepages_done(0x%lx) good_bytes=0x%llx"
--		     " length=0x%lx nr_pages=%u\n",
--		     pcol->inode->i_ino, _LLU(good_bytes), pcol->length,
--		     pcol->nr_pages);
--
--	for (i = 0; i < pcol->nr_pages; i++) {
--		struct page *page = pcol->pages[i];
--		struct inode *inode = page->mapping->host;
--		int page_stat;
--
--		if (inode != pcol->inode)
--			continue; /* osd might add more pages to a bio */
--
--		if (likely(length < good_bytes))
--			page_stat = 0;
--		else
--			page_stat = ret;
--
--		update_write_page(page, page_stat);
--		unlock_page(page);
--		EXOFS_DBGMSG2("    writepages_done(0x%lx, 0x%lx) status=%d\n",
--			     inode->i_ino, page->index, page_stat);
--
--		length += PAGE_SIZE;
--	}
--
--	pcol_free(pcol);
--	kfree(pcol);
--	EXOFS_DBGMSG2("writepages_done END\n");
--}
--
--static struct page *__r4w_get_page(void *priv, u64 offset, bool *uptodate)
--{
--	struct page_collect *pcol = priv;
--	pgoff_t index = offset / PAGE_SIZE;
--
--	if (!pcol->that_locked_page ||
--	    (pcol->that_locked_page->index != index)) {
--		struct page *page;
--		loff_t i_size = i_size_read(pcol->inode);
--
--		if (offset >= i_size) {
--			*uptodate = true;
--			EXOFS_DBGMSG2("offset >= i_size index=0x%lx\n", index);
--			return ZERO_PAGE(0);
--		}
--
--		page =  find_get_page(pcol->inode->i_mapping, index);
--		if (!page) {
--			page = find_or_create_page(pcol->inode->i_mapping,
--						   index, GFP_NOFS);
--			if (unlikely(!page)) {
--				EXOFS_DBGMSG("grab_cache_page Failed "
--					"index=0x%llx\n", _LLU(index));
--				return NULL;
--			}
--			unlock_page(page);
--		}
--		*uptodate = PageUptodate(page);
--		EXOFS_DBGMSG2("index=0x%lx uptodate=%d\n", index, *uptodate);
--		return page;
--	} else {
--		EXOFS_DBGMSG2("YES that_locked_page index=0x%lx\n",
--			     pcol->that_locked_page->index);
--		*uptodate = true;
--		return pcol->that_locked_page;
--	}
--}
--
--static void __r4w_put_page(void *priv, struct page *page)
--{
--	struct page_collect *pcol = priv;
--
--	if ((pcol->that_locked_page != page) && (ZERO_PAGE(0) != page)) {
--		EXOFS_DBGMSG2("index=0x%lx\n", page->index);
--		put_page(page);
--		return;
--	}
--	EXOFS_DBGMSG2("that_locked_page index=0x%lx\n",
--		     ZERO_PAGE(0) == page ? -1 : page->index);
--}
--
--static const struct _ore_r4w_op _r4w_op = {
--	.get_page = &__r4w_get_page,
--	.put_page = &__r4w_put_page,
--};
--
--static int write_exec(struct page_collect *pcol)
--{
--	struct exofs_i_info *oi = exofs_i(pcol->inode);
--	struct ore_io_state *ios;
--	struct page_collect *pcol_copy = NULL;
--	int ret;
--
--	if (!pcol->pages)
--		return 0;
--
--	BUG_ON(pcol->ios);
--	ret = ore_get_rw_state(&pcol->sbi->layout, &oi->oc, false,
--				 pcol->pg_first << PAGE_SHIFT,
--				 pcol->length, &pcol->ios);
--	if (unlikely(ret))
--		goto err;
--
--	pcol_copy = kmalloc(sizeof(*pcol_copy), GFP_KERNEL);
--	if (!pcol_copy) {
--		EXOFS_ERR("write_exec: Failed to kmalloc(pcol)\n");
--		ret = -ENOMEM;
--		goto err;
--	}
--
--	*pcol_copy = *pcol;
--
--	ios = pcol->ios;
--	ios->pages = pcol_copy->pages;
--	ios->done = writepages_done;
--	ios->r4w = &_r4w_op;
--	ios->private = pcol_copy;
--
--	/* pages ownership was passed to pcol_copy */
--	_pcol_reset(pcol);
--
--	ret = _maybe_not_all_in_one_io(ios, pcol_copy, pcol);
--	if (unlikely(ret))
--		goto err;
--
--	EXOFS_DBGMSG2("write_exec(0x%lx) offset=0x%llx length=0x%llx\n",
--		pcol->inode->i_ino, _LLU(ios->offset), _LLU(ios->length));
--
--	ret = ore_write(ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("write_exec: ore_write() Failed\n");
--		goto err;
--	}
--
--	atomic_inc(&pcol->sbi->s_curr_pending);
--	return 0;
--
--err:
--	if (!pcol_copy) /* Failed before ownership transfer */
--		pcol_copy = pcol;
--	_unlock_pcol_pages(pcol_copy, ret, WRITE);
--	pcol_free(pcol_copy);
--	kfree(pcol_copy);
--
--	return ret;
--}
--
--/* writepage_strip is called either directly from writepage() or by the VFS from
-- * within write_cache_pages(), to add one more page to be written to storage.
-- * It will try to collect as many contiguous pages as possible. If a
-- * discontinuity is encountered or it runs out of resources it will submit the
-- * previous segment and will start a new collection.
-- * Eventually caller must submit the last segment if present.
-- */
--static int writepage_strip(struct page *page,
--			   struct writeback_control *wbc_unused, void *data)
--{
--	struct page_collect *pcol = data;
--	struct inode *inode = pcol->inode;
--	struct exofs_i_info *oi = exofs_i(inode);
--	loff_t i_size = i_size_read(inode);
--	pgoff_t end_index = i_size >> PAGE_SHIFT;
--	size_t len;
--	int ret;
--
--	BUG_ON(!PageLocked(page));
--
--	ret = wait_obj_created(oi);
--	if (unlikely(ret))
--		goto fail;
--
--	if (page->index < end_index)
--		/* in this case, the page is within the limits of the file */
--		len = PAGE_SIZE;
--	else {
--		len = i_size & ~PAGE_MASK;
--
--		if (page->index > end_index || !len) {
--			/* in this case, the page is outside the limits
--			 * (truncate in progress)
--			 */
--			ret = write_exec(pcol);
--			if (unlikely(ret))
--				goto fail;
--			if (PageError(page))
--				ClearPageError(page);
--			unlock_page(page);
--			EXOFS_DBGMSG("writepage_strip(0x%lx, 0x%lx) "
--				     "outside the limits\n",
--				     inode->i_ino, page->index);
--			return 0;
--		}
--	}
--
--try_again:
--
--	if (unlikely(pcol->pg_first == -1)) {
--		pcol->pg_first = page->index;
--	} else if (unlikely((pcol->pg_first + pcol->nr_pages) !=
--		   page->index)) {
--		/* Discontinuity detected, split the request */
--		ret = write_exec(pcol);
--		if (unlikely(ret))
--			goto fail;
--
--		EXOFS_DBGMSG("writepage_strip(0x%lx, 0x%lx) Discontinuity\n",
--			     inode->i_ino, page->index);
--		goto try_again;
--	}
--
--	if (!pcol->pages) {
--		ret = pcol_try_alloc(pcol);
--		if (unlikely(ret))
--			goto fail;
--	}
--
--	EXOFS_DBGMSG2("    writepage_strip(0x%lx, 0x%lx) len=0x%zx\n",
--		     inode->i_ino, page->index, len);
--
--	ret = pcol_add_page(pcol, page, len);
--	if (unlikely(ret)) {
--		EXOFS_DBGMSG2("Failed pcol_add_page "
--			     "nr_pages=%u total_length=0x%lx\n",
--			     pcol->nr_pages, pcol->length);
--
--		/* split the request, next loop will start again */
--		ret = write_exec(pcol);
--		if (unlikely(ret)) {
--			EXOFS_DBGMSG("write_exec failed => %d", ret);
--			goto fail;
--		}
--
--		goto try_again;
--	}
--
--	BUG_ON(PageWriteback(page));
--	set_page_writeback(page);
--
--	return 0;
--
--fail:
--	EXOFS_DBGMSG("Error: writepage_strip(0x%lx, 0x%lx)=>%d\n",
--		     inode->i_ino, page->index, ret);
--	mapping_set_error(page->mapping, -EIO);
--	unlock_page(page);
--	return ret;
--}
--
--static int exofs_writepages(struct address_space *mapping,
--		       struct writeback_control *wbc)
--{
--	struct page_collect pcol;
--	long start, end, expected_pages;
--	int ret;
--
--	start = wbc->range_start >> PAGE_SHIFT;
--	end = (wbc->range_end == LLONG_MAX) ?
--			start + mapping->nrpages :
--			wbc->range_end >> PAGE_SHIFT;
--
--	if (start || end)
--		expected_pages = end - start + 1;
--	else
--		expected_pages = mapping->nrpages;
--
--	if (expected_pages < 32L)
--		expected_pages = 32L;
--
--	EXOFS_DBGMSG2("inode(0x%lx) wbc->start=0x%llx wbc->end=0x%llx "
--		     "nrpages=%lu start=0x%lx end=0x%lx expected_pages=%ld\n",
--		     mapping->host->i_ino, wbc->range_start, wbc->range_end,
--		     mapping->nrpages, start, end, expected_pages);
--
--	_pcol_init(&pcol, expected_pages, mapping->host);
--
--	ret = write_cache_pages(mapping, wbc, writepage_strip, &pcol);
--	if (unlikely(ret)) {
--		EXOFS_ERR("write_cache_pages => %d\n", ret);
--		return ret;
--	}
--
--	ret = write_exec(&pcol);
--	if (unlikely(ret))
--		return ret;
--
--	if (wbc->sync_mode == WB_SYNC_ALL) {
--		return write_exec(&pcol); /* pump the last reminder */
--	} else if (pcol.nr_pages) {
--		/* not SYNC let the reminder join the next writeout */
--		unsigned i;
--
--		for (i = 0; i < pcol.nr_pages; i++) {
--			struct page *page = pcol.pages[i];
--
--			end_page_writeback(page);
--			set_page_dirty(page);
--			unlock_page(page);
--		}
--	}
--	return 0;
--}
--
--/*
--static int exofs_writepage(struct page *page, struct writeback_control *wbc)
--{
--	struct page_collect pcol;
--	int ret;
--
--	_pcol_init(&pcol, 1, page->mapping->host);
--
--	ret = writepage_strip(page, NULL, &pcol);
--	if (ret) {
--		EXOFS_ERR("exofs_writepage => %d\n", ret);
--		return ret;
--	}
--
--	return write_exec(&pcol);
--}
--*/
--/* i_mutex held using inode->i_size directly */
--static void _write_failed(struct inode *inode, loff_t to)
--{
--	if (to > inode->i_size)
--		truncate_pagecache(inode, inode->i_size);
--}
--
--int exofs_write_begin(struct file *file, struct address_space *mapping,
--		loff_t pos, unsigned len, unsigned flags,
--		struct page **pagep, void **fsdata)
--{
--	int ret = 0;
--	struct page *page;
--
--	page = *pagep;
--	if (page == NULL) {
--		page = grab_cache_page_write_begin(mapping, pos >> PAGE_SHIFT,
--						   flags);
--		if (!page) {
--			EXOFS_DBGMSG("grab_cache_page_write_begin failed\n");
--			return -ENOMEM;
--		}
--		*pagep = page;
--	}
--
--	 /* read modify write */
--	if (!PageUptodate(page) && (len != PAGE_SIZE)) {
--		loff_t i_size = i_size_read(mapping->host);
--		pgoff_t end_index = i_size >> PAGE_SHIFT;
--
--		if (page->index > end_index) {
--			clear_highpage(page);
--			SetPageUptodate(page);
--		} else {
--			ret = _readpage(page, true);
--			if (ret) {
--				unlock_page(page);
--				EXOFS_DBGMSG("__readpage failed\n");
--			}
--		}
--	}
--	return ret;
--}
--
--static int exofs_write_begin_export(struct file *file,
--		struct address_space *mapping,
--		loff_t pos, unsigned len, unsigned flags,
--		struct page **pagep, void **fsdata)
--{
--	*pagep = NULL;
--
--	return exofs_write_begin(file, mapping, pos, len, flags, pagep,
--					fsdata);
--}
--
--static int exofs_write_end(struct file *file, struct address_space *mapping,
--			loff_t pos, unsigned len, unsigned copied,
--			struct page *page, void *fsdata)
--{
--	struct inode *inode = mapping->host;
--	loff_t last_pos = pos + copied;
--
--	if (!PageUptodate(page)) {
--		if (copied < len) {
--			_write_failed(inode, pos + len);
--			copied = 0;
--			goto out;
--		}
--		SetPageUptodate(page);
--	}
--	if (last_pos > inode->i_size) {
--		i_size_write(inode, last_pos);
--		mark_inode_dirty(inode);
--	}
--	set_page_dirty(page);
--out:
--	unlock_page(page);
--	put_page(page);
--	return copied;
--}
--
--static int exofs_releasepage(struct page *page, gfp_t gfp)
--{
--	EXOFS_DBGMSG("page 0x%lx\n", page->index);
--	WARN_ON(1);
--	return 0;
--}
--
--static void exofs_invalidatepage(struct page *page, unsigned int offset,
--				 unsigned int length)
--{
--	EXOFS_DBGMSG("page 0x%lx offset 0x%x length 0x%x\n",
--		     page->index, offset, length);
--	WARN_ON(1);
--}
--
--
-- /* TODO: Should be easy enough to do proprly */
--static ssize_t exofs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
--{
--	return 0;
--}
--
--const struct address_space_operations exofs_aops = {
--	.readpage	= exofs_readpage,
--	.readpages	= exofs_readpages,
--	.writepage	= NULL,
--	.writepages	= exofs_writepages,
--	.write_begin	= exofs_write_begin_export,
--	.write_end	= exofs_write_end,
--	.releasepage	= exofs_releasepage,
--	.set_page_dirty	= __set_page_dirty_nobuffers,
--	.invalidatepage = exofs_invalidatepage,
--
--	/* Not implemented Yet */
--	.bmap		= NULL, /* TODO: use osd's OSD_ACT_READ_MAP */
--	.direct_IO	= exofs_direct_IO,
--
--	/* With these NULL has special meaning or default is not exported */
--	.migratepage	= NULL,
--	.launder_page	= NULL,
--	.is_partially_uptodate = NULL,
--	.error_remove_page = NULL,
--};
--
--/******************************************************************************
-- * INODE OPERATIONS
-- *****************************************************************************/
--
--/*
-- * Test whether an inode is a fast symlink.
-- */
--static inline int exofs_inode_is_fast_symlink(struct inode *inode)
--{
--	struct exofs_i_info *oi = exofs_i(inode);
--
--	return S_ISLNK(inode->i_mode) && (oi->i_data[0] != 0);
--}
--
--static int _do_truncate(struct inode *inode, loff_t newsize)
--{
--	struct exofs_i_info *oi = exofs_i(inode);
--	struct exofs_sb_info *sbi = inode->i_sb->s_fs_info;
--	int ret;
--
--	inode->i_mtime = inode->i_ctime = current_time(inode);
--
--	ret = ore_truncate(&sbi->layout, &oi->oc, (u64)newsize);
--	if (likely(!ret))
--		truncate_setsize(inode, newsize);
--
--	EXOFS_DBGMSG2("(0x%lx) size=0x%llx ret=>%d\n",
--		     inode->i_ino, newsize, ret);
--	return ret;
--}
--
--/*
-- * Set inode attributes - update size attribute on OSD if needed,
-- *                        otherwise just call generic functions.
-- */
--int exofs_setattr(struct dentry *dentry, struct iattr *iattr)
--{
--	struct inode *inode = d_inode(dentry);
--	int error;
--
--	/* if we are about to modify an object, and it hasn't been
--	 * created yet, wait
--	 */
--	error = wait_obj_created(exofs_i(inode));
--	if (unlikely(error))
--		return error;
--
--	error = setattr_prepare(dentry, iattr);
--	if (unlikely(error))
--		return error;
--
--	if ((iattr->ia_valid & ATTR_SIZE) &&
--	    iattr->ia_size != i_size_read(inode)) {
--		error = _do_truncate(inode, iattr->ia_size);
--		if (unlikely(error))
--			return error;
--	}
--
--	setattr_copy(inode, iattr);
--	mark_inode_dirty(inode);
--	return 0;
--}
--
--static const struct osd_attr g_attr_inode_file_layout = ATTR_DEF(
--	EXOFS_APAGE_FS_DATA,
--	EXOFS_ATTR_INODE_FILE_LAYOUT,
--	0);
--static const struct osd_attr g_attr_inode_dir_layout = ATTR_DEF(
--	EXOFS_APAGE_FS_DATA,
--	EXOFS_ATTR_INODE_DIR_LAYOUT,
--	0);
--
--/*
-- * Read the Linux inode info from the OSD, and return it as is. In exofs the
-- * inode info is in an application specific page/attribute of the osd-object.
-- */
--static int exofs_get_inode(struct super_block *sb, struct exofs_i_info *oi,
--		    struct exofs_fcb *inode)
--{
--	struct exofs_sb_info *sbi = sb->s_fs_info;
--	struct osd_attr attrs[] = {
--		[0] = g_attr_inode_data,
--		[1] = g_attr_inode_file_layout,
--		[2] = g_attr_inode_dir_layout,
--	};
--	struct ore_io_state *ios;
--	struct exofs_on_disk_inode_layout *layout;
--	int ret;
--
--	ret = ore_get_io_state(&sbi->layout, &oi->oc, &ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("%s: ore_get_io_state failed.\n", __func__);
--		return ret;
--	}
--
--	attrs[1].len = exofs_on_disk_inode_layout_size(sbi->oc.numdevs);
--	attrs[2].len = exofs_on_disk_inode_layout_size(sbi->oc.numdevs);
--
--	ios->in_attr = attrs;
--	ios->in_attr_len = ARRAY_SIZE(attrs);
--
--	ret = ore_read(ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("object(0x%llx) corrupted, return empty file=>%d\n",
--			  _LLU(oi->one_comp.obj.id), ret);
--		memset(inode, 0, sizeof(*inode));
--		inode->i_mode = 0040000 | (0777 & ~022);
--		/* If object is lost on target we might as well enable it's
--		 * delete.
--		 */
--		ret = 0;
--		goto out;
--	}
--
--	ret = extract_attr_from_ios(ios, &attrs[0]);
--	if (ret) {
--		EXOFS_ERR("%s: extract_attr 0 of inode failed\n", __func__);
--		goto out;
--	}
--	WARN_ON(attrs[0].len != EXOFS_INO_ATTR_SIZE);
--	memcpy(inode, attrs[0].val_ptr, EXOFS_INO_ATTR_SIZE);
--
--	ret = extract_attr_from_ios(ios, &attrs[1]);
--	if (ret) {
--		EXOFS_ERR("%s: extract_attr 1 of inode failed\n", __func__);
--		goto out;
--	}
--	if (attrs[1].len) {
--		layout = attrs[1].val_ptr;
--		if (layout->gen_func != cpu_to_le16(LAYOUT_MOVING_WINDOW)) {
--			EXOFS_ERR("%s: unsupported files layout %d\n",
--				__func__, layout->gen_func);
--			ret = -ENOTSUPP;
--			goto out;
--		}
--	}
--
--	ret = extract_attr_from_ios(ios, &attrs[2]);
--	if (ret) {
--		EXOFS_ERR("%s: extract_attr 2 of inode failed\n", __func__);
--		goto out;
--	}
--	if (attrs[2].len) {
--		layout = attrs[2].val_ptr;
--		if (layout->gen_func != cpu_to_le16(LAYOUT_MOVING_WINDOW)) {
--			EXOFS_ERR("%s: unsupported meta-data layout %d\n",
--				__func__, layout->gen_func);
--			ret = -ENOTSUPP;
--			goto out;
--		}
--	}
--
--out:
--	ore_put_io_state(ios);
--	return ret;
--}
--
--static void __oi_init(struct exofs_i_info *oi)
--{
--	init_waitqueue_head(&oi->i_wq);
--	oi->i_flags = 0;
--}
--/*
-- * Fill in an inode read from the OSD and set it up for use
-- */
--struct inode *exofs_iget(struct super_block *sb, unsigned long ino)
--{
--	struct exofs_i_info *oi;
--	struct exofs_fcb fcb;
--	struct inode *inode;
--	int ret;
--
--	inode = iget_locked(sb, ino);
--	if (!inode)
--		return ERR_PTR(-ENOMEM);
--	if (!(inode->i_state & I_NEW))
--		return inode;
--	oi = exofs_i(inode);
--	__oi_init(oi);
--	exofs_init_comps(&oi->oc, &oi->one_comp, sb->s_fs_info,
--			 exofs_oi_objno(oi));
--
--	/* read the inode from the osd */
--	ret = exofs_get_inode(sb, oi, &fcb);
--	if (ret)
--		goto bad_inode;
--
--	set_obj_created(oi);
--
--	/* copy stuff from on-disk struct to in-memory struct */
--	inode->i_mode = le16_to_cpu(fcb.i_mode);
--	i_uid_write(inode, le32_to_cpu(fcb.i_uid));
--	i_gid_write(inode, le32_to_cpu(fcb.i_gid));
--	set_nlink(inode, le16_to_cpu(fcb.i_links_count));
--	inode->i_ctime.tv_sec = (signed)le32_to_cpu(fcb.i_ctime);
--	inode->i_atime.tv_sec = (signed)le32_to_cpu(fcb.i_atime);
--	inode->i_mtime.tv_sec = (signed)le32_to_cpu(fcb.i_mtime);
--	inode->i_ctime.tv_nsec =
--		inode->i_atime.tv_nsec = inode->i_mtime.tv_nsec = 0;
--	oi->i_commit_size = le64_to_cpu(fcb.i_size);
--	i_size_write(inode, oi->i_commit_size);
--	inode->i_blkbits = EXOFS_BLKSHIFT;
--	inode->i_generation = le32_to_cpu(fcb.i_generation);
--
--	oi->i_dir_start_lookup = 0;
--
--	if ((inode->i_nlink == 0) && (inode->i_mode == 0)) {
--		ret = -ESTALE;
--		goto bad_inode;
--	}
--
--	if (S_ISCHR(inode->i_mode) || S_ISBLK(inode->i_mode)) {
--		if (fcb.i_data[0])
--			inode->i_rdev =
--				old_decode_dev(le32_to_cpu(fcb.i_data[0]));
--		else
--			inode->i_rdev =
--				new_decode_dev(le32_to_cpu(fcb.i_data[1]));
--	} else {
--		memcpy(oi->i_data, fcb.i_data, sizeof(fcb.i_data));
--	}
--
--	if (S_ISREG(inode->i_mode)) {
--		inode->i_op = &exofs_file_inode_operations;
--		inode->i_fop = &exofs_file_operations;
--		inode->i_mapping->a_ops = &exofs_aops;
--	} else if (S_ISDIR(inode->i_mode)) {
--		inode->i_op = &exofs_dir_inode_operations;
--		inode->i_fop = &exofs_dir_operations;
--		inode->i_mapping->a_ops = &exofs_aops;
--	} else if (S_ISLNK(inode->i_mode)) {
--		if (exofs_inode_is_fast_symlink(inode)) {
--			inode->i_op = &simple_symlink_inode_operations;
--			inode->i_link = (char *)oi->i_data;
--		} else {
--			inode->i_op = &page_symlink_inode_operations;
--			inode_nohighmem(inode);
--			inode->i_mapping->a_ops = &exofs_aops;
--		}
--	} else {
--		inode->i_op = &exofs_special_inode_operations;
--		if (fcb.i_data[0])
--			init_special_inode(inode, inode->i_mode,
--			   old_decode_dev(le32_to_cpu(fcb.i_data[0])));
--		else
--			init_special_inode(inode, inode->i_mode,
--			   new_decode_dev(le32_to_cpu(fcb.i_data[1])));
--	}
--
--	unlock_new_inode(inode);
--	return inode;
--
--bad_inode:
--	iget_failed(inode);
--	return ERR_PTR(ret);
--}
--
--int __exofs_wait_obj_created(struct exofs_i_info *oi)
--{
--	if (!obj_created(oi)) {
--		EXOFS_DBGMSG("!obj_created\n");
--		BUG_ON(!obj_2bcreated(oi));
--		wait_event(oi->i_wq, obj_created(oi));
--		EXOFS_DBGMSG("wait_event done\n");
--	}
--	return unlikely(is_bad_inode(&oi->vfs_inode)) ? -EIO : 0;
--}
--
--/*
-- * Callback function from exofs_new_inode().  The important thing is that we
-- * set the obj_created flag so that other methods know that the object exists on
-- * the OSD.
-- */
--static void create_done(struct ore_io_state *ios, void *p)
--{
--	struct inode *inode = p;
--	struct exofs_i_info *oi = exofs_i(inode);
--	struct exofs_sb_info *sbi = inode->i_sb->s_fs_info;
--	int ret;
--
--	ret = ore_check_io(ios, NULL);
--	ore_put_io_state(ios);
--
--	atomic_dec(&sbi->s_curr_pending);
--
--	if (unlikely(ret)) {
--		EXOFS_ERR("object=0x%llx creation failed in pid=0x%llx",
--			  _LLU(exofs_oi_objno(oi)),
--			  _LLU(oi->one_comp.obj.partition));
--		/*TODO: When FS is corrupted creation can fail, object already
--		 * exist. Get rid of this asynchronous creation, if exist
--		 * increment the obj counter and try the next object. Until we
--		 * succeed. All these dangling objects will be made into lost
--		 * files by chkfs.exofs
--		 */
--	}
--
--	set_obj_created(oi);
--
--	wake_up(&oi->i_wq);
--}
--
--/*
-- * Set up a new inode and create an object for it on the OSD
-- */
--struct inode *exofs_new_inode(struct inode *dir, umode_t mode)
--{
--	struct super_block *sb = dir->i_sb;
--	struct exofs_sb_info *sbi = sb->s_fs_info;
--	struct inode *inode;
--	struct exofs_i_info *oi;
--	struct ore_io_state *ios;
--	int ret;
--
--	inode = new_inode(sb);
--	if (!inode)
--		return ERR_PTR(-ENOMEM);
--
--	oi = exofs_i(inode);
--	__oi_init(oi);
--
--	set_obj_2bcreated(oi);
--
--	inode_init_owner(inode, dir, mode);
--	inode->i_ino = sbi->s_nextid++;
--	inode->i_blkbits = EXOFS_BLKSHIFT;
--	inode->i_mtime = inode->i_atime = inode->i_ctime = current_time(inode);
--	oi->i_commit_size = inode->i_size = 0;
--	spin_lock(&sbi->s_next_gen_lock);
--	inode->i_generation = sbi->s_next_generation++;
--	spin_unlock(&sbi->s_next_gen_lock);
--	insert_inode_hash(inode);
--
--	exofs_init_comps(&oi->oc, &oi->one_comp, sb->s_fs_info,
--			 exofs_oi_objno(oi));
--	exofs_sbi_write_stats(sbi); /* Make sure new sbi->s_nextid is on disk */
--
--	mark_inode_dirty(inode);
--
--	ret = ore_get_io_state(&sbi->layout, &oi->oc, &ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("exofs_new_inode: ore_get_io_state failed\n");
--		return ERR_PTR(ret);
--	}
--
--	ios->done = create_done;
--	ios->private = inode;
--
--	ret = ore_create(ios);
--	if (ret) {
--		ore_put_io_state(ios);
--		return ERR_PTR(ret);
--	}
--	atomic_inc(&sbi->s_curr_pending);
--
--	return inode;
--}
--
--/*
-- * struct to pass two arguments to update_inode's callback
-- */
--struct updatei_args {
--	struct exofs_sb_info	*sbi;
--	struct exofs_fcb	fcb;
--};
--
--/*
-- * Callback function from exofs_update_inode().
-- */
--static void updatei_done(struct ore_io_state *ios, void *p)
--{
--	struct updatei_args *args = p;
--
--	ore_put_io_state(ios);
--
--	atomic_dec(&args->sbi->s_curr_pending);
--
--	kfree(args);
--}
--
--/*
-- * Write the inode to the OSD.  Just fill up the struct, and set the attribute
-- * synchronously or asynchronously depending on the do_sync flag.
-- */
--static int exofs_update_inode(struct inode *inode, int do_sync)
--{
--	struct exofs_i_info *oi = exofs_i(inode);
--	struct super_block *sb = inode->i_sb;
--	struct exofs_sb_info *sbi = sb->s_fs_info;
--	struct ore_io_state *ios;
--	struct osd_attr attr;
--	struct exofs_fcb *fcb;
--	struct updatei_args *args;
--	int ret;
--
--	args = kzalloc(sizeof(*args), GFP_KERNEL);
--	if (!args) {
--		EXOFS_DBGMSG("Failed kzalloc of args\n");
--		return -ENOMEM;
--	}
--
--	fcb = &args->fcb;
--
--	fcb->i_mode = cpu_to_le16(inode->i_mode);
--	fcb->i_uid = cpu_to_le32(i_uid_read(inode));
--	fcb->i_gid = cpu_to_le32(i_gid_read(inode));
--	fcb->i_links_count = cpu_to_le16(inode->i_nlink);
--	fcb->i_ctime = cpu_to_le32(inode->i_ctime.tv_sec);
--	fcb->i_atime = cpu_to_le32(inode->i_atime.tv_sec);
--	fcb->i_mtime = cpu_to_le32(inode->i_mtime.tv_sec);
--	oi->i_commit_size = i_size_read(inode);
--	fcb->i_size = cpu_to_le64(oi->i_commit_size);
--	fcb->i_generation = cpu_to_le32(inode->i_generation);
--
--	if (S_ISCHR(inode->i_mode) || S_ISBLK(inode->i_mode)) {
--		if (old_valid_dev(inode->i_rdev)) {
--			fcb->i_data[0] =
--				cpu_to_le32(old_encode_dev(inode->i_rdev));
--			fcb->i_data[1] = 0;
--		} else {
--			fcb->i_data[0] = 0;
--			fcb->i_data[1] =
--				cpu_to_le32(new_encode_dev(inode->i_rdev));
--			fcb->i_data[2] = 0;
--		}
--	} else
--		memcpy(fcb->i_data, oi->i_data, sizeof(fcb->i_data));
--
--	ret = ore_get_io_state(&sbi->layout, &oi->oc, &ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("%s: ore_get_io_state failed.\n", __func__);
--		goto free_args;
--	}
--
--	attr = g_attr_inode_data;
--	attr.val_ptr = fcb;
--	ios->out_attr_len = 1;
--	ios->out_attr = &attr;
--
--	wait_obj_created(oi);
--
--	if (!do_sync) {
--		args->sbi = sbi;
--		ios->done = updatei_done;
--		ios->private = args;
--	}
--
--	ret = ore_write(ios);
--	if (!do_sync && !ret) {
--		atomic_inc(&sbi->s_curr_pending);
--		goto out; /* deallocation in updatei_done */
--	}
--
--	ore_put_io_state(ios);
--free_args:
--	kfree(args);
--out:
--	EXOFS_DBGMSG("(0x%lx) do_sync=%d ret=>%d\n",
--		     inode->i_ino, do_sync, ret);
--	return ret;
--}
--
--int exofs_write_inode(struct inode *inode, struct writeback_control *wbc)
--{
--	/* FIXME: fix fsync and use wbc->sync_mode == WB_SYNC_ALL */
--	return exofs_update_inode(inode, 1);
--}
--
--/*
-- * Callback function from exofs_delete_inode() - don't have much cleaning up to
-- * do.
-- */
--static void delete_done(struct ore_io_state *ios, void *p)
--{
--	struct exofs_sb_info *sbi = p;
--
--	ore_put_io_state(ios);
--
--	atomic_dec(&sbi->s_curr_pending);
--}
--
--/*
-- * Called when the refcount of an inode reaches zero.  We remove the object
-- * from the OSD here.  We make sure the object was created before we try and
-- * delete it.
-- */
--void exofs_evict_inode(struct inode *inode)
--{
--	struct exofs_i_info *oi = exofs_i(inode);
--	struct super_block *sb = inode->i_sb;
--	struct exofs_sb_info *sbi = sb->s_fs_info;
--	struct ore_io_state *ios;
--	int ret;
--
--	truncate_inode_pages_final(&inode->i_data);
--
--	/* TODO: should do better here */
--	if (inode->i_nlink || is_bad_inode(inode))
--		goto no_delete;
--
--	inode->i_size = 0;
--	clear_inode(inode);
--
--	/* if we are deleting an obj that hasn't been created yet, wait.
--	 * This also makes sure that create_done cannot be called with an
--	 * already evicted inode.
--	 */
--	wait_obj_created(oi);
--	/* ignore the error, attempt a remove anyway */
--
--	/* Now Remove the OSD objects */
--	ret = ore_get_io_state(&sbi->layout, &oi->oc, &ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("%s: ore_get_io_state failed\n", __func__);
--		return;
--	}
--
--	ios->done = delete_done;
--	ios->private = sbi;
--
--	ret = ore_remove(ios);
--	if (ret) {
--		EXOFS_ERR("%s: ore_remove failed\n", __func__);
--		ore_put_io_state(ios);
--		return;
--	}
--	atomic_inc(&sbi->s_curr_pending);
--
--	return;
--
--no_delete:
--	clear_inode(inode);
--}
-diff --git a/fs/exofs/namei.c b/fs/exofs/namei.c
-deleted file mode 100644
-index 7295cd722770..000000000000
---- a/fs/exofs/namei.c
-+++ /dev/null
-@@ -1,323 +0,0 @@
--/*
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * Copyrights for code taken from ext2:
-- *     Copyright (C) 1992, 1993, 1994, 1995
-- *     Remy Card (card@masi.ibp.fr)
-- *     Laboratoire MASI - Institut Blaise Pascal
-- *     Universite Pierre et Marie Curie (Paris VI)
-- *     from
-- *     linux/fs/minix/inode.c
-- *     Copyright (C) 1991, 1992  Linus Torvalds
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--
--#include "exofs.h"
--
--static inline int exofs_add_nondir(struct dentry *dentry, struct inode *inode)
--{
--	int err = exofs_add_link(dentry, inode);
--	if (!err) {
--		d_instantiate(dentry, inode);
--		return 0;
--	}
--	inode_dec_link_count(inode);
--	iput(inode);
--	return err;
--}
--
--static struct dentry *exofs_lookup(struct inode *dir, struct dentry *dentry,
--				   unsigned int flags)
--{
--	struct inode *inode;
--	ino_t ino;
--
--	if (dentry->d_name.len > EXOFS_NAME_LEN)
--		return ERR_PTR(-ENAMETOOLONG);
--
--	ino = exofs_inode_by_name(dir, dentry);
--	inode = ino ? exofs_iget(dir->i_sb, ino) : NULL;
--	return d_splice_alias(inode, dentry);
--}
--
--static int exofs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
--			 bool excl)
--{
--	struct inode *inode = exofs_new_inode(dir, mode);
--	int err = PTR_ERR(inode);
--	if (!IS_ERR(inode)) {
--		inode->i_op = &exofs_file_inode_operations;
--		inode->i_fop = &exofs_file_operations;
--		inode->i_mapping->a_ops = &exofs_aops;
--		mark_inode_dirty(inode);
--		err = exofs_add_nondir(dentry, inode);
--	}
--	return err;
--}
--
--static int exofs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode,
--		       dev_t rdev)
--{
--	struct inode *inode;
--	int err;
--
--	inode = exofs_new_inode(dir, mode);
--	err = PTR_ERR(inode);
--	if (!IS_ERR(inode)) {
--		init_special_inode(inode, inode->i_mode, rdev);
--		mark_inode_dirty(inode);
--		err = exofs_add_nondir(dentry, inode);
--	}
--	return err;
--}
--
--static int exofs_symlink(struct inode *dir, struct dentry *dentry,
--			  const char *symname)
--{
--	struct super_block *sb = dir->i_sb;
--	int err = -ENAMETOOLONG;
--	unsigned l = strlen(symname)+1;
--	struct inode *inode;
--	struct exofs_i_info *oi;
--
--	if (l > sb->s_blocksize)
--		goto out;
--
--	inode = exofs_new_inode(dir, S_IFLNK | S_IRWXUGO);
--	err = PTR_ERR(inode);
--	if (IS_ERR(inode))
--		goto out;
--
--	oi = exofs_i(inode);
--	if (l > sizeof(oi->i_data)) {
--		/* slow symlink */
--		inode->i_op = &page_symlink_inode_operations;
--		inode_nohighmem(inode);
--		inode->i_mapping->a_ops = &exofs_aops;
--		memset(oi->i_data, 0, sizeof(oi->i_data));
--
--		err = page_symlink(inode, symname, l);
--		if (err)
--			goto out_fail;
--	} else {
--		/* fast symlink */
--		inode->i_op = &simple_symlink_inode_operations;
--		inode->i_link = (char *)oi->i_data;
--		memcpy(oi->i_data, symname, l);
--		inode->i_size = l-1;
--	}
--	mark_inode_dirty(inode);
--
--	err = exofs_add_nondir(dentry, inode);
--out:
--	return err;
--
--out_fail:
--	inode_dec_link_count(inode);
--	iput(inode);
--	goto out;
--}
--
--static int exofs_link(struct dentry *old_dentry, struct inode *dir,
--		struct dentry *dentry)
--{
--	struct inode *inode = d_inode(old_dentry);
--
--	inode->i_ctime = current_time(inode);
--	inode_inc_link_count(inode);
--	ihold(inode);
--
--	return exofs_add_nondir(dentry, inode);
--}
--
--static int exofs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode)
--{
--	struct inode *inode;
--	int err;
--
--	inode_inc_link_count(dir);
--
--	inode = exofs_new_inode(dir, S_IFDIR | mode);
--	err = PTR_ERR(inode);
--	if (IS_ERR(inode))
--		goto out_dir;
--
--	inode->i_op = &exofs_dir_inode_operations;
--	inode->i_fop = &exofs_dir_operations;
--	inode->i_mapping->a_ops = &exofs_aops;
--
--	inode_inc_link_count(inode);
--
--	err = exofs_make_empty(inode, dir);
--	if (err)
--		goto out_fail;
--
--	err = exofs_add_link(dentry, inode);
--	if (err)
--		goto out_fail;
--
--	d_instantiate(dentry, inode);
--out:
--	return err;
--
--out_fail:
--	inode_dec_link_count(inode);
--	inode_dec_link_count(inode);
--	iput(inode);
--out_dir:
--	inode_dec_link_count(dir);
--	goto out;
--}
--
--static int exofs_unlink(struct inode *dir, struct dentry *dentry)
--{
--	struct inode *inode = d_inode(dentry);
--	struct exofs_dir_entry *de;
--	struct page *page;
--	int err = -ENOENT;
--
--	de = exofs_find_entry(dir, dentry, &page);
--	if (!de)
--		goto out;
--
--	err = exofs_delete_entry(de, page);
--	if (err)
--		goto out;
--
--	inode->i_ctime = dir->i_ctime;
--	inode_dec_link_count(inode);
--	err = 0;
--out:
--	return err;
--}
--
--static int exofs_rmdir(struct inode *dir, struct dentry *dentry)
--{
--	struct inode *inode = d_inode(dentry);
--	int err = -ENOTEMPTY;
--
--	if (exofs_empty_dir(inode)) {
--		err = exofs_unlink(dir, dentry);
--		if (!err) {
--			inode->i_size = 0;
--			inode_dec_link_count(inode);
--			inode_dec_link_count(dir);
--		}
--	}
--	return err;
--}
--
--static int exofs_rename(struct inode *old_dir, struct dentry *old_dentry,
--			struct inode *new_dir, struct dentry *new_dentry,
--			unsigned int flags)
--{
--	struct inode *old_inode = d_inode(old_dentry);
--	struct inode *new_inode = d_inode(new_dentry);
--	struct page *dir_page = NULL;
--	struct exofs_dir_entry *dir_de = NULL;
--	struct page *old_page;
--	struct exofs_dir_entry *old_de;
--	int err = -ENOENT;
--
--	if (flags & ~RENAME_NOREPLACE)
--		return -EINVAL;
--
--	old_de = exofs_find_entry(old_dir, old_dentry, &old_page);
--	if (!old_de)
--		goto out;
--
--	if (S_ISDIR(old_inode->i_mode)) {
--		err = -EIO;
--		dir_de = exofs_dotdot(old_inode, &dir_page);
--		if (!dir_de)
--			goto out_old;
--	}
--
--	if (new_inode) {
--		struct page *new_page;
--		struct exofs_dir_entry *new_de;
--
--		err = -ENOTEMPTY;
--		if (dir_de && !exofs_empty_dir(new_inode))
--			goto out_dir;
--
--		err = -ENOENT;
--		new_de = exofs_find_entry(new_dir, new_dentry, &new_page);
--		if (!new_de)
--			goto out_dir;
--		err = exofs_set_link(new_dir, new_de, new_page, old_inode);
--		new_inode->i_ctime = current_time(new_inode);
--		if (dir_de)
--			drop_nlink(new_inode);
--		inode_dec_link_count(new_inode);
--		if (err)
--			goto out_dir;
--	} else {
--		err = exofs_add_link(new_dentry, old_inode);
--		if (err)
--			goto out_dir;
--		if (dir_de)
--			inode_inc_link_count(new_dir);
--	}
--
--	old_inode->i_ctime = current_time(old_inode);
--
--	exofs_delete_entry(old_de, old_page);
--	mark_inode_dirty(old_inode);
--
--	if (dir_de) {
--		err = exofs_set_link(old_inode, dir_de, dir_page, new_dir);
--		inode_dec_link_count(old_dir);
--		if (err)
--			goto out_dir;
--	}
--	return 0;
--
--
--out_dir:
--	if (dir_de) {
--		kunmap(dir_page);
--		put_page(dir_page);
--	}
--out_old:
--	kunmap(old_page);
--	put_page(old_page);
--out:
--	return err;
--}
--
--const struct inode_operations exofs_dir_inode_operations = {
--	.create 	= exofs_create,
--	.lookup 	= exofs_lookup,
--	.link   	= exofs_link,
--	.unlink 	= exofs_unlink,
--	.symlink	= exofs_symlink,
--	.mkdir  	= exofs_mkdir,
--	.rmdir  	= exofs_rmdir,
--	.mknod  	= exofs_mknod,
--	.rename		= exofs_rename,
--	.setattr	= exofs_setattr,
--};
--
--const struct inode_operations exofs_special_inode_operations = {
--	.setattr	= exofs_setattr,
--};
-diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
-deleted file mode 100644
-index 8bb72807e70d..000000000000
---- a/fs/exofs/ore.c
-+++ /dev/null
-@@ -1,1164 +0,0 @@
--/*
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--
--#include <linux/slab.h>
--#include <linux/module.h>
--#include <asm/div64.h>
--#include <linux/lcm.h>
--
--#include "ore_raid.h"
--
--MODULE_AUTHOR("Boaz Harrosh <ooo@electrozaur.com>");
--MODULE_DESCRIPTION("Objects Raid Engine ore.ko");
--MODULE_LICENSE("GPL");
--
--/* ore_verify_layout does a couple of things:
-- * 1. Given a minimum number of needed parameters fixes up the rest of the
-- *    members to be operatonals for the ore. The needed parameters are those
-- *    that are defined by the pnfs-objects layout STD.
-- * 2. Check to see if the current ore code actually supports these parameters
-- *    for example stripe_unit must be a multple of the system PAGE_SIZE,
-- *    and etc...
-- * 3. Cache some havily used calculations that will be needed by users.
-- */
--
--enum { BIO_MAX_PAGES_KMALLOC =
--		(PAGE_SIZE - sizeof(struct bio)) / sizeof(struct bio_vec),};
--
--int ore_verify_layout(unsigned total_comps, struct ore_layout *layout)
--{
--	u64 stripe_length;
--
--	switch (layout->raid_algorithm) {
--	case PNFS_OSD_RAID_0:
--		layout->parity = 0;
--		break;
--	case PNFS_OSD_RAID_5:
--		layout->parity = 1;
--		break;
--	case PNFS_OSD_RAID_PQ:
--		layout->parity = 2;
--		break;
--	case PNFS_OSD_RAID_4:
--	default:
--		ORE_ERR("Only RAID_0/5/6 for now received-enum=%d\n",
--			layout->raid_algorithm);
--		return -EINVAL;
--	}
--	if (0 != (layout->stripe_unit & ~PAGE_MASK)) {
--		ORE_ERR("Stripe Unit(0x%llx)"
--			  " must be Multples of PAGE_SIZE(0x%lx)\n",
--			  _LLU(layout->stripe_unit), PAGE_SIZE);
--		return -EINVAL;
--	}
--	if (layout->group_width) {
--		if (!layout->group_depth) {
--			ORE_ERR("group_depth == 0 && group_width != 0\n");
--			return -EINVAL;
--		}
--		if (total_comps < (layout->group_width * layout->mirrors_p1)) {
--			ORE_ERR("Data Map wrong, "
--				"numdevs=%d < group_width=%d * mirrors=%d\n",
--				total_comps, layout->group_width,
--				layout->mirrors_p1);
--			return -EINVAL;
--		}
--		layout->group_count = total_comps / layout->mirrors_p1 /
--						layout->group_width;
--	} else {
--		if (layout->group_depth) {
--			printk(KERN_NOTICE "Warning: group_depth ignored "
--				"group_width == 0 && group_depth == %lld\n",
--				_LLU(layout->group_depth));
--		}
--		layout->group_width = total_comps / layout->mirrors_p1;
--		layout->group_depth = -1;
--		layout->group_count = 1;
--	}
--
--	stripe_length = (u64)layout->group_width * layout->stripe_unit;
--	if (stripe_length >= (1ULL << 32)) {
--		ORE_ERR("Stripe_length(0x%llx) >= 32bit is not supported\n",
--			_LLU(stripe_length));
--		return -EINVAL;
--	}
--
--	layout->max_io_length =
--		(BIO_MAX_PAGES_KMALLOC * PAGE_SIZE - layout->stripe_unit) *
--					(layout->group_width - layout->parity);
--	if (layout->parity) {
--		unsigned stripe_length =
--				(layout->group_width - layout->parity) *
--				layout->stripe_unit;
--
--		layout->max_io_length /= stripe_length;
--		layout->max_io_length *= stripe_length;
--	}
--	ORE_DBGMSG("max_io_length=0x%lx\n", layout->max_io_length);
--
--	return 0;
--}
--EXPORT_SYMBOL(ore_verify_layout);
--
--static u8 *_ios_cred(struct ore_io_state *ios, unsigned index)
--{
--	return ios->oc->comps[index & ios->oc->single_comp].cred;
--}
--
--static struct osd_obj_id *_ios_obj(struct ore_io_state *ios, unsigned index)
--{
--	return &ios->oc->comps[index & ios->oc->single_comp].obj;
--}
--
--static struct osd_dev *_ios_od(struct ore_io_state *ios, unsigned index)
--{
--	ORE_DBGMSG2("oc->first_dev=%d oc->numdevs=%d i=%d oc->ods=%p\n",
--		    ios->oc->first_dev, ios->oc->numdevs, index,
--		    ios->oc->ods);
--
--	return ore_comp_dev(ios->oc, index);
--}
--
--int  _ore_get_io_state(struct ore_layout *layout,
--			struct ore_components *oc, unsigned numdevs,
--			unsigned sgs_per_dev, unsigned num_par_pages,
--			struct ore_io_state **pios)
--{
--	struct ore_io_state *ios;
--	struct page **pages;
--	struct osd_sg_entry *sgilist;
--	struct __alloc_all_io_state {
--		struct ore_io_state ios;
--		struct ore_per_dev_state per_dev[numdevs];
--		union {
--			struct osd_sg_entry sglist[sgs_per_dev * numdevs];
--			struct page *pages[num_par_pages];
--		};
--	} *_aios;
--
--	if (likely(sizeof(*_aios) <= PAGE_SIZE)) {
--		_aios = kzalloc(sizeof(*_aios), GFP_KERNEL);
--		if (unlikely(!_aios)) {
--			ORE_DBGMSG("Failed kzalloc bytes=%zd\n",
--				   sizeof(*_aios));
--			*pios = NULL;
--			return -ENOMEM;
--		}
--		pages = num_par_pages ? _aios->pages : NULL;
--		sgilist = sgs_per_dev ? _aios->sglist : NULL;
--		ios = &_aios->ios;
--	} else {
--		struct __alloc_small_io_state {
--			struct ore_io_state ios;
--			struct ore_per_dev_state per_dev[numdevs];
--		} *_aio_small;
--		union __extra_part {
--			struct osd_sg_entry sglist[sgs_per_dev * numdevs];
--			struct page *pages[num_par_pages];
--		} *extra_part;
--
--		_aio_small = kzalloc(sizeof(*_aio_small), GFP_KERNEL);
--		if (unlikely(!_aio_small)) {
--			ORE_DBGMSG("Failed alloc first part bytes=%zd\n",
--				   sizeof(*_aio_small));
--			*pios = NULL;
--			return -ENOMEM;
--		}
--		extra_part = kzalloc(sizeof(*extra_part), GFP_KERNEL);
--		if (unlikely(!extra_part)) {
--			ORE_DBGMSG("Failed alloc second part bytes=%zd\n",
--				   sizeof(*extra_part));
--			kfree(_aio_small);
--			*pios = NULL;
--			return -ENOMEM;
--		}
--
--		pages = num_par_pages ? extra_part->pages : NULL;
--		sgilist = sgs_per_dev ? extra_part->sglist : NULL;
--		/* In this case the per_dev[0].sgilist holds the pointer to
--		 * be freed
--		 */
--		ios = &_aio_small->ios;
--		ios->extra_part_alloc = true;
--	}
--
--	if (pages) {
--		ios->parity_pages = pages;
--		ios->max_par_pages = num_par_pages;
--	}
--	if (sgilist) {
--		unsigned d;
--
--		for (d = 0; d < numdevs; ++d) {
--			ios->per_dev[d].sglist = sgilist;
--			sgilist += sgs_per_dev;
--		}
--		ios->sgs_per_dev = sgs_per_dev;
--	}
--
--	ios->layout = layout;
--	ios->oc = oc;
--	*pios = ios;
--	return 0;
--}
--
--/* Allocate an io_state for only a single group of devices
-- *
-- * If a user needs to call ore_read/write() this version must be used becase it
-- * allocates extra stuff for striping and raid.
-- * The ore might decide to only IO less then @length bytes do to alignmets
-- * and constrains as follows:
-- * - The IO cannot cross group boundary.
-- * - In raid5/6 The end of the IO must align at end of a stripe eg.
-- *   (@offset + @length) % strip_size == 0. Or the complete range is within a
-- *   single stripe.
-- * - Memory condition only permitted a shorter IO. (A user can use @length=~0
-- *   And check the returned ios->length for max_io_size.)
-- *
-- * The caller must check returned ios->length (and/or ios->nr_pages) and
-- * re-issue these pages that fall outside of ios->length
-- */
--int  ore_get_rw_state(struct ore_layout *layout, struct ore_components *oc,
--		      bool is_reading, u64 offset, u64 length,
--		      struct ore_io_state **pios)
--{
--	struct ore_io_state *ios;
--	unsigned numdevs = layout->group_width * layout->mirrors_p1;
--	unsigned sgs_per_dev = 0, max_par_pages = 0;
--	int ret;
--
--	if (layout->parity && length) {
--		unsigned data_devs = layout->group_width - layout->parity;
--		unsigned stripe_size = layout->stripe_unit * data_devs;
--		unsigned pages_in_unit = layout->stripe_unit / PAGE_SIZE;
--		u32 remainder;
--		u64 num_stripes;
--		u64 num_raid_units;
--
--		num_stripes = div_u64_rem(length, stripe_size, &remainder);
--		if (remainder)
--			++num_stripes;
--
--		num_raid_units =  num_stripes * layout->parity;
--
--		if (is_reading) {
--			/* For reads add per_dev sglist array */
--			/* TODO: Raid 6 we need twice more. Actually:
--			*         num_stripes / LCMdP(W,P);
--			*         if (W%P != 0) num_stripes *= parity;
--			*/
--
--			/* first/last seg is split */
--			num_raid_units += layout->group_width;
--			sgs_per_dev = div_u64(num_raid_units, data_devs) + 2;
--		} else {
--			/* For Writes add parity pages array. */
--			max_par_pages = num_raid_units * pages_in_unit *
--						sizeof(struct page *);
--		}
--	}
--
--	ret = _ore_get_io_state(layout, oc, numdevs, sgs_per_dev, max_par_pages,
--				pios);
--	if (unlikely(ret))
--		return ret;
--
--	ios = *pios;
--	ios->reading = is_reading;
--	ios->offset = offset;
--
--	if (length) {
--		ore_calc_stripe_info(layout, offset, length, &ios->si);
--		ios->length = ios->si.length;
--		ios->nr_pages = ((ios->offset & (PAGE_SIZE - 1)) +
--				 ios->length + PAGE_SIZE - 1) / PAGE_SIZE;
--		if (layout->parity)
--			_ore_post_alloc_raid_stuff(ios);
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL(ore_get_rw_state);
--
--/* Allocate an io_state for all the devices in the comps array
-- *
-- * This version of io_state allocation is used mostly by create/remove
-- * and trunc where we currently need all the devices. The only wastful
-- * bit is the read/write_attributes with no IO. Those sites should
-- * be converted to use ore_get_rw_state() with length=0
-- */
--int  ore_get_io_state(struct ore_layout *layout, struct ore_components *oc,
--		      struct ore_io_state **pios)
--{
--	return _ore_get_io_state(layout, oc, oc->numdevs, 0, 0, pios);
--}
--EXPORT_SYMBOL(ore_get_io_state);
--
--void ore_put_io_state(struct ore_io_state *ios)
--{
--	if (ios) {
--		unsigned i;
--
--		for (i = 0; i < ios->numdevs; i++) {
--			struct ore_per_dev_state *per_dev = &ios->per_dev[i];
--
--			if (per_dev->or)
--				osd_end_request(per_dev->or);
--			if (per_dev->bio)
--				bio_put(per_dev->bio);
--		}
--
--		_ore_free_raid_stuff(ios);
--		kfree(ios);
--	}
--}
--EXPORT_SYMBOL(ore_put_io_state);
--
--static void _sync_done(struct ore_io_state *ios, void *p)
--{
--	struct completion *waiting = p;
--
--	complete(waiting);
--}
--
--static void _last_io(struct kref *kref)
--{
--	struct ore_io_state *ios = container_of(
--					kref, struct ore_io_state, kref);
--
--	ios->done(ios, ios->private);
--}
--
--static void _done_io(struct osd_request *or, void *p)
--{
--	struct ore_io_state *ios = p;
--
--	kref_put(&ios->kref, _last_io);
--}
--
--int ore_io_execute(struct ore_io_state *ios)
--{
--	DECLARE_COMPLETION_ONSTACK(wait);
--	bool sync = (ios->done == NULL);
--	int i, ret;
--
--	if (sync) {
--		ios->done = _sync_done;
--		ios->private = &wait;
--	}
--
--	for (i = 0; i < ios->numdevs; i++) {
--		struct osd_request *or = ios->per_dev[i].or;
--		if (unlikely(!or))
--			continue;
--
--		ret = osd_finalize_request(or, 0, _ios_cred(ios, i), NULL);
--		if (unlikely(ret)) {
--			ORE_DBGMSG("Failed to osd_finalize_request() => %d\n",
--				     ret);
--			return ret;
--		}
--	}
--
--	kref_init(&ios->kref);
--
--	for (i = 0; i < ios->numdevs; i++) {
--		struct osd_request *or = ios->per_dev[i].or;
--		if (unlikely(!or))
--			continue;
--
--		kref_get(&ios->kref);
--		osd_execute_request_async(or, _done_io, ios);
--	}
--
--	kref_put(&ios->kref, _last_io);
--	ret = 0;
--
--	if (sync) {
--		wait_for_completion(&wait);
--		ret = ore_check_io(ios, NULL);
--	}
--	return ret;
--}
--
--static void _clear_bio(struct bio *bio)
--{
--	struct bio_vec *bv;
--	unsigned i;
--
--	bio_for_each_segment_all(bv, bio, i) {
--		unsigned this_count = bv->bv_len;
--
--		if (likely(PAGE_SIZE == this_count))
--			clear_highpage(bv->bv_page);
--		else
--			zero_user(bv->bv_page, bv->bv_offset, this_count);
--	}
--}
--
--int ore_check_io(struct ore_io_state *ios, ore_on_dev_error on_dev_error)
--{
--	enum osd_err_priority acumulated_osd_err = 0;
--	int acumulated_lin_err = 0;
--	int i;
--
--	for (i = 0; i < ios->numdevs; i++) {
--		struct osd_sense_info osi;
--		struct ore_per_dev_state *per_dev = &ios->per_dev[i];
--		struct osd_request *or = per_dev->or;
--		int ret;
--
--		if (unlikely(!or))
--			continue;
--
--		ret = osd_req_decode_sense(or, &osi);
--		if (likely(!ret))
--			continue;
--
--		if ((OSD_ERR_PRI_CLEAR_PAGES == osi.osd_err_pri) &&
--		    per_dev->bio) {
--			/* start read offset passed endof file.
--			 * Note: if we do not have bio it means read-attributes
--			 * In this case we should return error to caller.
--			 */
--			_clear_bio(per_dev->bio);
--			ORE_DBGMSG("start read offset passed end of file "
--				"offset=0x%llx, length=0x%llx\n",
--				_LLU(per_dev->offset),
--				_LLU(per_dev->length));
--
--			continue; /* we recovered */
--		}
--
--		if (on_dev_error) {
--			u64 residual = ios->reading ?
--					or->in.residual : or->out.residual;
--			u64 offset = (ios->offset + ios->length) - residual;
--			unsigned dev = per_dev->dev - ios->oc->first_dev;
--			struct ore_dev *od = ios->oc->ods[dev];
--
--			on_dev_error(ios, od, dev, osi.osd_err_pri,
--				     offset, residual);
--		}
--		if (osi.osd_err_pri >= acumulated_osd_err) {
--			acumulated_osd_err = osi.osd_err_pri;
--			acumulated_lin_err = ret;
--		}
--	}
--
--	return acumulated_lin_err;
--}
--EXPORT_SYMBOL(ore_check_io);
--
--/*
-- * L - logical offset into the file
-- *
-- * D - number of Data devices
-- *	D = group_width - parity
-- *
-- * U - The number of bytes in a stripe within a group
-- *	U =  stripe_unit * D
-- *
-- * T - The number of bytes striped within a group of component objects
-- *     (before advancing to the next group)
-- *	T = U * group_depth
-- *
-- * S - The number of bytes striped across all component objects
-- *     before the pattern repeats
-- *	S = T * group_count
-- *
-- * M - The "major" (i.e., across all components) cycle number
-- *	M = L / S
-- *
-- * G - Counts the groups from the beginning of the major cycle
-- *	G = (L - (M * S)) / T	[or (L % S) / T]
-- *
-- * H - The byte offset within the group
-- *	H = (L - (M * S)) % T	[or (L % S) % T]
-- *
-- * N - The "minor" (i.e., across the group) stripe number
-- *	N = H / U
-- *
-- * C - The component index coresponding to L
-- *
-- *	C = (H - (N * U)) / stripe_unit + G * D
-- *	[or (L % U) / stripe_unit + G * D]
-- *
-- * O - The component offset coresponding to L
-- *	O = L % stripe_unit + N * stripe_unit + M * group_depth * stripe_unit
-- *
-- * LCMdP – Parity cycle: Lowest Common Multiple of group_width, parity
-- *          divide by parity
-- *	LCMdP = lcm(group_width, parity) / parity
-- *
-- * R - The parity Rotation stripe
-- *     (Note parity cycle always starts at a group's boundary)
-- *	R = N % LCMdP
-- *
-- * I = the first parity device index
-- *	I = (group_width + group_width - R*parity - parity) % group_width
-- *
-- * Craid - The component index Rotated
-- *	Craid = (group_width + C - R*parity) % group_width
-- *      (We add the group_width to avoid negative numbers modulo math)
-- */
--void ore_calc_stripe_info(struct ore_layout *layout, u64 file_offset,
--			  u64 length, struct ore_striping_info *si)
--{
--	u32	stripe_unit = layout->stripe_unit;
--	u32	group_width = layout->group_width;
--	u64	group_depth = layout->group_depth;
--	u32	parity      = layout->parity;
--
--	u32	D = group_width - parity;
--	u32	U = D * stripe_unit;
--	u64	T = U * group_depth;
--	u64	S = T * layout->group_count;
--	u64	M = div64_u64(file_offset, S);
--
--	/*
--	G = (L - (M * S)) / T
--	H = (L - (M * S)) % T
--	*/
--	u64	LmodS = file_offset - M * S;
--	u32	G = div64_u64(LmodS, T);
--	u64	H = LmodS - G * T;
--
--	u32	N = div_u64(H, U);
--	u32	Nlast;
--
--	/* "H - (N * U)" is just "H % U" so it's bound to u32 */
--	u32	C = (u32)(H - (N * U)) / stripe_unit + G * group_width;
--	u32 first_dev = C - C % group_width;
--
--	div_u64_rem(file_offset, stripe_unit, &si->unit_off);
--
--	si->obj_offset = si->unit_off + (N * stripe_unit) +
--				  (M * group_depth * stripe_unit);
--	si->cur_comp = C - first_dev;
--	si->cur_pg = si->unit_off / PAGE_SIZE;
--
--	if (parity) {
--		u32 LCMdP = lcm(group_width, parity) / parity;
--		/* R     = N % LCMdP; */
--		u32 RxP   = (N % LCMdP) * parity;
--
--		si->par_dev = (group_width + group_width - parity - RxP) %
--			      group_width + first_dev;
--		si->dev = (group_width + group_width + C - RxP) %
--			  group_width + first_dev;
--		si->bytes_in_stripe = U;
--		si->first_stripe_start = M * S + G * T + N * U;
--	} else {
--		/* Make the math correct see _prepare_one_group */
--		si->par_dev = group_width;
--		si->dev = C;
--	}
--
--	si->dev *= layout->mirrors_p1;
--	si->par_dev *= layout->mirrors_p1;
--	si->offset = file_offset;
--	si->length = T - H;
--	if (si->length > length)
--		si->length = length;
--
--	Nlast = div_u64(H + si->length + U - 1, U);
--	si->maxdevUnits = Nlast - N;
--
--	si->M = M;
--}
--EXPORT_SYMBOL(ore_calc_stripe_info);
--
--int _ore_add_stripe_unit(struct ore_io_state *ios,  unsigned *cur_pg,
--			 unsigned pgbase, struct page **pages,
--			 struct ore_per_dev_state *per_dev, int cur_len)
--{
--	unsigned pg = *cur_pg;
--	struct request_queue *q =
--			osd_request_queue(_ios_od(ios, per_dev->dev));
--	unsigned len = cur_len;
--	int ret;
--
--	if (per_dev->bio == NULL) {
--		unsigned bio_size;
--
--		if (!ios->reading) {
--			bio_size = ios->si.maxdevUnits;
--		} else {
--			bio_size = (ios->si.maxdevUnits + 1) *
--			     (ios->layout->group_width - ios->layout->parity) /
--			     ios->layout->group_width;
--		}
--		bio_size *= (ios->layout->stripe_unit / PAGE_SIZE);
--
--		per_dev->bio = bio_kmalloc(GFP_KERNEL, bio_size);
--		if (unlikely(!per_dev->bio)) {
--			ORE_DBGMSG("Failed to allocate BIO size=%u\n",
--				     bio_size);
--			ret = -ENOMEM;
--			goto out;
--		}
--	}
--
--	while (cur_len > 0) {
--		unsigned pglen = min_t(unsigned, PAGE_SIZE - pgbase, cur_len);
--		unsigned added_len;
--
--		cur_len -= pglen;
--
--		added_len = bio_add_pc_page(q, per_dev->bio, pages[pg],
--					    pglen, pgbase);
--		if (unlikely(pglen != added_len)) {
--			/* If bi_vcnt == bi_max then this is a SW BUG */
--			ORE_DBGMSG("Failed bio_add_pc_page bi_vcnt=0x%x "
--				   "bi_max=0x%x BIO_MAX=0x%x cur_len=0x%x\n",
--				   per_dev->bio->bi_vcnt,
--				   per_dev->bio->bi_max_vecs,
--				   BIO_MAX_PAGES_KMALLOC, cur_len);
--			ret = -ENOMEM;
--			goto out;
--		}
--		_add_stripe_page(ios->sp2d, &ios->si, pages[pg]);
--
--		pgbase = 0;
--		++pg;
--	}
--	BUG_ON(cur_len);
--
--	per_dev->length += len;
--	*cur_pg = pg;
--	ret = 0;
--out:	/* we fail the complete unit on an error eg don't advance
--	 * per_dev->length and cur_pg. This means that we might have a bigger
--	 * bio than the CDB requested length (per_dev->length). That's fine
--	 * only the oposite is fatal.
--	 */
--	return ret;
--}
--
--static int _add_parity_units(struct ore_io_state *ios,
--			     struct ore_striping_info *si,
--			     unsigned dev, unsigned first_dev,
--			     unsigned mirrors_p1, unsigned devs_in_group,
--			     unsigned cur_len)
--{
--	unsigned do_parity;
--	int ret = 0;
--
--	for (do_parity = ios->layout->parity; do_parity; --do_parity) {
--		struct ore_per_dev_state *per_dev;
--
--		per_dev = &ios->per_dev[dev - first_dev];
--		if (!per_dev->length && !per_dev->offset) {
--			/* Only/always the parity unit of the first
--			 * stripe will be empty. So this is a chance to
--			 * initialize the per_dev info.
--			 */
--			per_dev->dev = dev;
--			per_dev->offset = si->obj_offset - si->unit_off;
--		}
--
--		ret = _ore_add_parity_unit(ios, si, per_dev, cur_len,
--					   do_parity == 1);
--		if (unlikely(ret))
--				break;
--
--		if (do_parity != 1) {
--			dev = ((dev + mirrors_p1) % devs_in_group) + first_dev;
--			si->cur_comp = (si->cur_comp + 1) %
--						       ios->layout->group_width;
--		}
--	}
--
--	return ret;
--}
--
--static int _prepare_for_striping(struct ore_io_state *ios)
--{
--	struct ore_striping_info *si = &ios->si;
--	unsigned stripe_unit = ios->layout->stripe_unit;
--	unsigned mirrors_p1 = ios->layout->mirrors_p1;
--	unsigned group_width = ios->layout->group_width;
--	unsigned devs_in_group = group_width * mirrors_p1;
--	unsigned dev = si->dev;
--	unsigned first_dev = dev - (dev % devs_in_group);
--	unsigned cur_pg = ios->pages_consumed;
--	u64 length = ios->length;
--	int ret = 0;
--
--	if (!ios->pages) {
--		ios->numdevs = ios->layout->mirrors_p1;
--		return 0;
--	}
--
--	BUG_ON(length > si->length);
--
--	while (length) {
--		struct ore_per_dev_state *per_dev =
--						&ios->per_dev[dev - first_dev];
--		unsigned cur_len, page_off = 0;
--
--		if (!per_dev->length && !per_dev->offset) {
--			/* First time initialize the per_dev info. */
--			per_dev->dev = dev;
--			if (dev == si->dev) {
--				WARN_ON(dev == si->par_dev);
--				per_dev->offset = si->obj_offset;
--				cur_len = stripe_unit - si->unit_off;
--				page_off = si->unit_off & ~PAGE_MASK;
--				BUG_ON(page_off && (page_off != ios->pgbase));
--			} else {
--				per_dev->offset = si->obj_offset - si->unit_off;
--				cur_len = stripe_unit;
--			}
--		} else {
--			cur_len = stripe_unit;
--		}
--		if (cur_len >= length)
--			cur_len = length;
--
--		ret = _ore_add_stripe_unit(ios, &cur_pg, page_off, ios->pages,
--					   per_dev, cur_len);
--		if (unlikely(ret))
--			goto out;
--
--		length -= cur_len;
--
--		dev = ((dev + mirrors_p1) % devs_in_group) + first_dev;
--		si->cur_comp = (si->cur_comp + 1) % group_width;
--		if (unlikely((dev == si->par_dev) || (!length && ios->sp2d))) {
--			if (!length && ios->sp2d) {
--				/* If we are writing and this is the very last
--				 * stripe. then operate on parity dev.
--				 */
--				dev = si->par_dev;
--				/* If last stripe operate on parity comp */
--				si->cur_comp = group_width - ios->layout->parity;
--			}
--
--			/* In writes cur_len just means if it's the
--			 * last one. See _ore_add_parity_unit.
--			 */
--			ret = _add_parity_units(ios, si, dev, first_dev,
--						mirrors_p1, devs_in_group,
--						ios->sp2d ? length : cur_len);
--			if (unlikely(ret))
--					goto out;
--
--			/* Rotate next par_dev backwards with wraping */
--			si->par_dev = (devs_in_group + si->par_dev -
--				       ios->layout->parity * mirrors_p1) %
--				      devs_in_group + first_dev;
--			/* Next stripe, start fresh */
--			si->cur_comp = 0;
--			si->cur_pg = 0;
--			si->obj_offset += cur_len;
--			si->unit_off = 0;
--		}
--	}
--out:
--	ios->numdevs = devs_in_group;
--	ios->pages_consumed = cur_pg;
--	return ret;
--}
--
--int ore_create(struct ore_io_state *ios)
--{
--	int i, ret;
--
--	for (i = 0; i < ios->oc->numdevs; i++) {
--		struct osd_request *or;
--
--		or = osd_start_request(_ios_od(ios, i), GFP_KERNEL);
--		if (unlikely(!or)) {
--			ORE_ERR("%s: osd_start_request failed\n", __func__);
--			ret = -ENOMEM;
--			goto out;
--		}
--		ios->per_dev[i].or = or;
--		ios->numdevs++;
--
--		osd_req_create_object(or, _ios_obj(ios, i));
--	}
--	ret = ore_io_execute(ios);
--
--out:
--	return ret;
--}
--EXPORT_SYMBOL(ore_create);
--
--int ore_remove(struct ore_io_state *ios)
--{
--	int i, ret;
--
--	for (i = 0; i < ios->oc->numdevs; i++) {
--		struct osd_request *or;
--
--		or = osd_start_request(_ios_od(ios, i), GFP_KERNEL);
--		if (unlikely(!or)) {
--			ORE_ERR("%s: osd_start_request failed\n", __func__);
--			ret = -ENOMEM;
--			goto out;
--		}
--		ios->per_dev[i].or = or;
--		ios->numdevs++;
--
--		osd_req_remove_object(or, _ios_obj(ios, i));
--	}
--	ret = ore_io_execute(ios);
--
--out:
--	return ret;
--}
--EXPORT_SYMBOL(ore_remove);
--
--static int _write_mirror(struct ore_io_state *ios, int cur_comp)
--{
--	struct ore_per_dev_state *master_dev = &ios->per_dev[cur_comp];
--	unsigned dev = ios->per_dev[cur_comp].dev;
--	unsigned last_comp = cur_comp + ios->layout->mirrors_p1;
--	int ret = 0;
--
--	if (ios->pages && !master_dev->length)
--		return 0; /* Just an empty slot */
--
--	for (; cur_comp < last_comp; ++cur_comp, ++dev) {
--		struct ore_per_dev_state *per_dev = &ios->per_dev[cur_comp];
--		struct osd_request *or;
--
--		or = osd_start_request(_ios_od(ios, dev), GFP_KERNEL);
--		if (unlikely(!or)) {
--			ORE_ERR("%s: osd_start_request failed\n", __func__);
--			ret = -ENOMEM;
--			goto out;
--		}
--		per_dev->or = or;
--
--		if (ios->pages) {
--			struct bio *bio;
--
--			if (per_dev != master_dev) {
--				bio = bio_clone_kmalloc(master_dev->bio,
--							GFP_KERNEL);
--				if (unlikely(!bio)) {
--					ORE_DBGMSG(
--					      "Failed to allocate BIO size=%u\n",
--					      master_dev->bio->bi_max_vecs);
--					ret = -ENOMEM;
--					goto out;
--				}
--
--				bio->bi_bdev = NULL;
--				bio->bi_next = NULL;
--				per_dev->offset = master_dev->offset;
--				per_dev->length = master_dev->length;
--				per_dev->bio =  bio;
--				per_dev->dev = dev;
--			} else {
--				bio = master_dev->bio;
--				/* FIXME: bio_set_dir() */
--				bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--			}
--
--			osd_req_write(or, _ios_obj(ios, cur_comp),
--				      per_dev->offset, bio, per_dev->length);
--			ORE_DBGMSG("write(0x%llx) offset=0x%llx "
--				      "length=0x%llx dev=%d\n",
--				     _LLU(_ios_obj(ios, cur_comp)->id),
--				     _LLU(per_dev->offset),
--				     _LLU(per_dev->length), dev);
--		} else if (ios->kern_buff) {
--			per_dev->offset = ios->si.obj_offset;
--			per_dev->dev = ios->si.dev + dev;
--
--			/* no cross device without page array */
--			BUG_ON((ios->layout->group_width > 1) &&
--			       (ios->si.unit_off + ios->length >
--				ios->layout->stripe_unit));
--
--			ret = osd_req_write_kern(or, _ios_obj(ios, cur_comp),
--						 per_dev->offset,
--						 ios->kern_buff, ios->length);
--			if (unlikely(ret))
--				goto out;
--			ORE_DBGMSG2("write_kern(0x%llx) offset=0x%llx "
--				      "length=0x%llx dev=%d\n",
--				     _LLU(_ios_obj(ios, cur_comp)->id),
--				     _LLU(per_dev->offset),
--				     _LLU(ios->length), per_dev->dev);
--		} else {
--			osd_req_set_attributes(or, _ios_obj(ios, cur_comp));
--			ORE_DBGMSG2("obj(0x%llx) set_attributes=%d dev=%d\n",
--				     _LLU(_ios_obj(ios, cur_comp)->id),
--				     ios->out_attr_len, dev);
--		}
--
--		if (ios->out_attr)
--			osd_req_add_set_attr_list(or, ios->out_attr,
--						  ios->out_attr_len);
--
--		if (ios->in_attr)
--			osd_req_add_get_attr_list(or, ios->in_attr,
--						  ios->in_attr_len);
--	}
--
--out:
--	return ret;
--}
--
--int ore_write(struct ore_io_state *ios)
--{
--	int i;
--	int ret;
--
--	if (unlikely(ios->sp2d && !ios->r4w)) {
--		/* A library is attempting a RAID-write without providing
--		 * a pages lock interface.
--		 */
--		WARN_ON_ONCE(1);
--		return -ENOTSUPP;
--	}
--
--	ret = _prepare_for_striping(ios);
--	if (unlikely(ret))
--		return ret;
--
--	for (i = 0; i < ios->numdevs; i += ios->layout->mirrors_p1) {
--		ret = _write_mirror(ios, i);
--		if (unlikely(ret))
--			return ret;
--	}
--
--	ret = ore_io_execute(ios);
--	return ret;
--}
--EXPORT_SYMBOL(ore_write);
--
--int _ore_read_mirror(struct ore_io_state *ios, unsigned cur_comp)
--{
--	struct osd_request *or;
--	struct ore_per_dev_state *per_dev = &ios->per_dev[cur_comp];
--	struct osd_obj_id *obj = _ios_obj(ios, cur_comp);
--	unsigned first_dev = (unsigned)obj->id;
--
--	if (ios->pages && !per_dev->length)
--		return 0; /* Just an empty slot */
--
--	first_dev = per_dev->dev + first_dev % ios->layout->mirrors_p1;
--	or = osd_start_request(_ios_od(ios, first_dev), GFP_KERNEL);
--	if (unlikely(!or)) {
--		ORE_ERR("%s: osd_start_request failed\n", __func__);
--		return -ENOMEM;
--	}
--	per_dev->or = or;
--
--	if (ios->pages) {
--		if (per_dev->cur_sg) {
--			/* finalize the last sg_entry */
--			_ore_add_sg_seg(per_dev, 0, false);
--			if (unlikely(!per_dev->cur_sg))
--				return 0; /* Skip parity only device */
--
--			osd_req_read_sg(or, obj, per_dev->bio,
--					per_dev->sglist, per_dev->cur_sg);
--		} else {
--			/* The no raid case */
--			osd_req_read(or, obj, per_dev->offset,
--				     per_dev->bio, per_dev->length);
--		}
--
--		ORE_DBGMSG("read(0x%llx) offset=0x%llx length=0x%llx"
--			     " dev=%d sg_len=%d\n", _LLU(obj->id),
--			     _LLU(per_dev->offset), _LLU(per_dev->length),
--			     first_dev, per_dev->cur_sg);
--	} else {
--		BUG_ON(ios->kern_buff);
--
--		osd_req_get_attributes(or, obj);
--		ORE_DBGMSG2("obj(0x%llx) get_attributes=%d dev=%d\n",
--			      _LLU(obj->id),
--			      ios->in_attr_len, first_dev);
--	}
--	if (ios->out_attr)
--		osd_req_add_set_attr_list(or, ios->out_attr, ios->out_attr_len);
--
--	if (ios->in_attr)
--		osd_req_add_get_attr_list(or, ios->in_attr, ios->in_attr_len);
--
--	return 0;
--}
--
--int ore_read(struct ore_io_state *ios)
--{
--	int i;
--	int ret;
--
--	ret = _prepare_for_striping(ios);
--	if (unlikely(ret))
--		return ret;
--
--	for (i = 0; i < ios->numdevs; i += ios->layout->mirrors_p1) {
--		ret = _ore_read_mirror(ios, i);
--		if (unlikely(ret))
--			return ret;
--	}
--
--	ret = ore_io_execute(ios);
--	return ret;
--}
--EXPORT_SYMBOL(ore_read);
--
--int extract_attr_from_ios(struct ore_io_state *ios, struct osd_attr *attr)
--{
--	struct osd_attr cur_attr = {.attr_page = 0}; /* start with zeros */
--	void *iter = NULL;
--	int nelem;
--
--	do {
--		nelem = 1;
--		osd_req_decode_get_attr_list(ios->per_dev[0].or,
--					     &cur_attr, &nelem, &iter);
--		if ((cur_attr.attr_page == attr->attr_page) &&
--		    (cur_attr.attr_id == attr->attr_id)) {
--			attr->len = cur_attr.len;
--			attr->val_ptr = cur_attr.val_ptr;
--			return 0;
--		}
--	} while (iter);
--
--	return -EIO;
--}
--EXPORT_SYMBOL(extract_attr_from_ios);
--
--static int _truncate_mirrors(struct ore_io_state *ios, unsigned cur_comp,
--			     struct osd_attr *attr)
--{
--	int last_comp = cur_comp + ios->layout->mirrors_p1;
--
--	for (; cur_comp < last_comp; ++cur_comp) {
--		struct ore_per_dev_state *per_dev = &ios->per_dev[cur_comp];
--		struct osd_request *or;
--
--		or = osd_start_request(_ios_od(ios, cur_comp), GFP_KERNEL);
--		if (unlikely(!or)) {
--			ORE_ERR("%s: osd_start_request failed\n", __func__);
--			return -ENOMEM;
--		}
--		per_dev->or = or;
--
--		osd_req_set_attributes(or, _ios_obj(ios, cur_comp));
--		osd_req_add_set_attr_list(or, attr, 1);
--	}
--
--	return 0;
--}
--
--struct _trunc_info {
--	struct ore_striping_info si;
--	u64 prev_group_obj_off;
--	u64 next_group_obj_off;
--
--	unsigned first_group_dev;
--	unsigned nex_group_dev;
--};
--
--static void _calc_trunk_info(struct ore_layout *layout, u64 file_offset,
--			     struct _trunc_info *ti)
--{
--	unsigned stripe_unit = layout->stripe_unit;
--
--	ore_calc_stripe_info(layout, file_offset, 0, &ti->si);
--
--	ti->prev_group_obj_off = ti->si.M * stripe_unit;
--	ti->next_group_obj_off = ti->si.M ? (ti->si.M - 1) * stripe_unit : 0;
--
--	ti->first_group_dev = ti->si.dev - (ti->si.dev % layout->group_width);
--	ti->nex_group_dev = ti->first_group_dev + layout->group_width;
--}
--
--int ore_truncate(struct ore_layout *layout, struct ore_components *oc,
--		   u64 size)
--{
--	struct ore_io_state *ios;
--	struct exofs_trunc_attr {
--		struct osd_attr attr;
--		__be64 newsize;
--	} *size_attrs;
--	struct _trunc_info ti;
--	int i, ret;
--
--	ret = ore_get_io_state(layout, oc, &ios);
--	if (unlikely(ret))
--		return ret;
--
--	_calc_trunk_info(ios->layout, size, &ti);
--
--	size_attrs = kcalloc(ios->oc->numdevs, sizeof(*size_attrs),
--			     GFP_KERNEL);
--	if (unlikely(!size_attrs)) {
--		ret = -ENOMEM;
--		goto out;
--	}
--
--	ios->numdevs = ios->oc->numdevs;
--
--	for (i = 0; i < ios->numdevs; ++i) {
--		struct exofs_trunc_attr *size_attr = &size_attrs[i];
--		u64 obj_size;
--
--		if (i < ti.first_group_dev)
--			obj_size = ti.prev_group_obj_off;
--		else if (i >= ti.nex_group_dev)
--			obj_size = ti.next_group_obj_off;
--		else if (i < ti.si.dev) /* dev within this group */
--			obj_size = ti.si.obj_offset +
--				      ios->layout->stripe_unit - ti.si.unit_off;
--		else if (i == ti.si.dev)
--			obj_size = ti.si.obj_offset;
--		else /* i > ti.dev */
--			obj_size = ti.si.obj_offset - ti.si.unit_off;
--
--		size_attr->newsize = cpu_to_be64(obj_size);
--		size_attr->attr = g_attr_logical_length;
--		size_attr->attr.val_ptr = &size_attr->newsize;
--
--		ORE_DBGMSG2("trunc(0x%llx) obj_offset=0x%llx dev=%d\n",
--			     _LLU(oc->comps->obj.id), _LLU(obj_size), i);
--		ret = _truncate_mirrors(ios, i * ios->layout->mirrors_p1,
--					&size_attr->attr);
--		if (unlikely(ret))
--			goto out;
--	}
--	ret = ore_io_execute(ios);
--
--out:
--	kfree(size_attrs);
--	ore_put_io_state(ios);
--	return ret;
--}
--EXPORT_SYMBOL(ore_truncate);
--
--const struct osd_attr g_attr_logical_length = ATTR_DEF(
--	OSD_APAGE_OBJECT_INFORMATION, OSD_ATTR_OI_LOGICAL_LENGTH, 8);
--EXPORT_SYMBOL(g_attr_logical_length);
-diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
-deleted file mode 100644
-index 27cbdb697649..000000000000
---- a/fs/exofs/ore_raid.c
-+++ /dev/null
-@@ -1,721 +0,0 @@
--/*
-- * Copyright (C) 2011
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * This file is part of the objects raid engine (ore).
-- *
-- * It is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2 as published
-- * by the Free Software Foundation.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with "ore". If not, write to the Free Software Foundation, Inc:
-- *	"Free Software Foundation <info@fsf.org>"
-- */
--
--#include <linux/gfp.h>
--#include <linux/async_tx.h>
--
--#include "ore_raid.h"
--
--#undef ORE_DBGMSG2
--#define ORE_DBGMSG2 ORE_DBGMSG
--
--static struct page *_raid_page_alloc(void)
--{
--	return alloc_page(GFP_KERNEL);
--}
--
--static void _raid_page_free(struct page *p)
--{
--	__free_page(p);
--}
--
--/* This struct is forward declare in ore_io_state, but is private to here.
-- * It is put on ios->sp2d for RAID5/6 writes only. See _gen_xor_unit.
-- *
-- * __stripe_pages_2d is a 2d array of pages, and it is also a corner turn.
-- * Ascending page index access is sp2d(p-minor, c-major). But storage is
-- * sp2d[p-minor][c-major], so it can be properlly presented to the async-xor
-- * API.
-- */
--struct __stripe_pages_2d {
--	/* Cache some hot path repeated calculations */
--	unsigned parity;
--	unsigned data_devs;
--	unsigned pages_in_unit;
--
--	bool needed ;
--
--	/* Array size is pages_in_unit (layout->stripe_unit / PAGE_SIZE) */
--	struct __1_page_stripe {
--		bool alloc;
--		unsigned write_count;
--		struct async_submit_ctl submit;
--		struct dma_async_tx_descriptor *tx;
--
--		/* The size of this array is data_devs + parity */
--		struct page **pages;
--		struct page **scribble;
--		/* bool array, size of this array is data_devs */
--		char *page_is_read;
--	} _1p_stripes[];
--};
--
--/* This can get bigger then a page. So support multiple page allocations
-- * _sp2d_free should be called even if _sp2d_alloc fails (by returning
-- * none-zero).
-- */
--static int _sp2d_alloc(unsigned pages_in_unit, unsigned group_width,
--		       unsigned parity, struct __stripe_pages_2d **psp2d)
--{
--	struct __stripe_pages_2d *sp2d;
--	unsigned data_devs = group_width - parity;
--	struct _alloc_all_bytes {
--		struct __alloc_stripe_pages_2d {
--			struct __stripe_pages_2d sp2d;
--			struct __1_page_stripe _1p_stripes[pages_in_unit];
--		} __asp2d;
--		struct __alloc_1p_arrays {
--			struct page *pages[group_width];
--			struct page *scribble[group_width];
--			char page_is_read[data_devs];
--		} __a1pa[pages_in_unit];
--	} *_aab;
--	struct __alloc_1p_arrays *__a1pa;
--	struct __alloc_1p_arrays *__a1pa_end;
--	const unsigned sizeof__a1pa = sizeof(_aab->__a1pa[0]);
--	unsigned num_a1pa, alloc_size, i;
--
--	/* FIXME: check these numbers in ore_verify_layout */
--	BUG_ON(sizeof(_aab->__asp2d) > PAGE_SIZE);
--	BUG_ON(sizeof__a1pa > PAGE_SIZE);
--
--	if (sizeof(*_aab) > PAGE_SIZE) {
--		num_a1pa = (PAGE_SIZE - sizeof(_aab->__asp2d)) / sizeof__a1pa;
--		alloc_size = sizeof(_aab->__asp2d) + sizeof__a1pa * num_a1pa;
--	} else {
--		num_a1pa = pages_in_unit;
--		alloc_size = sizeof(*_aab);
--	}
--
--	_aab = kzalloc(alloc_size, GFP_KERNEL);
--	if (unlikely(!_aab)) {
--		ORE_DBGMSG("!! Failed to alloc sp2d size=%d\n", alloc_size);
--		return -ENOMEM;
--	}
--
--	sp2d = &_aab->__asp2d.sp2d;
--	*psp2d = sp2d; /* From here Just call _sp2d_free */
--
--	__a1pa = _aab->__a1pa;
--	__a1pa_end = __a1pa + num_a1pa;
--
--	for (i = 0; i < pages_in_unit; ++i) {
--		if (unlikely(__a1pa >= __a1pa_end)) {
--			num_a1pa = min_t(unsigned, PAGE_SIZE / sizeof__a1pa,
--							pages_in_unit - i);
--
--			__a1pa = kcalloc(num_a1pa, sizeof__a1pa, GFP_KERNEL);
--			if (unlikely(!__a1pa)) {
--				ORE_DBGMSG("!! Failed to _alloc_1p_arrays=%d\n",
--					   num_a1pa);
--				return -ENOMEM;
--			}
--			__a1pa_end = __a1pa + num_a1pa;
--			/* First *pages is marked for kfree of the buffer */
--			sp2d->_1p_stripes[i].alloc = true;
--		}
--
--		sp2d->_1p_stripes[i].pages = __a1pa->pages;
--		sp2d->_1p_stripes[i].scribble = __a1pa->scribble ;
--		sp2d->_1p_stripes[i].page_is_read = __a1pa->page_is_read;
--		++__a1pa;
--	}
--
--	sp2d->parity = parity;
--	sp2d->data_devs = data_devs;
--	sp2d->pages_in_unit = pages_in_unit;
--	return 0;
--}
--
--static void _sp2d_reset(struct __stripe_pages_2d *sp2d,
--			const struct _ore_r4w_op *r4w, void *priv)
--{
--	unsigned data_devs = sp2d->data_devs;
--	unsigned group_width = data_devs + sp2d->parity;
--	int p, c;
--
--	if (!sp2d->needed)
--		return;
--
--	for (c = data_devs - 1; c >= 0; --c)
--		for (p = sp2d->pages_in_unit - 1; p >= 0; --p) {
--			struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--
--			if (_1ps->page_is_read[c]) {
--				struct page *page = _1ps->pages[c];
--
--				r4w->put_page(priv, page);
--				_1ps->page_is_read[c] = false;
--			}
--		}
--
--	for (p = 0; p < sp2d->pages_in_unit; p++) {
--		struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--
--		memset(_1ps->pages, 0, group_width * sizeof(*_1ps->pages));
--		_1ps->write_count = 0;
--		_1ps->tx = NULL;
--	}
--
--	sp2d->needed = false;
--}
--
--static void _sp2d_free(struct __stripe_pages_2d *sp2d)
--{
--	unsigned i;
--
--	if (!sp2d)
--		return;
--
--	for (i = 0; i < sp2d->pages_in_unit; ++i) {
--		if (sp2d->_1p_stripes[i].alloc)
--			kfree(sp2d->_1p_stripes[i].pages);
--	}
--
--	kfree(sp2d);
--}
--
--static unsigned _sp2d_min_pg(struct __stripe_pages_2d *sp2d)
--{
--	unsigned p;
--
--	for (p = 0; p < sp2d->pages_in_unit; p++) {
--		struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--
--		if (_1ps->write_count)
--			return p;
--	}
--
--	return ~0;
--}
--
--static unsigned _sp2d_max_pg(struct __stripe_pages_2d *sp2d)
--{
--	int p;
--
--	for (p = sp2d->pages_in_unit - 1; p >= 0; --p) {
--		struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--
--		if (_1ps->write_count)
--			return p;
--	}
--
--	return ~0;
--}
--
--static void _gen_xor_unit(struct __stripe_pages_2d *sp2d)
--{
--	unsigned p;
--	unsigned tx_flags = ASYNC_TX_ACK;
--
--	if (sp2d->parity == 1)
--		tx_flags |= ASYNC_TX_XOR_ZERO_DST;
--
--	for (p = 0; p < sp2d->pages_in_unit; p++) {
--		struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--
--		if (!_1ps->write_count)
--			continue;
--
--		init_async_submit(&_1ps->submit, tx_flags,
--			NULL, NULL, NULL, (addr_conv_t *)_1ps->scribble);
--
--		if (sp2d->parity == 1)
--			_1ps->tx = async_xor(_1ps->pages[sp2d->data_devs],
--						_1ps->pages, 0, sp2d->data_devs,
--						PAGE_SIZE, &_1ps->submit);
--		else /* parity == 2 */
--			_1ps->tx = async_gen_syndrome(_1ps->pages, 0,
--						sp2d->data_devs + sp2d->parity,
--						PAGE_SIZE, &_1ps->submit);
--	}
--
--	for (p = 0; p < sp2d->pages_in_unit; p++) {
--		struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--		/* NOTE: We wait for HW synchronously (I don't have such HW
--		 * to test with.) Is parallelism needed with today's multi
--		 * cores?
--		 */
--		async_tx_issue_pending(_1ps->tx);
--	}
--}
--
--void _ore_add_stripe_page(struct __stripe_pages_2d *sp2d,
--		       struct ore_striping_info *si, struct page *page)
--{
--	struct __1_page_stripe *_1ps;
--
--	sp2d->needed = true;
--
--	_1ps = &sp2d->_1p_stripes[si->cur_pg];
--	_1ps->pages[si->cur_comp] = page;
--	++_1ps->write_count;
--
--	si->cur_pg = (si->cur_pg + 1) % sp2d->pages_in_unit;
--	/* si->cur_comp is advanced outside at main loop */
--}
--
--void _ore_add_sg_seg(struct ore_per_dev_state *per_dev, unsigned cur_len,
--		     bool not_last)
--{
--	struct osd_sg_entry *sge;
--
--	ORE_DBGMSG("dev=%d cur_len=0x%x not_last=%d cur_sg=%d "
--		     "offset=0x%llx length=0x%x last_sgs_total=0x%x\n",
--		     per_dev->dev, cur_len, not_last, per_dev->cur_sg,
--		     _LLU(per_dev->offset), per_dev->length,
--		     per_dev->last_sgs_total);
--
--	if (!per_dev->cur_sg) {
--		sge = per_dev->sglist;
--
--		/* First time we prepare two entries */
--		if (per_dev->length) {
--			++per_dev->cur_sg;
--			sge->offset = per_dev->offset;
--			sge->len = per_dev->length;
--		} else {
--			/* Here the parity is the first unit of this object.
--			 * This happens every time we reach a parity device on
--			 * the same stripe as the per_dev->offset. We need to
--			 * just skip this unit.
--			 */
--			per_dev->offset += cur_len;
--			return;
--		}
--	} else {
--		/* finalize the last one */
--		sge = &per_dev->sglist[per_dev->cur_sg - 1];
--		sge->len = per_dev->length - per_dev->last_sgs_total;
--	}
--
--	if (not_last) {
--		/* Partly prepare the next one */
--		struct osd_sg_entry *next_sge = sge + 1;
--
--		++per_dev->cur_sg;
--		next_sge->offset = sge->offset + sge->len + cur_len;
--		/* Save cur len so we know how mutch was added next time */
--		per_dev->last_sgs_total = per_dev->length;
--		next_sge->len = 0;
--	} else if (!sge->len) {
--		/* Optimize for when the last unit is a parity */
--		--per_dev->cur_sg;
--	}
--}
--
--static int _alloc_read_4_write(struct ore_io_state *ios)
--{
--	struct ore_layout *layout = ios->layout;
--	int ret;
--	/* We want to only read those pages not in cache so worst case
--	 * is a stripe populated with every other page
--	 */
--	unsigned sgs_per_dev = ios->sp2d->pages_in_unit + 2;
--
--	ret = _ore_get_io_state(layout, ios->oc,
--				layout->group_width * layout->mirrors_p1,
--				sgs_per_dev, 0, &ios->ios_read_4_write);
--	return ret;
--}
--
--/* @si contains info of the to-be-inserted page. Update of @si should be
-- * maintained by caller. Specificaly si->dev, si->obj_offset, ...
-- */
--static int _add_to_r4w(struct ore_io_state *ios, struct ore_striping_info *si,
--		       struct page *page, unsigned pg_len)
--{
--	struct request_queue *q;
--	struct ore_per_dev_state *per_dev;
--	struct ore_io_state *read_ios;
--	unsigned first_dev = si->dev - (si->dev %
--			  (ios->layout->group_width * ios->layout->mirrors_p1));
--	unsigned comp = si->dev - first_dev;
--	unsigned added_len;
--
--	if (!ios->ios_read_4_write) {
--		int ret = _alloc_read_4_write(ios);
--
--		if (unlikely(ret))
--			return ret;
--	}
--
--	read_ios = ios->ios_read_4_write;
--	read_ios->numdevs = ios->layout->group_width * ios->layout->mirrors_p1;
--
--	per_dev = &read_ios->per_dev[comp];
--	if (!per_dev->length) {
--		per_dev->bio = bio_kmalloc(GFP_KERNEL,
--					   ios->sp2d->pages_in_unit);
--		if (unlikely(!per_dev->bio)) {
--			ORE_DBGMSG("Failed to allocate BIO size=%u\n",
--				     ios->sp2d->pages_in_unit);
--			return -ENOMEM;
--		}
--		per_dev->offset = si->obj_offset;
--		per_dev->dev = si->dev;
--	} else if (si->obj_offset != (per_dev->offset + per_dev->length)) {
--		u64 gap = si->obj_offset - (per_dev->offset + per_dev->length);
--
--		_ore_add_sg_seg(per_dev, gap, true);
--	}
--	q = osd_request_queue(ore_comp_dev(read_ios->oc, per_dev->dev));
--	added_len = bio_add_pc_page(q, per_dev->bio, page, pg_len,
--				    si->obj_offset % PAGE_SIZE);
--	if (unlikely(added_len != pg_len)) {
--		ORE_DBGMSG("Failed to bio_add_pc_page bi_vcnt=%d\n",
--			      per_dev->bio->bi_vcnt);
--		return -ENOMEM;
--	}
--
--	per_dev->length += pg_len;
--	return 0;
--}
--
--/* read the beginning of an unaligned first page */
--static int _add_to_r4w_first_page(struct ore_io_state *ios, struct page *page)
--{
--	struct ore_striping_info si;
--	unsigned pg_len;
--
--	ore_calc_stripe_info(ios->layout, ios->offset, 0, &si);
--
--	pg_len = si.obj_offset % PAGE_SIZE;
--	si.obj_offset -= pg_len;
--
--	ORE_DBGMSG("offset=0x%llx len=0x%x index=0x%lx dev=%x\n",
--		   _LLU(si.obj_offset), pg_len, page->index, si.dev);
--
--	return _add_to_r4w(ios, &si, page, pg_len);
--}
--
--/* read the end of an incomplete last page */
--static int _add_to_r4w_last_page(struct ore_io_state *ios, u64 *offset)
--{
--	struct ore_striping_info si;
--	struct page *page;
--	unsigned pg_len, p, c;
--
--	ore_calc_stripe_info(ios->layout, *offset, 0, &si);
--
--	p = si.cur_pg;
--	c = si.cur_comp;
--	page = ios->sp2d->_1p_stripes[p].pages[c];
--
--	pg_len = PAGE_SIZE - (si.unit_off % PAGE_SIZE);
--	*offset += pg_len;
--
--	ORE_DBGMSG("p=%d, c=%d next-offset=0x%llx len=0x%x dev=%x par_dev=%d\n",
--		   p, c, _LLU(*offset), pg_len, si.dev, si.par_dev);
--
--	BUG_ON(!page);
--
--	return _add_to_r4w(ios, &si, page, pg_len);
--}
--
--static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
--{
--	struct bio_vec *bv;
--	unsigned i, d;
--
--	/* loop on all devices all pages */
--	for (d = 0; d < ios->numdevs; d++) {
--		struct bio *bio = ios->per_dev[d].bio;
--
--		if (!bio)
--			continue;
--
--		bio_for_each_segment_all(bv, bio, i) {
--			struct page *page = bv->bv_page;
--
--			SetPageUptodate(page);
--			if (PageError(page))
--				ClearPageError(page);
--		}
--	}
--}
--
--/* read_4_write is hacked to read the start of the first stripe and/or
-- * the end of the last stripe. If needed, with an sg-gap at each device/page.
-- * It is assumed to be called after the to_be_written pages of the first stripe
-- * are populating ios->sp2d[][]
-- *
-- * NOTE: We call ios->r4w->lock_fn for all pages needed for parity calculations
-- * These pages are held at sp2d[p].pages[c] but with
-- * sp2d[p].page_is_read[c] = true. At _sp2d_reset these pages are
-- * ios->r4w->lock_fn(). The ios->r4w->lock_fn might signal that the page is
-- * @uptodate=true, so we don't need to read it, only unlock, after IO.
-- *
-- * TODO: The read_4_write should calc a need_to_read_pages_count, if bigger then
-- * to-be-written count, we should consider the xor-in-place mode.
-- * need_to_read_pages_count is the actual number of pages not present in cache.
-- * maybe "devs_in_group - ios->sp2d[p].write_count" is a good enough
-- * approximation? In this mode the read pages are put in the empty places of
-- * ios->sp2d[p][*], xor is calculated the same way. These pages are
-- * allocated/freed and don't go through cache
-- */
--static int _read_4_write_first_stripe(struct ore_io_state *ios)
--{
--	struct ore_striping_info read_si;
--	struct __stripe_pages_2d *sp2d = ios->sp2d;
--	u64 offset = ios->si.first_stripe_start;
--	unsigned c, p, min_p = sp2d->pages_in_unit, max_p = -1;
--
--	if (offset == ios->offset) /* Go to start collect $200 */
--		goto read_last_stripe;
--
--	min_p = _sp2d_min_pg(sp2d);
--	max_p = _sp2d_max_pg(sp2d);
--
--	ORE_DBGMSG("stripe_start=0x%llx ios->offset=0x%llx min_p=%d max_p=%d\n",
--		   offset, ios->offset, min_p, max_p);
--
--	for (c = 0; ; c++) {
--		ore_calc_stripe_info(ios->layout, offset, 0, &read_si);
--		read_si.obj_offset += min_p * PAGE_SIZE;
--		offset += min_p * PAGE_SIZE;
--		for (p = min_p; p <= max_p; p++) {
--			struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--			struct page **pp = &_1ps->pages[c];
--			bool uptodate;
--
--			if (*pp) {
--				if (ios->offset % PAGE_SIZE)
--					/* Read the remainder of the page */
--					_add_to_r4w_first_page(ios, *pp);
--				/* to-be-written pages start here */
--				goto read_last_stripe;
--			}
--
--			*pp = ios->r4w->get_page(ios->private, offset,
--						 &uptodate);
--			if (unlikely(!*pp))
--				return -ENOMEM;
--
--			if (!uptodate)
--				_add_to_r4w(ios, &read_si, *pp, PAGE_SIZE);
--
--			/* Mark read-pages to be cache_released */
--			_1ps->page_is_read[c] = true;
--			read_si.obj_offset += PAGE_SIZE;
--			offset += PAGE_SIZE;
--		}
--		offset += (sp2d->pages_in_unit - p) * PAGE_SIZE;
--	}
--
--read_last_stripe:
--	return 0;
--}
--
--static int _read_4_write_last_stripe(struct ore_io_state *ios)
--{
--	struct ore_striping_info read_si;
--	struct __stripe_pages_2d *sp2d = ios->sp2d;
--	u64 offset;
--	u64 last_stripe_end;
--	unsigned bytes_in_stripe = ios->si.bytes_in_stripe;
--	unsigned c, p, min_p = sp2d->pages_in_unit, max_p = -1;
--
--	offset = ios->offset + ios->length;
--	if (offset % PAGE_SIZE)
--		_add_to_r4w_last_page(ios, &offset);
--		/* offset will be aligned to next page */
--
--	last_stripe_end = div_u64(offset + bytes_in_stripe - 1, bytes_in_stripe)
--				 * bytes_in_stripe;
--	if (offset == last_stripe_end) /* Optimize for the aligned case */
--		goto read_it;
--
--	ore_calc_stripe_info(ios->layout, offset, 0, &read_si);
--	p = read_si.cur_pg;
--	c = read_si.cur_comp;
--
--	if (min_p == sp2d->pages_in_unit) {
--		/* Didn't do it yet */
--		min_p = _sp2d_min_pg(sp2d);
--		max_p = _sp2d_max_pg(sp2d);
--	}
--
--	ORE_DBGMSG("offset=0x%llx stripe_end=0x%llx min_p=%d max_p=%d\n",
--		   offset, last_stripe_end, min_p, max_p);
--
--	while (offset < last_stripe_end) {
--		struct __1_page_stripe *_1ps = &sp2d->_1p_stripes[p];
--
--		if ((min_p <= p) && (p <= max_p)) {
--			struct page *page;
--			bool uptodate;
--
--			BUG_ON(_1ps->pages[c]);
--			page = ios->r4w->get_page(ios->private, offset,
--						  &uptodate);
--			if (unlikely(!page))
--				return -ENOMEM;
--
--			_1ps->pages[c] = page;
--			/* Mark read-pages to be cache_released */
--			_1ps->page_is_read[c] = true;
--			if (!uptodate)
--				_add_to_r4w(ios, &read_si, page, PAGE_SIZE);
--		}
--
--		offset += PAGE_SIZE;
--		if (p == (sp2d->pages_in_unit - 1)) {
--			++c;
--			p = 0;
--			ore_calc_stripe_info(ios->layout, offset, 0, &read_si);
--		} else {
--			read_si.obj_offset += PAGE_SIZE;
--			++p;
--		}
--	}
--
--read_it:
--	return 0;
--}
--
--static int _read_4_write_execute(struct ore_io_state *ios)
--{
--	struct ore_io_state *ios_read;
--	unsigned i;
--	int ret;
--
--	ios_read = ios->ios_read_4_write;
--	if (!ios_read)
--		return 0;
--
--	/* FIXME: Ugly to signal _sbi_read_mirror that we have bio(s). Change
--	 * to check for per_dev->bio
--	 */
--	ios_read->pages = ios->pages;
--
--	/* Now read these devices */
--	for (i = 0; i < ios_read->numdevs; i += ios_read->layout->mirrors_p1) {
--		ret = _ore_read_mirror(ios_read, i);
--		if (unlikely(ret))
--			return ret;
--	}
--
--	ret = ore_io_execute(ios_read); /* Synchronus execution */
--	if (unlikely(ret)) {
--		ORE_DBGMSG("!! ore_io_execute => %d\n", ret);
--		return ret;
--	}
--
--	_mark_read4write_pages_uptodate(ios_read, ret);
--	ore_put_io_state(ios_read);
--	ios->ios_read_4_write = NULL; /* Might need a reuse at last stripe */
--	return 0;
--}
--
--/* In writes @cur_len means length left. .i.e cur_len==0 is the last parity U */
--int _ore_add_parity_unit(struct ore_io_state *ios,
--			    struct ore_striping_info *si,
--			    struct ore_per_dev_state *per_dev,
--			    unsigned cur_len, bool do_xor)
--{
--	if (ios->reading) {
--		if (per_dev->cur_sg >= ios->sgs_per_dev) {
--			ORE_DBGMSG("cur_sg(%d) >= sgs_per_dev(%d)\n" ,
--				per_dev->cur_sg, ios->sgs_per_dev);
--			return -ENOMEM;
--		}
--		_ore_add_sg_seg(per_dev, cur_len, true);
--	} else {
--		struct __stripe_pages_2d *sp2d = ios->sp2d;
--		struct page **pages = ios->parity_pages + ios->cur_par_page;
--		unsigned num_pages;
--		unsigned array_start = 0;
--		unsigned i;
--		int ret;
--
--		si->cur_pg = _sp2d_min_pg(sp2d);
--		num_pages  = _sp2d_max_pg(sp2d) + 1 - si->cur_pg;
--
--		if (!per_dev->length) {
--			per_dev->offset += si->cur_pg * PAGE_SIZE;
--			/* If first stripe, Read in all read4write pages
--			 * (if needed) before we calculate the first parity.
--			 */
--			if (do_xor)
--				_read_4_write_first_stripe(ios);
--		}
--		if (!cur_len && do_xor)
--			/* If last stripe r4w pages of last stripe */
--			_read_4_write_last_stripe(ios);
--		_read_4_write_execute(ios);
--
--		for (i = 0; i < num_pages; i++) {
--			pages[i] = _raid_page_alloc();
--			if (unlikely(!pages[i]))
--				return -ENOMEM;
--
--			++(ios->cur_par_page);
--		}
--
--		BUG_ON(si->cur_comp < sp2d->data_devs);
--		BUG_ON(si->cur_pg + num_pages > sp2d->pages_in_unit);
--
--		ret = _ore_add_stripe_unit(ios,  &array_start, 0, pages,
--					   per_dev, num_pages * PAGE_SIZE);
--		if (unlikely(ret))
--			return ret;
--
--		if (do_xor) {
--			_gen_xor_unit(sp2d);
--			_sp2d_reset(sp2d, ios->r4w, ios->private);
--		}
--	}
--	return 0;
--}
--
--int _ore_post_alloc_raid_stuff(struct ore_io_state *ios)
--{
--	if (ios->parity_pages) {
--		struct ore_layout *layout = ios->layout;
--		unsigned pages_in_unit = layout->stripe_unit / PAGE_SIZE;
--
--		if (_sp2d_alloc(pages_in_unit, layout->group_width,
--				layout->parity, &ios->sp2d)) {
--			return -ENOMEM;
--		}
--	}
--	return 0;
--}
--
--void _ore_free_raid_stuff(struct ore_io_state *ios)
--{
--	if (ios->sp2d) { /* writing and raid */
--		unsigned i;
--
--		for (i = 0; i < ios->cur_par_page; i++) {
--			struct page *page = ios->parity_pages[i];
--
--			if (page)
--				_raid_page_free(page);
--		}
--		if (ios->extra_part_alloc)
--			kfree(ios->parity_pages);
--		/* If IO returned an error pages might need unlocking */
--		_sp2d_reset(ios->sp2d, ios->r4w, ios->private);
--		_sp2d_free(ios->sp2d);
--	} else {
--		/* Will only be set if raid reading && sglist is big */
--		if (ios->extra_part_alloc)
--			kfree(ios->per_dev[0].sglist);
--	}
--	if (ios->ios_read_4_write)
--		ore_put_io_state(ios->ios_read_4_write);
--}
-diff --git a/fs/exofs/ore_raid.h b/fs/exofs/ore_raid.h
-deleted file mode 100644
-index a6e746775570..000000000000
---- a/fs/exofs/ore_raid.h
-+++ /dev/null
-@@ -1,62 +0,0 @@
--/*
-- * Copyright (C) from 2011
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * This file is part of the objects raid engine (ore).
-- *
-- * It is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2 as published
-- * by the Free Software Foundation.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with "ore". If not, write to the Free Software Foundation, Inc:
-- *	"Free Software Foundation <info@fsf.org>"
-- */
--
--#include <scsi/osd_ore.h>
--
--#define ORE_ERR(fmt, a...) printk(KERN_ERR "ore: " fmt, ##a)
--
--#ifdef CONFIG_EXOFS_DEBUG
--#define ORE_DBGMSG(fmt, a...) \
--	printk(KERN_NOTICE "ore @%s:%d: " fmt, __func__, __LINE__, ##a)
--#else
--#define ORE_DBGMSG(fmt, a...) \
--	do { if (0) printk(fmt, ##a); } while (0)
--#endif
--
--/* u64 has problems with printk this will cast it to unsigned long long */
--#define _LLU(x) (unsigned long long)(x)
--
--#define ORE_DBGMSG2(M...) do {} while (0)
--/* #define ORE_DBGMSG2 ORE_DBGMSG */
--
--/* ios_raid.c stuff needed by ios.c */
--int _ore_post_alloc_raid_stuff(struct ore_io_state *ios);
--void _ore_free_raid_stuff(struct ore_io_state *ios);
--
--void _ore_add_sg_seg(struct ore_per_dev_state *per_dev, unsigned cur_len,
--		 bool not_last);
--int _ore_add_parity_unit(struct ore_io_state *ios, struct ore_striping_info *si,
--		     struct ore_per_dev_state *per_dev, unsigned cur_len,
--		     bool do_xor);
--void _ore_add_stripe_page(struct __stripe_pages_2d *sp2d,
--		       struct ore_striping_info *si, struct page *page);
--static inline void _add_stripe_page(struct __stripe_pages_2d *sp2d,
--				struct ore_striping_info *si, struct page *page)
--{
--	if (!sp2d) /* Inline the fast path */
--		return; /* Hay no raid stuff */
--	_ore_add_stripe_page(sp2d, si, page);
--}
--
--/* ios.c stuff needed by ios_raid.c */
--int  _ore_get_io_state(struct ore_layout *layout,
--			struct ore_components *oc, unsigned numdevs,
--			unsigned sgs_per_dev, unsigned num_par_pages,
--			struct ore_io_state **pios);
--int _ore_add_stripe_unit(struct ore_io_state *ios,  unsigned *cur_pg,
--		unsigned pgbase, struct page **pages,
--		struct ore_per_dev_state *per_dev, int cur_len);
--int _ore_read_mirror(struct ore_io_state *ios, unsigned cur_comp);
--int ore_io_execute(struct ore_io_state *ios);
-diff --git a/fs/exofs/super.c b/fs/exofs/super.c
-deleted file mode 100644
-index 1076a4233b39..000000000000
---- a/fs/exofs/super.c
-+++ /dev/null
-@@ -1,1049 +0,0 @@
--/*
-- * Copyright (C) 2005, 2006
-- * Avishay Traeger (avishay@gmail.com)
-- * Copyright (C) 2008, 2009
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * Copyrights for code taken from ext2:
-- *     Copyright (C) 1992, 1993, 1994, 1995
-- *     Remy Card (card@masi.ibp.fr)
-- *     Laboratoire MASI - Institut Blaise Pascal
-- *     Universite Pierre et Marie Curie (Paris VI)
-- *     from
-- *     linux/fs/minix/inode.c
-- *     Copyright (C) 1991, 1992  Linus Torvalds
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation.  Since it is based on ext2, and the only
-- * valid version of GPL for the Linux kernel is version 2, the only valid
-- * version of GPL for exofs is version 2.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--
--#include <linux/string.h>
--#include <linux/parser.h>
--#include <linux/vfs.h>
--#include <linux/random.h>
--#include <linux/module.h>
--#include <linux/exportfs.h>
--#include <linux/slab.h>
--
--#include "exofs.h"
--
--#define EXOFS_DBGMSG2(M...) do {} while (0)
--
--/******************************************************************************
-- * MOUNT OPTIONS
-- *****************************************************************************/
--
--/*
-- * struct to hold what we get from mount options
-- */
--struct exofs_mountopt {
--	bool is_osdname;
--	const char *dev_name;
--	uint64_t pid;
--	int timeout;
--};
--
--/*
-- * exofs-specific mount-time options.
-- */
--enum { Opt_name, Opt_pid, Opt_to, Opt_err };
--
--/*
-- * Our mount-time options.  These should ideally be 64-bit unsigned, but the
-- * kernel's parsing functions do not currently support that.  32-bit should be
-- * sufficient for most applications now.
-- */
--static match_table_t tokens = {
--	{Opt_name, "osdname=%s"},
--	{Opt_pid, "pid=%u"},
--	{Opt_to, "to=%u"},
--	{Opt_err, NULL}
--};
--
--/*
-- * The main option parsing method.  Also makes sure that all of the mandatory
-- * mount options were set.
-- */
--static int parse_options(char *options, struct exofs_mountopt *opts)
--{
--	char *p;
--	substring_t args[MAX_OPT_ARGS];
--	int option;
--	bool s_pid = false;
--
--	EXOFS_DBGMSG("parse_options %s\n", options);
--	/* defaults */
--	memset(opts, 0, sizeof(*opts));
--	opts->timeout = BLK_DEFAULT_SG_TIMEOUT;
--
--	while ((p = strsep(&options, ",")) != NULL) {
--		int token;
--		char str[32];
--
--		if (!*p)
--			continue;
--
--		token = match_token(p, tokens, args);
--		switch (token) {
--		case Opt_name:
--			opts->dev_name = match_strdup(&args[0]);
--			if (unlikely(!opts->dev_name)) {
--				EXOFS_ERR("Error allocating dev_name");
--				return -ENOMEM;
--			}
--			opts->is_osdname = true;
--			break;
--		case Opt_pid:
--			if (0 == match_strlcpy(str, &args[0], sizeof(str)))
--				return -EINVAL;
--			opts->pid = simple_strtoull(str, NULL, 0);
--			if (opts->pid < EXOFS_MIN_PID) {
--				EXOFS_ERR("Partition ID must be >= %u",
--					  EXOFS_MIN_PID);
--				return -EINVAL;
--			}
--			s_pid = 1;
--			break;
--		case Opt_to:
--			if (match_int(&args[0], &option))
--				return -EINVAL;
--			if (option <= 0) {
--				EXOFS_ERR("Timeout must be > 0");
--				return -EINVAL;
--			}
--			opts->timeout = option * HZ;
--			break;
--		}
--	}
--
--	if (!s_pid) {
--		EXOFS_ERR("Need to specify the following options:\n");
--		EXOFS_ERR("    -o pid=pid_no_to_use\n");
--		return -EINVAL;
--	}
--
--	return 0;
--}
--
--/******************************************************************************
-- * INODE CACHE
-- *****************************************************************************/
--
--/*
-- * Our inode cache.  Isn't it pretty?
-- */
--static struct kmem_cache *exofs_inode_cachep;
--
--/*
-- * Allocate an inode in the cache
-- */
--static struct inode *exofs_alloc_inode(struct super_block *sb)
--{
--	struct exofs_i_info *oi;
--
--	oi = kmem_cache_alloc(exofs_inode_cachep, GFP_KERNEL);
--	if (!oi)
--		return NULL;
--
--	oi->vfs_inode.i_version = 1;
--	return &oi->vfs_inode;
--}
--
--static void exofs_i_callback(struct rcu_head *head)
--{
--	struct inode *inode = container_of(head, struct inode, i_rcu);
--	kmem_cache_free(exofs_inode_cachep, exofs_i(inode));
--}
--
--/*
-- * Remove an inode from the cache
-- */
--static void exofs_destroy_inode(struct inode *inode)
--{
--	call_rcu(&inode->i_rcu, exofs_i_callback);
--}
--
--/*
-- * Initialize the inode
-- */
--static void exofs_init_once(void *foo)
--{
--	struct exofs_i_info *oi = foo;
--
--	inode_init_once(&oi->vfs_inode);
--}
--
--/*
-- * Create and initialize the inode cache
-- */
--static int init_inodecache(void)
--{
--	exofs_inode_cachep = kmem_cache_create("exofs_inode_cache",
--				sizeof(struct exofs_i_info), 0,
--				SLAB_RECLAIM_ACCOUNT | SLAB_MEM_SPREAD |
--				SLAB_ACCOUNT, exofs_init_once);
--	if (exofs_inode_cachep == NULL)
--		return -ENOMEM;
--	return 0;
--}
--
--/*
-- * Destroy the inode cache
-- */
--static void destroy_inodecache(void)
--{
--	/*
--	 * Make sure all delayed rcu free inodes are flushed before we
--	 * destroy cache.
--	 */
--	rcu_barrier();
--	kmem_cache_destroy(exofs_inode_cachep);
--}
--
--/******************************************************************************
-- * Some osd helpers
-- *****************************************************************************/
--void exofs_make_credential(u8 cred_a[OSD_CAP_LEN], const struct osd_obj_id *obj)
--{
--	osd_sec_init_nosec_doall_caps(cred_a, obj, false, true);
--}
--
--static int exofs_read_kern(struct osd_dev *od, u8 *cred, struct osd_obj_id *obj,
--		    u64 offset, void *p, unsigned length)
--{
--	struct osd_request *or = osd_start_request(od, GFP_KERNEL);
--/*	struct osd_sense_info osi = {.key = 0};*/
--	int ret;
--
--	if (unlikely(!or)) {
--		EXOFS_DBGMSG("%s: osd_start_request failed.\n", __func__);
--		return -ENOMEM;
--	}
--	ret = osd_req_read_kern(or, obj, offset, p, length);
--	if (unlikely(ret)) {
--		EXOFS_DBGMSG("%s: osd_req_read_kern failed.\n", __func__);
--		goto out;
--	}
--
--	ret = osd_finalize_request(or, 0, cred, NULL);
--	if (unlikely(ret)) {
--		EXOFS_DBGMSG("Failed to osd_finalize_request() => %d\n", ret);
--		goto out;
--	}
--
--	ret = osd_execute_request(or);
--	if (unlikely(ret))
--		EXOFS_DBGMSG("osd_execute_request() => %d\n", ret);
--	/* osd_req_decode_sense(or, ret); */
--
--out:
--	osd_end_request(or);
--	EXOFS_DBGMSG2("read_kern(0x%llx) offset=0x%llx "
--		      "length=0x%llx dev=%p ret=>%d\n",
--		      _LLU(obj->id), _LLU(offset), _LLU(length), od, ret);
--	return ret;
--}
--
--static const struct osd_attr g_attr_sb_stats = ATTR_DEF(
--	EXOFS_APAGE_SB_DATA,
--	EXOFS_ATTR_SB_STATS,
--	sizeof(struct exofs_sb_stats));
--
--static int __sbi_read_stats(struct exofs_sb_info *sbi)
--{
--	struct osd_attr attrs[] = {
--		[0] = g_attr_sb_stats,
--	};
--	struct ore_io_state *ios;
--	int ret;
--
--	ret = ore_get_io_state(&sbi->layout, &sbi->oc, &ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("%s: ore_get_io_state failed.\n", __func__);
--		return ret;
--	}
--
--	ios->in_attr = attrs;
--	ios->in_attr_len = ARRAY_SIZE(attrs);
--
--	ret = ore_read(ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("Error reading super_block stats => %d\n", ret);
--		goto out;
--	}
--
--	ret = extract_attr_from_ios(ios, &attrs[0]);
--	if (ret) {
--		EXOFS_ERR("%s: extract_attr of sb_stats failed\n", __func__);
--		goto out;
--	}
--	if (attrs[0].len) {
--		struct exofs_sb_stats *ess;
--
--		if (unlikely(attrs[0].len != sizeof(*ess))) {
--			EXOFS_ERR("%s: Wrong version of exofs_sb_stats "
--				  "size(%d) != expected(%zd)\n",
--				  __func__, attrs[0].len, sizeof(*ess));
--			goto out;
--		}
--
--		ess = attrs[0].val_ptr;
--		sbi->s_nextid = le64_to_cpu(ess->s_nextid);
--		sbi->s_numfiles = le32_to_cpu(ess->s_numfiles);
--	}
--
--out:
--	ore_put_io_state(ios);
--	return ret;
--}
--
--static void stats_done(struct ore_io_state *ios, void *p)
--{
--	ore_put_io_state(ios);
--	/* Good thanks nothing to do anymore */
--}
--
--/* Asynchronously write the stats attribute */
--int exofs_sbi_write_stats(struct exofs_sb_info *sbi)
--{
--	struct osd_attr attrs[] = {
--		[0] = g_attr_sb_stats,
--	};
--	struct ore_io_state *ios;
--	int ret;
--
--	ret = ore_get_io_state(&sbi->layout, &sbi->oc, &ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("%s: ore_get_io_state failed.\n", __func__);
--		return ret;
--	}
--
--	sbi->s_ess.s_nextid   = cpu_to_le64(sbi->s_nextid);
--	sbi->s_ess.s_numfiles = cpu_to_le64(sbi->s_numfiles);
--	attrs[0].val_ptr = &sbi->s_ess;
--
--
--	ios->done = stats_done;
--	ios->private = sbi;
--	ios->out_attr = attrs;
--	ios->out_attr_len = ARRAY_SIZE(attrs);
--
--	ret = ore_write(ios);
--	if (unlikely(ret)) {
--		EXOFS_ERR("%s: ore_write failed.\n", __func__);
--		ore_put_io_state(ios);
--	}
--
--	return ret;
--}
--
--/******************************************************************************
-- * SUPERBLOCK FUNCTIONS
-- *****************************************************************************/
--static const struct super_operations exofs_sops;
--static const struct export_operations exofs_export_ops;
--
--/*
-- * Write the superblock to the OSD
-- */
--static int exofs_sync_fs(struct super_block *sb, int wait)
--{
--	struct exofs_sb_info *sbi;
--	struct exofs_fscb *fscb;
--	struct ore_comp one_comp;
--	struct ore_components oc;
--	struct ore_io_state *ios;
--	int ret = -ENOMEM;
--
--	fscb = kmalloc(sizeof(*fscb), GFP_KERNEL);
--	if (unlikely(!fscb))
--		return -ENOMEM;
--
--	sbi = sb->s_fs_info;
--
--	/* NOTE: We no longer dirty the super_block anywhere in exofs. The
--	 * reason we write the fscb here on unmount is so we can stay backwards
--	 * compatible with fscb->s_version == 1. (What we are not compatible
--	 * with is if a new version FS crashed and then we try to mount an old
--	 * version). Otherwise the exofs_fscb is read-only from mkfs time. All
--	 * the writeable info is set in exofs_sbi_write_stats() above.
--	 */
--
--	exofs_init_comps(&oc, &one_comp, sbi, EXOFS_SUPER_ID);
--
--	ret = ore_get_io_state(&sbi->layout, &oc, &ios);
--	if (unlikely(ret))
--		goto out;
--
--	ios->length = offsetof(struct exofs_fscb, s_dev_table_oid);
--	memset(fscb, 0, ios->length);
--	fscb->s_nextid = cpu_to_le64(sbi->s_nextid);
--	fscb->s_numfiles = cpu_to_le64(sbi->s_numfiles);
--	fscb->s_magic = cpu_to_le16(sb->s_magic);
--	fscb->s_newfs = 0;
--	fscb->s_version = EXOFS_FSCB_VER;
--
--	ios->offset = 0;
--	ios->kern_buff = fscb;
--
--	ret = ore_write(ios);
--	if (unlikely(ret))
--		EXOFS_ERR("%s: ore_write failed.\n", __func__);
--
--out:
--	EXOFS_DBGMSG("s_nextid=0x%llx ret=%d\n", _LLU(sbi->s_nextid), ret);
--	ore_put_io_state(ios);
--	kfree(fscb);
--	return ret;
--}
--
--static void _exofs_print_device(const char *msg, const char *dev_path,
--				struct osd_dev *od, u64 pid)
--{
--	const struct osd_dev_info *odi = osduld_device_info(od);
--
--	printk(KERN_NOTICE "exofs: %s %s osd_name-%s pid-0x%llx\n",
--		msg, dev_path ?: "", odi->osdname, _LLU(pid));
--}
--
--static void exofs_free_sbi(struct exofs_sb_info *sbi)
--{
--	unsigned numdevs = sbi->oc.numdevs;
--
--	while (numdevs) {
--		unsigned i = --numdevs;
--		struct osd_dev *od = ore_comp_dev(&sbi->oc, i);
--
--		if (od) {
--			ore_comp_set_dev(&sbi->oc, i, NULL);
--			osduld_put_device(od);
--		}
--	}
--	kfree(sbi->oc.ods);
--	kfree(sbi);
--}
--
--/*
-- * This function is called when the vfs is freeing the superblock.  We just
-- * need to free our own part.
-- */
--static void exofs_put_super(struct super_block *sb)
--{
--	int num_pend;
--	struct exofs_sb_info *sbi = sb->s_fs_info;
--
--	/* make sure there are no pending commands */
--	for (num_pend = atomic_read(&sbi->s_curr_pending); num_pend > 0;
--	     num_pend = atomic_read(&sbi->s_curr_pending)) {
--		wait_queue_head_t wq;
--
--		printk(KERN_NOTICE "%s: !!Pending operations in flight. "
--		       "This is a BUG. please report to osd-dev@open-osd.org\n",
--		       __func__);
--		init_waitqueue_head(&wq);
--		wait_event_timeout(wq,
--				  (atomic_read(&sbi->s_curr_pending) == 0),
--				  msecs_to_jiffies(100));
--	}
--
--	_exofs_print_device("Unmounting", NULL, ore_comp_dev(&sbi->oc, 0),
--			    sbi->one_comp.obj.partition);
--
--	exofs_sysfs_sb_del(sbi);
--	bdi_destroy(&sbi->bdi);
--	exofs_free_sbi(sbi);
--	sb->s_fs_info = NULL;
--}
--
--static int _read_and_match_data_map(struct exofs_sb_info *sbi, unsigned numdevs,
--				    struct exofs_device_table *dt)
--{
--	int ret;
--
--	sbi->layout.stripe_unit =
--				le64_to_cpu(dt->dt_data_map.cb_stripe_unit);
--	sbi->layout.group_width =
--				le32_to_cpu(dt->dt_data_map.cb_group_width);
--	sbi->layout.group_depth =
--				le32_to_cpu(dt->dt_data_map.cb_group_depth);
--	sbi->layout.mirrors_p1  =
--				le32_to_cpu(dt->dt_data_map.cb_mirror_cnt) + 1;
--	sbi->layout.raid_algorithm  =
--				le32_to_cpu(dt->dt_data_map.cb_raid_algorithm);
--
--	ret = ore_verify_layout(numdevs, &sbi->layout);
--
--	EXOFS_DBGMSG("exofs: layout: "
--		"num_comps=%u stripe_unit=0x%x group_width=%u "
--		"group_depth=0x%llx mirrors_p1=%u raid_algorithm=%u\n",
--		numdevs,
--		sbi->layout.stripe_unit,
--		sbi->layout.group_width,
--		_LLU(sbi->layout.group_depth),
--		sbi->layout.mirrors_p1,
--		sbi->layout.raid_algorithm);
--	return ret;
--}
--
--static unsigned __ra_pages(struct ore_layout *layout)
--{
--	const unsigned _MIN_RA = 32; /* min 128K read-ahead */
--	unsigned ra_pages = layout->group_width * layout->stripe_unit /
--				PAGE_SIZE;
--	unsigned max_io_pages = exofs_max_io_pages(layout, ~0);
--
--	ra_pages *= 2; /* two stripes */
--	if (ra_pages < _MIN_RA)
--		ra_pages = roundup(_MIN_RA, ra_pages / 2);
--
--	if (ra_pages > max_io_pages)
--		ra_pages = max_io_pages;
--
--	return ra_pages;
--}
--
--/* @odi is valid only as long as @fscb_dev is valid */
--static int exofs_devs_2_odi(struct exofs_dt_device_info *dt_dev,
--			     struct osd_dev_info *odi)
--{
--	odi->systemid_len = le32_to_cpu(dt_dev->systemid_len);
--	if (likely(odi->systemid_len))
--		memcpy(odi->systemid, dt_dev->systemid, OSD_SYSTEMID_LEN);
--
--	odi->osdname_len = le32_to_cpu(dt_dev->osdname_len);
--	odi->osdname = dt_dev->osdname;
--
--	/* FIXME support long names. Will need a _put function */
--	if (dt_dev->long_name_offset)
--		return -EINVAL;
--
--	/* Make sure osdname is printable!
--	 * mkexofs should give us space for a null-terminator else the
--	 * device-table is invalid.
--	 */
--	if (unlikely(odi->osdname_len >= sizeof(dt_dev->osdname)))
--		odi->osdname_len = sizeof(dt_dev->osdname) - 1;
--	dt_dev->osdname[odi->osdname_len] = 0;
--
--	/* If it's all zeros something is bad we read past end-of-obj */
--	return !(odi->systemid_len || odi->osdname_len);
--}
--
--static int __alloc_dev_table(struct exofs_sb_info *sbi, unsigned numdevs,
--		      struct exofs_dev **peds)
--{
--	struct __alloc_ore_devs_and_exofs_devs {
--		/* Twice bigger table: See exofs_init_comps() and comment at
--		 * exofs_read_lookup_dev_table()
--		 */
--		struct ore_dev *oreds[numdevs * 2 - 1];
--		struct exofs_dev eds[numdevs];
--	} *aoded;
--	struct exofs_dev *eds;
--	unsigned i;
--
--	aoded = kzalloc(sizeof(*aoded), GFP_KERNEL);
--	if (unlikely(!aoded)) {
--		EXOFS_ERR("ERROR: failed allocating Device array[%d]\n",
--			  numdevs);
--		return -ENOMEM;
--	}
--
--	sbi->oc.ods = aoded->oreds;
--	*peds = eds = aoded->eds;
--	for (i = 0; i < numdevs; ++i)
--		aoded->oreds[i] = &eds[i].ored;
--	return 0;
--}
--
--static int exofs_read_lookup_dev_table(struct exofs_sb_info *sbi,
--				       struct osd_dev *fscb_od,
--				       unsigned table_count)
--{
--	struct ore_comp comp;
--	struct exofs_device_table *dt;
--	struct exofs_dev *eds;
--	unsigned table_bytes = table_count * sizeof(dt->dt_dev_table[0]) +
--					     sizeof(*dt);
--	unsigned numdevs, i;
--	int ret;
--
--	dt = kmalloc(table_bytes, GFP_KERNEL);
--	if (unlikely(!dt)) {
--		EXOFS_ERR("ERROR: allocating %x bytes for device table\n",
--			  table_bytes);
--		return -ENOMEM;
--	}
--
--	sbi->oc.numdevs = 0;
--
--	comp.obj.partition = sbi->one_comp.obj.partition;
--	comp.obj.id = EXOFS_DEVTABLE_ID;
--	exofs_make_credential(comp.cred, &comp.obj);
--
--	ret = exofs_read_kern(fscb_od, comp.cred, &comp.obj, 0, dt,
--			      table_bytes);
--	if (unlikely(ret)) {
--		EXOFS_ERR("ERROR: reading device table\n");
--		goto out;
--	}
--
--	numdevs = le64_to_cpu(dt->dt_num_devices);
--	if (unlikely(!numdevs)) {
--		ret = -EINVAL;
--		goto out;
--	}
--	WARN_ON(table_count != numdevs);
--
--	ret = _read_and_match_data_map(sbi, numdevs, dt);
--	if (unlikely(ret))
--		goto out;
--
--	ret = __alloc_dev_table(sbi, numdevs, &eds);
--	if (unlikely(ret))
--		goto out;
--	/* exofs round-robins the device table view according to inode
--	 * number. We hold a: twice bigger table hence inodes can point
--	 * to any device and have a sequential view of the table
--	 * starting at this device. See exofs_init_comps()
--	 */
--	memcpy(&sbi->oc.ods[numdevs], &sbi->oc.ods[0],
--		(numdevs - 1) * sizeof(sbi->oc.ods[0]));
--
--	/* create sysfs subdir under which we put the device table
--	 * And cluster layout. A Superblock is identified by the string:
--	 *	"dev[0].osdname"_"pid"
--	 */
--	exofs_sysfs_sb_add(sbi, &dt->dt_dev_table[0]);
--
--	for (i = 0; i < numdevs; i++) {
--		struct exofs_fscb fscb;
--		struct osd_dev_info odi;
--		struct osd_dev *od;
--
--		if (exofs_devs_2_odi(&dt->dt_dev_table[i], &odi)) {
--			EXOFS_ERR("ERROR: Read all-zeros device entry\n");
--			ret = -EINVAL;
--			goto out;
--		}
--
--		printk(KERN_NOTICE "Add device[%d]: osd_name-%s\n",
--		       i, odi.osdname);
--
--		/* the exofs id is currently the table index */
--		eds[i].did = i;
--
--		/* On all devices the device table is identical. The user can
--		 * specify any one of the participating devices on the command
--		 * line. We always keep them in device-table order.
--		 */
--		if (fscb_od && osduld_device_same(fscb_od, &odi)) {
--			eds[i].ored.od = fscb_od;
--			++sbi->oc.numdevs;
--			fscb_od = NULL;
--			exofs_sysfs_odev_add(&eds[i], sbi);
--			continue;
--		}
--
--		od = osduld_info_lookup(&odi);
--		if (IS_ERR(od)) {
--			ret = PTR_ERR(od);
--			EXOFS_ERR("ERROR: device requested is not found "
--				  "osd_name-%s =>%d\n", odi.osdname, ret);
--			goto out;
--		}
--
--		eds[i].ored.od = od;
--		++sbi->oc.numdevs;
--
--		/* Read the fscb of the other devices to make sure the FS
--		 * partition is there.
--		 */
--		ret = exofs_read_kern(od, comp.cred, &comp.obj, 0, &fscb,
--				      sizeof(fscb));
--		if (unlikely(ret)) {
--			EXOFS_ERR("ERROR: Malformed participating device "
--				  "error reading fscb osd_name-%s\n",
--				  odi.osdname);
--			goto out;
--		}
--		exofs_sysfs_odev_add(&eds[i], sbi);
--
--		/* TODO: verify other information is correct and FS-uuid
--		 *	 matches. Benny what did you say about device table
--		 *	 generation and old devices?
--		 */
--	}
--
--out:
--	kfree(dt);
--	if (unlikely(fscb_od && !ret)) {
--			EXOFS_ERR("ERROR: Bad device-table container device not present\n");
--			osduld_put_device(fscb_od);
--			return -EINVAL;
--	}
--	return ret;
--}
--
--/*
-- * Read the superblock from the OSD and fill in the fields
-- */
--static int exofs_fill_super(struct super_block *sb, void *data, int silent)
--{
--	struct inode *root;
--	struct exofs_mountopt *opts = data;
--	struct exofs_sb_info *sbi;	/*extended info                  */
--	struct osd_dev *od;		/* Master device                 */
--	struct exofs_fscb fscb;		/*on-disk superblock info        */
--	struct ore_comp comp;
--	unsigned table_count;
--	int ret;
--
--	sbi = kzalloc(sizeof(*sbi), GFP_KERNEL);
--	if (!sbi)
--		return -ENOMEM;
--
--	/* use mount options to fill superblock */
--	if (opts->is_osdname) {
--		struct osd_dev_info odi = {.systemid_len = 0};
--
--		odi.osdname_len = strlen(opts->dev_name);
--		odi.osdname = (u8 *)opts->dev_name;
--		od = osduld_info_lookup(&odi);
--		kfree(opts->dev_name);
--		opts->dev_name = NULL;
--	} else {
--		od = osduld_path_lookup(opts->dev_name);
--	}
--	if (IS_ERR(od)) {
--		ret = -EINVAL;
--		goto free_sbi;
--	}
--
--	/* Default layout in case we do not have a device-table */
--	sbi->layout.stripe_unit = PAGE_SIZE;
--	sbi->layout.mirrors_p1 = 1;
--	sbi->layout.group_width = 1;
--	sbi->layout.group_depth = -1;
--	sbi->layout.group_count = 1;
--	sbi->s_timeout = opts->timeout;
--
--	sbi->one_comp.obj.partition = opts->pid;
--	sbi->one_comp.obj.id = 0;
--	exofs_make_credential(sbi->one_comp.cred, &sbi->one_comp.obj);
--	sbi->oc.single_comp = EC_SINGLE_COMP;
--	sbi->oc.comps = &sbi->one_comp;
--
--	/* fill in some other data by hand */
--	memset(sb->s_id, 0, sizeof(sb->s_id));
--	strcpy(sb->s_id, "exofs");
--	sb->s_blocksize = EXOFS_BLKSIZE;
--	sb->s_blocksize_bits = EXOFS_BLKSHIFT;
--	sb->s_maxbytes = MAX_LFS_FILESIZE;
--	sb->s_max_links = EXOFS_LINK_MAX;
--	atomic_set(&sbi->s_curr_pending, 0);
--	sb->s_bdev = NULL;
--	sb->s_dev = 0;
--
--	comp.obj.partition = sbi->one_comp.obj.partition;
--	comp.obj.id = EXOFS_SUPER_ID;
--	exofs_make_credential(comp.cred, &comp.obj);
--
--	ret = exofs_read_kern(od, comp.cred, &comp.obj, 0, &fscb, sizeof(fscb));
--	if (unlikely(ret))
--		goto free_sbi;
--
--	sb->s_magic = le16_to_cpu(fscb.s_magic);
--	/* NOTE: we read below to be backward compatible with old versions */
--	sbi->s_nextid = le64_to_cpu(fscb.s_nextid);
--	sbi->s_numfiles = le32_to_cpu(fscb.s_numfiles);
--
--	/* make sure what we read from the object store is correct */
--	if (sb->s_magic != EXOFS_SUPER_MAGIC) {
--		if (!silent)
--			EXOFS_ERR("ERROR: Bad magic value\n");
--		ret = -EINVAL;
--		goto free_sbi;
--	}
--	if (le32_to_cpu(fscb.s_version) > EXOFS_FSCB_VER) {
--		EXOFS_ERR("ERROR: Bad FSCB version expected-%d got-%d\n",
--			  EXOFS_FSCB_VER, le32_to_cpu(fscb.s_version));
--		ret = -EINVAL;
--		goto free_sbi;
--	}
--
--	/* start generation numbers from a random point */
--	get_random_bytes(&sbi->s_next_generation, sizeof(u32));
--	spin_lock_init(&sbi->s_next_gen_lock);
--
--	table_count = le64_to_cpu(fscb.s_dev_table_count);
--	if (table_count) {
--		ret = exofs_read_lookup_dev_table(sbi, od, table_count);
--		if (unlikely(ret))
--			goto free_sbi;
--	} else {
--		struct exofs_dev *eds;
--
--		ret = __alloc_dev_table(sbi, 1, &eds);
--		if (unlikely(ret))
--			goto free_sbi;
--
--		ore_comp_set_dev(&sbi->oc, 0, od);
--		sbi->oc.numdevs = 1;
--	}
--
--	__sbi_read_stats(sbi);
--
--	/* set up operation vectors */
--	sbi->bdi.ra_pages = __ra_pages(&sbi->layout);
--	sb->s_bdi = &sbi->bdi;
--	sb->s_fs_info = sbi;
--	sb->s_op = &exofs_sops;
--	sb->s_export_op = &exofs_export_ops;
--	root = exofs_iget(sb, EXOFS_ROOT_ID - EXOFS_OBJ_OFF);
--	if (IS_ERR(root)) {
--		EXOFS_ERR("ERROR: exofs_iget failed\n");
--		ret = PTR_ERR(root);
--		goto free_sbi;
--	}
--	sb->s_root = d_make_root(root);
--	if (!sb->s_root) {
--		EXOFS_ERR("ERROR: get root inode failed\n");
--		ret = -ENOMEM;
--		goto free_sbi;
--	}
--
--	if (!S_ISDIR(root->i_mode)) {
--		dput(sb->s_root);
--		sb->s_root = NULL;
--		EXOFS_ERR("ERROR: corrupt root inode (mode = %hd)\n",
--		       root->i_mode);
--		ret = -EINVAL;
--		goto free_sbi;
--	}
--
--	ret = bdi_setup_and_register(&sbi->bdi, "exofs");
--	if (ret) {
--		EXOFS_DBGMSG("Failed to bdi_setup_and_register\n");
--		dput(sb->s_root);
--		sb->s_root = NULL;
--		goto free_sbi;
--	}
--
--	exofs_sysfs_dbg_print();
--	_exofs_print_device("Mounting", opts->dev_name,
--			    ore_comp_dev(&sbi->oc, 0),
--			    sbi->one_comp.obj.partition);
--	return 0;
--
--free_sbi:
--	EXOFS_ERR("Unable to mount exofs on %s pid=0x%llx err=%d\n",
--		  opts->dev_name, sbi->one_comp.obj.partition, ret);
--	exofs_free_sbi(sbi);
--	return ret;
--}
--
--/*
-- * Set up the superblock (calls exofs_fill_super eventually)
-- */
--static struct dentry *exofs_mount(struct file_system_type *type,
--			  int flags, const char *dev_name,
--			  void *data)
--{
--	struct exofs_mountopt opts;
--	int ret;
--
--	ret = parse_options(data, &opts);
--	if (ret)
--		return ERR_PTR(ret);
--
--	if (!opts.dev_name)
--		opts.dev_name = dev_name;
--	return mount_nodev(type, flags, &opts, exofs_fill_super);
--}
--
--/*
-- * Return information about the file system state in the buffer.  This is used
-- * by the 'df' command, for example.
-- */
--static int exofs_statfs(struct dentry *dentry, struct kstatfs *buf)
--{
--	struct super_block *sb = dentry->d_sb;
--	struct exofs_sb_info *sbi = sb->s_fs_info;
--	struct ore_io_state *ios;
--	struct osd_attr attrs[] = {
--		ATTR_DEF(OSD_APAGE_PARTITION_QUOTAS,
--			OSD_ATTR_PQ_CAPACITY_QUOTA, sizeof(__be64)),
--		ATTR_DEF(OSD_APAGE_PARTITION_INFORMATION,
--			OSD_ATTR_PI_USED_CAPACITY, sizeof(__be64)),
--	};
--	uint64_t capacity = ULLONG_MAX;
--	uint64_t used = ULLONG_MAX;
--	int ret;
--
--	ret = ore_get_io_state(&sbi->layout, &sbi->oc, &ios);
--	if (ret) {
--		EXOFS_DBGMSG("ore_get_io_state failed.\n");
--		return ret;
--	}
--
--	ios->in_attr = attrs;
--	ios->in_attr_len = ARRAY_SIZE(attrs);
--
--	ret = ore_read(ios);
--	if (unlikely(ret))
--		goto out;
--
--	ret = extract_attr_from_ios(ios, &attrs[0]);
--	if (likely(!ret)) {
--		capacity = get_unaligned_be64(attrs[0].val_ptr);
--		if (unlikely(!capacity))
--			capacity = ULLONG_MAX;
--	} else
--		EXOFS_DBGMSG("exofs_statfs: get capacity failed.\n");
--
--	ret = extract_attr_from_ios(ios, &attrs[1]);
--	if (likely(!ret))
--		used = get_unaligned_be64(attrs[1].val_ptr);
--	else
--		EXOFS_DBGMSG("exofs_statfs: get used-space failed.\n");
--
--	/* fill in the stats buffer */
--	buf->f_type = EXOFS_SUPER_MAGIC;
--	buf->f_bsize = EXOFS_BLKSIZE;
--	buf->f_blocks = capacity >> 9;
--	buf->f_bfree = (capacity - used) >> 9;
--	buf->f_bavail = buf->f_bfree;
--	buf->f_files = sbi->s_numfiles;
--	buf->f_ffree = EXOFS_MAX_ID - sbi->s_numfiles;
--	buf->f_namelen = EXOFS_NAME_LEN;
--
--out:
--	ore_put_io_state(ios);
--	return ret;
--}
--
--static const struct super_operations exofs_sops = {
--	.alloc_inode    = exofs_alloc_inode,
--	.destroy_inode  = exofs_destroy_inode,
--	.write_inode    = exofs_write_inode,
--	.evict_inode    = exofs_evict_inode,
--	.put_super      = exofs_put_super,
--	.sync_fs	= exofs_sync_fs,
--	.statfs         = exofs_statfs,
--};
--
--/******************************************************************************
-- * EXPORT OPERATIONS
-- *****************************************************************************/
--
--static struct dentry *exofs_get_parent(struct dentry *child)
--{
--	unsigned long ino = exofs_parent_ino(child);
--
--	if (!ino)
--		return ERR_PTR(-ESTALE);
--
--	return d_obtain_alias(exofs_iget(child->d_sb, ino));
--}
--
--static struct inode *exofs_nfs_get_inode(struct super_block *sb,
--		u64 ino, u32 generation)
--{
--	struct inode *inode;
--
--	inode = exofs_iget(sb, ino);
--	if (IS_ERR(inode))
--		return ERR_CAST(inode);
--	if (generation && inode->i_generation != generation) {
--		/* we didn't find the right inode.. */
--		iput(inode);
--		return ERR_PTR(-ESTALE);
--	}
--	return inode;
--}
--
--static struct dentry *exofs_fh_to_dentry(struct super_block *sb,
--				struct fid *fid, int fh_len, int fh_type)
--{
--	return generic_fh_to_dentry(sb, fid, fh_len, fh_type,
--				    exofs_nfs_get_inode);
--}
--
--static struct dentry *exofs_fh_to_parent(struct super_block *sb,
--				struct fid *fid, int fh_len, int fh_type)
--{
--	return generic_fh_to_parent(sb, fid, fh_len, fh_type,
--				    exofs_nfs_get_inode);
--}
--
--static const struct export_operations exofs_export_ops = {
--	.fh_to_dentry = exofs_fh_to_dentry,
--	.fh_to_parent = exofs_fh_to_parent,
--	.get_parent = exofs_get_parent,
--};
--
--/******************************************************************************
-- * INSMOD/RMMOD
-- *****************************************************************************/
--
--/*
-- * struct that describes this file system
-- */
--static struct file_system_type exofs_type = {
--	.owner          = THIS_MODULE,
--	.name           = "exofs",
--	.mount          = exofs_mount,
--	.kill_sb        = generic_shutdown_super,
--};
--MODULE_ALIAS_FS("exofs");
--
--static int __init init_exofs(void)
--{
--	int err;
--
--	err = init_inodecache();
--	if (err)
--		goto out;
--
--	err = register_filesystem(&exofs_type);
--	if (err)
--		goto out_d;
--
--	/* We don't fail if sysfs creation failed */
--	exofs_sysfs_init();
--
--	return 0;
--out_d:
--	destroy_inodecache();
--out:
--	return err;
--}
--
--static void __exit exit_exofs(void)
--{
--	exofs_sysfs_uninit();
--	unregister_filesystem(&exofs_type);
--	destroy_inodecache();
--}
--
--MODULE_AUTHOR("Avishay Traeger <avishay@gmail.com>");
--MODULE_DESCRIPTION("exofs");
--MODULE_LICENSE("GPL");
--
--module_init(init_exofs)
--module_exit(exit_exofs)
-diff --git a/fs/exofs/sys.c b/fs/exofs/sys.c
-deleted file mode 100644
-index 1f7d5e46cdda..000000000000
---- a/fs/exofs/sys.c
-+++ /dev/null
-@@ -1,205 +0,0 @@
--/*
-- * Copyright (C) 2012
-- * Sachin Bhamare <sbhamare@panasas.com>
-- * Boaz Harrosh <ooo@electrozaur.com>
-- *
-- * This file is part of exofs.
-- *
-- * exofs is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License 2 as published by
-- * the Free Software Foundation.
-- *
-- * exofs is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with exofs; if not, write to the:
-- *	Free Software Foundation <licensing@fsf.org>
-- */
--
--#include <linux/kobject.h>
--#include <linux/device.h>
--
--#include "exofs.h"
--
--struct odev_attr {
--	struct attribute attr;
--	ssize_t (*show)(struct exofs_dev *, char *);
--	ssize_t (*store)(struct exofs_dev *, const char *, size_t);
--};
--
--static ssize_t odev_attr_show(struct kobject *kobj, struct attribute *attr,
--		char *buf)
--{
--	struct exofs_dev *edp = container_of(kobj, struct exofs_dev, ed_kobj);
--	struct odev_attr *a = container_of(attr, struct odev_attr, attr);
--
--	return a->show ? a->show(edp, buf) : 0;
--}
--
--static ssize_t odev_attr_store(struct kobject *kobj, struct attribute *attr,
--		const char *buf, size_t len)
--{
--	struct exofs_dev *edp = container_of(kobj, struct exofs_dev, ed_kobj);
--	struct odev_attr *a = container_of(attr, struct odev_attr, attr);
--
--	return a->store ? a->store(edp, buf, len) : len;
--}
--
--static const struct sysfs_ops odev_attr_ops = {
--	.show  = odev_attr_show,
--	.store = odev_attr_store,
--};
--
--
--static struct kset *exofs_kset;
--
--static ssize_t osdname_show(struct exofs_dev *edp, char *buf)
--{
--	struct osd_dev *odev = edp->ored.od;
--	const struct osd_dev_info *odi = osduld_device_info(odev);
--
--	return snprintf(buf, odi->osdname_len + 1, "%s", odi->osdname);
--}
--
--static ssize_t systemid_show(struct exofs_dev *edp, char *buf)
--{
--	struct osd_dev *odev = edp->ored.od;
--	const struct osd_dev_info *odi = osduld_device_info(odev);
--
--	memcpy(buf, odi->systemid, odi->systemid_len);
--	return odi->systemid_len;
--}
--
--static ssize_t uri_show(struct exofs_dev *edp, char *buf)
--{
--	return snprintf(buf, edp->urilen, "%s", edp->uri);
--}
--
--static ssize_t uri_store(struct exofs_dev *edp, const char *buf, size_t len)
--{
--	uint8_t *new_uri;
--
--	edp->urilen = strlen(buf) + 1;
--	new_uri = krealloc(edp->uri, edp->urilen, GFP_KERNEL);
--	if (new_uri == NULL)
--		return -ENOMEM;
--	edp->uri = new_uri;
--	strncpy(edp->uri, buf, edp->urilen);
--	return edp->urilen;
--}
--
--#define OSD_ATTR(name, mode, show, store) \
--	static struct odev_attr odev_attr_##name = \
--					__ATTR(name, mode, show, store)
--
--OSD_ATTR(osdname, S_IRUGO, osdname_show, NULL);
--OSD_ATTR(systemid, S_IRUGO, systemid_show, NULL);
--OSD_ATTR(uri, S_IRWXU, uri_show, uri_store);
--
--static struct attribute *odev_attrs[] = {
--	&odev_attr_osdname.attr,
--	&odev_attr_systemid.attr,
--	&odev_attr_uri.attr,
--	NULL,
--};
--
--static struct kobj_type odev_ktype = {
--	.default_attrs	= odev_attrs,
--	.sysfs_ops	= &odev_attr_ops,
--};
--
--static struct kobj_type uuid_ktype = {
--};
--
--void exofs_sysfs_dbg_print(void)
--{
--#ifdef CONFIG_EXOFS_DEBUG
--	struct kobject *k_name, *k_tmp;
--
--	list_for_each_entry_safe(k_name, k_tmp, &exofs_kset->list, entry) {
--		printk(KERN_INFO "%s: name %s ref %d\n",
--			__func__, kobject_name(k_name),
--			(int)kref_read(&k_name->kref));
--	}
--#endif
--}
--/*
-- * This function removes all kobjects under exofs_kset
-- * At the end of it, exofs_kset kobject will have a refcount
-- * of 1 which gets decremented only on exofs module unload
-- */
--void exofs_sysfs_sb_del(struct exofs_sb_info *sbi)
--{
--	struct kobject *k_name, *k_tmp;
--	struct kobject *s_kobj = &sbi->s_kobj;
--
--	list_for_each_entry_safe(k_name, k_tmp, &exofs_kset->list, entry) {
--		/* Remove all that are children of this SBI */
--		if (k_name->parent == s_kobj)
--			kobject_put(k_name);
--	}
--	kobject_put(s_kobj);
--}
--
--/*
-- * This function creates sysfs entries to hold the current exofs cluster
-- * instance (uniquely identified by osdname,pid tuple).
-- * This function gets called once per exofs mount instance.
-- */
--int exofs_sysfs_sb_add(struct exofs_sb_info *sbi,
--		       struct exofs_dt_device_info *dt_dev)
--{
--	struct kobject *s_kobj;
--	int retval = 0;
--	uint64_t pid = sbi->one_comp.obj.partition;
--
--	/* allocate new uuid dirent */
--	s_kobj = &sbi->s_kobj;
--	s_kobj->kset = exofs_kset;
--	retval = kobject_init_and_add(s_kobj, &uuid_ktype,
--			&exofs_kset->kobj,  "%s_%llx", dt_dev->osdname, pid);
--	if (retval) {
--		EXOFS_ERR("ERROR: Failed to create sysfs entry for "
--			  "uuid-%s_%llx => %d\n", dt_dev->osdname, pid, retval);
--		return -ENOMEM;
--	}
--	return 0;
--}
--
--int exofs_sysfs_odev_add(struct exofs_dev *edev, struct exofs_sb_info *sbi)
--{
--	struct kobject *d_kobj;
--	int retval = 0;
--
--	/* create osd device group which contains following attributes
--	 * osdname, systemid & uri
--	 */
--	d_kobj = &edev->ed_kobj;
--	d_kobj->kset = exofs_kset;
--	retval = kobject_init_and_add(d_kobj, &odev_ktype,
--			&sbi->s_kobj, "dev%u", edev->did);
--	if (retval) {
--		EXOFS_ERR("ERROR: Failed to create sysfs entry for "
--				"device dev%u\n", edev->did);
--		return retval;
--	}
--	return 0;
--}
--
--int exofs_sysfs_init(void)
--{
--	exofs_kset = kset_create_and_add("exofs", NULL, fs_kobj);
--	if (!exofs_kset) {
--		EXOFS_ERR("ERROR: kset_create_and_add exofs failed\n");
--		return -ENOMEM;
--	}
--	return 0;
--}
--
--void exofs_sysfs_uninit(void)
--{
--	kset_unregister(exofs_kset);
--}
+ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
+ obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+new file mode 100644
+index 0000000..c4e7d8d
+--- /dev/null
++++ b/block/bfq-iosched.c
+@@ -0,0 +1,4166 @@
++/*
++ * Budget Fair Queueing (BFQ) I/O scheduler.
++ *
++ * Based on ideas and code from CFQ:
++ * Copyright (C) 2003 Jens Axboe <axboe@kernel.dk>
++ *
++ * Copyright (C) 2008 Fabio Checconi <fabio@gandalf.sssup.it>
++ *		      Paolo Valente <paolo.valente@unimore.it>
++ *
++ * Copyright (C) 2010 Paolo Valente <paolo.valente@unimore.it>
++ *                    Arianna Avanzini <avanzini@google.com>
++ *
++ * Copyright (C) 2017 Paolo Valente <paolo.valente@linaro.org>
++ *
++ *  This program is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU General Public License as
++ *  published by the Free Software Foundation; either version 2 of the
++ *  License, or (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  General Public License for more details.
++ *
++ * BFQ is a proportional-share I/O scheduler, with some extra
++ * low-latency capabilities. BFQ also supports full hierarchical
++ * scheduling through cgroups. Next paragraphs provide an introduction
++ * on BFQ inner workings. Details on BFQ benefits, usage and
++ * limitations can be found in Documentation/block/bfq-iosched.txt.
++ *
++ * BFQ is a proportional-share storage-I/O scheduling algorithm based
++ * on the slice-by-slice service scheme of CFQ. But BFQ assigns
++ * budgets, measured in number of sectors, to processes instead of
++ * time slices. The device is not granted to the in-service process
++ * for a given time slice, but until it has exhausted its assigned
++ * budget. This change from the time to the service domain enables BFQ
++ * to distribute the device throughput among processes as desired,
++ * without any distortion due to throughput fluctuations, or to device
++ * internal queueing. BFQ uses an ad hoc internal scheduler, called
++ * B-WF2Q+, to schedule processes according to their budgets. More
++ * precisely, BFQ schedules queues associated with processes. Each
++ * process/queue is assigned a user-configurable weight, and B-WF2Q+
++ * guarantees that each queue receives a fraction of the throughput
++ * proportional to its weight. Thanks to the accurate policy of
++ * B-WF2Q+, BFQ can afford to assign high budgets to I/O-bound
++ * processes issuing sequential requests (to boost the throughput),
++ * and yet guarantee a low latency to interactive and soft real-time
++ * applications.
++ *
++ * In particular, to provide these low-latency guarantees, BFQ
++ * explicitly privileges the I/O of two classes of time-sensitive
++ * applications: interactive and soft real-time. This feature enables
++ * BFQ to provide applications in these classes with a very low
++ * latency. Finally, BFQ also features additional heuristics for
++ * preserving both a low latency and a high throughput on NCQ-capable,
++ * rotational or flash-based devices, and to get the job done quickly
++ * for applications consisting in many I/O-bound processes.
++ *
++ * BFQ is described in [1], where also a reference to the initial, more
++ * theoretical paper on BFQ can be found. The interested reader can find
++ * in the latter paper full details on the main algorithm, as well as
++ * formulas of the guarantees and formal proofs of all the properties.
++ * With respect to the version of BFQ presented in these papers, this
++ * implementation adds a few more heuristics, such as the one that
++ * guarantees a low latency to soft real-time applications, and a
++ * hierarchical extension based on H-WF2Q+.
++ *
++ * B-WF2Q+ is based on WF2Q+, which is described in [2], together with
++ * H-WF2Q+, while the augmented tree used here to implement B-WF2Q+
++ * with O(log N) complexity derives from the one introduced with EEVDF
++ * in [3].
++ *
++ * [1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
++ *     Scheduler", Proceedings of the First Workshop on Mobile System
++ *     Technologies (MST-2015), May 2015.
++ *     http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
++ *
++ * [2] Jon C.R. Bennett and H. Zhang, "Hierarchical Packet Fair Queueing
++ *     Algorithms", IEEE/ACM Transactions on Networking, 5(5):675-689,
++ *     Oct 1997.
++ *
++ * http://www.cs.cmu.edu/~hzhang/papers/TON-97-Oct.ps.gz
++ *
++ * [3] I. Stoica and H. Abdel-Wahab, "Earliest Eligible Virtual Deadline
++ *     First: A Flexible and Accurate Mechanism for Proportional Share
++ *     Resource Allocation", technical report.
++ *
++ * http://www.cs.berkeley.edu/~istoica/papers/eevdf-tr-95.pdf
++ */
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/blkdev.h>
++#include <linux/elevator.h>
++#include <linux/ktime.h>
++#include <linux/rbtree.h>
++#include <linux/ioprio.h>
++#include <linux/sbitmap.h>
++#include <linux/delay.h>
++
++#include "blk.h"
++#include "blk-mq.h"
++#include "blk-mq-tag.h"
++#include "blk-mq-sched.h"
++#include <linux/blktrace_api.h>
++#include <linux/hrtimer.h>
++#include <linux/blk-cgroup.h>
++
++#define BFQ_IOPRIO_CLASSES	3
++#define BFQ_CL_IDLE_TIMEOUT	(HZ/5)
++
++#define BFQ_MIN_WEIGHT			1
++#define BFQ_MAX_WEIGHT			1000
++#define BFQ_WEIGHT_CONVERSION_COEFF	10
++
++#define BFQ_DEFAULT_QUEUE_IOPRIO	4
++
++#define BFQ_DEFAULT_GRP_WEIGHT	10
++#define BFQ_DEFAULT_GRP_IOPRIO	0
++#define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
++
++struct bfq_entity;
++
++/**
++ * struct bfq_service_tree - per ioprio_class service tree.
++ *
++ * Each service tree represents a B-WF2Q+ scheduler on its own.  Each
++ * ioprio_class has its own independent scheduler, and so its own
++ * bfq_service_tree.  All the fields are protected by the queue lock
++ * of the containing bfqd.
++ */
++struct bfq_service_tree {
++	/* tree for active entities (i.e., those backlogged) */
++	struct rb_root active;
++	/* tree for idle entities (i.e., not backlogged, with V <= F_i)*/
++	struct rb_root idle;
++
++	/* idle entity with minimum F_i */
++	struct bfq_entity *first_idle;
++	/* idle entity with maximum F_i */
++	struct bfq_entity *last_idle;
++
++	/* scheduler virtual time */
++	u64 vtime;
++	/* scheduler weight sum; active and idle entities contribute to it */
++	unsigned long wsum;
++};
++
++/**
++ * struct bfq_sched_data - multi-class scheduler.
++ *
++ * bfq_sched_data is the basic scheduler queue.  It supports three
++ * ioprio_classes, and can be used either as a toplevel queue or as
++ * an intermediate queue on a hierarchical setup.
++ * @next_in_service points to the active entity of the sched_data
++ * service trees that will be scheduled next.
++ *
++ * The supported ioprio_classes are the same as in CFQ, in descending
++ * priority order, IOPRIO_CLASS_RT, IOPRIO_CLASS_BE, IOPRIO_CLASS_IDLE.
++ * Requests from higher priority queues are served before all the
++ * requests from lower priority queues; among requests of the same
++ * queue requests are served according to B-WF2Q+.
++ * All the fields are protected by the queue lock of the containing bfqd.
++ */
++struct bfq_sched_data {
++	/* entity in service */
++	struct bfq_entity *in_service_entity;
++	/* head-of-the-line entity in the scheduler */
++	struct bfq_entity *next_in_service;
++	/* array of service trees, one per ioprio_class */
++	struct bfq_service_tree service_tree[BFQ_IOPRIO_CLASSES];
++};
++
++/**
++ * struct bfq_entity - schedulable entity.
++ *
++ * A bfq_entity is used to represent a bfq_queue (leaf node in the upper
++ * level scheduler). Each entity belongs to the sched_data of the parent
++ * group hierarchy. Non-leaf entities have also their own sched_data,
++ * stored in @my_sched_data.
++ *
++ * Each entity stores independently its priority values; this would
++ * allow different weights on different devices, but this
++ * functionality is not exported to userspace by now.  Priorities and
++ * weights are updated lazily, first storing the new values into the
++ * new_* fields, then setting the @prio_changed flag.  As soon as
++ * there is a transition in the entity state that allows the priority
++ * update to take place the effective and the requested priority
++ * values are synchronized.
++ *
++ * The weight value is calculated from the ioprio to export the same
++ * interface as CFQ.  When dealing with  ``well-behaved'' queues (i.e.,
++ * queues that do not spend too much time to consume their budget
++ * and have true sequential behavior, and when there are no external
++ * factors breaking anticipation) the relative weights at each level
++ * of the hierarchy should be guaranteed.  All the fields are
++ * protected by the queue lock of the containing bfqd.
++ */
++struct bfq_entity {
++	/* service_tree member */
++	struct rb_node rb_node;
++
++	/*
++	 * flag, true if the entity is on a tree (either the active or
++	 * the idle one of its service_tree).
++	 */
++	int on_st;
++
++	/* B-WF2Q+ start and finish timestamps [sectors/weight] */
++	u64 start, finish;
++
++	/* tree the entity is enqueued into; %NULL if not on a tree */
++	struct rb_root *tree;
++
++	/*
++	 * minimum start time of the (active) subtree rooted at this
++	 * entity; used for O(log N) lookups into active trees
++	 */
++	u64 min_start;
++
++	/* amount of service received during the last service slot */
++	int service;
++
++	/* budget, used also to calculate F_i: F_i = S_i + @budget / @weight */
++	int budget;
++
++	/* weight of the queue */
++	int weight;
++	/* next weight if a change is in progress */
++	int new_weight;
++
++	/* original weight, used to implement weight boosting */
++	int orig_weight;
++
++	/* parent entity, for hierarchical scheduling */
++	struct bfq_entity *parent;
++
++	/*
++	 * For non-leaf nodes in the hierarchy, the associated
++	 * scheduler queue, %NULL on leaf nodes.
++	 */
++	struct bfq_sched_data *my_sched_data;
++	/* the scheduler queue this entity belongs to */
++	struct bfq_sched_data *sched_data;
++
++	/* flag, set to request a weight, ioprio or ioprio_class change  */
++	int prio_changed;
++};
++
++/**
++ * struct bfq_ttime - per process thinktime stats.
++ */
++struct bfq_ttime {
++	/* completion time of the last request */
++	u64 last_end_request;
++
++	/* total process thinktime */
++	u64 ttime_total;
++	/* number of thinktime samples */
++	unsigned long ttime_samples;
++	/* average process thinktime */
++	u64 ttime_mean;
++};
++
++/**
++ * struct bfq_queue - leaf schedulable entity.
++ *
++ * A bfq_queue is a leaf request queue; it can be associated with an
++ * io_context or more, if it is async.
++ */
++struct bfq_queue {
++	/* reference counter */
++	int ref;
++	/* parent bfq_data */
++	struct bfq_data *bfqd;
++
++	/* current ioprio and ioprio class */
++	unsigned short ioprio, ioprio_class;
++	/* next ioprio and ioprio class if a change is in progress */
++	unsigned short new_ioprio, new_ioprio_class;
++
++	/* sorted list of pending requests */
++	struct rb_root sort_list;
++	/* if fifo isn't expired, next request to serve */
++	struct request *next_rq;
++	/* number of sync and async requests queued */
++	int queued[2];
++	/* number of requests currently allocated */
++	int allocated;
++	/* number of pending metadata requests */
++	int meta_pending;
++	/* fifo list of requests in sort_list */
++	struct list_head fifo;
++
++	/* entity representing this queue in the scheduler */
++	struct bfq_entity entity;
++
++	/* maximum budget allowed from the feedback mechanism */
++	int max_budget;
++	/* budget expiration (in jiffies) */
++	unsigned long budget_timeout;
++
++	/* number of requests on the dispatch list or inside driver */
++	int dispatched;
++
++	/* status flags */
++	unsigned long flags;
++
++	/* node for active/idle bfqq list inside parent bfqd */
++	struct list_head bfqq_list;
++
++	/* associated @bfq_ttime struct */
++	struct bfq_ttime ttime;
++
++	/* bit vector: a 1 for each seeky requests in history */
++	u32 seek_history;
++	/* position of the last request enqueued */
++	sector_t last_request_pos;
++
++	/* Number of consecutive pairs of request completion and
++	 * arrival, such that the queue becomes idle after the
++	 * completion, but the next request arrives within an idle
++	 * time slice; used only if the queue's IO_bound flag has been
++	 * cleared.
++	 */
++	unsigned int requests_within_timer;
++
++	/* pid of the process owning the queue, used for logging purposes */
++	pid_t pid;
++};
++
++/**
++ * struct bfq_io_cq - per (request_queue, io_context) structure.
++ */
++struct bfq_io_cq {
++	/* associated io_cq structure */
++	struct io_cq icq; /* must be the first member */
++	/* array of two process queues, the sync and the async */
++	struct bfq_queue *bfqq[2];
++	/* per (request_queue, blkcg) ioprio */
++	int ioprio;
++};
++
++/**
++ * struct bfq_data - per-device data structure.
++ *
++ * All the fields are protected by @lock.
++ */
++struct bfq_data {
++	/* device request queue */
++	struct request_queue *queue;
++	/* dispatch queue */
++	struct list_head dispatch;
++
++	/* root @bfq_sched_data for the device */
++	struct bfq_sched_data sched_data;
++
++	/*
++	 * Number of bfq_queues containing requests (including the
++	 * queue in service, even if it is idling).
++	 */
++	int busy_queues;
++	/* number of queued requests */
++	int queued;
++	/* number of requests dispatched and waiting for completion */
++	int rq_in_driver;
++
++	/*
++	 * Maximum number of requests in driver in the last
++	 * @hw_tag_samples completed requests.
++	 */
++	int max_rq_in_driver;
++	/* number of samples used to calculate hw_tag */
++	int hw_tag_samples;
++	/* flag set to one if the driver is showing a queueing behavior */
++	int hw_tag;
++
++	/* number of budgets assigned */
++	int budgets_assigned;
++
++	/*
++	 * Timer set when idling (waiting) for the next request from
++	 * the queue in service.
++	 */
++	struct hrtimer idle_slice_timer;
++
++	/* bfq_queue in service */
++	struct bfq_queue *in_service_queue;
++	/* bfq_io_cq (bic) associated with the @in_service_queue */
++	struct bfq_io_cq *in_service_bic;
++
++	/* on-disk position of the last served request */
++	sector_t last_position;
++
++	/* beginning of the last budget */
++	ktime_t last_budget_start;
++	/* beginning of the last idle slice */
++	ktime_t last_idling_start;
++	/* number of samples used to calculate @peak_rate */
++	int peak_rate_samples;
++	/*
++	 * Peak read/write rate, observed during the service of a
++	 * budget [BFQ_RATE_SHIFT * sectors/usec]. The value is
++	 * left-shifted by BFQ_RATE_SHIFT to increase precision in
++	 * fixed-point calculations.
++	 */
++	u64 peak_rate;
++	/* maximum budget allotted to a bfq_queue before rescheduling */
++	int bfq_max_budget;
++
++	/* list of all the bfq_queues active on the device */
++	struct list_head active_list;
++	/* list of all the bfq_queues idle on the device */
++	struct list_head idle_list;
++
++	/*
++	 * Timeout for async/sync requests; when it fires, requests
++	 * are served in fifo order.
++	 */
++	u64 bfq_fifo_expire[2];
++	/* weight of backward seeks wrt forward ones */
++	unsigned int bfq_back_penalty;
++	/* maximum allowed backward seek */
++	unsigned int bfq_back_max;
++	/* maximum idling time */
++	u32 bfq_slice_idle;
++	/* last time CLASS_IDLE was served */
++	u64 bfq_class_idle_last_service;
++
++	/* user-configured max budget value (0 for auto-tuning) */
++	int bfq_user_max_budget;
++	/*
++	 * Timeout for bfq_queues to consume their budget; used to
++	 * prevent seeky queues from imposing long latencies to
++	 * sequential or quasi-sequential ones (this also implies that
++	 * seeky queues cannot receive guarantees in the service
++	 * domain; after a timeout they are charged for the time they
++	 * have been in service, to preserve fairness among them, but
++	 * without service-domain guarantees).
++	 */
++	unsigned int bfq_timeout;
++
++	/*
++	 * Number of consecutive requests that must be issued within
++	 * the idle time slice to set again idling to a queue which
++	 * was marked as non-I/O-bound (see the definition of the
++	 * IO_bound flag for further details).
++	 */
++	unsigned int bfq_requests_within_timer;
++
++	/*
++	 * Force device idling whenever needed to provide accurate
++	 * service guarantees, without caring about throughput
++	 * issues. CAVEAT: this may even increase latencies, in case
++	 * of useless idling for processes that did stop doing I/O.
++	 */
++	bool strict_guarantees;
++
++	/* fallback dummy bfqq for extreme OOM conditions */
++	struct bfq_queue oom_bfqq;
++
++	spinlock_t lock;
++
++	/*
++	 * bic associated with the task issuing current bio for
++	 * merging. This and the next field are used as a support to
++	 * be able to perform the bic lookup, needed by bio-merge
++	 * functions, before the scheduler lock is taken, and thus
++	 * avoid taking the request-queue lock while the scheduler
++	 * lock is being held.
++	 */
++	struct bfq_io_cq *bio_bic;
++	/* bfqq associated with the task issuing current bio for merging */
++	struct bfq_queue *bio_bfqq;
++};
++
++enum bfqq_state_flags {
++	BFQQF_busy = 0,		/* has requests or is in service */
++	BFQQF_wait_request,	/* waiting for a request */
++	BFQQF_non_blocking_wait_rq, /*
++				     * waiting for a request
++				     * without idling the device
++				     */
++	BFQQF_fifo_expire,	/* FIFO checked in this slice */
++	BFQQF_idle_window,	/* slice idling enabled */
++	BFQQF_sync,		/* synchronous queue */
++	BFQQF_budget_new,	/* no completion with this budget */
++	BFQQF_IO_bound,		/*
++				 * bfqq has timed-out at least once
++				 * having consumed at most 2/10 of
++				 * its budget
++				 */
++};
++
++#define BFQ_BFQQ_FNS(name)						\
++static void bfq_mark_bfqq_##name(struct bfq_queue *bfqq)		\
++{									\
++	__set_bit(BFQQF_##name, &(bfqq)->flags);			\
++}									\
++static void bfq_clear_bfqq_##name(struct bfq_queue *bfqq)		\
++{									\
++	__clear_bit(BFQQF_##name, &(bfqq)->flags);		\
++}									\
++static int bfq_bfqq_##name(const struct bfq_queue *bfqq)		\
++{									\
++	return test_bit(BFQQF_##name, &(bfqq)->flags);		\
++}
++
++BFQ_BFQQ_FNS(busy);
++BFQ_BFQQ_FNS(wait_request);
++BFQ_BFQQ_FNS(non_blocking_wait_rq);
++BFQ_BFQQ_FNS(fifo_expire);
++BFQ_BFQQ_FNS(idle_window);
++BFQ_BFQQ_FNS(sync);
++BFQ_BFQQ_FNS(budget_new);
++BFQ_BFQQ_FNS(IO_bound);
++#undef BFQ_BFQQ_FNS
++
++/* Logging facilities. */
++#define bfq_log_bfqq(bfqd, bfqq, fmt, args...) \
++	blk_add_trace_msg((bfqd)->queue, "bfq%d " fmt, (bfqq)->pid, ##args)
++
++#define bfq_log(bfqd, fmt, args...) \
++	blk_add_trace_msg((bfqd)->queue, "bfq " fmt, ##args)
++
++/* Expiration reasons. */
++enum bfqq_expiration {
++	BFQQE_TOO_IDLE = 0,		/*
++					 * queue has been idling for
++					 * too long
++					 */
++	BFQQE_BUDGET_TIMEOUT,	/* budget took too long to be used */
++	BFQQE_BUDGET_EXHAUSTED,	/* budget consumed */
++	BFQQE_NO_MORE_REQUESTS,	/* the queue has no more requests */
++	BFQQE_PREEMPTED		/* preemption in progress */
++};
++
++static struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity);
++
++static struct bfq_service_tree *
++bfq_entity_service_tree(struct bfq_entity *entity)
++{
++	struct bfq_sched_data *sched_data = entity->sched_data;
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	unsigned int idx = bfqq ? bfqq->ioprio_class - 1 :
++				  BFQ_DEFAULT_GRP_CLASS - 1;
++
++	return sched_data->service_tree + idx;
++}
++
++static struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync)
++{
++	return bic->bfqq[is_sync];
++}
++
++static void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq,
++			 bool is_sync)
++{
++	bic->bfqq[is_sync] = bfqq;
++}
++
++static struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic)
++{
++	return bic->icq.q->elevator->elevator_data;
++}
++
++static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio);
++static void bfq_put_queue(struct bfq_queue *bfqq);
++static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
++				       struct bio *bio, bool is_sync,
++				       struct bfq_io_cq *bic);
++static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq);
++
++/*
++ * Array of async queues for all the processes, one queue
++ * per ioprio value per ioprio_class.
++ */
++struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
++/* Async queue for the idle class (ioprio is ignored) */
++struct bfq_queue *async_idle_bfqq;
++
++/* Expiration time of sync (0) and async (1) requests, in ns. */
++static const u64 bfq_fifo_expire[2] = { NSEC_PER_SEC / 4, NSEC_PER_SEC / 8 };
++
++/* Maximum backwards seek (magic number lifted from CFQ), in KiB. */
++static const int bfq_back_max = 16 * 1024;
++
++/* Penalty of a backwards seek, in number of sectors. */
++static const int bfq_back_penalty = 2;
++
++/* Idling period duration, in ns. */
++static u64 bfq_slice_idle = NSEC_PER_SEC / 125;
++
++/* Minimum number of assigned budgets for which stats are safe to compute. */
++static const int bfq_stats_min_budgets = 194;
++
++/* Default maximum budget values, in sectors and number of requests. */
++static const int bfq_default_max_budget = 16 * 1024;
++
++/* Default timeout values, in jiffies, approximating CFQ defaults. */
++static const int bfq_timeout = HZ / 8;
++
++static struct kmem_cache *bfq_pool;
++
++/* Below this threshold (in ms), we consider thinktime immediate. */
++#define BFQ_MIN_TT		(2 * NSEC_PER_MSEC)
++
++/* hw_tag detection: parallel requests threshold and min samples needed. */
++#define BFQ_HW_QUEUE_THRESHOLD	4
++#define BFQ_HW_QUEUE_SAMPLES	32
++
++#define BFQQ_SEEK_THR		(sector_t)(8 * 100)
++#define BFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
++#define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
++#define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
++
++/* Budget feedback step. */
++#define BFQ_BUDGET_STEP         128
++
++/* Min samples used for peak rate estimation (for autotuning). */
++#define BFQ_PEAK_RATE_SAMPLES	32
++
++/* Shift used for peak rate fixed precision calculations. */
++#define BFQ_RATE_SHIFT		16
++
++#define BFQ_SERVICE_TREE_INIT	((struct bfq_service_tree)		\
++				{ RB_ROOT, RB_ROOT, NULL, NULL, 0, 0 })
++
++#define RQ_BIC(rq)		((struct bfq_io_cq *) (rq)->elv.priv[0])
++#define RQ_BFQQ(rq)		((rq)->elv.priv[1])
++
++/**
++ * icq_to_bic - convert iocontext queue structure to bfq_io_cq.
++ * @icq: the iocontext queue.
++ */
++static struct bfq_io_cq *icq_to_bic(struct io_cq *icq)
++{
++	/* bic->icq is the first member, %NULL will convert to %NULL */
++	return container_of(icq, struct bfq_io_cq, icq);
++}
++
++/**
++ * bfq_bic_lookup - search into @ioc a bic associated to @bfqd.
++ * @bfqd: the lookup key.
++ * @ioc: the io_context of the process doing I/O.
++ * @q: the request queue.
++ */
++static struct bfq_io_cq *bfq_bic_lookup(struct bfq_data *bfqd,
++					struct io_context *ioc,
++					struct request_queue *q)
++{
++	if (ioc) {
++		unsigned long flags;
++		struct bfq_io_cq *icq;
++
++		spin_lock_irqsave(q->queue_lock, flags);
++		icq = icq_to_bic(ioc_lookup_icq(ioc, q));
++		spin_unlock_irqrestore(q->queue_lock, flags);
++
++		return icq;
++	}
++
++	return NULL;
++}
++
++/*
++ * Next two macros are just fake loops for the moment. They will
++ * become true loops in the cgroups-enabled variant of the code. Such
++ * a variant, in its turn, will be introduced by next commit.
++ */
++#define for_each_entity(entity)	\
++	for (; entity ; entity = NULL)
++
++#define for_each_entity_safe(entity, parent) \
++	for (parent = NULL; entity ; entity = parent)
++
++static int bfq_update_next_in_service(struct bfq_sched_data *sd)
++{
++	return 0;
++}
++
++static void bfq_check_next_in_service(struct bfq_sched_data *sd,
++				      struct bfq_entity *entity)
++{
++}
++
++static void bfq_update_budget(struct bfq_entity *next_in_service)
++{
++}
++
++/*
++ * Shift for timestamp calculations.  This actually limits the maximum
++ * service allowed in one timestamp delta (small shift values increase it),
++ * the maximum total weight that can be used for the queues in the system
++ * (big shift values increase it), and the period of virtual time
++ * wraparounds.
++ */
++#define WFQ_SERVICE_SHIFT	22
++
++/**
++ * bfq_gt - compare two timestamps.
++ * @a: first ts.
++ * @b: second ts.
++ *
++ * Return @a > @b, dealing with wrapping correctly.
++ */
++static int bfq_gt(u64 a, u64 b)
++{
++	return (s64)(a - b) > 0;
++}
++
++static struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = NULL;
++
++	if (!entity->my_sched_data)
++		bfqq = container_of(entity, struct bfq_queue, entity);
++
++	return bfqq;
++}
++
++
++/**
++ * bfq_delta - map service into the virtual time domain.
++ * @service: amount of service.
++ * @weight: scale factor (weight of an entity or weight sum).
++ */
++static u64 bfq_delta(unsigned long service, unsigned long weight)
++{
++	u64 d = (u64)service << WFQ_SERVICE_SHIFT;
++
++	do_div(d, weight);
++	return d;
++}
++
++/**
++ * bfq_calc_finish - assign the finish time to an entity.
++ * @entity: the entity to act upon.
++ * @service: the service to be charged to the entity.
++ */
++static void bfq_calc_finish(struct bfq_entity *entity, unsigned long service)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	entity->finish = entity->start +
++		bfq_delta(service, entity->weight);
++
++	if (bfqq) {
++		bfq_log_bfqq(bfqq->bfqd, bfqq,
++			"calc_finish: serv %lu, w %d",
++			service, entity->weight);
++		bfq_log_bfqq(bfqq->bfqd, bfqq,
++			"calc_finish: start %llu, finish %llu, delta %llu",
++			entity->start, entity->finish,
++			bfq_delta(service, entity->weight));
++	}
++}
++
++/**
++ * bfq_entity_of - get an entity from a node.
++ * @node: the node field of the entity.
++ *
++ * Convert a node pointer to the relative entity.  This is used only
++ * to simplify the logic of some functions and not as the generic
++ * conversion mechanism because, e.g., in the tree walking functions,
++ * the check for a %NULL value would be redundant.
++ */
++static struct bfq_entity *bfq_entity_of(struct rb_node *node)
++{
++	struct bfq_entity *entity = NULL;
++
++	if (node)
++		entity = rb_entry(node, struct bfq_entity, rb_node);
++
++	return entity;
++}
++
++/**
++ * bfq_extract - remove an entity from a tree.
++ * @root: the tree root.
++ * @entity: the entity to remove.
++ */
++static void bfq_extract(struct rb_root *root, struct bfq_entity *entity)
++{
++	entity->tree = NULL;
++	rb_erase(&entity->rb_node, root);
++}
++
++/**
++ * bfq_idle_extract - extract an entity from the idle tree.
++ * @st: the service tree of the owning @entity.
++ * @entity: the entity being removed.
++ */
++static void bfq_idle_extract(struct bfq_service_tree *st,
++			     struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct rb_node *next;
++
++	if (entity == st->first_idle) {
++		next = rb_next(&entity->rb_node);
++		st->first_idle = bfq_entity_of(next);
++	}
++
++	if (entity == st->last_idle) {
++		next = rb_prev(&entity->rb_node);
++		st->last_idle = bfq_entity_of(next);
++	}
++
++	bfq_extract(&st->idle, entity);
++
++	if (bfqq)
++		list_del(&bfqq->bfqq_list);
++}
++
++/**
++ * bfq_insert - generic tree insertion.
++ * @root: tree root.
++ * @entity: entity to insert.
++ *
++ * This is used for the idle and the active tree, since they are both
++ * ordered by finish time.
++ */
++static void bfq_insert(struct rb_root *root, struct bfq_entity *entity)
++{
++	struct bfq_entity *entry;
++	struct rb_node **node = &root->rb_node;
++	struct rb_node *parent = NULL;
++
++	while (*node) {
++		parent = *node;
++		entry = rb_entry(parent, struct bfq_entity, rb_node);
++
++		if (bfq_gt(entry->finish, entity->finish))
++			node = &parent->rb_left;
++		else
++			node = &parent->rb_right;
++	}
++
++	rb_link_node(&entity->rb_node, parent, node);
++	rb_insert_color(&entity->rb_node, root);
++
++	entity->tree = root;
++}
++
++/**
++ * bfq_update_min - update the min_start field of a entity.
++ * @entity: the entity to update.
++ * @node: one of its children.
++ *
++ * This function is called when @entity may store an invalid value for
++ * min_start due to updates to the active tree.  The function  assumes
++ * that the subtree rooted at @node (which may be its left or its right
++ * child) has a valid min_start value.
++ */
++static void bfq_update_min(struct bfq_entity *entity, struct rb_node *node)
++{
++	struct bfq_entity *child;
++
++	if (node) {
++		child = rb_entry(node, struct bfq_entity, rb_node);
++		if (bfq_gt(entity->min_start, child->min_start))
++			entity->min_start = child->min_start;
++	}
++}
++
++/**
++ * bfq_update_active_node - recalculate min_start.
++ * @node: the node to update.
++ *
++ * @node may have changed position or one of its children may have moved,
++ * this function updates its min_start value.  The left and right subtrees
++ * are assumed to hold a correct min_start value.
++ */
++static void bfq_update_active_node(struct rb_node *node)
++{
++	struct bfq_entity *entity = rb_entry(node, struct bfq_entity, rb_node);
++
++	entity->min_start = entity->start;
++	bfq_update_min(entity, node->rb_right);
++	bfq_update_min(entity, node->rb_left);
++}
++
++/**
++ * bfq_update_active_tree - update min_start for the whole active tree.
++ * @node: the starting node.
++ *
++ * @node must be the deepest modified node after an update.  This function
++ * updates its min_start using the values held by its children, assuming
++ * that they did not change, and then updates all the nodes that may have
++ * changed in the path to the root.  The only nodes that may have changed
++ * are the ones in the path or their siblings.
++ */
++static void bfq_update_active_tree(struct rb_node *node)
++{
++	struct rb_node *parent;
++
++up:
++	bfq_update_active_node(node);
++
++	parent = rb_parent(node);
++	if (!parent)
++		return;
++
++	if (node == parent->rb_left && parent->rb_right)
++		bfq_update_active_node(parent->rb_right);
++	else if (parent->rb_left)
++		bfq_update_active_node(parent->rb_left);
++
++	node = parent;
++	goto up;
++}
++
++/**
++ * bfq_active_insert - insert an entity in the active tree of its
++ *                     group/device.
++ * @st: the service tree of the entity.
++ * @entity: the entity being inserted.
++ *
++ * The active tree is ordered by finish time, but an extra key is kept
++ * per each node, containing the minimum value for the start times of
++ * its children (and the node itself), so it's possible to search for
++ * the eligible node with the lowest finish time in logarithmic time.
++ */
++static void bfq_active_insert(struct bfq_service_tree *st,
++			      struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct rb_node *node = &entity->rb_node;
++
++	bfq_insert(&st->active, entity);
++
++	if (node->rb_left)
++		node = node->rb_left;
++	else if (node->rb_right)
++		node = node->rb_right;
++
++	bfq_update_active_tree(node);
++
++	if (bfqq)
++		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
++}
++
++/**
++ * bfq_ioprio_to_weight - calc a weight from an ioprio.
++ * @ioprio: the ioprio value to convert.
++ */
++static unsigned short bfq_ioprio_to_weight(int ioprio)
++{
++	return (IOPRIO_BE_NR - ioprio) * BFQ_WEIGHT_CONVERSION_COEFF;
++}
++
++/**
++ * bfq_weight_to_ioprio - calc an ioprio from a weight.
++ * @weight: the weight value to convert.
++ *
++ * To preserve as much as possible the old only-ioprio user interface,
++ * 0 is used as an escape ioprio value for weights (numerically) equal or
++ * larger than IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF.
++ */
++static unsigned short bfq_weight_to_ioprio(int weight)
++{
++	return max_t(int, 0,
++		     IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF - weight);
++}
++
++static void bfq_get_entity(struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	if (bfqq) {
++		bfqq->ref++;
++		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
++			     bfqq, bfqq->ref);
++	}
++}
++
++/**
++ * bfq_find_deepest - find the deepest node that an extraction can modify.
++ * @node: the node being removed.
++ *
++ * Do the first step of an extraction in an rb tree, looking for the
++ * node that will replace @node, and returning the deepest node that
++ * the following modifications to the tree can touch.  If @node is the
++ * last node in the tree return %NULL.
++ */
++static struct rb_node *bfq_find_deepest(struct rb_node *node)
++{
++	struct rb_node *deepest;
++
++	if (!node->rb_right && !node->rb_left)
++		deepest = rb_parent(node);
++	else if (!node->rb_right)
++		deepest = node->rb_left;
++	else if (!node->rb_left)
++		deepest = node->rb_right;
++	else {
++		deepest = rb_next(node);
++		if (deepest->rb_right)
++			deepest = deepest->rb_right;
++		else if (rb_parent(deepest) != node)
++			deepest = rb_parent(deepest);
++	}
++
++	return deepest;
++}
++
++/**
++ * bfq_active_extract - remove an entity from the active tree.
++ * @st: the service_tree containing the tree.
++ * @entity: the entity being removed.
++ */
++static void bfq_active_extract(struct bfq_service_tree *st,
++			       struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct rb_node *node;
++
++	node = bfq_find_deepest(&entity->rb_node);
++	bfq_extract(&st->active, entity);
++
++	if (node)
++		bfq_update_active_tree(node);
++
++	if (bfqq)
++		list_del(&bfqq->bfqq_list);
++}
++
++/**
++ * bfq_idle_insert - insert an entity into the idle tree.
++ * @st: the service tree containing the tree.
++ * @entity: the entity to insert.
++ */
++static void bfq_idle_insert(struct bfq_service_tree *st,
++			    struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++	struct bfq_entity *first_idle = st->first_idle;
++	struct bfq_entity *last_idle = st->last_idle;
++
++	if (!first_idle || bfq_gt(first_idle->finish, entity->finish))
++		st->first_idle = entity;
++	if (!last_idle || bfq_gt(entity->finish, last_idle->finish))
++		st->last_idle = entity;
++
++	bfq_insert(&st->idle, entity);
++
++	if (bfqq)
++		list_add(&bfqq->bfqq_list, &bfqq->bfqd->idle_list);
++}
++
++/**
++ * bfq_forget_entity - do not consider entity any longer for scheduling
++ * @st: the service tree.
++ * @entity: the entity being removed.
++ * @is_in_service: true if entity is currently the in-service entity.
++ *
++ * Forget everything about @entity. In addition, if entity represents
++ * a queue, and the latter is not in service, then release the service
++ * reference to the queue (the one taken through bfq_get_entity). In
++ * fact, in this case, there is really no more service reference to
++ * the queue, as the latter is also outside any service tree. If,
++ * instead, the queue is in service, then __bfq_bfqd_reset_in_service
++ * will take care of putting the reference when the queue finally
++ * stops being served.
++ */
++static void bfq_forget_entity(struct bfq_service_tree *st,
++			      struct bfq_entity *entity,
++			      bool is_in_service)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	entity->on_st = 0;
++	st->wsum -= entity->weight;
++	if (bfqq && !is_in_service)
++		bfq_put_queue(bfqq);
++}
++
++/**
++ * bfq_put_idle_entity - release the idle tree ref of an entity.
++ * @st: service tree for the entity.
++ * @entity: the entity being released.
++ */
++static void bfq_put_idle_entity(struct bfq_service_tree *st,
++				struct bfq_entity *entity)
++{
++	bfq_idle_extract(st, entity);
++	bfq_forget_entity(st, entity,
++			  entity == entity->sched_data->in_service_entity);
++}
++
++/**
++ * bfq_forget_idle - update the idle tree if necessary.
++ * @st: the service tree to act upon.
++ *
++ * To preserve the global O(log N) complexity we only remove one entry here;
++ * as the idle tree will not grow indefinitely this can be done safely.
++ */
++static void bfq_forget_idle(struct bfq_service_tree *st)
++{
++	struct bfq_entity *first_idle = st->first_idle;
++	struct bfq_entity *last_idle = st->last_idle;
++
++	if (RB_EMPTY_ROOT(&st->active) && last_idle &&
++	    !bfq_gt(last_idle->finish, st->vtime)) {
++		/*
++		 * Forget the whole idle tree, increasing the vtime past
++		 * the last finish time of idle entities.
++		 */
++		st->vtime = last_idle->finish;
++	}
++
++	if (first_idle && !bfq_gt(first_idle->finish, st->vtime))
++		bfq_put_idle_entity(st, first_idle);
++}
++
++static struct bfq_service_tree *
++__bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
++			 struct bfq_entity *entity)
++{
++	struct bfq_service_tree *new_st = old_st;
++
++	if (entity->prio_changed) {
++		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++		unsigned short prev_weight, new_weight;
++		struct bfq_data *bfqd = NULL;
++
++		if (bfqq)
++			bfqd = bfqq->bfqd;
++
++		old_st->wsum -= entity->weight;
++
++		if (entity->new_weight != entity->orig_weight) {
++			if (entity->new_weight < BFQ_MIN_WEIGHT ||
++			    entity->new_weight > BFQ_MAX_WEIGHT) {
++				pr_crit("update_weight_prio: new_weight %d\n",
++					entity->new_weight);
++				if (entity->new_weight < BFQ_MIN_WEIGHT)
++					entity->new_weight = BFQ_MIN_WEIGHT;
++				else
++					entity->new_weight = BFQ_MAX_WEIGHT;
++			}
++			entity->orig_weight = entity->new_weight;
++			if (bfqq)
++				bfqq->ioprio =
++				  bfq_weight_to_ioprio(entity->orig_weight);
++		}
++
++		if (bfqq)
++			bfqq->ioprio_class = bfqq->new_ioprio_class;
++		entity->prio_changed = 0;
++
++		/*
++		 * NOTE: here we may be changing the weight too early,
++		 * this will cause unfairness.  The correct approach
++		 * would have required additional complexity to defer
++		 * weight changes to the proper time instants (i.e.,
++		 * when entity->finish <= old_st->vtime).
++		 */
++		new_st = bfq_entity_service_tree(entity);
++
++		prev_weight = entity->weight;
++		new_weight = entity->orig_weight;
++		entity->weight = new_weight;
++
++		new_st->wsum += entity->weight;
++
++		if (new_st != old_st)
++			entity->start = new_st->vtime;
++	}
++
++	return new_st;
++}
++
++/**
++ * bfq_bfqq_served - update the scheduler status after selection for
++ *                   service.
++ * @bfqq: the queue being served.
++ * @served: bytes to transfer.
++ *
++ * NOTE: this can be optimized, as the timestamps of upper level entities
++ * are synchronized every time a new bfqq is selected for service.  By now,
++ * we keep it to better check consistency.
++ */
++static void bfq_bfqq_served(struct bfq_queue *bfqq, int served)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++	struct bfq_service_tree *st;
++
++	for_each_entity(entity) {
++		st = bfq_entity_service_tree(entity);
++
++		entity->service += served;
++
++		st->vtime += bfq_delta(served, st->wsum);
++		bfq_forget_idle(st);
++	}
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "bfqq_served %d secs", served);
++}
++
++/**
++ * bfq_bfqq_charge_full_budget - set the service to the entity budget.
++ * @bfqq: the queue that needs a service update.
++ *
++ * When it's not possible to be fair in the service domain, because
++ * a queue is not consuming its budget fast enough (the meaning of
++ * fast depends on the timeout parameter), we charge it a full
++ * budget.  In this way we should obtain a sort of time-domain
++ * fairness among all the seeky/slow queues.
++ */
++static void bfq_bfqq_charge_full_budget(struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "charge_full_budget");
++
++	bfq_bfqq_served(bfqq, entity->budget - entity->service);
++}
++
++/**
++ * __bfq_activate_entity - activate an entity.
++ * @entity: the entity being activated.
++ * @non_blocking_wait_rq: true if this entity was waiting for a request
++ *
++ * Called whenever an entity is activated, i.e., it is not active and one
++ * of its children receives a new request, or has to be reactivated due to
++ * budget exhaustion.  It uses the current budget of the entity (and the
++ * service received if @entity is active) of the queue to calculate its
++ * timestamps.
++ */
++static void __bfq_activate_entity(struct bfq_entity *entity,
++				  bool non_blocking_wait_rq)
++{
++	struct bfq_sched_data *sd = entity->sched_data;
++	struct bfq_service_tree *st = bfq_entity_service_tree(entity);
++	bool backshifted = false;
++
++	if (entity == sd->in_service_entity) {
++		/*
++		 * If we are requeueing the current entity we have
++		 * to take care of not charging to it service it has
++		 * not received.
++		 */
++		bfq_calc_finish(entity, entity->service);
++		entity->start = entity->finish;
++		sd->in_service_entity = NULL;
++	} else if (entity->tree == &st->active) {
++		/*
++		 * Requeueing an entity due to a change of some
++		 * next_in_service entity below it.  We reuse the
++		 * old start time.
++		 */
++		bfq_active_extract(st, entity);
++	} else {
++		unsigned long long min_vstart;
++
++		/* See comments on bfq_fqq_update_budg_for_activation */
++		if (non_blocking_wait_rq && bfq_gt(st->vtime, entity->finish)) {
++			backshifted = true;
++			min_vstart = entity->finish;
++		} else
++			min_vstart = st->vtime;
++
++		if (entity->tree == &st->idle) {
++			/*
++			 * Must be on the idle tree, bfq_idle_extract() will
++			 * check for that.
++			 */
++			bfq_idle_extract(st, entity);
++			entity->start = bfq_gt(min_vstart, entity->finish) ?
++				min_vstart : entity->finish;
++		} else {
++			/*
++			 * The finish time of the entity may be invalid, and
++			 * it is in the past for sure, otherwise the queue
++			 * would have been on the idle tree.
++			 */
++			entity->start = min_vstart;
++			st->wsum += entity->weight;
++			/*
++			 * entity is about to be inserted into a service tree,
++			 * and then set in service: get a reference to make
++			 * sure entity does not disappear until it is no
++			 * longer in service or scheduled for service.
++			 */
++			bfq_get_entity(entity);
++
++			entity->on_st = 1;
++		}
++	}
++
++	st = __bfq_entity_update_weight_prio(st, entity);
++	bfq_calc_finish(entity, entity->budget);
++
++	/*
++	 * If some queues enjoy backshifting for a while, then their
++	 * (virtual) finish timestamps may happen to become lower and
++	 * lower than the system virtual time.	In particular, if
++	 * these queues often happen to be idle for short time
++	 * periods, and during such time periods other queues with
++	 * higher timestamps happen to be busy, then the backshifted
++	 * timestamps of the former queues can become much lower than
++	 * the system virtual time. In fact, to serve the queues with
++	 * higher timestamps while the ones with lower timestamps are
++	 * idle, the system virtual time may be pushed-up to much
++	 * higher values than the finish timestamps of the idle
++	 * queues. As a consequence, the finish timestamps of all new
++	 * or newly activated queues may end up being much larger than
++	 * those of lucky queues with backshifted timestamps. The
++	 * latter queues may then monopolize the device for a lot of
++	 * time. This would simply break service guarantees.
++	 *
++	 * To reduce this problem, push up a little bit the
++	 * backshifted timestamps of the queue associated with this
++	 * entity (only a queue can happen to have the backshifted
++	 * flag set): just enough to let the finish timestamp of the
++	 * queue be equal to the current value of the system virtual
++	 * time. This may introduce a little unfairness among queues
++	 * with backshifted timestamps, but it does not break
++	 * worst-case fairness guarantees.
++	 */
++	if (backshifted && bfq_gt(st->vtime, entity->finish)) {
++		unsigned long delta = st->vtime - entity->finish;
++
++		entity->start += delta;
++		entity->finish += delta;
++	}
++
++	bfq_active_insert(st, entity);
++}
++
++/**
++ * bfq_activate_entity - activate an entity and its ancestors if necessary.
++ * @entity: the entity to activate.
++ * @non_blocking_wait_rq: true if this entity was waiting for a request
++ *
++ * Activate @entity and all the entities on the path from it to the root.
++ */
++static void bfq_activate_entity(struct bfq_entity *entity,
++				bool non_blocking_wait_rq)
++{
++	struct bfq_sched_data *sd;
++
++	for_each_entity(entity) {
++		__bfq_activate_entity(entity, non_blocking_wait_rq);
++
++		sd = entity->sched_data;
++		if (!bfq_update_next_in_service(sd))
++			/*
++			 * No need to propagate the activation to the
++			 * upper entities, as they will be updated when
++			 * the in-service entity is rescheduled.
++			 */
++			break;
++	}
++}
++
++/**
++ * __bfq_deactivate_entity - deactivate an entity from its service tree.
++ * @entity: the entity to deactivate.
++ * @requeue: if false, the entity will not be put into the idle tree.
++ *
++ * Deactivate an entity, independently from its previous state.  If the
++ * entity was not on a service tree just return, otherwise if it is on
++ * any scheduler tree, extract it from that tree, and if necessary
++ * and if the caller did not specify @requeue, put it on the idle tree.
++ *
++ * Return %1 if the caller should update the entity hierarchy, i.e.,
++ * if the entity was in service or if it was the next_in_service for
++ * its sched_data; return %0 otherwise.
++ */
++static int __bfq_deactivate_entity(struct bfq_entity *entity, int requeue)
++{
++	struct bfq_sched_data *sd = entity->sched_data;
++	struct bfq_service_tree *st = bfq_entity_service_tree(entity);
++	int is_in_service = entity == sd->in_service_entity;
++	int ret = 0;
++
++	if (!entity->on_st)
++		return 0;
++
++	if (is_in_service) {
++		bfq_calc_finish(entity, entity->service);
++		sd->in_service_entity = NULL;
++	} else if (entity->tree == &st->active)
++		bfq_active_extract(st, entity);
++	else if (entity->tree == &st->idle)
++		bfq_idle_extract(st, entity);
++
++	if (is_in_service || sd->next_in_service == entity)
++		ret = bfq_update_next_in_service(sd);
++
++	if (!requeue || !bfq_gt(entity->finish, st->vtime))
++		bfq_forget_entity(st, entity, is_in_service);
++	else
++		bfq_idle_insert(st, entity);
++
++	return ret;
++}
++
++/**
++ * bfq_deactivate_entity - deactivate an entity.
++ * @entity: the entity to deactivate.
++ * @requeue: true if the entity can be put on the idle tree
++ */
++static void bfq_deactivate_entity(struct bfq_entity *entity, int requeue)
++{
++	struct bfq_sched_data *sd;
++	struct bfq_entity *parent = NULL;
++
++	for_each_entity_safe(entity, parent) {
++		sd = entity->sched_data;
++
++		if (!__bfq_deactivate_entity(entity, requeue))
++			/*
++			 * The parent entity is still backlogged, and
++			 * we don't need to update it as it is still
++			 * in service.
++			 */
++			break;
++
++		if (sd->next_in_service)
++			/*
++			 * The parent entity is still backlogged and
++			 * the budgets on the path towards the root
++			 * need to be updated.
++			 */
++			goto update;
++
++		/*
++		 * If we get here, then the parent is no more backlogged and
++		 * we want to propagate the deactivation upwards.
++		 */
++		requeue = 1;
++	}
++
++	return;
++
++update:
++	entity = parent;
++	for_each_entity(entity) {
++		__bfq_activate_entity(entity, false);
++
++		sd = entity->sched_data;
++		if (!bfq_update_next_in_service(sd))
++			break;
++	}
++}
++
++/**
++ * bfq_update_vtime - update vtime if necessary.
++ * @st: the service tree to act upon.
++ *
++ * If necessary update the service tree vtime to have at least one
++ * eligible entity, skipping to its start time.  Assumes that the
++ * active tree of the device is not empty.
++ *
++ * NOTE: this hierarchical implementation updates vtimes quite often,
++ * we may end up with reactivated processes getting timestamps after a
++ * vtime skip done because we needed a ->first_active entity on some
++ * intermediate node.
++ */
++static void bfq_update_vtime(struct bfq_service_tree *st)
++{
++	struct bfq_entity *entry;
++	struct rb_node *node = st->active.rb_node;
++
++	entry = rb_entry(node, struct bfq_entity, rb_node);
++	if (bfq_gt(entry->min_start, st->vtime)) {
++		st->vtime = entry->min_start;
++		bfq_forget_idle(st);
++	}
++}
++
++/**
++ * bfq_first_active_entity - find the eligible entity with
++ *                           the smallest finish time
++ * @st: the service tree to select from.
++ *
++ * This function searches the first schedulable entity, starting from the
++ * root of the tree and going on the left every time on this side there is
++ * a subtree with at least one eligible (start >= vtime) entity. The path on
++ * the right is followed only if a) the left subtree contains no eligible
++ * entities and b) no eligible entity has been found yet.
++ */
++static struct bfq_entity *bfq_first_active_entity(struct bfq_service_tree *st)
++{
++	struct bfq_entity *entry, *first = NULL;
++	struct rb_node *node = st->active.rb_node;
++
++	while (node) {
++		entry = rb_entry(node, struct bfq_entity, rb_node);
++left:
++		if (!bfq_gt(entry->start, st->vtime))
++			first = entry;
++
++		if (node->rb_left) {
++			entry = rb_entry(node->rb_left,
++					 struct bfq_entity, rb_node);
++			if (!bfq_gt(entry->min_start, st->vtime)) {
++				node = node->rb_left;
++				goto left;
++			}
++		}
++		if (first)
++			break;
++		node = node->rb_right;
++	}
++
++	return first;
++}
++
++/**
++ * __bfq_lookup_next_entity - return the first eligible entity in @st.
++ * @st: the service tree.
++ *
++ * Update the virtual time in @st and return the first eligible entity
++ * it contains.
++ */
++static struct bfq_entity *__bfq_lookup_next_entity(struct bfq_service_tree *st,
++						   bool force)
++{
++	struct bfq_entity *entity, *new_next_in_service = NULL;
++
++	if (RB_EMPTY_ROOT(&st->active))
++		return NULL;
++
++	bfq_update_vtime(st);
++	entity = bfq_first_active_entity(st);
++
++	/*
++	 * If the chosen entity does not match with the sched_data's
++	 * next_in_service and we are forcedly serving the IDLE priority
++	 * class tree, bubble up budget update.
++	 */
++	if (unlikely(force && entity != entity->sched_data->next_in_service)) {
++		new_next_in_service = entity;
++		for_each_entity(new_next_in_service)
++			bfq_update_budget(new_next_in_service);
++	}
++
++	return entity;
++}
++
++/**
++ * bfq_lookup_next_entity - return the first eligible entity in @sd.
++ * @sd: the sched_data.
++ * @extract: if true the returned entity will be also extracted from @sd.
++ *
++ * NOTE: since we cache the next_in_service entity at each level of the
++ * hierarchy, the complexity of the lookup can be decreased with
++ * absolutely no effort just returning the cached next_in_service value;
++ * we prefer to do full lookups to test the consistency of the data
++ * structures.
++ */
++static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
++						 int extract,
++						 struct bfq_data *bfqd)
++{
++	struct bfq_service_tree *st = sd->service_tree;
++	struct bfq_entity *entity;
++	int i = 0;
++
++	/*
++	 * Choose from idle class, if needed to guarantee a minimum
++	 * bandwidth to this class. This should also mitigate
++	 * priority-inversion problems in case a low priority task is
++	 * holding file system resources.
++	 */
++	if (bfqd &&
++	    jiffies - bfqd->bfq_class_idle_last_service >
++	    BFQ_CL_IDLE_TIMEOUT) {
++		entity = __bfq_lookup_next_entity(st + BFQ_IOPRIO_CLASSES - 1,
++						  true);
++		if (entity) {
++			i = BFQ_IOPRIO_CLASSES - 1;
++			bfqd->bfq_class_idle_last_service = jiffies;
++			sd->next_in_service = entity;
++		}
++	}
++	for (; i < BFQ_IOPRIO_CLASSES; i++) {
++		entity = __bfq_lookup_next_entity(st + i, false);
++		if (entity) {
++			if (extract) {
++				bfq_check_next_in_service(sd, entity);
++				bfq_active_extract(st + i, entity);
++				sd->in_service_entity = entity;
++				sd->next_in_service = NULL;
++			}
++			break;
++		}
++	}
++
++	return entity;
++}
++
++static bool next_queue_may_preempt(struct bfq_data *bfqd)
++{
++	struct bfq_sched_data *sd = &bfqd->sched_data;
++
++	return sd->next_in_service != sd->in_service_entity;
++}
++
++
++/*
++ * Get next queue for service.
++ */
++static struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
++{
++	struct bfq_entity *entity = NULL;
++	struct bfq_sched_data *sd;
++	struct bfq_queue *bfqq;
++
++	if (bfqd->busy_queues == 0)
++		return NULL;
++
++	sd = &bfqd->sched_data;
++	for (; sd ; sd = entity->my_sched_data) {
++		entity = bfq_lookup_next_entity(sd, 1, bfqd);
++		entity->service = 0;
++	}
++
++	bfqq = bfq_entity_to_bfqq(entity);
++
++	return bfqq;
++}
++
++static void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
++{
++	struct bfq_queue *in_serv_bfqq = bfqd->in_service_queue;
++	struct bfq_entity *in_serv_entity = &in_serv_bfqq->entity;
++
++	if (bfqd->in_service_bic) {
++		put_io_context(bfqd->in_service_bic->icq.ioc);
++		bfqd->in_service_bic = NULL;
++	}
++
++	bfq_clear_bfqq_wait_request(in_serv_bfqq);
++	hrtimer_try_to_cancel(&bfqd->idle_slice_timer);
++	bfqd->in_service_queue = NULL;
++
++	/*
++	 * in_serv_entity is no longer in service, so, if it is in no
++	 * service tree either, then release the service reference to
++	 * the queue it represents (taken with bfq_get_entity).
++	 */
++	if (!in_serv_entity->on_st)
++		bfq_put_queue(in_serv_bfqq);
++}
++
++static void bfq_deactivate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++				int requeue)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	bfq_deactivate_entity(entity, requeue);
++}
++
++static void bfq_activate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	bfq_activate_entity(entity, bfq_bfqq_non_blocking_wait_rq(bfqq));
++	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
++}
++
++/*
++ * Called when the bfqq no longer has requests pending, remove it from
++ * the service tree.
++ */
++static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			      int requeue)
++{
++	bfq_log_bfqq(bfqd, bfqq, "del from busy");
++
++	bfq_clear_bfqq_busy(bfqq);
++
++	bfqd->busy_queues--;
++
++	bfq_deactivate_bfqq(bfqd, bfqq, requeue);
++}
++
++/*
++ * Called when an inactive queue receives a new request.
++ */
++static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	bfq_log_bfqq(bfqd, bfqq, "add to busy");
++
++	bfq_activate_bfqq(bfqd, bfqq);
++
++	bfq_mark_bfqq_busy(bfqq);
++	bfqd->busy_queues++;
++}
++
++static void bfq_init_entity(struct bfq_entity *entity)
++{
++	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
++
++	entity->weight = entity->new_weight;
++	entity->orig_weight = entity->new_weight;
++
++	bfqq->ioprio = bfqq->new_ioprio;
++	bfqq->ioprio_class = bfqq->new_ioprio_class;
++
++	entity->sched_data = &bfqq->bfqd->sched_data;
++}
++
++#define bfq_class_idle(bfqq)	((bfqq)->ioprio_class == IOPRIO_CLASS_IDLE)
++#define bfq_class_rt(bfqq)	((bfqq)->ioprio_class == IOPRIO_CLASS_RT)
++
++#define bfq_sample_valid(samples)	((samples) > 80)
++
++/*
++ * Scheduler run of queue, if there are requests pending and no one in the
++ * driver that will restart queueing.
++ */
++static void bfq_schedule_dispatch(struct bfq_data *bfqd)
++{
++	if (bfqd->queued != 0) {
++		bfq_log(bfqd, "schedule dispatch");
++		blk_mq_run_hw_queues(bfqd->queue, true);
++	}
++}
++
++/*
++ * Lifted from AS - choose which of rq1 and rq2 that is best served now.
++ * We choose the request that is closesr to the head right now.  Distance
++ * behind the head is penalized and only allowed to a certain extent.
++ */
++static struct request *bfq_choose_req(struct bfq_data *bfqd,
++				      struct request *rq1,
++				      struct request *rq2,
++				      sector_t last)
++{
++	sector_t s1, s2, d1 = 0, d2 = 0;
++	unsigned long back_max;
++#define BFQ_RQ1_WRAP	0x01 /* request 1 wraps */
++#define BFQ_RQ2_WRAP	0x02 /* request 2 wraps */
++	unsigned int wrap = 0; /* bit mask: requests behind the disk head? */
++
++	if (!rq1 || rq1 == rq2)
++		return rq2;
++	if (!rq2)
++		return rq1;
++
++	if (rq_is_sync(rq1) && !rq_is_sync(rq2))
++		return rq1;
++	else if (rq_is_sync(rq2) && !rq_is_sync(rq1))
++		return rq2;
++	if ((rq1->cmd_flags & REQ_META) && !(rq2->cmd_flags & REQ_META))
++		return rq1;
++	else if ((rq2->cmd_flags & REQ_META) && !(rq1->cmd_flags & REQ_META))
++		return rq2;
++
++	s1 = blk_rq_pos(rq1);
++	s2 = blk_rq_pos(rq2);
++
++	/*
++	 * By definition, 1KiB is 2 sectors.
++	 */
++	back_max = bfqd->bfq_back_max * 2;
++
++	/*
++	 * Strict one way elevator _except_ in the case where we allow
++	 * short backward seeks which are biased as twice the cost of a
++	 * similar forward seek.
++	 */
++	if (s1 >= last)
++		d1 = s1 - last;
++	else if (s1 + back_max >= last)
++		d1 = (last - s1) * bfqd->bfq_back_penalty;
++	else
++		wrap |= BFQ_RQ1_WRAP;
++
++	if (s2 >= last)
++		d2 = s2 - last;
++	else if (s2 + back_max >= last)
++		d2 = (last - s2) * bfqd->bfq_back_penalty;
++	else
++		wrap |= BFQ_RQ2_WRAP;
++
++	/* Found required data */
++
++	/*
++	 * By doing switch() on the bit mask "wrap" we avoid having to
++	 * check two variables for all permutations: --> faster!
++	 */
++	switch (wrap) {
++	case 0: /* common case for CFQ: rq1 and rq2 not wrapped */
++		if (d1 < d2)
++			return rq1;
++		else if (d2 < d1)
++			return rq2;
++
++		if (s1 >= s2)
++			return rq1;
++		else
++			return rq2;
++
++	case BFQ_RQ2_WRAP:
++		return rq1;
++	case BFQ_RQ1_WRAP:
++		return rq2;
++	case BFQ_RQ1_WRAP|BFQ_RQ2_WRAP: /* both rqs wrapped */
++	default:
++		/*
++		 * Since both rqs are wrapped,
++		 * start with the one that's further behind head
++		 * (--> only *one* back seek required),
++		 * since back seek takes more time than forward.
++		 */
++		if (s1 <= s2)
++			return rq1;
++		else
++			return rq2;
++	}
++}
++
++/*
++ * Return expired entry, or NULL to just start from scratch in rbtree.
++ */
++static struct request *bfq_check_fifo(struct bfq_queue *bfqq,
++				      struct request *last)
++{
++	struct request *rq;
++
++	if (bfq_bfqq_fifo_expire(bfqq))
++		return NULL;
++
++	bfq_mark_bfqq_fifo_expire(bfqq);
++
++	rq = rq_entry_fifo(bfqq->fifo.next);
++
++	if (rq == last || ktime_get_ns() < rq->fifo_time)
++		return NULL;
++
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "check_fifo: returned %p", rq);
++	return rq;
++}
++
++static struct request *bfq_find_next_rq(struct bfq_data *bfqd,
++					struct bfq_queue *bfqq,
++					struct request *last)
++{
++	struct rb_node *rbnext = rb_next(&last->rb_node);
++	struct rb_node *rbprev = rb_prev(&last->rb_node);
++	struct request *next, *prev = NULL;
++
++	/* Follow expired path, else get first next available. */
++	next = bfq_check_fifo(bfqq, last);
++	if (next)
++		return next;
++
++	if (rbprev)
++		prev = rb_entry_rq(rbprev);
++
++	if (rbnext)
++		next = rb_entry_rq(rbnext);
++	else {
++		rbnext = rb_first(&bfqq->sort_list);
++		if (rbnext && rbnext != &last->rb_node)
++			next = rb_entry_rq(rbnext);
++	}
++
++	return bfq_choose_req(bfqd, next, prev, blk_rq_pos(last));
++}
++
++static unsigned long bfq_serv_to_charge(struct request *rq,
++					struct bfq_queue *bfqq)
++{
++	return blk_rq_sectors(rq);
++}
++
++/**
++ * bfq_updated_next_req - update the queue after a new next_rq selection.
++ * @bfqd: the device data the queue belongs to.
++ * @bfqq: the queue to update.
++ *
++ * If the first request of a queue changes we make sure that the queue
++ * has enough budget to serve at least its first request (if the
++ * request has grown).  We do this because if the queue has not enough
++ * budget for its first request, it has to go through two dispatch
++ * rounds to actually get it dispatched.
++ */
++static void bfq_updated_next_req(struct bfq_data *bfqd,
++				 struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++	struct request *next_rq = bfqq->next_rq;
++	unsigned long new_budget;
++
++	if (!next_rq)
++		return;
++
++	if (bfqq == bfqd->in_service_queue)
++		/*
++		 * In order not to break guarantees, budgets cannot be
++		 * changed after an entity has been selected.
++		 */
++		return;
++
++	new_budget = max_t(unsigned long, bfqq->max_budget,
++			   bfq_serv_to_charge(next_rq, bfqq));
++	if (entity->budget != new_budget) {
++		entity->budget = new_budget;
++		bfq_log_bfqq(bfqd, bfqq, "updated next rq: new budget %lu",
++					 new_budget);
++		bfq_activate_bfqq(bfqd, bfqq);
++	}
++}
++
++static int bfq_bfqq_budget_left(struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	return entity->budget - entity->service;
++}
++
++/*
++ * If enough samples have been computed, return the current max budget
++ * stored in bfqd, which is dynamically updated according to the
++ * estimated disk peak rate; otherwise return the default max budget
++ */
++static int bfq_max_budget(struct bfq_data *bfqd)
++{
++	if (bfqd->budgets_assigned < bfq_stats_min_budgets)
++		return bfq_default_max_budget;
++	else
++		return bfqd->bfq_max_budget;
++}
++
++/*
++ * Return min budget, which is a fraction of the current or default
++ * max budget (trying with 1/32)
++ */
++static int bfq_min_budget(struct bfq_data *bfqd)
++{
++	if (bfqd->budgets_assigned < bfq_stats_min_budgets)
++		return bfq_default_max_budget / 32;
++	else
++		return bfqd->bfq_max_budget / 32;
++}
++
++static void bfq_bfqq_expire(struct bfq_data *bfqd,
++			    struct bfq_queue *bfqq,
++			    bool compensate,
++			    enum bfqq_expiration reason);
++
++/*
++ * The next function, invoked after the input queue bfqq switches from
++ * idle to busy, updates the budget of bfqq. The function also tells
++ * whether the in-service queue should be expired, by returning
++ * true. The purpose of expiring the in-service queue is to give bfqq
++ * the chance to possibly preempt the in-service queue, and the reason
++ * for preempting the in-service queue is to achieve the following
++ * goal: guarantee to bfqq its reserved bandwidth even if bfqq has
++ * expired because it has remained idle.
++ *
++ * In particular, bfqq may have expired for one of the following two
++ * reasons:
++ *
++ * - BFQQE_NO_MORE_REQUESTS bfqq did not enjoy any device idling
++ *   and did not make it to issue a new request before its last
++ *   request was served;
++ *
++ * - BFQQE_TOO_IDLE bfqq did enjoy device idling, but did not issue
++ *   a new request before the expiration of the idling-time.
++ *
++ * Even if bfqq has expired for one of the above reasons, the process
++ * associated with the queue may be however issuing requests greedily,
++ * and thus be sensitive to the bandwidth it receives (bfqq may have
++ * remained idle for other reasons: CPU high load, bfqq not enjoying
++ * idling, I/O throttling somewhere in the path from the process to
++ * the I/O scheduler, ...). But if, after every expiration for one of
++ * the above two reasons, bfqq has to wait for the service of at least
++ * one full budget of another queue before being served again, then
++ * bfqq is likely to get a much lower bandwidth or resource time than
++ * its reserved ones. To address this issue, two countermeasures need
++ * to be taken.
++ *
++ * First, the budget and the timestamps of bfqq need to be updated in
++ * a special way on bfqq reactivation: they need to be updated as if
++ * bfqq did not remain idle and did not expire. In fact, if they are
++ * computed as if bfqq expired and remained idle until reactivation,
++ * then the process associated with bfqq is treated as if, instead of
++ * being greedy, it stopped issuing requests when bfqq remained idle,
++ * and restarts issuing requests only on this reactivation. In other
++ * words, the scheduler does not help the process recover the "service
++ * hole" between bfqq expiration and reactivation. As a consequence,
++ * the process receives a lower bandwidth than its reserved one. In
++ * contrast, to recover this hole, the budget must be updated as if
++ * bfqq was not expired at all before this reactivation, i.e., it must
++ * be set to the value of the remaining budget when bfqq was
++ * expired. Along the same line, timestamps need to be assigned the
++ * value they had the last time bfqq was selected for service, i.e.,
++ * before last expiration. Thus timestamps need to be back-shifted
++ * with respect to their normal computation (see [1] for more details
++ * on this tricky aspect).
++ *
++ * Secondly, to allow the process to recover the hole, the in-service
++ * queue must be expired too, to give bfqq the chance to preempt it
++ * immediately. In fact, if bfqq has to wait for a full budget of the
++ * in-service queue to be completed, then it may become impossible to
++ * let the process recover the hole, even if the back-shifted
++ * timestamps of bfqq are lower than those of the in-service queue. If
++ * this happens for most or all of the holes, then the process may not
++ * receive its reserved bandwidth. In this respect, it is worth noting
++ * that, being the service of outstanding requests unpreemptible, a
++ * little fraction of the holes may however be unrecoverable, thereby
++ * causing a little loss of bandwidth.
++ *
++ * The last important point is detecting whether bfqq does need this
++ * bandwidth recovery. In this respect, the next function deems the
++ * process associated with bfqq greedy, and thus allows it to recover
++ * the hole, if: 1) the process is waiting for the arrival of a new
++ * request (which implies that bfqq expired for one of the above two
++ * reasons), and 2) such a request has arrived soon. The first
++ * condition is controlled through the flag non_blocking_wait_rq,
++ * while the second through the flag arrived_in_time. If both
++ * conditions hold, then the function computes the budget in the
++ * above-described special way, and signals that the in-service queue
++ * should be expired. Timestamp back-shifting is done later in
++ * __bfq_activate_entity.
++ */
++static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
++						struct bfq_queue *bfqq,
++						bool arrived_in_time)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	if (bfq_bfqq_non_blocking_wait_rq(bfqq) && arrived_in_time) {
++		/*
++		 * We do not clear the flag non_blocking_wait_rq here, as
++		 * the latter is used in bfq_activate_bfqq to signal
++		 * that timestamps need to be back-shifted (and is
++		 * cleared right after).
++		 */
++
++		/*
++		 * In next assignment we rely on that either
++		 * entity->service or entity->budget are not updated
++		 * on expiration if bfqq is empty (see
++		 * __bfq_bfqq_recalc_budget). Thus both quantities
++		 * remain unchanged after such an expiration, and the
++		 * following statement therefore assigns to
++		 * entity->budget the remaining budget on such an
++		 * expiration. For clarity, entity->service is not
++		 * updated on expiration in any case, and, in normal
++		 * operation, is reset only when bfqq is selected for
++		 * service (see bfq_get_next_queue).
++		 */
++		entity->budget = min_t(unsigned long,
++				       bfq_bfqq_budget_left(bfqq),
++				       bfqq->max_budget);
++
++		return true;
++	}
++
++	entity->budget = max_t(unsigned long, bfqq->max_budget,
++			       bfq_serv_to_charge(bfqq->next_rq, bfqq));
++	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
++	return false;
++}
++
++static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
++					     struct bfq_queue *bfqq,
++					     struct request *rq)
++{
++	bool bfqq_wants_to_preempt,
++		/*
++		 * See the comments on
++		 * bfq_bfqq_update_budg_for_activation for
++		 * details on the usage of the next variable.
++		 */
++		arrived_in_time =  ktime_get_ns() <=
++			bfqq->ttime.last_end_request +
++			bfqd->bfq_slice_idle * 3;
++
++	/*
++	 * Update budget and check whether bfqq may want to preempt
++	 * the in-service queue.
++	 */
++	bfqq_wants_to_preempt =
++		bfq_bfqq_update_budg_for_activation(bfqd, bfqq,
++						    arrived_in_time);
++
++	if (!bfq_bfqq_IO_bound(bfqq)) {
++		if (arrived_in_time) {
++			bfqq->requests_within_timer++;
++			if (bfqq->requests_within_timer >=
++			    bfqd->bfq_requests_within_timer)
++				bfq_mark_bfqq_IO_bound(bfqq);
++		} else
++			bfqq->requests_within_timer = 0;
++	}
++
++	bfq_add_bfqq_busy(bfqd, bfqq);
++
++	/*
++	 * Expire in-service queue only if preemption may be needed
++	 * for guarantees. In this respect, the function
++	 * next_queue_may_preempt just checks a simple, necessary
++	 * condition, and not a sufficient condition based on
++	 * timestamps. In fact, for the latter condition to be
++	 * evaluated, timestamps would need first to be updated, and
++	 * this operation is quite costly (see the comments on the
++	 * function bfq_bfqq_update_budg_for_activation).
++	 */
++	if (bfqd->in_service_queue && bfqq_wants_to_preempt &&
++	    next_queue_may_preempt(bfqd))
++		bfq_bfqq_expire(bfqd, bfqd->in_service_queue,
++				false, BFQQE_PREEMPTED);
++}
++
++static void bfq_add_request(struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++	struct bfq_data *bfqd = bfqq->bfqd;
++	struct request *next_rq, *prev;
++
++	bfq_log_bfqq(bfqd, bfqq, "add_request %d", rq_is_sync(rq));
++	bfqq->queued[rq_is_sync(rq)]++;
++	bfqd->queued++;
++
++	elv_rb_add(&bfqq->sort_list, rq);
++
++	/*
++	 * Check if this request is a better next-serve candidate.
++	 */
++	prev = bfqq->next_rq;
++	next_rq = bfq_choose_req(bfqd, bfqq->next_rq, rq, bfqd->last_position);
++	bfqq->next_rq = next_rq;
++
++	if (!bfq_bfqq_busy(bfqq)) /* switching to busy ... */
++		bfq_bfqq_handle_idle_busy_switch(bfqd, bfqq, rq);
++	else if (prev != bfqq->next_rq)
++		bfq_updated_next_req(bfqd, bfqq);
++}
++
++static struct request *bfq_find_rq_fmerge(struct bfq_data *bfqd,
++					  struct bio *bio,
++					  struct request_queue *q)
++{
++	struct bfq_queue *bfqq = bfqd->bio_bfqq;
++
++
++	if (bfqq)
++		return elv_rb_find(&bfqq->sort_list, bio_end_sector(bio));
++
++	return NULL;
++}
++
++#if 0 /* Still not clear if we can do without next two functions */
++static void bfq_activate_request(struct request_queue *q, struct request *rq)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++
++	bfqd->rq_in_driver++;
++	bfqd->last_position = blk_rq_pos(rq) + blk_rq_sectors(rq);
++	bfq_log(bfqd, "activate_request: new bfqd->last_position %llu",
++		(unsigned long long)bfqd->last_position);
++}
++
++static void bfq_deactivate_request(struct request_queue *q, struct request *rq)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++
++	bfqd->rq_in_driver--;
++}
++#endif
++
++static void bfq_remove_request(struct request_queue *q,
++			       struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++	struct bfq_data *bfqd = bfqq->bfqd;
++	const int sync = rq_is_sync(rq);
++
++	if (bfqq->next_rq == rq) {
++		bfqq->next_rq = bfq_find_next_rq(bfqd, bfqq, rq);
++		bfq_updated_next_req(bfqd, bfqq);
++	}
++
++	if (rq->queuelist.prev != &rq->queuelist)
++		list_del_init(&rq->queuelist);
++	bfqq->queued[sync]--;
++	bfqd->queued--;
++	elv_rb_del(&bfqq->sort_list, rq);
++
++	elv_rqhash_del(q, rq);
++	if (q->last_merge == rq)
++		q->last_merge = NULL;
++
++	if (RB_EMPTY_ROOT(&bfqq->sort_list)) {
++		bfqq->next_rq = NULL;
++
++		if (bfq_bfqq_busy(bfqq) && bfqq != bfqd->in_service_queue) {
++			bfq_del_bfqq_busy(bfqd, bfqq, 1);
++			/*
++			 * bfqq emptied. In normal operation, when
++			 * bfqq is empty, bfqq->entity.service and
++			 * bfqq->entity.budget must contain,
++			 * respectively, the service received and the
++			 * budget used last time bfqq emptied. These
++			 * facts do not hold in this case, as at least
++			 * this last removal occurred while bfqq is
++			 * not in service. To avoid inconsistencies,
++			 * reset both bfqq->entity.service and
++			 * bfqq->entity.budget, if bfqq has still a
++			 * process that may issue I/O requests to it.
++			 */
++			bfqq->entity.budget = bfqq->entity.service = 0;
++		}
++	}
++
++	if (rq->cmd_flags & REQ_META)
++		bfqq->meta_pending--;
++}
++
++static bool bfq_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
++{
++	struct request_queue *q = hctx->queue;
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	struct request *free = NULL;
++	/*
++	 * bfq_bic_lookup grabs the queue_lock: invoke it now and
++	 * store its return value for later use, to avoid nesting
++	 * queue_lock inside the bfqd->lock. We assume that the bic
++	 * returned by bfq_bic_lookup does not go away before
++	 * bfqd->lock is taken.
++	 */
++	struct bfq_io_cq *bic = bfq_bic_lookup(bfqd, current->io_context, q);
++	bool ret;
++
++	spin_lock_irq(&bfqd->lock);
++
++	if (bic)
++		bfqd->bio_bfqq = bic_to_bfqq(bic, op_is_sync(bio->bi_opf));
++	else
++		bfqd->bio_bfqq = NULL;
++	bfqd->bio_bic = bic;
++
++	ret = blk_mq_sched_try_merge(q, bio, &free);
++
++	if (free)
++		blk_mq_free_request(free);
++	spin_unlock_irq(&bfqd->lock);
++
++	return ret;
++}
++
++static int bfq_request_merge(struct request_queue *q, struct request **req,
++			     struct bio *bio)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	struct request *__rq;
++
++	__rq = bfq_find_rq_fmerge(bfqd, bio, q);
++	if (__rq && elv_bio_merge_ok(__rq, bio)) {
++		*req = __rq;
++		return ELEVATOR_FRONT_MERGE;
++	}
++
++	return ELEVATOR_NO_MERGE;
++}
++
++static void bfq_request_merged(struct request_queue *q, struct request *req,
++			       enum elv_merge type)
++{
++	if (type == ELEVATOR_FRONT_MERGE &&
++	    rb_prev(&req->rb_node) &&
++	    blk_rq_pos(req) <
++	    blk_rq_pos(container_of(rb_prev(&req->rb_node),
++				    struct request, rb_node))) {
++		struct bfq_queue *bfqq = RQ_BFQQ(req);
++		struct bfq_data *bfqd = bfqq->bfqd;
++		struct request *prev, *next_rq;
++
++		/* Reposition request in its sort_list */
++		elv_rb_del(&bfqq->sort_list, req);
++		elv_rb_add(&bfqq->sort_list, req);
++
++		/* Choose next request to be served for bfqq */
++		prev = bfqq->next_rq;
++		next_rq = bfq_choose_req(bfqd, bfqq->next_rq, req,
++					 bfqd->last_position);
++		bfqq->next_rq = next_rq;
++		/*
++		 * If next_rq changes, update the queue's budget to fit
++		 * the new request.
++		 */
++		if (prev != bfqq->next_rq)
++			bfq_updated_next_req(bfqd, bfqq);
++	}
++}
++
++static void bfq_requests_merged(struct request_queue *q, struct request *rq,
++				struct request *next)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq), *next_bfqq = RQ_BFQQ(next);
++
++	if (!RB_EMPTY_NODE(&rq->rb_node))
++		return;
++	spin_lock_irq(&bfqq->bfqd->lock);
++
++	/*
++	 * If next and rq belong to the same bfq_queue and next is older
++	 * than rq, then reposition rq in the fifo (by substituting next
++	 * with rq). Otherwise, if next and rq belong to different
++	 * bfq_queues, never reposition rq: in fact, we would have to
++	 * reposition it with respect to next's position in its own fifo,
++	 * which would most certainly be too expensive with respect to
++	 * the benefits.
++	 */
++	if (bfqq == next_bfqq &&
++	    !list_empty(&rq->queuelist) && !list_empty(&next->queuelist) &&
++	    next->fifo_time < rq->fifo_time) {
++		list_del_init(&rq->queuelist);
++		list_replace_init(&next->queuelist, &rq->queuelist);
++		rq->fifo_time = next->fifo_time;
++	}
++
++	if (bfqq->next_rq == next)
++		bfqq->next_rq = rq;
++
++	bfq_remove_request(q, next);
++
++	spin_unlock_irq(&bfqq->bfqd->lock);
++}
++
++static bool bfq_allow_bio_merge(struct request_queue *q, struct request *rq,
++				struct bio *bio)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	bool is_sync = op_is_sync(bio->bi_opf);
++	struct bfq_queue *bfqq = bfqd->bio_bfqq;
++
++	/*
++	 * Disallow merge of a sync bio into an async request.
++	 */
++	if (is_sync && !rq_is_sync(rq))
++		return false;
++
++	/*
++	 * Lookup the bfqq that this bio will be queued with. Allow
++	 * merge only if rq is queued there.
++	 */
++	if (!bfqq)
++		return false;
++
++	return bfqq == RQ_BFQQ(rq);
++}
++
++static void __bfq_set_in_service_queue(struct bfq_data *bfqd,
++				       struct bfq_queue *bfqq)
++{
++	if (bfqq) {
++		bfq_mark_bfqq_budget_new(bfqq);
++		bfq_clear_bfqq_fifo_expire(bfqq);
++
++		bfqd->budgets_assigned = (bfqd->budgets_assigned * 7 + 256) / 8;
++
++		bfq_log_bfqq(bfqd, bfqq,
++			     "set_in_service_queue, cur-budget = %d",
++			     bfqq->entity.budget);
++	}
++
++	bfqd->in_service_queue = bfqq;
++}
++
++/*
++ * Get and set a new queue for service.
++ */
++static struct bfq_queue *bfq_set_in_service_queue(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq = bfq_get_next_queue(bfqd);
++
++	__bfq_set_in_service_queue(bfqd, bfqq);
++	return bfqq;
++}
++
++/*
++ * bfq_default_budget - return the default budget for @bfqq on @bfqd.
++ * @bfqd: the device descriptor.
++ * @bfqq: the queue to consider.
++ *
++ * We use 3/4 of the @bfqd maximum budget as the default value
++ * for the max_budget field of the queues.  This lets the feedback
++ * mechanism to start from some middle ground, then the behavior
++ * of the process will drive the heuristics towards high values, if
++ * it behaves as a greedy sequential reader, or towards small values
++ * if it shows a more intermittent behavior.
++ */
++static unsigned long bfq_default_budget(struct bfq_data *bfqd,
++					struct bfq_queue *bfqq)
++{
++	unsigned long budget;
++
++	/*
++	 * When we need an estimate of the peak rate we need to avoid
++	 * to give budgets that are too short due to previous
++	 * measurements.  So, in the first 10 assignments use a
++	 * ``safe'' budget value. For such first assignment the value
++	 * of bfqd->budgets_assigned happens to be lower than 194.
++	 * See __bfq_set_in_service_queue for the formula by which
++	 * this field is computed.
++	 */
++	if (bfqd->budgets_assigned < 194 && bfqd->bfq_user_max_budget == 0)
++		budget = bfq_default_max_budget;
++	else
++		budget = bfqd->bfq_max_budget;
++
++	return budget - budget / 4;
++}
++
++static void bfq_arm_slice_timer(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq = bfqd->in_service_queue;
++	struct bfq_io_cq *bic;
++	u32 sl;
++
++	/* Processes have exited, don't wait. */
++	bic = bfqd->in_service_bic;
++	if (!bic || atomic_read(&bic->icq.ioc->active_ref) == 0)
++		return;
++
++	bfq_mark_bfqq_wait_request(bfqq);
++
++	/*
++	 * We don't want to idle for seeks, but we do want to allow
++	 * fair distribution of slice time for a process doing back-to-back
++	 * seeks. So allow a little bit of time for him to submit a new rq.
++	 */
++	sl = bfqd->bfq_slice_idle;
++	/*
++	 * Grant only minimum idle time if the queue is seeky.
++	 */
++	if (BFQQ_SEEKY(bfqq))
++		sl = min_t(u64, sl, BFQ_MIN_TT);
++
++	bfqd->last_idling_start = ktime_get();
++	hrtimer_start(&bfqd->idle_slice_timer, ns_to_ktime(sl),
++		      HRTIMER_MODE_REL);
++}
++
++/*
++ * Set the maximum time for the in-service queue to consume its
++ * budget. This prevents seeky processes from lowering the disk
++ * throughput (always guaranteed with a time slice scheme as in CFQ).
++ */
++static void bfq_set_budget_timeout(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq = bfqd->in_service_queue;
++	unsigned int timeout_coeff = bfqq->entity.weight /
++				     bfqq->entity.orig_weight;
++
++	bfqd->last_budget_start = ktime_get();
++
++	bfq_clear_bfqq_budget_new(bfqq);
++	bfqq->budget_timeout = jiffies +
++		bfqd->bfq_timeout * timeout_coeff;
++
++	bfq_log_bfqq(bfqd, bfqq, "set budget_timeout %u",
++		jiffies_to_msecs(bfqd->bfq_timeout * timeout_coeff));
++}
++
++/*
++ * Remove request from internal lists.
++ */
++static void bfq_dispatch_remove(struct request_queue *q, struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++
++	/*
++	 * For consistency, the next instruction should have been
++	 * executed after removing the request from the queue and
++	 * dispatching it.  We execute instead this instruction before
++	 * bfq_remove_request() (and hence introduce a temporary
++	 * inconsistency), for efficiency.  In fact, should this
++	 * dispatch occur for a non in-service bfqq, this anticipated
++	 * increment prevents two counters related to bfqq->dispatched
++	 * from risking to be, first, uselessly decremented, and then
++	 * incremented again when the (new) value of bfqq->dispatched
++	 * happens to be taken into account.
++	 */
++	bfqq->dispatched++;
++
++	bfq_remove_request(q, rq);
++}
++
++static void __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	__bfq_bfqd_reset_in_service(bfqd);
++
++	if (RB_EMPTY_ROOT(&bfqq->sort_list))
++		bfq_del_bfqq_busy(bfqd, bfqq, 1);
++	else
++		bfq_activate_bfqq(bfqd, bfqq);
++}
++
++/**
++ * __bfq_bfqq_recalc_budget - try to adapt the budget to the @bfqq behavior.
++ * @bfqd: device data.
++ * @bfqq: queue to update.
++ * @reason: reason for expiration.
++ *
++ * Handle the feedback on @bfqq budget at queue expiration.
++ * See the body for detailed comments.
++ */
++static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
++				     struct bfq_queue *bfqq,
++				     enum bfqq_expiration reason)
++{
++	struct request *next_rq;
++	int budget, min_budget;
++
++	budget = bfqq->max_budget;
++	min_budget = bfq_min_budget(bfqd);
++
++	bfq_log_bfqq(bfqd, bfqq, "recalc_budg: last budg %d, budg left %d",
++		bfqq->entity.budget, bfq_bfqq_budget_left(bfqq));
++	bfq_log_bfqq(bfqd, bfqq, "recalc_budg: last max_budg %d, min budg %d",
++		budget, bfq_min_budget(bfqd));
++	bfq_log_bfqq(bfqd, bfqq, "recalc_budg: sync %d, seeky %d",
++		bfq_bfqq_sync(bfqq), BFQQ_SEEKY(bfqd->in_service_queue));
++
++	if (bfq_bfqq_sync(bfqq)) {
++		switch (reason) {
++		/*
++		 * Caveat: in all the following cases we trade latency
++		 * for throughput.
++		 */
++		case BFQQE_TOO_IDLE:
++			if (budget > min_budget + BFQ_BUDGET_STEP)
++				budget -= BFQ_BUDGET_STEP;
++			else
++				budget = min_budget;
++			break;
++		case BFQQE_BUDGET_TIMEOUT:
++			budget = bfq_default_budget(bfqd, bfqq);
++			break;
++		case BFQQE_BUDGET_EXHAUSTED:
++			/*
++			 * The process still has backlog, and did not
++			 * let either the budget timeout or the disk
++			 * idling timeout expire. Hence it is not
++			 * seeky, has a short thinktime and may be
++			 * happy with a higher budget too. So
++			 * definitely increase the budget of this good
++			 * candidate to boost the disk throughput.
++			 */
++			budget = min(budget + 8 * BFQ_BUDGET_STEP,
++				     bfqd->bfq_max_budget);
++			break;
++		case BFQQE_NO_MORE_REQUESTS:
++			/*
++			 * For queues that expire for this reason, it
++			 * is particularly important to keep the
++			 * budget close to the actual service they
++			 * need. Doing so reduces the timestamp
++			 * misalignment problem described in the
++			 * comments in the body of
++			 * __bfq_activate_entity. In fact, suppose
++			 * that a queue systematically expires for
++			 * BFQQE_NO_MORE_REQUESTS and presents a
++			 * new request in time to enjoy timestamp
++			 * back-shifting. The larger the budget of the
++			 * queue is with respect to the service the
++			 * queue actually requests in each service
++			 * slot, the more times the queue can be
++			 * reactivated with the same virtual finish
++			 * time. It follows that, even if this finish
++			 * time is pushed to the system virtual time
++			 * to reduce the consequent timestamp
++			 * misalignment, the queue unjustly enjoys for
++			 * many re-activations a lower finish time
++			 * than all newly activated queues.
++			 *
++			 * The service needed by bfqq is measured
++			 * quite precisely by bfqq->entity.service.
++			 * Since bfqq does not enjoy device idling,
++			 * bfqq->entity.service is equal to the number
++			 * of sectors that the process associated with
++			 * bfqq requested to read/write before waiting
++			 * for request completions, or blocking for
++			 * other reasons.
++			 */
++			budget = max_t(int, bfqq->entity.service, min_budget);
++			break;
++		default:
++			return;
++		}
++	} else {
++		/*
++		 * Async queues get always the maximum possible
++		 * budget, as for them we do not care about latency
++		 * (in addition, their ability to dispatch is limited
++		 * by the charging factor).
++		 */
++		budget = bfqd->bfq_max_budget;
++	}
++
++	bfqq->max_budget = budget;
++
++	if (bfqd->budgets_assigned >= bfq_stats_min_budgets &&
++	    !bfqd->bfq_user_max_budget)
++		bfqq->max_budget = min(bfqq->max_budget, bfqd->bfq_max_budget);
++
++	/*
++	 * If there is still backlog, then assign a new budget, making
++	 * sure that it is large enough for the next request.  Since
++	 * the finish time of bfqq must be kept in sync with the
++	 * budget, be sure to call __bfq_bfqq_expire() *after* this
++	 * update.
++	 *
++	 * If there is no backlog, then no need to update the budget;
++	 * it will be updated on the arrival of a new request.
++	 */
++	next_rq = bfqq->next_rq;
++	if (next_rq)
++		bfqq->entity.budget = max_t(unsigned long, bfqq->max_budget,
++					    bfq_serv_to_charge(next_rq, bfqq));
++
++	bfq_log_bfqq(bfqd, bfqq, "head sect: %u, new budget %d",
++			next_rq ? blk_rq_sectors(next_rq) : 0,
++			bfqq->entity.budget);
++}
++
++static unsigned long bfq_calc_max_budget(u64 peak_rate, u64 timeout)
++{
++	unsigned long max_budget;
++
++	/*
++	 * The max_budget calculated when autotuning is equal to the
++	 * amount of sectors transferred in timeout at the estimated
++	 * peak rate. To get this value, peak_rate is, first,
++	 * multiplied by 1000, because timeout is measured in ms,
++	 * while peak_rate is measured in sectors/usecs. Then the
++	 * result of this multiplication is right-shifted by
++	 * BFQ_RATE_SHIFT, because peak_rate is equal to the value of
++	 * the peak rate left-shifted by BFQ_RATE_SHIFT.
++	 */
++	max_budget = (unsigned long)(peak_rate * 1000 *
++				     timeout >> BFQ_RATE_SHIFT);
++
++	return max_budget;
++}
++
++/*
++ * In addition to updating the peak rate, checks whether the process
++ * is "slow", and returns 1 if so. This slow flag is used, in addition
++ * to the budget timeout, to reduce the amount of service provided to
++ * seeky processes, and hence reduce their chances to lower the
++ * throughput. See the code for more details.
++ */
++static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++				 bool compensate)
++{
++	u64 bw, usecs, expected, timeout;
++	ktime_t delta;
++	int update = 0;
++
++	if (!bfq_bfqq_sync(bfqq) || bfq_bfqq_budget_new(bfqq))
++		return false;
++
++	if (compensate)
++		delta = bfqd->last_idling_start;
++	else
++		delta = ktime_get();
++	delta = ktime_sub(delta, bfqd->last_budget_start);
++	usecs = ktime_to_us(delta);
++
++	/* don't use too short time intervals */
++	if (usecs < 1000)
++		return false;
++
++	/*
++	 * Calculate the bandwidth for the last slice.  We use a 64 bit
++	 * value to store the peak rate, in sectors per usec in fixed
++	 * point math.  We do so to have enough precision in the estimate
++	 * and to avoid overflows.
++	 */
++	bw = (u64)bfqq->entity.service << BFQ_RATE_SHIFT;
++	do_div(bw, (unsigned long)usecs);
++
++	timeout = jiffies_to_msecs(bfqd->bfq_timeout);
++
++	/*
++	 * Use only long (> 20ms) intervals to filter out spikes for
++	 * the peak rate estimation.
++	 */
++	if (usecs > 20000) {
++		if (bw > bfqd->peak_rate) {
++			bfqd->peak_rate = bw;
++			update = 1;
++			bfq_log(bfqd, "new peak_rate=%llu", bw);
++		}
++
++		update |= bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES - 1;
++
++		if (bfqd->peak_rate_samples < BFQ_PEAK_RATE_SAMPLES)
++			bfqd->peak_rate_samples++;
++
++		if (bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES &&
++		    update && bfqd->bfq_user_max_budget == 0) {
++			bfqd->bfq_max_budget =
++				bfq_calc_max_budget(bfqd->peak_rate,
++						    timeout);
++			bfq_log(bfqd, "new max_budget=%d",
++				bfqd->bfq_max_budget);
++		}
++	}
++
++	/*
++	 * A process is considered ``slow'' (i.e., seeky, so that we
++	 * cannot treat it fairly in the service domain, as it would
++	 * slow down too much the other processes) if, when a slice
++	 * ends for whatever reason, it has received service at a
++	 * rate that would not be high enough to complete the budget
++	 * before the budget timeout expiration.
++	 */
++	expected = bw * 1000 * timeout >> BFQ_RATE_SHIFT;
++
++	/*
++	 * Caveat: processes doing IO in the slower disk zones will
++	 * tend to be slow(er) even if not seeky. And the estimated
++	 * peak rate will actually be an average over the disk
++	 * surface. Hence, to not be too harsh with unlucky processes,
++	 * we keep a budget/3 margin of safety before declaring a
++	 * process slow.
++	 */
++	return expected > (4 * bfqq->entity.budget) / 3;
++}
++
++/*
++ * Return the farthest past time instant according to jiffies
++ * macros.
++ */
++static unsigned long bfq_smallest_from_now(void)
++{
++	return jiffies - MAX_JIFFY_OFFSET;
++}
++
++/**
++ * bfq_bfqq_expire - expire a queue.
++ * @bfqd: device owning the queue.
++ * @bfqq: the queue to expire.
++ * @compensate: if true, compensate for the time spent idling.
++ * @reason: the reason causing the expiration.
++ *
++ *
++ * If the process associated with the queue is slow (i.e., seeky), or
++ * in case of budget timeout, or, finally, if it is async, we
++ * artificially charge it an entire budget (independently of the
++ * actual service it received). As a consequence, the queue will get
++ * higher timestamps than the correct ones upon reactivation, and
++ * hence it will be rescheduled as if it had received more service
++ * than what it actually received. In the end, this class of processes
++ * will receive less service in proportion to how slowly they consume
++ * their budgets (and hence how seriously they tend to lower the
++ * throughput).
++ *
++ * In contrast, when a queue expires because it has been idling for
++ * too much or because it exhausted its budget, we do not touch the
++ * amount of service it has received. Hence when the queue will be
++ * reactivated and its timestamps updated, the latter will be in sync
++ * with the actual service received by the queue until expiration.
++ *
++ * Charging a full budget to the first type of queues and the exact
++ * service to the others has the effect of using the WF2Q+ policy to
++ * schedule the former on a timeslice basis, without violating the
++ * service domain guarantees of the latter.
++ */
++static void bfq_bfqq_expire(struct bfq_data *bfqd,
++			    struct bfq_queue *bfqq,
++			    bool compensate,
++			    enum bfqq_expiration reason)
++{
++	bool slow;
++	int ref;
++
++	/*
++	 * Update device peak rate for autotuning and check whether the
++	 * process is slow (see bfq_update_peak_rate).
++	 */
++	slow = bfq_update_peak_rate(bfqd, bfqq, compensate);
++
++	/*
++	 * As above explained, 'punish' slow (i.e., seeky), timed-out
++	 * and async queues, to favor sequential sync workloads.
++	 */
++	if (slow || reason == BFQQE_BUDGET_TIMEOUT)
++		bfq_bfqq_charge_full_budget(bfqq);
++
++	if (reason == BFQQE_TOO_IDLE &&
++	    bfqq->entity.service <= 2 * bfqq->entity.budget / 10)
++		bfq_clear_bfqq_IO_bound(bfqq);
++
++	bfq_log_bfqq(bfqd, bfqq,
++		"expire (%d, slow %d, num_disp %d, idle_win %d)", reason,
++		slow, bfqq->dispatched, bfq_bfqq_idle_window(bfqq));
++
++	/*
++	 * Increase, decrease or leave budget unchanged according to
++	 * reason.
++	 */
++	__bfq_bfqq_recalc_budget(bfqd, bfqq, reason);
++	ref = bfqq->ref;
++	__bfq_bfqq_expire(bfqd, bfqq);
++
++	/* mark bfqq as waiting a request only if a bic still points to it */
++	if (ref > 1 && !bfq_bfqq_busy(bfqq) &&
++	    reason != BFQQE_BUDGET_TIMEOUT &&
++	    reason != BFQQE_BUDGET_EXHAUSTED)
++		bfq_mark_bfqq_non_blocking_wait_rq(bfqq);
++}
++
++/*
++ * Budget timeout is not implemented through a dedicated timer, but
++ * just checked on request arrivals and completions, as well as on
++ * idle timer expirations.
++ */
++static bool bfq_bfqq_budget_timeout(struct bfq_queue *bfqq)
++{
++	if (bfq_bfqq_budget_new(bfqq) ||
++	    time_is_after_jiffies(bfqq->budget_timeout))
++		return false;
++	return true;
++}
++
++/*
++ * If we expire a queue that is actively waiting (i.e., with the
++ * device idled) for the arrival of a new request, then we may incur
++ * the timestamp misalignment problem described in the body of the
++ * function __bfq_activate_entity. Hence we return true only if this
++ * condition does not hold, or if the queue is slow enough to deserve
++ * only to be kicked off for preserving a high throughput.
++ */
++static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
++{
++	bfq_log_bfqq(bfqq->bfqd, bfqq,
++		"may_budget_timeout: wait_request %d left %d timeout %d",
++		bfq_bfqq_wait_request(bfqq),
++			bfq_bfqq_budget_left(bfqq) >=  bfqq->entity.budget / 3,
++		bfq_bfqq_budget_timeout(bfqq));
++
++	return (!bfq_bfqq_wait_request(bfqq) ||
++		bfq_bfqq_budget_left(bfqq) >=  bfqq->entity.budget / 3)
++		&&
++		bfq_bfqq_budget_timeout(bfqq);
++}
++
++/*
++ * For a queue that becomes empty, device idling is allowed only if
++ * this function returns true for the queue. And this function returns
++ * true only if idling is beneficial for throughput.
++ */
++static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++	bool idling_boosts_thr;
++
++	if (bfqd->strict_guarantees)
++		return true;
++
++	/*
++	 * The value of the next variable is computed considering that
++	 * idling is usually beneficial for the throughput if:
++	 * (a) the device is not NCQ-capable, or
++	 * (b) regardless of the presence of NCQ, the request pattern
++	 *     for bfqq is I/O-bound (possible throughput losses
++	 *     caused by granting idling to seeky queues are mitigated
++	 *     by the fact that, in all scenarios where boosting
++	 *     throughput is the best thing to do, i.e., in all
++	 *     symmetric scenarios, only a minimal idle time is
++	 *     allowed to seeky queues).
++	 */
++	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
++
++	/*
++	 * We have now the components we need to compute the return
++	 * value of the function, which is true only if both the
++	 * following conditions hold:
++	 * 1) bfqq is sync, because idling make sense only for sync queues;
++	 * 2) idling boosts the throughput.
++	 */
++	return bfq_bfqq_sync(bfqq) && idling_boosts_thr;
++}
++
++/*
++ * If the in-service queue is empty but the function bfq_bfqq_may_idle
++ * returns true, then:
++ * 1) the queue must remain in service and cannot be expired, and
++ * 2) the device must be idled to wait for the possible arrival of a new
++ *    request for the queue.
++ * See the comments on the function bfq_bfqq_may_idle for the reasons
++ * why performing device idling is the best choice to boost the throughput
++ * and preserve service guarantees when bfq_bfqq_may_idle itself
++ * returns true.
++ */
++static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++
++	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfqd->bfq_slice_idle != 0 &&
++	       bfq_bfqq_may_idle(bfqq);
++}
++
++/*
++ * Select a queue for service.  If we have a current queue in service,
++ * check whether to continue servicing it, or retrieve and set a new one.
++ */
++static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
++{
++	struct bfq_queue *bfqq;
++	struct request *next_rq;
++	enum bfqq_expiration reason = BFQQE_BUDGET_TIMEOUT;
++
++	bfqq = bfqd->in_service_queue;
++	if (!bfqq)
++		goto new_queue;
++
++	bfq_log_bfqq(bfqd, bfqq, "select_queue: already in-service queue");
++
++	if (bfq_may_expire_for_budg_timeout(bfqq) &&
++	    !bfq_bfqq_wait_request(bfqq) &&
++	    !bfq_bfqq_must_idle(bfqq))
++		goto expire;
++
++check_queue:
++	/*
++	 * This loop is rarely executed more than once. Even when it
++	 * happens, it is much more convenient to re-execute this loop
++	 * than to return NULL and trigger a new dispatch to get a
++	 * request served.
++	 */
++	next_rq = bfqq->next_rq;
++	/*
++	 * If bfqq has requests queued and it has enough budget left to
++	 * serve them, keep the queue, otherwise expire it.
++	 */
++	if (next_rq) {
++		if (bfq_serv_to_charge(next_rq, bfqq) >
++			bfq_bfqq_budget_left(bfqq)) {
++			/*
++			 * Expire the queue for budget exhaustion,
++			 * which makes sure that the next budget is
++			 * enough to serve the next request, even if
++			 * it comes from the fifo expired path.
++			 */
++			reason = BFQQE_BUDGET_EXHAUSTED;
++			goto expire;
++		} else {
++			/*
++			 * The idle timer may be pending because we may
++			 * not disable disk idling even when a new request
++			 * arrives.
++			 */
++			if (bfq_bfqq_wait_request(bfqq)) {
++				/*
++				 * If we get here: 1) at least a new request
++				 * has arrived but we have not disabled the
++				 * timer because the request was too small,
++				 * 2) then the block layer has unplugged
++				 * the device, causing the dispatch to be
++				 * invoked.
++				 *
++				 * Since the device is unplugged, now the
++				 * requests are probably large enough to
++				 * provide a reasonable throughput.
++				 * So we disable idling.
++				 */
++				bfq_clear_bfqq_wait_request(bfqq);
++				hrtimer_try_to_cancel(&bfqd->idle_slice_timer);
++			}
++			goto keep_queue;
++		}
++	}
++
++	/*
++	 * No requests pending. However, if the in-service queue is idling
++	 * for a new request, or has requests waiting for a completion and
++	 * may idle after their completion, then keep it anyway.
++	 */
++	if (bfq_bfqq_wait_request(bfqq) ||
++	    (bfqq->dispatched != 0 && bfq_bfqq_may_idle(bfqq))) {
++		bfqq = NULL;
++		goto keep_queue;
++	}
++
++	reason = BFQQE_NO_MORE_REQUESTS;
++expire:
++	bfq_bfqq_expire(bfqd, bfqq, false, reason);
++new_queue:
++	bfqq = bfq_set_in_service_queue(bfqd);
++	if (bfqq) {
++		bfq_log_bfqq(bfqd, bfqq, "select_queue: checking new queue");
++		goto check_queue;
++	}
++keep_queue:
++	if (bfqq)
++		bfq_log_bfqq(bfqd, bfqq, "select_queue: returned this queue");
++	else
++		bfq_log(bfqd, "select_queue: no queue returned");
++
++	return bfqq;
++}
++
++/*
++ * Dispatch next request from bfqq.
++ */
++static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
++						 struct bfq_queue *bfqq)
++{
++	struct request *rq = bfqq->next_rq;
++	unsigned long service_to_charge;
++
++	service_to_charge = bfq_serv_to_charge(rq, bfqq);
++
++	bfq_bfqq_served(bfqq, service_to_charge);
++
++	bfq_dispatch_remove(bfqd->queue, rq);
++
++	if (!bfqd->in_service_bic) {
++		atomic_long_inc(&RQ_BIC(rq)->icq.ioc->refcount);
++		bfqd->in_service_bic = RQ_BIC(rq);
++	}
++
++	/*
++	 * Expire bfqq, pretending that its budget expired, if bfqq
++	 * belongs to CLASS_IDLE and other queues are waiting for
++	 * service.
++	 */
++	if (bfqd->busy_queues > 1 && bfq_class_idle(bfqq))
++		goto expire;
++
++	return rq;
++
++expire:
++	bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
++	return rq;
++}
++
++static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
++{
++	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
++
++	/*
++	 * Avoiding lock: a race on bfqd->busy_queues should cause at
++	 * most a call to dispatch for nothing
++	 */
++	return !list_empty_careful(&bfqd->dispatch) ||
++		bfqd->busy_queues > 0;
++}
++
++static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
++{
++	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
++	struct request *rq = NULL;
++	struct bfq_queue *bfqq = NULL;
++
++	if (!list_empty(&bfqd->dispatch)) {
++		rq = list_first_entry(&bfqd->dispatch, struct request,
++				      queuelist);
++		list_del_init(&rq->queuelist);
++
++		bfqq = RQ_BFQQ(rq);
++
++		if (bfqq) {
++			/*
++			 * Increment counters here, because this
++			 * dispatch does not follow the standard
++			 * dispatch flow (where counters are
++			 * incremented)
++			 */
++			bfqq->dispatched++;
++
++			goto inc_in_driver_start_rq;
++		}
++
++		/*
++		 * We exploit the put_rq_private hook to decrement
++		 * rq_in_driver, but put_rq_private will not be
++		 * invoked on this request. So, to avoid unbalance,
++		 * just start this request, without incrementing
++		 * rq_in_driver. As a negative consequence,
++		 * rq_in_driver is deceptively lower than it should be
++		 * while this request is in service. This may cause
++		 * bfq_schedule_dispatch to be invoked uselessly.
++		 *
++		 * As for implementing an exact solution, the
++		 * put_request hook, if defined, is probably invoked
++		 * also on this request. So, by exploiting this hook,
++		 * we could 1) increment rq_in_driver here, and 2)
++		 * decrement it in put_request. Such a solution would
++		 * let the value of the counter be always accurate,
++		 * but it would entail using an extra interface
++		 * function. This cost seems higher than the benefit,
++		 * being the frequency of non-elevator-private
++		 * requests very low.
++		 */
++		goto start_rq;
++	}
++
++	bfq_log(bfqd, "dispatch requests: %d busy queues", bfqd->busy_queues);
++
++	if (bfqd->busy_queues == 0)
++		goto exit;
++
++	/*
++	 * Force device to serve one request at a time if
++	 * strict_guarantees is true. Forcing this service scheme is
++	 * currently the ONLY way to guarantee that the request
++	 * service order enforced by the scheduler is respected by a
++	 * queueing device. Otherwise the device is free even to make
++	 * some unlucky request wait for as long as the device
++	 * wishes.
++	 *
++	 * Of course, serving one request at at time may cause loss of
++	 * throughput.
++	 */
++	if (bfqd->strict_guarantees && bfqd->rq_in_driver > 0)
++		goto exit;
++
++	bfqq = bfq_select_queue(bfqd);
++	if (!bfqq)
++		goto exit;
++
++	rq = bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
++
++	if (rq) {
++inc_in_driver_start_rq:
++		bfqd->rq_in_driver++;
++start_rq:
++		rq->rq_flags |= RQF_STARTED;
++	}
++exit:
++	return rq;
++}
++
++static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
++{
++	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
++	struct request *rq;
++
++	spin_lock_irq(&bfqd->lock);
++	rq = __bfq_dispatch_request(hctx);
++	spin_unlock_irq(&bfqd->lock);
++
++	return rq;
++}
++
++/*
++ * Task holds one reference to the queue, dropped when task exits.  Each rq
++ * in-flight on this queue also holds a reference, dropped when rq is freed.
++ *
++ * Scheduler lock must be held here. Recall not to use bfqq after calling
++ * this function on it.
++ */
++static void bfq_put_queue(struct bfq_queue *bfqq)
++{
++	if (bfqq->bfqd)
++		bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d",
++			     bfqq, bfqq->ref);
++
++	bfqq->ref--;
++	if (bfqq->ref)
++		return;
++
++	kmem_cache_free(bfq_pool, bfqq);
++}
++
++static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++{
++	if (bfqq == bfqd->in_service_queue) {
++		__bfq_bfqq_expire(bfqd, bfqq);
++		bfq_schedule_dispatch(bfqd);
++	}
++
++	bfq_log_bfqq(bfqd, bfqq, "exit_bfqq: %p, %d", bfqq, bfqq->ref);
++
++	bfq_put_queue(bfqq); /* release process reference */
++}
++
++static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync)
++{
++	struct bfq_queue *bfqq = bic_to_bfqq(bic, is_sync);
++	struct bfq_data *bfqd;
++
++	if (bfqq)
++		bfqd = bfqq->bfqd; /* NULL if scheduler already exited */
++
++	if (bfqq && bfqd) {
++		unsigned long flags;
++
++		spin_lock_irqsave(&bfqd->lock, flags);
++		bfq_exit_bfqq(bfqd, bfqq);
++		bic_set_bfqq(bic, NULL, is_sync);
++		spin_unlock_irq(&bfqd->lock);
++	}
++}
++
++static void bfq_exit_icq(struct io_cq *icq)
++{
++	struct bfq_io_cq *bic = icq_to_bic(icq);
++
++	bfq_exit_icq_bfqq(bic, true);
++	bfq_exit_icq_bfqq(bic, false);
++}
++
++/*
++ * Update the entity prio values; note that the new values will not
++ * be used until the next (re)activation.
++ */
++static void
++bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
++{
++	struct task_struct *tsk = current;
++	int ioprio_class;
++	struct bfq_data *bfqd = bfqq->bfqd;
++
++	if (!bfqd)
++		return;
++
++	ioprio_class = IOPRIO_PRIO_CLASS(bic->ioprio);
++	switch (ioprio_class) {
++	default:
++		dev_err(bfqq->bfqd->queue->backing_dev_info->dev,
++			"bfq: bad prio class %d\n", ioprio_class);
++	case IOPRIO_CLASS_NONE:
++		/*
++		 * No prio set, inherit CPU scheduling settings.
++		 */
++		bfqq->new_ioprio = task_nice_ioprio(tsk);
++		bfqq->new_ioprio_class = task_nice_ioclass(tsk);
++		break;
++	case IOPRIO_CLASS_RT:
++		bfqq->new_ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++		bfqq->new_ioprio_class = IOPRIO_CLASS_RT;
++		break;
++	case IOPRIO_CLASS_BE:
++		bfqq->new_ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++		bfqq->new_ioprio_class = IOPRIO_CLASS_BE;
++		break;
++	case IOPRIO_CLASS_IDLE:
++		bfqq->new_ioprio_class = IOPRIO_CLASS_IDLE;
++		bfqq->new_ioprio = 7;
++		bfq_clear_bfqq_idle_window(bfqq);
++		break;
++	}
++
++	if (bfqq->new_ioprio >= IOPRIO_BE_NR) {
++		pr_crit("bfq_set_next_ioprio_data: new_ioprio %d\n",
++			bfqq->new_ioprio);
++		bfqq->new_ioprio = IOPRIO_BE_NR;
++	}
++
++	bfqq->entity.new_weight = bfq_ioprio_to_weight(bfqq->new_ioprio);
++	bfqq->entity.prio_changed = 1;
++}
++
++static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
++{
++	struct bfq_data *bfqd = bic_to_bfqd(bic);
++	struct bfq_queue *bfqq;
++	int ioprio = bic->icq.ioc->ioprio;
++
++	/*
++	 * This condition may trigger on a newly created bic, be sure to
++	 * drop the lock before returning.
++	 */
++	if (unlikely(!bfqd) || likely(bic->ioprio == ioprio))
++		return;
++
++	bic->ioprio = ioprio;
++
++	bfqq = bic_to_bfqq(bic, false);
++	if (bfqq) {
++		/* release process reference on this queue */
++		bfq_put_queue(bfqq);
++		bfqq = bfq_get_queue(bfqd, bio, BLK_RW_ASYNC, bic);
++		bic_set_bfqq(bic, bfqq, false);
++	}
++
++	bfqq = bic_to_bfqq(bic, true);
++	if (bfqq)
++		bfq_set_next_ioprio_data(bfqq, bic);
++}
++
++static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			  struct bfq_io_cq *bic, pid_t pid, int is_sync)
++{
++	RB_CLEAR_NODE(&bfqq->entity.rb_node);
++	INIT_LIST_HEAD(&bfqq->fifo);
++
++	bfqq->ref = 0;
++	bfqq->bfqd = bfqd;
++
++	if (bic)
++		bfq_set_next_ioprio_data(bfqq, bic);
++
++	if (is_sync) {
++		if (!bfq_class_idle(bfqq))
++			bfq_mark_bfqq_idle_window(bfqq);
++		bfq_mark_bfqq_sync(bfqq);
++	} else
++		bfq_clear_bfqq_sync(bfqq);
++
++	/* set end request to minus infinity from now */
++	bfqq->ttime.last_end_request = ktime_get_ns() + 1;
++
++	bfq_mark_bfqq_IO_bound(bfqq);
++
++	bfqq->pid = pid;
++
++	/* Tentative initial value to trade off between thr and lat */
++	bfqq->max_budget = bfq_default_budget(bfqd, bfqq);
++	bfqq->budget_timeout = bfq_smallest_from_now();
++	bfqq->pid = pid;
++
++	/* first request is almost certainly seeky */
++	bfqq->seek_history = 1;
++}
++
++static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
++					       int ioprio_class, int ioprio)
++{
++	switch (ioprio_class) {
++	case IOPRIO_CLASS_RT:
++		return &async_bfqq[0][ioprio];
++	case IOPRIO_CLASS_NONE:
++		ioprio = IOPRIO_NORM;
++		/* fall through */
++	case IOPRIO_CLASS_BE:
++		return &async_bfqq[1][ioprio];
++	case IOPRIO_CLASS_IDLE:
++		return &async_idle_bfqq;
++	default:
++		return NULL;
++	}
++}
++
++static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
++				       struct bio *bio, bool is_sync,
++				       struct bfq_io_cq *bic)
++{
++	const int ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++	const int ioprio_class = IOPRIO_PRIO_CLASS(bic->ioprio);
++	struct bfq_queue **async_bfqq = NULL;
++	struct bfq_queue *bfqq;
++
++	rcu_read_lock();
++
++	if (!is_sync) {
++		async_bfqq = bfq_async_queue_prio(bfqd, ioprio_class,
++						  ioprio);
++		bfqq = *async_bfqq;
++		if (bfqq)
++			goto out;
++	}
++
++	bfqq = kmem_cache_alloc_node(bfq_pool,
++				     GFP_NOWAIT | __GFP_ZERO | __GFP_NOWARN,
++				     bfqd->queue->node);
++
++	if (bfqq) {
++		bfq_init_bfqq(bfqd, bfqq, bic, current->pid,
++			      is_sync);
++		bfq_init_entity(&bfqq->entity);
++		bfq_log_bfqq(bfqd, bfqq, "allocated");
++	} else {
++		bfqq = &bfqd->oom_bfqq;
++		bfq_log_bfqq(bfqd, bfqq, "using oom bfqq");
++		goto out;
++	}
++
++	/*
++	 * Pin the queue now that it's allocated, scheduler exit will
++	 * prune it.
++	 */
++	if (async_bfqq) {
++		bfqq->ref++;
++		bfq_log_bfqq(bfqd, bfqq,
++			     "get_queue, bfqq not in async: %p, %d",
++			     bfqq, bfqq->ref);
++		*async_bfqq = bfqq;
++	}
++
++out:
++	bfqq->ref++; /* get a process reference to this queue */
++	bfq_log_bfqq(bfqd, bfqq, "get_queue, at end: %p, %d", bfqq, bfqq->ref);
++	rcu_read_unlock();
++	return bfqq;
++}
++
++static void bfq_update_io_thinktime(struct bfq_data *bfqd,
++				    struct bfq_queue *bfqq)
++{
++	struct bfq_ttime *ttime = &bfqq->ttime;
++	u64 elapsed = ktime_get_ns() - bfqq->ttime.last_end_request;
++
++	elapsed = min_t(u64, elapsed, 2ULL * bfqd->bfq_slice_idle);
++
++	ttime->ttime_samples = (7*bfqq->ttime.ttime_samples + 256) / 8;
++	ttime->ttime_total = div_u64(7*ttime->ttime_total + 256*elapsed,  8);
++	ttime->ttime_mean = div64_ul(ttime->ttime_total + 128,
++				     ttime->ttime_samples);
++}
++
++static void
++bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++		       struct request *rq)
++{
++	sector_t sdist = 0;
++
++	if (bfqq->last_request_pos) {
++		if (bfqq->last_request_pos < blk_rq_pos(rq))
++			sdist = blk_rq_pos(rq) - bfqq->last_request_pos;
++		else
++			sdist = bfqq->last_request_pos - blk_rq_pos(rq);
++	}
++
++	bfqq->seek_history <<= 1;
++	bfqq->seek_history |= sdist > BFQQ_SEEK_THR &&
++		(!blk_queue_nonrot(bfqd->queue) ||
++		 blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT);
++}
++
++/*
++ * Disable idle window if the process thinks too long or seeks so much that
++ * it doesn't matter.
++ */
++static void bfq_update_idle_window(struct bfq_data *bfqd,
++				   struct bfq_queue *bfqq,
++				   struct bfq_io_cq *bic)
++{
++	int enable_idle;
++
++	/* Don't idle for async or idle io prio class. */
++	if (!bfq_bfqq_sync(bfqq) || bfq_class_idle(bfqq))
++		return;
++
++	enable_idle = bfq_bfqq_idle_window(bfqq);
++
++	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
++	    bfqd->bfq_slice_idle == 0 ||
++		(bfqd->hw_tag && BFQQ_SEEKY(bfqq)))
++		enable_idle = 0;
++	else if (bfq_sample_valid(bfqq->ttime.ttime_samples)) {
++		if (bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle)
++			enable_idle = 0;
++		else
++			enable_idle = 1;
++	}
++	bfq_log_bfqq(bfqd, bfqq, "update_idle_window: enable_idle %d",
++		enable_idle);
++
++	if (enable_idle)
++		bfq_mark_bfqq_idle_window(bfqq);
++	else
++		bfq_clear_bfqq_idle_window(bfqq);
++}
++
++/*
++ * Called when a new fs request (rq) is added to bfqq.  Check if there's
++ * something we should do about it.
++ */
++static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++			    struct request *rq)
++{
++	struct bfq_io_cq *bic = RQ_BIC(rq);
++
++	if (rq->cmd_flags & REQ_META)
++		bfqq->meta_pending++;
++
++	bfq_update_io_thinktime(bfqd, bfqq);
++	bfq_update_io_seektime(bfqd, bfqq, rq);
++	if (bfqq->entity.service > bfq_max_budget(bfqd) / 8 ||
++	    !BFQQ_SEEKY(bfqq))
++		bfq_update_idle_window(bfqd, bfqq, bic);
++
++	bfq_log_bfqq(bfqd, bfqq,
++		     "rq_enqueued: idle_window=%d (seeky %d)",
++		     bfq_bfqq_idle_window(bfqq), BFQQ_SEEKY(bfqq));
++
++	bfqq->last_request_pos = blk_rq_pos(rq) + blk_rq_sectors(rq);
++
++	if (bfqq == bfqd->in_service_queue && bfq_bfqq_wait_request(bfqq)) {
++		bool small_req = bfqq->queued[rq_is_sync(rq)] == 1 &&
++				 blk_rq_sectors(rq) < 32;
++		bool budget_timeout = bfq_bfqq_budget_timeout(bfqq);
++
++		/*
++		 * There is just this request queued: if the request
++		 * is small and the queue is not to be expired, then
++		 * just exit.
++		 *
++		 * In this way, if the device is being idled to wait
++		 * for a new request from the in-service queue, we
++		 * avoid unplugging the device and committing the
++		 * device to serve just a small request. On the
++		 * contrary, we wait for the block layer to decide
++		 * when to unplug the device: hopefully, new requests
++		 * will be merged to this one quickly, then the device
++		 * will be unplugged and larger requests will be
++		 * dispatched.
++		 */
++		if (small_req && !budget_timeout)
++			return;
++
++		/*
++		 * A large enough request arrived, or the queue is to
++		 * be expired: in both cases disk idling is to be
++		 * stopped, so clear wait_request flag and reset
++		 * timer.
++		 */
++		bfq_clear_bfqq_wait_request(bfqq);
++		hrtimer_try_to_cancel(&bfqd->idle_slice_timer);
++
++		/*
++		 * The queue is not empty, because a new request just
++		 * arrived. Hence we can safely expire the queue, in
++		 * case of budget timeout, without risking that the
++		 * timestamps of the queue are not updated correctly.
++		 * See [1] for more details.
++		 */
++		if (budget_timeout)
++			bfq_bfqq_expire(bfqd, bfqq, false,
++					BFQQE_BUDGET_TIMEOUT);
++	}
++}
++
++static void __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++
++	bfq_add_request(rq);
++
++	rq->fifo_time = ktime_get_ns() + bfqd->bfq_fifo_expire[rq_is_sync(rq)];
++	list_add_tail(&rq->queuelist, &bfqq->fifo);
++
++	bfq_rq_enqueued(bfqd, bfqq, rq);
++}
++
++static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
++			       bool at_head)
++{
++	struct request_queue *q = hctx->queue;
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++
++	spin_lock_irq(&bfqd->lock);
++	if (blk_mq_sched_try_insert_merge(q, rq)) {
++		spin_unlock_irq(&bfqd->lock);
++		return;
++	}
++
++	spin_unlock_irq(&bfqd->lock);
++
++	blk_mq_sched_request_inserted(rq);
++
++	spin_lock_irq(&bfqd->lock);
++	if (at_head || blk_rq_is_passthrough(rq)) {
++		if (at_head)
++			list_add(&rq->queuelist, &bfqd->dispatch);
++		else
++			list_add_tail(&rq->queuelist, &bfqd->dispatch);
++	} else {
++		__bfq_insert_request(bfqd, rq);
++
++		if (rq_mergeable(rq)) {
++			elv_rqhash_add(q, rq);
++			if (!q->last_merge)
++				q->last_merge = rq;
++		}
++	}
++
++	spin_unlock_irq(&bfqd->lock);
++}
++
++static void bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
++				struct list_head *list, bool at_head)
++{
++	while (!list_empty(list)) {
++		struct request *rq;
++
++		rq = list_first_entry(list, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		bfq_insert_request(hctx, rq, at_head);
++	}
++}
++
++static void bfq_update_hw_tag(struct bfq_data *bfqd)
++{
++	bfqd->max_rq_in_driver = max_t(int, bfqd->max_rq_in_driver,
++				       bfqd->rq_in_driver);
++
++	if (bfqd->hw_tag == 1)
++		return;
++
++	/*
++	 * This sample is valid if the number of outstanding requests
++	 * is large enough to allow a queueing behavior.  Note that the
++	 * sum is not exact, as it's not taking into account deactivated
++	 * requests.
++	 */
++	if (bfqd->rq_in_driver + bfqd->queued < BFQ_HW_QUEUE_THRESHOLD)
++		return;
++
++	if (bfqd->hw_tag_samples++ < BFQ_HW_QUEUE_SAMPLES)
++		return;
++
++	bfqd->hw_tag = bfqd->max_rq_in_driver > BFQ_HW_QUEUE_THRESHOLD;
++	bfqd->max_rq_in_driver = 0;
++	bfqd->hw_tag_samples = 0;
++}
++
++static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
++{
++	bfq_update_hw_tag(bfqd);
++
++	bfqd->rq_in_driver--;
++	bfqq->dispatched--;
++
++	bfqq->ttime.last_end_request = ktime_get_ns();
++
++	/*
++	 * If this is the in-service queue, check if it needs to be expired,
++	 * or if we want to idle in case it has no pending requests.
++	 */
++	if (bfqd->in_service_queue == bfqq) {
++		if (bfq_bfqq_budget_new(bfqq))
++			bfq_set_budget_timeout(bfqd);
++
++		if (bfq_bfqq_must_idle(bfqq)) {
++			bfq_arm_slice_timer(bfqd);
++			return;
++		} else if (bfq_may_expire_for_budg_timeout(bfqq))
++			bfq_bfqq_expire(bfqd, bfqq, false,
++					BFQQE_BUDGET_TIMEOUT);
++		else if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
++			 (bfqq->dispatched == 0 ||
++			  !bfq_bfqq_may_idle(bfqq)))
++			bfq_bfqq_expire(bfqd, bfqq, false,
++					BFQQE_NO_MORE_REQUESTS);
++	}
++}
++
++static void bfq_put_rq_priv_body(struct bfq_queue *bfqq)
++{
++	bfqq->allocated--;
++
++	bfq_put_queue(bfqq);
++}
++
++static void bfq_put_rq_private(struct request_queue *q, struct request *rq)
++{
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
++	struct bfq_data *bfqd = bfqq->bfqd;
++
++
++	if (likely(rq->rq_flags & RQF_STARTED)) {
++		unsigned long flags;
++
++		spin_lock_irqsave(&bfqd->lock, flags);
++
++		bfq_completed_request(bfqq, bfqd);
++		bfq_put_rq_priv_body(bfqq);
++
++		spin_unlock_irqrestore(&bfqd->lock, flags);
++	} else {
++		/*
++		 * Request rq may be still/already in the scheduler,
++		 * in which case we need to remove it. And we cannot
++		 * defer such a check and removal, to avoid
++		 * inconsistencies in the time interval from the end
++		 * of this function to the start of the deferred work.
++		 * This situation seems to occur only in process
++		 * context, as a consequence of a merge. In the
++		 * current version of the code, this implies that the
++		 * lock is held.
++		 */
++
++		if (!RB_EMPTY_NODE(&rq->rb_node))
++			bfq_remove_request(q, rq);
++		bfq_put_rq_priv_body(bfqq);
++	}
++
++	rq->elv.priv[0] = NULL;
++	rq->elv.priv[1] = NULL;
++}
++
++/*
++ * Allocate bfq data structures associated with this request.
++ */
++static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
++			      struct bio *bio)
++{
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	struct bfq_io_cq *bic = icq_to_bic(rq->elv.icq);
++	const int is_sync = rq_is_sync(rq);
++	struct bfq_queue *bfqq;
++
++	spin_lock_irq(&bfqd->lock);
++
++	bfq_check_ioprio_change(bic, bio);
++
++	if (!bic)
++		goto queue_fail;
++
++	bfqq = bic_to_bfqq(bic, is_sync);
++	if (!bfqq || bfqq == &bfqd->oom_bfqq) {
++		if (bfqq)
++			bfq_put_queue(bfqq);
++		bfqq = bfq_get_queue(bfqd, bio, is_sync, bic);
++		bic_set_bfqq(bic, bfqq, is_sync);
++	}
++
++	bfqq->allocated++;
++	bfqq->ref++;
++	bfq_log_bfqq(bfqd, bfqq, "get_request %p: bfqq %p, %d",
++		     rq, bfqq, bfqq->ref);
++
++	rq->elv.priv[0] = bic;
++	rq->elv.priv[1] = bfqq;
++
++	spin_unlock_irq(&bfqd->lock);
++
++	return 0;
++
++queue_fail:
++	spin_unlock_irq(&bfqd->lock);
++
++	return 1;
++}
++
++static void bfq_idle_slice_timer_body(struct bfq_queue *bfqq)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++	enum bfqq_expiration reason;
++	unsigned long flags;
++
++	spin_lock_irqsave(&bfqd->lock, flags);
++	bfq_clear_bfqq_wait_request(bfqq);
++
++	if (bfqq != bfqd->in_service_queue) {
++		spin_unlock_irqrestore(&bfqd->lock, flags);
++		return;
++	}
++
++	if (bfq_bfqq_budget_timeout(bfqq))
++		/*
++		 * Also here the queue can be safely expired
++		 * for budget timeout without wasting
++		 * guarantees
++		 */
++		reason = BFQQE_BUDGET_TIMEOUT;
++	else if (bfqq->queued[0] == 0 && bfqq->queued[1] == 0)
++		/*
++		 * The queue may not be empty upon timer expiration,
++		 * because we may not disable the timer when the
++		 * first request of the in-service queue arrives
++		 * during disk idling.
++		 */
++		reason = BFQQE_TOO_IDLE;
++	else
++		goto schedule_dispatch;
++
++	bfq_bfqq_expire(bfqd, bfqq, true, reason);
++
++schedule_dispatch:
++	spin_unlock_irqrestore(&bfqd->lock, flags);
++	bfq_schedule_dispatch(bfqd);
++}
++
++/*
++ * Handler of the expiration of the timer running if the in-service queue
++ * is idling inside its time slice.
++ */
++static enum hrtimer_restart bfq_idle_slice_timer(struct hrtimer *timer)
++{
++	struct bfq_data *bfqd = container_of(timer, struct bfq_data,
++					     idle_slice_timer);
++	struct bfq_queue *bfqq = bfqd->in_service_queue;
++
++	/*
++	 * Theoretical race here: the in-service queue can be NULL or
++	 * different from the queue that was idling if a new request
++	 * arrives for the current queue and there is a full dispatch
++	 * cycle that changes the in-service queue.  This can hardly
++	 * happen, but in the worst case we just expire a queue too
++	 * early.
++	 */
++	if (bfqq)
++		bfq_idle_slice_timer_body(bfqq);
++
++	return HRTIMER_NORESTART;
++}
++
++static void __bfq_put_async_bfqq(struct bfq_data *bfqd,
++				 struct bfq_queue **bfqq_ptr)
++{
++	struct bfq_queue *bfqq = *bfqq_ptr;
++
++	bfq_log(bfqd, "put_async_bfqq: %p", bfqq);
++	if (bfqq) {
++		bfq_log_bfqq(bfqd, bfqq, "put_async_bfqq: putting %p, %d",
++			     bfqq, bfqq->ref);
++		bfq_put_queue(bfqq);
++		*bfqq_ptr = NULL;
++	}
++}
++
++/*
++ * Release the extra reference of the async queues as the device
++ * goes away.
++ */
++static void bfq_put_async_queues(struct bfq_data *bfqd)
++{
++	int i, j;
++
++	for (i = 0; i < 2; i++)
++		for (j = 0; j < IOPRIO_BE_NR; j++)
++			__bfq_put_async_bfqq(bfqd, &async_bfqq[i][j]);
++
++	__bfq_put_async_bfqq(bfqd, &async_idle_bfqq);
++}
++
++static void bfq_exit_queue(struct elevator_queue *e)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	struct bfq_queue *bfqq, *n;
++
++	hrtimer_cancel(&bfqd->idle_slice_timer);
++
++	spin_lock_irq(&bfqd->lock);
++	list_for_each_entry_safe(bfqq, n, &bfqd->idle_list, bfqq_list)
++		bfq_deactivate_bfqq(bfqd, bfqq, false);
++	bfq_put_async_queues(bfqd);
++	spin_unlock_irq(&bfqd->lock);
++
++	hrtimer_cancel(&bfqd->idle_slice_timer);
++
++	kfree(bfqd);
++}
++
++static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
++{
++	struct bfq_data *bfqd;
++	struct elevator_queue *eq;
++	int i;
++
++	eq = elevator_alloc(q, e);
++	if (!eq)
++		return -ENOMEM;
++
++	bfqd = kzalloc_node(sizeof(*bfqd), GFP_KERNEL, q->node);
++	if (!bfqd) {
++		kobject_put(&eq->kobj);
++		return -ENOMEM;
++	}
++	eq->elevator_data = bfqd;
++
++	/*
++	 * Our fallback bfqq if bfq_find_alloc_queue() runs into OOM issues.
++	 * Grab a permanent reference to it, so that the normal code flow
++	 * will not attempt to free it.
++	 */
++	bfq_init_bfqq(bfqd, &bfqd->oom_bfqq, NULL, 1, 0);
++	bfqd->oom_bfqq.ref++;
++	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
++	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
++	bfqd->oom_bfqq.entity.new_weight =
++		bfq_ioprio_to_weight(bfqd->oom_bfqq.new_ioprio);
++	/*
++	 * Trigger weight initialization, according to ioprio, at the
++	 * oom_bfqq's first activation. The oom_bfqq's ioprio and ioprio
++	 * class won't be changed any more.
++	 */
++	bfqd->oom_bfqq.entity.prio_changed = 1;
++
++	bfqd->queue = q;
++
++	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++)
++		bfqd->sched_data.service_tree[i] = BFQ_SERVICE_TREE_INIT;
++
++	hrtimer_init(&bfqd->idle_slice_timer, CLOCK_MONOTONIC,
++		     HRTIMER_MODE_REL);
++	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
++
++	INIT_LIST_HEAD(&bfqd->active_list);
++	INIT_LIST_HEAD(&bfqd->idle_list);
++
++	bfqd->hw_tag = -1;
++
++	bfqd->bfq_max_budget = bfq_default_max_budget;
++
++	bfqd->bfq_fifo_expire[0] = bfq_fifo_expire[0];
++	bfqd->bfq_fifo_expire[1] = bfq_fifo_expire[1];
++	bfqd->bfq_back_max = bfq_back_max;
++	bfqd->bfq_back_penalty = bfq_back_penalty;
++	bfqd->bfq_slice_idle = bfq_slice_idle;
++	bfqd->bfq_class_idle_last_service = 0;
++	bfqd->bfq_timeout = bfq_timeout;
++
++	bfqd->bfq_requests_within_timer = 120;
++
++	spin_lock_init(&bfqd->lock);
++	INIT_LIST_HEAD(&bfqd->dispatch);
++
++	q->elevator = eq;
++
++	return 0;
++}
++
++static void bfq_slab_kill(void)
++{
++	kmem_cache_destroy(bfq_pool);
++}
++
++static int __init bfq_slab_setup(void)
++{
++	bfq_pool = KMEM_CACHE(bfq_queue, 0);
++	if (!bfq_pool)
++		return -ENOMEM;
++	return 0;
++}
++
++static ssize_t bfq_var_show(unsigned int var, char *page)
++{
++	return sprintf(page, "%u\n", var);
++}
++
++static ssize_t bfq_var_store(unsigned long *var, const char *page,
++			     size_t count)
++{
++	unsigned long new_val;
++	int ret = kstrtoul(page, 10, &new_val);
++
++	if (ret == 0)
++		*var = new_val;
++
++	return count;
++}
++
++#define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
++static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	u64 __data = __VAR;						\
++	if (__CONV == 1)						\
++		__data = jiffies_to_msecs(__data);			\
++	else if (__CONV == 2)						\
++		__data = div_u64(__data, NSEC_PER_MSEC);		\
++	return bfq_var_show(__data, (page));				\
++}
++SHOW_FUNCTION(bfq_fifo_expire_sync_show, bfqd->bfq_fifo_expire[1], 2);
++SHOW_FUNCTION(bfq_fifo_expire_async_show, bfqd->bfq_fifo_expire[0], 2);
++SHOW_FUNCTION(bfq_back_seek_max_show, bfqd->bfq_back_max, 0);
++SHOW_FUNCTION(bfq_back_seek_penalty_show, bfqd->bfq_back_penalty, 0);
++SHOW_FUNCTION(bfq_slice_idle_show, bfqd->bfq_slice_idle, 2);
++SHOW_FUNCTION(bfq_max_budget_show, bfqd->bfq_user_max_budget, 0);
++SHOW_FUNCTION(bfq_timeout_sync_show, bfqd->bfq_timeout, 1);
++SHOW_FUNCTION(bfq_strict_guarantees_show, bfqd->strict_guarantees, 0);
++#undef SHOW_FUNCTION
++
++#define USEC_SHOW_FUNCTION(__FUNC, __VAR)				\
++static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	u64 __data = __VAR;						\
++	__data = div_u64(__data, NSEC_PER_USEC);			\
++	return bfq_var_show(__data, (page));				\
++}
++USEC_SHOW_FUNCTION(bfq_slice_idle_us_show, bfqd->bfq_slice_idle);
++#undef USEC_SHOW_FUNCTION
++
++#define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			\
++static ssize_t								\
++__FUNC(struct elevator_queue *e, const char *page, size_t count)	\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	unsigned long uninitialized_var(__data);			\
++	int ret = bfq_var_store(&__data, (page), count);		\
++	if (__data < (MIN))						\
++		__data = (MIN);						\
++	else if (__data > (MAX))					\
++		__data = (MAX);						\
++	if (__CONV == 1)						\
++		*(__PTR) = msecs_to_jiffies(__data);			\
++	else if (__CONV == 2)						\
++		*(__PTR) = (u64)__data * NSEC_PER_MSEC;			\
++	else								\
++		*(__PTR) = __data;					\
++	return ret;							\
++}
++STORE_FUNCTION(bfq_fifo_expire_sync_store, &bfqd->bfq_fifo_expire[1], 1,
++		INT_MAX, 2);
++STORE_FUNCTION(bfq_fifo_expire_async_store, &bfqd->bfq_fifo_expire[0], 1,
++		INT_MAX, 2);
++STORE_FUNCTION(bfq_back_seek_max_store, &bfqd->bfq_back_max, 0, INT_MAX, 0);
++STORE_FUNCTION(bfq_back_seek_penalty_store, &bfqd->bfq_back_penalty, 1,
++		INT_MAX, 0);
++STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, INT_MAX, 2);
++#undef STORE_FUNCTION
++
++#define USEC_STORE_FUNCTION(__FUNC, __PTR, MIN, MAX)			\
++static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)\
++{									\
++	struct bfq_data *bfqd = e->elevator_data;			\
++	unsigned long uninitialized_var(__data);			\
++	int ret = bfq_var_store(&__data, (page), count);		\
++	if (__data < (MIN))						\
++		__data = (MIN);						\
++	else if (__data > (MAX))					\
++		__data = (MAX);						\
++	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
++	return ret;							\
++}
++USEC_STORE_FUNCTION(bfq_slice_idle_us_store, &bfqd->bfq_slice_idle, 0,
++		    UINT_MAX);
++#undef USEC_STORE_FUNCTION
++
++static unsigned long bfq_estimated_max_budget(struct bfq_data *bfqd)
++{
++	u64 timeout = jiffies_to_msecs(bfqd->bfq_timeout);
++
++	if (bfqd->peak_rate_samples >= BFQ_PEAK_RATE_SAMPLES)
++		return bfq_calc_max_budget(bfqd->peak_rate, timeout);
++	else
++		return bfq_default_max_budget;
++}
++
++static ssize_t bfq_max_budget_store(struct elevator_queue *e,
++				    const char *page, size_t count)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	unsigned long uninitialized_var(__data);
++	int ret = bfq_var_store(&__data, (page), count);
++
++	if (__data == 0)
++		bfqd->bfq_max_budget = bfq_estimated_max_budget(bfqd);
++	else {
++		if (__data > INT_MAX)
++			__data = INT_MAX;
++		bfqd->bfq_max_budget = __data;
++	}
++
++	bfqd->bfq_user_max_budget = __data;
++
++	return ret;
++}
++
++/*
++ * Leaving this name to preserve name compatibility with cfq
++ * parameters, but this timeout is used for both sync and async.
++ */
++static ssize_t bfq_timeout_sync_store(struct elevator_queue *e,
++				      const char *page, size_t count)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	unsigned long uninitialized_var(__data);
++	int ret = bfq_var_store(&__data, (page), count);
++
++	if (__data < 1)
++		__data = 1;
++	else if (__data > INT_MAX)
++		__data = INT_MAX;
++
++	bfqd->bfq_timeout = msecs_to_jiffies(__data);
++	if (bfqd->bfq_user_max_budget == 0)
++		bfqd->bfq_max_budget = bfq_estimated_max_budget(bfqd);
++
++	return ret;
++}
++
++static ssize_t bfq_strict_guarantees_store(struct elevator_queue *e,
++				     const char *page, size_t count)
++{
++	struct bfq_data *bfqd = e->elevator_data;
++	unsigned long uninitialized_var(__data);
++	int ret = bfq_var_store(&__data, (page), count);
++
++	if (__data > 1)
++		__data = 1;
++	if (!bfqd->strict_guarantees && __data == 1
++	    && bfqd->bfq_slice_idle < 8 * NSEC_PER_MSEC)
++		bfqd->bfq_slice_idle = 8 * NSEC_PER_MSEC;
++
++	bfqd->strict_guarantees = __data;
++
++	return ret;
++}
++
++#define BFQ_ATTR(name) \
++	__ATTR(name, 0644, bfq_##name##_show, bfq_##name##_store)
++
++static struct elv_fs_entry bfq_attrs[] = {
++	BFQ_ATTR(fifo_expire_sync),
++	BFQ_ATTR(fifo_expire_async),
++	BFQ_ATTR(back_seek_max),
++	BFQ_ATTR(back_seek_penalty),
++	BFQ_ATTR(slice_idle),
++	BFQ_ATTR(slice_idle_us),
++	BFQ_ATTR(max_budget),
++	BFQ_ATTR(timeout_sync),
++	BFQ_ATTR(strict_guarantees),
++	__ATTR_NULL
++};
++
++static struct elevator_type iosched_bfq_mq = {
++	.ops.mq = {
++		.get_rq_priv		= bfq_get_rq_private,
++		.put_rq_priv		= bfq_put_rq_private,
++		.exit_icq		= bfq_exit_icq,
++		.insert_requests	= bfq_insert_requests,
++		.dispatch_request	= bfq_dispatch_request,
++		.next_request		= elv_rb_latter_request,
++		.former_request		= elv_rb_former_request,
++		.allow_merge		= bfq_allow_bio_merge,
++		.bio_merge		= bfq_bio_merge,
++		.request_merge		= bfq_request_merge,
++		.requests_merged	= bfq_requests_merged,
++		.request_merged		= bfq_request_merged,
++		.has_work		= bfq_has_work,
++		.init_sched		= bfq_init_queue,
++		.exit_sched		= bfq_exit_queue,
++	},
++
++	.uses_mq =		true,
++	.icq_size =		sizeof(struct bfq_io_cq),
++	.icq_align =		__alignof__(struct bfq_io_cq),
++	.elevator_attrs =	bfq_attrs,
++	.elevator_name =	"bfq",
++	.elevator_owner =	THIS_MODULE,
++};
++
++static int __init bfq_init(void)
++{
++	int ret;
++
++	ret = -ENOMEM;
++	if (bfq_slab_setup())
++		goto err_pol_unreg;
++
++	ret = elv_register(&iosched_bfq_mq);
++	if (ret)
++		goto err_pol_unreg;
++
++	return 0;
++
++err_pol_unreg:
++	return ret;
++}
++
++static void __exit bfq_exit(void)
++{
++	elv_unregister(&iosched_bfq_mq);
++	bfq_slab_kill();
++}
++
++module_init(bfq_init);
++module_exit(bfq_exit);
++
++MODULE_AUTHOR("Paolo Valente");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("MQ Budget Fair Queueing I/O Scheduler");
 -- 
-2.11.0
+2.10.0
