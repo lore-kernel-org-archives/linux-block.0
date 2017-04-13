@@ -1,84 +1,61 @@
 Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v6 02/10] blk-mq: Let blk_mq_debugfs_register() look up the queue name
-Date: Wed, 26 Apr 2017 13:47:49 -0700
-Message-ID: <20170426204757.18910-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "roger.pau@citrix.com"
+	<roger.pau@citrix.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "jbacik@fb.com" <jbacik@fb.com>,
+	"james.smart@broadcom.com" <james.smart@broadcom.com>, "dm-devel@redhat.com"
+	<dm-devel@redhat.com>
+Subject: Re: [PATCH 08/25] scsi: fix fast-fail for non-passthrough requests
+Date: Thu, 13 Apr 2017 20:41:07 +0000
+Message-ID: <1492116064.24345.12.camel@sandisk.com>
+References: <20170406153944.10058-1-hch@lst.de>
+	 <20170406153944.10058-9-hch@lst.de>
+In-Reply-To: <20170406153944.10058-9-hch@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-A later patch will move the call of blk_mq_debugfs_register() to
-a function to which the queue name is not passed as an argument.
-To avoid having to add a 'name' argument to multiple callers, let
-blk_mq_debugfs_register() look up the queue name.
+On Thu, 2017-04-06 at 17:39 +0200, Christoph Hellwig wrote:
+> Currently error is always 0 for non-passthrough requests when reaching th=
+e
+> scsi_noretry_cmd check in scsi_io_completion, which effectively disables
+> all fastfail logic.  Fix this by having a single call to
+> __scsi_error_from_host_byte at the beginning of the function and always
+> having a valid error value.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/scsi_lib.c | 28 +++++++---------------------
+>  1 file changed, 7 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 11972d1075f1..89b4d9e69866 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -779,21 +779,17 @@ void scsi_io_completion(struct scsi_cmnd *cmd, unsi=
+gned int good_bytes)
+>  		sense_valid =3D scsi_command_normalize_sense(cmd, &sshdr);
+>  		if (sense_valid)
+>  			sense_deferred =3D scsi_sense_is_deferred(&sshdr);
+> +
+> +		if (!sense_deferred)
+> +			error =3D __scsi_error_from_host_byte(cmd, result);
+>  	}
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 5 +++--
- block/blk-mq-sysfs.c   | 2 +-
- block/blk-mq.h         | 5 ++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+Hello Christoph,
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 3057641d5d15..e9282b945f6b 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -785,12 +785,13 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
- 	{},
- };
- 
--int blk_mq_debugfs_register(struct request_queue *q, const char *name)
-+int blk_mq_debugfs_register(struct request_queue *q)
- {
- 	if (!blk_debugfs_root)
- 		return -ENOENT;
- 
--	q->debugfs_dir = debugfs_create_dir(name, blk_debugfs_root);
-+	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-+					    blk_debugfs_root);
- 	if (!q->debugfs_dir)
- 		goto err;
- 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index a2dbb1a48e72..afb3451cf8a5 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -318,7 +318,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 
- 	kobject_uevent(&q->mq_kobj, KOBJ_ADD);
- 
--	blk_mq_debugfs_register(q, kobject_name(&dev->kobj));
-+	blk_mq_debugfs_register(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_register_hctx(hctx);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 7d955c756810..9049c0f11505 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -87,13 +87,12 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
-  * debugfs helpers
-  */
- #ifdef CONFIG_BLK_DEBUG_FS
--int blk_mq_debugfs_register(struct request_queue *q, const char *name);
-+int blk_mq_debugfs_register(struct request_queue *q);
- void blk_mq_debugfs_unregister(struct request_queue *q);
- int blk_mq_debugfs_register_hctxs(struct request_queue *q);
- void blk_mq_debugfs_unregister_hctxs(struct request_queue *q);
- #else
--static inline int blk_mq_debugfs_register(struct request_queue *q,
--					  const char *name)
-+static inline int blk_mq_debugfs_register(struct request_queue *q)
- {
- 	return 0;
- }
--- 
-2.12.2
+Sorry but this doesn't look correct to me. Further down a "error =3D
+__scsi_error_from_host_byte(cmd, result)" statement is removed that does no=
+t
+depend on "if (!sense_deferred)" so I think that assignment should happen
+independent of the value of "sense_deferred". Additionally, how can it make
+sense to call __scsi_error_from_host_byte() only if sense_deferred =3D=3D f=
+alse?
+As you know the SCSI command result is generated by the LLD so I don't thin=
+k
+that it depends on whether or not the sense data has been deferred.
+
+Bart.=
