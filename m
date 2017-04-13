@@ -1,63 +1,27 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk
-Subject: [PATCH v3 07/20] nilfs2: set the mapping error when calling SetPageError on writeback
-Date: Mon, 24 Apr 2017 09:22:46 -0400
-Message-Id: <20170424132259.8680-8-jlayton@redhat.com>
-In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
-References: <20170424132259.8680-1-jlayton@redhat.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 13 Apr 2017 16:08:10 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 3/6] blk-mq: Make blk_flags_show() callers append a
+ newline character
+Message-ID: <20170413230810.GD1550@vader.DHCP.thefacebook.com>
+References: <20170411205842.28137-1-bart.vanassche@sandisk.com>
+ <20170411205842.28137-4-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170411205842.28137-4-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-In a later patch, we're going to want to make the fsync codepath not do
-a TestClearPageError call as that can override the error set in the
-address space. To do that though, we need to ensure that filesystems
-that are relying on the PG_error bit for reporting writeback errors
-also set an error in the address space.
+On Tue, Apr 11, 2017 at 01:58:39PM -0700, Bart Van Assche wrote:
+> This patch does not change any functionality but makes it possible
+> to produce a single line of output with multiple flag-to-name
+> translations.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.com>
 
-Ensure that this is set in nilfs2.
-
-Cc: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/nilfs2/segment.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
-index febed1217b3f..612d4b446793 100644
---- a/fs/nilfs2/segment.c
-+++ b/fs/nilfs2/segment.c
-@@ -1745,6 +1745,7 @@ static void nilfs_end_page_io(struct page *page, int err)
- 	} else {
- 		__set_page_dirty_nobuffers(page);
- 		SetPageError(page);
-+		mapping_set_error(page_mapping(page), err);
- 	}
- 
- 	end_page_writeback(page);
--- 
-2.9.3
+Reviewed-by: Omar Sandoval <osandov@fb.com>
