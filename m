@@ -1,32 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:39852 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752089AbdDNUK3 (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:50945 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755604AbdDMTmy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2017 16:10:29 -0400
-Subject: Re: [PATCH block-tree] net: off by one in inet6_pton()
-To: Dan Carpenter <dan.carpenter@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        Thu, 13 Apr 2017 15:42:54 -0400
+Date: Thu, 13 Apr 2017 22:42:31 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: "David S. Miller" <davem@davemloft.net>, Jens Axboe <axboe@fb.com>,
         Sagi Grimberg <sagi@grimberg.me>
-References: <20170413194231.GD591@mwanda>
-CC: Wei Tang <tangwei@cmss.chinamobile.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        <netdev@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <fa3631c5-8f5a-1d45-0968-33a4219aab24@fb.com>
-Date: Fri, 14 Apr 2017 14:09:30 -0600
+Cc: Wei Tang <tangwei@cmss.chinamobile.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH block-tree] net: off by one in inet6_pton()
+Message-ID: <20170413194231.GD591@mwanda>
 MIME-Version: 1.0
-In-Reply-To: <20170413194231.GD591@mwanda>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 04/13/2017 01:42 PM, Dan Carpenter wrote:
-> If "scope_len" is sizeof(scope_id) then we would put the NUL terminator
-> one space beyond the end of the buffer.
+If "scope_len" is sizeof(scope_id) then we would put the NUL terminator
+one space beyond the end of the buffer.
 
-Added, thanks Dan.
+Fixes: b1a951fe469e ("net/utils: generic inet_pton_with_scope helper")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+This one goes through Jens' tree not through net-dev.
 
--- 
-Jens Axboe
+diff --git a/net/core/utils.c b/net/core/utils.c
+index da1089ea5389..93066bd0305a 100644
+--- a/net/core/utils.c
++++ b/net/core/utils.c
+@@ -339,7 +339,7 @@ static int inet6_pton(struct net *net, const char *src, u16 port_num,
+ 	    src + srclen != scope_delim && *scope_delim == '%') {
+ 		struct net_device *dev;
+ 		char scope_id[16];
+-		size_t scope_len = min_t(size_t, sizeof(scope_id),
++		size_t scope_len = min_t(size_t, sizeof(scope_id) - 1,
+ 					 src + srclen - scope_delim - 1);
+ 
+ 		memcpy(scope_id, scope_delim + 1, scope_len);
