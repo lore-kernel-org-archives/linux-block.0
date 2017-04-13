@@ -1,52 +1,57 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 01/23] pd: don't check blk_execute_rq return value.
-Date: Wed, 19 Apr 2017 21:26:46 +0200
-Message-Id: <20170419192708.22098-2-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
+Return-Path: <bblock@linux.vnet.ibm.com>
+Date: Thu, 13 Apr 2017 14:23:58 +0200
+From: Benjamin Block <bblock@linux.vnet.ibm.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v4 0/6] Avoid that scsi-mq and dm-mq queue processing
+ stalls sporadically
+References: <20170407181654.27836-1-bart.vanassche@sandisk.com>
+ <20170412105538.GB22576@bblock-ThinkPad-W530>
+ <1492020683.2764.9.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1492020683.2764.9.camel@sandisk.com>
+Message-Id: <20170413122358.GH22576@bblock-ThinkPad-W530>
 List-ID: <linux-block@vger.kernel.org>
 
-The driver never sets req->errors, so blk_execute_rq will always return 0.
+On Wed, Apr 12, 2017 at 06:11:25PM +0000, Bart Van Assche wrote:
+> On Wed, 2017-04-12 at 12:55 +0200, Benjamin Block wrote:
+> > On Fri, Apr 07, 2017 at 11:16:48AM -0700, Bart Van Assche wrote:
+> > > The six patches in this patch series fix the queue lockup I reported
+> > > recently on the linux-block mailing list. Please consider these patches
+> > > for inclusion in the upstream kernel.
+> >
+> > just out of curiosity. Is this maybe related to similar stuff happening
+> > when CPUs are hot plugged - at least in that the stack gets stuck? Like
+> > in this thread here:
+> > https://www.mail-archive.com/linux-block@vger.kernel.org/msg06057.html
+> >
+> > Would be interesting, because we recently saw similar stuff happening.
+>
+> Hello Benjamin,
+>
+> My proposal is to repeat that test with Jens' for-next branch. If the issue
+> still occurs with that tree then please check the contents of
+> /sys/kernel/debug/block/*/mq/*/{dispatch,*/rq_list}. That will allow to
+> determine whether or not any block layer requests are still pending. If
+> running the command below resolves the deadlock then it means that a
+> trigger to run a block layer queue is still missing somewhere:
+>
+> for a in /sys/kernel/debug/block/*/mq/state; do echo run >$a;�done
+>
+> See also git://git.kernel.dk/linux-block.git.
+>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/paride/pd.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Thx for the hint! I'll forward that and see if the affected folks are
+willing to reproduce.
 
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index b05e151c9b38..7d2402f90978 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -739,18 +739,15 @@ static int pd_special_command(struct pd_unit *disk,
- 		      enum action (*func)(struct pd_unit *disk))
- {
- 	struct request *rq;
--	int err = 0;
- 
- 	rq = blk_get_request(disk->gd->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
- 	if (IS_ERR(rq))
- 		return PTR_ERR(rq);
- 
- 	rq->special = func;
--
--	err = blk_execute_rq(disk->gd->queue, disk->gd, rq, 0);
--
-+	blk_execute_rq(disk->gd->queue, disk->gd, rq, 0);
- 	blk_put_request(rq);
--	return err;
-+	return 0;
- }
- 
- /* kernel glue structures */
--- 
-2.11.0
+
+                                                    Beste Gr��e / Best regards,
+                                                      - Benjamin Block
+--
+Linux on z Systems Development         /         IBM Systems & Technology Group
+		  IBM Deutschland Research & Development GmbH
+Vorsitz. AufsR.: Martina Koederitz     /        Gesch�ftsf�hrung: Dirk Wittkopp
+Sitz der Gesellschaft: B�blingen / Registergericht: AmtsG Stuttgart, HRB 243294
