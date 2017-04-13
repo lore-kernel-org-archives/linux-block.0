@@ -1,48 +1,68 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 05/25] fs: Get proper reference for s_bdi
-Date: Wed, 12 Apr 2017 12:24:29 +0200
-Message-Id: <20170412102449.16901-6-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 13 Apr 2017 16:17:56 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 4/6] blk-mq: Show operation, cmd_flags and rq_flags names
+Message-ID: <20170413231756.GE1550@vader.DHCP.thefacebook.com>
+References: <20170411205842.28137-1-bart.vanassche@sandisk.com>
+ <20170411205842.28137-5-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170411205842.28137-5-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-So far we just relied on block device to hold a bdi reference for us
-while the filesystem is mounted. While that works perfectly fine, it is
-a bit awkward that we have a pointer to a refcounted structure in the
-superblock without proper reference. So make s_bdi hold a proper
-reference to block device's BDI. No filesystem using mount_bdev()
-actually changes s_bdi so this is safe and will make bdev filesystems
-work the same way as filesystems needing to set up their private bdi.
+On Tue, Apr 11, 2017 at 01:58:40PM -0700, Bart Van Assche wrote:
+> Show the operation name, .cmd_flags and .rq_flags as names instead
+> of numbers.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/super.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+I like this :) one minor nit below.
 
-diff --git a/fs/super.c b/fs/super.c
-index 0f51a437c269..e267d3a00144 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1054,12 +1054,9 @@ static int set_bdev_super(struct super_block *s, void *data)
- {
- 	s->s_bdev = data;
- 	s->s_dev = s->s_bdev->bd_dev;
-+	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
-+	s->s_iflags |= SB_I_DYNBDI;
- 
--	/*
--	 * We set the bdi here to the queue backing, file systems can
--	 * overwrite this in ->fill_super()
--	 */
--	s->s_bdi = bdev_get_queue(s->s_bdev)->backing_dev_info;
- 	return 0;
- }
- 
--- 
-2.12.0
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+
+> ---
+>  block/blk-mq-debugfs.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 69 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index aae4b7c7b7b0..161f30fc236f 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+[snip]
+>  static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
+>  {
+>  	struct request *rq = list_entry_rq(v);
+> +	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
+>  
+> -	seq_printf(m, "%p {.cmd_flags=0x%x, .rq_flags=0x%x, .tag=%d, .internal_tag=%d}\n",
+> -		   rq, rq->cmd_flags, (__force unsigned int)rq->rq_flags,
+> -		   rq->tag, rq->internal_tag);
+> +	seq_printf(m, "%p {.op=", rq);
+> +	if (op < ARRAY_SIZE(op_name) && op_name[op])
+> +		seq_printf(m, "%s", op_name[op]);
+> +	else
+> +		seq_printf(m, "%d", op);
+> +	seq_puts(m, ", .cmd_flags=");
+> +	blk_flags_show(m, rq->cmd_flags ^ op, cmd_flag_name,
+                          ^^^^^^^^^^^^^^^^^^
+I think rq->cmd_flags & ~REQ_OP_MASK is slightly clearer here, but I
+don't feel that strongly about it, it's up to you.
+
+> +		       ARRAY_SIZE(cmd_flag_name));
+> +	seq_puts(m, ", .rq_flags=");
+> +	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
+> +		       ARRAY_SIZE(rqf_name));
+> +	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
+> +		   rq->internal_tag);
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.12.0
+> 
