@@ -1,47 +1,32 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 09/27] block: stop using blkdev_issue_write_same for zeroing
-Date: Wed,  5 Apr 2017 16:21:47 +0200
-Message-Id: <20170405142205.6477-10-hch@lst.de>
-In-Reply-To: <20170405142205.6477-1-hch@lst.de>
-References: <20170405142205.6477-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:39852 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752089AbdDNUK3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Apr 2017 16:10:29 -0400
+Subject: Re: [PATCH block-tree] net: off by one in inet6_pton()
+To: Dan Carpenter <dan.carpenter@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sagi Grimberg <sagi@grimberg.me>
+References: <20170413194231.GD591@mwanda>
+CC: Wei Tang <tangwei@cmss.chinamobile.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        <netdev@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <fa3631c5-8f5a-1d45-0968-33a4219aab24@fb.com>
+Date: Fri, 14 Apr 2017 14:09:30 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170413194231.GD591@mwanda>
+Content-Type: text/plain; charset="windows-1252"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We'll always use the WRITE ZEROES code for zeroing now.
+On 04/13/2017 01:42 PM, Dan Carpenter wrote:
+> If "scope_len" is sizeof(scope_id) then we would put the NUL terminator
+> one space beyond the end of the buffer.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-lib.c | 4 ----
- 1 file changed, 4 deletions(-)
+Added, thanks Dan.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index e5b853f2b8a2..2a8d638544a7 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -364,10 +364,6 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			return 0;
- 	}
- 
--	if (!blkdev_issue_write_same(bdev, sector, nr_sects, gfp_mask,
--			ZERO_PAGE(0)))
--		return 0;
--
- 	blk_start_plug(&plug);
- 	ret = __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
- 			&bio, discard);
 -- 
-2.11.0
+Jens Axboe
