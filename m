@@ -1,27 +1,26 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 0/2] Export more queue state information through debugfs
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-References: <20170330182127.24288-1-bart.vanassche@sandisk.com>
-Cc: linux-block@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <826af944-2316-8352-118c-91887d747eca@kernel.dk>
-Date: Mon, 10 Apr 2017 12:28:05 -0600
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "osandov@osandov.com" <osandov@osandov.com>
+CC: "hare@suse.com" <hare@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 5/6] blk-mq: Add blk_mq_ops.show_rq()
+Date: Fri, 14 Apr 2017 16:03:02 +0000
+Message-ID: <1492185780.2644.5.camel@sandisk.com>
+References: <20170411205842.28137-1-bart.vanassche@sandisk.com>
+	 <20170411205842.28137-6-bart.vanassche@sandisk.com>
+	 <20170413232104.GF1550@vader.DHCP.thefacebook.com>
+In-Reply-To: <20170413232104.GF1550@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <20170330182127.24288-1-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On 03/30/2017 12:21 PM, Bart Van Assche wrote:
-> Hello Jens,
-> 
-> This is a short patch series with one patch that exports the queue state
-> and another patch that shows symbolic names for hctx state and flags
-> instead of a numerical bitmask.
-> 
-> Please consider these patches for kernel v4.12.
+On Thu, 2017-04-13 at 16:21 -0700, Omar Sandoval wrote:
+> How about passing the seq_file to the callback instead of this
+> arbitrarily-sized on-stack buffer?
 
-Thanks, added for 4.12.
+Hello Omar,
 
+That sounds like a good idea to me. I will make that change.
 
--- 
-Jens Axboe
+Bart.=
