@@ -1,90 +1,132 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:46761 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753145AbdDMTfY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Apr 2017 15:35:24 -0400
-Date: Thu, 13 Apr 2017 22:35:14 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Matias Bjorling <mb@lightnvm.io>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] lightnvm: fix some error code in pblk-init.c
-Message-ID: <20170413193512.GB591@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 3/8] nowait aio: return if direct write will trigger writeback
+Date: Fri, 14 Apr 2017 07:02:52 -0500
+Message-Id: <20170414120257.8932-4-rgoldwyn@suse.de>
+In-Reply-To: <20170414120257.8932-1-rgoldwyn@suse.de>
+References: <20170414120257.8932-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-There were a bunch of places in pblk_lines_init() where we didn't set an
-error code.  And in pblk_writer_init() we accidentally return 1 instead
-of a correct error code, which would result in a Oops later.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Fixes: 11a5d6fdf919 ("lightnvm: physical block device (pblk) target")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Find out if the write will trigger a wait due to writeback. If yes,
+return -EAGAIN.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 94653b1f1300..3996e4b8fb0e 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -543,7 +543,7 @@ static int pblk_lines_init(struct pblk *pblk)
- 	long nr_bad_blks, nr_meta_blks, nr_free_blks;
- 	int bb_distance;
- 	int i;
--	int ret = 0;
+This introduces a new function filemap_range_has_page() which
+returns true if the file's mapping has a page within the range
+mentioned.
+
+Return -EINVAL for buffered AIO: there are multiple causes of
+delay such as page locks, dirty throttling logic, page loading
+from disk etc. which cannot be taken care of.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ include/linux/fs.h |  2 ++
+ mm/filemap.c       | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index e44de1c981a0..b14eab5daeb2 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2514,6 +2514,8 @@ extern int filemap_fdatawait(struct address_space *);
+ extern void filemap_fdatawait_keep_errors(struct address_space *);
+ extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
+ 				   loff_t lend);
++extern int filemap_range_has_page(struct address_space *, loff_t lstart,
++				   loff_t lend);
+ extern int filemap_write_and_wait(struct address_space *mapping);
+ extern int filemap_write_and_wait_range(struct address_space *mapping,
+ 				        loff_t lstart, loff_t lend);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index d51670b7fe6b..48b83d1d4a30 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -376,6 +376,39 @@ int filemap_flush(struct address_space *mapping)
+ }
+ EXPORT_SYMBOL(filemap_flush);
+ 
++/**
++ * filemap_range_has_page - check if a page exists in range.
++ * @mapping:		address space structure to wait for
++ * @start_byte:		offset in bytes where the range starts
++ * @end_byte:		offset in bytes where the range ends (inclusive)
++ *
++ * Find at least one page in the range supplied, usually used to check if
++ * direct writing in this range will trigger a writeback.
++ */
++int filemap_range_has_page(struct address_space *mapping,
++				loff_t start_byte, loff_t end_byte)
++{
++	pgoff_t index = start_byte >> PAGE_SHIFT;
++	pgoff_t end = end_byte >> PAGE_SHIFT;
++	struct pagevec pvec;
 +	int ret;
++
++	if (end_byte < start_byte)
++		return 0;
++
++	if (mapping->nrpages == 0)
++		return 0;
++
++	pagevec_init(&pvec, 0);
++	ret = pagevec_lookup(&pvec, mapping, index, 1);
++	if (!ret)
++		return 0;
++	ret = (pvec.pages[0]->index <= end);
++	pagevec_release(&pvec);
++	return ret;
++}
++EXPORT_SYMBOL(filemap_range_has_page);
++
+ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 				     loff_t start_byte, loff_t end_byte)
+ {
+@@ -2640,6 +2673,9 @@ inline ssize_t generic_write_checks(struct kiocb *iocb, struct iov_iter *from)
  
- 	lm->sec_per_line = geo->sec_per_blk * geo->nr_luns;
- 	lm->blk_per_line = geo->nr_luns;
-@@ -638,12 +638,16 @@ static int pblk_lines_init(struct pblk *pblk)
- 	}
+ 	pos = iocb->ki_pos;
  
- 	l_mg->bb_template = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
--	if (!l_mg->bb_template)
-+	if (!l_mg->bb_template) {
-+		ret = -ENOMEM;
- 		goto fail_free_meta;
++	if ((iocb->ki_flags & IOCB_NOWAIT) && !(iocb->ki_flags & IOCB_DIRECT))
++		return -EINVAL;
++
+ 	if (limit != RLIM_INFINITY) {
+ 		if (iocb->ki_pos >= limit) {
+ 			send_sig(SIGXFSZ, current, 0);
+@@ -2709,9 +2745,17 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
+ 	write_len = iov_iter_count(from);
+ 	end = (pos + write_len - 1) >> PAGE_SHIFT;
+ 
+-	written = filemap_write_and_wait_range(mapping, pos, pos + write_len - 1);
+-	if (written)
+-		goto out;
++	if (iocb->ki_flags & IOCB_NOWAIT) {
++		/* If there are pages to writeback, return */
++		if (filemap_range_has_page(inode->i_mapping, pos,
++					   pos + iov_iter_count(from)))
++			return -EAGAIN;
++	} else {
++		written = filemap_write_and_wait_range(mapping, pos,
++							pos + write_len - 1);
++		if (written)
++			goto out;
 +	}
  
- 	l_mg->bb_aux = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
--	if (!l_mg->bb_aux)
-+	if (!l_mg->bb_aux) {
-+		ret = -ENOMEM;
- 		goto fail_free_bb_template;
-+	}
- 
- 	bb_distance = (geo->nr_luns) * geo->sec_per_pl;
- 	for (i = 0; i < lm->sec_per_line; i += bb_distance)
-@@ -667,8 +671,10 @@ static int pblk_lines_init(struct pblk *pblk)
- 
- 	pblk->lines = kcalloc(l_mg->nr_lines, sizeof(struct pblk_line),
- 								GFP_KERNEL);
--	if (!pblk->lines)
-+	if (!pblk->lines) {
-+		ret = -ENOMEM;
- 		goto fail_free_bb_aux;
-+	}
- 
- 	nr_free_blks = 0;
- 	for (i = 0; i < l_mg->nr_lines; i++) {
-@@ -682,8 +688,10 @@ static int pblk_lines_init(struct pblk *pblk)
- 		spin_lock_init(&line->lock);
- 
- 		nr_bad_blks = pblk_bb_line(pblk, line);
--		if (nr_bad_blks < 0 || nr_bad_blks > lm->blk_per_line)
-+		if (nr_bad_blks < 0 || nr_bad_blks > lm->blk_per_line) {
-+			ret = -EINVAL;
- 			goto fail_free_lines;
-+		}
- 
- 		line->blk_in_line = lm->blk_per_line - nr_bad_blks;
- 		if (line->blk_in_line < lm->min_blk_line) {
-@@ -733,7 +741,7 @@ static int pblk_writer_init(struct pblk *pblk)
- 	pblk->writer_ts = kthread_create(pblk_write_ts, pblk, "pblk-writer-t");
- 	if (IS_ERR(pblk->writer_ts)) {
- 		pr_err("pblk: could not allocate writer kthread\n");
--		return 1;
-+		return PTR_ERR(pblk->writer_ts);
- 	}
- 
- 	return 0;
+ 	/*
+ 	 * After a write we want buffered reads to be sure to go to disk to get
+-- 
+2.12.0
