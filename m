@@ -1,42 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39398 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S938067AbdD1PQS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 11:16:18 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/4] blk-mq: support to use hw tag for scheduling
-Date: Fri, 28 Apr 2017 23:15:35 +0800
-Message-Id: <20170428151539.25514-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, target-devel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dm-devel@redhat.com
+Subject: Re: remove REQ_OP_WRITE_SAME
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170412084809.8245-1-hch@lst.de>
+Date: Thu, 13 Apr 2017 22:23:10 -0400
+In-Reply-To: <20170412084809.8245-1-hch@lst.de> (Christoph Hellwig's message
+	of "Wed, 12 Apr 2017 10:48:01 +0200")
+Message-ID: <yq1mvbjwwvl.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
 
-This patchset introduces flag of BLK_MQ_F_SCHED_USE_HW_TAG and
-allows to use hardware tag directly for IO scheduling if the queue's
-depth is big enough. In this way, we can avoid to allocate extra tags
-and request pool for IO schedule, and the schedule tag allocation/release
-can be saved in I/O submit path.
+Christoph,
 
-Thanks,
-Ming
+> Now that we are using REQ_OP_WRITE_ZEROES for all zeroing needs in the
+> kernel there is very little use left for REQ_OP_WRITE_SAME.  We only
+> have two callers left, and both just export optional protocol features
+> to remote systems: DRBD and the target code.
 
-Ming Lei (4):
-  blk-mq: introduce BLK_MQ_F_SCHED_USE_HW_TAG
-  blk-mq: introduce blk_mq_get_queue_depth()
-  blk-mq: use hw tag for scheduling if hw tag space is big enough
-  blk-mq: dump new introduced flag of BLK_MQ_F_SCHED_USE_HW_TAG
+While I'm not particularly married to WRITE SAME, I do think it's a
+shame that the RAID5/6 code never started using it. It does make a
+difference when initializing RAID sets.
 
- block/blk-mq-debugfs.c |  1 +
- block/blk-mq-sched.c   | 18 +++++++++++++-
- block/blk-mq-sched.h   | 15 ++++++++++++
- block/blk-mq.c         | 65 ++++++++++++++++++++++++++++++++++++++++++++------
- block/blk-mq.h         |  1 +
- include/linux/blk-mq.h |  1 +
- 6 files changed, 93 insertions(+), 8 deletions(-)
+The other thing that keeps me a bit on the fence is that a bunch of the
+plumbing to handle a bio with a payload different from bi_size is needed
+for the copy offload token. I'm hoping to have those patches ready for
+4.13. Right now there are a bunch of places where handling of
+REQ_OP_COPY_IN and REQ_OP_COPY_OUT share conditionals with WRITE SAME.
+
+So I suggest postponing the decision about whether to rip out WRITE SAME
+until I finish the token stuff.
 
 -- 
-2.9.3
+Martin K. Petersen	Oracle Linux Engineering
