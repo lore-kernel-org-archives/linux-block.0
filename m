@@ -1,44 +1,75 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:34912 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752374AbdDJSwB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2017 14:52:01 -0400
-Received: by mail-wm0-f51.google.com with SMTP id w64so46465650wma.0
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2017 11:52:00 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/3] lightnvm: make nvm_free static
-Date: Mon, 10 Apr 2017 20:51:37 +0200
-Message-Id: <1491850297-18235-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1491850297-18235-1-git-send-email-javier@cnexlabs.com>
-References: <1491850297-18235-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 6/8] nowait aio: ext4
+Date: Fri, 14 Apr 2017 07:02:55 -0500
+Message-Id: <20170414120257.8932-7-rgoldwyn@suse.de>
+In-Reply-To: <20170414120257.8932-1-rgoldwyn@suse.de>
+References: <20170414120257.8932-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Prefix the nvm_free static function with a missing static keyword.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Return EAGAIN if any of the following checks fail for direct I/O:
+  + i_rwsem is lockable
+  + Writing beyond end of file (will trigger allocation)
+  + Blocks are not allocated at the write location
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/lightnvm/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/ext4/file.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index bdbb333..3e51a05 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -999,7 +999,7 @@ static int nvm_core_init(struct nvm_dev *dev)
- 	return ret;
- }
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index cefa9835f275..2efdc6d4d3e8 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -216,7 +216,13 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 		return ext4_dax_write_iter(iocb, from);
+ #endif
  
--void nvm_free(struct nvm_dev *dev)
-+static void nvm_free(struct nvm_dev *dev)
- {
- 	if (!dev)
- 		return;
+-	inode_lock(inode);
++	if (iocb->ki_flags & IOCB_NOWAIT) {
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++	} else {
++		inode_lock(inode);
++	}
++
+ 	ret = ext4_write_checks(iocb, from);
+ 	if (ret <= 0)
+ 		goto out;
+@@ -235,9 +241,15 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 
+ 	iocb->private = &overwrite;
+ 	/* Check whether we do a DIO overwrite or not */
+-	if (o_direct && ext4_should_dioread_nolock(inode) && !unaligned_aio &&
+-	    ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from)))
+-		overwrite = 1;
++	if (o_direct && !unaligned_aio) {
++		if (ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from))) {
++			if (ext4_should_dioread_nolock(inode))
++				overwrite = 1;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
++		}
++	}
+ 
+ 	ret = __generic_file_write_iter(iocb, from);
+ 	inode_unlock(inode);
 -- 
-2.7.4
+2.12.0
