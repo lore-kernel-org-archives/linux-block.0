@@ -1,52 +1,67 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 3/5] nvme: mark nvme_max_retries static
-Date: Wed,  5 Apr 2017 16:18:54 +0200
-Message-Id: <20170405141856.1862-4-hch@lst.de>
-In-Reply-To: <20170405141856.1862-1-hch@lst.de>
-References: <20170405141856.1862-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f42.google.com ([74.125.83.42]:33532 "EHLO
+        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752046AbdDNIBI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Apr 2017 04:01:08 -0400
+Received: by mail-pg0-f42.google.com with SMTP id x125so41109445pgb.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2017 01:01:08 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v4 3/5] blk-mq: export helpers
+Date: Fri, 14 Apr 2017 01:00:00 -0700
+Message-Id: <45c2de5dc43bfefddbefaab32f203bf6795ffe9d.1492156558.git.osandov@fb.com>
+In-Reply-To: <cover.1492156558.git.osandov@fb.com>
+References: <cover.1492156558.git.osandov@fb.com>
+In-Reply-To: <cover.1492156558.git.osandov@fb.com>
+References: <cover.1492156558.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+From: Omar Sandoval <osandov@fb.com>
+
+blk_mq_finish_request() is required for schedulers that define their own
+put_request(). blk_mq_run_hw_queue() is required for schedulers that
+hold back requests to be run later.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/nvme/host/core.c | 3 +--
- drivers/nvme/host/nvme.h | 2 --
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ block/blk-mq.c         | 2 ++
+ include/linux/blk-mq.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index b225aacf4b89..933e67c60e33 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -49,10 +49,9 @@ unsigned char shutdown_timeout = 5;
- module_param(shutdown_timeout, byte, 0644);
- MODULE_PARM_DESC(shutdown_timeout, "timeout in seconds for controller shutdown");
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e536dacfae4c..7138cd98146e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -368,6 +368,7 @@ void blk_mq_finish_request(struct request *rq)
+ {
+ 	blk_mq_finish_hctx_request(blk_mq_map_queue(rq->q, rq->mq_ctx->cpu), rq);
+ }
++EXPORT_SYMBOL_GPL(blk_mq_finish_request);
  
--unsigned int nvme_max_retries = 5;
-+static unsigned int nvme_max_retries = 5;
- module_param_named(max_retries, nvme_max_retries, uint, 0644);
- MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
--EXPORT_SYMBOL_GPL(nvme_max_retries);
+ void blk_mq_free_request(struct request *rq)
+ {
+@@ -1183,6 +1184,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
+ }
++EXPORT_SYMBOL(blk_mq_run_hw_queue);
  
- static int nvme_char_major;
- module_param(nvme_char_major, int, 0);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 227f281482db..82ba9a305301 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -43,8 +43,6 @@ extern unsigned char shutdown_timeout;
- #define NVME_DEFAULT_KATO	5
- #define NVME_KATO_GRACE		10
- 
--extern unsigned int nvme_max_retries;
--
- enum {
- 	NVME_NS_LBA		= 0,
- 	NVME_NS_LIGHTNVM	= 1,
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index b90c3d5766cd..d75de612845d 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -238,6 +238,7 @@ void blk_mq_start_hw_queues(struct request_queue *q);
+ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
++void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
 -- 
-2.11.0
+2.12.2
