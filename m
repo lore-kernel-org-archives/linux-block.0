@@ -1,23 +1,27 @@
-Subject: Re: [PATCH] remove the mg_disk driver
-To: Christoph Hellwig <hch@lst.de>, donari75@gmail.com
-References: <20170406112846.31078-1-hch@lst.de>
-Cc: linux-block@vger.kernel.org
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <9e8d1c35-22dc-7022-5b2b-1d81d1e4b0e0@fb.com>
-Date: Fri, 14 Apr 2017 14:01:21 -0600
+Return-Path: <hch@lst.de>
+Date: Fri, 14 Apr 2017 10:21:47 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+	"roger.pau@citrix.com" <roger.pau@citrix.com>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"jbacik@fb.com" <jbacik@fb.com>,
+	"james.smart@broadcom.com" <james.smart@broadcom.com>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH 01/25] remove the mg_disk driver
+Message-ID: <20170414082147.GB24901@lst.de>
+References: <20170406153944.10058-1-hch@lst.de> <20170406153944.10058-2-hch@lst.de> <1492113491.24345.7.camel@sandisk.com>
 MIME-Version: 1.0
-In-Reply-To: <20170406112846.31078-1-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1492113491.24345.7.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/06/2017 05:28 AM, Christoph Hellwig wrote:
-> This drivers was added in 2008, but as far as a I can tell we never had a
-> single platform that actually registered resources for the platform driver.
-> 
-> It's also been unmaintained for a long time and apparently has a ATA mode
-> that can be driven using the IDE/libata subsystem.
+On Thu, Apr 13, 2017 at 07:58:13PM +0000, Bart Van Assche wrote:
+> Should the person who submitted this driver be CC-ed for this patch (unsik
+> Kim <donari75@gmail.com>)?
 
-Added for 4.12.
-
--- 
-Jens Axboe
+Yes, he should.  And in fact he was when I sent this patch out separately
+a little earlier, I just included it in this series for reference.
