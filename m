@@ -1,49 +1,58 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: kill req->errors V4
-Date: Thu, 20 Apr 2017 16:02:53 +0200
-Message-Id: <20170420140316.6546-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754810AbdDOS4Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Apr 2017 14:56:25 -0400
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [GIT PULL 06/19] lightnvm: enable nvme size compile asserts
+Date: Sat, 15 Apr 2017 20:55:40 +0200
+Message-ID: <20170415185553.16098-7-matias@cnexlabs.com>
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently the request structure has an errors field that is used in
-various different ways.  The oldest drivers use it as an error count,
-blk-mq and the generic timeout code assume that it holds a Linux
-errno for block completions, and various drivers use it for internal
-status values, often overwriting them with Linux errnos later,
-that is unless they are processing passthrough requests in which
-case they'll leave their errors in it.
+The asserts in _nvme_nvm_check_size are not compiled due to the function
+not begin called. Make sure that it is called, and also fix the wrong
+sizes of asserts for nvme_nvm_addr_format, and nvme_nvm_bb_tbl, which
+checked for number of bits instead of bytes.
 
-This series kills the ->errors field and replaced it with new fields
-in the drivers (or an odd hack in a union in struct request for
-two bitrotting old drivers).
+Reported-by: Scott Bauer <scott.bauer@intel.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/nvme/host/lightnvm.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Also available in the following git tree:
-
-    git://git.infradead.org/users/hch/block.git request-errors
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/request-errors
-
-Changes since V3:
- - SCSI OSD fix
- - Various Reviewed-by: tags
-
-Changes since V2;
- - reorder one patch to be earlier in the series
- - fix the argument to a bsg dprintk
- - fix a kerneldoc comment
-
-Changes since V1:
- - rebased on top the latest block for-next tree
- - fix error handling in nfsd blocklayout
- - dropped "scsi: fix fast-fail for non-passthrough requests"
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 4ea9c93..12c5a40 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -241,9 +241,9 @@ static inline void _nvme_nvm_check_size(void)
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_l2ptbl) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id_group) != 960);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_addr_format) != 128);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_addr_format) != 16);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id) != 4096);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 512);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 64);
+ }
+ 
+ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
+@@ -797,6 +797,8 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+ 	struct request_queue *q = ns->queue;
+ 	struct nvm_dev *dev;
+ 
++	_nvme_nvm_check_size();
++
+ 	dev = nvm_alloc_dev(node);
+ 	if (!dev)
+ 		return -ENOMEM;
+-- 
+2.9.3
