@@ -1,142 +1,91 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 9/9] nowait aio: Return -EOPNOTSUPP if filesystem does not support
-Date: Tue, 11 Apr 2017 09:26:19 -0500
-Message-Id: <20170411142619.27205-10-rgoldwyn@suse.de>
-In-Reply-To: <20170411142619.27205-1-rgoldwyn@suse.de>
-References: <20170411142619.27205-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754712AbdDOS4a (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Apr 2017 14:56:30 -0400
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [GIT PULL 08/19] lightnvm: double-clear of dev->lun_map on target init error
+Date: Sat, 15 Apr 2017 20:55:42 +0200
+Message-ID: <20170415185553.16098-9-matias@cnexlabs.com>
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Javier González <jg@lightnvm.io>
 
-The check is in generic_file_write_iter(), which is called by
-most filesystems, either through fsops.write_iter() or through
-the function defined by write_iter(). If not, we perform the
-check in the defined .write_iter() function which is called
-for direct IO.
+The dev->lun_map bits are cleared twice if an target init error occurs.
+First in the target clean routine, and then next in the nvm_tgt_create
+error function. Make sure that it is only cleared once by extending
+nvm_remove_tgt_devi() with a clear bit, such that clearing of bits can
+ignored when cleaning up a successful initialized target.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Fix style.
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- fs/9p/vfs_file.c | 3 +++
- fs/ceph/file.c   | 3 +++
- fs/cifs/file.c   | 3 +++
- fs/fuse/file.c   | 3 +++
- fs/nfs/direct.c  | 3 +++
- fs/ocfs2/file.c  | 3 +++
- mm/filemap.c     | 3 +++
- 7 files changed, 21 insertions(+)
+ drivers/lightnvm/core.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
-index 3de3b4a89d89..403681db7723 100644
---- a/fs/9p/vfs_file.c
-+++ b/fs/9p/vfs_file.c
-@@ -411,6 +411,9 @@ v9fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	loff_t origin;
- 	int err = 0;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index a14c52c..5eea3d5 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -89,7 +89,7 @@ static void nvm_release_luns_err(struct nvm_dev *dev, int lun_begin,
+ 		WARN_ON(!test_and_clear_bit(i, dev->lun_map));
+ }
  
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	retval = generic_write_checks(iocb, from);
- 	if (retval <= 0)
- 		return retval;
-diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-index 26cc95421cca..af28419b1731 100644
---- a/fs/ceph/file.c
-+++ b/fs/ceph/file.c
-@@ -1267,6 +1267,9 @@ static ssize_t ceph_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	int err, want, got;
- 	loff_t pos;
+-static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev)
++static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev, int clear)
+ {
+ 	struct nvm_dev *dev = tgt_dev->parent;
+ 	struct nvm_dev_map *dev_map = tgt_dev->map;
+@@ -100,11 +100,14 @@ static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev)
+ 		int *lun_offs = ch_map->lun_offs;
+ 		int ch = i + ch_map->ch_off;
  
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	if (ceph_snap(inode) != CEPH_NOSNAP)
- 		return -EROFS;
+-		for (j = 0; j < ch_map->nr_luns; j++) {
+-			int lun = j + lun_offs[j];
+-			int lunid = (ch * dev->geo.luns_per_chnl) + lun;
++		if (clear) {
++			for (j = 0; j < ch_map->nr_luns; j++) {
++				int lun = j + lun_offs[j];
++				int lunid = (ch * dev->geo.luns_per_chnl) + lun;
  
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index aa3debbba826..a828ab3e7775 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2638,6 +2638,9 @@ ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from)
- 	 * write request.
- 	 */
+-			WARN_ON(!test_and_clear_bit(lunid, dev->lun_map));
++				WARN_ON(!test_and_clear_bit(lunid,
++							dev->lun_map));
++			}
+ 		}
  
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	rc = generic_write_checks(iocb, from);
- 	if (rc <= 0)
- 		return rc;
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index ec238fb5a584..72786e798319 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -1425,6 +1425,9 @@ static ssize_t fuse_direct_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct fuse_io_priv io = FUSE_IO_PRIV_SYNC(file);
- 	ssize_t res;
+ 		kfree(ch_map->lun_offs);
+@@ -309,7 +312,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ err_queue:
+ 	blk_cleanup_queue(tqueue);
+ err_dev:
+-	nvm_remove_tgt_dev(tgt_dev);
++	nvm_remove_tgt_dev(tgt_dev, 0);
+ err_t:
+ 	kfree(t);
+ err_reserve:
+@@ -332,7 +335,7 @@ static void __nvm_remove_target(struct nvm_target *t)
+ 	if (tt->exit)
+ 		tt->exit(tdisk->private_data);
  
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	if (is_bad_inode(inode))
- 		return -EIO;
+-	nvm_remove_tgt_dev(t->dev);
++	nvm_remove_tgt_dev(t->dev, 1);
+ 	put_disk(tdisk);
  
-diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-index aab32fc3d6a8..ab419caebd5f 100644
---- a/fs/nfs/direct.c
-+++ b/fs/nfs/direct.c
-@@ -991,6 +991,9 @@ ssize_t nfs_file_direct_write(struct kiocb *iocb, struct iov_iter *iter)
- 	dfprintk(FILE, "NFS: direct write(%pD2, %zd@%Ld)\n",
- 		file, iov_iter_count(iter), (long long) iocb->ki_pos);
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	result = generic_write_checks(iocb, iter);
- 	if (result <= 0)
- 		return result;
-diff --git a/fs/ocfs2/file.c b/fs/ocfs2/file.c
-index bfeb647459d9..e7f8ba890305 100644
---- a/fs/ocfs2/file.c
-+++ b/fs/ocfs2/file.c
-@@ -2235,6 +2235,9 @@ static ssize_t ocfs2_file_write_iter(struct kiocb *iocb,
- 	if (count == 0)
- 		return 0;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	direct_io = iocb->ki_flags & IOCB_DIRECT ? 1 : 0;
- 
- 	inode_lock(inode);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 46e01b8f6880..48b83d1d4a30 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3026,6 +3026,9 @@ ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct inode *inode = file->f_mapping->host;
- 	ssize_t ret;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	inode_lock(inode);
- 	ret = generic_write_checks(iocb, from);
- 	if (ret > 0)
+ 	list_del(&t->list);
 -- 
-2.12.0
+2.9.3
