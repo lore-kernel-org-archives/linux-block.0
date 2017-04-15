@@ -1,30 +1,56 @@
-Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: kill req->errors
-Date: Thu,  6 Apr 2017 17:39:19 +0200
-Message-Id: <20170406153944.10058-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755634AbdDOS4u (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Apr 2017 14:56:50 -0400
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [GIT PULL 14/19] lightnvm: fix type checks on rrpc
+Date: Sat, 15 Apr 2017 20:55:48 +0200
+Message-ID: <20170415185553.16098-15-matias@cnexlabs.com>
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently the request structure has an errors field that is used in
-various different ways.  The oldest drivers use it as an error count,
-blk-mq and the generic timeout code assume that it holds a Linux
-errno for block completions, and various drivers use it for internal
-status values, often overwriting them with Linux errnos later,
-that is unless they are processing passthrough requests in which
-case they'll leave their errors in it.
+From: Javier González <jg@lightnvm.io>
 
-This series kills the ->errors field and replaced it with new fields
-in the drivers (or an odd hack in a union in struct request for
-two bitrotting old drivers).
+sector_t is always unsigned, therefore avoid < 0 checks on it.
 
-Note that this series expects that the patch to remove the mg_disk
-driver has been applied already on top of the block for-next tree.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/rrpc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 5dba544..cf0e28a 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -817,7 +817,7 @@ static int rrpc_read_ppalist_rq(struct rrpc *rrpc, struct bio *bio,
+ 
+ 	for (i = 0; i < npages; i++) {
+ 		/* We assume that mapping occurs at 4KB granularity */
+-		BUG_ON(!(laddr + i >= 0 && laddr + i < rrpc->nr_sects));
++		BUG_ON(!(laddr + i < rrpc->nr_sects));
+ 		gp = &rrpc->trans_map[laddr + i];
+ 
+ 		if (gp->rblk) {
+@@ -846,7 +846,7 @@ static int rrpc_read_rq(struct rrpc *rrpc, struct bio *bio, struct nvm_rq *rqd,
+ 	if (!is_gc && rrpc_lock_rq(rrpc, bio, rqd))
+ 		return NVM_IO_REQUEUE;
+ 
+-	BUG_ON(!(laddr >= 0 && laddr < rrpc->nr_sects));
++	BUG_ON(!(laddr < rrpc->nr_sects));
+ 	gp = &rrpc->trans_map[laddr];
+ 
+ 	if (gp->rblk) {
+-- 
+2.9.3
