@@ -1,100 +1,72 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: [resend PATCH v2 33/33] libnvdimm,
- pmem: disable dax flushing when pmem is fronting a volatile region
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, linux-fsdevel@vger.kernel.org,
-        Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
-Date: Mon, 17 Apr 2017 12:11:49 -0700
-Message-ID: <149245630894.10206.4512506206746702195.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755101AbdDOS4b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Apr 2017 14:56:31 -0400
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [GIT PULL 09/19] lightnvm: fix cleanup order of disk on init error
+Date: Sat, 15 Apr 2017 20:55:43 +0200
+Message-ID: <20170415185553.16098-10-matias@cnexlabs.com>
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The pmem driver attaches to both persistent and volatile memory ranges
-advertised by the ACPI NFIT. When the region is volatile it is redundant
-to spend cycles flushing caches at fsync(). Check if the hosting region
-is volatile and do not set QUEUE_FLAG_WC if it is.
+From: Javier González <jg@lightnvm.io>
 
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Reorder disk allocation such that the disk structure can be put
+safely.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/nvdimm/pmem.c        |    9 +++++++--
- drivers/nvdimm/region_devs.c |    6 ++++++
- include/linux/libnvdimm.h    |    1 +
- 3 files changed, 14 insertions(+), 2 deletions(-)
+ drivers/lightnvm/core.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index b000c6db5731..42876a75dab8 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -275,6 +275,7 @@ static int pmem_attach_disk(struct device *dev,
- 	struct vmem_altmap __altmap, *altmap = NULL;
- 	struct resource *res = &nsio->res;
- 	struct nd_pfn *nd_pfn = NULL;
-+	int has_flush, fua = 0, wbc;
- 	struct dax_device *dax_dev;
- 	int nid = dev_to_node(dev);
- 	struct nd_pfn_sb *pfn_sb;
-@@ -302,8 +303,12 @@ static int pmem_attach_disk(struct device *dev,
- 	dev_set_drvdata(dev, pmem);
- 	pmem->phys_addr = res->start;
- 	pmem->size = resource_size(res);
--	if (nvdimm_has_flush(nd_region) < 0)
-+	has_flush = nvdimm_has_flush(nd_region);
-+	if (has_flush < 0)
- 		dev_warn(dev, "unable to guarantee persistence of writes\n");
-+	else
-+		fua = has_flush;
-+	wbc = nvdimm_has_cache(nd_region);
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 5eea3d5..5f84d2a 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -264,15 +264,15 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 		goto err_t;
+ 	}
  
- 	if (!devm_request_mem_region(dev, res->start, resource_size(res),
- 				dev_name(&ndns->dev))) {
-@@ -344,7 +349,7 @@ static int pmem_attach_disk(struct device *dev,
- 		return PTR_ERR(addr);
- 	pmem->virt_addr = addr;
- 
--	blk_queue_write_cache(q, true, true);
-+	blk_queue_write_cache(q, wbc, fua);
- 	blk_queue_make_request(q, pmem_make_request);
- 	blk_queue_physical_block_size(q, PAGE_SIZE);
- 	blk_queue_max_hw_sectors(q, UINT_MAX);
-diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index 2df259010720..a085f7094b76 100644
---- a/drivers/nvdimm/region_devs.c
-+++ b/drivers/nvdimm/region_devs.c
-@@ -989,6 +989,12 @@ int nvdimm_has_flush(struct nd_region *nd_region)
- }
- EXPORT_SYMBOL_GPL(nvdimm_has_flush);
- 
-+int nvdimm_has_cache(struct nd_region *nd_region)
-+{
-+	return is_nd_pmem(&nd_region->dev);
-+}
-+EXPORT_SYMBOL_GPL(nvdimm_has_cache);
++	tdisk = alloc_disk(0);
++	if (!tdisk)
++		goto err_dev;
 +
- void __exit nd_region_devs_exit(void)
- {
- 	ida_destroy(&region_ida);
-diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
-index a98004745768..b733030107bb 100644
---- a/include/linux/libnvdimm.h
-+++ b/include/linux/libnvdimm.h
-@@ -162,6 +162,7 @@ void nd_region_release_lane(struct nd_region *nd_region, unsigned int lane);
- u64 nd_fletcher64(void *addr, size_t len, bool le);
- void nvdimm_flush(struct nd_region *nd_region);
- int nvdimm_has_flush(struct nd_region *nd_region);
-+int nvdimm_has_cache(struct nd_region *nd_region);
- #ifdef CONFIG_ARCH_HAS_PMEM_API
- void arch_memcpy_to_pmem(void *dst, void *src, unsigned size);
- #define ARCH_MEMREMAP_PMEM MEMREMAP_WB
+ 	tqueue = blk_alloc_queue_node(GFP_KERNEL, dev->q->node);
+ 	if (!tqueue)
+-		goto err_dev;
++		goto err_disk;
+ 	blk_queue_make_request(tqueue, tt->make_rq);
+ 
+-	tdisk = alloc_disk(0);
+-	if (!tdisk)
+-		goto err_queue;
+-
+ 	sprintf(tdisk->disk_name, "%s", create->tgtname);
+ 	tdisk->flags = GENHD_FL_EXT_DEVT;
+ 	tdisk->major = 0;
+@@ -308,9 +308,9 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	if (tt->exit)
+ 		tt->exit(targetdata);
+ err_init:
+-	put_disk(tdisk);
+-err_queue:
+ 	blk_cleanup_queue(tqueue);
++err_disk:
++	put_disk(tdisk);
+ err_dev:
+ 	nvm_remove_tgt_dev(tgt_dev, 0);
+ err_t:
+-- 
+2.9.3
