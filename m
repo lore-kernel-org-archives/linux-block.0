@@ -1,65 +1,48 @@
-Return-Path: <Avri.Altman@sandisk.com>
-From: Avri Altman <Avri.Altman@sandisk.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-CC: Arnd Bergmann <arnd@arndb.de>, Ulf Hansson <ulf.hansson@linaro.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
-	<axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Adrian Hunter
-	<adrian.hunter@intel.com>, Paolo Valente <paolo.valente@linaro.org>
-Subject: RE: Outstanding MQ questions from MMC
-Date: Sat, 15 Apr 2017 19:24:55 +0000
-Message-ID: <BY2PR0401MB0901B0167734FEFB7F1E5DF6E5040@BY2PR0401MB0901.namprd04.prod.outlook.com>
+Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <BY2PR0401MB0901B37DB60608662AE5C631E5050@BY2PR0401MB0901.namprd04.prod.outlook.com>
 References: <CACRpkdbZrkAqEdP1-QqDww0ZuFcY47Jgj9dPqkG_whrx7pwC-w@mail.gmail.com>
  <CAK8P3a1CGtj5VSVoMM34VWn781WpS8ZcHpq6n0UfNOWWYEq=QQ@mail.gmail.com>
  <CAPDyKFqiyEcScuWLVXE9kAa2yQyJCZfbXyAdAQOb081nLjyvvw@mail.gmail.com>
  <CAK8P3a1yJJ33R9EPPcErLUO2enFGrSJzWmVRwHdHP+3_2iP7ow@mail.gmail.com>
- <CACRpkdYsWnXLZEpZr74pLB8zjTV4Q=sdAfX+sz0n_E46SaJa9Q@mail.gmail.com>
- <BY2PR0401MB0901B37DB60608662AE5C631E5050@BY2PR0401MB0901.namprd04.prod.outlook.com>
- <CACRpkdbstMEC-_JcEfEm1debQRPeYBDmTPm0L_jGFnrgRZg1Zw@mail.gmail.com>
-In-Reply-To: <CACRpkdbstMEC-_JcEfEm1debQRPeYBDmTPm0L_jGFnrgRZg1Zw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+ <CACRpkdYsWnXLZEpZr74pLB8zjTV4Q=sdAfX+sz0n_E46SaJa9Q@mail.gmail.com> <BY2PR0401MB0901B37DB60608662AE5C631E5050@BY2PR0401MB0901.namprd04.prod.outlook.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 15 Apr 2017 20:34:48 +0200
+Message-ID: <CACRpkdbstMEC-_JcEfEm1debQRPeYBDmTPm0L_jGFnrgRZg1Zw@mail.gmail.com>
+Subject: Re: Outstanding MQ questions from MMC
+To: Avri Altman <Avri.Altman@sandisk.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Ulf Hansson <ulf.hansson@linaro.org>,
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Adrian Hunter <adrian.hunter@intel.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-WW91IGNhbiBzZWUgaG93IGl0J3MgZG9uZSBpbiBtbWNfYmxrX2lvY3RsX3JwbWJfY21kKCkuDQoN
-ClRoZSBSUE1CIHByb3RvY29sIGRlZmluZXMgNiB0eXBlcyBvZiBhY2Nlc3NlczoNCkFjY2Vzc2Vz
-IHRoYXQgcGVyZm9ybXMgcmVhZCBvcGVyYXRpb24gKHJlYWQgY291bnRlciwgcmVhZCBkYXRhLCBh
-bmQgcmVhZCBjb25maWd1cmF0aW9uKSAtIHJlcXVpcmVzIHNlbmRpbmcgMiByZXF1ZXN0cy4gDQpB
-Y2Nlc3NlcyB0aGF0IHBlcmZvcm1zIHdyaXRlIG9wZXJhdGlvbiAocHJvZ3JhbSBrZXksIHdyaXRl
-IGRhdGEsIHdyaXRlIGNvbmZpZ3VyYXRpb24pIC0gcmVxdWlyZXMgc2VuZGluZyAzIHJlcXVlc3Rz
-LA0KQnV0IHlvdSBtdXN0IGRvIHJlYWQgY291bnRlciBiZWZvcmVoYW5kIChhY2NlcHQgZnJvbSBw
-cm9ncmFtIGtleSksIGhlbmNlIHRoZSA1IGRpZmZlcmVudCByZXF1ZXN0cy4NCg0KVGhlIHN0YW5k
-YXJkIGRvZXMgbm90IGRlZmluZSBhICJzcGVjaWFsIiByZXF1ZXN0IHRoYXQgZG9lcyBpdCBhbGwg
-aW4gb25jZSwgDQpidXQgZXhwZWN0cyBhIHByZS1kZWZpbmUgc2VyaWVzIG9mIGNtZDE4ICYgY21k
-MjUgZm9yIGVhY2ggYWNjZXNzIHR5cGUsIA0KaW4gd2hpY2ggdGhlIHBheWxvYWQgYXJlIDUxMiBi
-eXRlcyBmcmFtZXMgaW4gYSBwcmUtZGVmaW5lZCBzdHJ1Y3R1cmUuDQogIA0KQ2hlZXJzLA0KQXZy
-aQ0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IExpbnVzIFdhbGxlaWog
-W21haWx0bzpsaW51cy53YWxsZWlqQGxpbmFyby5vcmddDQo+IFNlbnQ6IFNhdHVyZGF5LCBBcHJp
-bCAxNSwgMjAxNyA5OjM1IFBNDQo+IFRvOiBBdnJpIEFsdG1hbiA8QXZyaS5BbHRtYW5Ac2FuZGlz
-ay5jb20+DQo+IENjOiBBcm5kIEJlcmdtYW5uIDxhcm5kQGFybmRiLmRlPjsgVWxmIEhhbnNzb24N
-Cj4gPHVsZi5oYW5zc29uQGxpbmFyby5vcmc+OyBsaW51eC1tbWNAdmdlci5rZXJuZWwub3JnOyBs
-aW51eC0NCj4gYmxvY2tAdmdlci5rZXJuZWwub3JnOyBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwu
-ZGs+OyBDaHJpc3RvcGggSGVsbHdpZw0KPiA8aGNoQGxzdC5kZT47IEFkcmlhbiBIdW50ZXIgPGFk
-cmlhbi5odW50ZXJAaW50ZWwuY29tPjsgUGFvbG8gVmFsZW50ZQ0KPiA8cGFvbG8udmFsZW50ZUBs
-aW5hcm8ub3JnPg0KPiBTdWJqZWN0OiBSZTogT3V0c3RhbmRpbmcgTVEgcXVlc3Rpb25zIGZyb20g
-TU1DDQo+IA0KPiBPbiBGcmksIEFwciAxNCwgMjAxNyBhdCA4OjQxIFBNLCBBdnJpIEFsdG1hbiA8
-QXZyaS5BbHRtYW5Ac2FuZGlzay5jb20+DQo+IHdyb3RlOg0KPiA+IFtNZV0NCj4gPj4gMi4gVHVy
-biBSUE1CIGFuZCBvdGhlciBpb2N0bCgpIE1NQyBvcGVyYXRpb25zIGludG8gbW1jX3F1ZXVlX3Jl
-cQ0KPiA+PiAgICB0aGluZ3MgYW5kIGZ1bm5lbCB0aGVtIGludG8gdGhlIGJsb2NrIHNjaGVkdWxl
-cg0KPiA+PiAgICB1c2luZyBSRVFfT1BfRFJWX0lOL09VVCByZXF1ZXN0cy4NCj4gPj4NCj4gPg0K
-PiA+IEFjY2Vzc2luZyB0aGUgUlBNQiBpcyBkb25lIHZpYSBhIHN0cmFuZ2UgcHJvdG9jb2wsIGlu
-IHdoaWNoIGVhY2ggYWNjZXNzIGlzDQo+IGNvbXByaXNlZCBvZiBzZXZlcmFsIHJlcXVlc3RzLg0K
-PiA+IEZvciBleGFtcGxlLCB3cml0aW5nIHRvIHRoZSBSUE1CIHdpbGwgcmVxdWlyZSBzZW5kaW5n
-IDUgZGlmZmVyZW50IHJlcXVlc3RzOg0KPiA+IDIgcmVxdWVzdHMgdG8gcmVhZCB0aGUgd3JpdGUg
-Y291bnRlciwgYW5kIHRoZW4gMyBtb3JlIHJlcXVlc3RzIGZvciB0aGUNCj4gd3JpdGUgb3BlcmF0
-aW9uIGl0c2VsZi4NCj4gPg0KPiA+IE9uY2UgdGhlIHNlcXVlbmNlIGhhcyBzdGFydGVkLCBpdCBz
-aG91bGQgbm90IGdldCBpbnRlcmZlcmVkIGJ5IG90aGVyDQo+IHJlcXVlc3RzLCBvciB0aGUgb3Bl
-cmF0aW9uIHdpbGwgZmFpbC4NCj4gDQo+IFNvIEkgZ3Vlc3MgY3VycmVudGx5IHNvbWV0aGluZyB0
-YWtlcyBhIGhvc3QgbG9jayBhbmQgdGhlbiBwZXJmb3JtcyB0aGUNCj4gNSByZXF1ZXN0cy4NCj4g
-DQo+IFRodXMgd2UgbmVlZCB0byBzZW5kIGEgc2luZ2xlIGN1c3RvbSByZXF1ZXN0IGNvbnRhaW5p
-bmcgYSBsaXN0IG9mIDUgdGhpbmdzIHRvDQo+IGRvLCBhbmQgcmV0dXJuIGFmdGVyIHRoYXQuDQo+
-IA0KPiBPciBkbyB5b3UgbWVhbiB0aGF0IHdlIHJldHVybiB0byB1c2Vyc3BhY2UgaW5iZXR3ZWVu
-IHRoZXNlIGRpZmZlcmVudA0KPiByZXF1ZXN0cyBhbmQgdGhlIHNlcXVlbmNpbmcgaXMgZG9uZSBp
-biB1c2Vyc3BhY2U/DQo+IA0KPiBJIGhvcGUgbm90IGJlY2F1c2UgdGhhdCBzb3VuZHMgZnJhZ2ls
-ZSwgbGlrZSB1c2Vyc3BhY2UgY291bGQgY3Jhc2ggYW5kIGxlYXZlDQo+IHRoZSBob3N0IGxvY2sg
-ZGFuZ2xpbmcgOi8NCj4gDQo+IFlvdXJzLA0KPiBMaW51cyBXYWxsZWlqDQo=
+On Fri, Apr 14, 2017 at 8:41 PM, Avri Altman <Avri.Altman@sandisk.com> wrote:
+> [Me]
+>> 2. Turn RPMB and other ioctl() MMC operations into mmc_queue_req
+>>    things and funnel them into the block scheduler
+>>    using REQ_OP_DRV_IN/OUT requests.
+>>
+>
+> Accessing the RPMB is done via a strange protocol, in which each access is comprised of several requests.
+> For example, writing to the RPMB will require sending 5 different requests:
+> 2 requests to read the write counter, and then 3 more requests for the write operation itself.
+>
+> Once the sequence has started, it should not get interfered by other requests, or the operation will fail.
+
+So I guess currently something takes a host lock and then performs the
+5 requests.
+
+Thus we need to send a single custom request containing a list of 5
+things to do, and return after that.
+
+Or do you mean that we return to userspace inbetween these different
+requests and the sequencing is done in userspace?
+
+I hope not because that sounds fragile, like userspace could crash and
+leave the host lock dangling :/
+
+Yours,
+Linus Walleij
