@@ -1,99 +1,66 @@
-Return-Path: <BATV+245451ebeca5033ceab8+4986+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@bombadil.infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	Christoph Hellwig <hch@lst.de>
-Subject: nvme-fc: fix status code handling in nvme_fc_fcpio_done
-Date: Tue, 18 Apr 2017 08:52:08 -0700
-Message-Id: <20170418155229.5977-3-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: Christoph Hellwig <hch@infradead.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754787AbdDOS4Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Apr 2017 14:56:24 -0400
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [GIT PULL 05/19] lightnvm: free reverse device map
+Date: Sat, 15 Apr 2017 20:55:39 +0200
+Message-ID: <20170415185553.16098-6-matias@cnexlabs.com>
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+From: Javier González <jg@lightnvm.io>
 
-nvme_complete_async_event expects the little endian status code
-including the phase bit, and a new completion handler I plan to
-introduce will do so as well.
+Free the reverse mapping table correctly on target tear down
 
-Change the status variable into the little endian format with the
-phase bit used in the NVMe CQE to fix / enable this.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/nvme/host/fc.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/lightnvm/core.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index fc42172c796a..aad7f9c0be32 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -1147,7 +1147,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 	struct nvme_fc_ctrl *ctrl = op->ctrl;
- 	struct nvme_fc_queue *queue = op->queue;
- 	struct nvme_completion *cqe = &op->rsp_iu.cqe;
--	u16 status = NVME_SC_SUCCESS;
-+	__le16 status = cpu_to_le16(NVME_SC_SUCCESS << 1);
- 
- 	/*
- 	 * WARNING:
-@@ -1182,9 +1182,9 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 				sizeof(op->rsp_iu), DMA_FROM_DEVICE);
- 
- 	if (atomic_read(&op->state) == FCPOP_STATE_ABORTED)
--		status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
-+		status = cpu_to_le16((NVME_SC_ABORT_REQ | NVME_SC_DNR) << 1);
- 	else if (freq->status)
--		status = NVME_SC_FC_TRANSPORT_ERROR;
-+		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 
- 	/*
- 	 * For the linux implementation, if we have an unsuccesful
-@@ -1212,7 +1212,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 		 */
- 		if (freq->transferred_length !=
- 			be32_to_cpu(op->cmd_iu.data_len)) {
--			status = NVME_SC_FC_TRANSPORT_ERROR;
-+			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 			goto done;
- 		}
- 		op->nreq.result.u64 = 0;
-@@ -1229,15 +1229,15 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 					freq->transferred_length ||
- 			     op->rsp_iu.status_code ||
- 			     op->rqno != le16_to_cpu(cqe->command_id))) {
--			status = NVME_SC_FC_TRANSPORT_ERROR;
-+			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 			goto done;
- 		}
- 		op->nreq.result = cqe->result;
--		status = le16_to_cpu(cqe->status) >> 1;
-+		status = cqe->status;
- 		break;
- 
- 	default:
--		status = NVME_SC_FC_TRANSPORT_ERROR;
-+		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 		goto done;
- 	}
- 
-@@ -1249,7 +1249,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 		return;
- 	}
- 
--	blk_mq_complete_request(rq, status);
-+	blk_mq_complete_request(rq, le16_to_cpu(status) >> 1);
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 95105c4..a14c52c 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -411,6 +411,18 @@ static int nvm_register_map(struct nvm_dev *dev)
+ 	return -ENOMEM;
  }
  
- static int
++static void nvm_unregister_map(struct nvm_dev *dev)
++{
++	struct nvm_dev_map *rmap = dev->rmap;
++	int i;
++
++	for (i = 0; i < dev->geo.nr_chnls; i++)
++		kfree(rmap->chnls[i].lun_offs);
++
++	kfree(rmap->chnls);
++	kfree(rmap);
++}
++
+ static void nvm_map_to_dev(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p)
+ {
+ 	struct nvm_dev_map *dev_map = tgt_dev->map;
+@@ -992,7 +1004,7 @@ void nvm_free(struct nvm_dev *dev)
+ 	if (dev->dma_pool)
+ 		dev->ops->destroy_dma_pool(dev->dma_pool);
+ 
+-	kfree(dev->rmap);
++	nvm_unregister_map(dev);
+ 	kfree(dev->lptbl);
+ 	kfree(dev->lun_map);
+ 	kfree(dev);
 -- 
-2.11.0
+2.9.3
