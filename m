@@ -1,41 +1,52 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] A few small fixes for 4.11-rc
-Message-ID: <a1fa499a-d95f-f8b1-4d97-2d6144279c2c@kernel.dk>
-Date: Sun, 16 Apr 2017 10:04:10 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755982AbdDOS5O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Apr 2017 14:57:14 -0400
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [GIT PULL 17/19] lightnvm: pblk-gc: fix an error pointer dereference in init
+Date: Sat, 15 Apr 2017 20:55:51 +0200
+Message-ID: <20170415185553.16098-18-matias@cnexlabs.com>
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+From: Dan Carpenter <dan.carpenter@oracle.com>
 
-Four small fixes. Three of them fix the same error in NVMe, in loop, fc,
-and rdma respectively. The last one fix from Ming fixes a regression in
-this series, where our bvec gap logic was wrong and causes an oops on
-NVMe for certain conditions.
+These labels are reversed so we could end up dereferencing an error
+pointer or leaking.
 
-Please pull!
+Fixes: 7f347ba6bb3a ("lightnvm: physical block device (pblk) target")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-gc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Ming Lei (1):
-      block: fix bio_will_gap() for first bvec with offset
-
-Sagi Grimberg (3):
-      nvme-loop: Fix sqsize wrong assignment based on ctrl MQES capability
-      nvme-rdma: Fix sqsize wrong assignment based on ctrl MQES capability
-      nvme-fc: Fix sqsize wrong assignment based on ctrl MQES capability
-
- drivers/nvme/host/fc.c     |  2 +-
- drivers/nvme/host/rdma.c   |  2 +-
- drivers/nvme/target/loop.c |  2 +-
- include/linux/blkdev.h     | 32 ++++++++++++++++++++++++++++----
- 4 files changed, 31 insertions(+), 7 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 9b147cf..f173fd4 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -527,10 +527,10 @@ int pblk_gc_init(struct pblk *pblk)
+ 
+ 	return 0;
+ 
+-fail_free_main_kthread:
+-	kthread_stop(gc->gc_ts);
+ fail_free_writer_kthread:
+ 	kthread_stop(gc->gc_writer_ts);
++fail_free_main_kthread:
++	kthread_stop(gc->gc_ts);
+ 
+ 	return ret;
+ }
 -- 
-Jens Axboe
+2.9.3
