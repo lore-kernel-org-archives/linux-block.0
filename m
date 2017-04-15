@@ -1,120 +1,99 @@
-Return-Path: <elena.reshetova@intel.com>
-From: Elena Reshetova <elena.reshetova@intel.com>
-To: axboe@kernel.dk
-Cc: james.bottomley@hansenpartnership.com,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	gregkh@linuxfoundation.org,
-	fujita.tomonori@lab.ntt.co.jp,
-	mingo@redhat.com,
-	clm@fb.com,
-	jbacik@fb.com,
-	dsterba@suse.com,
-	Elena Reshetova <elena.reshetova@intel.com>,
-	Hans Liljestrand <ishkamiel@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	David Windsor <dwindsor@gmail.com>
-Subject: [PATCH 4/5] block: convert io_context.active_ref from atomic_t to refcount_t
-Date: Thu, 20 Apr 2017 14:27:23 +0300
-Message-Id: <1492687644-4405-5-git-send-email-elena.reshetova@intel.com>
-In-Reply-To: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
-References: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0053.outbound.protection.outlook.com ([104.47.41.53]:42825
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755983AbdDOS5U (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Apr 2017 14:57:20 -0400
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [GIT PULL 18/19] lightnvm: fix some WARN() messages
+Date: Sat, 15 Apr 2017 20:55:52 +0200
+Message-ID: <20170415185553.16098-19-matias@cnexlabs.com>
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-refcount_t type and corresponding API should be
-used instead of atomic_t when the variable is used as
-a reference counter. This allows to avoid accidental
-refcounter overflows that might lead to use-after-free
-situations.
+From: Dan Carpenter <dan.carpenter@oracle.com>
 
-Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
-Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: David Windsor <dwindsor@gmail.com>
+WARN_ON() takes a condition, not an error message.  I slightly tweaked
+some conditions so hopefully it's more clear.
+
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- block/blk-ioc.c           | 4 ++--
- block/cfq-iosched.c       | 4 ++--
- include/linux/iocontext.h | 6 +++---
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/lightnvm/pblk-read.c     | 12 ++++++------
+ drivers/lightnvm/pblk-recovery.c |  2 +-
+ drivers/lightnvm/pblk-write.c    |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index b12f9c8..130dc23 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -173,7 +173,7 @@ void put_io_context_active(struct io_context *ioc)
- 	unsigned long flags;
- 	struct io_cq *icq;
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index eff0982..bce7ed5 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -49,8 +49,8 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	int i, j = 0;
  
--	if (!atomic_dec_and_test(&ioc->active_ref)) {
-+	if (!refcount_dec_and_test(&ioc->active_ref)) {
- 		put_io_context(ioc);
+ 	/* logic error: lba out-of-bounds. Ignore read request */
+-	if (!(blba + nr_secs < pblk->rl.nr_secs)) {
+-		WARN_ON("pblk: read lbas out of bounds\n");
++	if (blba + nr_secs >= pblk->rl.nr_secs) {
++		WARN(1, "pblk: read lbas out of bounds\n");
  		return;
  	}
-@@ -256,7 +256,7 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_flags, int node)
- 	/* initialize */
- 	atomic_long_set(&ioc->refcount, 1);
- 	atomic_set(&ioc->nr_tasks, 1);
--	atomic_set(&ioc->active_ref, 1);
-+	refcount_set(&ioc->active_ref, 1);
- 	spin_lock_init(&ioc->lock);
- 	INIT_RADIX_TREE(&ioc->icq_tree, GFP_ATOMIC | __GFP_HIGH);
- 	INIT_HLIST_HEAD(&ioc->icq_list);
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 9212627..2871bb9 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -2959,7 +2959,7 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
- 	 * task has exited, don't wait
- 	 */
- 	cic = cfqd->active_cic;
--	if (!cic || !atomic_read(&cic->icq.ioc->active_ref))
-+	if (!cic || !refcount_read(&cic->icq.ioc->active_ref))
+ 
+@@ -254,8 +254,8 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	sector_t lba = pblk_get_lba(bio);
+ 
+ 	/* logic error: lba out-of-bounds. Ignore read request */
+-	if (!(lba < pblk->rl.nr_secs)) {
+-		WARN_ON("pblk: read lba out of bounds\n");
++	if (lba >= pblk->rl.nr_secs) {
++		WARN(1, "pblk: read lba out of bounds\n");
  		return;
+ 	}
  
- 	/*
-@@ -3959,7 +3959,7 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+@@ -411,8 +411,8 @@ static int read_rq_gc(struct pblk *pblk, struct nvm_rq *rqd,
+ 	int valid_secs = 0;
  
- 	if (cfqq->next_rq && req_noidle(cfqq->next_rq))
- 		enable_idle = 0;
--	else if (!atomic_read(&cic->icq.ioc->active_ref) ||
-+	else if (!refcount_read(&cic->icq.ioc->active_ref) ||
- 		 !cfqd->cfq_slice_idle ||
- 		 (!cfq_cfqq_deep(cfqq) && CFQQ_SEEKY(cfqq)))
- 		enable_idle = 0;
-diff --git a/include/linux/iocontext.h b/include/linux/iocontext.h
-index df38db2..e47b907 100644
---- a/include/linux/iocontext.h
-+++ b/include/linux/iocontext.h
-@@ -3,6 +3,7 @@
+ 	/* logic error: lba out-of-bounds */
+-	if (!(lba < pblk->rl.nr_secs)) {
+-		WARN_ON("pblk: read lba out of bounds\n");
++	if (lba >= pblk->rl.nr_secs) {
++		WARN(1, "pblk: read lba out of bounds\n");
+ 		goto out;
+ 	}
  
- #include <linux/radix-tree.h>
- #include <linux/rcupdate.h>
-+#include <linux/refcount.h>
- #include <linux/workqueue.h>
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 0d50f41..f8f8508 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -167,7 +167,7 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
+ 		if (le64_to_cpu(lba_list[i]) == ADDR_EMPTY) {
+ 			spin_lock(&line->lock);
+ 			if (test_and_set_bit(i, line->invalid_bitmap))
+-				WARN_ON_ONCE("pblk: rec. double invalidate:\n");
++				WARN_ONCE(1, "pblk: rec. double invalidate:\n");
+ 			else
+ 				line->vsc--;
+ 			spin_unlock(&line->lock);
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index ee57db9..74f7413 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -141,7 +141,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
  
- enum {
-@@ -96,7 +97,7 @@ struct io_cq {
-  */
- struct io_context {
- 	atomic_long_t refcount;
--	atomic_t active_ref;
-+	refcount_t active_ref;
- 	atomic_t nr_tasks;
+ 		/* Logic error */
+ 		if (bit > c_ctx->nr_valid) {
+-			WARN_ON_ONCE("pblk: corrupted write request\n");
++			WARN_ONCE(1, "pblk: corrupted write request\n");
+ 			goto out;
+ 		}
  
- 	/* all the fields below are protected by this lock */
-@@ -128,9 +129,8 @@ struct io_context {
- static inline void get_io_context_active(struct io_context *ioc)
- {
- 	WARN_ON_ONCE(atomic_long_read(&ioc->refcount) <= 0);
--	WARN_ON_ONCE(atomic_read(&ioc->active_ref) <= 0);
- 	atomic_long_inc(&ioc->refcount);
--	atomic_inc(&ioc->active_ref);
-+	refcount_inc(&ioc->active_ref);
- }
- 
- static inline void ioc_task_link(struct io_context *ioc)
 -- 
-2.7.4
+2.9.3
