@@ -1,63 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f172.google.com ([209.85.192.172]:34261 "EHLO
-        mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750784AbdDNIBG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2017 04:01:06 -0400
-Received: by mail-pf0-f172.google.com with SMTP id c198so38505373pfc.1
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2017 01:01:06 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v4 0/5] blk-mq: Kyber multiqueue I/O scheduler
-Date: Fri, 14 Apr 2017 00:59:57 -0700
-Message-Id: <cover.1492156558.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [GIT PULL 00/19] LightNVM patches for 4.12.
+To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias@cnexlabs.com>
+References: <20170415185553.16098-1-matias@cnexlabs.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <38deae6f-7978-189d-b4b2-c37719ba807e@fb.com>
+Date: Sun, 16 Apr 2017 14:37:20 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On 04/15/2017 12:55 PM, Matias Bjørling wrote:
+> Hi Jens,
+> 
+> With this merge window, we like to push pblk upstream. It is a new
+> host-side translation layer that implements support for exposing
+> Open-Channel SSDs as block devices.
+> 
+> We have described pblk in the LightNVM paper "LightNVM: The Linux
+> Open-Channel SSD Subsystem" that was accepted at FAST 2017. The paper
+> defines open-channel SSDs, the subsystem, pblk and has an evaluation as
+> well. Over the past couple of kernel versions we have shipped the
+> support patches for pblk, and we are now comfortable pushing the core of
+> pblk upstream.
+> 
+> The core contains the logic to control data placement and I/O scheduling
+> on open-channel SSDs. Including implementation of translation table
+> management, GC, recovery, rate-limiting, and similar components. It
+> assumes that the SSD is media-agnostic, and runs on both 1.2 and 2.0 of
+> the Open-Channel SSD specification without modifications.
+> 
+> I want to point out two neat features of pblk. First, pblk can be
+> instantiated multiple times on the same SSD, enabling I/O isolation
+> between tenants, and makes it able to fulfill strict QoS requirements.
+> We showed results from this at the NVMW '17 workshop this year, while
+> presenting the "Multi-Tenant I/O Isolation with Open-Channel SSDs" talk.
+> Second, now that a full host-side translation layer is implemented, one
+> can begin to optimize its data placement and I/O scheduling algorithms
+> to match user workloads. We have shown a couple of the benefits in the
+> LightNVM paper, and we know of a couple of companies and universities
+> that have begun making new algorithms.
+> 
+> In detail, this pull request contains:
+> 
+>  - The new host-side FTL pblk from Javier, and other contributors.
+> 
+>  - Add support to the "create" ioctl to force a target to be
+>    re-initialized at using "factory" flag from Javier.
+> 
+>  - Fix various errors in LightNVM core from Javier and me.
+> 
+>  - An optimization from Neil Brown to skip error checking on mempool
+>    allocations that can sleep.
+> 
+>  - A buffer overflow fix in nvme_nvm_identify from Scott Bauer.
+> 
+>  - Fix for bad block discovery handle error handling from Christophe
+>    Jaillet.
+> 
+>  - Fixes from Dan Carpenter to pblk after it went into linux-next.
+> 
+> Please pull from the for-jens branch or apply the patches posted with
+> this mail:
+> 
+>    https://github.com/OpenChannelSSD/linux.git for-jens
 
-This is v4 of Kyber, an I/O scheduler for multiqueue devices combining
-several techniques: the scalable bitmap library, the new blk-stats API,
-and queue depth throttling similar to blk-wbt. v1 was here [1], v2 was
-here [2], v3 was here [3].
-
-v4 fixes a hang in v3 caused by a race condition in the wait queue
-handling in kyber_get_domain_token().
-
-This series is based on block/for-next. Patches 1 and 2 implement a new
-sbitmap operation. Patch 3 exports a couple of helpers. Patch 4 moves a
-scheduler callback to somewhere more useful. Patch 5 implements the new
-scheduler.
-
-Thanks!
-
-1: http://marc.info/?l=linux-block&m=148978871820916&w=2
-2: http://marc.info/?l=linux-block&m=149132467510945&w=2
-3: http://marc.info/?l=linux-block&m=149180713919341&w=2
-
-Omar Sandoval (5):
-  sbitmap: add sbitmap_get_shallow() operation
-  blk-mq: add shallow depth option for blk_mq_get_tag()
-  blk-mq: export helpers
-  blk-mq-sched: make completed_request() callback more useful
-  blk-mq: introduce Kyber multiqueue I/O scheduler
-
- Documentation/block/kyber-iosched.txt |  14 +
- block/Kconfig.iosched                 |   9 +
- block/Makefile                        |   1 +
- block/blk-mq-sched.h                  |  11 +-
- block/blk-mq-tag.c                    |   5 +-
- block/blk-mq.c                        |   7 +-
- block/blk-mq.h                        |   1 +
- block/kyber-iosched.c                 | 719 ++++++++++++++++++++++++++++++++++
- include/linux/blk-mq.h                |   1 +
- include/linux/elevator.h              |   2 +-
- include/linux/sbitmap.h               |  55 +++
- lib/sbitmap.c                         |  75 +++-
- 12 files changed, 882 insertions(+), 18 deletions(-)
- create mode 100644 Documentation/block/kyber-iosched.txt
- create mode 100644 block/kyber-iosched.c
+Applied for 4.12, thanks Matias.
 
 -- 
-2.12.2
+Jens Axboe
