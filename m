@@ -1,80 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:38951 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757455AbdDRPwt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2017 11:52:49 -0400
-From: Christoph Hellwig <hch@bombadil.infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-        James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Christoph Hellwig <hch@lst.de>
-Subject: virtio_blk: don't use req->errors
-Date: Tue, 18 Apr 2017 08:52:12 -0700
-Message-Id: <20170418155229.5977-7-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [resend PATCH v2 24/33] filesystem-dax: convert to dax_flush()
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>, linux-fsdevel@vger.kernel.org,
+        Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
+Date: Mon, 17 Apr 2017 12:10:59 -0700
+Message-ID: <149245625960.10206.13531754204477404679.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+Filesystem-DAX flushes caches whenever it writes to the address returned
+through dax_direct_access() and when writing back dirty radix entries.
+That flushing is only required in the pmem case, so the dax_flush()
+helper skips cache management work when the underlying driver does not
+specify a flush method.
 
-Remove passing req->errors (which at that point is always 0) to
-blk_mq_complete_request, and rely on the virtio status code for the
-serial number passthrough request.
+We still do all the dirty tracking since the radix entry will already be
+there for locking purposes. However, the work to clean the entry will be
+a nop for some dax drivers.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/block/virtio_blk.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ fs/dax.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index dbc4e80680b1..8378ad480f77 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -175,19 +175,15 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
- static inline void virtblk_request_done(struct request *req)
- {
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
--	int error = virtblk_result(vbr);
- 
- 	switch (req_op(req)) {
- 	case REQ_OP_SCSI_IN:
- 	case REQ_OP_SCSI_OUT:
- 		virtblk_scsi_request_done(req);
- 		break;
--	case REQ_OP_DRV_IN:
--		req->errors = (error != 0);
--		break;
+diff --git a/fs/dax.c b/fs/dax.c
+index 11b9909c91df..edbf988de86c 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -798,7 +798,7 @@ static int dax_writeback_one(struct block_device *bdev,
  	}
  
--	blk_mq_end_request(req, error);
-+	blk_mq_end_request(req, virtblk_result(vbr));
- }
- 
- static void virtblk_done(struct virtqueue *vq)
-@@ -205,7 +201,7 @@ static void virtblk_done(struct virtqueue *vq)
- 		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
- 			struct request *req = blk_mq_rq_from_pdu(vbr);
- 
--			blk_mq_complete_request(req, req->errors);
-+			blk_mq_complete_request(req, 0);
- 			req_done = true;
- 		}
- 		if (unlikely(virtqueue_is_broken(vq)))
-@@ -311,7 +307,7 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
- 		goto out;
- 
- 	blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
--	err = req->errors ? -EIO : 0;
-+	err = virtblk_result(blk_mq_rq_to_pdu(req));
- out:
- 	blk_put_request(req);
- 	return err;
--- 
-2.11.0
+ 	dax_mapping_entry_mkclean(mapping, index, pfn_t_to_pfn(pfn));
+-	wb_cache_pmem(kaddr, size);
++	dax_flush(dax_dev, pgoff, kaddr, size);
+ 	/*
+ 	 * After we have flushed the cache, we can clear the dirty tag. There
+ 	 * cannot be new dirty data in the pfn after the flush has completed as
