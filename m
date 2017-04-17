@@ -1,85 +1,118 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH v3 2/8] blk-mq: Let blk_mq_debugfs_register() look up the queue name
-Date: Tue, 18 Apr 2017 16:29:43 -0700
-Message-ID: <20170418232949.5228-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [resend PATCH v2 19/33] dax,
+ pmem: introduce 'copy_from_iter' dax operation
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org,
+        Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
+Date: Mon, 17 Apr 2017 12:10:32 -0700
+Message-ID: <149245623288.10206.11548740991639475206.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-A later patch will move the call of blk_mq_debugfs_register() to
-a function to which the queue name is not passed as an argument.
-To avoid having to add a 'name' argument to multiple callers, let
-blk_mq_debugfs_register() look up the queue name.
+The direct-I/O write path for a pmem device must ensure that data is
+flushed to a power-fail safe zone when the operation is complete.
+However, other dax capable block devices, like brd, do not have this
+requirement.  Introduce a 'copy_from_iter' dax operation so that pmem
+can inject cache management without imposing this overhead on other dax
+capable block_device drivers.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+This is also a first step of moving all architecture-specific
+pmem-operations to the pmem driver.
+
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- block/blk-mq-debugfs.c | 5 +++--
- block/blk-mq-sysfs.c   | 2 +-
- block/blk-mq.h         | 5 ++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/nvdimm/pmem.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+ include/linux/dax.h   |    3 +++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index df9b688b877c..2a5d6d83d57c 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -782,12 +782,13 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
- 	{},
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 3b3dab73d741..e501df4ab4b4 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -220,6 +220,48 @@ __weak long __pmem_direct_access(struct pmem_device *pmem, pgoff_t pgoff,
+ 	return PHYS_PFN(pmem->size - pmem->pfn_pad - offset);
+ }
+ 
++static size_t pmem_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff,
++		void *addr, size_t bytes, struct iov_iter *i)
++{
++	size_t len;
++
++	/* TODO: skip the write-back by always using non-temporal stores */
++	len = copy_from_iter_nocache(addr, bytes, i);
++
++	/*
++	 * In the iovec case on x86_64 copy_from_iter_nocache() uses
++	 * non-temporal stores for the bulk of the transfer, but we need
++	 * to manually flush if the transfer is unaligned. A cached
++	 * memory copy is used when destination or size is not naturally
++	 * aligned. That is:
++	 *   - Require 8-byte alignment when size is 8 bytes or larger.
++	 *   - Require 4-byte alignment when size is 4 bytes.
++	 *
++	 * In the non-iovec case the entire destination needs to be
++	 * flushed.
++	 */
++	if (iter_is_iovec(i)) {
++		unsigned long flushed, dest = (unsigned long) addr;
++
++		if (bytes < 8) {
++			if (!IS_ALIGNED(dest, 4) || (bytes != 4))
++				wb_cache_pmem(addr, 1);
++		} else {
++			if (!IS_ALIGNED(dest, 8)) {
++				dest = ALIGN(dest, boot_cpu_data.x86_clflush_size);
++				wb_cache_pmem(addr, 1);
++			}
++
++			flushed = dest - (unsigned long) addr;
++			if (bytes > flushed && !IS_ALIGNED(bytes - flushed, 8))
++				wb_cache_pmem(addr + bytes - 1, 1);
++		}
++	} else
++		wb_cache_pmem(addr, bytes);
++
++	return len;
++}
++
+ static const struct block_device_operations pmem_fops = {
+ 	.owner =		THIS_MODULE,
+ 	.rw_page =		pmem_rw_page,
+@@ -236,6 +278,7 @@ static long pmem_dax_direct_access(struct dax_device *dax_dev,
+ 
+ static const struct dax_operations pmem_dax_ops = {
+ 	.direct_access = pmem_dax_direct_access,
++	.copy_from_iter = pmem_copy_from_iter,
  };
  
--int blk_mq_debugfs_register(struct request_queue *q, const char *name)
-+int blk_mq_debugfs_register(struct request_queue *q)
- {
- 	if (!blk_debugfs_root)
- 		return -ENOENT;
+ static void pmem_release_queue(void *q)
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index d3158e74a59e..156f067d4db5 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -16,6 +16,9 @@ struct dax_operations {
+ 	 */
+ 	long (*direct_access)(struct dax_device *, pgoff_t, long,
+ 			void **, pfn_t *);
++	/* copy_from_iter: dax-driver override for default copy_from_iter */
++	size_t (*copy_from_iter)(struct dax_device *, pgoff_t, void *, size_t,
++			struct iov_iter *);
+ };
  
--	q->debugfs_dir = debugfs_create_dir(name, blk_debugfs_root);
-+	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
-+					    blk_debugfs_root);
- 	if (!q->debugfs_dir)
- 		goto err;
- 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 54ef9402914c..727e3b675130 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -318,7 +318,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 
- 	kobject_uevent(&q->mq_kobj, KOBJ_ADD);
- 
--	blk_mq_debugfs_register(q, kobject_name(&dev->kobj));
-+	blk_mq_debugfs_register(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_register_hctx(hctx);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 7d955c756810..9049c0f11505 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -87,13 +87,12 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
-  * debugfs helpers
-  */
- #ifdef CONFIG_BLK_DEBUG_FS
--int blk_mq_debugfs_register(struct request_queue *q, const char *name);
-+int blk_mq_debugfs_register(struct request_queue *q);
- void blk_mq_debugfs_unregister(struct request_queue *q);
- int blk_mq_debugfs_register_hctxs(struct request_queue *q);
- void blk_mq_debugfs_unregister_hctxs(struct request_queue *q);
- #else
--static inline int blk_mq_debugfs_register(struct request_queue *q,
--					  const char *name)
-+static inline int blk_mq_debugfs_register(struct request_queue *q)
- {
- 	return 0;
- }
--- 
-2.12.2
+ int dax_read_lock(void);
