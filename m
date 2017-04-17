@@ -1,125 +1,179 @@
-Return-Path: <snitzer@gmail.com>
-Return-Path: <snitzer@gmail.com>
-Sender: Mike Snitzer <snitzer@gmail.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: dm-devel@redhat.com,
-	linux-block@vger.kernel.org,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH for-4.12] block, dm: use __blk_integrity_register to properly setup integrity profile
-Date: Fri, 21 Apr 2017 18:28:15 -0400
-Message-Id: <20170421222815.45663-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga07.intel.com ([134.134.136.100]:28822 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756760AbdDQTPR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Apr 2017 15:15:17 -0400
+Subject: [resend PATCH v2 07/33] brd: add dax_operations support
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org, hch@lst.de
+Date: Mon, 17 Apr 2017 12:09:27 -0700
+Message-ID: <149245616744.10206.871365891826305046.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+Setup a dax_inode to have the same lifetime as the brd block device and
+add a ->direct_access() method that is equivalent to
+brd_direct_access(). Once fs/dax.c has been converted to use
+dax_operations the old brd_direct_access() will be removed.
 
-When registering integrity profile on a DM device, the logical block
-size of the underlying device with integrity support must be used, not
-the logical block size of the stacked device we are creating.
-
-Introduce __blk_integrity_register() to allow users more precise control
-over the logical block size used to register the integrity profile.
-blk_integrity_register() now calls __blk_integrity_register().
-
-DM core's use of __blk_integrity_register() fixes a long-standing DM
-linear target bug where it cannot pass integrity data to the underlying
-device if its logical block size conflicts with the underlying device's
-logical block size.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- block/blk-integrity.c  | 14 +++++++++++---
- drivers/md/dm-table.c  |  6 ++++--
- include/linux/blkdev.h |  2 ++
- 3 files changed, 17 insertions(+), 5 deletions(-)
+ drivers/block/Kconfig |    1 +
+ drivers/block/brd.c   |   65 +++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 55 insertions(+), 11 deletions(-)
 
-NOTE: Jens, I'd like to get this staged in linux-dm.git for 4.12
-because the dm-inegrity target depends on it, doing so would avoid
-some awkward coordination between block and DM trees.  SO if you're OK
-with this patch, and with me sending it to Linus as part of the DM
-pull, please provide your Ack. Thanks!
-
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 9f0ff5b..d2a36e3 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -396,9 +396,10 @@ static struct blk_integrity_profile nop_profile = {
- };
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index f744de7a0f9b..e66956fc2c88 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -339,6 +339,7 @@ config BLK_DEV_SX8
  
- /**
-- * blk_integrity_register - Register a gendisk as being integrity-capable
-+ * __blk_integrity_register - Register a gendisk as being integrity-capable
-  * @disk:	struct gendisk pointer to make integrity-aware
-  * @template:	block integrity profile to register
-+ * @logical_block_size:	block size - integrity tag exists for each block
-  *
-  * Description: When a device needs to advertise itself as being able to
-  * send/receive integrity metadata it must use this function to register
-@@ -406,19 +407,26 @@ static struct blk_integrity_profile nop_profile = {
-  * struct with values appropriate for the underlying hardware. See
-  * Documentation/block/data-integrity.txt.
-  */
--void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template)
-+void __blk_integrity_register(struct gendisk *disk, struct blk_integrity *template,
-+			      unsigned logical_block_size)
- {
- 	struct blk_integrity *bi = &disk->queue->integrity;
+ config BLK_DEV_RAM
+ 	tristate "RAM block device support"
++	select DAX if BLK_DEV_RAM_DAX
+ 	---help---
+ 	  Saying Y here will allow you to use a portion of your RAM memory as
+ 	  a block device, so that you can make file systems on it, read and
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 3adc32a3153b..60f3193c9ce2 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -21,6 +21,7 @@
+ #include <linux/slab.h>
+ #ifdef CONFIG_BLK_DEV_RAM_DAX
+ #include <linux/pfn_t.h>
++#include <linux/dax.h>
+ #endif
  
- 	bi->flags = BLK_INTEGRITY_VERIFY | BLK_INTEGRITY_GENERATE |
- 		template->flags;
--	bi->interval_exp = ilog2(queue_logical_block_size(disk->queue));
-+	bi->interval_exp = ilog2(logical_block_size);
- 	bi->profile = template->profile ? template->profile : &nop_profile;
- 	bi->tuple_size = template->tuple_size;
- 	bi->tag_size = template->tag_size;
+ #include <linux/uaccess.h>
+@@ -41,6 +42,9 @@ struct brd_device {
  
- 	blk_integrity_revalidate(disk);
+ 	struct request_queue	*brd_queue;
+ 	struct gendisk		*brd_disk;
++#ifdef CONFIG_BLK_DEV_RAM_DAX
++	struct dax_device	*dax_dev;
++#endif
+ 	struct list_head	brd_list;
+ 
+ 	/*
+@@ -375,30 +379,53 @@ static int brd_rw_page(struct block_device *bdev, sector_t sector,
  }
-+EXPORT_SYMBOL(__blk_integrity_register);
-+
-+void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template)
-+{
-+	__blk_integrity_register(disk, template, queue_logical_block_size(disk->queue));
+ 
+ #ifdef CONFIG_BLK_DEV_RAM_DAX
+-static long brd_direct_access(struct block_device *bdev, sector_t sector,
+-			void **kaddr, pfn_t *pfn, long size)
++static long __brd_direct_access(struct brd_device *brd, pgoff_t pgoff,
++		long nr_pages, void **kaddr, pfn_t *pfn)
+ {
+-	struct brd_device *brd = bdev->bd_disk->private_data;
+ 	struct page *page;
+ 
+ 	if (!brd)
+ 		return -ENODEV;
+-	page = brd_insert_page(brd, sector);
++	page = brd_insert_page(brd, PFN_PHYS(pgoff) / 512);
+ 	if (!page)
+ 		return -ENOSPC;
+ 	*kaddr = page_address(page);
+ 	*pfn = page_to_pfn_t(page);
+ 
+-	return PAGE_SIZE;
++	return 1;
 +}
- EXPORT_SYMBOL(blk_integrity_register);
- 
- /**
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index b060084..b7a5843 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1181,13 +1181,15 @@ static int dm_table_register_integrity(struct dm_table *t)
- 		return 0;
- 
- 	if (!integrity_profile_exists(dm_disk(md))) {
-+		struct blk_integrity *integrity = blk_get_integrity(template_disk);
 +
- 		t->integrity_supported = true;
- 		/*
- 		 * Register integrity profile during table load; we can do
- 		 * this because the final profile must match during resume.
- 		 */
--		blk_integrity_register(dm_disk(md),
--				       blk_get_integrity(template_disk));
-+		__blk_integrity_register(dm_disk(md), integrity,
-+					 1U << integrity->interval_exp);
- 		return 0;
- 	}
++static long brd_blk_direct_access(struct block_device *bdev, sector_t sector,
++			void **kaddr, pfn_t *pfn, long size)
++{
++	struct brd_device *brd = bdev->bd_disk->private_data;
++	long nr_pages = __brd_direct_access(brd, PHYS_PFN(sector * 512),
++			PHYS_PFN(size), kaddr, pfn);
++
++	if (nr_pages < 0)
++		return nr_pages;
++	return nr_pages * PAGE_SIZE;
++}
++
++static long brd_dax_direct_access(struct dax_device *dax_dev,
++		pgoff_t pgoff, long nr_pages, void **kaddr, pfn_t *pfn)
++{
++	struct brd_device *brd = dax_get_private(dax_dev);
++
++	return __brd_direct_access(brd, pgoff, nr_pages, kaddr, pfn);
+ }
++
++static const struct dax_operations brd_dax_ops = {
++	.direct_access = brd_dax_direct_access,
++};
+ #else
+-#define brd_direct_access NULL
++#define brd_blk_direct_access NULL
+ #endif
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 796016e..353400c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1778,6 +1778,8 @@ struct blk_integrity_profile {
- 	const char			*name;
+ static const struct block_device_operations brd_fops = {
+ 	.owner =		THIS_MODULE,
+ 	.rw_page =		brd_rw_page,
+-	.direct_access =	brd_direct_access,
++	.direct_access =	brd_blk_direct_access,
  };
  
-+extern void __blk_integrity_register(struct gendisk *, struct blk_integrity *,
-+				     unsigned);
- extern void blk_integrity_register(struct gendisk *, struct blk_integrity *);
- extern void blk_integrity_unregister(struct gendisk *);
- extern int blk_integrity_compare(struct gendisk *, struct gendisk *);
--- 
-2.10.1
+ /*
+@@ -441,7 +468,9 @@ static struct brd_device *brd_alloc(int i)
+ {
+ 	struct brd_device *brd;
+ 	struct gendisk *disk;
+-
++#ifdef CONFIG_BLK_DEV_RAM_DAX
++	struct dax_device *dax_dev;
++#endif
+ 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
+ 	if (!brd)
+ 		goto out;
+@@ -469,9 +498,6 @@ static struct brd_device *brd_alloc(int i)
+ 	blk_queue_max_discard_sectors(brd->brd_queue, UINT_MAX);
+ 	brd->brd_queue->limits.discard_zeroes_data = 1;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, brd->brd_queue);
+-#ifdef CONFIG_BLK_DEV_RAM_DAX
+-	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
+-#endif
+ 	disk = brd->brd_disk = alloc_disk(max_part);
+ 	if (!disk)
+ 		goto out_free_queue;
+@@ -484,8 +510,21 @@ static struct brd_device *brd_alloc(int i)
+ 	sprintf(disk->disk_name, "ram%d", i);
+ 	set_capacity(disk, rd_size * 2);
+ 
++#ifdef CONFIG_BLK_DEV_RAM_DAX
++	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
++	dax_dev = alloc_dax(brd, disk->disk_name, &brd_dax_ops);
++	if (!dax_dev)
++		goto out_free_inode;
++#endif
++
++
+ 	return brd;
+ 
++#ifdef CONFIG_BLK_DEV_RAM_DAX
++out_free_inode:
++	kill_dax(dax_dev);
++	put_dax(dax_dev);
++#endif
+ out_free_queue:
+ 	blk_cleanup_queue(brd->brd_queue);
+ out_free_dev:
+@@ -525,6 +564,10 @@ static struct brd_device *brd_init_one(int i, bool *new)
+ static void brd_del_one(struct brd_device *brd)
+ {
+ 	list_del(&brd->brd_list);
++#ifdef CONFIG_BLK_DEV_RAM_DAX
++	kill_dax(brd->dax_dev);
++	put_dax(brd->dax_dev);
++#endif
+ 	del_gendisk(brd->brd_disk);
+ 	brd_free(brd);
+ }
