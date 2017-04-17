@@ -1,98 +1,184 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f44.google.com ([74.125.83.44]:34812 "EHLO
-        mail-pg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753154AbdDDQvJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 12:51:09 -0400
-Received: by mail-pg0-f44.google.com with SMTP id 21so158018666pgg.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Apr 2017 09:51:04 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 3/5] blk-mq-sched: make completed_request() callback more useful
-Date: Tue,  4 Apr 2017 09:49:56 -0700
-Message-Id: <fd069c79175711a85f37f1105aecf7c974d001a9.1491324365.git.osandov@fb.com>
-In-Reply-To: <cover.1491324365.git.osandov@fb.com>
-References: <cover.1491324365.git.osandov@fb.com>
-In-Reply-To: <cover.1491324365.git.osandov@fb.com>
-References: <cover.1491324365.git.osandov@fb.com>
+Received: from mga07.intel.com ([134.134.136.100]:48161 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757284AbdDQTQM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Apr 2017 15:16:12 -0400
+Subject: [resend PATCH v2 18/33] x86, dax,
+ pmem: remove indirection around memcpy_from_pmem()
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Tony Luck <tony.luck@intel.com>, Jan Kara <jack@suse.cz>,
+        dm-devel@redhat.com, Matthew Wilcox <mawilcox@microsoft.com>,
+        x86@kernel.org, linux-kernel@vger.kernel.org, hch@lst.de,
+        linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-fsdevel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>
+Date: Mon, 17 Apr 2017 12:10:27 -0700
+Message-ID: <149245622727.10206.9207175325089032123.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+memcpy_from_pmem() maps directly to memcpy_mcsafe(). The wrapper
+serves no real benefit aside from affording a more generic function name
+than the x86-specific 'mcsafe'. However this would not be the first time
+that x86 terminology leaked into the global namespace. For lack of
+better name, just use memcpy_mcsafe() directly.
 
-Currently, this callback is called right after put_request() and has no
-distinguishable purpose. Instead, let's call it before put_request() as
-soon as I/O has completed on the request, before we account it in
-blk-stat. With this, Kyber can enable stats when it sees a latency
-outlier and make sure the outlier gets accounted.
+This conversion also catches a place where we should have been using
+plain memcpy, acpi_nfit_blk_single_io().
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Cc: <x86@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- block/blk-mq-sched.h     | 11 +++--------
- block/blk-mq.c           |  5 ++++-
- include/linux/elevator.h |  2 +-
- 3 files changed, 8 insertions(+), 10 deletions(-)
+ arch/x86/include/asm/pmem.h      |    5 -----
+ arch/x86/include/asm/string_64.h |    1 +
+ drivers/acpi/nfit/core.c         |    3 +--
+ drivers/nvdimm/claim.c           |    2 +-
+ drivers/nvdimm/pmem.c            |    2 +-
+ include/linux/pmem.h             |   23 -----------------------
+ include/linux/string.h           |    8 ++++++++
+ 7 files changed, 12 insertions(+), 32 deletions(-)
 
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index c6e760df0fb4..d846e07bb564 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -82,17 +82,12 @@ blk_mq_sched_allow_merge(struct request_queue *q, struct request *rq,
- 	return true;
+diff --git a/arch/x86/include/asm/pmem.h b/arch/x86/include/asm/pmem.h
+index 529bb4a6487a..d5a22bac9988 100644
+--- a/arch/x86/include/asm/pmem.h
++++ b/arch/x86/include/asm/pmem.h
+@@ -44,11 +44,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
+ 		BUG();
  }
  
--static inline void
--blk_mq_sched_completed_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
-+static inline void blk_mq_sched_completed_request(struct request *rq)
- {
--	struct elevator_queue *e = hctx->queue->elevator;
-+	struct elevator_queue *e = rq->q->elevator;
- 
- 	if (e && e->type->ops.mq.completed_request)
--		e->type->ops.mq.completed_request(hctx, rq);
+-static inline int arch_memcpy_from_pmem(void *dst, const void *src, size_t n)
+-{
+-	return memcpy_mcsafe(dst, src, n);
+-}
 -
--	BUG_ON(rq->internal_tag == -1);
+ /**
+  * arch_wb_cache_pmem - write back a cache range with CLWB
+  * @vaddr:	virtual start address
+diff --git a/arch/x86/include/asm/string_64.h b/arch/x86/include/asm/string_64.h
+index a164862d77e3..733bae07fb29 100644
+--- a/arch/x86/include/asm/string_64.h
++++ b/arch/x86/include/asm/string_64.h
+@@ -79,6 +79,7 @@ int strcmp(const char *cs, const char *ct);
+ #define memset(s, c, n) __memset(s, c, n)
+ #endif
+ 
++#define __HAVE_ARCH_MEMCPY_MCSAFE 1
+ __must_check int memcpy_mcsafe_unrolled(void *dst, const void *src, size_t cnt);
+ DECLARE_STATIC_KEY_FALSE(mcsafe_key);
+ 
+diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
+index c8ea9d698cd0..d0c07b2344e4 100644
+--- a/drivers/acpi/nfit/core.c
++++ b/drivers/acpi/nfit/core.c
+@@ -1783,8 +1783,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
+ 				mmio_flush_range((void __force *)
+ 					mmio->addr.aperture + offset, c);
+ 
+-			memcpy_from_pmem(iobuf + copied,
+-					mmio->addr.aperture + offset, c);
++			memcpy(iobuf + copied, mmio->addr.aperture + offset, c);
+ 		}
+ 
+ 		copied += c;
+diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
+index ca6d572c48fc..3a35e8028b9c 100644
+--- a/drivers/nvdimm/claim.c
++++ b/drivers/nvdimm/claim.c
+@@ -239,7 +239,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 	if (rw == READ) {
+ 		if (unlikely(is_bad_pmem(&nsio->bb, sector, sz_align)))
+ 			return -EIO;
+-		return memcpy_from_pmem(buf, nsio->addr + offset, size);
++		return memcpy_mcsafe(buf, nsio->addr + offset, size);
+ 	}
+ 
+ 	if (unlikely(is_bad_pmem(&nsio->bb, sector, sz_align))) {
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 85b85633d674..3b3dab73d741 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -89,7 +89,7 @@ static int read_pmem(struct page *page, unsigned int off,
+ 	int rc;
+ 	void *mem = kmap_atomic(page);
+ 
+-	rc = memcpy_from_pmem(mem + off, pmem_addr, len);
++	rc = memcpy_mcsafe(mem + off, pmem_addr, len);
+ 	kunmap_atomic(mem);
+ 	if (rc)
+ 		return -EIO;
+diff --git a/include/linux/pmem.h b/include/linux/pmem.h
+index e856c2cb0fe8..71ecf3d46aac 100644
+--- a/include/linux/pmem.h
++++ b/include/linux/pmem.h
+@@ -31,12 +31,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
+ 	BUG();
+ }
+ 
+-static inline int arch_memcpy_from_pmem(void *dst, const void *src, size_t n)
+-{
+-	BUG();
+-	return -EFAULT;
+-}
 -
--	blk_mq_put_tag(hctx, hctx->sched_tags, rq->mq_ctx, rq->internal_tag);
-+		e->type->ops.mq.completed_request(rq);
- }
- 
- static inline void blk_mq_sched_started_request(struct request *rq)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b49fdfde7e06..3dbfed6d0e5b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -350,7 +350,7 @@ void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 	if (rq->tag != -1)
- 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
- 	if (sched_tag != -1)
--		blk_mq_sched_completed_request(hctx, rq);
-+		blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
- 	blk_mq_sched_restart_queues(hctx);
- 	blk_queue_exit(q);
- }
-@@ -443,6 +443,9 @@ static void __blk_mq_complete_request(struct request *rq)
+ static inline size_t arch_copy_from_iter_pmem(void *addr, size_t bytes,
+ 		struct iov_iter *i)
  {
- 	struct request_queue *q = rq->q;
+@@ -65,23 +59,6 @@ static inline bool arch_has_pmem_api(void)
+ 	return IS_ENABLED(CONFIG_ARCH_HAS_PMEM_API);
+ }
  
-+	if (rq->internal_tag != -1)
-+		blk_mq_sched_completed_request(rq);
-+
- 	blk_mq_stat_add(rq);
+-/*
+- * memcpy_from_pmem - read from persistent memory with error handling
+- * @dst: destination buffer
+- * @src: source buffer
+- * @size: transfer length
+- *
+- * Returns 0 on success negative error code on failure.
+- */
+-static inline int memcpy_from_pmem(void *dst, void const *src, size_t size)
+-{
+-	if (arch_has_pmem_api())
+-		return arch_memcpy_from_pmem(dst, src, size);
+-	else
+-		memcpy(dst, src, size);
+-	return 0;
+-}
+-
+ /**
+  * memcpy_to_pmem - copy data to persistent memory
+  * @dst: destination buffer for the copy
+diff --git a/include/linux/string.h b/include/linux/string.h
+index 26b6f6a66f83..9d6f189157e2 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -114,6 +114,14 @@ extern int memcmp(const void *,const void *,__kernel_size_t);
+ #ifndef __HAVE_ARCH_MEMCHR
+ extern void * memchr(const void *,int,__kernel_size_t);
+ #endif
++#ifndef __HAVE_ARCH_MEMCPY_MCSAFE
++static inline __must_check int memcpy_mcsafe(void *dst, const void *src,
++		size_t cnt)
++{
++	memcpy(dst, src, cnt);
++	return 0;
++}
++#endif
+ void *memchr_inv(const void *s, int c, size_t n);
+ char *strreplace(char *s, char old, char new);
  
- 	if (!q->softirq_done_fn)
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index b7ec315ee7e7..3a216318ae73 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -106,7 +106,7 @@ struct elevator_mq_ops {
- 	void (*insert_requests)(struct blk_mq_hw_ctx *, struct list_head *, bool);
- 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
- 	bool (*has_work)(struct blk_mq_hw_ctx *);
--	void (*completed_request)(struct blk_mq_hw_ctx *, struct request *);
-+	void (*completed_request)(struct request *);
- 	void (*started_request)(struct request *);
- 	void (*requeue_request)(struct request *);
- 	struct request *(*former_request)(struct request_queue *, struct request *);
--- 
-2.12.2
