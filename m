@@ -4,11 +4,11 @@ To: Jens Axboe <axboe@kernel.dk>
 CC: <linux-block@vger.kernel.org>, Bart Van Assche
 	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
 	<hare@suse.com>
-Subject: [PATCH v3 1/8] blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
-Date: Tue, 18 Apr 2017 16:29:42 -0700
-Message-ID: <20170418232949.5228-2-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+Subject: [PATCH v2 1/8] blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
+Date: Mon, 17 Apr 2017 09:56:44 -0700
+Message-ID: <20170417165651.12693-2-bart.vanassche@sandisk.com>
+In-Reply-To: <20170417165651.12693-1-bart.vanassche@sandisk.com>
+References: <20170417165651.12693-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: Bart.VanAssche@sandisk.com
@@ -25,13 +25,13 @@ Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
 Cc: Omar Sandoval <osandov@fb.com>
 Cc: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq-sysfs.c | 43 +++++++++++++++++++++++++++++++++++--------
+ block/blk-mq-sysfs.c | 37 ++++++++++++++++++++++++++++++-------
  block/blk-mq.h       |  1 +
  block/blk-sysfs.c    |  6 +++---
- 3 files changed, 39 insertions(+), 11 deletions(-)
+ 3 files changed, 34 insertions(+), 10 deletions(-)
 
 diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index d745ab81033a..54ef9402914c 100644
+index d745ab81033a..dc547369c875 100644
 --- a/block/blk-mq-sysfs.c
 +++ b/block/blk-mq-sysfs.c
 @@ -253,6 +253,8 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
@@ -71,7 +71,7 @@ index d745ab81033a..54ef9402914c 100644
  
  	ret = kobject_add(&q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
  	if (ret < 0)
-@@ -327,8 +330,20 @@ int blk_mq_register_dev(struct device *dev, struct request_queue *q)
+@@ -327,8 +330,18 @@ int blk_mq_register_dev(struct device *dev, struct request_queue *q)
  		__blk_mq_unregister_dev(dev, q);
  	else
  		q->mq_sysfs_init_done = true;
@@ -85,15 +85,13 @@ index d745ab81033a..54ef9402914c 100644
 +{
 +	int ret;
 +
-+	ret = mutex_lock_interruptible(&q->sysfs_lock);
-+	if (ret < 0)
-+		return ret;
-+	ret = __blk_mq_register_dev(dev, q);
++	mutex_lock(&q->sysfs_lock);
++	ret = blk_mq_register_dev(dev, q);
 +	mutex_unlock(&q->sysfs_lock);
  
  	return ret;
  }
-@@ -339,23 +354,32 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
+@@ -339,13 +352,18 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
  	struct blk_mq_hw_ctx *hctx;
  	int i;
  
@@ -113,23 +111,19 @@ index d745ab81033a..54ef9402914c 100644
  }
  
  int blk_mq_sysfs_register(struct request_queue *q)
- {
+@@ -353,8 +371,10 @@ int blk_mq_sysfs_register(struct request_queue *q)
  	struct blk_mq_hw_ctx *hctx;
--	int i, ret = 0;
-+	int i, ret;
+ 	int i, ret = 0;
  
--	if (!q->mq_sysfs_init_done)
-+	ret = mutex_lock_interruptible(&q->sysfs_lock);
-+	if (ret < 0)
- 		return ret;
- 
-+	if (!q->mq_sysfs_init_done)
-+		goto unlock;
++	mutex_lock(&q->sysfs_lock);
 +
+ 	if (!q->mq_sysfs_init_done)
+-		return ret;
++		goto unlock;
+ 
  	blk_mq_debugfs_register_hctxs(q);
  
- 	queue_for_each_hw_ctx(q, hctx, i) {
-@@ -364,5 +388,8 @@ int blk_mq_sysfs_register(struct request_queue *q)
+@@ -364,5 +384,8 @@ int blk_mq_sysfs_register(struct request_queue *q)
  			break;
  	}
  
