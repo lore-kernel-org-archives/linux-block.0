@@ -1,213 +1,201 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:60016 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753418AbdDQTOe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2017 15:14:34 -0400
-Subject: [resend PATCH v2 00/33] dax: introduce dax_operations
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [resend PATCH v2 23/33] dm: add ->flush() dax operation support
 From: Dan Williams <dan.j.williams@intel.com>
 To: linux-nvdimm@lists.01.org
-Cc: Tony Luck <tony.luck@intel.com>, Jan Kara <jack@suse.cz>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Toshi Kani <toshi.kani@hpe.com>,
-        Matthew Wilcox <mawilcox@microsoft.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-fsdevel@vger.kernel.org,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        dm-devel@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>
-Date: Mon, 17 Apr 2017 12:08:49 -0700
-Message-ID: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+Cc: Mike Snitzer <snitzer@redhat.com>, Toshi Kani <toshi.kani@hpe.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-fsdevel@vger.kernel.org, hch@lst.de
+Date: Mon, 17 Apr 2017 12:10:54 -0700
+Message-ID: <149245625444.10206.17427373360396242265.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-[ resend to add dm-devel, linux-block, and fs-devel, apologies for the
-duplicates ]
+Allow device-mapper to route flush operations to the
+per-target implementation. In order for the device stacking to work we
+need a dax_dev and a pgoff relative to that device. This gives each
+layer of the stack the information it needs to look up the operation
+pointer for the next level.
 
-Changes since v1 [1] and the dax-fs RFC [2]:
-* rename struct dax_inode to struct dax_device (Christoph)
-* rewrite arch_memcpy_to_pmem() in C with inline asm
-* use QUEUE_FLAG_WC to gate dax cache management (Jeff)
-* add device-mapper plumbing for the ->copy_from_iter() and ->flush()
-  dax_operations
-* kill struct blk_dax_ctl and bdev_direct_access (Christoph)
-* cleanup the ->direct_access() calling convention to be page based
-  (Christoph)
-* introduce dax_get_by_host() and don't pollute struct super_block with
-  dax_device details (Christoph)
+This conceptually allows for an array of mixed device drivers with
+varying flush implementations.
 
-[1]: https://lists.01.org/pipermail/linux-nvdimm/2017-January/008586.html
-[2]: https://lwn.net/Articles/713064/
-
+Cc: Toshi Kani <toshi.kani@hpe.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
-A few months back, in the course of reviewing the memcpy_nocache()
-proposal from Brian, Linus proposed that the pmem specific
-memcpy_to_pmem() routine be moved to be implemented at the driver level
-[3]:
+ drivers/dax/super.c           |   11 +++++++++++
+ drivers/md/dm-linear.c        |   15 +++++++++++++++
+ drivers/md/dm-stripe.c        |   20 ++++++++++++++++++++
+ drivers/md/dm.c               |   19 +++++++++++++++++++
+ include/linux/dax.h           |    2 ++
+ include/linux/device-mapper.h |    3 +++
+ 6 files changed, 70 insertions(+)
 
-   "Quite frankly, the whole 'memcpy_nocache()' idea or (ab-)using
-    copy_user_nocache() just needs to die. It's idiotic.
-    
-    As you point out, it's also fundamentally buggy crap.
-    
-    Throw it away. There is no possible way this is ever valid or
-    portable. We're not going to lie and claim that it is.
-    
-    If some driver ends up using 'movnt' by hand, that is up to that
-    *driver*. But no way in hell should we care about this one whit in
-    the sense of <linux/uaccess.h>."
-
-This feedback also dovetails with another fs/dax.c design wart of being
-hard coded to assume the backing device is pmem. We call the pmem
-specific copy, clear, and flush routines even if the backing device
-driver is one of the other 3 dax drivers (axonram, dccssblk, or brd).
-There is no reason to spend cpu cycles flushing the cache after writing
-to brd, for example, since it is using volatile memory for storage.
-
-Moreover, the pmem driver might be fronting a volatile memory range
-published by the ACPI NFIT, or the platform might have arranged to flush
-cpu caches on power fail. This latter capability is a feature that has
-appeared in embedded storage appliances (pre-ACPI-NFIT nvdimm
-platforms).
-
-So, this series:
-
-1/ moves what was previously named "the pmem api" out of the global
-   namespace and into drivers that need to be concerned with
-   architecture specific persistent memory considerations.
-
-2/ arranges for dax to stop abusing __copy_user_nocache() and implements
-   a libnvdimm-local memcpy that uses 'movnt' on x86_64. This might be
-   expanded in the future to use 'movntdqa' if the copy size is above
-   some threshold, or expanded with support for other architectures [4].
-
-3/ makes cache maintenance optional by arranging for dax to call driver
-   specific copy and flush operations only if the driver publishes them.
-
-4/ allows filesytem-dax cache management to be controlled by the block
-   device write-cache queue flag. The pmem driver is updated to clear
-   that flag by default when pmem is driving volatile memory.
-
-[3]: https://lists.01.org/pipermail/linux-nvdimm/2017-January/008364.html
-[4]: https://lists.01.org/pipermail/linux-nvdimm/2017-April/009478.html
-
-These patches have been through a round of build regression fixes
-notified by the 0day robot. All review welcome, but the patches that
-need extra attention are the device-mapper and uio changes
-(copy_from_iter_ops).
-
-This series is based on a merge of char-misc-next (for cdev api reworks)
-and libnvdimm-fixes (dax locking and __copy_user_nocache fixes).
-
----
-
-Dan Williams (33):
-      device-dax: rename 'dax_dev' to 'dev_dax'
-      dax: refactor dax-fs into a generic provider of 'struct dax_device' instances
-      dax: add a facility to lookup a dax device by 'host' device name
-      dax: introduce dax_operations
-      pmem: add dax_operations support
-      axon_ram: add dax_operations support
-      brd: add dax_operations support
-      dcssblk: add dax_operations support
-      block: kill bdev_dax_capable()
-      dax: introduce dax_direct_access()
-      dm: add dax_device and dax_operations support
-      dm: teach dm-targets to use a dax_device + dax_operations
-      ext2, ext4, xfs: retrieve dax_device for iomap operations
-      Revert "block: use DAX for partition table reads"
-      filesystem-dax: convert to dax_direct_access()
-      block, dax: convert bdev_dax_supported() to dax_direct_access()
-      block: remove block_device_operations ->direct_access()
-      x86, dax, pmem: remove indirection around memcpy_from_pmem()
-      dax, pmem: introduce 'copy_from_iter' dax operation
-      dm: add ->copy_from_iter() dax operation support
-      filesystem-dax: convert to dax_copy_from_iter()
-      dax, pmem: introduce an optional 'flush' dax_operation
-      dm: add ->flush() dax operation support
-      filesystem-dax: convert to dax_flush()
-      x86, dax: replace clear_pmem() with open coded memset + dax_ops->flush
-      x86, dax, libnvdimm: move wb_cache_pmem() to libnvdimm
-      x86, libnvdimm, pmem: move arch_invalidate_pmem() to libnvdimm
-      x86, libnvdimm, dax: stop abusing __copy_user_nocache
-      uio, libnvdimm, pmem: implement cache bypass for all copy_from_iter() operations
-      libnvdimm, pmem: fix persistence warning
-      libnvdimm, nfit: enable support for volatile ranges
-      filesystem-dax: gate calls to dax_flush() on QUEUE_FLAG_WC
-      libnvdimm, pmem: disable dax flushing when pmem is fronting a volatile region
-
-
- MAINTAINERS                      |    2 
- arch/powerpc/platforms/Kconfig   |    1 
- arch/powerpc/sysdev/axonram.c    |   45 +++-
- arch/x86/Kconfig                 |    1 
- arch/x86/include/asm/pmem.h      |  141 ------------
- arch/x86/include/asm/string_64.h |    1 
- block/Kconfig                    |    1 
- block/partition-generic.c        |   17 -
- drivers/Makefile                 |    2 
- drivers/acpi/nfit/core.c         |   15 +
- drivers/block/Kconfig            |    1 
- drivers/block/brd.c              |   52 +++-
- drivers/dax/Kconfig              |   10 +
- drivers/dax/Makefile             |    5 
- drivers/dax/dax.h                |   15 -
- drivers/dax/device-dax.h         |   25 ++
- drivers/dax/device.c             |  415 +++++++++++------------------------
- drivers/dax/pmem.c               |   10 -
- drivers/dax/super.c              |  445 ++++++++++++++++++++++++++++++++++++++
- drivers/md/Kconfig               |    1 
- drivers/md/dm-core.h             |    1 
- drivers/md/dm-linear.c           |   53 ++++-
- drivers/md/dm-snap.c             |    6 -
- drivers/md/dm-stripe.c           |   65 ++++--
- drivers/md/dm-target.c           |    6 -
- drivers/md/dm.c                  |  112 ++++++++--
- drivers/nvdimm/Kconfig           |    6 +
- drivers/nvdimm/Makefile          |    1 
- drivers/nvdimm/bus.c             |   10 -
- drivers/nvdimm/claim.c           |    9 -
- drivers/nvdimm/core.c            |    2 
- drivers/nvdimm/dax_devs.c        |    2 
- drivers/nvdimm/dimm_devs.c       |    2 
- drivers/nvdimm/namespace_devs.c  |    9 -
- drivers/nvdimm/nd-core.h         |    9 +
- drivers/nvdimm/pfn_devs.c        |    4 
- drivers/nvdimm/pmem.c            |   82 +++++--
- drivers/nvdimm/pmem.h            |   26 ++
- drivers/nvdimm/region_devs.c     |   39 ++-
- drivers/nvdimm/x86.c             |  155 +++++++++++++
- drivers/s390/block/Kconfig       |    1 
- drivers/s390/block/dcssblk.c     |   44 +++-
- fs/block_dev.c                   |  117 +++-------
- fs/dax.c                         |  302 ++++++++++++++------------
- fs/ext2/inode.c                  |    9 +
- fs/ext4/inode.c                  |    9 +
- fs/iomap.c                       |    3 
- fs/xfs/xfs_iomap.c               |   10 +
- include/linux/blkdev.h           |   19 --
- include/linux/dax.h              |   43 +++-
- include/linux/device-mapper.h    |   14 +
- include/linux/iomap.h            |    1 
- include/linux/libnvdimm.h        |   10 +
- include/linux/pmem.h             |  165 --------------
- include/linux/string.h           |    8 +
- include/linux/uio.h              |    4 
- lib/Kconfig                      |    6 -
- lib/iov_iter.c                   |   25 ++
- tools/testing/nvdimm/Kbuild      |   11 +
- tools/testing/nvdimm/pmem-dax.c  |   21 +-
- 60 files changed, 1584 insertions(+), 1042 deletions(-)
- delete mode 100644 arch/x86/include/asm/pmem.h
- create mode 100644 drivers/dax/device-dax.h
- rename drivers/dax/{dax.c => device.c} (60%)
- create mode 100644 drivers/dax/super.c
- create mode 100644 drivers/nvdimm/x86.c
- delete mode 100644 include/linux/pmem.h
+diff --git a/drivers/dax/super.c b/drivers/dax/super.c
+index 73f0da8e5d27..1253c05a2e53 100644
+--- a/drivers/dax/super.c
++++ b/drivers/dax/super.c
+@@ -117,6 +117,17 @@ size_t dax_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff, void *addr,
+ }
+ EXPORT_SYMBOL_GPL(dax_copy_from_iter);
+ 
++void dax_flush(struct dax_device *dax_dev, pgoff_t pgoff, void *addr,
++		size_t size)
++{
++	if (!dax_alive(dax_dev))
++		return;
++
++	if (dax_dev->ops->flush)
++		dax_dev->ops->flush(dax_dev, pgoff, addr, size);
++}
++EXPORT_SYMBOL_GPL(dax_flush);
++
+ bool dax_alive(struct dax_device *dax_dev)
+ {
+ 	lockdep_assert_held(&dax_srcu);
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 5fe44a0ddfab..70d8439a1b63 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -172,6 +172,20 @@ static size_t linear_dax_copy_from_iter(struct dm_target *ti, pgoff_t pgoff,
+ 	return dax_copy_from_iter(dax_dev, pgoff, addr, bytes, i);
+ }
+ 
++static void linear_dax_flush(struct dm_target *ti, pgoff_t pgoff, void *addr,
++		size_t size)
++{
++	struct linear_c *lc = ti->private;
++	struct block_device *bdev = lc->dev->bdev;
++	struct dax_device *dax_dev = lc->dev->dax_dev;
++	sector_t dev_sector, sector = pgoff * PAGE_SECTORS;
++
++	dev_sector = linear_map_sector(ti, sector);
++	if (bdev_dax_pgoff(bdev, dev_sector, ALIGN(size, PAGE_SIZE), &pgoff))
++		return;
++	dax_flush(dax_dev, pgoff, addr, size);
++}
++
+ static struct target_type linear_target = {
+ 	.name   = "linear",
+ 	.version = {1, 3, 0},
+@@ -184,6 +198,7 @@ static struct target_type linear_target = {
+ 	.iterate_devices = linear_iterate_devices,
+ 	.direct_access = linear_dax_direct_access,
+ 	.dax_copy_from_iter = linear_dax_copy_from_iter,
++	.dax_flush = linear_dax_flush,
+ };
+ 
+ int __init dm_linear_init(void)
+diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
+index 4f45d23249b2..829fd438318d 100644
+--- a/drivers/md/dm-stripe.c
++++ b/drivers/md/dm-stripe.c
+@@ -349,6 +349,25 @@ static size_t stripe_dax_copy_from_iter(struct dm_target *ti, pgoff_t pgoff,
+ 	return dax_copy_from_iter(dax_dev, pgoff, addr, bytes, i);
+ }
+ 
++static void stripe_dax_flush(struct dm_target *ti, pgoff_t pgoff, void *addr,
++		size_t size)
++{
++	sector_t dev_sector, sector = pgoff * PAGE_SECTORS;
++	struct stripe_c *sc = ti->private;
++	struct dax_device *dax_dev;
++	struct block_device *bdev;
++	uint32_t stripe;
++
++	stripe_map_sector(sc, sector, &stripe, &dev_sector);
++	dev_sector += sc->stripe[stripe].physical_start;
++	dax_dev = sc->stripe[stripe].dev->dax_dev;
++	bdev = sc->stripe[stripe].dev->bdev;
++
++	if (bdev_dax_pgoff(bdev, dev_sector, ALIGN(size, PAGE_SIZE), &pgoff))
++		return;
++	dax_flush(dax_dev, pgoff, addr, size);
++}
++
+ /*
+  * Stripe status:
+  *
+@@ -468,6 +487,7 @@ static struct target_type stripe_target = {
+ 	.io_hints = stripe_io_hints,
+ 	.direct_access = stripe_dax_direct_access,
+ 	.dax_copy_from_iter = stripe_dax_copy_from_iter,
++	.dax_flush = stripe_dax_flush,
+ };
+ 
+ int __init dm_stripe_init(void)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 8c8579efcba2..6a97711cdbdf 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -982,6 +982,24 @@ static size_t dm_dax_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff,
+ 	return ret;
+ }
+ 
++static void dm_dax_flush(struct dax_device *dax_dev, pgoff_t pgoff, void *addr,
++		size_t size)
++{
++	struct mapped_device *md = dax_get_private(dax_dev);
++	sector_t sector = pgoff * PAGE_SECTORS;
++	struct dm_target *ti;
++	int srcu_idx;
++
++	ti = dm_dax_get_live_target(md, sector, &srcu_idx);
++
++	if (!ti)
++		goto out;
++	if (ti->type->dax_flush)
++		ti->type->dax_flush(ti, pgoff, addr, size);
++ out:
++	dm_put_live_table(md, srcu_idx);
++}
++
+ /*
+  * A target may call dm_accept_partial_bio only from the map routine.  It is
+  * allowed for all bio types except REQ_PREFLUSH.
+@@ -2844,6 +2862,7 @@ static const struct block_device_operations dm_blk_dops = {
+ static const struct dax_operations dm_dax_ops = {
+ 	.direct_access = dm_dax_direct_access,
+ 	.copy_from_iter = dm_dax_copy_from_iter,
++	.flush = dm_dax_flush,
+ };
+ 
+ /*
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index c88bbcba26d9..2a4f533ef5e7 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -36,6 +36,8 @@ long dax_direct_access(struct dax_device *dax_dev, pgoff_t pgoff, long nr_pages,
+ 		void **kaddr, pfn_t *pfn);
+ size_t dax_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff, void *addr,
+ 		size_t bytes, struct iov_iter *i);
++void dax_flush(struct dax_device *dax_dev, pgoff_t pgoff, void *addr,
++		size_t size);
+ 
+ /*
+  * We use lowest available bit in exceptional entry for locking, one bit for
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index e18e4277d09d..3c5eab2d2a75 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -132,6 +132,8 @@ typedef long (*dm_dax_direct_access_fn) (struct dm_target *ti, pgoff_t pgoff,
+ 		long nr_pages, void **kaddr, pfn_t *pfn);
+ typedef size_t (*dm_dax_copy_from_iter_fn)(struct dm_target *ti, pgoff_t pgoff,
+ 		void *addr, size_t bytes, struct iov_iter *i);
++typedef void (*dm_dax_flush_fn)(struct dm_target *ti, pgoff_t pgoff, void *addr,
++		size_t size);
+ #define PAGE_SECTORS (PAGE_SIZE / 512)
+ 
+ void dm_error(const char *message);
+@@ -182,6 +184,7 @@ struct target_type {
+ 	dm_io_hints_fn io_hints;
+ 	dm_dax_direct_access_fn direct_access;
+ 	dm_dax_copy_from_iter_fn dax_copy_from_iter;
++	dm_dax_flush_fn dax_flush;
+ 
+ 	/* For internal device-mapper use. */
+ 	struct list_head list;
