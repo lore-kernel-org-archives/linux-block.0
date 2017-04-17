@@ -1,138 +1,241 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Ron Minnich <rminnich@sandia.gov>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        v9fs-developer@lists.sourceforge.net
-Subject: [PATCH 07/25] 9p: Convert to separately allocated bdi
-Date: Wed, 12 Apr 2017 12:24:31 +0200
-Message-Id: <20170412102449.16901-8-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
+Subject: [resend PATCH v2 26/33] x86, dax,
+ libnvdimm: move wb_cache_pmem() to libnvdimm
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
+        Matthew Wilcox <mawilcox@microsoft.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, hch@lst.de,
+        linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Oliver O'Halloran <oohall@gmail.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-fsdevel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>
+Date: Mon, 17 Apr 2017 12:11:10 -0700
+Message-ID: <149245627028.10206.369315439901964176.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside session. This unifies handling of bdi among users.
+With all calls to this routine re-directed through the pmem driver, we
+can kill the pmem api indirection. arch_wb_cache_pmem() is now
+optionally supplied by an arch specific extension to libnvdimm.  Same as
+before, pmem flushing is only defined for x86_64, but it is
+straightforward to add other archs in the future.
 
-CC: Eric Van Hensbergen <ericvh@gmail.com>
-CC: Ron Minnich <rminnich@sandia.gov>
-CC: Latchesar Ionkov <lucho@ionkov.net>
-CC: v9fs-developer@lists.sourceforge.net
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Cc: <x86@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Oliver O'Halloran <oohall@gmail.com>
+Cc: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- fs/9p/v9fs.c      | 10 +---------
- fs/9p/v9fs.h      |  1 -
- fs/9p/vfs_super.c | 15 ++++++++++++---
- 3 files changed, 13 insertions(+), 13 deletions(-)
+ arch/x86/include/asm/pmem.h |   21 ---------------------
+ drivers/nvdimm/Makefile     |    1 +
+ drivers/nvdimm/pmem.c       |   14 +++++---------
+ drivers/nvdimm/pmem.h       |    8 ++++++++
+ drivers/nvdimm/x86.c        |   36 ++++++++++++++++++++++++++++++++++++
+ include/linux/pmem.h        |   19 -------------------
+ tools/testing/nvdimm/Kbuild |    1 +
+ 7 files changed, 51 insertions(+), 49 deletions(-)
+ create mode 100644 drivers/nvdimm/x86.c
 
-diff --git a/fs/9p/v9fs.c b/fs/9p/v9fs.c
-index a89f3cfe3c7d..c202930086ed 100644
---- a/fs/9p/v9fs.c
-+++ b/fs/9p/v9fs.c
-@@ -333,10 +333,6 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
- 		goto err_names;
- 	init_rwsem(&v9ses->rename_sem);
- 
--	rc = bdi_setup_and_register(&v9ses->bdi, "9p");
--	if (rc)
--		goto err_names;
--
- 	v9ses->uid = INVALID_UID;
- 	v9ses->dfltuid = V9FS_DEFUID;
- 	v9ses->dfltgid = V9FS_DEFGID;
-@@ -345,7 +341,7 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
- 	if (IS_ERR(v9ses->clnt)) {
- 		rc = PTR_ERR(v9ses->clnt);
- 		p9_debug(P9_DEBUG_ERROR, "problem initializing 9p client\n");
--		goto err_bdi;
-+		goto err_names;
- 	}
- 
- 	v9ses->flags = V9FS_ACCESS_USER;
-@@ -415,8 +411,6 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
- 
- err_clnt:
- 	p9_client_destroy(v9ses->clnt);
--err_bdi:
--	bdi_destroy(&v9ses->bdi);
- err_names:
- 	kfree(v9ses->uname);
- 	kfree(v9ses->aname);
-@@ -445,8 +439,6 @@ void v9fs_session_close(struct v9fs_session_info *v9ses)
- 	kfree(v9ses->uname);
- 	kfree(v9ses->aname);
- 
--	bdi_destroy(&v9ses->bdi);
--
- 	spin_lock(&v9fs_sessionlist_lock);
- 	list_del(&v9ses->slist);
- 	spin_unlock(&v9fs_sessionlist_lock);
-diff --git a/fs/9p/v9fs.h b/fs/9p/v9fs.h
-index 443d12e02043..76eaf49abd3a 100644
---- a/fs/9p/v9fs.h
-+++ b/fs/9p/v9fs.h
-@@ -114,7 +114,6 @@ struct v9fs_session_info {
- 	kuid_t uid;		/* if ACCESS_SINGLE, the uid that has access */
- 	struct p9_client *clnt;	/* 9p client */
- 	struct list_head slist; /* list of sessions registered with v9fs */
--	struct backing_dev_info bdi;
- 	struct rw_semaphore rename_sem;
- };
- 
-diff --git a/fs/9p/vfs_super.c b/fs/9p/vfs_super.c
-index de3ed8629196..a0965fb587a5 100644
---- a/fs/9p/vfs_super.c
-+++ b/fs/9p/vfs_super.c
-@@ -72,10 +72,12 @@ static int v9fs_set_super(struct super_block *s, void *data)
-  *
-  */
- 
--static void
-+static int
- v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
- 		int flags, void *data)
- {
-+	int ret;
-+
- 	sb->s_maxbytes = MAX_LFS_FILESIZE;
- 	sb->s_blocksize_bits = fls(v9ses->maxdata - 1);
- 	sb->s_blocksize = 1 << sb->s_blocksize_bits;
-@@ -85,7 +87,11 @@ v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
- 		sb->s_xattr = v9fs_xattr_handlers;
- 	} else
- 		sb->s_op = &v9fs_super_ops;
--	sb->s_bdi = &v9ses->bdi;
-+
-+	ret = super_setup_bdi(sb);
-+	if (ret)
-+		return ret;
-+
- 	if (v9ses->cache)
- 		sb->s_bdi->ra_pages = (VM_MAX_READAHEAD * 1024)/PAGE_SIZE;
- 
-@@ -99,6 +105,7 @@ v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
- #endif
- 
- 	save_mount_options(sb, data);
-+	return 0;
+diff --git a/arch/x86/include/asm/pmem.h b/arch/x86/include/asm/pmem.h
+index f4c119d253f3..4759a179aa52 100644
+--- a/arch/x86/include/asm/pmem.h
++++ b/arch/x86/include/asm/pmem.h
+@@ -44,27 +44,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
+ 		BUG();
  }
  
- /**
-@@ -138,7 +145,9 @@ static struct dentry *v9fs_mount(struct file_system_type *fs_type, int flags,
- 		retval = PTR_ERR(sb);
- 		goto clunk_fid;
- 	}
--	v9fs_fill_super(sb, v9ses, flags, data);
-+	retval = v9fs_fill_super(sb, v9ses, flags, data);
-+	if (retval)
-+		goto release_sb;
+-/**
+- * arch_wb_cache_pmem - write back a cache range with CLWB
+- * @vaddr:	virtual start address
+- * @size:	number of bytes to write back
+- *
+- * Write back a cache range using the CLWB (cache line write back)
+- * instruction. Note that @size is internally rounded up to be cache
+- * line size aligned.
+- */
+-static inline void arch_wb_cache_pmem(void *addr, size_t size)
+-{
+-	u16 x86_clflush_size = boot_cpu_data.x86_clflush_size;
+-	unsigned long clflush_mask = x86_clflush_size - 1;
+-	void *vend = addr + size;
+-	void *p;
+-
+-	for (p = (void *)((unsigned long)addr & ~clflush_mask);
+-	     p < vend; p += x86_clflush_size)
+-		clwb(p);
+-}
+-
+ static inline void arch_invalidate_pmem(void *addr, size_t size)
+ {
+ 	clflush_cache_range(addr, size);
+diff --git a/drivers/nvdimm/Makefile b/drivers/nvdimm/Makefile
+index 909554c3f955..9eafb1dd2876 100644
+--- a/drivers/nvdimm/Makefile
++++ b/drivers/nvdimm/Makefile
+@@ -24,3 +24,4 @@ libnvdimm-$(CONFIG_ND_CLAIM) += claim.o
+ libnvdimm-$(CONFIG_BTT) += btt_devs.o
+ libnvdimm-$(CONFIG_NVDIMM_PFN) += pfn_devs.o
+ libnvdimm-$(CONFIG_NVDIMM_DAX) += dax_devs.o
++libnvdimm-$(CONFIG_X86_64) += x86.o
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 822b85fb3365..c77a3a757729 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -245,19 +245,19 @@ static size_t pmem_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff,
  
- 	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
- 		sb->s_d_op = &v9fs_cached_dentry_operations;
--- 
-2.12.0
+ 		if (bytes < 8) {
+ 			if (!IS_ALIGNED(dest, 4) || (bytes != 4))
+-				wb_cache_pmem(addr, 1);
++				arch_wb_cache_pmem(addr, 1);
+ 		} else {
+ 			if (!IS_ALIGNED(dest, 8)) {
+ 				dest = ALIGN(dest, boot_cpu_data.x86_clflush_size);
+-				wb_cache_pmem(addr, 1);
++				arch_wb_cache_pmem(addr, 1);
+ 			}
+ 
+ 			flushed = dest - (unsigned long) addr;
+ 			if (bytes > flushed && !IS_ALIGNED(bytes - flushed, 8))
+-				wb_cache_pmem(addr + bytes - 1, 1);
++				arch_wb_cache_pmem(addr + bytes - 1, 1);
+ 		}
+ 	} else
+-		wb_cache_pmem(addr, bytes);
++		arch_wb_cache_pmem(addr, bytes);
+ 
+ 	return len;
+ }
+@@ -279,11 +279,7 @@ static long pmem_dax_direct_access(struct dax_device *dax_dev,
+ static void pmem_dax_flush(struct dax_device *dax_dev, pgoff_t pgoff,
+ 		void *addr, size_t size)
+ {
+-	/*
+-	 * TODO: move arch specific cache management into the driver
+-	 * directly.
+-	 */
+-	wb_cache_pmem(addr, size);
++	arch_wb_cache_pmem(addr, size);
+ }
+ 
+ static const struct dax_operations pmem_dax_ops = {
+diff --git a/drivers/nvdimm/pmem.h b/drivers/nvdimm/pmem.h
+index 7f4dbd72a90a..c4b3371c7f88 100644
+--- a/drivers/nvdimm/pmem.h
++++ b/drivers/nvdimm/pmem.h
+@@ -5,6 +5,14 @@
+ #include <linux/pfn_t.h>
+ #include <linux/fs.h>
+ 
++#ifdef CONFIG_ARCH_HAS_PMEM_API
++void arch_wb_cache_pmem(void *addr, size_t size);
++#else
++static inline void arch_wb_cache_pmem(void *addr, size_t size)
++{
++}
++#endif
++
+ /* this definition is in it's own header for tools/testing/nvdimm to consume */
+ struct pmem_device {
+ 	/* One contiguous memory region per device */
+diff --git a/drivers/nvdimm/x86.c b/drivers/nvdimm/x86.c
+new file mode 100644
+index 000000000000..79d7267da4d2
+--- /dev/null
++++ b/drivers/nvdimm/x86.c
+@@ -0,0 +1,36 @@
++/*
++ * Copyright(c) 2015 - 2017 Intel Corporation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of version 2 of the GNU General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ */
++#include <asm/cacheflush.h>
++#include <asm/cpufeature.h>
++#include <asm/special_insns.h>
++
++/**
++ * arch_wb_cache_pmem - write back a cache range with CLWB
++ * @vaddr:	virtual start address
++ * @size:	number of bytes to write back
++ *
++ * Write back a cache range using the CLWB (cache line write back)
++ * instruction.
++ */
++void arch_wb_cache_pmem(void *addr, size_t size)
++{
++	u16 x86_clflush_size = boot_cpu_data.x86_clflush_size;
++	unsigned long clflush_mask = x86_clflush_size - 1;
++	void *vend = addr + size;
++	void *p;
++
++	for (p = (void *)((unsigned long)addr & ~clflush_mask);
++	     p < vend; p += x86_clflush_size)
++		clwb(p);
++}
++EXPORT_SYMBOL_GPL(arch_wb_cache_pmem);
+diff --git a/include/linux/pmem.h b/include/linux/pmem.h
+index 772bd02a5b52..33ae761f010a 100644
+--- a/include/linux/pmem.h
++++ b/include/linux/pmem.h
+@@ -31,11 +31,6 @@ static inline void arch_memcpy_to_pmem(void *dst, const void *src, size_t n)
+ 	BUG();
+ }
+ 
+-static inline void arch_wb_cache_pmem(void *addr, size_t size)
+-{
+-	BUG();
+-}
+-
+ static inline void arch_invalidate_pmem(void *addr, size_t size)
+ {
+ 	BUG();
+@@ -80,18 +75,4 @@ static inline void invalidate_pmem(void *addr, size_t size)
+ 	if (arch_has_pmem_api())
+ 		arch_invalidate_pmem(addr, size);
+ }
+-
+-/**
+- * wb_cache_pmem - write back processor cache for PMEM memory range
+- * @addr:	virtual start address
+- * @size:	number of bytes to write back
+- *
+- * Write back the processor cache range starting at 'addr' for 'size' bytes.
+- * See blkdev_issue_flush() note for memcpy_to_pmem().
+- */
+-static inline void wb_cache_pmem(void *addr, size_t size)
+-{
+-	if (arch_has_pmem_api())
+-		arch_wb_cache_pmem(addr, size);
+-}
+ #endif /* __PMEM_H__ */
+diff --git a/tools/testing/nvdimm/Kbuild b/tools/testing/nvdimm/Kbuild
+index 2033ad03b8cd..0e0c444737e9 100644
+--- a/tools/testing/nvdimm/Kbuild
++++ b/tools/testing/nvdimm/Kbuild
+@@ -72,6 +72,7 @@ libnvdimm-$(CONFIG_ND_CLAIM) += $(NVDIMM_SRC)/claim.o
+ libnvdimm-$(CONFIG_BTT) += $(NVDIMM_SRC)/btt_devs.o
+ libnvdimm-$(CONFIG_NVDIMM_PFN) += $(NVDIMM_SRC)/pfn_devs.o
+ libnvdimm-$(CONFIG_NVDIMM_DAX) += $(NVDIMM_SRC)/dax_devs.o
++libnvdimm-$(CONFIG_X86_64) += $(NVDIMM_SRC)/x86.o
+ libnvdimm-y += config_check.o
+ 
+ obj-m += test/
