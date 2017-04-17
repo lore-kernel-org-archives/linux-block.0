@@ -1,66 +1,91 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754787AbdDOS4Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2017 14:56:24 -0400
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [GIT PULL 05/19] lightnvm: free reverse device map
-Date: Sat, 15 Apr 2017 20:55:39 +0200
-Message-ID: <20170415185553.16098-6-matias@cnexlabs.com>
-In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
-References: <20170415185553.16098-1-matias@cnexlabs.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [resend PATCH v2 16/33] block,
+ dax: convert bdev_dax_supported() to dax_direct_access()
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org, hch@lst.de
+Date: Mon, 17 Apr 2017 12:10:16 -0700
+Message-ID: <149245621655.10206.6212373965558626649.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <jg@lightnvm.io>
+Kill of the final user of bdev_direct_access() and struct blk_dax_ctl.
 
-Free the reverse mapping table correctly on target tear down
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/lightnvm/core.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ fs/block_dev.c |   48 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 28 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 95105c4..a14c52c 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -411,6 +411,18 @@ static int nvm_register_map(struct nvm_dev *dev)
- 	return -ENOMEM;
- }
- 
-+static void nvm_unregister_map(struct nvm_dev *dev)
-+{
-+	struct nvm_dev_map *rmap = dev->rmap;
-+	int i;
-+
-+	for (i = 0; i < dev->geo.nr_chnls; i++)
-+		kfree(rmap->chnls[i].lun_offs);
-+
-+	kfree(rmap->chnls);
-+	kfree(rmap);
-+}
-+
- static void nvm_map_to_dev(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p)
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 2f7885712575..ecbdc8f9f718 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -788,35 +788,43 @@ EXPORT_SYMBOL(bdev_dax_pgoff);
+  */
+ int bdev_dax_supported(struct super_block *sb, int blocksize)
  {
- 	struct nvm_dev_map *dev_map = tgt_dev->map;
-@@ -992,7 +1004,7 @@ void nvm_free(struct nvm_dev *dev)
- 	if (dev->dma_pool)
- 		dev->ops->destroy_dma_pool(dev->dma_pool);
+-	struct blk_dax_ctl dax = {
+-		.sector = 0,
+-		.size = PAGE_SIZE,
+-	};
+-	int err;
++	struct block_device *bdev = sb->s_bdev;
++	struct dax_device *dax_dev;
++	pgoff_t pgoff;
++	int err, id;
++	void *kaddr;
++	pfn_t pfn;
++	long len;
  
--	kfree(dev->rmap);
-+	nvm_unregister_map(dev);
- 	kfree(dev->lptbl);
- 	kfree(dev->lun_map);
- 	kfree(dev);
--- 
-2.9.3
+ 	if (blocksize != PAGE_SIZE) {
+ 		vfs_msg(sb, KERN_ERR, "error: unsupported blocksize for dax");
+ 		return -EINVAL;
+ 	}
+ 
+-	err = bdev_direct_access(sb->s_bdev, &dax);
+-	if (err < 0) {
+-		switch (err) {
+-		case -EOPNOTSUPP:
+-			vfs_msg(sb, KERN_ERR,
+-				"error: device does not support dax");
+-			break;
+-		case -EINVAL:
+-			vfs_msg(sb, KERN_ERR,
+-				"error: unaligned partition for dax");
+-			break;
+-		default:
+-			vfs_msg(sb, KERN_ERR,
+-				"error: dax access failed (%d)", err);
+-		}
++	err = bdev_dax_pgoff(bdev, 0, PAGE_SIZE, &pgoff);
++	if (err) {
++		vfs_msg(sb, KERN_ERR, "error: unaligned partition for dax");
+ 		return err;
+ 	}
+ 
++	dax_dev = dax_get_by_host(bdev->bd_disk->disk_name);
++	if (!dax_dev) {
++		vfs_msg(sb, KERN_ERR, "error: device does not support dax");
++		return -EOPNOTSUPP;
++	}
++
++	id = dax_read_lock();
++	len = dax_direct_access(dax_dev, pgoff, 1, &kaddr, &pfn);
++	dax_read_unlock(id);
++
++	put_dax(dax_dev);
++
++	if (len < 1) {
++		vfs_msg(sb, KERN_ERR,
++				"error: dax access failed (%d)", len);
++		return len < 0 ? len : -EIO;
++	}
++
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(bdev_dax_supported);
