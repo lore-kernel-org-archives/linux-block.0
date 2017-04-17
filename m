@@ -1,118 +1,61 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
 To: Jens Axboe <axboe@kernel.dk>
-Date: Thu, 20 Apr 2017 15:38:49 +1000
-Subject: [PATCH 04/11] block: Improvements to bounce-buffer handling
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149266672902.27388.15322863417005890204.stgit@noble>
-In-Reply-To: <149266645258.27388.14083229348123176454.stgit@noble>
-References: <149266645258.27388.14083229348123176454.stgit@noble>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v2 4/8] blk-mq: Move the "state" debugfs attribute one level down
+Date: Mon, 17 Apr 2017 09:56:47 -0700
+Message-ID: <20170417165651.12693-5-bart.vanassche@sandisk.com>
+In-Reply-To: <20170417165651.12693-1-bart.vanassche@sandisk.com>
+References: <20170417165651.12693-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Since commit 23688bf4f830 ("block: ensure to split after potentially
-bouncing a bio") blk_queue_bounce() is called *before*
-blk_queue_split().
-This means that:
- 1/ the comments blk_queue_split() about bounce buffers are
-    irrelevant, and
- 2/ a very large bio (more than BIO_MAX_PAGES) will no longer be
-    split before it arrives at blk_queue_bounce(), leading to the
-    possibility that bio_clone_bioset() will fail and a NULL
-    will be dereferenced.
+Move the "state" attribute from the top level to the "mq" directory
+as requested by Omar.
 
-Separately, blk_queue_bounce() shouldn't use fs_bio_set as the bio
-being copied could be from the same set, and this could lead to a
-deadlock.
-
-So:
- - allocate 2 private biosets for blk_queue_bounce, one for
-   splitting enormous bios and one for cloning bios.
- - add code to split a bio that exceeds BIO_MAX_PAGES.
- - Fix up the comments in blk_queue_split()
-
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-merge.c |   14 ++++----------
- block/bounce.c    |   27 ++++++++++++++++++++++++++-
- 2 files changed, 30 insertions(+), 11 deletions(-)
+ block/blk-mq-debugfs.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d59074556703..51c84540d3bb 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -117,17 +117,11 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		 * each holds at most BIO_MAX_PAGES bvecs because
- 		 * bio_clone() can fail to allocate big bvecs.
- 		 *
--		 * It should have been better to apply the limit per
--		 * request queue in which bio_clone() is involved,
--		 * instead of globally. The biggest blocker is the
--		 * bio_clone() in bio bounce.
-+		 * Those drivers which will need to use bio_clone()
-+		 * should tell us in some way.  For now, impose the
-+		 * BIO_MAX_PAGES limit on all queues.
- 		 *
--		 * If bio is splitted by this reason, we should have
--		 * allowed to continue bios merging, but don't do
--		 * that now for making the change simple.
--		 *
--		 * TODO: deal with bio bounce's bio_clone() gracefully
--		 * and convert the global limit into per-queue limit.
-+		 * TODO: handle users of bio_clone() differently.
- 		 */
- 		if (bvecs++ >= BIO_MAX_PAGES)
- 			goto split;
-diff --git a/block/bounce.c b/block/bounce.c
-index 1cb5dd3a5da1..51fb538b504d 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -26,6 +26,7 @@
- #define POOL_SIZE	64
- #define ISA_POOL_SIZE	16
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 2a5d6d83d57c..34cac9a5fd28 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -141,11 +141,6 @@ static const struct file_operations blk_queue_flags_fops = {
+ 	.write		= blk_queue_flags_store,
+ };
  
-+struct bio_set *bounce_bio_set, *bounce_bio_split;
- static mempool_t *page_pool, *isa_page_pool;
+-static const struct blk_mq_debugfs_attr blk_queue_attrs[] = {
+-	{"state", 0600, &blk_queue_flags_fops},
+-	{},
+-};
+-
+ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
+ {
+ 	if (stat->nr_samples) {
+@@ -754,6 +749,7 @@ static const struct file_operations ctx_completed_fops = {
  
- #if defined(CONFIG_HIGHMEM) || defined(CONFIG_NEED_BOUNCE_POOL)
-@@ -40,6 +41,14 @@ static __init int init_emergency_pool(void)
- 	BUG_ON(!page_pool);
- 	pr_info("pool size: %d pages\n", POOL_SIZE);
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+ 	{"poll_stat", 0400, &queue_poll_stat_fops},
++	{"state", 0600, &blk_queue_flags_fops},
+ 	{},
+ };
  
-+	bounce_bio_set = bioset_create(BIO_POOL_SIZE, 0);
-+	BUG_ON(!bounce_bio_set);
-+	if (bioset_integrity_create(bounce_bio_set, BIO_POOL_SIZE))
-+		BUG_ON(1);
-+
-+	bounce_bio_split = bioset_create_nobvec(BIO_POOL_SIZE, 0);
-+	BUG_ON(!bounce_bio_split);
-+
- 	return 0;
- }
+@@ -870,9 +866,6 @@ int blk_mq_debugfs_register_hctxs(struct request_queue *q)
+ 	if (!q->debugfs_dir)
+ 		return -ENOENT;
  
-@@ -194,7 +203,23 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 
- 	return;
- bounce:
--	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, fs_bio_set);
-+	if (bio_segments(*bio_orig) > BIO_MAX_PAGES) {
-+		int cnt = 0;
-+		int sectors = 0;
-+		struct bio_vec bv;
-+		struct bvec_iter iter;
-+		bio_for_each_segment(bv, *bio_orig, iter) {
-+			if (cnt++ < BIO_MAX_PAGES)
-+				sectors += bv.bv_len >> 9;
-+			else
-+				break;
-+		}
-+		bio = bio_split(*bio_orig, sectors, GFP_NOIO, bounce_bio_split);
-+		bio_chain(bio, *bio_orig);
-+		generic_make_request(*bio_orig);
-+		*bio_orig = bio;
-+	}
-+	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
- 
- 	bio_for_each_segment_all(to, bio, i) {
- 		struct page *page = to->bv_page;
+-	if (!debugfs_create_files(q->debugfs_dir, q, blk_queue_attrs))
+-		goto err;
+-
+ 	q->mq_debugfs_dir = debugfs_create_dir("mq", q->debugfs_dir);
+ 	if (!q->mq_debugfs_dir)
+ 		goto err;
+-- 
+2.12.2
