@@ -1,60 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:36620 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752114AbdDJSwA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2017 14:52:00 -0400
-Received: by mail-wm0-f51.google.com with SMTP id o81so46299218wmb.1
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2017 11:51:59 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 1/3] lightnvm: convert sprintf into snprintf
-Date: Mon, 10 Apr 2017 20:51:36 +0200
-Message-Id: <1491850297-18235-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <alex@alex.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [Nbd] [PATCH] nbd: set the max segment size to UINT_MAX
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <1492436677-11209-1-git-send-email-jbacik@fb.com>
+Date: Mon, 17 Apr 2017 23:46:54 +0200
+Cc: Alex Bligh <alex@alex.org.uk>,
+ axboe@kernel.dk,
+ "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>,
+ linux-block@vger.kernel.org,
+ kernel-team@fb.com
+Message-Id: <49AD0AD8-9FEE-4CD8-BAB6-6C92FA3A2AD0@alex.org.uk>
+References: <1492436677-11209-1-git-send-email-jbacik@fb.com>
+To: Josef Bacik <josef@toxicpanda.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Convert sprintf calls to snprintf in order to make possible buffer
-overflow more obvious.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+> On 17 Apr 2017, at 15:44, Josef Bacik <josef@toxicpanda.com> wrote:
+>=20
+> NBD doesn't care about limiting the segment size, let the user push =
+the
+> largest bio's they want.  This allows us to control the request size
+> solely through max_sectors_kb.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index c3340ef..bdbb333 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -272,7 +272,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		goto err_disk;
- 	blk_queue_make_request(tqueue, tt->make_rq);
- 
--	sprintf(tdisk->disk_name, "%s", create->tgtname);
-+	snprintf(tdisk->disk_name, sizeof(tdisk->disk_name), "%s",
-+							create->tgtname);
- 	tdisk->flags = GENHD_FL_EXT_DEVT;
- 	tdisk->major = 0;
- 	tdisk->first_minor = 0;
-@@ -1195,13 +1196,13 @@ static long nvm_ioctl_get_devices(struct file *file, void __user *arg)
- 	list_for_each_entry(dev, &nvm_devices, devices) {
- 		struct nvm_ioctl_device_info *info = &devices->info[i];
- 
--		sprintf(info->devname, "%s", dev->name);
-+		snprintf(info->devname, sizeof(info->devname), "%s", dev->name);
- 
- 		/* kept for compatibility */
- 		info->bmversion[0] = 1;
- 		info->bmversion[1] = 0;
- 		info->bmversion[2] = 0;
--		sprintf(info->bmname, "%s", "gennvm");
-+		snprintf(info->bmname, sizeof(info->bmname), "%s", "gennvm");
- 		i++;
- 
- 		if (i > 31) {
--- 
-2.7.4
+I'm a bit lost around the various knobs in the kernel for maximum block
+sizes, but note that the NBD protocol is (with an extension, soon
+to be made mainstream by the looks of it) capable of negotiating
+block size minima, maxima and preferred sizes - see here:
+
+=
+https://github.com/NetworkBlockDevice/nbd/blob/extension-info/doc/proto.md=
+#block-size-constraints
+
+These are server block sizes (obviously) which would normally be passed
+from userland client to kernel client via an ioctl. I suspect such
+ioctls may not be implemented at the moment, and kernel support for
+them would be much appreciated.
+
+--=20
+Alex Bligh
