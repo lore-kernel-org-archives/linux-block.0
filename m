@@ -1,69 +1,144 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk
-Subject: [PATCH v3 19/20] jbd2: don't reset error in journal_finish_inode_data_buffers
-Date: Mon, 24 Apr 2017 09:22:58 -0400
-Message-Id: <20170424132259.8680-20-jlayton@redhat.com>
-In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
-References: <20170424132259.8680-1-jlayton@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [resend PATCH v2 13/33] ext2, ext4,
+ xfs: retrieve dax_device for iomap operations
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org, hch@lst.de
+Date: Mon, 17 Apr 2017 12:09:59 -0700
+Message-ID: <149245619928.10206.4104560527846554979.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Now that we don't clear writeback errors after fetching them, there is
-no need to reset them. This is also potentially racy.
+In preparation for converting fs/dax.c to use dax_direct_access()
+instead of bdev_direct_access(), add the plumbing to retrieve the
+dax_device associated with a given block_device.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- fs/jbd2/commit.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+ fs/ext2/inode.c       |    9 ++++++++-
+ fs/ext4/inode.c       |    9 ++++++++-
+ fs/xfs/xfs_iomap.c    |   10 ++++++++++
+ include/linux/iomap.h |    1 +
+ 4 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/fs/jbd2/commit.c b/fs/jbd2/commit.c
-index b6b194ec1b4f..4c6262652028 100644
---- a/fs/jbd2/commit.c
-+++ b/fs/jbd2/commit.c
-@@ -264,17 +264,8 @@ static int journal_finish_inode_data_buffers(journal_t *journal,
- 		jinode->i_flags |= JI_COMMIT_RUNNING;
- 		spin_unlock(&journal->j_list_lock);
- 		err = filemap_fdatawait(jinode->i_vfs_inode->i_mapping);
--		if (err) {
--			/*
--			 * Because AS_EIO is cleared by
--			 * filemap_fdatawait_range(), set it again so
--			 * that user process can get -EIO from fsync().
--			 */
--			mapping_set_error(jinode->i_vfs_inode->i_mapping, -EIO);
--
--			if (!ret)
--				ret = err;
--		}
-+		if (err && !ret)
-+			ret = err;
- 		spin_lock(&journal->j_list_lock);
- 		jinode->i_flags &= ~JI_COMMIT_RUNNING;
- 		smp_mb();
--- 
-2.9.3
+diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
+index 128cce540645..4c9d2d44e879 100644
+--- a/fs/ext2/inode.c
++++ b/fs/ext2/inode.c
+@@ -799,6 +799,7 @@ int ext2_get_block(struct inode *inode, sector_t iblock,
+ static int ext2_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
+ 		unsigned flags, struct iomap *iomap)
+ {
++	struct block_device *bdev;
+ 	unsigned int blkbits = inode->i_blkbits;
+ 	unsigned long first_block = offset >> blkbits;
+ 	unsigned long max_blocks = (length + (1 << blkbits) - 1) >> blkbits;
+@@ -812,8 +813,13 @@ static int ext2_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
+ 		return ret;
+ 
+ 	iomap->flags = 0;
+-	iomap->bdev = inode->i_sb->s_bdev;
++	bdev = inode->i_sb->s_bdev;
++	iomap->bdev = bdev;
+ 	iomap->offset = (u64)first_block << blkbits;
++	if (blk_queue_dax(bdev->bd_queue))
++		iomap->dax_dev = dax_get_by_host(bdev->bd_disk->disk_name);
++	else
++		iomap->dax_dev = NULL;
+ 
+ 	if (ret == 0) {
+ 		iomap->type = IOMAP_HOLE;
+@@ -835,6 +841,7 @@ static int
+ ext2_iomap_end(struct inode *inode, loff_t offset, loff_t length,
+ 		ssize_t written, unsigned flags, struct iomap *iomap)
+ {
++	put_dax(iomap->dax_dev);
+ 	if (iomap->type == IOMAP_MAPPED &&
+ 	    written < length &&
+ 	    (flags & IOMAP_WRITE))
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 4247d8d25687..2cb2634daa99 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3305,6 +3305,7 @@ static int ext4_releasepage(struct page *page, gfp_t wait)
+ static int ext4_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
+ 			    unsigned flags, struct iomap *iomap)
+ {
++	struct block_device *bdev;
+ 	unsigned int blkbits = inode->i_blkbits;
+ 	unsigned long first_block = offset >> blkbits;
+ 	unsigned long last_block = (offset + length - 1) >> blkbits;
+@@ -3373,7 +3374,12 @@ static int ext4_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
+ 	}
+ 
+ 	iomap->flags = 0;
+-	iomap->bdev = inode->i_sb->s_bdev;
++	bdev = inode->i_sb->s_bdev;
++	iomap->bdev = bdev;
++	if (blk_queue_dax(bdev->bd_queue))
++		iomap->dax_dev = dax_get_by_host(bdev->bd_disk->disk_name);
++	else
++		iomap->dax_dev = NULL;
+ 	iomap->offset = first_block << blkbits;
+ 
+ 	if (ret == 0) {
+@@ -3406,6 +3412,7 @@ static int ext4_iomap_end(struct inode *inode, loff_t offset, loff_t length,
+ 	int blkbits = inode->i_blkbits;
+ 	bool truncate = false;
+ 
++	put_dax(iomap->dax_dev);
+ 	if (!(flags & IOMAP_WRITE) || (flags & IOMAP_FAULT))
+ 		return 0;
+ 
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 288ee5b840d7..4b47403f8089 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -976,6 +976,7 @@ xfs_file_iomap_begin(
+ 	int			nimaps = 1, error = 0;
+ 	bool			shared = false, trimmed = false;
+ 	unsigned		lockmode;
++	struct block_device	*bdev;
+ 
+ 	if (XFS_FORCED_SHUTDOWN(mp))
+ 		return -EIO;
+@@ -1063,6 +1064,14 @@ xfs_file_iomap_begin(
+ 	}
+ 
+ 	xfs_bmbt_to_iomap(ip, iomap, &imap);
++
++	/* optionally associate a dax device with the iomap bdev */
++	bdev = iomap->bdev;
++	if (blk_queue_dax(bdev->bd_queue))
++		iomap->dax_dev = dax_get_by_host(bdev->bd_disk->disk_name);
++	else
++		iomap->dax_dev = NULL;
++
+ 	if (shared)
+ 		iomap->flags |= IOMAP_F_SHARED;
+ 	return 0;
+@@ -1140,6 +1149,7 @@ xfs_file_iomap_end(
+ 	unsigned		flags,
+ 	struct iomap		*iomap)
+ {
++	put_dax(iomap->dax_dev);
+ 	if ((flags & IOMAP_WRITE) && iomap->type == IOMAP_DELALLOC)
+ 		return xfs_file_iomap_end_delalloc(XFS_I(inode), offset,
+ 				length, written, iomap);
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 7291810067eb..f753e788da31 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -41,6 +41,7 @@ struct iomap {
+ 	u16			type;	/* type of mapping */
+ 	u16			flags;	/* flags for mapping */
+ 	struct block_device	*bdev;	/* block device for I/O */
++	struct dax_device	*dax_dev; /* dax_dev for dax operations */
+ };
+ 
+ /*
