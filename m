@@ -1,71 +1,43 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH v2 7/8] blk-mq: Add blk_mq_ops.show_rq()
-Date: Mon, 17 Apr 2017 09:56:50 -0700
-Message-ID: <20170417165651.12693-8-bart.vanassche@sandisk.com>
-In-Reply-To: <20170417165651.12693-1-bart.vanassche@sandisk.com>
-References: <20170417165651.12693-1-bart.vanassche@sandisk.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 00/12] nbd: Netlink interface and path failure
+ enhancements
+To: Josef Bacik <josef@toxicpanda.com>, nbd-general@lists.sourceforge.net,
+ linux-block@vger.kernel.org, kernel-team@fb.com
+References: <1491512527-4286-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d58e5d19-9bda-e5a0-55a1-00aee6ecb3b3@kernel.dk>
+Date: Mon, 17 Apr 2017 09:59:27 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <1491512527-4286-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-This new callback function will be used in the next patch to show
-more information about SCSI requests.
+On 04/06/2017 03:01 PM, Josef Bacik wrote:
+> This patchset adds a new netlink configuration interface to NBD as well as a
+> bunch of enhancments around path failures.  The patches provide the following
+> enhancemnts to NBD
+> 
+>  - Netlink configuration interface that doesn't leave a userspace application
+>    waiting in kernel space for the device to disconnect.
+>  - Netlink reconfigure interface for adding re-connected sockets to replace dead
+>    sockets.
+>  - A flag to destroy the NBD device on disconnect, much like how mount -o loop
+>    works.
+>  - A status interface that currently will only report whether a device is
+>    connected or not, but can be extended to include whatever in the future.
+>  - A netlink multicast notification scheme to notify user space when there are
+>    connection issues to allow for seamless reconnects.
+>  - Dead link handling.  You can specify a dead link timeout and the NBD device
+>    will pause IO for that timeout waiting to see if the connection can be
+>    re-established.  This is helpful to allow for things like nbd server upgrades
+>    where the whole server disappears for a short period of time.
+> 
+> These patches have been thorougly and continuously tested for about a month.
+> I've been finding bugs in various places, but this batch has been solid for the
+> last few days of testing, which include a constant disconnect/reconnect torture
+> test.  Thanks,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 6 +++++-
- include/linux/blk-mq.h | 6 ++++++
- 2 files changed, 11 insertions(+), 1 deletion(-)
+Added for 4.12, thanks.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 64b584ba576a..b1b669f98ea0 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -308,6 +308,7 @@ static const char *const rqf_name[] = {
- static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- {
- 	struct request *rq = list_entry_rq(v);
-+	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
- 	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
- 
- 	seq_printf(m, "%p {.op=", rq);
-@@ -321,8 +322,11 @@ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- 	seq_puts(m, ", .rq_flags=");
- 	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
- 		       ARRAY_SIZE(rqf_name));
--	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
-+	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
- 		   rq->internal_tag);
-+	if (mq_ops->show_rq)
-+		mq_ops->show_rq(m, rq);
-+	seq_puts(m, "}\n");
- 	return 0;
- }
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d75de612845d..a761d275cb44 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -121,6 +121,12 @@ struct blk_mq_ops {
- 	softirq_done_fn		*complete;
- 
- 	/*
-+	 * Used by the debugfs implementation to show driver-specific
-+	 * information about a request.
-+	 */
-+	void (*show_rq)(struct seq_file *m, struct request *rq);
-+
-+	/*
- 	 * Called when the block layer side of a hardware queue has been
- 	 * set up, allowing the driver to allocate/init matching structures.
- 	 * Ditto for exit/teardown.
 -- 
-2.12.2
+Jens Axboe
