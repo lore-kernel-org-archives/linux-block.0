@@ -1,100 +1,225 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37242 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750735AbdDMQIh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Apr 2017 12:08:37 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>, jth@kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] block: fix bio_will_gap()
-Date: Fri, 14 Apr 2017 00:06:26 +0800
-Message-Id: <20170413160626.14635-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [resend PATCH v2 20/33] dm: add ->copy_from_iter() dax operation
+ support
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Mike Snitzer <snitzer@redhat.com>, Toshi Kani <toshi.kani@hpe.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-fsdevel@vger.kernel.org, hch@lst.de
+Date: Mon, 17 Apr 2017 12:10:38 -0700
+Message-ID: <149245623835.10206.17481761679193180574.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Now commit 729204ef49ec("block: relax check on sg gap")
-allows us to merge bios if both are physically contiguous,
-this change can merge huge of small bios in use case of mkfs,
-for example, mkfs.ntfs running time can be decreased to ~1/10.
+Allow device-mapper to route copy_from_iter operations to the
+per-target implementation. In order for the device stacking to work we
+need a dax_dev and a pgoff relative to that device. This gives each
+layer of the stack the information it needs to look up the operation
+pointer for the next level.
 
-But if one rq starts with non-aligned buffer(the 1st bvec's
-bv_offset isn't zero) and if we allow to merge, it is quite
-difficult to respect sg gap limit, especially the segment
-can't be at maximum segment size, otherwise the segment
-ends in unaligned virt boundary. This patch trys to avoid the
-issue by not allowing to merge if the req starts with non-aligned
-buffer.
+This conceptually allows for an array of mixed device drivers with
+varying copy_from_iter implementations.
 
-Also add comments to explain why the merged segment can't
-end in unaligned virt boundary.
-
-Fixes: 729204ef49ec ("block: relax check on sg gap")
-Tested-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Cc: Toshi Kani <toshi.kani@hpe.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- include/linux/blkdev.h | 32 ++++++++++++++++++++++++++++----
- 1 file changed, 28 insertions(+), 4 deletions(-)
+ drivers/dax/super.c           |   13 +++++++++++++
+ drivers/md/dm-linear.c        |   15 +++++++++++++++
+ drivers/md/dm-stripe.c        |   20 ++++++++++++++++++++
+ drivers/md/dm.c               |   26 ++++++++++++++++++++++++++
+ include/linux/dax.h           |    2 ++
+ include/linux/device-mapper.h |    3 +++
+ 6 files changed, 79 insertions(+)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b75d6fe5a1b9..5eaf323de98b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1672,12 +1672,36 @@ static inline bool bios_segs_mergeable(struct request_queue *q,
- 	return true;
+diff --git a/drivers/dax/super.c b/drivers/dax/super.c
+index 23ce3ab49f10..73f0da8e5d27 100644
+--- a/drivers/dax/super.c
++++ b/drivers/dax/super.c
+@@ -17,6 +17,7 @@
+ #include <linux/cdev.h>
+ #include <linux/hash.h>
+ #include <linux/slab.h>
++#include <linux/uio.h>
+ #include <linux/dax.h>
+ #include <linux/fs.h>
+ 
+@@ -104,6 +105,18 @@ long dax_direct_access(struct dax_device *dax_dev, pgoff_t pgoff, long nr_pages,
  }
+ EXPORT_SYMBOL_GPL(dax_direct_access);
  
--static inline bool bio_will_gap(struct request_queue *q, struct bio *prev,
--			 struct bio *next)
-+static inline bool bio_will_gap(struct request_queue *q,
-+				struct request *prev_rq,
-+				struct bio *prev,
-+				struct bio *next)
- {
- 	if (bio_has_data(prev) && queue_virt_boundary(q)) {
- 		struct bio_vec pb, nb;
- 
-+		/*
-+		 * don't merge if the 1st bio starts with non-zero
-+		 * offset, otherwise it is quite difficult to respect
-+		 * sg gap limit. We work hard to merge huge of small
-+		 * single bios in case of mkfs.
-+		 */
-+		if (prev_rq)
-+			bio_get_first_bvec(prev_rq->bio, &pb);
-+		else
-+			bio_get_first_bvec(prev, &pb);
-+		if (pb.bv_offset)
-+			return true;
++size_t dax_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff, void *addr,
++		size_t bytes, struct iov_iter *i)
++{
++	if (!dax_alive(dax_dev))
++		return 0;
 +
-+		/*
-+		 * We don't need to worry about the situation that the
-+		 * merged segment ends in unaligned virt boundary:
-+		 *
-+		 * - if 'pb' ends aligned, the merged segment ends aligned
-+		 * - if 'pb' ends unaligned, the next bio must include
-+		 *   one single bvec of 'nb', otherwise the 'nb' can't
-+		 *   merge with 'pb'
-+		 */
- 		bio_get_last_bvec(prev, &pb);
- 		bio_get_first_bvec(next, &nb);
- 
-@@ -1690,12 +1714,12 @@ static inline bool bio_will_gap(struct request_queue *q, struct bio *prev,
- 
- static inline bool req_gap_back_merge(struct request *req, struct bio *bio)
++	if (!dax_dev->ops->copy_from_iter)
++		return copy_from_iter(addr, bytes, i);
++	return dax_dev->ops->copy_from_iter(dax_dev, pgoff, addr, bytes, i);
++}
++EXPORT_SYMBOL_GPL(dax_copy_from_iter);
++
+ bool dax_alive(struct dax_device *dax_dev)
  {
--	return bio_will_gap(req->q, req->biotail, bio);
-+	return bio_will_gap(req->q, req, req->biotail, bio);
+ 	lockdep_assert_held(&dax_srcu);
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index c5a52f4dae81..5fe44a0ddfab 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -158,6 +158,20 @@ static long linear_dax_direct_access(struct dm_target *ti, pgoff_t pgoff,
+ 	return dax_direct_access(dax_dev, pgoff, nr_pages, kaddr, pfn);
  }
  
- static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
- {
--	return bio_will_gap(req->q, bio, req->bio);
-+	return bio_will_gap(req->q, NULL, bio, req->bio);
++static size_t linear_dax_copy_from_iter(struct dm_target *ti, pgoff_t pgoff,
++		void *addr, size_t bytes, struct iov_iter *i)
++{
++	struct linear_c *lc = ti->private;
++	struct block_device *bdev = lc->dev->bdev;
++	struct dax_device *dax_dev = lc->dev->dax_dev;
++	sector_t dev_sector, sector = pgoff * PAGE_SECTORS;
++
++	dev_sector = linear_map_sector(ti, sector);
++	if (bdev_dax_pgoff(bdev, dev_sector, ALIGN(bytes, PAGE_SIZE), &pgoff))
++		return 0;
++	return dax_copy_from_iter(dax_dev, pgoff, addr, bytes, i);
++}
++
+ static struct target_type linear_target = {
+ 	.name   = "linear",
+ 	.version = {1, 3, 0},
+@@ -169,6 +183,7 @@ static struct target_type linear_target = {
+ 	.prepare_ioctl = linear_prepare_ioctl,
+ 	.iterate_devices = linear_iterate_devices,
+ 	.direct_access = linear_dax_direct_access,
++	.dax_copy_from_iter = linear_dax_copy_from_iter,
+ };
+ 
+ int __init dm_linear_init(void)
+diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
+index cb4b1e9e16ab..4f45d23249b2 100644
+--- a/drivers/md/dm-stripe.c
++++ b/drivers/md/dm-stripe.c
+@@ -330,6 +330,25 @@ static long stripe_dax_direct_access(struct dm_target *ti, pgoff_t pgoff,
+ 	return dax_direct_access(dax_dev, pgoff, nr_pages, kaddr, pfn);
  }
  
- static inline void blk_dump_rq(const struct request *req, const char *msg)
--- 
-2.9.3
++static size_t stripe_dax_copy_from_iter(struct dm_target *ti, pgoff_t pgoff,
++		void *addr, size_t bytes, struct iov_iter *i)
++{
++	sector_t dev_sector, sector = pgoff * PAGE_SECTORS;
++	struct stripe_c *sc = ti->private;
++	struct dax_device *dax_dev;
++	struct block_device *bdev;
++	uint32_t stripe;
++
++	stripe_map_sector(sc, sector, &stripe, &dev_sector);
++	dev_sector += sc->stripe[stripe].physical_start;
++	dax_dev = sc->stripe[stripe].dev->dax_dev;
++	bdev = sc->stripe[stripe].dev->bdev;
++
++	if (bdev_dax_pgoff(bdev, dev_sector, ALIGN(bytes, PAGE_SIZE), &pgoff))
++		return 0;
++	return dax_copy_from_iter(dax_dev, pgoff, addr, bytes, i);
++}
++
+ /*
+  * Stripe status:
+  *
+@@ -448,6 +467,7 @@ static struct target_type stripe_target = {
+ 	.iterate_devices = stripe_iterate_devices,
+ 	.io_hints = stripe_io_hints,
+ 	.direct_access = stripe_dax_direct_access,
++	.dax_copy_from_iter = stripe_dax_copy_from_iter,
+ };
+ 
+ int __init dm_stripe_init(void)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 79d5f5fd823e..8c8579efcba2 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -19,6 +19,7 @@
+ #include <linux/dax.h>
+ #include <linux/slab.h>
+ #include <linux/idr.h>
++#include <linux/uio.h>
+ #include <linux/hdreg.h>
+ #include <linux/delay.h>
+ #include <linux/wait.h>
+@@ -957,6 +958,30 @@ static long dm_dax_direct_access(struct dax_device *dax_dev, pgoff_t pgoff,
+ 	return ret;
+ }
+ 
++static size_t dm_dax_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff,
++		void *addr, size_t bytes, struct iov_iter *i)
++{
++	struct mapped_device *md = dax_get_private(dax_dev);
++	sector_t sector = pgoff * PAGE_SECTORS;
++	struct dm_target *ti;
++	long ret = 0;
++	int srcu_idx;
++
++	ti = dm_dax_get_live_target(md, sector, &srcu_idx);
++
++	if (!ti)
++		goto out;
++	if (!ti->type->dax_copy_from_iter) {
++		ret = copy_from_iter(addr, bytes, i);
++		goto out;
++	}
++	ret = ti->type->dax_copy_from_iter(ti, pgoff, addr, bytes, i);
++ out:
++	dm_put_live_table(md, srcu_idx);
++
++	return ret;
++}
++
+ /*
+  * A target may call dm_accept_partial_bio only from the map routine.  It is
+  * allowed for all bio types except REQ_PREFLUSH.
+@@ -2818,6 +2843,7 @@ static const struct block_device_operations dm_blk_dops = {
+ 
+ static const struct dax_operations dm_dax_ops = {
+ 	.direct_access = dm_dax_direct_access,
++	.copy_from_iter = dm_dax_copy_from_iter,
+ };
+ 
+ /*
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index 156f067d4db5..cd8561bb21f3 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -32,6 +32,8 @@ void kill_dax(struct dax_device *dax_dev);
+ void *dax_get_private(struct dax_device *dax_dev);
+ long dax_direct_access(struct dax_device *dax_dev, pgoff_t pgoff, long nr_pages,
+ 		void **kaddr, pfn_t *pfn);
++size_t dax_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff, void *addr,
++		size_t bytes, struct iov_iter *i);
+ 
+ /*
+  * We use lowest available bit in exceptional entry for locking, one bit for
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index df830d167892..e18e4277d09d 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -130,6 +130,8 @@ typedef int (*dm_busy_fn) (struct dm_target *ti);
+  */
+ typedef long (*dm_dax_direct_access_fn) (struct dm_target *ti, pgoff_t pgoff,
+ 		long nr_pages, void **kaddr, pfn_t *pfn);
++typedef size_t (*dm_dax_copy_from_iter_fn)(struct dm_target *ti, pgoff_t pgoff,
++		void *addr, size_t bytes, struct iov_iter *i);
+ #define PAGE_SECTORS (PAGE_SIZE / 512)
+ 
+ void dm_error(const char *message);
+@@ -179,6 +181,7 @@ struct target_type {
+ 	dm_iterate_devices_fn iterate_devices;
+ 	dm_io_hints_fn io_hints;
+ 	dm_dax_direct_access_fn direct_access;
++	dm_dax_copy_from_iter_fn dax_copy_from_iter;
+ 
+ 	/* For internal device-mapper use. */
+ 	struct list_head list;
