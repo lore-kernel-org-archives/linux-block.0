@@ -1,121 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f47.google.com ([74.125.83.47]:32800 "EHLO
-        mail-pg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751649AbdDCVnH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2017 17:43:07 -0400
-Received: by mail-pg0-f47.google.com with SMTP id x125so132434444pgb.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2017 14:43:07 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH 2/5] blk-mq-sched: set up scheduler tags when bringing up new queues
-Date: Mon,  3 Apr 2017 14:42:02 -0700
-Message-Id: <1ed3d9bdcfc855a9546b05fa59bb23dc3f85f726.1491254827.git.osandov@fb.com>
-In-Reply-To: <cover.1491254827.git.osandov@fb.com>
-References: <cover.1491254827.git.osandov@fb.com>
-In-Reply-To: <cover.1491254827.git.osandov@fb.com>
-References: <cover.1491254827.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, James Bottomley
+	<James.Bottomley@HansenPartnership.com>, Omar Sandoval <osandov@fb.com>,
+	Hannes Reinecke <hare@suse.com>, <linux-scsi@vger.kernel.org>
+Subject: [PATCH v2 8/8] scsi: Implement blk_mq_ops.show_rq()
+Date: Mon, 17 Apr 2017 09:56:51 -0700
+Message-ID: <20170417165651.12693-9-bart.vanassche@sandisk.com>
+In-Reply-To: <20170417165651.12693-1-bart.vanassche@sandisk.com>
+References: <20170417165651.12693-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Show the SCSI CDB, .eh_eflags and .result for pending SCSI commands
+in /sys/kernel/debug/block/*/mq/*/dispatch and */rq_list.
 
-If a new hardware queue is added at runtime, we don't allocate scheduler
-tags for it, leading to a crash. This hooks up the scheduler framework
-to blk_mq_{init,exit}_hctx() to make sure everything gets properly
-initialized/freed.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: <linux-scsi@vger.kernel.org>
 ---
- block/blk-mq-sched.c | 22 ++++++++++++++++++++++
- block/blk-mq-sched.h |  5 +++++
- block/blk-mq.c       |  9 ++++++++-
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ drivers/scsi/scsi_lib.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index e08ba915343e..3fd918bb13a2 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -460,6 +460,28 @@ void blk_mq_sched_teardown(struct request_queue *q)
- 		blk_mq_sched_free_tags(set, hctx, i);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 7bc4513bf4e4..52604573e4b6 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2126,6 +2126,31 @@ static void scsi_exit_rq(struct request_queue *q, struct request *rq)
+ 	scsi_free_sense_buffer(shost, cmd->sense_buffer);
  }
  
-+int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			   unsigned int hctx_idx)
++static const char *const ehflag_name[] = {
++	[ilog2(SCSI_EH_CANCEL_CMD)]	 = "CANCEL_CMD",
++	[ilog2(SCSI_EH_ABORT_SCHEDULED)] = "ABORT_SCHEDULED",
++};
++
++static void scsi_show_rq(struct seq_file *m, struct request *rq)
 +{
-+	struct elevator_queue *e = q->elevator;
++	struct scsi_cmnd *cmd = container_of(scsi_req(rq), typeof(*cmd), req);
++	unsigned int i;
 +
-+	if (!e)
-+		return 0;
-+
-+	return blk_mq_sched_alloc_tags(q, hctx, hctx_idx);
++	seq_puts(m, ", .cmd =");
++	for (i = 0; i < cmd->cmd_len; i++)
++		seq_printf(m, " %02x", cmd->cmnd[i]);
++	seq_puts(m, ", .eh_eflags =");
++	for (i = 0; i < sizeof(cmd->eh_eflags) * BITS_PER_BYTE; i++) {
++		if (!(cmd->eh_eflags & BIT(i)))
++			continue;
++		if (i < ARRAY_SIZE(ehflag_name) && ehflag_name[i])
++			seq_printf(m, " %s", ehflag_name[i]);
++		else
++			seq_printf(m, " %d", i);
++	}
++	seq_printf(m, ", .result = %#06x", cmd->result);
 +}
 +
-+void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx)
-+{
-+	struct elevator_queue *e = q->elevator;
-+
-+	if (!e)
-+		return;
-+
-+	blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
-+}
-+
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
  {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 873f9af5a35b..19db25e0c95a 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -35,6 +35,11 @@ void blk_mq_sched_move_to_dispatch(struct blk_mq_hw_ctx *hctx,
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
- void blk_mq_sched_teardown(struct request_queue *q);
- 
-+int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			   unsigned int hctx_idx);
-+void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx);
-+
- int blk_mq_sched_init(struct request_queue *q);
- 
- static inline bool
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 061fc2cc88d3..ac830cb488d7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1839,6 +1839,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 				       hctx->fq->flush_rq, hctx_idx,
- 				       flush_start_tag + hctx_idx);
- 
-+	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
-+
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
- 
-@@ -1905,9 +1907,12 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
- 		goto free_bitmap;
- 
-+	if (blk_mq_sched_init_hctx(q, hctx, hctx_idx))
-+		goto exit_hctx;
-+
- 	hctx->fq = blk_alloc_flush_queue(q, hctx->numa_node, set->cmd_size);
- 	if (!hctx->fq)
--		goto exit_hctx;
-+		goto sched_exit_hctx;
- 
- 	if (set->ops->init_request &&
- 	    set->ops->init_request(set->driver_data,
-@@ -1922,6 +1927,8 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 
-  free_fq:
- 	kfree(hctx->fq);
-+ sched_exit_hctx:
-+	blk_mq_sched_exit_hctx(q, hctx, hctx_idx);
-  exit_hctx:
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
+ 	struct Scsi_Host *shost = sdev->host;
+@@ -2158,6 +2183,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
+ 	.queue_rq	= scsi_queue_rq,
+ 	.complete	= scsi_softirq_done,
+ 	.timeout	= scsi_timeout,
++	.show_rq	= scsi_show_rq,
+ 	.init_request	= scsi_init_request,
+ 	.exit_request	= scsi_exit_request,
+ 	.map_queues	= scsi_map_queues,
 -- 
 2.12.2
