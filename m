@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:36862 "EHLO
+Received: from bombadil.infradead.org ([65.50.211.133]:38951 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757414AbdDRPwp (ORCPT
+        with ESMTP id S1757455AbdDRPwt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2017 11:52:45 -0400
+        Tue, 18 Apr 2017 11:52:49 -0400
 From: Christoph Hellwig <hch@bombadil.infradead.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Josef Bacik <jbacik@fb.com>,
@@ -11,35 +11,70 @@ Cc: Josef Bacik <jbacik@fb.com>,
         Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
         linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: kill req->errors V2
-Date: Tue, 18 Apr 2017 08:52:06 -0700
-Message-Id: <20170418155229.5977-1-hch@bombadil.infradead.org>
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Christoph Hellwig <hch@lst.de>
+Subject: virtio_blk: don't use req->errors
+Date: Tue, 18 Apr 2017 08:52:12 -0700
+Message-Id: <20170418155229.5977-7-hch@bombadil.infradead.org>
+In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
+References: <20170418155229.5977-1-hch@bombadil.infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Currently the request structure has an errors field that is used in
-various different ways.  The oldest drivers use it as an error count,
-blk-mq and the generic timeout code assume that it holds a Linux
-errno for block completions, and various drivers use it for internal
-status values, often overwriting them with Linux errnos later,
-that is unless they are processing passthrough requests in which
-case they'll leave their errors in it.
+From: Christoph Hellwig <hch@lst.de>
 
-This series kills the ->errors field and replaced it with new fields
-in the drivers (or an odd hack in a union in struct request for
-two bitrotting old drivers).
+Remove passing req->errors (which at that point is always 0) to
+blk_mq_complete_request, and rely on the virtio status code for the
+serial number passthrough request.
 
-Also available in the following git tree:
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/virtio_blk.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-    git://git.infradead.org/users/hch/block.git request-errors
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/request-errors
-
-
-Changes since V1:
- - rebased on top the latest block for-next tree
- - fix error handling in nfsd blocklayout
- - dropped "scsi: fix fast-fail for non-passthrough requests"
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index dbc4e80680b1..8378ad480f77 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -175,19 +175,15 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
+ static inline void virtblk_request_done(struct request *req)
+ {
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+-	int error = virtblk_result(vbr);
+ 
+ 	switch (req_op(req)) {
+ 	case REQ_OP_SCSI_IN:
+ 	case REQ_OP_SCSI_OUT:
+ 		virtblk_scsi_request_done(req);
+ 		break;
+-	case REQ_OP_DRV_IN:
+-		req->errors = (error != 0);
+-		break;
+ 	}
+ 
+-	blk_mq_end_request(req, error);
++	blk_mq_end_request(req, virtblk_result(vbr));
+ }
+ 
+ static void virtblk_done(struct virtqueue *vq)
+@@ -205,7 +201,7 @@ static void virtblk_done(struct virtqueue *vq)
+ 		while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
+ 			struct request *req = blk_mq_rq_from_pdu(vbr);
+ 
+-			blk_mq_complete_request(req, req->errors);
++			blk_mq_complete_request(req, 0);
+ 			req_done = true;
+ 		}
+ 		if (unlikely(virtqueue_is_broken(vq)))
+@@ -311,7 +307,7 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ 		goto out;
+ 
+ 	blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
+-	err = req->errors ? -EIO : 0;
++	err = virtblk_result(blk_mq_rq_to_pdu(req));
+ out:
+ 	blk_put_request(req);
+ 	return err;
+-- 
+2.11.0
