@@ -1,60 +1,81 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: kernel-team@fb.com,
-	axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block: allow us to change max_segments on the fly
-Date: Mon,  3 Apr 2017 15:13:18 -0400
-Message-Id: <1491246798-1774-1-git-send-email-jbacik@fb.com>
+Return-Path: <Alex.Lemberg@sandisk.com>
+From: Alex Lemberg <Alex.Lemberg@sandisk.com>
+To: Avri Altman <Avri.Altman@sandisk.com>, Linus Walleij
+	<linus.walleij@linaro.org>
+CC: Arnd Bergmann <arnd@arndb.de>, "ulf. org" <ulf.hansson@linaro.org>,
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Adrian Hunter
+	<adrian.hunter@intel.com>, Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: Outstanding MQ questions from MMC
+Date: Tue, 18 Apr 2017 15:31:22 +0000
+Message-ID: <34FA1610-93EF-441A-B8B9-F1DD6B706398@sandisk.com>
+References: <CACRpkdbZrkAqEdP1-QqDww0ZuFcY47Jgj9dPqkG_whrx7pwC-w@mail.gmail.com>
+ <CAK8P3a1CGtj5VSVoMM34VWn781WpS8ZcHpq6n0UfNOWWYEq=QQ@mail.gmail.com>
+ <CAPDyKFqiyEcScuWLVXE9kAa2yQyJCZfbXyAdAQOb081nLjyvvw@mail.gmail.com>
+ <CAK8P3a1yJJ33R9EPPcErLUO2enFGrSJzWmVRwHdHP+3_2iP7ow@mail.gmail.com>
+ <CACRpkdYsWnXLZEpZr74pLB8zjTV4Q=sdAfX+sz0n_E46SaJa9Q@mail.gmail.com>
+ <BY2PR0401MB0901B37DB60608662AE5C631E5050@BY2PR0401MB0901.namprd04.prod.outlook.com>
+ <CACRpkdbstMEC-_JcEfEm1debQRPeYBDmTPm0L_jGFnrgRZg1Zw@mail.gmail.com>
+ <BY2PR0401MB0901B0167734FEFB7F1E5DF6E5040@BY2PR0401MB0901.namprd04.prod.outlook.com>
+In-Reply-To: <BY2PR0401MB0901B0167734FEFB7F1E5DF6E5040@BY2PR0401MB0901.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-For things like NBD we want to be able to experiment with different
-sized requests going over the wire.  Half of our limit is controled by
-max_sectors_kb, but the other half is how many bvec's we can cram into a
-request, which is controlled by max_segments.  Changing this sysfs knob
-to be writeable allows us to be able to control our io limits more
-precisely.
-
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- block/blk-sysfs.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 4585426..e7db3f8 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -116,6 +116,19 @@ static ssize_t queue_max_sectors_show(struct request_queue *q, char *page)
- 	return queue_var_show(max_sectors_kb, (page));
- }
- 
-+static ssize_t queue_max_segments_store(struct request_queue *q,
-+					const char *page, size_t count)
-+{
-+	unsigned long max_segments;
-+	ssize_t ret = queue_var_store(&max_segments, page, count);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	q->limits.max_segments = (short)max_segments;
-+	return ret;
-+}
-+
- static ssize_t queue_max_segments_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show(queue_max_segments(q), (page));
-@@ -527,8 +540,9 @@ static struct queue_sysfs_entry queue_max_hw_sectors_entry = {
- };
- 
- static struct queue_sysfs_entry queue_max_segments_entry = {
--	.attr = {.name = "max_segments", .mode = S_IRUGO },
-+	.attr = {.name = "max_segments", .mode = S_IRUGO | S_IWUSR },
- 	.show = queue_max_segments_show,
-+	.store = queue_max_segments_store,
- };
- 
- static struct queue_sysfs_entry queue_max_discard_segments_entry = {
--- 
-2.7.4
+VGhlcmUgaXMgYW4gYWRkaXRpb25hbCBmdW5jdGlvbmFsaXR5LCB3aGljaCBpcyByZXF1aXJlIHRo
+ZSBob3N0IGxvY2sNCnRvIGJlIGhlbGQgZm9yIHNldmVyYWwgd3JpdGUgY29tbWFuZHMgLSB0aGUg
+RkZVLg0KSW4gY2FzZSBvZiBGRlUsIHRoZSBGVyBjYW4gYmUgZG93bmxvYWQvd3JpdGUgaW4gc2V2
+ZXJhbCBpdGVyYXRpb25zDQpvZiBXcml0ZSBjb21tYW5kIChDTUQyNSkuIFRoaXMgc2VxdWVuY2Ug
+c2hvdWxkIG5vdCBiZSBpbnRlcnJ1cHRlZCBieSByZWd1bGFyDQpXcml0ZSByZXF1ZXN0cy4NCklu
+IGN1cnJlbnQgZHJpdmVyLCBib3RoIEZGVSBhbmQgUlBNQiBjYW4gYmUgc2VudCBieSB1c2luZyBt
+bWNfYmxrX2lvY3RsX211bHRpX2NtZCgpLg0KDQpUaGFua3MsDQpBbGV4DQoNCg0KPiBPbiBBcHIg
+MTUsIDIwMTcsIGF0IDEwOjI0IFBNLCBBdnJpIEFsdG1hbiA8QXZyaS5BbHRtYW5Ac2FuZGlzay5j
+b20+IHdyb3RlOg0KPiANCj4gWW91IGNhbiBzZWUgaG93IGl0J3MgZG9uZSBpbiBtbWNfYmxrX2lv
+Y3RsX3JwbWJfY21kKCkuDQo+IA0KPiBUaGUgUlBNQiBwcm90b2NvbCBkZWZpbmVzIDYgdHlwZXMg
+b2YgYWNjZXNzZXM6DQo+IEFjY2Vzc2VzIHRoYXQgcGVyZm9ybXMgcmVhZCBvcGVyYXRpb24gKHJl
+YWQgY291bnRlciwgcmVhZCBkYXRhLCBhbmQgcmVhZCBjb25maWd1cmF0aW9uKSAtIHJlcXVpcmVz
+IHNlbmRpbmcgMiByZXF1ZXN0cy4gDQo+IEFjY2Vzc2VzIHRoYXQgcGVyZm9ybXMgd3JpdGUgb3Bl
+cmF0aW9uIChwcm9ncmFtIGtleSwgd3JpdGUgZGF0YSwgd3JpdGUgY29uZmlndXJhdGlvbikgLSBy
+ZXF1aXJlcyBzZW5kaW5nIDMgcmVxdWVzdHMsDQo+IEJ1dCB5b3UgbXVzdCBkbyByZWFkIGNvdW50
+ZXIgYmVmb3JlaGFuZCAoYWNjZXB0IGZyb20gcHJvZ3JhbSBrZXkpLCBoZW5jZSB0aGUgNSBkaWZm
+ZXJlbnQgcmVxdWVzdHMuDQo+IA0KPiBUaGUgc3RhbmRhcmQgZG9lcyBub3QgZGVmaW5lIGEgInNw
+ZWNpYWwiIHJlcXVlc3QgdGhhdCBkb2VzIGl0IGFsbCBpbiBvbmNlLCANCj4gYnV0IGV4cGVjdHMg
+YSBwcmUtZGVmaW5lIHNlcmllcyBvZiBjbWQxOCAmIGNtZDI1IGZvciBlYWNoIGFjY2VzcyB0eXBl
+LCANCj4gaW4gd2hpY2ggdGhlIHBheWxvYWQgYXJlIDUxMiBieXRlcyBmcmFtZXMgaW4gYSBwcmUt
+ZGVmaW5lZCBzdHJ1Y3R1cmUuDQo+IA0KPiBDaGVlcnMsDQo+IEF2cmkNCj4gDQo+PiAtLS0tLU9y
+aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPj4gRnJvbTogTGludXMgV2FsbGVpaiBbbWFpbHRvOmxpbnVz
+LndhbGxlaWpAbGluYXJvLm9yZ10NCj4+IFNlbnQ6IFNhdHVyZGF5LCBBcHJpbCAxNSwgMjAxNyA5
+OjM1IFBNDQo+PiBUbzogQXZyaSBBbHRtYW4gPEF2cmkuQWx0bWFuQHNhbmRpc2suY29tPg0KPj4g
+Q2M6IEFybmQgQmVyZ21hbm4gPGFybmRAYXJuZGIuZGU+OyBVbGYgSGFuc3Nvbg0KPj4gPHVsZi5o
+YW5zc29uQGxpbmFyby5vcmc+OyBsaW51eC1tbWNAdmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4+
+IGJsb2NrQHZnZXIua2VybmVsLm9yZzsgSmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRrPjsgQ2hy
+aXN0b3BoIEhlbGx3aWcNCj4+IDxoY2hAbHN0LmRlPjsgQWRyaWFuIEh1bnRlciA8YWRyaWFuLmh1
+bnRlckBpbnRlbC5jb20+OyBQYW9sbyBWYWxlbnRlDQo+PiA8cGFvbG8udmFsZW50ZUBsaW5hcm8u
+b3JnPg0KPj4gU3ViamVjdDogUmU6IE91dHN0YW5kaW5nIE1RIHF1ZXN0aW9ucyBmcm9tIE1NQw0K
+Pj4gDQo+PiBPbiBGcmksIEFwciAxNCwgMjAxNyBhdCA4OjQxIFBNLCBBdnJpIEFsdG1hbiA8QXZy
+aS5BbHRtYW5Ac2FuZGlzay5jb20+DQo+PiB3cm90ZToNCj4+PiBbTWVdDQo+Pj4+IDIuIFR1cm4g
+UlBNQiBhbmQgb3RoZXIgaW9jdGwoKSBNTUMgb3BlcmF0aW9ucyBpbnRvIG1tY19xdWV1ZV9yZXEN
+Cj4+Pj4gICB0aGluZ3MgYW5kIGZ1bm5lbCB0aGVtIGludG8gdGhlIGJsb2NrIHNjaGVkdWxlcg0K
+Pj4+PiAgIHVzaW5nIFJFUV9PUF9EUlZfSU4vT1VUIHJlcXVlc3RzLg0KPj4+PiANCj4+PiANCj4+
+PiBBY2Nlc3NpbmcgdGhlIFJQTUIgaXMgZG9uZSB2aWEgYSBzdHJhbmdlIHByb3RvY29sLCBpbiB3
+aGljaCBlYWNoIGFjY2VzcyBpcw0KPj4gY29tcHJpc2VkIG9mIHNldmVyYWwgcmVxdWVzdHMuDQo+
+Pj4gRm9yIGV4YW1wbGUsIHdyaXRpbmcgdG8gdGhlIFJQTUIgd2lsbCByZXF1aXJlIHNlbmRpbmcg
+NSBkaWZmZXJlbnQgcmVxdWVzdHM6DQo+Pj4gMiByZXF1ZXN0cyB0byByZWFkIHRoZSB3cml0ZSBj
+b3VudGVyLCBhbmQgdGhlbiAzIG1vcmUgcmVxdWVzdHMgZm9yIHRoZQ0KPj4gd3JpdGUgb3BlcmF0
+aW9uIGl0c2VsZi4NCj4+PiANCj4+PiBPbmNlIHRoZSBzZXF1ZW5jZSBoYXMgc3RhcnRlZCwgaXQg
+c2hvdWxkIG5vdCBnZXQgaW50ZXJmZXJlZCBieSBvdGhlcg0KPj4gcmVxdWVzdHMsIG9yIHRoZSBv
+cGVyYXRpb24gd2lsbCBmYWlsLg0KPj4gDQo+PiBTbyBJIGd1ZXNzIGN1cnJlbnRseSBzb21ldGhp
+bmcgdGFrZXMgYSBob3N0IGxvY2sgYW5kIHRoZW4gcGVyZm9ybXMgdGhlDQo+PiA1IHJlcXVlc3Rz
+Lg0KPj4gDQo+PiBUaHVzIHdlIG5lZWQgdG8gc2VuZCBhIHNpbmdsZSBjdXN0b20gcmVxdWVzdCBj
+b250YWluaW5nIGEgbGlzdCBvZiA1IHRoaW5ncyB0bw0KPj4gZG8sIGFuZCByZXR1cm4gYWZ0ZXIg
+dGhhdC4NCj4+IA0KPj4gT3IgZG8geW91IG1lYW4gdGhhdCB3ZSByZXR1cm4gdG8gdXNlcnNwYWNl
+IGluYmV0d2VlbiB0aGVzZSBkaWZmZXJlbnQNCj4+IHJlcXVlc3RzIGFuZCB0aGUgc2VxdWVuY2lu
+ZyBpcyBkb25lIGluIHVzZXJzcGFjZT8NCj4+IA0KPj4gSSBob3BlIG5vdCBiZWNhdXNlIHRoYXQg
+c291bmRzIGZyYWdpbGUsIGxpa2UgdXNlcnNwYWNlIGNvdWxkIGNyYXNoIGFuZCBsZWF2ZQ0KPj4g
+dGhlIGhvc3QgbG9jayBkYW5nbGluZyA6Lw0KPj4gDQo+PiBZb3VycywNCj4+IExpbnVzIFdhbGxl
+aWoNCj4gE++/ve+/vey5uxzvv70m77+9fu+/vSbvv70Y77+977+9Ky3vv73vv73dthfvv73vv713
+77+977+9y5vvv73vv73vv71t77+9Yu+/ve+/vWbvv73Ip++/vRfvv73vv73cqH3vv73vv73vv73G
+oHrvv70majordu+/ve+/ve+/vQfvv73vv73vv73vv716Wivvv73vv70rembvv73vv73vv71o77+9
+77+977+9fu+/ve+/ve+/ve+/vWnvv73vv73vv71677+9Hu+/vXfvv73vv73vv70/77+977+977+9
+77+9Ju+/vSnfohtmDQoNCg==
