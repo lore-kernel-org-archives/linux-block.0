@@ -1,65 +1,161 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:49401 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754947AbdDTCFh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2017 22:05:37 -0400
-To: Ilya Dryomov <idryomov@gmail.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        dm-devel@redhat.com, ceph-devel@vger.kernel.org,
-        Keith Busch <keith.busch@intel.com>
-Subject: Re: [PATCH] block: get rid of blk_integrity_revalidate()
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <1492533800-30627-1-git-send-email-idryomov@gmail.com>
-Date: Wed, 19 Apr 2017 22:04:59 -0400
-In-Reply-To: <1492533800-30627-1-git-send-email-idryomov@gmail.com> (Ilya
-        Dryomov's message of "Tue, 18 Apr 2017 18:43:20 +0200")
-Message-ID: <yq1shl3rfzo.fsf@oracle.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Ilya Dryomov <idryomov@gmail.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH] block: get rid of blk_integrity_revalidate()
+Date: Tue, 18 Apr 2017 18:43:20 +0200
+Message-Id: <1492533800-30627-1-git-send-email-idryomov@gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+ ceph-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Jens Axboe <axboe@fb.com>, dm-devel@redhat.com,
+ Dan Williams <dan.j.williams@intel.com>, Christoph Hellwig <hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Ilya Dryomov <idryomov@gmail.com> writes:
+Commit 25520d55cdb6 ("block: Inline blk_integrity in struct gendisk")
+introduced blk_integrity_revalidate(), which seems to assume ownership
+of the stable pages flag and unilaterally clears it if no blk_integrity
+profile is registered:
 
-Ilya,
+    if (bi->profile)
+            disk->queue->backing_dev_info->capabilities |=
+                    BDI_CAP_STABLE_WRITES;
+    else
+            disk->queue->backing_dev_info->capabilities &=
+                    ~BDI_CAP_STABLE_WRITES;
 
-> Commit 25520d55cdb6 ("block: Inline blk_integrity in struct gendisk")
-> introduced blk_integrity_revalidate(), which seems to assume ownership
-> of the stable pages flag and unilaterally clears it if no blk_integrity
-> profile is registered:
->
->     if (bi->profile)
->             disk->queue->backing_dev_info->capabilities |=
->                     BDI_CAP_STABLE_WRITES;
->     else
->             disk->queue->backing_dev_info->capabilities &=
->                     ~BDI_CAP_STABLE_WRITES;
->
-> It's called from revalidate_disk() and rescan_partitions(), making it
-> impossible to enable stable pages for drivers that support partitions
-> and don't use blk_integrity: while the call in revalidate_disk() can be
-> trivially worked around (see zram, which doesn't support partitions and
-> hence gets away with zram_revalidate_disk()), rescan_partitions() can
-> be triggered from userspace at any time.  This breaks rbd, where the
-> ceph messenger is responsible for generating/verifying CRCs.
->
-> Since blk_integrity_{un,}register() "must" be used for (un)registering
-> the integrity profile with the block layer, move BDI_CAP_STABLE_WRITES
-> setting there.  This way drivers that call blk_integrity_register() and
-> use integrity infrastructure won't interfere with drivers that don't
-> but still want stable pages.
+It's called from revalidate_disk() and rescan_partitions(), making it
+impossible to enable stable pages for drivers that support partitions
+and don't use blk_integrity: while the call in revalidate_disk() can be
+trivially worked around (see zram, which doesn't support partitions and
+hence gets away with zram_revalidate_disk()), rescan_partitions() can
+be triggered from userspace at any time.  This breaks rbd, where the
+ceph messenger is responsible for generating/verifying CRCs.
 
-I seem to recall that the reason for the revalidate hook was that either
-NVMe or nvdimm had to register an integrity profile prior to the actual
-format being known.
+Since blk_integrity_{un,}register() "must" be used for (un)registering
+the integrity profile with the block layer, move BDI_CAP_STABLE_WRITES
+setting there.  This way drivers that call blk_integrity_register() and
+use integrity infrastructure won't interfere with drivers that don't
+but still want stable pages.
 
-So while I am OK with the change from a SCSI perspective, I think we
-need Keith and Dan to ack it.
+Fixes: 25520d55cdb6 ("block: Inline blk_integrity in struct gendisk")
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: stable@vger.kernel.org # 4.4+, needs backporting
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+---
+I don't have any integrity-capable disks or nvme separate-metadata
+cards, so I couldn't test this as well as I wanted to.  25520d55cdb6
+went in with some nvme work, but Martin recalls that it may have had
+something to do with integrity-capable dm arrays losing the integrity
+capability at runtime.  Previous discussion at
 
+    http://www.spinics.net/lists/ceph-devel/msg35413.html
+
+---
+ block/blk-integrity.c     | 19 ++-----------------
+ block/partition-generic.c |  1 -
+ fs/block_dev.c            |  1 -
+ include/linux/genhd.h     |  2 --
+ 4 files changed, 2 insertions(+), 21 deletions(-)
+
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 9f0ff5ba4f84..35c5af1ea068 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -417,7 +417,7 @@ void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template
+ 	bi->tuple_size = template->tuple_size;
+ 	bi->tag_size = template->tag_size;
+ 
+-	blk_integrity_revalidate(disk);
++	disk->queue->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
+ }
+ EXPORT_SYMBOL(blk_integrity_register);
+ 
+@@ -430,26 +430,11 @@ EXPORT_SYMBOL(blk_integrity_register);
+  */
+ void blk_integrity_unregister(struct gendisk *disk)
+ {
+-	blk_integrity_revalidate(disk);
++	disk->queue->backing_dev_info->capabilities &= ~BDI_CAP_STABLE_WRITES;
+ 	memset(&disk->queue->integrity, 0, sizeof(struct blk_integrity));
+ }
+ EXPORT_SYMBOL(blk_integrity_unregister);
+ 
+-void blk_integrity_revalidate(struct gendisk *disk)
+-{
+-	struct blk_integrity *bi = &disk->queue->integrity;
+-
+-	if (!(disk->flags & GENHD_FL_UP))
+-		return;
+-
+-	if (bi->profile)
+-		disk->queue->backing_dev_info->capabilities |=
+-			BDI_CAP_STABLE_WRITES;
+-	else
+-		disk->queue->backing_dev_info->capabilities &=
+-			~BDI_CAP_STABLE_WRITES;
+-}
+-
+ void blk_integrity_add(struct gendisk *disk)
+ {
+ 	if (kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 7afb9907821f..0171a2faad68 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -497,7 +497,6 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+ 
+ 	if (disk->fops->revalidate_disk)
+ 		disk->fops->revalidate_disk(disk);
+-	blk_integrity_revalidate(disk);
+ 	check_disk_size_change(disk, bdev);
+ 	bdev->bd_invalidated = 0;
+ 	if (!get_capacity(disk) || !(state = check_partition(disk, bdev)))
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 2eca00ec4370..56039dfbc674 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1451,7 +1451,6 @@ int revalidate_disk(struct gendisk *disk)
+ 
+ 	if (disk->fops->revalidate_disk)
+ 		ret = disk->fops->revalidate_disk(disk);
+-	blk_integrity_revalidate(disk);
+ 	bdev = bdget_disk(disk, 0);
+ 	if (!bdev)
+ 		return ret;
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 76f39754e7b0..76d6a1cd4153 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -722,11 +722,9 @@ static inline void part_nr_sects_write(struct hd_struct *part, sector_t size)
+ #if defined(CONFIG_BLK_DEV_INTEGRITY)
+ extern void blk_integrity_add(struct gendisk *);
+ extern void blk_integrity_del(struct gendisk *);
+-extern void blk_integrity_revalidate(struct gendisk *);
+ #else	/* CONFIG_BLK_DEV_INTEGRITY */
+ static inline void blk_integrity_add(struct gendisk *disk) { }
+ static inline void blk_integrity_del(struct gendisk *disk) { }
+-static inline void blk_integrity_revalidate(struct gendisk *disk) { }
+ #endif	/* CONFIG_BLK_DEV_INTEGRITY */
+ 
+ #else /* CONFIG_BLOCK */
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.4.3
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
