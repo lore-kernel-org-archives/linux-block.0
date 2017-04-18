@@ -1,64 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755698AbdDOS4w (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2017 14:56:52 -0400
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [GIT PULL 15/19] lightnvm: convert sprintf into strlcpy
-Date: Sat, 15 Apr 2017 20:55:49 +0200
-Message-ID: <20170415185553.16098-16-matias@cnexlabs.com>
-In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
-References: <20170415185553.16098-1-matias@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Received: from bombadil.infradead.org ([65.50.211.133]:44464 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757438AbdDRPwq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Apr 2017 11:52:46 -0400
+From: Christoph Hellwig <hch@bombadil.infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+        James Smart <james.smart@broadcom.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Christoph Hellwig <hch@lst.de>
+Subject: swim3: remove (commented out) printing of req->errors
+Date: Tue, 18 Apr 2017 08:52:26 -0700
+Message-Id: <20170418155229.5977-21-hch@bombadil.infradead.org>
+In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
+References: <20170418155229.5977-1-hch@bombadil.infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+From: Christoph Hellwig <hch@lst.de>
 
-Convert sprintf calls to strlcpy in order to make possible buffer
-overflow more obvious.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/block/swim3.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 258007a..2c26af3 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -273,7 +273,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		goto err_disk;
- 	blk_queue_make_request(tqueue, tt->make_rq);
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index 61b3ffa4f458..ba4809c9bdba 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -343,8 +343,8 @@ static void start_request(struct floppy_state *fs)
+ 			  req->rq_disk->disk_name, req->cmd,
+ 			  (long)blk_rq_pos(req), blk_rq_sectors(req),
+ 			  bio_data(req->bio));
+-		swim3_dbg("           errors=%d current_nr_sectors=%u\n",
+-			  req->errors, blk_rq_cur_sectors(req));
++		swim3_dbg("           current_nr_sectors=%u\n",
++			  blk_rq_cur_sectors(req));
+ #endif
  
--	sprintf(tdisk->disk_name, "%s", create->tgtname);
-+	strlcpy(tdisk->disk_name, create->tgtname, sizeof(tdisk->disk_name));
- 	tdisk->flags = GENHD_FL_EXT_DEVT;
- 	tdisk->major = 0;
- 	tdisk->first_minor = 0;
-@@ -1198,13 +1198,13 @@ static long nvm_ioctl_get_devices(struct file *file, void __user *arg)
- 	list_for_each_entry(dev, &nvm_devices, devices) {
- 		struct nvm_ioctl_device_info *info = &devices->info[i];
- 
--		sprintf(info->devname, "%s", dev->name);
-+		strlcpy(info->devname, dev->name, sizeof(info->devname));
- 
- 		/* kept for compatibility */
- 		info->bmversion[0] = 1;
- 		info->bmversion[1] = 0;
- 		info->bmversion[2] = 0;
--		sprintf(info->bmname, "%s", "gennvm");
-+		strlcpy(info->bmname, "gennvm", sizeof(info->bmname));
- 		i++;
- 
- 		if (i > 31) {
+ 		if (blk_rq_pos(req) >= fs->total_secs) {
 -- 
-2.9.3
+2.11.0
