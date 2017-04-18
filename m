@@ -1,23 +1,59 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 19 Apr 2017 08:21:45 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>
-Subject: Re: [PATCH 5/5] block: Optimize ioprio_best()
-Message-ID: <20170419062145.GE6412@lst.de>
-References: <20170418231037.3968-1-bart.vanassche@sandisk.com> <20170418231037.3968-6-bart.vanassche@sandisk.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>,
+	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 5/5] block: Optimize ioprio_best()
+Date: Tue, 18 Apr 2017 16:10:37 -0700
+Message-ID: <20170418231037.3968-6-bart.vanassche@sandisk.com>
+In-Reply-To: <20170418231037.3968-1-bart.vanassche@sandisk.com>
+References: <20170418231037.3968-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170418231037.3968-6-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset="UTF-8"
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Apr 18, 2017 at 04:10:37PM -0700, Bart Van Assche wrote:
-> Since ioprio_best() translates IOPRIO_CLASS_NONE into IOPRIO_CLASS_BE
-> and since lower numerical priority values represent a higher priority
-> a simple numerical comparison is sufficient.
+Since ioprio_best() translates IOPRIO_CLASS_NONE into IOPRIO_CLASS_BE
+and since lower numerical priority values represent a higher priority
+a simple numerical comparison is sufficient.
 
-Looks good,
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Adam Manzanares <adam.manzanares@wdc.com>
+Tested-by: Adam Manzanares <adam.manzanares@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Matias Bjørling <m@bjorling.me>
+---
+ block/ioprio.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/ioprio.c b/block/ioprio.c
+index 0c47a00f92a8..4b120c9cf7e8 100644
+--- a/block/ioprio.c
++++ b/block/ioprio.c
+@@ -163,22 +163,12 @@ static int get_task_ioprio(struct task_struct *p)
+ 
+ int ioprio_best(unsigned short aprio, unsigned short bprio)
+ {
+-	unsigned short aclass;
+-	unsigned short bclass;
+-
+ 	if (!ioprio_valid(aprio))
+ 		aprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_NORM);
+ 	if (!ioprio_valid(bprio))
+ 		bprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_NORM);
+ 
+-	aclass = IOPRIO_PRIO_CLASS(aprio);
+-	bclass = IOPRIO_PRIO_CLASS(bprio);
+-	if (aclass == bclass)
+-		return min(aprio, bprio);
+-	if (aclass > bclass)
+-		return bprio;
+-	else
+-		return aprio;
++	return min(aprio, bprio);
+ }
+ 
+ SYSCALL_DEFINE2(ioprio_get, int, which, int, who)
+-- 
+2.12.2
