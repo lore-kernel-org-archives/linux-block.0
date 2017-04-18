@@ -1,32 +1,62 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
-        snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 11/25] block: add a REQ_UNMAP flag for REQ_OP_WRITE_ZEROES
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20170331163313.31821-1-hch@lst.de>
-	<20170331163313.31821-12-hch@lst.de>
-Date: Wed, 05 Apr 2017 07:46:55 -0400
-In-Reply-To: <20170331163313.31821-12-hch@lst.de> (Christoph Hellwig's message
-	of "Fri, 31 Mar 2017 18:32:59 +0200")
-Message-ID: <yq11st7t6ts.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <BATV+245451ebeca5033ceab8+4986+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@bombadil.infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	Christoph Hellwig <hch@lst.de>
+Subject: virtio: fix spelling of virtblk_scsi_request_done
+Date: Tue, 18 Apr 2017 08:52:11 -0700
+Message-Id: <20170418155229.5977-6-hch@bombadil.infradead.org>
+In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
+References: <20170418155229.5977-1-hch@bombadil.infradead.org>
+Sender: Christoph Hellwig <hch@infradead.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Christoph Hellwig <hch@lst.de> writes:
+From: Christoph Hellwig <hch@lst.de>
 
-> If this flag is set logical provisioning capable device should
-> release space for the zeroed blocks if possible, if it is not set
-> devices should keep the blocks anchored.
->
-> Also remove an out of sync kerneldoc comment for a static function
-> that would have become even more out of data with this change.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
+---
+ drivers/block/virtio_blk.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index eaf99022bdc6..dbc4e80680b1 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -111,7 +111,7 @@ static int virtblk_add_req_scsi(struct virtqueue *vq, struct virtblk_req *vbr,
+ 	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
+ }
+ 
+-static inline void virtblk_scsi_reques_done(struct request *req)
++static inline void virtblk_scsi_request_done(struct request *req)
+ {
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+ 	struct virtio_blk *vblk = req->q->queuedata;
+@@ -144,7 +144,7 @@ static inline int virtblk_add_req_scsi(struct virtqueue *vq,
+ {
+ 	return -EIO;
+ }
+-static inline void virtblk_scsi_reques_done(struct request *req)
++static inline void virtblk_scsi_request_done(struct request *req)
+ {
+ }
+ #define virtblk_ioctl	NULL
+@@ -180,7 +180,7 @@ static inline void virtblk_request_done(struct request *req)
+ 	switch (req_op(req)) {
+ 	case REQ_OP_SCSI_IN:
+ 	case REQ_OP_SCSI_OUT:
+-		virtblk_scsi_reques_done(req);
++		virtblk_scsi_request_done(req);
+ 		break;
+ 	case REQ_OP_DRV_IN:
+ 		req->errors = (error != 0);
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.11.0
