@@ -1,47 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:44464 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757438AbdDRPwq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2017 11:52:46 -0400
-From: Christoph Hellwig <hch@bombadil.infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-        James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Christoph Hellwig <hch@lst.de>
-Subject: swim3: remove (commented out) printing of req->errors
-Date: Tue, 18 Apr 2017 08:52:26 -0700
-Message-Id: <20170418155229.5977-21-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <dsterba@suse.cz>
+Date: Tue, 18 Apr 2017 13:39:02 +0200
+From: David Sterba <dsterba@suse.cz>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	sagi@grimberg.me, avi@scylladb.com, axboe@kernel.dk,
+	linux-api@vger.kernel.org, willy@infradead.org,
+	tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 8/8] nowait aio: btrfs
+Message-ID: <20170418113902.GS4781@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20170414120257.8932-1-rgoldwyn@suse.de>
+ <20170414120257.8932-9-rgoldwyn@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170414120257.8932-9-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+On Fri, Apr 14, 2017 at 07:02:57AM -0500, Goldwyn Rodrigues wrote:
+> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> 
+> Return EAGAIN if any of the following checks fail
+>  + i_rwsem is not lockable
+>  + NODATACOW or PREALLOC is not set
+>  + Cannot nocow at the desired location
+>  + Writing beyond end of file which is not allocated
+> 
+> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/swim3.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Acked-by: David Sterba <dsterba@suse.com>
 
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index 61b3ffa4f458..ba4809c9bdba 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -343,8 +343,8 @@ static void start_request(struct floppy_state *fs)
- 			  req->rq_disk->disk_name, req->cmd,
- 			  (long)blk_rq_pos(req), blk_rq_sectors(req),
- 			  bio_data(req->bio));
--		swim3_dbg("           errors=%d current_nr_sectors=%u\n",
--			  req->errors, blk_rq_cur_sectors(req));
-+		swim3_dbg("           current_nr_sectors=%u\n",
-+			  blk_rq_cur_sectors(req));
- #endif
- 
- 		if (blk_rq_pos(req) >= fs->total_secs) {
--- 
-2.11.0
+> +	if ((iocb->ki_flags & IOCB_NOWAIT) &&
+> +			(iocb->ki_flags & IOCB_DIRECT)) {
+> +		/* Don't sleep on inode rwsem */
+> +		if (!inode_trylock(inode))
+> +			return -EAGAIN;
+> +		/*
+> +		 * We will allocate space in case nodatacow is not set,
+> +		 * so bail
+> +		 */
+> +		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
+> +					      BTRFS_INODE_PREALLOC)) ||
+> +		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
+> +			inode_unlock(inode);
+> +			return -EAGAIN;
+> +		}
+> +	} else
+
+	} else {
+
+> +		inode_lock(inode);
+
+	}
