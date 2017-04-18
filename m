@@ -1,64 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751616AbdDOS41 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2017 14:56:27 -0400
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        NeilBrown <neilb@suse.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [GIT PULL 07/19] lightnvm: don't check for failure from mempool_alloc()
-Date: Sat, 15 Apr 2017 20:55:41 +0200
-Message-ID: <20170415185553.16098-8-matias@cnexlabs.com>
-In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
-References: <20170415185553.16098-1-matias@cnexlabs.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v3 5/8] blk-mq: Make blk_flags_show() callers append a newline character
+Date: Tue, 18 Apr 2017 16:29:46 -0700
+Message-ID: <20170418232949.5228-6-bart.vanassche@sandisk.com>
+In-Reply-To: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: NeilBrown <neilb@suse.com>
+This patch does not change any functionality but makes it possible
+to produce a single line of output with multiple flag-to-name
+translations.
 
-mempool_alloc() cannot fail if the gfp flags allow it to
-sleep, and both GFP_KERNEL and GFP_NOIO allows for sleeping.
-
-So rrpc_move_valid_pages() and rrpc_make_rq() don't need to
-test the return value.
-
-Signed-off-by: NeilBrown <neilb@suse.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
 ---
- drivers/lightnvm/rrpc.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ block/blk-mq-debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 4e4c299..a8acf9e 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -318,10 +318,6 @@ static int rrpc_move_valid_pages(struct rrpc *rrpc, struct rrpc_block *rblk)
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 34cac9a5fd28..27054293b37b 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -60,7 +60,6 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
+ 		else
+ 			seq_printf(m, "%d", i);
  	}
+-	seq_puts(m, "\n");
+ 	return 0;
+ }
  
- 	page = mempool_alloc(rrpc->page_pool, GFP_NOIO);
--	if (!page) {
--		bio_put(bio);
--		return -ENOMEM;
--	}
+@@ -102,6 +101,7 @@ static int blk_queue_flags_show(struct seq_file *m, void *v)
  
- 	while ((slot = find_first_zero_bit(rblk->invalid_pages,
- 					    nr_sec_per_blk)) < nr_sec_per_blk) {
-@@ -1006,11 +1002,6 @@ static blk_qc_t rrpc_make_rq(struct request_queue *q, struct bio *bio)
- 	}
+ 	blk_flags_show(m, q->queue_flags, blk_queue_flag_name,
+ 		       ARRAY_SIZE(blk_queue_flag_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
  
- 	rqd = mempool_alloc(rrpc->rq_pool, GFP_KERNEL);
--	if (!rqd) {
--		pr_err_ratelimited("rrpc: not able to queue bio.");
--		bio_io_error(bio);
--		return BLK_QC_T_NONE;
--	}
- 	memset(rqd, 0, sizeof(struct nvm_rq));
+@@ -190,6 +190,7 @@ static int hctx_state_show(struct seq_file *m, void *v)
  
- 	err = rrpc_submit_io(rrpc, bio, rqd, NVM_IOTYPE_NONE);
+ 	blk_flags_show(m, hctx->state, hctx_state_name,
+ 		       ARRAY_SIZE(hctx_state_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
+ 
+@@ -233,6 +234,7 @@ static int hctx_flags_show(struct seq_file *m, void *v)
+ 	blk_flags_show(m,
+ 		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
+ 		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
+ 
 -- 
-2.9.3
+2.12.2
