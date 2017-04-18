@@ -1,35 +1,58 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd-general@lists.sourceforge.net,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH] nbd: set the max segment size to UINT_MAX
-Date: Tue, 18 Apr 2017 16:22:51 -0400
-Message-Id: <1492546971-2682-1-git-send-email-jbacik@fb.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v3 0/8] blk-mq debugfs patches for kernel v4.12
+Date: Tue, 18 Apr 2017 16:29:41 -0700
+Message-ID: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-NBD doesn't care about limiting the segment size, let the user push the
-largest bio's they want.  This allows us to control the request size
-solely through max_sectors_kb.
+Hello Jens,
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 1 +
- 1 file changed, 1 insertion(+)
+Please consider the eight patches in this series for kernel v4.12.
+These patches improve blk-mq debugfs support.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index b78f23c..6e592c2 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1469,6 +1469,7 @@ static int nbd_dev_add(int index)
- 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, disk->queue);
- 	disk->queue->limits.discard_granularity = 512;
- 	blk_queue_max_discard_sectors(disk->queue, UINT_MAX);
-+	blk_queue_max_segment_size(disk->queue, UINT_MAX);
- 	blk_queue_max_hw_sectors(disk->queue, 65536);
- 	disk->queue->limits.max_sectors = 256;
- 
+Thanks,
+
+Bart.
+
+Changes compared to v2:
+- Changed the mutex_lock() calls in registration methods into
+  mutex_lock_interruptible() since these functions can be called from
+  the context of a user space process.
+- Avoid that the blk_mq_register_dev() changes in patch 1/8 cause a
+  deadlock.
+
+Changes compared to v1:
+- Added two patches and replaced patch 1/6 such that debugfs
+  attributes are now unregistered before freeing of a blk-mq queue
+  starts instead of checking the "dead" queue flag.
+- Changed "rq->cmd_flags ^ op" into "rq->cmd_flags & ~REQ_OP_MASK" as
+  proposed by Omar.
+- A seq_file pointer is now passed to the new queue_rq callback function
+  instead of a fixed-size char buffer.
+
+Bart Van Assche (8):
+  blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
+  blk-mq: Let blk_mq_debugfs_register() look up the queue name
+  blk-mq: Unregister debugfs attributes earlier
+  blk-mq: Move the "state" debugfs attribute one level down
+  blk-mq: Make blk_flags_show() callers append a newline character
+  blk-mq: Show operation, cmd_flags and rq_flags names
+  blk-mq: Add blk_mq_ops.show_rq()
+  scsi: Implement blk_mq_ops.show_rq()
+
+ block/blk-mq-debugfs.c  | 94 +++++++++++++++++++++++++++++++++++++++++--------
+ block/blk-mq-sysfs.c    | 66 +++++++++++++++++++---------------
+ block/blk-mq.h          |  6 ++--
+ block/blk-sysfs.c       |  9 +++--
+ drivers/scsi/scsi_lib.c | 26 ++++++++++++++
+ include/linux/blk-mq.h  |  6 ++++
+ 6 files changed, 156 insertions(+), 51 deletions(-)
+
 -- 
-2.7.4
+2.12.2
