@@ -1,42 +1,51 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "jthumshirn@suse.de" <jthumshirn@suse.de>
-CC: "zhaohongjiang@huawei.com" <zhaohongjiang@huawei.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "yanaijie@huawei.com"
-	<yanaijie@huawei.com>, "miaoxie@huawei.com" <miaoxie@huawei.com>,
-	"jack@suse.cz" <jack@suse.cz>
+Return-Path: <jthumshirn@suse.de>
+Date: Tue, 18 Apr 2017 09:35:26 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Russell King <linux@armlinux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+	Jan Kara <jack@suse.cz>, yanaijie@huawei.com,
+	zhaohongjiang@huawei.com, miaoxie@huawei.com,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH] ARM: Fix rd_size declaration
-Date: Tue, 18 Apr 2017 14:07:53 +0000
-Message-ID: <1492524472.2628.3.camel@sandisk.com>
+Message-ID: <20170418073526.GA6056@linux-x5ow.site>
 References: <20170417231003.7178-1-bart.vanassche@sandisk.com>
-	 <20170418073526.GA6056@linux-x5ow.site>
-In-Reply-To: <20170418073526.GA6056@linux-x5ow.site>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170417231003.7178-1-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTA0LTE4IGF0IDA5OjM1ICswMjAwLCBKb2hhbm5lcyBUaHVtc2hpcm4gd3Jv
-dGU6DQo+IE9uIE1vbiwgQXByIDE3LCAyMDE3IGF0IDA0OjEwOjAzUE0gLTA3MDAsIEJhcnQgVmFu
-IEFzc2NoZSB3cm90ZToNCj4gPiBUaGUgZ2xvYmFsIHZhcmlhYmxlICdyZF9zaXplJyBpcyBkZWNs
-YXJlZCBhcyAnaW50JyBpbiBzb3VyY2UgZmlsZQ0KPiA+IGFyY2gvYXJtL2tlcm5lbC9hdGFnc19w
-YXJzZS5jIGFuZCBhcyAndW5zaWduZWQgbG9uZycgaW4NCj4gPiBkcml2ZXJzL2Jsb2NrL2JyZC5j
-LiBGaXggdGhpcyBpbmNvbnNpc3RlbmN5Lg0KPiA+IA0KPiA+IFNpZ25lZC1vZmYtYnk6IEJhcnQg
-VmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAc2FuZGlzay5jb20+DQo+ID4gQ2M6IFJ1c3NlbGwg
-S2luZyA8bGludXhAYXJtbGludXgub3JnLnVrPg0KPiA+IENjOiBKZW5zIEF4Ym9lIDxheGJvZUBr
-ZXJuZWwuZGs+DQo+ID4gQ2M6IEphbiBLYXJhIDxqYWNrQHN1c2UuY3o+DQo+ID4gQ2M6IDx5YW5h
-aWppZUBodWF3ZWkuY29tPg0KPiA+IENjOiA8emhhb2hvbmdqaWFuZ0BodWF3ZWkuY29tPg0KPiA+
-IENjOiA8bWlhb3hpZUBodWF3ZWkuY29tPg0KPiA+IENjOiBsaW51eC1hcm0ta2VybmVsQGxpc3Rz
-LmluZnJhZGVhZC5vcmcNCj4gPiBDYzogbGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnDQo+ID4g
-LS0tDQo+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvYnJkLmggYi9pbmNsdWRlL2xpbnV4
-L2JyZC5oDQo+ID4gbmV3IGZpbGUgbW9kZSAxMDA2NDQNCj4gPiBpbmRleCAwMDAwMDAwMDAwMDAu
-LmRiYjBmOTJmZWZjOA0KPiA+IC0tLSAvZGV2L251bGwNCj4gPiArKysgYi9pbmNsdWRlL2xpbnV4
-L2JyZC5oDQo+ID4gQEAgLTAsMCArMSBAQA0KPiA+ICtleHRlcm4gdW5zaWduZWQgbG9uZyByZF9z
-aXplOw0KPiANCj4gU21hbGwgbml0LCBjYW4geW91IGFkZCBhbiBpbmNsdWRlIGd1YXJkIGhlcmUg
-YXMgd2VsbD8NCg0KSGVsbG8gSm9oYW5uZXMsDQoNClRoYW5rcyBmb3IgdGhlIHJldmlldy4gQnV0
-IGFyZSB5b3UgYXdhcmUgdGhhdCB3aXRoIHRoZSBjdXJyZW50IGNvbnRlbnQgYW4NCmluY2x1ZGUg
-Z3VhcmQgaXMgb3ZlcmtpbGwgYmVjYXVzZSBpdCBpcyBzYWZlIHRvIGV2YWx1YXRlIHRoZSAiZXh0
-ZXJuIHVuc2lnbmVkDQpsb25nIHJkX3NpemUiIGRlY2xhcmF0aW9uIG11bHRpcGxlIHRpbWVzPw0K
-DQpCYXJ0Lg==
+On Mon, Apr 17, 2017 at 04:10:03PM -0700, Bart Van Assche wrote:
+> The global variable 'rd_size' is declared as 'int' in source file
+> arch/arm/kernel/atags_parse.c and as 'unsigned long' in
+> drivers/block/brd.c. Fix this inconsistency.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: <yanaijie@huawei.com>
+> Cc: <zhaohongjiang@huawei.com>
+> Cc: <miaoxie@huawei.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-block@vger.kernel.org
+> ---
+> diff --git a/include/linux/brd.h b/include/linux/brd.h
+> new file mode 100644
+> index 000000000000..dbb0f92fefc8
+> --- /dev/null
+> +++ b/include/linux/brd.h
+> @@ -0,0 +1 @@
+> +extern unsigned long rd_size;
+
+Small nit, can you add an include guard here as well?
+
+Thanks,
+	Johannes
+
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
