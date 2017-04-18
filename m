@@ -1,31 +1,45 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "linux@armlinux.org.uk" <linux@armlinux.org.uk>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "jack@suse.cz" <jack@suse.cz>,
-	"zhaohongjiang@huawei.com" <zhaohongjiang@huawei.com>, "yanaijie@huawei.com"
-	<yanaijie@huawei.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"miaoxie@huawei.com" <miaoxie@huawei.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Tue, 18 Apr 2017 16:10:50 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "zhaohongjiang@huawei.com" <zhaohongjiang@huawei.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"yanaijie@huawei.com" <yanaijie@huawei.com>,
+	"miaoxie@huawei.com" <miaoxie@huawei.com>,
+	"jack@suse.cz" <jack@suse.cz>
 Subject: Re: [PATCH] ARM: Fix rd_size declaration
-Date: Wed, 26 Apr 2017 20:51:35 +0000
-Message-ID: <1493239894.2632.15.camel@sandisk.com>
+Message-ID: <20170418141050.GG6056@linux-x5ow.site>
 References: <20170417231003.7178-1-bart.vanassche@sandisk.com>
-In-Reply-To: <20170417231003.7178-1-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170418073526.GA6056@linux-x5ow.site>
+ <1492524472.2628.3.camel@sandisk.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1492524472.2628.3.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2017-04-17 at 16:10 -0700, Bart Van Assche wrote:
-> The global variable 'rd_size' is declared as 'int' in source file
-> arch/arm/kernel/atags_parse.c and as 'unsigned long' in
-> drivers/block/brd.c. Fix this inconsistency.
-> [ ... ]
+On Tue, Apr 18, 2017 at 02:07:53PM +0000, Bart Van Assche wrote:
+> Hello Johannes,
+> 
+> Thanks for the review. But are you aware that with the current content an
+> include guard is overkill because it is safe to evaluate the "extern unsigned
+> long rd_size" declaration multiple times?
 
-Hello Russell,
+Yes I am. But once someone does changes to this header and forgets the include
+guard as well it may cause errors.
 
-Have I sent this patch to the right maintainer?
+I am aware that this is rather cosmetic than needed, that's why I declared it
+as a nit.
 
-Thanks,
+Byte,
+	Johannes
 
-Bart.=
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
