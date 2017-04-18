@@ -1,50 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:45117 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757448AbdDRPwt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2017 11:52:49 -0400
-From: Christoph Hellwig <hch@bombadil.infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
+Return-Path: <konrad.wilk@oracle.com>
+Date: Tue, 18 Apr 2017 10:33:46 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
         James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
         linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Christoph Hellwig <hch@lst.de>
-Subject: block: add a error_count field to struct request
-Date: Tue, 18 Apr 2017 08:52:23 -0700
-Message-Id: <20170418155229.5977-18-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: kill req->errors
+Message-ID: <20170418143346.GA10356@char.us.oracle.com>
+References: <20170406153944.10058-1-hch@lst.de>
+ <20170406200024.GC6140@localhost.localdomain>
+ <20170407071124.GA26481@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170407071124.GA26481@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+On Fri, Apr 07, 2017 at 09:11:24AM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 06, 2017 at 04:00:24PM -0400, Konrad Rzeszutek Wilk wrote:
+> > You wouldn't have a git tree to easily test it? Thanks.
+> 
+> git://git.infradead.org/users/hch/block.git request-errors
+> 
+> Gitweb:
+> 
+> http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/request-errors
 
-This is for the legacy floppy and ataflop drivers that currently abuse
-->errors for this purpose.  It's stashed away in a union to not grow
-the struct size, the other fields are either used by modern drivers
-for different purposes or the I/O scheduler before queing the I/O
-to drivers.
+I tested it with Xen and it all worked out. Albeit in hindsight I didn't check
+the ones that matter - that is the error paths (duh!).
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5986e1250d7d..e618164462e8 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -175,6 +175,7 @@ struct request {
- 		struct rb_node rb_node;	/* sort/lookup */
- 		struct bio_vec special_vec;
- 		void *completion_data;
-+		int error_count; /* for legacy drivers, don't use */
- 	};
- 
- 	/*
--- 
-2.11.0
+So let me do that now.
