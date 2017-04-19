@@ -1,64 +1,20 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v3 5/8] blk-mq: Make blk_flags_show() callers append a newline character
-Date: Tue, 18 Apr 2017 16:29:46 -0700
-Message-ID: <20170418232949.5228-6-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 19 Apr 2017 08:19:25 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: Re: [PATCH 3/5] lightnvm: Use blk_init_request_from_bio() instead
+	of open-coding it
+Message-ID: <20170419061925.GC6412@lst.de>
+References: <20170418231037.3968-1-bart.vanassche@sandisk.com> <20170418231037.3968-4-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170418231037.3968-4-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes it possible
-to produce a single line of output with multiple flag-to-name
-translations.
+Looks good,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 34cac9a5fd28..27054293b37b 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -60,7 +60,6 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 		else
- 			seq_printf(m, "%d", i);
- 	}
--	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -102,6 +101,7 @@ static int blk_queue_flags_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, q->queue_flags, blk_queue_flag_name,
- 		       ARRAY_SIZE(blk_queue_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -190,6 +190,7 @@ static int hctx_state_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, hctx->state, hctx_state_name,
- 		       ARRAY_SIZE(hctx_state_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -233,6 +234,7 @@ static int hctx_flags_show(struct seq_file *m, void *v)
- 	blk_flags_show(m,
- 		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
- 		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
--- 
-2.12.2
+Reviewed-by: Christoph Hellwig <hch@lst.de>
