@@ -1,122 +1,50 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 22/23] blktrace: remove the unused block_rq_abort tracepoint
-Date: Thu, 20 Apr 2017 16:03:15 +0200
-Message-Id: <20170420140316.6546-23-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V4 00/16] Introduce the BFQ I/O scheduler
+To: Paolo Valente <paolo.valente@linaro.org>
+References: <20170412162322.11139-1-paolo.valente@linaro.org>
+ <62E939C2-CBA8-4D33-AEEF-380616616E52@linaro.org>
+ <9270aa70-a40a-68b1-c93c-5229014abb39@kernel.dk>
+ <B408C981-D97D-4BEC-979A-6C555CF1446A@linaro.org>
+Cc: Tejun Heo <tj@kernel.org>, Fabio Checconi <fchecconi@gmail.com>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>, linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>, broonie@kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5a0d1cd7-dbeb-be2e-e966-e4e661408132@kernel.dk>
+Date: Wed, 19 Apr 2017 13:34:12 -0600
+MIME-Version: 1.0
+In-Reply-To: <B408C981-D97D-4BEC-979A-6C555CF1446A@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/trace/events/block.h | 44 ++++++++++----------------------------------
- kernel/trace/blktrace.c      |  9 ---------
- 2 files changed, 10 insertions(+), 43 deletions(-)
+On 04/19/2017 01:05 PM, Paolo Valente wrote:
+> 
+>> Il giorno 19 apr 2017, alle ore 16:33, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>
+>> On 04/19/2017 03:23 AM, Paolo Valente wrote:
+>>>
+>>>> Il giorno 12 apr 2017, alle ore 18:23, Paolo Valente <paolo.valente@linaro.org> ha scritto:
+>>>>
+>>>> Hi,
+>>>> new patch series, addressing (both) issues raised by Bart [1], and
+>>>> with block/Makefile fixed as suggested by Bart [2].
+>>>>
+>>>
+>>> Hi Jens,
+>>> apparently no complain of any sort on this last series.  Do you think
+>>> we could make it for 4.12, or shall we aim at 4.13?
+>>
+>> We may as well queue it up now, I don't think there's much point in
+>> deferring an extra cycle.
+>>
+> 
+> A little scary, but (of course) fine for me.
 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index a88ed13446ff..99ed69fad041 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -61,7 +61,16 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
- 	TP_ARGS(bh)
- );
- 
--DECLARE_EVENT_CLASS(block_rq_with_error,
-+/**
-+ * block_rq_requeue - place block IO request back on a queue
-+ * @q: queue holding operation
-+ * @rq: block IO operation request
-+ *
-+ * The block operation request @rq is being placed back into queue
-+ * @q.  For some reason the request was not completed and needs to be
-+ * put back in the queue.
-+ */
-+TRACE_EVENT(block_rq_requeue,
- 
- 	TP_PROTO(struct request_queue *q, struct request *rq),
- 
-@@ -94,39 +103,6 @@ DECLARE_EVENT_CLASS(block_rq_with_error,
- );
- 
- /**
-- * block_rq_abort - abort block operation request
-- * @q: queue containing the block operation request
-- * @rq: block IO operation request
-- *
-- * Called immediately after pending block IO operation request @rq in
-- * queue @q is aborted. The fields in the operation request @rq
-- * can be examined to determine which device and sectors the pending
-- * operation would access.
-- */
--DEFINE_EVENT(block_rq_with_error, block_rq_abort,
--
--	TP_PROTO(struct request_queue *q, struct request *rq),
--
--	TP_ARGS(q, rq)
--);
--
--/**
-- * block_rq_requeue - place block IO request back on a queue
-- * @q: queue holding operation
-- * @rq: block IO operation request
-- *
-- * The block operation request @rq is being placed back into queue
-- * @q.  For some reason the request was not completed and needs to be
-- * put back in the queue.
-- */
--DEFINE_EVENT(block_rq_with_error, block_rq_requeue,
--
--	TP_PROTO(struct request_queue *q, struct request *rq),
--
--	TP_ARGS(q, rq)
--);
--
--/**
-  * block_rq_complete - block IO operation completed by device driver
-  * @q: queue containing the block operation request
-  * @rq: block operations request
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index b2058a7f94bd..9f3624dadb09 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -716,12 +716,6 @@ static void blk_add_trace_rq(struct request_queue *q, struct request *rq,
- 			rq->cmd_flags, what, rq->errors, 0, NULL);
- }
- 
--static void blk_add_trace_rq_abort(void *ignore,
--				   struct request_queue *q, struct request *rq)
--{
--	blk_add_trace_rq(q, rq, blk_rq_bytes(rq), BLK_TA_ABORT);
--}
--
- static void blk_add_trace_rq_insert(void *ignore,
- 				    struct request_queue *q, struct request *rq)
- {
-@@ -974,8 +968,6 @@ static void blk_register_tracepoints(void)
- {
- 	int ret;
- 
--	ret = register_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
--	WARN_ON(ret);
- 	ret = register_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
- 	WARN_ON(ret);
- 	ret = register_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
-@@ -1028,7 +1020,6 @@ static void blk_unregister_tracepoints(void)
- 	unregister_trace_block_rq_requeue(blk_add_trace_rq_requeue, NULL);
- 	unregister_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
- 	unregister_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
--	unregister_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
- 
- 	tracepoint_synchronize_unregister();
- }
+Reaching the culmination of having your big project merged after
+a long time is always a little scary. For now, kick back and open
+a Tignanello, and brace yourself for tending to potential bug
+reports once the 4.12 merge window opens.
+
 -- 
-2.11.0
+Jens Axboe
