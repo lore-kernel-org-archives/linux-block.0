@@ -1,112 +1,40 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 7/8] nowait aio: xfs
-Date: Fri, 14 Apr 2017 07:02:56 -0500
-Message-Id: <20170414120257.8932-8-rgoldwyn@suse.de>
-In-Reply-To: <20170414120257.8932-1-rgoldwyn@suse.de>
-References: <20170414120257.8932-1-rgoldwyn@suse.de>
+	dm-devel@redhat.com
+Subject: [PATCH 21/23] swim3: remove (commented out) printing of req->errors
+Date: Wed, 19 Apr 2017 21:27:06 +0200
+Message-Id: <20170419192708.22098-22-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-
-If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
-immediately.
-
-IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
-if it needs allocation either due to file extension, writing to a hole,
-or COW or waiting for other DIOs to finish.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/xfs/xfs_file.c  | 19 ++++++++++++++-----
- fs/xfs/xfs_iomap.c | 17 +++++++++++++++++
- 2 files changed, 31 insertions(+), 5 deletions(-)
+ drivers/block/swim3.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 35703a801372..b307940e7d56 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index 61b3ffa4f458..ba4809c9bdba 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -343,8 +343,8 @@ static void start_request(struct floppy_state *fs)
+ 			  req->rq_disk->disk_name, req->cmd,
+ 			  (long)blk_rq_pos(req), blk_rq_sectors(req),
+ 			  bio_data(req->bio));
+-		swim3_dbg("           errors=%d current_nr_sectors=%u\n",
+-			  req->errors, blk_rq_cur_sectors(req));
++		swim3_dbg("           current_nr_sectors=%u\n",
++			  blk_rq_cur_sectors(req));
+ #endif
  
--	xfs_ilock(ip, iolock);
--
-+	if (!xfs_ilock_nowait(ip, iolock)) {
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		xfs_ilock(ip, iolock);
-+	}
- 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
- 	if (ret)
- 		goto out;
-@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
- 	 * otherwise demote the lock if we had to take the exclusive lock
- 	 * for other reasons in xfs_file_aio_write_checks.
- 	 */
--	if (unaligned_io)
--		inode_dio_wait(inode);
--	else if (iolock == XFS_IOLOCK_EXCL) {
-+	if (unaligned_io) {
-+		/* If we are going to wait for other DIO to finish, bail */
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (atomic_read(&inode->i_dio_count))
-+				return -EAGAIN;
-+		} else {
-+			inode_dio_wait(inode);
-+		}
-+	} else if (iolock == XFS_IOLOCK_EXCL) {
- 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 288ee5b840d7..9baa65eeae9e 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -1015,6 +1015,15 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
- 		if (flags & IOMAP_DIRECT) {
-+			/*
-+			 * A reflinked inode will result in CoW alloc.
-+			 * FIXME: It could still overwrite on unshared extents
-+			 * and not need allocation.
-+			 */
-+			if (flags & IOMAP_NOWAIT) {
-+				error = -EAGAIN;
-+				goto out_unlock;
-+			}
- 			/* may drop and re-acquire the ilock */
- 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
- 					&lockmode);
-@@ -1032,6 +1041,14 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
- 		/*
-+		 * If nowait is set bail since we are going to make
-+		 * allocations.
-+		 */
-+		if (flags & IOMAP_NOWAIT) {
-+			error = -EAGAIN;
-+			goto out_unlock;
-+		}
-+		/*
- 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
- 		 * pages to keep the chunks of work done where somewhat symmetric
- 		 * with the work writeback does. This is a completely arbitrary
+ 		if (blk_rq_pos(req) >= fs->total_secs) {
 -- 
-2.12.0
+2.11.0
