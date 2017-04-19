@@ -1,54 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:57746 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934199AbdDST2M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2017 15:28:12 -0400
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Josef Bacik <jbacik@fb.com>,
-        James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 19/23] floppy: switch from req->errors to req->error_count
-Date: Wed, 19 Apr 2017 21:27:04 +0200
-Message-Id: <20170419192708.22098-20-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: kill req->errors V3
+Date: Wed, 19 Apr 2017 21:26:45 +0200
+Message-Id: <20170419192708.22098-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/floppy.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Currently the request structure has an errors field that is used in
+various different ways.  The oldest drivers use it as an error count,
+blk-mq and the generic timeout code assume that it holds a Linux
+errno for block completions, and various drivers use it for internal
+status values, often overwriting them with Linux errnos later,
+that is unless they are processing passthrough requests in which
+case they'll leave their errors in it.
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index ce102ec47ef2..60d4c7653178 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -2805,8 +2805,10 @@ static int set_next_request(void)
- 			fdc_queue = 0;
- 		if (q) {
- 			current_req = blk_fetch_request(q);
--			if (current_req)
-+			if (current_req) {
-+				current_req->error_count = 0;
- 				break;
-+			}
- 		}
- 	} while (fdc_queue != old_pos);
- 
-@@ -2866,7 +2868,7 @@ static void redo_fd_request(void)
- 		_floppy = floppy_type + DP->autodetect[DRS->probed_format];
- 	} else
- 		probing = 0;
--	errors = &(current_req->errors);
-+	errors = &(current_req->error_count);
- 	tmp = make_raw_rw_request();
- 	if (tmp < 2) {
- 		request_done(tmp);
--- 
-2.11.0
+This series kills the ->errors field and replaced it with new fields
+in the drivers (or an odd hack in a union in struct request for
+two bitrotting old drivers).
+
+Also available in the following git tree:
+
+    git://git.infradead.org/users/hch/block.git request-errors
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/request-errors
+
+Changes since V2;
+ - reorder one patch to be earlier in the series
+ - fix the argument to a bsg dprintk
+ - fix a kerneldoc comment
+
+Changes since V1:
+ - rebased on top the latest block for-next tree
+ - fix error handling in nfsd blocklayout
+ - dropped "scsi: fix fast-fail for non-passthrough requests"
