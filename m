@@ -10,8 +10,8 @@ Cc: Josef Bacik <jbacik@fb.com>,
 	linux-block@vger.kernel.org,
 	dm-devel@redhat.com
 Subject: kill req->errors V3
-Date: Wed, 19 Apr 2017 21:26:45 +0200
-Message-Id: <20170419192708.22098-1-hch@lst.de>
+Date: Wed, 19 Apr 2017 21:26:28 +0200
+Message-Id: <20170419192651.22037-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Currently the request structure has an errors field that is used in
