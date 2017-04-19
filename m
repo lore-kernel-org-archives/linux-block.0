@@ -1,76 +1,121 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: [resend PATCH v2 22/33] dax,
- pmem: introduce an optional 'flush' dax_operation
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Matthew Wilcox <mawilcox@microsoft.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
-        Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
-Date: Mon, 17 Apr 2017 12:10:49 -0700
-Message-ID: <149245624897.10206.4616998003694591377.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH V3 02/16] block, bfq: add full hierarchical scheduling and cgroups support
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <000F96F3-DF5D-4F3E-B1C5-C78795F5E0AA@linaro.org>
+Date: Wed, 19 Apr 2017 09:08:02 +0200
+Cc: Jens Axboe <axboe@kernel.dk>,
+ Fabio Checconi <fchecconi@gmail.com>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>,
+ linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ broonie@kernel.org
+Message-Id: <4D862DDD-3B6C-4453-91E7-9970784E5D41@linaro.org>
+References: <20170411134315.44135-1-paolo.valente@linaro.org> <20170411134315.44135-3-paolo.valente@linaro.org> <20170411214702.GA31551@wtj.duckdns.org> <1E0945A9-43F8-496D-B631-FB293921F304@linaro.org> <20170418070435.GB3899@wtj.duckdns.org> <000F96F3-DF5D-4F3E-B1C5-C78795F5E0AA@linaro.org>
+To: Tejun Heo <tj@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Filesystem-DAX flushes caches whenever it writes to the address returned
-through dax_direct_access() and when writing back dirty radix entries.
-That flushing is only required in the pmem case, so add a dax operation
-to allow pmem to take this extra action, but skip it for other dax
-capable devices that do not provide a flush routine.
 
-An example for this differentiation might be a volatile ram disk where
-there is no expectation of persistence. In fact the pmem driver itself might
-front such an address range specified by the NFIT. So, this "no flush"
-property might be something passed down by the bus / libnvdimm.
+> Il giorno 19 apr 2017, alle ore 07:33, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+>>=20
+>> Il giorno 18 apr 2017, alle ore 09:04, Tejun Heo <tj@kernel.org> ha =
+scritto:
+>>=20
+>> Hello, Paolo.
+>>=20
+>> On Wed, Apr 12, 2017 at 07:22:03AM +0200, Paolo Valente wrote:
+>>> could you elaborate a bit more on this?  I mean, cgroups support has
+>>> been in BFQ (and CFQ) for almost ten years, perfectly working as far
+>>> as I know.  Of course it is perfectly working in terms of I/O and =
+not
+>>> of CPU bandwidth distribution; and, for the moment, it is effective
+>>> only for devices below 30-50KIOPS.  What's the point in throwing
+>>> (momentarily?) away such a fundamental feature?  What am I missing?
+>>=20
+>> I've been trying to track down latency issues with the CPU controller
+>> which basically takes the same approach and I'm not sure nesting
+>> scheduler timelines is a good approach.  It intuitively feels elegant
+>> but seems to have some fundamental issues.  IIUC, bfq isn't quite the
+>> same in that it doesn't need load balancer across multiple queues and
+>> it could be that bfq is close enough to the basic model that the
+>> nested behavior maps to the correct scheduling behavior.
+>>=20
+>> However, for example, in the CPU controller, the nested timelines
+>> break sleeper boost.  The boost is implemented by considering the
+>> thread to have woken up upto some duration prior to the current time;
+>> however, it only affects the timeline inside the cgroup and there's =
+no
+>> good way to propagate it upwards.  The final result is two threads in
+>> a cgroup with the double weight can behave significantly worse in
+>> terms of latency compared to two threads with the weight of 1 in the
+>> root.
+>>=20
+>=20
+> Hi Tejun,
+> I don't know in detail the specific multiple-queue issues you report,
+> but bfq implements the upward propagation you mention: if a process in
+> a group is to be privileged, i.e., if the process has basically to be
+> provided with a higher weight (in addition to other important forms of
+> help), then this weight boost is propagated upward through the path
+> from the process to the root node in the group hierarchy.
+>=20
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- drivers/nvdimm/pmem.c |   11 +++++++++++
- include/linux/dax.h   |    2 ++
- 2 files changed, 13 insertions(+)
+ERRATA CORRIGE: actually, this propagation is implemented in a simple
+variant of bfq that I made for a virtualization company (to truly
+guarantee a low latency to the processes in a guest OS, regardless of
+the load in the host).  The base version of bfq in these patches
+contains all the mechanisms needed to get this propagation, but
+doesn't modify group weights autonomously.
 
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index e501df4ab4b4..822b85fb3365 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -276,9 +276,20 @@ static long pmem_dax_direct_access(struct dax_device *dax_dev,
- 	return __pmem_direct_access(pmem, pgoff, nr_pages, kaddr, pfn);
- }
- 
-+static void pmem_dax_flush(struct dax_device *dax_dev, pgoff_t pgoff,
-+		void *addr, size_t size)
-+{
-+	/*
-+	 * TODO: move arch specific cache management into the driver
-+	 * directly.
-+	 */
-+	wb_cache_pmem(addr, size);
-+}
-+
- static const struct dax_operations pmem_dax_ops = {
- 	.direct_access = pmem_dax_direct_access,
- 	.copy_from_iter = pmem_copy_from_iter,
-+	.flush = pmem_dax_flush,
- };
- 
- static void pmem_release_queue(void *q)
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index cd8561bb21f3..c88bbcba26d9 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -19,6 +19,8 @@ struct dax_operations {
- 	/* copy_from_iter: dax-driver override for default copy_from_iter */
- 	size_t (*copy_from_iter)(struct dax_device *, pgoff_t, void *, size_t,
- 			struct iov_iter *);
-+	/* flush: optional driver-specific cache management after writes */
-+	void (*flush)(struct dax_device *, pgoff_t, void *, size_t);
- };
- 
- int dax_read_lock(void);
+Paolo
+
+>> Given that the nested scheduling ends up pretty expensive, I'm not
+>> sure how good a model this nesting approach is.  Especially if there
+>> can be multiple queues, the weight distribution across cgroup
+>> instances across multiple queues has to be coordinated globally
+>> anyway,
+>=20
+> To get perfect global service guarantees, yes.  But you can settle
+> with tradeoffs that, according to my experience with storage and
+> packet I/O, are so good to be probably indistinguishable from an
+> ideal, but too costly solution.  I mean, with a well-done approximated
+> scheduling solution, the deviation with respect to an ideal service
+> can be in the same order of the noise caused by unavoidable latencies
+> of other sw and hw components than the scheduler.
+>=20
+>> so the weight / cost adjustment part can't happen
+>> automatically anyway as in single queue case.  If we're going there,
+>> we might as well implement cgroup support by actively modulating the
+>> combined weights, which will make individual scheduling operations
+>> cheaper and it easier to think about and guarantee latency behaviors.
+>>=20
+>=20
+> Yes.  Anyway, I didn't quite understand what is or could be the
+> alternative, w.r.t. hierarchical scheduling, for guaranteeing
+> bandwidth distribution of shared resources in a complex setting.  If
+> you think I could be of any help on this, just put me somehow in the
+> loop.
+>=20
+>> If you think that bfq will stay single queue and won't need timeline
+>> modifying heuristics (for responsiveness or whatever), the current
+>> approach could be fine, but I'm a bit awry about committing to the
+>> current approach if we're gonna encounter the same problems.
+>>=20
+>=20
+> As of now, bfq is targeted at not too fast devices (< 30-50KIOPS),
+> which happen to be single queue.  In particular, bfq is currently
+> agnostic w.r.t.  to the number of downstream queues.
+>=20
+> Thanks,
+> Paolo
+>=20
+>> Thanks.
+>>=20
+>> --=20
+>> tejun
