@@ -1,45 +1,54 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v2 0/5] Reduce code duplication
-Date: Wed, 19 Apr 2017 14:01:23 -0700
-Message-ID: <20170419210128.28374-1-bart.vanassche@sandisk.com>
+Subject: Re: [PATCH] lightnvm: assume 64-bit lba numbers
+To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias@cnexlabs.com>,
+ Arnd Bergmann <arnd@arndb.de>, Matias Bjorling <mb@lightnvm.io>
+References: <20170419173931.3902058-1-arnd@arndb.de>
+ <0c7f0894-4817-09c4-93b9-8158bbc6a562@cnexlabs.com>
+Cc: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <b6ea0f56-c4cf-fab9-5e67-eb2c292bd9f3@fb.com>
+Date: Wed, 19 Apr 2017 12:08:03 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <0c7f0894-4817-09c4-93b9-8158bbc6a562@cnexlabs.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+On 04/19/2017 12:04 PM, Matias Bj�rling wrote:
+> On 04/19/2017 07:39 PM, Arnd Bergmann wrote:
+>> The driver uses both u64 and sector_t to refer to offsets, and assigns between the
+>> two. This causes one harmless warning when sector_t is 32-bit:
+>>
+>> drivers/lightnvm/pblk-rb.c: In function 'pblk_rb_write_entry_gc':
+>> include/linux/lightnvm.h:215:20: error: large integer implicitly truncated to unsigned type [-Werror=overflow]
+>> drivers/lightnvm/pblk-rb.c:324:22: note: in expansion of macro 'ADDR_EMPTY'
+>>
+>> As the driver is already doing this inconsistently, changing the type
+>> won't make it worse and is an easy way to avoid the warning.
+>>
+>> Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>> ---
+>>  drivers/lightnvm/pblk.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+>> index c82120ce3be5..11ed7d83f572 100644
+>> --- a/drivers/lightnvm/pblk.h
+>> +++ b/drivers/lightnvm/pblk.h
+>> @@ -119,7 +119,7 @@ struct pblk_w_ctx {
+>>  	struct bio_list bios;		/* Original bios - used for completion
+>>  					 * in REQ_FUA, REQ_FLUSH case
+>>  					 */
+>> -	sector_t lba;			/* Logic addr. associated with entry */
+>> +	u64 lba;			/* Logic addr. associated with entry */
+>>  	struct ppa_addr ppa;		/* Physic addr. associated with entry */
+>>  	int flags;			/* Write context flags */
+>>  };
+>>
+> 
+> Thanks Arnd. Jens, could you pick this up? Thank you
 
-This series contains three patches intended to reduce code duplication
-and two patches that simplify / optimize I/O priority handling. Please
-consider these patches for kernel v4.12.
-
-Thanks,
-
-Bart.
-
-Changes compared to v1:
-- Converted ternary operators into an if/then/else-sequence.
-- Used EXPORT_SYMBOL_GPL() to export block layer internals.
-
-Bart Van Assche (5):
-  block: Export blk_init_request_from_bio()
-  null_blk: Use blk_init_request_from_bio() instead of open-coding it
-  lightnvm: Use blk_init_request_from_bio() instead of open-coding it
-  block: Inline blk_rq_set_prio()
-  block: Optimize ioprio_best()
-
- block/blk-core.c             | 12 +++++++++---
- block/blk-mq.c               |  2 +-
- block/blk.h                  |  1 -
- block/ioprio.c               | 12 +-----------
- drivers/block/null_blk.c     |  9 +--------
- drivers/nvme/host/lightnvm.c |  6 +-----
- include/linux/blkdev.h       | 15 +--------------
- 7 files changed, 14 insertions(+), 43 deletions(-)
+Done, thanks Arnd.
 
 -- 
-2.12.2
+Jens Axboe
