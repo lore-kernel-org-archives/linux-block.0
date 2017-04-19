@@ -1,161 +1,109 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Ilya Dryomov <idryomov@gmail.com>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH] block: get rid of blk_integrity_revalidate()
-Date: Tue, 18 Apr 2017 18:43:20 +0200
-Message-Id: <1492533800-30627-1-git-send-email-idryomov@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
- ceph-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
- Jens Axboe <axboe@fb.com>, dm-devel@redhat.com,
- Dan Williams <dan.j.williams@intel.com>, Christoph Hellwig <hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 09/23] loop: zero-fill bio on the submitting cpu
+Date: Wed, 19 Apr 2017 21:26:54 +0200
+Message-Id: <20170419192708.22098-10-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 25520d55cdb6 ("block: Inline blk_integrity in struct gendisk")
-introduced blk_integrity_revalidate(), which seems to assume ownership
-of the stable pages flag and unilaterally clears it if no blk_integrity
-profile is registered:
+In thruth I've just audited which blk-mq drivers don't currently have a
+complete callback, but I think this change is at least borderline useful.
 
-    if (bi->profile)
-            disk->queue->backing_dev_info->capabilities |=
-                    BDI_CAP_STABLE_WRITES;
-    else
-            disk->queue->backing_dev_info->capabilities &=
-                    ~BDI_CAP_STABLE_WRITES;
-
-It's called from revalidate_disk() and rescan_partitions(), making it
-impossible to enable stable pages for drivers that support partitions
-and don't use blk_integrity: while the call in revalidate_disk() can be
-trivially worked around (see zram, which doesn't support partitions and
-hence gets away with zram_revalidate_disk()), rescan_partitions() can
-be triggered from userspace at any time.  This breaks rbd, where the
-ceph messenger is responsible for generating/verifying CRCs.
-
-Since blk_integrity_{un,}register() "must" be used for (un)registering
-the integrity profile with the block layer, move BDI_CAP_STABLE_WRITES
-setting there.  This way drivers that call blk_integrity_register() and
-use integrity infrastructure won't interfere with drivers that don't
-but still want stable pages.
-
-Fixes: 25520d55cdb6 ("block: Inline blk_integrity in struct gendisk")
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: stable@vger.kernel.org # 4.4+, needs backporting
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
-I don't have any integrity-capable disks or nvme separate-metadata
-cards, so I couldn't test this as well as I wanted to.  25520d55cdb6
-went in with some nvme work, but Martin recalls that it may have had
-something to do with integrity-capable dm arrays losing the integrity
-capability at runtime.  Previous discussion at
+ drivers/block/loop.c | 30 ++++++++++++++----------------
+ drivers/block/loop.h |  1 +
+ 2 files changed, 15 insertions(+), 16 deletions(-)
 
-    http://www.spinics.net/lists/ceph-devel/msg35413.html
-
----
- block/blk-integrity.c     | 19 ++-----------------
- block/partition-generic.c |  1 -
- fs/block_dev.c            |  1 -
- include/linux/genhd.h     |  2 --
- 4 files changed, 2 insertions(+), 21 deletions(-)
-
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 9f0ff5ba4f84..35c5af1ea068 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -417,7 +417,7 @@ void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template
- 	bi->tuple_size = template->tuple_size;
- 	bi->tag_size = template->tag_size;
- 
--	blk_integrity_revalidate(disk);
-+	disk->queue->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 3081d83d2ea3..86351b3f7350 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -445,32 +445,27 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
+ 	return ret;
  }
- EXPORT_SYMBOL(blk_integrity_register);
  
-@@ -430,26 +430,11 @@ EXPORT_SYMBOL(blk_integrity_register);
-  */
- void blk_integrity_unregister(struct gendisk *disk)
+-static inline void handle_partial_read(struct loop_cmd *cmd, long bytes)
++static void lo_complete_rq(struct request *rq)
  {
--	blk_integrity_revalidate(disk);
-+	disk->queue->backing_dev_info->capabilities &= ~BDI_CAP_STABLE_WRITES;
- 	memset(&disk->queue->integrity, 0, sizeof(struct blk_integrity));
- }
- EXPORT_SYMBOL(blk_integrity_unregister);
- 
--void blk_integrity_revalidate(struct gendisk *disk)
--{
--	struct blk_integrity *bi = &disk->queue->integrity;
--
--	if (!(disk->flags & GENHD_FL_UP))
+-	if (bytes < 0 || op_is_write(req_op(cmd->rq)))
 -		return;
--
--	if (bi->profile)
--		disk->queue->backing_dev_info->capabilities |=
--			BDI_CAP_STABLE_WRITES;
--	else
--		disk->queue->backing_dev_info->capabilities &=
--			~BDI_CAP_STABLE_WRITES;
--}
--
- void blk_integrity_add(struct gendisk *disk)
++	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 
+-	if (unlikely(bytes < blk_rq_bytes(cmd->rq))) {
++	if (unlikely(req_op(cmd->rq) == REQ_OP_READ && cmd->use_aio &&
++		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(cmd->rq))) {
+ 		struct bio *bio = cmd->rq->bio;
+ 
+-		bio_advance(bio, bytes);
++		bio_advance(bio, cmd->ret);
+ 		zero_fill_bio(bio);
+ 	}
++
++	blk_mq_end_request(rq, cmd->ret < 0 ? -EIO : 0);
+ }
+ 
+ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
  {
- 	if (kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 7afb9907821f..0171a2faad68 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -497,7 +497,6 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+ 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+-	struct request *rq = cmd->rq;
+-
+-	handle_partial_read(cmd, ret);
  
- 	if (disk->fops->revalidate_disk)
- 		disk->fops->revalidate_disk(disk);
--	blk_integrity_revalidate(disk);
- 	check_disk_size_change(disk, bdev);
- 	bdev->bd_invalidated = 0;
- 	if (!get_capacity(disk) || !(state = check_partition(disk, bdev)))
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 2eca00ec4370..56039dfbc674 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1451,7 +1451,6 @@ int revalidate_disk(struct gendisk *disk)
+-	if (ret > 0)
+-		ret = 0;
+-	else if (ret < 0)
+-		ret = -EIO;
+-
+-	blk_mq_complete_request(rq, ret);
++	cmd->ret = ret;
++	blk_mq_complete_request(cmd->rq, 0);
+ }
  
- 	if (disk->fops->revalidate_disk)
- 		ret = disk->fops->revalidate_disk(disk);
--	blk_integrity_revalidate(disk);
- 	bdev = bdget_disk(disk, 0);
- 	if (!bdev)
- 		return ret;
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 76f39754e7b0..76d6a1cd4153 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -722,11 +722,9 @@ static inline void part_nr_sects_write(struct hd_struct *part, sector_t size)
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- extern void blk_integrity_add(struct gendisk *);
- extern void blk_integrity_del(struct gendisk *);
--extern void blk_integrity_revalidate(struct gendisk *);
- #else	/* CONFIG_BLK_DEV_INTEGRITY */
- static inline void blk_integrity_add(struct gendisk *disk) { }
- static inline void blk_integrity_del(struct gendisk *disk) { }
--static inline void blk_integrity_revalidate(struct gendisk *disk) { }
- #endif	/* CONFIG_BLK_DEV_INTEGRITY */
+ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+@@ -1688,8 +1683,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+ 	ret = do_req_filebacked(lo, cmd->rq);
+  failed:
+ 	/* complete non-aio request */
+-	if (!cmd->use_aio || ret)
+-		blk_mq_complete_request(cmd->rq, ret ? -EIO : 0);
++	if (!cmd->use_aio || ret) {
++		cmd->ret = ret ? -EIO : 0;
++		blk_mq_complete_request(cmd->rq, 0);
++	}
+ }
  
- #else /* CONFIG_BLOCK */
+ static void loop_queue_work(struct kthread_work *work)
+@@ -1715,6 +1712,7 @@ static int loop_init_request(void *data, struct request *rq,
+ static const struct blk_mq_ops loop_mq_ops = {
+ 	.queue_rq       = loop_queue_rq,
+ 	.init_request	= loop_init_request,
++	.complete	= lo_complete_rq,
+ };
+ 
+ static int loop_add(struct loop_device **l, int i)
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index fb2237c73e61..fecd3f97ef8c 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -70,6 +70,7 @@ struct loop_cmd {
+ 	struct request *rq;
+ 	struct list_head list;
+ 	bool use_aio;           /* use AIO interface to handle I/O */
++	long ret;
+ 	struct kiocb iocb;
+ };
+ 
 -- 
-2.4.3
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.11.0
