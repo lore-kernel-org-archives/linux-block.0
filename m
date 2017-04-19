@@ -1,105 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f67.google.com ([209.85.218.67]:33440 "EHLO
-        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1042890AbdDVAVw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 20:21:52 -0400
-From: jsmart2021@gmail.com
-To: linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        sagi@grimberg.me, emilne@redhat.com, jthumshirn@suse.de,
-        linux-block@vger.kernel.org, stable@vger.kernel.org,
-        martin.petersen@oracle.com
-Cc: James Smart <jsmart2021@gmail.com>,
-        Dick Kennedy <dick.kennedy@broadcom.com>,
-        James Smart <james.smart@broadcom.com>
-Subject: [PATCH] Fix panic on BFS configuration.
-Date: Fri, 21 Apr 2017 17:21:45 -0700
-Message-Id: <20170422002145.15923-1-jsmart2021@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+MIME-Version: 1.0
+In-Reply-To: <1492539735.2689.7.camel@sandisk.com>
+References: <CAJrWOzAM_A6fwFxTZVo9MmiwWF1d6Bp9zTdBvUfnDFCPY_CmCQ@mail.gmail.com>
+ <1492539735.2689.7.camel@sandisk.com>
+From: Roman Penyaev <roman.penyaev@profitbricks.com>
+Date: Wed, 19 Apr 2017 08:02:26 +0200
+Message-ID: <CAJrWOzD90kM7cwjpqX3oqK+0bC8L_WTzD+r5xmyx2QEYsajxcA@mail.gmail.com>
+Subject: Re: RDMA performance comparison: IBNBD, SCST, NVMEoF
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "mail@fholler.de" <mail@fholler.de>,
+	"sagi@grimberg.me" <sagi@grimberg.me>,
+	"jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>,
+	"yun.wang@profitbricks.com" <yun.wang@profitbricks.com>, "hch@lst.de" <hch@lst.de>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>,
+	"Milind.dumbare@gmail.com" <Milind.dumbare@gmail.com>, "dledford@redhat.com" <dledford@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: James Smart <jsmart2021@gmail.com>
+Hello Bart,
 
-To select the appropriate shost template, the driver is issuing
-a mailbox command to retrieve the wwn. Turns out the sending of
-the command precedes the reset of the function.  On SLI-4 adapters,
-this is inconsequential as the mailbox command location is specified
-by dma via the BMBX register. However, on SLI-3 adapters, the
-location of the mailbox command submission area changes. When the
-function is first powered on or reset, the cmd is submitted via PCI
-bar memory. Later the driver changes the function config to use
-host memory and DMA. The request to start a mailbox command is the
-same, a simple doorbell write, regardless of submission area.
-So.. if there has not been a boot driver run against the adapter,
-the mailbox command works as defaults are ok. But, if the boot
-driver has configured the card and, and if no platform pci
-function/slot reset occurs as the os starts, the mailbox command
-will fail. The SLI-3 device will use the stale boot driver dma
-location. This can cause PCI eeh errors.
+On Tue, Apr 18, 2017 at 8:22 PM, Bart Van Assche
+<Bart.VanAssche@sandisk.com> wrote:
+> On Tue, 2017-04-18 at 19:33 +0200, Roman Penyaev wrote:
+>> By current email I would like to share some fresh RDMA performance
+>> results of IBNBD, SCST and NVMEof, based on 4.10 kernel and variety
+>> of configurations.
+>
+> Hello Roman,
+>
+> Thank you for having shared these results. But please do not expect me
+> to have another look at IBNBD before the design bugs in the driver and
+> also in the protocol get fixed.
 
-Fix is to reset the sli-3 function before sending the
-mailbox command, thus synchronizing the function/driver on mailbox
-location.
+I expected only that you might find results interesting, where I target
+the following:
 
-This issue was introduced by this patch:
-http://www.spinics.net/lists/linux-scsi/msg105908.html
-which is in the stable pools with commit id:
-96418b5e2c8867da3279d877f5d1ffabfe460c3d
+    1) retest on latest kernel
+    2) compare against NVMEoF
+    3) retest using register_always=N
 
-This patch needs to be applied to the stable trees where ever the
-introducing patch exists.
 
-Signed-off-by: Dick Kennedy <dick.kennedy@broadcom.com>
-Signed-off-by: James Smart <james.smart@broadcom.com>
-Cc: stable@vger.kernel.org
----
- drivers/scsi/lpfc/lpfc_crtn.h | 1 +
- drivers/scsi/lpfc/lpfc_init.c | 7 +++++++
- drivers/scsi/lpfc/lpfc_sli.c  | 2 +-
- 3 files changed, 9 insertions(+), 1 deletion(-)
+> The presentation during Vault 2017 made
+> it clear that the driver does not scale if more than two CPUs submit I/O
+> simultaneously at the initiator side.
 
-diff --git a/drivers/scsi/lpfc/lpfc_crtn.h b/drivers/scsi/lpfc/lpfc_crtn.h
-index 944b32c..62016d6 100644
---- a/drivers/scsi/lpfc/lpfc_crtn.h
-+++ b/drivers/scsi/lpfc/lpfc_crtn.h
-@@ -294,6 +294,7 @@ int lpfc_selective_reset(struct lpfc_hba *);
- void lpfc_reset_barrier(struct lpfc_hba *);
- int lpfc_sli_brdready(struct lpfc_hba *, uint32_t);
- int lpfc_sli_brdkill(struct lpfc_hba *);
-+int lpfc_sli_chipset_init(struct lpfc_hba *);
- int lpfc_sli_brdreset(struct lpfc_hba *);
- int lpfc_sli_brdrestart(struct lpfc_hba *);
- int lpfc_sli_hba_setup(struct lpfc_hba *);
-diff --git a/drivers/scsi/lpfc/lpfc_init.c b/drivers/scsi/lpfc/lpfc_init.c
-index 90ae354..e85f273 100644
---- a/drivers/scsi/lpfc/lpfc_init.c
-+++ b/drivers/scsi/lpfc/lpfc_init.c
-@@ -3602,6 +3602,13 @@ lpfc_get_wwpn(struct lpfc_hba *phba)
- 	LPFC_MBOXQ_t *mboxq;
- 	MAILBOX_t *mb;
- 
-+	if (phba->sli_rev < LPFC_SLI_REV4) {
-+		/* Reset the port first */
-+		lpfc_sli_brdrestart(phba);
-+		rc = lpfc_sli_chipset_init(phba);
-+		if (rc)
-+			return (uint64_t)-1;
-+	}
- 
- 	mboxq = (LPFC_MBOXQ_t *) mempool_alloc(phba->mbox_mem_pool,
- 						GFP_KERNEL);
-diff --git a/drivers/scsi/lpfc/lpfc_sli.c b/drivers/scsi/lpfc/lpfc_sli.c
-index cf19f49..22862b7 100644
---- a/drivers/scsi/lpfc/lpfc_sli.c
-+++ b/drivers/scsi/lpfc/lpfc_sli.c
-@@ -4446,7 +4446,7 @@ lpfc_sli_brdrestart(struct lpfc_hba *phba)
-  * iteration, the function will restart the HBA again. The function returns
-  * zero if HBA successfully restarted else returns negative error code.
-  **/
--static int
-+int
- lpfc_sli_chipset_init(struct lpfc_hba *phba)
- {
- 	uint32_t status, i = 0;
--- 
-2.9.3
+On the iops graph, where I increase number of simultaneous fio jobs up to 128
+(initiator has 64 CPUs), NVMEoF tends to repeat the same curve, staying always
+below IBNBD.  So even this is a scalability problem, it can be seen on NVMEoF
+runs also. That's why I posted these results to draw someone's attention.
+
+
+--
+Roman
