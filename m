@@ -1,41 +1,37 @@
-Return-Path: <rgoldwyn@suse.de>
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 18 Apr 2017 23:39:30 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	sagi@grimberg.me, avi@scylladb.com, axboe@kernel.dk,
+	linux-api@vger.kernel.org, willy@infradead.org,
+	tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
 Subject: Re: [PATCH 2/8] nowait aio: Introduce RWF_NOWAIT
-To: Christoph Hellwig <hch@infradead.org>
+Message-ID: <20170419063930.GB20053@infradead.org>
 References: <20170414120257.8932-1-rgoldwyn@suse.de>
  <20170414120257.8932-3-rgoldwyn@suse.de>
- <20170419063930.GB20053@infradead.org>
-Cc: linux-fsdevel@vger.kernel.org, jack@suse.com,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, sagi@grimberg.me,
- avi@scylladb.com, axboe@kernel.dk, linux-api@vger.kernel.org,
- willy@infradead.org, tom.leiming@gmail.com
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <2d816e3e-3625-7ebd-8550-68a7cc9c1a2e@suse.de>
-Date: Wed, 19 Apr 2017 05:30:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170419063930.GB20053@infradead.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170414120257.8932-3-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
+>  	}
+>  
+> -
+>  	/* prevent overflows */
 
+Weird whitespace change.
 
-On 04/19/2017 01:39 AM, Christoph Hellwig wrote:
-> 
->> @@ -1593,6 +1593,11 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
->>  	}
->>  
->>  	req->common.ki_flags |= iocb_rw_flags(iocb->aio_rw_flags);
->> +	if ((req->common.ki_flags & IOCB_NOWAIT) &&
->> +	    !(req->common.ki_flags & IOCB_DIRECT)) {
->> +			ret = -EINVAL;
->> +			goto out_put_req;
->> +		}
-> 
-> Wrong indentation.  Also I think this should be EOPNOTSUPP here.
-> 
+> @@ -1593,6 +1593,11 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+>  	}
+>  
+>  	req->common.ki_flags |= iocb_rw_flags(iocb->aio_rw_flags);
+> +	if ((req->common.ki_flags & IOCB_NOWAIT) &&
+> +	    !(req->common.ki_flags & IOCB_DIRECT)) {
+> +			ret = -EINVAL;
+> +			goto out_put_req;
+> +		}
 
-Do we plan to add support for nowait in buffered I/O in the future? It
-is just too complicated. EINVAL suits best in this case.
-
--- 
-Goldwyn
+Wrong indentation.  Also I think this should be EOPNOTSUPP here.
