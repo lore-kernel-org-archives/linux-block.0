@@ -1,100 +1,31 @@
-Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 05/25] nvme: make nvme_error_status private
-Date: Thu,  6 Apr 2017 17:39:24 +0200
-Message-Id: <20170406153944.10058-6-hch@lst.de>
-In-Reply-To: <20170406153944.10058-1-hch@lst.de>
-References: <20170406153944.10058-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Date: Wed, 19 Apr 2017 09:11:45 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: ooo@electrozaur.com, martin.petersen@oracle.com,
+	trond.myklebust@primarydata.com, osd-dev@open-osd.org,
+	linux-nfs@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: RFC: drop the T10 OSD code and its users
+Message-ID: <20170419151144.GA22579@kernel.dk>
+References: <20170412160109.10598-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170412160109.10598-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently it's used by the lighnvm passthrough ioctl, but we'd like to make
-it private in preparation of block layer specific error code.  Lighnvm already
-returns the real NVMe status anyway, so I think we can just limit it to
-returning -EIO for any status set.
+On Wed, Apr 12 2017, Christoph Hellwig wrote:
+> The only real user of the T10 OSD protocol, the pNFS object layout
+> driver never went to the point of having shipping products, and the
+> other two users (osdblk and exofs) were simple example of it's usage.
+> 
+> The code has been mostly unmaintained for years and is getting in the
+> way of block / SCSI changes, so I think it's finally time to drop it.
+> 
+> These patches are against Jens' block for-next tree as that already
 
-This will need a careful audit from the lightnvm folks, though.
+I've added 1/4 for now, as that one should obviously go. If we have
+consensus to kill the rest, I'm all for it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c     | 3 +--
- drivers/nvme/host/lightnvm.c | 8 ++++----
- drivers/nvme/host/nvme.h     | 1 -
- 3 files changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index b73a86a78379..fbc7d64b6f10 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -66,7 +66,7 @@ static DEFINE_SPINLOCK(dev_list_lock);
- 
- static struct class *nvme_class;
- 
--int nvme_error_status(struct request *req)
-+static int nvme_error_status(struct request *req)
- {
- 	switch (nvme_req(req)->status & 0x7ff) {
- 	case NVME_SC_SUCCESS:
-@@ -77,7 +77,6 @@ int nvme_error_status(struct request *req)
- 		return -EIO;
- 	}
- }
--EXPORT_SYMBOL_GPL(nvme_error_status);
- 
- static inline bool nvme_req_needs_retry(struct request *req)
- {
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 3d7b92c4c577..69067833b242 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -484,7 +484,7 @@ static void nvme_nvm_end_io(struct request *rq, int error)
- 	struct nvm_rq *rqd = rq->end_io_data;
- 
- 	rqd->ppa_status = nvme_req(rq)->result.u64;
--	rqd->error = nvme_req(req)->status;
-+	rqd->error = nvme_req(rq)->status;
- 	nvm_end_io(rqd);
- 
- 	kfree(nvme_req(rq)->cmd);
-@@ -611,7 +611,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 	__le64 *metadata = NULL;
- 	dma_addr_t metadata_dma;
- 	DECLARE_COMPLETION_ONSTACK(wait);
--	int ret;
-+	int ret = 0;
- 
- 	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
- 			NVME_QID_ANY);
-@@ -683,8 +683,8 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 
- 	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
- 		ret = -EINTR;
--	else
--		ret = nvme_error_status(rq);
-+	else if (nvme_req(rq)->status & 0x7ff)
-+		ret = -EIO;
- 	if (result)
- 		*result = nvme_req(rq)->status & 0x7ff;
- 	if (status)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 7a03a0897e0b..4dc930d3545d 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -254,7 +254,6 @@ static inline void nvme_end_request(struct request *req, __le16 status,
- 	blk_mq_complete_request(req, 0);
- }
- 
--int nvme_error_status(struct request *req);
- void nvme_complete_rq(struct request *req);
- void nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
 -- 
-2.11.0
+Jens Axboe
