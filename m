@@ -1,4 +1,4 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Josef Bacik <jbacik@fb.com>,
@@ -9,127 +9,87 @@ Cc: Josef Bacik <jbacik@fb.com>,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
 	dm-devel@redhat.com
-Subject: [PATCH 13/23] nbd: don't use req->errors
-Date: Thu, 20 Apr 2017 16:03:06 +0200
-Message-Id: <20170420140316.6546-14-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
+Subject: [PATCH 03/23] nvme-fc: fix status code handling in nvme_fc_fcpio_done
+Date: Wed, 19 Apr 2017 21:26:48 +0200
+Message-Id: <20170419192708.22098-4-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Add a nbd-specific field instead.
+nvme_complete_async_event expects the little endian status code
+including the phase bit, and a new completion handler I plan to
+introduce will do so as well.
+
+Change the status variable into the little endian format with the
+phase bit used in the NVMe CQE to fix / enable this.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Josef Bacik <jbacik@fb.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/nbd.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ drivers/nvme/host/fc.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 6e592c2ba8fd..09a74a66beb1 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -115,6 +115,7 @@ struct nbd_cmd {
- 	int index;
- 	int cookie;
- 	struct completion send_complete;
-+	int status;
- };
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index fc42172c796a..aad7f9c0be32 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1147,7 +1147,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 	struct nvme_fc_ctrl *ctrl = op->ctrl;
+ 	struct nvme_fc_queue *queue = op->queue;
+ 	struct nvme_completion *cqe = &op->rsp_iu.cqe;
+-	u16 status = NVME_SC_SUCCESS;
++	__le16 status = cpu_to_le16(NVME_SC_SUCCESS << 1);
  
- #if IS_ENABLED(CONFIG_DEBUG_FS)
-@@ -244,16 +245,14 @@ static void nbd_size_set(struct nbd_device *nbd, loff_t blocksize,
- 	nbd_size_update(nbd);
- }
+ 	/*
+ 	 * WARNING:
+@@ -1182,9 +1182,9 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 				sizeof(op->rsp_iu), DMA_FROM_DEVICE);
  
--static void nbd_end_request(struct nbd_cmd *cmd)
-+static void nbd_complete_rq(struct request *req)
- {
--	struct nbd_device *nbd = cmd->nbd;
--	struct request *req = blk_mq_rq_from_pdu(cmd);
--	int error = req->errors ? -EIO : 0;
-+	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
+ 	if (atomic_read(&op->state) == FCPOP_STATE_ABORTED)
+-		status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
++		status = cpu_to_le16((NVME_SC_ABORT_REQ | NVME_SC_DNR) << 1);
+ 	else if (freq->status)
+-		status = NVME_SC_FC_TRANSPORT_ERROR;
++		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
  
--	dev_dbg(nbd_to_dev(nbd), "request %p: %s\n", cmd,
--		error ? "failed" : "done");
-+	dev_dbg(nbd_to_dev(cmd->nbd), "request %p: %s\n", cmd,
-+		cmd->status ? "failed" : "done");
- 
--	blk_mq_complete_request(req, error);
-+	blk_mq_end_request(req, cmd->status);
- }
- 
- /*
-@@ -286,7 +285,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	struct nbd_config *config;
- 
- 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
--		req->errors = -EIO;
-+		cmd->status = -EIO;
- 		return BLK_EH_HANDLED;
- 	}
- 
-@@ -331,7 +330,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 				    "Connection timed out\n");
- 	}
- 	set_bit(NBD_TIMEDOUT, &config->runtime_flags);
--	req->errors = -EIO;
-+	cmd->status = -EIO;
- 	sock_shutdown(nbd);
- 	nbd_config_put(nbd);
- 
-@@ -574,7 +573,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	if (ntohl(reply.error)) {
- 		dev_err(disk_to_dev(nbd->disk), "Other side returned error (%d)\n",
- 			ntohl(reply.error));
--		req->errors = -EIO;
-+		cmd->status = -EIO;
- 		return cmd;
- 	}
- 
-@@ -599,7 +598,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 				 */
- 				if (nbd_disconnected(config) ||
- 				    config->num_connections <= 1) {
--					req->errors = -EIO;
-+					cmd->status = -EIO;
- 					return cmd;
- 				}
- 				return ERR_PTR(-EIO);
-@@ -636,7 +635,7 @@ static void recv_work(struct work_struct *work)
- 			break;
+ 	/*
+ 	 * For the linux implementation, if we have an unsuccesful
+@@ -1212,7 +1212,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 		 */
+ 		if (freq->transferred_length !=
+ 			be32_to_cpu(op->cmd_iu.data_len)) {
+-			status = NVME_SC_FC_TRANSPORT_ERROR;
++			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
  		}
+ 		op->nreq.result.u64 = 0;
+@@ -1229,15 +1229,15 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 					freq->transferred_length ||
+ 			     op->rsp_iu.status_code ||
+ 			     op->rqno != le16_to_cpu(cqe->command_id))) {
+-			status = NVME_SC_FC_TRANSPORT_ERROR;
++			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
+ 		}
+ 		op->nreq.result = cqe->result;
+-		status = le16_to_cpu(cqe->status) >> 1;
++		status = cqe->status;
+ 		break;
  
--		nbd_end_request(cmd);
-+		blk_mq_complete_request(blk_mq_rq_from_pdu(cmd), 0);
+ 	default:
+-		status = NVME_SC_FC_TRANSPORT_ERROR;
++		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 		goto done;
  	}
- 	atomic_dec(&config->recv_threads);
- 	wake_up(&config->recv_wq);
-@@ -651,8 +650,8 @@ static void nbd_clear_req(struct request *req, void *data, bool reserved)
- 	if (!blk_mq_request_started(req))
+ 
+@@ -1249,7 +1249,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
  		return;
- 	cmd = blk_mq_rq_to_pdu(req);
--	req->errors = -EIO;
--	nbd_end_request(cmd);
-+	cmd->status = -EIO;
-+	blk_mq_complete_request(req, 0);
+ 	}
+ 
+-	blk_mq_complete_request(rq, status);
++	blk_mq_complete_request(rq, le16_to_cpu(status) >> 1);
  }
  
- static void nbd_clear_que(struct nbd_device *nbd)
-@@ -740,7 +739,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 		nbd_config_put(nbd);
- 		return -EINVAL;
- 	}
--	req->errors = 0;
-+	cmd->status = 0;
- again:
- 	nsock = config->socks[index];
- 	mutex_lock(&nsock->tx_lock);
-@@ -1408,6 +1407,7 @@ static int nbd_init_request(void *data, struct request *rq,
- 
- static const struct blk_mq_ops nbd_mq_ops = {
- 	.queue_rq	= nbd_queue_rq,
-+	.complete	= nbd_complete_rq,
- 	.init_request	= nbd_init_request,
- 	.timeout	= nbd_xmit_timeout,
- };
+ static int
 -- 
 2.11.0
