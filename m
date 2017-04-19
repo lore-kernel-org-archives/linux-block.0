@@ -1,67 +1,46 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 13/27] block_dev: use blkdev_issue_zerout for hole punches
-Date: Wed,  5 Apr 2017 16:21:51 +0200
-Message-Id: <20170405142205.6477-14-hch@lst.de>
-In-Reply-To: <20170405142205.6477-1-hch@lst.de>
-References: <20170405142205.6477-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:56232 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1760277AbdDSHoN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Apr 2017 03:44:13 -0400
+Date: Wed, 19 Apr 2017 15:44:02 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        Jozef Mikovic <jmikovic@redhat.com>
+Subject: Re: [PATCH 0/3] mtip32xx: make it working with mq scheduler
+Message-ID: <20170419074401.GA13212@ming.t460p>
+References: <20170419003142.9581-1-ming.lei@redhat.com>
+ <20170419062713.GA1372@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170419062713.GA1372@infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This gets us support for non-discard efficient write of zeroes (e.g. NVMe)
-and prepares for removing the discard_zeroes_data flag.
+On Tue, Apr 18, 2017 at 11:27:13PM -0700, Christoph Hellwig wrote:
+> Hi Ming,
+> 
+> I don't think your patch goes int the right direction.  The mtip32xx
+> driver never submits the requests it allocates using blk_mq_alloc_request.
+> So to fix this it should simply kmalloc the request, set a tag aside
+> and not use a block layer request for it at all, similar to what nvme
+> does for the AER command.
 
-Also remove a pointless discard support check, which is done in
-blkdev_issue_discard already.
+That is only about the internal command part(patch 1 and patch 2),
+and the patch 3 is required regardless.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+I choose to use blk_mq_get_driver_tag() for the 1st fix becasue it is the
+simpleset way, also given blk_mq_alloc_request() has been working on that
+for long time.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- fs/block_dev.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+If We do that via kmalloc, the command has to be initialzed as the way in
+.init_cmd(), the reserved tag space has to be accessed exclusively like what
+block layer provides, and mtip_cmd_from_tag() need to be fixed too.
+We still have to pass 'reserved_tags = 1' to blk-mq anyway.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 2f704c3a816f..e405d8e58e31 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -2069,7 +2069,6 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 			     loff_t len)
- {
- 	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
--	struct request_queue *q = bdev_get_queue(bdev);
- 	struct address_space *mapping;
- 	loff_t end = start + len - 1;
- 	loff_t isize;
-@@ -2108,15 +2107,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 					    GFP_KERNEL, BLKDEV_ZERO_NOUNMAP);
- 		break;
- 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
--		/* Only punch if the device can do zeroing discard. */
--		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
--			return -EOPNOTSUPP;
--		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
--					     GFP_KERNEL, 0);
-+		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-+					     GFP_KERNEL, BLKDEV_ZERO_NOFALLBACK);
- 		break;
- 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
--		if (!blk_queue_discard(q))
--			return -EOPNOTSUPP;
- 		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
- 					     GFP_KERNEL, 0);
- 		break;
--- 
-2.11.0
+That is why I suggest to use blk_mq_get_driver_tag() to fix the issue.
+
+Thanks,
+Ming
