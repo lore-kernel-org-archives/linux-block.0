@@ -1,61 +1,41 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v2 4/8] blk-mq: Move the "state" debugfs attribute one level down
-Date: Mon, 17 Apr 2017 09:56:47 -0700
-Message-ID: <20170417165651.12693-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170417165651.12693-1-bart.vanassche@sandisk.com>
-References: <20170417165651.12693-1-bart.vanassche@sandisk.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 19 Apr 2017 08:14:44 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@bombadil.infradead.org" <hch@bombadil.infradead.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@lst.de" <hch@lst.de>,
+	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+	"roger.pau@citrix.com" <roger.pau@citrix.com>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"jbacik@fb.com" <jbacik@fb.com>,
+	"james.smart@broadcom.com" <james.smart@broadcom.com>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: scsi: introduce a new result field in struct scsi_request
+Message-ID: <20170419061444.GB6257@lst.de>
+References: <20170418155229.5977-1-hch@bombadil.infradead.org> <20170418155229.5977-8-hch@bombadil.infradead.org> <1492554858.2689.17.camel@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1492554858.2689.17.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Move the "state" attribute from the top level to the "mq" directory
-as requested by Omar.
+On Tue, Apr 18, 2017 at 10:34:20PM +0000, Bart Van Assche wrote:
+> Did you perhaps intend "req->result" instead of "rq->result"?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+Yes.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 2a5d6d83d57c..34cac9a5fd28 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -141,11 +141,6 @@ static const struct file_operations blk_queue_flags_fops = {
- 	.write		= blk_queue_flags_store,
- };
- 
--static const struct blk_mq_debugfs_attr blk_queue_attrs[] = {
--	{"state", 0600, &blk_queue_flags_fops},
--	{},
--};
--
- static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
- {
- 	if (stat->nr_samples) {
-@@ -754,6 +749,7 @@ static const struct file_operations ctx_completed_fops = {
- 
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, &queue_poll_stat_fops},
-+	{"state", 0600, &blk_queue_flags_fops},
- 	{},
- };
- 
-@@ -870,9 +866,6 @@ int blk_mq_debugfs_register_hctxs(struct request_queue *q)
- 	if (!q->debugfs_dir)
- 		return -ENOENT;
- 
--	if (!debugfs_create_files(q->debugfs_dir, q, blk_queue_attrs))
--		goto err;
--
- 	q->mq_debugfs_dir = debugfs_create_dir("mq", q->debugfs_dir);
- 	if (!q->mq_debugfs_dir)
- 		goto err;
--- 
-2.12.2
+> Did you intend "war" or is that perhaps a typo?
+
+I'll fix the comment.
+
+> >  	trace_scsi_dispatch_cmd_done(cmd);
+> > -	blk_mq_complete_request(cmd->request, cmd->request->errors);
+> > +	blk_mq_complete_request(cmd->request, 0);
+> >  }
+> 
+> Why has cmd->request->errors been changed into 0?
+
+Because the argument is only used to set req->errors, which we won't
+look at any more.
