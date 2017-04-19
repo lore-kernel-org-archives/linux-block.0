@@ -1,58 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46572 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S938548AbdD1EaT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 00:30:19 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>, Josef Bacik <jbacik@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] block: nbd: fix double free
-Date: Fri, 28 Apr 2017 12:29:42 +0800
-Message-Id: <20170428042942.6567-1-ming.lei@redhat.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:57746 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934199AbdDST2M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Apr 2017 15:28:12 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+        James Smart <james.smart@broadcom.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH 19/23] floppy: switch from req->errors to req->error_count
+Date: Wed, 19 Apr 2017 21:27:04 +0200
+Message-Id: <20170419192708.22098-20-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks it is a typo, just fix it, otherwise the following
-warning can be trigerred:
-
-[ming@VM]$sudo rmmod nbd
-[sudo] password for ming:
-==================================================================
-BUG: KASAN: use-after-free in nbd_cleanup+0x115/0x18e [nbd] at addr ffff88024ca539b0
-Read of size 8 by task rmmod/2079
-Object at ffff88024ca53900, in cache kmalloc-256 size: 256
-Allocated:
-PID = 1414
-Freed:
-PID = 2079
-Memory state around the buggy address:
- ffff88024ca53880: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
- ffff88024ca53900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88024ca53980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                     ^
- ffff88024ca53a00: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
- ffff88024ca53a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-Fixes: c6a4759ea0c9(nbd: add device refcounting)
-Cc: Josef Bacik <jbacik@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/nbd.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/block/floppy.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 5583dc4ff941..fa44a6fce4cb 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2110,7 +2110,6 @@ static void __exit nbd_cleanup(void)
- 		if (refcount_read(&nbd->refs) != 2)
- 			printk(KERN_ERR "nbd: possibly leaking a device\n");
- 		nbd_put(nbd);
--		nbd_put(nbd);
- 	}
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index ce102ec47ef2..60d4c7653178 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -2805,8 +2805,10 @@ static int set_next_request(void)
+ 			fdc_queue = 0;
+ 		if (q) {
+ 			current_req = blk_fetch_request(q);
+-			if (current_req)
++			if (current_req) {
++				current_req->error_count = 0;
+ 				break;
++			}
+ 		}
+ 	} while (fdc_queue != old_pos);
  
- 	idr_destroy(&nbd_index_idr);
+@@ -2866,7 +2868,7 @@ static void redo_fd_request(void)
+ 		_floppy = floppy_type + DP->autodetect[DRS->probed_format];
+ 	} else
+ 		probing = 0;
+-	errors = &(current_req->errors);
++	errors = &(current_req->error_count);
+ 	tmp = make_raw_rw_request();
+ 	if (tmp < 2) {
+ 		request_done(tmp);
 -- 
-2.9.3
+2.11.0
