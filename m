@@ -1,40 +1,54 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 20 Apr 2017 10:30:22 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: Re: [PATCH v2 2/5] null_blk: Use blk_init_request_from_bio() instead
- of open-coding it
-Message-ID: <20170420083022.GX6217@linux-x5ow.site>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, =?UTF-8?q?Matias=20Bj=C3=B8rling?=
+	<m@bjorling.me>, Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v2 2/5] null_blk: Use blk_init_request_from_bio() instead of open-coding it
+Date: Wed, 19 Apr 2017 14:01:25 -0700
+Message-ID: <20170419210128.28374-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170419210128.28374-1-bart.vanassche@sandisk.com>
 References: <20170419210128.28374-1-bart.vanassche@sandisk.com>
- <20170419210128.28374-3-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170419210128.28374-3-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset="UTF-8"
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Apr 19, 2017 at 02:01:25PM -0700, Bart Van Assche wrote:
-> This patch changes the behavior of the null_blk driver for the
-> LightNVM mode as follows:
-> * REQ_FAILFAST_MASK is set for read-ahead requests.
-> * If no I/O priority has been set in the bio, the I/O priority is
->   copied from the I/O context.
-> * The rq_disk member is initialized if bio->bi_bdev != NULL.
-> * req->errors is initialized to zero.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Matias Bj�rling <m@bjorling.me>
-> Cc: Adam Manzanares <adam.manzanares@wdc.com>
-> ---
+This patch changes the behavior of the null_blk driver for the
+LightNVM mode as follows:
+* REQ_FAILFAST_MASK is set for read-ahead requests.
+* If no I/O priority has been set in the bio, the I/O priority is
+  copied from the I/O context.
+* The rq_disk member is initialized if bio->bi_bdev != NULL.
+* req->errors is initialized to zero.
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Matias Bjørling <m@bjorling.me>
+Cc: Adam Manzanares <adam.manzanares@wdc.com>
+---
+ drivers/block/null_blk.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index f93906ff31e8..e79e3d24e229 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -443,14 +443,7 @@ static int null_lnvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ 	if (IS_ERR(rq))
+ 		return -ENOMEM;
+ 
+-	rq->__sector = bio->bi_iter.bi_sector;
+-	rq->ioprio = bio_prio(bio);
+-
+-	if (bio_has_data(bio))
+-		rq->nr_phys_segments = bio_phys_segments(q, bio);
+-
+-	rq->__data_len = bio->bi_iter.bi_size;
+-	rq->bio = rq->biotail = bio;
++	blk_init_request_from_bio(rq, bio);
+ 
+ 	rq->end_io_data = rqd;
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.12.2
