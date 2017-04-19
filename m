@@ -1,32 +1,47 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        martin.petersen@oracle.com, agk@redhat.com, snitzer@redhat.com,
-        shli@kernel.org, philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        drbd-dev@lists.linbit.com, dm-devel@redhat.com,
-        linux-raid@vger.kernel.org
-Subject: Re: [PATCH 26/27] scsi: sd: Separate zeroout and discard command choices
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Return-Path: <paolo.bonzini@gmail.com>
+Return-Path: <paolo.bonzini@gmail.com>
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Subject: Re: [PATCH 26/27] scsi: sd: Separate zeroout and discard command
+ choices
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+ martin.petersen@oracle.com, agk@redhat.com, snitzer@redhat.com,
+ shli@kernel.org, philipp.reisner@linbit.com, lars.ellenberg@linbit.com
 References: <20170405172125.22600-1-hch@lst.de>
-	<20170405172125.22600-27-hch@lst.de>
-	<58c3d6a6-924e-cc86-1907-a9fd02a39c0e@redhat.com>
-Date: Wed, 19 Apr 2017 21:34:18 -0400
-In-Reply-To: <58c3d6a6-924e-cc86-1907-a9fd02a39c0e@redhat.com> (Paolo
-	Bonzini's message of "Wed, 19 Apr 2017 16:56:31 +0200")
-Message-ID: <yq1a87bsvz9.fsf@oracle.com>
+ <20170405172125.22600-27-hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ drbd-dev@lists.linbit.com, dm-devel@redhat.com, linux-raid@vger.kernel.org
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <58c3d6a6-924e-cc86-1907-a9fd02a39c0e@redhat.com>
+Date: Wed, 19 Apr 2017 16:56:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170405172125.22600-27-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
 
-Paolo,
 
-> Should this be conditional on lbprz, lbpws, lbpws10 and max_ws_blocks?
+On 05/04/2017 19:21, Christoph Hellwig wrote:
+> +static ssize_t
+> +zeroing_mode_store(struct device *dev, struct device_attribute *attr,
+> +		   const char *buf, size_t count)
+> +{
+> +	struct scsi_disk *sdkp = to_scsi_disk(dev);
+> +
+> +	if (!capable(CAP_SYS_ADMIN))
+> +		return -EACCES;
+> +
+> +
+> +	if (!strncmp(buf, zeroing_mode[SD_ZERO_WRITE], 20))
+> +		sdkp->zeroing_mode = SD_ZERO_WRITE;
+> +	else if (!strncmp(buf, zeroing_mode[SD_ZERO_WS], 20))
+> +		sdkp->zeroing_mode = SD_ZERO_WS;
+> +	else if (!strncmp(buf, zeroing_mode[SD_ZERO_WS16_UNMAP], 20))
+> +		sdkp->zeroing_mode = SD_ZERO_WS16_UNMAP;
+> +	else if (!strncmp(buf, zeroing_mode[SD_ZERO_WS10_UNMAP], 20))
+> +		sdkp->zeroing_mode = SD_ZERO_WS10_UNMAP;
 
-It is intentional that things can be overridden from userland for
-devices that report the "wrong" thing. We do the same for discard so
-people can set up udev rules.
+Should this be conditional on lbprz, lbpws, lbpws10 and max_ws_blocks?
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Thanks,
+
+Paolo
