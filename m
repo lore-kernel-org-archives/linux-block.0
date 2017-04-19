@@ -1,86 +1,91 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Date: Thu, 20 Apr 2017 15:38:49 +1000
-Subject: [PATCH 07/11] pktcdvd: use bio_clone_fast() instead of bio_clone()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149266672965.27388.264586329955894592.stgit@noble>
-In-Reply-To: <149266645258.27388.14083229348123176454.stgit@noble>
-References: <149266645258.27388.14083229348123176454.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 05/23] nvme: make nvme_error_status private
+Date: Wed, 19 Apr 2017 21:26:50 +0200
+Message-Id: <20170419192708.22098-6-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-pktcdvd doesn't change the bi_io_vec of the clone bio,
-so it is more efficient to use bio_clone_fast(), and not clone
-the bi_io_vec.
-This requires providing a bio_set, and it is safest to
-provide a dedicated bio_set rather than sharing
-fs_bio_set, which filesytems use.
-This new bio_set, pkt_bio_set, can also be use for the bio_split()
-call as the two allocations (bio_clone_fast, and bio_split) are
-independent, neither can block a bio allocated by the other.
+Currently it's used by the lighnvm passthrough ioctl, but we'd like to make
+it private in preparation of block layer specific error code.  Lighnvm already
+returns the real NVMe status anyway, so I think we can just limit it to
+returning -EIO for any status set.
 
-Signed-off-by: NeilBrown <neilb@suse.com>
+This will need a careful audit from the lightnvm folks, though.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/pktcdvd.c |   12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/nvme/host/core.c     | 3 +--
+ drivers/nvme/host/lightnvm.c | 6 +++---
+ drivers/nvme/host/nvme.h     | 1 -
+ 3 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 98394d034c29..7a437b5b8804 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -98,6 +98,7 @@ static int write_congestion_on  = PKT_WRITE_CONGESTION_ON;
- static int write_congestion_off = PKT_WRITE_CONGESTION_OFF;
- static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
- static mempool_t *psd_pool;
-+static struct bio_set *pkt_bio_set;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index c6f256d74b6b..805f250315ec 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -66,7 +66,7 @@ static DEFINE_SPINLOCK(dev_list_lock);
  
- static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
- static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
-@@ -2310,7 +2311,7 @@ static void pkt_end_io_read_cloned(struct bio *bio)
+ static struct class *nvme_class;
  
- static void pkt_make_request_read(struct pktcdvd_device *pd, struct bio *bio)
+-int nvme_error_status(struct request *req)
++static int nvme_error_status(struct request *req)
  {
--	struct bio *cloned_bio = bio_clone(bio, GFP_NOIO);
-+	struct bio *cloned_bio = bio_clone_fast(bio, GFP_NOIO, pkt_bio_set);
- 	struct packet_stacked_data *psd = mempool_alloc(psd_pool, GFP_NOIO);
+ 	switch (nvme_req(req)->status & 0x7ff) {
+ 	case NVME_SC_SUCCESS:
+@@ -77,7 +77,6 @@ int nvme_error_status(struct request *req)
+ 		return -EIO;
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(nvme_error_status);
  
- 	psd->pd = pd;
-@@ -2455,7 +2456,7 @@ static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
+ static inline bool nvme_req_needs_retry(struct request *req)
+ {
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index f85e6e57d641..7f407d5f0095 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -599,7 +599,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	__le64 *metadata = NULL;
+ 	dma_addr_t metadata_dma;
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+-	int ret;
++	int ret = 0;
  
- 			split = bio_split(bio, last_zone -
- 					  bio->bi_iter.bi_sector,
--					  GFP_NOIO, fs_bio_set);
-+					  GFP_NOIO, pkt_bio_set);
- 			bio_chain(split, bio);
- 		} else {
- 			split = bio;
-@@ -2919,6 +2920,11 @@ static int __init pkt_init(void)
- 					sizeof(struct packet_stacked_data));
- 	if (!psd_pool)
- 		return -ENOMEM;
-+	pkt_bio_set = bioset_create(BIO_POOL_SIZE, 0);
-+	if (!pkt_bio_set) {
-+		mempool_destroy(psd_pool);
-+		return -ENOMEM;
-+	}
+ 	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
+ 			NVME_QID_ANY);
+@@ -671,8 +671,8 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
  
- 	ret = register_blkdev(pktdev_major, DRIVER_NAME);
- 	if (ret < 0) {
-@@ -2951,6 +2957,7 @@ static int __init pkt_init(void)
- 	unregister_blkdev(pktdev_major, DRIVER_NAME);
- out2:
- 	mempool_destroy(psd_pool);
-+	bioset_free(pkt_bio_set);
- 	return ret;
+ 	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
+ 		ret = -EINTR;
+-	else
+-		ret = nvme_error_status(rq);
++	else if (nvme_req(rq)->status & 0x7ff)
++		ret = -EIO;
+ 	if (result)
+ 		*result = nvme_req(rq)->status & 0x7ff;
+ 	if (status)
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index d7330f75632d..550037f5efea 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -254,7 +254,6 @@ static inline void nvme_end_request(struct request *req, __le16 status,
+ 	blk_mq_complete_request(req, 0);
  }
  
-@@ -2964,6 +2971,7 @@ static void __exit pkt_exit(void)
- 
- 	unregister_blkdev(pktdev_major, DRIVER_NAME);
- 	mempool_destroy(psd_pool);
-+	bioset_free(pkt_bio_set);
- }
- 
- MODULE_DESCRIPTION("Packet writing layer for CD/DVD drives");
+-int nvme_error_status(struct request *req);
+ void nvme_complete_rq(struct request *req);
+ void nvme_cancel_request(struct request *req, void *data, bool reserved);
+ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+-- 
+2.11.0
