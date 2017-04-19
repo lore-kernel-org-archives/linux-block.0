@@ -1,61 +1,58 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v3 4/8] blk-mq: Move the "state" debugfs attribute one level down
-Date: Tue, 18 Apr 2017 16:29:45 -0700
-Message-ID: <20170418232949.5228-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 06/23] virtio: fix spelling of virtblk_scsi_request_done
+Date: Wed, 19 Apr 2017 21:26:51 +0200
+Message-Id: <20170419192708.22098-7-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Move the "state" attribute from the top level to the "mq" directory
-as requested by Omar.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
 ---
- block/blk-mq-debugfs.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ drivers/block/virtio_blk.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 2a5d6d83d57c..34cac9a5fd28 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -141,11 +141,6 @@ static const struct file_operations blk_queue_flags_fops = {
- 	.write		= blk_queue_flags_store,
- };
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index eaf99022bdc6..dbc4e80680b1 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -111,7 +111,7 @@ static int virtblk_add_req_scsi(struct virtqueue *vq, struct virtblk_req *vbr,
+ 	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
+ }
  
--static const struct blk_mq_debugfs_attr blk_queue_attrs[] = {
--	{"state", 0600, &blk_queue_flags_fops},
--	{},
--};
--
- static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
+-static inline void virtblk_scsi_reques_done(struct request *req)
++static inline void virtblk_scsi_request_done(struct request *req)
  {
- 	if (stat->nr_samples) {
-@@ -754,6 +749,7 @@ static const struct file_operations ctx_completed_fops = {
- 
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, &queue_poll_stat_fops},
-+	{"state", 0600, &blk_queue_flags_fops},
- 	{},
- };
- 
-@@ -870,9 +866,6 @@ int blk_mq_debugfs_register_hctxs(struct request_queue *q)
- 	if (!q->debugfs_dir)
- 		return -ENOENT;
- 
--	if (!debugfs_create_files(q->debugfs_dir, q, blk_queue_attrs))
--		goto err;
--
- 	q->mq_debugfs_dir = debugfs_create_dir("mq", q->debugfs_dir);
- 	if (!q->mq_debugfs_dir)
- 		goto err;
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+ 	struct virtio_blk *vblk = req->q->queuedata;
+@@ -144,7 +144,7 @@ static inline int virtblk_add_req_scsi(struct virtqueue *vq,
+ {
+ 	return -EIO;
+ }
+-static inline void virtblk_scsi_reques_done(struct request *req)
++static inline void virtblk_scsi_request_done(struct request *req)
+ {
+ }
+ #define virtblk_ioctl	NULL
+@@ -180,7 +180,7 @@ static inline void virtblk_request_done(struct request *req)
+ 	switch (req_op(req)) {
+ 	case REQ_OP_SCSI_IN:
+ 	case REQ_OP_SCSI_OUT:
+-		virtblk_scsi_reques_done(req);
++		virtblk_scsi_request_done(req);
+ 		break;
+ 	case REQ_OP_DRV_IN:
+ 		req->errors = (error != 0);
 -- 
-2.12.2
+2.11.0
