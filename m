@@ -1,34 +1,76 @@
-Return-Path: <axboe@kernel.dk>
-Received: from [192.168.1.154] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id r138sm297117ita.24.2017.04.20.15.45.56
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Apr 2017 15:45:57 -0700 (PDT)
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-mq-sched: add might_sleep() check for flush/fua insert
-Message-ID: <cd6d3a9a-8f6d-1cf8-6379-51de69544c1d@kernel.dk>
-Date: Thu, 20 Apr 2017 16:45:56 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 17/23] blk-mq: simplify __blk_mq_complete_request
+Date: Wed, 19 Apr 2017 21:27:02 +0200
+Message-Id: <20170419192708.22098-18-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-If we're doing a flush/fua insert, insertion might block on getting
-a driver tag, if can_block == true. Add a might_sleep check for that,
-since we just had a bug like that. This will help us catch a similar
-issue quicker in the future.
+Merge blk_mq_ipi_complete_request and blk_mq_stat_add into their only
+caller.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 9e3c0f92851b..57aec8462e93 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -372,6 +372,7 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0c19df66f5a0..1f98db082da3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -406,12 +406,19 @@ static void __blk_mq_complete_request_remote(void *data)
+ 	rq->q->softirq_done_fn(rq);
+ }
  
- 	if (rq->tag == -1 && op_is_flush(rq->cmd_flags)) {
-+		might_sleep_if(can_block);
- 		blk_mq_sched_insert_flush(hctx, rq, can_block);
+-static void blk_mq_ipi_complete_request(struct request *rq)
++static void __blk_mq_complete_request(struct request *rq)
+ {
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 	bool shared = false;
+ 	int cpu;
+ 
++	if (rq->internal_tag != -1)
++		blk_mq_sched_completed_request(rq);
++	if (rq->rq_flags & RQF_STATS) {
++		blk_mq_poll_stats_start(rq->q);
++		blk_stat_add(rq);
++	}
++
+ 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
+ 		rq->q->softirq_done_fn(rq);
  		return;
- 	}
-
-Signed-off-by: Jens Axboe <axboe@fb.com>
+@@ -432,22 +439,6 @@ static void blk_mq_ipi_complete_request(struct request *rq)
+ 	put_cpu();
+ }
+ 
+-static void blk_mq_stat_add(struct request *rq)
+-{
+-	if (rq->rq_flags & RQF_STATS) {
+-		blk_mq_poll_stats_start(rq->q);
+-		blk_stat_add(rq);
+-	}
+-}
+-
+-static void __blk_mq_complete_request(struct request *rq)
+-{
+-	if (rq->internal_tag != -1)
+-		blk_mq_sched_completed_request(rq);
+-	blk_mq_stat_add(rq);
+-	blk_mq_ipi_complete_request(rq);
+-}
+-
+ /**
+  * blk_mq_complete_request - end I/O on a request
+  * @rq:		the request being processed
+-- 
+2.11.0
