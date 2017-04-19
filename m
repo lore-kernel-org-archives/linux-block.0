@@ -1,56 +1,25 @@
-Return-Path: <BATV+12db14f66c2b178d1d1f+4974+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 06/25] virtio: fix spelling of virtblk_scsi_request_done
-Date: Thu,  6 Apr 2017 17:39:25 +0200
-Message-Id: <20170406153944.10058-7-hch@lst.de>
-In-Reply-To: <20170406153944.10058-1-hch@lst.de>
-References: <20170406153944.10058-1-hch@lst.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "roger.pau@citrix.com"
+	<roger.pau@citrix.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "jbacik@fb.com" <jbacik@fb.com>,
+	"james.smart@broadcom.com" <james.smart@broadcom.com>, "dm-devel@redhat.com"
+	<dm-devel@redhat.com>
+Subject: Re: [PATCH 01/23] pd: don't check blk_execute_rq return value.
+Date: Wed, 19 Apr 2017 21:02:33 +0000
+Message-ID: <1492635752.2543.16.camel@sandisk.com>
+References: <20170419192708.22098-1-hch@lst.de>
+	 <20170419192708.22098-2-hch@lst.de>
+In-Reply-To: <20170419192708.22098-2-hch@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/virtio_blk.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On Wed, 2017-04-19 at 21:26 +0200, Christoph Hellwig wrote:
+> The driver never sets req->errors, so blk_execute_rq will always return 0=
+.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index eaf99022bdc6..dbc4e80680b1 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -111,7 +111,7 @@ static int virtblk_add_req_scsi(struct virtqueue *vq, struct virtblk_req *vbr,
- 	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
- }
- 
--static inline void virtblk_scsi_reques_done(struct request *req)
-+static inline void virtblk_scsi_request_done(struct request *req)
- {
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
- 	struct virtio_blk *vblk = req->q->queuedata;
-@@ -144,7 +144,7 @@ static inline int virtblk_add_req_scsi(struct virtqueue *vq,
- {
- 	return -EIO;
- }
--static inline void virtblk_scsi_reques_done(struct request *req)
-+static inline void virtblk_scsi_request_done(struct request *req)
- {
- }
- #define virtblk_ioctl	NULL
-@@ -180,7 +180,7 @@ static inline void virtblk_request_done(struct request *req)
- 	switch (req_op(req)) {
- 	case REQ_OP_SCSI_IN:
- 	case REQ_OP_SCSI_OUT:
--		virtblk_scsi_reques_done(req);
-+		virtblk_scsi_request_done(req);
- 		break;
- 	case REQ_OP_DRV_IN:
- 		req->errors = (error != 0);
--- 
-2.11.0
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
