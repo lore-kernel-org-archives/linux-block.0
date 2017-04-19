@@ -1,39 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:42750 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1040684AbdDUUxN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 16:53:13 -0400
-Date: Fri, 21 Apr 2017 23:53:01 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Matias Bjorling <mb@lightnvm.io>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH 1/2] lightnvm: potential underflow in pblk_read_rq()
-Message-ID: <20170421205301.3ds7jrgcktuldvrp@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 20/23] ataflop: switch from req->errors to req->error_count
+Date: Wed, 19 Apr 2017 21:27:05 +0200
+Message-Id: <20170419192708.22098-21-hch@lst.de>
+In-Reply-To: <20170419192708.22098-1-hch@lst.de>
+References: <20170419192708.22098-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This is a static checker fix, and perhaps not a real bug.  The static
-checker thinks that nr_secs could be negative.  It would result in
-zeroing more memory than intended.  Anyway, even if it's not a bug,
-changing this variable to unsigned makes the code easier to audit.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/ataflop.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index bce7ed5fc73f..c9daa33e8d9c 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -288,7 +288,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
--	int nr_secs = pblk_get_secs(bio);
-+	unsigned int nr_secs = pblk_get_secs(bio);
- 	struct nvm_rq *rqd;
- 	unsigned long read_bitmap; /* Max 64 ppas per request */
- 	unsigned int bio_init_idx;
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index 2104b1b4ccda..fa69ecd52cb5 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -617,12 +617,12 @@ static void fd_error( void )
+ 	if (!fd_request)
+ 		return;
+ 
+-	fd_request->errors++;
+-	if (fd_request->errors >= MAX_ERRORS) {
++	fd_request->error_count++;
++	if (fd_request->error_count >= MAX_ERRORS) {
+ 		printk(KERN_ERR "fd%d: too many errors.\n", SelectedDrive );
+ 		fd_end_request_cur(-EIO);
+ 	}
+-	else if (fd_request->errors == RECALIBRATE_ERRORS) {
++	else if (fd_request->error_count == RECALIBRATE_ERRORS) {
+ 		printk(KERN_WARNING "fd%d: recalibrating\n", SelectedDrive );
+ 		if (SelectedDrive != -1)
+ 			SUD.track = -1;
+@@ -1386,7 +1386,7 @@ static void setup_req_params( int drive )
+ 	ReqData = ReqBuffer + 512 * ReqCnt;
+ 
+ 	if (UseTrackbuffer)
+-		read_track = (ReqCmd == READ && fd_request->errors == 0);
++		read_track = (ReqCmd == READ && fd_request->error_count == 0);
+ 	else
+ 		read_track = 0;
+ 
+@@ -1409,8 +1409,10 @@ static struct request *set_next_request(void)
+ 			fdc_queue = 0;
+ 		if (q) {
+ 			rq = blk_fetch_request(q);
+-			if (rq)
++			if (rq) {
++				rq->error_count = 0;
+ 				break;
++			}
+ 		}
+ 	} while (fdc_queue != old_pos);
+ 
+-- 
+2.11.0
