@@ -1,38 +1,29 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 10/23] null_blk: don't pass always-0 req->errors to blk_mq_complete_request
-Date: Wed, 19 Apr 2017 21:26:55 +0200
-Message-Id: <20170419192708.22098-11-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"James.Bottomley@HansenPartnership.com"
+	<James.Bottomley@HansenPartnership.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"hare@suse.com" <hare@suse.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v3 8/8] scsi: Implement blk_mq_ops.show_rq()
+Date: Wed, 19 Apr 2017 23:29:55 +0000
+Message-ID: <1492644594.2543.20.camel@sandisk.com>
+References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+	 <20170418232949.5228-9-bart.vanassche@sandisk.com>
+	 <yq1efworndq.fsf@oracle.com>
+In-Reply-To: <yq1efworndq.fsf@oracle.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/null_blk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, 2017-04-19 at 19:25 -0400, Martin K. Petersen wrote:
+> Bart Van Assche <bart.vanassche@sandisk.com> writes:
+> > Show the SCSI CDB, .eh_eflags and .result for pending SCSI commands
+> > in /sys/kernel/debug/block/*/mq/*/dispatch and */rq_list.
+>=20
+> SCSI_EH_CANCEL_CMD is no more (as of a06586325f37).
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index f93906ff31e8..24ca85a70fd8 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -281,7 +281,7 @@ static inline void null_handle_cmd(struct nullb_cmd *cmd)
- 	case NULL_IRQ_SOFTIRQ:
- 		switch (queue_mode)  {
- 		case NULL_Q_MQ:
--			blk_mq_complete_request(cmd->rq, cmd->rq->errors);
-+			blk_mq_complete_request(cmd->rq, 0);
- 			break;
- 		case NULL_Q_RQ:
- 			blk_complete_request(cmd->rq);
--- 
-2.11.0
+Thanks Martin. I will remove that flag when I repost this patch series.
+
+Bart.=
