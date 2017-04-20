@@ -1,76 +1,42 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 17/23] blk-mq: simplify __blk_mq_complete_request
-Date: Thu, 20 Apr 2017 16:03:10 +0200
-Message-Id: <20170420140316.6546-18-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:23381 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S940845AbdDTCok (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Apr 2017 22:44:40 -0400
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Subject: Re: [PATCH 6/9] T10: Move opencoded contants to common header
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
+        <1491332201-26926-7-git-send-email-dmonakhov@openvz.org>
+Date: Wed, 19 Apr 2017 22:44:31 -0400
+In-Reply-To: <1491332201-26926-7-git-send-email-dmonakhov@openvz.org> (Dmitry
+        Monakhov's message of "Tue, 4 Apr 2017 22:56:38 +0400")
+Message-ID: <yq14lxjpzlc.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Merge blk_mq_ipi_complete_request and blk_mq_stat_add into their only
-caller.
+Dmitry Monakhov <dmonakhov@openvz.org> writes:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 25 ++++++++-----------------
- 1 file changed, 8 insertions(+), 17 deletions(-)
+Dmitry,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3a2d179d49d6..3a21948c867a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -406,12 +406,19 @@ static void __blk_mq_complete_request_remote(void *data)
- 	rq->q->softirq_done_fn(rq);
- }
- 
--static void blk_mq_ipi_complete_request(struct request *rq)
-+static void __blk_mq_complete_request(struct request *rq)
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	bool shared = false;
- 	int cpu;
- 
-+	if (rq->internal_tag != -1)
-+		blk_mq_sched_completed_request(rq);
-+	if (rq->rq_flags & RQF_STATS) {
-+		blk_mq_poll_stats_start(rq->q);
-+		blk_stat_add(rq);
-+	}
-+
- 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
- 		rq->q->softirq_done_fn(rq);
- 		return;
-@@ -432,22 +439,6 @@ static void blk_mq_ipi_complete_request(struct request *rq)
- 	put_cpu();
- }
- 
--static void blk_mq_stat_add(struct request *rq)
--{
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
--		blk_stat_add(rq);
--	}
--}
--
--static void __blk_mq_complete_request(struct request *rq)
--{
--	if (rq->internal_tag != -1)
--		blk_mq_sched_completed_request(rq);
--	blk_mq_stat_add(rq);
--	blk_mq_ipi_complete_request(rq);
--}
--
- /**
-  * blk_mq_complete_request - end I/O on a request
-  * @rq:		the request being processed
+> diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
+> index 9fba9dd..f892442 100644
+> --- a/include/linux/t10-pi.h
+> +++ b/include/linux/t10-pi.h
+> @@ -33,6 +33,8 @@ struct t10_pi_tuple {
+>  	__be32 ref_tag;		/* Target LBA or indirect LBA */
+>  };
+>  
+> +#define T10_APP_ESCAPE cpu_to_be16(0xffff)
+> +#define T10_REF_ESCAPE cpu_to_be32(0xffffffff)
+
+T10 just means SCSI and does not imply protection information. Please
+make these T10_PI_{REF,APP}_ESCAPE (ideally in an enum).
+
 -- 
-2.11.0
+Martin K. Petersen	Oracle Linux Engineering
