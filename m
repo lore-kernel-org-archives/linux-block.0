@@ -1,41 +1,45 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 11/23] dm rq: don't pass irrelevant error code to blk_mq_complete_request
-Date: Thu, 20 Apr 2017 16:03:04 +0200
-Message-Id: <20170420140316.6546-12-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Date: Thu, 20 Apr 2017 12:11:16 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+	Petr Vandrovec <petr@vandrovec.name>, linux-nilfs@vger.kernel.org,
+	cluster-devel@redhat.com, osd-dev@open-osd.org,
+	codalist@coda.cs.cmu.edu, linux-afs@lists.infradead.org,
+	ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	v9fs-developer@lists.sourceforge.net, lustre-devel@lists.lustre.org
+Subject: Re: [PATCH 0/25 v3] fs: Convert all embedded bdis into separate ones
+Message-ID: <20170420181115.GA22378@kernel.dk>
+References: <20170412102449.16901-1-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-dm never uses rq->errors, so there is no need to pass an error argument
-to blk_mq_complete_request.
+On Wed, Apr 12 2017, Jan Kara wrote:
+> Hello,
+> 
+> this is the third revision of the patch series which converts all embedded
+> occurences of struct backing_dev_info to use standalone dynamically allocated
+> structures. This makes bdi handling unified across all bdi users and generally
+> removes some boilerplate code from filesystems setting up their own bdi. It
+> also allows us to remove some code from generic bdi implementation.
+> 
+> The patches were only compile-tested for most filesystems (I've tested
+> mounting only for NFS & btrfs) so fs maintainers please have a look whether
+> the changes look sound to you.
+> 
+> This series is based on top of bdi fixes that were merged into linux-block
+> git tree into for-next branch. I have pushed out the result as a branch to
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs.git bdi
+> 
+> Since all patches got reviewed by Christoph, can you please pick them up Jens?
+> Thanks!
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-rq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yep, picked up for 4.12. Thanks Jan!
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index e60f1b6845be..1173be21f6f6 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -363,7 +363,7 @@ static void dm_complete_request(struct request *rq, int error)
- 	if (!rq->q->mq_ops)
- 		blk_complete_request(rq);
- 	else
--		blk_mq_complete_request(rq, error);
-+		blk_mq_complete_request(rq, 0);
- }
- 
- /*
 -- 
-2.11.0
+Jens Axboe
