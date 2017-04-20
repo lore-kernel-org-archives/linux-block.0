@@ -1,50 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754723AbdDOS4V (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2017 14:56:21 -0400
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [GIT PULL 04/19] lightnvm: rename scrambler controller hint
-Date: Sat, 15 Apr 2017 20:55:38 +0200
-Message-ID: <20170415185553.16098-5-matias@cnexlabs.com>
-In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
-References: <20170415185553.16098-1-matias@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 06/23] virtio: fix spelling of virtblk_scsi_request_done
+Date: Thu, 20 Apr 2017 16:02:59 +0200
+Message-Id: <20170420140316.6546-7-hch@lst.de>
+In-Reply-To: <20170420140316.6546-1-hch@lst.de>
+References: <20170420140316.6546-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <jg@lightnvm.io>
-
-According to the OCSSD 1.2 specification, the 0x200 hint enables the
-media scrambler for the read/write opcode, providing that the controller
-has been correctly configured by the firmware. Rename the macro to
-represent this meaning.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
 ---
- include/linux/lightnvm.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/virtio_blk.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index e11163f..eff7d1f 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -123,7 +123,7 @@ enum {
- 	/* NAND Access Modes */
- 	NVM_IO_SUSPEND		= 0x80,
- 	NVM_IO_SLC_MODE		= 0x100,
--	NVM_IO_SCRAMBLE_DISABLE	= 0x200,
-+	NVM_IO_SCRAMBLE_ENABLE	= 0x200,
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index eaf99022bdc6..dbc4e80680b1 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -111,7 +111,7 @@ static int virtblk_add_req_scsi(struct virtqueue *vq, struct virtblk_req *vbr,
+ 	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
+ }
  
- 	/* Block Types */
- 	NVM_BLK_T_FREE		= 0x0,
+-static inline void virtblk_scsi_reques_done(struct request *req)
++static inline void virtblk_scsi_request_done(struct request *req)
+ {
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+ 	struct virtio_blk *vblk = req->q->queuedata;
+@@ -144,7 +144,7 @@ static inline int virtblk_add_req_scsi(struct virtqueue *vq,
+ {
+ 	return -EIO;
+ }
+-static inline void virtblk_scsi_reques_done(struct request *req)
++static inline void virtblk_scsi_request_done(struct request *req)
+ {
+ }
+ #define virtblk_ioctl	NULL
+@@ -180,7 +180,7 @@ static inline void virtblk_request_done(struct request *req)
+ 	switch (req_op(req)) {
+ 	case REQ_OP_SCSI_IN:
+ 	case REQ_OP_SCSI_OUT:
+-		virtblk_scsi_reques_done(req);
++		virtblk_scsi_request_done(req);
+ 		break;
+ 	case REQ_OP_DRV_IN:
+ 		req->errors = (error != 0);
 -- 
-2.9.3
+2.11.0
