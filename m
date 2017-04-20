@@ -1,108 +1,104 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-eopbgr670106.outbound.protection.outlook.com ([40.107.67.106]:7451
-        "EHLO CAN01-TO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755948AbdDPQRr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Apr 2017 12:17:47 -0400
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: Jens Axboe <axboe@fb.com>,
-        "Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>
-Subject: Kernel Oops: BUG: unable to handle kernel NULL pointer dereference at
- 0000000000000050; IP is at blk_mq_poll+0xa0/0x2e0
-Date: Sun, 16 Apr 2017 16:17:44 +0000
-Message-ID: <558BD27E-FEFA-4281-89CE-4C94964B4346@raithlin.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 2/5] block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
+Date: Thu, 20 Apr 2017 14:27:21 +0300
+Message-Id: <1492687644-4405-3-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
+References: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-SGkgQWxsDQoNCkFzIHBhcnQgb2YgbXkgdGVzdGluZyBvZiBJTyBwb2xsaW5nIFsxXSBJIGFtIHNl
-ZWluZyBhIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSBvb3BzIHRoYXQgc2VlbXMgdG8gaGF2ZSBi
-ZWVuIGludHJvZHVjZWQgaW4gdGhlIHByZXBhcmF0aW9uIGZvciA0LjExLiBUaGUga2VybmVsIG9v
-cHMgb3V0cHV0IGlzIGJlbG93IGFuZCB0aGlzIHNlZW1zIHRvIGJlIGR1ZSB0byBibGtfbXFfdGFn
-X3RvX3JxIHJldHVybmluZyBOVUxMIGluIGJsa19tcV9wb2xsIGluIGJsay1tcS5jLiBJIGhhdmUg
-bm90IGhhZCBhIGNoYW5jZSB0byBiaXNlY3QgdGhpcyBkb3duIHRvIGEgc2luZ2xlIGNvbW1pdCB5
-ZXQgYnV0IHRoZSBzYW1lIHRlc3Qgd29ya3MgZmluZSBpbiA0LjEwIGJ1dCBub3QgaW4gNC4xMS1y
-YzYuIEkgd2lsbCB0cnkgYW5kIGdldCBhIGJldHRlciBiaXNlY3QgYW5kIHNlbmQgb24gbW9yZSBp
-bmZvcm1hdGlvbiB3aGVuIEkgZ2V0IGl0LiANCg0KSSBhbSBydW5uaW5nIHRoZSBmb2xsb3dpbmcg
-c2ltcGxlIHNoZWxsIHNjcmlwdCB3aGljaCBhbHdheXMgdHJpZ2dlcnMgdGhlIE9vcHMuIE5vdGUg
-dGhpcyBzY3JpcHQgbmVlZHMgc29tZSB0d2Vha2luZyB0byB3b3JrIG9uIDQuMTEgYW5kIGVhcmxp
-ZXIgc2luY2UgdGhlIHNvbWUgdGhpbmdzIHdlcmUgbW92ZWQgZnJvbSBzeXNmcyB0byBkZWJ1Z2Zz
-IGluIHRoZSA0LjExIGFuZCA0LjEyIHRyZWVzLg0KDQojIS9iaW4vYmFzaA0KQkxPQ0s9bnZtZTFu
-MQ0KREVWPS9kZXYvJHtCTE9DS30NCg0KZWNobyAiVGVzdGluZyBwb2xsaW5nIG9uICR7REVWfSIN
-Cg0KIyBEaXNwbGF5IHRoZSBpbml0YWwgcG9sbGluZyBzZXR0aW5ncyBmb3IgdGhpcyBkZXZpY2Uu
-Li4NCg0KY2F0IC9zeXMvYmxvY2svJHtCTE9DS30vcXVldWUvaW9fcG9sbA0KY2F0IC9zeXMvYmxv
-Y2svJHtCTE9DS30vcXVldWUvaW9fcG9sbF9kZWxheQ0KDQojIERpc3BsYXkgdGhlIHBvbGxpbmcg
-cmVzdWx0cyBhbmQgc3RhdHMNCg0KY2F0IC9zeXMva2VybmVsL2RlYnVnL2Jsb2NrLyR7QkxPQ0t9
-L21xL3BvbGxfc3RhdA0KY2F0IC9zeXMva2VybmVsL2RlYnVnL2Jsb2NrLyR7QkxPQ0t9L21xLzAv
-aW9fcG9sbA0KDQojIE5vdyBkbyBzb21lIHBvbGxpbmcgSU8gYWdhaW5zdCB0aGUgYmxvY2sgZGV2
-aWNlIGluIHF1ZXN0aW9uLg0KDQpmaW8gLS1maWxlbmFtZT0ke0RFVn0gLS1zaXplPTEwMCUgLS1u
-dW1qb2JzPTEgLS1pb2RlcHRoPTEgXA0KICAgIC0tYnM9NGsgLS1udW1iZXJfaW9zPTFrIC0tcnVu
-dGltZT02MCAtLWlvZW5naW5lPXB2c3luYzIgLS1oaXByaSBcDQogICAgLS1ydz1yYW5kcncgLS1y
-YW5kb21fZ2VuZXJhdG9yPWxmc3IgLS1kaXJlY3Q9MSAtLWdyb3VwX3JlcG9ydGluZz0xIFwNCiAg
-ICAtLXJ3bWl4cmVhZD0xMDAgLS1sb29wcz0xIC0tbmFtZSBwb2xsLmZpbw0KDQojIERpc3BsYXkg
-dGhlIHBvbGxpbmcgcmVzdWx0cyBhbmQgc3RhdHMNCg0KY2F0IC9zeXMva2VybmVsL2RlYnVnL2Js
-b2NrLyR7QkxPQ0t9L21xL3BvbGxfc3RhdA0KY2F0IC9zeXMva2VybmVsL2RlYnVnL2Jsb2NrLyR7
-QkxPQ0t9L21xLzAvaW9fcG9sbA0KDQpbICAgMjYuMDI0NTI5XSBCVUc6IHVuYWJsZSB0byBoYW5k
-bGUga2VybmVsIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSBhdCAwMDAwMDAwMDAwMDAwMDUwDQpb
-ICAgMjYuMDI3MTY3XSBJUDogYmxrX21xX3BvbGwrMHhhMC8weDJlMA0KWyAgIDI2LjAyNzMyNl0g
-UEdEIDdhZDUxMDY3IA0KWyAgIDI2LjAyNzU4NF0gUFVEIDdhZGJlMDY3IA0KWyAgIDI2LjAyODAw
-Nl0gUE1EIDAgDQpbICAgMjYuMDI4MjM0XSANClsgICAyNi4wMjkzMTldIE9vcHM6IDAwMDAgWyMx
-XSBTTVANClsgICAyNi4wMzA0MDVdIENQVTogMCBQSUQ6IDE0NzQgQ29tbTogZmlvIE5vdCB0YWlu
-dGVkIDQuMTEuMC1yYzYgIzQyDQpbICAgMjYuMDMxNjc4XSBIYXJkd2FyZSBuYW1lOiBRRU1VIFN0
-YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAxOTk2KSwgQklPUyByZWwtMS43LjUtMC1nZTUxNDg4
-Yy0yMDE0MDYwMl8xNjQ2MTItbmlsc3Nvbi5ob21lLmtyYXhlbC5vcmcgMDQvMDEvMjAxNA0KWyAg
-IDI2LjAzMzc0OV0gdGFzazogZmZmZjg4MDA3Y2Y3NWEwMCB0YXNrLnN0YWNrOiBmZmZmYzkwMDAw
-NjljMDAwDQpbICAgMjYuMDM0NTc1XSBSSVA6IDAwMTA6YmxrX21xX3BvbGwrMHhhMC8weDJlMA0K
-WyAgIDI2LjAzNTIzNF0gUlNQOiAwMDE4OmZmZmZjOTAwMDA2OWZhMzggRUZMQUdTOiAwMDAwMDIx
-Ng0KWyAgIDI2LjAzNjI2OV0gUkFYOiBmZmZmODgwMDdjNWQ1MDAwIFJCWDogMDAwMDAwMDAwMDAw
-MDAwMCBSQ1g6IDAwMDAwMDAwMDAwMDAwMDANClsgICAyNi4wMzczMzBdIFJEWDogZmZmZjg4MDA3
-YzU2ZDFlOCBSU0k6IDAwMDAwMDAwMDAwMDAwYTcgUkRJOiAwMDAwMDAwMDAwMDAwMDAwDQpbICAg
-MjYuMDM5Mjg1XSBSQlA6IGZmZmZjOTAwMDA2OWZhZDAgUjA4OiAwMDAwMDAwMDAwMDAwMDAwIFIw
-OTogMDAwMDAwMDA4MDAwMDBhNw0KWyAgIDI2LjA0MDk2Ml0gUjEwOiBmZmZmYzkwMDAwNjlmYWEw
-IFIxMTogMDAwMDAwMDAwMDAwMTAwMCBSMTI6IGZmZmY4ODAwN2M1NjFmZTANClsgICAyNi4wNDIw
-MDVdIFIxMzogZmZmZmM5MDAwMDY5ZmQwMSBSMTQ6IGZmZmY4ODAwN2QzZjhhOTggUjE1OiBmZmZm
-ODgwMDdjNzcyODAwDQpbICAgMjYuMDQzNzM0XSBGUzogIDAwMDA3Zjg4MDhkN2M1ODAoMDAwMCkg
-R1M6ZmZmZjg4MDA3ZmMwMDAwMCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwDQpbICAgMjYu
-MDQ1MzY2XSBDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMz
-DQpbICAgMjYuMDQ3MjM5XSBDUjI6IDAwMDAwMDAwMDAwMDAwNTAgQ1IzOiAwMDAwMDAwMDdhZDRk
-MDAwIENSNDogMDAwMDAwMDAwMDAwMDZmMA0KWyAgIDI2LjA0ODgwMV0gRFIwOiAwMDAwMDAwMDAw
-MDAwMDAwIERSMTogMDAwMDAwMDAwMDAwMDAwMCBEUjI6IDAwMDAwMDAwMDAwMDAwMDANClsgICAy
-Ni4wNDk4OThdIERSMzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAwMDAwMDAwMDAgRFI3
-OiAwMDAwMDAwMDAwMDAwMDAwDQpbICAgMjYuMDUxMzAwXSBDYWxsIFRyYWNlOg0KWyAgIDI2LjA1
-MjU4MF0gID8gZ2VuZXJpY19tYWtlX3JlcXVlc3QrMHhmYi8weDJhMA0KWyAgIDI2LjA1Mzg2OV0g
-ID8gc3VibWl0X2JpbysweDY0LzB4MTIwDQpbICAgMjYuMDU0MTIzXSAgPyBzdWJtaXRfYmlvKzB4
-NjQvMHgxMjANClsgICAyNi4wNTQ5ODldICBfX2Jsa2Rldl9kaXJlY3RfSU9fc2ltcGxlKzB4MWJj
-LzB4MmYwDQpbICAgMjYuMDU1OTc4XSAgPyBfX2RfbG9va3VwX2RvbmUrMHg3OS8weGUwDQpbICAg
-MjYuMDU3MDA5XSAgPyBibGtkZXZfZnN5bmMrMHg1MC8weDUwDQpbICAgMjYuMDU4MzgyXSAgYmxr
-ZGV2X2RpcmVjdF9JTysweDM3ZC8weDM5MA0KWyAgIDI2LjA1OTMyMF0gID8gYmxrZGV2X2RpcmVj
-dF9JTysweDM3ZC8weDM5MA0KWyAgIDI2LjA1OTkzOV0gIGdlbmVyaWNfZmlsZV9yZWFkX2l0ZXIr
-MHgyYzIvMHg4YzANClsgICAyNi4wNjA0ODhdICA/IGdlbmVyaWNfZmlsZV9yZWFkX2l0ZXIrMHgy
-YzIvMHg4YzANClsgICAyNi4wNjA2NTZdICA/IHBhdGhfb3BlbmF0KzB4NmU0LzB4MTMyMA0KWyAg
-IDI2LjA2MDkxMF0gIGJsa2Rldl9yZWFkX2l0ZXIrMHgzNS8weDQwDQpbICAgMjYuMDYxNDMwXSAg
-X19kb19yZWFkdl93cml0ZXYrMHgxZWYvMHgzYjANClsgICAyNi4wNjE2MDldICBkb19yZWFkdl93
-cml0ZXYrMHg3ZC8weGIwDQpbICAgMjYuMDYyNjI5XSAgPyBoYW5kbGVfbW1fZmF1bHQrMHg4OC8w
-eDE1MA0KWyAgIDI2LjA2Mjg5NV0gIHZmc19yZWFkdisweDM5LzB4NTANClsgICAyNi4wNjMyOTFd
-ICA/IHZmc19yZWFkdisweDM5LzB4NTANClsgICAyNi4wNjM2NjZdICBkb19wcmVhZHYrMHhiMS8w
-eGQwDQpbICAgMjYuMDYzOTc1XSAgU3lTX3ByZWFkdjIrMHgxNy8weDMwDQpbICAgMjYuMDY0MTc1
-XSAgZW50cnlfU1lTQ0FMTF82NF9mYXN0cGF0aCsweDFhLzB4YTkNClsgICAyNi4wNjQ2ODJdIFJJ
-UDogMDAzMzoweDdmODgwNjRlMzBmOQ0KWyAgIDI2LjA2NDg3NV0gUlNQOiAwMDJiOjAwMDA3ZmZm
-NzRhMWI0ZjggRUZMQUdTOiAwMDAwMDIwMiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDE0Nw0KWyAg
-IDI2LjA2NTUzOF0gUkFYOiBmZmZmZmZmZmZmZmZmZmRhIFJCWDogMDAwMDAwMDAwMjQxMzUwMCBS
-Q1g6IDAwMDA3Zjg4MDY0ZTMwZjkNClsgICAyNi4wNjYyNzRdIFJEWDogMDAwMDAwMDAwMDAwMDAw
-MSBSU0k6IDAwMDAwMDAwMDI0MGQ3NzAgUkRJOiAwMDAwMDAwMDAwMDAwMDAzDQpbICAgMjYuMDY2
-NzAxXSBSQlA6IDAwMDA3Zjg3ZWViYjgwMDAgUjA4OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAw
-MDAwMDAwMDAwMDAwMQ0KWyAgIDI2LjA2Njg2OF0gUjEwOiAwMDAwMDAwMDI2NmZiMDAwIFIxMTog
-MDAwMDAwMDAwMDAwMDIwMiBSMTI6IDAwMDAwMDAwMDAwMDAwMDANClsgICAyNi4wNjczODRdIFIx
-MzogMDAwMDAwMDAwMDAwMTAwMCBSMTQ6IDAwMDAwMDAwMDI0MTM1MjggUjE1OiAwMDAwN2Y4N2Vl
-YmI4MDAwDQpbICAgMjYuMDY3ODc3XSBDb2RlOiAwMSAwMCAwMCAwZiBiNyBmMyA0OCBjMSBlMCAy
-MSA0OCBjMSBlOCAzMSA4NSBkYiA0YyA4YiAzYyBjMiAwZiA4OCBiNCAwMSAwMCAwMCA0OSA4YiA4
-NyBmMCAwMCAwMCAwMCAzMSBkYiAzOSAzMCAwZiA4NyBiNCAwMSAwMCAwMCA8NDg+IDhiIDQzIDUw
-IDRkIDhiIGI3IDgwIDAwIDAwIDAwIGE4IDA0IDBmIDg1IGU4IDAwIDAwIDAwIDQxIDhiIA0KWyAg
-IDI2LjA3MzgyMV0gUklQOiBibGtfbXFfcG9sbCsweGEwLzB4MmUwIFJTUDogZmZmZmM5MDAwMDY5
-ZmEzOA0KWyAgIDI2LjA3NDA3OF0gQ1IyOiAwMDAwMDAwMDAwMDAwMDUwDQpbICAgMjYuMDc2MTAx
-XSAtLS1bIGVuZCB0cmFjZSA5Zjk1NjY0NTVjZDI3YzIyIF0tLS0NCg0KQ2hlZXJzDQogDQpTdGVw
-aGVuDQoNClsxXSBodHRwOi8vbWFyYy5pbmZvLz9sPWxpbnV4LWJsb2NrJm09MTQ5MTU2Nzg1MjE1
-OTE5Jnc9Mg0KDQoNCg==
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
+
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
+---
+ block/blk-tag.c        | 8 ++++----
+ include/linux/blkdev.h | 3 ++-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-tag.c b/block/blk-tag.c
+index 07cc329..d83555e 100644
+--- a/block/blk-tag.c
++++ b/block/blk-tag.c
+@@ -35,7 +35,7 @@ EXPORT_SYMBOL(blk_queue_find_tag);
+  */
+ void blk_free_tags(struct blk_queue_tag *bqt)
+ {
+-	if (atomic_dec_and_test(&bqt->refcnt)) {
++	if (refcount_dec_and_test(&bqt->refcnt)) {
+ 		BUG_ON(find_first_bit(bqt->tag_map, bqt->max_depth) <
+ 							bqt->max_depth);
+ 
+@@ -130,7 +130,7 @@ static struct blk_queue_tag *__blk_queue_init_tags(struct request_queue *q,
+ 	if (init_tag_map(q, tags, depth))
+ 		goto fail;
+ 
+-	atomic_set(&tags->refcnt, 1);
++	refcount_set(&tags->refcnt, 1);
+ 	tags->alloc_policy = alloc_policy;
+ 	tags->next_tag = 0;
+ 	return tags;
+@@ -180,7 +180,7 @@ int blk_queue_init_tags(struct request_queue *q, int depth,
+ 		queue_flag_set(QUEUE_FLAG_QUEUED, q);
+ 		return 0;
+ 	} else
+-		atomic_inc(&tags->refcnt);
++		refcount_inc(&tags->refcnt);
+ 
+ 	/*
+ 	 * assign it, all done
+@@ -225,7 +225,7 @@ int blk_queue_resize_tags(struct request_queue *q, int new_depth)
+ 	 * Currently cannot replace a shared tag map with a new
+ 	 * one, so error out if this is the case
+ 	 */
+-	if (atomic_read(&bqt->refcnt) != 1)
++	if (refcount_read(&bqt->refcnt) != 1)
+ 		return -EBUSY;
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index aecca0e..95ef11c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -25,6 +25,7 @@
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
+ #include <linux/blkzoned.h>
++#include <linux/refcount.h>
+ 
+ struct module;
+ struct scsi_ioctl_command;
+@@ -288,7 +289,7 @@ struct blk_queue_tag {
+ 	unsigned long *tag_map;		/* bit map of free/busy tags */
+ 	int max_depth;			/* what we will send to device */
+ 	int real_max_depth;		/* what the array can hold */
+-	atomic_t refcnt;		/* map can be shared */
++	refcount_t refcnt;		/* map can be shared */
+ 	int alloc_policy;		/* tag allocation policy */
+ 	int next_tag;			/* next tag */
+ };
+-- 
+2.7.4
