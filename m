@@ -1,4 +1,4 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Josef Bacik <jbacik@fb.com>,
@@ -9,68 +9,87 @@ Cc: Josef Bacik <jbacik@fb.com>,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
 	dm-devel@redhat.com
-Subject: [PATCH 17/23] blk-mq: simplify __blk_mq_complete_request
-Date: Wed, 19 Apr 2017 21:27:02 +0200
-Message-Id: <20170419192708.22098-18-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
+Subject: [PATCH 03/23] nvme-fc: fix status code handling in nvme_fc_fcpio_done
+Date: Thu, 20 Apr 2017 16:02:56 +0200
+Message-Id: <20170420140316.6546-4-hch@lst.de>
+In-Reply-To: <20170420140316.6546-1-hch@lst.de>
+References: <20170420140316.6546-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Merge blk_mq_ipi_complete_request and blk_mq_stat_add into their only
-caller.
+nvme_complete_async_event expects the little endian status code
+including the phase bit, and a new completion handler I plan to
+introduce will do so as well.
+
+Change the status variable into the little endian format with the
+phase bit used in the NVMe CQE to fix / enable this.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-mq.c | 25 ++++++++-----------------
- 1 file changed, 8 insertions(+), 17 deletions(-)
+ drivers/nvme/host/fc.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0c19df66f5a0..1f98db082da3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -406,12 +406,19 @@ static void __blk_mq_complete_request_remote(void *data)
- 	rq->q->softirq_done_fn(rq);
- }
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index fc42172c796a..aad7f9c0be32 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1147,7 +1147,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 	struct nvme_fc_ctrl *ctrl = op->ctrl;
+ 	struct nvme_fc_queue *queue = op->queue;
+ 	struct nvme_completion *cqe = &op->rsp_iu.cqe;
+-	u16 status = NVME_SC_SUCCESS;
++	__le16 status = cpu_to_le16(NVME_SC_SUCCESS << 1);
  
--static void blk_mq_ipi_complete_request(struct request *rq)
-+static void __blk_mq_complete_request(struct request *rq)
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	bool shared = false;
- 	int cpu;
+ 	/*
+ 	 * WARNING:
+@@ -1182,9 +1182,9 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 				sizeof(op->rsp_iu), DMA_FROM_DEVICE);
  
-+	if (rq->internal_tag != -1)
-+		blk_mq_sched_completed_request(rq);
-+	if (rq->rq_flags & RQF_STATS) {
-+		blk_mq_poll_stats_start(rq->q);
-+		blk_stat_add(rq);
-+	}
-+
- 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
- 		rq->q->softirq_done_fn(rq);
+ 	if (atomic_read(&op->state) == FCPOP_STATE_ABORTED)
+-		status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
++		status = cpu_to_le16((NVME_SC_ABORT_REQ | NVME_SC_DNR) << 1);
+ 	else if (freq->status)
+-		status = NVME_SC_FC_TRANSPORT_ERROR;
++		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 
+ 	/*
+ 	 * For the linux implementation, if we have an unsuccesful
+@@ -1212,7 +1212,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 		 */
+ 		if (freq->transferred_length !=
+ 			be32_to_cpu(op->cmd_iu.data_len)) {
+-			status = NVME_SC_FC_TRANSPORT_ERROR;
++			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
+ 		}
+ 		op->nreq.result.u64 = 0;
+@@ -1229,15 +1229,15 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 					freq->transferred_length ||
+ 			     op->rsp_iu.status_code ||
+ 			     op->rqno != le16_to_cpu(cqe->command_id))) {
+-			status = NVME_SC_FC_TRANSPORT_ERROR;
++			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
+ 		}
+ 		op->nreq.result = cqe->result;
+-		status = le16_to_cpu(cqe->status) >> 1;
++		status = cqe->status;
+ 		break;
+ 
+ 	default:
+-		status = NVME_SC_FC_TRANSPORT_ERROR;
++		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 		goto done;
+ 	}
+ 
+@@ -1249,7 +1249,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
  		return;
-@@ -432,22 +439,6 @@ static void blk_mq_ipi_complete_request(struct request *rq)
- 	put_cpu();
+ 	}
+ 
+-	blk_mq_complete_request(rq, status);
++	blk_mq_complete_request(rq, le16_to_cpu(status) >> 1);
  }
  
--static void blk_mq_stat_add(struct request *rq)
--{
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
--		blk_stat_add(rq);
--	}
--}
--
--static void __blk_mq_complete_request(struct request *rq)
--{
--	if (rq->internal_tag != -1)
--		blk_mq_sched_completed_request(rq);
--	blk_mq_stat_add(rq);
--	blk_mq_ipi_complete_request(rq);
--}
--
- /**
-  * blk_mq_complete_request - end I/O on a request
-  * @rq:		the request being processed
+ static int
 -- 
 2.11.0
