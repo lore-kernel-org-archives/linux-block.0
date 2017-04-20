@@ -1,43 +1,23 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 18/23] block: add a error_count field to struct request
-Date: Wed, 19 Apr 2017 21:27:03 +0200
-Message-Id: <20170419192708.22098-19-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:42032 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S941484AbdDTFhX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 01:37:23 -0400
+Date: Wed, 19 Apr 2017 22:37:23 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: Improve error handling verbosity
+Message-ID: <20170420053723.GB10381@infradead.org>
+References: <1491221029-1609-1-git-send-email-dmonakhov@openvz.org>
+ <1491221029-1609-2-git-send-email-dmonakhov@openvz.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1491221029-1609-2-git-send-email-dmonakhov@openvz.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is for the legacy floppy and ataflop drivers that currently abuse
-->errors for this purpose.  It's stashed away in a union to not grow
-the struct size, the other fields are either used by modern drivers
-for different purposes or the I/O scheduler before queing the I/O
-to drivers.
+Looks fine,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d8bcd51b8a47..e8006abce8b6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -175,6 +175,7 @@ struct request {
- 		struct rb_node rb_node;	/* sort/lookup */
- 		struct bio_vec special_vec;
- 		void *completion_data;
-+		int error_count; /* for legacy drivers, don't use */
- 	};
- 
- 	/*
--- 
-2.11.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
