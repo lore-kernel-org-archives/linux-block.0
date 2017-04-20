@@ -1,174 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:24344 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756876AbdDQTPR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2017 15:15:17 -0400
-Subject: [resend PATCH v2 08/33] dcssblk: add dax_operations support
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-fsdevel@vger.kernel.org, hch@lst.de,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>
-Date: Mon, 17 Apr 2017 12:09:32 -0700
-Message-ID: <149245617283.10206.846177305206642788.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+Received: from mx2.suse.de ([195.135.220.15]:49979 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S970408AbdDTPTT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 11:19:19 -0400
+Date: Thu, 20 Apr 2017 17:19:16 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+        James Smart <james.smart@broadcom.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [PATCH 21/23] swim3: remove (commented out) printing of
+ req->errors
+Message-ID: <20170420151916.GO13676@linux-x5ow.site>
+References: <20170420140316.6546-1-hch@lst.de>
+ <20170420140316.6546-22-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170420140316.6546-22-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Setup a dax_dev to have the same lifetime as the dcssblk block device
-and add a ->direct_access() method that is equivalent to
-dcssblk_direct_access(). Once fs/dax.c has been converted to use
-dax_operations the old dcssblk_direct_access() will be removed.
+On Thu, Apr 20, 2017 at 04:03:14PM +0200, Christoph Hellwig wrote:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Cc: Gerald Schaefer <gerald.schaefer@de.ibm.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- drivers/s390/block/Kconfig   |    1 +
- drivers/s390/block/dcssblk.c |   54 +++++++++++++++++++++++++++++++++++-------
- 2 files changed, 46 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/s390/block/Kconfig b/drivers/s390/block/Kconfig
-index 4a3b62326183..0acb8c2f9475 100644
---- a/drivers/s390/block/Kconfig
-+++ b/drivers/s390/block/Kconfig
-@@ -14,6 +14,7 @@ config BLK_DEV_XPRAM
- 
- config DCSSBLK
- 	def_tristate m
-+	select DAX
- 	prompt "DCSSBLK support"
- 	depends on S390 && BLOCK
- 	help
-diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
-index 415d10a67b7a..682a9eb4934d 100644
---- a/drivers/s390/block/dcssblk.c
-+++ b/drivers/s390/block/dcssblk.c
-@@ -18,6 +18,7 @@
- #include <linux/interrupt.h>
- #include <linux/platform_device.h>
- #include <linux/pfn_t.h>
-+#include <linux/dax.h>
- #include <asm/extmem.h>
- #include <asm/io.h>
- 
-@@ -30,8 +31,10 @@ static int dcssblk_open(struct block_device *bdev, fmode_t mode);
- static void dcssblk_release(struct gendisk *disk, fmode_t mode);
- static blk_qc_t dcssblk_make_request(struct request_queue *q,
- 						struct bio *bio);
--static long dcssblk_direct_access(struct block_device *bdev, sector_t secnum,
-+static long dcssblk_blk_direct_access(struct block_device *bdev, sector_t secnum,
- 			 void **kaddr, pfn_t *pfn, long size);
-+static long dcssblk_dax_direct_access(struct dax_device *dax_dev, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn);
- 
- static char dcssblk_segments[DCSSBLK_PARM_LEN] = "\0";
- 
-@@ -40,7 +43,11 @@ static const struct block_device_operations dcssblk_devops = {
- 	.owner   	= THIS_MODULE,
- 	.open    	= dcssblk_open,
- 	.release 	= dcssblk_release,
--	.direct_access 	= dcssblk_direct_access,
-+	.direct_access 	= dcssblk_blk_direct_access,
-+};
-+
-+static const struct dax_operations dcssblk_dax_ops = {
-+	.direct_access = dcssblk_dax_direct_access,
- };
- 
- struct dcssblk_dev_info {
-@@ -57,6 +64,7 @@ struct dcssblk_dev_info {
- 	struct request_queue *dcssblk_queue;
- 	int num_of_segments;
- 	struct list_head seg_list;
-+	struct dax_device *dax_dev;
- };
- 
- struct segment_info {
-@@ -389,6 +397,8 @@ dcssblk_shared_store(struct device *dev, struct device_attribute *attr, const ch
- 	}
- 	list_del(&dev_info->lh);
- 
-+	kill_dax(dev_info->dax_dev);
-+	put_dax(dev_info->dax_dev);
- 	del_gendisk(dev_info->gd);
- 	blk_cleanup_queue(dev_info->dcssblk_queue);
- 	dev_info->gd->queue = NULL;
-@@ -525,6 +535,7 @@ dcssblk_add_store(struct device *dev, struct device_attribute *attr, const char
- 	int rc, i, j, num_of_segments;
- 	struct dcssblk_dev_info *dev_info;
- 	struct segment_info *seg_info, *temp;
-+	struct dax_device *dax_dev;
- 	char *local_buf;
- 	unsigned long seg_byte_size;
- 
-@@ -654,6 +665,11 @@ dcssblk_add_store(struct device *dev, struct device_attribute *attr, const char
- 	if (rc)
- 		goto put_dev;
- 
-+	dax_dev = alloc_dax(dev_info, dev_info->gd->disk_name,
-+			&dcssblk_dax_ops);
-+	if (!dax_dev)
-+		goto put_dev;
-+
- 	get_device(&dev_info->dev);
- 	device_add_disk(&dev_info->dev, dev_info->gd);
- 
-@@ -752,6 +768,8 @@ dcssblk_remove_store(struct device *dev, struct device_attribute *attr, const ch
- 	}
- 
- 	list_del(&dev_info->lh);
-+	kill_dax(dev_info->dax_dev);
-+	put_dax(dev_info->dax_dev);
- 	del_gendisk(dev_info->gd);
- 	blk_cleanup_queue(dev_info->dcssblk_queue);
- 	dev_info->gd->queue = NULL;
-@@ -883,21 +901,39 @@ dcssblk_make_request(struct request_queue *q, struct bio *bio)
- }
- 
- static long
--dcssblk_direct_access (struct block_device *bdev, sector_t secnum,
-+__dcssblk_direct_access(struct dcssblk_dev_info *dev_info, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn)
-+{
-+	resource_size_t offset = pgoff * PAGE_SIZE;
-+	unsigned long dev_sz;
-+
-+	dev_sz = dev_info->end - dev_info->start + 1;
-+	*kaddr = (void *) dev_info->start + offset;
-+	*pfn = __pfn_to_pfn_t(PFN_DOWN(dev_info->start + offset), PFN_DEV);
-+
-+	return (dev_sz - offset) / PAGE_SIZE;
-+}
-+
-+static long
-+dcssblk_blk_direct_access(struct block_device *bdev, sector_t secnum,
- 			void **kaddr, pfn_t *pfn, long size)
- {
- 	struct dcssblk_dev_info *dev_info;
--	unsigned long offset, dev_sz;
- 
- 	dev_info = bdev->bd_disk->private_data;
- 	if (!dev_info)
- 		return -ENODEV;
--	dev_sz = dev_info->end - dev_info->start + 1;
--	offset = secnum * 512;
--	*kaddr = (void *) dev_info->start + offset;
--	*pfn = __pfn_to_pfn_t(PFN_DOWN(dev_info->start + offset), PFN_DEV);
-+	return __dcssblk_direct_access(dev_info, PHYS_PFN(secnum * 512),
-+			PHYS_PFN(size), kaddr, pfn) * PAGE_SIZE;
-+}
-+
-+static long
-+dcssblk_dax_direct_access(struct dax_device *dax_dev, pgoff_t pgoff,
-+		long nr_pages, void **kaddr, pfn_t *pfn)
-+{
-+	struct dcssblk_dev_info *dev_info = dax_get_private(dax_dev);
- 
--	return dev_sz - offset;
-+	return __dcssblk_direct_access(dev_info, pgoff, nr_pages, kaddr, pfn);
- }
- 
- static void
+Easy enough,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
