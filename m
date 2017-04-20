@@ -1,32 +1,38 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 20 Apr 2017 17:02:37 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
 	James Smart <james.smart@broadcom.com>,
 	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH 10/23] null_blk: don't pass always-0 req->errors to
- blk_mq_complete_request
-Message-ID: <20170420150237.GJ13676@linux-x5ow.site>
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 10/23] null_blk: don't pass always-0 req->errors to blk_mq_complete_request
+Date: Thu, 20 Apr 2017 16:03:03 +0200
+Message-Id: <20170420140316.6546-11-hch@lst.de>
+In-Reply-To: <20170420140316.6546-1-hch@lst.de>
 References: <20170420140316.6546-1-hch@lst.de>
- <20170420140316.6546-11-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170420140316.6546-11-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 20, 2017 at 04:03:03PM +0200, Christoph Hellwig wrote:
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/null_blk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index e79e3d24e229..0ca4aa34edb9 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -281,7 +281,7 @@ static inline void null_handle_cmd(struct nullb_cmd *cmd)
+ 	case NULL_IRQ_SOFTIRQ:
+ 		switch (queue_mode)  {
+ 		case NULL_Q_MQ:
+-			blk_mq_complete_request(cmd->rq, cmd->rq->errors);
++			blk_mq_complete_request(cmd->rq, 0);
+ 			break;
+ 		case NULL_Q_RQ:
+ 			blk_complete_request(cmd->rq);
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
