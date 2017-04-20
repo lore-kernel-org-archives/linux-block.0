@@ -1,55 +1,90 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>,
-	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>, Adam Manzanares
-	<adam.manzanares@wdc.com>
-Subject: [PATCH 2/5] null_blk: Use blk_init_request_from_bio() instead of open-coding it
-Date: Tue, 18 Apr 2017 16:10:34 -0700
-Message-ID: <20170418231037.3968-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418231037.3968-1-bart.vanassche@sandisk.com>
-References: <20170418231037.3968-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 5/5] block: convert bsg_device.ref_count from atomic_t to refcount_t
+Date: Thu, 20 Apr 2017 14:27:24 +0300
+Message-Id: <1492687644-4405-6-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
+References: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch changes the behavior of the null_blk driver for the
-LightNVM mode as follows:
-* REQ_FAILFAST_MASK is set for read-ahead requests.
-* If no I/O priority has been set in the bio, the I/O priority is
-  copied from the I/O context.
-* The rq_disk member is initialized if bio->bi_bdev != NULL.
-* req->errors is initialized to zero.
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Matias Bjørling <m@bjorling.me>
-Cc: Adam Manzanares <adam.manzanares@wdc.com>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- drivers/block/null_blk.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ block/bsg.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index f93906ff31e8..e79e3d24e229 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -443,14 +443,7 @@ static int null_lnvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
- 	if (IS_ERR(rq))
- 		return -ENOMEM;
+diff --git a/block/bsg.c b/block/bsg.c
+index 74835db..6d0ceb9 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -21,6 +21,7 @@
+ #include <linux/idr.h>
+ #include <linux/bsg.h>
+ #include <linux/slab.h>
++#include <linux/refcount.h>
  
--	rq->__sector = bio->bi_iter.bi_sector;
--	rq->ioprio = bio_prio(bio);
--
--	if (bio_has_data(bio))
--		rq->nr_phys_segments = bio_phys_segments(q, bio);
--
--	rq->__data_len = bio->bi_iter.bi_size;
--	rq->bio = rq->biotail = bio;
-+	blk_init_request_from_bio(rq, bio);
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+@@ -38,7 +39,7 @@ struct bsg_device {
+ 	struct list_head busy_list;
+ 	struct list_head done_list;
+ 	struct hlist_node dev_list;
+-	atomic_t ref_count;
++	refcount_t ref_count;
+ 	int queued_cmds;
+ 	int done_cmds;
+ 	wait_queue_head_t wq_done;
+@@ -711,7 +712,7 @@ static int bsg_put_device(struct bsg_device *bd)
  
- 	rq->end_io_data = rqd;
+ 	mutex_lock(&bsg_mutex);
  
+-	do_free = atomic_dec_and_test(&bd->ref_count);
++	do_free = refcount_dec_and_test(&bd->ref_count);
+ 	if (!do_free) {
+ 		mutex_unlock(&bsg_mutex);
+ 		goto out;
+@@ -763,7 +764,7 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
+ 
+ 	bsg_set_block(bd, file);
+ 
+-	atomic_set(&bd->ref_count, 1);
++	refcount_set(&bd->ref_count, 1);
+ 	mutex_lock(&bsg_mutex);
+ 	hlist_add_head(&bd->dev_list, bsg_dev_idx_hash(iminor(inode)));
+ 
+@@ -783,7 +784,7 @@ static struct bsg_device *__bsg_get_device(int minor, struct request_queue *q)
+ 
+ 	hlist_for_each_entry(bd, bsg_dev_idx_hash(minor), dev_list) {
+ 		if (bd->queue == q) {
+-			atomic_inc(&bd->ref_count);
++			refcount_inc(&bd->ref_count);
+ 			goto found;
+ 		}
+ 	}
 -- 
-2.12.2
+2.7.4
