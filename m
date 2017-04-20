@@ -1,40 +1,34 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 20 Apr 2017 17:21:49 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
 	James Smart <james.smart@broadcom.com>,
 	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 21/23] swim3: remove (commented out) printing of req->errors
-Date: Thu, 20 Apr 2017 16:03:14 +0200
-Message-Id: <20170420140316.6546-22-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
+	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [PATCH 23/23] block: remove the errors field from struct request
+Message-ID: <20170420152148.GQ13676@linux-x5ow.site>
 References: <20170420140316.6546-1-hch@lst.de>
+ <20170420140316.6546-24-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170420140316.6546-24-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/swim3.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Thu, Apr 20, 2017 at 04:03:16PM +0200, Christoph Hellwig wrote:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
+> Acked-by: Roger Pau Monn� <roger.pau@citrix.com>
+> Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> ---
 
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index 61b3ffa4f458..ba4809c9bdba 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -343,8 +343,8 @@ static void start_request(struct floppy_state *fs)
- 			  req->rq_disk->disk_name, req->cmd,
- 			  (long)blk_rq_pos(req), blk_rq_sectors(req),
- 			  bio_data(req->bio));
--		swim3_dbg("           errors=%d current_nr_sectors=%u\n",
--			  req->errors, blk_rq_cur_sectors(req));
-+		swim3_dbg("           current_nr_sectors=%u\n",
-+			  blk_rq_cur_sectors(req));
- #endif
- 
- 		if (blk_rq_pos(req) >= fs->total_secs) {
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.11.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
