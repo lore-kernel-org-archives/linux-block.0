@@ -1,79 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:44265 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751536AbdDBNmK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2017 09:42:10 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@mellanox.com>,
-        Or Gerlitz <ogerlitz@mellanox.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH rfc 6/6] nvme-rdma: use intelligent affinity based queue mappings
-Date: Sun,  2 Apr 2017 16:41:32 +0300
-Message-Id: <1491140492-25703-7-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
-References: <1491140492-25703-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        martin.petersen@oracle.com, agk@redhat.com, snitzer@redhat.com,
+        shli@kernel.org, philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dm-devel@redhat.com,
+        linux-raid@vger.kernel.org
+Subject: Re: [PATCH 26/27] scsi: sd: Separate zeroout and discard command choices
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170405172125.22600-1-hch@lst.de>
+	<20170405172125.22600-27-hch@lst.de>
+	<58c3d6a6-924e-cc86-1907-a9fd02a39c0e@redhat.com>
+Date: Wed, 19 Apr 2017 21:34:18 -0400
+In-Reply-To: <58c3d6a6-924e-cc86-1907-a9fd02a39c0e@redhat.com> (Paolo
+	Bonzini's message of "Wed, 19 Apr 2017 16:56:31 +0200")
+Message-ID: <yq1a87bsvz9.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Use the geneic block layer affinity mapping helper. Also,
-limit nr_hw_queues to the rdma device number of irq vectors
-as we don't really need more.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Paolo,
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 4aae363943e3..81ee5b1207c8 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -19,6 +19,7 @@
- #include <linux/string.h>
- #include <linux/atomic.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-mq-rdma.h>
- #include <linux/types.h>
- #include <linux/list.h>
- #include <linux/mutex.h>
-@@ -645,10 +646,14 @@ static int nvme_rdma_connect_io_queues(struct nvme_rdma_ctrl *ctrl)
- static int nvme_rdma_init_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
- 	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
-+	struct ib_device *ibdev = ctrl->device->dev;
- 	unsigned int nr_io_queues;
- 	int i, ret;
- 
- 	nr_io_queues = min(opts->nr_io_queues, num_online_cpus());
-+	nr_io_queues = min_t(unsigned int, nr_io_queues,
-+				ibdev->num_comp_vectors);
-+
- 	ret = nvme_set_queue_count(&ctrl->ctrl, &nr_io_queues);
- 	if (ret)
- 		return ret;
-@@ -1523,6 +1528,13 @@ static void nvme_rdma_complete_rq(struct request *rq)
- 	nvme_complete_rq(rq);
- }
- 
-+static int nvme_rdma_map_queues(struct blk_mq_tag_set *set)
-+{
-+	struct nvme_rdma_ctrl *ctrl = set->driver_data;
-+
-+	return blk_mq_rdma_map_queues(set, ctrl->device->dev, 0);
-+}
-+
- static const struct blk_mq_ops nvme_rdma_mq_ops = {
- 	.queue_rq	= nvme_rdma_queue_rq,
- 	.complete	= nvme_rdma_complete_rq,
-@@ -1532,6 +1544,7 @@ static const struct blk_mq_ops nvme_rdma_mq_ops = {
- 	.init_hctx	= nvme_rdma_init_hctx,
- 	.poll		= nvme_rdma_poll,
- 	.timeout	= nvme_rdma_timeout,
-+	.map_queues	= nvme_rdma_map_queues,
- };
- 
- static const struct blk_mq_ops nvme_rdma_admin_mq_ops = {
+> Should this be conditional on lbprz, lbpws, lbpws10 and max_ws_blocks?
+
+It is intentional that things can be overridden from userland for
+devices that report the "wrong" thing. We do the same for discard so
+people can set up udev rules.
+
 -- 
-2.7.4
+Martin K. Petersen	Oracle Linux Engineering
