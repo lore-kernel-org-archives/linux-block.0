@@ -1,70 +1,40 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org, Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 1/2] scsi: convert unrecovered read error to -EILSEQ
-Date: Mon,  3 Apr 2017 16:03:48 +0400
-Message-Id: <1491221029-1609-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:24824 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934137AbdDTCvT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Apr 2017 22:51:19 -0400
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Subject: Re: [PATCH 8/9] bio: add bvec_iter rewind API
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
+        <1491332201-26926-9-git-send-email-dmonakhov@openvz.org>
+Date: Wed, 19 Apr 2017 22:51:08 -0400
+In-Reply-To: <1491332201-26926-9-git-send-email-dmonakhov@openvz.org> (Dmitry
+        Monakhov's message of "Tue, 4 Apr 2017 22:56:40 +0400")
+Message-ID: <yq1zifbokpv.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is quite easily to get URE after power failure and get scary message.
-URE is happens due to internal drive crc mismatch due to partial sector
-update. Most people interpret such message as "My drive is dying", which
-isreasonable assumption if your dmesg is full of complain from disks and
-read(2) return EIO. In fact this error is not fatal. One can fix it easily
-by rewriting affected sector.
+Dmitry Monakhov <dmonakhov@openvz.org> writes:
 
-So we have to handle URE like follows:
-- Return EILSEQ to signall caller that this is bad data related problem
-- Do not retry command, because this is useless.
+Dmitry,
 
+> Some ->bi_end_io handlers (for example: pi_verify or decrypt handlers)
+> need to know original data vector, but after bio traverse io-stack it
+> may be advanced, splited and relocated many times so it is hard to
+> guess original iterator. Let's add 'bi_done' conter which accounts
+> number of bytes iterator was advanced during it's evolution. Later
+> end_io handler may easily restore original iterator by rewinding
+> iterator to iter->bi_done.
 
+Originally, the original integrity bip was immutable. Any slicing and
+dicing was exclusively done on clones. And therefore the original bip
+was always suitable for use with verify.
 
-### Test case
-#Test uses two HDD: disks sdb sdc
-#Write_phase
-# let fio work ~100sec and then cut the power
-fio --ioengine=libaio --direct=1 --rw=write --bs=1M --iodepth=16 \
---time_based=1 --runtime=600 --filesize=1G --size=1T \
---name /dev/sdb --name /dev/sdc
-
-# Check_phase after system goes back
-fio --ioengine=libaio --direct=1 --group_reporting --rw=read --bs=1M \
---iodepth=16 --size=1G --filesize=1G
---name=/dev/sdb --name /dev/sdc
-
-More info about URE probability here:
-https://plus.google.com/101761226576930717211/posts/Pctq7kk1dLL
-
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
----
- drivers/scsi/scsi_lib.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 19125d7..59d64ad 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -961,6 +961,19 @@ void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
- 			/* See SSC3rXX or current. */
- 			action = ACTION_FAIL;
- 			break;
-+		case MEDIUM_ERROR:
-+			if (sshdr.asc == 0x11) {
-+				/* Handle unrecovered read error */
-+				switch (sshdr.ascq) {
-+				case 0x00: /* URE */
-+				case 0x04: /* URE auto reallocate failed */
-+				case 0x0B: /* URE recommend reassignment*/
-+				case 0x0C: /* URE recommend rewrite the data */
-+					action = ACTION_FAIL;
-+					error = -EILSEQ;
-+					break;
-+				}
-+			}
- 		default:
- 			action = ACTION_FAIL;
- 			break;
 -- 
-2.9.3
+Martin K. Petersen	Oracle Linux Engineering
