@@ -1,13 +1,6 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@osandov.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v3 2/2] blk-mq: Add a polling specific stats function
-Date: Thu, 20 Apr 2017 20:47:51 +0000
-Message-ID: <D356CC80-F509-4427-B999-641636131E8D@raithlin.com>
+To: Stephen Bates <sbates@raithlin.com>, Omar Sandoval <osandov@osandov.com>
 References: <1491567843-26190-1-git-send-email-sbates@raithlin.com>
  <1491567843-26190-3-git-send-email-sbates@raithlin.com>
  <20170420200706.GA24823@vader.DHCP.thefacebook.com>
@@ -15,20 +8,51 @@ References: <1491567843-26190-1-git-send-email-sbates@raithlin.com>
  <20170420202039.GB24823@vader.DHCP.thefacebook.com>
  <808e7f83-9f55-29cf-7472-c09daea665bd@kernel.dk>
  <0E9E52B3-977A-4159-83B3-758564FF67AD@raithlin.com>
- <6617fde7-4866-4a2d-6cf5-dc8b2c678186@kernel.dk>
-In-Reply-To: <6617fde7-4866-4a2d-6cf5-dc8b2c678186@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>,
+ "sagi@grimberg.me" <sagi@grimberg.me>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6617fde7-4866-4a2d-6cf5-dc8b2c678186@kernel.dk>
+Date: Thu, 20 Apr 2017 14:34:31 -0600
 MIME-Version: 1.0
+In-Reply-To: <0E9E52B3-977A-4159-83B3-758564FF67AD@raithlin.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-DQo+IEkgYWdyZWUsIGl0J3MgZmluZSBhcy1pcy4gV2Ugc2hvdWxkIHF1ZXVlIGl0IHVwIGZvciA0
-LjEyLg0KDQpHcmVhdC4gSSB3aWxsIGdldCBzb21ldGhpbmcgYmFzZWQgb24gT21hcuKAmXMgbGF0
-ZXN0IGNvbW1lbnRzIGFzYXAuDQoNCj4gPiBIb3dldmVyIHJpZ2h0IG5vdyBJIGFtIHN0dWNrIGFz
-IEkgYW0gc2VlaW5nIHRoZSBrZXJuZWwgb29wcyBJIHJlcG9ydGVkDQo+ID4gYmVmb3JlIGluIHRl
-c3Rpbmcgb2YgbXkgbGF0ZXN0IHBhdGNoc2V0IFsxXS4gSSB3aWxsIHRyeSBhbmQgZmluZCBzb21l
-DQo+PiB0aW1lIHRvIGJpc2VjdCB0aGF0IGJ1dCBpdCBsb29rcyBsaWtlIGl0IHdhcyBpbnRyb2R1
-Y2VkIHdoZW4gdGhlDQo+ID4gc3VwcG9ydCBmb3IgbXEgc2NoZWR1bGVycyB3YXMgYWRkZWQgKG9u
-IG9yIGFyb3VuZCBiZDE2NmVmMTgpLg0KDQo+IEp1c3QgcmVwbGllZCB0byB0aGF0IG9uZSwgbGV0
-IG1lIGtub3cgaWYgdGhlIHN1Z2dlc3Rpb24gd29ya3MuDQoNClRoYXQgc3VnZ2VzdGlvbiB3b3Jr
-ZWQuIERvIHlvdSB3YW50IG1lIHRvIHNlbmQgYSBwYXRjaCBmb3IgaXQ/DQoNClN0ZXBoZW4NCg0K
-DQoNCg==
+On 04/20/2017 02:33 PM, Stephen  Bates wrote:
+> 
+>> Nah, let's just leave it as-is then, even though I don't think it's the
+>> prettiest thing I've ever seen.
+> 
+> I did look at making the stats buckets in the request_queue struct
+> based on dir and size. Something like:
+> 
+> -       struct blk_rq_stat      poll_stat[2];
+> +       struct blk_rq_stat      poll_stat[2][BLK_MQ_POLL_STATS_BKTS/2];
+> 
+> This actually did clean up some in some places but because the
+> callback still uses a linear array of buckets we do get this:
+> 
+> -       if (cb->stat[READ].nr_samples)
+> -               q->poll_stat[READ] = cb->stat[READ];
+> -       if (cb->stat[WRITE].nr_samples)
+> -               q->poll_stat[WRITE] = cb->stat[WRITE];
+> +       for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
+> +               if (cb->stat[bucket].nr_samples)
+> +                       q->poll_stat[bucket%2][bucket/2] = cb->stat[bucket];
+> 
+> I tend to agree with Omar that keeping the buckets in a linear array
+> is overall cleaner and more generalized.
+
+I agree, it's fine as-is. We should queue it up for 4.12.
+
+> However right now I am stuck as I am seeing the kernel oops I reported
+> before in testing of my latest patchset [1]. I will try and find some
+> time to bisect that but it looks like it was introduced when the
+> support for mq schedulers was added (on or around bd166ef18).
+
+Just replied to that one, let me know if the suggestion works.
+
+-- 
+Jens Axboe
