@@ -1,72 +1,145 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v6 09/10] blk-mq: Add blk_mq_ops.show_rq()
-Date: Wed, 26 Apr 2017 13:47:56 -0700
-Message-ID: <20170426204757.18910-10-bart.vanassche@sandisk.com>
-In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 15/23] xen-blkfront: don't use req->errors
+Date: Thu, 20 Apr 2017 16:03:08 +0200
+Message-Id: <20170420140316.6546-16-hch@lst.de>
+In-Reply-To: <20170420140316.6546-1-hch@lst.de>
+References: <20170420140316.6546-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-This new callback function will be used in the next patch to show
-more information about SCSI requests.
+xen-blkfron is the last users using rq->errros for passing back error to
+blk-mq, and I'd like to get rid of that.  In the longer run the driver
+should be moving more of the completion processing into .complete, but
+this is the minimal change to move forward for now.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Roger Pau Monné <roger.pau@citrix.com>
+Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 ---
- block/blk-mq-debugfs.c | 6 +++++-
- include/linux/blk-mq.h | 8 ++++++++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ drivers/block/xen-blkfront.c | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ac39093c4ef7..bcd2a7d4a3a5 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -311,6 +311,7 @@ static const char *const rqf_name[] = {
- static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- {
- 	struct request *rq = list_entry_rq(v);
-+	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
- 	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
- 
- 	seq_printf(m, "%p {.op=", rq);
-@@ -324,8 +325,11 @@ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- 	seq_puts(m, ", .rq_flags=");
- 	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
- 		       ARRAY_SIZE(rqf_name));
--	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
-+	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
- 		   rq->internal_tag);
-+	if (mq_ops->show_rq)
-+		mq_ops->show_rq(m, rq);
-+	seq_puts(m, "}\n");
- 	return 0;
- }
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 0c4dadb85f62..32bd8eb5ba67 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -142,6 +142,14 @@ struct blk_mq_ops {
- 	reinit_request_fn	*reinit_request;
- 
- 	map_queues_fn		*map_queues;
-+
-+#ifdef CONFIG_BLK_DEBUG_FS
-+	/*
-+	 * Used by the debugfs implementation to show driver-specific
-+	 * information about a request.
-+	 */
-+	void (*show_rq)(struct seq_file *m, struct request *rq);
-+#endif
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index abed296ce605..57866355c060 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -115,6 +115,15 @@ struct split_bio {
+ 	atomic_t pending;
  };
  
- enum {
++struct blkif_req {
++	int	error;
++};
++
++static inline struct blkif_req *blkif_req(struct request *rq)
++{
++	return blk_mq_rq_to_pdu(rq);
++}
++
+ static DEFINE_MUTEX(blkfront_mutex);
+ static const struct block_device_operations xlvbd_block_fops;
+ 
+@@ -907,8 +916,14 @@ static int blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return BLK_MQ_RQ_QUEUE_BUSY;
+ }
+ 
++static void blkif_complete_rq(struct request *rq)
++{
++	blk_mq_end_request(rq, blkif_req(rq)->error);
++}
++
+ static const struct blk_mq_ops blkfront_mq_ops = {
+ 	.queue_rq = blkif_queue_rq,
++	.complete = blkif_complete_rq,
+ };
+ 
+ static void blkif_set_queue_limits(struct blkfront_info *info)
+@@ -969,7 +984,7 @@ static int xlvbd_init_blk_queue(struct gendisk *gd, u16 sector_size,
+ 		info->tag_set.queue_depth = BLK_RING_SIZE(info);
+ 	info->tag_set.numa_node = NUMA_NO_NODE;
+ 	info->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
+-	info->tag_set.cmd_size = 0;
++	info->tag_set.cmd_size = sizeof(struct blkif_req);
+ 	info->tag_set.driver_data = info;
+ 
+ 	if (blk_mq_alloc_tag_set(&info->tag_set))
+@@ -1543,7 +1558,6 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 	unsigned long flags;
+ 	struct blkfront_ring_info *rinfo = (struct blkfront_ring_info *)dev_id;
+ 	struct blkfront_info *info = rinfo->dev_info;
+-	int error;
+ 
+ 	if (unlikely(info->connected != BLKIF_STATE_CONNECTED))
+ 		return IRQ_HANDLED;
+@@ -1587,37 +1601,36 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 			continue;
+ 		}
+ 
+-		error = (bret->status == BLKIF_RSP_OKAY) ? 0 : -EIO;
++		blkif_req(req)->error = (bret->status == BLKIF_RSP_OKAY) ? 0 : -EIO;
+ 		switch (bret->operation) {
+ 		case BLKIF_OP_DISCARD:
+ 			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
+ 				struct request_queue *rq = info->rq;
+ 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+ 					   info->gd->disk_name, op_name(bret->operation));
+-				error = -EOPNOTSUPP;
++				blkif_req(req)->error = -EOPNOTSUPP;
+ 				info->feature_discard = 0;
+ 				info->feature_secdiscard = 0;
+ 				queue_flag_clear(QUEUE_FLAG_DISCARD, rq);
+ 				queue_flag_clear(QUEUE_FLAG_SECERASE, rq);
+ 			}
+-			blk_mq_complete_request(req, error);
+ 			break;
+ 		case BLKIF_OP_FLUSH_DISKCACHE:
+ 		case BLKIF_OP_WRITE_BARRIER:
+ 			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
+ 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+ 				       info->gd->disk_name, op_name(bret->operation));
+-				error = -EOPNOTSUPP;
++				blkif_req(req)->error = -EOPNOTSUPP;
+ 			}
+ 			if (unlikely(bret->status == BLKIF_RSP_ERROR &&
+ 				     rinfo->shadow[id].req.u.rw.nr_segments == 0)) {
+ 				printk(KERN_WARNING "blkfront: %s: empty %s op failed\n",
+ 				       info->gd->disk_name, op_name(bret->operation));
+-				error = -EOPNOTSUPP;
++				blkif_req(req)->error = -EOPNOTSUPP;
+ 			}
+-			if (unlikely(error)) {
+-				if (error == -EOPNOTSUPP)
+-					error = 0;
++			if (unlikely(blkif_req(req)->error)) {
++				if (blkif_req(req)->error == -EOPNOTSUPP)
++					blkif_req(req)->error = 0;
+ 				info->feature_fua = 0;
+ 				info->feature_flush = 0;
+ 				xlvbd_flush(info);
+@@ -1629,11 +1642,12 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
+ 					"request: %x\n", bret->status);
+ 
+-			blk_mq_complete_request(req, error);
+ 			break;
+ 		default:
+ 			BUG();
+ 		}
++
++		blk_mq_complete_request(req, 0);
+ 	}
+ 
+ 	rinfo->ring.rsp_cons = i;
 -- 
-2.12.2
+2.11.0
