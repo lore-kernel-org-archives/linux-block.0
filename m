@@ -1,13 +1,6 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@osandov.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>, "sagi@grimberg.me"
-	<sagi@grimberg.me>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v3 2/2] blk-mq: Add a polling specific stats function
-Date: Thu, 20 Apr 2017 21:45:34 +0000
-Message-ID: <AF85FD03-874B-4E51-BE7E-0B6A6F2F5E76@raithlin.com>
+To: Stephen Bates <sbates@raithlin.com>, Omar Sandoval <osandov@osandov.com>
 References: <1491567843-26190-1-git-send-email-sbates@raithlin.com>
  <1491567843-26190-3-git-send-email-sbates@raithlin.com>
  <20170420200706.GA24823@vader.DHCP.thefacebook.com>
@@ -21,13 +14,29 @@ References: <1491567843-26190-1-git-send-email-sbates@raithlin.com>
  <0C2FFC52-512F-4031-8E6F-487FA651A31B@raithlin.com>
  <6214fe06-c636-c565-9b2c-fab7cf2e6d19@kernel.dk>
  <F8C6A572-C589-4FF9-8DB2-66D6CC045EA1@raithlin.com>
- <16225338-232a-ef39-0b9d-1281e0a66367@kernel.dk>
-In-Reply-To: <16225338-232a-ef39-0b9d-1281e0a66367@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>,
+ "sagi@grimberg.me" <sagi@grimberg.me>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <16225338-232a-ef39-0b9d-1281e0a66367@kernel.dk>
+Date: Thu, 20 Apr 2017 15:42:56 -0600
 MIME-Version: 1.0
+In-Reply-To: <F8C6A572-C589-4FF9-8DB2-66D6CC045EA1@raithlin.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-DQo+IFlvdSBjYW4sIGJ1dCBpdCB3b24ndCBkbyBtdWNoIGdvb2Qgc2luY2UgdjMgaXMgYWxyZWFk
-eSBhcHBsaWVkLiBBbnkNCj4gZnVydGhlciBjaGFuZ2VzIG11c3QgYmUgaW5jcmVtZW50YWwuDQoN
-Ck9LLCBJIHdpbGwgc2VuZCBhIHNtYWxsIHBhdGNoIG9uIHRvcCBvZiB3aGF0IHlvdSBqdXN0IGFw
-cGxpZWQuIFRoYW5rcyENCg0KDQoNCg==
+On 04/20/2017 03:41 PM, Stephen  Bates wrote:
+> 
+>> Great thanks, pushed. I'll get this added for 4.11. Thanks for
+>> the report!
+> 
+> I see you applied my v3 series to the for-4.12/block branch. There is
+> one issue there I need to fix. Can I send you a v4 a bit later today
+> instead?
+
+You can, but it won't do much good since v3 is already applied. Any
+further changes must be incremental.
+
+-- 
+Jens Axboe
