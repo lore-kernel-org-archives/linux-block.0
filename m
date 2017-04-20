@@ -1,45 +1,28 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: kill req->errors V3
-Date: Wed, 19 Apr 2017 21:26:28 +0200
-Message-Id: <20170419192651.22037-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:21164 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1763535AbdDTCex (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Apr 2017 22:34:53 -0400
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Subject: Re: [PATCH 2/9] bio-integrity: bio_trim should truncate integrity vector accordingly
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
+        <1491332201-26926-3-git-send-email-dmonakhov@openvz.org>
+Date: Wed, 19 Apr 2017 22:34:42 -0400
+In-Reply-To: <1491332201-26926-3-git-send-email-dmonakhov@openvz.org> (Dmitry
+        Monakhov's message of "Tue, 4 Apr 2017 22:56:34 +0400")
+Message-ID: <yq1lgqvq01p.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently the request structure has an errors field that is used in
-various different ways.  The oldest drivers use it as an error count,
-blk-mq and the generic timeout code assume that it holds a Linux
-errno for block completions, and various drivers use it for internal
-status values, often overwriting them with Linux errnos later,
-that is unless they are processing passthrough requests in which
-case they'll leave their errors in it.
+Dmitry Monakhov <dmonakhov@openvz.org> writes:
 
-This series kills the ->errors field and replaced it with new fields
-in the drivers (or an odd hack in a union in struct request for
-two bitrotting old drivers).
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Also available in the following git tree:
-
-    git://git.infradead.org/users/hch/block.git request-errors
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/request-errors
-
-Changes since V2;
- - reorder one patch to be earlier in the series
- - fix the argument to a bsg dprintk
- - fix a kerneldoc comment
-
-Changes since V1:
- - rebased on top the latest block for-next tree
- - fix error handling in nfsd blocklayout
- - dropped "scsi: fix fast-fail for non-passthrough requests"
+-- 
+Martin K. Petersen	Oracle Linux Engineering
