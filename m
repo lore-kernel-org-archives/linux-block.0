@@ -1,99 +1,129 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 8/8] nowait aio: btrfs
-Date: Fri, 14 Apr 2017 07:02:57 -0500
-Message-Id: <20170414120257.8932-9-rgoldwyn@suse.de>
-In-Reply-To: <20170414120257.8932-1-rgoldwyn@suse.de>
-References: <20170414120257.8932-1-rgoldwyn@suse.de>
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 1/5] block: convert bio.__bi_cnt from atomic_t to refcount_t
+Date: Thu, 20 Apr 2017 14:27:20 +0300
+Message-Id: <1492687644-4405-2-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
+References: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-Return EAGAIN if any of the following checks fail
- + i_rwsem is not lockable
- + NODATACOW or PREALLOC is not set
- + Cannot nocow at the desired location
- + Writing beyond end of file which is not allocated
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
- fs/btrfs/inode.c |  3 +++
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ block/bio.c               | 6 +++---
+ fs/btrfs/volumes.c        | 2 +-
+ include/linux/bio.h       | 4 ++--
+ include/linux/blk_types.h | 3 ++-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 520cb7230b2d..a870e5dd2b4d 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1823,12 +1823,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	ssize_t num_written = 0;
- 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
- 	ssize_t err;
--	loff_t pos;
--	size_t count;
-+	loff_t pos = iocb->ki_pos;
-+	size_t count = iov_iter_count(from);
- 	loff_t oldsize;
- 	int clean_page = 0;
+diff --git a/block/bio.c b/block/bio.c
+index 5eec5e0..3dffc17 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -275,7 +275,7 @@ void bio_init(struct bio *bio, struct bio_vec *table,
+ {
+ 	memset(bio, 0, sizeof(*bio));
+ 	atomic_set(&bio->__bi_remaining, 1);
+-	atomic_set(&bio->__bi_cnt, 1);
++	refcount_set(&bio->__bi_cnt, 1);
  
--	inode_lock(inode);
-+	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-+			(iocb->ki_flags & IOCB_DIRECT)) {
-+		/* Don't sleep on inode rwsem */
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+		/*
-+		 * We will allocate space in case nodatacow is not set,
-+		 * so bail
-+		 */
-+		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
-+					      BTRFS_INODE_PREALLOC)) ||
-+		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
-+			inode_unlock(inode);
-+			return -EAGAIN;
-+		}
-+	} else
-+		inode_lock(inode);
-+
- 	err = generic_write_checks(iocb, from);
- 	if (err <= 0) {
- 		inode_unlock(inode);
-@@ -1862,8 +1879,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	 */
- 	update_time_for_write(inode);
+ 	bio->bi_io_vec = table;
+ 	bio->bi_max_vecs = max_vecs;
+@@ -543,12 +543,12 @@ void bio_put(struct bio *bio)
+ 	if (!bio_flagged(bio, BIO_REFFED))
+ 		bio_free(bio);
+ 	else {
+-		BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
++		BIO_BUG_ON(!refcount_read(&bio->__bi_cnt));
  
--	pos = iocb->ki_pos;
--	count = iov_iter_count(from);
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
- 	if (start_pos > oldsize) {
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index a18510be76c1..d91b21a76d6d 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8627,6 +8627,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			dio_data.overwrite = 1;
- 			inode_unlock(inode);
- 			relock = true;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
- 		}
- 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
- 		if (ret)
+ 		/*
+ 		 * last put frees it
+ 		 */
+-		if (atomic_dec_and_test(&bio->__bi_cnt))
++		if (refcount_dec_and_test(&bio->__bi_cnt))
+ 			bio_free(bio);
+ 	}
+ }
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index 13e55d1..ff1fe9d 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -441,7 +441,7 @@ static noinline void run_scheduled_bios(struct btrfs_device *device)
+ 		    waitqueue_active(&fs_info->async_submit_wait))
+ 			wake_up(&fs_info->async_submit_wait);
+ 
+-		BUG_ON(atomic_read(&cur->__bi_cnt) == 0);
++		BUG_ON(refcount_read(&cur->__bi_cnt) == 0);
+ 
+ 		/*
+ 		 * if we're doing the sync list, record that our
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 8e52119..44ac678 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -234,7 +234,7 @@ static inline void bio_get(struct bio *bio)
+ {
+ 	bio->bi_flags |= (1 << BIO_REFFED);
+ 	smp_mb__before_atomic();
+-	atomic_inc(&bio->__bi_cnt);
++	refcount_inc(&bio->__bi_cnt);
+ }
+ 
+ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+@@ -243,7 +243,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+ 		bio->bi_flags |= (1 << BIO_REFFED);
+ 		smp_mb__before_atomic();
+ 	}
+-	atomic_set(&bio->__bi_cnt, count);
++	refcount_set(&bio->__bi_cnt, count);
+ }
+ 
+ static inline bool bio_flagged(struct bio *bio, unsigned int bit)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d703acb..c41407f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/bvec.h>
++#include <linux/refcount.h>
+ 
+ struct bio_set;
+ struct bio;
+@@ -73,7 +74,7 @@ struct bio {
+ 
+ 	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
+ 
+-	atomic_t		__bi_cnt;	/* pin count */
++	refcount_t		__bi_cnt;	/* pin count */
+ 
+ 	struct bio_vec		*bi_io_vec;	/* the actual vec list */
+ 
 -- 
-2.12.0
+2.7.4
