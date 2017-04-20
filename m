@@ -1,69 +1,120 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@osandov.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-mq: fix schedule-while-atomic with scheduler attached
-Message-ID: <bf3c52f2-3150-1d0c-2ae3-740032707129@kernel.dk>
-Date: Thu, 20 Apr 2017 15:13:43 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 4/5] block: convert io_context.active_ref from atomic_t to refcount_t
+Date: Thu, 20 Apr 2017 14:27:23 +0300
+Message-Id: <1492687644-4405-5-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
+References: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We must have dropped the ctx before we call
-blk_mq_sched_insert_request() with can_block=true, otherwise we risk
-that a flush request can block on insertion if we are currently out of
-tags.
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-[   47.667190] BUG: scheduling while atomic: jbd2/sda2-8/2089/0x00000002
-[   47.674493] Modules linked in: x86_pkg_temp_thermal btrfs xor zlib_deflate raid6_pq sr_mod cdre
-[   47.690572] Preemption disabled at:
-[   47.690584] [<ffffffff81326c7c>] blk_mq_sched_get_request+0x6c/0x280
-[   47.701764] CPU: 1 PID: 2089 Comm: jbd2/sda2-8 Not tainted 4.11.0-rc7+ #271
-[   47.709630] Hardware name: Dell Inc. PowerEdge T630/0NT78X, BIOS 2.3.4 11/09/2016
-[   47.718081] Call Trace:
-[   47.720903]  dump_stack+0x4f/0x73
-[   47.724694]  ? blk_mq_sched_get_request+0x6c/0x280
-[   47.730137]  __schedule_bug+0x6c/0xc0
-[   47.734314]  __schedule+0x559/0x780
-[   47.738302]  schedule+0x3b/0x90
-[   47.741899]  io_schedule+0x11/0x40
-[   47.745788]  blk_mq_get_tag+0x167/0x2a0
-[   47.750162]  ? remove_wait_queue+0x70/0x70
-[   47.754901]  blk_mq_get_driver_tag+0x92/0xf0
-[   47.759758]  blk_mq_sched_insert_request+0x134/0x170
-[   47.765398]  ? blk_account_io_start+0xd0/0x270
-[   47.770679]  blk_mq_make_request+0x1b2/0x850
-[   47.775766]  generic_make_request+0xf7/0x2d0
-[   47.780860]  submit_bio+0x5f/0x120
-[   47.784979]  ? submit_bio+0x5f/0x120
-[   47.789631]  submit_bh_wbc.isra.46+0x10d/0x130
-[   47.794902]  submit_bh+0xb/0x10
-[   47.798719]  journal_submit_commit_record+0x190/0x210
-[   47.804686]  ? _raw_spin_unlock+0x13/0x30
-[   47.809480]  jbd2_journal_commit_transaction+0x180a/0x1d00
-[   47.815925]  kjournald2+0xb6/0x250
-[   47.820022]  ? kjournald2+0xb6/0x250
-[   47.824328]  ? remove_wait_queue+0x70/0x70
-[   47.829223]  kthread+0x10e/0x140
-[   47.833147]  ? commit_timeout+0x10/0x10
-[   47.837742]  ? kthread_create_on_node+0x40/0x40
-[   47.843122]  ret_from_fork+0x29/0x40
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
+---
+ block/blk-ioc.c           | 4 ++--
+ block/cfq-iosched.c       | 4 ++--
+ include/linux/iocontext.h | 6 +++---
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-Fixes: a4d907b6a33b ("blk-mq: streamline blk_mq_make_request")
-Signed-off-by: Jens Axboe <axboe@fb.com>
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9d7645f24b05..323eed50d615 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1634,8 +1634,10 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
- 		return cookie;
- 	} else if (q->elevator) {
-+		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
- 		blk_mq_sched_insert_request(rq, false, true, true, true);
-+		return cookie;
- 	} else if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio))
- 		blk_mq_run_hw_queue(data.hctx, true);
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index b12f9c8..130dc23 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -173,7 +173,7 @@ void put_io_context_active(struct io_context *ioc)
+ 	unsigned long flags;
+ 	struct io_cq *icq;
  
+-	if (!atomic_dec_and_test(&ioc->active_ref)) {
++	if (!refcount_dec_and_test(&ioc->active_ref)) {
+ 		put_io_context(ioc);
+ 		return;
+ 	}
+@@ -256,7 +256,7 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_flags, int node)
+ 	/* initialize */
+ 	atomic_long_set(&ioc->refcount, 1);
+ 	atomic_set(&ioc->nr_tasks, 1);
+-	atomic_set(&ioc->active_ref, 1);
++	refcount_set(&ioc->active_ref, 1);
+ 	spin_lock_init(&ioc->lock);
+ 	INIT_RADIX_TREE(&ioc->icq_tree, GFP_ATOMIC | __GFP_HIGH);
+ 	INIT_HLIST_HEAD(&ioc->icq_list);
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 9212627..2871bb9 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -2959,7 +2959,7 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
+ 	 * task has exited, don't wait
+ 	 */
+ 	cic = cfqd->active_cic;
+-	if (!cic || !atomic_read(&cic->icq.ioc->active_ref))
++	if (!cic || !refcount_read(&cic->icq.ioc->active_ref))
+ 		return;
+ 
+ 	/*
+@@ -3959,7 +3959,7 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 
+ 	if (cfqq->next_rq && req_noidle(cfqq->next_rq))
+ 		enable_idle = 0;
+-	else if (!atomic_read(&cic->icq.ioc->active_ref) ||
++	else if (!refcount_read(&cic->icq.ioc->active_ref) ||
+ 		 !cfqd->cfq_slice_idle ||
+ 		 (!cfq_cfqq_deep(cfqq) && CFQQ_SEEKY(cfqq)))
+ 		enable_idle = 0;
+diff --git a/include/linux/iocontext.h b/include/linux/iocontext.h
+index df38db2..e47b907 100644
+--- a/include/linux/iocontext.h
++++ b/include/linux/iocontext.h
+@@ -3,6 +3,7 @@
+ 
+ #include <linux/radix-tree.h>
+ #include <linux/rcupdate.h>
++#include <linux/refcount.h>
+ #include <linux/workqueue.h>
+ 
+ enum {
+@@ -96,7 +97,7 @@ struct io_cq {
+  */
+ struct io_context {
+ 	atomic_long_t refcount;
+-	atomic_t active_ref;
++	refcount_t active_ref;
+ 	atomic_t nr_tasks;
+ 
+ 	/* all the fields below are protected by this lock */
+@@ -128,9 +129,8 @@ struct io_context {
+ static inline void get_io_context_active(struct io_context *ioc)
+ {
+ 	WARN_ON_ONCE(atomic_long_read(&ioc->refcount) <= 0);
+-	WARN_ON_ONCE(atomic_read(&ioc->active_ref) <= 0);
+ 	atomic_long_inc(&ioc->refcount);
+-	atomic_inc(&ioc->active_ref);
++	refcount_inc(&ioc->active_ref);
+ }
+ 
+ static inline void ioc_task_link(struct io_context *ioc)
+-- 
+2.7.4
