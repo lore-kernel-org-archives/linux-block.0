@@ -1,26 +1,40 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "roger.pau@citrix.com"
-	<roger.pau@citrix.com>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "jbacik@fb.com" <jbacik@fb.com>,
-	"james.smart@broadcom.com" <james.smart@broadcom.com>, "dm-devel@redhat.com"
-	<dm-devel@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:46070 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S942489AbdDTPE1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 11:04:27 -0400
+Date: Thu, 20 Apr 2017 17:04:21 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+        James Smart <james.smart@broadcom.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
 Subject: Re: [PATCH 11/23] dm rq: don't pass irrelevant error code to
  blk_mq_complete_request
-Date: Thu, 20 Apr 2017 15:25:37 +0000
-Message-ID: <1492701936.2642.2.camel@sandisk.com>
+Message-ID: <20170420150421.GK13676@linux-x5ow.site>
 References: <20170420140316.6546-1-hch@lst.de>
-	 <20170420140316.6546-12-hch@lst.de>
-In-Reply-To: <20170420140316.6546-12-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170420140316.6546-12-hch@lst.de>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170420140316.6546-12-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, 2017-04-20 at 16:03 +0200, Christoph Hellwig wrote:
+On Thu, Apr 20, 2017 at 04:03:04PM +0200, Christoph Hellwig wrote:
 > dm never uses rq->errors, so there is no need to pass an error argument
 > to blk_mq_complete_request.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
