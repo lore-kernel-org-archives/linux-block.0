@@ -1,21 +1,43 @@
-Return-Path: <BATV+ec6d521f801fb612d965+4989+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 21 Apr 2017 04:31:40 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: NeilBrown <neilb@suse.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	linux-bcache@vger.kernel.org
-Subject: Re: [PATCH 09/11] bcache: use kmalloc to allocate bio in
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@kernel.dk>
+Date: Thu, 20 Apr 2017 15:38:50 +1000
+Subject: [PATCH 09/11] bcache: use kmalloc to allocate bio in
  bch_data_verify()
-Message-ID: <20170421113140.GH12523@infradead.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Kent Overstreet <kent.overstreet@gmail.com>, linux-bcache@vger.kernel.org
+Message-ID: <149266673005.27388.9415706764616504556.stgit@noble>
+In-Reply-To: <149266645258.27388.14083229348123176454.stgit@noble>
 References: <149266645258.27388.14083229348123176454.stgit@noble>
- <149266673005.27388.9415706764616504556.stgit@noble>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <149266673005.27388.9415706764616504556.stgit@noble>
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
+This function allocates a bio, then a collection
+of pages.  It copes with failure.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+It currently uses a mempool() to allocate the bio,
+but alloc_page() to allocate the pages.  These fail
+in different ways, so the usage is inconsistent.
+
+Change the bio_clone() to bio_clone_kmalloc()
+so that no pool is used either for the bio or the pages.
+
+Signed-off-by: NeilBrown <neilb@suse.com>
+---
+ drivers/md/bcache/debug.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index 06f55056aaae..35a5a7210e51 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -110,7 +110,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ 	struct bio_vec bv, cbv;
+ 	struct bvec_iter iter, citer = { 0 };
+ 
+-	check = bio_clone(bio, GFP_NOIO);
++	check = bio_clone_kmalloc(bio, GFP_NOIO);
+ 	if (!check)
+ 		return;
+ 	check->bi_opf = REQ_OP_READ;
