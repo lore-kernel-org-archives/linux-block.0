@@ -9,45 +9,58 @@ Cc: Josef Bacik <jbacik@fb.com>,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
 	dm-devel@redhat.com
-Subject: [PATCH 01/23] pd: don't check blk_execute_rq return value.
-Date: Thu, 20 Apr 2017 16:02:54 +0200
-Message-Id: <20170420140316.6546-2-hch@lst.de>
+Subject: [PATCH 20/23] ataflop: switch from req->errors to req->error_count
+Date: Thu, 20 Apr 2017 16:03:13 +0200
+Message-Id: <20170420140316.6546-21-hch@lst.de>
 In-Reply-To: <20170420140316.6546-1-hch@lst.de>
 References: <20170420140316.6546-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The driver never sets req->errors, so blk_execute_rq will always return 0.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
 ---
- drivers/block/paride/pd.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/block/ataflop.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index b05e151c9b38..7d2402f90978 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -739,18 +739,15 @@ static int pd_special_command(struct pd_unit *disk,
- 		      enum action (*func)(struct pd_unit *disk))
- {
- 	struct request *rq;
--	int err = 0;
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index 2104b1b4ccda..fa69ecd52cb5 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -617,12 +617,12 @@ static void fd_error( void )
+ 	if (!fd_request)
+ 		return;
  
- 	rq = blk_get_request(disk->gd->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
- 	if (IS_ERR(rq))
- 		return PTR_ERR(rq);
+-	fd_request->errors++;
+-	if (fd_request->errors >= MAX_ERRORS) {
++	fd_request->error_count++;
++	if (fd_request->error_count >= MAX_ERRORS) {
+ 		printk(KERN_ERR "fd%d: too many errors.\n", SelectedDrive );
+ 		fd_end_request_cur(-EIO);
+ 	}
+-	else if (fd_request->errors == RECALIBRATE_ERRORS) {
++	else if (fd_request->error_count == RECALIBRATE_ERRORS) {
+ 		printk(KERN_WARNING "fd%d: recalibrating\n", SelectedDrive );
+ 		if (SelectedDrive != -1)
+ 			SUD.track = -1;
+@@ -1386,7 +1386,7 @@ static void setup_req_params( int drive )
+ 	ReqData = ReqBuffer + 512 * ReqCnt;
  
- 	rq->special = func;
--
--	err = blk_execute_rq(disk->gd->queue, disk->gd, rq, 0);
--
-+	blk_execute_rq(disk->gd->queue, disk->gd, rq, 0);
- 	blk_put_request(rq);
--	return err;
-+	return 0;
- }
+ 	if (UseTrackbuffer)
+-		read_track = (ReqCmd == READ && fd_request->errors == 0);
++		read_track = (ReqCmd == READ && fd_request->error_count == 0);
+ 	else
+ 		read_track = 0;
  
- /* kernel glue structures */
+@@ -1409,8 +1409,10 @@ static struct request *set_next_request(void)
+ 			fdc_queue = 0;
+ 		if (q) {
+ 			rq = blk_fetch_request(q);
+-			if (rq)
++			if (rq) {
++				rq->error_count = 0;
+ 				break;
++			}
+ 		}
+ 	} while (fdc_queue != old_pos);
+ 
 -- 
 2.11.0
