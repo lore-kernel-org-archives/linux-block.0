@@ -1,22 +1,31 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"Damien.LeMoal@wdc.com" <Damien.LeMoal@wdc.com>, "osandov@osandov.com"
-	<osandov@osandov.com>, "sagi@grimberg.me" <sagi@grimberg.me>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: Fix poll_stat for new size-based bucketing.
-Date: Thu, 20 Apr 2017 23:13:46 +0000
-Message-ID: <8F6E7173-D719-4E85-9F18-7B20319E972C@raithlin.com>
+To: sbates@raithlin.com
 References: <1492729151-20983-1-git-send-email-sbates@raithlin.com>
- <44a0b09e-d150-a0e8-f5e2-5792f4d4f74a@kernel.dk>
-In-Reply-To: <44a0b09e-d150-a0e8-f5e2-5792f4d4f74a@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Damien.LeMoal@wdc.com, osandov@osandov.com, sagi@grimberg.me
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <44a0b09e-d150-a0e8-f5e2-5792f4d4f74a@kernel.dk>
+Date: Thu, 20 Apr 2017 17:12:08 -0600
 MIME-Version: 1.0
+In-Reply-To: <1492729151-20983-1-git-send-email-sbates@raithlin.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-DQo+IFRoYW5rcywgYWRkZWQuIEJUVywgaW4gdGhlIGZ1dHVyZSwgd2UgaGF2ZSBhIGZvcm1hdCBm
-b3Igc3BlY2lmeWluZw0KPiBpZiBhIHBhdGNoIGZpeGVzIGFub3RoZXIgcGF0Y2guIFRoaXMgc2hv
-dWxkIGhhdmUgYmVlbjoNCg0KVGhhbmtzIQ0KDQo+IEZpeGVzOiA3MjBiOGNjYzQ1MDAgKCJibGst
-bXE6IEFkZCBhIHBvbGxpbmcgc3BlY2lmaWMgc3RhdHMgZnVuY3Rpb24iKQ0KDQpEdWx5IG5vdGVk
-IGZvciBuZXh0IHRpbWUuIEFwb2xvZ2llcyBmb3IgdGhlIG1pc3PigKYNCg0KDQoNCg==
+On 04/20/2017 04:59 PM, sbates@raithlin.com wrote:
+> From: Stephen Bates <sbates@raithlin.com>
+> 
+> Fixes an issue where the size of the poll_stat array in request_queue
+> does not match the size expected by the new size based bucketing for
+> IO completion polling.
+> 
+> Should be applied on top of commit 720b8ccc4500 ("blk-mq: Add a
+> polling specific stats function").
+
+Thanks, added. BTW, in the future, we have a format for specifying
+if a patch fixes another patch. This should have been:
+
+Fixes: 720b8ccc4500 ("blk-mq: Add a polling specific stats function")
+
+-- 
+Jens Axboe
