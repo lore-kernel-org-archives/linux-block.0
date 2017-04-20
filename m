@@ -1,333 +1,379 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
+Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V3 15/16] block, bfq: remove all get and put of I/O contexts
-Date: Tue, 11 Apr 2017 15:43:14 +0200
-Message-Id: <20170411134315.44135-16-paolo.valente@linaro.org>
-In-Reply-To: <20170411134315.44135-1-paolo.valente@linaro.org>
-References: <20170411134315.44135-1-paolo.valente@linaro.org>
+	dm-devel@redhat.com
+Subject: [PATCH 04/23] nvme: split nvme status from block req->errors
+Date: Thu, 20 Apr 2017 16:02:57 +0200
+Message-Id: <20170420140316.6546-5-hch@lst.de>
+In-Reply-To: <20170420140316.6546-1-hch@lst.de>
+References: <20170420140316.6546-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-When a bfq queue is set in service and when it is merged, a reference
-to the I/O context associated with the queue is taken. This reference
-is then released when the queue is deselected from service or
-split. More precisely, the release of the reference is postponed to
-when the scheduler lock is released, to avoid nesting between the
-scheduler and the I/O-context lock. In fact, such nesting would lead
-to deadlocks, because of other code paths that take the same locks in
-the opposite order. This postponing of I/O-context releases does
-complicate code.
+We want our own clearly defined error field for NVMe passthrough commands,
+and the request errors field is going away in its current form.
 
-This commit addresses these issue by modifying involved operations in
-such a way to not need to get the above I/O-context references any
-more. Then it also removes any get and release of these references.
+Just store the status and result field in the nvme_request field from
+hardirq completion context (using a new helper) and then generate a
+Linux errno for the block layer only when we actually need it.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Because we can't overload the status value with a negative error code
+for cancelled command we now have a flags filed in struct nvme_request
+that contains a bit for this condition.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/bfq-iosched.c | 143 +++++++++-------------------------------------------
- 1 file changed, 23 insertions(+), 120 deletions(-)
+ drivers/nvme/host/core.c     | 50 +++++++++++++++++++++++++++-----------------
+ drivers/nvme/host/fc.c       | 10 ++++-----
+ drivers/nvme/host/lightnvm.c |  9 +++++---
+ drivers/nvme/host/nvme.h     | 33 +++++++++++++----------------
+ drivers/nvme/host/pci.c      | 11 +++++-----
+ drivers/nvme/host/rdma.c     |  5 ++---
+ drivers/nvme/target/loop.c   |  7 ++-----
+ 7 files changed, 65 insertions(+), 60 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index b7e3c86..30bb8f9 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -538,8 +538,6 @@ struct bfq_data {
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index d33f829c3ab7..c6f256d74b6b 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -66,11 +66,24 @@ static DEFINE_SPINLOCK(dev_list_lock);
  
- 	/* bfq_queue in service */
- 	struct bfq_queue *in_service_queue;
--	/* bfq_io_cq (bic) associated with the @in_service_queue */
--	struct bfq_io_cq *in_service_bic;
+ static struct class *nvme_class;
  
- 	/* on-disk position of the last served request */
- 	sector_t last_position;
-@@ -704,15 +702,6 @@ struct bfq_data {
- 	struct bfq_io_cq *bio_bic;
- 	/* bfqq associated with the task issuing current bio for merging */
- 	struct bfq_queue *bio_bfqq;
++int nvme_error_status(struct request *req)
++{
++	switch (nvme_req(req)->status & 0x7ff) {
++	case NVME_SC_SUCCESS:
++		return 0;
++	case NVME_SC_CAP_EXCEEDED:
++		return -ENOSPC;
++	default:
++		return -EIO;
++	}
++}
++EXPORT_SYMBOL_GPL(nvme_error_status);
++
+ static inline bool nvme_req_needs_retry(struct request *req)
+ {
+ 	if (blk_noretry_request(req))
+ 		return false;
+-	if (req->errors & NVME_SC_DNR)
++	if (nvme_req(req)->status & NVME_SC_DNR)
+ 		return false;
+ 	if (jiffies - req->start_time >= req->timeout)
+ 		return false;
+@@ -81,23 +94,13 @@ static inline bool nvme_req_needs_retry(struct request *req)
+ 
+ void nvme_complete_rq(struct request *req)
+ {
+-	int error = 0;
 -
+-	if (unlikely(req->errors)) {
+-		if (nvme_req_needs_retry(req)) {
+-			nvme_req(req)->retries++;
+-			blk_mq_requeue_request(req,
+-					!blk_mq_queue_stopped(req->q));
+-			return;
+-		}
+-
+-		if (blk_rq_is_passthrough(req))
+-			error = req->errors;
+-		else
+-			error = nvme_error_status(req->errors);
++	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
++		nvme_req(req)->retries++;
++		blk_mq_requeue_request(req, !blk_mq_queue_stopped(req->q));
++		return;
+ 	}
+ 
+-	blk_mq_end_request(req, error);
++	blk_mq_end_request(req, nvme_error_status(req));
+ }
+ EXPORT_SYMBOL_GPL(nvme_complete_rq);
+ 
+@@ -114,7 +117,9 @@ void nvme_cancel_request(struct request *req, void *data, bool reserved)
+ 	status = NVME_SC_ABORT_REQ;
+ 	if (blk_queue_dying(req->q))
+ 		status |= NVME_SC_DNR;
+-	blk_mq_complete_request(req, status);
++	nvme_req(req)->status = status;
++	blk_mq_complete_request(req, 0);
++
+ }
+ EXPORT_SYMBOL_GPL(nvme_cancel_request);
+ 
+@@ -357,6 +362,7 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 
+ 	if (!(req->rq_flags & RQF_DONTPREP)) {
+ 		nvme_req(req)->retries = 0;
++		nvme_req(req)->flags = 0;
+ 		req->rq_flags |= RQF_DONTPREP;
+ 	}
+ 
+@@ -413,7 +419,10 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 	blk_execute_rq(req->q, NULL, req, at_head);
+ 	if (result)
+ 		*result = nvme_req(req)->result;
+-	ret = req->errors;
++	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++		ret = -EINTR;
++	else
++		ret = nvme_req(req)->status;
+  out:
+ 	blk_mq_free_request(req);
+ 	return ret;
+@@ -498,7 +507,10 @@ int __nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 	}
+  submit:
+ 	blk_execute_rq(req->q, disk, req, 0);
+-	ret = req->errors;
++	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++		ret = -EINTR;
++	else
++		ret = nvme_req(req)->status;
+ 	if (result)
+ 		*result = le32_to_cpu(nvme_req(req)->result.u32);
+ 	if (meta && !ret && !write) {
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index aad7f9c0be32..450733c8cd24 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1148,6 +1148,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 	struct nvme_fc_queue *queue = op->queue;
+ 	struct nvme_completion *cqe = &op->rsp_iu.cqe;
+ 	__le16 status = cpu_to_le16(NVME_SC_SUCCESS << 1);
++	union nvme_result result;
+ 
+ 	/*
+ 	 * WARNING:
+@@ -1215,7 +1216,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
+ 		}
+-		op->nreq.result.u64 = 0;
++		result.u64 = 0;
+ 		break;
+ 
+ 	case sizeof(struct nvme_fc_ersp_iu):
+@@ -1232,7 +1233,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
+ 			goto done;
+ 		}
+-		op->nreq.result = cqe->result;
++		result = cqe->result;
+ 		status = cqe->status;
+ 		break;
+ 
+@@ -1243,13 +1244,12 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
+ 
+ done:
+ 	if (!queue->qnum && op->rqno >= AEN_CMDID_BASE) {
+-		nvme_complete_async_event(&queue->ctrl->ctrl, status,
+-					&op->nreq.result);
++		nvme_complete_async_event(&queue->ctrl->ctrl, status, &result);
+ 		nvme_fc_ctrl_put(ctrl);
+ 		return;
+ 	}
+ 
+-	blk_mq_complete_request(rq, le16_to_cpu(status) >> 1);
++	nvme_end_request(rq, status, result);
+ }
+ 
+ static int
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index b76e2e36fef4..cb599b3fc12c 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -484,7 +484,7 @@ static void nvme_nvm_end_io(struct request *rq, int error)
+ 	struct nvm_rq *rqd = rq->end_io_data;
+ 
+ 	rqd->ppa_status = nvme_req(rq)->result.u64;
+-	rqd->error = error;
++	rqd->error = nvme_req(rq)->status;
+ 	nvm_end_io(rqd);
+ 
+ 	kfree(nvme_req(rq)->cmd);
+@@ -665,9 +665,12 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 
+ 	wait_for_completion_io(&wait);
+ 
+-	ret = nvme_error_status(rq->errors);
++	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
++		ret = -EINTR;
++	else
++		ret = nvme_error_status(rq);
+ 	if (result)
+-		*result = rq->errors & 0x7ff;
++		*result = nvme_req(rq)->status & 0x7ff;
+ 	if (status)
+ 		*status = le64_to_cpu(nvme_req(rq)->result.u64);
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index a317461c21d3..d7330f75632d 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -21,16 +21,6 @@
+ #include <linux/lightnvm.h>
+ #include <linux/sed-opal.h>
+ 
+-enum {
 -	/*
--	 * io context to put right after bfqd->lock is released. This
--	 * filed is used to perform put_io_context, when needed, to
--	 * after the scheduler lock has been released, and thus
--	 * prevent an ioc->lock from being possibly taken while the
--	 * scheduler lock is being held.
+-	 * Driver internal status code for commands that were cancelled due
+-	 * to timeouts or controller shutdown.  The value is negative so
+-	 * that it a) doesn't overlap with the unsigned hardware error codes,
+-	 * and b) can easily be tested for.
 -	 */
--	struct io_context *ioc_to_put;
+-	NVME_SC_CANCELLED		= -EINTR,
+-};
+-
+ extern unsigned char nvme_io_timeout;
+ #define NVME_IO_TIMEOUT	(nvme_io_timeout * HZ)
+ 
+@@ -91,6 +81,12 @@ struct nvme_request {
+ 	struct nvme_command	*cmd;
+ 	union nvme_result	result;
+ 	u8			retries;
++	u8			flags;
++	u16			status;
++};
++
++enum {
++	NVME_REQ_CANCELLED		= (1 << 0),
  };
  
- enum bfqq_state_flags {
-@@ -1148,34 +1137,6 @@ static void bfq_schedule_dispatch(struct bfq_data *bfqd)
+ static inline struct nvme_request *nvme_req(struct request *req)
+@@ -248,18 +244,17 @@ static inline void nvme_cleanup_cmd(struct request *req)
  	}
  }
  
--/*
-- * Next two functions release bfqd->lock and put the io context
-- * pointed by bfqd->ioc_to_put. This delayed put is used to not risk
-- * to take an ioc->lock while the scheduler lock is being held.
-- */
--static void bfq_unlock_put_ioc(struct bfq_data *bfqd)
--{
--	struct io_context *ioc_to_put = bfqd->ioc_to_put;
--
--	bfqd->ioc_to_put = NULL;
--	spin_unlock_irq(&bfqd->lock);
--
--	if (ioc_to_put)
--		put_io_context(ioc_to_put);
--}
--
--static void bfq_unlock_put_ioc_restore(struct bfq_data *bfqd,
--				       unsigned long flags)
--{
--	struct io_context *ioc_to_put = bfqd->ioc_to_put;
--
--	bfqd->ioc_to_put = NULL;
--	spin_unlock_irqrestore(&bfqd->lock, flags);
--
--	if (ioc_to_put)
--		put_io_context(ioc_to_put);
--}
--
- /**
-  * bfq_gt - compare two timestamps.
-  * @a: first ts.
-@@ -2684,18 +2645,6 @@ static void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
- 	struct bfq_entity *in_serv_entity = &in_serv_bfqq->entity;
- 	struct bfq_entity *entity = in_serv_entity;
- 
--	if (bfqd->in_service_bic) {
--		/*
--		 * Schedule the release of a reference to
--		 * bfqd->in_service_bic->icq.ioc to right after the
--		 * scheduler lock is released. This ioc is not
--		 * released immediately, to not risk to possibly take
--		 * an ioc->lock while holding the scheduler lock.
--		 */
--		bfqd->ioc_to_put = bfqd->in_service_bic->icq.ioc;
--		bfqd->in_service_bic = NULL;
--	}
--
- 	bfq_clear_bfqq_wait_request(in_serv_bfqq);
- 	hrtimer_try_to_cancel(&bfqd->idle_slice_timer);
- 	bfqd->in_service_queue = NULL;
-@@ -3495,7 +3444,7 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
- 	__bfq_deactivate_entity(entity, false);
- 	bfq_put_async_queues(bfqd, bfqg);
- 
--	bfq_unlock_put_ioc_restore(bfqd, flags);
-+	spin_unlock_irqrestore(&bfqd->lock, flags);
- 	/*
- 	 * @blkg is going offline and will be ignored by
- 	 * blkg_[rw]stat_recursive_sum().  Transfer stats to the parent so
-@@ -5472,20 +5421,18 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- 	 * first time that the requests of some process are redirected to
- 	 * it.
- 	 *
--	 * We redirect bfqq to new_bfqq and not the opposite, because we
--	 * are in the context of the process owning bfqq, hence we have
--	 * the io_cq of this process. So we can immediately configure this
--	 * io_cq to redirect the requests of the process to new_bfqq.
-+	 * We redirect bfqq to new_bfqq and not the opposite, because
-+	 * we are in the context of the process owning bfqq, thus we
-+	 * have the io_cq of this process. So we can immediately
-+	 * configure this io_cq to redirect the requests of the
-+	 * process to new_bfqq. In contrast, the io_cq of new_bfqq is
-+	 * not available any more (new_bfqq->bic == NULL).
- 	 *
--	 * NOTE, even if new_bfqq coincides with the in-service queue, the
--	 * io_cq of new_bfqq is not available, because, if the in-service
--	 * queue is shared, bfqd->in_service_bic may not point to the
--	 * io_cq of the in-service queue.
--	 * Redirecting the requests of the process owning bfqq to the
--	 * currently in-service queue is in any case the best option, as
--	 * we feed the in-service queue with new requests close to the
--	 * last request served and, by doing so, hopefully increase the
--	 * throughput.
-+	 * Anyway, even in case new_bfqq coincides with the in-service
-+	 * queue, redirecting requests the in-service queue is the
-+	 * best option, as we feed the in-service queue with new
-+	 * requests close to the last request served and, by doing so,
-+	 * are likely to increase the throughput.
- 	 */
- 	bfqq->new_bfqq = new_bfqq;
- 	new_bfqq->ref += process_refs;
-@@ -5577,8 +5524,8 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- 	in_service_bfqq = bfqd->in_service_queue;
- 
--	if (!in_service_bfqq || in_service_bfqq == bfqq ||
--	    !bfqd->in_service_bic || wr_from_too_long(in_service_bfqq) ||
-+	if (!in_service_bfqq || in_service_bfqq == bfqq
-+	    || wr_from_too_long(in_service_bfqq) ||
- 	    unlikely(in_service_bfqq == &bfqd->oom_bfqq))
- 		goto check_scheduled;
- 
-@@ -5629,16 +5576,6 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- 	bic->saved_wr_cur_max_time = bfqq->wr_cur_max_time;
- }
- 
--static void bfq_get_bic_reference(struct bfq_queue *bfqq)
--{
--	/*
--	 * If bfqq->bic has a non-NULL value, the bic to which it belongs
--	 * is about to begin using a shared bfq_queue.
--	 */
--	if (bfqq->bic)
--		atomic_long_inc(&bfqq->bic->icq.ioc->refcount);
--}
--
- static void
- bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
- 		struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
-@@ -5683,12 +5620,6 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
- 		     bfqd->wr_busy_queues);
- 
- 	/*
--	 * Grab a reference to the bic, to prevent it from being destroyed
--	 * before being possibly touched by a bfq_split_bfqq().
--	 */
--	bfq_get_bic_reference(bfqq);
--	bfq_get_bic_reference(new_bfqq);
--	/*
- 	 * Merge queues (that is, let bic redirect its requests to new_bfqq)
- 	 */
- 	bic_set_bfqq(bic, new_bfqq, 1);
-@@ -5853,14 +5784,8 @@ static struct bfq_queue *bfq_set_in_service_queue(struct bfq_data *bfqd)
- static void bfq_arm_slice_timer(struct bfq_data *bfqd)
+-static inline int nvme_error_status(u16 status)
++static inline void nvme_end_request(struct request *req, __le16 status,
++		union nvme_result result)
  {
- 	struct bfq_queue *bfqq = bfqd->in_service_queue;
--	struct bfq_io_cq *bic;
- 	u32 sl;
- 
--	/* Processes have exited, don't wait. */
--	bic = bfqd->in_service_bic;
--	if (!bic || atomic_read(&bic->icq.ioc->active_ref) == 0)
--		return;
--
- 	bfq_mark_bfqq_wait_request(bfqq);
- 
- 	/*
-@@ -7147,11 +7072,6 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
- 	 */
- 	bfq_update_wr_data(bfqd, bfqq);
- 
--	if (!bfqd->in_service_bic) {
--		atomic_long_inc(&RQ_BIC(rq)->icq.ioc->refcount);
--		bfqd->in_service_bic = RQ_BIC(rq);
+-	switch (status & 0x7ff) {
+-	case NVME_SC_SUCCESS:
+-		return 0;
+-	case NVME_SC_CAP_EXCEEDED:
+-		return -ENOSPC;
+-	default:
+-		return -EIO;
 -	}
--
- 	/*
- 	 * Expire bfqq, pretending that its budget expired, if bfqq
- 	 * belongs to CLASS_IDLE and other queues are waiting for
-@@ -7272,7 +7192,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	spin_lock_irq(&bfqd->lock);
- 
- 	rq = __bfq_dispatch_request(hctx);
--	bfq_unlock_put_ioc(bfqd);
-+	spin_unlock_irq(&bfqd->lock);
- 
- 	return rq;
- }
-@@ -7360,20 +7280,9 @@ static void bfq_exit_icq_bfqq(struct bfq_io_cq *bic, bool is_sync)
- 		unsigned long flags;
- 
- 		spin_lock_irqsave(&bfqd->lock, flags);
--		/*
--		 * If the bic is using a shared queue, put the
--		 * reference taken on the io_context when the bic
--		 * started using a shared bfq_queue. This put cannot
--		 * make ioc->ref_count reach 0, then no ioc->lock
--		 * risks to be taken (leading to possible deadlock
--		 * scenarios).
--		 */
--		if (is_sync && bfq_bfqq_coop(bfqq))
--			put_io_context(bic->icq.ioc);
--
- 		bfq_exit_bfqq(bfqd, bfqq);
- 		bic_set_bfqq(bic, NULL, is_sync);
--		bfq_unlock_put_ioc_restore(bfqd, flags);
-+		spin_unlock_irqrestore(&bfqd->lock, flags);
- 	}
++	struct nvme_request *rq = nvme_req(req);
++
++	rq->status = le16_to_cpu(status) >> 1;
++	rq->result = result;
++	blk_mq_complete_request(req, 0);
  }
  
-@@ -7808,7 +7717,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
++int nvme_error_status(struct request *req);
+ void nvme_complete_rq(struct request *req);
+ void nvme_cancel_request(struct request *req, void *data, bool reserved);
+ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index f7a9f3fb5fdb..d9e2bd07ed56 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -679,8 +679,7 @@ static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag)
  		}
+ 
+ 		req = blk_mq_tag_to_rq(*nvmeq->tags, cqe.command_id);
+-		nvme_req(req)->result = cqe.result;
+-		blk_mq_complete_request(req, le16_to_cpu(cqe.status) >> 1);
++		nvme_end_request(req, cqe.status, cqe.result);
  	}
  
--	bfq_unlock_put_ioc(bfqd);
-+	spin_unlock_irq(&bfqd->lock);
+ 	if (head == nvmeq->cq_head && phase == nvmeq->cq_phase)
+@@ -817,9 +816,9 @@ static void abort_endio(struct request *req, int error)
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	struct nvme_queue *nvmeq = iod->nvmeq;
+-	u16 status = req->errors;
+ 
+-	dev_warn(nvmeq->dev->ctrl.device, "Abort status: 0x%x", status);
++	dev_warn(nvmeq->dev->ctrl.device,
++		 "Abort status: 0x%x", nvme_req(req)->status);
+ 	atomic_inc(&nvmeq->dev->ctrl.abort_limit);
+ 	blk_mq_free_request(req);
+ }
+@@ -843,7 +842,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 			 "I/O %d QID %d timeout, disable controller\n",
+ 			 req->tag, nvmeq->qid);
+ 		nvme_dev_disable(dev, false);
+-		req->errors = NVME_SC_CANCELLED;
++		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
+ 		return BLK_EH_HANDLED;
+ 	}
+ 
+@@ -863,7 +862,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		 * Mark the request as handled, since the inline shutdown
+ 		 * forces all outstanding requests to complete.
+ 		 */
+-		req->errors = NVME_SC_CANCELLED;
++		nvme_req(req)->flags |= NVME_REQ_CANCELLED;
+ 		return BLK_EH_HANDLED;
+ 	}
+ 
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 4aae363943e3..53b611f9ba5d 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -1178,8 +1178,7 @@ static int nvme_rdma_process_nvme_rsp(struct nvme_rdma_queue *queue,
+ 	    wc->ex.invalidate_rkey == req->mr->rkey)
+ 		req->mr->need_inval = false;
+ 
+-	req->req.result = cqe->result;
+-	blk_mq_complete_request(rq, le16_to_cpu(cqe->status) >> 1);
++	nvme_end_request(rq, cqe->status, cqe->result);
+ 	return ret;
  }
  
- static void bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
-@@ -7962,7 +7871,7 @@ static void bfq_put_rq_private(struct request_queue *q, struct request *rq)
- 		bfq_completed_request(bfqq, bfqd);
- 		bfq_put_rq_priv_body(bfqq);
+@@ -1416,7 +1415,7 @@ nvme_rdma_timeout(struct request *rq, bool reserved)
+ 	nvme_rdma_error_recovery(req->queue->ctrl);
  
--		bfq_unlock_put_ioc_restore(bfqd, flags);
-+		spin_unlock_irqrestore(&bfqd->lock, flags);
+ 	/* fail with DNR on cmd timeout */
+-	rq->errors = NVME_SC_ABORT_REQ | NVME_SC_DNR;
++	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
+ 
+ 	return BLK_EH_HANDLED;
+ }
+diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
+index 33b431e4eec3..8260ee1f8e48 100644
+--- a/drivers/nvme/target/loop.c
++++ b/drivers/nvme/target/loop.c
+@@ -124,7 +124,6 @@ static void nvme_loop_queue_response(struct nvmet_req *req)
+ 				&cqe->result);
  	} else {
- 		/*
- 		 * Request rq may be still/already in the scheduler,
-@@ -8055,6 +7964,7 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 	const int is_sync = rq_is_sync(rq);
- 	struct bfq_queue *bfqq;
- 	bool new_queue = false;
-+	bool split = false;
+ 		struct request *rq;
+-		struct nvme_loop_iod *iod;
  
- 	spin_lock_irq(&bfqd->lock);
+ 		rq = blk_mq_tag_to_rq(nvme_loop_tagset(queue), cqe->command_id);
+ 		if (!rq) {
+@@ -134,9 +133,7 @@ static void nvme_loop_queue_response(struct nvmet_req *req)
+ 			return;
+ 		}
  
-@@ -8078,14 +7988,7 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 				bic->saved_in_large_burst = true;
- 
- 			bfqq = bfq_split_bfqq(bic, bfqq);
--			/*
--			 * A reference to bic->icq.ioc needs to be
--			 * released after a queue split. Do not do it
--			 * immediately, to not risk to possibly take
--			 * an ioc->lock while holding the scheduler
--			 * lock.
--			 */
--			bfqd->ioc_to_put = bic->icq.ioc;
-+			split = true;
- 
- 			if (!bfqq)
- 				bfqq = bfq_get_bfqq_handle_split(bfqd, bic, bio,
-@@ -8110,7 +8013,7 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 	 */
- 	if (likely(bfqq != &bfqd->oom_bfqq) && bfqq_process_refs(bfqq) == 1) {
- 		bfqq->bic = bic;
--		if (bfqd->ioc_to_put) { /* if true, there has been a split */
-+		if (split) {
- 			/*
- 			 * The queue has just been split from a shared
- 			 * queue: restore the idle window and the
-@@ -8123,7 +8026,7 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 	if (unlikely(bfq_bfqq_just_created(bfqq)))
- 		bfq_handle_burst(bfqd, bfqq);
- 
--	bfq_unlock_put_ioc(bfqd);
-+	spin_unlock_irq(&bfqd->lock);
- 
- 	return 0;
- 
-@@ -8168,7 +8071,7 @@ static void bfq_idle_slice_timer_body(struct bfq_queue *bfqq)
- 	bfq_bfqq_expire(bfqd, bfqq, true, reason);
- 
- schedule_dispatch:
--	bfq_unlock_put_ioc_restore(bfqd, flags);
-+	spin_unlock_irqrestore(&bfqd->lock, flags);
- 	bfq_schedule_dispatch(bfqd);
+-		iod = blk_mq_rq_to_pdu(rq);
+-		iod->nvme_req.result = cqe->result;
+-		blk_mq_complete_request(rq, le16_to_cpu(cqe->status) >> 1);
++		nvme_end_request(rq, cqe->status, cqe->result);
+ 	}
  }
  
+@@ -157,7 +154,7 @@ nvme_loop_timeout(struct request *rq, bool reserved)
+ 	schedule_work(&iod->queue->ctrl->reset_work);
+ 
+ 	/* fail with DNR on admin cmd timeout */
+-	rq->errors = NVME_SC_ABORT_REQ | NVME_SC_DNR;
++	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
+ 
+ 	return BLK_EH_HANDLED;
+ }
 -- 
-2.10.0
+2.11.0
