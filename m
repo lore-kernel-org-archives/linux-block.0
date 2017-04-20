@@ -1,95 +1,39 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 03/23] nvme-fc: fix status code handling in nvme_fc_fcpio_done
-Date: Thu, 20 Apr 2017 16:02:56 +0200
-Message-Id: <20170420140316.6546-4-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:22884 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1764977AbdDTCjD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Apr 2017 22:39:03 -0400
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Subject: Re: [PATCH 4/9] bio-integrity: fix interface for bio_integrity_trim v2
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
+        <1491332201-26926-5-git-send-email-dmonakhov@openvz.org>
+Date: Wed, 19 Apr 2017 22:38:52 -0400
+In-Reply-To: <1491332201-26926-5-git-send-email-dmonakhov@openvz.org> (Dmitry
+        Monakhov's message of "Tue, 4 Apr 2017 22:56:36 +0400")
+Message-ID: <yq1d1c7pzur.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-nvme_complete_async_event expects the little endian status code
-including the phase bit, and a new completion handler I plan to
-introduce will do so as well.
+Dmitry Monakhov <dmonakhov@openvz.org> writes:
 
-Change the status variable into the little endian format with the
-phase bit used in the NVMe CQE to fix / enable this.
+> bio_integrity_trim inherent it's interface from bio_trim and accept
+> offset and size, but this API is error prone because data offset must
+> always be insync with bio's data offset. That is why we have integrity
+> update hook in bio_advance()
+>
+> So only meaningful values are: offset == 0, sectors ==
+> bio_sectors(bio) Let's just remove them completely.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/nvme/host/fc.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+This interface predates the iter/immutable stuff. It should be fine to
+remove the call arguments now.
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index fc42172c796a..aad7f9c0be32 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -1147,7 +1147,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 	struct nvme_fc_ctrl *ctrl = op->ctrl;
- 	struct nvme_fc_queue *queue = op->queue;
- 	struct nvme_completion *cqe = &op->rsp_iu.cqe;
--	u16 status = NVME_SC_SUCCESS;
-+	__le16 status = cpu_to_le16(NVME_SC_SUCCESS << 1);
- 
- 	/*
- 	 * WARNING:
-@@ -1182,9 +1182,9 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 				sizeof(op->rsp_iu), DMA_FROM_DEVICE);
- 
- 	if (atomic_read(&op->state) == FCPOP_STATE_ABORTED)
--		status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
-+		status = cpu_to_le16((NVME_SC_ABORT_REQ | NVME_SC_DNR) << 1);
- 	else if (freq->status)
--		status = NVME_SC_FC_TRANSPORT_ERROR;
-+		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 
- 	/*
- 	 * For the linux implementation, if we have an unsuccesful
-@@ -1212,7 +1212,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 		 */
- 		if (freq->transferred_length !=
- 			be32_to_cpu(op->cmd_iu.data_len)) {
--			status = NVME_SC_FC_TRANSPORT_ERROR;
-+			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 			goto done;
- 		}
- 		op->nreq.result.u64 = 0;
-@@ -1229,15 +1229,15 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 					freq->transferred_length ||
- 			     op->rsp_iu.status_code ||
- 			     op->rqno != le16_to_cpu(cqe->command_id))) {
--			status = NVME_SC_FC_TRANSPORT_ERROR;
-+			status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 			goto done;
- 		}
- 		op->nreq.result = cqe->result;
--		status = le16_to_cpu(cqe->status) >> 1;
-+		status = cqe->status;
- 		break;
- 
- 	default:
--		status = NVME_SC_FC_TRANSPORT_ERROR;
-+		status = cpu_to_le16(NVME_SC_FC_TRANSPORT_ERROR << 1);
- 		goto done;
- 	}
- 
-@@ -1249,7 +1249,7 @@ nvme_fc_fcpio_done(struct nvmefc_fcp_req *req)
- 		return;
- 	}
- 
--	blk_mq_complete_request(rq, status);
-+	blk_mq_complete_request(rq, le16_to_cpu(status) >> 1);
- }
- 
- static int
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.11.0
+Martin K. Petersen	Oracle Linux Engineering
