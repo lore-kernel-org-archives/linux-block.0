@@ -9,101 +9,68 @@ Cc: Josef Bacik <jbacik@fb.com>,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
 	dm-devel@redhat.com
-Subject: [PATCH 09/23] loop: zero-fill bio on the submitting cpu
-Date: Thu, 20 Apr 2017 16:03:02 +0200
-Message-Id: <20170420140316.6546-10-hch@lst.de>
+Subject: [PATCH 17/23] blk-mq: simplify __blk_mq_complete_request
+Date: Thu, 20 Apr 2017 16:03:10 +0200
+Message-Id: <20170420140316.6546-18-hch@lst.de>
 In-Reply-To: <20170420140316.6546-1-hch@lst.de>
 References: <20170420140316.6546-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-In thruth I've just audited which blk-mq drivers don't currently have a
-complete callback, but I think this change is at least borderline useful.
+Merge blk_mq_ipi_complete_request and blk_mq_stat_add into their only
+caller.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c | 30 ++++++++++++++----------------
- drivers/block/loop.h |  1 +
- 2 files changed, 15 insertions(+), 16 deletions(-)
+ block/blk-mq.c | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 3081d83d2ea3..86351b3f7350 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -445,32 +445,27 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
- 	return ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3a2d179d49d6..3a21948c867a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -406,12 +406,19 @@ static void __blk_mq_complete_request_remote(void *data)
+ 	rq->q->softirq_done_fn(rq);
  }
  
--static inline void handle_partial_read(struct loop_cmd *cmd, long bytes)
-+static void lo_complete_rq(struct request *rq)
+-static void blk_mq_ipi_complete_request(struct request *rq)
++static void __blk_mq_complete_request(struct request *rq)
  {
--	if (bytes < 0 || op_is_write(req_op(cmd->rq)))
--		return;
-+	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 	bool shared = false;
+ 	int cpu;
  
--	if (unlikely(bytes < blk_rq_bytes(cmd->rq))) {
-+	if (unlikely(req_op(cmd->rq) == REQ_OP_READ && cmd->use_aio &&
-+		     cmd->ret >= 0 && cmd->ret < blk_rq_bytes(cmd->rq))) {
- 		struct bio *bio = cmd->rq->bio;
- 
--		bio_advance(bio, bytes);
-+		bio_advance(bio, cmd->ret);
- 		zero_fill_bio(bio);
- 	}
-+
-+	blk_mq_end_request(rq, cmd->ret < 0 ? -EIO : 0);
- }
- 
- static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
--	struct request *rq = cmd->rq;
--
--	handle_partial_read(cmd, ret);
- 
--	if (ret > 0)
--		ret = 0;
--	else if (ret < 0)
--		ret = -EIO;
--
--	blk_mq_complete_request(rq, ret);
-+	cmd->ret = ret;
-+	blk_mq_complete_request(cmd->rq, 0);
- }
- 
- static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
-@@ -1688,8 +1683,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	ret = do_req_filebacked(lo, cmd->rq);
-  failed:
- 	/* complete non-aio request */
--	if (!cmd->use_aio || ret)
--		blk_mq_complete_request(cmd->rq, ret ? -EIO : 0);
-+	if (!cmd->use_aio || ret) {
-+		cmd->ret = ret ? -EIO : 0;
-+		blk_mq_complete_request(cmd->rq, 0);
++	if (rq->internal_tag != -1)
++		blk_mq_sched_completed_request(rq);
++	if (rq->rq_flags & RQF_STATS) {
++		blk_mq_poll_stats_start(rq->q);
++		blk_stat_add(rq);
 +	}
++
+ 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
+ 		rq->q->softirq_done_fn(rq);
+ 		return;
+@@ -432,22 +439,6 @@ static void blk_mq_ipi_complete_request(struct request *rq)
+ 	put_cpu();
  }
  
- static void loop_queue_work(struct kthread_work *work)
-@@ -1715,6 +1712,7 @@ static int loop_init_request(void *data, struct request *rq,
- static const struct blk_mq_ops loop_mq_ops = {
- 	.queue_rq       = loop_queue_rq,
- 	.init_request	= loop_init_request,
-+	.complete	= lo_complete_rq,
- };
- 
- static int loop_add(struct loop_device **l, int i)
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index fb2237c73e61..fecd3f97ef8c 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -70,6 +70,7 @@ struct loop_cmd {
- 	struct request *rq;
- 	struct list_head list;
- 	bool use_aio;           /* use AIO interface to handle I/O */
-+	long ret;
- 	struct kiocb iocb;
- };
- 
+-static void blk_mq_stat_add(struct request *rq)
+-{
+-	if (rq->rq_flags & RQF_STATS) {
+-		blk_mq_poll_stats_start(rq->q);
+-		blk_stat_add(rq);
+-	}
+-}
+-
+-static void __blk_mq_complete_request(struct request *rq)
+-{
+-	if (rq->internal_tag != -1)
+-		blk_mq_sched_completed_request(rq);
+-	blk_mq_stat_add(rq);
+-	blk_mq_ipi_complete_request(rq);
+-}
+-
+ /**
+  * blk_mq_complete_request - end I/O on a request
+  * @rq:		the request being processed
 -- 
 2.11.0
