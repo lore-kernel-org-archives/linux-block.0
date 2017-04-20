@@ -1,78 +1,35 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@bombadil.infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-        James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Christoph Hellwig <hch@lst.de>
-Subject: blk-mq: simplify __blk_mq_complete_request
-Date: Tue, 18 Apr 2017 08:52:22 -0700
-Message-Id: <20170418155229.5977-17-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 20 Apr 2017 10:31:20 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>
+Subject: Re: [PATCH v2 4/5] block: Inline blk_rq_set_prio()
+Message-ID: <20170420083120.GZ6217@linux-x5ow.site>
+References: <20170419210128.28374-1-bart.vanassche@sandisk.com>
+ <20170419210128.28374-5-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170419210128.28374-5-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+On Wed, Apr 19, 2017 at 02:01:27PM -0700, Bart Van Assche wrote:
+> Since only a single caller remains, inline blk_rq_set_prio(). Initialize
+> req->ioprio even if no I/O priority has been set in the bio nor in the
+> I/O context.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Adam Manzanares <adam.manzanares@wdc.com>
+> Tested-by: Adam Manzanares <adam.manzanares@wdc.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Matias Bj�rling <m@bjorling.me>
+> ---
 
-Merge blk_mq_ipi_complete_request and blk_mq_stat_add into their only
-caller.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 25 ++++++++-----------------
- 1 file changed, 8 insertions(+), 17 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0c19df66f5a0..1f98db082da3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -406,12 +406,19 @@ static void __blk_mq_complete_request_remote(void *data)
- 	rq->q->softirq_done_fn(rq);
- }
- 
--static void blk_mq_ipi_complete_request(struct request *rq)
-+static void __blk_mq_complete_request(struct request *rq)
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	bool shared = false;
- 	int cpu;
- 
-+	if (rq->internal_tag != -1)
-+		blk_mq_sched_completed_request(rq);
-+	if (rq->rq_flags & RQF_STATS) {
-+		blk_mq_poll_stats_start(rq->q);
-+		blk_stat_add(rq);
-+	}
-+
- 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &rq->q->queue_flags)) {
- 		rq->q->softirq_done_fn(rq);
- 		return;
-@@ -432,22 +439,6 @@ static void blk_mq_ipi_complete_request(struct request *rq)
- 	put_cpu();
- }
- 
--static void blk_mq_stat_add(struct request *rq)
--{
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
--		blk_stat_add(rq);
--	}
--}
--
--static void __blk_mq_complete_request(struct request *rq)
--{
--	if (rq->internal_tag != -1)
--		blk_mq_sched_completed_request(rq);
--	blk_mq_stat_add(rq);
--	blk_mq_ipi_complete_request(rq);
--}
--
- /**
-  * blk_mq_complete_request - end I/O on a request
-  * @rq:		the request being processed
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.11.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
