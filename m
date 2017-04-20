@@ -1,77 +1,50 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.com>, <linux-scsi@vger.kernel.org>
-Subject: [PATCH v3 8/8] scsi: Implement blk_mq_ops.show_rq()
-Date: Tue, 18 Apr 2017 16:29:49 -0700
-Message-ID: <20170418232949.5228-9-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 19/23] floppy: switch from req->errors to req->error_count
+Date: Thu, 20 Apr 2017 16:03:12 +0200
+Message-Id: <20170420140316.6546-20-hch@lst.de>
+In-Reply-To: <20170420140316.6546-1-hch@lst.de>
+References: <20170420140316.6546-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Show the SCSI CDB, .eh_eflags and .result for pending SCSI commands
-in /sys/kernel/debug/block/*/mq/*/dispatch and */rq_list.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: <linux-scsi@vger.kernel.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/scsi_lib.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ drivers/block/floppy.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 7bc4513bf4e4..52604573e4b6 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2126,6 +2126,31 @@ static void scsi_exit_rq(struct request_queue *q, struct request *rq)
- 	scsi_free_sense_buffer(shost, cmd->sense_buffer);
- }
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index ce102ec47ef2..60d4c7653178 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -2805,8 +2805,10 @@ static int set_next_request(void)
+ 			fdc_queue = 0;
+ 		if (q) {
+ 			current_req = blk_fetch_request(q);
+-			if (current_req)
++			if (current_req) {
++				current_req->error_count = 0;
+ 				break;
++			}
+ 		}
+ 	} while (fdc_queue != old_pos);
  
-+static const char *const ehflag_name[] = {
-+	[ilog2(SCSI_EH_CANCEL_CMD)]	 = "CANCEL_CMD",
-+	[ilog2(SCSI_EH_ABORT_SCHEDULED)] = "ABORT_SCHEDULED",
-+};
-+
-+static void scsi_show_rq(struct seq_file *m, struct request *rq)
-+{
-+	struct scsi_cmnd *cmd = container_of(scsi_req(rq), typeof(*cmd), req);
-+	unsigned int i;
-+
-+	seq_puts(m, ", .cmd =");
-+	for (i = 0; i < cmd->cmd_len; i++)
-+		seq_printf(m, " %02x", cmd->cmnd[i]);
-+	seq_puts(m, ", .eh_eflags =");
-+	for (i = 0; i < sizeof(cmd->eh_eflags) * BITS_PER_BYTE; i++) {
-+		if (!(cmd->eh_eflags & BIT(i)))
-+			continue;
-+		if (i < ARRAY_SIZE(ehflag_name) && ehflag_name[i])
-+			seq_printf(m, " %s", ehflag_name[i]);
-+		else
-+			seq_printf(m, " %d", i);
-+	}
-+	seq_printf(m, ", .result = %#06x", cmd->result);
-+}
-+
- struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
- {
- 	struct Scsi_Host *shost = sdev->host;
-@@ -2158,6 +2183,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
- 	.queue_rq	= scsi_queue_rq,
- 	.complete	= scsi_softirq_done,
- 	.timeout	= scsi_timeout,
-+	.show_rq	= scsi_show_rq,
- 	.init_request	= scsi_init_request,
- 	.exit_request	= scsi_exit_request,
- 	.map_queues	= scsi_map_queues,
+@@ -2866,7 +2868,7 @@ static void redo_fd_request(void)
+ 		_floppy = floppy_type + DP->autodetect[DRS->probed_format];
+ 	} else
+ 		probing = 0;
+-	errors = &(current_req->errors);
++	errors = &(current_req->error_count);
+ 	tmp = make_raw_rw_request();
+ 	if (tmp < 2) {
+ 		request_done(tmp);
 -- 
-2.12.2
+2.11.0
