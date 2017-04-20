@@ -1,39 +1,122 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:50583 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S970407AbdDTPVA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2017 11:21:00 -0400
-Date: Thu, 20 Apr 2017 17:20:56 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
-        James Smart <james.smart@broadcom.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH 22/23] blktrace: remove the unused block_rq_abort
- tracepoint
-Message-ID: <20170420152056.GP13676@linux-x5ow.site>
+Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Josef Bacik <jbacik@fb.com>,
+	James Smart <james.smart@broadcom.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 22/23] blktrace: remove the unused block_rq_abort tracepoint
+Date: Thu, 20 Apr 2017 16:03:15 +0200
+Message-Id: <20170420140316.6546-23-hch@lst.de>
+In-Reply-To: <20170420140316.6546-1-hch@lst.de>
 References: <20170420140316.6546-1-hch@lst.de>
- <20170420140316.6546-23-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170420140316.6546-23-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 20, 2017 at 04:03:15PM +0200, Christoph Hellwig wrote:
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/trace/events/block.h | 44 ++++++++++----------------------------------
+ kernel/trace/blktrace.c      |  9 ---------
+ 2 files changed, 10 insertions(+), 43 deletions(-)
 
-Just to be sure nothings forgotten, does this change need an update for
-blktrace as well?
-
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index a88ed13446ff..99ed69fad041 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -61,7 +61,16 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
+ 	TP_ARGS(bh)
+ );
+ 
+-DECLARE_EVENT_CLASS(block_rq_with_error,
++/**
++ * block_rq_requeue - place block IO request back on a queue
++ * @q: queue holding operation
++ * @rq: block IO operation request
++ *
++ * The block operation request @rq is being placed back into queue
++ * @q.  For some reason the request was not completed and needs to be
++ * put back in the queue.
++ */
++TRACE_EVENT(block_rq_requeue,
+ 
+ 	TP_PROTO(struct request_queue *q, struct request *rq),
+ 
+@@ -94,39 +103,6 @@ DECLARE_EVENT_CLASS(block_rq_with_error,
+ );
+ 
+ /**
+- * block_rq_abort - abort block operation request
+- * @q: queue containing the block operation request
+- * @rq: block IO operation request
+- *
+- * Called immediately after pending block IO operation request @rq in
+- * queue @q is aborted. The fields in the operation request @rq
+- * can be examined to determine which device and sectors the pending
+- * operation would access.
+- */
+-DEFINE_EVENT(block_rq_with_error, block_rq_abort,
+-
+-	TP_PROTO(struct request_queue *q, struct request *rq),
+-
+-	TP_ARGS(q, rq)
+-);
+-
+-/**
+- * block_rq_requeue - place block IO request back on a queue
+- * @q: queue holding operation
+- * @rq: block IO operation request
+- *
+- * The block operation request @rq is being placed back into queue
+- * @q.  For some reason the request was not completed and needs to be
+- * put back in the queue.
+- */
+-DEFINE_EVENT(block_rq_with_error, block_rq_requeue,
+-
+-	TP_PROTO(struct request_queue *q, struct request *rq),
+-
+-	TP_ARGS(q, rq)
+-);
+-
+-/**
+  * block_rq_complete - block IO operation completed by device driver
+  * @q: queue containing the block operation request
+  * @rq: block operations request
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index b2058a7f94bd..9f3624dadb09 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -716,12 +716,6 @@ static void blk_add_trace_rq(struct request_queue *q, struct request *rq,
+ 			rq->cmd_flags, what, rq->errors, 0, NULL);
+ }
+ 
+-static void blk_add_trace_rq_abort(void *ignore,
+-				   struct request_queue *q, struct request *rq)
+-{
+-	blk_add_trace_rq(q, rq, blk_rq_bytes(rq), BLK_TA_ABORT);
+-}
+-
+ static void blk_add_trace_rq_insert(void *ignore,
+ 				    struct request_queue *q, struct request *rq)
+ {
+@@ -974,8 +968,6 @@ static void blk_register_tracepoints(void)
+ {
+ 	int ret;
+ 
+-	ret = register_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
+-	WARN_ON(ret);
+ 	ret = register_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
+ 	WARN_ON(ret);
+ 	ret = register_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
+@@ -1028,7 +1020,6 @@ static void blk_unregister_tracepoints(void)
+ 	unregister_trace_block_rq_requeue(blk_add_trace_rq_requeue, NULL);
+ 	unregister_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
+ 	unregister_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
+-	unregister_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
+ 
+ 	tracepoint_synchronize_unregister();
+ }
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
