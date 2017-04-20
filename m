@@ -1,41 +1,46 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 11/23] dm rq: don't pass irrelevant error code to blk_mq_complete_request
-Date: Wed, 19 Apr 2017 21:26:56 +0200
-Message-Id: <20170419192708.22098-12-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq-sched: add might_sleep() check for flush/fua
+ insert
+Date: Thu, 20 Apr 2017 23:20:53 +0000
+Message-ID: <1492730452.2642.17.camel@sandisk.com>
+References: <cd6d3a9a-8f6d-1cf8-6379-51de69544c1d@kernel.dk>
+	 <1492729028.2642.16.camel@sandisk.com>
+	 <a31e70b9-0a9a-44bc-fefa-ac317b4e095b@kernel.dk>
+In-Reply-To: <a31e70b9-0a9a-44bc-fefa-ac317b4e095b@kernel.dk>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-dm never uses rq->errors, so there is no need to pass an error argument
-to blk_mq_complete_request.
+On Thu, 2017-04-20 at 17:09 -0600, Jens Axboe wrote:
+> From: Jens Axboe <axboe@fb.com>
+> Subject: [PATCH] blk-mq: add might_sleep check to blk_mq_get_driver_tag()
+>=20
+> If the caller passes in wait=3Dtrue, it has to be able to block
+> for a driver tag. We just had a bug where flush insertion
+> would block on tag allocation, while we had preempt disabled.
+> Ensure that we catch cases like that earlier next time.
+>=20
+> Signed-off-by: Jens Axboe <axboe@fb.com>
+>=20
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 992f09772f8a..dd6e5dd62804 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -866,6 +866,8 @@ bool blk_mq_get_driver_tag(struct request *rq, struct=
+ blk_mq_hw_ctx **hctx,
+>  		.flags =3D wait ? 0 : BLK_MQ_REQ_NOWAIT,
+>  	};
+> =20
+> +	might_sleep_if(wait);
+> +
+>  	if (rq->tag !=3D -1)
+>  		goto done;
+> =20
+>=20
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-rq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks!
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index e60f1b6845be..1173be21f6f6 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -363,7 +363,7 @@ static void dm_complete_request(struct request *rq, int error)
- 	if (!rq->q->mq_ops)
- 		blk_complete_request(rq);
- 	else
--		blk_mq_complete_request(rq, error);
-+		blk_mq_complete_request(rq, 0);
- }
- 
- /*
--- 
-2.11.0
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
