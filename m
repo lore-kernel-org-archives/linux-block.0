@@ -1,178 +1,165 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f48.google.com ([74.125.83.48]:33368 "EHLO
-        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753787AbdDES3X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2017 14:29:23 -0400
-Received: by mail-pg0-f48.google.com with SMTP id x125so12189030pgb.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2017 11:29:23 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 1/8] blk-mq: use the right hctx when getting a driver tag fails
-Date: Wed,  5 Apr 2017 11:28:13 -0700
-Message-Id: <89da4a6561df3e24af3ba1c8625470d3088d2fa1.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
-In-Reply-To: <cover.1491416593.git.osandov@fb.com>
-References: <cover.1491416593.git.osandov@fb.com>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:36240 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1034984AbdDUD4Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 23:56:25 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 03/10] dm-table: Check block devices zone model compatibility
+Date: Fri, 21 Apr 2017 12:55:51 +0900
+Message-Id: <20170421035558.2657-4-damien.lemoal@wdc.com>
+In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
+References: <20170421035558.2657-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-While dispatching requests, if we fail to get a driver tag, we mark the
-hardware queue as waiting for a tag and put the requests on a
-hctx->dispatch list to be run later when a driver tag is freed. However,
-blk_mq_dispatch_rq_list() may dispatch requests from multiple hardware
-queues if using a single-queue scheduler with a multiqueue device. If
-blk_mq_get_driver_tag() fails, it doesn't update the hardware queue we
-are processing. This means we end up using the hardware queue of the
-previous request, which may or may not be the same as that of the
-current request. If it isn't, the wrong hardware queue will end up
-waiting for a tag, and the requests will be on the wrong dispatch list,
-leading to a hang.
+When setting the dm device queue limits, several possibilities exists
+for zoned block devices:
+1) The dm target driver may want to expose a different zone model (e.g.
+host-managed device emulation or regular block device on top of
+host-managed zoned block devices)
+2) Expose the underlying zone model of the devices as is
 
-The fix is twofold:
+To allow both cases, the underlying block device zone model must be set
+in the target limits in dm_set_device_limits() and the compatibility of
+all devices checked similarly to the logical block size alignment. For
+this last check, introduce the function validate_hardware_zone_model()
+to check that all targets of a table have the same zone model and that
+the zone size of the target devices are equal.
 
-1. Make sure we save which hardware queue we were trying to get a
-   request for in blk_mq_get_driver_tag() regardless of whether it
-   succeeds or not.
-2. Make blk_mq_dispatch_rq_list() take a request_queue instead of a
-   blk_mq_hw_queue to make it clear that it must handle multiple
-   hardware queues, since I've already messed this up on a couple of
-   occasions.
-
-This didn't appear in testing with nvme and mq-deadline because nvme has
-more driver tags than the default number of scheduler tags. However,
-with the blk_mq_update_nr_hw_queues() fix, it showed up with nbd.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- block/blk-mq-sched.c |  9 +++++----
- block/blk-mq.c       | 25 +++++++++++++------------
- block/blk-mq.h       |  2 +-
- 3 files changed, 19 insertions(+), 17 deletions(-)
+ drivers/md/dm-table.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 95 insertions(+)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 09af8ff18719..fc00f00898d3 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -171,7 +171,8 @@ void blk_mq_sched_put_request(struct request *rq)
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 6947f0f..4683cb6 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -505,6 +505,8 @@ static int dm_set_device_limits(struct dm_target *ti, struct dm_dev *dev,
+ 		       q->limits.alignment_offset,
+ 		       (unsigned long long) start << SECTOR_SHIFT);
  
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- {
--	struct elevator_queue *e = hctx->queue->elevator;
-+	struct request_queue *q = hctx->queue;
-+	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
- 	bool did_work = false;
- 	LIST_HEAD(rq_list);
-@@ -203,10 +204,10 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		did_work = blk_mq_dispatch_rq_list(hctx, &rq_list);
-+		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
- 	} else if (!has_sched_dispatch) {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
--		blk_mq_dispatch_rq_list(hctx, &rq_list);
-+		blk_mq_dispatch_rq_list(q, &rq_list);
- 	}
- 
- 	/*
-@@ -222,7 +223,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 			if (!rq)
- 				break;
- 			list_add(&rq->queuelist, &rq_list);
--		} while (blk_mq_dispatch_rq_list(hctx, &rq_list));
-+		} while (blk_mq_dispatch_rq_list(q, &rq_list));
- 	}
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 061fc2cc88d3..6c1bedc23b5a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -863,12 +863,8 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 		.flags = wait ? 0 : BLK_MQ_REQ_NOWAIT,
- 	};
- 
--	if (rq->tag != -1) {
--done:
--		if (hctx)
--			*hctx = data.hctx;
--		return true;
--	}
-+	if (rq->tag != -1)
-+		goto done;
- 
- 	if (blk_mq_tag_is_reserved(data.hctx->sched_tags, rq->internal_tag))
- 		data.flags |= BLK_MQ_REQ_RESERVED;
-@@ -880,10 +876,12 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 			atomic_inc(&data.hctx->nr_active);
- 		}
- 		data.hctx->tags->rqs[rq->tag] = rq;
--		goto done;
- 	}
- 
--	return false;
-+done:
-+	if (hctx)
-+		*hctx = data.hctx;
-+	return rq->tag != -1;
- }
- 
- static void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
-@@ -980,14 +978,17 @@ static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
- 	return true;
- }
- 
--bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
-+bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- {
--	struct request_queue *q = hctx->queue;
-+	struct blk_mq_hw_ctx *hctx;
- 	struct request *rq;
- 	LIST_HEAD(driver_list);
- 	struct list_head *dptr;
- 	int errors, queued, ret = BLK_MQ_RQ_QUEUE_OK;
- 
-+	if (list_empty(list))
-+		return false;
++	limits->zoned = bdev_zoned_model(bdev);
 +
- 	/*
- 	 * Start off with dptr being NULL, so we start the first request
- 	 * immediately, even if we have more pending.
-@@ -998,7 +999,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 	 * Now process all the entries, sending them to the driver.
- 	 */
- 	errors = queued = 0;
--	while (!list_empty(list)) {
-+	do {
- 		struct blk_mq_queue_data bd;
+ 	return 0;
+ }
  
- 		rq = list_first_entry(list, struct request, queuelist);
-@@ -1069,7 +1070,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 		 */
- 		if (!dptr && list->next != list->prev)
- 			dptr = &driver_list;
--	}
-+	} while (!list_empty(list));
+@@ -720,6 +722,96 @@ static int validate_hardware_logical_block_alignment(struct dm_table *table,
+ 	return 0;
+ }
  
- 	hctx->dispatched[queued_to_index(queued)]++;
++/*
++ * Check a devices's table for compatibility between zoned devices used by
++ * the table targets. The zone model may come directly from a target block
++ * device or may have been set by the target using the io_hints method.
++ * Overall, if any of the table device targets is advertized as a zoned
++ * block device, then all targets devices should also be advertized as
++ * using the same model and the devices zone size all equal.
++ */
++static int validate_hardware_zone_model(struct dm_table *table,
++					struct queue_limits *limits)
++{
++	struct dm_target *ti;
++	struct queue_limits ti_limits;
++	unsigned int zone_sectors = limits->chunk_sectors;
++	unsigned int num_targets = dm_table_get_num_targets(table);
++	int zone_model = -1;
++	unsigned int i = 0;
++
++	if (!num_targets)
++		return 0;
++
++	/*
++	 * Check each entry in the table in turn.
++	 */
++	while (i < num_targets) {
++
++		ti = dm_table_get_target(table, i);
++
++		/* Get the target device limits */
++		blk_set_stacking_limits(&ti_limits);
++		if (ti->type->iterate_devices)
++			ti->type->iterate_devices(ti, dm_set_device_limits,
++						  &ti_limits);
++
++		/*
++		 * Let the target driver change the hardware limits, and
++		 * in particular the zone model if needed.
++		 */
++		if (ti->type->io_hints)
++			ti->type->io_hints(ti, &ti_limits);
++
++		/* Check zone model compatibility */
++		if (zone_model == -1)
++			zone_model = ti_limits.zoned;
++		if (ti_limits.zoned != zone_model) {
++			zone_model = -1;
++			break;
++		}
++
++		if (zone_model != BLK_ZONED_NONE) {
++			/* Check zone size validity and compatibility */
++			if (!zone_sectors ||
++			    !is_power_of_2(zone_sectors))
++				break;
++			if (ti_limits.chunk_sectors != zone_sectors) {
++				zone_sectors = ti_limits.chunk_sectors;
++				break;
++			}
++		}
++
++		i++;
++
++	}
++
++	if (i < num_targets) {
++		if (zone_model == -1)
++			DMWARN("%s: table line %u (start sect %llu len %llu) "
++			       "has an incompatible zone model",
++			       dm_device_name(table->md), i,
++			       (unsigned long long) ti->begin,
++			       (unsigned long long) ti->len);
++		else
++			DMWARN("%s: table line %u (start sect %llu len %llu) "
++			       "has an incompatible zone size %u",
++			       dm_device_name(table->md), i,
++			       (unsigned long long) ti->begin,
++			       (unsigned long long) ti->len,
++			       zone_sectors);
++		return -EINVAL;
++	}
++
++	if (zone_model == BLK_ZONED_HA ||
++	    zone_model == BLK_ZONED_HM) {
++		limits->zoned = zone_model;
++		limits->chunk_sectors = zone_sectors;
++	}
++
++	return 0;
++}
++
+ int dm_table_add_target(struct dm_table *t, const char *type,
+ 			sector_t start, sector_t len, char *params)
+ {
+@@ -1432,6 +1524,9 @@ int dm_calculate_queue_limits(struct dm_table *table,
+ 			       (unsigned long long) ti->len);
+ 	}
  
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 8d49c06fc520..7e6f2e467696 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -30,7 +30,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_free_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
--bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *, struct list_head *);
-+bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *);
- void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
- bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
++	if (validate_hardware_zone_model(table, limits))
++		return -EINVAL;
++
+ 	return validate_hardware_logical_block_alignment(table, limits);
+ }
+ 
 -- 
-2.12.2
+2.9.3
