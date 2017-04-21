@@ -1,45 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:50559 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1166155AbdDXH1n (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Mon, 24 Apr 2017 03:27:43 -0400
-Subject: Re: [PATCH v4 05/10] blk-mq: Unregister debugfs attributes earlier
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
+	<hare@suse.com>
+Subject: [PATCH v4 05/10] blk-mq: Unregister debugfs attributes earlier
+Date: Fri, 21 Apr 2017 16:40:21 -0700
+Message-ID: <20170421234026.18970-6-bart.vanassche@sandisk.com>
+In-Reply-To: <20170421234026.18970-1-bart.vanassche@sandisk.com>
 References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
- <20170421234026.18970-6-bart.vanassche@sandisk.com>
-Cc: linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
-From: Hannes Reinecke <hare@suse.com>
-Message-ID: <22228381-33a3-b381-a3e0-4ba3ce889b6b@suse.com>
-Date: Mon, 24 Apr 2017 09:27:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170421234026.18970-6-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-On 04/22/2017 01:40 AM, Bart Van Assche wrote:
-> One of the debugfs attributes allows to run a queue. Since running
-> a queue after a queue has entered the "dead" state is not allowed
-> and even can cause a kernel crash, unregister the debugfs attributes
-> before a queue reaches the "dead" state.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Omar Sandoval <osandov@fb.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> ---
->  block/blk-core.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+One of the debugfs attributes allows to run a queue. Since running
+a queue after a queue has entered the "dead" state is not allowed
+and even can cause a kernel crash, unregister the debugfs attributes
+before a queue reaches the "dead" state.
 
-Cheers,
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Hannes
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a49b0830aaaf..33c91a4bee97 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -566,6 +566,11 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	spin_lock_irq(lock);
+ 	if (!q->mq_ops)
+ 		__blk_drain_queue(q, true);
++	spin_unlock_irq(lock);
++
++	blk_mq_debugfs_unregister_mq(q);
++
++	spin_lock_irq(lock);
+ 	queue_flag_set(QUEUE_FLAG_DEAD, q);
+ 	spin_unlock_irq(lock);
+ 
 -- 
-Dr. Hannes Reinecke		               zSeries & Storage
-hare@suse.com			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.12.2
