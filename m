@@ -1,73 +1,61 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v4 00/10] blk-mq debugfs patches for kernel v4.12
-Date: Fri, 21 Apr 2017 16:40:16 -0700
-Message-ID: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Final block fixes for 4.11
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <730d0183-e197-ec7b-fc73-a5365ddbace5@kernel.dk>
+Date: Fri, 21 Apr 2017 08:21:41 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+Hi Linus,
 
-Please consider the ten patches in this series for kernel v4.12.
-These patches improve blk-mq debugfs support.
+A couple of last minute fixes for regressions in this cycle. More
+specifically:
 
-Thanks,
+- Two patches from Andy, adjusting the NVMe APST quirks to avoid some
+  issues specific to one Toshiba drive, and some variant of Samsung
+  on two specific Dell laptops.
 
-Bart.
+- A fix for mtip32xx, turning off mq scheduling on that device. We
+  have a real fix for this, but it's too late in the cycle. Thankfully
+  we already have a NO_SCHED flag we can apply here. A prep patch for
+  this is ensuring that we honor the NO_SCHED flag when attempting to
+  online switch schedulers, previsouly we only did so for drive load
+  time. From Ming.
 
-Changes compared to v3:
-- Changed the mutex_lock_interruptible() calls back to mutex_lock()
-  calls.
-- Added a patch that renames the functions for registering and
-  unregistering the "mq" directory in debugfs.
-- Moved the changes that add checking of the blk_mq_debugfs_register()
-  return value into a separate patch.
-- Moved the unregistration of the "mq" directory into blk_cleanup_queue().
-- Removed uninteresting information from scsi_show_rq().
-- Added Reviewed-by tag to the patches that got a positive review.
+- Fixing an oops in blk-mq polling with scheduling attached. This one
+  is easily reproducible, it would be a shame to release 4.11 with
+  that issue. From me.
 
-Changes compared to v2:
-- Changed the mutex_lock() calls in registration methods into
-  mutex_lock_interruptible() since these functions can be called from
-  the context of a user space process.
-- Avoid that the blk_mq_register_dev() changes in patch 1/8 cause a
-  deadlock.
+I'd prefer not having to send in patches at this point in time, but
+the above are all things that have regressed in this cycle and the
+fixes are relatively straight forward. Please pull!
 
-Changes compared to v1:
-- Added two patches and replaced patch 1/6 such that debugfs
-  attributes are now unregistered before freeing of a blk-mq queue
-  starts instead of checking the "dead" queue flag.
-- Changed "rq->cmd_flags ^ op" into "rq->cmd_flags & ~REQ_OP_MASK" as
-  proposed by Omar.
-- A seq_file pointer is now passed to the new queue_rq callback function
-  instead of a fixed-size char buffer.
 
-Bart Van Assche (10):
-  blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
-  blk-mq: Let blk_mq_debugfs_register() look up the queue name
-  blk-mq-debugfs: Rename functions for registering and unregistering the
-    mq directory
-  blk-mq: Check blk_mq_debugfs_register() return value
-  blk-mq: Unregister debugfs attributes earlier
-  blk-mq: Move the "state" debugfs attribute one level down
-  blk-mq: Make blk_flags_show() callers append a newline character
-  blk-mq: Show operation, cmd_flags and rq_flags names
-  blk-mq: Add blk_mq_ops.show_rq()
-  scsi: Implement blk_mq_ops.show_rq()
+  git://git.kernel.dk/linux-block.git for-linus
 
- block/blk-core.c        |   5 +++
- block/blk-mq-debugfs.c  | 102 +++++++++++++++++++++++++++++++++++++++---------
- block/blk-mq-sysfs.c    |  64 ++++++++++++++++++++++--------
- block/blk-mq.h          |  14 +++----
- block/blk-sysfs.c       |   6 +--
- drivers/scsi/scsi_lib.c |  11 ++++++
- include/linux/blk-mq.h  |   6 +++
- 7 files changed, 164 insertions(+), 44 deletions(-)
+
+----------------------------------------------------------------
+Andy Lutomirski (2):
+      nvme: Adjust the Samsung APST quirk
+      nvme: Quirk APST off on "THNSF5256GPUK TOSHIBA"
+
+Jens Axboe (1):
+      blk-mq: fix potential oops with polling and blk-mq scheduler
+
+Ming Lei (2):
+      block: respect BLK_MQ_F_NO_SCHED
+      mtip32xx: pass BLK_MQ_F_NO_SCHED
+
+ block/blk-mq.c                    | 11 ++++++++++-
+ block/elevator.c                  | 12 ++++++++++--
+ drivers/block/mtip32xx/mtip32xx.c |  2 +-
+ drivers/nvme/host/core.c          | 23 +++++++++++++++--------
+ drivers/nvme/host/nvme.h          |  5 +++++
+ drivers/nvme/host/pci.c           | 26 +++++++++++++++++++++++++-
+ 6 files changed, 66 insertions(+), 13 deletions(-)
 
 -- 
-2.12.2
+Jens Axboe
