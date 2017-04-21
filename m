@@ -1,46 +1,75 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/6] blk-mq: Fix the comment above blk_mq_quiesce_queue()
-Date: Thu, 27 Apr 2017 08:54:33 -0700
-Message-ID: <20170427155437.23228-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170427155437.23228-1-bart.vanassche@sandisk.com>
-References: <20170427155437.23228-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:53068 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1035038AbdDUD4n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 23:56:43 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 02/10] dm-table: Check device area zone alignment
+Date: Fri, 21 Apr 2017 12:55:50 +0900
+Message-Id: <20170421035558.2657-3-damien.lemoal@wdc.com>
+In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
+References: <20170421035558.2657-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The first version of blk_mq_quiesce_queue() that was posted on
-the linux-block mailing list waited for ongoing .queue_rq()
-calls but did not stop the request queue. The current version
-however stops the request queue. Hence reflect this behavior in
-the comment above that function.
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+If a target maps to a zoned block device, check that the device area is
+aligned on zone boundaries to avoid problems with REQ_OP_ZONE_RESET
+operations (resetting a partially mapped sequential zone would not be
+possible). This also greatly facilitate the processing of zone report
+with REQ_OP_ZONE_REPORT bios.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- block/blk-mq.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/md/dm-table.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3b3420f76b5a..113c09d8026c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -157,8 +157,7 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
-  * @q: request queue.
-  *
-  * Note: this function does not prevent that the struct request end_io()
-- * callback function is invoked. Additionally, it is not prevented that
-- * new queue_rq() calls occur unless the queue has been stopped first.
-+ * callback function is invoked.
-  */
- void blk_mq_quiesce_queue(struct request_queue *q)
- {
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 06d3b7b..6947f0f 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -339,6 +339,33 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
+ 		return 1;
+ 	}
+ 
++	/*
++	 * If the target is mapped to a zoned block device, check
++	 * that the device zones are not partially mapped.
++	 */
++	if (bdev_zoned_model(bdev) != BLK_ZONED_NONE) {
++		unsigned int zone_sectors = bdev_zone_sectors(bdev);
++
++		if (start & (zone_sectors - 1)) {
++			DMWARN("%s: start=%llu not aligned to h/w "
++			       "zone size %u of %s",
++			       dm_device_name(ti->table->md),
++			       (unsigned long long)start,
++			       zone_sectors, bdevname(bdev, b));
++			return 1;
++		}
++
++		if (start + len < dev_size &&
++		    len & (zone_sectors - 1)) {
++			DMWARN("%s: len=%llu not aligned to h/w "
++			       "zone size %u of %s",
++			       dm_device_name(ti->table->md),
++			       (unsigned long long)start,
++			       zone_sectors, bdevname(bdev, b));
++			return 1;
++		}
++	}
++
+ 	return 0;
+ }
+ 
 -- 
-2.12.2
+2.9.3
