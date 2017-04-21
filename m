@@ -1,145 +1,182 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk
-Subject: [PATCH v3 17/20] cifs: cleanup writeback handling errors and comments
-Date: Mon, 24 Apr 2017 09:22:56 -0400
-Message-Id: <20170424132259.8680-18-jlayton@redhat.com>
-In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
-References: <20170424132259.8680-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:33859 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1035040AbdDUD4t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 23:56:49 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 09/10] dm-kcopyd: Add sequential write feature
+Date: Fri, 21 Apr 2017 12:55:57 +0900
+Message-Id: <20170421035558.2657-10-damien.lemoal@wdc.com>
+In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
+References: <20170421035558.2657-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now that writeback errors are handled on a per-file basis using the new
-sequence counter method at the vfs layer, we no longer need to re-set
-errors in the mapping after doing writeback in non-fsync codepaths.
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Also, fix up some bogus comments.
+When copyying blocks to host-managed zoned block devices, writes must be
+sequential. dm_kcopyd_copy() does not howerver guarantee this as writes
+are issued in the completion order of reads, and reads may complete out
+of order despite being issued sequentially.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Fix this by introducing the DM_KCOPYD_WRITE_SEQ flag. This can be
+specified by the user when calling dm_kcopyd_copy() and is set
+automatically if one of the destinations is a host-managed zoned block
+device. For a split job, the master job maintains the write position at
+which writes must be issued. This is checked with the pop() function
+which is modify to not return any write I/O sub job that is not at the
+correct write position.
+
+When DM_KCOPYD_WRITE_SEQ is specified for a job, errors cannot be
+ignored and the flag DM_KCOPYD_IGNORE_ERROR is ignored, even if
+specified by the user.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- fs/cifs/cifsfs.c |  4 +---
- fs/cifs/file.c   |  7 ++-----
- fs/cifs/inode.c  | 22 +++++++---------------
- 3 files changed, 10 insertions(+), 23 deletions(-)
+ drivers/md/dm-kcopyd.c    | 68 +++++++++++++++++++++++++++++++++++++++++++++--
+ include/linux/dm-kcopyd.h |  1 +
+ 2 files changed, 67 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index dd3f5fabfdf6..017a2d1d02c7 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -829,10 +829,8 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
- 		if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
- 		    inode->i_mapping->nrpages != 0) {
- 			rc = filemap_fdatawait(inode->i_mapping);
--			if (rc) {
--				mapping_set_error(inode->i_mapping, rc);
-+			if (rc)
- 				return rc;
--			}
- 		}
- 		/*
- 		 * Some applications poll for the file length in this strange
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4b696a23b0b1..9b4f7f182add 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -722,9 +722,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	cinode = CIFS_I(inode);
+diff --git a/drivers/md/dm-kcopyd.c b/drivers/md/dm-kcopyd.c
+index 9e9d04cb..477846e 100644
+--- a/drivers/md/dm-kcopyd.c
++++ b/drivers/md/dm-kcopyd.c
+@@ -356,6 +356,7 @@ struct kcopyd_job {
+ 	struct mutex lock;
+ 	atomic_t sub_jobs;
+ 	sector_t progress;
++	sector_t write_ofst;
  
- 	if (can_flush) {
--		rc = filemap_write_and_wait(inode->i_mapping);
--		mapping_set_error(inode->i_mapping, rc);
--
-+		filemap_write_and_wait(inode->i_mapping);
- 		if (tcon->unix_ext)
- 			rc = cifs_get_inode_info_unix(&inode, full_path,
- 						      inode->i_sb, xid);
-@@ -3906,8 +3904,7 @@ void cifs_oplock_break(struct work_struct *work)
- 			break_lease(inode, O_WRONLY);
- 		rc = filemap_fdatawrite(inode->i_mapping);
- 		if (!CIFS_CACHE_READ(cinode)) {
--			rc = filemap_fdatawait(inode->i_mapping);
--			mapping_set_error(inode->i_mapping, rc);
-+			filemap_fdatawait(inode->i_mapping);
- 			cifs_zap_mapping(inode);
- 		}
- 		cifs_dbg(FYI, "Oplock flush inode %p rc %d\n", inode, rc);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index b261db34103c..a58e605240fc 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2008,10 +2008,8 @@ int cifs_getattr(const struct path *path, struct kstat *stat,
- 	if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
- 	    inode->i_mapping->nrpages != 0) {
- 		rc = filemap_fdatawait(inode->i_mapping);
--		if (rc) {
--			mapping_set_error(inode->i_mapping, rc);
-+		if (rc)
- 			return rc;
--		}
+ 	struct kcopyd_job *master_job;
+ };
+@@ -386,6 +387,34 @@ void dm_kcopyd_exit(void)
+  * Functions to push and pop a job onto the head of a given job
+  * list.
+  */
++static struct kcopyd_job *pop_io_job(struct list_head *jobs,
++				     struct dm_kcopyd_client *kc)
++{
++	struct kcopyd_job *job;
++
++	/*
++	 * For I/O jobs, pop any read, any write without sequential write
++	 * constraint and sequential writes that are at the right position.
++	 */
++	list_for_each_entry(job, jobs, list) {
++
++		if (job->rw == READ ||
++		    !test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags)) {
++			list_del(&job->list);
++			return job;
++		}
++
++		if (job->write_ofst == job->master_job->write_ofst) {
++			job->master_job->write_ofst += job->source.count;
++			list_del(&job->list);
++			return job;
++		}
++
++	}
++
++	return NULL;
++}
++
+ static struct kcopyd_job *pop(struct list_head *jobs,
+ 			      struct dm_kcopyd_client *kc)
+ {
+@@ -395,8 +424,12 @@ static struct kcopyd_job *pop(struct list_head *jobs,
+ 	spin_lock_irqsave(&kc->job_lock, flags);
+ 
+ 	if (!list_empty(jobs)) {
+-		job = list_entry(jobs->next, struct kcopyd_job, list);
+-		list_del(&job->list);
++		if (jobs == &kc->io_jobs) {
++			job = pop_io_job(jobs, kc);
++		} else {
++			job = list_entry(jobs->next, struct kcopyd_job, list);
++			list_del(&job->list);
++		}
  	}
+ 	spin_unlock_irqrestore(&kc->job_lock, flags);
  
- 	rc = cifs_revalidate_dentry_attr(dentry);
-@@ -2171,15 +2169,12 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 	 * Attempt to flush data before changing attributes. We need to do
- 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
- 	 * ownership or mode then we may also need to do this. Here, we take
--	 * the safe way out and just do the flush on all setattr requests. If
--	 * the flush returns error, store it to report later and continue.
-+	 * the safe way out and just do the flush on all setattr requests.
- 	 *
- 	 * BB: This should be smarter. Why bother flushing pages that
--	 * will be truncated anyway? Also, should we error out here if
--	 * the flush returns error?
-+	 * will be truncated anyway?
- 	 */
--	rc = filemap_write_and_wait(inode->i_mapping);
--	mapping_set_error(inode->i_mapping, rc);
-+	filemap_write_and_wait(inode->i_mapping);
- 	rc = 0;
+@@ -506,6 +539,14 @@ static int run_io_job(struct kcopyd_job *job)
+ 		.client = job->kc->io_client,
+ 	};
  
- 	if (attrs->ia_valid & ATTR_SIZE) {
-@@ -2314,15 +2309,12 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	 * Attempt to flush data before changing attributes. We need to do
- 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
- 	 * ownership or mode then we may also need to do this. Here, we take
--	 * the safe way out and just do the flush on all setattr requests. If
--	 * the flush returns error, store it to report later and continue.
-+	 * the safe way out and just do the flush on all setattr requests.
- 	 *
- 	 * BB: This should be smarter. Why bother flushing pages that
--	 * will be truncated anyway? Also, should we error out here if
--	 * the flush returns error?
-+	 * will be truncated anyway?
- 	 */
--	rc = filemap_write_and_wait(inode->i_mapping);
--	mapping_set_error(inode->i_mapping, rc);
-+	filemap_write_and_wait(inode->i_mapping);
- 	rc = 0;
++	/*
++	 * If we need to write sequentially and some reads or writes failed,
++	 * no point in continuing.
++	 */
++	if (test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags) &&
++	    job->master_job->write_err)
++		return -EIO;
++
+ 	io_job_start(job->kc->throttle);
  
- 	if (attrs->ia_valid & ATTR_SIZE) {
+ 	if (job->rw == READ)
+@@ -655,6 +696,7 @@ static void segment_complete(int read_err, unsigned long write_err,
+ 		int i;
+ 
+ 		*sub_job = *job;
++		sub_job->write_ofst = progress;
+ 		sub_job->source.sector += progress;
+ 		sub_job->source.count = count;
+ 
+@@ -723,6 +765,27 @@ int dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
+ 	job->num_dests = num_dests;
+ 	memcpy(&job->dests, dests, sizeof(*dests) * num_dests);
+ 
++	/*
++	 * If one of the destination is a host-managed zoned block device,
++	 * we need to write sequentially. If one of the destination is a
++	 * host-aware device, then leave it to the caller to choose what to do.
++	 */
++	if (!test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags)) {
++		for (i = 0; i < job->num_dests; i++) {
++			if (bdev_zoned_model(dests[i].bdev) == BLK_ZONED_HM) {
++				set_bit(DM_KCOPYD_WRITE_SEQ, &job->flags);
++				break;
++			}
++		}
++	}
++
++	/*
++	 * If we need to write sequentially, errors cannot be ignored.
++	 */
++	if (test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags) &&
++	    test_bit(DM_KCOPYD_IGNORE_ERROR, &job->flags))
++		clear_bit(DM_KCOPYD_IGNORE_ERROR, &job->flags);
++
+ 	if (from) {
+ 		job->source = *from;
+ 		job->pages = NULL;
+@@ -746,6 +809,7 @@ int dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
+ 	job->fn = fn;
+ 	job->context = context;
+ 	job->master_job = job;
++	job->write_ofst = 0;
+ 
+ 	if (job->source.count <= SUB_JOB_SIZE)
+ 		dispatch_job(job);
+diff --git a/include/linux/dm-kcopyd.h b/include/linux/dm-kcopyd.h
+index f486d63..cfac858 100644
+--- a/include/linux/dm-kcopyd.h
++++ b/include/linux/dm-kcopyd.h
+@@ -20,6 +20,7 @@
+ #define DM_KCOPYD_MAX_REGIONS 8
+ 
+ #define DM_KCOPYD_IGNORE_ERROR 1
++#define DM_KCOPYD_WRITE_SEQ    2
+ 
+ struct dm_kcopyd_throttle {
+ 	unsigned throttle;
 -- 
 2.9.3
