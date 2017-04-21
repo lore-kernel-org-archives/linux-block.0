@@ -1,121 +1,73 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk
-Subject: [PATCH v3 16/20] mm: don't TestClearPageError in __filemap_fdatawait_range
-Date: Mon, 24 Apr 2017 09:22:55 -0400
-Message-Id: <20170424132259.8680-17-jlayton@redhat.com>
-In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
-References: <20170424132259.8680-1-jlayton@redhat.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v4 00/10] blk-mq debugfs patches for kernel v4.12
+Date: Fri, 21 Apr 2017 16:40:16 -0700
+Message-ID: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-The -EIO returned here can end up overriding whatever error is marked in
-the address space, and be returned at fsync time, even when there is a
-more appropriate error stored in the mapping.
+Hello Jens,
 
-Read errors are also sometimes tracked on a per-page level using
-PG_error. Suppose we have a read error on a page, and then that page is
-subsequently dirtied by overwriting the whole page. Writeback doesn't
-clear PG_error, so we can then end up successfully writing back that
-page and still return -EIO on fsync.
+Please consider the ten patches in this series for kernel v4.12.
+These patches improve blk-mq debugfs support.
 
-Worse yet, PG_error is cleared during a sync() syscall, but the -EIO
-return from that is silently discarded. Any subsystem that is relying on
-PG_error to report errors during fsync can easily lose writeback errors
-due to this. All you need is a stray sync() call on the box at the wrong
-time and you've lost the error.
+Thanks,
 
-Since the handling of the PG_error flag is somewhat inconsistent across
-subsystems, let's just rely on marking the address space when there are
-writeback errors. Change the TestClearPageError call to ClearPageError,
-and make __filemap_fdatawait_range a void return function.
+Bart.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- mm/filemap.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
+Changes compared to v3:
+- Changed the mutex_lock_interruptible() calls back to mutex_lock()
+  calls.
+- Added a patch that renames the functions for registering and
+  unregistering the "mq" directory in debugfs.
+- Moved the changes that add checking of the blk_mq_debugfs_register()
+  return value into a separate patch.
+- Moved the unregistration of the "mq" directory into blk_cleanup_queue().
+- Removed uninteresting information from scsi_show_rq().
+- Added Reviewed-by tag to the patches that got a positive review.
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index d94a76d4e023..47e7f50fb830 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -363,17 +363,16 @@ int filemap_flush(struct address_space *mapping)
- }
- EXPORT_SYMBOL(filemap_flush);
- 
--static int __filemap_fdatawait_range(struct address_space *mapping,
-+static void __filemap_fdatawait_range(struct address_space *mapping,
- 				     loff_t start_byte, loff_t end_byte)
- {
- 	pgoff_t index = start_byte >> PAGE_SHIFT;
- 	pgoff_t end = end_byte >> PAGE_SHIFT;
- 	struct pagevec pvec;
- 	int nr_pages;
--	int ret = 0;
- 
- 	if (end_byte < start_byte)
--		goto out;
-+		return;
- 
- 	pagevec_init(&pvec, 0);
- 	while ((index <= end) &&
-@@ -390,14 +389,11 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
- 				continue;
- 
- 			wait_on_page_writeback(page);
--			if (TestClearPageError(page))
--				ret = -EIO;
-+			ClearPageError(page);
- 		}
- 		pagevec_release(&pvec);
- 		cond_resched();
- 	}
--out:
--	return ret;
- }
- 
- /**
-@@ -417,15 +413,10 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
- int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
- 			    loff_t end_byte)
- {
--	int ret, ret2;
- 	errseq_t since = filemap_sample_wb_error(mapping);
- 
--	ret = __filemap_fdatawait_range(mapping, start_byte, end_byte);
--	ret2 = filemap_check_wb_error(mapping, since);
--	if (!ret)
--		ret = ret2;
--
--	return ret;
-+	__filemap_fdatawait_range(mapping, start_byte, end_byte);
-+	return filemap_check_wb_error(mapping, since);
- }
- EXPORT_SYMBOL(filemap_fdatawait_range);
- 
+Changes compared to v2:
+- Changed the mutex_lock() calls in registration methods into
+  mutex_lock_interruptible() since these functions can be called from
+  the context of a user space process.
+- Avoid that the blk_mq_register_dev() changes in patch 1/8 cause a
+  deadlock.
+
+Changes compared to v1:
+- Added two patches and replaced patch 1/6 such that debugfs
+  attributes are now unregistered before freeing of a blk-mq queue
+  starts instead of checking the "dead" queue flag.
+- Changed "rq->cmd_flags ^ op" into "rq->cmd_flags & ~REQ_OP_MASK" as
+  proposed by Omar.
+- A seq_file pointer is now passed to the new queue_rq callback function
+  instead of a fixed-size char buffer.
+
+Bart Van Assche (10):
+  blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
+  blk-mq: Let blk_mq_debugfs_register() look up the queue name
+  blk-mq-debugfs: Rename functions for registering and unregistering the
+    mq directory
+  blk-mq: Check blk_mq_debugfs_register() return value
+  blk-mq: Unregister debugfs attributes earlier
+  blk-mq: Move the "state" debugfs attribute one level down
+  blk-mq: Make blk_flags_show() callers append a newline character
+  blk-mq: Show operation, cmd_flags and rq_flags names
+  blk-mq: Add blk_mq_ops.show_rq()
+  scsi: Implement blk_mq_ops.show_rq()
+
+ block/blk-core.c        |   5 +++
+ block/blk-mq-debugfs.c  | 102 +++++++++++++++++++++++++++++++++++++++---------
+ block/blk-mq-sysfs.c    |  64 ++++++++++++++++++++++--------
+ block/blk-mq.h          |  14 +++----
+ block/blk-sysfs.c       |   6 +--
+ drivers/scsi/scsi_lib.c |  11 ++++++
+ include/linux/blk-mq.h  |   6 +++
+ 7 files changed, 164 insertions(+), 44 deletions(-)
+
 -- 
-2.9.3
+2.12.2
