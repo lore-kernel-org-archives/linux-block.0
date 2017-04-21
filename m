@@ -1,53 +1,102 @@
-Return-Path: <BATV+9cf0d970ddff402c2c33+4973+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 3/5] nvme: mark nvme_max_retries static
-Date: Wed,  5 Apr 2017 19:18:10 +0200
-Message-Id: <20170405171812.19911-4-hch@lst.de>
-In-Reply-To: <20170405171812.19911-1-hch@lst.de>
-References: <20170405171812.19911-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:22545 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1035033AbdDUD4e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 23:56:34 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 07/10] dm-flakey: Add support for zoned block devices
+Date: Fri, 21 Apr 2017 12:55:55 +0900
+Message-Id: <20170421035558.2657-8-damien.lemoal@wdc.com>
+In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
+References: <20170421035558.2657-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+
+With the development of file system support for zoned block devices
+(e.g. f2fs), having dm-flakey support for these devices is interesting
+to improve testing.
+
+This patch adds support for zoned block devices in dm-flakey, both
+host-aware and host-managed. The target type feature is set to
+DM_TARGET_ZONED_HM indicate support for host-managed models. The
+remaining of the support adds hooks for remapping of REQ_OP_ZONE_RESET
+and REQ_OP_ZONE_REPORT bios. Additionally, in the bio completion path,
+(backward) remapping of a zone report reply is also added.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/nvme/host/core.c | 3 +--
- drivers/nvme/host/nvme.h | 2 --
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ drivers/md/dm-flakey.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index b225aacf4b89..933e67c60e33 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -49,10 +49,9 @@ unsigned char shutdown_timeout = 5;
- module_param(shutdown_timeout, byte, 0644);
- MODULE_PARM_DESC(shutdown_timeout, "timeout in seconds for controller shutdown");
+diff --git a/drivers/md/dm-flakey.c b/drivers/md/dm-flakey.c
+index 13305a1..b419c85 100644
+--- a/drivers/md/dm-flakey.c
++++ b/drivers/md/dm-flakey.c
+@@ -251,6 +251,8 @@ static int flakey_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	return 0;
  
--unsigned int nvme_max_retries = 5;
-+static unsigned int nvme_max_retries = 5;
- module_param_named(max_retries, nvme_max_retries, uint, 0644);
- MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
--EXPORT_SYMBOL_GPL(nvme_max_retries);
+ bad:
++	if (fc->dev)
++		dm_put_device(ti, fc->dev);
+ 	kfree(fc);
+ 	return r;
+ }
+@@ -275,7 +277,7 @@ static void flakey_map_bio(struct dm_target *ti, struct bio *bio)
+ 	struct flakey_c *fc = ti->private;
  
- static int nvme_char_major;
- module_param(nvme_char_major, int, 0);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 227f281482db..82ba9a305301 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -43,8 +43,6 @@ extern unsigned char shutdown_timeout;
- #define NVME_DEFAULT_KATO	5
- #define NVME_KATO_GRACE		10
+ 	bio->bi_bdev = fc->dev->bdev;
+-	if (bio_sectors(bio))
++	if (bio_sectors(bio) || bio_op(bio) == REQ_OP_ZONE_RESET)
+ 		bio->bi_iter.bi_sector =
+ 			flakey_map_sector(ti, bio->bi_iter.bi_sector);
+ }
+@@ -306,6 +308,14 @@ static int flakey_map(struct dm_target *ti, struct bio *bio)
+ 	struct per_bio_data *pb = dm_per_bio_data(bio, sizeof(struct per_bio_data));
+ 	pb->bio_submitted = false;
  
--extern unsigned int nvme_max_retries;
--
- enum {
- 	NVME_NS_LBA		= 0,
- 	NVME_NS_LIGHTNVM	= 1,
++	/* Do not fail reset zone */
++	if (bio_op(bio) == REQ_OP_ZONE_RESET)
++		goto map_bio;
++
++	/* We need to remap reported zones, so remember the BIO iter */
++	if (bio_op(bio) == REQ_OP_ZONE_REPORT)
++		goto map_bio;
++
+ 	/* Are we alive ? */
+ 	elapsed = (jiffies - fc->start_time) / HZ;
+ 	if (elapsed % (fc->up_interval + fc->down_interval) >= fc->up_interval) {
+@@ -363,6 +373,14 @@ static int flakey_end_io(struct dm_target *ti, struct bio *bio, int error)
+ 	struct flakey_c *fc = ti->private;
+ 	struct per_bio_data *pb = dm_per_bio_data(bio, sizeof(struct per_bio_data));
+ 
++	if (bio_op(bio) == REQ_OP_ZONE_RESET)
++		return error;
++
++	if (bio_op(bio) == REQ_OP_ZONE_REPORT) {
++		dm_remap_zone_report(ti, bio, fc->start);
++		return error;
++	}
++
+ 	if (!error && pb->bio_submitted && (bio_data_dir(bio) == READ)) {
+ 		if (fc->corrupt_bio_byte && (fc->corrupt_bio_rw == READ) &&
+ 		    all_corrupt_bio_flags_match(bio, fc)) {
+@@ -446,6 +464,7 @@ static int flakey_iterate_devices(struct dm_target *ti, iterate_devices_callout_
+ static struct target_type flakey_target = {
+ 	.name   = "flakey",
+ 	.version = {1, 4, 0},
++	.features = DM_TARGET_ZONED_HM,
+ 	.module = THIS_MODULE,
+ 	.ctr    = flakey_ctr,
+ 	.dtr    = flakey_dtr,
 -- 
-2.11.0
+2.9.3
