@@ -1,90 +1,157 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:38591 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754765AbdD0Wvp (ORCPT
+Received: from mail-oi0-f54.google.com ([209.85.218.54]:34004 "EHLO
+        mail-oi0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1039533AbdDUXyL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2017 18:51:45 -0400
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 4/6] blk-mq: don't bypass scheduler for reserved requests
-Date: Thu, 27 Apr 2017 16:51:32 -0600
-Message-ID: <1493333494-600-5-git-send-email-axboe@fb.com>
-In-Reply-To: <1493333494-600-1-git-send-email-axboe@fb.com>
-References: <1493333494-600-1-git-send-email-axboe@fb.com>
+        Fri, 21 Apr 2017 19:54:11 -0400
+Received: by mail-oi0-f54.google.com with SMTP id x184so115792949oia.1
+        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2017 16:54:11 -0700 (PDT)
+Subject: Re: [PATCH-v0 2/2] Fix memory corruption of the lpfc_ncmd->list
+ pointers
+To: Dick Kennedy <dick.kennedy@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vreg.kernel.org
+References: <1492800146-24218-1-git-send-email-dick.kennedy@broadcom.com>
+ <1492800146-24218-3-git-send-email-dick.kennedy@broadcom.com>
+Cc: martin.petersen@orcale.com, jthumshirn@suse.de, emilne@redhat.com
+From: James Smart <james.smart@broadcom.com>
+Message-ID: <65dd7de1-d191-d10d-e78d-935494d2b896@broadcom.com>
+Date: Fri, 21 Apr 2017 16:54:09 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1492800146-24218-3-git-send-email-dick.kennedy@broadcom.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Instead of bypassing the scheduler for insertion of reserved requests,
-we ensure that the request is marked as RQF_RESERVED so they driver
-knows where it came from.
+Please disregard - I am recutting, breaking it from the series, 
+reposting as an individual patch.
 
-Usually we just use the tag to know if it's reserved or not,
-but that only works when the request has a driver tag assigned.
-Using RQF_RESERVED can be done independently of whether or not
-scheduling is used.
+-- james
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-mq-sched.c   | 8 +++-----
- block/blk-mq.c         | 3 +++
- include/linux/blkdev.h | 2 ++
- 3 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 8b361e192e8a..27c67465f856 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -82,11 +82,7 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
- 	if (likely(!data->hctx))
- 		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
- 
--	/*
--	 * For a reserved tag, allocate a normal request since we might
--	 * have driver dependencies on the value of the internal tag.
--	 */
--	if (e && !(data->flags & BLK_MQ_REQ_RESERVED)) {
-+	if (e) {
- 		data->flags |= BLK_MQ_REQ_INTERNAL;
- 
- 		/*
-@@ -104,6 +100,8 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
- 	}
- 
- 	if (rq) {
-+		if (data->flags & BLK_MQ_REQ_RESERVED)
-+			rq->rq_flags |= RQF_RESERVED;
- 		if (!op_is_flush(op)) {
- 			rq->elv.icq = NULL;
- 			if (e && e->type->icq_cache)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b75ef2392db7..0168b27469cb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -268,6 +268,9 @@ struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
- 			data->hctx->tags->rqs[rq->tag] = rq;
- 		}
- 
-+		if (data->flags & BLK_MQ_REQ_RESERVED)
-+			rq->rq_flags |= RQF_RESERVED;
-+
- 		blk_mq_rq_ctx_init(data->q, data->ctx, rq, op);
- 		return rq;
- 	}
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ba3884f26288..c246de5861dc 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -120,6 +120,8 @@ typedef __u32 __bitwise req_flags_t;
- /* Look at ->special_vec for the actual data payload instead of the
-    bio chain. */
- #define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
-+/* Request came from the reserved tags/pool */
-+#define RQF_RESERVED		((__force req_flags_t)(1 << 19))
- 
- /* flags that prevent us from merging requests: */
- #define RQF_NOMERGE_FLAGS \
--- 
-2.7.4
+On 4/21/2017 11:42 AM, Dick Kennedy wrote:
+> When starting the nvme Initiator and nvmet Target cli apps,
+> the nvmeI would cause an Oops in the nvme buffer list_head.
+>
+> The nvmeI was using the private data area of the template and
+> setting it to 0 size.  This caused a use conflict with the
+> nvme transport also using the memory area and causing the
+> memory corruption.
+>
+> NVMEI driver now claims a size for fcpreq that is provided in
+> the template and zero's out the area when done.  This
+> change has fixed the memory corruption.  I also altered some
+> list_del's to list_del_init because the lpfc_ncmd's are
+> migrating between the abts and put lists.
+> There are some new debug log statements added to help
+> debug.
+>
+> Signed-off-by: Dick Kennedy <dick.kennedy@broadcom.com>
+> Signed-off-by: James Smart <james.smart@broadcom.com>
+> ---
+>   drivers/scsi/lpfc/lpfc_nvme.c | 17 +++++++++++------
+>   drivers/scsi/lpfc/lpfc_nvme.h |  4 ++++
+>   2 files changed, 15 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/scsi/lpfc/lpfc_nvme.c b/drivers/scsi/lpfc/lpfc_nvme.c
+> index f98cbc2..8008c82 100644
+> --- a/drivers/scsi/lpfc/lpfc_nvme.c
+> +++ b/drivers/scsi/lpfc/lpfc_nvme.c
+> @@ -761,6 +761,7 @@ lpfc_nvme_io_cmd_wqe_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
+>   	struct nvme_fc_cmd_iu *cp;
+>   	struct lpfc_nvme_rport *rport;
+>   	struct lpfc_nodelist *ndlp;
+> +	struct lpfc_nvme_fcpreq_priv *freqpriv;
+>   	unsigned long flags;
+>   	uint32_t code;
+>   	uint16_t cid, sqhd, data;
+> @@ -918,6 +919,8 @@ out_err:
+>   			phba->cpucheck_cmpl_io[lpfc_ncmd->cpu]++;
+>   	}
+>   #endif
+> +	freqpriv = nCmd->private;
+> +	freqpriv->nvme_buf = NULL;
+>   	nCmd->done(nCmd);
+>   
+>   	spin_lock_irqsave(&phba->hbalock, flags);
+> @@ -1214,6 +1217,7 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
+>   	struct lpfc_nvme_buf *lpfc_ncmd;
+>   	struct lpfc_nvme_rport *rport;
+>   	struct lpfc_nvme_qhandle *lpfc_queue_info;
+> +	struct lpfc_nvme_fcpreq_priv *freqpriv = pnvme_fcreq->private;
+>   #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
+>   	uint64_t start = 0;
+>   #endif
+> @@ -1292,7 +1296,7 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
+>   	 * Do not let the IO hang out forever.  There is no midlayer issuing
+>   	 * an abort so inform the FW of the maximum IO pending time.
+>   	 */
+> -	pnvme_fcreq->private = (void *)lpfc_ncmd;
+> +	freqpriv->nvme_buf = lpfc_ncmd;
+>   	lpfc_ncmd->nvmeCmd = pnvme_fcreq;
+>   	lpfc_ncmd->nrport = rport;
+>   	lpfc_ncmd->ndlp = ndlp;
+> @@ -1422,6 +1426,7 @@ lpfc_nvme_fcp_abort(struct nvme_fc_local_port *pnvme_lport,
+>   	struct lpfc_nvme_buf *lpfc_nbuf;
+>   	struct lpfc_iocbq *abts_buf;
+>   	struct lpfc_iocbq *nvmereq_wqe;
+> +	struct lpfc_nvme_fcpreq_priv *freqpriv = pnvme_fcreq->private;
+>   	union lpfc_wqe *abts_wqe;
+>   	unsigned long flags;
+>   	int ret_val;
+> @@ -1484,7 +1489,7 @@ lpfc_nvme_fcp_abort(struct nvme_fc_local_port *pnvme_lport,
+>   		return;
+>   	}
+>   
+> -	lpfc_nbuf = (struct lpfc_nvme_buf *)pnvme_fcreq->private;
+> +	lpfc_nbuf = freqpriv->nvme_buf;
+>   	if (!lpfc_nbuf) {
+>   		spin_unlock_irqrestore(&phba->hbalock, flags);
+>   		lpfc_printf_vlog(vport, KERN_ERR, LOG_NVME_ABTS,
+> @@ -1637,7 +1642,7 @@ static struct nvme_fc_port_template lpfc_nvme_template = {
+>   	.local_priv_sz = sizeof(struct lpfc_nvme_lport),
+>   	.remote_priv_sz = sizeof(struct lpfc_nvme_rport),
+>   	.lsrqst_priv_sz = 0,
+> -	.fcprqst_priv_sz = 0,
+> +	.fcprqst_priv_sz = sizeof(struct lpfc_nvme_fcpreq_priv),
+>   };
+>   
+>   /**
+> @@ -2068,7 +2073,7 @@ lpfc_get_nvme_buf(struct lpfc_hba *phba, struct lpfc_nodelist *ndlp)
+>   		if (lpfc_test_rrq_active(phba, ndlp,
+>   					 lpfc_ncmd->cur_iocbq.sli4_lxritag))
+>   			continue;
+> -		list_del(&lpfc_ncmd->list);
+> +		list_del_init(&lpfc_ncmd->list);
+>   		found = 1;
+>   		break;
+>   	}
+> @@ -2083,7 +2088,7 @@ lpfc_get_nvme_buf(struct lpfc_hba *phba, struct lpfc_nodelist *ndlp)
+>   			if (lpfc_test_rrq_active(
+>   				phba, ndlp, lpfc_ncmd->cur_iocbq.sli4_lxritag))
+>   				continue;
+> -			list_del(&lpfc_ncmd->list);
+> +			list_del_init(&lpfc_ncmd->list);
+>   			found = 1;
+>   			break;
+>   		}
+> @@ -2542,7 +2547,7 @@ lpfc_sli4_nvme_xri_aborted(struct lpfc_hba *phba,
+>   				 &phba->sli4_hba.lpfc_abts_nvme_buf_list,
+>   				 list) {
+>   		if (lpfc_ncmd->cur_iocbq.sli4_xritag == xri) {
+> -			list_del(&lpfc_ncmd->list);
+> +			list_del_init(&lpfc_ncmd->list);
+>   			lpfc_ncmd->flags &= ~LPFC_SBUF_XBUSY;
+>   			lpfc_ncmd->status = IOSTAT_SUCCESS;
+>   			spin_unlock(
+> diff --git a/drivers/scsi/lpfc/lpfc_nvme.h b/drivers/scsi/lpfc/lpfc_nvme.h
+> index 2582f46..ec32f45 100644
+> --- a/drivers/scsi/lpfc/lpfc_nvme.h
+> +++ b/drivers/scsi/lpfc/lpfc_nvme.h
+> @@ -97,3 +97,7 @@ struct lpfc_nvme_buf {
+>   	uint64_t ts_data_nvme;
+>   #endif
+>   };
+> +
+> +struct lpfc_nvme_fcpreq_priv {
+> +	struct lpfc_nvme_buf *nvme_buf;
+> +};
