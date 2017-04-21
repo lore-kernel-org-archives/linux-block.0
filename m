@@ -1,117 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0041.outbound.protection.outlook.com ([104.47.41.41]:38016
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755369AbdDOS4h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2017 14:56:37 -0400
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [GIT PULL 11/19] lightnvm: allow to init targets on factory mode
-Date: Sat, 15 Apr 2017 20:55:45 +0200
-Message-ID: <20170415185553.16098-12-matias@cnexlabs.com>
-In-Reply-To: <20170415185553.16098-1-matias@cnexlabs.com>
-References: <20170415185553.16098-1-matias@cnexlabs.com>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:36240 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1034979AbdDUD43 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 23:56:29 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 05/10] dm: Fix REQ_OP_ZONE_REPORT bio handling
+Date: Fri, 21 Apr 2017 12:55:53 +0900
+Message-Id: <20170421035558.2657-6-damien.lemoal@wdc.com>
+In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
+References: <20170421035558.2657-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Target initialization has two responsibilities: creating the target
-partition and instantiating the target. This patch enables to create a
-factory partition (e.g., do not trigger recovery on the given target).
-This is useful for target development and for being able to restore the
-device state at any moment in time without requiring a full-device
-erase.
+A REQ_OP_ZONE_REPORT bio is not a medium access command. Its number of
+sectors indicates the maximum size allowed for the report reply size
+and not an amount of sectors accessed from the device.
+REQ_OP_ZONE_REPORT bios should thus not be split depending on the
+target device maximum I/O length but passed as is. Note that it is the
+responsability of the target to remap and format the report reply.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/lightnvm/core.c       | 14 +++++++++++---
- drivers/lightnvm/rrpc.c       |  3 ++-
- include/linux/lightnvm.h      |  3 ++-
- include/uapi/linux/lightnvm.h |  4 ++++
- 4 files changed, 19 insertions(+), 5 deletions(-)
+ drivers/md/dm.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 5f84d2a..a63b563 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -280,7 +280,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	tdisk->fops = &nvm_fops;
- 	tdisk->queue = tqueue;
- 
--	targetdata = tt->init(tgt_dev, tdisk);
-+	targetdata = tt->init(tgt_dev, tdisk, create->flags);
- 	if (IS_ERR(targetdata))
- 		goto err_init;
- 
-@@ -1244,8 +1244,16 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
- 	create.tgtname[DISK_NAME_LEN - 1] = '\0';
- 
- 	if (create.flags != 0) {
--		pr_err("nvm: no flags supported\n");
--		return -EINVAL;
-+		__u32 flags = create.flags;
-+
-+		/* Check for valid flags */
-+		if (flags & NVM_TARGET_FACTORY)
-+			flags &= ~NVM_TARGET_FACTORY;
-+
-+		if (flags) {
-+			pr_err("nvm: flag not supported\n");
-+			return -EINVAL;
-+		}
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1d98035..cd44928 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1098,7 +1098,8 @@ static int clone_bio(struct dm_target_io *tio, struct bio *bio,
+ 			return r;
  	}
  
- 	return __nvm_configure_create(&create);
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index a8acf9e..5dba544 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -1506,7 +1506,8 @@ static int rrpc_luns_configure(struct rrpc *rrpc)
+-	bio_advance(clone, to_bytes(sector - clone->bi_iter.bi_sector));
++	if (bio_op(bio) != REQ_OP_ZONE_REPORT)
++		bio_advance(clone, to_bytes(sector - clone->bi_iter.bi_sector));
+ 	clone->bi_iter.bi_size = to_bytes(len);
  
- static struct nvm_tgt_type tt_rrpc;
+ 	if (bio_integrity(bio))
+@@ -1275,7 +1276,11 @@ static int __split_and_process_non_flush(struct clone_info *ci)
+ 	if (!dm_target_is_valid(ti))
+ 		return -EIO;
  
--static void *rrpc_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk)
-+static void *rrpc_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
-+		       int flags)
- {
- 	struct request_queue *bqueue = dev->q;
- 	struct request_queue *tqueue = tdisk->queue;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index eff7d1f..7dfa56e 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -436,7 +436,8 @@ static inline int ppa_cmp_blk(struct ppa_addr ppa1, struct ppa_addr ppa2)
+-	len = min_t(sector_t, max_io_len(ci->sector, ti), ci->sector_count);
++	if (bio_op(bio) == REQ_OP_ZONE_REPORT)
++		len = ci->sector_count;
++	else
++		len = min_t(sector_t, max_io_len(ci->sector, ti),
++			    ci->sector_count);
  
- typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
- typedef sector_t (nvm_tgt_capacity_fn)(void *);
--typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *);
-+typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *,
-+				int flags);
- typedef void (nvm_tgt_exit_fn)(void *);
- typedef int (nvm_tgt_sysfs_init_fn)(struct gendisk *);
- typedef void (nvm_tgt_sysfs_exit_fn)(struct gendisk *);
-diff --git a/include/uapi/linux/lightnvm.h b/include/uapi/linux/lightnvm.h
-index fd19f36..c8aec4b 100644
---- a/include/uapi/linux/lightnvm.h
-+++ b/include/uapi/linux/lightnvm.h
-@@ -85,6 +85,10 @@ struct nvm_ioctl_create_conf {
- 	};
- };
- 
-+enum {
-+	NVM_TARGET_FACTORY = 1 << 0,	/* Init target in factory mode */
-+};
-+
- struct nvm_ioctl_create {
- 	char dev[DISK_NAME_LEN];		/* open-channel SSD device */
- 	char tgttype[NVM_TTYPE_NAME_MAX];	/* target type name */
+ 	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
+ 	if (r < 0)
 -- 
 2.9.3
