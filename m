@@ -1,108 +1,76 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Omar Sandoval <osandov@fb.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart van Assche <bart.vanassche@sandisk.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 1/2] block: Implement global tagset
-Date: Tue,  4 Apr 2017 14:07:44 +0200
-Message-Id: <1491307665-47656-2-git-send-email-hare@suse.de>
-In-Reply-To: <1491307665-47656-1-git-send-email-hare@suse.de>
-References: <1491307665-47656-1-git-send-email-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:35364 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1424459AbdDUTGQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Apr 2017 15:06:16 -0400
+Received: by mail-wm0-f42.google.com with SMTP id w64so22537077wma.0
+        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2017 12:06:16 -0700 (PDT)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <F1FB4E37-23D4-4E6B-9310-78FA4699556C@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_A62A987E-1F9B-473C-8C4B-C64030F5D14B";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] lightnvm: propagate pblk_init return to userspace
+Date: Fri, 21 Apr 2017 17:07:50 +0200
+In-Reply-To: <20170420182356.GA7866@hercules.tuxera.com>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Rakesh Pandit <rakesh@tuxera.com>
+References: <20170420182356.GA7866@hercules.tuxera.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Most legacy HBAs have a tagset per HBA, not per queue. To map
-these devices onto block-mq this patch implements a new tagset
-flag BLK_MQ_F_GLOBAL_TAGS, which will cause the tag allocator
-to use just one tagset for all hardware queues.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-tag.c     | 12 ++++++++----
- block/blk-mq.c         | 10 ++++++++--
- include/linux/blk-mq.h |  1 +
- 3 files changed, 17 insertions(+), 6 deletions(-)
+--Apple-Mail=_A62A987E-1F9B-473C-8C4B-C64030F5D14B
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e48bc2c..a14e76c 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -276,9 +276,11 @@ static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv)
- {
--	int i;
-+	int i, lim = tagset->nr_hw_queues;
- 
--	for (i = 0; i < tagset->nr_hw_queues; i++) {
-+	if (tagset->flags & BLK_MQ_F_GLOBAL_TAGS)
-+		lim = 1;
-+	for (i = 0; i < lim; i++) {
- 		if (tagset->tags && tagset->tags[i])
- 			blk_mq_all_tag_busy_iter(tagset->tags[i], fn, priv);
- 	}
-@@ -287,12 +289,14 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set)
- {
--	int i, j, ret = 0;
-+	int i, j, ret = 0, lim = set->nr_hw_queues;
- 
- 	if (!set->ops->reinit_request)
- 		goto out;
- 
--	for (i = 0; i < set->nr_hw_queues; i++) {
-+	if (set->flags & BLK_MQ_F_GLOBAL_TAGS)
-+		lim = 1;
-+	for (i = 0; i < lim; i++) {
- 		struct blk_mq_tags *tags = set->tags[i];
- 
- 		for (j = 0; j < tags->nr_tags; j++) {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 159187a..db96ed0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2061,6 +2061,10 @@ static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
- {
- 	int ret = 0;
- 
-+	if ((set->flags & BLK_MQ_F_GLOBAL_TAGS) && hctx_idx != 0) {
-+		set->tags[hctx_idx] = set->tags[0];
-+		return true;
-+	}
- 	set->tags[hctx_idx] = blk_mq_alloc_rq_map(set, hctx_idx,
- 					set->queue_depth, set->reserved_tags);
- 	if (!set->tags[hctx_idx])
-@@ -2080,8 +2084,10 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
- 					 unsigned int hctx_idx)
- {
- 	if (set->tags[hctx_idx]) {
--		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
--		blk_mq_free_rq_map(set->tags[hctx_idx]);
-+		if (!(set->flags & BLK_MQ_F_GLOBAL_TAGS) || hctx_idx == 0) {
-+			blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
-+			blk_mq_free_rq_map(set->tags[hctx_idx]);
-+		}
- 		set->tags[hctx_idx] = NULL;
- 	}
- }
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b296a90..eee27b016 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -155,6 +155,7 @@ enum {
- 	BLK_MQ_F_DEFER_ISSUE	= 1 << 4,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
-+	BLK_MQ_F_GLOBAL_TAGS	= 1 << 7,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
- 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
- 
--- 
-1.8.5.6
+> On 20 Apr 2017, at 20.23, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>=20
+> =46rom userspace calling ioctl(NVM_DEV_CREATE) was returning ENOMEM =
+for
+> invalid arguments even though pblk (pblk_init) was returning correctly
+> -EINVAL to nvm_create_tgt inside core.  This patch propagates the
+> correct return value to userspace.
+>=20
+> Because pblk was introduced recently this only needs to go in 4.12.
+>=20
+> Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
+> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+>=20
+
+Looks good.
+
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+
+Javier
+
+--Apple-Mail=_A62A987E-1F9B-473C-8C4B-C64030F5D14B
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJY+iBHAAoJEGMfBTt1mRjKDcQQAK0BOSZtGW8YKR2yR36hCDLh
+GvuEODhpskjUs26nDfdb+bXwqJo7qvGxKpAaGcGg0QahVgjtGFdoHAqfQIQNFijD
+9yJ43o2ortvNaH9owD09zlgVOmv7JP/LoloUNLeO3fPONhiuL7ElzrGBZTP7Bg5A
+znRtPUC/FCTB/Ptl6staAiXO5T5OETwN66OnjRTubsCeaxnyaVorNsNJjZM8hCoV
+NYy9ePC7g56Z1nTEDUZG77JLvunUtFtrZ4YD7SRxFUcP9I0MMua89+5cCCTUChxj
+JjE+vwakLc3UeFPVuQHoCELG48QMU1wVG23JZ5abLmpJoqzRguRGiVDvpBi1IITd
+LSBZTKY/OyB07BNn0nAByM+vXTCLghyDtBIw1x8dkdK/NmFidBzV2y1IZmJfotv+
+xofFIAu6MBM00mk7yyvMRfk9bon9Em9kJ2l6YfMQ+o2hEwINbzvO+OHSdCCbCTZ/
+gd+7/J8VorX/1xYf411YxouIKCIidnGjGAq0UDwcQaqn1DVbt0OnDt095G1DJlIP
+cDKBer/fNFxkPNov0h38zCibh4bAYAOhFA2QZfx5Hi2uelzlrF7+7eZ0DMsD0uii
+lRJ7IgS9A/d4/Hh2vmmYKaIjAqz7GcmZo41XgKQmpiRvPS/q/WR4K//sQ2x/kg6k
++I8VWbDbPHGkryCpZtVd
+=c01T
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_A62A987E-1F9B-473C-8C4B-C64030F5D14B--
