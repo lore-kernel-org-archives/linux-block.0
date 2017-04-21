@@ -1,34 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44294 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1038523AbdDULTX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 07:19:23 -0400
-Subject: Re: Status of pwritev2/preadv2 in glibc?
-To: Christoph Hellwig <hch@infradead.org>,
-        Stephen Bates <sbates@raithlin.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:49754 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1032755AbdDUK4U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Apr 2017 06:56:20 -0400
+Date: Fri, 21 Apr 2017 03:56:18 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Stephen Bates <sbates@raithlin.com>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
         "jonathan.derrick@intel.com" <jonathan.derrick@intel.com>,
         libc-alpha@sourceware.org
+Subject: Re: Status of pwritev2/preadv2 in glibc?
+Message-ID: <20170421105618.GB31499@infradead.org>
 References: <ECD1C373-3464-4AEF-8E73-3130C5BFAF87@raithlin.com>
- <20170421105618.GB31499@infradead.org>
-From: Florian Weimer <fweimer@redhat.com>
-Message-ID: <4ab1466b-5273-d3fb-8db1-3ad21578ccfc@redhat.com>
-Date: Fri, 21 Apr 2017 13:19:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170421105618.GB31499@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <ECD1C373-3464-4AEF-8E73-3130C5BFAF87@raithlin.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 04/21/2017 12:56 PM, Christoph Hellwig wrote:
-> It would probably help to add the glibc list as the glibc developers
-> might know better..
+It would probably help to add the glibc list as the glibc developers
+might know better..
 
-So far, no one has submitted a patch.
-
-I hope the off_t parameter is passed exactly the same way as for pwritev 
-and its 64-bit variant, for all architectures.
-
-Thanks,
-Florian
+On Sat, Apr 15, 2017 at 04:24:29PM +0000, Stephen  Bates wrote:
+> Hi
+> 
+> Does anyone know the status of support for the pwritev2/preadv2 system calls in glibc? I am doing some more IO polling testing and realized that the support is not in 2.25 and does not seem to be staged for later release?
+> 
+> Right now I am using the FIO_HAVE_PWRITEV2 support that fio provides but it’d be nice to be able to write/adapt other user-space programs to test this capability…
+> 
+> Stephen 
+> 
+> 
+---end quoted text---
