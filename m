@@ -1,91 +1,28 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 05/23] nvme: make nvme_error_status private
-Date: Wed, 19 Apr 2017 21:26:50 +0200
-Message-Id: <20170419192708.22098-6-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
+Return-Path: <prvs=277bcc1d4=roger.pau@citrix.com>
+Date: Fri, 21 Apr 2017 12:46:22 +0100
+From: Roger Pau Monne <roger.pau@citrix.com>
+To: Christoph Hellwig <hch@infradead.org>
+CC: NeilBrown <neilb@suse.com>, Jens Axboe <axboe@kernel.dk>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Konrad
+ Rzeszutek Wilk <konrad.wilk@oracle.com>, <xen-devel@lists.xenproject.org>
+Subject: Re: [PATCH 08/11] xen-blkfront: remove bio splitting.
+Message-ID: <20170421114622.ymoprc7a4h3g6xqi@dhcp-3-128.uk.xensource.com>
+References: <149266645258.27388.14083229348123176454.stgit@noble>
+ <149266672984.27388.11947154313852245586.stgit@noble>
+ <20170421113620.GK12523@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20170421113620.GK12523@infradead.org>
+Return-Path: roger.pau@citrix.com
 List-ID: <linux-block@vger.kernel.org>
 
-Currently it's used by the lighnvm passthrough ioctl, but we'd like to make
-it private in preparation of block layer specific error code.  Lighnvm already
-returns the real NVMe status anyway, so I think we can just limit it to
-returning -EIO for any status set.
+On Fri, Apr 21, 2017 at 04:36:20AM -0700, Christoph Hellwig wrote:
+> Btw, I really don't understand why this code even looks at bios over
+> just requeueing the request.  Can someone explain that bit to me?
 
-This will need a careful audit from the lightnvm folks, though.
+This was done because Linux could migrate from a host supporting indirect
+descriptors to a host not supporting them, and so the maximum number of
+segments per request could change, and the requests already on the queue might
+need to be split.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c     | 3 +--
- drivers/nvme/host/lightnvm.c | 6 +++---
- drivers/nvme/host/nvme.h     | 1 -
- 3 files changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index c6f256d74b6b..805f250315ec 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -66,7 +66,7 @@ static DEFINE_SPINLOCK(dev_list_lock);
- 
- static struct class *nvme_class;
- 
--int nvme_error_status(struct request *req)
-+static int nvme_error_status(struct request *req)
- {
- 	switch (nvme_req(req)->status & 0x7ff) {
- 	case NVME_SC_SUCCESS:
-@@ -77,7 +77,6 @@ int nvme_error_status(struct request *req)
- 		return -EIO;
- 	}
- }
--EXPORT_SYMBOL_GPL(nvme_error_status);
- 
- static inline bool nvme_req_needs_retry(struct request *req)
- {
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index f85e6e57d641..7f407d5f0095 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -599,7 +599,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 	__le64 *metadata = NULL;
- 	dma_addr_t metadata_dma;
- 	DECLARE_COMPLETION_ONSTACK(wait);
--	int ret;
-+	int ret = 0;
- 
- 	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
- 			NVME_QID_ANY);
-@@ -671,8 +671,8 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 
- 	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
- 		ret = -EINTR;
--	else
--		ret = nvme_error_status(rq);
-+	else if (nvme_req(rq)->status & 0x7ff)
-+		ret = -EIO;
- 	if (result)
- 		*result = nvme_req(rq)->status & 0x7ff;
- 	if (status)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index d7330f75632d..550037f5efea 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -254,7 +254,6 @@ static inline void nvme_end_request(struct request *req, __le16 status,
- 	blk_mq_complete_request(req, 0);
- }
- 
--int nvme_error_status(struct request *req);
- void nvme_complete_rq(struct request *req);
- void nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
--- 
-2.11.0
+Roger.
