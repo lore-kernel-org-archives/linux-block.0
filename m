@@ -1,30 +1,43 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
-        snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 25/25] block: remove the discard_zeroes_data flag
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20170331163313.31821-1-hch@lst.de>
-	<20170331163313.31821-26-hch@lst.de>
-Date: Wed, 05 Apr 2017 07:56:49 -0400
-In-Reply-To: <20170331163313.31821-26-hch@lst.de> (Christoph Hellwig's message
-	of "Fri, 31 Mar 2017 18:33:13 +0200")
-Message-ID: <yq1bmsbrrsu.fsf@oracle.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Fri, 21 Apr 2017 15:11:17 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hare@suse.com" <hare@suse.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"osandov@fb.com" <osandov@fb.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v3 1/8] blk-mq: Register <dev>/queue/mq after having
+ registered <dev>/queue
+Message-ID: <20170421221117.GC17177@vader.DHCP.thefacebook.com>
+References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+ <20170418232949.5228-2-bart.vanassche@sandisk.com>
+ <20170421220518.GA17177@vader.DHCP.thefacebook.com>
+ <1492812553.2499.11.camel@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1492812553.2499.11.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Christoph Hellwig <hch@lst.de> writes:
+On Fri, Apr 21, 2017 at 10:09:14PM +0000, Bart Van Assche wrote:
+> On Fri, 2017-04-21 at 15:05 -0700, Omar Sandoval wrote:
+> > On Tue, Apr 18, 2017 at 04:29:42PM -0700, Bart Van Assche wrote:
+> > > +int blk_mq_register_dev(struct device *dev, struct request_queue *q)
+> > > +{
+> > > +	int ret;
+> > > +
+> > > +	ret = mutex_lock_interruptible(&q->sysfs_lock);
+> > 
+> > Why did you make this interruptible? blk_mq_disable_hotplug() wasn't
+> > interruptible before, so now dm_mq_init_request_queue() can fail
+> > silently if it is interrupted.
+> 
+> Hello Omar,
+> 
+> Whether or not blk_mq_register_dev() should be interruptible is not that
+> important to me. I can change this function such that it again ignores
+> signals.
+> 
+> Bart.
 
-> Now that we use the proper REQ_OP_WRITE_ZEROES operation everywhere we
-> can kill this hack.
-
-Oh yeah!
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Keeping the old behavior is safer, let's do that.
