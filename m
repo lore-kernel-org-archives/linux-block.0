@@ -1,23 +1,105 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] nbd: set the max segments to USHRT_MAX
-To: Josef Bacik <josef@toxicpanda.com>, nbd-general@lists.sourceforge.net,
- linux-block@vger.kernel.org, kernel-team@fb.com
-References: <1492717621-9042-1-git-send-email-jbacik@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3abe6211-2ed8-a88f-23e4-e5064c0fe2c5@kernel.dk>
-Date: Thu, 20 Apr 2017 19:54:11 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:47185 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1034983AbdDUD4V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Apr 2017 23:56:21 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 01/10] dm-table: Introduce DM_TARGET_ZONED_HM feature
+Date: Fri, 21 Apr 2017 12:55:49 +0900
+Message-Id: <20170421035558.2657-2-damien.lemoal@wdc.com>
+In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
+References: <20170421035558.2657-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <1492717621-9042-1-git-send-email-jbacik@fb.com>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 04/20/2017 01:47 PM, Josef Bacik wrote:
-> I lack the basic understanding of what segments mean, so we were being
-> limited to 512kib requests even with higher max_sectors sizes set.
-> Setting the maximum number of segments to unlimited allows us to
-> actually have arbitrarily large IO's go through NBD.
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Applied for 4.12, thanks Josef.
+The target drivers currently available will not operate correctly if a
+table target maps onto a host-managed zoned block device.
 
+To avoid problems, this patch introduces the new feature flag
+DM_TARGET_ZONED_HM for a target driver to explicitly state that it
+supports host-managed zoned block devices. This feature is checked
+in dm_get_device() to prevent the addition to a table of a target
+mapping to a host-managed zoned block device if the target type does
+not have the feature enabled.
+
+Note that as host-aware zoned block devices are backward compatible
+with regular block devices, they can be used by any of the current
+target types. This new feature is thus restricted to host-managed
+zoned block devices.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/md/dm-table.c         | 23 +++++++++++++++++++++++
+ include/linux/device-mapper.h |  6 ++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 3ad16d9..06d3b7b 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -388,6 +388,24 @@ dev_t dm_get_dev_t(const char *path)
+ EXPORT_SYMBOL_GPL(dm_get_dev_t);
+ 
+ /*
++ * Check if the target supports supports host-managed zoned block devices.
++ */
++static bool device_supported(struct dm_target *ti, struct dm_dev *dev)
++{
++	struct block_device *bdev = dev->bdev;
++	char b[BDEVNAME_SIZE];
++
++	if (bdev_zoned_model(bdev) == BLK_ZONED_HM &&
++	    !dm_target_zoned_hm(ti->type)) {
++		DMWARN("%s: Unsupported host-managed zoned block device %s",
++		       dm_device_name(ti->table->md), bdevname(bdev, b));
++		return false;
++	}
++
++	return true;
++}
++
++/*
+  * Add a device to the list, or just increment the usage count if
+  * it's already present.
+  */
+@@ -426,6 +444,11 @@ int dm_get_device(struct dm_target *ti, const char *path, fmode_t mode,
+ 	}
+ 	atomic_inc(&dd->count);
+ 
++	if (!device_supported(ti, dd->dm_dev)) {
++		dm_put_device(ti, dd->dm_dev);
++		return -ENOTSUPP;
++	}
++
+ 	*result = dd->dm_dev;
+ 	return 0;
+ }
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index a7e6903..b3c2408 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -214,6 +214,12 @@ struct target_type {
+ #define dm_target_is_wildcard(type)	((type)->features & DM_TARGET_WILDCARD)
+ 
+ /*
++ * Indicates that a target supports host-managed zoned block devices.
++ */
++#define DM_TARGET_ZONED_HM		0x00000010
++#define dm_target_zoned_hm(type)	((type)->features & DM_TARGET_ZONED_HM)
++
++/*
+  * Some targets need to be sent the same WRITE bio severals times so
+  * that they can send copies of it to different devices.  This function
+  * examines any supplied bio and returns the number of copies of it the
 -- 
-Jens Axboe
+2.9.3
