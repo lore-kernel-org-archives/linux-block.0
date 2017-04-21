@@ -1,44 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:47989 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1166025AbdDXH2W (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Mon, 24 Apr 2017 03:28:22 -0400
-Subject: Re: [PATCH v4 06/10] blk-mq: Move the "state" debugfs attribute one
- level down
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v4 06/10] blk-mq: Move the "state" debugfs attribute one level down
+Date: Fri, 21 Apr 2017 16:40:22 -0700
+Message-ID: <20170421234026.18970-7-bart.vanassche@sandisk.com>
+In-Reply-To: <20170421234026.18970-1-bart.vanassche@sandisk.com>
 References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
- <20170421234026.18970-7-bart.vanassche@sandisk.com>
-Cc: linux-block@vger.kernel.org
-From: Hannes Reinecke <hare@suse.com>
-Message-ID: <a83902d2-b89b-4885-935d-866b05162cb1@suse.com>
-Date: Mon, 24 Apr 2017 09:28:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170421234026.18970-7-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-On 04/22/2017 01:40 AM, Bart Van Assche wrote:
-> Move the "state" attribute from the top level to the "mq" directory
-> as requested by Omar.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Omar Sandoval <osandov@fb.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> ---
->  block/blk-mq-debugfs.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Move the "state" attribute from the top level to the "mq" directory
+as requested by Omar.
 
-Cheers,
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-mq-debugfs.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-Hannes
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index d99064e9e76a..1132be4e9c1c 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -141,11 +141,6 @@ static const struct file_operations blk_queue_flags_fops = {
+ 	.write		= blk_queue_flags_store,
+ };
+ 
+-static const struct blk_mq_debugfs_attr blk_queue_attrs[] = {
+-	{"state", 0600, &blk_queue_flags_fops},
+-	{},
+-};
+-
+ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
+ {
+ 	if (stat->nr_samples) {
+@@ -757,6 +752,7 @@ static const struct file_operations ctx_completed_fops = {
+ 
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+ 	{"poll_stat", 0400, &queue_poll_stat_fops},
++	{"state", 0600, &blk_queue_flags_fops},
+ 	{},
+ };
+ 
+@@ -873,9 +869,6 @@ int blk_mq_debugfs_register_mq(struct request_queue *q)
+ 	if (!q->debugfs_dir)
+ 		return -ENOENT;
+ 
+-	if (!debugfs_create_files(q->debugfs_dir, q, blk_queue_attrs))
+-		goto err;
+-
+ 	q->mq_debugfs_dir = debugfs_create_dir("mq", q->debugfs_dir);
+ 	if (!q->mq_debugfs_dir)
+ 		goto err;
 -- 
-Dr. Hannes Reinecke		               zSeries & Storage
-hare@suse.com			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.12.2
