@@ -1,39 +1,66 @@
-Return-Path: <peterz@infradead.org>
-Date: Fri, 21 Apr 2017 17:22:41 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Reshetova, Elena" <elena.reshetova@intel.com>,
-	Eric Biggers <ebiggers3@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	"james.bottomley@hansenpartnership.com" <james.bottomley@hansenpartnership.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"fujita.tomonori@lab.ntt.co.jp" <fujita.tomonori@lab.ntt.co.jp>,
-	"mingo@redhat.com" <mingo@redhat.com>, "clm@fb.com" <clm@fb.com>,
-	"jbacik@fb.com" <jbacik@fb.com>,
-	"dsterba@suse.com" <dsterba@suse.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 0/5] v2: block subsystem refcounter conversions
-Message-ID: <20170421152241.q45w3ckjax5xiddq@hirez.programming.kicks-ass.net>
+To: "Reshetova, Elena" <elena.reshetova@intel.com>,
+ Eric Biggers <ebiggers3@gmail.com>, Kees Cook <keescook@chromium.org>
 References: <1492687644-4405-1-git-send-email-elena.reshetova@intel.com>
  <20170420135651.GA26595@infradead.org>
  <2236FBA76BA1254E88B949DDB74E612B41C8DA36@IRSMSX102.ger.corp.intel.com>
  <20170420183319.GB103004@gmail.com>
  <2236FBA76BA1254E88B949DDB74E612B41C8E21B@IRSMSX102.ger.corp.intel.com>
- <31311853-3554-cefe-1210-2ffae1a20058@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ "james.bottomley@hansenpartnership.com"
+ <james.bottomley@hansenpartnership.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+ "fujita.tomonori@lab.ntt.co.jp" <fujita.tomonori@lab.ntt.co.jp>,
+ "mingo@redhat.com" <mingo@redhat.com>, "clm@fb.com" <clm@fb.com>,
+ "jbacik@fb.com" <jbacik@fb.com>, "dsterba@suse.com" <dsterba@suse.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <31311853-3554-cefe-1210-2ffae1a20058@kernel.dk>
+Date: Fri, 21 Apr 2017 08:03:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <31311853-3554-cefe-1210-2ffae1a20058@kernel.dk>
+In-Reply-To: <2236FBA76BA1254E88B949DDB74E612B41C8E21B@IRSMSX102.ger.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Apr 21, 2017 at 08:03:13AM -0600, Jens Axboe wrote:
-> You have it so easy - the code is completely standalone, building a
-> small test framework around it and measuring performance in _user space_
-> is trivial.
+On 04/21/2017 04:55 AM, Reshetova, Elena wrote:
+>>>> Please don't send any more conversions until those have been resolved.
+>>
+>> Like I suggested months ago, how about doing an efficient implementation of
+>> refcount_t which doesn't use the bloated cmpxchg loop?  Then there would be
+>> no
+>> need for endless performance arguments.  In fact, in PaX there are already
+>> example implementations for several architectures.  It's unfortunate that
+>> they're still being ignored for some reason.
+> 
+> Providing efficient arch. specific implementation for refcount_t is
+> likely the next step to make performance-sensitive places happy.
+> However, in order to do it, we will need to measure for each subsystem
+> a) current atomic_t usage - base measurement 
+> b) pure refcount_t usage impact
+> c) arch. specific refcount_t impact 
 
-Something like this you mean:
+> Otherwise I have a chicken and egg problem here: people want better
+> performance and want to see arch. specific code for this, but in order
+> to convince maintainer in need of arch. specific code, I need to show
+> that we do have indeed a performance issue. 
 
-  https://lkml.kernel.org/r/20170322165144.dtidvvbxey7w5pbd@hirez.programming.kicks-ass.net
+Sorry, but that's a big load of...
+
+You have it so easy - the code is completely standalone, building a
+small test framework around it and measuring performance in _user space_
+is trivial. Don't go around benchmarking conversions in specific
+subsystems. Generate numbers showing how refcount_t compares to atomic_t
+for various (valid) use cases.
+
+Once you have that, convincing people to adopt it would be so much
+easier. So stop talking about excuses, and start producing some numbers.
+If you can't do that, my level of interest in converting anything in
+block is zero.
+
+-- 
+Jens Axboe
