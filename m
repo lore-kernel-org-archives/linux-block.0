@@ -1,131 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:34249 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1433572AbdDZHkw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2017 03:40:52 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: snitzer@redhat.com
-Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 2/4] dm rq: change ->rq_end_io calling conventions
-Date: Wed, 26 Apr 2017 09:40:37 +0200
-Message-Id: <20170426074039.14602-3-hch@lst.de>
-In-Reply-To: <20170426074039.14602-1-hch@lst.de>
-References: <20170426074039.14602-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Fri, 21 Apr 2017 15:17:39 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH v3 3/8] blk-mq: Unregister debugfs attributes earlier
+Message-ID: <20170421221739.GE17177@vader.DHCP.thefacebook.com>
+References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+ <20170418232949.5228-4-bart.vanassche@sandisk.com>
+ <20170421221628.GD17177@vader.DHCP.thefacebook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170421221628.GD17177@vader.DHCP.thefacebook.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Instead of returning either a DM_ENDIO_* constant or an error code, add
-a new DM_ENDIO_DONE value that means keep errno as is.  This allows us
-to easily keep the existing error code in case where we can't push back,
-and it also preparares for the new block level status codes with strict
-type checking.
+On Fri, Apr 21, 2017 at 03:16:28PM -0700, Omar Sandoval wrote:
+> On Tue, Apr 18, 2017 at 04:29:44PM -0700, Bart Van Assche wrote:
+> > One of the debugfs attributes allows to run a queue. Since running
+> > a queue after a queue has entered the "dead" state is not allowed
+> > and even can cause a kernel crash, unregister the debugfs attributes
+> > before a queue reaches the "dead" state.
+> > 
+> > Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> > Cc: Omar Sandoval <osandov@fb.com>
+> > Cc: Hannes Reinecke <hare@suse.com>
+> > ---
+> >  block/blk-mq-sysfs.c | 31 ++++++-------------------------
+> >  block/blk-sysfs.c    |  3 +--
+> >  2 files changed, 7 insertions(+), 27 deletions(-)
+> > 
+> > diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> > index 727e3b675130..1b2107f229ee 100644
+> > --- a/block/blk-mq-sysfs.c
+> > +++ b/block/blk-mq-sysfs.c
+> > @@ -258,7 +258,7 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+> >  	queue_for_each_hw_ctx(q, hctx, i)
+> >  		blk_mq_unregister_hctx(hctx);
+> >  
+> > -	blk_mq_debugfs_unregister_hctxs(q);
+> > +	blk_mq_debugfs_unregister(q);
+> 
+> This isn't what we want to do. First of all, we can't get remove the
+> /sys/kernel/debug/block/$dev directory until after we shutdown blktrace.
+> You unregister the top-level directory in other places, too. That should
+> only be done in the blk_release_queue() like it was originally.
+> 
+> More importantly, this doesn't actually fix the issue at hand. The
+> blk_mq_debugfs_unregister_hctxs() call needs to be moved earlier.
+> Actually, can you please rename blk_mq_debugfs_unregister_mq() to make
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-mpath.c         |  8 +++++---
- drivers/md/dm-rq.c            | 17 ++++++++++-------
- include/linux/device-mapper.h |  1 +
- 3 files changed, 16 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 1973670ea102..9e971be254f4 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -1478,6 +1478,7 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
- {
- 	struct dm_mpath_io *mpio = get_mpio(map_context);
- 	struct pgpath *pgpath = mpio->pgpath;
-+	int r = DM_ENDIO_DONE;
- 
- 	/*
- 	 * We don't queue any clone request inside the multipath target
-@@ -1493,15 +1494,16 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
- 	if (error && !noretry_error(error)) {
- 		struct multipath *m = ti->private;
- 
--		error = DM_ENDIO_REQUEUE;
-+		r = DM_ENDIO_REQUEUE;
- 
- 		if (pgpath)
- 			fail_path(pgpath);
- 
- 		if (!atomic_read(&m->nr_valid_paths)) {
- 			if (!test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
-+				/* complete with the original error */
- 				if (!must_push_back_rq(m))
--					error = -EIO;
-+					r = DM_ENDIO_DONE;
- 			}
- 		}
- 	}
-@@ -1513,7 +1515,7 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
- 			ps->type->end_io(ps, &pgpath->path, mpio->nr_bytes);
- 	}
- 
--	return error;
-+	return r;
- }
- 
- static int do_end_io_bio(struct multipath *m, struct bio *clone,
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index bff7e3bdb4ed..769f04f83ca2 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -287,7 +287,7 @@ static void dm_requeue_original_request(struct dm_rq_target_io *tio, bool delay_
- 
- static void dm_done(struct request *clone, int error, bool mapped)
- {
--	int r = error;
-+	int r = DM_ENDIO_DONE;
- 	struct dm_rq_target_io *tio = clone->end_io_data;
- 	dm_request_endio_fn rq_end_io = NULL;
- 
-@@ -298,7 +298,7 @@ static void dm_done(struct request *clone, int error, bool mapped)
- 			r = rq_end_io(tio->ti, clone, error, &tio->info);
- 	}
- 
--	if (unlikely(r == -EREMOTEIO)) {
-+	if (unlikely(error == -EREMOTEIO)) {
- 		if (req_op(clone) == REQ_OP_WRITE_SAME &&
- 		    !clone->q->limits.max_write_same_sectors)
- 			disable_write_same(tio->md);
-@@ -307,16 +307,19 @@ static void dm_done(struct request *clone, int error, bool mapped)
- 			disable_write_zeroes(tio->md);
- 	}
- 
--	if (r <= 0)
-+	switch (r) {
-+	case DM_ENDIO_DONE:
- 		/* The target wants to complete the I/O */
--		dm_end_request(clone, r);
--	else if (r == DM_ENDIO_INCOMPLETE)
-+		dm_end_request(clone, error);
-+		break;
-+	case DM_ENDIO_INCOMPLETE:
- 		/* The target will handle the I/O */
- 		return;
--	else if (r == DM_ENDIO_REQUEUE)
-+	case DM_ENDIO_REQUEUE:
- 		/* The target wants to requeue the I/O */
- 		dm_requeue_original_request(tio, false);
--	else {
-+		break;
-+	default:
- 		DMWARN("unimplemented target endio return value: %d", r);
- 		BUG();
- 	}
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index c7ea33e38fb9..5bafe3af27cc 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -579,6 +579,7 @@ extern struct ratelimit_state dm_ratelimit_state;
- /*
-  * Definitions of return values from target end_io function.
-  */
-+#define DM_ENDIO_DONE		0
- #define DM_ENDIO_INCOMPLETE	1
- #define DM_ENDIO_REQUEUE	2
- 
--- 
-2.11.0
+I meant can you please rename blk_mq_debugfs_unregister_hctxs() to
+blk_mq_debugfs_unregister_mq().
