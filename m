@@ -1,82 +1,71 @@
-Return-Path: <BATV+d06792d33419b921eada+4978+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	target-devel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com
-Subject: [PATCH 2/8] target: remove iblock WRITE_SAME passthrough support
-Date: Mon, 10 Apr 2017 18:08:01 +0200
-Message-Id: <20170410160807.23674-3-hch@lst.de>
-In-Reply-To: <20170410160807.23674-1-hch@lst.de>
-References: <20170410160807.23674-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43548 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1425420AbdDVPmU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Apr 2017 11:42:20 -0400
+Date: Sat, 22 Apr 2017 11:25:06 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        Toshi Kani <toshi.kani@hpe.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [resend PATCH v2 11/33] dm: add dax_device and dax_operations
+ support
+Message-ID: <20170422152505.GB22651@redhat.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <149245618859.10206.13182319600260215993.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <CAPcyv4iskwS2izbZEtf7vSsk06cd3C0jhbDF3sfsOkWakc6jaw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAPcyv4iskwS2izbZEtf7vSsk06cd3C0jhbDF3sfsOkWakc6jaw@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the pscsi driver to support arbitrary command passthrough
-instead.
+On Thu, Apr 20 2017 at 12:30pm -0400,
+Dan Williams <dan.j.williams@intel.com> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/target/target_core_iblock.c | 34 ----------------------------------
- 1 file changed, 34 deletions(-)
+> On Mon, Apr 17, 2017 at 12:09 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+> > Allocate a dax_device to represent the capacity of a device-mapper
+> > instance. Provide a ->direct_access() method via the new dax_operations
+> > indirection that mirrors the functionality of the current direct_access
+> > support via block_device_operations.  Once fs/dax.c has been converted
+> > to use dax_operations the old dm_blk_direct_access() will be removed.
+> >
+> > A new helper dm_dax_get_live_target() is introduced to separate some of
+> > the dm-specifics from the direct_access implementation.
+> >
+> > This enabling is only for the top-level dm representation to upper
+> > layers. Converting target direct_access implementations is deferred to a
+> > separate patch.
+> >
+> > Cc: Toshi Kani <toshi.kani@hpe.com>
+> > Cc: Mike Snitzer <snitzer@redhat.com>
+> 
+> Hi Mike,
+> 
+> Any concerns with these dax_device and dax_operations changes to
+> device-mapper for the upcoming merge window?
 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index d316ed537d59..9da31970a004 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -415,39 +415,8 @@ iblock_execute_unmap(struct se_cmd *cmd, sector_t lba, sector_t nolb)
- }
- 
- static sense_reason_t
--iblock_execute_write_same_direct(struct block_device *bdev, struct se_cmd *cmd)
--{
--	struct se_device *dev = cmd->se_dev;
--	struct scatterlist *sg = &cmd->t_data_sg[0];
--	struct page *page = NULL;
--	int ret;
--
--	if (sg->offset) {
--		page = alloc_page(GFP_KERNEL);
--		if (!page)
--			return TCM_OUT_OF_RESOURCES;
--		sg_copy_to_buffer(sg, cmd->t_data_nents, page_address(page),
--				  dev->dev_attrib.block_size);
--	}
--
--	ret = blkdev_issue_write_same(bdev,
--				target_to_linux_sector(dev, cmd->t_task_lba),
--				target_to_linux_sector(dev,
--					sbc_get_write_same_sectors(cmd)),
--				GFP_KERNEL, page ? page : sg_page(sg));
--	if (page)
--		__free_page(page);
--	if (ret)
--		return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
--
--	target_complete_cmd(cmd, GOOD);
--	return 0;
--}
--
--static sense_reason_t
- iblock_execute_write_same(struct se_cmd *cmd)
- {
--	struct block_device *bdev = IBLOCK_DEV(cmd->se_dev)->ibd_bd;
- 	struct iblock_req *ibr;
- 	struct scatterlist *sg;
- 	struct bio *bio;
-@@ -472,9 +441,6 @@ iblock_execute_write_same(struct se_cmd *cmd)
- 		return TCM_INVALID_CDB_FIELD;
- 	}
- 
--	if (bdev_write_same(bdev))
--		return iblock_execute_write_same_direct(bdev, cmd);
--
- 	ibr = kzalloc(sizeof(struct iblock_req), GFP_KERNEL);
- 	if (!ibr)
- 		goto fail;
--- 
-2.11.0
+Sorry for the delay.
+
+I just reviewed them, overall looks good.  The enabling functions in the
+DAX code, that are mixed in with the DM changes, could maybe be factored
+out into separate earlier patches but I don't feel that strongly about
+that.
+
+Feel free to add this tag to the handful of relevant DM patches:
+
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+
+I haven't done a merge with the linux-dm.git 'dm-4.12' branch but it'd
+be good to verify there aren't any merge conflicts.  If there are then
+it'd be nice to know going in to the merge so that we can forecast as
+much to Linus.
+
+I really appreciate you doing this work!
+
+Thanks,
+Mike
