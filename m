@@ -1,114 +1,290 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f54.google.com ([209.85.214.54]:36336 "EHLO
-        mail-it0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1043744AbdDVJbg (ORCPT
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:35652 "EHLO
+        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1043725AbdDVJWe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Apr 2017 05:31:36 -0400
-Received: by mail-it0-f54.google.com with SMTP id g66so11607636ite.1
-        for <linux-block@vger.kernel.org>; Sat, 22 Apr 2017 02:31:35 -0700 (PDT)
-From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
-Message-Id: <ACB77414-F14D-4FBE-90D2-555E95B127C3@lightnvm.io>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_C531D83F-5CAA-424B-8729-093DE5896455";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+        Sat, 22 Apr 2017 05:22:34 -0400
+Received: by mail-lf0-f47.google.com with SMTP id 75so54519744lfs.2
+        for <linux-block@vger.kernel.org>; Sat, 22 Apr 2017 02:22:33 -0700 (PDT)
 Subject: Re: [PATCH 5/5] lightnvm: pblk: fix erase counters on error fail
-Date: Sat, 22 Apr 2017 11:31:17 +0200
-In-Reply-To: <9d864388-00e8-d5e4-eef7-2f5d4d8f738d@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-To: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
 References: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
  <1492817569-13532-6-git-send-email-javier@cnexlabs.com>
- <9d864388-00e8-d5e4-eef7-2f5d4d8f738d@lightnvm.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <9d864388-00e8-d5e4-eef7-2f5d4d8f738d@lightnvm.io>
+Date: Sat, 22 Apr 2017 11:22:29 +0200
+MIME-Version: 1.0
+In-Reply-To: <1492817569-13532-6-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+On 04/22/2017 01:32 AM, Javier González wrote:
+> When block erases fail, these blocks are marked bad. The number of valid
+> blocks in the line was not updated, which could cause an infinite loop
+> on the erase path.
+>
+> Fix this atomic counter and, in order to avoid taking an irq lock on the
+> interrupt context, make the erase counters atomic too.
 
---Apple-Mail=_C531D83F-5CAA-424B-8729-093DE5896455
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+I can't find out where the counters are used in irq context? Can you 
+point me in the right direction? I'll prefer for these counters to go in 
+under the existing line_lock.
 
+>
+> Also, in the case that a significant number of blocks become bad in a
+> line, the result is the double shared metadata buffer (emeta) to stop
+> the pipeline until all metadata is flushed to the media. Increase the
+> number of metadata lines from 2 to 4 to avoid this case.
 
-> On 22 Apr 2017, at 11.22, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
->=20
-> On 04/22/2017 01:32 AM, Javier Gonz=C3=A1lez wrote:
->> When block erases fail, these blocks are marked bad. The number of =
-valid
->> blocks in the line was not updated, which could cause an infinite =
-loop
->> on the erase path.
->>=20
->> Fix this atomic counter and, in order to avoid taking an irq lock on =
-the
->> interrupt context, make the erase counters atomic too.
->=20
-> I can't find out where the counters are used in irq context? Can you
-> point me in the right direction? I'll prefer for these counters to go
-> in under the existing line_lock.
->=20
+How does moving to 4 lines solve this case? The way I read it is that it 
+only postpones when this occurs?
 
-This counter is line->blk_in_line, which is used on pblk_mark_bb. This
-is triggered on the erase completion path. Note that we do not want to
-wait until the recovery kicks in on the workqueue since the line might
-start getting recycled straight away if we are close to reaching
-capacity. This is indeed the scenario that triggers the race condition.
+>
+> Fixes: a4bd217b4326 "lightnvm: physical block device (pblk) target"
+>
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>  drivers/lightnvm/pblk-core.c  | 28 +++++++++++++++++++---------
+>  drivers/lightnvm/pblk-gc.c    |  2 +-
+>  drivers/lightnvm/pblk-init.c  |  9 ++++++---
+>  drivers/lightnvm/pblk-map.c   |  4 ++--
+>  drivers/lightnvm/pblk-rl.c    |  6 ++++--
+>  drivers/lightnvm/pblk-write.c |  4 ++--
+>  drivers/lightnvm/pblk.h       |  6 +++---
+>  7 files changed, 37 insertions(+), 22 deletions(-)
+>
+> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> index ac3742b..5e44768 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -29,6 +29,7 @@ static void pblk_mark_bb(struct pblk *pblk, struct pblk_line *line,
+>  	pr_debug("pblk: erase failed: line:%d, pos:%d\n", line->id, pos);
+>  	atomic_long_inc(&pblk->erase_failed);
+>
+> +	atomic_dec(&line->blk_in_line);
+>  	if (test_and_set_bit(pos, line->blk_bitmap))
+>  		pr_err("pblk: attempted to erase bb: line:%d, pos:%d\n",
+>  							line->id, pos);
+> @@ -832,21 +833,28 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line)
+>  	struct ppa_addr ppa;
+>  	int bit = -1;
+>
+> -	/* Erase one block at the time and only erase good blocks */
+> -	while ((bit = find_next_zero_bit(line->erase_bitmap, lm->blk_per_line,
+> -						bit + 1)) < lm->blk_per_line) {
+> +	/* Erase only good blocks, one at a time */
+> +	do {
+> +		spin_lock(&line->lock);
+> +		bit = find_next_zero_bit(line->erase_bitmap, lm->blk_per_line,
+> +								bit + 1);
+> +		if (bit >= lm->blk_per_line) {
+> +			spin_unlock(&line->lock);
+> +			break;
+> +		}
+> +
+>  		ppa = pblk->luns[bit].bppa; /* set ch and lun */
+>  		ppa.g.blk = line->id;
+>
+> -		/* If the erase fails, the block is bad and should be marked */
+> -		line->left_eblks--;
+> +		atomic_dec(&line->left_eblks);
+>  		WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
+> +		spin_unlock(&line->lock);
+>
+>  		if (pblk_blk_erase_sync(pblk, ppa)) {
+>  			pr_err("pblk: failed to erase line %d\n", line->id);
+>  			return -ENOMEM;
+>  		}
+> -	}
+> +	} while (1);
+>
+>  	return 0;
+>  }
+> @@ -1007,6 +1015,7 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+>  static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
+>  {
+>  	struct pblk_line_meta *lm = &pblk->lm;
+> +	int blk_in_line = atomic_read(&line->blk_in_line);
+>
+>  	line->map_bitmap = mempool_alloc(pblk->line_meta_pool, GFP_ATOMIC);
+>  	if (!line->map_bitmap)
+> @@ -1030,12 +1039,13 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
+>  		return -EINTR;
+>  	}
+>  	line->state = PBLK_LINESTATE_OPEN;
+> +
+> +	atomic_set(&line->left_eblks, blk_in_line);
+> +	atomic_set(&line->left_seblks, blk_in_line);
+>  	spin_unlock(&line->lock);
+>
+>  	/* Bad blocks do not need to be erased */
+>  	bitmap_copy(line->erase_bitmap, line->blk_bitmap, lm->blk_per_line);
+> -	line->left_eblks = line->blk_in_line;
+> -	atomic_set(&line->left_seblks, line->left_eblks);
+>
+>  	kref_init(&line->ref);
+>
+> @@ -1231,7 +1241,7 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
+>  	left_seblks = atomic_read(&new->left_seblks);
+>  	if (left_seblks) {
+>  		/* If line is not fully erased, erase it */
+> -		if (new->left_eblks) {
+> +		if (atomic_read(&new->left_eblks)) {
+>  			if (pblk_line_erase(pblk, new))
+>  				return NULL;
+>  		} else {
+> diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+> index f173fd4..eaf479c 100644
+> --- a/drivers/lightnvm/pblk-gc.c
+> +++ b/drivers/lightnvm/pblk-gc.c
+> @@ -332,7 +332,7 @@ static void pblk_gc_run(struct pblk *pblk)
+>  		}
+>
+>  		line = list_first_entry(group_list, struct pblk_line, list);
+> -		nr_blocks_free += line->blk_in_line;
+> +		nr_blocks_free += atomic_read(&line->blk_in_line);
+>
+>  		spin_lock(&line->lock);
+>  		WARN_ON(line->state != PBLK_LINESTATE_CLOSED);
+> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+> index 3996e4b..15b2787 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -678,6 +678,8 @@ static int pblk_lines_init(struct pblk *pblk)
+>
+>  	nr_free_blks = 0;
+>  	for (i = 0; i < l_mg->nr_lines; i++) {
+> +		int blk_in_line;
+> +
+>  		line = &pblk->lines[i];
+>
+>  		line->pblk = pblk;
+> @@ -693,14 +695,15 @@ static int pblk_lines_init(struct pblk *pblk)
+>  			goto fail_free_lines;
+>  		}
+>
+> -		line->blk_in_line = lm->blk_per_line - nr_bad_blks;
+> -		if (line->blk_in_line < lm->min_blk_line) {
+> +		blk_in_line = lm->blk_per_line - nr_bad_blks;
+> +		if (blk_in_line < lm->min_blk_line) {
+>  			line->state = PBLK_LINESTATE_BAD;
+>  			list_add_tail(&line->list, &l_mg->bad_list);
+>  			continue;
+>  		}
+>
+> -		nr_free_blks += line->blk_in_line;
+> +		nr_free_blks += blk_in_line;
+> +		atomic_set(&line->blk_in_line, blk_in_line);
+>
+>  		l_mg->nr_free_lines++;
+>  		list_add_tail(&line->list, &l_mg->free_list);
+> diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+> index 3f8bab4..17c1695 100644
+> --- a/drivers/lightnvm/pblk-map.c
+> +++ b/drivers/lightnvm/pblk-map.c
+> @@ -110,7 +110,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>  				continue;
+>
+>  			set_bit(erase_lun, e_line->erase_bitmap);
+> -			e_line->left_eblks--;
+> +			atomic_dec(&e_line->left_eblks);
+>  			*erase_ppa = rqd->ppa_list[i];
+>  			erase_ppa->g.blk = e_line->id;
+>
+> @@ -129,7 +129,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>  			return;
+>
+>  		set_bit(i, e_line->erase_bitmap);
+> -		e_line->left_eblks--;
+> +		atomic_dec(&e_line->left_eblks);
+>  		*erase_ppa = pblk->luns[i].bppa; /* set ch and lun */
+>  		erase_ppa->g.blk = e_line->id;
+>  	}
+> diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
+> index 4042162..ab7cbb1 100644
+> --- a/drivers/lightnvm/pblk-rl.c
+> +++ b/drivers/lightnvm/pblk-rl.c
+> @@ -107,9 +107,10 @@ void pblk_rl_set_gc_rsc(struct pblk_rl *rl, int rsv)
+>  void pblk_rl_free_lines_inc(struct pblk_rl *rl, struct pblk_line *line)
+>  {
+>  	struct pblk *pblk = container_of(rl, struct pblk, rl);
+> +	int blk_in_line = atomic_read(&line->blk_in_line);
+>  	int ret;
+>
+> -	atomic_add(line->blk_in_line, &rl->free_blocks);
+> +	atomic_add(blk_in_line, &rl->free_blocks);
+>  	/* Rates will not change that often - no need to lock update */
+>  	ret = pblk_rl_update_rates(rl, rl->rb_budget);
+>
+> @@ -122,9 +123,10 @@ void pblk_rl_free_lines_inc(struct pblk_rl *rl, struct pblk_line *line)
+>  void pblk_rl_free_lines_dec(struct pblk_rl *rl, struct pblk_line *line)
+>  {
+>  	struct pblk *pblk = container_of(rl, struct pblk, rl);
+> +	int blk_in_line = atomic_read(&line->blk_in_line);
+>  	int ret;
+>
+> -	atomic_sub(line->blk_in_line, &rl->free_blocks);
+> +	atomic_sub(blk_in_line, &rl->free_blocks);
+>
+>  	/* Rates will not change that often - no need to lock update */
+>  	ret = pblk_rl_update_rates(rl, rl->rb_budget);
+> diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+> index a896190..aef6fd7 100644
+> --- a/drivers/lightnvm/pblk-write.c
+> +++ b/drivers/lightnvm/pblk-write.c
+> @@ -244,7 +244,7 @@ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>  	}
+>
+>  	ppa_set_empty(&erase_ppa);
+> -	if (likely(!e_line || !e_line->left_eblks))
+> +	if (likely(!e_line || !atomic_read(&e_line->left_eblks)))
+>  		pblk_map_rq(pblk, rqd, c_ctx->sentry, lun_bitmap, valid, 0);
+>  	else
+>  		pblk_map_erase_rq(pblk, rqd, c_ctx->sentry, lun_bitmap,
+> @@ -257,7 +257,7 @@ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>  			struct nvm_geo *geo = &dev->geo;
+>  			int bit;
+>
+> -			e_line->left_eblks++;
+> +			atomic_inc(&e_line->left_eblks);
+>  			bit = erase_ppa.g.lun * geo->nr_chnls + erase_ppa.g.ch;
+>  			WARN_ON(!test_and_clear_bit(bit, e_line->erase_bitmap));
+>  			up(&pblk->erase_sem);
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index c82120c..02dd18f 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -363,14 +363,14 @@ struct pblk_line {
+>
+>  	unsigned int sec_in_line;	/* Number of usable secs in line */
+>
+> -	unsigned int blk_in_line;	/* Number of good blocks in line */
+> +	atomic_t blk_in_line;		/* Number of good blocks in line */
+>  	unsigned long *blk_bitmap;	/* Bitmap for valid/invalid blocks */
+>  	unsigned long *erase_bitmap;	/* Bitmap for erased blocks */
+>
+>  	unsigned long *map_bitmap;	/* Bitmap for mapped sectors in line */
+>  	unsigned long *invalid_bitmap;	/* Bitmap for invalid sectors in line */
+>
+> -	int left_eblks;			/* Blocks left for erasing */
+> +	atomic_t left_eblks;		/* Blocks left for erasing */
+>  	atomic_t left_seblks;		/* Blocks left for sync erasing */
+>
+>  	int left_msecs;			/* Sectors left for mapping */
+> @@ -383,7 +383,7 @@ struct pblk_line {
+>  	spinlock_t lock;		/* Necessary for invalid_bitmap only */
+>  };
+>
+> -#define PBLK_DATA_LINES 2
+> +#define PBLK_DATA_LINES 4
 
-Making all erase counters atomic allows us to avoid taking the
-line_lock. Note that the counters do not depend on each other.
+Why this change? I like to keep new features for 4.13. Only bugfixes for 
+4.12.
 
->> Also, in the case that a significant number of blocks become bad in a
->> line, the result is the double shared metadata buffer (emeta) to stop
->> the pipeline until all metadata is flushed to the media. Increase the
->> number of metadata lines from 2 to 4 to avoid this case.
->=20
-> How does moving to 4 lines solve this case? The way I read it is that
-> it only postpones when this occurs?
->=20
-
-The chances of having more than 2 lines falling out of blocks after
-pre-condition are slim. Adding two more lines should be enough.
-
->>=20
->> [...]
->>=20
->> -#define PBLK_DATA_LINES 2
->> +#define PBLK_DATA_LINES 4
->=20
-> Why this change? I like to keep new features for 4.13. Only bugfixes =
-for 4.12.
-
-This is the 4 lines referred above. I see it as a bug fix since we risk
-stalling the pipeline if a line goes above a certain number of bad
-blocks on initialization, but we can leave it out and fix this when we
-add in-line metadata on the write thread for 4.12
-
-Thanks,
-Javier
-
---Apple-Mail=_C531D83F-5CAA-424B-8729-093DE5896455
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBCgAGBQJY+yLmAAoJEGMfBTt1mRjKOBEP/2qPJ7ik2etK6An/OWHiUcXD
-JOOpRUPCby8+kuwC19w/7ucLdsYRjpZZGHyQ0nqfZ+UuQyWTVirGpu3bTHC5kNuU
-sgCfceoS8NvW6gUvROG7/yu0xyD8KREEJzBMCzD7T45W1LyZJlkmBtRPUoSOPiOf
-BK+ildUsTGpOdDuBIIhDVTcINra3KpwaMdxf4oXUvy+hDNleDSfqfbGTO9Ldvzu1
-PmcS2jZgvDxy/zJSdBSR2C/Wc9R54LXBV1hIynaD+GonZERTkNT4D8LYK6KagNEQ
-eacLgswtqBwo7Hwbdl3EoNEjI0Sh62ypQSmmI27he3F0+MvYlQtHxvyvvwPJOtVu
-pVRXObolVTH+WYIR1mWgFoXsiOEOOA0PML7QKa3EZM+VFixFzKgtTaZ6Ji0dGZCQ
-zPdlzhMyMlDcB3pfD/XvroRDfyTC4TeFSCT0VmN5PHqBaRHqoG2VaF1Vl464VfVF
-Xr/Zpv8RSUXgaBUiY7UJUtJIWfk9bobO1gw1T7Q9UjVRXc+4F35XDhih7wrNoDcK
-8TsByKsEePVacDjDHTne9f+FaDPn8GHf/d0Ep2o1ZlHCrAE1RZIE9LyKhCBXebrG
-suDLBBVs0Hro8lz4CRTfOm8v76y/XsQIB8IouMKQjVr1HghrGNf4DaEPztPPzYgZ
-I6LNEXee229KXFXCndtj
-=yHYR
------END PGP SIGNATURE-----
-
---Apple-Mail=_C531D83F-5CAA-424B-8729-093DE5896455--
+>
+>  enum{
+>  	PBLK_KMALLOC_META = 1,
+>
