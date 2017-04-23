@@ -1,58 +1,42 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH] block: Fix list corruption of blk stats callback list
-Date: Tue, 11 Apr 2017 11:29:01 +0200
-Message-Id: <20170411092901.5974-1-jack@suse.cz>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2 for-4.12] block: fix blk_integrity_register to use
+ template's interval_exp if not 0
+To: Mike Snitzer <snitzer@redhat.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170421222815.45663-1-snitzer@redhat.com>
+ <yq1o9vpjs9f.fsf@oracle.com> <20170422151043.GA22651@redhat.com>
+ <20170422212209.GA49088@redhat.com>
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org,
+ Mikulas Patocka <mpatocka@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f4d58699-3ae7-1a89-8366-75a4c50c6b53@kernel.dk>
+Date: Sun, 23 Apr 2017 13:00:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170422212209.GA49088@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-When CFQ calls wbt_disable_default(), it will call
-blk_stat_remove_callback() to stop gathering IO statistics for the
-purposes of writeback throttling. Later, when request_queue is
-unregistered, wbt_exit() will call blk_stat_remove_callback() again
-which will try to delete callback from the list again and possibly cause
-list corruption.
+On 04/22/2017 03:22 PM, Mike Snitzer wrote:
+> When registering an integrity profile: if the template's interval_exp is
+> not 0 use it, otherwise use the ilog2() of logical block size of the
+> provided gendisk.
+> 
+> This fixes a long-standing DM linear target bug where it cannot pass
+> integrity data to the underlying device if its logical block size
+> conflicts with the underlying device's logical block size.
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: Mikulas Patocka <mpatocka@redhat.com>
+> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> ---
+>  block/blk-integrity.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> Jens, please feel free to pick this up for 4.12 and I'll just make the
+> dm-integrity commit Depends-on it once you've staged it.
 
-Fix the problem by making wbt_disable_default() called wbt_exit() which
-is properly guarded against being called multiple times.
+OK, I'll commit it. I'll send out my pull request as soon as the merge
+window opens, so you should not have any delays.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/blk-wbt.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
-
-So this fixes the list debug errors reported by 0-day for me. It was a
-pre-existing problem with wbt_disable_default().
-
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index ffa80e11cf14..b3b79149d3a0 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -653,19 +653,15 @@ void wbt_set_write_cache(struct rq_wb *rwb, bool write_cache_on)
- 		rwb->wc = write_cache_on;
- }
- 
-- /*
-- * Disable wbt, if enabled by default. Only called from CFQ, if we have
-- * cgroups enabled
-+/*
-+ * Disable wbt, if enabled by default. Only called from CFQ.
-  */
- void wbt_disable_default(struct request_queue *q)
- {
- 	struct rq_wb *rwb = q->rq_wb;
- 
--	if (rwb && rwb->enable_state == WBT_STATE_ON_DEFAULT) {
--		blk_stat_remove_callback(q, rwb->cb);
--		rwb->win_nsec = rwb->min_lat_nsec = 0;
--		wbt_update_limits(rwb);
--	}
-+	if (rwb && rwb->enable_state == WBT_STATE_ON_DEFAULT)
-+		wbt_exit(q);
- }
- EXPORT_SYMBOL_GPL(wbt_disable_default);
- 
 -- 
-2.12.0
+Jens Axboe
