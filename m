@@ -1,82 +1,48 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Thu, 20 Apr 2017 15:38:49 +1000
-Subject: [PATCH 05/11] rbd: use bio_clone_fast() instead of bio_clone()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>, Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org
-Message-ID: <149266672920.27388.16945242936892893803.stgit@noble>
-In-Reply-To: <149266645258.27388.14083229348123176454.stgit@noble>
-References: <149266645258.27388.14083229348123176454.stgit@noble>
+Return-Path: <openosd@gmail.com>
+Return-Path: <openosd@gmail.com>
+Subject: Re: [PATCH 3/4] nfs: remove the objlayout driver
+To: Trond Myklebust <trondmy@primarydata.com>
+References: <20170412160109.10598-1-hch@lst.de>
+ <20170412160109.10598-4-hch@lst.de>
+ <1492719505.82584.3.camel@primarydata.com>
+ <272aea55-0738-5de2-ca97-414e13b478af@electrozaur.com>
+ <B6CCD2A9-4691-45DC-AD60-E9A2ECDE22D3@primarydata.com>
+Cc: hch <hch@lst.de>, Martin Petersen <martin.petersen@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+From: Boaz Harrosh <ooo@electrozaur.com>
+Message-ID: <e253b5f5-d241-9391-dbeb-8e5f6b25b6c0@electrozaur.com>
+Date: Sun, 23 Apr 2017 12:36:09 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <B6CCD2A9-4691-45DC-AD60-E9A2ECDE22D3@primarydata.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-bio_clone() makes a copy of the bi_io_vec, but rbd never changes that,
-so there is no need for a copy.
-bio_clone_fast() can be used instead, which avoids making the copy.
+On 04/21/2017 05:00 PM, Trond Myklebust wrote:
+> Maintenance is not development. It’s about doing all the followup
+> _after_ the feature is declared to be developed. That’s been missing
+> for quite some time in the case of the OSD pNFS code, which is why
+> I’m not even bothering to consider staging. If you are saying you are
+> still maintaining exofs, and want to continue doing so, then great,
+> but note that there is a file called BUGS in that directory that has
+> been untouched since 2008, and that’s why I thing staging is a good
+> idea.
+> 
 
-This requires that we provide a bio_set.  bio_clone() uses fs_bio_set,
-but it isn't, in general, safe to use the same bio_set at different
-levels of the stack, as that can lead to deadlocks.  As filesystems
-use fs_bio_set, block devices shouldn't.
+No, the BUGS file is just stale. As you said was not ever updated. All
+the bugs (1) in there do no longer exist for a long long time.
+I will send a patch to remove the file.
 
-As rbd never stacks, it is safe to have a single global bio_set for
-all rbd devices to use.  So allocate that when the module is
-initialised, and use it with bio_clone_fast().
+Yes I maintain this fs. It has the complete fixture list, of what was
+first intended. I keep running it every major kernel release to make
+sure it actually runs, and there are no regressions.
 
-Signed-off-by: NeilBrown <neilb@suse.com>
----
- drivers/block/rbd.c |   16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+If this FS stands in the way of any new development please anyone
+contact me and I will help in the conversion. Of exofs and the
+osd-uld.
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 089ac4179919..48eecffc612e 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -441,6 +441,8 @@ static DEFINE_SPINLOCK(rbd_client_list_lock);
- static struct kmem_cache	*rbd_img_request_cache;
- static struct kmem_cache	*rbd_obj_request_cache;
- 
-+static struct bio_set		*rbd_bio_clone;
-+
- static int rbd_major;
- static DEFINE_IDA(rbd_dev_id_ida);
- 
-@@ -1362,7 +1364,7 @@ static struct bio *bio_clone_range(struct bio *bio_src,
- {
- 	struct bio *bio;
- 
--	bio = bio_clone(bio_src, gfpmask);
-+	bio = bio_clone_fast(bio_src, gfpmask, rbd_bio_clone);
- 	if (!bio)
- 		return NULL;	/* ENOMEM */
- 
-@@ -6342,8 +6344,16 @@ static int rbd_slab_init(void)
- 	if (!rbd_obj_request_cache)
- 		goto out_err;
- 
-+	rbd_assert(!rbd_bio_clone);
-+	rbd_bio_clone = bioset_create(BIO_POOL_SIZE, 0);
-+	if (!rbd_bio_clone)
-+		goto out_err_clone;
-+
- 	return 0;
- 
-+out_err_clone:
-+	kmem_cache_destroy(rbd_obj_request_cache);
-+	rbd_obj_request_cache = NULL;
- out_err:
- 	kmem_cache_destroy(rbd_img_request_cache);
- 	rbd_img_request_cache = NULL;
-@@ -6359,6 +6369,10 @@ static void rbd_slab_exit(void)
- 	rbd_assert(rbd_img_request_cache);
- 	kmem_cache_destroy(rbd_img_request_cache);
- 	rbd_img_request_cache = NULL;
-+
-+	rbd_assert(rbd_bio_clone);
-+	bioset_free(rbd_bio_clone);
-+	rbd_bio_clone = NULL;
- }
- 
- static int __init rbd_init(void)
+Thanks
+Boaz
