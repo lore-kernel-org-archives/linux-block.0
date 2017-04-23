@@ -1,44 +1,51 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Omar Sandoval <osandov@fb.com>,
-	Ming Lei <tom.leiming@gmail.com>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv6 1/2] loop: Remove unused 'bdev' argument from loop_set_capacity
-Date: Fri,  7 Apr 2017 08:58:57 +0200
-Message-Id: <1491548338-71005-2-git-send-email-hare@suse.de>
-In-Reply-To: <1491548338-71005-1-git-send-email-hare@suse.de>
-References: <1491548338-71005-1-git-send-email-hare@suse.de>
+Return-Path: <axboe@kernel.dk>
+Date: Sun, 23 Apr 2017 16:58:25 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>
+Cc: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@cnexlabs.com>
+Subject: Re: [PATCH 0/5] lightnvm: pblk extra patches for 4.12
+Message-ID: <20170423225823.GA5767@kernel.dk>
+References: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
+ <49082c5d-963c-d463-3a84-206308d9bff2@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <49082c5d-963c-d463-3a84-206308d9bff2@lightnvm.io>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Sun, Apr 23 2017, Matias Bj�rling wrote:
+> On 04/22/2017 01:32 AM, Javier Gonz�lez wrote:
+> >Hi Matias,
+> >
+> >This is a couple of bug fixes for the pblk release patch.
+> >
+> >Thanks,
+> >Javier
+> >
+> >Javier Gonz�lez (5):
+> >  lightnvm: pblk: fix race condition on line retry
+> >  lightnvm: pblk: fix bad error check
+> >  lightnvm: pblk: fix memory leak on error path
+> >  lightnvm: pblk: free metadata on line alloc failure
+> >  lightnvm: pblk: fix erase counters on error fail
+> >
+> > drivers/lightnvm/pblk-core.c  | 60 ++++++++++++++++++++++++++-----------------
+> > drivers/lightnvm/pblk-gc.c    |  2 +-
+> > drivers/lightnvm/pblk-init.c  |  9 ++++---
+> > drivers/lightnvm/pblk-map.c   |  4 +--
+> > drivers/lightnvm/pblk-rl.c    |  6 +++--
+> > drivers/lightnvm/pblk-write.c |  7 +++--
+> > drivers/lightnvm/pblk.h       |  6 ++---
+> > 7 files changed, 57 insertions(+), 37 deletions(-)
+> >
+> 
+> Hi Jens,
+> 
+> Could you pick these up as well? This will properly be the last for
+> the 4.12 window. Thank you!
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cc981f3..81b3900 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1307,7 +1307,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	return err;
- }
- 
--static int loop_set_capacity(struct loop_device *lo, struct block_device *bdev)
-+static int loop_set_capacity(struct loop_device *lo)
- {
- 	if (unlikely(lo->lo_state != Lo_bound))
- 		return -ENXIO;
-@@ -1370,7 +1370,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_SET_CAPACITY:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
--			err = loop_set_capacity(lo, bdev);
-+			err = loop_set_capacity(lo);
- 		break;
- 	case LOOP_SET_DIRECT_IO:
- 		err = -EPERM;
+Yep, added for 4.12, thanks.
+
 -- 
-1.8.5.6
+Jens Axboe
