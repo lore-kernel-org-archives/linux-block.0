@@ -1,6 +1,6 @@
-Return-Path: <jack@suse.cz>
-Date: Mon, 24 Apr 2017 18:04:31 +0200
-From: Jan Kara <jack@suse.cz>
+Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 24 Apr 2017 08:25:06 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: Jeff Layton <jlayton@redhat.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
@@ -15,7 +15,7 @@ Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	tytso@mit.edu, axboe@kernel.dk
 Subject: Re: [PATCH v3 10/20] fuse: set mapping error in writepage_locked
  when it fails
-Message-ID: <20170424160431.GK23988@quack2.suse.cz>
+Message-ID: <20170424152506.GJ9112@infradead.org>
 References: <20170424132259.8680-1-jlayton@redhat.com>
  <20170424132259.8680-11-jlayton@redhat.com>
 MIME-Version: 1.0
@@ -23,36 +23,6 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170424132259.8680-11-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon 24-04-17 09:22:49, Jeff Layton wrote:
-> This ensures that we see errors on fsync when writeback fails.
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Looks fine,
 
-Hum, but do we really want to clobber mapping errors with temporary stuff
-like ENOMEM? Or do you want to handle that in mapping_set_error?
-
-								Honza
-
-> ---
->  fs/fuse/file.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-> index ec238fb5a584..07d0efcb050c 100644
-> --- a/fs/fuse/file.c
-> +++ b/fs/fuse/file.c
-> @@ -1669,6 +1669,7 @@ static int fuse_writepage_locked(struct page *page)
->  err_free:
->  	fuse_request_free(req);
->  err:
-> +	mapping_set_error(page->mapping, error);
->  	end_page_writeback(page);
->  	return error;
->  }
-> -- 
-> 2.9.3
-> 
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Reviewed-by: Christoph Hellwig <hch@lst.de>
