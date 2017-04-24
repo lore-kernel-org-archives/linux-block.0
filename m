@@ -1,167 +1,121 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:39068 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1755557AbdD0Wvq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2017 18:51:46 -0400
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 5/6] mtip32xx: convert internal command issue to block IO path
-Date: Thu, 27 Apr 2017 16:51:33 -0600
-Message-ID: <1493333494-600-6-git-send-email-axboe@fb.com>
-In-Reply-To: <1493333494-600-1-git-send-email-axboe@fb.com>
-References: <1493333494-600-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 16/20] mm: don't TestClearPageError in __filemap_fdatawait_range
+Date: Mon, 24 Apr 2017 09:22:55 -0400
+Message-Id: <20170424132259.8680-17-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The driver special cases certain things for command issue, depending
-on whether it's an internal command or not. Make the internal commands
-use the regular infrastructure for issuing IO.
+The -EIO returned here can end up overriding whatever error is marked in
+the address space, and be returned at fsync time, even when there is a
+more appropriate error stored in the mapping.
 
-Since this is an 8-group souped up AHCI variant, we have to deal
-with NCQ vs non-queueable commands. Do this from the queue_rq
-handler, by backing off unless the drive is idle.
+Read errors are also sometimes tracked on a per-page level using
+PG_error. Suppose we have a read error on a page, and then that page is
+subsequently dirtied by overwriting the whole page. Writeback doesn't
+clear PG_error, so we can then end up successfully writing back that
+page and still return -EIO on fsync.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Worse yet, PG_error is cleared during a sync() syscall, but the -EIO
+return from that is silently discarded. Any subsystem that is relying on
+PG_error to report errors during fsync can easily lose writeback errors
+due to this. All you need is a stray sync() call on the box at the wrong
+time and you've lost the error.
+
+Since the handling of the PG_error flag is somewhat inconsistent across
+subsystems, let's just rely on marking the address space when there are
+writeback errors. Change the TestClearPageError call to ClearPageError,
+and make __filemap_fdatawait_range a void return function.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 82 ++++++++++++++++++++++++++++-----------
- 1 file changed, 59 insertions(+), 23 deletions(-)
+ mm/filemap.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index f0732cc92864..ba03a5b1f05a 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -1088,6 +1088,13 @@ static int mtip_quiesce_io(struct mtip_port *port, unsigned long timeout)
- 	return -EFAULT;
+diff --git a/mm/filemap.c b/mm/filemap.c
+index d94a76d4e023..47e7f50fb830 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -363,17 +363,16 @@ int filemap_flush(struct address_space *mapping)
  }
+ EXPORT_SYMBOL(filemap_flush);
  
-+struct mtip_int_cmd {
-+	int fis_len;
-+	dma_addr_t buffer;
-+	int buf_len;
-+	u32 opts;
-+};
-+
- /*
-  * Execute an internal command and wait for the completion.
-  *
-@@ -1114,10 +1121,16 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 					u32 opts,
- 					unsigned long timeout)
+-static int __filemap_fdatawait_range(struct address_space *mapping,
++static void __filemap_fdatawait_range(struct address_space *mapping,
+ 				     loff_t start_byte, loff_t end_byte)
  {
--	struct mtip_cmd_sg *command_sg;
- 	DECLARE_COMPLETION_ONSTACK(wait);
- 	struct mtip_cmd *int_cmd;
- 	struct driver_data *dd = port->dd;
-+	struct request *rq;
-+	struct mtip_int_cmd icmd = {
-+		.fis_len = fis_len,
-+		.buffer = buffer,
-+		.buf_len = buf_len,
-+		.opts = opts
-+	};
- 	int rv = 0;
- 	unsigned long start;
+ 	pgoff_t index = start_byte >> PAGE_SHIFT;
+ 	pgoff_t end = end_byte >> PAGE_SHIFT;
+ 	struct pagevec pvec;
+ 	int nr_pages;
+-	int ret = 0;
  
-@@ -1132,6 +1145,8 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 		dbg_printk(MTIP_DRV_NAME "Unable to allocate tag for PIO cmd\n");
- 		return -EFAULT;
+ 	if (end_byte < start_byte)
+-		goto out;
++		return;
+ 
+ 	pagevec_init(&pvec, 0);
+ 	while ((index <= end) &&
+@@ -390,14 +389,11 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 				continue;
+ 
+ 			wait_on_page_writeback(page);
+-			if (TestClearPageError(page))
+-				ret = -EIO;
++			ClearPageError(page);
+ 		}
+ 		pagevec_release(&pvec);
+ 		cond_resched();
  	}
-+	rq = blk_mq_rq_from_pdu(int_cmd);
-+	rq->end_io_data = &icmd;
- 
- 	set_bit(MTIP_PF_IC_ACTIVE_BIT, &port->flags);
- 
-@@ -1158,30 +1173,10 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 	/* Copy the command to the command table */
- 	memcpy(int_cmd->command, fis, fis_len*4);
- 
--	/* Populate the SG list */
--	int_cmd->command_header->opts =
--		 __force_bit2int cpu_to_le32(opts | fis_len);
--	if (buf_len) {
--		command_sg = int_cmd->command + AHCI_CMD_TBL_HDR_SZ;
--
--		command_sg->info =
--			__force_bit2int cpu_to_le32((buf_len-1) & 0x3FFFFF);
--		command_sg->dba	=
--			__force_bit2int cpu_to_le32(buffer & 0xFFFFFFFF);
--		command_sg->dba_upper =
--			__force_bit2int cpu_to_le32((buffer >> 16) >> 16);
--
--		int_cmd->command_header->opts |=
--			__force_bit2int cpu_to_le32((1 << 16));
--	}
--
--	/* Populate the command header */
--	int_cmd->command_header->byte_count = 0;
--
- 	start = jiffies;
- 
--	/* Issue the command to the hardware */
--	mtip_issue_non_ncq_command(port, MTIP_TAG_INTERNAL);
-+	/* insert request and run queue */
-+	blk_execute_rq_nowait(rq->q, NULL, rq, true, NULL);
- 
- 	/* Wait for the command to complete or timeout. */
- 	rv = wait_for_completion_interruptible_timeout(&wait,
-@@ -3762,6 +3757,44 @@ static bool mtip_check_unal_depth(struct blk_mq_hw_ctx *hctx,
- 	return false;
+-out:
+-	return ret;
  }
  
-+static int mtip_issue_reserved_cmd(struct blk_mq_hw_ctx *hctx,
-+				   struct request *rq)
-+{
-+	struct driver_data *dd = hctx->queue->queuedata;
-+	struct mtip_int_cmd *icmd = rq->end_io_data;
-+	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
-+	struct mtip_cmd_sg *command_sg;
-+
-+	if (mtip_commands_active(dd->port))
-+		return BLK_MQ_RQ_QUEUE_BUSY;
-+
-+	rq->end_io_data = NULL;
-+
-+	/* Populate the SG list */
-+	cmd->command_header->opts =
-+		 __force_bit2int cpu_to_le32(icmd->opts | icmd->fis_len);
-+	if (icmd->buf_len) {
-+		command_sg = cmd->command + AHCI_CMD_TBL_HDR_SZ;
-+
-+		command_sg->info =
-+			__force_bit2int cpu_to_le32((icmd->buf_len-1) & 0x3FFFFF);
-+		command_sg->dba	=
-+			__force_bit2int cpu_to_le32(icmd->buffer & 0xFFFFFFFF);
-+		command_sg->dba_upper =
-+			__force_bit2int cpu_to_le32((icmd->buffer >> 16) >> 16);
-+
-+		cmd->command_header->opts |=
-+			__force_bit2int cpu_to_le32((1 << 16));
-+	}
-+
-+	/* Populate the command header */
-+	cmd->command_header->byte_count = 0;
-+
-+	blk_mq_start_request(rq);
-+	mtip_issue_non_ncq_command(dd->port, rq->tag);
-+	return BLK_MQ_RQ_QUEUE_OK;
-+}
-+
- static int mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			 const struct blk_mq_queue_data *bd)
+ /**
+@@ -417,15 +413,10 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
+ 			    loff_t end_byte)
  {
-@@ -3770,6 +3803,9 @@ static int mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
+-	int ret, ret2;
+ 	errseq_t since = filemap_sample_wb_error(mapping);
  
- 	mtip_init_cmd_header(rq);
- 
-+	if (rq->rq_flags & RQF_RESERVED)
-+		return mtip_issue_reserved_cmd(hctx, rq);
-+
- 	if (unlikely(mtip_check_unal_depth(hctx, rq)))
- 		return BLK_MQ_RQ_QUEUE_BUSY;
+-	ret = __filemap_fdatawait_range(mapping, start_byte, end_byte);
+-	ret2 = filemap_check_wb_error(mapping, since);
+-	if (!ret)
+-		ret = ret2;
+-
+-	return ret;
++	__filemap_fdatawait_range(mapping, start_byte, end_byte);
++	return filemap_check_wb_error(mapping, since);
+ }
+ EXPORT_SYMBOL(filemap_fdatawait_range);
  
 -- 
-2.7.4
+2.9.3
