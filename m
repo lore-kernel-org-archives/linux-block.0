@@ -1,122 +1,76 @@
-Return-Path: <BATV+37a85350ad3536f8a084+4987+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 22/23] blktrace: remove the unused block_rq_abort tracepoint
-Date: Wed, 19 Apr 2017 21:27:07 +0200
-Message-Id: <20170419192708.22098-23-hch@lst.de>
-In-Reply-To: <20170419192708.22098-1-hch@lst.de>
-References: <20170419192708.22098-1-hch@lst.de>
+Return-Path: <jlayton@redhat.com>
+Return-Path: <jlayton@redhat.com>
+Message-ID: <1493054187.2895.18.camel@redhat.com>
+Subject: Re: [PATCH v3 11/20] cifs: set mapping error when page writeback
+ fails in writepage or launder_pages
+From: Jeff Layton <jlayton@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+ jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+ cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+ v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+ linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+ dhowells@redhat.com,  akpm@linux-foundation.org,
+ ross.zwisler@linux.intel.com, mawilcox@microsoft.com,  jack@suse.com,
+ viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+ tytso@mit.edu, axboe@kernel.dk
+Date: Mon, 24 Apr 2017 13:16:27 -0400
+In-Reply-To: <20170424152708.GK9112@infradead.org>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+	 <20170424132259.8680-12-jlayton@redhat.com>
+	 <20170424152708.GK9112@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/trace/events/block.h | 44 ++++++++++----------------------------------
- kernel/trace/blktrace.c      |  9 ---------
- 2 files changed, 10 insertions(+), 43 deletions(-)
+On Mon, 2017-04-24 at 08:27 -0700, Christoph Hellwig wrote:
+> On Mon, Apr 24, 2017 at 09:22:50AM -0400, Jeff Layton wrote:
+> > Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> > ---
+> >  fs/cifs/file.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> > index 21d404535739..4b696a23b0b1 100644
+> > --- a/fs/cifs/file.c
+> > +++ b/fs/cifs/file.c
+> > @@ -2234,14 +2234,16 @@ cifs_writepage_locked(struct page *page, struct writeback_control *wbc)
+> >  	set_page_writeback(page);
+> >  retry_write:
+> >  	rc = cifs_partialpagewrite(page, 0, PAGE_SIZE);
+> > +	if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL) {
+> >  		goto retry_write;
+> > +	} else if (rc == -EAGAIN) {
+> >  		redirty_page_for_writepage(wbc, page);
+> > +	} else if (rc != 0) {
+> >  		SetPageError(page);
+> > +		mapping_set_error(page->mapping, rc);
+> > +	} else {
+> >  		SetPageUptodate(page);
+> > +	}
+> 
+> Hmmm.  I might be a little too nitpicky, but I hate having the same
+> partial condition duplicated if possible.  Why not:
+> 
+> 	if (rc == -EAGAIN) {
+> 		if (wbc->sync_mode == WB_SYNC_ALL)
+> 			goto retry_write;
+> 		redirty_page_for_writepage(wbc, page);
+> 	} else if (rc) {
+> 		SetPageError(page);
+> 		mapping_set_error(page->mapping, rc);
+> 	} else {
+> 		SetPageUptodate(page);
+> 	}
+> 
+> Otherwise this looks fine to me:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index a88ed13446ff..99ed69fad041 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -61,7 +61,16 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
- 	TP_ARGS(bh)
- );
- 
--DECLARE_EVENT_CLASS(block_rq_with_error,
-+/**
-+ * block_rq_requeue - place block IO request back on a queue
-+ * @q: queue holding operation
-+ * @rq: block IO operation request
-+ *
-+ * The block operation request @rq is being placed back into queue
-+ * @q.  For some reason the request was not completed and needs to be
-+ * put back in the queue.
-+ */
-+TRACE_EVENT(block_rq_requeue,
- 
- 	TP_PROTO(struct request_queue *q, struct request *rq),
- 
-@@ -94,39 +103,6 @@ DECLARE_EVENT_CLASS(block_rq_with_error,
- );
- 
- /**
-- * block_rq_abort - abort block operation request
-- * @q: queue containing the block operation request
-- * @rq: block IO operation request
-- *
-- * Called immediately after pending block IO operation request @rq in
-- * queue @q is aborted. The fields in the operation request @rq
-- * can be examined to determine which device and sectors the pending
-- * operation would access.
-- */
--DEFINE_EVENT(block_rq_with_error, block_rq_abort,
--
--	TP_PROTO(struct request_queue *q, struct request *rq),
--
--	TP_ARGS(q, rq)
--);
--
--/**
-- * block_rq_requeue - place block IO request back on a queue
-- * @q: queue holding operation
-- * @rq: block IO operation request
-- *
-- * The block operation request @rq is being placed back into queue
-- * @q.  For some reason the request was not completed and needs to be
-- * put back in the queue.
-- */
--DEFINE_EVENT(block_rq_with_error, block_rq_requeue,
--
--	TP_PROTO(struct request_queue *q, struct request *rq),
--
--	TP_ARGS(q, rq)
--);
--
--/**
-  * block_rq_complete - block IO operation completed by device driver
-  * @q: queue containing the block operation request
-  * @rq: block operations request
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index b2058a7f94bd..9f3624dadb09 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -716,12 +716,6 @@ static void blk_add_trace_rq(struct request_queue *q, struct request *rq,
- 			rq->cmd_flags, what, rq->errors, 0, NULL);
- }
- 
--static void blk_add_trace_rq_abort(void *ignore,
--				   struct request_queue *q, struct request *rq)
--{
--	blk_add_trace_rq(q, rq, blk_rq_bytes(rq), BLK_TA_ABORT);
--}
--
- static void blk_add_trace_rq_insert(void *ignore,
- 				    struct request_queue *q, struct request *rq)
- {
-@@ -974,8 +968,6 @@ static void blk_register_tracepoints(void)
- {
- 	int ret;
- 
--	ret = register_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
--	WARN_ON(ret);
- 	ret = register_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
- 	WARN_ON(ret);
- 	ret = register_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
-@@ -1028,7 +1020,6 @@ static void blk_unregister_tracepoints(void)
- 	unregister_trace_block_rq_requeue(blk_add_trace_rq_requeue, NULL);
- 	unregister_trace_block_rq_issue(blk_add_trace_rq_issue, NULL);
- 	unregister_trace_block_rq_insert(blk_add_trace_rq_insert, NULL);
--	unregister_trace_block_rq_abort(blk_add_trace_rq_abort, NULL);
- 
- 	tracepoint_synchronize_unregister();
- }
+No, you're absolutely right. I merged that change into the patch.
+
+Thanks for the review so far!
 -- 
-2.11.0
+Jeff Layton <jlayton@redhat.com>
