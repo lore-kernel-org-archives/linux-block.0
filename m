@@ -1,114 +1,29 @@
 Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v6 08/10] blk-mq: Show operation, cmd_flags and rq_flags names
-Date: Wed, 26 Apr 2017 13:47:55 -0700
-Message-ID: <20170426204757.18910-9-bart.vanassche@sandisk.com>
-In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "osandov@osandov.com" <osandov@osandov.com>
+CC: "hare@suse.com" <hare@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v4 04/10] blk-mq: Check blk_mq_debugfs_register() return
+ value
+Date: Mon, 24 Apr 2017 17:05:28 +0000
+Message-ID: <1493053527.3394.6.camel@sandisk.com>
+References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+	 <20170421234026.18970-5-bart.vanassche@sandisk.com>
+	 <20170424164935.GB28510@vader.DHCP.thefacebook.com>
+In-Reply-To: <20170424164935.GB28510@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Show the operation name, .cmd_flags and .rq_flags as names instead
-of numbers.
+On Mon, 2017-04-24 at 09:49 -0700, Omar Sandoval wrote:
+> On Fri, Apr 21, 2017 at 04:40:20PM -0700, Bart Van Assche wrote:
+> > Make __blk_mq_register_dev() check the blk_mq_debugfs_register()
+> > return value.
+>=20
+> I intentionally didn't check this. In my opinion, a missing debug
+> directory shouldn't be fatal.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 69 insertions(+), 3 deletions(-)
+OK, I will remove that return value check again.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ccc7b0f71230..ac39093c4ef7 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -253,13 +253,79 @@ static const struct file_operations hctx_flags_fops = {
- 	.release	= single_release,
- };
- 
-+static const char *const op_name[] = {
-+	[REQ_OP_READ]		= "READ",
-+	[REQ_OP_WRITE]		= "WRITE",
-+	[REQ_OP_FLUSH]		= "FLUSH",
-+	[REQ_OP_DISCARD]	= "DISCARD",
-+	[REQ_OP_ZONE_REPORT]	= "ZONE_REPORT",
-+	[REQ_OP_SECURE_ERASE]	= "SECURE_ERASE",
-+	[REQ_OP_ZONE_RESET]	= "ZONE_RESET",
-+	[REQ_OP_WRITE_SAME]	= "WRITE_SAME",
-+	[REQ_OP_WRITE_ZEROES]	= "WRITE_ZEROES",
-+	[REQ_OP_SCSI_IN]	= "SCSI_IN",
-+	[REQ_OP_SCSI_OUT]	= "SCSI_OUT",
-+	[REQ_OP_DRV_IN]		= "DRV_IN",
-+	[REQ_OP_DRV_OUT]	= "DRV_OUT",
-+};
-+
-+static const char *const cmd_flag_name[] = {
-+	[__REQ_FAILFAST_DEV]		= "FAILFAST_DEV",
-+	[__REQ_FAILFAST_TRANSPORT]	= "FAILFAST_TRANSPORT",
-+	[__REQ_FAILFAST_DRIVER]		= "FAILFAST_DRIVER",
-+	[__REQ_SYNC]			= "SYNC",
-+	[__REQ_META]			= "META",
-+	[__REQ_PRIO]			= "PRIO",
-+	[__REQ_NOMERGE]			= "NOMERGE",
-+	[__REQ_IDLE]			= "IDLE",
-+	[__REQ_INTEGRITY]		= "INTEGRITY",
-+	[__REQ_FUA]			= "FUA",
-+	[__REQ_PREFLUSH]		= "PREFLUSH",
-+	[__REQ_RAHEAD]			= "RAHEAD",
-+	[__REQ_BACKGROUND]		= "BACKGROUND",
-+	[__REQ_NR_BITS]			= "NR_BITS",
-+};
-+
-+static const char *const rqf_name[] = {
-+	[ilog2((__force u32)RQF_SORTED)]		= "SORTED",
-+	[ilog2((__force u32)RQF_STARTED)]		= "STARTED",
-+	[ilog2((__force u32)RQF_QUEUED)]		= "QUEUED",
-+	[ilog2((__force u32)RQF_SOFTBARRIER)]		= "SOFTBARRIER",
-+	[ilog2((__force u32)RQF_FLUSH_SEQ)]		= "FLUSH_SEQ",
-+	[ilog2((__force u32)RQF_MIXED_MERGE)]		= "MIXED_MERGE",
-+	[ilog2((__force u32)RQF_MQ_INFLIGHT)]		= "MQ_INFLIGHT",
-+	[ilog2((__force u32)RQF_DONTPREP)]		= "DONTPREP",
-+	[ilog2((__force u32)RQF_PREEMPT)]		= "PREEMPT",
-+	[ilog2((__force u32)RQF_COPY_USER)]		= "COPY_USER",
-+	[ilog2((__force u32)RQF_FAILED)]		= "FAILED",
-+	[ilog2((__force u32)RQF_QUIET)]			= "QUIET",
-+	[ilog2((__force u32)RQF_ELVPRIV)]		= "ELVPRIV",
-+	[ilog2((__force u32)RQF_IO_STAT)]		= "IO_STAT",
-+	[ilog2((__force u32)RQF_ALLOCED)]		= "ALLOCED",
-+	[ilog2((__force u32)RQF_PM)]			= "PM",
-+	[ilog2((__force u32)RQF_HASHED)]		= "HASHED",
-+	[ilog2((__force u32)RQF_STATS)]			= "STATS",
-+	[ilog2((__force u32)RQF_SPECIAL_PAYLOAD)]	= "SPECIAL_PAYLOAD",
-+};
-+
- static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- {
- 	struct request *rq = list_entry_rq(v);
-+	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
- 
--	seq_printf(m, "%p {.cmd_flags=0x%x, .rq_flags=0x%x, .tag=%d, .internal_tag=%d}\n",
--		   rq, rq->cmd_flags, (__force unsigned int)rq->rq_flags,
--		   rq->tag, rq->internal_tag);
-+	seq_printf(m, "%p {.op=", rq);
-+	if (op < ARRAY_SIZE(op_name) && op_name[op])
-+		seq_printf(m, "%s", op_name[op]);
-+	else
-+		seq_printf(m, "%d", op);
-+	seq_puts(m, ", .cmd_flags=");
-+	blk_flags_show(m, rq->cmd_flags & ~REQ_OP_MASK, cmd_flag_name,
-+		       ARRAY_SIZE(cmd_flag_name));
-+	seq_puts(m, ", .rq_flags=");
-+	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
-+		       ARRAY_SIZE(rqf_name));
-+	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
-+		   rq->internal_tag);
- 	return 0;
- }
- 
--- 
-2.12.2
+Bart.=
