@@ -1,44 +1,83 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:2178 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S979420AbdDYAFy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2017 20:05:54 -0400
-From: Jon Derrick <jonathan.derrick@intel.com>
-To: axboe@fb.com
-Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, keith.busch@intel.com,
-        hch@infradead.org, sagi@grimberg.me,
-        Jon Derrick <jonathan.derrick@intel.com>
-Subject: [PATCH] nvme/scsi: Consider LBA format in IO splitting calculation
-Date: Mon, 24 Apr 2017 18:02:43 -0600
-Message-Id: <20170425000243.2019-1-jonathan.derrick@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Mon, 24 Apr 2017 17:46:13 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
+Subject: Re: [PATCH v3 04/20] fs: check for writeback errors after syncing
+ out buffers in generic_file_fsync
+Message-ID: <20170424154613.GG23988@quack2.suse.cz>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-5-jlayton@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170424132259.8680-5-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The current command submission code uses a sector-based value when
-considering the maximum number of blocks per command. With a
-4k-formatted namespace and a command exceeding max hardware limits, this
-calculation doesn't split IOs which should be split and fails in the
-nvme layer. This patch fixes that calculation and enables IO splitting
-in these circumstances.
+On Mon 24-04-17 09:22:43, Jeff Layton wrote:
+> ext2 currently does a test+clear of the AS_EIO flag, which is
+> is problematic for some coming changes.
+> 
+> What we really need to do instead is call filemap_check_errors
+> in __generic_file_fsync after syncing out the buffers. That
+> will be sufficient for this case, and help other callers detect
+> these errors properly as well.
+> 
+> With that, we don't need to twiddle it in ext2.
+> 
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
----
- drivers/nvme/host/scsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Looks good to me. You can add:
 
-diff --git a/drivers/nvme/host/scsi.c b/drivers/nvme/host/scsi.c
-index f49ae27..988da61 100644
---- a/drivers/nvme/host/scsi.c
-+++ b/drivers/nvme/host/scsi.c
-@@ -1609,7 +1609,7 @@ static int nvme_trans_do_nvme_io(struct nvme_ns *ns, struct sg_io_hdr *hdr,
- 	struct nvme_command c;
- 	u8 opcode = (is_write ? nvme_cmd_write : nvme_cmd_read);
- 	u16 control;
--	u32 max_blocks = queue_max_hw_sectors(ns->queue);
-+	u32 max_blocks = queue_max_hw_sectors(ns->queue) >> (ns->lba_shift - 9);
- 
- 	num_cmds = nvme_trans_io_get_num_cmds(hdr, cdb_info, max_blocks);
- 
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+> ---
+>  fs/ext2/file.c | 2 +-
+>  fs/libfs.c     | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/ext2/file.c b/fs/ext2/file.c
+> index b21891a6bfca..ed00e7ae0ef3 100644
+> --- a/fs/ext2/file.c
+> +++ b/fs/ext2/file.c
+> @@ -177,7 +177,7 @@ int ext2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+>  	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
+>  
+>  	ret = generic_file_fsync(file, start, end, datasync);
+> -	if (ret == -EIO || test_and_clear_bit(AS_EIO, &mapping->flags)) {
+> +	if (ret == -EIO) {
+>  		/* We don't really know where the IO error happened... */
+>  		ext2_error(sb, __func__,
+>  			   "detected IO error when writing metadata buffers");
+> diff --git a/fs/libfs.c b/fs/libfs.c
+> index a8b62e5d43a9..12a48ee442d3 100644
+> --- a/fs/libfs.c
+> +++ b/fs/libfs.c
+> @@ -991,7 +991,8 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
+>  
+>  out:
+>  	inode_unlock(inode);
+> -	return ret;
+> +	err = filemap_check_errors(inode->i_mapping);
+> +	return ret ? : err;
+>  }
+>  EXPORT_SYMBOL(__generic_file_fsync);
+>  
+> -- 
+> 2.9.3
+> 
+> 
 -- 
-2.9.3
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
