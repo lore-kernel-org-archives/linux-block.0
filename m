@@ -1,62 +1,35 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk
-Subject: [PATCH v3 09/20] 9p: set mapping error when writeback fails in launder_page
-Date: Mon, 24 Apr 2017 09:22:48 -0400
-Message-Id: <20170424132259.8680-10-jlayton@redhat.com>
-In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
-References: <20170424132259.8680-1-jlayton@redhat.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Mon, 24 Apr 2017 09:57:49 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH v4 02/10] blk-mq: Let blk_mq_debugfs_register() look up
+ the queue name
+Message-ID: <20170424165749.GD28510@vader.DHCP.thefacebook.com>
+References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+ <20170421234026.18970-3-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170421234026.18970-3-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-launder_page is just writeback under the page lock. We still need to
-mark the mapping for errors there when they occur.
+On Fri, Apr 21, 2017 at 04:40:18PM -0700, Bart Van Assche wrote:
+> A later patch will move the call of blk_mq_debugfs_register() to
+> a function to which the queue name is not passed as an argument.
+> To avoid having to add a 'name' argument to multiple callers, let
+> blk_mq_debugfs_register() look up the queue name.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/9p/vfs_addr.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+I think I already said this for v3, but
 
-diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-index adaf6f6dd858..7af6e6501698 100644
---- a/fs/9p/vfs_addr.c
-+++ b/fs/9p/vfs_addr.c
-@@ -223,8 +223,11 @@ static int v9fs_launder_page(struct page *page)
- 	v9fs_fscache_wait_on_page_write(inode, page);
- 	if (clear_page_dirty_for_io(page)) {
- 		retval = v9fs_vfs_writepage_locked(page);
--		if (retval)
-+		if (retval) {
-+			if (retval != -EAGAIN)
-+				mapping_set_error(page->mapping, retval);
- 			return retval;
-+		}
- 	}
- 	return 0;
- }
--- 
-2.9.3
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  block/blk-mq-debugfs.c | 5 +++--
+>  block/blk-mq-sysfs.c   | 2 +-
+>  block/blk-mq.h         | 5 ++---
+>  3 files changed, 6 insertions(+), 6 deletions(-)
