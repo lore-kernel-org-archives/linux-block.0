@@ -1,64 +1,28 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Thu, 20 Apr 2017 15:38:50 +1000
-Subject: [PATCH 11/11] block: don't check for BIO_MAX_PAGES in
- blk_bio_segment_split()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149266673048.27388.6882396367486800999.stgit@noble>
-In-Reply-To: <149266645258.27388.14083229348123176454.stgit@noble>
-References: <149266645258.27388.14083229348123176454.stgit@noble>
+Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 24 Apr 2017 08:24:19 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
+Subject: Re: [PATCH v3 07/20] nilfs2: set the mapping error when calling
+ SetPageError on writeback
+Message-ID: <20170424152419.GG9112@infradead.org>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-8-jlayton@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170424132259.8680-8-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-blk_bio_segment_split() makes sure bios have no more than
-BIO_MAX_PAGES entries in the bi_io_vec.
-This was done because bio_clone_bioset() (when given a
-mempool bioset) could not handle larger io_vecs.
+Looks fine,
 
-No driver uses bio_clone_bioset() any more, they all
-use bio_clone_fast() if anything, and bio_clone_fast()
-doesn't clone the bi_io_vec.
-
-The main user of of bio_clone_bioset() at this level
-is bounce.c, and bouncing now happens before blk_bio_segment_split(),
-so that is not of concern.
-
-So remove the big helpful comment and the code.
-
-Signed-off-by: NeilBrown <neilb@suse.com>
----
- block/blk-merge.c |   16 ----------------
- 1 file changed, 16 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index e7862e9dcc39..cea544ec5d96 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -108,25 +108,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	bool do_split = true;
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
--	unsigned bvecs = 0;
- 
- 	bio_for_each_segment(bv, bio, iter) {
- 		/*
--		 * With arbitrary bio size, the incoming bio may be very
--		 * big. We have to split the bio into small bios so that
--		 * each holds at most BIO_MAX_PAGES bvecs because
--		 * bio_clone_bioset() can fail to allocate big bvecs.
--		 *
--		 * Those drivers which will need to use bio_clone_bioset()
--		 * should tell us in some way.  For now, impose the
--		 * BIO_MAX_PAGES limit on all queues.
--		 *
--		 * TODO: handle users of bio_clone_bioset() differently.
--		 */
--		if (bvecs++ >= BIO_MAX_PAGES)
--			goto split;
--
--		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
- 		 */
+Reviewed-by: Christoph Hellwig <hch@lst.de>
