@@ -1,336 +1,178 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: [resend PATCH v2 31/33] libnvdimm,
- nfit: enable support for volatile ranges
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Jan Kara <jack@suse.cz>, dm-devel@redhat.com,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, linux-fsdevel@vger.kernel.org,
-        Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
-Date: Mon, 17 Apr 2017 12:11:37 -0700
-Message-ID: <149245629733.10206.15242943489066430670.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:34978 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1168930AbdDXLBP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Apr 2017 07:01:15 -0400
+Received: by mail-wm0-f41.google.com with SMTP id w64so58466183wma.0
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2017 04:01:14 -0700 (PDT)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <2364B63D-0D5D-4246-8E14-BE5230819FFC@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_A203A799-4F03-4604-BE4E-719D68450B58";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 1/2] lightnvm: potential underflow in pblk_read_rq()
+Date: Mon, 24 Apr 2017 13:01:10 +0200
+In-Reply-To: <20170424102437.wqht5g2r2z5upyoo@mwanda>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+References: <20170421205301.3ds7jrgcktuldvrp@mwanda>
+ <E2348B07-559F-4874-A3A4-C1079A2A09D2@lightnvm.io>
+ <20170424102437.wqht5g2r2z5upyoo@mwanda>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Allow volatile nfit ranges to participate in all the same infrastructure
-provided for persistent memory regions. A resulting resulting namespace
-device will still be called "pmem", but the parent region type will be
-"nd_volatile". This is in preparation for disabling the dax ->flush()
-operation in the pmem driver when it is hosted on a volatile range.
 
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- drivers/acpi/nfit/core.c        |    9 ++++++++-
- drivers/nvdimm/bus.c            |   10 +++++-----
- drivers/nvdimm/core.c           |    2 +-
- drivers/nvdimm/dax_devs.c       |    2 +-
- drivers/nvdimm/dimm_devs.c      |    2 +-
- drivers/nvdimm/namespace_devs.c |    8 ++++----
- drivers/nvdimm/nd-core.h        |    9 +++++++++
- drivers/nvdimm/pfn_devs.c       |    4 ++--
- drivers/nvdimm/region_devs.c    |   27 ++++++++++++++-------------
- 9 files changed, 45 insertions(+), 28 deletions(-)
+--Apple-Mail=_A203A799-4F03-4604-BE4E-719D68450B58
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
-index 8b4c6212737c..6ac31846c4df 100644
---- a/drivers/acpi/nfit/core.c
-+++ b/drivers/acpi/nfit/core.c
-@@ -2162,6 +2162,13 @@ static bool nfit_spa_is_virtual(struct acpi_nfit_system_address *spa)
- 		nfit_spa_type(spa) == NFIT_SPA_PCD);
- }
- 
-+static bool nfit_spa_is_volatile(struct acpi_nfit_system_address *spa)
-+{
-+	return (nfit_spa_type(spa) == NFIT_SPA_VDISK ||
-+		nfit_spa_type(spa) == NFIT_SPA_VCD   ||
-+		nfit_spa_type(spa) == NFIT_SPA_VOLATILE);
-+}
-+
- static int acpi_nfit_register_region(struct acpi_nfit_desc *acpi_desc,
- 		struct nfit_spa *nfit_spa)
- {
-@@ -2236,7 +2243,7 @@ static int acpi_nfit_register_region(struct acpi_nfit_desc *acpi_desc,
- 				ndr_desc);
- 		if (!nfit_spa->nd_region)
- 			rc = -ENOMEM;
--	} else if (nfit_spa_type(spa) == NFIT_SPA_VOLATILE) {
-+	} else if (nfit_spa_is_volatile(spa)) {
- 		nfit_spa->nd_region = nvdimm_volatile_region_create(nvdimm_bus,
- 				ndr_desc);
- 		if (!nfit_spa->nd_region)
-diff --git a/drivers/nvdimm/bus.c b/drivers/nvdimm/bus.c
-index 351bac8f6503..d4173fbdba28 100644
---- a/drivers/nvdimm/bus.c
-+++ b/drivers/nvdimm/bus.c
-@@ -37,13 +37,13 @@ static int to_nd_device_type(struct device *dev)
- {
- 	if (is_nvdimm(dev))
- 		return ND_DEVICE_DIMM;
--	else if (is_nd_pmem(dev))
-+	else if (is_memory(dev))
- 		return ND_DEVICE_REGION_PMEM;
- 	else if (is_nd_blk(dev))
- 		return ND_DEVICE_REGION_BLK;
- 	else if (is_nd_dax(dev))
- 		return ND_DEVICE_DAX_PMEM;
--	else if (is_nd_pmem(dev->parent) || is_nd_blk(dev->parent))
-+	else if (is_nd_region(dev->parent))
- 		return nd_region_to_nstype(to_nd_region(dev->parent));
- 
- 	return 0;
-@@ -55,7 +55,7 @@ static int nvdimm_bus_uevent(struct device *dev, struct kobj_uevent_env *env)
- 	 * Ensure that region devices always have their numa node set as
- 	 * early as possible.
- 	 */
--	if (is_nd_pmem(dev) || is_nd_blk(dev))
-+	if (is_nd_region(dev))
- 		set_dev_node(dev, to_nd_region(dev)->numa_node);
- 	return add_uevent_var(env, "MODALIAS=" ND_DEVICE_MODALIAS_FMT,
- 			to_nd_device_type(dev));
-@@ -64,7 +64,7 @@ static int nvdimm_bus_uevent(struct device *dev, struct kobj_uevent_env *env)
- static struct module *to_bus_provider(struct device *dev)
- {
- 	/* pin bus providers while regions are enabled */
--	if (is_nd_pmem(dev) || is_nd_blk(dev)) {
-+	if (is_nd_region(dev)) {
- 		struct nvdimm_bus *nvdimm_bus = walk_to_nvdimm_bus(dev);
- 
- 		return nvdimm_bus->nd_desc->module;
-@@ -771,7 +771,7 @@ void wait_nvdimm_bus_probe_idle(struct device *dev)
- 
- static int pmem_active(struct device *dev, void *data)
- {
--	if (is_nd_pmem(dev) && dev->driver)
-+	if (is_memory(dev) && dev->driver)
- 		return -EBUSY;
- 	return 0;
- }
-diff --git a/drivers/nvdimm/core.c b/drivers/nvdimm/core.c
-index 9303cfeb8bee..875ef4cecb35 100644
---- a/drivers/nvdimm/core.c
-+++ b/drivers/nvdimm/core.c
-@@ -504,7 +504,7 @@ void nvdimm_badblocks_populate(struct nd_region *nd_region,
- 	struct nvdimm_bus *nvdimm_bus;
- 	struct list_head *poison_list;
- 
--	if (!is_nd_pmem(&nd_region->dev)) {
-+	if (!is_memory(&nd_region->dev)) {
- 		dev_WARN_ONCE(&nd_region->dev, 1,
- 				"%s only valid for pmem regions\n", __func__);
- 		return;
-diff --git a/drivers/nvdimm/dax_devs.c b/drivers/nvdimm/dax_devs.c
-index 45fa82cae87c..6a92b84c8072 100644
---- a/drivers/nvdimm/dax_devs.c
-+++ b/drivers/nvdimm/dax_devs.c
-@@ -89,7 +89,7 @@ struct device *nd_dax_create(struct nd_region *nd_region)
- 	struct device *dev = NULL;
- 	struct nd_dax *nd_dax;
- 
--	if (!is_nd_pmem(&nd_region->dev))
-+	if (!is_memory(&nd_region->dev))
- 		return NULL;
- 
- 	nd_dax = nd_dax_alloc(nd_region);
-diff --git a/drivers/nvdimm/dimm_devs.c b/drivers/nvdimm/dimm_devs.c
-index 8b721321be5b..d814e5adab5c 100644
---- a/drivers/nvdimm/dimm_devs.c
-+++ b/drivers/nvdimm/dimm_devs.c
-@@ -403,7 +403,7 @@ int alias_dpa_busy(struct device *dev, void *data)
- 	struct resource *res;
- 	int i;
- 
--	if (!is_nd_pmem(dev))
-+	if (!is_memory(dev))
- 		return 0;
- 
- 	nd_region = to_nd_region(dev);
-diff --git a/drivers/nvdimm/namespace_devs.c b/drivers/nvdimm/namespace_devs.c
-index 2580f6655bea..4fa3c1fce6bf 100644
---- a/drivers/nvdimm/namespace_devs.c
-+++ b/drivers/nvdimm/namespace_devs.c
-@@ -111,7 +111,7 @@ static int is_uuid_busy(struct device *dev, void *data)
- 
- static int is_namespace_uuid_busy(struct device *dev, void *data)
- {
--	if (is_nd_pmem(dev) || is_nd_blk(dev))
-+	if (is_nd_region(dev))
- 		return device_for_each_child(dev, data, is_uuid_busy);
- 	return 0;
- }
-@@ -786,7 +786,7 @@ static int __reserve_free_pmem(struct device *dev, void *data)
- 	struct nd_label_id label_id;
- 	int i;
- 
--	if (!is_nd_pmem(dev))
-+	if (!is_memory(dev))
- 		return 0;
- 
- 	nd_region = to_nd_region(dev);
-@@ -1875,7 +1875,7 @@ static struct device *nd_namespace_pmem_create(struct nd_region *nd_region)
- 	struct resource *res;
- 	struct device *dev;
- 
--	if (!is_nd_pmem(&nd_region->dev))
-+	if (!is_memory(&nd_region->dev))
- 		return NULL;
- 
- 	nspm = kzalloc(sizeof(*nspm), GFP_KERNEL);
-@@ -2155,7 +2155,7 @@ static struct device **scan_labels(struct nd_region *nd_region)
- 		}
- 		dev->parent = &nd_region->dev;
- 		devs[count++] = dev;
--	} else if (is_nd_pmem(&nd_region->dev)) {
-+	} else if (is_memory(&nd_region->dev)) {
- 		/* clean unselected labels */
- 		for (i = 0; i < nd_region->ndr_mappings; i++) {
- 			struct list_head *l, *e;
-diff --git a/drivers/nvdimm/nd-core.h b/drivers/nvdimm/nd-core.h
-index 8623e57c2ce3..f26263cc8a36 100644
---- a/drivers/nvdimm/nd-core.h
-+++ b/drivers/nvdimm/nd-core.h
-@@ -63,7 +63,16 @@ struct blk_alloc_info {
- 
- bool is_nvdimm(struct device *dev);
- bool is_nd_pmem(struct device *dev);
-+bool is_nd_volatile(struct device *dev);
- bool is_nd_blk(struct device *dev);
-+static inline bool is_nd_region(struct device *dev)
-+{
-+	return is_nd_pmem(dev) || is_nd_blk(dev) || is_nd_volatile(dev);
-+}
-+static inline bool is_memory(struct device *dev)
-+{
-+	return is_nd_pmem(dev) || is_nd_volatile(dev);
-+}
- struct nvdimm_bus *walk_to_nvdimm_bus(struct device *nd_dev);
- int __init nvdimm_bus_init(void);
- void nvdimm_bus_exit(void);
-diff --git a/drivers/nvdimm/pfn_devs.c b/drivers/nvdimm/pfn_devs.c
-index 6c033c9a2f06..7cc77684316b 100644
---- a/drivers/nvdimm/pfn_devs.c
-+++ b/drivers/nvdimm/pfn_devs.c
-@@ -331,7 +331,7 @@ struct device *nd_pfn_create(struct nd_region *nd_region)
- 	struct nd_pfn *nd_pfn;
- 	struct device *dev;
- 
--	if (!is_nd_pmem(&nd_region->dev))
-+	if (!is_memory(&nd_region->dev))
- 		return NULL;
- 
- 	nd_pfn = nd_pfn_alloc(nd_region);
-@@ -354,7 +354,7 @@ int nd_pfn_validate(struct nd_pfn *nd_pfn, const char *sig)
- 	if (!pfn_sb || !ndns)
- 		return -ENODEV;
- 
--	if (!is_nd_pmem(nd_pfn->dev.parent))
-+	if (!is_memory(nd_pfn->dev.parent))
- 		return -ENODEV;
- 
- 	if (nvdimm_read_bytes(ndns, SZ_4K, pfn_sb, sizeof(*pfn_sb)))
-diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index 5976f6c0407f..2df259010720 100644
---- a/drivers/nvdimm/region_devs.c
-+++ b/drivers/nvdimm/region_devs.c
-@@ -168,6 +168,11 @@ bool is_nd_blk(struct device *dev)
- 	return dev ? dev->type == &nd_blk_device_type : false;
- }
- 
-+bool is_nd_volatile(struct device *dev)
-+{
-+	return dev ? dev->type == &nd_volatile_device_type : false;
-+}
-+
- struct nd_region *to_nd_region(struct device *dev)
- {
- 	struct nd_region *nd_region = container_of(dev, struct nd_region, dev);
-@@ -214,7 +219,7 @@ EXPORT_SYMBOL_GPL(nd_blk_region_set_provider_data);
-  */
- int nd_region_to_nstype(struct nd_region *nd_region)
- {
--	if (is_nd_pmem(&nd_region->dev)) {
-+	if (is_memory(&nd_region->dev)) {
- 		u16 i, alias;
- 
- 		for (i = 0, alias = 0; i < nd_region->ndr_mappings; i++) {
-@@ -242,7 +247,7 @@ static ssize_t size_show(struct device *dev,
- 	struct nd_region *nd_region = to_nd_region(dev);
- 	unsigned long long size = 0;
- 
--	if (is_nd_pmem(dev)) {
-+	if (is_memory(dev)) {
- 		size = nd_region->ndr_size;
- 	} else if (nd_region->ndr_mappings == 1) {
- 		struct nd_mapping *nd_mapping = &nd_region->mapping[0];
-@@ -278,7 +283,7 @@ static ssize_t set_cookie_show(struct device *dev,
- 	struct nd_region *nd_region = to_nd_region(dev);
- 	struct nd_interleave_set *nd_set = nd_region->nd_set;
- 
--	if (is_nd_pmem(dev) && nd_set)
-+	if (is_memory(dev) && nd_set)
- 		/* pass, should be precluded by region_visible */;
- 	else
- 		return -ENXIO;
-@@ -305,7 +310,7 @@ resource_size_t nd_region_available_dpa(struct nd_region *nd_region)
- 		if (!ndd)
- 			return 0;
- 
--		if (is_nd_pmem(&nd_region->dev)) {
-+		if (is_memory(&nd_region->dev)) {
- 			available += nd_pmem_available_dpa(nd_region,
- 					nd_mapping, &overlap);
- 			if (overlap > blk_max_overlap) {
-@@ -469,10 +474,10 @@ static umode_t region_visible(struct kobject *kobj, struct attribute *a, int n)
- 	struct nd_interleave_set *nd_set = nd_region->nd_set;
- 	int type = nd_region_to_nstype(nd_region);
- 
--	if (!is_nd_pmem(dev) && a == &dev_attr_pfn_seed.attr)
-+	if (!is_memory(dev) && a == &dev_attr_pfn_seed.attr)
- 		return 0;
- 
--	if (!is_nd_pmem(dev) && a == &dev_attr_dax_seed.attr)
-+	if (!is_memory(dev) && a == &dev_attr_dax_seed.attr)
- 		return 0;
- 
- 	if (a != &dev_attr_set_cookie.attr
-@@ -483,7 +488,7 @@ static umode_t region_visible(struct kobject *kobj, struct attribute *a, int n)
- 				|| type == ND_DEVICE_NAMESPACE_BLK)
- 			&& a == &dev_attr_available_size.attr)
- 		return a->mode;
--	else if (is_nd_pmem(dev) && nd_set)
-+	else if (is_memory(dev) && nd_set)
- 		return a->mode;
- 
- 	return 0;
-@@ -535,7 +540,7 @@ static void nd_region_notify_driver_action(struct nvdimm_bus *nvdimm_bus,
- {
- 	struct nd_region *nd_region;
- 
--	if (!probe && (is_nd_pmem(dev) || is_nd_blk(dev))) {
-+	if (!probe && is_nd_region(dev)) {
- 		int i;
- 
- 		nd_region = to_nd_region(dev);
-@@ -553,12 +558,8 @@ static void nd_region_notify_driver_action(struct nvdimm_bus *nvdimm_bus,
- 			if (ndd)
- 				atomic_dec(&nvdimm->busy);
- 		}
--
--		if (is_nd_pmem(dev))
--			return;
- 	}
--	if (dev->parent && (is_nd_blk(dev->parent) || is_nd_pmem(dev->parent))
--			&& probe) {
-+	if (dev->parent && is_nd_region(dev->parent) && probe) {
- 		nd_region = to_nd_region(dev->parent);
- 		nvdimm_bus_lock(dev);
- 		if (nd_region->ns_seed == dev)
+> On 24 Apr 2017, at 12.24, Dan Carpenter <dan.carpenter@oracle.com> =
+wrote:
+>=20
+> On Sat, Apr 22, 2017 at 12:24:50AM +0200, Javier Gonz=C3=A1lez wrote:
+>>> On 21 Apr 2017, at 22.53, Dan Carpenter <dan.carpenter@oracle.com> =
+wrote:
+>>>=20
+>>> This is a static checker fix, and perhaps not a real bug.  The =
+static
+>>> checker thinks that nr_secs could be negative.  It would result in
+>>> zeroing more memory than intended.  Anyway, even if it's not a bug,
+>>> changing this variable to unsigned makes the code easier to audit.
+>>>=20
+>>> Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) =
+target")
+>>> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+>>>=20
+>>> diff --git a/drivers/lightnvm/pblk-read.c =
+b/drivers/lightnvm/pblk-read.c
+>>> index bce7ed5fc73f..c9daa33e8d9c 100644
+>>> --- a/drivers/lightnvm/pblk-read.c
+>>> +++ b/drivers/lightnvm/pblk-read.c
+>>> @@ -288,7 +288,7 @@ static void pblk_read_rq(struct pblk *pblk, =
+struct nvm_rq *rqd,
+>>> int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>> {
+>>> 	struct nvm_tgt_dev *dev =3D pblk->dev;
+>>> -	int nr_secs =3D pblk_get_secs(bio);
+>>> +	unsigned int nr_secs =3D pblk_get_secs(bio);
+>>> 	struct nvm_rq *rqd;
+>>> 	unsigned long read_bitmap; /* Max 64 ppas per request */
+>>> 	unsigned int bio_init_idx;
+>>=20
+>> Thanks Dan. While you are at it, can you also modify the type on the
+>> other 2 calls to pblk_get_secs in pblk-cache and pblk-core?
+>=20
+> Ugh...  My patch wasn't needed at all.  I should have looked more
+> carefully.  pblk_get_secs() can only return up to UINT_MAX / 4096 so
+> it can't overflow to negative.
+>=20
+> pblk_get_secs() should probably return sector_t instead of unsigned =
+int?
+
+Since pblk_get_secs() divides an unsigned int (bio->bi_iter.bi_size), I
+think unsigned int would suffice. Why sector_t? In any case, the calls
+to this function do convert the type unnecessarily and should be
+changed; so I would say that your patch is still a good cleanup.
+
+>=20
+> I do get another static checker warning caused by the pblk-cache code.
+> drivers/lightnvm/pblk-rl.c:30 pblk_rl_user_may_insert() XXX: potential =
+integer overflow from user 'rb_user_cnt + nr_entries'
+>=20
+
+Can I ask which static checker you use? I don't see these warning
+neither on sparse nor in smatch.
+
+> It's seems like a true warning but harmless.
+>=20
+> drivers/lightnvm/pblk-rb.c
+>   425  /*
+>   426   * Atomically check that (i) there is space on the write buffer =
+for the
+>   427   * incoming I/O, and (ii) the current I/O type has enough =
+budget in the write
+>   428   * buffer (rate-limiter).
+>   429   */
+>   430  int pblk_rb_may_write_user(struct pblk_rb *rb, struct bio *bio,
+>   431                             unsigned int nr_entries, unsigned =
+int *pos)
+>                                                ^^^^^^^^^^
+> Assume this is very high.
+
+This can be bigger than the reserved entries for user I/O on the write
+buffer. In pblk-init, we split the bio if necessary (pblk_rw_io); I
+should probably add a comment. on pblk_rl_user_may_insert().
+
+>=20
+>   432  {
+>   433          struct pblk *pblk =3D container_of(rb, struct pblk, =
+rwb);
+>   434          int flush_done;
+>   435
+>   436          spin_lock(&rb->w_lock);
+>   437          if (!pblk_rl_user_may_insert(&pblk->rl, nr_entries)) {
+>                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> We can have an integer overflow in here so this passes.
+>=20
+>   438                  spin_unlock(&rb->w_lock);
+>   439                  return NVM_IO_REQUEUE;
+>   440          }
+>   441
+>   442          if (!pblk_rb_may_write_flush(rb, nr_entries, pos, bio, =
+&flush_done)) {
+>                     ^^^^^^^^^^^^^^^^^^^^^^^
+> But this check won't pass, so it's harmless.
+
+Exactly. This is related to the above.
+
+>=20
+>   443                  spin_unlock(&rb->w_lock);
+>   444                  return NVM_IO_REQUEUE;
+>   445          }
+>   446
+>   447          pblk_rl_user_in(&pblk->rl, nr_entries);
+>   448          spin_unlock(&rb->w_lock);
+>   449
+>   450          return flush_done;
+>   451  }
+>=20
+
+How do you typically get rid of these "harmless" warnings?
+
+> regards,
+> dan carpenter
+
+Thanks,
+Javier
+
+
+--Apple-Mail=_A203A799-4F03-4604-BE4E-719D68450B58
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJY/dr3AAoJEGMfBTt1mRjKLkEP/jE+/uVk/6qRTWHqM3WXFe9A
+WmAhK+jx0403k4CSjOl4YLeKMD5c43O9/lyg8LOOXKg54uo+t2P0TY9evpD2VeHB
+LPTYoXMTBYI3AZH/AnbQqqUcLgqoFTR+SLQSTYshgW9MW+IJuj6+nmN6E1xWUIxD
+uwNuQ9eIGavsIWMRc84K8dkdkc02JSjkC78FxrYJQk69FcVwTfRvPLJ2D2brLUEA
+nnDjYbmzOzjKsuokc7grdcIpTDOsK/Giwz+2EI1XM1Jgobk6udIvPxoH+CA/kJrc
+iHJLDcdiwsCYnVWLwREJhUIZJBVaYn/6h3xYK1KkY7l1HZXn01AemLDHzyhlcJRI
+OpKO3pIPr+HXNfSIQpchuDYtbnlBGeV6cDfmN5JECJ+CJIsHqUgeCxtlkdhMX98S
+LbxVDITOSCfjv6pok6QMC8PGciGDPI9kDXdH3WR2UcZETjvykOYFG14cur1f4iWv
+PTCI+yRqEpV0zefluFZLwC9GZ6/cemUQFWNndMkBa56o1LAehWdr47mFmIPRYiMy
+Ls1Eln0nUbgJWz6nwDKjWLrrLz0sygoQlW1+61DVsbGPp/B9gn8jQNNxKr6e5Rux
+X+AXrBw6tQxAtse8CMQMZbN/GiMYHEeGuqhOMuzh1HUuF6vrZ3AetLXw87LOj1V9
+fyJWHarAviTMz2iIPA2N
+=l92G
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_A203A799-4F03-4604-BE4E-719D68450B58--
