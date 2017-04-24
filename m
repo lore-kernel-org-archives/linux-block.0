@@ -1,239 +1,83 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f48.google.com ([74.125.83.48]:36521 "EHLO
-        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753080AbdDDQvD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 12:51:03 -0400
-Received: by mail-pg0-f48.google.com with SMTP id g2so155820837pge.3
-        for <linux-block@vger.kernel.org>; Tue, 04 Apr 2017 09:51:03 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 1/5] sbitmap: add sbitmap_get_shallow() operation
-Date: Tue,  4 Apr 2017 09:49:54 -0700
-Message-Id: <6db1464bcdc86191141f4348c1842c51ad216c2a.1491324365.git.osandov@fb.com>
-In-Reply-To: <cover.1491324365.git.osandov@fb.com>
-References: <cover.1491324365.git.osandov@fb.com>
-In-Reply-To: <cover.1491324365.git.osandov@fb.com>
-References: <cover.1491324365.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "osandov@osandov.com" <osandov@osandov.com>
+CC: "hare@suse.com" <hare@suse.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v4 05/10] blk-mq: Unregister debugfs attributes earlier
+Date: Mon, 24 Apr 2017 17:34:46 +0000
+Message-ID: <1493055284.3394.12.camel@sandisk.com>
+References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+	 <20170421234026.18970-6-bart.vanassche@sandisk.com>
+	 <20170424165549.GC28510@vader.DHCP.thefacebook.com>
+	 <1493053923.3394.8.camel@sandisk.com>
+	 <20170424171746.GF28510@vader.DHCP.thefacebook.com>
+	 <1493054652.3394.10.camel@sandisk.com>
+	 <20170424172615.GG28510@vader.DHCP.thefacebook.com>
+	 <20170424172905.GH28510@vader.DHCP.thefacebook.com>
+In-Reply-To: <20170424172905.GH28510@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Mon, 2017-04-24 at 10:29 -0700, Omar Sandoval wrote:
+> On Mon, Apr 24, 2017 at 10:26:15AM -0700, Omar Sandoval wrote:
+> > On Mon, Apr 24, 2017 at 05:24:13PM +0000, Bart Van Assche wrote:
+> > > On Mon, 2017-04-24 at 10:17 -0700, Omar Sandoval wrote:
+> > > > On Mon, Apr 24, 2017 at 05:12:05PM +0000, Bart Van Assche wrote:
+> > > > > On Mon, 2017-04-24 at 09:55 -0700, Omar Sandoval wrote:
+> > > > > > On Fri, Apr 21, 2017 at 04:40:21PM -0700, Bart Van Assche wrote=
+:
+> > > > > > > @@ -566,6 +566,11 @@ void blk_cleanup_queue(struct request_qu=
+eue *q)
+> > > > > > >  	spin_lock_irq(lock);
+> > > > > > >  	if (!q->mq_ops)
+> > > > > > >  		__blk_drain_queue(q, true);
+> > > > > > > +	spin_unlock_irq(lock);
+> > > > > > > +
+> > > > > > > +	blk_mq_debugfs_unregister_mq(q);
+> > > > > > > +
+> > > > > > > +	spin_lock_irq(lock);
+> > > > > > >  	queue_flag_set(QUEUE_FLAG_DEAD, q);
+> > > > > > >  	spin_unlock_irq(lock);
+> > > > > >=20
+> > > > > > Do we actually have to hold the queue lock when we set QUEUE_FL=
+AG_DEAD?
+> > > > >=20
+> > > > > It's way easier to keep that spin_lock()/spin_unlock() pair than =
+to analyze
+> > > > > the block driver core and all block drivers to see whether or not=
+ any
+> > > > > concurrent queue flag changes could occur.
+> > > >=20
+> > > > Ah, I didn't realize that queue_flag_set() did a non-atomic set. I'=
+m
+> > > > wondering if anything bad could happen if something raced between w=
+hen
+> > > > we drop the lock and regrab it. Maybe just move the
+> > > > blk_mq_debugfs_unregister_mq() before we grab the lock the first ti=
+me
+> > > > instead?
+> > >=20
+> > > That would have the disadvantage that debugfs attributes would be unr=
+egistered
+> > > before __blk_drain_queue() is called and hence that these debugfs att=
+ributes
+> > > would not be available to debug hangs in queue draining for tradition=
+al block
+> > > layer queues ...
+> >=20
+> > True, this is probably fine, then.
+>=20
+> Actually, if we drop this lock, then for non-mq, can't we end up with
+> some I/O's sneaking in between when we drain the queue and mark it dead
+> while the lock is dropped?
 
-This operation supports the use case of limiting the number of bits that
-can be allocated for a given operation. Rather than setting aside some
-bits at the end of the bitmap, we can set aside bits in each word of the
-bitmap. This means we can keep the allocation hints spread out and
-support sbitmap_resize() nicely at the cost of lower granularity for the
-allowed depth.
+That's a good question but I don't think so. Queuing new I/O after a queue
+has been marked as "dying" is not allowed. For both blk-sq and blk-mq queue=
+s
+blk_get_request() returns -ENODEV if that function is called after the "dyi=
+ng"
+flag has been set.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- include/linux/sbitmap.h | 55 ++++++++++++++++++++++++++++++++++++
- lib/sbitmap.c           | 75 ++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 123 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index d4e0a204c118..a1904aadbc45 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -176,6 +176,25 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
- int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin);
- 
- /**
-+ * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
-+ * limiting the depth used from each word.
-+ * @sb: Bitmap to allocate from.
-+ * @alloc_hint: Hint for where to start searching for a free bit.
-+ * @shallow_depth: The maximum number of bits to allocate from a single word.
-+ *
-+ * This rather specific operation allows for having multiple users with
-+ * different allocation limits. E.g., there can be a high-priority class that
-+ * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
-+ * with a @shallow_depth of (1 << (@sb->shift - 1)). Then, the low-priority
-+ * class can only allocate half of the total bits in the bitmap, preventing it
-+ * from starving out the high-priority class.
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+int sbitmap_get_shallow(struct sbitmap *sb, unsigned int alloc_hint,
-+			unsigned long shallow_depth);
-+
-+/**
-  * sbitmap_any_bit_set() - Check for a set bit in a &struct sbitmap.
-  * @sb: Bitmap to check.
-  *
-@@ -326,6 +345,19 @@ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth);
- int __sbitmap_queue_get(struct sbitmap_queue *sbq);
- 
- /**
-+ * __sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
-+ * sbitmap_queue, limiting the depth used from each word, with preemption
-+ * already disabled.
-+ * @sbq: Bitmap queue to allocate from.
-+ * @shallow_depth: The maximum number of bits to allocate from a single word.
-+ * See sbitmap_get_shallow().
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+				unsigned int shallow_depth);
-+
-+/**
-  * sbitmap_queue_get() - Try to allocate a free bit from a &struct
-  * sbitmap_queue.
-  * @sbq: Bitmap queue to allocate from.
-@@ -346,6 +378,29 @@ static inline int sbitmap_queue_get(struct sbitmap_queue *sbq,
- }
- 
- /**
-+ * sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
-+ * sbitmap_queue, limiting the depth used from each word.
-+ * @sbq: Bitmap queue to allocate from.
-+ * @cpu: Output parameter; will contain the CPU we ran on (e.g., to be passed to
-+ *       sbitmap_queue_clear()).
-+ * @shallow_depth: The maximum number of bits to allocate from a single word.
-+ * See sbitmap_get_shallow().
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+static inline int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+					    unsigned int *cpu,
-+					    unsigned int shallow_depth)
-+{
-+	int nr;
-+
-+	*cpu = get_cpu();
-+	nr = __sbitmap_queue_get_shallow(sbq, shallow_depth);
-+	put_cpu();
-+	return nr;
-+}
-+
-+/**
-  * sbitmap_queue_clear() - Free an allocated bit and wake up waiters on a
-  * &struct sbitmap_queue.
-  * @sbq: Bitmap to free from.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 60e800e0b5a0..80aa8d5463fa 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -79,15 +79,15 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
- }
- EXPORT_SYMBOL_GPL(sbitmap_resize);
- 
--static int __sbitmap_get_word(struct sbitmap_word *word, unsigned int hint,
--			      bool wrap)
-+static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
-+			      unsigned int hint, bool wrap)
- {
- 	unsigned int orig_hint = hint;
- 	int nr;
- 
- 	while (1) {
--		nr = find_next_zero_bit(&word->word, word->depth, hint);
--		if (unlikely(nr >= word->depth)) {
-+		nr = find_next_zero_bit(word, depth, hint);
-+		if (unlikely(nr >= depth)) {
- 			/*
- 			 * We started with an offset, and we didn't reset the
- 			 * offset to 0 in a failure case, so start from 0 to
-@@ -100,11 +100,11 @@ static int __sbitmap_get_word(struct sbitmap_word *word, unsigned int hint,
- 			return -1;
- 		}
- 
--		if (!test_and_set_bit(nr, &word->word))
-+		if (!test_and_set_bit(nr, word))
- 			break;
- 
- 		hint = nr + 1;
--		if (hint >= word->depth - 1)
-+		if (hint >= depth - 1)
- 			hint = 0;
- 	}
- 
-@@ -119,7 +119,8 @@ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin)
- 	index = SB_NR_TO_INDEX(sb, alloc_hint);
- 
- 	for (i = 0; i < sb->map_nr; i++) {
--		nr = __sbitmap_get_word(&sb->map[index],
-+		nr = __sbitmap_get_word(&sb->map[index].word,
-+					sb->map[index].depth,
- 					SB_NR_TO_BIT(sb, alloc_hint),
- 					!round_robin);
- 		if (nr != -1) {
-@@ -141,6 +142,37 @@ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin)
- }
- EXPORT_SYMBOL_GPL(sbitmap_get);
- 
-+int sbitmap_get_shallow(struct sbitmap *sb, unsigned int alloc_hint,
-+			unsigned long shallow_depth)
-+{
-+	unsigned int i, index;
-+	int nr = -1;
-+
-+	index = SB_NR_TO_INDEX(sb, alloc_hint);
-+
-+	for (i = 0; i < sb->map_nr; i++) {
-+		nr = __sbitmap_get_word(&sb->map[index].word,
-+					min(sb->map[index].depth, shallow_depth),
-+					SB_NR_TO_BIT(sb, alloc_hint), true);
-+		if (nr != -1) {
-+			nr += index << sb->shift;
-+			break;
-+		}
-+
-+		/* Jump to next index. */
-+		index++;
-+		alloc_hint = index << sb->shift;
-+
-+		if (index >= sb->map_nr) {
-+			index = 0;
-+			alloc_hint = 0;
-+		}
-+	}
-+
-+	return nr;
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_get_shallow);
-+
- bool sbitmap_any_bit_set(const struct sbitmap *sb)
- {
- 	unsigned int i;
-@@ -342,6 +374,35 @@ int __sbitmap_queue_get(struct sbitmap_queue *sbq)
- }
- EXPORT_SYMBOL_GPL(__sbitmap_queue_get);
- 
-+int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+				unsigned int shallow_depth)
-+{
-+	unsigned int hint, depth;
-+	int nr;
-+
-+	hint = this_cpu_read(*sbq->alloc_hint);
-+	depth = READ_ONCE(sbq->sb.depth);
-+	if (unlikely(hint >= depth)) {
-+		hint = depth ? prandom_u32() % depth : 0;
-+		this_cpu_write(*sbq->alloc_hint, hint);
-+	}
-+	nr = sbitmap_get_shallow(&sbq->sb, hint, shallow_depth);
-+
-+	if (nr == -1) {
-+		/* If the map is full, a hint won't do us much good. */
-+		this_cpu_write(*sbq->alloc_hint, 0);
-+	} else if (nr == hint || unlikely(sbq->round_robin)) {
-+		/* Only update the hint if we used it. */
-+		hint = nr + 1;
-+		if (hint >= depth - 1)
-+			hint = 0;
-+		this_cpu_write(*sbq->alloc_hint, hint);
-+	}
-+
-+	return nr;
-+}
-+EXPORT_SYMBOL_GPL(__sbitmap_queue_get_shallow);
-+
- static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- {
- 	int i, wake_index;
--- 
-2.12.2
+Bart.=
