@@ -1,48 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:41883 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S967155AbdD1QzA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 12:55:00 -0400
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 5/6] blk-mq-sched: remove hack that bypasses scheduler for reserved requests
-Date: Fri, 28 Apr 2017 10:54:32 -0600
-Message-ID: <1493398473-29872-6-git-send-email-axboe@fb.com>
-In-Reply-To: <1493398473-29872-1-git-send-email-axboe@fb.com>
-References: <1493398473-29872-1-git-send-email-axboe@fb.com>
+Return-Path: <jack@suse.cz>
+Date: Mon, 24 Apr 2017 17:57:55 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
+Subject: Re: [PATCH v3 09/20] 9p: set mapping error when writeback fails in
+ launder_page
+Message-ID: <20170424155755.GJ23988@quack2.suse.cz>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-10-jlayton@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170424132259.8680-10-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-We have update the troublesome driver (mtip32xx) to deal with this
-appropriately. So kill the hack that bypassed scheduler allocation
-and insertion for reserved requests.
+On Mon 24-04-17 09:22:48, Jeff Layton wrote:
+> launder_page is just writeback under the page lock. We still need to
+> mark the mapping for errors there when they occur.
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-mq-sched.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+Looks good. You can add:
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 8b361e192e8a..e79e9f18d7c2 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -82,11 +82,7 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
- 	if (likely(!data->hctx))
- 		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
- 
--	/*
--	 * For a reserved tag, allocate a normal request since we might
--	 * have driver dependencies on the value of the internal tag.
--	 */
--	if (e && !(data->flags & BLK_MQ_REQ_RESERVED)) {
-+	if (e) {
- 		data->flags |= BLK_MQ_REQ_INTERNAL;
- 
- 		/*
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  fs/9p/vfs_addr.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+> index adaf6f6dd858..7af6e6501698 100644
+> --- a/fs/9p/vfs_addr.c
+> +++ b/fs/9p/vfs_addr.c
+> @@ -223,8 +223,11 @@ static int v9fs_launder_page(struct page *page)
+>  	v9fs_fscache_wait_on_page_write(inode, page);
+>  	if (clear_page_dirty_for_io(page)) {
+>  		retval = v9fs_vfs_writepage_locked(page);
+> -		if (retval)
+> +		if (retval) {
+> +			if (retval != -EAGAIN)
+> +				mapping_set_error(page->mapping, retval);
+>  			return retval;
+> +		}
+>  	}
+>  	return 0;
+>  }
+> -- 
+> 2.9.3
+> 
+> 
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
