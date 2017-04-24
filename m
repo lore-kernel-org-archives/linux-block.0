@@ -1,169 +1,27 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v6 01/10] blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
-Date: Wed, 26 Apr 2017 13:47:48 -0700
-Message-ID: <20170426204757.18910-2-bart.vanassche@sandisk.com>
-In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 24 Apr 2017 08:22:23 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
+Subject: Re: [PATCH v3 01/20] mm: drop "wait" parameter from write_one_page
+Message-ID: <20170424152223.GA9112@infradead.org>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-2-jlayton@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170424132259.8680-2-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-A later patch in this series will modify blk_mq_debugfs_register()
-such that it uses q->kobj.parent to determine the name of a
-request queue. Hence make sure that that pointer is initialized
-before blk_mq_debugfs_register() is called. To avoid lock inversion,
-protect sysfs / debugfs registration with the queue sysfs_lock
-instead of the global mutex all_q_mutex.
+Looks fine,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-sysfs.c | 35 ++++++++++++++++++++++++++++-------
- block/blk-mq.h       |  1 +
- block/blk-sysfs.c    |  6 +++---
- 3 files changed, 32 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index d745ab81033a..a2dbb1a48e72 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -253,6 +253,8 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
-+	lockdep_assert_held(&q->sysfs_lock);
-+
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_unregister_hctx(hctx);
- 
-@@ -267,9 +269,9 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
- 
- void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
- {
--	blk_mq_disable_hotplug();
-+	mutex_lock(&q->sysfs_lock);
- 	__blk_mq_unregister_dev(dev, q);
--	blk_mq_enable_hotplug();
-+	mutex_unlock(&q->sysfs_lock);
- }
- 
- void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
-@@ -302,12 +304,13 @@ void blk_mq_sysfs_init(struct request_queue *q)
- 	}
- }
- 
--int blk_mq_register_dev(struct device *dev, struct request_queue *q)
-+int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	int ret, i;
- 
--	blk_mq_disable_hotplug();
-+	WARN_ON_ONCE(!q->kobj.parent);
-+	lockdep_assert_held(&q->sysfs_lock);
- 
- 	ret = kobject_add(&q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
- 	if (ret < 0)
-@@ -327,8 +330,18 @@ int blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 		__blk_mq_unregister_dev(dev, q);
- 	else
- 		q->mq_sysfs_init_done = true;
-+
- out:
--	blk_mq_enable_hotplug();
-+	return ret;
-+}
-+
-+int blk_mq_register_dev(struct device *dev, struct request_queue *q)
-+{
-+	int ret;
-+
-+	mutex_lock(&q->sysfs_lock);
-+	ret = __blk_mq_register_dev(dev, q);
-+	mutex_unlock(&q->sysfs_lock);
- 
- 	return ret;
- }
-@@ -339,13 +352,17 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
-+	mutex_lock(&q->sysfs_lock);
- 	if (!q->mq_sysfs_init_done)
--		return;
-+		goto unlock;
- 
- 	blk_mq_debugfs_unregister_hctxs(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_unregister_hctx(hctx);
-+
-+unlock:
-+	mutex_unlock(&q->sysfs_lock);
- }
- 
- int blk_mq_sysfs_register(struct request_queue *q)
-@@ -353,8 +370,9 @@ int blk_mq_sysfs_register(struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	int i, ret = 0;
- 
-+	mutex_lock(&q->sysfs_lock);
- 	if (!q->mq_sysfs_init_done)
--		return ret;
-+		goto unlock;
- 
- 	blk_mq_debugfs_register_hctxs(q);
- 
-@@ -364,5 +382,8 @@ int blk_mq_sysfs_register(struct request_queue *q)
- 			break;
- 	}
- 
-+unlock:
-+	mutex_unlock(&q->sysfs_lock);
-+
- 	return ret;
- }
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 524f44742816..7d955c756810 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -78,6 +78,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
-  */
- extern void blk_mq_sysfs_init(struct request_queue *q);
- extern void blk_mq_sysfs_deinit(struct request_queue *q);
-+extern int __blk_mq_register_dev(struct device *dev, struct request_queue *q);
- extern int blk_mq_sysfs_register(struct request_queue *q);
- extern void blk_mq_sysfs_unregister(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f85723332288..3f37813ccbaf 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -877,9 +877,6 @@ int blk_register_queue(struct gendisk *disk)
- 	if (ret)
- 		return ret;
- 
--	if (q->mq_ops)
--		blk_mq_register_dev(dev, q);
--
- 	/* Prevent changes through sysfs until registration is completed. */
- 	mutex_lock(&q->sysfs_lock);
- 
-@@ -889,6 +886,9 @@ int blk_register_queue(struct gendisk *disk)
- 		goto unlock;
- 	}
- 
-+	if (q->mq_ops)
-+		__blk_mq_register_dev(dev, q);
-+
- 	kobject_uevent(&q->kobj, KOBJ_ADD);
- 
- 	wbt_enable_default(q);
--- 
-2.12.2
+Reviewed-by: Christoph Hellwig <hch@lst.de>
