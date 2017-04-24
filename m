@@ -1,6 +1,6 @@
-Return-Path: <ross.zwisler@linux.intel.com>
-Date: Mon, 24 Apr 2017 13:16:04 -0600
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Return-Path: <jack@suse.cz>
+Date: Mon, 24 Apr 2017 17:54:16 +0200
+From: Jan Kara <jack@suse.cz>
 To: Jeff Layton <jlayton@redhat.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
@@ -14,7 +14,7 @@ Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
 	tytso@mit.edu, axboe@kernel.dk
 Subject: Re: [PATCH v3 06/20] dax: set errors in mapping when writeback fails
-Message-ID: <20170424191604.GA2884@linux.intel.com>
+Message-ID: <20170424155416.GH23988@quack2.suse.cz>
 References: <20170424132259.8680-1-jlayton@redhat.com>
  <20170424132259.8680-7-jlayton@redhat.com>
 MIME-Version: 1.0
@@ -22,15 +22,30 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170424132259.8680-7-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Apr 24, 2017 at 09:22:45AM -0400, Jeff Layton wrote:
+On Mon 24-04-17 09:22:45, Jeff Layton wrote:
 > In order to get proper error codes from fsync, we must set an error in
 > the mapping range when writeback fails.
 > 
 > Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Works fine in some error injection testing.
+So I'm fine with the change but please expand the changelog to something
+like:
 
-Tested-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+DAX currently doesn't set errors in the mapping when cache flushing fails
+in dax_writeback_mapping_range(). Since this function can get called only
+from fsync(2) or sync(2), this is actually as good as it can currently get
+since we correctly propagate the error up from dax_writeback_mapping_range()
+to filemap_fdatawrite(). However in the future better writeback error
+handling will enable us to properly report these errors on fsync(2) even if
+there are multiple file descriptors open against the file or if sync(2)
+gets called before fsync(2). So convert DAX to using standard error
+reporting through the mapping.
+
+After improving the changelog you can add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
 
 > ---
 >  fs/dax.c | 4 +++-
@@ -55,3 +70,7 @@ Tested-by: Ross Zwisler <ross.zwisler@linux.intel.com>
 > -- 
 > 2.9.3
 > 
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
