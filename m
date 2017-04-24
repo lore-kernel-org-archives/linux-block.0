@@ -1,53 +1,145 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd-general@lists.sourceforge.net,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Subject: [PATCH] nbd: fix use after free on module unload
-Date: Fri, 28 Apr 2017 09:49:19 -0400
-Message-Id: <1493387359-9496-1-git-send-email-jbacik@fb.com>
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 17/20] cifs: cleanup writeback handling errors and comments
+Date: Mon, 24 Apr 2017 09:22:56 -0400
+Message-Id: <20170424132259.8680-18-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
+References: <20170424132259.8680-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-list_for_each_entry() isn't super safe if we're freeing the objects
-while we traverse the list.  Also don't bother taking the extra
-reference, the module refcounting stuff will save us from having anybody
-messing with the device while we're trying to unload.
+Now that writeback errors are handled on a per-file basis using the new
+sequence counter method at the vfs layer, we no longer need to re-set
+errors in the mapping after doing writeback in non-fsync codepaths.
 
-Reported-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Also, fix up some bogus comments.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/block/nbd.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ fs/cifs/cifsfs.c |  4 +---
+ fs/cifs/file.c   |  7 ++-----
+ fs/cifs/inode.c  | 22 +++++++---------------
+ 3 files changed, 10 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 76e5f8f..9a6d34e 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2090,7 +2090,6 @@ static int nbd_exit_cb(int id, void *ptr, void *data)
- 	struct list_head *list = (struct list_head *)data;
- 	struct nbd_device *nbd = ptr;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index dd3f5fabfdf6..017a2d1d02c7 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -829,10 +829,8 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
+ 		if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
+ 		    inode->i_mapping->nrpages != 0) {
+ 			rc = filemap_fdatawait(inode->i_mapping);
+-			if (rc) {
+-				mapping_set_error(inode->i_mapping, rc);
++			if (rc)
+ 				return rc;
+-			}
+ 		}
+ 		/*
+ 		 * Some applications poll for the file length in this strange
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 4b696a23b0b1..9b4f7f182add 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -722,9 +722,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	cinode = CIFS_I(inode);
  
--	refcount_inc(&nbd->refs);
- 	list_add_tail(&nbd->list, list);
- 	return 0;
- }
-@@ -2106,11 +2105,12 @@ static void __exit nbd_cleanup(void)
- 	idr_for_each(&nbd_index_idr, &nbd_exit_cb, &del_list);
- 	mutex_unlock(&nbd_index_mutex);
- 
--	list_for_each_entry(nbd, &del_list, list) {
--		if (refcount_read(&nbd->refs) != 2)
-+	while (!list_empty(&del_list)) {
-+		nbd = list_first_entry(&del_list, struct nbd_device, list);
-+		list_del_init(&nbd->list);
-+		if (refcount_read(&nbd->refs) != 1)
- 			printk(KERN_ERR "nbd: possibly leaking a device\n");
- 		nbd_put(nbd);
--		nbd_put(nbd);
+ 	if (can_flush) {
+-		rc = filemap_write_and_wait(inode->i_mapping);
+-		mapping_set_error(inode->i_mapping, rc);
+-
++		filemap_write_and_wait(inode->i_mapping);
+ 		if (tcon->unix_ext)
+ 			rc = cifs_get_inode_info_unix(&inode, full_path,
+ 						      inode->i_sb, xid);
+@@ -3906,8 +3904,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 			break_lease(inode, O_WRONLY);
+ 		rc = filemap_fdatawrite(inode->i_mapping);
+ 		if (!CIFS_CACHE_READ(cinode)) {
+-			rc = filemap_fdatawait(inode->i_mapping);
+-			mapping_set_error(inode->i_mapping, rc);
++			filemap_fdatawait(inode->i_mapping);
+ 			cifs_zap_mapping(inode);
+ 		}
+ 		cifs_dbg(FYI, "Oplock flush inode %p rc %d\n", inode, rc);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index b261db34103c..a58e605240fc 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -2008,10 +2008,8 @@ int cifs_getattr(const struct path *path, struct kstat *stat,
+ 	if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
+ 	    inode->i_mapping->nrpages != 0) {
+ 		rc = filemap_fdatawait(inode->i_mapping);
+-		if (rc) {
+-			mapping_set_error(inode->i_mapping, rc);
++		if (rc)
+ 			return rc;
+-		}
  	}
  
- 	idr_destroy(&nbd_index_idr);
+ 	rc = cifs_revalidate_dentry_attr(dentry);
+@@ -2171,15 +2169,12 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
+ 	 * Attempt to flush data before changing attributes. We need to do
+ 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
+ 	 * ownership or mode then we may also need to do this. Here, we take
+-	 * the safe way out and just do the flush on all setattr requests. If
+-	 * the flush returns error, store it to report later and continue.
++	 * the safe way out and just do the flush on all setattr requests.
+ 	 *
+ 	 * BB: This should be smarter. Why bother flushing pages that
+-	 * will be truncated anyway? Also, should we error out here if
+-	 * the flush returns error?
++	 * will be truncated anyway?
+ 	 */
+-	rc = filemap_write_and_wait(inode->i_mapping);
+-	mapping_set_error(inode->i_mapping, rc);
++	filemap_write_and_wait(inode->i_mapping);
+ 	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
+@@ -2314,15 +2309,12 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 	 * Attempt to flush data before changing attributes. We need to do
+ 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
+ 	 * ownership or mode then we may also need to do this. Here, we take
+-	 * the safe way out and just do the flush on all setattr requests. If
+-	 * the flush returns error, store it to report later and continue.
++	 * the safe way out and just do the flush on all setattr requests.
+ 	 *
+ 	 * BB: This should be smarter. Why bother flushing pages that
+-	 * will be truncated anyway? Also, should we error out here if
+-	 * the flush returns error?
++	 * will be truncated anyway?
+ 	 */
+-	rc = filemap_write_and_wait(inode->i_mapping);
+-	mapping_set_error(inode->i_mapping, rc);
++	filemap_write_and_wait(inode->i_mapping);
+ 	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
 -- 
-2.7.4
+2.9.3
