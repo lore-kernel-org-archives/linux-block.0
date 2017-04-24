@@ -1,53 +1,64 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>,
-	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>, Adam Manzanares
-	<adam.manzanares@wdc.com>
-Subject: [PATCH 3/5] lightnvm: Use blk_init_request_from_bio() instead of open-coding it
-Date: Tue, 18 Apr 2017 16:10:35 -0700
-Message-ID: <20170418231037.3968-4-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418231037.3968-1-bart.vanassche@sandisk.com>
-References: <20170418231037.3968-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:36253 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S973361AbdDXQQI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Apr 2017 12:16:08 -0400
+Reply-To: jsmart2021@gmail.com
+Subject: Re: [PATCH] lpfc: Fix panic on BFS configuration.
+References: <20170422002404.16027-1-jsmart2021@gmail.com>
+To: linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        sagi@grimberg.me, emilne@redhat.com, jthumshirn@suse.de,
+        linux-block@vger.kernel.org, stable@vger.kernel.org,
+        martin.petersen@oracle.com
+Cc: Dick Kennedy <dick.kennedy@broadcom.com>,
+        James Smart <james.smart@broadcom.com>
+From: James Smart <jsmart2021@gmail.com>
+Message-ID: <4b43a678-2e7e-5543-d0e8-d803f195238b@gmail.com>
+Date: Mon, 24 Apr 2017 09:16:00 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170422002404.16027-1-jsmart2021@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch changes the behavior of the lightnvm driver as follows:
-* REQ_FAILFAST_MASK is set for read-ahead requests.
-* If no I/O priority has been set in the bio, the I/O priority is
-  copied from the I/O context.
-* The rq_disk member is initialized if bio->bi_bdev != NULL.
-* The bio sector offset is copied into req->__sector instead of
-  retaining the value -1 set by blk_mq_alloc_request().
-* req->errors is initialized to zero.
+Please disregard this patch. there is an issue in the fix
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Matias Bjørling <m@bjorling.me>
-Cc: Adam Manzanares <adam.manzanares@wdc.com>
----
- drivers/nvme/host/lightnvm.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+-- james
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 4b78090518e1..b76e2e36fef4 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -511,11 +511,7 @@ static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
- 	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
- 
- 	if (bio) {
--		rq->ioprio = bio_prio(bio);
--		rq->__data_len = bio->bi_iter.bi_size;
--		rq->bio = rq->biotail = bio;
--		if (bio_has_data(bio))
--			rq->nr_phys_segments = bio_phys_segments(q, bio);
-+		blk_init_request_from_bio(rq, bio);
- 	} else {
- 		rq->ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_NORM);
- 		rq->__data_len = 0;
--- 
-2.12.2
+
+On 4/21/2017 5:24 PM, jsmart2021@gmail.com wrote:
+> From: James Smart <jsmart2021@gmail.com>
+>
+> To select the appropriate shost template, the driver is issuing
+> a mailbox command to retrieve the wwn. Turns out the sending of
+> the command precedes the reset of the function.  On SLI-4 adapters,
+> this is inconsequential as the mailbox command location is specified
+> by dma via the BMBX register. However, on SLI-3 adapters, the
+> location of the mailbox command submission area changes. When the
+> function is first powered on or reset, the cmd is submitted via PCI
+> bar memory. Later the driver changes the function config to use
+> host memory and DMA. The request to start a mailbox command is the
+> same, a simple doorbell write, regardless of submission area.
+> So.. if there has not been a boot driver run against the adapter,
+> the mailbox command works as defaults are ok. But, if the boot
+> driver has configured the card and, and if no platform pci
+> function/slot reset occurs as the os starts, the mailbox command
+> will fail. The SLI-3 device will use the stale boot driver dma
+> location. This can cause PCI eeh errors.
+>
+> Fix is to reset the sli-3 function before sending the
+> mailbox command, thus synchronizing the function/driver on mailbox
+> location.
+>
+> This issue was introduced by this patch:
+> http://www.spinics.net/lists/linux-scsi/msg105908.html
+> which is in the stable pools with commit id:
+> 96418b5e2c8867da3279d877f5d1ffabfe460c3d
+>
+> This patch needs to be applied to the stable trees where ever the
+> introducing patch exists.
+>
+> Signed-off-by: Dick Kennedy <dick.kennedy@broadcom.com>
+> Signed-off-by: James Smart <james.smart@broadcom.com>
+> Cc: stable@vger.kernel.org
