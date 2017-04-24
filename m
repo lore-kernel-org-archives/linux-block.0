@@ -1,33 +1,28 @@
-Return-Path: <hubcap@omnibond.com>
+Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 24 Apr 2017 08:23:48 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
+Subject: Re: [PATCH v3 05/20] orangefs: don't call filemap_write_and_wait
+ from fsync
+Message-ID: <20170424152348.GE9112@infradead.org>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-6-jlayton@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170424152348.GE9112@infradead.org>
-References: <20170424132259.8680-1-jlayton@redhat.com> <20170424132259.8680-6-jlayton@redhat.com>
- <20170424152348.GE9112@infradead.org>
-From: Mike Marshall <hubcap@omnibond.com>
-Date: Mon, 24 Apr 2017 14:18:41 -0400
-Message-ID: <CAOg9mSQPqSVLXqovLiezKycWJ+U2J1UZJ0tO2p8TeKh8WP2S2g@mail.gmail.com>
-Subject: Re: [PATCH v3 05/20] orangefs: don't call filemap_write_and_wait from fsync
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jeff Layton <jlayton@redhat.com>, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>, linux-btrfs@vger.kernel.org,
-	Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-cifs@vger.kernel.org,
-	linux-mm <linux-mm@kvack.org>, jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net, v9fs-developer@lists.sourceforge.net,
-	osd-dev@open-osd.org, linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Matthew Wilcox <mawilcox@microsoft.com>, jack@suse.com, Al Viro <viro@zeniv.linux.org.uk>,
-	corbet@lwn.net, neilb@suse.de, Chris Mason <clm@fb.com>, "Theodore Ts'o" <tytso@mit.edu>,
-	Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170424132259.8680-6-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-I've been running it here...
+Looks fine,
 
-Acked-by: Mike Marshall <hubcap@omnibond.com>
-
-On Mon, Apr 24, 2017 at 11:23 AM, Christoph Hellwig <hch@infradead.org> wrote:
-> Looks fine,
->
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
