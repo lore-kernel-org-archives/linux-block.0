@@ -1,6 +1,6 @@
-Return-Path: <jack@suse.cz>
-Date: Mon, 24 Apr 2017 17:57:55 +0200
-From: Jan Kara <jack@suse.cz>
+Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 24 Apr 2017 08:24:55 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: Jeff Layton <jlayton@redhat.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
@@ -15,7 +15,7 @@ Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	tytso@mit.edu, axboe@kernel.dk
 Subject: Re: [PATCH v3 09/20] 9p: set mapping error when writeback fails in
  launder_page
-Message-ID: <20170424155755.GJ23988@quack2.suse.cz>
+Message-ID: <20170424152455.GI9112@infradead.org>
 References: <20170424132259.8680-1-jlayton@redhat.com>
  <20170424132259.8680-10-jlayton@redhat.com>
 MIME-Version: 1.0
@@ -23,43 +23,12 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170424132259.8680-10-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon 24-04-17 09:22:48, Jeff Layton wrote:
+On Mon, Apr 24, 2017 at 09:22:48AM -0400, Jeff Layton wrote:
 > launder_page is just writeback under the page lock. We still need to
 > mark the mapping for errors there when they occur.
 > 
 > Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Looks good. You can add:
+Looks fine,
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/9p/vfs_addr.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-> index adaf6f6dd858..7af6e6501698 100644
-> --- a/fs/9p/vfs_addr.c
-> +++ b/fs/9p/vfs_addr.c
-> @@ -223,8 +223,11 @@ static int v9fs_launder_page(struct page *page)
->  	v9fs_fscache_wait_on_page_write(inode, page);
->  	if (clear_page_dirty_for_io(page)) {
->  		retval = v9fs_vfs_writepage_locked(page);
-> -		if (retval)
-> +		if (retval) {
-> +			if (retval != -EAGAIN)
-> +				mapping_set_error(page->mapping, retval);
->  			return retval;
-> +		}
->  	}
->  	return 0;
->  }
-> -- 
-> 2.9.3
-> 
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Reviewed-by: Christoph Hellwig <hch@lst.de>
