@@ -1,28 +1,62 @@
-Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Mon, 24 Apr 2017 08:24:38 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
-	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
-	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
-	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
-	tytso@mit.edu, axboe@kernel.dk
-Subject: Re: [PATCH v3 08/20] mm: ensure that we set mapping error if
- writeout() fails
-Message-ID: <20170424152438.GH9112@infradead.org>
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 08/20] mm: ensure that we set mapping error if writeout() fails
+Date: Mon, 24 Apr 2017 09:22:47 -0400
+Message-Id: <20170424132259.8680-9-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
 References: <20170424132259.8680-1-jlayton@redhat.com>
- <20170424132259.8680-9-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170424132259.8680-9-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
+If writepage fails during a page migration, then we need to ensure that
+fsync will see it by flagging the mapping.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ mm/migrate.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/mm/migrate.c b/mm/migrate.c
+index 738f1d5f8350..3a59830bdae2 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -792,7 +792,11 @@ static int writeout(struct address_space *mapping, struct page *page)
+ 		/* unlocked. Relock */
+ 		lock_page(page);
+ 
+-	return (rc < 0) ? -EIO : -EAGAIN;
++	if (rc < 0) {
++		mapping_set_error(mapping, rc);
++		return -EIO;
++	}
++	return -EAGAIN;
+ }
+ 
+ /*
+-- 
+2.9.3
