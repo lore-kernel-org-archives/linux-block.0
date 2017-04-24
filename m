@@ -1,102 +1,86 @@
-Return-Path: <BATV+245451ebeca5033ceab8+4986+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@bombadil.infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	Christoph Hellwig <hch@lst.de>
-Subject: mtip32xx: add a status field to struct mtip_cmd
-Date: Tue, 18 Apr 2017 08:52:19 -0700
-Message-Id: <20170418155229.5977-14-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: Christoph Hellwig <hch@infradead.org>
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 18/20] mm: clean up error handling in write_one_page
+Date: Mon, 24 Apr 2017 09:22:57 -0400
+Message-Id: <20170424132259.8680-19-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
+References: <20170424132259.8680-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+Don't try to check PageError since that's potentially racy and not
+necessarily going to be set after writepage errors out.
 
-Instead of using req->errors, which will go away.
+Instead, sample the mapping error early on, and use that value to tell
+us whether we got a writeback error since then.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 16 +++++++++-------
- drivers/block/mtip32xx/mtip32xx.h |  1 +
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ mm/page-writeback.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 05e3e664ea1b..7406de29db58 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -241,7 +241,8 @@ static void mtip_async_complete(struct mtip_port *port,
- 
- 	rq = mtip_rq_from_tag(dd, tag);
- 
--	blk_mq_complete_request(rq, status);
-+	cmd->status = status;
-+	blk_mq_complete_request(rq, 0);
- }
- 
- /*
-@@ -2910,18 +2911,19 @@ static void mtip_softirq_done_fn(struct request *rq)
- 	if (unlikely(cmd->unaligned))
- 		up(&dd->port->cmd_slot_unal);
- 
--	blk_mq_end_request(rq, rq->errors);
-+	blk_mq_end_request(rq, cmd->status);
- }
- 
- static void mtip_abort_cmd(struct request *req, void *data,
- 							bool reserved)
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index de0dbf12e2c1..1643456881b4 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2373,11 +2373,12 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
+ int write_one_page(struct page *page)
  {
-+	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
- 	struct driver_data *dd = data;
+ 	struct address_space *mapping = page->mapping;
+-	int ret = 0;
++	int ret = 0, ret2;
+ 	struct writeback_control wbc = {
+ 		.sync_mode = WB_SYNC_ALL,
+ 		.nr_to_write = 1,
+ 	};
++	errseq_t since = filemap_sample_wb_error(mapping);
  
- 	dbg_printk(MTIP_DRV_NAME " Aborting request, tag = %d\n", req->tag);
+ 	BUG_ON(!PageLocked(page));
  
- 	clear_bit(req->tag, dd->port->cmds_to_issue);
--	req->errors = -EIO;
-+	cmd->status = -EIO;
- 	mtip_softirq_done_fn(req);
+@@ -2386,16 +2387,14 @@ int write_one_page(struct page *page)
+ 	if (clear_page_dirty_for_io(page)) {
+ 		get_page(page);
+ 		ret = mapping->a_ops->writepage(page, &wbc);
+-		if (ret == 0) {
++		if (ret == 0)
+ 			wait_on_page_writeback(page);
+-			if (PageError(page))
+-				ret = -EIO;
+-		}
+ 		put_page(page);
+ 	} else {
+ 		unlock_page(page);
+ 	}
+-	return ret;
++	ret2 = filemap_check_wb_error(mapping, since);
++	return ret ? : ret2;
  }
+ EXPORT_SYMBOL(write_one_page);
  
-@@ -3816,7 +3818,6 @@ static int mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (likely(!ret))
- 		return BLK_MQ_RQ_QUEUE_OK;
- 
--	rq->errors = ret;
- 	return BLK_MQ_RQ_QUEUE_ERROR;
- }
- 
-@@ -4106,9 +4107,10 @@ static void mtip_no_dev_cleanup(struct request *rq, void *data, bool reserv)
- 	struct driver_data *dd = (struct driver_data *)data;
- 	struct mtip_cmd *cmd;
- 
--	if (likely(!reserv))
--		blk_mq_complete_request(rq, -ENODEV);
--	else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
-+	if (likely(!reserv)) {
-+		cmd->status = -ENODEV;
-+		blk_mq_complete_request(rq, 0);
-+	} else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
- 
- 		cmd = mtip_cmd_from_tag(dd, MTIP_TAG_INTERNAL);
- 		if (cmd->comp_func)
-diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-index 7617888f7944..57b41528a824 100644
---- a/drivers/block/mtip32xx/mtip32xx.h
-+++ b/drivers/block/mtip32xx/mtip32xx.h
-@@ -352,6 +352,7 @@ struct mtip_cmd {
- 	int retries; /* The number of retries left for this command. */
- 
- 	int direction; /* Data transfer direction */
-+	int status;
- };
- 
- /* Structure used to describe a port. */
 -- 
-2.11.0
+2.9.3
