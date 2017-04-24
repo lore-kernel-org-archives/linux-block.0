@@ -1,64 +1,111 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v6 07/10] blk-mq: Make blk_flags_show() callers append a newline character
-Date: Wed, 26 Apr 2017 13:47:54 -0700
-Message-ID: <20170426204757.18910-8-bart.vanassche@sandisk.com>
-In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <jlayton@redhat.com>
+Return-Path: <jlayton@redhat.com>
+Message-ID: <1493056356.2895.19.camel@redhat.com>
+Subject: Re: [PATCH v3 20/20] gfs2: clean up some filemap_* calls
+From: Jeff Layton <jlayton@redhat.com>
+To: Bob Peterson <rpeterso@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+ jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+ cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+ v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+ linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+ dhowells@redhat.com,  akpm@linux-foundation.org, hch@infradead.org, ross
+ zwisler <ross.zwisler@linux.intel.com>, mawilcox@microsoft.com,
+ jack@suse.com,  viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de,
+ clm@fb.com, tytso@mit.edu,  axboe@kernel.dk
+Date: Mon, 24 Apr 2017 13:52:36 -0400
+In-Reply-To: <2092108386.509535.1493055674293.JavaMail.zimbra@redhat.com>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+	 <20170424132259.8680-21-jlayton@redhat.com>
+	 <2139341349.405174.1493043175630.JavaMail.zimbra@redhat.com>
+	 <1493053143.2895.15.camel@redhat.com>
+	 <2092108386.509535.1493055674293.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes it possible
-to produce a single line of output with multiple flag-to-name
-translations.
+On Mon, 2017-04-24 at 13:41 -0400, Bob Peterson wrote:
+> Hi,
+> 
+> ----- Original Message -----
+> > On Mon, 2017-04-24 at 10:12 -0400, Bob Peterson wrote:
+> > > > +	filemap_write_and_wait_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
+> > > 
+> > > This should probably have "error = ", no?
+> > > 
+> > 
+> > This error is discarded in the current code after resetting the error in
+> > the mapping. With the earlier patches in this set we don't need to reset
+> > the error like this anymore.
+> > 
+> > Now, if this code should doing something else with those errors, then
+> > that's a separate problem.
+> 
+> Okay, I see. My bad.
+>  
+> > > >  	gfs2_ail_empty_gl(gl);
+> > > >  
+> > > >  	spin_lock(&gl->gl_lockref.lock);
+> > > > @@ -225,12 +223,10 @@ static void inode_go_sync(struct gfs2_glock *gl)
+> > > >  	filemap_fdatawrite(metamapping);
+> > > >  	if (ip) {
+> > > >  		struct address_space *mapping = ip->i_inode.i_mapping;
+> > > > -		filemap_fdatawrite(mapping);
+> > > > -		error = filemap_fdatawait(mapping);
+> > > > -		mapping_set_error(mapping, error);
+> > > > +		filemap_write_and_wait(mapping);
+> > > > +	} else {
+> > > > +		filemap_fdatawait(metamapping);
+> > > >  	}
+> > > > -	error = filemap_fdatawait(metamapping);
+> > > > -	mapping_set_error(metamapping, error);
+> > > 
+> > > This part doesn't look right at all. There's a big difference in gfs2
+> > > between
+> > > mapping and metamapping. We need to wait for metamapping regardless.
+> > > 
+> > 
+> > ...and this should wait. Basically, filemap_write_and_wait does
+> > filemap_fdatawrite and then filemap_fdatawait. This is mostly just
+> > replacing the existing code with a more concise helper.
+> 
+> But this isn't a simple replacement with a helper. This is two different
+> address spaces (mapping and metamapping) and you added an else in there.
+> 
+> So with this patch metamapping gets written, and if there's an ip,
+> mapping gets written but it doesn't wait for metamapping. Unless
+> I'm missing something.
+> 
+> You could replace both filemap_fdatawrites with the helper instead.
+> Today's code is structured as:
+> 
+> (a) write metamapping
+> if (ip)
+>     (b) write mapping
+>     (c) wait for mapping
+> (d) wait for metamapping
+> 
+> If you use the helper for both, it becomes, (a & d)(b & c) which is probably
+> acceptable. (I think we just tried to optimize what the elevator was doing).
+> 
+> But the way you've got it coded here still looks wrong. It looks like:
+> (a)
+> if (ip)
+>    (b & c)
+> ELSE -
+>    (d)
+> 
+> So (d) (metamapping) isn't guaranteed to be synced at the end of the function.
+> Of course, you know the modified helper functions better than I do.
+> What am I missing?
+> 
+> 
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+<facepalm>
+You're right of course. I'll fix that up in my tree.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 1132be4e9c1c..ccc7b0f71230 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -60,7 +60,6 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 		else
- 			seq_printf(m, "%d", i);
- 	}
--	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -102,6 +101,7 @@ static int blk_queue_flags_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, q->queue_flags, blk_queue_flag_name,
- 		       ARRAY_SIZE(blk_queue_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -193,6 +193,7 @@ static int hctx_state_show(struct seq_file *m, void *v)
- 
- 	blk_flags_show(m, hctx->state, hctx_state_name,
- 		       ARRAY_SIZE(hctx_state_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
-@@ -236,6 +237,7 @@ static int hctx_flags_show(struct seq_file *m, void *v)
- 	blk_flags_show(m,
- 		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
- 		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
+Thanks!
 -- 
-2.12.2
+Jeff Layton <jlayton@redhat.com>
