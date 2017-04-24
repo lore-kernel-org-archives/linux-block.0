@@ -1,67 +1,67 @@
-Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Mon, 24 Apr 2017 08:27:08 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
-	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
-	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
-	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
-	tytso@mit.edu, axboe@kernel.dk
-Subject: Re: [PATCH v3 11/20] cifs: set mapping error when page writeback
- fails in writepage or launder_pages
-Message-ID: <20170424152708.GK9112@infradead.org>
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 11/20] cifs: set mapping error when page writeback fails in writepage or launder_pages
+Date: Mon, 24 Apr 2017 09:22:50 -0400
+Message-Id: <20170424132259.8680-12-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
 References: <20170424132259.8680-1-jlayton@redhat.com>
- <20170424132259.8680-12-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170424132259.8680-12-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Apr 24, 2017 at 09:22:50AM -0400, Jeff Layton wrote:
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> ---
->  fs/cifs/file.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 21d404535739..4b696a23b0b1 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2234,14 +2234,16 @@ cifs_writepage_locked(struct page *page, struct writeback_control *wbc)
->  	set_page_writeback(page);
->  retry_write:
->  	rc = cifs_partialpagewrite(page, 0, PAGE_SIZE);
-> +	if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL) {
->  		goto retry_write;
-> +	} else if (rc == -EAGAIN) {
->  		redirty_page_for_writepage(wbc, page);
-> +	} else if (rc != 0) {
->  		SetPageError(page);
-> +		mapping_set_error(page->mapping, rc);
-> +	} else {
->  		SetPageUptodate(page);
-> +	}
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ fs/cifs/file.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Hmmm.  I might be a little too nitpicky, but I hate having the same
-partial condition duplicated if possible.  Why not:
-
-	if (rc == -EAGAIN) {
-		if (wbc->sync_mode == WB_SYNC_ALL)
-			goto retry_write;
-		redirty_page_for_writepage(wbc, page);
-	} else if (rc) {
-		SetPageError(page);
-		mapping_set_error(page->mapping, rc);
-	} else {
-		SetPageUptodate(page);
-	}
-
-Otherwise this looks fine to me:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 21d404535739..4b696a23b0b1 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2234,14 +2234,16 @@ cifs_writepage_locked(struct page *page, struct writeback_control *wbc)
+ 	set_page_writeback(page);
+ retry_write:
+ 	rc = cifs_partialpagewrite(page, 0, PAGE_SIZE);
+-	if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL)
++	if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL) {
+ 		goto retry_write;
+-	else if (rc == -EAGAIN)
++	} else if (rc == -EAGAIN) {
+ 		redirty_page_for_writepage(wbc, page);
+-	else if (rc != 0)
++	} else if (rc != 0) {
+ 		SetPageError(page);
+-	else
++		mapping_set_error(page->mapping, rc);
++	} else {
+ 		SetPageUptodate(page);
++	}
+ 	end_page_writeback(page);
+ 	put_page(page);
+ 	free_xid(xid);
+-- 
+2.9.3
