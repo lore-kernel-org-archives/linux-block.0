@@ -1,28 +1,57 @@
-Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Mon, 24 Apr 2017 08:22:50 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
-	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
-	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
-	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
-	tytso@mit.edu, axboe@kernel.dk
-Subject: Re: [PATCH v3 03/20] buffer: use mapping_set_error instead of
- setting the flag
-Message-ID: <20170424152250.GC9112@infradead.org>
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 03/20] buffer: use mapping_set_error instead of setting the flag
+Date: Mon, 24 Apr 2017 09:22:42 -0400
+Message-Id: <20170424132259.8680-4-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
 References: <20170424132259.8680-1-jlayton@redhat.com>
- <20170424132259.8680-4-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170424132259.8680-4-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+---
+ fs/buffer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 9196f2a270da..70638941066d 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -483,7 +483,7 @@ static void __remove_assoc_queue(struct buffer_head *bh)
+ 	list_del_init(&bh->b_assoc_buffers);
+ 	WARN_ON(!bh->b_assoc_map);
+ 	if (buffer_write_io_error(bh))
+-		set_bit(AS_EIO, &bh->b_assoc_map->flags);
++		mapping_set_error(bh->b_assoc_map, -EIO);
+ 	bh->b_assoc_map = NULL;
+ }
+ 
+-- 
+2.9.3
