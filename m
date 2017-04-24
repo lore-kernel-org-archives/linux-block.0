@@ -1,29 +1,77 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>,
-        <linux-scsi@vger.kernel.org>
+Return-Path: <hare@suse.com>
 Subject: Re: [PATCH v4 10/10] scsi: Implement blk_mq_ops.show_rq()
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
 References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
-	<20170421234026.18970-11-bart.vanassche@sandisk.com>
-Date: Mon, 24 Apr 2017 17:35:08 -0400
-In-Reply-To: <20170421234026.18970-11-bart.vanassche@sandisk.com> (Bart Van
-	Assche's message of "Fri, 21 Apr 2017 16:40:26 -0700")
-Message-ID: <yq1k269ij5f.fsf@oracle.com>
+ <20170421234026.18970-11-bart.vanassche@sandisk.com>
+Cc: linux-block@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ Omar Sandoval <osandov@fb.com>, linux-scsi@vger.kernel.org
+From: Hannes Reinecke <hare@suse.com>
+Message-ID: <39275522-8046-bf48-a0da-d3b693b699e2@suse.com>
+Date: Mon, 24 Apr 2017 09:35:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170421234026.18970-11-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-
-Bart,
-
+On 04/22/2017 01:40 AM, Bart Van Assche wrote:
 > Show the SCSI CDB, .eh_eflags and .result for pending SCSI commands
 > in /sys/kernel/debug/block/*/mq/*/dispatch and */rq_list.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: <linux-scsi@vger.kernel.org>
+> ---
+>  drivers/scsi/scsi_lib.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 4a20e6098f7c..90bb269042df 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -2125,6 +2125,16 @@ static void scsi_exit_rq(struct request_queue *q, struct request *rq)
+>  	scsi_free_sense_buffer(shost, cmd->sense_buffer);
+>  }
+>  
+> +static void scsi_show_rq(struct seq_file *m, struct request *rq)
+> +{
+> +	struct scsi_cmnd *cmd = container_of(scsi_req(rq), typeof(*cmd), req);
+> +	unsigned int i;
+> +
+> +	seq_puts(m, ", .cmd =");
+> +	for (i = 0; i < cmd->cmd_len; i++)
+> +		seq_printf(m, " %02x", cmd->cmnd[i]);
+> +}
+> +
+>  struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
+>  {
+>  	struct Scsi_Host *shost = sdev->host;
+> @@ -2157,6 +2167,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
+>  	.queue_rq	= scsi_queue_rq,
+>  	.complete	= scsi_softirq_done,
+>  	.timeout	= scsi_timeout,
+> +	.show_rq	= scsi_show_rq,
+>  	.init_request	= scsi_init_request,
+>  	.exit_request	= scsi_exit_request,
+>  	.map_queues	= scsi_map_queues,
+> 
+Hmm. Can't say I'm happy with this callback.
+And I really would like to see a similar implementation for NVMe.
 
-Why not use SCSI tracing if you are interested in these?
+But if others agree:
 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Dr. Hannes Reinecke		               zSeries & Storage
+hare@suse.com			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
