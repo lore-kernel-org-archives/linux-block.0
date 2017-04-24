@@ -1,69 +1,83 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH] blk-mq: Remove blk_mq_sched_move_to_dispatch()
-Date: Thu, 20 Apr 2017 16:25:19 -0700
-Message-ID: <20170420232519.19906-1-bart.vanassche@sandisk.com>
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Javier =?utf-8?Q?Gonz=C3=A1lez?= <jg@lightnvm.io>
+Date: Mon, 24 Apr 2017 12:32:04 +1000
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/11] blk: remove bio_set arg from blk_queue_split()
+In-Reply-To: <F684F05A-679F-4704-A70E-7C1EE92B83E7@lightnvm.io>
+References: <149266645258.27388.14083229348123176454.stgit@noble> <149266672835.27388.5719138070560521601.stgit@noble> <F684F05A-679F-4704-A70E-7C1EE92B83E7@lightnvm.io>
+Message-ID: <87efwir0wr.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
 
-commit c13660a08c8b ("blk-mq-sched: change ->dispatch_requests()
-to ->dispatch_request()") removed the last user of this function.
-Hence also remove the function itself.
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-sched.c | 16 ----------------
- block/blk-mq-sched.h |  3 ---
- 2 files changed, 19 deletions(-)
+On Sat, Apr 22 2017, Javier Gonz=C3=A1lez wrote:
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 9e3c0f92851b..e79e9f18d7c2 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -190,22 +190,6 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	}
- }
- 
--void blk_mq_sched_move_to_dispatch(struct blk_mq_hw_ctx *hctx,
--				   struct list_head *rq_list,
--				   struct request *(*get_rq)(struct blk_mq_hw_ctx *))
--{
--	do {
--		struct request *rq;
--
--		rq = get_rq(hctx);
--		if (!rq)
--			break;
--
--		list_add_tail(&rq->queuelist, rq_list);
--	} while (1);
--}
--EXPORT_SYMBOL_GPL(blk_mq_sched_move_to_dispatch);
--
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- 			    struct request **merged_request)
- {
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 120c6abc37cc..edafb5383b7b 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -24,9 +24,6 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 				  struct list_head *list, bool run_queue_async);
- 
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
--void blk_mq_sched_move_to_dispatch(struct blk_mq_hw_ctx *hctx,
--			struct list_head *rq_list,
--			struct request *(*get_rq)(struct blk_mq_hw_ctx *));
- 
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
- void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
--- 
-2.12.2
+>> On 20 Apr 2017, at 07.38, NeilBrown <neilb@suse.com> wrote:
+>>=20
+>> blk_queue_split() is always called with the last arg being q->bio_split,
+>> where 'q' is the first arg.
+>>=20
+>> Also blk_queue_split() sometimes uses the passed-in 'bs' and sometimes u=
+ses
+>> q->bio_split.
+>>=20
+>> This is inconsistent and unnecessary.  Remove the last arg and always use
+>> q->bio_split inside blk_queue_split()
+>>=20
+>> Signed-off-by: NeilBrown <neilb@suse.com>
+>> ---
+>> block/blk-core.c              |    2 +-
+>> block/blk-merge.c             |    9 ++++-----
+>> block/blk-mq.c                |    2 +-
+>> drivers/block/drbd/drbd_req.c |    2 +-
+>> drivers/block/pktcdvd.c       |    2 +-
+>> drivers/block/ps3vram.c       |    2 +-
+>> drivers/block/rsxx/dev.c      |    2 +-
+>> drivers/block/umem.c          |    2 +-
+>> drivers/block/zram/zram_drv.c |    2 +-
+>> drivers/lightnvm/rrpc.c       |    2 +-
+>> drivers/md/md.c               |    2 +-
+>> drivers/s390/block/dcssblk.c  |    2 +-
+>> drivers/s390/block/xpram.c    |    2 +-
+>> include/linux/blkdev.h        |    3 +--
+>> 14 files changed, 17 insertions(+), 19 deletions(-)
+>>=20
+>
+> It most probably made it to Jens' tree after you made these changes, but
+> in drivers/lightnvm/pblk-init.c we also use blk_queue_split() in a
+> couple of places inside pblk_rw_io().
+
+Ahh, yes - thanks.  That will need to same small change.
+
+Jens, do you prefer a resend, or and update patch, or to just add this
+change manually?
+
+Thanks,
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlj9Y6QACgkQOeye3VZi
+gbk7cRAAmk6dBewV28tJFa3ov4+APE+XHElJVDbDMz2CL77990kTMsDGvAfLn5no
+FjU2k/94p/45gYVb+avqUiwRWQoh6WQDZHt6b0hFPhhf75yWbwdYaGtrPHGlco5+
+Wb6WEvqKtA4AvTbFOaq6Je3mw49TKAAyQ14k4GL+3Ac0BVLXfS0FMY89jEJ6jP3i
+8Uh+VS48SWMWZWoZTLlheKrtLObf37AoHqbTwXVSbcGIzAF4UZpO9ViKZpm8bh79
+ufQWYuWZlXsceyEQt1syoWROiLER1oaLrO9XSobPhzqH3gEppqhUZ/Klim87KaLR
+e+gJZWR8pFi7LvKFWClKhpr/rcFToFlx815SMdz1yK44hlmzPmMj9xy6SAsxWg12
+XI6IFqGrRQu/wVV5kvszJclpIp7ZSeDnJrKlmkMeuwtiGQPbXyLt5dl4s6/0lVl/
+UcgTeALsc5fvxnLk2kHCyPdKgSBFDy5uXwJuoxqPlXryfPEeSDB61ZJ9ZbpA4JJz
+eVrbizmowqBDFmPnmGYK/ZYAcv09RFTmZsM/LhmyrDCkTnQoX7Kmr6z0FJI6OyBZ
+9NDg0JMBNHZQZ/R8itSGufgrMgL/xKXR+k+F5BUIbGA1qhJt8m+Rt/fkU4japAsT
+8fPHCBJXGk7q7XXYqatOPRqylpxFnEL4xKGcTRm9QcnBIYLwZ+o=
+=yXDS
+-----END PGP SIGNATURE-----
+--=-=-=--
