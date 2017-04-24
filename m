@@ -1,113 +1,33 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk
-Subject: [PATCH v3 20/20] gfs2: clean up some filemap_* calls
-Date: Mon, 24 Apr 2017 09:22:59 -0400
-Message-Id: <20170424132259.8680-21-jlayton@redhat.com>
-In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
-References: <20170424132259.8680-1-jlayton@redhat.com>
+Return-Path: <hubcap@omnibond.com>
+MIME-Version: 1.0
+In-Reply-To: <20170424152348.GE9112@infradead.org>
+References: <20170424132259.8680-1-jlayton@redhat.com> <20170424132259.8680-6-jlayton@redhat.com>
+ <20170424152348.GE9112@infradead.org>
+From: Mike Marshall <hubcap@omnibond.com>
+Date: Mon, 24 Apr 2017 14:18:41 -0400
+Message-ID: <CAOg9mSQPqSVLXqovLiezKycWJ+U2J1UZJ0tO2p8TeKh8WP2S2g@mail.gmail.com>
+Subject: Re: [PATCH v3 05/20] orangefs: don't call filemap_write_and_wait from fsync
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jeff Layton <jlayton@redhat.com>, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>, linux-btrfs@vger.kernel.org,
+	Ext4 Developers List <linux-ext4@vger.kernel.org>, linux-cifs@vger.kernel.org,
+	linux-mm <linux-mm@kvack.org>, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net, v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org, linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Matthew Wilcox <mawilcox@microsoft.com>, jack@suse.com, Al Viro <viro@zeniv.linux.org.uk>,
+	corbet@lwn.net, neilb@suse.de, Chris Mason <clm@fb.com>, "Theodore Ts'o" <tytso@mit.edu>,
+	Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-In some places, it's trying to reset the mapping error after calling
-filemap_fdatawait. That's no longer required. Also, turn several
-filemap_fdatawrite+filemap_fdatawait calls into filemap_write_and_wait.
-That will at least return writeback errors that occur during the write
-phase.
+I've been running it here...
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/gfs2/glops.c | 12 ++++--------
- fs/gfs2/lops.c  |  4 +---
- fs/gfs2/super.c |  6 ++----
- 3 files changed, 7 insertions(+), 15 deletions(-)
+Acked-by: Mike Marshall <hubcap@omnibond.com>
 
-diff --git a/fs/gfs2/glops.c b/fs/gfs2/glops.c
-index 5db59d444838..7362d19fdc4c 100644
---- a/fs/gfs2/glops.c
-+++ b/fs/gfs2/glops.c
-@@ -158,9 +158,7 @@ static void rgrp_go_sync(struct gfs2_glock *gl)
- 	GLOCK_BUG_ON(gl, gl->gl_state != LM_ST_EXCLUSIVE);
- 
- 	gfs2_log_flush(sdp, gl, NORMAL_FLUSH);
--	filemap_fdatawrite_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
--	error = filemap_fdatawait_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
--	mapping_set_error(mapping, error);
-+	filemap_write_and_wait_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
- 	gfs2_ail_empty_gl(gl);
- 
- 	spin_lock(&gl->gl_lockref.lock);
-@@ -225,12 +223,10 @@ static void inode_go_sync(struct gfs2_glock *gl)
- 	filemap_fdatawrite(metamapping);
- 	if (ip) {
- 		struct address_space *mapping = ip->i_inode.i_mapping;
--		filemap_fdatawrite(mapping);
--		error = filemap_fdatawait(mapping);
--		mapping_set_error(mapping, error);
-+		filemap_write_and_wait(mapping);
-+	} else {
-+		filemap_fdatawait(metamapping);
- 	}
--	error = filemap_fdatawait(metamapping);
--	mapping_set_error(metamapping, error);
- 	gfs2_ail_empty_gl(gl);
- 	/*
- 	 * Writeback of the data mapping may cause the dirty flag to be set
-diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
-index b1f9144b42c7..565ce33dec9b 100644
---- a/fs/gfs2/lops.c
-+++ b/fs/gfs2/lops.c
-@@ -586,9 +586,7 @@ static void gfs2_meta_sync(struct gfs2_glock *gl)
- 	if (mapping == NULL)
- 		mapping = &sdp->sd_aspace;
- 
--	filemap_fdatawrite(mapping);
--	error = filemap_fdatawait(mapping);
--
-+	error = filemap_write_and_wait(mapping);
- 	if (error)
- 		gfs2_io_error(gl->gl_name.ln_sbd);
- }
-diff --git a/fs/gfs2/super.c b/fs/gfs2/super.c
-index 361796a84fce..675c39566ea1 100644
---- a/fs/gfs2/super.c
-+++ b/fs/gfs2/super.c
-@@ -1593,10 +1593,8 @@ static void gfs2_evict_inode(struct inode *inode)
- out_truncate:
- 	gfs2_log_flush(sdp, ip->i_gl, NORMAL_FLUSH);
- 	metamapping = gfs2_glock2aspace(ip->i_gl);
--	if (test_bit(GLF_DIRTY, &ip->i_gl->gl_flags)) {
--		filemap_fdatawrite(metamapping);
--		filemap_fdatawait(metamapping);
--	}
-+	if (test_bit(GLF_DIRTY, &ip->i_gl->gl_flags))
-+		filemap_write_and_wait(metamapping);
- 	write_inode_now(inode, 1);
- 	gfs2_ail_flush(ip->i_gl, 0);
- 
--- 
-2.9.3
+On Mon, Apr 24, 2017 at 11:23 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> Looks fine,
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
