@@ -1,105 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:47185 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1034983AbdDUD4V (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2017 23:56:21 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH 01/10] dm-table: Introduce DM_TARGET_ZONED_HM feature
-Date: Fri, 21 Apr 2017 12:55:49 +0900
-Message-Id: <20170421035558.2657-2-damien.lemoal@wdc.com>
-In-Reply-To: <20170421035558.2657-1-damien.lemoal@wdc.com>
-References: <20170421035558.2657-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 15/20] mm: remove AS_EIO and AS_ENOSPC flags
+Date: Mon, 24 Apr 2017 09:22:54 -0400
+Message-Id: <20170424132259.8680-16-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+They're no longer used.
 
-The target drivers currently available will not operate correctly if a
-table target maps onto a host-managed zoned block device.
-
-To avoid problems, this patch introduces the new feature flag
-DM_TARGET_ZONED_HM for a target driver to explicitly state that it
-supports host-managed zoned block devices. This feature is checked
-in dm_get_device() to prevent the addition to a table of a target
-mapping to a host-managed zoned block device if the target type does
-not have the feature enabled.
-
-Note that as host-aware zoned block devices are backward compatible
-with regular block devices, they can be used by any of the current
-target types. This new feature is thus restricted to host-managed
-zoned block devices.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/md/dm-table.c         | 23 +++++++++++++++++++++++
- include/linux/device-mapper.h |  6 ++++++
- 2 files changed, 29 insertions(+)
+ include/linux/pagemap.h | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 3ad16d9..06d3b7b 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -388,6 +388,24 @@ dev_t dm_get_dev_t(const char *path)
- EXPORT_SYMBOL_GPL(dm_get_dev_t);
- 
- /*
-+ * Check if the target supports supports host-managed zoned block devices.
-+ */
-+static bool device_supported(struct dm_target *ti, struct dm_dev *dev)
-+{
-+	struct block_device *bdev = dev->bdev;
-+	char b[BDEVNAME_SIZE];
-+
-+	if (bdev_zoned_model(bdev) == BLK_ZONED_HM &&
-+	    !dm_target_zoned_hm(ti->type)) {
-+		DMWARN("%s: Unsupported host-managed zoned block device %s",
-+		       dm_device_name(ti->table->md), bdevname(bdev, b));
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+/*
-  * Add a device to the list, or just increment the usage count if
-  * it's already present.
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 32512ffc15fa..9593eac41499 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -20,13 +20,11 @@
+  * Bits in mapping->flags.
   */
-@@ -426,6 +444,11 @@ int dm_get_device(struct dm_target *ti, const char *path, fmode_t mode,
- 	}
- 	atomic_inc(&dd->count);
+ enum mapping_flags {
+-	AS_EIO		= 0,	/* IO error on async write */
+-	AS_ENOSPC	= 1,	/* ENOSPC on async write */
+-	AS_MM_ALL_LOCKS	= 2,	/* under mm_take_all_locks() */
+-	AS_UNEVICTABLE	= 3,	/* e.g., ramdisk, SHM_LOCK */
+-	AS_EXITING	= 4, 	/* final truncate in progress */
++	AS_MM_ALL_LOCKS	= 0,	/* under mm_take_all_locks() */
++	AS_UNEVICTABLE	= 1,	/* e.g., ramdisk, SHM_LOCK */
++	AS_EXITING	= 2, 	/* final truncate in progress */
+ 	/* writeback related tags are not used */
+-	AS_NO_WRITEBACK_TAGS = 5,
++	AS_NO_WRITEBACK_TAGS = 3,
+ };
  
-+	if (!device_supported(ti, dd->dm_dev)) {
-+		dm_put_device(ti, dd->dm_dev);
-+		return -ENOTSUPP;
-+	}
-+
- 	*result = dd->dm_dev;
- 	return 0;
- }
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index a7e6903..b3c2408 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -214,6 +214,12 @@ struct target_type {
- #define dm_target_is_wildcard(type)	((type)->features & DM_TARGET_WILDCARD)
- 
- /*
-+ * Indicates that a target supports host-managed zoned block devices.
-+ */
-+#define DM_TARGET_ZONED_HM		0x00000010
-+#define dm_target_zoned_hm(type)	((type)->features & DM_TARGET_ZONED_HM)
-+
-+/*
-  * Some targets need to be sent the same WRITE bio severals times so
-  * that they can send copies of it to different devices.  This function
-  * examines any supplied bio and returns the number of copies of it the
+ static inline void mapping_set_error(struct address_space *mapping, int error)
 -- 
 2.9.3
