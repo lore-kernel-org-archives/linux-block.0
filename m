@@ -1,28 +1,63 @@
-Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Mon, 24 Apr 2017 08:24:19 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
-	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
-	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
-	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
-	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
-	tytso@mit.edu, axboe@kernel.dk
-Subject: Re: [PATCH v3 07/20] nilfs2: set the mapping error when calling
- SetPageError on writeback
-Message-ID: <20170424152419.GG9112@infradead.org>
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk
+Subject: [PATCH v3 07/20] nilfs2: set the mapping error when calling SetPageError on writeback
+Date: Mon, 24 Apr 2017 09:22:46 -0400
+Message-Id: <20170424132259.8680-8-jlayton@redhat.com>
+In-Reply-To: <20170424132259.8680-1-jlayton@redhat.com>
 References: <20170424132259.8680-1-jlayton@redhat.com>
- <20170424132259.8680-8-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170424132259.8680-8-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
+In a later patch, we're going to want to make the fsync codepath not do
+a TestClearPageError call as that can override the error set in the
+address space. To do that though, we need to ensure that filesystems
+that are relying on the PG_error bit for reporting writeback errors
+also set an error in the address space.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Ensure that this is set in nilfs2.
+
+Cc: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ fs/nilfs2/segment.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
+index febed1217b3f..612d4b446793 100644
+--- a/fs/nilfs2/segment.c
++++ b/fs/nilfs2/segment.c
+@@ -1745,6 +1745,7 @@ static void nilfs_end_page_io(struct page *page, int err)
+ 	} else {
+ 		__set_page_dirty_nobuffers(page);
+ 		SetPageError(page);
++		mapping_set_error(page_mapping(page), err);
+ 	}
+ 
+ 	end_page_writeback(page);
+-- 
+2.9.3
