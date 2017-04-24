@@ -1,6 +1,6 @@
-Return-Path: <jack@suse.cz>
-Date: Mon, 24 Apr 2017 17:56:14 +0200
-From: Jan Kara <jack@suse.cz>
+Return-Path: <BATV+253d158279d9b4f3ffaf+4992+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 24 Apr 2017 08:24:38 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: Jeff Layton <jlayton@redhat.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
@@ -15,7 +15,7 @@ Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	tytso@mit.edu, axboe@kernel.dk
 Subject: Re: [PATCH v3 08/20] mm: ensure that we set mapping error if
  writeout() fails
-Message-ID: <20170424155614.GI23988@quack2.suse.cz>
+Message-ID: <20170424152438.GH9112@infradead.org>
 References: <20170424132259.8680-1-jlayton@redhat.com>
  <20170424132259.8680-9-jlayton@redhat.com>
 MIME-Version: 1.0
@@ -23,42 +23,6 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170424132259.8680-9-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon 24-04-17 09:22:47, Jeff Layton wrote:
-> If writepage fails during a page migration, then we need to ensure that
-> fsync will see it by flagging the mapping.
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Looks fine,
 
-Looks good to me. You can add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-> ---
->  mm/migrate.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mm/migrate.c b/mm/migrate.c
-> index 738f1d5f8350..3a59830bdae2 100644
-> --- a/mm/migrate.c
-> +++ b/mm/migrate.c
-> @@ -792,7 +792,11 @@ static int writeout(struct address_space *mapping, struct page *page)
->  		/* unlocked. Relock */
->  		lock_page(page);
->  
-> -	return (rc < 0) ? -EIO : -EAGAIN;
-> +	if (rc < 0) {
-> +		mapping_set_error(mapping, rc);
-> +		return -EIO;
-> +	}
-> +	return -EAGAIN;
->  }
->  
->  /*
-> -- 
-> 2.9.3
-> 
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Reviewed-by: Christoph Hellwig <hch@lst.de>
