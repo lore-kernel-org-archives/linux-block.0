@@ -1,91 +1,78 @@
-Return-Path: <jlayton@redhat.com>
-Return-Path: <jlayton@redhat.com>
-Message-ID: <1493053143.2895.15.camel@redhat.com>
-Subject: Re: [PATCH v3 20/20] gfs2: clean up some filemap_* calls
-From: Jeff Layton <jlayton@redhat.com>
-To: Bob Peterson <rpeterso@redhat.com>
+Return-Path: <rpeterso@redhat.com>
+Date: Mon, 24 Apr 2017 10:12:55 -0400 (EDT)
+From: Bob Peterson <rpeterso@redhat.com>
+To: Jeff Layton <jlayton@redhat.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-cifs@vger.kernel.org, linux-mm@kvack.org,
- jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
- cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
- v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
- linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
- dhowells@redhat.com,  akpm@linux-foundation.org, hch@infradead.org, ross
- zwisler <ross.zwisler@linux.intel.com>, mawilcox@microsoft.com,
- jack@suse.com,  viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de,
- clm@fb.com, tytso@mit.edu,  axboe@kernel.dk
-Date: Mon, 24 Apr 2017 12:59:03 -0400
-In-Reply-To: <2139341349.405174.1493043175630.JavaMail.zimbra@redhat.com>
-References: <20170424132259.8680-1-jlayton@redhat.com>
-	 <20170424132259.8680-21-jlayton@redhat.com>
-	 <2139341349.405174.1493043175630.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross zwisler <ross.zwisler@linux.intel.com>, mawilcox@microsoft.com,
+	jack@suse.com, viro@zeniv.linux.org.uk, corbet@lwn.net,
+	neilb@suse.de, clm@fb.com, tytso@mit.edu, axboe@kernel.dk
+Message-ID: <2139341349.405174.1493043175630.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170424132259.8680-21-jlayton@redhat.com>
+References: <20170424132259.8680-1-jlayton@redhat.com> <20170424132259.8680-21-jlayton@redhat.com>
+Subject: Re: [PATCH v3 20/20] gfs2: clean up some filemap_* calls
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2017-04-24 at 10:12 -0400, Bob Peterson wrote:
-> ----- Original Message -----
-> > In some places, it's trying to reset the mapping error after calling
-> > filemap_fdatawait. That's no longer required. Also, turn several
-> > filemap_fdatawrite+filemap_fdatawait calls into filemap_write_and_wait.
-> > That will at least return writeback errors that occur during the write
-> > phase.
-> > 
-> > Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> > ---
-> >  fs/gfs2/glops.c | 12 ++++--------
-> >  fs/gfs2/lops.c  |  4 +---
-> >  fs/gfs2/super.c |  6 ++----
-> >  3 files changed, 7 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/fs/gfs2/glops.c b/fs/gfs2/glops.c
-> > index 5db59d444838..7362d19fdc4c 100644
-> > --- a/fs/gfs2/glops.c
-> > +++ b/fs/gfs2/glops.c
-> > @@ -158,9 +158,7 @@ static void rgrp_go_sync(struct gfs2_glock *gl)
-> >  	GLOCK_BUG_ON(gl, gl->gl_state != LM_ST_EXCLUSIVE);
-> >  
-> >  	gfs2_log_flush(sdp, gl, NORMAL_FLUSH);
-> > -	filemap_fdatawrite_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
-> > -	error = filemap_fdatawait_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
-> > -	mapping_set_error(mapping, error);
-> > +	filemap_write_and_wait_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
-> 
-> This should probably have "error = ", no?
-> 
+----- Original Message -----
+| In some places, it's trying to reset the mapping error after calling
+| filemap_fdatawait. That's no longer required. Also, turn several
+| filemap_fdatawrite+filemap_fdatawait calls into filemap_write_and_wait.
+| That will at least return writeback errors that occur during the write
+| phase.
+| 
+| Signed-off-by: Jeff Layton <jlayton@redhat.com>
+| ---
+|  fs/gfs2/glops.c | 12 ++++--------
+|  fs/gfs2/lops.c  |  4 +---
+|  fs/gfs2/super.c |  6 ++----
+|  3 files changed, 7 insertions(+), 15 deletions(-)
+| 
+| diff --git a/fs/gfs2/glops.c b/fs/gfs2/glops.c
+| index 5db59d444838..7362d19fdc4c 100644
+| --- a/fs/gfs2/glops.c
+| +++ b/fs/gfs2/glops.c
+| @@ -158,9 +158,7 @@ static void rgrp_go_sync(struct gfs2_glock *gl)
+|  	GLOCK_BUG_ON(gl, gl->gl_state != LM_ST_EXCLUSIVE);
+|  
+|  	gfs2_log_flush(sdp, gl, NORMAL_FLUSH);
+| -	filemap_fdatawrite_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
+| -	error = filemap_fdatawait_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
+| -	mapping_set_error(mapping, error);
+| +	filemap_write_and_wait_range(mapping, gl->gl_vm.start, gl->gl_vm.end);
 
-This error is discarded in the current code after resetting the error in
-the mapping. With the earlier patches in this set we don't need to reset
-the error like this anymore.
+This should probably have "error = ", no?
 
-Now, if this code should doing something else with those errors, then
-that's a separate problem.
+|  	gfs2_ail_empty_gl(gl);
+|  
+|  	spin_lock(&gl->gl_lockref.lock);
+| @@ -225,12 +223,10 @@ static void inode_go_sync(struct gfs2_glock *gl)
+|  	filemap_fdatawrite(metamapping);
+|  	if (ip) {
+|  		struct address_space *mapping = ip->i_inode.i_mapping;
+| -		filemap_fdatawrite(mapping);
+| -		error = filemap_fdatawait(mapping);
+| -		mapping_set_error(mapping, error);
+| +		filemap_write_and_wait(mapping);
+| +	} else {
+| +		filemap_fdatawait(metamapping);
+|  	}
+| -	error = filemap_fdatawait(metamapping);
+| -	mapping_set_error(metamapping, error);
 
-> >  	gfs2_ail_empty_gl(gl);
-> >  
-> >  	spin_lock(&gl->gl_lockref.lock);
-> > @@ -225,12 +223,10 @@ static void inode_go_sync(struct gfs2_glock *gl)
-> >  	filemap_fdatawrite(metamapping);
-> >  	if (ip) {
-> >  		struct address_space *mapping = ip->i_inode.i_mapping;
-> > -		filemap_fdatawrite(mapping);
-> > -		error = filemap_fdatawait(mapping);
-> > -		mapping_set_error(mapping, error);
-> > +		filemap_write_and_wait(mapping);
-> > +	} else {
-> > +		filemap_fdatawait(metamapping);
-> >  	}
-> > -	error = filemap_fdatawait(metamapping);
-> > -	mapping_set_error(metamapping, error);
-> 
-> This part doesn't look right at all. There's a big difference in gfs2 between
-> mapping and metamapping. We need to wait for metamapping regardless.
-> 
+This part doesn't look right at all. There's a big difference in gfs2 between
+mapping and metamapping. We need to wait for metamapping regardless.
 
-...and this should wait. Basically, filemap_write_and_wait does
-filemap_fdatawrite and then filemap_fdatawait. This is mostly just
-replacing the existing code with a more concise helper.
+(snip)
 
--- 
-Jeff Layton <jlayton@redhat.com>
+Regards,
+
+Bob Peterson
+Red Hat File Systems
