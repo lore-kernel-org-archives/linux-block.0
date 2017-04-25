@@ -1,240 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:62770 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S940221AbdDSWhi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2017 18:37:38 -0400
-Subject: [PATCH v3] dax: add a facility to lookup a dax device by 'host'
- device name
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-kernel@vger.kernel.org, hch@lst.de
-Date: Wed, 19 Apr 2017 15:31:53 -0700
-Message-ID: <149264098308.36586.14533308558533384197.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v5 07/10] blk-mq: Make blk_flags_show() callers append a newline character
+Date: Tue, 25 Apr 2017 13:37:42 -0700
+Message-ID: <20170425203745.19946-8-bart.vanassche@sandisk.com>
+In-Reply-To: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-For the current block_device based filesystem-dax path, we need a way
-for it to lookup the dax_device associated with a block_device. Add a
-'host' property of a dax_device that can be used for this purpose. It is
-a free form string, but for a dax_device associated with a block device
-it is the bdev name.
+This patch does not change any functionality but makes it possible
+to produce a single line of output with multiple flag-to-name
+translations.
 
-This is a stop-gap until filesystems are able to mount on a dax-inode
-directly.
-
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
-Changes since v2:
-* fixed slab corruption due to non-null dax_dev->host at
-  dax_i_callback() time
+ block/blk-mq-debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
- drivers/dax/dax.h    |    2 +
- drivers/dax/device.c |    2 +
- drivers/dax/super.c  |   87 ++++++++++++++++++++++++++++++++++++++++++++++++--
- include/linux/dax.h  |    1 +
- 4 files changed, 86 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/dax/dax.h b/drivers/dax/dax.h
-index 2472d9da96db..246a24d68d4c 100644
---- a/drivers/dax/dax.h
-+++ b/drivers/dax/dax.h
-@@ -13,7 +13,7 @@
- #ifndef __DAX_H__
- #define __DAX_H__
- struct dax_device;
--struct dax_device *alloc_dax(void *private);
-+struct dax_device *alloc_dax(void *private, const char *host);
- void put_dax(struct dax_device *dax_dev);
- bool dax_alive(struct dax_device *dax_dev);
- void kill_dax(struct dax_device *dax_dev);
-diff --git a/drivers/dax/device.c b/drivers/dax/device.c
-index 19a42edbfa03..db68f4fa8ce0 100644
---- a/drivers/dax/device.c
-+++ b/drivers/dax/device.c
-@@ -645,7 +645,7 @@ struct dev_dax *devm_create_dev_dax(struct dax_region *dax_region,
- 		goto err_id;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 1132be4e9c1c..ccc7b0f71230 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -60,7 +60,6 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
+ 		else
+ 			seq_printf(m, "%d", i);
  	}
- 
--	dax_dev = alloc_dax(dev_dax);
-+	dax_dev = alloc_dax(dev_dax, NULL);
- 	if (!dax_dev)
- 		goto err_dax;
- 
-diff --git a/drivers/dax/super.c b/drivers/dax/super.c
-index c9f85f1c086e..8d446674c1da 100644
---- a/drivers/dax/super.c
-+++ b/drivers/dax/super.c
-@@ -30,6 +30,10 @@ static DEFINE_IDA(dax_minor_ida);
- static struct kmem_cache *dax_cache __read_mostly;
- static struct super_block *dax_superblock __read_mostly;
- 
-+#define DAX_HASH_SIZE (PAGE_SIZE / sizeof(struct hlist_head))
-+static struct hlist_head dax_host_list[DAX_HASH_SIZE];
-+static DEFINE_SPINLOCK(dax_host_lock);
-+
- int dax_read_lock(void)
- {
- 	return srcu_read_lock(&dax_srcu);
-@@ -46,12 +50,15 @@ EXPORT_SYMBOL_GPL(dax_read_unlock);
-  * struct dax_device - anchor object for dax services
-  * @inode: core vfs
-  * @cdev: optional character interface for "device dax"
-+ * @host: optional name for lookups where the device path is not available
-  * @private: dax driver private data
-  * @alive: !alive + rcu grace period == no new operations / mappings
-  */
- struct dax_device {
-+	struct hlist_node list;
- 	struct inode inode;
- 	struct cdev cdev;
-+	const char *host;
- 	void *private;
- 	bool alive;
- };
-@@ -63,6 +70,11 @@ bool dax_alive(struct dax_device *dax_dev)
- }
- EXPORT_SYMBOL_GPL(dax_alive);
- 
-+static int dax_host_hash(const char *host)
-+{
-+	return hashlen_hash(hashlen_string("DAX", host)) % DAX_HASH_SIZE;
-+}
-+
- /*
-  * Note, rcu is not protecting the liveness of dax_dev, rcu is ensuring
-  * that any fault handlers or operations that might have seen
-@@ -75,7 +87,13 @@ void kill_dax(struct dax_device *dax_dev)
- 		return;
- 
- 	dax_dev->alive = false;
-+
- 	synchronize_srcu(&dax_srcu);
-+
-+	spin_lock(&dax_host_lock);
-+	hlist_del_init(&dax_dev->list);
-+	spin_unlock(&dax_host_lock);
-+
- 	dax_dev->private = NULL;
- }
- EXPORT_SYMBOL_GPL(kill_dax);
-@@ -98,6 +116,8 @@ static void dax_i_callback(struct rcu_head *head)
- 	struct inode *inode = container_of(head, struct inode, i_rcu);
- 	struct dax_device *dax_dev = to_dax_dev(inode);
- 
-+	kfree(dax_dev->host);
-+	dax_dev->host = NULL;
- 	ida_simple_remove(&dax_minor_ida, MINOR(inode->i_rdev));
- 	kmem_cache_free(dax_cache, dax_dev);
- }
-@@ -169,26 +189,53 @@ static struct dax_device *dax_dev_get(dev_t devt)
- 	return dax_dev;
+-	seq_puts(m, "\n");
+ 	return 0;
  }
  
--struct dax_device *alloc_dax(void *private)
-+static void dax_add_host(struct dax_device *dax_dev, const char *host)
-+{
-+	int hash;
-+
-+	/*
-+	 * Unconditionally init dax_dev since it's coming from a
-+	 * non-zeroed slab cache
-+	 */
-+	INIT_HLIST_NODE(&dax_dev->list);
-+	dax_dev->host = host;
-+	if (!host)
-+		return;
-+
-+	hash = dax_host_hash(host);
-+	spin_lock(&dax_host_lock);
-+	hlist_add_head(&dax_dev->list, &dax_host_list[hash]);
-+	spin_unlock(&dax_host_lock);
-+}
-+
-+struct dax_device *alloc_dax(void *private, const char *__host)
- {
- 	struct dax_device *dax_dev;
-+	const char *host;
- 	dev_t devt;
- 	int minor;
+@@ -102,6 +101,7 @@ static int blk_queue_flags_show(struct seq_file *m, void *v)
  
-+	host = kstrdup(__host, GFP_KERNEL);
-+	if (__host && !host)
-+		return NULL;
-+
- 	minor = ida_simple_get(&dax_minor_ida, 0, nr_dax, GFP_KERNEL);
- 	if (minor < 0)
--		return NULL;
-+		goto err_minor;
- 
- 	devt = MKDEV(MAJOR(dax_devt), minor);
- 	dax_dev = dax_dev_get(devt);
- 	if (!dax_dev)
--		goto err_inode;
-+		goto err_dev;
- 
-+	dax_add_host(dax_dev, host);
- 	dax_dev->private = private;
- 	return dax_dev;
- 
-- err_inode:
-+ err_dev:
- 	ida_simple_remove(&dax_minor_ida, minor);
-+ err_minor:
-+	kfree(host);
- 	return NULL;
+ 	blk_flags_show(m, q->queue_flags, blk_queue_flag_name,
+ 		       ARRAY_SIZE(blk_queue_flag_name));
++	seq_puts(m, "\n");
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(alloc_dax);
-@@ -202,6 +249,38 @@ void put_dax(struct dax_device *dax_dev)
- EXPORT_SYMBOL_GPL(put_dax);
  
- /**
-+ * dax_get_by_host() - temporary lookup mechanism for filesystem-dax
-+ * @host: alternate name for the device registered by a dax driver
-+ */
-+struct dax_device *dax_get_by_host(const char *host)
-+{
-+	struct dax_device *dax_dev, *found = NULL;
-+	int hash, id;
-+
-+	if (!host)
-+		return NULL;
-+
-+	hash = dax_host_hash(host);
-+
-+	id = dax_read_lock();
-+	spin_lock(&dax_host_lock);
-+	hlist_for_each_entry(dax_dev, &dax_host_list[hash], list) {
-+		if (!dax_alive(dax_dev)
-+				|| strcmp(host, dax_dev->host) != 0)
-+			continue;
-+
-+		if (igrab(&dax_dev->inode))
-+			found = dax_dev;
-+		break;
-+	}
-+	spin_unlock(&dax_host_lock);
-+	dax_read_unlock(id);
-+
-+	return found;
-+}
-+EXPORT_SYMBOL_GPL(dax_get_by_host);
-+
-+/**
-  * inode_dax: convert a public inode into its dax_dev
-  * @inode: An inode with i_cdev pointing to a dax_dev
-  *
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 5b62f5d19aea..9b2d5ba10d7d 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -10,6 +10,7 @@ struct iomap_ops;
+@@ -193,6 +193,7 @@ static int hctx_state_show(struct seq_file *m, void *v)
  
- int dax_read_lock(void);
- void dax_read_unlock(int id);
-+struct dax_device *dax_get_by_host(const char *host);
+ 	blk_flags_show(m, hctx->state, hctx_state_name,
+ 		       ARRAY_SIZE(hctx_state_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
  
- /*
-  * We use lowest available bit in exceptional entry for locking, one bit for
+@@ -236,6 +237,7 @@ static int hctx_flags_show(struct seq_file *m, void *v)
+ 	blk_flags_show(m,
+ 		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
+ 		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
+ 
+-- 
+2.12.2
