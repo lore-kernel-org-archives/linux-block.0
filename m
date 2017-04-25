@@ -1,61 +1,169 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:35978 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1426670AbdDUXdE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 19:33:04 -0400
-Received: by mail-wm0-f41.google.com with SMTP id o81so25767224wmb.1
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2017 16:33:03 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 3/5] lightnvm: pblk: fix memory leak on error path
-Date: Sat, 22 Apr 2017 01:32:47 +0200
-Message-Id: <1492817569-13532-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
-References: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v5 01/10] blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
+Date: Tue, 25 Apr 2017 13:37:36 -0700
+Message-ID: <20170425203745.19946-2-bart.vanassche@sandisk.com>
+In-Reply-To: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-When write recovery fails, Free memory for the recovery structure.
+A later patch in this series will modify blk_mq_debugfs_register()
+such that it uses q->kobj.parent to determine the name of a
+request queue. Hence make sure that that pointer is initialized
+before blk_mq_debugfs_register() is called. To avoid lock inversion,
+protect sysfs / debugfs registration with the queue sysfs_lock
+instead of the global mutex all_q_mutex.
 
-Fixes: a4bd217b4326 "lightnvm: physical block device (pblk) target"
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/lightnvm/pblk-write.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/blk-mq-sysfs.c | 35 ++++++++++++++++++++++++++++-------
+ block/blk-mq.h       |  1 +
+ block/blk-sysfs.c    |  6 +++---
+ 3 files changed, 32 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 74f7413..a896190 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -142,6 +142,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
- 		/* Logic error */
- 		if (bit > c_ctx->nr_valid) {
- 			WARN_ONCE(1, "pblk: corrupted write request\n");
-+			mempool_free(recovery, pblk->rec_pool);
- 			goto out;
- 		}
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index d745ab81033a..a2dbb1a48e72 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -253,6 +253,8 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
  
-@@ -149,6 +150,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
- 		entry = pblk_rb_sync_scan_entry(&pblk->rwb, &ppa);
- 		if (!entry) {
- 			pr_err("pblk: could not scan entry on write failure\n");
-+			mempool_free(recovery, pblk->rec_pool);
- 			goto out;
- 		}
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_unregister_hctx(hctx);
  
-@@ -162,6 +164,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
- 	ret = pblk_recov_setup_rq(pblk, c_ctx, recovery, comp_bits, c_entries);
- 	if (ret) {
- 		pr_err("pblk: could not recover from write failure\n");
-+		mempool_free(recovery, pblk->rec_pool);
- 		goto out;
+@@ -267,9 +269,9 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ 
+ void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ {
+-	blk_mq_disable_hotplug();
++	mutex_lock(&q->sysfs_lock);
+ 	__blk_mq_unregister_dev(dev, q);
+-	blk_mq_enable_hotplug();
++	mutex_unlock(&q->sysfs_lock);
+ }
+ 
+ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+@@ -302,12 +304,13 @@ void blk_mq_sysfs_init(struct request_queue *q)
+ 	}
+ }
+ 
+-int blk_mq_register_dev(struct device *dev, struct request_queue *q)
++int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int ret, i;
+ 
+-	blk_mq_disable_hotplug();
++	WARN_ON_ONCE(!q->kobj.parent);
++	lockdep_assert_held(&q->sysfs_lock);
+ 
+ 	ret = kobject_add(&q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
+ 	if (ret < 0)
+@@ -327,8 +330,18 @@ int blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ 		__blk_mq_unregister_dev(dev, q);
+ 	else
+ 		q->mq_sysfs_init_done = true;
++
+ out:
+-	blk_mq_enable_hotplug();
++	return ret;
++}
++
++int blk_mq_register_dev(struct device *dev, struct request_queue *q)
++{
++	int ret;
++
++	mutex_lock(&q->sysfs_lock);
++	ret = __blk_mq_register_dev(dev, q);
++	mutex_unlock(&q->sysfs_lock);
+ 
+ 	return ret;
+ }
+@@ -339,13 +352,17 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
+ 
++	mutex_lock(&q->sysfs_lock);
+ 	if (!q->mq_sysfs_init_done)
+-		return;
++		goto unlock;
+ 
+ 	blk_mq_debugfs_unregister_hctxs(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_unregister_hctx(hctx);
++
++unlock:
++	mutex_unlock(&q->sysfs_lock);
+ }
+ 
+ int blk_mq_sysfs_register(struct request_queue *q)
+@@ -353,8 +370,9 @@ int blk_mq_sysfs_register(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i, ret = 0;
+ 
++	mutex_lock(&q->sysfs_lock);
+ 	if (!q->mq_sysfs_init_done)
+-		return ret;
++		goto unlock;
+ 
+ 	blk_mq_debugfs_register_hctxs(q);
+ 
+@@ -364,5 +382,8 @@ int blk_mq_sysfs_register(struct request_queue *q)
+ 			break;
  	}
  
++unlock:
++	mutex_unlock(&q->sysfs_lock);
++
+ 	return ret;
+ }
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 524f44742816..7d955c756810 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -78,6 +78,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+  */
+ extern void blk_mq_sysfs_init(struct request_queue *q);
+ extern void blk_mq_sysfs_deinit(struct request_queue *q);
++extern int __blk_mq_register_dev(struct device *dev, struct request_queue *q);
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index f85723332288..3f37813ccbaf 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -877,9 +877,6 @@ int blk_register_queue(struct gendisk *disk)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (q->mq_ops)
+-		blk_mq_register_dev(dev, q);
+-
+ 	/* Prevent changes through sysfs until registration is completed. */
+ 	mutex_lock(&q->sysfs_lock);
+ 
+@@ -889,6 +886,9 @@ int blk_register_queue(struct gendisk *disk)
+ 		goto unlock;
+ 	}
+ 
++	if (q->mq_ops)
++		__blk_mq_register_dev(dev, q);
++
+ 	kobject_uevent(&q->kobj, KOBJ_ADD);
+ 
+ 	wbt_enable_default(q);
 -- 
-2.7.4
+2.12.2
