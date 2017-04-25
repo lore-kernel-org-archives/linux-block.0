@@ -1,53 +1,56 @@
-Return-Path: <BATV+245451ebeca5033ceab8+4986+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@bombadil.infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	Christoph Hellwig <hch@lst.de>
-Subject: pd: remove bogus check for req->errors
-Date: Tue, 18 Apr 2017 08:52:27 -0700
-Message-Id: <20170418155229.5977-22-hch@bombadil.infradead.org>
-In-Reply-To: <20170418155229.5977-1-hch@bombadil.infradead.org>
-References: <20170418155229.5977-1-hch@bombadil.infradead.org>
-Sender: Christoph Hellwig <hch@infradead.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v4 09/10] blk-mq: Add blk_mq_ops.show_rq()
+To: Hannes Reinecke <hare@suse.de>,
+ Bart Van Assche <Bart.VanAssche@sandisk.com>, "hare@suse.com" <hare@suse.com>
+References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+ <20170421234026.18970-10-bart.vanassche@sandisk.com>
+ <1e88d065-5a98-1edc-658e-c0194e471994@suse.com>
+ <1493070705.3394.21.camel@sandisk.com>
+ <43f3d07e-610e-f5a1-8d3a-bdd06213764f@suse.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <535c4cf7-0ff5-5837-45d6-915591d4cf0b@kernel.dk>
+Date: Tue, 25 Apr 2017 09:34:39 -0700
+MIME-Version: 1.0
+In-Reply-To: <43f3d07e-610e-f5a1-8d3a-bdd06213764f@suse.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+On 04/25/2017 08:16 AM, Hannes Reinecke wrote:
+> On 04/24/2017 11:51 PM, Bart Van Assche wrote:
+>> On Mon, 2017-04-24 at 09:32 +0200, Hannes Reinecke wrote:
+>>> On 04/22/2017 01:40 AM, Bart Van Assche wrote:
+>>>> --- a/include/linux/blk-mq.h
+>>>> +++ b/include/linux/blk-mq.h
+>>>> @@ -121,6 +121,12 @@ struct blk_mq_ops {
+>>>>  	softirq_done_fn		*complete;
+>>>>  
+>>>>  	/*
+>>>> +	 * Used by the debugfs implementation to show driver-specific
+>>>> +	 * information about a request.
+>>>> +	 */
+>>>> +	void (*show_rq)(struct seq_file *m, struct request *rq);
+>>>> +
+>>>> +	/*
+>>>>  	 * Called when the block layer side of a hardware queue has been
+>>>>  	 * set up, allowing the driver to allocate/init matching structures.
+>>>>  	 * Ditto for exit/teardown.
+>>>>
+>>>
+>>> I don't really like this; what does happen if someone disabled
+>>> CONFIG_BLK_DEBUGFS? Won't we end up with a stale callback?
+>>
+>> Hello Hannes,
+>>
+>> How about surrounding (*show_rq)() function pointer with #ifdef CONFIG_BLK_DEBUGFS /
+>> #endif?
+>>
+> Nope.
+> 
+> Then you'll end up with different offsets in the structures, depending
+> on how the kernel is compiled. Making debugging a nightmare.
 
-The driver never sets req->errors
----
- drivers/block/paride/pd.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+That's nonsense, we deal with this all the time already.
 
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index 82c6d02193ae..3b0ab214fe74 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -739,7 +739,6 @@ static int pd_special_command(struct pd_unit *disk,
- 		      enum action (*func)(struct pd_unit *disk))
- {
- 	struct request *rq;
--	int err = 0;
- 
- 	rq = blk_get_request(disk->gd->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
- 	if (IS_ERR(rq))
-@@ -748,10 +747,9 @@ static int pd_special_command(struct pd_unit *disk,
- 	rq->special = func;
- 
- 	blk_execute_rq(disk->gd->queue, disk->gd, rq, 0);
--	err = req->errors ? -EIO : 0;
- 
- 	blk_put_request(rq);
--	return err;
-+	return 0;
- }
- 
- /* kernel glue structures */
 -- 
-2.11.0
+Jens Axboe
