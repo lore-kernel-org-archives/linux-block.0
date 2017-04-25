@@ -2,61 +2,60 @@ Return-Path: <Bart.VanAssche@sandisk.com>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
 To: Jens Axboe <axboe@kernel.dk>
 CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.com>, <linux-scsi@vger.kernel.org>
-Subject: [PATCH v4 10/10] scsi: Implement blk_mq_ops.show_rq()
-Date: Fri, 21 Apr 2017 16:40:26 -0700
-Message-ID: <20170421234026.18970-11-bart.vanassche@sandisk.com>
-In-Reply-To: <20170421234026.18970-1-bart.vanassche@sandisk.com>
-References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v5 06/10] blk-mq: Move the "state" debugfs attribute one level down
+Date: Tue, 25 Apr 2017 13:37:41 -0700
+Message-ID: <20170425203745.19946-7-bart.vanassche@sandisk.com>
+In-Reply-To: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Show the SCSI CDB, .eh_eflags and .result for pending SCSI commands
-in /sys/kernel/debug/block/*/mq/*/dispatch and */rq_list.
+Move the "state" attribute from the top level to the "mq" directory
+as requested by Omar.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: <linux-scsi@vger.kernel.org>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/scsi_lib.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/blk-mq-debugfs.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 4a20e6098f7c..90bb269042df 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2125,6 +2125,16 @@ static void scsi_exit_rq(struct request_queue *q, struct request *rq)
- 	scsi_free_sense_buffer(shost, cmd->sense_buffer);
- }
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index d99064e9e76a..1132be4e9c1c 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -141,11 +141,6 @@ static const struct file_operations blk_queue_flags_fops = {
+ 	.write		= blk_queue_flags_store,
+ };
  
-+static void scsi_show_rq(struct seq_file *m, struct request *rq)
-+{
-+	struct scsi_cmnd *cmd = container_of(scsi_req(rq), typeof(*cmd), req);
-+	unsigned int i;
-+
-+	seq_puts(m, ", .cmd =");
-+	for (i = 0; i < cmd->cmd_len; i++)
-+		seq_printf(m, " %02x", cmd->cmnd[i]);
-+}
-+
- struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
+-static const struct blk_mq_debugfs_attr blk_queue_attrs[] = {
+-	{"state", 0600, &blk_queue_flags_fops},
+-	{},
+-};
+-
+ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
  {
- 	struct Scsi_Host *shost = sdev->host;
-@@ -2157,6 +2167,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
- 	.queue_rq	= scsi_queue_rq,
- 	.complete	= scsi_softirq_done,
- 	.timeout	= scsi_timeout,
-+	.show_rq	= scsi_show_rq,
- 	.init_request	= scsi_init_request,
- 	.exit_request	= scsi_exit_request,
- 	.map_queues	= scsi_map_queues,
+ 	if (stat->nr_samples) {
+@@ -757,6 +752,7 @@ static const struct file_operations ctx_completed_fops = {
+ 
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+ 	{"poll_stat", 0400, &queue_poll_stat_fops},
++	{"state", 0600, &blk_queue_flags_fops},
+ 	{},
+ };
+ 
+@@ -873,9 +869,6 @@ int blk_mq_debugfs_register_mq(struct request_queue *q)
+ 	if (!q->debugfs_dir)
+ 		return -ENOENT;
+ 
+-	if (!debugfs_create_files(q->debugfs_dir, q, blk_queue_attrs))
+-		goto err;
+-
+ 	q->mq_debugfs_dir = debugfs_create_dir("mq", q->debugfs_dir);
+ 	if (!q->mq_debugfs_dir)
+ 		goto err;
 -- 
 2.12.2
