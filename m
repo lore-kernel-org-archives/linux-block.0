@@ -1,44 +1,71 @@
-Return-Path: <Damien.LeMoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] nvme/scsi: Consider LBA format in IO splitting
  calculation
-To: Jens Axboe <axboe@kernel.dk>, Jon Derrick <jonathan.derrick@intel.com>
-Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- linux-block@vger.kernel.org, keith.busch@intel.com, hch@infradead.org,
- sagi@grimberg.me
+To: Damien Le Moal <damien.lemoal@wdc.com>,
+ Jon Derrick <jonathan.derrick@intel.com>
 References: <20170425000243.2019-1-jonathan.derrick@intel.com>
  <20170425040025.GA23572@kernel.dk>
  <267a4710-3a71-c08c-8e03-19bd2e73d056@wdc.com>
- <9a84df91-509d-1c1f-8653-849e42a50b6a@kernel.dk>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <5159e2b1-d9cf-b76b-7000-d0b7c3c0d975@wdc.com>
-Date: Tue, 25 Apr 2017 13:43:20 +0900
+Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ linux-block@vger.kernel.org, keith.busch@intel.com, hch@infradead.org,
+ sagi@grimberg.me
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9a84df91-509d-1c1f-8653-849e42a50b6a@kernel.dk>
+Date: Mon, 24 Apr 2017 21:32:13 -0700
 MIME-Version: 1.0
-In-Reply-To: <9a84df91-509d-1c1f-8653-849e42a50b6a@kernel.dk>
-Return-Path: damien.lemoal@wdc.com
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <267a4710-3a71-c08c-8e03-19bd2e73d056@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-SmVucywKCk9uIDQvMjUvMTcgMTM6MzIsIEplbnMgQXhib2Ugd3JvdGU6Cj4+IEkganVzdCByZWFs
-aXplZCB0aGF0IHRoaXMgbWFjcm8gaXMgZGVmaW5lZCBpbiBsaW51eC9kZXZpY2UtbWFwcGVyLmgs
-Cj4+IHdoaWNoIGRvZXMgbm90IHNlZW0gbGlrZSB0byBiZXN0IHBsYWNlIHRvIGhhdmUgaXQuIFdo
-eSBub3QgYmxrZGV2LmggPwo+PiBBbnkgcGFydGljdWxhciByZWFzb24gPyBUaGlzIGxlYWRzIHRv
-IHNvbWUgc3RyYW5nZSBpbmNsdWRlIGRlcGVuZGVuY2llcywKPj4gbGlrZSBtYW55IG5mcy9ibG9j
-a2xheW91dC8gZmlsZXMgaW5jbHVkaW5nIGRldmljZS1tYXBwZXIuaCBqdXN0IHRvIGdldAo+PiB0
-aGF0IGRlZmluaXRpb24uCj4gCj4gSSdtIGZpbmUgd2l0aCBtb3ZpbmcgaXQgYW5kIHVzaW5nIGl0
-IGV2ZXJ5d2hlcmUuIFJpZ2h0IG5vdyB3ZSBkb24ndCBpbgo+IHRoZSBibG9jayBjb3JlIGF0IGFs
-bCwgOSBpcyBhbHdheXMgaGFyZCBjb2RlZC4gV2hpbGUgdGhhdCBjaGFuZ2Ugd291bGQKPiBiZSBm
-aW5lLCBpdCBzaG91bGQgYmUgZG9uZSBpbmRlcGVuZGVudGx5IG9mIHRoaXMgcGF0Y2gsIHdoaWNo
-IGlzIGEgcmVhbAo+IGJ1ZyBmaXguCgpUaGFuayB5b3UgZm9yIHRoZSBjbGFyaWZpY2F0aW9uLiBJ
-IHdpbGwgdHJ5IHRvIHNlbmQgc29tZXRoaW5nIGxhdGVyLgoKQmVzdCByZWdhcmRzLgoKLS0gCkRh
-bWllbiBMZSBNb2FsLApXZXN0ZXJuIERpZ2l0YWwKV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0aW9u
-IChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eSBOb3RpY2UgJiBE
-aXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRoIGl0
-IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZpbGVnZWQgaW5mb3JtYXRp
-b24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBpbnRlbmRlZCBzb2xlbHkg
-Zm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRvIHdoaWNoIHRoZXkgYXJl
-IGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55IGRp
-c2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0aW9uIHRha2VuIG9yIG9t
-aXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHByb2hpYml0ZWQuIElmIHlv
-dSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBz
-ZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRpcmV0eSBm
-cm9tIHlvdXIgc3lzdGVtLgo=
+On 04/24/2017 09:27 PM, Damien Le Moal wrote:
+> Jon,
+> 
+> On 4/25/17 13:00, Jens Axboe wrote:
+>> On Mon, Apr 24 2017, Jon Derrick wrote:
+>>> The current command submission code uses a sector-based value when
+>>> considering the maximum number of blocks per command. With a
+>>> 4k-formatted namespace and a command exceeding max hardware limits, this
+>>> calculation doesn't split IOs which should be split and fails in the
+>>> nvme layer. This patch fixes that calculation and enables IO splitting
+>>> in these circumstances.
+>>>
+>>> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+>>> ---
+>>>  drivers/nvme/host/scsi.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/nvme/host/scsi.c b/drivers/nvme/host/scsi.c
+>>> index f49ae27..988da61 100644
+>>> --- a/drivers/nvme/host/scsi.c
+>>> +++ b/drivers/nvme/host/scsi.c
+>>> @@ -1609,7 +1609,7 @@ static int nvme_trans_do_nvme_io(struct nvme_ns *ns, struct sg_io_hdr *hdr,
+>>>  	struct nvme_command c;
+>>>  	u8 opcode = (is_write ? nvme_cmd_write : nvme_cmd_read);
+>>>  	u16 control;
+>>> -	u32 max_blocks = queue_max_hw_sectors(ns->queue);
+>>> +	u32 max_blocks = queue_max_hw_sectors(ns->queue) >> (ns->lba_shift - 9);
+>>>  
+>>>  	num_cmds = nvme_trans_io_get_num_cmds(hdr, cdb_info, max_blocks);
+>>
+>> Patch looks correct to me, as we always consider the hw sectors settings
+>> in units of 512b blocks.
+>>
+>> Reviewed-by: Jens Axboe <axboe@fb.com>
+> 
+> May be replace 9 with SECTOR_SHIFT ?
+> 
+> Jens,
+> 
+> I just realized that this macro is defined in linux/device-mapper.h,
+> which does not seem like to best place to have it. Why not blkdev.h ?
+> Any particular reason ? This leads to some strange include dependencies,
+> like many nfs/blocklayout/ files including device-mapper.h just to get
+> that definition.
+
+I'm fine with moving it and using it everywhere. Right now we don't in
+the block core at all, 9 is always hard coded. While that change would
+be fine, it should be done independently of this patch, which is a real
+bug fix.
+
+-- 
+Jens Axboe
