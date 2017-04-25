@@ -1,97 +1,84 @@
-Return-Path: <sbates130272@gmail.com>
-Return-Path: <sbates130272@gmail.com>
-From: sbates@raithlin.com
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Damien.LeMoal@wdc.com,
-	osandov@osandov.com,
-	sbates@raithlin.com,
-	sagi@grimberg.me
-Subject: [PATCH] blk-mq: Fix poll_stat for new size-based bucketing.
-Date: Thu, 20 Apr 2017 16:59:11 -0600
-Message-Id: <1492729151-20983-1-git-send-email-sbates@raithlin.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v5 02/10] blk-mq: Let blk_mq_debugfs_register() look up the queue name
+Date: Tue, 25 Apr 2017 13:37:37 -0700
+Message-ID: <20170425203745.19946-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Stephen Bates <sbates@raithlin.com>
+A later patch will move the call of blk_mq_debugfs_register() to
+a function to which the queue name is not passed as an argument.
+To avoid having to add a 'name' argument to multiple callers, let
+blk_mq_debugfs_register() look up the queue name.
 
-Fixes an issue where the size of the poll_stat array in request_queue
-does not match the size expected by the new size based bucketing for
-IO completion polling.
-
-Should be applied on top of commit 720b8ccc4500 ("blk-mq: Add a
-polling specific stats function").
-
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq-debugfs.c | 15 +++++++++------
- block/blk-mq.c         |  8 ++++----
- include/linux/blkdev.h |  5 ++++-
- 3 files changed, 17 insertions(+), 11 deletions(-)
+ block/blk-mq-debugfs.c | 5 +++--
+ block/blk-mq-sysfs.c   | 2 +-
+ block/blk-mq.h         | 5 ++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index df9b688..3057641 100644
+index 3057641d5d15..e9282b945f6b 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -159,14 +159,17 @@ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
- static int queue_poll_stat_show(struct seq_file *m, void *v)
+@@ -785,12 +785,13 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
+ 	{},
+ };
+ 
+-int blk_mq_debugfs_register(struct request_queue *q, const char *name)
++int blk_mq_debugfs_register(struct request_queue *q)
  {
- 	struct request_queue *q = m->private;
-+	int bucket;
+ 	if (!blk_debugfs_root)
+ 		return -ENOENT;
  
--	seq_puts(m, "read: ");
--	print_stat(m, &q->poll_stat[READ]);
--	seq_puts(m, "\n");
-+	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS/2; bucket++) {
-+		seq_printf(m, "read  (%d Bytes): ", 1 << (9+bucket));
-+		print_stat(m, &q->poll_stat[2*bucket]);
-+		seq_puts(m, "\n");
+-	q->debugfs_dir = debugfs_create_dir(name, blk_debugfs_root);
++	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
++					    blk_debugfs_root);
+ 	if (!q->debugfs_dir)
+ 		goto err;
  
--	seq_puts(m, "write: ");
--	print_stat(m, &q->poll_stat[WRITE]);
--	seq_puts(m, "\n");
-+		seq_printf(m, "write (%d Bytes): ",  1 << (9+bucket));
-+		print_stat(m, &q->poll_stat[2*bucket+1]);
-+		seq_puts(m, "\n");
-+	}
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index a2dbb1a48e72..afb3451cf8a5 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -318,7 +318,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ 
+ 	kobject_uevent(&q->mq_kobj, KOBJ_ADD);
+ 
+-	blk_mq_debugfs_register(q, kobject_name(&dev->kobj));
++	blk_mq_debugfs_register(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		ret = blk_mq_register_hctx(hctx);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 7d955c756810..9049c0f11505 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -87,13 +87,12 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+  * debugfs helpers
+  */
+ #ifdef CONFIG_BLK_DEBUG_FS
+-int blk_mq_debugfs_register(struct request_queue *q, const char *name);
++int blk_mq_debugfs_register(struct request_queue *q);
+ void blk_mq_debugfs_unregister(struct request_queue *q);
+ int blk_mq_debugfs_register_hctxs(struct request_queue *q);
+ void blk_mq_debugfs_unregister_hctxs(struct request_queue *q);
+ #else
+-static inline int blk_mq_debugfs_register(struct request_queue *q,
+-					  const char *name)
++static inline int blk_mq_debugfs_register(struct request_queue *q)
+ {
  	return 0;
  }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9d7645f..81f7c99 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -42,8 +42,6 @@ static LIST_HEAD(all_q_list);
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- 
--/* Must be consisitent with function below */
--#define BLK_MQ_POLL_STATS_BKTS 16
- static int blk_mq_poll_stats_bkt(const struct request *rq)
- {
- 	int ddir, bytes, bucket;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6c4ab0d..6c24786 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -46,6 +46,9 @@ struct blk_stat_callback;
- #define BLKDEV_MIN_RQ	4
- #define BLKDEV_MAX_RQ	128	/* Default maximum */
- 
-+/* Must be consisitent with blk_mq_poll_stats_bkt() */
-+#define BLK_MQ_POLL_STATS_BKTS 16
-+
- /*
-  * Maximum number of blkcg policies allowed to be registered concurrently.
-  * Defined here to simplify include dependency.
-@@ -517,7 +520,7 @@ struct request_queue {
- 	int			poll_nsec;
- 
- 	struct blk_stat_callback	*poll_cb;
--	struct blk_rq_stat	poll_stat[2];
-+	struct blk_rq_stat	poll_stat[BLK_MQ_POLL_STATS_BKTS];
- 
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
 -- 
-2.7.4
+2.12.2
