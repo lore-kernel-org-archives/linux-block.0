@@ -1,64 +1,49 @@
-Return-Path: <Damien.LeMoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Date: Mon, 24 Apr 2017 22:00:26 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, keith.busch@intel.com,
+	hch@infradead.org, sagi@grimberg.me
 Subject: Re: [PATCH] nvme/scsi: Consider LBA format in IO splitting
  calculation
-To: Jens Axboe <axboe@kernel.dk>, Jon Derrick <jonathan.derrick@intel.com>
-Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- linux-block@vger.kernel.org, keith.busch@intel.com, hch@infradead.org,
- sagi@grimberg.me
+Message-ID: <20170425040025.GA23572@kernel.dk>
 References: <20170425000243.2019-1-jonathan.derrick@intel.com>
- <20170425040025.GA23572@kernel.dk>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <267a4710-3a71-c08c-8e03-19bd2e73d056@wdc.com>
-Date: Tue, 25 Apr 2017 13:27:46 +0900
 MIME-Version: 1.0
-In-Reply-To: <20170425040025.GA23572@kernel.dk>
-Return-Path: damien.lemoal@wdc.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170425000243.2019-1-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Sm9uLAoKT24gNC8yNS8xNyAxMzowMCwgSmVucyBBeGJvZSB3cm90ZToKPiBPbiBNb24sIEFwciAy
-NCAyMDE3LCBKb24gRGVycmljayB3cm90ZToKPj4gVGhlIGN1cnJlbnQgY29tbWFuZCBzdWJtaXNz
-aW9uIGNvZGUgdXNlcyBhIHNlY3Rvci1iYXNlZCB2YWx1ZSB3aGVuCj4+IGNvbnNpZGVyaW5nIHRo
-ZSBtYXhpbXVtIG51bWJlciBvZiBibG9ja3MgcGVyIGNvbW1hbmQuIFdpdGggYQo+PiA0ay1mb3Jt
-YXR0ZWQgbmFtZXNwYWNlIGFuZCBhIGNvbW1hbmQgZXhjZWVkaW5nIG1heCBoYXJkd2FyZSBsaW1p
-dHMsIHRoaXMKPj4gY2FsY3VsYXRpb24gZG9lc24ndCBzcGxpdCBJT3Mgd2hpY2ggc2hvdWxkIGJl
-IHNwbGl0IGFuZCBmYWlscyBpbiB0aGUKPj4gbnZtZSBsYXllci4gVGhpcyBwYXRjaCBmaXhlcyB0
-aGF0IGNhbGN1bGF0aW9uIGFuZCBlbmFibGVzIElPIHNwbGl0dGluZwo+PiBpbiB0aGVzZSBjaXJj
-dW1zdGFuY2VzLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBKb24gRGVycmljayA8am9uYXRoYW4uZGVy
-cmlja0BpbnRlbC5jb20+Cj4+IC0tLQo+PiAgZHJpdmVycy9udm1lL2hvc3Qvc2NzaS5jIHwgMiAr
-LQo+PiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCj4+Cj4+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9zY3NpLmMgYi9kcml2ZXJzL252bWUvaG9z
-dC9zY3NpLmMKPj4gaW5kZXggZjQ5YWUyNy4uOTg4ZGE2MSAxMDA2NDQKPj4gLS0tIGEvZHJpdmVy
-cy9udm1lL2hvc3Qvc2NzaS5jCj4+ICsrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L3Njc2kuYwo+PiBA
-QCAtMTYwOSw3ICsxNjA5LDcgQEAgc3RhdGljIGludCBudm1lX3RyYW5zX2RvX252bWVfaW8oc3Ry
-dWN0IG52bWVfbnMgKm5zLCBzdHJ1Y3Qgc2dfaW9faGRyICpoZHIsCj4+ICAJc3RydWN0IG52bWVf
-Y29tbWFuZCBjOwo+PiAgCXU4IG9wY29kZSA9IChpc193cml0ZSA/IG52bWVfY21kX3dyaXRlIDog
-bnZtZV9jbWRfcmVhZCk7Cj4+ICAJdTE2IGNvbnRyb2w7Cj4+IC0JdTMyIG1heF9ibG9ja3MgPSBx
-dWV1ZV9tYXhfaHdfc2VjdG9ycyhucy0+cXVldWUpOwo+PiArCXUzMiBtYXhfYmxvY2tzID0gcXVl
-dWVfbWF4X2h3X3NlY3RvcnMobnMtPnF1ZXVlKSA+PiAobnMtPmxiYV9zaGlmdCAtIDkpOwo+PiAg
-Cj4+ICAJbnVtX2NtZHMgPSBudm1lX3RyYW5zX2lvX2dldF9udW1fY21kcyhoZHIsIGNkYl9pbmZv
-LCBtYXhfYmxvY2tzKTsKPiAKPiBQYXRjaCBsb29rcyBjb3JyZWN0IHRvIG1lLCBhcyB3ZSBhbHdh
-eXMgY29uc2lkZXIgdGhlIGh3IHNlY3RvcnMgc2V0dGluZ3MKPiBpbiB1bml0cyBvZiA1MTJiIGJs
-b2Nrcy4KPiAKPiBSZXZpZXdlZC1ieTogSmVucyBBeGJvZSA8YXhib2VAZmIuY29tPgoKTWF5IGJl
-IHJlcGxhY2UgOSB3aXRoIFNFQ1RPUl9TSElGVCA/CgpKZW5zLAoKSSBqdXN0IHJlYWxpemVkIHRo
-YXQgdGhpcyBtYWNybyBpcyBkZWZpbmVkIGluIGxpbnV4L2RldmljZS1tYXBwZXIuaCwKd2hpY2gg
-ZG9lcyBub3Qgc2VlbSBsaWtlIHRvIGJlc3QgcGxhY2UgdG8gaGF2ZSBpdC4gV2h5IG5vdCBibGtk
-ZXYuaCA/CkFueSBwYXJ0aWN1bGFyIHJlYXNvbiA/IFRoaXMgbGVhZHMgdG8gc29tZSBzdHJhbmdl
-IGluY2x1ZGUgZGVwZW5kZW5jaWVzLApsaWtlIG1hbnkgbmZzL2Jsb2NrbGF5b3V0LyBmaWxlcyBp
-bmNsdWRpbmcgZGV2aWNlLW1hcHBlci5oIGp1c3QgdG8gZ2V0CnRoYXQgZGVmaW5pdGlvbi4KCkJl
-c3QgcmVnYXJkcy4KCi0tIApEYW1pZW4gTGUgTW9hbCwgUGguRC4KU3IuIE1hbmFnZXIsIFN5c3Rl
-bSBTb2Z0d2FyZSBSZXNlYXJjaCBHcm91cCwKV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0aW9uCkRh
-bWllbi5MZU1vYWxAd2RjLmNvbQooKzgxKSAwNDY2LTk4LTM1OTMgKGV4dC4gNTEzNTkzKQoxIGtp
-cmloYXJhLWNobywgRnVqaXNhd2EsCkthbmFnYXdhLCAyNTItMDg4OCBKYXBhbgp3d3cud2RjLmNv
-bSwgd3d3Lmhnc3QuY29tCldlc3Rlcm4gRGlnaXRhbCBDb3Jwb3JhdGlvbiAoYW5kIGl0cyBzdWJz
-aWRpYXJpZXMpIEUtbWFpbCBDb25maWRlbnRpYWxpdHkgTm90aWNlICYgRGlzY2xhaW1lcjoKClRo
-aXMgZS1tYWlsIGFuZCBhbnkgZmlsZXMgdHJhbnNtaXR0ZWQgd2l0aCBpdCBtYXkgY29udGFpbiBj
-b25maWRlbnRpYWwgb3IgbGVnYWxseSBwcml2aWxlZ2VkIGluZm9ybWF0aW9uIG9mIFdEQyBhbmQv
-b3IgaXRzIGFmZmlsaWF0ZXMsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0aGUgdXNlIG9m
-IHRoZSBpbmRpdmlkdWFsIG9yIGVudGl0eSB0byB3aGljaCB0aGV5IGFyZSBhZGRyZXNzZWQuIElm
-IHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIGFueSBkaXNjbG9zdXJlLCBjb3B5
-aW5nLCBkaXN0cmlidXRpb24gb3IgYW55IGFjdGlvbiB0YWtlbiBvciBvbWl0dGVkIHRvIGJlIHRh
-a2VuIGluIHJlbGlhbmNlIG9uIGl0LCBpcyBwcm9oaWJpdGVkLiBJZiB5b3UgaGF2ZSByZWNlaXZl
-ZCB0aGlzIGUtbWFpbCBpbiBlcnJvciwgcGxlYXNlIG5vdGlmeSB0aGUgc2VuZGVyIGltbWVkaWF0
-ZWx5IGFuZCBkZWxldGUgdGhlIGUtbWFpbCBpbiBpdHMgZW50aXJldHkgZnJvbSB5b3VyIHN5c3Rl
-bS4K
+On Mon, Apr 24 2017, Jon Derrick wrote:
+> The current command submission code uses a sector-based value when
+> considering the maximum number of blocks per command. With a
+> 4k-formatted namespace and a command exceeding max hardware limits, this
+> calculation doesn't split IOs which should be split and fails in the
+> nvme layer. This patch fixes that calculation and enables IO splitting
+> in these circumstances.
+> 
+> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+> ---
+>  drivers/nvme/host/scsi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nvme/host/scsi.c b/drivers/nvme/host/scsi.c
+> index f49ae27..988da61 100644
+> --- a/drivers/nvme/host/scsi.c
+> +++ b/drivers/nvme/host/scsi.c
+> @@ -1609,7 +1609,7 @@ static int nvme_trans_do_nvme_io(struct nvme_ns *ns, struct sg_io_hdr *hdr,
+>  	struct nvme_command c;
+>  	u8 opcode = (is_write ? nvme_cmd_write : nvme_cmd_read);
+>  	u16 control;
+> -	u32 max_blocks = queue_max_hw_sectors(ns->queue);
+> +	u32 max_blocks = queue_max_hw_sectors(ns->queue) >> (ns->lba_shift - 9);
+>  
+>  	num_cmds = nvme_trans_io_get_num_cmds(hdr, cdb_info, max_blocks);
+
+Patch looks correct to me, as we always consider the hw sectors settings
+in units of 512b blocks.
+
+Reviewed-by: Jens Axboe <axboe@fb.com>
+
+-- 
+Jens Axboe
