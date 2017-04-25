@@ -2,92 +2,86 @@ Return-Path: <Bart.VanAssche@sandisk.com>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
 To: Jens Axboe <axboe@kernel.dk>
 CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH 4/6] blk-mq-debugfs: Show requeue list
-Date: Thu, 27 Apr 2017 08:54:35 -0700
-Message-ID: <20170427155437.23228-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170427155437.23228-1-bart.vanassche@sandisk.com>
-References: <20170427155437.23228-1-bart.vanassche@sandisk.com>
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v5 00/10] blk-mq debugfs patches for kernel v4.12
+Date: Tue, 25 Apr 2017 13:37:35 -0700
+Message-ID: <20170425203745.19946-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-When verifying whether or not a blk-mq driver forgot to kick the
-requeue list after having requeued a request it is important to
-be able to verify the contents of the requeue list. Hence export
-that list through debugfs.
+Hello Jens,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+Please consider the ten patches in this series for kernel v4.12.
+These patches improve blk-mq debugfs support.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 9cb673bc7230..5092d90e37f6 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -341,6 +341,50 @@ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- 	return 0;
- }
- 
-+static void *queue_requeue_list_start(struct seq_file *m, loff_t *pos)
-+	__acquires(&q->requeue_lock)
-+{
-+	struct request_queue *q = m->private;
-+
-+	spin_lock(&q->requeue_lock);
-+	return seq_list_start(&q->requeue_list, *pos);
-+}
-+
-+static void *queue_requeue_list_next(struct seq_file *m, void *v, loff_t *pos)
-+{
-+	struct request_queue *q = m->private;
-+
-+	return seq_list_next(v, &q->requeue_list, pos);
-+}
-+
-+static void queue_requeue_list_stop(struct seq_file *m, void *v)
-+	__releases(&q->requeue_lock)
-+{
-+	struct request_queue *q = m->private;
-+
-+	spin_unlock(&q->requeue_lock);
-+}
-+
-+static const struct seq_operations queue_requeue_list_seq_ops = {
-+	.start	= queue_requeue_list_start,
-+	.next	= queue_requeue_list_next,
-+	.stop	= queue_requeue_list_stop,
-+	.show	= blk_mq_debugfs_rq_show,
-+};
-+
-+static int queue_requeue_list_open(struct inode *inode, struct file *file)
-+{
-+	return blk_mq_debugfs_seq_open(inode, file,
-+				       &queue_requeue_list_seq_ops);
-+}
-+
-+static const struct file_operations queue_requeue_list_fops = {
-+	.open		= queue_requeue_list_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= seq_release,
-+};
-+
- static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
- 	__acquires(&hctx->lock)
- {
-@@ -831,6 +875,7 @@ static const struct file_operations ctx_completed_fops = {
- };
- 
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
-+	{"requeue_list", 0400, &queue_requeue_list_fops},
- 	{"poll_stat", 0400, &queue_poll_stat_fops},
- 	{"state", 0600, &blk_queue_flags_fops},
- 	{},
+Thanks,
+
+Bart.
+
+Changes compared to v4:
+- Modified patch 4 such that debugfs registration failures no longer cause
+  block device registration to fail.
+- Modified patch 8 such that it no longer introduces new sparse warnings.
+- Modified patch 9 such that .show_rq() is only defined if CONFIG_BLK_DEBUG_FS
+  is enabled.
+- Moved the definition of scsi_show_rq() to a new file in patch 10 and changed
+  the implementation of scsi_show_rq() such that it now uses
+  __scsi_format_command().
+
+Changes compared to v3:
+- Changed the mutex_lock_interruptible() calls back to mutex_lock()
+  calls.
+- Added a patch that renames the functions for registering and
+  unregistering the "mq" directory in debugfs.
+- Moved the changes that add checking of the blk_mq_debugfs_register()
+  return value into a separate patch.
+- Moved the unregistration of the "mq" directory into blk_cleanup_queue().
+- Removed uninteresting information from scsi_show_rq().
+- Added Reviewed-by tag to the patches that got a positive review.
+
+Changes compared to v2:
+- Changed the mutex_lock() calls in registration methods into
+  mutex_lock_interruptible() since these functions can be called from
+  the context of a user space process.
+- Avoid that the blk_mq_register_dev() changes in patch 1/8 cause a
+  deadlock.
+
+Changes compared to v1:
+- Added two patches and replaced patch 1/6 such that debugfs
+  attributes are now unregistered before freeing of a blk-mq queue
+  starts instead of checking the "dead" queue flag.
+- Changed "rq->cmd_flags ^ op" into "rq->cmd_flags & ~REQ_OP_MASK" as
+  proposed by Omar.
+- A seq_file pointer is now passed to the new queue_rq callback function
+  instead of a fixed-size char buffer.
+Bart Van Assche (10):
+  blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
+  blk-mq: Let blk_mq_debugfs_register() look up the queue name
+  blk-mq-debugfs: Rename functions for registering and unregistering the
+    mq directory
+  blk-mq: Only unregister hctxs for which registration succeeded
+  blk-mq: Unregister debugfs attributes earlier
+  blk-mq: Move the "state" debugfs attribute one level down
+  blk-mq: Make blk_flags_show() callers append a newline character
+  blk-mq: Show operation, cmd_flags and rq_flags names
+  blk-mq: Add blk_mq_ops.show_rq()
+  scsi: Implement blk_mq_ops.show_rq()
+
+ block/blk-core.c            |   5 +++
+ block/blk-mq-debugfs.c      | 102 ++++++++++++++++++++++++++++++++++++--------
+ block/blk-mq-sysfs.c        |  61 +++++++++++++++++++-------
+ block/blk-mq.h              |  14 +++---
+ block/blk-sysfs.c           |   6 +--
+ drivers/scsi/Makefile       |   1 +
+ drivers/scsi/scsi_debugfs.c |  13 ++++++
+ drivers/scsi/scsi_debugfs.h |   4 ++
+ drivers/scsi/scsi_lib.c     |   4 ++
+ include/linux/blk-mq.h      |   8 ++++
+ 10 files changed, 174 insertions(+), 44 deletions(-)
+ create mode 100644 drivers/scsi/scsi_debugfs.c
+ create mode 100644 drivers/scsi/scsi_debugfs.h
+
 -- 
 2.12.2
