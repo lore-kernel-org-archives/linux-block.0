@@ -1,116 +1,84 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: jsmart2021@gmail.com
-To: linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
- sagi@grimberg.me, emilne@redhat.com, jthumshirn@suse.de,
- linux-block@vger.kernel.org, stable@vger.kernel.org,
- martin.petersen@oracle.com
-Subject: [PATCH] lpfc: Fix panic on BFS configuration.
-Date: Fri, 21 Apr 2017 17:24:04 -0700
-Message-Id: <20170422002404.16027-1-jsmart2021@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: James Smart <jsmart2021@gmail.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- James Smart <james.smart@broadcom.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f52.google.com ([209.85.218.52]:35305 "EHLO
+        mail-oi0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1952554AbdDYWdk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Apr 2017 18:33:40 -0400
+Received: by mail-oi0-f52.google.com with SMTP id j201so189404202oih.2
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2017 15:33:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <CAPcyv4g+WEYD7RVAekDdBn0+-+GRdKiK1HOG8JrVBAT4h5-CvQ@mail.gmail.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <CAPcyv4g+WEYD7RVAekDdBn0+-+GRdKiK1HOG8JrVBAT4h5-CvQ@mail.gmail.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 25 Apr 2017 15:33:38 -0700
+Message-ID: <CAPcyv4iZ7A6mOK-p5gVqOgiq9_B0tfV9q0-ouLk5oECZRo4x0A@mail.gmail.com>
+Subject: Re: [resend PATCH v2 00/33] dax: introduce dax_operations
+To: "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>
+Cc: Tony Luck <tony.luck@intel.com>, Jan Kara <jack@suse.cz>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Toshi Kani <toshi.kani@hpe.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        X86 ML <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>, Ingo Molnar <mingo@redhat.com>,
+        "Oliver O'Halloran" <oohall@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        dm-devel@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Jens Axboe <axboe@fb.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: James Smart <jsmart2021@gmail.com>
+On Fri, Apr 21, 2017 at 6:06 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+> [ adding akpm, sfr, and jens ]
+>
+> I applied this series and pushed it out for the nvdimm.git branch that
+> gets auto pulled into -next. The set is still awaiting acks from
+> device-mapper, ext4, xfs, and vfs (for the copy_from_iter_ops, patch
+> 29/33). If those come next week perhaps this can be merged for 4.12,
+> but if not this will need to wait until 4.13.
+>
+> There are some minor collisions with Al's copy_from_user rework, the
+> new dax tracepoints, and the removal of discard support from the brd
+> driver. A sample merge is available here:
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/nvdimm/nvdimm.git/log/?h=libnvdimm-for-4.12-merge
+>
+> If it causes any other problems just drop and I'll retry for 4.13.
 
-To select the appropriate shost template, the driver is issuing
-a mailbox command to retrieve the wwn. Turns out the sending of
-the command precedes the reset of the function.  On SLI-4 adapters,
-this is inconsequential as the mailbox command location is specified
-by dma via the BMBX register. However, on SLI-3 adapters, the
-location of the mailbox command submission area changes. When the
-function is first powered on or reset, the cmd is submitted via PCI
-bar memory. Later the driver changes the function config to use
-host memory and DMA. The request to start a mailbox command is the
-same, a simple doorbell write, regardless of submission area.
-So.. if there has not been a boot driver run against the adapter,
-the mailbox command works as defaults are ok. But, if the boot
-driver has configured the card and, and if no platform pci
-function/slot reset occurs as the os starts, the mailbox command
-will fail. The SLI-3 device will use the stale boot driver dma
-location. This can cause PCI eeh errors.
+Al has nak'd the uaccess related changes, and I'll need to rework
+those patches to move the pmem routines into lib/iov_iter.c directly.
+That doesn't affect the dax_device and dax_operations work, so I'm
+still looking to move forward with that change.  That reduces the set
+targeting 4.12 to just the first 18 patches from this series:
 
-Fix is to reset the sli-3 function before sending the
-mailbox command, thus synchronizing the function/driver on mailbox
-location.
-
-This issue was introduced by this patch:
-http://www.spinics.net/lists/linux-scsi/msg105908.html
-which is in the stable pools with commit id:
-96418b5e2c8867da3279d877f5d1ffabfe460c3d
-
-This patch needs to be applied to the stable trees where ever the
-introducing patch exists.
-
-Signed-off-by: Dick Kennedy <dick.kennedy@broadcom.com>
-Signed-off-by: James Smart <james.smart@broadcom.com>
-Cc: stable@vger.kernel.org
----
- drivers/scsi/lpfc/lpfc_crtn.h | 1 +
- drivers/scsi/lpfc/lpfc_init.c | 7 +++++++
- drivers/scsi/lpfc/lpfc_sli.c  | 2 +-
- 3 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/scsi/lpfc/lpfc_crtn.h b/drivers/scsi/lpfc/lpfc_crtn.h
-index 944b32c..62016d6 100644
---- a/drivers/scsi/lpfc/lpfc_crtn.h
-+++ b/drivers/scsi/lpfc/lpfc_crtn.h
-@@ -294,6 +294,7 @@ int lpfc_selective_reset(struct lpfc_hba *);
- void lpfc_reset_barrier(struct lpfc_hba *);
- int lpfc_sli_brdready(struct lpfc_hba *, uint32_t);
- int lpfc_sli_brdkill(struct lpfc_hba *);
-+int lpfc_sli_chipset_init(struct lpfc_hba *);
- int lpfc_sli_brdreset(struct lpfc_hba *);
- int lpfc_sli_brdrestart(struct lpfc_hba *);
- int lpfc_sli_hba_setup(struct lpfc_hba *);
-diff --git a/drivers/scsi/lpfc/lpfc_init.c b/drivers/scsi/lpfc/lpfc_init.c
-index 90ae354..e85f273 100644
---- a/drivers/scsi/lpfc/lpfc_init.c
-+++ b/drivers/scsi/lpfc/lpfc_init.c
-@@ -3602,6 +3602,13 @@ lpfc_get_wwpn(struct lpfc_hba *phba)
- 	LPFC_MBOXQ_t *mboxq;
- 	MAILBOX_t *mb;
- 
-+	if (phba->sli_rev < LPFC_SLI_REV4) {
-+		/* Reset the port first */
-+		lpfc_sli_brdrestart(phba);
-+		rc = lpfc_sli_chipset_init(phba);
-+		if (rc)
-+			return (uint64_t)-1;
-+	}
- 
- 	mboxq = (LPFC_MBOXQ_t *) mempool_alloc(phba->mbox_mem_pool,
- 						GFP_KERNEL);
-diff --git a/drivers/scsi/lpfc/lpfc_sli.c b/drivers/scsi/lpfc/lpfc_sli.c
-index cf19f49..22862b7 100644
---- a/drivers/scsi/lpfc/lpfc_sli.c
-+++ b/drivers/scsi/lpfc/lpfc_sli.c
-@@ -4446,7 +4446,7 @@ lpfc_sli_brdrestart(struct lpfc_hba *phba)
-  * iteration, the function will restart the HBA again. The function returns
-  * zero if HBA successfully restarted else returns negative error code.
-  **/
--static int
-+int
- lpfc_sli_chipset_init(struct lpfc_hba *phba)
- {
- 	uint32_t status, i = 0;
--- 
-2.9.3
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Dan Williams (18):
+      device-dax: rename 'dax_dev' to 'dev_dax'
+      dax: refactor dax-fs into a generic provider of 'struct
+dax_device' instances
+      dax: add a facility to lookup a dax device by 'host' device name
+      dax: introduce dax_operations
+      pmem: add dax_operations support
+      axon_ram: add dax_operations support
+      brd: add dax_operations support
+      dcssblk: add dax_operations support
+      block: kill bdev_dax_capable()
+      dax: introduce dax_direct_access()
+      dm: add dax_device and dax_operations support
+      dm: teach dm-targets to use a dax_device + dax_operations
+      ext2, ext4, xfs: retrieve dax_device for iomap operations
+      Revert "block: use DAX for partition table reads"
+      filesystem-dax: convert to dax_direct_access()
+      block, dax: convert bdev_dax_supported() to dax_direct_access()
+      block: remove block_device_operations ->direct_access()
+      x86, dax, pmem: remove indirection around memcpy_from_pmem()
