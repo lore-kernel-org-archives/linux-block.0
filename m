@@ -1,109 +1,32 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:51590 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1433572AbdDZHks (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2017 03:40:48 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: snitzer@redhat.com
-Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 1/4] dm mpath: merge do_end_io into multipath_end_io
-Date: Wed, 26 Apr 2017 09:40:36 +0200
-Message-Id: <20170426074039.14602-2-hch@lst.de>
-In-Reply-To: <20170426074039.14602-1-hch@lst.de>
-References: <20170426074039.14602-1-hch@lst.de>
+Received: from mail-eopbgr670129.outbound.protection.outlook.com ([40.107.67.129]:39472
+        "EHLO CAN01-TO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1954852AbdDYVXa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Apr 2017 17:23:30 -0400
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        "jonathan.derrick@intel.com" <jonathan.derrick@intel.com>,
+        "libc-alpha@sourceware.org" <libc-alpha@sourceware.org>
+Subject: Re: Status of pwritev2/preadv2 in glibc?
+Date: Tue, 25 Apr 2017 21:23:28 +0000
+Message-ID: <21B6AEB8-7655-4E9C-B3C4-8BD853AEA39B@raithlin.com>
+References: <ECD1C373-3464-4AEF-8E73-3130C5BFAF87@raithlin.com>
+ <20170421105618.GB31499@infradead.org>
+ <4ab1466b-5273-d3fb-8db1-3ad21578ccfc@redhat.com>
+ <11169EBC-13BF-4E65-B975-7B98D42F61CE@raithlin.com>
+ <0ecdf90d-ded9-d0d3-e88c-4cedb803a0a9@linaro.org>
+In-Reply-To: <0ecdf90d-ded9-d0d3-e88c-4cedb803a0a9@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This simplifies the I/O completion path a bit.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-mpath.c | 53 +++++++++++++++++----------------------------------
- 1 file changed, 18 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 2950b145443d..1973670ea102 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -1473,12 +1473,12 @@ static int noretry_error(int error)
- 	return 0;
- }
- 
--/*
-- * end_io handling
-- */
--static int do_end_io(struct multipath *m, struct request *clone,
--		     int error, struct dm_mpath_io *mpio)
-+static int multipath_end_io(struct dm_target *ti, struct request *clone,
-+			    int error, union map_info *map_context)
- {
-+	struct dm_mpath_io *mpio = get_mpio(map_context);
-+	struct pgpath *pgpath = mpio->pgpath;
-+
- 	/*
- 	 * We don't queue any clone request inside the multipath target
- 	 * during end I/O handling, since those clone requests don't have
-@@ -1490,47 +1490,30 @@ static int do_end_io(struct multipath *m, struct request *clone,
- 	 * request into dm core, which will remake a clone request and
- 	 * clone bios for it and resubmit it later.
- 	 */
--	int r = DM_ENDIO_REQUEUE;
--
--	if (!error)
--		return 0;	/* I/O complete */
-+	if (error && !noretry_error(error)) {
-+		struct multipath *m = ti->private;
- 
--	if (noretry_error(error))
--		return error;
-+		error = DM_ENDIO_REQUEUE;
- 
--	if (mpio->pgpath)
--		fail_path(mpio->pgpath);
-+		if (pgpath)
-+			fail_path(pgpath);
- 
--	if (!atomic_read(&m->nr_valid_paths)) {
--		if (!test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
--			if (!must_push_back_rq(m))
--				r = -EIO;
-+		if (!atomic_read(&m->nr_valid_paths)) {
-+			if (!test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
-+				if (!must_push_back_rq(m))
-+					error = -EIO;
-+			}
- 		}
- 	}
- 
--	return r;
--}
--
--static int multipath_end_io(struct dm_target *ti, struct request *clone,
--			    int error, union map_info *map_context)
--{
--	struct multipath *m = ti->private;
--	struct dm_mpath_io *mpio = get_mpio(map_context);
--	struct pgpath *pgpath;
--	struct path_selector *ps;
--	int r;
--
--	BUG_ON(!mpio);
--
--	r = do_end_io(m, clone, error, mpio);
--	pgpath = mpio->pgpath;
- 	if (pgpath) {
--		ps = &pgpath->pg->ps;
-+		struct path_selector *ps = &pgpath->pg->ps;
-+
- 		if (ps->type->end_io)
- 			ps->type->end_io(ps, &pgpath->path, mpio->nr_bytes);
- 	}
- 
--	return r;
-+	return error;
- }
- 
- static int do_end_io_bio(struct multipath *m, struct bio *clone,
--- 
-2.11.0
+DQo+IEkgYW0gd29ya2luZyBvbiBpdCBidHcgWzFdDQoNClRoYW5rcyBmb3Igd29ya2luZyBvbiB0
+aGlzIEFkaGVtZXJ2YWwhDQoNCj4gUFM6IHJlc2VuZGluZyB3aXRoIGNjIHRvIGFsbC4NCg0KQ2Fu
+IHlvdSBjYyBsaW51eC1ibG9jayB3aGVuIHlvdSBzdWJtaXQgdGhlIHBhdGNoc2V0Pw0KDQpTdGVw
+aGVuDQoNCg==
