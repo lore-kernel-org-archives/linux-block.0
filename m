@@ -1,94 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40268 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752737AbdDLKZH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2017 06:25:07 -0400
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
-        linux-afs@lists.infradead.org
-Subject: [PATCH 12/25] afs: Convert to separately allocated bdi
-Date: Wed, 12 Apr 2017 12:24:36 +0200
-Message-Id: <20170412102449.16901-13-jack@suse.cz>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>,
+ Christoph Hellwig <hch@infradead.org>
+References: <20170414120257.8932-1-rgoldwyn@suse.de>
+ <20170414120257.8932-6-rgoldwyn@suse.de>
+ <20170419064505.GD20053@infradead.org>
+ <3485e23c-3a4d-23a5-50d5-69c824353d1a@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, sagi@grimberg.me,
+ avi@scylladb.com, linux-api@vger.kernel.org, willy@infradead.org,
+ tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b1a0b06c-603b-e765-e3a3-2c91562549bc@kernel.dk>
+Date: Mon, 24 Apr 2017 20:28:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <3485e23c-3a4d-23a5-50d5-69c824353d1a@suse.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+On 04/24/2017 03:10 PM, Goldwyn Rodrigues wrote:
+> 
+> 
+> On 04/19/2017 01:45 AM, Christoph Hellwig wrote:
+>> On Fri, Apr 14, 2017 at 07:02:54AM -0500, Goldwyn Rodrigues wrote:
+>>> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>>>
+>>
+>>> +	/* Request queue supports BIO_NOWAIT */
+>>> +	queue_flag_set_unlocked(QUEUE_FLAG_NOWAIT, q);
+>>
+>> BIO_NOWAIT is gone.  And the comment would not be needed if the
+>> flag had a more descriptive name, e.g. QUEUE_FLAG_NOWAIT_SUPPORT.
+>>
+>> And I think all request based drivers should set the flag implicitly
+>> as ->queuecommand can't sleep, and ->queue_rq only when it's always
+>> offloaded to a workqueue when the BLK_MQ_F_BLOCKING flag is set.
+>>
+> 
+> We introduced QUEUE_FLAG_NOWAIT for devices which would not wait for
+> request completions. The ones which wait are MD devices because of sync
+> or suspend operations.
+> 
+> The only user of BLK_MQ_F_NONBLOCKING seems to be nbd. As you mentioned,
+> it uses the flag to offload it to a workqueue.
+> 
+> The other way to do it implicitly is to change the flag to
+> BLK_MAY_BLOCK_REQS and use it for devices which do wait such as md/dm.
+> Is that what you are hinting at? Or do you have something else in mind?
 
-CC: David Howells <dhowells@redhat.com>
-CC: linux-afs@lists.infradead.org
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/afs/internal.h | 1 -
- fs/afs/super.c    | 5 ++++-
- fs/afs/volume.c   | 8 --------
- 3 files changed, 4 insertions(+), 10 deletions(-)
+You are misunderstanding. What Christoph (correctly) says is that request
+based drivers do not block, so all of those are fine. What you need to
+worry about is drivers that are NOT request based. In other words, drivers
+that hook into make_request_fn and process bio's.
 
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index a6901360fb81..393672997cc2 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -318,7 +318,6 @@ struct afs_volume {
- 	unsigned short		rjservers;	/* number of servers discarded due to -ENOMEDIUM */
- 	struct afs_server	*servers[8];	/* servers on which volume resides (ordered) */
- 	struct rw_semaphore	server_sem;	/* lock for accessing current server */
--	struct backing_dev_info	bdi;
- };
- 
- /*
-diff --git a/fs/afs/super.c b/fs/afs/super.c
-index fbdb022b75a2..c79633e5cfd8 100644
---- a/fs/afs/super.c
-+++ b/fs/afs/super.c
-@@ -319,7 +319,10 @@ static int afs_fill_super(struct super_block *sb,
- 	sb->s_blocksize_bits	= PAGE_SHIFT;
- 	sb->s_magic		= AFS_FS_MAGIC;
- 	sb->s_op		= &afs_super_ops;
--	sb->s_bdi		= &as->volume->bdi;
-+	ret = super_setup_bdi(sb);
-+	if (ret)
-+		return ret;
-+	sb->s_bdi->ra_pages	= VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
- 	strlcpy(sb->s_id, as->volume->vlocation->vldb.name, sizeof(sb->s_id));
- 
- 	/* allocate the root inode and dentry */
-diff --git a/fs/afs/volume.c b/fs/afs/volume.c
-index 546f9d01710b..db73d6dad02b 100644
---- a/fs/afs/volume.c
-+++ b/fs/afs/volume.c
-@@ -106,11 +106,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
- 	volume->cell		= params->cell;
- 	volume->vid		= vlocation->vldb.vid[params->type];
- 
--	volume->bdi.ra_pages	= VM_MAX_READAHEAD*1024/PAGE_SIZE; 
--	ret = bdi_setup_and_register(&volume->bdi, "afs");
--	if (ret)
--		goto error_bdi;
--
- 	init_rwsem(&volume->server_sem);
- 
- 	/* look up all the applicable server records */
-@@ -156,8 +151,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
- 	return ERR_PTR(ret);
- 
- error_discard:
--	bdi_destroy(&volume->bdi);
--error_bdi:
- 	up_write(&params->cell->vl_sem);
- 
- 	for (loop = volume->nservers - 1; loop >= 0; loop--)
-@@ -207,7 +200,6 @@ void afs_put_volume(struct afs_volume *volume)
- 	for (loop = volume->nservers - 1; loop >= 0; loop--)
- 		afs_put_server(volume->servers[loop]);
- 
--	bdi_destroy(&volume->bdi);
- 	kfree(volume);
- 
- 	_leave(" [destroyed]");
 -- 
-2.12.0
+Jens Axboe
