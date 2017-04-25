@@ -1,117 +1,36 @@
 Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>, Hannes Reinecke
-	<hare@suse.de>, Long Li <longli@microsoft.com>, "K . Y . Srinivasan"
-	<kys@microsoft.com>
-Subject: [PATCH v3 4/5] blk-mq: Introduce blk_mq_delay_run_hw_queue()
-Date: Thu, 6 Apr 2017 11:10:49 -0700
-Message-ID: <20170406181050.12137-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170406181050.12137-1-bart.vanassche@sandisk.com>
-References: <20170406181050.12137-1-bart.vanassche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "osandov@osandov.com" <osandov@osandov.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"James.Bottomley@HansenPartnership.com"
+	<James.Bottomley@HansenPartnership.com>, "hare@suse.com" <hare@suse.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "osandov@fb.com"
+	<osandov@fb.com>, "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v5 10/10] scsi: Implement blk_mq_ops.show_rq()
+Date: Tue, 25 Apr 2017 22:06:24 +0000
+Message-ID: <1493157983.2628.24.camel@sandisk.com>
+References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+	 <20170425203745.19946-11-bart.vanassche@sandisk.com>
+	 <20170425213956.GD6361@vader>
+In-Reply-To: <20170425213956.GD6361@vader>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce a function that runs a hardware queue unconditionally
-after a delay. Note: there is already a function that stops and
-restarts a hardware queue after a delay, namely blk_mq_delay_queue().
+On Tue, 2017-04-25 at 14:39 -0700, Omar Sandoval wrote:
+> On Tue, Apr 25, 2017 at 01:37:45PM -0700, Bart Van Assche wrote:
+> > Show the SCSI CDB, .eh_eflags and .result for pending SCSI commands
+> > in /sys/kernel/debug/block/*/mq/*/dispatch and */rq_list.
+>=20
+> Only thing I noticed was that the only other caller I see has buf[70].
+> No idea if that's a meaningful number. For the sake of this not getting
+> bike-shedded to death,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Long Li <longli@microsoft.com>
-Cc: K. Y. Srinivasan <kys@microsoft.com>
----
- block/blk-mq.c         | 32 ++++++++++++++++++++++++++++++--
- include/linux/blk-mq.h |  2 ++
- 2 files changed, 32 insertions(+), 2 deletions(-)
+Neither length is sufficient to avoid truncation of e.g. ATA pass-through
+commands or commands with variable length CDBs. However, from the point of
+view of debugging queue lockups the most useful information in a SCSI
+command are the first two bytes of the CDB. The chosen buffer length is
+definitely enough to make sure that these two bytes will be reported.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4db48ad76878..36a80ab6fff8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1146,7 +1146,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 	return hctx->next_cpu;
- }
- 
--void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
-+static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
-+					unsigned long msecs)
- {
- 	if (unlikely(blk_mq_hctx_stopped(hctx) ||
- 		     !blk_mq_hw_queue_mapped(hctx)))
-@@ -1163,7 +1164,24 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 		put_cpu();
- 	}
- 
--	kblockd_schedule_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work);
-+	if (msecs == 0)
-+		kblockd_schedule_work_on(blk_mq_hctx_next_cpu(hctx),
-+					 &hctx->run_work);
-+	else
-+		kblockd_schedule_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
-+						 &hctx->delayed_run_work,
-+						 msecs_to_jiffies(msecs));
-+}
-+
-+void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
-+{
-+	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
-+}
-+EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
-+
-+void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
-+{
-+	__blk_mq_delay_run_hw_queue(hctx, async, 0);
- }
- 
- void blk_mq_run_hw_queues(struct request_queue *q, bool async)
-@@ -1266,6 +1284,15 @@ static void blk_mq_run_work_fn(struct work_struct *work)
- 	__blk_mq_run_hw_queue(hctx);
- }
- 
-+static void blk_mq_delayed_run_work_fn(struct work_struct *work)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+
-+	hctx = container_of(work, struct blk_mq_hw_ctx, delayed_run_work.work);
-+
-+	__blk_mq_run_hw_queue(hctx);
-+}
-+
- static void blk_mq_delay_work_fn(struct work_struct *work)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -1866,6 +1893,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 		node = hctx->numa_node = set->numa_node;
- 
- 	INIT_WORK(&hctx->run_work, blk_mq_run_work_fn);
-+	INIT_DELAYED_WORK(&hctx->delayed_run_work, blk_mq_delayed_run_work_fn);
- 	INIT_DELAYED_WORK(&hctx->delay_work, blk_mq_delay_work_fn);
- 	spin_lock_init(&hctx->lock);
- 	INIT_LIST_HEAD(&hctx->dispatch);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index bdea90d75274..b90c3d5766cd 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -51,6 +51,7 @@ struct blk_mq_hw_ctx {
- 
- 	atomic_t		nr_active;
- 
-+	struct delayed_work	delayed_run_work;
- 	struct delayed_work	delay_work;
- 
- 	struct hlist_node	cpuhp_dead;
-@@ -236,6 +237,7 @@ void blk_mq_stop_hw_queues(struct request_queue *q);
- void blk_mq_start_hw_queues(struct request_queue *q);
- void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
-+void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
--- 
-2.12.0
+Bart.=
