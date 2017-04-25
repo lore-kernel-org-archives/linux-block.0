@@ -1,30 +1,44 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Date: Tue, 25 Apr 2017 10:57:57 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jon Derrick <jonathan.derrick@intel.com>
-Subject: Re: [PATCH] nvme/scsi: Consider LBA format in IO splitting calculation
-Message-ID: <20170425175757.GB3575@infradead.org>
+Return-Path: <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH] nvme/scsi: Consider LBA format in IO splitting
+ calculation
+To: Jens Axboe <axboe@kernel.dk>, Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ linux-block@vger.kernel.org, keith.busch@intel.com, hch@infradead.org,
+ sagi@grimberg.me
 References: <20170425000243.2019-1-jonathan.derrick@intel.com>
+ <20170425040025.GA23572@kernel.dk>
+ <267a4710-3a71-c08c-8e03-19bd2e73d056@wdc.com>
+ <9a84df91-509d-1c1f-8653-849e42a50b6a@kernel.dk>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <5159e2b1-d9cf-b76b-7000-d0b7c3c0d975@wdc.com>
+Date: Tue, 25 Apr 2017 13:43:20 +0900
 MIME-Version: 1.0
-In-Reply-To: <20170425000243.2019-1-jonathan.derrick@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: keith.busch@intel.com, sagi@grimberg.me, linux-scsi@vger.kernel.org,
- hch@infradead.org, linux-nvme@lists.infradead.org, axboe@fb.com,
- linux-block@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+In-Reply-To: <9a84df91-509d-1c1f-8653-849e42a50b6a@kernel.dk>
+Return-Path: damien.lemoal@wdc.com
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Applied to nvme-4.12.
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+SmVucywKCk9uIDQvMjUvMTcgMTM6MzIsIEplbnMgQXhib2Ugd3JvdGU6Cj4+IEkganVzdCByZWFs
+aXplZCB0aGF0IHRoaXMgbWFjcm8gaXMgZGVmaW5lZCBpbiBsaW51eC9kZXZpY2UtbWFwcGVyLmgs
+Cj4+IHdoaWNoIGRvZXMgbm90IHNlZW0gbGlrZSB0byBiZXN0IHBsYWNlIHRvIGhhdmUgaXQuIFdo
+eSBub3QgYmxrZGV2LmggPwo+PiBBbnkgcGFydGljdWxhciByZWFzb24gPyBUaGlzIGxlYWRzIHRv
+IHNvbWUgc3RyYW5nZSBpbmNsdWRlIGRlcGVuZGVuY2llcywKPj4gbGlrZSBtYW55IG5mcy9ibG9j
+a2xheW91dC8gZmlsZXMgaW5jbHVkaW5nIGRldmljZS1tYXBwZXIuaCBqdXN0IHRvIGdldAo+PiB0
+aGF0IGRlZmluaXRpb24uCj4gCj4gSSdtIGZpbmUgd2l0aCBtb3ZpbmcgaXQgYW5kIHVzaW5nIGl0
+IGV2ZXJ5d2hlcmUuIFJpZ2h0IG5vdyB3ZSBkb24ndCBpbgo+IHRoZSBibG9jayBjb3JlIGF0IGFs
+bCwgOSBpcyBhbHdheXMgaGFyZCBjb2RlZC4gV2hpbGUgdGhhdCBjaGFuZ2Ugd291bGQKPiBiZSBm
+aW5lLCBpdCBzaG91bGQgYmUgZG9uZSBpbmRlcGVuZGVudGx5IG9mIHRoaXMgcGF0Y2gsIHdoaWNo
+IGlzIGEgcmVhbAo+IGJ1ZyBmaXguCgpUaGFuayB5b3UgZm9yIHRoZSBjbGFyaWZpY2F0aW9uLiBJ
+IHdpbGwgdHJ5IHRvIHNlbmQgc29tZXRoaW5nIGxhdGVyLgoKQmVzdCByZWdhcmRzLgoKLS0gCkRh
+bWllbiBMZSBNb2FsLApXZXN0ZXJuIERpZ2l0YWwKV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0aW9u
+IChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eSBOb3RpY2UgJiBE
+aXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRoIGl0
+IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZpbGVnZWQgaW5mb3JtYXRp
+b24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBpbnRlbmRlZCBzb2xlbHkg
+Zm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRvIHdoaWNoIHRoZXkgYXJl
+IGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55IGRp
+c2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0aW9uIHRha2VuIG9yIG9t
+aXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHByb2hpYml0ZWQuIElmIHlv
+dSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBz
+ZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRpcmV0eSBm
+cm9tIHlvdXIgc3lzdGVtLgo=
