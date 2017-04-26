@@ -1,53 +1,40 @@
 Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v6 05/10] blk-mq: Unregister debugfs attributes earlier
-Date: Wed, 26 Apr 2017 13:47:52 -0700
-Message-ID: <20170426204757.18910-6-bart.vanassche@sandisk.com>
-In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "osandov@osandov.com" <osandov@osandov.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v5 05/10] blk-mq: Unregister debugfs attributes earlier
+Date: Wed, 26 Apr 2017 20:38:11 +0000
+Message-ID: <1493239091.2632.14.camel@sandisk.com>
+References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+	 <20170425203745.19946-6-bart.vanassche@sandisk.com>
+	 <20170425213018.GB6361@vader>
+	 <0da834e7-f934-9317-509a-455932d837e4@kernel.dk>
+In-Reply-To: <0da834e7-f934-9317-509a-455932d837e4@kernel.dk>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-We currently call blk_mq_free_queue() from blk_cleanup_queue()
-before we unregister the debugfs attributes for that queue in
-blk_release_queue(). This leaves a window open during which
-accessing most of the mq debugfs attributes would cause a
-use-after-free. Additionally, the "state" attribute allows
-running the queue, which we should not do after the queue has
-entered the "dead" state. Fix both cases by unregistering the
-debugfs attributes before freeing queue resources starts.
+On Tue, 2017-04-25 at 14:41 -0700, Jens Axboe wrote:
+> Looks fine to me. However, I think there's room for improvement here.
+> Why don't we just make it:
+>=20
+> 	if (!q->mq_ops) {
+> 		spin_lock_irq(lock);
+> 		__blk_drain_queue(q, true);
+> 	} else {
+> 		blk_mq_debugfs_unregister_mq(q);
+> 		spin_lock_irq(lock);
+> 	}
+>=20
+> 	queue_flag_set(QUEUE_FLAG_DEAD, q);
+> 	[...]
+>=20
+> Would seem much more readable to me, and less dropping/acquiring for
+> cases where we don't need it.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Hello Jens,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a49b0830aaaf..6bd4d1754d29 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -563,9 +563,13 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 * prevent that q->request_fn() gets invoked after draining finished.
- 	 */
- 	blk_freeze_queue(q);
--	spin_lock_irq(lock);
--	if (!q->mq_ops)
-+	if (!q->mq_ops) {
-+		spin_lock_irq(lock);
- 		__blk_drain_queue(q, true);
-+	} else {
-+		blk_mq_debugfs_unregister_mq(q);
-+		spin_lock_irq(lock);
-+	}
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
- 
--- 
-2.12.2
+This looks fine to me. I will update the patch.
+
+Bart.=
