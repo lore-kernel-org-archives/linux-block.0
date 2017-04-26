@@ -1,98 +1,57 @@
-Return-Path: <BATV+cba2d22df955e8193e5b+4988+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Josef Bacik <jbacik@fb.com>,
-	James Smart <james.smart@broadcom.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 14/23] mtip32xx: add a status field to struct mtip_cmd
-Date: Thu, 20 Apr 2017 16:03:07 +0200
-Message-Id: <20170420140316.6546-15-hch@lst.de>
-In-Reply-To: <20170420140316.6546-1-hch@lst.de>
-References: <20170420140316.6546-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:49004 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1955462AbdDZGP6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Apr 2017 02:15:58 -0400
+Date: Wed, 26 Apr 2017 14:14:03 +0800
+From: Ye Xiaolong <xiaolong.ye@intel.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: kbuild test robot <lkp@intel.com>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        kbuild-all@01.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>
+Subject: Re: [kbuild-all] [PATCH v3] axon_ram: add dax_operations support
+Message-ID: <20170426061403.GI29367@yexl-desktop>
+References: <149264111867.36586.15762148888692084363.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <201704201000.drxGPNHB%fengguang.wu@intel.com>
+ <CAPcyv4jWN9-JrckBR1wa1Tp7eqB0Hyb61nUhHak5rotVsTgQ7A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAPcyv4jWN9-JrckBR1wa1Tp7eqB0Hyb61nUhHak5rotVsTgQ7A@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Instead of using req->errors, which will go away.
+On 04/19, Dan Williams wrote:
+>On Wed, Apr 19, 2017 at 8:01 PM, kbuild test robot <lkp@intel.com> wrote:
+>> Hi Dan,
+>>
+>> [auto build test ERROR on powerpc/next]
+>> [also build test ERROR on v4.11-rc7 next-20170419]
+>> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+>>
+>>
+>> url:    https://github.com/0day-ci/linux/commits/Dan-Williams/axon_ram-add-dax_operations-support/20170420-091615
+>> base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git next
+>
+>Hi kbuild team, yes this is the wrong base. It's part of a larger
+>series [1] and I'm just re-sending a few select patches with updates
+>from review, rather than the full 33 patch series. Any better way to
+>send individual updates to a patch in a series without re-sending the
+>whole series?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/mtip32xx/mtip32xx.c | 16 +++++++++-------
- drivers/block/mtip32xx/mtip32xx.h |  1 +
- 2 files changed, 10 insertions(+), 7 deletions(-)
+Thanks for the feedback, as it's a common practice in community, we are
+developing a new feature to recognize the updated patch of a patch series, and
+apply it together with the whole patchset other than applying it individually.
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 05e3e664ea1b..7406de29db58 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -241,7 +241,8 @@ static void mtip_async_complete(struct mtip_port *port,
- 
- 	rq = mtip_rq_from_tag(dd, tag);
- 
--	blk_mq_complete_request(rq, status);
-+	cmd->status = status;
-+	blk_mq_complete_request(rq, 0);
- }
- 
- /*
-@@ -2910,18 +2911,19 @@ static void mtip_softirq_done_fn(struct request *rq)
- 	if (unlikely(cmd->unaligned))
- 		up(&dd->port->cmd_slot_unal);
- 
--	blk_mq_end_request(rq, rq->errors);
-+	blk_mq_end_request(rq, cmd->status);
- }
- 
- static void mtip_abort_cmd(struct request *req, void *data,
- 							bool reserved)
- {
-+	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
- 	struct driver_data *dd = data;
- 
- 	dbg_printk(MTIP_DRV_NAME " Aborting request, tag = %d\n", req->tag);
- 
- 	clear_bit(req->tag, dd->port->cmds_to_issue);
--	req->errors = -EIO;
-+	cmd->status = -EIO;
- 	mtip_softirq_done_fn(req);
- }
- 
-@@ -3816,7 +3818,6 @@ static int mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (likely(!ret))
- 		return BLK_MQ_RQ_QUEUE_OK;
- 
--	rq->errors = ret;
- 	return BLK_MQ_RQ_QUEUE_ERROR;
- }
- 
-@@ -4106,9 +4107,10 @@ static void mtip_no_dev_cleanup(struct request *rq, void *data, bool reserv)
- 	struct driver_data *dd = (struct driver_data *)data;
- 	struct mtip_cmd *cmd;
- 
--	if (likely(!reserv))
--		blk_mq_complete_request(rq, -ENODEV);
--	else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
-+	if (likely(!reserv)) {
-+		cmd->status = -ENODEV;
-+		blk_mq_complete_request(rq, 0);
-+	} else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
- 
- 		cmd = mtip_cmd_from_tag(dd, MTIP_TAG_INTERNAL);
- 		if (cmd->comp_func)
-diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-index 7617888f7944..57b41528a824 100644
---- a/drivers/block/mtip32xx/mtip32xx.h
-+++ b/drivers/block/mtip32xx/mtip32xx.h
-@@ -352,6 +352,7 @@ struct mtip_cmd {
- 	int retries; /* The number of retries left for this command. */
- 
- 	int direction; /* Data transfer direction */
-+	int status;
- };
- 
- /* Structure used to describe a port. */
--- 
-2.11.0
+Thanks,
+Xiaolong
+
+>
+>[1]: https://lkml.org/lkml/2017/4/14/495
+>_______________________________________________
+>kbuild-all mailing list
+>kbuild-all@lists.01.org
+>https://lists.01.org/mailman/listinfo/kbuild-all
