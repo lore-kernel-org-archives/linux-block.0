@@ -1,127 +1,78 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v6 03/10] blk-mq-debugfs: Rename functions for registering and unregistering the mq directory
-Date: Wed, 26 Apr 2017 13:47:50 -0700
-Message-ID: <20170426204757.18910-4-bart.vanassche@sandisk.com>
-In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:46748 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1433572AbdDZHk7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Apr 2017 03:40:59 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: snitzer@redhat.com
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 4/4] dm: introduce a new DM_MAPIO_KILL return value
+Date: Wed, 26 Apr 2017 09:40:39 +0200
+Message-Id: <20170426074039.14602-5-hch@lst.de>
+In-Reply-To: <20170426074039.14602-1-hch@lst.de>
+References: <20170426074039.14602-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Since the blk_mq_debugfs_*register_hctxs() functions register and
-unregister all attributes under the "mq" directory, rename these
-into blk_mq_debugfs_*register_mq().
+This untangles the DM_MAPIO_* values returned from ->clone_and_map_rq
+from the error codes used by the block layer.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-debugfs.c | 8 ++++----
- block/blk-mq-sysfs.c   | 6 +++---
- block/blk-mq.h         | 8 ++++----
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ drivers/md/dm-rq.c            | 12 +++++-------
+ drivers/md/dm-target.c        |  2 +-
+ include/linux/device-mapper.h |  1 +
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index e9282b945f6b..d99064e9e76a 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -795,7 +795,7 @@ int blk_mq_debugfs_register(struct request_queue *q)
- 	if (!q->debugfs_dir)
- 		goto err;
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 769f04f83ca2..ea4fdf68a0ed 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -504,14 +504,12 @@ static int map_request(struct dm_rq_target_io *tio)
+ 		/* The target wants to requeue the I/O after a delay */
+ 		dm_requeue_original_request(tio, true);
+ 		break;
+-	default:
+-		if (r > 0) {
+-			DMWARN("unimplemented target map return value: %d", r);
+-			BUG();
+-		}
+-
++	case DM_MAPIO_KILL:
+ 		/* The target wants to complete the I/O */
+-		dm_kill_unmapped_request(rq, r);
++		dm_kill_unmapped_request(rq, -EIO);
++	default:
++		DMWARN("unimplemented target map return value: %d", r);
++		BUG();
+ 	}
  
--	if (blk_mq_debugfs_register_hctxs(q))
-+	if (blk_mq_debugfs_register_mq(q))
- 		goto err;
- 
- 	return 0;
-@@ -865,7 +865,7 @@ static int blk_mq_debugfs_register_hctx(struct request_queue *q,
- 	return 0;
+ 	return r;
+diff --git a/drivers/md/dm-target.c b/drivers/md/dm-target.c
+index 43d3445b121d..6264ff00dcf0 100644
+--- a/drivers/md/dm-target.c
++++ b/drivers/md/dm-target.c
+@@ -135,7 +135,7 @@ static int io_err_clone_and_map_rq(struct dm_target *ti, struct request *rq,
+ 				   union map_info *map_context,
+ 				   struct request **clone)
+ {
+-	return -EIO;
++	return DM_MAPIO_KILL;
  }
  
--int blk_mq_debugfs_register_hctxs(struct request_queue *q)
-+int blk_mq_debugfs_register_mq(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-@@ -891,11 +891,11 @@ int blk_mq_debugfs_register_hctxs(struct request_queue *q)
- 	return 0;
+ static void io_err_release_clone_rq(struct request *clone)
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 5bafe3af27cc..0dc4d9cce128 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -590,6 +590,7 @@ extern struct ratelimit_state dm_ratelimit_state;
+ #define DM_MAPIO_REMAPPED	1
+ #define DM_MAPIO_REQUEUE	DM_ENDIO_REQUEUE
+ #define DM_MAPIO_DELAY_REQUEUE	3
++#define DM_MAPIO_KILL		4
  
- err:
--	blk_mq_debugfs_unregister_hctxs(q);
-+	blk_mq_debugfs_unregister_mq(q);
- 	return -ENOMEM;
- }
- 
--void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
-+void blk_mq_debugfs_unregister_mq(struct request_queue *q)
- {
- 	debugfs_remove_recursive(q->mq_debugfs_dir);
- 	q->mq_debugfs_dir = NULL;
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index afb3451cf8a5..c2cac20d981d 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -258,7 +258,7 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_unregister_hctx(hctx);
- 
--	blk_mq_debugfs_unregister_hctxs(q);
-+	blk_mq_debugfs_unregister_mq(q);
- 
- 	kobject_uevent(&q->mq_kobj, KOBJ_REMOVE);
- 	kobject_del(&q->mq_kobj);
-@@ -356,7 +356,7 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
- 	if (!q->mq_sysfs_init_done)
- 		goto unlock;
- 
--	blk_mq_debugfs_unregister_hctxs(q);
-+	blk_mq_debugfs_unregister_mq(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_unregister_hctx(hctx);
-@@ -374,7 +374,7 @@ int blk_mq_sysfs_register(struct request_queue *q)
- 	if (!q->mq_sysfs_init_done)
- 		goto unlock;
- 
--	blk_mq_debugfs_register_hctxs(q);
-+	blk_mq_debugfs_register_mq(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_register_hctx(hctx);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 9049c0f11505..2814a14e529c 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -89,8 +89,8 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
- #ifdef CONFIG_BLK_DEBUG_FS
- int blk_mq_debugfs_register(struct request_queue *q);
- void blk_mq_debugfs_unregister(struct request_queue *q);
--int blk_mq_debugfs_register_hctxs(struct request_queue *q);
--void blk_mq_debugfs_unregister_hctxs(struct request_queue *q);
-+int blk_mq_debugfs_register_mq(struct request_queue *q);
-+void blk_mq_debugfs_unregister_mq(struct request_queue *q);
- #else
- static inline int blk_mq_debugfs_register(struct request_queue *q)
- {
-@@ -101,12 +101,12 @@ static inline void blk_mq_debugfs_unregister(struct request_queue *q)
- {
- }
- 
--static inline int blk_mq_debugfs_register_hctxs(struct request_queue *q)
-+static inline int blk_mq_debugfs_register_mq(struct request_queue *q)
- {
- 	return 0;
- }
- 
--static inline void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
-+static inline void blk_mq_debugfs_unregister_mq(struct request_queue *q)
- {
- }
- #endif
+ #define dm_sector_div64(x, y)( \
+ { \
 -- 
-2.12.2
+2.11.0
