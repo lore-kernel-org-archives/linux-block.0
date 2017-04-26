@@ -1,58 +1,57 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] blk-mq: Fix preempt count imbalance
-Date: Fri, 21 Apr 2017 10:58:42 -0700
-Message-ID: <20170421175842.9208-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:46321 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1433572AbdDZHk4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Apr 2017 03:40:56 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: snitzer@redhat.com
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 3/4] dm mpath: simplify multipath_clone_and_map a little bit
+Date: Wed, 26 Apr 2017 09:40:38 +0200
+Message-Id: <20170426074039.14602-4-hch@lst.de>
+In-Reply-To: <20170426074039.14602-1-hch@lst.de>
+References: <20170426074039.14602-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid that the following kernel bug gets triggered:
+Remove the r variable and just expand the value at the two places where
+it is used.
 
-BUG: sleeping function called from invalid context at ./include/linux/buffer_head.h:349
-in_atomic(): 1, irqs_disabled(): 0, pid: 8019, name: find
-CPU: 10 PID: 8019 Comm: find Tainted: G        W I     4.11.0-rc4-dbg+ #2
-Call Trace:
- dump_stack+0x68/0x93
- ___might_sleep+0x16e/0x230
- __might_sleep+0x4a/0x80
- __ext4_get_inode_loc+0x1e0/0x4e0
- ext4_iget+0x70/0xbc0
- ext4_iget_normal+0x2f/0x40
- ext4_lookup+0xb6/0x1f0
- lookup_slow+0x104/0x1e0
- walk_component+0x19a/0x330
- path_lookupat+0x4b/0x100
- filename_lookup+0x9a/0x110
- user_path_at_empty+0x36/0x40
- vfs_statx+0x67/0xc0
- SYSC_newfstatat+0x20/0x40
- SyS_newfstatat+0xe/0x10
- entry_SYSCALL_64_fastpath+0x18/0xad
-
-Fixes: b00c53e8f411 ("blk-mq: fix schedule-while-atomic with scheduler attached")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/md/dm-mpath.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4130c7730d6d..f5d24a94ae68 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1631,6 +1631,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	} else if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_run_hw_queue(data.hctx, true);
-+	} else {
-+		blk_mq_put_ctx(data.ctx);
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 9e971be254f4..33ecda737376 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -484,7 +484,6 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 				   struct request **__clone)
+ {
+ 	struct multipath *m = ti->private;
+-	int r = DM_MAPIO_REQUEUE;
+ 	size_t nr_bytes = blk_rq_bytes(rq);
+ 	struct pgpath *pgpath;
+ 	struct block_device *bdev;
+@@ -503,7 +502,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
+ 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
+ 		pg_init_all_paths(m);
+-		return r;
++		return DM_MAPIO_REQUEUE;
  	}
  
- 	return cookie;
+ 	memset(mpio, 0, sizeof(*mpio));
+@@ -517,7 +516,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 			GFP_ATOMIC);
+ 	if (IS_ERR(clone)) {
+ 		/* EBUSY, ENODEV or EWOULDBLOCK: requeue */
+-		return r;
++		return DM_MAPIO_REQUEUE;
+ 	}
+ 	clone->bio = clone->biotail = NULL;
+ 	clone->rq_disk = bdev->bd_disk;
 -- 
-2.12.2
+2.11.0
