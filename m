@@ -2,71 +2,60 @@ Return-Path: <Bart.VanAssche@sandisk.com>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
 To: Jens Axboe <axboe@kernel.dk>
 CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH v4 04/10] blk-mq: Check blk_mq_debugfs_register() return value
-Date: Fri, 21 Apr 2017 16:40:20 -0700
-Message-ID: <20170421234026.18970-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170421234026.18970-1-bart.vanassche@sandisk.com>
-References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v6 06/10] blk-mq: Move the "state" debugfs attribute one level down
+Date: Wed, 26 Apr 2017 13:47:53 -0700
+Message-ID: <20170426204757.18910-7-bart.vanassche@sandisk.com>
+In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Make __blk_mq_register_dev() check the blk_mq_debugfs_register()
-return value. In the error path, only unregister hctxs for which
-registration succeeded.
+Move the "state" attribute from the top level to the "mq" directory
+as requested by Omar.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq-sysfs.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ block/blk-mq-debugfs.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index c2cac20d981d..5f66a7798878 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -318,21 +318,32 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index d99064e9e76a..1132be4e9c1c 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -141,11 +141,6 @@ static const struct file_operations blk_queue_flags_fops = {
+ 	.write		= blk_queue_flags_store,
+ };
  
- 	kobject_uevent(&q->mq_kobj, KOBJ_ADD);
+-static const struct blk_mq_debugfs_attr blk_queue_attrs[] = {
+-	{"state", 0600, &blk_queue_flags_fops},
+-	{},
+-};
+-
+ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
+ {
+ 	if (stat->nr_samples) {
+@@ -757,6 +752,7 @@ static const struct file_operations ctx_completed_fops = {
  
--	blk_mq_debugfs_register(q);
-+	ret = blk_mq_debugfs_register(q);
-+	if (ret)
-+		goto remove;
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+ 	{"poll_stat", 0400, &queue_poll_stat_fops},
++	{"state", 0600, &blk_queue_flags_fops},
+ 	{},
+ };
  
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_register_hctx(hctx);
- 		if (ret)
--			break;
-+			goto unreg;
- 	}
+@@ -873,9 +869,6 @@ int blk_mq_debugfs_register_mq(struct request_queue *q)
+ 	if (!q->debugfs_dir)
+ 		return -ENOENT;
  
--	if (ret)
--		__blk_mq_unregister_dev(dev, q);
--	else
--		q->mq_sysfs_init_done = true;
-+	q->mq_sysfs_init_done = true;
- 
- out:
- 	return ret;
-+
-+unreg:
-+	while (--i >= 0)
-+		blk_mq_unregister_hctx(hctx);
-+
-+	blk_mq_debugfs_unregister_mq(q);
-+
-+remove:
-+	kobject_uevent(&q->mq_kobj, KOBJ_REMOVE);
-+	kobject_del(&q->mq_kobj);
-+	kobject_put(&dev->kobj);
-+	goto out;
- }
- 
- int blk_mq_register_dev(struct device *dev, struct request_queue *q)
+-	if (!debugfs_create_files(q->debugfs_dir, q, blk_queue_attrs))
+-		goto err;
+-
+ 	q->mq_debugfs_dir = debugfs_create_dir("mq", q->debugfs_dir);
+ 	if (!q->mq_debugfs_dir)
+ 		goto err;
 -- 
 2.12.2
