@@ -1,82 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:44922 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1426128AbdD1OCJ (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:51590 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1433572AbdDZHks (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 10:02:09 -0400
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 3/6] mtip32xx: abstract out "are any commands active" helper
-Date: Fri, 28 Apr 2017 08:01:54 -0600
-Message-ID: <1493388117-15185-6-git-send-email-axboe@fb.com>
-In-Reply-To: <1493388117-15185-1-git-send-email-axboe@fb.com>
-References: <1493388117-15185-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Wed, 26 Apr 2017 03:40:48 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: snitzer@redhat.com
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 1/4] dm mpath: merge do_end_io into multipath_end_io
+Date: Wed, 26 Apr 2017 09:40:36 +0200
+Message-Id: <20170426074039.14602-2-hch@lst.de>
+In-Reply-To: <20170426074039.14602-1-hch@lst.de>
+References: <20170426074039.14602-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is a prep patch for backoff in ->queue_rq() for non-ncq commands.
+This simplifies the I/O completion path a bit.
 
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ drivers/md/dm-mpath.c | 53 +++++++++++++++++----------------------------------
+ 1 file changed, 18 insertions(+), 35 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 36f3d34f2156..aee94f260725 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -1030,6 +1030,22 @@ static bool mtip_pause_ncq(struct mtip_port *port,
- 	return false;
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 2950b145443d..1973670ea102 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -1473,12 +1473,12 @@ static int noretry_error(int error)
+ 	return 0;
  }
  
-+static bool mtip_commands_active(struct mtip_port *port)
-+{
-+	unsigned int active;
-+	unsigned int n;
-+
-+	/*
-+	 * Ignore s_active bit 0 of array element 0.
-+	 * This bit will always be set
-+	 */
-+	active = readl(port->s_active[0]) & 0xFFFFFFFE;
-+	for (n = 1; n < port->dd->slot_groups; n++)
-+		active |= readl(port->s_active[n]);
-+
-+	return active != 0;
-+}
-+
- /*
-  * Wait for port to quiesce
-  *
-@@ -1043,8 +1059,7 @@ static bool mtip_pause_ncq(struct mtip_port *port,
- static int mtip_quiesce_io(struct mtip_port *port, unsigned long timeout)
+-/*
+- * end_io handling
+- */
+-static int do_end_io(struct multipath *m, struct request *clone,
+-		     int error, struct dm_mpath_io *mpio)
++static int multipath_end_io(struct dm_target *ti, struct request *clone,
++			    int error, union map_info *map_context)
  {
- 	unsigned long to;
--	unsigned int n;
--	unsigned int active = 1;
-+	bool active = true;
- 
- 	blk_mq_stop_hw_queues(port->dd->queue);
- 
-@@ -1061,14 +1076,7 @@ static int mtip_quiesce_io(struct mtip_port *port, unsigned long timeout)
- 		if (mtip_check_surprise_removal(port->dd->pdev))
- 			goto err_fault;
- 
--		/*
--		 * Ignore s_active bit 0 of array element 0.
--		 * This bit will always be set
--		 */
--		active = readl(port->s_active[0]) & 0xFFFFFFFE;
--		for (n = 1; n < port->dd->slot_groups; n++)
--			active |= readl(port->s_active[n]);
++	struct dm_mpath_io *mpio = get_mpio(map_context);
++	struct pgpath *pgpath = mpio->pgpath;
++
+ 	/*
+ 	 * We don't queue any clone request inside the multipath target
+ 	 * during end I/O handling, since those clone requests don't have
+@@ -1490,47 +1490,30 @@ static int do_end_io(struct multipath *m, struct request *clone,
+ 	 * request into dm core, which will remake a clone request and
+ 	 * clone bios for it and resubmit it later.
+ 	 */
+-	int r = DM_ENDIO_REQUEUE;
 -
-+		active = mtip_commands_active(port);
- 		if (!active)
- 			break;
- 	} while (time_before(jiffies, to));
+-	if (!error)
+-		return 0;	/* I/O complete */
++	if (error && !noretry_error(error)) {
++		struct multipath *m = ti->private;
+ 
+-	if (noretry_error(error))
+-		return error;
++		error = DM_ENDIO_REQUEUE;
+ 
+-	if (mpio->pgpath)
+-		fail_path(mpio->pgpath);
++		if (pgpath)
++			fail_path(pgpath);
+ 
+-	if (!atomic_read(&m->nr_valid_paths)) {
+-		if (!test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
+-			if (!must_push_back_rq(m))
+-				r = -EIO;
++		if (!atomic_read(&m->nr_valid_paths)) {
++			if (!test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
++				if (!must_push_back_rq(m))
++					error = -EIO;
++			}
+ 		}
+ 	}
+ 
+-	return r;
+-}
+-
+-static int multipath_end_io(struct dm_target *ti, struct request *clone,
+-			    int error, union map_info *map_context)
+-{
+-	struct multipath *m = ti->private;
+-	struct dm_mpath_io *mpio = get_mpio(map_context);
+-	struct pgpath *pgpath;
+-	struct path_selector *ps;
+-	int r;
+-
+-	BUG_ON(!mpio);
+-
+-	r = do_end_io(m, clone, error, mpio);
+-	pgpath = mpio->pgpath;
+ 	if (pgpath) {
+-		ps = &pgpath->pg->ps;
++		struct path_selector *ps = &pgpath->pg->ps;
++
+ 		if (ps->type->end_io)
+ 			ps->type->end_io(ps, &pgpath->path, mpio->nr_bytes);
+ 	}
+ 
+-	return r;
++	return error;
+ }
+ 
+ static int do_end_io_bio(struct multipath *m, struct bio *clone,
 -- 
-2.7.4
+2.11.0
