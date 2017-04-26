@@ -3,56 +3,51 @@ From: Bart Van Assche <bart.vanassche@sandisk.com>
 To: Jens Axboe <axboe@kernel.dk>
 CC: <linux-block@vger.kernel.org>, Bart Van Assche
 	<bart.vanassche@sandisk.com>
-Subject: [PATCH v3 0/8] blk-mq debugfs patches for kernel v4.12
-Date: Tue, 18 Apr 2017 16:29:41 -0700
-Message-ID: <20170418232949.5228-1-bart.vanassche@sandisk.com>
+Subject: [PATCH v6 05/10] blk-mq: Unregister debugfs attributes earlier
+Date: Wed, 26 Apr 2017 13:47:52 -0700
+Message-ID: <20170426204757.18910-6-bart.vanassche@sandisk.com>
+In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+We currently call blk_mq_free_queue() from blk_cleanup_queue()
+before we unregister the debugfs attributes for that queue in
+blk_release_queue(). This leaves a window open during which
+accessing most of the mq debugfs attributes would cause a
+use-after-free. Additionally, the "state" attribute allows
+running the queue, which we should not do after the queue has
+entered the "dead" state. Fix both cases by unregistering the
+debugfs attributes before freeing queue resources starts.
 
-Please consider the eight patches in this series for kernel v4.12.
-These patches improve blk-mq debugfs support.
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+---
+ block/blk-core.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Thanks,
-
-Bart.
-
-Changes compared to v2:
-- Changed the mutex_lock() calls in registration methods into
-  mutex_lock_interruptible() since these functions can be called from
-  the context of a user space process.
-- Avoid that the blk_mq_register_dev() changes in patch 1/8 cause a
-  deadlock.
-
-Changes compared to v1:
-- Added two patches and replaced patch 1/6 such that debugfs
-  attributes are now unregistered before freeing of a blk-mq queue
-  starts instead of checking the "dead" queue flag.
-- Changed "rq->cmd_flags ^ op" into "rq->cmd_flags & ~REQ_OP_MASK" as
-  proposed by Omar.
-- A seq_file pointer is now passed to the new queue_rq callback function
-  instead of a fixed-size char buffer.
-
-Bart Van Assche (8):
-  blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
-  blk-mq: Let blk_mq_debugfs_register() look up the queue name
-  blk-mq: Unregister debugfs attributes earlier
-  blk-mq: Move the "state" debugfs attribute one level down
-  blk-mq: Make blk_flags_show() callers append a newline character
-  blk-mq: Show operation, cmd_flags and rq_flags names
-  blk-mq: Add blk_mq_ops.show_rq()
-  scsi: Implement blk_mq_ops.show_rq()
-
- block/blk-mq-debugfs.c  | 94 +++++++++++++++++++++++++++++++++++++++++--------
- block/blk-mq-sysfs.c    | 66 +++++++++++++++++++---------------
- block/blk-mq.h          |  6 ++--
- block/blk-sysfs.c       |  9 +++--
- drivers/scsi/scsi_lib.c | 26 ++++++++++++++
- include/linux/blk-mq.h  |  6 ++++
- 6 files changed, 156 insertions(+), 51 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a49b0830aaaf..6bd4d1754d29 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -563,9 +563,13 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 * prevent that q->request_fn() gets invoked after draining finished.
+ 	 */
+ 	blk_freeze_queue(q);
+-	spin_lock_irq(lock);
+-	if (!q->mq_ops)
++	if (!q->mq_ops) {
++		spin_lock_irq(lock);
+ 		__blk_drain_queue(q, true);
++	} else {
++		blk_mq_debugfs_unregister_mq(q);
++		spin_lock_irq(lock);
++	}
+ 	queue_flag_set(QUEUE_FLAG_DEAD, q);
+ 	spin_unlock_irq(lock);
+ 
 -- 
 2.12.2
