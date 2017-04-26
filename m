@@ -2,72 +2,126 @@ Return-Path: <Bart.VanAssche@sandisk.com>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
 To: Jens Axboe <axboe@kernel.dk>
 CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, Hannes Reinecke
-	<hare@suse.com>
-Subject: [PATCH v5 09/10] blk-mq: Add blk_mq_ops.show_rq()
-Date: Tue, 25 Apr 2017 13:37:44 -0700
-Message-ID: <20170425203745.19946-10-bart.vanassche@sandisk.com>
-In-Reply-To: <20170425203745.19946-1-bart.vanassche@sandisk.com>
-References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v6 03/10] blk-mq-debugfs: Rename functions for registering and unregistering the mq directory
+Date: Wed, 26 Apr 2017 13:47:50 -0700
+Message-ID: <20170426204757.18910-4-bart.vanassche@sandisk.com>
+In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-This new callback function will be used in the next patch to show
-more information about SCSI requests.
+Since the blk_mq_debugfs_*register_hctxs() functions register and
+unregister all attributes under the "mq" directory, rename these
+into blk_mq_debugfs_*register_mq().
 
 Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-mq-debugfs.c | 6 +++++-
- include/linux/blk-mq.h | 8 ++++++++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ block/blk-mq-debugfs.c | 8 ++++----
+ block/blk-mq-sysfs.c   | 6 +++---
+ block/blk-mq.h         | 8 ++++----
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ac39093c4ef7..bcd2a7d4a3a5 100644
+index e9282b945f6b..d99064e9e76a 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -311,6 +311,7 @@ static const char *const rqf_name[] = {
- static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- {
- 	struct request *rq = list_entry_rq(v);
-+	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
- 	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
+@@ -795,7 +795,7 @@ int blk_mq_debugfs_register(struct request_queue *q)
+ 	if (!q->debugfs_dir)
+ 		goto err;
  
- 	seq_printf(m, "%p {.op=", rq);
-@@ -324,8 +325,11 @@ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- 	seq_puts(m, ", .rq_flags=");
- 	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
- 		       ARRAY_SIZE(rqf_name));
--	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
-+	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
- 		   rq->internal_tag);
-+	if (mq_ops->show_rq)
-+		mq_ops->show_rq(m, rq);
-+	seq_puts(m, "}\n");
+-	if (blk_mq_debugfs_register_hctxs(q))
++	if (blk_mq_debugfs_register_mq(q))
+ 		goto err;
+ 
+ 	return 0;
+@@ -865,7 +865,7 @@ static int blk_mq_debugfs_register_hctx(struct request_queue *q,
  	return 0;
  }
  
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 0c4dadb85f62..32bd8eb5ba67 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -142,6 +142,14 @@ struct blk_mq_ops {
- 	reinit_request_fn	*reinit_request;
+-int blk_mq_debugfs_register_hctxs(struct request_queue *q)
++int blk_mq_debugfs_register_mq(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
+@@ -891,11 +891,11 @@ int blk_mq_debugfs_register_hctxs(struct request_queue *q)
+ 	return 0;
  
- 	map_queues_fn		*map_queues;
-+
-+#ifdef CONFIG_BLK_DEBUG_FS
-+	/*
-+	 * Used by the debugfs implementation to show driver-specific
-+	 * information about a request.
-+	 */
-+	void (*show_rq)(struct seq_file *m, struct request *rq);
-+#endif
- };
+ err:
+-	blk_mq_debugfs_unregister_hctxs(q);
++	blk_mq_debugfs_unregister_mq(q);
+ 	return -ENOMEM;
+ }
  
- enum {
+-void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
++void blk_mq_debugfs_unregister_mq(struct request_queue *q)
+ {
+ 	debugfs_remove_recursive(q->mq_debugfs_dir);
+ 	q->mq_debugfs_dir = NULL;
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index afb3451cf8a5..c2cac20d981d 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -258,7 +258,7 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_unregister_hctx(hctx);
+ 
+-	blk_mq_debugfs_unregister_hctxs(q);
++	blk_mq_debugfs_unregister_mq(q);
+ 
+ 	kobject_uevent(&q->mq_kobj, KOBJ_REMOVE);
+ 	kobject_del(&q->mq_kobj);
+@@ -356,7 +356,7 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
+ 	if (!q->mq_sysfs_init_done)
+ 		goto unlock;
+ 
+-	blk_mq_debugfs_unregister_hctxs(q);
++	blk_mq_debugfs_unregister_mq(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_unregister_hctx(hctx);
+@@ -374,7 +374,7 @@ int blk_mq_sysfs_register(struct request_queue *q)
+ 	if (!q->mq_sysfs_init_done)
+ 		goto unlock;
+ 
+-	blk_mq_debugfs_register_hctxs(q);
++	blk_mq_debugfs_register_mq(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		ret = blk_mq_register_hctx(hctx);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 9049c0f11505..2814a14e529c 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -89,8 +89,8 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+ #ifdef CONFIG_BLK_DEBUG_FS
+ int blk_mq_debugfs_register(struct request_queue *q);
+ void blk_mq_debugfs_unregister(struct request_queue *q);
+-int blk_mq_debugfs_register_hctxs(struct request_queue *q);
+-void blk_mq_debugfs_unregister_hctxs(struct request_queue *q);
++int blk_mq_debugfs_register_mq(struct request_queue *q);
++void blk_mq_debugfs_unregister_mq(struct request_queue *q);
+ #else
+ static inline int blk_mq_debugfs_register(struct request_queue *q)
+ {
+@@ -101,12 +101,12 @@ static inline void blk_mq_debugfs_unregister(struct request_queue *q)
+ {
+ }
+ 
+-static inline int blk_mq_debugfs_register_hctxs(struct request_queue *q)
++static inline int blk_mq_debugfs_register_mq(struct request_queue *q)
+ {
+ 	return 0;
+ }
+ 
+-static inline void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
++static inline void blk_mq_debugfs_unregister_mq(struct request_queue *q)
+ {
+ }
+ #endif
 -- 
 2.12.2
