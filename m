@@ -1,24 +1,29 @@
-Return-Path: <davem@davemloft.net>
-Date: Wed, 26 Apr 2017 10:39:08 -0400 (EDT)
-Message-Id: <20170426.103908.1730143387784680812.davem@davemloft.net>
-To: hch@lst.de
+Return-Path: <b.zolnierkie@samsung.com>
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
 Cc: axboe@kernel.dk, linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
  linux-block@vger.kernel.org
 Subject: Re: [PATCH 3/3] ide-pm: always pass 0 error to ide_complete_rq in
  ide_do_devset
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170426073422.14511-4-hch@lst.de>
+Date: Wed, 26 Apr 2017 12:33:20 +0200
+Message-id: <6500755.RihOe6T0DR@amdc3058>
+In-reply-to: <20170426073422.14511-4-hch@lst.de>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 References: <20170426073422.14511-1-hch@lst.de>
-	<20170426073422.14511-4-hch@lst.de>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+ <20170426073422.14511-4-hch@lst.de>
+ <CGME20170426103322epcas5p390d45ef01f24b5bfb457761f9c71a530@epcas5p3.samsung.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
-Date: Wed, 26 Apr 2017 09:34:22 +0200
-
+On Wednesday, April 26, 2017 09:34:22 AM Christoph Hellwig wrote:
 > The caller only looks at the scsi_request result field anyway.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Acked-by: David S. Miller <davem@davemloft.net>
+Reviewed-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+
+Best regards,
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
