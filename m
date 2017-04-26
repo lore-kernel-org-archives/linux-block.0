@@ -1,29 +1,34 @@
-Return-Path: <b.zolnierkie@samsung.com>
-From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] ide-pm: always pass 0 error to ide_complete_rq in
- ide_do_devset
-Date: Wed, 26 Apr 2017 12:33:20 +0200
-Message-id: <6500755.RihOe6T0DR@amdc3058>
-In-reply-to: <20170426073422.14511-4-hch@lst.de>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Return-Path: <BATV+8090579d37507300b01f+4994+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 3/3] ide-pm: always pass 0 error to ide_complete_rq in ide_do_devset
+Date: Wed, 26 Apr 2017 09:34:22 +0200
+Message-Id: <20170426073422.14511-4-hch@lst.de>
+In-Reply-To: <20170426073422.14511-1-hch@lst.de>
 References: <20170426073422.14511-1-hch@lst.de>
- <20170426073422.14511-4-hch@lst.de>
- <CGME20170426103322epcas5p390d45ef01f24b5bfb457761f9c71a530@epcas5p3.samsung.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wednesday, April 26, 2017 09:34:22 AM Christoph Hellwig wrote:
-> The caller only looks at the scsi_request result field anyway.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The caller only looks at the scsi_request result field anyway.
 
-Reviewed-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/ide/ide-devsets.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Best regards,
---
-Bartlomiej Zolnierkiewicz
-Samsung R&D Institute Poland
-Samsung Electronics
+diff --git a/drivers/ide/ide-devsets.c b/drivers/ide/ide-devsets.c
+index b1223234037d..9b69c32ee560 100644
+--- a/drivers/ide/ide-devsets.c
++++ b/drivers/ide/ide-devsets.c
+@@ -187,6 +187,6 @@ ide_startstop_t ide_do_devset(ide_drive_t *drive, struct request *rq)
+ 	err = setfunc(drive, *(int *)&scsi_req(rq)->cmd[1]);
+ 	if (err)
+ 		scsi_req(rq)->result = err;
+-	ide_complete_rq(drive, err, blk_rq_bytes(rq));
++	ide_complete_rq(drive, 0, blk_rq_bytes(rq));
+ 	return ide_stopped;
+ }
+-- 
+2.11.0
