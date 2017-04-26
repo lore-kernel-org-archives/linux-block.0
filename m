@@ -1,37 +1,72 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH v6 09/10] blk-mq: Add blk_mq_ops.show_rq()
-To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v6 09/10] blk-mq: Add blk_mq_ops.show_rq()
+Date: Wed, 26 Apr 2017 13:47:56 -0700
+Message-ID: <20170426204757.18910-10-bart.vanassche@sandisk.com>
+In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
 References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
- <20170426204757.18910-10-bart.vanassche@sandisk.com>
-Cc: linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <8260522f-fba8-aef0-d7a8-fcf999f2a63a@suse.de>
-Date: Thu, 27 Apr 2017 08:41:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170426204757.18910-10-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/26/2017 10:47 PM, Bart Van Assche wrote:
-> This new callback function will be used in the next patch to show
-> more information about SCSI requests.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Omar Sandoval <osandov@fb.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> ---
->  block/blk-mq-debugfs.c | 6 +++++-
->  include/linux/blk-mq.h | 8 ++++++++
->  2 files changed, 13 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+This new callback function will be used in the next patch to show
+more information about SCSI requests.
 
-Cheers,
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-mq-debugfs.c | 6 +++++-
+ include/linux/blk-mq.h | 8 ++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-Hannes
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index ac39093c4ef7..bcd2a7d4a3a5 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -311,6 +311,7 @@ static const char *const rqf_name[] = {
+ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
+ {
+ 	struct request *rq = list_entry_rq(v);
++	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
+ 	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
+ 
+ 	seq_printf(m, "%p {.op=", rq);
+@@ -324,8 +325,11 @@ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
+ 	seq_puts(m, ", .rq_flags=");
+ 	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
+ 		       ARRAY_SIZE(rqf_name));
+-	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
++	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
+ 		   rq->internal_tag);
++	if (mq_ops->show_rq)
++		mq_ops->show_rq(m, rq);
++	seq_puts(m, "}\n");
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 0c4dadb85f62..32bd8eb5ba67 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -142,6 +142,14 @@ struct blk_mq_ops {
+ 	reinit_request_fn	*reinit_request;
+ 
+ 	map_queues_fn		*map_queues;
++
++#ifdef CONFIG_BLK_DEBUG_FS
++	/*
++	 * Used by the debugfs implementation to show driver-specific
++	 * information about a request.
++	 */
++	void (*show_rq)(struct seq_file *m, struct request *rq);
++#endif
+ };
+ 
+ enum {
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.12.2
