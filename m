@@ -1,71 +1,131 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:35322 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1426666AbdDUXdC (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:34249 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1433572AbdDZHkw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 19:33:02 -0400
-Received: by mail-wm0-f44.google.com with SMTP id w64so25874444wma.0
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2017 16:33:01 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 1/5] lightnvm: pblk: fix race condition on line retry
-Date: Sat, 22 Apr 2017 01:32:45 +0200
-Message-Id: <1492817569-13532-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
-References: <1492817569-13532-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        Wed, 26 Apr 2017 03:40:52 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: snitzer@redhat.com
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 2/4] dm rq: change ->rq_end_io calling conventions
+Date: Wed, 26 Apr 2017 09:40:37 +0200
+Message-Id: <20170426074039.14602-3-hch@lst.de>
+In-Reply-To: <20170426074039.14602-1-hch@lst.de>
+References: <20170426074039.14602-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When a pblk line fails (or is recovered), make sure to take the line
-management lock.
+Instead of returning either a DM_ENDIO_* constant or an error code, add
+a new DM_ENDIO_DONE value that means keep errno as is.  This allows us
+to easily keep the existing error code in case where we can't push back,
+and it also preparares for the new block level status codes with strict
+type checking.
 
-Fixes: a4bd217b4326 "lightnvm: physical block device (pblk) target"
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/pblk-core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/md/dm-mpath.c         |  8 +++++---
+ drivers/md/dm-rq.c            | 17 ++++++++++-------
+ include/linux/device-mapper.h |  1 +
+ 3 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index a2bcd09..7065658 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1050,13 +1050,14 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
- 	spin_lock(&l_mg->free_lock);
- 	l_mg->data_line = line;
- 	list_del(&line->list);
--	spin_unlock(&l_mg->free_lock);
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 1973670ea102..9e971be254f4 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -1478,6 +1478,7 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
+ {
+ 	struct dm_mpath_io *mpio = get_mpio(map_context);
+ 	struct pgpath *pgpath = mpio->pgpath;
++	int r = DM_ENDIO_DONE;
  
- 	ret = pblk_line_prepare(pblk, line);
- 	if (ret) {
- 		list_add(&line->list, &l_mg->free_list);
-+		spin_unlock(&l_mg->free_lock);
- 		return ret;
+ 	/*
+ 	 * We don't queue any clone request inside the multipath target
+@@ -1493,15 +1494,16 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
+ 	if (error && !noretry_error(error)) {
+ 		struct multipath *m = ti->private;
+ 
+-		error = DM_ENDIO_REQUEUE;
++		r = DM_ENDIO_REQUEUE;
+ 
+ 		if (pgpath)
+ 			fail_path(pgpath);
+ 
+ 		if (!atomic_read(&m->nr_valid_paths)) {
+ 			if (!test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
++				/* complete with the original error */
+ 				if (!must_push_back_rq(m))
+-					error = -EIO;
++					r = DM_ENDIO_DONE;
+ 			}
+ 		}
  	}
-+	spin_unlock(&l_mg->free_lock);
+@@ -1513,7 +1515,7 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
+ 			ps->type->end_io(ps, &pgpath->path, mpio->nr_bytes);
+ 	}
  
- 	pblk_rl_free_lines_dec(&pblk->rl, line);
- 
-@@ -1140,6 +1141,7 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
- 	line->invalid_bitmap = NULL;
- 	line->smeta = NULL;
- 	line->emeta = NULL;
-+	l_mg->data_line = retry_line;
- 	spin_unlock(&l_mg->free_lock);
- 
- 	if (pblk_line_erase(pblk, retry_line))
-@@ -1147,8 +1149,6 @@ static struct pblk_line *pblk_line_retry(struct pblk *pblk,
- 
- 	pblk_rl_free_lines_dec(&pblk->rl, retry_line);
- 
--	l_mg->data_line = retry_line;
--
- 	return retry_line;
+-	return error;
++	return r;
  }
  
+ static int do_end_io_bio(struct multipath *m, struct bio *clone,
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index bff7e3bdb4ed..769f04f83ca2 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -287,7 +287,7 @@ static void dm_requeue_original_request(struct dm_rq_target_io *tio, bool delay_
+ 
+ static void dm_done(struct request *clone, int error, bool mapped)
+ {
+-	int r = error;
++	int r = DM_ENDIO_DONE;
+ 	struct dm_rq_target_io *tio = clone->end_io_data;
+ 	dm_request_endio_fn rq_end_io = NULL;
+ 
+@@ -298,7 +298,7 @@ static void dm_done(struct request *clone, int error, bool mapped)
+ 			r = rq_end_io(tio->ti, clone, error, &tio->info);
+ 	}
+ 
+-	if (unlikely(r == -EREMOTEIO)) {
++	if (unlikely(error == -EREMOTEIO)) {
+ 		if (req_op(clone) == REQ_OP_WRITE_SAME &&
+ 		    !clone->q->limits.max_write_same_sectors)
+ 			disable_write_same(tio->md);
+@@ -307,16 +307,19 @@ static void dm_done(struct request *clone, int error, bool mapped)
+ 			disable_write_zeroes(tio->md);
+ 	}
+ 
+-	if (r <= 0)
++	switch (r) {
++	case DM_ENDIO_DONE:
+ 		/* The target wants to complete the I/O */
+-		dm_end_request(clone, r);
+-	else if (r == DM_ENDIO_INCOMPLETE)
++		dm_end_request(clone, error);
++		break;
++	case DM_ENDIO_INCOMPLETE:
+ 		/* The target will handle the I/O */
+ 		return;
+-	else if (r == DM_ENDIO_REQUEUE)
++	case DM_ENDIO_REQUEUE:
+ 		/* The target wants to requeue the I/O */
+ 		dm_requeue_original_request(tio, false);
+-	else {
++		break;
++	default:
+ 		DMWARN("unimplemented target endio return value: %d", r);
+ 		BUG();
+ 	}
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index c7ea33e38fb9..5bafe3af27cc 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -579,6 +579,7 @@ extern struct ratelimit_state dm_ratelimit_state;
+ /*
+  * Definitions of return values from target end_io function.
+  */
++#define DM_ENDIO_DONE		0
+ #define DM_ENDIO_INCOMPLETE	1
+ #define DM_ENDIO_REQUEUE	2
+ 
 -- 
-2.7.4
+2.11.0
