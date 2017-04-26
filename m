@@ -1,40 +1,32 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "osandov@osandov.com" <osandov@osandov.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 26 Apr 2017 13:37:58 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v5 05/10] blk-mq: Unregister debugfs attributes earlier
-Date: Wed, 26 Apr 2017 20:38:11 +0000
-Message-ID: <1493239091.2632.14.camel@sandisk.com>
+Message-ID: <20170426203758.GA29476@vader.dhcp.thefacebook.com>
 References: <20170425203745.19946-1-bart.vanassche@sandisk.com>
-	 <20170425203745.19946-6-bart.vanassche@sandisk.com>
-	 <20170425213018.GB6361@vader>
-	 <0da834e7-f934-9317-509a-455932d837e4@kernel.dk>
-In-Reply-To: <0da834e7-f934-9317-509a-455932d837e4@kernel.dk>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170425203745.19946-6-bart.vanassche@sandisk.com>
+ <20170425213018.GB6361@vader>
+ <1493238750.2632.13.camel@sandisk.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1493238750.2632.13.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, 2017-04-25 at 14:41 -0700, Jens Axboe wrote:
-> Looks fine to me. However, I think there's room for improvement here.
-> Why don't we just make it:
->=20
-> 	if (!q->mq_ops) {
-> 		spin_lock_irq(lock);
-> 		__blk_drain_queue(q, true);
-> 	} else {
-> 		blk_mq_debugfs_unregister_mq(q);
-> 		spin_lock_irq(lock);
-> 	}
->=20
-> 	queue_flag_set(QUEUE_FLAG_DEAD, q);
-> 	[...]
->=20
-> Would seem much more readable to me, and less dropping/acquiring for
-> cases where we don't need it.
+On Wed, Apr 26, 2017 at 08:32:31PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-04-25 at 14:30 -0700, Omar Sandoval wrote:
+> > Jens, could you ack that dropping the lock is okay?
+> 
+> Hello Omar,
+> 
+> If you have a look at the block layer history then you will see that the
+> current approach for shutting down block layer queues is an approach that
+> I had introduced myself. See also commits 3f3299d5c026, 807592a4fafb and
+> c246e80d8673.
+> 
+> Bart.
 
-Hello Jens,
-
-This looks fine to me. I will update the patch.
-
-Bart.=
+Thanks for the reference. Jens' suggestion looks the cleanest to me.
