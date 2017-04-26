@@ -1,68 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0071.outbound.protection.outlook.com ([104.47.41.71]:47356
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1951591AbdDYRH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2017 13:07:59 -0400
-From: =?iso-8859-1?Q?Matias_Bj=F8rling?= <matias@cnexlabs.com>
-To: Christoph Hellwig <hch@lst.de>,
-        Javier Gonzalez <javier@cnexlabs.com>,
-        "axboe@fb.com" <axboe@fb.com>
-CC: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] nvme/lightnvm: add missing endianess conversion in
-        nvme_nvm_end_io
-Date: Tue, 25 Apr 2017 17:07:53 +0000
-Message-ID: <MWHPR06MB2781448DFC0474CCEB0A6CE7BA1E0@MWHPR06MB2781.namprd06.prod.outlook.com>
-References: <20170421063017.26380-1-hch@lst.de>,<20170425164100.GA15964@lst.de>
-In-Reply-To: <20170425164100.GA15964@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Bart Van Assche
+	<bart.vanassche@sandisk.com>
+Subject: [PATCH v6 07/10] blk-mq: Make blk_flags_show() callers append a newline character
+Date: Wed, 26 Apr 2017 13:47:54 -0700
+Message-ID: <20170426204757.18910-8-bart.vanassche@sandisk.com>
+In-Reply-To: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+References: <20170426204757.18910-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-________________________________________
-From: Christoph Hellwig <hch@lst.de>
-Sent: 25 April 2017 09:41
-To: Javier Gonzalez; Matias Bj=F8rling
-Cc: linux-nvme@lists.infradead.org
-Subject: Re: [PATCH] nvme/lightnvm: add missing endianess conversion in nvm=
-e_nvm_end_io
+This patch does not change any functionality but makes it possible
+to produce a single line of output with multiple flag-to-name
+translations.
 
-Javier, Matias:  can I get a quick ACK?  This is the last patch needed
-to make drivers/nvme warning-free.
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-mq-debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On Fri, Apr 21, 2017 at 08:30:17AM +0200, Christoph Hellwig wrote:
-> Found by sparse.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/nvme/host/lightnvm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-> index de61a4a03d78..e4e4e60b1224 100644
-> --- a/drivers/nvme/host/lightnvm.c
-> +++ b/drivers/nvme/host/lightnvm.c
-> @@ -483,7 +483,7 @@ static void nvme_nvm_end_io(struct request *rq, int e=
-rror)
->  {
->       struct nvm_rq *rqd =3D rq->end_io_data;
->
-> -     rqd->ppa_status =3D nvme_req(rq)->result.u64;
-> +     rqd->ppa_status =3D le64_to_cpu(nvme_req(rq)->result.u64);
->       rqd->error =3D nvme_req(rq)->status;
->       nvm_end_io(rqd);
->
-> --
-> 2.11.0
->
->
-> _______________________________________________
-> Linux-nvme mailing list
-> Linux-nvme@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-nvme
-
-Thanks Christoph.
-
-Reviewed-by: Matias Bj=F8rling <matias@cnexlabs.com>=
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 1132be4e9c1c..ccc7b0f71230 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -60,7 +60,6 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
+ 		else
+ 			seq_printf(m, "%d", i);
+ 	}
+-	seq_puts(m, "\n");
+ 	return 0;
+ }
+ 
+@@ -102,6 +101,7 @@ static int blk_queue_flags_show(struct seq_file *m, void *v)
+ 
+ 	blk_flags_show(m, q->queue_flags, blk_queue_flag_name,
+ 		       ARRAY_SIZE(blk_queue_flag_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
+ 
+@@ -193,6 +193,7 @@ static int hctx_state_show(struct seq_file *m, void *v)
+ 
+ 	blk_flags_show(m, hctx->state, hctx_state_name,
+ 		       ARRAY_SIZE(hctx_state_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
+ 
+@@ -236,6 +237,7 @@ static int hctx_flags_show(struct seq_file *m, void *v)
+ 	blk_flags_show(m,
+ 		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
+ 		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
++	seq_puts(m, "\n");
+ 	return 0;
+ }
+ 
+-- 
+2.12.2
