@@ -1,114 +1,54 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v3 6/8] blk-mq: Show operation, cmd_flags and rq_flags names
-Date: Tue, 18 Apr 2017 16:29:47 -0700
-Message-ID: <20170418232949.5228-7-bart.vanassche@sandisk.com>
-In-Reply-To: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-References: <20170418232949.5228-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <BATV+d57f7b82a529b7e9747b+4995+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 5/5] nvme-loop: merge init_request methods
+Date: Thu, 27 Apr 2017 19:45:01 +0200
+Message-Id: <20170427174501.18965-6-hch@lst.de>
+In-Reply-To: <20170427174501.18965-1-hch@lst.de>
+References: <20170427174501.18965-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Show the operation name, .cmd_flags and .rq_flags as names instead
-of numbers.
+Now that we get the tagset passed we can have a single implementation for
+the I/O and admin queues.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-debugfs.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 69 insertions(+), 3 deletions(-)
+ drivers/nvme/target/loop.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 27054293b37b..64b584ba576a 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -250,13 +250,79 @@ static const struct file_operations hctx_flags_fops = {
- 	.release	= single_release,
- };
- 
-+static const char *const op_name[] = {
-+	[REQ_OP_READ]		= "READ",
-+	[REQ_OP_WRITE]		= "WRITE",
-+	[REQ_OP_FLUSH]		= "FLUSH",
-+	[REQ_OP_DISCARD]	= "DISCARD",
-+	[REQ_OP_ZONE_REPORT]	= "ZONE_REPORT",
-+	[REQ_OP_SECURE_ERASE]	= "SECURE_ERASE",
-+	[REQ_OP_ZONE_RESET]	= "ZONE_RESET",
-+	[REQ_OP_WRITE_SAME]	= "WRITE_SAME",
-+	[REQ_OP_WRITE_ZEROES]	= "WRITE_ZEROES",
-+	[REQ_OP_SCSI_IN]	= "SCSI_IN",
-+	[REQ_OP_SCSI_OUT]	= "SCSI_OUT",
-+	[REQ_OP_DRV_IN]		= "DRV_IN",
-+	[REQ_OP_DRV_OUT]	= "DRV_OUT",
-+};
-+
-+static const char *const cmd_flag_name[] = {
-+	[__REQ_FAILFAST_DEV]		= "FAILFAST_DEV",
-+	[__REQ_FAILFAST_TRANSPORT]	= "FAILFAST_TRANSPORT",
-+	[__REQ_FAILFAST_DRIVER]		= "FAILFAST_DRIVER",
-+	[__REQ_SYNC]			= "SYNC",
-+	[__REQ_META]			= "META",
-+	[__REQ_PRIO]			= "PRIO",
-+	[__REQ_NOMERGE]			= "NOMERGE",
-+	[__REQ_IDLE]			= "IDLE",
-+	[__REQ_INTEGRITY]		= "INTEGRITY",
-+	[__REQ_FUA]			= "FUA",
-+	[__REQ_PREFLUSH]		= "PREFLUSH",
-+	[__REQ_RAHEAD]			= "RAHEAD",
-+	[__REQ_BACKGROUND]		= "BACKGROUND",
-+	[__REQ_NR_BITS]			= "NR_BITS",
-+};
-+
-+static const char *const rqf_name[] = {
-+	[ilog2(RQF_SORTED)]		= "SORTED",
-+	[ilog2(RQF_STARTED)]		= "STARTED",
-+	[ilog2(RQF_QUEUED)]		= "QUEUED",
-+	[ilog2(RQF_SOFTBARRIER)]	= "SOFTBARRIER",
-+	[ilog2(RQF_FLUSH_SEQ)]		= "FLUSH_SEQ",
-+	[ilog2(RQF_MIXED_MERGE)]	= "MIXED_MERGE",
-+	[ilog2(RQF_MQ_INFLIGHT)]	= "MQ_INFLIGHT",
-+	[ilog2(RQF_DONTPREP)]		= "DONTPREP",
-+	[ilog2(RQF_PREEMPT)]		= "PREEMPT",
-+	[ilog2(RQF_COPY_USER)]		= "COPY_USER",
-+	[ilog2(RQF_FAILED)]		= "FAILED",
-+	[ilog2(RQF_QUIET)]		= "QUIET",
-+	[ilog2(RQF_ELVPRIV)]		= "ELVPRIV",
-+	[ilog2(RQF_IO_STAT)]		= "IO_STAT",
-+	[ilog2(RQF_ALLOCED)]		= "ALLOCED",
-+	[ilog2(RQF_PM)]			= "PM",
-+	[ilog2(RQF_HASHED)]		= "HASHED",
-+	[ilog2(RQF_STATS)]		= "STATS",
-+	[ilog2(RQF_SPECIAL_PAYLOAD)]	= "SPECIAL_PAYLOAD",
-+};
-+
- static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
+diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
+index feb497134aee..420bde8ed488 100644
+--- a/drivers/nvme/target/loop.c
++++ b/drivers/nvme/target/loop.c
+@@ -234,15 +234,10 @@ static int nvme_loop_init_request(struct blk_mq_tag_set *set,
+ 		struct request *req, unsigned int hctx_idx,
+ 		unsigned int numa_node)
  {
- 	struct request *rq = list_entry_rq(v);
-+	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
+-	return nvme_loop_init_iod(set->driver_data, blk_mq_rq_to_pdu(req),
+-			hctx_idx + 1);
+-}
++	struct nvme_loop_ctrl *ctrl = set->driver_data;
  
--	seq_printf(m, "%p {.cmd_flags=0x%x, .rq_flags=0x%x, .tag=%d, .internal_tag=%d}\n",
--		   rq, rq->cmd_flags, (__force unsigned int)rq->rq_flags,
--		   rq->tag, rq->internal_tag);
-+	seq_printf(m, "%p {.op=", rq);
-+	if (op < ARRAY_SIZE(op_name) && op_name[op])
-+		seq_printf(m, "%s", op_name[op]);
-+	else
-+		seq_printf(m, "%d", op);
-+	seq_puts(m, ", .cmd_flags=");
-+	blk_flags_show(m, rq->cmd_flags & ~REQ_OP_MASK, cmd_flag_name,
-+		       ARRAY_SIZE(cmd_flag_name));
-+	seq_puts(m, ", .rq_flags=");
-+	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
-+		       ARRAY_SIZE(rqf_name));
-+	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
-+		   rq->internal_tag);
- 	return 0;
+-static int nvme_loop_init_admin_request(struct blk_mq_tag_set *set,
+-		struct request *req, unsigned int hctx_idx,
+-		unsigned int numa_node)
+-{
+-	return nvme_loop_init_iod(set->driver_data, blk_mq_rq_to_pdu(req), 0);
++	return nvme_loop_init_iod(ctrl, blk_mq_rq_to_pdu(req),
++			(set == &ctrl->tag_set) ? hctx_idx + 1 : 0);
  }
  
+ static int nvme_loop_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
+@@ -280,7 +275,7 @@ static const struct blk_mq_ops nvme_loop_mq_ops = {
+ static const struct blk_mq_ops nvme_loop_admin_mq_ops = {
+ 	.queue_rq	= nvme_loop_queue_rq,
+ 	.complete	= nvme_loop_complete_rq,
+-	.init_request	= nvme_loop_init_admin_request,
++	.init_request	= nvme_loop_init_request,
+ 	.init_hctx	= nvme_loop_init_admin_hctx,
+ 	.timeout	= nvme_loop_timeout,
+ };
 -- 
-2.12.2
+2.11.0
