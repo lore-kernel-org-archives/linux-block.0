@@ -1,114 +1,90 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v4 08/10] blk-mq: Show operation, cmd_flags and rq_flags names
-Date: Fri, 21 Apr 2017 16:40:24 -0700
-Message-ID: <20170421234026.18970-9-bart.vanassche@sandisk.com>
-In-Reply-To: <20170421234026.18970-1-bart.vanassche@sandisk.com>
-References: <20170421234026.18970-1-bart.vanassche@sandisk.com>
+Subject: Re: [PATCH 5/6] mtip32xx: convert internal command issue to block IO
+ path
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <1493333494-600-1-git-send-email-axboe@fb.com>
+ <1493333494-600-6-git-send-email-axboe@fb.com>
+ <1493335751.2625.19.camel@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <5b667f22-d12a-7e57-237a-155faba55409@fb.com>
+Date: Thu, 27 Apr 2017 17:35:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <1493335751.2625.19.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Show the operation name, .cmd_flags and .rq_flags as names instead
-of numbers.
+On 04/27/2017 05:29 PM, Bart Van Assche wrote:
+> On Thu, 2017-04-27 at 16:51 -0600, Jens Axboe wrote:
+>> @@ -1114,10 +1121,16 @@ static int mtip_exec_internal_command(struct mtip_port *port,
+>>  					u32 opts,
+>>  					unsigned long timeout)
+>>  {
+>> -	struct mtip_cmd_sg *command_sg;
+>>  	DECLARE_COMPLETION_ONSTACK(wait);
+>>  	struct mtip_cmd *int_cmd;
+>>  	struct driver_data *dd = port->dd;
+>> +	struct request *rq;
+>> +	struct mtip_int_cmd icmd = {
+>> +		.fis_len = fis_len,
+>> +		.buffer = buffer,
+>> +		.buf_len = buf_len,
+>> +		.opts = opts
+>> +	};
+>>  	int rv = 0;
+>>  	unsigned long start;
+>>  
+>> @@ -1132,6 +1145,8 @@ static int mtip_exec_internal_command(struct mtip_port *port,
+>>  		dbg_printk(MTIP_DRV_NAME "Unable to allocate tag for PIO cmd\n");
+>>  		return -EFAULT;
+>>  	}
+>> +	rq = blk_mq_rq_from_pdu(int_cmd);
+>> +	rq->end_io_data = &icmd;
+>>  
+>>  	set_bit(MTIP_PF_IC_ACTIVE_BIT, &port->flags);
+>>  
+>> @@ -1158,30 +1173,10 @@ static int mtip_exec_internal_command(struct mtip_port *port,
+>>  	/* Copy the command to the command table */
+>>  	memcpy(int_cmd->command, fis, fis_len*4);
+>>  
+>> -	/* Populate the SG list */
+>> -	int_cmd->command_header->opts =
+>> -		 __force_bit2int cpu_to_le32(opts | fis_len);
+>> -	if (buf_len) {
+>> -		command_sg = int_cmd->command + AHCI_CMD_TBL_HDR_SZ;
+>> -
+>> -		command_sg->info =
+>> -			__force_bit2int cpu_to_le32((buf_len-1) & 0x3FFFFF);
+>> -		command_sg->dba	=
+>> -			__force_bit2int cpu_to_le32(buffer & 0xFFFFFFFF);
+>> -		command_sg->dba_upper =
+>> -			__force_bit2int cpu_to_le32((buffer >> 16) >> 16);
+>> -
+>> -		int_cmd->command_header->opts |=
+>> -			__force_bit2int cpu_to_le32((1 << 16));
+>> -	}
+>> -
+>> -	/* Populate the command header */
+>> -	int_cmd->command_header->byte_count = 0;
+>> -
+>>  	start = jiffies;
+>>  
+>> -	/* Issue the command to the hardware */
+>> -	mtip_issue_non_ncq_command(port, MTIP_TAG_INTERNAL);
+>> +	/* insert request and run queue */
+>> +	blk_execute_rq_nowait(rq->q, NULL, rq, true, NULL);
+>>  
+>>  	/* Wait for the command to complete or timeout. */
+>>  	rv = wait_for_completion_interruptible_timeout(&wait,
+> 
+> Hello Jens,
+> 
+> What will happen upon timeout? Will the end_io_data pointer be dereferenced if
+> a timeout occurs? Can that cause the completion function to access data on the
+> stack after it has been freed?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
----
- block/blk-mq-debugfs.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 69 insertions(+), 3 deletions(-)
+Good point - since we know get timeouts courtesy of blk-mq, I will kill
+this individual timeout to avoid having any races there.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ccc7b0f71230..3a99146ece39 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -253,13 +253,79 @@ static const struct file_operations hctx_flags_fops = {
- 	.release	= single_release,
- };
- 
-+static const char *const op_name[] = {
-+	[REQ_OP_READ]		= "READ",
-+	[REQ_OP_WRITE]		= "WRITE",
-+	[REQ_OP_FLUSH]		= "FLUSH",
-+	[REQ_OP_DISCARD]	= "DISCARD",
-+	[REQ_OP_ZONE_REPORT]	= "ZONE_REPORT",
-+	[REQ_OP_SECURE_ERASE]	= "SECURE_ERASE",
-+	[REQ_OP_ZONE_RESET]	= "ZONE_RESET",
-+	[REQ_OP_WRITE_SAME]	= "WRITE_SAME",
-+	[REQ_OP_WRITE_ZEROES]	= "WRITE_ZEROES",
-+	[REQ_OP_SCSI_IN]	= "SCSI_IN",
-+	[REQ_OP_SCSI_OUT]	= "SCSI_OUT",
-+	[REQ_OP_DRV_IN]		= "DRV_IN",
-+	[REQ_OP_DRV_OUT]	= "DRV_OUT",
-+};
-+
-+static const char *const cmd_flag_name[] = {
-+	[__REQ_FAILFAST_DEV]		= "FAILFAST_DEV",
-+	[__REQ_FAILFAST_TRANSPORT]	= "FAILFAST_TRANSPORT",
-+	[__REQ_FAILFAST_DRIVER]		= "FAILFAST_DRIVER",
-+	[__REQ_SYNC]			= "SYNC",
-+	[__REQ_META]			= "META",
-+	[__REQ_PRIO]			= "PRIO",
-+	[__REQ_NOMERGE]			= "NOMERGE",
-+	[__REQ_IDLE]			= "IDLE",
-+	[__REQ_INTEGRITY]		= "INTEGRITY",
-+	[__REQ_FUA]			= "FUA",
-+	[__REQ_PREFLUSH]		= "PREFLUSH",
-+	[__REQ_RAHEAD]			= "RAHEAD",
-+	[__REQ_BACKGROUND]		= "BACKGROUND",
-+	[__REQ_NR_BITS]			= "NR_BITS",
-+};
-+
-+static const char *const rqf_name[] = {
-+	[ilog2(RQF_SORTED)]		= "SORTED",
-+	[ilog2(RQF_STARTED)]		= "STARTED",
-+	[ilog2(RQF_QUEUED)]		= "QUEUED",
-+	[ilog2(RQF_SOFTBARRIER)]	= "SOFTBARRIER",
-+	[ilog2(RQF_FLUSH_SEQ)]		= "FLUSH_SEQ",
-+	[ilog2(RQF_MIXED_MERGE)]	= "MIXED_MERGE",
-+	[ilog2(RQF_MQ_INFLIGHT)]	= "MQ_INFLIGHT",
-+	[ilog2(RQF_DONTPREP)]		= "DONTPREP",
-+	[ilog2(RQF_PREEMPT)]		= "PREEMPT",
-+	[ilog2(RQF_COPY_USER)]		= "COPY_USER",
-+	[ilog2(RQF_FAILED)]		= "FAILED",
-+	[ilog2(RQF_QUIET)]		= "QUIET",
-+	[ilog2(RQF_ELVPRIV)]		= "ELVPRIV",
-+	[ilog2(RQF_IO_STAT)]		= "IO_STAT",
-+	[ilog2(RQF_ALLOCED)]		= "ALLOCED",
-+	[ilog2(RQF_PM)]			= "PM",
-+	[ilog2(RQF_HASHED)]		= "HASHED",
-+	[ilog2(RQF_STATS)]		= "STATS",
-+	[ilog2(RQF_SPECIAL_PAYLOAD)]	= "SPECIAL_PAYLOAD",
-+};
-+
- static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- {
- 	struct request *rq = list_entry_rq(v);
-+	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
- 
--	seq_printf(m, "%p {.cmd_flags=0x%x, .rq_flags=0x%x, .tag=%d, .internal_tag=%d}\n",
--		   rq, rq->cmd_flags, (__force unsigned int)rq->rq_flags,
--		   rq->tag, rq->internal_tag);
-+	seq_printf(m, "%p {.op=", rq);
-+	if (op < ARRAY_SIZE(op_name) && op_name[op])
-+		seq_printf(m, "%s", op_name[op]);
-+	else
-+		seq_printf(m, "%d", op);
-+	seq_puts(m, ", .cmd_flags=");
-+	blk_flags_show(m, rq->cmd_flags & ~REQ_OP_MASK, cmd_flag_name,
-+		       ARRAY_SIZE(cmd_flag_name));
-+	seq_puts(m, ", .rq_flags=");
-+	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
-+		       ARRAY_SIZE(rqf_name));
-+	seq_printf(m, ", .tag=%d, .internal_tag=%d}\n", rq->tag,
-+		   rq->internal_tag);
- 	return 0;
- }
- 
 -- 
-2.12.2
+Jens Axboe
