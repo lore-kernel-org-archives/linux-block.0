@@ -1,36 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:49754 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1032755AbdDUK4U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2017 06:56:20 -0400
-Date: Fri, 21 Apr 2017 03:56:18 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Stephen Bates <sbates@raithlin.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        "jonathan.derrick@intel.com" <jonathan.derrick@intel.com>,
-        libc-alpha@sourceware.org
-Subject: Re: Status of pwritev2/preadv2 in glibc?
-Message-ID: <20170421105618.GB31499@infradead.org>
-References: <ECD1C373-3464-4AEF-8E73-3130C5BFAF87@raithlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <ECD1C373-3464-4AEF-8E73-3130C5BFAF87@raithlin.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+d57f7b82a529b7e9747b+4995+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/5] nvme-fc: merge init_request methods
+Date: Thu, 27 Apr 2017 19:45:00 +0200
+Message-Id: <20170427174501.18965-5-hch@lst.de>
+In-Reply-To: <20170427174501.18965-1-hch@lst.de>
+References: <20170427174501.18965-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-It would probably help to add the glibc list as the glibc developers
-might know better..
+Now that we get the tagset passed we can have a single implementation for
+the I/O and admin queues.
 
-On Sat, Apr 15, 2017 at 04:24:29PM +0000, Stephen  Bates wrote:
-> Hi
-> 
-> Does anyone know the status of support for the pwritev2/preadv2 system calls in glibc? I am doing some more IO polling testing and realized that the support is not in 2.25 and does not seem to be staged for later release?
-> 
-> Right now I am using the FIO_HAVE_PWRITEV2 support that fio provides but it’d be nice to be able to write/adapt other user-space programs to test this capability…
-> 
-> Stephen 
-> 
-> 
----end quoted text---
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/fc.c | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 70e689bf1cad..938da2678bd6 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1439,18 +1439,8 @@ nvme_fc_init_request(struct blk_mq_tag_set *set, struct request *rq,
+ {
+ 	struct nvme_fc_ctrl *ctrl = set->driver_data;
+ 	struct nvme_fc_fcp_op *op = blk_mq_rq_to_pdu(rq);
+-	struct nvme_fc_queue *queue = &ctrl->queues[hctx_idx+1];
+-
+-	return __nvme_fc_init_request(ctrl, queue, op, rq, queue->rqcnt++);
+-}
+-
+-static int
+-nvme_fc_init_admin_request(struct blk_mq_tag_set *set, struct request *rq,
+-		unsigned int hctx_idx, unsigned int numa_node)
+-{
+-	struct nvme_fc_ctrl *ctrl = set->driver_data;
+-	struct nvme_fc_fcp_op *op = blk_mq_rq_to_pdu(rq);
+-	struct nvme_fc_queue *queue = &ctrl->queues[0];
++	int queue_idx = (set == &ctrl->tag_set) ? hctx_idx + 1 : 0;
++	struct nvme_fc_queue *queue = &ctrl->queues[queue_idx];
+ 
+ 	return __nvme_fc_init_request(ctrl, queue, op, rq, queue->rqcnt++);
+ }
+@@ -2704,7 +2694,7 @@ nvme_fc_connect_ctrl_work(struct work_struct *work)
+ static const struct blk_mq_ops nvme_fc_admin_mq_ops = {
+ 	.queue_rq	= nvme_fc_queue_rq,
+ 	.complete	= nvme_fc_complete_rq,
+-	.init_request	= nvme_fc_init_admin_request,
++	.init_request	= nvme_fc_init_request,
+ 	.exit_request	= nvme_fc_exit_request,
+ 	.reinit_request	= nvme_fc_reinit_request,
+ 	.init_hctx	= nvme_fc_init_admin_hctx,
+-- 
+2.11.0
