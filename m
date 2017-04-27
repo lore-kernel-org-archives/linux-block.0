@@ -1,56 +1,51 @@
-Return-Path: <BATV+d57f7b82a529b7e9747b+4995+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 4/5] nvme-fc: merge init_request methods
-Date: Thu, 27 Apr 2017 19:45:00 +0200
-Message-Id: <20170427174501.18965-5-hch@lst.de>
-In-Reply-To: <20170427174501.18965-1-hch@lst.de>
-References: <20170427174501.18965-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:57665 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1031362AbdD0XVr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Apr 2017 19:21:47 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: "hch@lst.de" <hch@lst.de>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH 3/6] mtip32xx: abstract out "are any commands active"
+ helper
+Date: Thu, 27 Apr 2017 23:21:41 +0000
+Message-ID: <1493335300.2625.17.camel@sandisk.com>
+References: <1493333494-600-1-git-send-email-axboe@fb.com>
+         <1493333494-600-4-git-send-email-axboe@fb.com>
+In-Reply-To: <1493333494-600-4-git-send-email-axboe@fb.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now that we get the tagset passed we can have a single implementation for
-the I/O and admin queues.
+On Thu, 2017-04-27 at 16:51 -0600, Jens Axboe wrote:
+> This is a prep patch for backoff in ->queue_rq() for non-ncq commands.
+>=20
+> Signed-off-by: Jens Axboe <axboe@fb.com>
+> ---
+>  drivers/block/mtip32xx/mtip32xx.c | 28 ++++++++++++++++++----------
+>  1 file changed, 18 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/m=
+tip32xx.c
+> index 36f3d34f2156..f0732cc92864 100644
+> --- a/drivers/block/mtip32xx/mtip32xx.c
+> +++ b/drivers/block/mtip32xx/mtip32xx.c
+> @@ -1030,6 +1030,22 @@ static bool mtip_pause_ncq(struct mtip_port *port,
+>  	return false;
+>  }
+> =20
+> +static bool mtip_commands_active(struct mtip_port *port)
+> +{
+> +	unsigned int n;
+> +	unsigned int active =3D 1;
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/fc.c | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
+Hello Jens,
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 70e689bf1cad..938da2678bd6 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -1439,18 +1439,8 @@ nvme_fc_init_request(struct blk_mq_tag_set *set, struct request *rq,
- {
- 	struct nvme_fc_ctrl *ctrl = set->driver_data;
- 	struct nvme_fc_fcp_op *op = blk_mq_rq_to_pdu(rq);
--	struct nvme_fc_queue *queue = &ctrl->queues[hctx_idx+1];
--
--	return __nvme_fc_init_request(ctrl, queue, op, rq, queue->rqcnt++);
--}
--
--static int
--nvme_fc_init_admin_request(struct blk_mq_tag_set *set, struct request *rq,
--		unsigned int hctx_idx, unsigned int numa_node)
--{
--	struct nvme_fc_ctrl *ctrl = set->driver_data;
--	struct nvme_fc_fcp_op *op = blk_mq_rq_to_pdu(rq);
--	struct nvme_fc_queue *queue = &ctrl->queues[0];
-+	int queue_idx = (set == &ctrl->tag_set) ? hctx_idx + 1 : 0;
-+	struct nvme_fc_queue *queue = &ctrl->queues[queue_idx];
- 
- 	return __nvme_fc_init_request(ctrl, queue, op, rq, queue->rqcnt++);
- }
-@@ -2704,7 +2694,7 @@ nvme_fc_connect_ctrl_work(struct work_struct *work)
- static const struct blk_mq_ops nvme_fc_admin_mq_ops = {
- 	.queue_rq	= nvme_fc_queue_rq,
- 	.complete	= nvme_fc_complete_rq,
--	.init_request	= nvme_fc_init_admin_request,
-+	.init_request	= nvme_fc_init_request,
- 	.exit_request	= nvme_fc_exit_request,
- 	.reinit_request	= nvme_fc_reinit_request,
- 	.init_hctx	= nvme_fc_init_admin_hctx,
--- 
-2.11.0
+Initializing 'active' doesn't harm but I don't think that is needed in this
+function. Anyway:
+
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
