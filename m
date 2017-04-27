@@ -1,25 +1,27 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:44967 "EHLO newverein.lst.de"
+Received: from mx1.redhat.com ([209.132.183.28]:52516 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932072AbdD0GdU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2017 02:33:20 -0400
-Date: Thu, 27 Apr 2017 08:33:18 +0200
-From: "hch@lst.de" <hch@lst.de>
+        id S1033475AbdD0CYL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Apr 2017 22:24:11 -0400
+Date: Wed, 26 Apr 2017 22:24:08 -0400
+From: Mike Snitzer <snitzer@redhat.com>
 To: Bart Van Assche <Bart.VanAssche@sandisk.com>
 Cc: "hch@lst.de" <hch@lst.de>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: small dm mpath cleanups
-Message-ID: <20170427063318.GA20345@lst.de>
-References: <20170426074039.14602-1-hch@lst.de> <1493232084.2632.5.camel@sandisk.com>
+Message-ID: <20170427022407.GA19985@redhat.com>
+References: <20170426074039.14602-1-hch@lst.de>
+ <1493232084.2632.5.camel@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1493232084.2632.5.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Apr 26, 2017 at 06:41:27PM +0000, Bart Van Assche wrote:
+On Wed, Apr 26 2017 at  2:41pm -0400,
+Bart Van Assche <Bart.VanAssche@sandisk.com> wrote:
+
 > On Wed, 2017-04-26 at 09:40 +0200, Christoph Hellwig wrote:
 > > this series has some prep patches for my work to have proper, type
 > > checked block errors codes.  One fallout of that is that we need to
@@ -36,5 +38,7 @@ On Wed, Apr 26, 2017 at 06:41:27PM +0000, Bart Van Assche wrote:
 > series then that would make it harder to apply my patches on the stable
 > kernel trees. Mike and Christoph, please advise how to proceed.
 
-Bugfixes always go before cleanups.  I'd be happy to delay and/or rebase
-any of my patches as needed.
+I'll go over your series and christoph's tomorrow (thursday).  I'll pull
+all fixes to the front and rebase later patches as needed.
+
+Mike
