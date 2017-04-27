@@ -1,114 +1,295 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] post-merge pull for 4.12
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <0557bc2d-df76-e8ef-8983-14b03f45f689@kernel.dk>
-Date: Sun, 30 Apr 2017 20:50:07 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <penguin-kernel@i-love.sakura.ne.jp>
+To: linux-block@vger.kernel.org, linux-mm@kvack.org
+Cc: axboe@kernel.dk, mhocko@kernel.org
+Subject: block: mempool allocation hangs under OOM. (Re: A pitfall of mempool?)
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <201704252022.DFB26076.FMOQVFOtJOSFHL@I-love.SAKURA.ne.jp>
+In-Reply-To: <201704252022.DFB26076.FMOQVFOtJOSFHL@I-love.SAKURA.ne.jp>
+Message-Id: <201704272019.JEH26057.SHFOtMLJOOVFQF@I-love.SAKURA.ne.jp>
+Date: Thu, 27 Apr 2017 20:19:11 +0900
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Hello.
 
-After the main block pull request, please pull the below changes. This
-pull request contains:
+I noticed a hang up where kswapd was unable to get memory for bio from mempool
+at bio_alloc_bioset(GFP_NOFS) request at
+http://lkml.kernel.org/r/201704252022.DFB26076.FMOQVFOtJOSFHL@I-love.SAKURA.ne.jp .
 
-- Further fixups to the NVMe APST code, from Andy.
+Since there is no mean to check whether kswapd was making progress, I tried
+below patch on top of allocation watchdog patch at
+http://lkml.kernel.org/r/1489578541-81526-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp .
 
-- Various fixes for (mostly) nvme-fc, from Christoph and James.
+----------
+ include/linux/gfp.h | 8 ++++++++
+ kernel/hung_task.c  | 5 ++++-
+ mm/mempool.c        | 9 ++++++++-
+ mm/page_alloc.c     | 6 ++----
+ 4 files changed, 22 insertions(+), 6 deletions(-)
 
-- NVMe scsi fixes from Jon and Christoph.
+diff --git a/include/linux/gfp.h b/include/linux/gfp.h
+index 2b1a44f5..cc16050 100644
+--- a/include/linux/gfp.h
++++ b/include/linux/gfp.h
+@@ -469,6 +469,14 @@ static inline struct page *alloc_pages_node(int nid, gfp_t gfp_mask,
+ 	return __alloc_pages_node(nid, gfp_mask, order);
+ }
+ 
++#ifdef CONFIG_DETECT_MEMALLOC_STALL_TASK
++extern void start_memalloc_timer(const gfp_t gfp_mask, const int order);
++extern void stop_memalloc_timer(const gfp_t gfp_mask);
++#else
++#define start_memalloc_timer(gfp_mask, order) do { } while (0)
++#define stop_memalloc_timer(gfp_mask) do { } while (0)
++#endif
++
+ #ifdef CONFIG_NUMA
+ extern struct page *alloc_pages_current(gfp_t gfp_mask, unsigned order);
+ 
+diff --git a/kernel/hung_task.c b/kernel/hung_task.c
+index 8f237c0..7d11e8e 100644
+--- a/kernel/hung_task.c
++++ b/kernel/hung_task.c
+@@ -17,6 +17,7 @@
+ #include <linux/sysctl.h>
+ #include <linux/utsname.h>
+ #include <linux/oom.h>
++#include <linux/console.h>
+ #include <linux/sched/signal.h>
+ #include <linux/sched/debug.h>
+ 
+@@ -149,7 +150,9 @@ static bool rcu_lock_break(struct task_struct *g, struct task_struct *t)
+ 	get_task_struct(g);
+ 	get_task_struct(t);
+ 	rcu_read_unlock();
+-	cond_resched();
++	if (console_trylock())
++		console_unlock();
++	//cond_resched();
+ 	rcu_read_lock();
+ 	can_cont = pid_alive(g) && pid_alive(t);
+ 	put_task_struct(t);
+diff --git a/mm/mempool.c b/mm/mempool.c
+index 47a659d..8b449af 100644
+--- a/mm/mempool.c
++++ b/mm/mempool.c
+@@ -324,11 +324,14 @@ void *mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
+ 
+ 	gfp_temp = gfp_mask & ~(__GFP_DIRECT_RECLAIM|__GFP_IO);
+ 
++	start_memalloc_timer(gfp_temp, -1);
+ repeat_alloc:
+ 
+ 	element = pool->alloc(gfp_temp, pool->pool_data);
+-	if (likely(element != NULL))
++	if (likely(element != NULL)) {
++		stop_memalloc_timer(gfp_temp);
+ 		return element;
++	}
+ 
+ 	spin_lock_irqsave(&pool->lock, flags);
+ 	if (likely(pool->curr_nr)) {
+@@ -341,6 +344,7 @@ void *mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
+ 		 * for debugging.
+ 		 */
+ 		kmemleak_update_trace(element);
++		stop_memalloc_timer(gfp_temp);
+ 		return element;
+ 	}
+ 
+@@ -350,13 +354,16 @@ void *mempool_alloc(mempool_t *pool, gfp_t gfp_mask)
+ 	 */
+ 	if (gfp_temp != gfp_mask) {
+ 		spin_unlock_irqrestore(&pool->lock, flags);
++		stop_memalloc_timer(gfp_temp);
+ 		gfp_temp = gfp_mask;
++		start_memalloc_timer(gfp_temp, -1);
+ 		goto repeat_alloc;
+ 	}
+ 
+ 	/* We must not sleep if !__GFP_DIRECT_RECLAIM */
+ 	if (!(gfp_mask & __GFP_DIRECT_RECLAIM)) {
+ 		spin_unlock_irqrestore(&pool->lock, flags);
++		stop_memalloc_timer(gfp_temp);
+ 		return NULL;
+ 	}
+ 
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index f539752..652ba4f 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -4008,7 +4008,7 @@ bool memalloc_maybe_stalling(void)
+ 	return false;
+ }
+ 
+-static void start_memalloc_timer(const gfp_t gfp_mask, const int order)
++void start_memalloc_timer(const gfp_t gfp_mask, const int order)
+ {
+ 	struct memalloc_info *m = &current->memalloc;
+ 
+@@ -4032,7 +4032,7 @@ static void start_memalloc_timer(const gfp_t gfp_mask, const int order)
+ 	m->in_flight++;
+ }
+ 
+-static void stop_memalloc_timer(const gfp_t gfp_mask)
++void stop_memalloc_timer(const gfp_t gfp_mask)
+ {
+ 	struct memalloc_info *m = &current->memalloc;
+ 
+@@ -4055,8 +4055,6 @@ static void memalloc_counter_fold(int cpu)
+ }
+ 
+ #else
+-#define start_memalloc_timer(gfp_mask, order) do { } while (0)
+-#define stop_memalloc_timer(gfp_mask) do { } while (0)
+ #define memalloc_counter_fold(cpu) do { } while (0)
+ #endif
+ 
+----------
 
-Please pull!
+These patches reported that mempool_alloc(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY|__GFP_NOMEMALLOC)
+was not able to get memory for more than 15 minutes (and thus unable to submit block I/O
+request for reclaiming memory via FS writeback, and thus unable to unblock __GFP_FS
+allocation requests waiting for FS writeback, and thus unable to invoke the OOM killer for
+reclaiming memory for more than 12 minutes, and thus unable to unblock mempool_alloc(),
+and thus silent hang up).
 
+Complete log is at http://I-love.SAKURA.ne.jp/tmp/serial-20170427.txt.xz .
+----------
+[    0.000000] Linux version 4.11.0-rc8-next-20170426+ (root@localhost.localdomain) (gcc version 6.2.1 20160916 (Red Hat 6.2.1-3) (GCC) ) #96 SMP Thu Apr 27 09:45:31 JST 2017
+[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-4.11.0-rc8-next-20170426+ root=UUID=98df1583-260a-423a-a193-182dade5d085 ro crashkernel=256M security=none sysrq_always_enabled console=ttyS0,115200n8 console=tty0 LANG=en_US.UTF-8
+(...snipped...)
+[  588.687385] Out of memory: Kill process 8050 (a.out) score 999 or sacrifice child
+[  588.691029] Killed process 8050 (a.out) total-vm:4168kB, anon-rss:80kB, file-rss:0kB, shmem-rss:0kB
+[  588.699415] oom_reaper: reaped process 8050 (a.out), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB
+(...snipped...)
+[ 1401.127653] MemAlloc: a.out(8865) flags=0x400040 switches=1816 seq=25 gfp=0x1411240(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY|__GFP_NOMEMALLOC) order=4294967295 delay=1054846 uninterruptible
+[ 1401.134726] a.out           D11768  8865   7842 0x00000080
+[ 1401.137339] Call Trace:
+[ 1401.138802]  __schedule+0x403/0x940
+[ 1401.140626]  schedule+0x3d/0x90
+[ 1401.142324]  schedule_timeout+0x23b/0x510
+[ 1401.144348]  ? init_timer_on_stack_key+0x60/0x60
+[ 1401.146578]  io_schedule_timeout+0x1e/0x50
+[ 1401.148618]  ? io_schedule_timeout+0x1e/0x50
+[ 1401.150689]  mempool_alloc+0x18b/0x1c0
+[ 1401.152587]  ? remove_wait_queue+0x70/0x70
+[ 1401.154619]  bio_alloc_bioset+0xae/0x230
+[ 1401.156580]  xfs_add_to_ioend+0x7b/0x260 [xfs]
+[ 1401.158750]  xfs_do_writepage+0x3d9/0x8f0 [xfs]
+[ 1401.160916]  write_cache_pages+0x230/0x680
+[ 1401.162935]  ? xfs_add_to_ioend+0x260/0x260 [xfs]
+[ 1401.165169]  ? sched_clock+0x9/0x10
+[ 1401.166961]  ? xfs_vm_writepages+0x55/0xa0 [xfs]
+[ 1401.169183]  xfs_vm_writepages+0x6b/0xa0 [xfs]
+[ 1401.171312]  do_writepages+0x21/0x30
+[ 1401.173115]  __filemap_fdatawrite_range+0xc6/0x100
+[ 1401.175381]  filemap_write_and_wait_range+0x2d/0x70
+[ 1401.177705]  xfs_file_fsync+0x86/0x2b0 [xfs]
+[ 1401.179785]  vfs_fsync_range+0x4b/0xb0
+[ 1401.181660]  ? __audit_syscall_exit+0x21f/0x2c0
+[ 1401.183824]  do_fsync+0x3d/0x70
+[ 1401.185473]  SyS_fsync+0x10/0x20
+[ 1401.187160]  do_syscall_64+0x6c/0x1c0
+[ 1401.189004]  entry_SYSCALL64_slow_path+0x25/0x25
+(...snipped...)
+[ 1401.211964] MemAlloc: a.out(8866) flags=0x400040 switches=1825 seq=31 gfp=0x1411240(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY|__GFP_NOMEMALLOC) order=4294967295 delay=1055258 uninterruptible
+[ 1401.219018] a.out           D11320  8866   7842 0x00000080
+[ 1401.221583] Call Trace:
+[ 1401.223032]  __schedule+0x403/0x940
+[ 1401.224871]  schedule+0x3d/0x90
+[ 1401.226545]  schedule_timeout+0x23b/0x510
+[ 1401.228550]  ? init_timer_on_stack_key+0x60/0x60
+[ 1401.230773]  io_schedule_timeout+0x1e/0x50
+[ 1401.232791]  ? io_schedule_timeout+0x1e/0x50
+[ 1401.234890]  mempool_alloc+0x18b/0x1c0
+[ 1401.236768]  ? remove_wait_queue+0x70/0x70
+[ 1401.238757]  bvec_alloc+0x90/0xf0
+[ 1401.240444]  bio_alloc_bioset+0x17b/0x230
+[ 1401.242425]  xfs_add_to_ioend+0x7b/0x260 [xfs]
+[ 1401.244566]  xfs_do_writepage+0x3d9/0x8f0 [xfs]
+[ 1401.246709]  write_cache_pages+0x230/0x680
+[ 1401.248736]  ? xfs_add_to_ioend+0x260/0x260 [xfs]
+[ 1401.250944]  ? sched_clock+0x9/0x10
+[ 1401.252720]  ? xfs_vm_writepages+0x55/0xa0 [xfs]
+[ 1401.254918]  xfs_vm_writepages+0x6b/0xa0 [xfs]
+[ 1401.257028]  do_writepages+0x21/0x30
+[ 1401.258832]  __filemap_fdatawrite_range+0xc6/0x100
+[ 1401.261079]  filemap_write_and_wait_range+0x2d/0x70
+[ 1401.263383]  xfs_file_fsync+0x86/0x2b0 [xfs]
+[ 1401.265435]  vfs_fsync_range+0x4b/0xb0
+[ 1401.267301]  ? __audit_syscall_exit+0x21f/0x2c0
+[ 1401.269449]  do_fsync+0x3d/0x70
+[ 1401.271080]  SyS_fsync+0x10/0x20
+[ 1401.272738]  do_syscall_64+0x6c/0x1c0
+[ 1401.274574]  entry_SYSCALL64_slow_path+0x25/0x25
+----------
 
-  git://git.kernel.dk/linux-block.git for-4.12/post-merge
+# ./scripts/faddr2line vmlinux bio_alloc_bioset+0xae/0x230
+bio_alloc_bioset+0xae/0x230:
+bio_alloc_bioset at block/bio.c:484
+# ./scripts/faddr2line vmlinux bio_alloc_bioset+0x17b/0x230
+bio_alloc_bioset+0x17b/0x230:
+bio_alloc_bioset at block/bio.c:501
+# ./scripts/faddr2line vmlinux bvec_alloc+0x90/0xf0
+bvec_alloc+0x90/0xf0:
+bvec_alloc at block/bio.c:216
 
+Something is wrong with assumptions for mempool_alloc() under memory pressure.
+I was expecting for a patch that forces not to wait for FS writeback forever
+at shrink_inactive_list() at
+http://lkml.kernel.org/r/20170307133057.26182-1-mhocko@kernel.org , but
+I think this mempool allocation hang problem should be examined before
+we give up and workaround shrink_inactive_list().
 
-----------------------------------------------------------------
-Andy Lutomirski (3):
-      nvme: Fix APST comment
-      nvme: Display raw APST configuration via DYNAMIC_DEBUG
-      nvme: Add nvme_core.force_apst to ignore the NO_APST quirk
+Reproducer is shown below. Just write()ing & fsync()ing files on a plain
+XFS filesystem ( /dev/sda1 ) on a plain SCSI disk under memory pressure.
+No RAID/LVM/loopback etc. are used.
+----------
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
-Christoph Hellwig (8):
-      nvme-fc: mark two symbols static
-      nvmet-fc: mark nvmet_fc_handle_fcp_rqst static
-      nvmet-fc: fix endianess annoations for nvmet_fc_format_rsp_hdr
-      nvmet-fc: mark the sqhd field as __le16
-      nvmet-fc: properly endian swap sq_head
-      nvmet-fcloop: mark two symbols static
-      nvme-lightnvm: add missing endianess conversion in nvme_nvm_end_io
-      nvme-scsi: remove nvme_trans_security_protocol
+int main(int argc, char *argv[])
+{
+	static char buffer[128] = { };
+	char *buf = NULL;
+	unsigned long size;
+	unsigned long i;
+	for (i = 0; i < 1024; i++) {
+		if (fork() == 0) {
+			int fd = open("/proc/self/oom_score_adj", O_WRONLY);
+			write(fd, "1000", 4);
+			close(fd);
+			snprintf(buffer, sizeof(buffer), "/tmp/file.%u", getpid());
+			fd = open(buffer, O_WRONLY | O_CREAT | O_APPEND, 0600);
+			sleep(1);
+			while (write(fd, buffer, sizeof(buffer)) == sizeof(buffer))
+				fsync(fd);
+			_exit(0);
+		}
+	}
+	for (size = 1048576; size < 512UL * (1 << 30); size <<= 1) {
+		char *cp = realloc(buf, size);
+		if (!cp) {
+			size >>= 1;
+			break;
+		}
+		buf = cp;
+	}
+	sleep(2);
+	/* Will cause OOM due to overcommit */
+	for (i = 0; i < size; i += 4096) {
+		buf[i] = 0;
+	}
+	pause();
+	return 0;
+}
+----------
 
-Ewan D. Milne (1):
-      nvme-fc: avoid memory corruption caused by calling nvmf_free_options() twice
-
-James Smart (26):
-      nvme_fc: fix command id check
-      nvme_fc: add aen abort to teardown
-      nvme_fc: add controller reset support
-      Standardize nvme SGL segment count
-      Fix nvme unregister port timeout.
-      Fix rejected nvme LS Req.
-      Fix log message in completion path.
-      Add debug messages for nvme/fcp resource allocation.
-      Fix spelling in comments.
-      Remove unused defines for NVME PostBuf.
-      Remove NULL ptr check before kfree.
-      Fix extra line print in rqpair debug print.
-      Fix PRLI ACC rsp for NVME
-      Fix driver unload/reload operation.
-      Fix driver usage of 128B WQEs when WQ_CREATE is V1.
-      Fix nvme initiator handling when not enabled.
-      Remove hba lock from NVMET issue WQE.
-      Fix driver load issues when MRQ=8
-      Fix crash after issuing lip reset
-      Fix max_sgl_segments settings for NVME / NVMET
-      Add Fabric assigned WWN support.
-      Fix implicit logo and RSCN handling for NVMET
-      Update ABORT processing for NVMET.
-      Fix Express lane queue creation.
-      lpfc revison 11.2.0.12
-      lpfc: Fix memory corruption of the lpfc_ncmd->list pointers
-
-Jens Axboe (3):
-      Merge branch 'master' into for-4.12/post-merge
-      Merge branch 'nvme-4.12' of git://git.infradead.org/nvme into for-4.12/post-merge
-
-Jon Derrick (1):
-      nvme-scsi: Consider LBA format in IO splitting calculation
-
- drivers/nvme/host/core.c           |   38 +-
- drivers/nvme/host/fc.c             | 1173 ++++++++++++++++++++++++------------
- drivers/nvme/host/lightnvm.c       |    2 +-
- drivers/nvme/host/scsi.c           |   15 +-
- drivers/nvme/target/fc.c           |    8 +-
- drivers/nvme/target/fcloop.c       |    4 +-
- drivers/scsi/lpfc/lpfc.h           |    5 +-
- drivers/scsi/lpfc/lpfc_attr.c      |   10 +-
- drivers/scsi/lpfc/lpfc_bsg.c       |    4 +
- drivers/scsi/lpfc/lpfc_crtn.h      |    9 +-
- drivers/scsi/lpfc/lpfc_ct.c        |   68 ++-
- drivers/scsi/lpfc/lpfc_debugfs.c   |   67 +-
- drivers/scsi/lpfc/lpfc_disc.h      |    1 +
- drivers/scsi/lpfc/lpfc_els.c       |   68 +--
- drivers/scsi/lpfc/lpfc_hbadisc.c   |  133 ++--
- drivers/scsi/lpfc/lpfc_hw.h        |    3 +
- drivers/scsi/lpfc/lpfc_hw4.h       |    4 +
- drivers/scsi/lpfc/lpfc_init.c      |  202 ++++---
- drivers/scsi/lpfc/lpfc_mbox.c      |    7 +-
- drivers/scsi/lpfc/lpfc_nportdisc.c |    8 +-
- drivers/scsi/lpfc/lpfc_nvme.c      |  157 +++--
- drivers/scsi/lpfc/lpfc_nvme.h      |   11 +-
- drivers/scsi/lpfc/lpfc_nvmet.c     |  377 +++++++++---
- drivers/scsi/lpfc/lpfc_nvmet.h     |   14 +-
- drivers/scsi/lpfc/lpfc_sli.c       |   22 +-
- drivers/scsi/lpfc/lpfc_sli4.h      |    2 +-
- drivers/scsi/lpfc/lpfc_version.h   |    2 +-
- drivers/scsi/lpfc/lpfc_vport.c     |    3 +-
- 28 files changed, 1654 insertions(+), 763 deletions(-)
-
--- 
-Jens Axboe
+Regards.
