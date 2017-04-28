@@ -1,17 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:53303 "EHLO
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:49928 "EHLO
         mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1031500AbdD1OcD (ORCPT
+        by vger.kernel.org with ESMTP id S1423501AbdD1OCW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 10:32:03 -0400
+        Fri, 28 Apr 2017 10:02:22 -0400
 From: Jens Axboe <axboe@fb.com>
 To: <linux-block@vger.kernel.org>
 CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
 Subject: [PATCH 6/6] Revert "mtip32xx: pass BLK_MQ_F_NO_SCHED"
-Date: Fri, 28 Apr 2017 08:31:51 -0600
-Message-ID: <1493389911-19512-7-git-send-email-axboe@fb.com>
-In-Reply-To: <1493389911-19512-1-git-send-email-axboe@fb.com>
-References: <1493389911-19512-1-git-send-email-axboe@fb.com>
+Date: Fri, 28 Apr 2017 08:01:57 -0600
+Message-ID: <1493388117-15185-9-git-send-email-axboe@fb.com>
+In-Reply-To: <1493388117-15185-1-git-send-email-axboe@fb.com>
+References: <1493388117-15185-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
