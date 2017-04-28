@@ -1,96 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f181.google.com ([209.85.128.181]:35720 "EHLO
-        mail-wr0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752010AbdDJSgs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2017 14:36:48 -0400
-Received: by mail-wr0-f181.google.com with SMTP id o21so126396095wrb.2
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2017 11:36:47 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bart.VanAssche@sandisk.com,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH v4] lightnvm: pblk
-Date: Mon, 10 Apr 2017 20:36:38 +0200
-Message-Id: <1491849399-12798-1-git-send-email-javier@cnexlabs.com>
+Received: from mx1.redhat.com ([209.132.183.28]:57108 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752251AbdD1Xts (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Apr 2017 19:49:48 -0400
+Date: Sat, 29 Apr 2017 07:49:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "osandov@fb.com" <osandov@fb.com>
+Subject: Re: [PATCH ] block: don't call blk_mq_quiesce_queue() during
+ switching mq sched
+Message-ID: <20170428234933.GA29628@ming.t460p>
+References: <20170428073250.9579-1-ming.lei@redhat.com>
+ <88cb69a2-34a7-6315-cc18-b254a46914dc@fb.com>
+ <1493395159.2767.5.camel@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1493395159.2767.5.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch introduces pblk, a new target for LightNVM implementing a
-full host-based FTL. Details on the commit message.
+On Fri, Apr 28, 2017 at 03:59:20PM +0000, Bart Van Assche wrote:
+> On Fri, 2017-04-28 at 07:42 -0600, Jens Axboe wrote:
+> > On 04/28/2017 01:32 AM, Ming Lei wrote:
+> > > We have freezed queue already, not necessary to call
+> > > blk_mq_quiesce_queue() any more, so remove it.
+> > 
+> > Are you sure? It ensures that we also aren't in the middle of
+> > blk_mq_make_request(), we need a stable view of the sched
+> > status throughout that.
+> 
+> Hello Jens,
+> 
+> My understanding is that blk_mq_freeze_queue() provides stronger guarantees
+> than�blk_mq_quiesce_queue(). The former waits until all pending requests have
+> finished while the latter only waits until pending .queue_rq() calls have
+> finished. blk_mq_freeze_queue() also causes new blk_get_request() calls to
+> wait until blk_mq_unfreeze_queue() is called while�blk_get_request() can
+> still succeed after blk_mq_quiesce_queue() returned and before
+> blk_mq_start_stopped_hw_queues() is called.
+> 
+> Regarding blk_mq_make_request(): I think that the blk_queue_enter() call in
+> generic_make_request() prevents that blk_mq_make_request() gets called after
+> a queue has been frozen.
 
-Changes since v3:
-* Apply Bart's feedback [1]
-* Implement dynamic L2P optimizations for > 32-bit physical media
-* geometry (from Matias Bjørling)
-* Fix memory leak on GC (Reported by Simon A. F. Lund)
-* 8064 is a perfectly round number of lines :)
+Jens & Bart, so I understand you don't object to this patch any more,
+then I will post a v1 for covering blk_mq_update_nr_requests().
 
-[1] https://lkml.org/lkml/2017/4/8/172
-
-Changes since v2:
-* Rebase on top of Matias' for-4.12/core
-* Implement L2P scan recovery to recover L2P table in case of power
- failure.
-* Re-design disk format to be more flexible in future versions (from
-  Matias Bjørling)
-* Implement per-instance uuid to allow correct recovery without
-  forcing line erases (from Matias Bjørling)
-* Re-design GC threading to have several GC readers and a single
-  writer that places data on the write buffer. This allows to maximize
-  the GC write buffer budget without having unnecessary GC writers
-  competing for the write buffer lock.
-* Simplify sysfs interface.
-* Refactoring and several code improvements (together with Matias
- Bjørling)
-
-Changes since v1:
-* Rebase on top of Matias' for-4.12/core
-* Move from per-LUN block allocation to a line model. This means that a
-  whole lines across all LUNs is allocated at a time. Data is still
-  stripped in a round-robin fashion at a page granurality.
-* Implement new disk format scheme, where metadata is stored per line
-  instead of per LUN. This allows for space optimizations.
-* Improvements on GC workqueue management and victim selection.
-* Implement sysfs interface to query pblk's operation and statistics.
-* Implement a user - GC I/O rate-limiter
-* Various bug fixes
-
-Javier González (1):
-  lightnvm: physical block device (pblk) target
-
- Documentation/lightnvm/pblk.txt  |   21 +
- drivers/lightnvm/Kconfig         |    9 +
- drivers/lightnvm/Makefile        |    5 +
- drivers/lightnvm/pblk-cache.c    |  114 +++
- drivers/lightnvm/pblk-core.c     | 1658 ++++++++++++++++++++++++++++++++++++++
- drivers/lightnvm/pblk-gc.c       |  555 +++++++++++++
- drivers/lightnvm/pblk-init.c     |  948 ++++++++++++++++++++++
- drivers/lightnvm/pblk-map.c      |  134 +++
- drivers/lightnvm/pblk-rb.c       |  856 ++++++++++++++++++++
- drivers/lightnvm/pblk-read.c     |  529 ++++++++++++
- drivers/lightnvm/pblk-recovery.c | 1003 +++++++++++++++++++++++
- drivers/lightnvm/pblk-rl.c       |  182 +++++
- drivers/lightnvm/pblk-sysfs.c    |  502 ++++++++++++
- drivers/lightnvm/pblk-write.c    |  412 ++++++++++
- drivers/lightnvm/pblk.h          | 1136 ++++++++++++++++++++++++++
- 15 files changed, 8064 insertions(+)
- create mode 100644 Documentation/lightnvm/pblk.txt
- create mode 100644 drivers/lightnvm/pblk-cache.c
- create mode 100644 drivers/lightnvm/pblk-core.c
- create mode 100644 drivers/lightnvm/pblk-gc.c
- create mode 100644 drivers/lightnvm/pblk-init.c
- create mode 100644 drivers/lightnvm/pblk-map.c
- create mode 100644 drivers/lightnvm/pblk-rb.c
- create mode 100644 drivers/lightnvm/pblk-read.c
- create mode 100644 drivers/lightnvm/pblk-recovery.c
- create mode 100644 drivers/lightnvm/pblk-rl.c
- create mode 100644 drivers/lightnvm/pblk-sysfs.c
- create mode 100644 drivers/lightnvm/pblk-write.c
- create mode 100644 drivers/lightnvm/pblk.h
-
--- 
-2.7.4
+Thanks,
+Ming
