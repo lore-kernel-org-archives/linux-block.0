@@ -1,26 +1,49 @@
-Subject: Re: [PATCH ] block: don't call blk_mq_quiesce_queue() during
- switching mq sched
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-References: <20170428073250.9579-1-ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Omar Sandoval <osandov@fb.com>,
- Bart Van Assche <bart.vanassche@sandisk.com>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <88cb69a2-34a7-6315-cc18-b254a46914dc@fb.com>
-Date: Fri, 28 Apr 2017 07:42:05 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170428073250.9579-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:50838 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1164803AbdD1HdA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Apr 2017 03:33:00 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: [PATCH ] block: don't call blk_mq_quiesce_queue() during switching mq sched
+Date: Fri, 28 Apr 2017 15:32:50 +0800
+Message-Id: <20170428073250.9579-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 04/28/2017 01:32 AM, Ming Lei wrote:
-> We have freezed queue already, not necessary to call
-> blk_mq_quiesce_queue() any more, so remove it.
+We have freezed queue already, not necessary to call
+blk_mq_quiesce_queue() any more, so remove it.
 
-Are you sure? It ensures that we also aren't in the middle of
-blk_mq_make_request(), we need a stable view of the sched
-status throughout that.
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/elevator.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Similarly with updating the request maps.
-
+diff --git a/block/elevator.c b/block/elevator.c
+index bf11e70f008b..c7a4ee682033 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -950,7 +950,6 @@ static int elevator_switch_mq(struct request_queue *q,
+ 	int ret;
+ 
+ 	blk_mq_freeze_queue(q);
+-	blk_mq_quiesce_queue(q);
+ 
+ 	if (q->elevator) {
+ 		if (q->elevator->registered)
+@@ -978,9 +977,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 
+ out:
+ 	blk_mq_unfreeze_queue(q);
+-	blk_mq_start_stopped_hw_queues(q, true);
+ 	return ret;
+-
+ }
+ 
+ /*
 -- 
-Jens Axboe
+2.9.3
