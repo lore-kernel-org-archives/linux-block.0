@@ -1,17 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:39433 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1031027AbdD1OcB (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:44922 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1426128AbdD1OCJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 10:32:01 -0400
+        Fri, 28 Apr 2017 10:02:09 -0400
 From: Jens Axboe <axboe@fb.com>
 To: <linux-block@vger.kernel.org>
 CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
 Subject: [PATCH 3/6] mtip32xx: abstract out "are any commands active" helper
-Date: Fri, 28 Apr 2017 08:31:48 -0600
-Message-ID: <1493389911-19512-4-git-send-email-axboe@fb.com>
-In-Reply-To: <1493389911-19512-1-git-send-email-axboe@fb.com>
-References: <1493389911-19512-1-git-send-email-axboe@fb.com>
+Date: Fri, 28 Apr 2017 08:01:54 -0600
+Message-ID: <1493388117-15185-6-git-send-email-axboe@fb.com>
+In-Reply-To: <1493388117-15185-1-git-send-email-axboe@fb.com>
+References: <1493388117-15185-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
