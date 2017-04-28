@@ -1,17 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:41884 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S968834AbdD1QzA (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:45180 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S969515AbdD1Ozv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 12:55:00 -0400
+        Fri, 28 Apr 2017 10:55:51 -0400
 From: Jens Axboe <axboe@fb.com>
 To: <linux-block@vger.kernel.org>
 CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 6/6] Revert "mtip32xx: pass BLK_MQ_F_NO_SCHED"
-Date: Fri, 28 Apr 2017 10:54:33 -0600
-Message-ID: <1493398473-29872-7-git-send-email-axboe@fb.com>
-In-Reply-To: <1493398473-29872-1-git-send-email-axboe@fb.com>
-References: <1493398473-29872-1-git-send-email-axboe@fb.com>
+Subject: [PATCH 7/7] Revert "mtip32xx: pass BLK_MQ_F_NO_SCHED"
+Date: Fri, 28 Apr 2017 08:55:40 -0600
+Message-ID: <1493391340-24629-8-git-send-email-axboe@fb.com>
+In-Reply-To: <1493391340-24629-1-git-send-email-axboe@fb.com>
+References: <1493391340-24629-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
@@ -31,10 +31,10 @@ Signed-off-by: Jens Axboe <axboe@fb.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 9749b099a914..9108be601a64 100644
+index 9780c4d3697c..c598c5ac2fd0 100644
 --- a/drivers/block/mtip32xx/mtip32xx.c
 +++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -3961,7 +3961,7 @@ static int mtip_block_initialize(struct driver_data *dd)
+@@ -3964,7 +3964,7 @@ static int mtip_block_initialize(struct driver_data *dd)
  	dd->tags.reserved_tags = 1;
  	dd->tags.cmd_size = sizeof(struct mtip_cmd);
  	dd->tags.numa_node = dd->numa_node;
