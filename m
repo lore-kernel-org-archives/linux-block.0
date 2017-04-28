@@ -1,78 +1,79 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:46748 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1433572AbdDZHk7 (ORCPT
+Received: from mail-yb0-f195.google.com ([209.85.213.195]:34759 "EHLO
+        mail-yb0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S939124AbdD1Vqu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2017 03:40:59 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: snitzer@redhat.com
-Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 4/4] dm: introduce a new DM_MAPIO_KILL return value
-Date: Wed, 26 Apr 2017 09:40:39 +0200
-Message-Id: <20170426074039.14602-5-hch@lst.de>
-In-Reply-To: <20170426074039.14602-1-hch@lst.de>
-References: <20170426074039.14602-1-hch@lst.de>
+        Fri, 28 Apr 2017 17:46:50 -0400
+Date: Fri, 28 Apr 2017 17:46:47 -0400
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "scott.bauer@intel.com" <scott.bauer@intel.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        Jan Kara <jack@suse.com>
+Subject: Re: BUG: KASAN: use-after-free in scsi_exit_rq
+Message-ID: <20170428214647.GG22354@htj.duckdns.org>
+References: <20170420211849.GB7387@sbauer-Z170X-UD5>
+ <1492811357.2499.9.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1492811357.2499.9.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This untangles the DM_MAPIO_* values returned from ->clone_and_map_rq
-from the error codes used by the block layer.
+(cc'ing Jan)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-rq.c            | 12 +++++-------
- drivers/md/dm-target.c        |  2 +-
- include/linux/device-mapper.h |  1 +
- 3 files changed, 7 insertions(+), 8 deletions(-)
+Hello, Bart.
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 769f04f83ca2..ea4fdf68a0ed 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -504,14 +504,12 @@ static int map_request(struct dm_rq_target_io *tio)
- 		/* The target wants to requeue the I/O after a delay */
- 		dm_requeue_original_request(tio, true);
- 		break;
--	default:
--		if (r > 0) {
--			DMWARN("unimplemented target map return value: %d", r);
--			BUG();
--		}
--
-+	case DM_MAPIO_KILL:
- 		/* The target wants to complete the I/O */
--		dm_kill_unmapped_request(rq, r);
-+		dm_kill_unmapped_request(rq, -EIO);
-+	default:
-+		DMWARN("unimplemented target map return value: %d", r);
-+		BUG();
- 	}
- 
- 	return r;
-diff --git a/drivers/md/dm-target.c b/drivers/md/dm-target.c
-index 43d3445b121d..6264ff00dcf0 100644
---- a/drivers/md/dm-target.c
-+++ b/drivers/md/dm-target.c
-@@ -135,7 +135,7 @@ static int io_err_clone_and_map_rq(struct dm_target *ti, struct request *rq,
- 				   union map_info *map_context,
- 				   struct request **clone)
- {
--	return -EIO;
-+	return DM_MAPIO_KILL;
- }
- 
- static void io_err_release_clone_rq(struct request *clone)
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index 5bafe3af27cc..0dc4d9cce128 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -590,6 +590,7 @@ extern struct ratelimit_state dm_ratelimit_state;
- #define DM_MAPIO_REMAPPED	1
- #define DM_MAPIO_REQUEUE	DM_ENDIO_REQUEUE
- #define DM_MAPIO_DELAY_REQUEUE	3
-+#define DM_MAPIO_KILL		4
- 
- #define dm_sector_div64(x, y)( \
- { \
+On Fri, Apr 21, 2017 at 09:49:17PM +0000, Bart Van Assche wrote:
+> On Thu, 2017-04-20 at 15:18 -0600, Scott Bauer wrote:
+> > [  642.638860] BUG: KASAN: use-after-free in scsi_exit_rq+0xf3/0x120 at addr ffff8802b7fedf00
+> > [  642.639362] Read of size 1 by task rcuos/5/53
+> > [  642.639713] CPU: 7 PID: 53 Comm: rcuos/6 Not tainted 4.11.0-rc5+ #13
+> > [  642.640170] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.7.5-0-ge51488c-20140602_164612-nilsson.home.kraxel.org 04/01/2014
+> > [  642.640923] Call Trace:
+> > [  642.641080]  dump_stack+0x63/0x8f
+> > [  642.641289]  kasan_object_err+0x21/0x70
+> > [  642.641531]  kasan_report.part.1+0x231/0x500
+> > [  642.641823]  ? scsi_exit_rq+0xf3/0x120
+> > [  642.642054]  ? _raw_spin_unlock_irqrestore+0xe/0x10
+> > [  642.642353]  ? free_percpu+0x1b7/0x340
+> > [  642.642586]  ? put_task_stack+0x117/0x2b0
+> > [  642.642837]  __asan_report_load1_noabort+0x2e/0x30
+> > [  642.643138]  scsi_exit_rq+0xf3/0x120
+> > [  642.643366]  free_request_size+0x44/0x60
+> > [  642.643614]  mempool_destroy.part.6+0x9b/0x150
+> > [  642.643899]  ? kasan_slab_free+0x87/0xb0
+> > [  642.644152]  mempool_destroy+0x13/0x20
+> > [  642.644394]  blk_exit_rl+0x36/0x40
+> > [  642.644614]  blkg_free+0x146/0x200
+> > [  642.644836]  __blkg_release_rcu+0x121/0x220
+> > [  642.645112]  rcu_nocb_kthread+0x61f/0xca0
+> > [  642.645376]  ? get_state_synchronize_rcu+0x20/0x20
+> > [  642.645690]  ? pci_mmcfg_check_reserved+0x110/0x110
+> > [  642.646011]  kthread+0x298/0x390
+> > [  642.646224]  ? get_state_synchronize_rcu+0x20/0x20
+> > [  642.646535]  ? kthread_park+0x160/0x160
+> > [  642.646787]  ret_from_fork+0x2c/0x40
+> 
+> I'm not familiar with cgroups but seeing this makes me wonder whether it would
+> be possible to move the blk_exit_rl() calls from blk_release_queue() into
+> blk_cleanup_queue()? The SCSI core frees a SCSI host after blk_cleanup_queue()
+> has finished for all associated SCSI devices. This is why I think that calling
+> blk_exit_rl() earlier would be sufficient to avoid that scsi_exit_rq()
+> dereferences a SCSI host pointer after it has been freed.
+
+Hmm... I see.  Didn't know request put path involved derefing those
+structs.  The blk_exit_rl() call just replaced open coded
+mempool_destroy call, so the destruction order was always like this.
+We shouldn't have any request in flight by cleanup, so moving it there
+should be fine.
+
+Thanks.
+
 -- 
-2.11.0
+tejun
