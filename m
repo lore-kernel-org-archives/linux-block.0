@@ -1,29 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51772 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1162804AbdD1P1y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 11:27:54 -0400
-Date: Fri, 28 Apr 2017 23:27:40 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Josef Bacik <jbacik@fb.com>
-Cc: Jens Axboe <axboe@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:60035 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1425921AbdD1NDc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Apr 2017 09:03:32 -0400
+From: Josef Bacik <jbacik@fb.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: Christoph Hellwig <hch@infradead.org>
 Subject: Re: [PATCH] block: nbd: fix double free
-Message-ID: <20170428152739.GC25592@ming.t460p>
+Date: Fri, 28 Apr 2017 13:00:30 +0000
+Message-ID: <B95137F4-8B73-47EA-9DB6-BF008F59B2AD@fb.com>
 References: <20170428042942.6567-1-ming.lei@redhat.com>
- <B95137F4-8B73-47EA-9DB6-BF008F59B2AD@fb.com>
+In-Reply-To: <20170428042942.6567-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <B95137F4-8B73-47EA-9DB6-BF008F59B2AD@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Apr 28, 2017 at 01:00:30PM +0000, Josef Bacik wrote:
-> We should have 2 references on the device at this point, did you see a “nbd: possibly leaking a device” message before the kasan stuff?  Thanks,
-> 
-
-There isn't such message before kasan warning.
-
-Thanks,
-Ming
+V2Ugc2hvdWxkIGhhdmUgMiByZWZlcmVuY2VzIG9uIHRoZSBkZXZpY2UgYXQgdGhpcyBwb2ludCwg
+ZGlkIHlvdSBzZWUgYSDigJxuYmQ6IHBvc3NpYmx5IGxlYWtpbmcgYSBkZXZpY2XigJ0gbWVzc2Fn
+ZSBiZWZvcmUgdGhlIGthc2FuIHN0dWZmPyAgVGhhbmtzLA0KDQpKb3NlZg0KDQpPbiA0LzI4LzE3
+LCAxMjoyOSBBTSwgIk1pbmcgTGVpIiA8bWluZy5sZWlAcmVkaGF0LmNvbT4gd3JvdGU6DQoNCkxv
+b2tzIGl0IGlzIGEgdHlwbywganVzdCBmaXggaXQsIG90aGVyd2lzZSB0aGUgZm9sbG93aW5nDQp3
+YXJuaW5nIGNhbiBiZSB0cmlnZXJyZWQ6DQoNClttaW5nQFZNXSRzdWRvIHJtbW9kIG5iZA0KW3N1
+ZG9dIHBhc3N3b3JkIGZvciBtaW5nOg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQpCVUc6IEtBU0FOOiB1c2UtYWZ0ZXIt
+ZnJlZSBpbiBuYmRfY2xlYW51cCsweDExNS8weDE4ZSBbbmJkXSBhdCBhZGRyIGZmZmY4ODAyNGNh
+NTM5YjANClJlYWQgb2Ygc2l6ZSA4IGJ5IHRhc2sgcm1tb2QvMjA3OQ0KT2JqZWN0IGF0IGZmZmY4
+ODAyNGNhNTM5MDAsIGluIGNhY2hlIGttYWxsb2MtMjU2IHNpemU6IDI1Ng0KQWxsb2NhdGVkOg0K
+UElEID0gMTQxNA0KRnJlZWQ6DQpQSUQgPSAyMDc5DQpNZW1vcnkgc3RhdGUgYXJvdW5kIHRoZSBi
+dWdneSBhZGRyZXNzOg0KIGZmZmY4ODAyNGNhNTM4ODA6IGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZi
+IGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjDQogZmZmZjg4MDI0Y2E1MzkwMDogZmIgZmIgZmIgZmIg
+ZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmINCj5mZmZmODgwMjRjYTUzOTgwOiBm
+YiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYg0KICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4NCiBmZmZmODgwMjRjYTUzYTAwOiBmYyBmYyBm
+YyBmYyBmYyBmYyBmYyBmYyBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYg0KIGZmZmY4ODAyNGNhNTNh
+ODA6IGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiDQo9PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT0NCg0KRml4ZXM6IGM2YTQ3NTllYTBjOShuYmQ6IGFkZCBkZXZpY2UgcmVmY291bnRpbmcp
+DQpDYzogSm9zZWYgQmFjaWsgPGpiYWNpa0BmYi5jb20+DQpTaWduZWQtb2ZmLWJ5OiBNaW5nIExl
+aSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCi0tLQ0KIGRyaXZlcnMvYmxvY2svbmJkLmMgfCAxIC0N
+CiAxIGZpbGUgY2hhbmdlZCwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9i
+bG9jay9uYmQuYyBiL2RyaXZlcnMvYmxvY2svbmJkLmMNCmluZGV4IDU1ODNkYzRmZjk0MS4uZmE0
+NGE2ZmNlNGNiIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibG9jay9uYmQuYw0KKysrIGIvZHJpdmVy
+cy9ibG9jay9uYmQuYw0KQEAgLTIxMTAsNyArMjExMCw2IEBAIHN0YXRpYyB2b2lkIF9fZXhpdCBu
+YmRfY2xlYW51cCh2b2lkKQ0KIAkJaWYgKHJlZmNvdW50X3JlYWQoJm5iZC0+cmVmcykgIT0gMikN
+CiAJCQlwcmludGsoS0VSTl9FUlIgIm5iZDogcG9zc2libHkgbGVha2luZyBhIGRldmljZVxuIik7
+DQogCQluYmRfcHV0KG5iZCk7DQotCQluYmRfcHV0KG5iZCk7DQogCX0NCiANCiAJaWRyX2Rlc3Ry
+b3koJm5iZF9pbmRleF9pZHIpOw0KLS0gDQoyLjkuMw0KDQoNCg0K
