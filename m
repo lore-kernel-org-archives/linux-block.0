@@ -1,17 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:48342 "EHLO
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:44917 "EHLO
         mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S939453AbdD1OcA (ORCPT
+        by vger.kernel.org with ESMTP id S1164303AbdD1OCN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 10:32:00 -0400
+        Fri, 28 Apr 2017 10:02:13 -0400
 From: Jens Axboe <axboe@fb.com>
 To: <linux-block@vger.kernel.org>
 CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
 Subject: [PATCH 2/6] mtip32xx: kill atomic argument to mtip_quiesce_io()
-Date: Fri, 28 Apr 2017 08:31:47 -0600
-Message-ID: <1493389911-19512-3-git-send-email-axboe@fb.com>
-In-Reply-To: <1493389911-19512-1-git-send-email-axboe@fb.com>
-References: <1493389911-19512-1-git-send-email-axboe@fb.com>
+Date: Fri, 28 Apr 2017 08:01:53 -0600
+Message-ID: <1493388117-15185-5-git-send-email-axboe@fb.com>
+In-Reply-To: <1493388117-15185-1-git-send-email-axboe@fb.com>
+References: <1493388117-15185-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
