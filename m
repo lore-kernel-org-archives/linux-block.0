@@ -1,15 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:44916 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1426132AbdD1OCN (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:51587 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1423455AbdD1OCK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 10:02:13 -0400
+        Fri, 28 Apr 2017 10:02:10 -0400
 From: Jens Axboe <axboe@fb.com>
 To: <linux-block@vger.kernel.org>
 CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/2] mtip32xx: convert internal command issue to block IO path
-Date: Fri, 28 Apr 2017 08:01:50 -0600
-Message-ID: <1493388117-15185-2-git-send-email-axboe@fb.com>
+Subject: [PATCH 5/6] mtip32xx: convert internal command issue to block IO path
+Date: Fri, 28 Apr 2017 08:01:56 -0600
+Message-ID: <1493388117-15185-8-git-send-email-axboe@fb.com>
 In-Reply-To: <1493388117-15185-1-git-send-email-axboe@fb.com>
 References: <1493388117-15185-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
@@ -27,11 +27,11 @@ handler, by backing off unless the drive is idle.
 
 Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 101 +++++++++++++++++++++++++++-----------
- 1 file changed, 71 insertions(+), 30 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 103 +++++++++++++++++++++++++++-----------
+ 1 file changed, 73 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index aee94f260725..cb2d93b3b8ec 100644
+index aee94f260725..90f14f799527 100644
 --- a/drivers/block/mtip32xx/mtip32xx.c
 +++ b/drivers/block/mtip32xx/mtip32xx.c
 @@ -195,7 +195,7 @@ static struct mtip_cmd *mtip_get_int_command(struct driver_data *dd)
@@ -190,7 +190,7 @@ index aee94f260725..cb2d93b3b8ec 100644
  	if (unlikely(mtip_check_unal_depth(hctx, rq)))
  		return BLK_MQ_RQ_QUEUE_BUSY;
  
-@@ -3825,8 +3861,12 @@ static enum blk_eh_timer_return mtip_cmd_timeout(struct request *req,
+@@ -3825,8 +3861,14 @@ static enum blk_eh_timer_return mtip_cmd_timeout(struct request *req,
  {
  	struct driver_data *dd = req->q->queuedata;
  
@@ -199,12 +199,14 @@ index aee94f260725..cb2d93b3b8ec 100644
 +		struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
 +
 +		cmd->status = -ETIME;
++		if (cmd->comp_func)
++			cmd->comp_func(dd->port, MTIP_TAG_INTERNAL, cmd, -ETIME);
  		goto exit_handler;
 +	}
  
  	if (test_bit(req->tag, dd->port->cmds_to_issue))
  		goto exit_handler;
-@@ -4063,6 +4103,7 @@ static void mtip_no_dev_cleanup(struct request *rq, void *data, bool reserv)
+@@ -4063,6 +4105,7 @@ static void mtip_no_dev_cleanup(struct request *rq, void *data, bool reserv)
  	} else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
  
  		cmd = mtip_cmd_from_tag(dd, MTIP_TAG_INTERNAL);
