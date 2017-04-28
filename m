@@ -1,111 +1,42 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v6 00/10] blk-mq debugfs patches for kernel v4.12
-Date: Wed, 26 Apr 2017 13:47:47 -0700
-Message-ID: <20170426204757.18910-1-bart.vanassche@sandisk.com>
+Subject: Re: [PATCH 4/6] blk-mq: don't bypass scheduler for reserved requests
+To: Christoph Hellwig <hch@lst.de>
+References: <1493389911-19512-1-git-send-email-axboe@fb.com>
+ <1493389911-19512-5-git-send-email-axboe@fb.com>
+ <20170428144155.GD1443@lst.de>
+Cc: linux-block@vger.kernel.org, ming.lei@redhat.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <5d51dab9-3191-2148-431f-dde6c8a89040@fb.com>
+Date: Fri, 28 Apr 2017 08:45:07 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <20170428144155.GD1443@lst.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+On 04/28/2017 08:41 AM, Christoph Hellwig wrote:
+> On Fri, Apr 28, 2017 at 08:31:49AM -0600, Jens Axboe wrote:
+>> Instead of bypassing the scheduler for insertion of reserved requests,
+>> we ensure that the request is marked as RQF_RESERVED so they driver
+>> knows where it came from.
+>>
+>> Usually we just use the tag to know if it's reserved or not,
+>> but that only works when the request has a driver tag assigned.
+>> Using RQF_RESERVED can be done independently of whether or not
+>> scheduling is used.
+> 
+> Do we really need a flag for this?  If anyone cares if a request
+> is internal it can just check ->tag / ->internal_tag is smaller
+> than ->nr_reserved_tags using a little helper.
+> 
+> I'd really like to keep the number of flags down as much as possible.
 
-Please consider the ten patches in this series for kernel v4.12.
-These patches improve blk-mq debugfs support.
+Ming had the same comment. Once we enter ->queue_rq() and later we don't
+need the flag, since ->tag has been assigned and the regular helper
+works fine. We can kill it. I forgot about this in the previous reply,
+but it was meant to pass the fact that this was a reserved request to
+get_driver_tag(), but it doesn't need that, since we already use the
+regular helper against ->internal_tag.
 
-Thanks,
-
-Bart.
-
-Changes compared to v5:
-- Updated patch 4/10 as proposed by Omar: fixed unregistration code and
-  changed "goto out" at the end of __blk_mq_register_dev() into "return ret".
-- For patch 5/10, replaced the patch description by the patch description
-  proposed by Omar and reduced the number of spin lock/unlock calls as
-  requested by Jens.
-- Added Reviewed-by tags to the patches for which v5 got a review but v4 not.
-- For patch 10/10, added an example of what the generated output looks like
-  to the description of this patch and increased the size of the output
-  buffer from 64 to 80 characters. 
-
-Changes compared to v4:
-- Modified patch 4 such that debugfs registration failures no longer cause
-  block device registration to fail.
-- Modified patch 8 such that it no longer introduces new sparse warnings.
-- Modified patch 9 such that .show_rq() is only defined if CONFIG_BLK_DEBUG_FS
-  is enabled.
-- Moved the definition of scsi_show_rq() to a new file in patch 10 and changed
-  the implementation of scsi_show_rq() such that it now uses
-  __scsi_format_command().
-
-Changes compared to v3:
-- Changed the mutex_lock_interruptible() calls back to mutex_lock()
-  calls.
-- Added a patch that renames the functions for registering and
-  unregistering the "mq" directory in debugfs.
-- Moved the changes that add checking of the blk_mq_debugfs_register()
-  return value into a separate patch.
-- Moved the unregistration of the "mq" directory into blk_cleanup_queue().
-- Removed uninteresting information from scsi_show_rq().
-- Added Reviewed-by tag to the patches that got a positive review.
-
-Changes compared to v2:
-- Changed the mutex_lock() calls in registration methods into
-  mutex_lock_interruptible() since these functions can be called from
-  the context of a user space process.
-- Avoid that the blk_mq_register_dev() changes in patch 1/8 cause a
-  deadlock.
-
-Changes compared to v1:
-- Added two patches and replaced patch 1/6 such that debugfs
-  attributes are now unregistered before freeing of a blk-mq queue
-  starts instead of checking the "dead" queue flag.
-- Changed "rq->cmd_flags ^ op" into "rq->cmd_flags & ~REQ_OP_MASK" as
-  proposed by Omar.
-- A seq_file pointer is now passed to the new queue_rq callback function
-  instead of a fixed-size char buffer.
-Bart Van Assche (10):
-  blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
-  blk-mq: Let blk_mq_debugfs_register() look up the queue name
-  blk-mq-debugfs: Rename functions for registering and unregistering the
-    mq directory
-  blk-mq: Only unregister hctxs for which registration succeeded
-  blk-mq: Unregister debugfs attributes earlier
-  blk-mq: Move the "state" debugfs attribute one level down
-  blk-mq: Make blk_flags_show() callers append a newline character
-  blk-mq: Show operation, cmd_flags and rq_flags names
-  blk-mq: Add blk_mq_ops.show_rq()
-  scsi: Implement blk_mq_ops.show_rq()
-
-Bart Van Assche (10):
-  blk-mq: Register <dev>/queue/mq after having registered <dev>/queue
-  blk-mq: Let blk_mq_debugfs_register() look up the queue name
-  blk-mq-debugfs: Rename functions for registering and unregistering the
-    mq directory
-  blk-mq: Only unregister hctxs for which registration succeeded
-  blk-mq: Unregister debugfs attributes earlier
-  blk-mq: Move the "state" debugfs attribute one level down
-  blk-mq: Make blk_flags_show() callers append a newline character
-  blk-mq: Show operation, cmd_flags and rq_flags names
-  blk-mq: Add blk_mq_ops.show_rq()
-  scsi: Implement blk_mq_ops.show_rq()
-
- block/blk-core.c            |   8 +++-
- block/blk-mq-debugfs.c      | 102 ++++++++++++++++++++++++++++++++++++--------
- block/blk-mq-sysfs.c        |  61 +++++++++++++++++++-------
- block/blk-mq.h              |  14 +++---
- block/blk-sysfs.c           |   6 +--
- drivers/scsi/Makefile       |   1 +
- drivers/scsi/scsi_debugfs.c |  13 ++++++
- drivers/scsi/scsi_debugfs.h |   4 ++
- drivers/scsi/scsi_lib.c     |   4 ++
- include/linux/blk-mq.h      |   8 ++++
- 10 files changed, 175 insertions(+), 46 deletions(-)
- create mode 100644 drivers/scsi/scsi_debugfs.c
- create mode 100644 drivers/scsi/scsi_debugfs.h
+I'll drop this patch.
 
 -- 
-2.12.2
+Jens Axboe
