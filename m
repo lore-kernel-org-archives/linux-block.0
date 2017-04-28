@@ -1,51 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:60035 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1425921AbdD1NDc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 09:03:32 -0400
-From: Josef Bacik <jbacik@fb.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH] block: nbd: fix double free
-Date: Fri, 28 Apr 2017 13:00:30 +0000
-Message-ID: <B95137F4-8B73-47EA-9DB6-BF008F59B2AD@fb.com>
-References: <20170428042942.6567-1-ming.lei@redhat.com>
-In-Reply-To: <20170428042942.6567-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Received: from mx1.redhat.com ([209.132.183.28]:46572 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S938548AbdD1EaT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Apr 2017 00:30:19 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>, Josef Bacik <jbacik@fb.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: nbd: fix double free
+Date: Fri, 28 Apr 2017 12:29:42 +0800
+Message-Id: <20170428042942.6567-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-V2Ugc2hvdWxkIGhhdmUgMiByZWZlcmVuY2VzIG9uIHRoZSBkZXZpY2UgYXQgdGhpcyBwb2ludCwg
-ZGlkIHlvdSBzZWUgYSDigJxuYmQ6IHBvc3NpYmx5IGxlYWtpbmcgYSBkZXZpY2XigJ0gbWVzc2Fn
-ZSBiZWZvcmUgdGhlIGthc2FuIHN0dWZmPyAgVGhhbmtzLA0KDQpKb3NlZg0KDQpPbiA0LzI4LzE3
-LCAxMjoyOSBBTSwgIk1pbmcgTGVpIiA8bWluZy5sZWlAcmVkaGF0LmNvbT4gd3JvdGU6DQoNCkxv
-b2tzIGl0IGlzIGEgdHlwbywganVzdCBmaXggaXQsIG90aGVyd2lzZSB0aGUgZm9sbG93aW5nDQp3
-YXJuaW5nIGNhbiBiZSB0cmlnZXJyZWQ6DQoNClttaW5nQFZNXSRzdWRvIHJtbW9kIG5iZA0KW3N1
-ZG9dIHBhc3N3b3JkIGZvciBtaW5nOg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQpCVUc6IEtBU0FOOiB1c2UtYWZ0ZXIt
-ZnJlZSBpbiBuYmRfY2xlYW51cCsweDExNS8weDE4ZSBbbmJkXSBhdCBhZGRyIGZmZmY4ODAyNGNh
-NTM5YjANClJlYWQgb2Ygc2l6ZSA4IGJ5IHRhc2sgcm1tb2QvMjA3OQ0KT2JqZWN0IGF0IGZmZmY4
-ODAyNGNhNTM5MDAsIGluIGNhY2hlIGttYWxsb2MtMjU2IHNpemU6IDI1Ng0KQWxsb2NhdGVkOg0K
-UElEID0gMTQxNA0KRnJlZWQ6DQpQSUQgPSAyMDc5DQpNZW1vcnkgc3RhdGUgYXJvdW5kIHRoZSBi
-dWdneSBhZGRyZXNzOg0KIGZmZmY4ODAyNGNhNTM4ODA6IGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZi
-IGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjDQogZmZmZjg4MDI0Y2E1MzkwMDogZmIgZmIgZmIgZmIg
-ZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmIgZmINCj5mZmZmODgwMjRjYTUzOTgwOiBm
-YiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYg0KICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4NCiBmZmZmODgwMjRjYTUzYTAwOiBmYyBmYyBm
-YyBmYyBmYyBmYyBmYyBmYyBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYg0KIGZmZmY4ODAyNGNhNTNh
-ODA6IGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiDQo9PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT0NCg0KRml4ZXM6IGM2YTQ3NTllYTBjOShuYmQ6IGFkZCBkZXZpY2UgcmVmY291bnRpbmcp
-DQpDYzogSm9zZWYgQmFjaWsgPGpiYWNpa0BmYi5jb20+DQpTaWduZWQtb2ZmLWJ5OiBNaW5nIExl
-aSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCi0tLQ0KIGRyaXZlcnMvYmxvY2svbmJkLmMgfCAxIC0N
-CiAxIGZpbGUgY2hhbmdlZCwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9i
-bG9jay9uYmQuYyBiL2RyaXZlcnMvYmxvY2svbmJkLmMNCmluZGV4IDU1ODNkYzRmZjk0MS4uZmE0
-NGE2ZmNlNGNiIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibG9jay9uYmQuYw0KKysrIGIvZHJpdmVy
-cy9ibG9jay9uYmQuYw0KQEAgLTIxMTAsNyArMjExMCw2IEBAIHN0YXRpYyB2b2lkIF9fZXhpdCBu
-YmRfY2xlYW51cCh2b2lkKQ0KIAkJaWYgKHJlZmNvdW50X3JlYWQoJm5iZC0+cmVmcykgIT0gMikN
-CiAJCQlwcmludGsoS0VSTl9FUlIgIm5iZDogcG9zc2libHkgbGVha2luZyBhIGRldmljZVxuIik7
-DQogCQluYmRfcHV0KG5iZCk7DQotCQluYmRfcHV0KG5iZCk7DQogCX0NCiANCiAJaWRyX2Rlc3Ry
-b3koJm5iZF9pbmRleF9pZHIpOw0KLS0gDQoyLjkuMw0KDQoNCg0K
+Looks it is a typo, just fix it, otherwise the following
+warning can be trigerred:
+
+[ming@VM]$sudo rmmod nbd
+[sudo] password for ming:
+==================================================================
+BUG: KASAN: use-after-free in nbd_cleanup+0x115/0x18e [nbd] at addr ffff88024ca539b0
+Read of size 8 by task rmmod/2079
+Object at ffff88024ca53900, in cache kmalloc-256 size: 256
+Allocated:
+PID = 1414
+Freed:
+PID = 2079
+Memory state around the buggy address:
+ ffff88024ca53880: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff88024ca53900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88024ca53980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                     ^
+ ffff88024ca53a00: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
+ ffff88024ca53a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+Fixes: c6a4759ea0c9(nbd: add device refcounting)
+Cc: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/nbd.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 5583dc4ff941..fa44a6fce4cb 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2110,7 +2110,6 @@ static void __exit nbd_cleanup(void)
+ 		if (refcount_read(&nbd->refs) != 2)
+ 			printk(KERN_ERR "nbd: possibly leaking a device\n");
+ 		nbd_put(nbd);
+-		nbd_put(nbd);
+ 	}
+ 
+ 	idr_destroy(&nbd_index_idr);
+-- 
+2.9.3
