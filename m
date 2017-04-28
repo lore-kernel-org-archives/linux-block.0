@@ -1,27 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:45156 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S937577AbdD1Ozs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 10:55:48 -0400
+Subject: Re: [PATCH v2 0/6] Fixup mtip32xx for scheduling
+To: Christoph Hellwig <hch@lst.de>
+References: <1493388117-15185-1-git-send-email-axboe@fb.com>
+ <20170428141022.GB32073@lst.de> <3ee5ce46-8085-2383-2041-e00f5bb0878e@fb.com>
+ <20170428141458.GA308@lst.de>
+Cc: linux-block@vger.kernel.org, ming.lei@redhat.com
 From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <ming.lei@redhat.com>, <hch@lst.de>
-Subject: [PATCH v3 0/7] Fixup mtip32xx for scheduling
-Date: Fri, 28 Apr 2017 08:55:33 -0600
-Message-ID: <1493391340-24629-1-git-send-email-axboe@fb.com>
+Message-ID: <3f25f044-126a-e976-6239-232ae141ca60@fb.com>
+Date: Fri, 28 Apr 2017 08:17:51 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170428141458.GA308@lst.de>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Sending out a new version, since it'd be great to get this fixed
-up before sending out the 4.12 pull requests.
+On 04/28/2017 08:14 AM, Christoph Hellwig wrote:
+> On Fri, Apr 28, 2017 at 08:13:56AM -0600, Jens Axboe wrote:
+>> On 04/28/2017 08:10 AM, Christoph Hellwig wrote:
+>>> On Fri, Apr 28, 2017 at 08:01:49AM -0600, Jens Axboe wrote:
+>>>> Round two of this patchset to cleanup. Changes since the first
+>>>> posting:
+>>>
+>>> I got two mixed series in my inbox, one with two patches and one with
+>>> 6.  The two patch one doesn't seem to have a cover letter.
+>>
+>> Hmm, I seem to get both series in full over the mailing. Perhaps
+>> it'll show up later? Isn't it the cover letter you are replying
+>> to?
+> 
+> That's the 0/6 cover letter, I didn't get a 0/2 one both here and
+> on my linux-block subsription (which uses a different mail server)
 
-Changes since v2(a):
+Ah. There is no 0/2 cover letter, I resent the full series (just with
+v2 in the 0/6 line) with after having made the changes.
 
-- Kill RQF_RESERVED. Export helper to help the driver see if a given
-  request is reserved or not, and use this insead of RQF_RESERVED.
 
 -- 
 Jens Axboe
