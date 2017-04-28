@@ -1,70 +1,24 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Saeed Mahameed <saeedm@mellanox.com>,
-	Leon Romanovsky <leonro@mellanox.com>
-Subject: [PATCH v2 3/6] RDMA/core: expose affinity mappings per completion vector
-Date: Thu,  6 Apr 2017 13:36:35 +0300
-Message-Id: <1491474998-16423-4-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
-References: <1491474998-16423-1-git-send-email-sagi@grimberg.me>
+Return-Path: <hch@lst.de>
+Date: Fri, 28 Apr 2017 16:53:00 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: update ->init_request and ->exit_request prototypes
+Message-ID: <20170428145300.GA1776@lst.de>
+References: <20170427174501.18965-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170427174501.18965-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This will allow ULPs to intelligently locate threads based
-on completion vector cpu affinity mappings. In case the
-driver does not expose a get_vector_affinity callout, return
-NULL so the caller can maintain a fallback logic.
+On Thu, Apr 27, 2017 at 07:44:56PM +0200, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this series (against for-4.12/post-merge) updates the blk-mq
+> ->init_request and ->exit request methods to drop a now harmful
+> parameter, and update one to pass a little more information.  It
+> then cleans up the nvme drivers based on that.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- include/rdma/ib_verbs.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
-index 0f1813c13687..d44b62791c64 100644
---- a/include/rdma/ib_verbs.h
-+++ b/include/rdma/ib_verbs.h
-@@ -2150,6 +2150,8 @@ struct ib_device {
- 	 */
- 	int (*get_port_immutable)(struct ib_device *, u8, struct ib_port_immutable *);
- 	void (*get_dev_fw_str)(struct ib_device *, char *str, size_t str_len);
-+	const struct cpumask *(*get_vector_affinity)(struct ib_device *ibdev,
-+						     int comp_vector);
- };
- 
- struct ib_client {
-@@ -3377,4 +3379,26 @@ void ib_drain_qp(struct ib_qp *qp);
- 
- int ib_resolve_eth_dmac(struct ib_device *device,
- 			struct ib_ah_attr *ah_attr);
-+
-+/**
-+ * ib_get_vector_affinity - Get the affinity mappings of a given completion
-+ *   vector
-+ * @device:         the rdma device
-+ * @comp_vector:    index of completion vector
-+ *
-+ * Returns NULL on failure, otherwise a corresponding cpu map of the
-+ * completion vector (returns all-cpus map if the device driver doesn't
-+ * implement get_vector_affinity).
-+ */
-+static inline const struct cpumask *
-+ib_get_vector_affinity(struct ib_device *device, int comp_vector)
-+{
-+	if (comp_vector > device->num_comp_vectors ||
-+	    !device->get_vector_affinity)
-+		return NULL;
-+
-+	return device->get_vector_affinity(device, comp_vector);
-+
-+}
-+
- #endif /* IB_VERBS_H */
--- 
-2.7.4
+Turns out that while Jeff was right that this won't work against
+for-4.12/post-merge, it applies without fuzz and works fine against
+for-next.  Sorry for the confusion.
