@@ -1,43 +1,62 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "osandov@fb.com" <osandov@fb.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 28 Apr 2017 11:48:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+	stable@vger.kernel.org
 Subject: Re: [PATCH 1/6] blk-mq: Make blk_mq_quiesce_queue() wait for all
  .queue_rq() calls
-Date: Fri, 28 Apr 2017 15:35:59 +0000
-Message-ID: <1493393758.2767.3.camel@sandisk.com>
+Message-ID: <20170428034850.GD31518@ming.t460p>
 References: <20170427155437.23228-1-bart.vanassche@sandisk.com>
-	 <20170427155437.23228-2-bart.vanassche@sandisk.com>
-	 <20170428020038.GA31518@ming.t460p>
-In-Reply-To: <20170428020038.GA31518@ming.t460p>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170427155437.23228-2-bart.vanassche@sandisk.com>
+ <20170428020038.GA31518@ming.t460p>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170428020038.GA31518@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2017-04-28 at 10:00 +0800, Ming Lei wrote:
+Hi,
+
+On Fri, Apr 28, 2017 at 10:00:44AM +0800, Ming Lei wrote:
+> Hi Bart,
+> 
 > On Thu, Apr 27, 2017 at 08:54:32AM -0700, Bart Van Assche wrote:
-> >  void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
-> >  {
-> > -	cancel_work(&hctx->run_work);
-> > -	cancel_delayed_work(&hctx->delay_work);
-> > +	cancel_work_sync(&hctx->run_work);
-> > +	cancel_delayed_work_sync(&hctx->delay_work);
->=20
-> Could you explain it a bit why we need the sync version?
+> > blk_mq_quiesce_queue() callers, e.g. elevator_switch_mq(), assume
+> > that no .queue_rq() calls occur while switching to another I/O
+> 
+> I think we should call blk_mq_freeze_queue_wait() instead
+> of blk_quiesce_queue() in elevator_switch_mq(), otherwise
+> it is easy to cause use-after-free.
 
-Because the purpose of this patch is to make blk_mq_quiesce_queue() wait fo=
-r
-all .queue_rq() calls.
+Sorry, my fault, blk_mq_freeze_queue_wait() has been done in
+blk_mq_freeze_queue() already, so no new IO can enter queue
+any more, and all old pending IOs will be fninished when 
+blk_mq_freeze_queue() returns.
 
-> So I suggest to unity both .run_work and .dealyed_run_work
-> into one work, just as what Jens did in the following link:
->=20
-> 	http://marc.info/?t=3D149183989800010&r=3D1&w=3D2
+> 
+> > scheduler. This patch fixes the following kernel crash if another
+> > I/O scheduler than "none" is the default scheduler:
+> > 
+> > general protection fault: 0000 [#1] SMP
+> > RIP: 0010:__lock_acquire+0xfe/0x1280
+> > Call Trace:
+> >  lock_acquire+0xd5/0x1c0
+> >  _raw_spin_lock+0x2a/0x40
+> >  dd_dispatch_request+0x29/0x1e0
+> >  blk_mq_sched_dispatch_requests+0x139/0x190
+> >  __blk_mq_run_hw_queue+0x12d/0x1c0
+> >  blk_mq_run_work_fn+0xd/0x10
+> >  process_one_work+0x206/0x6a0
+> >  worker_thread+0x49/0x4a0
+> >  kthread+0x107/0x140
+> >  ret_from_fork+0x2e/0x40
 
-That should be done after this patch is upstream otherwise this
-patch won't apply to the stable trees.
+So I am just wondering where the I/O in the above issue is
+from? and feels there might be other bug behind the issue. 
 
-Bart.=
+Also blk_mq_quiesce_queue() in elevator_switch_mq()
+shouldn't be necessary.
+
+Thanks,
+Ming
