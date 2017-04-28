@@ -1,38 +1,48 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH 0/6] Six more patches for Linux kernel v4.12
-Date: Thu, 27 Apr 2017 08:54:31 -0700
-Message-ID: <20170427155437.23228-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:41883 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S967155AbdD1QzA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Apr 2017 12:55:00 -0400
+From: Jens Axboe <axboe@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 5/6] blk-mq-sched: remove hack that bypasses scheduler for reserved requests
+Date: Fri, 28 Apr 2017 10:54:32 -0600
+Message-ID: <1493398473-29872-6-git-send-email-axboe@fb.com>
+In-Reply-To: <1493398473-29872-1-git-send-email-axboe@fb.com>
+References: <1493398473-29872-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+We have update the troublesome driver (mtip32xx) to deal with this
+appropriately. So kill the hack that bypassed scheduler allocation
+and insertion for reserved requests.
 
-Since the merge window will open soon, do you still accept patches for
-Linux kernel v4.12? If so, please consider the six patches in this series.
-This series contains one bug fix, one comment fix and four patches that
-extend the blk-mq-debugfs functionality further.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
+---
+ block/blk-mq-sched.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-Thanks,
-
-Bart.
-
-Bart Van Assche (6):
-  blk-mq: Make blk_mq_quiesce_queue() wait for all .queue_rq() calls
-  blk-mq: Fix the comment above blk_mq_quiesce_queue()
-  blk-mq-debugfs: Show atomic request flags
-  blk-mq-debugfs: Show requeue list
-  blk-mq-debugfs: Show busy requests
-  blk-mq-debugfs: Add 'kick' operation
-
- block/blk-mq-debugfs.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++-
- block/blk-mq.c         |  8 ++---
- 2 files changed, 98 insertions(+), 5 deletions(-)
-
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 8b361e192e8a..e79e9f18d7c2 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -82,11 +82,7 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
+ 	if (likely(!data->hctx))
+ 		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
+ 
+-	/*
+-	 * For a reserved tag, allocate a normal request since we might
+-	 * have driver dependencies on the value of the internal tag.
+-	 */
+-	if (e && !(data->flags & BLK_MQ_REQ_RESERVED)) {
++	if (e) {
+ 		data->flags |= BLK_MQ_REQ_INTERNAL;
+ 
+ 		/*
 -- 
-2.12.2
+2.7.4
