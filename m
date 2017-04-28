@@ -1,40 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:35049 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755440AbdDDS4v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2017 14:56:51 -0400
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 2/9] bio-integrity: bio_trim should truncate integrity vector accordingly
-Date: Tue,  4 Apr 2017 22:56:34 +0400
-Message-Id: <1491332201-26926-3-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
-References: <1491332201-26926-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=629101232e=axboe@fb.com>
+Subject: Re: [PATCH] nbd: fix use after free on module unload
+To: Josef Bacik <josef@toxicpanda.com>, <axboe@kernel.dk>,
+        <nbd-general@lists.sourceforge.net>, <linux-block@vger.kernel.org>,
+        <kernel-team@fb.com>
+References: <1493387359-9496-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <ec758c0a-da9d-ae5a-04cf-b22b79b4cae3@fb.com>
+Date: Fri, 28 Apr 2017 08:14:58 -0600
+MIME-Version: 1.0
+In-Reply-To: <1493387359-9496-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset="windows-1252"
+List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
----
- block/bio.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On 04/28/2017 07:49 AM, Josef Bacik wrote:
+> list_for_each_entry() isn't super safe if we're freeing the objects
+> while we traverse the list.  Also don't bother taking the extra
+> reference, the module refcounting stuff will save us from having anybody
+> messing with the device while we're trying to unload.
 
-diff --git a/block/bio.c b/block/bio.c
-index e75878f..fa84323 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1907,6 +1907,10 @@ void bio_trim(struct bio *bio, int offset, int size)
- 	bio_advance(bio, offset << 9);
- 
- 	bio->bi_iter.bi_size = size;
-+
-+	if (bio_integrity(bio))
-+		bio_integrity_trim(bio, 0, size);
-+
- }
- EXPORT_SYMBOL_GPL(bio_trim);
- 
+That looks better/safer. Applied for 4.12.
+
 -- 
-2.9.3
+Jens Axboe
