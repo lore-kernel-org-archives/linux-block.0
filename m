@@ -1,54 +1,62 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, =?UTF-8?q?Matias=20Bj=C3=B8rling?=
-	<m@bjorling.me>, Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v2 2/5] null_blk: Use blk_init_request_from_bio() instead of open-coding it
-Date: Wed, 19 Apr 2017 14:01:25 -0700
-Message-ID: <20170419210128.28374-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170419210128.28374-1-bart.vanassche@sandisk.com>
-References: <20170419210128.28374-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:46604 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754458AbdD1PWV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Apr 2017 11:22:21 -0400
+Date: Fri, 28 Apr 2017 23:22:06 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de
+Subject: Re: [PATCH 4/7] blk-mq: add and export helper to tell if a request
+ is reserved
+Message-ID: <20170428152205.GA25592@ming.t460p>
+References: <1493391340-24629-1-git-send-email-axboe@fb.com>
+ <1493391340-24629-5-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1493391340-24629-5-git-send-email-axboe@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch changes the behavior of the null_blk driver for the
-LightNVM mode as follows:
-* REQ_FAILFAST_MASK is set for read-ahead requests.
-* If no I/O priority has been set in the bio, the I/O priority is
-  copied from the I/O context.
-* The rq_disk member is initialized if bio->bi_bdev != NULL.
-* req->errors is initialized to zero.
+On Fri, Apr 28, 2017 at 08:55:37AM -0600, Jens Axboe wrote:
+> We only have an internal helper for checking a tag value. Add
+> an exported helper that takes a request and hardware queue,
+> and check against the driver tags.
+> 
+> Signed-off-by: Jens Axboe <axboe@fb.com>
+> ---
+>  block/blk-mq-tag.c     | 6 ++++++
+>  include/linux/blk-mq.h | 1 +
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index d0be72ccb091..0a04b5c14076 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -476,3 +476,9 @@ u32 blk_mq_unique_tag(struct request *rq)
+>  		(rq->tag & BLK_MQ_UNIQUE_TAG_MASK);
+>  }
+>  EXPORT_SYMBOL(blk_mq_unique_tag);
+> +
+> +bool blk_mq_rq_is_reserved(struct blk_mq_hw_ctx *hctx, struct request *rq)
+> +{
+> +	return blk_mq_tag_is_reserved(hctx->tags, rq->tag);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_mq_rq_is_reserved);
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 32bd8eb5ba67..13e51520fa27 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -224,6 +224,7 @@ static inline u16 blk_mq_unique_tag_to_tag(u32 unique_tag)
+>  	return unique_tag & BLK_MQ_UNIQUE_TAG_MASK;
+>  }
+>  
+> +bool blk_mq_rq_is_reserved(struct blk_mq_hw_ctx *hctx, struct request *rq);
+>  
+>  int blk_mq_request_started(struct request *rq);
+>  void blk_mq_start_request(struct request *rq);
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Matias Bjørling <m@bjorling.me>
-Cc: Adam Manzanares <adam.manzanares@wdc.com>
----
- drivers/block/null_blk.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index f93906ff31e8..e79e3d24e229 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -443,14 +443,7 @@ static int null_lnvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
- 	if (IS_ERR(rq))
- 		return -ENOMEM;
- 
--	rq->__sector = bio->bi_iter.bi_sector;
--	rq->ioprio = bio_prio(bio);
--
--	if (bio_has_data(bio))
--		rq->nr_phys_segments = bio_phys_segments(q, bio);
--
--	rq->__data_len = bio->bi_iter.bi_size;
--	rq->bio = rq->biotail = bio;
-+	blk_init_request_from_bio(rq, bio);
- 
- 	rq->end_io_data = rqd;
- 
--- 
-2.12.2
+Thanks,
+Ming
