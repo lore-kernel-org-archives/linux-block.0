@@ -1,221 +1,475 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:45178 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S968487AbdD1Ozv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2017 10:55:51 -0400
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <ming.lei@redhat.com>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 5/7] mtip32xx: convert internal command issue to block IO path
-Date: Fri, 28 Apr 2017 08:55:38 -0600
-Message-ID: <1493391340-24629-6-git-send-email-axboe@fb.com>
-In-Reply-To: <1493391340-24629-1-git-send-email-axboe@fb.com>
-References: <1493391340-24629-1-git-send-email-axboe@fb.com>
+Received: from mga04.intel.com ([192.55.52.120]:58232 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S642489AbdD1TpG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Apr 2017 15:45:06 -0400
+Subject: [PATCH v2] x86,
+ uaccess: introduce copy_from_iter_wt for pmem / writethrough
+ operations
+From: Dan Williams <dan.j.williams@intel.com>
+To: viro@zeniv.linux.org.uk
+Cc: Jan Kara <jack@suse.cz>, Matthew Wilcox <mawilcox@microsoft.com>,
+        x86@kernel.org, linux-kernel@vger.kernel.org, hch@lst.de,
+        linux-block@vger.kernel.org, linux-nvdimm@lists.01.org,
+        jmoyer@redhat.com, Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-fsdevel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        ross.zwisler@linux.intel.com
+Date: Fri, 28 Apr 2017 12:39:12 -0700
+Message-ID: <149340820800.28724.16189291963486607562.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <20170427063054.soejyqocqqrihfdw@gmail.com>
+References: <20170427063054.soejyqocqqrihfdw@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The driver special cases certain things for command issue, depending
-on whether it's an internal command or not. Make the internal commands
-use the regular infrastructure for issuing IO.
+The pmem driver has a need to transfer data with a persistent memory
+destination and be able to rely on the fact that the destination writes
+are not cached. It is sufficient for the writes to be flushed to a
+cpu-store-buffer (non-temporal / "movnt" in x86 terms), as we expect
+userspace to call fsync() to ensure data-writes have reached a
+power-fail-safe zone in the platform. The fsync() triggers a REQ_FUA or
+REQ_FLUSH to the pmem driver which will turn around and fence previous
+writes with an "sfence".
 
-Since this is an 8-group souped up AHCI variant, we have to deal
-with NCQ vs non-queueable commands. Do this from the queue_rq
-handler, by backing off unless the drive is idle.
+Implement a __copy_from_user_inatomic_wt, memcpy_page_wt, and memcpy_wt,
+that guarantee that the destination buffer is not dirty in the cpu cache
+on completion. The new copy_from_iter_wt and sub-routines will be used
+to replace the "pmem api" (include/linux/pmem.h +
+arch/x86/include/asm/pmem.h). The availability of copy_from_iter_wt()
+and memcpy_wt() are gated by the CONFIG_ARCH_HAS_UACCESS_WT config
+symbol, and fallback to copy_from_iter_nocache() and plain memcpy()
+otherwise.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+This is meant to satisfy the concern from Linus that if a driver wants
+to do something beyond the normal nocache semantics it should be
+something private to that driver [1], and Al's concern that anything
+uaccess related belongs with the rest of the uaccess code [2].
+
+[1]: https://lists.01.org/pipermail/linux-nvdimm/2017-January/008364.html
+[2]: https://lists.01.org/pipermail/linux-nvdimm/2017-April/009942.html
+
+Cc: <x86@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 106 +++++++++++++++++++++++++++-----------
- 1 file changed, 76 insertions(+), 30 deletions(-)
+Changes since the initial RFC:
+* s/writethru/wt/ since we already have ioremap_wt(), set_memory_wt(),
+  etc. (Ingo)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index aee94f260725..9780c4d3697c 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -195,7 +195,7 @@ static struct mtip_cmd *mtip_get_int_command(struct driver_data *dd)
- 	if (mtip_check_surprise_removal(dd->pdev))
- 		return NULL;
- 
--	rq = blk_mq_alloc_request(dd->queue, 0, BLK_MQ_REQ_RESERVED);
-+	rq = blk_mq_alloc_request(dd->queue, REQ_OP_DRV_IN, BLK_MQ_REQ_RESERVED);
- 	if (IS_ERR(rq))
- 		return NULL;
- 
-@@ -1088,6 +1088,13 @@ static int mtip_quiesce_io(struct mtip_port *port, unsigned long timeout)
- 	return -EFAULT;
+ arch/x86/Kconfig                  |    1 
+ arch/x86/include/asm/string_64.h  |    5 +
+ arch/x86/include/asm/uaccess_64.h |   11 +++
+ arch/x86/lib/usercopy_64.c        |  128 +++++++++++++++++++++++++++++++++++++
+ drivers/acpi/nfit/core.c          |    3 -
+ drivers/nvdimm/claim.c            |    2 -
+ drivers/nvdimm/pmem.c             |   13 +++-
+ drivers/nvdimm/region_devs.c      |    4 +
+ include/linux/dax.h               |    3 +
+ include/linux/string.h            |    6 ++
+ include/linux/uio.h               |   15 ++++
+ lib/Kconfig                       |    3 +
+ lib/iov_iter.c                    |   21 ++++++
+ 13 files changed, 208 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 1d50fdff77ee..398117923b1c 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -54,6 +54,7 @@ config X86
+ 	select ARCH_HAS_KCOV			if X86_64
+ 	select ARCH_HAS_MMIO_FLUSH
+ 	select ARCH_HAS_PMEM_API		if X86_64
++	select ARCH_HAS_UACCESS_WT		if X86_64
+ 	select ARCH_HAS_SET_MEMORY
+ 	select ARCH_HAS_SG_CHAIN
+ 	select ARCH_HAS_STRICT_KERNEL_RWX
+diff --git a/arch/x86/include/asm/string_64.h b/arch/x86/include/asm/string_64.h
+index 733bae07fb29..dfbd66b11c72 100644
+--- a/arch/x86/include/asm/string_64.h
++++ b/arch/x86/include/asm/string_64.h
+@@ -109,6 +109,11 @@ memcpy_mcsafe(void *dst, const void *src, size_t cnt)
+ 	return 0;
  }
  
-+struct mtip_int_cmd {
-+	int fis_len;
-+	dma_addr_t buffer;
-+	int buf_len;
-+	u32 opts;
-+};
++#ifdef CONFIG_ARCH_HAS_UACCESS_WT
++#define __HAVE_ARCH_MEMCPY_WT 1
++void memcpy_wt(void *dst, const void *src, size_t cnt);
++#endif
 +
- /*
-  * Execute an internal command and wait for the completion.
-  *
-@@ -1114,10 +1121,16 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 					u32 opts,
- 					unsigned long timeout)
- {
--	struct mtip_cmd_sg *command_sg;
- 	DECLARE_COMPLETION_ONSTACK(wait);
- 	struct mtip_cmd *int_cmd;
- 	struct driver_data *dd = port->dd;
-+	struct request *rq;
-+	struct mtip_int_cmd icmd = {
-+		.fis_len = fis_len,
-+		.buffer = buffer,
-+		.buf_len = buf_len,
-+		.opts = opts
-+	};
- 	int rv = 0;
- 	unsigned long start;
+ #endif /* __KERNEL__ */
  
-@@ -1132,6 +1145,8 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 		dbg_printk(MTIP_DRV_NAME "Unable to allocate tag for PIO cmd\n");
- 		return -EFAULT;
- 	}
-+	rq = blk_mq_rq_from_pdu(int_cmd);
-+	rq->end_io_data = &icmd;
+ #endif /* _ASM_X86_STRING_64_H */
+diff --git a/arch/x86/include/asm/uaccess_64.h b/arch/x86/include/asm/uaccess_64.h
+index c5504b9a472e..07ded30c7e89 100644
+--- a/arch/x86/include/asm/uaccess_64.h
++++ b/arch/x86/include/asm/uaccess_64.h
+@@ -171,6 +171,10 @@ unsigned long raw_copy_in_user(void __user *dst, const void __user *src, unsigne
+ extern long __copy_user_nocache(void *dst, const void __user *src,
+ 				unsigned size, int zerorest);
  
- 	set_bit(MTIP_PF_IC_ACTIVE_BIT, &port->flags);
- 
-@@ -1158,35 +1173,16 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 	/* Copy the command to the command table */
- 	memcpy(int_cmd->command, fis, fis_len*4);
- 
--	/* Populate the SG list */
--	int_cmd->command_header->opts =
--		 __force_bit2int cpu_to_le32(opts | fis_len);
--	if (buf_len) {
--		command_sg = int_cmd->command + AHCI_CMD_TBL_HDR_SZ;
--
--		command_sg->info =
--			__force_bit2int cpu_to_le32((buf_len-1) & 0x3FFFFF);
--		command_sg->dba	=
--			__force_bit2int cpu_to_le32(buffer & 0xFFFFFFFF);
--		command_sg->dba_upper =
--			__force_bit2int cpu_to_le32((buffer >> 16) >> 16);
--
--		int_cmd->command_header->opts |=
--			__force_bit2int cpu_to_le32((1 << 16));
--	}
--
--	/* Populate the command header */
--	int_cmd->command_header->byte_count = 0;
--
- 	start = jiffies;
-+	rq->timeout = timeout;
- 
--	/* Issue the command to the hardware */
--	mtip_issue_non_ncq_command(port, MTIP_TAG_INTERNAL);
-+	/* insert request and run queue */
-+	blk_execute_rq_nowait(rq->q, NULL, rq, true, NULL);
++extern long __copy_user_wt(void *dst, const void __user *src, unsigned size);
++extern void memcpy_page_wt(char *to, struct page *page, size_t offset,
++			   size_t len);
 +
-+	wait_for_completion(&wait);
-+	rv = int_cmd->status;
- 
--	/* Wait for the command to complete or timeout. */
--	rv = wait_for_completion_interruptible_timeout(&wait,
--				msecs_to_jiffies(timeout));
--	if (rv <= 0) {
-+	if (rv < 0) {
- 		if (rv == -ERESTARTSYS) { /* interrupted */
- 			dev_err(&dd->pdev->dev,
- 				"Internal command [%02X] was interrupted after %u ms\n",
-@@ -1217,7 +1213,6 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 		goto exec_ic_exit;
- 	}
- 
--	rv = 0;
- 	if (readl(port->cmd_issue[MTIP_TAG_INTERNAL])
- 			& (1 << MTIP_TAG_INTERNAL)) {
- 		rv = -ENXIO;
-@@ -3762,6 +3757,44 @@ static bool mtip_check_unal_depth(struct blk_mq_hw_ctx *hctx,
- 	return false;
+ static inline int
+ __copy_from_user_inatomic_nocache(void *dst, const void __user *src,
+ 				  unsigned size)
+@@ -179,6 +183,13 @@ __copy_from_user_inatomic_nocache(void *dst, const void __user *src,
+ 	return __copy_user_nocache(dst, src, size, 0);
  }
  
-+static int mtip_issue_reserved_cmd(struct blk_mq_hw_ctx *hctx,
-+				   struct request *rq)
++static inline int
++__copy_from_user_inatomic_wt(void *dst, const void __user *src, unsigned size)
 +{
-+	struct driver_data *dd = hctx->queue->queuedata;
-+	struct mtip_int_cmd *icmd = rq->end_io_data;
-+	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
-+	struct mtip_cmd_sg *command_sg;
-+
-+	if (mtip_commands_active(dd->port))
-+		return BLK_MQ_RQ_QUEUE_BUSY;
-+
-+	rq->end_io_data = NULL;
-+
-+	/* Populate the SG list */
-+	cmd->command_header->opts =
-+		 __force_bit2int cpu_to_le32(icmd->opts | icmd->fis_len);
-+	if (icmd->buf_len) {
-+		command_sg = cmd->command + AHCI_CMD_TBL_HDR_SZ;
-+
-+		command_sg->info =
-+			__force_bit2int cpu_to_le32((icmd->buf_len-1) & 0x3FFFFF);
-+		command_sg->dba	=
-+			__force_bit2int cpu_to_le32(icmd->buffer & 0xFFFFFFFF);
-+		command_sg->dba_upper =
-+			__force_bit2int cpu_to_le32((icmd->buffer >> 16) >> 16);
-+
-+		cmd->command_header->opts |=
-+			__force_bit2int cpu_to_le32((1 << 16));
-+	}
-+
-+	/* Populate the command header */
-+	cmd->command_header->byte_count = 0;
-+
-+	blk_mq_start_request(rq);
-+	mtip_issue_non_ncq_command(dd->port, rq->tag);
-+	return BLK_MQ_RQ_QUEUE_OK;
++	kasan_check_write(dst, size);
++	return __copy_user_wt(dst, src, size);
 +}
 +
- static int mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			 const struct blk_mq_queue_data *bd)
- {
-@@ -3770,6 +3803,12 @@ static int mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
+ unsigned long
+ copy_user_handle_tail(char *to, char *from, unsigned len);
  
- 	mtip_init_cmd_header(rq);
+diff --git a/arch/x86/lib/usercopy_64.c b/arch/x86/lib/usercopy_64.c
+index 3b7c40a2e3e1..0aeff66a022f 100644
+--- a/arch/x86/lib/usercopy_64.c
++++ b/arch/x86/lib/usercopy_64.c
+@@ -7,6 +7,7 @@
+  */
+ #include <linux/export.h>
+ #include <linux/uaccess.h>
++#include <linux/highmem.h>
  
+ /*
+  * Zero Userspace
+@@ -73,3 +74,130 @@ copy_user_handle_tail(char *to, char *from, unsigned len)
+ 	clac();
+ 	return len;
+ }
++
++#ifdef CONFIG_ARCH_HAS_UACCESS_WT
++/**
++ * clean_cache_range - write back a cache range with CLWB
++ * @vaddr:	virtual start address
++ * @size:	number of bytes to write back
++ *
++ * Write back a cache range using the CLWB (cache line write back)
++ * instruction. Note that @size is internally rounded up to be cache
++ * line size aligned.
++ */
++static void clean_cache_range(void *addr, size_t size)
++{
++	u16 x86_clflush_size = boot_cpu_data.x86_clflush_size;
++	unsigned long clflush_mask = x86_clflush_size - 1;
++	void *vend = addr + size;
++	void *p;
++
++	for (p = (void *)((unsigned long)addr & ~clflush_mask);
++	     p < vend; p += x86_clflush_size)
++		clwb(p);
++}
++
++long __copy_user_wt(void *dst, const void __user *src, unsigned size)
++{
++	unsigned long flushed, dest = (unsigned long) dst;
++	long rc = __copy_user_nocache(dst, src, size, 0);
++
 +	/*
-+	 * Reserved tags are internal commands
++	 * __copy_user_nocache() uses non-temporal stores for the bulk
++	 * of the transfer, but we need to manually flush if the
++	 * transfer is unaligned. A cached memory copy is used when
++	 * destination or size is not naturally aligned. That is:
++	 *   - Require 8-byte alignment when size is 8 bytes or larger.
++	 *   - Require 4-byte alignment when size is 4 bytes.
 +	 */
-+	if (blk_mq_rq_is_reserved(hctx, rq))
-+		return mtip_issue_reserved_cmd(hctx, rq);
++	if (size < 8) {
++		if (!IS_ALIGNED(dest, 4) || size != 4)
++			clean_cache_range(dst, 1);
++	} else {
++		if (!IS_ALIGNED(dest, 8)) {
++			dest = ALIGN(dest, boot_cpu_data.x86_clflush_size);
++			clean_cache_range(dst, 1);
++		}
 +
- 	if (unlikely(mtip_check_unal_depth(hctx, rq)))
- 		return BLK_MQ_RQ_QUEUE_BUSY;
- 
-@@ -3825,8 +3864,14 @@ static enum blk_eh_timer_return mtip_cmd_timeout(struct request *req,
- {
- 	struct driver_data *dd = req->q->queuedata;
- 
--	if (reserved)
-+	if (reserved) {
-+		struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
-+
-+		cmd->status = -ETIME;
-+		if (cmd->comp_func)
-+			cmd->comp_func(dd->port, MTIP_TAG_INTERNAL, cmd, -ETIME);
- 		goto exit_handler;
++		flushed = dest - (unsigned long) dst;
++		if (size > flushed && !IS_ALIGNED(size - flushed, 8))
++			clean_cache_range(dst + size - 1, 1);
 +	}
++
++	return rc;
++}
++
++void memcpy_wt(void *_dst, const void *_src, size_t size)
++{
++	unsigned long dest = (unsigned long) _dst;
++	unsigned long source = (unsigned long) _src;
++
++	/* cache copy and flush to align dest */
++	if (!IS_ALIGNED(dest, 8)) {
++		unsigned len = min_t(unsigned, size, ALIGN(dest, 8) - dest);
++
++		memcpy((void *) dest, (void *) source, len);
++		clean_cache_range((void *) dest, len);
++		dest += len;
++		source += len;
++		size -= len;
++		if (!size)
++			return;
++	}
++
++	/* 4x8 movnti loop */
++	while (size >= 32) {
++		asm("movq    (%0), %%r8\n"
++		    "movq   8(%0), %%r9\n"
++		    "movq  16(%0), %%r10\n"
++		    "movq  24(%0), %%r11\n"
++		    "movnti  %%r8,   (%1)\n"
++		    "movnti  %%r9,  8(%1)\n"
++		    "movnti %%r10, 16(%1)\n"
++		    "movnti %%r11, 24(%1)\n"
++		    :: "r" (source), "r" (dest)
++		    : "memory", "r8", "r9", "r10", "r11");
++		dest += 32;
++		source += 32;
++		size -= 32;
++	}
++
++	/* 1x8 movnti loop */
++	while (size >= 8) {
++		asm("movq    (%0), %%r8\n"
++		    "movnti  %%r8,   (%1)\n"
++		    :: "r" (source), "r" (dest)
++		    : "memory", "r8");
++		dest += 8;
++		source += 8;
++		size -= 8;
++	}
++
++	/* 1x4 movnti loop */
++	while (size >= 4) {
++		asm("movl    (%0), %%r8d\n"
++		    "movnti  %%r8d,   (%1)\n"
++		    :: "r" (source), "r" (dest)
++		    : "memory", "r8");
++		dest += 4;
++		source += 4;
++		size -= 4;
++	}
++
++	/* cache copy for remaining bytes */
++	if (size) {
++		memcpy((void *) dest, (void *) source, size);
++		clean_cache_range((void *) dest, size);
++	}
++}
++EXPORT_SYMBOL_GPL(memcpy_wt);
++
++void memcpy_page_wt(char *to, struct page *page, size_t offset,
++		size_t len)
++{
++	char *from = kmap_atomic(page);
++
++	memcpy_wt(to, from + offset, len);
++	kunmap_atomic(from);
++}
++#endif
+diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
+index d0c07b2344e4..be9bba609f26 100644
+--- a/drivers/acpi/nfit/core.c
++++ b/drivers/acpi/nfit/core.c
+@@ -1776,8 +1776,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
+ 		}
  
- 	if (test_bit(req->tag, dd->port->cmds_to_issue))
- 		goto exit_handler;
-@@ -4063,6 +4108,7 @@ static void mtip_no_dev_cleanup(struct request *rq, void *data, bool reserv)
- 	} else if (test_bit(MTIP_PF_IC_ACTIVE_BIT, &dd->port->flags)) {
+ 		if (rw)
+-			memcpy_to_pmem(mmio->addr.aperture + offset,
+-					iobuf + copied, c);
++			memcpy_wt(mmio->addr.aperture + offset, iobuf + copied, c);
+ 		else {
+ 			if (nfit_blk->dimm_flags & NFIT_BLK_READ_FLUSH)
+ 				mmio_flush_range((void __force *)
+diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
+index 3a35e8028b9c..864ed42baaf0 100644
+--- a/drivers/nvdimm/claim.c
++++ b/drivers/nvdimm/claim.c
+@@ -266,7 +266,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 			rc = -EIO;
+ 	}
  
- 		cmd = mtip_cmd_from_tag(dd, MTIP_TAG_INTERNAL);
-+		cmd->status = -ENODEV;
- 		if (cmd->comp_func)
- 			cmd->comp_func(dd->port, MTIP_TAG_INTERNAL,
- 					cmd, -ENODEV);
--- 
-2.7.4
+-	memcpy_to_pmem(nsio->addr + offset, buf, size);
++	memcpy_wt(nsio->addr + offset, buf, size);
+ 	nvdimm_flush(to_nd_region(ndns->dev.parent));
+ 
+ 	return rc;
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 3b3dab73d741..4be8f30de9b3 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -28,6 +28,7 @@
+ #include <linux/pfn_t.h>
+ #include <linux/slab.h>
+ #include <linux/pmem.h>
++#include <linux/uio.h>
+ #include <linux/dax.h>
+ #include <linux/nd.h>
+ #include "pmem.h"
+@@ -79,7 +80,7 @@ static void write_pmem(void *pmem_addr, struct page *page,
+ {
+ 	void *mem = kmap_atomic(page);
+ 
+-	memcpy_to_pmem(pmem_addr, mem + off, len);
++	memcpy_wt(pmem_addr, mem + off, len);
+ 	kunmap_atomic(mem);
+ }
+ 
+@@ -234,8 +235,15 @@ static long pmem_dax_direct_access(struct dax_device *dax_dev,
+ 	return __pmem_direct_access(pmem, pgoff, nr_pages, kaddr, pfn);
+ }
+ 
++static size_t pmem_copy_from_iter(struct dax_device *dax_dev, pgoff_t pgoff,
++		void *addr, size_t bytes, struct iov_iter *i)
++{
++	return copy_from_iter_wt(addr, bytes, i);
++}
++
+ static const struct dax_operations pmem_dax_ops = {
+ 	.direct_access = pmem_dax_direct_access,
++	.copy_from_iter = pmem_copy_from_iter,
+ };
+ 
+ static void pmem_release_queue(void *q)
+@@ -288,7 +296,8 @@ static int pmem_attach_disk(struct device *dev,
+ 	dev_set_drvdata(dev, pmem);
+ 	pmem->phys_addr = res->start;
+ 	pmem->size = resource_size(res);
+-	if (nvdimm_has_flush(nd_region) < 0)
++	if (!IS_ENABLED(CONFIG_ARCH_HAS_UACCESS_WT)
++			|| nvdimm_has_flush(nd_region) < 0)
+ 		dev_warn(dev, "unable to guarantee persistence of writes\n");
+ 
+ 	if (!devm_request_mem_region(dev, res->start, resource_size(res),
+diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+index b7cb5066d961..016af2a6694d 100644
+--- a/drivers/nvdimm/region_devs.c
++++ b/drivers/nvdimm/region_devs.c
+@@ -947,8 +947,8 @@ void nvdimm_flush(struct nd_region *nd_region)
+ 	 * The first wmb() is needed to 'sfence' all previous writes
+ 	 * such that they are architecturally visible for the platform
+ 	 * buffer flush.  Note that we've already arranged for pmem
+-	 * writes to avoid the cache via arch_memcpy_to_pmem().  The
+-	 * final wmb() ensures ordering for the NVDIMM flush write.
++	 * writes to avoid the cache via memcpy_wt().  The final wmb()
++	 * ensures ordering for the NVDIMM flush write.
+ 	 */
+ 	wmb();
+ 	for (i = 0; i < nd_region->ndr_mappings; i++)
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index d3158e74a59e..156f067d4db5 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -16,6 +16,9 @@ struct dax_operations {
+ 	 */
+ 	long (*direct_access)(struct dax_device *, pgoff_t, long,
+ 			void **, pfn_t *);
++	/* copy_from_iter: dax-driver override for default copy_from_iter */
++	size_t (*copy_from_iter)(struct dax_device *, pgoff_t, void *, size_t,
++			struct iov_iter *);
+ };
+ 
+ int dax_read_lock(void);
+diff --git a/include/linux/string.h b/include/linux/string.h
+index 9d6f189157e2..245e0a29b7e5 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -122,6 +122,12 @@ static inline __must_check int memcpy_mcsafe(void *dst, const void *src,
+ 	return 0;
+ }
+ #endif
++#ifndef __HAVE_ARCH_MEMCPY_WT
++static inline void memcpy_wt(void *dst, const void *src, size_t cnt)
++{
++	memcpy(dst, src, cnt);
++}
++#endif
+ void *memchr_inv(const void *s, int c, size_t n);
+ char *strreplace(char *s, char old, char new);
+ 
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index f2d36a3d3005..30c43aa371b5 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -95,6 +95,21 @@ size_t copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i);
+ size_t copy_from_iter(void *addr, size_t bytes, struct iov_iter *i);
+ bool copy_from_iter_full(void *addr, size_t bytes, struct iov_iter *i);
+ size_t copy_from_iter_nocache(void *addr, size_t bytes, struct iov_iter *i);
++#ifdef CONFIG_ARCH_HAS_UACCESS_WT
++/*
++ * Note, users like pmem that depend on the stricter semantics of
++ * copy_from_iter_wt() than copy_from_iter_nocache() must check
++ * for IS_ENABLED(CONFIG_ARCH_HAS_UACCESS_WRITETHROUGH) before assuming
++ * that the destination is flushed from the cache on return.
++ */
++size_t copy_from_iter_wt(void *addr, size_t bytes, struct iov_iter *i);
++#else
++static inline size_t copy_from_iter_wt(void *addr, size_t bytes,
++				       struct iov_iter *i)
++{
++	return copy_from_iter_nocache(addr, bytes, i);
++}
++#endif
+ bool copy_from_iter_full_nocache(void *addr, size_t bytes, struct iov_iter *i);
+ size_t iov_iter_zero(size_t bytes, struct iov_iter *);
+ unsigned long iov_iter_alignment(const struct iov_iter *i);
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 0c8b78a9ae2e..f0752a7a9001 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -548,6 +548,9 @@ config ARCH_HAS_SG_CHAIN
+ config ARCH_HAS_PMEM_API
+ 	bool
+ 
++config ARCH_HAS_UACCESS_WT
++	bool
++
+ config ARCH_HAS_MMIO_FLUSH
+ 	bool
+ 
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f7c93568ec99..19ab9af091f9 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -615,6 +615,27 @@ size_t copy_from_iter_nocache(void *addr, size_t bytes, struct iov_iter *i)
+ }
+ EXPORT_SYMBOL(copy_from_iter_nocache);
+ 
++#ifdef CONFIG_ARCH_HAS_UACCESS_WT
++size_t copy_from_iter_wt(void *addr, size_t bytes, struct iov_iter *i)
++{
++	char *to = addr;
++	if (unlikely(i->type & ITER_PIPE)) {
++		WARN_ON(1);
++		return 0;
++	}
++	iterate_and_advance(i, bytes, v,
++		__copy_from_user_inatomic_wt((to += v.iov_len) - v.iov_len,
++					 v.iov_base, v.iov_len),
++		memcpy_page_wt((to += v.bv_len) - v.bv_len, v.bv_page,
++				 v.bv_offset, v.bv_len),
++		memcpy_wt((to += v.iov_len) - v.iov_len, v.iov_base, v.iov_len)
++	)
++
++	return bytes;
++}
++EXPORT_SYMBOL_GPL(copy_from_iter_wt);
++#endif
++
+ bool copy_from_iter_full_nocache(void *addr, size_t bytes, struct iov_iter *i)
+ {
+ 	char *to = addr;
