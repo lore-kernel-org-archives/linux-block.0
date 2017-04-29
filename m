@@ -1,86 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:47615 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755304AbdDMTg5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Apr 2017 15:36:57 -0400
-Date: Thu, 13 Apr 2017 22:36:37 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Matias Bjorling <mb@lightnvm.io>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] lightnvm: fix some WARN() messages
-Message-ID: <20170413193636.GC591@mwanda>
+Received: from mx1.redhat.com ([209.132.183.28]:50932 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S967713AbdD2K7T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Apr 2017 06:59:19 -0400
+Date: Sat, 29 Apr 2017 18:59:11 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH 3/4] blk-mq: use hw tag for scheduling if hw tag space is
+ big enough
+Message-ID: <20170429105910.GD12421@ming.t460p>
+References: <20170428151539.25514-1-ming.lei@redhat.com>
+ <20170428151539.25514-4-ming.lei@redhat.com>
+ <c8984e2a-ecdc-fdf7-afba-484b823270c9@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <c8984e2a-ecdc-fdf7-afba-484b823270c9@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-WARN_ON() takes a condition, not an error message.  I slightly tweaked
-some conditions so hopefully it's more clear.
+On Fri, Apr 28, 2017 at 12:22:45PM -0600, Jens Axboe wrote:
+> On 04/28/2017 09:15 AM, Ming Lei wrote:  
+> > +/*
+> > + * If this queue has enough hardware tags and doesn't share tags with
+> > + * other queues, just use hw tag directly for scheduling.
+> > + */
+> > +static inline bool blk_mq_sched_may_use_hw_tag(struct request_queue *q)
+> > +{
+> > +	if (q->tag_set->flags & BLK_MQ_F_TAG_SHARED)
+> > +		return false;
+> > +
+> > +	if (blk_mq_get_queue_depth(q) < q->nr_requests)
+> > +		return false;
+> 
+> I think we should leave a bigger gap. Ideally, for scheduling, we should
+> have a hw queue depth that's around half of what the scheduler has to
+> work with. That will always leave us something to schedule with, if the
+> hw can't deplete the whole pool.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+When .sched_tags and .tags are different, it makes sense to make
+nr_requests to be two times of queue_depth.
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index eff0982c076f..bce7ed5fc73f 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -49,8 +49,8 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 	int i, j = 0;
- 
- 	/* logic error: lba out-of-bounds. Ignore read request */
--	if (!(blba + nr_secs < pblk->rl.nr_secs)) {
--		WARN_ON("pblk: read lbas out of bounds\n");
-+	if (blba + nr_secs >= pblk->rl.nr_secs) {
-+		WARN(1, "pblk: read lbas out of bounds\n");
- 		return;
- 	}
- 
-@@ -254,8 +254,8 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 	sector_t lba = pblk_get_lba(bio);
- 
- 	/* logic error: lba out-of-bounds. Ignore read request */
--	if (!(lba < pblk->rl.nr_secs)) {
--		WARN_ON("pblk: read lba out of bounds\n");
-+	if (lba >= pblk->rl.nr_secs) {
-+		WARN(1, "pblk: read lba out of bounds\n");
- 		return;
- 	}
- 
-@@ -411,8 +411,8 @@ static int read_rq_gc(struct pblk *pblk, struct nvm_rq *rqd,
- 	int valid_secs = 0;
- 
- 	/* logic error: lba out-of-bounds */
--	if (!(lba < pblk->rl.nr_secs)) {
--		WARN_ON("pblk: read lba out of bounds\n");
-+	if (lba >= pblk->rl.nr_secs) {
-+		WARN(1, "pblk: read lba out of bounds\n");
- 		goto out;
- 	}
- 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 02c415b957d4..56547ca87926 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -141,7 +141,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
- 
- 		/* Logic error */
- 		if (bit > c_ctx->nr_valid) {
--			WARN_ON_ONCE("pblk: corrupted write request\n");
-+			WARN_ONCE(1, "pblk: corrupted write request\n");
- 			goto out;
- 		}
- 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 0d50f415cfde..f8f85087cd3c 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -167,7 +167,7 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
- 		if (le64_to_cpu(lba_list[i]) == ADDR_EMPTY) {
- 			spin_lock(&line->lock);
- 			if (test_and_set_bit(i, line->invalid_bitmap))
--				WARN_ON_ONCE("pblk: rec. double invalidate:\n");
-+				WARN_ONCE(1, "pblk: rec. double invalidate:\n");
- 			else
- 				line->vsc--;
- 			spin_unlock(&line->lock);
+When we switch to schedule with hw tags directly, the euquation
+can't be true at all. The simple policy in this patch can't be worsen
+than standalone .sched_tags because lifetime of one sched tag is
+actually same with request(from its allocation<io submission> to
+freeing<io completion>). When we have bigger queue depth, even we can
+schedule more.
+
+
+Thanks,
+Ming
