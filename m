@@ -1,55 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ud10.udmedia.de ([194.117.254.50]:44994 "EHLO
-        mail.ud10.udmedia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S938987AbdD2Fov (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Apr 2017 01:44:51 -0400
-Date: Sat, 29 Apr 2017 07:38:08 +0200
-From: Markus Trippelsdorf <markus@trippelsdorf.de>
-To: linux-block@vger.kernel.org
-Subject: [PATCH cosmetic] Remove trailing newline in elevator switch error
- message
-Message-ID: <20170429053808.GA293@x4>
+Received: from mx1.redhat.com ([209.132.183.28]:48618 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S376386AbdD2Jzj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Apr 2017 05:55:39 -0400
+Date: Sat, 29 Apr 2017 17:55:30 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH 2/4] blk-mq: introduce blk_mq_get_queue_depth()
+Message-ID: <20170429095529.GB12421@ming.t460p>
+References: <20170428151539.25514-1-ming.lei@redhat.com>
+ <20170428151539.25514-3-ming.lei@redhat.com>
+ <01993bcb-da07-a8f5-1f00-09b808f9efc9@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <01993bcb-da07-a8f5-1f00-09b808f9efc9@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Trying to switch to a non-existing elevator currently results in garbled
-dmesg output, e.g.:
+On Fri, Apr 28, 2017 at 12:23:38PM -0600, Jens Axboe wrote:
+> On 04/28/2017 09:15 AM, Ming Lei wrote:
+> > The hardware queue depth can be resized via blk_mq_update_nr_requests(),
+> > so introduce this helper for retrieving queue's depth easily.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-mq.c | 12 ++++++++++++
+> >  block/blk-mq.h |  1 +
+> >  2 files changed, 13 insertions(+)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index e530bc54f0d9..04761fb76ab4 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2637,6 +2637,18 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+> >  }
+> >  EXPORT_SYMBOL(blk_mq_free_tag_set);
+> >  
+> > +/*
+> > + * Queue depth can be changed via blk_mq_update_nr_requests(),
+> > + * so use this helper to retrieve queue's depth.
+> > + */
+> > +int blk_mq_get_queue_depth(struct request_queue *q)
+> > +{
+> > +	/* All queues have same queue depth */
+> > +	struct blk_mq_tags	*tags = q->tag_set->tags[0];
+> > +
+> > +	return tags->bitmap_tags.sb.depth;
+> > +}
+> 
+> What about the per-hw queue tag space? q->nr_requests is device side,
+> this might not be.
 
- # echo "foo" > /sys/block/sda/queue/scheduler 
+This helper returns hw queue's actual queue depth, so only hw tag
+space is involved.
 
-elevator: type foo not found
-elevator: switch to foo
- failed
+We don't have per-hw queue tag space yet, and the tag space
+should belong to tag set actually, but the hw queue number can be
+one. And now all hw queues have same queue depth, either it is
+set->queue_depth, or the new value updated in blk_mq_update_nr_requests().
+And tags's depth is always the latest value.
 
-(note the unintended line break.)
+The similar comment can be found in kyber_sched_tags_shift() too.
 
-Fix by stripping the trailing newline.
+BTW, this patch missed reserved tags, will fix it in V1.
 
-diff --git a/block/elevator.c b/block/elevator.c
-index bf11e70f008b..4f13fcd3c626 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -1112,6 +1112,7 @@ static inline bool elv_support_iosched(struct request_queue *q)
- ssize_t elv_iosched_store(struct request_queue *q, const char *name,
- 			  size_t count)
- {
-+	char elevator_name[ELV_NAME_MAX];
- 	int ret;
- 
- 	if (!(q->mq_ops || q->request_fn) || !elv_support_iosched(q))
-@@ -1121,7 +1122,9 @@ ssize_t elv_iosched_store(struct request_queue *q, const char *name,
- 	if (!ret)
- 		return count;
- 
--	printk(KERN_ERR "elevator: switch to %s failed\n", name);
-+	strlcpy(elevator_name, name, sizeof(elevator_name));
-+	strstrip(elevator_name);
-+	printk(KERN_ERR "elevator: switch to %s failed\n", elevator_name);
- 	return ret;
- }
- 
--- 
-Markus
+Thanks,
+Ming
