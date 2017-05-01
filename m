@@ -1,88 +1,67 @@
-Return-Path: <markus@trippelsdorf.de>
-Date: Mon, 1 May 2017 18:29:28 +0200
-From: "markus@trippelsdorf.de" <markus@trippelsdorf.de>
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 cosmetic] Remove trailing newline in elevator switch
- error message
-Message-ID: <20170501162928.GB291@x4>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:31179 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752065AbdEAQ2k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 12:28:40 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "markus@trippelsdorf.de" <markus@trippelsdorf.de>
+Subject: Re: [PATCH cosmetic] Remove trailing newline in elevator switch error
+ message
+Date: Mon, 1 May 2017 15:18:48 +0000
+Message-ID: <1493651927.2665.3.camel@sandisk.com>
 References: <20170429053808.GA293@x4>
- <1493651927.2665.3.camel@sandisk.com>
- <20170501154958.GA291@x4>
- <1493654279.2665.5.camel@sandisk.com>
+In-Reply-To: <20170429053808.GA293@x4>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1493654279.2665.5.camel@sandisk.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Trying to switch to a non-existing elevator currently results in garbled
-dmesg output, e.g.:
+On Sat, 2017-04-29 at 07:38 +0200, Markus Trippelsdorf wrote:
+> Trying to switch to a non-existing elevator currently results in garbled
+> dmesg output, e.g.:
+>=20
+>  # echo "foo" > /sys/block/sda/queue/scheduler=20
+>=20
+> elevator: type foo not found
+> elevator: switch to foo
+>  failed
+>=20
+> (note the unintended line break.)
+>=20
+> Fix by stripping the trailing newline.
+>=20
+> diff --git a/block/elevator.c b/block/elevator.c
+> index bf11e70f008b..4f13fcd3c626 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -1112,6 +1112,7 @@ static inline bool elv_support_iosched(struct reque=
+st_queue *q)
+>  ssize_t elv_iosched_store(struct request_queue *q, const char *name,
+>  			  size_t count)
+>  {
+> +	char elevator_name[ELV_NAME_MAX];
+>  	int ret;
+> =20
+>  	if (!(q->mq_ops || q->request_fn) || !elv_support_iosched(q))
+> @@ -1121,7 +1122,9 @@ ssize_t elv_iosched_store(struct request_queue *q, =
+const char *name,
+>  	if (!ret)
+>  		return count;
+> =20
+> -	printk(KERN_ERR "elevator: switch to %s failed\n", name);
+> +	strlcpy(elevator_name, name, sizeof(elevator_name));
+> +	strstrip(elevator_name);
+> +	printk(KERN_ERR "elevator: switch to %s failed\n", elevator_name);
+>  	return ret;
+>  }
 
- # echo "foo" > /sys/block/sda/queue/scheduler 
+Hello Markus,
 
-elevator: type foo not found
-elevator: switch to foo
- failed
+Your patch duplicates the code to remove trailing whitespace which is not
+very elegant. Please move the code that removes trailing whitespace from
+__elevator_change() into  elv_iosched_store() instead of duplicating it.
 
-(note the unintended line break.)
+Thanks,
 
-Fix by stripping the trailing newline.
-
-Signed-off-by: Markus Trippelsdorf <markus@trippelsdorf.de>
-
-diff --git a/block/elevator.c b/block/elevator.c
-index bf11e70f008b..1af23eee4395 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -1054,7 +1054,6 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
-  */
- static int __elevator_change(struct request_queue *q, const char *name)
- {
--	char elevator_name[ELV_NAME_MAX];
- 	struct elevator_type *e;
- 
- 	/*
-@@ -1063,15 +1062,14 @@ static int __elevator_change(struct request_queue *q, const char *name)
- 	if (q->mq_ops && !strncmp(name, "none", 4))
- 		return elevator_switch(q, NULL);
- 
--	strlcpy(elevator_name, name, sizeof(elevator_name));
--	e = elevator_get(strstrip(elevator_name), true);
-+	e = elevator_get(name, true);
- 	if (!e) {
--		printk(KERN_ERR "elevator: type %s not found\n", elevator_name);
-+		printk(KERN_ERR "elevator: type %s not found\n", name);
- 		return -EINVAL;
- 	}
- 
- 	if (q->elevator &&
--	    !strcmp(elevator_name, q->elevator->type->elevator_name)) {
-+	    !strcmp(name, q->elevator->type->elevator_name)) {
- 		elevator_put(e);
- 		return 0;
- 	}
-@@ -1112,16 +1110,19 @@ static inline bool elv_support_iosched(struct request_queue *q)
- ssize_t elv_iosched_store(struct request_queue *q, const char *name,
- 			  size_t count)
- {
-+	char elevator_name[ELV_NAME_MAX];
- 	int ret;
- 
- 	if (!(q->mq_ops || q->request_fn) || !elv_support_iosched(q))
- 		return count;
- 
--	ret = __elevator_change(q, name);
-+	strlcpy(elevator_name, name, sizeof(elevator_name));
-+	strstrip(elevator_name);
-+	ret = __elevator_change(q, elevator_name);
- 	if (!ret)
- 		return count;
- 
--	printk(KERN_ERR "elevator: switch to %s failed\n", name);
-+	printk(KERN_ERR "elevator: switch to %s failed\n", elevator_name);
- 	return ret;
- }
- 
--- 
-Markus
+Bart.=20
