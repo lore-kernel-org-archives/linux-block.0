@@ -1,56 +1,105 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f54.google.com ([74.125.83.54]:34679 "EHLO
-        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756404AbdECTTO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2017 15:19:14 -0400
-Received: by mail-pg0-f54.google.com with SMTP id v1so83102367pgv.1
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2017 12:19:14 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
-Subject: [PATCH 4/9] blk-mq: Do not invoke queue operations on a dead queue
-Date: Wed,  3 May 2017 12:18:57 -0700
-Message-Id: <e3f2929bbfacac5ad5b02cf3de39ecd5e6287e40.1493839103.git.osandov@fb.com>
-In-Reply-To: <cover.1493839103.git.osandov@fb.com>
-References: <cover.1493839103.git.osandov@fb.com>
-In-Reply-To: <cover.1493839103.git.osandov@fb.com>
-References: <cover.1493839103.git.osandov@fb.com>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:28770 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750703AbdEARxn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:43 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v2 01/10] dm-table: Introduce DM_TARGET_ZONED_HM feature
+Date: Tue,  2 May 2017 02:53:05 +0900
+Message-Id: <20170501175314.10922-2-damien.lemoal@wdc.com>
+In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
+References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-In commit e869b5462f83 ("blk-mq: Unregister debugfs attributes
-earlier"), we shuffled the debugfs cleanup around so that the "state"
-attribute was removed before we freed the blk-mq data structures.
-However, later changes are going to undo that, so we need to explicitly
-disallow running a dead queue.
+The target drivers currently available will not operate correctly if a
+table target maps onto a host-managed zoned block device.
 
-[Omar: rebased and updated commit message]
-Signed-off-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+To avoid problems, this patch introduces the new feature flag
+DM_TARGET_ZONED_HM for a target driver to explicitly state that it
+supports host-managed zoned block devices. This feature is checked
+in dm_get_device() to prevent the addition to a table of a target
+mapping to a host-managed zoned block device if the target type does
+not have the feature enabled.
+
+Note that as host-aware zoned block devices are backward compatible
+with regular block devices, they can be used by any of the current
+target types. This new feature is thus restricted to host-managed
+zoned block devices.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq-debugfs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/md/dm-table.c         | 23 +++++++++++++++++++++++
+ include/linux/device-mapper.h |  6 ++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 00cc89c34590..48b9f59acd91 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -102,6 +102,14 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
- 	struct request_queue *q = data;
- 	char op[16] = { }, *s;
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 3ad16d9..06d3b7b 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -388,6 +388,24 @@ dev_t dm_get_dev_t(const char *path)
+ EXPORT_SYMBOL_GPL(dm_get_dev_t);
  
-+	/*
-+	 * The "state" attribute is removed after blk_cleanup_queue() has called
-+	 * blk_mq_free_queue(). Return if QUEUE_FLAG_DEAD has been set to avoid
-+	 * triggering a use-after-free.
-+	 */
-+	if (blk_queue_dead(q))
-+		return -ENOENT;
+ /*
++ * Check if the target supports supports host-managed zoned block devices.
++ */
++static bool device_supported(struct dm_target *ti, struct dm_dev *dev)
++{
++	struct block_device *bdev = dev->bdev;
++	char b[BDEVNAME_SIZE];
 +
- 	if (copy_from_user(op, buf, min(count, sizeof(op) - 1)))
- 		return -EFAULT;
- 	s = op;
++	if (bdev_zoned_model(bdev) == BLK_ZONED_HM &&
++	    !dm_target_zoned_hm(ti->type)) {
++		DMWARN("%s: Unsupported host-managed zoned block device %s",
++		       dm_device_name(ti->table->md), bdevname(bdev, b));
++		return false;
++	}
++
++	return true;
++}
++
++/*
+  * Add a device to the list, or just increment the usage count if
+  * it's already present.
+  */
+@@ -426,6 +444,11 @@ int dm_get_device(struct dm_target *ti, const char *path, fmode_t mode,
+ 	}
+ 	atomic_inc(&dd->count);
+ 
++	if (!device_supported(ti, dd->dm_dev)) {
++		dm_put_device(ti, dd->dm_dev);
++		return -ENOTSUPP;
++	}
++
+ 	*result = dd->dm_dev;
+ 	return 0;
+ }
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index a7e6903..b3c2408 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -214,6 +214,12 @@ struct target_type {
+ #define dm_target_is_wildcard(type)	((type)->features & DM_TARGET_WILDCARD)
+ 
+ /*
++ * Indicates that a target supports host-managed zoned block devices.
++ */
++#define DM_TARGET_ZONED_HM		0x00000010
++#define dm_target_zoned_hm(type)	((type)->features & DM_TARGET_ZONED_HM)
++
++/*
+  * Some targets need to be sent the same WRITE bio severals times so
+  * that they can send copies of it to different devices.  This function
+  * examines any supplied bio and returns the number of copies of it the
 -- 
-2.12.2
+2.9.3
