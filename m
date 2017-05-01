@@ -1,96 +1,78 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44722 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753089AbdEJOA7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2017 10:00:59 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v4ADrWqE009883
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2017 10:00:59 -0400
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2abx638xwg-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2017 10:00:58 -0400
-Received: from localhost
-        by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <wenxiong@us.ibm.com>;
-        Wed, 10 May 2017 11:00:56 -0300
-Received: from d24av02.br.ibm.com (d24av02.br.ibm.com [9.8.31.93])
-        by d24relay03.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id v4AE0mlQ29098206
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2017 11:00:53 -0300
-Received: from d24av02.br.ibm.com (localhost [127.0.0.1])
-        by d24av02.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id v4AE0X7b019201
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2017 11:00:33 -0300
-From: wenxiong@linux.vnet.ibm.com
-To: linux-block@vger.kernel.org
-Cc: brking@linux.vnet.ibm.com, dougmill@linux.vnet.ibm.com,
-        axboe@fb.com, wenxiong@linux.vnet.ibm.com
-Subject: [PATCH] blk-mq: NVMe 512B/4K+T10 DIF/DIX format returns I/O error on dd with split op
-Date: Wed, 10 May 2017 08:54:11 -0500
-Message-Id: <1494424451-856-1-git-send-email-wenxiong@linux.vnet.ibm.com>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42560 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750703AbdEARyC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:54:02 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v2 08/10] dm-linear: Add support for zoned block devices
+Date: Tue,  2 May 2017 02:53:12 +0900
+Message-Id: <20170501175314.10922-9-damien.lemoal@wdc.com>
+In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
+References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Wen Xiong <wenxiong@linux.vnet.ibm.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-When formatting NVMe to 512B/4K + T10 DIf/DIX, dd with split op returns
-"Input/output error". Looks block layer split the bio after calling
-bio_integrity_prep(bio). This patch fixes the issue.
+Add support for zoned block devices by allowing host-managed zoned block
+device mapped targets, the remapping of REQ_OP_ZONE_RESET and the post
+processing (reply remapping) of REQ_OP_ZONE_REPORT.
 
-Below is how we debug this issue:
-(1)format nvme to 4K block # size with type 2 DIF
-(2)dd with block size bigger than 1024k.
-oflag=direct
-dd: error writing '/dev/nvme0n1': Input/output error
-
-We added some debug code in nvme device driver. It showed us the first
-op and the second op have the same bi and pi address. This is not
-correct.
-
-1st op: nvme0n1 Op:Wr slba 0x505 length 0x100, PI ctrl=0x1400,
-	dsmgmt=0x0, AT=0x0 & RT=0x505
-	Guard 0x00b1, AT 0x0000, RT physical 0x00000505 RT virtual 0x00002828
-
-2nd op: nvme0n1 Op:Wr slba 0x605 length 0x1, PI ctrl=0x1400, dsmgmt=0x0,
-	AT=0x0 & RT=0x605  ==> This op fails and subsequent 5 retires..
-	Guard 0x00b1, AT 0x0000, RT physical 0x00000605 RT virtual 0x00002828
-
-With the fix, It showed us both of the first op and the second op have
-correct bi and pi address.
-
-1st op: nvme2n1 Op:Wr slba 0x505 length 0x100, PI ctrl=0x1400,
-	dsmgmt=0x0, AT=0x0 & RT=0x505
-	Guard 0x5ccb, AT 0x0000, RT physical 0x00000505 RT virtual
-	0x00002828
-2nd op: nvme2n1 Op:Wr slba 0x605 length 0x1, PI ctrl=0x1400, dsmgmt=0x0,
-	AT=0x0 & RT=0x605
-	Guard 0xab4c, AT 0x0000, RT physical 0x00000605 RT virtual
-	0x00003028
-
-Signed-off-by: Wen Xiong <wenxiong@linux.vnet.ibm.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/dm-linear.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c7836a1..4754a4a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1517,13 +1517,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 4788b0b..9c4debd 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -87,7 +87,7 @@ static void linear_map_bio(struct dm_target *ti, struct bio *bio)
+ 	struct linear_c *lc = ti->private;
  
- 	blk_queue_bounce(q, &bio);
+ 	bio->bi_bdev = lc->dev->bdev;
+-	if (bio_sectors(bio))
++	if (bio_sectors(bio) || bio_op(bio) == REQ_OP_ZONE_RESET)
+ 		bio->bi_iter.bi_sector =
+ 			linear_map_sector(ti, bio->bi_iter.bi_sector);
+ }
+@@ -99,6 +99,16 @@ static int linear_map(struct dm_target *ti, struct bio *bio)
+ 	return DM_MAPIO_REMAPPED;
+ }
  
-+	blk_queue_split(q, &bio, q->bio_split);
++static int linear_end_io(struct dm_target *ti, struct bio *bio, int error)
++{
++	struct linear_c *lc = ti->private;
 +
- 	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
- 		bio_io_error(bio);
- 		return BLK_QC_T_NONE;
- 	}
- 
--	blk_queue_split(q, &bio, q->bio_split);
--
- 	if (!is_flush_fua && !blk_queue_nomerges(q) &&
- 	    blk_attempt_plug_merge(q, bio, &request_count, &same_queue_rq))
- 		return BLK_QC_T_NONE;
++	if (!error && bio_op(bio) == REQ_OP_ZONE_REPORT)
++		dm_remap_zone_report(ti, bio, lc->start);
++
++	return error;
++}
++
+ static void linear_status(struct dm_target *ti, status_type_t type,
+ 			  unsigned status_flags, char *result, unsigned maxlen)
+ {
+@@ -162,10 +172,12 @@ static long linear_direct_access(struct dm_target *ti, sector_t sector,
+ static struct target_type linear_target = {
+ 	.name   = "linear",
+ 	.version = {1, 3, 0},
++	.features = DM_TARGET_ZONED_HM,
+ 	.module = THIS_MODULE,
+ 	.ctr    = linear_ctr,
+ 	.dtr    = linear_dtr,
+ 	.map    = linear_map,
++	.end_io = linear_end_io,
+ 	.status = linear_status,
+ 	.prepare_ioctl = linear_prepare_ioctl,
+ 	.iterate_devices = linear_iterate_devices,
 -- 
-1.7.1
+2.9.3
