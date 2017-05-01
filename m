@@ -1,54 +1,102 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56246 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757644AbdECT7V (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 May 2017 15:59:21 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 3/5] blk-mq: don't update q->nr_requests when updating hw queue's depth
-Date: Thu,  4 May 2017 03:58:37 +0800
-Message-Id: <20170503195839.6539-4-ming.lei@redhat.com>
-In-Reply-To: <20170503195839.6539-1-ming.lei@redhat.com>
-References: <20170503195839.6539-1-ming.lei@redhat.com>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42560 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750703AbdEARx6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:58 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v2 07/10] dm-flakey: Add support for zoned block devices
+Date: Tue,  2 May 2017 02:53:11 +0900
+Message-Id: <20170501175314.10922-8-damien.lemoal@wdc.com>
+In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
+References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In MQ scheduler, q->nr_requests represents requests in scheduler
-queue depth, so don't update it if hw queue's depth is updated.
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+With the development of file system support for zoned block devices
+(e.g. f2fs), having dm-flakey support for these devices is interesting
+to improve testing.
+
+This patch adds support for zoned block devices in dm-flakey, both
+host-aware and host-managed. The target type feature is set to
+DM_TARGET_ZONED_HM indicate support for host-managed models. The
+remaining of the support adds hooks for remapping of REQ_OP_ZONE_RESET
+and REQ_OP_ZONE_REPORT bios. Additionally, in the bio completion path,
+(backward) remapping of a zone report reply is also added.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/md/dm-flakey.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index be475ad112ec..681bf33d8de8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2643,6 +2643,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 	struct blk_mq_tag_set *set = q->tag_set;
- 	struct blk_mq_hw_ctx *hctx;
- 	int i, ret;
-+	bool sched = false;
+diff --git a/drivers/md/dm-flakey.c b/drivers/md/dm-flakey.c
+index 13305a1..b419c85 100644
+--- a/drivers/md/dm-flakey.c
++++ b/drivers/md/dm-flakey.c
+@@ -251,6 +251,8 @@ static int flakey_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	return 0;
  
- 	if (!set)
- 		return -EINVAL;
-@@ -2664,12 +2665,13 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		} else {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
- 							nr, true);
-+			sched = true;
- 		}
- 		if (ret)
- 			break;
- 	}
+ bad:
++	if (fc->dev)
++		dm_put_device(ti, fc->dev);
+ 	kfree(fc);
+ 	return r;
+ }
+@@ -275,7 +277,7 @@ static void flakey_map_bio(struct dm_target *ti, struct bio *bio)
+ 	struct flakey_c *fc = ti->private;
  
--	if (!ret)
-+	if (!ret && sched)
- 		q->nr_requests = nr;
+ 	bio->bi_bdev = fc->dev->bdev;
+-	if (bio_sectors(bio))
++	if (bio_sectors(bio) || bio_op(bio) == REQ_OP_ZONE_RESET)
+ 		bio->bi_iter.bi_sector =
+ 			flakey_map_sector(ti, bio->bi_iter.bi_sector);
+ }
+@@ -306,6 +308,14 @@ static int flakey_map(struct dm_target *ti, struct bio *bio)
+ 	struct per_bio_data *pb = dm_per_bio_data(bio, sizeof(struct per_bio_data));
+ 	pb->bio_submitted = false;
  
- 	blk_mq_unfreeze_queue(q);
++	/* Do not fail reset zone */
++	if (bio_op(bio) == REQ_OP_ZONE_RESET)
++		goto map_bio;
++
++	/* We need to remap reported zones, so remember the BIO iter */
++	if (bio_op(bio) == REQ_OP_ZONE_REPORT)
++		goto map_bio;
++
+ 	/* Are we alive ? */
+ 	elapsed = (jiffies - fc->start_time) / HZ;
+ 	if (elapsed % (fc->up_interval + fc->down_interval) >= fc->up_interval) {
+@@ -363,6 +373,14 @@ static int flakey_end_io(struct dm_target *ti, struct bio *bio, int error)
+ 	struct flakey_c *fc = ti->private;
+ 	struct per_bio_data *pb = dm_per_bio_data(bio, sizeof(struct per_bio_data));
+ 
++	if (bio_op(bio) == REQ_OP_ZONE_RESET)
++		return error;
++
++	if (bio_op(bio) == REQ_OP_ZONE_REPORT) {
++		dm_remap_zone_report(ti, bio, fc->start);
++		return error;
++	}
++
+ 	if (!error && pb->bio_submitted && (bio_data_dir(bio) == READ)) {
+ 		if (fc->corrupt_bio_byte && (fc->corrupt_bio_rw == READ) &&
+ 		    all_corrupt_bio_flags_match(bio, fc)) {
+@@ -446,6 +464,7 @@ static int flakey_iterate_devices(struct dm_target *ti, iterate_devices_callout_
+ static struct target_type flakey_target = {
+ 	.name   = "flakey",
+ 	.version = {1, 4, 0},
++	.features = DM_TARGET_ZONED_HM,
+ 	.module = THIS_MODULE,
+ 	.ctr    = flakey_ctr,
+ 	.dtr    = flakey_dtr,
 -- 
 2.9.3
