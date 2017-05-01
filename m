@@ -1,81 +1,65 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
-Date: Thu, 11 May 2017 14:17:01 -0500
-Message-Id: <20170511191710.31959-2-rgoldwyn@suse.de>
-In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
-References: <20170511191710.31959-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:56443 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750703AbdEARxx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:53 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v2 05/10] dm: Fix REQ_OP_ZONE_REPORT bio handling
+Date: Tue,  2 May 2017 02:53:09 +0900
+Message-Id: <20170501175314.10922-6-damien.lemoal@wdc.com>
+In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
+References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+A REQ_OP_ZONE_REPORT bio is not a medium access command. Its number of
+sectors indicates the maximum size allowed for the report reply size
+and not an amount of sectors accessed from the device.
+REQ_OP_ZONE_REPORT bios should thus not be split depending on the
+target device maximum I/O length but passed as is. Note that it is the
+responsability of the target to remap and format the report reply.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- fs/read_write.c    | 12 +++---------
- include/linux/fs.h | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 9 deletions(-)
+ drivers/md/dm.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index c4f88afbc67f..362f91cd8d66 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 	struct kiocb kiocb;
- 	ssize_t ret;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1d98035..cd44928 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1098,7 +1098,8 @@ static int clone_bio(struct dm_target_io *tio, struct bio *bio,
+ 			return r;
+ 	}
  
--	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
--		return -EOPNOTSUPP;
--
- 	init_sync_kiocb(&kiocb, filp);
--	if (flags & RWF_HIPRI)
--		kiocb.ki_flags |= IOCB_HIPRI;
--	if (flags & RWF_DSYNC)
--		kiocb.ki_flags |= IOCB_DSYNC;
--	if (flags & RWF_SYNC)
--		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	ret = kiocb_set_rw_flags(&kiocb, flags);
-+	if (ret)
-+		return ret;
- 	kiocb.ki_pos = *ppos;
+-	bio_advance(clone, to_bytes(sector - clone->bi_iter.bi_sector));
++	if (bio_op(bio) != REQ_OP_ZONE_REPORT)
++		bio_advance(clone, to_bytes(sector - clone->bi_iter.bi_sector));
+ 	clone->bi_iter.bi_size = to_bytes(len);
  
- 	if (type == READ)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 7251f7bb45e8..869c9a6fe58d 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3049,6 +3049,20 @@ static inline int iocb_flags(struct file *file)
- 	return res;
- }
+ 	if (bio_integrity(bio))
+@@ -1275,7 +1276,11 @@ static int __split_and_process_non_flush(struct clone_info *ci)
+ 	if (!dm_target_is_valid(ti))
+ 		return -EIO;
  
-+static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
-+{
-+	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
-+		return -EOPNOTSUPP;
-+
-+	if (flags & RWF_HIPRI)
-+		ki->ki_flags |= IOCB_HIPRI;
-+	if (flags & RWF_DSYNC)
-+		ki->ki_flags |= IOCB_DSYNC;
-+	if (flags & RWF_SYNC)
-+		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	return 0;
-+}
-+
- static inline ino_t parent_ino(struct dentry *dentry)
- {
- 	ino_t res;
+-	len = min_t(sector_t, max_io_len(ci->sector, ti), ci->sector_count);
++	if (bio_op(bio) == REQ_OP_ZONE_REPORT)
++		len = ci->sector_count;
++	else
++		len = min_t(sector_t, max_io_len(ci->sector, ti),
++			    ci->sector_count);
+ 
+ 	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
+ 	if (r < 0)
 -- 
-2.12.0
+2.9.3
