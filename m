@@ -1,200 +1,182 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 6/6] mmc: debugfs: Move EXT CSD debugfs acces to block layer
-Date: Fri, 19 May 2017 15:37:32 +0200
-Message-Id: <20170519133732.27470-7-linus.walleij@linaro.org>
-In-Reply-To: <20170519133732.27470-1-linus.walleij@linaro.org>
-References: <20170519133732.27470-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42560 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750760AbdEARyD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:54:03 -0400
+From: damien.lemoal@wdc.com
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v2 09/10] dm-kcopyd: Add sequential write feature
+Date: Tue,  2 May 2017 02:53:13 +0900
+Message-Id: <20170501175314.10922-10-damien.lemoal@wdc.com>
+In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
+References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Just like the previous commit moving status retriveal for
-MMC and SD cards into the block layer (when active), this
-moves the retrieveal of the EXT CSD from the card from
-the special ext_csd file into the block stack as well.
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-Again special care is taken to make the debugfs work even
-with the block layer disabled. Again this solves a
-starvation issue during heavy block workloads.
+When copyying blocks to host-managed zoned block devices, writes must be
+sequential. dm_kcopyd_copy() does not howerver guarantee this as writes
+are issued in the completion order of reads, and reads may complete out
+of order despite being issued sequentially.
 
-It has been tested with and without the block layer and
-during heavy load from dd.
+Fix this by introducing the DM_KCOPYD_WRITE_SEQ flag. This can be
+specified by the user when calling dm_kcopyd_copy() and is set
+automatically if one of the destinations is a host-managed zoned block
+device. For a split job, the master job maintains the write position at
+which writes must be issued. This is checked with the pop() function
+which is modify to not return any write I/O sub job that is not at the
+correct write position.
 
-Since we can't keep adding weirdo data pointers into
-struct mmc_queue_req this converts the
-struct mmc_blk_ioc_data **idata pointer to a simple
-void *drv_op_data that gets casted into whatever data
-the driver-specific command needs to pass, and then I
-cast it to the right target type in the sending and
-receiving functions.
+When DM_KCOPYD_WRITE_SEQ is specified for a job, errors cannot be
+ignored and the flag DM_KCOPYD_IGNORE_ERROR is ignored, even if
+specified by the user.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/mmc/core/block.c   | 30 +++++++++++++++++++++++++++---
- drivers/mmc/core/block.h   | 12 ++++++++++++
- drivers/mmc/core/debugfs.c |  4 +---
- drivers/mmc/core/queue.h   |  4 +++-
- 4 files changed, 43 insertions(+), 7 deletions(-)
+ drivers/md/dm-kcopyd.c    | 68 +++++++++++++++++++++++++++++++++++++++++++++--
+ include/linux/dm-kcopyd.h |  1 +
+ 2 files changed, 67 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 8858798d1349..5be7f06d4ecd 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -599,7 +599,7 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- 		__GFP_RECLAIM);
- 	idatas[0] = idata;
- 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_IOCTL;
--	req_to_mmc_queue_req(req)->idata = idatas;
-+	req_to_mmc_queue_req(req)->drv_op_data = idatas;
- 	req_to_mmc_queue_req(req)->ioc_count = 1;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
- 	ioc_err = req_to_mmc_queue_req(req)->drv_op_result;
-@@ -675,7 +675,7 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 		idata[0]->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
- 		__GFP_RECLAIM);
- 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_IOCTL;
--	req_to_mmc_queue_req(req)->idata = idata;
-+	req_to_mmc_queue_req(req)->drv_op_data = idata;
- 	req_to_mmc_queue_req(req)->ioc_count = num_of_cmds;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
- 	ioc_err = req_to_mmc_queue_req(req)->drv_op_result;
-@@ -1191,6 +1191,8 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 	struct mmc_queue_req *mq_rq;
- 	struct mmc_card *card = mq->card;
- 	struct mmc_blk_data *md = mq->blkdata;
-+	struct mmc_blk_ioc_data	**idata;
-+	u8 **ext_csd;
- 	u32 status;
- 	int ret;
- 	int i;
-@@ -1199,8 +1201,9 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+diff --git a/drivers/md/dm-kcopyd.c b/drivers/md/dm-kcopyd.c
+index 9e9d04cb..477846e 100644
+--- a/drivers/md/dm-kcopyd.c
++++ b/drivers/md/dm-kcopyd.c
+@@ -356,6 +356,7 @@ struct kcopyd_job {
+ 	struct mutex lock;
+ 	atomic_t sub_jobs;
+ 	sector_t progress;
++	sector_t write_ofst;
  
- 	switch (mq_rq->drv_op) {
- 	case MMC_DRV_OP_IOCTL:
-+		idata = mq_rq->drv_op_data;
- 		for (i = 0; i < mq_rq->ioc_count; i++) {
--			ret = __mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
-+			ret = __mmc_blk_ioctl_cmd(card, md, idata[i]);
- 			if (ret)
- 				break;
- 		}
-@@ -1225,6 +1228,10 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 		if (!ret)
- 			ret = status;
- 		break;
-+	case MMC_DRV_OP_GET_EXT_CSD:
-+		ext_csd = mq_rq->drv_op_data;
-+		ret = mmc_get_ext_csd(card, ext_csd);
-+		break;
- 	default:
- 		pr_err("%s: unknown driver specific operation\n",
- 		       md->disk->disk_name);
-@@ -1996,6 +2003,23 @@ int mmc_blk_card_status_get(struct mmc_card *card, u64 *val)
- }
- EXPORT_SYMBOL(mmc_blk_card_status_get);
- 
-+
-+/* Called from debugfs for MMC cards */
-+int mmc_blk_get_ext_csd(struct mmc_card *card, u8 **ext_csd)
-+{
-+	struct mmc_blk_data *md = dev_get_drvdata(&card->dev);
-+	struct mmc_queue *mq = &md->queue;
-+	struct request *req;
-+
-+	/* Ask the block layer about the EXT CSD */
-+	req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_EXT_CSD;
-+	req_to_mmc_queue_req(req)->drv_op_data = ext_csd;
-+	blk_execute_rq(mq->queue, NULL, req, 0);
-+	return req_to_mmc_queue_req(req)->drv_op_result;
-+}
-+EXPORT_SYMBOL(mmc_blk_get_ext_csd);
-+
- static inline int mmc_blk_readonly(struct mmc_card *card)
- {
- 	return mmc_card_readonly(card) ||
-diff --git a/drivers/mmc/core/block.h b/drivers/mmc/core/block.h
-index 1e26755a864b..c85c3b71dcad 100644
---- a/drivers/mmc/core/block.h
-+++ b/drivers/mmc/core/block.h
-@@ -12,6 +12,7 @@ struct request;
- 
- void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req);
- int mmc_blk_card_status_get(struct mmc_card *card, u64 *val);
-+int mmc_blk_get_ext_csd(struct mmc_card *card, u8 **ext_csd);
- 
- #else
- 
-@@ -41,6 +42,17 @@ static inline int mmc_blk_card_status_get(struct mmc_card *card, u64 *val)
- 	return ret;
- }
- 
-+static inline int mmc_blk_get_ext_csd(struct mmc_card *card, u8 **ext_csd)
-+{
-+	int ret;
-+
-+	mmc_get_card(card);
-+	ret = mmc_get_ext_csd(card, ext_csd);
-+	mmc_put_card(card);
-+
-+	return ret;
-+}
-+
- #endif /* IS_ENABLED(CONFIG_MMC_BLOCK) */
- 
- #endif
-diff --git a/drivers/mmc/core/debugfs.c b/drivers/mmc/core/debugfs.c
-index ce5b921c7d96..85e058120e3b 100644
---- a/drivers/mmc/core/debugfs.c
-+++ b/drivers/mmc/core/debugfs.c
-@@ -303,9 +303,7 @@ static int mmc_ext_csd_open(struct inode *inode, struct file *filp)
- 	if (!buf)
- 		return -ENOMEM;
- 
--	mmc_get_card(card);
--	err = mmc_get_ext_csd(card, &ext_csd);
--	mmc_put_card(card);
-+	err = mmc_blk_get_ext_csd(card, &ext_csd);
- 	if (err)
- 		goto out_free;
- 
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index 2b39717453a5..2f67856661da 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -37,11 +37,13 @@ struct mmc_blk_request {
-  * @MMC_DRV_OP_IOCTL: ioctl operation
-  * @MMC_DRV_OP_BOOT_WP: write protect boot partitions
-  * @MMC_DRV_OP_GET_CARD_STATUS: get card status
-+ * @MMC_DRV_OP_GET_EXT_CSD: get extended card descriptor
+ 	struct kcopyd_job *master_job;
+ };
+@@ -386,6 +387,34 @@ void dm_kcopyd_exit(void)
+  * Functions to push and pop a job onto the head of a given job
+  * list.
   */
- enum mmc_drv_op {
- 	MMC_DRV_OP_IOCTL,
- 	MMC_DRV_OP_BOOT_WP,
- 	MMC_DRV_OP_GET_CARD_STATUS,
-+	MMC_DRV_OP_GET_EXT_CSD,
- };
++static struct kcopyd_job *pop_io_job(struct list_head *jobs,
++				     struct dm_kcopyd_client *kc)
++{
++	struct kcopyd_job *job;
++
++	/*
++	 * For I/O jobs, pop any read, any write without sequential write
++	 * constraint and sequential writes that are at the right position.
++	 */
++	list_for_each_entry(job, jobs, list) {
++
++		if (job->rw == READ ||
++		    !test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags)) {
++			list_del(&job->list);
++			return job;
++		}
++
++		if (job->write_ofst == job->master_job->write_ofst) {
++			job->master_job->write_ofst += job->source.count;
++			list_del(&job->list);
++			return job;
++		}
++
++	}
++
++	return NULL;
++}
++
+ static struct kcopyd_job *pop(struct list_head *jobs,
+ 			      struct dm_kcopyd_client *kc)
+ {
+@@ -395,8 +424,12 @@ static struct kcopyd_job *pop(struct list_head *jobs,
+ 	spin_lock_irqsave(&kc->job_lock, flags);
  
- struct mmc_queue_req {
-@@ -53,7 +55,7 @@ struct mmc_queue_req {
- 	struct mmc_async_req	areq;
- 	enum mmc_drv_op		drv_op;
- 	int			drv_op_result;
--	struct mmc_blk_ioc_data	**idata;
-+	void			*drv_op_data;
- 	unsigned int		ioc_count;
- };
+ 	if (!list_empty(jobs)) {
+-		job = list_entry(jobs->next, struct kcopyd_job, list);
+-		list_del(&job->list);
++		if (jobs == &kc->io_jobs) {
++			job = pop_io_job(jobs, kc);
++		} else {
++			job = list_entry(jobs->next, struct kcopyd_job, list);
++			list_del(&job->list);
++		}
+ 	}
+ 	spin_unlock_irqrestore(&kc->job_lock, flags);
  
+@@ -506,6 +539,14 @@ static int run_io_job(struct kcopyd_job *job)
+ 		.client = job->kc->io_client,
+ 	};
+ 
++	/*
++	 * If we need to write sequentially and some reads or writes failed,
++	 * no point in continuing.
++	 */
++	if (test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags) &&
++	    job->master_job->write_err)
++		return -EIO;
++
+ 	io_job_start(job->kc->throttle);
+ 
+ 	if (job->rw == READ)
+@@ -655,6 +696,7 @@ static void segment_complete(int read_err, unsigned long write_err,
+ 		int i;
+ 
+ 		*sub_job = *job;
++		sub_job->write_ofst = progress;
+ 		sub_job->source.sector += progress;
+ 		sub_job->source.count = count;
+ 
+@@ -723,6 +765,27 @@ int dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
+ 	job->num_dests = num_dests;
+ 	memcpy(&job->dests, dests, sizeof(*dests) * num_dests);
+ 
++	/*
++	 * If one of the destination is a host-managed zoned block device,
++	 * we need to write sequentially. If one of the destination is a
++	 * host-aware device, then leave it to the caller to choose what to do.
++	 */
++	if (!test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags)) {
++		for (i = 0; i < job->num_dests; i++) {
++			if (bdev_zoned_model(dests[i].bdev) == BLK_ZONED_HM) {
++				set_bit(DM_KCOPYD_WRITE_SEQ, &job->flags);
++				break;
++			}
++		}
++	}
++
++	/*
++	 * If we need to write sequentially, errors cannot be ignored.
++	 */
++	if (test_bit(DM_KCOPYD_WRITE_SEQ, &job->flags) &&
++	    test_bit(DM_KCOPYD_IGNORE_ERROR, &job->flags))
++		clear_bit(DM_KCOPYD_IGNORE_ERROR, &job->flags);
++
+ 	if (from) {
+ 		job->source = *from;
+ 		job->pages = NULL;
+@@ -746,6 +809,7 @@ int dm_kcopyd_copy(struct dm_kcopyd_client *kc, struct dm_io_region *from,
+ 	job->fn = fn;
+ 	job->context = context;
+ 	job->master_job = job;
++	job->write_ofst = 0;
+ 
+ 	if (job->source.count <= SUB_JOB_SIZE)
+ 		dispatch_job(job);
+diff --git a/include/linux/dm-kcopyd.h b/include/linux/dm-kcopyd.h
+index f486d63..cfac858 100644
+--- a/include/linux/dm-kcopyd.h
++++ b/include/linux/dm-kcopyd.h
+@@ -20,6 +20,7 @@
+ #define DM_KCOPYD_MAX_REGIONS 8
+ 
+ #define DM_KCOPYD_IGNORE_ERROR 1
++#define DM_KCOPYD_WRITE_SEQ    2
+ 
+ struct dm_kcopyd_throttle {
+ 	unsigned throttle;
 -- 
 2.9.3
