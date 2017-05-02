@@ -1,38 +1,108 @@
-Return-Path: <markus@trippelsdorf.de>
-Date: Tue, 2 May 2017 10:00:44 +0200
-From: Markus Trippelsdorf <markus@trippelsdorf.de>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Paolo Valente <paolo.valente@linaro.org>, Jens Axboe <axboe@kernel.dk>,
-	Ulf Hansson <ulf.hansson@linaro.org>, linux-block@vger.kernel.org
-Subject: Re: Playing with BFQ
-Message-ID: <20170502080044.GA292@x4>
-References: <CA+icZUV8wEKJkDpfMaPhAyc1fyVG-ViZF4nO=5raZOkLa_ikzQ@mail.gmail.com>
+Return-Path: <sedat.dilek@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+icZUV8wEKJkDpfMaPhAyc1fyVG-ViZF4nO=5raZOkLa_ikzQ@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Tue, 2 May 2017 09:54:42 +0200
+Message-ID: <CA+icZUV8wEKJkDpfMaPhAyc1fyVG-ViZF4nO=5raZOkLa_ikzQ@mail.gmail.com>
+Subject: Playing with BFQ
+To: Paolo Valente <paolo.valente@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org
+Content-Type: multipart/mixed; boundary=f403043ed3f042de5f054e85da92
 List-ID: <linux-block@vger.kernel.org>
 
-On 2017.05.02 at 09:54 +0200, Sedat Dilek wrote:
-> Hi,
-> 
-> I want to play with BFQ.
-> 
-> My base is block-next as of 28-Apr-2017.
-> 
-> First I looked through the Kconfigs.
-> What is a good setting?
-> Built as module?
-> 
-> How can I switch the IO-scheduler - real-time?
-> 
-> Not sure if the attached patches make sense (right now).
+--f403043ed3f042de5f054e85da92
+Content-Type: text/plain; charset=UTF-8
 
-No, it doesn't make sense at all.
-BFQ is a mq scheduler. To use it you should enable
-SCSI_MQ_DEFAULT. And then you can switch schedulers like:
+Hi,
 
- echo "kyber" > /sys/block/sda/queue/scheduler
- echo "bfq" > /sys/block/sdb/queue/scheduler
+I want to play with BFQ.
 
--- 
-Markus
+My base is block-next as of 28-Apr-2017.
+
+First I looked through the Kconfigs.
+What is a good setting?
+Built as module?
+
+How can I switch the IO-scheduler - real-time?
+
+Not sure if the attached patches make sense (right now).
+
+Please comment.
+
+
+Kind Regards,
+- Sedat -
+
+--f403043ed3f042de5f054e85da92
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-block-bfq-Move-CONFIG_IOSCHED_BFQ-and-CONFIG_BFQ_GRO.patch"
+Content-Disposition: attachment;
+	filename="0001-block-bfq-Move-CONFIG_IOSCHED_BFQ-and-CONFIG_BFQ_GRO.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j279bnam0
+
+RnJvbSA3ZDkyMjMwMmEzYWY4OTM0ZGE0NmU4ZmMwNGQyNTYwMjVkOGRkYjI3IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTZWRhdCBEaWxlayA8c2VkYXQuZGlsZWtAZ21haWwuY29tPgpE
+YXRlOiBUdWUsIDIgTWF5IDIwMTcgMDk6MzE6MzcgKzAyMDAKU3ViamVjdDogW1BBVENIXSBibG9j
+azogYmZxOiBNb3ZlIENPTkZJR19JT1NDSEVEX0JGUSBhbmQKIENPTkZJR19CRlFfR1JPVVBfSU9T
+Q0hFRAoKLS0tCiBibG9jay9LY29uZmlnLmlvc2NoZWQgfCA0MCArKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMjAgaW5zZXJ0aW9ucygrKSwg
+MjAgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYmxvY2svS2NvbmZpZy5pb3NjaGVkIGIvYmxv
+Y2svS2NvbmZpZy5pb3NjaGVkCmluZGV4IGZkMmNlZmE0N2QzNS4uOGVhMmM4ZDc3MTAwIDEwMDY0
+NAotLS0gYS9ibG9jay9LY29uZmlnLmlvc2NoZWQKKysrIGIvYmxvY2svS2NvbmZpZy5pb3NjaGVk
+CkBAIC0zOSw2ICszOSwyNiBAQCBjb25maWcgQ0ZRX0dST1VQX0lPU0NIRUQKIAktLS1oZWxwLS0t
+CiAJICBFbmFibGUgZ3JvdXAgSU8gc2NoZWR1bGluZyBpbiBDRlEuCiAKK2NvbmZpZyBJT1NDSEVE
+X0JGUQorICAgICAgICB0cmlzdGF0ZSAiQkZRIEkvTyBzY2hlZHVsZXIiCisgICAgICAgIGRlZmF1
+bHQgbgorICAgICAgICAtLS1oZWxwLS0tCisgICAgICAgIEJGUSBJL08gc2NoZWR1bGVyIGZvciBC
+TEstTVEuIEJGUSBkaXN0cmlidXRlcyB0aGUgYmFuZHdpZHRoIG9mCisgICAgICAgIG9mIHRoZSBk
+ZXZpY2UgYW1vbmcgYWxsIHByb2Nlc3NlcyBhY2NvcmRpbmcgdG8gdGhlaXIgd2VpZ2h0cywKKyAg
+ICAgICAgcmVnYXJkbGVzcyBvZiB0aGUgZGV2aWNlIHBhcmFtZXRlcnMgYW5kIHdpdGggYW55IHdv
+cmtsb2FkLiBJdAorICAgICAgICBhbHNvIGd1YXJhbnRlZXMgYSBsb3cgbGF0ZW5jeSB0byBpbnRl
+cmFjdGl2ZSBhbmQgc29mdAorICAgICAgICByZWFsLXRpbWUgYXBwbGljYXRpb25zLiAgRGV0YWls
+cyBpbgorICAgICAgICBEb2N1bWVudGF0aW9uL2Jsb2NrL2JmcS1pb3NjaGVkLnR4dAorCitjb25m
+aWcgQkZRX0dST1VQX0lPU0NIRUQKKyAgICAgICBib29sICJCRlEgaGllcmFyY2hpY2FsIHNjaGVk
+dWxpbmcgc3VwcG9ydCIKKyAgICAgICBkZXBlbmRzIG9uIElPU0NIRURfQkZRICYmIEJMS19DR1JP
+VVAKKyAgICAgICBkZWZhdWx0IG4KKyAgICAgICAtLS1oZWxwLS0tCisKKyAgICAgICBFbmFibGUg
+aGllcmFyY2hpY2FsIHNjaGVkdWxpbmcgaW4gQkZRLCB1c2luZyB0aGUgYmxraW8KKyAgICAgICAo
+Y2dyb3Vwcy12MSkgb3IgaW8gKGNncm91cHMtdjIpIGNvbnRyb2xsZXIuCisKIGNob2ljZQogCiAJ
+cHJvbXB0ICJEZWZhdWx0IEkvTyBzY2hlZHVsZXIiCkBAIC03OSwyNiArOTksNiBAQCBjb25maWcg
+TVFfSU9TQ0hFRF9LWUJFUgogCSAgc3luY2hyb25vdXMgd3JpdGVzLCBpdCB3aWxsIHNlbGYtdHVu
+ZSBxdWV1ZSBkZXB0aHMgdG8gYWNoaWV2ZSB0aGF0CiAJICBnb2FsLgogCi1jb25maWcgSU9TQ0hF
+RF9CRlEKLQl0cmlzdGF0ZSAiQkZRIEkvTyBzY2hlZHVsZXIiCi0JZGVmYXVsdCBuCi0JLS0taGVs
+cC0tLQotCUJGUSBJL08gc2NoZWR1bGVyIGZvciBCTEstTVEuIEJGUSBkaXN0cmlidXRlcyB0aGUg
+YmFuZHdpZHRoIG9mCi0Jb2YgdGhlIGRldmljZSBhbW9uZyBhbGwgcHJvY2Vzc2VzIGFjY29yZGlu
+ZyB0byB0aGVpciB3ZWlnaHRzLAotCXJlZ2FyZGxlc3Mgb2YgdGhlIGRldmljZSBwYXJhbWV0ZXJz
+IGFuZCB3aXRoIGFueSB3b3JrbG9hZC4gSXQKLQlhbHNvIGd1YXJhbnRlZXMgYSBsb3cgbGF0ZW5j
+eSB0byBpbnRlcmFjdGl2ZSBhbmQgc29mdAotCXJlYWwtdGltZSBhcHBsaWNhdGlvbnMuICBEZXRh
+aWxzIGluCi0JRG9jdW1lbnRhdGlvbi9ibG9jay9iZnEtaW9zY2hlZC50eHQKLQotY29uZmlnIEJG
+UV9HUk9VUF9JT1NDSEVECi0gICAgICAgYm9vbCAiQkZRIGhpZXJhcmNoaWNhbCBzY2hlZHVsaW5n
+IHN1cHBvcnQiCi0gICAgICAgZGVwZW5kcyBvbiBJT1NDSEVEX0JGUSAmJiBCTEtfQ0dST1VQCi0g
+ICAgICAgZGVmYXVsdCBuCi0gICAgICAgLS0taGVscC0tLQotCi0gICAgICAgRW5hYmxlIGhpZXJh
+cmNoaWNhbCBzY2hlZHVsaW5nIGluIEJGUSwgdXNpbmcgdGhlIGJsa2lvCi0gICAgICAgKGNncm91
+cHMtdjEpIG9yIGlvIChjZ3JvdXBzLXYyKSBjb250cm9sbGVyLgotCiBlbmRtZW51CiAKIGVuZGlm
+Ci0tIAoyLjExLjAKCg==
+--f403043ed3f042de5f054e85da92
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0002-block-bfq-Introduce-DEFAULT_BFQ.patch"
+Content-Disposition: attachment;
+	filename="0002-block-bfq-Introduce-DEFAULT_BFQ.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j279bq341
+
+RnJvbSBkYTMzNzk0MjRmYzAyMzdkNWRlMjVlOTQ2ZWQ1NDgyYTYyNWFhYWMyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTZWRhdCBEaWxlayA8c2VkYXQuZGlsZWtAZ21haWwuY29tPgpE
+YXRlOiBUdWUsIDIgTWF5IDIwMTcgMDk6MzM6MjcgKzAyMDAKU3ViamVjdDogW1BBVENIXSBibG9j
+azogYmZxOiBJbnRyb2R1Y2UgREVGQVVMVF9CRlEKCi0tLQogYmxvY2svS2NvbmZpZy5pb3NjaGVk
+IHwgNCArKysrCiAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEv
+YmxvY2svS2NvbmZpZy5pb3NjaGVkIGIvYmxvY2svS2NvbmZpZy5pb3NjaGVkCmluZGV4IDhlYTJj
+OGQ3NzEwMC4uZjM3NDU1ZGNmMzgxIDEwMDY0NAotLS0gYS9ibG9jay9LY29uZmlnLmlvc2NoZWQK
+KysrIGIvYmxvY2svS2NvbmZpZy5pb3NjaGVkCkBAIC03Myw2ICs3Myw5IEBAIGNob2ljZQogCWNv
+bmZpZyBERUZBVUxUX0NGUQogCQlib29sICJDRlEiIGlmIElPU0NIRURfQ0ZRPXkKIAorCWNvbmZp
+ZyBERUZBVUxUX0JGUQorCQlib29sICJCRlEiIGlmIElPU0NIRURfQkZRPXkKKwogCWNvbmZpZyBE
+RUZBVUxUX05PT1AKIAkJYm9vbCAiTm8tb3AiCiAKQEAgLTgyLDYgKzg1LDcgQEAgY29uZmlnIERF
+RkFVTFRfSU9TQ0hFRAogCXN0cmluZwogCWRlZmF1bHQgImRlYWRsaW5lIiBpZiBERUZBVUxUX0RF
+QURMSU5FCiAJZGVmYXVsdCAiY2ZxIiBpZiBERUZBVUxUX0NGUQorCWRlZmF1bHQgImJmcSIgaWYg
+REVGQVVMVF9CRlEKIAlkZWZhdWx0ICJub29wIiBpZiBERUZBVUxUX05PT1AKIAogY29uZmlnIE1R
+X0lPU0NIRURfREVBRExJTkUKLS0gCjIuMTEuMAoK
+--f403043ed3f042de5f054e85da92--
