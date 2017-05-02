@@ -1,68 +1,88 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 09/27] nilfs2: set the mapping error when calling SetPageError on writeback
-Date: Tue,  9 May 2017 11:49:12 -0400
-Message-Id: <20170509154930.29524-10-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@kernel.dk>
+Date: Tue, 02 May 2017 13:42:25 +1000
+Subject: [PATCH 08/13] pktcdvd: use bio_clone_fast() instead of bio_clone()
+Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
+ linux-kernel@vger.kernel.org
+Message-ID: <149369654538.5146.7904913979507183228.stgit@noble>
+In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
+References: <149369628671.5146.4865312503373040039.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-In a later patch, we're going to want to make the fsync codepath not do
-a TestClearPageError call as that can override the error set in the
-address space. To do that though, we need to ensure that filesystems
-that are relying on the PG_error bit for reporting writeback errors
-also set an error in the address space.
+pktcdvd doesn't change the bi_io_vec of the clone bio,
+so it is more efficient to use bio_clone_fast(), and not clone
+the bi_io_vec.
+This requires providing a bio_set, and it is safest to
+provide a dedicated bio_set rather than sharing
+fs_bio_set, which filesytems use.
+This new bio_set, pkt_bio_set, can also be use for the bio_split()
+call as the two allocations (bio_clone_fast, and bio_split) are
+independent, neither can block a bio allocated by the other.
 
-Ensure that this is set in nilfs2.
-
-Acked-by: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- fs/nilfs2/segment.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/pktcdvd.c |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
-index febed1217b3f..612d4b446793 100644
---- a/fs/nilfs2/segment.c
-+++ b/fs/nilfs2/segment.c
-@@ -1745,6 +1745,7 @@ static void nilfs_end_page_io(struct page *page, int err)
- 	} else {
- 		__set_page_dirty_nobuffers(page);
- 		SetPageError(page);
-+		mapping_set_error(page_mapping(page), err);
- 	}
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 1457e65c50b1..6f9c31fae335 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -98,6 +98,7 @@ static int write_congestion_on  = PKT_WRITE_CONGESTION_ON;
+ static int write_congestion_off = PKT_WRITE_CONGESTION_OFF;
+ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
+ static mempool_t *psd_pool;
++static struct bio_set *pkt_bio_set;
  
- 	end_page_writeback(page);
--- 
-2.9.3
+ static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
+ static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
+@@ -2310,7 +2311,7 @@ static void pkt_end_io_read_cloned(struct bio *bio)
+ 
+ static void pkt_make_request_read(struct pktcdvd_device *pd, struct bio *bio)
+ {
+-	struct bio *cloned_bio = bio_clone(bio, GFP_NOIO);
++	struct bio *cloned_bio = bio_clone_fast(bio, GFP_NOIO, pkt_bio_set);
+ 	struct packet_stacked_data *psd = mempool_alloc(psd_pool, GFP_NOIO);
+ 
+ 	psd->pd = pd;
+@@ -2455,7 +2456,7 @@ static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 			split = bio_split(bio, last_zone -
+ 					  bio->bi_iter.bi_sector,
+-					  GFP_NOIO, fs_bio_set);
++					  GFP_NOIO, pkt_bio_set);
+ 			bio_chain(split, bio);
+ 		} else {
+ 			split = bio;
+@@ -2919,6 +2920,11 @@ static int __init pkt_init(void)
+ 					sizeof(struct packet_stacked_data));
+ 	if (!psd_pool)
+ 		return -ENOMEM;
++	pkt_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
++	if (!pkt_bio_set) {
++		mempool_destroy(psd_pool);
++		return -ENOMEM;
++	}
+ 
+ 	ret = register_blkdev(pktdev_major, DRIVER_NAME);
+ 	if (ret < 0) {
+@@ -2951,6 +2957,7 @@ static int __init pkt_init(void)
+ 	unregister_blkdev(pktdev_major, DRIVER_NAME);
+ out2:
+ 	mempool_destroy(psd_pool);
++	bioset_free(pkt_bio_set);
+ 	return ret;
+ }
+ 
+@@ -2964,6 +2971,7 @@ static void __exit pkt_exit(void)
+ 
+ 	unregister_blkdev(pktdev_major, DRIVER_NAME);
+ 	mempool_destroy(psd_pool);
++	bioset_free(pkt_bio_set);
+ }
+ 
+ MODULE_DESCRIPTION("Packet writing layer for CD/DVD drives");
