@@ -1,48 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:49016 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751308AbdEBVyD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2017 17:54:03 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "agk@redhat.com" <agk@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "hare@suse.de" <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v2 10/10] dm-zoned: Drive-managed zoned block device
- target
-Date: Tue, 2 May 2017 21:53:41 +0000
-Message-ID: <1493762020.2552.15.camel@sandisk.com>
-References: <20170501175314.10922-1-damien.lemoal@wdc.com>
-         <20170501175314.10922-11-damien.lemoal@wdc.com>
-In-Reply-To: <20170501175314.10922-11-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Received: from mx1.redhat.com ([209.132.183.28]:36954 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750735AbdEBM1m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 May 2017 08:27:42 -0400
+Date: Tue, 2 May 2017 20:27:32 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de
+Subject: Re: [PATCH v4 0/6] Fixup mtip32xx for scheduling
+Message-ID: <20170502122731.GA26157@ming.t460p>
+References: <1493398473-29872-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1493398473-29872-1-git-send-email-axboe@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 2017-05-02 at 02:53 +0900, damien.lemoal@wdc.com wrote:
-> +static unsigned long dmz_mblock_shrinker_count(struct shrinker *shrink,
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct shri=
-nk_control *sc)
-> +{
-> +=A0=A0=A0=A0=A0=A0=A0struct dmz_target *dmz =3D
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0container_of(shrink, struct=
- dmz_target, mblk_shrinker);
-> +
-> +=A0=A0=A0=A0=A0=A0=A0return atomic_read(&dmz->nr_mblks);
-> +}
+On Fri, Apr 28, 2017 at 10:54:27AM -0600, Jens Axboe wrote:
+> OK, I think we're getting there now. I dropped the RQF_RESERVED
+> and the tag helper, since mtip32xx can just call
+> blk_rq_is_passthrough() and know it's an internal request.
+> 
+> We can do another cleanup series of mtip32xx making the
+> internal requests use the normal blk end_io infrastructure,
+> and use the provider helpers for mapping data. I think
+> that should be done separately as a cleanup, keeping this series
+> as a straight forward conversion.
+> 
+> I've tested this on the following card:
+> 
+> [   56.394162] mtip32xx 0000:81:00.0: Model: P320h-MTFDGAR350SAH
+> 
+> and it works fine for me.
 
-Hello Damien,
+Tested this patchset against the latest linus tree, works fine
+on my system with mq-deadline scheduler enabled.
 
-dmz_mblock_shrinker_count() probably should return the following value sinc=
-e
-dmz_shrink_mblock_cache() won't free more than the this number of elements:
+	Tested-by: Ming Lei <ming.lei@redhat.com>
 
-        max(atomic_read(&dmz->nr_mblks) - dmz->min_nr_mblks, 0)=20
-
-But since v2 is IMHO good enough to be merged, for the whole series:
-
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>=
+Thanks,
+Ming
