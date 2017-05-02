@@ -1,79 +1,138 @@
-Return-Path: <jg@lightnvm.io>
-Return-Path: <jg@lightnvm.io>
-From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
-Message-Id: <C1087240-F47E-4975-849C-917FBBB9B00C@lightnvm.io>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_BFF15DAE-9EA9-43DA-9350-460FD9927056";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Javier =?utf-8?Q?Gonz=C3=A1lez?= <jg@lightnvm.io>
+Date: Wed, 03 May 2017 07:51:32 +1000
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 09/13] lightnvm/pblk-read: use bio_clone_fast()
-Date: Wed, 3 May 2017 08:42:59 +0200
-In-Reply-To: <8737cnq657.fsf@notabene.neil.brown.name>
-Cc: Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org,
- Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org
-To: NeilBrown <neilb@suse.com>
-References: <149369628671.5146.4865312503373040039.stgit@noble>
- <149369654558.5146.13818001419050826182.stgit@noble>
- <FC7673E1-94A3-4C93-960F-EF05A0BF09B0@lightnvm.io>
- <8737cnq657.fsf@notabene.neil.brown.name>
+In-Reply-To: <FC7673E1-94A3-4C93-960F-EF05A0BF09B0@lightnvm.io>
+References: <149369628671.5146.4865312503373040039.stgit@noble> <149369654558.5146.13818001419050826182.stgit@noble> <FC7673E1-94A3-4C93-960F-EF05A0BF09B0@lightnvm.io>
+Message-ID: <8737cnq657.fsf@notabene.neil.brown.name>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
 
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---Apple-Mail=_BFF15DAE-9EA9-43DA-9350-460FD9927056
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=us-ascii
+On Tue, May 02 2017, Javier Gonz=C3=A1lez wrote:
 
-> On 2 May 2017, at 23.51, NeilBrown <neilb@suse.com> wrote:
-> 
->> 
->> Hi Neil,
->> 
->> Looks good. Thanks for fixing this. I did not know that bio_clone_bioset
->> was not supposed to be used on drivers.
-> 
-> Prior to my patchset, using bio_clone_bioset() wasn't wrong in drivers,
-> though it was a waste when bio_clone_fast() would to just as well as is
-> more efficient.
-> After my patchset, using it can be problematic.  I'm wondering what I
-> should do to encourage those problems to be more visible so that if
-> people to us it, they'll get a warning or something.
-> 
-> Thanks,
-> NeilBrown
-> 
+>> On 2 May 2017, at 05.42, NeilBrown <neilb@suse.com> wrote:
+>>=20
+>> pblk_submit_read() uses bio_clone_bioset() but doesn't change the
+>> io_vec, so bio_clone_fast() is a better choice.
+>>=20
+>> It also uses fs_bio_set which is intended for filesystems.  Using it
+>> in a device driver can deadlock.
+>> So allocate a new bioset, and and use bio_clone_fast().
+>>=20
+>> Signed-off-by: NeilBrown <neilb@suse.com>
+>> ---
+>> drivers/lightnvm/pblk-init.c |   12 +++++++++++-
+>> drivers/lightnvm/pblk-read.c |    2 +-
+>> drivers/lightnvm/pblk.h      |    1 +
+>> 3 files changed, 13 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>> index b3fec8ec55b8..aaefbccce30e 100644
+>> --- a/drivers/lightnvm/pblk-init.c
+>> +++ b/drivers/lightnvm/pblk-init.c
+>> @@ -23,6 +23,7 @@
+>> static struct kmem_cache *pblk_blk_ws_cache, *pblk_rec_cache, *pblk_r_rq=
+_cache,
+>> 					*pblk_w_rq_cache, *pblk_line_meta_cache;
+>> static DECLARE_RWSEM(pblk_lock);
+>> +struct bio_set *pblk_bio_set;
+>>=20
+>> static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
+>> 			  struct bio *bio)
+>> @@ -946,11 +947,20 @@ static struct nvm_tgt_type tt_pblk =3D {
+>>=20
+>> static int __init pblk_module_init(void)
+>> {
+>> -	return nvm_register_tgt_type(&tt_pblk);
+>> +	int ret;
+>> +
+>> +	pblk_bio_set =3D bioset_create(BIO_POOL_SIZE, 0, 0);
+>> +	if (!pblk_bio_set)
+>> +		return -ENOMEM;
+>> +	ret =3D nvm_register_tgt_type(&tt_pblk);
+>> +	if (ret)
+>> +		bioset_free(pblk_bio_set);
+>> +	return ret;
+>> }
+>>=20
+>> static void pblk_module_exit(void)
+>> {
+>> +	bioset_free(pblk_bio_set);
+>> 	nvm_unregister_tgt_type(&tt_pblk);
+>> }
+>>=20
+>> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+>> index 4a12f14d78c6..8ee0c50a7a71 100644
+>> --- a/drivers/lightnvm/pblk-read.c
+>> +++ b/drivers/lightnvm/pblk-read.c
+>> @@ -342,7 +342,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *=
+bio)
+>> 		struct pblk_r_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+>>=20
+>> 		/* Clone read bio to deal with read errors internally */
+>> -		int_bio =3D bio_clone_bioset(bio, GFP_KERNEL, fs_bio_set);
+>> +		int_bio =3D bio_clone_fast(bio, GFP_KERNEL, pblk_bio_set);
+>> 		if (!int_bio) {
+>> 			pr_err("pblk: could not clone read bio\n");
+>> 			return NVM_IO_ERR;
+>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+>> index 99f3186b5288..95b665f23925 100644
+>> --- a/drivers/lightnvm/pblk.h
+>> +++ b/drivers/lightnvm/pblk.h
+>> @@ -702,6 +702,7 @@ void pblk_write_should_kick(struct pblk *pblk);
+>> /*
+>>  * pblk read path
+>>  */
+>> +extern struct bio_set *pblk_bio_set;
+>> int pblk_submit_read(struct pblk *pblk, struct bio *bio);
+>> int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
+>> 			unsigned int nr_secs, unsigned int *secs_to_gc,
+>
+> Hi Neil,
+>
+> Looks good. Thanks for fixing this. I did not know that bio_clone_bioset
+> was not supposed to be used on drivers.
 
-Thanks for the explanation Neil. In my opinion a comment on top of
-bio_clone_bioset() would be hellful, as Ming suggested. But a warning
-might make sense too.
+Prior to my patchset, using bio_clone_bioset() wasn't wrong in drivers,
+though it was a waste when bio_clone_fast() would to just as well as is
+more efficient.
+After my patchset, using it can be problematic.  I'm wondering what I
+should do to encourage those problems to be more visible so that if
+people to us it, they'll get a warning or something.
 
-Javier
+Thanks,
+NeilBrown
 
---Apple-Mail=_BFF15DAE-9EA9-43DA-9350-460FD9927056
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
+
+>
+> Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+> Tested-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBCgAGBQJZCXvzAAoJEGMfBTt1mRjKRL8P/0U/Xq0gq8i1E55Wg9aWtSsQ
-2kJyhfYSGnVWsYGqz5iFgAq/FcmB08dpX8BbOtHpg0hAoohnqzORv3I7JGdVBsBb
-NrlpowHyBAd6q81ixXcnJobCaCh0sYntKenag7o17Yas3WVpS7M6xG0JjY740mqu
-yRTh3DmcJ77xLCD/80U8E5PTL10Z8+ubl6p14f+pRxP8qWc+hcxi1uGxh3bBekrL
-MvTV+m5O7MRen4xEh+W7ukvvz5Sg5eb2ezvCpFKwOG7PZfpqMAKBbThUZ68bzBH3
-xL3lKF4hYlkMl63qHsW4boMD3HWm7LGQwggTYUAeOB1p1ODbH6rnf0zeoSy+NeQN
-767oqjm+XSYI6tWrYTNm+41Yu3ByZvzehsgTTVokoTJ0BSLs/FSNmSC3Tmw7Xwfx
-Pp6cfJtrVKH8E+0oNPx//rLvqnKWQKfj9bGy6YG/zj3vkWdk5Zg6f2Op7nbbrshT
-mywRwCYKuX3INjU8+/uwExdT8zZqUfFNLTwvSV3rU9uwkcQcrj25zE0uoOABKVZt
-r8vp1V63osIL4zZToGmJZTmHXAdMnYuiCgp1pEIsT7WRyry9f53rekrJa1TvXqNt
-BdadT1nvKPzoui7QtpjZZEMiGmjzOJoQZEZUdYSDF7KirVyHnXI3rFDdM9NH5ps/
-u2sQcLt+JClKXJEZUc2w
-=z8v+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlkI/2UACgkQOeye3VZi
+gbkTgQ/+NtSbeeFWQ4fAsZV9s2K2eNNULq68NzDevic99MZ7UyFdGQAg22sFaQnu
+qLxFkvdohX/11Z4ycD/H00RDKJNdbm9h1Igg39aDWArJxLemtGVFQ/bNPJPruEJw
+noR8Nj2kwuwZpHOn1FFyLoFzOvMlRxVEJ1lxTTM+qq0P3ahUksp505621pAZDejV
+G9tsf8V2Bgr+5XVpnTcTHWlUSjucMHGzquP1yhnBADXZo4aX99E3q6y9adv81mLq
+uKtgApfIUBLekPwyQw+avP2USs1VLy68LGdH46XsCB7ikgh204WG/1BOLkpYBYb5
+LgJPqNcomKZ64A+zWUjh4FtJb2U0z8LABlEW5Ok7yEoZljC7R491WmSIb8RsoYtZ
+uL976C/uB5mHSo7X59j84tna4ubNfc3p92925bp8FB0Fep9gTnG2z8GFAtHth6nt
+OJYJh2D8C2Ao/eETq3fpMgWaSyzG4g3kQ0OfGka9b3wCrQ9MdflsmQK560+iRP1j
+a+LYDjK/EZGpjNJOOc7KuBjJ8Yq3vRCswJALuyzndhV/iCrU0EOCk3NWU17dqS67
+zGiDDfB60QlSB5tLwyL17baXo86zHc7LdFSQYJGx1dG8VzeF2yfMLTK/Z/3VNt5t
+6Cf+KflW78FtCbfTgV7vv3F/LrNC1c5WD2HFwP9eOxLtKL41NuE=
+=HIGX
 -----END PGP SIGNATURE-----
-
---Apple-Mail=_BFF15DAE-9EA9-43DA-9350-460FD9927056--
+--=-=-=--
