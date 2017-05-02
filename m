@@ -1,64 +1,76 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Christoph Hellwig <hch@lst.de>, "Markus
- Trippelsdorf" <markus@trippelsdorf.de>
-Subject: [PATCH] block: Remove elevator_change()
-Date: Mon, 1 May 2017 08:58:49 -0700
-Message-ID: <20170501155849.5134-1-bart.vanassche@sandisk.com>
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Christoph Hellwig <hch@infradead.org>
+Date: Wed, 03 May 2017 07:47:29 +1000
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/13] blk: replace bioset_create_nobvec() with a flags arg to bioset_create()
+In-Reply-To: <20170502080617.GA5578@infradead.org>
+References: <149369628671.5146.4865312503373040039.stgit@noble> <149369654407.5146.12779672368228096310.stgit@noble> <20170502080617.GA5578@infradead.org>
+Message-ID: <8760hjq6by.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
 
-Since commit 84253394927c ("remove the mg_disk driver") removed the
-only caller of elevator_change(), also remove the elevator_change()
-function itself.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Markus Trippelsdorf <markus@trippelsdorf.de>
----
- block/elevator.c         | 13 -------------
- include/linux/elevator.h |  1 -
- 2 files changed, 14 deletions(-)
+On Tue, May 02 2017, Christoph Hellwig wrote:
 
-diff --git a/block/elevator.c b/block/elevator.c
-index c7a4ee682033..ab726a5c0bf6 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -1085,19 +1085,6 @@ static int __elevator_change(struct request_queue *q, const char *name)
- 	return elevator_switch(q, e);
- }
- 
--int elevator_change(struct request_queue *q, const char *name)
--{
--	int ret;
--
--	/* Protect q->elevator from elevator_init() */
--	mutex_lock(&q->sysfs_lock);
--	ret = __elevator_change(q, name);
--	mutex_unlock(&q->sysfs_lock);
--
--	return ret;
--}
--EXPORT_SYMBOL(elevator_change);
--
- static inline bool elv_support_iosched(struct request_queue *q)
- {
- 	if (q->mq_ops && q->tag_set && (q->tag_set->flags &
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 3a216318ae73..d44840368ee7 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -214,7 +214,6 @@ extern ssize_t elv_iosched_store(struct request_queue *, const char *, size_t);
- 
- extern int elevator_init(struct request_queue *, char *);
- extern void elevator_exit(struct request_queue *, struct elevator_queue *);
--extern int elevator_change(struct request_queue *, const char *);
- extern bool elv_bio_merge_ok(struct request *, struct bio *);
- extern struct elevator_queue *elevator_alloc(struct request_queue *,
- 					struct elevator_type *);
--- 
-2.12.2
+>> diff --git a/include/linux/bio.h b/include/linux/bio.h
+>> index d1b04b0e99cf..0975da6bebd9 100644
+>> --- a/include/linux/bio.h
+>> +++ b/include/linux/bio.h
+>> @@ -373,8 +373,10 @@ static inline struct bio *bio_next_split(struct bio=
+ *bio, int sectors,
+>>  	return bio_split(bio, sectors, gfp, bs);
+>>  }
+>>=20=20
+>> -extern struct bio_set *bioset_create(unsigned int, unsigned int);
+>> -extern struct bio_set *bioset_create_nobvec(unsigned int, unsigned int);
+>> +extern struct bio_set *bioset_create(unsigned int, unsigned int, int fl=
+ags);
+>> +enum {
+>> +	BIOSET_NEED_BVECS =3D BIT(0),
+>> +};
+>
+> I really hate the BIT macro as it obsfucates what's going on.
+
+So post a patch to remove it from the tree.
+I happen to like it, but I wouldn't fight for it.
+
+>
+> Why not just
+>
+> 	BIOSET_NEED_BVECS	=3D (1 << 0),
+>
+> which is a lot more intuitive.
+>
+> Otherwise looks fine to me:
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+Thanks,
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlkI/nEACgkQOeye3VZi
+gblIPBAAiMFgYoae49mqKbyBBi1tqWvecYRuvJqumWf4241UfHaqq/h4fAgViIQJ
+YtQKiex9mEZWtr+OknPWeKk2oEhF+pGYJTeRUHnLyaVqMgsyh5dDHhCCeo6bg/FH
+jMmaLkAjsWPtiITvZ5lFHVEXTsusjsWyBCB/vyS5n5uwsZrl5ZEPxV30XO0Yb3BN
+Z/hoA70j3kWGc6FkrK38r+4MQDK4n+wz3EO16YasDV3VoVuue+ji834dlrhbkMMH
+SoIWkIM7Ka3ih4105NdP5BgvjfZ6u21Kd/KKttIOopRSGLDTvD7gYZullsyTrSWJ
+4rScg4ZlaoZ9vekF3i10LkblfrbAG+Rz7yaAjbB+bw4fv5TXfix5air5PtPFjBHU
+1+Q2anbHfVnoshnok72Y3Y4fuPxBbwWNzC656lDg3b3FNXe4P/yrn0GfLnztqyUe
+u0lQccJNiwhifVNqZaMPsAlDqGlqjIRtLpcUxIpwBUY4S04HYsyTYi4mLClf1JIf
+fsJyT9JChutiMxrygaVCkfscI6RbZjnQwTVaP071JprvcS3N4c9w7wxotRiKfTBg
+yhEbA1g6gMSz+ClNObzp/gP7BGv37+Xlx3Be0t/StMicSveijtIdCCUpLs+0C8nt
+hBUW81U98FTLeJazbtMdrhmmX/5qpa9PuMYwX5B+YtlUcjQX4Gw=
+=WfZO
+-----END PGP SIGNATURE-----
+--=-=-=--
