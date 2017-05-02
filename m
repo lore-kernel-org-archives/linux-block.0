@@ -1,11 +1,11 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 2 May 2017 19:00:07 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <BATV+0ce91e3c8ec9178008cb+5000+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 2 May 2017 01:14:25 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: NeilBrown <neilb@suse.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 03/13] blk: make the bioset rescue_workqueue optional.
-Message-ID: <20170502105859.GC1803@ming.t460p>
+Message-ID: <20170502081425.GC5578@infradead.org>
 References: <149369628671.5146.4865312503373040039.stgit@noble>
  <149369654434.5146.15331164625586213889.stgit@noble>
 MIME-Version: 1.0
@@ -24,9 +24,6 @@ On Tue, May 02, 2017 at 01:42:24PM +1000, NeilBrown wrote:
 > All callers of bioset_create() and bioset_create_nobvec(),
 > that are inside block device drivers, are converted to the
 > _rescued() version.
-
-The above comment about *_nobvec() need to be updated.
-
 > 
 > biosets used by filesystems or other top-level users do not
 > need rescuing as the bio can never be queued behind other
@@ -51,10 +48,6 @@ The above comment about *_nobvec() need to be updated.
 >  drivers/md/dm.c           |    5 +++--
 >  include/linux/bio.h       |    1 +
 >  7 files changed, 21 insertions(+), 9 deletions(-)
-
-DRBD can stack on block device too, so I guess it might need
-BIOSET_NEED_RESCUER?
-
 > 
 > diff --git a/block/bio.c b/block/bio.c
 > index 3f1286ed301e..257606e742e0 100644
@@ -66,12 +59,6 @@ BIOSET_NEED_RESCUER?
 >  
 > +	if (!WARN_ON_ONCE(!bs->rescue_workqueue))
 > +		return;
-
-I guess the above check should have been the following?
-
-	if (WARN_ON_ONCE(!bs->rescue_workqueue))
-		return;
-
 >  	/*
 >  	 * In order to guarantee forward progress we must punt only bios that
 >  	 * were allocated from this bio_set; otherwise, if there was a bio on
@@ -123,96 +110,9 @@ I guess the above check should have been the following?
 >  
 > -	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
 > +	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER);
->  	if (!q->bio_split)
->  		goto fail_id;
->  
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 8b9dae98cc7e..bb50991a82d3 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -786,7 +786,8 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
->  
->  	minor *= BCACHE_MINORS;
->  
-> -	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio), BIOSET_NEED_BVECS)) ||
-> +	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio),
-> +					   BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER)) ||
->  	    !(d->disk = alloc_disk(BCACHE_MINORS))) {
->  		ida_simple_remove(&bcache_minor, minor);
->  		return -ENOMEM;
-> @@ -1520,7 +1521,8 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
->  				sizeof(struct bbio) + sizeof(struct bio_vec) *
->  				bucket_pages(c))) ||
->  	    !(c->fill_iter = mempool_create_kmalloc_pool(1, iter_size)) ||
-> -	    !(c->bio_split = bioset_create(4, offsetof(struct bbio, bio), BIOSET_NEED_BVECS)) ||
-> +	    !(c->bio_split = bioset_create(4, offsetof(struct bbio, bio),
-> +					   BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER)) ||
->  	    !(c->uuids = alloc_bucket_pages(GFP_KERNEL, c)) ||
->  	    !(c->moving_gc_wq = alloc_workqueue("bcache_gc",
->  						WQ_MEM_RECLAIM, 0)) ||
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index 5a98c1eb87d9..87155eb7b39c 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -1936,7 +1936,7 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  		goto bad;
->  	}
->  
-> -	cc->bs = bioset_create(MIN_IOS, 0, BIOSET_NEED_BVECS);
-> +	cc->bs = bioset_create(MIN_IOS, 0, BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER);
->  	if (!cc->bs) {
->  		ti->error = "Cannot allocate crypt bioset";
->  		goto bad;
-> diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-> index 1d86d1d39d48..95b9ac98fe0c 100644
-> --- a/drivers/md/dm-io.c
-> +++ b/drivers/md/dm-io.c
-> @@ -58,7 +58,7 @@ struct dm_io_client *dm_io_client_create(void)
->  	if (!client->pool)
->  		goto bad;
->  
-> -	client->bios = bioset_create(min_ios, 0, BIOSET_NEED_BVECS);
-> +	client->bios = bioset_create(min_ios, 0, BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER);
->  	if (!client->bios)
->  		goto bad;
->  
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index e21a7d58c8ef..4f96556cb8c5 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1014,7 +1014,8 @@ static void flush_current_bio_list(struct blk_plug_cb *cb, bool from_schedule)
->  
->  		while ((bio = bio_list_pop(&list))) {
->  			struct bio_set *bs = bio->bi_pool;
-> -			if (unlikely(!bs) || bs == fs_bio_set) {
-> +			if (unlikely(!bs) || bs == fs_bio_set ||
-> +			    !bs->rescue_workqueue) {
->  				bio_list_add(&current->bio_list[i], bio);
->  				continue;
->  			}
-> @@ -2601,7 +2602,7 @@ struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, unsigned t
->  		BUG();
->  	}
->  
-> -	pools->bs = bioset_create(pool_size, front_pad, 0);
-> +	pools->bs = bioset_create(pool_size, front_pad, BIOSET_NEED_RESCUER);
->  	if (!pools->bs)
->  		goto out;
->  
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 0975da6bebd9..40e5d7b62f29 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -376,6 +376,7 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
->  extern struct bio_set *bioset_create(unsigned int, unsigned int, int flags);
->  enum {
->  	BIOSET_NEED_BVECS = BIT(0),
-> +	BIOSET_NEED_RESCUER = BIT(1),
->  };
->  extern void bioset_free(struct bio_set *);
->  extern mempool_t *biovec_create_pool(int pool_entries);
-> 
-> 
 
-Thanks,
-Ming
+Please avoid > 80 char lines.
+
+Otherwise looks fine,
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
