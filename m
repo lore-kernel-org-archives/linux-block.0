@@ -1,107 +1,138 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:25 +1000
-Subject: [PATCH 10/13] xen-blkfront: remove bio splitting.
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
+Return-Path: <javigon.napster@gmail.com>
+Return-Path: <javigon.napster@gmail.com>
+From: javigon <javigon.napster@gmail.com>
+Message-Id: <63D46798-F6A7-4686-8577-CDE5F4B413D5@gmail.com>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_5A83D2D9-6AAC-4BA2-B0CD-25A560004039";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 01/13] blk: remove bio_set arg from blk_queue_split()
+Date: Tue, 2 May 2017 12:44:53 +0200
+In-Reply-To: <149369654384.5146.13347645646156684946.stgit@noble>
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ Ming Lei <tom.leiming@gmail.com>,
  linux-kernel@vger.kernel.org
-Message-ID: <149369654578.5146.16549743448824620743.stgit@noble>
-In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
+To: NeilBrown <neilb@suse.com>
 References: <149369628671.5146.4865312503373040039.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ <149369654384.5146.13347645646156684946.stgit@noble>
 List-ID: <linux-block@vger.kernel.org>
 
-bios that are re-submitted will pass through blk_queue_split() when
-blk_queue_bio() is called, and this will split the bio if necessary.
-There is no longer any need to do this splitting in xen-blkfront.
 
-Acked-by: Roger Pau Monné <roger.pau@citrix.com>
-Signed-off-by: NeilBrown <neilb@suse.com>
----
- drivers/block/xen-blkfront.c |   54 ++----------------------------------------
- 1 file changed, 3 insertions(+), 51 deletions(-)
+--Apple-Mail=_5A83D2D9-6AAC-4BA2-B0CD-25A560004039
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 39459631667c..fb963a010d4d 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -110,11 +110,6 @@ struct blk_shadow {
- 	unsigned long associated_id;
- };
- 
--struct split_bio {
--	struct bio *bio;
--	atomic_t pending;
--};
--
- struct blkif_req {
- 	int	error;
- };
-@@ -1996,28 +1991,13 @@ static int blkfront_probe(struct xenbus_device *dev,
- 	return 0;
- }
- 
--static void split_bio_end(struct bio *bio)
--{
--	struct split_bio *split_bio = bio->bi_private;
--
--	if (atomic_dec_and_test(&split_bio->pending)) {
--		split_bio->bio->bi_phys_segments = 0;
--		split_bio->bio->bi_error = bio->bi_error;
--		bio_endio(split_bio->bio);
--		kfree(split_bio);
--	}
--	bio_put(bio);
--}
--
- static int blkif_recover(struct blkfront_info *info)
- {
--	unsigned int i, r_index;
-+	unsigned int r_index;
- 	struct request *req, *n;
- 	int rc;
--	struct bio *bio, *cloned_bio;
--	unsigned int segs, offset;
--	int pending, size;
--	struct split_bio *split_bio;
-+	struct bio *bio;
-+	unsigned int segs;
- 
- 	blkfront_gather_backend_features(info);
- 	/* Reset limits changed by blk_mq_update_nr_hw_queues(). */
-@@ -2056,34 +2036,6 @@ static int blkif_recover(struct blkfront_info *info)
- 
- 	while ((bio = bio_list_pop(&info->bio_list)) != NULL) {
- 		/* Traverse the list of pending bios and re-queue them */
--		if (bio_segments(bio) > segs) {
--			/*
--			 * This bio has more segments than what we can
--			 * handle, we have to split it.
--			 */
--			pending = (bio_segments(bio) + segs - 1) / segs;
--			split_bio = kzalloc(sizeof(*split_bio), GFP_NOIO);
--			BUG_ON(split_bio == NULL);
--			atomic_set(&split_bio->pending, pending);
--			split_bio->bio = bio;
--			for (i = 0; i < pending; i++) {
--				offset = (i * segs * XEN_PAGE_SIZE) >> 9;
--				size = min((unsigned int)(segs * XEN_PAGE_SIZE) >> 9,
--					   (unsigned int)bio_sectors(bio) - offset);
--				cloned_bio = bio_clone(bio, GFP_NOIO);
--				BUG_ON(cloned_bio == NULL);
--				bio_trim(cloned_bio, offset, size);
--				cloned_bio->bi_private = split_bio;
--				cloned_bio->bi_end_io = split_bio_end;
--				submit_bio(cloned_bio);
--			}
--			/*
--			 * Now we have to wait for all those smaller bios to
--			 * end, so we can also end the "parent" bio.
--			 */
--			continue;
--		}
--		/* We don't need to split this bio */
- 		submit_bio(bio);
- 	}
- 
+
+> On 2 May 2017, at 05.42, NeilBrown <neilb@suse.com> wrote:
+>=20
+> blk_queue_split() is always called with the last arg being =
+q->bio_split,
+> where 'q' is the first arg.
+>=20
+> Also blk_queue_split() sometimes uses the passed-in 'bs' and sometimes =
+uses
+> q->bio_split.
+>=20
+> This is inconsistent and unnecessary.  Remove the last arg and always =
+use
+> q->bio_split inside blk_queue_split()
+>=20
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Credit-to: Javier Gonz=C3=A1lez <jg@lightnvm.io> (Noticed that =
+lightnvm was missed)
+> Signed-off-by: NeilBrown <neilb@suse.com>
+> ---
+> block/blk-core.c              |    2 +-
+> block/blk-merge.c             |    9 ++++-----
+> block/blk-mq.c                |    2 +-
+> drivers/block/drbd/drbd_req.c |    2 +-
+> drivers/block/pktcdvd.c       |    2 +-
+> drivers/block/ps3vram.c       |    2 +-
+> drivers/block/rsxx/dev.c      |    2 +-
+> drivers/block/umem.c          |    2 +-
+> drivers/block/zram/zram_drv.c |    2 +-
+> drivers/lightnvm/pblk-init.c  |    4 ++--
+> drivers/lightnvm/rrpc.c       |    2 +-
+> drivers/md/md.c               |    2 +-
+> drivers/s390/block/dcssblk.c  |    2 +-
+> drivers/s390/block/xpram.c    |    2 +-
+> include/linux/blkdev.h        |    3 +--
+> 15 files changed, 19 insertions(+), 21 deletions(-)
+>=20
+
+> [..]
+
+> diff --git a/drivers/lightnvm/pblk-init.c =
+b/drivers/lightnvm/pblk-init.c
+> index ae8cd6d5af8b..b3fec8ec55b8 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -33,7 +33,7 @@ static int pblk_rw_io(struct request_queue *q, =
+struct pblk *pblk,
+> 	 * constraint. Writes can be of arbitrary size.
+> 	 */
+> 	if (bio_data_dir(bio) =3D=3D READ) {
+> -		blk_queue_split(q, &bio, q->bio_split);
+> +		blk_queue_split(q, &bio);
+> 		ret =3D pblk_submit_read(pblk, bio);
+> 		if (ret =3D=3D NVM_IO_DONE && bio_flagged(bio, =
+BIO_CLONED))
+> 			bio_put(bio);
+> @@ -46,7 +46,7 @@ static int pblk_rw_io(struct request_queue *q, =
+struct pblk *pblk,
+> 	 * available for user I/O.
+> 	 */
+> 	if (unlikely(pblk_get_secs(bio) >=3D =
+pblk_rl_sysfs_rate_show(&pblk->rl)))
+> -		blk_queue_split(q, &bio, q->bio_split);
+> +		blk_queue_split(q, &bio);
+>=20
+> 	return pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
+> }
+> diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+> index cf0e28a0ff61..8e241056b141 100644
+> --- a/drivers/lightnvm/rrpc.c
+> +++ b/drivers/lightnvm/rrpc.c
+> @@ -994,7 +994,7 @@ static blk_qc_t rrpc_make_rq(struct request_queue =
+*q, struct bio *bio)
+> 	struct nvm_rq *rqd;
+> 	int err;
+>=20
+> -	blk_queue_split(q, &bio, q->bio_split);
+> +	blk_queue_split(q, &bio);
+>=20
+> 	if (bio_op(bio) =3D=3D REQ_OP_DISCARD) {
+> 		rrpc_discard(rrpc, bio);
+>=20
+
+Hi Neil,
+
+Thanks for adding the LightNVM changes. It works fine on our test setup.
+
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+Tested-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+
+
+--Apple-Mail=_5A83D2D9-6AAC-4BA2-B0CD-25A560004039
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCgAGBQJZCGMlAAoJEGn/+wzNTX/af/oH/0vnEXHJEPY3eSFOBSo4CTHM
+UhBUkCGMCshTjTlU8Bfjd9qyecxSpqD8xtRVlbLbtdSz7JLo5NA8DJ8BdV1DorpS
+wwkMjPQb4TDhYt6cTsUQVv5vRzhjUjWXETv5Pfsss0ueu3G2vXeO4ALYDiJ0aN5q
+oT1uxWDbRTpWVT9zXQ8hJQhqHbfcUYtmBn8/xQgJxa17e0D5IKY+W+zH8KghZSEc
+/+ssV7tpm4PinDc9Cgvdkv/xF5rq/pvKiWEJiTqF9cMf9ir1nyoIxD9fbF4LNSgO
+qvN6qXwqDMj5X1U5xcIrC8FCKc9X08DlMozkrfm4OJExLqcXaPnfpsRrigSu8vE=
+=oOnk
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_5A83D2D9-6AAC-4BA2-B0CD-25A560004039--
