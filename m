@@ -1,65 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:56443 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750703AbdEARxx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:53 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2 05/10] dm: Fix REQ_OP_ZONE_REPORT bio handling
-Date: Tue,  2 May 2017 02:53:09 +0900
-Message-Id: <20170501175314.10922-6-damien.lemoal@wdc.com>
-In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
-References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+Received: from mx2.suse.de ([195.135.220.15]:43705 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750767AbdEBGO2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 May 2017 02:14:28 -0400
+Subject: Re: [PATCH 5/7] mtip32xx: convert internal command issue to block IO
+ path
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+References: <1493391340-24629-1-git-send-email-axboe@fb.com>
+ <1493391340-24629-6-git-send-email-axboe@fb.com>
+Cc: ming.lei@redhat.com, hch@lst.de
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e17116c3-c48e-8411-7879-840aa0ee6b69@suse.de>
+Date: Tue, 2 May 2017 08:14:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1493391340-24629-6-git-send-email-axboe@fb.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
-
-A REQ_OP_ZONE_REPORT bio is not a medium access command. Its number of
-sectors indicates the maximum size allowed for the report reply size
-and not an amount of sectors accessed from the device.
-REQ_OP_ZONE_REPORT bios should thus not be split depending on the
-target device maximum I/O length but passed as is. Note that it is the
-responsability of the target to remap and format the report reply.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+On 04/28/2017 04:55 PM, Jens Axboe wrote:
+> The driver special cases certain things for command issue, depending
+> on whether it's an internal command or not. Make the internal commands
+> use the regular infrastructure for issuing IO.
+> 
+> Since this is an 8-group souped up AHCI variant, we have to deal
+> with NCQ vs non-queueable commands. Do this from the queue_rq
+> handler, by backing off unless the drive is idle.
+> 
+> Signed-off-by: Jens Axboe <axboe@fb.com>
+> ---
+>  drivers/block/mtip32xx/mtip32xx.c | 106 +++++++++++++++++++++++++++-----------
+>  1 file changed, 76 insertions(+), 30 deletions(-)
+> 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- drivers/md/dm.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 1d98035..cd44928 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1098,7 +1098,8 @@ static int clone_bio(struct dm_target_io *tio, struct bio *bio,
- 			return r;
- 	}
- 
--	bio_advance(clone, to_bytes(sector - clone->bi_iter.bi_sector));
-+	if (bio_op(bio) != REQ_OP_ZONE_REPORT)
-+		bio_advance(clone, to_bytes(sector - clone->bi_iter.bi_sector));
- 	clone->bi_iter.bi_size = to_bytes(len);
- 
- 	if (bio_integrity(bio))
-@@ -1275,7 +1276,11 @@ static int __split_and_process_non_flush(struct clone_info *ci)
- 	if (!dm_target_is_valid(ti))
- 		return -EIO;
- 
--	len = min_t(sector_t, max_io_len(ci->sector, ti), ci->sector_count);
-+	if (bio_op(bio) == REQ_OP_ZONE_REPORT)
-+		len = ci->sector_count;
-+	else
-+		len = min_t(sector_t, max_io_len(ci->sector, ti),
-+			    ci->sector_count);
- 
- 	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
- 	if (r < 0)
+Cheers,
+
+Hannes
 -- 
-2.9.3
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
