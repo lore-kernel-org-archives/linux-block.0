@@ -1,17 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46874 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751023AbdEBIqr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 May 2017 04:46:47 -0400
-Date: Tue, 2 May 2017 16:46:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Received: from mail-pf0-f175.google.com ([209.85.192.175]:36753 "EHLO
+        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750848AbdEBDtO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 23:49:14 -0400
+Received: by mail-pf0-f175.google.com with SMTP id q66so38660155pfi.3
+        for <linux-block@vger.kernel.org>; Mon, 01 May 2017 20:49:14 -0700 (PDT)
+Date: Mon, 1 May 2017 20:49:12 -0700
+From: Omar Sandoval <osandov@osandov.com>
 To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Cc: "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>
 Subject: Re: [PATCH 3/4] blk-mq: use hw tag for scheduling if hw tag space is
  big enough
-Message-ID: <20170502084637.GA963@ming.t460p>
+Message-ID: <20170502034912.GA4842@vader>
 References: <20170428151539.25514-1-ming.lei@redhat.com>
  <20170428151539.25514-4-ming.lei@redhat.com>
  <1493402979.2767.10.camel@sandisk.com>
@@ -61,17 +64,11 @@ On Mon, May 01, 2017 at 03:06:16PM +0000, Bart Van Assche wrote:
 > guarantees that each user that shares a tag set gets at least some tags.
 > The .active_queues counter keeps track of the number of hardware queues
 > that share a tag set.
+> 
+> Bart.
 
-OK, from hctx_may_queue(), each hw queue can be allocated at most
-tags of (queue depth / nr_hw_queues), and we can allow to use
-hw tag for scheduler too if the following condition is ture for
-shared tags:
-
-	q->nr_requests <= (blk_mq_get_queue_depth(q) / nr_hw_queues)
-
-It should often be true for some scsi devices(such as virtio-scsi)
-in some configurations.
-
-
-thanks,
-Ming
+The scheduler tags are there to abstract away the hardware, and
+USE_HW_TAG should just be an optimization for when that abstraction is a
+noop. That's not the case when there are shared tags, and I doubt that
+the overhead of the scheduler tags is significant for scsi-mq. Let's
+stick with the behavior Ming had here.
