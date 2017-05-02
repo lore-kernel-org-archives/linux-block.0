@@ -1,72 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55400 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750757AbdEAX2U (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 May 2017 19:28:20 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH] block: don't call blk_mq_quiesce_queue() after queue is freezed
-Date: Tue,  2 May 2017 07:28:02 +0800
-Message-Id: <20170501232802.27219-1-ming.lei@redhat.com>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:49016 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751308AbdEBVyD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2017 17:54:03 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "agk@redhat.com" <agk@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "hare@suse.de" <hare@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 10/10] dm-zoned: Drive-managed zoned block device
+ target
+Date: Tue, 2 May 2017 21:53:41 +0000
+Message-ID: <1493762020.2552.15.camel@sandisk.com>
+References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+         <20170501175314.10922-11-damien.lemoal@wdc.com>
+In-Reply-To: <20170501175314.10922-11-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-After queue is freezed, no request in this queue can be in use
-at all, so there can't be any .queue_rq() is running on this queue.
-It isn't necessary to call blk_mq_quiesce_queue() any more, so
-remove it in both elevator_switch_mq() and blk_mq_update_nr_requests().
+On Tue, 2017-05-02 at 02:53 +0900, damien.lemoal@wdc.com wrote:
+> +static unsigned long dmz_mblock_shrinker_count(struct shrinker *shrink,
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct shri=
+nk_control *sc)
+> +{
+> +=A0=A0=A0=A0=A0=A0=A0struct dmz_target *dmz =3D
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0container_of(shrink, struct=
+ dmz_target, mblk_shrinker);
+> +
+> +=A0=A0=A0=A0=A0=A0=A0return atomic_read(&dmz->nr_mblks);
+> +}
 
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c   | 2 --
- block/elevator.c | 3 ---
- 2 files changed, 5 deletions(-)
+Hello Damien,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bf90684a007a..8f72f16b498a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2617,7 +2617,6 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		return -EINVAL;
- 
- 	blk_mq_freeze_queue(q);
--	blk_mq_quiesce_queue(q);
- 
- 	ret = 0;
- 	queue_for_each_hw_ctx(q, hctx, i) {
-@@ -2643,7 +2642,6 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		q->nr_requests = nr;
- 
- 	blk_mq_unfreeze_queue(q);
--	blk_mq_start_stopped_hw_queues(q, true);
- 
- 	return ret;
- }
-diff --git a/block/elevator.c b/block/elevator.c
-index bf11e70f008b..c7a4ee682033 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -950,7 +950,6 @@ static int elevator_switch_mq(struct request_queue *q,
- 	int ret;
- 
- 	blk_mq_freeze_queue(q);
--	blk_mq_quiesce_queue(q);
- 
- 	if (q->elevator) {
- 		if (q->elevator->registered)
-@@ -978,9 +977,7 @@ static int elevator_switch_mq(struct request_queue *q,
- 
- out:
- 	blk_mq_unfreeze_queue(q);
--	blk_mq_start_stopped_hw_queues(q, true);
- 	return ret;
--
- }
- 
- /*
--- 
-2.9.3
+dmz_mblock_shrinker_count() probably should return the following value sinc=
+e
+dmz_shrink_mblock_cache() won't free more than the this number of elements:
+
+        max(atomic_read(&dmz->nr_mblks) - dmz->min_nr_mblks, 0)=20
+
+But since v2 is IMHO good enough to be merged, for the whole series:
+
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>=
