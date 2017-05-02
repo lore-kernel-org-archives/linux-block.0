@@ -1,57 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51242 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754984AbdECT6D (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 May 2017 15:58:03 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 0/4] blk-mq: support to use hw tag for scheduling
-Date: Thu,  4 May 2017 03:57:41 +0800
-Message-Id: <20170503195746.6413-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@kernel.dk>
+Date: Tue, 02 May 2017 13:42:26 +1000
+Subject: [PATCH 11/13] bcache: use kmalloc to allocate bio in
+ bch_data_verify()
+Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
+ linux-kernel@vger.kernel.org
+Message-ID: <149369654598.5146.245471167001845646.stgit@noble>
+In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
+References: <149369628671.5146.4865312503373040039.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+This function allocates a bio, then a collection
+of pages.  It copes with failure.
 
-This patchset introduces flag of BLK_MQ_F_SCHED_USE_HW_TAG and
-allows to use hardware tag directly for IO scheduling if the queue's
-depth is big enough. In this way, we can avoid to allocate extra tags
-and request pool for IO schedule, and the schedule tag allocation/release
-can be saved in I/O submit path.
+It currently uses a mempool() to allocate the bio,
+but alloc_page() to allocate the pages.  These fail
+in different ways, so the usage is inconsistent.
 
-V2:
-	- fix oops when kyber is used
-	- move dumping the new flag into patch 1
-	- support to use hw tag for shared tags
-	- update hctx->sched_tag when BLK_MQ_F_SCHED_USE_HW_TAG
-	is changed
-	- clear the flag in patch of blk_mq_exit_sched()
-	- don't update q->nr_requests when updating hw queue's depth
-	- fix blk_mq_get_queue_depth()
+Change the bio_clone() to bio_clone_kmalloc()
+so that no pool is used either for the bio or the pages.
 
-Thanks reviewing from Bart, Omar, Jens and others.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Kent Overstreet <kent.overstreet@gmail.com>
+Reviewed-by : Ming Lei <ming.lei@redhat.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
+---
+ drivers/md/bcache/debug.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Thanks,
-Ming
-
-Ming Lei (5):
-  blk-mq: introduce BLK_MQ_F_SCHED_USE_HW_TAG
-  blk-mq: introduce blk_mq_get_queue_depth()
-  blk-mq: don't update q->nr_requests when updating hw queue's depth
-  blk-mq: use hw tag for scheduling if hw tag space is big enough
-  blk-mq: allow to use hw tag for shared tags
-
- block/blk-mq-debugfs.c |  1 +
- block/blk-mq-sched.c   | 34 ++++++++++++++++-----
- block/blk-mq-sched.h   | 24 +++++++++++++++
- block/blk-mq.c         | 82 +++++++++++++++++++++++++++++++++++++++++++++-----
- block/blk-mq.h         | 12 ++++++++
- block/kyber-iosched.c  |  7 ++++-
- include/linux/blk-mq.h |  1 +
- 7 files changed, 144 insertions(+), 17 deletions(-)
-
--- 
-2.9.3
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index 06f55056aaae..35a5a7210e51 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -110,7 +110,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ 	struct bio_vec bv, cbv;
+ 	struct bvec_iter iter, citer = { 0 };
+ 
+-	check = bio_clone(bio, GFP_NOIO);
++	check = bio_clone_kmalloc(bio, GFP_NOIO);
+ 	if (!check)
+ 		return;
+ 	check->bi_opf = REQ_OP_READ;
