@@ -1,12 +1,12 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 2 May 2017 17:40:21 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <BATV+0ce91e3c8ec9178008cb+5000+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 2 May 2017 01:06:17 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: NeilBrown <neilb@suse.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 02/13] blk: replace bioset_create_nobvec() with a flags
  arg to bioset_create()
-Message-ID: <20170502094019.GA1803@ming.t460p>
+Message-ID: <20170502080617.GA5578@infradead.org>
 References: <149369628671.5146.4865312503373040039.stgit@noble>
  <149369654407.5146.12779672368228096310.stgit@noble>
 MIME-Version: 1.0
@@ -14,27 +14,29 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <149369654407.5146.12779672368228096310.stgit@noble>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 02, 2017 at 01:42:24PM +1000, NeilBrown wrote:
-> "flags" arguments are often seen as good API design as they allow
-> easy extensibility.
-> bioset_create_nobvec() is implemented internally as a variation in
-> flags passed to __bioset_create().
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index d1b04b0e99cf..0975da6bebd9 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -373,8 +373,10 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
+>  	return bio_split(bio, sectors, gfp, bs);
+>  }
+>  
+> -extern struct bio_set *bioset_create(unsigned int, unsigned int);
+> -extern struct bio_set *bioset_create_nobvec(unsigned int, unsigned int);
+> +extern struct bio_set *bioset_create(unsigned int, unsigned int, int flags);
+> +enum {
+> +	BIOSET_NEED_BVECS = BIT(0),
+> +};
 
->From driver's view, this flag has document benifit too.
+I really hate the BIT macro as it obsfucates what's going on.
 
-> 
-> To support future extension, make the internal structure part of the
-> API.
-> i.e. add a 'flags' argument to bioset_create() and discard
-> bioset_create_nobvec().
-> 
-> Note that the bio_split allocations in drivers/md/raid* do not need
-> the bvec mempool - they should have used bioset_create_nobvec().
-> 
-> Suggested-by: Christoph Hellwig <hch@infradead.org>
-> Signed-off-by: NeilBrown <neilb@suse.com>
+Why not just
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+	BIOSET_NEED_BVECS	= (1 << 0),
 
-Thanks,
-Ming
+which is a lot more intuitive.
+
+Otherwise looks fine to me:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
