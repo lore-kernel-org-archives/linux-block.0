@@ -1,19 +1,65 @@
-Return-Path: <BATV+0ce91e3c8ec9178008cb+5000+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 2 May 2017 01:15:52 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: NeilBrown <neilb@suse.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] block: don't check for BIO_MAX_PAGES in
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@kernel.dk>
+Date: Tue, 02 May 2017 13:42:26 +1000
+Subject: [PATCH 13/13] block: don't check for BIO_MAX_PAGES in
  blk_bio_segment_split()
-Message-ID: <20170502081552.GF5578@infradead.org>
+Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
+ linux-kernel@vger.kernel.org
+Message-ID: <149369654638.5146.3067734913419940612.stgit@noble>
+In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
 References: <149369628671.5146.4865312503373040039.stgit@noble>
- <149369654638.5146.3067734913419940612.stgit@noble>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <149369654638.5146.3067734913419940612.stgit@noble>
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
+blk_bio_segment_split() makes sure bios have no more than
+BIO_MAX_PAGES entries in the bi_io_vec.
+This was done because bio_clone_bioset() (when given a
+mempool bioset) could not handle larger io_vecs.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+No driver uses bio_clone_bioset() any more, they all
+use bio_clone_fast() if anything, and bio_clone_fast()
+doesn't clone the bi_io_vec.
+
+The main user of of bio_clone_bioset() at this level
+is bounce.c, and bouncing now happens before blk_bio_segment_split(),
+so that is not of concern.
+
+So remove the big helpful comment and the code.
+
+Signed-off-by: NeilBrown <neilb@suse.com>
+---
+ block/blk-merge.c |   16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index e7862e9dcc39..cea544ec5d96 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -108,25 +108,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	bool do_split = true;
+ 	struct bio *new = NULL;
+ 	const unsigned max_sectors = get_max_io_size(q, bio);
+-	unsigned bvecs = 0;
+ 
+ 	bio_for_each_segment(bv, bio, iter) {
+ 		/*
+-		 * With arbitrary bio size, the incoming bio may be very
+-		 * big. We have to split the bio into small bios so that
+-		 * each holds at most BIO_MAX_PAGES bvecs because
+-		 * bio_clone_bioset() can fail to allocate big bvecs.
+-		 *
+-		 * Those drivers which will need to use bio_clone_bioset()
+-		 * should tell us in some way.  For now, impose the
+-		 * BIO_MAX_PAGES limit on all queues.
+-		 *
+-		 * TODO: handle users of bio_clone_bioset() differently.
+-		 */
+-		if (bvecs++ >= BIO_MAX_PAGES)
+-			goto split;
+-
+-		/*
+ 		 * If the queue doesn't support SG gaps and adding this
+ 		 * offset would create a gap, disallow it.
+ 		 */
