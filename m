@@ -1,52 +1,57 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Mon, 1 May 2017 17:19:24 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH 6/6] blk-mq-debugfs: Add 'kick' operation
-Message-ID: <20170502001924.GB2894@vader>
-References: <20170427155437.23228-1-bart.vanassche@sandisk.com>
- <20170427155437.23228-7-bart.vanassche@sandisk.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 4/6] mtip32xx: convert internal command issue to block IO
+ path
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>, "hch@lst.de" <hch@lst.de>
+References: <1493398473-29872-1-git-send-email-axboe@fb.com>
+ <1493398473-29872-5-git-send-email-axboe@fb.com>
+ <20170502072810.GA11582@lst.de> <b5eae6e4-92f3-3266-5f8e-21c7ab6e69f6@fb.com>
+ <a43cf987-6f97-a82d-38e7-f8880c4d63ae@kernel.dk>
+ <da3549ce-74ad-07da-528c-3a8b84b275f9@kernel.dk>
+ <20170502151607.GA22963@lst.de>
+ <f2281c8c-0982-7d2f-ba35-060d9ea1bb48@kernel.dk>
+ <1493739741.2552.3.camel@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <41799614-ef3a-d91a-3302-808964df36da@kernel.dk>
+Date: Tue, 2 May 2017 10:00:49 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170427155437.23228-7-bart.vanassche@sandisk.com>
+In-Reply-To: <1493739741.2552.3.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 27, 2017 at 08:54:37AM -0700, Bart Van Assche wrote:
-> Running a queue causes the block layer to examine the per-CPU and
-> hw queues but not the requeue list. Hence add a 'kick' operation
-> that also examines the requeue list.
-
-The naming of these operations isn't super intuitive, but it makes
-enough sense if you know the code, I guess.
-
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Omar Sandoval <osandov@fb.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> ---
->  block/blk-mq-debugfs.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+On 05/02/2017 09:42 AM, Bart Van Assche wrote:
+> On Tue, 2017-05-02 at 09:25 -0600, Jens Axboe wrote:
+>> On 05/02/2017 09:16 AM, Christoph Hellwig wrote:
+>>> Any reason for the move from ->end_io_data to ->special?  I thought
+>>> that ->special was something we'd get rid of sooner or later now
+>>> that we can have additional per-cmd data even for !mq.
+>>
+>> With the switch to blk_execute_rq(), we can't be using end_io_data
+>> and end_io, as we use that internally for the wakeup. So I have to
+>> stuff it somewhere.
+>>
+>> The obvious option would be to move it to mtip_cmd, but we can't
+>> safely access that prior to having a driver tag assigned, which doesn't
+>> happen until we end up in our ->queue_rq(). So we need to stuff it
+>> somewhere.
 > 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index a5e286e04569..aeca26c739d1 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -120,8 +120,10 @@ static ssize_t blk_queue_flags_store(struct file *file, const char __user *ubuf,
->  		blk_mq_run_hw_queues(q, true);
->  	} else if (strcmp(op, "start") == 0) {
->  		blk_mq_start_stopped_hw_queues(q, true);
-> +	} else if (strcmp(op, "kick") == 0) {
-> +		blk_mq_kick_requeue_list(q);
->  	} else {
-> -		pr_err("%s: unsupported operation %s. Use either 'run' or 'start'\n",
-> +		pr_err("%s: unsupported operation %s. Use 'run', 'start' or 'kick'\n",
->  		       __func__, op);
->  		return -EINVAL;
->  	}
-> -- 
-> 2.12.2
+> Hello Jens,
 > 
+> Do you think it would be a good idea to allow blk_get_request() callers
+> to specify that a driver tag has to be allocated even if a scheduler has
+> been configured? That would make it possible to store completion data in
+> mtip_cmd for the mtip driver.
+
+Honestly, I think it's fine that we can stuff it _somewhere_ in the
+request. I'd rather not expose the driver vs internal tag anymore
+than we absolutely have, it's just prone to work on one configuration
+and then break if someone turns scheduling on or off.
+
+The real fix here, to avoid using ->special, would be to map the
+request before insertion. Then we don't have to pass any info at all.
+But that will require touching the callers of the internal command
+path for mtip32xx. Left as an exercise to the reader...
+
+-- 
+Jens Axboe
