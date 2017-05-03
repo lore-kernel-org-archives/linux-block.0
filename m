@@ -1,98 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:28770 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750703AbdEARxk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:40 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2 00/10] dm: zoned block device support
-Date: Tue,  2 May 2017 02:53:04 +0900
-Message-Id: <20170501175314.10922-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mx1.redhat.com ([209.132.183.28]:44336 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757636AbdECT7M (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 May 2017 15:59:12 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 2/5] blk-mq: introduce blk_mq_get_queue_depth()
+Date: Thu,  4 May 2017 03:58:36 +0800
+Message-Id: <20170503195839.6539-3-ming.lei@redhat.com>
+In-Reply-To: <20170503195839.6539-1-ming.lei@redhat.com>
+References: <20170503195839.6539-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+The hardware queue depth can be resized via blk_mq_update_nr_requests(),
+so introduce this helper for retrieving queue's depth easily.
 
-This series introduces zoned block device support to the device mapper
-infrastructure. Pathces are as follows:
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 12 ++++++++++++
+ block/blk-mq.h |  1 +
+ 2 files changed, 13 insertions(+)
 
-- Patch 1: Add a new target type feature flag to indicate if a target type
-  supports host-managed zoned block devices. This prevents using these drives
-  with the current target types since none of them have the proper support
-  implemented and will not operate properly with these drives.
-- Patch 2: If a target device is a zoned block device, check that the range of
-  LBAs mapped is aligned to the device zone size and that the device start
-  offset also aligns to zone boundaries. This is necessary for zone reset and
-  zone report correct execution.
-- Patch 3: Check that the different target devices of a table have compatible
-  zone sizes and models. This is necessary for target types that expose a zone
-  model different from the underlying device.
-- Patch 4: Fix handling of REQ_OP_ZONE_RESET bios
-- Patch 5: Fix handling of REQ_OP_ZONE_REPORT bios
-- Patch 6: Introduce a new helper function to reverse map a device zone report
-  to the target LBA range
-- Patch 7: Add support for host-managed zoned block devices to dm-flakey. This
-  is necessary for testing file systems supporting natively these drives (e.g.
-  f2fs).
-- Patch 8: Add support for for zoned block devices to dm-linear. This can have
-  useful applications during development and testing (e.g. allow creating
-  smaller zoned devices with different combinations and positions of zones).
-  There are also interesting applications for production, for instance, the
-  ability to aggregate conventional zones of different drives to create a
-  regular disk.
-- Patch 9: Add sequential write enforcement to dm_kcopyd_copy so that
-  sequential zones of a host-managed zoned block device can be specified as
-  destinations.
-- Patch 10: New dm-zoned target type (this was already sent for review twice).
-  This resend adds modifications suggested by Hannes to implement reclaim
-  using dm-kcopyd. dm-zoned depends on patch 9.
-
-As always, comments and reviews are welcome.
-
-Changes from v1:
-- Use for-loop in patch 3 as suggested by Bart
-- Add memory shrinker to dm-zoned to shrink the metadata block cache under
-  memory pressure (suggested by Bart)
-- Added Hannes Reviewed-by tag
-
-Damien Le Moal (10):
-  dm-table: Introduce DM_TARGET_ZONED_HM feature
-  dm-table: Check device area zone alignment
-  dm-table: Check block devices zone model compatibility
-  dm: Fix REQ_OP_ZONE_RESET bio handling
-  dm: Fix REQ_OP_ZONE_REPORT bio handling
-  dm: Introduce dm_remap_zone_report()
-  dm-flakey: Add support for zoned block devices
-  dm-linear: Add support for zoned block devices
-  dm-kcopyd: Add sequential write feature
-  dm-zoned: Drive-managed zoned block device target
-
- Documentation/device-mapper/dm-zoned.txt |  154 +++
- drivers/md/Kconfig                       |   19 +
- drivers/md/Makefile                      |    2 +
- drivers/md/dm-flakey.c                   |   21 +-
- drivers/md/dm-kcopyd.c                   |   68 +-
- drivers/md/dm-linear.c                   |   14 +-
- drivers/md/dm-table.c                    |  145 ++
- drivers/md/dm-zoned-io.c                 |  998 ++++++++++++++
- drivers/md/dm-zoned-metadata.c           | 2195 ++++++++++++++++++++++++++++++
- drivers/md/dm-zoned-reclaim.c            |  535 ++++++++
- drivers/md/dm-zoned.h                    |  528 +++++++
- drivers/md/dm.c                          |   93 +-
- include/linux/device-mapper.h            |   16 +
- include/linux/dm-kcopyd.h                |    1 +
- 14 files changed, 4783 insertions(+), 6 deletions(-)
- create mode 100644 Documentation/device-mapper/dm-zoned.txt
- create mode 100644 drivers/md/dm-zoned-io.c
- create mode 100644 drivers/md/dm-zoned-metadata.c
- create mode 100644 drivers/md/dm-zoned-reclaim.c
- create mode 100644 drivers/md/dm-zoned.h
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 095099df041f..be475ad112ec 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2120,6 +2120,18 @@ static void blk_mq_map_swqueue(struct request_queue *q,
+ 	}
+ }
+ 
++/*
++ * Queue depth can be changed via blk_mq_update_nr_requests(),
++ * so use this helper to retrieve queue's depth.
++ */
++int blk_mq_get_queue_depth(struct request_queue *q)
++{
++	/* All queues have same queue depth */
++	struct blk_mq_tags	*tags = q->tag_set->tags[0];
++
++	return tags->bitmap_tags.sb.depth + tags->breserved_tags.sb.depth;
++}
++
+ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 2814a14e529c..8085d5989cf5 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -166,6 +166,7 @@ void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ void blk_mq_finish_request(struct request *rq);
+ struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
+ 					unsigned int op);
++int blk_mq_get_queue_depth(struct request_queue *q);
+ 
+ static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
+ {
 -- 
 2.9.3
