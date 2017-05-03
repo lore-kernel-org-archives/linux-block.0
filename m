@@ -1,56 +1,23 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40232 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934477AbdEZDIa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 23:08:30 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH 4/6] blk-mq: update comments on blk_mq_quiesce_queue()
-Date: Fri, 26 May 2017 11:07:37 +0800
-Message-Id: <20170526030740.26959-5-ming.lei@redhat.com>
-In-Reply-To: <20170526030740.26959-1-ming.lei@redhat.com>
-References: <20170526030740.26959-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: update ->init_request and ->exit_request prototypes
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+References: <20170427174501.18965-1-hch@lst.de> <20170428145300.GA1776@lst.de>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <7aaf923d-4f7c-82f1-7bcc-80c435d59f93@grimberg.me>
+Date: Wed, 3 May 2017 10:53:36 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170428145300.GA1776@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Actually what we want to get from blk_mq_quiesce_queue()
-isn't only to wait for completion of all ongooing .queue_rq().
 
-In the typical context of canceling requests, we need to
-make sure that the following is done in the dispatch path
-before starting to cancel requests:
-	- failed dispatched request is freeed
-	- busy dispatched request is requeued, and the STARTED
-	flag is cleared
+> Turns out that while Jeff was right that this won't work against
+> for-4.12/post-merge, it applies without fuzz and works fine against
+> for-next.  Sorry for the confusion.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Regardless of that, series looks like a nice cleanup to me,
+you can add to your respin:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 864709453c90..e1fc9ab50c87 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -155,12 +155,12 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
- /**
-- * blk_mq_quiesce_queue() - wait until all ongoing queue_rq calls have finished
-+ * blk_mq_quiesce_queue() - wait until all ongoing dispatching have finished
-  * @q: request queue.
-  *
-  * Note: this function does not prevent that the struct request end_io()
-- * callback function is invoked. Additionally, it is not prevented that
-- * new queue_rq() calls occur unless the queue has been stopped first.
-+ * callback function is invoked. Once this function is returned, we make
-+ * sure no dispatching can happen.
-  */
- void blk_mq_quiesce_queue(struct request_queue *q)
- {
--- 
-2.9.4
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
