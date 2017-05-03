@@ -1,205 +1,222 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 07/10] fs: return on congested block device
-Date: Thu, 11 May 2017 14:17:07 -0500
-Message-Id: <20170511191710.31959-8-rgoldwyn@suse.de>
-In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
-References: <20170511191710.31959-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f42.google.com ([74.125.83.42]:35789 "EHLO
+        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755868AbdECTTT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2017 15:19:19 -0400
+Received: by mail-pg0-f42.google.com with SMTP id o3so77872969pgn.2
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2017 12:19:19 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+Subject: [PATCH 9/9] mq-deadline: add debugfs attributes
+Date: Wed,  3 May 2017 12:19:02 -0700
+Message-Id: <306d6a725cd8a55578b53d15d05128979cf3a037.1493839103.git.osandov@fb.com>
+In-Reply-To: <cover.1493839103.git.osandov@fb.com>
+References: <cover.1493839103.git.osandov@fb.com>
+In-Reply-To: <cover.1493839103.git.osandov@fb.com>
+References: <cover.1493839103.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Omar Sandoval <osandov@fb.com>
 
-A new bio operation flag REQ_NOWAIT is introduced to identify bio's
-orignating from iocb with IOCB_NOWAIT. This flag indicates
-to return immediately if a request cannot be made instead
-of retrying.
+Expose the fifo lists, cached next requests, batching state, and
+dispatch list. It'd also be possible to add the sorted lists, but there
+aren't already seq_file helpers for rbtrees.
 
-Stacked devices such as md (the ones with make_request_fn hooks)
-currently are not supported because it may block for housekeeping.
-For example, an md can have a part of the device suspended.
-For this reason, only request based devices are supported.
-In the future, this feature will be expanded to stacked devices
-by teaching them how to handle the REQ_NOWAIT flags.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-core.c          | 24 ++++++++++++++++++++++--
- block/blk-mq-sched.c      |  3 +++
- block/blk-mq.c            |  4 ++++
- fs/direct-io.c            | 10 ++++++++--
- include/linux/bio.h       |  6 ++++++
- include/linux/blk_types.h |  2 ++
- 6 files changed, 45 insertions(+), 4 deletions(-)
+ block/blk-mq-debugfs.c |   8 +++-
+ block/blk-mq-debugfs.h |   1 +
+ block/mq-deadline.c    | 123 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 130 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d772c221cc17..effe934b806b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1232,6 +1232,11 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	if (!IS_ERR(rq))
- 		return rq;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 6c12b4dbc8ec..3a33f7e2f68c 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -262,9 +262,8 @@ static const char *const rqf_name[] = {
+ };
+ #undef RQF_NAME
  
-+	if (op & REQ_NOWAIT) {
-+		blk_put_rl(rl);
-+		return ERR_PTR(-EAGAIN);
-+	}
-+
- 	if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
- 		blk_put_rl(rl);
- 		return rq;
-@@ -1870,6 +1875,17 @@ generic_make_request_checks(struct bio *bio)
- 		goto end_io;
- 	}
+-int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
++int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
+ {
+-	struct request *rq = list_entry_rq(v);
+ 	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
+ 	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
  
-+	/*
-+	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
-+	 * if queue does not have QUEUE_FLAG_NOWAIT_SUPPORT set
-+	 * and if it is not a request based queue.
-+	 */
-+
-+	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q)) {
-+		err = -EOPNOTSUPP;
-+		goto end_io;
-+	}
-+
- 	part = bio->bi_bdev->bd_part;
- 	if (should_fail_request(part, bio->bi_iter.bi_size) ||
- 	    should_fail_request(&part_to_disk(part)->part0,
-@@ -2021,7 +2037,7 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	do {
- 		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 
--		if (likely(blk_queue_enter(q, false) == 0)) {
-+		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
- 			struct bio_list lower, same;
- 
- 			/* Create a fresh bio_list for all subordinate requests */
-@@ -2046,7 +2062,11 @@ blk_qc_t generic_make_request(struct bio *bio)
- 			bio_list_merge(&bio_list_on_stack[0], &same);
- 			bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
- 		} else {
--			bio_io_error(bio);
-+			if (unlikely(!blk_queue_dying(q) &&
-+					(bio->bi_opf & REQ_NOWAIT)))
-+				bio_wouldblock_error(bio);
-+			else
-+				bio_io_error(bio);
- 		}
- 		bio = bio_list_pop(&bio_list_on_stack[0]);
- 	} while (bio);
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index c974a1bbf4cb..019d881d62b7 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -119,6 +119,9 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
- 	if (likely(!data->hctx))
- 		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
- 
-+	if (op & REQ_NOWAIT)
-+		data->flags |= BLK_MQ_REQ_NOWAIT;
-+
- 	if (e) {
- 		data->flags |= BLK_MQ_REQ_INTERNAL;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c7836a1ded97..d7613ae6a269 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1538,6 +1538,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	rq = blk_mq_sched_get_request(q, bio, bio->bi_opf, &data);
- 	if (unlikely(!rq)) {
- 		__wbt_done(q->rq_wb, wb_acct);
-+		if (bio->bi_opf & REQ_NOWAIT)
-+			bio_wouldblock_error(bio);
- 		return BLK_QC_T_NONE;
- 	}
- 
-@@ -1662,6 +1664,8 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
- 	rq = blk_mq_sched_get_request(q, bio, bio->bi_opf, &data);
- 	if (unlikely(!rq)) {
- 		__wbt_done(q->rq_wb, wb_acct);
-+		if (bio->bi_opf & REQ_NOWAIT)
-+			bio_wouldblock_error(bio);
- 		return BLK_QC_T_NONE;
- 	}
- 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a04ebea77de8..139ebd5ae1c7 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -480,8 +480,12 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
- 	unsigned i;
- 	int err;
- 
--	if (bio->bi_error)
--		dio->io_error = -EIO;
-+	if (bio->bi_error) {
-+		if (bio->bi_error == -EAGAIN && (bio->bi_opf & REQ_NOWAIT))
-+			dio->io_error = -EAGAIN;
-+		else
-+			dio->io_error = -EIO;
-+	}
- 
- 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
- 		err = bio->bi_error;
-@@ -1197,6 +1201,8 @@ do_blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
- 	if (iov_iter_rw(iter) == WRITE) {
- 		dio->op = REQ_OP_WRITE;
- 		dio->op_flags = REQ_SYNC | REQ_IDLE;
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			dio->op_flags |= REQ_NOWAIT;
- 	} else {
- 		dio->op = REQ_OP_READ;
- 	}
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8e521194f6fc..1a9270744b1e 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -425,6 +425,12 @@ static inline void bio_io_error(struct bio *bio)
- 	bio_endio(bio);
+@@ -287,6 +286,11 @@ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
+ 	return 0;
  }
  
-+static inline void bio_wouldblock_error(struct bio *bio)
++int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
 +{
-+	bio->bi_error = -EAGAIN;
-+	bio_endio(bio);
++	return __blk_mq_debugfs_rq_show(m, list_entry_rq(v));
 +}
 +
- struct request_queue;
- extern int bio_phys_segments(struct request_queue *, struct bio *);
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d703acb55d0f..5ce4da30ba43 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -187,6 +187,7 @@ enum req_flag_bits {
- 	__REQ_PREFLUSH,		/* request for cache flush */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
-+	__REQ_NOWAIT,		/* Don't wait if request will block */
- 	__REQ_NR_BITS,		/* stops here */
+ static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
+ 	__acquires(&hctx->lock)
+ {
+diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+index 7c67f813a294..b72e5c5f065e 100644
+--- a/block/blk-mq-debugfs.h
++++ b/block/blk-mq-debugfs.h
+@@ -11,6 +11,7 @@ struct blk_mq_debugfs_attr {
+ 	const struct seq_operations *seq_ops;
  };
  
-@@ -203,6 +204,7 @@ enum req_flag_bits {
- #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
-+#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
++int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
+ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
  
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ int blk_mq_debugfs_register(struct request_queue *q);
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 236121633ca0..1b964a387afe 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -19,6 +19,7 @@
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
++#include "blk-mq-debugfs.h"
+ #include "blk-mq-tag.h"
+ #include "blk-mq-sched.h"
+ 
+@@ -517,6 +518,125 @@ static struct elv_fs_entry deadline_attrs[] = {
+ 	__ATTR_NULL
+ };
+ 
++#ifdef CONFIG_BLK_DEBUG_FS
++#define DEADLINE_DEBUGFS_DDIR_ATTRS(ddir, name)				\
++static void *deadline_##name##_fifo_start(struct seq_file *m,		\
++					  loff_t *pos)			\
++	__acquires(&dd->lock)						\
++{									\
++	struct request_queue *q = m->private;				\
++	struct deadline_data *dd = q->elevator->elevator_data;		\
++									\
++	spin_lock(&dd->lock);						\
++	return seq_list_start(&dd->fifo_list[ddir], *pos);		\
++}									\
++									\
++static void *deadline_##name##_fifo_next(struct seq_file *m, void *v,	\
++					 loff_t *pos)			\
++{									\
++	struct request_queue *q = m->private;				\
++	struct deadline_data *dd = q->elevator->elevator_data;		\
++									\
++	return seq_list_next(v, &dd->fifo_list[ddir], pos);		\
++}									\
++									\
++static void deadline_##name##_fifo_stop(struct seq_file *m, void *v)	\
++	__releases(&dd->lock)						\
++{									\
++	struct request_queue *q = m->private;				\
++	struct deadline_data *dd = q->elevator->elevator_data;		\
++									\
++	spin_unlock(&dd->lock);						\
++}									\
++									\
++static const struct seq_operations deadline_##name##_fifo_seq_ops = {	\
++	.start	= deadline_##name##_fifo_start,				\
++	.next	= deadline_##name##_fifo_next,				\
++	.stop	= deadline_##name##_fifo_stop,				\
++	.show	= blk_mq_debugfs_rq_show,				\
++};									\
++									\
++static int deadline_##name##_next_rq_show(void *data,			\
++					  struct seq_file *m)		\
++{									\
++	struct request_queue *q = data;					\
++	struct deadline_data *dd = q->elevator->elevator_data;		\
++	struct request *rq = dd->next_rq[ddir];				\
++									\
++	if (rq)								\
++		__blk_mq_debugfs_rq_show(m, rq);			\
++	return 0;							\
++}
++DEADLINE_DEBUGFS_DDIR_ATTRS(READ, read)
++DEADLINE_DEBUGFS_DDIR_ATTRS(WRITE, write)
++#undef DEADLINE_DEBUGFS_DDIR_ATTRS
++
++static int deadline_batching_show(void *data, struct seq_file *m)
++{
++	struct request_queue *q = data;
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	seq_printf(m, "%u\n", dd->batching);
++	return 0;
++}
++
++static int deadline_starved_show(void *data, struct seq_file *m)
++{
++	struct request_queue *q = data;
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	seq_printf(m, "%u\n", dd->starved);
++	return 0;
++}
++
++static void *deadline_dispatch_start(struct seq_file *m, loff_t *pos)
++	__acquires(&dd->lock)
++{
++	struct request_queue *q = m->private;
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	spin_lock(&dd->lock);
++	return seq_list_start(&dd->dispatch, *pos);
++}
++
++static void *deadline_dispatch_next(struct seq_file *m, void *v, loff_t *pos)
++{
++	struct request_queue *q = m->private;
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	return seq_list_next(v, &dd->dispatch, pos);
++}
++
++static void deadline_dispatch_stop(struct seq_file *m, void *v)
++	__releases(&dd->lock)
++{
++	struct request_queue *q = m->private;
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	spin_unlock(&dd->lock);
++}
++
++static const struct seq_operations deadline_dispatch_seq_ops = {
++	.start	= deadline_dispatch_start,
++	.next	= deadline_dispatch_next,
++	.stop	= deadline_dispatch_stop,
++	.show	= blk_mq_debugfs_rq_show,
++};
++
++#define DEADLINE_QUEUE_DDIR_ATTRS(name)						\
++	{#name "_fifo_list", 0400, .seq_ops = &deadline_##name##_fifo_seq_ops},	\
++	{#name "_next_rq", 0400, deadline_##name##_next_rq_show}
++static const struct blk_mq_debugfs_attr deadline_queue_debugfs_attrs[] = {
++	DEADLINE_QUEUE_DDIR_ATTRS(read),
++	DEADLINE_QUEUE_DDIR_ATTRS(write),
++	{"batching", 0400, deadline_batching_show},
++	{"starved", 0400, deadline_starved_show},
++	{"dispatch", 0400, .seq_ops = &deadline_dispatch_seq_ops},
++	{},
++};
++#undef DEADLINE_QUEUE_DDIR_ATTRS
++#endif
++
+ static struct elevator_type mq_deadline = {
+ 	.ops.mq = {
+ 		.insert_requests	= dd_insert_requests,
+@@ -533,6 +653,9 @@ static struct elevator_type mq_deadline = {
+ 	},
+ 
+ 	.uses_mq	= true,
++#ifdef CONFIG_BLK_DEBUG_FS
++	.queue_debugfs_attrs = deadline_queue_debugfs_attrs,
++#endif
+ 	.elevator_attrs = deadline_attrs,
+ 	.elevator_name = "mq-deadline",
+ 	.elevator_owner = THIS_MODULE,
 -- 
-2.12.0
+2.12.2
