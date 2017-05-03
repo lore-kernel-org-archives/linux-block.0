@@ -1,32 +1,52 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "linux@armlinux.org.uk" <linux@armlinux.org.uk>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "jack@suse.cz" <jack@suse.cz>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"zhaohongjiang@huawei.com" <zhaohongjiang@huawei.com>, "yanaijie@huawei.com"
-	<yanaijie@huawei.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"miaoxie@huawei.com" <miaoxie@huawei.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:38982 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756708AbdECTZy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2017 15:25:54 -0400
+Date: Wed, 3 May 2017 20:25:41 +0100
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "jack@suse.cz" <jack@suse.cz>,
+        "zhaohongjiang@huawei.com" <zhaohongjiang@huawei.com>,
+        "yanaijie@huawei.com" <yanaijie@huawei.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "miaoxie@huawei.com" <miaoxie@huawei.com>
 Subject: Re: [PATCH] ARM: Fix rd_size declaration
-Date: Wed, 3 May 2017 19:38:17 +0000
-Message-ID: <1493840295.3901.32.camel@sandisk.com>
+Message-ID: <20170503192541.GE22219@n2100.armlinux.org.uk>
 References: <20170417231003.7178-1-bart.vanassche@sandisk.com>
-	 <1493239894.2632.15.camel@sandisk.com>
-	 <20170503192541.GE22219@n2100.armlinux.org.uk>
-In-Reply-To: <20170503192541.GE22219@n2100.armlinux.org.uk>
-Content-Type: text/plain; charset="iso-8859-1"
+ <1493239894.2632.15.camel@sandisk.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1493239894.2632.15.camel@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, 2017-05-03 at 20:25 +0100, Russell King - ARM Linux wrote:
-> There were comments on the patch which seemed to be unresolved.
+On Wed, Apr 26, 2017 at 08:51:35PM +0000, Bart Van Assche wrote:
+> On Mon, 2017-04-17 at 16:10 -0700, Bart Van Assche wrote:
+> > The global variable 'rd_size' is declared as 'int' in source file
+> > arch/arm/kernel/atags_parse.c and as 'unsigned long' in
+> > drivers/block/brd.c. Fix this inconsistency.
+> > [ ... ]
+> 
+> Hello Russell,
+> 
+> Have I sent this patch to the right maintainer?
 
-Do you mean the header guard? That's easy to resolve.
+There were comments on the patch which seemed to be unresolved.
 
-> However, it would be nice if rd_size could go with some other related
-> declarations somewhere (if there are any.)
+I, too, don't like the idea of a single-line header file.  I'm also
+wondering what the right solution here is - we're the only architecture
+in the modern kernel that writes to rd_size, no one else does that.
+I haven't been able to dig into the history to find out whether other
+architectures used to, or what.
 
-Sorry but I don't know about any other declarations that should be moved
-into a brd header file.
+However, it would be nice if rd_size could go with some other related
+declarations somewhere (if there are any.)
 
-Bart.=
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
