@@ -1,56 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.14]:63150 "EHLO mout.web.de"
+Received: from mx1.redhat.com ([209.132.183.28]:56246 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750737AbdECSgX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 May 2017 14:36:23 -0400
-Subject: [PATCH 2/2] blk-mq-debugfs: Add spaces in queue_poll_stat_show()
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-To: linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-References: <507a3eee-6dfe-c218-1056-38221bd22be7@users.sourceforge.net>
-Message-ID: <49822157-111d-0f44-3a5f-bd070cf7ebc7@users.sourceforge.net>
-Date: Wed, 3 May 2017 20:36:15 +0200
-MIME-Version: 1.0
-In-Reply-To: <507a3eee-6dfe-c218-1056-38221bd22be7@users.sourceforge.net>
-Content-Type: text/plain; charset=utf-8
+        id S1757644AbdECT7V (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 May 2017 15:59:21 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 3/5] blk-mq: don't update q->nr_requests when updating hw queue's depth
+Date: Thu,  4 May 2017 03:58:37 +0800
+Message-Id: <20170503195839.6539-4-ming.lei@redhat.com>
+In-Reply-To: <20170503195839.6539-1-ming.lei@redhat.com>
+References: <20170503195839.6539-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 3 May 2017 20:18:22 +0200
+In MQ scheduler, q->nr_requests represents requests in scheduler
+queue depth, so don't update it if hw queue's depth is updated.
 
-Use space characters at some source code places according to
-the Linux coding style convention.
-
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ block/blk-mq.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 2265b70b1121..34cdd5f2b511 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -156,12 +156,12 @@ static int queue_poll_stat_show(struct seq_file *m, void *v)
- 	struct request_queue *q = m->private;
- 	int bucket;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index be475ad112ec..681bf33d8de8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2643,6 +2643,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	struct blk_mq_tag_set *set = q->tag_set;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i, ret;
++	bool sched = false;
  
--	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS/2; bucket++) {
--		seq_printf(m, "read  (%d Bytes): ", 1 << (9+bucket));
--		print_stat(m, &q->poll_stat[2*bucket]);
-+	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS / 2; bucket++) {
-+		seq_printf(m, "read  (%d Bytes): ", 1 << (9 + bucket));
-+		print_stat(m, &q->poll_stat[2 * bucket]);
- 		seq_putc(m, '\n');
--		seq_printf(m, "write (%d Bytes): ",  1 << (9+bucket));
--		print_stat(m, &q->poll_stat[2*bucket+1]);
-+		seq_printf(m, "write (%d Bytes): ",  1 << (9 + bucket));
-+		print_stat(m, &q->poll_stat[2 * bucket + 1]);
- 		seq_putc(m, '\n');
+ 	if (!set)
+ 		return -EINVAL;
+@@ -2664,12 +2665,13 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		} else {
+ 			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+ 							nr, true);
++			sched = true;
+ 		}
+ 		if (ret)
+ 			break;
  	}
- 	return 0;
+ 
+-	if (!ret)
++	if (!ret && sched)
+ 		q->nr_requests = nr;
+ 
+ 	blk_mq_unfreeze_queue(q);
 -- 
-2.12.2
+2.9.3
