@@ -1,54 +1,71 @@
-Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 07/15] block_dev: propagate bio_iov_iter_get_pages error in __blkdev_direct_IO
-Date: Thu, 18 May 2017 15:18:04 +0200
-Message-Id: <20170518131812.22956-8-hch@lst.de>
-In-Reply-To: <20170518131812.22956-1-hch@lst.de>
-References: <20170518131812.22956-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f48.google.com ([74.125.83.48]:36387 "EHLO
+        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756372AbdECTTK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2017 15:19:10 -0400
+Received: by mail-pg0-f48.google.com with SMTP id t7so82975844pgt.3
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2017 12:19:10 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+Subject: [PATCH 0/9] blk-mq-debugfs: scheduler support and cleanups
+Date: Wed,  3 May 2017 12:18:53 -0700
+Message-Id: <cover.1493839103.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Once we move the block layer to its own status code we'll still want to
-propagate the bio_iov_iter_get_pages, so restructure __blkdev_direct_IO
-to take ret into account when returning the errno.
----
- fs/block_dev.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+From: Omar Sandoval <osandov@fb.com>
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 519599dddd36..c1dc393ad6b9 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -334,7 +334,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
- 	loff_t pos = iocb->ki_pos;
- 	blk_qc_t qc = BLK_QC_T_NONE;
--	int ret;
-+	int ret = 0;
- 
- 	if ((pos | iov_iter_alignment(iter)) &
- 	    (bdev_logical_block_size(bdev) - 1))
-@@ -363,7 +363,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 
- 		ret = bio_iov_iter_get_pages(bio, iter);
- 		if (unlikely(ret)) {
--			bio->bi_error = ret;
-+			bio->bi_error = -EIO;
- 			bio_endio(bio);
- 			break;
- 		}
-@@ -412,7 +412,8 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 	}
- 	__set_current_state(TASK_RUNNING);
- 
--	ret = dio->bio.bi_error;
-+	if (!ret)
-+		ret = dio->bio.bi_error;
- 	if (likely(!ret))
- 		ret = dio->size;
- 
+Hi,
+
+This series makes more enhancements to blk-mq-debugfs.
+
+- Patch 1 is a subjective change.
+- Patches 2 and 3 are cleanups.
+- Patch 4 is Bart's patch from a couple of weeks ago, necessitated by
+  patch 6.
+- Patch 5 is another cleanup.
+- Patch 6 reworks the lifetimes of the debugfs attributes to be tied to
+  the structure lifetimes themselves rather being duct taped on to
+  sysfs. This is what I should have done in the first place, and would
+  have also been a way to fix the same thing we fixed in e869b5462f83
+  ("blk-mq: Unregister debugfs attributes earlier"), but I didn't think
+  of doing it this way until I started adding scheduler support.
+- Patch 7 allows schedulers to register debugfs attributes, implemented
+  in patches 8 and 9 for kyber and mq-deadline, respectively.
+
+Please take a look and give it a spin.
+
+Thanks!
+
+Bart Van Assche (1):
+  blk-mq: Do not invoke queue operations on a dead queue
+
+Omar Sandoval (8):
+  blk-mq-debugfs: separate flags with |
+  blk-mq-debugfs: clean up flag definitions
+  blk-mq-debugfs: get rid of a bunch of boilerplate
+  blk-mq: move debugfs declarations to a separate header file
+  blk-mq: untangle debugfs and sysfs
+  blk-mq-debugfs: allow schedulers to register debugfs attributes
+  kyber: add debugfs attributes
+  mq-deadline: add debugfs attributes
+
+ block/blk-core.c         |   8 +-
+ block/blk-mq-debugfs.c   | 851 +++++++++++++++++++++--------------------------
+ block/blk-mq-debugfs.h   |  79 +++++
+ block/blk-mq-sched.c     |  24 +-
+ block/blk-mq-sysfs.c     |  10 -
+ block/blk-mq.c           |   7 +
+ block/blk-mq.h           |  28 --
+ block/blk-sysfs.c        |   3 +
+ block/kyber-iosched.c    | 130 ++++++++
+ block/mq-deadline.c      | 123 +++++++
+ include/linux/blk-mq.h   |   5 +
+ include/linux/blkdev.h   |   2 +-
+ include/linux/elevator.h |   7 +
+ 13 files changed, 751 insertions(+), 526 deletions(-)
+ create mode 100644 block/blk-mq-debugfs.h
+
 -- 
-2.11.0
+2.12.2
