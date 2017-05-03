@@ -1,38 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:35239 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751376AbdEFPed (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 6 May 2017 11:34:33 -0400
-From: Geliang Tang <geliangtang@gmail.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: Geliang Tang <geliangtang@gmail.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] lightnvm: fix error return code of memdup_user
-Date: Sat,  6 May 2017 23:34:24 +0800
-Message-Id: <f0f70c9326edab0cc56731f24244e86f8ba84ef4.1493727412.git.geliangtang@gmail.com>
+Received: from mail-pg0-f53.google.com ([74.125.83.53]:34661 "EHLO
+        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755354AbdECTTL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2017 15:19:11 -0400
+Received: by mail-pg0-f53.google.com with SMTP id v1so83101628pgv.1
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2017 12:19:11 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+Subject: [PATCH 1/9] blk-mq-debugfs: separate flags with |
+Date: Wed,  3 May 2017 12:18:54 -0700
+Message-Id: <a93a27c6300f9a129b8d897bff289a19e4d59704.1493839103.git.osandov@fb.com>
+In-Reply-To: <cover.1493839103.git.osandov@fb.com>
+References: <cover.1493839103.git.osandov@fb.com>
+In-Reply-To: <cover.1493839103.git.osandov@fb.com>
+References: <cover.1493839103.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The error return code of memdup_user() should be -ENOMEM or -EFAULT.
-So this patch changed it to PTR_ERR(info).
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+This reads more naturally than spaces.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/lightnvm/core.c | 2 +-
+ block/blk-mq-debugfs.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 54a06c3..e8b5edd 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -1164,7 +1164,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
- 
- 	info = memdup_user(arg, sizeof(struct nvm_ioctl_info));
- 	if (IS_ERR(info))
--		return -EFAULT;
-+		return PTR_ERR(info);
- 
- 	info->version[0] = NVM_VERSION_MAJOR;
- 	info->version[1] = NVM_VERSION_MINOR;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index bcd2a7d4a3a5..1ff3d726fb03 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -53,7 +53,7 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
+ 		if (!(flags & BIT(i)))
+ 			continue;
+ 		if (sep)
+-			seq_puts(m, " ");
++			seq_puts(m, "|");
+ 		sep = true;
+ 		if (i < flag_name_count && flag_name[i])
+ 			seq_puts(m, flag_name[i]);
 -- 
-2.9.3
+2.12.2
