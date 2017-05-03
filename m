@@ -1,15 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44058 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:51242 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757633AbdECT6x (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 May 2017 15:58:53 -0400
+        id S1754984AbdECT6D (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 May 2017 15:58:03 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 0/5] blk-mq: support to use hw tag for scheduling
-Date: Thu,  4 May 2017 03:58:34 +0800
-Message-Id: <20170503195839.6539-1-ming.lei@redhat.com>
+Subject: [PATCH v2 0/4] blk-mq: support to use hw tag for scheduling
+Date: Thu,  4 May 2017 03:57:41 +0800
+Message-Id: <20170503195746.6413-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
