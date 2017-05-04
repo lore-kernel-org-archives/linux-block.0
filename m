@@ -1,61 +1,24 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 11/27] fuse: set mapping error in writepage_locked when it fails
-Date: Tue,  9 May 2017 11:49:14 -0400
-Message-Id: <20170509154930.29524-12-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:56521 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751991AbdEDL16 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 07:27:58 -0400
+Date: Thu, 4 May 2017 04:27:57 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
+Cc: mb@lightnvm.io, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@cnexlabs.com>
+Subject: Re: [PATCH 2/2] lightnvm: fix bad back free on error path
+Message-ID: <20170504112757.GB22269@infradead.org>
+References: <1493803145-18082-1-git-send-email-javier@cnexlabs.com>
+ <1493803145-18082-2-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1493803145-18082-2-git-send-email-javier@cnexlabs.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This ensures that we see errors on fsync when writeback fails.
+Looks fine,
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/fuse/file.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index ec238fb5a584..07d0efcb050c 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -1669,6 +1669,7 @@ static int fuse_writepage_locked(struct page *page)
- err_free:
- 	fuse_request_free(req);
- err:
-+	mapping_set_error(page->mapping, error);
- 	end_page_writeback(page);
- 	return error;
- }
--- 
-2.9.3
