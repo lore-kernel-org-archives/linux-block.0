@@ -1,53 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:56443 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750703AbdEARxv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:51 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2 04/10] dm: Fix REQ_OP_ZONE_RESET bio handling
-Date: Tue,  2 May 2017 02:53:08 +0900
-Message-Id: <20170501175314.10922-5-damien.lemoal@wdc.com>
-In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
-References: <20170501175314.10922-1-damien.lemoal@wdc.com>
+Received: from mx2.suse.de ([195.135.220.15]:44747 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750758AbdEDLUr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 May 2017 07:20:47 -0400
+Subject: Re: [PATCH v2 02/12] blk-mq-debugfs: clean up flag definitions
+To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org
+References: <cover.1493882751.git.osandov@fb.com>
+ <a7ef9bfaa9756e211fa480d84c7f832a8f8c1d4f.1493882751.git.osandov@fb.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <8958af23-1b93-fd6c-a229-5b4e50cdfd9c@suse.de>
+Date: Thu, 4 May 2017 13:20:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <a7ef9bfaa9756e211fa480d84c7f832a8f8c1d4f.1493882751.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
-
-The REQ_OP_ZONE_RESET bio has no payload and zero sectors. Its position
-is the only information used to indicate the zone to reset on the
-device. Due to its zero length, this bio is not cloned and sent to the
-target through the non-flush case in __split_and_process_bio().
-Add an additional case in that function to call
-__split_and_process_non_flush() without checking the clone info size.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+On 05/04/2017 09:31 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> Make sure the spelled out flag names match the definition. This also
+> adds a missing hctx state, BLK_MQ_S_START_ON_RUN, and a missing
+> cmd_flag, __REQ_NOUNMAP.
+> 
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq-debugfs.c | 201 ++++++++++++++++++++++++++-----------------------
+>  1 file changed, 108 insertions(+), 93 deletions(-)
+> 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- drivers/md/dm.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index dfb7597..1d98035 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1318,6 +1318,10 @@ static void __split_and_process_bio(struct mapped_device *md,
- 		ci.sector_count = 0;
- 		error = __send_empty_flush(&ci);
- 		/* dec_pending submits any data associated with flush */
-+	} else if (bio_op(bio) == REQ_OP_ZONE_RESET) {
-+		ci.bio = bio;
-+		ci.sector_count = 0;
-+		error = __split_and_process_non_flush(&ci);
- 	} else {
- 		ci.bio = bio;
- 		ci.sector_count = bio_sectors(bio);
+Cheers,
+
+Hannes
 -- 
-2.9.3
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
