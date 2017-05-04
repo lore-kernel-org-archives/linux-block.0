@@ -1,48 +1,159 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45224 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751905AbdEDL0R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 May 2017 07:26:17 -0400
-Subject: Re: [PATCH v2 08/12] blk-mq: move debugfs declarations to a separate
- header file
-To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org
-References: <cover.1493882751.git.osandov@fb.com>
- <14d98327e1b274f2d39f7988faf1614a9a06716b.1493882751.git.osandov@fb.com>
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:36046 "EHLO
+        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752545AbdEDHbv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 03:31:51 -0400
+Received: by mail-pf0-f171.google.com with SMTP id q66so3715770pfi.3
+        for <linux-block@vger.kernel.org>; Thu, 04 May 2017 00:31:51 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <5a9f9fe6-1e22-3bce-0848-69b87823b194@suse.de>
-Date: Thu, 4 May 2017 13:26:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <14d98327e1b274f2d39f7988faf1614a9a06716b.1493882751.git.osandov@fb.com>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH v2 08/12] blk-mq: move debugfs declarations to a separate header file
+Date: Thu,  4 May 2017 00:31:30 -0700
+Message-Id: <14d98327e1b274f2d39f7988faf1614a9a06716b.1493882751.git.osandov@fb.com>
+In-Reply-To: <cover.1493882751.git.osandov@fb.com>
+References: <cover.1493882751.git.osandov@fb.com>
+In-Reply-To: <cover.1493882751.git.osandov@fb.com>
+References: <cover.1493882751.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 05/04/2017 09:31 AM, Omar Sandoval wrote:
-> From: Omar Sandoval <osandov@fb.com>
-> 
-> Preparation for adding more declarations.
-> 
-> Signed-off-by: Omar Sandoval <osandov@fb.com>
-> ---
->  block/blk-core.c       |  1 +
->  block/blk-mq-debugfs.c |  1 +
->  block/blk-mq-debugfs.h | 29 +++++++++++++++++++++++++++++
->  block/blk-mq-sysfs.c   |  1 +
->  block/blk-mq.h         | 28 ----------------------------
->  block/blk-sysfs.c      |  1 +
->  6 files changed, 33 insertions(+), 28 deletions(-)
->  create mode 100644 block/blk-mq-debugfs.h
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+From: Omar Sandoval <osandov@fb.com>
 
-Cheers,
+Preparation for adding more declarations.
 
-Hannes
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ block/blk-core.c       |  1 +
+ block/blk-mq-debugfs.c |  1 +
+ block/blk-mq-debugfs.h | 29 +++++++++++++++++++++++++++++
+ block/blk-mq-sysfs.c   |  1 +
+ block/blk-mq.h         | 28 ----------------------------
+ block/blk-sysfs.c      |  1 +
+ 6 files changed, 33 insertions(+), 28 deletions(-)
+ create mode 100644 block/blk-mq-debugfs.h
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 24886b69690f..acdca6536562 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -40,6 +40,7 @@
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
++#include "blk-mq-debugfs.h"
+ #include "blk-mq-sched.h"
+ #include "blk-wbt.h"
+ 
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 347fbb8e059c..1dc1847b5363 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -21,6 +21,7 @@
+ #include <linux/blk-mq.h>
+ #include "blk.h"
+ #include "blk-mq.h"
++#include "blk-mq-debugfs.h"
+ #include "blk-mq-tag.h"
+ 
+ struct blk_mq_debugfs_attr {
+diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+new file mode 100644
+index 000000000000..00b0f71d0ae9
+--- /dev/null
++++ b/block/blk-mq-debugfs.h
+@@ -0,0 +1,29 @@
++#ifndef INT_BLK_MQ_DEBUGFS_H
++#define INT_BLK_MQ_DEBUGFS_H
++
++#ifdef CONFIG_BLK_DEBUG_FS
++int blk_mq_debugfs_register(struct request_queue *q);
++void blk_mq_debugfs_unregister(struct request_queue *q);
++int blk_mq_debugfs_register_mq(struct request_queue *q);
++void blk_mq_debugfs_unregister_mq(struct request_queue *q);
++#else
++static inline int blk_mq_debugfs_register(struct request_queue *q)
++{
++	return 0;
++}
++
++static inline void blk_mq_debugfs_unregister(struct request_queue *q)
++{
++}
++
++static inline int blk_mq_debugfs_register_mq(struct request_queue *q)
++{
++	return 0;
++}
++
++static inline void blk_mq_debugfs_unregister_mq(struct request_queue *q)
++{
++}
++#endif
++
++#endif
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index ec0afdf765e3..71a237a90d43 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -11,6 +11,7 @@
+ 
+ #include <linux/blk-mq.h>
+ #include "blk-mq.h"
++#include "blk-mq-debugfs.h"
+ #include "blk-mq-tag.h"
+ 
+ static void blk_mq_sysfs_release(struct kobject *kobj)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 2814a14e529c..cc67b48e3551 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -83,34 +83,6 @@ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+ 
+-/*
+- * debugfs helpers
+- */
+-#ifdef CONFIG_BLK_DEBUG_FS
+-int blk_mq_debugfs_register(struct request_queue *q);
+-void blk_mq_debugfs_unregister(struct request_queue *q);
+-int blk_mq_debugfs_register_mq(struct request_queue *q);
+-void blk_mq_debugfs_unregister_mq(struct request_queue *q);
+-#else
+-static inline int blk_mq_debugfs_register(struct request_queue *q)
+-{
+-	return 0;
+-}
+-
+-static inline void blk_mq_debugfs_unregister(struct request_queue *q)
+-{
+-}
+-
+-static inline int blk_mq_debugfs_register_mq(struct request_queue *q)
+-{
+-	return 0;
+-}
+-
+-static inline void blk_mq_debugfs_unregister_mq(struct request_queue *q)
+-{
+-}
+-#endif
+-
+ extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
+ 
+ void blk_mq_release(struct request_queue *q);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 3f37813ccbaf..9995355121d7 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -13,6 +13,7 @@
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
++#include "blk-mq-debugfs.h"
+ #include "blk-wbt.h"
+ 
+ struct queue_sysfs_entry {
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.12.2
