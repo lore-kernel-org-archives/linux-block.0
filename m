@@ -1,48 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45191 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751913AbdEDLZu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 May 2017 07:25:50 -0400
-Subject: Re: [PATCH v2 07/12] blk-mq: Do not invoke queue operations on a dead
- queue
-To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org
-References: <cover.1493882751.git.osandov@fb.com>
- <71712db1ecbe0432055c4976314a57485fff7f18.1493882751.git.osandov@fb.com>
+Received: from mail-pf0-f172.google.com ([209.85.192.172]:35593 "EHLO
+        mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752545AbdEDHbu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 03:31:50 -0400
+Received: by mail-pf0-f172.google.com with SMTP id v14so3725115pfd.2
+        for <linux-block@vger.kernel.org>; Thu, 04 May 2017 00:31:49 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <e6bb2a84-9fff-4fba-0ee5-e56b655f1668@suse.de>
-Date: Thu, 4 May 2017 13:25:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <71712db1ecbe0432055c4976314a57485fff7f18.1493882751.git.osandov@fb.com>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH v2 07/12] blk-mq: Do not invoke queue operations on a dead queue
+Date: Thu,  4 May 2017 00:31:29 -0700
+Message-Id: <71712db1ecbe0432055c4976314a57485fff7f18.1493882751.git.osandov@fb.com>
+In-Reply-To: <cover.1493882751.git.osandov@fb.com>
+References: <cover.1493882751.git.osandov@fb.com>
+In-Reply-To: <cover.1493882751.git.osandov@fb.com>
+References: <cover.1493882751.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 05/04/2017 09:31 AM, Omar Sandoval wrote:
-> From: Bart Van Assche <bart.vanassche@sandisk.com>
-> 
-> In commit e869b5462f83 ("blk-mq: Unregister debugfs attributes
-> earlier"), we shuffled the debugfs cleanup around so that the "state"
-> attribute was removed before we freed the blk-mq data structures.
-> However, later changes are going to undo that, so we need to explicitly
-> disallow running a dead queue.
-> 
-> [Omar: rebased and updated commit message]
-> Signed-off-by: Omar Sandoval <osandov@fb.com>
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> ---
->  block/blk-mq-debugfs.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
 
-Cheers,
+In commit e869b5462f83 ("blk-mq: Unregister debugfs attributes
+earlier"), we shuffled the debugfs cleanup around so that the "state"
+attribute was removed before we freed the blk-mq data structures.
+However, later changes are going to undo that, so we need to explicitly
+disallow running a dead queue.
 
-Hannes
+[Omar: rebased and updated commit message]
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+---
+ block/blk-mq-debugfs.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 1579af6fcbed..347fbb8e059c 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -102,6 +102,14 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+ 	struct request_queue *q = data;
+ 	char opbuf[16] = { }, *op;
+ 
++	/*
++	 * The "state" attribute is removed after blk_cleanup_queue() has called
++	 * blk_mq_free_queue(). Return if QUEUE_FLAG_DEAD has been set to avoid
++	 * triggering a use-after-free.
++	 */
++	if (blk_queue_dead(q))
++		return -ENOENT;
++
+ 	if (count >= sizeof(opbuf)) {
+ 		pr_err("%s: operation too long\n", __func__);
+ 		goto inval;
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.12.2
