@@ -1,56 +1,48 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        "Jeff Layton" <jlayton@poochiereds.net>, Jens Axboe <axboe@fb.com>,
-        "Christoph Hellwig" <hch@lst.de>, Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>, <linux-nfs@vger.kernel.org>,
-        <linux-block@vger.kernel.org>
-Subject: [PATCH 05/18] nfsd: Check private request size before submitting a SCSI request
-Date: Fri, 19 May 2017 11:30:03 -0700
-Message-ID: <20170519183016.12646-6-bart.vanassche@sandisk.com>
-In-Reply-To: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-References: <20170519183016.12646-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:45191 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751913AbdEDLZu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 May 2017 07:25:50 -0400
+Subject: Re: [PATCH v2 07/12] blk-mq: Do not invoke queue operations on a dead
+ queue
+To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org
+References: <cover.1493882751.git.osandov@fb.com>
+ <71712db1ecbe0432055c4976314a57485fff7f18.1493882751.git.osandov@fb.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e6bb2a84-9fff-4fba-0ee5-e56b655f1668@suse.de>
+Date: Thu, 4 May 2017 13:25:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <71712db1ecbe0432055c4976314a57485fff7f18.1493882751.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Since using scsi_req() is only allowed against request queues for which
-struct scsi_request is the first member of their private request
-data, refuse to register block layer queues for which the private
-data is smaller than struct scsi_request.
+On 05/04/2017 09:31 AM, Omar Sandoval wrote:
+> From: Bart Van Assche <bart.vanassche@sandisk.com>
+> 
+> In commit e869b5462f83 ("blk-mq: Unregister debugfs attributes
+> earlier"), we shuffled the debugfs cleanup around so that the "state"
+> attribute was removed before we freed the blk-mq data structures.
+> However, later changes are going to undo that, so we need to explicitly
+> disallow running a dead queue.
+> 
+> [Omar: rebased and updated commit message]
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> ---
+>  block/blk-mq-debugfs.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: J. Bruce Fields <bfields@fieldses.org>
-Cc: Jeff Layton <jlayton@poochiereds.net>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: linux-nfs@vger.kernel.org
-Cc: linux-block@vger.kernel.org
----
- fs/nfsd/blocklayout.c | 3 +++
- 1 file changed, 3 insertions(+)
+Cheers,
 
-diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
-index fb5213afc854..90d1df31491b 100644
---- a/fs/nfsd/blocklayout.c
-+++ b/fs/nfsd/blocklayout.c
-@@ -219,6 +219,9 @@ static int nfsd4_scsi_identify_device(struct block_device *bdev,
- 	u8 *buf, *d, type, assoc;
- 	int error;
- 
-+	if (WARN_ON_ONCE(blk_queue_cmd_size(q) < sizeof(struct scsi_request)))
-+		return -EINVAL;
-+
- 	buf = kzalloc(bufflen, GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
+Hannes
 -- 
-2.12.2
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
