@@ -1,37 +1,48 @@
-Return-Path: <ulf.hansson@linaro.org>
-Return-Path: <ulf.hansson@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	linux-block@vger.kernel.org,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Mark Brown <broonie@kernel.org>,
-	Adrian Hunter <adrian.hunter@intel.com>
-Subject: [RFC PATCH 0/3] mmc: core: Prepare mmc host locking for blk-mq
-Date: Thu, 11 May 2017 14:38:59 +0200
-Message-Id: <1494506343-28572-1-git-send-email-ulf.hansson@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:45224 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751905AbdEDL0R (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 May 2017 07:26:17 -0400
+Subject: Re: [PATCH v2 08/12] blk-mq: move debugfs declarations to a separate
+ header file
+To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org
+References: <cover.1493882751.git.osandov@fb.com>
+ <14d98327e1b274f2d39f7988faf1614a9a06716b.1493882751.git.osandov@fb.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5a9f9fe6-1e22-3bce-0848-69b87823b194@suse.de>
+Date: Thu, 4 May 2017 13:26:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <14d98327e1b274f2d39f7988faf1614a9a06716b.1493882751.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The current APIs, mmc_claim|release_host() doesn't play well when the mmc block
-device driver tries to convert to blk-mq. In principle we need a re-claiming
-possibility of the host from the mmc block device driver, and to know when to
-release the host, need to keep track of a reference count instead.
+On 05/04/2017 09:31 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> Preparation for adding more declarations.
+> 
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-core.c       |  1 +
+>  block/blk-mq-debugfs.c |  1 +
+>  block/blk-mq-debugfs.h | 29 +++++++++++++++++++++++++++++
+>  block/blk-mq-sysfs.c   |  1 +
+>  block/blk-mq.h         | 28 ----------------------------
+>  block/blk-sysfs.c      |  1 +
+>  6 files changed, 33 insertions(+), 28 deletions(-)
+>  create mode 100644 block/blk-mq-debugfs.h
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-This series, so far untested, implements the idea from above. Sent as an RFC
-just to get peoples opinion of whether this is an approach that could work.
+Cheers,
 
-Ulf Hansson (3):
-  mmc: sdio: Don't use abort-able claim host method from SDIO IRQ thread
-  mmc: core: Remove redundant abort-able claim host API
-  mmc: core: Allow mmc block device to re-claim the host
-
- drivers/mmc/core/core.c     | 33 ++++++++++++++-------------------
- drivers/mmc/core/core.h     | 10 ++--------
- drivers/mmc/core/sdio_irq.c | 10 ++++++----
- include/linux/mmc/host.h    |  2 +-
- 4 files changed, 23 insertions(+), 32 deletions(-)
-
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
