@@ -1,47 +1,42 @@
-Return-Path: <mka@google.com>
-Return-Path: <mka@google.com>
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Douglas Anderson <dianders@chromium.org>,
-	Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH 2/3] cfq-iosched: Fix warning about unused dummy functions
-Date: Fri, 26 May 2017 14:22:36 -0700
-Message-Id: <20170526212237.103525-3-mka@chromium.org>
-In-Reply-To: <20170526212237.103525-1-mka@chromium.org>
-References: <20170526212237.103525-1-mka@chromium.org>
+Date: Thu, 4 May 2017 08:22:17 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+Subject: Re: [PATCH v2 10/12] blk-mq-debugfs: allow schedulers to register
+ debugfs attributes
+Message-ID: <20170504142217.GC9292@kernel.dk>
+References: <cover.1493882751.git.osandov@fb.com>
+ <006e6393f62e9ac84d7ee76634b80cb4fe49b66e.1493882751.git.osandov@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <006e6393f62e9ac84d7ee76634b80cb4fe49b66e.1493882751.git.osandov@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Only define dummies for cfqg_stats_set_start_group_wait_time()
-and cfqg_stats_end_empty_time() when CONFIG_CFQ_GROUP_IOSCHED=y. This
-fixes the following warnings when building with clang:
+On Thu, May 04 2017, Omar Sandoval wrote:
+> diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+> index 596e9b16d3d1..29ecb43aa412 100644
+> --- a/block/blk-mq-debugfs.h
+> +++ b/block/blk-mq-debugfs.h
+> @@ -2,6 +2,15 @@
+>  #define INT_BLK_MQ_DEBUGFS_H
+>  
+>  #ifdef CONFIG_BLK_DEBUG_FS
+> +struct blk_mq_debugfs_attr {
+> +	const char *name;
+> +	umode_t mode;
+> +	int (*show)(void *, struct seq_file *);
+> +	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
+> +	/* Set either .show or .seq_ops. */
+> +	const struct seq_operations *seq_ops;
+> +};
+> +
+>  int blk_mq_debugfs_register(struct request_queue *q);
+>  void blk_mq_debugfs_unregister(struct request_queue *q);
+>  int blk_mq_debugfs_register_hctx(struct request_queue *q,
 
-    block/cfq-iosched.c:589:20: error: unused function
-        'cfqg_stats_set_start_group_wait_time' [-Werror,-Wunused-function]
+This needs a <linux/seq_file.h> include in blk-mq-debugfs.h, or my
+compile starts breaking on both kyber and mq-deadline.
 
-    block/cfq-iosched.c:590:20: error: unused function
-        'cfqg_stats_end_empty_time' [-Werror,-Wunused-function]
-
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
- block/cfq-iosched.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 36ab3645effc..b23c73db4cc0 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -588,8 +588,10 @@ static void cfqg_stats_update_avg_queue_size(struct cfq_group *cfqg)
- 
- #else	/* CONFIG_CFQ_GROUP_IOSCHED && CONFIG_DEBUG_BLK_CGROUP */
- 
-+#ifdef CONFIG_CFQ_GROUP_IOSCHED
- static inline void cfqg_stats_set_start_group_wait_time(struct cfq_group *cfqg, struct cfq_group *curr_cfqg) { }
- static inline void cfqg_stats_end_empty_time(struct cfqg_stats *stats) { }
-+#endif
- static inline void cfqg_stats_update_dequeue(struct cfq_group *cfqg) { }
- static inline void cfqg_stats_set_start_empty_time(struct cfq_group *cfqg) { }
- static inline void cfqg_stats_update_idle_time(struct cfq_group *cfqg) { }
 -- 
-2.13.0.219.gdb65acc882-goog
+Jens Axboe
