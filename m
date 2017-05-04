@@ -1,30 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:62074 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751473AbdEDXRZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 19:17:25 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "osandov@osandov.com" <osandov@osandov.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:45554 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750758AbdEDL3d (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 May 2017 07:29:33 -0400
 Subject: Re: [PATCH v2 11/12] kyber: add debugfs attributes
-Date: Thu, 4 May 2017 23:17:20 +0000
-Message-ID: <1493939840.2692.18.camel@sandisk.com>
+To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org
 References: <cover.1493882751.git.osandov@fb.com>
-         <13ff6ed57d5acc649cb34415596bfd75c96471eb.1493882751.git.osandov@fb.com>
-In-Reply-To: <13ff6ed57d5acc649cb34415596bfd75c96471eb.1493882751.git.osandov@fb.com>
-Content-Type: text/plain; charset="iso-8859-1"
+ <13ff6ed57d5acc649cb34415596bfd75c96471eb.1493882751.git.osandov@fb.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <34a2bd6e-355e-6dd5-11d8-8473f9bf0c5f@suse.de>
+Date: Thu, 4 May 2017 13:29:31 +0200
 MIME-Version: 1.0
+In-Reply-To: <13ff6ed57d5acc649cb34415596bfd75c96471eb.1493882751.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, 2017-05-04 at 00:31 -0700, Omar Sandoval wrote:
-> +#define KYBER_DEBUGFS_DOMAIN_ATTRS(domain, name)
+On 05/04/2017 09:31 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> Expose the domain token pools, asynchronous sbitmap depth, domain
+> request lists, and batching state.
+> 
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq-debugfs.c |   3 +-
+>  block/blk-mq-debugfs.h |   2 +
+>  block/kyber-iosched.c  | 130 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 134 insertions(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Hello Omar,
+Cheers,
 
-That's a really long macro name. Have you considered to leave out "_DOMAIN"
-from the name of this and related macros?
-
-Bart.=
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
