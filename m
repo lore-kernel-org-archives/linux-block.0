@@ -1,53 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:38500 "EHLO
-        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752710AbdECJTb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2017 05:19:31 -0400
-Received: by mail-wm0-f53.google.com with SMTP id r190so50217359wme.1
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2017 02:19:30 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/2] lightnvm: fix bad back free on error path
-Date: Wed,  3 May 2017 11:19:05 +0200
-Message-Id: <1493803145-18082-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1493803145-18082-1-git-send-email-javier@cnexlabs.com>
-References: <1493803145-18082-1-git-send-email-javier@cnexlabs.com>
+Received: from mx2.suse.de ([195.135.220.15]:44622 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752337AbdEDLTR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 May 2017 07:19:17 -0400
+Subject: Re: [PATCH v2 01/12] blk-mq-debugfs: separate flags with |
+To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org
+References: <cover.1493882751.git.osandov@fb.com>
+ <a93a27c6300f9a129b8d897bff289a19e4d59704.1493882751.git.osandov@fb.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <6503166d-ba56-1698-9d0c-62a8f0f78e2c@suse.de>
+Date: Thu, 4 May 2017 13:19:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <a93a27c6300f9a129b8d897bff289a19e4d59704.1493882751.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Free memory correctly when an allocation fails on a loop and we free
-backwards previously successful allocations.
+On 05/04/2017 09:31 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> This reads more naturally than spaces.
+> 
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq-debugfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Cheers,
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 54a06c3a2b8c..6a4aa608ad95 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -74,7 +74,7 @@ static int nvm_reserve_luns(struct nvm_dev *dev, int lun_begin, int lun_end)
- 
- 	return 0;
- err:
--	while (--i > lun_begin)
-+	while (--i >= lun_begin)
- 		clear_bit(i, dev->lun_map);
- 
- 	return -EBUSY;
-@@ -211,7 +211,7 @@ static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
- 
- 	return tgt_dev;
- err_ch:
--	while (--i > 0)
-+	while (--i >= 0)
- 		kfree(dev_map->chnls[i].lun_offs);
- 	kfree(luns);
- err_luns:
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
