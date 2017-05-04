@@ -1,71 +1,51 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 07/27] orangefs: don't call filemap_write_and_wait from fsync
-Date: Tue,  9 May 2017 11:49:10 -0400
-Message-Id: <20170509154930.29524-8-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 4 May 2017 10:12:33 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH V2 4/5] blk-mq: use hw tag for scheduling if hw tag space
+ is big enough
+Message-ID: <20170504021232.GB16084@ming.t460p>
+References: <20170503195839.6539-1-ming.lei@redhat.com>
+ <20170503195839.6539-5-ming.lei@redhat.com>
+ <20170503201444.GA29177@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170503201444.GA29177@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Orangefs doesn't do buffered writes yet, so there's no point in
-initiating and waiting for writeback.
+On Wed, May 03, 2017 at 02:14:45PM -0600, Jens Axboe wrote:
+> On Thu, May 04 2017, Ming Lei wrote:
+> > diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+> > index edafb5383b7b..241d23c18181 100644
+> > --- a/block/blk-mq-sched.h
+> > +++ b/block/blk-mq-sched.h
+> > @@ -129,4 +136,19 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+> >  	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+> >  }
+> >  
+> > +/*
+> > + * If this queue has enough hardware tags and doesn't share tags with
+> > + * other queues, just use hw tag directly for scheduling.
+> > + */
+> > +static inline bool blk_mq_sched_may_use_hw_tag(struct request_queue *q)
+> > +{
+> > +	if (q->tag_set->flags & BLK_MQ_F_TAG_SHARED)
+> > +		return false;
+> > +
+> > +	if (blk_mq_get_queue_depth(q) < q->nr_requests)
+> > +		return false;
+> > +
+> > +	return true;
+> > +}
+> > +
+> 
+> Let's put that in block/blk-mq-sched.c instead, especially since it
+> grows more code in the next patch.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Mike Marshall <hubcap@omnibond.com>
----
- fs/orangefs/file.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+OK, will do it in V3.
 
-diff --git a/fs/orangefs/file.c b/fs/orangefs/file.c
-index e6bbc8083d77..17ab42c4db52 100644
---- a/fs/orangefs/file.c
-+++ b/fs/orangefs/file.c
-@@ -646,14 +646,11 @@ static int orangefs_fsync(struct file *file,
- 		       loff_t end,
- 		       int datasync)
- {
--	int ret = -EINVAL;
-+	int ret;
- 	struct orangefs_inode_s *orangefs_inode =
- 		ORANGEFS_I(file_inode(file));
- 	struct orangefs_kernel_op_s *new_op = NULL;
- 
--	/* required call */
--	filemap_write_and_wait_range(file->f_mapping, start, end);
--
- 	new_op = op_alloc(ORANGEFS_VFS_OP_FSYNC);
- 	if (!new_op)
- 		return -ENOMEM;
--- 
-2.9.3
+Thanks,
+Ming
