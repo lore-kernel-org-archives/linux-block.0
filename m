@@ -1,25 +1,39 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 5 May 2017 10:57:13 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	target-devel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com
-Subject: Re: remove REQ_OP_WRITE_SAME
-Message-ID: <20170505085713.GA5008@lst.de>
-References: <20170412084809.8245-1-hch@lst.de> <yq1mvbjwwvl.fsf@oracle.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:24293 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750969AbdEDXHB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 19:07:01 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "osandov@osandov.com" <osandov@osandov.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: "kernel-team@fb.com" <kernel-team@fb.com>
+Subject: Re: [PATCH v2 03/12] blk-mq-debugfs: error on long write to queue
+ "state" file
+Date: Thu, 4 May 2017 23:06:58 +0000
+Message-ID: <1493939217.2692.13.camel@sandisk.com>
+References: <cover.1493882751.git.osandov@fb.com>
+         <859ef1939e07171f902b4fbb5bebbb274d68df18.1493882751.git.osandov@fb.com>
+In-Reply-To: <859ef1939e07171f902b4fbb5bebbb274d68df18.1493882751.git.osandov@fb.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <yq1mvbjwwvl.fsf@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, Apr 13, 2017 at 10:23:10PM -0400, Martin K. Petersen wrote:
-> The other thing that keeps me a bit on the fence is that a bunch of the
-> plumbing to handle a bio with a payload different from bi_size is needed
-> for the copy offload token. I'm hoping to have those patches ready for
-> 4.13. Right now there are a bunch of places where handling of
-> REQ_OP_COPY_IN and REQ_OP_COPY_OUT share conditionals with WRITE SAME.
+On Thu, 2017-05-04 at 00:31 -0700, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+>=20
+> blk_queue_flags_store() currently truncates and returns a short write if
+> the operation being written is too long. This can give us weird results,
+> like here:
+>=20
+> $ echo "run            bar"
+> echo: write error: invalid argument
+> $ dmesg
+> [ 1103.075435] blk_queue_flags_store: unsupported operation bar. Use eith=
+er 'run' or 'start'
+>=20
+> Instead, return an error if the user does this. While we're here, make
+> the argument names consistent with everywhere else in this file.
 
-Any chance to get a sneak preview of that work?
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>=
