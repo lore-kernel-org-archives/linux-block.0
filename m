@@ -1,22 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f49.google.com ([209.85.218.49]:34449 "EHLO
-        mail-oi0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751400AbdEEWZE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2017 18:25:04 -0400
-Received: by mail-oi0-f49.google.com with SMTP id b204so2396245oii.1
-        for <linux-block@vger.kernel.org>; Fri, 05 May 2017 15:25:04 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1494016773.30303.69.camel@hpe.com>
-References: <20170427063054.soejyqocqqrihfdw@gmail.com> <149340820800.28724.16189291963486607562.stgit@dwillia2-desk3.amr.corp.intel.com>
- <1494016773.30303.69.camel@hpe.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Fri, 5 May 2017 15:25:03 -0700
-Message-ID: <CAPcyv4igCk9EBXSCVr8W1B-oNwq8q5kr7AMTkwvnMAhdwMgjRA@mail.gmail.com>
-Subject: Re: [PATCH v2] x86, uaccess: introduce copy_from_iter_wt for pmem /
- writethrough operations
-To: "Kani, Toshimitsu" <toshi.kani@hpe.com>
-Cc: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Received: from g9t1613g.houston.hpe.com ([15.241.32.99]:34000 "EHLO
+        g9t1613g.houston.hpe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755319AbdEEUjt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2017 16:39:49 -0400
+From: "Kani, Toshimitsu" <toshi.kani@hpe.com>
+To: "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "jmoyer@redhat.com" <jmoyer@redhat.com>,
         "tglx@linutronix.de" <tglx@linutronix.de>,
@@ -28,70 +18,57 @@ Cc: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "ross.zwisler@linux.intel.com" <ross.zwisler@linux.intel.com>,
         "jack@suse.cz" <jack@suse.cz>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v2] x86, uaccess: introduce copy_from_iter_wt for pmem /
+ writethrough operations
+Date: Fri, 5 May 2017 20:39:40 +0000
+Message-ID: <1494016773.30303.69.camel@hpe.com>
+References: <20170427063054.soejyqocqqrihfdw@gmail.com>
+         <149340820800.28724.16189291963486607562.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <149340820800.28724.16189291963486607562.stgit@dwillia2-desk3.amr.corp.intel.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, May 5, 2017 at 1:39 PM, Kani, Toshimitsu <toshi.kani@hpe.com> wrote:
-> On Fri, 2017-04-28 at 12:39 -0700, Dan Williams wrote:
->> The pmem driver has a need to transfer data with a persistent memory
->> destination and be able to rely on the fact that the destination
->> writes are not cached. It is sufficient for the writes to be flushed
->> to a cpu-store-buffer (non-temporal / "movnt" in x86 terms), as we
->> expect userspace to call fsync() to ensure data-writes have reached a
->> power-fail-safe zone in the platform. The fsync() triggers a REQ_FUA
->> or REQ_FLUSH to the pmem driver which will turn around and fence
->> previous writes with an "sfence".
->>
->> Implement a __copy_from_user_inatomic_wt, memcpy_page_wt, and
->> memcpy_wt, that guarantee that the destination buffer is not dirty in
->> the cpu cache on completion. The new copy_from_iter_wt and sub-
->> routines will be used to replace the "pmem api" (include/linux/pmem.h
->> + arch/x86/include/asm/pmem.h). The availability of
->> copy_from_iter_wt() and memcpy_wt() are gated by the
->> CONFIG_ARCH_HAS_UACCESS_WT config symbol, and fallback to
->> copy_from_iter_nocache() and plain memcpy() otherwise.
->>
->> This is meant to satisfy the concern from Linus that if a driver
->> wants to do something beyond the normal nocache semantics it should
->> be something private to that driver [1], and Al's concern that
->> anything uaccess related belongs with the rest of the uaccess code
->> [2].
->>
->> [1]: https://lists.01.org/pipermail/linux-nvdimm/2017-January/008364.
->> html
->> [2]: https://lists.01.org/pipermail/linux-nvdimm/2017-April/009942.ht
->> ml
->>
->> Cc: <x86@kernel.org>
->> Cc: Jan Kara <jack@suse.cz>
->> Cc: Jeff Moyer <jmoyer@redhat.com>
->> Cc: Ingo Molnar <mingo@redhat.com>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: "H. Peter Anvin" <hpa@zytor.com>
->> Cc: Al Viro <viro@zeniv.linux.org.uk>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Matthew Wilcox <mawilcox@microsoft.com>
->> Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
->> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
->> ---
->> Changes since the initial RFC:
->> * s/writethru/wt/ since we already have ioremap_wt(),
->> set_memory_wt(), etc. (Ingo)
->
-> Sorry I should have said earlier, but I think the term "wt" is
-> misleading.  Non-temporal stores used in memcpy_wt() provide WC
-> semantics, not WT semantics.
-
-The non-temporal stores do, but memcpy_wt() is using a combination of
-non-temporal stores and explicit cache flushing.
-
-> How about using "nocache" as it's been
-> used in __copy_user_nocache()?
-
-The difference in my mind is that the "_nocache" suffix indicates
-opportunistic / optional cache pollution avoidance whereas "_wt"
-strictly arranges for caches not to contain dirty data upon completion
-of the routine. For example, non-temporal stores on older x86 cpus
-could potentially leave dirty data in the cache, so memcpy_wt on those
-cpus would need to use explicit cache flushing.
+T24gRnJpLCAyMDE3LTA0LTI4IGF0IDEyOjM5IC0wNzAwLCBEYW4gV2lsbGlhbXMgd3JvdGU6DQo+
+IFRoZSBwbWVtIGRyaXZlciBoYXMgYSBuZWVkIHRvIHRyYW5zZmVyIGRhdGEgd2l0aCBhIHBlcnNp
+c3RlbnQgbWVtb3J5DQo+IGRlc3RpbmF0aW9uIGFuZCBiZSBhYmxlIHRvIHJlbHkgb24gdGhlIGZh
+Y3QgdGhhdCB0aGUgZGVzdGluYXRpb24NCj4gd3JpdGVzIGFyZSBub3QgY2FjaGVkLiBJdCBpcyBz
+dWZmaWNpZW50IGZvciB0aGUgd3JpdGVzIHRvIGJlIGZsdXNoZWQNCj4gdG8gYSBjcHUtc3RvcmUt
+YnVmZmVyIChub24tdGVtcG9yYWwgLyAibW92bnQiIGluIHg4NiB0ZXJtcyksIGFzIHdlDQo+IGV4
+cGVjdCB1c2Vyc3BhY2UgdG8gY2FsbCBmc3luYygpIHRvIGVuc3VyZSBkYXRhLXdyaXRlcyBoYXZl
+IHJlYWNoZWQgYQ0KPiBwb3dlci1mYWlsLXNhZmUgem9uZSBpbiB0aGUgcGxhdGZvcm0uIFRoZSBm
+c3luYygpIHRyaWdnZXJzIGEgUkVRX0ZVQQ0KPiBvciBSRVFfRkxVU0ggdG8gdGhlIHBtZW0gZHJp
+dmVyIHdoaWNoIHdpbGwgdHVybiBhcm91bmQgYW5kIGZlbmNlDQo+IHByZXZpb3VzIHdyaXRlcyB3
+aXRoIGFuICJzZmVuY2UiLg0KPiANCj4gSW1wbGVtZW50IGEgX19jb3B5X2Zyb21fdXNlcl9pbmF0
+b21pY193dCwgbWVtY3B5X3BhZ2Vfd3QsIGFuZA0KPiBtZW1jcHlfd3QsIHRoYXQgZ3VhcmFudGVl
+IHRoYXQgdGhlIGRlc3RpbmF0aW9uIGJ1ZmZlciBpcyBub3QgZGlydHkgaW4NCj4gdGhlIGNwdSBj
+YWNoZSBvbiBjb21wbGV0aW9uLiBUaGUgbmV3IGNvcHlfZnJvbV9pdGVyX3d0IGFuZCBzdWItDQo+
+IHJvdXRpbmVzIHdpbGwgYmUgdXNlZCB0byByZXBsYWNlIHRoZSAicG1lbSBhcGkiIChpbmNsdWRl
+L2xpbnV4L3BtZW0uaA0KPiArIGFyY2gveDg2L2luY2x1ZGUvYXNtL3BtZW0uaCkuIFRoZSBhdmFp
+bGFiaWxpdHkgb2YNCj4gY29weV9mcm9tX2l0ZXJfd3QoKSBhbmQgbWVtY3B5X3d0KCkgYXJlIGdh
+dGVkIGJ5IHRoZQ0KPiBDT05GSUdfQVJDSF9IQVNfVUFDQ0VTU19XVCBjb25maWcgc3ltYm9sLCBh
+bmQgZmFsbGJhY2sgdG8NCj4gY29weV9mcm9tX2l0ZXJfbm9jYWNoZSgpIGFuZCBwbGFpbiBtZW1j
+cHkoKSBvdGhlcndpc2UuDQo+IA0KPiBUaGlzIGlzIG1lYW50IHRvIHNhdGlzZnkgdGhlIGNvbmNl
+cm4gZnJvbSBMaW51cyB0aGF0IGlmIGEgZHJpdmVyDQo+IHdhbnRzIHRvIGRvIHNvbWV0aGluZyBi
+ZXlvbmQgdGhlIG5vcm1hbCBub2NhY2hlIHNlbWFudGljcyBpdCBzaG91bGQNCj4gYmUgc29tZXRo
+aW5nIHByaXZhdGUgdG8gdGhhdCBkcml2ZXIgWzFdLCBhbmQgQWwncyBjb25jZXJuIHRoYXQNCj4g
+YW55dGhpbmcgdWFjY2VzcyByZWxhdGVkIGJlbG9uZ3Mgd2l0aCB0aGUgcmVzdCBvZiB0aGUgdWFj
+Y2VzcyBjb2RlDQo+IFsyXS4NCj4gDQo+IFsxXTogaHR0cHM6Ly9saXN0cy4wMS5vcmcvcGlwZXJt
+YWlsL2xpbnV4LW52ZGltbS8yMDE3LUphbnVhcnkvMDA4MzY0Lg0KPiBodG1sDQo+IFsyXTogaHR0
+cHM6Ly9saXN0cy4wMS5vcmcvcGlwZXJtYWlsL2xpbnV4LW52ZGltbS8yMDE3LUFwcmlsLzAwOTk0
+Mi5odA0KPiBtbA0KPiANCj4gQ2M6IDx4ODZAa2VybmVsLm9yZz4NCj4gQ2M6IEphbiBLYXJhIDxq
+YWNrQHN1c2UuY3o+DQo+IENjOiBKZWZmIE1veWVyIDxqbW95ZXJAcmVkaGF0LmNvbT4NCj4gQ2M6
+IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRoYXQuY29tPg0KPiBDYzogQ2hyaXN0b3BoIEhlbGx3aWcg
+PGhjaEBsc3QuZGU+DQo+IENjOiAiSC4gUGV0ZXIgQW52aW4iIDxocGFAenl0b3IuY29tPg0KPiBD
+YzogQWwgVmlybyA8dmlyb0B6ZW5pdi5saW51eC5vcmcudWs+DQo+IENjOiBUaG9tYXMgR2xlaXhu
+ZXIgPHRnbHhAbGludXRyb25peC5kZT4NCj4gQ2M6IE1hdHRoZXcgV2lsY294IDxtYXdpbGNveEBt
+aWNyb3NvZnQuY29tPg0KPiBDYzogUm9zcyBad2lzbGVyIDxyb3NzLnp3aXNsZXJAbGludXguaW50
+ZWwuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBEYW4gV2lsbGlhbXMgPGRhbi5qLndpbGxpYW1zQGlu
+dGVsLmNvbT4NCj4gLS0tDQo+IENoYW5nZXMgc2luY2UgdGhlIGluaXRpYWwgUkZDOg0KPiAqIHMv
+d3JpdGV0aHJ1L3d0LyBzaW5jZSB3ZSBhbHJlYWR5IGhhdmUgaW9yZW1hcF93dCgpLA0KPiBzZXRf
+bWVtb3J5X3d0KCksIGV0Yy4gKEluZ28pDQoNClNvcnJ5IEkgc2hvdWxkIGhhdmUgc2FpZCBlYXJs
+aWVyLCBidXQgSSB0aGluayB0aGUgdGVybSAid3QiIGlzDQptaXNsZWFkaW5nLiAgTm9uLXRlbXBv
+cmFsIHN0b3JlcyB1c2VkIGluIG1lbWNweV93dCgpIHByb3ZpZGUgV0MNCnNlbWFudGljcywgbm90
+IFdUIHNlbWFudGljcy4gIEhvdyBhYm91dCB1c2luZyAibm9jYWNoZSIgYXMgaXQncyBiZWVuDQp1
+c2VkIGluIF9fY29weV91c2VyX25vY2FjaGUoKT8NCg0KVGhhbmtzLA0KLVRvc2hpDQo=
