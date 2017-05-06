@@ -1,222 +1,132 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:35789 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755868AbdECTTT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2017 15:19:19 -0400
-Received: by mail-pg0-f42.google.com with SMTP id o3so77872969pgn.2
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2017 12:19:19 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
-Subject: [PATCH 9/9] mq-deadline: add debugfs attributes
-Date: Wed,  3 May 2017 12:19:02 -0700
-Message-Id: <306d6a725cd8a55578b53d15d05128979cf3a037.1493839103.git.osandov@fb.com>
-In-Reply-To: <cover.1493839103.git.osandov@fb.com>
-References: <cover.1493839103.git.osandov@fb.com>
-In-Reply-To: <cover.1493839103.git.osandov@fb.com>
-References: <cover.1493839103.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block changes for 4.12-rc1
+Message-ID: <634cb6d2-a66b-9971-71ea-f179b7a831ee@kernel.dk>
+Date: Fri, 5 May 2017 22:25:49 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Hi Linus,
 
-Expose the fifo lists, cached next requests, batching state, and
-dispatch list. It'd also be possible to add the sorted lists, but there
-aren't already seq_file helpers for rbtrees.
+Some fixes and followup features/changes that should go in, in this
+merge window. This pull request contains:
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-debugfs.c |   8 +++-
- block/blk-mq-debugfs.h |   1 +
- block/mq-deadline.c    | 123 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 130 insertions(+), 2 deletions(-)
+- Two fixes for lightnvm from Javier, fixing problems in the new code
+  merge previously in this merge window.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 6c12b4dbc8ec..3a33f7e2f68c 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -262,9 +262,8 @@ static const char *const rqf_name[] = {
- };
- #undef RQF_NAME
- 
--int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
-+int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
- {
--	struct request *rq = list_entry_rq(v);
- 	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
- 	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
- 
-@@ -287,6 +286,11 @@ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- 	return 0;
- }
- 
-+int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
-+{
-+	return __blk_mq_debugfs_rq_show(m, list_entry_rq(v));
-+}
-+
- static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
- 	__acquires(&hctx->lock)
- {
-diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-index 7c67f813a294..b72e5c5f065e 100644
---- a/block/blk-mq-debugfs.h
-+++ b/block/blk-mq-debugfs.h
-@@ -11,6 +11,7 @@ struct blk_mq_debugfs_attr {
- 	const struct seq_operations *seq_ops;
- };
- 
-+int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
- int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
- 
- int blk_mq_debugfs_register(struct request_queue *q);
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 236121633ca0..1b964a387afe 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -19,6 +19,7 @@
- 
- #include "blk.h"
- #include "blk-mq.h"
-+#include "blk-mq-debugfs.h"
- #include "blk-mq-tag.h"
- #include "blk-mq-sched.h"
- 
-@@ -517,6 +518,125 @@ static struct elv_fs_entry deadline_attrs[] = {
- 	__ATTR_NULL
- };
- 
-+#ifdef CONFIG_BLK_DEBUG_FS
-+#define DEADLINE_DEBUGFS_DDIR_ATTRS(ddir, name)				\
-+static void *deadline_##name##_fifo_start(struct seq_file *m,		\
-+					  loff_t *pos)			\
-+	__acquires(&dd->lock)						\
-+{									\
-+	struct request_queue *q = m->private;				\
-+	struct deadline_data *dd = q->elevator->elevator_data;		\
-+									\
-+	spin_lock(&dd->lock);						\
-+	return seq_list_start(&dd->fifo_list[ddir], *pos);		\
-+}									\
-+									\
-+static void *deadline_##name##_fifo_next(struct seq_file *m, void *v,	\
-+					 loff_t *pos)			\
-+{									\
-+	struct request_queue *q = m->private;				\
-+	struct deadline_data *dd = q->elevator->elevator_data;		\
-+									\
-+	return seq_list_next(v, &dd->fifo_list[ddir], pos);		\
-+}									\
-+									\
-+static void deadline_##name##_fifo_stop(struct seq_file *m, void *v)	\
-+	__releases(&dd->lock)						\
-+{									\
-+	struct request_queue *q = m->private;				\
-+	struct deadline_data *dd = q->elevator->elevator_data;		\
-+									\
-+	spin_unlock(&dd->lock);						\
-+}									\
-+									\
-+static const struct seq_operations deadline_##name##_fifo_seq_ops = {	\
-+	.start	= deadline_##name##_fifo_start,				\
-+	.next	= deadline_##name##_fifo_next,				\
-+	.stop	= deadline_##name##_fifo_stop,				\
-+	.show	= blk_mq_debugfs_rq_show,				\
-+};									\
-+									\
-+static int deadline_##name##_next_rq_show(void *data,			\
-+					  struct seq_file *m)		\
-+{									\
-+	struct request_queue *q = data;					\
-+	struct deadline_data *dd = q->elevator->elevator_data;		\
-+	struct request *rq = dd->next_rq[ddir];				\
-+									\
-+	if (rq)								\
-+		__blk_mq_debugfs_rq_show(m, rq);			\
-+	return 0;							\
-+}
-+DEADLINE_DEBUGFS_DDIR_ATTRS(READ, read)
-+DEADLINE_DEBUGFS_DDIR_ATTRS(WRITE, write)
-+#undef DEADLINE_DEBUGFS_DDIR_ATTRS
-+
-+static int deadline_batching_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	seq_printf(m, "%u\n", dd->batching);
-+	return 0;
-+}
-+
-+static int deadline_starved_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	seq_printf(m, "%u\n", dd->starved);
-+	return 0;
-+}
-+
-+static void *deadline_dispatch_start(struct seq_file *m, loff_t *pos)
-+	__acquires(&dd->lock)
-+{
-+	struct request_queue *q = m->private;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	spin_lock(&dd->lock);
-+	return seq_list_start(&dd->dispatch, *pos);
-+}
-+
-+static void *deadline_dispatch_next(struct seq_file *m, void *v, loff_t *pos)
-+{
-+	struct request_queue *q = m->private;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	return seq_list_next(v, &dd->dispatch, pos);
-+}
-+
-+static void deadline_dispatch_stop(struct seq_file *m, void *v)
-+	__releases(&dd->lock)
-+{
-+	struct request_queue *q = m->private;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	spin_unlock(&dd->lock);
-+}
-+
-+static const struct seq_operations deadline_dispatch_seq_ops = {
-+	.start	= deadline_dispatch_start,
-+	.next	= deadline_dispatch_next,
-+	.stop	= deadline_dispatch_stop,
-+	.show	= blk_mq_debugfs_rq_show,
-+};
-+
-+#define DEADLINE_QUEUE_DDIR_ATTRS(name)						\
-+	{#name "_fifo_list", 0400, .seq_ops = &deadline_##name##_fifo_seq_ops},	\
-+	{#name "_next_rq", 0400, deadline_##name##_next_rq_show}
-+static const struct blk_mq_debugfs_attr deadline_queue_debugfs_attrs[] = {
-+	DEADLINE_QUEUE_DDIR_ATTRS(read),
-+	DEADLINE_QUEUE_DDIR_ATTRS(write),
-+	{"batching", 0400, deadline_batching_show},
-+	{"starved", 0400, deadline_starved_show},
-+	{"dispatch", 0400, .seq_ops = &deadline_dispatch_seq_ops},
-+	{},
-+};
-+#undef DEADLINE_QUEUE_DDIR_ATTRS
-+#endif
-+
- static struct elevator_type mq_deadline = {
- 	.ops.mq = {
- 		.insert_requests	= dd_insert_requests,
-@@ -533,6 +653,9 @@ static struct elevator_type mq_deadline = {
- 	},
- 
- 	.uses_mq	= true,
-+#ifdef CONFIG_BLK_DEBUG_FS
-+	.queue_debugfs_attrs = deadline_queue_debugfs_attrs,
-+#endif
- 	.elevator_attrs = deadline_attrs,
- 	.elevator_name = "mq-deadline",
- 	.elevator_owner = THIS_MODULE,
+- A fix from Jan for the backing device changes, fixing an issue in NFS
+  that causes a failure to mount on certain setups.
+
+- A change from Christoph, cleaning up the blk-mq init and exit request
+  paths.
+
+- Remove elevator_change(), which is now unused. From Bart.
+
+- A fix for queue operation invocation on a dead queue, from Bart.
+
+- A series fixing up mtip32xx for blk-mq scheduling, removing a bandaid
+  we previously had in place for this. From me.
+
+- A regression fix for this series, fixing a case where we wait on
+  workqueue flushing from an invalid (non-blocking) context. From me.
+
+- A fix/optimization from Ming, ensuring that we don't both quiesce and
+  freeze a queue at the same time.
+
+- A fix from Peter on lock ordering for CPU hotplug. Not a real problem
+  right now, but will be once the CPU hotplug rework goes in.
+
+- A series from Omar, cleaning up out blk-mq debugfs support, and adding
+  support for exporting info from schedulers in debugfs as well. This is
+  really useful in debugging stalls or livelocks. From Omar.
+
+Please pull this for 4.12-rc, thanks!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Bart Van Assche (2):
+      block: Remove elevator_change()
+      blk-mq: Do not invoke queue operations on a dead queue
+
+Christoph Hellwig (1):
+      blk-mq: update ->init_request and ->exit_request prototypes
+
+Jan Kara (1):
+      nfs: Fix bdi handling for cloned superblocks
+
+Javier González (2):
+      lightnvm: create cmd before allocating request
+      lightnvm: fix bad back free on error path
+
+Jens Axboe (9):
+      mtip32xx: get rid of 'atomic' argument to mtip_exec_internal_command()
+      mtip32xx: kill atomic argument to mtip_quiesce_io()
+      mtip32xx: abstract out "are any commands active" helper
+      mtip32xx: convert internal command issue to block IO path
+      blk-mq-sched: remove hack that bypasses scheduler for reserved requests
+      Revert "mtip32xx: pass BLK_MQ_F_NO_SCHED"
+      mtip32xx: cleanup internal tag assumptions
+      mtip32xx: convert internal commands to regular block infrastructure
+      blk-mq: don't use sync workqueue flushing from drivers
+
+Ming Lei (1):
+      block: don't call blk_mq_quiesce_queue() after queue is frozen
+
+Omar Sandoval (11):
+      blk-mq-debugfs: separate flags with |
+      blk-mq-debugfs: clean up flag definitions
+      blk-mq-debugfs: error on long write to queue "state" file
+      blk-mq-debugfs: don't open code strstrip()
+      blk-mq-debugfs: rename hw queue directories from <n> to hctx<n>
+      blk-mq-debugfs: get rid of a bunch of boilerplate
+      blk-mq: move debugfs declarations to a separate header file
+      blk-mq: untangle debugfs and sysfs
+      blk-mq-debugfs: allow schedulers to register debugfs attributes
+      kyber: add debugfs attributes
+      mq-deadline: add debugfs attributes
+
+Peter Zijlstra (1):
+      block/mq: Cure cpu hotplug lock inversion
+
+ block/blk-core.c                  |   8 +-
+ block/blk-mq-debugfs.c            | 870 +++++++++++++++++---------------------
+ block/blk-mq-debugfs.h            |  82 ++++
+ block/blk-mq-sched.c              |  30 +-
+ block/blk-mq-sysfs.c              |  10 -
+ block/blk-mq.c                    |  54 ++-
+ block/blk-mq.h                    |  28 --
+ block/blk-sysfs.c                 |   3 +
+ block/elevator.c                  |  16 -
+ block/kyber-iosched.c             | 130 ++++++
+ block/mq-deadline.c               | 123 ++++++
+ drivers/block/loop.c              |   5 +-
+ drivers/block/mtip32xx/mtip32xx.c | 490 +++++++--------------
+ drivers/block/mtip32xx/mtip32xx.h |  10 -
+ drivers/block/nbd.c               |   7 +-
+ drivers/block/rbd.c               |   5 +-
+ drivers/block/virtio_blk.c        |   7 +-
+ drivers/lightnvm/core.c           |   4 +-
+ drivers/md/dm-rq.c                |   7 +-
+ drivers/mtd/ubi/block.c           |   7 +-
+ drivers/nvme/host/fc.c            |  20 +-
+ drivers/nvme/host/lightnvm.c      |   4 +-
+ drivers/nvme/host/pci.c           |  15 +-
+ drivers/nvme/host/rdma.c          |  28 +-
+ drivers/nvme/target/loop.c        |  17 +-
+ drivers/scsi/scsi_lib.c           |  13 +-
+ fs/nfs/internal.h                 |   6 +-
+ fs/nfs/super.c                    |  28 +-
+ include/linux/blk-mq.h            |   9 +-
+ include/linux/blkdev.h            |   2 +-
+ include/linux/elevator.h          |   8 +-
+ 31 files changed, 1035 insertions(+), 1011 deletions(-)
+ create mode 100644 block/blk-mq-debugfs.h
+
 -- 
-2.12.2
+Jens Axboe
