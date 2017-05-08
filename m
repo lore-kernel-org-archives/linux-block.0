@@ -1,57 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f172.google.com ([209.85.192.172]:35582 "EHLO
-        mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751485AbdEDHbr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 03:31:47 -0400
-Received: by mail-pf0-f172.google.com with SMTP id v14so3724617pfd.2
-        for <linux-block@vger.kernel.org>; Thu, 04 May 2017 00:31:46 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
-Subject: [PATCH v2 04/12] blk-mq-debugfs: don't open code strstrip()
-Date: Thu,  4 May 2017 00:31:26 -0700
-Message-Id: <65b6e5cb3c0be1eaa543a38e47512c2f45a0ace1.1493882751.git.osandov@fb.com>
-In-Reply-To: <cover.1493882751.git.osandov@fb.com>
-References: <cover.1493882751.git.osandov@fb.com>
-In-Reply-To: <cover.1493882751.git.osandov@fb.com>
-References: <cover.1493882751.git.osandov@fb.com>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33481 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750797AbdEHG4V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2017 02:56:21 -0400
+Received: by mail-wm0-f67.google.com with SMTP id y10so13278744wmh.0
+        for <linux-block@vger.kernel.org>; Sun, 07 May 2017 23:56:20 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: fix error return code of memdup_user
+To: Geliang Tang <geliangtang@gmail.com>,
+        Matias Bjorling <mb@lightnvm.io>, Jens Axboe <axboe@fb.com>
+References: <f0f70c9326edab0cc56731f24244e86f8ba84ef4.1493727412.git.geliangtang@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <879c9631-5d56-d3ad-6b7e-7b16ba1cdbde@bjorling.me>
+Date: Mon, 8 May 2017 08:56:18 +0200
+MIME-Version: 1.0
+In-Reply-To: <f0f70c9326edab0cc56731f24244e86f8ba84ef4.1493727412.git.geliangtang@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
 
-Slightly more readable, plus we also strip leading spaces.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-debugfs.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+On 05/06/2017 05:34 PM, Geliang Tang wrote:
+> The error return code of memdup_user() should be -ENOMEM or -EFAULT.
+> So this patch changed it to PTR_ERR(info).
+>
+> Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+> ---
+>  drivers/lightnvm/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index 54a06c3..e8b5edd 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -1164,7 +1164,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+>
+>  	info = memdup_user(arg, sizeof(struct nvm_ioctl_info));
+>  	if (IS_ERR(info))
+> -		return -EFAULT;
+> +		return PTR_ERR(info);
+>
+>  	info->version[0] = NVM_VERSION_MAJOR;
+>  	info->version[1] = NVM_VERSION_MINOR;
+>
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 2a19237455d4..109ae9f3d400 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -111,17 +111,16 @@ static ssize_t blk_queue_flags_store(struct file *file, const char __user *buf,
- 				     size_t count, loff_t *ppos)
- {
- 	struct request_queue *q = file_inode(file)->i_private;
--	char op[16] = { }, *s;
-+	char opbuf[16] = { }, *op;
- 
--	if (count >= sizeof(op)) {
-+	if (count >= sizeof(opbuf)) {
- 		pr_err("%s: operation too long\n", __func__);
- 		goto inval;
- 	}
- 
--	if (copy_from_user(op, buf, count))
-+	if (copy_from_user(opbuf, buf, count))
- 		return -EFAULT;
--	s = op;
--	strsep(&s, " \t\n"); /* strip trailing whitespace */
-+	op = strstrip(opbuf);
- 	if (strcmp(op, "run") == 0) {
- 		blk_mq_run_hw_queues(q, true);
- 	} else if (strcmp(op, "start") == 0) {
--- 
-2.12.2
+Thanks Geliang. Jens, would you pick this beauty up? :)
+
+Reviewed-by: Matias Bj�rling <matias@cnexlabs.com>
