@@ -1,25 +1,41 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: make __blk_mq_stop_hw_queues static
-To: Colin King <colin.king@canonical.com>, linux-block@vger.kernel.org
-References: <20170508104440.10945-1-colin.king@canonical.com>
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <11c54006-03bf-4532-970f-2d5fecf734a6@kernel.dk>
-Date: Mon, 8 May 2017 08:09:57 -0600
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-mq: make __blk_mq_stop_hw_queues static
+Date: Mon,  8 May 2017 11:44:40 +0100
+Message-Id: <20170508104440.10945-1-colin.king@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20170508104440.10945-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/08/2017 04:44 AM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> Making __blk_mq_stop_hw_queues static fixes sparse warning:
-> 
->   block/blk-mq.c:6: warning: symbol '__blk_mq_stop_hw_queues' was not
->   declared. Should it be static?
+From: Colin Ian King <colin.king@canonical.com>
 
-Thanks, added.
+Making __blk_mq_stop_hw_queues static fixes sparse warning:
 
+  block/blk-mq.c:6: warning: symbol '__blk_mq_stop_hw_queues' was not
+  declared. Should it be static?
+
+Fixes: 2719aa217e0d0 ("blk-mq: don't use sync workqueue flushing from drivers")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5d4ce7eb8dbf..5385fc89a6d2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1236,7 +1236,7 @@ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ }
+ EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+ 
+-void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
++static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
 -- 
-Jens Axboe
+2.11.0
