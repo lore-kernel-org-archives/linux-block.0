@@ -1,74 +1,25 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 08/10] ext4: nowait aio support
-Date: Wed, 24 May 2017 11:41:48 -0500
-Message-Id: <20170524164150.9492-9-rgoldwyn@suse.de>
-In-Reply-To: <20170524164150.9492-1-rgoldwyn@suse.de>
-References: <20170524164150.9492-1-rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX] block, bfq: use pointer entity->sched_data only if
+ set
+To: Paolo Valente <paolo.valente@linaro.org>
+References: <20170509093727.2595-1-paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <884a6d3c-40aa-c2a6-9981-82d48148429b@kernel.dk>
+Date: Tue, 9 May 2017 08:53:52 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170509093727.2595-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On 05/09/2017 03:37 AM, Paolo Valente wrote:
+> In the function __bfq_deactivate_entity, the pointer
+> entity->sched_data could happen to be used before being properly
+> initialized. This led to a NULL pointer dereference. This commit fixes
+> this bug by just using this pointer only where it is safe to do so.
 
-Return EAGAIN if any of the following checks fail for direct I/O:
-  + i_rwsem is lockable
-  + Writing beyond end of file (will trigger allocation)
-  + Blocks are not allocated at the write location
+Added, thanks.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- fs/ext4/file.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
-
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 831fd6beebf0..07f08ff2c11b 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -216,7 +216,13 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		return ext4_dax_write_iter(iocb, from);
- #endif
- 
--	inode_lock(inode);
-+	if (iocb->ki_flags & IOCB_NOWAIT) {
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+	} else {
-+		inode_lock(inode);
-+	}
-+
- 	ret = ext4_write_checks(iocb, from);
- 	if (ret <= 0)
- 		goto out;
-@@ -235,9 +241,15 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 
- 	iocb->private = &overwrite;
- 	/* Check whether we do a DIO overwrite or not */
--	if (o_direct && ext4_should_dioread_nolock(inode) && !unaligned_aio &&
--	    ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from)))
--		overwrite = 1;
-+	if (o_direct && !unaligned_aio) {
-+		if (ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from))) {
-+			if (ext4_should_dioread_nolock(inode))
-+				overwrite = 1;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
-+		}
-+	}
- 
- 	ret = __generic_file_write_iter(iocb, from);
- 	inode_unlock(inode);
 -- 
-2.12.0
+Jens Axboe
