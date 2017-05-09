@@ -1,100 +1,87 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
 	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
 	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 8/8] nowait aio: btrfs
-Date: Tue,  9 May 2017 07:22:19 -0500
-Message-Id: <20170509122219.31756-9-rgoldwyn@suse.de>
-In-Reply-To: <20170509122219.31756-1-rgoldwyn@suse.de>
-References: <20170509122219.31756-1-rgoldwyn@suse.de>
+	josef@toxicpanda.com,
+	hubcap@omnibond.com,
+	rpeterso@redhat.com,
+	bo.li.liu@oracle.com
+Subject: [PATCH v4 16/27] fs: adapt sync_file_range to new reporting infrastructure
+Date: Tue,  9 May 2017 11:49:19 -0400
+Message-Id: <20170509154930.29524-17-jlayton@redhat.com>
+In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
+References: <20170509154930.29524-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Since it returns errors in a way similar to fsync, have it use the same
+method for returning previously-reported writeback errors.
 
-Return EAGAIN if any of the following checks fail
- + i_rwsem is not lockable
- + NODATACOW or PREALLOC is not set
- + Cannot nocow at the desired location
- + Writing beyond end of file which is not allocated
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Acked-by: David Sterba <dsterba@suse.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
- fs/btrfs/inode.c |  3 +++
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ fs/sync.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 520cb7230b2d..a870e5dd2b4d 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1823,12 +1823,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	ssize_t num_written = 0;
- 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
- 	ssize_t err;
--	loff_t pos;
--	size_t count;
-+	loff_t pos = iocb->ki_pos;
-+	size_t count = iov_iter_count(from);
- 	loff_t oldsize;
- 	int clean_page = 0;
+diff --git a/fs/sync.c b/fs/sync.c
+index 11ba023434b1..89a03b5252d2 100644
+--- a/fs/sync.c
++++ b/fs/sync.c
+@@ -271,8 +271,11 @@ SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
+  *
+  *
+  * SYNC_FILE_RANGE_WAIT_BEFORE and SYNC_FILE_RANGE_WAIT_AFTER will detect any
+- * I/O errors or ENOSPC conditions and will return those to the caller, after
+- * clearing the EIO and ENOSPC flags in the address_space.
++ * error condition that occurred prior to or after writeback, and will return
++ * that to the caller, while advancing the file's errseq_t cursor. Note that
++ * any errors returned here may have occurred in an area of the file that is
++ * not covered by the given range as most filesystems track writeback errors
++ * on a per-address_space basis
+  *
+  * It should be noted that none of these operations write out the file's
+  * metadata.  So unless the application is strictly performing overwrites of
+@@ -282,7 +285,7 @@ SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
+ SYSCALL_DEFINE4(sync_file_range, int, fd, loff_t, offset, loff_t, nbytes,
+ 				unsigned int, flags)
+ {
+-	int ret;
++	int ret, ret2;
+ 	struct fd f;
+ 	struct address_space *mapping;
+ 	loff_t endbyte;			/* inclusive */
+@@ -356,7 +359,9 @@ SYSCALL_DEFINE4(sync_file_range, int, fd, loff_t, offset, loff_t, nbytes,
  
--	inode_lock(inode);
-+	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-+			(iocb->ki_flags & IOCB_DIRECT)) {
-+		/* Don't sleep on inode rwsem */
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+		/*
-+		 * We will allocate space in case nodatacow is not set,
-+		 * so bail
-+		 */
-+		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
-+					      BTRFS_INODE_PREALLOC)) ||
-+		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
-+			inode_unlock(inode);
-+			return -EAGAIN;
-+		}
-+	} else
-+		inode_lock(inode);
-+
- 	err = generic_write_checks(iocb, from);
- 	if (err <= 0) {
- 		inode_unlock(inode);
-@@ -1862,8 +1879,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	 */
- 	update_time_for_write(inode);
- 
--	pos = iocb->ki_pos;
--	count = iov_iter_count(from);
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
- 	if (start_pos > oldsize) {
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 5e71f1ea3391..47d3fcd86979 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8625,6 +8625,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			dio_data.overwrite = 1;
- 			inode_unlock(inode);
- 			relock = true;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
- 		}
- 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
- 		if (ret)
+ 	if (flags & SYNC_FILE_RANGE_WAIT_AFTER)
+ 		ret = filemap_fdatawait_range(mapping, offset, endbyte);
+-
++	ret2 = filemap_report_wb_error(f.file);
++	if (!ret)
++		ret = ret2;
+ out_put:
+ 	fdput(f);
+ out:
 -- 
-2.12.0
+2.9.3
