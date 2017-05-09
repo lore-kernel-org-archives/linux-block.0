@@ -1,120 +1,44 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, "Don
- Brace" <don.brace@microsemi.com>
-Subject: [PATCH v2 2/6] block: Introduce queue flag QUEUE_FLAG_SCSI_PASSTHROUGH
-Date: Wed, 31 May 2017 14:43:46 -0700
-Message-ID: <20170531214350.31157-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
-References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f65.google.com ([209.85.214.65]:34704 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752541AbdEIOVc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2017 10:21:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <149427743028.38205.11259335580114937340.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <149427742346.38205.12361226658239922137.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <149427743028.38205.11259335580114937340.stgit@dwillia2-desk3.amr.corp.intel.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 9 May 2017 16:21:30 +0200
+Message-ID: <CAMuHMdXL-nWk7nWkjJL9Zd9ObeAdjLH-OTKGWxFHFvLOPo_WmQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] device-dax: kill NR_DEV_DAX
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        linux-block@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
->From the context where a SCSI command is submitted it is not always
-possible to figure out whether or not the queue the command is
-submitted to has struct scsi_request as the first member of its
-private data. Hence introduce the flag QUEUE_FLAG_SCSI_PASSTHROUGH.
+On Mon, May 8, 2017 at 11:03 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+> There is no point to ask how many device-dax instances the kernel should
+> support. Since we are already using a dynamic major number, just allow
+> the max number of minors by default and be done. This also fixes the
+> fact that the proposed max for the NR_DEV_DAX range was larger than what
+> could be supported by alloc_chrdev_region().
+>
+> Fixes: ba09c01d2fa8 ("dax: convert to the cdev api")
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Don Brace <don.brace@microsemi.com>
----
- block/bsg-lib.c                   | 1 +
- drivers/block/cciss.c             | 1 +
- drivers/ide/ide-probe.c           | 1 +
- drivers/scsi/scsi_lib.c           | 2 ++
- drivers/scsi/scsi_transport_sas.c | 1 +
- include/linux/blkdev.h            | 3 +++
- 6 files changed, 9 insertions(+)
+Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 0a23dbba2d30..9b91daefcd9b 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -246,6 +246,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, char *name,
- 	q->bsg_job_size = dd_job_size;
- 	q->bsg_job_fn = job_fn;
- 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
-+	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
- 	blk_queue_softirq_done(q, bsg_softirq_done);
- 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
- 
-diff --git a/drivers/block/cciss.c b/drivers/block/cciss.c
-index cd375503f7b0..3761066fe89d 100644
---- a/drivers/block/cciss.c
-+++ b/drivers/block/cciss.c
-@@ -1956,6 +1956,7 @@ static int cciss_add_disk(ctlr_info_t *h, struct gendisk *disk,
- 	disk->queue->cmd_size = sizeof(struct scsi_request);
- 	disk->queue->request_fn = do_cciss_request;
- 	disk->queue->queue_lock = &h->lock;
-+	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, disk->queue);
- 	if (blk_init_allocated_queue(disk->queue) < 0)
- 		goto cleanup_queue;
- 
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 023562565d11..b3f85250dea9 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -773,6 +773,7 @@ static int ide_init_queue(ide_drive_t *drive)
- 	q->request_fn = do_ide_request;
- 	q->init_rq_fn = ide_init_rq;
- 	q->cmd_size = sizeof(struct ide_request);
-+	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
- 	if (blk_init_allocated_queue(q) < 0) {
- 		blk_cleanup_queue(q);
- 		return 1;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 99e16ac479e3..884aaa84c2dd 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2057,6 +2057,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- {
- 	struct device *dev = shost->dma_dev;
- 
-+	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
-+
- 	/*
- 	 * this limit is imposed by hardware restrictions
- 	 */
-diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
-index 0ebe2f1bb908..d16414bfe2ef 100644
---- a/drivers/scsi/scsi_transport_sas.c
-+++ b/drivers/scsi/scsi_transport_sas.c
-@@ -264,6 +264,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
- 		q->queuedata = shost;
- 
- 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
-+	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
- 	return 0;
- 
- out_cleanup_queue:
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ab92c4ea138b..019f18c65098 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -618,6 +618,7 @@ struct request_queue {
- #define QUEUE_FLAG_STATS       27	/* track rq completion times */
- #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
- #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
-+#define QUEUE_FLAG_SCSI_PASSTHROUGH 30	/* queue supports SCSI commands */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -708,6 +709,8 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_queue_secure_erase(q) \
- 	(test_bit(QUEUE_FLAG_SECERASE, &(q)->queue_flags))
- #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
-+#define blk_queue_scsi_passthrough(q)	\
-+	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
--- 
-2.12.2
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
