@@ -1,22 +1,26 @@
-Return-Path: <bcache@lists.ewheeler.net>
-From: bcache@lists.ewheeler.net
-To: linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org,
-	hch@infradead.org,
-	axboe@kernel.dk,
-	Tang Junhui <tang.junhui@zte.com.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH 02/19] bcache: fix sequential large write IO bypass
-Date: Fri, 30 Jun 2017 13:42:51 -0700
-Message-Id: <1498855388-16990-2-git-send-email-bcache@lists.ewheeler.net>
-In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:45155 "EHLO
+        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752403AbdF3KVU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 06:21:20 -0400
+Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
+        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id C22053E567F
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
+        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 0946AB40084
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+In-Reply-To: <20170629134510.GA32385@infradead.org>
 References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+From: Tang Junhui <tang.junhui@zte.com.cn>
+Date: Tue, 9 May 2017 12:05:08 -0700
+Subject: [PATCH 02/19] bcache: fix sequential large write IO bypass
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
-
-From: Tang Junhui <tang.junhui@zte.com.cn>
+To: linux-block@vger.kernel.org
+Message-Id: <20170629222107.D41A5100128@ware.dreamhost.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Sequential write IOs were tested with bs=1M by FIO in writeback cache
 mode, these IOs were expected to be bypassed, but actually they did not.
