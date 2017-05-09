@@ -13,7 +13,8 @@ To: linux-fsdevel@vger.kernel.org,
 	linux-f2fs-devel@lists.sourceforge.net,
 	v9fs-developer@lists.sourceforge.net,
 	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
+	linux-block@vger.kernel.org,
+	fstests@vger.kernel.org
 Cc: dhowells@redhat.com,
 	akpm@linux-foundation.org,
 	hch@infradead.org,
@@ -30,480 +31,384 @@ Cc: dhowells@redhat.com,
 	hubcap@omnibond.com,
 	rpeterso@redhat.com,
 	bo.li.liu@oracle.com
-Subject: [PATCH v4 15/27] fs: retrofit old error reporting API onto new infrastructure
-Date: Tue,  9 May 2017 11:49:18 -0400
-Message-Id: <20170509154930.29524-16-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Subject: [xfstests PATCH v2 1/3] generic: add a writeback error handling test
+Date: Tue,  9 May 2017 12:12:43 -0400
+Message-Id: <20170509161245.29908-2-jlayton@redhat.com>
+In-Reply-To: <20170509161245.29908-1-jlayton@redhat.com>
+References: <20170509161245.29908-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that we have a better way to store and report errors that occur
-during writeback, we need to convert the existing codebase to use it. We
-could just adapt all of the filesystem code and related infrastructure
-to the new API, but that's a lot of churn.
+I'm working on a set of kernel patches to change how writeback errors
+are handled and reported in the kernel. Instead of reporting a
+writeback error to only the first fsync caller on the file, I aim
+to make the kernel report them once on every file description.
 
-When it comes to setting errors in the mapping, filemap_set_wb_error is
-a drop-in replacement for mapping_set_error. Turn that function into a
-simple wrapper around the new one.
+This patch adds a test for the new behavior. Basically, open many fds
+to the same file, turn on dm_error, write to each of the fds, and then
+fsync them all to ensure that they all get an error back.
 
-Because we want to ensure that writeback errors are always reported at
-fsync time, inject filemap_report_wb_error calls much closer to the
-syscall boundary, in call_fsync.
-
-For fsync calls (and things like the nfsd equivalent), we either return
-the error that the fsync operation returns, or the one returned by
-filemap_report_wb_error. In both cases, we advance the file->f_wb_err to
-the latest value. This allows us to provide new fsync semantics that
-will return errors that may have occurred previously and been viewed
-via other file descriptors.
-
-The final piece of the puzzle is what to do about filemap_check_errors
-calls that are being called directly or via filemap_* functions. Here,
-we must take a little "creative license".
-
-Since we now handle advancing the file->f_wb_err value at the generic
-filesystem layer, we no longer need those callers to clear errors out
-of the mapping or advance an errseq_t.
-
-A lot of the existing codebase relies on being getting an error back
-from those functions when there is a writeback problem, so we do still
-want to have them report writeback errors somehow.
-
-When reporting writeback errors, we will always report errors that have
-occurred since a particular point in time. With the old writeback error
-reporting, the time we used was "since it was last tested/cleared" which
-is entirely arbitrary and potentially racy. Now, we can at least report
-the latest error that has occurred since an arbitrary point in time
-(represented as a sampled errseq_t value).
-
-In the case where we don't have a struct file to work with, this patch
-just has the wrappers sample the current mapping->wb_err value, and use
-that as an arbitrary point from which to check for errors.
-
-That's probably not "correct" in all cases, particularly in the case of
-something like filemap_fdatawait, but I'm not sure it's any worse than
-what we already have, and this gives us a basis from which to work.
-
-A lot of those callers will likely want to change to a model where they
-sample the errseq_t much earlier (perhaps when starting a transaction),
-store it in an appropriate place and then use that value later when
-checking to see if an error occurred.
-
-That will almost certainly take some involvement from other subsystem
-maintainers. I'm quite open to adding new API functions to help enable
-this if that would be helpful, but I don't really want to do that until
-I better understand what's needed.
+To do that, I'm adding a new tools/dmerror script that the C program
+can use to load the error table. For now, that's all it can do, but
+we can fill it out with other commands as necessary.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- Documentation/filesystems/vfs.txt |  9 +++----
- fs/btrfs/file.c                   | 10 ++------
- fs/btrfs/tree-log.c               |  9 ++-----
- fs/f2fs/file.c                    |  3 +++
- fs/f2fs/node.c                    |  6 +----
- fs/fuse/file.c                    |  7 ++++--
- fs/libfs.c                        |  6 +++--
- include/linux/fs.h                | 19 +++++++++------
- include/linux/pagemap.h           |  8 ++----
- mm/filemap.c                      | 51 +++++++++++++++++----------------------
- 10 files changed, 57 insertions(+), 71 deletions(-)
+ common/dmerror        |  13 +++--
+ src/Makefile          |   2 +-
+ src/fsync-err.c       | 138 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/generic/999     |  75 +++++++++++++++++++++++++++
+ tests/generic/999.out |   3 ++
+ tests/generic/group   |   1 +
+ tools/dmerror         |  47 +++++++++++++++++
+ 7 files changed, 273 insertions(+), 6 deletions(-)
+ create mode 100644 src/fsync-err.c
+ create mode 100755 tests/generic/999
+ create mode 100644 tests/generic/999.out
+ create mode 100755 tools/dmerror
 
-diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-index ed06fb39822b..f201a77873f7 100644
---- a/Documentation/filesystems/vfs.txt
-+++ b/Documentation/filesystems/vfs.txt
-@@ -577,7 +577,7 @@ written at any point after PG_Dirty is clear.  Once it is known to be
- safe, PG_Writeback is cleared.
+diff --git a/common/dmerror b/common/dmerror
+index d46c5d0b7266..238baa213b1f 100644
+--- a/common/dmerror
++++ b/common/dmerror
+@@ -23,22 +23,25 @@ if [ $? -eq 0 ]; then
+ 	_notrun "Cannot run tests with DAX on dmerror devices"
+ fi
  
- If there is an error during writeback, then the address_space should be
--marked with an error (typically using filemap_set_wb_error), in order to
-+marked with an error (typically using mapping_set_error), in order to
- ensure that the error can later be reported to the application when an
- fsync is issued.
- 
-@@ -893,10 +893,9 @@ otherwise noted.
- 
-   release: called when the last reference to an open file is closed
- 
--  fsync: called by the fsync(2) system call. Filesystems that use the
--	pagecache should call filemap_report_wb_error before returning
--	to ensure that any errors that occurred during writeback are
--	reported and the file's error sequence advanced.
-+  fsync: called by the fsync(2) system call. Errors that were previously
-+	 recorded using mapping_set_error will automatically be returned to
-+	 the application and the file's error sequence advanced.
- 
-   fasync: called by the fcntl(2) system call when asynchronous
- 	(non-blocking) mode is enabled for a file
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 520cb7230b2d..e15faf240b51 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1962,6 +1962,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	int ret = 0;
- 	bool full_sync = 0;
- 	u64 len;
-+	errseq_t wb_since = READ_ONCE(file->f_wb_err);
- 
- 	/*
- 	 * The range length can be represented by u64, we have to do the typecasts
-@@ -2079,14 +2080,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 		 */
- 		clear_bit(BTRFS_INODE_NEEDS_FULL_SYNC,
- 			  &BTRFS_I(inode)->runtime_flags);
--		/*
--		 * An ordered extent might have started before and completed
--		 * already with io errors, in which case the inode was not
--		 * updated and we end up here. So check the inode's mapping
--		 * flags for any errors that might have happened while doing
--		 * writeback of file data.
--		 */
--		ret = filemap_check_errors(inode->i_mapping);
-+		ret = filemap_check_wb_error(inode->i_mapping, wb_since);
- 		inode_unlock(inode);
- 		goto out;
- 	}
-diff --git a/fs/btrfs/tree-log.c b/fs/btrfs/tree-log.c
-index a59674c3e69e..d0a123dbb199 100644
---- a/fs/btrfs/tree-log.c
-+++ b/fs/btrfs/tree-log.c
-@@ -3972,12 +3972,6 @@ static int wait_ordered_extents(struct btrfs_trans_handle *trans,
- 			    test_bit(BTRFS_ORDERED_IOERR, &ordered->flags)));
- 
- 		if (test_bit(BTRFS_ORDERED_IOERR, &ordered->flags)) {
--			/*
--			 * Clear the AS_EIO/AS_ENOSPC flags from the inode's
--			 * i_mapping flags, so that the next fsync won't get
--			 * an outdated io error too.
--			 */
--			filemap_check_errors(inode->i_mapping);
- 			*ordered_io_error = true;
- 			break;
- 		}
-@@ -4171,6 +4165,7 @@ static int btrfs_log_changed_extents(struct btrfs_trans_handle *trans,
- 	u64 test_gen;
- 	int ret = 0;
- 	int num = 0;
-+	errseq_t since = filemap_sample_wb_error(inode->vfs_inode.i_mapping);
- 
- 	INIT_LIST_HEAD(&extents);
- 
-@@ -4214,7 +4209,7 @@ static int btrfs_log_changed_extents(struct btrfs_trans_handle *trans,
- 	 * without writing to the log tree and the fsync must report the
- 	 * file data write error and not commit the current transaction.
- 	 */
--	ret = filemap_check_errors(inode->vfs_inode.i_mapping);
-+	ret = filemap_check_wb_error(inode->vfs_inode.i_mapping, since);
- 	if (ret)
- 		ctx->io_err = ret;
- process:
-diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-index 5f7317875a67..7ce13281925f 100644
---- a/fs/f2fs/file.c
-+++ b/fs/f2fs/file.c
-@@ -187,6 +187,7 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
- 		.nr_to_write = LONG_MAX,
- 		.for_reclaim = 0,
- 	};
-+	errseq_t since = READ_ONCE(file->f_wb_err);
- 
- 	if (unlikely(f2fs_readonly(inode->i_sb)))
- 		return 0;
-@@ -265,6 +266,8 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
- 	}
- 
- 	ret = wait_on_node_pages_writeback(sbi, ino);
-+	if (ret == 0)
-+		ret = filemap_check_wb_error(NODE_MAPPING(sbi), since);
- 	if (ret)
- 		goto out;
- 
-diff --git a/fs/f2fs/node.c b/fs/f2fs/node.c
-index 481aa8dc79f4..b3ef9504fd8b 100644
---- a/fs/f2fs/node.c
-+++ b/fs/f2fs/node.c
-@@ -1630,7 +1630,7 @@ int wait_on_node_pages_writeback(struct f2fs_sb_info *sbi, nid_t ino)
+-_dmerror_init()
++_dmerror_setup()
  {
- 	pgoff_t index = 0, end = ULONG_MAX;
- 	struct pagevec pvec;
--	int ret2, ret = 0;
-+	int ret = 0;
+ 	local dm_backing_dev=$SCRATCH_DEV
  
- 	pagevec_init(&pvec, 0);
- 
-@@ -1658,10 +1658,6 @@ int wait_on_node_pages_writeback(struct f2fs_sb_info *sbi, nid_t ino)
- 		pagevec_release(&pvec);
- 		cond_resched();
- 	}
+-	$DMSETUP_PROG remove error-test > /dev/null 2>&1
 -
--	ret2 = filemap_check_errors(NODE_MAPPING(sbi));
--	if (!ret)
--		ret = ret2;
- 	return ret;
- }
+ 	local blk_dev_size=`blockdev --getsz $dm_backing_dev`
  
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index 07d0efcb050c..e1ced9cfb090 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -398,6 +398,7 @@ static int fuse_flush(struct file *file, fl_owner_t id)
- 	struct fuse_req *req;
- 	struct fuse_flush_in inarg;
- 	int err;
-+	errseq_t since = READ_ONCE(file->f_wb_err);
+ 	DMERROR_DEV='/dev/mapper/error-test'
  
- 	if (is_bad_inode(inode))
- 		return -EIO;
-@@ -413,7 +414,7 @@ static int fuse_flush(struct file *file, fl_owner_t id)
- 	fuse_sync_writes(inode);
- 	inode_unlock(inode);
+ 	DMLINEAR_TABLE="0 $blk_dev_size linear $dm_backing_dev 0"
  
--	err = filemap_check_errors(file->f_mapping);
-+	err = filemap_check_wb_error(file->f_mapping, since);
- 	if (err)
- 		return err;
- 
-@@ -446,6 +447,7 @@ int fuse_fsync_common(struct file *file, loff_t start, loff_t end,
- 	FUSE_ARGS(args);
- 	struct fuse_fsync_in inarg;
- 	int err;
-+	errseq_t since;
- 
- 	if (is_bad_inode(inode))
- 		return -EIO;
-@@ -461,6 +463,7 @@ int fuse_fsync_common(struct file *file, loff_t start, loff_t end,
- 	if (err)
- 		goto out;
- 
-+	since = READ_ONCE(file->f_wb_err);
- 	fuse_sync_writes(inode);
- 
- 	/*
-@@ -468,7 +471,7 @@ int fuse_fsync_common(struct file *file, loff_t start, loff_t end,
- 	 * filemap_write_and_wait_range() does not catch errors.
- 	 * We have to do this directly after fuse_sync_writes()
- 	 */
--	err = filemap_check_errors(file->f_mapping);
-+	err = filemap_check_wb_error(file->f_mapping, since);
- 	if (err)
- 		goto out;
- 
-diff --git a/fs/libfs.c b/fs/libfs.c
-index efd23040ab25..23319d74fa42 100644
---- a/fs/libfs.c
-+++ b/fs/libfs.c
-@@ -991,8 +991,10 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
- 
- out:
- 	inode_unlock(inode);
--	err = filemap_check_errors(inode->i_mapping);
--	return ret ? ret : err;
-+	if (!ret)
-+		ret = filemap_check_wb_error(inode->i_mapping,
-+						READ_ONCE(file->f_wb_err));
-+	return ret;
- }
- EXPORT_SYMBOL(__generic_file_fsync);
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index bab3333e8671..e3068f3f69be 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1739,12 +1739,6 @@ static inline int call_mmap(struct file *file, struct vm_area_struct *vma)
- 	return file->f_op->mmap(file, vma);
- }
- 
--static inline int call_fsync(struct file *file, loff_t start, loff_t end,
--			     int datasync)
--{
--	return file->f_op->fsync(file, start, end, datasync);
--}
--
- ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
- 			      unsigned long nr_segs, unsigned long fast_segs,
- 			      struct iovec *fast_pointer,
-@@ -2512,6 +2506,8 @@ extern int filemap_fdatawrite(struct address_space *);
- extern int filemap_flush(struct address_space *);
- extern int filemap_fdatawait(struct address_space *);
- extern void filemap_fdatawait_keep_errors(struct address_space *);
-+extern int filemap_fdatawait_range_since(struct address_space *, loff_t lstart,
-+				   loff_t lend, errseq_t since);
- extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
- 				   loff_t lend);
- extern int filemap_write_and_wait(struct address_space *mapping);
-@@ -2521,7 +2517,6 @@ extern int __filemap_fdatawrite_range(struct address_space *mapping,
- 				loff_t start, loff_t end, int sync_mode);
- extern int filemap_fdatawrite_range(struct address_space *mapping,
- 				loff_t start, loff_t end);
--extern int filemap_check_errors(struct address_space *mapping);
- extern int __must_check filemap_report_wb_error(struct file *file);
- 
- /**
-@@ -2544,6 +2539,16 @@ static inline errseq_t filemap_sample_wb_error(struct address_space *mapping)
- 	return errseq_sample(&mapping->wb_err);
- }
- 
-+static inline int call_fsync(struct file *file, loff_t start, loff_t end,
-+			     int datasync)
-+{
-+	int ret, ret2;
-+
-+	ret = file->f_op->fsync(file, start, end, datasync);
-+	ret2 = filemap_report_wb_error(file);
-+	return ret ? ret : ret2;
++	DMERROR_TABLE="0 $blk_dev_size error $dm_backing_dev 0"
 +}
 +
- extern int vfs_fsync_range(struct file *file, loff_t start, loff_t end,
- 			   int datasync);
- extern int vfs_fsync(struct file *file, int datasync);
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 84943e8057ef..32512ffc15fa 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -14,6 +14,7 @@
- #include <linux/bitops.h>
- #include <linux/hardirq.h> /* for in_interrupt() */
- #include <linux/hugetlb_inline.h>
-+#include <linux/errseq.h>
- 
- /*
-  * Bits in mapping->flags.
-@@ -30,12 +31,7 @@ enum mapping_flags {
- 
- static inline void mapping_set_error(struct address_space *mapping, int error)
- {
--	if (unlikely(error)) {
--		if (error == -ENOSPC)
--			set_bit(AS_ENOSPC, &mapping->flags);
--		else
--			set_bit(AS_EIO, &mapping->flags);
--	}
-+	return errseq_set(&mapping->wb_err, error);
- }
- 
- static inline void mapping_set_unevictable(struct address_space *mapping)
-diff --git a/mm/filemap.c b/mm/filemap.c
-index ee1a798acfc1..eaec849ec8e5 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -36,6 +36,7 @@
- #include <linux/memcontrol.h>
- #include <linux/cleancache.h>
- #include <linux/rmap.h>
-+#include <linux/errseq.h>
- #include "internal.h"
- 
- #define CREATE_TRACE_POINTS
-@@ -295,20 +296,6 @@ void delete_from_page_cache(struct page *page)
- }
- EXPORT_SYMBOL(delete_from_page_cache);
- 
--int filemap_check_errors(struct address_space *mapping)
--{
--	int ret = 0;
--	/* Check for outstanding write errors */
--	if (test_bit(AS_ENOSPC, &mapping->flags) &&
--	    test_and_clear_bit(AS_ENOSPC, &mapping->flags))
--		ret = -ENOSPC;
--	if (test_bit(AS_EIO, &mapping->flags) &&
--	    test_and_clear_bit(AS_EIO, &mapping->flags))
--		ret = -EIO;
--	return ret;
--}
--EXPORT_SYMBOL(filemap_check_errors);
--
- /**
-  * __filemap_fdatawrite_range - start writeback on mapping dirty pages in range
-  * @mapping:	address space structure to write
-@@ -418,27 +405,32 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
-  * @mapping:		address space structure to wait for
-  * @start_byte:		offset in bytes where the range starts
-  * @end_byte:		offset in bytes where the range ends (inclusive)
-+ * @since:		check for errors since this errseq_t
-  *
-  * Walk the list of under-writeback pages of the given address space
-  * in the given range and wait for all of them.  Check error status of
-- * the address space and return it.
-- *
-- * Since the error status of the address space is cleared by this function,
-- * callers are responsible for checking the return value and handling and/or
-- * reporting the error.
-+ * the address space vs. the since value and return it.
-  */
--int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
--			    loff_t end_byte)
-+int filemap_fdatawait_range_since(struct address_space *mapping,
-+		loff_t start_byte, loff_t end_byte, errseq_t since)
- {
- 	int ret, ret2;
- 
- 	ret = __filemap_fdatawait_range(mapping, start_byte, end_byte);
--	ret2 = filemap_check_errors(mapping);
-+	ret2 = filemap_check_wb_error(mapping, since);
- 	if (!ret)
- 		ret = ret2;
- 
- 	return ret;
- }
-+EXPORT_SYMBOL(filemap_fdatawait_range_since);
-+
-+int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
-+			    loff_t end_byte)
++_dmerror_init()
 +{
-+	return filemap_fdatawait_range_since(mapping, start_byte, end_byte,
-+			filemap_sample_wb_error(mapping));
++	_dmerror_setup
++	$DMSETUP_PROG remove error-test > /dev/null 2>&1
+ 	$DMSETUP_PROG create error-test --table "$DMLINEAR_TABLE" || \
+ 		_fatal "failed to create dm linear device"
+-
+-	DMERROR_TABLE="0 $blk_dev_size error $dm_backing_dev 0"
+ }
+ 
+ _dmerror_mount()
+diff --git a/src/Makefile b/src/Makefile
+index e5042c9b7d8e..eb8ff6c4a344 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -12,7 +12,7 @@ TARGETS = dirstress fill fill2 getpagesize holes lstat64 \
+ 	godown resvtest writemod makeextents itrash rename \
+ 	multi_open_unlink dmiperf unwritten_sync genhashnames t_holes \
+ 	t_mmap_writev t_truncate_cmtime dirhash_collide t_rename_overwrite \
+-	holetest t_truncate_self t_mmap_dio af_unix t_mmap_stale_pmd
++	holetest t_truncate_self t_mmap_dio af_unix t_mmap_stale_pmd fsync-err
+ 
+ LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
+ 	preallo_rw_pattern_writer ftrunc trunc fs_perms testx looptest \
+diff --git a/src/fsync-err.c b/src/fsync-err.c
+new file mode 100644
+index 000000000000..8ad27b3da3e7
+--- /dev/null
++++ b/src/fsync-err.c
+@@ -0,0 +1,138 @@
++/*
++ * fsync-err.c: test whether writeback errors are reported to all open fds
++ * Copyright (c) 2017: Jeff Layton <jlayton@redhat.com>
++ *
++ * Open a file several times, write to it and then fsync. Flip dm_error over
++ * to make the backing device stop working. Overwrite the same section and
++ * call fsync on all fds and verify that we get errors on all of them. Then,
++ * fsync one more time on all of them and verify that they return 0.
++ */
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++
++#define NUM_FDS	10
++
++static void usage() {
++	fprintf(stderr, "Usage: fsync-err <filename>\n");
 +}
- EXPORT_SYMBOL(filemap_fdatawait_range);
- 
- /**
-@@ -489,6 +481,7 @@ EXPORT_SYMBOL(filemap_fdatawait);
- int filemap_write_and_wait(struct address_space *mapping)
- {
- 	int err = 0;
-+	errseq_t since = filemap_sample_wb_error(mapping);
- 
- 	if ((!dax_mapping(mapping) && mapping->nrpages) ||
- 	    (dax_mapping(mapping) && mapping->nrexceptional)) {
-@@ -500,12 +493,12 @@ int filemap_write_and_wait(struct address_space *mapping)
- 		 * thing (e.g. bug) happened, so we avoid waiting for it.
- 		 */
- 		if (err != -EIO) {
--			int err2 = filemap_fdatawait(mapping);
-+			filemap_fdatawait_keep_errors(mapping);
- 			if (!err)
--				err = err2;
-+				err = filemap_check_wb_error(mapping, since);
- 		}
- 	} else {
--		err = filemap_check_errors(mapping);
-+		err = filemap_check_wb_error(mapping, since);
- 	}
- 	return err;
- }
-@@ -526,6 +519,7 @@ int filemap_write_and_wait_range(struct address_space *mapping,
- 				 loff_t lstart, loff_t lend)
- {
- 	int err = 0;
-+	errseq_t since = filemap_sample_wb_error(mapping);
- 
- 	if ((!dax_mapping(mapping) && mapping->nrpages) ||
- 	    (dax_mapping(mapping) && mapping->nrexceptional)) {
-@@ -533,13 +527,12 @@ int filemap_write_and_wait_range(struct address_space *mapping,
- 						 WB_SYNC_ALL);
- 		/* See comment of filemap_write_and_wait() */
- 		if (err != -EIO) {
--			int err2 = filemap_fdatawait_range(mapping,
--						lstart, lend);
-+			__filemap_fdatawait_range(mapping, lstart, lend);
- 			if (!err)
--				err = err2;
-+				err = filemap_check_wb_error(mapping, since);
- 		}
- 	} else {
--		err = filemap_check_errors(mapping);
-+		err = filemap_check_wb_error(mapping, since);
- 	}
- 	return err;
- }
++
++int main(int argc, char **argv)
++{
++	int fd[NUM_FDS], ret, i;
++	char *fname, *buf;
++
++	if (argc < 1) {
++		usage();
++		return 1;
++	}
++
++	/* First argument is filename */
++	fname = argv[1];
++
++	for (i = 0; i < NUM_FDS; ++i) {
++		fd[i] = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
++		if (fd[i] < 0) {
++			printf("open of fd[%d] failed: %m\n", i);
++			return 1;
++		}
++	}
++
++	buf = "foobar";
++	for (i = 0; i < NUM_FDS; ++i) {
++		ret = write(fd[i], buf, strlen(buf) + 1);
++		if (ret < 0) {
++			printf("First write on fd[%d] failed: %m\n", i);
++			return 1;
++		}
++	}
++
++	for (i = 0; i < NUM_FDS; ++i) {
++		ret = fsync(fd[i]);
++		if (ret < 0) {
++			printf("First fsync on fd[%d] failed: %m\n", i);
++			return 1;
++		}
++	}
++
++	/* flip the device to non-working mode */
++	ret = system("./tools/dmerror load_error_table");
++	if (ret) {
++		if (WIFEXITED(ret))
++			printf("system: program exited: %d\n",
++					WEXITSTATUS(ret));
++		else
++			printf("system: 0x%x\n", (int)ret);
++
++		return 1;
++	}
++
++	for (i = 0; i < NUM_FDS; ++i) {
++		ret = write(fd[i], buf, strlen(buf) + 1);
++		if (ret < 0) {
++			printf("Second write on fd[%d] failed: %m\n", i);
++			return 1;
++		}
++	}
++
++	for (i = 0; i < NUM_FDS; ++i) {
++		ret = fsync(fd[i]);
++		/* Now, we EXPECT the error! */
++		if (ret >= 0) {
++			printf("Success on second fsync on fd[%d]!\n", i);
++			return 1;
++		}
++	}
++
++	/* flip the device to working mode */
++	ret = system("./tools/dmerror load_working_table");
++	if (ret) {
++		if (WIFEXITED(ret))
++			printf("system: program exited: %d\n",
++					WEXITSTATUS(ret));
++		else
++			printf("system: 0x%x\n", (int)ret);
++
++		return 1;
++	}
++
++	for (i = 0; i < NUM_FDS; ++i) {
++		ret = fsync(fd[i]);
++		if (ret < 0) {
++			/* Now the error should be clear */
++			printf("Third fsync on fd[%d] failed: %m\n", i);
++			return 1;
++		}
++	}
++
++	/*
++	 * reopen each file to guarantee the same one stays in core. fsync
++	 * each one to make sure we see no errors.
++	 */
++	for (i = 0; i < NUM_FDS; ++i) {
++		ret = close(fd[i]);
++		if (ret < 0) {
++			printf("Close of fd[%d] returned unexpected error: %m\n", i);
++			return 1;
++		}
++		fd[i] = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
++		if (fd[i] < 0) {
++			printf("Second open of fd[%d] failed: %m\n", i);
++			return 1;
++		}
++		ret = fsync(fd[i]);
++		if (ret < 0) {
++			/* New opens should not return an error */
++			printf("First fsync after reopen of fd[%d] failed: %m\n", i);
++			return 1;
++		}
++	}
++
++	printf("Test passed!\n");
++	return 0;
++}
+diff --git a/tests/generic/999 b/tests/generic/999
+new file mode 100755
+index 000000000000..57e093b43416
+--- /dev/null
++++ b/tests/generic/999
+@@ -0,0 +1,75 @@
++#! /bin/bash
++# FS QA Test No. 999
++#
++# Open a file several times, write to it, fsync on all fds and make sure that
++# they all return 0. Change the device to start throwing errors. Write again
++# on all fds and fsync on all fds. Ensure that we get errors on all of them.
++# Then fsync on all one last time and verify that all return 0.
++#
++#-----------------------------------------------------------------------
++# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it would be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write the Free Software Foundation,
++# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#-----------------------------------------------------------------------
++
++seq=`basename $0`
++seqres=$RESULT_DIR/$seq
++echo "QA output created by $seq"
++
++here=`pwd`
++tmp=/tmp/$$
++status=1    # failure is the default!
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++_cleanup()
++{
++    cd /
++    rm -rf $tmp.* $testdir
++    _dmerror_cleanup
++}
++
++# get standard environment, filters and checks
++. ./common/rc
++. ./common/filter
++. ./common/dmerror
++
++# real QA test starts here
++_supported_os Linux
++_require_scratch
++_require_logdev
++_require_dm_target error
++
++rm -f $seqres.full
++
++echo "Format and mount"
++$XFS_IO_PROG -d -c "pwrite -S 0x7c -b 1048576 0 $((64 * 1048576))" $SCRATCH_DEV >> $seqres.full
++_scratch_mkfs > $seqres.full 2>&1
++_dmerror_init
++_dmerror_mount >> $seqres.full 2>&1
++_dmerror_unmount
++_dmerror_mount
++
++_require_fs_space $SCRATCH_MNT 8192
++
++testfile=$SCRATCH_MNT/fsync-err-test
++
++$here/src/fsync-err $testfile
++
++# success, all done
++_dmerror_load_working_table
++_dmerror_unmount
++_dmerror_cleanup
++_repair_scratch_fs >> $seqres.full
++status=0
++exit
+diff --git a/tests/generic/999.out b/tests/generic/999.out
+new file mode 100644
+index 000000000000..2e48492ff6d1
+--- /dev/null
++++ b/tests/generic/999.out
+@@ -0,0 +1,3 @@
++QA output created by 999
++Format and mount
++Test passed!
+diff --git a/tests/generic/group b/tests/generic/group
+index 9fc7f9d419a8..854c39277dd5 100644
+--- a/tests/generic/group
++++ b/tests/generic/group
+@@ -432,3 +432,4 @@
+ 427 auto quick aio rw
+ 428 auto quick
+ 429 auto encrypt
++999 auto quick
+diff --git a/tools/dmerror b/tools/dmerror
+new file mode 100755
+index 000000000000..fc0de295e778
+--- /dev/null
++++ b/tools/dmerror
+@@ -0,0 +1,47 @@
++#!/bin/bash
++#-----------------------------------------------------------------------
++# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it would be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write the Free Software Foundation,
++# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#-----------------------------------------------------------------------
++
++. ./common/rc
++. ./common/dmerror
++
++_dmerror_setup
++
++case $1 in
++cleanup)
++	_dmerror_cleanup
++	;;
++init)
++	_dmerror_init
++	;;
++load_error_table)
++	_dmerror_load_error_table
++	;;
++load_working_table)
++	_dmerror_load_working_table
++	;;
++mount)
++	_dmerror_mount
++	;;
++*)
++	echo "Usage: $0 {init|cleanup|load_error_table|load_working_table|mount}"
++	exit 1
++	;;
++esac
++
++status=0
++exit
 -- 
 2.9.3
