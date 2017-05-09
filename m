@@ -1,134 +1,88 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net
-Cc: linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 15/17] fs: add a write_one_page_since
-Date: Wed, 31 May 2017 08:45:38 -0400
-Message-Id: <20170531124540.8782-16-jlayton@redhat.com>
-In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f41.google.com ([209.85.218.41]:35132 "EHLO
+        mail-oi0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752576AbdEIOL7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2017 10:11:59 -0400
+Received: by mail-oi0-f41.google.com with SMTP id l18so799735oig.2
+        for <linux-block@vger.kernel.org>; Tue, 09 May 2017 07:11:59 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAMuHMdVpHHY-XGDtDYCt2wN8w_VPQU5t6E4FMr2S42zN7vyN4w@mail.gmail.com>
+References: <149427742346.38205.12361226658239922137.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <201705090658.bE7SNvsF%fengguang.wu@intel.com> <CAMuHMdVpHHY-XGDtDYCt2wN8w_VPQU5t6E4FMr2S42zN7vyN4w@mail.gmail.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 9 May 2017 07:11:58 -0700
+Message-ID: <CAPcyv4giBhFoNPc7h+R-8f7L7tXN_5iVkQs8yZP1mjOn2=JvHg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] block, dax: move "select DAX" from BLOCK to FS_DAX
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "kbuild-all@01.org" <kbuild-all@01.org>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        linux-block@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kbuild test robot <lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Allow filesystems to pass in an errseq_t for a since value.
+On Tue, May 9, 2017 at 12:57 AM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> Hi Dan,
+>
+> On Tue, May 9, 2017 at 12:36 AM, kbuild test robot <lkp@intel.com> wrote:
+>> [auto build test ERROR on linus/master]
+>> [also build test ERROR on next-20170508]
+>> [cannot apply to v4.11]
+>> [if your patch is applied to the wrong git tree, please drop us a note t=
+o help improve the system]
+>>
+>> url:    https://github.com/0day-ci/linux/commits/Dan-Williams/block-dax-=
+move-select-DAX-from-BLOCK-to-FS_DAX/20170509-051522
+>> config: parisc-c3000_defconfig (attached as .config)
+>> compiler: hppa-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
+>> reproduce:
+>>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sb=
+in/make.cross -O ~/bin/make.cross
+>>         chmod +x ~/bin/make.cross
+>>         # save the attached .config to linux build tree
+>>         make.cross ARCH=3Dparisc
+>>
+>> All errors (new ones prefixed by >>):
+>>
+>>    fs/built-in.o: In function `bdev_dax_supported':
+>>>> (.text.bdev_dax_supported+0x4c): undefined reference to `dax_get_by_ho=
+st'
+>>    fs/built-in.o: In function `bdev_dax_supported':
+>>>> (.text.bdev_dax_supported+0x5c): undefined reference to `dax_read_lock=
+'
+>>    fs/built-in.o: In function `bdev_dax_supported':
+>>>> (.text.bdev_dax_supported+0x7c): undefined reference to `dax_direct_ac=
+cess'
+>>    fs/built-in.o: In function `bdev_dax_supported':
+>>>> (.text.bdev_dax_supported+0x88): undefined reference to `dax_read_unlo=
+ck'
+>>    fs/built-in.o: In function `bdev_dax_supported':
+>>>> (.text.bdev_dax_supported+0x90): undefined reference to `put_dax'
+>
+> I ran into the same issue if CONFIG_DAX=3Dm (it's still selected by some =
+other
+> modular symbol). #if IS_ENABLED(CONFIG_DAX) is true in the modular case, =
+so
+> the dummies provided by include/linux/dax.h are not used.
+>
+> However, while changing it to #ifdef CONFIG_DAX allows to build vmlinux, =
+it
+> leads to other issues as DAX is compiled as a module:
+>
+>     drivers/dax/super.c:35: error: redefinition of =E2=80=98dax_read_lock=
+=E2=80=99
+>     include/linux/dax.h:30: error: previous definition of
+> =E2=80=98dax_read_lock=E2=80=99 was here
+>
+> Yes, calling into optional modular code from builtin code in fs/blockdev.=
+c is
+> tricky ;-(  Perhaps you can make bdev_dax_supported() a small wrapper
+> that calls into the real code through a function pointer, when the DAX mo=
+dule
+> is available?
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- include/linux/mm.h  |  2 ++
- mm/page-writeback.c | 53 +++++++++++++++++++++++++++++++++++++++++------------
- 2 files changed, 43 insertions(+), 12 deletions(-)
-
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index ca9c8b27cecb..c901d7313374 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -23,6 +23,7 @@
- #include <linux/page_ext.h>
- #include <linux/err.h>
- #include <linux/page_ref.h>
-+#include <linux/errseq.h>
- 
- struct mempolicy;
- struct anon_vma;
-@@ -2200,6 +2201,7 @@ extern int filemap_page_mkwrite(struct vm_fault *vmf);
- 
- /* mm/page-writeback.c */
- int __must_check write_one_page(struct page *page);
-+int __must_check write_one_page_since(struct page *page, errseq_t since);
- void task_dirty_inc(struct task_struct *tsk);
- 
- /* readahead.c */
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index e369e8ea2a29..63058e35c60d 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2365,19 +2365,10 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
- 	return ret;
- }
- 
--/**
-- * write_one_page - write out a single page and wait on I/O
-- * @page: the page to write
-- *
-- * The page must be locked by the caller and will be unlocked upon return.
-- *
-- * Note that the mapping's AS_EIO/AS_ENOSPC flags will be cleared when this
-- * function returns.
-- */
--int write_one_page(struct page *page)
-+static int __write_one_page(struct page *page)
- {
- 	struct address_space *mapping = page->mapping;
--	int ret = 0, ret2;
-+	int ret;
- 	struct writeback_control wbc = {
- 		.sync_mode = WB_SYNC_ALL,
- 		.nr_to_write = 1,
-@@ -2394,16 +2385,54 @@ int write_one_page(struct page *page)
- 			wait_on_page_writeback(page);
- 		put_page(page);
- 	} else {
-+		ret = 0;
- 		unlock_page(page);
- 	}
-+	return ret;
-+}
- 
-+/**
-+ * write_one_page - write out a single page and wait on I/O
-+ * @page: the page to write
-+ *
-+ * The page must be locked by the caller and will be unlocked upon return.
-+ *
-+ * Note that the mapping's AS_EIO/AS_ENOSPC flags will be cleared when this
-+ * function returns.
-+ */
-+int write_one_page(struct page *page)
-+{
-+	int ret;
-+
-+	ret = __write_one_page(page);
- 	if (!ret)
--		ret = filemap_check_errors(mapping);
-+		ret = filemap_check_errors(page->mapping);
- 	return ret;
- }
- EXPORT_SYMBOL(write_one_page);
- 
- /*
-+ * write_one_page_since - write out a single page and wait on I/O
-+ * @page: the page to write
-+ * @since: previously sampled errseq_t
-+ *
-+ * The page must be locked by the caller and will be unlocked upon return.
-+ *
-+ * The caller should pass in a previously-sampled errseq_t. The mapping will
-+ * be checked for errors since that point.
-+ */
-+int write_one_page_since(struct page *page, errseq_t since)
-+{
-+	int ret;
-+
-+	ret = __write_one_page(page);
-+	if (!ret)
-+		ret = filemap_check_wb_err(page->mapping, since);
-+	return ret;
-+}
-+EXPORT_SYMBOL(write_one_page_since);
-+
-+/*
-  * For address_spaces which do not use buffers nor write back.
-  */
- int __set_page_dirty_no_writeback(struct page *page)
--- 
-2.9.4
+In fact, that is close to what I did for v2, and it passed a full run
+through the kbuild robot. I'll send it out shortly.
