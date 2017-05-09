@@ -1,62 +1,61 @@
-Return-Path: <jack@suse.cz>
-Date: Wed, 10 May 2017 13:13:46 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
 	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org, dhowells@redhat.com,
-	akpm@linux-foundation.org, hch@infradead.org,
-	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
-	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
-	tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com,
-	hubcap@omnibond.com, rpeterso@redhat.com, bo.li.liu@oracle.com
-Subject: Re: [PATCH v4 11/27] fuse: set mapping error in writepage_locked
- when it fails
-Message-ID: <20170510111346.GC25137@quack2.suse.cz>
+	v9fs-developer@lists.sourceforge.net,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	josef@toxicpanda.com,
+	hubcap@omnibond.com,
+	rpeterso@redhat.com,
+	bo.li.liu@oracle.com
+Subject: [PATCH v4 11/27] fuse: set mapping error in writepage_locked when it fails
+Date: Tue,  9 May 2017 11:49:14 -0400
+Message-Id: <20170509154930.29524-12-jlayton@redhat.com>
+In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
 References: <20170509154930.29524-1-jlayton@redhat.com>
- <20170509154930.29524-12-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170509154930.29524-12-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue 09-05-17 11:49:14, Jeff Layton wrote:
-> This ensures that we see errors on fsync when writeback fails.
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+This ensures that we see errors on fsync when writeback fails.
 
-Looks good to me. You can add:
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/fuse/file.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/fuse/file.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-> index ec238fb5a584..07d0efcb050c 100644
-> --- a/fs/fuse/file.c
-> +++ b/fs/fuse/file.c
-> @@ -1669,6 +1669,7 @@ static int fuse_writepage_locked(struct page *page)
->  err_free:
->  	fuse_request_free(req);
->  err:
-> +	mapping_set_error(page->mapping, error);
->  	end_page_writeback(page);
->  	return error;
->  }
-> -- 
-> 2.9.3
-> 
-> 
+diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+index ec238fb5a584..07d0efcb050c 100644
+--- a/fs/fuse/file.c
++++ b/fs/fuse/file.c
+@@ -1669,6 +1669,7 @@ static int fuse_writepage_locked(struct page *page)
+ err_free:
+ 	fuse_request_free(req);
+ err:
++	mapping_set_error(page->mapping, error);
+ 	end_page_writeback(page);
+ 	return error;
+ }
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.9.3
