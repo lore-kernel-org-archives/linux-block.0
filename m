@@ -1,51 +1,71 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 10/12] block: Constify disk_type
-Date: Wed, 31 May 2017 15:52:44 -0700
-Message-ID: <20170531225246.26261-11-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-References: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	josef@toxicpanda.com,
+	hubcap@omnibond.com,
+	rpeterso@redhat.com,
+	bo.li.liu@oracle.com
+Subject: [PATCH v4 07/27] orangefs: don't call filemap_write_and_wait from fsync
+Date: Tue,  9 May 2017 11:49:10 -0400
+Message-Id: <20170509154930.29524-8-jlayton@redhat.com>
+In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
+References: <20170509154930.29524-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The variable 'disk_type' is never modified so constify it.
+Orangefs doesn't do buffered writes yet, so there's no point in
+initiating and waiting for writeback.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Acked-by: Mike Marshall <hubcap@omnibond.com>
 ---
- block/genhd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/orangefs/file.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index d252d29fe837..7f520fa25d16 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -36,7 +36,7 @@ struct kobject *block_depr;
- static DEFINE_SPINLOCK(ext_devt_lock);
- static DEFINE_IDR(ext_devt_idr);
+diff --git a/fs/orangefs/file.c b/fs/orangefs/file.c
+index e6bbc8083d77..17ab42c4db52 100644
+--- a/fs/orangefs/file.c
++++ b/fs/orangefs/file.c
+@@ -646,14 +646,11 @@ static int orangefs_fsync(struct file *file,
+ 		       loff_t end,
+ 		       int datasync)
+ {
+-	int ret = -EINVAL;
++	int ret;
+ 	struct orangefs_inode_s *orangefs_inode =
+ 		ORANGEFS_I(file_inode(file));
+ 	struct orangefs_kernel_op_s *new_op = NULL;
  
--static struct device_type disk_type;
-+static const struct device_type disk_type;
- 
- static void disk_check_events(struct disk_events *ev,
- 			      unsigned int *clearing_ptr);
-@@ -1183,7 +1183,7 @@ static char *block_devnode(struct device *dev, umode_t *mode,
- 	return NULL;
- }
- 
--static struct device_type disk_type = {
-+static const struct device_type disk_type = {
- 	.name		= "disk",
- 	.groups		= disk_attr_groups,
- 	.release	= disk_release,
+-	/* required call */
+-	filemap_write_and_wait_range(file->f_mapping, start, end);
+-
+ 	new_op = op_alloc(ORANGEFS_VFS_OP_FSYNC);
+ 	if (!new_op)
+ 		return -ENOMEM;
 -- 
-2.12.2
+2.9.3
