@@ -1,42 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43597 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750767AbdEBGMz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 May 2017 02:12:55 -0400
-Subject: Re: [PATCH 4/7] blk-mq: add and export helper to tell if a request is
- reserved
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-References: <1493391340-24629-1-git-send-email-axboe@fb.com>
- <1493391340-24629-5-git-send-email-axboe@fb.com>
-Cc: ming.lei@redhat.com, hch@lst.de
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <e14def6c-3b7e-257e-a462-161505d21c9a@suse.de>
-Date: Tue, 2 May 2017 08:12:53 +0200
-MIME-Version: 1.0
-In-Reply-To: <1493391340-24629-5-git-send-email-axboe@fb.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	josef@toxicpanda.com,
+	hubcap@omnibond.com,
+	rpeterso@redhat.com,
+	bo.li.liu@oracle.com
+Subject: [PATCH v4 26/27] mm: flesh out comments over mapping_set_error
+Date: Tue,  9 May 2017 11:49:29 -0400
+Message-Id: <20170509154930.29524-27-jlayton@redhat.com>
+In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
+References: <20170509154930.29524-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On 04/28/2017 04:55 PM, Jens Axboe wrote:
-> We only have an internal helper for checking a tag value. Add
-> an exported helper that takes a request and hardware queue,
-> and check against the driver tags.
-> 
-> Signed-off-by: Jens Axboe <axboe@fb.com>
-> ---
->  block/blk-mq-tag.c     | 6 ++++++
->  include/linux/blk-mq.h | 1 +
->  2 files changed, 7 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ include/linux/pagemap.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-Cheers,
-
-Hannes
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 9593eac41499..9b453eae0aa1 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -27,6 +27,20 @@ enum mapping_flags {
+ 	AS_NO_WRITEBACK_TAGS = 3,
+ };
+ 
++/**
++ * mapping_set_error - record a writeback error in the address_space
++ * @mapping - the mapping in which an error should be set
++ * @error - the error to set in the mapping
++ *
++ * When writeback fails in some way, we must record that error so that
++ * userspace can be informed when fsync and the like are called.  We endeavor
++ * to report errors on any file that was open at the time of the error.  Some
++ * internal callers also need to know when writeback errors have occurred.
++ *
++ * When a writeback error occurs, most will filesystems will want to call
++ * mapping_set_error to record the error in the mapping so that it will be
++ * automatically reported whenever fsync is called on the file.
++ */
+ static inline void mapping_set_error(struct address_space *mapping, int error)
+ {
+ 	return errseq_set(&mapping->wb_err, error);
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.9.3
