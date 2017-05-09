@@ -13,8 +13,7 @@ To: linux-fsdevel@vger.kernel.org,
 	linux-f2fs-devel@lists.sourceforge.net,
 	v9fs-developer@lists.sourceforge.net,
 	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	fstests@vger.kernel.org
+	linux-block@vger.kernel.org
 Cc: dhowells@redhat.com,
 	akpm@linux-foundation.org,
 	hch@infradead.org,
@@ -31,39 +30,39 @@ Cc: dhowells@redhat.com,
 	hubcap@omnibond.com,
 	rpeterso@redhat.com,
 	bo.li.liu@oracle.com
-Subject: [xfstests PATCH v2 2/3] ext4: allow ext4 to use $SCRATCH_LOGDEV
-Date: Tue,  9 May 2017 12:12:44 -0400
-Message-Id: <20170509161245.29908-3-jlayton@redhat.com>
-In-Reply-To: <20170509161245.29908-1-jlayton@redhat.com>
-References: <20170509161245.29908-1-jlayton@redhat.com>
+Subject: [PATCH v4 10/27] 9p: set mapping error when writeback fails in launder_page
+Date: Tue,  9 May 2017 11:49:13 -0400
+Message-Id: <20170509154930.29524-11-jlayton@redhat.com>
+In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
+References: <20170509154930.29524-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The writeback error handling test requires that you put the journal on a
-separate device. This allows us to use dmerror to simulate data
-writeback failure, without affecting the journal.
-
-xfs already has infrastructure for this (a'la $SCRATCH_LOGDEV), so wire
-up the ext4 code so that it can do the same thing when _scratch_mkfs is
-called.
+launder_page is just writeback under the page lock. We still need to
+mark the mapping for errors there when they occur.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- common/rc | 3 +++
- 1 file changed, 3 insertions(+)
+ fs/9p/vfs_addr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/common/rc b/common/rc
-index 257b1903359d..8b815d9c8c33 100644
---- a/common/rc
-+++ b/common/rc
-@@ -675,6 +675,9 @@ _scratch_mkfs_ext4()
- 	local tmp=`mktemp`
- 	local mkfs_status
- 
-+	[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
-+	    $mkfs_cmd -O journal_dev $SCRATCH_LOGDEV && \
-+	    mkfs_cmd="$mkfs_cmd -J device=$SCRATCH_LOGDEV"
- 
- 	_scratch_do_mkfs "$mkfs_cmd" "$mkfs_filter" $* 2>$tmp.mkfserr 1>$tmp.mkfsstd
- 	mkfs_status=$?
+diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+index adaf6f6dd858..7af6e6501698 100644
+--- a/fs/9p/vfs_addr.c
++++ b/fs/9p/vfs_addr.c
+@@ -223,8 +223,11 @@ static int v9fs_launder_page(struct page *page)
+ 	v9fs_fscache_wait_on_page_write(inode, page);
+ 	if (clear_page_dirty_for_io(page)) {
+ 		retval = v9fs_vfs_writepage_locked(page);
+-		if (retval)
++		if (retval) {
++			if (retval != -EAGAIN)
++				mapping_set_error(page->mapping, retval);
+ 			return retval;
++		}
+ 	}
+ 	return 0;
+ }
 -- 
 2.9.3
