@@ -1,61 +1,92 @@
-Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <34FA1610-93EF-441A-B8B9-F1DD6B706398@sandisk.com>
-References: <CACRpkdbZrkAqEdP1-QqDww0ZuFcY47Jgj9dPqkG_whrx7pwC-w@mail.gmail.com>
- <CAK8P3a1CGtj5VSVoMM34VWn781WpS8ZcHpq6n0UfNOWWYEq=QQ@mail.gmail.com>
- <CAPDyKFqiyEcScuWLVXE9kAa2yQyJCZfbXyAdAQOb081nLjyvvw@mail.gmail.com>
- <CAK8P3a1yJJ33R9EPPcErLUO2enFGrSJzWmVRwHdHP+3_2iP7ow@mail.gmail.com>
- <CACRpkdYsWnXLZEpZr74pLB8zjTV4Q=sdAfX+sz0n_E46SaJa9Q@mail.gmail.com>
- <BY2PR0401MB0901B37DB60608662AE5C631E5050@BY2PR0401MB0901.namprd04.prod.outlook.com>
- <CACRpkdbstMEC-_JcEfEm1debQRPeYBDmTPm0L_jGFnrgRZg1Zw@mail.gmail.com>
- <BY2PR0401MB0901B0167734FEFB7F1E5DF6E5040@BY2PR0401MB0901.namprd04.prod.outlook.com>
- <34FA1610-93EF-441A-B8B9-F1DD6B706398@sandisk.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 18 May 2017 11:36:34 +0200
-Message-ID: <CACRpkdaczsqeBE155iXmxqDj5K04mrEnysHeMuzJD8uC-_b3Sw@mail.gmail.com>
-Subject: Re: Outstanding MQ questions from MMC
-To: Alex Lemberg <Alex.Lemberg@sandisk.com>
-Cc: Avri Altman <Avri.Altman@sandisk.com>, Arnd Bergmann <arnd@arndb.de>,
-	"ulf. org" <ulf.hansson@linaro.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com
+Subject: [PATCH 0/8 v7] No wait AIO
+Date: Tue,  9 May 2017 07:22:11 -0500
+Message-Id: <20170509122219.31756-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Apr 18, 2017 at 5:31 PM, Alex Lemberg <Alex.Lemberg@sandisk.com> wrote:
+Formerly known as non-blocking AIO.
 
-> There is an additional functionality, which is require the host lock
-> to be held for several write commands - the FFU.
-> In case of FFU, the FW can be download/write in several iterations
-> of Write command (CMD25). This sequence should not be interrupted by regular
-> Write requests.
-> In current driver, both FFU and RPMB can be sent by using mmc_blk_ioctl_multi_cmd().
+This series adds nonblocking feature to asynchronous I/O writes.
+io_submit() can be delayed because of a number of reason:
+ - Block allocation for files
+ - Data writebacks for direct I/O
+ - Sleeping because of waiting to acquire i_rwsem
+ - Congested block device
 
-Both single and multi ioctl()s are funneled into the block layer
-using the driver-specific request ops in the latest iteration of
-my patch set.
+The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
+any of these conditions are met. This way userspace can push most
+of the write()s to the kernel to the best of its ability to complete
+and if it returns -EAGAIN, can defer it to another thread.
 
-It turns out this was a simpler change than I though.
+In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
+uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
+IOCB_NOWAIT for struct iocb, REQ_NOWAIT for bio.bi_opf and IOMAP_NOWAIT for
+iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
+not use aio_flags because it is not currently checked for invalidity
+in the kernel.
 
-If you check the patch set I realized that I also fixes a userspace
-starvation issue when issueing ioctls() such as for RPMB
-during heavy block I/O.
+This feature is provided for direct I/O of asynchronous I/O only. I have
+tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
+The nowait feature is for request based devices. In the future, I intend to
+add support to stacked devices such as md.
 
-This usecase:
+Applications will have to check supportability
+by sending a async direct write and any other error besides -EAGAIN
+would mean it is not supported.
 
-> dd if=/dev/mmcblk3 of=/dev/null bs=1M &
-> mmc extcs read /dev/mmcblk3
+Changes since v1:
+ + changed name from _NONBLOCKING to *_NOWAIT
+ + filemap_range_has_page call moved to closer to (just before) calling filemap_write_and_wait_range().
+ + BIO_NOWAIT limited to get_request()
+ + XFS fixes 
+	- included reflink 
+	- use of xfs_ilock_nowait() instead of a XFS_IOLOCK_NONBLOCKING flag
+	- Translate the flag through IOMAP_NOWAIT (iomap) to check for
+	  block allocation for the file.
+ + ext4 coding style
 
-This would previously hang until the dd command was complete before
-issuing the ioctl() command, just waiting for the host lock.
-I guess RPMB has the same problem...
+Changes since v2:
+ + Using aio_reserved1 as aio_rw_flags instead of aio_flags
+ + blk-mq support
+ + xfs uptodate with kernel and reflink changes
 
-It is now fixed.
+ Changes since v3:
+  + Added FS_NOWAIT, which is set if the filesystem supports NOWAIT feature.
+  + Checks in generic_make_request() to make sure BIO_NOWAIT comes in
+    for async direct writes only.
+  + Added QUEUE_FLAG_NOWAIT, which is set if the device supports BIO_NOWAIT.
+    This is added (rather not set) to block devices such as dm/md currently.
 
-If you can verify the v2 patch set (just posted) and provide Tested-by's
-(or bug reports...) it's appreciated.
+ Changes since v4:
+  + Ported AIO code to use RWF_* flags. Check for RWF_* flags in
+    generic_file_write_iter().
+  + Changed IOCB_RW_FLAGS_NOWAIT to RWF_NOWAIT.
 
-Yours,
-Linus Walleij
+ Changes since v5:
+  + BIO_NOWAIT to REQ_NOWAIT
+  + Common helper for RWF flags.
+
+ Changes since v6:
+  + REQ_NOWAIT will be ignored for request based devices since they
+    cannot block. So, removed QUEUE_FLAG_NOWAIT since it is not
+    required in the current implementation. It will be resurrected
+    when we program for stacked devices.
+  + changed kiocb_rw_flags() to kiocb_set_rw_flags() in order to accomodate
+    for errors. Moved checks in the function.
+
+-- 
+Goldwyn
