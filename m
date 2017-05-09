@@ -1,21 +1,25 @@
-Return-Path: <bcache@lists.ewheeler.net>
-From: bcache@lists.ewheeler.net
-To: linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org,
-	hch@infradead.org,
-	axboe@kernel.dk,
-	Tang Junhui <tang.junhui@zte.com.cn>,
-	stable@vger.kernel.org # 4.10,
-	Stefan Bader <stefan.bader@canonical.com>
-Subject: [PATCH 05/19] bcache: fix calling ida_simple_remove() with incorrect minor
-Date: Fri, 30 Jun 2017 13:42:54 -0700
-Message-Id: <1498855388-16990-5-git-send-email-bcache@lists.ewheeler.net>
-In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:45148 "EHLO
+        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751565AbdF3KVU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 06:21:20 -0400
+Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
+        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id C22323E5681
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
+        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 1795AB40097
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+In-Reply-To: <20170629134510.GA32385@infradead.org>
 References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
-List-ID: <linux-block@vger.kernel.org>
-
 From: Tang Junhui <tang.junhui@zte.com.cn>
+Date: Tue, 9 May 2017 12:14:06 -0700
+Subject: [PATCH 05/19] bcache: fix calling ida_simple_remove() with incorrect
+ minor
+To: linux-block@vger.kernel.org
+Message-Id: <20170629222107.E21BD10012D@ware.dreamhost.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 bcache called ida_simple_remove() with minor which have multiplied by
 BCACHE_MINORS, it would cause minor wrong release and leakage.
