@@ -1,72 +1,149 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:51075 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755987AbdESSa1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2017 14:30:27 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH 01/18] block: Introduce blk_queue_cmd_size()
-Date: Fri, 19 May 2017 11:29:59 -0700
-Message-ID: <20170519183016.12646-2-bart.vanassche@sandisk.com>
-In-Reply-To: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-References: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	josef@toxicpanda.com,
+	hubcap@omnibond.com,
+	rpeterso@redhat.com,
+	bo.li.liu@oracle.com
+Subject: [PATCH v4 20/27] cifs: cleanup writeback handling errors and comments
+Date: Tue,  9 May 2017 11:49:23 -0400
+Message-Id: <20170509154930.29524-21-jlayton@redhat.com>
+In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
+References: <20170509154930.29524-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This function will be used by later patches in this series.
+Now that writeback errors are handled on a per-file basis using the new
+sequence counter method at the vfs layer, we no longer need to re-set
+errors in the mapping after doing writeback in non-fsync codepaths.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: linux-block@vger.kernel.org
+Also, fix up some bogus comments.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- block/blk-core.c       | 10 ++++++++++
- include/linux/blkdev.h |  1 +
- 2 files changed, 11 insertions(+)
+ fs/cifs/cifsfs.c |  4 +---
+ fs/cifs/file.c   |  7 ++-----
+ fs/cifs/inode.c  | 22 +++++++---------------
+ 3 files changed, 10 insertions(+), 23 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c7068520794b..a69d420b7ff0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -601,6 +601,16 @@ static void free_request_simple(void *element, void *data)
- 	kmem_cache_free(request_cachep, element);
- }
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index dd3f5fabfdf6..017a2d1d02c7 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -829,10 +829,8 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
+ 		if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
+ 		    inode->i_mapping->nrpages != 0) {
+ 			rc = filemap_fdatawait(inode->i_mapping);
+-			if (rc) {
+-				mapping_set_error(inode->i_mapping, rc);
++			if (rc)
+ 				return rc;
+-			}
+ 		}
+ 		/*
+ 		 * Some applications poll for the file length in this strange
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 0bee7f8d91ad..9825d892716e 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -722,9 +722,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	cinode = CIFS_I(inode);
  
-+/**
-+ * blk_queue_cmd_size - size in bytes of driver-private request data
-+ * @q: request queue pointer
-+ */
-+int blk_queue_cmd_size(struct request_queue *q)
-+{
-+	return q->mq_ops ? q->tag_set->cmd_size : q->cmd_size;
-+}
-+EXPORT_SYMBOL_GPL(blk_queue_cmd_size);
-+
- static void *alloc_request_size(gfp_t gfp_mask, void *data)
- {
- 	struct request_queue *q = data;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b5d1e27631ee..75b71374e1ba 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1212,6 +1212,7 @@ extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatte
- extern void blk_dump_rq_flags(struct request *, char *);
- extern long nr_blockdev_pages(void);
+ 	if (can_flush) {
+-		rc = filemap_write_and_wait(inode->i_mapping);
+-		mapping_set_error(inode->i_mapping, rc);
+-
++		filemap_write_and_wait(inode->i_mapping);
+ 		if (tcon->unix_ext)
+ 			rc = cifs_get_inode_info_unix(&inode, full_path,
+ 						      inode->i_sb, xid);
+@@ -3906,8 +3904,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 			break_lease(inode, O_WRONLY);
+ 		rc = filemap_fdatawrite(inode->i_mapping);
+ 		if (!CIFS_CACHE_READ(cinode)) {
+-			rc = filemap_fdatawait(inode->i_mapping);
+-			mapping_set_error(inode->i_mapping, rc);
++			filemap_fdatawait(inode->i_mapping);
+ 			cifs_zap_mapping(inode);
+ 		}
+ 		cifs_dbg(FYI, "Oplock flush inode %p rc %d\n", inode, rc);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index b261db34103c..a58e605240fc 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -2008,10 +2008,8 @@ int cifs_getattr(const struct path *path, struct kstat *stat,
+ 	if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
+ 	    inode->i_mapping->nrpages != 0) {
+ 		rc = filemap_fdatawait(inode->i_mapping);
+-		if (rc) {
+-			mapping_set_error(inode->i_mapping, rc);
++		if (rc)
+ 			return rc;
+-		}
+ 	}
  
-+int blk_queue_cmd_size(struct request_queue *q);
- bool __must_check blk_get_queue(struct request_queue *);
- struct request_queue *blk_alloc_queue(gfp_t);
- struct request_queue *blk_alloc_queue_node(gfp_t, int);
+ 	rc = cifs_revalidate_dentry_attr(dentry);
+@@ -2171,15 +2169,12 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
+ 	 * Attempt to flush data before changing attributes. We need to do
+ 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
+ 	 * ownership or mode then we may also need to do this. Here, we take
+-	 * the safe way out and just do the flush on all setattr requests. If
+-	 * the flush returns error, store it to report later and continue.
++	 * the safe way out and just do the flush on all setattr requests.
+ 	 *
+ 	 * BB: This should be smarter. Why bother flushing pages that
+-	 * will be truncated anyway? Also, should we error out here if
+-	 * the flush returns error?
++	 * will be truncated anyway?
+ 	 */
+-	rc = filemap_write_and_wait(inode->i_mapping);
+-	mapping_set_error(inode->i_mapping, rc);
++	filemap_write_and_wait(inode->i_mapping);
+ 	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
+@@ -2314,15 +2309,12 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 	 * Attempt to flush data before changing attributes. We need to do
+ 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
+ 	 * ownership or mode then we may also need to do this. Here, we take
+-	 * the safe way out and just do the flush on all setattr requests. If
+-	 * the flush returns error, store it to report later and continue.
++	 * the safe way out and just do the flush on all setattr requests.
+ 	 *
+ 	 * BB: This should be smarter. Why bother flushing pages that
+-	 * will be truncated anyway? Also, should we error out here if
+-	 * the flush returns error?
++	 * will be truncated anyway?
+ 	 */
+-	rc = filemap_write_and_wait(inode->i_mapping);
+-	mapping_set_error(inode->i_mapping, rc);
++	filemap_write_and_wait(inode->i_mapping);
+ 	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
 -- 
-2.12.2
+2.9.3
