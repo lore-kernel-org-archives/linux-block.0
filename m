@@ -1,210 +1,96 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net,
 	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
+	cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net,
+	linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: dhowells@redhat.com,
+	akpm@linux-foundation.org,
+	hch@infradead.org,
+	ross.zwisler@linux.intel.com,
+	mawilcox@microsoft.com,
+	jack@suse.com,
+	viro@zeniv.linux.org.uk,
+	corbet@lwn.net,
+	neilb@suse.de,
+	clm@fb.com,
+	tytso@mit.edu,
 	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 04/10] fs: Introduce RWF_NOWAIT
-Date: Thu, 11 May 2017 14:17:04 -0500
-Message-Id: <20170511191710.31959-5-rgoldwyn@suse.de>
-In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
-References: <20170511191710.31959-1-rgoldwyn@suse.de>
+	josef@toxicpanda.com,
+	hubcap@omnibond.com,
+	rpeterso@redhat.com,
+	bo.li.liu@oracle.com
+Subject: [PATCH v4 27/27] mm: clean up comments in me_pagecache_dirty
+Date: Tue,  9 May 2017 11:49:30 -0400
+Message-Id: <20170509154930.29524-28-jlayton@redhat.com>
+In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
+References: <20170509154930.29524-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+This no longer applies with the new writeback error tracking and
+reporting infrastructure.
 
-RWF_NOWAIT informs kernel to bail out if an AIO request will block
-for reasons such as file allocations, or a writeback triggered,
-or would block while allocating requests while performing
-direct I/O.
-
-RWF_NOWAIT is translated to IOCB_NOWAIT for iocb->ki_flags.
-
-The check for -EOPNOTSUPP is placed in generic_file_write_iter(). This
-is called by most filesystems, either through fsops.write_iter() or through
-the function defined by write_iter(). If not, we perform the check defined
-by .write_iter() which is called for direct IO specifically.
-
-Filesystems xfs, btrfs and ext4 would be supported in the following patches.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- fs/9p/vfs_file.c        | 3 +++
- fs/aio.c                | 6 ++++++
- fs/ceph/file.c          | 3 +++
- fs/cifs/file.c          | 3 +++
- fs/fuse/file.c          | 3 +++
- fs/nfs/direct.c         | 3 +++
- fs/ocfs2/file.c         | 3 +++
- include/linux/fs.h      | 5 ++++-
- include/uapi/linux/fs.h | 1 +
- mm/filemap.c            | 3 +++
- 10 files changed, 32 insertions(+), 1 deletion(-)
+ mm/memory-failure.c | 35 +++++------------------------------
+ 1 file changed, 5 insertions(+), 30 deletions(-)
 
-diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
-index 3de3b4a89d89..403681db7723 100644
---- a/fs/9p/vfs_file.c
-+++ b/fs/9p/vfs_file.c
-@@ -411,6 +411,9 @@ v9fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	loff_t origin;
- 	int err = 0;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	retval = generic_write_checks(iocb, from);
- 	if (retval <= 0)
- 		return retval;
-diff --git a/fs/aio.c b/fs/aio.c
-index 020fa0045e3c..34027b67e2f4 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1592,6 +1592,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		goto out_put_req;
+diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+index 4b56e53e5378..be5f998a0772 100644
+--- a/mm/memory-failure.c
++++ b/mm/memory-failure.c
+@@ -642,37 +642,12 @@ static int me_pagecache_dirty(struct page *p, unsigned long pfn)
+ 	if (mapping) {
+ 		/*
+ 		 * IO error will be reported by write(), fsync(), etc.
+-		 * who check the mapping.
+-		 * This way the application knows that something went
+-		 * wrong with its dirty file data.
++		 * who check the mapping. This way the application knows that
++		 * something went wrong when writing back its dirty file data.
+ 		 *
+-		 * There's one open issue:
+-		 *
+-		 * The EIO will be only reported on the next IO
+-		 * operation and then cleared through the IO map.
+-		 * Normally Linux has two mechanisms to pass IO error
+-		 * first through the AS_EIO flag in the address space
+-		 * and then through the PageError flag in the page.
+-		 * Since we drop pages on memory failure handling the
+-		 * only mechanism open to use is through AS_AIO.
+-		 *
+-		 * This has the disadvantage that it gets cleared on
+-		 * the first operation that returns an error, while
+-		 * the PageError bit is more sticky and only cleared
+-		 * when the page is reread or dropped.  If an
+-		 * application assumes it will always get error on
+-		 * fsync, but does other operations on the fd before
+-		 * and the page is dropped between then the error
+-		 * will not be properly reported.
+-		 *
+-		 * This can already happen even without hwpoisoned
+-		 * pages: first on metadata IO errors (which only
+-		 * report through AS_EIO) or when the page is dropped
+-		 * at the wrong time.
+-		 *
+-		 * So right now we assume that the application DTRT on
+-		 * the first EIO, but we're not worse than other parts
+-		 * of the kernel.
++		 * Note that errors are reported only once per file
++		 * description, but should be reported on all open file
++		 * descriptions for this inode.
+ 		 */
+ 		mapping_set_error(mapping, -EIO);
  	}
- 
-+	if ((req->common.ki_flags & IOCB_NOWAIT) &&
-+			!(req->common.ki_flags & IOCB_DIRECT)) {
-+		ret = -EOPNOTSUPP;
-+		goto out_put_req;
-+	}
-+
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-index 26cc95421cca..af28419b1731 100644
---- a/fs/ceph/file.c
-+++ b/fs/ceph/file.c
-@@ -1267,6 +1267,9 @@ static ssize_t ceph_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	int err, want, got;
- 	loff_t pos;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	if (ceph_snap(inode) != CEPH_NOSNAP)
- 		return -EROFS;
- 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 21d404535739..f8858a06e119 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2638,6 +2638,9 @@ ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from)
- 	 * write request.
- 	 */
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	rc = generic_write_checks(iocb, from);
- 	if (rc <= 0)
- 		return rc;
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index ec238fb5a584..72786e798319 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -1425,6 +1425,9 @@ static ssize_t fuse_direct_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct fuse_io_priv io = FUSE_IO_PRIV_SYNC(file);
- 	ssize_t res;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	if (is_bad_inode(inode))
- 		return -EIO;
- 
-diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-index c1b5fed7c863..dcea0caa5cb5 100644
---- a/fs/nfs/direct.c
-+++ b/fs/nfs/direct.c
-@@ -996,6 +996,9 @@ ssize_t nfs_file_direct_write(struct kiocb *iocb, struct iov_iter *iter)
- 	dfprintk(FILE, "NFS: direct write(%pD2, %zd@%Ld)\n",
- 		file, iov_iter_count(iter), (long long) iocb->ki_pos);
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	result = generic_write_checks(iocb, iter);
- 	if (result <= 0)
- 		return result;
-diff --git a/fs/ocfs2/file.c b/fs/ocfs2/file.c
-index bfeb647459d9..e7f8ba890305 100644
---- a/fs/ocfs2/file.c
-+++ b/fs/ocfs2/file.c
-@@ -2235,6 +2235,9 @@ static ssize_t ocfs2_file_write_iter(struct kiocb *iocb,
- 	if (count == 0)
- 		return 0;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	direct_io = iocb->ki_flags & IOCB_DIRECT ? 1 : 0;
- 
- 	inode_lock(inode);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2e6fc6a23f91..7e39b510b7a4 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -270,6 +270,7 @@ struct writeback_control;
- #define IOCB_DSYNC		(1 << 4)
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
-+#define IOCB_NOWAIT		(1 << 7)
- 
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -3053,7 +3054,7 @@ static inline int iocb_flags(struct file *file)
- 
- static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
- {
--	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
-+	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT)))
- 		return -EOPNOTSUPP;
- 
- 	if (flags & RWF_HIPRI)
-@@ -3062,6 +3063,8 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
- 		ki->ki_flags |= IOCB_DSYNC;
- 	if (flags & RWF_SYNC)
- 		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	if (flags & RWF_NOWAIT)
-+		ki->ki_flags |= IOCB_NOWAIT;
- 	return 0;
- }
- 
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 048a85e9f017..7bcaef101876 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -347,5 +347,6 @@ struct fscrypt_policy {
- #define RWF_HIPRI			0x00000001 /* high priority request, poll if possible */
- #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
- #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
-+#define RWF_NOWAIT			0x00000008 /* per-IO, return -EAGAIN if operation would block */
- 
- #endif /* _UAPI_LINUX_FS_H */
-diff --git a/mm/filemap.c b/mm/filemap.c
-index fae5a361befb..ca3031f505f2 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3015,6 +3015,9 @@ ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct inode *inode = file->f_mapping->host;
- 	ssize_t ret;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EOPNOTSUPP;
-+
- 	inode_lock(inode);
- 	ret = generic_write_checks(iocb, from);
- 	if (ret > 0)
 -- 
-2.12.0
+2.9.3
