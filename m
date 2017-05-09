@@ -1,156 +1,405 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42560 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750703AbdEARxz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:55 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2 06/10] dm: Introduce dm_remap_zone_report()
-Date: Tue,  2 May 2017 02:53:10 +0900
-Message-Id: <20170501175314.10922-7-damien.lemoal@wdc.com>
-In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
-References: <20170501175314.10922-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jg@lightnvm.io>
+Return-Path: <jg@lightnvm.io>
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <9F25B10A-6FC4-4B30-9683-7723246977D2@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_F447B7A7-836A-49A7-B1CB-5AB45236C5B8";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: Large latency on blk_queue_enter
+Date: Tue, 9 May 2017 16:21:51 +0200
+In-Reply-To: <B3E68D58-EAAF-4DDE-BE0E-C60444C971C7@lightnvm.io>
+Cc: Ming Lei <ming.lei@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>,
+ Dan Williams <dan.j.williams@intel.com>,
+ linux-block@vger.kernel.org,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+To: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+References: <576f9601-b0de-c636-8195-07e12fe99734@fb.com>
+ <991bbc1d-1849-94d9-5787-69a630e7e10d@kernel.dk>
+ <A781A1A3-58FA-49DF-9197-35FBD05E7476@lightnvm.io>
+ <347b1a1d-de9e-509f-13c2-df0d4c427682@kernel.dk>
+ <EAD85BFB-0DB3-44E4-992A-FF789DA1F46C@lightnvm.io>
+ <822b8db4-9b98-da1f-2157-12b2af599b82@kernel.dk>
+ <98125B90-AA08-49F4-8214-56AC86E4A645@lightnvm.io>
+ <7f6e8c4b-504e-b786-da52-776c666e8c73@kernel.dk>
+ <9AFF433E-1B77-4800-8B27-8E335F2F5DDE@lightnvm.io>
+ <C3E13E05-ECE3-4CEB-ADFD-B8D6A7E6B0D7@lightnvm.io>
+ <20170509105845.GA24858@ming.t460p>
+ <B3E68D58-EAAF-4DDE-BE0E-C60444C971C7@lightnvm.io>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
 
-A target driver support zoned block devices and exposing it as such may
-receive REQ_OP_ZONE_REPORT request for the user to determine the mapped
-device zone configuration. To process properly such request, the target
-driver may need to remap the zone descriptors provided in the report
-reply. The helper function dm_remap_zone_report() does this generically
-using only the target start offset and length and the start offset
-within the target device.
+--Apple-Mail=_F447B7A7-836A-49A7-B1CB-5AB45236C5B8
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-dm_remap_zone_report() will remap the start sector of all zones
-reported. If the report includes sequential zones, the write pointer
-position of these zones will also be remapped.
+> On 9 May 2017, at 13.21, Javier Gonz=C3=A1lez <jg@lightnvm.io> wrote:
+>=20
+>> On 9 May 2017, at 12.58, Ming Lei <ming.lei@redhat.com> wrote:
+>>=20
+>> On Tue, May 09, 2017 at 12:34:42PM +0200, Javier Gonz=C3=A1lez wrote:
+>>>> On 8 May 2017, at 18.39, Javier Gonz=C3=A1lez <jg@lightnvm.io> =
+wrote:
+>>>>=20
+>>>>> On 8 May 2017, at 18.06, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>=20
+>>>>> On 05/08/2017 09:49 AM, Javier Gonz=C3=A1lez wrote:
+>>>>>>> On 8 May 2017, at 17.40, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>=20
+>>>>>>> On 05/08/2017 09:38 AM, Javier Gonz=C3=A1lez wrote:
+>>>>>>>>> On 8 May 2017, at 17.25, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>=20
+>>>>>>>>> On 05/08/2017 09:22 AM, Javier Gonz=C3=A1lez wrote:
+>>>>>>>>>> Javier
+>>>>>>>>>>=20
+>>>>>>>>>>> On 8 May 2017, at 17.14, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>>>=20
+>>>>>>>>>>> On 05/08/2017 09:08 AM, Jens Axboe wrote:
+>>>>>>>>>>>> On 05/08/2017 09:02 AM, Javier Gonz=C3=A1lez wrote:
+>>>>>>>>>>>>>> On 8 May 2017, at 16.52, Jens Axboe <axboe@fb.com> wrote:
+>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>> On 05/08/2017 08:46 AM, Javier Gonz=C3=A1lez wrote:
+>>>>>>>>>>>>>>>> On 8 May 2017, at 16.23, Jens Axboe <axboe@fb.com> =
+wrote:
+>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>> On 05/08/2017 08:20 AM, Javier Gonz=C3=A1lez wrote:
+>>>>>>>>>>>>>>>>>> On 8 May 2017, at 16.13, Jens Axboe <axboe@fb.com> =
+wrote:
+>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>> On 05/08/2017 07:44 AM, Javier Gonz=C3=A1lez wrote:
+>>>>>>>>>>>>>>>>>>>> On 8 May 2017, at 14.27, Ming Lei =
+<ming.lei@redhat.com> wrote:
+>>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>>> On Mon, May 08, 2017 at 01:54:58PM +0200, Javier =
+Gonz=C3=A1lez wrote:
+>>>>>>>>>>>>>>>>>>>>> Hi,
+>>>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>>>> I find an unusual added latency(~20-30ms) on =
+blk_queue_enter when
+>>>>>>>>>>>>>>>>>>>>> allocating a request directly from the NVMe driver =
+through
+>>>>>>>>>>>>>>>>>>>>> nvme_alloc_request. I could use some help =
+confirming that this is a bug
+>>>>>>>>>>>>>>>>>>>>> and not an expected side effect due to something =
+else.
+>>>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>>>> I can reproduce this latency consistently on =
+LightNVM when mixing I/O
+>>>>>>>>>>>>>>>>>>>>> from pblk and I/O sent through an ioctl using =
+liblightnvm, but I don't
+>>>>>>>>>>>>>>>>>>>>> see anything on the LightNVM side that could =
+impact the request
+>>>>>>>>>>>>>>>>>>>>> allocation.
+>>>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>>>> When I have a 100% read workload sent from pblk, =
+the max. latency is
+>>>>>>>>>>>>>>>>>>>>> constant throughout several runs at ~80us (which =
+is normal for the media
+>>>>>>>>>>>>>>>>>>>>> we are using at bs=3D4k, qd=3D1). All pblk I/Os =
+reach the nvme_nvm_submit_io
+>>>>>>>>>>>>>>>>>>>>> function on lightnvm.c., which uses =
+nvme_alloc_request. When we send a
+>>>>>>>>>>>>>>>>>>>>> command from user space through an ioctl, then the =
+max latency goes up
+>>>>>>>>>>>>>>>>>>>>> to ~20-30ms. This happens independently from the =
+actual command
+>>>>>>>>>>>>>>>>>>>>> (IN/OUT). I tracked down the added latency down to =
+the call
+>>>>>>>>>>>>>>>>>>>>> percpu_ref_tryget_live in blk_queue_enter. Seems =
+that the queue
+>>>>>>>>>>>>>>>>>>>>> reference counter is not released as it should =
+through blk_queue_exit in
+>>>>>>>>>>>>>>>>>>>>> blk_mq_alloc_request. For reference, all ioctl =
+I/Os reach the
+>>>>>>>>>>>>>>>>>>>>> nvme_nvm_submit_user_cmd on lightnvm.c
+>>>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>>>> Do you have any idea about why this might happen? =
+I can dig more into
+>>>>>>>>>>>>>>>>>>>>> it, but first I wanted to make sure that I am not =
+missing any obvious
+>>>>>>>>>>>>>>>>>>>>> assumption, which would explain the reference =
+counter to be held for a
+>>>>>>>>>>>>>>>>>>>>> longer time.
+>>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>>> You need to check if the .q_usage_counter is =
+working at atomic mode.
+>>>>>>>>>>>>>>>>>>>> This counter is initialized as atomic mode, and =
+finally switchs to
+>>>>>>>>>>>>>>>>>>>> percpu mode via percpu_ref_switch_to_percpu() in =
+blk_register_queue().
+>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>> Thanks for commenting Ming.
+>>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>>> The .q_usage_counter is not working on atomic mode. =
+The queue is
+>>>>>>>>>>>>>>>>>>> initialized normally through blk_register_queue() =
+and the counter is
+>>>>>>>>>>>>>>>>>>> switched to percpu mode, as you mentioned. As I =
+understand it, this is
+>>>>>>>>>>>>>>>>>>> how it should be, right?
+>>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>>> That is how it should be, yes. You're not running =
+with any heavy
+>>>>>>>>>>>>>>>>>> debugging options, like lockdep or anything like =
+that?
+>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>> No lockdep, KASAN, kmemleak or any of the other usual =
+suspects.
+>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>> What's interesting is that it only happens when one of =
+the I/Os comes
+>>>>>>>>>>>>>>>>> from user space through the ioctl. If I have several =
+pblk instances on
+>>>>>>>>>>>>>>>>> the same device (which would end up allocating a new =
+request in
+>>>>>>>>>>>>>>>>> parallel, potentially on the same core), the latency =
+spike does not
+>>>>>>>>>>>>>>>>> trigger.
+>>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>>> I also tried to bind the read thread and the =
+liblightnvm thread issuing
+>>>>>>>>>>>>>>>>> the ioctl to different cores, but it does not help...
+>>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>>> How do I reproduce this? Off the top of my head, and =
+looking at the code,
+>>>>>>>>>>>>>>>> I have no idea what is going on here.
+>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>> Using LightNVM and liblightnvm [1] you can reproduce it =
+by:
+>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>> 1. Instantiate a pblk instance on the first channel =
+(luns 0 - 7):
+>>>>>>>>>>>>>>> sudo nvme lnvm create -d nvme0n1 -n test0 -t pblk -b 0 =
+-e 7 -f
+>>>>>>>>>>>>>>> 2. Write 5GB to the test0 block device with a normal fio =
+script
+>>>>>>>>>>>>>>> 3. Read 5GB to verify that latencies are good (max. =
+~80-90us at bs=3D4k, qd=3D1)
+>>>>>>>>>>>>>>> 4. Re-run 3. and in parallel send a command through =
+liblightnvm to a
+>>>>>>>>>>>>>>> different channel. A simple command is an erase (erase =
+block 900 on
+>>>>>>>>>>>>>>> channel 2, lun 0):
+>>>>>>>>>>>>>>> 	sudo nvm_vblk line_erase /dev/nvme0n1 2 2 0 0 =
+900
+>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>> After 4. you should see a ~25-30ms latency on the read =
+workload.
+>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>> I tried to reproduce the ioctl in a more generic way to =
+reach
+>>>>>>>>>>>>>>> __nvme_submit_user_cmd(), but SPDK steals the whole =
+device. Also, qemu
+>>>>>>>>>>>>>>> is not reliable for this kind of performance testing.
+>>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>>> If you have a suggestion on how I can mix an ioctl with =
+normal block I/O
+>>>>>>>>>>>>>>> read on a standard NVMe device, I'm happy to try it and =
+see if I can
+>>>>>>>>>>>>>>> reproduce the issue.
+>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>> Just to rule out this being any hardware related delays =
+in processing
+>>>>>>>>>>>>>> IO:
+>>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>> 1) Does it reproduce with a simpler command, anything =
+close to a no-op
+>>>>>>>>>>>>>> that you can test?
+>>>>>>>>>>>>>=20
+>>>>>>>>>>>>> Yes. I tried with a 4KB read and with a fake command I =
+drop right after
+>>>>>>>>>>>>> allocation.
+>>>>>>>>>>>>>=20
+>>>>>>>>>>>>>> 2) What did you use to time the stall being =
+blk_queue_enter()?
+>>>>>>>>>>>>>=20
+>>>>>>>>>>>>> I have some debug code measuring time with ktime_get() in =
+different
+>>>>>>>>>>>>> places in the stack, and among other places, around =
+blk_queue_enter(). I
+>>>>>>>>>>>>> use them then to measure max latency and expose it through =
+sysfs. I can
+>>>>>>>>>>>>> see that the latency peak is recorded in the probe before
+>>>>>>>>>>>>> blk_queue_enter() and not in the one after.
+>>>>>>>>>>>>>=20
+>>>>>>>>>>>>> I also did an experiment, where the normal I/O path =
+allocates the
+>>>>>>>>>>>>> request with BLK_MQ_REQ_NOWAIT. When running the =
+experiment above, the
+>>>>>>>>>>>>> read test fails since we reach:
+>>>>>>>>>>>>> 	if (nowait)
+>>>>>>>>>>>>> 	  return -EBUSY;
+>>>>>>>>>>>>>=20
+>>>>>>>>>>>>> in blk_queue_enter.
+>>>>>>>>>>>>=20
+>>>>>>>>>>>> OK, that's starting to make more sense, that indicates that =
+there is indeed
+>>>>>>>>>>>> something wrong with the refs. Does the below help?
+>>>>>>>>>>>=20
+>>>>>>>>>>> No, that can't be right, it does look balanced to begin =
+with.
+>>>>>>>>>>> blk_mq_alloc_request() always grabs a queue ref, and always =
+drops it. If
+>>>>>>>>>>> we return with a request succesfully allocated, then we have =
+an extra
+>>>>>>>>>>> ref on it, which is dropped when it is later freed.
+>>>>>>>>>>=20
+>>>>>>>>>> I agree, it seems more like a reference is put too late. I =
+looked into
+>>>>>>>>>> into the places where the reference is put, but it all seems =
+normal. In
+>>>>>>>>>> any case, I run it (just to see), and it did not help.
+>>>>>>>>>>=20
+>>>>>>>>>>> Something smells fishy, I'll dig a bit.
+>>>>>>>>>>=20
+>>>>>>>>>> Thanks! I continue looking into it myself; let me know if I =
+can help
+>>>>>>>>>> with something more specific.
+>>>>>>>>>=20
+>>>>>>>>> What exact kernel are you running? And does the device have a =
+scheduler
+>>>>>>>>> attached, or is it set to "none"?
+>>>>>>>>=20
+>>>>>>>> I can reproduce the issue on 4.11-rc7. I will rebase on top of =
+your
+>>>>>>>> for-4.12/block, but I cannot see any patches that might be =
+related. If
+>>>>>>>> it changes I'll ping you.
+>>>>>>>=20
+>>>>>>> I don't suspect it will do anything for you. I just ask to know =
+what
+>>>>>>> base you are on.
+>>>>>>>=20
+>>>>>>>> I mentioned the problem to Christoph last week and disabling =
+the
+>>>>>>>> schedulers was the first thing he recommended. I measured time =
+around
+>>>>>>>> blk_mq_sched_get_request and for this particular test the =
+choose of
+>>>>>>>> scheduler (including BFQ and kyber) does not seem to have an =
+effect.
+>>>>>>>=20
+>>>>>>> kyber vs none would be the interesting test. Some of the paths =
+are a
+>>>>>>> little different depending if there's a scheduler attached or =
+not, so
+>>>>>>> it's good to know that we're seeing this in both cases.
+>>>>>>=20
+>>>>>> I just tested on your for-4.12/block with none and kyber and the =
+latency
+>>>>>> spike appears in both cases.
+>>>>>=20
+>>>>> OK good. I looked at your reproduction case. Looks like we =
+ultimately
+>>>>> end up submitting IO through nvme_nvm_submit_user_cmd() when you =
+do the
+>>>>> nvm_vblk line_erase, which is basically the same code as
+>>>>> NVME_IOCTL_SUBMIT_IO as far as request alloc, setup, issue, free =
+goes.
+>>>>> So does it reproduce for you as well on a normal nvme device, if =
+you run
+>>>>> a nvme read /dev/nvme0 [...] while running the same read fio job?
+>>>>=20
+>>>> Ok. I'll try that.
+>>>=20
+>>> I cannot reproduce the latency on a normal nvme drive when mixing =
+I/O
+>>> from a fio job and ioctls.
+>>>=20
+>>> The path is different from the one in pblk, since normal block I/O
+>>> uses the generic_make_request(), but still, they both need to
+>>> blk_queue_enter(), allocate a request, etc. They only "major" =
+difference
+>>> I see is that normal block I/O requests are given by get_request()
+>>> (which as far as I understand takes pre-allocated requests from the
+>>> queue request list), while pblk allocates each request via
+>>> nvme_alloc_request().
+>>>=20
+>>> What puzzles me most is that having different pblk instances, =
+issuing
+>>> I/O in parallel does not trigger the long tail. Otherwise, I would =
+think
+>>> that we are just unlucky and get scheduled out. Still, 20ms...
+>>>=20
+>>> BTW, in order to discard NUMA, I tried on a single socket machine, =
+and
+>>> same, same.
+>>=20
+>> I suspect the .q_usage_counter is DEAD, and you can check it via
+>> percpu_ref_is_dying(), or just check if slow path is reached.
+>>=20
+>> The fast path is that percpu_ref_tryget_live() returns directly,
+>> and slow path is reached only if queue is freezed or dead.
+>>=20
+>> If that is true, you can add a dump_stack() in =
+blk_freeze_queue_start()
+>> to see where the unusual freezing/unfreezing is from.
+>=20
+>=20
+> Thanks for the hint Ming! You are right. We somehow trigger a re-read
+> partition:
+>=20
+> [  324.010184]  dump_stack+0x63/0x90
+> [  324.010191]  blk_freeze_queue_start+0x1e/0x50
+> [  324.010194]  blk_mq_freeze_queue+0x12/0x20
+> [  324.010199]  __nvme_revalidate_disk+0xa4/0x350
+> [  324.010203]  nvme_revalidate_disk+0x53/0x90
+> [  324.010206]  rescan_partitions+0x8d/0x380
+> [  324.010211]  ? tlb_flush_mmu_free+0x36/0x60
+> [  324.010218]  ? security_capable+0x48/0x60
+> [  324.010221]  __blkdev_reread_part+0x65/0x70
+> [  324.010223]  blkdev_reread_part+0x23/0x40
+> [  324.010225]  blkdev_ioctl+0x387/0x910
+> [  324.010229]  ? locks_insert_lock_ctx+0x7e/0xd0
+> [  324.010235]  block_ioctl+0x3d/0x50
+> [  324.010239]  do_vfs_ioctl+0xa1/0x5d0
+> [  324.010242]  ? locks_lock_inode_wait+0x51/0x150
+> [  324.010247]  ? kmem_cache_alloc+0xd7/0x1b0
+> [  324.010249]  ? locks_alloc_lock+0x1b/0x70
+> [  324.010252]  SyS_ioctl+0x79/0x90
+> [  324.010254]  ? SyS_flock+0x11c/0x180
+> [  324.010260]  entry_SYSCALL_64_fastpath+0x1e/0xad
+>=20
+> I'm checking why this happens now...
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- drivers/md/dm.c               | 80 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/device-mapper.h | 10 ++++++
- 2 files changed, 90 insertions(+)
+So apparently we opened a file descriptor with O_RDWR for sending ioctls
+on liblightnvm. Opening for writing triggered a syscall to re-read
+and ultimately reached blk_mq_freeze_queue(), which accounted for the
+latencies we observed. For reference, nvme-cli opens the fd read-only,
+reason why we could not reproduce the issue with nvme read.
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index cd44928..1f6558e 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -975,6 +975,86 @@ void dm_accept_partial_bio(struct bio *bio, unsigned n_sectors)
- }
- EXPORT_SYMBOL_GPL(dm_accept_partial_bio);
- 
-+#ifdef CONFIG_BLK_DEV_ZONED
-+/*
-+ * The zone descriptors obtained with a zone report indicate
-+ * zone positions within the target device. The zone descriptors
-+ * must be remapped to match their position within the dm device.
-+ * A target may call dm_remap_zone_report after completion of a
-+ * REQ_OP_ZONE_REPORT bio to remap the zone descriptors obtained
-+ * from the target device mapping to the dm device.
-+ */
-+void dm_remap_zone_report(struct dm_target *ti, struct bio *bio, sector_t start)
-+{
-+	struct dm_target_io *tio =
-+		container_of(bio, struct dm_target_io, clone);
-+	struct bio *report_bio = tio->io->bio;
-+	struct blk_zone_report_hdr *hdr = NULL;
-+	struct blk_zone *zone;
-+	unsigned int nr_rep = 0;
-+	unsigned int ofst;
-+	struct bio_vec bvec;
-+	struct bvec_iter iter;
-+	void *addr;
-+
-+	if (bio->bi_error)
-+		return;
-+
-+	/*
-+	 * Remap the start sector of the reported zones. For sequential zones,
-+	 * also remap the write pointer position.
-+	 */
-+	bio_for_each_segment(bvec, report_bio, iter) {
-+
-+		addr = kmap_atomic(bvec.bv_page);
-+
-+		/* Remember the report header in the first page */
-+		if (!hdr) {
-+			hdr = addr;
-+			ofst = sizeof(struct blk_zone_report_hdr);
-+		} else {
-+			ofst = 0;
-+		}
-+
-+		/* Set zones start sector */
-+		while (hdr->nr_zones && ofst < bvec.bv_len) {
-+			zone = addr + ofst;
-+			if (zone->start >= start + ti->len) {
-+				hdr->nr_zones = 0;
-+				break;
-+			}
-+			zone->start = zone->start + ti->begin - start;
-+			if (zone->type != BLK_ZONE_TYPE_CONVENTIONAL) {
-+				if (zone->cond == BLK_ZONE_COND_FULL)
-+					zone->wp = zone->start + zone->len;
-+				else if (zone->cond == BLK_ZONE_COND_EMPTY)
-+					zone->wp = zone->start;
-+				else
-+					zone->wp = zone->wp + ti->begin - start;
-+			}
-+			ofst += sizeof(struct blk_zone);
-+			hdr->nr_zones--;
-+			nr_rep++;
-+		}
-+
-+		if (addr != hdr)
-+			kunmap_atomic(addr);
-+
-+		if (!hdr->nr_zones)
-+			break;
-+
-+	}
-+
-+	if (hdr) {
-+		hdr->nr_zones = nr_rep;
-+		kunmap_atomic(hdr);
-+	}
-+
-+	bio_advance(report_bio, report_bio->bi_iter.bi_size);
-+}
-+EXPORT_SYMBOL_GPL(dm_remap_zone_report);
-+#endif
-+
- /*
-  * Flush current->bio_list when the target map method blocks.
-  * This fixes deadlocks in snapshot and possibly in other targets.
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index b3c2408..d21c761 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -433,6 +433,16 @@ struct gendisk *dm_disk(struct mapped_device *md);
- int dm_suspended(struct dm_target *ti);
- int dm_noflush_suspending(struct dm_target *ti);
- void dm_accept_partial_bio(struct bio *bio, unsigned n_sectors);
-+#ifdef CONFIG_BLK_DEV_ZONED
-+void dm_remap_zone_report(struct dm_target *ti, struct bio *bio,
-+			  sector_t start);
-+#else
-+static inline void dm_remap_zone_report(struct dm_target *ti, struct bio *bio,
-+					sector_t start)
-+{
-+	bio->bi_error = -ENOTSUPP;
-+}
-+#endif
- union map_info *dm_get_rq_mapinfo(struct request *rq);
- 
- struct queue_limits *dm_get_queue_limits(struct mapped_device *md);
--- 
-2.9.3
+Thanks Ming and Jens for looking into this and giving good advice. Much
+appreciated!
+
+Javier
+
+--Apple-Mail=_F447B7A7-836A-49A7-B1CB-5AB45236C5B8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJZEdB/AAoJEGMfBTt1mRjKeDwQAMaYDYHZk2Zxz62F26j+G3IP
+ZxRJILZ6L5wNMEHs9L4c7zCalDEMJa89OVvQEoxnaWZyd7TVIXctNyWSzYiQ9qIg
+ABumcWwpmmTCHOMxueaxU6LFW3xjcweWWalxK7d/2WrNB3+9RAeP6Sgoril6TT5E
+VKYaJ+h9yEKXoglQBDE2wUoSdMjAT6sRYp+2qxaV95OsMhQgoFRdEbMrZDkyL7Mc
+M43rIeZvsDHb4WUCCC4BdVofhtHa4GCUJl8313Sr8K2o4FdEt8sbV+w8v35stpu7
+jR7yK5+IAKNdbbuPaE6+QMmYUTaFk+TbkPRP1w3b2OPzcmH9ey9B9PpuNP3HL9BD
+YB6cdNacmk3RYLROHHbcL2s+qIEcUTzDazDgu86nxIxXnHeYzqNYPixEI0VHzoRm
+7bJqKnM4Afs0CgVjp0z2YfmPANUWT7Exdl9REAFCWq0032GENELO+V+TNLOmPo6p
+l/cU2PdklWkv7E2kZMv9RMp56OTqhuIeZVZGijBx3Dlwu9MJbI3+6B9NWKipYlIo
+SgcvOjUpgcUKtpOaLW+Pw8mnQhQdy0gHMleIXI+HoksqvlB9bZHbJ5yzGYAKGGiq
+tQb1dRiPb0rPqJe2smJdVVIgC2qW0ysYjN9dkDBQXoz4YC3Q81O9B81aQadF/Evi
+PsopUTvThK5Djt6wzHm/
+=wW/O
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_F447B7A7-836A-49A7-B1CB-5AB45236C5B8--
