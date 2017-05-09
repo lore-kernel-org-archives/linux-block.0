@@ -1,69 +1,100 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:54018 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934572AbdEOP24 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 May 2017 11:28:56 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: snitzer@redhat.com
-Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 4/4] dm: fix REQ_RAHEAD handling
-Date: Mon, 15 May 2017 17:28:39 +0200
-Message-Id: <20170515152839.23375-5-hch@lst.de>
-In-Reply-To: <20170515152839.23375-1-hch@lst.de>
-References: <20170515152839.23375-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	tom.leiming@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 8/8] nowait aio: btrfs
+Date: Tue,  9 May 2017 07:22:19 -0500
+Message-Id: <20170509122219.31756-9-rgoldwyn@suse.de>
+In-Reply-To: <20170509122219.31756-1-rgoldwyn@suse.de>
+References: <20170509122219.31756-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-A few (but not all) dm targets use a special EWOULDBLOCK error code for
-failing REQ_RAHEAD requests that fail due to a lack of available resources.
-But no one else knows about this magic code, and lower level drivers also
-don't generate it when failing read-ahead requests for similar reasons.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-So remove this special casing and ignore all additional error handling for
-REQ_RAHEAD - if this was a real underlying error we'd get a normal read
-once the real read comes in.
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Acked-by: David Sterba <dsterba@suse.com>
 ---
- drivers/md/dm-raid1.c  | 4 ++--
- drivers/md/dm-stripe.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index a95cbb80fb34..5e30b08b91d9 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -1214,7 +1214,7 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index 520cb7230b2d..a870e5dd2b4d 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1823,12 +1823,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
+ 
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
++		}
++	} else
++		inode_lock(inode);
++
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1862,8 +1879,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
  	 */
- 	if (!r || (r == -EWOULDBLOCK)) {
- 		if (bio->bi_opf & REQ_RAHEAD)
--			return -EWOULDBLOCK;
-+			return -EIO;
+ 	update_time_for_write(inode);
  
- 		queue_bio(ms, bio, rw);
- 		return DM_MAPIO_SUBMITTED;
-@@ -1258,7 +1258,7 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (error == -EOPNOTSUPP)
- 		return error;
- 
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (unlikely(error)) {
-diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
-index 75152482f3ad..780e95889a7c 100644
---- a/drivers/md/dm-stripe.c
-+++ b/drivers/md/dm-stripe.c
-@@ -384,7 +384,7 @@ static int stripe_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (!error)
- 		return 0; /* I/O complete */
- 
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (error == -EOPNOTSUPP)
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 5e71f1ea3391..47d3fcd86979 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8625,6 +8625,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			dio_data.overwrite = 1;
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
 -- 
-2.11.0
+2.12.0
