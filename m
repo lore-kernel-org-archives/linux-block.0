@@ -1,38 +1,53 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: fstests@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 2/9] bio-integrity: bio_trim should truncate integrity vector accordingly
-Date: Wed, 10 May 2017 19:20:45 +0400
-Message-Id: <1494429652-9488-3-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
-References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:58288 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753842AbdEJP4E (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 May 2017 11:56:04 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 0/4] blk-mq: support to use hw tag for scheduling
+Date: Wed, 10 May 2017 23:55:39 +0800
+Message-Id: <20170510155543.18033-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
----
- block/bio.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi,
 
-diff --git a/block/bio.c b/block/bio.c
-index 888e780..2f01f1b 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1889,6 +1889,10 @@ void bio_trim(struct bio *bio, int offset, int size)
- 	bio_advance(bio, offset << 9);
- 
- 	bio->bi_iter.bi_size = size;
-+
-+	if (bio_integrity(bio))
-+		bio_integrity_trim(bio, 0, size);
-+
- }
- EXPORT_SYMBOL_GPL(bio_trim);
- 
+This patchset introduces flag of BLK_MQ_F_SCHED_USE_HW_TAG and
+allows to use hardware tag directly for IO scheduling if the queue's
+depth is big enough. In this way, we can avoid to allocate extra tags
+and request pool for IO schedule, and the schedule tag allocation/release
+can be saved in I/O submit path.
+
+V3:
+	- respect q->nr_requests by resizing hw tags, as suggested by Omar
+
+V2:
+	- fix oops when kyber is used
+	- move dumping the new flag into patch 1
+	- support to use hw tag for shared tags
+	- update hctx->sched_tag when BLK_MQ_F_SCHED_USE_HW_TAG is changed
+	- clear the flag in patch of blk_mq_exit_sched()
+	- don't update q->nr_requests when updating hw queue's depth
+	- fix blk_mq_get_queue_depth()
+
+Ming Lei (4):
+  blk-mq: introduce BLK_MQ_F_SCHED_USE_HW_TAG
+  blk-mq: introduce blk_mq_get_queue_depth()
+  blk-mq: use hw tag for scheduling if hw tag space is big enough
+  blk-mq: allow to use hw tag for shared tags
+
+ block/blk-mq-debugfs.c |   1 +
+ block/blk-mq-sched.c   |  90 ++++++++++++++++++++++++++++++++++++++++----
+ block/blk-mq-sched.h   |   9 +++++
+ block/blk-mq.c         | 100 +++++++++++++++++++++++++++++++++++++++++++++----
+ block/blk-mq.h         |  24 ++++++++++++
+ block/kyber-iosched.c  |   7 +++-
+ include/linux/blk-mq.h |   1 +
+ include/linux/blkdev.h |   8 ++++
+ 8 files changed, 223 insertions(+), 17 deletions(-)
+
 -- 
 2.9.3
