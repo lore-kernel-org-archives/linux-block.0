@@ -1,92 +1,121 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com
-Subject: [PATCH 0/8 v7] No wait AIO
-Date: Tue,  9 May 2017 07:22:11 -0500
-Message-Id: <20170509122219.31756-1-rgoldwyn@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: fstests@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 4/9] bio-integrity: fix interface for bio_integrity_trim
+Date: Wed, 10 May 2017 19:20:47 +0400
+Message-Id: <1494429652-9488-5-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Formerly known as non-blocking AIO.
+bio_integrity_trim inherent it's interface from bio_trim and accept
+offset and size, but this API is error prone because data offset
+must always be insync with bio's data offset. That is why we have
+integrity update hook in bio_advance()
 
-This series adds nonblocking feature to asynchronous I/O writes.
-io_submit() can be delayed because of a number of reason:
- - Block allocation for files
- - Data writebacks for direct I/O
- - Sleeping because of waiting to acquire i_rwsem
- - Congested block device
+So only meaningful values are: offset == 0, sectors == bio_sectors(bio)
+Let's just remove them completely.
 
-The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
-any of these conditions are met. This way userspace can push most
-of the write()s to the kernel to the best of its ability to complete
-and if it returns -EAGAIN, can defer it to another thread.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+---
+ block/bio-integrity.c | 11 ++---------
+ block/bio.c           |  4 ++--
+ drivers/md/dm.c       |  2 +-
+ include/linux/bio.h   |  5 ++---
+ 4 files changed, 7 insertions(+), 15 deletions(-)
 
-In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
-uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
-IOCB_NOWAIT for struct iocb, REQ_NOWAIT for bio.bi_opf and IOMAP_NOWAIT for
-iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
-not use aio_flags because it is not currently checked for invalidity
-in the kernel.
-
-This feature is provided for direct I/O of asynchronous I/O only. I have
-tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
-The nowait feature is for request based devices. In the future, I intend to
-add support to stacked devices such as md.
-
-Applications will have to check supportability
-by sending a async direct write and any other error besides -EAGAIN
-would mean it is not supported.
-
-Changes since v1:
- + changed name from _NONBLOCKING to *_NOWAIT
- + filemap_range_has_page call moved to closer to (just before) calling filemap_write_and_wait_range().
- + BIO_NOWAIT limited to get_request()
- + XFS fixes 
-	- included reflink 
-	- use of xfs_ilock_nowait() instead of a XFS_IOLOCK_NONBLOCKING flag
-	- Translate the flag through IOMAP_NOWAIT (iomap) to check for
-	  block allocation for the file.
- + ext4 coding style
-
-Changes since v2:
- + Using aio_reserved1 as aio_rw_flags instead of aio_flags
- + blk-mq support
- + xfs uptodate with kernel and reflink changes
-
- Changes since v3:
-  + Added FS_NOWAIT, which is set if the filesystem supports NOWAIT feature.
-  + Checks in generic_make_request() to make sure BIO_NOWAIT comes in
-    for async direct writes only.
-  + Added QUEUE_FLAG_NOWAIT, which is set if the device supports BIO_NOWAIT.
-    This is added (rather not set) to block devices such as dm/md currently.
-
- Changes since v4:
-  + Ported AIO code to use RWF_* flags. Check for RWF_* flags in
-    generic_file_write_iter().
-  + Changed IOCB_RW_FLAGS_NOWAIT to RWF_NOWAIT.
-
- Changes since v5:
-  + BIO_NOWAIT to REQ_NOWAIT
-  + Common helper for RWF flags.
-
- Changes since v6:
-  + REQ_NOWAIT will be ignored for request based devices since they
-    cannot block. So, removed QUEUE_FLAG_NOWAIT since it is not
-    required in the current implementation. It will be resurrected
-    when we program for stacked devices.
-  + changed kiocb_rw_flags() to kiocb_set_rw_flags() in order to accomodate
-    for errors. Moved checks in the function.
-
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 82a6ffb..6170dad 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -433,22 +433,15 @@ EXPORT_SYMBOL(bio_integrity_advance);
+ /**
+  * bio_integrity_trim - Trim integrity vector
+  * @bio:	bio whose integrity vector to update
+- * @offset:	offset to first data sector
+- * @sectors:	number of data sectors
+  *
+  * Description: Used to trim the integrity vector in a cloned bio.
+- * The ivec will be advanced corresponding to 'offset' data sectors
+- * and the length will be truncated corresponding to 'len' data
+- * sectors.
+  */
+-void bio_integrity_trim(struct bio *bio, unsigned int offset,
+-			unsigned int sectors)
++void bio_integrity_trim(struct bio *bio)
+ {
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+ 
+-	bio_integrity_advance(bio, offset << 9);
+-	bip->bip_iter.bi_size = bio_integrity_bytes(bi, sectors);
++	bip->bip_iter.bi_size = bio_integrity_bytes(bi, bio_sectors(bio));
+ }
+ EXPORT_SYMBOL(bio_integrity_trim);
+ 
+diff --git a/block/bio.c b/block/bio.c
+index 2f01f1b..d42e602 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1857,7 +1857,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
+ 	split->bi_iter.bi_size = sectors << 9;
+ 
+ 	if (bio_integrity(split))
+-		bio_integrity_trim(split, 0, sectors);
++		bio_integrity_trim(split);
+ 
+ 	bio_advance(bio, split->bi_iter.bi_size);
+ 
+@@ -1891,7 +1891,7 @@ void bio_trim(struct bio *bio, int offset, int size)
+ 	bio->bi_iter.bi_size = size;
+ 
+ 	if (bio_integrity(bio))
+-		bio_integrity_trim(bio, 0, size);
++		bio_integrity_trim(bio);
+ 
+ }
+ EXPORT_SYMBOL_GPL(bio_trim);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 6ef9500..35e5f57 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1146,7 +1146,7 @@ static int clone_bio(struct dm_target_io *tio, struct bio *bio,
+ 	clone->bi_iter.bi_size = to_bytes(len);
+ 
+ 	if (unlikely(bio_integrity(bio) != NULL))
+-		bio_integrity_trim(clone, 0, len);
++		bio_integrity_trim(clone);
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d1b04b0..5834186 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -724,7 +724,7 @@ extern bool bio_integrity_enabled(struct bio *bio);
+ extern int bio_integrity_prep(struct bio *);
+ extern void bio_integrity_endio(struct bio *);
+ extern void bio_integrity_advance(struct bio *, unsigned int);
+-extern void bio_integrity_trim(struct bio *, unsigned int, unsigned int);
++extern void bio_integrity_trim(struct bio *);
+ extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
+ extern int bioset_integrity_create(struct bio_set *, int);
+ extern void bioset_integrity_free(struct bio_set *);
+@@ -774,8 +774,7 @@ static inline void bio_integrity_advance(struct bio *bio,
+ 	return;
+ }
+ 
+-static inline void bio_integrity_trim(struct bio *bio, unsigned int offset,
+-				      unsigned int sectors)
++static inline void bio_integrity_trim(struct bio *bio)
+ {
+ 	return;
+ }
 -- 
-Goldwyn
+2.9.3
