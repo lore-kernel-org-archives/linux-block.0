@@ -1,64 +1,44 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:24 +1000
-Subject: [PATCH 04/13] blk: use non-rescuing bioset for q->bio_split.
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org
-Message-ID: <149369654452.5146.12018336836086489178.stgit@noble>
-In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
-References: <149369628671.5146.4865312503373040039.stgit@noble>
+Return-Path: <rpeterso@redhat.com>
+Date: Wed, 10 May 2017 12:18:51 -0400 (EDT)
+From: Bob Peterson <rpeterso@redhat.com>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org, dhowells@redhat.com,
+	akpm@linux-foundation.org, hch@infradead.org,
+	ross zwisler <ross.zwisler@linux.intel.com>, mawilcox@microsoft.com,
+	jack@suse.com, viro@zeniv.linux.org.uk, corbet@lwn.net,
+	neilb@suse.de, clm@fb.com, tytso@mit.edu, axboe@kernel.dk,
+	josef@toxicpanda.com, hubcap@omnibond.com,
+	bo li liu <bo.li.liu@oracle.com>
+Message-ID: <1840580824.6421109.1494433131277.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170509154930.29524-24-jlayton@redhat.com>
+References: <20170509154930.29524-1-jlayton@redhat.com> <20170509154930.29524-24-jlayton@redhat.com>
+Subject: Re: [PATCH v4 23/27] gfs2: clean up some filemap_* calls
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-A rescuing bioset is only useful if there might be bios from
-that same bioset on the bio_list_on_stack queue at a time
-when bio_alloc_bioset() is called.  This never applies to
-q->bio_split.
+----- Original Message -----
+| In some places, it's trying to reset the mapping error after calling
+| filemap_fdatawait. That's no longer required. Also, turn several
+| filemap_fdatawrite+filemap_fdatawait calls into filemap_write_and_wait.
+| That will at least return writeback errors that occur during the write
+| phase.
+| 
+| Signed-off-by: Jeff Layton <jlayton@redhat.com>
+| ---
 
-Allocations from q->bio_split are only ever made from
-blk_queue_split() which is only ever called early in each of
-various make_request_fn()s.  The original bio (call this A)
-is then passed to generic_make_request() and is placed on
-the bio_list_on_stack queue, and the bio that was allocated
-from q->bio_split (B) is processed.
+Hi Jeff,
 
-The processing of this may cause other bios to be passed to
-generic_make_request() or may even cause the bio B itself to
-be passed, possible after some prefix has been split off
-(using some other bioset).
+This version looks better. ACK.
 
-generic_make_request() now guarantees that all of these bios
-(B and dependants) will be fully processed before the tail
-of the original bio A gets handled.  None of these early bios
-can possible trigger an allocation from the original
-q->bio_split as they are either too small to require
-splitting or (more likely) are destined for a different queue.
+Regards,
 
-The next time that the original q->bio_split might be used
-by this thread is when A is processed again, as it might
-still be too big to handle directly.  By this time there
-cannot be any other bios allocated from q->bio_split in the
-generic_make_request() queue.  So no rescuing will ever be
-needed.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: NeilBrown <neilb@suse.com>
----
- block/blk-core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ae51f159a2ca..3797753f4085 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -730,7 +730,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	if (q->id < 0)
- 		goto fail_q;
- 
--	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER);
-+	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
- 	if (!q->bio_split)
- 		goto fail_id;
- 
+Bob Peterson
+Red Hat File Systems
