@@ -1,146 +1,125 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 24/27][RFC] nfs: convert to new errseq_t based error tracking for writeback errors
-Date: Tue,  9 May 2017 11:49:27 -0400
-Message-Id: <20170509154930.29524-25-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: fstests@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 8/9] bio: add bvec_iter rewind API
+Date: Wed, 10 May 2017 19:20:51 +0400
+Message-Id: <1494429652-9488-9-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Drop the ERROR_WRITE flag and convert the error field in the context to
-a errseq_t. Add a new wb_err_cursor to track the reporting of the
-errseq_t. In principle, we could use the f_wb_err field in struct file
-for that, but that's problematic with the stock reporting in call_fsync.
+Some ->bi_end_io handlers (for example: pi_verify or decrypt handlers)
+need to know original data vector, but after bio traverse io-stack it may
+be advanced, splited and relocated many times so it is hard to guess
+original iterator. Let's add 'bi_done' conter which accounts number
+of bytes iterator was advanced during it's evolution. Later end_io handler
+may easily restore original iterator by rewinding iterator to
+iter->bi_done.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Note: this change makes sizeof (struct bvec_iter) multiple to 8
 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- fs/nfs/file.c          | 19 +++++++++++--------
- fs/nfs/inode.c         |  5 +++--
- fs/nfs/write.c         |  2 +-
- include/linux/nfs_fs.h |  3 ++-
- 4 files changed, 17 insertions(+), 12 deletions(-)
+ include/linux/bio.h  | 21 +++++++++++++++++++--
+ include/linux/bvec.h | 27 +++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 2 deletions(-)
 
-I did this on a lark to see how it would be, but I don't think this is
-really better than what's there already. There may be a better way to
-provide the right semantics without using an errseq_t here.
-
-diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-index 668213984d68..fd4d2b381d4b 100644
---- a/fs/nfs/file.c
-+++ b/fs/nfs/file.c
-@@ -212,21 +212,24 @@ nfs_file_fsync_commit(struct file *file, loff_t start, loff_t end, int datasync)
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 643ecba..ab812a0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -166,9 +166,10 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
  {
- 	struct nfs_open_context *ctx = nfs_file_open_context(file);
- 	struct inode *inode = file_inode(file);
--	int have_error, do_resend, status;
--	int ret = 0;
-+	int do_resend, status;
-+	int ret;
+ 	iter->bi_sector += bytes >> 9;
  
- 	dprintk("NFS: fsync file(%pD2) datasync %d\n", file, datasync);
+-	if (bio_no_advance_iter(bio))
++	if (bio_no_advance_iter(bio)) {
+ 		iter->bi_size -= bytes;
+-	else {
++		iter->bi_done += bytes;
++	} else {
+ 		int err;
  
- 	nfs_inc_stats(inode, NFSIOS_VFSFSYNC);
- 	do_resend = test_and_clear_bit(NFS_CONTEXT_RESEND_WRITES, &ctx->flags);
--	have_error = test_and_clear_bit(NFS_CONTEXT_ERROR_WRITE, &ctx->flags);
-+	clear_bit(NFS_CONTEXT_ERROR_WRITE, &ctx->flags);
- 	status = nfs_commit_inode(inode, FLUSH_SYNC);
--	have_error |= test_bit(NFS_CONTEXT_ERROR_WRITE, &ctx->flags);
--	if (have_error) {
--		ret = xchg(&ctx->error, 0);
--		if (ret)
--			goto out;
-+	ret = errseq_check(&ctx->wb_err, READ_ONCE(ctx->wb_err_cursor));
-+	if (ret) {
-+		/* Use f_lock to serialize changes to wb_err_cursor */
-+		spin_lock(&file->f_lock);
-+		ret = errseq_check_and_advance(&ctx->wb_err, &ctx->wb_err_cursor);
-+		spin_unlock(&file->f_lock);
+ 		err = bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+@@ -176,6 +177,22 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
  	}
-+	if (ret)
-+		goto out;
- 	if (status < 0) {
- 		ret = status;
- 		goto out;
-diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
-index f489a5a71bd5..ca85f6b39e3b 100644
---- a/fs/nfs/inode.c
-+++ b/fs/nfs/inode.c
-@@ -869,7 +869,8 @@ struct nfs_open_context *alloc_nfs_open_context(struct dentry *dentry,
- 	ctx->state = NULL;
- 	ctx->mode = f_mode;
- 	ctx->flags = 0;
--	ctx->error = 0;
-+	ctx->wb_err = 0;
-+	ctx->wb_err_cursor = 0;
- 	ctx->flock_owner = (fl_owner_t)filp;
- 	nfs_init_lock_context(&ctx->lock_context);
- 	ctx->lock_context.open_context = ctx;
-@@ -978,7 +979,7 @@ void nfs_file_clear_open_context(struct file *filp)
- 		 * We fatal error on write before. Try to writeback
- 		 * every page again.
- 		 */
--		if (ctx->error < 0)
-+		if (errseq_check(&ctx->wb_err, ctx->wb_err_cursor))
- 			invalidate_inode_pages2(inode->i_mapping);
- 		filp->private_data = NULL;
- 		spin_lock(&inode->i_lock);
-diff --git a/fs/nfs/write.c b/fs/nfs/write.c
-index abb2c8a3be42..95a5b4ac6714 100644
---- a/fs/nfs/write.c
-+++ b/fs/nfs/write.c
-@@ -94,7 +94,7 @@ static void nfs_writehdr_free(struct nfs_pgio_header *hdr)
- 
- static void nfs_context_set_write_error(struct nfs_open_context *ctx, int error)
- {
--	ctx->error = error;
-+	errseq_set(&ctx->wb_err, error);
- 	smp_wmb();
- 	set_bit(NFS_CONTEXT_ERROR_WRITE, &ctx->flags);
  }
-diff --git a/include/linux/nfs_fs.h b/include/linux/nfs_fs.h
-index 287f34161086..336adf1a38f7 100644
---- a/include/linux/nfs_fs.h
-+++ b/include/linux/nfs_fs.h
-@@ -76,7 +76,8 @@ struct nfs_open_context {
- #define NFS_CONTEXT_ERROR_WRITE		(0)
- #define NFS_CONTEXT_RESEND_WRITES	(1)
- #define NFS_CONTEXT_BAD			(2)
--	int error;
-+	errseq_t wb_err;		/* where wb errors are tracked */
-+	errseq_t wb_err_cursor;		/* reporting cursor */
  
- 	struct list_head list;
- 	struct nfs4_threshold	*mdsthreshold;
++static inline int bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
++				    unsigned int bytes)
++{
++	int err = 0;
++
++	iter->bi_sector -= bytes >> 9;
++
++	if (bio_no_advance_iter(bio)) {
++		iter->bi_size += bytes;
++		iter->bi_done -= bytes;
++	} else {
++		err = bvec_iter_rewind(bio->bi_io_vec, iter, bytes);
++	}
++	return err;
++}
++
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 984a7a8..8cfe4d6 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -40,6 +40,8 @@ struct bvec_iter {
+ 
+ 	unsigned int		bi_idx;		/* current index into bvl_vec */
+ 
++	unsigned int            bi_done;	/* number of bytes completed */
++
+ 	unsigned int            bi_bvec_done;	/* number of bytes completed in
+ 						   current bvec */
+ };
+@@ -84,6 +86,7 @@ static inline int bvec_iter_advance(const struct bio_vec *bv,
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+ 		iter->bi_bvec_done += len;
++		iter->bi_done += len;
+ 
+ 		if (iter->bi_bvec_done == __bvec_iter_bvec(bv, *iter)->bv_len) {
+ 			iter->bi_bvec_done = 0;
+@@ -93,6 +96,30 @@ static inline int bvec_iter_advance(const struct bio_vec *bv,
+ 	return 0;
+ }
+ 
++static inline int bvec_iter_rewind(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned int bytes)
++{
++	while (bytes) {
++		unsigned len = min(bytes, iter->bi_bvec_done);
++
++		if (iter->bi_bvec_done == 0) {
++			if (WARN_ONCE(iter->bi_idx == 0,
++				      "Attempted to rewind iter beyond "
++				      "bvec's boundaries\n")) {
++				return -EINVAL;
++			}
++			iter->bi_idx--;
++			iter->bi_bvec_done = __bvec_iter_bvec(bv, *iter)->bv_len;
++			continue;
++		}
++		bytes -= len;
++		iter->bi_size += len;
++		iter->bi_bvec_done -= len;
++	}
++	return 0;
++}
++
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
 -- 
 2.9.3
