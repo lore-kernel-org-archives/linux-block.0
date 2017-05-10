@@ -1,163 +1,187 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:9617 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750703AbdEARxs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:48 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2 03/10] dm-table: Check block devices zone model compatibility
-Date: Tue,  2 May 2017 02:53:07 +0900
-Message-Id: <20170501175314.10922-4-damien.lemoal@wdc.com>
-In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
-References: <20170501175314.10922-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mx1.redhat.com ([209.132.183.28]:49078 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753825AbdEJP5C (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 May 2017 11:57:02 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 4/4] blk-mq: allow to use hw tag for shared tags
+Date: Wed, 10 May 2017 23:55:43 +0800
+Message-Id: <20170510155543.18033-5-ming.lei@redhat.com>
+In-Reply-To: <20170510155543.18033-1-ming.lei@redhat.com>
+References: <20170510155543.18033-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+In case of shared tags, hctx_may_queue() limits that
+the maximum number of requests allocated to one hw
+queue is .queue_depth / active_queues.
 
-When setting the dm device queue limits, several possibilities exists
-for zoned block devices:
-1) The dm target driver may want to expose a different zone model (e.g.
-host-managed device emulation or regular block device on top of
-host-managed zoned block devices)
-2) Expose the underlying zone model of the devices as is
+So we try to allow to use hw tag for this case
+if .queue_depth/shared_queues is not less than
+q->nr_requests.
 
-To allow both cases, the underlying block device zone model must be set
-in the target limits in dm_set_device_limits() and the compatibility of
-all devices checked similarly to the logical block size alignment. For
-this last check, introduce the function validate_hardware_zone_model()
-to check that all targets of a table have the same zone model and that
-the zone size of the target devices are equal.
+This can cover some scsi devices too, such as virtio-scsi
+in default configuration.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/dm-table.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 93 insertions(+)
+ block/blk-mq-sched.c | 16 ++++++++--------
+ block/blk-mq-sched.h |  1 +
+ block/blk-mq.c       | 21 ++++++++++++++++++---
+ block/blk-mq.h       | 23 +++++++++++++++++++++++
+ 4 files changed, 50 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 6947f0f..cc89a78 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -505,6 +505,8 @@ static int dm_set_device_limits(struct dm_target *ti, struct dm_dev *dev,
- 		       q->limits.alignment_offset,
- 		       (unsigned long long) start << SECTOR_SHIFT);
- 
-+	limits->zoned = bdev_zoned_model(bdev);
-+
- 	return 0;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index a7e125a40e0a..f2114eb3eebb 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -459,8 +459,7 @@ static int blk_mq_set_queue_depth(struct blk_mq_hw_ctx *hctx,
+ 	return blk_mq_tag_update_depth(hctx, &hctx->tags, nr, false);
  }
  
-@@ -720,6 +722,94 @@ static int validate_hardware_logical_block_alignment(struct dm_table *table,
- 	return 0;
- }
- 
-+/*
-+ * Check a devices's table for compatibility between zoned devices used by
-+ * the table targets. The zone model may come directly from a target block
-+ * device or may have been set by the target using the io_hints method.
-+ * Overall, if any of the table device targets is advertized as a zoned
-+ * block device, then all targets devices should also be advertized as
-+ * using the same model and the devices zone size all equal.
-+ */
-+static int validate_hardware_zone_model(struct dm_table *table,
-+					struct queue_limits *limits)
-+{
-+	struct dm_target *ti;
-+	struct queue_limits ti_limits;
-+	unsigned int zone_sectors = limits->chunk_sectors;
-+	unsigned int num_targets = dm_table_get_num_targets(table);
-+	int zone_model = -1;
-+	unsigned int i;
-+
-+	if (!num_targets)
-+		return 0;
-+
-+	/*
-+	 * Check each entry in the table in turn.
-+	 */
-+	for (i = 0; i < num_targets; i++) {
-+
-+		ti = dm_table_get_target(table, i);
-+
-+		/* Get the target device limits */
-+		blk_set_stacking_limits(&ti_limits);
-+		if (ti->type->iterate_devices)
-+			ti->type->iterate_devices(ti, dm_set_device_limits,
-+						  &ti_limits);
-+
-+		/*
-+		 * Let the target driver change the hardware limits, and
-+		 * in particular the zone model if needed.
-+		 */
-+		if (ti->type->io_hints)
-+			ti->type->io_hints(ti, &ti_limits);
-+
-+		/* Check zone model compatibility */
-+		if (zone_model == -1)
-+			zone_model = ti_limits.zoned;
-+		if (ti_limits.zoned != zone_model) {
-+			zone_model = -1;
-+			break;
-+		}
-+
-+		if (zone_model != BLK_ZONED_NONE) {
-+			/* Check zone size validity and compatibility */
-+			if (!zone_sectors ||
-+			    !is_power_of_2(zone_sectors))
-+				break;
-+			if (ti_limits.chunk_sectors != zone_sectors) {
-+				zone_sectors = ti_limits.chunk_sectors;
-+				break;
-+			}
-+		}
-+
-+	}
-+
-+	if (i < num_targets) {
-+		if (zone_model == -1)
-+			DMWARN("%s: table line %u (start sect %llu len %llu) "
-+			       "has an incompatible zone model",
-+			       dm_device_name(table->md), i,
-+			       (unsigned long long) ti->begin,
-+			       (unsigned long long) ti->len);
-+		else
-+			DMWARN("%s: table line %u (start sect %llu len %llu) "
-+			       "has an incompatible zone size %u",
-+			       dm_device_name(table->md), i,
-+			       (unsigned long long) ti->begin,
-+			       (unsigned long long) ti->len,
-+			       zone_sectors);
-+		return -EINVAL;
-+	}
-+
-+	if (zone_model == BLK_ZONED_HA ||
-+	    zone_model == BLK_ZONED_HM) {
-+		limits->zoned = zone_model;
-+		limits->chunk_sectors = zone_sectors;
-+	}
-+
-+	return 0;
-+}
-+
- int dm_table_add_target(struct dm_table *t, const char *type,
- 			sector_t start, sector_t len, char *params)
+-static int blk_mq_set_queues_depth(struct request_queue *q,
+-				   unsigned int nr)
++int blk_mq_set_queues_depth(struct request_queue *q, unsigned int nr)
  {
-@@ -1432,6 +1522,9 @@ int dm_calculate_queue_limits(struct dm_table *table,
- 			       (unsigned long long) ti->len);
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i, j, ret;
+@@ -543,15 +542,14 @@ void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+ }
+ 
+ /*
+- * If this queue has enough hardware tags and doesn't share tags with
+- * other queues, just use hw tag directly for scheduling.
++ * If this queue has enough hardware tags, just use hw tag directly
++ * for scheduling.
+  */
+ bool blk_mq_sched_may_use_hw_tag(struct request_queue *q)
+ {
+-	if (q->tag_set->flags & BLK_MQ_F_TAG_SHARED)
+-		return false;
++	int nr_shared = blk_mq_get_shared_queues(q);
+ 
+-	if (q->act_hw_queue_depth < q->nr_requests)
++	if ((q->act_hw_queue_depth / nr_shared) < q->nr_requests)
+ 		return false;
+ 
+ 	return true;
+@@ -578,8 +576,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 
+ 	auto_hw_tag = blk_mq_sched_may_use_hw_tag(q);
+ 	if (auto_hw_tag) {
++		unsigned int nr_shared = blk_mq_get_shared_queues(q);
++
+ 		q->act_hw_queue_depth = blk_mq_get_queue_depth(q);
+-		if (blk_mq_set_queues_depth(q, q->nr_requests))
++		if (blk_mq_set_queues_depth(q, q->nr_requests * nr_shared))
+ 			auto_hw_tag = false;
  	}
  
-+	if (validate_hardware_zone_model(table, limits))
-+		return -EINVAL;
-+
- 	return validate_hardware_logical_block_alignment(table, limits);
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index bbfc1ea5fafa..6deca4f9e656 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -26,6 +26,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
+ 
+ bool blk_mq_sched_may_use_hw_tag(struct request_queue *q);
++int blk_mq_set_queues_depth(struct request_queue *q, unsigned int nr);
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
+ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e02fa8d078e6..401a04388ac9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2150,15 +2150,17 @@ int blk_mq_get_queue_depth(struct request_queue *q)
+ 	return tags->bitmap_tags.sb.depth + tags->breserved_tags.sb.depth;
  }
  
+-static void blk_mq_update_sched_flag(struct request_queue *q)
++static bool blk_mq_update_sched_flag(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
++	bool use_hw_tag;
+ 
+ 	if (!q->elevator)
+-		return;
++		return false;
+ 
+-	if (!blk_mq_sched_may_use_hw_tag(q))
++	use_hw_tag = blk_mq_sched_may_use_hw_tag(q);
++	if (!use_hw_tag)
+ 		queue_for_each_hw_ctx(q, hctx, i) {
+ 			if (hctx->flags & BLK_MQ_F_SCHED_USE_HW_TAG) {
+ 				blk_mq_set_queue_depth(hctx, q->act_hw_queue_depth);
+@@ -2176,6 +2178,16 @@ static void blk_mq_update_sched_flag(struct request_queue *q)
+ 			if (hctx->sched_tags)
+ 				blk_mq_sched_free_tags(q->tag_set, hctx, i);
+ 		}
++	return use_hw_tag;
++}
++
++static void blk_mq_update_for_sched(struct request_queue *q)
++{
++	if (!blk_mq_update_sched_flag(q))
++		return;
++
++	blk_mq_set_queues_depth(q, q->nr_requests *
++				__blk_mq_get_shared_queues(q));
+ }
+ 
+ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+@@ -2217,6 +2229,8 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
+ 		/* update existing queue */
+ 		blk_mq_update_tag_set_depth(set, false);
+ 	}
++
++	blk_mq_update_for_sched(q);
+ 	mutex_unlock(&set->tag_list_lock);
+ 
+ 	synchronize_rcu();
+@@ -2239,6 +2253,7 @@ static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
+ 		queue_set_hctx_shared(q, true);
+ 	list_add_tail_rcu(&q->tag_set_list, &set->tag_list);
+ 
++	blk_mq_update_for_sched(q);
+ 	mutex_unlock(&set->tag_list_lock);
+ }
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index d49d46de2923..3fd869bee744 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -150,4 +150,27 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ 	return hctx->nr_ctx && hctx->tags;
+ }
+ 
++/* return how many queues shared tag set with me */
++static inline int __blk_mq_get_shared_queues(struct request_queue *q)
++{
++	struct blk_mq_tag_set *set = q->tag_set;
++	int nr = 0;
++
++	list_for_each_entry_rcu(q, &set->tag_list, tag_set_list)
++		nr++;
++	return nr;
++}
++
++static inline int blk_mq_get_shared_queues(struct request_queue *q)
++{
++	int nr = 0;
++	struct blk_mq_tag_set *set = q->tag_set;
++
++	mutex_lock(&set->tag_list_lock);
++	nr = __blk_mq_get_shared_queues(q);
++	mutex_unlock(&set->tag_list_lock);
++
++	return nr;
++}
++
+ #endif
 -- 
 2.9.3
