@@ -1,74 +1,43 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	Zhang Yi <yizhan@redhat.com>,
-	linux-block@vger.kernel.org,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v3 2/3] nvme: avoid to use blk_mq_abort_requeue_list()
-Date: Mon, 22 May 2017 23:05:04 +0800
-Message-Id: <20170522150505.452-3-ming.lei@redhat.com>
-In-Reply-To: <20170522150505.452-1-ming.lei@redhat.com>
-References: <20170522150505.452-1-ming.lei@redhat.com>
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 3/5] mmc: block: Tag is_rpmb as bool
+Date: Wed, 10 May 2017 10:24:16 +0200
+Message-Id: <20170510082418.10513-4-linus.walleij@linaro.org>
+In-Reply-To: <20170510082418.10513-1-linus.walleij@linaro.org>
+References: <20170510082418.10513-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-NVMe may add request into requeue list simply and not kick off the
-requeue if hw queues are stopped. Then blk_mq_abort_requeue_list()
-is called in both nvme_kill_queues() and nvme_ns_remove() for
-dealing with this issue.
+The variable is_rpmb is clearly a bool and even assigned true
+and false, yet declared as an int.
 
-Unfortunately blk_mq_abort_requeue_list() is absolutely a
-race maker, for example, one request may be requeued during
-the aborting. So this patch just calls blk_mq_kick_requeue_list() in
-nvme_kill_queues() to handle this issue like what nvme_start_queues()
-does. Now all requests in requeue list when queues are stopped will be
-handled by blk_mq_kick_requeue_list() when queues are restarted, either
-in nvme_start_queues() or in nvme_kill_queues().
-
-Cc: stable@vger.kernel.org
-Reported-by: Zhang Yi <yizhan@redhat.com>
-Reviewed-by: Keith Busch <keith.busch@intel.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/nvme/host/core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/mmc/core/block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 40d5e4a9e8d7..04e115834702 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2098,7 +2098,6 @@ static void nvme_ns_remove(struct nvme_ns *ns)
- 		if (ns->ndev)
- 			nvme_nvm_unregister_sysfs(ns);
- 		del_gendisk(ns->disk);
--		blk_mq_abort_requeue_list(ns->queue);
- 		blk_cleanup_queue(ns->queue);
- 	}
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index be782b8d4a0d..323f3790b629 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -443,7 +443,7 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
+ 	struct mmc_request mrq = {};
+ 	struct scatterlist sg;
+ 	int err;
+-	int is_rpmb = false;
++	bool is_rpmb = false;
+ 	u32 status = 0;
  
-@@ -2436,7 +2435,6 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 			continue;
- 		revalidate_disk(ns->disk);
- 		blk_set_queue_dying(ns->queue);
--		blk_mq_abort_requeue_list(ns->queue);
- 
- 		/*
- 		 * Forcibly start all queues to avoid having stuck requests.
-@@ -2444,6 +2442,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 		 * when the final removal happens.
- 		 */
- 		blk_mq_start_hw_queues(ns->queue);
-+
-+		/* draining requests in requeue list */
-+		blk_mq_kick_requeue_list(ns->queue);
- 	}
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
+ 	if (!card || !md || !idata)
 -- 
-2.9.4
+2.9.3
