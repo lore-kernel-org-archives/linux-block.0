@@ -1,97 +1,35 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org
-Subject: [PATCH 0/10 v8] No wait AIO
-Date: Thu, 11 May 2017 14:17:00 -0500
-Message-Id: <20170511191710.31959-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:35883 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751118AbdEJOjI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 May 2017 10:39:08 -0400
+To: wenxiong@linux.vnet.ibm.com
+Cc: linux-block@vger.kernel.org, brking@linux.vnet.ibm.com,
+        dougmill@linux.vnet.ibm.com, axboe@fb.com
+Subject: Re: [PATCH] blk-mq: NVMe 512B/4K+T10 DIF/DIX format returns I/O error on dd with split op
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1494424451-856-1-git-send-email-wenxiong@linux.vnet.ibm.com>
+Date: Wed, 10 May 2017 10:39:01 -0400
+In-Reply-To: <1494424451-856-1-git-send-email-wenxiong@linux.vnet.ibm.com>
+        (wenxiong@linux.vnet.ibm.com's message of "Wed, 10 May 2017 08:54:11
+        -0500")
+Message-ID: <yq1lgq4pyii.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Formerly known as non-blocking AIO.
 
-This series adds nonblocking feature to asynchronous I/O writes.
-io_submit() can be delayed because of a number of reason:
- - Block allocation for files
- - Data writebacks for direct I/O
- - Sleeping because of waiting to acquire i_rwsem
- - Congested block device
+wenxiong@linux.vnet.ibm.com,
 
-The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
-any of these conditions are met. This way userspace can push most
-of the write()s to the kernel to the best of its ability to complete
-and if it returns -EAGAIN, can defer it to another thread.
+> When formatting NVMe to 512B/4K + T10 DIf/DIX, dd with split op
+> returns "Input/output error". Looks block layer split the bio after
+> calling bio_integrity_prep(bio). This patch fixes the issue.
 
-In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
-uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
-IOCB_NOWAIT for struct iocb, REQ_NOWAIT for bio.bi_opf and IOMAP_NOWAIT for
-iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
-not use aio_flags because it is not currently checked for invalidity
-in the kernel.
+Looks good.
 
-This feature is provided for direct I/O of asynchronous I/O only. I have
-tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
-The nowait feature is for request based devices. In the future, I intend to
-add support to stacked devices such as md.
-
-Applications will have to check supportability
-by sending a async direct write and any other error besides -EAGAIN
-would mean it is not supported.
-
-First two patches are prep patches into nowait I/O.
-
-Changes since v1:
- + changed name from _NONBLOCKING to *_NOWAIT
- + filemap_range_has_page call moved to closer to (just before) calling filemap_write_and_wait_range().
- + BIO_NOWAIT limited to get_request()
- + XFS fixes 
-	- included reflink 
-	- use of xfs_ilock_nowait() instead of a XFS_IOLOCK_NONBLOCKING flag
-	- Translate the flag through IOMAP_NOWAIT (iomap) to check for
-	  block allocation for the file.
- + ext4 coding style
-
-Changes since v2:
- + Using aio_reserved1 as aio_rw_flags instead of aio_flags
- + blk-mq support
- + xfs uptodate with kernel and reflink changes
-
- Changes since v3:
-  + Added FS_NOWAIT, which is set if the filesystem supports NOWAIT feature.
-  + Checks in generic_make_request() to make sure BIO_NOWAIT comes in
-    for async direct writes only.
-  + Added QUEUE_FLAG_NOWAIT, which is set if the device supports BIO_NOWAIT.
-    This is added (rather not set) to block devices such as dm/md currently.
-
- Changes since v4:
-  + Ported AIO code to use RWF_* flags. Check for RWF_* flags in
-    generic_file_write_iter().
-  + Changed IOCB_RW_FLAGS_NOWAIT to RWF_NOWAIT.
-
- Changes since v5:
-  + BIO_NOWAIT to REQ_NOWAIT
-  + Common helper for RWF flags.
-
- Changes since v6:
-  + REQ_NOWAIT will be ignored for request based devices since they
-    cannot block. So, removed QUEUE_FLAG_NOWAIT since it is not
-    required in the current implementation. It will be resurrected
-    when we program for stacked devices.
-  + changed kiocb_rw_flags() to kiocb_set_rw_flags() in order to accomodate
-    for errors. Moved checks in the function.
-
- Changes since v7:
-  + split patches into prep so the main patches are smaller and easier
-    to understand
-  + All patches are reviewed or acked!
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-Goldwyn
+Martin K. Petersen	Oracle Linux Engineering
