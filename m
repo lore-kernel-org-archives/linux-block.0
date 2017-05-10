@@ -1,22 +1,39 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] elevator: eliminate unused result build warning
-To: Firo Yang <firogm@gmail.com>
-References: <20170510152935.24968-1-yongming.yang@windriver.com>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Firo Yang <yongming.yang@windriver.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <532727bf-934b-cf7b-0294-7fcee66ff5af@kernel.dk>
-Date: Wed, 10 May 2017 09:30:19 -0600
+Return-Path: <firogm@gmail.com>
+Return-Path: <firogm@gmail.com>
+From: Firo Yang <firogm@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Firo Yang <yongming.yang@windriver.com>,
+	Firo Yang <firogm@gmail.com>
+Subject: [PATCH] elevator: eliminate unused result build warning
+Date: Wed, 10 May 2017 23:29:35 +0800
+Message-Id: <20170510152935.24968-1-yongming.yang@windriver.com>
 MIME-Version: 1.0
-In-Reply-To: <20170510152935.24968-1-yongming.yang@windriver.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/10/2017 09:29 AM, Firo Yang wrote:
-> Gcc complains about ignoring return value of ‘strstrip’; Fix it by
-> just using the strstrip() as the function parameter.
+Gcc complains about ignoring return value of ‘strstrip’; Fix it by
+just using the strstrip() as the function parameter.
 
-This has already been fixed up.
+Signed-off-by: Firo Yang <firogm@gmail.com>
+---
+ block/elevator.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
+diff --git a/block/elevator.c b/block/elevator.c
+index fda6be9..dd0ed19 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -1099,8 +1099,7 @@ ssize_t elv_iosched_store(struct request_queue *q, const char *name,
+ 		return count;
+ 
+ 	strlcpy(elevator_name, skip_spaces(name), sizeof(elevator_name));
+-	strstrip(elevator_name);
+-	ret = __elevator_change(q, elevator_name);
++	ret = __elevator_change(q, strstrip(elevator_name));
+ 	if (!ret)
+ 		return count;
+ 
 -- 
-Jens Axboe
+2.9.3
