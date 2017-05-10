@@ -1,24 +1,23 @@
-Return-Path: <bo.li.liu@oracle.com>
-Date: Thu, 18 May 2017 21:07:31 -0700
-From: Liu Bo <bo.li.liu@oracle.com>
+Return-Path: <jack@suse.cz>
+Date: Wed, 10 May 2017 13:09:24 +0200
+From: Jan Kara <jack@suse.cz>
 To: Jeff Layton <jlayton@redhat.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
-        linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
-        linux-f2fs-devel@lists.sourceforge.net,
-        v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-        linux-block@vger.kernel.org, dhowells@redhat.com,
-        akpm@linux-foundation.org, hch@infradead.org,
-        ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
-        viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
-        tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com,
-        hubcap@omnibond.com, rpeterso@redhat.com
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org, dhowells@redhat.com,
+	akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com,
+	hubcap@omnibond.com, rpeterso@redhat.com, bo.li.liu@oracle.com
 Subject: Re: [PATCH v4 05/27] btrfs: btrfs_wait_tree_block_writeback can be
  void return
-Message-ID: <20170519040731.GA30704@lim.localdomain>
-Reply-To: bo.li.liu@oracle.com
+Message-ID: <20170510110924.GB25137@quack2.suse.cz>
 References: <20170509154930.29524-1-jlayton@redhat.com>
  <20170509154930.29524-6-jlayton@redhat.com>
 MIME-Version: 1.0
@@ -26,14 +25,16 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170509154930.29524-6-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 09, 2017 at 11:49:08AM -0400, Jeff Layton wrote:
+On Tue 09-05-17 11:49:08, Jeff Layton wrote:
 > Nothing checks its return value.
-
-Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
-
--liubo
 > 
 > Signed-off-by: Jeff Layton <jlayton@redhat.com>
+
+Looks good to me. You can add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
 > ---
 >  fs/btrfs/disk-io.c | 6 +++---
 >  fs/btrfs/disk-io.h | 2 +-
@@ -73,3 +74,7 @@ Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
 > -- 
 > 2.9.3
 > 
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
