@@ -1,128 +1,88 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:24 +1000
-Subject: [PATCH 05/13] block: Improvements to bounce-buffer handling
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org
-Message-ID: <149369654475.5146.215368176129979588.stgit@noble>
-In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
-References: <149369628671.5146.4865312503373040039.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Dmitry Monakhov <dmonakhov@openvz.org>
+To: fstests@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Dmitry Monakhov <dmonakhov@openvz.org>
+Subject: [PATCH 9/9] bio-integrity: Restore original iterator on verify stage
+Date: Wed, 10 May 2017 19:20:52 +0400
+Message-Id: <1494429652-9488-10-git-send-email-dmonakhov@openvz.org>
+In-Reply-To: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Since commit 23688bf4f830 ("block: ensure to split after potentially
-bouncing a bio") blk_queue_bounce() is called *before*
-blk_queue_split().
-This means that:
- 1/ the comments blk_queue_split() about bounce buffers are
-    irrelevant, and
- 2/ a very large bio (more than BIO_MAX_PAGES) will no longer be
-    split before it arrives at blk_queue_bounce(), leading to the
-    possibility that bio_clone_bioset() will fail and a NULL
-    will be dereferenced.
+Currently ->verify_fn not woks at all because at the moment it is called
+bio->bi_iter.bi_size == 0, so we do not iterate integrity bvecs at all.
 
-Separately, blk_queue_bounce() shouldn't use fs_bio_set as the bio
-being copied could be from the same set, and this could lead to a
-deadlock.
+In order to perform verification we need to know original data vector,
+with new bvec rewind API this is trivial.
 
-So:
- - allocate 2 private biosets for blk_queue_bounce, one for
-   splitting enormous bios and one for cloning bios.
- - add code to split a bio that exceeds BIO_MAX_PAGES.
- - Fix up the comments in blk_queue_split()
+testcase: https://github.com/dmonakhov/xfstests/commit/3c6509eaa83b9c17cd0bc95d73fcdd76e1c54a85
 
-Credit-to: Ming Lei <tom.leiming@gmail.com> (suggested using single bio_for_each_segment loop)
-Signed-off-by: NeilBrown <neilb@suse.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- block/blk-merge.c |   14 ++++----------
- block/bounce.c    |   32 ++++++++++++++++++++++++++------
- 2 files changed, 30 insertions(+), 16 deletions(-)
+ block/bio-integrity.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d59074556703..51c84540d3bb 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -117,17 +117,11 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		 * each holds at most BIO_MAX_PAGES bvecs because
- 		 * bio_clone() can fail to allocate big bvecs.
- 		 *
--		 * It should have been better to apply the limit per
--		 * request queue in which bio_clone() is involved,
--		 * instead of globally. The biggest blocker is the
--		 * bio_clone() in bio bounce.
-+		 * Those drivers which will need to use bio_clone()
-+		 * should tell us in some way.  For now, impose the
-+		 * BIO_MAX_PAGES limit on all queues.
- 		 *
--		 * If bio is splitted by this reason, we should have
--		 * allowed to continue bios merging, but don't do
--		 * that now for making the change simple.
--		 *
--		 * TODO: deal with bio bounce's bio_clone() gracefully
--		 * and convert the global limit into per-queue limit.
-+		 * TODO: handle users of bio_clone() differently.
- 		 */
- 		if (bvecs++ >= BIO_MAX_PAGES)
- 			goto split;
-diff --git a/block/bounce.c b/block/bounce.c
-index 1cb5dd3a5da1..087ecc2dc66c 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -26,6 +26,7 @@
- #define POOL_SIZE	64
- #define ISA_POOL_SIZE	16
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 9b9ace3..4b03128 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -184,9 +184,10 @@ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
+ /**
+  * bio_integrity_process - Process integrity metadata for a bio
+  * @bio:	bio to generate/verify integrity metadata for
++ * @proc_iter:  iterator to process
+  * @proc_fn:	Pointer to the relevant processing function
+  */
+-static int bio_integrity_process(struct bio *bio,
++static int bio_integrity_process(struct bio *bio, struct bvec_iter *proc_iter,
+ 				 integrity_processing_fn *proc_fn)
+ {
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+@@ -200,10 +201,10 @@ static int bio_integrity_process(struct bio *bio,
  
-+struct bio_set *bounce_bio_set, *bounce_bio_split;
- static mempool_t *page_pool, *isa_page_pool;
+ 	iter.disk_name = bio->bi_bdev->bd_disk->disk_name;
+ 	iter.interval = 1 << bi->interval_exp;
+-	iter.seed = bip_get_seed(bip);
++	iter.seed = proc_iter->bi_sector;
+ 	iter.prot_buf = prot_buf;
  
- #if defined(CONFIG_HIGHMEM) || defined(CONFIG_NEED_BOUNCE_POOL)
-@@ -40,6 +41,14 @@ static __init int init_emergency_pool(void)
- 	BUG_ON(!page_pool);
- 	pr_info("pool size: %d pages\n", POOL_SIZE);
+-	bio_for_each_segment(bv, bio, bviter) {
++	__bio_for_each_segment(bv, bio, bviter, *proc_iter) {
+ 		void *kaddr = kmap_atomic(bv.bv_page);
  
-+	bounce_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
-+	BUG_ON(!bounce_bio_set);
-+	if (bioset_integrity_create(bounce_bio_set, BIO_POOL_SIZE))
-+		BUG_ON(1);
-+
-+	bounce_bio_split = bioset_create(BIO_POOL_SIZE, 0, 0);
-+	BUG_ON(!bounce_bio_split);
-+
+ 		iter.data_buf = kaddr + bv.bv_offset;
+@@ -333,7 +334,8 @@ int bio_integrity_prep(struct bio *bio)
+ 
+ 	/* Auto-generate integrity metadata if this is a write */
+ 	if (bio_data_dir(bio) == WRITE)
+-		bio_integrity_process(bio, bi->profile->generate_fn);
++		bio_integrity_process(bio, &bio->bi_iter,
++				      bi->profile->generate_fn);
  	return 0;
- }
- 
-@@ -186,15 +195,26 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	int rw = bio_data_dir(*bio_orig);
- 	struct bio_vec *to, from;
- 	struct bvec_iter iter;
--	unsigned i;
-+	unsigned i = 0;
-+	bool bounce = false;
-+	int sectors = 0;
- 
--	bio_for_each_segment(from, *bio_orig, iter)
-+	bio_for_each_segment(from, *bio_orig, iter) {
-+		if (i++ < BIO_MAX_PAGES)
-+			sectors += from.bv_len >> 9;
- 		if (page_to_pfn(from.bv_page) > queue_bounce_pfn(q))
--			goto bounce;
-+			bounce = true;
-+	}
-+	if (!bounce)
-+		return;
- 
--	return;
--bounce:
--	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, fs_bio_set);
-+	if (sectors < bio_sectors(*bio_orig)) {
-+		bio = bio_split(*bio_orig, sectors, GFP_NOIO, bounce_bio_split);
-+		bio_chain(bio, *bio_orig);
-+		generic_make_request(*bio_orig);
-+		*bio_orig = bio;
-+	}
-+	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
- 
- 	bio_for_each_segment_all(to, bio, i) {
- 		struct page *page = to->bv_page;
+ err_end_io:
+ 	bio->bi_error = err;
+@@ -357,9 +359,15 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ 		container_of(work, struct bio_integrity_payload, bip_work);
+ 	struct bio *bio = bip->bip_bio;
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+-
+-	bio->bi_error = bio_integrity_process(bio, bi->profile->verify_fn);
+-
++	struct bvec_iter iter = bio->bi_iter;
++
++	/* At the moment verify is called bio's iterator was advanced
++	 * during split and completion, we need to rewind iterator to
++	 * it's original position */
++	bio->bi_error = bio_rewind_iter(bio, &iter, iter.bi_done);
++	if (!bio->bi_error)
++		bio->bi_error = bio_integrity_process(bio, &iter,
++						      bi->profile->verify_fn);
+ 	/* Restore original bio completion handler */
+ 	bio->bi_end_io = bip->bip_end_io;
+ 	bio_endio(bio);
+-- 
+2.9.3
