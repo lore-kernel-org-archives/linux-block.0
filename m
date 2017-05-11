@@ -1,45 +1,111 @@
-Return-Path: <prvs=6312870a7a=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <Kernel-team@fb.com>
-Subject: [PATCH] blktrace: fix integer parse
-Date: Fri, 19 May 2017 08:04:59 -0700
-Message-ID: <3ceaaf95edea4e3f506f1e458323ceef5886f955.1495169957.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 09/10] xfs: nowait aio support
+Date: Thu, 11 May 2017 14:17:09 -0500
+Message-Id: <20170511191710.31959-10-rgoldwyn@suse.de>
+In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
+References: <20170511191710.31959-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-sscanf is a very poor way to parse integer. For example, I input
-"discard" for act_mask, it gets 0xd and completely messes up. Using
-correct API to do integer parse.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-This patch also makes attributes accept any base of integer.
+If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
+immediately.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
+if it needs allocation either due to file extension, writing to a hole,
+or COW or waiting for other DIOs to finish.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- kernel/trace/blktrace.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/xfs/xfs_file.c  | 19 ++++++++++++++-----
+ fs/xfs/xfs_iomap.c | 17 +++++++++++++++++
+ 2 files changed, 31 insertions(+), 5 deletions(-)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index bd8ae8d..193c5f5 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1662,14 +1662,14 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 		goto out;
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 35703a801372..b307940e7d56 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
  
- 	if (attr == &dev_attr_act_mask) {
--		if (sscanf(buf, "%llx", &value) != 1) {
-+		if (kstrtoull(buf, 0, &value)) {
- 			/* Assume it is a list of trace category names */
- 			ret = blk_trace_str2mask(buf);
- 			if (ret < 0)
- 				goto out;
- 			value = ret;
- 		}
--	} else if (sscanf(buf, "%llu", &value) != 1)
-+	} else if (kstrtoull(buf, 0, &value))
+-	xfs_ilock(ip, iolock);
+-
++	if (!xfs_ilock_nowait(ip, iolock)) {
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		xfs_ilock(ip, iolock);
++	}
+ 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
+ 	if (ret)
  		goto out;
+@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
+ 	 * otherwise demote the lock if we had to take the exclusive lock
+ 	 * for other reasons in xfs_file_aio_write_checks.
+ 	 */
+-	if (unaligned_io)
+-		inode_dio_wait(inode);
+-	else if (iolock == XFS_IOLOCK_EXCL) {
++	if (unaligned_io) {
++		/* If we are going to wait for other DIO to finish, bail */
++		if (iocb->ki_flags & IOCB_NOWAIT) {
++			if (atomic_read(&inode->i_dio_count))
++				return -EAGAIN;
++		} else {
++			inode_dio_wait(inode);
++		}
++	} else if (iolock == XFS_IOLOCK_EXCL) {
+ 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 288ee5b840d7..9baa65eeae9e 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -1015,6 +1015,15 @@ xfs_file_iomap_begin(
  
- 	ret = -ENXIO;
+ 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
+ 		if (flags & IOMAP_DIRECT) {
++			/*
++			 * A reflinked inode will result in CoW alloc.
++			 * FIXME: It could still overwrite on unshared extents
++			 * and not need allocation.
++			 */
++			if (flags & IOMAP_NOWAIT) {
++				error = -EAGAIN;
++				goto out_unlock;
++			}
+ 			/* may drop and re-acquire the ilock */
+ 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
+ 					&lockmode);
+@@ -1032,6 +1041,14 @@ xfs_file_iomap_begin(
+ 
+ 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
+ 		/*
++		 * If nowait is set bail since we are going to make
++		 * allocations.
++		 */
++		if (flags & IOMAP_NOWAIT) {
++			error = -EAGAIN;
++			goto out_unlock;
++		}
++		/*
+ 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
+ 		 * pages to keep the chunks of work done where somewhat symmetric
+ 		 * with the work writeback does. This is a completely arbitrary
 -- 
-2.9.3
+2.12.0
