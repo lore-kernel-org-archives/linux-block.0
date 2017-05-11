@@ -1,38 +1,102 @@
-Return-Path: <mka@google.com>
-Return-Path: <mka@google.com>
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH] block: partitions: mac: Mark mac_fix_string() as __maybe_unused
-Date: Thu, 18 May 2017 18:24:54 -0700
-Message-Id: <20170519012454.66962-1-mka@chromium.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:59075 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754803AbdEKHmT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 May 2017 03:42:19 -0400
+Date: Thu, 11 May 2017 00:42:18 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+        sagi@grimberg.me, avi@scylladb.com, axboe@kernel.dk,
+        linux-api@vger.kernel.org, willy@infradead.org,
+        tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 2/8] nowait aio: Introduce RWF_NOWAIT
+Message-ID: <20170511074218.GB15626@infradead.org>
+References: <20170509122219.31756-1-rgoldwyn@suse.de>
+ <20170509122219.31756-3-rgoldwyn@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170509122219.31756-3-rgoldwyn@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The function is only used when CONFIG_PPC_PMAC=y. Adding the attribute
-fixes the following warning when building with clang:
+On Tue, May 09, 2017 at 07:22:13AM -0500, Goldwyn Rodrigues wrote:
+> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> 
+> This flag informs kernel to bail out if an AIO request will block
+> for reasons such as file allocations, or a writeback triggered,
+> or would block while allocating requests while performing
+> direct I/O.
+> 
+> Unfortunately, aio_flags is not checked for validity, which would
+> break existing applications which have it set to anything besides zero
+> or IOCB_FLAG_RESFD. So, we are using aio_reserved1 and renaming it
+> to aio_rw_flags.
+> 
+> RWF_NOWAIT is translated to IOCB_NOWAIT for iocb->ki_flags.
+> 
+> The check for -EOPNOTSUPP is placed in generic_file_write_iter(). This
+> is called by most filesystems, either through fsops.write_iter() or through
+> the function defined by write_iter(). If not, we perform the check defined
+> by .write_iter() which is called for direct IO specifically.
+> 
+> Filesystems xfs, btrfs and ext4 would be supported in the following patches.
+> 
+> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> ---
+>  fs/9p/vfs_file.c        | 3 +++
+>  fs/aio.c                | 6 ++++++
+>  fs/ceph/file.c          | 3 +++
+>  fs/cifs/file.c          | 3 +++
+>  fs/fuse/file.c          | 3 +++
+>  fs/nfs/direct.c         | 3 +++
+>  fs/ocfs2/file.c         | 3 +++
+>  include/linux/fs.h      | 5 ++++-
+>  include/uapi/linux/fs.h | 1 +
+>  mm/filemap.c            | 3 +++
+>  10 files changed, 32 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
+> index 3de3b4a89d89..403681db7723 100644
+> --- a/fs/9p/vfs_file.c
+> +++ b/fs/9p/vfs_file.c
+> @@ -411,6 +411,9 @@ v9fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  	loff_t origin;
+>  	int err = 0;
+>  
+> +	if (iocb->ki_flags & IOCB_NOWAIT)
+> +		return -EOPNOTSUPP;
+> +
+>  	retval = generic_write_checks(iocb, from);
+>  	if (retval <= 0)
+>  		return retval;
+> diff --git a/fs/aio.c b/fs/aio.c
+> index 020fa0045e3c..ea9f8581d902 100644
+> --- a/fs/aio.c
+> +++ b/fs/aio.c
+> @@ -1592,6 +1592,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+>  		goto out_put_req;
+>  	}
+>  
+> +	if ((req->common.ki_flags & IOCB_NOWAIT) &&
+> +		!(req->common.ki_flags & IOCB_DIRECT)) {
 
-block/partitions/mac.c:22:20: error: unused function 'mac_fix_string'
-    [-Werror,-Wunused-function]
+Weird indentation.  Either align after the opening if brace:
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
- block/partitions/mac.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+	if ((req->common.ki_flags & IOCB_NOWAIT) &&
+	    !(req->common.ki_flags & IOCB_DIRECT)) {
 
-diff --git a/block/partitions/mac.c b/block/partitions/mac.c
-index 621317ac4d59..57483faddaac 100644
---- a/block/partitions/mac.c
-+++ b/block/partitions/mac.c
-@@ -19,7 +19,7 @@ extern void note_bootable_part(dev_t dev, int part, int goodness);
-  * Code to understand MacOS partition tables.
-  */
- 
--static inline void mac_fix_string(char *stg, int len)
-+static inline void __maybe_unused mac_fix_string(char *stg, int len)
- {
- 	int i;
- 
--- 
-2.13.0.303.g4ebf302169-goog
+or using two tabs:
+
+	if ((req->common.ki_flags & IOCB_NOWAIT) &&
+			!(req->common.ki_flags & IOCB_DIRECT)) {
+
+if the first version looks confusing, but never using the same
+indentation level as the following code.
+
+Except for that the patch looks fine to me:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
