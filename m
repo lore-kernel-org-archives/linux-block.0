@@ -1,149 +1,60 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
 	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
+	sagi@grimberg.me,
+	avi@scylladb.com,
 	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 20/27] cifs: cleanup writeback handling errors and comments
-Date: Tue,  9 May 2017 11:49:23 -0400
-Message-Id: <20170509154930.29524-21-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+	linux-api@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 06/10] fs: Introduce IOMAP_NOWAIT
+Date: Thu, 11 May 2017 14:17:06 -0500
+Message-Id: <20170511191710.31959-7-rgoldwyn@suse.de>
+In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
+References: <20170511191710.31959-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that writeback errors are handled on a per-file basis using the new
-sequence counter method at the vfs layer, we no longer need to re-set
-errors in the mapping after doing writeback in non-fsync codepaths.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Also, fix up some bogus comments.
+IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
+This is used by XFS in the XFS patch.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/cifs/cifsfs.c |  4 +---
- fs/cifs/file.c   |  7 ++-----
- fs/cifs/inode.c  | 22 +++++++---------------
- 3 files changed, 10 insertions(+), 23 deletions(-)
+ fs/iomap.c            | 2 ++
+ include/linux/iomap.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index dd3f5fabfdf6..017a2d1d02c7 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -829,10 +829,8 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
- 		if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
- 		    inode->i_mapping->nrpages != 0) {
- 			rc = filemap_fdatawait(inode->i_mapping);
--			if (rc) {
--				mapping_set_error(inode->i_mapping, rc);
-+			if (rc)
- 				return rc;
--			}
- 		}
- 		/*
- 		 * Some applications poll for the file length in this strange
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0bee7f8d91ad..9825d892716e 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -722,9 +722,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	cinode = CIFS_I(inode);
- 
- 	if (can_flush) {
--		rc = filemap_write_and_wait(inode->i_mapping);
--		mapping_set_error(inode->i_mapping, rc);
--
-+		filemap_write_and_wait(inode->i_mapping);
- 		if (tcon->unix_ext)
- 			rc = cifs_get_inode_info_unix(&inode, full_path,
- 						      inode->i_sb, xid);
-@@ -3906,8 +3904,7 @@ void cifs_oplock_break(struct work_struct *work)
- 			break_lease(inode, O_WRONLY);
- 		rc = filemap_fdatawrite(inode->i_mapping);
- 		if (!CIFS_CACHE_READ(cinode)) {
--			rc = filemap_fdatawait(inode->i_mapping);
--			mapping_set_error(inode->i_mapping, rc);
-+			filemap_fdatawait(inode->i_mapping);
- 			cifs_zap_mapping(inode);
- 		}
- 		cifs_dbg(FYI, "Oplock flush inode %p rc %d\n", inode, rc);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index b261db34103c..a58e605240fc 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2008,10 +2008,8 @@ int cifs_getattr(const struct path *path, struct kstat *stat,
- 	if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
- 	    inode->i_mapping->nrpages != 0) {
- 		rc = filemap_fdatawait(inode->i_mapping);
--		if (rc) {
--			mapping_set_error(inode->i_mapping, rc);
-+		if (rc)
- 			return rc;
--		}
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 141c3cd55a8b..d1c81753d411 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -885,6 +885,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 	} else {
+ 		dio->flags |= IOMAP_DIO_WRITE;
+ 		flags |= IOMAP_WRITE;
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			flags |= IOMAP_NOWAIT;
  	}
  
- 	rc = cifs_revalidate_dentry_attr(dentry);
-@@ -2171,15 +2169,12 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 	 * Attempt to flush data before changing attributes. We need to do
- 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
- 	 * ownership or mode then we may also need to do this. Here, we take
--	 * the safe way out and just do the flush on all setattr requests. If
--	 * the flush returns error, store it to report later and continue.
-+	 * the safe way out and just do the flush on all setattr requests.
- 	 *
- 	 * BB: This should be smarter. Why bother flushing pages that
--	 * will be truncated anyway? Also, should we error out here if
--	 * the flush returns error?
-+	 * will be truncated anyway?
- 	 */
--	rc = filemap_write_and_wait(inode->i_mapping);
--	mapping_set_error(inode->i_mapping, rc);
-+	filemap_write_and_wait(inode->i_mapping);
- 	rc = 0;
+ 	if (mapping->nrpages) {
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 7291810067eb..53f6af89c625 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -51,6 +51,7 @@ struct iomap {
+ #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
+ #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
+ #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
++#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
  
- 	if (attrs->ia_valid & ATTR_SIZE) {
-@@ -2314,15 +2309,12 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	 * Attempt to flush data before changing attributes. We need to do
- 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
- 	 * ownership or mode then we may also need to do this. Here, we take
--	 * the safe way out and just do the flush on all setattr requests. If
--	 * the flush returns error, store it to report later and continue.
-+	 * the safe way out and just do the flush on all setattr requests.
- 	 *
- 	 * BB: This should be smarter. Why bother flushing pages that
--	 * will be truncated anyway? Also, should we error out here if
--	 * the flush returns error?
-+	 * will be truncated anyway?
- 	 */
--	rc = filemap_write_and_wait(inode->i_mapping);
--	mapping_set_error(inode->i_mapping, rc);
-+	filemap_write_and_wait(inode->i_mapping);
- 	rc = 0;
- 
- 	if (attrs->ia_valid & ATTR_SIZE) {
+ struct iomap_ops {
+ 	/*
 -- 
-2.9.3
+2.12.0
