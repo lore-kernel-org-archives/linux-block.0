@@ -1,292 +1,123 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 14/27] fs: new infrastructure for writeback error handling and reporting
-Date: Tue,  9 May 2017 11:49:17 -0400
-Message-Id: <20170509154930.29524-15-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <ulf.hansson@linaro.org>
+Return-Path: <ulf.hansson@linaro.org>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	linux-block@vger.kernel.org,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Mark Brown <broonie@kernel.org>,
+	Adrian Hunter <adrian.hunter@intel.com>
+Subject: [RFC PATCH 2/3] mmc: core: Remove redundant abort-able claim host API
+Date: Thu, 11 May 2017 14:39:01 +0200
+Message-Id: <1494506343-28572-3-git-send-email-ulf.hansson@linaro.org>
+In-Reply-To: <1494506343-28572-1-git-send-email-ulf.hansson@linaro.org>
+References: <1494506343-28572-1-git-send-email-ulf.hansson@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Most filesystems currently use mapping_set_error and
-filemap_check_errors for setting and reporting/clearing writeback errors
-at the mapping level. filemap_check_errors is indirectly called from
-most of the filemap_fdatawait_* functions and from
-filemap_write_and_wait*. These functions are called from all sorts of
-contexts to wait on writeback to finish -- e.g. mostly in fsync, but
-also in truncate calls, getattr, etc.
+The only user of the abort-able claim host API was the SDIO IRQ thread, but
+as that use has now been removed, let's simplify the code and remove the
+API.
 
-The non-fsync callers are problematic. We should be reporting writeback
-errors during fsync, but many places spread over the tree clear out
-errors before they can be properly reported, or report errors at
-nonsensical times.
-
-If I get -EIO on a stat() call, there is no reason for me to assume that
-it is because some previous writeback failed. The fact that it also
-clears out the error such that a subsequent fsync returns 0 is a bug,
-and a nasty one since that's potentially silent data corruption.
-
-This patch adds a small bit of new infrastructure for setting and
-reporting errors during address_space writeback. While the above was my
-original impetus for adding this, I think it's also the case that
-current fsync semantics are just problematic for userland. Most
-applications that call fsync do so to ensure that the data they wrote
-has hit the backing store.
-
-In the case where there are multiple writers to the file at the same
-time, this is really hard to determine. The first one to call fsync will
-see any stored error, and the rest get back 0. The processes with open
-fds may not be associated with one another in any way. They could even
-be in different containers, so ensuring coordination between all fsync
-callers is not really an option.
-
-One way to remedy this would be to track what file descriptor was used
-to dirty the file, but that's rather cumbersome and would likely be
-slow. However, there is a simpler way to improve the semantics here
-without incurring too much overhead.
-
-This set adds an errseq_t to struct address_space, and a corresponding
-one is added to struct file. Writeback errors are recorded in the
-mapping's errseq_t, and the one in struct file is used as the "since"
-value.
-
-This changes the semantics of the Linux fsync implementation such that
-applications can now use it to determine whether there were any
-writeback errors since fsync(fd) was last called (or since the file was
-opened in the case of fsync having never been called).
-
-Note that those writeback errors may have occurred when writing data
-that was dirtied via an entirely different fd, but that's the case now
-with the current mapping_set_error/filemap_check_error infrastructure.
-This will at least prevent you from getting a false report of success.
-
-The new behavior is still consistent with the POSIX spec, and is more
-reliable for application developers. This patch just adds some basic
-infrastructure for doing this. Later patches will change the existing
-code to use this new infrastructure.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
 ---
- Documentation/filesystems/vfs.txt | 10 +++++++++-
- drivers/dax/dax.c                 |  1 +
- fs/block_dev.c                    |  1 +
- fs/file_table.c                   |  1 +
- fs/open.c                         |  3 +++
- include/linux/fs.h                | 24 ++++++++++++++++++++++++
- mm/filemap.c                      | 38 ++++++++++++++++++++++++++++++++++++++
- 7 files changed, 77 insertions(+), 1 deletion(-)
+ drivers/mmc/core/core.c | 31 ++++++++++---------------------
+ drivers/mmc/core/core.h | 13 +------------
+ 2 files changed, 11 insertions(+), 33 deletions(-)
 
-diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-index 94dd27ef4a76..ed06fb39822b 100644
---- a/Documentation/filesystems/vfs.txt
-+++ b/Documentation/filesystems/vfs.txt
-@@ -576,6 +576,11 @@ should clear PG_Dirty and set PG_Writeback.  It can be actually
- written at any point after PG_Dirty is clear.  Once it is known to be
- safe, PG_Writeback is cleared.
- 
-+If there is an error during writeback, then the address_space should be
-+marked with an error (typically using filemap_set_wb_error), in order to
-+ensure that the error can later be reported to the application when an
-+fsync is issued.
-+
- Writeback makes use of a writeback_control structure...
- 
- struct address_space_operations
-@@ -888,7 +893,10 @@ otherwise noted.
- 
-   release: called when the last reference to an open file is closed
- 
--  fsync: called by the fsync(2) system call
-+  fsync: called by the fsync(2) system call. Filesystems that use the
-+	pagecache should call filemap_report_wb_error before returning
-+	to ensure that any errors that occurred during writeback are
-+	reported and the file's error sequence advanced.
- 
-   fasync: called by the fcntl(2) system call when asynchronous
- 	(non-blocking) mode is enabled for a file
-diff --git a/drivers/dax/dax.c b/drivers/dax/dax.c
-index 806f180c80d8..984d6ec35dda 100644
---- a/drivers/dax/dax.c
-+++ b/drivers/dax/dax.c
-@@ -668,6 +668,7 @@ static int dax_open(struct inode *inode, struct file *filp)
- 	inode->i_mapping = dax_dev->inode->i_mapping;
- 	inode->i_mapping->host = dax_dev->inode;
- 	filp->f_mapping = inode->i_mapping;
-+	filp->f_wb_err = filemap_sample_wb_error(filp->f_mapping);
- 	filp->private_data = dax_dev;
- 	inode->i_flags = S_DAX;
- 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 2eca00ec4370..daab40c2e8af 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1857,6 +1857,7 @@ static int blkdev_open(struct inode * inode, struct file * filp)
- 		return -ENOMEM;
- 
- 	filp->f_mapping = bdev->bd_inode->i_mapping;
-+	filp->f_wb_err = filemap_sample_wb_error(filp->f_mapping);
- 
- 	return blkdev_get(bdev, filp->f_mode, filp);
- }
-diff --git a/fs/file_table.c b/fs/file_table.c
-index 954d510b765a..d6138b6411ff 100644
---- a/fs/file_table.c
-+++ b/fs/file_table.c
-@@ -168,6 +168,7 @@ struct file *alloc_file(const struct path *path, fmode_t mode,
- 	file->f_path = *path;
- 	file->f_inode = path->dentry->d_inode;
- 	file->f_mapping = path->dentry->d_inode->i_mapping;
-+	file->f_wb_err = filemap_sample_wb_error(file->f_mapping);
- 	if ((mode & FMODE_READ) &&
- 	     likely(fop->read || fop->read_iter))
- 		mode |= FMODE_CAN_READ;
-diff --git a/fs/open.c b/fs/open.c
-index 949cef29c3bb..88bfed8d3c88 100644
---- a/fs/open.c
-+++ b/fs/open.c
-@@ -709,6 +709,9 @@ static int do_dentry_open(struct file *f,
- 	f->f_inode = inode;
- 	f->f_mapping = inode->i_mapping;
- 
-+	/* Ensure that we skip any errors that predate opening of the file */
-+	f->f_wb_err = filemap_sample_wb_error(f->f_mapping);
-+
- 	if (unlikely(f->f_flags & O_PATH)) {
- 		f->f_mode = FMODE_PATH;
- 		f->f_op = &empty_fops;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 38adefd8e2a0..bab3333e8671 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -31,6 +31,7 @@
- #include <linux/workqueue.h>
- #include <linux/percpu-rwsem.h>
- #include <linux/delayed_call.h>
-+#include <linux/errseq.h>
- 
- #include <asm/byteorder.h>
- #include <uapi/linux/fs.h>
-@@ -394,6 +395,7 @@ struct address_space {
- 	gfp_t			gfp_mask;	/* implicit gfp mask for allocations */
- 	struct list_head	private_list;	/* ditto */
- 	void			*private_data;	/* ditto */
-+	errseq_t		wb_err;
- } __attribute__((aligned(sizeof(long))));
- 	/*
- 	 * On most architectures that alignment is already the case; but
-@@ -846,6 +848,7 @@ struct file {
- 	 * Must not be taken from IRQ context.
- 	 */
- 	spinlock_t		f_lock;
-+	errseq_t		f_wb_err;
- 	atomic_long_t		f_count;
- 	unsigned int 		f_flags;
- 	fmode_t			f_mode;
-@@ -2519,6 +2522,27 @@ extern int __filemap_fdatawrite_range(struct address_space *mapping,
- extern int filemap_fdatawrite_range(struct address_space *mapping,
- 				loff_t start, loff_t end);
- extern int filemap_check_errors(struct address_space *mapping);
-+extern int __must_check filemap_report_wb_error(struct file *file);
-+
-+/**
-+ * filemap_check_wb_error - has an error occurred since the mark was sampled?
-+ * @mapping: mapping to check for writeback errors
-+ * @since: previously-sampled errseq_t
-+ *
-+ * Grab the errseq_t value from the mapping, and see if it has changed "since"
-+ * the given value was sampled.
-+ *
-+ * If it has then report the latest error set, otherwise return 0.
-+ */
-+static inline int filemap_check_wb_error(struct address_space *mapping, errseq_t since)
-+{
-+	return errseq_check(&mapping->wb_err, since);
-+}
-+
-+static inline errseq_t filemap_sample_wb_error(struct address_space *mapping)
-+{
-+	return errseq_sample(&mapping->wb_err);
-+}
- 
- extern int vfs_fsync_range(struct file *file, loff_t start, loff_t end,
- 			   int datasync);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 1694623a6289..ee1a798acfc1 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -546,6 +546,44 @@ int filemap_write_and_wait_range(struct address_space *mapping,
- EXPORT_SYMBOL(filemap_write_and_wait_range);
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 82c45dd..0701e30 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -1019,20 +1019,15 @@ unsigned int mmc_align_data_size(struct mmc_card *card, unsigned int sz)
+ EXPORT_SYMBOL(mmc_align_data_size);
  
  /**
-+ * filemap_report_wb_error - report wb error (if any) that was previously set
-+ * @file: struct file on which the error is being reported
-+ *
-+ * When userland calls fsync (or something like nfsd does the equivalent), we
-+ * want to report any writeback errors that occurred since the last fsync (or
-+ * since the file was opened if there haven't been any).
-+ *
-+ * Grab the wb_err from the mapping. If it matches what we have in the file,
-+ * then just quickly return 0. The file is all caught up.
-+ *
-+ * If it doesn't match, then take the mapping value, set the "seen" flag in
-+ * it and try to swap it into place. If it works, or another task beat us
-+ * to it with the new value, then update the f_wb_err and return the error
-+ * portion. The error at this point must be reported via proper channels
-+ * (a'la fsync, or NFS COMMIT operation, etc.).
-+ *
-+ * While we handle mapping->wb_err with atomic operations, the f_wb_err
-+ * value is protected by the f_lock since we must ensure that it reflects
-+ * the latest value swapped in for this file descriptor.
-+ */
-+int filemap_report_wb_error(struct file *file)
-+{
-+	int err = 0;
-+	struct address_space *mapping = file->f_mapping;
-+
-+	/* Locklessly handle the common case where nothing has changed */
-+	if (errseq_check(&mapping->wb_err, READ_ONCE(file->f_wb_err))) {
-+		/* Something changed, must use slow path */
-+		spin_lock(&file->f_lock);
-+		err = errseq_check_and_advance(&mapping->wb_err,
-+						&file->f_wb_err);
-+		spin_unlock(&file->f_lock);
-+	}
-+	return err;
-+}
-+EXPORT_SYMBOL(filemap_report_wb_error);
-+
-+/**
-  * replace_page_cache_page - replace a pagecache page with a new one
-  * @old:	page to be replaced
-  * @new:	page to replace with
+- *	__mmc_claim_host - exclusively claim a host
++ *	mmc_claim_host - exclusively claim a host
+  *	@host: mmc host to claim
+- *	@abort: whether or not the operation should be aborted
+  *
+- *	Claim a host for a set of operations.  If @abort is non null and
+- *	dereference a non-zero value then this will return prematurely with
+- *	that non-zero value without acquiring the lock.  Returns zero
+- *	with the lock held otherwise.
++ *	Claim a host for a set of operations.
+  */
+-int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
++void mmc_claim_host(struct mmc_host *host)
+ {
+ 	DECLARE_WAITQUEUE(wait, current);
+ 	unsigned long flags;
+-	int stop;
+ 	bool pm = false;
+ 
+ 	might_sleep();
+@@ -1041,31 +1036,25 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
+ 	spin_lock_irqsave(&host->lock, flags);
+ 	while (1) {
+ 		set_current_state(TASK_UNINTERRUPTIBLE);
+-		stop = abort ? atomic_read(abort) : 0;
+-		if (stop || !host->claimed || host->claimer == current)
++		if (!host->claimed || host->claimer == current)
+ 			break;
+ 		spin_unlock_irqrestore(&host->lock, flags);
+ 		schedule();
+ 		spin_lock_irqsave(&host->lock, flags);
+ 	}
+ 	set_current_state(TASK_RUNNING);
+-	if (!stop) {
+-		host->claimed = 1;
+-		host->claimer = current;
+-		host->claim_cnt += 1;
+-		if (host->claim_cnt == 1)
+-			pm = true;
+-	} else
+-		wake_up(&host->wq);
++	host->claimed = 1;
++	host->claimer = current;
++	host->claim_cnt += 1;
++	if (host->claim_cnt == 1)
++		pm = true;
+ 	spin_unlock_irqrestore(&host->lock, flags);
+ 	remove_wait_queue(&host->wq, &wait);
+ 
+ 	if (pm)
+ 		pm_runtime_get_sync(mmc_dev(host));
+-
+-	return stop;
+ }
+-EXPORT_SYMBOL(__mmc_claim_host);
++EXPORT_SYMBOL(mmc_claim_host);
+ 
+ /**
+  *	mmc_release_host - release a host
+diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
+index 55f543f..b247b1f 100644
+--- a/drivers/mmc/core/core.h
++++ b/drivers/mmc/core/core.h
+@@ -122,20 +122,9 @@ int mmc_set_blocklen(struct mmc_card *card, unsigned int blocklen);
+ int mmc_set_blockcount(struct mmc_card *card, unsigned int blockcount,
+ 			bool is_rel_write);
+ 
+-int __mmc_claim_host(struct mmc_host *host, atomic_t *abort);
++void mmc_claim_host(struct mmc_host *host);
+ void mmc_release_host(struct mmc_host *host);
+ void mmc_get_card(struct mmc_card *card);
+ void mmc_put_card(struct mmc_card *card);
+ 
+-/**
+- *	mmc_claim_host - exclusively claim a host
+- *	@host: mmc host to claim
+- *
+- *	Claim a host for a set of operations.
+- */
+-static inline void mmc_claim_host(struct mmc_host *host)
+-{
+-	__mmc_claim_host(host, NULL);
+-}
+-
+ #endif
 -- 
-2.9.3
+2.7.4
