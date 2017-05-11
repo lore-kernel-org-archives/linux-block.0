@@ -1,58 +1,54 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 02/11] blk: make the bioset rescue_workqueue optional.
-To: NeilBrown <neilb@suse.com>, Christoph Hellwig <hch@infradead.org>
-References: <149266645258.27388.14083229348123176454.stgit@noble>
- <149266672858.27388.11409778158413625707.stgit@noble>
- <20170421112458.GB12523@infradead.org>
- <87h91er2t6.fsf@notabene.neil.brown.name>
- <20170424151013.GA17867@infradead.org>
- <87tw55qigs.fsf@notabene.neil.brown.name>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <583a23d7-3d5f-e280-6ef4-a7fec84359e2@kernel.dk>
-Date: Mon, 1 May 2017 08:02:13 -0600
+Return-Path: <BATV+20fadfe1c4e01d3c2e43+5009+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 11 May 2017 00:40:35 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	sagi@grimberg.me, avi@scylladb.com, axboe@kernel.dk,
+	linux-api@vger.kernel.org, willy@infradead.org,
+	tom.leiming@gmail.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 1/8] Use RWF_* flags for AIO operations
+Message-ID: <20170511074035.GA15626@infradead.org>
+References: <20170509122219.31756-1-rgoldwyn@suse.de>
+ <20170509122219.31756-2-rgoldwyn@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <87tw55qigs.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170509122219.31756-2-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 04/30/2017 11:00 PM, NeilBrown wrote:
-> On Mon, Apr 24 2017, Christoph Hellwig wrote:
-> 
->> On Mon, Apr 24, 2017 at 11:51:01AM +1000, NeilBrown wrote:
->>>
->>> I was following the existing practice exemplified by
->>> bioset_create_nobvec().
->>
->> Which is pretty ugly to start with..
-> 
-> That is a matter of personal taste.
-> As such, it is up to the maintainer to change it if they want it
-> changed.
-> 
->>
->>> By not changing the signature of the function, I can avoid touching
->>> quite a few places where it is called.
->>
->> There are 13 callers of bioset_create and one caller of
->> bioset_create_nobvec, and your series touches many of those.
->>
->> So just adding a flags argument to bioset_create and passing
->> BIOSET_NEED_BVECS and BIOSET_NEED_RESUER flags to it doesn't seem
->> to much of an effort, and it's going to create a much nicer and easier
->> to extend interface.
-> 
-> If someone else submitted a patch to discard bioset_create_nobvec in
-> favour of BIOSET_NEED_BVECS and got it accepted, then I would rebase my
-> series on that.  As it is, I'm basing my patches on the style currently
-> present in the tree.
-> 
-> Of course, if Jens says he'll only take my patches if I change to style
-> to match your preference, I'll do that.
+Please add subsystem prefixes to your subject lines, e.g.
 
-I generally tend to prefer tree wide cleanups to improve our APIs, even
-if it does cause an extra bit of pain. Would you mind doing that as a
-prep patch?
+fs:
 
--- 
-Jens Axboe
+for all the generic fs ones,
+
+xfs:
+
+for XFS,
+
+block:
+
+for block layer changes, etc.
+
+>  
+> -	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
+> -		return -EOPNOTSUPP;
+> -
+>  	init_sync_kiocb(&kiocb, filp);
+> -	if (flags & RWF_HIPRI)
+> -		kiocb.ki_flags |= IOCB_HIPRI;
+> -	if (flags & RWF_DSYNC)
+> -		kiocb.ki_flags |= IOCB_DSYNC;
+> -	if (flags & RWF_SYNC)
+> -		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
+> +	ret = kiocb_set_rw_flags(&kiocb, flags);
+> +	if (ret)
+> +		return ret;
+
+And please split factoring out kiocb_set_rw_flags into a separate
+prep patch.
+
+Otherwise these changes look fine:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
