@@ -1,47 +1,25 @@
-Return-Path: <jlayton@redhat.com>
-Return-Path: <jlayton@redhat.com>
-Message-ID: <1494343983.2659.7.camel@redhat.com>
-Subject: Re: [RFC xfstests PATCH] xfstests: add a writeback error handling
- test
-From: Jeff Layton <jlayton@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:44867 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751208AbdEKHbp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 May 2017 03:31:45 -0400
+Date: Thu, 11 May 2017 00:31:45 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Dmitry Monakhov <dmonakhov@openvz.org>
 Cc: fstests@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-cifs@vger.kernel.org, linux-mm@kvack.org,
-  jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
- cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
- v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
- linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
- dhowells@redhat.com,  akpm@linux-foundation.org,
- ross.zwisler@linux.intel.com, mawilcox@microsoft.com,  jack@suse.com,
- viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
- tytso@mit.edu, axboe@kernel.dk
-Date: Tue, 09 May 2017 11:33:03 -0400
-In-Reply-To: <20170424150019.GA3288@infradead.org>
-References: <20170424134551.10301-1-jlayton@redhat.com>
-	 <20170424150019.GA3288@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 5/9] bio-integrity: fold bio_integrity_enabled to
+ bio_integrity_prep
+Message-ID: <20170511073145.GB26586@infradead.org>
+References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+ <1494429652-9488-6-git-send-email-dmonakhov@openvz.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1494429652-9488-6-git-send-email-dmonakhov@openvz.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, 2017-04-24 at 08:00 -0700, Christoph Hellwig wrote:
-> On Mon, Apr 24, 2017 at 09:45:51AM -0400, Jeff Layton wrote:
-> > With the patch series above, ext4 now passes. xfs and btrfs end up in
-> > r/o mode after the test. xfs returns -EIO at that point though, and
-> > btrfs returns -EROFS. What behavior we actually want there, I'm not
-> > certain. We might be able to mitigate that by putting the journals on a
-> > separate device?
-> 
-> This looks like XFS shut down because of a permanent write error from
-> dm-error.  Which seems like the expected behavior.
+Looks good,
 
-Oops, didn't see this message earlier...
-
-Yeah, that's entirely reasonable when there is a write error to the
-journal. The latest version of this uses $SCRATCH_LOGDEV to put the
-journal on a different device, and with that I get the expected behavior
-from xfs.
-
-Thanks,
--- 
-Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
