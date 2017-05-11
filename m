@@ -1,52 +1,35 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, "J . Bruce Fields"
-	<bfields@fieldses.org>, Jeff Layton <jlayton@poochiereds.net>, Jens Axboe
-	<axboe@fb.com>, Omar Sandoval <osandov@fb.com>, <linux-nfs@vger.kernel.org>
-Subject: [PATCH 06/19] nfsd: Check private request size before submitting a SCSI request
-Date: Thu, 25 May 2017 11:43:14 -0700
-Message-ID: <20170525184327.23570-7-bart.vanassche@sandisk.com>
-In-Reply-To: <20170525184327.23570-1-bart.vanassche@sandisk.com>
-References: <20170525184327.23570-1-bart.vanassche@sandisk.com>
+Return-Path: <rgoldwyn@suse.de>
+Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, sagi@grimberg.me,
+ avi@scylladb.com, axboe@kernel.dk, linux-api@vger.kernel.org,
+ willy@infradead.org, tom.leiming@gmail.com,
+ Goldwyn Rodrigues <rgoldwyn@suse.com>
+References: <20170509122219.31756-1-rgoldwyn@suse.de>
+ <20170509122219.31756-6-rgoldwyn@suse.de>
+ <20170511074451.GD15626@infradead.org>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Message-ID: <7653c93d-df5c-fc87-cfdd-051dd33c11fb@suse.de>
+Date: Thu, 11 May 2017 13:16:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <20170511074451.GD15626@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Since using scsi_req() is only allowed against request queues for
-which struct scsi_request is the first member of their private
-request data, refuse to submit SCSI commands against a queue for
-which this is not the case.
 
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: J. Bruce Fields <bfields@fieldses.org>
-Cc: Jeff Layton <jlayton@poochiereds.net>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: linux-nfs@vger.kernel.org
-Cc: linux-block@vger.kernel.org
----
- fs/nfsd/blocklayout.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
-index fb5213afc854..38e14cf7e74a 100644
---- a/fs/nfsd/blocklayout.c
-+++ b/fs/nfsd/blocklayout.c
-@@ -219,6 +219,9 @@ static int nfsd4_scsi_identify_device(struct block_device *bdev,
- 	u8 *buf, *d, type, assoc;
- 	int error;
- 
-+	if (WARN_ON_ONCE(!blk_queue_scsi_pdu(q)))
-+		return -EINVAL;
-+
- 	buf = kzalloc(bufflen, GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
+On 05/11/2017 02:44 AM, Christoph Hellwig wrote:
+> Looks fine,
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> Although lifting the make_request limit is something a lot of users
+> would appreciate in the near future..
+> 
+
+Yes, I understand. That will be on my todo list next on priority.
+
 -- 
-2.12.2
+Goldwyn
