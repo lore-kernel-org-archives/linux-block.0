@@ -1,90 +1,97 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: stress that low_latency must be off to get max throughput
-Date: Tue,  9 May 2017 12:54:23 +0200
-Message-Id: <20170509105423.3672-1-paolo.valente@linaro.org>
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org
+Subject: [PATCH 0/10 v8] No wait AIO
+Date: Thu, 11 May 2017 14:17:00 -0500
+Message-Id: <20170511191710.31959-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The introduction of the BFQ and Kyber I/O schedulers has triggered a
-new wave of I/O benchmarks. Unfortunately, comments and discussions on
-these benchmarks confirm that there is still little awareness that it
-is very hard to achieve, at the same time, a low latency and a high
-throughput. In particular, virtually all benchmarks measure
-throughput, or throughput-related figures of merit, but, for BFQ, they
-use the scheduler in its default configuration. This configuration is
-geared, instead, toward a low latency. This is evidently a sign that
-BFQ documentation is still too unclear on this important aspect. This
-commit addresses this issue by stressing how BFQ configuration must be
-(easily) changed if the only goal is maximum throughput.
+Formerly known as non-blocking AIO.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- Documentation/block/bfq-iosched.txt | 17 ++++++++++++++++-
- block/bfq-iosched.c                 |  5 +++++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+This series adds nonblocking feature to asynchronous I/O writes.
+io_submit() can be delayed because of a number of reason:
+ - Block allocation for files
+ - Data writebacks for direct I/O
+ - Sleeping because of waiting to acquire i_rwsem
+ - Congested block device
 
-diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
-index 1b87df6..05e2822 100644
---- a/Documentation/block/bfq-iosched.txt
-+++ b/Documentation/block/bfq-iosched.txt
-@@ -11,6 +11,13 @@ controllers), BFQ's main features are:
-   groups (switching back to time distribution when needed to keep
-   throughput high).
- 
-+In its default configuration, BFQ privileges latency over
-+throughput. So, when needed for achieving a lower latency, BFQ builds
-+schedules that may lead to a lower throughput. If your main or only
-+goal, for a given device, is to achieve the maximum-possible
-+throughput at all times, then do switch off all low-latency heuristics
-+for that device, by setting low_latency to 0. Full details in Section 3.
-+
- On average CPUs, the current version of BFQ can handle devices
- performing at most ~30K IOPS; at most ~50 KIOPS on faster CPUs. As a
- reference, 30-50 KIOPS correspond to very high bandwidths with
-@@ -375,11 +382,19 @@ default, low latency mode is enabled. If enabled, interactive and soft
- real-time applications are privileged and experience a lower latency,
- as explained in more detail in the description of how BFQ works.
- 
--DO NOT enable this mode if you need full control on bandwidth
-+DISABLE this mode if you need full control on bandwidth
- distribution. In fact, if it is enabled, then BFQ automatically
- increases the bandwidth share of privileged applications, as the main
- means to guarantee a lower latency to them.
- 
-+In addition, as already highlighted at the beginning of this document,
-+DISABLE this mode if your only goal is to achieve a high throughput.
-+In fact, privileging the I/O of some application over the rest may
-+entail a lower throughput. To achieve the highest-possible throughput
-+on a non-rotational device, setting slice_idle to 0 may be needed too
-+(at the cost of giving up any strong guarantee on fairness and low
-+latency).
-+
- timeout_sync
- ------------
- 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index bd8499e..08ce450 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -56,6 +56,11 @@
-  * rotational or flash-based devices, and to get the job done quickly
-  * for applications consisting in many I/O-bound processes.
-  *
-+ * NOTE: if the main or only goal, with a given device, is to achieve
-+ * the maximum-possible throughput at all times, then do switch off
-+ * all low-latency heuristics for that device, by setting low_latency
-+ * to 0.
-+ *
-  * BFQ is described in [1], where also a reference to the initial, more
-  * theoretical paper on BFQ can be found. The interested reader can find
-  * in the latter paper full details on the main algorithm, as well as
+The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
+any of these conditions are met. This way userspace can push most
+of the write()s to the kernel to the best of its ability to complete
+and if it returns -EAGAIN, can defer it to another thread.
+
+In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
+uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
+IOCB_NOWAIT for struct iocb, REQ_NOWAIT for bio.bi_opf and IOMAP_NOWAIT for
+iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
+not use aio_flags because it is not currently checked for invalidity
+in the kernel.
+
+This feature is provided for direct I/O of asynchronous I/O only. I have
+tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
+The nowait feature is for request based devices. In the future, I intend to
+add support to stacked devices such as md.
+
+Applications will have to check supportability
+by sending a async direct write and any other error besides -EAGAIN
+would mean it is not supported.
+
+First two patches are prep patches into nowait I/O.
+
+Changes since v1:
+ + changed name from _NONBLOCKING to *_NOWAIT
+ + filemap_range_has_page call moved to closer to (just before) calling filemap_write_and_wait_range().
+ + BIO_NOWAIT limited to get_request()
+ + XFS fixes 
+	- included reflink 
+	- use of xfs_ilock_nowait() instead of a XFS_IOLOCK_NONBLOCKING flag
+	- Translate the flag through IOMAP_NOWAIT (iomap) to check for
+	  block allocation for the file.
+ + ext4 coding style
+
+Changes since v2:
+ + Using aio_reserved1 as aio_rw_flags instead of aio_flags
+ + blk-mq support
+ + xfs uptodate with kernel and reflink changes
+
+ Changes since v3:
+  + Added FS_NOWAIT, which is set if the filesystem supports NOWAIT feature.
+  + Checks in generic_make_request() to make sure BIO_NOWAIT comes in
+    for async direct writes only.
+  + Added QUEUE_FLAG_NOWAIT, which is set if the device supports BIO_NOWAIT.
+    This is added (rather not set) to block devices such as dm/md currently.
+
+ Changes since v4:
+  + Ported AIO code to use RWF_* flags. Check for RWF_* flags in
+    generic_file_write_iter().
+  + Changed IOCB_RW_FLAGS_NOWAIT to RWF_NOWAIT.
+
+ Changes since v5:
+  + BIO_NOWAIT to REQ_NOWAIT
+  + Common helper for RWF flags.
+
+ Changes since v6:
+  + REQ_NOWAIT will be ignored for request based devices since they
+    cannot block. So, removed QUEUE_FLAG_NOWAIT since it is not
+    required in the current implementation. It will be resurrected
+    when we program for stacked devices.
+  + changed kiocb_rw_flags() to kiocb_set_rw_flags() in order to accomodate
+    for errors. Moved checks in the function.
+
+ Changes since v7:
+  + split patches into prep so the main patches are smaller and easier
+    to understand
+  + All patches are reviewed or acked!
+
 -- 
-2.10.0
+Goldwyn
