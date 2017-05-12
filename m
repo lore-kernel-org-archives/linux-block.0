@@ -1,85 +1,43 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "agk@redhat.com" <agk@redhat.com>, "lars.ellenberg@linbit.com"
-	<lars.ellenberg@linbit.com>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "philipp.reisner@linbit.com"
-	<philipp.reisner@linbit.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"shli@kernel.org" <shli@kernel.org>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>, "drbd-dev@lists.linbit.com"
-	<drbd-dev@lists.linbit.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "target-devel@vger.kernel.org"
-	<target-devel@vger.kernel.org>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>
-Subject: Re: [PATCH 25/27] block: remove the discard_zeroes_data flag
-Date: Mon, 1 May 2017 20:45:21 +0000
-Message-ID: <1493671519.2665.15.camel@sandisk.com>
-References: <20170405172125.22600-1-hch@lst.de>
-	 <20170405172125.22600-26-hch@lst.de>
-In-Reply-To: <20170405172125.22600-26-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:35702 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751574AbdELTaC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 May 2017 15:30:02 -0400
+Received: by mail-pg0-f51.google.com with SMTP id q125so15067281pgq.2
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2017 12:30:02 -0700 (PDT)
+Date: Fri, 12 May 2017 12:30:00 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Markus Trippelsdorf <markus@trippelsdorf.de>
+Cc: linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Subject: Re: Kyber scheduler brings system to halt when used on swap partition
+Message-ID: <20170512193000.GB15267@vader.DHCP.thefacebook.com>
+References: <20170511125724.GA302@x4>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170511125724.GA302@x4>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, 2017-04-05 at 19:21 +0200, Christoph Hellwig wrote:
-> Now that we use the proper REQ_OP_WRITE_ZEROES operation everywhere we ca=
-n
-> kill this hack.
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> [ ... ]
-> diff --git a/drivers/target/target_core_device.c b/drivers/target/target_=
-core_device.c
-> index c754ae33bf7b..d2f089cfa9ae 100644
-> --- a/drivers/target/target_core_device.c
-> +++ b/drivers/target/target_core_device.c
-> @@ -851,7 +851,7 @@ bool target_configure_unmap_from_queue(struct se_dev_=
-attrib *attrib,
->  	attrib->unmap_granularity =3D q->limits.discard_granularity / block_siz=
-e;
->  	attrib->unmap_granularity_alignment =3D q->limits.discard_alignment /
->  								block_size;
-> -	attrib->unmap_zeroes_data =3D q->limits.discard_zeroes_data;
-> +	attrib->unmap_zeroes_data =3D 0;
->  	return true;
->  }
->  EXPORT_SYMBOL(target_configure_unmap_from_queue);
+On Thu, May 11, 2017 at 02:57:24PM +0200, Markus Trippelsdorf wrote:
+> Using the new Kyber mq scheduler brings my system to a halt as soon as it
+> starts swapping. The swap partition resides on an SSD and is the only
+> partition in use on that drive.
+> Symptoms are stuttering sound and non moving mouse pointer. After a
+> while the monitor switches off, because it gets no signal anymore.
+> At which point only a hard reset will bring the system back.
+> 
+> "none" works fine.
 
-Hello Christoph,
+Thanks for testing, I'm taking a look to see if there's anything special
+about the swap path that would trigger this. In the meantime, if you
+swapoff your swap partition and do some I/O on it, what happens? Here's
+a first-order guess at a fio job you could run:
 
-Sorry that I hadn't noticed this before but I think that this patch
-introduces a significant performance regressions for LIO users. Before
-this patch the LBPRZ flag was reported correctly to initiator systems
-through the thin provisioning VPD. With this patch applied that flag
-will always be reported as zero, forcing initiators to submit WRITE
-commands with zeroed data buffers instead of submitting the SCSI UNMAP
-command to block devices for which=A0discard_zeroes_data was set. From
-target_core_spc.c:
+fio --group_reporting --filename=$partition \
+	--name swapin --numjobs=8 --ioengine=sync --rw=randread \
+	--name swapout --numjobs=4 --ioengine=libaio --iodepth=8 --rw=randwrite
 
-/* Thin Provisioning VPD */
-static sense_reason_t spc_emulate_evpd_b2(struct se_cmd *cmd, unsigned char=
- *buf)
-{
-	[ ... ]
-	/*
-	 * The unmap_zeroes_data set means that the underlying device supports
-	 * REQ_DISCARD and has the discard_zeroes_data bit set. This satisfies
-	 * the SBC requirements for LBPRZ, meaning that a subsequent read
-	 * will return zeroes after an UNMAP or WRITE SAME (16) to an LBA
-	 * See sbc4r36 6.6.4.
-	 */
-	if (((dev->dev_attrib.emulate_tpu !=3D 0) ||
-	=A0=A0=A0=A0=A0(dev->dev_attrib.emulate_tpws !=3D 0)) &&
-	=A0=A0=A0=A0=A0(dev->dev_attrib.unmap_zeroes_data !=3D 0))
-		buf[5] |=3D 0x04;
-	[ ... ]
-}
-
-Please advise how to proceed.
-
-Thanks,
-
-Bart.=
+Interesting to note is that wbt, which Kyber borrowed ideas from, treats
+kswapd specially, allowing it to queue more I/O than other processes. I
+wonder if we need to do the same in Kyber.
