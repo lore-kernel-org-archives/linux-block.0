@@ -1,414 +1,193 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	fstests@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [xfstests PATCH v2 1/3] generic: add a writeback error handling test
-Date: Tue,  9 May 2017 12:12:43 -0400
-Message-Id: <20170509161245.29908-2-jlayton@redhat.com>
-In-Reply-To: <20170509161245.29908-1-jlayton@redhat.com>
-References: <20170509161245.29908-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:49502 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754530AbdELKby (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 May 2017 06:31:54 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v4 4/4] blk-mq: allow to use hw tag for shared tags
+Date: Fri, 12 May 2017 18:31:03 +0800
+Message-Id: <20170512103103.24485-5-ming.lei@redhat.com>
+In-Reply-To: <20170512103103.24485-1-ming.lei@redhat.com>
+References: <20170512103103.24485-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-I'm working on a set of kernel patches to change how writeback errors
-are handled and reported in the kernel. Instead of reporting a
-writeback error to only the first fsync caller on the file, I aim
-to make the kernel report them once on every file description.
+In case of shared tags, hctx_may_queue() limits that
+the maximum number of requests allocated to one hw
+queue is .queue_depth / active_queues.
 
-This patch adds a test for the new behavior. Basically, open many fds
-to the same file, turn on dm_error, write to each of the fds, and then
-fsync them all to ensure that they all get an error back.
+So we try to allow to use hw tag for this case
+if .queue_depth/shared_queues is not less than
+q->nr_requests.
 
-To do that, I'm adding a new tools/dmerror script that the C program
-can use to load the error table. For now, that's all it can do, but
-we can fill it out with other commands as necessary.
+This can cover some scsi devices too, such as virtio-scsi
+in default configuration.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- common/dmerror        |  13 +++--
- src/Makefile          |   2 +-
- src/fsync-err.c       | 138 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/generic/999     |  75 +++++++++++++++++++++++++++
- tests/generic/999.out |   3 ++
- tests/generic/group   |   1 +
- tools/dmerror         |  47 +++++++++++++++++
- 7 files changed, 273 insertions(+), 6 deletions(-)
- create mode 100644 src/fsync-err.c
- create mode 100755 tests/generic/999
- create mode 100644 tests/generic/999.out
- create mode 100755 tools/dmerror
+ block/blk-mq-sched.c | 17 ++++++++++-------
+ block/blk-mq-sched.h |  1 +
+ block/blk-mq.c       | 25 ++++++++++++++++++++++---
+ block/blk-mq.h       | 23 +++++++++++++++++++++++
+ 4 files changed, 56 insertions(+), 10 deletions(-)
 
-diff --git a/common/dmerror b/common/dmerror
-index d46c5d0b7266..238baa213b1f 100644
---- a/common/dmerror
-+++ b/common/dmerror
-@@ -23,22 +23,25 @@ if [ $? -eq 0 ]; then
- 	_notrun "Cannot run tests with DAX on dmerror devices"
- fi
- 
--_dmerror_init()
-+_dmerror_setup()
- {
- 	local dm_backing_dev=$SCRATCH_DEV
- 
--	$DMSETUP_PROG remove error-test > /dev/null 2>&1
--
- 	local blk_dev_size=`blockdev --getsz $dm_backing_dev`
- 
- 	DMERROR_DEV='/dev/mapper/error-test'
- 
- 	DMLINEAR_TABLE="0 $blk_dev_size linear $dm_backing_dev 0"
- 
-+	DMERROR_TABLE="0 $blk_dev_size error $dm_backing_dev 0"
-+}
-+
-+_dmerror_init()
-+{
-+	_dmerror_setup
-+	$DMSETUP_PROG remove error-test > /dev/null 2>&1
- 	$DMSETUP_PROG create error-test --table "$DMLINEAR_TABLE" || \
- 		_fatal "failed to create dm linear device"
--
--	DMERROR_TABLE="0 $blk_dev_size error $dm_backing_dev 0"
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index c62590b98d67..d5f8f5b8e801 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -450,8 +450,7 @@ int blk_mq_sched_alloc_tags(struct request_queue *q,
+ 	return ret;
  }
  
- _dmerror_mount()
-diff --git a/src/Makefile b/src/Makefile
-index e5042c9b7d8e..eb8ff6c4a344 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -12,7 +12,7 @@ TARGETS = dirstress fill fill2 getpagesize holes lstat64 \
- 	godown resvtest writemod makeextents itrash rename \
- 	multi_open_unlink dmiperf unwritten_sync genhashnames t_holes \
- 	t_mmap_writev t_truncate_cmtime dirhash_collide t_rename_overwrite \
--	holetest t_truncate_self t_mmap_dio af_unix t_mmap_stale_pmd
-+	holetest t_truncate_self t_mmap_dio af_unix t_mmap_stale_pmd fsync-err
+-static int blk_mq_set_queues_depth(struct request_queue *q,
+-				   unsigned int nr)
++int blk_mq_set_queues_depth(struct request_queue *q, unsigned int nr)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i, j, ret;
+@@ -534,15 +533,17 @@ void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
+ }
  
- LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
- 	preallo_rw_pattern_writer ftrunc trunc fs_perms testx looptest \
-diff --git a/src/fsync-err.c b/src/fsync-err.c
-new file mode 100644
-index 000000000000..8ad27b3da3e7
---- /dev/null
-+++ b/src/fsync-err.c
-@@ -0,0 +1,138 @@
-+/*
-+ * fsync-err.c: test whether writeback errors are reported to all open fds
-+ * Copyright (c) 2017: Jeff Layton <jlayton@redhat.com>
-+ *
-+ * Open a file several times, write to it and then fsync. Flip dm_error over
-+ * to make the backing device stop working. Overwrite the same section and
-+ * call fsync on all fds and verify that we get errors on all of them. Then,
-+ * fsync one more time on all of them and verify that they return 0.
-+ */
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <unistd.h>
+ /*
+- * If this queue has enough hardware tags and doesn't share tags with
+- * other queues, just use hw tag directly for scheduling.
++ * If this queue has enough hardware tags, just use hw tag directly
++ * for scheduling.
+  */
+ bool blk_mq_sched_may_use_hw_tag(struct request_queue *q)
+ {
++	int nr_shared = 1;
 +
-+#define NUM_FDS	10
+ 	if (q->tag_set->flags & BLK_MQ_F_TAG_SHARED)
+-		return false;
++		nr_shared = blk_mq_get_shared_queues(q);
+ 
+-	if (q->act_hw_queue_depth < q->nr_requests)
++	if ((q->act_hw_queue_depth / nr_shared) < q->nr_requests)
+ 		return false;
+ 
+ 	return true;
+@@ -569,8 +570,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 
+ 	auto_hw_tag = blk_mq_sched_may_use_hw_tag(q);
+ 	if (auto_hw_tag) {
++		unsigned int nr_shared = blk_mq_get_shared_queues(q);
 +
-+static void usage() {
-+	fprintf(stderr, "Usage: fsync-err <filename>\n");
+ 		q->act_hw_queue_depth = blk_mq_get_queue_depth(q);
+-		if (blk_mq_set_queues_depth(q, q->nr_requests))
++		if (blk_mq_set_queues_depth(q, q->nr_requests * nr_shared))
+ 			auto_hw_tag = false;
+ 	}
+ 
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 1e738599fbd6..06979786e381 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -26,6 +26,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
+ 
+ bool blk_mq_sched_may_use_hw_tag(struct request_queue *q);
++int blk_mq_set_queues_depth(struct request_queue *q, unsigned int nr);
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
+ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1c52556ab7f6..5225a7358087 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2154,15 +2154,17 @@ int blk_mq_get_queue_depth(struct request_queue *q)
+ 	return tags->bitmap_tags.sb.depth + tags->breserved_tags.sb.depth;
+ }
+ 
+-static void blk_mq_update_sched_flag(struct request_queue *q)
++static bool blk_mq_update_sched_flag(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
++	bool use_hw_tag;
+ 
+ 	if (!q->elevator)
+-		return;
++		return false;
+ 
+-	if (!blk_mq_sched_may_use_hw_tag(q))
++	use_hw_tag = blk_mq_sched_may_use_hw_tag(q);
++	if (!use_hw_tag)
+ 		queue_for_each_hw_ctx(q, hctx, i) {
+ 			if (hctx->flags & BLK_MQ_F_SCHED_USE_HW_TAG) {
+ 				blk_mq_set_queue_depth(hctx, q->act_hw_queue_depth);
+@@ -2180,6 +2182,18 @@ static void blk_mq_update_sched_flag(struct request_queue *q)
+ 			if (hctx->sched_tags)
+ 				blk_mq_sched_free_tags(q->tag_set, hctx, i);
+ 		}
++	return use_hw_tag;
 +}
 +
-+int main(int argc, char **argv)
++static void blk_mq_update_for_sched(struct request_queue *q)
 +{
-+	int fd[NUM_FDS], ret, i;
-+	char *fname, *buf;
++	if (!blk_mq_update_sched_flag(q))
++		return;
 +
-+	if (argc < 1) {
-+		usage();
-+		return 1;
-+	}
++	blk_mq_freeze_queue(q);
++	blk_mq_set_queues_depth(q, q->nr_requests *
++				__blk_mq_get_shared_queues(q));
++	blk_mq_unfreeze_queue(q);
+ }
+ 
+ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+@@ -2221,6 +2235,9 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
+ 		/* update existing queue */
+ 		blk_mq_update_tag_set_depth(set, false);
+ 	}
 +
-+	/* First argument is filename */
-+	fname = argv[1];
-+
-+	for (i = 0; i < NUM_FDS; ++i) {
-+		fd[i] = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-+		if (fd[i] < 0) {
-+			printf("open of fd[%d] failed: %m\n", i);
-+			return 1;
-+		}
-+	}
-+
-+	buf = "foobar";
-+	for (i = 0; i < NUM_FDS; ++i) {
-+		ret = write(fd[i], buf, strlen(buf) + 1);
-+		if (ret < 0) {
-+			printf("First write on fd[%d] failed: %m\n", i);
-+			return 1;
-+		}
-+	}
-+
-+	for (i = 0; i < NUM_FDS; ++i) {
-+		ret = fsync(fd[i]);
-+		if (ret < 0) {
-+			printf("First fsync on fd[%d] failed: %m\n", i);
-+			return 1;
-+		}
-+	}
-+
-+	/* flip the device to non-working mode */
-+	ret = system("./tools/dmerror load_error_table");
-+	if (ret) {
-+		if (WIFEXITED(ret))
-+			printf("system: program exited: %d\n",
-+					WEXITSTATUS(ret));
-+		else
-+			printf("system: 0x%x\n", (int)ret);
-+
-+		return 1;
-+	}
-+
-+	for (i = 0; i < NUM_FDS; ++i) {
-+		ret = write(fd[i], buf, strlen(buf) + 1);
-+		if (ret < 0) {
-+			printf("Second write on fd[%d] failed: %m\n", i);
-+			return 1;
-+		}
-+	}
-+
-+	for (i = 0; i < NUM_FDS; ++i) {
-+		ret = fsync(fd[i]);
-+		/* Now, we EXPECT the error! */
-+		if (ret >= 0) {
-+			printf("Success on second fsync on fd[%d]!\n", i);
-+			return 1;
-+		}
-+	}
-+
-+	/* flip the device to working mode */
-+	ret = system("./tools/dmerror load_working_table");
-+	if (ret) {
-+		if (WIFEXITED(ret))
-+			printf("system: program exited: %d\n",
-+					WEXITSTATUS(ret));
-+		else
-+			printf("system: 0x%x\n", (int)ret);
-+
-+		return 1;
-+	}
-+
-+	for (i = 0; i < NUM_FDS; ++i) {
-+		ret = fsync(fd[i]);
-+		if (ret < 0) {
-+			/* Now the error should be clear */
-+			printf("Third fsync on fd[%d] failed: %m\n", i);
-+			return 1;
-+		}
-+	}
-+
-+	/*
-+	 * reopen each file to guarantee the same one stays in core. fsync
-+	 * each one to make sure we see no errors.
-+	 */
-+	for (i = 0; i < NUM_FDS; ++i) {
-+		ret = close(fd[i]);
-+		if (ret < 0) {
-+			printf("Close of fd[%d] returned unexpected error: %m\n", i);
-+			return 1;
-+		}
-+		fd[i] = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-+		if (fd[i] < 0) {
-+			printf("Second open of fd[%d] failed: %m\n", i);
-+			return 1;
-+		}
-+		ret = fsync(fd[i]);
-+		if (ret < 0) {
-+			/* New opens should not return an error */
-+			printf("First fsync after reopen of fd[%d] failed: %m\n", i);
-+			return 1;
-+		}
-+	}
-+
-+	printf("Test passed!\n");
-+	return 0;
-+}
-diff --git a/tests/generic/999 b/tests/generic/999
-new file mode 100755
-index 000000000000..57e093b43416
---- /dev/null
-+++ b/tests/generic/999
-@@ -0,0 +1,75 @@
-+#! /bin/bash
-+# FS QA Test No. 999
-+#
-+# Open a file several times, write to it, fsync on all fds and make sure that
-+# they all return 0. Change the device to start throwing errors. Write again
-+# on all fds and fsync on all fds. Ensure that we get errors on all of them.
-+# Then fsync on all one last time and verify that all return 0.
-+#
-+#-----------------------------------------------------------------------
-+# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License as
-+# published by the Free Software Foundation.
-+#
-+# This program is distributed in the hope that it would be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write the Free Software Foundation,
-+# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+#-----------------------------------------------------------------------
-+
-+seq=`basename $0`
-+seqres=$RESULT_DIR/$seq
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+tmp=/tmp/$$
-+status=1    # failure is the default!
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+_cleanup()
++	list_for_each_entry(q, &set->tag_list, tag_set_list)
++		blk_mq_update_for_sched(q);
+ 	mutex_unlock(&set->tag_list_lock);
+ 
+ 	synchronize_rcu();
+@@ -2243,6 +2260,8 @@ static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
+ 		queue_set_hctx_shared(q, true);
+ 	list_add_tail_rcu(&q->tag_set_list, &set->tag_list);
+ 
++	list_for_each_entry(q, &set->tag_list, tag_set_list)
++		blk_mq_update_for_sched(q);
+ 	mutex_unlock(&set->tag_list_lock);
+ }
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index d49d46de2923..3fd869bee744 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -150,4 +150,27 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ 	return hctx->nr_ctx && hctx->tags;
+ }
+ 
++/* return how many queues shared tag set with me */
++static inline int __blk_mq_get_shared_queues(struct request_queue *q)
 +{
-+    cd /
-+    rm -rf $tmp.* $testdir
-+    _dmerror_cleanup
++	struct blk_mq_tag_set *set = q->tag_set;
++	int nr = 0;
++
++	list_for_each_entry_rcu(q, &set->tag_list, tag_set_list)
++		nr++;
++	return nr;
 +}
 +
-+# get standard environment, filters and checks
-+. ./common/rc
-+. ./common/filter
-+. ./common/dmerror
++static inline int blk_mq_get_shared_queues(struct request_queue *q)
++{
++	int nr = 0;
++	struct blk_mq_tag_set *set = q->tag_set;
 +
-+# real QA test starts here
-+_supported_os Linux
-+_require_scratch
-+_require_logdev
-+_require_dm_target error
++	mutex_lock(&set->tag_list_lock);
++	nr = __blk_mq_get_shared_queues(q);
++	mutex_unlock(&set->tag_list_lock);
 +
-+rm -f $seqres.full
++	return nr;
++}
 +
-+echo "Format and mount"
-+$XFS_IO_PROG -d -c "pwrite -S 0x7c -b 1048576 0 $((64 * 1048576))" $SCRATCH_DEV >> $seqres.full
-+_scratch_mkfs > $seqres.full 2>&1
-+_dmerror_init
-+_dmerror_mount >> $seqres.full 2>&1
-+_dmerror_unmount
-+_dmerror_mount
-+
-+_require_fs_space $SCRATCH_MNT 8192
-+
-+testfile=$SCRATCH_MNT/fsync-err-test
-+
-+$here/src/fsync-err $testfile
-+
-+# success, all done
-+_dmerror_load_working_table
-+_dmerror_unmount
-+_dmerror_cleanup
-+_repair_scratch_fs >> $seqres.full
-+status=0
-+exit
-diff --git a/tests/generic/999.out b/tests/generic/999.out
-new file mode 100644
-index 000000000000..2e48492ff6d1
---- /dev/null
-+++ b/tests/generic/999.out
-@@ -0,0 +1,3 @@
-+QA output created by 999
-+Format and mount
-+Test passed!
-diff --git a/tests/generic/group b/tests/generic/group
-index 9fc7f9d419a8..854c39277dd5 100644
---- a/tests/generic/group
-+++ b/tests/generic/group
-@@ -432,3 +432,4 @@
- 427 auto quick aio rw
- 428 auto quick
- 429 auto encrypt
-+999 auto quick
-diff --git a/tools/dmerror b/tools/dmerror
-new file mode 100755
-index 000000000000..fc0de295e778
---- /dev/null
-+++ b/tools/dmerror
-@@ -0,0 +1,47 @@
-+#!/bin/bash
-+#-----------------------------------------------------------------------
-+# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License as
-+# published by the Free Software Foundation.
-+#
-+# This program is distributed in the hope that it would be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write the Free Software Foundation,
-+# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+#-----------------------------------------------------------------------
-+
-+. ./common/rc
-+. ./common/dmerror
-+
-+_dmerror_setup
-+
-+case $1 in
-+cleanup)
-+	_dmerror_cleanup
-+	;;
-+init)
-+	_dmerror_init
-+	;;
-+load_error_table)
-+	_dmerror_load_error_table
-+	;;
-+load_working_table)
-+	_dmerror_load_working_table
-+	;;
-+mount)
-+	_dmerror_mount
-+	;;
-+*)
-+	echo "Usage: $0 {init|cleanup|load_error_table|load_working_table|mount}"
-+	exit 1
-+	;;
-+esac
-+
-+status=0
-+exit
+ #endif
 -- 
 2.9.3
