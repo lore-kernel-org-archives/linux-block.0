@@ -1,157 +1,109 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Return-Path: <sedat.dilek@gmail.com>
+MIME-Version: 1.0
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <CA+icZUXNbdjLwsSTnGQPdhKe1RVkMF1D1yEOVhx2LZ+kswFOVA@mail.gmail.com>
+References: <CA+icZUV8wEKJkDpfMaPhAyc1fyVG-ViZF4nO=5raZOkLa_ikzQ@mail.gmail.com>
+ <20170502080044.GA292@x4> <CA+icZUXVtBnDZd--nB8xZx0wQAiPAHp9QWhCxo2t62Q0SCui5Q@mail.gmail.com>
+ <20170502121605.GA294@x4> <CA+icZUUJor+TK18ac8CepUd26ehcTijaA7NAmQxqW4b8yGJpzg@mail.gmail.com>
+ <20170503091628.GB292@x4> <886609A4-9996-410F-8BB4-65B23866B31D@linaro.org> <CA+icZUXNbdjLwsSTnGQPdhKe1RVkMF1D1yEOVhx2LZ+kswFOVA@mail.gmail.com>
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Sat, 13 May 2017 10:00:19 +0200
+Message-ID: <CA+icZUV2a40mRGCbCVQvtQLVe=C7K7w9uTbWjQ6mOLUN1xgcvg@mail.gmail.com>
 Subject: Re: Playing with BFQ
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <CA+icZUURp65W36S+qcFO5Uwg+wBJS4N2Dw8z42S9BktfYjOFrg@mail.gmail.com>
-Date: Tue, 16 May 2017 10:45:00 +0200
-Cc: Markus Trippelsdorf <markus@trippelsdorf.de>,
- Jens Axboe <axboe@kernel.dk>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- linux-block@vger.kernel.org,
- Goldwyn Rodrigues <rgoldwyn@suse.de>,
- Mark Brown <broonie@kernel.org>
-Message-Id: <46E25DBE-D153-4517-B6F7-5C32424E1332@linaro.org>
-References: <CA+icZUV8wEKJkDpfMaPhAyc1fyVG-ViZF4nO=5raZOkLa_ikzQ@mail.gmail.com> <20170502080044.GA292@x4> <CA+icZUXVtBnDZd--nB8xZx0wQAiPAHp9QWhCxo2t62Q0SCui5Q@mail.gmail.com> <20170502121605.GA294@x4> <CA+icZUUJor+TK18ac8CepUd26ehcTijaA7NAmQxqW4b8yGJpzg@mail.gmail.com> <D3002E96-EDB4-42FA-85F9-3B1E42EAB4DC@linaro.org> <CA+icZUURp65W36S+qcFO5Uwg+wBJS4N2Dw8z42S9BktfYjOFrg@mail.gmail.com>
-To: sedat.dilek@gmail.com
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Markus Trippelsdorf <markus@trippelsdorf.de>, Jens Axboe <axboe@kernel.dk>,
+	Ulf Hansson <ulf.hansson@linaro.org>, linux-block@vger.kernel.org
+Content-Type: multipart/mixed; boundary="001a11467a5e9af500054f63366f"
 List-ID: <linux-block@vger.kernel.org>
 
+--001a11467a5e9af500054f63366f
+Content-Type: text/plain; charset="UTF-8"
 
-> Il giorno 13 mag 2017, alle ore 09:50, Sedat Dilek =
-<sedat.dilek@gmail.com> ha scritto:
->=20
-> On Wed, May 3, 2017 at 11:21 AM, Paolo Valente =
-<paolo.valente@linaro.org> wrote:
->>=20
->>> Il giorno 03 mag 2017, alle ore 10:00, Sedat Dilek =
-<sedat.dilek@gmail.com> ha scritto:
->>>=20
->>> On Tue, May 2, 2017 at 2:16 PM, Markus Trippelsdorf
->>> <markus@trippelsdorf.de> wrote:
->>>> On 2017.05.02 at 14:07 +0200, Sedat Dilek wrote:
->>>>> On Tue, May 2, 2017 at 10:00 AM, Markus Trippelsdorf
->>>>> <markus@trippelsdorf.de> wrote:
->>>>>> On 2017.05.02 at 09:54 +0200, Sedat Dilek wrote:
->>>>>>> Hi,
->>>>>>>=20
->>>>>>> I want to play with BFQ.
->>>>>>>=20
->>>>>>> My base is block-next as of 28-Apr-2017.
->>>>> [...]
->>>>>>> Not sure if the attached patches make sense (right now).
->>>>>>=20
->>>>>> No, it doesn't make sense at all.
->>>>>=20
->>>>> Hmm, I looked at 4.11.0-v8r11 and 0001 has exactly what my 2 =
-patches do :-).
->>>>=20
->>>> BFQ started as a conventional scheduler. But because mq is the way =
-of
->>>> the future it was ported before it was accepted into mainline.
->>>>=20
->>>=20
->>> I am still playing and want to do my own experiences with BFQ.
->>>=20
->>> Not sure if FIO is a good testcase-tool here.
->>>=20
->>=20
->> If you want to perform a thorough benchmarking of also responsiveness
->> and latency for time-sensitive applications (such as video playing)
->> then you may want to use S [1].  It's rather rustic, do ask if you
->> encounter any difficulty.
->>=20
->> [1] https://github.com/Algodev-github/S
->>=20
->=20
-> Sorry for the delay.
+On Sat, May 13, 2017 at 9:54 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> On Wed, May 3, 2017 at 11:24 AM, Paolo Valente <paolo.valente@linaro.org> wrote:
+>>
+>>> Il giorno 03 mag 2017, alle ore 11:16, Markus Trippelsdorf <markus@trippelsdorf.de> ha scritto:
+>>>
+>>> On 2017.05.03 at 10:00 +0200, Sedat Dilek wrote:
+>>>> On Tue, May 2, 2017 at 2:16 PM, Markus Trippelsdorf
+>>>> <markus@trippelsdorf.de> wrote:
+>>>>> On 2017.05.02 at 14:07 +0200, Sedat Dilek wrote:
+>>>>>> On Tue, May 2, 2017 at 10:00 AM, Markus Trippelsdorf
+>>>>>> <markus@trippelsdorf.de> wrote:
+>>>>>>> On 2017.05.02 at 09:54 +0200, Sedat Dilek wrote:
+>>>>>>>> Hi,
+>>>>>>>>
+>>>>>>>> I want to play with BFQ.
+>>>>>>>>
+>>>>>>>> My base is block-next as of 28-Apr-2017.
+>>>>>> [...]
+>>>>>>>> Not sure if the attached patches make sense (right now).
+>>>>>>>
+>>>>>>> No, it doesn't make sense at all.
+>>>>>>
+>>>>>> Hmm, I looked at 4.11.0-v8r11 and 0001 has exactly what my 2 patches do :-).
+>>>>>
+>>>>> BFQ started as a conventional scheduler. But because mq is the way of
+>>>>> the future it was ported before it was accepted into mainline.
+>>>>>
+>>>>
+>>>> I am still playing and want to do my own experiences with BFQ.
+>>>>
+>>>> Not sure if FIO is a good testcase-tool here.
+>>>>
+>>>> So if MQ is the way why isn't the Kconfig called CONFIG_MQ_IOSCHED_BFQ
+>>>> according to CONFIG_MQ_IOSCHED_DEADLINE?
+>>>
+>>> Good point. The current naming is confusing.
+>>>
+>>> Also:
+>>> # cat /sys/block/sda/queue/scheduler
+>>> mq-deadline [kyber] bfq none
+>>>
+>>> These should all be prefixed with mq-.
+>>>
+>>
+>> The logic here, as proposed by Jens, is not to add the mq tag when
+>> there is no risk of ambiguity (such as between deadline and
+>> mq-deadline). I'm open to any sensible choice.
+>>
+>
+> The naming is confusing but I can understand the point of Jens.
+>
+> The Kconfigs of BFQ in block/Kconfig.iosched need a move (see my two
+> patches attached in the initial posting).
+> AFAICS you have the same in your latest BFQ-patchset for Linux v4.11.y.
+>
+> I am re-attaching my two patches.
+>
+> - Sedat -
 
-Don't worry, I'm replying late too ...
+Updated 0002 patch v2.
 
-> Currently, I am swittching from Ubuntu/precise 12.04 LTS (EOL) back to
-> the Debian world.
->=20
-> The responsiveness is really bad when my mlocate cron-job, a git pull
-> on linux.git and firefox runs parallel.
+- Sedat -
 
-Thanks for reporting this issue.  I have a few considerations and
-requests for information on it.
+--001a11467a5e9af500054f63366f
+Content-Type: text/x-patch; charset="US-ASCII";
+	name="0002-block-bfq-Introduce-CONFIG_DEFAULT_BFQ.patch"
+Content-Disposition: attachment;
+	filename="0002-block-bfq-Introduce-CONFIG_DEFAULT_BFQ.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j2mzdupx2
 
-1) Two of the three sources of I/O you mention, namely mlocate update
-and git pull, are doing writes.  As I already pointed in a few
-occasions and places, intense write workloads trigger problems that an
-I/O scheduler cannot solve.  In contrast, these problems *can* be
-solved using BFQ.  In particular, I already have a prototype solution,
-but I have't found support yet to turn it into a possible
-production-level solution;  till a few days, ago, when I talked about
-this with Goldwyn Rodrigues (in CC). He seems interested in having a
-look at this solution, and possibly collaborating on it.
-
-2) A web browser like Firefox can generate extremely varying
-workloads; so, if you mentioned Firefox as one of the sources of I/O
-in your unlucky situation, then it would be important to know what
-Firefox was doing.
-
-3) Even if BFQ cannot counteract problems occurring above its head, it
-usually improves responsiveness even in heavy-write scenarios.  It
-would then be interesting if you could compare responsiveness with the
-other I/O schedulers (mq-deadline, Kyber) and with none too (make sure
-that the I/O is really the same in all cases).
-
-
-> This is with Linux v4.11.1-rc1 and BFQ patchset v4.11.0-v8r11.
->=20
-> My linux-config is attached.
->=20
->>> So if MQ is the way why isn't the Kconfig called =
-CONFIG_MQ_IOSCHED_BFQ
->>> according to CONFIG_MQ_IOSCHED_DEADLINE?
->>>=20
->>> As we are talking about "*Storage* I/O schedulers" which of the MQ
->>> Kconfig make sense when using MQ_DEADLINE and (MQ_)BFQ?
->>>=20
->>> # egrep -i 'bfq|deadline|_mq|mq_|_mq_' =
-/boot/config-4.11.0-1-bfq-amd64
->>> CONFIG_POSIX_MQUEUE=3Dy
->>> CONFIG_POSIX_MQUEUE_SYSCTL=3Dy
->>> CONFIG_BLK_WBT_MQ=3Dy
->>> CONFIG_BLK_MQ_PCI=3Dy
->>> CONFIG_BLK_MQ_VIRTIO=3Dy
->>> CONFIG_IOSCHED_DEADLINE=3Dy
->>> CONFIG_IOSCHED_BFQ=3Dy
->>> CONFIG_BFQ_GROUP_IOSCHED=3Dy
->>> # CONFIG_DEFAULT_DEADLINE is not set
->>> CONFIG_DEFAULT_BFQ=3Dy
->>> CONFIG_DEFAULT_IOSCHED=3D"bfq"
->>> CONFIG_MQ_IOSCHED_DEADLINE=3Dy
->>> # CONFIG_NET_SCH_MQPRIO is not set
->>> CONFIG_SCSI_MQ_DEFAULT=3Dy
->>> # CONFIG_DM_MQ_DEFAULT is not set
->>>=20
->>=20
->> The config for BFQ seems correct.  For the others, it depends on what
->> scheduler you want.  If useful for you, the other two MQ- schedulers
->> are mq-deadline and cyber.
->>=20
->=20
-> What about those two (Kconfig) patches which is in your current
-> bfq-4.11.y patchset.
->=20
-
-I'm not sure I fully understand the purpose of the two patches you
-propose (in your following emails).  The first patch seems to move BFQ
-config options to a different position in Kconfig.iosched, but the
-position of those items should be irrelevant.  Am I missing something?
-The second patch seems to have to do with configuration bits of bfq
-for blk, yet such a bfq version is not available in mainline.
-
-In any case, for possible new submissions, you should inline your
-patches.  For complete instructions on submitting patches, have a look
-at Documentation/process/submitting-patches
-
-Thanks,
-Paolo
-
-
-> Thanks Sedat.
-> <config-4.11.1-rc1-1-iniza-amd64>
+RnJvbSBkYTMzNzk0MjRmYzAyMzdkNWRlMjVlOTQ2ZWQ1NDgyYTYyNWFhYWMyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTZWRhdCBEaWxlayA8c2VkYXQuZGlsZWtAZ21haWwuY29tPgpE
+YXRlOiBUdWUsIDIgTWF5IDIwMTcgMDk6MzM6MjcgKzAyMDAKU3ViamVjdDogW1BBVENIXSBibG9j
+azogYmZxOiBJbnRyb2R1Y2UgQ09ORklHX0RFRkFVTFRfQkZRCgotLS0KWyB2Mjogcy9ERUZBVUxU
+X0JGUS9DT05GSUdfREVGQVVMVF9CRlEgaW4gc3ViamVjdCBsaW5lLiAtZGlsZWtzIF0KCiBibG9j
+ay9LY29uZmlnLmlvc2NoZWQgfCA0ICsrKysKIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMo
+KykKCmRpZmYgLS1naXQgYS9ibG9jay9LY29uZmlnLmlvc2NoZWQgYi9ibG9jay9LY29uZmlnLmlv
+c2NoZWQKaW5kZXggOGVhMmM4ZDc3MTAwLi5mMzc0NTVkY2YzODEgMTAwNjQ0Ci0tLSBhL2Jsb2Nr
+L0tjb25maWcuaW9zY2hlZAorKysgYi9ibG9jay9LY29uZmlnLmlvc2NoZWQKQEAgLTczLDYgKzcz
+LDkgQEAgY2hvaWNlCiAJY29uZmlnIERFRkFVTFRfQ0ZRCiAJCWJvb2wgIkNGUSIgaWYgSU9TQ0hF
+RF9DRlE9eQogCisJY29uZmlnIERFRkFVTFRfQkZRCisJCWJvb2wgIkJGUSIgaWYgSU9TQ0hFRF9C
+RlE9eQorCiAJY29uZmlnIERFRkFVTFRfTk9PUAogCQlib29sICJOby1vcCIKIApAQCAtODIsNiAr
+ODUsNyBAQCBjb25maWcgREVGQVVMVF9JT1NDSEVECiAJc3RyaW5nCiAJZGVmYXVsdCAiZGVhZGxp
+bmUiIGlmIERFRkFVTFRfREVBRExJTkUKIAlkZWZhdWx0ICJjZnEiIGlmIERFRkFVTFRfQ0ZRCisJ
+ZGVmYXVsdCAiYmZxIiBpZiBERUZBVUxUX0JGUQogCWRlZmF1bHQgIm5vb3AiIGlmIERFRkFVTFRf
+Tk9PUAogCiBjb25maWcgTVFfSU9TQ0hFRF9ERUFETElORQotLSAKMi4xMS4wCgo=
+--001a11467a5e9af500054f63366f--
