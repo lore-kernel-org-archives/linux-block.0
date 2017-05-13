@@ -1,60 +1,89 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 06/10] fs: Introduce IOMAP_NOWAIT
-Date: Thu, 11 May 2017 14:17:06 -0500
-Message-Id: <20170511191710.31959-7-rgoldwyn@suse.de>
-In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
-References: <20170511191710.31959-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:35295 "EHLO
+        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750779AbdEMEaG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 May 2017 00:30:06 -0400
+Received: by mail-wm0-f51.google.com with SMTP id b84so35952360wmh.0
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2017 21:30:06 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH] lightnvm: pblk: fix bad free seq. on error path
+Date: Sat, 13 May 2017 06:29:55 +0200
+Message-Id: <1494649795-569-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Braces around the error patch for metadata pre-allocation are wrongly
+placed. This causes a memory leak in case of a memory allocation
+failure. Fix it
 
-IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
-This is used by XFS in the XFS patch.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- fs/iomap.c            | 2 ++
- include/linux/iomap.h | 1 +
- 2 files changed, 3 insertions(+)
+ drivers/lightnvm/pblk-init.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 141c3cd55a8b..d1c81753d411 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -885,6 +885,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	} else {
- 		dio->flags |= IOMAP_DIO_WRITE;
- 		flags |= IOMAP_WRITE;
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			flags |= IOMAP_NOWAIT;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index ae8cd6d5af8b..a2ee875aede3 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -604,12 +604,12 @@ static int pblk_lines_init(struct pblk *pblk)
+ 	l_mg->smeta_alloc_type = PBLK_KMALLOC_META;
+ 	for (i = 0; i < PBLK_DATA_LINES; i++) {
+ 		l_mg->sline_meta[i].meta = kmalloc(lm->smeta_len, GFP_KERNEL);
+-		if (!l_mg->sline_meta[i].meta)
+-			while (--i >= 0) {
++		if (!l_mg->sline_meta[i].meta) {
++			while (--i >= 0)
+ 				kfree(l_mg->sline_meta[i].meta);
+-				ret = -ENOMEM;
+-				goto fail;
+-			}
++			ret = -ENOMEM;
++			goto fail;
++		}
  	}
  
- 	if (mapping->nrpages) {
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 7291810067eb..53f6af89c625 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -51,6 +51,7 @@ struct iomap {
- #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
- #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
- #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
-+#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
+ 	if (lm->emeta_len > KMALLOC_MAX_CACHE_SIZE) {
+@@ -617,12 +617,12 @@ static int pblk_lines_init(struct pblk *pblk)
  
- struct iomap_ops {
- 	/*
+ 		for (i = 0; i < PBLK_DATA_LINES; i++) {
+ 			l_mg->eline_meta[i].meta = vmalloc(lm->emeta_len);
+-			if (!l_mg->eline_meta[i].meta)
+-				while (--i >= 0) {
++			if (!l_mg->eline_meta[i].meta) {
++				while (--i >= 0)
+ 					vfree(l_mg->eline_meta[i].meta);
+-					ret = -ENOMEM;
+-					goto fail;
+-				}
++				ret = -ENOMEM;
++				goto fail_free_meta;
++			}
+ 		}
+ 	} else {
+ 		l_mg->emeta_alloc_type = PBLK_KMALLOC_META;
+@@ -630,12 +630,12 @@ static int pblk_lines_init(struct pblk *pblk)
+ 		for (i = 0; i < PBLK_DATA_LINES; i++) {
+ 			l_mg->eline_meta[i].meta =
+ 					kmalloc(lm->emeta_len, GFP_KERNEL);
+-			if (!l_mg->eline_meta[i].meta)
+-				while (--i >= 0) {
++			if (!l_mg->eline_meta[i].meta) {
++				while (--i >= 0)
+ 					kfree(l_mg->eline_meta[i].meta);
+-					ret = -ENOMEM;
+-					goto fail;
+-				}
++				ret = -ENOMEM;
++				goto fail_free_meta;
++			}
+ 		}
+ 	}
+ 
 -- 
-2.12.0
+2.7.4
