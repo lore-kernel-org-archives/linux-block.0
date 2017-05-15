@@ -1,39 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f50.google.com ([74.125.83.50]:32980 "EHLO
-        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754546AbdEORfv (ORCPT
+Received: from mail-pf0-f169.google.com ([209.85.192.169]:34711 "EHLO
+        mail-pf0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750935AbdEORaj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 May 2017 13:35:51 -0400
-Received: by mail-pg0-f50.google.com with SMTP id u187so63346788pgb.0
-        for <linux-block@vger.kernel.org>; Mon, 15 May 2017 10:35:51 -0700 (PDT)
-Date: Mon, 15 May 2017 10:35:48 -0700
+        Mon, 15 May 2017 13:30:39 -0400
+Received: by mail-pf0-f169.google.com with SMTP id 9so26602916pfj.1
+        for <linux-block@vger.kernel.org>; Mon, 15 May 2017 10:30:39 -0700 (PDT)
+Date: Mon, 15 May 2017 10:30:36 -0700
 From: Omar Sandoval <osandov@osandov.com>
-To: Dmitry Monakhov <dmonlist@gmail.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
 Cc: linux-block@vger.kernel.org, kernel-team@fb.com
 Subject: Re: Announcing blktests
-Message-ID: <20170515173548.GB18764@vader.DHCP.thefacebook.com>
+Message-ID: <20170515173036.GA18764@vader.DHCP.thefacebook.com>
 References: <20170512184905.GA15267@vader.DHCP.thefacebook.com>
- <87h90m71xb.fsf@dmlp.sw.ru>
+ <a321ac00-aa4d-a42d-28dd-ebf37a248a1a@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <87h90m71xb.fsf@dmlp.sw.ru>
+In-Reply-To: <a321ac00-aa4d-a42d-28dd-ebf37a248a1a@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, May 15, 2017 at 03:13:52PM +0300, Dmitry Monakhov wrote:
-> Omar Sandoval <osandov@osandov.com> writes:
-> 
+On Mon, May 15, 2017 at 09:44:13AM +0200, Johannes Thumshirn wrote:
+> On 05/12/2017 08:49 PM, Omar Sandoval wrote:
 > > Hi, everyone,
-> >
+> > 
 > > At LSF/MM, we talked about the need for somewhere to dump tests for the
 > > block layer/storage stack. I've put together a test suite inspired by
 > > xfstests here: https://github.com/osandov/blktests.
-> >
+> > 
 > > I started out with the opinion that we should reuse xfstests for this,
 > > but it became clear that the requirements for testing block devices are
 > > slightly different, and it diverged significantly from there. In
 > > particular, blktests supports:
-> >
+> > 
 > > - Per-device tests. You can configure a list of test devices and the
 > >   per-device tests will run on each one (currently in serial, we can
 > >   support parallel runs in the future if needed).
@@ -43,24 +42,28 @@ On Mon, May 15, 2017 at 03:13:52PM +0300, Dmitry Monakhov wrote:
 > >   that xfstests supports, blktests can also report arbitrary test
 > >   metrics which don't affect whether the test passes but can be useful
 > >   for spotting regressions.
-> Cool. Thank you.
-> It would be nice to have hermetic kvm environment similar to
-> xfstests-bld [1] . I'm a volunteer to do that.
+> > 
+> > Jens and I wrote up an initial set of tests, but there are a lot more we
+> > can still write. I'm also happy to take feature requests, just email me
+> > or open an issue on the GitHub repo.
+> 
+> \o/
+> 
+> You're my hero :-).
+> 
+> Do you only accept github pull requests or do you accept patches via
+> linux-block as well?
 
-Fine with me. Currently I think the only things we shell out to besides
-basic coreutils and util-linux stuff are fio and parted.
+Patches are fine, just format them with `git format-patch
+--subject-prefix="PATCH blktests"` so I don't lose them.
 
-> Also I'm interested in adding my t10-dif csum tests.
-> Is this ok to add it to separate ./tests/t10-dif group ?
+> As a side note, I'm currently working on a partition table fuzzer to
+> stress block/partitions/*.c a bit. I think this could be included into
+> your framework as well (it's only one .c file currently with no external
+> dependencies).
 
-Yeah, I think that'd make sense as its own group.
-
-> Side observations:
-> Observation #1
-> I've run this on fresh fedora kernel and it hit panic on the very first tests,
-> which is very good sign for regression test framework.
-
-Awesome! Any idea which test it was? There is a marker in dmesg before
-each test is run.
+Yup, that sounds like a good fit. Currently we don't have any programs
+to build, but it'd be easy to add a src/ directory and do what xfstests
+does.
 
 Thanks!
