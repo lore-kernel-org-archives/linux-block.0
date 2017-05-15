@@ -1,272 +1,100 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40164 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753898AbdEJP4m (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2017 11:56:42 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 3/4] blk-mq: use hw tag for scheduling if hw tag space is big enough
-Date: Wed, 10 May 2017 23:55:42 +0800
-Message-Id: <20170510155543.18033-4-ming.lei@redhat.com>
-In-Reply-To: <20170510155543.18033-1-ming.lei@redhat.com>
-References: <20170510155543.18033-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ulf.hansson@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <6b359de4-4503-ca19-0e1d-84b909b21786@intel.com>
+References: <1494506343-28572-1-git-send-email-ulf.hansson@linaro.org>
+ <1494506343-28572-2-git-send-email-ulf.hansson@linaro.org> <6b359de4-4503-ca19-0e1d-84b909b21786@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Mon, 15 May 2017 14:51:04 +0200
+Message-ID: <CAPDyKFr9eWCSrjx0qcxKzfJ+Oq7Z48h39dsCcn2iu_JNWJz=mQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/3] mmc: sdio: Don't use abort-able claim host method
+ from SDIO IRQ thread
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Paolo Valente <paolo.valente@linaro.org>, linux-block@vger.kernel.org,
+	Linus Walleij <linus.walleij@linaro.org>, Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-When tag space of one device is big enough, we use hw tag
-directly for I/O scheduling.
+On 12 May 2017 at 09:42, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> On 11/05/17 15:39, Ulf Hansson wrote:
+>> In a step to simplify the use of the lock, mmc_claim|release_host(), let's
+>> change the SDIO IRQ thread to move away from using the abort-able claim
+>> host method.
+>>
+>> In the SDIO IRQ thread case, we can instead check the numbers of SDIO IRQs
+>> that are currently claimed via host->sdio_irqs, as this field is protected
+>> from updates unless the host is claimed. When host->sdio_irqs has become
+>> zero, it means the SDIO func driver(s) has released the SDIO IRQ, then we
+>> can bail out and stop running the SDIO IRQ thread.
+>
+> Does that work?  It looks a like kthread_stop() will wait on the thread,
+> which is waiting to claim the host, which is claimed by the caller of
+> sdio_card_irq_put() which called kthread_stop() i.e. deadlock.
 
-Now the decision is made if hw queue depth is not less than
-q->nr_requests and the tag set isn't shared.
+Adrian, you are right and thanks for your analyze!
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c   | 80 +++++++++++++++++++++++++++++++++++++++++++++-----
- block/blk-mq-sched.h   |  8 +++++
- block/blk-mq.c         | 35 ++++++++++++++++++++--
- include/linux/blkdev.h |  8 +++++
- 4 files changed, 122 insertions(+), 9 deletions(-)
+Maybe it's better that I first continue with my other series,
+converting the kthread to a work/work-queue. As that makes it easier
+to move away from using the abort-able claim host API.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 2c5981ff9e04..a7e125a40e0a 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -417,9 +417,9 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 	blk_mq_run_hw_queue(hctx, run_queue_async);
- }
- 
--static void blk_mq_sched_free_tags(struct blk_mq_tag_set *set,
--				   struct blk_mq_hw_ctx *hctx,
--				   unsigned int hctx_idx)
-+void blk_mq_sched_free_tags(struct blk_mq_tag_set *set,
-+			    struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx)
- {
- 	if (hctx->sched_tags) {
- 		blk_mq_free_rqs(set, hctx->sched_tags, hctx_idx);
-@@ -428,9 +428,9 @@ static void blk_mq_sched_free_tags(struct blk_mq_tag_set *set,
- 	}
- }
- 
--static int blk_mq_sched_alloc_tags(struct request_queue *q,
--				   struct blk_mq_hw_ctx *hctx,
--				   unsigned int hctx_idx)
-+int blk_mq_sched_alloc_tags(struct request_queue *q,
-+			    struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
- 	int ret;
-@@ -450,14 +450,52 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
- 	return ret;
- }
- 
-+static int blk_mq_set_queue_depth(struct blk_mq_hw_ctx *hctx,
-+				  unsigned int nr)
-+{
-+	if (!hctx->tags)
-+		return -EINVAL;
-+
-+	return blk_mq_tag_update_depth(hctx, &hctx->tags, nr, false);
-+}
-+
-+static int blk_mq_set_queues_depth(struct request_queue *q,
-+				   unsigned int nr)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	int i, j, ret;
-+
-+	queue_for_each_hw_ctx(q, hctx, i) {
-+		ret = blk_mq_set_queue_depth(hctx, nr);
-+		if (ret)
-+			goto recovery;
-+	}
-+	return 0;
-+
-+ recovery:
-+	queue_for_each_hw_ctx(q, hctx, j) {
-+		if (j >= i)
-+			break;
-+		blk_mq_tag_update_depth(hctx, &hctx->tags,
-+					q->act_hw_queue_depth,
-+					false);
-+	}
-+	return ret;
-+}
-+
- static void blk_mq_sched_tags_teardown(struct request_queue *q)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
--	queue_for_each_hw_ctx(q, hctx, i)
-+	queue_for_each_hw_ctx(q, hctx, i) {
-+		if (hctx->flags & BLK_MQ_F_SCHED_USE_HW_TAG) {
-+			blk_mq_set_queue_depth(hctx, q->act_hw_queue_depth);
-+			hctx->flags &= ~BLK_MQ_F_SCHED_USE_HW_TAG;
-+		}
- 		blk_mq_sched_free_tags(set, hctx, i);
-+	}
- }
- 
- int blk_mq_sched_init_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
-@@ -504,12 +542,28 @@ void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- 	blk_mq_sched_free_tags(q->tag_set, hctx, hctx_idx);
- }
- 
-+/*
-+ * If this queue has enough hardware tags and doesn't share tags with
-+ * other queues, just use hw tag directly for scheduling.
-+ */
-+bool blk_mq_sched_may_use_hw_tag(struct request_queue *q)
-+{
-+	if (q->tag_set->flags & BLK_MQ_F_TAG_SHARED)
-+		return false;
-+
-+	if (q->act_hw_queue_depth < q->nr_requests)
-+		return false;
-+
-+	return true;
-+}
-+
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	struct elevator_queue *eq;
- 	unsigned int i;
- 	int ret;
-+	bool auto_hw_tag;
- 
- 	if (!e) {
- 		q->elevator = NULL;
-@@ -522,7 +576,19 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 	 */
- 	q->nr_requests = 2 * BLKDEV_MAX_RQ;
- 
-+	auto_hw_tag = blk_mq_sched_may_use_hw_tag(q);
-+	if (auto_hw_tag) {
-+		q->act_hw_queue_depth = blk_mq_get_queue_depth(q);
-+		if (blk_mq_set_queues_depth(q, q->nr_requests))
-+			auto_hw_tag = false;
-+	}
-+
- 	queue_for_each_hw_ctx(q, hctx, i) {
-+		if (auto_hw_tag)
-+			hctx->flags |= BLK_MQ_F_SCHED_USE_HW_TAG;
-+		else
-+			hctx->flags &= ~BLK_MQ_F_SCHED_USE_HW_TAG;
-+
- 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
- 		if (ret)
- 			goto err;
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index edafb5383b7b..bbfc1ea5fafa 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -25,6 +25,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
- 
-+bool blk_mq_sched_may_use_hw_tag(struct request_queue *q);
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
- void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
- 
-@@ -35,6 +36,13 @@ void blk_mq_sched_exit_hctx(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
- 
- int blk_mq_sched_init(struct request_queue *q);
- 
-+void blk_mq_sched_free_tags(struct blk_mq_tag_set *set,
-+			    struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx);
-+int blk_mq_sched_alloc_tags(struct request_queue *q,
-+			    struct blk_mq_hw_ctx *hctx,
-+			    unsigned int hctx_idx);
-+
- static inline bool
- blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1a61ca611fae..e02fa8d078e6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2150,6 +2150,34 @@ int blk_mq_get_queue_depth(struct request_queue *q)
- 	return tags->bitmap_tags.sb.depth + tags->breserved_tags.sb.depth;
- }
- 
-+static void blk_mq_update_sched_flag(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	int i;
-+
-+	if (!q->elevator)
-+		return;
-+
-+	if (!blk_mq_sched_may_use_hw_tag(q))
-+		queue_for_each_hw_ctx(q, hctx, i) {
-+			if (hctx->flags & BLK_MQ_F_SCHED_USE_HW_TAG) {
-+				blk_mq_set_queue_depth(hctx, q->act_hw_queue_depth);
-+				hctx->flags &= ~BLK_MQ_F_SCHED_USE_HW_TAG;
-+			}
-+			if (!hctx->sched_tags) {
-+				if (blk_mq_sched_alloc_tags(q, hctx, i))
-+					goto force_use_hw_tag;
-+			}
-+		}
-+	else
-+ force_use_hw_tag:
-+		queue_for_each_hw_ctx(q, hctx, i) {
-+			hctx->flags |= BLK_MQ_F_SCHED_USE_HW_TAG;
-+			if (hctx->sched_tags)
-+				blk_mq_sched_free_tags(q->tag_set, hctx, i);
-+		}
-+}
-+
- static void queue_set_hctx_shared(struct request_queue *q, bool shared)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -2366,7 +2394,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	/*
- 	 * Do this after blk_queue_make_request() overrides it...
- 	 */
--	q->nr_requests = set->queue_depth;
-+	q->act_hw_queue_depth = q->nr_requests = set->queue_depth;
- 
- 	/*
- 	 * Default to classic polling
-@@ -2689,8 +2717,11 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 			break;
- 	}
- 
--	if (!ret)
-+	if (!ret) {
- 		q->nr_requests = nr;
-+		q->act_hw_queue_depth = blk_mq_get_queue_depth(q);
-+		blk_mq_update_sched_flag(q);
-+	}
- 
- 	blk_mq_unfreeze_queue(q);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b5d1e27631ee..7389e388d583 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -428,6 +428,14 @@ struct request_queue {
- 	unsigned int		nr_hw_queues;
- 
- 	/*
-+	 * save active hw queue depth before using hw tag for scheduling,
-+	 * this need to revisit if per hw queue depth is supported.
-+	 *
-+	 * Only used by blk-mq-sched.
-+	 */
-+	unsigned int		act_hw_queue_depth;
-+
-+	/*
- 	 * Dispatch queue sorting
- 	 */
- 	sector_t		end_sector;
--- 
-2.9.3
+Kind regards
+Uffe
+
+>
+>>
+>> Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+>> ---
+>>  drivers/mmc/core/sdio_irq.c | 10 ++++++----
+>>  include/linux/mmc/host.h    |  1 -
+>>  2 files changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/mmc/core/sdio_irq.c b/drivers/mmc/core/sdio_irq.c
+>> index 6d4b720..95f7a09 100644
+>> --- a/drivers/mmc/core/sdio_irq.c
+>> +++ b/drivers/mmc/core/sdio_irq.c
+>> @@ -137,9 +137,13 @@ static int sdio_irq_thread(void *_host)
+>>                * holding of the host lock does not cover too much work
+>>                * that doesn't require that lock to be held.
+>>                */
+>> -             ret = __mmc_claim_host(host, &host->sdio_irq_thread_abort);
+>> -             if (ret)
+>> +             mmc_claim_host(host);
+>> +             if (!host->sdio_irqs) {
+>> +                     ret = 1;
+>> +                     mmc_release_host(host);
+>>                       break;
+>> +             }
+>> +
+>>               ret = process_sdio_pending_irqs(host);
+>>               host->sdio_irq_pending = false;
+>>               mmc_release_host(host);
+>> @@ -195,7 +199,6 @@ static int sdio_card_irq_get(struct mmc_card *card)
+>>
+>>       if (!host->sdio_irqs++) {
+>>               if (!(host->caps2 & MMC_CAP2_SDIO_IRQ_NOTHREAD)) {
+>> -                     atomic_set(&host->sdio_irq_thread_abort, 0);
+>>                       host->sdio_irq_thread =
+>>                               kthread_run(sdio_irq_thread, host,
+>>                                           "ksdioirqd/%s", mmc_hostname(host));
+>> @@ -223,7 +226,6 @@ static int sdio_card_irq_put(struct mmc_card *card)
+>>
+>>       if (!--host->sdio_irqs) {
+>>               if (!(host->caps2 & MMC_CAP2_SDIO_IRQ_NOTHREAD)) {
+>> -                     atomic_set(&host->sdio_irq_thread_abort, 1);
+>>                       kthread_stop(host->sdio_irq_thread);
+>>               } else if (host->caps & MMC_CAP_SDIO_IRQ) {
+>>                       host->ops->enable_sdio_irq(host, 0);
+>> diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+>> index 21385ac..8a4131f 100644
+>> --- a/include/linux/mmc/host.h
+>> +++ b/include/linux/mmc/host.h
+>> @@ -359,7 +359,6 @@ struct mmc_host {
+>>       unsigned int            sdio_irqs;
+>>       struct task_struct      *sdio_irq_thread;
+>>       bool                    sdio_irq_pending;
+>> -     atomic_t                sdio_irq_thread_abort;
+>>
+>>       mmc_pm_flag_t           pm_flags;       /* requested pm features */
+>>
+>>
+>
