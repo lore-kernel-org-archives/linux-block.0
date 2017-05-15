@@ -1,96 +1,35 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 27/27] mm: clean up comments in me_pagecache_dirty
-Date: Tue,  9 May 2017 11:49:30 -0400
-Message-Id: <20170509154930.29524-28-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:50214 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S965626AbdEOSlO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 May 2017 14:41:14 -0400
+Date: Mon, 15 May 2017 14:41:08 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] dm mpath: don't return -EIO from dm_report_EIO
+Message-ID: <20170515184108.GB6257@redhat.com>
+References: <20170515152839.23375-1-hch@lst.de>
+ <20170515152839.23375-3-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170515152839.23375-3-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This no longer applies with the new writeback error tracking and
-reporting infrastructure.
+On Mon, May 15 2017 at 11:28am -0400,
+Christoph Hellwig <hch@lst.de> wrote:
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- mm/memory-failure.c | 35 +++++------------------------------
- 1 file changed, 5 insertions(+), 30 deletions(-)
+> Instead just turn the macro into a helper for the warning message.
+> This removes an unessecary assignment in this patch, and will allow
+> to fix a place where -EIO is the wrong error value in th next.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-index 4b56e53e5378..be5f998a0772 100644
---- a/mm/memory-failure.c
-+++ b/mm/memory-failure.c
-@@ -642,37 +642,12 @@ static int me_pagecache_dirty(struct page *p, unsigned long pfn)
- 	if (mapping) {
- 		/*
- 		 * IO error will be reported by write(), fsync(), etc.
--		 * who check the mapping.
--		 * This way the application knows that something went
--		 * wrong with its dirty file data.
-+		 * who check the mapping. This way the application knows that
-+		 * something went wrong when writing back its dirty file data.
- 		 *
--		 * There's one open issue:
--		 *
--		 * The EIO will be only reported on the next IO
--		 * operation and then cleared through the IO map.
--		 * Normally Linux has two mechanisms to pass IO error
--		 * first through the AS_EIO flag in the address space
--		 * and then through the PageError flag in the page.
--		 * Since we drop pages on memory failure handling the
--		 * only mechanism open to use is through AS_AIO.
--		 *
--		 * This has the disadvantage that it gets cleared on
--		 * the first operation that returns an error, while
--		 * the PageError bit is more sticky and only cleared
--		 * when the page is reread or dropped.  If an
--		 * application assumes it will always get error on
--		 * fsync, but does other operations on the fd before
--		 * and the page is dropped between then the error
--		 * will not be properly reported.
--		 *
--		 * This can already happen even without hwpoisoned
--		 * pages: first on metadata IO errors (which only
--		 * report through AS_EIO) or when the page is dropped
--		 * at the wrong time.
--		 *
--		 * So right now we assume that the application DTRT on
--		 * the first EIO, but we're not worse than other parts
--		 * of the kernel.
-+		 * Note that errors are reported only once per file
-+		 * description, but should be reported on all open file
-+		 * descriptions for this inode.
- 		 */
- 		mapping_set_error(mapping, -EIO);
- 	}
--- 
-2.9.3
+Something clearlyy got screwed up in my rebase.  Because I specifically
+recall casting the multipath_clone_and_map()'s !pgpath call with:
+(void) dm_report_EIO(m);
+
+Very weird.  Anyway, thanks for catching these issues.
+
+Mike
