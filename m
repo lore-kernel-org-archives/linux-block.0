@@ -1,67 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48398 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753898AbdEJP4b (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2017 11:56:31 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 2/4] blk-mq: introduce blk_mq_get_queue_depth()
-Date: Wed, 10 May 2017 23:55:41 +0800
-Message-Id: <20170510155543.18033-3-ming.lei@redhat.com>
-In-Reply-To: <20170510155543.18033-1-ming.lei@redhat.com>
-References: <20170510155543.18033-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Mon, 15 May 2017 14:01:14 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org, dhowells@redhat.com,
+	akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com,
+	hubcap@omnibond.com, rpeterso@redhat.com, bo.li.liu@oracle.com
+Subject: Re: [PATCH v4 21/27] mm: clean up error handling in write_one_page
+Message-ID: <20170515120114.GF16182@quack2.suse.cz>
+References: <20170509154930.29524-1-jlayton@redhat.com>
+ <20170509154930.29524-22-jlayton@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170509154930.29524-22-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The hardware queue depth can be resized via blk_mq_update_nr_requests(),
-so introduce this helper for retrieving queue's depth easily.
+On Tue 09-05-17 11:49:24, Jeff Layton wrote:
+> Don't try to check PageError since that's potentially racy and not
+> necessarily going to be set after writepage errors out.
+> 
+> Instead, sample the mapping error early on, and use that value to tell
+> us whether we got a writeback error since then.
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 15 +++++++++++++++
- block/blk-mq.h |  1 +
- 2 files changed, 16 insertions(+)
+Looks good to me. You can add:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 50b968fa4922..1a61ca611fae 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2135,6 +2135,21 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 	}
- }
- 
-+/*
-+ * Queue depth can be changed via blk_mq_update_nr_requests(),
-+ * so use this helper to retrieve queue's depth.
-+ */
-+int blk_mq_get_queue_depth(struct request_queue *q)
-+{
-+	/*
-+	 * All queues have same queue depth, need to revisit
-+	 * if per hw-queue depth is supported.
-+	 */
-+	struct blk_mq_tags	*tags = q->tag_set->tags[0];
-+
-+	return tags->bitmap_tags.sb.depth + tags->breserved_tags.sb.depth;
-+}
-+
- static void queue_set_hctx_shared(struct request_queue *q, bool shared)
- {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index cc67b48e3551..d49d46de2923 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -138,6 +138,7 @@ void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- void blk_mq_finish_request(struct request *rq);
- struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
- 					unsigned int op);
-+int blk_mq_get_queue_depth(struct request_queue *q);
- 
- static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
- {
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  mm/page-writeback.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> index de0dbf12e2c1..1643456881b4 100644
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -2373,11 +2373,12 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
+>  int write_one_page(struct page *page)
+>  {
+>  	struct address_space *mapping = page->mapping;
+> -	int ret = 0;
+> +	int ret = 0, ret2;
+>  	struct writeback_control wbc = {
+>  		.sync_mode = WB_SYNC_ALL,
+>  		.nr_to_write = 1,
+>  	};
+> +	errseq_t since = filemap_sample_wb_error(mapping);
+>  
+>  	BUG_ON(!PageLocked(page));
+>  
+> @@ -2386,16 +2387,14 @@ int write_one_page(struct page *page)
+>  	if (clear_page_dirty_for_io(page)) {
+>  		get_page(page);
+>  		ret = mapping->a_ops->writepage(page, &wbc);
+> -		if (ret == 0) {
+> +		if (ret == 0)
+>  			wait_on_page_writeback(page);
+> -			if (PageError(page))
+> -				ret = -EIO;
+> -		}
+>  		put_page(page);
+>  	} else {
+>  		unlock_page(page);
+>  	}
+> -	return ret;
+> +	ret2 = filemap_check_wb_error(mapping, since);
+> +	return ret ? : ret2;
+>  }
+>  EXPORT_SYMBOL(write_one_page);
+>  
+> -- 
+> 2.9.3
+> 
+> 
 -- 
-2.9.3
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
