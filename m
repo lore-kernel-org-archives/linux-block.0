@@ -1,90 +1,82 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 21/27] mm: clean up error handling in write_one_page
-Date: Tue,  9 May 2017 11:49:24 -0400
-Message-Id: <20170509154930.29524-22-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qk0-f193.google.com ([209.85.220.193]:35685 "EHLO
+        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935021AbdEOSqr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 May 2017 14:46:47 -0400
+Received: by mail-qk0-f193.google.com with SMTP id k74so18889369qke.2
+        for <linux-block@vger.kernel.org>; Mon, 15 May 2017 11:46:46 -0700 (PDT)
+Date: Mon, 15 May 2017 14:46:41 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/4] dm: fix REQ_RAHEAD handling
+Message-ID: <20170515184641.GA22139@redhat.com>
+References: <20170515152839.23375-1-hch@lst.de>
+ <20170515152839.23375-5-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170515152839.23375-5-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Don't try to check PageError since that's potentially racy and not
-necessarily going to be set after writepage errors out.
+On Mon, May 15 2017 at 11:28P -0400,
+Christoph Hellwig <hch@lst.de> wrote:
 
-Instead, sample the mapping error early on, and use that value to tell
-us whether we got a writeback error since then.
+> A few (but not all) dm targets use a special EWOULDBLOCK error code for
+> failing REQ_RAHEAD requests that fail due to a lack of available resources.
+> But no one else knows about this magic code, and lower level drivers also
+> don't generate it when failing read-ahead requests for similar reasons.
+> 
+> So remove this special casing and ignore all additional error handling for
+> REQ_RAHEAD - if this was a real underlying error we'd get a normal read
+> once the real read comes in.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/md/dm-raid1.c  | 4 ++--
+>  drivers/md/dm-stripe.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
+> index a95cbb80fb34..5e30b08b91d9 100644
+> --- a/drivers/md/dm-raid1.c
+> +++ b/drivers/md/dm-raid1.c
+> @@ -1214,7 +1214,7 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
+>  	 */
+>  	if (!r || (r == -EWOULDBLOCK)) {
+>  		if (bio->bi_opf & REQ_RAHEAD)
+> -			return -EWOULDBLOCK;
+> +			return -EIO;
+>  
+>  		queue_bio(ms, bio, rw);
+>  		return DM_MAPIO_SUBMITTED;
+> @@ -1258,7 +1258,7 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio, int error)
+>  	if (error == -EOPNOTSUPP)
+>  		return error;
+>  
+> -	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
+> +	if (bio->bi_opf & REQ_RAHEAD)
+>  		return error;
+>  
+>  	if (unlikely(error)) {
+> diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
+> index 75152482f3ad..780e95889a7c 100644
+> --- a/drivers/md/dm-stripe.c
+> +++ b/drivers/md/dm-stripe.c
+> @@ -384,7 +384,7 @@ static int stripe_end_io(struct dm_target *ti, struct bio *bio, int error)
+>  	if (!error)
+>  		return 0; /* I/O complete */
+>  
+> -	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
+> +	if (bio->bi_opf & REQ_RAHEAD)
+>  		return error;
+>  
+>  	if (error == -EOPNOTSUPP)
+> -- 
+> 2.11.0
+> 
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- mm/page-writeback.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index de0dbf12e2c1..1643456881b4 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2373,11 +2373,12 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
- int write_one_page(struct page *page)
- {
- 	struct address_space *mapping = page->mapping;
--	int ret = 0;
-+	int ret = 0, ret2;
- 	struct writeback_control wbc = {
- 		.sync_mode = WB_SYNC_ALL,
- 		.nr_to_write = 1,
- 	};
-+	errseq_t since = filemap_sample_wb_error(mapping);
- 
- 	BUG_ON(!PageLocked(page));
- 
-@@ -2386,16 +2387,14 @@ int write_one_page(struct page *page)
- 	if (clear_page_dirty_for_io(page)) {
- 		get_page(page);
- 		ret = mapping->a_ops->writepage(page, &wbc);
--		if (ret == 0) {
-+		if (ret == 0)
- 			wait_on_page_writeback(page);
--			if (PageError(page))
--				ret = -EIO;
--		}
- 		put_page(page);
- 	} else {
- 		unlock_page(page);
- 	}
--	return ret;
-+	ret2 = filemap_check_wb_error(mapping, since);
-+	return ret ? : ret2;
- }
- EXPORT_SYMBOL(write_one_page);
- 
--- 
-2.9.3
+I'll let this one go for now.. meaning I won't pick it up, nor will I
+send it for 4.12.  Please just roll this into your broader block work
+that you mentioned.
