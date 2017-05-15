@@ -1,67 +1,42 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 03/27] mm: fix mapping_set_error call in me_pagecache_dirty
-Date: Tue,  9 May 2017 11:49:06 -0400
-Message-Id: <20170509154930.29524-4-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:44926 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934572AbdEOP2x (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 May 2017 11:28:53 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: snitzer@redhat.com
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 3/4] dm mpath: multipath_clone_and_map must not return -EIO
+Date: Mon, 15 May 2017 17:28:38 +0200
+Message-Id: <20170515152839.23375-4-hch@lst.de>
+In-Reply-To: <20170515152839.23375-1-hch@lst.de>
+References: <20170515152839.23375-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The error code should be negative. Since this ends up in the default
-case anyway, this is harmless, but it's less confusing to negate it.
-Also, later patches will require a negative error code here.
+Since 412445ac ("dm: introduce a new DM_MAPIO_KILL return value"),  the
+clone_and_map_rq methods must not return errno values, so fix it up
+to properly return DM_MAPIO_KILL instead, instead of the -EIO value
+that sneaked in due to a conflict between two patches.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- mm/memory-failure.c | 2 +-
+ drivers/md/dm-mpath.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-index 27f7210e7fab..4b56e53e5378 100644
---- a/mm/memory-failure.c
-+++ b/mm/memory-failure.c
-@@ -674,7 +674,7 @@ static int me_pagecache_dirty(struct page *p, unsigned long pfn)
- 		 * the first EIO, but we're not worse than other parts
- 		 * of the kernel.
- 		 */
--		mapping_set_error(mapping, EIO);
-+		mapping_set_error(mapping, -EIO);
- 	}
- 
- 	return me_pagecache_clean(p, pfn);
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index d55454f98b59..3df056b73b66 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -481,7 +481,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 		if (test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))
+ 			return DM_MAPIO_DELAY_REQUEUE;
+ 		dm_report_EIO(m);	/* Failed */
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
+ 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
+ 		if (pg_init_all_paths(m))
 -- 
-2.9.3
+2.11.0
