@@ -1,37 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f182.google.com ([209.85.216.182]:35578 "EHLO
-        mail-qt0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758811AbdEOMOJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 May 2017 08:14:09 -0400
-Received: by mail-qt0-f182.google.com with SMTP id v27so71676965qtg.2
-        for <linux-block@vger.kernel.org>; Mon, 15 May 2017 05:14:08 -0700 (PDT)
-From: Dmitry Monakhov <dmonlist@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:42005 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751370AbdEOHoP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 May 2017 03:44:15 -0400
+Subject: Re: Announcing blktests
 To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
 Cc: kernel-team@fb.com
-Subject: Re: Announcing blktests
-In-Reply-To: <20170512184905.GA15267@vader.DHCP.thefacebook.com>
 References: <20170512184905.GA15267@vader.DHCP.thefacebook.com>
-Date: Mon, 15 May 2017 15:13:52 +0300
-Message-ID: <87h90m71xb.fsf@dmlp.sw.ru>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <a321ac00-aa4d-a42d-28dd-ebf37a248a1a@suse.de>
+Date: Mon, 15 May 2017 09:44:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170512184905.GA15267@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Omar Sandoval <osandov@osandov.com> writes:
-
+On 05/12/2017 08:49 PM, Omar Sandoval wrote:
 > Hi, everyone,
->
+> 
 > At LSF/MM, we talked about the need for somewhere to dump tests for the
 > block layer/storage stack. I've put together a test suite inspired by
 > xfstests here: https://github.com/osandov/blktests.
->
+> 
 > I started out with the opinion that we should reuse xfstests for this,
 > but it became clear that the requirements for testing block devices are
 > slightly different, and it diverged significantly from there. In
 > particular, blktests supports:
->
+> 
 > - Per-device tests. You can configure a list of test devices and the
 >   per-device tests will run on each one (currently in serial, we can
 >   support parallel runs in the future if needed).
@@ -41,28 +37,29 @@ Omar Sandoval <osandov@osandov.com> writes:
 >   that xfstests supports, blktests can also report arbitrary test
 >   metrics which don't affect whether the test passes but can be useful
 >   for spotting regressions.
-Cool. Thank you.
-It would be nice to have hermetic kvm environment similar to
-xfstests-bld [1] . I'm a volunteer to do that.
-
-Also I'm interested in adding my t10-dif csum tests.
-Is this ok to add it to separate ./tests/t10-dif group ?
-
-Side observations:
-Observation #1
-I've run this on fresh fedora kernel and it hit panic on the very first tests,
-which is very good sign for regression test framework.
-Observation #2
-It is appeared that git tree was corrupted after crash  :) Defenitely fsync is missed
-somewhere in git-core, I've straced it and found 'git clone' does only
-two fsync for tmp-pack-xxx files. It seems git's crash consistency is horrably broken.
->
+> 
 > Jens and I wrote up an initial set of tests, but there are a lot more we
 > can still write. I'm also happy to take feature requests, just email me
 > or open an issue on the GitHub repo.
->
-> Thanks,
-> Omar
 
-Footnotes: 
-[1]  https://github.com/tytso/xfstests-bld
+\o/
+
+You're my hero :-).
+
+Do you only accept github pull requests or do you accept patches via
+linux-block as well?
+
+As a side note, I'm currently working on a partition table fuzzer to
+stress block/partitions/*.c a bit. I think this could be included into
+your framework as well (it's only one .c file currently with no external
+dependencies).
+
+Byte,
+	Johannes
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
