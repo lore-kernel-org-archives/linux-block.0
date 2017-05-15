@@ -1,83 +1,74 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4-12-rc1
-Message-ID: <0742772b-1685-6c1f-cb5c-f5583a7a9390@kernel.dk>
-Date: Thu, 11 May 2017 09:42:30 -0600
+Return-Path: <jack@suse.cz>
+Date: Mon, 15 May 2017 13:58:38 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org, dhowells@redhat.com,
+	akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com,
+	hubcap@omnibond.com, rpeterso@redhat.com, bo.li.liu@oracle.com
+Subject: Re: [PATCH v4 22/27] jbd2: don't reset error in
+ journal_finish_inode_data_buffers
+Message-ID: <20170515115838.GE16182@quack2.suse.cz>
+References: <20170509154930.29524-1-jlayton@redhat.com>
+ <20170509154930.29524-23-jlayton@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170509154930.29524-23-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On Tue 09-05-17 11:49:25, Jeff Layton wrote:
+> Now that we don't clear writeback errors after fetching them, there is
+> no need to reset them. This is also potentially racy.
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-A smaller collection of fixes that should go into -rc1. This pull
-request contains:
+Looks good. You can add:
 
-- A fix from Christoph, fixing a regression with the WRITE_SAME
-  and partial completions. Caused a BUG() on ppc.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-- Fixup for __blk_mq_stop_hw_queues(), it should be static. From Colin.
+								Honza
 
-- Removal of dmesg error messages on elevator switching, when invoked
-  from sysfs. From me.
-
-- Fix for blk-stat, using this_cpu_ptr() in a section only protected by
-  rcu_read_lock(). This breaks when PREEMPT_RCU is enabled. From me.
-
-- Two fixes for BFQ from Paolo, one fixing a crash and one updating the
-  documentation.
-
-- An error handling lightnvm memory leak, from Rakesh.
-
-- The previous blk-mq hot unplug lock reversal depends on the CPU
-  hotplug rework that isn't in mainline yet. This caused a lockdep splat
-  when people unplugged CPUs with blk-mq devices. From Wanpeng.
-
-- A regression fix for DIF/DIX on blk-mq. From Wen.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      block: handle partial completions for special payload requests
-
-Colin Ian King (1):
-      blk-mq: make __blk_mq_stop_hw_queues static
-
-Geert Uytterhoeven (1):
-      lightnvm: remove unused rq parameter of nvme_nvm_rqtocmd() to kill warning
-
-Jens Axboe (2):
-      elevator: remove redundant warnings on IO scheduler switch
-      blk-stat: don't use this_cpu_ptr() in a preemptable section
-
-Paolo Valente (2):
-      block, bfq: use pointer entity->sched_data only if set
-      block, bfq: stress that low_latency must be off to get max throughput
-
-Rakesh Pandit (1):
-      nvme: lightnvm: fix memory leak
-
-Wanpeng Li (1):
-      block/mq: fix potential deadlock during cpu hotplug
-
-Wen Xiong (1):
-      blk-mq: NVMe 512B/4K+T10 DIF/DIX format returns I/O error on dd with split op
-
- Documentation/block/bfq-iosched.txt | 17 ++++++++++++++++-
- block/bfq-iosched.c                 |  5 +++++
- block/bfq-wf2q.c                    | 13 +++++++++++--
- block/blk-core.c                    | 24 ++++++++++++------------
- block/blk-mq.c                      | 10 +++++-----
- block/blk-stat.c                    | 17 ++++++++++-------
- block/elevator.c                    |  5 +----
- drivers/nvme/host/lightnvm.c        |  9 +++++----
- 8 files changed, 65 insertions(+), 35 deletions(-)
-
+> ---
+>  fs/jbd2/commit.c | 13 ++-----------
+>  1 file changed, 2 insertions(+), 11 deletions(-)
+> 
+> diff --git a/fs/jbd2/commit.c b/fs/jbd2/commit.c
+> index b6b194ec1b4f..4c6262652028 100644
+> --- a/fs/jbd2/commit.c
+> +++ b/fs/jbd2/commit.c
+> @@ -264,17 +264,8 @@ static int journal_finish_inode_data_buffers(journal_t *journal,
+>  		jinode->i_flags |= JI_COMMIT_RUNNING;
+>  		spin_unlock(&journal->j_list_lock);
+>  		err = filemap_fdatawait(jinode->i_vfs_inode->i_mapping);
+> -		if (err) {
+> -			/*
+> -			 * Because AS_EIO is cleared by
+> -			 * filemap_fdatawait_range(), set it again so
+> -			 * that user process can get -EIO from fsync().
+> -			 */
+> -			mapping_set_error(jinode->i_vfs_inode->i_mapping, -EIO);
+> -
+> -			if (!ret)
+> -				ret = err;
+> -		}
+> +		if (err && !ret)
+> +			ret = err;
+>  		spin_lock(&journal->j_list_lock);
+>  		jinode->i_flags &= ~JI_COMMIT_RUNNING;
+>  		smp_mb();
+> -- 
+> 2.9.3
+> 
+> 
 -- 
-Jens Axboe
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
