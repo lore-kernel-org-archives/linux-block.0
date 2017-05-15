@@ -1,56 +1,66 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f172.google.com ([209.85.192.172]:35593 "EHLO
-        mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752545AbdEDHbu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 03:31:50 -0400
-Received: by mail-pf0-f172.google.com with SMTP id v14so3725115pfd.2
-        for <linux-block@vger.kernel.org>; Thu, 04 May 2017 00:31:49 -0700 (PDT)
+Received: from mail-pg0-f50.google.com ([74.125.83.50]:32980 "EHLO
+        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754546AbdEORfv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 May 2017 13:35:51 -0400
+Received: by mail-pg0-f50.google.com with SMTP id u187so63346788pgb.0
+        for <linux-block@vger.kernel.org>; Mon, 15 May 2017 10:35:51 -0700 (PDT)
+Date: Mon, 15 May 2017 10:35:48 -0700
 From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
-Subject: [PATCH v2 07/12] blk-mq: Do not invoke queue operations on a dead queue
-Date: Thu,  4 May 2017 00:31:29 -0700
-Message-Id: <71712db1ecbe0432055c4976314a57485fff7f18.1493882751.git.osandov@fb.com>
-In-Reply-To: <cover.1493882751.git.osandov@fb.com>
-References: <cover.1493882751.git.osandov@fb.com>
-In-Reply-To: <cover.1493882751.git.osandov@fb.com>
-References: <cover.1493882751.git.osandov@fb.com>
+To: Dmitry Monakhov <dmonlist@gmail.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: Announcing blktests
+Message-ID: <20170515173548.GB18764@vader.DHCP.thefacebook.com>
+References: <20170512184905.GA15267@vader.DHCP.thefacebook.com>
+ <87h90m71xb.fsf@dmlp.sw.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <87h90m71xb.fsf@dmlp.sw.ru>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+On Mon, May 15, 2017 at 03:13:52PM +0300, Dmitry Monakhov wrote:
+> Omar Sandoval <osandov@osandov.com> writes:
+> 
+> > Hi, everyone,
+> >
+> > At LSF/MM, we talked about the need for somewhere to dump tests for the
+> > block layer/storage stack. I've put together a test suite inspired by
+> > xfstests here: https://github.com/osandov/blktests.
+> >
+> > I started out with the opinion that we should reuse xfstests for this,
+> > but it became clear that the requirements for testing block devices are
+> > slightly different, and it diverged significantly from there. In
+> > particular, blktests supports:
+> >
+> > - Per-device tests. You can configure a list of test devices and the
+> >   per-device tests will run on each one (currently in serial, we can
+> >   support parallel runs in the future if needed).
+> > - No-device tests. Some tests don't need to run on real hardware, and we
+> >   can just set up a null-blk or scsi-debug device.
+> > - Performance numbers. In addition to the output comparison pass/fail
+> >   that xfstests supports, blktests can also report arbitrary test
+> >   metrics which don't affect whether the test passes but can be useful
+> >   for spotting regressions.
+> Cool. Thank you.
+> It would be nice to have hermetic kvm environment similar to
+> xfstests-bld [1] . I'm a volunteer to do that.
 
-In commit e869b5462f83 ("blk-mq: Unregister debugfs attributes
-earlier"), we shuffled the debugfs cleanup around so that the "state"
-attribute was removed before we freed the blk-mq data structures.
-However, later changes are going to undo that, so we need to explicitly
-disallow running a dead queue.
+Fine with me. Currently I think the only things we shell out to besides
+basic coreutils and util-linux stuff are fio and parted.
 
-[Omar: rebased and updated commit message]
-Signed-off-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
----
- block/blk-mq-debugfs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> Also I'm interested in adding my t10-dif csum tests.
+> Is this ok to add it to separate ./tests/t10-dif group ?
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 1579af6fcbed..347fbb8e059c 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -102,6 +102,14 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
- 	struct request_queue *q = data;
- 	char opbuf[16] = { }, *op;
- 
-+	/*
-+	 * The "state" attribute is removed after blk_cleanup_queue() has called
-+	 * blk_mq_free_queue(). Return if QUEUE_FLAG_DEAD has been set to avoid
-+	 * triggering a use-after-free.
-+	 */
-+	if (blk_queue_dead(q))
-+		return -ENOENT;
-+
- 	if (count >= sizeof(opbuf)) {
- 		pr_err("%s: operation too long\n", __func__);
- 		goto inval;
--- 
-2.12.2
+Yeah, I think that'd make sense as its own group.
+
+> Side observations:
+> Observation #1
+> I've run this on fresh fedora kernel and it hit panic on the very first tests,
+> which is very good sign for regression test framework.
+
+Awesome! Any idea which test it was? There is a marker in dmesg before
+each test is run.
+
+Thanks!
