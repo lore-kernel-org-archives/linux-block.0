@@ -1,217 +1,118 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Matthew Wilcox <mawilcox@microsoft.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Stephen Bates <sbates@raithlin.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Jerome Glisse <jglisse@redhat.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 24 May 2017 15:42:11 -0600
-Message-Id: <1495662147-18277-1-git-send-email-logang@deltatee.com>
-Subject: [RFC PATCH 00/16] Unmappable memory in SGLs for p2p transfers
+Return-Path: <ulf.hansson@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <e3887ef8-cd5d-ebda-35c4-01b2ea064afc@intel.com>
+References: <1494506343-28572-1-git-send-email-ulf.hansson@linaro.org>
+ <1494506343-28572-4-git-send-email-ulf.hansson@linaro.org>
+ <f583aa94-578c-493d-f863-2fcc67e5d848@intel.com> <CAPDyKFqmvksL=bLR0FOfR=Q7B4TNa6oy0XZwFvkoT7nxLW4JBQ@mail.gmail.com>
+ <e3887ef8-cd5d-ebda-35c4-01b2ea064afc@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 16 May 2017 16:32:52 +0200
+Message-ID: <CAPDyKFperzkkh2wDyh3=G1-357CZvYvaRtHv3Wp4QVXXfutBhA@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/3] mmc: core: Allow mmc block device to re-claim the host
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Paolo Valente <paolo.valente@linaro.org>, linux-block@vger.kernel.org,
+	Linus Walleij <linus.walleij@linaro.org>, Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 16 May 2017 at 15:24, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> On 15/05/17 17:05, Ulf Hansson wrote:
+>> On 12 May 2017 at 10:36, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>>> On 11/05/17 15:39, Ulf Hansson wrote:
+>>>> The current mmc block device implementation is tricky when it comes to
+>>>> claim and release of the host, while processing I/O requests. In principle
+>>>> we need to claim the host at the first request entering the queue and then
+>>>> we need to release the host, as soon as the queue becomes empty. This
+>>>> complexity relates to the asynchronous request mechanism that the mmc block
+>>>> device driver implements.
+>>>>
+>>>> For the legacy block interface that we currently implements, the above
+>>>> issue can be addressed, as we can find out when the queue really becomes
+>>>> empty.
+>>>>
+>>>> However, to find out whether the queue is empty, isn't really an applicable
+>>>> method when using the new blk-mq interface, as requests are instead pushed
+>>>> to us via the struct struct blk_mq_ops and its function pointers.
+>>>
+>>> That is not entirely true.  We can pull requests by running the queue i.e.
+>>> blk_mq_run_hw_queues(q, false), returning BLK_MQ_RQ_QUEUE_BUSY and stopping
+>>> / starting the queue as needed.
+>>
+>> I am not sure how that would work. It doesn't sound very effective to
+>> me, but I may be wrong.
+>
+> The queue depth is not the arbiter of whether we can issue a request.  That
+> means there will certainly be times when we have to return
+> BLK_MQ_RQ_QUEUE_BUSY from ->queue_rq() and perhaps stop the queue as well.
+>
+> We could start with ->queue_rq() feeding every request to the existing
+> thread and work towards having it submit requests immediately when possible.
+>  Currently mmc core cannot submit mmc_requests without waiting, but the
+> command queue implementation can for read/write requests when the host
+> controller and card are runtime resumed and the card is switched to the
+> correct internal partition (and we are not currently discarding flushing or
+> recovering), so it might be simpler to start with cmdq ;-)
 
-This RFC patchset continues my work attempting to enforce iomem safety
-within scatterlists. This takes a bit of a different tack from my
-last series [1] which tried to introduce a common scatterlist mapping
-function. Instead, this series takes the approach of marking SGLs that
-may contain unmappable memory and fencing off only the marked instances
-from calling sg_page and sg_virt, etc. This means we'd no longer need to
-clean up every SGL user in the kernel and try to deal with cases that
-assume every SGL always contains mappable memory with no error path.
+In the end I guess the only thing to do is to compare the patchsets to
+see how the result would look like. :-)
 
-Patches 1 through 5 are cleanup/prep patches that I'll likely be
-submitting to their respective maintainers in short order.
+My current observation is that our current implementation of the mmc
+block device and corresponding mmc queue, is still rather messy, even
+if you and Linus recently has worked hard to improve the situation.
 
-Patch 6 converts SGLs to use pfn_t instead of the existing page_link
-as suggested (and seemingly planned for) by Dan.
+Moreover it looks quite different compared to other block device
+drivers and in the way of striving to make it more robust and
+maintainable, that's not good.
 
-Patches 7 and 8 then add unmappable or io memory support to SGLs
+Therefore, I am not really comfortable with replacing one mmc hack for
+block device management with yet another, as that seems to be what
+your approach would do - unless I am mistaken of course.
 
-Patches 9 through 14, similarly convert the bvec layer to use pfn_t
+Instead I would like us to move into a more generic blk device
+approach. Whatever that means. :-)
 
-Patches 15 and 16 test the above work by applying it to the nvme-fabrics
-code such that unmappable SGLs are being used without any BUG_ONS in
-somewhat limitted testing cases.
+>
+>>
+>>>
+>>> But, as I have written before, we could start with the most trivial
+>>> implementation.  ->queue_rq() puts the requests in a list and then the
+>>> thread removes them from the list.
+>>
+>> That would work...
+>>
+>>>
+>>> That would be a good start because it would avoid having to deal with other
+>>> issues at the same time.
+>>
+>> ...however this doesn't seem like a step in the direction we want to
+>> take when porting to blkmq.
+>>
+>> There will be an extra context switch for each an every request, won't there?
+>
+> No, for synchronous requests, it would be the same as now. ->queue_rq()
+> would be called in the context of the submitter and would wake the thread
+> just like ->request_fn() does now.
 
-Seeing this work is still incomplete and experimental, I'm looking to
-get feedback on people's opinions of whether this is an acceptable
-approach. If it is favourable, would people be open to seeing cleaned
-up versions of patches 6, and 9 through 14 be submitted upstream?
-(ie. just the parts for converting to pfn_t and continuing the
-unmappable/iomem/p2pmem work out-of-tree for a time).
+You are right!
 
-This work also opens up the possibility of having p2pmem not use
-ZONE_DEVICE struct pages and instead just sticking with pfn_ts
-with a specific p2p radix tree for looking up the backing device.
-Presently, I'm ambivalent towards this and would like to hear other's
-opinions.
+However, in my comparison I was thinking of how it *can* work if we
+were able to submit/prepare request in the context of the caller.
 
-This series is based on v4.12-rc2 and a git tree is available here:
+>
+>>
+>> My point is, to be able to convert to blkmq, we must also avoid
+>> performance regression - at leas as long as possible.
+>
+> It would still be better to start simple, and measure the performance, than
+> to guess where the bottlenecks are.
 
-https://github.com/sbates130272/linux-p2pmem.git io_pfn_t
+Yes, starting simple is always good!
 
-Thanks for your time,
+Although, even if simple, we need to stop adding more mmc specific
+hacks into the mmc block device layer.
 
-Logan
+[...]
 
-[1] https://lkml.org/lkml/2017/4/25/738
-
-Logan Gunthorpe (16):
-  dmaengine: ste_dma40, imx-dma: Cleanup scatterlist layering violations
-  staging: ccree: Cleanup: remove references to page_link
-  kfifo: Cleanup example to not use page_link
-  um: add dummy ioremap and iounmap functions
-  tile: provide default ioremap declaration
-  scatterlist: convert page_link to pfn_t
-  scatterlist: support unmappable memory in the scatterlist
-  scatterlist: add iomem support to sg_miter and sg_copy_*
-  bvec: introduce bvec_page and bvec_set_page accessors
-  bvec: massive conversion of all bv_page users
-  bvec: convert to using pfn_t internally
-  bvec: use sg_set_pfn when mapping a bio to an sgl
-  block: bio: introduce bio_add_pfn
-  block: bio: go straight from pfn_t to phys instead of through page
-  dma-mapping: introduce and use unmappable safe sg_virt call
-  nvmet: use unmappable sgl in rdma target
-
- arch/powerpc/sysdev/axonram.c                      |   2 +-
- arch/tile/mm/pgtable.c                             |  13 ++
- arch/um/include/asm/io.h                           |  17 ++
- block/bio-integrity.c                              |   8 +-
- block/bio.c                                        |  58 +++----
- block/blk-core.c                                   |   2 +-
- block/blk-integrity.c                              |   6 +-
- block/blk-lib.c                                    |   2 +-
- block/blk-merge.c                                  |  10 +-
- block/blk-zoned.c                                  |   6 +-
- block/bounce.c                                     |  27 +--
- drivers/block/aoe/aoecmd.c                         |   4 +-
- drivers/block/brd.c                                |   3 +-
- drivers/block/drbd/drbd_bitmap.c                   |   6 +-
- drivers/block/drbd/drbd_main.c                     |   4 +-
- drivers/block/drbd/drbd_receiver.c                 |   4 +-
- drivers/block/drbd/drbd_worker.c                   |   2 +-
- drivers/block/floppy.c                             |   4 +-
- drivers/block/loop.c                               |  12 +-
- drivers/block/ps3disk.c                            |   2 +-
- drivers/block/ps3vram.c                            |   2 +-
- drivers/block/rbd.c                                |   2 +-
- drivers/block/rsxx/dma.c                           |   3 +-
- drivers/block/umem.c                               |   2 +-
- drivers/block/zram/zram_drv.c                      |  14 +-
- drivers/dma/imx-dma.c                              |   7 +-
- drivers/dma/ste_dma40.c                            |   5 +-
- drivers/lightnvm/pblk-core.c                       |   2 +-
- drivers/lightnvm/pblk-read.c                       |   6 +-
- drivers/md/bcache/btree.c                          |   2 +-
- drivers/md/bcache/debug.c                          |   4 +-
- drivers/md/bcache/request.c                        |   4 +-
- drivers/md/bcache/super.c                          |  10 +-
- drivers/md/bcache/util.c                           |   6 +-
- drivers/md/dm-crypt.c                              |  16 +-
- drivers/md/dm-integrity.c                          |  18 +-
- drivers/md/dm-io.c                                 |   2 +-
- drivers/md/dm-log-writes.c                         |  12 +-
- drivers/md/dm-verity-target.c                      |   4 +-
- drivers/md/raid5.c                                 |  10 +-
- drivers/memstick/core/mspro_block.c                |   2 +-
- drivers/nvdimm/blk.c                               |   4 +-
- drivers/nvdimm/btt.c                               |   5 +-
- drivers/nvdimm/pmem.c                              |   2 +-
- drivers/nvme/host/core.c                           |   2 +-
- drivers/nvme/host/nvme.h                           |   2 +-
- drivers/nvme/host/pci.c                            |   5 +-
- drivers/nvme/target/Kconfig                        |  12 ++
- drivers/nvme/target/io-cmd.c                       |   2 +-
- drivers/nvme/target/rdma.c                         |  29 +++-
- drivers/s390/block/dasd_diag.c                     |   2 +-
- drivers/s390/block/dasd_eckd.c                     |  14 +-
- drivers/s390/block/dasd_fba.c                      |   6 +-
- drivers/s390/block/dcssblk.c                       |   2 +-
- drivers/s390/block/scm_blk.c                       |   2 +-
- drivers/s390/block/scm_blk_cluster.c               |   2 +-
- drivers/s390/block/xpram.c                         |   2 +-
- drivers/scsi/mpt3sas/mpt3sas_transport.c           |   6 +-
- drivers/scsi/sd.c                                  |  16 +-
- drivers/scsi/sd_dif.c                              |   4 +-
- drivers/staging/ccree/ssi_buffer_mgr.c             |  17 +-
- .../staging/lustre/lnet/klnds/o2iblnd/o2iblnd_cb.c |   4 +-
- .../lustre/lnet/klnds/socklnd/socklnd_lib.c        |  10 +-
- drivers/staging/lustre/lnet/lnet/lib-move.c        |   4 +-
- drivers/staging/lustre/lnet/lnet/router.c          |   6 +-
- drivers/staging/lustre/lnet/selftest/brw_test.c    |   4 +-
- drivers/staging/lustre/lnet/selftest/conrpc.c      |  10 +-
- drivers/staging/lustre/lnet/selftest/framework.c   |   2 +-
- drivers/staging/lustre/lnet/selftest/rpc.c         |   4 +-
- drivers/staging/lustre/lustre/include/lustre_net.h |   2 +-
- drivers/staging/lustre/lustre/osc/osc_page.c       |   2 +-
- drivers/staging/lustre/lustre/ptlrpc/client.c      |   2 +-
- drivers/staging/lustre/lustre/ptlrpc/sec_bulk.c    |   6 +-
- drivers/staging/lustre/lustre/ptlrpc/sec_plain.c   |   4 +-
- drivers/target/target_core_file.c                  |   4 +-
- drivers/xen/biomerge.c                             |   4 +-
- fs/9p/vfs_addr.c                                   |   6 +-
- fs/afs/rxrpc.c                                     |   4 +-
- fs/block_dev.c                                     |   8 +-
- fs/btrfs/check-integrity.c                         |   4 +-
- fs/btrfs/compression.c                             |  14 +-
- fs/btrfs/disk-io.c                                 |   4 +-
- fs/btrfs/extent_io.c                               |   8 +-
- fs/btrfs/file-item.c                               |   8 +-
- fs/btrfs/inode.c                                   |  14 +-
- fs/btrfs/raid56.c                                  |   4 +-
- fs/buffer.c                                        |   2 +-
- fs/cifs/connect.c                                  |   3 +-
- fs/cifs/file.c                                     |   6 +-
- fs/cifs/misc.c                                     |   2 +-
- fs/cifs/smb2ops.c                                  |   2 +-
- fs/cifs/transport.c                                |   3 +-
- fs/crypto/bio.c                                    |   2 +-
- fs/direct-io.c                                     |   2 +-
- fs/exofs/ore.c                                     |   4 +-
- fs/exofs/ore_raid.c                                |   2 +-
- fs/ext4/page-io.c                                  |   2 +-
- fs/ext4/readpage.c                                 |   2 +-
- fs/f2fs/data.c                                     |  12 +-
- fs/gfs2/lops.c                                     |   4 +-
- fs/gfs2/meta_io.c                                  |   2 +-
- fs/iomap.c                                         |   2 +-
- fs/mpage.c                                         |   2 +-
- fs/orangefs/inode.c                                |   3 +-
- fs/splice.c                                        |   2 +-
- fs/xfs/xfs_aops.c                                  |   2 +-
- include/linux/bio.h                                |  34 +++-
- include/linux/bvec.h                               |  21 ++-
- include/linux/dma-mapping.h                        |   9 +-
- include/linux/pfn_t.h                              |  42 ++++-
- include/linux/scatterlist.h                        | 189 +++++++++++++++------
- kernel/power/swap.c                                |   2 +-
- lib/Kconfig                                        |  11 ++
- lib/iov_iter.c                                     |  24 +--
- lib/scatterlist.c                                  |  65 ++++++-
- mm/page_io.c                                       |   8 +-
- net/ceph/messenger.c                               |   6 +-
- samples/kfifo/dma-example.c                        |   8 +-
- 118 files changed, 690 insertions(+), 393 deletions(-)
- create mode 100644 arch/um/include/asm/io.h
-
---
-2.1.4
+Kind regards
+Uffe
