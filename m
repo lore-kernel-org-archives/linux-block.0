@@ -1,134 +1,74 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	tom.leiming@gmail.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 1/8] Use RWF_* flags for AIO operations
-Date: Tue,  9 May 2017 07:22:12 -0500
-Message-Id: <20170509122219.31756-2-rgoldwyn@suse.de>
-In-Reply-To: <20170509122219.31756-1-rgoldwyn@suse.de>
-References: <20170509122219.31756-1-rgoldwyn@suse.de>
+Return-Path: <prvs=631096caf0=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, <Kernel-team@fb.com>
+Subject: [PATCH 2/4] blk-throttle: output some debug info in trace
+Date: Wed, 17 May 2017 13:07:25 -0700
+Message-ID: <6e507e6429463f59bcb7f11ca89ba4d41c59ec56.1495050247.git.shli@fb.com>
+In-Reply-To: <cover.1495050247.git.shli@fb.com>
+References: <cover.1495050247.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+These info are important to understand what's happening and help debug.
 
-RWF_* flags is used for preadv2/pwritev2 calls. Port to use
-it for aio operations as well. For this, aio_rw_flags is
-introduced in struct iocb (using aio_reserved1) which will
-carry these flags.
-
-This is a precursor to the nowait AIO calls.
-
-Note, the only place RWF_HIPRI comes in effect is dio_await_one().
-All the rest of the locations, aio code return -EIOCBQUEUED before the
-checks for RWF_HIPRI.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- fs/aio.c                     |  8 +++++++-
- fs/read_write.c              | 12 +++---------
- include/linux/fs.h           | 14 ++++++++++++++
- include/uapi/linux/aio_abi.h |  2 +-
- 4 files changed, 25 insertions(+), 11 deletions(-)
+ block/blk-throttle.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index f52d925ee259..020fa0045e3c 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1541,7 +1541,7 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 	ssize_t ret;
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 16174f8..1f8d62f 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1748,12 +1748,18 @@ static bool throtl_tg_is_idle(struct throtl_grp *tg)
+ 	 * - IO latency is largely below threshold
+ 	 */
+ 	unsigned long time = jiffies_to_usecs(4 * tg->td->throtl_slice);
++	bool ret;
  
- 	/* enforce forwards compatibility on users */
--	if (unlikely(iocb->aio_reserved1 || iocb->aio_reserved2)) {
-+	if (unlikely(iocb->aio_reserved2)) {
- 		pr_debug("EINVAL: reserve field set\n");
- 		return -EINVAL;
- 	}
-@@ -1586,6 +1586,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		req->common.ki_flags |= IOCB_EVENTFD;
- 	}
- 
-+	ret = kiocb_set_rw_flags(&req->common, iocb->aio_rw_flags);
-+	if (unlikely(ret)) {
-+		pr_debug("EINVAL: aio_rw_flags\n");
-+		goto out_put_req;
-+	}
-+
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/fs/read_write.c b/fs/read_write.c
-index c4f88afbc67f..362f91cd8d66 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 	struct kiocb kiocb;
- 	ssize_t ret;
- 
--	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
--		return -EOPNOTSUPP;
--
- 	init_sync_kiocb(&kiocb, filp);
--	if (flags & RWF_HIPRI)
--		kiocb.ki_flags |= IOCB_HIPRI;
--	if (flags & RWF_DSYNC)
--		kiocb.ki_flags |= IOCB_DSYNC;
--	if (flags & RWF_SYNC)
--		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	ret = kiocb_set_rw_flags(&kiocb, flags);
-+	if (ret)
-+		return ret;
- 	kiocb.ki_pos = *ppos;
- 
- 	if (type == READ)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 7251f7bb45e8..869c9a6fe58d 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3049,6 +3049,20 @@ static inline int iocb_flags(struct file *file)
- 	return res;
+ 	time = min_t(unsigned long, MAX_IDLE_TIME, time);
+-	return (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
++	ret = (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
+ 	       tg->avg_idletime > tg->idletime_threshold ||
+ 	       (tg->latency_target && tg->bio_cnt &&
+ 		tg->bad_bio_cnt * 5 < tg->bio_cnt);
++	throtl_log(&tg->service_queue,
++		"avg_idle=%ld, idle_threshold=%ld, bad_bio=%d, total_bio=%d, is_idle=%d, scale=%d",
++		tg->avg_idletime, tg->idletime_threshold, tg->bad_bio_cnt,
++		tg->bio_cnt, ret, tg->td->scale);
++	return ret;
  }
  
-+static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
-+{
-+	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
-+		return -EOPNOTSUPP;
-+
-+	if (flags & RWF_HIPRI)
-+		ki->ki_flags |= IOCB_HIPRI;
-+	if (flags & RWF_DSYNC)
-+		ki->ki_flags |= IOCB_DSYNC;
-+	if (flags & RWF_SYNC)
-+		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	return 0;
-+}
-+
- static inline ino_t parent_ino(struct dentry *dentry)
- {
- 	ino_t res;
-diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
-index bb2554f7fbd1..a2d4a8ac94ca 100644
---- a/include/uapi/linux/aio_abi.h
-+++ b/include/uapi/linux/aio_abi.h
-@@ -79,7 +79,7 @@ struct io_event {
- struct iocb {
- 	/* these are internal to the kernel/libc. */
- 	__u64	aio_data;	/* data to be returned in event's data */
--	__u32	PADDED(aio_key, aio_reserved1);
-+	__u32	PADDED(aio_key, aio_rw_flags);
- 				/* the kernel sets aio_key to the req # */
+ static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
+@@ -1849,6 +1855,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 	struct cgroup_subsys_state *pos_css;
+ 	struct blkcg_gq *blkg;
  
- 	/* common fields */
++	throtl_log(&td->service_queue, "upgrade to max");
+ 	td->limit_index = LIMIT_MAX;
+ 	td->low_upgrade_time = jiffies;
+ 	td->scale = 0;
+@@ -1871,6 +1878,7 @@ static void throtl_downgrade_state(struct throtl_data *td, int new)
+ {
+ 	td->scale /= 2;
+ 
++	throtl_log(&td->service_queue, "downgrade, scale %d", td->scale);
+ 	if (td->scale) {
+ 		td->low_upgrade_time = jiffies - td->scale * td->throtl_slice;
+ 		return;
+@@ -2044,6 +2052,11 @@ static void throtl_update_latency_buckets(struct throtl_data *td)
+ 		td->avg_buckets[i].valid = true;
+ 		last_latency = td->avg_buckets[i].latency;
+ 	}
++
++	for (i = 0; i < LATENCY_BUCKET_SIZE; i++)
++		throtl_log(&td->service_queue,
++			"Latency bucket %d: latency=%ld, valid=%d", i,
++			td->avg_buckets[i].latency, td->avg_buckets[i].valid);
+ }
+ #else
+ static inline void throtl_update_latency_buckets(struct throtl_data *td)
 -- 
-2.12.0
+2.9.3
