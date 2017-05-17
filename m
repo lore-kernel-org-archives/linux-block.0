@@ -1,23 +1,29 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 17 May 2017 17:57:52 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, Kernel-team@fb.com
 Subject: Re: [PATCH 0/4] blk-throttle: fix a few issues
-To: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org
-Cc: tj@kernel.org, Kernel-team@fb.com
+Message-ID: <20170517215752.GI942@htj.duckdns.org>
 References: <cover.1495050247.git.shli@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <32753a32-bb46-6bf1-dead-6b794145f7b6@kernel.dk>
-Date: Mon, 22 May 2017 14:45:56 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <cover.1495050247.git.shli@fb.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/17/2017 02:07 PM, Shaohua Li wrote:
+On Wed, May 17, 2017 at 01:07:23PM -0700, Shaohua Li wrote:
 > Hi,
 > 
 > The patchset fix a few issues for io.low limit. The title of the patches
 > explain the issues pretty well.
 
-Looks good to me, added for 4.12-rc3.
+Looks good to me.
+
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
 
 -- 
-Jens Axboe
+tejun
