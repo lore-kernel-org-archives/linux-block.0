@@ -1,72 +1,37 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: fstests@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 1/9] bio-integrity: Do not allocate integrity context for bio w/o data
-Date: Wed, 10 May 2017 19:20:44 +0400
-Message-Id: <1494429652-9488-2-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
-References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	Zhang Yi <yizhan@redhat.com>,
+	linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/2] nvme: fix hang in path of removing disk
+Date: Wed, 17 May 2017 09:27:27 +0800
+Message-Id: <20170517012729.13469-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If bio has no data, such as ones from blkdev_issue_flush(),
-then we have nothing to protect.
+The 1st patch fixes one race between resettting failure and remove.
 
-This patch prevent bugon like follows:
+The 2nd patch avoids hanging in del_gendisk() if del_gendisk() waits
+for these submitted writeback requests.
 
-kfree_debugcheck: out of range ptr ac1fa1d106742a5ah
-kernel BUG at mm/slab.c:2773!
-invalid opcode: 0000 [#1] SMP
-Modules linked in: bcache
-CPU: 0 PID: 4428 Comm: xfs_io Tainted: G        W       4.11.0-rc4-ext4-00041-g2ef0043-dirty #43
-Hardware name: Virtuozzo KVM, BIOS seabios-1.7.5-11.vz7.4 04/01/2014
-task: ffff880137786440 task.stack: ffffc90000ba8000
-RIP: 0010:kfree_debugcheck+0x25/0x2a
-RSP: 0018:ffffc90000babde0 EFLAGS: 00010082
-RAX: 0000000000000034 RBX: ac1fa1d106742a5a RCX: 0000000000000007
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88013f3ccb40
-RBP: ffffc90000babde8 R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000fcb76420 R11: 00000000725172ed R12: 0000000000000282
-R13: ffffffff8150e766 R14: ffff88013a145e00 R15: 0000000000000001
-FS:  00007fb09384bf40(0000) GS:ffff88013f200000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd0172f9e40 CR3: 0000000137fa9000 CR4: 00000000000006f0
-Call Trace:
- kfree+0xc8/0x1b3
- bio_integrity_free+0xc3/0x16b
- bio_free+0x25/0x66
- bio_put+0x14/0x26
- blkdev_issue_flush+0x7a/0x85
- blkdev_fsync+0x35/0x42
- vfs_fsync_range+0x8e/0x9f
- vfs_fsync+0x1c/0x1e
- do_fsync+0x31/0x4a
- SyS_fsync+0x10/0x14
- entry_SYSCALL_64_fastpath+0x1f/0xc2
+Keith, about the 1st patch, as we talked, there are two directions for
+fixing the 1st issue, I know you may be working towards treating this
+reset failure as controller dead, and not completed yet. But if
+nvme_remove_dead_ctrl() is needed in any one of reset failure path,
+this patch is still required. Seems both two directions aren't
+contradictorily.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
----
- block/bio-integrity.c | 3 +++
- 1 file changed, 3 insertions(+)
+Ming Lei (2):
+  nvme: fix race between removing and reseting failure
+  nvme: avoid to hang in remove disk
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 5384713..b5009a8 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -175,6 +175,9 @@ bool bio_integrity_enabled(struct bio *bio)
- 	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
- 		return false;
- 
-+	if (!bio_sectors(bio))
-+		return false;
-+
- 	/* Already protected? */
- 	if (bio_integrity(bio))
- 		return false;
+ drivers/nvme/host/core.c | 8 ++++++++
+ drivers/nvme/host/pci.c  | 9 ++++++++-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+
 -- 
 2.9.3
