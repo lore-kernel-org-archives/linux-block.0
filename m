@@ -1,29 +1,30 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 17 May 2017 17:57:52 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Shaohua Li <shli@fb.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, Kernel-team@fb.com
-Subject: Re: [PATCH 0/4] blk-throttle: fix a few issues
-Message-ID: <20170517215752.GI942@htj.duckdns.org>
-References: <cover.1495050247.git.shli@fb.com>
+Return-Path: <prvs=631096caf0=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, <Kernel-team@fb.com>
+Subject: [PATCH 0/4] blk-throttle: fix a few issues
+Date: Wed, 17 May 2017 13:07:23 -0700
+Message-ID: <cover.1495050247.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <cover.1495050247.git.shli@fb.com>
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 17, 2017 at 01:07:23PM -0700, Shaohua Li wrote:
-> Hi,
-> 
-> The patchset fix a few issues for io.low limit. The title of the patches
-> explain the issues pretty well.
+Hi,
 
-Looks good to me.
+The patchset fix a few issues for io.low limit. The title of the patches
+explain the issues pretty well.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Thanks,
+Shaohua
 
-Thanks.
+Shaohua Li (4):
+  blk-throttle: add hierarchy support for latency target and idle time
+  blk-throttle: output some debug info in trace
+  blk-throttle: respect 0 bps/iops settings for io.low
+  blk-throttle: force user to configure all settings for io.low
+
+ block/blk-throttle.c | 172 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 109 insertions(+), 63 deletions(-)
 
 -- 
-tejun
+2.9.3
