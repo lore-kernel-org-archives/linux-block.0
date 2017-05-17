@@ -1,76 +1,158 @@
-Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 11/15] fs-writeback: move wbc_to_write_flags out of line
-Date: Thu, 18 May 2017 15:18:08 +0200
-Message-Id: <20170518131812.22956-12-hch@lst.de>
-In-Reply-To: <20170518131812.22956-1-hch@lst.de>
-References: <20170518131812.22956-1-hch@lst.de>
+Return-Path: <prvs=631096caf0=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>, <Kernel-team@fb.com>
+Subject: [PATCH 1/4] blk-throttle: add hierarchy support for latency target and idle time
+Date: Wed, 17 May 2017 13:07:24 -0700
+Message-ID: <47549a2aa54bd505ef9c4fb651374baff55a453a.1495050247.git.shli@fb.com>
+In-Reply-To: <cover.1495050247.git.shli@fb.com>
+References: <cover.1495050247.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-This way writeback.h doesn't need to pull in blk_types.h.
+For idle time, children's setting should not be bigger than parent's.
+For latency target, children's setting should not be smaller than
+parent's. The leaf nodes will adjust their settings according to the
+hierarchy and compare their IO with the settings and do
+upgrade/downgrade. parents nodes don't need to track their IO
+latency/idle time.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- fs/fs-writeback.c         | 13 +++++++++++++
- include/linux/writeback.h | 11 +----------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+ block/blk-throttle.c | 50 ++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 36 insertions(+), 14 deletions(-)
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 63ee2940775c..51b65591afe1 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -59,6 +59,19 @@ struct wb_writeback_work {
- 	struct wb_completion *done;	/* set if the caller waits */
- };
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index b78db2e..16174f8 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -157,6 +157,7 @@ struct throtl_grp {
+ 	unsigned long last_check_time;
  
-+#ifdef CONFIG_BLOCK
-+int wbc_to_write_flags(struct writeback_control *wbc)
-+{
-+	if (wbc->sync_mode == WB_SYNC_ALL)
-+		return REQ_SYNC;
-+	else if (wbc->for_kupdate || wbc->for_background)
-+		return REQ_BACKGROUND;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(wbc_to_write_flags);
-+#endif
-+
- /*
-  * If one wants to wait for one or more wb_writeback_works, each work's
-  * ->done should be set to a wb_completion defined using the following
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index d5815794416c..c5ae6ef9b317 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -9,7 +9,6 @@
- #include <linux/fs.h>
- #include <linux/flex_proportions.h>
- #include <linux/backing-dev-defs.h>
--#include <linux/blk_types.h>
+ 	unsigned long latency_target; /* us */
++	unsigned long latency_target_conf; /* us */
+ 	/* When did we start a new slice */
+ 	unsigned long slice_start[2];
+ 	unsigned long slice_end[2];
+@@ -165,6 +166,7 @@ struct throtl_grp {
+ 	unsigned long checked_last_finish_time; /* ns / 1024 */
+ 	unsigned long avg_idletime; /* ns / 1024 */
+ 	unsigned long idletime_threshold; /* us */
++	unsigned long idletime_threshold_conf; /* us */
  
- struct bio;
+ 	unsigned int bio_cnt; /* total bios */
+ 	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
+@@ -482,6 +484,7 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
+ 	/* LIMIT_LOW will have default value 0 */
  
-@@ -103,15 +102,7 @@ struct writeback_control {
- #endif
- };
+ 	tg->latency_target = DFL_LATENCY_TARGET;
++	tg->latency_target_conf = DFL_LATENCY_TARGET;
  
--static inline int wbc_to_write_flags(struct writeback_control *wbc)
--{
--	if (wbc->sync_mode == WB_SYNC_ALL)
--		return REQ_SYNC;
--	else if (wbc->for_kupdate || wbc->for_background)
--		return REQ_BACKGROUND;
--
--	return 0;
--}
-+int wbc_to_write_flags(struct writeback_control *wbc);
+ 	return &tg->pd;
+ }
+@@ -512,6 +515,7 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
+ 	tg->td = td;
+ 
+ 	tg->idletime_threshold = td->dft_idletime_threshold;
++	tg->idletime_threshold_conf = td->dft_idletime_threshold;
+ }
  
  /*
-  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
+@@ -1367,8 +1371,25 @@ static void tg_conf_updated(struct throtl_grp *tg)
+ 	 * restrictions in the whole hierarchy and allows them to bypass
+ 	 * blk-throttle.
+ 	 */
+-	blkg_for_each_descendant_pre(blkg, pos_css, tg_to_blkg(tg))
+-		tg_update_has_rules(blkg_to_tg(blkg));
++	blkg_for_each_descendant_pre(blkg, pos_css, tg_to_blkg(tg)) {
++		struct throtl_grp *this_tg = blkg_to_tg(blkg);
++		struct throtl_grp *parent_tg;
++
++		tg_update_has_rules(this_tg);
++		/* ignore root/second level */
++		if (!cgroup_subsys_on_dfl(io_cgrp_subsys) || !blkg->parent ||
++		    !blkg->parent->parent)
++			continue;
++		parent_tg = blkg_to_tg(blkg->parent);
++		/*
++		 * make sure all children has lower idle time threshold and
++		 * higher latency target
++		 */
++		this_tg->idletime_threshold = min(this_tg->idletime_threshold,
++				parent_tg->idletime_threshold);
++		this_tg->latency_target = max(this_tg->latency_target,
++				parent_tg->latency_target);
++	}
+ 
+ 	/*
+ 	 * We're already holding queue_lock and know @tg is valid.  Let's
+@@ -1497,8 +1518,8 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	    tg->iops_conf[READ][off] == iops_dft &&
+ 	    tg->iops_conf[WRITE][off] == iops_dft &&
+ 	    (off != LIMIT_LOW ||
+-	     (tg->idletime_threshold == tg->td->dft_idletime_threshold &&
+-	      tg->latency_target == DFL_LATENCY_TARGET)))
++	     (tg->idletime_threshold_conf == tg->td->dft_idletime_threshold &&
++	      tg->latency_target_conf == DFL_LATENCY_TARGET)))
+ 		return 0;
+ 
+ 	if (tg->bps_conf[READ][off] != bps_dft)
+@@ -1514,17 +1535,17 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
+ 		snprintf(bufs[3], sizeof(bufs[3]), "%u",
+ 			tg->iops_conf[WRITE][off]);
+ 	if (off == LIMIT_LOW) {
+-		if (tg->idletime_threshold == ULONG_MAX)
++		if (tg->idletime_threshold_conf == ULONG_MAX)
+ 			strcpy(idle_time, " idle=max");
+ 		else
+ 			snprintf(idle_time, sizeof(idle_time), " idle=%lu",
+-				tg->idletime_threshold);
++				tg->idletime_threshold_conf);
+ 
+-		if (tg->latency_target == ULONG_MAX)
++		if (tg->latency_target_conf == ULONG_MAX)
+ 			strcpy(latency_time, " latency=max");
+ 		else
+ 			snprintf(latency_time, sizeof(latency_time),
+-				" latency=%lu", tg->latency_target);
++				" latency=%lu", tg->latency_target_conf);
+ 	}
+ 
+ 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s%s%s\n",
+@@ -1563,8 +1584,8 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 	v[2] = tg->iops_conf[READ][index];
+ 	v[3] = tg->iops_conf[WRITE][index];
+ 
+-	idle_time = tg->idletime_threshold;
+-	latency_time = tg->latency_target;
++	idle_time = tg->idletime_threshold_conf;
++	latency_time = tg->latency_target_conf;
+ 	while (true) {
+ 		char tok[27];	/* wiops=18446744073709551616 */
+ 		char *p;
+@@ -1628,10 +1649,10 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 		blk_throtl_update_limit_valid(tg->td);
+ 		if (tg->td->limit_valid[LIMIT_LOW])
+ 			tg->td->limit_index = LIMIT_LOW;
+-		tg->idletime_threshold = (idle_time == ULONG_MAX) ?
+-			ULONG_MAX : idle_time;
+-		tg->latency_target = (latency_time == ULONG_MAX) ?
+-			ULONG_MAX : latency_time;
++		tg->idletime_threshold_conf = idle_time;
++		tg->idletime_threshold = tg->idletime_threshold_conf;
++		tg->latency_target_conf = latency_time;
++		tg->latency_target = tg->latency_target_conf;
+ 	}
+ 	tg_conf_updated(tg);
+ 	ret = 0;
+@@ -2385,6 +2406,7 @@ void blk_throtl_register_queue(struct request_queue *q)
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+ 
+ 		tg->idletime_threshold = td->dft_idletime_threshold;
++		tg->idletime_threshold_conf = td->dft_idletime_threshold;
+ 	}
+ 	rcu_read_unlock();
+ }
 -- 
-2.11.0
+2.9.3
