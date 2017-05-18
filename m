@@ -1,71 +1,39 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 26/27] mm: flesh out comments over mapping_set_error
-Date: Tue,  9 May 2017 11:49:29 -0400
-Message-Id: <20170509154930.29524-27-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <eb50dffe-5cb9-d8d3-e218-399de512b074@intel.com>
+References: <20170510082418.10513-1-linus.walleij@linaro.org>
+ <20170510082418.10513-3-linus.walleij@linaro.org> <f432dc3d-f66a-fcfe-fd8f-ac764b29c9db@intel.com>
+ <CACRpkdaZuyZNDV=bjy2maZ0HYMEZCkNctkbEivThNM4jDT_c8Q@mail.gmail.com> <eb50dffe-5cb9-d8d3-e218-399de512b074@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 18 May 2017 15:31:53 +0200
+Message-ID: <CACRpkdZMNWp2PmTf-ypn=hxHa8GPCbVhA5OKdCWp5FBRUQu22Q@mail.gmail.com>
+Subject: Re: [PATCH 2/5] mmc: core: Allocate per-request data using the block
+ layer core
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- include/linux/pagemap.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+On Thu, May 18, 2017 at 2:42 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> On 18/05/17 11:21, Linus Walleij wrote:
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 9593eac41499..9b453eae0aa1 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -27,6 +27,20 @@ enum mapping_flags {
- 	AS_NO_WRITEBACK_TAGS = 3,
- };
- 
-+/**
-+ * mapping_set_error - record a writeback error in the address_space
-+ * @mapping - the mapping in which an error should be set
-+ * @error - the error to set in the mapping
-+ *
-+ * When writeback fails in some way, we must record that error so that
-+ * userspace can be informed when fsync and the like are called.  We endeavor
-+ * to report errors on any file that was open at the time of the error.  Some
-+ * internal callers also need to know when writeback errors have occurred.
-+ *
-+ * When a writeback error occurs, most will filesystems will want to call
-+ * mapping_set_error to record the error in the mapping so that it will be
-+ * automatically reported whenever fsync is called on the file.
-+ */
- static inline void mapping_set_error(struct address_space *mapping, int error)
- {
- 	return errseq_set(&mapping->wb_err, error);
--- 
-2.9.3
+>> It's better to do what everyone else does and let the core do this
+>> allocation of extra data (tag) instead.
+>
+> I agree it is much nicer, but the extra bounce buffer allocations still seem
+> gratuitous.  Maybe we should allocate them as needed from a memory pool,
+> instead of for every request.
+
+Incidentally IIRC that is what happens when we migrate to MQ.
+In the old block layer, the per-request data is indeed initialized for
+every request as you say, but in MQ the same struct request *'s
+are reused from a pool, they are only initialized once, i.e. when
+you add the block device.
+
+(If I remember my logs right.)
+
+Yours,
+Linus Walleij
