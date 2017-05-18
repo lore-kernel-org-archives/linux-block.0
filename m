@@ -1,20 +1,49 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "linux-btrfs@vger.kernel.org"
-	<linux-btrfs@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-Subject: Re: [PATCH 03/15] gfs2: remove the unused sd_log_error field
-Date: Wed, 24 May 2017 16:05:56 +0000
-Message-ID: <1495641955.2823.8.camel@sandisk.com>
+Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 03/15] gfs2: remove the unused sd_log_error field
+Date: Thu, 18 May 2017 15:18:00 +0200
+Message-Id: <20170518131812.22956-4-hch@lst.de>
+In-Reply-To: <20170518131812.22956-1-hch@lst.de>
 References: <20170518131812.22956-1-hch@lst.de>
-	 <20170518131812.22956-4-hch@lst.de>
-In-Reply-To: <20170518131812.22956-4-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-05-18 at 15:18 +0200, Christoph Hellwig wrote:
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/gfs2/incore.h | 1 -
+ fs/gfs2/lops.c   | 4 +---
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
+diff --git a/fs/gfs2/incore.h b/fs/gfs2/incore.h
+index b7cf65d13561..aa3d44527fa2 100644
+--- a/fs/gfs2/incore.h
++++ b/fs/gfs2/incore.h
+@@ -815,7 +815,6 @@ struct gfs2_sbd {
+ 	atomic_t sd_log_in_flight;
+ 	struct bio *sd_log_bio;
+ 	wait_queue_head_t sd_log_flush_wait;
+-	int sd_log_error;
+ 
+ 	atomic_t sd_reserving_log;
+ 	wait_queue_head_t sd_reserving_log_wait;
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index b1f9144b42c7..13ebf15a4db0 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -209,10 +209,8 @@ static void gfs2_end_log_write(struct bio *bio)
+ 	struct page *page;
+ 	int i;
+ 
+-	if (bio->bi_error) {
+-		sdp->sd_log_error = bio->bi_error;
++	if (bio->bi_error)
+ 		fs_err(sdp, "Error %d writing to log\n", bio->bi_error);
+-	}
+ 
+ 	bio_for_each_segment_all(bvec, bio, i) {
+ 		page = bvec->bv_page;
+-- 
+2.11.0
