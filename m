@@ -1,47 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f53.google.com ([74.125.83.53]:35838 "EHLO
-        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754347AbdERWqs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2017 18:46:48 -0400
-Received: by mail-pg0-f53.google.com with SMTP id q125so29179322pgq.2
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2017 15:46:48 -0700 (PDT)
-Date: Thu, 18 May 2017 15:46:45 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Christoph Hellwig <hch@infradead.org>,
+Received: from mx2.suse.de ([195.135.220.15]:40568 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S964801AbdERNaA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 May 2017 09:30:00 -0400
+Subject: Re: [PATCH blktests 0/3] Add SCSI generic test group
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@osandov.com>,
         Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH blktests 0/3] Add SCSI generic test group
-Message-ID: <20170518224645.GD26871@vader.DHCP.thefacebook.com>
 References: <cover.1495109149.git.jthumshirn@suse.de>
  <20170518131928.GA26060@infradead.org>
- <94150f71-5bbb-2ee2-b7d4-d0f2f7124684@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <94150f71-5bbb-2ee2-b7d4-d0f2f7124684@suse.de>
+Date: Thu, 18 May 2017 15:29:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <94150f71-5bbb-2ee2-b7d4-d0f2f7124684@suse.de>
+In-Reply-To: <20170518131928.GA26060@infradead.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, May 18, 2017 at 03:29:45PM +0200, Johannes Thumshirn wrote:
-> On 05/18/2017 03:19 PM, Christoph Hellwig wrote:
-> > All SG_IO test should also apply to block device nodes that support
-> > the ioctl..
-> > 
+On 05/18/2017 03:19 PM, Christoph Hellwig wrote:
+> All SG_IO test should also apply to block device nodes that support
+> the ioctl..
 > 
-> But these are not necessarily SG_IO tests, are they?
-> 
-> The test included is doesn't hit the SG_IO path in the sg driver, but
-> the sg_read path.
-> 
-> Of cause we can make a generic sg_io tool but IMHO it's quite convenient
-> to just throw in the reproducers we get.
-> 
-> And as it exercises the /dev/sg character device I decided to make a new
-> group.
-> 
-> 	Johannes
 
-Looking at this some more, it seems like the syzkaller reproducer always
-bangs on /dev/sg0. How hard would it be to adapt it to run on the sg
-device for every test device instead?
+But these are not necessarily SG_IO tests, are they?
+
+The test included is doesn't hit the SG_IO path in the sg driver, but
+the sg_read path.
+
+Of cause we can make a generic sg_io tool but IMHO it's quite convenient
+to just throw in the reproducers we get.
+
+And as it exercises the /dev/sg character device I decided to make a new
+group.
+
+	Johannes
+
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
