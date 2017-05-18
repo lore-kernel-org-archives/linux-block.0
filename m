@@ -1,88 +1,54 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:25 +1000
-Subject: [PATCH 09/13] lightnvm/pblk-read: use bio_clone_fast()
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org
-Cc: Javier Gonzalez <jg@lightnvm.io>
-Message-ID: <149369654558.5146.13818001419050826182.stgit@noble>
-In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
-References: <149369628671.5146.4865312503373040039.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 07/15] block_dev: propagate bio_iov_iter_get_pages error in __blkdev_direct_IO
+Date: Thu, 18 May 2017 15:18:04 +0200
+Message-Id: <20170518131812.22956-8-hch@lst.de>
+In-Reply-To: <20170518131812.22956-1-hch@lst.de>
+References: <20170518131812.22956-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-pblk_submit_read() uses bio_clone_bioset() but doesn't change the
-io_vec, so bio_clone_fast() is a better choice.
-
-It also uses fs_bio_set which is intended for filesystems.  Using it
-in a device driver can deadlock.
-So allocate a new bioset, and and use bio_clone_fast().
-
-Signed-off-by: NeilBrown <neilb@suse.com>
+Once we move the block layer to its own status code we'll still want to
+propagate the bio_iov_iter_get_pages, so restructure __blkdev_direct_IO
+to take ret into account when returning the errno.
 ---
- drivers/lightnvm/pblk-init.c |   12 +++++++++++-
- drivers/lightnvm/pblk-read.c |    2 +-
- drivers/lightnvm/pblk.h      |    1 +
- 3 files changed, 13 insertions(+), 2 deletions(-)
+ fs/block_dev.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index b3fec8ec55b8..aaefbccce30e 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -23,6 +23,7 @@
- static struct kmem_cache *pblk_blk_ws_cache, *pblk_rec_cache, *pblk_r_rq_cache,
- 					*pblk_w_rq_cache, *pblk_line_meta_cache;
- static DECLARE_RWSEM(pblk_lock);
-+struct bio_set *pblk_bio_set;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 519599dddd36..c1dc393ad6b9 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -334,7 +334,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
+ 	loff_t pos = iocb->ki_pos;
+ 	blk_qc_t qc = BLK_QC_T_NONE;
+-	int ret;
++	int ret = 0;
  
- static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
- 			  struct bio *bio)
-@@ -946,11 +947,20 @@ static struct nvm_tgt_type tt_pblk = {
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+@@ -363,7 +363,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
  
- static int __init pblk_module_init(void)
- {
--	return nvm_register_tgt_type(&tt_pblk);
-+	int ret;
-+
-+	pblk_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
-+	if (!pblk_bio_set)
-+		return -ENOMEM;
-+	ret = nvm_register_tgt_type(&tt_pblk);
-+	if (ret)
-+		bioset_free(pblk_bio_set);
-+	return ret;
- }
+ 		ret = bio_iov_iter_get_pages(bio, iter);
+ 		if (unlikely(ret)) {
+-			bio->bi_error = ret;
++			bio->bi_error = -EIO;
+ 			bio_endio(bio);
+ 			break;
+ 		}
+@@ -412,7 +412,8 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	}
+ 	__set_current_state(TASK_RUNNING);
  
- static void pblk_module_exit(void)
- {
-+	bioset_free(pblk_bio_set);
- 	nvm_unregister_tgt_type(&tt_pblk);
- }
+-	ret = dio->bio.bi_error;
++	if (!ret)
++		ret = dio->bio.bi_error;
+ 	if (likely(!ret))
+ 		ret = dio->size;
  
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 4a12f14d78c6..8ee0c50a7a71 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -342,7 +342,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 		struct pblk_r_ctx *r_ctx = nvm_rq_to_pdu(rqd);
- 
- 		/* Clone read bio to deal with read errors internally */
--		int_bio = bio_clone_bioset(bio, GFP_KERNEL, fs_bio_set);
-+		int_bio = bio_clone_fast(bio, GFP_KERNEL, pblk_bio_set);
- 		if (!int_bio) {
- 			pr_err("pblk: could not clone read bio\n");
- 			return NVM_IO_ERR;
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 99f3186b5288..95b665f23925 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -702,6 +702,7 @@ void pblk_write_should_kick(struct pblk *pblk);
- /*
-  * pblk read path
-  */
-+extern struct bio_set *pblk_bio_set;
- int pblk_submit_read(struct pblk *pblk, struct bio *bio);
- int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
- 			unsigned int nr_secs, unsigned int *secs_to_gc,
+-- 
+2.11.0
