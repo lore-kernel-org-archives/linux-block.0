@@ -1,53 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58288 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753842AbdEJP4E (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2017 11:56:04 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 0/4] blk-mq: support to use hw tag for scheduling
-Date: Wed, 10 May 2017 23:55:39 +0800
-Message-Id: <20170510155543.18033-1-ming.lei@redhat.com>
+Received: from userp1040.oracle.com ([156.151.31.81]:19879 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751486AbdERJZ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 May 2017 05:25:59 -0400
+Subject: Re: [RFC PATCH 0/2] Introduce blkdev_issue_flush_no_wait()
+To: dsterba@suse.cz,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20170516093914.16035-1-anand.jain@oracle.com>
+ <1494943642.2935.1.camel@sandisk.com> <20170517171400.GI4065@suse.cz>
+Cc: Bart Van Assche <Bart.VanAssche@sandisk.com>
+From: Anand Jain <anand.jain@oracle.com>
+Message-ID: <557ddd47-8e78-fde5-2f71-65fcd44ea7c7@oracle.com>
+Date: Thu, 18 May 2017 17:31:44 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170517171400.GI4065@suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
 
-This patchset introduces flag of BLK_MQ_F_SCHED_USE_HW_TAG and
-allows to use hardware tag directly for IO scheduling if the queue's
-depth is big enough. In this way, we can avoid to allocate extra tags
-and request pool for IO schedule, and the schedule tag allocation/release
-can be saved in I/O submit path.
 
-V3:
-	- respect q->nr_requests by resizing hw tags, as suggested by Omar
+On 05/18/2017 01:14 AM, David Sterba wrote:
+> On Tue, May 16, 2017 at 02:07:23PM +0000, Bart Van Assche wrote:
+>> On Tue, 2017-05-16 at 17:39 +0800, Anand Jain wrote:
+>>> BTRFS wanted a block device flush function which does not wait for
+>>> its completion, so that the flush for the next device can be called
+>>> in the same thread.
+>>>
+>>> Here is a RFC patch to provide the function
+>>> 'blkdev_issue_flush_no_wait()', which is based on the current device
+>>> flush function 'blkdev_issue_flush()', however it uses submit_bio()
+>>> instead of submit_bio_wait().
+>>>
+>>> This patch is for review comments, will send out a final patch based
+>>> on the comments received.
+>>
+>> Since the block layer can reorder requests, I think using
+>> blkdev_issue_flush_no_wait() will only yield the intended result if
+>> the caller waits until the requests that have to be flushed have completed.
+>> Is that how you intend to use this function?
+>
+> Yes, this is intended. Regarding the two patches, I don't think we need
+> them. A more detailed explanation below.
+>
+> The function blkdev_issue_flush_no_wait would be used in multi-device
+> btrfs to submit the barriers in parallel.
+>
+> fs/btrfs/disk-io.c:barrier_all_devices
+>
+> pseudocode:
+>
+> foreach device
+> 	write_dev_flush(wait=0)
+> 		submit_bio(device->bio)
+>
+> (would newly use blkdev_issue_flush_no_wait)
+>
+>
+> foreach device
+> 	write_dev_flush(wiat=1)
+> 		wait_for_completion(device->bio)
+>
+> The submission path of write_dev_flush mimics the structure of
+> blkdev_issue_flush, so Anand supposedly wants to move that to API.
+>
+> I personally don't think this is necessary and am fine with opencoding
+> it, btrfs would likely be the only user of the new function anyway.
+> Other reason is that we want to preallocate the bio used for flushing so
+> we can avoid ENOMEM when submitting disk barriers. This would not be
+> possible. In summary, I think we can address all the problems inside
+> btrfs without extending block layer as for now.
 
-V2:
-	- fix oops when kyber is used
-	- move dumping the new flag into patch 1
-	- support to use hw tag for shared tags
-	- update hctx->sched_tag when BLK_MQ_F_SCHED_USE_HW_TAG is changed
-	- clear the flag in patch of blk_mq_exit_sched()
-	- don't update q->nr_requests when updating hw queue's depth
-	- fix blk_mq_get_queue_depth()
 
-Ming Lei (4):
-  blk-mq: introduce BLK_MQ_F_SCHED_USE_HW_TAG
-  blk-mq: introduce blk_mq_get_queue_depth()
-  blk-mq: use hw tag for scheduling if hw tag space is big enough
-  blk-mq: allow to use hw tag for shared tags
+   Thanks David.
 
- block/blk-mq-debugfs.c |   1 +
- block/blk-mq-sched.c   |  90 ++++++++++++++++++++++++++++++++++++++++----
- block/blk-mq-sched.h   |   9 +++++
- block/blk-mq.c         | 100 +++++++++++++++++++++++++++++++++++++++++++++----
- block/blk-mq.h         |  24 ++++++++++++
- block/kyber-iosched.c  |   7 +++-
- include/linux/blk-mq.h |   1 +
- include/linux/blkdev.h |   8 ++++
- 8 files changed, 223 insertions(+), 17 deletions(-)
+   Pls. Ignore this set.
 
--- 
-2.9.3
+
+
+Thanks, Anand
