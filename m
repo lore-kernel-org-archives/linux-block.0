@@ -1,82 +1,50 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.12-rc2
-Message-ID: <fa8c8e9b-3c23-ac92-56b7-037efeb8b405@kernel.dk>
-Date: Sat, 20 May 2017 17:07:27 -0600
+Return-Path: <hch@lst.de>
+Date: Thu, 18 May 2017 11:40:42 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: Outstanding MQ questions from MMC
+Message-ID: <20170518094042.GA10016@lst.de>
+References: <CACRpkdbZrkAqEdP1-QqDww0ZuFcY47Jgj9dPqkG_whrx7pwC-w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACRpkdbZrkAqEdP1-QqDww0ZuFcY47Jgj9dPqkG_whrx7pwC-w@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On Wed, Mar 29, 2017 at 05:09:37AM +0200, Linus Walleij wrote:
+> 2. When MMC cards are ejected a serious error condition occurs. So for this
+> reason we spool out the queue with
+> 
+> req->rq_flags |= RQF_QUIET;
+> blk_end_request_all(req, -EIO);
+> 
+> This will shut up a huge amount of console errors for example.
+> I have no clue on how to manage this with MQ. I am currently using
+> 
+> blk_mq_complete_request(mq_rq->req, -EIO);
+> 
+> and nothing else, and it will hit all requests for the ejected card coming
+> in from this point. Is this the right solution? Or is there some medium
+> eject handling I'm not aware of inside the MQ layer? It seems like something
+> that can happen on pluggable harddrives and CDROMS and what not.
 
-A small collection of fixes that should go into this cycle. This pull
-request contains:
+Hot unplug handling currently is a mess in the block layer (not just the
+mq case).  Especially if you ever requeue an I/O there is tons of
+boilerplate code.  I wish we could move a little more of this into the
+core, but right now I don't have a good idea on how to.
 
-- A pull request from Christoph for NVMe, which ended up being manually
-  applied to avoid pulling in newer bits in master. Mostly fibre channel
-  fixes from James, but also a few fixes from Jon and Vijay
+> 3. Sometimes a read or write gets partially completed. Say we read 12 out
+> of 15 sectors or somthing like that. I have no idea how often this occurs in
+> practice. With the old block layer we did this:
+> 
+> blk_end_request(req, 0, bytes_xfered);
 
-- A pull request from Konrad, with just a single fix for xen-blkback
-  from Gustavo.
-
-- A fuseblk bdi fix from Jan, fixing a regression in this series with
-  the dynamic backing devices.
-
-- A blktrace fix from Shaohua, replacing sscanf() with kstrtoull().
-
-- A request leak fix for drbd from Lars, fixing a regression in the last
-  series with the kref changes. This will go to stable as well.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Gustavo A. R. Silva (1):
-      block: xen-blkback: add null check to avoid null pointer dereference
-
-James Smart (4):
-      nvme-fc: correct port role bits
-      nvme-fc: require target or discovery role for fc-nvme targets
-      nvme-fc: stop queues on error detection
-      nvmet-fc: remove target cpu scheduling flag
-
-Jan Kara (1):
-      fuseblk: Fix warning in super_setup_bdi_name()
-
-Jens Axboe (1):
-      Merge branch 'stable/for-jens-4.12' of git://git.kernel.org/.../konrad/xen into for-linus
-
-Jon Derrick (1):
-      nvme: unmap CMB and remove sysfs file in reset path
-
-Lars Ellenberg (1):
-      drbd: fix request leak introduced by locking/atomic, kref: Kill kref_sub()
-
-Shaohua Li (1):
-      blktrace: fix integer parse
-
-Vijay Immanuel (1):
-      nvmet: release the sq ref on rdma read errors
-
- drivers/block/drbd/drbd_req.c      | 27 +++++++++++++++------------
- drivers/block/xen-blkback/xenbus.c |  8 +++++---
- drivers/nvme/host/fc.c             | 10 ++++++++++
- drivers/nvme/host/pci.c            |  7 ++++++-
- drivers/nvme/target/core.c         |  6 ++++++
- drivers/nvme/target/fc.c           |  4 +---
- drivers/nvme/target/fcloop.c       |  1 -
- drivers/nvme/target/nvmet.h        |  1 +
- drivers/nvme/target/rdma.c         |  1 +
- drivers/scsi/lpfc/lpfc_nvmet.c     |  1 -
- fs/fuse/inode.c                    |  9 ++++++++-
- include/linux/nvme-fc-driver.h     | 16 ++++------------
- kernel/trace/blktrace.c            |  4 ++--
- 13 files changed, 59 insertions(+), 36 deletions(-)
-
--- 
-Jens Axboe
+You can still do this with mq, but you have to open code it.  Take a look
+at scsi_end_request which has opencoded versions of the mq and non-mq
+end_request routines.  Currently it's the only example of blk-mq partial
+completions.
