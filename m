@@ -1,91 +1,89 @@
 Return-Path: <linus.walleij@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <f432dc3d-f66a-fcfe-fd8f-ac764b29c9db@intel.com>
+In-Reply-To: <CAPDyKFpdhu3FBe5OP2mR1-3EK0JFPojGKS1F2K_whzZ249Ue8Q@mail.gmail.com>
 References: <20170510082418.10513-1-linus.walleij@linaro.org>
- <20170510082418.10513-3-linus.walleij@linaro.org> <f432dc3d-f66a-fcfe-fd8f-ac764b29c9db@intel.com>
+ <20170510082418.10513-3-linus.walleij@linaro.org> <CAPDyKFpdhu3FBe5OP2mR1-3EK0JFPojGKS1F2K_whzZ249Ue8Q@mail.gmail.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 18 May 2017 10:21:26 +0200
-Message-ID: <CACRpkdaZuyZNDV=bjy2maZ0HYMEZCkNctkbEivThNM4jDT_c8Q@mail.gmail.com>
+Date: Thu, 18 May 2017 10:01:59 +0200
+Message-ID: <CACRpkdb5kE2ETLFDDAW4zyqo3-y2JD2f87bNPfXc9i9oe5gOyQ@mail.gmail.com>
 Subject: Re: [PATCH 2/5] mmc: core: Allocate per-request data using the block
  layer core
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Adrian Hunter <adrian.hunter@intel.com>,
 	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
 	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 16, 2017 at 1:54 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
-> On 10/05/17 11:24, Linus Walleij wrote:
->> The mmc_queue_req is a per-request state container the MMC core uses
->> to carry bounce buffers, pointers to asynchronous requests and so on.
->> Currently allocated as a static array of objects, then as a request
->> comes in, a mmc_queue_req is assigned to it, and used during the
->> lifetime of the request.
->>
->> This is backwards compared to how other block layer drivers work:
->> they usally let the block core provide a per-request struct that get
->> allocated right beind the struct request, and which can be obtained
->> using the blk_mq_rq_to_pdu() helper. (The _mq_ infix in this function
->> name is misleading: it is used by both the old and the MQ block
->> layer.)
->>
->> The per-request struct gets allocated to the size stored in the queue
->> variable .cmd_size initialized using the .init_rq_fn() and
->> cleaned up using .exit_rq_fn().
->>
->> The block layer code makes the MMC core rely on this mechanism to
->> allocate the per-request mmc_queue_req state container.
->>
->> Doing this make a lot of complicated queue handling go away.
+On Tue, May 16, 2017 at 11:02 AM, Ulf Hansson <ulf.hansson@linaro.org> wrote:
+> On 10 May 2017 at 10:24, Linus Walleij <linus.walleij@linaro.org> wrote:
+
+>> @@ -1662,7 +1655,7 @@ static void mmc_blk_rw_try_restart(struct mmc_queue *mq, struct request *req,
+>>         if (mmc_card_removed(mq->card)) {
+>>                 req->rq_flags |= RQF_QUIET;
+>>                 blk_end_request_all(req, -EIO);
+>> -               mmc_queue_req_free(mq, mqrq);
+>> +               mq->qcnt--; /* FIXME: just set to 0? */
 >
-> Isn't that at the expense of increased memory allocation.
+> As mentioned below, perhaps this FIXME is fine to add. As I assume you
+> soon intend to take care of it, right?
+
+Yes that goes away with my MQ patches (not yet rebased)
+by stopping to try to look when the queue is empty and just
+issue requests asynchronously. I just wanted to point this out,
+that counter is kind of fragile and scary to me.
+
+>> -       for (i = 0; i < qdepth; i++) {
+>> -               mqrq[i].sg = mmc_alloc_sg(max_segs);
+>> -               if (!mqrq[i].sg)
+>> +       /* FIXME: use req_to_mq_rq() everywhere this is dereferenced */
 >
-> Have you compared the number of allocations?  It looks to me like the block
-> layer allocates a minimum of 4 requests in the memory pool which will
-> increase if there are more in the I/O scheduler, plus 1 for flush.  There
-> are often 4 queues per eMMC (2x boot,RPMB and main area), so that is 20
-> requests minimum, up from 2 allocations previously.  For someone using 64K
-> bounce buffers, you have increased memory allocation by at least 18x64 =
-> 1152k.  However the I/O scheduler could allocate a lot more.
+> Why not do that right now, instead of adding a FIXME comment?
 
-That is not a realistic example.
+This comment is wrong, just a development artifact I will just delete it.
 
-As pointed out in patch #1, bounce buffers are used on old systems
-which have max_segs == 1. No modern hardware has that,
-they all have multiple segments-capable host controllers and
-often also DMA engines.
-
-Old systems with max_segs == 1 also have:
-
-- One SD or MMC slot
-- No eMMC (because it was not yet invented in those times)
-- So no RPMB or Boot partitions, just main area
-
-If you can point me to a system that has max_segs == 1 and an
-eMMC mounted, I can look into it and ask the driver maintainers to
-check if it disturbs them, but I think those simply do not exist.
-
->> Doing this refactoring is necessary to move the ioctl() operations
->> into custom block layer requests tagged with REQ_OP_DRV_[IN|OUT]
+>>         mq->card = card;
+>> -       mq->queue = blk_init_queue(mmc_request_fn, lock);
+>> +       mq->queue = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
 >
-> Obviously you could create a per-request data structure with only the
-> reference to the IOCTL data, and without putting all the memory allocations
-> there as well.
+> Seems like we should use blk_alloc_queue() instead, as it calls
+> blk_alloc_queue_node(gfp_mask, NUMA_NO_NODE) for us.
 
-Not easily, and this is the way all IDE, ATA, SCSI disks etc are
-doing this so why would be try to be different and maintain a lot
-of deviant code.
+OK
 
-The allocation of extra data is done by the block layer when issueing
-blk_get_request() so trying to keep the old mechanism of a list of
-struct mmc_queue_req and trying to pair these with incoming requests
-inevitably means a lot of extra work, possibly deepening that list or
-creating out-of-list extra entries and whatnot.
+>> +static inline struct mmc_queue_req *req_to_mq_rq(struct request *rq)
+>
+> To be more consistent with existing function names, perhaps rename this to:
+> req_to_mmc_queue_req()
+>
+>> +{
+>> +       return blk_mq_rq_to_pdu(rq);
+>> +}
+>> +
+>
+> [...]
+>
+>>  struct mmc_queue {
+>> @@ -45,14 +50,15 @@ struct mmc_queue {
+>>         bool                    asleep;
+>>         struct mmc_blk_data     *blkdata;
+>>         struct request_queue    *queue;
+>> -       struct mmc_queue_req    *mqrq;
+>> -       int                     qdepth;
+>> +       /*
+>> +        * FIXME: this counter is not a very reliable way of keeping
+>> +        * track of how many requests that are ongoing. Switch to just
+>> +        * letting the block core keep track of requests and per-request
+>> +        * associated mmc_queue_req data.
+>> +        */
+>>         int                     qcnt;
+>
+> I am not very fond of FIXME comments, however perhaps this one really
+> deserves to be a FIXME because you intend to fix this asap, right?
 
-It's better to do what everyone else does and let the core do this
-allocation of extra data (tag) instead.
+Same as the first comment. It is fragile and I don't like it,
+with asynchronous issueing in MQ this goes away.
 
 Yours,
 Linus Walleij
