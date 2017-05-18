@@ -1,143 +1,76 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>
+Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 2/6] mmc: block: Tag DRV_OPs with a driver operation type
-Date: Fri, 19 May 2017 15:37:28 +0200
-Message-Id: <20170519133732.27470-3-linus.walleij@linaro.org>
-In-Reply-To: <20170519133732.27470-1-linus.walleij@linaro.org>
-References: <20170519133732.27470-1-linus.walleij@linaro.org>
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 11/15] fs-writeback: move wbc_to_write_flags out of line
+Date: Thu, 18 May 2017 15:18:08 +0200
+Message-Id: <20170518131812.22956-12-hch@lst.de>
+In-Reply-To: <20170518131812.22956-1-hch@lst.de>
+References: <20170518131812.22956-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-We will expand the DRV_OP usage, so we need to know which
-operation we're performing. Tag the operations with an
-enum:ed type and rename the function so it is clear that
-it deals with any command and put a switch statement in
-it. Currently only ioctls are supported.
+This way writeback.h doesn't need to pull in blk_types.h.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/mmc/core/block.c | 37 ++++++++++++++++++++++++-------------
- drivers/mmc/core/queue.h |  9 +++++++++
- 2 files changed, 33 insertions(+), 13 deletions(-)
+ fs/fs-writeback.c         | 13 +++++++++++++
+ include/linux/writeback.h | 11 +----------
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 553ab4d1db94..b24e7f5171c9 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -602,6 +602,7 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- 		idata->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
- 		__GFP_RECLAIM);
- 	idatas[0] = idata;
-+	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_IOCTL;
- 	req_to_mmc_queue_req(req)->idata = idatas;
- 	req_to_mmc_queue_req(req)->ioc_count = 1;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
-@@ -618,11 +619,11 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- }
- 
- /*
-- * The ioctl commands come back from the block layer after it queued it and
-+ * The non-block commands come back from the block layer after it queued it and
-  * processed it with all other requests and then they get issued in this
-  * function.
-  */
--static void mmc_blk_ioctl_cmd_issue(struct mmc_queue *mq, struct request *req)
-+static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- {
- 	struct mmc_queue_req *mq_rq;
- 	struct mmc_card *card = mq->card;
-@@ -631,18 +632,27 @@ static void mmc_blk_ioctl_cmd_issue(struct mmc_queue *mq, struct request *req)
- 	int i;
- 
- 	mq_rq = req_to_mmc_queue_req(req);
--	for (i = 0; i < mq_rq->ioc_count; i++) {
--		ioc_err = __mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
--		if (ioc_err)
--			break;
--	}
--	mq_rq->ioc_result = ioc_err;
- 
--	/* Always switch back to main area after RPMB access */
--	if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
--		mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
-+	switch (mq_rq->drv_op) {
-+	case MMC_DRV_OP_IOCTL:
-+		for (i = 0; i < mq_rq->ioc_count; i++) {
-+			ioc_err =
-+				__mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
-+			if (ioc_err)
-+				break;
-+		}
-+		mq_rq->ioc_result = ioc_err;
-+
-+		/* Always switch back to main area after RPMB access */
-+		if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
-+			mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
- 
--	blk_end_request_all(req, ioc_err);
-+		blk_end_request_all(req, ioc_err);
-+		break;
-+	default:
-+		/* Unknown operation */
-+		break;
-+	}
- }
- 
- static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
-@@ -705,6 +715,7 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 	req = blk_get_request(mq->queue,
- 		idata[0]->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
- 		__GFP_RECLAIM);
-+	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_IOCTL;
- 	req_to_mmc_queue_req(req)->idata = idata;
- 	req_to_mmc_queue_req(req)->ioc_count = num_of_cmds;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
-@@ -1904,7 +1915,7 @@ void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
- 			 */
- 			if (mq->qcnt)
- 				mmc_blk_issue_rw_rq(mq, NULL);
--			mmc_blk_ioctl_cmd_issue(mq, req);
-+			mmc_blk_issue_drv_op(mq, req);
- 			break;
- 		case REQ_OP_DISCARD:
- 			/*
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index 2793020a3c8c..1e6062eb3e07 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -32,6 +32,14 @@ struct mmc_blk_request {
- 	int			retune_retry_done;
+diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+index 63ee2940775c..51b65591afe1 100644
+--- a/fs/fs-writeback.c
++++ b/fs/fs-writeback.c
+@@ -59,6 +59,19 @@ struct wb_writeback_work {
+ 	struct wb_completion *done;	/* set if the caller waits */
  };
  
-+/**
-+ * enum mmc_drv_op - enumerates the operations in the mmc_queue_req
-+ * @MMC_DRV_OP_IOCTL: ioctl operation
-+ */
-+enum mmc_drv_op {
-+	MMC_DRV_OP_IOCTL,
-+};
++#ifdef CONFIG_BLOCK
++int wbc_to_write_flags(struct writeback_control *wbc)
++{
++	if (wbc->sync_mode == WB_SYNC_ALL)
++		return REQ_SYNC;
++	else if (wbc->for_kupdate || wbc->for_background)
++		return REQ_BACKGROUND;
 +
- struct mmc_queue_req {
- 	struct mmc_blk_request	brq;
- 	struct scatterlist	*sg;
-@@ -39,6 +47,7 @@ struct mmc_queue_req {
- 	struct scatterlist	*bounce_sg;
- 	unsigned int		bounce_sg_len;
- 	struct mmc_async_req	areq;
-+	enum mmc_drv_op		drv_op;
- 	int			ioc_result;
- 	struct mmc_blk_ioc_data	**idata;
- 	unsigned int		ioc_count;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(wbc_to_write_flags);
++#endif
++
+ /*
+  * If one wants to wait for one or more wb_writeback_works, each work's
+  * ->done should be set to a wb_completion defined using the following
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index d5815794416c..c5ae6ef9b317 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -9,7 +9,6 @@
+ #include <linux/fs.h>
+ #include <linux/flex_proportions.h>
+ #include <linux/backing-dev-defs.h>
+-#include <linux/blk_types.h>
+ 
+ struct bio;
+ 
+@@ -103,15 +102,7 @@ struct writeback_control {
+ #endif
+ };
+ 
+-static inline int wbc_to_write_flags(struct writeback_control *wbc)
+-{
+-	if (wbc->sync_mode == WB_SYNC_ALL)
+-		return REQ_SYNC;
+-	else if (wbc->for_kupdate || wbc->for_background)
+-		return REQ_BACKGROUND;
+-
+-	return 0;
+-}
++int wbc_to_write_flags(struct writeback_control *wbc);
+ 
+ /*
+  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
 -- 
-2.9.3
+2.11.0
