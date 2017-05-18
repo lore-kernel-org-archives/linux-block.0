@@ -1,63 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f181.google.com ([209.85.192.181]:34155 "EHLO
-        mail-pf0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755157AbdERViK (ORCPT
+Received: from mail-pg0-f47.google.com ([74.125.83.47]:36366 "EHLO
+        mail-pg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753965AbdERVGW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2017 17:38:10 -0400
-Received: by mail-pf0-f181.google.com with SMTP id 9so29807228pfj.1
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2017 14:38:10 -0700 (PDT)
-Date: Thu, 18 May 2017 14:38:08 -0700
+        Thu, 18 May 2017 17:06:22 -0400
+Received: by mail-pg0-f47.google.com with SMTP id x64so28177448pgd.3
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2017 14:06:22 -0700 (PDT)
+Date: Thu, 18 May 2017 14:06:20 -0700
 From: Omar Sandoval <osandov@osandov.com>
 To: Johannes Thumshirn <jthumshirn@suse.de>
 Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
 Subject: Re: [PATCH blktests 2/3] tests/sg: add SCSI generic test grouop
-Message-ID: <20170518213808.GC26871@vader.DHCP.thefacebook.com>
+Message-ID: <20170518210620.GA26871@vader.DHCP.thefacebook.com>
 References: <cover.1495109149.git.jthumshirn@suse.de>
  <b9201d03f70519230dcffd5cfa92496a3bad5da4.1495109149.git.jthumshirn@suse.de>
- <20170518210620.GA26871@vader.DHCP.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170518210620.GA26871@vader.DHCP.thefacebook.com>
+In-Reply-To: <b9201d03f70519230dcffd5cfa92496a3bad5da4.1495109149.git.jthumshirn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, May 18, 2017 at 02:06:20PM -0700, Omar Sandoval wrote:
-> On Thu, May 18, 2017 at 02:13:07PM +0200, Johannes Thumshirn wrote:
-> > Add a test group for tests of the SCSI generic driver and and
-> > functions common to the SCSI generic driver and it's test cases.
-> > 
-> > Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-> > ---
-> >  common/sg      | 22 ++++++++++++++++++++++
-> >  tests/sg/group | 40 ++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 62 insertions(+)
-> >  create mode 100644 common/sg
-> >  create mode 100644 tests/sg/group
-> > 
-> > diff --git a/common/sg b/common/sg
-> > new file mode 100644
-> > index 000000000000..30b5089c68f7
-> > --- /dev/null
-> > +++ b/common/sg
-> > +# TODO: if this test group has extra requirements for what devices it can be
-> > +# run on, it should define a group_device_requires() function. If tests in this
-> > +# group can be run on the test device, it should return zero. Otherwise, it
-> > +# should return non-zero and set the $SKIP_REASON variable. $TEST_DEV is the
-> > +# full path of the block device (e.g., /dev/nvme0n1 or /dev/sda1), and
-> > +# $TEST_DEV_SYSFS is the sysfs path of the disk (not the partition, e.g.,
-> > +# /sys/block/nvme0n1 or /sys/block/sda).
-> > +#
-> > +# Usually, group_device_requires() just needs to check that the test device is
-> > +# the right type of hardware or supports any necessary features using the
-> > +# _test_dev_foo helpers. If group_device_requires() returns non-zero, all tests
-> > +# in this group will be skipped on that device.
-> > +# group_device_requires() {
-> > +# 	_test_dev_is_foo && _test_dev_supports_bar
-> > +# }
+On Thu, May 18, 2017 at 02:13:07PM +0200, Johannes Thumshirn wrote:
+> Add a test group for tests of the SCSI generic driver and and
+> functions common to the SCSI generic driver and it's test cases.
 > 
-> Leftover TODO, I'll remove it when applying. If we add an sg test that
-> runs on an actual device, we can define group_device_requires().
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  common/sg      | 22 ++++++++++++++++++++++
+>  tests/sg/group | 40 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 62 insertions(+)
+>  create mode 100644 common/sg
+>  create mode 100644 tests/sg/group
+> 
+> diff --git a/common/sg b/common/sg
+> new file mode 100644
+> index 000000000000..30b5089c68f7
+> --- /dev/null
+> +++ b/common/sg
+> +# TODO: if this test group has extra requirements for what devices it can be
+> +# run on, it should define a group_device_requires() function. If tests in this
+> +# group can be run on the test device, it should return zero. Otherwise, it
+> +# should return non-zero and set the $SKIP_REASON variable. $TEST_DEV is the
+> +# full path of the block device (e.g., /dev/nvme0n1 or /dev/sda1), and
+> +# $TEST_DEV_SYSFS is the sysfs path of the disk (not the partition, e.g.,
+> +# /sys/block/nvme0n1 or /sys/block/sda).
+> +#
+> +# Usually, group_device_requires() just needs to check that the test device is
+> +# the right type of hardware or supports any necessary features using the
+> +# _test_dev_foo helpers. If group_device_requires() returns non-zero, all tests
+> +# in this group will be skipped on that device.
+> +# group_device_requires() {
+> +# 	_test_dev_is_foo && _test_dev_supports_bar
+> +# }
 
-On second though, since I had some comments for patch 3, just fix this
-up when you resend.
+Leftover TODO, I'll remove it when applying. If we add an sg test that
+runs on an actual device, we can define group_device_requires().
