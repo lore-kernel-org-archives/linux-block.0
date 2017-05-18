@@ -1,21 +1,62 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "linux-btrfs@vger.kernel.org"
-	<linux-btrfs@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-Subject: Re: [PATCH 01/15] nvme-lightnvm: use blk_execute_rq in
- nvme_nvm_submit_user_cmd
-Date: Wed, 24 May 2017 15:50:18 +0000
-Message-ID: <1495641016.2823.6.camel@sandisk.com>
+Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 01/15] nvme-lightnvm: use blk_execute_rq in nvme_nvm_submit_user_cmd
+Date: Thu, 18 May 2017 15:17:58 +0200
+Message-Id: <20170518131812.22956-2-hch@lst.de>
+In-Reply-To: <20170518131812.22956-1-hch@lst.de>
 References: <20170518131812.22956-1-hch@lst.de>
-	 <20170518131812.22956-2-hch@lst.de>
-In-Reply-To: <20170518131812.22956-2-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-05-18 at 15:17 +0200, Christoph Hellwig wrote:
-> Instead of reinventing it poorly.
+Instead of reinventing it poorly.
 
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/nvme/host/lightnvm.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index f5df78ed1e10..f3885b5e56bd 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -571,13 +571,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.max_phys_sect		= 64,
+ };
+ 
+-static void nvme_nvm_end_user_vio(struct request *rq, int error)
+-{
+-	struct completion *waiting = rq->end_io_data;
+-
+-	complete(waiting);
+-}
+-
+ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 				struct nvme_ns *ns,
+ 				struct nvme_nvm_command *vcmd,
+@@ -608,7 +601,6 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	rq->timeout = timeout ? timeout : ADMIN_TIMEOUT;
+ 
+ 	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
+-	rq->end_io_data = &wait;
+ 
+ 	if (ppa_buf && ppa_len) {
+ 		ppa_list = dma_pool_alloc(dev->dma_pool, GFP_KERNEL, &ppa_dma);
+@@ -662,9 +654,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	}
+ 
+ submit:
+-	blk_execute_rq_nowait(q, NULL, rq, 0, nvme_nvm_end_user_vio);
+-
+-	wait_for_completion_io(&wait);
++	blk_execute_rq(q, NULL, rq, 0);
+ 
+ 	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
+ 		ret = -EINTR;
+-- 
+2.11.0
