@@ -1,147 +1,38 @@
 Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <BY2PR0401MB09019584ED8645C66540EA5CE5E20@BY2PR0401MB0901.namprd04.prod.outlook.com>
+References: <20170510082418.10513-1-linus.walleij@linaro.org>
+ <20170510082418.10513-6-linus.walleij@linaro.org> <BY2PR0401MB09019584ED8645C66540EA5CE5E20@BY2PR0401MB0901.namprd04.prod.outlook.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 5/6 v2] mmc: block: move multi-ioctl() to use block layer
-Date: Thu, 18 May 2017 11:29:35 +0200
-Message-Id: <20170518092936.9277-5-linus.walleij@linaro.org>
-In-Reply-To: <20170518092936.9277-1-linus.walleij@linaro.org>
-References: <20170518092936.9277-1-linus.walleij@linaro.org>
+Date: Thu, 18 May 2017 11:26:51 +0200
+Message-ID: <CACRpkdYLD=8G9R9DveGHPa61WB-dnqKUi_gPQPn0YKTs5TRP1g@mail.gmail.com>
+Subject: Re: [PATCH 5/5] mmc: block: move multi-ioctl() to use block layer
+To: Avri Altman <Avri.Altman@sandisk.com>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-This switches also the multiple-command ioctl() call to issue
-all ioctl()s through the block layer instead of going directly
-to the device.
+On Fri, May 12, 2017 at 11:09 PM, Avri Altman <Avri.Altman@sandisk.com> wrote:
 
-We extend the passed argument with an argument count and loop
-over all passed commands in the ioctl() issue function called
-from the block layer.
+>> +     req = blk_get_request(mq->queue,
+>> +             idata[0]->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
+>> +             __GFP_RECLAIM);
+>
+> It is possible, e.g. as in RPMB access, that some commands are read and some are write.
+> Not sure that it makes any difference, because once it get back to mmc_blk_ioctl_cmd_issue(),
+> The correct mmc requests will be issued anyway?
 
-By doing this we are again loosening the grip on the big host
-lock, since two calls to mmc_get_card()/mmc_put_card() are
-removed.
+The OP type (REQ_OP_DRV_OUT or REQ_OP_DRV_IN) has no semantic
+effect in the MMC/SD stack, I just need to set it to something reasonable.
+They will all be handled the same when issueing the request later.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
-ChangeLog v1->v2:
-- - Update to the API change for req_to_mmc_queue_req()
----
- drivers/mmc/core/block.c | 38 +++++++++++++++++++++++++-------------
- drivers/mmc/core/queue.h |  3 ++-
- 2 files changed, 27 insertions(+), 14 deletions(-)
+The only semantic effect would be if the block layer prioritize these types
+of requests differently compared to each other or to other requests, in
+which case I think this rough guess is not a big issue.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 9fb2bd529156..e9737987956f 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -563,6 +563,7 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- 			     struct mmc_ioc_cmd __user *ic_ptr)
- {
- 	struct mmc_blk_ioc_data *idata;
-+	struct mmc_blk_ioc_data *idatas[1];
- 	struct mmc_blk_data *md;
- 	struct mmc_queue *mq;
- 	struct mmc_card *card;
-@@ -600,7 +601,9 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- 	req = blk_get_request(mq->queue,
- 		idata->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
- 		__GFP_RECLAIM);
--	req_to_mmc_queue_req(req)->idata = idata;
-+	idatas[0] = idata;
-+	req_to_mmc_queue_req(req)->idata = idatas;
-+	req_to_mmc_queue_req(req)->ioc_count = 1;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
- 	ioc_err = req_to_mmc_queue_req(req)->ioc_result;
- 	err = mmc_blk_ioctl_copy_to_user(ic_ptr, idata);
-@@ -622,14 +625,17 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- static void mmc_blk_ioctl_cmd_issue(struct mmc_queue *mq, struct request *req)
- {
- 	struct mmc_queue_req *mq_rq;
--	struct mmc_blk_ioc_data *idata;
- 	struct mmc_card *card = mq->card;
- 	struct mmc_blk_data *md = mq->blkdata;
- 	int ioc_err;
-+	int i;
- 
- 	mq_rq = req_to_mmc_queue_req(req);
--	idata = mq_rq->idata;
--	ioc_err = __mmc_blk_ioctl_cmd(card, md, idata);
-+	for (i = 0; i < mq_rq->ioc_count; i++) {
-+		ioc_err = __mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
-+		if (ioc_err)
-+			break;
-+	}
- 	mq_rq->ioc_result = ioc_err;
- 
- 	/* Always switch back to main area after RPMB access */
-@@ -646,8 +652,10 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 	struct mmc_ioc_cmd __user *cmds = user->cmds;
- 	struct mmc_card *card;
- 	struct mmc_blk_data *md;
-+	struct mmc_queue *mq;
- 	int i, err = 0, ioc_err = 0;
- 	__u64 num_of_cmds;
-+	struct request *req;
- 
- 	/*
- 	 * The caller must have CAP_SYS_RAWIO, and must be calling this on the
-@@ -689,21 +697,25 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 		goto cmd_done;
- 	}
- 
--	mmc_get_card(card);
--
--	for (i = 0; i < num_of_cmds && !ioc_err; i++)
--		ioc_err = __mmc_blk_ioctl_cmd(card, md, idata[i]);
--
--	/* Always switch back to main area after RPMB access */
--	if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
--		mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
- 
--	mmc_put_card(card);
-+	/*
-+	 * Dispatch the ioctl()s into the block request queue.
-+	 */
-+	mq = &md->queue;
-+	req = blk_get_request(mq->queue,
-+		idata[0]->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
-+		__GFP_RECLAIM);
-+	req_to_mmc_queue_req(req)->idata = idata;
-+	req_to_mmc_queue_req(req)->ioc_count = num_of_cmds;
-+	blk_execute_rq(mq->queue, NULL, req, 0);
-+	ioc_err = req_to_mmc_queue_req(req)->ioc_result;
- 
- 	/* copy to user if data and response */
- 	for (i = 0; i < num_of_cmds && !err; i++)
- 		err = mmc_blk_ioctl_copy_to_user(&cmds[i], idata[i]);
- 
-+	blk_put_request(req);
-+
- cmd_done:
- 	mmc_blk_put(md);
- cmd_err:
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index 005ece9ac7cb..8c76e7118c95 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -42,7 +42,8 @@ struct mmc_queue_req {
- 	unsigned int		bounce_sg_len;
- 	struct mmc_async_req	areq;
- 	int			ioc_result;
--	struct mmc_blk_ioc_data	*idata;
-+	struct mmc_blk_ioc_data	**idata;
-+	unsigned int		ioc_count;
- };
- 
- struct mmc_queue {
--- 
-2.9.3
+Yours,
+Linus Walleij
