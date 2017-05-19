@@ -1,33 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:42730 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750822AbdEUGcj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 May 2017 02:32:39 -0400
-Date: Sun, 21 May 2017 08:32:37 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 02/18] bsg: Check private request size before attaching
-        to a queue
-Message-ID: <20170521063237.GE12287@lst.de>
-References: <20170519183016.12646-1-bart.vanassche@sandisk.com> <20170519183016.12646-3-bart.vanassche@sandisk.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+CC: <linux-scsi@vger.kernel.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>, <linux-block@vger.kernel.org>
+Subject: [PATCH 02/18] bsg: Check private request size before attaching to a queue
+Date: Fri, 19 May 2017 11:30:00 -0700
+Message-ID: <20170519183016.12646-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170519183016.12646-1-bart.vanassche@sandisk.com>
+References: <20170519183016.12646-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170519183016.12646-3-bart.vanassche@sandisk.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart,
+Since BSG only supports request queues for which struct scsi_request
+is the first member of their private request data, refuse to register
+block layer queues for which the private data is smaller than struct
+scsi_request.
 
-I think this is the wrong kind of check - while we do care about the
-size of the queue, we only do it as a side effect of the queue
-being able to handle REQ_OP_SCSI_IN/REQ_OP_SCSI_OUT commands.
+References: commit bd1599d931ca ("scsi_transport_sas: fix BSG ioctl memory corruption")
+References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: linux-block@vger.kernel.org
+---
+ block/bsg.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I think we'll need a flag for those in the queue instead.
-
-And btw, I didn't get your cover letter [0/18], did that get lost
-somewhere?
+diff --git a/block/bsg.c b/block/bsg.c
+index 6fd08544d77e..5ccecc9855ac 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -750,6 +750,12 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
+ #ifdef BSG_DEBUG
+ 	unsigned char buf[32];
+ #endif
++
++	if (blk_queue_cmd_size(rq) < sizeof(struct scsi_request)) {
++		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
++		return ERR_PTR(-EINVAL);
++	}
++
+ 	if (!blk_get_queue(rq))
+ 		return ERR_PTR(-ENXIO);
+ 
+-- 
+2.12.2
