@@ -1,57 +1,27 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: use pointer entity->sched_data only if set
-Date: Tue,  9 May 2017 11:37:27 +0200
-Message-Id: <20170509093727.2595-1-paolo.valente@linaro.org>
+Return-Path: <BATV+c76b9e6b5f659e20e25d+5017+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Thomas Gleixner <tglx@linutronix.de>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: spread MSI(-X) vectors to all possible CPUs V2
+Date: Fri, 19 May 2017 10:57:49 +0200
+Message-Id: <20170519085756.29742-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-In the function __bfq_deactivate_entity, the pointer
-entity->sched_data could happen to be used before being properly
-initialized. This led to a NULL pointer dereference. This commit fixes
-this bug by just using this pointer only where it is safe to do so.
+Hi all,
 
-Reported-by: Tom Harrison <l12436.tw@gmail.com>
-Tested-by: Tom Harrison <l12436.tw@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-wf2q.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+this series changes our automatic MSI-X vector assignment so that it
+takes all present CPUs into account instead of all online ones.  This
+allows to better deal with cpu hotplug events, which could happen
+frequently due to power management for example.
 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index b4fc3e4..8726ede 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1114,12 +1114,21 @@ static void bfq_activate_requeue_entity(struct bfq_entity *entity,
- bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
- {
- 	struct bfq_sched_data *sd = entity->sched_data;
--	struct bfq_service_tree *st = bfq_entity_service_tree(entity);
--	int is_in_service = entity == sd->in_service_entity;
-+	struct bfq_service_tree *st;
-+	bool is_in_service;
- 
- 	if (!entity->on_st) /* entity never activated, or already inactive */
- 		return false;
- 
-+	/*
-+	 * If we get here, then entity is active, which implies that
-+	 * bfq_group_set_parent has already been invoked for the group
-+	 * represented by entity. Therefore, the field
-+	 * entity->sched_data has been set, and we can safely use it.
-+	 */
-+	st = bfq_entity_service_tree(entity);
-+	is_in_service = entity == sd->in_service_entity;
-+
- 	if (is_in_service)
- 		bfq_calc_finish(entity, entity->service);
- 
--- 
-2.10.0
+Changes since V1:
+ - rebase to current Linus' tree
+ - add irq_lock_sparse calls
+ - move memory allocations outside of (raw) spinlocks
+ - remove the irq_force_complete_move call
+ - factor some common code into helpers
+ - identation fixups
