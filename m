@@ -1,150 +1,124 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 19/27] buffer: set errors in mapping at the time that the error occurs
-Date: Tue,  9 May 2017 11:49:22 -0400
-Message-Id: <20170509154930.29524-20-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 3/6] mmc: block: Move DRV OP issue function
+Date: Fri, 19 May 2017 15:37:29 +0200
+Message-Id: <20170519133732.27470-4-linus.walleij@linaro.org>
+In-Reply-To: <20170519133732.27470-1-linus.walleij@linaro.org>
+References: <20170519133732.27470-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-I noticed on xfs that I could still sometimes get back an error on fsync
-on a fd that was opened after the error condition had been cleared.
+We will need to access static functions above the pure block layer
+operations in the file, so move the driver operations issue
+function down so we can see all non-blocklayer symbols.
 
-The problem is that the buffer code sets the write_io_error flag and
-then later checks that flag to set the error in the mapping. That flag
-perisists for quite a while however. If the file is later opened with
-O_TRUNC, the buffers will then be invalidated and the mapping's error
-set such that a subsequent fsync will return error. I think this is
-incorrect, as there was no writeback between the open and fsync.
-
-Add a new mark_buffer_write_io_error operation that sets the flag and
-the error in the mapping at the same time. Replace all calls to
-set_buffer_write_io_error with mark_buffer_write_io_error, and remove
-the places that check this flag in order to set the error in the
-mapping.
-
-This sets the error in the mapping earlier, at the time that it's first
-detected.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- fs/buffer.c                 | 19 +++++++++++++------
- fs/gfs2/lops.c              |  2 +-
- include/linux/buffer_head.h |  1 +
- 3 files changed, 15 insertions(+), 7 deletions(-)
+ drivers/mmc/core/block.c | 74 ++++++++++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 70638941066d..1b566cf3f4e4 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -179,7 +179,7 @@ void end_buffer_write_sync(struct buffer_head *bh, int uptodate)
- 		set_buffer_uptodate(bh);
- 	} else {
- 		buffer_io_error(bh, ", lost sync page write");
--		set_buffer_write_io_error(bh);
-+		mark_buffer_write_io_error(bh);
- 		clear_buffer_uptodate(bh);
- 	}
- 	unlock_buffer(bh);
-@@ -354,7 +354,7 @@ void end_buffer_async_write(struct buffer_head *bh, int uptodate)
- 	} else {
- 		buffer_io_error(bh, ", lost async page write");
- 		mapping_set_error(page->mapping, -EIO);
--		set_buffer_write_io_error(bh);
-+		mark_buffer_write_io_error(bh);
- 		clear_buffer_uptodate(bh);
- 		SetPageError(page);
- 	}
-@@ -482,8 +482,6 @@ static void __remove_assoc_queue(struct buffer_head *bh)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index b24e7f5171c9..75b1baacf28b 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -618,43 +618,6 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
+ 	return ioc_err ? ioc_err : err;
+ }
+ 
+-/*
+- * The non-block commands come back from the block layer after it queued it and
+- * processed it with all other requests and then they get issued in this
+- * function.
+- */
+-static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+-{
+-	struct mmc_queue_req *mq_rq;
+-	struct mmc_card *card = mq->card;
+-	struct mmc_blk_data *md = mq->blkdata;
+-	int ioc_err;
+-	int i;
+-
+-	mq_rq = req_to_mmc_queue_req(req);
+-
+-	switch (mq_rq->drv_op) {
+-	case MMC_DRV_OP_IOCTL:
+-		for (i = 0; i < mq_rq->ioc_count; i++) {
+-			ioc_err =
+-				__mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
+-			if (ioc_err)
+-				break;
+-		}
+-		mq_rq->ioc_result = ioc_err;
+-
+-		/* Always switch back to main area after RPMB access */
+-		if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
+-			mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
+-
+-		blk_end_request_all(req, ioc_err);
+-		break;
+-	default:
+-		/* Unknown operation */
+-		break;
+-	}
+-}
+-
+ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
+ 				   struct mmc_ioc_multi_cmd __user *user)
  {
- 	list_del_init(&bh->b_assoc_buffers);
- 	WARN_ON(!bh->b_assoc_map);
--	if (buffer_write_io_error(bh))
--		mapping_set_error(bh->b_assoc_map, -EIO);
- 	bh->b_assoc_map = NULL;
+@@ -1222,6 +1185,43 @@ int mmc_access_rpmb(struct mmc_queue *mq)
+ 	return false;
  }
  
-@@ -1182,6 +1180,17 @@ void mark_buffer_dirty(struct buffer_head *bh)
- }
- EXPORT_SYMBOL(mark_buffer_dirty);
- 
-+void mark_buffer_write_io_error(struct buffer_head *bh)
++/*
++ * The non-block commands come back from the block layer after it queued it and
++ * processed it with all other requests and then they get issued in this
++ * function.
++ */
++static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
 +{
-+	set_buffer_write_io_error(bh);
-+	/* FIXME: do we need to set this in both places? */
-+	if (bh->b_page && bh->b_page->mapping)
-+		mapping_set_error(bh->b_page->mapping, -EIO);
-+	if (bh->b_assoc_map)
-+		mapping_set_error(bh->b_assoc_map, -EIO);
-+}
-+EXPORT_SYMBOL(mark_buffer_write_io_error);
++	struct mmc_queue_req *mq_rq;
++	struct mmc_card *card = mq->card;
++	struct mmc_blk_data *md = mq->blkdata;
++	int ioc_err;
++	int i;
 +
- /*
-  * Decrement a buffer_head's reference count.  If all buffers against a page
-  * have zero reference count, are clean and unlocked, and if the page is clean
-@@ -3291,8 +3300,6 @@ drop_buffers(struct page *page, struct buffer_head **buffers_to_free)
- 
- 	bh = head;
- 	do {
--		if (buffer_write_io_error(bh) && page->mapping)
--			mapping_set_error(page->mapping, -EIO);
- 		if (buffer_busy(bh))
- 			goto failed;
- 		bh = bh->b_this_page;
-diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
-index b1f9144b42c7..cd7857ab1a6a 100644
---- a/fs/gfs2/lops.c
-+++ b/fs/gfs2/lops.c
-@@ -182,7 +182,7 @@ static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp, struct bio_vec *bvec,
- 		bh = bh->b_this_page;
- 	do {
- 		if (error)
--			set_buffer_write_io_error(bh);
-+			mark_buffer_write_io_error(bh);
- 		unlock_buffer(bh);
- 		next = bh->b_this_page;
- 		size -= bh->b_size;
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index 79591c3660cc..db6256fb1692 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -149,6 +149,7 @@ void buffer_check_dirty_writeback(struct page *page,
-  */
- 
- void mark_buffer_dirty(struct buffer_head *bh);
-+void mark_buffer_write_io_error(struct buffer_head *bh);
- void init_buffer(struct buffer_head *, bh_end_io_t *, void *);
- void touch_buffer(struct buffer_head *bh);
- void set_bh_page(struct buffer_head *bh,
++	mq_rq = req_to_mmc_queue_req(req);
++
++	switch (mq_rq->drv_op) {
++	case MMC_DRV_OP_IOCTL:
++		for (i = 0; i < mq_rq->ioc_count; i++) {
++			ioc_err =
++				__mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
++			if (ioc_err)
++				break;
++		}
++		mq_rq->ioc_result = ioc_err;
++
++		/* Always switch back to main area after RPMB access */
++		if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
++			mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
++
++		blk_end_request_all(req, ioc_err);
++		break;
++	default:
++		/* Unknown operation */
++		break;
++	}
++}
++
+ static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
+ {
+ 	struct mmc_blk_data *md = mq->blkdata;
 -- 
 2.9.3
