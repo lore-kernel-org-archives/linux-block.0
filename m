@@ -1,52 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49577 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55296 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751406AbdESNzk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2017 09:55:40 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
+        id S1751513AbdESGmD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 May 2017 02:42:03 -0400
+Subject: Re: [PATCH blktests 0/3] Add SCSI generic test group
 To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests v2 0/3] Add SCSI generic test group
-Date: Fri, 19 May 2017 15:55:28 +0200
-Message-Id: <cover.1495201975.git.jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
+References: <cover.1495109149.git.jthumshirn@suse.de>
+ <20170518131928.GA26060@infradead.org>
+ <94150f71-5bbb-2ee2-b7d4-d0f2f7124684@suse.de>
+ <20170518224645.GD26871@vader.DHCP.thefacebook.com>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <8762b307-4001-7509-5dd6-74ad4fe8ccc2@suse.de>
+Date: Fri, 19 May 2017 08:41:55 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170518224645.GD26871@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add a test group for the SCSI generic driver and one syzcaller
-reproducer for this group.
+On 05/19/2017 12:46 AM, Omar Sandoval wrote:
+> Looking at this some more, it seems like the syzkaller reproducer always
+> bangs on /dev/sg0. How hard would it be to adapt it to run on the sg
+> device for every test device instead?
 
-The reprodcuer is distributed as a C program, so the makefile is
-amended to build C files to be used in the test.
+Can't be too hard I guess ;-).
 
-Changes to v1:
-* Stripped left over TODO comment
-* Modified reproducer to accept a device name
-* Fixed Makefile so it can build more than one target
+Maybe I can even clean it up a bit so it compiles with the "-Wall
+-Wextra -Werror" trinity.
 
-Johannes Thumshirn (3):
-  Add ability to build test-cases
-  tests/sg: add SCSI generic test grouop
-  sg/001: add regression test for syzcaller generated GPF in sg_read
-    path
+I'll send you a v2 once I'm done with it (and all other comments).
 
- Makefile         |  26 +++-
- common/sg        |  41 ++++++
- src/.gitignore   |   1 +
- src/Makefile     |  16 ++
- src/sg-001.c     | 438 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/sg/001     |  47 ++++++
- tests/sg/001.out |   2 +
- tests/sg/group   |  28 ++++
- 8 files changed, 598 insertions(+), 1 deletion(-)
- create mode 100644 common/sg
- create mode 100644 src/.gitignore
- create mode 100644 src/Makefile
- create mode 100644 src/sg-001.c
- create mode 100755 tests/sg/001
- create mode 100644 tests/sg/001.out
- create mode 100644 tests/sg/group
-
+Byte,
+	Johannes
 -- 
-2.12.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
