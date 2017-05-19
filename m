@@ -1,88 +1,91 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:25 +1000
-Subject: [PATCH 08/13] pktcdvd: use bio_clone_fast() instead of bio_clone()
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org
-Message-ID: <149369654538.5146.7904913979507183228.stgit@noble>
-In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
-References: <149369628671.5146.4865312503373040039.stgit@noble>
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 19 May 2017 21:19:28 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	Zhang Yi <yizhan@redhat.com>, linux-block@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] nvme: avoid to hang in remove disk
+Message-ID: <20170519131923.GA4019@ming.t460p>
+References: <20170517012729.13469-1-ming.lei@redhat.com>
+ <20170517012729.13469-3-ming.lei@redhat.com>
+ <20170518134931.GB31489@lst.de>
+ <20170518153542.GC18526@ming.t460p>
+ <20170518160624.GA6015@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170518160624.GA6015@localhost.localdomain>
 List-ID: <linux-block@vger.kernel.org>
 
-pktcdvd doesn't change the bi_io_vec of the clone bio,
-so it is more efficient to use bio_clone_fast(), and not clone
-the bi_io_vec.
-This requires providing a bio_set, and it is safest to
-provide a dedicated bio_set rather than sharing
-fs_bio_set, which filesytems use.
-This new bio_set, pkt_bio_set, can also be use for the bio_split()
-call as the two allocations (bio_clone_fast, and bio_split) are
-independent, neither can block a bio allocated by the other.
+On Thu, May 18, 2017 at 12:06:24PM -0400, Keith Busch wrote:
+> On Thu, May 18, 2017 at 11:35:43PM +0800, Ming Lei wrote:
+> > On Thu, May 18, 2017 at 03:49:31PM +0200, Christoph Hellwig wrote:
+> > > On Wed, May 17, 2017 at 09:27:29AM +0800, Ming Lei wrote:
+> > > > If some writeback requests are submitted just before queue is killed,
+> > > > and these requests may not be canceled in nvme_dev_disable() because
+> > > > they are not started yet, it is still possible for blk-mq to hold
+> > > > these requests in .requeue list.
+> > > > 
+> > > > So we have to abort these requests first before del_gendisk(), because
+> > > > del_gendisk() may wait for completion of these requests.
+> > > > 
+> > > > Cc: stable@vger.kernel.org
+> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > ---
+> > > >  drivers/nvme/host/core.c | 8 ++++++++
+> > > >  1 file changed, 8 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> > > > index d5e0906262ea..8eaeea86509a 100644
+> > > > --- a/drivers/nvme/host/core.c
+> > > > +++ b/drivers/nvme/host/core.c
+> > > > @@ -2097,6 +2097,14 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+> > > >  					&nvme_ns_attr_group);
+> > > >  		if (ns->ndev)
+> > > >  			nvme_nvm_unregister_sysfs(ns);
+> > > > +		/*
+> > > > +		 * If queue is dead, we have to abort requests in
+> > > > +		 * requeue list because fsync_bdev() in removing disk
+> > > > +		 * path may wait for these IOs, which can't
+> > > > +		 * be submitted to hardware too.
+> > > > +		 */
+> > > > +		if (blk_queue_dying(ns->queue))
+> > > > +			blk_mq_abort_requeue_list(ns->queue);
+> > > >  		del_gendisk(ns->disk);
+> > > >  		blk_mq_abort_requeue_list(ns->queue);
+> > > 
+> > > Why can't we just move the blk_mq_abort_requeue_list call before
+> > > del_gendisk in general?
+> > 
+> > That may cause data loss if queue isn't killed. Normally queue is only killed
+> > when the controller is dead(such as in reset failure) or !pci_device_is_present()
+> > (in nvme_remove()).
+> 
+> But in your test, your controller isn't even dead. Why are we killing
+> it when it's still functional? I think we need to first not consider
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: NeilBrown <neilb@suse.com>
----
- drivers/block/pktcdvd.c |   12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Last time, you posted one patch which looks fixes the hang, but the
+NVMe device becomes not functional after rebinding later, see
+the link:
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 1457e65c50b1..6f9c31fae335 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -98,6 +98,7 @@ static int write_congestion_on  = PKT_WRITE_CONGESTION_ON;
- static int write_congestion_off = PKT_WRITE_CONGESTION_OFF;
- static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
- static mempool_t *psd_pool;
-+static struct bio_set *pkt_bio_set;
- 
- static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
- static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
-@@ -2310,7 +2311,7 @@ static void pkt_end_io_read_cloned(struct bio *bio)
- 
- static void pkt_make_request_read(struct pktcdvd_device *pd, struct bio *bio)
- {
--	struct bio *cloned_bio = bio_clone(bio, GFP_NOIO);
-+	struct bio *cloned_bio = bio_clone_fast(bio, GFP_NOIO, pkt_bio_set);
- 	struct packet_stacked_data *psd = mempool_alloc(psd_pool, GFP_NOIO);
- 
- 	psd->pd = pd;
-@@ -2455,7 +2456,7 @@ static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
- 
- 			split = bio_split(bio, last_zone -
- 					  bio->bi_iter.bi_sector,
--					  GFP_NOIO, fs_bio_set);
-+					  GFP_NOIO, pkt_bio_set);
- 			bio_chain(split, bio);
- 		} else {
- 			split = bio;
-@@ -2919,6 +2920,11 @@ static int __init pkt_init(void)
- 					sizeof(struct packet_stacked_data));
- 	if (!psd_pool)
- 		return -ENOMEM;
-+	pkt_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
-+	if (!pkt_bio_set) {
-+		mempool_destroy(psd_pool);
-+		return -ENOMEM;
-+	}
- 
- 	ret = register_blkdev(pktdev_major, DRIVER_NAME);
- 	if (ret < 0) {
-@@ -2951,6 +2957,7 @@ static int __init pkt_init(void)
- 	unregister_blkdev(pktdev_major, DRIVER_NAME);
- out2:
- 	mempool_destroy(psd_pool);
-+	bioset_free(pkt_bio_set);
- 	return ret;
- }
- 
-@@ -2964,6 +2971,7 @@ static void __exit pkt_exit(void)
- 
- 	unregister_blkdev(pktdev_major, DRIVER_NAME);
- 	mempool_destroy(psd_pool);
-+	bioset_free(pkt_bio_set);
- }
- 
- MODULE_DESCRIPTION("Packet writing layer for CD/DVD drives");
+	http://marc.info/?l=linux-block&m=149430047402103&w=2
+
+Also not sure it is worthy of doing that, because in my case,
+nvme_dev_disable() has been called in nvme_reset_notify() before the reset,
+that means requests have been canceled already. As I mentioned, the two
+directions aren't contradictorily. But thinking controller as live under
+this situation need big change, such as, not canceling requests in whole
+reset path.
+
+Finally this patch is not only for the case of reset failure vs. remove,
+but also for hot-unplug, queues are still killed in path of hot remove.
+
+> this perfectly functional controller to be dead under these conditions,
+> and second, understand why killing the queues after del_gendisk is called
+> does not allow forward progress.
+
+I have explained this cause in last email, :-)
+
+Thanks,
+Ming
