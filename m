@@ -1,46 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:59946 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750822AbdEUHDZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 May 2017 03:03:25 -0400
-Date: Sun, 21 May 2017 00:03:22 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Omar Sandoval <osandov@osandov.com>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH blktests 0/3] Add SCSI generic test group
-Message-ID: <20170521070322.GA10453@infradead.org>
-References: <cover.1495109149.git.jthumshirn@suse.de>
- <20170518131928.GA26060@infradead.org>
- <94150f71-5bbb-2ee2-b7d4-d0f2f7124684@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <94150f71-5bbb-2ee2-b7d4-d0f2f7124684@suse.de>
+Received: from mx2.suse.de ([195.135.220.15]:49577 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751406AbdESNzk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 May 2017 09:55:40 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH blktests v2 0/3] Add SCSI generic test group
+Date: Fri, 19 May 2017 15:55:28 +0200
+Message-Id: <cover.1495201975.git.jthumshirn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, May 18, 2017 at 03:29:45PM +0200, Johannes Thumshirn wrote:
-> On 05/18/2017 03:19 PM, Christoph Hellwig wrote:
-> > All SG_IO test should also apply to block device nodes that support
-> > the ioctl..
-> > 
-> 
-> But these are not necessarily SG_IO tests, are they?
-> 
-> The test included is doesn't hit the SG_IO path in the sg driver, but
-> the sg_read path.
+Add a test group for the SCSI generic driver and one syzcaller
+reproducer for this group.
 
-Oh, you're right.
+The reprodcuer is distributed as a C program, so the makefile is
+amended to build C files to be used in the test.
 
-> 
-> Of cause we can make a generic sg_io tool but IMHO it's quite convenient
-> to just throw in the reproducers we get.
-> 
-> And as it exercises the /dev/sg character device I decided to make a new
-> group.
+Changes to v1:
+* Stripped left over TODO comment
+* Modified reproducer to accept a device name
+* Fixed Makefile so it can build more than one target
 
-Yeah, makes sense.  And any SG_IO test should be able to run on
-both block device nodes and sg nodes.
+Johannes Thumshirn (3):
+  Add ability to build test-cases
+  tests/sg: add SCSI generic test grouop
+  sg/001: add regression test for syzcaller generated GPF in sg_read
+    path
+
+ Makefile         |  26 +++-
+ common/sg        |  41 ++++++
+ src/.gitignore   |   1 +
+ src/Makefile     |  16 ++
+ src/sg-001.c     | 438 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/sg/001     |  47 ++++++
+ tests/sg/001.out |   2 +
+ tests/sg/group   |  28 ++++
+ 8 files changed, 598 insertions(+), 1 deletion(-)
+ create mode 100644 common/sg
+ create mode 100644 src/.gitignore
+ create mode 100644 src/Makefile
+ create mode 100644 src/sg-001.c
+ create mode 100755 tests/sg/001
+ create mode 100644 tests/sg/001.out
+ create mode 100644 tests/sg/group
+
+-- 
+2.12.0
