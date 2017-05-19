@@ -1,33 +1,31 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Tue, 23 May 2017 17:28:36 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Jens Axboe <axboe@kernel.dk>, Will Drewry <wad@chromium.org>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] block: fix an error code in add_partition()
-Message-ID: <20170523142836.GB28346@elgon.mountain>
+Return-Path: <hch@lst.de>
+Date: Fri, 19 May 2017 10:22:44 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 12/15] block: merge blk_types.h into bio.h
+Message-ID: <20170519082244.GC1411@lst.de>
+References: <20170518131812.22956-1-hch@lst.de> <20170518131812.22956-13-hch@lst.de> <1495117551.2713.1.camel@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1495117551.2713.1.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We don't set an error code on this path.  It means that we return NULL
-instead of an error pointer and the caller does a NULL dereference.
+On Thu, May 18, 2017 at 02:25:52PM +0000, Bart Van Assche wrote:
+> On Thu, 2017-05-18 at 15:18 +0200, Christoph Hellwig wrote:
+> > We've cleaned up our headers sufficiently that we don't need this split
+> > anymore.
+> 
+> Hello Christoph,
+> 
+> Request-based drivers need the structure definitions from <linux/blkdev.h> and
+> the type definitions from <linux/blk_types.h> but do not need the definition of
+> struct bio. Have you considered to remove #include <linux/bio.h> from file
+> include/linux/blkdev.h? Do you think that would help to reduce the kernel build
+> time?
 
-Fixes: 6d1d8050b4bc ("block, partition: add partition_meta_info to hd_struct")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index ff07b9143ca4..c5ec8246e25e 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -320,8 +320,10 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 
- 	if (info) {
- 		struct partition_meta_info *pinfo = alloc_part_info(disk);
--		if (!pinfo)
-+		if (!pinfo) {
-+			err = -ENOMEM;
- 			goto out_free_stats;
-+		}
- 		memcpy(pinfo, info, sizeof(*info));
- 		p->info = pinfo;
- 	}
+Most block drivers end up needing bio.h anyway.  But I can skip this
+part of the series for now.
