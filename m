@@ -1,53 +1,182 @@
-Return-Path: <BATV+b4fbce47cc06aa9bd228+5018+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Sat, 20 May 2017 15:10:48 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [GIT PULL] nvme fixes for 4.12-rc2
-Message-ID: <20170520131048.cjmpq2dnttritszb@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 4/6] mmc: block: Move boot partition locking into a driver op
+Date: Fri, 19 May 2017 15:37:30 +0200
+Message-Id: <20170519133732.27470-5-linus.walleij@linaro.org>
+In-Reply-To: <20170519133732.27470-1-linus.walleij@linaro.org>
+References: <20170519133732.27470-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+This moves the boot partition lock command (issued from sysfs)
+into a custom block layer request, just like the ioctl()s,
+getting rid of yet another instance of mmc_get_card().
 
-a few fixes for 4.12-rc2.  There are a few more that we need to get into
-4.12, but I'd rather get the current queue to you ASAP.
+Since we now have two operations issuing special DRV_OP's, we
+rename the result variable ->drv_op_result.
 
+Tested by locking the boot partition from userspace:
+> cd /sys/devices/platform/soc/80114000.sdi4_per2/mmc_host/mmc3/
+     mmc3:0001/block/mmcblk3/mmcblk3boot0
+> echo 1 > ro_lock_until_next_power_on
+[  178.645324] mmcblk3boot1: Locking boot partition ro until next power on
+[  178.652221] mmcblk3boot0: Locking boot partition ro until next power on
 
-The following changes since commit 56868a460b83c0f93d339256a81064d89aadae8e:
+Also tested this with a huge dd job in the background: it
+is now possible to lock the boot partitions on the card even
+under heavy I/O.
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide (2017-05-09 15:56:58 -0700)
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/mmc/core/block.c | 53 +++++++++++++++++++++++++++---------------------
+ drivers/mmc/core/queue.h |  4 +++-
+ 2 files changed, 33 insertions(+), 24 deletions(-)
 
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.12
-
-for you to fetch changes up to 3d5d1207d61b522b6aac24f896e53401e876b26e:
-
-  nvmet: release the sq ref on rdma read errors (2017-05-11 12:52:46 +0200)
-
-----------------------------------------------------------------
-James Smart (4):
-      nvme-fc: correct port role bits
-      nvme-fc: require target or discovery role for fc-nvme targets
-      nvme-fc: stop queues on error detection
-      nvmet-fc: remove target cpu scheduling flag
-
-Jon Derrick (1):
-      nvme: unmap CMB and remove sysfs file in reset path
-
-Vijay Immanuel (1):
-      nvmet: release the sq ref on rdma read errors
-
- drivers/nvme/host/fc.c         | 10 ++++++++++
- drivers/nvme/host/pci.c        |  7 ++++++-
- drivers/nvme/target/core.c     |  6 ++++++
- drivers/nvme/target/fc.c       |  4 +---
- drivers/nvme/target/fcloop.c   |  1 -
- drivers/nvme/target/nvmet.h    |  1 +
- drivers/nvme/target/rdma.c     |  1 +
- drivers/scsi/lpfc/lpfc_nvmet.c |  1 -
- include/linux/nvme-fc-driver.h | 16 ++++------------
- 9 files changed, 29 insertions(+), 18 deletions(-)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 75b1baacf28b..52635120a0a5 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -190,6 +190,8 @@ static ssize_t power_ro_lock_store(struct device *dev,
+ 	int ret;
+ 	struct mmc_blk_data *md, *part_md;
+ 	struct mmc_card *card;
++	struct mmc_queue *mq;
++	struct request *req;
+ 	unsigned long set;
+ 
+ 	if (kstrtoul(buf, 0, &set))
+@@ -199,20 +201,14 @@ static ssize_t power_ro_lock_store(struct device *dev,
+ 		return count;
+ 
+ 	md = mmc_blk_get(dev_to_disk(dev));
++	mq = &md->queue;
+ 	card = md->queue.card;
+ 
+-	mmc_get_card(card);
+-
+-	ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_BOOT_WP,
+-				card->ext_csd.boot_ro_lock |
+-				EXT_CSD_BOOT_WP_B_PWR_WP_EN,
+-				card->ext_csd.part_time);
+-	if (ret)
+-		pr_err("%s: Locking boot partition ro until next power on failed: %d\n", md->disk->disk_name, ret);
+-	else
+-		card->ext_csd.boot_ro_lock |= EXT_CSD_BOOT_WP_B_PWR_WP_EN;
+-
+-	mmc_put_card(card);
++	/* Dispatch locking to the block layer */
++	req = blk_get_request(mq->queue, REQ_OP_DRV_OUT, __GFP_RECLAIM);
++	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_BOOT_WP;
++	blk_execute_rq(mq->queue, NULL, req, 0);
++	ret = req_to_mmc_queue_req(req)->drv_op_result;
+ 
+ 	if (!ret) {
+ 		pr_info("%s: Locking boot partition ro until next power on\n",
+@@ -606,7 +602,7 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
+ 	req_to_mmc_queue_req(req)->idata = idatas;
+ 	req_to_mmc_queue_req(req)->ioc_count = 1;
+ 	blk_execute_rq(mq->queue, NULL, req, 0);
+-	ioc_err = req_to_mmc_queue_req(req)->ioc_result;
++	ioc_err = req_to_mmc_queue_req(req)->drv_op_result;
+ 	err = mmc_blk_ioctl_copy_to_user(ic_ptr, idata);
+ 	blk_put_request(req);
+ 
+@@ -682,7 +678,7 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
+ 	req_to_mmc_queue_req(req)->idata = idata;
+ 	req_to_mmc_queue_req(req)->ioc_count = num_of_cmds;
+ 	blk_execute_rq(mq->queue, NULL, req, 0);
+-	ioc_err = req_to_mmc_queue_req(req)->ioc_result;
++	ioc_err = req_to_mmc_queue_req(req)->drv_op_result;
+ 
+ 	/* copy to user if data and response */
+ 	for (i = 0; i < num_of_cmds && !err; i++)
+@@ -1195,7 +1191,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 	struct mmc_queue_req *mq_rq;
+ 	struct mmc_card *card = mq->card;
+ 	struct mmc_blk_data *md = mq->blkdata;
+-	int ioc_err;
++	int ret;
+ 	int i;
+ 
+ 	mq_rq = req_to_mmc_queue_req(req);
+@@ -1203,23 +1199,34 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 	switch (mq_rq->drv_op) {
+ 	case MMC_DRV_OP_IOCTL:
+ 		for (i = 0; i < mq_rq->ioc_count; i++) {
+-			ioc_err =
+-				__mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
+-			if (ioc_err)
++			ret = __mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
++			if (ret)
+ 				break;
+ 		}
+-		mq_rq->ioc_result = ioc_err;
+-
+ 		/* Always switch back to main area after RPMB access */
+ 		if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
+ 			mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
+-
+-		blk_end_request_all(req, ioc_err);
++		break;
++	case MMC_DRV_OP_BOOT_WP:
++		ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_BOOT_WP,
++				 card->ext_csd.boot_ro_lock |
++				 EXT_CSD_BOOT_WP_B_PWR_WP_EN,
++				 card->ext_csd.part_time);
++		if (ret)
++			pr_err("%s: Locking boot partition ro until next power on failed: %d\n",
++			       md->disk->disk_name, ret);
++		else
++			card->ext_csd.boot_ro_lock |=
++				EXT_CSD_BOOT_WP_B_PWR_WP_EN;
+ 		break;
+ 	default:
+-		/* Unknown operation */
++		pr_err("%s: unknown driver specific operation\n",
++		       md->disk->disk_name);
++		ret = -EINVAL;
+ 		break;
+ 	}
++	mq_rq->drv_op_result = ret;
++	blk_end_request_all(req, ret);
+ }
+ 
+ static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
+diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
+index 1e6062eb3e07..361b46408e0f 100644
+--- a/drivers/mmc/core/queue.h
++++ b/drivers/mmc/core/queue.h
+@@ -35,9 +35,11 @@ struct mmc_blk_request {
+ /**
+  * enum mmc_drv_op - enumerates the operations in the mmc_queue_req
+  * @MMC_DRV_OP_IOCTL: ioctl operation
++ * @MMC_DRV_OP_BOOT_WP: write protect boot partitions
+  */
+ enum mmc_drv_op {
+ 	MMC_DRV_OP_IOCTL,
++	MMC_DRV_OP_BOOT_WP,
+ };
+ 
+ struct mmc_queue_req {
+@@ -48,7 +50,7 @@ struct mmc_queue_req {
+ 	unsigned int		bounce_sg_len;
+ 	struct mmc_async_req	areq;
+ 	enum mmc_drv_op		drv_op;
+-	int			ioc_result;
++	int			drv_op_result;
+ 	struct mmc_blk_ioc_data	**idata;
+ 	unsigned int		ioc_count;
+ };
+-- 
+2.9.3
