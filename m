@@ -1,54 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:53630 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1760495AbdEXAea (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:34:30 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 06/31] scmd_eh_abort_handler(): Add a comment
-Date: Tue, 23 May 2017 17:33:55 -0700
-Message-ID: <20170524003420.5381-7-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+Return-Path: <linus.walleij@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <CAPDyKFpOj5tWuuEnwo-sTcN0rBCmz5r2YfT2HMSnEfMPc=+iRQ@mail.gmail.com>
+References: <20170518092936.9277-1-linus.walleij@linaro.org> <CAPDyKFpOj5tWuuEnwo-sTcN0rBCmz5r2YfT2HMSnEfMPc=+iRQ@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 19 May 2017 15:56:08 +0200
+Message-ID: <CACRpkdaG__UbL6vH_=AgtO95oeA60iuTGquwD1ADmU9LtT245Q@mail.gmail.com>
+Subject: Re: [PATCH 1/6 v2] mmc: core: Delete bounce buffer Kconfig option
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Adrian Hunter <adrian.hunter@intel.com>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-After the patch that introduced this function was posted on the
-linux-scsi mailing list an explanation was posted why this patch
-is correct. Since that explanation contains important information,
-add a summary of it above the code that explanation applies to.
-See also http://www.spinics.net/lists/linux-scsi/msg106326.html.
+On Fri, May 19, 2017 at 10:30 AM, Ulf Hansson <ulf.hansson@linaro.org> wrote:
 
-References: e494f6a72839 ("[SCSI] improve eh timeout handler")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Hannes Reinecke <hare@suse.de>
----
- drivers/scsi/scsi_error.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+> Thanks, the *series* applied for next! (Responding to patch1 as
+> couldn't find the cover-letter for v2).
 
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index ac3196420435..19cafa3efb17 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -116,6 +116,12 @@ static int scsi_host_eh_past_deadline(struct Scsi_Host *shost)
- /**
-  * scmd_eh_abort_handler - Handle command aborts
-  * @work:	command to be aborted.
-+ *
-+ * Note: this function must be called only for a command that has timed out.
-+ * Because the block layer sets REQ_ATOM_COMPLETE before it calls
-+ * scsi_times_out(), any .scsi_done() calls from the LLD for commands that
-+ * have timed out do not have any effect. Hence it is safe to call
-+ * scsi_finish_command() from this function.
-  */
- void
- scmd_eh_abort_handler(struct work_struct *work)
--- 
-2.12.2
+Awesome, and just to make sure you will not be bored in the weekend
+I just sent a sequel series expanding the use of per-request datas
+to move more host locking and congestion out of the way.
+
+Yours,
+Linus Walleij
