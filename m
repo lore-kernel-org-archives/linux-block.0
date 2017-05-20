@@ -1,36 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48312 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750789AbdEBKV0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 May 2017 06:21:26 -0400
-Date: Tue, 2 May 2017 12:21:23 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Treat REQ_FUA and REQ_PREFLUSH as synchronous
-Message-ID: <20170502102123.GE13916@quack2.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	Zhang Yi <yizhan@redhat.com>,
+	linux-block@vger.kernel.org,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 0/3] nvme: fix hang in path of removing disk
+Date: Sat, 20 May 2017 11:56:02 +0800
+Message-Id: <20170520035605.21785-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+The first two patches fixes hang during removing disk.
 
-Commit b685d3d65ac7 "block: treat REQ_FUA and REQ_PREFLUSH as synchronous"
-made requests with REQ_FUA and REQ_PREFLUSH to be treated as synchronous
-and dropped REQ_SYNC from definitions of WRITE_FUA and friends. This
-however introduced a bunch of bugs to filesystems (I know about ext4,
-btrfs, f2fs, gfs2, reiserfs regressing because of this) because they
-implicitely expected REQ_FUA or REQ_PREFLUSH implies a synchronous request.
-At the first sight they do however generic_make_request_checks() will strip
-REQ_FUA and REQ_PREFLUSH flags from a bio if the underlying storage does
-not have volatile write cache and so writes suddenly become async. I will
-go and fix filesystems to explicitely set REQ_SYNC if they want sync
-behavior as that is a good cleanup anyway but I wanted to question whether
-it makes sense to treat REQ_FUA and REQ_PREFLUSH ops as synchronous in
-op_is_sync() since callers cannot rely on this anyway... Thoughts?
+The 3rd patch removes blk_mq_abort_requeue_list() since
+no one uses it any more.
 
-								Honza
+
+Ming Lei (3):
+  nvme: use blk_mq_start_hw_queues() in nvme_kill_queues()
+  nvme: avoid to use blk_mq_abort_requeue_list()
+  blk-mq: remove blk_mq_abort_requeue_list()
+
+ block/blk-mq.c           | 19 -------------------
+ drivers/nvme/host/core.c | 13 ++++++++++---
+ include/linux/blk-mq.h   |  1 -
+ 3 files changed, 10 insertions(+), 23 deletions(-)
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.9.4
