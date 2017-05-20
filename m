@@ -1,55 +1,51 @@
-Return-Path: <BATV+c76b9e6b5f659e20e25d+5017+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/7] blk-mq: include all present CPUs in the default queue mapping
-Date: Fri, 19 May 2017 10:57:54 +0200
-Message-Id: <20170519085756.29742-6-hch@lst.de>
-In-Reply-To: <20170519085756.29742-1-hch@lst.de>
-References: <20170519085756.29742-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme fixes for 4.12-rc2
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+References: <20170520131048.cjmpq2dnttritszb@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <660bcd31-3093-8bde-1d1c-b1dfe94cf57b@kernel.dk>
+Date: Sat, 20 May 2017 10:13:15 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170520131048.cjmpq2dnttritszb@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This way we get a nice distribution independent of the current cpu
-online / offline state.
+On 05/20/2017 07:10 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> a few fixes for 4.12-rc2.  There are a few more that we need to get into
+> 4.12, but I'd rather get the current queue to you ASAP.
+> 
+> 
+> The following changes since commit 56868a460b83c0f93d339256a81064d89aadae8e:
+> 
+>   Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide (2017-05-09 15:56:58 -0700)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.12
+> 
+> for you to fetch changes up to 3d5d1207d61b522b6aac24f896e53401e876b26e:
+> 
+>   nvmet: release the sq ref on rdma read errors (2017-05-11 12:52:46 +0200)
+> 
+> ----------------------------------------------------------------
+> James Smart (4):
+>       nvme-fc: correct port role bits
+>       nvme-fc: require target or discovery role for fc-nvme targets
+>       nvme-fc: stop queues on error detection
+>       nvmet-fc: remove target cpu scheduling flag
+> 
+> Jon Derrick (1):
+>       nvme: unmap CMB and remove sysfs file in reset path
+> 
+> Vijay Immanuel (1):
+>       nvmet: release the sq ref on rdma read errors
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-cpumap.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Thanks - I hand applied these, your base is much further ahead than my
+for-linus.
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 8e61e8640e17..5eaecd40f701 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -35,7 +35,6 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- {
- 	unsigned int *map = set->mq_map;
- 	unsigned int nr_queues = set->nr_hw_queues;
--	const struct cpumask *online_mask = cpu_online_mask;
- 	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
- 	cpumask_var_t cpus;
- 
-@@ -44,7 +43,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 
- 	cpumask_clear(cpus);
- 	nr_cpus = nr_uniq_cpus = 0;
--	for_each_cpu(i, online_mask) {
-+	for_each_present_cpu(i) {
- 		nr_cpus++;
- 		first_sibling = get_first_sibling(i);
- 		if (!cpumask_test_cpu(first_sibling, cpus))
-@@ -54,7 +53,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 
- 	queue = 0;
- 	for_each_possible_cpu(i) {
--		if (!cpumask_test_cpu(i, online_mask)) {
-+		if (!cpumask_test_cpu(i, cpu_present_mask)) {
- 			map[i] = 0;
- 			continue;
- 		}
 -- 
-2.11.0
+Jens Axboe
