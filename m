@@ -1,49 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:7422 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763368AbdEXAf0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:35:26 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 28/31] scsi_setup_fs_cmnd(): Call scsi_req_init() instead of open-coding it
-Date: Tue, 23 May 2017 17:34:17 -0700
-Message-ID: <20170524003420.5381-29-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.12-rc2
+Message-ID: <fa8c8e9b-3c23-ac92-56b7-037efeb8b405@kernel.dk>
+Date: Sat, 20 May 2017 17:07:27 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The only functional change is that this patch causes scsi_setup_fs_cmnd()
-to clear scsi_request.sense_len.
+Hi Linus,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
----
- drivers/scsi/scsi_lib.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+A small collection of fixes that should go into this cycle. This pull
+request contains:
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 612bf6c201dc..2d680d8ea80f 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1211,8 +1211,8 @@ static int scsi_setup_fs_cmnd(struct scsi_device *sdev, struct request *req)
- 			return ret;
- 	}
- 
--	cmd->cmnd = scsi_req(req)->cmd = scsi_req(req)->__cmd;
--	memset(cmd->cmnd, 0, BLK_MAX_CDB);
-+	scsi_req_init(&cmd->req);
-+	cmd->cmnd = scsi_req(req)->cmd;
- 	return scsi_cmd_to_driver(cmd)->init_command(cmd);
- }
- 
+- A pull request from Christoph for NVMe, which ended up being manually
+  applied to avoid pulling in newer bits in master. Mostly fibre channel
+  fixes from James, but also a few fixes from Jon and Vijay
+
+- A pull request from Konrad, with just a single fix for xen-blkback
+  from Gustavo.
+
+- A fuseblk bdi fix from Jan, fixing a regression in this series with
+  the dynamic backing devices.
+
+- A blktrace fix from Shaohua, replacing sscanf() with kstrtoull().
+
+- A request leak fix for drbd from Lars, fixing a regression in the last
+  series with the kref changes. This will go to stable as well.
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Gustavo A. R. Silva (1):
+      block: xen-blkback: add null check to avoid null pointer dereference
+
+James Smart (4):
+      nvme-fc: correct port role bits
+      nvme-fc: require target or discovery role for fc-nvme targets
+      nvme-fc: stop queues on error detection
+      nvmet-fc: remove target cpu scheduling flag
+
+Jan Kara (1):
+      fuseblk: Fix warning in super_setup_bdi_name()
+
+Jens Axboe (1):
+      Merge branch 'stable/for-jens-4.12' of git://git.kernel.org/.../konrad/xen into for-linus
+
+Jon Derrick (1):
+      nvme: unmap CMB and remove sysfs file in reset path
+
+Lars Ellenberg (1):
+      drbd: fix request leak introduced by locking/atomic, kref: Kill kref_sub()
+
+Shaohua Li (1):
+      blktrace: fix integer parse
+
+Vijay Immanuel (1):
+      nvmet: release the sq ref on rdma read errors
+
+ drivers/block/drbd/drbd_req.c      | 27 +++++++++++++++------------
+ drivers/block/xen-blkback/xenbus.c |  8 +++++---
+ drivers/nvme/host/fc.c             | 10 ++++++++++
+ drivers/nvme/host/pci.c            |  7 ++++++-
+ drivers/nvme/target/core.c         |  6 ++++++
+ drivers/nvme/target/fc.c           |  4 +---
+ drivers/nvme/target/fcloop.c       |  1 -
+ drivers/nvme/target/nvmet.h        |  1 +
+ drivers/nvme/target/rdma.c         |  1 +
+ drivers/scsi/lpfc/lpfc_nvmet.c     |  1 -
+ fs/fuse/inode.c                    |  9 ++++++++-
+ include/linux/nvme-fc-driver.h     | 16 ++++------------
+ kernel/trace/blktrace.c            |  4 ++--
+ 13 files changed, 59 insertions(+), 36 deletions(-)
+
 -- 
-2.12.2
+Jens Axboe
