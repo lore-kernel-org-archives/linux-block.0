@@ -1,35 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:48040 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751302AbdEUOdI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 May 2017 10:33:08 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "James.Bottomley@HansenPartnership.com"
-        <James.Bottomley@HansenPartnership.com>,
-        "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 02/18] bsg: Check private request size before attaching to
- a queue
-Date: Sun, 21 May 2017 14:33:05 +0000
-Message-ID: <1495377183.3192.1.camel@sandisk.com>
-References: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-         <20170519183016.12646-3-bart.vanassche@sandisk.com>
-         <20170521063237.GE12287@lst.de>
-In-Reply-To: <20170521063237.GE12287@lst.de>
-Content-Type: text/plain; charset="utf-8"
+Received: from verein.lst.de ([213.95.11.211]:42730 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750822AbdEUGcj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 21 May 2017 02:32:39 -0400
+Date: Sun, 21 May 2017 08:32:37 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 02/18] bsg: Check private request size before attaching
+        to a queue
+Message-ID: <20170521063237.GE12287@lst.de>
+References: <20170519183016.12646-1-bart.vanassche@sandisk.com> <20170519183016.12646-3-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170519183016.12646-3-bart.vanassche@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDE3LTA1LTIxIGF0IDA4OjMyICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gQW5kIGJ0dywgSSBkaWRuJ3QgZ2V0IHlvdXIgY292ZXIgbGV0dGVyIFswLzE4XSwgZGlk
-IHRoYXQgZ2V0IGxvc3QNCj4gc29tZXdoZXJlPw0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNClRoYW5r
-cyBmb3IgdGhlIHJldmlldyBjb21tZW50cy4gVGhlIGNvdmVyIGxldHRlciBzaG91bGQgaGF2ZSBt
-YWRlIGl0IHRvIGF0DQpsZWFzdCB0aGUgbGludXgtc2NzaSBtYWlsaW5nIGxpc3Qgc2luY2UgaXQg
-c2hvd3MgdXAgaW4gYXQgbGVhc3Qgb25lIGFyY2hpdmUgb2YNCnRoYXQgbWFpbGluZyBsaXN0OiBo
-dHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51eC1zY3NpL21zZzEwODk0MC5odG1sLg0K
-DQpCYXJ0Lg==
+Hi Bart,
+
+I think this is the wrong kind of check - while we do care about the
+size of the queue, we only do it as a side effect of the queue
+being able to handle REQ_OP_SCSI_IN/REQ_OP_SCSI_OUT commands.
+
+I think we'll need a flag for those in the queue instead.
+
+And btw, I didn't get your cover letter [0/18], did that get lost
+somewhere?
