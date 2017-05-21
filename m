@@ -1,83 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:29004 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933530AbdEVRHR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2017 13:07:17 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "James.Bottomley@HansenPartnership.com"
-        <James.Bottomley@HansenPartnership.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "axboe@fb.com" <axboe@fb.com>
+Received: from verein.lst.de ([213.95.11.211]:42737 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750822AbdEUGep (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 21 May 2017 02:34:45 -0400
+Date: Sun, 21 May 2017 08:34:43 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org, Jens Axboe <axboe@fb.com>,
+        Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>,
+        Hannes Reinecke <hare@suse.com>, linux-block@vger.kernel.org
 Subject: Re: [PATCH 07/18] block: Introduce request_queue.initialize_rq_fn()
-Date: Mon, 22 May 2017 17:07:13 +0000
-Message-ID: <1495472831.2610.4.camel@sandisk.com>
-References: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-         <20170519183016.12646-8-bart.vanassche@sandisk.com>
-         <20170521063443.GF12287@lst.de>
-In-Reply-To: <20170521063443.GF12287@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+Message-ID: <20170521063443.GF12287@lst.de>
+References: <20170519183016.12646-1-bart.vanassche@sandisk.com> <20170519183016.12646-8-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170519183016.12646-8-bart.vanassche@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sun, 2017-05-21 at 08:34 +0200, Christoph Hellwig wrote:
-> On Fri, May 19, 2017 at 11:30:05AM -0700, Bart Van Assche wrote:
-> > Several block drivers need to initialize the driver-private data
-> > after having called blk_get_request() and before .prep_rq_fn() is
-> > called, e.g. when submitting a REQ_OP_SCSI_* request. Avoid that
-> > that initialization code has to be repeated after every
-> > blk_get_request() call by adding a new callback function to struct
-> > request_queue.
-> >=20
-> > Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> > Cc: Jens Axboe <axboe@fb.com>
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Omar Sandoval <osandov@fb.com>
-> > Cc: Hannes Reinecke <hare@suse.com>
-> > Cc: linux-block@vger.kernel.org
-> > ---
-> >  block/blk-core.c       | 3 +++
-> >  block/blk-mq.c         | 3 +++
-> >  include/linux/blkdev.h | 4 ++++
-> >  3 files changed, 10 insertions(+)
-> >=20
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index a69d420b7ff0..f2540d164679 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -126,6 +126,9 @@ void blk_rq_init(struct request_queue *q, struct re=
-quest *rq)
-> >  	rq->start_time =3D jiffies;
-> >  	set_start_time_ns(rq);
-> >  	rq->part =3D NULL;
-> > +
-> > +	if (q->initialize_rq_fn)
-> > +		q->initialize_rq_fn(rq);
->=20
-> Can we keep this out of the fast path and only do it from the
-> blk_get_request / blk_mq_alloc_request path?  And while were at it
-> I think those two should be merged as far as the public interface
-> goes, that is we should also expose the flags argument for the
-> legacy path.
+On Fri, May 19, 2017 at 11:30:05AM -0700, Bart Van Assche wrote:
+> Several block drivers need to initialize the driver-private data
+> after having called blk_get_request() and before .prep_rq_fn() is
+> called, e.g. when submitting a REQ_OP_SCSI_* request. Avoid that
+> that initialization code has to be repeated after every
+> blk_get_request() call by adding a new callback function to struct
+> request_queue.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Jens Axboe <axboe@fb.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: linux-block@vger.kernel.org
+> ---
+>  block/blk-core.c       | 3 +++
+>  block/blk-mq.c         | 3 +++
+>  include/linux/blkdev.h | 4 ++++
+>  3 files changed, 10 insertions(+)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index a69d420b7ff0..f2540d164679 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -126,6 +126,9 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+>  	rq->start_time = jiffies;
+>  	set_start_time_ns(rq);
+>  	rq->part = NULL;
+> +
+> +	if (q->initialize_rq_fn)
+> +		q->initialize_rq_fn(rq);
 
-Hello Christoph,
-
-For blk-mq I could move the .initialize_rq_fn() call from
-blk_mq_rq_ctx_init() into blk_mq_sched_get_request(). I can't move it
-higher up in the request allocation call chain because otherwise
-blk_mq_alloc_request_hctx() wouldn't call .initialize_rq_fn().
-
-For blk-sq I'm not sure that the .initialize_rq_fn() call can be
-moved because I'd like all blk_rq_init() callers to call
-.initialize_rq_fn(), including ide_prep_sense().
-
-Are you sure it would help to move the .initialize_rq_fn() calls?
-
-Thanks,
-
-Bart.=
+Can we keep this out of the fast path and only do it from the
+blk_get_request / blk_mq_alloc_request path?  And while were at it
+I think those two should be merged as far as the public interface
+goes, that is we should also expose the flags argument for the
+legacy path.
