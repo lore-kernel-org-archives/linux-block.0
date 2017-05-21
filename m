@@ -1,53 +1,43 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH 04/18] cdrom: Check private request size before attaching to a queue
-Date: Fri, 19 May 2017 11:30:02 -0700
-Message-ID: <20170519183016.12646-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-References: <20170519183016.12646-1-bart.vanassche@sandisk.com>
+Return-Path: <minchan.kim@gmail.com>
+Return-Path: <minchan.kim@gmail.com>
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date: Sun, 21 May 2017 16:15:36 +0900
+From: Minchan Kim <minchan@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+	kernel-team <kernel-team@lge.com>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
+	axboe@kernel.dk, jlayton@redhat.com, tytso@mit.edu
+Subject: Re: [PATCH 2/2] zram: do not count duplicated pages as compressed
+Message-ID: <20170521071536.GA9377@bgram>
+References: <20170516073616.GB767@jagdpanzerIV.localdomain>
+ <20170517083212.GA25750@bbox>
+ <20170521070427.GB10453@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170521070427.GB10453@infradead.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Since the cdrom driver only supports request queues for which
-struct scsi_request is the first member of their private request
-data, refuse to register block layer queues for which the private
-data is smaller than struct scsi_request.
+On Sun, May 21, 2017 at 12:04:27AM -0700, Christoph Hellwig wrote:
+> On Wed, May 17, 2017 at 05:32:12PM +0900, Minchan Kim wrote:
+> > Is block device(esp, zram which is compressed ram block device) okay to
+> > return garbage when ongoing overwrite IO fails?
+> > 
+> > O_DIRECT write 4 block "aaa.." -> success
+> > read  4 block "aaa.." -> success
+> > O_DIRECT write 4 block "bbb.." -> fail
+> > read  4 block "000..' -> it is okay?
+> > 
+> > Hope to get an answer form experts. :)
+> 
+> It's "okay" as it's what existing real block devices do (at least on a
+> sector boundary).  It's not "nice" though, so if you can avoid it,
+> please do.
 
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: linux-block@vger.kernel.org
----
- drivers/cdrom/cdrom.c | 5 +++++
- 1 file changed, 5 insertions(+)
+That was my understanding so I wanted to avoid it for just simple
+code refactoring. Your comment helps to confirm the thhought.
 
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index 76c952fd9ab9..dc20e4368136 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -594,6 +594,11 @@ int register_cdrom(struct cdrom_device_info *cdi)
- 
- 	if (cdo->open == NULL || cdo->release == NULL)
- 		return -EINVAL;
-+	if (blk_queue_cmd_size(cdi->disk->queue) <
-+	    sizeof(struct scsi_request)) {
-+		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
-+		return -EINVAL;
-+	}
- 	if (!banner_printed) {
- 		pr_info("Uniform CD-ROM driver " REVISION "\n");
- 		banner_printed = 1;
--- 
-2.12.2
+Thanks, Christoph!
