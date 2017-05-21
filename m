@@ -1,43 +1,85 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	Zhang Yi <yizhan@redhat.com>,
-	linux-block@vger.kernel.org,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 0/3] nvme: fix hang in path of removing disk
-Date: Mon, 22 May 2017 23:05:02 +0800
-Message-Id: <20170522150505.452-1-ming.lei@redhat.com>
+Return-Path: <BATV+207f86e375be5294e3b5+5019+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Sun, 21 May 2017 00:12:37 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: axboe@kernel.dk
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>, fstests@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/9] bio-integrity: Do not allocate integrity context for
+ bio w/o data
+Message-ID: <20170521071237.GA23226@infradead.org>
+References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+ <1494429652-9488-2-git-send-email-dmonakhov@openvz.org>
+ <20170511073032.GA26586@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170511073032.GA26586@infradead.org>
 List-ID: <linux-block@vger.kernel.org>
 
-The first two patches fixes hang during removing disk.
+On Thu, May 11, 2017 at 12:30:32AM -0700, Christoph Hellwig wrote:
+> Jens, can you pick this up for 4.12?
 
-The 3rd patch removes blk_mq_abort_requeue_list() since
-no one uses it any more.
+ping?
 
-V3:
-	- adjust comments about 'Forcibly start all queues'
-	as suggested by Christoph
-
-V2:
-	- figure out one big issue is that we should start
-	queues unconditionally when killing queues
-	- fix requeue races in another way
-
-
-Ming Lei (3):
-  nvme: use blk_mq_start_hw_queues() in nvme_kill_queues()
-  nvme: avoid to use blk_mq_abort_requeue_list()
-  blk-mq: remove blk_mq_abort_requeue_list()
-
- block/blk-mq.c           | 19 -------------------
- drivers/nvme/host/core.c | 13 ++++++++++---
- include/linux/blk-mq.h   |  1 -
- 3 files changed, 10 insertions(+), 23 deletions(-)
-
--- 
-2.9.4
+> On Wed, May 10, 2017 at 07:20:44PM +0400, Dmitry Monakhov wrote:
+> > If bio has no data, such as ones from blkdev_issue_flush(),
+> > then we have nothing to protect.
+> > 
+> > This patch prevent bugon like follows:
+> > 
+> > kfree_debugcheck: out of range ptr ac1fa1d106742a5ah
+> > kernel BUG at mm/slab.c:2773!
+> > invalid opcode: 0000 [#1] SMP
+> > Modules linked in: bcache
+> > CPU: 0 PID: 4428 Comm: xfs_io Tainted: G        W       4.11.0-rc4-ext4-00041-g2ef0043-dirty #43
+> > Hardware name: Virtuozzo KVM, BIOS seabios-1.7.5-11.vz7.4 04/01/2014
+> > task: ffff880137786440 task.stack: ffffc90000ba8000
+> > RIP: 0010:kfree_debugcheck+0x25/0x2a
+> > RSP: 0018:ffffc90000babde0 EFLAGS: 00010082
+> > RAX: 0000000000000034 RBX: ac1fa1d106742a5a RCX: 0000000000000007
+> > RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88013f3ccb40
+> > RBP: ffffc90000babde8 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 00000000fcb76420 R11: 00000000725172ed R12: 0000000000000282
+> > R13: ffffffff8150e766 R14: ffff88013a145e00 R15: 0000000000000001
+> > FS:  00007fb09384bf40(0000) GS:ffff88013f200000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007fd0172f9e40 CR3: 0000000137fa9000 CR4: 00000000000006f0
+> > Call Trace:
+> >  kfree+0xc8/0x1b3
+> >  bio_integrity_free+0xc3/0x16b
+> >  bio_free+0x25/0x66
+> >  bio_put+0x14/0x26
+> >  blkdev_issue_flush+0x7a/0x85
+> >  blkdev_fsync+0x35/0x42
+> >  vfs_fsync_range+0x8e/0x9f
+> >  vfs_fsync+0x1c/0x1e
+> >  do_fsync+0x31/0x4a
+> >  SyS_fsync+0x10/0x14
+> >  entry_SYSCALL_64_fastpath+0x1f/0xc2
+> > 
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > Reviewed-by: Hannes Reinecke <hare@suse.com>
+> > Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> > Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+> > ---
+> >  block/bio-integrity.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> > index 5384713..b5009a8 100644
+> > --- a/block/bio-integrity.c
+> > +++ b/block/bio-integrity.c
+> > @@ -175,6 +175,9 @@ bool bio_integrity_enabled(struct bio *bio)
+> >  	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
+> >  		return false;
+> >  
+> > +	if (!bio_sectors(bio))
+> > +		return false;
+> > +
+> >  	/* Already protected? */
+> >  	if (bio_integrity(bio))
+> >  		return false;
+> > -- 
+> > 2.9.3
+> > 
+> ---end quoted text---
+---end quoted text---
