@@ -1,103 +1,73 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests 2/3] tests/sg: add SCSI generic test grouop
-Date: Thu, 18 May 2017 14:13:07 +0200
-Message-Id: <b9201d03f70519230dcffd5cfa92496a3bad5da4.1495109149.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1495109149.git.jthumshirn@suse.de>
-References: <cover.1495109149.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1495109149.git.jthumshirn@suse.de>
-References: <cover.1495109149.git.jthumshirn@suse.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	Zhang Yi <yizhan@redhat.com>,
+	linux-block@vger.kernel.org,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 3/3] blk-mq: remove blk_mq_abort_requeue_list()
+Date: Mon, 22 May 2017 23:05:05 +0800
+Message-Id: <20170522150505.452-4-ming.lei@redhat.com>
+In-Reply-To: <20170522150505.452-1-ming.lei@redhat.com>
+References: <20170522150505.452-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Add a test group for tests of the SCSI generic driver and and
-functions common to the SCSI generic driver and it's test cases.
+No one uses it any more, so remove it.
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Keith Busch <keith.busch@intel.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- common/sg      | 22 ++++++++++++++++++++++
- tests/sg/group | 40 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
- create mode 100644 common/sg
- create mode 100644 tests/sg/group
+ block/blk-mq.c         | 19 -------------------
+ include/linux/blk-mq.h |  1 -
+ 2 files changed, 20 deletions(-)
 
-diff --git a/common/sg b/common/sg
-new file mode 100644
-index 000000000000..30b5089c68f7
---- /dev/null
-+++ b/common/sg
-@@ -0,0 +1,22 @@
-+#!/bin/bash
-+#
-+# SCSI generic helper functions.
-+#
-+# Copyright (C) 2017 Johannes Thumshirn
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+_have_scsi_generic() {
-+	_have_module sg
-+}
-diff --git a/tests/sg/group b/tests/sg/group
-new file mode 100644
-index 000000000000..55af9a2730eb
---- /dev/null
-+++ b/tests/sg/group
-@@ -0,0 +1,40 @@
-+#!/bin/bash
-+#
-+# Regression tests for SCSI generic device
-+#
-+# Copyright (C) 2017 Johannes Thumshirn <jthumshirn@suse.de>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+. common/sg
-+
-+group_requires() {
-+	_have_scsi_generic
-+}
-+
-+# TODO: if this test group has extra requirements for what devices it can be
-+# run on, it should define a group_device_requires() function. If tests in this
-+# group can be run on the test device, it should return zero. Otherwise, it
-+# should return non-zero and set the $SKIP_REASON variable. $TEST_DEV is the
-+# full path of the block device (e.g., /dev/nvme0n1 or /dev/sda1), and
-+# $TEST_DEV_SYSFS is the sysfs path of the disk (not the partition, e.g.,
-+# /sys/block/nvme0n1 or /sys/block/sda).
-+#
-+# Usually, group_device_requires() just needs to check that the test device is
-+# the right type of hardware or supports any necessary features using the
-+# _test_dev_foo helpers. If group_device_requires() returns non-zero, all tests
-+# in this group will be skipped on that device.
-+# group_device_requires() {
-+# 	_test_dev_is_foo && _test_dev_supports_bar
-+# }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a69ad122ed66..f2224ffd225d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -628,25 +628,6 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q,
+ }
+ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
+ 
+-void blk_mq_abort_requeue_list(struct request_queue *q)
+-{
+-	unsigned long flags;
+-	LIST_HEAD(rq_list);
+-
+-	spin_lock_irqsave(&q->requeue_lock, flags);
+-	list_splice_init(&q->requeue_list, &rq_list);
+-	spin_unlock_irqrestore(&q->requeue_lock, flags);
+-
+-	while (!list_empty(&rq_list)) {
+-		struct request *rq;
+-
+-		rq = list_first_entry(&rq_list, struct request, queuelist);
+-		list_del_init(&rq->queuelist);
+-		blk_mq_end_request(rq, -EIO);
+-	}
+-}
+-EXPORT_SYMBOL(blk_mq_abort_requeue_list);
+-
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
+ {
+ 	if (tag < tags->nr_tags) {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index c47aa248c640..fcd641032f8d 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -238,7 +238,6 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ 				bool kick_requeue_list);
+ void blk_mq_kick_requeue_list(struct request_queue *q);
+ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
+-void blk_mq_abort_requeue_list(struct request_queue *q);
+ void blk_mq_complete_request(struct request *rq);
+ 
+ bool blk_mq_queue_stopped(struct request_queue *q);
 -- 
-2.12.0
+2.9.4
