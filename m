@@ -1,64 +1,74 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: fstests@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	dhowells@redhat.com,
-	linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org,
+	Zhang Yi <yizhan@redhat.com>,
 	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [xfstests PATCH v3 0/5] add a test for reporting writeback errors across all fds on fsync
-Date: Wed, 31 May 2017 09:08:15 -0400
-Message-Id: <20170531130820.17634-1-jlayton@redhat.com>
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v3 2/3] nvme: avoid to use blk_mq_abort_requeue_list()
+Date: Mon, 22 May 2017 23:05:04 +0800
+Message-Id: <20170522150505.452-3-ming.lei@redhat.com>
+In-Reply-To: <20170522150505.452-1-ming.lei@redhat.com>
+References: <20170522150505.452-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patchset is a companion to the Linux kernel patch series I recently
-posted with the cover letter:
+NVMe may add request into requeue list simply and not kick off the
+requeue if hw queues are stopped. Then blk_mq_abort_requeue_list()
+is called in both nvme_kill_queues() and nvme_ns_remove() for
+dealing with this issue.
 
-    [PATCH v5 00/17] fs: introduce new writeback error reporting and convert ext2 and ext4 to use it
+Unfortunately blk_mq_abort_requeue_list() is absolutely a
+race maker, for example, one request may be requeued during
+the aborting. So this patch just calls blk_mq_kick_requeue_list() in
+nvme_kill_queues() to handle this issue like what nvme_start_queues()
+does. Now all requests in requeue list when queues are stopped will be
+handled by blk_mq_kick_requeue_list() when queues are restarted, either
+in nvme_start_queues() or in nvme_kill_queues().
 
-That patchset adds a new userland-visible change to report errors on
-all open file descriptions when there is an error on fsync, not just
-the first one to race in.
+Cc: stable@vger.kernel.org
+Reported-by: Zhang Yi <yizhan@redhat.com>
+Reviewed-by: Keith Busch <keith.busch@intel.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/nvme/host/core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Note that this set contains a patch to emulate $SCRATCH_LOGDEV on btrfs,
-but the kernel patches for that are not quite ready yet. The test did
-pass on btrfs in an earlier incarnation of the set, however.
-
-Jeff Layton (5):
-  generic: add a writeback error handling test
-  ext4: allow ext4 to use $SCRATCH_LOGDEV
-  generic: test writeback error handling on dmerror devices
-  ext3: allow it to put journal on a separate device when doing
-    scratch_mkfs
-  btrfs: allow it to use $SCRATCH_LOGDEV
-
- common/dmerror             |  13 ++--
- common/rc                  |  16 ++++-
- doc/auxiliary-programs.txt |   8 +++
- src/Makefile               |   2 +-
- src/fsync-err.c            | 161 +++++++++++++++++++++++++++++++++++++++++++++
- tests/generic/998          |  64 ++++++++++++++++++
- tests/generic/998.out      |   2 +
- tests/generic/999          |  76 +++++++++++++++++++++
- tests/generic/999.out      |   3 +
- tests/generic/group        |   2 +
- tools/dmerror              |  44 +++++++++++++
- 11 files changed, 384 insertions(+), 7 deletions(-)
- create mode 100644 src/fsync-err.c
- create mode 100755 tests/generic/998
- create mode 100644 tests/generic/998.out
- create mode 100755 tests/generic/999
- create mode 100644 tests/generic/999.out
- create mode 100755 tools/dmerror
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 40d5e4a9e8d7..04e115834702 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2098,7 +2098,6 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+ 		if (ns->ndev)
+ 			nvme_nvm_unregister_sysfs(ns);
+ 		del_gendisk(ns->disk);
+-		blk_mq_abort_requeue_list(ns->queue);
+ 		blk_cleanup_queue(ns->queue);
+ 	}
+ 
+@@ -2436,7 +2435,6 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+ 			continue;
+ 		revalidate_disk(ns->disk);
+ 		blk_set_queue_dying(ns->queue);
+-		blk_mq_abort_requeue_list(ns->queue);
+ 
+ 		/*
+ 		 * Forcibly start all queues to avoid having stuck requests.
+@@ -2444,6 +2442,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+ 		 * when the final removal happens.
+ 		 */
+ 		blk_mq_start_hw_queues(ns->queue);
++
++		/* draining requests in requeue list */
++		blk_mq_kick_requeue_list(ns->queue);
+ 	}
+ 	mutex_unlock(&ctrl->namespaces_mutex);
+ }
 -- 
 2.9.4
