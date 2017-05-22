@@ -1,95 +1,100 @@
-Return-Path: <Avri.Altman@sandisk.com>
-From: Avri Altman <Avri.Altman@sandisk.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>, Linus Walleij
-	<linus.walleij@linaro.org>
-CC: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Adrian Hunter
-	<adrian.hunter@intel.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph
- Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>, Bartlomiej
- Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente
-	<paolo.valente@linaro.org>
-Subject: RE: [PATCH 0/6] More MMC block core refactorings
-Date: Mon, 22 May 2017 12:44:14 +0000
-Message-ID: <BY2PR0401MB09012CAF1776FF4D3496558CE5F80@BY2PR0401MB0901.namprd04.prod.outlook.com>
-References: <20170519133732.27470-1-linus.walleij@linaro.org>
- <CAPDyKFrRXmxKZTngMYtWZCi3ZTuSgRFnnHnxQxB1aEzHdiyc+Q@mail.gmail.com>
-In-Reply-To: <CAPDyKFrRXmxKZTngMYtWZCi3ZTuSgRFnnHnxQxB1aEzHdiyc+Q@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <ulf.hansson@linaro.org>
 MIME-Version: 1.0
+In-Reply-To: <20170519133732.27470-1-linus.walleij@linaro.org>
+References: <20170519133732.27470-1-linus.walleij@linaro.org>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Mon, 22 May 2017 14:05:09 +0200
+Message-ID: <CAPDyKFrRXmxKZTngMYtWZCi3ZTuSgRFnnHnxQxB1aEzHdiyc+Q@mail.gmail.com>
+Subject: Re: [PATCH 0/6] More MMC block core refactorings
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Adrian Hunter <adrian.hunter@intel.com>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVWxmIEhhbnNzb24gW21h
-aWx0bzp1bGYuaGFuc3NvbkBsaW5hcm8ub3JnXQ0KPiBTZW50OiBNb25kYXksIE1heSAyMiwgMjAx
-NyAzOjA1IFBNDQo+IFRvOiBMaW51cyBXYWxsZWlqIDxsaW51cy53YWxsZWlqQGxpbmFyby5vcmc+
-DQo+IENjOiBsaW51eC1tbWNAdmdlci5rZXJuZWwub3JnOyBBZHJpYW4gSHVudGVyIDxhZHJpYW4u
-aHVudGVyQGludGVsLmNvbT47DQo+IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgSmVucyBB
-eGJvZSA8YXhib2VAa2VybmVsLmRrPjsgQ2hyaXN0b3BoDQo+IEhlbGx3aWcgPGhjaEBsc3QuZGU+
-OyBBcm5kIEJlcmdtYW5uIDxhcm5kQGFybmRiLmRlPjsgQmFydGxvbWllag0KPiBab2xuaWVya2ll
-d2ljeiA8Yi56b2xuaWVya2llQHNhbXN1bmcuY29tPjsgUGFvbG8gVmFsZW50ZQ0KPiA8cGFvbG8u
-dmFsZW50ZUBsaW5hcm8ub3JnPjsgQXZyaSBBbHRtYW4gPEF2cmkuQWx0bWFuQHNhbmRpc2suY29t
-Pg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDAvNl0gTW9yZSBNTUMgYmxvY2sgY29yZSByZWZhY3Rv
-cmluZ3MNCj4gDQo+IE9uIDE5IE1heSAyMDE3IGF0IDE1OjM3LCBMaW51cyBXYWxsZWlqIDxsaW51
-cy53YWxsZWlqQGxpbmFyby5vcmc+IHdyb3RlOg0KPiA+IFRoaXMgc2VyaWVzIGJ1aWxkcyBvbiB0
-b3Agb2YgdGhlIHByZXZpb3VzIHNlcmllcyB0aGF0IGNyZWF0ZWQgY3VzdG9tDQo+ID4gRFJWX09Q
-IHJlcXVlc3RzIGZvciBpb2N0bCgpIG9wZXJhdGlvbnMgaW4gTU1DLg0KPiA+DQo+ID4gVGhlIGZp
-cnN0IHBhdGNoIGlzIGEgc3VnZ2VzdGlvbiBmcm9tIENocmlzdG9waCwgdGhlIHNlY29uZCBidWls
-ZHMNCj4gPiBpbmZyYXN0cnVjdHVyZSBmb3IgaXNzdWluZyBtb3JlLCBjdXJyZW50bHkgb3J0aG9n
-b25hbCBjdXN0b20NCj4gPiBvcGVyYXRpb25zIHRocm91Z2ggdGhlIGJsb2NrIGxheWVyLg0KPiA+
-DQo+ID4gVGhlIGZpcnN0IG9wZXJhdGlvbiB3ZSBtb3ZlIG92ZXIgaXMgcHJldHR5IHVuY29udHJv
-dmVyc2lhbCBhbmQNCj4gPiBzdHJhaWdodC1mb3J3YXJkOiBpdCBpcyB0aGUgb3BlcmF0aW9uIHRo
-YXQgd3JpdGUtcHJvdGVjdC1sb2NrcyB0aGUNCj4gPiBib290IHBhcnRpdGlvbnMgZnJvbSBzeXNm
-cy4gVGhpcyBpcyBub3cgZG9uZSB0aHJvdWdoIHRoZSBibG9jayBsYXllcg0KPiA+IHNvIHdlIGRv
-IG5vdCBuZWVkIHRvIGNvbmdlc3QgYW5kIHN0YXJ2ZSBpbiB0aGUgYmlnIE1NQyBsb2NrLg0KPiA+
-DQo+ID4gVGhlIGxhc3QgdHdvIHBhdGNoZXMgYXJlIG1vcmUgY29udG92ZXJzaWFsOiB0aGV5IG1v
-dmUgdGhlIHR3byBkZWJ1Z2ZzDQo+ID4gYWNjZXNzZXMgZm9yIHJlYWRpbmcgY2FyZCBzdGF0dXMg
-YW5kIEVYVCBDU0Qgb3ZlciB0byB1c2luZyB0aGUgYmxvY2sNCj4gPiBsYXllciBmdW5uZWwgKmlm
-KiAqcHJlc2VudCouDQo+ID4NCj4gPiBTbyBpZiB0aGUgYmxvY2sgbGF5ZXIgaXMgY29uZmlndXJl
-ZCBvdXQsIHRoZXNlIHdpbGwgc3RpbGwgaXNzdWUNCj4gPiBvcGVyYXRpb25zIGRpcmVjdGx5IGFu
-ZCB0YWtlIHRoZSBiaWcgTU1DIGxvY2suDQo+ID4NCj4gPiBUaGUgcGF0Y2ggc2VyaWVzIGlzIGZ1
-bGx5IEFCSSBzYWZlOiBhbnkgc2NyaXB0cyBvciBjb2RlIHVzaW5nIHRoZQ0KPiA+IGRlYnVnZnMg
-d2l0aCBvciB3aXRob3V0IHRoZSBibG9jayBsYXllciB3aWxsIHN0aWxsIHdvcmsuDQo+ID4NCj4g
-PiBIb3dldmVyIHRoaXMgbGVhdmVzIHRoZSBtbWNfY2FyZF9nZXQoKSBsb2NrcyBpbiB0aGUgYmxv
-Y2suaCBoZWFkZXIgZm9yDQo+ID4gdGhlICFDT05GSUdfTU1DX0JMT0NLIGNhc2UgYW5kIEknbSBu
-b3QgcmVhbGx5IGhhcHB5IHRvIGtlZXAgdGhlbQ0KPiA+IGFyb3VuZCwgdGhlIGlkZWEgaXMgdG8g
-dGVybWluYXRlIHRoZW0uDQo+ID4NCj4gPiBXYXlzIGZvcndhcmQgYWZ0ZXIgdGhlc2UgcGF0Y2hl
-czoNCj4gPg0KPiA+IC0gU2ltcGx5IHJlbW92ZSB0aGUgZGVidWdmcyBmaWxlcyBmb3Igc3RhdHVz
-IGFuZCBleHRfY3NkIGlmDQo+ID4gICB0aGUgYmxvY2sgbGF5ZXIgaXMgbm90IHRoZXJlLiBUaGUg
-ZGVidWdmcyBpcyBub3QgQUJJIGFmdGVyDQo+ID4gICBhbGwsIGFuZCB0aGVyZSBpcyBhbiBpb2N0
-bCgpIHRvIGRvIHRoZSBzYW1lIGpvYiwgYW5kDQo+ID4gICB0aGF0IGlzIHdoYXQgbW1jLXV0aWxz
-IGlzIHVzaW5nLg0KPiA+DQo+ID4gLSBTaW1wbHkgcmVtb3ZlIHRoZSBkZWJ1Z2ZzIGZpbGVzIGZv
-ciBzdGF0dXMgYW5kIGV4dF9jc2QNCj4gPiAgIGNvbXBsZXRlbHkgLSBhbmQgcmVxdWlyZSB1c2Vy
-cyB0byBzd2l0Y2ggdG8gdXNpbmcgdGhlDQo+ID4gICBpb2N0bCgpIG1tYy11dGlscyB3YXkgb2Yg
-ZG9pbmcgdGhpbmdzIGlmIHRoZXkgd2FudCB0bw0KPiA+ICAgaW5zcGVjdCB0aGVpciBNTUMvU0Qg
-Y2FyZHMuDQo+IA0KPiBJIGxpa2UgdGhpcyBhcHByb2FjaC4NCj4gDQo+IG1tYy11dGlscyBpcyBh
-bHNvIGZhciBiZXR0ZXIgaW4gcGFyc2luZyB0aGUgcmVzdWx0cyBmcm9tIGV4dCBjc2QgYW5kIHBy
-ZXNlbnRzDQo+IHRoZSBvdXRwdXQgaW4gYSBtb3JlIGh1bWFuIHJlYWRhYmxlIGZvcm1hdC4NCj4g
-DQo+IE1vcmVvdmVyLCBwZW9wbGUgdGhhdCBuZWVkcyB0byBkZWJ1ZyB0aGUgYmVoYXZpb3Igb2Yg
-YSBjYXJkIHNob3VsZCBsaWtlbHkNCj4gbm90IGhhdmUgYSBwcm9ibGVtIHdpdGggdXNpbmcgbW1j
-LXV0aWxzLg0KDQpUaG9zZSBkZWJ1Z2ZzIGVudHJpZXMgYXJlIHRoZXJlIGZvciBhZ2VzLCBhbmQg
-dGhlcmUgYXJlIHNvbWUgdXNlci1zcGFjZSB1dGlsaXRpZXMsDQogZS5nLiBmb3IgYmVuY2htYXJr
-aW5nIGV0Yy4gdGhhdCBjb3VudCBvbiBpdCBiZWluZyB0aGVyZSwgDQogYXMgdGhlIGtleSBpZGVu
-dGlmaWNhdGlvbiBjcml0ZXJpYSBpZiBhIG1tYyBkZXZpY2UgaXMgcHJlc2VudC4NCg0KDQo+IA0K
-PiA+DQo+ID4gLSBXYWl0IGFuZCBzZWU6IHdoZW4gSSBnZXQgdG8gcmVtb3ZpbmcgdGhlIGJpZyBN
-TUMgbG9jayBmcm9tDQo+ID4gICBTRElPIEkgd2lsbCBhbnl3YXkgaGF2ZSB0byBkZWFsIHdpdGgg
-dGhpcyBtZXNzIHNpbmNlDQo+ID4gICB0aGUgYmlnIGxvY2sgaXMgbm8gbW9yZSBhIGJsb2NrIGxh
-eWVyIHByb2JsZW0sIGJ1dCBhDQo+ID4gICBwcm9ibGVtIHdpdGggdGhlIGVudGlyZSBNTUMvU0Qv
-U0RJTyBzdGFjay4NCj4gPg0KPiA+IEluIGFueSBjYXNlOiB0aGVzZSBwYXRjaGVzIGZpeGVzIHRo
-ZSBzdGFydmF0aW9uIG9mIHRoZSBib290IHBhcnRpdGlvbg0KPiA+IGxvY2tpbmcgYW5kIHRoZSBk
-ZWJ1Z2ZzIGFjY2VzcyB3aGVuIHVzaW5nIHRoZSBibG9jayBsYXllciBoZWF2aWx5IGF0DQo+ID4g
-dGhlIHNhbWUgdGltZS4NCj4gPg0KPiA+IExpbnVzIFdhbGxlaWogKDYpOg0KPiA+ICAgbW1jOiBi
-bG9jazogcmVtb3ZlIHJlcSBiYWNrIHBvaW50ZXINCj4gPiAgIG1tYzogYmxvY2s6IFRhZyBEUlZf
-T1BzIHdpdGggYSBkcml2ZXIgb3BlcmF0aW9uIHR5cGUNCj4gPiAgIG1tYzogYmxvY2s6IE1vdmUg
-RFJWIE9QIGlzc3VlIGZ1bmN0aW9uDQo+ID4gICBtbWM6IGJsb2NrOiBNb3ZlIGJvb3QgcGFydGl0
-aW9uIGxvY2tpbmcgaW50byBhIGRyaXZlciBvcA0KPiA+ICAgbW1jOiBkZWJ1Z2ZzOiBNb3ZlIGNh
-cmQgc3RhdHVzIHJldHJpZXZlYWwgaW50byB0aGUgYmxvY2sgbGF5ZXINCj4gPiAgIG1tYzogZGVi
-dWdmczogTW92ZSBFWFQgQ1NEIGRlYnVnZnMgYWNjZXMgdG8gYmxvY2sgbGF5ZXINCj4gPg0KPiA+
-ICBkcml2ZXJzL21tYy9jb3JlL2Jsb2NrLmMgICB8IDE2OA0KPiArKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0NCj4gPiAgZHJpdmVycy9tbWMvY29yZS9ibG9jay5o
-ICAgfCAgNDkgKysrKysrKysrKysrKw0KPiA+ICBkcml2ZXJzL21tYy9jb3JlL2RlYnVnZnMuYyB8
-ICAxOSArLS0tLQ0KPiA+ICBkcml2ZXJzL21tYy9jb3JlL3F1ZXVlLmMgICB8ICAxMyArKy0tDQo+
-ID4gIGRyaXZlcnMvbW1jL2NvcmUvcXVldWUuaCAgIHwgIDI3ICsrKysrKystDQo+ID4gIDUgZmls
-ZXMgY2hhbmdlZCwgMjAwIGluc2VydGlvbnMoKyksIDc2IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4g
-LS0NCj4gPiAyLjkuMw0KPiA+DQo+IA0KPiBJIGRlY2lkZWQgdG8gcGljayBwYXRjaCAxLT40IGF0
-IHRoaXMgc3RhZ2UgYXMgdGhvc2UgbG9va3MgbmljZSBhbmQgY2xlYW4uIFRoZQ0KPiByZXN0IHdp
-bGwgbmVlZCBhIHJlLXNwaW4uDQo+IA0KPiBUaGFua3MgYW5kIGtpbmQgcmVnYXJkcw0KPiBVZmZl
-DQo=
+On 19 May 2017 at 15:37, Linus Walleij <linus.walleij@linaro.org> wrote:
+> This series builds on top of the previous series that created
+> custom DRV_OP requests for ioctl() operations in MMC.
+>
+> The first patch is a suggestion from Christoph, the second
+> builds infrastructure for issuing more, currently orthogonal
+> custom operations through the block layer.
+>
+> The first operation we move over is pretty uncontroversial
+> and straight-forward: it is the operation that
+> write-protect-locks the boot partitions from sysfs. This
+> is now done through the block layer so we do not need
+> to congest and starve in the big MMC lock.
+>
+> The last two patches are more contoversial: they move the
+> two debugfs accesses for reading card status and EXT CSD
+> over to using the block layer funnel *if* *present*.
+>
+> So if the block layer is configured out, these will still
+> issue operations directly and take the big MMC lock.
+>
+> The patch series is fully ABI safe: any scripts or code
+> using the debugfs with or without the block layer will
+> still work.
+>
+> However this leaves the mmc_card_get() locks in the block.h
+> header for the !CONFIG_MMC_BLOCK case and I'm not really happy
+> to keep them around, the idea is to terminate them.
+>
+> Ways forward after these patches:
+>
+> - Simply remove the debugfs files for status and ext_csd if
+>   the block layer is not there. The debugfs is not ABI after
+>   all, and there is an ioctl() to do the same job, and
+>   that is what mmc-utils is using.
+>
+> - Simply remove the debugfs files for status and ext_csd
+>   completely - and require users to switch to using the
+>   ioctl() mmc-utils way of doing things if they want to
+>   inspect their MMC/SD cards.
+
+I like this approach.
+
+mmc-utils is also far better in parsing the results from ext csd and
+presents the output in a more human readable format.
+
+Moreover, people that needs to debug the behavior of a card should
+likely not have a problem with using mmc-utils.
+
+>
+> - Wait and see: when I get to removing the big MMC lock from
+>   SDIO I will anyway have to deal with this mess since
+>   the big lock is no more a block layer problem, but a
+>   problem with the entire MMC/SD/SDIO stack.
+>
+> In any case: these patches fixes the starvation of the
+> boot partition locking and the debugfs access when using
+> the block layer heavily at the same time.
+>
+> Linus Walleij (6):
+>   mmc: block: remove req back pointer
+>   mmc: block: Tag DRV_OPs with a driver operation type
+>   mmc: block: Move DRV OP issue function
+>   mmc: block: Move boot partition locking into a driver op
+>   mmc: debugfs: Move card status retrieveal into the block layer
+>   mmc: debugfs: Move EXT CSD debugfs acces to block layer
+>
+>  drivers/mmc/core/block.c   | 168 ++++++++++++++++++++++++++++++++-------------
+>  drivers/mmc/core/block.h   |  49 +++++++++++++
+>  drivers/mmc/core/debugfs.c |  19 +----
+>  drivers/mmc/core/queue.c   |  13 ++--
+>  drivers/mmc/core/queue.h   |  27 +++++++-
+>  5 files changed, 200 insertions(+), 76 deletions(-)
+>
+> --
+> 2.9.3
+>
+
+I decided to pick patch 1->4 at this stage as those looks nice and
+clean. The rest will need a re-spin.
+
+Thanks and kind regards
+Uffe
