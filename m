@@ -1,96 +1,28 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 13/24] xfs: remove uuid_getnodeuniq and xfs_uu_t
-Date: Wed, 31 May 2017 18:18:15 +0200
-Message-Id: <20170531161826.23243-14-hch@lst.de>
-In-Reply-To: <20170531161826.23243-1-hch@lst.de>
-References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 22 May 2017 09:49:12 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "James.Bottomley@HansenPartnership.com"
+        <James.Bottomley@HansenPartnership.com>,
+        "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 02/18] bsg: Check private request size before attaching
+        to a queue
+Message-ID: <20170522074912.GA2081@lst.de>
+References: <20170519183016.12646-1-bart.vanassche@sandisk.com> <20170519183016.12646-3-bart.vanassche@sandisk.com> <20170521063237.GE12287@lst.de> <1495377183.3192.1.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1495377183.3192.1.camel@sandisk.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Opencode uuid_getnodeuniq in the only caller, and directly decode
-the uuid_t representation instead of using a structure cast for it.
+On Sun, May 21, 2017 at 02:33:05PM +0000, Bart Van Assche wrote:
+> Thanks for the review comments. The cover letter should have made it to at
+> least the linux-scsi mailing list since it shows up in at least one archive of
+> that mailing list: https://www.spinics.net/lists/linux-scsi/msg108940.html.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/uuid.c      | 25 -------------------------
- fs/xfs/uuid.h      |  1 -
- fs/xfs/xfs_mount.c |  5 ++++-
- 3 files changed, 4 insertions(+), 27 deletions(-)
-
-diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
-index 29ed78c8637b..737c186ea98b 100644
---- a/fs/xfs/uuid.c
-+++ b/fs/xfs/uuid.c
-@@ -17,31 +17,6 @@
-  */
- #include <xfs.h>
- 
--/* IRIX interpretation of an uuid_t */
--typedef struct {
--	__be32	uu_timelow;
--	__be16	uu_timemid;
--	__be16	uu_timehi;
--	__be16	uu_clockseq;
--	__be16	uu_node[3];
--} xfs_uu_t;
--
--/*
-- * uuid_getnodeuniq - obtain the node unique fields of a UUID.
-- *
-- * This is not in any way a standard or condoned UUID function;
-- * it just something that's needed for user-level file handles.
-- */
--void
--uuid_getnodeuniq(uuid_t *uuid, int fsid [2])
--{
--	xfs_uu_t *uup = (xfs_uu_t *)uuid;
--
--	fsid[0] = (be16_to_cpu(uup->uu_clockseq) << 16) |
--		   be16_to_cpu(uup->uu_timemid);
--	fsid[1] = be32_to_cpu(uup->uu_timelow);
--}
--
- int
- uuid_is_nil(uuid_t *uuid)
- {
-diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
-index 86bbed071e79..5aea49bf0963 100644
---- a/fs/xfs/uuid.h
-+++ b/fs/xfs/uuid.h
-@@ -19,6 +19,5 @@
- #define __XFS_SUPPORT_UUID_H__
- 
- extern int uuid_is_nil(uuid_t *uuid);
--extern void uuid_getnodeuniq(uuid_t *uuid, int fsid [2]);
- 
- #endif	/* __XFS_SUPPORT_UUID_H__ */
-diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
-index 2eaf81859166..51f7d03ef86c 100644
---- a/fs/xfs/xfs_mount.c
-+++ b/fs/xfs/xfs_mount.c
-@@ -793,7 +793,10 @@ xfs_mountfs(
- 	 *  Copies the low order bits of the timestamp and the randomly
- 	 *  set "sequence" number out of a UUID.
- 	 */
--	uuid_getnodeuniq(&sbp->sb_uuid, mp->m_fixedfsid);
-+	mp->m_fixedfsid[0] =
-+		(get_unaligned_be16(&sbp->sb_uuid.b[8]) << 16) |
-+		 get_unaligned_be16(&sbp->sb_uuid.b[4]);
-+	mp->m_fixedfsid[1] = get_unaligned_be32(&sbp->sb_uuid.b[0]);
- 
- 	mp->m_dmevmask = 0;	/* not persistent; set after each mount */
- 
--- 
-2.11.0
+Yes, I see it on the list now.  But it's missing various Cc that the
+actual patches have, including that to me, which seems a bit broken.
