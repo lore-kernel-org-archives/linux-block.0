@@ -1,73 +1,23 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org,
-	Zhang Yi <yizhan@redhat.com>,
-	linux-block@vger.kernel.org,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 3/3] blk-mq: remove blk_mq_abort_requeue_list()
-Date: Mon, 22 May 2017 23:05:05 +0800
-Message-Id: <20170522150505.452-4-ming.lei@redhat.com>
-In-Reply-To: <20170522150505.452-1-ming.lei@redhat.com>
-References: <20170522150505.452-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/4] blk-throttle: fix a few issues
+To: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org
+Cc: tj@kernel.org, Kernel-team@fb.com
+References: <cover.1495050247.git.shli@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <32753a32-bb46-6bf1-dead-6b794145f7b6@kernel.dk>
+Date: Mon, 22 May 2017 14:45:56 -0600
+MIME-Version: 1.0
+In-Reply-To: <cover.1495050247.git.shli@fb.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-No one uses it any more, so remove it.
+On 05/17/2017 02:07 PM, Shaohua Li wrote:
+> Hi,
+> 
+> The patchset fix a few issues for io.low limit. The title of the patches
+> explain the issues pretty well.
 
-Reviewed-by: Keith Busch <keith.busch@intel.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c         | 19 -------------------
- include/linux/blk-mq.h |  1 -
- 2 files changed, 20 deletions(-)
+Looks good to me, added for 4.12-rc3.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a69ad122ed66..f2224ffd225d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -628,25 +628,6 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q,
- }
- EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
- 
--void blk_mq_abort_requeue_list(struct request_queue *q)
--{
--	unsigned long flags;
--	LIST_HEAD(rq_list);
--
--	spin_lock_irqsave(&q->requeue_lock, flags);
--	list_splice_init(&q->requeue_list, &rq_list);
--	spin_unlock_irqrestore(&q->requeue_lock, flags);
--
--	while (!list_empty(&rq_list)) {
--		struct request *rq;
--
--		rq = list_first_entry(&rq_list, struct request, queuelist);
--		list_del_init(&rq->queuelist);
--		blk_mq_end_request(rq, -EIO);
--	}
--}
--EXPORT_SYMBOL(blk_mq_abort_requeue_list);
--
- struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
- {
- 	if (tag < tags->nr_tags) {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index c47aa248c640..fcd641032f8d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -238,7 +238,6 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
- 				bool kick_requeue_list);
- void blk_mq_kick_requeue_list(struct request_queue *q);
- void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
--void blk_mq_abort_requeue_list(struct request_queue *q);
- void blk_mq_complete_request(struct request *rq);
- 
- bool blk_mq_queue_stopped(struct request_queue *q);
 -- 
-2.9.4
+Jens Axboe
