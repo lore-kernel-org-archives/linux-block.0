@@ -1,45 +1,88 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33663 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933221AbdEWG6i (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 02:58:38 -0400
-Subject: Re: [PATCH blktests v2 3/3] sg/001: add regression test for syzcaller
- generated GPF in sg_read path
-To: Omar Sandoval <osandov@osandov.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 22 May 2017 10:59:05 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
 Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH blktests v2 3/3] sg/001: add regression test for
+ syzcaller generated GPF in sg_read path
+Message-ID: <20170522175905.GA17738@vader.DHCP.thefacebook.com>
 References: <cover.1495201975.git.jthumshirn@suse.de>
  <79600648b662bc8b9e701ff6627986887384585b.1495201975.git.jthumshirn@suse.de>
- <20170522175905.GA17738@vader.DHCP.thefacebook.com>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Message-ID: <b8de93e9-af4b-d0fc-270e-b938f68688b4@suse.de>
-Date: Tue, 23 May 2017 08:58:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170522175905.GA17738@vader.DHCP.thefacebook.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <79600648b662bc8b9e701ff6627986887384585b.1495201975.git.jthumshirn@suse.de>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 05/22/2017 07:59 PM, Omar Sandoval wrote:
-> This looks much better, thanks! One question for you: is there any value
-> in running this on specific test devices (i.e., changing test() to
-> test_device() and using "$TEST_DEV" instead of a scsi-debug device), or
-> would it be a waste of time since it's just exercising generic code?
+On Fri, May 19, 2017 at 03:55:31PM +0200, Johannes Thumshirn wrote:
+> Add a regression test for commit 48ae8484e9fc ("scsi: sg: don't return
+> bogus Sg_requests"). This is a general protection fault triggered by
+> syzcaller via issuing bogus read(2)s on the /dev/sg devices.
+> 
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  tests/sg/001     | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/sg/001.out |  2 ++
+>  2 files changed, 49 insertions(+)
+>  create mode 100755 tests/sg/001
+>  create mode 100644 tests/sg/001.out
+> 
+> diff --git a/tests/sg/001 b/tests/sg/001
+> new file mode 100755
+> index 000000000000..86430409b6a3
+> --- /dev/null
+> +++ b/tests/sg/001
+> @@ -0,0 +1,47 @@
+> +#!/bin/bash
+> +#
+> +# Regression test for commit 48ae8484e9fc ("scsi: sg: don't return bogus
+> +# Sg_requests")
+> +#
+> +# Copyright (C) 2017 Johannes Thumshirn <jthumshirn@suse.de>
+> +#
+> +# This program is free software: you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation, either version 3 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +
+> +. common/sg
+> +. common/scsi_debug
+> +
+> +DESCRIPTION="try triggering a kernel GPF with 0 byte SG reads"
+> +QUICK=1
+> +
+> +requires() {
+> +	_have_program src/sg-001 \
+> +	    && _have_scsi_debug \
+> +	    && _have_scsi_generic
+> +}
+> +
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	if ! _get_scsi_debug_dev; then
+> +	    return 1
+> +	fi
+> +
+> +	SG_DEV=$(_get_sg_from_blockdev "$SCSI_DEBUG_NAME")
+> +	timeout -s INT 10s ./src/sg-001 "$SG_DEV"
+> +
+> +	_put_scsi_debug_dev
+> +
+> +	echo "Test complete"
+> +}
 
-That's just generic code. All I need is a SCSI device so I get a /dev/sg
-device node.
-
-One could do a check if $TEST_DEV is a SCSI device and have a fall-back
-to scsi_debug if it isn't, but I'm not sure if this isn't just a waste
-of time.
-
-Byte,
-	Johannes
-
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+This looks much better, thanks! One question for you: is there any value
+in running this on specific test devices (i.e., changing test() to
+test_device() and using "$TEST_DEV" instead of a scsi-debug device), or
+would it be a waste of time since it's just exercising generic code?
