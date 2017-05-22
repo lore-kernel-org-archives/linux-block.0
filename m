@@ -1,70 +1,34 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 17/27] mm: remove AS_EIO and AS_ENOSPC flags
-Date: Tue,  9 May 2017 11:49:20 -0400
-Message-Id: <20170509154930.29524-18-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <jthumshirn@suse.de>
+Subject: Re: [PATCH v2 3/3] blk-mq: remove blk_mq_abort_requeue_list()
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org, Zhang Yi <yizhan@redhat.com>,
+ linux-block@vger.kernel.org
+References: <20170520035605.21785-1-ming.lei@redhat.com>
+ <20170520035605.21785-4-ming.lei@redhat.com>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <36461789-9377-a245-0920-5e6ee671f5bb@suse.de>
+Date: Mon, 22 May 2017 09:43:11 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170520035605.21785-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-They're no longer used.
+On 05/20/2017 05:56 AM, Ming Lei wrote:
+> No one uses it any more, so remove it.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- include/linux/pagemap.h | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 32512ffc15fa..9593eac41499 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -20,13 +20,11 @@
-  * Bits in mapping->flags.
-  */
- enum mapping_flags {
--	AS_EIO		= 0,	/* IO error on async write */
--	AS_ENOSPC	= 1,	/* ENOSPC on async write */
--	AS_MM_ALL_LOCKS	= 2,	/* under mm_take_all_locks() */
--	AS_UNEVICTABLE	= 3,	/* e.g., ramdisk, SHM_LOCK */
--	AS_EXITING	= 4, 	/* final truncate in progress */
-+	AS_MM_ALL_LOCKS	= 0,	/* under mm_take_all_locks() */
-+	AS_UNEVICTABLE	= 1,	/* e.g., ramdisk, SHM_LOCK */
-+	AS_EXITING	= 2, 	/* final truncate in progress */
- 	/* writeback related tags are not used */
--	AS_NO_WRITEBACK_TAGS = 5,
-+	AS_NO_WRITEBACK_TAGS = 3,
- };
- 
- static inline void mapping_set_error(struct address_space *mapping, int error)
+
 -- 
-2.9.3
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
