@@ -1,38 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55423 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753638AbdERHgY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2017 03:36:24 -0400
-To: Omar Sandoval <osandov@osandov.com>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Subject: blktests and /dev/sg syzkaller reproducers
-Message-ID: <ed7bae97-5623-2191-f46d-4fc288eda13e@suse.de>
-Date: Thu, 18 May 2017 09:36:17 +0200
+Return-Path: <hch@lst.de>
+Date: Tue, 23 May 2017 11:37:35 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/7] genirq/affinity: factor out a irq_affinity_set
+	helper
+Message-ID: <20170523093735.GC23632@lst.de>
+References: <20170519085756.29742-1-hch@lst.de> <20170519085756.29742-4-hch@lst.de> <alpine.DEB.2.20.1705212052000.3023@nanos>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.20.1705212052000.3023@nanos>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Omar,
+On Sun, May 21, 2017 at 09:03:06PM +0200, Thomas Gleixner wrote:
+> > +{
+> > +	struct irq_data *data = irq_desc_get_irq_data(desc);
+> > +	struct irq_chip *chip = irq_data_get_irq_chip(data);
+> > +	bool ret = false;
+> > +
+> > +	if (!irqd_can_move_in_process_context(data) && chip->irq_mask)
+> 
+> Using that inline directly will make this function useless on architectures
+> which have GENERIC_PENDING_IRQS not set.
+> 
+> kernel/irq/manage.c has that wrapped. We need to move those wrappers to the
+> internal header file, so that it gets compiled out on other platforms.
 
-I was thinking of adding some of the syszcaller reproducers I've
-collected, which have been crashing the SCSI generic driver.
-
-This would require blktests to have a build infrastructure (not a big
-deal I know).
-
-So my question is, are you comfortable with adding these tests (in a new
-group probably) I'll look through my reproducer collection and work on a
-patch set.
-
-Byte,
-	Johannes
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Ok, will do.
