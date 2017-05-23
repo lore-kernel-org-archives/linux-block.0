@@ -1,109 +1,21 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:26 +1000
-Subject: [PATCH 12/13] block: remove bio_clone() and all references.
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org
-Message-ID: <149369654617.5146.3832882299237790310.stgit@noble>
-In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
-References: <149369628671.5146.4865312503373040039.stgit@noble>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: fix an error code in add_partition()
+To: Dan Carpenter <dan.carpenter@oracle.com>, Will Drewry <wad@chromium.org>
+Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20170523142836.GB28346@elgon.mountain>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6691b746-45c7-a366-1a5c-741a369fd4b2@kernel.dk>
+Date: Tue, 23 May 2017 08:42:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170523142836.GB28346@elgon.mountain>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-bio_clone() is no longer used.
-Only bio_clone_bioset() or bio_clone_fast().
-This is for the best, as bio_clone() used fs_bio_set,
-and filesystems are unlikely to want to use bio_clone().
+On 05/23/2017 08:28 AM, Dan Carpenter wrote:
+> We don't set an error code on this path.  It means that we return NULL
+> instead of an error pointer and the caller does a NULL dereference.
 
-So remove bio_clone() and all references.
-This includes a fix to some incorrect documentation.
+Thanks Dan, applied.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: NeilBrown <neilb@suse.com>
----
- Documentation/block/biodoc.txt |    2 +-
- block/bio.c                    |    2 +-
- block/blk-merge.c              |    6 +++---
- drivers/md/md.c                |    2 +-
- include/linux/bio.h            |    5 -----
- 5 files changed, 6 insertions(+), 11 deletions(-)
-
-diff --git a/Documentation/block/biodoc.txt b/Documentation/block/biodoc.txt
-index 01ddeaf64b0f..9490f2845f06 100644
---- a/Documentation/block/biodoc.txt
-+++ b/Documentation/block/biodoc.txt
-@@ -632,7 +632,7 @@ to i/o submission, if the bio fields are likely to be accessed after the
- i/o is issued (since the bio may otherwise get freed in case i/o completion
- happens in the meantime).
- 
--The bio_clone() routine may be used to duplicate a bio, where the clone
-+The bio_clone_fast() routine may be used to duplicate a bio, where the clone
- shares the bio_vec_list with the original bio (i.e. both point to the
- same bio_vec_list). This would typically be used for splitting i/o requests
- in lvm or md.
-diff --git a/block/bio.c b/block/bio.c
-index 257606e742e0..d82f6da94421 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -547,7 +547,7 @@ EXPORT_SYMBOL(zero_fill_bio);
-  *
-  * Description:
-  *   Put a reference to a &struct bio, either one you have gotten with
-- *   bio_alloc, bio_get or bio_clone. The last put of a bio will free it.
-+ *   bio_alloc, bio_get or bio_clone_*. The last put of a bio will free it.
-  **/
- void bio_put(struct bio *bio)
- {
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 51c84540d3bb..e7862e9dcc39 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -115,13 +115,13 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		 * With arbitrary bio size, the incoming bio may be very
- 		 * big. We have to split the bio into small bios so that
- 		 * each holds at most BIO_MAX_PAGES bvecs because
--		 * bio_clone() can fail to allocate big bvecs.
-+		 * bio_clone_bioset() can fail to allocate big bvecs.
- 		 *
--		 * Those drivers which will need to use bio_clone()
-+		 * Those drivers which will need to use bio_clone_bioset()
- 		 * should tell us in some way.  For now, impose the
- 		 * BIO_MAX_PAGES limit on all queues.
- 		 *
--		 * TODO: handle users of bio_clone() differently.
-+		 * TODO: handle users of bio_clone_bioset() differently.
- 		 */
- 		if (bvecs++ >= BIO_MAX_PAGES)
- 			goto split;
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 1379fb636de2..cd2fa40e9af3 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -185,7 +185,7 @@ static int start_readonly;
- static bool create_on_open = true;
- 
- /* bio_clone_mddev
-- * like bio_clone, but with a local bio set
-+ * like bio_clone_bioset, but with a local bio set
-  */
- 
- struct bio *bio_alloc_mddev(gfp_t gfp_mask, int nr_iovecs,
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 40e5d7b62f29..538c981ac26a 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -395,11 +395,6 @@ static inline struct bio *bio_alloc(gfp_t gfp_mask, unsigned int nr_iovecs)
- 	return bio_alloc_bioset(gfp_mask, nr_iovecs, fs_bio_set);
- }
- 
--static inline struct bio *bio_clone(struct bio *bio, gfp_t gfp_mask)
--{
--	return bio_clone_bioset(bio, gfp_mask, fs_bio_set);
--}
--
- static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
- {
- 	return bio_alloc_bioset(gfp_mask, nr_iovecs, NULL);
+-- 
+Jens Axboe
