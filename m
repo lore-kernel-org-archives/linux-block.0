@@ -1,66 +1,69 @@
-Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 04/13] dm: fix REQ_RAHEAD handling
-Date: Fri, 26 May 2017 11:56:11 +0300
-Message-Id: <20170526085620.3113-5-hch@lst.de>
-In-Reply-To: <20170526085620.3113-1-hch@lst.de>
-References: <20170526085620.3113-1-hch@lst.de>
+Return-Path: <Avri.Altman@sandisk.com>
+From: Avri Altman <Avri.Altman@sandisk.com>
+To: Linus Walleij <linus.walleij@linaro.org>, "linux-mmc@vger.kernel.org"
+	<linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, Adrian
+ Hunter <adrian.hunter@intel.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Arnd Bergmann
+	<arnd@arndb.de>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo
+ Valente <paolo.valente@linaro.org>
+Subject: RE: [PATCH 5/5] mmc: block: move multi-ioctl() to use block layer
+Date: Tue, 23 May 2017 10:51:42 +0000
+Message-ID: <BY2PR0401MB090174BB8EA9C92BF2711878E5F90@BY2PR0401MB0901.namprd04.prod.outlook.com>
+References: <20170510082418.10513-1-linus.walleij@linaro.org>
+ <20170510082418.10513-6-linus.walleij@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-A few (but not all) dm targets use a special EWOULDBLOCK error code for
-failing REQ_RAHEAD requests that fail due to a lack of available resources.
-But no one else knows about this magic code, and lower level drivers also
-don't generate it when failing read-ahead requests for similar reasons.
 
-So remove this special casing and ignore all additional error handling for
-REQ_RAHEAD - if this was a real underlying error we'd get a normal read
-once the real read comes in.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
----
- drivers/md/dm-raid1.c  | 4 ++--
- drivers/md/dm-stripe.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> -----Original Message-----
+> From: Avri Altman
+> Sent: Tuesday, May 23, 2017 12:21 PM
+> To: 'Linus Walleij' <linus.walleij@linaro.org>; linux-mmc@vger.kernel.org=
+; Ulf
+> Hansson <ulf.hansson@linaro.org>; Adrian Hunter
+> <adrian.hunter@intel.com>
+> Cc: linux-block@vger.kernel.org; Jens Axboe <axboe@kernel.dk>; Christoph
+> Hellwig <hch@lst.de>; Arnd Bergmann <arnd@arndb.de>; Bartlomiej
+> Zolnierkiewicz <b.zolnierkie@samsung.com>; Paolo Valente
+> <paolo.valente@linaro.org>
+> Subject: RE: [PATCH 5/5] mmc: block: move multi-ioctl() to use block laye=
+r
+>=20
+>=20
+>=20
+> > -----Original Message-----
+> > From: linux-mmc-owner@vger.kernel.org [mailto:linux-mmc-
+> > owner@vger.kernel.org] On Behalf Of Linus Walleij
+> > Sent: Wednesday, May 10, 2017 11:24 AM
+> > To: linux-mmc@vger.kernel.org; Ulf Hansson <ulf.hansson@linaro.org>;
+> > Adrian Hunter <adrian.hunter@intel.com>
+> > Cc: linux-block@vger.kernel.org; Jens Axboe <axboe@kernel.dk>;
+> > Christoph Hellwig <hch@lst.de>; Arnd Bergmann <arnd@arndb.de>;
+> > Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>; Paolo Valente
+> > <paolo.valente@linaro.org>; Linus Walleij <linus.walleij@linaro.org>
+> > Subject: [PATCH 5/5] mmc: block: move multi-ioctl() to use block layer
+> >
+> > This switches also the multiple-command ioctl() call to issue all
+> > ioctl()s through the block layer instead of going directly to the devic=
+e.
+> >
+> > We extend the passed argument with an argument count and loop over all
+> > passed commands in the ioctl() issue function called from the block lay=
+er.
+> >
+> > By doing this we are again loosening the grip on the big host lock,
+> > since two calls to mmc_get_card()/mmc_put_card() are removed.
+> >
+> > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> Tested-by: Avri Altman <Avri.Altman@sandisk.com>
 
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index a95cbb80fb34..5e30b08b91d9 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -1214,7 +1214,7 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
- 	 */
- 	if (!r || (r == -EWOULDBLOCK)) {
- 		if (bio->bi_opf & REQ_RAHEAD)
--			return -EWOULDBLOCK;
-+			return -EIO;
- 
- 		queue_bio(ms, bio, rw);
- 		return DM_MAPIO_SUBMITTED;
-@@ -1258,7 +1258,7 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (error == -EOPNOTSUPP)
- 		return error;
- 
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (unlikely(error)) {
-diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
-index 75152482f3ad..780e95889a7c 100644
---- a/drivers/md/dm-stripe.c
-+++ b/drivers/md/dm-stripe.c
-@@ -384,7 +384,7 @@ static int stripe_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (!error)
- 		return 0; /* I/O complete */
- 
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (error == -EOPNOTSUPP)
--- 
-2.11.0
+Few more words - we used mmc_utils to run ffu (field firmware update) that =
+uses multi-ioctl.
+We used Intel NUC with SanDisk storage - this way we could verify that inde=
+ed our fw is updated properly.
+
+Cheers,
+Avri
