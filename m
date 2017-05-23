@@ -1,62 +1,45 @@
-Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 01/15] nvme-lightnvm: use blk_execute_rq in nvme_nvm_submit_user_cmd
-Date: Thu, 18 May 2017 15:17:58 +0200
-Message-Id: <20170518131812.22956-2-hch@lst.de>
-In-Reply-To: <20170518131812.22956-1-hch@lst.de>
-References: <20170518131812.22956-1-hch@lst.de>
+Return-Path: <pierre@ossman.eu>
+Subject: Re: [RFC PATCH] mmc: core: Remove CONFIG_MMC_BLOCK_BOUNCE option.
+To: Linus Walleij <linus.walleij@linaro.org>,
+ "Steven J. Hill" <Steven.Hill@cavium.com>, Vinod Koul <vinod.koul@intel.com>
+Cc: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Adrian Hunter
+ <adrian.hunter@intel.com>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Arnd Bergmann <arnd@arndb.de>, Paolo Valente <paolo.valente@linaro.org>,
+ Daniel Mack <daniel@zonque.org>, Marc Zyngier <marc.zyngier@arm.com>
+References: <20170510082418.10513-1-linus.walleij@linaro.org>
+ <CGME20170510082450epcas1p148987e484907660670e2f875530c31c8@epcas1p1.samsung.com>
+ <20170510082418.10513-2-linus.walleij@linaro.org>
+ <3202707.f2tzK1cxd8@amdc3058>
+ <CACRpkdZp3JtnNrxsvtNT7hDB1w5KJomngs-=J8PG5fbDF=e+0w@mail.gmail.com>
+ <cc8694f6-4955-51d3-6342-107cfbb50ed2@cavium.com>
+ <CACRpkdYV2KfyRL6eweie3Yb-Em7L9X6Y3k=SOqO107oUX9MNbw@mail.gmail.com>
+From: Pierre Ossman <pierre@ossman.eu>
+Message-ID: <e38eb2c8-db91-1a36-925d-aa88be56a40b@ossman.eu>
+Date: Tue, 23 May 2017 20:24:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CACRpkdYV2KfyRL6eweie3Yb-Em7L9X6Y3k=SOqO107oUX9MNbw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of reinventing it poorly.
+On 23/05/17 11:05, Linus Walleij wrote:
+> 
+> Pierre, what host were you developing this for? Maybe I can try
+> to get the same and test it.
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Javier González <javier@cnexlabs.com>
----
- drivers/nvme/host/lightnvm.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+I think the work primarily was done with the Texas Instruments SDHCI 
+host that HP used in their laptops. Ricoh controllers were also popular, 
+but they had some proprietary mode that you had to get them out of.
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index f5df78ed1e10..f3885b5e56bd 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -571,13 +571,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
- 	.max_phys_sect		= 64,
- };
- 
--static void nvme_nvm_end_user_vio(struct request *rq, int error)
--{
--	struct completion *waiting = rq->end_io_data;
--
--	complete(waiting);
--}
--
- static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 				struct nvme_ns *ns,
- 				struct nvme_nvm_command *vcmd,
-@@ -608,7 +601,6 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 	rq->timeout = timeout ? timeout : ADMIN_TIMEOUT;
- 
- 	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
--	rq->end_io_data = &wait;
- 
- 	if (ppa_buf && ppa_len) {
- 		ppa_list = dma_pool_alloc(dev->dma_pool, GFP_KERNEL, &ppa_dma);
-@@ -662,9 +654,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
- 	}
- 
- submit:
--	blk_execute_rq_nowait(q, NULL, rq, 0, nvme_nvm_end_user_vio);
--
--	wait_for_completion_io(&wait);
-+	blk_execute_rq(q, NULL, rq, 0);
- 
- 	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
- 		ret = -EINTR;
+If I recall correctly, all early SDHCI controllers needed this feature. 
+I think scatter/gather was a later addition to the spec.
+
+I take it updates to the SD specification hasn't fixed this performance 
+issue?
+
+Regards
 -- 
-2.11.0
+Pierre Ossman
