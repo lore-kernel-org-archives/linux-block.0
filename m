@@ -1,60 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37330 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1758586AbdEZDJB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 23:09:01 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH 6/6] blk-mq: clarify dispatching won't be blocked by stopping queue
-Date: Fri, 26 May 2017 11:07:40 +0800
-Message-Id: <20170526030740.26959-8-ming.lei@redhat.com>
-In-Reply-To: <20170526030740.26959-1-ming.lei@redhat.com>
-References: <20170526030740.26959-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Subject: Re: [PATCH blktests v2 3/3] sg/001: add regression test for syzcaller
+ generated GPF in sg_read path
+To: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@osandov.com>
+Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+ Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
+References: <cover.1495201975.git.jthumshirn@suse.de>
+ <79600648b662bc8b9e701ff6627986887384585b.1495201975.git.jthumshirn@suse.de>
+ <20170522175905.GA17738@vader.DHCP.thefacebook.com>
+ <b8de93e9-af4b-d0fc-270e-b938f68688b4@suse.de>
+ <f278026c-42f6-9022-f72a-84439141f5d7@kernel.dk>
+ <491d4221-8d89-8284-0971-d6f0e47b6463@suse.de>
+ <5417a4c9-fb9f-af9e-fa4a-fffb113a0f30@kernel.dk>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <631117b1-9a4c-f91e-d884-72ff820d1afb@suse.de>
+Date: Tue, 23 May 2017 16:46:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <5417a4c9-fb9f-af9e-fa4a-fffb113a0f30@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-BLK_MQ_S_STOPPED may be not observed in other concurrent I/O paths,
-we can't guarantee that dispatching won't happen after queue
-is stopped.
+On 05/23/2017 04:39 PM, Jens Axboe wrote:
+> I tried to look up that commit:
+> 
+>  48ae8484e9fc ("scsi: sg: don't return bogus Sg_requests")
+> 
+> but that isn't in Linus' tree. Even searched for just the title, still
+> didn't find anything.
 
-So clarify the fact and avoid potential misuse.
+It's queued up in Martin's tree [1].
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+> 
+> I'm assuming this is a bug in the sg.c driver, in which case the 2/3
+> prep and real test case looks fine. For generic device testing, we
+> should just use SG_IO and not bother with sg.c at all. The world would
+> be a better place if we could just get rid of sg.c...
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 900eb91e0ece..32bed5bac7da 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1240,6 +1240,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
- 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
- }
- 
-+/*
-+ * Do not expect that dispatching or .queue_rq() can be blocked
-+ * after blk_mq_stop_hw_queue() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	__blk_mq_stop_hw_queue(hctx, false);
-@@ -1255,6 +1260,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
- 		__blk_mq_stop_hw_queue(hctx, sync);
- }
- 
-+/*
-+ * Do not expect that dispatching or .queue_rq() can be blocked
-+ * after blk_mq_stop_hw_queues() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queues(struct request_queue *q)
- {
- 	__blk_mq_stop_hw_queues(q, false);
+Agreed. Yes the bug is in the sg.c driver and we did have quite some of
+these lately thanks to the syzcaller folks.
+
+My intention with these tests was to have a place where we can throw in
+the syzcaller reproducers and run it in nicely Qemu.
+
+[1]
+https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git/commit/?h=4.12/scsi-fixes&id=48ae8484e9fc324b4968d33c585e54bc98e44d61
+
 -- 
-2.9.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
