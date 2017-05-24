@@ -1,139 +1,81 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:54147 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1760697AbdEXAfV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:35:21 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
+Received: from mx2.suse.de ([195.135.220.15]:60260 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933607AbdEXGMB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:12:01 -0400
+Subject: Re: [PATCH 25/31] scsi-mq: Make behavior scsi_mq_prep_fn() closer to
+ that of scsi_prep_fn()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>, "Christoph Hellwig" <hch@lst.de>,
-        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
-        Hannes Reinecke <hare@suse.com>, <stable@vger.kernel.org>
-Subject: [PATCH 09/31] block: Avoid that blk_exit_rl() triggers a use-after-free
-Date: Tue, 23 May 2017 17:33:58 -0700
-Message-ID: <20170524003420.5381-10-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
 References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-26-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <1a3c896d-000f-1d13-a618-20fdcee186b3@suse.de>
+Date: Wed, 24 May 2017 08:11:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170524003420.5381-26-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Since the introduction of the .init_rq_fn() and .exit_rq_fn() it
-is essential that the memory allocated for struct request_queue
-stays around until all blk_exit_rl() calls have finished. Hence
-make blk_init_rl() take a reference on struct request_queue.
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> Instead of clearing most of struct scsi_cmnd and reinitializing
+> it, rely on scsi_initialize_rq() for initialization of struct
+> scsi_cmnd. This patch fixes a bug, namely that it avoids that
+> jiffies_at_alloc gets overwritten if a request is requeued.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/scsi_lib.c | 12 +-----------
+>  1 file changed, 1 insertion(+), 11 deletions(-)
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 4b24c45fa113..12fd2bb0fe9c 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1861,27 +1861,17 @@ static int scsi_mq_prep_fn(struct request *req)
+>  	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+>  	struct scsi_device *sdev = req->q->queuedata;
+>  	struct Scsi_Host *shost = sdev->host;
+> -	unsigned char *sense_buf = cmd->sense_buffer;
+>  	struct scatterlist *sg;
+>  
+> -	/* zero out the cmd, except for the embedded scsi_request */
+> -	memset((char *)cmd + sizeof(cmd->req), 0,
+> -		sizeof(*cmd) - sizeof(cmd->req) + shost->hostt->cmd_size);
+> +	memset(scsi_cmd_priv(cmd), 0, shost->hostt->cmd_size);
+>  
+>  	req->special = cmd;
+>  
+>  	cmd->request = req;
+> -	cmd->device = sdev;
+> -	cmd->sense_buffer = sense_buf;
+>  
+>  	cmd->tag = req->tag;
+> -
+>  	cmd->prot_op = SCSI_PROT_NORMAL;
+>  
+> -	INIT_LIST_HEAD(&cmd->list);
+> -	INIT_DELAYED_WORK(&cmd->abort_work, scmd_eh_abort_handler);
+> -	cmd->jiffies_at_alloc = jiffies;
+> -
+>  	scsi_add_cmd_to_list(cmd);
+>  
+>  	sg = (void *)cmd + sizeof(struct scsi_cmnd) + shost->hostt->cmd_size;
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-This patch fixes the following crash:
+Cheers,
 
-general protection fault: 0000 [#2] SMP
-CPU: 3 PID: 28 Comm: ksoftirqd/3 Tainted: G      D         4.12.0-rc2-dbg+ #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.0.0-prebuilt.qemu-project.org 04/01/2014
-task: ffff88013a108040 task.stack: ffffc9000071c000
-RIP: 0010:free_request_size+0x1a/0x30
-RSP: 0018:ffffc9000071fd38 EFLAGS: 00010202
-RAX: 6b6b6b6b6b6b6b6b RBX: ffff880067362a88 RCX: 0000000000000003
-RDX: ffff880067464178 RSI: ffff880067362a88 RDI: ffff880135ea4418
-RBP: ffffc9000071fd40 R08: 0000000000000000 R09: 0000000100180009
-R10: ffffc9000071fd38 R11: ffffffff81110800 R12: ffff88006752d3d8
-R13: ffff88006752d3d8 R14: ffff88013a108040 R15: 000000000000000a
-FS:  0000000000000000(0000) GS:ffff88013fd80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa8ec1edb00 CR3: 0000000138ee8000 CR4: 00000000001406e0
-Call Trace:
- mempool_destroy.part.10+0x21/0x40
- mempool_destroy+0xe/0x10
- blk_exit_rl+0x12/0x20
- blkg_free+0x4d/0xa0
- __blkg_release_rcu+0x59/0x170
- rcu_process_callbacks+0x260/0x4e0
- __do_softirq+0x116/0x250
- smpboot_thread_fn+0x123/0x1e0
- kthread+0x109/0x140
- ret_from_fork+0x31/0x40
-
-Fixes: commit e9c787e65c0c ("scsi: allocate scsi_cmnd structures as part of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: <stable@vger.kernel.org> # v4.11+
----
- block/blk-cgroup.c |  2 +-
- block/blk-core.c   | 10 ++++++++--
- block/blk-sysfs.c  |  2 +-
- block/blk.h        |  2 +-
- 4 files changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 7c2947128f58..0480892e97e5 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -74,7 +74,7 @@ static void blkg_free(struct blkcg_gq *blkg)
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
- 
- 	if (blkg->blkcg != &blkcg_root)
--		blk_exit_rl(&blkg->rl);
-+		blk_exit_rl(blkg->q, &blkg->rl);
- 
- 	blkg_rwstat_exit(&blkg->stat_ios);
- 	blkg_rwstat_exit(&blkg->stat_bytes);
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c7068520794b..55a7b76db7c2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -648,13 +648,19 @@ int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 	if (!rl->rq_pool)
- 		return -ENOMEM;
- 
-+	if (rl != &q->root_rl)
-+		blk_get_queue(q);
-+
- 	return 0;
- }
- 
--void blk_exit_rl(struct request_list *rl)
-+void blk_exit_rl(struct request_queue *q, struct request_list *rl)
- {
--	if (rl->rq_pool)
-+	if (rl->rq_pool) {
- 		mempool_destroy(rl->rq_pool);
-+		if (rl != &q->root_rl)
-+			blk_put_queue(q);
-+	}
- }
- 
- struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 504fee940052..2ff8842f0dc1 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -809,7 +809,7 @@ static void blk_release_queue(struct kobject *kobj)
- 
- 	blk_free_queue_stats(q->stats);
- 
--	blk_exit_rl(&q->root_rl);
-+	blk_exit_rl(q, &q->root_rl);
- 
- 	if (q->queue_tags)
- 		__blk_queue_free_tags(q);
-diff --git a/block/blk.h b/block/blk.h
-index 2ed70228e44f..83c8e1100525 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -59,7 +59,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 		gfp_t gfp_mask);
--void blk_exit_rl(struct request_list *rl);
-+void blk_exit_rl(struct request_queue *q, struct request_list *rl);
- void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
- 			struct bio *bio);
- void blk_queue_bypass_start(struct request_queue *q);
+Hannes
 -- 
-2.12.2
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
