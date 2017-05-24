@@ -1,158 +1,63 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 1/6] mmc: block: remove req back pointer
-Date: Fri, 19 May 2017 15:37:27 +0200
-Message-Id: <20170519133732.27470-2-linus.walleij@linaro.org>
-In-Reply-To: <20170519133732.27470-1-linus.walleij@linaro.org>
-References: <20170519133732.27470-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:60775 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S934001AbdEXGOO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:14:14 -0400
+Subject: Re: [PATCH 29/31] scsi: snic: Remove code that zeroes driver-private
+ command data
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Narsimhulu Musini <nmusini@cisco.com>,
+        Sesidhar Baddela <sebaddel@cisco.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-30-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <cae81103-ea67-06c2-a7fb-32be3c8f5d82@suse.de>
+Date: Wed, 24 May 2017 08:14:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-30-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Just as we can use blk_mq_rq_from_pdu() to get the per-request
-tag we can use blk_mq_rq_to_pdu() to get a request from a tag.
-Introduce a static inline helper so we are on the clear what
-is happening.
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> Since the SCSI core zeroes driver-private command data, remove
+> that code from the snic driver.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Narsimhulu Musini <nmusini@cisco.com>
+> Cc: Sesidhar Baddela <sebaddel@cisco.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/snic/snic_scsi.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/scsi/snic/snic_scsi.c b/drivers/scsi/snic/snic_scsi.c
+> index da979a73baa0..05c3a7282d4a 100644
+> --- a/drivers/scsi/snic/snic_scsi.c
+> +++ b/drivers/scsi/snic/snic_scsi.c
+> @@ -359,8 +359,6 @@ snic_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *sc)
+>  	SNIC_SCSI_DBG(shost, "sc %p Tag %d (sc %0x) lun %lld in snic_qcmd\n",
+>  		      sc, snic_cmd_tag(sc), sc->cmnd[0], sc->device->lun);
+>  
+> -	memset(scsi_cmd_priv(sc), 0, sizeof(struct snic_internal_io_state));
+> -
+>  	ret = snic_issue_scsi_req(snic, tgt, sc);
+>  	if (ret) {
+>  		SNIC_HOST_ERR(shost, "Failed to Q, Scsi Req w/ err %d.\n", ret);
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/mmc/core/block.c |  8 ++++----
- drivers/mmc/core/queue.c | 13 +++++--------
- drivers/mmc/core/queue.h |  8 +++++++-
- 3 files changed, 16 insertions(+), 13 deletions(-)
+Cheers,
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index e9737987956f..553ab4d1db94 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1366,7 +1366,7 @@ static enum mmc_blk_status mmc_blk_err_check(struct mmc_card *card,
- 	struct mmc_queue_req *mq_mrq = container_of(areq, struct mmc_queue_req,
- 						    areq);
- 	struct mmc_blk_request *brq = &mq_mrq->brq;
--	struct request *req = mq_mrq->req;
-+	struct request *req = mmc_queue_req_to_req(mq_mrq);
- 	int need_retune = card->host->need_retune;
- 	bool ecc_err = false;
- 	bool gen_err = false;
-@@ -1473,7 +1473,7 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
- 	struct mmc_blk_data *md = mq->blkdata;
- 	struct mmc_card *card = md->queue.card;
- 	struct mmc_blk_request *brq = &mqrq->brq;
--	struct request *req = mqrq->req;
-+	struct request *req = mmc_queue_req_to_req(mqrq);
- 
- 	/*
- 	 * Reliable writes are used to implement Forced Unit Access and
-@@ -1578,7 +1578,7 @@ static void mmc_blk_rw_rq_prep(struct mmc_queue_req *mqrq,
- {
- 	u32 readcmd, writecmd;
- 	struct mmc_blk_request *brq = &mqrq->brq;
--	struct request *req = mqrq->req;
-+	struct request *req = mmc_queue_req_to_req(mqrq);
- 	struct mmc_blk_data *md = mq->blkdata;
- 	bool do_rel_wr, do_data_tag;
- 
-@@ -1760,7 +1760,7 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
- 		 */
- 		mq_rq =	container_of(old_areq, struct mmc_queue_req, areq);
- 		brq = &mq_rq->brq;
--		old_req = mq_rq->req;
-+		old_req = mmc_queue_req_to_req(mq_rq);
- 		type = rq_data_dir(old_req) == READ ? MMC_BLK_READ : MMC_BLK_WRITE;
- 		mmc_queue_bounce_post(mq_rq);
- 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index c18c41289ecf..4bf9978b707a 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -184,8 +184,6 @@ static int mmc_init_request(struct request_queue *q, struct request *req,
- 	struct mmc_card *card = mq->card;
- 	struct mmc_host *host = card->host;
- 
--	mq_rq->req = req;
--
- 	if (card->bouncesz) {
- 		mq_rq->bounce_buf = kmalloc(card->bouncesz, gfp);
- 		if (!mq_rq->bounce_buf)
-@@ -223,8 +221,6 @@ static void mmc_exit_request(struct request_queue *q, struct request *req)
- 
- 	kfree(mq_rq->sg);
- 	mq_rq->sg = NULL;
--
--	mq_rq->req = NULL;
- }
- 
- /**
-@@ -374,12 +370,13 @@ unsigned int mmc_queue_map_sg(struct mmc_queue *mq, struct mmc_queue_req *mqrq)
- 	unsigned int sg_len;
- 	size_t buflen;
- 	struct scatterlist *sg;
-+	struct request *req = mmc_queue_req_to_req(mqrq);
- 	int i;
- 
- 	if (!mqrq->bounce_buf)
--		return blk_rq_map_sg(mq->queue, mqrq->req, mqrq->sg);
-+		return blk_rq_map_sg(mq->queue, req, mqrq->sg);
- 
--	sg_len = blk_rq_map_sg(mq->queue, mqrq->req, mqrq->bounce_sg);
-+	sg_len = blk_rq_map_sg(mq->queue, req, mqrq->bounce_sg);
- 
- 	mqrq->bounce_sg_len = sg_len;
- 
-@@ -401,7 +398,7 @@ void mmc_queue_bounce_pre(struct mmc_queue_req *mqrq)
- 	if (!mqrq->bounce_buf)
- 		return;
- 
--	if (rq_data_dir(mqrq->req) != WRITE)
-+	if (rq_data_dir(mmc_queue_req_to_req(mqrq)) != WRITE)
- 		return;
- 
- 	sg_copy_to_buffer(mqrq->bounce_sg, mqrq->bounce_sg_len,
-@@ -417,7 +414,7 @@ void mmc_queue_bounce_post(struct mmc_queue_req *mqrq)
- 	if (!mqrq->bounce_buf)
- 		return;
- 
--	if (rq_data_dir(mqrq->req) != READ)
-+	if (rq_data_dir(mmc_queue_req_to_req(mqrq)) != READ)
- 		return;
- 
- 	sg_copy_from_buffer(mqrq->bounce_sg, mqrq->bounce_sg_len,
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index dfe481a8b5ed..2793020a3c8c 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -12,6 +12,13 @@ static inline struct mmc_queue_req *req_to_mmc_queue_req(struct request *rq)
- 	return blk_mq_rq_to_pdu(rq);
- }
- 
-+struct mmc_queue_req;
-+
-+static inline struct request *mmc_queue_req_to_req(struct mmc_queue_req *mqr)
-+{
-+	return blk_mq_rq_from_pdu(mqr);
-+}
-+
- struct task_struct;
- struct mmc_blk_data;
- struct mmc_blk_ioc_data;
-@@ -26,7 +33,6 @@ struct mmc_blk_request {
- };
- 
- struct mmc_queue_req {
--	struct request		*req;
- 	struct mmc_blk_request	brq;
- 	struct scatterlist	*sg;
- 	char			*bounce_buf;
+Hannes
 -- 
-2.9.3
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
