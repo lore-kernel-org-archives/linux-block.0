@@ -1,49 +1,78 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59589 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933607AbdEXGJE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2017 02:09:04 -0400
-Subject: Re: [PATCH 21/31] scsi: Move most of scsi_init_command() into
- scsi_initialize_rq()
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:21845 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1763366AbdEXAec (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 May 2017 20:34:32 -0400
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>,
         James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        "Bart Van Assche" <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 21/31] scsi: Move most of scsi_init_command() into scsi_initialize_rq()
+Date: Tue, 23 May 2017 17:34:10 -0700
+Message-ID: <20170524003420.5381-22-bart.vanassche@sandisk.com>
+In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
 References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
- <20170524003420.5381-22-bart.vanassche@sandisk.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <527d29a6-f4a8-b84f-4fec-47b4f0b96bf3@suse.de>
-Date: Wed, 24 May 2017 08:09:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170524003420.5381-22-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 05/24/2017 02:34 AM, Bart Van Assche wrote:
-> Move the initializations that only have to be performed once and
-> not every time a request is prepared from scsi_init_command()
-> into scsi_initialize_rq(). This patch also moves the
-> jiffies_at_alloc assignment such that it gets back the meaning it
-> had before commit e9c787e65c0c, namely the value of the jiffies
-> counter at request allocation time.
-> 
-> Fixes: commit e9c787e65c0c ("scsi: allocate scsi_cmnd structures as part of struct request")
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.de>
-> ---
->  drivers/scsi/scsi_lib.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Move the initializations that only have to be performed once and
+not every time a request is prepared from scsi_init_command()
+into scsi_initialize_rq(). This patch also moves the
+jiffies_at_alloc assignment such that it gets back the meaning it
+had before commit e9c787e65c0c, namely the value of the jiffies
+counter at request allocation time.
 
-Cheers,
+Fixes: commit e9c787e65c0c ("scsi: allocate scsi_cmnd structures as part of struct request")
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+---
+ drivers/scsi/scsi_lib.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-Hannes
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 5e2f26524475..d2e6b4c14e35 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1155,26 +1155,25 @@ void scsi_del_cmd_from_list(struct scsi_cmnd *cmd)
+ static void scsi_initialize_rq(struct request *rq)
+ {
+ 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
+-
+-	scsi_req_init(&cmd->req);
+-}
+-
+-/* Called after a request has been started. */
+-void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
+-{
++	struct scsi_device *dev = rq->q->queuedata;
+ 	void *buf = cmd->sense_buffer;
+ 	void *prot = cmd->prot_sdb;
+ 
+ 	/* zero out the cmd, except for the embedded scsi_request */
+ 	memset((char *)cmd + sizeof(cmd->req), 0,
+-		sizeof(*cmd) - sizeof(cmd->req) + dev->host->hostt->cmd_size);
+-
++	       sizeof(*cmd) - sizeof(cmd->req));
++	scsi_req_init(&cmd->req);
+ 	cmd->device = dev;
+ 	cmd->sense_buffer = buf;
+ 	cmd->prot_sdb = prot;
+ 	INIT_DELAYED_WORK(&cmd->abort_work, scmd_eh_abort_handler);
+ 	cmd->jiffies_at_alloc = jiffies;
++}
+ 
++/* Called after a request has been started. */
++void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
++{
++	memset(scsi_cmd_priv(cmd), 0, dev->host->hostt->cmd_size);
+ 	scsi_add_cmd_to_list(cmd);
+ }
+ 
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.12.2
