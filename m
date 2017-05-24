@@ -1,459 +1,217 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Omar Sandoval <osandov@fb.com>,
-        Hannes Reinecke <hare@suse.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH 08/18] block: Make scsi_req_init() calls implicit
-Date: Fri, 19 May 2017 11:30:06 -0700
-Message-ID: <20170519183016.12646-9-bart.vanassche@sandisk.com>
-In-Reply-To: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-References: <20170519183016.12646-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Matthew Wilcox <mawilcox@microsoft.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Stephen Bates <sbates@raithlin.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Jerome Glisse <jglisse@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 24 May 2017 15:42:11 -0600
+Message-Id: <1495662147-18277-1-git-send-email-logang@deltatee.com>
+Subject: [RFC PATCH 00/16] Unmappable memory in SGLs for p2p transfers
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of explicitly calling scsi_req_init(), let
-blk_get_request() call that function from inside blk_rq_init().
-Add an .initialize_rq_fn() callback function to the block drivers
-that need it. Merge the IDE .init_rq_fn() function into
-.initialize_rq_fn() because it is too small to keep it as a
-separate function.
+Hi,
 
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: linux-block@vger.kernel.org
----
- block/bsg.c                        |  1 -
- block/scsi_ioctl.c                 |  3 ---
- drivers/block/pktcdvd.c            |  1 -
- drivers/cdrom/cdrom.c              |  1 -
- drivers/ide/ide-atapi.c            |  2 --
- drivers/ide/ide-cd.c               |  1 -
- drivers/ide/ide-cd_ioctl.c         |  1 -
- drivers/ide/ide-devsets.c          |  1 -
- drivers/ide/ide-disk.c             |  1 -
- drivers/ide/ide-ioctls.c           |  2 --
- drivers/ide/ide-park.c             |  2 --
- drivers/ide/ide-pm.c               |  2 --
- drivers/ide/ide-probe.c            |  6 +++---
- drivers/ide/ide-tape.c             |  1 -
- drivers/ide/ide-taskfile.c         |  1 -
- drivers/scsi/osd/osd_initiator.c   |  2 --
- drivers/scsi/osst.c                |  1 -
- drivers/scsi/scsi_error.c          |  1 -
- drivers/scsi/scsi_lib.c            | 10 +++++++++-
- drivers/scsi/scsi_transport_sas.c  |  6 ++++++
- drivers/scsi/sg.c                  |  2 --
- drivers/scsi/st.c                  |  1 -
- drivers/target/target_core_pscsi.c |  2 --
- fs/nfsd/blocklayout.c              |  1 -
- 24 files changed, 18 insertions(+), 34 deletions(-)
+This RFC patchset continues my work attempting to enforce iomem safety
+within scatterlists. This takes a bit of a different tack from my
+last series [1] which tried to introduce a common scatterlist mapping
+function. Instead, this series takes the approach of marking SGLs that
+may contain unmappable memory and fencing off only the marked instances
+from calling sg_page and sg_virt, etc. This means we'd no longer need to
+clean up every SGL user in the kernel and try to deal with cases that
+assume every SGL always contains mappable memory with no error path.
 
-diff --git a/block/bsg.c b/block/bsg.c
-index 5ccecc9855ac..0fe9b584fde0 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -236,7 +236,6 @@ bsg_map_hdr(struct bsg_device *bd, struct sg_io_v4 *hdr, fmode_t has_write_perm)
- 	rq = blk_get_request(q, op, GFP_KERNEL);
- 	if (IS_ERR(rq))
- 		return rq;
--	scsi_req_init(rq);
- 
- 	ret = blk_fill_sgv4_hdr_rq(q, rq, hdr, bd, has_write_perm);
- 	if (ret)
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 4a294a5f7fab..f96c51f5df40 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -326,7 +326,6 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
- 	if (IS_ERR(rq))
- 		return PTR_ERR(rq);
- 	req = scsi_req(rq);
--	scsi_req_init(rq);
- 
- 	if (hdr->cmd_len > BLK_MAX_CDB) {
- 		req->cmd = kzalloc(hdr->cmd_len, GFP_KERNEL);
-@@ -456,7 +455,6 @@ int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
- 		goto error_free_buffer;
- 	}
- 	req = scsi_req(rq);
--	scsi_req_init(rq);
- 
- 	cmdlen = COMMAND_SIZE(opcode);
- 
-@@ -542,7 +540,6 @@ static int __blk_send_generic(struct request_queue *q, struct gendisk *bd_disk,
- 	rq = blk_get_request(q, REQ_OP_SCSI_OUT, __GFP_RECLAIM);
- 	if (IS_ERR(rq))
- 		return PTR_ERR(rq);
--	scsi_req_init(rq);
- 	rq->timeout = BLK_DEFAULT_SG_TIMEOUT;
- 	scsi_req(rq)->cmd[0] = cmd;
- 	scsi_req(rq)->cmd[4] = data;
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 4134bb54f6ad..12dc1f334420 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -707,7 +707,6 @@ static int pkt_generic_packet(struct pktcdvd_device *pd, struct packet_command *
- 			     REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
- 	if (IS_ERR(rq))
- 		return PTR_ERR(rq);
--	scsi_req_init(rq);
- 
- 	if (cgc->buflen) {
- 		ret = blk_rq_map_kern(q, rq, cgc->buffer, cgc->buflen,
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index dc20e4368136..547157b8fa1f 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -2200,7 +2200,6 @@ static int cdrom_read_cdda_bpc(struct cdrom_device_info *cdi, __u8 __user *ubuf,
- 			break;
- 		}
- 		req = scsi_req(rq);
--		scsi_req_init(rq);
- 
- 		ret = blk_rq_map_user(q, rq, NULL, ubuf, len, GFP_KERNEL);
- 		if (ret) {
-diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
-index 5901937284e7..7edebe0fb1eb 100644
---- a/drivers/ide/ide-atapi.c
-+++ b/drivers/ide/ide-atapi.c
-@@ -93,7 +93,6 @@ int ide_queue_pc_tail(ide_drive_t *drive, struct gendisk *disk,
- 	int error;
- 
- 	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_MISC;
- 	rq->special = (char *)pc;
- 
-@@ -200,7 +199,6 @@ void ide_prep_sense(ide_drive_t *drive, struct request *rq)
- 	memset(sense, 0, sizeof(*sense));
- 
- 	blk_rq_init(rq->q, sense_rq);
--	scsi_req_init(sense_rq);
- 
- 	err = blk_rq_map_kern(drive->queue, sense_rq, sense, sense_len,
- 			      GFP_NOIO);
-diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
-index 07e5ff3a64c3..a14ccb34c923 100644
---- a/drivers/ide/ide-cd.c
-+++ b/drivers/ide/ide-cd.c
-@@ -438,7 +438,6 @@ int ide_cd_queue_pc(ide_drive_t *drive, const unsigned char *cmd,
- 
- 		rq = blk_get_request(drive->queue,
- 			write ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,  __GFP_RECLAIM);
--		scsi_req_init(rq);
- 		memcpy(scsi_req(rq)->cmd, cmd, BLK_MAX_CDB);
- 		ide_req(rq)->type = ATA_PRIV_PC;
- 		rq->rq_flags |= rq_flags;
-diff --git a/drivers/ide/ide-cd_ioctl.c b/drivers/ide/ide-cd_ioctl.c
-index 55cd736c39c6..9d26c9737e21 100644
---- a/drivers/ide/ide-cd_ioctl.c
-+++ b/drivers/ide/ide-cd_ioctl.c
-@@ -304,7 +304,6 @@ int ide_cdrom_reset(struct cdrom_device_info *cdi)
- 	int ret;
- 
- 	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_MISC;
- 	rq->rq_flags = RQF_QUIET;
- 	blk_execute_rq(drive->queue, cd->disk, rq, 0);
-diff --git a/drivers/ide/ide-devsets.c b/drivers/ide/ide-devsets.c
-index 9b69c32ee560..ef7c8c43a380 100644
---- a/drivers/ide/ide-devsets.c
-+++ b/drivers/ide/ide-devsets.c
-@@ -166,7 +166,6 @@ int ide_devset_execute(ide_drive_t *drive, const struct ide_devset *setting,
- 		return setting->set(drive, arg);
- 
- 	rq = blk_get_request(q, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_MISC;
- 	scsi_req(rq)->cmd_len = 5;
- 	scsi_req(rq)->cmd[0] = REQ_DEVSET_EXEC;
-diff --git a/drivers/ide/ide-disk.c b/drivers/ide/ide-disk.c
-index 7c06237f3479..241983da5fc4 100644
---- a/drivers/ide/ide-disk.c
-+++ b/drivers/ide/ide-disk.c
-@@ -478,7 +478,6 @@ static int set_multcount(ide_drive_t *drive, int arg)
- 		return -EBUSY;
- 
- 	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_TASKFILE;
- 
- 	drive->mult_req = arg;
-diff --git a/drivers/ide/ide-ioctls.c b/drivers/ide/ide-ioctls.c
-index 8c0d17297a7a..3661abb16a5f 100644
---- a/drivers/ide/ide-ioctls.c
-+++ b/drivers/ide/ide-ioctls.c
-@@ -126,7 +126,6 @@ static int ide_cmd_ioctl(ide_drive_t *drive, unsigned long arg)
- 		struct request *rq;
- 
- 		rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--		scsi_req_init(rq);
- 		ide_req(rq)->type = ATA_PRIV_TASKFILE;
- 		blk_execute_rq(drive->queue, NULL, rq, 0);
- 		err = scsi_req(rq)->result ? -EIO : 0;
-@@ -224,7 +223,6 @@ static int generic_drive_reset(ide_drive_t *drive)
- 	int ret = 0;
- 
- 	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_MISC;
- 	scsi_req(rq)->cmd_len = 1;
- 	scsi_req(rq)->cmd[0] = REQ_DRIVE_RESET;
-diff --git a/drivers/ide/ide-park.c b/drivers/ide/ide-park.c
-index 94e3107f59b9..1f264d5d3f3f 100644
---- a/drivers/ide/ide-park.c
-+++ b/drivers/ide/ide-park.c
-@@ -32,7 +32,6 @@ static void issue_park_cmd(ide_drive_t *drive, unsigned long timeout)
- 	spin_unlock_irq(&hwif->lock);
- 
- 	rq = blk_get_request(q, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	scsi_req(rq)->cmd[0] = REQ_PARK_HEADS;
- 	scsi_req(rq)->cmd_len = 1;
- 	ide_req(rq)->type = ATA_PRIV_MISC;
-@@ -48,7 +47,6 @@ static void issue_park_cmd(ide_drive_t *drive, unsigned long timeout)
- 	 * timeout has expired, so power management will be reenabled.
- 	 */
- 	rq = blk_get_request(q, REQ_OP_DRV_IN, GFP_NOWAIT);
--	scsi_req_init(rq);
- 	if (IS_ERR(rq))
- 		goto out;
- 
-diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
-index 0977fc1f40ce..cfe3c2d7db7f 100644
---- a/drivers/ide/ide-pm.c
-+++ b/drivers/ide/ide-pm.c
-@@ -19,7 +19,6 @@ int generic_ide_suspend(struct device *dev, pm_message_t mesg)
- 
- 	memset(&rqpm, 0, sizeof(rqpm));
- 	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_PM_SUSPEND;
- 	rq->special = &rqpm;
- 	rqpm.pm_step = IDE_PM_START_SUSPEND;
-@@ -91,7 +90,6 @@ int generic_ide_resume(struct device *dev)
- 
- 	memset(&rqpm, 0, sizeof(rqpm));
- 	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
- 	rq->rq_flags |= RQF_PREEMPT;
- 	rq->special = &rqpm;
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 023562565d11..824eae707d25 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -741,12 +741,12 @@ static void ide_port_tune_devices(ide_hwif_t *hwif)
- 	}
- }
- 
--static int ide_init_rq(struct request_queue *q, struct request *rq, gfp_t gfp)
-+static void ide_initialize_rq(struct request *rq)
- {
- 	struct ide_request *req = blk_mq_rq_to_pdu(rq);
- 
-+	scsi_req_init(rq);
- 	req->sreq.sense = req->sense;
--	return 0;
- }
- 
- /*
-@@ -771,7 +771,7 @@ static int ide_init_queue(ide_drive_t *drive)
- 		return 1;
- 
- 	q->request_fn = do_ide_request;
--	q->init_rq_fn = ide_init_rq;
-+	q->initialize_rq_fn = ide_initialize_rq;
- 	q->cmd_size = sizeof(struct ide_request);
- 	if (blk_init_allocated_queue(q) < 0) {
- 		blk_cleanup_queue(q);
-diff --git a/drivers/ide/ide-tape.c b/drivers/ide/ide-tape.c
-index a0651f948b76..370fd39dce94 100644
---- a/drivers/ide/ide-tape.c
-+++ b/drivers/ide/ide-tape.c
-@@ -855,7 +855,6 @@ static int idetape_queue_rw_tail(ide_drive_t *drive, int cmd, int size)
- 	BUG_ON(size < 0 || size % tape->blk_size);
- 
- 	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_MISC;
- 	scsi_req(rq)->cmd[13] = cmd;
- 	rq->rq_disk = tape->disk;
-diff --git a/drivers/ide/ide-taskfile.c b/drivers/ide/ide-taskfile.c
-index d71199d23c9e..d915a8eba557 100644
---- a/drivers/ide/ide-taskfile.c
-+++ b/drivers/ide/ide-taskfile.c
-@@ -433,7 +433,6 @@ int ide_raw_taskfile(ide_drive_t *drive, struct ide_cmd *cmd, u8 *buf,
- 	rq = blk_get_request(drive->queue,
- 		(cmd->tf_flags & IDE_TFLAG_WRITE) ?
- 			REQ_OP_DRV_OUT : REQ_OP_DRV_IN, __GFP_RECLAIM);
--	scsi_req_init(rq);
- 	ide_req(rq)->type = ATA_PRIV_TASKFILE;
- 
- 	/*
-diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
-index 8a1b94816419..d974e7f1d2f1 100644
---- a/drivers/scsi/osd/osd_initiator.c
-+++ b/drivers/scsi/osd/osd_initiator.c
-@@ -1572,7 +1572,6 @@ static struct request *_make_request(struct request_queue *q, bool has_write,
- 			flags);
- 	if (IS_ERR(req))
- 		return req;
--	scsi_req_init(req);
- 
- 	for_each_bio(bio) {
- 		struct bio *bounce_bio = bio;
-@@ -1617,7 +1616,6 @@ static int _init_blk_request(struct osd_request *or,
- 				ret = PTR_ERR(req);
- 				goto out;
- 			}
--			scsi_req_init(req);
- 			or->in.req = or->request->next_rq = req;
- 		}
- 	} else if (has_in)
-diff --git a/drivers/scsi/osst.c b/drivers/scsi/osst.c
-index 67cbed92f07d..22080148c6a8 100644
---- a/drivers/scsi/osst.c
-+++ b/drivers/scsi/osst.c
-@@ -373,7 +373,6 @@ static int osst_execute(struct osst_request *SRpnt, const unsigned char *cmd,
- 		return DRIVER_ERROR << 24;
- 
- 	rq = scsi_req(req);
--	scsi_req_init(req);
- 	req->rq_flags |= RQF_QUIET;
- 
- 	SRpnt->bio = NULL;
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index 23d6f225c671..fbbdc345be85 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -1915,7 +1915,6 @@ static void scsi_eh_lock_door(struct scsi_device *sdev)
- 	if (IS_ERR(req))
- 		return;
- 	rq = scsi_req(req);
--	scsi_req_init(req);
- 
- 	rq->cmd[0] = ALLOW_MEDIUM_REMOVAL;
- 	rq->cmd[1] = 0;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 22bc8701ba19..a294a010d585 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -250,7 +250,6 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
--	scsi_req_init(req);
- 
- 	if (bufflen &&	blk_rq_map_kern(sdev->request_queue, req,
- 					buffer, bufflen, __GFP_RECLAIM))
-@@ -1134,6 +1133,13 @@ int scsi_init_io(struct scsi_cmnd *cmd)
- }
- EXPORT_SYMBOL(scsi_init_io);
- 
-+/* Called from inside blk_get_request() */
-+static void scsi_initialize_rq(struct request *rq)
-+{
-+	scsi_req_init(rq);
-+}
-+
-+/* Called after a request has been started. */
- void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
- {
- 	void *buf = cmd->sense_buffer;
-@@ -2087,6 +2093,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- 	 * blk_queue_update_dma_alignment() later.
- 	 */
- 	blk_queue_dma_alignment(q, 0x03);
-+
-+	q->initialize_rq_fn = scsi_initialize_rq;
- }
- EXPORT_SYMBOL_GPL(__scsi_init_queue);
- 
-diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
-index 0ebe2f1bb908..6de65e73201d 100644
---- a/drivers/scsi/scsi_transport_sas.c
-+++ b/drivers/scsi/scsi_transport_sas.c
-@@ -213,6 +213,11 @@ static void sas_host_release(struct device *dev)
- 		blk_cleanup_queue(q);
- }
- 
-+static void sas_initialize_rq(struct request *rq)
-+{
-+	scsi_req_init(rq);
-+}
-+
- static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
- {
- 	struct request_queue *q;
-@@ -230,6 +235,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
- 	q = blk_alloc_queue(GFP_KERNEL);
- 	if (!q)
- 		return -ENOMEM;
-+	q->initialize_rq_fn = sas_initialize_rq;
- 	q->cmd_size = sizeof(struct scsi_request);
- 
- 	if (rphy) {
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 0a38ba01b7b4..071a7fe27c11 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1732,8 +1732,6 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
- 	}
- 	req = scsi_req(rq);
- 
--	scsi_req_init(rq);
--
- 	if (hp->cmd_len > BLK_MAX_CDB)
- 		req->cmd = long_cmdp;
- 	memcpy(req->cmd, cmd, hp->cmd_len);
-diff --git a/drivers/scsi/st.c b/drivers/scsi/st.c
-index 1ea34d6f5437..dc4d2b9e15a0 100644
---- a/drivers/scsi/st.c
-+++ b/drivers/scsi/st.c
-@@ -549,7 +549,6 @@ static int st_scsi_execute(struct st_request *SRpnt, const unsigned char *cmd,
- 	if (IS_ERR(req))
- 		return DRIVER_ERROR << 24;
- 	rq = scsi_req(req);
--	scsi_req_init(req);
- 	req->rq_flags |= RQF_QUIET;
- 
- 	mdata->null_mapped = 1;
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index a93d94e68ab5..4df4fd5783c3 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -992,8 +992,6 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- 		goto fail;
- 	}
- 
--	scsi_req_init(req);
--
- 	if (sgl) {
- 		ret = pscsi_map_sg(cmd, sgl, sgl_nents, req);
- 		if (ret)
-diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
-index 90d1df31491b..d5a1f6c015c9 100644
---- a/fs/nfsd/blocklayout.c
-+++ b/fs/nfsd/blocklayout.c
-@@ -232,7 +232,6 @@ static int nfsd4_scsi_identify_device(struct block_device *bdev,
- 		goto out_free_buf;
- 	}
- 	req = scsi_req(rq);
--	scsi_req_init(rq);
- 
- 	error = blk_rq_map_kern(q, rq, buf, bufflen, GFP_KERNEL);
- 	if (error)
--- 
-2.12.2
+Patches 1 through 5 are cleanup/prep patches that I'll likely be
+submitting to their respective maintainers in short order.
+
+Patch 6 converts SGLs to use pfn_t instead of the existing page_link
+as suggested (and seemingly planned for) by Dan.
+
+Patches 7 and 8 then add unmappable or io memory support to SGLs
+
+Patches 9 through 14, similarly convert the bvec layer to use pfn_t
+
+Patches 15 and 16 test the above work by applying it to the nvme-fabrics
+code such that unmappable SGLs are being used without any BUG_ONS in
+somewhat limitted testing cases.
+
+Seeing this work is still incomplete and experimental, I'm looking to
+get feedback on people's opinions of whether this is an acceptable
+approach. If it is favourable, would people be open to seeing cleaned
+up versions of patches 6, and 9 through 14 be submitted upstream?
+(ie. just the parts for converting to pfn_t and continuing the
+unmappable/iomem/p2pmem work out-of-tree for a time).
+
+This work also opens up the possibility of having p2pmem not use
+ZONE_DEVICE struct pages and instead just sticking with pfn_ts
+with a specific p2p radix tree for looking up the backing device.
+Presently, I'm ambivalent towards this and would like to hear other's
+opinions.
+
+This series is based on v4.12-rc2 and a git tree is available here:
+
+https://github.com/sbates130272/linux-p2pmem.git io_pfn_t
+
+Thanks for your time,
+
+Logan
+
+[1] https://lkml.org/lkml/2017/4/25/738
+
+Logan Gunthorpe (16):
+  dmaengine: ste_dma40, imx-dma: Cleanup scatterlist layering violations
+  staging: ccree: Cleanup: remove references to page_link
+  kfifo: Cleanup example to not use page_link
+  um: add dummy ioremap and iounmap functions
+  tile: provide default ioremap declaration
+  scatterlist: convert page_link to pfn_t
+  scatterlist: support unmappable memory in the scatterlist
+  scatterlist: add iomem support to sg_miter and sg_copy_*
+  bvec: introduce bvec_page and bvec_set_page accessors
+  bvec: massive conversion of all bv_page users
+  bvec: convert to using pfn_t internally
+  bvec: use sg_set_pfn when mapping a bio to an sgl
+  block: bio: introduce bio_add_pfn
+  block: bio: go straight from pfn_t to phys instead of through page
+  dma-mapping: introduce and use unmappable safe sg_virt call
+  nvmet: use unmappable sgl in rdma target
+
+ arch/powerpc/sysdev/axonram.c                      |   2 +-
+ arch/tile/mm/pgtable.c                             |  13 ++
+ arch/um/include/asm/io.h                           |  17 ++
+ block/bio-integrity.c                              |   8 +-
+ block/bio.c                                        |  58 +++----
+ block/blk-core.c                                   |   2 +-
+ block/blk-integrity.c                              |   6 +-
+ block/blk-lib.c                                    |   2 +-
+ block/blk-merge.c                                  |  10 +-
+ block/blk-zoned.c                                  |   6 +-
+ block/bounce.c                                     |  27 +--
+ drivers/block/aoe/aoecmd.c                         |   4 +-
+ drivers/block/brd.c                                |   3 +-
+ drivers/block/drbd/drbd_bitmap.c                   |   6 +-
+ drivers/block/drbd/drbd_main.c                     |   4 +-
+ drivers/block/drbd/drbd_receiver.c                 |   4 +-
+ drivers/block/drbd/drbd_worker.c                   |   2 +-
+ drivers/block/floppy.c                             |   4 +-
+ drivers/block/loop.c                               |  12 +-
+ drivers/block/ps3disk.c                            |   2 +-
+ drivers/block/ps3vram.c                            |   2 +-
+ drivers/block/rbd.c                                |   2 +-
+ drivers/block/rsxx/dma.c                           |   3 +-
+ drivers/block/umem.c                               |   2 +-
+ drivers/block/zram/zram_drv.c                      |  14 +-
+ drivers/dma/imx-dma.c                              |   7 +-
+ drivers/dma/ste_dma40.c                            |   5 +-
+ drivers/lightnvm/pblk-core.c                       |   2 +-
+ drivers/lightnvm/pblk-read.c                       |   6 +-
+ drivers/md/bcache/btree.c                          |   2 +-
+ drivers/md/bcache/debug.c                          |   4 +-
+ drivers/md/bcache/request.c                        |   4 +-
+ drivers/md/bcache/super.c                          |  10 +-
+ drivers/md/bcache/util.c                           |   6 +-
+ drivers/md/dm-crypt.c                              |  16 +-
+ drivers/md/dm-integrity.c                          |  18 +-
+ drivers/md/dm-io.c                                 |   2 +-
+ drivers/md/dm-log-writes.c                         |  12 +-
+ drivers/md/dm-verity-target.c                      |   4 +-
+ drivers/md/raid5.c                                 |  10 +-
+ drivers/memstick/core/mspro_block.c                |   2 +-
+ drivers/nvdimm/blk.c                               |   4 +-
+ drivers/nvdimm/btt.c                               |   5 +-
+ drivers/nvdimm/pmem.c                              |   2 +-
+ drivers/nvme/host/core.c                           |   2 +-
+ drivers/nvme/host/nvme.h                           |   2 +-
+ drivers/nvme/host/pci.c                            |   5 +-
+ drivers/nvme/target/Kconfig                        |  12 ++
+ drivers/nvme/target/io-cmd.c                       |   2 +-
+ drivers/nvme/target/rdma.c                         |  29 +++-
+ drivers/s390/block/dasd_diag.c                     |   2 +-
+ drivers/s390/block/dasd_eckd.c                     |  14 +-
+ drivers/s390/block/dasd_fba.c                      |   6 +-
+ drivers/s390/block/dcssblk.c                       |   2 +-
+ drivers/s390/block/scm_blk.c                       |   2 +-
+ drivers/s390/block/scm_blk_cluster.c               |   2 +-
+ drivers/s390/block/xpram.c                         |   2 +-
+ drivers/scsi/mpt3sas/mpt3sas_transport.c           |   6 +-
+ drivers/scsi/sd.c                                  |  16 +-
+ drivers/scsi/sd_dif.c                              |   4 +-
+ drivers/staging/ccree/ssi_buffer_mgr.c             |  17 +-
+ .../staging/lustre/lnet/klnds/o2iblnd/o2iblnd_cb.c |   4 +-
+ .../lustre/lnet/klnds/socklnd/socklnd_lib.c        |  10 +-
+ drivers/staging/lustre/lnet/lnet/lib-move.c        |   4 +-
+ drivers/staging/lustre/lnet/lnet/router.c          |   6 +-
+ drivers/staging/lustre/lnet/selftest/brw_test.c    |   4 +-
+ drivers/staging/lustre/lnet/selftest/conrpc.c      |  10 +-
+ drivers/staging/lustre/lnet/selftest/framework.c   |   2 +-
+ drivers/staging/lustre/lnet/selftest/rpc.c         |   4 +-
+ drivers/staging/lustre/lustre/include/lustre_net.h |   2 +-
+ drivers/staging/lustre/lustre/osc/osc_page.c       |   2 +-
+ drivers/staging/lustre/lustre/ptlrpc/client.c      |   2 +-
+ drivers/staging/lustre/lustre/ptlrpc/sec_bulk.c    |   6 +-
+ drivers/staging/lustre/lustre/ptlrpc/sec_plain.c   |   4 +-
+ drivers/target/target_core_file.c                  |   4 +-
+ drivers/xen/biomerge.c                             |   4 +-
+ fs/9p/vfs_addr.c                                   |   6 +-
+ fs/afs/rxrpc.c                                     |   4 +-
+ fs/block_dev.c                                     |   8 +-
+ fs/btrfs/check-integrity.c                         |   4 +-
+ fs/btrfs/compression.c                             |  14 +-
+ fs/btrfs/disk-io.c                                 |   4 +-
+ fs/btrfs/extent_io.c                               |   8 +-
+ fs/btrfs/file-item.c                               |   8 +-
+ fs/btrfs/inode.c                                   |  14 +-
+ fs/btrfs/raid56.c                                  |   4 +-
+ fs/buffer.c                                        |   2 +-
+ fs/cifs/connect.c                                  |   3 +-
+ fs/cifs/file.c                                     |   6 +-
+ fs/cifs/misc.c                                     |   2 +-
+ fs/cifs/smb2ops.c                                  |   2 +-
+ fs/cifs/transport.c                                |   3 +-
+ fs/crypto/bio.c                                    |   2 +-
+ fs/direct-io.c                                     |   2 +-
+ fs/exofs/ore.c                                     |   4 +-
+ fs/exofs/ore_raid.c                                |   2 +-
+ fs/ext4/page-io.c                                  |   2 +-
+ fs/ext4/readpage.c                                 |   2 +-
+ fs/f2fs/data.c                                     |  12 +-
+ fs/gfs2/lops.c                                     |   4 +-
+ fs/gfs2/meta_io.c                                  |   2 +-
+ fs/iomap.c                                         |   2 +-
+ fs/mpage.c                                         |   2 +-
+ fs/orangefs/inode.c                                |   3 +-
+ fs/splice.c                                        |   2 +-
+ fs/xfs/xfs_aops.c                                  |   2 +-
+ include/linux/bio.h                                |  34 +++-
+ include/linux/bvec.h                               |  21 ++-
+ include/linux/dma-mapping.h                        |   9 +-
+ include/linux/pfn_t.h                              |  42 ++++-
+ include/linux/scatterlist.h                        | 189 +++++++++++++++------
+ kernel/power/swap.c                                |   2 +-
+ lib/Kconfig                                        |  11 ++
+ lib/iov_iter.c                                     |  24 +--
+ lib/scatterlist.c                                  |  65 ++++++-
+ mm/page_io.c                                       |   8 +-
+ net/ceph/messenger.c                               |   6 +-
+ samples/kfifo/dma-example.c                        |   8 +-
+ 118 files changed, 690 insertions(+), 393 deletions(-)
+ create mode 100644 arch/um/include/asm/io.h
+
+--
+2.1.4
