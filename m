@@ -1,95 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49582 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:51421 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752010AbdESNzk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2017 09:55:40 -0400
+        id S966711AbdEXHia (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 03:38:30 -0400
+Subject: Re: [PATCH 02/31] Create two versions of
+ scsi_internal_device_unblock()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-3-bart.vanassche@sandisk.com>
 From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests v2 3/3] sg/001: add regression test for syzcaller generated GPF in sg_read path
-Date: Fri, 19 May 2017 15:55:31 +0200
-Message-Id: <79600648b662bc8b9e701ff6627986887384585b.1495201975.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1495201975.git.jthumshirn@suse.de>
-References: <cover.1495201975.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1495201975.git.jthumshirn@suse.de>
-References: <cover.1495201975.git.jthumshirn@suse.de>
+Message-ID: <237f74fa-2123-940e-5b22-e3e716a562d7@suse.de>
+Date: Wed, 24 May 2017 09:38:28 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-3-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add a regression test for commit 48ae8484e9fc ("scsi: sg: don't return
-bogus Sg_requests"). This is a general protection fault triggered by
-syzcaller via issuing bogus read(2)s on the /dev/sg devices.
+On 05/24/2017 02:33 AM, Bart Van Assche wrote:
+> This will make it easier to serialize SCSI device state changes
+> through a mutex.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+> ---
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- tests/sg/001     | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/sg/001.out |  2 ++
- 2 files changed, 49 insertions(+)
- create mode 100755 tests/sg/001
- create mode 100644 tests/sg/001.out
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-diff --git a/tests/sg/001 b/tests/sg/001
-new file mode 100755
-index 000000000000..86430409b6a3
---- /dev/null
-+++ b/tests/sg/001
-@@ -0,0 +1,47 @@
-+#!/bin/bash
-+#
-+# Regression test for commit 48ae8484e9fc ("scsi: sg: don't return bogus
-+# Sg_requests")
-+#
-+# Copyright (C) 2017 Johannes Thumshirn <jthumshirn@suse.de>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+. common/sg
-+. common/scsi_debug
-+
-+DESCRIPTION="try triggering a kernel GPF with 0 byte SG reads"
-+QUICK=1
-+
-+requires() {
-+	_have_program src/sg-001 \
-+	    && _have_scsi_debug \
-+	    && _have_scsi_generic
-+}
-+
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _get_scsi_debug_dev; then
-+	    return 1
-+	fi
-+
-+	SG_DEV=$(_get_sg_from_blockdev "$SCSI_DEBUG_NAME")
-+	timeout -s INT 10s ./src/sg-001 "$SG_DEV"
-+
-+	_put_scsi_debug_dev
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/sg/001.out b/tests/sg/001.out
-new file mode 100644
-index 000000000000..beb4c437dd28
---- /dev/null
-+++ b/tests/sg/001.out
-@@ -0,0 +1,2 @@
-+Running sg/001
-+Test complete
+
 -- 
-2.12.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
