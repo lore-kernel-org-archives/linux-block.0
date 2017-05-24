@@ -1,73 +1,45 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 12/27] cifs: set mapping error when page writeback fails in writepage or launder_pages
-Date: Tue,  9 May 2017 11:49:15 -0400
-Message-Id: <20170509154930.29524-13-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:60703 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S934001AbdEXGNz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:13:55 -0400
+Subject: Re: [PATCH 28/31] scsi_setup_fs_cmnd(): Call scsi_req_init() instead
+ of open-coding it
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-29-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <ab277c15-c26a-10cd-8a9a-eac905131453@suse.de>
+Date: Wed, 24 May 2017 08:13:53 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-29-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/cifs/file.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> The only functional change is that this patch causes scsi_setup_fs_cmnd()
+> to clear scsi_request.sense_len.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/scsi_lib.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 21d404535739..0bee7f8d91ad 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2234,14 +2234,16 @@ cifs_writepage_locked(struct page *page, struct writeback_control *wbc)
- 	set_page_writeback(page);
- retry_write:
- 	rc = cifs_partialpagewrite(page, 0, PAGE_SIZE);
--	if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL)
--		goto retry_write;
--	else if (rc == -EAGAIN)
-+	if (rc == -EAGAIN) {
-+		if (wbc->sync_mode == WB_SYNC_ALL)
-+			goto retry_write;
- 		redirty_page_for_writepage(wbc, page);
--	else if (rc != 0)
-+	} else if (rc != 0) {
- 		SetPageError(page);
--	else
-+		mapping_set_error(page->mapping, rc);
-+	} else {
- 		SetPageUptodate(page);
-+	}
- 	end_page_writeback(page);
- 	put_page(page);
- 	free_xid(xid);
+Cheers,
+
+Hannes
 -- 
-2.9.3
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
