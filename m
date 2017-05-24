@@ -1,15 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45788 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:56611 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1763136AbdEXKcP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2017 06:32:15 -0400
-Date: Wed, 24 May 2017 18:31:51 +0800
+        id S966765AbdEXKMi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 06:12:38 -0400
+Date: Wed, 24 May 2017 18:12:24 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Christoph Hellwig <hch@infradead.org>
 Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Subject: Re: [PATCH 2/2] blk-mq: make per-sw-queue bio merge as default
  .bio_merge
-Message-ID: <20170524103149.GB22431@ming.t460p>
+Message-ID: <20170524101212.GA22431@ming.t460p>
 References: <20170523114736.12026-1-ming.lei@redhat.com>
  <20170523114736.12026-3-ming.lei@redhat.com>
  <20170524095843.GB30474@infradead.org>
@@ -111,12 +111,7 @@ On Wed, May 24, 2017 at 02:58:43AM -0700, Christoph Hellwig wrote:
 > blk-mq.c (and dropping the sched in the name) rather than moving
 > blk_mq_attempt_merge out.
 
-Looked at the code further, maybe it isn't good to move
-__blk_mq_sched_bio_merge() to blk-mq.c because the stuff of
-'e && e->type->ops.mq.*' has never been put into blk-mq.c.
-
-So how about not moving blk_mq_attempt_merge() and just define it as
-global?
+OK, will do that in V3.
 
 Thanks,
 Ming
