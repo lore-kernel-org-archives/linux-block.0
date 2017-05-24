@@ -1,48 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58134 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S966308AbdEXGD3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2017 02:03:29 -0400
-Subject: Re: [PATCH 16/31] scsi: Make scsi_ioctl_reset() pass the request
- queue pointer to blk_rq_init()
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>,
         James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        "Bart Van Assche" <bart.vanassche@sandisk.com>,
         Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 16/31] scsi: Make scsi_ioctl_reset() pass the request queue pointer to blk_rq_init()
+Date: Tue, 23 May 2017 17:34:05 -0700
+Message-ID: <20170524003420.5381-17-bart.vanassche@sandisk.com>
+In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
 References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
- <20170524003420.5381-17-bart.vanassche@sandisk.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <d2d8d461-79c0-679a-2b46-d544a87fdb4f@suse.de>
-Date: Wed, 24 May 2017 08:03:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170524003420.5381-17-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 05/24/2017 02:34 AM, Bart Van Assche wrote:
-> A later patch will add a call to a request initialization function
-> into blk_rq_init(). Hence make sure that all blk_rq_init() calls
-> specify the request queue pointer. Since TMF callback functions in
-> SCSI LLD drivers do not use request.q, this patch does not change
-> the behavior of any SCSI driver.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.com>
-> ---
->  drivers/scsi/scsi_error.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+A later patch will add a call to a request initialization function
+into blk_rq_init(). Hence make sure that all blk_rq_init() calls
+specify the request queue pointer. Since TMF callback functions in
+SCSI LLD drivers do not use request.q, this patch does not change
+the behavior of any SCSI driver.
 
-Cheers,
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+---
+ drivers/scsi/scsi_error.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Hannes
+diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
+index 7ba5f988426c..bbcc269f0ec1 100644
+--- a/drivers/scsi/scsi_error.c
++++ b/drivers/scsi/scsi_error.c
+@@ -2286,7 +2286,12 @@ scsi_ioctl_reset(struct scsi_device *dev, int __user *arg)
+ 			shost->hostt->cmd_size, GFP_KERNEL);
+ 	if (!rq)
+ 		goto out_put_autopm_host;
+-	blk_rq_init(NULL, rq);
++	/*
++	 * Although blk_rq_init() is intended for single queue block
++	 * drivers, this code path even uses blk_rq_init() when @dev is
++	 * a scsi-mq device.
++	 */
++	blk_rq_init(dev->request_queue, rq);
+ 
+ 	scmd = (struct scsi_cmnd *)(rq + 1);
+ 	scsi_init_command(dev, scmd);
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.12.2
