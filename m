@@ -1,93 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:50880 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934572AbdEOP2u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 May 2017 11:28:50 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: snitzer@redhat.com
-Cc: dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 2/4] dm mpath: don't return -EIO from dm_report_EIO
-Date: Mon, 15 May 2017 17:28:37 +0200
-Message-Id: <20170515152839.23375-3-hch@lst.de>
-In-Reply-To: <20170515152839.23375-1-hch@lst.de>
-References: <20170515152839.23375-1-hch@lst.de>
+Received: from mx2.suse.de ([195.135.220.15]:60608 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S934001AbdEXGNf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:13:35 -0400
+Subject: Re: [PATCH 27/31] scsi: Consolidate more initialization code
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-28-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <80b51a1a-6341-c777-e22f-a6e01e66dcd9@suse.de>
+Date: Wed, 24 May 2017 08:13:33 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-28-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Instead just turn the macro into a helper for the warning message.
-This removes an unessecary assignment in this patch, and will allow
-to fix a place where -EIO is the wrong error value in th next.
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> Initialize struct scsi_cmnd.request from inside scsi_initialize_rq()
+> instead of every time a request is prepared. Note: moving the tag
+> initialization into scsi_initialize_rq() is not possible because
+> the single-queue block layer only assigns a tag to a request after
+> a request has been started.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/scsi_error.c | 1 -
+>  drivers/scsi/scsi_lib.c   | 4 +---
+>  2 files changed, 1 insertion(+), 4 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-mpath.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+Cheers,
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 926a6bcb32c8..d55454f98b59 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -447,7 +447,7 @@ static struct pgpath *choose_pgpath(struct multipath *m, size_t nr_bytes)
-  * it has been invoked.
-  */
- #define dm_report_EIO(m)						\
--({									\
-+do {									\
- 	struct mapped_device *md = dm_table_get_md((m)->ti->table);	\
- 									\
- 	pr_debug("%s: returning EIO; QIFNP = %d; SQIFNP = %d; DNFS = %d\n", \
-@@ -455,8 +455,7 @@ static struct pgpath *choose_pgpath(struct multipath *m, size_t nr_bytes)
- 		 test_bit(MPATHF_QUEUE_IF_NO_PATH, &(m)->flags),	\
- 		 test_bit(MPATHF_SAVED_QUEUE_IF_NO_PATH, &(m)->flags),	\
- 		 dm_noflush_suspending((m)->ti));			\
--	-EIO;								\
--})
-+} while (0)
- 
- /*
-  * Map cloned requests (request-based multipath)
-@@ -481,7 +480,8 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 	if (!pgpath) {
- 		if (test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))
- 			return DM_MAPIO_DELAY_REQUEUE;
--		return dm_report_EIO(m);	/* Failed */
-+		dm_report_EIO(m);	/* Failed */
-+		return -EIO;
- 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
- 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
- 		if (pg_init_all_paths(m))
-@@ -558,7 +558,8 @@ static int __multipath_map_bio(struct multipath *m, struct bio *bio, struct dm_m
- 	if (!pgpath) {
- 		if (test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))
- 			return DM_MAPIO_REQUEUE;
--		return dm_report_EIO(m);
-+		dm_report_EIO(m);
-+		return -EIO;
- 	}
- 
- 	mpio->pgpath = pgpath;
-@@ -1493,7 +1494,7 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
- 		if (atomic_read(&m->nr_valid_paths) == 0 &&
- 		    !test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
- 			if (error == -EIO)
--				error = dm_report_EIO(m);
-+				dm_report_EIO(m);
- 			/* complete with the original error */
- 			r = DM_ENDIO_DONE;
- 		}
-@@ -1524,8 +1525,10 @@ static int do_end_io_bio(struct multipath *m, struct bio *clone,
- 		fail_path(mpio->pgpath);
- 
- 	if (atomic_read(&m->nr_valid_paths) == 0 &&
--	    !test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))
--		return dm_report_EIO(m);
-+	    !test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
-+		dm_report_EIO(m);
-+		return -EIO;
-+	}
- 
- 	/* Queue for the daemon to resubmit */
- 	dm_bio_restore(get_bio_details_from_bio(clone), clone);
+Hannes
 -- 
-2.11.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
