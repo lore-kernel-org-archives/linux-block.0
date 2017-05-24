@@ -1,66 +1,54 @@
-Return-Path: <rakesh@tuxera.com>
-Date: Mon, 15 May 2017 23:34:00 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Jan Kara <jack@suse.cz>, Miklos Szeredi <miklos@szeredi.hu>
-CC: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 16/25] fuse: Convert to separately allocated bdi
-Message-ID: <20170515203400.GA8068@hercules.tuxera.com>
-References: <20170412102449.16901-1-jack@suse.cz>
- <20170412102449.16901-17-jack@suse.cz>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "James.Bottomley@HansenPartnership.com"
+        <James.Bottomley@HansenPartnership.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
+        "hare@suse.com" <hare@suse.com>
+Subject: Re: [PATCH 11/31] block: Introduce queue flag QUEUE_FLAG_SCSI_SUP
+Date: Wed, 24 May 2017 15:05:28 +0000
+Message-ID: <1495638326.2823.1.camel@sandisk.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+         <20170524003420.5381-12-bart.vanassche@sandisk.com>
+         <ff6777f8-eb90-224c-a615-3dca235d1d18@suse.de>
+In-Reply-To: <ff6777f8-eb90-224c-a615-3dca235d1d18@suse.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <20170412102449.16901-17-jack@suse.cz>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jan, Miklos,
+On Wed, 2017-05-24 at 08:01 +0200, Hannes Reinecke wrote:
+> On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> > From the context where a SCSI command is submitted it is not always
+> > possible to figure out whether or not the queue the command is
+> > submitted to has struct scsi_request as the first member of its
+> > private data. Hence introduce the flag QUEUE_FLAG_SCSI_SUP.
+> >=20
+> > Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> > Cc: Jens Axboe <axboe@fb.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Cc: Omar Sandoval <osandov@fb.com>
+> > Cc: Hannes Reinecke <hare@suse.com>
+> > ---
+> >  block/bsg-lib.c                   | 1 +
+> >  drivers/block/cciss.c             | 1 +
+> >  drivers/ide/ide-probe.c           | 1 +
+> >  drivers/scsi/scsi_lib.c           | 2 ++
+> >  drivers/scsi/scsi_transport_sas.c | 1 +
+> >  include/linux/blkdev.h            | 2 ++
+> >  6 files changed, 8 insertions(+)
+> >=20
+>=20
+> Bit of an odd name; what about QUEUE_FLAG_SCSI_PDU?
 
-On Wed, Apr 12, 2017 at 12:24:40PM +0200, Jan Kara wrote:
-> Allocate struct backing_dev_info separately instead of embedding it
-> inside the superblock. This unifies handling of bdi among users.
->
-> CC: Miklos Szeredi <miklos@szeredi.hu>
-> CC: linux-fsdevel@vger.kernel.org
-> Acked-by: Miklos Szeredi <mszeredi@redhat.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Jan Kara <jack@suse.cz>
+Hello Hannes,
 
-...
+That sounds like a good idea to me. I will rename the flag when I repost th=
+is
+series.
 
->  static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
->  {
->  	int err;
-> +	char *suffix = "";
->  
-> -	fc->bdi.name = "fuse";
-> -	fc->bdi.ra_pages = (VM_MAX_READAHEAD * 1024) / PAGE_SIZE;
-> -	/* fuse does it's own writeback accounting */
-> -	fc->bdi.capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
-> -
-> -	err = bdi_init(&fc->bdi);
-> +	if (sb->s_bdev)
-> +		suffix = "-fuseblk";
-> +	err = super_setup_bdi_name(sb, "%u:%u%s", MAJOR(fc->dev),
-> +				   MINOR(fc->dev), suffix);
->  	if (err)
->  		return err;
->
-
-This call to super_setup_bdi_name would only work with "fuse" but not
-with "fuseblk" as mounting a block device in userspace triggers
-mount_bdev call which results in set_bdev_super taking a reference
-from block device's BDI.  But super_setup_bdi_name allocates a new bdi
-and ignores the already existing reference which triggers:
-
-WARN_ON(sb->s_bdi != &noop_backing_dev_info);
-
-as sb->s_bdi already has a reference from set_bdev_super.  This works
-for "fuse" (without a blocking device) for obvious reasons.  I can
-reproduce this on -rc1 and also found a report on lkml:
-https://lkml.org/lkml/2017/5/2/445
-
-Only sane solution seems to be maintaining a private bdi instace just
-for fuseblk and let fuse use the common new infrastructure.
-
-Best regards,
-Rakesh
+Bart.=
