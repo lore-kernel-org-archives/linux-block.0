@@ -1,73 +1,57 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Matthew Wilcox <mawilcox@microsoft.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Stephen Bates <sbates@raithlin.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Jerome Glisse <jglisse@redhat.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 24 May 2017 15:42:25 -0600
-Message-Id: <1495662147-18277-15-git-send-email-logang@deltatee.com>
-In-Reply-To: <1495662147-18277-1-git-send-email-logang@deltatee.com>
-References: <1495662147-18277-1-git-send-email-logang@deltatee.com>
-Subject: [RFC PATCH 14/16] block: bio: go straight from pfn_t to phys instead of through page
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:56777 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751881AbdEXF6y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 01:58:54 -0400
+Subject: Re: [PATCH 10/31] Avoid that scsi_exit_rq() triggers a use-after-free
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Scott Bauer <scott.bauer@intel.com>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        Hannes Reinecke <hare@suse.com>, stable@vger.kernel.org
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-11-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <cd37eb82-f85a-afca-c027-2fd1675bdb4c@suse.de>
+Date: Wed, 24 May 2017 07:58:51 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-11-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Going straight from pfn_t to physical address is cheaper and
-avoids the potential BUG_ON in bvec_page for unmappable memory.
+On 05/24/2017 02:33 AM, Bart Van Assche wrote:
+> Dereferencing shost from scsi_exit_rq() is not safe because the
+> SCSI host may already have been freed when scsi_exit_rq() is
+> called. Increasing the shost reference count in scsi_init_rq()
+> and dropping that reference in scsi_exit_rq() is nontrivial since
+> scsi_host_dev_release() may sleep and since scsi_exit_rq() may
+> be called from interrupt context. Since scsi_exit_rq() only needs
+> a single bit from shost, copy that bit into struct scsi_cmnd.
+> 
+> Reported-by: Scott Bauer <scott.bauer@intel.com>
+> Fixes: e9c787e65c0c ("scsi: allocate scsi_cmnd structures as part of struct request")
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Scott Bauer <scott.bauer@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: <stable@vger.kernel.org>
+> ---
+>  drivers/scsi/scsi_lib.c  | 43 +++++++++++++++++++++++++------------------
+>  include/scsi/scsi_cmnd.h |  1 +
+>  2 files changed, 26 insertions(+), 18 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
----
- include/linux/bio.h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Cheers,
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index bc5f5d3..890c94d 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -46,6 +46,8 @@
- #define bio_iter_iovec(bio, iter)				\
- 	bvec_iter_bvec((bio)->bi_io_vec, (iter))
- 
-+#define bio_iter_pfn_t(bio, iter)				\
-+	bvec_iter_pfn_t((bio)->bi_io_vec, (iter))
- #define bio_iter_page(bio, iter)				\
- 	bvec_iter_page((bio)->bi_io_vec, (iter))
- #define bio_iter_len(bio, iter)					\
-@@ -53,6 +55,7 @@
- #define bio_iter_offset(bio, iter)				\
- 	bvec_iter_offset((bio)->bi_io_vec, (iter))
- 
-+#define bio_pfn_t(bio)		bio_iter_pfn_t((bio), (bio)->bi_iter)
- #define bio_page(bio)		bio_iter_page((bio), (bio)->bi_iter)
- #define bio_offset(bio)		bio_iter_offset((bio), (bio)->bi_iter)
- #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
-@@ -118,8 +121,8 @@ static inline void *bio_data(struct bio *bio)
- /*
-  * will die
-  */
--#define bio_to_phys(bio)	(page_to_phys(bio_page((bio))) + (unsigned long) bio_offset((bio)))
--#define bvec_to_phys(bv)	(page_to_phys(bvec_page((bv))) + (unsigned long) (bv)->bv_offset)
-+#define bio_to_phys(bio)	(pfn_t_to_phys(bio_pfn_t((bio))) + (unsigned long) bio_offset((bio)))
-+#define bvec_to_phys(bv)	(pfn_t_to_phys((bv)->bv_pfn) + (unsigned long) (bv)->bv_offset)
- 
- /*
-  * queues that have highmem support enabled may still need to revert to
+Hannes
 -- 
-2.1.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
