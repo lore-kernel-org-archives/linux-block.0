@@ -1,74 +1,98 @@
-Return-Path: <prvs=631096caf0=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, <Kernel-team@fb.com>
-Subject: [PATCH 2/4] blk-throttle: output some debug info in trace
-Date: Wed, 17 May 2017 13:07:25 -0700
-Message-ID: <6e507e6429463f59bcb7f11ca89ba4d41c59ec56.1495050247.git.shli@fb.com>
-In-Reply-To: <cover.1495050247.git.shli@fb.com>
-References: <cover.1495050247.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 10/10] btrfs: nowait aio support
+Date: Wed, 24 May 2017 11:41:50 -0500
+Message-Id: <20170524164150.9492-11-rgoldwyn@suse.de>
+In-Reply-To: <20170524164150.9492-1-rgoldwyn@suse.de>
+References: <20170524164150.9492-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-These info are important to understand what's happening and help debug.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Acked-by: David Sterba <dsterba@suse.com>
 ---
- block/blk-throttle.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 16174f8..1f8d62f 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1748,12 +1748,18 @@ static bool throtl_tg_is_idle(struct throtl_grp *tg)
- 	 * - IO latency is largely below threshold
- 	 */
- 	unsigned long time = jiffies_to_usecs(4 * tg->td->throtl_slice);
-+	bool ret;
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index da1096eb1a40..aae088e49915 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1875,12 +1875,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
  
- 	time = min_t(unsigned long, MAX_IDLE_TIME, time);
--	return (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
-+	ret = (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
- 	       tg->avg_idletime > tg->idletime_threshold ||
- 	       (tg->latency_target && tg->bio_cnt &&
- 		tg->bad_bio_cnt * 5 < tg->bio_cnt);
-+	throtl_log(&tg->service_queue,
-+		"avg_idle=%ld, idle_threshold=%ld, bad_bio=%d, total_bio=%d, is_idle=%d, scale=%d",
-+		tg->avg_idletime, tg->idletime_threshold, tg->bad_bio_cnt,
-+		tg->bio_cnt, ret, tg->td->scale);
-+	return ret;
- }
- 
- static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
-@@ -1849,6 +1855,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 	struct cgroup_subsys_state *pos_css;
- 	struct blkcg_gq *blkg;
- 
-+	throtl_log(&td->service_queue, "upgrade to max");
- 	td->limit_index = LIMIT_MAX;
- 	td->low_upgrade_time = jiffies;
- 	td->scale = 0;
-@@ -1871,6 +1878,7 @@ static void throtl_downgrade_state(struct throtl_data *td, int new)
- {
- 	td->scale /= 2;
- 
-+	throtl_log(&td->service_queue, "downgrade, scale %d", td->scale);
- 	if (td->scale) {
- 		td->low_upgrade_time = jiffies - td->scale * td->throtl_slice;
- 		return;
-@@ -2044,6 +2052,11 @@ static void throtl_update_latency_buckets(struct throtl_data *td)
- 		td->avg_buckets[i].valid = true;
- 		last_latency = td->avg_buckets[i].latency;
- 	}
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
++		}
++	} else
++		inode_lock(inode);
 +
-+	for (i = 0; i < LATENCY_BUCKET_SIZE; i++)
-+		throtl_log(&td->service_queue,
-+			"Latency bucket %d: latency=%ld, valid=%d", i,
-+			td->avg_buckets[i].latency, td->avg_buckets[i].valid);
- }
- #else
- static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1914,8 +1931,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	 */
+ 	update_time_for_write(inode);
+ 
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 17cbe9306faf..2ab71b946829 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8755,6 +8755,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			dio_data.overwrite = 1;
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
 -- 
-2.9.3
+2.12.0
