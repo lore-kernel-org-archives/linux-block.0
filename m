@@ -1,29 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:58786 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751989AbdEPLxL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 May 2017 07:53:11 -0400
-Date: Tue, 16 May 2017 04:53:06 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Daeho Jeong <daeho.jeong@samsung.com>
-Cc: jack@suse.com, tytso@mit.edu, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] ext4: hand over jobs handling discard commands on commit
- complete phase to kworkers
-Message-ID: <20170516115306.GA15058@infradead.org>
-References: <CGME20170516073738epcas1p42daa31d04ae9d07eae07d9fcee6708a2@epcas1p4.samsung.com>
- <1494920262-10128-1-git-send-email-daeho.jeong@samsung.com>
+Received: from mx2.suse.de ([195.135.220.15]:58134 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S966308AbdEXGD3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:03:29 -0400
+Subject: Re: [PATCH 16/31] scsi: Make scsi_ioctl_reset() pass the request
+ queue pointer to blk_rq_init()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-17-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <d2d8d461-79c0-679a-2b46-d544a87fdb4f@suse.de>
+Date: Wed, 24 May 2017 08:03:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1494920262-10128-1-git-send-email-daeho.jeong@samsung.com>
+In-Reply-To: <20170524003420.5381-17-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, May 16, 2017 at 04:37:42PM +0900, Daeho Jeong wrote:
-> Now, when we mount ext4 filesystem with '-o discard' option, we have to
-> issue all the discard commands for the blocks to be deallocated and
-> wait for the completion of the commands on the commit complete phase.
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> A later patch will add a call to a request initialization function
+> into blk_rq_init(). Hence make sure that all blk_rq_init() calls
+> specify the request queue pointer. Since TMF callback functions in
+> SCSI LLD drivers do not use request.q, this patch does not change
+> the behavior of any SCSI driver.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/scsi_error.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-No, you don't.  You can execute them asynchronously, similar to what
-XFS already does.
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
