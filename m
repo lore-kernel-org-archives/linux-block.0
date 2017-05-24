@@ -1,97 +1,46 @@
-Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 08/15] dm mpath: merge do_end_io_bio into multipath_end_io_bio
-Date: Thu, 18 May 2017 15:18:05 +0200
-Message-Id: <20170518131812.22956-9-hch@lst.de>
-In-Reply-To: <20170518131812.22956-1-hch@lst.de>
-References: <20170518131812.22956-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:54704 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S966972AbdEXHwN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 03:52:13 -0400
+Subject: Re: [PATCH 08/31] sd, sr: Convert two assignments into warning
+ statements
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-9-bart.vanassche@sandisk.com>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <7452f775-f802-8454-d929-b2953ee7955b@suse.de>
+Date: Wed, 24 May 2017 09:52:11 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-9-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This simplifies the code and especially the error passing a bit and
-will help with the next patch.
+On 05/24/2017 02:33 AM, Bart Van Assche wrote:
+> Before scsi_prep_fn() calls the ULP .init_command() callback
+> function it stores the SCSI command pointer in request.special.
+> This means that the SCpnt = rq->special assignments in the sd
+> and sr drivers assign a pointer to itself. Hence convert these
+> two assignment statements into warning statements.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-mpath.c | 42 ++++++++++++++++--------------------------
- 1 file changed, 16 insertions(+), 26 deletions(-)
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 3df056b73b66..b1cb0273b081 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -1510,24 +1510,26 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
- 	return r;
- }
- 
--static int do_end_io_bio(struct multipath *m, struct bio *clone,
--			 int error, struct dm_mpath_io *mpio)
-+static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone, int error)
- {
-+	struct multipath *m = ti->private;
-+	struct dm_mpath_io *mpio = get_mpio_from_bio(clone);
-+	struct pgpath *pgpath = mpio->pgpath;
- 	unsigned long flags;
- 
--	if (!error)
--		return 0;	/* I/O complete */
-+	BUG_ON(!mpio);
- 
--	if (noretry_error(error))
--		return error;
-+	if (!error || noretry_error(error))
-+		goto done;
- 
--	if (mpio->pgpath)
--		fail_path(mpio->pgpath);
-+	if (pgpath)
-+		fail_path(pgpath);
- 
- 	if (atomic_read(&m->nr_valid_paths) == 0 &&
- 	    !test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
- 		dm_report_EIO(m);
--		return -EIO;
-+		error = -EIO;
-+		goto done;
- 	}
- 
- 	/* Queue for the daemon to resubmit */
-@@ -1539,28 +1541,16 @@ static int do_end_io_bio(struct multipath *m, struct bio *clone,
- 	if (!test_bit(MPATHF_QUEUE_IO, &m->flags))
- 		queue_work(kmultipathd, &m->process_queued_bios);
- 
--	return DM_ENDIO_INCOMPLETE;
--}
--
--static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone, int error)
--{
--	struct multipath *m = ti->private;
--	struct dm_mpath_io *mpio = get_mpio_from_bio(clone);
--	struct pgpath *pgpath;
--	struct path_selector *ps;
--	int r;
--
--	BUG_ON(!mpio);
--
--	r = do_end_io_bio(m, clone, error, mpio);
--	pgpath = mpio->pgpath;
-+	error = DM_ENDIO_INCOMPLETE;
-+done:
- 	if (pgpath) {
--		ps = &pgpath->pg->ps;
-+		struct path_selector *ps = &pgpath->pg->ps;
-+
- 		if (ps->type->end_io)
- 			ps->type->end_io(ps, &pgpath->path, mpio->nr_bytes);
- 	}
- 
--	return r;
-+	return error;
- }
- 
- /*
 -- 
-2.11.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
