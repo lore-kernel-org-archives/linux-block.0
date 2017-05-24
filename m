@@ -1,50 +1,54 @@
-Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 06/15] fs: simplify dio_bio_complete
-Date: Thu, 18 May 2017 15:18:03 +0200
-Message-Id: <20170518131812.22956-7-hch@lst.de>
-In-Reply-To: <20170518131812.22956-1-hch@lst.de>
-References: <20170518131812.22956-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:58363 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S966241AbdEXGES (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:04:18 -0400
+Subject: Re: [PATCH 17/31] block: Introduce request_queue.initialize_rq_fn()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-18-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <6149c822-26b6-3dc7-e4da-a81b1a88669f@suse.de>
+Date: Wed, 24 May 2017 08:04:15 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-18-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Only read bio->bi_error once in the common path.
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> Several block drivers need to initialize the driver-private data
+> after having called blk_get_request() and before .prep_rq_fn() is
+> called, e.g. when submitting a REQ_OP_SCSI_* request. Avoid that
+> that initialization code has to be repeated after every
+> blk_get_request() call by adding a new callback function to struct
+> request_queue.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Jens Axboe <axboe@fb.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: linux-block@vger.kernel.org
+> ---
+>  block/blk-core.c       | 3 +++
+>  block/blk-mq.c         | 3 +++
+>  include/linux/blkdev.h | 4 ++++
+>  3 files changed, 10 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/direct-io.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Cheers,
 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 04247a6c3f73..bb711e4b86c2 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -477,13 +477,12 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	unsigned i;
--	int err;
-+	int err = bio->bi_error;
- 
--	if (bio->bi_error)
-+	if (err)
- 		dio->io_error = -EIO;
- 
- 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
--		err = bio->bi_error;
- 		bio_check_pages_dirty(bio);	/* transfers ownership */
- 	} else {
- 		bio_for_each_segment_all(bvec, bio, i) {
-@@ -494,7 +493,6 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
- 				set_page_dirty_lock(page);
- 			put_page(page);
- 		}
--		err = bio->bi_error;
- 		bio_put(bio);
- 	}
- 	return err;
+Hannes
 -- 
-2.11.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
