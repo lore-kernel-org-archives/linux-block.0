@@ -1,113 +1,46 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 17/22] partitions/ldm: switch to use uuid_t
-Date: Sun, 28 May 2017 13:20:03 +0300
-Message-Id: <20170528102008.30276-18-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:59841 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933607AbdEXGKJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:10:09 -0400
+Subject: Re: [PATCH 23/31] scsi: Move sense buffer pointer initialization into
+ scsi_initialize_rq()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-24-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <0394b15b-e7c2-9723-3849-2354e9c4bde9@suse.de>
+Date: Wed, 24 May 2017 08:10:07 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-24-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-And the uuid helpers.
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> This patch is a preparation for the next patch that will zero
+> the struct scsi_request embedded in struct scsi_cmnd before
+> calling scsi_req_init().
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/scsi_lib.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- block/partitions/ldm.c | 10 +++++-----
- block/partitions/ldm.h |  6 ++----
- 2 files changed, 7 insertions(+), 9 deletions(-)
+Cheers,
 
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index edcea70674c9..bbf929e80b94 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -115,7 +115,7 @@ static bool ldm_parse_privhead(const u8 *data, struct privhead *ph)
- 		ldm_error("PRIVHEAD disk size doesn't match real disk size");
- 		return false;
- 	}
--	if (uuid_be_to_bin(data + 0x0030, (uuid_be *)ph->disk_id)) {
-+	if (uuid_to_bin(data + 0x0030, &ph->disk_id)) {
- 		ldm_error("PRIVHEAD contains an invalid GUID.");
- 		return false;
- 	}
-@@ -234,7 +234,7 @@ static bool ldm_compare_privheads (const struct privhead *ph1,
- 		(ph1->logical_disk_size  == ph2->logical_disk_size)	&&
- 		(ph1->config_start       == ph2->config_start)		&&
- 		(ph1->config_size        == ph2->config_size)		&&
--		!memcmp (ph1->disk_id, ph2->disk_id, GUID_SIZE));
-+		uuid_equal(&ph1->disk_id, &ph2->disk_id));
- }
- 
- /**
-@@ -557,7 +557,7 @@ static struct vblk * ldm_get_disk_objid (const struct ldmdb *ldb)
- 
- 	list_for_each (item, &ldb->v_disk) {
- 		struct vblk *v = list_entry (item, struct vblk, list);
--		if (!memcmp (v->vblk.disk.disk_id, ldb->ph.disk_id, GUID_SIZE))
-+		if (uuid_equal(&v->vblk.disk.disk_id, &ldb->ph.disk_id))
- 			return v;
- 	}
- 
-@@ -892,7 +892,7 @@ static bool ldm_parse_dsk3 (const u8 *buffer, int buflen, struct vblk *vb)
- 	disk = &vb->vblk.disk;
- 	ldm_get_vstr (buffer + 0x18 + r_diskid, disk->alt_name,
- 		sizeof (disk->alt_name));
--	if (uuid_be_to_bin(buffer + 0x19 + r_name, (uuid_be *)disk->disk_id))
-+	if (uuid_to_bin(buffer + 0x19 + r_name, &disk->disk_id))
- 		return false;
- 
- 	return true;
-@@ -927,7 +927,7 @@ static bool ldm_parse_dsk4 (const u8 *buffer, int buflen, struct vblk *vb)
- 		return false;
- 
- 	disk = &vb->vblk.disk;
--	memcpy (disk->disk_id, buffer + 0x18 + r_name, GUID_SIZE);
-+	uuid_copy(&disk->disk_id, (uuid_t *)(buffer + 0x18 + r_name));
- 	return true;
- }
- 
-diff --git a/block/partitions/ldm.h b/block/partitions/ldm.h
-index 374242c0971a..f4c6055df956 100644
---- a/block/partitions/ldm.h
-+++ b/block/partitions/ldm.h
-@@ -112,8 +112,6 @@ struct frag {				/* VBLK Fragment handling */
- 
- /* In memory LDM database structures. */
- 
--#define GUID_SIZE		16
--
- struct privhead {			/* Offsets and sizes are in sectors. */
- 	u16	ver_major;
- 	u16	ver_minor;
-@@ -121,7 +119,7 @@ struct privhead {			/* Offsets and sizes are in sectors. */
- 	u64	logical_disk_size;
- 	u64	config_start;
- 	u64	config_size;
--	u8	disk_id[GUID_SIZE];
-+	uuid_t	disk_id;
- };
- 
- struct tocblock {			/* We have exactly two bitmaps. */
-@@ -154,7 +152,7 @@ struct vblk_dgrp {			/* VBLK Disk Group */
- };
- 
- struct vblk_disk {			/* VBLK Disk */
--	u8	disk_id[GUID_SIZE];
-+	uuid_t	disk_id;
- 	u8	alt_name[128];
- };
- 
+Hannes
 -- 
-2.11.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
