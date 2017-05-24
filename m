@@ -1,33 +1,30 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "James.Bottomley@HansenPartnership.com"
-	<James.Bottomley@HansenPartnership.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 00/31] SCSI patches for kernel v4.13.
-Date: Wed, 24 May 2017 04:43:01 +0000
-Message-ID: <1495600980.2714.1.camel@sandisk.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-	 <28a3029c-b5eb-ca56-f0ef-75600ca1dd6e@kernel.dk>
-In-Reply-To: <28a3029c-b5eb-ca56-f0ef-75600ca1dd6e@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <28a3029c-b5eb-ca56-f0ef-75600ca1dd6e@kernel.dk>
+Date: Tue, 23 May 2017 21:55:05 -0600
 MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTA1LTIzIGF0IDIxOjU1IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biAwNS8yMy8yMDE3IDA2OjMzIFBNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gSGVsbG8g
-TWFydGluLA0KPiA+IA0KPiA+IFRoaXMgcGF0Y2ggc2VyaWVzIGNvbnNpc3RzIG9mIHRoZSBidWcg
-Zml4ZXMgSSBjYW1lIHVwIHdpdGggZHVyaW5nDQo+ID4gdGhlIHBhc3QgdHdvIG1vbnRocy4gUGxl
-YXNlIGNvbnNpZGVyIHRoZXNlIHBhdGNoZXMgZm9yIGtlcm5lbCB2NC4xMy4NCj4gDQo+IEVobSwg
-bGFzdCBJIGNoZWNrZWQgdGhlIGJsb2NrIHBhdGNoZXMgaGFkbid0IGJlZW4gcmV2aWV3ZWQvc2ln
-bmVkLW9mZg0KPiBieSBhbnlvbmUgZWxzZS4gV2Ugc3RpbGwgaGF2ZSB0aGF0IGluaXQgYWRkaXRp
-b24gaW4gdGhlIGhvdCBwYXRoIGZvcg0KPiByZXF1ZXN0IGluaXRpYWxpemF0aW9uLCBhcyBDaHJp
-c3RvcGggcG9pbnRlZCBvdXQuDQo+IA0KPiBTbyBsZXQncyBob2xkIG9mZiBvbiB0aGlzIGEgYml0
-LCBhdCBsZWFzdCBvbiB0aGUgYmxvY2sgcGFydHMsIHVudGlsDQo+IHdlIGhhdmUgdGhpbmdzIHBy
-b3Blcmx5IHNpZ25lZCBvZmYuDQoNCkhpIEplbnMsDQoNCkluIGNhc2UgdGhpcyB3b3VsZG4ndCBi
-ZSBjbGVhciwgSSBmdWxseSBhZ3JlZSB3aXRoIHlvdSB0aGF0IHlvdXIgYXBwcm92YWwNCmlzIHJl
-cXVpcmVkIGZvciB0aGUgYmxvY2sgbGF5ZXIgcGF0Y2hlcy4gSXQncyBiZWNhdXNlIHRoZXJlIGFy
-ZSBzZXZlcmFsDQpibG9jayBsYXllciBwYXRjaGVzIGluIHRoaXMgc2VyaWVzIHRoYXQgSSBoYXZl
-IENjLWVkIHRoZSBibG9jayBsYXllcg0KbWFpbGluZyBsaXN0IGZvciB0aGUgd2hvbGUgc2VyaWVz
-Lg0KDQpCYXJ0Lg==
+On 05/23/2017 06:33 PM, Bart Van Assche wrote:
+> Hello Martin,
+> 
+> This patch series consists of the bug fixes I came up with during
+> the past two months. Please consider these patches for kernel v4.13.
+
+Ehm, last I checked the block patches hadn't been reviewed/signed-off
+by anyone else. We still have that init addition in the hot path for
+request initialization, as Christoph pointed out.
+
+So let's hold off on this a bit, at least on the block parts, until
+we have things properly signed off.
+
+-- 
+Jens Axboe
