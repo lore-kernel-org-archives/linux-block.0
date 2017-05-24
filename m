@@ -1,58 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44633 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763398AbdEXAef (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:34:35 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Omar Sandoval" <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 12/31] bsg: Check queue type before attaching to a queue
-Date: Tue, 23 May 2017 17:34:01 -0700
-Message-ID: <20170524003420.5381-13-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Matthew Wilcox <mawilcox@microsoft.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Stephen Bates <sbates@raithlin.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Jerome Glisse <jglisse@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 24 May 2017 15:42:16 -0600
+Message-Id: <1495662147-18277-6-git-send-email-logang@deltatee.com>
+In-Reply-To: <1495662147-18277-1-git-send-email-logang@deltatee.com>
+References: <1495662147-18277-1-git-send-email-logang@deltatee.com>
+Subject: [RFC PATCH 05/16] tile: provide default ioremap declaration
+List-ID: <linux-block@vger.kernel.org>
 
-Since BSG only supports request queues for which struct scsi_request
-is the first member of their private request data, refuse to register
-block layer queues for which struct scsi_request is not the first
-member of their private data.
+Add a default ioremap function which was not provided in all
+circumstances. (Only when CONFIG_PCI and CONFIG_TILEGX was set).
 
-References: commit bd1599d931ca ("scsi_transport_sas: fix BSG ioctl memory corruption")
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: linux-block@vger.kernel.org
+I have designs to use them in scatterlist.c where they'd likely never
+be called with this architecture, but it is needed to compile.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
 ---
- block/bsg.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/tile/mm/pgtable.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/block/bsg.c b/block/bsg.c
-index 6fd08544d77e..f7695bb141d9 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -750,6 +750,12 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
- #ifdef BSG_DEBUG
- 	unsigned char buf[32];
- #endif
-+
-+	if (!blk_queue_scsi_sup(rq)) {
-+		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
- 	if (!blk_get_queue(rq))
- 		return ERR_PTR(-ENXIO);
+diff --git a/arch/tile/mm/pgtable.c b/arch/tile/mm/pgtable.c
+index 492a736..c61df18 100644
+--- a/arch/tile/mm/pgtable.c
++++ b/arch/tile/mm/pgtable.c
+@@ -503,6 +503,19 @@ void __iomem *ioremap_prot(resource_size_t phys_addr, unsigned long size,
+ }
+ EXPORT_SYMBOL(ioremap_prot);
  
++#if !defined(CONFIG_PCI) || !defined(CONFIG_TILEGX)
++/* ioremap is conditionally declared in pci_gx.c */
++
++void __iomem *ioremap(resource_size_t phys_addr, unsigned long size)
++{
++	pgprot_t pgprot = {};
++
++	return ioremap_prot(phys_addr, size, pgprot);
++}
++EXPORT_SYMBOL(ioremap);
++
++#endif
++
+ /* Unmap an MMIO VA mapping. */
+ void iounmap(volatile void __iomem *addr_in)
+ {
 -- 
-2.12.2
+2.1.4
