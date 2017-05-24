@@ -1,30 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yw0-f194.google.com ([209.85.161.194]:35398 "EHLO
-        mail-yw0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932464AbdEXPJf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2017 11:09:35 -0400
-Date: Wed, 24 May 2017 11:09:32 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.com>,
-        stable@vger.kernel.org
+Received: from mx2.suse.de ([195.135.220.15]:55968 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S937613AbdEXFzz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 01:55:55 -0400
 Subject: Re: [PATCH 09/31] block: Avoid that blk_exit_rl() triggers a
  use-after-free
-Message-ID: <20170524150932.GC24798@htj.duckdns.org>
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
+        Hannes Reinecke <hare@suse.com>, stable@vger.kernel.org
 References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
  <20170524003420.5381-10-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <de6847ba-e58a-7fe5-a2d2-58b00daf5a46@suse.de>
+Date: Wed, 24 May 2017 07:55:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170524003420.5381-10-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, May 23, 2017 at 05:33:58PM -0700, Bart Van Assche wrote:
+On 05/24/2017 02:33 AM, Bart Van Assche wrote:
 > Since the introduction of the .init_rq_fn() and .exit_rq_fn() it
 > is essential that the memory allocated for struct request_queue
 > stays around until all blk_exit_rl() calls have finished. Hence
@@ -66,10 +65,21 @@ On Tue, May 23, 2017 at 05:33:58PM -0700, Bart Van Assche wrote:
 > Cc: Jan Kara <jack@suse.cz>
 > Cc: Hannes Reinecke <hare@suse.com>
 > Cc: <stable@vger.kernel.org> # v4.11+
+> ---
+>  block/blk-cgroup.c |  2 +-
+>  block/blk-core.c   | 10 ++++++++--
+>  block/blk-sysfs.c  |  2 +-
+>  block/blk.h        |  2 +-
+>  4 files changed, 11 insertions(+), 5 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Cheers,
 
-Thanks.
-
+Hannes
 -- 
-tejun
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
