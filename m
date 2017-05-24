@@ -1,47 +1,32 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH v2 4/6] pktcdvd: Check queue type before attaching to a queue
-Date: Wed, 31 May 2017 14:43:48 -0700
-Message-ID: <20170531214350.31157-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
-References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH 31/31] xen/scsifront: Remove code that zeroes
+ driver-private command data
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-32-bart.vanassche@sandisk.com>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <10eedc1d-a5cf-d4fd-e470-172631f07645@suse.com>
+Date: Wed, 24 May 2017 09:02:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <20170524003420.5381-32-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Since the pktcdvd driver only supports request queues for which
-struct scsi_request is the first member of their private request
-data, refuse to register block layer queues for which struct
-scsi_request is not the first member of the private data.
+On 24/05/17 02:34, Bart Van Assche wrote:
+> Since the SCSI core zeroes driver-private command data, remove
+> that code from the xen-scsifront driver.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: xen-devel@lists.xenproject.org
 
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
----
- drivers/block/pktcdvd.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Reviewed-by: Juergen Gross <jgross@suse.com>
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 205b865ebeb9..42e3c880a8a5 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2583,6 +2583,11 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
- 	bdev = bdget(dev);
- 	if (!bdev)
- 		return -ENOMEM;
-+	if (!blk_queue_scsi_passthrough(bdev_get_queue(bdev))) {
-+		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
-+		bdput(bdev);
-+		return -EINVAL;
-+	}
- 	ret = blkdev_get(bdev, FMODE_READ | FMODE_NDELAY, NULL);
- 	if (ret)
- 		return ret;
--- 
-2.12.2
+Thanks,
+
+Juergen
