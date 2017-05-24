@@ -1,48 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:56500 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763444AbdEXAet (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:34:49 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
+Received: from mx2.suse.de ([195.135.220.15]:54742 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S938322AbdEXFvm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 01:51:42 -0400
+Subject: Re: [PATCH 04/31] Introduce scsi_start_queue()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 30/31] scsi: virtio: Remove code that zeroes driver-private command data
-Date: Tue, 23 May 2017 17:34:19 -0700
-Message-ID: <20170524003420.5381-31-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Israel Rukshin <israelr@mellanox.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Benjamin Block <bblock@linux.vnet.ibm.com>
 References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-5-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <7346a47f-1694-3808-af6c-c356d0008e15@suse.de>
+Date: Wed, 24 May 2017 07:51:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170524003420.5381-5-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Since the SCSI core zeroes driver-private command data, remove
-that code from the virtio driver.
+On 05/24/2017 02:33 AM, Bart Van Assche wrote:
+> This patch does not change any functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Israel Rukshin <israelr@mellanox.com>
+> Cc: Max Gurtovoy <maxg@mellanox.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Benjamin Block <bblock@linux.vnet.ibm.com>
+> ---
+>  drivers/scsi/scsi_lib.c  | 25 +++++++++++++++----------
+>  drivers/scsi/scsi_priv.h |  1 +
+>  2 files changed, 16 insertions(+), 10 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
----
- drivers/scsi/virtio_scsi.c | 1 -
- 1 file changed, 1 deletion(-)
+Cheers,
 
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index f8dbfeee6c63..dc2e97c543a5 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -547,7 +547,6 @@ static int virtscsi_queuecommand(struct virtio_scsi *vscsi,
- 	dev_dbg(&sc->device->sdev_gendev,
- 		"cmd %p CDB: %#02x\n", sc, sc->cmnd[0]);
- 
--	memset(cmd, 0, sizeof(*cmd));
- 	cmd->sc = sc;
- 
- 	BUG_ON(sc->cmd_len > VIRTIO_SCSI_CDB_SIZE);
+Hannes
 -- 
-2.12.2
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
