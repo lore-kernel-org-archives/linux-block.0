@@ -1,59 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36466 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751022AbdEaMir (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2017 08:38:47 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 8/9] blk-mq: clarify dispatch may not be drained/blocked by stopping queue
-Date: Wed, 31 May 2017 20:37:05 +0800
-Message-Id: <20170531123706.20885-9-ming.lei@redhat.com>
-In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
-References: <20170531123706.20885-1-ming.lei@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:60882 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S936309AbdEXGOp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 May 2017 02:14:45 -0400
+Subject: Re: [PATCH 30/31] scsi: virtio: Remove code that zeroes
+ driver-private command data
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <20170524003420.5381-31-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <ef73e928-26af-53d4-0e60-719c47c979ce@suse.de>
+Date: Wed, 24 May 2017 08:14:43 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524003420.5381-31-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-BLK_MQ_S_STOPPED may not be observed in other concurrent I/O paths,
-we can't guarantee that dispatching won't happen after returning
-from the APIs of stopping queue.
+On 05/24/2017 02:34 AM, Bart Van Assche wrote:
+> Since the SCSI core zeroes driver-private command data, remove
+> that code from the virtio driver.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/scsi/virtio_scsi.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
+> index f8dbfeee6c63..dc2e97c543a5 100644
+> --- a/drivers/scsi/virtio_scsi.c
+> +++ b/drivers/scsi/virtio_scsi.c
+> @@ -547,7 +547,6 @@ static int virtscsi_queuecommand(struct virtio_scsi *vscsi,
+>  	dev_dbg(&sc->device->sdev_gendev,
+>  		"cmd %p CDB: %#02x\n", sc, sc->cmnd[0]);
+>  
+> -	memset(cmd, 0, sizeof(*cmd));
+>  	cmd->sc = sc;
+>  
+>  	BUG_ON(sc->cmd_len > VIRTIO_SCSI_CDB_SIZE);
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-So clarify the fact and avoid potential misuse.
+Cheers,
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bcff1b184bbb..352aaaf0bcf9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1187,6 +1187,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
- 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
- }
- 
-+/*
-+ * We do not guarantee that dispatch can be drained or blocked
-+ * after blk_mq_stop_hw_queue() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	__blk_mq_stop_hw_queue(hctx, false);
-@@ -1202,6 +1207,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
- 		__blk_mq_stop_hw_queue(hctx, sync);
- }
- 
-+/*
-+ * We do not guarantee that dispatch can be drained or blocked
-+ * after blk_mq_stop_hw_queues() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queues(struct request_queue *q)
- {
- 	__blk_mq_stop_hw_queues(q, false);
+Hannes
 -- 
-2.9.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
