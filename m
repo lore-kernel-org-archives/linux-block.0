@@ -1,215 +1,154 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
 	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 5/6] mmc: debugfs: Move card status retrieveal into the block layer
-Date: Fri, 19 May 2017 15:37:31 +0200
-Message-Id: <20170519133732.27470-6-linus.walleij@linaro.org>
-In-Reply-To: <20170519133732.27470-1-linus.walleij@linaro.org>
-References: <20170519133732.27470-1-linus.walleij@linaro.org>
+	Dan Williams <dan.j.williams@intel.com>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Matthew Wilcox <mawilcox@microsoft.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Stephen Bates <sbates@raithlin.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Jerome Glisse <jglisse@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 24 May 2017 15:42:22 -0600
+Message-Id: <1495662147-18277-12-git-send-email-logang@deltatee.com>
+In-Reply-To: <1495662147-18277-1-git-send-email-logang@deltatee.com>
+References: <1495662147-18277-1-git-send-email-logang@deltatee.com>
+Subject: [RFC PATCH 11/16] bvec: convert to using pfn_t internally
 List-ID: <linux-block@vger.kernel.org>
 
-The debugfs file "status" (in e.g. /debug/mmc3/mmc3:0001) is
-only available if and only if the card used is an (e)MMC or
-SD card, not for SDIO, as can be seen from this guard in
-mmc_add_card_debugfs();
+With bv_page fenced off, we can now convert it to a pfn_t fairly simply.
+Everything should work the same with the exception of a BUG_ON
+for potentially unmappable pfns.
 
-if (mmc_card_mmc(card) || mmc_card_sd(card))
-  (...create debugfs "status" entry...)
+A couple of initializers that assign {NULL} to a bio_vec had to also be
+changed to {} to prevent a warning seeing pfn_t is actually a struct.
 
-Further this debugfs entry suffers from all the same starvation
-issues as the other userspace things, under e.g. a heavy
-dd operation.
-
-It is therefore logical to move this over to the block layer
-when it is enabled, using the new custom requests and issue
-it using the block request queue.
-
-This makes this debugfs card access land under the request
-queue host lock instead of orthogonally taking the lock.
-
-Tested during heavy dd load by cat:in the status file. We
-add IS_ENABLED() guards and keep the code snippet just
-issueing the card status as a static inline in the header
-so we can still have card status working when the block
-layer is compiled out.
-
-Keeping two copies of mmc_dbg_card_status_get() around
-seems to be a necessary evil to be able to have the MMC/SD
-stack working with the block layer disabled: under these
-circumstances, the code must simply take another path.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
 ---
- drivers/mmc/core/block.c   | 28 ++++++++++++++++++++++++++++
- drivers/mmc/core/block.h   | 37 +++++++++++++++++++++++++++++++++++++
- drivers/mmc/core/debugfs.c | 15 ++-------------
- drivers/mmc/core/queue.h   |  2 ++
- 4 files changed, 69 insertions(+), 13 deletions(-)
+ block/blk-integrity.c |  4 ++--
+ block/blk-merge.c     |  6 +++---
+ include/linux/bvec.h  | 13 +++++++++----
+ 3 files changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 52635120a0a5..8858798d1349 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1191,6 +1191,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 	struct mmc_queue_req *mq_rq;
- 	struct mmc_card *card = mq->card;
- 	struct mmc_blk_data *md = mq->blkdata;
-+	u32 status;
- 	int ret;
- 	int i;
- 
-@@ -1219,6 +1220,11 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 			card->ext_csd.boot_ro_lock |=
- 				EXT_CSD_BOOT_WP_B_PWR_WP_EN;
- 		break;
-+	case MMC_DRV_OP_GET_CARD_STATUS:
-+		ret = mmc_send_status(card, &status);
-+		if (!ret)
-+			ret = status;
-+		break;
- 	default:
- 		pr_err("%s: unknown driver specific operation\n",
- 		       md->disk->disk_name);
-@@ -1968,6 +1974,28 @@ void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
- 		mmc_put_card(card);
- }
- 
-+/* Called from debugfs for MMC/SD cards */
-+int mmc_blk_card_status_get(struct mmc_card *card, u64 *val)
-+{
-+	struct mmc_blk_data *md = dev_get_drvdata(&card->dev);
-+	struct mmc_queue *mq = &md->queue;
-+	struct request *req;
-+	int ret;
-+
-+	/* Ask the block layer about the card status */
-+	req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_CARD_STATUS;
-+	blk_execute_rq(mq->queue, NULL, req, 0);
-+	ret = req_to_mmc_queue_req(req)->drv_op_result;
-+	if (ret >= 0) {
-+		*val = ret;
-+		ret = 0;
-+	}
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(mmc_blk_card_status_get);
-+
- static inline int mmc_blk_readonly(struct mmc_card *card)
- {
- 	return mmc_card_readonly(card) ||
-diff --git a/drivers/mmc/core/block.h b/drivers/mmc/core/block.h
-index 860ca7c8df86..1e26755a864b 100644
---- a/drivers/mmc/core/block.h
-+++ b/drivers/mmc/core/block.h
-@@ -1,9 +1,46 @@
- #ifndef _MMC_CORE_BLOCK_H
- #define _MMC_CORE_BLOCK_H
- 
-+#include <linux/kconfig.h>
-+#include "core.h"
-+#include "mmc_ops.h"
-+
- struct mmc_queue;
- struct request;
- 
-+#if IS_ENABLED(CONFIG_MMC_BLOCK)
-+
- void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req);
-+int mmc_blk_card_status_get(struct mmc_card *card, u64 *val);
-+
-+#else
-+
-+/*
-+ * Small stub functions to be used when the block layer is not
-+ * enabled, e.g. for pure SDIO without MMC/SD configurations.
-+ */
-+
-+static inline void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
-+{
-+	return;
-+}
-+
-+static inline int mmc_blk_card_status_get(struct mmc_card *card, u64 *val)
-+{
-+	u32 status;
-+	int ret;
-+
-+	mmc_get_card(card);
-+
-+	ret = mmc_send_status(card, &status);
-+	if (!ret)
-+		*val = status;
-+
-+	mmc_put_card(card);
-+
-+	return ret;
-+}
-+
-+#endif /* IS_ENABLED(CONFIG_MMC_BLOCK) */
- 
- #endif
-diff --git a/drivers/mmc/core/debugfs.c b/drivers/mmc/core/debugfs.c
-index a1fba5732d66..ce5b921c7d96 100644
---- a/drivers/mmc/core/debugfs.c
-+++ b/drivers/mmc/core/debugfs.c
-@@ -19,6 +19,7 @@
- #include <linux/mmc/card.h>
- #include <linux/mmc/host.h>
- 
-+#include "block.h"
- #include "core.h"
- #include "card.h"
- #include "host.h"
-@@ -283,19 +284,7 @@ void mmc_remove_host_debugfs(struct mmc_host *host)
- 
- static int mmc_dbg_card_status_get(void *data, u64 *val)
- {
--	struct mmc_card	*card = data;
--	u32		status;
--	int		ret;
--
--	mmc_get_card(card);
--
--	ret = mmc_send_status(data, &status);
--	if (!ret)
--		*val = status;
--
--	mmc_put_card(card);
--
--	return ret;
-+	return mmc_blk_card_status_get(data, val);
- }
- DEFINE_SIMPLE_ATTRIBUTE(mmc_dbg_card_status_fops, mmc_dbg_card_status_get,
- 		NULL, "%08llx\n");
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index 361b46408e0f..2b39717453a5 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -36,10 +36,12 @@ struct mmc_blk_request {
-  * enum mmc_drv_op - enumerates the operations in the mmc_queue_req
-  * @MMC_DRV_OP_IOCTL: ioctl operation
-  * @MMC_DRV_OP_BOOT_WP: write protect boot partitions
-+ * @MMC_DRV_OP_GET_CARD_STATUS: get card status
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 857138a..2ba66f7 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -40,7 +40,7 @@
   */
- enum mmc_drv_op {
- 	MMC_DRV_OP_IOCTL,
- 	MMC_DRV_OP_BOOT_WP,
-+	MMC_DRV_OP_GET_CARD_STATUS,
- };
+ int blk_rq_count_integrity_sg(struct request_queue *q, struct bio *bio)
+ {
+-	struct bio_vec iv, ivprv = { NULL };
++	struct bio_vec iv, ivprv = {};
+ 	unsigned int segments = 0;
+ 	unsigned int seg_size = 0;
+ 	struct bvec_iter iter;
+@@ -86,7 +86,7 @@ EXPORT_SYMBOL(blk_rq_count_integrity_sg);
+ int blk_rq_map_integrity_sg(struct request_queue *q, struct bio *bio,
+ 			    struct scatterlist *sglist)
+ {
+-	struct bio_vec iv, ivprv = { NULL };
++	struct bio_vec iv, ivprv = {};
+ 	struct scatterlist *sg = NULL;
+ 	unsigned int segments = 0;
+ 	struct bvec_iter iter;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 65dcee9..93e87fe 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -245,7 +245,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 					     struct bio *bio,
+ 					     bool no_sg_merge)
+ {
+-	struct bio_vec bv, bvprv = { NULL };
++	struct bio_vec bv, bvprv = {};
+ 	int cluster, prev = 0;
+ 	unsigned int seg_size, nr_phys_segs;
+ 	struct bio *fbio, *bbio;
+@@ -347,7 +347,7 @@ EXPORT_SYMBOL(blk_recount_segments);
+ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
+ 				   struct bio *nxt)
+ {
+-	struct bio_vec end_bv = { NULL }, nxt_bv;
++	struct bio_vec end_bv = {}, nxt_bv;
  
- struct mmc_queue_req {
+ 	if (!blk_queue_cluster(q))
+ 		return 0;
+@@ -430,7 +430,7 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
+ 			     struct scatterlist *sglist,
+ 			     struct scatterlist **sg)
+ {
+-	struct bio_vec bvec, bvprv = { NULL };
++	struct bio_vec bvec, bvprv = {};
+ 	struct bvec_iter iter;
+ 	int cluster = blk_queue_cluster(q), nsegs = 0;
+ 
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index b53b879..d950288 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -22,12 +22,13 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/bug.h>
++#include <linux/pfn_t.h>
+ 
+ /*
+  * was unsigned short, but we might as well be ready for > 64kB I/O pages
+  */
+ struct bio_vec {
+-	struct page	*bv_page;
++	pfn_t		bv_pfn;
+ 	unsigned int	bv_len;
+ 	unsigned int	bv_offset;
+ };
+@@ -45,12 +46,13 @@ struct bvec_iter {
+ 
+ static inline struct page *bvec_page(const struct bio_vec *bvec)
+ {
+-	return bvec->bv_page;
++	BUG_ON(!pfn_t_is_always_mappable(bvec->bv_pfn));
++	return pfn_t_to_page(bvec->bv_pfn);
+ }
+ 
+ static inline void bvec_set_page(struct bio_vec *bvec, struct page *page)
+ {
+-	bvec->bv_page = page;
++	bvec->bv_pfn = page_to_pfn_t(page);
+ }
+ 
+ /*
+@@ -59,6 +61,9 @@ static inline void bvec_set_page(struct bio_vec *bvec, struct page *page)
+  */
+ #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
+ 
++#define bvec_iter_pfn_t(bvec, iter)				\
++	(__bvec_iter_bvec((bvec), (iter))->bv_pfn)
++
+ #define bvec_iter_page(bvec, iter)				\
+ 	(bvec_page(__bvec_iter_bvec((bvec), (iter))))
+ 
+@@ -71,7 +76,7 @@ static inline void bvec_set_page(struct bio_vec *bvec, struct page *page)
+ 
+ #define bvec_iter_bvec(bvec, iter)				\
+ ((struct bio_vec) {						\
+-	.bv_page	= bvec_iter_page((bvec), (iter)),	\
++	.bv_pfn		= bvec_iter_pfn_t((bvec), (iter)),	\
+ 	.bv_len		= bvec_iter_len((bvec), (iter)),	\
+ 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
+ })
 -- 
-2.9.3
+2.1.4
