@@ -1,36 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:28006 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754839AbdEYCFE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2017 22:05:04 -0400
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "James.Bottomley@HansenPartnership.com"
+	<James.Bottomley@HansenPartnership.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH 00/31] SCSI patches for kernel v4.13.
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Date: Wed, 24 May 2017 04:43:01 +0000
+Message-ID: <1495600980.2714.1.camel@sandisk.com>
 References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-Date: Wed, 24 May 2017 22:04:55 -0400
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com> (Bart Van
-        Assche's message of "Tue, 23 May 2017 17:33:49 -0700")
-Message-ID: <yq1o9uhsnco.fsf@oracle.com>
+	 <28a3029c-b5eb-ca56-f0ef-75600ca1dd6e@kernel.dk>
+In-Reply-To: <28a3029c-b5eb-ca56-f0ef-75600ca1dd6e@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-
-Bart,
-
-> This patch series consists of the bug fixes I came up with during the
-> past two months. Please consider these patches for kernel v4.13.
-
-No major objections from me. Although you may have to slice and dice the
-series differently so we can get the block bits queued through Jens and
-then do the rest as a stage 2 merge.
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+T24gVHVlLCAyMDE3LTA1LTIzIGF0IDIxOjU1IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAwNS8yMy8yMDE3IDA2OjMzIFBNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gSGVsbG8g
+TWFydGluLA0KPiA+IA0KPiA+IFRoaXMgcGF0Y2ggc2VyaWVzIGNvbnNpc3RzIG9mIHRoZSBidWcg
+Zml4ZXMgSSBjYW1lIHVwIHdpdGggZHVyaW5nDQo+ID4gdGhlIHBhc3QgdHdvIG1vbnRocy4gUGxl
+YXNlIGNvbnNpZGVyIHRoZXNlIHBhdGNoZXMgZm9yIGtlcm5lbCB2NC4xMy4NCj4gDQo+IEVobSwg
+bGFzdCBJIGNoZWNrZWQgdGhlIGJsb2NrIHBhdGNoZXMgaGFkbid0IGJlZW4gcmV2aWV3ZWQvc2ln
+bmVkLW9mZg0KPiBieSBhbnlvbmUgZWxzZS4gV2Ugc3RpbGwgaGF2ZSB0aGF0IGluaXQgYWRkaXRp
+b24gaW4gdGhlIGhvdCBwYXRoIGZvcg0KPiByZXF1ZXN0IGluaXRpYWxpemF0aW9uLCBhcyBDaHJp
+c3RvcGggcG9pbnRlZCBvdXQuDQo+IA0KPiBTbyBsZXQncyBob2xkIG9mZiBvbiB0aGlzIGEgYml0
+LCBhdCBsZWFzdCBvbiB0aGUgYmxvY2sgcGFydHMsIHVudGlsDQo+IHdlIGhhdmUgdGhpbmdzIHBy
+b3Blcmx5IHNpZ25lZCBvZmYuDQoNCkhpIEplbnMsDQoNCkluIGNhc2UgdGhpcyB3b3VsZG4ndCBi
+ZSBjbGVhciwgSSBmdWxseSBhZ3JlZSB3aXRoIHlvdSB0aGF0IHlvdXIgYXBwcm92YWwNCmlzIHJl
+cXVpcmVkIGZvciB0aGUgYmxvY2sgbGF5ZXIgcGF0Y2hlcy4gSXQncyBiZWNhdXNlIHRoZXJlIGFy
+ZSBzZXZlcmFsDQpibG9jayBsYXllciBwYXRjaGVzIGluIHRoaXMgc2VyaWVzIHRoYXQgSSBoYXZl
+IENjLWVkIHRoZSBibG9jayBsYXllcg0KbWFpbGluZyBsaXN0IGZvciB0aGUgd2hvbGUgc2VyaWVz
+Lg0KDQpCYXJ0Lg==
