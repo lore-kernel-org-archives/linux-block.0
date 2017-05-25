@@ -1,85 +1,42 @@
-Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 05/15] fs: remove the unused error argument to dio_end_io()
-Date: Thu, 18 May 2017 15:18:02 +0200
-Message-Id: <20170518131812.22956-6-hch@lst.de>
-In-Reply-To: <20170518131812.22956-1-hch@lst.de>
-References: <20170518131812.22956-1-hch@lst.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Omar Sandoval" <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 12/31] bsg: Check queue type before attaching to a queue
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+        <20170524003420.5381-13-bart.vanassche@sandisk.com>
+Date: Wed, 24 May 2017 22:01:21 -0400
+In-Reply-To: <20170524003420.5381-13-bart.vanassche@sandisk.com> (Bart Van
+        Assche's message of "Tue, 23 May 2017 17:34:01 -0700")
+Message-ID: <yq1shjtsnim.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/btrfs/inode.c   | 6 +++---
- fs/direct-io.c     | 3 +--
- include/linux/fs.h | 2 +-
- 3 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 17cbe9306faf..758b2666885e 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8244,7 +8244,7 @@ static void btrfs_endio_direct_read(struct bio *bio)
- 	kfree(dip);
- 
- 	dio_bio->bi_error = bio->bi_error;
--	dio_end_io(dio_bio, bio->bi_error);
-+	dio_end_io(dio_bio);
- 
- 	if (io_bio->end_io)
- 		io_bio->end_io(io_bio, err);
-@@ -8304,7 +8304,7 @@ static void btrfs_endio_direct_write(struct bio *bio)
- 	kfree(dip);
- 
- 	dio_bio->bi_error = bio->bi_error;
--	dio_end_io(dio_bio, bio->bi_error);
-+	dio_end_io(dio_bio);
- 	bio_put(bio);
- }
- 
-@@ -8673,7 +8673,7 @@ static void btrfs_submit_direct(struct bio *dio_bio, struct inode *inode,
- 		 * Releases and cleans up our dio_bio, no need to bio_put()
- 		 * nor bio_endio()/bio_io_error() against dio_bio.
- 		 */
--		dio_end_io(dio_bio, ret);
-+		dio_end_io(dio_bio);
- 	}
- 	if (io_bio)
- 		bio_put(io_bio);
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a04ebea77de8..04247a6c3f73 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -348,13 +348,12 @@ static void dio_bio_end_io(struct bio *bio)
- /**
-  * dio_end_io - handle the end io action for the given bio
-  * @bio: The direct io bio thats being completed
-- * @error: Error if there was one
-  *
-  * This is meant to be called by any filesystem that uses their own dio_submit_t
-  * so that the DIO specific endio actions are dealt with after the filesystem
-  * has done it's completion work.
-  */
--void dio_end_io(struct bio *bio, int error)
-+void dio_end_io(struct bio *bio)
- {
- 	struct dio *dio = bio->bi_private;
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 803e5a9b2654..4388ab58843d 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2843,7 +2843,7 @@ enum {
- 	DIO_SKIP_DIO_COUNT = 0x08,
- };
- 
--void dio_end_io(struct bio *bio, int error);
-+void dio_end_io(struct bio *bio);
- 
- ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
- 			     struct block_device *bdev, struct iov_iter *iter,
+Bart,
+
+> Since BSG only supports request queues for which struct scsi_request
+> is the first member of their private request data, refuse to register
+> block layer queues for which struct scsi_request is not the first
+> member of their private data.
+
+> +
+> +	if (!blk_queue_scsi_sup(rq)) {
+
+If you are renaming the flag, how about blk_queue_scsi_pdu()?
+
+> +		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+>  	if (!blk_get_queue(rq))
+>  		return ERR_PTR(-ENXIO);
+
 -- 
-2.11.0
+Martin K. Petersen	Oracle Linux Engineering
