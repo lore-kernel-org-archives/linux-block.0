@@ -1,63 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57854 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757537AbdEYJJh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 05:09:37 -0400
-Date: Thu, 25 May 2017 17:09:18 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:54592 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S941903AbdEYFZE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 May 2017 01:25:04 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [PATCH 0/7] blk-mq: fix queue quiescing
-Message-ID: <20170525090917.GB15737@ming.t460p>
+Date: Thu, 25 May 2017 05:24:54 +0000
+Message-ID: <1495689892.3045.2.camel@sandisk.com>
 References: <20170525042131.13172-1-ming.lei@redhat.com>
- <1495689892.3045.2.camel@sandisk.com>
+In-Reply-To: <20170525042131.13172-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1495689892.3045.2.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, May 25, 2017 at 05:24:54AM +0000, Bart Van Assche wrote:
-> On Thu, 2017-05-25 at 12:21 +0800, Ming Lei wrote:
-> > One big problem of blk_mq_quiesce_queue() is that it
-> > can't prevent .queue_rq() in direct issue path from
-> > being run even though hw queues are stopped by
-> > blk_mq_quiesce_queue().
-> 
-> That's wrong. All what's needed to prevent that
-> __blk_mq_try_issue_directly() calls .queue_rq() for a stopped
-> queue is to check in __blk_mq_try_issue_directly() whether the
-
-That should work, and I just didn't want to introduce a check
-on global variable in fast path, but just figured out that
-it is inevitable for percpu_ref too.
-
-> relevant hardware queue has been stopped. That approach has the
-
-I don't think it is a good idea to abuse stopped state for checking
-queue quiesce, actually stopping queue has made lots of trouble,
-we should avoid it in blk_mq_quiesce_queue() in the future, even
-most of them in driver side.
-
-So I will introduce a queue quiesce flag like in patch 2 for this
-purpose.
-
-> following two advantages over the approach of your patch series:
-> - Lower code complexity and hence easier to review and to maintain.
-> - Faster for queues for which BLK_MQ_F_BLOCKING has not been set.
->   For non-preemptible kernels rcu_read_lock() and rcu_read_lock()
->   are optimized out. That is not possible for
->   percpu_ref_tryget_live() / percpu_ref_put().
-
-That won't be issue for perpcu access at all.
-
-Another big issue is that 'srcu_struct' is very big, which shouldn't
-be embedded into hctx, since we only have one real user of
-BLK_MQ_F_BLOCKING.
-
-So I will fix that too.
-
-Thanks,
-Ming
+T24gVGh1LCAyMDE3LTA1LTI1IGF0IDEyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT25l
+IGJpZyBwcm9ibGVtIG9mIGJsa19tcV9xdWllc2NlX3F1ZXVlKCkgaXMgdGhhdCBpdA0KPiBjYW4n
+dCBwcmV2ZW50IC5xdWV1ZV9ycSgpIGluIGRpcmVjdCBpc3N1ZSBwYXRoIGZyb20NCj4gYmVpbmcg
+cnVuIGV2ZW4gdGhvdWdoIGh3IHF1ZXVlcyBhcmUgc3RvcHBlZCBieQ0KPiBibGtfbXFfcXVpZXNj
+ZV9xdWV1ZSgpLg0KDQpUaGF0J3Mgd3JvbmcuIEFsbCB3aGF0J3MgbmVlZGVkIHRvIHByZXZlbnQg
+dGhhdA0KX19ibGtfbXFfdHJ5X2lzc3VlX2RpcmVjdGx5KCkgY2FsbHMgLnF1ZXVlX3JxKCkgZm9y
+IGEgc3RvcHBlZA0KcXVldWUgaXMgdG8gY2hlY2sgaW4gX19ibGtfbXFfdHJ5X2lzc3VlX2RpcmVj
+dGx5KCkgd2hldGhlciB0aGUNCnJlbGV2YW50IGhhcmR3YXJlIHF1ZXVlIGhhcyBiZWVuIHN0b3Bw
+ZWQuIFRoYXQgYXBwcm9hY2ggaGFzIHRoZQ0KZm9sbG93aW5nIHR3byBhZHZhbnRhZ2VzIG92ZXIg
+dGhlIGFwcHJvYWNoIG9mIHlvdXIgcGF0Y2ggc2VyaWVzOg0KLSBMb3dlciBjb2RlIGNvbXBsZXhp
+dHkgYW5kIGhlbmNlIGVhc2llciB0byByZXZpZXcgYW5kIHRvIG1haW50YWluLg0KLSBGYXN0ZXIg
+Zm9yIHF1ZXVlcyBmb3Igd2hpY2ggQkxLX01RX0ZfQkxPQ0tJTkcgaGFzIG5vdCBiZWVuIHNldC4N
+CiAgRm9yIG5vbi1wcmVlbXB0aWJsZSBrZXJuZWxzIHJjdV9yZWFkX2xvY2soKSBhbmQgcmN1X3Jl
+YWRfbG9jaygpDQogIGFyZSBvcHRpbWl6ZWQgb3V0LiBUaGF0IGlzIG5vdCBwb3NzaWJsZSBmb3IN
+CiAgcGVyY3B1X3JlZl90cnlnZXRfbGl2ZSgpIC8gcGVyY3B1X3JlZl9wdXQoKS4NCg0KQmFydC4=
