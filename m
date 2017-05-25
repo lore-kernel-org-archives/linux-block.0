@@ -1,80 +1,92 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 05/27] btrfs: btrfs_wait_tree_block_writeback can be void return
-Date: Tue,  9 May 2017 11:49:08 -0400
-Message-Id: <20170509154930.29524-6-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>
+Subject: [PATCH 00/19] Block layer patches for kernel v4.13
+Date: Thu, 25 May 2017 11:43:08 -0700
+Message-ID: <20170525184327.23570-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Nothing checks its return value.
+Hello Jens,
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/btrfs/disk-io.c | 6 +++---
- fs/btrfs/disk-io.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+The patches in this series are:
+* A repost of the block layer patches I had sent to Martin earlier
+  this week but now sent to you.
+* Two patches to reduce the size of struct blk_mq_hw_ctx.
+* A series of documentation patches I prepared about two months ago
+  but for which I had not yet had the time to post these.
 
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index eb1ee7b6f532..8c479bd5534a 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -1222,10 +1222,10 @@ int btrfs_write_tree_block(struct extent_buffer *buf)
- 					buf->start + buf->len - 1);
- }
- 
--int btrfs_wait_tree_block_writeback(struct extent_buffer *buf)
-+void btrfs_wait_tree_block_writeback(struct extent_buffer *buf)
- {
--	return filemap_fdatawait_range(buf->pages[0]->mapping,
--				       buf->start, buf->start + buf->len - 1);
-+	filemap_fdatawait_range(buf->pages[0]->mapping,
-+			        buf->start, buf->start + buf->len - 1);
- }
- 
- struct extent_buffer *read_tree_block(struct btrfs_fs_info *fs_info, u64 bytenr,
-diff --git a/fs/btrfs/disk-io.h b/fs/btrfs/disk-io.h
-index 2e0ec29bfd69..9cc87835abb5 100644
---- a/fs/btrfs/disk-io.h
-+++ b/fs/btrfs/disk-io.h
-@@ -127,7 +127,7 @@ int btrfs_wq_submit_bio(struct btrfs_fs_info *fs_info, struct inode *inode,
- 			extent_submit_bio_hook_t *submit_bio_done);
- unsigned long btrfs_async_submit_limit(struct btrfs_fs_info *info);
- int btrfs_write_tree_block(struct extent_buffer *buf);
--int btrfs_wait_tree_block_writeback(struct extent_buffer *buf);
-+void btrfs_wait_tree_block_writeback(struct extent_buffer *buf);
- int btrfs_init_log_root_tree(struct btrfs_trans_handle *trans,
- 			     struct btrfs_fs_info *fs_info);
- int btrfs_add_log_tree(struct btrfs_trans_handle *trans,
+Please consider these patches for kernel v4.13.
+
+Thanks,
+
+Bart.
+
+Bart Van Assche (19):
+  block: Avoid that blk_exit_rl() triggers a use-after-free
+  block: Introduce queue flag QUEUE_FLAG_SCSI_PDU
+  bsg: Check queue type before attaching to a queue
+  pktcdvd: Check queue type before attaching to a queue
+  cdrom: Check private request size before attaching to a queue
+  nfsd: Check private request size before submitting a SCSI request
+  scsi: Make scsi_ioctl_reset() pass the request queue pointer to
+    blk_rq_init()
+  block: Introduce request_queue.initialize_rq_fn()
+  block: Make scsi_req_init() calls implicit
+  blk-mq: Change blk_mq_hw_ctx.queue_rq_srcu into an array
+  blk-mq: Reduce blk_mq_hw_ctx size
+  blk-mq: Initialize a request before assigning a tag
+  blk-mq: Fix the comment above blk_mq_quiesce_queue()
+  block: Add a comment above queue_lockdep_assert_held()
+  block: Check locking assumptions at runtime
+  block: Document what queue type each function is intended for
+  blk-mq: Document locking assumptions
+  block: Constify disk_type
+  block: Make request operation type argument declarations consistent
+
+ block/blk-cgroup.c                 |   2 +-
+ block/blk-core.c                   | 129 ++++++++++++++++++++++++++++---------
+ block/blk-flush.c                  |   8 ++-
+ block/blk-merge.c                  |   2 +
+ block/blk-mq.c                     |  68 ++++++++++++-------
+ block/blk-sysfs.c                  |   2 +-
+ block/blk-tag.c                    |  15 ++---
+ block/blk-timeout.c                |   4 +-
+ block/blk.h                        |   2 +-
+ block/bsg-lib.c                    |   1 +
+ block/bsg.c                        |   7 +-
+ block/genhd.c                      |   4 +-
+ block/scsi_ioctl.c                 |   3 -
+ drivers/block/cciss.c              |   1 +
+ drivers/block/pktcdvd.c            |   6 +-
+ drivers/cdrom/cdrom.c              |   5 +-
+ drivers/ide/ide-atapi.c            |   2 -
+ drivers/ide/ide-cd.c               |   1 -
+ drivers/ide/ide-cd_ioctl.c         |   1 -
+ drivers/ide/ide-devsets.c          |   1 -
+ drivers/ide/ide-disk.c             |   1 -
+ drivers/ide/ide-ioctls.c           |   2 -
+ drivers/ide/ide-park.c             |   2 -
+ drivers/ide/ide-pm.c               |   2 -
+ drivers/ide/ide-probe.c            |   7 +-
+ drivers/ide/ide-tape.c             |   1 -
+ drivers/ide/ide-taskfile.c         |   1 -
+ drivers/scsi/osd/osd_initiator.c   |   2 -
+ drivers/scsi/osst.c                |   1 -
+ drivers/scsi/scsi_error.c          |   8 ++-
+ drivers/scsi/scsi_lib.c            |  12 +++-
+ drivers/scsi/scsi_transport_sas.c  |   7 ++
+ drivers/scsi/sg.c                  |   2 -
+ drivers/scsi/st.c                  |   1 -
+ drivers/target/target_core_pscsi.c |   2 -
+ fs/nfsd/blocklayout.c              |   4 +-
+ include/linux/blk-mq.h             |  11 ++--
+ include/linux/blkdev.h             |  16 ++++-
+ 38 files changed, 232 insertions(+), 114 deletions(-)
+
 -- 
-2.9.3
+2.12.2
