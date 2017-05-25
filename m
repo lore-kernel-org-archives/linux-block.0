@@ -1,19 +1,48 @@
-Return-Path: <hch@lst.de>
-Date: Sun, 28 May 2017 10:42:38 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
-	Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 14/19] block: Add a comment above
-	queue_lockdep_assert_held()
-Message-ID: <20170528084238.GI13083@lst.de>
-References: <20170525184327.23570-1-bart.vanassche@sandisk.com> <20170525184327.23570-15-bart.vanassche@sandisk.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
+ Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 14/19] block: Add a comment above queue_lockdep_assert_held()
+Date: Thu, 25 May 2017 11:43:22 -0700
+Message-ID: <20170525184327.23570-15-bart.vanassche@sandisk.com>
+In-Reply-To: <20170525184327.23570-1-bart.vanassche@sandisk.com>
+References: <20170525184327.23570-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170525184327.23570-15-bart.vanassche@sandisk.com>
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
+Add a comment above the queue_lockdep_assert_held() macro that
+explains the purpose of the q->queue_lock test.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/blkdev.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 8a223a0c95d5..293067a2726e 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -634,6 +634,13 @@ struct request_queue {
+ 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
+ 				 (1 << QUEUE_FLAG_POLL))
+ 
++/*
++ * @q->queue_lock is set while a queue is being initialized. Since we know
++ * that no other threads access the queue object before @q->queue_lock has
++ * been set, it is safe to manipulate queue flags without holding the
++ * queue_lock if @q->queue_lock == NULL. See also blk_alloc_queue_node() and
++ * blk_init_allocated_queue().
++ */
+ static inline void queue_lockdep_assert_held(struct request_queue *q)
+ {
+ 	if (q->queue_lock)
+-- 
+2.12.2
