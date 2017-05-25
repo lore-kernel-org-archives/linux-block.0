@@ -1,24 +1,118 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 26 May 2017 08:02:14 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
-	Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH 02/19] block: Introduce queue flag QUEUE_FLAG_SCSI_PDU
-Message-ID: <20170526060214.GB18424@lst.de>
-References: <20170525184327.23570-1-bart.vanassche@sandisk.com> <20170525184327.23570-3-bart.vanassche@sandisk.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Jens Axboe <axboe@fb.com>, Omar
+ Sandoval <osandov@fb.com>
+Subject: [PATCH 02/19] block: Introduce queue flag QUEUE_FLAG_SCSI_PDU
+Date: Thu, 25 May 2017 11:43:10 -0700
+Message-ID: <20170525184327.23570-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170525184327.23570-1-bart.vanassche@sandisk.com>
+References: <20170525184327.23570-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170525184327.23570-3-bart.vanassche@sandisk.com>
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, May 25, 2017 at 11:43:10AM -0700, Bart Van Assche wrote:
-> >From the context where a SCSI command is submitted it is not always
-> possible to figure out whether or not the queue the command is
-> submitted to has struct scsi_request as the first member of its
-> private data. Hence introduce the flag QUEUE_FLAG_SCSI_PDU.
+>From the context where a SCSI command is submitted it is not always
+possible to figure out whether or not the queue the command is
+submitted to has struct scsi_request as the first member of its
+private data. Hence introduce the flag QUEUE_FLAG_SCSI_PDU.
 
-I would call it QUEUE_FLAG_SCSI_PASSTHROUGH, but except for that:
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Jens Axboe <axboe@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Omar Sandoval <osandov@fb.com>
+---
+ block/bsg-lib.c                   | 1 +
+ drivers/block/cciss.c             | 1 +
+ drivers/ide/ide-probe.c           | 1 +
+ drivers/scsi/scsi_lib.c           | 2 ++
+ drivers/scsi/scsi_transport_sas.c | 1 +
+ include/linux/blkdev.h            | 2 ++
+ 6 files changed, 8 insertions(+)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 0a23dbba2d30..298710aa65a3 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -246,6 +246,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, char *name,
+ 	q->bsg_job_size = dd_job_size;
+ 	q->bsg_job_fn = job_fn;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PDU, q);
+ 	blk_queue_softirq_done(q, bsg_softirq_done);
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
+ 
+diff --git a/drivers/block/cciss.c b/drivers/block/cciss.c
+index cd375503f7b0..453d420a96dd 100644
+--- a/drivers/block/cciss.c
++++ b/drivers/block/cciss.c
+@@ -1956,6 +1956,7 @@ static int cciss_add_disk(ctlr_info_t *h, struct gendisk *disk,
+ 	disk->queue->cmd_size = sizeof(struct scsi_request);
+ 	disk->queue->request_fn = do_cciss_request;
+ 	disk->queue->queue_lock = &h->lock;
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PDU, disk->queue);
+ 	if (blk_init_allocated_queue(disk->queue) < 0)
+ 		goto cleanup_queue;
+ 
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index 023562565d11..a7cead2fd9ff 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -773,6 +773,7 @@ static int ide_init_queue(ide_drive_t *drive)
+ 	q->request_fn = do_ide_request;
+ 	q->init_rq_fn = ide_init_rq;
+ 	q->cmd_size = sizeof(struct ide_request);
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PDU, q);
+ 	if (blk_init_allocated_queue(q) < 0) {
+ 		blk_cleanup_queue(q);
+ 		return 1;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 814a4bd8405d..48dd47e6bdf4 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2056,6 +2056,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+ {
+ 	struct device *dev = shost->dma_dev;
+ 
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PDU, q);
++
+ 	/*
+ 	 * this limit is imposed by hardware restrictions
+ 	 */
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index 0ebe2f1bb908..f903004f3cad 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -264,6 +264,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 		q->queuedata = shost;
+ 
+ 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PDU, q);
+ 	return 0;
+ 
+ out_cleanup_queue:
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index b5d1e27631ee..94fd2600584d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -618,6 +618,7 @@ struct request_queue {
+ #define QUEUE_FLAG_STATS       27	/* track rq completion times */
+ #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
+ #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
++#define QUEUE_FLAG_SCSI_PDU    30	/* queue supports SCSI commands */
+ 
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
+@@ -708,6 +709,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ #define blk_queue_secure_erase(q) \
+ 	(test_bit(QUEUE_FLAG_SECERASE, &(q)->queue_flags))
+ #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
++#define blk_queue_scsi_pdu(q)	test_bit(QUEUE_FLAG_SCSI_PDU, &(q)->queue_flags)
+ 
+ #define blk_noretry_request(rq) \
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+-- 
+2.12.2
