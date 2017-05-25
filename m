@@ -1,113 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:5769 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1760675AbdEXAfS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:35:18 -0400
+Return-Path: <Bart.VanAssche@sandisk.com>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 19/31] scsi: Change argument type of scsi_req_init()
-Date: Tue, 23 May 2017 17:34:08 -0700
-Message-ID: <20170524003420.5381-20-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
+ Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 5/5] blk-mq-debugfs: Add 'kick' operation
+Date: Thu, 25 May 2017 16:38:10 -0700
+Message-ID: <20170525233810.23211-6-bart.vanassche@sandisk.com>
+In-Reply-To: <20170525233810.23211-1-bart.vanassche@sandisk.com>
+References: <20170525233810.23211-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-Since scsi_req_init() works on a struct scsi_request, change the
-argument type into struct scsi_request *.
+Running a queue causes the block layer to examine the per-CPU and
+hw queues but not the requeue list. Hence add a 'kick' operation
+that also examines the requeue list.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/scsi_ioctl.c                | 10 +++++++---
- drivers/ide/ide-probe.c           |  2 +-
- drivers/scsi/scsi_lib.c           |  4 +++-
- drivers/scsi/scsi_transport_sas.c |  2 +-
- include/scsi/scsi_request.h       |  2 +-
- 5 files changed, 13 insertions(+), 7 deletions(-)
+ block/blk-mq-debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index f96c51f5df40..7440de44dd85 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -741,10 +741,14 @@ int scsi_cmd_blk_ioctl(struct block_device *bd, fmode_t mode,
- }
- EXPORT_SYMBOL(scsi_cmd_blk_ioctl);
- 
--void scsi_req_init(struct request *rq)
-+/**
-+ * scsi_req_init - initialize certain fields of a scsi_request structure
-+ * @req: Pointer to a scsi_request structure.
-+ * Initializes .__cmd[], .cmd, .cmd_len and .sense_len but no other members
-+ * of struct scsi_request.
-+ */
-+void scsi_req_init(struct scsi_request *req)
- {
--	struct scsi_request *req = scsi_req(rq);
--
- 	memset(req->__cmd, 0, sizeof(req->__cmd));
- 	req->cmd = req->__cmd;
- 	req->cmd_len = BLK_MAX_CDB;
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 6b979f27584c..c5c4050f5bbc 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -745,7 +745,7 @@ static void ide_initialize_rq(struct request *rq)
- {
- 	struct ide_request *req = blk_mq_rq_to_pdu(rq);
- 
--	scsi_req_init(rq);
-+	scsi_req_init(&req->sreq);
- 	req->sreq.sense = req->sense;
- }
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 01ddf05e741e..31d2b9cd20e5 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1135,7 +1135,9 @@ EXPORT_SYMBOL(scsi_init_io);
- /* Called from inside blk_get_request() */
- static void scsi_initialize_rq(struct request *rq)
- {
--	scsi_req_init(rq);
-+	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
-+
-+	scsi_req_init(&cmd->req);
- }
- 
- /* Called after a request has been started. */
-diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
-index 2512242812d6..7c3c7682569d 100644
---- a/drivers/scsi/scsi_transport_sas.c
-+++ b/drivers/scsi/scsi_transport_sas.c
-@@ -215,7 +215,7 @@ static void sas_host_release(struct device *dev)
- 
- static void sas_initialize_rq(struct request *rq)
- {
--	scsi_req_init(rq);
-+	scsi_req_init(scsi_req(rq));
- }
- 
- static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
-diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
-index f0c76f9dc285..e0afa445ee4e 100644
---- a/include/scsi/scsi_request.h
-+++ b/include/scsi/scsi_request.h
-@@ -27,6 +27,6 @@ static inline void scsi_req_free_cmd(struct scsi_request *req)
- 		kfree(req->cmd);
- }
- 
--void scsi_req_init(struct request *);
-+void scsi_req_init(struct scsi_request *req);
- 
- #endif /* _SCSI_SCSI_REQUEST_H */
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 70a2b955afee..89277a888800 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -114,10 +114,12 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+ 		blk_mq_run_hw_queues(q, true);
+ 	} else if (strcmp(op, "start") == 0) {
+ 		blk_mq_start_stopped_hw_queues(q, true);
++	} else if (strcmp(op, "kick") == 0) {
++		blk_mq_kick_requeue_list(q);
+ 	} else {
+ 		pr_err("%s: unsupported operation '%s'\n", __func__, op);
+ inval:
+-		pr_err("%s: use either 'run' or 'start'\n", __func__);
++		pr_err("%s: use 'run', 'start' or 'kick'\n", __func__);
+ 		return -EINVAL;
+ 	}
+ 	return count;
 -- 
 2.12.2
