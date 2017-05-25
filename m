@@ -1,89 +1,91 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:21533 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763421AbdEXAeo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:34:44 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>, "Christoph Hellwig" <hch@lst.de>,
-        Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 17/31] block: Introduce request_queue.initialize_rq_fn()
-Date: Tue, 23 May 2017 17:34:06 -0700
-Message-ID: <20170524003420.5381-18-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+Return-Path: <jack@suse.cz>
+Date: Thu, 25 May 2017 10:16:14 +0200
+From: Jan Kara <jack@suse.cz>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	axboe@kernel.dk, linux-api@vger.kernel.org, adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_*
+ flags
+Message-ID: <20170525081614.GB28950@quack2.suse.cz>
+References: <20170524164150.9492-1-rgoldwyn@suse.de>
+ <20170524164150.9492-2-rgoldwyn@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170524164150.9492-2-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Several block drivers need to initialize the driver-private data
-after having called blk_get_request() and before .prep_rq_fn() is
-called, e.g. when submitting a REQ_OP_SCSI_* request. Avoid that
-that initialization code has to be repeated after every
-blk_get_request() call by adding a new callback function to struct
-request_queue.
+On Wed 24-05-17 11:41:41, Goldwyn Rodrigues wrote:
+> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> 
+> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: linux-block@vger.kernel.org
----
- block/blk-core.c       | 3 +++
- block/blk-mq.c         | 3 +++
- include/linux/blkdev.h | 4 ++++
- 3 files changed, 10 insertions(+)
+Looks good. You can add:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 55a7b76db7c2..8a680f7bb168 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -126,6 +126,9 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
- 	rq->start_time = jiffies;
- 	set_start_time_ns(rq);
- 	rq->part = NULL;
-+
-+	if (q->initialize_rq_fn)
-+		q->initialize_rq_fn(rq);
- }
- EXPORT_SYMBOL(blk_rq_init);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a69ad122ed66..2af43d4e5b96 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -241,6 +241,9 @@ void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
- 	rq->end_io_data = NULL;
- 	rq->next_rq = NULL;
- 
-+	if (q->initialize_rq_fn)
-+		q->initialize_rq_fn(rq);
-+
- 	ctx->rq_dispatched[op_is_sync(op)]++;
- }
- EXPORT_SYMBOL_GPL(blk_mq_rq_ctx_init);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6416a5834b05..e3c03d429371 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -410,8 +410,12 @@ struct request_queue {
- 	rq_timed_out_fn		*rq_timed_out_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
- 	lld_busy_fn		*lld_busy_fn;
-+	/* Called just after a request is allocated */
- 	init_rq_fn		*init_rq_fn;
-+	/* Called just before a request is freed */
- 	exit_rq_fn		*exit_rq_fn;
-+	/* Called from inside blk_get_request() */
-+	void (*initialize_rq_fn)(struct request *rq);
- 
- 	const struct blk_mq_ops	*mq_ops;
- 
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  fs/read_write.c    | 12 +++---------
+>  include/linux/fs.h | 14 ++++++++++++++
+>  2 files changed, 17 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/read_write.c b/fs/read_write.c
+> index 47c1d4484df9..53c816c61122 100644
+> --- a/fs/read_write.c
+> +++ b/fs/read_write.c
+> @@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
+>  	struct kiocb kiocb;
+>  	ssize_t ret;
+>  
+> -	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
+> -		return -EOPNOTSUPP;
+> -
+>  	init_sync_kiocb(&kiocb, filp);
+> -	if (flags & RWF_HIPRI)
+> -		kiocb.ki_flags |= IOCB_HIPRI;
+> -	if (flags & RWF_DSYNC)
+> -		kiocb.ki_flags |= IOCB_DSYNC;
+> -	if (flags & RWF_SYNC)
+> -		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
+> +	ret = kiocb_set_rw_flags(&kiocb, flags);
+> +	if (ret)
+> +		return ret;
+>  	kiocb.ki_pos = *ppos;
+>  
+>  	if (type == READ)
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 803e5a9b2654..f53867140f43 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -3056,6 +3056,20 @@ static inline int iocb_flags(struct file *file)
+>  	return res;
+>  }
+>  
+> +static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
+> +{
+> +	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
+> +		return -EOPNOTSUPP;
+> +
+> +	if (flags & RWF_HIPRI)
+> +		ki->ki_flags |= IOCB_HIPRI;
+> +	if (flags & RWF_DSYNC)
+> +		ki->ki_flags |= IOCB_DSYNC;
+> +	if (flags & RWF_SYNC)
+> +		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
+> +	return 0;
+> +}
+> +
+>  static inline ino_t parent_ino(struct dentry *dentry)
+>  {
+>  	ino_t res;
+> -- 
+> 2.12.0
+> 
 -- 
-2.12.2
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
