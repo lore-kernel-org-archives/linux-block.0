@@ -1,36 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:54592 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941903AbdEYFZE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 01:25:04 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH 0/7] blk-mq: fix queue quiescing
-Date: Thu, 25 May 2017 05:24:54 +0000
-Message-ID: <1495689892.3045.2.camel@sandisk.com>
-References: <20170525042131.13172-1-ming.lei@redhat.com>
-In-Reply-To: <20170525042131.13172-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Received: from mx1.redhat.com ([209.132.183.28]:41418 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S941653AbdEYEVi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 May 2017 00:21:38 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: [PATCH 0/7] blk-mq: fix queue quiescing
+Date: Thu, 25 May 2017 12:21:24 +0800
+Message-Id: <20170525042131.13172-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDE3LTA1LTI1IGF0IDEyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT25l
-IGJpZyBwcm9ibGVtIG9mIGJsa19tcV9xdWllc2NlX3F1ZXVlKCkgaXMgdGhhdCBpdA0KPiBjYW4n
-dCBwcmV2ZW50IC5xdWV1ZV9ycSgpIGluIGRpcmVjdCBpc3N1ZSBwYXRoIGZyb20NCj4gYmVpbmcg
-cnVuIGV2ZW4gdGhvdWdoIGh3IHF1ZXVlcyBhcmUgc3RvcHBlZCBieQ0KPiBibGtfbXFfcXVpZXNj
-ZV9xdWV1ZSgpLg0KDQpUaGF0J3Mgd3JvbmcuIEFsbCB3aGF0J3MgbmVlZGVkIHRvIHByZXZlbnQg
-dGhhdA0KX19ibGtfbXFfdHJ5X2lzc3VlX2RpcmVjdGx5KCkgY2FsbHMgLnF1ZXVlX3JxKCkgZm9y
-IGEgc3RvcHBlZA0KcXVldWUgaXMgdG8gY2hlY2sgaW4gX19ibGtfbXFfdHJ5X2lzc3VlX2RpcmVj
-dGx5KCkgd2hldGhlciB0aGUNCnJlbGV2YW50IGhhcmR3YXJlIHF1ZXVlIGhhcyBiZWVuIHN0b3Bw
-ZWQuIFRoYXQgYXBwcm9hY2ggaGFzIHRoZQ0KZm9sbG93aW5nIHR3byBhZHZhbnRhZ2VzIG92ZXIg
-dGhlIGFwcHJvYWNoIG9mIHlvdXIgcGF0Y2ggc2VyaWVzOg0KLSBMb3dlciBjb2RlIGNvbXBsZXhp
-dHkgYW5kIGhlbmNlIGVhc2llciB0byByZXZpZXcgYW5kIHRvIG1haW50YWluLg0KLSBGYXN0ZXIg
-Zm9yIHF1ZXVlcyBmb3Igd2hpY2ggQkxLX01RX0ZfQkxPQ0tJTkcgaGFzIG5vdCBiZWVuIHNldC4N
-CiAgRm9yIG5vbi1wcmVlbXB0aWJsZSBrZXJuZWxzIHJjdV9yZWFkX2xvY2soKSBhbmQgcmN1X3Jl
-YWRfbG9jaygpDQogIGFyZSBvcHRpbWl6ZWQgb3V0LiBUaGF0IGlzIG5vdCBwb3NzaWJsZSBmb3IN
-CiAgcGVyY3B1X3JlZl90cnlnZXRfbGl2ZSgpIC8gcGVyY3B1X3JlZl9wdXQoKS4NCg0KQmFydC4=
+Hi,
+
+One big problem of blk_mq_quiesce_queue() is that it
+can't prevent .queue_rq() in direct issue path from
+being run even though hw queues are stopped by
+blk_mq_quiesce_queue().
+    
+It is observed that request double-free/use-after-free
+can be triggered easily when canceling NVMe requests via
+blk_mq_tagset_busy_iter(...nvme_cancel_request) in nvme_dev_disable().
+The reason is that blk_mq_quiesce_queue() can't prevent
+direct issue from being run.
+ 
+This patchset implements queue quiescing via percpu_ref
+and fixes the above issue.
+
+Actually we have to quiesce queue for canceling dispatched
+requests via blk_mq_tagset_busy_iter(), otherwise use-after-free
+can be made easily. This way of canceling dispatched requests
+has been used in several drivers, only NVMe uses blk_mq_quiesce_queue()
+to avoid the issue, and others need to be fixed too.
+
+Also this patchset cleans up the code much, and the fat 'srcu_struct'
+can be removed from 'struct blk_mq_hw_ctx'.
+
+Thanks,
+Ming
+
+Ming Lei (7):
+  blk-mq: introduce blk_mq_unquiesce_queue
+  block: introduce flag of QUEUE_FLAG_QUIESCED
+  dm: use the introduced blk_mq_unquiesce_queue()
+  nvme: use the introduced blk_mq_unquiesce_queue()
+  scsi: use the introduced blk_mq_unquiesce_queue()
+  blk-mq: quiesce queue via percpu_ref
+  blk-mq: update comments on blk_mq_quiesce_queue()
+
+ block/blk-mq.c           | 131 +++++++++++++++++++++++++++++++----------------
+ drivers/md/dm-rq.c       |   2 +-
+ drivers/nvme/host/core.c |   2 +-
+ drivers/scsi/scsi_lib.c  |   5 +-
+ include/linux/blk-mq.h   |   2 -
+ include/linux/blkdev.h   |   8 +++
+ 6 files changed, 102 insertions(+), 48 deletions(-)
+
+-- 
+2.9.4
