@@ -1,77 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43490 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:46302 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932076AbdE0OWO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 May 2017 10:22:14 -0400
+        id S937011AbdEZDIu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 May 2017 23:08:50 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH v2 3/8] blk-mq: use the introduced blk_mq_unquiesce_queue()
-Date: Sat, 27 May 2017 22:21:21 +0800
-Message-Id: <20170527142126.26079-4-ming.lei@redhat.com>
-In-Reply-To: <20170527142126.26079-1-ming.lei@redhat.com>
-References: <20170527142126.26079-1-ming.lei@redhat.com>
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: [PATCH 6/6] blk-mq: clarify dispatching may not be drained/blocked by stopping queue
+Date: Fri, 26 May 2017 11:07:39 +0800
+Message-Id: <20170526030740.26959-7-ming.lei@redhat.com>
+In-Reply-To: <20170526030740.26959-1-ming.lei@redhat.com>
+References: <20170526030740.26959-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-blk_mq_unquiesce_queue() is used for unquiescing the
-queue explicitly, so replace blk_mq_start_stopped_hw_queues()
-with it.
+BLK_MQ_S_STOPPED may be not observed in other concurrent I/O paths,
+we can't guarantee that dispatching won't happen after queue
+is stopped.
 
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-scsi@vger.kernel.org
-Cc: dm-devel@redhat.com
+So clarify the fact and avoid potential misuse.
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/dm-rq.c       | 2 +-
- drivers/nvme/host/core.c | 2 +-
- drivers/scsi/scsi_lib.c  | 5 ++++-
- 3 files changed, 6 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 2af27026aa2e..673fcf075077 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -71,7 +71,7 @@ static void dm_old_start_queue(struct request_queue *q)
- 
- static void dm_mq_start_queue(struct request_queue *q)
- {
--	blk_mq_start_stopped_hw_queues(q, true);
-+	blk_mq_unquiesce_queue(q);
- 	blk_mq_kick_requeue_list(q);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 900eb91e0ece..32bed5bac7da 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1240,6 +1240,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+ 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
  }
  
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 04e115834702..231d36028afc 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2514,7 +2514,7 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
++/*
++ * Do not expect that dispatching or .queue_rq() can be blocked
++ * after blk_mq_stop_hw_queue() returns. Please use
++ * blk_mq_quiesce_queue() for that requirement.
++ */
+ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ {
+ 	__blk_mq_stop_hw_queue(hctx, false);
+@@ -1255,6 +1260,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+ 		__blk_mq_stop_hw_queue(hctx, sync);
+ }
  
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
--		blk_mq_start_stopped_hw_queues(ns->queue, true);
-+		blk_mq_unquiesce_queue(ns->queue);
- 		blk_mq_kick_requeue_list(ns->queue);
- 	}
- 	mutex_unlock(&ctrl->namespaces_mutex);
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 814a4bd8405d..72b11f75719c 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -3030,7 +3030,10 @@ scsi_internal_device_unblock(struct scsi_device *sdev,
- 		return -EINVAL;
- 
- 	if (q->mq_ops) {
--		blk_mq_start_stopped_hw_queues(q, false);
-+		if (blk_queue_quiesced(q))
-+			blk_mq_unquiesce_queue(q);
-+		else
-+			blk_mq_start_stopped_hw_queues(q, false);
- 	} else {
- 		spin_lock_irqsave(q->queue_lock, flags);
- 		blk_start_queue(q);
++/*
++ * Do not expect that dispatching or .queue_rq() can be blocked
++ * after blk_mq_stop_hw_queues() returns. Please use
++ * blk_mq_quiesce_queue() for that requirement.
++ */
+ void blk_mq_stop_hw_queues(struct request_queue *q)
+ {
+ 	__blk_mq_stop_hw_queues(q, false);
 -- 
 2.9.4
