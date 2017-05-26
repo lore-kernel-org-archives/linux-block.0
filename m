@@ -1,52 +1,77 @@
 Return-Path: <Bart.VanAssche@sandisk.com>
 From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
 CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
 	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
 	"osandov@fb.com" <osandov@fb.com>, "ming.lei@redhat.com"
 	<ming.lei@redhat.com>
 Subject: Re: [PATCH 4/5] blk-mq-debugfs: Show busy requests
-Date: Fri, 26 May 2017 21:27:22 +0000
-Message-ID: <1495834041.2634.11.camel@sandisk.com>
+Date: Fri, 26 May 2017 21:22:37 +0000
+Message-ID: <1495833756.2634.9.camel@sandisk.com>
 References: <20170525233810.23211-1-bart.vanassche@sandisk.com>
 	 <20170525233810.23211-5-bart.vanassche@sandisk.com>
-	 <60bf5a0d-461e-94b7-98d6-56583d53cd73@suse.de>
-In-Reply-To: <60bf5a0d-461e-94b7-98d6-56583d53cd73@suse.de>
+	 <fa7126bb-7652-ed01-da08-23c3f428c00b@kernel.dk>
+	 <1495833461.2634.7.camel@sandisk.com>
+	 <0c124a6c-8c2d-1fb9-118f-96ce7fadc64c@kernel.dk>
+In-Reply-To: <0c124a6c-8c2d-1fb9-118f-96ce7fadc64c@kernel.dk>
 Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2017-05-26 at 16:38 +0200, Hannes Reinecke wrote:
-> Hmm. I wonder if this is going to work as intended; 'busy' might be
-> changing rapidly, so the busy_iter might be giving us unintended results.
-> Have you checked?
+On Fri, 2017-05-26 at 15:20 -0600, Jens Axboe wrote:
+> On 05/26/2017 03:17 PM, Bart Van Assche wrote:
+> > On Fri, 2017-05-26 at 07:26 -0600, Jens Axboe wrote:
+> > > On 05/25/2017 05:38 PM, Bart Van Assche wrote:
+> > > > Requests that got stuck in a block driver are neither on
+> > > > blk_mq_ctx.rq_list nor on any hw dispatch queue. Make these
+> > > > visible in debugfs through the "busy" attribute.
+> > > >=20
+> > > > Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> > > > Cc: Christoph Hellwig <hch@lst.de>
+> > > > Cc: Hannes Reinecke <hare@suse.com>
+> > > > Cc: Omar Sandoval <osandov@fb.com>
+> > > > Cc: Ming Lei <ming.lei@redhat.com>
+> > > > ---
+> > > >  block/blk-mq-debugfs.c | 25 +++++++++++++++++++++++++
+> > > >  1 file changed, 25 insertions(+)
+> > > >=20
+> > > > diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> > > > index 8b06a12c1461..70a2b955afee 100644
+> > > > --- a/block/blk-mq-debugfs.c
+> > > > +++ b/block/blk-mq-debugfs.c
+> > > > @@ -370,6 +370,30 @@ static const struct seq_operations hctx_dispat=
+ch_seq_ops =3D {
+> > > >  	.show	=3D blk_mq_debugfs_rq_show,
+> > > >  };
+> > > > =20
+> > > > +struct show_busy_ctx {
+> > > > +	struct seq_file		*m;
+> > > > +	struct blk_mq_hw_ctx	*hctx;
+> > > > +};
+> > > > +
+> > > > +static void hctx_show_busy(struct request *rq, void *data, bool re=
+served)
+> > > > +{
+> > > > +	const struct show_busy_ctx *ctx =3D data;
+> > >=20
+> > > Let's not call that variable 'ctx', in blk-mq that's pretty much
+> > > reserved for the sw queues.
+> >=20
+> > Hello Jens,
+> >=20
+> > How about renaming show_busy_ctx into show_busy_params and ctx into par=
+ams?
+>=20
+> I think that would be an improvement. Also, this:
+>=20
+> 	blk_mq_debugfs_rq_show(ctx->m, &rq->queuelist);
+>=20
+> doesn't look safe at all, as you are passing in a node instead of a
+> head. I think you just want to use __blk_mq_debugfs_rq_show() here.
 
-Hello Hannes,
+Hello Jens,
 
-The intention is that this attribute is used by developers to figure out wh=
-ich
-requests got stuck if one or more requests got stuck. Querying this attribu=
-te a
-few times should help to see whether the requests shown are requests that
-complete quickly or whether these are requests that got stuck. The output I
-collected while testing this debugfs attribute looks fine to me:
-
-# while true; do (cd /sys/kernel/debug/block && for f in */*/busy; do [ -e =
-$f ] && grep -aH '' $f; done); done
-[ ... ]
-sde/hctx0/busy:ffff880267dcba00 {.op=3DWRITE, .cmd_flags=3DFAILFAST_TRANSPO=
-RT|SYNC|META|PRIO|NOMERGE, .rq_flags=3DMQ_INFLIGHT|DONTPREP|IO_STAT|STATS, =
-.atomic_flags=3DSTARTED, .tag=3D19, .internal_tag=3D-1,
-.cmd=3DWrite(10) 2a 00 00 07 92 38 00 00 08 00}
-sde/hctx0/busy:ffff880267dcd140 {.op=3DWRITE, .cmd_flags=3DFAILFAST_TRANSPO=
-RT|SYNC|META|PRIO|NOMERGE, .rq_flags=3DMQ_INFLIGHT|DONTPREP|IO_STAT|STATS, =
-.atomic_flags=3DSTARTED, .tag=3D20, .internal_tag=3D-1,
-.cmd=3DWrite(10) 2a 00 00 07 92 80 00 00 08 00}
-[ ... ]
-sr0/hctx0/busy:ffff88046797d140 {.op=3DSCSI_IN, .cmd_flags=3D, .rq_flags=3D=
-DONTPREP|PREEMPT|COPY_USER|QUIET|IO_STAT|STATS, .atomic_flags=3DSTARTED, .t=
-ag=3D20, .internal_tag=3D-1, .cmd=3DGet event status
-notification 4a 01 00 00 10 00 00 00 08 00}
-[ ... ]
+That change will make the compiler perform type checking. I agree that's
+an improvement. I will make that change.
 
 Bart.=
