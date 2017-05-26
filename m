@@ -1,203 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:53495 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750989AbdE1KVD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 May 2017 06:21:03 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 12/22] xfs: use the common helper uuid_is_null()
-Date: Sun, 28 May 2017 13:19:58 +0300
-Message-Id: <20170528102008.30276-13-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
+Received: from mx1.redhat.com ([209.132.183.28]:42940 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758864AbdEZDH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 May 2017 23:07:59 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: [PATCH 1/6] blk-mq: introduce blk_mq_unquiesce_queue
+Date: Fri, 26 May 2017 11:07:34 +0800
+Message-Id: <20170526030740.26959-2-ming.lei@redhat.com>
+In-Reply-To: <20170526030740.26959-1-ming.lei@redhat.com>
+References: <20170526030740.26959-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Amir Goldstein <amir73il@gmail.com>
+Now we use blk_mq_start_stopped_hw_queues() implictely
+as pair of blk_mq_quiesce_queue(), now we introduce
+blk_mq_unquiesce_queue() explictely.
 
-Use the common helper uuid_is_null() and remove the xfs specific
-helper uuid_is_nil().
+Also this function is introduced for fixing
+current quiescing mechanism, which will be done
+in the following patches.
 
-The common helper does not check for the NULL pointer value as
-xfs helper did, but xfs code never calls the helper with a pointer
-that can be NULL.
-
-Conform comments and warning strings to use the term 'null uuid'
-instead of 'nil uuid', because this is the terminology used by
-lib/uuid.c and its users. It is also the terminology used in
-userspace by libuuid and xfsprogs.
-
-Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-[hch: remove now unused uuid.[ch]]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Brian Foster <bfoster@redhat.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/xfs/Makefile          |  3 +--
- fs/xfs/uuid.c            | 32 --------------------------------
- fs/xfs/uuid.h            | 23 -----------------------
- fs/xfs/xfs_linux.h       |  1 -
- fs/xfs/xfs_log_recover.c |  6 +++---
- fs/xfs/xfs_mount.c       |  8 ++++----
- 6 files changed, 8 insertions(+), 65 deletions(-)
- delete mode 100644 fs/xfs/uuid.c
- delete mode 100644 fs/xfs/uuid.h
+ block/blk-mq.c         | 13 +++++++++++++
+ include/linux/blkdev.h |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/fs/xfs/Makefile b/fs/xfs/Makefile
-index 5c90f82b8f6b..a6e955bfead8 100644
---- a/fs/xfs/Makefile
-+++ b/fs/xfs/Makefile
-@@ -98,8 +98,7 @@ xfs-y				+= xfs_aops.o \
- 				   xfs_sysfs.o \
- 				   xfs_trans.o \
- 				   xfs_xattr.o \
--				   kmem.o \
--				   uuid.o
-+				   kmem.o
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f2224ffd225d..a26fee3fb389 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -181,6 +181,19 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
  
- # low-level transaction/log code
- xfs-y				+= xfs_log.o \
-diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
-deleted file mode 100644
-index 737c186ea98b..000000000000
---- a/fs/xfs/uuid.c
-+++ /dev/null
-@@ -1,32 +0,0 @@
--/*
-- * Copyright (c) 2000-2003,2005 Silicon Graphics, Inc.
-- * All Rights Reserved.
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope that it would be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, write the Free Software Foundation,
-- * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--#include <xfs.h>
--
--int
--uuid_is_nil(uuid_t *uuid)
--{
--	int	i;
--	char	*cp = (char *)uuid;
--
--	if (uuid == NULL)
--		return 0;
--	/* implied check of version number here... */
--	for (i = 0; i < sizeof *uuid; i++)
--		if (*cp++) return 0;	/* not nil */
--	return 1;	/* is nil */
--}
-diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
-deleted file mode 100644
-index 5aea49bf0963..000000000000
---- a/fs/xfs/uuid.h
-+++ /dev/null
-@@ -1,23 +0,0 @@
--/*
-- * Copyright (c) 2000-2003,2005 Silicon Graphics, Inc.
-- * All Rights Reserved.
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope that it would be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, write the Free Software Foundation,
-- * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- */
--#ifndef __XFS_SUPPORT_UUID_H__
--#define __XFS_SUPPORT_UUID_H__
--
--extern int uuid_is_nil(uuid_t *uuid);
--
--#endif	/* __XFS_SUPPORT_UUID_H__ */
-diff --git a/fs/xfs/xfs_linux.h b/fs/xfs/xfs_linux.h
-index 2c33d915e550..2d167fe643ec 100644
---- a/fs/xfs/xfs_linux.h
-+++ b/fs/xfs/xfs_linux.h
-@@ -43,7 +43,6 @@ typedef __u32			xfs_nlink_t;
- 
- #include "kmem.h"
- #include "mrlock.h"
--#include "uuid.h"
- 
- #include <linux/semaphore.h>
- #include <linux/mm.h>
-diff --git a/fs/xfs/xfs_log_recover.c b/fs/xfs/xfs_log_recover.c
-index cd0b077deb35..8cec1e5505a4 100644
---- a/fs/xfs/xfs_log_recover.c
-+++ b/fs/xfs/xfs_log_recover.c
-@@ -352,13 +352,13 @@ xlog_header_check_mount(
++/**
++ * blk_mq_unquiesce_queue() - pair of blk_mq_quiesce_queue()
++ * @q: request queue.
++ *
++ * This function recovers queue into the state before quiescing
++ * done by blk_mq_quiesce_queue
++ */
++void blk_mq_unquiesce_queue(struct request_queue *q)
++{
++	blk_mq_start_stopped_hw_queues(q, true);
++}
++EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
++
+ void blk_mq_wake_waiters(struct request_queue *q)
  {
- 	ASSERT(head->h_magicno == cpu_to_be32(XLOG_HEADER_MAGIC_NUM));
- 
--	if (uuid_is_nil(&head->h_fs_uuid)) {
-+	if (uuid_is_null(&head->h_fs_uuid)) {
- 		/*
- 		 * IRIX doesn't write the h_fs_uuid or h_fmt fields. If
--		 * h_fs_uuid is nil, we assume this log was last mounted
-+		 * h_fs_uuid is null, we assume this log was last mounted
- 		 * by IRIX and continue.
- 		 */
--		xfs_warn(mp, "nil uuid in log - IRIX style log");
-+		xfs_warn(mp, "null uuid in log - IRIX style log");
- 	} else if (unlikely(!uuid_equal(&mp->m_sb.sb_uuid, &head->h_fs_uuid))) {
- 		xfs_warn(mp, "log has mismatched uuid - can't recover");
- 		xlog_header_check_dump(mp, head);
-diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
-index 51f7d03ef86c..54452967e35e 100644
---- a/fs/xfs/xfs_mount.c
-+++ b/fs/xfs/xfs_mount.c
-@@ -80,14 +80,14 @@ xfs_uuid_mount(
- 	if (mp->m_flags & XFS_MOUNT_NOUUID)
- 		return 0;
- 
--	if (uuid_is_nil(uuid)) {
--		xfs_warn(mp, "Filesystem has nil UUID - can't mount");
-+	if (uuid_is_null(uuid)) {
-+		xfs_warn(mp, "Filesystem has null UUID - can't mount");
- 		return -EINVAL;
- 	}
- 
- 	mutex_lock(&xfs_uuid_table_mutex);
- 	for (i = 0, hole = -1; i < xfs_uuid_table_size; i++) {
--		if (uuid_is_nil(&xfs_uuid_table[i])) {
-+		if (uuid_is_null(&xfs_uuid_table[i])) {
- 			hole = i;
- 			continue;
- 		}
-@@ -124,7 +124,7 @@ xfs_uuid_unmount(
- 
- 	mutex_lock(&xfs_uuid_table_mutex);
- 	for (i = 0; i < xfs_uuid_table_size; i++) {
--		if (uuid_is_nil(&xfs_uuid_table[i]))
-+		if (uuid_is_null(&xfs_uuid_table[i]))
- 			continue;
- 		if (!uuid_equal(uuid, &xfs_uuid_table[i]))
- 			continue;
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ab92c4ea138b..41291be82ac4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -964,6 +964,7 @@ extern void __blk_run_queue_uncond(struct request_queue *q);
+ extern void blk_run_queue(struct request_queue *);
+ extern void blk_run_queue_async(struct request_queue *q);
+ extern void blk_mq_quiesce_queue(struct request_queue *q);
++extern void blk_mq_unquiesce_queue(struct request_queue *q);
+ extern int blk_rq_map_user(struct request_queue *, struct request *,
+ 			   struct rq_map_data *, void __user *, unsigned long,
+ 			   gfp_t);
 -- 
-2.11.0
+2.9.4
