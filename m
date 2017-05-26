@@ -1,81 +1,66 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
-Date: Wed, 24 May 2017 11:41:41 -0500
-Message-Id: <20170524164150.9492-2-rgoldwyn@suse.de>
-In-Reply-To: <20170524164150.9492-1-rgoldwyn@suse.de>
-References: <20170524164150.9492-1-rgoldwyn@suse.de>
+Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 04/13] dm: fix REQ_RAHEAD handling
+Date: Fri, 26 May 2017 11:56:11 +0300
+Message-Id: <20170526085620.3113-5-hch@lst.de>
+In-Reply-To: <20170526085620.3113-1-hch@lst.de>
+References: <20170526085620.3113-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+A few (but not all) dm targets use a special EWOULDBLOCK error code for
+failing REQ_RAHEAD requests that fail due to a lack of available resources.
+But no one else knows about this magic code, and lower level drivers also
+don't generate it when failing read-ahead requests for similar reasons.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+So remove this special casing and ignore all additional error handling for
+REQ_RAHEAD - if this was a real underlying error we'd get a normal read
+once the real read comes in.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
 ---
- fs/read_write.c    | 12 +++---------
- include/linux/fs.h | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 9 deletions(-)
+ drivers/md/dm-raid1.c  | 4 ++--
+ drivers/md/dm-stripe.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 47c1d4484df9..53c816c61122 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 	struct kiocb kiocb;
- 	ssize_t ret;
+diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
+index a95cbb80fb34..5e30b08b91d9 100644
+--- a/drivers/md/dm-raid1.c
++++ b/drivers/md/dm-raid1.c
+@@ -1214,7 +1214,7 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
+ 	 */
+ 	if (!r || (r == -EWOULDBLOCK)) {
+ 		if (bio->bi_opf & REQ_RAHEAD)
+-			return -EWOULDBLOCK;
++			return -EIO;
  
--	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
--		return -EOPNOTSUPP;
--
- 	init_sync_kiocb(&kiocb, filp);
--	if (flags & RWF_HIPRI)
--		kiocb.ki_flags |= IOCB_HIPRI;
--	if (flags & RWF_DSYNC)
--		kiocb.ki_flags |= IOCB_DSYNC;
--	if (flags & RWF_SYNC)
--		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	ret = kiocb_set_rw_flags(&kiocb, flags);
-+	if (ret)
-+		return ret;
- 	kiocb.ki_pos = *ppos;
+ 		queue_bio(ms, bio, rw);
+ 		return DM_MAPIO_SUBMITTED;
+@@ -1258,7 +1258,7 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio, int error)
+ 	if (error == -EOPNOTSUPP)
+ 		return error;
  
- 	if (type == READ)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 803e5a9b2654..f53867140f43 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3056,6 +3056,20 @@ static inline int iocb_flags(struct file *file)
- 	return res;
- }
+-	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
++	if (bio->bi_opf & REQ_RAHEAD)
+ 		return error;
  
-+static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
-+{
-+	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
-+		return -EOPNOTSUPP;
-+
-+	if (flags & RWF_HIPRI)
-+		ki->ki_flags |= IOCB_HIPRI;
-+	if (flags & RWF_DSYNC)
-+		ki->ki_flags |= IOCB_DSYNC;
-+	if (flags & RWF_SYNC)
-+		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	return 0;
-+}
-+
- static inline ino_t parent_ino(struct dentry *dentry)
- {
- 	ino_t res;
+ 	if (unlikely(error)) {
+diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
+index 75152482f3ad..780e95889a7c 100644
+--- a/drivers/md/dm-stripe.c
++++ b/drivers/md/dm-stripe.c
+@@ -384,7 +384,7 @@ static int stripe_end_io(struct dm_target *ti, struct bio *bio, int error)
+ 	if (!error)
+ 		return 0; /* I/O complete */
+ 
+-	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
++	if (bio->bi_opf & REQ_RAHEAD)
+ 		return error;
+ 
+ 	if (error == -EOPNOTSUPP)
 -- 
-2.12.0
+2.11.0
