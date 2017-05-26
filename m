@@ -1,82 +1,63 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 3/5] blk-mq-debugfs: Show requeue list
-Date: Thu, 25 May 2017 16:38:08 -0700
-Message-ID: <20170525233810.23211-4-bart.vanassche@sandisk.com>
-In-Reply-To: <20170525233810.23211-1-bart.vanassche@sandisk.com>
-References: <20170525233810.23211-1-bart.vanassche@sandisk.com>
+Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 01/13] nvme-lightnvm: use blk_execute_rq in nvme_nvm_submit_user_cmd
+Date: Fri, 26 May 2017 11:56:08 +0300
+Message-Id: <20170526085620.3113-2-hch@lst.de>
+In-Reply-To: <20170526085620.3113-1-hch@lst.de>
+References: <20170526085620.3113-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-When verifying whether or not a blk-mq driver forgot to kick the
-requeue list after having requeued a request it is important to
-be able to verify the contents of the requeue list. Hence export
-that list through debugfs.
+Instead of reinventing it poorly.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Reviewed-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-mq-debugfs.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ drivers/nvme/host/lightnvm.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index d56ddd7a1285..8b06a12c1461 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -308,6 +308,37 @@ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- }
- EXPORT_SYMBOL_GPL(blk_mq_debugfs_rq_show);
- 
-+static void *queue_requeue_list_start(struct seq_file *m, loff_t *pos)
-+	__acquires(&q->requeue_lock)
-+{
-+	struct request_queue *q = m->private;
-+
-+	spin_lock_irq(&q->requeue_lock);
-+	return seq_list_start(&q->requeue_list, *pos);
-+}
-+
-+static void *queue_requeue_list_next(struct seq_file *m, void *v, loff_t *pos)
-+{
-+	struct request_queue *q = m->private;
-+
-+	return seq_list_next(v, &q->requeue_list, pos);
-+}
-+
-+static void queue_requeue_list_stop(struct seq_file *m, void *v)
-+	__releases(&q->requeue_lock)
-+{
-+	struct request_queue *q = m->private;
-+
-+	spin_unlock_irq(&q->requeue_lock);
-+}
-+
-+static const struct seq_operations queue_requeue_list_seq_ops = {
-+	.start	= queue_requeue_list_start,
-+	.next	= queue_requeue_list_next,
-+	.stop	= queue_requeue_list_stop,
-+	.show	= blk_mq_debugfs_rq_show,
-+};
-+
- static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
- 	__acquires(&hctx->lock)
- {
-@@ -665,6 +696,7 @@ const struct file_operations blk_mq_debugfs_fops = {
- 
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, queue_poll_stat_show},
-+	{"requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops},
- 	{"state", 0600, queue_state_show, queue_state_write},
- 	{},
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index f5df78ed1e10..f3885b5e56bd 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -571,13 +571,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.max_phys_sect		= 64,
  };
+ 
+-static void nvme_nvm_end_user_vio(struct request *rq, int error)
+-{
+-	struct completion *waiting = rq->end_io_data;
+-
+-	complete(waiting);
+-}
+-
+ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 				struct nvme_ns *ns,
+ 				struct nvme_nvm_command *vcmd,
+@@ -608,7 +601,6 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	rq->timeout = timeout ? timeout : ADMIN_TIMEOUT;
+ 
+ 	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
+-	rq->end_io_data = &wait;
+ 
+ 	if (ppa_buf && ppa_len) {
+ 		ppa_list = dma_pool_alloc(dev->dma_pool, GFP_KERNEL, &ppa_dma);
+@@ -662,9 +654,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	}
+ 
+ submit:
+-	blk_execute_rq_nowait(q, NULL, rq, 0, nvme_nvm_end_user_vio);
+-
+-	wait_for_completion_io(&wait);
++	blk_execute_rq(q, NULL, rq, 0);
+ 
+ 	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
+ 		ret = -EINTR;
 -- 
-2.12.2
+2.11.0
