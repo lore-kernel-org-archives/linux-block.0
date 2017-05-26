@@ -1,36 +1,40 @@
-Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 02/13] scsi/osd: don't save block errors into req_results
-Date: Fri, 26 May 2017 11:56:09 +0300
-Message-Id: <20170526085620.3113-3-hch@lst.de>
-In-Reply-To: <20170526085620.3113-1-hch@lst.de>
-References: <20170526085620.3113-1-hch@lst.de>
+Return-Path: <hch@lst.de>
+Date: Fri, 26 May 2017 07:15:40 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 02/15] scsi/osd: don't save block errors into
+	req_results
+Message-ID: <20170526051540.GA17709@lst.de>
+References: <20170518131812.22956-1-hch@lst.de> <20170518131812.22956-3-hch@lst.de> <1495641879.2823.7.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1495641879.2823.7.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We will only have sense data if the command exectured and got a SCSI
-result, so this is pointless.
+On Wed, May 24, 2017 at 04:04:40PM +0000, Bart Van Assche wrote:
+> Are you sure that that code is not necessary? From osd_initiator.c:
+> 
+> static void _put_request(struct request *rq)
+> {
+> 	/*
+> 	 * If osd_finalize_request() was called but the request was not
+> 	 * executed through the block layer, then we must release BIOs.
+> 	 * TODO: Keep error code in or->async_error. Need to audit all
+> 	 *�������code paths.
+> 	 */
+> 	if (unlikely(rq->bio))
+> 		blk_end_request(rq, -ENOMEM, blk_rq_bytes(rq));
+> 	else
+> 		blk_put_request(rq);
+> }
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/osd/osd_initiator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Which isn't using it at all.  It has a ten year old comment to pass
+on some error, but even then ORing two different error types together
+would no be very helpful.
 
-diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
-index 8a1b94816419..14785177ce7b 100644
---- a/drivers/scsi/osd/osd_initiator.c
-+++ b/drivers/scsi/osd/osd_initiator.c
-@@ -477,7 +477,7 @@ static void _set_error_resid(struct osd_request *or, struct request *req,
- 			     int error)
- {
- 	or->async_error = error;
--	or->req_errors = scsi_req(req)->result ? : error;
-+	or->req_errors = scsi_req(req)->result;
- 	or->sense_len = scsi_req(req)->sense_len;
- 	if (or->sense_len)
- 		memcpy(or->sense, scsi_req(req)->sense, or->sense_len);
--- 
-2.11.0
+> 
+> Bart.---end quoted text---
