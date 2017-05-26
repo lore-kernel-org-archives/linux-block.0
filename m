@@ -1,26 +1,42 @@
-Return-Path: <mka@google.com>
-Return-Path: <mka@google.com>
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Douglas Anderson <dianders@chromium.org>,
-	Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH 0/3] cfq-iosched: Fix warnings about unused functions
-Date: Fri, 26 May 2017 14:22:34 -0700
-Message-Id: <20170526212237.103525-1-mka@chromium.org>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 3/5] blk-mq-debugfs: Show requeue list
+To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20170525233810.23211-1-bart.vanassche@sandisk.com>
+ <20170525233810.23211-4-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <aee94c57-7223-1b2d-86b3-72bc920550a6@suse.de>
+Date: Fri, 26 May 2017 07:57:09 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170525233810.23211-4-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch series fixes a bunch of 'unused-function' warnings raised by
-clang.
+On 05/26/2017 01:38 AM, Bart Van Assche wrote:
+> When verifying whether or not a blk-mq driver forgot to kick the
+> requeue list after having requeued a request it is important to
+> be able to verify the contents of the requeue list. Hence export
+> that list through debugfs.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-debugfs.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Matthias Kaehlcke (3):
-  cfq-iosched: Mark cfq_clear_cfqq_*() as __maybe_unused
-  cfq-iosched: Fix warning about unused dummy functions
-  cfq-iosched: Delete unused function min_vdisktime()
+Cheers,
 
- block/cfq-iosched.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
-
+Hannes
 -- 
-2.13.0.219.gdb65acc882-goog
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
