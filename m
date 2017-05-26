@@ -1,76 +1,69 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 04/22] md: namespace private helper names
-Date: Sun, 28 May 2017 13:19:50 +0300
-Message-Id: <20170528102008.30276-5-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:60060 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758864AbdEZDHt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 May 2017 23:07:49 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: [PATCH 0/6] blk-mq: fix & improve queue quiescing
+Date: Fri, 26 May 2017 11:07:33 +0800
+Message-Id: <20170526030740.26959-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Amir Goldstein <amir73il@gmail.com>
+Hi,
 
-The md private helper uuid_equal() collides with a generic helper
-of the same name.
+There are some issues in current blk_mq_quiesce_queue():
+    - in case of direct issue or BLK_MQ_S_START_ON_RUN, dispatch won't
+    can't be prevented after blk_mq_quiesce_queue() is returned.
+    - in theory, new RCU read-side critical sections may begin while
+    synchronize_rcu() was waiting, and end after returning of
+    synchronize_rcu(), then dispatch still may be run after
+    synchronize_rcu() returns..
 
-Rename the md private helper to md_uuid_equal() and do the same for
-md_sb_equal().
+It is observed that request double-free/use-after-free
+can be triggered easily when canceling NVMe requests via
+blk_mq_tagset_busy_iter(...nvme_cancel_request) in nvme_dev_disable().
+The reason is that blk_mq_quiesce_queue() can't prevent
+dispatching from being run during the period.
 
-Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Shaohua Li <shli@kernel.org>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/md/md.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Actually we have to quiesce queue for canceling dispatched
+requests via blk_mq_tagset_busy_iter(), otherwise use-after-free
+can be made easily. This way of canceling dispatched requests
+has been used in several drivers, only NVMe uses blk_mq_quiesce_queue()
+to avoid the issue, and others need to be fixed too. And it
+is a common case for recovering dead controller.
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 10367ffe92e3..b9ab268ba7f9 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -825,7 +825,7 @@ static int read_disk_sb(struct md_rdev *rdev, int size)
- 	return -EINVAL;
- }
+blk_mq_quiesce_queue() is implemented via stopping queue, which
+limits its uses, and easy to casue race, any start queue is other
+paths may break blk_mq_quiesce_queue(). For example, we sometimes
+stops queue when hw can't handle so many ongoing requests and restart
+queues after srequests are completed. Meantime when we want to cancel
+requests if hardware is dead, quiescing is run first, then the restarting
+in complete path can break the quiescing. This patch improves this
+interface via removing stopping queue, then it can be easier to use.
  
--static int uuid_equal(mdp_super_t *sb1, mdp_super_t *sb2)
-+static int md_uuid_equal(mdp_super_t *sb1, mdp_super_t *sb2)
- {
- 	return	sb1->set_uuid0 == sb2->set_uuid0 &&
- 		sb1->set_uuid1 == sb2->set_uuid1 &&
-@@ -833,7 +833,7 @@ static int uuid_equal(mdp_super_t *sb1, mdp_super_t *sb2)
- 		sb1->set_uuid3 == sb2->set_uuid3;
- }
- 
--static int sb_equal(mdp_super_t *sb1, mdp_super_t *sb2)
-+static int md_sb_equal(mdp_super_t *sb1, mdp_super_t *sb2)
- {
- 	int ret;
- 	mdp_super_t *tmp1, *tmp2;
-@@ -1025,12 +1025,12 @@ static int super_90_load(struct md_rdev *rdev, struct md_rdev *refdev, int minor
- 	} else {
- 		__u64 ev1, ev2;
- 		mdp_super_t *refsb = page_address(refdev->sb_page);
--		if (!uuid_equal(refsb, sb)) {
-+		if (!md_uuid_equal(refsb, sb)) {
- 			pr_warn("md: %s has different UUID to %s\n",
- 				b, bdevname(refdev->bdev,b2));
- 			goto abort;
- 		}
--		if (!sb_equal(refsb, sb)) {
-+		if (!md_sb_equal(refsb, sb)) {
- 			pr_warn("md: %s has same UUID but different superblock to %s\n",
- 				b, bdevname(refdev->bdev, b2));
- 			goto abort;
+Thanks,
+Ming
+
+Ming Lei (6):
+  blk-mq: introduce blk_mq_unquiesce_queue
+  blk-mq: use the introduced blk_mq_unquiesce_queue()
+  blk-mq: fix blk_mq_quiesce_queue
+  blk-mq: update comments on blk_mq_quiesce_queue()
+  blk-mq: don't stop queue for quiescing
+  blk-mq: clarify dispatching won't be blocked by stopping queue
+
+ block/blk-mq.c           | 67 +++++++++++++++++++++++++++++++++++++++++-------
+ drivers/md/dm-rq.c       |  2 +-
+ drivers/nvme/host/core.c |  2 +-
+ drivers/scsi/scsi_lib.c  |  5 +++-
+ include/linux/blkdev.h   |  3 +++
+ 5 files changed, 67 insertions(+), 12 deletions(-)
+
 -- 
-2.11.0
+2.9.4
