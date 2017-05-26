@@ -1,25 +1,31 @@
-Return-Path: <hare@suse.de>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 25 May 2017 17:23:14 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>,
+	Hannes Reinecke <hare@suse.com>, Ming Lei <ming.lei@redhat.com>
 Subject: Re: [PATCH 1/5] blk-mq: Only register debugfs attributes for blk-mq
  queues
-To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>,
- Ming Lei <ming.lei@redhat.com>
+Message-ID: <20170526002314.GB12994@vader>
 References: <20170525233810.23211-1-bart.vanassche@sandisk.com>
  <20170525233810.23211-2-bart.vanassche@sandisk.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <050027c6-4132-4051-d28a-19336bfe41e2@suse.de>
-Date: Fri, 26 May 2017 07:56:26 +0200
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170525233810.23211-2-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/26/2017 01:38 AM, Bart Van Assche wrote:
+On Thu, May 25, 2017 at 04:38:06PM -0700, Bart Van Assche wrote:
 > The code in blk-mq-debugfs.c assumes that it is working on a blk-mq
 > queue and is not intended to work on a blk-sq queue. Hence only
 > register blk-mq debugfs attributes for blk-mq queues.
-> 
+
+Oops. This is probably what David reported here:
+https://github.com/ddiss/rapido/pull/13#event-1093484761. Thanks, Bart.
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+
 > Fixes: commit 9c1051aacde8 ("blk-mq: untangle debugfs and sysfs")
 > Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
 > Cc: Omar Sandoval <osandov@fb.com>
@@ -48,16 +54,6 @@ On 05/26/2017 01:38 AM, Bart Van Assche wrote:
 >  
 >  	kobject_uevent(&q->kobj, KOBJ_ADD);
 >  
+> -- 
+> 2.12.2
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-
-Cheers,
-
-Hannes
-
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
