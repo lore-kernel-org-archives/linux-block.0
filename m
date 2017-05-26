@@ -1,65 +1,51 @@
-Return-Path: <BATV+2e090b1720e02457929d+5016+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
 To: axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	dm-devel@redhat.com,
 	linux-btrfs@vger.kernel.org
-Subject: [PATCH 04/15] dm: fix REQ_RAHEAD handling
-Date: Thu, 18 May 2017 15:18:01 +0200
-Message-Id: <20170518131812.22956-5-hch@lst.de>
-In-Reply-To: <20170518131812.22956-1-hch@lst.de>
-References: <20170518131812.22956-1-hch@lst.de>
+Subject: [PATCH 06/13] fs: simplify dio_bio_complete
+Date: Fri, 26 May 2017 11:56:13 +0300
+Message-Id: <20170526085620.3113-7-hch@lst.de>
+In-Reply-To: <20170526085620.3113-1-hch@lst.de>
+References: <20170526085620.3113-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-A few (but not all) dm targets use a special EWOULDBLOCK error code for
-failing REQ_RAHEAD requests that fail due to a lack of available resources.
-But no one else knows about this magic code, and lower level drivers also
-don't generate it when failing read-ahead requests for similar reasons.
-
-So remove this special casing and ignore all additional error handling for
-REQ_RAHEAD - if this was a real underlying error we'd get a normal read
-once the real read comes in.
+Only read bio->bi_error once in the common path.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
 ---
- drivers/md/dm-raid1.c  | 4 ++--
- drivers/md/dm-stripe.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ fs/direct-io.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index a95cbb80fb34..5e30b08b91d9 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -1214,7 +1214,7 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
- 	 */
- 	if (!r || (r == -EWOULDBLOCK)) {
- 		if (bio->bi_opf & REQ_RAHEAD)
--			return -EWOULDBLOCK;
-+			return -EIO;
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 04247a6c3f73..bb711e4b86c2 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -477,13 +477,12 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	unsigned i;
+-	int err;
++	int err = bio->bi_error;
  
- 		queue_bio(ms, bio, rw);
- 		return DM_MAPIO_SUBMITTED;
-@@ -1258,7 +1258,7 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (error == -EOPNOTSUPP)
- 		return error;
+-	if (bio->bi_error)
++	if (err)
+ 		dio->io_error = -EIO;
  
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (unlikely(error)) {
-diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
-index 75152482f3ad..780e95889a7c 100644
---- a/drivers/md/dm-stripe.c
-+++ b/drivers/md/dm-stripe.c
-@@ -384,7 +384,7 @@ static int stripe_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (!error)
- 		return 0; /* I/O complete */
- 
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (error == -EOPNOTSUPP)
+ 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
+-		err = bio->bi_error;
+ 		bio_check_pages_dirty(bio);	/* transfers ownership */
+ 	} else {
+ 		bio_for_each_segment_all(bvec, bio, i) {
+@@ -494,7 +493,6 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
+ 				set_page_dirty_lock(page);
+ 			put_page(page);
+ 		}
+-		err = bio->bi_error;
+ 		bio_put(bio);
+ 	}
+ 	return err;
 -- 
 2.11.0
