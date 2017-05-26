@@ -1,243 +1,172 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net
-Cc: linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 03/17] mm: tracepoints for writeback error events
-Date: Wed, 31 May 2017 08:45:26 -0400
-Message-Id: <20170531124540.8782-4-jlayton@redhat.com>
-In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Fri, 26 May 2017 16:24:02 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH 2/6] blk-mq: use the introduced blk_mq_unquiesce_queue()
+Message-ID: <20170526082326.GA29558@ming.t460p>
+References: <20170526030740.26959-3-ming.lei@redhat.com>
+ <201705261505.zm4lMvaq%fengguang.wu@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <201705261505.zm4lMvaq%fengguang.wu@intel.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>, linux-nvme@lists.infradead.org,
+ Jens Axboe <axboe@fb.com>, dm-devel@redhat.com, kbuild-all@01.org,
+ Bart Van Assche <bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-To enable that, make __errseq_set return the value that it was set to
-we exit the loop. Take heed that that value is not suitable as a later
-"since" value, as it will not have been marked seen.
+On Fri, May 26, 2017 at 03:46:51PM +0800, kbuild test robot wrote:
+> Hi Ming,
+> 
+> [auto build test ERROR on block/for-next]
+> [also build test ERROR on v4.12-rc2 next-20170525]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Ming-Lei/blk-mq-introduce-blk_mq_unquiesce_queue/20170526-140138
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+> config: x86_64-randconfig-x019-201721 (attached as .config)
+> compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
+> reproduce:
+>         # save the attached .config to linux build tree
+>         make ARCH=x86_64 
+> 
+> Note: the linux-review/Ming-Lei/blk-mq-introduce-blk_mq_unquiesce_queue/20170526-140138 HEAD 470e70e5203ed8f76bb7c1a86db58023098bfc21 builds fine.
+>       It only hurts bisectibility.
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    drivers/scsi/scsi_lib.c: In function 'scsi_internal_device_unblock':
+> >> drivers/scsi/scsi_lib.c:3033:7: error: implicit declaration of function 'blk_queue_quiesced' [-Werror=implicit-function-declaration]
+>       if (blk_queue_quiesced(q))
+>           ^~~~~~~~~~~~~~~~~~
+>    Cyclomatic Complexity 5 include/linux/compiler.h:__read_once_size
+>    Cyclomatic Complexity 5 include/linux/compiler.h:__write_once_size
+>    Cyclomatic Complexity 1 arch/x86/include/asm/bitops.h:test_and_clear_bit
+>    Cyclomatic Complexity 1 arch/x86/include/asm/bitops.h:constant_test_bit
+>    Cyclomatic Complexity 1 arch/x86/include/asm/bitops.h:variable_test_bit
+>    Cyclomatic Complexity 1 arch/x86/include/asm/bitops.h:fls64
+>    Cyclomatic Complexity 1 include/uapi/linux/swab.h:__swab16p
+>    Cyclomatic Complexity 1 include/uapi/linux/byteorder/little_endian.h:__be16_to_cpup
+>    Cyclomatic Complexity 1 include/linux/log2.h:__ilog2_u64
+>    Cyclomatic Complexity 1 include/linux/list.h:INIT_LIST_HEAD
+>    Cyclomatic Complexity 1 include/linux/list.h:__list_add_valid
+>    Cyclomatic Complexity 1 include/linux/list.h:__list_del_entry_valid
+>    Cyclomatic Complexity 2 include/linux/list.h:__list_add
+>    Cyclomatic Complexity 1 include/linux/list.h:list_add_tail
+>    Cyclomatic Complexity 1 include/linux/list.h:__list_del
+>    Cyclomatic Complexity 2 include/linux/list.h:__list_del_entry
+>    Cyclomatic Complexity 1 include/linux/list.h:list_del
+>    Cyclomatic Complexity 1 include/linux/list.h:list_del_init
+>    Cyclomatic Complexity 1 include/linux/list.h:list_move_tail
+>    Cyclomatic Complexity 1 include/linux/list.h:list_empty
+>    Cyclomatic Complexity 1 include/linux/list.h:__list_splice
+>    Cyclomatic Complexity 2 include/linux/list.h:list_splice
+>    Cyclomatic Complexity 2 include/linux/list.h:list_splice_init
+>    Cyclomatic Complexity 1 arch/x86/include/asm/current.h:get_current
+>    Cyclomatic Complexity 1 include/asm-generic/getorder.h:__get_order
+>    Cyclomatic Complexity 1 arch/x86/include/asm/atomic.h:atomic_read
+>    Cyclomatic Complexity 1 arch/x86/include/asm/atomic.h:atomic_set
+>    Cyclomatic Complexity 1 arch/x86/include/asm/atomic.h:atomic_inc
+>    Cyclomatic Complexity 1 arch/x86/include/asm/atomic.h:atomic_dec
+>    Cyclomatic Complexity 1 arch/x86/include/asm/atomic.h:atomic_add_return
+>    Cyclomatic Complexity 1 arch/x86/include/asm/atomic.h:atomic_sub_return
+>    Cyclomatic Complexity 1 include/linux/jump_label.h:static_key_count
+>    Cyclomatic Complexity 2 include/linux/jump_label.h:static_key_false
+>    Cyclomatic Complexity 1 arch/x86/include/asm/paravirt.h:arch_local_save_flags
+>    Cyclomatic Complexity 1 arch/x86/include/asm/irqflags.h:arch_irqs_disabled_flags
+>    Cyclomatic Complexity 5 arch/x86/include/asm/preempt.h:__preempt_count_add
+>    Cyclomatic Complexity 1 arch/x86/include/asm/preempt.h:__preempt_count_dec_and_test
+>    Cyclomatic Complexity 1 include/linux/spinlock.h:spinlock_check
+>    Cyclomatic Complexity 1 include/linux/spinlock.h:spin_lock_irq
+>    Cyclomatic Complexity 1 include/linux/spinlock.h:spin_unlock_irq
+>    Cyclomatic Complexity 1 include/linux/spinlock.h:spin_unlock_irqrestore
+>    Cyclomatic Complexity 1 include/linux/rcupdate.h:rcu_read_lock_sched_notrace
+>    Cyclomatic Complexity 1 include/linux/mm.h:lowmem_page_address
+>    Cyclomatic Complexity 1 include/linux/uaccess.h:pagefault_disabled_inc
+>    Cyclomatic Complexity 1 include/linux/uaccess.h:pagefault_disabled_dec
+>    Cyclomatic Complexity 1 include/linux/uaccess.h:pagefault_disable
+>    Cyclomatic Complexity 1 include/linux/uaccess.h:pagefault_enable
+>    Cyclomatic Complexity 1 include/linux/highmem.h:kmap_atomic
+>    Cyclomatic Complexity 1 include/linux/blk_types.h:op_is_write
+>    Cyclomatic Complexity 1 include/linux/slab.h:kmem_cache_alloc_node
+>    Cyclomatic Complexity 68 include/linux/slab.h:kmalloc_large
+>    Cyclomatic Complexity 3 include/linux/slab.h:kmalloc
+>    Cyclomatic Complexity 1 include/linux/slab.h:kzalloc
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:blk_rq_is_scsi
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:blk_rq_is_private
+>    Cyclomatic Complexity 3 include/linux/blkdev.h:blk_rq_is_passthrough
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:blk_rq_bytes
+>    Cyclomatic Complexity 2 include/linux/blkdev.h:blk_rq_payload_bytes
+>    Cyclomatic Complexity 2 include/linux/blkdev.h:blk_rq_nr_phys_segments
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:blk_integrity_rq
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:blk_rq_count_integrity_sg
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:blk_rq_map_integrity_sg
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:blk_queue_max_integrity_segments
+>    Cyclomatic Complexity 1 include/linux/blkdev.h:queue_max_integrity_segments
+>    Cyclomatic Complexity 3 include/linux/dma-mapping.h:dma_get_max_seg_size
+>    Cyclomatic Complexity 2 include/linux/dma-mapping.h:dma_set_seg_boundary
+>    Cyclomatic Complexity 1 include/linux/dma-mapping.h:dma_max_pfn
+>    Cyclomatic Complexity 1 include/linux/blk-mq.h:blk_mq_rq_to_pdu
+>    Cyclomatic Complexity 1 include/linux/unaligned/access_ok.h:get_unaligned_be16
+>    Cyclomatic Complexity 1 include/scsi/scsi_common.h:scsi_varlen_cdb_length
+>    Cyclomatic Complexity 2 include/scsi/scsi_common.h:scsi_command_size
+>    Cyclomatic Complexity 2 include/scsi/scsi_common.h:scsi_sense_valid
+>    Cyclomatic Complexity 3 include/scsi/scsi.h:scsi_status_is_good
+>    Cyclomatic Complexity 1 include/scsi/scsi_device.h:scsi_target
+>    Cyclomatic Complexity 1 include/scsi/scsi_device.h:scsi_device_online
+>    Cyclomatic Complexity 1 include/scsi/scsi_device.h:scsi_device_blocked
+>    Cyclomatic Complexity 1 include/scsi/scsi_request.h:scsi_req
+>    Cyclomatic Complexity 1 include/scsi/scsi_cmnd.h:scsi_cmd_to_driver
+>    Cyclomatic Complexity 1 include/scsi/scsi_cmnd.h:scsi_set_resid
+>    Cyclomatic Complexity 1 include/scsi/scsi_cmnd.h:scsi_get_resid
+>    Cyclomatic Complexity 3 include/scsi/scsi_cmnd.h:scsi_bidi_cmnd
+>    Cyclomatic Complexity 2 include/scsi/scsi_cmnd.h:scsi_in
+>    Cyclomatic Complexity 2 include/scsi/scsi_cmnd.h:scsi_prot_sg_count
+>    Cyclomatic Complexity 1 include/scsi/scsi_cmnd.h:set_host_byte
+>    Cyclomatic Complexity 3 include/scsi/scsi_eh.h:scsi_sense_is_deferred
+>    Cyclomatic Complexity 3 include/scsi/scsi_host.h:scsi_host_in_recovery
+>    Cyclomatic Complexity 1 include/scsi/scsi_host.h:scsi_get_device
+>    Cyclomatic Complexity 1 include/scsi/scsi_host.h:scsi_host_get_prot
+>    Cyclomatic Complexity 1 include/scsi/scsi_host.h:scsi_host_prot_dma
+>    Cyclomatic Complexity 1 drivers/scsi/scsi_priv.h:scsi_log_send
+>    Cyclomatic Complexity 1 drivers/scsi/scsi_priv.h:scsi_log_completion
+>    Cyclomatic Complexity 2 drivers/scsi/scsi_lib.c:scsi_select_sense_cache
+>    Cyclomatic Complexity 1 drivers/scsi/scsi_lib.c:scsi_alloc_sense_buffer
+>    Cyclomatic Complexity 4 drivers/scsi/scsi_lib.c:scsi_set_blocked
+>    Cyclomatic Complexity 3 drivers/scsi/scsi_lib.c:scsi_device_is_busy
+>    Cyclomatic Complexity 4 drivers/scsi/scsi_lib.c:scsi_target_is_busy
+>    Cyclomatic Complexity 5 drivers/scsi/scsi_lib.c:scsi_host_is_busy
+>    Cyclomatic Complexity 3 drivers/scsi/scsi_lib.c:scsi_uninit_cmd
+> 
+> vim +/blk_queue_quiesced +3033 drivers/scsi/scsi_lib.c
+> 
+>   3027				sdev->sdev_state = SDEV_CREATED;
+>   3028		} else if (sdev->sdev_state != SDEV_CANCEL &&
+>   3029			 sdev->sdev_state != SDEV_OFFLINE)
+>   3030			return -EINVAL;
+>   3031	
+>   3032		if (q->mq_ops) {
+> > 3033			if (blk_queue_quiesced(q))
+>   3034				blk_mq_unquiesce_queue(q);
+>   3035			else
+>   3036				blk_mq_start_stopped_hw_queues(q, false);
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- include/linux/errseq.h         |  2 +-
- include/linux/fs.h             |  5 +++-
- include/trace/events/filemap.h | 55 ++++++++++++++++++++++++++++++++++++++++++
- lib/errseq.c                   | 20 ++++++++++-----
- mm/filemap.c                   | 13 +++++++++-
- 5 files changed, 86 insertions(+), 9 deletions(-)
+My fault, I shouldn't have merged blk_queue_quiesced()
+into patch 03, will fix it in V2.
 
-diff --git a/include/linux/errseq.h b/include/linux/errseq.h
-index 0d2555f310cd..9e0d444ac88d 100644
---- a/include/linux/errseq.h
-+++ b/include/linux/errseq.h
-@@ -5,7 +5,7 @@
- 
- typedef u32	errseq_t;
- 
--void __errseq_set(errseq_t *eseq, int err);
-+errseq_t __errseq_set(errseq_t *eseq, int err);
- static inline void errseq_set(errseq_t *eseq, int err)
- {
- 	/* Optimize for the common case of no error */
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 24178107379d..293cbc7f3520 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2528,6 +2528,7 @@ extern int filemap_fdatawrite_range(struct address_space *mapping,
- extern int filemap_check_errors(struct address_space *mapping);
- 
- extern int __must_check filemap_report_wb_err(struct file *file);
-+extern void __filemap_set_wb_err(struct address_space *mapping, int err);
- 
- /**
-  * filemap_set_wb_err - set a writeback error on an address_space
-@@ -2547,7 +2548,9 @@ extern int __must_check filemap_report_wb_err(struct file *file);
-  */
- static inline void filemap_set_wb_err(struct address_space *mapping, int err)
- {
--	errseq_set(&mapping->wb_err, err);
-+	/* Fastpath for common case of no error */
-+	if (unlikely(err))
-+		__filemap_set_wb_err(mapping, err);
- }
- 
- /**
-diff --git a/include/trace/events/filemap.h b/include/trace/events/filemap.h
-index 42febb6bc1d5..2af66920f267 100644
---- a/include/trace/events/filemap.h
-+++ b/include/trace/events/filemap.h
-@@ -10,6 +10,7 @@
- #include <linux/memcontrol.h>
- #include <linux/device.h>
- #include <linux/kdev_t.h>
-+#include <linux/errseq.h>
- 
- DECLARE_EVENT_CLASS(mm_filemap_op_page_cache,
- 
-@@ -52,6 +53,60 @@ DEFINE_EVENT(mm_filemap_op_page_cache, mm_filemap_add_to_page_cache,
- 	TP_ARGS(page)
- 	);
- 
-+TRACE_EVENT(filemap_set_wb_err,
-+		TP_PROTO(struct address_space *mapping, errseq_t eseq),
-+
-+		TP_ARGS(mapping, eseq),
-+
-+		TP_STRUCT__entry(
-+			__field(unsigned long, i_ino)
-+			__field(dev_t, s_dev)
-+			__field(errseq_t, errseq)
-+		),
-+
-+		TP_fast_assign(
-+			__entry->i_ino = mapping->host->i_ino;
-+			__entry->errseq = eseq;
-+			if (mapping->host->i_sb)
-+				__entry->s_dev = mapping->host->i_sb->s_dev;
-+			else
-+				__entry->s_dev = mapping->host->i_rdev;
-+		),
-+
-+		TP_printk("dev=%d:%d ino=0x%lx errseq=0x%x",
-+			MAJOR(__entry->s_dev), MINOR(__entry->s_dev),
-+			__entry->i_ino, __entry->errseq)
-+);
-+
-+TRACE_EVENT(filemap_report_wb_err,
-+		TP_PROTO(struct file *file, errseq_t old),
-+
-+		TP_ARGS(file, old),
-+
-+		TP_STRUCT__entry(
-+			__field(struct file *, file);
-+			__field(unsigned long, i_ino)
-+			__field(dev_t, s_dev)
-+			__field(errseq_t, old)
-+			__field(errseq_t, new)
-+		),
-+
-+		TP_fast_assign(
-+			__entry->file = file;
-+			__entry->i_ino = file->f_mapping->host->i_ino;
-+			if (file->f_mapping->host->i_sb)
-+				__entry->s_dev = file->f_mapping->host->i_sb->s_dev;
-+			else
-+				__entry->s_dev = file->f_mapping->host->i_rdev;
-+			__entry->old = old;
-+			__entry->new = file->f_wb_err;
-+		),
-+
-+		TP_printk("file=%p dev=%d:%d ino=0x%lx old=0x%x new=0x%x",
-+			__entry->file, MAJOR(__entry->s_dev),
-+			MINOR(__entry->s_dev), __entry->i_ino, __entry->old,
-+			__entry->new)
-+);
- #endif /* _TRACE_FILEMAP_H */
- 
- /* This part must be outside protection */
-diff --git a/lib/errseq.c b/lib/errseq.c
-index d129c0611c1f..009972d3000c 100644
---- a/lib/errseq.c
-+++ b/lib/errseq.c
-@@ -52,10 +52,14 @@
-  *
-  * Most callers will want to use the errseq_set inline wrapper to efficiently
-  * handle the common case where err is 0.
-+ *
-+ * We do return an errseq_t here, primarily for debugging purposes. The return
-+ * value should not be used as a previously sampled value in later calls as it
-+ * will not have the SEEN flag set.
-  */
--void __errseq_set(errseq_t *eseq, int err)
-+errseq_t __errseq_set(errseq_t *eseq, int err)
- {
--	errseq_t old;
-+	errseq_t cur, old;
- 
- 	/* MAX_ERRNO must be able to serve as a mask */
- 	BUILD_BUG_ON_NOT_POWER_OF_2(MAX_ERRNO + 1);
-@@ -66,13 +70,14 @@ void __errseq_set(errseq_t *eseq, int err)
- 	 * also don't accept zero here as that would effectively clear a
- 	 * previous error.
- 	 */
-+	old = READ_ONCE(*eseq);
-+
- 	if (WARN(unlikely(err == 0 || (unsigned int)-err > MAX_ERRNO),
- 				"err = %d\n", err))
--		return;
-+		return old;
- 
--	old = READ_ONCE(*eseq);
- 	for (;;) {
--		errseq_t new, cur;
-+		errseq_t new;
- 
- 		/* Clear out error bits and set new error */
- 		new = (old & ~(MAX_ERRNO|ERRSEQ_SEEN)) | -err;
-@@ -82,8 +87,10 @@ void __errseq_set(errseq_t *eseq, int err)
- 			new += ERRSEQ_CTR_INC;
- 
- 		/* If there would be no change, then call it done */
--		if (new == old)
-+		if (new == old) {
-+			cur = new;
- 			break;
-+		}
- 
- 		/* Try to swap the new value into place */
- 		cur = cmpxchg(eseq, old, new);
-@@ -98,6 +105,7 @@ void __errseq_set(errseq_t *eseq, int err)
- 		/* Raced with an update, try again */
- 		old = cur;
- 	}
-+	return cur;
- }
- EXPORT_SYMBOL(__errseq_set);
- 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index aeb58db10688..c5e19ea0bf12 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -535,6 +535,14 @@ int filemap_write_and_wait_range(struct address_space *mapping,
- }
- EXPORT_SYMBOL(filemap_write_and_wait_range);
- 
-+void __filemap_set_wb_err(struct address_space *mapping, int err)
-+{
-+	errseq_t eseq = __errseq_set(&mapping->wb_err, err);
-+	trace_filemap_set_wb_err(mapping, eseq);
-+
-+}
-+EXPORT_SYMBOL(__filemap_set_wb_err);
-+
- /**
-  * filemap_report_wb_err - report wb error (if any) that was previously set
-  * @file: struct file on which the error is being reported
-@@ -559,14 +567,17 @@ EXPORT_SYMBOL(filemap_write_and_wait_range);
- int filemap_report_wb_err(struct file *file)
- {
- 	int err = 0;
-+	errseq_t old = READ_ONCE(file->f_wb_err);
- 	struct address_space *mapping = file->f_mapping;
- 
- 	/* Locklessly handle the common case where nothing has changed */
--	if (errseq_check(&mapping->wb_err, READ_ONCE(file->f_wb_err))) {
-+	if (errseq_check(&mapping->wb_err, old)) {
- 		/* Something changed, must use slow path */
- 		spin_lock(&file->f_lock);
-+		old = file->f_wb_err;
- 		err = errseq_check_and_advance(&mapping->wb_err,
- 						&file->f_wb_err);
-+		trace_filemap_report_wb_err(file, old);
- 		spin_unlock(&file->f_lock);
- 	}
- 	return err;
--- 
-2.9.4
+Thanks,
+Ming
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
