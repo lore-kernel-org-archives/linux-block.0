@@ -1,32 +1,54 @@
-Return-Path: <jthumshirn@suse.de>
-Subject: Re: [PATCH 07/13] block_dev: propagate bio_iov_iter_get_pages error
- in __blkdev_direct_IO
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, dm-devel@redhat.com,
- linux-btrfs@vger.kernel.org
+Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 07/13] block_dev: propagate bio_iov_iter_get_pages error in __blkdev_direct_IO
+Date: Fri, 26 May 2017 11:56:14 +0300
+Message-Id: <20170526085620.3113-8-hch@lst.de>
+In-Reply-To: <20170526085620.3113-1-hch@lst.de>
 References: <20170526085620.3113-1-hch@lst.de>
- <20170526085620.3113-8-hch@lst.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Message-ID: <b5bc89a2-a17f-7e98-a767-bfa0c90afaac@suse.de>
-Date: Fri, 26 May 2017 11:12:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170526085620.3113-8-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/26/2017 10:56 AM, Christoph Hellwig wrote:
-> Once we move the block layer to its own status code we'll still want to
-> propagate the bio_iov_iter_get_pages, so restructure __blkdev_direct_IO
-> to take ret into account when returning the errno.
-> ---
+Once we move the block layer to its own status code we'll still want to
+propagate the bio_iov_iter_get_pages, so restructure __blkdev_direct_IO
+to take ret into account when returning the errno.
+---
+ fs/block_dev.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-
--ENOSIGNOFF?
-
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 519599dddd36..c1dc393ad6b9 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -334,7 +334,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
+ 	loff_t pos = iocb->ki_pos;
+ 	blk_qc_t qc = BLK_QC_T_NONE;
+-	int ret;
++	int ret = 0;
+ 
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+@@ -363,7 +363,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 
+ 		ret = bio_iov_iter_get_pages(bio, iter);
+ 		if (unlikely(ret)) {
+-			bio->bi_error = ret;
++			bio->bi_error = -EIO;
+ 			bio_endio(bio);
+ 			break;
+ 		}
+@@ -412,7 +412,8 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	}
+ 	__set_current_state(TASK_RUNNING);
+ 
+-	ret = dio->bio.bi_error;
++	if (!ret)
++		ret = dio->bio.bi_error;
+ 	if (likely(!ret))
+ 		ret = dio->size;
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
