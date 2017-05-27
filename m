@@ -1,130 +1,96 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 25/27] Documentation: flesh out the section in vfs.txt on storing and reporting writeback errors
-Date: Tue,  9 May 2017 11:49:28 -0400
-Message-Id: <20170509154930.29524-26-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:46702 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752339AbdE0OW4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 May 2017 10:22:56 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 8/8] Revert "blk-mq: don't use sync workqueue flushing from drivers"
+Date: Sat, 27 May 2017 22:21:26 +0800
+Message-Id: <20170527142126.26079-9-ming.lei@redhat.com>
+In-Reply-To: <20170527142126.26079-1-ming.lei@redhat.com>
+References: <20170527142126.26079-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-I waxed a little loquacious here, but I figured that more detail was
-better, and writeback error handling is so hard to get right.
+This patch reverts commit 2719aa217e0d02(blk-mq: don't use
+sync workqueue flushing from drivers) because only
+blk_mq_quiesce_queue() need the sync flush, and now
+we don't need to stop queue any more, so revert it.
 
-Cc: Jan Kara <jack@suse.cz>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Also changes to cancel_delayed_work() in blk_mq_stop_hw_queue().
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- Documentation/filesystems/vfs.txt | 54 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 45 insertions(+), 9 deletions(-)
+ block/blk-mq.c | 30 ++++++++----------------------
+ 1 file changed, 8 insertions(+), 22 deletions(-)
 
-diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-index f201a77873f7..382190a872e5 100644
---- a/Documentation/filesystems/vfs.txt
-+++ b/Documentation/filesystems/vfs.txt
-@@ -576,12 +576,46 @@ should clear PG_Dirty and set PG_Writeback.  It can be actually
- written at any point after PG_Dirty is clear.  Once it is known to be
- safe, PG_Writeback is cleared.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 73e07bc074a6..f38226bd651d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -42,7 +42,6 @@ static LIST_HEAD(all_q_list);
  
--If there is an error during writeback, then the address_space should be
--marked with an error (typically using mapping_set_error), in order to
--ensure that the error can later be reported to the application when an
--fsync is issued.
+ static void blk_mq_poll_stats_start(struct request_queue *q);
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+-static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
+ 
+ static int blk_mq_poll_stats_bkt(const struct request *rq)
+ {
+@@ -1230,16 +1229,6 @@ bool blk_mq_queue_stopped(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_mq_queue_stopped);
+ 
+-static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+-{
+-	if (sync)
+-		cancel_delayed_work_sync(&hctx->run_work);
+-	else
+-		cancel_delayed_work(&hctx->run_work);
 -
--Writeback makes use of a writeback_control structure...
-+Writeback makes use of a writeback_control structure to direct the
-+operations.  This gives the the writepage and writepages operations some
-+information about the nature of and reason for the writeback request,
-+and the constraints under which it is being done.  It is also used to
-+return information back to the caller about the result of a writepage or
-+writepages request.
+-	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-}
+-
+ /*
+  * We do not guarantee that dispatch can be drained or blocked
+  * after blk_mq_stop_hw_queue() returns. Please use
+@@ -1247,18 +1236,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+  */
+ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ {
+-	__blk_mq_stop_hw_queue(hctx, false);
+-}
+-EXPORT_SYMBOL(blk_mq_stop_hw_queue);
++	cancel_delayed_work(&hctx->run_work);
+ 
+-static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i)
+-		__blk_mq_stop_hw_queue(hctx, sync);
++	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+ }
++EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+ 
+ /*
+  * We do not guarantee that dispatch can be drained or blocked
+@@ -1267,7 +1249,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+  */
+ void blk_mq_stop_hw_queues(struct request_queue *q)
+ {
+-	__blk_mq_stop_hw_queues(q, false);
++	struct blk_mq_hw_ctx *hctx;
++	int i;
 +
-+Handling errors during writeback
-+--------------------------------
-+Most applications that utilize the pagecache will periodically call
-+fsync to ensure that data written has made it to the backing store.
-+When there is an error during writeback, that error should be reported
-+when fsync is called.  After an error has been reported to fsync,
-+subsequent fsync calls on the same file descriptor should return 0,
-+unless further writeback errors have occurred since the previous fsync.
-+
-+Ideally, the kernel would report it only on file descriptions on which
-+writes were done that subsequently failed to be written back.  The
-+generic pagecache infrastructure does not track the file descriptions
-+that have dirtied each individual page however, so determining which
-+file descriptors should get back an error is not possible.
-+
-+Instead, the generic writeback error tracking infrastructure in the
-+kernel settles for reporting errors to fsync on all file descriptions
-+that were open at the time that the error occurred.  In a situation with
-+multiple writers, all of them will get back an error on a subsequent fsync,
-+even if all of the writes done through that particular file descriptor
-+succeeded (or even if there were no writes on that file descriptor at all).
-+
-+Filesystems that wish to use this infrastructure should call
-+mapping_set_error to record the error in the address_space when it
-+occurs.  The generic vfs code will then handle reporting the error when
-+fsync is called, even if the fsync file operation returned 0.
-+
-+Filesystems are free to track errors internally if they choose (i.e. if
-+they do keep track of how the pages were dirtied), but they should aim
-+to provide the same (or better) error reporting semantics for when there
-+are multiple writers.  Those filesystems should avoid calling
-+mapping_set_error in order to ensure that errors stored in the mapping
-+aren't improperly reported by the generic filesystem code.
++	queue_for_each_hw_ctx(q, hctx, i)
++		blk_mq_stop_hw_queue(hctx);
+ }
+ EXPORT_SYMBOL(blk_mq_stop_hw_queues);
  
- struct address_space_operations
- -------------------------------
-@@ -810,7 +844,8 @@ struct address_space_operations {
- The File Object
- ===============
- 
--A file object represents a file opened by a process.
-+A file object represents a file opened by a process. This is also known
-+as an "open file description" in POSIX parlance.
- 
- 
- struct file_operations
-@@ -893,9 +928,10 @@ otherwise noted.
- 
-   release: called when the last reference to an open file is closed
- 
--  fsync: called by the fsync(2) system call. Errors that were previously
-+  fsync: called by the fsync(2) system call.  Errors that were previously
- 	 recorded using mapping_set_error will automatically be returned to
--	 the application and the file's error sequence advanced.
-+	 the application and the struct file's error sequence advanced.
-+	 See the section above on handling writeback errors.
- 
-   fasync: called by the fcntl(2) system call when asynchronous
- 	(non-blocking) mode is enabled for a file
 -- 
-2.9.3
+2.9.4
