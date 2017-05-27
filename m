@@ -1,30 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17976 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750871AbdE3PQ1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2017 11:16:27 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH v2 1/8] blk-mq: introduce blk_mq_unquiesce_queue
-Date: Tue, 30 May 2017 15:09:36 +0000
-Message-ID: <1496156976.2627.4.camel@sandisk.com>
+Received: from mx1.redhat.com ([209.132.183.28]:41118 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752388AbdE0OVx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 May 2017 10:21:53 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 1/8] blk-mq: introduce blk_mq_unquiesce_queue
+Date: Sat, 27 May 2017 22:21:19 +0800
+Message-Id: <20170527142126.26079-2-ming.lei@redhat.com>
+In-Reply-To: <20170527142126.26079-1-ming.lei@redhat.com>
 References: <20170527142126.26079-1-ming.lei@redhat.com>
-         <20170527142126.26079-2-ming.lei@redhat.com>
-In-Reply-To: <20170527142126.26079-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, 2017-05-27 at 22:21 +0800, Ming Lei wrote:
-> + * blk_mq_unquiesce_queue() - pair of blk_mq_quiesce_queue()
-                                 ^^^^=20
+We use blk_mq_start_stopped_hw_queues() implictely
+as pair of blk_mq_quiesce_queue() for unquiescing the queue,
+so we introduce blk_mq_unquiesce_queue() and make it
+as pair of blk_mq_quiesce_queue() explicitely.
 
-Sorry but that comment is incomprehensible to me. Did you perhaps mean
-"counterpart" instead of "pair"?
+This function is for fixing current quiescing mechanism
+in the following patches.
 
-Bart.=
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c         | 13 +++++++++++++
+ include/linux/blkdev.h |  1 +
+ 2 files changed, 14 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f2224ffd225d..8ecbbb718946 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -181,6 +181,19 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+ 
++/*
++ * blk_mq_unquiesce_queue() - pair of blk_mq_quiesce_queue()
++ * @q: request queue.
++ *
++ * This function recovers queue into the state before quiescing
++ * which is done by blk_mq_quiesce_queue.
++ */
++void blk_mq_unquiesce_queue(struct request_queue *q)
++{
++	blk_mq_start_stopped_hw_queues(q, true);
++}
++EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
++
+ void blk_mq_wake_waiters(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ab92c4ea138b..41291be82ac4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -964,6 +964,7 @@ extern void __blk_run_queue_uncond(struct request_queue *q);
+ extern void blk_run_queue(struct request_queue *);
+ extern void blk_run_queue_async(struct request_queue *q);
+ extern void blk_mq_quiesce_queue(struct request_queue *q);
++extern void blk_mq_unquiesce_queue(struct request_queue *q);
+ extern int blk_rq_map_user(struct request_queue *, struct request *,
+ 			   struct rq_map_data *, void __user *, unsigned long,
+ 			   gfp_t);
+-- 
+2.9.4
