@@ -1,137 +1,68 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33194 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751062AbdE1KoK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 May 2017 06:44:10 -0400
-Date: Sun, 28 May 2017 18:44:01 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:42683 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750746AbdE0Vqu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 May 2017 17:46:50 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [PATCH v2 4/8] blk-mq: fix blk_mq_quiesce_queue
-Message-ID: <20170528104400.GB6488@ming.t460p>
+Date: Sat, 27 May 2017 21:46:45 +0000
+Message-ID: <1495921605.13651.2.camel@sandisk.com>
 References: <20170527142126.26079-1-ming.lei@redhat.com>
- <20170527142126.26079-5-ming.lei@redhat.com>
- <1495921605.13651.2.camel@sandisk.com>
+         <20170527142126.26079-5-ming.lei@redhat.com>
+In-Reply-To: <20170527142126.26079-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1495921605.13651.2.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
-On Sat, May 27, 2017 at 09:46:45PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-05-27 at 22:21 +0800, Ming Lei wrote:
-> > It is required that no dispatch can happen any more once
-> > blk_mq_quiesce_queue() returns, and we don't have such requirement
-> > on APIs of stopping queue.
-> > 
-> > But blk_mq_quiesce_queue() still may not block/drain dispatch in the
-> > following cases:
-> > 
-> > - direct issue or BLK_MQ_S_START_ON_RUN
-> > - in theory, new RCU read-side critical sections may begin while
-> > synchronize_rcu() was waiting, and end after synchronize_rcu()
-> > returns, during the period dispatch still may happen
-> 
-> Hello Ming,
-
-Hello Bart,
-
-> 
-> I think the title and the description of this patch are wrong. Since
-> the current queue quiescing mechanism works fine for drivers that do
-> not stop and restart a queue (e.g. SCSI and dm-core), please change the
-
-I have provided the issues in current quiesce mechanism, now I post it again:
-
-	But blk_mq_quiesce_queue() still may not block/drain dispatch in the
-	following cases:
-	
-	- direct issue or BLK_MQ_S_START_ON_RUN
-	- in theory, new RCU read-side critical sections may begin while
-	synchronize_rcu() was waiting, and end after synchronize_rcu()
-	returns, during the period dispatch still may happen
-
-Not like stopping queue, any dispatching has to be drained/blocked
-when the synchronize_rcu() returns, otherwise double free or
-use-after-free can be triggered, which has been observed on NVMe
-already.
-
-> title and description to reflect that the purpose of this patch is
-> to allow drivers that use the quiesce mechanism to restart a queue
-> without unquiescing it.
-
-First it is really a fix, and then a improvement, so could you tell me
-where is wrong with the title and the description?
-
-> 
-> > @@ -209,6 +217,9 @@ void blk_mq_wake_waiters(struct request_queue *q)
-> >  	 * the queue are notified as well.
-> >  	 */
-> >  	wake_up_all(&q->mq_freeze_wq);
-> > +
-> > +	/* Forcibly unquiesce the queue to avoid having stuck requests */
-> > +	blk_mq_unquiesce_queue(q);
-> >  }
-> 
-> Should the block layer unquiesce a queue if a block driver hasn't 
-> done that before queue removal starts or should the block driver
-> itself do that?
-
-Some drivers might quiesce a queue and not unquiesce it, such as
-NVMe.
-
-OK, I will consider to fix drivers first.
-
-> The block layer doesn't restart stopped queues from
-> inside blk_set_queue_dying() so why should it unquiesce a quiesced
-> queue?
-
-If the quiesced queue isn't unquiesced, it may cause I/O hang, since
-any I/O in sw queue/scheduler queue can't be completed at all.
-
-OK, will fix driver in next post.
-
-Actually the queue has to be started after blk_set_queue_dying(),
-otherwise it can cause I/O hang too, and there can be lots of
-writeback I/O in the following del_gendisk(). We have done it
-in NVMe already, see nvme_kill_queues().
-
-Maybe in future, we should consider to do that all in block layer.
-
->  
-> >  bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
-> > @@ -1108,13 +1119,15 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-> >  
-> >  	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
-> >  		rcu_read_lock();
-> > -		blk_mq_sched_dispatch_requests(hctx);
-> > +		if (!blk_queue_quiesced(hctx->queue))
-> > +			blk_mq_sched_dispatch_requests(hctx);
-> >  		rcu_read_unlock();
-> >  	} else {
-> >  		might_sleep();
-> >  
-> >  		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
-> > -		blk_mq_sched_dispatch_requests(hctx);
-> > +		if (!blk_queue_quiesced(hctx->queue))
-> > +			blk_mq_sched_dispatch_requests(hctx);
-> >  		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
-> >  	}
-> >  }
-> 
-> Sorry but I don't like these changes. Why have the blk_queue_quiesced()
-> calls be added at other code locations than the blk_mq_hctx_stopped() calls?
-> This will make the block layer unnecessary hard to maintain. Please consider
-> to change the blk_mq_hctx_stopped(hctx) calls in blk_mq_sched_dispatch_requests()
-> and *blk_mq_*run_hw_queue*() into blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q).
-
-One benefit is that we make it explicit that the flag has to be checked
-inside the RCU read-side critical sections. If you put it somewhere,
-someone may put it out of read-side critical sections in future.
-
-
-Thanks,
-Ming
+T24gU2F0LCAyMDE3LTA1LTI3IGF0IDIyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSXQg
+aXMgcmVxdWlyZWQgdGhhdCBubyBkaXNwYXRjaCBjYW4gaGFwcGVuIGFueSBtb3JlIG9uY2UNCj4g
+YmxrX21xX3F1aWVzY2VfcXVldWUoKSByZXR1cm5zLCBhbmQgd2UgZG9uJ3QgaGF2ZSBzdWNoIHJl
+cXVpcmVtZW50DQo+IG9uIEFQSXMgb2Ygc3RvcHBpbmcgcXVldWUuDQo+IA0KPiBCdXQgYmxrX21x
+X3F1aWVzY2VfcXVldWUoKSBzdGlsbCBtYXkgbm90IGJsb2NrL2RyYWluIGRpc3BhdGNoIGluIHRo
+ZQ0KPiBmb2xsb3dpbmcgY2FzZXM6DQo+IA0KPiAtIGRpcmVjdCBpc3N1ZSBvciBCTEtfTVFfU19T
+VEFSVF9PTl9SVU4NCj4gLSBpbiB0aGVvcnksIG5ldyBSQ1UgcmVhZC1zaWRlIGNyaXRpY2FsIHNl
+Y3Rpb25zIG1heSBiZWdpbiB3aGlsZQ0KPiBzeW5jaHJvbml6ZV9yY3UoKSB3YXMgd2FpdGluZywg
+YW5kIGVuZCBhZnRlciBzeW5jaHJvbml6ZV9yY3UoKQ0KPiByZXR1cm5zLCBkdXJpbmcgdGhlIHBl
+cmlvZCBkaXNwYXRjaCBzdGlsbCBtYXkgaGFwcGVuDQoNCkhlbGxvIE1pbmcsDQoNCkkgdGhpbmsg
+dGhlIHRpdGxlIGFuZCB0aGUgZGVzY3JpcHRpb24gb2YgdGhpcyBwYXRjaCBhcmUgd3JvbmcuIFNp
+bmNlDQp0aGUgY3VycmVudCBxdWV1ZSBxdWllc2NpbmcgbWVjaGFuaXNtIHdvcmtzIGZpbmUgZm9y
+IGRyaXZlcnMgdGhhdCBkbw0Kbm90IHN0b3AgYW5kIHJlc3RhcnQgYSBxdWV1ZSAoZS5nLiBTQ1NJ
+IGFuZCBkbS1jb3JlKSwgcGxlYXNlIGNoYW5nZSB0aGUNCnRpdGxlIGFuZCBkZXNjcmlwdGlvbiB0
+byByZWZsZWN0IHRoYXQgdGhlIHB1cnBvc2Ugb2YgdGhpcyBwYXRjaCBpcw0KdG8gYWxsb3cgZHJp
+dmVycyB0aGF0IHVzZSB0aGUgcXVpZXNjZSBtZWNoYW5pc20gdG8gcmVzdGFydCBhIHF1ZXVlDQp3
+aXRob3V0IHVucXVpZXNjaW5nIGl0Lg0KDQo+IEBAIC0yMDksNiArMjE3LDkgQEAgdm9pZCBibGtf
+bXFfd2FrZV93YWl0ZXJzKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxKQ0KPiAgCSAqIHRoZSBxdWV1
+ZSBhcmUgbm90aWZpZWQgYXMgd2VsbC4NCj4gIAkgKi8NCj4gIAl3YWtlX3VwX2FsbCgmcS0+bXFf
+ZnJlZXplX3dxKTsNCj4gKw0KPiArCS8qIEZvcmNpYmx5IHVucXVpZXNjZSB0aGUgcXVldWUgdG8g
+YXZvaWQgaGF2aW5nIHN0dWNrIHJlcXVlc3RzICovDQo+ICsJYmxrX21xX3VucXVpZXNjZV9xdWV1
+ZShxKTsNCj4gIH0NCg0KU2hvdWxkIHRoZSBibG9jayBsYXllciB1bnF1aWVzY2UgYSBxdWV1ZSBp
+ZiBhIGJsb2NrIGRyaXZlciBoYXNuJ3QgDQpkb25lIHRoYXQgYmVmb3JlIHF1ZXVlIHJlbW92YWwg
+c3RhcnRzIG9yIHNob3VsZCB0aGUgYmxvY2sgZHJpdmVyDQppdHNlbGYgZG8gdGhhdD8gVGhlIGJs
+b2NrIGxheWVyIGRvZXNuJ3QgcmVzdGFydCBzdG9wcGVkIHF1ZXVlcyBmcm9tDQppbnNpZGUgYmxr
+X3NldF9xdWV1ZV9keWluZygpIHNvIHdoeSBzaG91bGQgaXQgdW5xdWllc2NlIGEgcXVpZXNjZWQN
+CnF1ZXVlPw0KIA0KPiAgYm9vbCBibGtfbXFfY2FuX3F1ZXVlKHN0cnVjdCBibGtfbXFfaHdfY3R4
+ICpoY3R4KQ0KPiBAQCAtMTEwOCwxMyArMTExOSwxNSBAQCBzdGF0aWMgdm9pZCBfX2Jsa19tcV9y
+dW5faHdfcXVldWUoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgpDQo+ICANCj4gIAlpZiAoISho
+Y3R4LT5mbGFncyAmIEJMS19NUV9GX0JMT0NLSU5HKSkgew0KPiAgCQlyY3VfcmVhZF9sb2NrKCk7
+DQo+IC0JCWJsa19tcV9zY2hlZF9kaXNwYXRjaF9yZXF1ZXN0cyhoY3R4KTsNCj4gKwkJaWYgKCFi
+bGtfcXVldWVfcXVpZXNjZWQoaGN0eC0+cXVldWUpKQ0KPiArCQkJYmxrX21xX3NjaGVkX2Rpc3Bh
+dGNoX3JlcXVlc3RzKGhjdHgpOw0KPiAgCQlyY3VfcmVhZF91bmxvY2soKTsNCj4gIAl9IGVsc2Ug
+ew0KPiAgCQltaWdodF9zbGVlcCgpOw0KPiAgDQo+ICAJCXNyY3VfaWR4ID0gc3JjdV9yZWFkX2xv
+Y2soJmhjdHgtPnF1ZXVlX3JxX3NyY3UpOw0KPiAtCQlibGtfbXFfc2NoZWRfZGlzcGF0Y2hfcmVx
+dWVzdHMoaGN0eCk7DQo+ICsJCWlmICghYmxrX3F1ZXVlX3F1aWVzY2VkKGhjdHgtPnF1ZXVlKSkN
+Cj4gKwkJCWJsa19tcV9zY2hlZF9kaXNwYXRjaF9yZXF1ZXN0cyhoY3R4KTsNCj4gIAkJc3JjdV9y
+ZWFkX3VubG9jaygmaGN0eC0+cXVldWVfcnFfc3JjdSwgc3JjdV9pZHgpOw0KPiAgCX0NCj4gIH0N
+Cg0KU29ycnkgYnV0IEkgZG9uJ3QgbGlrZSB0aGVzZSBjaGFuZ2VzLiBXaHkgaGF2ZSB0aGUgYmxr
+X3F1ZXVlX3F1aWVzY2VkKCkNCmNhbGxzIGJlIGFkZGVkIGF0IG90aGVyIGNvZGUgbG9jYXRpb25z
+IHRoYW4gdGhlIGJsa19tcV9oY3R4X3N0b3BwZWQoKSBjYWxscz8NClRoaXMgd2lsbCBtYWtlIHRo
+ZSBibG9jayBsYXllciB1bm5lY2Vzc2FyeSBoYXJkIHRvIG1haW50YWluLiBQbGVhc2UgY29uc2lk
+ZXINCnRvIGNoYW5nZSB0aGUgYmxrX21xX2hjdHhfc3RvcHBlZChoY3R4KSBjYWxscyBpbiBibGtf
+bXFfc2NoZWRfZGlzcGF0Y2hfcmVxdWVzdHMoKQ0KYW5kICpibGtfbXFfKnJ1bl9od19xdWV1ZSoo
+KSBpbnRvIGJsa19tcV9oY3R4X3N0b3BwZWQoaGN0eCkgfHwgYmxrX3F1ZXVlX3F1aWVzY2VkKHEp
+Lg0KDQpUaGFua3MsDQoNCkJhcnQu
