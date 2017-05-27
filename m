@@ -1,42 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:27961 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750746AbdE0Vta (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 May 2017 17:49:30 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH v2 6/8] blk-mq: don't stop queue for quiescing
-Date: Sat, 27 May 2017 21:49:27 +0000
-Message-ID: <1495921766.13651.4.camel@sandisk.com>
+Received: from mx1.redhat.com ([209.132.183.28]:59122 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932076AbdE0OWk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 May 2017 10:22:40 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 6/8] blk-mq: don't stop queue for quiescing
+Date: Sat, 27 May 2017 22:21:24 +0800
+Message-Id: <20170527142126.26079-7-ming.lei@redhat.com>
+In-Reply-To: <20170527142126.26079-1-ming.lei@redhat.com>
 References: <20170527142126.26079-1-ming.lei@redhat.com>
-         <20170527142126.26079-7-ming.lei@redhat.com>
-In-Reply-To: <20170527142126.26079-7-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA1LTI3IGF0IDIyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZGlm
-ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXggMDMyMDQ1
-ODQxODU2Li44NGNjZTY3Y2FlZTMgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1tcS5jDQo+ICsr
-KyBiL2Jsb2NrL2Jsay1tcS5jDQo+IEBAIC0xNjgsOCArMTY4LDYgQEAgdm9pZCBibGtfbXFfcXVp
-ZXNjZV9xdWV1ZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkNCj4gIAl1bnNpZ25lZCBpbnQgaTsN
-Cj4gIAlib29sIHJjdSA9IGZhbHNlOw0KPiAgDQo+IC0JX19ibGtfbXFfc3RvcF9od19xdWV1ZXMo
-cSwgdHJ1ZSk7DQo+IC0NCj4gIAlzcGluX2xvY2tfaXJxKHEtPnF1ZXVlX2xvY2spOw0KPiAgCXF1
-ZXVlX2ZsYWdfc2V0KFFVRVVFX0ZMQUdfUVVJRVNDRUQsIHEpOw0KPiAgCXNwaW5fdW5sb2NrX2ly
-cShxLT5xdWV1ZV9sb2NrKTsNCj4gQEAgLTE5OCw3ICsxOTYsMTIgQEAgdm9pZCBibGtfbXFfdW5x
-dWllc2NlX3F1ZXVlKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxKQ0KPiAgCXF1ZXVlX2ZsYWdfY2xl
-YXIoUVVFVUVfRkxBR19RVUlFU0NFRCwgcSk7DQo+ICAJc3Bpbl91bmxvY2tfaXJxKHEtPnF1ZXVl
-X2xvY2spOw0KPiAgDQo+IC0JYmxrX21xX3N0YXJ0X3N0b3BwZWRfaHdfcXVldWVzKHEsIHRydWUp
-Ow0KPiArCS8qDQo+ICsJICogRHVyaW5nIHF1aWVzY2luZywgcmVxdWVzdHMgY2FuIGJlIGluc2Vy
-dGVkDQo+ICsJICogdG8gc2NoZWR1bGVyJ3MgcXVldWUgb3Igc3cgcXVldWUsIHNvIHdlIHJ1bg0K
-PiArCSAqIHF1ZXVlcyBmb3IgZGlzcGF0Y2hpbmcgdGhlc2UgcmVxdWVzdHMuDQo+ICsJICovDQo+
-ICsJYmxrX21xX3N0YXJ0X2h3X3F1ZXVlcyhxKTsNCj4gIH0NCj4gIEVYUE9SVF9TWU1CT0xfR1BM
-KGJsa19tcV91bnF1aWVzY2VfcXVldWUpOw0KDQpIZWxsbyBNaW5nLA0KDQpUaGlzIGxvb2tzIHJl
-YWxseSB3ZWlyZCB0byBtZS4gSWYgYmxrX21xX3F1aWVzY2VfcXVldWUoKSBkb2Vzbid0IHN0b3Ag
-YW55DQpoYXJkd2FyZSBxdWV1ZXMsIHdoeSBzaG91bGQgYmxrX21xX3VucXVpZXNjZV9xdWV1ZSgp
-IHN0YXJ0IGFueSBoYXJkd2FyZQ0KcXVldWVzPw0KDQpCYXJ0Lg==
+Queue can be started by other blk-mq APIs and can be used in
+different cases, this limits uses of blk_mq_quiesce_queue()
+if it is based on stopping queue, and make its usage very
+difficult, especially users have to use the stop queue APIs
+carefully for avoiding to break blk_mq_quiesce_queue().
+
+We have applied the QUIESCED flag for draining and blocking
+dispatch, so it isn't necessary to stop queue any more.
+
+After stopping queue is removed, blk_mq_quiesce_queue() can
+be used safely and easily, then users won't worry about queue
+restarting during quiescing at all.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 032045841856..84cce67caee3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -168,8 +168,6 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+ 	unsigned int i;
+ 	bool rcu = false;
+ 
+-	__blk_mq_stop_hw_queues(q, true);
+-
+ 	spin_lock_irq(q->queue_lock);
+ 	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
+ 	spin_unlock_irq(q->queue_lock);
+@@ -198,7 +196,12 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+ 	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+ 	spin_unlock_irq(q->queue_lock);
+ 
+-	blk_mq_start_stopped_hw_queues(q, true);
++	/*
++	 * During quiescing, requests can be inserted
++	 * to scheduler's queue or sw queue, so we run
++	 * queues for dispatching these requests.
++	 */
++	blk_mq_start_hw_queues(q);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
+ 
+-- 
+2.9.4
