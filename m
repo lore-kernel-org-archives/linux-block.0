@@ -1,43 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:48673 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750912AbdE3ROz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2017 13:14:55 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH v2 5/8] blk-mq: update comments on blk_mq_quiesce_queue()
-Date: Tue, 30 May 2017 17:14:44 +0000
-Message-ID: <1496164482.2627.13.camel@sandisk.com>
+Received: from mx1.redhat.com ([209.132.183.28]:53416 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932076AbdE0OWc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 May 2017 10:22:32 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 5/8] blk-mq: update comments on blk_mq_quiesce_queue()
+Date: Sat, 27 May 2017 22:21:23 +0800
+Message-Id: <20170527142126.26079-6-ming.lei@redhat.com>
+In-Reply-To: <20170527142126.26079-1-ming.lei@redhat.com>
 References: <20170527142126.26079-1-ming.lei@redhat.com>
-         <20170527142126.26079-6-ming.lei@redhat.com>
-In-Reply-To: <20170527142126.26079-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, 2017-05-27 at 22:21 +0800, Ming Lei wrote:
->  /**
-> - * blk_mq_quiesce_queue() - wait until all ongoing queue_rq calls have f=
-inished
-> + * blk_mq_quiesce_queue() - wait until all ongoing dispatching have fini=
-shed
->   * @q: request queue.
->   *
+Actually what we want to get from blk_mq_quiesce_queue()
+isn't only to wait for completion of all ongoing .queue_rq().
 
-Hello Ming,
+In the typical context of canceling requests, we need to
+make sure that the following is done in the dispatch path
+before starting to cancel requests:
 
-The concept of dispatching does not have a meaning to block driver authors =
-who are
-not familiar with the block layer internals. However, every author of a blk=
--mq driver
-knows what the .queue_rq() function is. Additionally, the new comment is gr=
-ammatically
-incorrect. So the above change looks like a step in the wrong direction to =
-me.
+	- failed dispatched request is finished
+	- busy dispatched request is requeued, and the STARTED
+	flag is cleared
 
-Bart.=
+So update comment to keep code, doc and our expection consistent.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 470ee5514ea9..032045841856 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -155,12 +155,12 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
+ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
+ 
+ /**
+- * blk_mq_quiesce_queue() - wait until all ongoing queue_rq calls have finished
++ * blk_mq_quiesce_queue() - wait until all ongoing dispatching have finished
+  * @q: request queue.
+  *
+  * Note: this function does not prevent that the struct request end_io()
+- * callback function is invoked. Additionally, it is not prevented that
+- * new queue_rq() calls occur unless the queue has been stopped first.
++ * callback function is invoked. Once this function is returned, we make
++ * sure no dispatching can happen.
+  */
+ void blk_mq_quiesce_queue(struct request_queue *q)
+ {
+-- 
+2.9.4
