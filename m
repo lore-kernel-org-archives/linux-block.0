@@ -1,70 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42436 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750984AbdE1Kuz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 May 2017 06:50:55 -0400
-Date: Sun, 28 May 2017 18:50:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:27961 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750746AbdE0Vta (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 May 2017 17:49:30 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [PATCH v2 6/8] blk-mq: don't stop queue for quiescing
-Message-ID: <20170528105047.GC6488@ming.t460p>
+Date: Sat, 27 May 2017 21:49:27 +0000
+Message-ID: <1495921766.13651.4.camel@sandisk.com>
 References: <20170527142126.26079-1-ming.lei@redhat.com>
- <20170527142126.26079-7-ming.lei@redhat.com>
- <1495921766.13651.4.camel@sandisk.com>
+         <20170527142126.26079-7-ming.lei@redhat.com>
+In-Reply-To: <20170527142126.26079-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1495921766.13651.4.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, May 27, 2017 at 09:49:27PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-05-27 at 22:21 +0800, Ming Lei wrote:
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 032045841856..84cce67caee3 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -168,8 +168,6 @@ void blk_mq_quiesce_queue(struct request_queue *q)
-> >  	unsigned int i;
-> >  	bool rcu = false;
-> >  
-> > -	__blk_mq_stop_hw_queues(q, true);
-> > -
-> >  	spin_lock_irq(q->queue_lock);
-> >  	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-> >  	spin_unlock_irq(q->queue_lock);
-> > @@ -198,7 +196,12 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
-> >  	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-> >  	spin_unlock_irq(q->queue_lock);
-> >  
-> > -	blk_mq_start_stopped_hw_queues(q, true);
-> > +	/*
-> > +	 * During quiescing, requests can be inserted
-> > +	 * to scheduler's queue or sw queue, so we run
-> > +	 * queues for dispatching these requests.
-> > +	 */
-> > +	blk_mq_start_hw_queues(q);
-> >  }
-> >  EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
-> 
-> Hello Ming,
-
-Hello Bart,
-
-> 
-> This looks really weird to me. If blk_mq_quiesce_queue() doesn't stop any
-> hardware queues, why should blk_mq_unquiesce_queue() start any hardware
-> queues?
-
-Please see the above comment, especially in direct issue path, we have to
-insert the request into sw/scheduler queue when queue is quiesced,
-and these queued requests have to be dispatched out during unquiescing.
-
-I considered to sleep the current context under this situation, but
-turns out it is more complicated to handle, given we have very limited
-queue depth, just let applications consumes all, then wait.
-
-Thanks,
-Ming
+T24gU2F0LCAyMDE3LTA1LTI3IGF0IDIyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZGlm
+ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXggMDMyMDQ1
+ODQxODU2Li44NGNjZTY3Y2FlZTMgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1tcS5jDQo+ICsr
+KyBiL2Jsb2NrL2Jsay1tcS5jDQo+IEBAIC0xNjgsOCArMTY4LDYgQEAgdm9pZCBibGtfbXFfcXVp
+ZXNjZV9xdWV1ZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkNCj4gIAl1bnNpZ25lZCBpbnQgaTsN
+Cj4gIAlib29sIHJjdSA9IGZhbHNlOw0KPiAgDQo+IC0JX19ibGtfbXFfc3RvcF9od19xdWV1ZXMo
+cSwgdHJ1ZSk7DQo+IC0NCj4gIAlzcGluX2xvY2tfaXJxKHEtPnF1ZXVlX2xvY2spOw0KPiAgCXF1
+ZXVlX2ZsYWdfc2V0KFFVRVVFX0ZMQUdfUVVJRVNDRUQsIHEpOw0KPiAgCXNwaW5fdW5sb2NrX2ly
+cShxLT5xdWV1ZV9sb2NrKTsNCj4gQEAgLTE5OCw3ICsxOTYsMTIgQEAgdm9pZCBibGtfbXFfdW5x
+dWllc2NlX3F1ZXVlKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxKQ0KPiAgCXF1ZXVlX2ZsYWdfY2xl
+YXIoUVVFVUVfRkxBR19RVUlFU0NFRCwgcSk7DQo+ICAJc3Bpbl91bmxvY2tfaXJxKHEtPnF1ZXVl
+X2xvY2spOw0KPiAgDQo+IC0JYmxrX21xX3N0YXJ0X3N0b3BwZWRfaHdfcXVldWVzKHEsIHRydWUp
+Ow0KPiArCS8qDQo+ICsJICogRHVyaW5nIHF1aWVzY2luZywgcmVxdWVzdHMgY2FuIGJlIGluc2Vy
+dGVkDQo+ICsJICogdG8gc2NoZWR1bGVyJ3MgcXVldWUgb3Igc3cgcXVldWUsIHNvIHdlIHJ1bg0K
+PiArCSAqIHF1ZXVlcyBmb3IgZGlzcGF0Y2hpbmcgdGhlc2UgcmVxdWVzdHMuDQo+ICsJICovDQo+
+ICsJYmxrX21xX3N0YXJ0X2h3X3F1ZXVlcyhxKTsNCj4gIH0NCj4gIEVYUE9SVF9TWU1CT0xfR1BM
+KGJsa19tcV91bnF1aWVzY2VfcXVldWUpOw0KDQpIZWxsbyBNaW5nLA0KDQpUaGlzIGxvb2tzIHJl
+YWxseSB3ZWlyZCB0byBtZS4gSWYgYmxrX21xX3F1aWVzY2VfcXVldWUoKSBkb2Vzbid0IHN0b3Ag
+YW55DQpoYXJkd2FyZSBxdWV1ZXMsIHdoeSBzaG91bGQgYmxrX21xX3VucXVpZXNjZV9xdWV1ZSgp
+IHN0YXJ0IGFueSBoYXJkd2FyZQ0KcXVldWVzPw0KDQpCYXJ0Lg==
