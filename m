@@ -1,43 +1,18 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <hch@lst.de>
+Date: Sun, 28 May 2017 10:37:58 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
+	Omar Sandoval <osandov@fb.com>
 Subject: Re: [PATCH 08/19] block: Introduce request_queue.initialize_rq_fn()
-Date: Sun, 28 May 2017 16:12:45 +0000
-Message-ID: <1495987965.2849.7.camel@sandisk.com>
-References: <20170525184327.23570-1-bart.vanassche@sandisk.com>
-	 <20170525184327.23570-9-bart.vanassche@sandisk.com>
-	 <20170526063430.GA19034@lst.de> <1495842989.2634.13.camel@sandisk.com>
-	 <20170528083440.GB13083@lst.de>
-In-Reply-To: <20170528083440.GB13083@lst.de>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20170528083758.GC13083@lst.de>
+References: <20170525184327.23570-1-bart.vanassche@sandisk.com> <20170525184327.23570-9-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170525184327.23570-9-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU3VuLCAyMDE3LTA1LTI4IGF0IDEwOjM0ICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
-biBGcmksIE1heSAyNiwgMjAxNyBhdCAxMTo1NjozMFBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
-d3JvdGU6DQo+ID4gSSBoYXZlIHRyaWVkIHRvIG1vdmUgdGhhdCBjYWxsIGludG8gYmxrX21xX2Fs
-bG9jX3JlcXVlc3QoKSBidXQgdGhhdA0KPiA+IHJlc3VsdGVkIGluIGEga2VybmVsIG9vcHMgZHVy
-aW5nIGJvb3QgZHVlIHRvIHNjc2lfYWRkX2NtZF90b19saXN0KCkNCj4gPiBkZXJlZmVyZW5jaW5n
-IHNjc2lfY21uZC5kZXZpY2UgYW5kIGR1ZSB0byB0aGF0IHBvaW50ZXIgYmVpbmcgaW52YWxpZC4N
-Cj4gPiBJIHRoaW5rIHRoYXQgcG9pbnRlciB3YXMgaW52YWxpZCBiZWNhdXNlIG1vdmluZyB0aGUg
-aW5pdGlhbGl6ZV9ycV9mbigpDQo+ID4gY2FsbCBpbnRvIGJsa19tcV9hbGxvY19yZXF1ZXN0KCkg
-Y2F1c2VkIHJlcXVlc3QgaW5pdGlhbGl6YXRpb24gdG8gYmUNCj4gPiBza2lwcGVkIGZvciB0aGUg
-Zm9sbG93aW5nIGNvZGUgcGF0aDoNCj4gPiBzdWJtaXRfYmlvKCkNCj4gPiAtPiBnZW5lcmljX21h
-a2VfcmVxdWVzdCgpDQo+ID4gICAtPiAubWFrZV9yZXF1ZXN0X2ZuID09IGJsa19tcV9tYWtlX3Jl
-cXVlc3QoKQ0KPiA+ICAgICAtPiBibGtfbXFfc2NoZWRfZ2V0X3JlcXVlc3QoKQ0KPiA+ICAgICAg
-IC0+IF9fYmxrX21xX2FsbG9jX3JlcXVlc3QoKQ0KPiA+ICAgICAgICAgLT4gYmxrX21xX3JxX2N0
-eF9pbml0KCkNCj4gPiANCj4gPiBUaGlzIGlzIHdoeSBJIHdvdWxkIGxpa2UgdG8ga2VlcCB0aGUg
-LmluaXRpYWxpemVfcnFfZm4oKSBjYWxsIGluDQo+ID4gYmxrX21xX3JxX2N0eF9pbml0KCkuDQo+
-IA0KPiBCdXQgd2UgZG9uJ3QgY2FsbCBzY3NpX3JlcV9pbml0IGZvciB0aGlzIHBhdGggZWl0aGVy
-IHdpdGggdGhlIGN1cnJlbnQNCj4gY29kZS4gIFNvIG5vdCBoYXZpbmcgdGhlIGNhbGwgc2hvdWxk
-IGJlIGZpbmUgYXMgbG9uZyBhcyB5b3UgZW5zdXJlDQo+IHdlIHN0aWxsIG1hbnVhbGx5IGluaXRp
-YWxpemUgZXZlcnl0aGluZyBmb3IgdGhlIG5vbi1wYXNzdGhyb3VnaCBwYXRoDQo+IGluIHRoZSBs
-YXRlciBwYXRjaGVzLiAgSSdsbCBrZWVwIGFuIGV5ZSBvbiB0aGF0IGlzc3VlIHdoaWxlIHJldmll
-d2luZw0KPiB0aGUgcmVtYWluaW5nIHBhdGNoZXMuDQoNCkhlbGxvIENocmlzdG9waCwNCg0KRG8g
-eW91IHNlZSBhbiBhbHRlcm5hdGl2ZSB0byBpbnRyb2R1Y2luZyBhbiAuaW5pdGlhbGl6ZV9ycV9m
-bigpIGNhbGwgaW4NCmJsa19ycV9pbml0KCkgLyBibGtfbXFfcnFfY3R4X2luaXQoKSB0byBlbnN1
-cmUgdGhhdCBqaWZmaWVzX2F0X2FsbG9jIGlzDQpvbmx5IHNldCBvbmNlIGFuZCBub3QgZXZlcnkg
-dGltZSBhIHJlcXVlc3QgaXMgcmVxdWV1ZWQ/DQoNClRoYW5rcywNCg0KQmFydC4=
+Oh, and btw - for the mq case we don't want to use the function
+pointer directly in the queue, but in blk_mq_ops, so that we have
+all the mq methods in one place.
