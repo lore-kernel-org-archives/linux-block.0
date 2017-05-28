@@ -1,134 +1,203 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net
-Cc: linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 00/17] fs: introduce new writeback error reporting and convert ext2 and ext4 to use it
-Date: Wed, 31 May 2017 08:45:23 -0400
-Message-Id: <20170531124540.8782-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:53495 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750989AbdE1KVD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 May 2017 06:21:03 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 12/22] xfs: use the common helper uuid_is_null()
+Date: Sun, 28 May 2017 13:19:58 +0300
+Message-Id: <20170528102008.30276-13-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-v5: don't retrofit old API over the new infrastructure
-    add fstype flag to indicate how wb errors are tracked within that fs
-    add more function variants that take a errseq_t "since" value
-    add second errseq_t to struct file to track metadata wb errors
-    convert ext4 and ext2 to use the new APIs
+From: Amir Goldstein <amir73il@gmail.com>
 
-v4: several more cleanup patches
-    documentation and kerneldoc comment updates
-    fix bugs in gfs2 patches
-    make sync_file_range use same error reporting semantics
-    bugfixes in buffer.c
-    convert nfs to new scheme (maybe bogus, can be dropped)
+Use the common helper uuid_is_null() and remove the xfs specific
+helper uuid_is_nil().
 
-v3: wb_err_t -> errseq_t conversion
-    clean up places that re-set errors after calling filemap_* functions
+The common helper does not check for the NULL pointer value as
+xfs helper did, but xfs code never calls the helper with a pointer
+that can be NULL.
 
-v2: introduce wb_err_t, use atomics
+Conform comments and warning strings to use the term 'null uuid'
+instead of 'nil uuid', because this is the terminology used by
+lib/uuid.c and its users. It is also the terminology used in
+userspace by libuuid and xfsprogs.
 
-This is v5 of the patchset to improve how we're tracking and reporting
-errors that occur during pagecache writeback. The main difference in
-this set from the last one is that I've stopped trying to retrofit the
-old error tracking API on top of the new one. This is more work since
-we'll have to touch each fs individually, but should be safer as the
-"since" values used for checking errors will be more deliberate.
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+[hch: remove now unused uuid.[ch]]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Brian Foster <bfoster@redhat.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ fs/xfs/Makefile          |  3 +--
+ fs/xfs/uuid.c            | 32 --------------------------------
+ fs/xfs/uuid.h            | 23 -----------------------
+ fs/xfs/xfs_linux.h       |  1 -
+ fs/xfs/xfs_log_recover.c |  6 +++---
+ fs/xfs/xfs_mount.c       |  8 ++++----
+ 6 files changed, 8 insertions(+), 65 deletions(-)
+ delete mode 100644 fs/xfs/uuid.c
+ delete mode 100644 fs/xfs/uuid.h
 
-There are several situations where the kernel can "lose" errors that
-occur during writeback, such that fsync will return success even
-though it failed to write back some data previously. The basic idea
-here is to have the kernel be more deliberate about the point from
-which errors are checked to ensure that that doesn't happen.
-
-An additional aim of this set is to change the behavior of fsync in
-Linux to report writeback errors on all fds instead of just the first
-one. This allows writers to reliably tell whether their data made it to
-the backing device without having to coordinate fsync calls with other
-writers.
-
-To do this, we add a new typedef: errseq_t. This is a 32-bit value
-that can store an error code, and a sequence number so we can tell
-whether it has changed since we last sampled it. This allows us to
-record errors in the address_space and then report those errors only
-once per file description.
-
-This set just alters block device files, ext4 and the legacy ext2
-driver. If this general approach seems acceptable, then I'll start
-converting other filesystems in follow-on patchsets. I'd also like
-to get this into linux-next as soon as possible to ensure that we're
-banging out any bugs that might be lurking here.
-
-I also have a couple of xfstests for this as well that I'll re-post
-soon.
-
-Jeff Layton (17):
-  lib: add errseq_t type and infrastructure for handling it
-  fs: new infrastructure for writeback error handling and reporting
-  mm: tracepoints for writeback error events
-  fs: add a new fstype flag to indicate how writeback errors are tracked
-  Documentation: flesh out the section in vfs.txt on storing and
-    reporting writeback errors
-  fs: adapt sync_file_range to new reporting infrastructure
-  mm: add filemap_fdatawait_range_since and
-    filemap_write_and_wait_range_since
-  dax: set errors in mapping when writeback fails
-  block: convert to errseq_t based writeback error tracking
-  block: add sync_blockdev_since and sync_filesystem_since
-  fs: add f_md_wb_err field to struct file for tracking metadata errors
-  fs: allow __generic_file_fsync to support both flavors of error
-    reporting
-  jbd2: conditionally handle errors using errseq_t based on FS_WB_ERRSEQ
-    flag
-  ext4: convert to errseq_t based error tracking
-  fs: add a write_one_page_since
-  ext2: convert to errseq_t based writeback error tracking
-  fs: convert ext2 to use write_one_page_since
-
- Documentation/filesystems/vfs.txt |  50 ++++++++-
- drivers/dax/device.c              |   1 +
- fs/block_dev.c                    |  29 +++++-
- fs/dax.c                          |  18 +++-
- fs/ext2/dir.c                     |  25 +++--
- fs/ext2/file.c                    |  29 ++++--
- fs/ext2/super.c                   |   2 +-
- fs/ext4/dir.c                     |   8 +-
- fs/ext4/ext4.h                    |   8 +-
- fs/ext4/extents.c                 |  24 +++--
- fs/ext4/file.c                    |   5 +-
- fs/ext4/fsync.c                   |  23 ++++-
- fs/ext4/inode.c                   |  19 ++--
- fs/ext4/ioctl.c                   |   9 +-
- fs/ext4/super.c                   |   9 +-
- fs/file_table.c                   |   1 +
- fs/internal.h                     |   8 ++
- fs/jbd2/commit.c                  |  29 ++++--
- fs/jbd2/recovery.c                |   5 +-
- fs/jbd2/transaction.c             |   1 +
- fs/libfs.c                        |  26 +++--
- fs/open.c                         |   3 +
- fs/sync.c                         |  62 +++++++++++-
- include/linux/errseq.h            |  19 ++++
- include/linux/fs.h                |  82 ++++++++++++++-
- include/linux/jbd2.h              |   3 +
- include/linux/mm.h                |   2 +
- include/linux/pagemap.h           |  32 ++++--
- include/trace/events/filemap.h    |  52 ++++++++++
- lib/Makefile                      |   2 +-
- lib/errseq.c                      | 208 ++++++++++++++++++++++++++++++++++++++
- mm/filemap.c                      | 145 ++++++++++++++++++++++++++
- mm/page-writeback.c               |  53 +++++++---
- 33 files changed, 892 insertions(+), 100 deletions(-)
- create mode 100644 include/linux/errseq.h
- create mode 100644 lib/errseq.c
-
+diff --git a/fs/xfs/Makefile b/fs/xfs/Makefile
+index 5c90f82b8f6b..a6e955bfead8 100644
+--- a/fs/xfs/Makefile
++++ b/fs/xfs/Makefile
+@@ -98,8 +98,7 @@ xfs-y				+= xfs_aops.o \
+ 				   xfs_sysfs.o \
+ 				   xfs_trans.o \
+ 				   xfs_xattr.o \
+-				   kmem.o \
+-				   uuid.o
++				   kmem.o
+ 
+ # low-level transaction/log code
+ xfs-y				+= xfs_log.o \
+diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
+deleted file mode 100644
+index 737c186ea98b..000000000000
+--- a/fs/xfs/uuid.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+- * Copyright (c) 2000-2003,2005 Silicon Graphics, Inc.
+- * All Rights Reserved.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it would be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write the Free Software Foundation,
+- * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-#include <xfs.h>
+-
+-int
+-uuid_is_nil(uuid_t *uuid)
+-{
+-	int	i;
+-	char	*cp = (char *)uuid;
+-
+-	if (uuid == NULL)
+-		return 0;
+-	/* implied check of version number here... */
+-	for (i = 0; i < sizeof *uuid; i++)
+-		if (*cp++) return 0;	/* not nil */
+-	return 1;	/* is nil */
+-}
+diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
+deleted file mode 100644
+index 5aea49bf0963..000000000000
+--- a/fs/xfs/uuid.h
++++ /dev/null
+@@ -1,23 +0,0 @@
+-/*
+- * Copyright (c) 2000-2003,2005 Silicon Graphics, Inc.
+- * All Rights Reserved.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it would be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write the Free Software Foundation,
+- * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-#ifndef __XFS_SUPPORT_UUID_H__
+-#define __XFS_SUPPORT_UUID_H__
+-
+-extern int uuid_is_nil(uuid_t *uuid);
+-
+-#endif	/* __XFS_SUPPORT_UUID_H__ */
+diff --git a/fs/xfs/xfs_linux.h b/fs/xfs/xfs_linux.h
+index 2c33d915e550..2d167fe643ec 100644
+--- a/fs/xfs/xfs_linux.h
++++ b/fs/xfs/xfs_linux.h
+@@ -43,7 +43,6 @@ typedef __u32			xfs_nlink_t;
+ 
+ #include "kmem.h"
+ #include "mrlock.h"
+-#include "uuid.h"
+ 
+ #include <linux/semaphore.h>
+ #include <linux/mm.h>
+diff --git a/fs/xfs/xfs_log_recover.c b/fs/xfs/xfs_log_recover.c
+index cd0b077deb35..8cec1e5505a4 100644
+--- a/fs/xfs/xfs_log_recover.c
++++ b/fs/xfs/xfs_log_recover.c
+@@ -352,13 +352,13 @@ xlog_header_check_mount(
+ {
+ 	ASSERT(head->h_magicno == cpu_to_be32(XLOG_HEADER_MAGIC_NUM));
+ 
+-	if (uuid_is_nil(&head->h_fs_uuid)) {
++	if (uuid_is_null(&head->h_fs_uuid)) {
+ 		/*
+ 		 * IRIX doesn't write the h_fs_uuid or h_fmt fields. If
+-		 * h_fs_uuid is nil, we assume this log was last mounted
++		 * h_fs_uuid is null, we assume this log was last mounted
+ 		 * by IRIX and continue.
+ 		 */
+-		xfs_warn(mp, "nil uuid in log - IRIX style log");
++		xfs_warn(mp, "null uuid in log - IRIX style log");
+ 	} else if (unlikely(!uuid_equal(&mp->m_sb.sb_uuid, &head->h_fs_uuid))) {
+ 		xfs_warn(mp, "log has mismatched uuid - can't recover");
+ 		xlog_header_check_dump(mp, head);
+diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
+index 51f7d03ef86c..54452967e35e 100644
+--- a/fs/xfs/xfs_mount.c
++++ b/fs/xfs/xfs_mount.c
+@@ -80,14 +80,14 @@ xfs_uuid_mount(
+ 	if (mp->m_flags & XFS_MOUNT_NOUUID)
+ 		return 0;
+ 
+-	if (uuid_is_nil(uuid)) {
+-		xfs_warn(mp, "Filesystem has nil UUID - can't mount");
++	if (uuid_is_null(uuid)) {
++		xfs_warn(mp, "Filesystem has null UUID - can't mount");
+ 		return -EINVAL;
+ 	}
+ 
+ 	mutex_lock(&xfs_uuid_table_mutex);
+ 	for (i = 0, hole = -1; i < xfs_uuid_table_size; i++) {
+-		if (uuid_is_nil(&xfs_uuid_table[i])) {
++		if (uuid_is_null(&xfs_uuid_table[i])) {
+ 			hole = i;
+ 			continue;
+ 		}
+@@ -124,7 +124,7 @@ xfs_uuid_unmount(
+ 
+ 	mutex_lock(&xfs_uuid_table_mutex);
+ 	for (i = 0; i < xfs_uuid_table_size; i++) {
+-		if (uuid_is_nil(&xfs_uuid_table[i]))
++		if (uuid_is_null(&xfs_uuid_table[i]))
+ 			continue;
+ 		if (!uuid_equal(uuid, &xfs_uuid_table[i]))
+ 			continue;
 -- 
-2.9.4
+2.11.0
