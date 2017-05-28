@@ -1,44 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:36016 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751485AbdEDHbn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2017 03:31:43 -0400
-Received: by mail-pf0-f176.google.com with SMTP id q66so3714360pfi.3
-        for <linux-block@vger.kernel.org>; Thu, 04 May 2017 00:31:43 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>, kernel-team@fb.com
-Subject: [PATCH v2 01/12] blk-mq-debugfs: separate flags with |
-Date: Thu,  4 May 2017 00:31:23 -0700
-Message-Id: <a93a27c6300f9a129b8d897bff289a19e4d59704.1493882751.git.osandov@fb.com>
-In-Reply-To: <cover.1493882751.git.osandov@fb.com>
-References: <cover.1493882751.git.osandov@fb.com>
-In-Reply-To: <cover.1493882751.git.osandov@fb.com>
-References: <cover.1493882751.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Sun, 28 May 2017 11:49:38 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH 07/13] block_dev: propagate bio_iov_iter_get_pages
+	error in __blkdev_direct_IO
+Message-ID: <20170528094938.GD14199@lst.de>
+References: <20170526085620.3113-1-hch@lst.de> <20170526085620.3113-8-hch@lst.de> <b5bc89a2-a17f-7e98-a767-bfa0c90afaac@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b5bc89a2-a17f-7e98-a767-bfa0c90afaac@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Fri, May 26, 2017 at 11:12:31AM +0200, Johannes Thumshirn wrote:
+> On 05/26/2017 10:56 AM, Christoph Hellwig wrote:
+> > Once we move the block layer to its own status code we'll still want to
+> > propagate the bio_iov_iter_get_pages, so restructure __blkdev_direct_IO
+> > to take ret into account when returning the errno.
+> > ---
+> 
+> 
+> -ENOSIGNOFF?
 
-This reads more naturally than spaces.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index bcd2a7d4a3a5..1ff3d726fb03 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -53,7 +53,7 @@ static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 		if (!(flags & BIT(i)))
- 			continue;
- 		if (sep)
--			seq_puts(m, " ");
-+			seq_puts(m, "|");
- 		sep = true;
- 		if (i < flag_name_count && flag_name[i])
- 			seq_puts(m, flag_name[i]);
--- 
-2.12.2
+Fixed.
