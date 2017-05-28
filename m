@@ -1,86 +1,44 @@
-Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 05/13] fs: remove the unused error argument to dio_end_io()
-Date: Fri, 26 May 2017 11:56:12 +0300
-Message-Id: <20170526085620.3113-6-hch@lst.de>
-In-Reply-To: <20170526085620.3113-1-hch@lst.de>
-References: <20170526085620.3113-1-hch@lst.de>
+Return-Path: <hch@lst.de>
+Date: Sun, 28 May 2017 10:32:55 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"osandov@fb.com" <osandov@fb.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 05/19] cdrom: Check private request size before
+	attaching to a queue
+Message-ID: <20170528083255.GA13083@lst.de>
+References: <20170525184327.23570-1-bart.vanassche@sandisk.com> <20170525184327.23570-6-bart.vanassche@sandisk.com> <20170526060813.GE18424@lst.de> <1495813840.2634.1.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1495813840.2634.1.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
----
- fs/btrfs/inode.c   | 6 +++---
- fs/direct-io.c     | 3 +--
- include/linux/fs.h | 2 +-
- 3 files changed, 5 insertions(+), 6 deletions(-)
+On Fri, May 26, 2017 at 03:50:42PM +0000, Bart Van Assche wrote:
+> On Fri, 2017-05-26 at 08:08 +0200, Christoph Hellwig wrote:
+> > On Thu, May 25, 2017 at 11:43:13AM -0700, Bart Van Assche wrote:
+> > > Since the cdrom driver only supports request queues for which
+> > > struct scsi_request is the first member of their private request
+> > > data, refuse to register block layer queues for which this is
+> > > not the case.
+> > 
+> > Hmm.  I think we have a deeper issue there.  The cdrom layer usually
+> > sends packets commands through the cdrom ops ->generic_packet
+> > method, but one function (cdrom_read_cdda_bpc) seems to directly
+> > send a scsi passthrough request.  It is only used if the cdda_method
+> > is not CDDA_OLD, which is set if the cdrom_device_info structure
+> > does not have a gendisk pointer hanging off it.  It seems like
+> > the legacy cdrom drivers fall into that category and would be
+> > broken by this change.
+> 
+> Hello Christoph,
+> 
+> How about moving the check into cdrom_read_cdda_bpc()? As far as I can see
+> that function is only called if a CDROMREADAUDIO ioctl is submitted. Although
+> Documentation/cdrom/cdrom-standard.tex mentions that that ioctl is unsupported
+> applications like cdparanoia use it.
 
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 17cbe9306faf..758b2666885e 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8244,7 +8244,7 @@ static void btrfs_endio_direct_read(struct bio *bio)
- 	kfree(dip);
- 
- 	dio_bio->bi_error = bio->bi_error;
--	dio_end_io(dio_bio, bio->bi_error);
-+	dio_end_io(dio_bio);
- 
- 	if (io_bio->end_io)
- 		io_bio->end_io(io_bio, err);
-@@ -8304,7 +8304,7 @@ static void btrfs_endio_direct_write(struct bio *bio)
- 	kfree(dip);
- 
- 	dio_bio->bi_error = bio->bi_error;
--	dio_end_io(dio_bio, bio->bi_error);
-+	dio_end_io(dio_bio);
- 	bio_put(bio);
- }
- 
-@@ -8673,7 +8673,7 @@ static void btrfs_submit_direct(struct bio *dio_bio, struct inode *inode,
- 		 * Releases and cleans up our dio_bio, no need to bio_put()
- 		 * nor bio_endio()/bio_io_error() against dio_bio.
- 		 */
--		dio_end_io(dio_bio, ret);
-+		dio_end_io(dio_bio);
- 	}
- 	if (io_bio)
- 		bio_put(io_bio);
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a04ebea77de8..04247a6c3f73 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -348,13 +348,12 @@ static void dio_bio_end_io(struct bio *bio)
- /**
-  * dio_end_io - handle the end io action for the given bio
-  * @bio: The direct io bio thats being completed
-- * @error: Error if there was one
-  *
-  * This is meant to be called by any filesystem that uses their own dio_submit_t
-  * so that the DIO specific endio actions are dealt with after the filesystem
-  * has done it's completion work.
-  */
--void dio_end_io(struct bio *bio, int error)
-+void dio_end_io(struct bio *bio)
- {
- 	struct dio *dio = bio->bi_private;
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 803e5a9b2654..4388ab58843d 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2843,7 +2843,7 @@ enum {
- 	DIO_SKIP_DIO_COUNT = 0x08,
- };
- 
--void dio_end_io(struct bio *bio, int error);
-+void dio_end_io(struct bio *bio);
- 
- ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
- 			     struct block_device *bdev, struct iov_iter *iter,
--- 
-2.11.0
+I guess that's fine for now.  In the long run we can probably replace
+the current users of generic_packet method with direct scsi passthrough
+requests, but that can be left for later.
