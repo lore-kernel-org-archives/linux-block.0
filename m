@@ -1,260 +1,78 @@
-Return-Path: <BATV+c76b9e6b5f659e20e25d+5017+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6/7] blk-mq: create hctx for each present CPU
-Date: Fri, 19 May 2017 10:57:55 +0200
-Message-Id: <20170519085756.29742-7-hch@lst.de>
-In-Reply-To: <20170519085756.29742-1-hch@lst.de>
-References: <20170519085756.29742-1-hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 14/22] ima/policy: switch to use uuid_t
+Date: Sun, 28 May 2017 13:20:00 +0300
+Message-Id: <20170528102008.30276-15-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we only create hctx for online CPUs, which can lead to a lot
-of churn due to frequent soft offline / online operations.  Instead
-allocate one for each present CPU to avoid this and dramatically simplify
-the code.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- block/blk-mq.c             | 120 +++++----------------------------------------
- block/blk-mq.h             |   5 --
- include/linux/cpuhotplug.h |   1 -
- 3 files changed, 11 insertions(+), 115 deletions(-)
+ security/integrity/ima/ima_policy.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a69ad122ed66..01bbc30a2807 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -37,9 +37,6 @@
- #include "blk-wbt.h"
- #include "blk-mq-sched.h"
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index 49fbc3e8f012..da3e7d50e0d7 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -61,7 +61,7 @@ struct ima_rule_entry {
+ 	enum ima_hooks func;
+ 	int mask;
+ 	unsigned long fsmagic;
+-	u8 fsuuid[16];
++	uuid_t fsuuid;
+ 	kuid_t uid;
+ 	kuid_t fowner;
+ 	bool (*uid_op)(kuid_t, kuid_t);    /* Handlers for operators       */
+@@ -244,7 +244,7 @@ static bool ima_match_rules(struct ima_rule_entry *rule, struct inode *inode,
+ 	    && rule->fsmagic != inode->i_sb->s_magic)
+ 		return false;
+ 	if ((rule->flags & IMA_FSUUID) &&
+-	    memcmp(rule->fsuuid, inode->i_sb->s_uuid, sizeof(rule->fsuuid)))
++	    memcmp(&rule->fsuuid, inode->i_sb->s_uuid, sizeof(rule->fsuuid)))
+ 		return false;
+ 	if ((rule->flags & IMA_UID) && !rule->uid_op(cred->uid, rule->uid))
+ 		return false;
+@@ -711,13 +711,12 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
+ 		case Opt_fsuuid:
+ 			ima_log_string(ab, "fsuuid", args[0].from);
  
--static DEFINE_MUTEX(all_q_mutex);
--static LIST_HEAD(all_q_list);
--
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
-@@ -1985,8 +1982,8 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- 		INIT_LIST_HEAD(&__ctx->rq_list);
- 		__ctx->queue = q;
+-			if (memchr_inv(entry->fsuuid, 0x00,
+-				       sizeof(entry->fsuuid))) {
++			if (uuid_is_null(&entry->fsuuid)) {
+ 				result = -EINVAL;
+ 				break;
+ 			}
  
--		/* If the cpu isn't online, the cpu is mapped to first hctx */
--		if (!cpu_online(i))
-+		/* If the cpu isn't present, the cpu is mapped to first hctx */
-+		if (!cpu_present(i))
- 			continue;
- 
- 		hctx = blk_mq_map_queue(q, i);
-@@ -2029,8 +2026,7 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
- 	}
- }
- 
--static void blk_mq_map_swqueue(struct request_queue *q,
--			       const struct cpumask *online_mask)
-+static void blk_mq_map_swqueue(struct request_queue *q)
- {
- 	unsigned int i, hctx_idx;
- 	struct blk_mq_hw_ctx *hctx;
-@@ -2048,13 +2044,11 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 	}
- 
- 	/*
--	 * Map software to hardware queues
-+	 * Map software to hardware queues.
-+	 *
-+	 * If the cpu isn't present, the cpu is mapped to first hctx.
- 	 */
--	for_each_possible_cpu(i) {
--		/* If the cpu isn't online, the cpu is mapped to first hctx */
--		if (!cpumask_test_cpu(i, online_mask))
--			continue;
--
-+	for_each_present_cpu(i) {
- 		hctx_idx = q->mq_map[i];
- 		/* unmapped hw queue can be remapped after CPU topo changed */
- 		if (!set->tags[hctx_idx] &&
-@@ -2340,16 +2334,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		blk_queue_softirq_done(q, set->ops->complete);
- 
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
--
--	get_online_cpus();
--	mutex_lock(&all_q_mutex);
--
--	list_add_tail(&q->all_q_node, &all_q_list);
- 	blk_mq_add_queue_tag_set(set, q);
--	blk_mq_map_swqueue(q, cpu_online_mask);
--
--	mutex_unlock(&all_q_mutex);
--	put_online_cpus();
-+	blk_mq_map_swqueue(q);
- 
- 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
- 		int ret;
-@@ -2375,18 +2361,12 @@ void blk_mq_free_queue(struct request_queue *q)
- {
- 	struct blk_mq_tag_set	*set = q->tag_set;
- 
--	mutex_lock(&all_q_mutex);
--	list_del_init(&q->all_q_node);
--	mutex_unlock(&all_q_mutex);
--
- 	blk_mq_del_queue_tag_set(q);
--
- 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
- }
- 
- /* Basically redo blk_mq_init_queue with queue frozen */
--static void blk_mq_queue_reinit(struct request_queue *q,
--				const struct cpumask *online_mask)
-+static void blk_mq_queue_reinit(struct request_queue *q)
- {
- 	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
- 
-@@ -2399,76 +2379,12 @@ static void blk_mq_queue_reinit(struct request_queue *q,
- 	 * involves free and re-allocate memory, worthy doing?)
- 	 */
- 
--	blk_mq_map_swqueue(q, online_mask);
-+	blk_mq_map_swqueue(q);
- 
- 	blk_mq_sysfs_register(q);
- 	blk_mq_debugfs_register_hctxs(q);
- }
- 
--/*
-- * New online cpumask which is going to be set in this hotplug event.
-- * Declare this cpumasks as global as cpu-hotplug operation is invoked
-- * one-by-one and dynamically allocating this could result in a failure.
-- */
--static struct cpumask cpuhp_online_new;
--
--static void blk_mq_queue_reinit_work(void)
--{
--	struct request_queue *q;
--
--	mutex_lock(&all_q_mutex);
--	/*
--	 * We need to freeze and reinit all existing queues.  Freezing
--	 * involves synchronous wait for an RCU grace period and doing it
--	 * one by one may take a long time.  Start freezing all queues in
--	 * one swoop and then wait for the completions so that freezing can
--	 * take place in parallel.
--	 */
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_freeze_queue_start(q);
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_freeze_queue_wait(q);
--
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_queue_reinit(q, &cpuhp_online_new);
--
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_unfreeze_queue(q);
--
--	mutex_unlock(&all_q_mutex);
--}
--
--static int blk_mq_queue_reinit_dead(unsigned int cpu)
--{
--	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
--	blk_mq_queue_reinit_work();
--	return 0;
--}
--
--/*
-- * Before hotadded cpu starts handling requests, new mappings must be
-- * established.  Otherwise, these requests in hw queue might never be
-- * dispatched.
-- *
-- * For example, there is a single hw queue (hctx) and two CPU queues (ctx0
-- * for CPU0, and ctx1 for CPU1).
-- *
-- * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
-- * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
-- *
-- * And then while running hw queue, blk_mq_flush_busy_ctxs() finds bit0 is set
-- * in pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
-- * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list is
-- * ignored.
-- */
--static int blk_mq_queue_reinit_prepare(unsigned int cpu)
--{
--	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
--	cpumask_set_cpu(cpu, &cpuhp_online_new);
--	blk_mq_queue_reinit_work();
--	return 0;
--}
--
- static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- {
- 	int i;
-@@ -2678,7 +2594,7 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
- 	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
--		blk_mq_queue_reinit(q, cpu_online_mask);
-+		blk_mq_queue_reinit(q);
+-			result = uuid_to_bin(args[0].from, (uuid_t *)&entry->fsuuid);
++			result = uuid_to_bin(args[0].from, &entry->fsuuid);
+ 			if (!result)
+ 				entry->flags |= IMA_FSUUID;
+ 			break;
+@@ -1086,7 +1085,7 @@ int ima_policy_show(struct seq_file *m, void *v)
  	}
  
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
-@@ -2887,24 +2803,10 @@ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
- }
- EXPORT_SYMBOL_GPL(blk_mq_poll);
+ 	if (entry->flags & IMA_FSUUID) {
+-		seq_printf(m, "fsuuid=%pU", entry->fsuuid);
++		seq_printf(m, "fsuuid=%pU", &entry->fsuuid);
+ 		seq_puts(m, " ");
+ 	}
  
--void blk_mq_disable_hotplug(void)
--{
--	mutex_lock(&all_q_mutex);
--}
--
--void blk_mq_enable_hotplug(void)
--{
--	mutex_unlock(&all_q_mutex);
--}
--
- static int __init blk_mq_init(void)
- {
- 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
- 				blk_mq_hctx_notify_dead);
--
--	cpuhp_setup_state_nocalls(CPUHP_BLK_MQ_PREPARE, "block/mq:prepare",
--				  blk_mq_queue_reinit_prepare,
--				  blk_mq_queue_reinit_dead);
- 	return 0;
- }
- subsys_initcall(blk_mq_init);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index cc67b48e3551..558df56544d2 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -56,11 +56,6 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 				bool at_head);
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 				struct list_head *list);
--/*
-- * CPU hotplug helpers
-- */
--void blk_mq_enable_hotplug(void);
--void blk_mq_disable_hotplug(void);
- 
- /*
-  * CPU -> queue mappings
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index c15f22c54535..7f815d915977 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -58,7 +58,6 @@ enum cpuhp_state {
- 	CPUHP_XEN_EVTCHN_PREPARE,
- 	CPUHP_ARM_SHMOBILE_SCU_PREPARE,
- 	CPUHP_SH_SH3X_PREPARE,
--	CPUHP_BLK_MQ_PREPARE,
- 	CPUHP_NET_FLOW_PREPARE,
- 	CPUHP_TOPOLOGY_PREPARE,
- 	CPUHP_NET_IUCV_PREPARE,
 -- 
 2.11.0
