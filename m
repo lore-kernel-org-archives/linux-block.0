@@ -11,86 +11,68 @@ Cc: Shaohua Li <shli@kernel.org>,
         linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 05/22] uuid: remove uuid_be defintions from the uapi header
-Date: Sun, 28 May 2017 13:19:51 +0300
-Message-Id: <20170528102008.30276-6-hch@lst.de>
+Subject: [PATCH 13/22] block: remove blk_part_pack_uuid
+Date: Sun, 28 May 2017 13:19:59 +0300
+Message-Id: <20170528102008.30276-14-hch@lst.de>
 In-Reply-To: <20170528102008.30276-1-hch@lst.de>
 References: <20170528102008.30276-1-hch@lst.de>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-We don't use uuid_be and the UUID_BE constants in any uapi headers, so make
-them private to the kernel.
+This helper was only used by IMA of all things, which would get spurious
+errors if CONFIG_BLOCK is disabled.  Just opencode the call there.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- include/linux/uuid.h      | 15 +++++++++++++++
- include/uapi/linux/uuid.h | 16 ----------------
- 2 files changed, 15 insertions(+), 16 deletions(-)
+ include/linux/genhd.h               | 11 -----------
+ security/integrity/ima/ima_policy.c |  3 +--
+ 2 files changed, 1 insertion(+), 13 deletions(-)
 
-diff --git a/include/linux/uuid.h b/include/linux/uuid.h
-index 2d095fc60204..30fb13018e29 100644
---- a/include/linux/uuid.h
-+++ b/include/linux/uuid.h
-@@ -18,6 +18,21 @@
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index acff9437e5c3..e619fae2f037 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -219,12 +219,6 @@ static inline struct gendisk *part_to_disk(struct hd_struct *part)
+ 	return NULL;
+ }
  
- #include <uapi/linux/uuid.h>
- 
-+typedef struct {
-+	__u8 b[16];
-+} uuid_be;
-+
-+#define UUID_BE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)		\
-+((uuid_be)								\
-+{{ ((a) >> 24) & 0xff, ((a) >> 16) & 0xff, ((a) >> 8) & 0xff, (a) & 0xff, \
-+   ((b) >> 8) & 0xff, (b) & 0xff,					\
-+   ((c) >> 8) & 0xff, (c) & 0xff,					\
-+   (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }})
-+
-+#define NULL_UUID_BE							\
-+	UUID_BE(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00,	\
-+		0x00, 0x00, 0x00, 0x00)
-+
- /*
-  * The length of a UUID string ("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
-  * not including trailing NUL.
-diff --git a/include/uapi/linux/uuid.h b/include/uapi/linux/uuid.h
-index 3738e5fb6a4d..0099756c4bac 100644
---- a/include/uapi/linux/uuid.h
-+++ b/include/uapi/linux/uuid.h
-@@ -24,10 +24,6 @@ typedef struct {
- 	__u8 b[16];
- } uuid_le;
- 
--typedef struct {
--	__u8 b[16];
--} uuid_be;
+-static inline int blk_part_pack_uuid(const u8 *uuid_str, u8 *to)
+-{
+-	uuid_be_to_bin(uuid_str, (uuid_be *)to);
+-	return 0;
+-}
 -
- #define UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)		\
- ((uuid_le)								\
- {{ (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-@@ -35,20 +31,8 @@ typedef struct {
-    (c) & 0xff, ((c) >> 8) & 0xff,					\
-    (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }})
+ static inline int disk_max_parts(struct gendisk *disk)
+ {
+ 	if (disk->flags & GENHD_FL_EXT_DEVT)
+@@ -736,11 +730,6 @@ static inline dev_t blk_lookup_devt(const char *name, int partno)
+ 	dev_t devt = MKDEV(0, 0);
+ 	return devt;
+ }
+-
+-static inline int blk_part_pack_uuid(const u8 *uuid_str, u8 *to)
+-{
+-	return -EINVAL;
+-}
+ #endif /* CONFIG_BLOCK */
  
--#define UUID_BE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)		\
--((uuid_be)								\
--{{ ((a) >> 24) & 0xff, ((a) >> 16) & 0xff, ((a) >> 8) & 0xff, (a) & 0xff, \
--   ((b) >> 8) & 0xff, (b) & 0xff,					\
--   ((c) >> 8) & 0xff, (c) & 0xff,					\
--   (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }})
--
- #define NULL_UUID_LE							\
- 	UUID_LE(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00,	\
- 		0x00, 0x00, 0x00, 0x00)
+ #endif /* _LINUX_GENHD_H */
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index 3ab1067db624..49fbc3e8f012 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -717,8 +717,7 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
+ 				break;
+ 			}
  
--#define NULL_UUID_BE							\
--	UUID_BE(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00,	\
--		0x00, 0x00, 0x00, 0x00)
--
--
- #endif /* _UAPI_LINUX_UUID_H_ */
+-			result = blk_part_pack_uuid(args[0].from,
+-						    entry->fsuuid);
++			result = uuid_to_bin(args[0].from, (uuid_t *)&entry->fsuuid);
+ 			if (!result)
+ 				entry->flags |= IMA_FSUUID;
+ 			break;
 -- 
 2.11.0
