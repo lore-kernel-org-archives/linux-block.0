@@ -1,47 +1,96 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH 05/19] cdrom: Check private request size before attaching to a queue
-Date: Thu, 25 May 2017 11:43:13 -0700
-Message-ID: <20170525184327.23570-6-bart.vanassche@sandisk.com>
-In-Reply-To: <20170525184327.23570-1-bart.vanassche@sandisk.com>
-References: <20170525184327.23570-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 05/22] uuid: remove uuid_be defintions from the uapi header
+Date: Sun, 28 May 2017 13:19:51 +0300
+Message-Id: <20170528102008.30276-6-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Since the cdrom driver only supports request queues for which
-struct scsi_request is the first member of their private request
-data, refuse to register block layer queues for which this is
-not the case.
+We don't use uuid_be and the UUID_BE constants in any uapi headers, so make
+them private to the kernel.
 
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: linux-block@vger.kernel.org
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/cdrom/cdrom.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/linux/uuid.h      | 15 +++++++++++++++
+ include/uapi/linux/uuid.h | 16 ----------------
+ 2 files changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index 76c952fd9ab9..5c1fec31b7ef 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -594,6 +594,10 @@ int register_cdrom(struct cdrom_device_info *cdi)
+diff --git a/include/linux/uuid.h b/include/linux/uuid.h
+index 2d095fc60204..30fb13018e29 100644
+--- a/include/linux/uuid.h
++++ b/include/linux/uuid.h
+@@ -18,6 +18,21 @@
  
- 	if (cdo->open == NULL || cdo->release == NULL)
- 		return -EINVAL;
-+	if (!blk_queue_scsi_pdu(cdi->disk->queue)) {
-+		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
-+		return -EINVAL;
-+	}
- 	if (!banner_printed) {
- 		pr_info("Uniform CD-ROM driver " REVISION "\n");
- 		banner_printed = 1;
+ #include <uapi/linux/uuid.h>
+ 
++typedef struct {
++	__u8 b[16];
++} uuid_be;
++
++#define UUID_BE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)		\
++((uuid_be)								\
++{{ ((a) >> 24) & 0xff, ((a) >> 16) & 0xff, ((a) >> 8) & 0xff, (a) & 0xff, \
++   ((b) >> 8) & 0xff, (b) & 0xff,					\
++   ((c) >> 8) & 0xff, (c) & 0xff,					\
++   (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }})
++
++#define NULL_UUID_BE							\
++	UUID_BE(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00,	\
++		0x00, 0x00, 0x00, 0x00)
++
+ /*
+  * The length of a UUID string ("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+  * not including trailing NUL.
+diff --git a/include/uapi/linux/uuid.h b/include/uapi/linux/uuid.h
+index 3738e5fb6a4d..0099756c4bac 100644
+--- a/include/uapi/linux/uuid.h
++++ b/include/uapi/linux/uuid.h
+@@ -24,10 +24,6 @@ typedef struct {
+ 	__u8 b[16];
+ } uuid_le;
+ 
+-typedef struct {
+-	__u8 b[16];
+-} uuid_be;
+-
+ #define UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)		\
+ ((uuid_le)								\
+ {{ (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
+@@ -35,20 +31,8 @@ typedef struct {
+    (c) & 0xff, ((c) >> 8) & 0xff,					\
+    (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }})
+ 
+-#define UUID_BE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)		\
+-((uuid_be)								\
+-{{ ((a) >> 24) & 0xff, ((a) >> 16) & 0xff, ((a) >> 8) & 0xff, (a) & 0xff, \
+-   ((b) >> 8) & 0xff, (b) & 0xff,					\
+-   ((c) >> 8) & 0xff, (c) & 0xff,					\
+-   (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }})
+-
+ #define NULL_UUID_LE							\
+ 	UUID_LE(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00,	\
+ 		0x00, 0x00, 0x00, 0x00)
+ 
+-#define NULL_UUID_BE							\
+-	UUID_BE(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00,	\
+-		0x00, 0x00, 0x00, 0x00)
+-
+-
+ #endif /* _UAPI_LINUX_UUID_H_ */
 -- 
-2.12.2
+2.11.0
