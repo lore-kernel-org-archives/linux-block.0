@@ -11,47 +11,62 @@ Cc: Shaohua Li <shli@kernel.org>,
         linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 16/22] overlayfs: use uuid_t instead of uuid_be
-Date: Sun, 28 May 2017 13:20:02 +0300
-Message-Id: <20170528102008.30276-17-hch@lst.de>
+Subject: [PATCH 03/22] xfs: use uuid_be to implement the uuid_t type
+Date: Sun, 28 May 2017 13:19:49 +0300
+Message-Id: <20170528102008.30276-4-hch@lst.de>
 In-Reply-To: <20170528102008.30276-1-hch@lst.de>
 References: <20170528102008.30276-1-hch@lst.de>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
+Use the generic Linux definition to implement our UUID type, this will
+allow using more generic infrastructure in the future.
+
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Brian Foster <bfoster@redhat.com>
 Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- fs/overlayfs/copy_up.c   | 2 +-
- fs/overlayfs/overlayfs.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/xfs/uuid.h      | 4 ----
+ fs/xfs/xfs_linux.h | 3 +++
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/fs/overlayfs/copy_up.c b/fs/overlayfs/copy_up.c
-index 5b795873f7fa..2a67e8c13098 100644
---- a/fs/overlayfs/copy_up.c
-+++ b/fs/overlayfs/copy_up.c
-@@ -233,7 +233,7 @@ int ovl_set_attr(struct dentry *upperdentry, struct kstat *stat)
- 	return err;
- }
+diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
+index 104db0f3bed6..4f1441ba4fa5 100644
+--- a/fs/xfs/uuid.h
++++ b/fs/xfs/uuid.h
+@@ -18,10 +18,6 @@
+ #ifndef __XFS_SUPPORT_UUID_H__
+ #define __XFS_SUPPORT_UUID_H__
  
--static struct ovl_fh *ovl_encode_fh(struct dentry *lower, uuid_be *uuid)
-+static struct ovl_fh *ovl_encode_fh(struct dentry *lower, uuid_t *uuid)
- {
- 	struct ovl_fh *fh;
- 	int fh_type, fh_len, dwords;
-diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
-index caa36cb9c46d..cb0fc450419b 100644
---- a/fs/overlayfs/overlayfs.h
-+++ b/fs/overlayfs/overlayfs.h
-@@ -55,7 +55,7 @@ struct ovl_fh {
- 	u8 len;		/* size of this header + size of fid */
- 	u8 flags;	/* OVL_FH_FLAG_* */
- 	u8 type;	/* fid_type of fid */
--	uuid_be uuid;	/* uuid of filesystem */
-+	uuid_t uuid;	/* uuid of filesystem */
- 	u8 fid[0];	/* file identifier */
- } __packed;
+-typedef struct {
+-	unsigned char	__u_bits[16];
+-} uuid_t;
+-
+ extern int uuid_is_nil(uuid_t *uuid);
+ extern int uuid_equal(uuid_t *uuid1, uuid_t *uuid2);
+ extern void uuid_getnodeuniq(uuid_t *uuid, int fsid [2]);
+diff --git a/fs/xfs/xfs_linux.h b/fs/xfs/xfs_linux.h
+index 044fb0e15390..89ee5ec66837 100644
+--- a/fs/xfs/xfs_linux.h
++++ b/fs/xfs/xfs_linux.h
+@@ -19,6 +19,7 @@
+ #define __XFS_LINUX__
  
+ #include <linux/types.h>
++#include <linux/uuid.h>
+ 
+ /*
+  * Kernel specific type declarations for XFS
+@@ -38,6 +39,8 @@ typedef __s64			xfs_daddr_t;	/* <disk address> type */
+ typedef __u32			xfs_dev_t;
+ typedef __u32			xfs_nlink_t;
+ 
++typedef uuid_be			uuid_t;
++
+ #include "xfs_types.h"
+ 
+ #include "kmem.h"
 -- 
 2.11.0
