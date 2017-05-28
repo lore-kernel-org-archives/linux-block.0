@@ -1,71 +1,126 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42940 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1758864AbdEZDH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 23:07:59 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH 1/6] blk-mq: introduce blk_mq_unquiesce_queue
-Date: Fri, 26 May 2017 11:07:34 +0800
-Message-Id: <20170526030740.26959-2-ming.lei@redhat.com>
-In-Reply-To: <20170526030740.26959-1-ming.lei@redhat.com>
-References: <20170526030740.26959-1-ming.lei@redhat.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:42130 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750979AbdE1KVF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 May 2017 06:21:05 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 08/22] uuid: hoist helpers uuid_equal() and uuid_copy() from xfs
+Date: Sun, 28 May 2017 13:19:54 +0300
+Message-Id: <20170528102008.30276-9-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now we use blk_mq_start_stopped_hw_queues() implictely
-as pair of blk_mq_quiesce_queue(), now we introduce
-blk_mq_unquiesce_queue() explictely.
+These helper are used to compare and copy two uuid_t type objects.
 
-Also this function is introduced for fixing
-current quiescing mechanism, which will be done
-in the following patches.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+[hch: also provide the respective guid_ versions]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- block/blk-mq.c         | 13 +++++++++++++
- include/linux/blkdev.h |  1 +
- 2 files changed, 14 insertions(+)
+ fs/xfs/uuid.c        |  6 ------
+ fs/xfs/uuid.h        |  7 -------
+ include/linux/uuid.h | 20 ++++++++++++++++++++
+ lib/test_uuid.c      |  4 ++--
+ 4 files changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f2224ffd225d..a26fee3fb389 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -181,6 +181,19 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
+index b83f76b6d410..29ed78c8637b 100644
+--- a/fs/xfs/uuid.c
++++ b/fs/xfs/uuid.c
+@@ -55,9 +55,3 @@ uuid_is_nil(uuid_t *uuid)
+ 		if (*cp++) return 0;	/* not nil */
+ 	return 1;	/* is nil */
  }
- EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+-
+-int
+-uuid_equal(uuid_t *uuid1, uuid_t *uuid2)
+-{
+-	return memcmp(uuid1, uuid2, sizeof(uuid_t)) ? 0 : 1;
+-}
+diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
+index 4f1441ba4fa5..86bbed071e79 100644
+--- a/fs/xfs/uuid.h
++++ b/fs/xfs/uuid.h
+@@ -19,13 +19,6 @@
+ #define __XFS_SUPPORT_UUID_H__
  
-+/**
-+ * blk_mq_unquiesce_queue() - pair of blk_mq_quiesce_queue()
-+ * @q: request queue.
-+ *
-+ * This function recovers queue into the state before quiescing
-+ * done by blk_mq_quiesce_queue
-+ */
-+void blk_mq_unquiesce_queue(struct request_queue *q)
+ extern int uuid_is_nil(uuid_t *uuid);
+-extern int uuid_equal(uuid_t *uuid1, uuid_t *uuid2);
+ extern void uuid_getnodeuniq(uuid_t *uuid, int fsid [2]);
+ 
+-static inline void
+-uuid_copy(uuid_t *dst, uuid_t *src)
+-{
+-	memcpy(dst, src, sizeof(uuid_t));
+-}
+-
+ #endif	/* __XFS_SUPPORT_UUID_H__ */
+diff --git a/include/linux/uuid.h b/include/linux/uuid.h
+index a9d0fdba5404..b4b147f52d6c 100644
+--- a/include/linux/uuid.h
++++ b/include/linux/uuid.h
+@@ -35,6 +35,26 @@ typedef struct {
+  */
+ #define	UUID_STRING_LEN		36
+ 
++static inline bool guid_equal(const guid_t *u1, const guid_t *u2)
 +{
-+	blk_mq_start_stopped_hw_queues(q, true);
++	return memcmp(u1, u2, sizeof(guid_t)) == 0;
 +}
-+EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
 +
- void blk_mq_wake_waiters(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ab92c4ea138b..41291be82ac4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -964,6 +964,7 @@ extern void __blk_run_queue_uncond(struct request_queue *q);
- extern void blk_run_queue(struct request_queue *);
- extern void blk_run_queue_async(struct request_queue *q);
- extern void blk_mq_quiesce_queue(struct request_queue *q);
-+extern void blk_mq_unquiesce_queue(struct request_queue *q);
- extern int blk_rq_map_user(struct request_queue *, struct request *,
- 			   struct rq_map_data *, void __user *, unsigned long,
- 			   gfp_t);
++static inline void guid_copy(guid_t *dst, const guid_t *src)
++{
++	memcpy(dst, src, sizeof(guid_t));
++}
++
++static inline bool uuid_equal(const uuid_t *u1, const uuid_t *u2)
++{
++	return memcmp(u1, u2, sizeof(uuid_t)) == 0;
++}
++
++static inline void uuid_copy(uuid_t *dst, const uuid_t *src)
++{
++	memcpy(dst, src, sizeof(uuid_t));
++}
++
+ void generate_random_uuid(unsigned char uuid[16]);
+ 
+ extern void guid_gen(guid_t *u);
+diff --git a/lib/test_uuid.c b/lib/test_uuid.c
+index 9cad846fd805..4d05189e5f87 100644
+--- a/lib/test_uuid.c
++++ b/lib/test_uuid.c
+@@ -71,7 +71,7 @@ static void __init test_uuid_test(const struct test_uuid_data *data)
+ 		test_uuid_failed("conversion", false, false, data->uuid, NULL);
+ 
+ 	total_tests++;
+-	if (uuid_le_cmp(data->le, le)) {
++	if (!guid_equal(&data->le, &le)) {
+ 		sprintf(buf, "%pUl", &le);
+ 		test_uuid_failed("cmp", false, false, data->uuid, buf);
+ 	}
+@@ -82,7 +82,7 @@ static void __init test_uuid_test(const struct test_uuid_data *data)
+ 		test_uuid_failed("conversion", false, true, data->uuid, NULL);
+ 
+ 	total_tests++;
+-	if (uuid_be_cmp(data->be, be)) {
++	if (uuid_equal(&data->be, &be)) {
+ 		sprintf(buf, "%pUb", &be);
+ 		test_uuid_failed("cmp", false, true, data->uuid, buf);
+ 	}
 -- 
-2.9.4
+2.11.0
