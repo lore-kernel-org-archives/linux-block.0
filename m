@@ -1,65 +1,62 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:26 +1000
-Subject: [PATCH 13/13] block: don't check for BIO_MAX_PAGES in
- blk_bio_segment_split()
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org
-Message-ID: <149369654638.5146.3067734913419940612.stgit@noble>
-In-Reply-To: <149369628671.5146.4865312503373040039.stgit@noble>
-References: <149369628671.5146.4865312503373040039.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 02/22] xfs: use uuid_copy() helper to abstract uuid_t
+Date: Sun, 28 May 2017 13:19:48 +0300
+Message-Id: <20170528102008.30276-3-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-blk_bio_segment_split() makes sure bios have no more than
-BIO_MAX_PAGES entries in the bi_io_vec.
-This was done because bio_clone_bioset() (when given a
-mempool bioset) could not handle larger io_vecs.
+From: Amir Goldstein <amir73il@gmail.com>
 
-No driver uses bio_clone_bioset() any more, they all
-use bio_clone_fast() if anything, and bio_clone_fast()
-doesn't clone the bi_io_vec.
+uuid_t definition is about to change.
 
-The main user of of bio_clone_bioset() at this level
-is bounce.c, and bouncing now happens before blk_bio_segment_split(),
-so that is not of concern.
-
-So remove the big helpful comment and the code.
-
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Brian Foster <bfoster@redhat.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- block/blk-merge.c |   16 ----------------
- 1 file changed, 16 deletions(-)
+ fs/xfs/xfs_inode_item.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index e7862e9dcc39..cea544ec5d96 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -108,25 +108,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	bool do_split = true;
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
--	unsigned bvecs = 0;
- 
- 	bio_for_each_segment(bv, bio, iter) {
- 		/*
--		 * With arbitrary bio size, the incoming bio may be very
--		 * big. We have to split the bio into small bios so that
--		 * each holds at most BIO_MAX_PAGES bvecs because
--		 * bio_clone_bioset() can fail to allocate big bvecs.
--		 *
--		 * Those drivers which will need to use bio_clone_bioset()
--		 * should tell us in some way.  For now, impose the
--		 * BIO_MAX_PAGES limit on all queues.
--		 *
--		 * TODO: handle users of bio_clone_bioset() differently.
--		 */
--		if (bvecs++ >= BIO_MAX_PAGES)
--			goto split;
--
--		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
- 		 */
+diff --git a/fs/xfs/xfs_inode_item.c b/fs/xfs/xfs_inode_item.c
+index 08cb7d1a4a3a..013cc78d7daf 100644
+--- a/fs/xfs/xfs_inode_item.c
++++ b/fs/xfs/xfs_inode_item.c
+@@ -834,9 +834,7 @@ xfs_inode_item_format_convert(
+ 		in_f->ilf_dsize = in_f32->ilf_dsize;
+ 		in_f->ilf_ino = in_f32->ilf_ino;
+ 		/* copy biggest field of ilf_u */
+-		memcpy(in_f->ilf_u.ilfu_uuid.__u_bits,
+-		       in_f32->ilf_u.ilfu_uuid.__u_bits,
+-		       sizeof(uuid_t));
++		uuid_copy(&in_f->ilf_u.ilfu_uuid, &in_f32->ilf_u.ilfu_uuid);
+ 		in_f->ilf_blkno = in_f32->ilf_blkno;
+ 		in_f->ilf_len = in_f32->ilf_len;
+ 		in_f->ilf_boffset = in_f32->ilf_boffset;
+@@ -851,9 +849,7 @@ xfs_inode_item_format_convert(
+ 		in_f->ilf_dsize = in_f64->ilf_dsize;
+ 		in_f->ilf_ino = in_f64->ilf_ino;
+ 		/* copy biggest field of ilf_u */
+-		memcpy(in_f->ilf_u.ilfu_uuid.__u_bits,
+-		       in_f64->ilf_u.ilfu_uuid.__u_bits,
+-		       sizeof(uuid_t));
++		uuid_copy(&in_f->ilf_u.ilfu_uuid, &in_f64->ilf_u.ilfu_uuid);
+ 		in_f->ilf_blkno = in_f64->ilf_blkno;
+ 		in_f->ilf_len = in_f64->ilf_len;
+ 		in_f->ilf_boffset = in_f64->ilf_boffset;
+-- 
+2.11.0
