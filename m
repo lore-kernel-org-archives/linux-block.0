@@ -1,60 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46302 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S937011AbdEZDIu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 23:08:50 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH 6/6] blk-mq: clarify dispatching may not be drained/blocked by stopping queue
-Date: Fri, 26 May 2017 11:07:39 +0800
-Message-Id: <20170526030740.26959-7-ming.lei@redhat.com>
-In-Reply-To: <20170526030740.26959-1-ming.lei@redhat.com>
-References: <20170526030740.26959-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 18/22] sysctl: switch to use uuid_t
+Date: Sun, 28 May 2017 13:20:04 +0300
+Message-Id: <20170528102008.30276-19-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-BLK_MQ_S_STOPPED may be not observed in other concurrent I/O paths,
-we can't guarantee that dispatching won't happen after queue
-is stopped.
-
-So clarify the fact and avoid potential misuse.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- block/blk-mq.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ kernel/sysctl_binary.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 900eb91e0ece..32bed5bac7da 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1240,6 +1240,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
- 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
- }
+diff --git a/kernel/sysctl_binary.c b/kernel/sysctl_binary.c
+index ece4b177052b..1ae520eed53c 100644
+--- a/kernel/sysctl_binary.c
++++ b/kernel/sysctl_binary.c
+@@ -1119,7 +1119,7 @@ static ssize_t bin_uuid(struct file *file,
+ 	/* Only supports reads */
+ 	if (oldval && oldlen) {
+ 		char buf[UUID_STRING_LEN + 1];
+-		uuid_be uuid;
++		uuid_t uuid;
  
-+/*
-+ * Do not expect that dispatching or .queue_rq() can be blocked
-+ * after blk_mq_stop_hw_queue() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	__blk_mq_stop_hw_queue(hctx, false);
-@@ -1255,6 +1260,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
- 		__blk_mq_stop_hw_queue(hctx, sync);
- }
+ 		result = kernel_read(file, 0, buf, sizeof(buf) - 1);
+ 		if (result < 0)
+@@ -1128,7 +1128,7 @@ static ssize_t bin_uuid(struct file *file,
+ 		buf[result] = '\0';
  
-+/*
-+ * Do not expect that dispatching or .queue_rq() can be blocked
-+ * after blk_mq_stop_hw_queues() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queues(struct request_queue *q)
- {
- 	__blk_mq_stop_hw_queues(q, false);
+ 		result = -EIO;
+-		if (uuid_be_to_bin(buf, &uuid))
++		if (uuid_to_bin(buf, &uuid))
+ 			goto out;
+ 
+ 		if (oldlen > 16)
 -- 
-2.9.4
+2.11.0
