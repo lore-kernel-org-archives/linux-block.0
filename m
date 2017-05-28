@@ -1,36 +1,44 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Dmitry Monakhov <dmonakhov@openvz.org>
-To: fstests@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 3/9] bio-integrity:  bio_integrity_advance must update integrity seed
-Date: Wed, 10 May 2017 19:20:46 +0400
-Message-Id: <1494429652-9488-4-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
-References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: cleanup UUID types V5
+Date: Sun, 28 May 2017 13:19:46 +0300
+Message-Id: <20170528102008.30276-1-hch@lst.de>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-SCSI drivers do care about bip_seed so we must update it accordingly.
+Hi all,
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
----
- block/bio-integrity.c | 1 +
- 1 file changed, 1 insertion(+)
+this series, which is a combined effort from Amir, Andy and me introduces
+new uuid_t and guid_t type names that are less confusing than the existing
+types, adds new helpers for them and starts switching the fs code over to
+it.  Andy has additional patches on top to convert many of the users
+that use char arrays for UUIDs and GUIDs to these (or rather a predecessor
+for now until updated).
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index b5009a8..82a6ffb 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -425,6 +425,7 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
- 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
- 	unsigned bytes = bio_integrity_bytes(bi, bytes_done >> 9);
- 
-+	bip->bip_iter.bi_sector += bytes_done >> 9;
- 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
- }
- EXPORT_SYMBOL(bio_integrity_advance);
--- 
-2.9.3
+Changes since V4:
+ - removed the patch to remove uuid_be for now
+ - move the md patch to the front of the queue
+ - remove the union for V1 uuids and provide accessors instead
+ - new patch to set s_uuid for tmpfs
+ - revert the patch that moved struct uuid_v1 from afs to the core
+ - implement the fsid generation differently in XFS due to the
+   change above
+ - add a MAINTAINERS entry
+
+Changes since V3:
+ - stop exposing uuid_be/uuid_t to userspace
+ - remove uuid_be entirely
+
+Changes since V2:
+ - various cleanups
