@@ -1,47 +1,19 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <hch@lst.de>
+Date: Sun, 28 May 2017 10:43:18 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 07/22] uuid: don't export guid_index and uuid_index
-Date: Sun, 28 May 2017 13:19:53 +0300
-Message-Id: <20170528102008.30276-8-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 19/19] block: Make request operation type argument
+	declarations consistent
+Message-ID: <20170528084318.GK13083@lst.de>
+References: <20170525184327.23570-1-bart.vanassche@sandisk.com> <20170525184327.23570-20-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170525184327.23570-20-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-These are only used in uuid.c and vsprintf.c and aren't something modules
-should use directly.
+Looks fine,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- lib/uuid.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/lib/uuid.c b/lib/uuid.c
-index f80dc63f6ca8..003bf6823003 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -22,9 +22,7 @@
- #include <linux/random.h>
- 
- const u8 guid_index[16] = {3,2,1,0,5,4,7,6,8,9,10,11,12,13,14,15};
--EXPORT_SYMBOL(guid_index);
- const u8 uuid_index[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
--EXPORT_SYMBOL(uuid_index);
- 
- /***************************************************************
-  * Random UUID interface
--- 
-2.11.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
