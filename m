@@ -5,44 +5,39 @@ CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH 08/19] block: Introduce request_queue.initialize_rq_fn()
-Date: Tue, 30 May 2017 17:54:50 +0000
-Message-ID: <1496166889.2627.20.camel@sandisk.com>
+Date: Sun, 28 May 2017 16:12:45 +0000
+Message-ID: <1495987965.2849.7.camel@sandisk.com>
 References: <20170525184327.23570-1-bart.vanassche@sandisk.com>
 	 <20170525184327.23570-9-bart.vanassche@sandisk.com>
-	 <20170528083758.GC13083@lst.de>
-In-Reply-To: <20170528083758.GC13083@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+	 <20170526063430.GA19034@lst.de> <1495842989.2634.13.camel@sandisk.com>
+	 <20170528083440.GB13083@lst.de>
+In-Reply-To: <20170528083440.GB13083@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, 2017-05-28 at 10:37 +0200, Christoph Hellwig wrote:
-> Oh, and btw - for the mq case we don't want to use the function
-> pointer directly in the queue, but in blk_mq_ops, so that we have
-> all the mq methods in one place.
-
-Hello Christoph,
-
-Are you sure of this? All other function pointers that apply to both blk-sq
-and blk-mq occur in struct request, e.g. .make_request_fn(), .init_rq_fn()
-and .exit_rq_fn(). If the .initialize_rq_fn() will be added to struct reque=
-st
-all I have to add to blk_get_request is the following:
-
-=A0=A0=A0=A0=A0=A0=A0 if (!IS_ERR(req) && q->initialize_rq_fn)
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 q->initialize_rq_fn(req);
-
-However, if for the mq case the .initialize_rq_fn() would be added to struc=
-t
-blk_mq_ops then that code would look as follows:
-
-=A0=A0=A0=A0=A0=A0=A0 if (!IS_ERR(req))
-                if (q->mq_ops)
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 q->mq=
-_ops->initialize_rq_fn(req);
-=A0=A0=A0=A0=A0=A0=A0 =A0=A0=A0=A0=A0=A0=A0 else
-=A0=A0=A0=A0=A0=A0=A0=A0 =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0q->in=
-itialize_rq_fn(req);
-
-Personally I prefer the first alternative.
-
-Bart.=
+T24gU3VuLCAyMDE3LTA1LTI4IGF0IDEwOjM0ICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
+biBGcmksIE1heSAyNiwgMjAxNyBhdCAxMTo1NjozMFBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4gSSBoYXZlIHRyaWVkIHRvIG1vdmUgdGhhdCBjYWxsIGludG8gYmxrX21xX2Fs
+bG9jX3JlcXVlc3QoKSBidXQgdGhhdA0KPiA+IHJlc3VsdGVkIGluIGEga2VybmVsIG9vcHMgZHVy
+aW5nIGJvb3QgZHVlIHRvIHNjc2lfYWRkX2NtZF90b19saXN0KCkNCj4gPiBkZXJlZmVyZW5jaW5n
+IHNjc2lfY21uZC5kZXZpY2UgYW5kIGR1ZSB0byB0aGF0IHBvaW50ZXIgYmVpbmcgaW52YWxpZC4N
+Cj4gPiBJIHRoaW5rIHRoYXQgcG9pbnRlciB3YXMgaW52YWxpZCBiZWNhdXNlIG1vdmluZyB0aGUg
+aW5pdGlhbGl6ZV9ycV9mbigpDQo+ID4gY2FsbCBpbnRvIGJsa19tcV9hbGxvY19yZXF1ZXN0KCkg
+Y2F1c2VkIHJlcXVlc3QgaW5pdGlhbGl6YXRpb24gdG8gYmUNCj4gPiBza2lwcGVkIGZvciB0aGUg
+Zm9sbG93aW5nIGNvZGUgcGF0aDoNCj4gPiBzdWJtaXRfYmlvKCkNCj4gPiAtPiBnZW5lcmljX21h
+a2VfcmVxdWVzdCgpDQo+ID4gICAtPiAubWFrZV9yZXF1ZXN0X2ZuID09IGJsa19tcV9tYWtlX3Jl
+cXVlc3QoKQ0KPiA+ICAgICAtPiBibGtfbXFfc2NoZWRfZ2V0X3JlcXVlc3QoKQ0KPiA+ICAgICAg
+IC0+IF9fYmxrX21xX2FsbG9jX3JlcXVlc3QoKQ0KPiA+ICAgICAgICAgLT4gYmxrX21xX3JxX2N0
+eF9pbml0KCkNCj4gPiANCj4gPiBUaGlzIGlzIHdoeSBJIHdvdWxkIGxpa2UgdG8ga2VlcCB0aGUg
+LmluaXRpYWxpemVfcnFfZm4oKSBjYWxsIGluDQo+ID4gYmxrX21xX3JxX2N0eF9pbml0KCkuDQo+
+IA0KPiBCdXQgd2UgZG9uJ3QgY2FsbCBzY3NpX3JlcV9pbml0IGZvciB0aGlzIHBhdGggZWl0aGVy
+IHdpdGggdGhlIGN1cnJlbnQNCj4gY29kZS4gIFNvIG5vdCBoYXZpbmcgdGhlIGNhbGwgc2hvdWxk
+IGJlIGZpbmUgYXMgbG9uZyBhcyB5b3UgZW5zdXJlDQo+IHdlIHN0aWxsIG1hbnVhbGx5IGluaXRp
+YWxpemUgZXZlcnl0aGluZyBmb3IgdGhlIG5vbi1wYXNzdGhyb3VnaCBwYXRoDQo+IGluIHRoZSBs
+YXRlciBwYXRjaGVzLiAgSSdsbCBrZWVwIGFuIGV5ZSBvbiB0aGF0IGlzc3VlIHdoaWxlIHJldmll
+d2luZw0KPiB0aGUgcmVtYWluaW5nIHBhdGNoZXMuDQoNCkhlbGxvIENocmlzdG9waCwNCg0KRG8g
+eW91IHNlZSBhbiBhbHRlcm5hdGl2ZSB0byBpbnRyb2R1Y2luZyBhbiAuaW5pdGlhbGl6ZV9ycV9m
+bigpIGNhbGwgaW4NCmJsa19ycV9pbml0KCkgLyBibGtfbXFfcnFfY3R4X2luaXQoKSB0byBlbnN1
+cmUgdGhhdCBqaWZmaWVzX2F0X2FsbG9jIGlzDQpvbmx5IHNldCBvbmNlIGFuZCBub3QgZXZlcnkg
+dGltZSBhIHJlcXVlc3QgaXMgcmVxdWV1ZWQ/DQoNClRoYW5rcywNCg0KQmFydC4=
