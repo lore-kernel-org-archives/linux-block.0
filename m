@@ -1,49 +1,113 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34154 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751022AbdEaMiD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2017 08:38:03 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org
-Subject: [PATCH v3 4/9] nvme: host: unquiesce queue in nvme_kill_queues()
-Date: Wed, 31 May 2017 20:37:01 +0800
-Message-Id: <20170531123706.20885-5-ming.lei@redhat.com>
-In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
-References: <20170531123706.20885-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 17/22] partitions/ldm: switch to use uuid_t
+Date: Sun, 28 May 2017 13:20:03 +0300
+Message-Id: <20170528102008.30276-18-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-When nvme_kill_queues() is run, queues may be in
-quiesced state, so we forcibly unquiesce queues to avoid
-blocking dispatch, and I/O hang can be avoided in
-remove path.
+And the uuid helpers.
 
-Peviously we use blk_mq_start_stopped_hw_queues() as
-counterpart of blk_mq_quiesce_queue(), now we have
-introduced blk_mq_unquiesce_queue(), so use it explicitly.
-
-Cc: linux-nvme@lists.infradead.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/nvme/host/core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/partitions/ldm.c | 10 +++++-----
+ block/partitions/ldm.h |  6 ++----
+ 2 files changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index c3f189e54d10..e44326d5cf19 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2448,6 +2448,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 		revalidate_disk(ns->disk);
- 		blk_set_queue_dying(ns->queue);
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index edcea70674c9..bbf929e80b94 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -115,7 +115,7 @@ static bool ldm_parse_privhead(const u8 *data, struct privhead *ph)
+ 		ldm_error("PRIVHEAD disk size doesn't match real disk size");
+ 		return false;
+ 	}
+-	if (uuid_be_to_bin(data + 0x0030, (uuid_be *)ph->disk_id)) {
++	if (uuid_to_bin(data + 0x0030, &ph->disk_id)) {
+ 		ldm_error("PRIVHEAD contains an invalid GUID.");
+ 		return false;
+ 	}
+@@ -234,7 +234,7 @@ static bool ldm_compare_privheads (const struct privhead *ph1,
+ 		(ph1->logical_disk_size  == ph2->logical_disk_size)	&&
+ 		(ph1->config_start       == ph2->config_start)		&&
+ 		(ph1->config_size        == ph2->config_size)		&&
+-		!memcmp (ph1->disk_id, ph2->disk_id, GUID_SIZE));
++		uuid_equal(&ph1->disk_id, &ph2->disk_id));
+ }
  
-+		/* Forcibly unquiesce queues to avoid blocking dispatch */
-+		blk_mq_unquiesce_queue(ns->queue);
-+
- 		/*
- 		 * Forcibly start all queues to avoid having stuck requests.
- 		 * Note that we must ensure the queues are not stopped
+ /**
+@@ -557,7 +557,7 @@ static struct vblk * ldm_get_disk_objid (const struct ldmdb *ldb)
+ 
+ 	list_for_each (item, &ldb->v_disk) {
+ 		struct vblk *v = list_entry (item, struct vblk, list);
+-		if (!memcmp (v->vblk.disk.disk_id, ldb->ph.disk_id, GUID_SIZE))
++		if (uuid_equal(&v->vblk.disk.disk_id, &ldb->ph.disk_id))
+ 			return v;
+ 	}
+ 
+@@ -892,7 +892,7 @@ static bool ldm_parse_dsk3 (const u8 *buffer, int buflen, struct vblk *vb)
+ 	disk = &vb->vblk.disk;
+ 	ldm_get_vstr (buffer + 0x18 + r_diskid, disk->alt_name,
+ 		sizeof (disk->alt_name));
+-	if (uuid_be_to_bin(buffer + 0x19 + r_name, (uuid_be *)disk->disk_id))
++	if (uuid_to_bin(buffer + 0x19 + r_name, &disk->disk_id))
+ 		return false;
+ 
+ 	return true;
+@@ -927,7 +927,7 @@ static bool ldm_parse_dsk4 (const u8 *buffer, int buflen, struct vblk *vb)
+ 		return false;
+ 
+ 	disk = &vb->vblk.disk;
+-	memcpy (disk->disk_id, buffer + 0x18 + r_name, GUID_SIZE);
++	uuid_copy(&disk->disk_id, (uuid_t *)(buffer + 0x18 + r_name));
+ 	return true;
+ }
+ 
+diff --git a/block/partitions/ldm.h b/block/partitions/ldm.h
+index 374242c0971a..f4c6055df956 100644
+--- a/block/partitions/ldm.h
++++ b/block/partitions/ldm.h
+@@ -112,8 +112,6 @@ struct frag {				/* VBLK Fragment handling */
+ 
+ /* In memory LDM database structures. */
+ 
+-#define GUID_SIZE		16
+-
+ struct privhead {			/* Offsets and sizes are in sectors. */
+ 	u16	ver_major;
+ 	u16	ver_minor;
+@@ -121,7 +119,7 @@ struct privhead {			/* Offsets and sizes are in sectors. */
+ 	u64	logical_disk_size;
+ 	u64	config_start;
+ 	u64	config_size;
+-	u8	disk_id[GUID_SIZE];
++	uuid_t	disk_id;
+ };
+ 
+ struct tocblock {			/* We have exactly two bitmaps. */
+@@ -154,7 +152,7 @@ struct vblk_dgrp {			/* VBLK Disk Group */
+ };
+ 
+ struct vblk_disk {			/* VBLK Disk */
+-	u8	disk_id[GUID_SIZE];
++	uuid_t	disk_id;
+ 	u8	alt_name[128];
+ };
+ 
 -- 
-2.9.4
+2.11.0
