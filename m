@@ -1,62 +1,76 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41418 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S941653AbdEYEVi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 00:21:38 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 0/7] blk-mq: fix queue quiescing
-Date: Thu, 25 May 2017 12:21:24 +0800
-Message-Id: <20170525042131.13172-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 04/22] md: namespace private helper names
+Date: Sun, 28 May 2017 13:19:50 +0300
+Message-Id: <20170528102008.30276-5-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+From: Amir Goldstein <amir73il@gmail.com>
 
-One big problem of blk_mq_quiesce_queue() is that it
-can't prevent .queue_rq() in direct issue path from
-being run even though hw queues are stopped by
-blk_mq_quiesce_queue().
-    
-It is observed that request double-free/use-after-free
-can be triggered easily when canceling NVMe requests via
-blk_mq_tagset_busy_iter(...nvme_cancel_request) in nvme_dev_disable().
-The reason is that blk_mq_quiesce_queue() can't prevent
-direct issue from being run.
+The md private helper uuid_equal() collides with a generic helper
+of the same name.
+
+Rename the md private helper to md_uuid_equal() and do the same for
+md_sb_equal().
+
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Shaohua Li <shli@kernel.org>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/md/md.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 10367ffe92e3..b9ab268ba7f9 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -825,7 +825,7 @@ static int read_disk_sb(struct md_rdev *rdev, int size)
+ 	return -EINVAL;
+ }
  
-This patchset implements queue quiescing via percpu_ref
-and fixes the above issue.
-
-Actually we have to quiesce queue for canceling dispatched
-requests via blk_mq_tagset_busy_iter(), otherwise use-after-free
-can be made easily. This way of canceling dispatched requests
-has been used in several drivers, only NVMe uses blk_mq_quiesce_queue()
-to avoid the issue, and others need to be fixed too.
-
-Also this patchset cleans up the code much, and the fat 'srcu_struct'
-can be removed from 'struct blk_mq_hw_ctx'.
-
-Thanks,
-Ming
-
-Ming Lei (7):
-  blk-mq: introduce blk_mq_unquiesce_queue
-  block: introduce flag of QUEUE_FLAG_QUIESCED
-  dm: use the introduced blk_mq_unquiesce_queue()
-  nvme: use the introduced blk_mq_unquiesce_queue()
-  scsi: use the introduced blk_mq_unquiesce_queue()
-  blk-mq: quiesce queue via percpu_ref
-  blk-mq: update comments on blk_mq_quiesce_queue()
-
- block/blk-mq.c           | 131 +++++++++++++++++++++++++++++++----------------
- drivers/md/dm-rq.c       |   2 +-
- drivers/nvme/host/core.c |   2 +-
- drivers/scsi/scsi_lib.c  |   5 +-
- include/linux/blk-mq.h   |   2 -
- include/linux/blkdev.h   |   8 +++
- 6 files changed, 102 insertions(+), 48 deletions(-)
-
+-static int uuid_equal(mdp_super_t *sb1, mdp_super_t *sb2)
++static int md_uuid_equal(mdp_super_t *sb1, mdp_super_t *sb2)
+ {
+ 	return	sb1->set_uuid0 == sb2->set_uuid0 &&
+ 		sb1->set_uuid1 == sb2->set_uuid1 &&
+@@ -833,7 +833,7 @@ static int uuid_equal(mdp_super_t *sb1, mdp_super_t *sb2)
+ 		sb1->set_uuid3 == sb2->set_uuid3;
+ }
+ 
+-static int sb_equal(mdp_super_t *sb1, mdp_super_t *sb2)
++static int md_sb_equal(mdp_super_t *sb1, mdp_super_t *sb2)
+ {
+ 	int ret;
+ 	mdp_super_t *tmp1, *tmp2;
+@@ -1025,12 +1025,12 @@ static int super_90_load(struct md_rdev *rdev, struct md_rdev *refdev, int minor
+ 	} else {
+ 		__u64 ev1, ev2;
+ 		mdp_super_t *refsb = page_address(refdev->sb_page);
+-		if (!uuid_equal(refsb, sb)) {
++		if (!md_uuid_equal(refsb, sb)) {
+ 			pr_warn("md: %s has different UUID to %s\n",
+ 				b, bdevname(refdev->bdev,b2));
+ 			goto abort;
+ 		}
+-		if (!sb_equal(refsb, sb)) {
++		if (!md_sb_equal(refsb, sb)) {
+ 			pr_warn("md: %s has same UUID but different superblock to %s\n",
+ 				b, bdevname(refdev->bdev, b2));
+ 			goto abort;
 -- 
-2.9.4
+2.11.0
