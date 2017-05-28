@@ -1,122 +1,101 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net
-Cc: linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 17/17] fs: convert ext2 to use write_one_page_since
-Date: Wed, 31 May 2017 08:45:40 -0400
-Message-Id: <20170531124540.8782-18-jlayton@redhat.com>
-In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:35821 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750979AbdE1KVJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 May 2017 06:21:09 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 11/22] xfs: remove uuid_getnodeuniq and xfs_uu_t
+Date: Sun, 28 May 2017 13:19:57 +0300
+Message-Id: <20170528102008.30276-12-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Sample the wb_err before changing the directory, so that we can catch
-errors that occur since that point.
+Opencode uuid_getnodeuniq in the only caller, and directly decode
+the uuid_t representation instead of using a structure cast for it.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/ext2/dir.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ fs/xfs/uuid.c      | 25 -------------------------
+ fs/xfs/uuid.h      |  1 -
+ fs/xfs/xfs_mount.c |  5 ++++-
+ 3 files changed, 4 insertions(+), 27 deletions(-)
 
-diff --git a/fs/ext2/dir.c b/fs/ext2/dir.c
-index 6e476c9929f8..073f096ac5e6 100644
---- a/fs/ext2/dir.c
-+++ b/fs/ext2/dir.c
-@@ -85,7 +85,8 @@ ext2_last_byte(struct inode *inode, unsigned long page_nr)
- 	return last_byte;
- }
+diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
+index 29ed78c8637b..737c186ea98b 100644
+--- a/fs/xfs/uuid.c
++++ b/fs/xfs/uuid.c
+@@ -17,31 +17,6 @@
+  */
+ #include <xfs.h>
  
--static int ext2_commit_chunk(struct page *page, loff_t pos, unsigned len)
-+static int ext2_commit_chunk(struct page *page, loff_t pos, unsigned len,
-+				errseq_t since)
+-/* IRIX interpretation of an uuid_t */
+-typedef struct {
+-	__be32	uu_timelow;
+-	__be16	uu_timemid;
+-	__be16	uu_timehi;
+-	__be16	uu_clockseq;
+-	__be16	uu_node[3];
+-} xfs_uu_t;
+-
+-/*
+- * uuid_getnodeuniq - obtain the node unique fields of a UUID.
+- *
+- * This is not in any way a standard or condoned UUID function;
+- * it just something that's needed for user-level file handles.
+- */
+-void
+-uuid_getnodeuniq(uuid_t *uuid, int fsid [2])
+-{
+-	xfs_uu_t *uup = (xfs_uu_t *)uuid;
+-
+-	fsid[0] = (be16_to_cpu(uup->uu_clockseq) << 16) |
+-		   be16_to_cpu(uup->uu_timemid);
+-	fsid[1] = be32_to_cpu(uup->uu_timelow);
+-}
+-
+ int
+ uuid_is_nil(uuid_t *uuid)
  {
- 	struct address_space *mapping = page->mapping;
- 	struct inode *dir = mapping->host;
-@@ -100,7 +101,7 @@ static int ext2_commit_chunk(struct page *page, loff_t pos, unsigned len)
- 	}
+diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
+index 86bbed071e79..5aea49bf0963 100644
+--- a/fs/xfs/uuid.h
++++ b/fs/xfs/uuid.h
+@@ -19,6 +19,5 @@
+ #define __XFS_SUPPORT_UUID_H__
  
- 	if (IS_DIRSYNC(dir)) {
--		err = write_one_page(page);
-+		err = write_one_page_since(page, since);
- 		if (!err)
- 			err = sync_inode_metadata(dir, 1);
- 	} else {
-@@ -462,13 +463,14 @@ void ext2_set_link(struct inode *dir, struct ext2_dir_entry_2 *de,
- 			(char *) de - (char *) page_address(page);
- 	unsigned len = ext2_rec_len_from_disk(de->rec_len);
- 	int err;
-+	errseq_t since = filemap_sample_wb_err(dir->i_mapping);
+ extern int uuid_is_nil(uuid_t *uuid);
+-extern void uuid_getnodeuniq(uuid_t *uuid, int fsid [2]);
  
- 	lock_page(page);
- 	err = ext2_prepare_chunk(page, pos, len);
- 	BUG_ON(err);
- 	de->inode = cpu_to_le32(inode->i_ino);
- 	ext2_set_de_type(de, inode);
--	err = ext2_commit_chunk(page, pos, len);
-+	err = ext2_commit_chunk(page, pos, len, since);
- 	ext2_put_page(page);
- 	if (update_times)
- 		dir->i_mtime = dir->i_ctime = current_time(dir);
-@@ -494,6 +496,7 @@ int ext2_add_link (struct dentry *dentry, struct inode *inode)
- 	char *kaddr;
- 	loff_t pos;
- 	int err;
-+	errseq_t since = filemap_sample_wb_err(dir->i_mapping);
+ #endif	/* __XFS_SUPPORT_UUID_H__ */
+diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
+index 2eaf81859166..51f7d03ef86c 100644
+--- a/fs/xfs/xfs_mount.c
++++ b/fs/xfs/xfs_mount.c
+@@ -793,7 +793,10 @@ xfs_mountfs(
+ 	 *  Copies the low order bits of the timestamp and the randomly
+ 	 *  set "sequence" number out of a UUID.
+ 	 */
+-	uuid_getnodeuniq(&sbp->sb_uuid, mp->m_fixedfsid);
++	mp->m_fixedfsid[0] =
++		(get_unaligned_be16(&sbp->sb_uuid.b[8]) << 16) |
++		 get_unaligned_be16(&sbp->sb_uuid.b[4]);
++	mp->m_fixedfsid[1] = get_unaligned_be32(&sbp->sb_uuid.b[0]);
  
- 	/*
- 	 * We take care of directory expansion in the same loop.
-@@ -560,7 +563,7 @@ int ext2_add_link (struct dentry *dentry, struct inode *inode)
- 	memcpy(de->name, name, namelen);
- 	de->inode = cpu_to_le32(inode->i_ino);
- 	ext2_set_de_type (de, inode);
--	err = ext2_commit_chunk(page, pos, rec_len);
-+	err = ext2_commit_chunk(page, pos, rec_len, since);
- 	dir->i_mtime = dir->i_ctime = current_time(dir);
- 	EXT2_I(dir)->i_flags &= ~EXT2_BTREE_FL;
- 	mark_inode_dirty(dir);
-@@ -589,6 +592,7 @@ int ext2_delete_entry (struct ext2_dir_entry_2 * dir, struct page * page )
- 	ext2_dirent * pde = NULL;
- 	ext2_dirent * de = (ext2_dirent *) (kaddr + from);
- 	int err;
-+	errseq_t since = filemap_sample_wb_err(inode->i_mapping);
+ 	mp->m_dmevmask = 0;	/* not persistent; set after each mount */
  
- 	while ((char*)de < (char*)dir) {
- 		if (de->rec_len == 0) {
-@@ -609,7 +613,7 @@ int ext2_delete_entry (struct ext2_dir_entry_2 * dir, struct page * page )
- 	if (pde)
- 		pde->rec_len = ext2_rec_len_to_disk(to - from);
- 	dir->inode = 0;
--	err = ext2_commit_chunk(page, pos, to - from);
-+	err = ext2_commit_chunk(page, pos, to - from, since);
- 	inode->i_ctime = inode->i_mtime = current_time(inode);
- 	EXT2_I(inode)->i_flags &= ~EXT2_BTREE_FL;
- 	mark_inode_dirty(inode);
-@@ -628,6 +632,7 @@ int ext2_make_empty(struct inode *inode, struct inode *parent)
- 	struct ext2_dir_entry_2 * de;
- 	int err;
- 	void *kaddr;
-+	errseq_t since = filemap_sample_wb_err(inode->i_mapping);
- 
- 	if (!page)
- 		return -ENOMEM;
-@@ -653,7 +658,7 @@ int ext2_make_empty(struct inode *inode, struct inode *parent)
- 	memcpy (de->name, "..\0", 4);
- 	ext2_set_de_type (de, inode);
- 	kunmap_atomic(kaddr);
--	err = ext2_commit_chunk(page, 0, chunk_size);
-+	err = ext2_commit_chunk(page, 0, chunk_size, since);
- fail:
- 	put_page(page);
- 	return err;
 -- 
-2.9.4
+2.11.0
