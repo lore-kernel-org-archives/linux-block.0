@@ -1,89 +1,58 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 12/19] blk-mq: Initialize a request before assigning a tag
-Date: Thu, 25 May 2017 11:43:20 -0700
-Message-ID: <20170525184327.23570-13-bart.vanassche@sandisk.com>
-In-Reply-To: <20170525184327.23570-1-bart.vanassche@sandisk.com>
-References: <20170525184327.23570-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:60076 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751676AbdE1KWB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 May 2017 06:22:01 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 22/22] MAINTAINERS: add uuid entry
+Date: Sun, 28 May 2017 13:20:08 +0300
+Message-Id: <20170528102008.30276-23-hch@lst.de>
+In-Reply-To: <20170528102008.30276-1-hch@lst.de>
+References: <20170528102008.30276-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Initialization of blk-mq requests is a bit weird: blk_mq_rq_ctx_init()
-is called after a tag has been assigned and .rq_flags is initialized
-in __blk_mq_finish_request(). Call blk_mq_rq_ctx_init() before
-modifying any struct request members. Initialize .rq_flags in
-blk_mq_rq_ctx_init() instead of in __blk_mq_finish_request(). This
-patch does not change the behavior of the block layer.
+I'll keep maintaining whatever little changed we need here, with Andy as
+my designated reviewer.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b8092786d42f..1fcc20df1a4e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -212,6 +212,7 @@ void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
- 	rq->q = q;
- 	rq->mq_ctx = ctx;
- 	rq->cmd_flags = op;
-+	rq->rq_flags = 0;
- 	if (blk_queue_io_stat(q))
- 		rq->rq_flags |= RQF_IO_STAT;
- 	/* do not touch atomic flags, it needs atomic ops against the timer */
-@@ -231,7 +232,8 @@ void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
- 	rq->nr_integrity_segments = 0;
- #endif
- 	rq->special = NULL;
--	/* tag was already set */
-+	rq->tag = -1;
-+	rq->internal_tag = -1;
- 	rq->extra_len = 0;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 053c3bdd1fe5..660c14729205 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13463,6 +13463,17 @@ W:	http://en.wikipedia.org/wiki/Util-linux
+ T:	git git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git
+ S:	Maintained
  
- 	INIT_LIST_HEAD(&rq->timeout_list);
-@@ -260,20 +262,19 @@ struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
- 
- 		rq = tags->static_rqs[tag];
- 
-+		blk_mq_rq_ctx_init(data->q, data->ctx, rq, op);
++UUID HELPERS
++M:	Christoph Hellwig <hch@lst.de>
++R:	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
++L:	linux-kernel@vger.kernel.org
++T:	git git://git.infradead.org/users/hch/uuid.git
++F:	lib/uuid.c
++F:	lib/test_uuid.c
++F:	include/linux/uuid.h
++F:	include/uapi/linux/uuid.h
++S:	Maintained
 +
- 		if (data->flags & BLK_MQ_REQ_INTERNAL) {
--			rq->tag = -1;
- 			rq->internal_tag = tag;
- 		} else {
- 			if (blk_mq_tag_busy(data->hctx)) {
--				rq->rq_flags = RQF_MQ_INFLIGHT;
-+				rq->rq_flags |= RQF_MQ_INFLIGHT;
- 				atomic_inc(&data->hctx->nr_active);
- 			}
- 			rq->tag = tag;
--			rq->internal_tag = -1;
--			data->hctx->tags->rqs[rq->tag] = rq;
-+			data->hctx->tags->rqs[tag] = rq;
- 		}
- 
--		blk_mq_rq_ctx_init(data->q, data->ctx, rq, op);
- 		return rq;
- 	}
- 
-@@ -364,7 +365,6 @@ void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 		atomic_dec(&hctx->nr_active);
- 
- 	wbt_done(q->rq_wb, &rq->issue_stat);
--	rq->rq_flags = 0;
- 
- 	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
- 	clear_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
+ UVESAFB DRIVER
+ M:	Michal Januszewski <spock@gentoo.org>
+ L:	linux-fbdev@vger.kernel.org
 -- 
-2.12.2
+2.11.0
