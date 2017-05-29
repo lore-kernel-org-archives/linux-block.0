@@ -1,69 +1,51 @@
-Return-Path: <rgoldwyn@suse.de>
+Return-Path: <BATV+0d45ca0e35774f00f1bb+5027+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 29 May 2017 01:33:38 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+	jack@suse.com, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, axboe@kernel.dk,
+	linux-api@vger.kernel.org, adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk, Goldwyn Rodrigues <rgoldwyn@suse.com>
 Subject: Re: [PATCH 09/10] xfs: nowait aio support
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-fsdevel@vger.kernel.org, jack@suse.com,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, axboe@kernel.dk,
- linux-api@vger.kernel.org, adam.manzanares@wdc.com, viro@zeniv.linux.org.uk,
- Goldwyn Rodrigues <rgoldwyn@suse.com>
+Message-ID: <20170529083338.GC1899@infradead.org>
 References: <20170524164150.9492-1-rgoldwyn@suse.de>
  <20170524164150.9492-10-rgoldwyn@suse.de>
  <20170528093113.GB14519@infradead.org>
  <cfc1e7ad-f74b-a14a-ac30-8472f7f684af@suse.de>
- <20170529083338.GC1899@infradead.org>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <f105d585-e88c-b037-9905-d0c608c609d9@suse.de>
-Date: Tue, 30 May 2017 11:13:29 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170529083338.GC1899@infradead.org>
 Content-Type: text/plain; charset=utf-8
+In-Reply-To: <cfc1e7ad-f74b-a14a-ac30-8472f7f684af@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-On 05/29/2017 03:33 AM, Christoph Hellwig wrote:
-> On Sun, May 28, 2017 at 09:38:26PM -0500, Goldwyn Rodrigues wrote:
->>
->>
->> On 05/28/2017 04:31 AM, Christoph Hellwig wrote:
->>> Despite my previous reviewed-by tag this will need another fix:
->>>
->>> xfs_file_iomap_begin needs to return EAGAIN if we don't have the extent
->>> list in memoery already.  E.g. something like this:
->>>
->>> 	if ((flags & IOMAP_NOWAIT) && !(ip->i_d.if_flags & XFS_IFEXTENTS)) {
->>> 		error = -EAGAIN;
->>> 		goto out_unlock;
->>> 	}
->>>
->>> right after locking the ilock.
->>>
->>
->> I am not sure if it is right to penalize the application to write to
->> file which has been freshly opened (and is the first one to open). It
->> basically means extent maps needs to be read from disk. Do you see a
->> reason it would have a non-deterministic wait if it is the only user? I
->> understand the block layer can block if it has too many requests though.
+On Sun, May 28, 2017 at 09:38:26PM -0500, Goldwyn Rodrigues wrote:
 > 
-> For either a read or a write we might have to read in the extent list
-> (note that for few enough extents they are stored in the inode and
-> we won't have to), in which case the call will block and by the
-> semantics you define we'll need to return -EAGAIN.
-
-Yes, that is right. I will include it in.
-
 > 
-> Btw, can you write a small blurb up for the man page to document these
-> ѕemantics in man-page like language?
+> On 05/28/2017 04:31 AM, Christoph Hellwig wrote:
+> > Despite my previous reviewed-by tag this will need another fix:
+> > 
+> > xfs_file_iomap_begin needs to return EAGAIN if we don't have the extent
+> > list in memoery already.  E.g. something like this:
+> > 
+> > 	if ((flags & IOMAP_NOWAIT) && !(ip->i_d.if_flags & XFS_IFEXTENTS)) {
+> > 		error = -EAGAIN;
+> > 		goto out_unlock;
+> > 	}
+> > 
+> > right after locking the ilock.
+> > 
 > 
+> I am not sure if it is right to penalize the application to write to
+> file which has been freshly opened (and is the first one to open). It
+> basically means extent maps needs to be read from disk. Do you see a
+> reason it would have a non-deterministic wait if it is the only user? I
+> understand the block layer can block if it has too many requests though.
 
-Yes, but which man page would it belong to?
-Should it be a subsection of errors in io_getevents/io_submit. We don't
-want to add ERRORS to io_getevents() because it would be the return
-value of the io_getevents call, and not the ones in the iocb structure.
-Should it be a new man page, say for iocb(7/8)?
+For either a read or a write we might have to read in the extent list
+(note that for few enough extents they are stored in the inode and
+we won't have to), in which case the call will block and by the
+semantics you define we'll need to return -EAGAIN.
 
-
-
--- 
-Goldwyn
+Btw, can you write a small blurb up for the man page to document these
+ѕemantics in man-page like language?
