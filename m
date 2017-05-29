@@ -1,30 +1,35 @@
-Return-Path: <BATV+0d45ca0e35774f00f1bb+5027+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Mon, 29 May 2017 01:32:17 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
-	jack@suse.com, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, axboe@kernel.dk,
-	linux-api@vger.kernel.org, adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk
+Return-Path: <rgoldwyn@suse.de>
 Subject: Re: [PATCH 0/10 v9] No wait AIO
-Message-ID: <20170529083217.GB1899@infradead.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, axboe@kernel.dk,
+ linux-api@vger.kernel.org, adam.manzanares@wdc.com, viro@zeniv.linux.org.uk
 References: <20170524164150.9492-1-rgoldwyn@suse.de>
  <20170528092728.GA14519@infradead.org>
- <acb0fc57-5005-4422-9c42-3345e892ecb2@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Message-ID: <acb0fc57-5005-4422-9c42-3345e892ecb2@suse.de>
+Date: Sun, 28 May 2017 21:38:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <acb0fc57-5005-4422-9c42-3345e892ecb2@suse.de>
+In-Reply-To: <20170528092728.GA14519@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, May 28, 2017 at 09:38:27PM -0500, Goldwyn Rodrigues wrote:
-> This effort focused on writes only.
-> 
-> >From the point of view of the application/user, reads are usually
-> required to complete with success. I don't see a scenario where reads()
-> would need the nowait feature. If there is a use case, I'd be happy to
-> add and support it.
 
-Both of them usually have a point.  And if they would block the
-main thread we'll have to offload them to a thread pool.
+
+On 05/28/2017 04:27 AM, Christoph Hellwig wrote:
+>>  Changes since v8:
+>>  + Err out AIO reads with -EINVAL flagged as RWF_NOWAIT
+> 
+> Ugg, why?  Reads aren't really treated any different than writes in
+> the direct I/O code.
+
+This effort focused on writes only.
+
+>From the point of view of the application/user, reads are usually
+required to complete with success. I don't see a scenario where reads()
+would need the nowait feature. If there is a use case, I'd be happy to
+add and support it.
+
+-- 
+Goldwyn
