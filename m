@@ -1,91 +1,30 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Mon, 1 May 2017 17:17:41 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH 5/6] blk-mq-debugfs: Show busy requests
-Message-ID: <20170502001741.GA2894@vader>
-References: <20170427155437.23228-1-bart.vanassche@sandisk.com>
- <20170427155437.23228-6-bart.vanassche@sandisk.com>
+Return-Path: <BATV+0d45ca0e35774f00f1bb+5027+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 29 May 2017 01:32:17 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+	jack@suse.com, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, axboe@kernel.dk,
+	linux-api@vger.kernel.org, adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk
+Subject: Re: [PATCH 0/10 v9] No wait AIO
+Message-ID: <20170529083217.GB1899@infradead.org>
+References: <20170524164150.9492-1-rgoldwyn@suse.de>
+ <20170528092728.GA14519@infradead.org>
+ <acb0fc57-5005-4422-9c42-3345e892ecb2@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170427155437.23228-6-bart.vanassche@sandisk.com>
+In-Reply-To: <acb0fc57-5005-4422-9c42-3345e892ecb2@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Apr 27, 2017 at 08:54:36AM -0700, Bart Van Assche wrote:
-> Requests that got stuck in a block driver are neither on
-> blk_mq_ctx.rq_list nor on any hw dispatch queue. Make these
-> visible in debugfs through the "busy" attribute.
+On Sun, May 28, 2017 at 09:38:27PM -0500, Goldwyn Rodrigues wrote:
+> This effort focused on writes only.
 > 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Omar Sandoval <osandov@fb.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> ---
->  block/blk-mq-debugfs.c | 38 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 38 insertions(+)
-> 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 5092d90e37f6..a5e286e04569 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -428,6 +428,43 @@ static const struct file_operations hctx_dispatch_fops = {
->  	.release	= seq_release,
->  };
->  
-> +struct show_busy_ctx {
-> +	struct seq_file		*m;
-> +	struct blk_mq_hw_ctx	*hctx;
-> +};
-> +
-> +static void hctx_show_busy(struct request *rq, void *data, bool reserved)
-> +{
-> +	const struct show_busy_ctx *ctx = data;
-> +	struct request_queue *q = rq->q;
-> +
-> +	if (q->queue_hw_ctx[rq->mq_ctx->index_hw] == ctx->hctx &&
+> >From the point of view of the application/user, reads are usually
+> required to complete with success. I don't see a scenario where reads()
+> would need the nowait feature. If there is a use case, I'd be happy to
+> add and support it.
 
-This doesn't look right. ctx->index_hw is the index into hctx->ctxs for
-this ctx. I think you mean blk_mq_map_queue(q, rq->mq_ctx->cpu).
-
-> +	    test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-> +		blk_mq_debugfs_rq_show(ctx->m, &rq->queuelist);
-> +}
-> +
-> +static int hctx_busy_show(struct seq_file *m, void *v)
-> +{
-> +	struct blk_mq_hw_ctx *hctx = m->private;
-> +	struct show_busy_ctx ctx = { .m = m, .hctx = hctx };
-> +
-> +	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy, &ctx);
-> +
-> +	return 0;
-> +}
-> +
-> +static int hctx_busy_open(struct inode *inode, struct file *file)
-> +{
-> +	return single_open(file, hctx_busy_show, inode->i_private);
-> +}
-> +
-> +static const struct file_operations hctx_busy_fops = {
-> +	.open		= hctx_busy_open,
-> +	.read		= seq_read,
-> +	.llseek		= seq_lseek,
-> +	.release	= single_release,
-> +};
-> +
->  static int hctx_ctx_map_show(struct seq_file *m, void *v)
->  {
->  	struct blk_mq_hw_ctx *hctx = m->private;
-> @@ -885,6 +922,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
->  	{"state", 0400, &hctx_state_fops},
->  	{"flags", 0400, &hctx_flags_fops},
->  	{"dispatch", 0400, &hctx_dispatch_fops},
-> +	{"busy", 0400, &hctx_busy_fops},
->  	{"ctx_map", 0400, &hctx_ctx_map_fops},
->  	{"tags", 0400, &hctx_tags_fops},
->  	{"tags_bitmap", 0400, &hctx_tags_bitmap_fops},
-> -- 
-> 2.12.2
-> 
+Both of them usually have a point.  And if they would block the
+main thread we'll have to offload them to a thread pool.
