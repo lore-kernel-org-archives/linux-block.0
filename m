@@ -1,101 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:35821 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750979AbdE1KVJ (ORCPT
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:14207 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750733AbdE3PTp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 May 2017 06:21:09 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 11/22] xfs: remove uuid_getnodeuniq and xfs_uu_t
-Date: Sun, 28 May 2017 13:19:57 +0300
-Message-Id: <20170528102008.30276-12-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
+        Tue, 30 May 2017 11:19:45 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v2 2/8] block: introduce flag of QUEUE_FLAG_QUIESCED
+Date: Tue, 30 May 2017 15:11:26 +0000
+Message-ID: <1496157085.2627.6.camel@sandisk.com>
+References: <20170527142126.26079-1-ming.lei@redhat.com>
+         <20170527142126.26079-3-ming.lei@redhat.com>
+In-Reply-To: <20170527142126.26079-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Opencode uuid_getnodeuniq in the only caller, and directly decode
-the uuid_t representation instead of using a structure cast for it.
+On Sat, 2017-05-27 at 22:21 +0800, Ming Lei wrote:
+> This flag is introduced for fixing & improving the quiescing code.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/uuid.c      | 25 -------------------------
- fs/xfs/uuid.h      |  1 -
- fs/xfs/xfs_mount.c |  5 ++++-
- 3 files changed, 4 insertions(+), 27 deletions(-)
+Hello Ming,
 
-diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
-index 29ed78c8637b..737c186ea98b 100644
---- a/fs/xfs/uuid.c
-+++ b/fs/xfs/uuid.c
-@@ -17,31 +17,6 @@
-  */
- #include <xfs.h>
- 
--/* IRIX interpretation of an uuid_t */
--typedef struct {
--	__be32	uu_timelow;
--	__be16	uu_timemid;
--	__be16	uu_timehi;
--	__be16	uu_clockseq;
--	__be16	uu_node[3];
--} xfs_uu_t;
--
--/*
-- * uuid_getnodeuniq - obtain the node unique fields of a UUID.
-- *
-- * This is not in any way a standard or condoned UUID function;
-- * it just something that's needed for user-level file handles.
-- */
--void
--uuid_getnodeuniq(uuid_t *uuid, int fsid [2])
--{
--	xfs_uu_t *uup = (xfs_uu_t *)uuid;
--
--	fsid[0] = (be16_to_cpu(uup->uu_clockseq) << 16) |
--		   be16_to_cpu(uup->uu_timemid);
--	fsid[1] = be32_to_cpu(uup->uu_timelow);
--}
--
- int
- uuid_is_nil(uuid_t *uuid)
- {
-diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
-index 86bbed071e79..5aea49bf0963 100644
---- a/fs/xfs/uuid.h
-+++ b/fs/xfs/uuid.h
-@@ -19,6 +19,5 @@
- #define __XFS_SUPPORT_UUID_H__
- 
- extern int uuid_is_nil(uuid_t *uuid);
--extern void uuid_getnodeuniq(uuid_t *uuid, int fsid [2]);
- 
- #endif	/* __XFS_SUPPORT_UUID_H__ */
-diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
-index 2eaf81859166..51f7d03ef86c 100644
---- a/fs/xfs/xfs_mount.c
-+++ b/fs/xfs/xfs_mount.c
-@@ -793,7 +793,10 @@ xfs_mountfs(
- 	 *  Copies the low order bits of the timestamp and the randomly
- 	 *  set "sequence" number out of a UUID.
- 	 */
--	uuid_getnodeuniq(&sbp->sb_uuid, mp->m_fixedfsid);
-+	mp->m_fixedfsid[0] =
-+		(get_unaligned_be16(&sbp->sb_uuid.b[8]) << 16) |
-+		 get_unaligned_be16(&sbp->sb_uuid.b[4]);
-+	mp->m_fixedfsid[1] = get_unaligned_be32(&sbp->sb_uuid.b[0]);
- 
- 	mp->m_dmevmask = 0;	/* not persistent; set after each mount */
- 
--- 
-2.11.0
+Since the quiescing code works fine, a better description would be that the
+purpose of this flag is to allow block drivers to use both the queue stoppi=
+ng
+and queue quiescing mechanisms instead of only one of these two mechanisms.
+
+Bart.=
