@@ -1,111 +1,34 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 09/10] xfs: nowait aio support
-Date: Wed, 24 May 2017 11:41:49 -0500
-Message-Id: <20170524164150.9492-10-rgoldwyn@suse.de>
-In-Reply-To: <20170524164150.9492-1-rgoldwyn@suse.de>
-References: <20170524164150.9492-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-yw0-f173.google.com ([209.85.161.173]:35663 "EHLO
+        mail-yw0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750965AbdE3NAY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 May 2017 09:00:24 -0400
+Received: by mail-yw0-f173.google.com with SMTP id l74so39421815ywe.2
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2017 06:00:24 -0700 (PDT)
+Date: Tue, 30 May 2017 13:00:22 +0000
+From: Josef Bacik <josef@toxicpanda.com>
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: Josef Bacik <jbacik@fb.com>, nbd-general@lists.sourceforge.net,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>
+Subject: Re: [PATCH v2 2/2] nbd: don't leak nbd_config
+Message-ID: <20170530130021.GB14918@li70-116.members.linode.com>
+References: <1495554595-30945-1-git-send-email-idryomov@gmail.com>
+ <1495554595-30945-2-git-send-email-idryomov@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1495554595-30945-2-git-send-email-idryomov@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Tue, May 23, 2017 at 05:49:55PM +0200, Ilya Dryomov wrote:
+> nbd_config is allocated in nbd_alloc_config(), but never freed.
+> 
+> Fixes: 5ea8d10802ec ("nbd: separate out the config information")
+> Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
 
-If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
-immediately.
+Reviewed-by: Josef Bacik <jbacik@fb.com>
 
-IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
-if it needs allocation either due to file extension, writing to a hole,
-or COW or waiting for other DIOs to finish.
+Thanks,
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_file.c  | 19 ++++++++++++++-----
- fs/xfs/xfs_iomap.c | 17 +++++++++++++++++
- 2 files changed, 31 insertions(+), 5 deletions(-)
-
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 35703a801372..b307940e7d56 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
- 
--	xfs_ilock(ip, iolock);
--
-+	if (!xfs_ilock_nowait(ip, iolock)) {
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		xfs_ilock(ip, iolock);
-+	}
- 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
- 	if (ret)
- 		goto out;
-@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
- 	 * otherwise demote the lock if we had to take the exclusive lock
- 	 * for other reasons in xfs_file_aio_write_checks.
- 	 */
--	if (unaligned_io)
--		inode_dio_wait(inode);
--	else if (iolock == XFS_IOLOCK_EXCL) {
-+	if (unaligned_io) {
-+		/* If we are going to wait for other DIO to finish, bail */
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (atomic_read(&inode->i_dio_count))
-+				return -EAGAIN;
-+		} else {
-+			inode_dio_wait(inode);
-+		}
-+	} else if (iolock == XFS_IOLOCK_EXCL) {
- 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 94e5bdf7304c..8b0e3c1e086d 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -1016,6 +1016,15 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
- 		if (flags & IOMAP_DIRECT) {
-+			/*
-+			 * A reflinked inode will result in CoW alloc.
-+			 * FIXME: It could still overwrite on unshared extents
-+			 * and not need allocation.
-+			 */
-+			if (flags & IOMAP_NOWAIT) {
-+				error = -EAGAIN;
-+				goto out_unlock;
-+			}
- 			/* may drop and re-acquire the ilock */
- 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
- 					&lockmode);
-@@ -1033,6 +1042,14 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
- 		/*
-+		 * If nowait is set bail since we are going to make
-+		 * allocations.
-+		 */
-+		if (flags & IOMAP_NOWAIT) {
-+			error = -EAGAIN;
-+			goto out_unlock;
-+		}
-+		/*
- 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
- 		 * pages to keep the chunks of work done where somewhat symmetric
- 		 * with the work writeback does. This is a completely arbitrary
--- 
-2.12.0
+Josef
