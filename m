@@ -1,74 +1,66 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/5] blk-mq-debugfs: Show busy requests
-Date: Thu, 25 May 2017 16:38:09 -0700
-Message-ID: <20170525233810.23211-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170525233810.23211-1-bart.vanassche@sandisk.com>
-References: <20170525233810.23211-1-bart.vanassche@sandisk.com>
+Return-Path: <dianders@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Sender: dianders@google.com
+In-Reply-To: <20170528074952.GA22193@infradead.org>
+References: <20170526212237.103525-1-mka@chromium.org> <20170526212237.103525-2-mka@chromium.org>
+ <20170528074952.GA22193@infradead.org>
+From: Doug Anderson <dianders@chromium.org>
+Date: Tue, 30 May 2017 09:28:17 -0700
+Message-ID: <CAD=FV=VCdvZZEBvqnre4r0QxM0N545QVQ2sYngyxf+5R1jM6LA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] cfq-iosched: Mark cfq_clear_cfqq_*() as __maybe_unused
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Jens Axboe <axboe@kernel.dk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Requests that got stuck in a block driver are neither on
-blk_mq_ctx.rq_list nor on any hw dispatch queue. Make these
-visible in debugfs through the "busy" attribute.
+Christoph,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-debugfs.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+On Sun, May 28, 2017 at 12:49 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> On Fri, May 26, 2017 at 02:22:35PM -0700, Matthias Kaehlcke wrote:
+>> This fixes the following warning when building with clang:
+>>
+>>     block/cfq-iosched.c:449:1: error: unused function 'cfq_clear_cfqq_sync'
+>>         [-Werror,-Wunused-function]
+>>
+>> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>
+> Matthias, can you please stop sending these patches?  Gcc semantics
+> correctly are that static inlines can be unused and it's perfectly
+> fine.  It's your job to make clang fit that instead of spreading garbage
+> all over the kernel.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 8b06a12c1461..70a2b955afee 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -370,6 +370,30 @@ static const struct seq_operations hctx_dispatch_seq_ops = {
- 	.show	= blk_mq_debugfs_rq_show,
- };
- 
-+struct show_busy_ctx {
-+	struct seq_file		*m;
-+	struct blk_mq_hw_ctx	*hctx;
-+};
-+
-+static void hctx_show_busy(struct request *rq, void *data, bool reserved)
-+{
-+	const struct show_busy_ctx *ctx = data;
-+
-+	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == ctx->hctx &&
-+	    test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-+		blk_mq_debugfs_rq_show(ctx->m, &rq->queuelist);
-+}
-+
-+static int hctx_busy_show(void *data, struct seq_file *m)
-+{
-+	struct blk_mq_hw_ctx *hctx = data;
-+	struct show_busy_ctx ctx = { .m = m, .hctx = hctx };
-+
-+	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy, &ctx);
-+
-+	return 0;
-+}
-+
- static int hctx_ctx_map_show(void *data, struct seq_file *m)
- {
- 	struct blk_mq_hw_ctx *hctx = data;
-@@ -705,6 +729,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"state", 0400, hctx_state_show},
- 	{"flags", 0400, hctx_flags_show},
- 	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
-+	{"busy", 0400, hctx_busy_show},
- 	{"ctx_map", 0400, hctx_ctx_map_show},
- 	{"tags", 0400, hctx_tags_show},
- 	{"tags_bitmap", 0400, hctx_tags_bitmap_show},
--- 
-2.12.2
+I think we've been having discussions about this in many different
+scattered threads.  A quick summary here is:
+
+* clang only warns about unused static inline functions if those
+functions are in ".c" files.  That basically means there aren't nearly
+as many false positives of the check as you would think.
+
+* Matthias has found several instances of dead code with his work.
+It's nice to get rid of those.  In addition, in at least one example
+his work has actually identified code that was not dead (AKA actual
+instructions were generated) but the code was clearly not correct.
+That's because there was a "static inline" save and restore function.
+The save was called but not the restore.  This points to either a bug
+(should have called the restore) or code that should be eliminated.
+https://patchwork.kernel.org/patch/9750813/
+
+* Most compiler warnings generate a bit of "noise".  It's always a
+judgement call about whether the signal to noise ratio makes the
+warning useful.  This is a tough call, but IMHO the signal to noise
+ratio for the clang behavior makes it worth it.  The number of "maybe
+unused" patches is not that great and IMHO adding the attribute is
+also documenting the function, which is useful too.
+
+* There exists a patch to make clang behave like gcc.
+https://patchwork.kernel.org/patch/9746913/.  If folks truly believe
+that the noise is not worth it, we can apply that.
+
+
+I just talked to Matthias and he is going to try to start a thread to
+get hopefully get a general policy agreed upon before continuing to
+post patches.
+
+
+-Doug
