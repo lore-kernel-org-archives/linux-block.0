@@ -1,47 +1,22 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:28384 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756594AbdE0OWB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 May 2017 10:22:01 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 2/8] block: introduce flag of QUEUE_FLAG_QUIESCED
-Date: Sat, 27 May 2017 22:21:20 +0800
-Message-Id: <20170527142126.26079-3-ming.lei@redhat.com>
-In-Reply-To: <20170527142126.26079-1-ming.lei@redhat.com>
-References: <20170527142126.26079-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2 1/2] nbd: nbd_reset() call in nbd_dev_add() is
+ redundant
+To: Ilya Dryomov <idryomov@gmail.com>, Josef Bacik <jbacik@fb.com>
+Cc: nbd-general@lists.sourceforge.net, linux-block@vger.kernel.org
+References: <1495554595-30945-1-git-send-email-idryomov@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e2094f61-b383-09e4-5795-d01c6dc0ee8d@kernel.dk>
+Date: Tue, 30 May 2017 08:15:47 -0600
+MIME-Version: 1.0
+In-Reply-To: <1495554595-30945-1-git-send-email-idryomov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This flag is introduced for fixing & improving the quiescing code.
+On 05/23/2017 09:49 AM, Ilya Dryomov wrote:
+> There is nothing to clear -- nbd_device has just been allocated.
+> Fold nbd_reset() into its other caller, nbd_config_put().
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 2 ++
- 1 file changed, 2 insertions(+)
+Added 1+2 for 4.12.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 41291be82ac4..60967797f4f6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -618,6 +618,7 @@ struct request_queue {
- #define QUEUE_FLAG_STATS       27	/* track rq completion times */
- #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
- #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
-+#define QUEUE_FLAG_QUIESCED    30	/* queue has been quiesced */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -712,6 +713,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
-+#define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
- 
- static inline bool blk_account_rq(struct request *rq)
- {
 -- 
-2.9.4
+Jens Axboe
