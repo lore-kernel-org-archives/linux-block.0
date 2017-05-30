@@ -1,54 +1,39 @@
-Return-Path: <comet.berkeley@gmail.com>
-Return-Path: <comet.berkeley@gmail.com>
-Date: Thu, 25 May 2017 21:52:50 -0700 (PDT)
-From: Richard Narron <comet.berkeley@gmail.com>
-To: linux-block@vger.kernel.org
-cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-    Andries Brouwer <aeb@cwi.nl>
-Subject: [PATCH v3 1/1] partitions/msdos: FreeBSD UFS2 file systems are not
- recognized
-Message-ID: <alpine.LNX.2.21.1705252147520.2125@joy.test>
+Return-Path: <krisman@collabora.co.uk>
+From: Gabriel Krisman Bertazi <krisman@collabora.co.uk>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>,  linux-block@vger.kernel.org,  Bart Van Assche <Bart.VanAssche@sandisk.com>,  linux-nvme@lists.infradead.org
+Subject: Re: [PATCH] blk-mq: Take tagset lock when updaing hw queues
+References: <1496169551-26868-1-git-send-email-keith.busch@intel.com>
+Date: Tue, 30 May 2017 16:52:14 -0300
+In-Reply-To: <1496169551-26868-1-git-send-email-keith.busch@intel.com> (Keith
+	Busch's message of "Tue, 30 May 2017 14:39:11 -0400")
+Message-ID: <87fufmm8b5.fsf@dilma.collabora.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-The code in block/partitions/msdos.c recognizes FreeBSD, OpenBSD
-and NetBSD partitions and does a reasonable job picking out OpenBSD
-and NetBSD UFS subpartitions.
+Keith Busch <keith.busch@intel.com> writes:
 
-But for FreeBSD the subpartitions are always "bad".
+> The tagset lock needs to be held when iterating the tag_list, so a
+> lockdep assert was added when updating number of hardware queues. The
+> drivers calling this API, however, were unaware of the new requirement,
+> so are failing the assertion.
+>
+> This patch takes the lock within the blk-mq function so the drivers do
+> not have to be modified in order to be safe.
+>
+> Fixes: 705cda97e ("blk-mq: Make it safe to use RCU to iterate over blk_mq_tag_set.tag_list")
+>
+> Reported-by: Gabriel Krisman Bertazi <krisman@collabora.co.uk>
+> Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
 
-     Kernel: <bsd:bad subpartition - ignored
+I know it is already applied but, FWIW, I can confirm it fixed the issue
+in our CI.  Feel free to add:
 
-Though all 3 of these BSD systems use UFS as a file system, only
-FreeBSD uses relative start addresses in the subpartition
-declarations.
+Tested-by: Gabriel Krisman Bertazi <krisman@collabora.co.uk>
 
-The following patch fixes this for FreeBSD partitions and leaves
-the code for OpenBSD and NetBSD intact:
+Thanks again, Keith.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Andries Brouwer <aeb@cwi.nl>
-Cc: linux-block@vger.kernel.org
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Richard Narron <comet.berkeley@gmail.com>
----
-Changelog v2->v3:
-- Add Cc:
-Changelog v1->v2: 
-- Improve style, use += 
----
-  block/partitions/msdos.c | 2 ++
-  1 file changed, 2 insertions(+)
-
---- a/block/partitions/msdos.c	2015-12-27 18:17:37.000000000 -0800
-+++ b/block/partitions/msdos.c	2015-12-29 10:44:25.813773357 -0800
-@@ -300,6 +300,8 @@ static void parse_bsd(struct parsed_part
-  			continue;
-  		bsd_start = le32_to_cpu(p->p_offset);
-  		bsd_size = le32_to_cpu(p->p_size);
-+		if (memcmp(flavour, "bsd\0", 4) == 0)
-+			bsd_start += offset;
-  		if (offset == bsd_start && size == bsd_size)
-  			/* full parent partition, we have it already */
-  			continue;
+-- 
+Gabriel Krisman Bertazi
