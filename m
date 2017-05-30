@@ -1,46 +1,22 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41648 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S941653AbdEYEVx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 00:21:53 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 2/7] block: introduce flag of QUEUE_FLAG_QUIESCED
-Date: Thu, 25 May 2017 12:21:26 +0800
-Message-Id: <20170525042131.13172-3-ming.lei@redhat.com>
-In-Reply-To: <20170525042131.13172-1-ming.lei@redhat.com>
-References: <20170525042131.13172-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] nbd: add FUA op support
+To: Shaun McDowell <shaunjmcdowell@gmail.com>, linux-block@vger.kernel.org
+Cc: jbacik@fb.com, nbd-general@lists.sourceforge.net, bsdkurt@gmail.com
+References: <20170526035554.GA31566@auir>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7f285935-f1f1-30f3-6a23-befd1f39c790@kernel.dk>
+Date: Tue, 30 May 2017 08:20:59 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170526035554.GA31566@auir>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This flag is introduced for reimplementing the quiescing code.
+On 05/25/2017 09:55 PM, Shaun McDowell wrote:
+> NBD userland client and server have FUA (forced unit access) support
+> and flags defined. Make NBD kernel module recognize NBD_FLAG_SEND_FUA,
+> enable FUA on the queue, and forward FUA requests to the server.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 2 ++
- 1 file changed, 2 insertions(+)
+Queued up for 4.13, thanks.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 41291be82ac4..60967797f4f6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -618,6 +618,7 @@ struct request_queue {
- #define QUEUE_FLAG_STATS       27	/* track rq completion times */
- #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
- #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
-+#define QUEUE_FLAG_QUIESCED    30	/* queue has been quiesced */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -712,6 +713,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
-+#define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
- 
- static inline bool blk_account_rq(struct request *rq)
- {
 -- 
-2.9.4
+Jens Axboe
