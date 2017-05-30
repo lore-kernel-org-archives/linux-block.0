@@ -1,126 +1,93 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:42130 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750979AbdE1KVF (ORCPT
+Received: from mail-it0-f47.google.com ([209.85.214.47]:36383 "EHLO
+        mail-it0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750952AbdE3NY6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 May 2017 06:21:05 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 08/22] uuid: hoist helpers uuid_equal() and uuid_copy() from xfs
-Date: Sun, 28 May 2017 13:19:54 +0300
-Message-Id: <20170528102008.30276-9-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
+        Tue, 30 May 2017 09:24:58 -0400
+Received: by mail-it0-f47.google.com with SMTP id o5so41342754ith.1
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2017 06:24:58 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170529090548.GA33534@dhcp-216.srv.tuxera.com>
+References: <20170513195038.GA8782@hercules.tuxera.com> <0BEA8552-A2D0-4B70-A9CF-98A019726FCC@cnexlabs.com>
+ <20170529090548.GA33534@dhcp-216.srv.tuxera.com>
+From: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+Date: Tue, 30 May 2017 15:24:57 +0200
+Message-ID: <CAOA7RkOe4QgFMKg6UqjMFknAsjc13w2Pa4bS-mLE1Sm9UogDGg@mail.gmail.com>
+Subject: Re: [PATCH] ligtnvm: if LUNs are already allocated fix return
+To: Rakesh Pandit <rakesh@tuxera.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Javier Gonzalez <javier@cnexlabs.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-These helper are used to compare and copy two uuid_t type objects.
+On Mon, May 29, 2017 at 11:05 AM, Rakesh Pandit <rakesh@tuxera.com> wrote:
+> Hi Matias,
+>
+> On Mon, May 15, 2017 at 06:31:58AM +0000, Javier Gonzalez wrote:
+>> >
+>> > On 13 May 2017, at 21.50, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>> >
+>> > While creating new device with NVM_DEV_CREATE if LUNs are already
+>> > allocated ioctl would return -ENOMEM which is wrong.  This patch
+>> > propagates -EBUSY from nvm_reserve_luns which is correct response.
+>> >
+>> > Fixes: ade69e243 ("lightnvm: merge gennvm with core")
+>> > Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+>> > ---
+>> > drivers/lightnvm/core.c | 11 ++++++-----
+>> > 1 file changed, 6 insertions(+), 5 deletions(-)
+>> >
+>> > diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+>> > index 6a4aa60..440deb5 100644
+>> > --- a/drivers/lightnvm/core.c
+>> > +++ b/drivers/lightnvm/core.c
+>> > @@ -235,7 +235,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, str=
+uct nvm_ioctl_create *create)
+>> >     struct nvm_target *t;
+>> >     struct nvm_tgt_dev *tgt_dev;
+>> >     void *targetdata;
+>> > -   int ret;
+>> > +   int ret =3D 0;
+>> >
+>> >     tt =3D nvm_find_target_type(create->tgttype, 1);
+>> >     if (!tt) {
+>> > @@ -252,8 +252,9 @@ static int nvm_create_tgt(struct nvm_dev *dev, str=
+uct nvm_ioctl_create *create)
+>> >     }
+>> >     mutex_unlock(&dev->mlock);
+>> >
+>> > -   if (nvm_reserve_luns(dev, s->lun_begin, s->lun_end))
+>> > -           return -ENOMEM;
+>> > +   ret =3D nvm_reserve_luns(dev, s->lun_begin, s->lun_end);
+>> > +   if (ret)
+>> > +           goto err;
+>> >
+>> >     t =3D kmalloc(sizeof(struct nvm_target), GFP_KERNEL);
+>> >     if (!t) {
+>> > @@ -314,8 +315,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, str=
+uct nvm_ioctl_create *create)
+>> >     mutex_lock(&dev->mlock);
+>> >     list_add_tail(&t->list, &dev->targets);
+>> >     mutex_unlock(&dev->mlock);
+>> > -
+>> > -   return 0;
+>> > +err:
+>> > +   return ret;
+>> > err_sysfs:
+>> >     if (tt->exit)
+>> >             tt->exit(targetdata);
+>> > --
+>> > 2.9.3
+>>
+>> Looks good.
+>>
+>> Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+>>
+>
+> May you review/approve this so that it gets queued ?
 
-Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-[hch: also provide the respective guid_ versions]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- fs/xfs/uuid.c        |  6 ------
- fs/xfs/uuid.h        |  7 -------
- include/linux/uuid.h | 20 ++++++++++++++++++++
- lib/test_uuid.c      |  4 ++--
- 4 files changed, 22 insertions(+), 15 deletions(-)
+Thanks, Rakesh. Will do. Queued it up for 4.13.
 
-diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
-index b83f76b6d410..29ed78c8637b 100644
---- a/fs/xfs/uuid.c
-+++ b/fs/xfs/uuid.c
-@@ -55,9 +55,3 @@ uuid_is_nil(uuid_t *uuid)
- 		if (*cp++) return 0;	/* not nil */
- 	return 1;	/* is nil */
- }
--
--int
--uuid_equal(uuid_t *uuid1, uuid_t *uuid2)
--{
--	return memcmp(uuid1, uuid2, sizeof(uuid_t)) ? 0 : 1;
--}
-diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
-index 4f1441ba4fa5..86bbed071e79 100644
---- a/fs/xfs/uuid.h
-+++ b/fs/xfs/uuid.h
-@@ -19,13 +19,6 @@
- #define __XFS_SUPPORT_UUID_H__
- 
- extern int uuid_is_nil(uuid_t *uuid);
--extern int uuid_equal(uuid_t *uuid1, uuid_t *uuid2);
- extern void uuid_getnodeuniq(uuid_t *uuid, int fsid [2]);
- 
--static inline void
--uuid_copy(uuid_t *dst, uuid_t *src)
--{
--	memcpy(dst, src, sizeof(uuid_t));
--}
--
- #endif	/* __XFS_SUPPORT_UUID_H__ */
-diff --git a/include/linux/uuid.h b/include/linux/uuid.h
-index a9d0fdba5404..b4b147f52d6c 100644
---- a/include/linux/uuid.h
-+++ b/include/linux/uuid.h
-@@ -35,6 +35,26 @@ typedef struct {
-  */
- #define	UUID_STRING_LEN		36
- 
-+static inline bool guid_equal(const guid_t *u1, const guid_t *u2)
-+{
-+	return memcmp(u1, u2, sizeof(guid_t)) == 0;
-+}
-+
-+static inline void guid_copy(guid_t *dst, const guid_t *src)
-+{
-+	memcpy(dst, src, sizeof(guid_t));
-+}
-+
-+static inline bool uuid_equal(const uuid_t *u1, const uuid_t *u2)
-+{
-+	return memcmp(u1, u2, sizeof(uuid_t)) == 0;
-+}
-+
-+static inline void uuid_copy(uuid_t *dst, const uuid_t *src)
-+{
-+	memcpy(dst, src, sizeof(uuid_t));
-+}
-+
- void generate_random_uuid(unsigned char uuid[16]);
- 
- extern void guid_gen(guid_t *u);
-diff --git a/lib/test_uuid.c b/lib/test_uuid.c
-index 9cad846fd805..4d05189e5f87 100644
---- a/lib/test_uuid.c
-+++ b/lib/test_uuid.c
-@@ -71,7 +71,7 @@ static void __init test_uuid_test(const struct test_uuid_data *data)
- 		test_uuid_failed("conversion", false, false, data->uuid, NULL);
- 
- 	total_tests++;
--	if (uuid_le_cmp(data->le, le)) {
-+	if (!guid_equal(&data->le, &le)) {
- 		sprintf(buf, "%pUl", &le);
- 		test_uuid_failed("cmp", false, false, data->uuid, buf);
- 	}
-@@ -82,7 +82,7 @@ static void __init test_uuid_test(const struct test_uuid_data *data)
- 		test_uuid_failed("conversion", false, true, data->uuid, NULL);
- 
- 	total_tests++;
--	if (uuid_be_cmp(data->be, be)) {
-+	if (uuid_equal(&data->be, &be)) {
- 		sprintf(buf, "%pUb", &be);
- 		test_uuid_failed("cmp", false, true, data->uuid, buf);
- 	}
--- 
-2.11.0
+-Matias
