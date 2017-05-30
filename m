@@ -1,8 +1,13 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 31 May 2017 11:41:57 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: David Howells <dhowells@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52606 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750898AbdE3KAM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 May 2017 06:00:12 -0400
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20170528102008.30276-2-hch@lst.de>
+References: <20170528102008.30276-2-hch@lst.de> <20170528102008.30276-1-hch@lst.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dhowells@redhat.com,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Amir Goldstein <amir73il@gmail.com>,
         linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
@@ -11,27 +16,29 @@ Cc: Christoph Hellwig <hch@lst.de>,
         Mimi Zohar <zohar@linux.vnet.ibm.com>,
         linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+        linux-block@vger.kernel.org
 Subject: Re: [PATCH 01/22] Revert "afs: Move UUID struct to linux/uuid.h"
-Message-ID: <20170531094157.GA10511@lst.de>
-References: <20170528102008.30276-2-hch@lst.de> <20170528102008.30276-1-hch@lst.de> <9377.1496138404@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9377.1496138404@warthog.procyon.org.uk>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Date: Tue, 30 May 2017 11:00:04 +0100
+Message-ID: <9377.1496138404@warthog.procyon.org.uk>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, May 30, 2017 at 11:00:04AM +0100, David Howells wrote:
-> This isn't going to work.  You've effectively changed the types of the fields
-> in the UUID struct from BE to CPU-endian, but you're still calling
-> generate_random_uuid(), which produces a BE UUID.  You need to leave the
-> struct members as __beXX or stop using the core UUID routines.
+Christoph Hellwig <hch@lst.de> wrote:
+
+> This reverts commit ff548773106ec7f8031bc6172e0234bd2a02c19c.
 > 
-> Just move the struct uuid_v1 as-is to the afs headers and rename it to struct
-> afs_uuid.  You can then leave the (un)marshalling code alone.
+> The V1 uuid intrepreatation in struct form isn't really useful to the
+> rest of the kernel, and not really compatible to it either, so move it
+> back to AFS instead of polluting the global uuid.h.
 
-That's one option.  The other option would be to revert
+This isn't going to work.  You've effectively changed the types of the fields
+in the UUID struct from BE to CPU-endian, but you're still calling
+generate_random_uuid(), which produces a BE UUID.  You need to leave the
+struct members as __beXX or stop using the core UUID routines.
 
-"afs: Use core kernel UUID generation", as that also changed the
-v1 UUID to a v4 uuid.  Does the afs protocol require a v1 uuid
-or does it just use the formwat on the wire?
+Just move the struct uuid_v1 as-is to the afs headers and rename it to struct
+afs_uuid.  You can then leave the (un)marshalling code alone.
+
+David
