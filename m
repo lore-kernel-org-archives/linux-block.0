@@ -1,62 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:34412 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751605AbdE1KVm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 May 2017 06:21:42 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH 21/22] tmpfs: generate random sb->s_uuid
-Date: Sun, 28 May 2017 13:20:07 +0300
-Message-Id: <20170528102008.30276-22-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 4/5] blk-mq-debugfs: Show busy requests
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>
+Cc: "hch@lst.de" <hch@lst.de>, "osandov@fb.com" <osandov@fb.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "hare@suse.com" <hare@suse.com>
+References: <20170525233810.23211-1-bart.vanassche@sandisk.com>
+ <20170525233810.23211-5-bart.vanassche@sandisk.com>
+ <20170527005456.GB20421@ming.t460p> <1496165077.2627.15.camel@sandisk.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2c6537c7-591c-0663-8271-7120fe7c9336@kernel.dk>
+Date: Tue, 30 May 2017 11:32:26 -0600
+MIME-Version: 1.0
+In-Reply-To: <1496165077.2627.15.camel@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Amir Goldstein <amir73il@gmail.com>
+On 05/30/2017 11:24 AM, Bart Van Assche wrote:
+>> [ ... ]
+>> During this small window, the request can be freed and reallocated
+>> in another I/O path, then use-after-free is caused.
+> 
+> A similar remark applies to all request queue debugfs attributes: the
+> queue state can change immediately after having queried the state so
+> that's not unique to this attribute. Regarding the "use-after-free":
+> the memory that is allocated for requests is only freed after the
+> debugfs attributes have been removed so the code that implements this
+> attribute will read the contents of a struct request. It is up to the
+> person who reads the contents of this attribute to decide how to
+> interpret the contents.
 
-This is used by overlayfs to encode intrasystem unique file handles.
+I think it's important to stress that the memory is not going away, so
+it'll potentially just show a new state of the request. That's perfectly
+fine, and will happen all the time for the various debugfs exports. The
+useful aspect of them is when things have come to a halt, for whatever
+reason. The states will tend to stay stable when that happens, and
+provide a useful method of introspection to debug the issue.
 
-Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
-Cc: Hugh Dickins <hughd@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- mm/shmem.c | 2 ++
- 1 file changed, 2 insertions(+)
+The important part here is that the memory is perfectly valid, so we
+won't run into issues with that.
 
-diff --git a/mm/shmem.c b/mm/shmem.c
-index e67d6ba4e98e..391f2dcca727 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -75,6 +75,7 @@ static struct vfsmount *shm_mnt;
- #include <uapi/linux/memfd.h>
- #include <linux/userfaultfd_k.h>
- #include <linux/rmap.h>
-+#include <linux/uuid.h>
- 
- #include <linux/uaccess.h>
- #include <asm/pgtable.h>
-@@ -3761,6 +3762,7 @@ int shmem_fill_super(struct super_block *sb, void *data, int silent)
- #ifdef CONFIG_TMPFS_POSIX_ACL
- 	sb->s_flags |= MS_POSIXACL;
- #endif
-+	uuid_gen(&sb->s_uuid);
- 
- 	inode = shmem_get_inode(sb, NULL, S_IFDIR | sbinfo->mode, 0, VM_NORESERVE);
- 	if (!inode)
 -- 
-2.11.0
+Jens Axboe
