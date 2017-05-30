@@ -1,111 +1,58 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 09/10] xfs: nowait aio support
-Date: Thu, 11 May 2017 14:17:09 -0500
-Message-Id: <20170511191710.31959-10-rgoldwyn@suse.de>
-In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
-References: <20170511191710.31959-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:35500 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750896AbdE3AeZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 May 2017 20:34:25 -0400
+Date: Tue, 30 May 2017 08:34:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+Subject: Re: [PATCH v2 0/8] blk-mq: fix & improve queue quiescing
+Message-ID: <20170530003411.GC29253@ming.t460p>
+References: <20170527142126.26079-1-ming.lei@redhat.com>
+ <1495920721.13651.0.camel@sandisk.com>
+ <20170528111105.GD6488@ming.t460p>
+ <1495987272.2849.1.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1495987272.2849.1.camel@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Sun, May 28, 2017 at 04:01:13PM +0000, Bart Van Assche wrote:
+> On Sun, 2017-05-28 at 19:11 +0800, Ming Lei wrote:
+> > On Sat, May 27, 2017 at 09:32:02PM +0000, Bart Van Assche wrote:
+> > > On Sat, 2017-05-27 at 22:21 +0800, Ming Lei wrote:
+> > > > There are some issues in current blk_mq_quiesce_queue():
+> > > > 
+> > > >     - in case of direct issue or BLK_MQ_S_START_ON_RUN, dispatch won't
+> > > >     be prevented after blk_mq_quiesce_queue() is returned.
+> > > >     - in theory, new RCU read-side critical sections may begin while
+> > > >     synchronize_rcu() was waiting, and end after returning from 
+> > > >     synchronize_rcu(), then dispatch still may be run after
+> > > >     synchronize_rcu() returns
+> > > 
+> > > I disagree with the second part of your statement. blk_mq_quiesce_queue()
+> > 
+> > You can find the similar description from line 158 to line 180.
+> > of Documentation/RCU/whatisRCU.txt.
+> > 
+> > For example, there may be schedule preempt or irq handling between
+> > checking stopped flag(false) and the RCU read-side critical sections, and
+> > synchronize_*rcu() may return before running this RCU read-side critical
+> > sections. That is why we have to move the check into RCU read-side
+> > critical sections.
+> 
+> Hello Ming,
+> 
+> Have you noticed that in the current blk-mq code the test of the hctx
+> stopped flag already occurs *inside* an RCU read-side critical section?
+> __blk_mq_run_hw_queue() grabs an RCU read lock before
+> blk_mq_sched_dispatch_requests() calls blk_mq_hctx_stopped().
 
-If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
-immediately.
+OK, that is what I missed, will update the commit log in next post.
 
-IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
-if it needs allocation either due to file extension, writing to a hole,
-or COW or waiting for other DIOs to finish.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_file.c  | 19 ++++++++++++++-----
- fs/xfs/xfs_iomap.c | 17 +++++++++++++++++
- 2 files changed, 31 insertions(+), 5 deletions(-)
-
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 35703a801372..b307940e7d56 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
- 
--	xfs_ilock(ip, iolock);
--
-+	if (!xfs_ilock_nowait(ip, iolock)) {
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		xfs_ilock(ip, iolock);
-+	}
- 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
- 	if (ret)
- 		goto out;
-@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
- 	 * otherwise demote the lock if we had to take the exclusive lock
- 	 * for other reasons in xfs_file_aio_write_checks.
- 	 */
--	if (unaligned_io)
--		inode_dio_wait(inode);
--	else if (iolock == XFS_IOLOCK_EXCL) {
-+	if (unaligned_io) {
-+		/* If we are going to wait for other DIO to finish, bail */
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (atomic_read(&inode->i_dio_count))
-+				return -EAGAIN;
-+		} else {
-+			inode_dio_wait(inode);
-+		}
-+	} else if (iolock == XFS_IOLOCK_EXCL) {
- 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 288ee5b840d7..9baa65eeae9e 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -1015,6 +1015,15 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
- 		if (flags & IOMAP_DIRECT) {
-+			/*
-+			 * A reflinked inode will result in CoW alloc.
-+			 * FIXME: It could still overwrite on unshared extents
-+			 * and not need allocation.
-+			 */
-+			if (flags & IOMAP_NOWAIT) {
-+				error = -EAGAIN;
-+				goto out_unlock;
-+			}
- 			/* may drop and re-acquire the ilock */
- 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
- 					&lockmode);
-@@ -1032,6 +1041,14 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
- 		/*
-+		 * If nowait is set bail since we are going to make
-+		 * allocations.
-+		 */
-+		if (flags & IOMAP_NOWAIT) {
-+			error = -EAGAIN;
-+			goto out_unlock;
-+		}
-+		/*
- 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
- 		 * pages to keep the chunks of work done where somewhat symmetric
- 		 * with the work writeback does. This is a completely arbitrary
--- 
-2.12.0
+Thanks,
+Ming
