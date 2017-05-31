@@ -1,46 +1,248 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:58806 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751187AbdEaPhd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2017 11:37:33 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: [PATCH v3 5/9] blk-mq: fix blk_mq_quiesce_queue
-Date: Wed, 31 May 2017 15:37:30 +0000
-Message-ID: <1496245049.2608.7.camel@sandisk.com>
+Received: from mx1.redhat.com ([209.132.183.28]:34916 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751011AbdEaMiO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 08:38:14 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 5/9] blk-mq: fix blk_mq_quiesce_queue
+Date: Wed, 31 May 2017 20:37:02 +0800
+Message-Id: <20170531123706.20885-6-ming.lei@redhat.com>
+In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
 References: <20170531123706.20885-1-ming.lei@redhat.com>
-         <20170531123706.20885-6-ming.lei@redhat.com>
-In-Reply-To: <20170531123706.20885-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, 2017-05-31 at 20:37 +0800, Ming Lei wrote:
->=20
-> +	/* wait until queue is unquiesced */
-> +	wait_event_cmd(q->quiesce_wq, !blk_queue_quiesced(q),
-> +			may_sleep ?
-> +			srcu_read_unlock(&hctx->queue_rq_srcu, *srcu_idx) :
-> +			rcu_read_unlock(),
-> +			may_sleep ?
-> +			*srcu_idx =3D srcu_read_lock(&hctx->queue_rq_srcu) :
-> +			rcu_read_lock());
-> +
->  	if (q->elevator)
->  		goto insert;
+It is required that no dispatch can happen any more once
+blk_mq_quiesce_queue() returns, and we don't have such requirement
+on APIs of stopping queue.
 
-What I see is that in this patch a new waitqueue has been introduced
-(quiesce_wq) and also that an explanation of why you think this new waitque=
-ue
-is needed is missing completely. Why is it that you think that the
-synchronize_scru() and synchronize_rcu() calls in blk_mq_quiesce_queue() ar=
-e
-not sufficient? If this new waitqueue is not needed, please remove that
-waitqueue again.
+But blk_mq_quiesce_queue() still may not block/drain dispatch in the
+following cases:
 
-Bart.=
+- direct issue
+- BLK_MQ_S_START_ON_RUN
+
+So use the new flag of QUEUE_FLAG_QUIESCED and evaluate it
+inside RCU read-side critical sections for fixing the above issues.
+
+This patch fixes request use-after-free[1][2] during canceling requets
+of NVMe in nvme_dev_disable(), which can be triggered easily during
+NVMe reset & remove test.
+
+[1] oops kernel log when CONFIG_BLK_DEV_INTEGRITY is on
+[  103.412969] BUG: unable to handle kernel NULL pointer dereference at 000000000000000a
+[  103.412980] IP: bio_integrity_advance+0x48/0xf0
+[  103.412981] PGD 275a88067
+[  103.412981] P4D 275a88067
+[  103.412982] PUD 276c43067
+[  103.412983] PMD 0
+[  103.412984]
+[  103.412986] Oops: 0000 [#1] SMP
+[  103.412989] Modules linked in: vfat fat intel_rapl sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel pcbc aesni_intel crypto_simd cryptd ipmi_ssif iTCO_wdt iTCO_vendor_support mxm_wmi glue_helper dcdbas ipmi_si mei_me pcspkr mei sg ipmi_devintf lpc_ich ipmi_msghandler shpchp acpi_power_meter wmi nfsd auth_rpcgss nfs_acl lockd grace sunrpc ip_tables xfs libcrc32c sd_mod mgag200 i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm crc32c_intel nvme ahci nvme_core libahci libata tg3 i2c_core megaraid_sas ptp pps_core dm_mirror dm_region_hash dm_log dm_mod
+[  103.413035] CPU: 0 PID: 102 Comm: kworker/0:2 Not tainted 4.11.0+ #1
+[  103.413036] Hardware name: Dell Inc. PowerEdge R730xd/072T6D, BIOS 2.2.5 09/06/2016
+[  103.413041] Workqueue: events nvme_remove_dead_ctrl_work [nvme]
+[  103.413043] task: ffff9cc8775c8000 task.stack: ffffc033c252c000
+[  103.413045] RIP: 0010:bio_integrity_advance+0x48/0xf0
+[  103.413046] RSP: 0018:ffffc033c252fc10 EFLAGS: 00010202
+[  103.413048] RAX: 0000000000000000 RBX: ffff9cc8720a8cc0 RCX: ffff9cca72958240
+[  103.413049] RDX: ffff9cca72958000 RSI: 0000000000000008 RDI: ffff9cc872537f00
+[  103.413049] RBP: ffffc033c252fc28 R08: 0000000000000000 R09: ffffffffb963a0d5
+[  103.413050] R10: 000000000000063e R11: 0000000000000000 R12: ffff9cc8720a8d18
+[  103.413051] R13: 0000000000001000 R14: ffff9cc872682e00 R15: 00000000fffffffb
+[  103.413053] FS:  0000000000000000(0000) GS:ffff9cc877c00000(0000) knlGS:0000000000000000
+[  103.413054] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  103.413055] CR2: 000000000000000a CR3: 0000000276c41000 CR4: 00000000001406f0
+[  103.413056] Call Trace:
+[  103.413063]  bio_advance+0x2a/0xe0
+[  103.413067]  blk_update_request+0x76/0x330
+[  103.413072]  blk_mq_end_request+0x1a/0x70
+[  103.413074]  blk_mq_dispatch_rq_list+0x370/0x410
+[  103.413076]  ? blk_mq_flush_busy_ctxs+0x94/0xe0
+[  103.413080]  blk_mq_sched_dispatch_requests+0x173/0x1a0
+[  103.413083]  __blk_mq_run_hw_queue+0x8e/0xa0
+[  103.413085]  __blk_mq_delay_run_hw_queue+0x9d/0xa0
+[  103.413088]  blk_mq_start_hw_queue+0x17/0x20
+[  103.413090]  blk_mq_start_hw_queues+0x32/0x50
+[  103.413095]  nvme_kill_queues+0x54/0x80 [nvme_core]
+[  103.413097]  nvme_remove_dead_ctrl_work+0x1f/0x40 [nvme]
+[  103.413103]  process_one_work+0x149/0x360
+[  103.413105]  worker_thread+0x4d/0x3c0
+[  103.413109]  kthread+0x109/0x140
+[  103.413111]  ? rescuer_thread+0x380/0x380
+[  103.413113]  ? kthread_park+0x60/0x60
+[  103.413120]  ret_from_fork+0x2c/0x40
+[  103.413121] Code: 08 4c 8b 63 50 48 8b 80 80 00 00 00 48 8b 90 d0 03 00 00 31 c0 48 83 ba 40 02 00 00 00 48 8d 8a 40 02 00 00 48 0f 45 c1 c1 ee 09 <0f> b6 48 0a 0f b6 40 09 41 89 f5 83 e9 09 41 d3 ed 44 0f af e8
+[  103.413145] RIP: bio_integrity_advance+0x48/0xf0 RSP: ffffc033c252fc10
+[  103.413146] CR2: 000000000000000a
+[  103.413157] ---[ end trace cd6875d16eb5a11e ]---
+[  103.455368] Kernel panic - not syncing: Fatal exception
+[  103.459826] Kernel Offset: 0x37600000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  103.850916] ---[ end Kernel panic - not syncing: Fatal exception
+[  103.857637] sched: Unexpected reschedule of offline CPU#1!
+[  103.863762] ------------[ cut here ]------------
+
+[2] kernel hang in blk_mq_freeze_queue_wait() when CONFIG_BLK_DEV_INTEGRITY is off
+[  247.129825] INFO: task nvme-test:1772 blocked for more than 120 seconds.
+[  247.137311]       Not tainted 4.12.0-rc2.upstream+ #4
+[  247.142954] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  247.151704] Call Trace:
+[  247.154445]  __schedule+0x28a/0x880
+[  247.158341]  schedule+0x36/0x80
+[  247.161850]  blk_mq_freeze_queue_wait+0x4b/0xb0
+[  247.166913]  ? remove_wait_queue+0x60/0x60
+[  247.171485]  blk_freeze_queue+0x1a/0x20
+[  247.175770]  blk_cleanup_queue+0x7f/0x140
+[  247.180252]  nvme_ns_remove+0xa3/0xb0 [nvme_core]
+[  247.185503]  nvme_remove_namespaces+0x32/0x50 [nvme_core]
+[  247.191532]  nvme_uninit_ctrl+0x2d/0xa0 [nvme_core]
+[  247.196977]  nvme_remove+0x70/0x110 [nvme]
+[  247.201545]  pci_device_remove+0x39/0xc0
+[  247.205927]  device_release_driver_internal+0x141/0x200
+[  247.211761]  device_release_driver+0x12/0x20
+[  247.216531]  pci_stop_bus_device+0x8c/0xa0
+[  247.221104]  pci_stop_and_remove_bus_device_locked+0x1a/0x30
+[  247.227420]  remove_store+0x7c/0x90
+[  247.231320]  dev_attr_store+0x18/0x30
+[  247.235409]  sysfs_kf_write+0x3a/0x50
+[  247.239497]  kernfs_fop_write+0xff/0x180
+[  247.243867]  __vfs_write+0x37/0x160
+[  247.247757]  ? selinux_file_permission+0xe5/0x120
+[  247.253011]  ? security_file_permission+0x3b/0xc0
+[  247.258260]  vfs_write+0xb2/0x1b0
+[  247.261964]  ? syscall_trace_enter+0x1d0/0x2b0
+[  247.266924]  SyS_write+0x55/0xc0
+[  247.270540]  do_syscall_64+0x67/0x150
+[  247.274636]  entry_SYSCALL64_slow_path+0x25/0x25
+[  247.279794] RIP: 0033:0x7f5c96740840
+[  247.283785] RSP: 002b:00007ffd00e87ee8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[  247.292238] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f5c96740840
+[  247.300194] RDX: 0000000000000002 RSI: 00007f5c97060000 RDI: 0000000000000001
+[  247.308159] RBP: 00007f5c97060000 R08: 000000000000000a R09: 00007f5c97059740
+[  247.316123] R10: 0000000000000001 R11: 0000000000000246 R12: 00007f5c96a14400
+[  247.324087] R13: 0000000000000002 R14: 0000000000000001 R15: 0000000000000000
+[  370.016340] INFO: task nvme-test:1772 blocked for more than 120 seconds.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c   |  3 ++-
+ block/blk-mq.c         | 28 +++++++++++++++++++++++++---
+ include/linux/blkdev.h |  3 +++
+ 3 files changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index c4e2afb9d12d..ec9885df324c 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -141,7 +141,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	bool did_work = false;
+ 	LIST_HEAD(rq_list);
+ 
+-	if (unlikely(blk_mq_hctx_stopped(hctx)))
++	/* RCU or SRCU read lock is needed before checking quiesced flag */
++	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
+ 		return;
+ 
+ 	hctx->run++;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 2f0d80bad7be..56ba7e7a8c60 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -170,6 +170,10 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+ 
+ 	__blk_mq_stop_hw_queues(q, true);
+ 
++	spin_lock_irq(q->queue_lock);
++	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
++	spin_unlock_irq(q->queue_lock);
++
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (hctx->flags & BLK_MQ_F_BLOCKING)
+ 			synchronize_srcu(&hctx->queue_rq_srcu);
+@@ -190,7 +194,13 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+  */
+ void blk_mq_unquiesce_queue(struct request_queue *q)
+ {
++	spin_lock_irq(q->queue_lock);
++	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
++	spin_unlock_irq(q->queue_lock);
++
+ 	blk_mq_start_stopped_hw_queues(q, true);
++
++	wake_up_all(&q->quiesce_wq);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
+ 
+@@ -1414,7 +1424,8 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ }
+ 
+ static void __blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
+-				      bool may_sleep)
++					bool may_sleep,
++					unsigned int *srcu_idx)
+ {
+ 	struct request_queue *q = rq->q;
+ 	struct blk_mq_queue_data bd = {
+@@ -1425,6 +1436,15 @@ static void __blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
+ 	blk_qc_t new_cookie;
+ 	int ret;
+ 
++	/* wait until queue is unquiesced */
++	wait_event_cmd(q->quiesce_wq, !blk_queue_quiesced(q),
++			may_sleep ?
++			srcu_read_unlock(&hctx->queue_rq_srcu, *srcu_idx) :
++			rcu_read_unlock(),
++			may_sleep ?
++			*srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu) :
++			rcu_read_lock());
++
+ 	if (q->elevator)
+ 		goto insert;
+ 
+@@ -1460,7 +1480,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ {
+ 	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+ 		rcu_read_lock();
+-		__blk_mq_try_issue_directly(rq, cookie, false);
++		__blk_mq_try_issue_directly(rq, cookie, false, NULL);
+ 		rcu_read_unlock();
+ 	} else {
+ 		unsigned int srcu_idx;
+@@ -1468,7 +1488,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		might_sleep();
+ 
+ 		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
+-		__blk_mq_try_issue_directly(rq, cookie, true);
++		__blk_mq_try_issue_directly(rq, cookie, true, &srcu_idx);
+ 		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
+ 	}
+ }
+@@ -2218,6 +2238,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	/* mark the queue as mq asap */
+ 	q->mq_ops = set->ops;
+ 
++	init_waitqueue_head(&q->quiesce_wq);
++
+ 	q->poll_cb = blk_stat_alloc_callback(blk_mq_poll_stats_fn,
+ 					     blk_mq_poll_stats_bkt,
+ 					     BLK_MQ_POLL_STATS_BKTS, q);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 60967797f4f6..253d52d35bd1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -586,6 +586,9 @@ struct request_queue {
+ 
+ 	size_t			cmd_size;
+ 	void			*rq_alloc_data;
++
++	/* for blk_mq_quiesce_queue() */
++	wait_queue_head_t       quiesce_wq;
+ };
+ 
+ #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
+-- 
+2.9.4
