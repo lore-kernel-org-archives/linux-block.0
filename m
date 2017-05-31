@@ -1,85 +1,53 @@
 Return-Path: <jlayton@redhat.com>
 From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
+To: fstests@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Al Viro <viro@ZenIV.linux.org.uk>,
 	Jan Kara <jack@suse.cz>,
 	tytso@mit.edu,
 	axboe@kernel.dk,
 	mawilcox@microsoft.com,
 	ross.zwisler@linux.intel.com,
-	corbet@lwn.net
-Cc: linux-ext4@vger.kernel.org,
+	corbet@lwn.net,
+	dhowells@redhat.com,
+	linux-ext4@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-doc@vger.kernel.org
-Subject: [PATCH v5 08/17] dax: set errors in mapping when writeback fails
-Date: Wed, 31 May 2017 08:45:31 -0400
-Message-Id: <20170531124540.8782-9-jlayton@redhat.com>
-In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
+Subject: [xfstests PATCH v3 4/5] ext3: allow it to put journal on a separate device when doing scratch_mkfs
+Date: Wed, 31 May 2017 09:08:19 -0400
+Message-Id: <20170531130820.17634-5-jlayton@redhat.com>
+In-Reply-To: <20170531130820.17634-1-jlayton@redhat.com>
+References: <20170531130820.17634-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Jan's description for this patch is much better than mine, so I'm
-quoting it verbatim here:
-
------------------8<-----------------
-DAX currently doesn't set errors in the mapping when cache flushing
-fails in dax_writeback_mapping_range(). Since this function can get
-called only from fsync(2) or sync(2), this is actually as good as it can
-currently get since we correctly propagate the error up from
-dax_writeback_mapping_range() to filemap_fdatawrite()
-
-However, in the future better writeback error handling will enable us to
-properly report these errors on fsync(2) even if there are multiple file
-descriptors open against the file or if sync(2) gets called before
-fsync(2). So convert DAX to using standard error reporting through the
-mapping.
------------------8<-----------------
-
-For now, only do this when the FS_WB_ERRSEQ flag is set. The
-AS_EIO/AS_ENOSPC flags are not currently cleared in the older code when
-writeback initiation fails, only when we discover an error after waiting
-on writeback to complete, so we only want to do this with errseq_t based
-error handling to prevent seeing duplicate errors on fsync.
-
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-and-Tested-by: Ross Zwisler <ross.zwisler@linux.intel.com>
 ---
- fs/dax.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ common/rc | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/fs/dax.c b/fs/dax.c
-index c22eaf162f95..42788d8505c7 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -856,8 +856,24 @@ int dax_writeback_mapping_range(struct address_space *mapping,
- 
- 			ret = dax_writeback_one(bdev, dax_dev, mapping,
- 					indices[i], pvec.pages[i]);
--			if (ret < 0)
-+			if (ret < 0) {
-+				/*
-+				 * For fs' that use errseq_t based error
-+				 * tracking, we must call mapping_set_error
-+				 * here to ensure that fsync on all open fds
-+				 * get back an error. Doing this with the old
-+				 * wb error tracking infrastructure is
-+				 * problematic though, as DAX writeback is
-+				 * synchronous, and the error flags are not
-+				 * cleared when initiation fails, only when
-+				 * it fails after the write has been submitted
-+				 * to the backing store.
-+				 */
-+				if (mapping->host->i_sb->s_type->fs_flags &
-+						FS_WB_ERRSEQ)
-+					mapping_set_error(mapping, ret);
- 				goto out;
-+			}
- 		}
- 	}
- out:
+diff --git a/common/rc b/common/rc
+index 391d36f373cd..83765aacfb06 100644
+--- a/common/rc
++++ b/common/rc
+@@ -832,7 +832,16 @@ _scratch_mkfs()
+ 		mkfs_cmd="$MKFS_BTRFS_PROG"
+ 		mkfs_filter="cat"
+ 		;;
+-	ext2|ext3)
++	ext3)
++		mkfs_cmd="$MKFS_PROG -t $FSTYP -- -F"
++		mkfs_filter="grep -v -e ^Warning: -e \"^mke2fs \""
++
++		# put journal on separate device?
++		[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
++		$mkfs_cmd -O journal_dev $SCRATCH_LOGDEV && \
++		mkfs_cmd="$mkfs_cmd -J device=$SCRATCH_LOGDEV"
++		;;
++	ext2)
+ 		mkfs_cmd="$MKFS_PROG -t $FSTYP -- -F"
+ 		mkfs_filter="grep -v -e ^Warning: -e \"^mke2fs \""
+ 		;;
 -- 
 2.9.4
