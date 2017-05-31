@@ -1,57 +1,60 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH 23/24] tmpfs: generate random sb->s_uuid
-Date: Wed, 31 May 2017 18:18:25 +0200
-Message-Id: <20170531161826.23243-24-hch@lst.de>
-In-Reply-To: <20170531161826.23243-1-hch@lst.de>
-References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:38216 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751038AbdEaMih (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 08:38:37 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 7/9] blk-mq: don't stop queue for quiescing
+Date: Wed, 31 May 2017 20:37:04 +0800
+Message-Id: <20170531123706.20885-8-ming.lei@redhat.com>
+In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
+References: <20170531123706.20885-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Amir Goldstein <amir73il@gmail.com>
+Queue can be started by other blk-mq APIs and can be used in
+different cases, this limits uses of blk_mq_quiesce_queue()
+if it is based on stopping queue, and make its usage very
+difficult, especially users have to use the stop queue APIs
+carefully for avoiding to break blk_mq_quiesce_queue().
 
-This is used by overlayfs to encode intrasystem unique file handles.
+We have applied the QUIESCED flag for draining and blocking
+dispatch, so it isn't necessary to stop queue any more.
 
-Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
-Cc: Hugh Dickins <hughd@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+After stopping queue is removed, blk_mq_quiesce_queue() can
+be used safely and easily, then users won't worry about queue
+restarting during quiescing at all.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- mm/shmem.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-mq.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/mm/shmem.c b/mm/shmem.c
-index e67d6ba4e98e..391f2dcca727 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -75,6 +75,7 @@ static struct vfsmount *shm_mnt;
- #include <uapi/linux/memfd.h>
- #include <linux/userfaultfd_k.h>
- #include <linux/rmap.h>
-+#include <linux/uuid.h>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1faddaf005e2..bcff1b184bbb 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -169,8 +169,6 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+ 	unsigned int i;
+ 	bool rcu = false;
  
- #include <linux/uaccess.h>
- #include <asm/pgtable.h>
-@@ -3761,6 +3762,7 @@ int shmem_fill_super(struct super_block *sb, void *data, int silent)
- #ifdef CONFIG_TMPFS_POSIX_ACL
- 	sb->s_flags |= MS_POSIXACL;
- #endif
-+	uuid_gen(&sb->s_uuid);
+-	__blk_mq_stop_hw_queues(q, true);
+-
+ 	spin_lock_irq(q->queue_lock);
+ 	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
+ 	spin_unlock_irq(q->queue_lock);
+@@ -199,8 +197,6 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+ 	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+ 	spin_unlock_irq(q->queue_lock);
  
- 	inode = shmem_get_inode(sb, NULL, S_IFDIR | sbinfo->mode, 0, VM_NORESERVE);
- 	if (!inode)
+-	blk_mq_start_stopped_hw_queues(q, true);
+-
+ 	wake_up_all(&q->quiesce_wq);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
 -- 
-2.11.0
+2.9.4
