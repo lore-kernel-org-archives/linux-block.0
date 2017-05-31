@@ -1,93 +1,46 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block changes for 4.12-rc3
-Message-ID: <c687e9f0-3d0b-db76-6c5d-56a5dc9f8792@kernel.dk>
-Date: Fri, 26 May 2017 12:03:30 -0600
+Return-Path: <jack@suse.cz>
+Date: Wed, 31 May 2017 10:51:37 +0200
+From: Jan Kara <jack@suse.cz>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+	jack@suse.com, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, axboe@kernel.dk,
+	linux-api@vger.kernel.org, adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 09/10] xfs: nowait aio support
+Message-ID: <20170531085137.GB14011@quack2.suse.cz>
+References: <20170524164150.9492-1-rgoldwyn@suse.de>
+ <20170524164150.9492-10-rgoldwyn@suse.de>
+ <20170528093113.GB14519@infradead.org>
+ <cfc1e7ad-f74b-a14a-ac30-8472f7f684af@suse.de>
+ <20170529083338.GC1899@infradead.org>
+ <f105d585-e88c-b037-9905-d0c608c609d9@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f105d585-e88c-b037-9905-d0c608c609d9@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On Tue 30-05-17 11:13:29, Goldwyn Rodrigues wrote:
+> > Btw, can you write a small blurb up for the man page to document these
+> > ѕemantics in man-page like language?
+> > 
+> 
+> Yes, but which man page would it belong to?
+> Should it be a subsection of errors in io_getevents/io_submit. We don't
+> want to add ERRORS to io_getevents() because it would be the return
+> value of the io_getevents call, and not the ones in the iocb structure.
+> Should it be a new man page, say for iocb(7/8)?
 
-A collection of fixes that should go into this series. This pull request
-contains:
+I think you should extend the manpage for io_submit(8). There you can add
+definition of struct iocb in 'DESCRIPTION' section explaining at least the
+most common fields. You can also explain there which flags can be passed
+and what are they intended to do.
 
-- A set of NVMe fixes, pulled from Christoph. This includes a set of
-  fixes for the fiber channel bits from James Smart, rdma queue depth
-  fix from Marta, controller removal fixes from Ming, and some more APST
-  quirk updates from Andy.
+You can also expand EAGAIN error description to specifically mention that
+in case of NOWAIT aio EAGAIN can be returned if io submission would block.
 
-- A blk-mq debugfs fix from Bart, fixing a problem with the untangling
-  of the sysfs and debugfs blk-mq bits that was added in this series.
-
-- Error code fix in add_partition() from Dan.
-
-- A small series of fixes for the new blk-throttle code from Shaohua.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Andy Lutomirski (1):
-      nvme: Quirk APST on Intel 600P/P3100 devices
-
-Bart Van Assche (1):
-      blk-mq: Only register debugfs attributes for blk-mq queues
-
-Christoph Hellwig (3):
-      nvme-pci: consistencly use ctrl->device for logging
-      nvme: replace is_flags field in nvme_ctrl_ops with a flags field
-      nvme: only setup block integrity if supported by the driver
-
-Dan Carpenter (1):
-      block: fix an error code in add_partition()
-
-James Smart (6):
-      nvme_fc: get rid of local reconnect_delay
-      nvme_fc: Support ctrl_loss_tmo
-      nvme_fc: revise comment on teardown
-      nvme_fc: set logging level on resets/deletes
-      nvme_fc: correct nvme status set on abort
-      nvme_fc: remove extra controller reference taken on reconnect
-
-Jens Axboe (1):
-      Merge branch 'nvme-4.12' of git://git.infradead.org/nvme into for-linus
-
-Marta Rybczynska (1):
-      nvme-rdma: support devices with queue size < 32
-
-Ming Lei (3):
-      nvme: use blk_mq_start_hw_queues() in nvme_kill_queues()
-      nvme: avoid to use blk_mq_abort_requeue_list()
-      blk-mq: remove blk_mq_abort_requeue_list()
-
-Richard (1):
-      partitions/msdos: FreeBSD UFS2 file systems are not recognized
-
-Shaohua Li (4):
-      blk-throttle: add hierarchy support for latency target and idle time
-      blk-throttle: output some debug info in trace
-      blk-throttle: respect 0 bps/iops settings for io.low
-      blk-throttle: force user to configure all settings for io.low
-
- block/blk-mq.c             |  19 -----
- block/blk-sysfs.c          |   6 +-
- block/blk-throttle.c       | 172 ++++++++++++++++++++++++++++-----------------
- block/partition-generic.c  |   4 +-
- block/partitions/msdos.c   |   2 +
- drivers/nvme/host/core.c   |  65 +++++++++++------
- drivers/nvme/host/fc.c     | 147 ++++++++++++++++----------------------
- drivers/nvme/host/nvme.h   |   4 +-
- drivers/nvme/host/pci.c    |  15 ++--
- drivers/nvme/host/rdma.c   |  20 ++++--
- drivers/nvme/target/loop.c |   2 +-
- include/linux/blk-mq.h     |   1 -
- 12 files changed, 247 insertions(+), 210 deletions(-)
-
+								Honza
 -- 
-Jens Axboe
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
