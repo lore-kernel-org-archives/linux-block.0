@@ -1,53 +1,49 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 24/24] MAINTAINERS: add uuid entry
-Date: Wed, 31 May 2017 18:18:26 +0200
-Message-Id: <20170531161826.23243-25-hch@lst.de>
-In-Reply-To: <20170531161826.23243-1-hch@lst.de>
-References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
+Subject: [PATCH v2 3/6] bsg: Check queue type before attaching to a queue
+Date: Wed, 31 May 2017 14:43:47 -0700
+Message-ID: <20170531214350.31157-4-bart.vanassche@sandisk.com>
+In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-I'll keep maintaining whatever little changed we need here, with Andy as
-my designated reviewer.
+Since BSG only supports request queues for which struct scsi_request
+is the first member of their private request data, refuse to register
+block layer queues for which struct scsi_request is not the first
+member of their private data.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+References: commit bd1599d931ca ("scsi_transport_sas: fix BSG ioctl memory corruption")
+References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Omar Sandoval <osandov@fb.com>
 ---
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/bsg.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 053c3bdd1fe5..660c14729205 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13463,6 +13463,17 @@ W:	http://en.wikipedia.org/wiki/Util-linux
- T:	git git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git
- S:	Maintained
- 
-+UUID HELPERS
-+M:	Christoph Hellwig <hch@lst.de>
-+R:	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-+L:	linux-kernel@vger.kernel.org
-+T:	git git://git.infradead.org/users/hch/uuid.git
-+F:	lib/uuid.c
-+F:	lib/test_uuid.c
-+F:	include/linux/uuid.h
-+F:	include/uapi/linux/uuid.h
-+S:	Maintained
+diff --git a/block/bsg.c b/block/bsg.c
+index 6fd08544d77e..40db8ff4c618 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -750,6 +750,12 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
+ #ifdef BSG_DEBUG
+ 	unsigned char buf[32];
+ #endif
 +
- UVESAFB DRIVER
- M:	Michal Januszewski <spock@gentoo.org>
- L:	linux-fbdev@vger.kernel.org
++	if (!blk_queue_scsi_passthrough(rq)) {
++		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
++		return ERR_PTR(-EINVAL);
++	}
++
+ 	if (!blk_get_queue(rq))
+ 		return ERR_PTR(-ENXIO);
+ 
 -- 
-2.11.0
+2.12.2
