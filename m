@@ -1,10 +1,11 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 31 May 2017 21:39:48 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Christoph Hellwig <hch@lst.de>,
+Message-ID: <1496254594.28981.37.camel@linux.intel.com>
+Subject: Re: [PATCH 15/24] block: remove blk_part_pack_uuid
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Christoph Hellwig <hch@lst.de>,
         Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
         Dan Williams <dan.j.williams@intel.com>,
         David Howells <dhowells@redhat.com>,
         Steven Whitehouse <swhiteho@redhat.com>,
@@ -12,28 +13,28 @@ Cc: Christoph Hellwig <hch@lst.de>,
         linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH 15/24] block: remove blk_part_pack_uuid
-Message-ID: <20170531193948.GB6906@lst.de>
-References: <20170531161826.23243-1-hch@lst.de> <20170531161826.23243-16-hch@lst.de> <1496254594.28981.37.camel@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1496254594.28981.37.camel@linux.intel.com>
+Date: Wed, 31 May 2017 21:16:34 +0300
+In-Reply-To: <20170531161826.23243-16-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+         <20170531161826.23243-16-hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 31, 2017 at 09:16:34PM +0300, Andy Shevchenko wrote:
-> On Wed, 2017-05-31 at 18:18 +0200, Christoph Hellwig wrote:
-> > This helper was only used by IMA of all things, which would get
-> > spurious
-> > errors if CONFIG_BLOCK is disabled.��Just opencode the call there.
-> 
-> > -			result = blk_part_pack_uuid(args[0].from,
-> > -						����entry->fsuuid);
-> > +			result = uuid_to_bin(args[0].from, (uuid_t
-> > *)&entry->fsuuid);
-> > 
-> 
-> uuid_parse() ?
+On Wed, 2017-05-31 at 18:18 +0200, Christoph Hellwig wrote:
+> This helper was only used by IMA of all things, which would get
+> spurious
+> errors if CONFIG_BLOCK is disabled.  Just opencode the call there.
 
-Yes.  I fixed this up, but it seems like I didn't squash it into
-the right patch..
+> -			result = blk_part_pack_uuid(args[0].from,
+> -						    entry->fsuuid);
+> +			result = uuid_to_bin(args[0].from, (uuid_t
+> *)&entry->fsuuid);
+> 
+
+uuid_parse() ?
+
+-- 
+Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Intel Finland Oy
