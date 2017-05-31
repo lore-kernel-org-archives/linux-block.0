@@ -1,40 +1,143 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f193.google.com ([209.85.216.193]:35332 "EHLO
-        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751746AbdEWKil (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 06:38:41 -0400
-Received: by mail-qt0-f193.google.com with SMTP id r58so21610237qtb.2
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2017 03:38:41 -0700 (PDT)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: Josef Bacik <jbacik@fb.com>
-Cc: nbd-general@lists.sourceforge.net, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH] nbd: don't leak nbd_config
-Date: Tue, 23 May 2017 12:38:31 +0200
-Message-Id: <1495535911-29036-1-git-send-email-idryomov@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net
+Cc: linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v5 13/17] jbd2: conditionally handle errors using errseq_t based on FS_WB_ERRSEQ flag
+Date: Wed, 31 May 2017 08:45:36 -0400
+Message-Id: <20170531124540.8782-14-jlayton@redhat.com>
+In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
+References: <20170531124540.8782-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-nbd_config is allocated in nbd_alloc_config(), but never freed.
+Grab the current mapping->wb_err when linking a transaction to the list
+and stash it in the journal inode. Then we can use that as a "since"
+value when committing it to ensure that there were no writeback errors
+since the transaction was started.
 
-Fixes: 5ea8d10802ec ("nbd: separate out the config information")
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+We do still need to perform old-style error handling too for now in
+journal_finish_inode_data_buffers. jbd2 is shared infrastructure between
+several filesystems. Eventually we should be able to remove the flag check
+and simplify this function again.
+
+For journal recovery, sample the wb_err early on and then pass that as
+the since value to sync_blockdev_since.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/block/nbd.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/jbd2/commit.c      | 29 +++++++++++++++++++----------
+ fs/jbd2/recovery.c    |  5 +++--
+ fs/jbd2/transaction.c |  1 +
+ include/linux/jbd2.h  |  3 +++
+ 4 files changed, 26 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9a7bb2c29447..882fb9efbab1 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -940,6 +940,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
- /* Reset all properties of an NBD device */
- static void nbd_reset(struct nbd_device *nbd)
+diff --git a/fs/jbd2/commit.c b/fs/jbd2/commit.c
+index b6b194ec1b4f..aea71e4bc9be 100644
+--- a/fs/jbd2/commit.c
++++ b/fs/jbd2/commit.c
+@@ -259,21 +259,30 @@ static int journal_finish_inode_data_buffers(journal_t *journal,
+ 	/* For locking, see the comment in journal_submit_data_buffers() */
+ 	spin_lock(&journal->j_list_lock);
+ 	list_for_each_entry(jinode, &commit_transaction->t_inode_list, i_list) {
++		struct inode *inode = jinode->i_vfs_inode;
++
+ 		if (!(jinode->i_flags & JI_WAIT_DATA))
+ 			continue;
+ 		jinode->i_flags |= JI_COMMIT_RUNNING;
+ 		spin_unlock(&journal->j_list_lock);
+-		err = filemap_fdatawait(jinode->i_vfs_inode->i_mapping);
+-		if (err) {
+-			/*
+-			 * Because AS_EIO is cleared by
+-			 * filemap_fdatawait_range(), set it again so
+-			 * that user process can get -EIO from fsync().
+-			 */
+-			mapping_set_error(jinode->i_vfs_inode->i_mapping, -EIO);
+-
+-			if (!ret)
++		if (inode->i_sb->s_type->fs_flags & FS_WB_ERRSEQ) {
++			err = filemap_fdatawait_since(inode->i_mapping,
++					jinode->i_since);
++			if (err && !ret)
+ 				ret = err;
++		} else {
++			err = filemap_fdatawait(inode->i_mapping);
++			if (err) {
++				/*
++				 * Because AS_EIO is cleared by
++				 * filemap_fdatawait_range(), we must set it again so
++				 * that user process can get -EIO from fsync() if
++				 * non-errseq_t based error tracking is in play.
++				 */
++				mapping_set_error(inode->i_mapping, -EIO);
++				if (!ret)
++					ret = err;
++			}
+ 		}
+ 		spin_lock(&journal->j_list_lock);
+ 		jinode->i_flags &= ~JI_COMMIT_RUNNING;
+diff --git a/fs/jbd2/recovery.c b/fs/jbd2/recovery.c
+index 02dd3360cb20..06a8ee71848c 100644
+--- a/fs/jbd2/recovery.c
++++ b/fs/jbd2/recovery.c
+@@ -248,11 +248,12 @@ int jbd2_journal_recover(journal_t *journal)
  {
-+	kfree(nbd->config);
- 	nbd->config = NULL;
- 	nbd->tag_set.timeout = 0;
- 	queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, nbd->disk->queue);
+ 	int			err, err2;
+ 	journal_superblock_t *	sb;
+-
+ 	struct recovery_info	info;
++	errseq_t		since;
+ 
+ 	memset(&info, 0, sizeof(info));
+ 	sb = journal->j_superblock;
++	since = filemap_sample_wb_err(journal->j_fs_dev->bd_inode->i_mapping);
+ 
+ 	/*
+ 	 * The journal superblock's s_start field (the current log head)
+@@ -284,7 +285,7 @@ int jbd2_journal_recover(journal_t *journal)
+ 	journal->j_transaction_sequence = ++info.end_transaction;
+ 
+ 	jbd2_journal_clear_revoke(journal);
+-	err2 = sync_blockdev(journal->j_fs_dev);
++	err2 = sync_blockdev_since(journal->j_fs_dev, since);
+ 	if (!err)
+ 		err = err2;
+ 	/* Make sure all replayed data is on permanent storage */
+diff --git a/fs/jbd2/transaction.c b/fs/jbd2/transaction.c
+index 9ee4832b6f8b..e9e6af20a087 100644
+--- a/fs/jbd2/transaction.c
++++ b/fs/jbd2/transaction.c
+@@ -2535,6 +2535,7 @@ static int jbd2_journal_file_inode(handle_t *handle, struct jbd2_inode *jinode,
+ 	/* Not on any transaction list... */
+ 	J_ASSERT(!jinode->i_next_transaction);
+ 	jinode->i_transaction = transaction;
++	jinode->i_since = filemap_sample_wb_err(jinode->i_vfs_inode->i_mapping);
+ 	list_add(&jinode->i_list, &transaction->t_inode_list);
+ done:
+ 	spin_unlock(&journal->j_list_lock);
+diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
+index 606b6bce3a5b..b6901eac2d8e 100644
+--- a/include/linux/jbd2.h
++++ b/include/linux/jbd2.h
+@@ -439,6 +439,9 @@ struct jbd2_inode {
+ 
+ 	/* Flags of inode [j_list_lock] */
+ 	unsigned long i_flags;
++
++	/* Sampled writeback error at the time of transaction start */
++	errseq_t i_since;
+ };
+ 
+ struct jbd2_revoke_table_s;
 -- 
-2.4.3
+2.9.4
