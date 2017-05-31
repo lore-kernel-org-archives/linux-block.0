@@ -1,62 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43546 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S937011AbdEZDIj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 23:08:39 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH 5/6] blk-mq: don't stop queue for quiescing
-Date: Fri, 26 May 2017 11:07:38 +0800
-Message-Id: <20170526030740.26959-6-ming.lei@redhat.com>
-In-Reply-To: <20170526030740.26959-1-ming.lei@redhat.com>
-References: <20170526030740.26959-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, "J . Bruce Fields"
+	<bfields@fieldses.org>, Jeff Layton <jlayton@poochiereds.net>, Omar Sandoval
+	<osandov@fb.com>, <linux-nfs@vger.kernel.org>
+Subject: [PATCH v2 6/6] nfsd: Check queue type before submitting a SCSI request
+Date: Wed, 31 May 2017 14:43:50 -0700
+Message-ID: <20170531214350.31157-7-bart.vanassche@sandisk.com>
+In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-Now we use the QUIESCED flag to drain & block dispatching,
-not necessary to stop queue any more.
+Since using scsi_req() is only allowed against request queues for
+which struct scsi_request is the first member of their private
+request data, refuse to submit SCSI commands against a queue for
+which this is not the case.
 
-Also queue can be started by other blk-mq APIs, this limits
-uses of blk_mq_quiesce_queue().
-
-Now blk_mq_quiesce_queue() can be used safely and users won't
-worry about queue restart during quiescing.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: J. Bruce Fields <bfields@fieldses.org>
+Cc: Jeff Layton <jlayton@poochiereds.net>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: linux-nfs@vger.kernel.org
 ---
- block/blk-mq.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ fs/nfsd/blocklayout.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e1fc9ab50c87..900eb91e0ece 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -168,8 +168,6 @@ void blk_mq_quiesce_queue(struct request_queue *q)
- 	unsigned int i;
- 	bool rcu = false;
+diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
+index fb5213afc854..47ed19c53f2e 100644
+--- a/fs/nfsd/blocklayout.c
++++ b/fs/nfsd/blocklayout.c
+@@ -219,6 +219,9 @@ static int nfsd4_scsi_identify_device(struct block_device *bdev,
+ 	u8 *buf, *d, type, assoc;
+ 	int error;
  
--	__blk_mq_stop_hw_queues(q, true);
--
- 	spin_lock_irq(q->queue_lock);
- 	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
- 	spin_unlock_irq(q->queue_lock);
-@@ -198,7 +196,12 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
- 	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
- 	spin_unlock_irq(q->queue_lock);
- 
--	blk_mq_start_stopped_hw_queues(q, true);
-+	/*
-+	 * During quiescing, requests can be inserted
-+	 * to scheduler queue or sw queue, so we run
-+	 * queues for dispatching these requests.
-+	 */
-+	blk_mq_start_hw_queues(q);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
- 
++	if (WARN_ON_ONCE(!blk_queue_scsi_passthrough(q)))
++		return -EINVAL;
++
+ 	buf = kzalloc(bufflen, GFP_KERNEL);
+ 	if (!buf)
+ 		return -ENOMEM;
 -- 
-2.9.4
+2.12.2
