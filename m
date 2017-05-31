@@ -1,76 +1,59 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 20/22] scsi_debug: switch to uuid_t
-Date: Sun, 28 May 2017 13:20:06 +0300
-Message-Id: <20170528102008.30276-21-hch@lst.de>
-In-Reply-To: <20170528102008.30276-1-hch@lst.de>
-References: <20170528102008.30276-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:36466 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751022AbdEaMir (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 08:38:47 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 8/9] blk-mq: clarify dispatch may not be drained/blocked by stopping queue
+Date: Wed, 31 May 2017 20:37:05 +0800
+Message-Id: <20170531123706.20885-9-ming.lei@redhat.com>
+In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
+References: <20170531123706.20885-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+BLK_MQ_S_STOPPED may not be observed in other concurrent I/O paths,
+we can't guarantee that dispatching won't happen after returning
+from the APIs of stopping queue.
+
+So clarify the fact and avoid potential misuse.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/scsi_debug.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ block/blk-mq.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 17249c3650fe..35ee09644cfb 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -245,7 +245,7 @@ struct sdebug_dev_info {
- 	unsigned int channel;
- 	unsigned int target;
- 	u64 lun;
--	uuid_be lu_name;
-+	uuid_t lu_name;
- 	struct sdebug_host_info *sdbg_host;
- 	unsigned long uas_bm[1];
- 	atomic_t num_in_q;
-@@ -965,7 +965,7 @@ static const u64 naa3_comp_c = 0x3111111000000000ULL;
- static int inquiry_vpd_83(unsigned char *arr, int port_group_id,
- 			  int target_dev_id, int dev_id_num,
- 			  const char *dev_id_str, int dev_id_str_len,
--			  const uuid_be *lu_name)
-+			  const uuid_t *lu_name)
- {
- 	int num, port_a;
- 	char b[32];
-@@ -3568,7 +3568,7 @@ static void sdebug_q_cmd_wq_complete(struct work_struct *work)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bcff1b184bbb..352aaaf0bcf9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1187,6 +1187,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+ 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
  }
  
- static bool got_shared_uuid;
--static uuid_be shared_uuid;
-+static uuid_t shared_uuid;
++/*
++ * We do not guarantee that dispatch can be drained or blocked
++ * after blk_mq_stop_hw_queue() returns. Please use
++ * blk_mq_quiesce_queue() for that requirement.
++ */
+ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ {
+ 	__blk_mq_stop_hw_queue(hctx, false);
+@@ -1202,6 +1207,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+ 		__blk_mq_stop_hw_queue(hctx, sync);
+ }
  
- static struct sdebug_dev_info *sdebug_device_create(
- 			struct sdebug_host_info *sdbg_host, gfp_t flags)
-@@ -3578,12 +3578,12 @@ static struct sdebug_dev_info *sdebug_device_create(
- 	devip = kzalloc(sizeof(*devip), flags);
- 	if (devip) {
- 		if (sdebug_uuid_ctl == 1)
--			uuid_be_gen(&devip->lu_name);
-+			uuid_gen(&devip->lu_name);
- 		else if (sdebug_uuid_ctl == 2) {
- 			if (got_shared_uuid)
- 				devip->lu_name = shared_uuid;
- 			else {
--				uuid_be_gen(&shared_uuid);
-+				uuid_gen(&shared_uuid);
- 				got_shared_uuid = true;
- 				devip->lu_name = shared_uuid;
- 			}
++/*
++ * We do not guarantee that dispatch can be drained or blocked
++ * after blk_mq_stop_hw_queues() returns. Please use
++ * blk_mq_quiesce_queue() for that requirement.
++ */
+ void blk_mq_stop_hw_queues(struct request_queue *q)
+ {
+ 	__blk_mq_stop_hw_queues(q, false);
 -- 
-2.11.0
+2.9.4
