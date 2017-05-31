@@ -1,87 +1,64 @@
 Return-Path: <jlayton@redhat.com>
 From: Jeff Layton <jlayton@redhat.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	linux-f2fs-devel@lists.sourceforge.net,
-	v9fs-developer@lists.sourceforge.net,
-	linux-nilfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: dhowells@redhat.com,
-	akpm@linux-foundation.org,
-	hch@infradead.org,
-	ross.zwisler@linux.intel.com,
-	mawilcox@microsoft.com,
-	jack@suse.com,
-	viro@zeniv.linux.org.uk,
-	corbet@lwn.net,
-	neilb@suse.de,
-	clm@fb.com,
+To: fstests@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
 	tytso@mit.edu,
 	axboe@kernel.dk,
-	josef@toxicpanda.com,
-	hubcap@omnibond.com,
-	rpeterso@redhat.com,
-	bo.li.liu@oracle.com
-Subject: [PATCH v4 16/27] fs: adapt sync_file_range to new reporting infrastructure
-Date: Tue,  9 May 2017 11:49:19 -0400
-Message-Id: <20170509154930.29524-17-jlayton@redhat.com>
-In-Reply-To: <20170509154930.29524-1-jlayton@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	dhowells@redhat.com,
+	linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [xfstests PATCH v3 0/5] add a test for reporting writeback errors across all fds on fsync
+Date: Wed, 31 May 2017 09:08:15 -0400
+Message-Id: <20170531130820.17634-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Since it returns errors in a way similar to fsync, have it use the same
-method for returning previously-reported writeback errors.
+This patchset is a companion to the Linux kernel patch series I recently
+posted with the cover letter:
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/sync.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+    [PATCH v5 00/17] fs: introduce new writeback error reporting and convert ext2 and ext4 to use it
 
-diff --git a/fs/sync.c b/fs/sync.c
-index 11ba023434b1..89a03b5252d2 100644
---- a/fs/sync.c
-+++ b/fs/sync.c
-@@ -271,8 +271,11 @@ SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
-  *
-  *
-  * SYNC_FILE_RANGE_WAIT_BEFORE and SYNC_FILE_RANGE_WAIT_AFTER will detect any
-- * I/O errors or ENOSPC conditions and will return those to the caller, after
-- * clearing the EIO and ENOSPC flags in the address_space.
-+ * error condition that occurred prior to or after writeback, and will return
-+ * that to the caller, while advancing the file's errseq_t cursor. Note that
-+ * any errors returned here may have occurred in an area of the file that is
-+ * not covered by the given range as most filesystems track writeback errors
-+ * on a per-address_space basis
-  *
-  * It should be noted that none of these operations write out the file's
-  * metadata.  So unless the application is strictly performing overwrites of
-@@ -282,7 +285,7 @@ SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
- SYSCALL_DEFINE4(sync_file_range, int, fd, loff_t, offset, loff_t, nbytes,
- 				unsigned int, flags)
- {
--	int ret;
-+	int ret, ret2;
- 	struct fd f;
- 	struct address_space *mapping;
- 	loff_t endbyte;			/* inclusive */
-@@ -356,7 +359,9 @@ SYSCALL_DEFINE4(sync_file_range, int, fd, loff_t, offset, loff_t, nbytes,
- 
- 	if (flags & SYNC_FILE_RANGE_WAIT_AFTER)
- 		ret = filemap_fdatawait_range(mapping, offset, endbyte);
--
-+	ret2 = filemap_report_wb_error(f.file);
-+	if (!ret)
-+		ret = ret2;
- out_put:
- 	fdput(f);
- out:
+That patchset adds a new userland-visible change to report errors on
+all open file descriptions when there is an error on fsync, not just
+the first one to race in.
+
+Note that this set contains a patch to emulate $SCRATCH_LOGDEV on btrfs,
+but the kernel patches for that are not quite ready yet. The test did
+pass on btrfs in an earlier incarnation of the set, however.
+
+Jeff Layton (5):
+  generic: add a writeback error handling test
+  ext4: allow ext4 to use $SCRATCH_LOGDEV
+  generic: test writeback error handling on dmerror devices
+  ext3: allow it to put journal on a separate device when doing
+    scratch_mkfs
+  btrfs: allow it to use $SCRATCH_LOGDEV
+
+ common/dmerror             |  13 ++--
+ common/rc                  |  16 ++++-
+ doc/auxiliary-programs.txt |   8 +++
+ src/Makefile               |   2 +-
+ src/fsync-err.c            | 161 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/generic/998          |  64 ++++++++++++++++++
+ tests/generic/998.out      |   2 +
+ tests/generic/999          |  76 +++++++++++++++++++++
+ tests/generic/999.out      |   3 +
+ tests/generic/group        |   2 +
+ tools/dmerror              |  44 +++++++++++++
+ 11 files changed, 384 insertions(+), 7 deletions(-)
+ create mode 100644 src/fsync-err.c
+ create mode 100755 tests/generic/998
+ create mode 100644 tests/generic/998.out
+ create mode 100755 tests/generic/999
+ create mode 100644 tests/generic/999.out
+ create mode 100755 tools/dmerror
+
 -- 
-2.9.3
+2.9.4
