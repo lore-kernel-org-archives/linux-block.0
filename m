@@ -1,121 +1,62 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>
-Subject: [PATCH v2 04/12] block: Change argument type of scsi_req_init()
-Date: Wed, 31 May 2017 15:52:38 -0700
-Message-ID: <20170531225246.26261-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-References: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 02/24] xfs: use uuid_copy() helper to abstract uuid_t
+Date: Wed, 31 May 2017 18:18:04 +0200
+Message-Id: <20170531161826.23243-3-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Since scsi_req_init() works on a struct scsi_request, change the
-argument type into struct scsi_request *.
+From: Amir Goldstein <amir73il@gmail.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+uuid_t definition is about to change.
+
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Brian Foster <bfoster@redhat.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- block/scsi_ioctl.c                | 10 +++++++---
- drivers/ide/ide-atapi.c           |  2 +-
- drivers/ide/ide-probe.c           |  2 +-
- drivers/scsi/scsi_lib.c           |  4 +++-
- drivers/scsi/scsi_transport_sas.c |  2 +-
- include/scsi/scsi_request.h       |  2 +-
- 6 files changed, 14 insertions(+), 8 deletions(-)
+ fs/xfs/xfs_inode_item.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index f96c51f5df40..7440de44dd85 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -741,10 +741,14 @@ int scsi_cmd_blk_ioctl(struct block_device *bd, fmode_t mode,
- }
- EXPORT_SYMBOL(scsi_cmd_blk_ioctl);
- 
--void scsi_req_init(struct request *rq)
-+/**
-+ * scsi_req_init - initialize certain fields of a scsi_request structure
-+ * @req: Pointer to a scsi_request structure.
-+ * Initializes .__cmd[], .cmd, .cmd_len and .sense_len but no other members
-+ * of struct scsi_request.
-+ */
-+void scsi_req_init(struct scsi_request *req)
- {
--	struct scsi_request *req = scsi_req(rq);
--
- 	memset(req->__cmd, 0, sizeof(req->__cmd));
- 	req->cmd = req->__cmd;
- 	req->cmd_len = BLK_MAX_CDB;
-diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
-index 98e78b520417..5ffecef8b910 100644
---- a/drivers/ide/ide-atapi.c
-+++ b/drivers/ide/ide-atapi.c
-@@ -199,7 +199,7 @@ void ide_prep_sense(ide_drive_t *drive, struct request *rq)
- 	memset(sense, 0, sizeof(*sense));
- 
- 	blk_rq_init(rq->q, sense_rq);
--	scsi_req_init(sense_rq);
-+	scsi_req_init(req);
- 
- 	err = blk_rq_map_kern(drive->queue, sense_rq, sense, sense_len,
- 			      GFP_NOIO);
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index c60e5ffc9231..01b2adfd8226 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -745,7 +745,7 @@ static void ide_initialize_rq(struct request *rq)
- {
- 	struct ide_request *req = blk_mq_rq_to_pdu(rq);
- 
--	scsi_req_init(rq);
-+	scsi_req_init(&req->sreq);
- 	req->sreq.sense = req->sense;
- }
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e96ffd187558..b629d8cbf0d1 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1136,7 +1136,9 @@ EXPORT_SYMBOL(scsi_init_io);
- /* Called from inside blk_get_request() */
- static void scsi_initialize_rq(struct request *rq)
- {
--	scsi_req_init(rq);
-+	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
-+
-+	scsi_req_init(&cmd->req);
- }
- 
- /* Called after a request has been started. */
-diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
-index f5449da6fcad..35598905d785 100644
---- a/drivers/scsi/scsi_transport_sas.c
-+++ b/drivers/scsi/scsi_transport_sas.c
-@@ -215,7 +215,7 @@ static void sas_host_release(struct device *dev)
- 
- static void sas_initialize_rq(struct request *rq)
- {
--	scsi_req_init(rq);
-+	scsi_req_init(scsi_req(rq));
- }
- 
- static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
-diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
-index f0c76f9dc285..e0afa445ee4e 100644
---- a/include/scsi/scsi_request.h
-+++ b/include/scsi/scsi_request.h
-@@ -27,6 +27,6 @@ static inline void scsi_req_free_cmd(struct scsi_request *req)
- 		kfree(req->cmd);
- }
- 
--void scsi_req_init(struct request *);
-+void scsi_req_init(struct scsi_request *req);
- 
- #endif /* _SCSI_SCSI_REQUEST_H */
+diff --git a/fs/xfs/xfs_inode_item.c b/fs/xfs/xfs_inode_item.c
+index 08cb7d1a4a3a..013cc78d7daf 100644
+--- a/fs/xfs/xfs_inode_item.c
++++ b/fs/xfs/xfs_inode_item.c
+@@ -834,9 +834,7 @@ xfs_inode_item_format_convert(
+ 		in_f->ilf_dsize = in_f32->ilf_dsize;
+ 		in_f->ilf_ino = in_f32->ilf_ino;
+ 		/* copy biggest field of ilf_u */
+-		memcpy(in_f->ilf_u.ilfu_uuid.__u_bits,
+-		       in_f32->ilf_u.ilfu_uuid.__u_bits,
+-		       sizeof(uuid_t));
++		uuid_copy(&in_f->ilf_u.ilfu_uuid, &in_f32->ilf_u.ilfu_uuid);
+ 		in_f->ilf_blkno = in_f32->ilf_blkno;
+ 		in_f->ilf_len = in_f32->ilf_len;
+ 		in_f->ilf_boffset = in_f32->ilf_boffset;
+@@ -851,9 +849,7 @@ xfs_inode_item_format_convert(
+ 		in_f->ilf_dsize = in_f64->ilf_dsize;
+ 		in_f->ilf_ino = in_f64->ilf_ino;
+ 		/* copy biggest field of ilf_u */
+-		memcpy(in_f->ilf_u.ilfu_uuid.__u_bits,
+-		       in_f64->ilf_u.ilfu_uuid.__u_bits,
+-		       sizeof(uuid_t));
++		uuid_copy(&in_f->ilf_u.ilfu_uuid, &in_f64->ilf_u.ilfu_uuid);
+ 		in_f->ilf_blkno = in_f64->ilf_blkno;
+ 		in_f->ilf_len = in_f64->ilf_len;
+ 		in_f->ilf_boffset = in_f64->ilf_boffset;
 -- 
-2.12.2
+2.11.0
