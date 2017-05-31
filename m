@@ -1,75 +1,57 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 3/4] blk-mq-debugfs: Show busy requests
-Date: Wed, 31 May 2017 14:30:49 -0700
-Message-ID: <20170531213050.30276-4-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531213050.30276-1-bart.vanassche@sandisk.com>
-References: <20170531213050.30276-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 18/24] overlayfs: use uuid_t instead of uuid_be
+Date: Wed, 31 May 2017 18:18:20 +0200
+Message-Id: <20170531161826.23243-19-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Requests that got stuck in a block driver are neither on
-blk_mq_ctx.rq_list nor on any hw dispatch queue. Make these
-visible in debugfs through the "busy" attribute.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- block/blk-mq-debugfs.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ fs/overlayfs/copy_up.c   | 2 +-
+ fs/overlayfs/overlayfs.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 8b06a12c1461..fa0f624dfccd 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -370,6 +370,31 @@ static const struct seq_operations hctx_dispatch_seq_ops = {
- 	.show	= blk_mq_debugfs_rq_show,
- };
+diff --git a/fs/overlayfs/copy_up.c b/fs/overlayfs/copy_up.c
+index 5b795873f7fa..2a67e8c13098 100644
+--- a/fs/overlayfs/copy_up.c
++++ b/fs/overlayfs/copy_up.c
+@@ -233,7 +233,7 @@ int ovl_set_attr(struct dentry *upperdentry, struct kstat *stat)
+ 	return err;
+ }
  
-+struct show_busy_params {
-+	struct seq_file		*m;
-+	struct blk_mq_hw_ctx	*hctx;
-+};
-+
-+static void hctx_show_busy(struct request *rq, void *data, bool reserved)
-+{
-+	const struct show_busy_params *params = data;
-+
-+	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
-+	    test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-+		__blk_mq_debugfs_rq_show(params->m,
-+					 list_entry_rq(&rq->queuelist));
-+}
-+
-+static int hctx_busy_show(void *data, struct seq_file *m)
-+{
-+	struct blk_mq_hw_ctx *hctx = data;
-+	struct show_busy_params params = { .m = m, .hctx = hctx };
-+
-+	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy, &params);
-+
-+	return 0;
-+}
-+
- static int hctx_ctx_map_show(void *data, struct seq_file *m)
+-static struct ovl_fh *ovl_encode_fh(struct dentry *lower, uuid_be *uuid)
++static struct ovl_fh *ovl_encode_fh(struct dentry *lower, uuid_t *uuid)
  {
- 	struct blk_mq_hw_ctx *hctx = data;
-@@ -705,6 +730,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"state", 0400, hctx_state_show},
- 	{"flags", 0400, hctx_flags_show},
- 	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
-+	{"busy", 0400, hctx_busy_show},
- 	{"ctx_map", 0400, hctx_ctx_map_show},
- 	{"tags", 0400, hctx_tags_show},
- 	{"tags_bitmap", 0400, hctx_tags_bitmap_show},
+ 	struct ovl_fh *fh;
+ 	int fh_type, fh_len, dwords;
+diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
+index caa36cb9c46d..cb0fc450419b 100644
+--- a/fs/overlayfs/overlayfs.h
++++ b/fs/overlayfs/overlayfs.h
+@@ -55,7 +55,7 @@ struct ovl_fh {
+ 	u8 len;		/* size of this header + size of fid */
+ 	u8 flags;	/* OVL_FH_FLAG_* */
+ 	u8 type;	/* fid_type of fid */
+-	uuid_be uuid;	/* uuid of filesystem */
++	uuid_t uuid;	/* uuid of filesystem */
+ 	u8 fid[0];	/* file identifier */
+ } __packed;
+ 
 -- 
-2.12.2
+2.11.0
