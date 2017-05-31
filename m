@@ -1,105 +1,134 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:28770 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750703AbdEARxn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2017 13:53:43 -0400
-From: damien.lemoal@wdc.com
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2 01/10] dm-table: Introduce DM_TARGET_ZONED_HM feature
-Date: Tue,  2 May 2017 02:53:05 +0900
-Message-Id: <20170501175314.10922-2-damien.lemoal@wdc.com>
-In-Reply-To: <20170501175314.10922-1-damien.lemoal@wdc.com>
-References: <20170501175314.10922-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net
+Cc: linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v5 15/17] fs: add a write_one_page_since
+Date: Wed, 31 May 2017 08:45:38 -0400
+Message-Id: <20170531124540.8782-16-jlayton@redhat.com>
+In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
+References: <20170531124540.8782-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+Allow filesystems to pass in an errseq_t for a since value.
 
-The target drivers currently available will not operate correctly if a
-table target maps onto a host-managed zoned block device.
-
-To avoid problems, this patch introduces the new feature flag
-DM_TARGET_ZONED_HM for a target driver to explicitly state that it
-supports host-managed zoned block devices. This feature is checked
-in dm_get_device() to prevent the addition to a table of a target
-mapping to a host-managed zoned block device if the target type does
-not have the feature enabled.
-
-Note that as host-aware zoned block devices are backward compatible
-with regular block devices, they can be used by any of the current
-target types. This new feature is thus restricted to host-managed
-zoned block devices.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/md/dm-table.c         | 23 +++++++++++++++++++++++
- include/linux/device-mapper.h |  6 ++++++
- 2 files changed, 29 insertions(+)
+ include/linux/mm.h  |  2 ++
+ mm/page-writeback.c | 53 +++++++++++++++++++++++++++++++++++++++++------------
+ 2 files changed, 43 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 3ad16d9..06d3b7b 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -388,6 +388,24 @@ dev_t dm_get_dev_t(const char *path)
- EXPORT_SYMBOL_GPL(dm_get_dev_t);
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index ca9c8b27cecb..c901d7313374 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -23,6 +23,7 @@
+ #include <linux/page_ext.h>
+ #include <linux/err.h>
+ #include <linux/page_ref.h>
++#include <linux/errseq.h>
  
- /*
-+ * Check if the target supports supports host-managed zoned block devices.
-+ */
-+static bool device_supported(struct dm_target *ti, struct dm_dev *dev)
-+{
-+	struct block_device *bdev = dev->bdev;
-+	char b[BDEVNAME_SIZE];
-+
-+	if (bdev_zoned_model(bdev) == BLK_ZONED_HM &&
-+	    !dm_target_zoned_hm(ti->type)) {
-+		DMWARN("%s: Unsupported host-managed zoned block device %s",
-+		       dm_device_name(ti->table->md), bdevname(bdev, b));
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+/*
-  * Add a device to the list, or just increment the usage count if
-  * it's already present.
-  */
-@@ -426,6 +444,11 @@ int dm_get_device(struct dm_target *ti, const char *path, fmode_t mode,
- 	}
- 	atomic_inc(&dd->count);
+ struct mempolicy;
+ struct anon_vma;
+@@ -2200,6 +2201,7 @@ extern int filemap_page_mkwrite(struct vm_fault *vmf);
  
-+	if (!device_supported(ti, dd->dm_dev)) {
-+		dm_put_device(ti, dd->dm_dev);
-+		return -ENOTSUPP;
-+	}
-+
- 	*result = dd->dm_dev;
- 	return 0;
+ /* mm/page-writeback.c */
+ int __must_check write_one_page(struct page *page);
++int __must_check write_one_page_since(struct page *page, errseq_t since);
+ void task_dirty_inc(struct task_struct *tsk);
+ 
+ /* readahead.c */
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index e369e8ea2a29..63058e35c60d 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2365,19 +2365,10 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
+ 	return ret;
  }
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index a7e6903..b3c2408 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -214,6 +214,12 @@ struct target_type {
- #define dm_target_is_wildcard(type)	((type)->features & DM_TARGET_WILDCARD)
+ 
+-/**
+- * write_one_page - write out a single page and wait on I/O
+- * @page: the page to write
+- *
+- * The page must be locked by the caller and will be unlocked upon return.
+- *
+- * Note that the mapping's AS_EIO/AS_ENOSPC flags will be cleared when this
+- * function returns.
+- */
+-int write_one_page(struct page *page)
++static int __write_one_page(struct page *page)
+ {
+ 	struct address_space *mapping = page->mapping;
+-	int ret = 0, ret2;
++	int ret;
+ 	struct writeback_control wbc = {
+ 		.sync_mode = WB_SYNC_ALL,
+ 		.nr_to_write = 1,
+@@ -2394,16 +2385,54 @@ int write_one_page(struct page *page)
+ 			wait_on_page_writeback(page);
+ 		put_page(page);
+ 	} else {
++		ret = 0;
+ 		unlock_page(page);
+ 	}
++	return ret;
++}
+ 
++/**
++ * write_one_page - write out a single page and wait on I/O
++ * @page: the page to write
++ *
++ * The page must be locked by the caller and will be unlocked upon return.
++ *
++ * Note that the mapping's AS_EIO/AS_ENOSPC flags will be cleared when this
++ * function returns.
++ */
++int write_one_page(struct page *page)
++{
++	int ret;
++
++	ret = __write_one_page(page);
+ 	if (!ret)
+-		ret = filemap_check_errors(mapping);
++		ret = filemap_check_errors(page->mapping);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(write_one_page);
  
  /*
-+ * Indicates that a target supports host-managed zoned block devices.
++ * write_one_page_since - write out a single page and wait on I/O
++ * @page: the page to write
++ * @since: previously sampled errseq_t
++ *
++ * The page must be locked by the caller and will be unlocked upon return.
++ *
++ * The caller should pass in a previously-sampled errseq_t. The mapping will
++ * be checked for errors since that point.
 + */
-+#define DM_TARGET_ZONED_HM		0x00000010
-+#define dm_target_zoned_hm(type)	((type)->features & DM_TARGET_ZONED_HM)
++int write_one_page_since(struct page *page, errseq_t since)
++{
++	int ret;
++
++	ret = __write_one_page(page);
++	if (!ret)
++		ret = filemap_check_wb_err(page->mapping, since);
++	return ret;
++}
++EXPORT_SYMBOL(write_one_page_since);
 +
 +/*
-  * Some targets need to be sent the same WRITE bio severals times so
-  * that they can send copies of it to different devices.  This function
-  * examines any supplied bio and returns the number of copies of it the
+  * For address_spaces which do not use buffers nor write back.
+  */
+ int __set_page_dirty_no_writeback(struct page *page)
 -- 
-2.9.3
+2.9.4
