@@ -1,130 +1,126 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Jan Kara <jack@suse.cz>,
-	<stable@vger.kernel.org>
-Subject: [PATCH v2 1/6] block: Avoid that blk_exit_rl() triggers a use-after-free
-Date: Wed, 31 May 2017 14:43:45 -0700
-Message-ID: <20170531214350.31157-2-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
-References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: fstests@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	dhowells@redhat.com,
+	linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [xfstests PATCH v3 3/5] generic: test writeback error handling on dmerror devices
+Date: Wed, 31 May 2017 09:08:18 -0400
+Message-Id: <20170531130820.17634-4-jlayton@redhat.com>
+In-Reply-To: <20170531130820.17634-1-jlayton@redhat.com>
+References: <20170531130820.17634-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Since the introduction of .init_rq_fn() and .exit_rq_fn() it is
-essential that the memory allocated for struct request_queue
-stays around until all blk_exit_rl() calls have finished. Hence
-make blk_init_rl() take a reference on struct request_queue.
+Ensure that we get an error back on all fds when a block device is
+open by multiple writers and writeback fails.
 
-This patch fixes the following crash:
-
-general protection fault: 0000 [#2] SMP
-CPU: 3 PID: 28 Comm: ksoftirqd/3 Tainted: G      D         4.12.0-rc2-dbg+ #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.0.0-prebuilt.qemu-project.org 04/01/2014
-task: ffff88013a108040 task.stack: ffffc9000071c000
-RIP: 0010:free_request_size+0x1a/0x30
-RSP: 0018:ffffc9000071fd38 EFLAGS: 00010202
-RAX: 6b6b6b6b6b6b6b6b RBX: ffff880067362a88 RCX: 0000000000000003
-RDX: ffff880067464178 RSI: ffff880067362a88 RDI: ffff880135ea4418
-RBP: ffffc9000071fd40 R08: 0000000000000000 R09: 0000000100180009
-R10: ffffc9000071fd38 R11: ffffffff81110800 R12: ffff88006752d3d8
-R13: ffff88006752d3d8 R14: ffff88013a108040 R15: 000000000000000a
-FS:  0000000000000000(0000) GS:ffff88013fd80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa8ec1edb00 CR3: 0000000138ee8000 CR4: 00000000001406e0
-Call Trace:
- mempool_destroy.part.10+0x21/0x40
- mempool_destroy+0xe/0x10
- blk_exit_rl+0x12/0x20
- blkg_free+0x4d/0xa0
- __blkg_release_rcu+0x59/0x170
- rcu_process_callbacks+0x260/0x4e0
- __do_softirq+0x116/0x250
- smpboot_thread_fn+0x123/0x1e0
- kthread+0x109/0x140
- ret_from_fork+0x31/0x40
-
-Fixes: commit e9c787e65c0c ("scsi: allocate scsi_cmnd structures as part of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>
-Cc: <stable@vger.kernel.org> # v4.11+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- block/blk-cgroup.c |  2 +-
- block/blk-core.c   | 10 ++++++++--
- block/blk-sysfs.c  |  2 +-
- block/blk.h        |  2 +-
- 4 files changed, 11 insertions(+), 5 deletions(-)
+ tests/generic/998     | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/generic/998.out |  2 ++
+ tests/generic/group   |  1 +
+ 3 files changed, 67 insertions(+)
+ create mode 100755 tests/generic/998
+ create mode 100644 tests/generic/998.out
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 7c2947128f58..0480892e97e5 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -74,7 +74,7 @@ static void blkg_free(struct blkcg_gq *blkg)
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
- 
- 	if (blkg->blkcg != &blkcg_root)
--		blk_exit_rl(&blkg->rl);
-+		blk_exit_rl(blkg->q, &blkg->rl);
- 
- 	blkg_rwstat_exit(&blkg->stat_ios);
- 	blkg_rwstat_exit(&blkg->stat_bytes);
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c7068520794b..a7421b772d0e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -648,13 +648,19 @@ int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 	if (!rl->rq_pool)
- 		return -ENOMEM;
- 
-+	if (rl != &q->root_rl)
-+		WARN_ON_ONCE(!blk_get_queue(q));
+diff --git a/tests/generic/998 b/tests/generic/998
+new file mode 100755
+index 000000000000..fbadb47507c2
+--- /dev/null
++++ b/tests/generic/998
+@@ -0,0 +1,64 @@
++#! /bin/bash
++# FS QA Test No. 998
++#
++# Test writeback error handling when writing to block devices via pagecache.
++# See src/fsync-err.c for details of what test actually does.
++#
++#-----------------------------------------------------------------------
++# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it would be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write the Free Software Foundation,
++# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#-----------------------------------------------------------------------
 +
- 	return 0;
- }
- 
--void blk_exit_rl(struct request_list *rl)
-+void blk_exit_rl(struct request_queue *q, struct request_list *rl)
- {
--	if (rl->rq_pool)
-+	if (rl->rq_pool) {
- 		mempool_destroy(rl->rq_pool);
-+		if (rl != &q->root_rl)
-+			blk_put_queue(q);
-+	}
- }
- 
- struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 712b018e9f54..283da7fbe034 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -809,7 +809,7 @@ static void blk_release_queue(struct kobject *kobj)
- 
- 	blk_free_queue_stats(q->stats);
- 
--	blk_exit_rl(&q->root_rl);
-+	blk_exit_rl(q, &q->root_rl);
- 
- 	if (q->queue_tags)
- 		__blk_queue_free_tags(q);
-diff --git a/block/blk.h b/block/blk.h
-index 2ed70228e44f..83c8e1100525 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -59,7 +59,7 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 		gfp_t gfp_mask);
--void blk_exit_rl(struct request_list *rl);
-+void blk_exit_rl(struct request_queue *q, struct request_list *rl);
- void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
- 			struct bio *bio);
- void blk_queue_bypass_start(struct request_queue *q);
++seq=`basename $0`
++seqres=$RESULT_DIR/$seq
++echo "QA output created by $seq"
++
++here=`pwd`
++tmp=/tmp/$$
++status=1    # failure is the default!
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++_cleanup()
++{
++    cd /
++    rm -rf $tmp.* $testdir
++    _dmerror_cleanup
++}
++
++# get standard environment, filters and checks
++. ./common/rc
++. ./common/filter
++. ./common/dmerror
++
++# real QA test starts here
++_supported_os Linux
++_require_scratch
++_require_logdev
++_require_dm_target error
++_require_test_program fsync-err
++
++rm -f $seqres.full
++
++$XFS_IO_PROG -d -c "pwrite -S 0x7c -b 1048576 0 $((64 * 1048576))" $SCRATCH_DEV >> $seqres.full
++_dmerror_init
++
++$here/src/fsync-err $DMERROR_DEV
++
++# success, all done
++_dmerror_load_working_table
++_dmerror_cleanup
++_scratch_mkfs > $seqres.full 2>&1
++status=0
++exit
+diff --git a/tests/generic/998.out b/tests/generic/998.out
+new file mode 100644
+index 000000000000..658c438820e2
+--- /dev/null
++++ b/tests/generic/998.out
+@@ -0,0 +1,2 @@
++QA output created by 998
++Test passed!
+diff --git a/tests/generic/group b/tests/generic/group
+index 39f7b14657f1..9fc384363ca7 100644
+--- a/tests/generic/group
++++ b/tests/generic/group
+@@ -440,4 +440,5 @@
+ 435 auto encrypt
+ 436 auto quick rw
+ 437 auto quick
++998 auto quick
+ 999 auto quick
 -- 
-2.12.2
+2.9.4
