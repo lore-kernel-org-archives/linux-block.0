@@ -1,73 +1,76 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net
-Cc: linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 09/17] block: convert to errseq_t based writeback error tracking
-Date: Wed, 31 May 2017 08:45:32 -0400
-Message-Id: <20170531124540.8782-10-jlayton@redhat.com>
-In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 22/24] scsi_debug: switch to uuid_t
+Date: Wed, 31 May 2017 18:18:24 +0200
+Message-Id: <20170531161826.23243-23-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Fairly straightforward conversion. In fsync, just use the file->f_wb_err
-value as a "since" value. At the end, call filemap_report_wb_err to
-advance the cursor in it.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- fs/block_dev.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ drivers/scsi/scsi_debug.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 4d62fe771587..0d5f849e2a18 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -622,11 +622,13 @@ int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
+diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+index 17249c3650fe..35ee09644cfb 100644
+--- a/drivers/scsi/scsi_debug.c
++++ b/drivers/scsi/scsi_debug.c
+@@ -245,7 +245,7 @@ struct sdebug_dev_info {
+ 	unsigned int channel;
+ 	unsigned int target;
+ 	u64 lun;
+-	uuid_be lu_name;
++	uuid_t lu_name;
+ 	struct sdebug_host_info *sdbg_host;
+ 	unsigned long uas_bm[1];
+ 	atomic_t num_in_q;
+@@ -965,7 +965,7 @@ static const u64 naa3_comp_c = 0x3111111000000000ULL;
+ static int inquiry_vpd_83(unsigned char *arr, int port_group_id,
+ 			  int target_dev_id, int dev_id_num,
+ 			  const char *dev_id_str, int dev_id_str_len,
+-			  const uuid_be *lu_name)
++			  const uuid_t *lu_name)
  {
- 	struct inode *bd_inode = bdev_file_inode(filp);
- 	struct block_device *bdev = I_BDEV(bd_inode);
--	int error;
-+	int error, wberr;
-+	errseq_t since = READ_ONCE(filp->f_wb_err);
- 	
--	error = filemap_write_and_wait_range(filp->f_mapping, start, end);
-+	error = filemap_write_and_wait_range_since(filp->f_mapping, start,
-+							end, since);
- 	if (error)
--		return error;
-+		goto out;
- 
- 	/*
- 	 * There is no need to serialise calls to blkdev_issue_flush with
-@@ -637,6 +639,10 @@ int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
- 	if (error == -EOPNOTSUPP)
- 		error = 0;
- 
-+out:
-+	wberr = filemap_report_wb_err(filp);
-+	if (!error)
-+		error = wberr;
- 	return error;
+ 	int num, port_a;
+ 	char b[32];
+@@ -3568,7 +3568,7 @@ static void sdebug_q_cmd_wq_complete(struct work_struct *work)
  }
- EXPORT_SYMBOL(blkdev_fsync);
-@@ -801,6 +807,7 @@ static struct file_system_type bd_type = {
- 	.name		= "bdev",
- 	.mount		= bd_mount,
- 	.kill_sb	= kill_anon_super,
-+	.fs_flags	= FS_WB_ERRSEQ,
- };
  
- struct super_block *blockdev_superblock __read_mostly;
+ static bool got_shared_uuid;
+-static uuid_be shared_uuid;
++static uuid_t shared_uuid;
+ 
+ static struct sdebug_dev_info *sdebug_device_create(
+ 			struct sdebug_host_info *sdbg_host, gfp_t flags)
+@@ -3578,12 +3578,12 @@ static struct sdebug_dev_info *sdebug_device_create(
+ 	devip = kzalloc(sizeof(*devip), flags);
+ 	if (devip) {
+ 		if (sdebug_uuid_ctl == 1)
+-			uuid_be_gen(&devip->lu_name);
++			uuid_gen(&devip->lu_name);
+ 		else if (sdebug_uuid_ctl == 2) {
+ 			if (got_shared_uuid)
+ 				devip->lu_name = shared_uuid;
+ 			else {
+-				uuid_be_gen(&shared_uuid);
++				uuid_gen(&shared_uuid);
+ 				got_shared_uuid = true;
+ 				devip->lu_name = shared_uuid;
+ 			}
 -- 
-2.9.4
+2.11.0
