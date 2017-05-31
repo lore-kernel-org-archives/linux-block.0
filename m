@@ -1,54 +1,55 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: fstests@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	dhowells@redhat.com,
-	linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [xfstests PATCH v3 5/5] btrfs: allow it to use $SCRATCH_LOGDEV
-Date: Wed, 31 May 2017 09:08:20 -0400
-Message-Id: <20170531130820.17634-6-jlayton@redhat.com>
-In-Reply-To: <20170531130820.17634-1-jlayton@redhat.com>
-References: <20170531130820.17634-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:50337 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751011AbdEaQT1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 12:19:27 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 07/24] nfsd: namespace-prefix uuid_parse
+Date: Wed, 31 May 2017 18:18:09 +0200
+Message-Id: <20170531161826.23243-8-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-With btrfs, we can't really put the log on a separate device. What we
-can do however is mirror the metadata across two devices and make the
-data striped across all devices. When we turn on dmerror then the
-metadata can fall back to using the other mirror while the data errors
-out.
-
-Note that the current incarnation of btrfs has a fixed 64k stripe
-width. If that ever changes or becomes settable, we may need to adjust
-the amount of data that the test program writes.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- common/rc | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/nfsd/export.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/common/rc b/common/rc
-index 83765aacfb06..078270451b53 100644
---- a/common/rc
-+++ b/common/rc
-@@ -830,6 +830,8 @@ _scratch_mkfs()
- 		;;
- 	btrfs)
- 		mkfs_cmd="$MKFS_BTRFS_PROG"
-+		[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
-+			mkfs_cmd="$mkfs_cmd -d raid0 -m raid1 $SCRATCH_LOGDEV"
- 		mkfs_filter="cat"
- 		;;
- 	ext3)
+diff --git a/fs/nfsd/export.c b/fs/nfsd/export.c
+index e71f11b1a180..3bc08c394a3f 100644
+--- a/fs/nfsd/export.c
++++ b/fs/nfsd/export.c
+@@ -486,7 +486,7 @@ secinfo_parse(char **mesg, char *buf, struct svc_export *exp) { return 0; }
+ #endif
+ 
+ static inline int
+-uuid_parse(char **mesg, char *buf, unsigned char **puuid)
++nfsd_uuid_parse(char **mesg, char *buf, unsigned char **puuid)
+ {
+ 	int len;
+ 
+@@ -586,7 +586,7 @@ static int svc_export_parse(struct cache_detail *cd, char *mesg, int mlen)
+ 			if (strcmp(buf, "fsloc") == 0)
+ 				err = fsloc_parse(&mesg, buf, &exp.ex_fslocs);
+ 			else if (strcmp(buf, "uuid") == 0)
+-				err = uuid_parse(&mesg, buf, &exp.ex_uuid);
++				err = nfsd_uuid_parse(&mesg, buf, &exp.ex_uuid);
+ 			else if (strcmp(buf, "secinfo") == 0)
+ 				err = secinfo_parse(&mesg, buf, &exp);
+ 			else
 -- 
-2.9.4
+2.11.0
