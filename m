@@ -1,156 +1,158 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 21/24] nvme: switch to uuid_t
-Date: Wed, 31 May 2017 18:18:23 +0200
-Message-Id: <20170531161826.23243-22-hch@lst.de>
-In-Reply-To: <20170531161826.23243-1-hch@lst.de>
-References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net
+Cc: linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v5 07/17] mm: add filemap_fdatawait_range_since and filemap_write_and_wait_range_since
+Date: Wed, 31 May 2017 08:45:30 -0400
+Message-Id: <20170531124540.8782-8-jlayton@redhat.com>
+In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
+References: <20170531124540.8782-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/nvme/host/fabrics.c | 8 ++++----
- drivers/nvme/host/fabrics.h | 2 +-
- drivers/nvme/host/fc.c      | 3 +--
- drivers/nvme/target/nvmet.h | 1 +
- include/linux/nvme-fc.h     | 3 +--
- include/linux/nvme.h        | 3 ++-
- 6 files changed, 10 insertions(+), 10 deletions(-)
+Add new filemap_*wait* variants that take a "since" value and return an
+error if one occurred since that sample point.
 
-diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
-index 990e6fb32a63..c190d7e36900 100644
---- a/drivers/nvme/host/fabrics.c
-+++ b/drivers/nvme/host/fabrics.c
-@@ -58,7 +58,7 @@ static struct nvmf_host *nvmf_host_add(const char *hostnqn)
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ include/linux/fs.h |  9 ++++++++
+ mm/filemap.c       | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+)
+
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 2f3bcf4eb73b..7d1bd3163d99 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2516,12 +2516,21 @@ extern int write_inode_now(struct inode *, int);
+ extern int filemap_fdatawrite(struct address_space *);
+ extern int filemap_flush(struct address_space *);
+ extern int filemap_fdatawait(struct address_space *);
++extern int filemap_fdatawait_since(struct address_space *, errseq_t);
+ extern void filemap_fdatawait_keep_errors(struct address_space *);
+ extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
+ 				   loff_t lend);
++extern int filemap_fdatawait_range_since(struct address_space *mapping,
++				   loff_t start_byte, loff_t end_byte,
++				   errseq_t since);
+ extern int filemap_write_and_wait(struct address_space *mapping);
++extern int filemap_write_and_wait_since(struct address_space *mapping,
++					errseq_t since);
+ extern int filemap_write_and_wait_range(struct address_space *mapping,
+ 				        loff_t lstart, loff_t lend);
++extern int filemap_write_and_wait_range_since(struct address_space *mapping,
++				   loff_t start_byte, loff_t end_byte,
++				   errseq_t since);
+ extern int __filemap_fdatawrite_range(struct address_space *mapping,
+ 				loff_t start, loff_t end, int sync_mode);
+ extern int filemap_fdatawrite_range(struct address_space *mapping,
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 97dc28f853fc..38a14dc825ad 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -431,6 +431,14 @@ int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
+ }
+ EXPORT_SYMBOL(filemap_fdatawait_range);
  
- 	kref_init(&host->ref);
- 	memcpy(host->nqn, hostnqn, NVMF_NQN_SIZE);
--	uuid_be_gen(&host->id);
-+	uuid_gen(&host->id);
- 
- 	list_add_tail(&host->list, &nvmf_hosts);
- out_unlock:
-@@ -75,7 +75,7 @@ static struct nvmf_host *nvmf_host_default(void)
- 		return NULL;
- 
- 	kref_init(&host->ref);
--	uuid_be_gen(&host->id);
-+	uuid_gen(&host->id);
- 	snprintf(host->nqn, NVMF_NQN_SIZE,
- 		"nqn.2014-08.org.nvmexpress:NVMf:uuid:%pUb", &host->id);
- 
-@@ -395,7 +395,7 @@ int nvmf_connect_admin_queue(struct nvme_ctrl *ctrl)
- 	if (!data)
- 		return -ENOMEM;
- 
--	memcpy(&data->hostid, &ctrl->opts->host->id, sizeof(uuid_be));
-+	uuid_copy(&data->hostid, &ctrl->opts->host->id);
- 	data->cntlid = cpu_to_le16(0xffff);
- 	strncpy(data->subsysnqn, ctrl->opts->subsysnqn, NVMF_NQN_SIZE);
- 	strncpy(data->hostnqn, ctrl->opts->host->nqn, NVMF_NQN_SIZE);
-@@ -454,7 +454,7 @@ int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid)
- 	if (!data)
- 		return -ENOMEM;
- 
--	memcpy(&data->hostid, &ctrl->opts->host->id, sizeof(uuid_be));
-+	uuid_copy(&data->hostid, &ctrl->opts->host->id);
- 	data->cntlid = cpu_to_le16(ctrl->cntlid);
- 	strncpy(data->subsysnqn, ctrl->opts->subsysnqn, NVMF_NQN_SIZE);
- 	strncpy(data->hostnqn, ctrl->opts->host->nqn, NVMF_NQN_SIZE);
-diff --git a/drivers/nvme/host/fabrics.h b/drivers/nvme/host/fabrics.h
-index f5a9c1fb186f..29be7600689d 100644
---- a/drivers/nvme/host/fabrics.h
-+++ b/drivers/nvme/host/fabrics.h
-@@ -36,7 +36,7 @@ struct nvmf_host {
- 	struct kref		ref;
- 	struct list_head	list;
- 	char			nqn[NVMF_NQN_SIZE];
--	uuid_be			id;
-+	uuid_t			id;
- };
- 
++int filemap_fdatawait_range_since(struct address_space *mapping, loff_t start_byte,
++				  loff_t end_byte, errseq_t since)
++{
++	__filemap_fdatawait_range(mapping, start_byte, end_byte);
++	return filemap_check_wb_err(mapping, since);
++}
++EXPORT_SYMBOL(filemap_fdatawait_range_since);
++
  /**
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 5b14cbefb724..96b983bb44bd 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -878,8 +878,7 @@ nvme_fc_connect_admin_queue(struct nvme_fc_ctrl *ctrl,
- 	assoc_rqst->assoc_cmd.sqsize = cpu_to_be16(qsize);
- 	/* Linux supports only Dynamic controllers */
- 	assoc_rqst->assoc_cmd.cntlid = cpu_to_be16(0xffff);
--	memcpy(&assoc_rqst->assoc_cmd.hostid, &ctrl->ctrl.opts->host->id,
--		min_t(size_t, FCNVME_ASSOC_HOSTID_LEN, sizeof(uuid_be)));
-+	uuid_copy(&assoc_rqst->assoc_cmd.hostid, &ctrl->ctrl.opts->host->id);
- 	strncpy(assoc_rqst->assoc_cmd.hostnqn, ctrl->ctrl.opts->host->nqn,
- 		min(FCNVME_ASSOC_HOSTNQN_LEN, NVMF_NQN_SIZE));
- 	strncpy(assoc_rqst->assoc_cmd.subnqn, ctrl->ctrl.opts->subsysnqn,
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index cfc5c7fb0ab7..8ff6e430b30a 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -21,6 +21,7 @@
- #include <linux/percpu-refcount.h>
- #include <linux/list.h>
- #include <linux/mutex.h>
-+#include <linux/uuid.h>
- #include <linux/nvme.h>
- #include <linux/configfs.h>
- #include <linux/rcupdate.h>
-diff --git a/include/linux/nvme-fc.h b/include/linux/nvme-fc.h
-index e997c4a49a88..bc711a10be05 100644
---- a/include/linux/nvme-fc.h
-+++ b/include/linux/nvme-fc.h
-@@ -177,7 +177,6 @@ struct fcnvme_lsdesc_rjt {
- };
+  * filemap_fdatawait_keep_errors - wait for writeback without clearing errors
+  * @mapping: address space structure to wait for
+@@ -476,6 +484,17 @@ int filemap_fdatawait(struct address_space *mapping)
+ }
+ EXPORT_SYMBOL(filemap_fdatawait);
  
++int filemap_fdatawait_since(struct address_space *mapping, errseq_t since)
++{
++	loff_t i_size = i_size_read(mapping->host);
++
++	if (i_size == 0)
++		return 0;
++
++	return filemap_fdatawait_range_since(mapping, 0, i_size - 1, since);
++}
++EXPORT_SYMBOL(filemap_fdatawait_since);
++
+ int filemap_write_and_wait(struct address_space *mapping)
+ {
+ 	int err = 0;
+@@ -501,6 +520,31 @@ int filemap_write_and_wait(struct address_space *mapping)
+ }
+ EXPORT_SYMBOL(filemap_write_and_wait);
  
--#define FCNVME_ASSOC_HOSTID_LEN		16
- #define FCNVME_ASSOC_HOSTNQN_LEN	256
- #define FCNVME_ASSOC_SUBNQN_LEN		256
++int filemap_write_and_wait_since(struct address_space *mapping, errseq_t since)
++{
++	int err = 0;
++
++	if ((!dax_mapping(mapping) && mapping->nrpages) ||
++	    (dax_mapping(mapping) && mapping->nrexceptional)) {
++		err = filemap_fdatawrite(mapping);
++		/*
++		 * Even if the above returned error, the pages may be
++		 * written partially (e.g. -ENOSPC), so we wait for it.
++		 * But the -EIO is special case, it may indicate the worst
++		 * thing (e.g. bug) happened, so we avoid waiting for it.
++		 */
++		if (err != -EIO) {
++			int err2 = filemap_fdatawait_since(mapping, since);
++			if (!err)
++				err = err2;
++		}
++	} else {
++		err = filemap_check_wb_err(mapping, since);
++	}
++	return err;
++}
++EXPORT_SYMBOL(filemap_write_and_wait_since);
++
+ /**
+  * filemap_write_and_wait_range - write out & wait on a file range
+  * @mapping:	the address_space for the pages
+@@ -535,6 +579,29 @@ int filemap_write_and_wait_range(struct address_space *mapping,
+ }
+ EXPORT_SYMBOL(filemap_write_and_wait_range);
  
-@@ -191,7 +190,7 @@ struct fcnvme_lsdesc_cr_assoc_cmd {
- 	__be16	cntlid;
- 	__be16	sqsize;
- 	__be32	rsvd52;
--	u8	hostid[FCNVME_ASSOC_HOSTID_LEN];
-+	uuid_t	hostid;
- 	u8	hostnqn[FCNVME_ASSOC_HOSTNQN_LEN];
- 	u8	subnqn[FCNVME_ASSOC_SUBNQN_LEN];
- 	u8	rsvd632[384];
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index b625bacf37ef..e400a69fa1d3 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -16,6 +16,7 @@
- #define _LINUX_NVME_H
- 
- #include <linux/types.h>
-+#include <linux/uuid.h>
- 
- /* NQN names in commands fields specified one size */
- #define NVMF_NQN_FIELD_LEN	256
-@@ -843,7 +844,7 @@ struct nvmf_connect_command {
- };
- 
- struct nvmf_connect_data {
--	__u8		hostid[16];
-+	uuid_t		hostid;
- 	__le16		cntlid;
- 	char		resv4[238];
- 	char		subsysnqn[NVMF_NQN_FIELD_LEN];
++int filemap_write_and_wait_range_since(struct address_space *mapping,
++				 loff_t lstart, loff_t lend, errseq_t since)
++{
++	int err = 0;
++
++	if ((!dax_mapping(mapping) && mapping->nrpages) ||
++	    (dax_mapping(mapping) && mapping->nrexceptional)) {
++		err = __filemap_fdatawrite_range(mapping, lstart, lend,
++						 WB_SYNC_ALL);
++		/* See comment of filemap_write_and_wait() */
++		if (err != -EIO) {
++			int err2 = filemap_fdatawait_range_since(mapping,
++						lstart, lend, since);
++			if (!err)
++				err = err2;
++		}
++	} else {
++		err = filemap_check_wb_err(mapping, since);
++	}
++	return err;
++}
++EXPORT_SYMBOL(filemap_write_and_wait_range_since);
++
+ void __filemap_set_wb_err(struct address_space *mapping, int err)
+ {
+ 	errseq_t eseq = __errseq_set(&mapping->wb_err, err);
 -- 
-2.11.0
+2.9.4
