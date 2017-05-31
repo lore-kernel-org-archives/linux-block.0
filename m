@@ -1,48 +1,27 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: cleanup UUID types V6
-Date: Wed, 31 May 2017 18:18:02 +0200
-Message-Id: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] cfq-iosched: fix the delay of cfq_group's vdisktime
+ under iops mode
+To: Hou Tao <houtao1@huawei.com>
+Cc: linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
+References: <1488975415-40417-1-git-send-email-houtao1@huawei.com>
+ <20170308140518.GE19740@quack2.suse.cz>
+ <dc6db873-1958-7812-bfea-5d9396c53818@huawei.com>
+ <23092e51-2ee6-fc0d-988b-6c540e4f8661@huawei.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8afa289d-4448-56bb-ae96-e1ddd40d2078@kernel.dk>
+Date: Wed, 31 May 2017 09:25:47 -0600
+MIME-Version: 1.0
+In-Reply-To: <23092e51-2ee6-fc0d-988b-6c540e4f8661@huawei.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On 05/30/2017 09:09 PM, Hou Tao wrote:
+> Hi Jens,
+> 
+> I didn't found the patch in your linux-block git tree and the vanilla git tree.
+> Maybe you have forgot this CFQ fix ?
 
-this series, which is a combined effort from Amir, Andy and me introduces
-new uuid_t and guid_t type names that are less confusing than the existing
-types, adds new helpers for them and starts switching the fs code over to
-it.  Andy has additional patches on top to convert many of the users
-that use char arrays for UUIDs and GUIDs to these (or rather a predecessor
-for now until updated).
+Looks like that did get missed, sorry about that. I've queued it up now.
 
-Changes since V5:
- - fix the AFS revert to respect endianess
- - rename uuid_to_bin to uuid_parse
-
-Changes since V4:
- - removed the patch to remove uuid_be for now
- - move the md patch to the front of the queue
- - remove the union for V1 uuids and provide accessors instead
- - new patch to set s_uuid for tmpfs
- - revert the patch that moved struct uuid_v1 from afs to the core
- - implement the fsid generation differently in XFS due to the
-   change above
- - add a MAINTAINERS entry
-
-Changes since V3:
- - stop exposing uuid_be/uuid_t to userspace
- - remove uuid_be entirely
-
-Changes since V2:
- - various cleanups
+-- 
+Jens Axboe
