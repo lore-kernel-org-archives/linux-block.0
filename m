@@ -1,126 +1,85 @@
 Return-Path: <jlayton@redhat.com>
 From: Jeff Layton <jlayton@redhat.com>
-To: fstests@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>,
+To: Andrew Morton <akpm@linux-foundation.org>,
 	Al Viro <viro@ZenIV.linux.org.uk>,
 	Jan Kara <jack@suse.cz>,
 	tytso@mit.edu,
 	axboe@kernel.dk,
 	mawilcox@microsoft.com,
 	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	dhowells@redhat.com,
-	linux-ext4@vger.kernel.org,
+	corbet@lwn.net
+Cc: linux-ext4@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-doc@vger.kernel.org
-Subject: [xfstests PATCH v3 3/5] generic: test writeback error handling on dmerror devices
-Date: Wed, 31 May 2017 09:08:18 -0400
-Message-Id: <20170531130820.17634-4-jlayton@redhat.com>
-In-Reply-To: <20170531130820.17634-1-jlayton@redhat.com>
-References: <20170531130820.17634-1-jlayton@redhat.com>
+Subject: [PATCH v5 08/17] dax: set errors in mapping when writeback fails
+Date: Wed, 31 May 2017 08:45:31 -0400
+Message-Id: <20170531124540.8782-9-jlayton@redhat.com>
+In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
+References: <20170531124540.8782-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Ensure that we get an error back on all fds when a block device is
-open by multiple writers and writeback fails.
+Jan's description for this patch is much better than mine, so I'm
+quoting it verbatim here:
+
+-----------------8<-----------------
+DAX currently doesn't set errors in the mapping when cache flushing
+fails in dax_writeback_mapping_range(). Since this function can get
+called only from fsync(2) or sync(2), this is actually as good as it can
+currently get since we correctly propagate the error up from
+dax_writeback_mapping_range() to filemap_fdatawrite()
+
+However, in the future better writeback error handling will enable us to
+properly report these errors on fsync(2) even if there are multiple file
+descriptors open against the file or if sync(2) gets called before
+fsync(2). So convert DAX to using standard error reporting through the
+mapping.
+-----------------8<-----------------
+
+For now, only do this when the FS_WB_ERRSEQ flag is set. The
+AS_EIO/AS_ENOSPC flags are not currently cleared in the older code when
+writeback initiation fails, only when we discover an error after waiting
+on writeback to complete, so we only want to do this with errseq_t based
+error handling to prevent seeing duplicate errors on fsync.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-and-Tested-by: Ross Zwisler <ross.zwisler@linux.intel.com>
 ---
- tests/generic/998     | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/generic/998.out |  2 ++
- tests/generic/group   |  1 +
- 3 files changed, 67 insertions(+)
- create mode 100755 tests/generic/998
- create mode 100644 tests/generic/998.out
+ fs/dax.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/tests/generic/998 b/tests/generic/998
-new file mode 100755
-index 000000000000..fbadb47507c2
---- /dev/null
-+++ b/tests/generic/998
-@@ -0,0 +1,64 @@
-+#! /bin/bash
-+# FS QA Test No. 998
-+#
-+# Test writeback error handling when writing to block devices via pagecache.
-+# See src/fsync-err.c for details of what test actually does.
-+#
-+#-----------------------------------------------------------------------
-+# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License as
-+# published by the Free Software Foundation.
-+#
-+# This program is distributed in the hope that it would be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write the Free Software Foundation,
-+# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+#-----------------------------------------------------------------------
-+
-+seq=`basename $0`
-+seqres=$RESULT_DIR/$seq
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+tmp=/tmp/$$
-+status=1    # failure is the default!
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+_cleanup()
-+{
-+    cd /
-+    rm -rf $tmp.* $testdir
-+    _dmerror_cleanup
-+}
-+
-+# get standard environment, filters and checks
-+. ./common/rc
-+. ./common/filter
-+. ./common/dmerror
-+
-+# real QA test starts here
-+_supported_os Linux
-+_require_scratch
-+_require_logdev
-+_require_dm_target error
-+_require_test_program fsync-err
-+
-+rm -f $seqres.full
-+
-+$XFS_IO_PROG -d -c "pwrite -S 0x7c -b 1048576 0 $((64 * 1048576))" $SCRATCH_DEV >> $seqres.full
-+_dmerror_init
-+
-+$here/src/fsync-err $DMERROR_DEV
-+
-+# success, all done
-+_dmerror_load_working_table
-+_dmerror_cleanup
-+_scratch_mkfs > $seqres.full 2>&1
-+status=0
-+exit
-diff --git a/tests/generic/998.out b/tests/generic/998.out
-new file mode 100644
-index 000000000000..658c438820e2
---- /dev/null
-+++ b/tests/generic/998.out
-@@ -0,0 +1,2 @@
-+QA output created by 998
-+Test passed!
-diff --git a/tests/generic/group b/tests/generic/group
-index 39f7b14657f1..9fc384363ca7 100644
---- a/tests/generic/group
-+++ b/tests/generic/group
-@@ -440,4 +440,5 @@
- 435 auto encrypt
- 436 auto quick rw
- 437 auto quick
-+998 auto quick
- 999 auto quick
+diff --git a/fs/dax.c b/fs/dax.c
+index c22eaf162f95..42788d8505c7 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -856,8 +856,24 @@ int dax_writeback_mapping_range(struct address_space *mapping,
+ 
+ 			ret = dax_writeback_one(bdev, dax_dev, mapping,
+ 					indices[i], pvec.pages[i]);
+-			if (ret < 0)
++			if (ret < 0) {
++				/*
++				 * For fs' that use errseq_t based error
++				 * tracking, we must call mapping_set_error
++				 * here to ensure that fsync on all open fds
++				 * get back an error. Doing this with the old
++				 * wb error tracking infrastructure is
++				 * problematic though, as DAX writeback is
++				 * synchronous, and the error flags are not
++				 * cleared when initiation fails, only when
++				 * it fails after the write has been submitted
++				 * to the backing store.
++				 */
++				if (mapping->host->i_sb->s_type->fs_flags &
++						FS_WB_ERRSEQ)
++					mapping_set_error(mapping, ret);
+ 				goto out;
++			}
+ 		}
+ 	}
+ out:
 -- 
 2.9.4
