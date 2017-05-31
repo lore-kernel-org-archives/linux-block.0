@@ -1,94 +1,120 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 02/10] fs: Introduce filemap_range_has_page()
-Date: Thu, 11 May 2017 14:17:02 -0500
-Message-Id: <20170511191710.31959-3-rgoldwyn@suse.de>
-In-Reply-To: <20170511191710.31959-1-rgoldwyn@suse.de>
-References: <20170511191710.31959-1-rgoldwyn@suse.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>, "Don
+ Brace" <don.brace@microsemi.com>
+Subject: [PATCH v2 2/6] block: Introduce queue flag QUEUE_FLAG_SCSI_PASSTHROUGH
+Date: Wed, 31 May 2017 14:43:46 -0700
+Message-ID: <20170531214350.31157-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>From the context where a SCSI command is submitted it is not always
+possible to figure out whether or not the queue the command is
+submitted to has struct scsi_request as the first member of its
+private data. Hence introduce the flag QUEUE_FLAG_SCSI_PASSTHROUGH.
 
-filemap_range_has_page() return true if the file's mapping has
-a page within the range mentioned. This function will be used
-to check if a write() call will cause a writeback of previous
-writes.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Don Brace <don.brace@microsemi.com>
 ---
- include/linux/fs.h |  2 ++
- mm/filemap.c       | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ block/bsg-lib.c                   | 1 +
+ drivers/block/cciss.c             | 1 +
+ drivers/ide/ide-probe.c           | 1 +
+ drivers/scsi/scsi_lib.c           | 2 ++
+ drivers/scsi/scsi_transport_sas.c | 1 +
+ include/linux/blkdev.h            | 3 +++
+ 6 files changed, 9 insertions(+)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 869c9a6fe58d..2e6fc6a23f91 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2513,6 +2513,8 @@ extern int filemap_fdatawait(struct address_space *);
- extern void filemap_fdatawait_keep_errors(struct address_space *);
- extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
- 				   loff_t lend);
-+extern int filemap_range_has_page(struct address_space *, loff_t lstart,
-+				  loff_t lend);
- extern int filemap_write_and_wait(struct address_space *mapping);
- extern int filemap_write_and_wait_range(struct address_space *mapping,
- 				        loff_t lstart, loff_t lend);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 1694623a6289..fae5a361befb 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -376,6 +376,39 @@ int filemap_flush(struct address_space *mapping)
- }
- EXPORT_SYMBOL(filemap_flush);
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 0a23dbba2d30..9b91daefcd9b 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -246,6 +246,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, char *name,
+ 	q->bsg_job_size = dd_job_size;
+ 	q->bsg_job_fn = job_fn;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
+ 	blk_queue_softirq_done(q, bsg_softirq_done);
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
  
-+/**
-+ * filemap_range_has_page - check if a page exists in range.
-+ * @mapping:           address space structure to wait for
-+ * @start_byte:        offset in bytes where the range starts
-+ * @end_byte:          offset in bytes where the range ends (inclusive)
-+ *
-+ * Find at least one page in the range supplied, usually used to check if
-+ * direct writing in this range will trigger a writeback.
-+ */
-+int filemap_range_has_page(struct address_space *mapping,
-+			   loff_t start_byte, loff_t end_byte)
-+{
-+	pgoff_t index = start_byte >> PAGE_SHIFT;
-+	pgoff_t end = end_byte >> PAGE_SHIFT;
-+	struct pagevec pvec;
-+	int ret;
-+
-+	if (end_byte < start_byte)
-+		return 0;
-+
-+	if (mapping->nrpages == 0)
-+		return 0;
-+
-+	pagevec_init(&pvec, 0);
-+	ret = pagevec_lookup(&pvec, mapping, index, 1);
-+	if (!ret)
-+		return 0;
-+	ret = (pvec.pages[0]->index <= end);
-+	pagevec_release(&pvec);
-+	return ret;
-+}
-+EXPORT_SYMBOL(filemap_range_has_page);
-+
- static int __filemap_fdatawait_range(struct address_space *mapping,
- 				     loff_t start_byte, loff_t end_byte)
+diff --git a/drivers/block/cciss.c b/drivers/block/cciss.c
+index cd375503f7b0..3761066fe89d 100644
+--- a/drivers/block/cciss.c
++++ b/drivers/block/cciss.c
+@@ -1956,6 +1956,7 @@ static int cciss_add_disk(ctlr_info_t *h, struct gendisk *disk,
+ 	disk->queue->cmd_size = sizeof(struct scsi_request);
+ 	disk->queue->request_fn = do_cciss_request;
+ 	disk->queue->queue_lock = &h->lock;
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, disk->queue);
+ 	if (blk_init_allocated_queue(disk->queue) < 0)
+ 		goto cleanup_queue;
+ 
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index 023562565d11..b3f85250dea9 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -773,6 +773,7 @@ static int ide_init_queue(ide_drive_t *drive)
+ 	q->request_fn = do_ide_request;
+ 	q->init_rq_fn = ide_init_rq;
+ 	q->cmd_size = sizeof(struct ide_request);
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
+ 	if (blk_init_allocated_queue(q) < 0) {
+ 		blk_cleanup_queue(q);
+ 		return 1;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 99e16ac479e3..884aaa84c2dd 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2057,6 +2057,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
  {
+ 	struct device *dev = shost->dma_dev;
+ 
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
++
+ 	/*
+ 	 * this limit is imposed by hardware restrictions
+ 	 */
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index 0ebe2f1bb908..d16414bfe2ef 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -264,6 +264,7 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 		q->queuedata = shost;
+ 
+ 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
++	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
+ 	return 0;
+ 
+ out_cleanup_queue:
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ab92c4ea138b..019f18c65098 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -618,6 +618,7 @@ struct request_queue {
+ #define QUEUE_FLAG_STATS       27	/* track rq completion times */
+ #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
+ #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
++#define QUEUE_FLAG_SCSI_PASSTHROUGH 30	/* queue supports SCSI commands */
+ 
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
+@@ -708,6 +709,8 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ #define blk_queue_secure_erase(q) \
+ 	(test_bit(QUEUE_FLAG_SECERASE, &(q)->queue_flags))
+ #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
++#define blk_queue_scsi_passthrough(q)	\
++	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
+ 
+ #define blk_noretry_request(rq) \
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
 -- 
-2.12.0
+2.12.2
