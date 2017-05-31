@@ -1,38 +1,113 @@
-Return-Path: <BATV+d77af5b924b055cfe402+5024+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: dedicated error codes for the block layer V2
-Date: Fri, 26 May 2017 11:56:07 +0300
-Message-Id: <20170526085620.3113-1-hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 19/24] partitions/ldm: switch to use uuid_t
+Date: Wed, 31 May 2017 18:18:21 +0200
+Message-Id: <20170531161826.23243-20-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This series introduces a new blk_status_t error code type for the block
-layer so that we can have tigher control and explicit semantics for
-block layer errors.
+And the uuid helpers.
 
-All but the last three patches are cleanups that lead to the new type.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ block/partitions/ldm.c | 10 +++++-----
+ block/partitions/ldm.h |  6 ++----
+ 2 files changed, 7 insertions(+), 9 deletions(-)
 
-The series it mostly limited to the block layer and drivers, and touching
-file systems a little bit.  The only major exception is btrfs, which
-does funny things with bios and thus sees a larger amount of propagation
-of the new blk_status_t.
-
-A git tree is also available at:
-
-    git://git.infradead.org/users/hch/block.git block-errors
-
-gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/block-errors
-
-Note the the two biggest patches didn't make it to linux-block and
-linux-btrfs last time.  If you didn't get them they are available in
-the git tree above.  Unfortunately there is no easy way to split them
-up.
-
-Changes since V1: 
- - keep blk_types.h for now
- - removed a BUG_ON in dm-mpath
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index edcea70674c9..2a365c756648 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -115,7 +115,7 @@ static bool ldm_parse_privhead(const u8 *data, struct privhead *ph)
+ 		ldm_error("PRIVHEAD disk size doesn't match real disk size");
+ 		return false;
+ 	}
+-	if (uuid_be_to_bin(data + 0x0030, (uuid_be *)ph->disk_id)) {
++	if (uuid_parse(data + 0x0030, &ph->disk_id)) {
+ 		ldm_error("PRIVHEAD contains an invalid GUID.");
+ 		return false;
+ 	}
+@@ -234,7 +234,7 @@ static bool ldm_compare_privheads (const struct privhead *ph1,
+ 		(ph1->logical_disk_size  == ph2->logical_disk_size)	&&
+ 		(ph1->config_start       == ph2->config_start)		&&
+ 		(ph1->config_size        == ph2->config_size)		&&
+-		!memcmp (ph1->disk_id, ph2->disk_id, GUID_SIZE));
++		uuid_equal(&ph1->disk_id, &ph2->disk_id));
+ }
+ 
+ /**
+@@ -557,7 +557,7 @@ static struct vblk * ldm_get_disk_objid (const struct ldmdb *ldb)
+ 
+ 	list_for_each (item, &ldb->v_disk) {
+ 		struct vblk *v = list_entry (item, struct vblk, list);
+-		if (!memcmp (v->vblk.disk.disk_id, ldb->ph.disk_id, GUID_SIZE))
++		if (uuid_equal(&v->vblk.disk.disk_id, &ldb->ph.disk_id))
+ 			return v;
+ 	}
+ 
+@@ -892,7 +892,7 @@ static bool ldm_parse_dsk3 (const u8 *buffer, int buflen, struct vblk *vb)
+ 	disk = &vb->vblk.disk;
+ 	ldm_get_vstr (buffer + 0x18 + r_diskid, disk->alt_name,
+ 		sizeof (disk->alt_name));
+-	if (uuid_be_to_bin(buffer + 0x19 + r_name, (uuid_be *)disk->disk_id))
++	if (uuid_parse(buffer + 0x19 + r_name, &disk->disk_id))
+ 		return false;
+ 
+ 	return true;
+@@ -927,7 +927,7 @@ static bool ldm_parse_dsk4 (const u8 *buffer, int buflen, struct vblk *vb)
+ 		return false;
+ 
+ 	disk = &vb->vblk.disk;
+-	memcpy (disk->disk_id, buffer + 0x18 + r_name, GUID_SIZE);
++	uuid_copy(&disk->disk_id, (uuid_t *)(buffer + 0x18 + r_name));
+ 	return true;
+ }
+ 
+diff --git a/block/partitions/ldm.h b/block/partitions/ldm.h
+index 374242c0971a..f4c6055df956 100644
+--- a/block/partitions/ldm.h
++++ b/block/partitions/ldm.h
+@@ -112,8 +112,6 @@ struct frag {				/* VBLK Fragment handling */
+ 
+ /* In memory LDM database structures. */
+ 
+-#define GUID_SIZE		16
+-
+ struct privhead {			/* Offsets and sizes are in sectors. */
+ 	u16	ver_major;
+ 	u16	ver_minor;
+@@ -121,7 +119,7 @@ struct privhead {			/* Offsets and sizes are in sectors. */
+ 	u64	logical_disk_size;
+ 	u64	config_start;
+ 	u64	config_size;
+-	u8	disk_id[GUID_SIZE];
++	uuid_t	disk_id;
+ };
+ 
+ struct tocblock {			/* We have exactly two bitmaps. */
+@@ -154,7 +152,7 @@ struct vblk_dgrp {			/* VBLK Disk Group */
+ };
+ 
+ struct vblk_disk {			/* VBLK Disk */
+-	u8	disk_id[GUID_SIZE];
++	uuid_t	disk_id;
+ 	u8	alt_name[128];
+ };
+ 
+-- 
+2.11.0
