@@ -1,533 +1,198 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests 1/3] Add ability to build test-cases
-Date: Thu, 18 May 2017 14:13:06 +0200
-Message-Id: <eb62e33aecc49884f16618e51ebbe5e00e8e4b3f.1495109149.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1495109149.git.jthumshirn@suse.de>
-References: <cover.1495109149.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1495109149.git.jthumshirn@suse.de>
-References: <cover.1495109149.git.jthumshirn@suse.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 14/24] xfs: use the common helper uuid_is_null()
+Date: Wed, 31 May 2017 18:18:16 +0200
+Message-Id: <20170531161826.23243-15-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Add the ability to build test cases from C files. This is handy for
-things like syzcaller reproducers and all other kinds of test
-binaries.
+From: Amir Goldstein <amir73il@gmail.com>
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Use the common helper uuid_is_null() and remove the xfs specific
+helper uuid_is_nil().
+
+The common helper does not check for the NULL pointer value as
+xfs helper did, but xfs code never calls the helper with a pointer
+that can be NULL.
+
+Conform comments and warning strings to use the term 'null uuid'
+instead of 'nil uuid', because this is the terminology used by
+lib/uuid.c and its users. It is also the terminology used in
+userspace by libuuid and xfsprogs.
+
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+[hch: remove now unused uuid.[ch]]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Brian Foster <bfoster@redhat.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- Makefile       |  26 +++-
- src/.gitignore |   1 +
- src/Makefile   |  14 ++
- src/sg-001.c   | 430 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 470 insertions(+), 1 deletion(-)
- create mode 100644 src/.gitignore
- create mode 100644 src/Makefile
- create mode 100644 src/sg-001.c
+ fs/xfs/Makefile          |  3 +--
+ fs/xfs/uuid.c            | 32 --------------------------------
+ fs/xfs/uuid.h            | 23 -----------------------
+ fs/xfs/xfs_linux.h       |  1 -
+ fs/xfs/xfs_log_recover.c |  6 +++---
+ fs/xfs/xfs_mount.c       |  8 ++++----
+ 6 files changed, 8 insertions(+), 65 deletions(-)
+ delete mode 100644 fs/xfs/uuid.c
+ delete mode 100644 fs/xfs/uuid.h
 
-diff --git a/Makefile b/Makefile
-index 3a0f0100232c..a70623dd4a52 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1,7 +1,31 @@
-+ifeq ("$(origin V)", "command line")
-+	BUILD_VERBOSE = $(V)
-+else
-+	BUILD_VERBOSE = 0
-+endif
-+ifndef BUILD_VERBOSE
-+	BUILD_VERBOSE = 0
-+endif
-+
-+ifeq ($(BUILD_VERBOSE),1)
-+	Q =
-+else
-+	Q = @
-+endif
-+
-+MAKEOPTS = --no-print-directory Q=$(Q)
-+
-+SUBDIRS = src
-+default:
-+	$(Q)$(MAKE) $(MAKEOPTS) -C $(SUBDIRS)
-+
-+clean:
-+	$(Q)$(MAKE) $(MAKEOPTS) -C $(SUBDIRS) clean
-+
- all:
- 	@echo "Please read README.md"
+diff --git a/fs/xfs/Makefile b/fs/xfs/Makefile
+index 5c90f82b8f6b..a6e955bfead8 100644
+--- a/fs/xfs/Makefile
++++ b/fs/xfs/Makefile
+@@ -98,8 +98,7 @@ xfs-y				+= xfs_aops.o \
+ 				   xfs_sysfs.o \
+ 				   xfs_trans.o \
+ 				   xfs_xattr.o \
+-				   kmem.o \
+-				   uuid.o
++				   kmem.o
  
- shellcheck:
- 	shellcheck -x -f gcc check new common/* tests/*/[0-9]*[0-9]
+ # low-level transaction/log code
+ xfs-y				+= xfs_log.o \
+diff --git a/fs/xfs/uuid.c b/fs/xfs/uuid.c
+deleted file mode 100644
+index 737c186ea98b..000000000000
+--- a/fs/xfs/uuid.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+- * Copyright (c) 2000-2003,2005 Silicon Graphics, Inc.
+- * All Rights Reserved.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it would be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write the Free Software Foundation,
+- * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-#include <xfs.h>
+-
+-int
+-uuid_is_nil(uuid_t *uuid)
+-{
+-	int	i;
+-	char	*cp = (char *)uuid;
+-
+-	if (uuid == NULL)
+-		return 0;
+-	/* implied check of version number here... */
+-	for (i = 0; i < sizeof *uuid; i++)
+-		if (*cp++) return 0;	/* not nil */
+-	return 1;	/* is nil */
+-}
+diff --git a/fs/xfs/uuid.h b/fs/xfs/uuid.h
+deleted file mode 100644
+index 5aea49bf0963..000000000000
+--- a/fs/xfs/uuid.h
++++ /dev/null
+@@ -1,23 +0,0 @@
+-/*
+- * Copyright (c) 2000-2003,2005 Silicon Graphics, Inc.
+- * All Rights Reserved.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it would be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write the Free Software Foundation,
+- * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-#ifndef __XFS_SUPPORT_UUID_H__
+-#define __XFS_SUPPORT_UUID_H__
+-
+-extern int uuid_is_nil(uuid_t *uuid);
+-
+-#endif	/* __XFS_SUPPORT_UUID_H__ */
+diff --git a/fs/xfs/xfs_linux.h b/fs/xfs/xfs_linux.h
+index 2c33d915e550..2d167fe643ec 100644
+--- a/fs/xfs/xfs_linux.h
++++ b/fs/xfs/xfs_linux.h
+@@ -43,7 +43,6 @@ typedef __u32			xfs_nlink_t;
  
--.PHONY: all shellcheck
-+.PHONY: all shellcheck clean
-diff --git a/src/.gitignore b/src/.gitignore
-new file mode 100644
-index 000000000000..f543ddb9280f
---- /dev/null
-+++ b/src/.gitignore
-@@ -0,0 +1 @@
-+sg-001
-diff --git a/src/Makefile b/src/Makefile
-new file mode 100644
-index 000000000000..8012c2e542c0
---- /dev/null
-+++ b/src/Makefile
-@@ -0,0 +1,14 @@
-+CC = gcc
-+CFLAGS = -O2
-+
-+TARGETS = sg-001
-+
-+FILES = $(TARGETS:=.c)
-+
-+$(TARGETS):
-+	@echo "    [CC]    $@"
-+	$(Q)$(CC) $@.c -o $@ $(CFLAGS)
-+
-+clean:
-+	@echo "    [CLEAN]  $(notdir $(CURDIR))"
-+	$(Q)rm -f $(TARGETS) *.o
-diff --git a/src/sg-001.c b/src/sg-001.c
-new file mode 100644
-index 000000000000..ace85af523b3
---- /dev/null
-+++ b/src/sg-001.c
-@@ -0,0 +1,430 @@
-+// autogenerated by syzkaller (http://github.com/google/syzkaller)
-+
-+#ifndef __NR_read
-+#define __NR_read 0
-+#endif
-+#ifndef __NR_mmap
-+#define __NR_mmap 9
-+#endif
-+#ifndef __NR_syz_open_dev
-+#define __NR_syz_open_dev 1000002
-+#endif
-+#ifndef __NR_write
-+#define __NR_write 1
-+#endif
-+
-+#define _GNU_SOURCE
-+
-+#include <sys/ioctl.h>
-+#include <sys/mman.h>
-+#include <sys/mount.h>
-+#include <sys/prctl.h>
-+#include <sys/resource.h>
-+#include <sys/socket.h>
-+#include <sys/stat.h>
-+#include <sys/syscall.h>
-+#include <sys/time.h>
-+#include <sys/types.h>
-+#include <sys/wait.h>
-+
-+#include <arpa/inet.h>
-+#include <linux/capability.h>
-+#include <linux/if.h>
-+#include <linux/if_ether.h>
-+#include <linux/if_tun.h>
-+#include <linux/ip.h>
-+#include <linux/kvm.h>
-+#include <linux/sched.h>
-+#include <linux/tcp.h>
-+#include <net/if_arp.h>
-+
-+#include <assert.h>
-+#include <dirent.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <grp.h>
-+#include <pthread.h>
-+#include <setjmp.h>
-+#include <signal.h>
-+#include <stdarg.h>
-+#include <stdbool.h>
-+#include <stddef.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+
-+const int kFailStatus = 67;
-+const int kErrorStatus = 68;
-+const int kRetryStatus = 69;
-+
-+__attribute__((noreturn)) void doexit(int status)
-+{
-+  volatile unsigned i;
-+  syscall(__NR_exit_group, status);
-+  for (i = 0;; i++) {
-+  }
-+}
-+
-+__attribute__((noreturn)) void fail(const char* msg, ...)
-+{
-+  int e = errno;
-+  fflush(stdout);
-+  va_list args;
-+  va_start(args, msg);
-+  vfprintf(stderr, msg, args);
-+  va_end(args);
-+  fprintf(stderr, " (errno %d)\n", e);
-+  doexit((e == ENOMEM || e == EAGAIN) ? kRetryStatus : kFailStatus);
-+}
-+
-+__attribute__((noreturn)) void exitf(const char* msg, ...)
-+{
-+  int e = errno;
-+  fflush(stdout);
-+  va_list args;
-+  va_start(args, msg);
-+  vfprintf(stderr, msg, args);
-+  va_end(args);
-+  fprintf(stderr, " (errno %d)\n", e);
-+  doexit(kRetryStatus);
-+}
-+
-+static int flag_debug;
-+
-+void debug(const char* msg, ...)
-+{
-+  if (!flag_debug)
-+    return;
-+  va_list args;
-+  va_start(args, msg);
-+  vfprintf(stdout, msg, args);
-+  va_end(args);
-+  fflush(stdout);
-+}
-+
-+__thread int skip_segv;
-+__thread jmp_buf segv_env;
-+
-+static void segv_handler(int sig, siginfo_t* info, void* uctx)
-+{
-+  uintptr_t addr = (uintptr_t)info->si_addr;
-+  const uintptr_t prog_start = 1 << 20;
-+  const uintptr_t prog_end = 100 << 20;
-+  if (__atomic_load_n(&skip_segv, __ATOMIC_RELAXED) &&
-+      (addr < prog_start || addr > prog_end)) {
-+    debug("SIGSEGV on %p, skipping\n", addr);
-+    _longjmp(segv_env, 1);
-+  }
-+  debug("SIGSEGV on %p, exiting\n", addr);
-+  doexit(sig);
-+  for (;;) {
-+  }
-+}
-+
-+static void install_segv_handler()
-+{
-+  struct sigaction sa;
-+  memset(&sa, 0, sizeof(sa));
-+  sa.sa_sigaction = segv_handler;
-+  sa.sa_flags = SA_NODEFER | SA_SIGINFO;
-+  sigaction(SIGSEGV, &sa, NULL);
-+  sigaction(SIGBUS, &sa, NULL);
-+}
-+
-+#define NONFAILING(...)                                                \
-+  {                                                                    \
-+    __atomic_fetch_add(&skip_segv, 1, __ATOMIC_SEQ_CST);               \
-+    if (_setjmp(segv_env) == 0) {                                      \
-+      __VA_ARGS__;                                                     \
-+    }                                                                  \
-+    __atomic_fetch_sub(&skip_segv, 1, __ATOMIC_SEQ_CST);               \
-+  }
-+
-+#define BITMASK_LEN(type, bf_len) (type)((1ull << (bf_len)) - 1)
-+
-+#define BITMASK_LEN_OFF(type, bf_off, bf_len)                          \
-+  (type)(BITMASK_LEN(type, (bf_len)) << (bf_off))
-+
-+#define STORE_BY_BITMASK(type, addr, val, bf_off, bf_len)              \
-+  if ((bf_off) == 0 && (bf_len) == 0) {                                \
-+    *(type*)(addr) = (type)(val);                                      \
-+  } else {                                                             \
-+    type new_val = *(type*)(addr);                                     \
-+    new_val &= ~BITMASK_LEN_OFF(type, (bf_off), (bf_len));             \
-+    new_val |= ((type)(val)&BITMASK_LEN(type, (bf_len))) << (bf_off);  \
-+    *(type*)(addr) = new_val;                                          \
-+  }
-+
-+struct csum_inet {
-+  uint32_t acc;
-+};
-+
-+void csum_inet_init(struct csum_inet* csum)
-+{
-+  csum->acc = 0;
-+}
-+
-+void csum_inet_update(struct csum_inet* csum, const uint8_t* data,
-+                      size_t length)
-+{
-+  if (length == 0)
-+    return;
-+
-+  size_t i;
-+  for (i = 0; i < length - 1; i += 2)
-+    csum->acc += *(uint16_t*)&data[i];
-+
-+  if (length & 1)
-+    csum->acc += (uint16_t)data[length - 1];
-+
-+  while (csum->acc > 0xffff)
-+    csum->acc = (csum->acc & 0xffff) + (csum->acc >> 16);
-+}
-+
-+uint16_t csum_inet_digest(struct csum_inet* csum)
-+{
-+  return ~csum->acc;
-+}
-+
-+static uintptr_t syz_open_dev(uintptr_t a0, uintptr_t a1, uintptr_t a2)
-+{
-+  if (a0 == 0xc || a0 == 0xb) {
-+    char buf[128];
-+    sprintf(buf, "/dev/%s/%d:%d", a0 == 0xc ? "char" : "block",
-+            (uint8_t)a1, (uint8_t)a2);
-+    return open(buf, O_RDWR, 0);
-+  } else {
-+    char buf[1024];
-+    char* hash;
-+    NONFAILING(strncpy(buf, (char*)a0, sizeof(buf)));
-+    buf[sizeof(buf) - 1] = 0;
-+    while ((hash = strchr(buf, '#'))) {
-+      *hash = '0' + (char)(a1 % 10);
-+      a1 /= 10;
-+    }
-+    return open(buf, a2, 0);
-+  }
-+}
-+
-+static uintptr_t execute_syscall(int nr, uintptr_t a0, uintptr_t a1,
-+                                 uintptr_t a2, uintptr_t a3,
-+                                 uintptr_t a4, uintptr_t a5,
-+                                 uintptr_t a6, uintptr_t a7,
-+                                 uintptr_t a8)
-+{
-+  switch (nr) {
-+  default:
-+    return syscall(nr, a0, a1, a2, a3, a4, a5);
-+  case __NR_syz_open_dev:
-+    return syz_open_dev(a0, a1, a2);
-+  }
-+}
-+
-+static void setup_main_process()
-+{
-+  struct sigaction sa;
-+  memset(&sa, 0, sizeof(sa));
-+  sa.sa_handler = SIG_IGN;
-+  syscall(SYS_rt_sigaction, 0x20, &sa, NULL, 8);
-+  syscall(SYS_rt_sigaction, 0x21, &sa, NULL, 8);
-+  install_segv_handler();
-+
-+  char tmpdir_template[] = "./syzkaller.XXXXXX";
-+  char* tmpdir = mkdtemp(tmpdir_template);
-+  if (!tmpdir)
-+    fail("failed to mkdtemp");
-+  if (chmod(tmpdir, 0777))
-+    fail("failed to chmod");
-+  if (chdir(tmpdir))
-+    fail("failed to chdir");
-+}
-+
-+static void loop();
-+
-+static void sandbox_common()
-+{
-+  prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
-+  setpgrp();
-+  setsid();
-+
-+  struct rlimit rlim;
-+  rlim.rlim_cur = rlim.rlim_max = 128 << 20;
-+  setrlimit(RLIMIT_AS, &rlim);
-+  rlim.rlim_cur = rlim.rlim_max = 1 << 20;
-+  setrlimit(RLIMIT_FSIZE, &rlim);
-+  rlim.rlim_cur = rlim.rlim_max = 1 << 20;
-+  setrlimit(RLIMIT_STACK, &rlim);
-+  rlim.rlim_cur = rlim.rlim_max = 0;
-+  setrlimit(RLIMIT_CORE, &rlim);
-+
-+  unshare(CLONE_NEWNS);
-+  unshare(CLONE_NEWIPC);
-+  unshare(CLONE_IO);
-+}
-+
-+static int do_sandbox_none(int executor_pid, bool enable_tun)
-+{
-+  int pid = fork();
-+  if (pid)
-+    return pid;
-+
-+  sandbox_common();
-+
-+  loop();
-+  doexit(1);
-+}
-+
-+static void remove_dir(const char* dir)
-+{
-+  DIR* dp;
-+  struct dirent* ep;
-+  int iter = 0;
-+retry:
-+  dp = opendir(dir);
-+  if (dp == NULL) {
-+    if (errno == EMFILE) {
-+      exitf("opendir(%s) failed due to NOFILE, exiting");
-+    }
-+    exitf("opendir(%s) failed", dir);
-+  }
-+  while ((ep = readdir(dp))) {
-+    if (strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0)
-+      continue;
-+    char filename[FILENAME_MAX];
-+    snprintf(filename, sizeof(filename), "%s/%s", dir, ep->d_name);
-+    struct stat st;
-+    if (lstat(filename, &st))
-+      exitf("lstat(%s) failed", filename);
-+    if (S_ISDIR(st.st_mode)) {
-+      remove_dir(filename);
-+      continue;
-+    }
-+    int i;
-+    for (i = 0;; i++) {
-+      debug("unlink(%s)\n", filename);
-+      if (unlink(filename) == 0)
-+        break;
-+      if (errno == EROFS) {
-+        debug("ignoring EROFS\n");
-+        break;
-+      }
-+      if (errno != EBUSY || i > 100)
-+        exitf("unlink(%s) failed", filename);
-+      debug("umount(%s)\n", filename);
-+      if (umount2(filename, MNT_DETACH))
-+        exitf("umount(%s) failed", filename);
-+    }
-+  }
-+  closedir(dp);
-+  int i;
-+  for (i = 0;; i++) {
-+    debug("rmdir(%s)\n", dir);
-+    if (rmdir(dir) == 0)
-+      break;
-+    if (i < 100) {
-+      if (errno == EROFS) {
-+        debug("ignoring EROFS\n");
-+        break;
-+      }
-+      if (errno == EBUSY) {
-+        debug("umount(%s)\n", dir);
-+        if (umount2(dir, MNT_DETACH))
-+          exitf("umount(%s) failed", dir);
-+        continue;
-+      }
-+      if (errno == ENOTEMPTY) {
-+        if (iter < 100) {
-+          iter++;
-+          goto retry;
-+        }
-+      }
-+    }
-+    exitf("rmdir(%s) failed", dir);
-+  }
-+}
-+
-+static uint64_t current_time_ms()
-+{
-+  struct timespec ts;
-+
-+  if (clock_gettime(CLOCK_MONOTONIC, &ts))
-+    fail("clock_gettime failed");
-+  return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
-+}
-+
-+static void test();
-+
-+void loop()
-+{
-+  int iter;
-+  for (iter = 0;; iter++) {
-+    char cwdbuf[256];
-+    sprintf(cwdbuf, "./%d", iter);
-+    if (mkdir(cwdbuf, 0777))
-+      fail("failed to mkdir");
-+    int pid = fork();
-+    if (pid < 0)
-+      fail("clone failed");
-+    if (pid == 0) {
-+      prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
-+      setpgrp();
-+      if (chdir(cwdbuf))
-+        fail("failed to chdir");
-+      test();
-+      doexit(0);
-+    }
-+    int status = 0;
-+    uint64_t start = current_time_ms();
-+    for (;;) {
-+      int res = waitpid(-1, &status, __WALL | WNOHANG);
-+      if (res == pid)
-+        break;
-+      usleep(1000);
-+      if (current_time_ms() - start > 5 * 1000) {
-+        kill(-pid, SIGKILL);
-+        kill(pid, SIGKILL);
-+        while (waitpid(-1, &status, __WALL) != pid) {
-+        }
-+        break;
-+      }
-+    }
-+    remove_dir(cwdbuf);
-+  }
-+}
-+
-+long r[15];
-+void test()
-+{
-+  memset(r, -1, sizeof(r));
-+  r[0] = execute_syscall(__NR_mmap, 0x20000000ul, 0x5000ul, 0x3ul,
-+                         0x32ul, 0xfffffffffffffffful, 0x0ul, 0, 0, 0);
-+  NONFAILING(memcpy((void*)0x20000000,
-+                    "\x2f\x64\x65\x76\x2f\x73\x67\x23\x00", 9));
-+  r[2] = execute_syscall(__NR_syz_open_dev, 0x20000000ul, 0x0ul, 0x2ul,
-+                         0, 0, 0, 0, 0, 0);
-+  NONFAILING(*(uint64_t*)0x20001fdc = (uint64_t)0x0);
-+  NONFAILING(*(uint64_t*)0x20001fe4 = (uint64_t)0x0);
-+  NONFAILING(*(uint16_t*)0x20001fec = (uint16_t)0x3);
-+  NONFAILING(*(uint16_t*)0x20001fee = (uint16_t)0x4);
-+  NONFAILING(*(uint32_t*)0x20001ff0 = (uint32_t)0x9);
-+  NONFAILING(*(uint64_t*)0x20001ff4 = (uint64_t)0x0);
-+  NONFAILING(*(uint64_t*)0x20001ffc = (uint64_t)0x2710);
-+  NONFAILING(*(uint16_t*)0x20002004 = (uint16_t)0x7);
-+  NONFAILING(*(uint16_t*)0x20002006 = (uint16_t)0x7);
-+  NONFAILING(*(uint32_t*)0x20002008 = (uint32_t)0x8);
-+  r[13] = execute_syscall(__NR_write, r[2], 0x20001fdcul, 0x30ul, 0, 0,
-+                          0, 0, 0, 0);
-+  r[14] = execute_syscall(__NR_read, r[2], 0x20002f36ul, 0x0ul, 0, 0, 0,
-+                          0, 0, 0);
-+}
-+int main()
-+{
-+  setup_main_process();
-+  int pid = do_sandbox_none(0, false);
-+  int status = 0;
-+  while (waitpid(pid, &status, __WALL) != pid) {
-+  }
-+  return 0;
-+}
+ #include "kmem.h"
+ #include "mrlock.h"
+-#include "uuid.h"
+ 
+ #include <linux/semaphore.h>
+ #include <linux/mm.h>
+diff --git a/fs/xfs/xfs_log_recover.c b/fs/xfs/xfs_log_recover.c
+index cd0b077deb35..8cec1e5505a4 100644
+--- a/fs/xfs/xfs_log_recover.c
++++ b/fs/xfs/xfs_log_recover.c
+@@ -352,13 +352,13 @@ xlog_header_check_mount(
+ {
+ 	ASSERT(head->h_magicno == cpu_to_be32(XLOG_HEADER_MAGIC_NUM));
+ 
+-	if (uuid_is_nil(&head->h_fs_uuid)) {
++	if (uuid_is_null(&head->h_fs_uuid)) {
+ 		/*
+ 		 * IRIX doesn't write the h_fs_uuid or h_fmt fields. If
+-		 * h_fs_uuid is nil, we assume this log was last mounted
++		 * h_fs_uuid is null, we assume this log was last mounted
+ 		 * by IRIX and continue.
+ 		 */
+-		xfs_warn(mp, "nil uuid in log - IRIX style log");
++		xfs_warn(mp, "null uuid in log - IRIX style log");
+ 	} else if (unlikely(!uuid_equal(&mp->m_sb.sb_uuid, &head->h_fs_uuid))) {
+ 		xfs_warn(mp, "log has mismatched uuid - can't recover");
+ 		xlog_header_check_dump(mp, head);
+diff --git a/fs/xfs/xfs_mount.c b/fs/xfs/xfs_mount.c
+index 51f7d03ef86c..54452967e35e 100644
+--- a/fs/xfs/xfs_mount.c
++++ b/fs/xfs/xfs_mount.c
+@@ -80,14 +80,14 @@ xfs_uuid_mount(
+ 	if (mp->m_flags & XFS_MOUNT_NOUUID)
+ 		return 0;
+ 
+-	if (uuid_is_nil(uuid)) {
+-		xfs_warn(mp, "Filesystem has nil UUID - can't mount");
++	if (uuid_is_null(uuid)) {
++		xfs_warn(mp, "Filesystem has null UUID - can't mount");
+ 		return -EINVAL;
+ 	}
+ 
+ 	mutex_lock(&xfs_uuid_table_mutex);
+ 	for (i = 0, hole = -1; i < xfs_uuid_table_size; i++) {
+-		if (uuid_is_nil(&xfs_uuid_table[i])) {
++		if (uuid_is_null(&xfs_uuid_table[i])) {
+ 			hole = i;
+ 			continue;
+ 		}
+@@ -124,7 +124,7 @@ xfs_uuid_unmount(
+ 
+ 	mutex_lock(&xfs_uuid_table_mutex);
+ 	for (i = 0; i < xfs_uuid_table_size; i++) {
+-		if (uuid_is_nil(&xfs_uuid_table[i]))
++		if (uuid_is_null(&xfs_uuid_table[i]))
+ 			continue;
+ 		if (!uuid_equal(uuid, &xfs_uuid_table[i]))
+ 			continue;
 -- 
-2.12.0
+2.11.0
