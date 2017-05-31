@@ -1,47 +1,47 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 09/24] uuid: don't export guid_index and uuid_index
-Date: Wed, 31 May 2017 18:18:11 +0200
-Message-Id: <20170531161826.23243-10-hch@lst.de>
-In-Reply-To: <20170531161826.23243-1-hch@lst.de>
-References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:40046 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751022AbdEaMhn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 08:37:43 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 2/9] block: introduce flag of QUEUE_FLAG_QUIESCED
+Date: Wed, 31 May 2017 20:36:59 +0800
+Message-Id: <20170531123706.20885-3-ming.lei@redhat.com>
+In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
+References: <20170531123706.20885-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-These are only used in uuid.c and vsprintf.c and aren't something modules
-should use directly.
+This flag is introduced for improving the quiescing code.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- lib/uuid.c | 2 --
- 1 file changed, 2 deletions(-)
+ include/linux/blkdev.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index 90bee73f7bd7..f7116ed88e01 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -22,9 +22,7 @@
- #include <linux/random.h>
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 41291be82ac4..60967797f4f6 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -618,6 +618,7 @@ struct request_queue {
+ #define QUEUE_FLAG_STATS       27	/* track rq completion times */
+ #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
+ #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
++#define QUEUE_FLAG_QUIESCED    30	/* queue has been quiesced */
  
- const u8 guid_index[16] = {3,2,1,0,5,4,7,6,8,9,10,11,12,13,14,15};
--EXPORT_SYMBOL(guid_index);
- const u8 uuid_index[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
--EXPORT_SYMBOL(uuid_index);
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
+@@ -712,6 +713,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ #define blk_noretry_request(rq) \
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+ 			     REQ_FAILFAST_DRIVER))
++#define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
  
- /***************************************************************
-  * Random UUID interface
+ static inline bool blk_account_rq(struct request *rq)
+ {
 -- 
-2.11.0
+2.9.4
