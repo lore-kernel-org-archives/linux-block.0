@@ -1,78 +1,137 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 15/24] block: remove blk_part_pack_uuid
-Date: Wed, 31 May 2017 18:18:17 +0200
-Message-Id: <20170531161826.23243-16-hch@lst.de>
-In-Reply-To: <20170531161826.23243-1-hch@lst.de>
-References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net
+Cc: linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v5 16/17] ext2: convert to errseq_t based writeback error tracking
+Date: Wed, 31 May 2017 08:45:39 -0400
+Message-Id: <20170531124540.8782-17-jlayton@redhat.com>
+In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
+References: <20170531124540.8782-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This helper was only used by IMA of all things, which would get spurious
-errors if CONFIG_BLOCK is disabled.  Just opencode the call there.
+Set the flag to indicate that we want new-style data writeback error
+handling.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+This means that we need to override the open routines for files and
+directories so that we can sample the bdev wb_err at open.
+
+XXX: doesn't quite pass the xfstest for this currently, as ext2_error
+     resets the error on the device inode on every call.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- include/linux/genhd.h               | 11 -----------
- security/integrity/ima/ima_policy.c |  3 +--
- 2 files changed, 1 insertion(+), 13 deletions(-)
+ fs/ext2/dir.c   |  8 ++++++++
+ fs/ext2/file.c  | 29 +++++++++++++++++++++++------
+ fs/ext2/super.c |  2 +-
+ 3 files changed, 32 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index acff9437e5c3..e619fae2f037 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -219,12 +219,6 @@ static inline struct gendisk *part_to_disk(struct hd_struct *part)
- 	return NULL;
+diff --git a/fs/ext2/dir.c b/fs/ext2/dir.c
+index e2709695b177..6e476c9929f8 100644
+--- a/fs/ext2/dir.c
++++ b/fs/ext2/dir.c
+@@ -713,6 +713,13 @@ int ext2_empty_dir (struct inode * inode)
+ 	return 0;
  }
  
--static inline int blk_part_pack_uuid(const u8 *uuid_str, u8 *to)
--{
--	uuid_be_to_bin(uuid_str, (uuid_be *)to);
--	return 0;
--}
--
- static inline int disk_max_parts(struct gendisk *disk)
++static int ext2_dir_open(struct inode *inode, struct file *file)
++{
++	/* Sample blockdev mapping errseq_t for metadata writeback */
++	file->f_md_wb_err = filemap_sample_wb_err(inode->i_sb->s_bdev->bd_inode->i_mapping);
++	return 0;
++}
++
+ const struct file_operations ext2_dir_operations = {
+ 	.llseek		= generic_file_llseek,
+ 	.read		= generic_read_dir,
+@@ -721,5 +728,6 @@ const struct file_operations ext2_dir_operations = {
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= ext2_compat_ioctl,
+ #endif
++	.open		= ext2_dir_open,
+ 	.fsync		= ext2_fsync,
+ };
+diff --git a/fs/ext2/file.c b/fs/ext2/file.c
+index ed00e7ae0ef3..6f3cd7bc3fb3 100644
+--- a/fs/ext2/file.c
++++ b/fs/ext2/file.c
+@@ -172,16 +172,23 @@ static int ext2_release_file (struct inode * inode, struct file * filp)
+ 
+ int ext2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
  {
- 	if (disk->flags & GENHD_FL_EXT_DEVT)
-@@ -736,11 +730,6 @@ static inline dev_t blk_lookup_devt(const char *name, int partno)
- 	dev_t devt = MKDEV(0, 0);
- 	return devt;
+-	int ret;
++	int ret, ret2;
+ 	struct super_block *sb = file->f_mapping->host->i_sb;
+ 	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
+ 
+ 	ret = generic_file_fsync(file, start, end, datasync);
+-	if (ret == -EIO) {
+-		/* We don't really know where the IO error happened... */
+-		ext2_error(sb, __func__,
++
++	ret2 = filemap_report_wb_err(file);
++	if (ret == 0)
++		ret = ret2;
++
++	ret2 = filemap_report_md_wb_err(file, mapping);
++	if (ret2) {
++		if (ret == 0)
++			ret = ret2;
++		if (ret == -EIO)
++			ext2_error(sb, __func__,
+ 			   "detected IO error when writing metadata buffers");
+-		ret = -EIO;
+ 	}
+ 	return ret;
  }
--
--static inline int blk_part_pack_uuid(const u8 *uuid_str, u8 *to)
--{
--	return -EINVAL;
--}
- #endif /* CONFIG_BLOCK */
+@@ -204,6 +211,16 @@ static ssize_t ext2_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	return generic_file_write_iter(iocb, from);
+ }
  
- #endif /* _LINUX_GENHD_H */
-diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
-index 3ab1067db624..49fbc3e8f012 100644
---- a/security/integrity/ima/ima_policy.c
-+++ b/security/integrity/ima/ima_policy.c
-@@ -717,8 +717,7 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
- 				break;
- 			}
++static int ext2_file_open(struct inode *inode, struct file *file)
++{
++	int ret;
++
++	ret = dquot_file_open(inode, file);
++	if (likely(ret == 0))
++		file->f_md_wb_err = filemap_sample_wb_err(inode->i_sb->s_bdev->bd_inode->i_mapping);
++	return ret;
++}
++
+ const struct file_operations ext2_file_operations = {
+ 	.llseek		= generic_file_llseek,
+ 	.read_iter	= ext2_file_read_iter,
+@@ -213,7 +230,7 @@ const struct file_operations ext2_file_operations = {
+ 	.compat_ioctl	= ext2_compat_ioctl,
+ #endif
+ 	.mmap		= ext2_file_mmap,
+-	.open		= dquot_file_open,
++	.open		= ext2_file_open,
+ 	.release	= ext2_release_file,
+ 	.fsync		= ext2_fsync,
+ 	.get_unmapped_area = thp_get_unmapped_area,
+diff --git a/fs/ext2/super.c b/fs/ext2/super.c
+index 9c2028b50e5c..dd37d7f955bf 100644
+--- a/fs/ext2/super.c
++++ b/fs/ext2/super.c
+@@ -1629,7 +1629,7 @@ static struct file_system_type ext2_fs_type = {
+ 	.name		= "ext2",
+ 	.mount		= ext2_mount,
+ 	.kill_sb	= kill_block_super,
+-	.fs_flags	= FS_REQUIRES_DEV,
++	.fs_flags	= FS_REQUIRES_DEV|FS_WB_ERRSEQ,
+ };
+ MODULE_ALIAS_FS("ext2");
  
--			result = blk_part_pack_uuid(args[0].from,
--						    entry->fsuuid);
-+			result = uuid_to_bin(args[0].from, (uuid_t *)&entry->fsuuid);
- 			if (!result)
- 				entry->flags |= IMA_FSUUID;
- 			break;
 -- 
-2.11.0
+2.9.4
