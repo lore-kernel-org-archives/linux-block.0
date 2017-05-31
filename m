@@ -1,47 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40046 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751022AbdEaMhn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2017 08:37:43 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 2/9] block: introduce flag of QUEUE_FLAG_QUIESCED
-Date: Wed, 31 May 2017 20:36:59 +0800
-Message-Id: <20170531123706.20885-3-ming.lei@redhat.com>
-In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
-References: <20170531123706.20885-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net
+Cc: linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v5 06/17] fs: adapt sync_file_range to new reporting infrastructure
+Date: Wed, 31 May 2017 08:45:29 -0400
+Message-Id: <20170531124540.8782-7-jlayton@redhat.com>
+In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
+References: <20170531124540.8782-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This flag is introduced for improving the quiescing code.
+Since it returns errors in a way similar to fsync, have it use the same
+method for returning previously-reported writeback errors.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- include/linux/blkdev.h | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/sync.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 41291be82ac4..60967797f4f6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -618,6 +618,7 @@ struct request_queue {
- #define QUEUE_FLAG_STATS       27	/* track rq completion times */
- #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
- #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
-+#define QUEUE_FLAG_QUIESCED    30	/* queue has been quiesced */
+diff --git a/fs/sync.c b/fs/sync.c
+index ec93aac4feb9..819a81526714 100644
+--- a/fs/sync.c
++++ b/fs/sync.c
+@@ -275,8 +275,11 @@ SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
+  *
+  *
+  * SYNC_FILE_RANGE_WAIT_BEFORE and SYNC_FILE_RANGE_WAIT_AFTER will detect any
+- * I/O errors or ENOSPC conditions and will return those to the caller, after
+- * clearing the EIO and ENOSPC flags in the address_space.
++ * error condition that occurred prior to or after writeback, and will return
++ * that to the caller, while advancing the file's errseq_t cursor. Note that
++ * any errors returned here may have occurred in an area of the file that is
++ * not covered by the given range as most filesystems track writeback errors
++ * on a per-address_space basis
+  *
+  * It should be noted that none of these operations write out the file's
+  * metadata.  So unless the application is strictly performing overwrites of
+@@ -343,19 +346,25 @@ SYSCALL_DEFINE4(sync_file_range, int, fd, loff_t, offset, loff_t, nbytes,
+ 	if (flags & SYNC_FILE_RANGE_WAIT_BEFORE) {
+ 		ret = filemap_fdatawait_range(mapping, offset, endbyte);
+ 		if (ret < 0)
+-			goto out_put;
++			goto out_report;
+ 	}
  
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -712,6 +713,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
-+#define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
+ 	if (flags & SYNC_FILE_RANGE_WRITE) {
+ 		ret = __filemap_fdatawrite_range(mapping, offset, endbyte,
+ 						 WB_SYNC_NONE);
+ 		if (ret < 0)
+-			goto out_put;
++			goto out_report;
+ 	}
  
- static inline bool blk_account_rq(struct request *rq)
- {
+ 	if (flags & SYNC_FILE_RANGE_WAIT_AFTER)
+ 		ret = filemap_fdatawait_range(mapping, offset, endbyte);
+ 
++out_report:
++	if (mapping->host->i_sb->s_type->fs_flags & FS_WB_ERRSEQ) {
++		int ret2 = filemap_report_wb_err(f.file);
++		if (!ret)
++			ret = ret2;
++	}
+ out_put:
+ 	fdput(f);
+ out:
 -- 
 2.9.4
