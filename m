@@ -1,50 +1,78 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, "J . Bruce Fields"
-	<bfields@fieldses.org>, Jeff Layton <jlayton@poochiereds.net>, Omar Sandoval
-	<osandov@fb.com>, <linux-nfs@vger.kernel.org>
-Subject: [PATCH v2 6/6] nfsd: Check queue type before submitting a SCSI request
-Date: Wed, 31 May 2017 14:43:50 -0700
-Message-ID: <20170531214350.31157-7-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
-References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 16/24] ima/policy: switch to use uuid_t
+Date: Wed, 31 May 2017 18:18:18 +0200
+Message-Id: <20170531161826.23243-17-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Since using scsi_req() is only allowed against request queues for
-which struct scsi_request is the first member of their private
-request data, refuse to submit SCSI commands against a queue for
-which this is not the case.
-
-References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: J. Bruce Fields <bfields@fieldses.org>
-Cc: Jeff Layton <jlayton@poochiereds.net>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: linux-nfs@vger.kernel.org
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- fs/nfsd/blocklayout.c | 3 +++
- 1 file changed, 3 insertions(+)
+ security/integrity/ima/ima_policy.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
-index fb5213afc854..47ed19c53f2e 100644
---- a/fs/nfsd/blocklayout.c
-+++ b/fs/nfsd/blocklayout.c
-@@ -219,6 +219,9 @@ static int nfsd4_scsi_identify_device(struct block_device *bdev,
- 	u8 *buf, *d, type, assoc;
- 	int error;
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index 49fbc3e8f012..9a7c7cbdbe7c 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -61,7 +61,7 @@ struct ima_rule_entry {
+ 	enum ima_hooks func;
+ 	int mask;
+ 	unsigned long fsmagic;
+-	u8 fsuuid[16];
++	uuid_t fsuuid;
+ 	kuid_t uid;
+ 	kuid_t fowner;
+ 	bool (*uid_op)(kuid_t, kuid_t);    /* Handlers for operators       */
+@@ -244,7 +244,7 @@ static bool ima_match_rules(struct ima_rule_entry *rule, struct inode *inode,
+ 	    && rule->fsmagic != inode->i_sb->s_magic)
+ 		return false;
+ 	if ((rule->flags & IMA_FSUUID) &&
+-	    memcmp(rule->fsuuid, inode->i_sb->s_uuid, sizeof(rule->fsuuid)))
++	    memcmp(&rule->fsuuid, inode->i_sb->s_uuid, sizeof(rule->fsuuid)))
+ 		return false;
+ 	if ((rule->flags & IMA_UID) && !rule->uid_op(cred->uid, rule->uid))
+ 		return false;
+@@ -711,13 +711,12 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
+ 		case Opt_fsuuid:
+ 			ima_log_string(ab, "fsuuid", args[0].from);
  
-+	if (WARN_ON_ONCE(!blk_queue_scsi_passthrough(q)))
-+		return -EINVAL;
-+
- 	buf = kzalloc(bufflen, GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
+-			if (memchr_inv(entry->fsuuid, 0x00,
+-				       sizeof(entry->fsuuid))) {
++			if (uuid_is_null(&entry->fsuuid)) {
+ 				result = -EINVAL;
+ 				break;
+ 			}
+ 
+-			result = uuid_to_bin(args[0].from, (uuid_t *)&entry->fsuuid);
++			result = uuid_parse(args[0].from, &entry->fsuuid);
+ 			if (!result)
+ 				entry->flags |= IMA_FSUUID;
+ 			break;
+@@ -1086,7 +1085,7 @@ int ima_policy_show(struct seq_file *m, void *v)
+ 	}
+ 
+ 	if (entry->flags & IMA_FSUUID) {
+-		seq_printf(m, "fsuuid=%pU", entry->fsuuid);
++		seq_printf(m, "fsuuid=%pU", &entry->fsuuid);
+ 		seq_puts(m, " ");
+ 	}
+ 
 -- 
-2.12.2
+2.11.0
