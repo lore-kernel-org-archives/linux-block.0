@@ -1,105 +1,96 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f195.google.com ([209.85.220.195]:36209 "EHLO
-        mail-qk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752132AbdEZD4I (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2017 23:56:08 -0400
-Received: by mail-qk0-f195.google.com with SMTP id y128so32438247qka.3
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2017 20:56:08 -0700 (PDT)
-Date: Thu, 25 May 2017 23:55:54 -0400
-From: Shaun McDowell <shaunjmcdowell@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: jbacik@fb.com, nbd-general@lists.sourceforge.net, bsdkurt@gmail.com
-Subject: [PATCH] nbd: add FUA op support
-Message-ID: <20170526035554.GA31566@auir>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from mx1.redhat.com ([209.132.183.28]:35590 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751028AbdEaMiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 08:38:55 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 9/9] Revert "blk-mq: don't use sync workqueue flushing from drivers"
+Date: Wed, 31 May 2017 20:37:06 +0800
+Message-Id: <20170531123706.20885-10-ming.lei@redhat.com>
+In-Reply-To: <20170531123706.20885-1-ming.lei@redhat.com>
+References: <20170531123706.20885-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-NBD userland client and server have FUA (forced unit access) support
-and flags defined. Make NBD kernel module recognize NBD_FLAG_SEND_FUA,
-enable FUA on the queue, and forward FUA requests to the server.
+This patch reverts commit 2719aa217e0d02(blk-mq: don't use
+sync workqueue flushing from drivers) because only
+blk_mq_quiesce_queue() need the sync flush, and now
+we don't need to stop queue any more, so revert it.
 
-Signed-off-by: Shaun McDowell <shaunjmcdowell@gmail.com>
+Also changes to cancel_delayed_work() in blk_mq_stop_hw_queue().
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/nbd.c      | 16 +++++++++++++---
- include/uapi/linux/nbd.h |  4 ++++
- 2 files changed, 17 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 30 ++++++++----------------------
+ 1 file changed, 8 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9a7bb2c..c5e52f6 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -400,6 +400,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	unsigned long size = blk_rq_bytes(req);
- 	struct bio *bio;
- 	u32 type;
-+	u32 nbd_cmd_flags = 0;
- 	u32 tag = blk_mq_unique_tag(req);
- 	int sent = nsock->sent, skip = 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 352aaaf0bcf9..6be10102b343 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -42,7 +42,6 @@ static LIST_HEAD(all_q_list);
  
-@@ -429,6 +430,9 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 		return -EIO;
- 	}
+ static void blk_mq_poll_stats_start(struct request_queue *q);
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+-static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
  
-+	if (req->cmd_flags & REQ_FUA)
-+		nbd_cmd_flags |= NBD_CMD_FLAG_FUA;
-+
- 	/* We did a partial send previously, and we at least sent the whole
- 	 * request struct, so just go and send the rest of the pages in the
- 	 * request.
-@@ -442,7 +446,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	}
- 	cmd->index = index;
- 	cmd->cookie = nsock->cookie;
--	request.type = htonl(type);
-+	request.type = htonl(type | nbd_cmd_flags);
- 	if (type != NBD_CMD_FLUSH) {
- 		request.from = cpu_to_be64((u64)blk_rq_pos(req) << 9);
- 		request.len = htonl(size);
-@@ -965,8 +969,12 @@ static void nbd_parse_flags(struct nbd_device *nbd)
- 		set_disk_ro(nbd->disk, false);
- 	if (config->flags & NBD_FLAG_SEND_TRIM)
- 		queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, nbd->disk->queue);
--	if (config->flags & NBD_FLAG_SEND_FLUSH)
--		blk_queue_write_cache(nbd->disk->queue, true, false);
-+	if (config->flags & NBD_FLAG_SEND_FLUSH) {
-+		if (config->flags & NBD_FLAG_SEND_FUA)
-+			blk_queue_write_cache(nbd->disk->queue, true, true);
-+		else
-+			blk_queue_write_cache(nbd->disk->queue, true, false);
-+	}
- 	else
- 		blk_queue_write_cache(nbd->disk->queue, false, false);
+ static int blk_mq_poll_stats_bkt(const struct request *rq)
+ {
+@@ -1177,16 +1176,6 @@ bool blk_mq_queue_stopped(struct request_queue *q)
  }
-@@ -1309,6 +1317,8 @@ static int nbd_dbg_flags_show(struct seq_file *s, void *unused)
- 		seq_puts(s, "NBD_FLAG_READ_ONLY\n");
- 	if (flags & NBD_FLAG_SEND_FLUSH)
- 		seq_puts(s, "NBD_FLAG_SEND_FLUSH\n");
-+	if (flags & NBD_FLAG_SEND_FUA)
-+		seq_puts(s, "NBD_FLAG_SEND_FUA\n");
- 	if (flags & NBD_FLAG_SEND_TRIM)
- 		seq_puts(s, "NBD_FLAG_SEND_TRIM\n");
+ EXPORT_SYMBOL(blk_mq_queue_stopped);
  
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index 155e33f..a50527e 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -41,10 +41,14 @@ enum {
- #define NBD_FLAG_HAS_FLAGS	(1 << 0) /* nbd-server supports flags */
- #define NBD_FLAG_READ_ONLY	(1 << 1) /* device is read-only */
- #define NBD_FLAG_SEND_FLUSH	(1 << 2) /* can flush writeback cache */
-+#define NBD_FLAG_SEND_FUA	(1 << 3) /* send FUA (forced unit access) */
- /* there is a gap here to match userspace */
- #define NBD_FLAG_SEND_TRIM	(1 << 5) /* send trim/discard */
- #define NBD_FLAG_CAN_MULTI_CONN	(1 << 8)	/* Server supports multiple connections per export. */
+-static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+-{
+-	if (sync)
+-		cancel_delayed_work_sync(&hctx->run_work);
+-	else
+-		cancel_delayed_work(&hctx->run_work);
+-
+-	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-}
+-
+ /*
+  * We do not guarantee that dispatch can be drained or blocked
+  * after blk_mq_stop_hw_queue() returns. Please use
+@@ -1194,18 +1183,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+  */
+ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ {
+-	__blk_mq_stop_hw_queue(hctx, false);
+-}
+-EXPORT_SYMBOL(blk_mq_stop_hw_queue);
++	cancel_delayed_work(&hctx->run_work);
  
-+/* values for cmd flags in the upper 16 bits of request type */
-+#define NBD_CMD_FLAG_FUA	(1 << 16) /* FUA (forced unit access) op */
+-static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i)
+-		__blk_mq_stop_hw_queue(hctx, sync);
++	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+ }
++EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+ 
+ /*
+  * We do not guarantee that dispatch can be drained or blocked
+@@ -1214,7 +1196,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+  */
+ void blk_mq_stop_hw_queues(struct request_queue *q)
+ {
+-	__blk_mq_stop_hw_queues(q, false);
++	struct blk_mq_hw_ctx *hctx;
++	int i;
 +
- /* These are client behavior specific flags. */
- #define NBD_CFLAG_DESTROY_ON_DISCONNECT	(1 << 0) /* delete the nbd device on
- 						    disconnect. */
++	queue_for_each_hw_ctx(q, hctx, i)
++		blk_mq_stop_hw_queue(hctx);
+ }
+ EXPORT_SYMBOL(blk_mq_stop_hw_queues);
+ 
 -- 
-2.7.4
+2.9.4
