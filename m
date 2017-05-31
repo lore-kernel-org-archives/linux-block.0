@@ -1,48 +1,57 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
- boyu.mt@taobao.com, wenqing.lz@taobao.com, qijiang.qj@alibaba-inc.com
-From: Joseph Qi <jiangqi903@gmail.com>
-Subject: blk-mq: free callback if error occurs in blk_mq_init_allocated_queue
-Message-ID: <728065d3-0100-514a-70b0-66b1cfe85480@gmail.com>
-Date: Thu, 1 Jun 2017 13:02:40 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Hugh Dickins <hughd@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH 23/24] tmpfs: generate random sb->s_uuid
+Date: Wed, 31 May 2017 18:18:25 +0200
+Message-Id: <20170531161826.23243-24-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+From: Amir Goldstein <amir73il@gmail.com>
 
-If error occurs, we have to free the allocated callback in
-blk_mq_init_allocated_queue to avoid memory leaking.
+This is used by overlayfs to encode intrasystem unique file handles.
 
-Fixes: 34dbad5d26e2 ("blk-stat: convert to callback-based statistics reporting")
-Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
+Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
+Cc: Hugh Dickins <hughd@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ mm/shmem.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f2224ffd..50b5d7b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2273,7 +2273,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+diff --git a/mm/shmem.c b/mm/shmem.c
+index e67d6ba4e98e..391f2dcca727 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -75,6 +75,7 @@ static struct vfsmount *shm_mnt;
+ #include <uapi/linux/memfd.h>
+ #include <linux/userfaultfd_k.h>
+ #include <linux/rmap.h>
++#include <linux/uuid.h>
  
- 	q->queue_ctx = alloc_percpu(struct blk_mq_ctx);
- 	if (!q->queue_ctx)
--		goto err_exit;
-+		goto err_poll_cb;
+ #include <linux/uaccess.h>
+ #include <asm/pgtable.h>
+@@ -3761,6 +3762,7 @@ int shmem_fill_super(struct super_block *sb, void *data, int silent)
+ #ifdef CONFIG_TMPFS_POSIX_ACL
+ 	sb->s_flags |= MS_POSIXACL;
+ #endif
++	uuid_gen(&sb->s_uuid);
  
- 	/* init q->mq_kobj and sw queues' kobjects */
- 	blk_mq_sysfs_init(q);
-@@ -2346,6 +2346,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	kfree(q->queue_hw_ctx);
- err_percpu:
- 	free_percpu(q->queue_ctx);
-+err_poll_cb:
-+	blk_stat_free_callback(q->poll_cb);
- err_exit:
- 	q->mq_ops = NULL;
- 	return ERR_PTR(-ENOMEM);
+ 	inode = shmem_get_inode(sb, NULL, S_IFDIR | sbinfo->mode, 0, VM_NORESERVE);
+ 	if (!inode)
 -- 
-1.8.3.1
+2.11.0
