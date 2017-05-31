@@ -1,61 +1,57 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 11/12] blk-mq: Warn when attempting to run a hardware queue that is not mapped
-Date: Wed, 31 May 2017 15:52:45 -0700
-Message-ID: <20170531225246.26261-12-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-References: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:43325 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751433AbdEaQUe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 12:20:34 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc: Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 20/24] sysctl: switch to use uuid_t
+Date: Wed, 31 May 2017 18:18:22 +0200
+Message-Id: <20170531161826.23243-21-hch@lst.de>
+In-Reply-To: <20170531161826.23243-1-hch@lst.de>
+References: <20170531161826.23243-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A queue must be frozen while the mapped state of a hardware queue
-is changed. Additionally, any change of the mapped state is
-followed by a call to blk_mq_map_swqueue() (see also
-blk_mq_init_allocated_queue() and blk_mq_update_nr_hw_queues()).
-Since blk_mq_map_swqueue() does not map any unmapped hardware
-queue onto any software queue, no attempt will be made to run
-an unmapped hardware queue. Hence issue a warning upon attempts
-to run an unmapped hardware queue.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Amir Goldstein <amir73il@gmail.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- block/blk-mq.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ kernel/sysctl_binary.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b56cb3d9060f..12a627743842 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1091,8 +1091,9 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
--	if (unlikely(blk_mq_hctx_stopped(hctx) ||
--		     !blk_mq_hw_queue_mapped(hctx)))
-+	WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx));
-+
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
+diff --git a/kernel/sysctl_binary.c b/kernel/sysctl_binary.c
+index ece4b177052b..939a158eab11 100644
+--- a/kernel/sysctl_binary.c
++++ b/kernel/sysctl_binary.c
+@@ -1119,7 +1119,7 @@ static ssize_t bin_uuid(struct file *file,
+ 	/* Only supports reads */
+ 	if (oldval && oldlen) {
+ 		char buf[UUID_STRING_LEN + 1];
+-		uuid_be uuid;
++		uuid_t uuid;
  
- 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
-@@ -1252,7 +1253,7 @@ static void blk_mq_run_work_fn(struct work_struct *work)
+ 		result = kernel_read(file, 0, buf, sizeof(buf) - 1);
+ 		if (result < 0)
+@@ -1128,7 +1128,7 @@ static ssize_t bin_uuid(struct file *file,
+ 		buf[result] = '\0';
  
- void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
- {
--	if (unlikely(!blk_mq_hw_queue_mapped(hctx)))
-+	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
- 		return;
+ 		result = -EIO;
+-		if (uuid_be_to_bin(buf, &uuid))
++		if (uuid_parse(buf, &uuid))
+ 			goto out;
  
- 	/*
+ 		if (oldlen > 16)
 -- 
-2.12.2
+2.11.0
