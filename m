@@ -1,77 +1,42 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>
-Subject: [PATCH v2 02/12] block: Introduce request_queue.initialize_rq_fn()
-Date: Wed, 31 May 2017 15:52:36 -0700
-Message-ID: <20170531225246.26261-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-References: <20170531225246.26261-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:51042 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750999AbdEaSZf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 May 2017 14:25:35 -0400
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20170531161826.23243-2-hch@lst.de>
+References: <20170531161826.23243-2-hch@lst.de> <20170531161826.23243-1-hch@lst.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dhowells@redhat.com,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 01/24] uuid,afs: move struct uuid_v1 back into afs
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 31 May 2017 19:25:31 +0100
+Message-ID: <31365.1496255131@warthog.procyon.org.uk>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Several block drivers need to initialize the driver-private data
-after having called blk_get_request() and before .prep_rq_fn() is
-called, e.g. when submitting a REQ_OP_SCSI_* request. Avoid that
-that initialization code has to be repeated after every
-blk_get_request() call by adding a new callback function to struct
-request_queue.
+Christoph Hellwig <hch@lst.de> wrote:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
----
- block/blk-core.c       | 11 +++++++++--
- include/linux/blkdev.h |  4 ++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+> This essentially is a partial revert of commit ff548773
+> ("afs: Move UUID struct to linux/uuid.h") and moves struct uuid_v1 back into
+> fs/afs as struct afs_uuid.  It however keeps it as big endian structure
+> so that we can use the normal uuid generation helpers when casting to/from
+> struct afs_uuid.
+> 
+> The V1 uuid intrepreatation in struct form isn't really useful to the
+> rest of the kernel, and not really compatible to it either, so move it
+> back to AFS instead of polluting the global uuid.h.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3bc431a77309..3f68bc1f044c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1308,12 +1308,19 @@ static struct request *blk_old_get_request(struct request_queue *q,
- struct request *blk_get_request(struct request_queue *q, unsigned int op,
- 				gfp_t gfp_mask)
- {
-+	struct request *req;
-+
- 	if (q->mq_ops)
--		return blk_mq_alloc_request(q, op,
-+		req = blk_mq_alloc_request(q, op,
- 			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
- 				0 : BLK_MQ_REQ_NOWAIT);
- 	else
--		return blk_old_get_request(q, op, gfp_mask);
-+		req = blk_old_get_request(q, op, gfp_mask);
-+
-+	if (!IS_ERR(req) && q->initialize_rq_fn)
-+		q->initialize_rq_fn(req);
-+
-+	return req;
- }
- EXPORT_SYMBOL(blk_get_request);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6c4235018b49..cbc0028290e4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -410,8 +410,12 @@ struct request_queue {
- 	rq_timed_out_fn		*rq_timed_out_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
- 	lld_busy_fn		*lld_busy_fn;
-+	/* Called just after a request is allocated */
- 	init_rq_fn		*init_rq_fn;
-+	/* Called just before a request is freed */
- 	exit_rq_fn		*exit_rq_fn;
-+	/* Called from inside blk_get_request() */
-+	void (*initialize_rq_fn)(struct request *rq);
- 
- 	const struct blk_mq_ops	*mq_ops;
- 
--- 
-2.12.2
+Acked-by: David Howells <dhowells@redhat.com>
