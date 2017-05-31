@@ -1,9 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:43325 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751433AbdEaQUe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2017 12:20:34 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Christoph Hellwig <hch@lst.de>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Amir Goldstein <amir73il@gmail.com>,
@@ -16,42 +11,43 @@ Cc: Shaohua Li <shli@kernel.org>,
         linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 20/24] sysctl: switch to use uuid_t
-Date: Wed, 31 May 2017 18:18:22 +0200
-Message-Id: <20170531161826.23243-21-hch@lst.de>
+Subject: [PATCH 24/24] MAINTAINERS: add uuid entry
+Date: Wed, 31 May 2017 18:18:26 +0200
+Message-Id: <20170531161826.23243-25-hch@lst.de>
 In-Reply-To: <20170531161826.23243-1-hch@lst.de>
 References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
+
+I'll keep maintaining whatever little changed we need here, with Andy as
+my designated reviewer.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- kernel/sysctl_binary.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/kernel/sysctl_binary.c b/kernel/sysctl_binary.c
-index ece4b177052b..939a158eab11 100644
---- a/kernel/sysctl_binary.c
-+++ b/kernel/sysctl_binary.c
-@@ -1119,7 +1119,7 @@ static ssize_t bin_uuid(struct file *file,
- 	/* Only supports reads */
- 	if (oldval && oldlen) {
- 		char buf[UUID_STRING_LEN + 1];
--		uuid_be uuid;
-+		uuid_t uuid;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 053c3bdd1fe5..660c14729205 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13463,6 +13463,17 @@ W:	http://en.wikipedia.org/wiki/Util-linux
+ T:	git git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git
+ S:	Maintained
  
- 		result = kernel_read(file, 0, buf, sizeof(buf) - 1);
- 		if (result < 0)
-@@ -1128,7 +1128,7 @@ static ssize_t bin_uuid(struct file *file,
- 		buf[result] = '\0';
- 
- 		result = -EIO;
--		if (uuid_be_to_bin(buf, &uuid))
-+		if (uuid_parse(buf, &uuid))
- 			goto out;
- 
- 		if (oldlen > 16)
++UUID HELPERS
++M:	Christoph Hellwig <hch@lst.de>
++R:	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
++L:	linux-kernel@vger.kernel.org
++T:	git git://git.infradead.org/users/hch/uuid.git
++F:	lib/uuid.c
++F:	lib/test_uuid.c
++F:	include/linux/uuid.h
++F:	include/uapi/linux/uuid.h
++S:	Maintained
++
+ UVESAFB DRIVER
+ M:	Michal Januszewski <spock@gentoo.org>
+ L:	linux-fbdev@vger.kernel.org
 -- 
 2.11.0
