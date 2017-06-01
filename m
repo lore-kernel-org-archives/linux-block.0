@@ -1,77 +1,22 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net
-Cc: linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 12/17] fs: allow __generic_file_fsync to support both flavors of error reporting
-Date: Wed, 31 May 2017 08:45:35 -0400
-Message-Id: <20170531124540.8782-13-jlayton@redhat.com>
-In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Thu, 1 Jun 2017 08:09:19 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v2 05/12] blk-mq: Initialize a request before assigning
+	a tag
+Message-ID: <20170601060919.GG16248@lst.de>
+References: <20170531225246.26261-1-bart.vanassche@sandisk.com> <20170531225246.26261-6-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170531225246.26261-6-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-For now, we add a FS_WB_ERRSEQ check to know how to handle it.
+Looks fine,
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/libfs.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/fs/libfs.c b/fs/libfs.c
-index 1dec90819366..2ae58a252718 100644
---- a/fs/libfs.c
-+++ b/fs/libfs.c
-@@ -971,10 +971,18 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
- 				 int datasync)
- {
- 	struct inode *inode = file->f_mapping->host;
--	int err;
--	int ret;
--
--	err = filemap_write_and_wait_range(inode->i_mapping, start, end);
-+	int err, ret;
-+	bool use_errseq = inode->i_sb->s_type->fs_flags & FS_WB_ERRSEQ;
-+	errseq_t since;
-+
-+	if (use_errseq) {
-+		since = READ_ONCE(file->f_wb_err);
-+		err = filemap_write_and_wait_range_since(inode->i_mapping,
-+				start, end, since);
-+	} else {
-+		err = filemap_write_and_wait_range(inode->i_mapping,
-+							start, end);
-+	}
- 	if (err)
- 		return err;
- 
-@@ -988,11 +996,15 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
- 	err = sync_inode_metadata(inode, 1);
- 	if (ret == 0)
- 		ret = err;
--
- out:
- 	inode_unlock(inode);
--	err = filemap_check_errors(inode->i_mapping);
--	return ret ? ret : err;
-+	if (ret == 0) {
-+		if (use_errseq)
-+			err = filemap_check_wb_err(inode->i_mapping, since);
-+		else
-+			err = filemap_check_errors(inode->i_mapping);
-+	}
-+	return ret;
- }
- EXPORT_SYMBOL(__generic_file_fsync);
- 
--- 
-2.9.4
+Btw, blk_mq_rq_ctx_init should be marked static, but I'll send a separate
+patch for that.
