@@ -1,61 +1,88 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43767 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751008AbdEBGPL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 May 2017 02:15:11 -0400
-Subject: Re: [PATCH 6/7] blk-mq-sched: remove hack that bypasses scheduler for
- reserved requests
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-References: <1493391340-24629-1-git-send-email-axboe@fb.com>
- <1493391340-24629-7-git-send-email-axboe@fb.com>
-Cc: ming.lei@redhat.com, hch@lst.de
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <513a18bb-4958-a8e7-e9f0-d6fc2276b28f@suse.de>
-Date: Tue, 2 May 2017 08:15:05 +0200
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 1 Jun 2017 10:41:32 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH v2 2/4] blk-mq-debugfs: Show requeue list
+Message-ID: <20170601024131.GD23563@ming.t460p>
+References: <20170531213050.30276-1-bart.vanassche@sandisk.com>
+ <20170531213050.30276-3-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-In-Reply-To: <1493391340-24629-7-git-send-email-axboe@fb.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170531213050.30276-3-bart.vanassche@sandisk.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On 04/28/2017 04:55 PM, Jens Axboe wrote:
-> We have update the troublesome driver (mtip32xx) to deal with this
-> appropriately. So kill the hack that bypassed scheduler allocation
-> and insertion for reserved requests.
+On Wed, May 31, 2017 at 02:30:48PM -0700, Bart Van Assche wrote:
+> When verifying whether or not a blk-mq driver forgot to kick the
+> requeue list after having requeued a request it is important to
+> be able to verify the contents of the requeue list. Hence export
+> that list through debugfs.
 > 
-updated?
-
-> Signed-off-by: Jens Axboe <axboe@fb.com>
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-mq-sched.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+>  block/blk-mq-debugfs.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
 > 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 8b361e192e8a..e79e9f18d7c2 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -82,11 +82,7 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
->  	if (likely(!data->hctx))
->  		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index d56ddd7a1285..8b06a12c1461 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -308,6 +308,37 @@ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
+>  }
+>  EXPORT_SYMBOL_GPL(blk_mq_debugfs_rq_show);
 >  
-> -	/*
-> -	 * For a reserved tag, allocate a normal request since we might
-> -	 * have driver dependencies on the value of the internal tag.
-> -	 */
-> -	if (e && !(data->flags & BLK_MQ_REQ_RESERVED)) {
-> +	if (e) {
->  		data->flags |= BLK_MQ_REQ_INTERNAL;
+> +static void *queue_requeue_list_start(struct seq_file *m, loff_t *pos)
+> +	__acquires(&q->requeue_lock)
+> +{
+> +	struct request_queue *q = m->private;
+> +
+> +	spin_lock_irq(&q->requeue_lock);
+> +	return seq_list_start(&q->requeue_list, *pos);
+> +}
+> +
+> +static void *queue_requeue_list_next(struct seq_file *m, void *v, loff_t *pos)
+> +{
+> +	struct request_queue *q = m->private;
+> +
+> +	return seq_list_next(v, &q->requeue_list, pos);
+> +}
+> +
+> +static void queue_requeue_list_stop(struct seq_file *m, void *v)
+> +	__releases(&q->requeue_lock)
+> +{
+> +	struct request_queue *q = m->private;
+> +
+> +	spin_unlock_irq(&q->requeue_lock);
+> +}
+> +
+> +static const struct seq_operations queue_requeue_list_seq_ops = {
+> +	.start	= queue_requeue_list_start,
+> +	.next	= queue_requeue_list_next,
+> +	.stop	= queue_requeue_list_stop,
+> +	.show	= blk_mq_debugfs_rq_show,
+> +};
+> +
+>  static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
+>  	__acquires(&hctx->lock)
+>  {
+> @@ -665,6 +696,7 @@ const struct file_operations blk_mq_debugfs_fops = {
 >  
->  		/*
+>  static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+>  	{"poll_stat", 0400, queue_poll_stat_show},
+> +	{"requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops},
+>  	{"state", 0600, queue_state_show, queue_state_write},
+>  	{},
+>  };
+> -- 
+> 2.12.2
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cheers,
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+thanks,
+Ming
