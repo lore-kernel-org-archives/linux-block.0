@@ -1,47 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from gateway32.websitewelcome.com ([192.185.145.182]:42080 "EHLO
-        gateway32.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1757598AbdEWWh6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 18:37:58 -0400
-Received: from cm2.websitewelcome.com (cm2.websitewelcome.com [192.185.178.13])
-        by gateway32.websitewelcome.com (Postfix) with ESMTP id C421186F361
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2017 17:13:49 -0500 (CDT)
-Date: Tue, 23 May 2017 17:13:47 -0500
-From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-To: Josef Bacik <jbacik@fb.com>
-Cc: linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-Subject: [PATCH] block: fix potential null pointer dereference
-Message-ID: <20170523221347.GA11184@embeddedgus>
+Return-Path: <hch@lst.de>
+Date: Thu, 1 Jun 2017 08:10:12 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v2 08/12] block: Document what queue type each function
+	is intended for
+Message-ID: <20170601061012.GI16248@lst.de>
+References: <20170531225246.26261-1-bart.vanassche@sandisk.com> <20170531225246.26261-9-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170531225246.26261-9-bart.vanassche@sandisk.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Add null check before dereferencing pointer dev_list inside
-function nla_nest_end() at line 1968: nla_nest_end(reply, dev_list);
+On Wed, May 31, 2017 at 03:52:42PM -0700, Bart Van Assche wrote:
+> Some functions in block/blk-core.c must only be used on blk-sq queues
+> while others are safe to use against any queue type. Document which
+> functions are intended for blk-sq queues and issue a warning if the
+> blk-sq API is misused.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
 
-Addresses-Coverity-ID: 1408827
-Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
----
- drivers/block/nbd.c | 3 +++
- 1 file changed, 3 insertions(+)
+Looks fine,
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9a7bb2c..6006de5 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1948,6 +1948,9 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	dev_list = nla_nest_start(reply, NBD_ATTR_DEVICE_LIST);
-+	if (!dev_list)
-+		goto out;
-+
- 	if (index == -1) {
- 		ret = idr_for_each(&nbd_index_idr, &status_cb, reply);
- 		if (ret) {
--- 
-2.5.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
