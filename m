@@ -1,31 +1,28 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:26062 "EHLO mga14.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:29600 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751767AbdFTXUj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Jun 2017 19:20:39 -0400
-Date: Tue, 20 Jun 2017 19:29:14 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Jon Derrick <jonathan.derrick@intel.com>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, linux-block@vger.kernel.org,
-        stable@vger.kernel.org, linux-pci@vger.kernel.org
+        id S1752646AbdFTW0B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jun 2017 18:26:01 -0400
 Subject: Re: [PATCH] pci/vmd: Move srcu cleanup after bus/irq domain removal
-Message-ID: <20170620232913.GF24415@localhost.localdomain>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: linux-block@vger.kernel.org, Keith Busch <keith.busch@intel.com>,
+        stable@vger.kernel.org, linux-pci@vger.kernel.org
 References: <1497996784-9177-1-git-send-email-jonathan.derrick@intel.com>
- <a2ea4fb0-f451-ab6e-05db-1bf0a7a74807@intel.com>
+From: Jon Derrick <jonathan.derrick@intel.com>
+Message-ID: <a2ea4fb0-f451-ab6e-05db-1bf0a7a74807@intel.com>
+Date: Thu, 1 Jun 2017 12:30:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <a2ea4fb0-f451-ab6e-05db-1bf0a7a74807@intel.com>
+In-Reply-To: <1497996784-9177-1-git-send-email-jonathan.derrick@intel.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> On 06/20/2017 04:13 PM, Jon Derrick wrote:
++linux-pci
+
+On 06/20/2017 04:13 PM, Jon Derrick wrote:
 > Recent __call_srcu changes have exposed that we need to cleanup srcu
 > structures after pci_stop_root_bus calls into vmd_msi_free.
-
-Adding the obligatory:
-
-Fixes: 3906b91844d6 ("PCI: vmd: Use SRCU as a local RCU to prevent delaying global RCU")
- 
+> 
 > Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
 > Acked-by: Keith Busch <keith.busch@intel.com>
 > Cc: <stable@vger.kernel.org> # 4.11
