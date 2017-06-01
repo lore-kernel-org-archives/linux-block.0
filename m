@@ -1,66 +1,49 @@
-Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 04/13] dm: fix REQ_RAHEAD handling
-Date: Sat,  3 Jun 2017 09:37:57 +0200
-Message-Id: <20170603073806.2046-5-hch@lst.de>
-In-Reply-To: <20170603073806.2046-1-hch@lst.de>
-References: <20170603073806.2046-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3 0/4] Extend blk-mq-debugfs functionality further
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b6bc9856-7165-9938-c7e9-9dbe96b022b2@kernel.dk>
+Date: Thu, 1 Jun 2017 12:03:26 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-A few (but not all) dm targets use a special EWOULDBLOCK error code for
-failing REQ_RAHEAD requests that fail due to a lack of available resources.
-But no one else knows about this magic code, and lower level drivers also
-don't generate it when failing read-ahead requests for similar reasons.
+On 06/01/2017 08:55 AM, Bart Van Assche wrote:
+> Hello Jens,
+> 
+> This series contains four patches that add new features to the blk-mq-debugfs
+> code. Please consider these patches for kernel v4.13.
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> Changes between v2 and v3:
+> - Renamed a function in the patch that shows busy requests. In the same patch,
+>   added a comment as requested by Ming.
+> - Added Reviewed-by tags to those patches that got an additional review.  
+> 
+> Changes compared to v1:
+> - Left out the first patch of this series because it's already upstream.
+> - Renamed "ctx" into "params" in the patch that shows the busy requests.
+> - In the same patch, switched from blk_mq_debugfs_rq_show() to
+>   __blk_mq_debugfs_rq_show().
+> 
+> The patches in this series are:
+> 
+> Bart Van Assche (4):
+>   blk-mq-debugfs: Show atomic request flags
+>   blk-mq-debugfs: Show requeue list
+>   blk-mq-debugfs: Show busy requests
+>   blk-mq-debugfs: Add 'kick' operation
+> 
+>  block/blk-mq-debugfs.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 76 insertions(+), 1 deletion(-)
 
-So remove this special casing and ignore all additional error handling for
-REQ_RAHEAD - if this was a real underlying error we'd get a normal read
-once the real read comes in.
+Added for 4.13, thanks Bart.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
----
- drivers/md/dm-raid1.c  | 4 ++--
- drivers/md/dm-stripe.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index a95cbb80fb34..5e30b08b91d9 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -1214,7 +1214,7 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
- 	 */
- 	if (!r || (r == -EWOULDBLOCK)) {
- 		if (bio->bi_opf & REQ_RAHEAD)
--			return -EWOULDBLOCK;
-+			return -EIO;
- 
- 		queue_bio(ms, bio, rw);
- 		return DM_MAPIO_SUBMITTED;
-@@ -1258,7 +1258,7 @@ static int mirror_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (error == -EOPNOTSUPP)
- 		return error;
- 
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (unlikely(error)) {
-diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
-index 75152482f3ad..780e95889a7c 100644
---- a/drivers/md/dm-stripe.c
-+++ b/drivers/md/dm-stripe.c
-@@ -384,7 +384,7 @@ static int stripe_end_io(struct dm_target *ti, struct bio *bio, int error)
- 	if (!error)
- 		return 0; /* I/O complete */
- 
--	if ((error == -EWOULDBLOCK) && (bio->bi_opf & REQ_RAHEAD))
-+	if (bio->bi_opf & REQ_RAHEAD)
- 		return error;
- 
- 	if (error == -EOPNOTSUPP)
 -- 
-2.11.0
+Jens Axboe
