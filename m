@@ -1,20 +1,20 @@
-Return-Path: <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 1 Jun 2017 10:47:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>
 Subject: Re: [PATCH v2 3/4] blk-mq-debugfs: Show busy requests
-To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
- Ming Lei <ming.lei@redhat.com>
+Message-ID: <20170601024714.GE23563@ming.t460p>
 References: <20170531213050.30276-1-bart.vanassche@sandisk.com>
  <20170531213050.30276-4-bart.vanassche@sandisk.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <d4be7f33-2ac3-e935-6687-0e3618956e49@suse.de>
-Date: Thu, 1 Jun 2017 07:48:35 +0200
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170531213050.30276-4-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/31/2017 11:30 PM, Bart Van Assche wrote:
+On Wed, May 31, 2017 at 02:30:49PM -0700, Bart Van Assche wrote:
 > Requests that got stuck in a block driver are neither on
 > blk_mq_ctx.rq_list nor on any hw dispatch queue. Make these
 > visible in debugfs through the "busy" attribute.
@@ -28,14 +28,34 @@ On 05/31/2017 11:30 PM, Bart Van Assche wrote:
 >  block/blk-mq-debugfs.c | 26 ++++++++++++++++++++++++++
 >  1 file changed, 26 insertions(+)
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 8b06a12c1461..fa0f624dfccd 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -370,6 +370,31 @@ static const struct seq_operations hctx_dispatch_seq_ops = {
+>  	.show	= blk_mq_debugfs_rq_show,
+>  };
+>  
+> +struct show_busy_params {
+> +	struct seq_file		*m;
+> +	struct blk_mq_hw_ctx	*hctx;
+> +};
+> +
+> +static void hctx_show_busy(struct request *rq, void *data, bool reserved)
+> +{
+> +	const struct show_busy_params *params = data;
+> +
+> +	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
+> +	    test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
+> +		__blk_mq_debugfs_rq_show(params->m,
+> +					 list_entry_rq(&rq->queuelist));
+> +}
 
-Cheers,
+Not like dumping requests in ctx and requeue list, the dumped requests
+here may have been released and the result may not be 100% reliable,
+so suggest to add comment for this fact.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Otherwise, looks fine for me.
+
+Thanks,
+Ming
