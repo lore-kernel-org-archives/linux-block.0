@@ -1,20 +1,20 @@
-Return-Path: <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 1 Jun 2017 10:50:13 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>
 Subject: Re: [PATCH v2 4/4] blk-mq-debugfs: Add 'kick' operation
-To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
- Ming Lei <ming.lei@redhat.com>
+Message-ID: <20170601025013.GF23563@ming.t460p>
 References: <20170531213050.30276-1-bart.vanassche@sandisk.com>
  <20170531213050.30276-5-bart.vanassche@sandisk.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <0ddc8a94-5fb7-3842-1370-5ed1778c185b@suse.de>
-Date: Thu, 1 Jun 2017 07:48:56 +0200
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170531213050.30276-5-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 05/31/2017 11:30 PM, Bart Van Assche wrote:
+On Wed, May 31, 2017 at 02:30:50PM -0700, Bart Van Assche wrote:
 > Running a queue causes the block layer to examine the per-CPU and
 > hw queues but not the requeue list. Hence add a 'kick' operation
 > that also examines the requeue list.
@@ -46,15 +46,10 @@ On 05/31/2017 11:30 PM, Bart Van Assche wrote:
 >  		return -EINVAL;
 >  	}
 >  	return count;
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+> -- 
+> 2.12.2
 
-Cheers,
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Thanks,
+Ming
