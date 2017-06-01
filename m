@@ -1,81 +1,49 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 05/11] block: add helpers for setting/checking stream validity
-Date: Wed, 14 Jun 2017 13:05:28 -0600
-Message-Id: <1497467134-6323-6-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
+ Sandoval" <osandov@fb.com>
+Subject: [PATCH v3 4/4] blk-mq-debugfs: Add 'kick' operation
+Date: Thu, 1 Jun 2017 08:55:13 -0700
+Message-ID: <20170601155513.26712-5-bart.vanassche@sandisk.com>
+In-Reply-To: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+References: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-We map the RWF_WRITE_* life time flags to the internal flags.
-Drivers can then, in turn, map those flags to a suitable stream
-type.
+Running a queue causes the block layer to examine the per-CPU and
+hw queues but not the requeue list. Hence add a 'kick' operation
+that also examines the requeue list.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
 ---
- block/bio.c               | 16 ++++++++++++++++
- include/linux/bio.h       |  1 +
- include/linux/blk_types.h |  5 +++++
- 3 files changed, 22 insertions(+)
+ block/blk-mq-debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 888e7801c638..25ea7c365aac 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -2082,6 +2082,22 @@ void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
- 
- #endif /* CONFIG_BLK_CGROUP */
- 
-+static const unsigned int rwf_write_to_opf_flag[] = {
-+	0, REQ_WRITE_SHORT, REQ_WRITE_MEDIUM, REQ_WRITE_LONG, REQ_WRITE_EXTREME
-+};
-+
-+/*
-+ * 'stream_flags' is one of RWF_WRITE_LIFE_* values
-+ */
-+void bio_set_streamid(struct bio *bio, unsigned int rwf_flags)
-+{
-+	if (WARN_ON_ONCE(rwf_flags >= ARRAY_SIZE(rwf_write_to_opf_flag)))
-+		return;
-+
-+	bio->bi_opf |= rwf_write_to_opf_flag[rwf_flags];
-+}
-+EXPORT_SYMBOL_GPL(bio_set_streamid);
-+
- static void __init biovec_init_slabs(void)
- {
- 	int i;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d1b04b0e99cf..a1b3145020ad 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -443,6 +443,7 @@ extern struct bio *bio_copy_kern(struct request_queue *, void *, unsigned int,
- 				 gfp_t, int);
- extern void bio_set_pages_dirty(struct bio *bio);
- extern void bio_check_pages_dirty(struct bio *bio);
-+extern void bio_set_streamid(struct bio *bio, unsigned int rwf_flags);
- 
- void generic_start_io_acct(int rw, unsigned long sectors,
- 			   struct hd_struct *part);
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 57d1eb530799..06c8c35f0288 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -323,4 +323,9 @@ struct blk_rq_stat {
- 	u64 batch;
- };
- 
-+static inline bool blk_stream_valid(unsigned int opf)
-+{
-+	return (opf & REQ_WRITE_LIFE_MASK) != 0;
-+}
-+
- #endif /* __LINUX_BLK_TYPES_H */
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 90c454bbaf92..9edebbdce0bd 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -114,10 +114,12 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+ 		blk_mq_run_hw_queues(q, true);
+ 	} else if (strcmp(op, "start") == 0) {
+ 		blk_mq_start_stopped_hw_queues(q, true);
++	} else if (strcmp(op, "kick") == 0) {
++		blk_mq_kick_requeue_list(q);
+ 	} else {
+ 		pr_err("%s: unsupported operation '%s'\n", __func__, op);
+ inval:
+-		pr_err("%s: use either 'run' or 'start'\n", __func__);
++		pr_err("%s: use 'run', 'start' or 'kick'\n", __func__);
+ 		return -EINVAL;
+ 	}
+ 	return count;
 -- 
-2.7.4
+2.12.2
