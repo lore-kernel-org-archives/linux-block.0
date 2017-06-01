@@ -1,67 +1,30 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f193.google.com ([209.85.216.193]:35244 "EHLO
-        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1759683AbdEWPuF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 11:50:05 -0400
-Received: by mail-qt0-f193.google.com with SMTP id r58so22730644qtb.2
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2017 08:50:05 -0700 (PDT)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: Josef Bacik <jbacik@fb.com>
-Cc: nbd-general@lists.sourceforge.net, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH v2 1/2] nbd: nbd_reset() call in nbd_dev_add() is redundant
-Date: Tue, 23 May 2017 17:49:54 +0200
-Message-Id: <1495554595-30945-1-git-send-email-idryomov@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Thu, 1 Jun 2017 08:05:44 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 0/6] Split scsi passthrough fields out of struct
+	request sequel
+Message-ID: <20170601060544.GC16248@lst.de>
+References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170531214350.31157-1-bart.vanassche@sandisk.com>
+List-ID: <linux-block@vger.kernel.org>
 
-There is nothing to clear -- nbd_device has just been allocated.
-Fold nbd_reset() into its other caller, nbd_config_put().
+On Wed, May 31, 2017 at 02:43:44PM -0700, Bart Van Assche wrote:
+> Hello Jens,
+> 
+> The patches in this series are a sequel of Christoph's "Split scsi passthrough
+> fields out of struct request" patch series. The changes compared to v1 of this
+> patch series are:
+> - Renamed QUEUE_FLAG_SCSI_PDU into QUEUE_FLAG_SCSI_PASSTHROUGH and
+>   blk_queue_scsi_pdu() into blk_queue_scsi_passthrough().
+> - In the cdrom driver, moved the SCSI passthrough support test from
+>   register_cdrom() to cdrom_read_cdda_bpc().
+> 
+> Please consider these patches for kernel v4.13.
 
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
----
- drivers/block/nbd.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9a7bb2c29447..e725d8d5ab0b 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -937,14 +937,6 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
- 	return -ENOSPC;
- }
- 
--/* Reset all properties of an NBD device */
--static void nbd_reset(struct nbd_device *nbd)
--{
--	nbd->config = NULL;
--	nbd->tag_set.timeout = 0;
--	queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, nbd->disk->queue);
--}
--
- static void nbd_bdev_reset(struct block_device *bdev)
- {
- 	if (bdev->bd_openers > 1)
-@@ -1029,7 +1021,10 @@ static void nbd_config_put(struct nbd_device *nbd)
- 			}
- 			kfree(config->socks);
- 		}
--		nbd_reset(nbd);
-+		nbd->config = NULL;
-+
-+		nbd->tag_set.timeout = 0;
-+		queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, nbd->disk->queue);
- 
- 		mutex_unlock(&nbd->config_lock);
- 		nbd_put(nbd);
-@@ -1483,7 +1478,6 @@ static int nbd_dev_add(int index)
- 	disk->fops = &nbd_fops;
- 	disk->private_data = nbd;
- 	sprintf(disk->disk_name, "nbd%d", index);
--	nbd_reset(nbd);
- 	add_disk(disk);
- 	nbd_total_devices++;
- 	return index;
--- 
-2.4.3
+I think these should probably go into 4.12.  At least the first one
+should for sure.
