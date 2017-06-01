@@ -1,63 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:31040 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763426AbdEXAer (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2017 20:34:47 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Bart Van Assche" <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 23/31] scsi: Move sense buffer pointer initialization into scsi_initialize_rq()
-Date: Tue, 23 May 2017 17:34:12 -0700
-Message-ID: <20170524003420.5381-24-bart.vanassche@sandisk.com>
-In-Reply-To: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 4/4] blk-mq-debugfs: Add 'kick' operation
+To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20170531213050.30276-1-bart.vanassche@sandisk.com>
+ <20170531213050.30276-5-bart.vanassche@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <0ddc8a94-5fb7-3842-1370-5ed1778c185b@suse.de>
+Date: Thu, 1 Jun 2017 07:48:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170531213050.30276-5-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This patch is a preparation for the next patch that will zero
-the struct scsi_request embedded in struct scsi_cmnd before
-calling scsi_req_init().
+On 05/31/2017 11:30 PM, Bart Van Assche wrote:
+> Running a queue causes the block layer to examine the per-CPU and
+> hw queues but not the requeue list. Hence add a 'kick' operation
+> that also examines the requeue list.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-debugfs.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index fa0f624dfccd..962c8417809d 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -114,10 +114,12 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
+>  		blk_mq_run_hw_queues(q, true);
+>  	} else if (strcmp(op, "start") == 0) {
+>  		blk_mq_start_stopped_hw_queues(q, true);
+> +	} else if (strcmp(op, "kick") == 0) {
+> +		blk_mq_kick_requeue_list(q);
+>  	} else {
+>  		pr_err("%s: unsupported operation '%s'\n", __func__, op);
+>  inval:
+> -		pr_err("%s: use either 'run' or 'start'\n", __func__);
+> +		pr_err("%s: use 'run', 'start' or 'kick'\n", __func__);
+>  		return -EINVAL;
+>  	}
+>  	return count;
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
----
- drivers/scsi/scsi_lib.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Cheers,
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 359f824ab78c..10c6adb208dc 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1164,6 +1164,7 @@ static void scsi_initialize_rq(struct request *rq)
- 	       sizeof(*cmd) - sizeof(cmd->req));
- 	scsi_req_init(&cmd->req);
- 	cmd->device = dev;
-+	cmd->req.sense = cmd->sense_buffer;
- 	cmd->sense_buffer = buf;
- 	cmd->prot_sdb = prot;
- 	INIT_DELAYED_WORK(&cmd->abort_work, scmd_eh_abort_handler);
-@@ -2025,7 +2026,6 @@ static int scsi_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 						    GFP_KERNEL, numa_node);
- 	if (!cmd->sense_buffer)
- 		return -ENOMEM;
--	cmd->req.sense = cmd->sense_buffer;
- 	return 0;
- }
- 
-@@ -2123,7 +2123,6 @@ static int scsi_init_rq(struct request_queue *q, struct request *rq, gfp_t gfp)
- 						    NUMA_NO_NODE);
- 	if (!cmd->sense_buffer)
- 		goto fail;
--	cmd->req.sense = cmd->sense_buffer;
- 
- 	if (scsi_host_get_prot(shost) >= SHOST_DIX_TYPE0_PROTECTION) {
- 		cmd->prot_sdb = kmem_cache_zalloc(scsi_sdb_cache, gfp);
+Hannes
 -- 
-2.12.2
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
