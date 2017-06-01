@@ -1,48 +1,28 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 06/12] block: Add a comment above queue_lockdep_assert_held()
-Date: Wed, 31 May 2017 15:52:40 -0700
-Message-ID: <20170531225246.26261-7-bart.vanassche@sandisk.com>
-In-Reply-To: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-References: <20170531225246.26261-1-bart.vanassche@sandisk.com>
+Return-Path: <hch@lst.de>
+Date: Thu, 1 Jun 2017 08:05:19 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH v2 5/6] cdrom: Check SCSI passthrough support before
+	reading audio
+Message-ID: <20170601060519.GB16248@lst.de>
+References: <20170531214350.31157-1-bart.vanassche@sandisk.com> <20170531214350.31157-6-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170531214350.31157-6-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Add a comment above the queue_lockdep_assert_held() macro that
-explains the purpose of the q->queue_lock test.
+On Wed, May 31, 2017 at 02:43:49PM -0700, Bart Van Assche wrote:
+> The CDROMREADAUDIO ioctl uses SCSI passthrough when the .disk
+> pointer has been set in struct cdrom_device_info. Hence check
+> whether SCSI passthrough is supported before submitting a SCSI
+> command. Note: both the ide-cd and sr drivers set the disk
+> pointer in struct cdrom_device_info but neither the pcd nor
+> the gdrom driver sets that pointer.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+And I think that's exactly the point.  There probably can be some
+further cleanup in this area, but for now this looks good:
+
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index cbc0028290e4..1e73b4df13a9 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -634,6 +634,13 @@ struct request_queue {
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
- 				 (1 << QUEUE_FLAG_POLL))
- 
-+/*
-+ * @q->queue_lock is set while a queue is being initialized. Since we know
-+ * that no other threads access the queue object before @q->queue_lock has
-+ * been set, it is safe to manipulate queue flags without holding the
-+ * queue_lock if @q->queue_lock == NULL. See also blk_alloc_queue_node() and
-+ * blk_init_allocated_queue().
-+ */
- static inline void queue_lockdep_assert_held(struct request_queue *q)
- {
- 	if (q->queue_lock)
--- 
-2.12.2
