@@ -1,116 +1,30 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v7 19/22] ext4: add more robust reporting of metadata writeback errors
-Date: Fri, 16 Jun 2017 15:34:24 -0400
-Message-Id: <20170616193427.13955-20-jlayton@redhat.com>
-In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
-References: <20170616193427.13955-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:47012 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751083AbdFAOJQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2017 10:09:16 -0400
+Date: Thu, 1 Jun 2017 07:09:15 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "James.Bottomley@HansenPartnership.com"
+        <James.Bottomley@HansenPartnership.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 00/31] SCSI patches for kernel v4.13.
+Message-ID: <20170601140915.GA25911@infradead.org>
+References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
+ <yq1o9uhsnco.fsf@oracle.com>
+ <1496326082.3075.3.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1496326082.3075.3.camel@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-ext4 uses the blockdev mapping for tracking metadata stored in the
-pagecache. Sample its wb_err when opening a file and store that in
-the f_md_wb_err field.
+On Thu, Jun 01, 2017 at 02:08:04PM +0000, Bart Van Assche wrote:
+> The first eight patches in this series do not depend on any block layer changes.
+> Do you want me to repost this patches or can you perhaps queue these without a
+> repost?
 
-Change ext4_sync_file to check for data errors first, and then check the
-blockdev mapping for metadata errors afterward.
-
-Note that because metadata writeback errors are only tracked on a
-per-device level, this does mean that we'll end up reporting an error on
-all open file descriptors when there is a metadata writeback failure.
-That's not ideal, but we can possibly improve upon it in the future.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/ext4/dir.c   |  8 ++++++--
- fs/ext4/file.c  |  5 ++++-
- fs/ext4/fsync.c | 13 +++++++++++++
- 3 files changed, 23 insertions(+), 3 deletions(-)
-
-diff --git a/fs/ext4/dir.c b/fs/ext4/dir.c
-index e8b365000d73..6bbb19510f74 100644
---- a/fs/ext4/dir.c
-+++ b/fs/ext4/dir.c
-@@ -611,9 +611,13 @@ static int ext4_dx_readdir(struct file *file, struct dir_context *ctx)
- 
- static int ext4_dir_open(struct inode * inode, struct file * filp)
- {
-+	int ret = 0;
-+
- 	if (ext4_encrypted_inode(inode))
--		return fscrypt_get_encryption_info(inode) ? -EACCES : 0;
--	return 0;
-+		ret = fscrypt_get_encryption_info(inode) ? -EACCES : 0;
-+	if (!ret)
-+		filp->f_md_wb_err = filemap_sample_wb_err(inode->i_sb->s_bdev->bd_inode->i_mapping);
-+	return ret;
- }
- 
- static int ext4_release_dir(struct inode *inode, struct file *filp)
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 02ce7e7bbdf5..6e505269132c 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -435,7 +435,10 @@ static int ext4_file_open(struct inode * inode, struct file * filp)
- 		if (ret < 0)
- 			return ret;
- 	}
--	return dquot_file_open(inode, filp);
-+	ret = dquot_file_open(inode, filp);
-+	if (!ret)
-+		filp->f_md_wb_err = filemap_sample_wb_err(sb->s_bdev->bd_inode->i_mapping);
-+	return ret;
- }
- 
- /*
-diff --git a/fs/ext4/fsync.c b/fs/ext4/fsync.c
-index 03d6259d8662..8ea8ec517da5 100644
---- a/fs/ext4/fsync.c
-+++ b/fs/ext4/fsync.c
-@@ -161,10 +161,23 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 			ret = err;
- 	}
- out:
-+	/*
-+	 * Was there a metadata writeback error since last fsync?
-+	 *
-+	 * FIXME: ext4 tracks metadata with a whole-block device mapping. If
-+	 * there is any sort of metadata writeback error, we'll report an
-+	 * error on all open fds, even ones not associated with this inode.
-+	 */
-+	err = filemap_report_md_wb_err(file,
-+				inode->i_sb->s_bdev->bd_inode->i_mapping);
-+	if (!ret)
-+		ret = err;
-+
- 	/* Was there a writeback error of the data since last fsync? */
- 	err = filemap_report_wb_err(file);
- 	if (!ret)
- 		ret = err;
-+
- 	trace_ext4_sync_file_exit(inode, ret);
- 	return ret;
- }
--- 
-2.13.0
+It would be great if you could repost them, also for the reviewers.
