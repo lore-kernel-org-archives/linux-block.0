@@ -1,68 +1,48 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel@vger.kernel.org
-Cc: Shaohua Li <shli@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-xfs@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 12/24] S390/sysinfo: use uuid_is_null instead of opencoding it
-Date: Wed, 31 May 2017 18:18:14 +0200
-Message-Id: <20170531161826.23243-13-hch@lst.de>
-In-Reply-To: <20170531161826.23243-1-hch@lst.de>
-References: <20170531161826.23243-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
+ boyu.mt@taobao.com, wenqing.lz@taobao.com, qijiang.qj@alibaba-inc.com
+From: Joseph Qi <jiangqi903@gmail.com>
+Subject: blk-mq: free callback if error occurs in blk_mq_init_allocated_queue
+Message-ID: <728065d3-0100-514a-70b0-66b1cfe85480@gmail.com>
+Date: Thu, 1 Jun 2017 13:02:40 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-And switch to use uuid_t instead of the old uuid_be type.
+From: Joseph Qi <qijiang.qj@alibaba-inc.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+If error occurs, we have to free the allocated callback in
+blk_mq_init_allocated_queue to avoid memory leaking.
+
+Fixes: 34dbad5d26e2 ("blk-stat: convert to callback-based statistics reporting")
+Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
 ---
- arch/s390/include/asm/sysinfo.h | 4 ++--
- arch/s390/kernel/sysinfo.c      | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/s390/include/asm/sysinfo.h b/arch/s390/include/asm/sysinfo.h
-index e784bed6ed7f..2b498e58b914 100644
---- a/arch/s390/include/asm/sysinfo.h
-+++ b/arch/s390/include/asm/sysinfo.h
-@@ -109,7 +109,7 @@ struct sysinfo_2_2_2 {
- 	unsigned short cpus_shared;
- 	char reserved_4[3];
- 	unsigned char vsne;
--	uuid_be uuid;
-+	uuid_t uuid;
- 	char reserved_5[160];
- 	char ext_name[256];
- };
-@@ -134,7 +134,7 @@ struct sysinfo_3_2_2 {
- 		char reserved_1[3];
- 		unsigned char evmne;
- 		unsigned int reserved_2;
--		uuid_be uuid;
-+		uuid_t uuid;
- 	} vm[8];
- 	char reserved_3[1504];
- 	char ext_names[8][256];
-diff --git a/arch/s390/kernel/sysinfo.c b/arch/s390/kernel/sysinfo.c
-index eefcb54872a5..fb869b103825 100644
---- a/arch/s390/kernel/sysinfo.c
-+++ b/arch/s390/kernel/sysinfo.c
-@@ -242,7 +242,7 @@ static void print_ext_name(struct seq_file *m, int lvl,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f2224ffd..50b5d7b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2273,7 +2273,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
  
- static void print_uuid(struct seq_file *m, int i, struct sysinfo_3_2_2 *info)
- {
--	if (!memcmp(&info->vm[i].uuid, &NULL_UUID_BE, sizeof(uuid_be)))
-+	if (uuid_is_null(&info->vm[i].uuid))
- 		return;
- 	seq_printf(m, "VM%02d UUID:            %pUb\n", i, &info->vm[i].uuid);
- }
+ 	q->queue_ctx = alloc_percpu(struct blk_mq_ctx);
+ 	if (!q->queue_ctx)
+-		goto err_exit;
++		goto err_poll_cb;
+ 
+ 	/* init q->mq_kobj and sw queues' kobjects */
+ 	blk_mq_sysfs_init(q);
+@@ -2346,6 +2346,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	kfree(q->queue_hw_ctx);
+ err_percpu:
+ 	free_percpu(q->queue_ctx);
++err_poll_cb:
++	blk_stat_free_callback(q->poll_cb);
+ err_exit:
+ 	q->mq_ops = NULL;
+ 	return ERR_PTR(-ENOMEM);
 -- 
-2.11.0
+1.8.3.1
