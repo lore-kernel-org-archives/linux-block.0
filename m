@@ -1,111 +1,81 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:53547 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751186AbdFDMmm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jun 2017 08:42:42 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Tejun Heo <tj@kernel.org>
-Cc: Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 4/6] libata: factor out a ata_identify_page_supported helper
-Date: Sun,  4 Jun 2017 14:42:23 +0200
-Message-Id: <20170604124225.27032-5-hch@lst.de>
-In-Reply-To: <20170604124225.27032-1-hch@lst.de>
-References: <20170604124225.27032-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
+Subject: [PATCH v3 2/4] blk-mq-debugfs: Show requeue list
+Date: Thu, 1 Jun 2017 08:55:11 -0700
+Message-ID: <20170601155513.26712-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+References: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+When verifying whether or not a blk-mq driver forgot to kick the
+requeue list after having requeued a request it is important to
+be able to verify the contents of the requeue list. Hence export
+that list through debugfs.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Omar Sandoval <osandov@fb.com>
 ---
- drivers/ata/libata-core.c | 59 +++++++++++++++++++++++++----------------------
- 1 file changed, 32 insertions(+), 27 deletions(-)
+ block/blk-mq-debugfs.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 445e7050637b..f57131115594 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -2120,6 +2120,37 @@ static bool ata_log_supported(struct ata_device *dev, u8 log)
- 	return get_unaligned_le16(&ap->sector_buf[log * 2]) ? true : false;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index d56ddd7a1285..8b06a12c1461 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -308,6 +308,37 @@ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
  }
+ EXPORT_SYMBOL_GPL(blk_mq_debugfs_rq_show);
  
-+static bool ata_identify_page_supported(struct ata_device *dev, u8 page)
++static void *queue_requeue_list_start(struct seq_file *m, loff_t *pos)
++	__acquires(&q->requeue_lock)
 +{
-+	struct ata_port *ap = dev->link->ap;
-+	unsigned int err, i;
++	struct request_queue *q = m->private;
 +
-+	if (!ata_log_supported(dev, ATA_LOG_IDENTIFY_DEVICE)) {
-+		ata_dev_warn(dev, "ATA Identify Device Log not supported\n");
-+		return false;
-+	}
-+
-+	/*
-+	 * Read IDENTIFY DEVICE data log, page 0, to figure out if the page is
-+	 * supported.
-+	 */
-+	err = ata_read_log_page(dev, ATA_LOG_IDENTIFY_DEVICE, 0, ap->sector_buf,
-+			1);
-+	if (err) {
-+		ata_dev_info(dev,
-+			     "failed to get Device Identify Log Emask 0x%x\n",
-+			     err);
-+		return false;
-+	}
-+
-+	for (i = 0; i < ap->sector_buf[8]; i++) {
-+		if (ap->sector_buf[9 + i] == page)
-+			return true;
-+	}
-+
-+	return false;
++	spin_lock_irq(&q->requeue_lock);
++	return seq_list_start(&q->requeue_list, *pos);
 +}
 +
- static int ata_do_link_spd_horkage(struct ata_device *dev)
++static void *queue_requeue_list_next(struct seq_file *m, void *v, loff_t *pos)
++{
++	struct request_queue *q = m->private;
++
++	return seq_list_next(v, &q->requeue_list, pos);
++}
++
++static void queue_requeue_list_stop(struct seq_file *m, void *v)
++	__releases(&q->requeue_lock)
++{
++	struct request_queue *q = m->private;
++
++	spin_unlock_irq(&q->requeue_lock);
++}
++
++static const struct seq_operations queue_requeue_list_seq_ops = {
++	.start	= queue_requeue_list_start,
++	.next	= queue_requeue_list_next,
++	.stop	= queue_requeue_list_stop,
++	.show	= blk_mq_debugfs_rq_show,
++};
++
+ static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
+ 	__acquires(&hctx->lock)
  {
- 	struct ata_link *plink = ata_dev_phys_link(dev);
-@@ -2325,8 +2356,6 @@ static void ata_dev_config_zac(struct ata_device *dev)
- 	struct ata_port *ap = dev->link->ap;
- 	unsigned int err_mask;
- 	u8 *identify_buf = ap->sector_buf;
--	int i, found = 0;
--	u16 log_pages;
+@@ -665,6 +696,7 @@ const struct file_operations blk_mq_debugfs_fops = {
  
- 	dev->zac_zones_optimal_open = U32_MAX;
- 	dev->zac_zones_optimal_nonseq = U32_MAX;
-@@ -2346,31 +2375,7 @@ static void ata_dev_config_zac(struct ata_device *dev)
- 	if (!(dev->flags & ATA_DFLAG_ZAC))
- 		return;
- 
--	if (!ata_log_supported(dev, ATA_LOG_IDENTIFY_DEVICE)) {
--		ata_dev_warn(dev, "ATA Identify Device Log not supported\n");
--		return;
--	}
--
--	/*
--	 * Read IDENTIFY DEVICE data log, page 0, to figure out
--	 * if page 9 is supported.
--	 */
--	err_mask = ata_read_log_page(dev, ATA_LOG_IDENTIFY_DEVICE, 0,
--				     identify_buf, 1);
--	if (err_mask) {
--		ata_dev_info(dev,
--			     "failed to get Device Identify Log Emask 0x%x\n",
--			     err_mask);
--		return;
--	}
--	log_pages = identify_buf[8];
--	for (i = 0; i < log_pages; i++) {
--		if (identify_buf[9 + i] == ATA_LOG_ZONED_INFORMATION) {
--			found++;
--			break;
--		}
--	}
--	if (!found) {
-+	if (!ata_identify_page_supported(dev, ATA_LOG_ZONED_INFORMATION)) {
- 		ata_dev_warn(dev,
- 			     "ATA Zoned Information Log not supported\n");
- 		return;
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+ 	{"poll_stat", 0400, queue_poll_stat_show},
++	{"requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops},
+ 	{"state", 0600, queue_state_show, queue_state_write},
+ 	{},
+ };
 -- 
-2.11.0
+2.12.2
