@@ -1,27 +1,88 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <rakesh@tuxera.com>
+Date: Fri, 2 Jun 2017 21:04:35 +0300
+From: Rakesh Pandit <rakesh@tuxera.com>
+To: Ming Lei <ming.lei@redhat.com>
+CC: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, "Johannes
+ Thumshirn" <jthumshirn@suse.de>, <linux-nvme@lists.infradead.org>,
+	<linux-block@vger.kernel.org>
 Subject: Re: [PATCH] nvme: fix hang in remove path
-To: Rakesh Pandit <rakesh@tuxera.com>, Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
- Christoph Hellwig <hch@lst.de>, Johannes Thumshirn <jthumshirn@suse.de>,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Message-ID: <20170602180435.GA23335@dhcp-216.srv.tuxera.com>
 References: <20170602083208.4518-1-ming.lei@redhat.com>
- <20170602180435.GA23335@dhcp-216.srv.tuxera.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <244bc065-92eb-c3e0-faa7-11569fc326d6@grimberg.me>
-Date: Sun, 4 Jun 2017 18:24:09 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170602180435.GA23335@dhcp-216.srv.tuxera.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20170602083208.4518-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
+Hi Ming,
 
-> It would make sense to still add:
+On Fri, Jun 02, 2017 at 04:32:08PM +0800, Ming Lei wrote:
+> We need to start admin queues too in nvme_kill_queues()
+> for avoiding hang in remove path[1].
 > 
-> if (ctrl->state == NVME_CTRL_DELETING || ctrl->state == NVME_CTRL_DEAD)
-> 	return
-> 
-> inside nvme_configure_apst at the top irrespective of this change.
+> This patch is very similar with 806f026f9b901eaf(nvme: use
+> blk_mq_start_hw_queues() in nvme_kill_queues()).
 
-I'm not sure what is the value given that it is taken care of in
-.queue_rq?
+It would make sense to still add:
+
+if (ctrl->state == NVME_CTRL_DELETING || ctrl->state == NVME_CTRL_DEAD)
+	return
+
+inside nvme_configure_apst at the top irrespective of this change.
+
+It would make sure that no further instructions are executed
+(possibily no commands of any sort are sent ever) if we already know
+that there is no point sending latency tolerance update to controller
+if it is already dead or in process of deletion.
+
+> 
+> [1] hang stack trace
+> [<ffffffff813c9716>] blk_execute_rq+0x56/0x80
+> [<ffffffff815cb6e9>] __nvme_submit_sync_cmd+0x89/0xf0
+> [<ffffffff815ce7be>] nvme_set_features+0x5e/0x90
+> [<ffffffff815ce9f6>] nvme_configure_apst+0x166/0x200
+> [<ffffffff815cef45>] nvme_set_latency_tolerance+0x35/0x50
+> [<ffffffff8157bd11>] apply_constraint+0xb1/0xc0
+> [<ffffffff8157cbb4>] dev_pm_qos_constraints_destroy+0xf4/0x1f0
+> [<ffffffff8157b44a>] dpm_sysfs_remove+0x2a/0x60
+> [<ffffffff8156d951>] device_del+0x101/0x320
+> [<ffffffff8156db8a>] device_unregister+0x1a/0x60
+> [<ffffffff8156dc4c>] device_destroy+0x3c/0x50
+> [<ffffffff815cd295>] nvme_uninit_ctrl+0x45/0xa0
+> [<ffffffff815d4858>] nvme_remove+0x78/0x110
+> [<ffffffff81452b69>] pci_device_remove+0x39/0xb0
+> [<ffffffff81572935>] device_release_driver_internal+0x155/0x210
+> [<ffffffff81572a02>] device_release_driver+0x12/0x20
+> [<ffffffff815d36fb>] nvme_remove_dead_ctrl_work+0x6b/0x70
+> [<ffffffff810bf3bc>] process_one_work+0x18c/0x3a0
+> [<ffffffff810bf61e>] worker_thread+0x4e/0x3b0
+> [<ffffffff810c5ac9>] kthread+0x109/0x140
+> [<ffffffff8185800c>] ret_from_fork+0x2c/0x40
+> [<ffffffffffffffff>] 0xffffffffffffffff
+> 
+> Fixes: c5552fde102fc("nvme: Enable autonomous power state transitions")
+> Reported-by: Rakesh Pandit <rakesh@tuxera.com>
+> Tested-by: Rakesh Pandit <rakesh@tuxera.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/nvme/host/core.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index a60926410438..0f9cc0c55e15 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2438,6 +2438,10 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+>  	struct nvme_ns *ns;
+>  
+>  	mutex_lock(&ctrl->namespaces_mutex);
+> +
+> +	/* Forcibly start all queues to avoid having stuck requests */
+> +	blk_mq_start_hw_queues(ctrl->admin_q);
+> +
+>  	list_for_each_entry(ns, &ctrl->namespaces, list) {
+>  		/*
+>  		 * Revalidating a dead namespace sets capacity to 0. This will
+> -- 
+> 2.9.4
+> 
