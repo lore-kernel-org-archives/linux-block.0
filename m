@@ -1,70 +1,78 @@
-Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 06/10] blk-mq: don't bounce by default
-Date: Mon, 19 Jun 2017 09:26:24 +0200
-Message-Id: <20170619072628.12894-7-hch@lst.de>
-In-Reply-To: <20170619072628.12894-1-hch@lst.de>
-References: <20170619072628.12894-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:38446 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750971AbdFBVy2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Jun 2017 17:54:28 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH 00/11]blktrace: output cgroup info
+Date: Fri,  2 Jun 2017 14:53:53 -0700
+Message-Id: <cover.1496432591.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For historical reasons we default to bouncing highmem pages for all block
-queues.  But the blk-mq drivers are easy to audit to ensure that we don't
-need this - scsi and mtip32xx set explicit limits and everyone else doesn't
-have any particular ones.
+From: Shaohua Li <shli@fb.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c               | 5 -----
- drivers/block/virtio_blk.c   | 3 ---
- drivers/block/xen-blkfront.c | 3 ---
- 3 files changed, 11 deletions(-)
+Hi,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e26b7435e245..dd276a9e138e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2300,11 +2300,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	blk_queue_make_request(q, blk_mq_make_request);
- 
- 	/*
--	 * by default assume old behaviour and bounce for any highmem page
--	 */
--	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
--
--	/*
- 	 * Do this after blk_queue_make_request() overrides it...
- 	 */
- 	q->nr_requests = set->queue_depth;
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index e59bd4549a8a..0297ad7c1452 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -720,9 +720,6 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	/* We can handle whatever the host told us to handle. */
- 	blk_queue_max_segments(q, vblk->sg_elems-2);
- 
--	/* No need to bounce any requests */
--	blk_queue_bounce_limit(q, BLK_BOUNCE_ANY);
--
- 	/* No real sector limit. */
- 	blk_queue_max_hw_sectors(q, -1U);
- 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index ac90093fcb25..c852ed3c01d5 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -953,9 +953,6 @@ static void blkif_set_queue_limits(struct blkfront_info *info)
- 
- 	/* Make sure buffer addresses are sector-aligned. */
- 	blk_queue_dma_alignment(rq, 511);
--
--	/* Make sure we don't use bounce buffers. */
--	blk_queue_bounce_limit(rq, BLK_BOUNCE_ANY);
- }
- 
- static int xlvbd_init_blk_queue(struct gendisk *gd, u16 sector_size,
+Currently blktrace isn't cgroup aware. blktrace prints out task name of current
+context, but the task of current context isn't always in the cgroup where the
+BIO comes from. We can't use task name to find out IO cgroup. For example,
+Writeback BIOs always comes from flusher thread but the BIOs are for different
+blk cgroups. Request could be requeued and dispatched from completely different
+tasks. MD/DM are another examples. This brings challenges if we want to use
+blktrace for performance tunning with cgroup enabled.
+
+This patchset try to fix the gap. We print out cgroup fhandle info in blktrace.
+Userspace can use open_by_handle_at() syscall to find the cgroup by fhandle. Or
+userspace can use name_to_handle_at() syscall to find fhandle for a cgroup and
+use a BPF program to filter out blktrace for a specific cgroup.
+
+The first 5 patches adds export operation handlers for kernfs, so userspace can
+use open_by_handle_at/name_to_handle_at to a kernfs file. Later patches make
+blktrace output cgroup info.
+
+Thanks,
+Shaohua
+
+Shaohua Li (11):
+  kernfs: implement i_generation
+  kernfs: use idr instead of ida to manage inode number
+  kernfs: add an API to get kernfs node from inode number
+  kernfs: don't set dentry->d_fsdata
+  kernfs: add exportfs operations
+  cgroup: export fhandle info for a cgroup
+  blktrace: export cgroup info in trace
+  block: always attach cgroup info into bio
+  block: call __bio_free in bio_endio
+  blktrace: add an option to allow displying cgroup path
+  block: use standard blktrace API to output cgroup info for debug notes
+
+ arch/x86/kernel/cpu/intel_rdt_rdtgroup.c |   2 +-
+ block/bfq-iosched.h                      |  16 +-
+ block/bio-integrity.c                    |   1 +
+ block/bio.c                              |   1 +
+ block/blk-throttle.c                     |  13 +-
+ block/cfq-iosched.c                      |  15 +-
+ fs/kernfs/dir.c                          |  80 +++++++---
+ fs/kernfs/file.c                         |   6 +-
+ fs/kernfs/inode.c                        |   7 +-
+ fs/kernfs/kernfs-internal.h              |   4 +
+ fs/kernfs/mount.c                        | 107 +++++++++++--
+ fs/kernfs/symlink.c                      |   6 +-
+ fs/sysfs/mount.c                         |   2 +-
+ include/linux/blk-cgroup.h               |  16 +-
+ include/linux/blktrace_api.h             |  12 +-
+ include/linux/cgroup-defs.h              |   2 +
+ include/linux/cgroup.h                   |  14 ++
+ include/linux/kernfs.h                   |  23 ++-
+ include/uapi/linux/blktrace_api.h        |   3 +
+ kernel/cgroup/cgroup.c                   |  18 ++-
+ kernel/trace/blktrace.c                  | 254 +++++++++++++++++++++----------
+ 21 files changed, 430 insertions(+), 172 deletions(-)
+
 -- 
-2.11.0
+2.9.3
