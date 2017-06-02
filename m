@@ -1,127 +1,92 @@
-Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 7/9] bio: add bvec_iter rewind API
-Date: Thu, 29 Jun 2017 11:31:14 -0700
-Message-Id: <20170629183116.28685-8-hch@lst.de>
-In-Reply-To: <20170629183116.28685-1-hch@lst.de>
-References: <20170629183116.28685-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:38460 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751341AbdFBVy3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Jun 2017 17:54:29 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH 01/11] kernfs: implement i_generation
+Date: Fri,  2 Jun 2017 14:53:54 -0700
+Message-Id: <b7c17173ade56502121bbc13860e293f84e704c6.1496432591.git.shli@fb.com>
+In-Reply-To: <cover.1496432591.git.shli@fb.com>
+References: <cover.1496432591.git.shli@fb.com>
+In-Reply-To: <cover.1496432591.git.shli@fb.com>
+References: <cover.1496432591.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Dmitry Monakhov <dmonakhov@openvz.org>
+From: Shaohua Li <shli@fb.com>
 
-Some ->bi_end_io handlers (for example: pi_verify or decrypt handlers)
-need to know original data vector, but after bio traverse io-stack it may
-be advanced, splited and relocated many times so it is hard to guess
-original iterator. Let's add 'bi_done' conter which accounts number
-of bytes iterator was advanced during it's evolution. Later end_io handler
-may easily restore original iterator by rewinding iterator to
-iter->bi_done.
+Set i_generation for kernfs inode. This is required to implement exportfs
+operations.
 
-Note: this change makes sizeof (struct bvec_iter) multiple to 8
+Note, the generation is 32-bit, so it's possible the generation wraps up
+and we find stale files. The possiblity is low, since fhandle matches
+both inode number and generation. In most fs, the generation is 32-bit.
+fhandle only export 32-bit generation for most fs. So unless we have
+solid reason, we'd live with the possible conflict.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-[hch: switched to true/false return]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- include/linux/bio.h  | 19 +++++++++++++++++--
- include/linux/bvec.h | 27 +++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+), 2 deletions(-)
+ fs/kernfs/dir.c        | 2 ++
+ fs/kernfs/inode.c      | 1 +
+ include/linux/kernfs.h | 2 ++
+ 3 files changed, 5 insertions(+)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index f27b22330ae7..7b989233e8d0 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -165,14 +165,29 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- {
- 	iter->bi_sector += bytes >> 9;
+diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
+index db5900aaa..09d093e 100644
+--- a/fs/kernfs/dir.c
++++ b/fs/kernfs/dir.c
+@@ -634,6 +634,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 	if (ret < 0)
+ 		goto err_out2;
+ 	kn->ino = ret;
++	kn->generation = atomic_inc_return(&root->next_generation);
  
--	if (bio_no_advance_iter(bio))
-+	if (bio_no_advance_iter(bio)) {
- 		iter->bi_size -= bytes;
--	else {
-+		iter->bi_done += bytes;
-+	} else {
- 		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
- 		/* TODO: It is reasonable to complete bio with error here. */
- 	}
- }
+ 	atomic_set(&kn->count, 1);
+ 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
+@@ -877,6 +878,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
  
-+static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
-+		unsigned int bytes)
-+{
-+	iter->bi_sector -= bytes >> 9;
-+
-+	if (bio_no_advance_iter(bio)) {
-+		iter->bi_size += bytes;
-+		iter->bi_done -= bytes;
-+		return true;
-+	}
-+
-+	return bvec_iter_rewind(bio->bi_io_vec, iter, bytes);
-+}
-+
- #define __bio_for_each_segment(bvl, bio, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index de317b4c13c1..ec8a4d7af6bd 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -40,6 +40,8 @@ struct bvec_iter {
+ 	ida_init(&root->ino_ida);
+ 	INIT_LIST_HEAD(&root->supers);
++	atomic_set(&root->next_generation, 0);
  
- 	unsigned int		bi_idx;		/* current index into bvl_vec */
+ 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
+ 			       KERNFS_DIR);
+diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
+index fb4b4a7..79cdae4 100644
+--- a/fs/kernfs/inode.c
++++ b/fs/kernfs/inode.c
+@@ -220,6 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
+ 	inode->i_private = kn;
+ 	inode->i_mapping->a_ops = &kernfs_aops;
+ 	inode->i_op = &kernfs_iops;
++	inode->i_generation = kn->generation;
  
-+	unsigned int            bi_done;	/* number of bytes completed */
-+
- 	unsigned int            bi_bvec_done;	/* number of bytes completed in
- 						   current bvec */
+ 	set_default_inode_attr(inode, kn->mode);
+ 	kernfs_refresh_inode(kn, inode);
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index a9b11b8..c5f0fa7 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -135,6 +135,7 @@ struct kernfs_node {
+ 	umode_t			mode;
+ 	unsigned int		ino;
+ 	struct kernfs_iattrs	*iattr;
++	u32			generation;
  };
-@@ -83,6 +85,7 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
- 		bytes -= len;
- 		iter->bi_size -= len;
- 		iter->bi_bvec_done += len;
-+		iter->bi_done += len;
  
- 		if (iter->bi_bvec_done == __bvec_iter_bvec(bv, *iter)->bv_len) {
- 			iter->bi_bvec_done = 0;
-@@ -92,6 +95,30 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
- 	return true;
- }
+ /*
+@@ -170,6 +171,7 @@ struct kernfs_root {
+ 	struct list_head	supers;
  
-+static inline bool bvec_iter_rewind(const struct bio_vec *bv,
-+				     struct bvec_iter *iter,
-+				     unsigned int bytes)
-+{
-+	while (bytes) {
-+		unsigned len = min(bytes, iter->bi_bvec_done);
-+
-+		if (iter->bi_bvec_done == 0) {
-+			if (WARN_ONCE(iter->bi_idx == 0,
-+				      "Attempted to rewind iter beyond "
-+				      "bvec's boundaries\n")) {
-+				return false;
-+			}
-+			iter->bi_idx--;
-+			iter->bi_bvec_done = __bvec_iter_bvec(bv, *iter)->bv_len;
-+			continue;
-+		}
-+		bytes -= len;
-+		iter->bi_size += len;
-+		iter->bi_bvec_done -= len;
-+	}
-+	return true;
-+}
-+
- #define for_each_bvec(bvl, bio_vec, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
+ 	wait_queue_head_t	deactivate_waitq;
++	atomic_t		next_generation;
+ };
+ 
+ struct kernfs_open_file {
 -- 
-2.11.0
+2.9.3
