@@ -1,51 +1,89 @@
-Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/8] genirq: allow assigning affinity to present but not online CPUs
-Date: Sat,  3 Jun 2017 16:03:56 +0200
-Message-Id: <20170603140403.27379-2-hch@lst.de>
-In-Reply-To: <20170603140403.27379-1-hch@lst.de>
-References: <20170603140403.27379-1-hch@lst.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 2 Jun 2017 10:07:43 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Eduardo Valentin <eduval@amazon.com>
+Subject: Re: [PATCH v3 3/4] blk-mq-debugfs: Show busy requests
+Message-ID: <20170602020742.GG30505@ming.t460p>
+References: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+ <20170601155513.26712-4-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170601155513.26712-4-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This will allow us to spread MSI/MSI-X affinity over all present CPUs and
-thus better deal with systems where cpus are take on and offline all the
-time.
+On Thu, Jun 01, 2017 at 08:55:12AM -0700, Bart Van Assche wrote:
+> Requests that got stuck in a block driver are neither on
+> blk_mq_ctx.rq_list nor on any hw dispatch queue. Make these
+> visible in debugfs through the "busy" attribute.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Eduardo Valentin <eduval@amazon.com>
+> ---
+>  block/blk-mq-debugfs.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 8b06a12c1461..90c454bbaf92 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -370,6 +370,36 @@ static const struct seq_operations hctx_dispatch_seq_ops = {
+>  	.show	= blk_mq_debugfs_rq_show,
+>  };
+>  
+> +struct show_busy_params {
+> +	struct seq_file		*m;
+> +	struct blk_mq_hw_ctx	*hctx;
+> +};
+> +
+> +/*
+> + * Note: the state of a request may change while this function is in progress,
+> + * e.g. due to a concurrent blk_mq_finish_request() call.
+> + */
+> +static void hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
+> +{
+> +	const struct show_busy_params *params = data;
+> +
+> +	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
+> +	    test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
+> +		__blk_mq_debugfs_rq_show(params->m,
+> +					 list_entry_rq(&rq->queuelist));
+> +}
+> +
+> +static int hctx_busy_show(void *data, struct seq_file *m)
+> +{
+> +	struct blk_mq_hw_ctx *hctx = data;
+> +	struct show_busy_params params = { .m = m, .hctx = hctx };
+> +
+> +	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy_rq,
+> +				&params);
+> +
+> +	return 0;
+> +}
+> +
+>  static int hctx_ctx_map_show(void *data, struct seq_file *m)
+>  {
+>  	struct blk_mq_hw_ctx *hctx = data;
+> @@ -705,6 +735,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
+>  	{"state", 0400, hctx_state_show},
+>  	{"flags", 0400, hctx_flags_show},
+>  	{"dispatch", 0400, .seq_ops = &hctx_dispatch_seq_ops},
+> +	{"busy", 0400, hctx_busy_show},
+>  	{"ctx_map", 0400, hctx_ctx_map_show},
+>  	{"tags", 0400, hctx_tags_show},
+>  	{"tags_bitmap", 0400, hctx_tags_bitmap_show},
+> -- 
+> 2.12.2
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- kernel/irq/manage.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-index 070be980c37a..5c25d4a5dc46 100644
---- a/kernel/irq/manage.c
-+++ b/kernel/irq/manage.c
-@@ -361,17 +361,17 @@ static int setup_affinity(struct irq_desc *desc, struct cpumask *mask)
- 	if (irqd_affinity_is_managed(&desc->irq_data) ||
- 	    irqd_has_set(&desc->irq_data, IRQD_AFFINITY_SET)) {
- 		if (cpumask_intersects(desc->irq_common_data.affinity,
--				       cpu_online_mask))
-+				       cpu_present_mask))
- 			set = desc->irq_common_data.affinity;
- 		else
- 			irqd_clear(&desc->irq_data, IRQD_AFFINITY_SET);
- 	}
- 
--	cpumask_and(mask, cpu_online_mask, set);
-+	cpumask_and(mask, cpu_present_mask, set);
- 	if (node != NUMA_NO_NODE) {
- 		const struct cpumask *nodemask = cpumask_of_node(node);
- 
--		/* make sure at least one of the cpus in nodemask is online */
-+		/* make sure at least one of the cpus in nodemask is present */
- 		if (cpumask_intersects(mask, nodemask))
- 			cpumask_and(mask, mask, nodemask);
- 	}
--- 
-2.11.0
+Thanks,
+Ming
