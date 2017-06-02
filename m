@@ -1,76 +1,72 @@
-Return-Path: <ross.zwisler@linux.intel.com>
-Date: Thu, 1 Jun 2017 23:25:45 -0600
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v5 00/17] fs: introduce new writeback error reporting and
- convert ext2 and ext4 to use it
-Message-ID: <20170602052545.GB5909@linux.intel.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:61582 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751135AbdFBWgA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2017 18:36:00 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH v3 3/9] blk-mq: use the introduced
+ blk_mq_unquiesce_queue()
+Date: Fri, 2 Jun 2017 22:19:53 +0000
+Message-ID: <1496441991.1214.25.camel@sandisk.com>
+References: <20170531123706.20885-1-ming.lei@redhat.com>
+         <20170531123706.20885-4-ming.lei@redhat.com>
+         <1496244100.2608.3.camel@sandisk.com> <20170601005423.GA23563@ming.t460p>
+         <1496358538.3075.12.camel@sandisk.com> <20170602020041.GE30505@ming.t460p>
+In-Reply-To: <20170602020041.GE30505@ming.t460p>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170531124540.8782-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, May 31, 2017 at 08:45:23AM -0400, Jeff Layton wrote:
-> v5: don't retrofit old API over the new infrastructure
->     add fstype flag to indicate how wb errors are tracked within that fs
->     add more function variants that take a errseq_t "since" value
->     add second errseq_t to struct file to track metadata wb errors
->     convert ext4 and ext2 to use the new APIs
-> 
-> v4: several more cleanup patches
->     documentation and kerneldoc comment updates
->     fix bugs in gfs2 patches
->     make sync_file_range use same error reporting semantics
->     bugfixes in buffer.c
->     convert nfs to new scheme (maybe bogus, can be dropped)
-> 
-> v3: wb_err_t -> errseq_t conversion
->     clean up places that re-set errors after calling filemap_* functions
-> 
-> v2: introduce wb_err_t, use atomics
-> 
-> This is v5 of the patchset to improve how we're tracking and reporting
-> errors that occur during pagecache writeback. The main difference in
-> this set from the last one is that I've stopped trying to retrofit the
-> old error tracking API on top of the new one. This is more work since
-> we'll have to touch each fs individually, but should be safer as the
-> "since" values used for checking errors will be more deliberate.
-> 
-> There are several situations where the kernel can "lose" errors that
-> occur during writeback, such that fsync will return success even
-> though it failed to write back some data previously. The basic idea
-> here is to have the kernel be more deliberate about the point from
-> which errors are checked to ensure that that doesn't happen.
-> 
-> An additional aim of this set is to change the behavior of fsync in
-> Linux to report writeback errors on all fds instead of just the first
-> one. This allows writers to reliably tell whether their data made it to
-> the backing device without having to coordinate fsync calls with other
-> writers.
-> 
-> To do this, we add a new typedef: errseq_t. This is a 32-bit value
-> that can store an error code, and a sequence number so we can tell
-> whether it has changed since we last sampled it. This allows us to
-> record errors in the address_space and then report those errors only
-> once per file description.
-> 
-> This set just alters block device files, ext4 and the legacy ext2
-> driver. If this general approach seems acceptable, then I'll start
-> converting other filesystems in follow-on patchsets. I'd also like
-> to get this into linux-next as soon as possible to ensure that we're
-> banging out any bugs that might be lurking here.
-> 
-> I also have a couple of xfstests for this as well that I'll re-post
-> soon.
+On Fri, 2017-06-02 at 10:00 +0800, Ming Lei wrote:
+> On Thu, Jun 01, 2017 at 11:09:00PM +0000, Bart Van Assche wrote:
+> > My opinion is that scsi_internal_device_block() and scsi_internal_devic=
+e_unblock()
+> > should be changed as follows for the scsi-mq code path:
+> > * scsi_internal_device_block() should call blk_mq_quiesce_queue(q) if t=
+he "wait"
+> >   argument is true and should set the QUEUE_FLAG_QUIESCED flag if the "=
+wait"
+> >   argument is false.
+> > * scsi_internal_device_unblock() should call blk_mq_unquiesce_queue().
+> >=20
+> > I am aware it sounds weird to set the QUEUE_FLAG_QUIESCED flag without =
+waiting
+> > until ongoing .queue_rq() calls have finished. The only driver that tri=
+ggers
+>=20
+> This way may break the contract of blk_mq_quiesce_queue() and is really w=
+eird.
+> And the above change shouldn't be related with this patchset, so better
+> to do whatever you want once this patch is merged.
 
-Can you tell me a baseline that this applies cleanly to, or give me a link to
-a tree with these patches already applied?  I've tried applying it to v4.11,
-linux/master and mmots/master, and so far nothing has worked.
+No, what I proposed doesn't break the contract of blk_mq_quiesce_queue().
+The contract of that function is that if it is called that all pending
+.queue_rq() calls have finished and no new .queue_rq() calls will occur
+until blk_mq_unquiesce_queue() is called. Since the wait =3D=3D false path =
+does
+not call blk_mq_quiesce_queue() that contract does not apply.
+
+> This patchset won't break current SCSI uses of blk_mq_quiesce_queue() and
+> won't cause regression, and I setup one iSCSI target yesterday and it wor=
+ks
+> just fine, how about just keeping this patch as it is?
+
+As I explained in a previous e-mail, the iSCSI initiator driver does not
+trigger the wait =3D=3D false path so your test did not trigger that code p=
+ath.
+
+Something else I explained in a previous e-mail is that your patch makes it
+impossible to use the STOPPED flag in the SCSI core what it was originally
+intended for, namely preventing that the block layer keeps trying to queue
+requests while the block driver knows that it will have to return "BUSY".
+This is why I asked you to modify the SCSI integration of your patch.
+
+Bart.=
