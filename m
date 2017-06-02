@@ -1,116 +1,75 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:38530 "EHLO mail.kernel.org"
+Received: from mx1.redhat.com ([209.132.183.28]:41796 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751395AbdFBVyc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Jun 2017 17:54:32 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH 03/11] kernfs: add an API to get kernfs node from inode number
-Date: Fri,  2 Jun 2017 14:53:56 -0700
-Message-Id: <41d336f7006d63c6dd5bddf407c16de8064debc3.1496432591.git.shli@fb.com>
-In-Reply-To: <cover.1496432591.git.shli@fb.com>
-References: <cover.1496432591.git.shli@fb.com>
-In-Reply-To: <cover.1496432591.git.shli@fb.com>
-References: <cover.1496432591.git.shli@fb.com>
+        id S1751120AbdFBCC0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Jun 2017 22:02:26 -0400
+Date: Fri, 2 Jun 2017 10:02:11 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+Subject: Re: [PATCH v3 5/9] blk-mq: fix blk_mq_quiesce_queue
+Message-ID: <20170602020210.GF30505@ming.t460p>
+References: <20170531123706.20885-1-ming.lei@redhat.com>
+ <20170531123706.20885-6-ming.lei@redhat.com>
+ <1496245049.2608.7.camel@sandisk.com>
+ <20170601022133.GB23563@ming.t460p>
+ <1496359149.3075.14.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1496359149.3075.14.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
+On Thu, Jun 01, 2017 at 11:19:11PM +0000, Bart Van Assche wrote:
+> On Thu, 2017-06-01 at 10:21 +0800, Ming Lei wrote:
+> > On Wed, May 31, 2017 at 03:37:30PM +0000, Bart Van Assche wrote:
+> > > On Wed, 2017-05-31 at 20:37 +0800, Ming Lei wrote:
+> > > > 
+> > > > +	/* wait until queue is unquiesced */
+> > > > +	wait_event_cmd(q->quiesce_wq, !blk_queue_quiesced(q),
+> > > > +			may_sleep ?
+> > > > +			srcu_read_unlock(&hctx->queue_rq_srcu, *srcu_idx) :
+> > > > +			rcu_read_unlock(),
+> > > > +			may_sleep ?
+> > > > +			*srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu) :
+> > > > +			rcu_read_lock());
+> > > > +
+> > > >  	if (q->elevator)
+> > > >  		goto insert;
+> > > 
+> > > What I see is that in this patch a new waitqueue has been introduced
+> > > (quiesce_wq) and also that an explanation of why you think this new waitqueue
+> > > is needed is missing completely. Why is it that you think that the
+> > > synchronize_scru() and synchronize_rcu() calls in blk_mq_quiesce_queue() are
+> > > not sufficient? If this new waitqueue is not needed, please remove that
+> > > waitqueue again.
+> > 
+> > OK, the reason is simple, and it is only related with direct issue.
+> > 
+> > Under this situation, when the queue is quiesced, we have to
+> > 
+> > 	- insert the current request into sw queue(scheduler queue)
+> > 	OR
+> > 	-wait until queue becomes unquiesced like what this patch is doing
+> > 
+> > The disadvantage of the 1st way is that we have to consider to run queue
+> > again in blk_mq_unquiesce_queue() for the queued requests during quiescing.
+> > 
+> > For the 2nd way(what this patch is doing), one benefit is that application
+> > can avoid to submit I/O to a quiesced queue. Another benefit is that we
+> > needn't to consider to run queue in blk_mq_unquiesce_queue(). But with cost
+> > of one waitqueue, the cost should be cheap, but if you persist on the 1st
+> > approach, I am fine to change to that.
+> 
+> Hello Ming,
+> 
+> Since the runtime overhead of the alternative approach (insert into queue) is
+> significantly smaller and since it will result in a simpler implementation I
+> prefer the alternative approach.
 
-Add an API to get kernfs node from inode number. We will need this to
-implement exportfs operations.
+OK, no problem, will change to the way of insert & run queue.
 
-To make the API lock free, kernfs node is freed in RCU context. And we
-depend on kernfs_node count/ino number to filter stale kernfs nodes.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- fs/kernfs/dir.c             | 35 +++++++++++++++++++++++++++++++++++
- fs/kernfs/kernfs-internal.h |  2 ++
- fs/kernfs/mount.c           |  4 +++-
- 3 files changed, 40 insertions(+), 1 deletion(-)
-
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index 8e8545a..4c86e4c 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -643,6 +643,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 	kn->ino = ret;
- 	kn->generation = atomic_inc_return(&root->next_generation);
- 
-+	/* set ino first. Above atomic_inc_return has a barrier */
- 	atomic_set(&kn->count, 1);
- 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
- 	RB_CLEAR_NODE(&kn->rb);
-@@ -674,6 +675,40 @@ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
- 	return kn;
- }
- 
-+/*
-+ * kernfs_get_node_by_ino - get kernfs_node from inode number
-+ * @root: the kernfs root
-+ * @ino: inode number
-+ *
-+ * RETURNS:
-+ * NULL on failure. Return a kernfs node with reference counter incremented
-+ */
-+struct kernfs_node *kernfs_get_node_by_ino(struct kernfs_root *root,
-+					   unsigned int ino)
-+{
-+	struct kernfs_node *kn;
-+
-+	rcu_read_lock();
-+	kn = idr_find(&root->ino_idr, ino);
-+	if (!kn)
-+		goto out;
-+	/* kernfs_put removes the ino after count is 0 */
-+	if (!atomic_inc_not_zero(&kn->count)) {
-+		kn = NULL;
-+		goto out;
-+	}
-+	/* If this node is reused, __kernfs_new_node sets ino before count */
-+	if (kn->ino != ino)
-+		goto out;
-+	rcu_read_unlock();
-+
-+	return kn;
-+out:
-+	rcu_read_unlock();
-+	kernfs_put(kn);
-+	return NULL;
-+}
-+
- /**
-  *	kernfs_add_one - add kernfs_node to parent without warning
-  *	@kn: kernfs_node to be added
-diff --git a/fs/kernfs/kernfs-internal.h b/fs/kernfs/kernfs-internal.h
-index 2d5144a..3534cfe 100644
---- a/fs/kernfs/kernfs-internal.h
-+++ b/fs/kernfs/kernfs-internal.h
-@@ -98,6 +98,8 @@ int kernfs_add_one(struct kernfs_node *kn);
- struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
- 				    const char *name, umode_t mode,
- 				    unsigned flags);
-+struct kernfs_node *kernfs_get_node_by_ino(struct kernfs_root *root,
-+					   unsigned int ino);
- 
- /*
-  * file.c
-diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
-index d5b149a..343dfeb 100644
---- a/fs/kernfs/mount.c
-+++ b/fs/kernfs/mount.c
-@@ -332,5 +332,7 @@ void __init kernfs_init(void)
- {
- 	kernfs_node_cache = kmem_cache_create("kernfs_node_cache",
- 					      sizeof(struct kernfs_node),
--					      0, SLAB_PANIC, NULL);
-+					      0,
-+					      SLAB_PANIC | SLAB_TYPESAFE_BY_RCU,
-+					      NULL);
- }
--- 
-2.9.3
+Thanks,
+Ming
