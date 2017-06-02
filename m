@@ -1,32 +1,35 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:32228 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750971AbdFBWiy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2017 18:38:54 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "axboe@fb.com" <axboe@fb.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC: "hch@lst.de" <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: Block device integrity support
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Cc: "hch@lst.de" <hch@lst.de>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date: Fri, 2 Jun 2017 22:38:48 +0000
+Message-ID: <1496443127.1214.27.camel@sandisk.com>
 References: <1496440434.1214.23.camel@sandisk.com>
- <yq1lgpahvtp.fsf@oracle.com> <1496443127.1214.27.camel@sandisk.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d0bfe2ea-6d77-e7cd-eebd-3f8471c47fcb@kernel.dk>
-Date: Fri, 2 Jun 2017 15:52:57 -0700
+         <yq1lgpahvtp.fsf@oracle.com>
+In-Reply-To: <yq1lgpahvtp.fsf@oracle.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <1496443127.1214.27.camel@sandisk.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 06/02/2017 03:38 PM, Bart Van Assche wrote:
-> On Fri, 2017-06-02 at 18:24 -0400, Martin K. Petersen wrote:
->>> then the output shown below appears in the kernel log. Does anyone know how
->>> to fix this? Sorry but I'm not really familiar with the integrity
->>> code.
->>
->> Dmitry posted a fix for this a few weeks ago.
-> 
-> Ah, that's right. Jens, had you noticed this message:
-> https://www.spinics.net/lists/fstests/msg06214.html?
+On Fri, 2017-06-02 at 18:24 -0400, Martin K. Petersen wrote:
+> > then the output shown below appears in the kernel log. Does anyone know=
+ how
+> > to fix this? Sorry but I'm not really familiar with the integrity
+> > code.
+>=20
+> Dmitry posted a fix for this a few weeks ago.
 
-No, unfortunately not. I'll queue it up for 4.13 and mark it
-stable for 4.12.
+Ah, that's right. Jens, had you noticed this message:
+https://www.spinics.net/lists/fstests/msg06214.html?
 
--- 
-Jens Axboe
+Thanks,
+
+Bart.=
