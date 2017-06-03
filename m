@@ -1,260 +1,346 @@
 Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 7/8] blk-mq: create hctx for each present CPU
-Date: Sat,  3 Jun 2017 16:04:02 +0200
-Message-Id: <20170603140403.27379-8-hch@lst.de>
-In-Reply-To: <20170603140403.27379-1-hch@lst.de>
-References: <20170603140403.27379-1-hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 09/13] dm: don't return errnos from ->map
+Date: Sat,  3 Jun 2017 09:38:02 +0200
+Message-Id: <20170603073806.2046-10-hch@lst.de>
+In-Reply-To: <20170603073806.2046-1-hch@lst.de>
+References: <20170603073806.2046-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we only create hctx for online CPUs, which can lead to a lot
-of churn due to frequent soft offline / online operations.  Instead
-allocate one for each present CPU to avoid this and dramatically simplify
-the code.
+Instead use the special DM_MAPIO_KILL return value to return -EIO just
+like we do for the request based path.  Note that dm-log-writes returned
+-ENOMEM in a few places, which now becomes -EIO instead.  No consumer
+treats -ENOMEM special so this shouldn't be an issue (and it should
+use a mempool to start with to make guaranteed progress).
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c             | 120 +++++----------------------------------------
- block/blk-mq.h             |   5 --
- include/linux/cpuhotplug.h |   1 -
- 3 files changed, 11 insertions(+), 115 deletions(-)
+ drivers/md/dm-crypt.c         |  4 ++--
+ drivers/md/dm-flakey.c        |  4 ++--
+ drivers/md/dm-integrity.c     | 12 ++++++------
+ drivers/md/dm-log-writes.c    |  4 ++--
+ drivers/md/dm-mpath.c         | 13 ++++++++++---
+ drivers/md/dm-raid1.c         |  6 +++---
+ drivers/md/dm-snap.c          |  8 ++++----
+ drivers/md/dm-target.c        |  2 +-
+ drivers/md/dm-verity-target.c |  6 +++---
+ drivers/md/dm-zero.c          |  4 ++--
+ drivers/md/dm.c               | 16 +++++++++++-----
+ 11 files changed, 46 insertions(+), 33 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1bcccedcc74f..66ca9a090984 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -37,9 +37,6 @@
- #include "blk-wbt.h"
- #include "blk-mq-sched.h"
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index ebf9e72d479b..f4b51809db21 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -2795,10 +2795,10 @@ static int crypt_map(struct dm_target *ti, struct bio *bio)
+ 	 * and is aligned to this size as defined in IO hints.
+ 	 */
+ 	if (unlikely((bio->bi_iter.bi_sector & ((cc->sector_size >> SECTOR_SHIFT) - 1)) != 0))
+-		return -EIO;
++		return DM_MAPIO_KILL;
  
--static DEFINE_MUTEX(all_q_mutex);
--static LIST_HEAD(all_q_list);
--
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
-@@ -1966,8 +1963,8 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- 		INIT_LIST_HEAD(&__ctx->rq_list);
- 		__ctx->queue = q;
+ 	if (unlikely(bio->bi_iter.bi_size & (cc->sector_size - 1)))
+-		return -EIO;
++		return DM_MAPIO_KILL;
  
--		/* If the cpu isn't online, the cpu is mapped to first hctx */
--		if (!cpu_online(i))
-+		/* If the cpu isn't present, the cpu is mapped to first hctx */
-+		if (!cpu_present(i))
- 			continue;
+ 	io = dm_per_bio_data(bio, cc->per_bio_data_size);
+ 	crypt_io_init(io, cc, bio, dm_target_offset(ti, bio->bi_iter.bi_sector));
+diff --git a/drivers/md/dm-flakey.c b/drivers/md/dm-flakey.c
+index 13305a182611..e8f093b323ce 100644
+--- a/drivers/md/dm-flakey.c
++++ b/drivers/md/dm-flakey.c
+@@ -321,7 +321,7 @@ static int flakey_map(struct dm_target *ti, struct bio *bio)
+ 		if (bio_data_dir(bio) == READ) {
+ 			if (!fc->corrupt_bio_byte && !test_bit(DROP_WRITES, &fc->flags) &&
+ 			    !test_bit(ERROR_WRITES, &fc->flags))
+-				return -EIO;
++				return DM_MAPIO_KILL;
+ 			goto map_bio;
+ 		}
  
- 		hctx = blk_mq_map_queue(q, i);
-@@ -2010,8 +2007,7 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+@@ -349,7 +349,7 @@ static int flakey_map(struct dm_target *ti, struct bio *bio)
+ 		/*
+ 		 * By default, error all I/O.
+ 		 */
+-		return -EIO;
++		return DM_MAPIO_KILL;
  	}
+ 
+ map_bio:
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index c7f7c8d76576..ee78fb471229 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -1352,13 +1352,13 @@ static int dm_integrity_map(struct dm_target *ti, struct bio *bio)
+ 		DMERR("Too big sector number: 0x%llx + 0x%x > 0x%llx",
+ 		      (unsigned long long)dio->range.logical_sector, bio_sectors(bio),
+ 		      (unsigned long long)ic->provided_data_sectors);
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 	}
+ 	if (unlikely((dio->range.logical_sector | bio_sectors(bio)) & (unsigned)(ic->sectors_per_block - 1))) {
+ 		DMERR("Bio not aligned on %u sectors: 0x%llx, 0x%x",
+ 		      ic->sectors_per_block,
+ 		      (unsigned long long)dio->range.logical_sector, bio_sectors(bio));
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 	}
+ 
+ 	if (ic->sectors_per_block > 1) {
+@@ -1368,7 +1368,7 @@ static int dm_integrity_map(struct dm_target *ti, struct bio *bio)
+ 			if (unlikely((bv.bv_offset | bv.bv_len) & ((ic->sectors_per_block << SECTOR_SHIFT) - 1))) {
+ 				DMERR("Bio vector (%u,%u) is not aligned on %u-sector boundary",
+ 					bv.bv_offset, bv.bv_len, ic->sectors_per_block);
+-				return -EIO;
++				return DM_MAPIO_KILL;
+ 			}
+ 		}
+ 	}
+@@ -1383,18 +1383,18 @@ static int dm_integrity_map(struct dm_target *ti, struct bio *bio)
+ 				wanted_tag_size *= ic->tag_size;
+ 			if (unlikely(wanted_tag_size != bip->bip_iter.bi_size)) {
+ 				DMERR("Invalid integrity data size %u, expected %u", bip->bip_iter.bi_size, wanted_tag_size);
+-				return -EIO;
++				return DM_MAPIO_KILL;
+ 			}
+ 		}
+ 	} else {
+ 		if (unlikely(bip != NULL)) {
+ 			DMERR("Unexpected integrity data when using internal hash");
+-			return -EIO;
++			return DM_MAPIO_KILL;
+ 		}
+ 	}
+ 
+ 	if (unlikely(ic->mode == 'R') && unlikely(dio->write))
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 
+ 	get_area_and_offset(ic, dio->range.logical_sector, &area, &offset);
+ 	dio->metadata_block = get_metadata_sector_and_offset(ic, area, offset, &dio->metadata_offset);
+diff --git a/drivers/md/dm-log-writes.c b/drivers/md/dm-log-writes.c
+index 4dfe38655a49..e42264706c59 100644
+--- a/drivers/md/dm-log-writes.c
++++ b/drivers/md/dm-log-writes.c
+@@ -586,7 +586,7 @@ static int log_writes_map(struct dm_target *ti, struct bio *bio)
+ 		spin_lock_irq(&lc->blocks_lock);
+ 		lc->logging_enabled = false;
+ 		spin_unlock_irq(&lc->blocks_lock);
+-		return -ENOMEM;
++		return DM_MAPIO_KILL;
+ 	}
+ 	INIT_LIST_HEAD(&block->list);
+ 	pb->block = block;
+@@ -639,7 +639,7 @@ static int log_writes_map(struct dm_target *ti, struct bio *bio)
+ 			spin_lock_irq(&lc->blocks_lock);
+ 			lc->logging_enabled = false;
+ 			spin_unlock_irq(&lc->blocks_lock);
+-			return -ENOMEM;
++			return DM_MAPIO_KILL;
+ 		}
+ 
+ 		src = kmap_atomic(bv.bv_page);
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 6d5ebb76149d..bf6e49c780d5 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -559,7 +559,7 @@ static int __multipath_map_bio(struct multipath *m, struct bio *bio, struct dm_m
+ 		if (test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))
+ 			return DM_MAPIO_REQUEUE;
+ 		dm_report_EIO(m);
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 	}
+ 
+ 	mpio->pgpath = pgpath;
+@@ -621,11 +621,18 @@ static void process_queued_bios(struct work_struct *work)
+ 	blk_start_plug(&plug);
+ 	while ((bio = bio_list_pop(&bios))) {
+ 		r = __multipath_map_bio(m, bio, get_mpio_from_bio(bio));
+-		if (r < 0 || r == DM_MAPIO_REQUEUE) {
++		switch (r) {
++		case DM_MAPIO_KILL:
++			r = -EIO;
++			/*FALLTHRU*/
++		case DM_MAPIO_REQUEUE:
+ 			bio->bi_error = r;
+ 			bio_endio(bio);
+-		} else if (r == DM_MAPIO_REMAPPED)
++			break;
++		case DM_MAPIO_REMAPPED:
+ 			generic_make_request(bio);
++			break;
++		}
+ 	}
+ 	blk_finish_plug(&plug);
  }
+diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
+index 5e30b08b91d9..d9c0c6a77eb5 100644
+--- a/drivers/md/dm-raid1.c
++++ b/drivers/md/dm-raid1.c
+@@ -1207,14 +1207,14 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
  
--static void blk_mq_map_swqueue(struct request_queue *q,
--			       const struct cpumask *online_mask)
-+static void blk_mq_map_swqueue(struct request_queue *q)
- {
- 	unsigned int i, hctx_idx;
- 	struct blk_mq_hw_ctx *hctx;
-@@ -2029,13 +2025,11 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 	}
+ 	r = log->type->in_sync(log, dm_rh_bio_to_region(ms->rh, bio), 0);
+ 	if (r < 0 && r != -EWOULDBLOCK)
+-		return r;
++		return DM_MAPIO_KILL;
  
  	/*
--	 * Map software to hardware queues
-+	 * Map software to hardware queues.
-+	 *
-+	 * If the cpu isn't present, the cpu is mapped to first hctx.
+ 	 * If region is not in-sync queue the bio.
  	 */
--	for_each_possible_cpu(i) {
--		/* If the cpu isn't online, the cpu is mapped to first hctx */
--		if (!cpumask_test_cpu(i, online_mask))
--			continue;
--
-+	for_each_present_cpu(i) {
- 		hctx_idx = q->mq_map[i];
- 		/* unmapped hw queue can be remapped after CPU topo changed */
- 		if (!set->tags[hctx_idx] &&
-@@ -2321,16 +2315,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		blk_queue_softirq_done(q, set->ops->complete);
+ 	if (!r || (r == -EWOULDBLOCK)) {
+ 		if (bio->bi_opf & REQ_RAHEAD)
+-			return -EIO;
++			return DM_MAPIO_KILL;
  
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
--
--	get_online_cpus();
--	mutex_lock(&all_q_mutex);
--
--	list_add_tail(&q->all_q_node, &all_q_list);
- 	blk_mq_add_queue_tag_set(set, q);
--	blk_mq_map_swqueue(q, cpu_online_mask);
--
--	mutex_unlock(&all_q_mutex);
--	put_online_cpus();
-+	blk_mq_map_swqueue(q);
- 
- 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
- 		int ret;
-@@ -2356,18 +2342,12 @@ void blk_mq_free_queue(struct request_queue *q)
- {
- 	struct blk_mq_tag_set	*set = q->tag_set;
- 
--	mutex_lock(&all_q_mutex);
--	list_del_init(&q->all_q_node);
--	mutex_unlock(&all_q_mutex);
--
- 	blk_mq_del_queue_tag_set(q);
--
- 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
- }
- 
- /* Basically redo blk_mq_init_queue with queue frozen */
--static void blk_mq_queue_reinit(struct request_queue *q,
--				const struct cpumask *online_mask)
-+static void blk_mq_queue_reinit(struct request_queue *q)
- {
- 	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
- 
-@@ -2380,76 +2360,12 @@ static void blk_mq_queue_reinit(struct request_queue *q,
- 	 * involves free and re-allocate memory, worthy doing?)
+ 		queue_bio(ms, bio, rw);
+ 		return DM_MAPIO_SUBMITTED;
+@@ -1226,7 +1226,7 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
  	 */
+ 	m = choose_mirror(ms, bio->bi_iter.bi_sector);
+ 	if (unlikely(!m))
+-		return -EIO;
++		return DM_MAPIO_KILL;
  
--	blk_mq_map_swqueue(q, online_mask);
-+	blk_mq_map_swqueue(q);
+ 	dm_bio_record(&bio_record->details, bio);
+ 	bio_record->m = m;
+diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
+index e152d9817c81..5a7f73f9a6fb 100644
+--- a/drivers/md/dm-snap.c
++++ b/drivers/md/dm-snap.c
+@@ -1690,7 +1690,7 @@ static int snapshot_map(struct dm_target *ti, struct bio *bio)
+ 	/* Full snapshots are not usable */
+ 	/* To get here the table must be live so s->active is always set. */
+ 	if (!s->valid)
+-		return -EIO;
++		return DM_MAPIO_KILL;
  
- 	blk_mq_sysfs_register(q);
- 	blk_mq_debugfs_register_hctxs(q);
- }
+ 	/* FIXME: should only take write lock if we need
+ 	 * to copy an exception */
+@@ -1698,7 +1698,7 @@ static int snapshot_map(struct dm_target *ti, struct bio *bio)
  
--/*
-- * New online cpumask which is going to be set in this hotplug event.
-- * Declare this cpumasks as global as cpu-hotplug operation is invoked
-- * one-by-one and dynamically allocating this could result in a failure.
-- */
--static struct cpumask cpuhp_online_new;
--
--static void blk_mq_queue_reinit_work(void)
--{
--	struct request_queue *q;
--
--	mutex_lock(&all_q_mutex);
--	/*
--	 * We need to freeze and reinit all existing queues.  Freezing
--	 * involves synchronous wait for an RCU grace period and doing it
--	 * one by one may take a long time.  Start freezing all queues in
--	 * one swoop and then wait for the completions so that freezing can
--	 * take place in parallel.
--	 */
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_freeze_queue_start(q);
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_freeze_queue_wait(q);
--
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_queue_reinit(q, &cpuhp_online_new);
--
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_unfreeze_queue(q);
--
--	mutex_unlock(&all_q_mutex);
--}
--
--static int blk_mq_queue_reinit_dead(unsigned int cpu)
--{
--	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
--	blk_mq_queue_reinit_work();
--	return 0;
--}
--
--/*
-- * Before hotadded cpu starts handling requests, new mappings must be
-- * established.  Otherwise, these requests in hw queue might never be
-- * dispatched.
-- *
-- * For example, there is a single hw queue (hctx) and two CPU queues (ctx0
-- * for CPU0, and ctx1 for CPU1).
-- *
-- * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
-- * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
-- *
-- * And then while running hw queue, blk_mq_flush_busy_ctxs() finds bit0 is set
-- * in pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
-- * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list is
-- * ignored.
-- */
--static int blk_mq_queue_reinit_prepare(unsigned int cpu)
--{
--	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
--	cpumask_set_cpu(cpu, &cpuhp_online_new);
--	blk_mq_queue_reinit_work();
--	return 0;
--}
--
- static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- {
- 	int i;
-@@ -2660,7 +2576,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
--		blk_mq_queue_reinit(q, cpu_online_mask);
-+		blk_mq_queue_reinit(q);
+ 	if (!s->valid || (unlikely(s->snapshot_overflowed) &&
+ 	    bio_data_dir(bio) == WRITE)) {
+-		r = -EIO;
++		r = DM_MAPIO_KILL;
+ 		goto out_unlock;
  	}
  
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
-@@ -2876,24 +2792,10 @@ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
- }
- EXPORT_SYMBOL_GPL(blk_mq_poll);
+@@ -1723,7 +1723,7 @@ static int snapshot_map(struct dm_target *ti, struct bio *bio)
  
--void blk_mq_disable_hotplug(void)
--{
--	mutex_lock(&all_q_mutex);
--}
--
--void blk_mq_enable_hotplug(void)
--{
--	mutex_unlock(&all_q_mutex);
--}
--
- static int __init blk_mq_init(void)
+ 			if (!s->valid || s->snapshot_overflowed) {
+ 				free_pending_exception(pe);
+-				r = -EIO;
++				r = DM_MAPIO_KILL;
+ 				goto out_unlock;
+ 			}
+ 
+@@ -1741,7 +1741,7 @@ static int snapshot_map(struct dm_target *ti, struct bio *bio)
+ 					DMERR("Snapshot overflowed: Unable to allocate exception.");
+ 				} else
+ 					__invalidate_snapshot(s, -ENOMEM);
+-				r = -EIO;
++				r = DM_MAPIO_KILL;
+ 				goto out_unlock;
+ 			}
+ 		}
+diff --git a/drivers/md/dm-target.c b/drivers/md/dm-target.c
+index b242b750542f..c0d7e60820c4 100644
+--- a/drivers/md/dm-target.c
++++ b/drivers/md/dm-target.c
+@@ -128,7 +128,7 @@ static void io_err_dtr(struct dm_target *tt)
+ 
+ static int io_err_map(struct dm_target *tt, struct bio *bio)
  {
- 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
- 				blk_mq_hctx_notify_dead);
--
--	cpuhp_setup_state_nocalls(CPUHP_BLK_MQ_PREPARE, "block/mq:prepare",
--				  blk_mq_queue_reinit_prepare,
--				  blk_mq_queue_reinit_dead);
- 	return 0;
+-	return -EIO;
++	return DM_MAPIO_KILL;
  }
- subsys_initcall(blk_mq_init);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index cc67b48e3551..558df56544d2 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -56,11 +56,6 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 				bool at_head);
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 				struct list_head *list);
--/*
-- * CPU hotplug helpers
-- */
--void blk_mq_enable_hotplug(void);
--void blk_mq_disable_hotplug(void);
  
- /*
-  * CPU -> queue mappings
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index c15f22c54535..7f815d915977 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -58,7 +58,6 @@ enum cpuhp_state {
- 	CPUHP_XEN_EVTCHN_PREPARE,
- 	CPUHP_ARM_SHMOBILE_SCU_PREPARE,
- 	CPUHP_SH_SH3X_PREPARE,
--	CPUHP_BLK_MQ_PREPARE,
- 	CPUHP_NET_FLOW_PREPARE,
- 	CPUHP_TOPOLOGY_PREPARE,
- 	CPUHP_NET_IUCV_PREPARE,
+ static int io_err_clone_and_map_rq(struct dm_target *ti, struct request *rq,
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index 97de961a3bfc..9ed55468b98b 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -643,17 +643,17 @@ static int verity_map(struct dm_target *ti, struct bio *bio)
+ 	if (((unsigned)bio->bi_iter.bi_sector | bio_sectors(bio)) &
+ 	    ((1 << (v->data_dev_block_bits - SECTOR_SHIFT)) - 1)) {
+ 		DMERR_LIMIT("unaligned io");
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 	}
+ 
+ 	if (bio_end_sector(bio) >>
+ 	    (v->data_dev_block_bits - SECTOR_SHIFT) > v->data_blocks) {
+ 		DMERR_LIMIT("io out of range");
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 	}
+ 
+ 	if (bio_data_dir(bio) == WRITE)
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 
+ 	io = dm_per_bio_data(bio, ti->per_io_data_size);
+ 	io->v = v;
+diff --git a/drivers/md/dm-zero.c b/drivers/md/dm-zero.c
+index b616f11d8473..b65ca8dcfbdc 100644
+--- a/drivers/md/dm-zero.c
++++ b/drivers/md/dm-zero.c
+@@ -39,7 +39,7 @@ static int zero_map(struct dm_target *ti, struct bio *bio)
+ 	case REQ_OP_READ:
+ 		if (bio->bi_opf & REQ_RAHEAD) {
+ 			/* readahead of null bytes only wastes buffer cache */
+-			return -EIO;
++			return DM_MAPIO_KILL;
+ 		}
+ 		zero_fill_bio(bio);
+ 		break;
+@@ -47,7 +47,7 @@ static int zero_map(struct dm_target *ti, struct bio *bio)
+ 		/* writes get silently dropped */
+ 		break;
+ 	default:
+-		return -EIO;
++		return DM_MAPIO_KILL;
+ 	}
+ 
+ 	bio_endio(bio);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 6ef9500226c0..499f8209bacf 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1084,18 +1084,24 @@ static void __map_bio(struct dm_target_io *tio)
+ 	r = ti->type->map(ti, clone);
+ 	dm_offload_end(&o);
+ 
+-	if (r == DM_MAPIO_REMAPPED) {
++	switch (r) {
++	case DM_MAPIO_SUBMITTED:
++		break;
++	case DM_MAPIO_REMAPPED:
+ 		/* the bio has been remapped so dispatch it */
+-
+ 		trace_block_bio_remap(bdev_get_queue(clone->bi_bdev), clone,
+ 				      tio->io->bio->bi_bdev->bd_dev, sector);
+-
+ 		generic_make_request(clone);
+-	} else if (r < 0 || r == DM_MAPIO_REQUEUE) {
++		break;
++	case DM_MAPIO_KILL:
++		r = -EIO;
++		/*FALLTHRU*/
++	case DM_MAPIO_REQUEUE:
+ 		/* error the io and bail out, or requeue it if needed */
+ 		dec_pending(tio->io, r);
+ 		free_tio(tio);
+-	} else if (r != DM_MAPIO_SUBMITTED) {
++		break;
++	default:
+ 		DMWARN("unimplemented target map return value: %d", r);
+ 		BUG();
+ 	}
 -- 
 2.11.0
