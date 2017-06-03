@@ -1,61 +1,50 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 06/10] fs: Introduce IOMAP_NOWAIT
-Date: Tue,  6 Jun 2017 06:19:35 -0500
-Message-Id: <20170606111939.27272-7-rgoldwyn@suse.de>
-In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
-References: <20170606111939.27272-1-rgoldwyn@suse.de>
+Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 03/13] gfs2: remove the unused sd_log_error field
+Date: Sat,  3 Jun 2017 09:37:56 +0200
+Message-Id: <20170603073806.2046-4-hch@lst.de>
+In-Reply-To: <20170603073806.2046-1-hch@lst.de>
+References: <20170603073806.2046-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-
-IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
-This is used by XFS in the XFS patch.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
 ---
- fs/iomap.c            | 2 ++
- include/linux/iomap.h | 1 +
- 2 files changed, 3 insertions(+)
+ fs/gfs2/incore.h | 1 -
+ fs/gfs2/lops.c   | 4 +---
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 4b10892967a5..5d85ec6e7b20 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -879,6 +879,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	} else {
- 		dio->flags |= IOMAP_DIO_WRITE;
- 		flags |= IOMAP_WRITE;
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			flags |= IOMAP_NOWAIT;
- 	}
+diff --git a/fs/gfs2/incore.h b/fs/gfs2/incore.h
+index b7cf65d13561..aa3d44527fa2 100644
+--- a/fs/gfs2/incore.h
++++ b/fs/gfs2/incore.h
+@@ -815,7 +815,6 @@ struct gfs2_sbd {
+ 	atomic_t sd_log_in_flight;
+ 	struct bio *sd_log_bio;
+ 	wait_queue_head_t sd_log_flush_wait;
+-	int sd_log_error;
  
- 	ret = filemap_write_and_wait_range(mapping, start, end);
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index f753e788da31..69f4e9470084 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -52,6 +52,7 @@ struct iomap {
- #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
- #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
- #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
-+#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
+ 	atomic_t sd_reserving_log;
+ 	wait_queue_head_t sd_reserving_log_wait;
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index b1f9144b42c7..13ebf15a4db0 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -209,10 +209,8 @@ static void gfs2_end_log_write(struct bio *bio)
+ 	struct page *page;
+ 	int i;
  
- struct iomap_ops {
- 	/*
+-	if (bio->bi_error) {
+-		sdp->sd_log_error = bio->bi_error;
++	if (bio->bi_error)
+ 		fs_err(sdp, "Error %d writing to log\n", bio->bi_error);
+-	}
+ 
+ 	bio_for_each_segment_all(bvec, bio, i) {
+ 		page = bvec->bv_page;
 -- 
-2.12.0
+2.11.0
