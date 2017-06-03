@@ -1,128 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f50.google.com ([209.85.218.50]:34255 "EHLO
-        mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751373AbdFEH2y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2017 03:28:54 -0400
-Received: by mail-oi0-f50.google.com with SMTP id o65so123801159oif.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2017 00:28:53 -0700 (PDT)
-From: Sumit Saxena <sumit.saxena@broadcom.com>
-MIME-Version: 1.0
-Date: Mon, 5 Jun 2017 12:58:51 +0530
-Message-ID: <3e25920f0068797bd74e5ea37a2dc3dc@mail.gmail.com>
-Subject: Application stops due to ext4 filesytsem IO error
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 05/13] fs: remove the unused error argument to dio_end_io()
+Date: Sat,  3 Jun 2017 09:37:58 +0200
+Message-Id: <20170603073806.2046-6-hch@lst.de>
+In-Reply-To: <20170603073806.2046-1-hch@lst.de>
+References: <20170603073806.2046-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Jens,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
+---
+ fs/btrfs/inode.c   | 6 +++---
+ fs/direct-io.c     | 3 +--
+ include/linux/fs.h | 2 +-
+ 3 files changed, 5 insertions(+), 6 deletions(-)
 
-We am observing  application stops while running ext4 filesystem IOs along
-with target reset in parallel.
-Our suspect is this behavior can be attributed to linux block layer. See
-below for details-
-
-Problem statement - " Application stops due to IO error from file system
-buffered IO. (Note - It is always a FS meta data read failure)"
-Issue is reproducible - "Yes. It is consistently reproducible."
-Brief about setup -
-Latest 4.11 kernel. Issue hits irrespective of whether SCSI MQ is enabled
-or disabled. use_blk_mq=Y and use_blk_mq=N has similar issue.
-Direct attached 4 SAS/SATA drives connected to MegaRAID Invader
-controller.
-
-Reproduction steps -
--Create ext4 FS on 4 JBODs(non RAID volumes) behind MegaRAID SAS
-controller.
--Start Data integrity test on all four ext4 mounted partition. (Tool
-should be configured to send Buffered FS IO).
--Send Target Reset  (have some delay between next reset to allow some IO
-on device) on each JBOD to simulate error condition. (sg_reset -d
-/dev/sdX).
-
-End result -
-Combination of target resets and FS IOs in parallel causes application
-halt with ext4 Filesystem IO error.
-We are able to restart  application without cleaning and unmounting
-filesystem.
-Below are the error logs at the time of application stop-
-
---------------------------
-sd 0:0:53:0: target reset called for
-scmd(ffff88003cf25148)
-sd 0:0:53:0: attempting target reset!
-scmd(ffff88003cf25148) tm_dev_handle 0xb
-sd 0:0:53:0: [sde] tag#519 BRCM Debug: request->cmd_flags: 0x80700
-bio->bi_flags: 0x2          bio->bi_opf: 0x3000 rq_flags 0x20e3
-..
-sd 0:0:53:0: [sde] tag#519 CDB: Read(10) 28 00 15 00 11 10 00 00 f8 00
-EXT4-fs error (device sde): __ext4_get_inode_loc:4465: inode #11018287:
-block 44040738: comm chaos: unable to read itable block
------------------------
-
-We debug further to understand what is happening above LLD. See below-
-
-During target reset,  there may be IO coming from target with CHECK
-CONDITION with below sense information-.
-Sense Key : Aborted Command [current]
-Add. Sense: No additional sense information
-
-Such Aborted command should be retried by SML/Block layer. This happens
-from SML expect for FS Meta data read.
->From driver level debug, we found IOs with REQ_FAILFAST_DEV bit set in
-scmd->request->cmd_flags are not retried by SML and that is also as
-expected.
-
-Below is the code in scsi_error.c(function- scsi_noretry_cmd) which causes
-IOs with REQ_FAILFAST_DEV enabled not getting retried bit completed back
-to upper layer-
---------
-/*
-     * assume caller has checked sense and determined
-     * the check condition was retryable.
-     */
-    if (scmd->request->cmd_flags & REQ_FAILFAST_DEV ||
-        scmd->request->cmd_type == REQ_TYPE_BLOCK_PC)
-        return 1;
-    else
-        return 0;
---------
-
-IO which causes application to stop has REQ_FAILFAST_DEV enabled inside
-"scmd->request->cmd_flags". We noticed that this bit will be set for
-filesystem Read ahead meta data IOs. In order to confirm the same, we
-mounted with option inode_readahead_blks=0 to disable ext4's inode table
-readahead algorithm and did not observe the issue. Issue does not hit with
-DIRECT IOs but only with cached/buffered IOs.
-
-2. From driver level debug prints, we also noticed - There are many IO
-failures with REQ_FAILFAST_DEV handled gracefully by filesystem.
-Application level failure happens only If IO has RQF_MIXED_MERGE set.
-If IO merging is disabled through sysfs parameter for SCSI device in
-question- nomerges set to 2, we are not seeing the issue.
-
-3. We added few prints in driver to dump "scmd->request->cmd_flags" and
-"scmd->request->rq_flags" for IOs completed with CHECK CONDITION and
-culprit IOs has all these bits- REQ_FAILFAST_DEV and REQ_RAHEAD bit set in
-"scmd->request->cmd_flags" and RQF_MIXED_MERGE bit set in
-"scmd->request->rq_flags". Also it's not necessarily true that all IOs
-with these three bits set will cause issue but whenever issue hits, these
-three bits are set for IO causing failure.
-
-
-In summary,
-FS mechanism of using READ AHEAD for meta data works fine (in case of IO
-failure) if there is no mix/merge at block layer.
-FS mechanism of using READ AHEAD for meta data has some corner case which
-is not handled properly (in case of IO failure) if  there was  mix/merge
-at block layer.
-megaraid_sas driver's behavior seems correct here. Aborted IO goes to SML
-with CHECK CONDITION settings and SML decided to fail fast IO as it was
-requested.
-
-Query -  Is this block layer (page cache) issue?  What should be the ideal
-fix ?
-
-Thanks,
-Sumit
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 17cbe9306faf..758b2666885e 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8244,7 +8244,7 @@ static void btrfs_endio_direct_read(struct bio *bio)
+ 	kfree(dip);
+ 
+ 	dio_bio->bi_error = bio->bi_error;
+-	dio_end_io(dio_bio, bio->bi_error);
++	dio_end_io(dio_bio);
+ 
+ 	if (io_bio->end_io)
+ 		io_bio->end_io(io_bio, err);
+@@ -8304,7 +8304,7 @@ static void btrfs_endio_direct_write(struct bio *bio)
+ 	kfree(dip);
+ 
+ 	dio_bio->bi_error = bio->bi_error;
+-	dio_end_io(dio_bio, bio->bi_error);
++	dio_end_io(dio_bio);
+ 	bio_put(bio);
+ }
+ 
+@@ -8673,7 +8673,7 @@ static void btrfs_submit_direct(struct bio *dio_bio, struct inode *inode,
+ 		 * Releases and cleans up our dio_bio, no need to bio_put()
+ 		 * nor bio_endio()/bio_io_error() against dio_bio.
+ 		 */
+-		dio_end_io(dio_bio, ret);
++		dio_end_io(dio_bio);
+ 	}
+ 	if (io_bio)
+ 		bio_put(io_bio);
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index a04ebea77de8..04247a6c3f73 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -348,13 +348,12 @@ static void dio_bio_end_io(struct bio *bio)
+ /**
+  * dio_end_io - handle the end io action for the given bio
+  * @bio: The direct io bio thats being completed
+- * @error: Error if there was one
+  *
+  * This is meant to be called by any filesystem that uses their own dio_submit_t
+  * so that the DIO specific endio actions are dealt with after the filesystem
+  * has done it's completion work.
+  */
+-void dio_end_io(struct bio *bio, int error)
++void dio_end_io(struct bio *bio)
+ {
+ 	struct dio *dio = bio->bi_private;
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 803e5a9b2654..4388ab58843d 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2843,7 +2843,7 @@ enum {
+ 	DIO_SKIP_DIO_COUNT = 0x08,
+ };
+ 
+-void dio_end_io(struct bio *bio, int error);
++void dio_end_io(struct bio *bio);
+ 
+ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+ 			     struct block_device *bdev, struct iov_iter *iter,
+-- 
+2.11.0
