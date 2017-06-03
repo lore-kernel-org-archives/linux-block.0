@@ -1,68 +1,56 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 13/13] btrfs: minimal conversion to errseq_t writeback error reporting on fsync
-Date: Mon, 12 Jun 2017 08:23:08 -0400
-Message-Id: <20170612122316.13244-17-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
+Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 07/13] block_dev: propagate bio_iov_iter_get_pages error in __blkdev_direct_IO
+Date: Sat,  3 Jun 2017 09:38:00 +0200
+Message-Id: <20170603073806.2046-8-hch@lst.de>
+In-Reply-To: <20170603073806.2046-1-hch@lst.de>
+References: <20170603073806.2046-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Internal callers of filemap_* functions are left as-is.
+Once we move the block layer to its own status code we'll still want to
+propagate the bio_iov_iter_get_pages, so restructure __blkdev_direct_IO
+to take ret into account when returning the errno.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/btrfs/file.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ fs/block_dev.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index da1096eb1a40..4632f16bc49c 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -2011,7 +2011,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	struct btrfs_root *root = BTRFS_I(inode)->root;
- 	struct btrfs_trans_handle *trans;
- 	struct btrfs_log_ctx ctx;
--	int ret = 0;
-+	int ret = 0, err;
- 	bool full_sync = 0;
- 	u64 len;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 519599dddd36..c1dc393ad6b9 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -334,7 +334,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
+ 	loff_t pos = iocb->ki_pos;
+ 	blk_qc_t qc = BLK_QC_T_NONE;
+-	int ret;
++	int ret = 0;
  
-@@ -2030,7 +2030,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	 */
- 	ret = start_ordered_ops(inode, start, end);
- 	if (ret)
--		return ret;
-+		goto out;
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+@@ -363,7 +363,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
  
- 	inode_lock(inode);
- 	atomic_inc(&root->log_batch);
-@@ -2227,6 +2227,9 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 		ret = btrfs_end_transaction(trans);
+ 		ret = bio_iov_iter_get_pages(bio, iter);
+ 		if (unlikely(ret)) {
+-			bio->bi_error = ret;
++			bio->bi_error = -EIO;
+ 			bio_endio(bio);
+ 			break;
+ 		}
+@@ -412,7 +412,8 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
  	}
- out:
-+	err = filemap_report_wb_err(file);
+ 	__set_current_state(TASK_RUNNING);
+ 
+-	ret = dio->bio.bi_error;
 +	if (!ret)
-+		ret = err;
- 	return ret > 0 ? -EIO : ret;
- }
++		ret = dio->bio.bi_error;
+ 	if (likely(!ret))
+ 		ret = dio->size;
  
 -- 
-2.13.0
+2.11.0
