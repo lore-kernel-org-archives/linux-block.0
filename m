@@ -1,74 +1,42 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 05/10] fs: return if direct write will trigger writeback
-Date: Tue,  6 Jun 2017 06:19:34 -0500
-Message-Id: <20170606111939.27272-6-rgoldwyn@suse.de>
-In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
-References: <20170606111939.27272-1-rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Block device integrity support
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "hch@lst.de" <hch@lst.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <1496440434.1214.23.camel@sandisk.com>
+ <yq1lgpahvtp.fsf@oracle.com> <1496443127.1214.27.camel@sandisk.com>
+ <d0bfe2ea-6d77-e7cd-eebd-3f8471c47fcb@kernel.dk>
+ <20170603073244.GA23235@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <17329e00-ab17-0036-d152-4ca1b3cce520@kernel.dk>
+Date: Sat, 3 Jun 2017 06:37:41 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170603073244.GA23235@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On 06/03/2017 12:32 AM, Christoph Hellwig wrote:
+> On Fri, Jun 02, 2017 at 03:52:57PM -0700, Jens Axboe wrote:
+>> On 06/02/2017 03:38 PM, Bart Van Assche wrote:
+>>> On Fri, 2017-06-02 at 18:24 -0400, Martin K. Petersen wrote:
+>>>>> then the output shown below appears in the kernel log. Does anyone know how
+>>>>> to fix this? Sorry but I'm not really familiar with the integrity
+>>>>> code.
+>>>>
+>>>> Dmitry posted a fix for this a few weeks ago.
+>>>
+>>> Ah, that's right. Jens, had you noticed this message:
+>>> https://www.spinics.net/lists/fstests/msg06214.html?
+>>
+>> No, unfortunately not. I'll queue it up for 4.13 and mark it
+>> stable for 4.12.
+> 
+> Can we please get it into 4.12-rc?
 
-Find out if the write will trigger a wait due to writeback. If yes,
-return -EAGAIN.
+Yes of course, that's actually what I did. I just got the version
+numbers mixed up.
 
-Return -EINVAL for buffered AIO: there are multiple causes of
-delay such as page locks, dirty throttling logic, page loading
-from disk etc. which cannot be taken care of.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- mm/filemap.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 097213275461..bc146efa6815 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2675,6 +2675,9 @@ inline ssize_t generic_write_checks(struct kiocb *iocb, struct iov_iter *from)
- 
- 	pos = iocb->ki_pos;
- 
-+	if ((iocb->ki_flags & IOCB_NOWAIT) && !(iocb->ki_flags & IOCB_DIRECT))
-+		return -EINVAL;
-+
- 	if (limit != RLIM_INFINITY) {
- 		if (iocb->ki_pos >= limit) {
- 			send_sig(SIGXFSZ, current, 0);
-@@ -2743,9 +2746,17 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
- 	write_len = iov_iter_count(from);
- 	end = (pos + write_len - 1) >> PAGE_SHIFT;
- 
--	written = filemap_write_and_wait_range(mapping, pos, pos + write_len - 1);
--	if (written)
--		goto out;
-+	if (iocb->ki_flags & IOCB_NOWAIT) {
-+		/* If there are pages to writeback, return */
-+		if (filemap_range_has_page(inode->i_mapping, pos,
-+					   pos + iov_iter_count(from)))
-+			return -EAGAIN;
-+	} else {
-+		written = filemap_write_and_wait_range(mapping, pos,
-+							pos + write_len - 1);
-+		if (written)
-+			goto out;
-+	}
- 
- 	/*
- 	 * After a write we want buffered reads to be sure to go to disk to get
 -- 
-2.12.0
+Jens Axboe
