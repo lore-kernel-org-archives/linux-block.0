@@ -1,40 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52268 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753255AbdFRPWr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:47 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 28/30] nvme: update tagset nr_hw_queues when reallocating io queues
-Date: Sun, 18 Jun 2017 18:22:02 +0300
-Message-Id: <1497799324-19598-29-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 08/13] dm mpath: merge do_end_io_bio into multipath_end_io_bio
+Date: Sat,  3 Jun 2017 09:38:01 +0200
+Message-Id: <20170603073806.2046-9-hch@lst.de>
+In-Reply-To: <20170603073806.2046-1-hch@lst.de>
+References: <20170603073806.2046-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+This simplifies the code and especially the error passing a bit and
+will help with the next patch.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/md/dm-mpath.c | 42 +++++++++++++++---------------------------
+ 1 file changed, 15 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 6937ba26ff2c..476c49c0601f 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2776,6 +2776,9 @@ int nvme_configure_io_queues(struct nvme_ctrl *ctrl, bool new)
- 		ret = blk_mq_reinit_tagset(ctrl->tagset);
- 		if (ret)
- 			goto out_free_io_queues;
-+
-+		blk_mq_update_nr_hw_queues(ctrl->tagset,
-+				ctrl->queue_count - 1);
-        }
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 3df056b73b66..6d5ebb76149d 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -1510,24 +1510,24 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
+ 	return r;
+ }
  
- 	ret = nvme_start_io_queues(ctrl);
+-static int do_end_io_bio(struct multipath *m, struct bio *clone,
+-			 int error, struct dm_mpath_io *mpio)
++static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone, int error)
+ {
++	struct multipath *m = ti->private;
++	struct dm_mpath_io *mpio = get_mpio_from_bio(clone);
++	struct pgpath *pgpath = mpio->pgpath;
+ 	unsigned long flags;
+ 
+-	if (!error)
+-		return 0;	/* I/O complete */
+-
+-	if (noretry_error(error))
+-		return error;
++	if (!error || noretry_error(error))
++		goto done;
+ 
+-	if (mpio->pgpath)
+-		fail_path(mpio->pgpath);
++	if (pgpath)
++		fail_path(pgpath);
+ 
+ 	if (atomic_read(&m->nr_valid_paths) == 0 &&
+ 	    !test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
+ 		dm_report_EIO(m);
+-		return -EIO;
++		error = -EIO;
++		goto done;
+ 	}
+ 
+ 	/* Queue for the daemon to resubmit */
+@@ -1539,28 +1539,16 @@ static int do_end_io_bio(struct multipath *m, struct bio *clone,
+ 	if (!test_bit(MPATHF_QUEUE_IO, &m->flags))
+ 		queue_work(kmultipathd, &m->process_queued_bios);
+ 
+-	return DM_ENDIO_INCOMPLETE;
+-}
+-
+-static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone, int error)
+-{
+-	struct multipath *m = ti->private;
+-	struct dm_mpath_io *mpio = get_mpio_from_bio(clone);
+-	struct pgpath *pgpath;
+-	struct path_selector *ps;
+-	int r;
+-
+-	BUG_ON(!mpio);
+-
+-	r = do_end_io_bio(m, clone, error, mpio);
+-	pgpath = mpio->pgpath;
++	error = DM_ENDIO_INCOMPLETE;
++done:
+ 	if (pgpath) {
+-		ps = &pgpath->pg->ps;
++		struct path_selector *ps = &pgpath->pg->ps;
++
+ 		if (ps->type->end_io)
+ 			ps->type->end_io(ps, &pgpath->path, mpio->nr_bytes);
+ 	}
+ 
+-	return r;
++	return error;
+ }
+ 
+ /*
 -- 
-2.7.4
+2.11.0
