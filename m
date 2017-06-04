@@ -1,53 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38172 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751390AbdFFPXC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 11:23:02 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 03/12] blk-mq: move blk_mq_quiesce_queue() into include/linux/blk-mq.h
-Date: Tue,  6 Jun 2017 23:22:01 +0800
-Message-Id: <20170606152210.22806-4-ming.lei@redhat.com>
-In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
-References: <20170606152210.22806-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 4/8] genirq/affinity: assign vectors to all present CPUs
+To: Christoph Hellwig <hch@lst.de>, Thomas Gleixner <tglx@linutronix.de>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20170603140403.27379-1-hch@lst.de>
+ <20170603140403.27379-5-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <5a48e208-9279-9db9-2465-dfdb8d0319e5@grimberg.me>
+Date: Sun, 4 Jun 2017 18:17:10 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170603140403.27379-5-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-We usually put blk_mq_*() into include/linux/blk-mq.h, so
-move this API into there.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blk-mq.h | 1 +
- include/linux/blkdev.h | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index fcd641032f8d..1e480015d172 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -247,6 +247,7 @@ void blk_mq_stop_hw_queues(struct request_queue *q);
- void blk_mq_start_hw_queues(struct request_queue *q);
- void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
-+void blk_mq_quiesce_queue(struct request_queue *q);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 019f18c65098..7178ad6805e3 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -966,7 +966,6 @@ extern void __blk_run_queue(struct request_queue *q);
- extern void __blk_run_queue_uncond(struct request_queue *q);
- extern void blk_run_queue(struct request_queue *);
- extern void blk_run_queue_async(struct request_queue *q);
--extern void blk_mq_quiesce_queue(struct request_queue *q);
- extern int blk_rq_map_user(struct request_queue *, struct request *,
- 			   struct rq_map_data *, void __user *, unsigned long,
- 			   gfp_t);
--- 
-2.9.4
+On 03/06/17 17:03, Christoph Hellwig wrote:
+> Currently we only assign spread vectors to online CPUs, which ties the
+> IRQ mapping to the currently online devices and doesn't deal nicely with
+> the fact that CPUs could come and go rapidly due to e.g. power management.
+> 
+> Instead assign vectors to all present CPUs to avoid this churn.
+> 
+> For this we have to build a map of all possible CPUs for a give node, as
+
+s/give/given/
+
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
