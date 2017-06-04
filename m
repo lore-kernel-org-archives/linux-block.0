@@ -1,95 +1,88 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:46814 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751458AbdFFTkr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 15:40:47 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: tj@kernel.org, axboe@fb.com, Kernel-team@fb.com,
-        Shaohua Li <shli@fb.com>
-Subject: [PATCH] blk-throttle: set default latency baseline for harddisk
-Date: Tue,  6 Jun 2017 12:40:43 -0700
-Message-Id: <af8d351c4d0639b4df0dae777cc96944f52751c1.1496777767.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <joelaf@google.com>
+MIME-Version: 1.0
+In-Reply-To: <20170604040350.12641-3-joelaf@google.com>
+References: <20170604040350.12641-1-joelaf@google.com> <20170604040350.12641-3-joelaf@google.com>
+From: Joel Fernandes <joelaf@google.com>
+Date: Sat, 3 Jun 2017 22:44:35 -0700
+Message-ID: <CAJWu+oqeeWj-956wO_3HXemhhuDj_iuR8+gwuQ=Kbhzovb2weA@mail.gmail.com>
+Subject: Re: [RFC v2 2/4] tracing: Add support for recording tgid of tasks
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Joel Fernandes <joelaf@google.com>, kernel-team@android.com,
+	Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+Some minor things that I will rework in next rev after spending some
+more time on it:
 
-hard disk IO latency varies a lot depending on spindle move. The latency
-range could be from several microseconds to several milliseconds. It's
-pretty hard to get the baseline latency used by io.low.
+On Sat, Jun 3, 2017 at 9:03 PM, Joel Fernandes <joelaf@google.com> wrote:
+[..]
+> @@ -463,7 +469,7 @@ int trace_set_clr_event(const char *system, const char *event, int set);
+>  #define event_trace_printk(ip, fmt, args...)                           \
+>  do {                                                                   \
+>         __trace_printk_check_format(fmt, ##args);                       \
+> -       tracing_record_cmdline(current);                                \
+> +       tracing_record_taskinfo_single(current, true, false);           \
+>         if (__builtin_constant_p(fmt)) {                                \
+>                 static const char *trace_printk_fmt                     \
+>                   __attribute__((section("__trace_printk_fmt"))) =      \
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 193c5f5e3f79..d7394cdf899e 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -236,7 +236,7 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
+>         cpu = raw_smp_processor_id();
+>
+>         if (blk_tracer) {
+> -               tracing_record_cmdline(current);
+> +               tracing_record_taskinfo_single(current, true, false);
 
-We will use a different stragety here. The idea is only using IO with
-spindle move to determine if cgroup IO is in good state. For HD, if io
-latency is small (< 1ms), we ignore the IO. Such IO is likely from
-sequential IO, and is helpless to help determine if a cgroup's IO is
-impacted by other cgroups. With this, we only account IO with big
-latency. Then we can choose a hardcoded baseline latency for HD (4ms,
-which is typical IO latency with seek).  With all these settings, the
-io.low latency works for both HD and SSD.
+I think I will try to preserve the existing API so that existing users
+aren't bothered much.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+>
+>                 buffer = blk_tr->trace_buffer.buffer;
+>                 pc = preempt_count();
+> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+> index 63deff9cdf2c..7be21ae4f0a8 100644
+> --- a/kernel/trace/trace.c
+> +++ b/kernel/trace/trace.c
+> @@ -87,7 +87,7 @@ dummy_set_flag(struct trace_array *tr, u32 old_flags, u32 bit, int set)
+>   * tracing is active, only save the comm when a trace event
+>   * occurred.
+>   */
+> -static DEFINE_PER_CPU(bool, trace_cmdline_save);
+> +static DEFINE_PER_CPU(bool, trace_taskinfo_save);
+>
+>  /*
+>   * Kill all tracing for good (never come back).
+> @@ -790,7 +790,7 @@ EXPORT_SYMBOL_GPL(tracing_on);
+>  static __always_inline void
+>  __buffer_unlock_commit(struct ring_buffer *buffer, struct ring_buffer_event *event)
+>  {
+> -       __this_cpu_write(trace_cmdline_save, true);
+> +       __this_cpu_write(trace_taskinfo_save, true);
+>
+>         /* If this is the temp buffer, we need to commit fully */
+>         if (this_cpu_read(trace_buffered_event) == event) {
+> @@ -1709,6 +1709,15 @@ void tracing_reset_all_online_cpus(void)
+>         }
+>  }
+>
+> +static unsigned int *tgid_map;
+> +
+> +void tracing_alloc_tgid_map(void)
+> +{
+> +       tgid_map = kzalloc((PID_MAX_DEFAULT + 1) * sizeof(*tgid_map),
+> +                          GFP_KERNEL);
+> +       WARN_ONCE(!tgid_map, "Allocation of tgid_map failed\n");
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index fc13dd0..fb6a0bf 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -27,6 +27,13 @@ static int throtl_quantum = 32;
- #define MIN_THROTL_IOPS (10)
- #define DFL_LATENCY_TARGET (-1L)
- #define DFL_IDLE_THRESHOLD (0)
-+#define DFL_HD_BASELINE_LATENCY (4000L) /* 4ms */
-+#define LATENCY_FILTERED_SSD (0)
-+/*
-+ * For HD, very small latency comes from sequential IO. Such IO is helpless to
-+ * help determine if its IO is impacted by others, hence we ignore the IO
-+ */
-+#define LATENCY_FILTERED_HD (1000L) /* 1ms */
- 
- #define SKIP_LATENCY (((u64)1) << BLK_STAT_RES_SHIFT)
- 
-@@ -212,6 +219,7 @@ struct throtl_data
- 	struct avg_latency_bucket avg_buckets[LATENCY_BUCKET_SIZE];
- 	struct latency_bucket __percpu *latency_buckets;
- 	unsigned long last_calculate_time;
-+	unsigned long filtered_latency;
- 
- 	bool track_bio_latency;
- };
-@@ -2281,7 +2289,7 @@ void blk_throtl_bio_endio(struct bio *bio)
- 		throtl_track_latency(tg->td, blk_stat_size(&bio->bi_issue_stat),
- 			bio_op(bio), lat);
- 
--	if (tg->latency_target) {
-+	if (tg->latency_target && lat >= tg->td->filtered_latency) {
- 		int bucket;
- 		unsigned int threshold;
- 
-@@ -2417,14 +2425,20 @@ void blk_throtl_exit(struct request_queue *q)
- void blk_throtl_register_queue(struct request_queue *q)
- {
- 	struct throtl_data *td;
-+	int i;
- 
- 	td = q->td;
- 	BUG_ON(!td);
- 
--	if (blk_queue_nonrot(q))
-+	if (blk_queue_nonrot(q)) {
- 		td->throtl_slice = DFL_THROTL_SLICE_SSD;
--	else
-+		td->filtered_latency = LATENCY_FILTERED_SSD;
-+	} else {
- 		td->throtl_slice = DFL_THROTL_SLICE_HD;
-+		td->filtered_latency = LATENCY_FILTERED_HD;
-+		for (i = 0; i < LATENCY_BUCKET_SIZE; i++)
-+			td->avg_buckets[i].latency = DFL_HD_BASELINE_LATENCY;
-+	}
- #ifndef CONFIG_BLK_DEV_THROTTLING_LOW
- 	/* if no low limit, use previous default */
- 	td->throtl_slice = DFL_THROTL_SLICE_HD;
--- 
-2.9.3
+I should check if tgid_map is already allocated or there's a chance of
+re-allocating.
+
+Looking forward to any other comments...
+
+thanks,
+
+-Joel
