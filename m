@@ -1,44 +1,203 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47325 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750755AbdFFG1X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 02:27:23 -0400
-Subject: Re: [PATCH 1/6] libata: move ata_read_log_page to libata-core.c
-To: Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:60720 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751139AbdFDMmf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jun 2017 08:42:35 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: Tejun Heo <tj@kernel.org>
 Cc: Scott Bauer <scott.bauer@intel.com>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         Rafael Antognolli <rafael.antognolli@intel.com>,
         Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH 1/6] libata: move ata_read_log_page to libata-core.c
+Date: Sun,  4 Jun 2017 14:42:20 +0200
+Message-Id: <20170604124225.27032-2-hch@lst.de>
+In-Reply-To: <20170604124225.27032-1-hch@lst.de>
 References: <20170604124225.27032-1-hch@lst.de>
- <20170604124225.27032-2-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <7bda2948-1e81-da25-9fef-9b5519dc8545@suse.de>
-Date: Tue, 6 Jun 2017 08:27:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170604124225.27032-2-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 06/04/2017 02:42 PM, Christoph Hellwig wrote:
-> It is core functionality, and only one of the users is in the EH code.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/ata/libata-core.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++
->  drivers/ata/libata-eh.c   | 64 -----------------------------------------------
->  drivers/ata/libata.h      |  4 +--
->  3 files changed, 66 insertions(+), 66 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+It is core functionality, and only one of the users is in the EH code.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/ata/libata-core.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/ata/libata-eh.c   | 64 -----------------------------------------------
+ drivers/ata/libata.h      |  4 +--
+ 3 files changed, 66 insertions(+), 66 deletions(-)
 
-Hannes
+diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+index 2d83b8c75965..d4bab5052268 100644
+--- a/drivers/ata/libata-core.c
++++ b/drivers/ata/libata-core.c
+@@ -2047,6 +2047,70 @@ int ata_dev_read_id(struct ata_device *dev, unsigned int *p_class,
+ 	return rc;
+ }
+ 
++/**
++ *	ata_read_log_page - read a specific log page
++ *	@dev: target device
++ *	@log: log to read
++ *	@page: page to read
++ *	@buf: buffer to store read page
++ *	@sectors: number of sectors to read
++ *
++ *	Read log page using READ_LOG_EXT command.
++ *
++ *	LOCKING:
++ *	Kernel thread context (may sleep).
++ *
++ *	RETURNS:
++ *	0 on success, AC_ERR_* mask otherwise.
++ */
++unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
++			       u8 page, void *buf, unsigned int sectors)
++{
++	unsigned long ap_flags = dev->link->ap->flags;
++	struct ata_taskfile tf;
++	unsigned int err_mask;
++	bool dma = false;
++
++	DPRINTK("read log page - log 0x%x, page 0x%x\n", log, page);
++
++	/*
++	 * Return error without actually issuing the command on controllers
++	 * which e.g. lockup on a read log page.
++	 */
++	if (ap_flags & ATA_FLAG_NO_LOG_PAGE)
++		return AC_ERR_DEV;
++
++retry:
++	ata_tf_init(dev, &tf);
++	if (dev->dma_mode && ata_id_has_read_log_dma_ext(dev->id) &&
++	    !(dev->horkage & ATA_HORKAGE_NO_NCQ_LOG)) {
++		tf.command = ATA_CMD_READ_LOG_DMA_EXT;
++		tf.protocol = ATA_PROT_DMA;
++		dma = true;
++	} else {
++		tf.command = ATA_CMD_READ_LOG_EXT;
++		tf.protocol = ATA_PROT_PIO;
++		dma = false;
++	}
++	tf.lbal = log;
++	tf.lbam = page;
++	tf.nsect = sectors;
++	tf.hob_nsect = sectors >> 8;
++	tf.flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_LBA48 | ATA_TFLAG_DEVICE;
++
++	err_mask = ata_exec_internal(dev, &tf, NULL, DMA_FROM_DEVICE,
++				     buf, sectors * ATA_SECT_SIZE, 0);
++
++	if (err_mask && dma) {
++		dev->horkage |= ATA_HORKAGE_NO_NCQ_LOG;
++		ata_dev_warn(dev, "READ LOG DMA EXT failed, trying unqueued\n");
++		goto retry;
++	}
++
++	DPRINTK("EXIT, err_mask=%x\n", err_mask);
++	return err_mask;
++}
++
+ static int ata_do_link_spd_horkage(struct ata_device *dev)
+ {
+ 	struct ata_link *plink = ata_dev_phys_link(dev);
+diff --git a/drivers/ata/libata-eh.c b/drivers/ata/libata-eh.c
+index ef68232b5222..528a4e1b2af3 100644
+--- a/drivers/ata/libata-eh.c
++++ b/drivers/ata/libata-eh.c
+@@ -1488,70 +1488,6 @@ static const char *ata_err_string(unsigned int err_mask)
+ }
+ 
+ /**
+- *	ata_read_log_page - read a specific log page
+- *	@dev: target device
+- *	@log: log to read
+- *	@page: page to read
+- *	@buf: buffer to store read page
+- *	@sectors: number of sectors to read
+- *
+- *	Read log page using READ_LOG_EXT command.
+- *
+- *	LOCKING:
+- *	Kernel thread context (may sleep).
+- *
+- *	RETURNS:
+- *	0 on success, AC_ERR_* mask otherwise.
+- */
+-unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
+-			       u8 page, void *buf, unsigned int sectors)
+-{
+-	unsigned long ap_flags = dev->link->ap->flags;
+-	struct ata_taskfile tf;
+-	unsigned int err_mask;
+-	bool dma = false;
+-
+-	DPRINTK("read log page - log 0x%x, page 0x%x\n", log, page);
+-
+-	/*
+-	 * Return error without actually issuing the command on controllers
+-	 * which e.g. lockup on a read log page.
+-	 */
+-	if (ap_flags & ATA_FLAG_NO_LOG_PAGE)
+-		return AC_ERR_DEV;
+-
+-retry:
+-	ata_tf_init(dev, &tf);
+-	if (dev->dma_mode && ata_id_has_read_log_dma_ext(dev->id) &&
+-	    !(dev->horkage & ATA_HORKAGE_NO_NCQ_LOG)) {
+-		tf.command = ATA_CMD_READ_LOG_DMA_EXT;
+-		tf.protocol = ATA_PROT_DMA;
+-		dma = true;
+-	} else {
+-		tf.command = ATA_CMD_READ_LOG_EXT;
+-		tf.protocol = ATA_PROT_PIO;
+-		dma = false;
+-	}
+-	tf.lbal = log;
+-	tf.lbam = page;
+-	tf.nsect = sectors;
+-	tf.hob_nsect = sectors >> 8;
+-	tf.flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_LBA48 | ATA_TFLAG_DEVICE;
+-
+-	err_mask = ata_exec_internal(dev, &tf, NULL, DMA_FROM_DEVICE,
+-				     buf, sectors * ATA_SECT_SIZE, 0);
+-
+-	if (err_mask && dma) {
+-		dev->horkage |= ATA_HORKAGE_NO_NCQ_LOG;
+-		ata_dev_warn(dev, "READ LOG DMA EXT failed, trying unqueued\n");
+-		goto retry;
+-	}
+-
+-	DPRINTK("EXIT, err_mask=%x\n", err_mask);
+-	return err_mask;
+-}
+-
+-/**
+  *	ata_eh_read_log_10h - Read log page 10h for NCQ error details
+  *	@dev: Device to read log page 10h from
+  *	@tag: Resulting tag of the failed command
+diff --git a/drivers/ata/libata.h b/drivers/ata/libata.h
+index 120fce0befd3..84569d563ae2 100644
+--- a/drivers/ata/libata.h
++++ b/drivers/ata/libata.h
+@@ -98,6 +98,8 @@ extern struct ata_port *ata_port_alloc(struct ata_host *host);
+ extern const char *sata_spd_string(unsigned int spd);
+ extern int ata_port_probe(struct ata_port *ap);
+ extern void __ata_port_probe(struct ata_port *ap);
++extern unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
++				      u8 page, void *buf, unsigned int sectors);
+ 
+ #define to_ata_port(d) container_of(d, struct ata_port, tdev)
+ 
+@@ -160,8 +162,6 @@ extern void ata_eh_about_to_do(struct ata_link *link, struct ata_device *dev,
+ 			       unsigned int action);
+ extern void ata_eh_done(struct ata_link *link, struct ata_device *dev,
+ 			unsigned int action);
+-extern unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
+-				      u8 page, void *buf, unsigned int sectors);
+ extern void ata_eh_autopsy(struct ata_port *ap);
+ const char *ata_get_cmd_descript(u8 command);
+ extern void ata_eh_report(struct ata_port *ap);
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.11.0
