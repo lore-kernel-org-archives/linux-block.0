@@ -1,26 +1,20 @@
-Return-Path: <tglx@linutronix.de>
-Date: Fri, 16 Jun 2017 12:23:17 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Christoph Hellwig <hch@lst.de>
-cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-    linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/8] genirq/affinity: factor out a irq_affinity_set
- helper
-In-Reply-To: <20170603140403.27379-4-hch@lst.de>
-Message-ID: <alpine.DEB.2.20.1706161221250.2254@nanos>
-References: <20170603140403.27379-1-hch@lst.de> <20170603140403.27379-4-hch@lst.de>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 3/8] genirq/affinity: factor out a irq_affinity_set helper
+To: Christoph Hellwig <hch@lst.de>, Thomas Gleixner <tglx@linutronix.de>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20170603140403.27379-1-hch@lst.de>
+ <20170603140403.27379-4-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <92915e0f-c751-8cf2-6259-b0d7318bafcc@grimberg.me>
+Date: Sun, 4 Jun 2017 18:15:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170603140403.27379-4-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, 3 Jun 2017, Christoph Hellwig wrote:
-> +
-> +bool irq_affinity_set(int irq, struct irq_desc *desc, const cpumask_t *mask)
+Looks good to me,
 
-This should be named irq_affinity_force() because it circumvents the 'move
-in irq context' mechanism. I'll do that myself. No need to resend.
-
-Thanks,
-
-	tglx
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
