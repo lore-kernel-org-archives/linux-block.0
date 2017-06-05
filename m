@@ -1,43 +1,59 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org,
-	hch@lst.de,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6/9] ext4: add support for passing in write hints for buffered writes
-Date: Mon, 26 Jun 2017 09:37:57 -0600
-Message-Id: <1498491480-16306-7-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
-References: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:57148 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751112AbdFEQCJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Jun 2017 12:02:09 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org
+Subject: [PATCH v4 06/11] nvme: host: unquiesce queue in nvme_kill_queues()
+Date: Mon,  5 Jun 2017 23:59:20 +0800
+Message-Id: <20170605155925.7896-7-ming.lei@redhat.com>
+In-Reply-To: <20170605155925.7896-1-ming.lei@redhat.com>
+References: <20170605155925.7896-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+When nvme_kill_queues() is run, queues may be in
+quiesced state, so we forcibly unquiesce queues to avoid
+blocking dispatch, and I/O hang can be avoided in
+remove path.
+
+Peviously we use blk_mq_start_stopped_hw_queues() as
+counterpart of blk_mq_quiesce_queue(), now we have
+introduced blk_mq_unquiesce_queue(), so use it explicitly.
+
+Cc: linux-nvme@lists.infradead.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/ext4/page-io.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/nvme/host/core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 930ca0fc9a0f..02e5a7b8d60b 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -350,6 +350,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 	if (bio) {
- 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
- 				  REQ_SYNC : 0;
-+		io_op_flags |= inode_hint_to_opf(io->io_end->inode);
- 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
- 		submit_bio(io->io_bio);
- 	}
-@@ -397,6 +398,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
- 		ret = io_submit_init_bio(io, bh);
- 		if (ret)
- 			return ret;
-+		io->io_bio->bi_opf |= inode_hint_to_opf(inode);
- 	}
- 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
- 	if (ret != bh->b_size)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index c3f189e54d10..d4e5fc95da4b 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2438,6 +2438,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+ 	struct nvme_ns *ns;
+ 
+ 	mutex_lock(&ctrl->namespaces_mutex);
++
++	/* Forcibly unquiesce queues to avoid blocking dispatch */
++	blk_mq_unquiesce_queue(ctrl->admin_q);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list) {
+ 		/*
+ 		 * Revalidating a dead namespace sets capacity to 0. This will
+@@ -2448,6 +2451,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+ 		revalidate_disk(ns->disk);
+ 		blk_set_queue_dying(ns->queue);
+ 
++		/* Forcibly unquiesce queues to avoid blocking dispatch */
++		blk_mq_unquiesce_queue(ns->queue);
++
+ 		/*
+ 		 * Forcibly start all queues to avoid having stuck requests.
+ 		 * Note that we must ensure the queues are not stopped
 -- 
-2.7.4
+2.9.4
