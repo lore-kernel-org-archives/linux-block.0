@@ -1,36 +1,39 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/11] btrfs: add support for passing in write hints for buffered writes
-Date: Sat, 17 Jun 2017 13:59:53 -0600
-Message-Id: <1497729594-4707-11-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:1984 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751180AbdFEVgp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2017 17:36:45 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v4 09/11] blk-mq: don't stop queue for quiescing
+Date: Mon, 5 Jun 2017 21:36:42 +0000
+Message-ID: <1496698601.2623.31.camel@sandisk.com>
+References: <20170605155925.7896-1-ming.lei@redhat.com>
+         <20170605155925.7896-10-ming.lei@redhat.com>
+In-Reply-To: <20170605155925.7896-10-ming.lei@redhat.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Chris Mason <clm@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/btrfs/extent_io.c | 1 +
- 1 file changed, 1 insertion(+)
+On Mon, 2017-06-05 at 23:59 +0800, Ming Lei wrote:
+> @@ -169,11 +169,7 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+>  	unsigned int i;
+>  	bool rcu =3D false;
+> =20
+> -	__blk_mq_stop_hw_queues(q, true);
+> -
+> -	spin_lock_irq(q->queue_lock);
+> -	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
+> -	spin_unlock_irq(q->queue_lock);
+> +	blk_mq_quiesce_queue_nowait(q);
+> =20
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index d3619e010005..92e75e4014ea 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2826,6 +2826,7 @@ static int submit_extent_page(int op, int op_flags, struct extent_io_tree *tree,
- 	bio_add_page(bio, page, page_size, offset);
- 	bio->bi_end_io = end_io_func;
- 	bio->bi_private = tree;
-+	op_flags |= write_hint_to_opf(inode_write_hint(page->mapping->host));
- 	bio_set_op_attrs(bio, op, op_flags);
- 	if (wbc) {
- 		wbc_init_bio(wbc, bio);
--- 
-2.7.4
+Although I would have preferred to keep blk_mq_quiesce_nowait() open-coded =
+in
+this function,
+
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
