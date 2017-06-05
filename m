@@ -1,96 +1,43 @@
-Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 08/13] dm mpath: merge do_end_io_bio into multipath_end_io_bio
-Date: Sat,  3 Jun 2017 09:38:01 +0200
-Message-Id: <20170603073806.2046-9-hch@lst.de>
-In-Reply-To: <20170603073806.2046-1-hch@lst.de>
-References: <20170603073806.2046-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:39717 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751180AbdFEVdC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2017 17:33:02 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v4 07/11] blk-mq: use QUEUE_FLAG_QUIESCED to quiesce queue
+Date: Mon, 5 Jun 2017 21:32:59 +0000
+Message-ID: <1496698378.2623.28.camel@sandisk.com>
+References: <20170605155925.7896-1-ming.lei@redhat.com>
+         <20170605155925.7896-8-ming.lei@redhat.com>
+In-Reply-To: <20170605155925.7896-8-ming.lei@redhat.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This simplifies the code and especially the error passing a bit and
-will help with the next patch.
+On Mon, 2017-06-05 at 23:59 +0800, Ming Lei wrote:
+> It is required that no dispatch can happen any more once
+> blk_mq_quiesce_queue() returns, and we don't have such requirement
+> on APIs of stopping queue.
+>=20
+> But blk_mq_quiesce_queue() still may not block/drain dispatch in the
+> the case of BLK_MQ_S_START_ON_RUN, so use the new introduced flag of
+> QUEUE_FLAG_QUIESCED and evaluate it inside RCU read-side critical
+> sections for fixing this issue.
+>=20
+> Also blk_mq_quiesce_queue() is implemented via stopping queue, which
+> limits its uses, and easy to cause race, because any queue restart in
+> other paths may break blk_mq_quiesce_queue(). With the introduced
+> flag of QUEUE_FLAG_QUIESCED, we don't need to depend on stopping queue
+> for quiescing any more.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-mpath.c | 42 +++++++++++++++---------------------------
- 1 file changed, 15 insertions(+), 27 deletions(-)
+Hello Ming,
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 3df056b73b66..6d5ebb76149d 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -1510,24 +1510,24 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
- 	return r;
- }
- 
--static int do_end_io_bio(struct multipath *m, struct bio *clone,
--			 int error, struct dm_mpath_io *mpio)
-+static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone, int error)
- {
-+	struct multipath *m = ti->private;
-+	struct dm_mpath_io *mpio = get_mpio_from_bio(clone);
-+	struct pgpath *pgpath = mpio->pgpath;
- 	unsigned long flags;
- 
--	if (!error)
--		return 0;	/* I/O complete */
--
--	if (noretry_error(error))
--		return error;
-+	if (!error || noretry_error(error))
-+		goto done;
- 
--	if (mpio->pgpath)
--		fail_path(mpio->pgpath);
-+	if (pgpath)
-+		fail_path(pgpath);
- 
- 	if (atomic_read(&m->nr_valid_paths) == 0 &&
- 	    !test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)) {
- 		dm_report_EIO(m);
--		return -EIO;
-+		error = -EIO;
-+		goto done;
- 	}
- 
- 	/* Queue for the daemon to resubmit */
-@@ -1539,28 +1539,16 @@ static int do_end_io_bio(struct multipath *m, struct bio *clone,
- 	if (!test_bit(MPATHF_QUEUE_IO, &m->flags))
- 		queue_work(kmultipathd, &m->process_queued_bios);
- 
--	return DM_ENDIO_INCOMPLETE;
--}
--
--static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone, int error)
--{
--	struct multipath *m = ti->private;
--	struct dm_mpath_io *mpio = get_mpio_from_bio(clone);
--	struct pgpath *pgpath;
--	struct path_selector *ps;
--	int r;
--
--	BUG_ON(!mpio);
--
--	r = do_end_io_bio(m, clone, error, mpio);
--	pgpath = mpio->pgpath;
-+	error = DM_ENDIO_INCOMPLETE;
-+done:
- 	if (pgpath) {
--		ps = &pgpath->pg->ps;
-+		struct path_selector *ps = &pgpath->pg->ps;
-+
- 		if (ps->type->end_io)
- 			ps->type->end_io(ps, &pgpath->path, mpio->nr_bytes);
- 	}
- 
--	return r;
-+	return error;
- }
- 
- /*
--- 
-2.11.0
+Since this patch depends on patch 1 I will wait with reviewing this patch
+until there is agreement about patch 1 in this series.
+
+Bart.=
