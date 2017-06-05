@@ -1,114 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:39362 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751859AbdFHINI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2017 04:13:08 -0400
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>,
-        Hannes Reinecke <hare@suse.com>, Jan Kara <jack@suse.cz>,
-        Mike Christie <mchristi@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>
-Subject: [PATCH 6/7] pktcdvd: use class_groups instead of class_attrs
-Date: Thu,  8 Jun 2017 10:12:41 +0200
-Message-Id: <20170608081242.27061-7-gregkh@linuxfoundation.org>
-In-Reply-To: <20170608081242.27061-1-gregkh@linuxfoundation.org>
-References: <20170608081242.27061-1-gregkh@linuxfoundation.org>
+Received: from mx1.redhat.com ([209.132.183.28]:55570 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751077AbdFEQAE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Jun 2017 12:00:04 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v4 00/11] blk-mq: fix & improve queue quiescing
+Date: Mon,  5 Jun 2017 23:59:14 +0800
+Message-Id: <20170605155925.7896-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The class_attrs pointer is long depreciated, and is about to be finally
-removed, so move to use the class_groups pointer instead.
+Hi,
 
-Cc: <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Mike Christie <mchristi@redhat.com>
-Cc: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/block/pktcdvd.c | 35 +++++++++++++++++------------------
- 1 file changed, 17 insertions(+), 18 deletions(-)
+There is one big issue in current blk_mq_quiesce_queue():
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 205b865ebeb9..98939ee97476 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -348,9 +348,9 @@ static void class_pktcdvd_release(struct class *cls)
- {
- 	kfree(cls);
- }
--static ssize_t class_pktcdvd_show_map(struct class *c,
--					struct class_attribute *attr,
--					char *data)
-+
-+static ssize_t device_map_show(struct class *c, struct class_attribute *attr,
-+			       char *data)
- {
- 	int n = 0;
- 	int idx;
-@@ -368,11 +368,10 @@ static ssize_t class_pktcdvd_show_map(struct class *c,
- 	mutex_unlock(&ctl_mutex);
- 	return n;
- }
-+static CLASS_ATTR_RO(device_map);
- 
--static ssize_t class_pktcdvd_store_add(struct class *c,
--					struct class_attribute *attr,
--					const char *buf,
--					size_t count)
-+static ssize_t add_store(struct class *c, struct class_attribute *attr,
-+			 const char *buf, size_t count)
- {
- 	unsigned int major, minor;
- 
-@@ -390,11 +389,10 @@ static ssize_t class_pktcdvd_store_add(struct class *c,
- 
- 	return -EINVAL;
- }
-+static CLASS_ATTR_WO(add);
- 
--static ssize_t class_pktcdvd_store_remove(struct class *c,
--					  struct class_attribute *attr,
--					  const char *buf,
--					size_t count)
-+static ssize_t remove_store(struct class *c, struct class_attribute *attr,
-+			    const char *buf, size_t count)
- {
- 	unsigned int major, minor;
- 	if (sscanf(buf, "%u:%u", &major, &minor) == 2) {
-@@ -403,14 +401,15 @@ static ssize_t class_pktcdvd_store_remove(struct class *c,
- 	}
- 	return -EINVAL;
- }
-+static CLASS_ATTR_WO(remove);
- 
--static struct class_attribute class_pktcdvd_attrs[] = {
-- __ATTR(add,            0200, NULL, class_pktcdvd_store_add),
-- __ATTR(remove,         0200, NULL, class_pktcdvd_store_remove),
-- __ATTR(device_map,     0444, class_pktcdvd_show_map, NULL),
-- __ATTR_NULL
-+static struct attribute *class_pktcdvd_attrs[] = {
-+	&class_attr_add.attr,
-+	&class_attr_remove.attr,
-+	&class_attr_device_map.attr,
-+	NULL,
- };
--
-+ATTRIBUTE_GROUPS(class_pktcdvd);
- 
- static int pkt_sysfs_init(void)
- {
-@@ -426,7 +425,7 @@ static int pkt_sysfs_init(void)
- 	class_pktcdvd->name = DRIVER_NAME;
- 	class_pktcdvd->owner = THIS_MODULE;
- 	class_pktcdvd->class_release = class_pktcdvd_release;
--	class_pktcdvd->class_attrs = class_pktcdvd_attrs;
-+	class_pktcdvd->class_groups = class_pktcdvd_groups;
- 	ret = class_register(class_pktcdvd);
- 	if (ret) {
- 		kfree(class_pktcdvd);
+    - in case of direct issue or BLK_MQ_S_START_ON_RUN, dispatch won't
+    be prevented after blk_mq_quiesce_queue() is returned.
+
+The 1st patch fixes the problem in direct issue, please consider it for v4.12.
+
+The other 10 patches improves blk_mq_quiesce_queue(), and
+make is easy to use, and avoid race between queue restart and
+quiescing. These 10 patches should be for v4.13.
+
+One typical use case of blk_mq_quiesce_queue() is for canceling
+requests when queue is dead. Currently, only NVMe uses this API
+for canceling requests. Actually we have to quiesce queue first
+before canceling requests in other drivers too, such as NBD and
+mtip32xx,
+
+Another use case is for freezing device, for example, virtio-blk
+uses stopping queue in virtblk_freeze(), but that way isn't safe
+becasue dispatch still may happen after blk_mq_stop_hw_queues()
+returns.
+
+Unfortunately blk_mq_quiesce_queue() is implemented via stopping queue,
+we can't switch to blk_mq_quiesce_queue() simply in above cases because
+any queue restart in other pathes may break blk_mq_quiesce_queue().
+For example, we sometimes stops queue when hw can't handle too many
+ongoing requests and restarts queue after requests are completed.
+Meantime when we want to cancel requests if hardware is dead or need
+to suspend, quiescing has to be run first, then the restarting
+in complete path can break quiescing easily. This patch improves this
+interface via removing stopping queue, then it can be easier to use.
+
+V4:
+	- introduce the 1st patch for fixing direct issue
+	- take Bart's suggestion to deal with quiescing in SCSI
+	- avoid to introduce waitqueue
+
+V3:
+	- wait until queue becomes unquiesced in direct issue path, so
+	we can avoid to queue the current req into sw queue or scheduler
+	queue, then the state of STOPPED needn't to be touched
+	- move checking of !blk_queue_quiesced() into blk_mq_sched_dispatch_requests()
+	as suggested by Bart
+	- NVMe: unquiesce queue in nvme_kill_queues()
+	- misc changes(fix grammer issue in commit log or comment, ...)
+
+V2:
+	- split patch "blk-mq: fix blk_mq_quiesce_queue" into two and
+  	fix one build issue when only applying the 1st two patches.
+	- add kernel oops and hang log into commit log
+	- add 'Revert "blk-mq: don't use sync workqueue flushing from drivers"'
+
+Ming Lei (11):
+  blk-mq: fix direct issue
+  blk-mq: move blk_mq_quiesce_queue() into include/linux/blk-mq.h
+  blk-mq: introduce blk_mq_quiesce_queue_nowait()
+  blk-mq: introduce blk_mq_unquiesce_queue
+  blk-mq: use the introduced blk_mq_unquiesce_queue()
+  nvme: host: unquiesce queue in nvme_kill_queues()
+  blk-mq: use QUEUE_FLAG_QUIESCED to quiesce queue
+  blk-mq: update comments on blk_mq_quiesce_queue()
+  blk-mq: don't stop queue for quiescing
+  blk-mq: clarify dispatch may not be drained/blocked by stopping queue
+  Revert "blk-mq: don't use sync workqueue flushing from drivers"
+
+ block/blk-mq-sched.c     |  3 +-
+ block/blk-mq.c           | 80 ++++++++++++++++++++++++++++++------------------
+ drivers/md/dm-rq.c       |  2 +-
+ drivers/nvme/host/core.c |  8 ++++-
+ drivers/scsi/scsi_lib.c  |  4 +--
+ include/linux/blk-mq.h   | 12 ++++++++
+ include/linux/blkdev.h   |  3 +-
+ 7 files changed, 77 insertions(+), 35 deletions(-)
+
 -- 
-2.13.1
+2.9.4
