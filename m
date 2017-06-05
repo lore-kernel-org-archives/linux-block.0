@@ -1,108 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34565 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751810AbdF3JHt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 05:07:49 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Jens Axboe <axboe@fb.com>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests v2] tests: use nproc to get number of CPUs for fio jobs
-Date: Fri, 30 Jun 2017 11:07:35 +0200
-Message-Id: <20170630090735.11709-1-jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
+Date: Mon,  5 Jun 2017 00:35:31 -0500
+Message-Id: <20170605053540.19393-2-rgoldwyn@suse.de>
+In-Reply-To: <20170605053540.19393-1-rgoldwyn@suse.de>
+References: <20170605053540.19393-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Use nproc to get number of CPUs for fio jobs and introduce
-_run_fio_rand_io helper for parallel IO which we don't really care about
-the details and just want some IO.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- common/fio      | 7 +++++++
- tests/block/005 | 4 +---
- tests/block/006 | 2 +-
- tests/block/008 | 4 +---
- tests/block/011 | 5 ++---
- 5 files changed, 12 insertions(+), 10 deletions(-)
+ fs/read_write.c    | 12 +++---------
+ include/linux/fs.h | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/common/fio b/common/fio
-index 86ed4b2b7180..2b0759d19f5d 100644
---- a/common/fio
-+++ b/common/fio
-@@ -166,6 +166,13 @@ _run_fio() {
- 	fio "${args[@]}" "$@"
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 47c1d4484df9..53c816c61122 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
+ 	struct kiocb kiocb;
+ 	ssize_t ret;
+ 
+-	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
+-		return -EOPNOTSUPP;
+-
+ 	init_sync_kiocb(&kiocb, filp);
+-	if (flags & RWF_HIPRI)
+-		kiocb.ki_flags |= IOCB_HIPRI;
+-	if (flags & RWF_DSYNC)
+-		kiocb.ki_flags |= IOCB_DSYNC;
+-	if (flags & RWF_SYNC)
+-		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	ret = kiocb_set_rw_flags(&kiocb, flags);
++	if (ret)
++		return ret;
+ 	kiocb.ki_pos = *ppos;
+ 
+ 	if (type == READ)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 803e5a9b2654..f53867140f43 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3056,6 +3056,20 @@ static inline int iocb_flags(struct file *file)
+ 	return res;
  }
  
-+# Wrapper around _run_fio used if you need some I/O but don't really care much
-+# about the details
-+_run_fio_rand_io() {
-+	_run_fio --bs=4k --rw=randread --norandommap --numjobs=$(nproc) \
-+		--name=reads --direct=1
++static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
++{
++	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
++		return -EOPNOTSUPP;
++
++	if (flags & RWF_HIPRI)
++		ki->ki_flags |= IOCB_HIPRI;
++	if (flags & RWF_DSYNC)
++		ki->ki_flags |= IOCB_DSYNC;
++	if (flags & RWF_SYNC)
++		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	return 0;
 +}
 +
- _fio_perf_report() {
- 	# If there is more than one group, we don't know what to report.
- 	if [[ $(wc -l < "$TMPDIR/fio_perf") -gt 1 ]]; then
-diff --git a/tests/block/005 b/tests/block/005
-index 8f8b7065404e..e59a3e35221b 100755
---- a/tests/block/005
-+++ b/tests/block/005
-@@ -36,9 +36,7 @@ test_device() {
- 	fi
- 
- 	# start fio job
--	_run_fio --bs=4k --rw=randread --norandommap \
--		--name=reads --filename="$TEST_DEV" --size="$size" \
--		--numjobs=8 --direct=1 &
-+	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" &
- 
- 	# while job is running, switch between schedulers
- 	while kill -0 $! 2>/dev/null; do
-diff --git a/tests/block/006 b/tests/block/006
-index 18e31cbf3809..2b8450104e46 100755
---- a/tests/block/006
-+++ b/tests/block/006
-@@ -43,7 +43,7 @@ test() {
- 		--filename=/dev/nullb0 --size=5g --direct=1
- 
- 	# run async test
--	_fio_perf --bs=4k --ioengine=libaio --iodepth=8 --numjobs=4 \
-+	_fio_perf --bs=4k --ioengine=libaio --iodepth=8 --numjobs=$(nproc) \
- 		--rw=randread --norandommap --name=async \
- 		--filename=/dev/nullb0 --size=5g --direct=1
- 
-diff --git a/tests/block/008 b/tests/block/008
-index 033fa0d5e7a5..03abf57241bd 100755
---- a/tests/block/008
-+++ b/tests/block/008
-@@ -36,9 +36,7 @@ test_device() {
- 	fi
- 
- 	# start fio job
--	_run_fio --bs=4k --rw=randread --norandommap \
--		--name=reads --filename="$TEST_DEV" --size="$size" \
--		--numjobs=8 --direct=1 &
-+	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" &
- 
- 	# while job is running, hotplug CPUs randomly
- 	while kill -0 $! 2>/dev/null; do
-diff --git a/tests/block/011 b/tests/block/011
-index 65ed3dfa7092..920c58bb8ee4 100755
---- a/tests/block/011
-+++ b/tests/block/011
-@@ -40,9 +40,8 @@ test_device() {
- 	fi
- 
- 	# start fio job
--	_run_fio --bs=4k --rw=randread --norandommap \
--		--name=reads --filename="$TEST_DEV" --size="$size" \
--		--numjobs=8 --direct=1 --ignore_error=EIO,ENXIO,ENODEV &
-+	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" \
-+			--ignore_error=EIO,ENXIO,ENODEV &
- 
- 	while kill -0 $! 2>/dev/null; do
- 		echo 0 > "/sys/bus/pci/devices/${pdev}/enable"
+ static inline ino_t parent_ino(struct dentry *dentry)
+ {
+ 	ino_t res;
 -- 
-2.12.3
+2.12.0
