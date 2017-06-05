@@ -1,42 +1,80 @@
-Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/9] bio-integrity: bio_integrity_advance must update integrity seed
-Date: Thu, 29 Jun 2017 11:31:09 -0700
-Message-Id: <20170629183116.28685-3-hch@lst.de>
-In-Reply-To: <20170629183116.28685-1-hch@lst.de>
-References: <20170629183116.28685-1-hch@lst.de>
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 03/10] fs: Use RWF_* flags for AIO operations
+Date: Mon,  5 Jun 2017 00:35:33 -0500
+Message-Id: <20170605053540.19393-4-rgoldwyn@suse.de>
+In-Reply-To: <20170605053540.19393-1-rgoldwyn@suse.de>
+References: <20170605053540.19393-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dmitry Monakhov <dmonakhov@openvz.org>
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-SCSI drivers do care about bip_seed so we must update it accordingly.
+aio_rw_flags is introduced in struct iocb (using aio_reserved1) which will
+carry the RWF_* flags. We cannot use aio_flags because they are not
+checked for validity which may break existing applications.
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Note, the only place RWF_HIPRI comes in effect is dio_await_one().
+All the rest of the locations, aio code return -EIOCBQUEUED before the
+checks for RWF_HIPRI.
+
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/bio-integrity.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/aio.c                     | 8 +++++++-
+ include/uapi/linux/aio_abi.h | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index b8a3a65f7364..8c2253c59edb 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -425,6 +425,7 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
- 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
- 	unsigned bytes = bio_integrity_bytes(bi, bytes_done >> 9);
+diff --git a/fs/aio.c b/fs/aio.c
+index f52d925ee259..020fa0045e3c 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1541,7 +1541,7 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 	ssize_t ret;
  
-+	bip->bip_iter.bi_sector += bytes_done >> 9;
- 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
- }
- EXPORT_SYMBOL(bio_integrity_advance);
+ 	/* enforce forwards compatibility on users */
+-	if (unlikely(iocb->aio_reserved1 || iocb->aio_reserved2)) {
++	if (unlikely(iocb->aio_reserved2)) {
+ 		pr_debug("EINVAL: reserve field set\n");
+ 		return -EINVAL;
+ 	}
+@@ -1586,6 +1586,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		req->common.ki_flags |= IOCB_EVENTFD;
+ 	}
+ 
++	ret = kiocb_set_rw_flags(&req->common, iocb->aio_rw_flags);
++	if (unlikely(ret)) {
++		pr_debug("EINVAL: aio_rw_flags\n");
++		goto out_put_req;
++	}
++
+ 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
+ 	if (unlikely(ret)) {
+ 		pr_debug("EFAULT: aio_key\n");
+diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
+index bb2554f7fbd1..a2d4a8ac94ca 100644
+--- a/include/uapi/linux/aio_abi.h
++++ b/include/uapi/linux/aio_abi.h
+@@ -79,7 +79,7 @@ struct io_event {
+ struct iocb {
+ 	/* these are internal to the kernel/libc. */
+ 	__u64	aio_data;	/* data to be returned in event's data */
+-	__u32	PADDED(aio_key, aio_reserved1);
++	__u32	PADDED(aio_key, aio_rw_flags);
+ 				/* the kernel sets aio_key to the req # */
+ 
+ 	/* common fields */
 -- 
-2.11.0
+2.12.0
