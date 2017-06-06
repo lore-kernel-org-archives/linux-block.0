@@ -1,37 +1,56 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 8/9] btrfs: add support for passing in write hints for buffered writes
-Date: Mon, 19 Jun 2017 11:05:01 -0600
-Message-Id: <1497891902-25737-9-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497891902-25737-1-git-send-email-axboe@kernel.dk>
-References: <1497891902-25737-1-git-send-email-axboe@kernel.dk>
+Return-Path: <rakesh@tuxera.com>
+Date: Tue, 6 Jun 2017 10:30:46 +0300
+From: Rakesh Pandit <rakesh@tuxera.com>
+To: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+CC: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, Keith Busch
+	<keith.busch@intel.com>, Johannes Thumshirn <jthumshirn@suse.de>,
+	<linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] nvme: fix hang in remove path
+Message-ID: <20170606073046.GA34428@dhcp-216.srv.tuxera.com>
+References: <20170602083208.4518-1-ming.lei@redhat.com>
+ <20170602180435.GA23335@dhcp-216.srv.tuxera.com>
+ <244bc065-92eb-c3e0-faa7-11569fc326d6@grimberg.me>
+ <20170605084434.GA30864@dhcp-216.srv.tuxera.com>
+ <20170605084732.GA30881@dhcp-216.srv.tuxera.com>
+ <20170605194532.GA2549@hercules.tuxera.com>
+ <23b9bc87-81a0-93e8-3730-f07e68e46702@grimberg.me>
+ <20170606071223.GA15359@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20170606071223.GA15359@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Chris Mason <clm@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/btrfs/extent_io.c | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, Jun 06, 2017 at 09:12:23AM +0200, Christoph Hellwig wrote:
+> On Tue, Jun 06, 2017 at 10:10:45AM +0300, Sagi Grimberg wrote:
+> >
+> >>>> Note 7 here is NVME_SC_ABORT_REQ.  Also we would avoid walking through
+> >>>> all power states inside the nvme_configure_apst as
+> >>>> nvme_set_latency_tolerance was called with value
+> >>>> PM_QOS_LATENCY_TOLERANCE_NO_CONSTRAINT (-1) which sets
+> >>>> ctrl->ps_max_latency_us to U64_MAX and tries to send a sync command
+> >>>> which of course fails with error message.
+> >>
+> >> Even though this change from this patch does fix the hang, just tested
+> >> again and I can see above error message "failed to set APST feature 7"
+> >> while nvme_remove PID is getting executed.
+> >>
+> >> So, sync requests (while nvme_remove is executing) are going through
+> >> and not everything is handled well in .queue_rq while controller is
+> >> under deleting state or dead state.
+> >
+> > The error message is expected because queue_rq is failing the I/O, did
+> > you see it actually hang?
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 19eedf2e630b..3e57cfaa6dd6 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2830,6 +2830,7 @@ static int submit_extent_page(int op, int op_flags, struct extent_io_tree *tree,
- 	bio_add_page(bio, page, page_size, offset);
- 	bio->bi_end_io = end_io_func;
- 	bio->bi_private = tree;
-+	op_flags |= write_hint_to_opf(inode_write_hint(page->mapping->host));
- 	bio_set_op_attrs(bio, op, op_flags);
- 	if (wbc) {
- 		wbc_init_bio(wbc, bio);
--- 
-2.7.4
+No hang.
+
+> >
+> > Personally I'm not too bothered with the error log, we can suppress it
+> > conditional on the ctrl state if it really annoys people, but if we're
+> > conditioning on the ctrl state, we can do it like you suggested anyway...
+> 
+> Yeah.  Or just remove the error printk entirely..
+
+Thanks for input, lets ignore.
+
+Based on earlier message I guess this is already queued.  If not it
+seems worth adding for 4.12-rc.
