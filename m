@@ -1,36 +1,43 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-Date: Tue, 6 Jun 2017 11:58:02 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
-        Scott Bauer <scott.bauer@intel.com>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH 6/6] sd: add support for TCG OPAL self encrypting disks
+To: Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>
+Cc: Scott Bauer <scott.bauer@intel.com>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         Rafael Antognolli <rafael.antognolli@intel.com>,
         Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 6/6] sd: add support for TCG OPAL self encrypting disks
-Message-ID: <20170606095802.GA20590@lst.de>
-References: <20170604124225.27032-1-hch@lst.de> <20170604124225.27032-7-hch@lst.de> <yq1lgp6djr3.fsf@oracle.com>
+References: <20170604124225.27032-1-hch@lst.de>
+ <20170604124225.27032-7-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <f626c9f5-ef7d-6cb6-1272-baf2db692d3a@suse.de>
+Date: Tue, 6 Jun 2017 08:31:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <yq1lgp6djr3.fsf@oracle.com>
-Sender: linux-ide-owner@vger.kernel.org
+In-Reply-To: <20170604124225.27032-7-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 05, 2017 at 08:48:00PM -0400, Martin K. Petersen wrote:
-> For WRITE SAME, scsi_report_opcode() is gated not only by
-> sdev->no_report_opcodes but by sdev->no_write_same.
+On 06/04/2017 02:42 PM, Christoph Hellwig wrote:
+> Just wire up the generic TCG OPAL infrastructure to the SCSI disk driver
+> and the Security In/Out commands.
 > 
-> I'm concerned about firing off REPORT OPCODES to random devices without
-> a sufficiently good heuristic. Doesn't look like SAT has anything to
-> offer in this department, though. Maybe it's time to consider a
-> vendor-specific Linux VPD page...
+> Note that I don't know of any actual SCSI disks that do support TCG OPAL,
+> but this is required to support ATA disks through libata.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/sd.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  drivers/scsi/sd.h |  2 ++
+>  2 files changed, 46 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Eww.  Given that as far as I can tell only ATA devices implement
-OPAL we could key it off that for now.  But that's only going to
-defer the problem until support for other security protocols comes
-along for real SCSI devices.
+Cheers,
 
-But as we already set no_report_opcodes for all usb-storage and
-quirked uas devices I think the worst offenders are already covered
-anyway.
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
