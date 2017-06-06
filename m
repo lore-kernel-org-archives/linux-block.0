@@ -1,63 +1,29 @@
-Return-Path: <eguan@redhat.com>
-Date: Tue, 6 Jun 2017 17:06:22 +0800
-From: Eryu Guan <eguan@redhat.com>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: fstests@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net, dhowells@redhat.com,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [xfstests PATCH v3 4/5] ext3: allow it to put journal on a
- separate device when doing scratch_mkfs
-Message-ID: <20170606090622.GQ19952@eguan.usersys.redhat.com>
-References: <20170531130820.17634-1-jlayton@redhat.com>
- <20170531130820.17634-5-jlayton@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:63064 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751436AbdFFV5J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Jun 2017 17:57:09 -0400
+Date: Tue, 6 Jun 2017 15:42:52 -0600
+From: Scott Bauer <scott.bauer@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+Subject: Re: Opal userspace
+Message-ID: <20170606214251.2fukfnsvcnyptwcr@sbauer-Z170X-UD5>
+References: <20170604071503.GA32121@lst.de>
+ <20170605205225.tcn4ow7v7ez4csuv@sbauer-Z170X-UD5>
+ <20170606092524.GA18313@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170531130820.17634-5-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170606092524.GA18313@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, May 31, 2017 at 09:08:19AM -0400, Jeff Layton wrote:
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> ---
->  common/rc | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+On Tue, Jun 06, 2017 at 11:25:24AM +0200, Christoph Hellwig wrote:
+> I don't really care about the place, I just send the -temp link
+> to a few people and they got really confused by it.
 > 
-> diff --git a/common/rc b/common/rc
-> index 391d36f373cd..83765aacfb06 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -832,7 +832,16 @@ _scratch_mkfs()
->  		mkfs_cmd="$MKFS_BTRFS_PROG"
->  		mkfs_filter="cat"
->  		;;
-> -	ext2|ext3)
-> +	ext3)
-> +		mkfs_cmd="$MKFS_PROG -t $FSTYP -- -F"
-> +		mkfs_filter="grep -v -e ^Warning: -e \"^mke2fs \""
-> +
-> +		# put journal on separate device?
-> +		[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
-> +		$mkfs_cmd -O journal_dev $SCRATCH_LOGDEV && \
-> +		mkfs_cmd="$mkfs_cmd -J device=$SCRATCH_LOGDEV"
+> Btw, do you have any plans to integrate the OPAL code with the
+> distros so that the setup will be seamless?
 
-Similar to that ext4 patch, need $MKFS_OPTIONS when creating journal
-device.
-
-Thanks,
-Eryu
-
-> +		;;
-> +	ext2)
->  		mkfs_cmd="$MKFS_PROG -t $FSTYP -- -F"
->  		mkfs_filter="grep -v -e ^Warning: -e \"^mke2fs \""
->  		;;
-> -- 
-> 2.9.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe fstests" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Nope, I have not done so. I will see if we have any distro contacts
+and if they care to work on integration. 
