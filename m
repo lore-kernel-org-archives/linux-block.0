@@ -1,48 +1,64 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 07/12] block: Add a comment above queue_lockdep_assert_held()
-Date: Thu, 8 Jun 2017 10:33:50 -0700
-Message-ID: <20170608173355.25898-8-bart.vanassche@sandisk.com>
-In-Reply-To: <20170608173355.25898-1-bart.vanassche@sandisk.com>
-References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+Return-Path: <eguan@redhat.com>
+Date: Tue, 6 Jun 2017 17:01:07 +0800
+From: Eryu Guan <eguan@redhat.com>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: fstests@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com, corbet@lwn.net, dhowells@redhat.com,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [xfstests PATCH v3 2/5] ext4: allow ext4 to use $SCRATCH_LOGDEV
+Message-ID: <20170606090107.GO19952@eguan.usersys.redhat.com>
+References: <20170531130820.17634-1-jlayton@redhat.com>
+ <20170531130820.17634-3-jlayton@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170531130820.17634-3-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Add a comment above the queue_lockdep_assert_held() macro that
-explains the purpose of the q->queue_lock test.
+On Wed, May 31, 2017 at 09:08:17AM -0400, Jeff Layton wrote:
+> The writeback error handling test requires that you put the journal on a
+> separate device. This allows us to use dmerror to simulate data
+> writeback failure, without affecting the journal.
+> 
+> xfs already has infrastructure for this (a'la $SCRATCH_LOGDEV), so wire
+> up the ext4 code so that it can do the same thing when _scratch_mkfs is
+> called.
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+> ---
+>  common/rc | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/common/rc b/common/rc
+> index 743df427c047..391d36f373cd 100644
+> --- a/common/rc
+> +++ b/common/rc
+> @@ -676,6 +676,9 @@ _scratch_mkfs_ext4()
+>  	local tmp=`mktemp`
+>  	local mkfs_status
+>  
+> +	[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
+> +	    $mkfs_cmd -O journal_dev $SCRATCH_LOGDEV && \
+> +	    mkfs_cmd="$mkfs_cmd -J device=$SCRATCH_LOGDEV"
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+Need $MKFS_OPTIONS too when creating journal device, otherwise mkfs will
+fail when making non-default block size ext4, i.e. journal device has 4k
+block size, but ext4 has 1k block size if we have MKFS_OPTIONS="-b 1024"
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index cbc0028290e4..1e73b4df13a9 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -634,6 +634,13 @@ struct request_queue {
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
- 				 (1 << QUEUE_FLAG_POLL))
- 
-+/*
-+ * @q->queue_lock is set while a queue is being initialized. Since we know
-+ * that no other threads access the queue object before @q->queue_lock has
-+ * been set, it is safe to manipulate queue flags without holding the
-+ * queue_lock if @q->queue_lock == NULL. See also blk_alloc_queue_node() and
-+ * blk_init_allocated_queue().
-+ */
- static inline void queue_lockdep_assert_held(struct request_queue *q)
- {
- 	if (q->queue_lock)
--- 
-2.12.2
+Thanks,
+Eryu
+
+>  
+>  	_scratch_do_mkfs "$mkfs_cmd" "$mkfs_filter" $* 2>$tmp.mkfserr 1>$tmp.mkfsstd
+>  	mkfs_status=$?
+> -- 
+> 2.9.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe fstests" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
