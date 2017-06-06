@@ -1,168 +1,83 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [xfstests PATCH v5 5/5] btrfs: make a btrfs version of writeback error reporting test
-Date: Fri, 16 Jun 2017 15:36:19 -0400
-Message-Id: <20170616193619.14576-6-jlayton@redhat.com>
-In-Reply-To: <20170616193619.14576-1-jlayton@redhat.com>
-References: <20170616193619.14576-1-jlayton@redhat.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH v5 06/12] blk-mq: use the introduced blk_mq_unquiesce_queue()
+Date: Tue,  6 Jun 2017 23:22:04 +0800
+Message-Id: <20170606152210.22806-7-ming.lei@redhat.com>
+In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
+References: <20170606152210.22806-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-For btrfs, we can test how it reports data writeback errors on fsync by
-implementing a suggestion from Chris Mason:
+blk_mq_unquiesce_queue() is used for unquiescing the
+queue explicitly, so replace blk_mq_start_stopped_hw_queues()
+with it.
 
-Build a filesystem with 2 devices that stripes the data across
-both devices, but mirrors metadata across both. Then, make one
-of the devices fail and test what it does.
+For the scsi part, this patch takes Bart's suggestion to
+switch to block quiesce/unquiesce API completely.
 
-Cc: Chris Mason <clm@fb.com>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Cc: linux-nvme@lists.infradead.org
+Cc: linux-scsi@vger.kernel.org
+Cc: dm-devel@redhat.com
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tests/btrfs/999     | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/btrfs/999.out |  3 ++
- tests/btrfs/group   |  1 +
- 3 files changed, 98 insertions(+)
- create mode 100755 tests/btrfs/999
- create mode 100644 tests/btrfs/999.out
+ drivers/md/dm-rq.c       | 2 +-
+ drivers/nvme/host/core.c | 2 +-
+ drivers/scsi/scsi_lib.c  | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/btrfs/999 b/tests/btrfs/999
-new file mode 100755
-index 000000000000..903e36526708
---- /dev/null
-+++ b/tests/btrfs/999
-@@ -0,0 +1,94 @@
-+#! /bin/bash
-+# FS QA Test No. 999
-+#
-+# Open a file several times, write to it, fsync on all fds and make sure that
-+# they all return 0. Change the device to start throwing errors. Write again
-+# on all fds and fsync on all fds. Ensure that we get errors on all of them.
-+# Then fsync on all one last time and verify that all return 0.
-+#
-+#-----------------------------------------------------------------------
-+# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License as
-+# published by the Free Software Foundation.
-+#
-+# This program is distributed in the hope that it would be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, write the Free Software Foundation,
-+# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+#-----------------------------------------------------------------------
-+
-+seq=`basename $0`
-+seqres=$RESULT_DIR/$seq
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+tmp=/tmp/$$
-+status=1    # failure is the default!
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+_cleanup()
-+{
-+    cd /
-+    rm -rf $tmp.* $testdir
-+    _dmerror_cleanup
-+}
-+
-+# get standard environment, filters and checks
-+. ./common/rc
-+. ./common/filter
-+. ./common/dmerror
-+
-+# real QA test starts here
-+_supported_os Linux
-+_supported_fs btrfs
-+_require_dm_target error
-+_require_test_program fsync-err
-+_require_test_program dmerror
-+
-+# bring up dmerror device
-+_scratch_unmount
-+_dmerror_init
-+
-+# Replace first device with error-test device
-+old_SCRATCH_DEV=$SCRATCH_DEV
-+SCRATCH_DEV_POOL=`echo $SCRATCH_DEV_POOL | perl -pe "s#$SCRATCH_DEV#$DMERROR_DEV#"`
-+SCRATCH_DEV=$DMERROR_DEV
-+
-+_require_scratch
-+_require_scratch_dev_pool
-+
-+rm -f $seqres.full
-+
-+echo "Format and mount"
-+
-+_scratch_pool_mkfs "-d raid0 -m raid1" > $seqres.full 2>&1
-+_scratch_mount
-+
-+# How much do we need to write? We need to hit all of the stripes. btrfs uses
-+# a fixed 64k stripesize, so write enough to hit each one
-+number_of_devices=`echo $SCRATCH_DEV_POOL | wc -w`
-+write_kb=$(($number_of_devices * 64))
-+_require_fs_space $SCRATCH_MNT $write_kb
-+
-+testfile=$SCRATCH_MNT/fsync-err-test
-+
-+SCRATCH_DEV=$old_SCRATCH_DEV
-+$here/src/fsync-err -b $(($write_kb * 1024)) -d $here/src/dmerror $testfile
-+
-+# success, all done
-+_dmerror_load_working_table
-+
-+# fs may be corrupt after this -- attempt to repair it
-+_repair_scratch_fs >> $seqres.full
-+
-+# remove dmerror device
-+_dmerror_cleanup
-+
-+status=0
-+exit
-diff --git a/tests/btrfs/999.out b/tests/btrfs/999.out
-new file mode 100644
-index 000000000000..2e48492ff6d1
---- /dev/null
-+++ b/tests/btrfs/999.out
-@@ -0,0 +1,3 @@
-+QA output created by 999
-+Format and mount
-+Test passed!
-diff --git a/tests/btrfs/group b/tests/btrfs/group
-index be0548796260..c9063f0a4087 100644
---- a/tests/btrfs/group
-+++ b/tests/btrfs/group
-@@ -147,3 +147,4 @@
- 142 auto quick
- 143 auto quick
- 144 auto quick send
-+999 auto quick
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index b639fa7246ee..ea4029de077f 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -71,7 +71,7 @@ static void dm_old_start_queue(struct request_queue *q)
+ 
+ static void dm_mq_start_queue(struct request_queue *q)
+ {
+-	blk_mq_start_stopped_hw_queues(q, true);
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_kick_requeue_list(q);
+ }
+ 
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index a60926410438..c3f189e54d10 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2526,7 +2526,7 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
+ 
+ 	mutex_lock(&ctrl->namespaces_mutex);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list) {
+-		blk_mq_start_stopped_hw_queues(ns->queue, true);
++		blk_mq_unquiesce_queue(ns->queue);
+ 		blk_mq_kick_requeue_list(ns->queue);
+ 	}
+ 	mutex_unlock(&ctrl->namespaces_mutex);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 884aaa84c2dd..d6df1dafdc9f 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2979,7 +2979,7 @@ scsi_internal_device_block(struct scsi_device *sdev, bool wait)
+ 		if (wait)
+ 			blk_mq_quiesce_queue(q);
+ 		else
+-			blk_mq_stop_hw_queues(q);
++			blk_mq_quiesce_queue_nowait(q);
+ 	} else {
+ 		spin_lock_irqsave(q->queue_lock, flags);
+ 		blk_stop_queue(q);
+@@ -3033,7 +3033,7 @@ scsi_internal_device_unblock(struct scsi_device *sdev,
+ 		return -EINVAL;
+ 
+ 	if (q->mq_ops) {
+-		blk_mq_start_stopped_hw_queues(q, false);
++		blk_mq_unquiesce_queue(q);
+ 	} else {
+ 		spin_lock_irqsave(q->queue_lock, flags);
+ 		blk_start_queue(q);
 -- 
-2.13.0
+2.9.4
