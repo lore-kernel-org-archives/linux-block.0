@@ -1,42 +1,97 @@
-Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 8/8] nvme: allocate queues for all possible CPUs
-Date: Sat,  3 Jun 2017 16:04:03 +0200
-Message-Id: <20170603140403.27379-9-hch@lst.de>
-In-Reply-To: <20170603140403.27379-1-hch@lst.de>
-References: <20170603140403.27379-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:45138 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751281AbdFFPYw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Jun 2017 11:24:52 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v5 12/12] Revert "blk-mq: don't use sync workqueue flushing from drivers"
+Date: Tue,  6 Jun 2017 23:22:10 +0800
+Message-Id: <20170606152210.22806-13-ming.lei@redhat.com>
+In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
+References: <20170606152210.22806-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Unlike most drіvers that simply pass the maximum possible vectors to
-pci_alloc_irq_vectors NVMe needs to configure the device before allocting
-the vectors, so it needs a manual update for the new scheme of using
-all present CPUs.
+This patch reverts commit 2719aa217e0d02(blk-mq: don't use
+sync workqueue flushing from drivers) because only
+blk_mq_quiesce_queue() need the sync flush, and now
+we don't need to stop queue any more, so revert it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Also changes to cancel_delayed_work() in blk_mq_stop_hw_queue().
+
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c | 30 ++++++++----------------------
+ 1 file changed, 8 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index d52701df7245..4152d93fbbef 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1525,7 +1525,7 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 	int result, nr_io_queues, size;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7b584bf7d310..7ae610a7a811 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -42,7 +42,6 @@ static LIST_HEAD(all_q_list);
  
--	nr_io_queues = num_online_cpus();
-+	nr_io_queues = num_present_cpus();
- 	result = nvme_set_queue_count(&dev->ctrl, &nr_io_queues);
- 	if (result < 0)
- 		return result;
+ static void blk_mq_poll_stats_start(struct request_queue *q);
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+-static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
+ 
+ static int blk_mq_poll_stats_bkt(const struct request *rq)
+ {
+@@ -1176,16 +1175,6 @@ bool blk_mq_queue_stopped(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_mq_queue_stopped);
+ 
+-static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+-{
+-	if (sync)
+-		cancel_delayed_work_sync(&hctx->run_work);
+-	else
+-		cancel_delayed_work(&hctx->run_work);
+-
+-	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-}
+-
+ /*
+  * This function is often used for pausing .queue_rq() by driver when
+  * there isn't enough resource or some conditions aren't satisfied, and
+@@ -1197,18 +1186,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
+  */
+ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ {
+-	__blk_mq_stop_hw_queue(hctx, false);
+-}
+-EXPORT_SYMBOL(blk_mq_stop_hw_queue);
++	cancel_delayed_work(&hctx->run_work);
+ 
+-static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i)
+-		__blk_mq_stop_hw_queue(hctx, sync);
++	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+ }
++EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+ 
+ /*
+  * This function is often used for pausing .queue_rq() by driver when
+@@ -1221,7 +1203,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
+  */
+ void blk_mq_stop_hw_queues(struct request_queue *q)
+ {
+-	__blk_mq_stop_hw_queues(q, false);
++	struct blk_mq_hw_ctx *hctx;
++	int i;
++
++	queue_for_each_hw_ctx(q, hctx, i)
++		blk_mq_stop_hw_queue(hctx);
+ }
+ EXPORT_SYMBOL(blk_mq_stop_hw_queues);
+ 
 -- 
-2.11.0
+2.9.4
