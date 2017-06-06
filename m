@@ -1,39 +1,37 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 47/51] fs: crypto: convert to bio_for_each_segment_all_sp()
-Date: Mon, 26 Jun 2017 20:10:30 +0800
-Message-Id: <20170626121034.3051-48-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <linux-ide-owner@vger.kernel.org>
+Subject: Re: [PATCH 4/6] libata: factor out a ata_identify_page_supported
+ helper
+To: Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>
+Cc: Scott Bauer <scott.bauer@intel.com>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        Rafael Antognolli <rafael.antognolli@intel.com>,
+        Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20170604124225.27032-1-hch@lst.de>
+ <20170604124225.27032-5-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <7f7a3c87-d518-f290-5c05-cd22feacb593@suse.de>
+Date: Tue, 6 Jun 2017 08:29:56 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170604124225.27032-5-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/crypto/bio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 06/04/2017 02:42 PM, Christoph Hellwig wrote:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/ata/libata-core.c | 59 +++++++++++++++++++++++++----------------------
+>  1 file changed, 32 insertions(+), 27 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
-index 6181e9526860..d5516ed19166 100644
---- a/fs/crypto/bio.c
-+++ b/fs/crypto/bio.c
-@@ -36,8 +36,9 @@ static void completion_pages(struct work_struct *work)
- 	struct bio *bio = ctx->r.bio;
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_sp(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 		int ret = fscrypt_decrypt_page(page->mapping->host, page,
- 				PAGE_SIZE, 0, page->index);
+Cheers,
+
+Hannes
 -- 
-2.9.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
