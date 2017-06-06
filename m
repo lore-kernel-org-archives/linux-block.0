@@ -1,196 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40328 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:58700 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751077AbdFEQAV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jun 2017 12:00:21 -0400
+        id S1751462AbdFFPXx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Jun 2017 11:23:53 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH v4 01/11] blk-mq: fix direct issue
-Date: Mon,  5 Jun 2017 23:59:15 +0800
-Message-Id: <20170605155925.7896-2-ming.lei@redhat.com>
-In-Reply-To: <20170605155925.7896-1-ming.lei@redhat.com>
-References: <20170605155925.7896-1-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org
+Subject: [PATCH v5 07/12] nvme: host: unquiesce queue in nvme_kill_queues()
+Date: Tue,  6 Jun 2017 23:22:05 +0800
+Message-Id: <20170606152210.22806-8-ming.lei@redhat.com>
+In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
+References: <20170606152210.22806-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If queue is stopped, we shouldn't dispatch request into driver and
-hardware, unfortunately the check is removed in bd166ef183c2(blk-mq-sched:
-add framework for MQ capable IO schedulers).
+When nvme_kill_queues() is run, queues may be in
+quiesced state, so we forcibly unquiesce queues to avoid
+blocking dispatch, and I/O hang can be avoided in
+remove path.
 
-This patch fixes the issue by moving the check back into
-__blk_mq_try_issue_directly().
+Peviously we use blk_mq_start_stopped_hw_queues() as
+counterpart of blk_mq_quiesce_queue(), now we have
+introduced blk_mq_unquiesce_queue(), so use it explicitly.
 
-This patch fixes request use-after-free[1][2] during canceling requets
-of NVMe in nvme_dev_disable(), which can be triggered easily during
-NVMe reset & remove test.
-
-[1] oops kernel log when CONFIG_BLK_DEV_INTEGRITY is on
-[  103.412969] BUG: unable to handle kernel NULL pointer dereference at 000000000000000a
-[  103.412980] IP: bio_integrity_advance+0x48/0xf0
-[  103.412981] PGD 275a88067
-[  103.412981] P4D 275a88067
-[  103.412982] PUD 276c43067
-[  103.412983] PMD 0
-[  103.412984]
-[  103.412986] Oops: 0000 [#1] SMP
-[  103.412989] Modules linked in: vfat fat intel_rapl sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel pcbc aesni_intel crypto_simd cryptd ipmi_ssif iTCO_wdt iTCO_vendor_support mxm_wmi glue_helper dcdbas ipmi_si mei_me pcspkr mei sg ipmi_devintf lpc_ich ipmi_msghandler shpchp acpi_power_meter wmi nfsd auth_rpcgss nfs_acl lockd grace sunrpc ip_tables xfs libcrc32c sd_mod mgag200 i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm crc32c_intel nvme ahci nvme_core libahci libata tg3 i2c_core megaraid_sas ptp pps_core dm_mirror dm_region_hash dm_log dm_mod
-[  103.413035] CPU: 0 PID: 102 Comm: kworker/0:2 Not tainted 4.11.0+ #1
-[  103.413036] Hardware name: Dell Inc. PowerEdge R730xd/072T6D, BIOS 2.2.5 09/06/2016
-[  103.413041] Workqueue: events nvme_remove_dead_ctrl_work [nvme]
-[  103.413043] task: ffff9cc8775c8000 task.stack: ffffc033c252c000
-[  103.413045] RIP: 0010:bio_integrity_advance+0x48/0xf0
-[  103.413046] RSP: 0018:ffffc033c252fc10 EFLAGS: 00010202
-[  103.413048] RAX: 0000000000000000 RBX: ffff9cc8720a8cc0 RCX: ffff9cca72958240
-[  103.413049] RDX: ffff9cca72958000 RSI: 0000000000000008 RDI: ffff9cc872537f00
-[  103.413049] RBP: ffffc033c252fc28 R08: 0000000000000000 R09: ffffffffb963a0d5
-[  103.413050] R10: 000000000000063e R11: 0000000000000000 R12: ffff9cc8720a8d18
-[  103.413051] R13: 0000000000001000 R14: ffff9cc872682e00 R15: 00000000fffffffb
-[  103.413053] FS:  0000000000000000(0000) GS:ffff9cc877c00000(0000) knlGS:0000000000000000
-[  103.413054] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  103.413055] CR2: 000000000000000a CR3: 0000000276c41000 CR4: 00000000001406f0
-[  103.413056] Call Trace:
-[  103.413063]  bio_advance+0x2a/0xe0
-[  103.413067]  blk_update_request+0x76/0x330
-[  103.413072]  blk_mq_end_request+0x1a/0x70
-[  103.413074]  blk_mq_dispatch_rq_list+0x370/0x410
-[  103.413076]  ? blk_mq_flush_busy_ctxs+0x94/0xe0
-[  103.413080]  blk_mq_sched_dispatch_requests+0x173/0x1a0
-[  103.413083]  __blk_mq_run_hw_queue+0x8e/0xa0
-[  103.413085]  __blk_mq_delay_run_hw_queue+0x9d/0xa0
-[  103.413088]  blk_mq_start_hw_queue+0x17/0x20
-[  103.413090]  blk_mq_start_hw_queues+0x32/0x50
-[  103.413095]  nvme_kill_queues+0x54/0x80 [nvme_core]
-[  103.413097]  nvme_remove_dead_ctrl_work+0x1f/0x40 [nvme]
-[  103.413103]  process_one_work+0x149/0x360
-[  103.413105]  worker_thread+0x4d/0x3c0
-[  103.413109]  kthread+0x109/0x140
-[  103.413111]  ? rescuer_thread+0x380/0x380
-[  103.413113]  ? kthread_park+0x60/0x60
-[  103.413120]  ret_from_fork+0x2c/0x40
-[  103.413121] Code: 08 4c 8b 63 50 48 8b 80 80 00 00 00 48 8b 90 d0 03 00 00 31 c0 48 83 ba 40 02 00 00 00 48 8d 8a 40 02 00 00 48 0f 45 c1 c1 ee 09 <0f> b6 48 0a 0f b6 40 09 41 89 f5 83 e9 09 41 d3 ed 44 0f af e8
-[  103.413145] RIP: bio_integrity_advance+0x48/0xf0 RSP: ffffc033c252fc10
-[  103.413146] CR2: 000000000000000a
-[  103.413157] ---[ end trace cd6875d16eb5a11e ]---
-[  103.455368] Kernel panic - not syncing: Fatal exception
-[  103.459826] Kernel Offset: 0x37600000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[  103.850916] ---[ end Kernel panic - not syncing: Fatal exception
-[  103.857637] sched: Unexpected reschedule of offline CPU#1!
-[  103.863762] ------------[ cut here ]------------
-
-[2] kernel hang in blk_mq_freeze_queue_wait() when CONFIG_BLK_DEV_INTEGRITY is off
-[  247.129825] INFO: task nvme-test:1772 blocked for more than 120 seconds.
-[  247.137311]       Not tainted 4.12.0-rc2.upstream+ #4
-[  247.142954] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  247.151704] Call Trace:
-[  247.154445]  __schedule+0x28a/0x880
-[  247.158341]  schedule+0x36/0x80
-[  247.161850]  blk_mq_freeze_queue_wait+0x4b/0xb0
-[  247.166913]  ? remove_wait_queue+0x60/0x60
-[  247.171485]  blk_freeze_queue+0x1a/0x20
-[  247.175770]  blk_cleanup_queue+0x7f/0x140
-[  247.180252]  nvme_ns_remove+0xa3/0xb0 [nvme_core]
-[  247.185503]  nvme_remove_namespaces+0x32/0x50 [nvme_core]
-[  247.191532]  nvme_uninit_ctrl+0x2d/0xa0 [nvme_core]
-[  247.196977]  nvme_remove+0x70/0x110 [nvme]
-[  247.201545]  pci_device_remove+0x39/0xc0
-[  247.205927]  device_release_driver_internal+0x141/0x200
-[  247.211761]  device_release_driver+0x12/0x20
-[  247.216531]  pci_stop_bus_device+0x8c/0xa0
-[  247.221104]  pci_stop_and_remove_bus_device_locked+0x1a/0x30
-[  247.227420]  remove_store+0x7c/0x90
-[  247.231320]  dev_attr_store+0x18/0x30
-[  247.235409]  sysfs_kf_write+0x3a/0x50
-[  247.239497]  kernfs_fop_write+0xff/0x180
-[  247.243867]  __vfs_write+0x37/0x160
-[  247.247757]  ? selinux_file_permission+0xe5/0x120
-[  247.253011]  ? security_file_permission+0x3b/0xc0
-[  247.258260]  vfs_write+0xb2/0x1b0
-[  247.261964]  ? syscall_trace_enter+0x1d0/0x2b0
-[  247.266924]  SyS_write+0x55/0xc0
-[  247.270540]  do_syscall_64+0x67/0x150
-[  247.274636]  entry_SYSCALL64_slow_path+0x25/0x25
-[  247.279794] RIP: 0033:0x7f5c96740840
-[  247.283785] RSP: 002b:00007ffd00e87ee8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-[  247.292238] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f5c96740840
-[  247.300194] RDX: 0000000000000002 RSI: 00007f5c97060000 RDI: 0000000000000001
-[  247.308159] RBP: 00007f5c97060000 R08: 000000000000000a R09: 00007f5c97059740
-[  247.316123] R10: 0000000000000001 R11: 0000000000000246 R12: 00007f5c96a14400
-[  247.324087] R13: 0000000000000002 R14: 0000000000000001 R15: 0000000000000000
-[  370.016340] INFO: task nvme-test:1772 blocked for more than 120 seconds.
-
-Fixes: bd166ef183c2(blk-mq-sched: add framework for MQ capable IO schedulers)
-Cc: stable@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ drivers/nvme/host/core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 58688205c8f4..2da2cb8d9ff4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1400,22 +1400,28 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
- }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index c3f189e54d10..d4e5fc95da4b 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2438,6 +2438,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+ 	struct nvme_ns *ns;
  
--static void __blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
--				      bool may_sleep)
-+static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+					struct request *rq,
-+					blk_qc_t *cookie, bool may_sleep)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
- 		.rq = rq,
- 		.last = true,
- 	};
--	struct blk_mq_hw_ctx *hctx;
- 	blk_qc_t new_cookie;
- 	int ret;
-+	bool run_queue = true;
+ 	mutex_lock(&ctrl->namespaces_mutex);
 +
-+	if (blk_mq_hctx_stopped(hctx)) {
-+		run_queue = false;
-+		goto insert;
-+	}
++	/* Forcibly unquiesce queues to avoid blocking dispatch */
++	blk_mq_unquiesce_queue(ctrl->admin_q);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list) {
+ 		/*
+ 		 * Revalidating a dead namespace sets capacity to 0. This will
+@@ -2448,6 +2451,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+ 		revalidate_disk(ns->disk);
+ 		blk_set_queue_dying(ns->queue);
  
- 	if (q->elevator)
- 		goto insert;
- 
--	if (!blk_mq_get_driver_tag(rq, &hctx, false))
-+	if (!blk_mq_get_driver_tag(rq, NULL, false))
- 		goto insert;
- 
- 	new_cookie = request_to_qc_t(hctx, rq);
-@@ -1439,7 +1445,7 @@ static void __blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
- 
- 	__blk_mq_requeue_request(rq);
- insert:
--	blk_mq_sched_insert_request(rq, false, true, false, may_sleep);
-+	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
- }
- 
- static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-@@ -1447,7 +1453,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- {
- 	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
- 		rcu_read_lock();
--		__blk_mq_try_issue_directly(rq, cookie, false);
-+		__blk_mq_try_issue_directly(hctx, rq, cookie, false);
- 		rcu_read_unlock();
- 	} else {
- 		unsigned int srcu_idx;
-@@ -1455,7 +1461,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		might_sleep();
- 
- 		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
--		__blk_mq_try_issue_directly(rq, cookie, true);
-+		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
- 		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
- 	}
- }
++		/* Forcibly unquiesce queues to avoid blocking dispatch */
++		blk_mq_unquiesce_queue(ns->queue);
++
+ 		/*
+ 		 * Forcibly start all queues to avoid having stuck requests.
+ 		 * Note that we must ensure the queues are not stopped
 -- 
 2.9.4
