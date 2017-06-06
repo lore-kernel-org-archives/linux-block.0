@@ -1,97 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45138 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751281AbdFFPYw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 11:24:52 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 12/12] Revert "blk-mq: don't use sync workqueue flushing from drivers"
-Date: Tue,  6 Jun 2017 23:22:10 +0800
-Message-Id: <20170606152210.22806-13-ming.lei@redhat.com>
-In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
-References: <20170606152210.22806-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 06/10] fs: Introduce IOMAP_NOWAIT
+Date: Tue,  6 Jun 2017 06:19:35 -0500
+Message-Id: <20170606111939.27272-7-rgoldwyn@suse.de>
+In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
+References: <20170606111939.27272-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch reverts commit 2719aa217e0d02(blk-mq: don't use
-sync workqueue flushing from drivers) because only
-blk_mq_quiesce_queue() need the sync flush, and now
-we don't need to stop queue any more, so revert it.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Also changes to cancel_delayed_work() in blk_mq_stop_hw_queue().
+IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
+This is used by XFS in the XFS patch.
 
-Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/blk-mq.c | 30 ++++++++----------------------
- 1 file changed, 8 insertions(+), 22 deletions(-)
+ fs/iomap.c            | 2 ++
+ include/linux/iomap.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7b584bf7d310..7ae610a7a811 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -42,7 +42,6 @@ static LIST_HEAD(all_q_list);
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 4b10892967a5..5d85ec6e7b20 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -879,6 +879,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 	} else {
+ 		dio->flags |= IOMAP_DIO_WRITE;
+ 		flags |= IOMAP_WRITE;
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			flags |= IOMAP_NOWAIT;
+ 	}
  
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
--static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
+ 	ret = filemap_write_and_wait_range(mapping, start, end);
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index f753e788da31..69f4e9470084 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -52,6 +52,7 @@ struct iomap {
+ #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
+ #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
+ #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
++#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
  
- static int blk_mq_poll_stats_bkt(const struct request *rq)
- {
-@@ -1176,16 +1175,6 @@ bool blk_mq_queue_stopped(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_mq_queue_stopped);
- 
--static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
--{
--	if (sync)
--		cancel_delayed_work_sync(&hctx->run_work);
--	else
--		cancel_delayed_work(&hctx->run_work);
--
--	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
--}
--
- /*
-  * This function is often used for pausing .queue_rq() by driver when
-  * there isn't enough resource or some conditions aren't satisfied, and
-@@ -1197,18 +1186,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
-  */
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
--	__blk_mq_stop_hw_queue(hctx, false);
--}
--EXPORT_SYMBOL(blk_mq_stop_hw_queue);
-+	cancel_delayed_work(&hctx->run_work);
- 
--static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
--{
--	struct blk_mq_hw_ctx *hctx;
--	int i;
--
--	queue_for_each_hw_ctx(q, hctx, i)
--		__blk_mq_stop_hw_queue(hctx, sync);
-+	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
- }
-+EXPORT_SYMBOL(blk_mq_stop_hw_queue);
- 
- /*
-  * This function is often used for pausing .queue_rq() by driver when
-@@ -1221,7 +1203,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
-  */
- void blk_mq_stop_hw_queues(struct request_queue *q)
- {
--	__blk_mq_stop_hw_queues(q, false);
-+	struct blk_mq_hw_ctx *hctx;
-+	int i;
-+
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		blk_mq_stop_hw_queue(hctx);
- }
- EXPORT_SYMBOL(blk_mq_stop_hw_queues);
- 
+ struct iomap_ops {
+ 	/*
 -- 
-2.9.4
+2.12.0
