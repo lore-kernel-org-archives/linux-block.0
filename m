@@ -1,59 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43874 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751153AbdFEQCp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Jun 2017 12:02:45 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v4 10/11] blk-mq: clarify dispatch may not be drained/blocked by stopping queue
-Date: Mon,  5 Jun 2017 23:59:24 +0800
-Message-Id: <20170605155925.7896-11-ming.lei@redhat.com>
-In-Reply-To: <20170605155925.7896-1-ming.lei@redhat.com>
-References: <20170605155925.7896-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
+Date: Tue,  6 Jun 2017 06:19:30 -0500
+Message-Id: <20170606111939.27272-2-rgoldwyn@suse.de>
+In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
+References: <20170606111939.27272-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-BLK_MQ_S_STOPPED may not be observed in other concurrent I/O paths,
-we can't guarantee that dispatching won't happen after returning
-from the APIs of stopping queue.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-So clarify the fact and avoid potential misuse.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/blk-mq.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ fs/read_write.c    | 12 +++---------
+ include/linux/fs.h | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2788cacdaa1e..d3e24d600246 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1186,6 +1186,11 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
- 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 47c1d4484df9..53c816c61122 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
+ 	struct kiocb kiocb;
+ 	ssize_t ret;
+ 
+-	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
+-		return -EOPNOTSUPP;
+-
+ 	init_sync_kiocb(&kiocb, filp);
+-	if (flags & RWF_HIPRI)
+-		kiocb.ki_flags |= IOCB_HIPRI;
+-	if (flags & RWF_DSYNC)
+-		kiocb.ki_flags |= IOCB_DSYNC;
+-	if (flags & RWF_SYNC)
+-		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	ret = kiocb_set_rw_flags(&kiocb, flags);
++	if (ret)
++		return ret;
+ 	kiocb.ki_pos = *ppos;
+ 
+ 	if (type == READ)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 803e5a9b2654..f53867140f43 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3056,6 +3056,20 @@ static inline int iocb_flags(struct file *file)
+ 	return res;
  }
  
-+/*
-+ * We do not guarantee that dispatch can be drained or blocked
-+ * after blk_mq_stop_hw_queue() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
++static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
++{
++	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
++		return -EOPNOTSUPP;
++
++	if (flags & RWF_HIPRI)
++		ki->ki_flags |= IOCB_HIPRI;
++	if (flags & RWF_DSYNC)
++		ki->ki_flags |= IOCB_DSYNC;
++	if (flags & RWF_SYNC)
++		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	return 0;
++}
++
+ static inline ino_t parent_ino(struct dentry *dentry)
  {
- 	__blk_mq_stop_hw_queue(hctx, false);
-@@ -1201,6 +1206,11 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
- 		__blk_mq_stop_hw_queue(hctx, sync);
- }
- 
-+/*
-+ * We do not guarantee that dispatch can be drained or blocked
-+ * after blk_mq_stop_hw_queues() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queues(struct request_queue *q)
- {
- 	__blk_mq_stop_hw_queues(q, false);
+ 	ino_t res;
 -- 
-2.9.4
+2.12.0
