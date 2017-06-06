@@ -1,67 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51552 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:6332 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751281AbdFFPYj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 11:24:39 -0400
+        id S1751305AbdFFMsc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Jun 2017 08:48:32 -0400
+Date: Tue, 6 Jun 2017 20:48:08 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 11/12] blk-mq: clarify dispatch may not be drained/blocked by stopping queue
-Date: Tue,  6 Jun 2017 23:22:09 +0800
-Message-Id: <20170606152210.22806-12-ming.lei@redhat.com>
-In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
-References: <20170606152210.22806-1-ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+Subject: Re: [PATCH v4 10/11] blk-mq: clarify dispatch may not be
+ drained/blocked by stopping queue
+Message-ID: <20170606124806.GB13877@ming.t460p>
+References: <20170605155925.7896-1-ming.lei@redhat.com>
+ <20170605155925.7896-11-ming.lei@redhat.com>
+ <1496706919.2623.36.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1496706919.2623.36.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-BLK_MQ_S_STOPPED may not be observed in other concurrent I/O paths,
-we can't guarantee that dispatching won't happen after returning
-from the APIs of stopping queue.
+On Mon, Jun 05, 2017 at 11:55:20PM +0000, Bart Van Assche wrote:
+> On Mon, 2017-06-05 at 23:59 +0800, Ming Lei wrote:
+> > +/*
+> > + * We do not guarantee that dispatch can be drained or blocked
+> > + * after blk_mq_stop_hw_queue() returns. Please use
+> > + * blk_mq_quiesce_queue() for that requirement.
+> > + */
+> 
+> Hello Ming,
+> 
+> This is comment explains what blk_mq_stop_hw_queue() should not be used for
+> and may leave the reader wondering what it is useful for. How about mentioning
+> first that this function is useful to pause .queue_rq() calls as long as the
+> block driver it will have to return BUSY if .queue_rq() is called?
 
-So clarify the fact and avoid potential misuse.
+OK, will make that as one example.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4eb849bf1d85..7b584bf7d310 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1186,6 +1186,15 @@ static void __blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx, bool sync)
- 	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
- }
- 
-+/*
-+ * This function is often used for pausing .queue_rq() by driver when
-+ * there isn't enough resource or some conditions aren't satisfied, and
-+ * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
-+ *
-+ * We do not guarantee that dispatch can be drained or blocked
-+ * after blk_mq_stop_hw_queue() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	__blk_mq_stop_hw_queue(hctx, false);
-@@ -1201,6 +1210,15 @@ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync)
- 		__blk_mq_stop_hw_queue(hctx, sync);
- }
- 
-+/*
-+ * This function is often used for pausing .queue_rq() by driver when
-+ * there isn't enough resource or some conditions aren't satisfied, and
-+ * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
-+ *
-+ * We do not guarantee that dispatch can be drained or blocked
-+ * after blk_mq_stop_hw_queues() returns. Please use
-+ * blk_mq_quiesce_queue() for that requirement.
-+ */
- void blk_mq_stop_hw_queues(struct request_queue *q)
- {
- 	__blk_mq_stop_hw_queues(q, false);
--- 
-2.9.4
+Thanks,
+Ming
