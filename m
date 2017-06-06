@@ -1,41 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:32847 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751090AbdFAOIH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2017 10:08:07 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "James.Bottomley@HansenPartnership.com"
-        <James.Bottomley@HansenPartnership.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 00/31] SCSI patches for kernel v4.13.
-Date: Thu, 1 Jun 2017 14:08:04 +0000
-Message-ID: <1496326082.3075.3.camel@sandisk.com>
-References: <20170524003420.5381-1-bart.vanassche@sandisk.com>
-         <yq1o9uhsnco.fsf@oracle.com>
-In-Reply-To: <yq1o9uhsnco.fsf@oracle.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 08/10] ext4: nowait aio support
+Date: Tue,  6 Jun 2017 06:19:37 -0500
+Message-Id: <20170606111939.27272-9-rgoldwyn@suse.de>
+In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
+References: <20170606111939.27272-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 2017-05-24 at 22:04 -0400, Martin K. Petersen wrote:
-> > This patch series consists of the bug fixes I came up with during the
-> > past two months. Please consider these patches for kernel v4.13.
->=20
-> No major objections from me. Although you may have to slice and dice the
-> series differently so we can get the block bits queued through Jens and
-> then do the rest as a stage 2 merge.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Hello Martin,
+Return EAGAIN if any of the following checks fail for direct I/O:
+  + i_rwsem is lockable
+  + Writing beyond end of file (will trigger allocation)
+  + Blocks are not allocated at the write location
 
-The first eight patches in this series do not depend on any block layer cha=
-nges.
-Do you want me to repost this patches or can you perhaps queue these withou=
-t a
-repost?
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+---
+ fs/ext4/file.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-Thanks,
-
-Bart.=
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index 831fd6beebf0..07f08ff2c11b 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -216,7 +216,13 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 		return ext4_dax_write_iter(iocb, from);
+ #endif
+ 
+-	inode_lock(inode);
++	if (iocb->ki_flags & IOCB_NOWAIT) {
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++	} else {
++		inode_lock(inode);
++	}
++
+ 	ret = ext4_write_checks(iocb, from);
+ 	if (ret <= 0)
+ 		goto out;
+@@ -235,9 +241,15 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 
+ 	iocb->private = &overwrite;
+ 	/* Check whether we do a DIO overwrite or not */
+-	if (o_direct && ext4_should_dioread_nolock(inode) && !unaligned_aio &&
+-	    ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from)))
+-		overwrite = 1;
++	if (o_direct && !unaligned_aio) {
++		if (ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from))) {
++			if (ext4_should_dioread_nolock(inode))
++				overwrite = 1;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
++		}
++	}
+ 
+ 	ret = __generic_file_write_iter(iocb, from);
+ 	inode_unlock(inode);
+-- 
+2.12.0
