@@ -1,54 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51049 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751461AbdFZMRm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:17:42 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 28/51] block: introduce bvec_for_each_sp_bvec()
-Date: Mon, 26 Jun 2017 20:10:11 +0800
-Message-Id: <20170626121034.3051-29-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:17058 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751427AbdFFP7j (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2017 11:59:39 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v5 01/12] blk-mq: pass correct hctx to
+ blk_mq_try_issue_directly
+Date: Tue, 6 Jun 2017 15:59:30 +0000
+Message-ID: <1496764769.2692.6.camel@sandisk.com>
+References: <20170606152210.22806-1-ming.lei@redhat.com>
+         <20170606152210.22806-2-ming.lei@redhat.com>
+In-Reply-To: <20170606152210.22806-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This helper can be used to iterate each singlepage bvec
-from one multipage bvec.
+On Tue, 2017-06-06 at 23:21 +0800, Ming Lei wrote:
+> When direct issue is done on request picked up from plug list,
+> the hctx need to be updated with the actual hw queue, otherwise
+> wrong hctx is used and may hurt performance, especially when
+> wrong SRCU readlock is acquired/released
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bvec.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 5c51c58fe202..7addceea9828 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -192,4 +192,18 @@ static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
- 	.bi_bvec_done	= 0,						\
- }
- 
-+/*
-+ * This helper iterates over the multipage bvec of @mp_bvec and
-+ * returns each singlepage bvec via @sp_bvl.
-+ */
-+#define __bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, start)		\
-+	for (iter = start,						\
-+	     (iter).bi_size = (mp_bvec)->bv_len  - (iter).bi_bvec_done;	\
-+	     (iter).bi_size &&						\
-+		((sp_bvl = bvec_iter_bvec((mp_bvec), (iter))), 1);	\
-+	     bvec_iter_advance((mp_bvec), &(iter), (sp_bvl).bv_len))
-+
-+#define bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter)			\
-+	__bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, BVEC_ITER_ALL_INIT)
-+
- #endif /* __LINUX_BVEC_ITER_H */
--- 
-2.9.4
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
