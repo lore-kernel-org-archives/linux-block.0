@@ -1,45 +1,27 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 0/5] Convert RPMB block device to a character device
-Date: Thu, 15 Jun 2017 14:12:54 +0200
-Message-Id: <20170615121259.8281-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:2665 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751445AbdFFQGw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2017 12:06:52 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v5 03/12] blk-mq: move blk_mq_quiesce_queue() into
+ include/linux/blk-mq.h
+Date: Tue, 6 Jun 2017 16:06:49 +0000
+Message-ID: <1496765208.2692.9.camel@sandisk.com>
+References: <20170606152210.22806-1-ming.lei@redhat.com>
+         <20170606152210.22806-4-ming.lei@redhat.com>
+In-Reply-To: <20170606152210.22806-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Looking for ways to get rid of the RPMB "block device" and the
-extra block queue. This is one approach, I don't know if it will
-stick, let's discuss it, especially the RFC patch.
+On Tue, 2017-06-06 at 23:22 +0800, Ming Lei wrote:
+> We usually put blk_mq_*() into include/linux/blk-mq.h, so
+> move this API into there.
 
-Patches 1,2,3 can be applied as cleanups unless they collide with
-something else.
-
-Patch 5 is a consequence of the character device conversion.
-
-For motivation and in-depth description of the problem I am trying
-to solve, see patch 4, the RFC.
-
-Linus Walleij (5):
-  mmc: block: Move duplicate check
-  mmc: block: Refactor mmc_blk_part_switch()
-  mmc: block: Reparametrize mmc_blk_ioctl_[multi]_cmd()
-  RFC: mmc: block: Convert RPMB to a character device
-  mmc: block: Delete mmc_access_rpmb()
-
- drivers/mmc/core/block.c | 384 ++++++++++++++++++++++++++++++++++++-----------
- drivers/mmc/core/queue.c |   2 +-
- drivers/mmc/core/queue.h |   4 +-
- 3 files changed, 303 insertions(+), 87 deletions(-)
-
--- 
-2.9.4
+Reviewed-by: Bart Van Assche <Bart.VanAssche@sandisk.com>=
