@@ -1,110 +1,98 @@
-Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/8] genirq: move pending helpers to internal.h
-Date: Sat,  3 Jun 2017 16:03:57 +0200
-Message-Id: <20170603140403.27379-3-hch@lst.de>
-In-Reply-To: <20170603140403.27379-1-hch@lst.de>
-References: <20170603140403.27379-1-hch@lst.de>
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	adam.manzanares@wdc.com,
+	viro@zeniv.linux.org.uk,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 10/10] btrfs: nowait aio support
+Date: Tue,  6 Jun 2017 06:19:39 -0500
+Message-Id: <20170606111939.27272-11-rgoldwyn@suse.de>
+In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
+References: <20170606111939.27272-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-So that the affinity code can reuse them.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
+
+Acked-by: David Sterba <dsterba@suse.com>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- kernel/irq/internals.h | 38 ++++++++++++++++++++++++++++++++++++++
- kernel/irq/manage.c    | 28 ----------------------------
- 2 files changed, 38 insertions(+), 28 deletions(-)
+ fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/kernel/irq/internals.h b/kernel/irq/internals.h
-index bc226e783bd2..b81f6ce73a68 100644
---- a/kernel/irq/internals.h
-+++ b/kernel/irq/internals.h
-@@ -226,3 +226,41 @@ irq_pm_install_action(struct irq_desc *desc, struct irqaction *action) { }
- static inline void
- irq_pm_remove_action(struct irq_desc *desc, struct irqaction *action) { }
- #endif
-+
-+#ifdef CONFIG_GENERIC_PENDING_IRQ
-+static inline bool irq_can_move_pcntxt(struct irq_data *data)
-+{
-+	return irqd_can_move_in_process_context(data);
-+}
-+static inline bool irq_move_pending(struct irq_data *data)
-+{
-+	return irqd_is_setaffinity_pending(data);
-+}
-+static inline void
-+irq_copy_pending(struct irq_desc *desc, const struct cpumask *mask)
-+{
-+	cpumask_copy(desc->pending_mask, mask);
-+}
-+static inline void
-+irq_get_pending(struct cpumask *mask, struct irq_desc *desc)
-+{
-+	cpumask_copy(mask, desc->pending_mask);
-+}
-+#else /* CONFIG_GENERIC_PENDING_IRQ */
-+static inline bool irq_can_move_pcntxt(struct irq_data *data)
-+{
-+	return true;
-+}
-+static inline bool irq_move_pending(struct irq_data *data)
-+{
-+	return false;
-+}
-+static inline void
-+irq_copy_pending(struct irq_desc *desc, const struct cpumask *mask)
-+{
-+}
-+static inline void
-+irq_get_pending(struct cpumask *mask, struct irq_desc *desc)
-+{
-+}
-+#endif /* CONFIG_GENERIC_PENDING_IRQ */
-diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-index 5c25d4a5dc46..5fa334e5c046 100644
---- a/kernel/irq/manage.c
-+++ b/kernel/irq/manage.c
-@@ -168,34 +168,6 @@ void irq_set_thread_affinity(struct irq_desc *desc)
- 			set_bit(IRQTF_AFFINITY, &action->thread_flags);
- }
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index da1096eb1a40..aae088e49915 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1875,12 +1875,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
  
--#ifdef CONFIG_GENERIC_PENDING_IRQ
--static inline bool irq_can_move_pcntxt(struct irq_data *data)
--{
--	return irqd_can_move_in_process_context(data);
--}
--static inline bool irq_move_pending(struct irq_data *data)
--{
--	return irqd_is_setaffinity_pending(data);
--}
--static inline void
--irq_copy_pending(struct irq_desc *desc, const struct cpumask *mask)
--{
--	cpumask_copy(desc->pending_mask, mask);
--}
--static inline void
--irq_get_pending(struct cpumask *mask, struct irq_desc *desc)
--{
--	cpumask_copy(mask, desc->pending_mask);
--}
--#else
--static inline bool irq_can_move_pcntxt(struct irq_data *data) { return true; }
--static inline bool irq_move_pending(struct irq_data *data) { return false; }
--static inline void
--irq_copy_pending(struct irq_desc *desc, const struct cpumask *mask) { }
--static inline void
--irq_get_pending(struct cpumask *mask, struct irq_desc *desc) { }
--#endif
--
- int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask,
- 			bool force)
- {
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
++		}
++	} else
++		inode_lock(inode);
++
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1914,8 +1931,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	 */
+ 	update_time_for_write(inode);
+ 
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 17cbe9306faf..2ab71b946829 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8755,6 +8755,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			dio_data.overwrite = 1;
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
 -- 
-2.11.0
+2.12.0
