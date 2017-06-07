@@ -1,29 +1,22 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:37390 "EHLO
-        prv-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751464AbdFGJod (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:5:1>);
-        Wed, 7 Jun 2017 05:44:33 -0400
-Message-Id: <5938579E0200009500089974@prv-mh.provo.novell.com>
-Date: Wed, 07 Jun 2017 03:44:30 -0600
-From: "Jin Nan Wang" <jnwang@suse.com>
-To: <ming.lei@redhat.com>
-Cc: <axboe@fb.com>, "Hannes Reinecke" <hare@suse.com>,
-        "Mel Gorman" <MGorman@suse.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?Q?=E7=AD=94=E5=A4=8D=EF=BC=9A=20Re:=20[PATCH]=20Fix=20lo?=
- =?UTF-8?Q?op=20device=20flush=20before=20configure?=
+Received: from mx1.redhat.com ([209.132.183.28]:46936 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751676AbdFGJZa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 7 Jun 2017 05:25:30 -0400
+Date: Wed, 7 Jun 2017 17:25:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: James Wang <jnwang@suse.com>
+Cc: axboe@fb.com, hare@suse.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mgorman@suse.com
+Subject: Re: [PATCH] Fix loop device flush before configure
+Message-ID: <20170607092511.GB25572@ming.t460p>
 References: <20170607090104.17337-1-jnwang@suse.com>
- <20170607092511.GB25572@ming.t460p>
-In-Reply-To: <20170607092511.GB25572@ming.t460p>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170607090104.17337-1-jnwang@suse.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
-
->>> Ming Lei <ming.lei@redhat.com> 2017-6-7 下午 17:26 >>>
 On Wed, Jun 07, 2017 at 05:01:04PM +0800, James Wang wrote:
 > This condition check was exist at before commit b5dd2f6047ca ("block: loop:
 > improve performance via blk-mq") When add MQ support to loop device, it be
@@ -100,7 +93,6 @@ But looks better to add check like the following
 because we don't clear lo->worker_task in loop_unprepare_queue()
 and it is more readable to check on lo->lo_state.
 
-why not?
 
 thanks,
 Ming
