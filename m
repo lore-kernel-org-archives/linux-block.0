@@ -1,27 +1,38 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Wed, 7 Jun 2017 15:04:11 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Wed, 7 Jun 2017 21:06:59 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Thomas Gleixner <tglx@linutronix.de>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 7/8] blk-mq: create hctx for each present CPU
-Message-ID: <20170607220411.GF7481@vader.DHCP.thefacebook.com>
-References: <20170603140403.27379-1-hch@lst.de>
- <20170603140403.27379-8-hch@lst.de>
+Message-ID: <20170607190659.GA32550@lst.de>
+References: <20170603140403.27379-1-hch@lst.de> <20170603140403.27379-8-hch@lst.de> <20170607091038.GA25572@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170603140403.27379-8-hch@lst.de>
+In-Reply-To: <20170607091038.GA25572@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Jun 03, 2017 at 04:04:02PM +0200, Christoph Hellwig wrote:
-> Currently we only create hctx for online CPUs, which can lead to a lot
-> of churn due to frequent soft offline / online operations.  Instead
-> allocate one for each present CPU to avoid this and dramatically simplify
-> the code.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Wed, Jun 07, 2017 at 05:10:46PM +0800, Ming Lei wrote:
+> One thing not sure is that we may need to handle new CPU hotplug
+> after initialization. Without the CPU hotplug handler, system may
+> not scale well when more CPUs are added to sockets.
 
-Oh man, this cleanup is great. Did you run blktests on this? block/008
-does a bunch of hotplugging while I/O is running.
+Adding physical CPUs to sockets is a very rare activity, and we
+should not optimize for it.  Taking CPUs that are physically present
+offline and online is the case that is interesting, and that's what
+this patchset changes.
+
+> Another thing is that I don't see how NVMe handles this situation,
+> blk_mq_update_nr_hw_queues() is called in nvme_reset_work(), so
+> that means RESET need to be triggered after new CPUs are added to
+> system?
+
+Yes.
+
+> I have tried to add new CPUs runtime on Qemu, and not see
+> new hw queues are added no matter this patchset is applied or not.
+
+Do you even see the CPUs in your VM?  For physical hotplug you'll
+need to reserve spots in the cpumap beforehand.
