@@ -1,36 +1,38 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/11] btrfs: add support for passing in write hints for buffered writes
-Date: Wed, 14 Jun 2017 21:45:11 -0600
-Message-Id: <1497498312-17704-11-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
-References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:36920 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751414AbdFGHDv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 7 Jun 2017 03:03:51 -0400
+Subject: Re: [PATCH blktests v2 0/3] Add SCSI generic test group
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
+References: <cover.1495201975.git.jthumshirn@suse.de>
+ <20170607064408.GA9840@vader>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <17146abe-6286-fdcd-1cdb-d004754f73f2@suse.de>
+Date: Wed, 7 Jun 2017 09:03:49 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170607064408.GA9840@vader>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Chris Mason <clm@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/btrfs/extent_io.c | 1 +
- 1 file changed, 1 insertion(+)
+On 06/07/2017 08:44 AM, Omar Sandoval wrote:
+> Sorry for the delay, I was chasing down a few Btrfs bugs for the last
+> couple of weeks. I applied these with some small changes. I stuck with
+> running syzkaller on the scsi-debug device like you had here, we can
+> revisit that for future tests if it makes sense to run them on a real
+> device. Thanks!
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index d3619e010005..2bc2dfca87c2 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2826,6 +2826,7 @@ static int submit_extent_page(int op, int op_flags, struct extent_io_tree *tree,
- 	bio_add_page(bio, page, page_size, offset);
- 	bio->bi_end_io = end_io_func;
- 	bio->bi_private = tree;
-+	op_flags |= bio_op_write_hint(inode_write_hint(page->mapping->host));
- 	bio_set_op_attrs(bio, op, op_flags);
- 	if (wbc) {
- 		wbc_init_bio(wbc, bio);
+Yes I wanted to go to it tomorrow and send you a v3, I got stuck in NVMe
+;-). Thanks for applying it anyways, I'll send a follow up.
+
+	Johannes
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
