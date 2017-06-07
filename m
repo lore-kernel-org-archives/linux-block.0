@@ -1,55 +1,38 @@
-Return-Path: <BATV+8132ee8c7e24eb087ca3+5055+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] blk-mq: include all present CPUs in the default queue mapping
-Date: Mon, 26 Jun 2017 12:20:56 +0200
-Message-Id: <20170626102058.10200-2-hch@lst.de>
-In-Reply-To: <20170626102058.10200-1-hch@lst.de>
-References: <20170626102058.10200-1-hch@lst.de>
+Subject: Re: [PATCH] blk-throttle: fix NULL pointer dereference in
+ throtl_schedule_pending_timer
+To: Joseph Qi <jiangqi903@gmail.com>, linux-block@vger.kernel.org
+Cc: Shaohua Li <shli@fb.com>, boyu.mt@taobao.com, wenqing.lz@taobao.com,
+ qijiang.qj@alibaba-inc.com
+References: <ba25ffe3-9db7-2311-51c7-91fce0ce8cfa@gmail.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <3bb46db6-4395-194d-84ab-334a2eb4f99f@fb.com>
+Date: Wed, 7 Jun 2017 08:12:05 -0600
+MIME-Version: 1.0
+In-Reply-To: <ba25ffe3-9db7-2311-51c7-91fce0ce8cfa@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This way we get a nice distribution independent of the current cpu
-online / offline state.
+On 06/06/2017 09:36 PM, Joseph Qi wrote:
+> From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+> 
+> I have encountered a NULL pointer dereference in
+> throtl_schedule_pending_timer:
+>   [  413.735396] BUG: unable to handle kernel NULL pointer dereference at 0000000000000038
+>   [  413.735535] IP: [<ffffffff812ebbbf>] throtl_schedule_pending_timer+0x3f/0x210
+>   [  413.735643] PGD 22c8cf067 PUD 22cb34067 PMD 0
+>   [  413.735713] Oops: 0000 [#1] SMP
+>   ......
+> 
+> This is caused by the following case:
+>   blk_throtl_bio
+>     throtl_schedule_next_dispatch  <= sq is top level one without parent
+>       throtl_schedule_pending_timer
+>         sq_to_tg(sq)->td->throtl_slice  <= sq_to_tg(sq) returns NULL
+> 
+> Fix it by using sq_to_td instead of sq_to_tg(sq)->td, which will always
+> return a valid td.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-cpumap.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 8e61e8640e17..5eaecd40f701 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -35,7 +35,6 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- {
- 	unsigned int *map = set->mq_map;
- 	unsigned int nr_queues = set->nr_hw_queues;
--	const struct cpumask *online_mask = cpu_online_mask;
- 	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
- 	cpumask_var_t cpus;
- 
-@@ -44,7 +43,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 
- 	cpumask_clear(cpus);
- 	nr_cpus = nr_uniq_cpus = 0;
--	for_each_cpu(i, online_mask) {
-+	for_each_present_cpu(i) {
- 		nr_cpus++;
- 		first_sibling = get_first_sibling(i);
- 		if (!cpumask_test_cpu(first_sibling, cpus))
-@@ -54,7 +53,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 
- 	queue = 0;
- 	for_each_possible_cpu(i) {
--		if (!cpumask_test_cpu(i, online_mask)) {
-+		if (!cpumask_test_cpu(i, cpu_present_mask)) {
- 			map[i] = 0;
- 			continue;
- 		}
 -- 
-2.11.0
+Jens Axboe
