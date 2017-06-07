@@ -1,80 +1,64 @@
-Return-Path: <eguan@redhat.com>
-Date: Tue, 6 Jun 2017 17:19:30 +0800
-From: Eryu Guan <eguan@redhat.com>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: fstests@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net, dhowells@redhat.com,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [xfstests PATCH v3 5/5] btrfs: allow it to use $SCRATCH_LOGDEV
-Message-ID: <20170606091930.GR19952@eguan.usersys.redhat.com>
-References: <20170531130820.17634-1-jlayton@redhat.com>
- <20170531130820.17634-6-jlayton@redhat.com>
+Subject: Re: [PATCH] blk-throttle: set default latency baseline for harddisk
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-block@vger.kernel.org, tj@kernel.org, Kernel-team@fb.com,
+ Shaohua Li <shli@fb.com>
+References: <af8d351c4d0639b4df0dae777cc96944f52751c1.1496777767.git.shli@fb.com>
+ <5c403cc9-fbfa-829e-f413-48fa503df6fb@fb.com>
+ <20170606221135.mrugl2crbly3r65c@kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <3e683baf-5d02-4f08-7846-6bfd6ccfe465@fb.com>
+Date: Wed, 7 Jun 2017 09:09:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170531130820.17634-6-jlayton@redhat.com>
+In-Reply-To: <20170606221135.mrugl2crbly3r65c@kernel.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 31, 2017 at 09:08:20AM -0400, Jeff Layton wrote:
-> With btrfs, we can't really put the log on a separate device. What we
-> can do however is mirror the metadata across two devices and make the
-> data striped across all devices. When we turn on dmerror then the
-> metadata can fall back to using the other mirror while the data errors
-> out.
+On 06/06/2017 04:11 PM, Shaohua Li wrote:
+> On Tue, Jun 06, 2017 at 03:12:12PM -0600, Jens Axboe wrote:
+>> On 06/06/2017 01:40 PM, Shaohua Li wrote:
+>>> From: Shaohua Li <shli@fb.com>
+>>>
+>>> hard disk IO latency varies a lot depending on spindle move. The latency
+>>> range could be from several microseconds to several milliseconds. It's
+>>> pretty hard to get the baseline latency used by io.low.
+>>>
+>>> We will use a different stragety here. The idea is only using IO with
+>>> spindle move to determine if cgroup IO is in good state. For HD, if io
+>>> latency is small (< 1ms), we ignore the IO. Such IO is likely from
+>>> sequential IO, and is helpless to help determine if a cgroup's IO is
+>>> impacted by other cgroups. With this, we only account IO with big
+>>> latency. Then we can choose a hardcoded baseline latency for HD (4ms,
+>>> which is typical IO latency with seek).  With all these settings, the
+>>> io.low latency works for both HD and SSD.
+>>
+>> I think that makes sense for reads - a quick read is certainly a cache
+>> hit, due to a sequential IO hit. But what about for writes? Most are
+>> absorbed by the write cache, so most will be < 1ms probably. Let's say
+>> an app is doing random writes, the one write we do account will
+>> potentially come at a much higher cost than the actual cost of that one
+>> write. Simiarly for sequential writes, but the ratio of costs is closer
+>> there.
+>>
+>> Maybe that's OK?
 > 
-> Note that the current incarnation of btrfs has a fixed 64k stripe
-> width. If that ever changes or becomes settable, we may need to adjust
-> the amount of data that the test program writes.
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> ---
->  common/rc | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/common/rc b/common/rc
-> index 83765aacfb06..078270451b53 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -830,6 +830,8 @@ _scratch_mkfs()
->  		;;
->  	btrfs)
->  		mkfs_cmd="$MKFS_BTRFS_PROG"
-> +		[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
-> +			mkfs_cmd="$mkfs_cmd -d raid0 -m raid1 $SCRATCH_LOGDEV"
+> Good question. So the concern is say we have 10 io, without cache, the 10 io
+> will have large latency; but with cache, only the 10th io has a very large
+> latency, so we miss accounting some IOs.
 
-I don't think this is the correct way to do it. If btrfs doesn't support
-external log device, then this test doesn't fit btrfs, or we need other
-ways to test btrfs.
+Precisely!
 
-One of the problems of this hack is that raid1 requires all devices are
-in the same size, we have a _require_scratch_dev_pool_equal_size() rule
-to check on it, but this hack doesn't do the proper check and test fails
-if SCRATCH_LOGDEV is smaller or bigger in size.
+> I don't have a good solution for this.  On the other hand, this
+> wouldn't occur in workload with sustained IO, so this problem sounds
+> not a big deal. We probably can add a check later if collected sample
+> count isn't enough, ignore the samples, which I think can mitigate
+> this problem partly.
 
-If btrfs "-d raid0 -m raid1" is capable to do this writeback error test,
-perhaps you can write a new btrfs test and mkfs with "-d raid0 -m raid1"
-explicitly. e.g.
+I'm almost wondering if it doesn't just make sense to have fixed costs
+for a single spindle. But it probably doesn't make sense to special case
+that, and I think you are right in that it works itself out over time
+with sustained IO.
 
-...
-_require_scratch_dev_pool 2
-_require_scratch_dev_pool_equal_size
-...
-_scratch_mkfs "-d raid0 -m raid1"
-...
+I'll add your patch for 4.12.
 
-Thanks,
-Eryu
-
->  		mkfs_filter="cat"
->  		;;
->  	ext3)
-> -- 
-> 2.9.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe fstests" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Jens Axboe
