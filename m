@@ -1,150 +1,34 @@
-Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 05/10] block: don't bother with bounce limits for make_request drivers
-Date: Mon, 19 Jun 2017 09:26:23 +0200
-Message-Id: <20170619072628.12894-6-hch@lst.de>
-In-Reply-To: <20170619072628.12894-1-hch@lst.de>
-References: <20170619072628.12894-1-hch@lst.de>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 7 Jun 2017 11:04:03 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv7 2/2] loop: support 4k physical blocksize
+Message-ID: <20170607180403.GC7481@vader.DHCP.thefacebook.com>
+References: <1491562257-82574-1-git-send-email-hare@suse.de>
+ <1491562257-82574-3-git-send-email-hare@suse.de>
+ <20170407145924.GA29654@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170407145924.GA29654@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-We only call blk_queue_bounce for request-based drivers, so stop messing
-with it for make_request based drivers.
+On Fri, Apr 07, 2017 at 10:59:29PM +0800, Ming Lei wrote:
+> On Fri, Apr 07, 2017 at 12:50:57PM +0200, Hannes Reinecke wrote:
+> > When generating bootable VM images certain systems (most notably
+> > s390x) require devices with 4k blocksize. This patch implements
+> > a new flag 'LO_FLAGS_BLOCKSIZE' which will set the physical
+> > blocksize to that of the underlying device, and allow to change
+> > the logical blocksize for up to the physical blocksize.
+> > 
+> > Signed-off-by: Hannes Reinecke <hare@suse.com>
+[snip]
+> Looks V7 still doesn't recover logical/physical block size for
+> new attached file?
+> 
+> Thanks,
+> Ming
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c               | 5 +++++
- block/blk-mq.c                 | 5 +++++
- block/blk-settings.c           | 5 -----
- drivers/block/brd.c            | 1 -
- drivers/block/drbd/drbd_main.c | 1 -
- drivers/block/rsxx/dev.c       | 1 -
- drivers/nvdimm/blk.c           | 1 -
- drivers/nvdimm/btt.c           | 1 -
- drivers/nvdimm/pmem.c          | 1 -
- 9 files changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 62cf92550512..07b26853ce1e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -954,6 +954,11 @@ int blk_init_allocated_queue(struct request_queue *q)
- 	 */
- 	blk_queue_make_request(q, blk_queue_bio);
- 
-+	/*
-+	 * by default assume old behaviour and bounce for any highmem page
-+	 */
-+	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
-+
- 	q->sg_reserved_size = INT_MAX;
- 
- 	/* Protect q->elevator from elevator_change */
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index dd276a9e138e..e26b7435e245 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2300,6 +2300,11 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	blk_queue_make_request(q, blk_mq_make_request);
- 
- 	/*
-+	 * by default assume old behaviour and bounce for any highmem page
-+	 */
-+	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
-+
-+	/*
- 	 * Do this after blk_queue_make_request() overrides it...
- 	 */
- 	q->nr_requests = set->queue_depth;
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 4fa81ed383ca..be1f115b538b 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -172,11 +172,6 @@ void blk_queue_make_request(struct request_queue *q, make_request_fn *mfn)
- 	q->nr_batching = BLK_BATCH_REQ;
- 
- 	blk_set_default_limits(&q->limits);
--
--	/*
--	 * by default assume old behaviour and bounce for any highmem page
--	 */
--	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
- }
- EXPORT_SYMBOL(blk_queue_make_request);
- 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 57b574f2f66a..6112e99bedf7 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -418,7 +418,6 @@ static struct brd_device *brd_alloc(int i)
- 
- 	blk_queue_make_request(brd->brd_queue, brd_make_request);
- 	blk_queue_max_hw_sectors(brd->brd_queue, 1024);
--	blk_queue_bounce_limit(brd->brd_queue, BLK_BOUNCE_ANY);
- 
- 	/* This is so fdisk will align partitions on 4k, because of
- 	 * direct_access API needing 4k alignment, returning a PFN
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 90680034ef57..5fb99e06ebe4 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -2850,7 +2850,6 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
- 	/* Setting the max_hw_sectors to an odd value of 8kibyte here
- 	   This triggers a max_bio_size message upon first attach or connect */
- 	blk_queue_max_hw_sectors(q, DRBD_MAX_BIO_SIZE_SAFE >> 8);
--	blk_queue_bounce_limit(q, BLK_BOUNCE_ANY);
- 	q->queue_lock = &resource->req_lock;
- 
- 	device->md_io.page = alloc_page(GFP_KERNEL);
-diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
-index 4e8bdfa0aa31..7f4acebf4657 100644
---- a/drivers/block/rsxx/dev.c
-+++ b/drivers/block/rsxx/dev.c
-@@ -284,7 +284,6 @@ int rsxx_setup_dev(struct rsxx_cardinfo *card)
- 	}
- 
- 	blk_queue_make_request(card->queue, rsxx_make_request);
--	blk_queue_bounce_limit(card->queue, BLK_BOUNCE_ANY);
- 	blk_queue_max_hw_sectors(card->queue, blkdev_max_hw_sectors);
- 	blk_queue_physical_block_size(card->queue, RSXX_HW_BLK_SIZE);
- 
-diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
-index 79eb9fb358d5..f12d23c49771 100644
---- a/drivers/nvdimm/blk.c
-+++ b/drivers/nvdimm/blk.c
-@@ -273,7 +273,6 @@ static int nsblk_attach_disk(struct nd_namespace_blk *nsblk)
- 
- 	blk_queue_make_request(q, nd_blk_make_request);
- 	blk_queue_max_hw_sectors(q, UINT_MAX);
--	blk_queue_bounce_limit(q, BLK_BOUNCE_ANY);
- 	blk_queue_logical_block_size(q, nsblk_sector_size(nsblk));
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
- 	q->queuedata = nsblk;
-diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-index 31b2d14e210d..b6ba0618ea46 100644
---- a/drivers/nvdimm/btt.c
-+++ b/drivers/nvdimm/btt.c
-@@ -1297,7 +1297,6 @@ static int btt_blk_init(struct btt *btt)
- 	blk_queue_make_request(btt->btt_queue, btt_make_request);
- 	blk_queue_logical_block_size(btt->btt_queue, btt->sector_size);
- 	blk_queue_max_hw_sectors(btt->btt_queue, UINT_MAX);
--	blk_queue_bounce_limit(btt->btt_queue, BLK_BOUNCE_ANY);
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, btt->btt_queue);
- 	btt->btt_queue->queuedata = btt;
- 
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 7bd383aeea14..6b577afb1d44 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -343,7 +343,6 @@ static int pmem_attach_disk(struct device *dev,
- 	blk_queue_make_request(q, pmem_make_request);
- 	blk_queue_physical_block_size(q, PAGE_SIZE);
- 	blk_queue_max_hw_sectors(q, UINT_MAX);
--	blk_queue_bounce_limit(q, BLK_BOUNCE_ANY);
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DAX, q);
- 	q->queuedata = pmem;
--- 
-2.11.0
+Hannes, ping? I'd still like this patch.
