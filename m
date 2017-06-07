@@ -1,38 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36920 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751414AbdFGHDv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Jun 2017 03:03:51 -0400
-Subject: Re: [PATCH blktests v2 0/3] Add SCSI generic test group
-To: Omar Sandoval <osandov@osandov.com>
+Received: from mail-pf0-f172.google.com ([209.85.192.172]:36079 "EHLO
+        mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751190AbdFGGoK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2017 02:44:10 -0400
+Received: by mail-pf0-f172.google.com with SMTP id x63so2189186pff.3
+        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2017 23:44:10 -0700 (PDT)
+Date: Tue, 6 Jun 2017 23:44:08 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
 Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH blktests v2 0/3] Add SCSI generic test group
+Message-ID: <20170607064408.GA9840@vader>
 References: <cover.1495201975.git.jthumshirn@suse.de>
- <20170607064408.GA9840@vader>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Message-ID: <17146abe-6286-fdcd-1cdb-d004754f73f2@suse.de>
-Date: Wed, 7 Jun 2017 09:03:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170607064408.GA9840@vader>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <cover.1495201975.git.jthumshirn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 06/07/2017 08:44 AM, Omar Sandoval wrote:
-> Sorry for the delay, I was chasing down a few Btrfs bugs for the last
-> couple of weeks. I applied these with some small changes. I stuck with
-> running syzkaller on the scsi-debug device like you had here, we can
-> revisit that for future tests if it makes sense to run them on a real
-> device. Thanks!
+On Fri, May 19, 2017 at 03:55:28PM +0200, Johannes Thumshirn wrote:
+> Add a test group for the SCSI generic driver and one syzcaller
+> reproducer for this group.
+> 
+> The reprodcuer is distributed as a C program, so the makefile is
+> amended to build C files to be used in the test.
+> 
+> Changes to v1:
+> * Stripped left over TODO comment
+> * Modified reproducer to accept a device name
+> * Fixed Makefile so it can build more than one target
+> 
+> Johannes Thumshirn (3):
+>   Add ability to build test-cases
+>   tests/sg: add SCSI generic test grouop
+>   sg/001: add regression test for syzcaller generated GPF in sg_read
+>     path
 
-Yes I wanted to go to it tomorrow and send you a v3, I got stuck in NVMe
-;-). Thanks for applying it anyways, I'll send a follow up.
+Hey, Johannes,
 
-	Johannes
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Sorry for the delay, I was chasing down a few Btrfs bugs for the last
+couple of weeks. I applied these with some small changes. I stuck with
+running syzkaller on the scsi-debug device like you had here, we can
+revisit that for future tests if it makes sense to run them on a real
+device. Thanks!
