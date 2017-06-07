@@ -1,82 +1,42 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
-Date: Tue,  6 Jun 2017 06:19:30 -0500
-Message-Id: <20170606111939.27272-2-rgoldwyn@suse.de>
-In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
-References: <20170606111939.27272-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:37656 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751474AbdFGCuu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Jun 2017 22:50:50 -0400
+Date: Wed, 7 Jun 2017 10:50:29 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH v5 02/12] blk-mq: fix direct issue
+Message-ID: <20170607025028.GA5582@ming.t460p>
+References: <20170606152210.22806-1-ming.lei@redhat.com>
+ <20170606152210.22806-3-ming.lei@redhat.com>
+ <1496764970.2692.7.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1496764970.2692.7.camel@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Tue, Jun 06, 2017 at 04:02:52PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-06-06 at 23:22 +0800, Ming Lei wrote:
+> > If queue is stopped, we shouldn't dispatch request into driver and
+> > hardware, unfortunately the check is removed in bd166ef183c2(blk-mq-sched:
+> > add framework for MQ capable IO schedulers).
+> > 
+> > This patch fixes the issue by moving the check back into
+> > __blk_mq_try_issue_directly().
+> > 
+> > This patch fixes request use-after-free[1][2] during canceling requets
+> > of NVMe in nvme_dev_disable(), which can be triggered easily during
+> > NVMe reset & remove test.
+> 
+> Although I'm not convinced that this patch fixes [2], the patch itself looks
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/read_write.c    | 12 +++---------
- include/linux/fs.h | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 9 deletions(-)
+The .q_usage_counter will be leaked once request is double free.
 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 47c1d4484df9..53c816c61122 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 	struct kiocb kiocb;
- 	ssize_t ret;
- 
--	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
--		return -EOPNOTSUPP;
--
- 	init_sync_kiocb(&kiocb, filp);
--	if (flags & RWF_HIPRI)
--		kiocb.ki_flags |= IOCB_HIPRI;
--	if (flags & RWF_DSYNC)
--		kiocb.ki_flags |= IOCB_DSYNC;
--	if (flags & RWF_SYNC)
--		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	ret = kiocb_set_rw_flags(&kiocb, flags);
-+	if (ret)
-+		return ret;
- 	kiocb.ki_pos = *ppos;
- 
- 	if (type == READ)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 803e5a9b2654..f53867140f43 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3056,6 +3056,20 @@ static inline int iocb_flags(struct file *file)
- 	return res;
- }
- 
-+static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
-+{
-+	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
-+		return -EOPNOTSUPP;
-+
-+	if (flags & RWF_HIPRI)
-+		ki->ki_flags |= IOCB_HIPRI;
-+	if (flags & RWF_DSYNC)
-+		ki->ki_flags |= IOCB_DSYNC;
-+	if (flags & RWF_SYNC)
-+		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	return 0;
-+}
-+
- static inline ino_t parent_ino(struct dentry *dentry)
- {
- 	ino_t res;
--- 
-2.12.0
+Thanks,
+Ming
