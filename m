@@ -1,207 +1,153 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:43492 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751218AbdFDMmp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jun 2017 08:42:45 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Tejun Heo <tj@kernel.org>
-Cc: Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 5/6] libata: implement SECURITY PROTOCOL IN/OUT
-Date: Sun,  4 Jun 2017 14:42:24 +0200
-Message-Id: <20170604124225.27032-6-hch@lst.de>
-In-Reply-To: <20170604124225.27032-1-hch@lst.de>
-References: <20170604124225.27032-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
+ Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 02/12] block: Make request operation type argument declarations consistent
+Date: Thu, 8 Jun 2017 10:33:45 -0700
+Message-ID: <20170608173355.25898-3-bart.vanassche@sandisk.com>
+In-Reply-To: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-This allows us to use the generic OPAL code with ATA devices.
+Instead of declaring the second argument of blk_*_get_request()
+as int and passing it to functions that expect an unsigned int,
+declare that second argument as unsigned int. Also because of
+consistency, rename that second argument from 'rw' into 'op'.
+This patch does not change any functionality.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/ata/libata-core.c | 32 ++++++++++++++++++++
- drivers/ata/libata-scsi.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/ata.h       |  1 +
- include/linux/libata.h    |  1 +
- 4 files changed, 110 insertions(+)
+ block/blk-core.c       | 13 +++++++------
+ block/blk-mq.c         | 10 +++++-----
+ include/linux/blk-mq.h |  6 +++---
+ include/linux/blkdev.h |  3 ++-
+ 4 files changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index f57131115594..6eb08595a1b5 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -2405,6 +2405,37 @@ static void ata_dev_config_zac(struct ata_device *dev)
- 	}
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a7421b772d0e..3bc431a77309 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1283,8 +1283,8 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+ 	goto retry;
  }
  
-+static void ata_dev_config_trusted(struct ata_device *dev)
-+{
-+	struct ata_port *ap = dev->link->ap;
-+	u64 trusted_cap;
-+	unsigned int err;
-+
-+	if (!ata_identify_page_supported(dev, ATA_LOG_SECURITY)) {
-+		ata_dev_warn(dev,
-+			     "Security Log not supported\n");
-+		return;
-+	}
-+
-+	err = ata_read_log_page(dev, ATA_LOG_IDENTIFY_DEVICE, ATA_LOG_SECURITY,
-+			ap->sector_buf, 1);
-+	if (err) {
-+		ata_dev_dbg(dev,
-+			    "failed to read Security Log, Emask 0x%x\n", err);
-+		return;
-+	}
-+
-+	trusted_cap = get_unaligned_le64(&ap->sector_buf[40]);
-+	if (!(trusted_cap & (1ULL << 63))) {
-+		ata_dev_dbg(dev,
-+			    "Trusted Computing capability qword not valid!\n");
-+		return;
-+	}
-+
-+	if (trusted_cap & (1 << 0))
-+		dev->flags |= ATA_DFLAG_TRUSTED;
-+}
-+
- /**
-  *	ata_dev_configure - Configure the specified ATA/ATAPI device
-  *	@dev: Target device to configure
-@@ -2629,6 +2660,7 @@ int ata_dev_configure(struct ata_device *dev)
- 		}
- 		ata_dev_config_sense_reporting(dev);
- 		ata_dev_config_zac(dev);
-+		ata_dev_config_trusted(dev);
- 		dev->cdb_len = 16;
- 	}
+-static struct request *blk_old_get_request(struct request_queue *q, int rw,
+-		gfp_t gfp_mask)
++static struct request *blk_old_get_request(struct request_queue *q,
++					   unsigned int op, gfp_t gfp_mask)
+ {
+ 	struct request *rq;
  
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index 49ba9834c715..3d28f2bd79af 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -3563,6 +3563,11 @@ static unsigned int ata_scsiop_maint_in(struct ata_scsi_args *args, u8 *rbuf)
- 		    dev->class == ATA_DEV_ZAC)
- 			supported = 3;
- 		break;
-+	case SECURITY_PROTOCOL_IN:
-+	case SECURITY_PROTOCOL_OUT:
-+		if (dev->flags & ATA_DFLAG_TRUSTED)
-+			supported = 3;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -4067,6 +4072,71 @@ static unsigned int ata_scsi_mode_select_xlat(struct ata_queued_cmd *qc)
- 	return 1;
+@@ -1292,7 +1292,7 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
+ 	create_io_context(gfp_mask, q->node);
+ 
+ 	spin_lock_irq(q->queue_lock);
+-	rq = get_request(q, rw, NULL, gfp_mask);
++	rq = get_request(q, op, NULL, gfp_mask);
+ 	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
+ 		return rq;
+@@ -1305,14 +1305,15 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
+ 	return rq;
  }
  
-+static u8 ata_scsi_trusted_op(u32 len, bool send, bool dma)
-+{
-+	if (len == 0)
-+		return ATA_CMD_TRUSTED_NONDATA;
-+	else if (send)
-+		return dma ? ATA_CMD_TRUSTED_SND_DMA : ATA_CMD_TRUSTED_SND;
-+	else
-+		return dma ? ATA_CMD_TRUSTED_RCV_DMA : ATA_CMD_TRUSTED_RCV;
-+}
-+
-+static unsigned int ata_scsi_security_inout_xlat(struct ata_queued_cmd *qc)
-+{
-+	struct scsi_cmnd *scmd = qc->scsicmd;
-+	const u8 *cdb = scmd->cmnd;
-+	struct ata_taskfile *tf = &qc->tf;
-+	u8 secp = cdb[1];
-+	bool send = (cdb[0] == SECURITY_PROTOCOL_OUT);
-+	u16 spsp = get_unaligned_be16(&cdb[2]);
-+	u32 len = get_unaligned_be32(&cdb[6]);
-+	bool dma = !(qc->dev->flags & ATA_DFLAG_PIO);
-+
-+	/*
-+	 * We don't support the ATA "security" protocol.
-+	 */
-+	if (secp == 0xef) {
-+		ata_scsi_set_invalid_field(qc->dev, scmd, 1, 0);
-+		return 1;
-+	}
-+
-+	if (cdb[4] & 7) { /* INC_512 */
-+		if (len > 0xffff) {
-+			ata_scsi_set_invalid_field(qc->dev, scmd, 6, 0);
-+			return 1;
-+		}
-+	} else {
-+		if (len > 0x01fffe00) {
-+			ata_scsi_set_invalid_field(qc->dev, scmd, 6, 0);
-+			return 1;
-+		}
-+
-+		/* convert to the sector-based ATA addressing */
-+		len = (len + 511) / 512;
-+	}
-+
-+	tf->protocol = dma ? ATA_PROT_DMA : ATA_PROT_PIO;
-+	tf->flags |= ATA_TFLAG_DEVICE | ATA_TFLAG_ISADDR | ATA_TFLAG_LBA;
-+	if (send)
-+		tf->flags |= ATA_TFLAG_WRITE;
-+	tf->command = ata_scsi_trusted_op(len, send, dma);
-+	tf->feature = secp;
-+	tf->lbam = spsp & 0xff;
-+	tf->lbah = spsp >> 8;
-+
-+	if (len) {
-+		tf->nsect = len & 0xff;
-+		tf->lbal = len >> 8;
-+	} else {
-+		if (!send)
-+			tf->lbah = (1 << 7);
-+	}
-+
-+	ata_qc_set_pc_nbytes(qc);
-+	return 0;
-+}
-+
- /**
-  *	ata_get_xlat_func - check if SCSI to ATA translation is possible
-  *	@dev: ATA device
-@@ -4118,6 +4188,12 @@ static inline ata_xlat_func_t ata_get_xlat_func(struct ata_device *dev, u8 cmd)
- 	case ZBC_OUT:
- 		return ata_scsi_zbc_out_xlat;
+-struct request *blk_get_request(struct request_queue *q, int rw, gfp_t gfp_mask)
++struct request *blk_get_request(struct request_queue *q, unsigned int op,
++				gfp_t gfp_mask)
+ {
+ 	if (q->mq_ops)
+-		return blk_mq_alloc_request(q, rw,
++		return blk_mq_alloc_request(q, op,
+ 			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
+ 				0 : BLK_MQ_REQ_NOWAIT);
+ 	else
+-		return blk_old_get_request(q, rw, gfp_mask);
++		return blk_old_get_request(q, op, gfp_mask);
+ }
+ EXPORT_SYMBOL(blk_get_request);
  
-+	case SECURITY_PROTOCOL_IN:
-+	case SECURITY_PROTOCOL_OUT:
-+		if (!(dev->flags & ATA_DFLAG_TRUSTED))
-+			break;
-+		return ata_scsi_security_inout_xlat;
-+
- 	case START_STOP:
- 		return ata_scsi_start_stop_xlat;
- 	}
-diff --git a/include/linux/ata.h b/include/linux/ata.h
-index 44de34c954d8..5781bf310560 100644
---- a/include/linux/ata.h
-+++ b/include/linux/ata.h
-@@ -341,6 +341,7 @@ enum {
- 	ATA_LOG_IDENTIFY_DEVICE	= 0x30,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ef64a3ea4e83..8cd5261ca1ab 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -278,7 +278,7 @@ struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
+ }
+ EXPORT_SYMBOL_GPL(__blk_mq_alloc_request);
  
- 	/* Identify device log pages: */
-+	ATA_LOG_SECURITY	  = 0x06,
- 	ATA_LOG_SATA_SETTINGS	  = 0x08,
- 	ATA_LOG_ZONED_INFORMATION = 0x09,
+-struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
++struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 		unsigned int flags)
+ {
+ 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
+@@ -289,7 +289,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ 	if (ret)
+ 		return ERR_PTR(ret);
  
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index c9a69fc8821e..65711cb3a740 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -156,6 +156,7 @@ enum {
- 	ATA_DFLAG_ACPI_PENDING	= (1 << 5), /* ACPI resume action pending */
- 	ATA_DFLAG_ACPI_FAILED	= (1 << 6), /* ACPI on devcfg has failed */
- 	ATA_DFLAG_AN		= (1 << 7), /* AN configured */
-+	ATA_DFLAG_TRUSTED	= (1 << 8), /* device supports trusted send/recv */
- 	ATA_DFLAG_DMADIR	= (1 << 10), /* device requires DMADIR */
- 	ATA_DFLAG_CFG_MASK	= (1 << 12) - 1,
+-	rq = blk_mq_sched_get_request(q, NULL, rw, &alloc_data);
++	rq = blk_mq_sched_get_request(q, NULL, op, &alloc_data);
  
+ 	blk_mq_put_ctx(alloc_data.ctx);
+ 	blk_queue_exit(q);
+@@ -304,8 +304,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ }
+ EXPORT_SYMBOL(blk_mq_alloc_request);
+ 
+-struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
+-		unsigned int flags, unsigned int hctx_idx)
++struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
++		unsigned int op, unsigned int flags, unsigned int hctx_idx)
+ {
+ 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
+ 	struct request *rq;
+@@ -340,7 +340,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
+ 	cpu = cpumask_first(alloc_data.hctx->cpumask);
+ 	alloc_data.ctx = __blk_mq_get_ctx(q, cpu);
+ 
+-	rq = blk_mq_sched_get_request(q, NULL, rw, &alloc_data);
++	rq = blk_mq_sched_get_request(q, NULL, op, &alloc_data);
+ 
+ 	blk_queue_exit(q);
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index c534ec64e214..a4759fd34e7e 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -205,10 +205,10 @@ enum {
+ 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
+ };
+ 
+-struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
++struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 		unsigned int flags);
+-struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int op,
+-		unsigned int flags, unsigned int hctx_idx);
++struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
++		unsigned int op, unsigned int flags, unsigned int hctx_idx);
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
+ 
+ enum {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 019f18c65098..6c4235018b49 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -932,7 +932,8 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
+ extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
+ extern void blk_put_request(struct request *);
+ extern void __blk_put_request(struct request_queue *, struct request *);
+-extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
++extern struct request *blk_get_request(struct request_queue *, unsigned int op,
++				       gfp_t gfp_mask);
+ extern void blk_requeue_request(struct request_queue *, struct request *);
+ extern int blk_lld_busy(struct request_queue *q);
+ extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
 -- 
-2.11.0
+2.12.2
