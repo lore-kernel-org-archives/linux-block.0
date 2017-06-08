@@ -1,98 +1,121 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 10/10] btrfs: nowait aio support
-Date: Mon,  5 Jun 2017 00:35:40 -0500
-Message-Id: <20170605053540.19393-11-rgoldwyn@suse.de>
-In-Reply-To: <20170605053540.19393-1-rgoldwyn@suse.de>
-References: <20170605053540.19393-1-rgoldwyn@suse.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>
+Subject: [PATCH v3 05/12] block: Change argument type of scsi_req_init()
+Date: Thu, 8 Jun 2017 10:33:48 -0700
+Message-ID: <20170608173355.25898-6-bart.vanassche@sandisk.com>
+In-Reply-To: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Since scsi_req_init() works on a struct scsi_request, change the
+argument type into struct scsi_request *.
 
-Return EAGAIN if any of the following checks fail
- + i_rwsem is not lockable
- + NODATACOW or PREALLOC is not set
- + Cannot nocow at the desired location
- + Writing beyond end of file which is not allocated
-
-Acked-by: David Sterba <dsterba@suse.com>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
- fs/btrfs/inode.c |  3 +++
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ block/scsi_ioctl.c                | 10 +++++++---
+ drivers/ide/ide-atapi.c           |  2 +-
+ drivers/ide/ide-probe.c           |  2 +-
+ drivers/scsi/scsi_lib.c           |  4 +++-
+ drivers/scsi/scsi_transport_sas.c |  2 +-
+ include/scsi/scsi_request.h       |  2 +-
+ 6 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index da1096eb1a40..aae088e49915 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1875,12 +1875,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	ssize_t num_written = 0;
- 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
- 	ssize_t err;
--	loff_t pos;
--	size_t count;
-+	loff_t pos = iocb->ki_pos;
-+	size_t count = iov_iter_count(from);
- 	loff_t oldsize;
- 	int clean_page = 0;
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index f96c51f5df40..7440de44dd85 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -741,10 +741,14 @@ int scsi_cmd_blk_ioctl(struct block_device *bd, fmode_t mode,
+ }
+ EXPORT_SYMBOL(scsi_cmd_blk_ioctl);
  
--	inode_lock(inode);
-+	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-+			(iocb->ki_flags & IOCB_DIRECT)) {
-+		/* Don't sleep on inode rwsem */
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+		/*
-+		 * We will allocate space in case nodatacow is not set,
-+		 * so bail
-+		 */
-+		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
-+					      BTRFS_INODE_PREALLOC)) ||
-+		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
-+			inode_unlock(inode);
-+			return -EAGAIN;
-+		}
-+	} else
-+		inode_lock(inode);
+-void scsi_req_init(struct request *rq)
++/**
++ * scsi_req_init - initialize certain fields of a scsi_request structure
++ * @req: Pointer to a scsi_request structure.
++ * Initializes .__cmd[], .cmd, .cmd_len and .sense_len but no other members
++ * of struct scsi_request.
++ */
++void scsi_req_init(struct scsi_request *req)
+ {
+-	struct scsi_request *req = scsi_req(rq);
+-
+ 	memset(req->__cmd, 0, sizeof(req->__cmd));
+ 	req->cmd = req->__cmd;
+ 	req->cmd_len = BLK_MAX_CDB;
+diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
+index 98e78b520417..5ffecef8b910 100644
+--- a/drivers/ide/ide-atapi.c
++++ b/drivers/ide/ide-atapi.c
+@@ -199,7 +199,7 @@ void ide_prep_sense(ide_drive_t *drive, struct request *rq)
+ 	memset(sense, 0, sizeof(*sense));
+ 
+ 	blk_rq_init(rq->q, sense_rq);
+-	scsi_req_init(sense_rq);
++	scsi_req_init(req);
+ 
+ 	err = blk_rq_map_kern(drive->queue, sense_rq, sense, sense_len,
+ 			      GFP_NOIO);
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index c60e5ffc9231..01b2adfd8226 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -745,7 +745,7 @@ static void ide_initialize_rq(struct request *rq)
+ {
+ 	struct ide_request *req = blk_mq_rq_to_pdu(rq);
+ 
+-	scsi_req_init(rq);
++	scsi_req_init(&req->sreq);
+ 	req->sreq.sense = req->sense;
+ }
+ 
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 378cf44a97fc..c5a43a7c960d 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1136,7 +1136,9 @@ EXPORT_SYMBOL(scsi_init_io);
+ /* Called from inside blk_get_request() */
+ static void scsi_initialize_rq(struct request *rq)
+ {
+-	scsi_req_init(rq);
++	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
 +
- 	err = generic_write_checks(iocb, from);
- 	if (err <= 0) {
- 		inode_unlock(inode);
-@@ -1914,8 +1931,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	 */
- 	update_time_for_write(inode);
++	scsi_req_init(&cmd->req);
+ }
  
--	pos = iocb->ki_pos;
--	count = iov_iter_count(from);
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
- 	if (start_pos > oldsize) {
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 17cbe9306faf..2ab71b946829 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8755,6 +8755,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			dio_data.overwrite = 1;
- 			inode_unlock(inode);
- 			relock = true;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
- 		}
- 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
- 		if (ret)
+ /* Called after a request has been started. */
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index f5449da6fcad..35598905d785 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -215,7 +215,7 @@ static void sas_host_release(struct device *dev)
+ 
+ static void sas_initialize_rq(struct request *rq)
+ {
+-	scsi_req_init(rq);
++	scsi_req_init(scsi_req(rq));
+ }
+ 
+ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
+index f0c76f9dc285..e0afa445ee4e 100644
+--- a/include/scsi/scsi_request.h
++++ b/include/scsi/scsi_request.h
+@@ -27,6 +27,6 @@ static inline void scsi_req_free_cmd(struct scsi_request *req)
+ 		kfree(req->cmd);
+ }
+ 
+-void scsi_req_init(struct request *);
++void scsi_req_init(struct scsi_request *req);
+ 
+ #endif /* _SCSI_SCSI_REQUEST_H */
 -- 
-2.12.0
+2.12.2
