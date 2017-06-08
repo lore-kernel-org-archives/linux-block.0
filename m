@@ -1,70 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44874 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751059AbdFREjw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:39:52 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:57 +1000
-Subject: [PATCH 04/13] blk: use non-rescuing bioset for q->bio_split.
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073762.23258.10105627316695148099.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
+ Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 12/12] blk-mq: Warn when attempting to run a hardware queue that is not mapped
+Date: Thu, 8 Jun 2017 10:33:55 -0700
+Message-ID: <20170608173355.25898-13-bart.vanassche@sandisk.com>
+In-Reply-To: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-A rescuing bioset is only useful if there might be bios from
-that same bioset on the bio_list_on_stack queue at a time
-when bio_alloc_bioset() is called.  This never applies to
-q->bio_split.
+A queue must be frozen while the mapped state of a hardware queue
+is changed. Additionally, any change of the mapped state is
+followed by a call to blk_mq_map_swqueue() (see also
+blk_mq_init_allocated_queue() and blk_mq_update_nr_hw_queues()).
+Since blk_mq_map_swqueue() does not map any unmapped hardware
+queue onto any software queue, no attempt will be made to run
+an unmapped hardware queue. Hence issue a warning upon attempts
+to run an unmapped hardware queue.
 
-Allocations from q->bio_split are only ever made from
-blk_queue_split() which is only ever called early in each of
-various make_request_fn()s.  The original bio (call this A)
-is then passed to generic_make_request() and is placed on
-the bio_list_on_stack queue, and the bio that was allocated
-from q->bio_split (B) is processed.
-
-The processing of this may cause other bios to be passed to
-generic_make_request() or may even cause the bio B itself to
-be passed, possible after some prefix has been split off
-(using some other bioset).
-
-generic_make_request() now guarantees that all of these bios
-(B and dependants) will be fully processed before the tail
-of the original bio A gets handled.  None of these early bios
-can possible trigger an allocation from the original
-q->bio_split as they are either too small to require
-splitting or (more likely) are destined for a different queue.
-
-The next time that the original q->bio_split might be used
-by this thread is when A is processed again, as it might
-still be too big to handle directly.  By this time there
-cannot be any other bios allocated from q->bio_split in the
-generic_make_request() queue.  So no rescuing will ever be
-needed.
-
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: NeilBrown <neilb@suse.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/blk-mq.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9bd10c46a538..62cf92550512 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -790,8 +790,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	if (q->id < 0)
- 		goto fail_q;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0f8c011eff97..689026d3c4bd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1091,8 +1091,9 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
+-	if (unlikely(blk_mq_hctx_stopped(hctx) ||
+-		     !blk_mq_hw_queue_mapped(hctx)))
++	WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx));
++
++	if (unlikely(blk_mq_hctx_stopped(hctx)))
+ 		return;
  
--	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, (BIOSET_NEED_BVECS |
--							BIOSET_NEED_RESCUER));
-+	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
- 	if (!q->bio_split)
- 		goto fail_id;
+ 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
+@@ -1252,7 +1253,7 @@ static void blk_mq_run_work_fn(struct work_struct *work)
  
+ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+ {
+-	if (unlikely(!blk_mq_hw_queue_mapped(hctx)))
++	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
+ 		return;
+ 
+ 	/*
+-- 
+2.12.2
