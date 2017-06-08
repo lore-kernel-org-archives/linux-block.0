@@ -1,131 +1,83 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	akpm@linux-foundation.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 09/10] xfs: nowait aio support
-Date: Thu, 15 Jun 2017 11:00:01 -0500
-Message-Id: <20170615160002.17233-10-rgoldwyn@suse.de>
-In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
-References: <20170615160002.17233-1-rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX] block, bfq: access and cache blkg data only when
+ safe
+To: Paolo Valente <paolo.valente@linaro.org>, Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org, Linux-Kernal <linux-kernel@vger.kernel.org>,
+ ulf.hansson@linaro.org, broonie@kernel.org
+References: <20170605081115.3402-1-paolo.valente@linaro.org>
+ <20847C23-6D7A-4D24-ADBF-51849612FEDA@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <cd8f0234-f33f-d13b-34eb-f574f546d8ae@kernel.dk>
+Date: Thu, 8 Jun 2017 09:52:14 -0600
+MIME-Version: 1.0
+In-Reply-To: <20847C23-6D7A-4D24-ADBF-51849612FEDA@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On 06/08/2017 09:30 AM, Paolo Valente wrote:
+> 
+>> Il giorno 05 giu 2017, alle ore 10:11, Paolo Valente <paolo.valente@linaro.org> ha scritto:
+>>
+>> In blk-cgroup, operations on blkg objects are protected with the
+>> request_queue lock. This is no more the lock that protects
+>> I/O-scheduler operations in blk-mq. In fact, the latter are now
+>> protected with a finer-grained per-scheduler-instance lock. As a
+>> consequence, although blkg lookups are also rcu-protected, blk-mq I/O
+>> schedulers may see inconsistent data when they access blkg and
+>> blkg-related objects. BFQ does access these objects, and does incur
+>> this problem, in the following case.
+>>
+>> The blkg_lookup performed in bfq_get_queue, being protected (only)
+>> through rcu, may happen to return the address of a copy of the
+>> original blkg. If this is the case, then the blkg_get performed in
+>> bfq_get_queue, to pin down the blkg, is useless: it does not prevent
+>> blk-cgroup code from destroying both the original blkg and all objects
+>> directly or indirectly referred by the copy of the blkg. BFQ accesses
+>> these objects, which typically causes a crash for NULL-pointer
+>> dereference of memory-protection violation.
+>>
+>> Some additional protection mechanism should be added to blk-cgroup to
+>> address this issue. In the meantime, this commit provides a quick
+>> temporary fix for BFQ: cache (when safe) blkg data that might
+>> disappear right after a blkg_lookup.
+>>
+>> In particular, this commit exploits the following facts to achieve its
+>> goal without introducing further locks.  Destroy operations on a blkg
+>> invoke, as a first step, hooks of the scheduler associated with the
+>> blkg. And these hooks are executed with bfqd->lock held for BFQ. As a
+>> consequence, for any blkg associated with the request queue an
+>> instance of BFQ is attached to, we are guaranteed that such a blkg is
+>> not destroyed, and that all the pointers it contains are consistent,
+>> while that instance is holding its bfqd->lock. A blkg_lookup performed
+>> with bfqd->lock held then returns a fully consistent blkg, which
+>> remains consistent until this lock is held. In more detail, this holds
+>> even if the returned blkg is a copy of the original one.
+>>
+>> Finally, also the object describing a group inside BFQ needs to be
+>> protected from destruction on the blkg_free of the original blkg
+>> (which invokes bfq_pd_free). This commit adds private refcounting for
+>> this object, to let it disappear only after no bfq_queue refers to it
+>> any longer.
+>>
+>> This commit also removes or updates some stale comments on locking
+>> issues related to blk-cgroup operations.
+>>
+>> Reported-by: Tomas Konir <tomas.konir@gmail.com>
+>> Reported-by: Lee Tibbert <lee.tibbert@gmail.com>
+>> Reported-by: Marco Piazza <mpiazza@gmail.com>
+>> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+>> Tested-by: Tomas Konir <tomas.konir@gmail.com>
+>> Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+>> Tested-by: Marco Piazza <mpiazza@gmail.com>
+> 
+> Hi Jens,
+> are you waiting for some further review/ack on this, or is it just in
+> your queue of patches to check?  Sorry for bothering you, but this bug
+> is causing problems to users.
 
-If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
-immediately.
+I'll pull it in, it'll make the next -rc. I'll often let patches sit
+for a few days even if I agree with them, to give others a chance to
+either further review, comment, or disagree with them.
 
-IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
-if it needs allocation either due to file extension, writing to a hole,
-or COW or waiting for other DIOs to finish.
-
-Return -EAGAIN if we don't have extent list in memory.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
----
- fs/xfs/xfs_file.c  | 20 +++++++++++++++-----
- fs/xfs/xfs_iomap.c | 22 ++++++++++++++++++++++
- 2 files changed, 37 insertions(+), 5 deletions(-)
-
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 5fb5a0958a14..e159eb381d9f 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
- 
--	xfs_ilock(ip, iolock);
--
-+	if (!xfs_ilock_nowait(ip, iolock)) {
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		xfs_ilock(ip, iolock);
-+	}
- 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
- 	if (ret)
- 		goto out;
-@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
- 	 * otherwise demote the lock if we had to take the exclusive lock
- 	 * for other reasons in xfs_file_aio_write_checks.
- 	 */
--	if (unaligned_io)
--		inode_dio_wait(inode);
--	else if (iolock == XFS_IOLOCK_EXCL) {
-+	if (unaligned_io) {
-+		/* If we are going to wait for other DIO to finish, bail */
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (atomic_read(&inode->i_dio_count))
-+				return -EAGAIN;
-+		} else {
-+			inode_dio_wait(inode);
-+		}
-+	} else if (iolock == XFS_IOLOCK_EXCL) {
- 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
-@@ -892,6 +901,7 @@ xfs_file_open(
- 		return -EFBIG;
- 	if (XFS_FORCED_SHUTDOWN(XFS_M(inode->i_sb)))
- 		return -EIO;
-+	file->f_mode |= FMODE_AIO_NOWAIT;
- 	return 0;
- }
- 
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 94e5bdf7304c..05dc87e8c1f5 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -995,6 +995,11 @@ xfs_file_iomap_begin(
- 		lockmode = xfs_ilock_data_map_shared(ip);
- 	}
- 
-+	if ((flags & IOMAP_NOWAIT) && !(ip->i_df.if_flags & XFS_IFEXTENTS)) {
-+		error = -EAGAIN;
-+		goto out_unlock;
-+	}
-+
- 	ASSERT(offset <= mp->m_super->s_maxbytes);
- 	if ((xfs_fsize_t)offset + length > mp->m_super->s_maxbytes)
- 		length = mp->m_super->s_maxbytes - offset;
-@@ -1016,6 +1021,15 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
- 		if (flags & IOMAP_DIRECT) {
-+			/*
-+			 * A reflinked inode will result in CoW alloc.
-+			 * FIXME: It could still overwrite on unshared extents
-+			 * and not need allocation.
-+			 */
-+			if (flags & IOMAP_NOWAIT) {
-+				error = -EAGAIN;
-+				goto out_unlock;
-+			}
- 			/* may drop and re-acquire the ilock */
- 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
- 					&lockmode);
-@@ -1033,6 +1047,14 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
- 		/*
-+		 * If nowait is set bail since we are going to make
-+		 * allocations.
-+		 */
-+		if (flags & IOMAP_NOWAIT) {
-+			error = -EAGAIN;
-+			goto out_unlock;
-+		}
-+		/*
- 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
- 		 * pages to keep the chunks of work done where somewhat symmetric
- 		 * with the work writeback does. This is a completely arbitrary
 -- 
-2.12.0
+Jens Axboe
