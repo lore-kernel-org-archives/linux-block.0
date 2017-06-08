@@ -1,203 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:60720 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751139AbdFDMmf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jun 2017 08:42:35 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Tejun Heo <tj@kernel.org>
-Cc: Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 1/6] libata: move ata_read_log_page to libata-core.c
-Date: Sun,  4 Jun 2017 14:42:20 +0200
-Message-Id: <20170604124225.27032-2-hch@lst.de>
-In-Reply-To: <20170604124225.27032-1-hch@lst.de>
-References: <20170604124225.27032-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] Fix loop device flush before configure v3
+To: James Wang <jnwang@suse.com>, efault@gmx.de
+Cc: ming.lei@redhat.com, hare@suse.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, mgorman@suse.com
+References: <20170608065251.13961-1-jnwang@suse.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7f7d3164-3e0b-25a1-10fd-1cbdf7d2167d@kernel.dk>
+Date: Thu, 8 Jun 2017 08:04:57 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170608065251.13961-1-jnwang@suse.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-It is core functionality, and only one of the users is in the EH code.
+On 06/08/2017 12:52 AM, James Wang wrote:
+> While installing SLES-12 (based on v4.4), I found that the installer
+> will stall for 60+ seconds during LVM disk scan.  The root cause was
+> determined to be the removal of a bound device check in loop_flush()
+> by commit b5dd2f6047ca ("block: loop: improve performance via blk-mq").
+> 
+> Restoring this check, examining ->lo_state as set by loop_set_fd()
+> eliminates the bad behavior.
+> 
+> Test method:
+> modprobe loop max_loop=64
+> dd if=/dev/zero of=disk bs=512 count=200K
+> for((i=0;i<4;i++))do losetup -f disk; done
+> mkfs.ext4 -F /dev/loop0
+> for((i=0;i<4;i++))do mkdir t$i; mount /dev/loop$i t$i;done
+> for f in `ls /dev/loop[0-9]*|sort`; do \
+> 	echo $f; dd if=$f of=/dev/null  bs=512 count=1; \
+> 	done
+> 
+> Test output:  stock          patched
+> /dev/loop0    18.1217e-05    8.3842e-05
+> /dev/loop1     6.1114e-05    0.000147979
+> /dev/loop10    0.414701      0.000116564
+> /dev/loop11    0.7474        6.7942e-05
+> /dev/loop12    0.747986      8.9082e-05
+> /dev/loop13    0.746532      7.4799e-05
+> /dev/loop14    0.480041      9.3926e-05
+> /dev/loop15    1.26453       7.2522e-05
+> 
+> Note that from loop10 onward, the device is not mounted, yet the
+> stock kernel consumes several orders of magnitude more wall time
+> than it does for a mounted device.
+> (Thanks for Mike Galbraith <efault@gmx.de>, give a changelog review.)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/ata/libata-core.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++
- drivers/ata/libata-eh.c   | 64 -----------------------------------------------
- drivers/ata/libata.h      |  4 +--
- 3 files changed, 66 insertions(+), 66 deletions(-)
+Added for 4.12, thanks.
 
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 2d83b8c75965..d4bab5052268 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -2047,6 +2047,70 @@ int ata_dev_read_id(struct ata_device *dev, unsigned int *p_class,
- 	return rc;
- }
- 
-+/**
-+ *	ata_read_log_page - read a specific log page
-+ *	@dev: target device
-+ *	@log: log to read
-+ *	@page: page to read
-+ *	@buf: buffer to store read page
-+ *	@sectors: number of sectors to read
-+ *
-+ *	Read log page using READ_LOG_EXT command.
-+ *
-+ *	LOCKING:
-+ *	Kernel thread context (may sleep).
-+ *
-+ *	RETURNS:
-+ *	0 on success, AC_ERR_* mask otherwise.
-+ */
-+unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
-+			       u8 page, void *buf, unsigned int sectors)
-+{
-+	unsigned long ap_flags = dev->link->ap->flags;
-+	struct ata_taskfile tf;
-+	unsigned int err_mask;
-+	bool dma = false;
-+
-+	DPRINTK("read log page - log 0x%x, page 0x%x\n", log, page);
-+
-+	/*
-+	 * Return error without actually issuing the command on controllers
-+	 * which e.g. lockup on a read log page.
-+	 */
-+	if (ap_flags & ATA_FLAG_NO_LOG_PAGE)
-+		return AC_ERR_DEV;
-+
-+retry:
-+	ata_tf_init(dev, &tf);
-+	if (dev->dma_mode && ata_id_has_read_log_dma_ext(dev->id) &&
-+	    !(dev->horkage & ATA_HORKAGE_NO_NCQ_LOG)) {
-+		tf.command = ATA_CMD_READ_LOG_DMA_EXT;
-+		tf.protocol = ATA_PROT_DMA;
-+		dma = true;
-+	} else {
-+		tf.command = ATA_CMD_READ_LOG_EXT;
-+		tf.protocol = ATA_PROT_PIO;
-+		dma = false;
-+	}
-+	tf.lbal = log;
-+	tf.lbam = page;
-+	tf.nsect = sectors;
-+	tf.hob_nsect = sectors >> 8;
-+	tf.flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_LBA48 | ATA_TFLAG_DEVICE;
-+
-+	err_mask = ata_exec_internal(dev, &tf, NULL, DMA_FROM_DEVICE,
-+				     buf, sectors * ATA_SECT_SIZE, 0);
-+
-+	if (err_mask && dma) {
-+		dev->horkage |= ATA_HORKAGE_NO_NCQ_LOG;
-+		ata_dev_warn(dev, "READ LOG DMA EXT failed, trying unqueued\n");
-+		goto retry;
-+	}
-+
-+	DPRINTK("EXIT, err_mask=%x\n", err_mask);
-+	return err_mask;
-+}
-+
- static int ata_do_link_spd_horkage(struct ata_device *dev)
- {
- 	struct ata_link *plink = ata_dev_phys_link(dev);
-diff --git a/drivers/ata/libata-eh.c b/drivers/ata/libata-eh.c
-index ef68232b5222..528a4e1b2af3 100644
---- a/drivers/ata/libata-eh.c
-+++ b/drivers/ata/libata-eh.c
-@@ -1488,70 +1488,6 @@ static const char *ata_err_string(unsigned int err_mask)
- }
- 
- /**
-- *	ata_read_log_page - read a specific log page
-- *	@dev: target device
-- *	@log: log to read
-- *	@page: page to read
-- *	@buf: buffer to store read page
-- *	@sectors: number of sectors to read
-- *
-- *	Read log page using READ_LOG_EXT command.
-- *
-- *	LOCKING:
-- *	Kernel thread context (may sleep).
-- *
-- *	RETURNS:
-- *	0 on success, AC_ERR_* mask otherwise.
-- */
--unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
--			       u8 page, void *buf, unsigned int sectors)
--{
--	unsigned long ap_flags = dev->link->ap->flags;
--	struct ata_taskfile tf;
--	unsigned int err_mask;
--	bool dma = false;
--
--	DPRINTK("read log page - log 0x%x, page 0x%x\n", log, page);
--
--	/*
--	 * Return error without actually issuing the command on controllers
--	 * which e.g. lockup on a read log page.
--	 */
--	if (ap_flags & ATA_FLAG_NO_LOG_PAGE)
--		return AC_ERR_DEV;
--
--retry:
--	ata_tf_init(dev, &tf);
--	if (dev->dma_mode && ata_id_has_read_log_dma_ext(dev->id) &&
--	    !(dev->horkage & ATA_HORKAGE_NO_NCQ_LOG)) {
--		tf.command = ATA_CMD_READ_LOG_DMA_EXT;
--		tf.protocol = ATA_PROT_DMA;
--		dma = true;
--	} else {
--		tf.command = ATA_CMD_READ_LOG_EXT;
--		tf.protocol = ATA_PROT_PIO;
--		dma = false;
--	}
--	tf.lbal = log;
--	tf.lbam = page;
--	tf.nsect = sectors;
--	tf.hob_nsect = sectors >> 8;
--	tf.flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_LBA48 | ATA_TFLAG_DEVICE;
--
--	err_mask = ata_exec_internal(dev, &tf, NULL, DMA_FROM_DEVICE,
--				     buf, sectors * ATA_SECT_SIZE, 0);
--
--	if (err_mask && dma) {
--		dev->horkage |= ATA_HORKAGE_NO_NCQ_LOG;
--		ata_dev_warn(dev, "READ LOG DMA EXT failed, trying unqueued\n");
--		goto retry;
--	}
--
--	DPRINTK("EXIT, err_mask=%x\n", err_mask);
--	return err_mask;
--}
--
--/**
-  *	ata_eh_read_log_10h - Read log page 10h for NCQ error details
-  *	@dev: Device to read log page 10h from
-  *	@tag: Resulting tag of the failed command
-diff --git a/drivers/ata/libata.h b/drivers/ata/libata.h
-index 120fce0befd3..84569d563ae2 100644
---- a/drivers/ata/libata.h
-+++ b/drivers/ata/libata.h
-@@ -98,6 +98,8 @@ extern struct ata_port *ata_port_alloc(struct ata_host *host);
- extern const char *sata_spd_string(unsigned int spd);
- extern int ata_port_probe(struct ata_port *ap);
- extern void __ata_port_probe(struct ata_port *ap);
-+extern unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
-+				      u8 page, void *buf, unsigned int sectors);
- 
- #define to_ata_port(d) container_of(d, struct ata_port, tdev)
- 
-@@ -160,8 +162,6 @@ extern void ata_eh_about_to_do(struct ata_link *link, struct ata_device *dev,
- 			       unsigned int action);
- extern void ata_eh_done(struct ata_link *link, struct ata_device *dev,
- 			unsigned int action);
--extern unsigned int ata_read_log_page(struct ata_device *dev, u8 log,
--				      u8 page, void *buf, unsigned int sectors);
- extern void ata_eh_autopsy(struct ata_port *ap);
- const char *ata_get_cmd_descript(u8 command);
- extern void ata_eh_report(struct ata_port *ap);
 -- 
-2.11.0
+Jens Axboe
