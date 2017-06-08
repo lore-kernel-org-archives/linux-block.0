@@ -1,59 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34073 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751727AbdFPFEC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2017 01:04:02 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Fri, 16 Jun 2017 15:02:09 +1000
-Subject: [PATCH 1/2] loop: use filp_close() rather than fput()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149758932908.10006.10765671892098302463.stgit@noble>
-In-Reply-To: <149758925866.10006.12779875832895865043.stgit@noble>
-References: <149758925866.10006.12779875832895865043.stgit@noble>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
+ Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 07/12] block: Add a comment above queue_lockdep_assert_held()
+Date: Thu, 8 Jun 2017 10:33:50 -0700
+Message-ID: <20170608173355.25898-8-bart.vanassche@sandisk.com>
+In-Reply-To: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-When a loop device is being shutdown the backing file is
-closed with fput().  This is different from how close(2)
-closes files - it uses filp_close().
+Add a comment above the queue_lockdep_assert_held() macro that
+explains the purpose of the q->queue_lock test.
 
-The difference is important for filesystems which provide a ->flush
-file operation such as NFS.  NFS assumes a flush will always
-be called on last close, and gets confused otherwise.
-
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/linux/blkdev.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ebbd0c3fe0ed..9c457ca6c55e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -682,7 +682,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	if (error)
- 		goto out_putf;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index cbc0028290e4..1e73b4df13a9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -634,6 +634,13 @@ struct request_queue {
+ 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
+ 				 (1 << QUEUE_FLAG_POLL))
  
--	fput(old_file);
-+	filp_close(old_file, NULL);
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
- 		loop_reread_partitions(lo, bdev);
- 	return 0;
-@@ -1071,12 +1071,12 @@ static int loop_clr_fd(struct loop_device *lo)
- 	loop_unprepare_queue(lo);
- 	mutex_unlock(&lo->lo_ctl_mutex);
- 	/*
--	 * Need not hold lo_ctl_mutex to fput backing file.
-+	 * Need not hold lo_ctl_mutex to close backing file.
- 	 * Calling fput holding lo_ctl_mutex triggers a circular
- 	 * lock dependency possibility warning as fput can take
- 	 * bd_mutex which is usually taken before lo_ctl_mutex.
- 	 */
--	fput(filp);
-+	filp_close(filp, NULL);
- 	return 0;
- }
- 
++/*
++ * @q->queue_lock is set while a queue is being initialized. Since we know
++ * that no other threads access the queue object before @q->queue_lock has
++ * been set, it is safe to manipulate queue flags without holding the
++ * queue_lock if @q->queue_lock == NULL. See also blk_alloc_queue_node() and
++ * blk_init_allocated_queue().
++ */
+ static inline void queue_lockdep_assert_held(struct request_queue *q)
+ {
+ 	if (q->queue_lock)
+-- 
+2.12.2
