@@ -1,42 +1,167 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-Subject: Re: [PATCHv8 2/2] loop: support 4k physical blocksize
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
-CC: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
-	<linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Omar Sandoval <osandov@fb.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCHv8 2/2] loop: support 4k physical blocksize
+Date: Thu,  8 Jun 2017 13:46:45 +0200
+Message-Id: <1496922405-38302-3-git-send-email-hare@suse.de>
+In-Reply-To: <1496922405-38302-1-git-send-email-hare@suse.de>
 References: <1496922405-38302-1-git-send-email-hare@suse.de>
- <1496922405-38302-3-git-send-email-hare@suse.de>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-Message-ID: <b70e5a20-8dcf-677d-3574-051a5a6e22ad@wdc.com>
-Date: Fri, 9 Jun 2017 08:30:43 -0700
-MIME-Version: 1.0
-In-Reply-To: <1496922405-38302-3-git-send-email-hare@suse.de>
-Content-Type: text/plain; charset="utf-8"
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/08/17 04:46, Hannes Reinecke wrote:
->  	if (lo->lo_offset != info->lo_offset ||
-> -	    lo->lo_sizelimit != info->lo_sizelimit)
-> -		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
-> +	    lo->lo_sizelimit != info->lo_sizelimit ||
-> +	    lo->lo_flags != lo_flags ||
-> +	    ((lo->lo_flags & LO_FLAGS_BLOCKSIZE) &&
-> +	     lo->lo_logical_blocksize != LO_INFO_BLOCKSIZE(info))) {
-> +		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit,
-> +				     LO_INFO_BLOCKSIZE(info)))
->  			err = -EFBIG;
->  			goto exit;
->  		}
+When generating bootable VM images certain systems (most notably
+s390x) require devices with 4k blocksize. This patch implements
+a new flag 'LO_FLAGS_BLOCKSIZE' which will set the physical
+blocksize to that of the underlying device, and allow to change
+the logical blocksize for up to the physical blocksize.
 
-Hello Hannes and Jens,
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+---
+ drivers/block/loop.c      | 43 +++++++++++++++++++++++++++++++++++++------
+ drivers/block/loop.h      |  1 +
+ include/uapi/linux/loop.h |  3 +++
+ 3 files changed, 41 insertions(+), 6 deletions(-)
 
-gcc reports the following for the above code:
-
-drivers/block/loop.c:1149:3: warning: this 'if' clause does not guard...
-[-Wmisleading-indentation]
-
-Please review this code. Have the braces perhaps been misplaced?
-
-Thanks,
-
-Bart.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index fc706ad..4d376c1 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -221,7 +221,8 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+ }
+ 
+ static int
+-figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
++figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit,
++		 loff_t logical_blocksize)
+ {
+ 	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
+ 	sector_t x = (sector_t)size;
+@@ -233,6 +234,12 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+ 		lo->lo_offset = offset;
+ 	if (lo->lo_sizelimit != sizelimit)
+ 		lo->lo_sizelimit = sizelimit;
++	if (lo->lo_flags & LO_FLAGS_BLOCKSIZE) {
++		lo->lo_logical_blocksize = logical_blocksize;
++		blk_queue_physical_block_size(lo->lo_queue, lo->lo_blocksize);
++		blk_queue_logical_block_size(lo->lo_queue,
++					     lo->lo_logical_blocksize);
++	}
+ 	set_capacity(lo->lo_disk, x);
+ 	bd_set_size(bdev, (loff_t)get_capacity(bdev->bd_disk) << 9);
+ 	/* let user-space know about the new size */
+@@ -810,6 +817,7 @@ static void loop_config_discard(struct loop_device *lo)
+ 	struct file *file = lo->lo_backing_file;
+ 	struct inode *inode = file->f_mapping->host;
+ 	struct request_queue *q = lo->lo_queue;
++	int lo_bits = 9;
+ 
+ 	/*
+ 	 * We use punch hole to reclaim the free space used by the
+@@ -829,8 +837,11 @@ static void loop_config_discard(struct loop_device *lo)
+ 
+ 	q->limits.discard_granularity = inode->i_sb->s_blocksize;
+ 	q->limits.discard_alignment = 0;
+-	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
+-	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
++	if (lo->lo_flags & LO_FLAGS_BLOCKSIZE)
++		lo_bits = blksize_bits(lo->lo_logical_blocksize);
++
++	blk_queue_max_discard_sectors(q, UINT_MAX >> lo_bits);
++	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> lo_bits);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+ }
+ 
+@@ -918,6 +929,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 
+ 	lo->use_dio = false;
+ 	lo->lo_blocksize = lo_blocksize;
++	lo->lo_logical_blocksize = 512;
+ 	lo->lo_device = bdev;
+ 	lo->lo_flags = lo_flags;
+ 	lo->lo_backing_file = file;
+@@ -1083,6 +1095,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	int err;
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
++	int lo_flags = lo->lo_flags;
+ 
+ 	if (lo->lo_encrypt_key_size &&
+ 	    !uid_eq(lo->lo_key_owner, uid) &&
+@@ -1115,9 +1128,26 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	if (err)
+ 		goto exit;
+ 
++	if (info->lo_flags & LO_FLAGS_BLOCKSIZE) {
++		if (!(lo->lo_flags & LO_FLAGS_BLOCKSIZE))
++			lo->lo_logical_blocksize = 512;
++		lo->lo_flags |= LO_FLAGS_BLOCKSIZE;
++		if (LO_INFO_BLOCKSIZE(info) != 512 &&
++		    LO_INFO_BLOCKSIZE(info) != 1024 &&
++		    LO_INFO_BLOCKSIZE(info) != 2048 &&
++		    LO_INFO_BLOCKSIZE(info) != 4096)
++			return -EINVAL;
++		if (LO_INFO_BLOCKSIZE(info) > lo->lo_blocksize)
++			return -EINVAL;
++	}
++
+ 	if (lo->lo_offset != info->lo_offset ||
+-	    lo->lo_sizelimit != info->lo_sizelimit)
+-		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
++	    lo->lo_sizelimit != info->lo_sizelimit ||
++	    lo->lo_flags != lo_flags ||
++	    ((lo->lo_flags & LO_FLAGS_BLOCKSIZE) &&
++	     lo->lo_logical_blocksize != LO_INFO_BLOCKSIZE(info))) {
++		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit,
++				     LO_INFO_BLOCKSIZE(info)))
+ 			err = -EFBIG;
+ 			goto exit;
+ 		}
+@@ -1308,7 +1338,8 @@ static int loop_set_capacity(struct loop_device *lo)
+ 	if (unlikely(lo->lo_state != Lo_bound))
+ 		return -ENXIO;
+ 
+-	return figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit);
++	return figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit,
++				lo->lo_logical_blocksize);
+ }
+ 
+ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index fecd3f9..2c096b9 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -49,6 +49,7 @@ struct loop_device {
+ 	struct file *	lo_backing_file;
+ 	struct block_device *lo_device;
+ 	unsigned	lo_blocksize;
++	unsigned	lo_logical_blocksize;
+ 	void		*key_data; 
+ 
+ 	gfp_t		old_gfp_mask;
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index c8125ec..a3960f9 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -22,6 +22,7 @@ enum {
+ 	LO_FLAGS_AUTOCLEAR	= 4,
+ 	LO_FLAGS_PARTSCAN	= 8,
+ 	LO_FLAGS_DIRECT_IO	= 16,
++	LO_FLAGS_BLOCKSIZE	= 32,
+ };
+ 
+ #include <asm/posix_types.h>	/* for __kernel_old_dev_t */
+@@ -59,6 +60,8 @@ struct loop_info64 {
+ 	__u64		   lo_init[2];
+ };
+ 
++#define LO_INFO_BLOCKSIZE(l) (l)->lo_init[0]
++
+ /*
+  * Loop filter types
+  */
+-- 
+1.8.5.6
