@@ -1,128 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59384 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751431AbdFFPYI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 11:24:08 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 08/12] blk-mq: use QUEUE_FLAG_QUIESCED to quiesce queue
-Date: Tue,  6 Jun 2017 23:22:06 +0800
-Message-Id: <20170606152210.22806-9-ming.lei@redhat.com>
-In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
-References: <20170606152210.22806-1-ming.lei@redhat.com>
+Received: from smtp.nue.novell.com ([195.135.221.5]:53399 "EHLO
+        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750752AbdFHHIE (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Thu, 8 Jun 2017 03:08:04 -0400
+Subject: Re: [PATCH] Fix loop device flush before configure
+To: Christoph Hellwig <hch@infradead.org>
+Cc: axboe@fb.com, hare@suse.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mgorman@suse.com
+References: <20170607090104.17337-1-jnwang@suse.com>
+ <20170607131718.GC18252@infradead.org>
+ <2D8954BF-E3D2-4A61-AAE2-A3FDD080C26A@suse.com>
+ <20170608065657.GB14568@infradead.org>
+From: James Wang <jnwang@suse.com>
+Message-ID: <5e97dcff-b434-40cf-a11a-a933fd04447c@suse.com>
+Date: Thu, 8 Jun 2017 15:07:48 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170608065657.GB14568@infradead.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It is required that no dispatch can happen any more once
-blk_mq_quiesce_queue() returns, and we don't have such requirement
-on APIs of stopping queue.
 
-But blk_mq_quiesce_queue() still may not block/drain dispatch in the
-the case of BLK_MQ_S_START_ON_RUN, so use the new introduced flag of
-QUEUE_FLAG_QUIESCED and evaluate it inside RCU read-side critical
-sections for fixing this issue.
 
-Also blk_mq_quiesce_queue() is implemented via stopping queue, which
-limits its uses, and easy to cause race, because any queue restart in
-other paths may break blk_mq_quiesce_queue(). With the introduced
-flag of QUEUE_FLAG_QUIESCED, we don't need to depend on stopping queue
-for quiescing any more.
+On 06/08/2017 02:56 PM, Christoph Hellwig wrote:
+> On Thu, Jun 08, 2017 at 08:45:31AM +0800, James Wang wrote:
+>> Ok I got it blktests is a suite. I'd like to contribute something. If you need, we adapt you,;-)!
+>> But I have to learn some how to do that, need time.
+> I haven't added test myself to blktests yet either, so I'd have to
+> learn it as well.  Omar can probably help you though.
+>
+>
+Ah, I have fork this project  in Github.  and write 1 script in 'loop' 
+group.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c   |  3 ++-
- block/blk-mq.c         | 11 ++++++++++-
- include/linux/blk-mq.h |  4 ++++
- include/linux/blkdev.h |  2 ++
- 4 files changed, 18 insertions(+), 2 deletions(-)
+Debuging................
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index c4e2afb9d12d..ec9885df324c 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -141,7 +141,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	bool did_work = false;
- 	LIST_HEAD(rq_list);
- 
--	if (unlikely(blk_mq_hctx_stopped(hctx)))
-+	/* RCU or SRCU read lock is needed before checking quiesced flag */
-+	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
- 		return;
- 
- 	hctx->run++;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ed8e2edca1a7..7369810d3dc0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -170,6 +170,10 @@ void blk_mq_quiesce_queue(struct request_queue *q)
- 
- 	__blk_mq_stop_hw_queues(q, true);
- 
-+	spin_lock_irq(q->queue_lock);
-+	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-+	spin_unlock_irq(q->queue_lock);
-+
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (hctx->flags & BLK_MQ_F_BLOCKING)
- 			synchronize_srcu(&hctx->queue_rq_srcu);
-@@ -190,6 +194,10 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
-  */
- void blk_mq_unquiesce_queue(struct request_queue *q)
- {
-+	spin_lock_irq(q->queue_lock);
-+	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-+	spin_unlock_irq(q->queue_lock);
-+
- 	blk_mq_start_stopped_hw_queues(q, true);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
-@@ -1426,7 +1434,8 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	int ret;
- 	bool run_queue = true;
- 
--	if (blk_mq_hctx_stopped(hctx)) {
-+	/* RCU or SRCU read lock is needed before checking quiesced flag */
-+	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
- 		run_queue = false;
- 		goto insert;
- 	}
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index fc0fc45fc658..dc96ce3f5425 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -271,6 +271,10 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
-  */
- static inline void blk_mq_quiesce_queue_nowait(struct request_queue *q)
- {
-+	spin_lock_irq(q->queue_lock);
-+	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-+	spin_unlock_irq(q->queue_lock);
-+
- 	blk_mq_stop_hw_queues(q);
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 7178ad6805e3..7da799a88244 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -619,6 +619,7 @@ struct request_queue {
- #define QUEUE_FLAG_POLL_STATS  28	/* collecting stats for hybrid polling */
- #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 30	/* queue supports SCSI commands */
-+#define QUEUE_FLAG_QUIESCED    31	/* queue has been quiesced */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -715,6 +716,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
-+#define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
- 
- static inline bool blk_account_rq(struct request *rq)
- {
+
+James
+
 -- 
-2.9.4
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
