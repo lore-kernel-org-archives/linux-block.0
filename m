@@ -1,39 +1,51 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 09/11] xfs: add support for passing in stream information for buffered writes
-Date: Tue, 13 Jun 2017 11:15:21 -0600
-Message-Id: <1497374123-15286-10-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
-References: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
+ Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 11/12] block: Constify disk_type
+Date: Thu, 8 Jun 2017 10:33:54 -0700
+Message-ID: <20170608173355.25898-12-bart.vanassche@sandisk.com>
+In-Reply-To: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/xfs/xfs_aops.c | 2 ++
- 1 file changed, 2 insertions(+)
+The variable 'disk_type' is never modified so constify it.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 09af0f7cd55e..9770be0140ad 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -505,6 +505,7 @@ xfs_submit_ioend(
- 		return status;
- 	}
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+---
+ block/genhd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index d252d29fe837..7f520fa25d16 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -36,7 +36,7 @@ struct kobject *block_depr;
+ static DEFINE_SPINLOCK(ext_devt_lock);
+ static DEFINE_IDR(ext_devt_idr);
  
-+	bio_set_streamid(ioend->io_bio, inode_streamid(ioend->io_inode));
- 	submit_bio(ioend->io_bio);
- 	return 0;
+-static struct device_type disk_type;
++static const struct device_type disk_type;
+ 
+ static void disk_check_events(struct disk_events *ev,
+ 			      unsigned int *clearing_ptr);
+@@ -1183,7 +1183,7 @@ static char *block_devnode(struct device *dev, umode_t *mode,
+ 	return NULL;
  }
-@@ -564,6 +565,7 @@ xfs_chain_bio(
- 	bio_chain(ioend->io_bio, new);
- 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
- 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
-+	bio_set_streamid(ioend->io_bio, inode_streamid(ioend->io_inode));
- 	submit_bio(ioend->io_bio);
- 	ioend->io_bio = new;
- }
+ 
+-static struct device_type disk_type = {
++static const struct device_type disk_type = {
+ 	.name		= "disk",
+ 	.groups		= disk_attr_groups,
+ 	.release	= disk_release,
 -- 
-2.7.4
+2.12.2
