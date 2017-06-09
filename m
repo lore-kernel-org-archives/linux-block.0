@@ -1,41 +1,43 @@
 Return-Path: <axboe@kernel.dk>
+Date: Fri, 9 Jun 2017 09:29:27 -0600
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 07/10] ext4: add support for passing in stream information for buffered writes
-Date: Tue, 13 Jun 2017 22:01:56 -0600
-Message-Id: <1497412919-19400-8-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
-References: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, dm-devel@redhat.com,
+	linux-btrfs@vger.kernel.org
+Subject: Re: dedicated error codes for the block layer V3
+Message-ID: <20170609152926.GB24734@kernel.dk>
+References: <20170603073806.2046-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170603073806.2046-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/ext4/page-io.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Sat, Jun 03 2017, Christoph Hellwig wrote:
+> This series introduces a new blk_status_t error code type for the block
+> layer so that we can have tigher control and explicit semantics for
+> block layer errors.
+> 
+> All but the last three patches are cleanups that lead to the new type.
+> 
+> The series it mostly limited to the block layer and drivers, and touching
+> file systems a little bit.  The only major exception is btrfs, which
+> does funny things with bios and thus sees a larger amount of propagation
+> of the new blk_status_t.
+> 
+> A git tree is also available at:
+> 
+>     git://git.infradead.org/users/hch/block.git block-errors
+> 
+> gitweb:
+> 
+>     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/block-errors
+> 
+> Note the the two biggest patches didn't make it to linux-block and
+> linux-btrfs last time.  If you didn't get them they are available in
+> the git tree above.  Unfortunately there is no easy way to split them
+> up.
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 1a82138ba739..033b5bfa4e0b 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -350,6 +350,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
- 				  REQ_SYNC : 0;
- 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
-+		bio_set_streamid(io->io_bio, inode_streamid(io->io_end->inode));
- 		submit_bio(io->io_bio);
- 	}
- 	io->io_bio = NULL;
-@@ -396,6 +397,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
- 		ret = io_submit_init_bio(io, bh);
- 		if (ret)
- 			return ret;
-+		bio_set_streamid(io->io_bio, inode_streamid(inode));
- 	}
- 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
- 	if (ret != bh->b_size)
+Added for 4.13, thanks.
+
 -- 
-2.7.4
+Jens Axboe
