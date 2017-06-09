@@ -1,65 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:35746 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751406AbdFZJ6Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 05:58:25 -0400
-Received: by mail-wm0-f51.google.com with SMTP id w126so2847779wme.0
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:25 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 16/20] lightnvm: pblk: cleanup unnecessary code
-Date: Mon, 26 Jun 2017 11:57:25 +0200
-Message-Id: <1498471049-25505-17-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
-References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHv8 2/2] loop: support 4k physical blocksize
+To: Bart Van Assche <bart.vanassche@wdc.com>, Hannes Reinecke <hare@suse.de>
+Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
+ linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+References: <1496922405-38302-1-git-send-email-hare@suse.de>
+ <1496922405-38302-3-git-send-email-hare@suse.de>
+ <b70e5a20-8dcf-677d-3574-051a5a6e22ad@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <fd3d3cad-a08a-67b7-0c71-7b7e4212c518@kernel.dk>
+Date: Fri, 9 Jun 2017 09:33:44 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <b70e5a20-8dcf-677d-3574-051a5a6e22ad@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Cleanup unnecessary headers and code lines.
+On 06/09/2017 09:30 AM, Bart Van Assche wrote:
+> On 06/08/17 04:46, Hannes Reinecke wrote:
+>>  	if (lo->lo_offset != info->lo_offset ||
+>> -	    lo->lo_sizelimit != info->lo_sizelimit)
+>> -		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
+>> +	    lo->lo_sizelimit != info->lo_sizelimit ||
+>> +	    lo->lo_flags != lo_flags ||
+>> +	    ((lo->lo_flags & LO_FLAGS_BLOCKSIZE) &&
+>> +	     lo->lo_logical_blocksize != LO_INFO_BLOCKSIZE(info))) {
+>> +		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit,
+>> +				     LO_INFO_BLOCKSIZE(info)))
+>>  			err = -EFBIG;
+>>  			goto exit;
+>>  		}
+> 
+> Hello Hannes and Jens,
+> 
+> gcc reports the following for the above code:
+> 
+> drivers/block/loop.c:1149:3: warning: this 'if' clause does not guard...
+> [-Wmisleading-indentation]
+> 
+> Please review this code. Have the braces perhaps been misplaced?
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c  | 1 -
- drivers/lightnvm/pblk-write.c | 6 ------
- 2 files changed, 7 deletions(-)
+It's clearly buggy, fix has gone in:
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index cba7cd78e4a6..d815cdad56b8 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -17,7 +17,6 @@
-  */
- 
- #include "pblk.h"
--#include <linux/time.h>
- 
- static void pblk_mark_bb(struct pblk *pblk, struct pblk_line *line,
- 			 struct ppa_addr *ppa)
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 3db2cbe5b788..a50bfbd12c32 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -27,14 +27,8 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 	for (i = 0; i < c_ctx->nr_valid; i++) {
- 		struct pblk_w_ctx *w_ctx;
--		struct ppa_addr p;
--		struct pblk_line *line;
- 
- 		w_ctx = pblk_rb_w_ctx(&pblk->rwb, c_ctx->sentry + i);
--
--		p = rqd->ppa_list[i];
--		line = &pblk->lines[pblk_dev_ppa_to_line(p)];
--
- 		while ((original_bio = bio_list_pop(&w_ctx->bios)))
- 			bio_endio(original_bio);
- 	}
+http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.13/block&id=b040ad9cf6a169cc000a5324fcada695dfa1f4b3
+
 -- 
-2.7.4
+Jens Axboe
