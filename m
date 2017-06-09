@@ -1,92 +1,134 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44901 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752998AbdFREk2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:40:28 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:58 +1000
-Subject: [PATCH 08/13] pktcdvd: use bio_clone_fast() instead of bio_clone()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073849.23258.16678605618298313321.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:59458 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751538AbdFISIf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2017 14:08:35 -0400
+Subject: patch "pktcdvd: use class_groups instead of class_attrs" added to driver-core-next
+To: gregkh@linuxfoundation.org, Bart.VanAssche@sandisk.com,
+        axboe@fb.com, hare@suse.com, jack@suse.cz,
+        linux-block@vger.kernel.org, mchristi@redhat.com
+From: <gregkh@linuxfoundation.org>
+Date: Fri, 09 Jun 2017 20:08:15 +0200
+Message-ID: <149703169513788@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=ANSI_X3.4-1968
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-pktcdvd doesn't change the bi_io_vec of the clone bio,
-so it is more efficient to use bio_clone_fast(), and not clone
-the bi_io_vec.
-This requires providing a bio_set, and it is safest to
-provide a dedicated bio_set rather than sharing
-fs_bio_set, which filesytems use.
-This new bio_set, pkt_bio_set, can also be use for the bio_split()
-call as the two allocations (bio_clone_fast, and bio_split) are
-independent, neither can block a bio allocated by the other.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: NeilBrown <neilb@suse.com>
+This is a note to let you know that I've just added the patch titled
+
+    pktcdvd: use class_groups instead of class_attrs
+
+to my driver-core git tree which can be found at
+    git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git
+in the driver-core-next branch.
+
+The patch will show up in the next release of the linux-next tree
+(usually sometime within the next 24 hours during the week.)
+
+The patch will also be merged in the next major kernel release
+during the merge window.
+
+If you have any questions about this process, please let me know.
+
+
+>From dc307f921f5c4c0cc64675203065c9b6a94f0bcb Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Thu, 8 Jun 2017 10:12:41 +0200
+Subject: pktcdvd: use class_groups instead of class_attrs
+
+The class_attrs pointer is long depreciated, and is about to be finally
+removed, so move to use the class_groups pointer instead.
+
+Cc: <linux-block@vger.kernel.org>
+Acked-by: Jens Axboe <axboe@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Mike Christie <mchristi@redhat.com>
+Cc: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/block/pktcdvd.c |   12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/block/pktcdvd.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 1f363638b453..26c04baae967 100644
+index 205b865ebeb9..98939ee97476 100644
 --- a/drivers/block/pktcdvd.c
 +++ b/drivers/block/pktcdvd.c
-@@ -98,6 +98,7 @@ static int write_congestion_on  = PKT_WRITE_CONGESTION_ON;
- static int write_congestion_off = PKT_WRITE_CONGESTION_OFF;
- static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
- static mempool_t *psd_pool;
-+static struct bio_set *pkt_bio_set;
- 
- static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
- static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
-@@ -2310,7 +2311,7 @@ static void pkt_end_io_read_cloned(struct bio *bio)
- 
- static void pkt_make_request_read(struct pktcdvd_device *pd, struct bio *bio)
+@@ -348,9 +348,9 @@ static void class_pktcdvd_release(struct class *cls)
  {
--	struct bio *cloned_bio = bio_clone(bio, GFP_NOIO);
-+	struct bio *cloned_bio = bio_clone_fast(bio, GFP_NOIO, pkt_bio_set);
- 	struct packet_stacked_data *psd = mempool_alloc(psd_pool, GFP_NOIO);
- 
- 	psd->pd = pd;
-@@ -2455,7 +2456,7 @@ static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
- 
- 			split = bio_split(bio, last_zone -
- 					  bio->bi_iter.bi_sector,
--					  GFP_NOIO, fs_bio_set);
-+					  GFP_NOIO, pkt_bio_set);
- 			bio_chain(split, bio);
- 		} else {
- 			split = bio;
-@@ -2924,6 +2925,11 @@ static int __init pkt_init(void)
- 					sizeof(struct packet_stacked_data));
- 	if (!psd_pool)
- 		return -ENOMEM;
-+	pkt_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
-+	if (!pkt_bio_set) {
-+		mempool_destroy(psd_pool);
-+		return -ENOMEM;
-+	}
- 
- 	ret = register_blkdev(pktdev_major, DRIVER_NAME);
- 	if (ret < 0) {
-@@ -2956,6 +2962,7 @@ static int __init pkt_init(void)
- 	unregister_blkdev(pktdev_major, DRIVER_NAME);
- out2:
- 	mempool_destroy(psd_pool);
-+	bioset_free(pkt_bio_set);
- 	return ret;
+ 	kfree(cls);
  }
- 
-@@ -2969,6 +2976,7 @@ static void __exit pkt_exit(void)
- 
- 	unregister_blkdev(pktdev_major, DRIVER_NAME);
- 	mempool_destroy(psd_pool);
-+	bioset_free(pkt_bio_set);
+-static ssize_t class_pktcdvd_show_map(struct class *c,
+-					struct class_attribute *attr,
+-					char *data)
++
++static ssize_t device_map_show(struct class *c, struct class_attribute *attr,
++			       char *data)
+ {
+ 	int n = 0;
+ 	int idx;
+@@ -368,11 +368,10 @@ static ssize_t class_pktcdvd_show_map(struct class *c,
+ 	mutex_unlock(&ctl_mutex);
+ 	return n;
  }
++static CLASS_ATTR_RO(device_map);
  
- MODULE_DESCRIPTION("Packet writing layer for CD/DVD drives");
+-static ssize_t class_pktcdvd_store_add(struct class *c,
+-					struct class_attribute *attr,
+-					const char *buf,
+-					size_t count)
++static ssize_t add_store(struct class *c, struct class_attribute *attr,
++			 const char *buf, size_t count)
+ {
+ 	unsigned int major, minor;
+ 
+@@ -390,11 +389,10 @@ static ssize_t class_pktcdvd_store_add(struct class *c,
+ 
+ 	return -EINVAL;
+ }
++static CLASS_ATTR_WO(add);
+ 
+-static ssize_t class_pktcdvd_store_remove(struct class *c,
+-					  struct class_attribute *attr,
+-					  const char *buf,
+-					size_t count)
++static ssize_t remove_store(struct class *c, struct class_attribute *attr,
++			    const char *buf, size_t count)
+ {
+ 	unsigned int major, minor;
+ 	if (sscanf(buf, "%u:%u", &major, &minor) == 2) {
+@@ -403,14 +401,15 @@ static ssize_t class_pktcdvd_store_remove(struct class *c,
+ 	}
+ 	return -EINVAL;
+ }
++static CLASS_ATTR_WO(remove);
+ 
+-static struct class_attribute class_pktcdvd_attrs[] = {
+- __ATTR(add,            0200, NULL, class_pktcdvd_store_add),
+- __ATTR(remove,         0200, NULL, class_pktcdvd_store_remove),
+- __ATTR(device_map,     0444, class_pktcdvd_show_map, NULL),
+- __ATTR_NULL
++static struct attribute *class_pktcdvd_attrs[] = {
++	&class_attr_add.attr,
++	&class_attr_remove.attr,
++	&class_attr_device_map.attr,
++	NULL,
+ };
+-
++ATTRIBUTE_GROUPS(class_pktcdvd);
+ 
+ static int pkt_sysfs_init(void)
+ {
+@@ -426,7 +425,7 @@ static int pkt_sysfs_init(void)
+ 	class_pktcdvd->name = DRIVER_NAME;
+ 	class_pktcdvd->owner = THIS_MODULE;
+ 	class_pktcdvd->class_release = class_pktcdvd_release;
+-	class_pktcdvd->class_attrs = class_pktcdvd_attrs;
++	class_pktcdvd->class_groups = class_pktcdvd_groups;
+ 	ret = class_register(class_pktcdvd);
+ 	if (ret) {
+ 		kfree(class_pktcdvd);
+-- 
+2.13.1
