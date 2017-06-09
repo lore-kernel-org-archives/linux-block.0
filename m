@@ -1,40 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41054 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751704AbdFZMLj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:11:39 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 01/51] block: drbd: comment on direct access bvec table
-Date: Mon, 26 Jun 2017 20:09:44 +0800
-Message-Id: <20170626121034.3051-2-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] nbd: set sk->sk_sndtimeo for our sockets
+To: josef@toxicpanda.com, nbd-general@lists.sourceforge.net,
+ linux-block@vger.kernel.org, kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+References: <1496950770-5642-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b3fd3402-4ef4-0540-9fda-394433d24d1e@kernel.dk>
+Date: Fri, 9 Jun 2017 08:33:47 -0600
+MIME-Version: 1.0
+In-Reply-To: <1496950770-5642-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/drbd/drbd_bitmap.c | 1 +
- 1 file changed, 1 insertion(+)
+On 06/08/2017 01:39 PM, josef@toxicpanda.com wrote:
+> From: Josef Bacik <jbacik@fb.com>
+> 
+> If the nbd server stops receiving packets altogether we will get stuck
+> waiting for them to receive indefinitely as the tcp buffer will never
+> empty, which looks like a deadlock.  Fix this by setting the sk send
+> timeout to our configured timeout, that way if the server really
+> misbehaves we'll disconnect cleanly instead of waiting forever.
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-index 809fd245c3dc..70890d950dc9 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -953,6 +953,7 @@ static void drbd_bm_endio(struct bio *bio)
- 	struct drbd_bm_aio_ctx *ctx = bio->bi_private;
- 	struct drbd_device *device = ctx->device;
- 	struct drbd_bitmap *b = device->bitmap;
-+	/* single page bio, safe for multipage bvec */
- 	unsigned int idx = bm_page_to_idx(bio->bi_io_vec[0].bv_page);
- 
- 	if ((ctx->flags & BM_AIO_COPY_PAGES) == 0 &&
+Queued up for 4.13, thanks.
+
 -- 
-2.9.4
+Jens Axboe
