@@ -1,49 +1,35 @@
-Return-Path: <rgoldwyn@suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from zeniv.linux.org.uk ([195.92.253.2]:36036 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750945AbdFJFep (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 10 Jun 2017 01:34:45 -0400
+Date: Sat, 10 Jun 2017 06:34:41 +0100
+From: Al Viro <viro@ZenIV.linux.org.uk>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Goldwyn Rodrigues <rgoldwyn@suse.de>, akpm@linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, jack@suse.com,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+        axboe@kernel.dk, linux-api@vger.kernel.org, adam.manzanares@wdc.com
 Subject: Re: [PATCH 0/10 v11] No wait AIO
-To: Al Viro <viro@ZenIV.linux.org.uk>, Christoph Hellwig <hch@infradead.org>
-Cc: akpm@linux-foundation.org, linux-fsdevel@vger.kernel.org, jack@suse.com,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, axboe@kernel.dk,
- linux-api@vger.kernel.org, adam.manzanares@wdc.com
+Message-ID: <20170610053441.GD6365@ZenIV.linux.org.uk>
 References: <20170606111939.27272-1-rgoldwyn@suse.de>
  <20170608073910.GB9292@infradead.org>
- <20170610053441.GD6365@ZenIV.linux.org.uk>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <58bbe95e-5a4a-4387-3a00-16ed2e861bd3@suse.de>
-Date: Mon, 12 Jun 2017 17:38:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170610053441.GD6365@ZenIV.linux.org.uk>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170608073910.GB9292@infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-
-
-On 06/10/2017 12:34 AM, Al Viro wrote:
-> On Thu, Jun 08, 2017 at 12:39:10AM -0700, Christoph Hellwig wrote:
->> As already indicated this whole series looks fine to me.
->>
->> Al: are you going to pick this up?  Or Andrew?
+On Thu, Jun 08, 2017 at 12:39:10AM -0700, Christoph Hellwig wrote:
+> As already indicated this whole series looks fine to me.
 > 
-> The main issue here is "let's bail out from ->write_iter() instances"
-> patch.  It very obviously has holes in coverage.
-> 
-> Could we have FMODE_AIO_NOWAIT and make those who claim to support it
-> set that in ->open()?  And make aio check that and bail out if asked
-> for nowait on a file without that flag...
-> 
+> Al: are you going to pick this up?  Or Andrew?
 
-Yes, I would agree.
+The main issue here is "let's bail out from ->write_iter() instances"
+patch.  It very obviously has holes in coverage.
 
-We had FS_NOWAIT in filesystem type flags (in v3), but retracted it
-later in v4.
-
-Another option could be to keep the feature against FS_REQUIRES_DEV to
-rule out filesystems which are not local, but it again has the problem
-of holes in coverage.
-
-I will work on adding FMODE_AIO_NOWAIT in the meantime.
-
-Thanks,
-
--- 
-Goldwyn
+Could we have FMODE_AIO_NOWAIT and make those who claim to support it
+set that in ->open()?  And make aio check that and bail out if asked
+for nowait on a file without that flag...
