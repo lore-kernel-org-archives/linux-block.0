@@ -1,53 +1,112 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45988 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751435AbdFZMUS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:20:18 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org
-Subject: [PATCH v2 43/51] xfs: convert to bio_for_each_segment_all_sp()
-Date: Mon, 26 Jun 2017 20:10:26 +0800
-Message-Id: <20170626121034.3051-44-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v6 05/20] mm: don't TestClearPageError in __filemap_fdatawait_range
+Date: Mon, 12 Jun 2017 08:22:57 -0400
+Message-Id: <20170612122316.13244-6-jlayton@redhat.com>
+In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
+References: <20170612122316.13244-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: linux-xfs@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+The -EIO returned here can end up overriding whatever error is marked in
+the address space, and be returned at fsync time, even when there is a
+more appropriate error stored in the mapping.
+
+Read errors are also sometimes tracked on a per-page level using
+PG_error. Suppose we have a read error on a page, and then that page is
+subsequently dirtied by overwriting the whole page. Writeback doesn't
+clear PG_error, so we can then end up successfully writing back that
+page and still return -EIO on fsync.
+
+Worse yet, PG_error is cleared during a sync() syscall, but the -EIO
+return from that is silently discarded. Any subsystem that is relying on
+PG_error to report errors during fsync can easily lose writeback errors
+due to this. All you need is a stray sync() call to wait for writeback
+to complete and you've lost the error.
+
+Since the handling of the PG_error flag is somewhat inconsistent across
+subsystems, let's just rely on marking the address space when there are
+writeback errors. Change the TestClearPageError call to ClearPageError,
+and make __filemap_fdatawait_range a void return function.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- fs/xfs/xfs_aops.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ mm/filemap.c | 20 +++++---------------
+ 1 file changed, 5 insertions(+), 15 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 11ef989b8629..621efe71c70a 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -139,6 +139,7 @@ xfs_destroy_ioend(
- 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
- 		struct bio_vec	*bvec;
- 		int		i;
-+		struct bvec_iter_all bia;
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 6f1be573a5e6..1de71753de28 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -376,17 +376,16 @@ int filemap_flush(struct address_space *mapping)
+ }
+ EXPORT_SYMBOL(filemap_flush);
  
- 		/*
- 		 * For the last bio, bi_private points to the ioend, so we
-@@ -150,7 +151,7 @@ xfs_destroy_ioend(
- 			next = bio->bi_private;
+-static int __filemap_fdatawait_range(struct address_space *mapping,
++static void __filemap_fdatawait_range(struct address_space *mapping,
+ 				     loff_t start_byte, loff_t end_byte)
+ {
+ 	pgoff_t index = start_byte >> PAGE_SHIFT;
+ 	pgoff_t end = end_byte >> PAGE_SHIFT;
+ 	struct pagevec pvec;
+ 	int nr_pages;
+-	int ret = 0;
  
- 		/* walk each page on bio, ending page IO on them */
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 			xfs_finish_page_writeback(inode, bvec, error);
+ 	if (end_byte < start_byte)
+-		goto out;
++		return;
  
- 		bio_put(bio);
+ 	pagevec_init(&pvec, 0);
+ 	while ((index <= end) &&
+@@ -403,14 +402,11 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 				continue;
+ 
+ 			wait_on_page_writeback(page);
+-			if (TestClearPageError(page))
+-				ret = -EIO;
++			ClearPageError(page);
+ 		}
+ 		pagevec_release(&pvec);
+ 		cond_resched();
+ 	}
+-out:
+-	return ret;
+ }
+ 
+ /**
+@@ -430,14 +426,8 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
+ 			    loff_t end_byte)
+ {
+-	int ret, ret2;
+-
+-	ret = __filemap_fdatawait_range(mapping, start_byte, end_byte);
+-	ret2 = filemap_check_errors(mapping);
+-	if (!ret)
+-		ret = ret2;
+-
+-	return ret;
++	__filemap_fdatawait_range(mapping, start_byte, end_byte);
++	return filemap_check_errors(mapping);
+ }
+ EXPORT_SYMBOL(filemap_fdatawait_range);
+ 
 -- 
-2.9.4
+2.13.0
