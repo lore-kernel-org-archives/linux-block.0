@@ -1,44 +1,59 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/11] btrfs: add support for passing in stream information for buffered writes
-Date: Tue, 13 Jun 2017 11:15:22 -0600
-Message-Id: <1497374123-15286-11-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
-References: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+Subject: [PATCH v6 16/20] block: convert to errseq_t based writeback error tracking
+Date: Mon, 12 Jun 2017 08:23:12 -0400
+Message-Id: <20170612122316.13244-21-jlayton@redhat.com>
+In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
+References: <20170612122316.13244-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/btrfs/extent_io.c | 1 +
- fs/btrfs/inode.c     | 1 +
- 2 files changed, 2 insertions(+)
+This is a very minimal conversion to errseq_t based error tracking
+for raw block device access.
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index d3619e010005..b245085e8f10 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2827,6 +2827,7 @@ static int submit_extent_page(int op, int op_flags, struct extent_io_tree *tree,
- 	bio->bi_end_io = end_io_func;
- 	bio->bi_private = tree;
- 	bio_set_op_attrs(bio, op, op_flags);
-+	bio_set_streamid(bio, inode_streamid(page->mapping->host));
- 	if (wbc) {
- 		wbc_init_bio(wbc, bio);
- 		wbc_account_io(wbc, page, page_size);
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index ef3c98c527c1..db0558a19f65 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8608,6 +8608,7 @@ static void btrfs_submit_direct(struct bio *dio_bio, struct inode *inode,
- 	atomic_set(&dip->pending_bios, 0);
- 	btrfs_bio = btrfs_io_bio(io_bio);
- 	btrfs_bio->logical = file_offset;
-+	bio_set_streamid(io_bio, bio_stream(dio_bio));
+Only real change that is strictly required is that we must ensure that
+filemap_report_wb_err is unconditionally called after fsync, which is
+now done if FS_WB_ERRSEQ is set in fs_flags. That ensures that the
+errseq_t in the file is advanced to the latest value in the mapping.
+
+Note that there are internal callers that call sync_blockdev and the
+like that are not affected by this. They'll continue to use the
+AS_EIO/AS_ENOSPC flags for error reporting like they always have for
+now.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ fs/block_dev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 4d62fe771587..4bf865cc99de 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -801,6 +801,7 @@ static struct file_system_type bd_type = {
+ 	.name		= "bdev",
+ 	.mount		= bd_mount,
+ 	.kill_sb	= kill_anon_super,
++	.fs_flags	= FS_WB_ERRSEQ,
+ };
  
- 	if (write) {
- 		io_bio->bi_end_io = btrfs_endio_direct_write;
+ struct super_block *blockdev_superblock __read_mostly;
 -- 
-2.7.4
+2.13.0
