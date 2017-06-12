@@ -1,33 +1,76 @@
-Return-Path: <BATV+db5541eadd89fe7a50e5+5041+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Mon, 12 Jun 2017 05:42:24 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net,
-	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
 	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v6 15/20] fs: have call_fsync call filemap_report_wb_err
- if FS_WB_ERRSEQ is set
-Message-ID: <20170612124224.GA18360@infradead.org>
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v6 15/20] fs: have call_fsync call filemap_report_wb_err if FS_WB_ERRSEQ is set
+Date: Mon, 12 Jun 2017 08:23:11 -0400
+Message-Id: <20170612122316.13244-20-jlayton@redhat.com>
+In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
 References: <20170612122316.13244-1-jlayton@redhat.com>
- <20170612122316.13244-20-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170612122316.13244-20-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 12, 2017 at 08:23:11AM -0400, Jeff Layton wrote:
-> Allow filesystems to opt-in to a final check of wb_err if FS_WB_ERRSEQ
-> is set. Technically, we could just plumb these calls into all of the
-> fsync operations, but I think this means less code, changes and churn.
+Allow filesystems to opt-in to a final check of wb_err if FS_WB_ERRSEQ
+is set. Technically, we could just plumb these calls into all of the
+fsync operations, but I think this means less code, changes and churn.
 
-Please add it to every fs, that is a consistent with how we handle
-everything else related to writeback.
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ include/linux/fs.h | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-Oh, and please kill this idiotic call_fsync helper while you're at it.
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 17ba6284ab14..ef3feeec80b2 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1742,12 +1742,6 @@ static inline int call_mmap(struct file *file, struct vm_area_struct *vma)
+ 	return file->f_op->mmap(file, vma);
+ }
+ 
+-static inline int call_fsync(struct file *file, loff_t start, loff_t end,
+-			     int datasync)
+-{
+-	return file->f_op->fsync(file, start, end, datasync);
+-}
+-
+ ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
+ 			      unsigned long nr_segs, unsigned long fast_segs,
+ 			      struct iovec *fast_pointer,
+@@ -2583,6 +2577,20 @@ static inline errseq_t filemap_sample_wb_err(struct address_space *mapping)
+ 	return errseq_sample(&mapping->wb_err);
+ }
+ 
++static inline int call_fsync(struct file *file, loff_t start, loff_t end,
++			     int datasync)
++{
++	int ret;
++
++	ret = file->f_op->fsync(file, start, end, datasync);
++	if (file->f_mapping->host->i_sb->s_type->fs_flags & FS_WB_ERRSEQ) {
++		int ret2 = filemap_report_wb_err(file);
++		if (!ret)
++			ret = ret2;
++	}
++	return ret;
++}
++
+ extern int vfs_fsync_range(struct file *file, loff_t start, loff_t end,
+ 			   int datasync);
+ extern int vfs_fsync(struct file *file, int datasync);
+-- 
+2.13.0
