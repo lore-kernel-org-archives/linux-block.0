@@ -1,52 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:38514 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752454AbdF3P44 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 11:56:56 -0400
-Received: by mail-wm0-f48.google.com with SMTP id b184so50445547wme.1
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:56:55 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 04/10] lightnvm: pblk: schedule if data is not ready
-Date: Fri, 30 Jun 2017 17:56:37 +0200
-Message-Id: <1498838203-21539-5-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
-References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v6 20/20] btrfs: minimal conversion to errseq_t writeback error reporting on fsync
+Date: Mon, 12 Jun 2017 08:23:16 -0400
+Message-Id: <20170612122316.13244-25-jlayton@redhat.com>
+In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
+References: <20170612122316.13244-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When user threads place data into the write buffer, they reserve space
-and do the memory copy out of the lock. As a consequence, when the write
-thread starts persisting data, there is a chance that it is not copied
-yet. In this case, avoid polling, and schedule before retrying.
+Set the FS_WB_ERRSEQ flag to opt-in to errseq_t based reporting.
+Internal call to filemap_* functions are left as-is.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/lightnvm/pblk-rb.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ fs/btrfs/super.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 665a4ccfe7f5..2dda874af890 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -578,8 +578,10 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
- 		 */
- try:
- 		flags = READ_ONCE(entry->w_ctx.flags);
--		if (!(flags & PBLK_WRITTEN_DATA))
-+		if (!(flags & PBLK_WRITTEN_DATA)) {
-+			io_schedule();
- 			goto try;
-+		}
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 4f1cdd5058f1..c99af09cd3e7 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -2184,7 +2184,7 @@ static struct file_system_type btrfs_fs_type = {
+ 	.name		= "btrfs",
+ 	.mount		= btrfs_mount,
+ 	.kill_sb	= btrfs_kill_super,
+-	.fs_flags	= FS_REQUIRES_DEV | FS_BINARY_MOUNTDATA,
++	.fs_flags	= FS_REQUIRES_DEV | FS_BINARY_MOUNTDATA | FS_WB_ERRSEQ,
+ };
+ MODULE_ALIAS_FS("btrfs");
  
- 		page = virt_to_page(entry->data);
- 		if (!page) {
 -- 
-2.7.4
+2.13.0
