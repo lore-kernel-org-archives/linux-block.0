@@ -1,86 +1,56 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-yb0-f194.google.com ([209.85.213.194]:34714 "EHLO
+        mail-yb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752251AbdFLS3d (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Jun 2017 14:29:33 -0400
+Date: Mon, 12 Jun 2017 14:29:31 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org
-Subject: [PATCH v2 11/51] md: raid1: initialize bvec table via bio_add_page()
-Date: Mon, 26 Jun 2017 20:09:54 +0800
-Message-Id: <20170626121034.3051-12-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+        gregkh@linuxfoundation.org, hch@lst.de, axboe@fb.com,
+        rostedt@goodmis.org, lizefan@huawei.com, Kernel-team@fb.com,
+        Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH 04/11] kernfs: don't set dentry->d_fsdata
+Message-ID: <20170612182931.GI19206@htj.duckdns.org>
+References: <cover.1496432591.git.shli@fb.com>
+ <fbb39a1220cf88687ed3a05f4cd4ad7ed56ffdf0.1496432591.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <fbb39a1220cf88687ed3a05f4cd4ad7ed56ffdf0.1496432591.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We will support multipage bvec soon, so initialize bvec
-table using the standardy way instead of writing the
-talbe directly. Otherwise it won't work any more once
-multipage bvec is enabled.
+Hello,
 
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/raid1.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+On Fri, Jun 02, 2017 at 02:53:57PM -0700, Shaohua Li wrote:
+> @@ -570,7 +570,8 @@ static int kernfs_dop_revalidate(struct dentry *dentry, unsigned int flags)
+>  		goto out_bad;
+>  
+>  	/* The kernfs node has been moved? */
+> -	if (dentry->d_parent->d_fsdata != kn->parent)
+> +	if (d_really_is_negative(dentry->d_parent) ||
+> +	    kernfs_dentry_node(dentry->d_parent) != kn->parent)
+>  		goto out_bad;
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 3febfc8391fb..835c42396861 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2086,10 +2086,8 @@ static void process_checks(struct r1bio *r1_bio)
- 	/* Fix variable parts of all bios */
- 	vcnt = (r1_bio->sectors + PAGE_SIZE / 512 - 1) >> (PAGE_SHIFT - 9);
- 	for (i = 0; i < conf->raid_disks * 2; i++) {
--		int j;
- 		int size;
- 		blk_status_t status;
--		struct bio_vec *bi;
- 		struct bio *b = r1_bio->bios[i];
- 		struct resync_pages *rp = get_resync_pages(b);
- 		if (b->bi_end_io != end_sync_read)
-@@ -2098,8 +2096,6 @@ static void process_checks(struct r1bio *r1_bio)
- 		status = b->bi_status;
- 		bio_reset(b);
- 		b->bi_status = status;
--		b->bi_vcnt = vcnt;
--		b->bi_iter.bi_size = r1_bio->sectors << 9;
- 		b->bi_iter.bi_sector = r1_bio->sector +
- 			conf->mirrors[i].rdev->data_offset;
- 		b->bi_bdev = conf->mirrors[i].rdev->bdev;
-@@ -2107,15 +2103,20 @@ static void process_checks(struct r1bio *r1_bio)
- 		rp->raid_bio = r1_bio;
- 		b->bi_private = rp;
- 
--		size = b->bi_iter.bi_size;
--		bio_for_each_segment_all(bi, b, j) {
--			bi->bv_offset = 0;
--			if (size > PAGE_SIZE)
--				bi->bv_len = PAGE_SIZE;
--			else
--				bi->bv_len = size;
--			size -= PAGE_SIZE;
--		}
-+		/* initialize bvec table again */
-+		rp->idx = 0;
-+		size = r1_bio->sectors << 9;
-+		do {
-+			struct page *page = resync_fetch_page(rp, rp->idx++);
-+			int len = min_t(int, size, PAGE_SIZE);
-+
-+			/*
-+			 * won't fail because the vec table is big
-+			 * enough to hold all these pages
-+			 */
-+			bio_add_page(b, page, len, 0);
-+			size -= len;
-+		} while (rp->idx < RESYNC_PAGES && size > 0);
- 	}
- 	for (primary = 0; primary < conf->raid_disks * 2; primary++)
- 		if (r1_bio->bios[primary]->bi_end_io == end_sync_read &&
+Can we move d_really_is_negative() into kernfs_dentry_node()?  That
+might add an additional NULL test to some paths but I don't think that
+will ever show up anywhere.
+
+> diff --git a/fs/kernfs/kernfs-internal.h b/fs/kernfs/kernfs-internal.h
+> index 3534cfe..82e11fa 100644
+> --- a/fs/kernfs/kernfs-internal.h
+> +++ b/fs/kernfs/kernfs-internal.h
+> @@ -70,6 +70,8 @@ struct kernfs_super_info {
+>  };
+>  #define kernfs_info(SB) ((struct kernfs_super_info *)(SB->s_fs_info))
+>  
+> +#define kernfs_dentry_node(d)  ((d_inode(d))->i_private)
+
+I know the prev one is a macro but let's make the new one an inline
+function.
+
+Thnaks.
+
 -- 
-2.9.4
+tejun
