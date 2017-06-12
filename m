@@ -1,103 +1,108 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38766 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751488AbdFWOaM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jun 2017 10:30:12 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests 2/2] block/011: Perform PCI reset while doing IO
-Date: Fri, 23 Jun 2017 16:29:51 +0200
-Message-Id: <20170623142951.17189-2-jthumshirn@suse.de>
-In-Reply-To: <20170623142951.17189-1-jthumshirn@suse.de>
-References: <20170623142951.17189-1-jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v6 10/13] ext4: add more robust reporting of metadata writeback errors
+Date: Mon, 12 Jun 2017 08:23:02 -0400
+Message-Id: <20170612122316.13244-11-jlayton@redhat.com>
+In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
+References: <20170612122316.13244-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+ext4 uses the blockdev mapping for tracking metadata stored in the
+pagecache. Sample its wb_err when opening a file and store that in
+the f_md_wb_err field.
 
-This test-case performs I/O with fio while doing PCI disable/enable
-cycles.
+Change ext4_sync_file to check for data errors first, and then check the
+blockdev mapping for metadata errors afterward.
 
-In the results we don't care for I/O errors but for hiccups in dmesg only.
+Note that because metadata writeback errors are only tracked on a
+per-device level, this does mean that we'll end up reporting an error on
+all open file descriptors when there is a metadata writeback failure.
+That's not ideal, but we can possibly improve upon it in the future.
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- tests/block/011     | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/block/011.out |  2 ++
- 2 files changed, 56 insertions(+)
- create mode 100755 tests/block/011
- create mode 100644 tests/block/011.out
+ fs/ext4/dir.c   |  8 ++++++--
+ fs/ext4/file.c  |  5 ++++-
+ fs/ext4/fsync.c | 13 +++++++++++++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
 
-diff --git a/tests/block/011 b/tests/block/011
-new file mode 100755
-index 000000000000..b0de35816d48
---- /dev/null
-+++ b/tests/block/011
-@@ -0,0 +1,54 @@
-+#!/bin/bash
-+#
-+# Do disable PCI device while doing I/O to it
-+#
-+# Copyright (C) 2017 Johannes Thumshirn <jthumshirn@suse.de>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+diff --git a/fs/ext4/dir.c b/fs/ext4/dir.c
+index e8b365000d73..6bbb19510f74 100644
+--- a/fs/ext4/dir.c
++++ b/fs/ext4/dir.c
+@@ -611,9 +611,13 @@ static int ext4_dx_readdir(struct file *file, struct dir_context *ctx)
+ 
+ static int ext4_dir_open(struct inode * inode, struct file * filp)
+ {
++	int ret = 0;
 +
-+DESCRIPTION="disable PCI device while doing I/O"
-+TIMED=1
+ 	if (ext4_encrypted_inode(inode))
+-		return fscrypt_get_encryption_info(inode) ? -EACCES : 0;
+-	return 0;
++		ret = fscrypt_get_encryption_info(inode) ? -EACCES : 0;
++	if (!ret)
++		filp->f_md_wb_err = filemap_sample_wb_err(inode->i_sb->s_bdev->bd_inode->i_mapping);
++	return ret;
+ }
+ 
+ static int ext4_release_dir(struct inode *inode, struct file *filp)
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index 831fd6beebf0..fe0d6e01c4b7 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -435,7 +435,10 @@ static int ext4_file_open(struct inode * inode, struct file * filp)
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+-	return dquot_file_open(inode, filp);
++	ret = dquot_file_open(inode, filp);
++	if (!ret)
++		filp->f_md_wb_err = filemap_sample_wb_err(sb->s_bdev->bd_inode->i_mapping);
++	return ret;
+ }
+ 
+ /*
+diff --git a/fs/ext4/fsync.c b/fs/ext4/fsync.c
+index 03d6259d8662..36363a6730d7 100644
+--- a/fs/ext4/fsync.c
++++ b/fs/ext4/fsync.c
+@@ -165,6 +165,19 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+ 	err = filemap_report_wb_err(file);
+ 	if (!ret)
+ 		ret = err;
 +
-+requires() {
-+	_have_fio
-+}
++	/*
++	 * Was there a metadata writeback error since last fsync?
++	 *
++	 * FIXME: ext4 tracks metadata with a whole-block device mapping. So,
++	 * if there is any sort of metadata writeback error, we'll report an
++	 * error on all open fds, even ones not associated with the inode
++	 */
++	err = filemap_report_md_wb_err(file,
++				inode->i_sb->s_bdev->bd_inode->i_mapping);
++	if (!ret)
++		ret = err;
 +
-+device_requires() {
-+	_test_dev_is_pci
-+}
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	pdev=$(_get_pci_dev_from_blkdev)
-+
-+	if _test_dev_is_rotational; then
-+		size="32m"
-+	else
-+		size="1g"
-+	fi
-+
-+	# start fio job
-+	_run_fio --bs=4k --rw=randread --norandommap \
-+		--name=reads --filename="$TEST_DEV" --size="$size" \
-+		--numjobs=8 --direct=1 2>/dev/null &
-+
-+	while kill -0 $! 2>/dev/null; do
-+		echo 0 > "/sys/bus/pci/devices/${pdev}/enable"
-+		sleep .2
-+		echo 1 > "/sys/bus/pci/devices/${pdev}/enable"
-+	done
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/block/011.out b/tests/block/011.out
-new file mode 100644
-index 000000000000..8e067df63097
---- /dev/null
-+++ b/tests/block/011.out
-@@ -0,0 +1,2 @@
-+Running block/011
-+Test complete
+ 	trace_ext4_sync_file_exit(inode, ret);
+ 	return ret;
+ }
 -- 
-2.12.3
+2.13.0
