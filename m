@@ -18,73 +18,59 @@ Cc: linux-fsdevel@vger.kernel.org,
 	linux-xfs@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v6 14/20] dax: set errors in mapping when writeback fails
-Date: Mon, 12 Jun 2017 08:23:10 -0400
-Message-Id: <20170612122316.13244-19-jlayton@redhat.com>
+Subject: [PATCH v6 03/20] fs: check for writeback errors after syncing out buffers in generic_file_fsync
+Date: Mon, 12 Jun 2017 08:22:55 -0400
+Message-Id: <20170612122316.13244-4-jlayton@redhat.com>
 In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
 References: <20170612122316.13244-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Jan Kara's description for this patch is much better than mine, so I'm
-quoting it verbatim here:
+ext2 currently does a test+clear of the AS_EIO flag, which is
+is problematic for some coming changes.
 
------------------8<-----------------
-DAX currently doesn't set errors in the mapping when cache flushing
-fails in dax_writeback_mapping_range(). Since this function can get
-called only from fsync(2) or sync(2), this is actually as good as it can
-currently get since we correctly propagate the error up from
-dax_writeback_mapping_range() to filemap_fdatawrite()
+What we really need to do instead is call filemap_check_errors
+in __generic_file_fsync after syncing out the buffers. That
+will be sufficient for this case, and help other callers detect
+these errors properly as well.
 
-However, in the future better writeback error handling will enable us to
-properly report these errors on fsync(2) even if there are multiple file
-descriptors open against the file or if sync(2) gets called before
-fsync(2). So convert DAX to using standard error reporting through the
-mapping.
------------------8<-----------------
+With that, we don't need to twiddle it in ext2.
 
-For now, only do this when the FS_WB_ERRSEQ flag is set. The
-AS_EIO/AS_ENOSPC flags are not currently cleared in the older code when
-writeback initiation fails, only when we discover an error after waiting
-on writeback to complete, so we only want to do this with errseq_t based
-error handling to prevent seeing duplicate errors on fsync.
-
+Suggested-by: Jan Kara <jack@suse.cz>
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-and-Tested-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
 ---
- fs/dax.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ fs/ext2/file.c | 2 +-
+ fs/libfs.c     | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/dax.c b/fs/dax.c
-index 2a6889b3585f..ba3b17eefcfc 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -856,8 +856,24 @@ int dax_writeback_mapping_range(struct address_space *mapping,
+diff --git a/fs/ext2/file.c b/fs/ext2/file.c
+index b21891a6bfca..ed00e7ae0ef3 100644
+--- a/fs/ext2/file.c
++++ b/fs/ext2/file.c
+@@ -177,7 +177,7 @@ int ext2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+ 	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
  
- 			ret = dax_writeback_one(bdev, dax_dev, mapping,
- 					indices[i], pvec.pages[i]);
--			if (ret < 0)
-+			if (ret < 0) {
-+				/*
-+				 * For fs' that use errseq_t based error
-+				 * tracking, we must call mapping_set_error
-+				 * here to ensure that fsync on all open fds
-+				 * get back an error. Doing this with the old
-+				 * wb error tracking infrastructure is
-+				 * problematic though, as DAX writeback is
-+				 * synchronous, and the error flags are not
-+				 * cleared when initiation fails, only when
-+				 * it fails after the write has been submitted
-+				 * to the backing store.
-+				 */
-+				if (mapping->host->i_sb->s_type->fs_flags &
-+						FS_WB_ERRSEQ)
-+					mapping_set_error(mapping, ret);
- 				goto out;
-+			}
- 		}
- 	}
+ 	ret = generic_file_fsync(file, start, end, datasync);
+-	if (ret == -EIO || test_and_clear_bit(AS_EIO, &mapping->flags)) {
++	if (ret == -EIO) {
+ 		/* We don't really know where the IO error happened... */
+ 		ext2_error(sb, __func__,
+ 			   "detected IO error when writing metadata buffers");
+diff --git a/fs/libfs.c b/fs/libfs.c
+index a04395334bb1..1dec90819366 100644
+--- a/fs/libfs.c
++++ b/fs/libfs.c
+@@ -991,7 +991,8 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
+ 
  out:
+ 	inode_unlock(inode);
+-	return ret;
++	err = filemap_check_errors(inode->i_mapping);
++	return ret ? ret : err;
+ }
+ EXPORT_SYMBOL(__generic_file_fsync);
+ 
 -- 
 2.13.0
