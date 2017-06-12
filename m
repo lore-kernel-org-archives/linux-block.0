@@ -1,50 +1,33 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.12-rc
-Message-ID: <807cadff-89de-2a9b-f882-b8729e4e0fb0@kernel.dk>
-Date: Wed, 21 Jun 2017 18:48:59 -0600
+Return-Path: <BATV+db5541eadd89fe7a50e5+5041+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 12 Jun 2017 05:44:01 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com, corbet@lwn.net,
+	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v6 14/20] dax: set errors in mapping when writeback fails
+Message-ID: <20170612124401.GB18360@infradead.org>
+References: <20170612122316.13244-1-jlayton@redhat.com>
+ <20170612122316.13244-19-jlayton@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170612122316.13244-19-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On Mon, Jun 12, 2017 at 08:23:10AM -0400, Jeff Layton wrote:
+> For now, only do this when the FS_WB_ERRSEQ flag is set. The
+> AS_EIO/AS_ENOSPC flags are not currently cleared in the older code when
+> writeback initiation fails, only when we discover an error after waiting
+> on writeback to complete, so we only want to do this with errseq_t based
+> error handling to prevent seeing duplicate errors on fsync.
 
-This pull request contains a set of fixes for xen-blkback by way of
-Konrad, and a performance regression fix for blk-mq for shared tags. The
-latter could account for as much as a 50x reduction in performance, with
-the test case from the user with 500 name spaces. A more realistic setup
-on my end with 32 drives showed a 3.5x drop. The fix has been thoroughly
-tested before being committed.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Jan Beulich (1):
-      xen-blkback: don't leak stack data via response ring
-
-Jens Axboe (2):
-      Merge branch 'stable/for-jens-4.12' of git://git.kernel.org/.../konrad/xen into for-linus
-      blk-mq: fix performance regression with shared tags
-
-Juergen Gross (3):
-      xen/blkback: fix disconnect while I/Os in flight
-      xen/blkback: don't free be structure too early
-      xen/blkback: don't use xen_blkif_get() in xen-blkback kthread
-
- block/blk-mq-sched.c                | 58 +++++++++++++++++++++++++++++--------
- block/blk-mq-sched.h                |  9 ------
- block/blk-mq.c                      | 16 ++++++++--
- drivers/block/xen-blkback/blkback.c | 26 ++++++++---------
- drivers/block/xen-blkback/common.h  | 26 ++++-------------
- drivers/block/xen-blkback/xenbus.c  | 15 +++++-----
- include/linux/blkdev.h              |  2 ++
- 7 files changed, 87 insertions(+), 65 deletions(-)
-
--- 
-Jens Axboe
+Please make sure this doens't stay conditional by the end of the series.
+We only have three file systems using dax, and a series should be able
+to make them agree on a single interface.
