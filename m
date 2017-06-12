@@ -1,20 +1,24 @@
-Return-Path: <bcache@lists.ewheeler.net>
-From: bcache@lists.ewheeler.net
-To: linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org,
-	hch@infradead.org,
-	axboe@kernel.dk,
-	Tony Asleson <tasleson@redhat.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 14/19] bcache: Correct return value for sysfs attach errors
-Date: Fri, 30 Jun 2017 13:43:03 -0700
-Message-Id: <1498855388-16990-14-git-send-email-bcache@lists.ewheeler.net>
-In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:44976 "EHLO
+        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752415AbdF3KVQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 06:21:16 -0400
+Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
+        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id D9B343E56B6
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:09 -0700 (PDT)
+Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
+        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 56DA4B400D4
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+In-Reply-To: <20170629134510.GA32385@infradead.org>
 References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
-List-ID: <linux-block@vger.kernel.org>
-
 From: Tony Asleson <tasleson@redhat.com>
+Date: Mon, 12 Jun 2017 16:18:26 -0500
+Subject: [PATCH 14/19] bcache: Correct return value for sysfs attach errors
+To: linux-block@vger.kernel.org
+Message-Id: <20170629222108.43B65100131@ware.dreamhost.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 If you encounter any errors in bch_cached_dev_attach it will return a negative
 error code.  The variable 'v' which stores the result is unsigned, thus user
