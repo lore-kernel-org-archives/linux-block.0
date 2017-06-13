@@ -2,16 +2,14 @@ Return-Path: <axboe@kernel.dk>
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 06/10] fs: add support for buffered writeback to pass down stream information
-Date: Tue, 13 Jun 2017 22:01:55 -0600
-Message-Id: <1497412919-19400-7-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
-References: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 07/11] fs: add support for buffered writeback to pass down stream information
+Date: Tue, 13 Jun 2017 11:15:19 -0600
+Message-Id: <1497374123-15286-8-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+References: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
  fs/buffer.c | 14 +++++++++-----
