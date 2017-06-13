@@ -1,70 +1,65 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 02/11] block: add definition for support data write life
+ times
+To: Andreas Dilger <adilger@dilger.ca>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, linux-block@vger.kernel.org
+References: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+ <1497374123-15286-3-git-send-email-axboe@kernel.dk>
+ <44670077-46FF-44C0-85DD-CA52BE2EB2E6@dilger.ca>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 06/11] fs: add O_DIRECT support for sending down bio stream information
-Date: Wed, 14 Jun 2017 13:05:29 -0600
-Message-Id: <1497467134-6323-7-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+Message-ID: <7082c8f9-115b-5121-199f-facd0f4dea69@kernel.dk>
+Date: Tue, 13 Jun 2017 14:10:09 -0600
+MIME-Version: 1.0
+In-Reply-To: <44670077-46FF-44C0-85DD-CA52BE2EB2E6@dilger.ca>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/block_dev.c | 2 ++
- fs/direct-io.c | 2 ++
- fs/iomap.c     | 1 +
- 3 files changed, 5 insertions(+)
+On 06/13/2017 01:07 PM, Andreas Dilger wrote:
+> On Jun 13, 2017, at 11:15 AM, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>> include/linux/blk_types.h | 13 +++++++++++++
+>> 1 file changed, 13 insertions(+)
+>>
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index 1940876a7fa7..16c4e657807f 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -314,6 +314,19 @@ struct blk_rq_stat {
+>> 	u64 batch;
+>> };
+>>
+>> +/*
+>> + * Data life time definitions for writes. These are relative within a
+>> + * given device, no absolute meaning is attached to them.
+>> + */
+>> +enum {
+>> +	WRITE_LIFE_UNKNOWN	= 0,
+>> +	WRITE_LIFE_SHORT,
+>> +	WRITE_LIFE_MEDIUM,
+>> +	WRITE_LIFE_LONG,
+>> +	WRITE_LIFE_EXTREME,
+>> +	WRITE_LIFE_NR,
+>> +};
+> 
+> With the exception of these enums, there is actually enough space in the
+> various structures to pass at least a 4-bit stream ID through the whole
+> stack (actually, a full 32-bit stream ID, except for the debugfs stats).
+> 
+> I'm not necessarily against having some pre-defined meanings for these
+> values, but with a few trivial changes to the code it would be possible
+> to make this functionality much more flexible.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 519599dddd36..31ba4a8f0a28 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -239,6 +239,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 			should_dirty = true;
- 	} else {
- 		bio.bi_opf = dio_bio_write_op(iocb);
-+		bio_set_streamid(&bio, iocb_streamid(iocb));
- 		task_io_account_write(ret);
- 	}
- 
-@@ -374,6 +375,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 				bio_set_pages_dirty(bio);
- 		} else {
- 			bio->bi_opf = dio_bio_write_op(iocb);
-+			bio_set_streamid(bio, iocb_streamid(iocb));
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		}
- 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a04ebea77de8..a770e82bb9f8 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -386,6 +386,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 	else
- 		bio->bi_end_io = dio_bio_end_io;
- 
-+	bio_set_streamid(bio, iocb_streamid(dio->iocb));
-+
- 	sdio->bio = bio;
- 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 4b10892967a5..fa7d29632fbc 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -804,6 +804,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		if (dio->flags & IOMAP_DIO_WRITE) {
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+			bio_set_streamid(bio, inode_streamid(inode));
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		} else {
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
+One thing I'm envisioning, down the line, is to have sets of streams. We
+have the four streams, should be good enough for any app. But for multiple
+apps, it becomes more difficult. So we could essentially shift the stream
+ID up and share this space, and also utilize more streams on the back end
+for that. For software caching solution, they can already factor in the
+application, but for hardware devices, we could make use of that.
+
+So I don't think there's anything wrong with the current approach. The
+whole point was not to over-complicate or over-engineer this.
+
 -- 
-2.7.4
+Jens Axboe
