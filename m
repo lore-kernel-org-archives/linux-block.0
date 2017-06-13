@@ -1,56 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52158 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753176AbdFRPW3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:29 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 14/30] nvme-rdma: stop queues instead of simply flipping their state
-Date: Sun, 18 Jun 2017 18:21:48 +0300
-Message-Id: <1497799324-19598-15-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+Return-Path: <jlayton@redhat.com>
+Message-ID: <1497349642.5762.3.camel@redhat.com>
+Subject: Re: [PATCH v6 19/20] xfs: minimal conversion to errseq_t writeback
+ error reporting
+From: Jeff Layton <jlayton@redhat.com>
+To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Date: Tue, 13 Jun 2017 06:27:22 -0400
+In-Reply-To: <20170613043056.GO4530@birch.djwong.org>
+References: <20170612122316.13244-1-jlayton@redhat.com>
+	 <20170612122316.13244-24-jlayton@redhat.com>
+	 <20170613043056.GO4530@birch.djwong.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-If we move the queues from LIVE state, we might as well stop
-them (drain for rdma). Do it after we stop the sw request queues
-to prevent a stray request sneaking in .queue_rq after we stop
-the queue.
+On Mon, 2017-06-12 at 21:30 -0700, Darrick J. Wong wrote:
+> On Mon, Jun 12, 2017 at 08:23:15AM -0400, Jeff Layton wrote:
+> > Just set the FS_WB_ERRSEQ flag to indicate that we want to use errseq_t
+> > based error reporting. Internal filemap_* calls are left as-is for now.
+> > 
+> > Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> > ---
+> >  fs/xfs/xfs_super.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+> > index 455a575f101d..28d3be187025 100644
+> > --- a/fs/xfs/xfs_super.c
+> > +++ b/fs/xfs/xfs_super.c
+> > @@ -1758,7 +1758,7 @@ static struct file_system_type xfs_fs_type = {
+> >  	.name			= "xfs",
+> >  	.mount			= xfs_fs_mount,
+> >  	.kill_sb		= kill_block_super,
+> > -	.fs_flags		= FS_REQUIRES_DEV,
+> > +	.fs_flags		= FS_REQUIRES_DEV | FS_WB_ERRSEQ,
+> 
+> Huh?  Why are there two patches with the same subject line?  And this
+> same bit of code too?  Or ... 11/13, 11/20?  What's going on here?
+> 
+> <confused>
+> 
+> --D
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Oh my -- sorry about that. I ended up with two different interleaved
+patchsets. The /20 series is the one I meant to send.
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index d9524389aedd..fbe2ca4f4ba3 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -952,16 +952,15 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
- {
- 	struct nvme_rdma_ctrl *ctrl = container_of(work,
- 			struct nvme_rdma_ctrl, err_work);
--	int i;
- 
- 	nvme_stop_keep_alive(&ctrl->ctrl);
- 
--	for (i = 0; i < ctrl->ctrl.queue_count; i++)
--		clear_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[i].flags);
--
--	if (ctrl->ctrl.queue_count > 1)
-+	if (ctrl->ctrl.queue_count > 1) {
- 		nvme_stop_queues(&ctrl->ctrl);
-+		nvme_rdma_stop_io_queues(ctrl);
-+	}
- 	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	nvme_rdma_stop_queue(ctrl, 0);
- 
- 	/* We must take care of fastfail/requeue all our inflight requests */
- 	if (ctrl->ctrl.queue_count > 1)
+Just ignore these for now though, as I'll be sending a v7 (at least) to
+address HCH's comments.
 -- 
-2.7.4
+Jeff Layton <jlayton@redhat.com>
