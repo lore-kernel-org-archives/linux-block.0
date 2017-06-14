@@ -1,110 +1,73 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 01/11] block: add support for carrying stream information in a bio
-Date: Tue, 13 Jun 2017 11:15:13 -0600
-Message-Id: <1497374123-15286-2-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
-References: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Michael Halcrow <mhalcrow@google.com>
+To: Michael Halcrow <mhalcrow@google.com>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Eric Biggers <ebiggers@google.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-ext4@vger.kernel.org, Tyler Hicks <tyler.hicks@canonical.com>
+Subject: [RFC PATCH 4/4] f2fs: Set the bio REQ_NOENCRYPT flag
+Date: Wed, 14 Jun 2017 16:40:40 -0700
+Message-Id: <20170614234040.4326-5-mhalcrow@google.com>
+In-Reply-To: <20170614234040.4326-1-mhalcrow@google.com>
+References: <20170614234040.4326-1-mhalcrow@google.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-No functional changes in this patch, but it allows each bio to
-carry a stream ID and disallows merging of bio's with different
-stream IDs.
+When lower layers such as dm-crypt observe the REQ_NOENCRYPT flag, it
+helps the I/O stack avoid redundant encryption, improving performance
+and power utilization.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Note that lower layers must be consistent in their observation of this
+flag in order to avoid the possibility of data corruption.
+
+Signed-off-by: Michael Halcrow <mhalcrow@google.com>
 ---
- block/bio.c               |  2 ++
- block/blk-merge.c         | 14 ++++++++++++++
- include/linux/blk_types.h | 17 +++++++++++++++++
- 3 files changed, 33 insertions(+)
+ fs/f2fs/data.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 888e7801c638..77f4be1f7428 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -595,6 +595,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_opf = bio_src->bi_opf;
- 	bio->bi_iter = bio_src->bi_iter;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
-+	bio->bi_stream = bio_src->bi_stream;
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 7c0f6bdf817d..2a000c0ec7e1 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -359,6 +359,7 @@ int f2fs_submit_page_bio(struct f2fs_io_info *fio)
+ 		bio_put(bio);
+ 		return -EFAULT;
+ 	}
++	fio->op_flags |= fio->encrypted_page ? REQ_NOENCRYPT : 0;
+ 	bio_set_op_attrs(bio, fio->op, fio->op_flags);
  
- 	bio_clone_blkcg_association(bio, bio_src);
- }
-@@ -678,6 +679,7 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 	bio->bi_opf		= bio_src->bi_opf;
- 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
- 	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
-+	bio->bi_stream		= bio_src->bi_stream;
+ 	__submit_bio(fio->sbi, bio, fio->type);
+@@ -384,6 +385,7 @@ int f2fs_submit_page_mbio(struct f2fs_io_info *fio)
+ 	verify_block_addr(sbi, fio->new_blkaddr);
  
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 3990ae406341..28998acdd675 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -693,6 +693,13 @@ static struct request *attempt_merge(struct request_queue *q,
- 		return NULL;
+ 	bio_page = fio->encrypted_page ? fio->encrypted_page : fio->page;
++	fio->op_flags |= fio->encrypted_page ? REQ_NOENCRYPT : 0;
  
- 	/*
-+	 * Don't allow merge of different streams, or for a stream with
-+	 * non-stream IO.
-+	 */
-+	if (req->bio->bi_stream != next->bio->bi_stream)
-+		return NULL;
-+
-+	/*
- 	 * If we are allowed to merge, then append bio list
- 	 * from next to rq and release next. merge_requests_fn
- 	 * will have updated segment counts, update sector
-@@ -811,6 +818,13 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 	    !blk_write_same_mergeable(rq->bio, bio))
- 		return false;
+ 	/* set submitted = 1 as a return value */
+ 	fio->submitted = 1;
+@@ -1242,7 +1244,10 @@ static int f2fs_mpage_readpages(struct address_space *mapping,
+ 				bio = NULL;
+ 				goto set_error_page;
+ 			}
+-			bio_set_op_attrs(bio, REQ_OP_READ, 0);
++			bio_set_op_attrs(bio, REQ_OP_READ,
++					 (f2fs_encrypted_inode(inode) ?
++					  REQ_NOENCRYPT :
++					  0));
+ 		}
  
-+	/*
-+	 * Don't allow merge of different streams, or for a stream with
-+	 * non-stream IO.
-+	 */
-+	if (rq->bio->bi_stream != bio->bi_stream)
-+		return false;
-+
- 	return true;
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 61339bc44400..1940876a7fa7 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -36,6 +36,8 @@ struct bio {
- 	unsigned short		bi_flags;	/* status, etc and bvec pool number */
- 	unsigned short		bi_ioprio;
- 
-+	unsigned int		bi_stream;	/* write life time hint */
-+
- 	struct bvec_iter	bi_iter;
- 
- 	/* Number of segments in this BIO after
-@@ -312,4 +314,19 @@ struct blk_rq_stat {
- 	u64 batch;
- };
- 
-+static inline void bio_set_streamid(struct bio *bio, unsigned int stream)
-+{
-+	bio->bi_stream = stream;
-+}
-+
-+static inline bool bio_stream_valid(struct bio *bio)
-+{
-+	return bio->bi_stream != 0;
-+}
-+
-+static inline unsigned int bio_stream(struct bio *bio)
-+{
-+	return bio->bi_stream;
-+}
-+
- #endif /* __LINUX_BLK_TYPES_H */
+ 		if (bio_add_page(bio, page, blocksize, 0) < blocksize)
+@@ -1914,7 +1919,8 @@ static int f2fs_write_begin(struct file *file, struct address_space *mapping,
+ 			err = PTR_ERR(bio);
+ 			goto fail;
+ 		}
+-		bio->bi_opf = REQ_OP_READ;
++		bio->bi_opf = REQ_OP_READ |
++			(f2fs_encrypted_inode(inode) ? REQ_NOENCRYPT : 0);
+ 		if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
+ 			bio_put(bio);
+ 			err = -EFAULT;
 -- 
-2.7.4
+2.13.1.508.gb3defc5cc-goog
