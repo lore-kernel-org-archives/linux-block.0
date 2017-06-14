@@ -1,16 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47632 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:47544 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752860AbdFNQMU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2017 12:12:20 -0400
+        id S1752445AbdFNQMV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Jun 2017 12:12:21 -0400
 From: Shaohua Li <shli@kernel.org>
 To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
         axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
         Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 07/12] cgroup: export fhandle info for a cgroup
-Date: Wed, 14 Jun 2017 09:12:05 -0700
-Message-Id: <8d928141f1e628c31b4502068b35c97987645138.1497455937.git.shli@fb.com>
+Subject: [PATCH V2 02/12] kernfs: use idr instead of ida to manage inode number
+Date: Wed, 14 Jun 2017 09:12:00 -0700
+Message-Id: <3f9c2c3ac1697b40a6412a1a4676379306bbf344.1497455937.git.shli@fb.com>
 In-Reply-To: <cover.1497455937.git.shli@fb.com>
 References: <cover.1497455937.git.shli@fb.com>
 In-Reply-To: <cover.1497455937.git.shli@fb.com>
@@ -20,43 +20,90 @@ List-Id: linux-block@vger.kernel.org
 
 From: Shaohua Li <shli@fb.com>
 
-Add an API to export cgroup fhandle info. We don't export a full 'struct
-file_handle', there are unrequired info. Sepcifically, cgroup is always
-a directory, so we don't need a 'FILEID_KERNFS_WITH_PARENT' type
-fhandle, we only need export the inode number and generation number.
-Since the first part of 'kernfs_fid' and 'kernfs_node_id' have the same
-layout, we can just export a 'kernfs_node_id'.
+kernfs uses ida to manage inode number. The problem is we can't get
+kernfs_node from inode number with ida. Switching to use idr, next patch
+will add an API to get kernfs_node from inode number.
 
 Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- include/linux/cgroup.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/kernfs/dir.c        | 17 ++++++++++++-----
+ include/linux/kernfs.h |  2 +-
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 30c6877..5ebe89f 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -609,6 +609,10 @@ static inline void cgroup_kthread_ready(void)
- 	current->no_cgroup_migration = 0;
+diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
+index 09d093e..8e8545a 100644
+--- a/fs/kernfs/dir.c
++++ b/fs/kernfs/dir.c
+@@ -21,6 +21,7 @@
+ DEFINE_MUTEX(kernfs_mutex);
+ static DEFINE_SPINLOCK(kernfs_rename_lock);	/* kn->parent and ->name */
+ static char kernfs_pr_cont_buf[PATH_MAX];	/* protected by rename_lock */
++static DEFINE_SPINLOCK(kernfs_idr_lock);	/* root->ino_idr */
+ 
+ #define rb_to_kn(X) rb_entry((X), struct kernfs_node, rb)
+ 
+@@ -533,7 +534,9 @@ void kernfs_put(struct kernfs_node *kn)
+ 		simple_xattrs_free(&kn->iattr->xattrs);
+ 	}
+ 	kfree(kn->iattr);
+-	ida_simple_remove(&root->ino_ida, kn->ino);
++	spin_lock(&kernfs_idr_lock);
++	idr_remove(&root->ino_idr, kn->ino);
++	spin_unlock(&kernfs_idr_lock);
+ 	kmem_cache_free(kernfs_node_cache, kn);
+ 
+ 	kn = parent;
+@@ -542,7 +545,7 @@ void kernfs_put(struct kernfs_node *kn)
+ 			goto repeat;
+ 	} else {
+ 		/* just released the root kn, free @root too */
+-		ida_destroy(&root->ino_ida);
++		idr_destroy(&root->ino_idr);
+ 		kfree(root);
+ 	}
  }
+@@ -630,7 +633,11 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 	if (!kn)
+ 		goto err_out1;
  
-+static inline struct kernfs_node_id *cgroup_get_node_id(struct cgroup *cgrp)
-+{
-+	return &cgrp->kn->id;
-+}
- #else /* !CONFIG_CGROUPS */
+-	ret = ida_simple_get(&root->ino_ida, 1, 0, GFP_KERNEL);
++	idr_preload(GFP_KERNEL);
++	spin_lock(&kernfs_idr_lock);
++	ret = idr_alloc(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
++	spin_unlock(&kernfs_idr_lock);
++	idr_preload_end();
+ 	if (ret < 0)
+ 		goto err_out2;
+ 	kn->ino = ret;
+@@ -876,14 +883,14 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
+ 	if (!root)
+ 		return ERR_PTR(-ENOMEM);
  
- struct cgroup_subsys_state;
-@@ -631,6 +635,10 @@ static inline int cgroup_init_early(void) { return 0; }
- static inline int cgroup_init(void) { return 0; }
- static inline void cgroup_init_kthreadd(void) {}
- static inline void cgroup_kthread_ready(void) {}
-+static inline struct kernfs_node_id *cgroup_get_node_id(struct cgroup *cgrp)
-+{
-+	return NULL;
-+}
+-	ida_init(&root->ino_ida);
++	idr_init(&root->ino_idr);
+ 	INIT_LIST_HEAD(&root->supers);
+ 	atomic_set(&root->next_generation, 0);
  
- static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
- 					       struct cgroup *ancestor)
+ 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
+ 			       KERNFS_DIR);
+ 	if (!kn) {
+-		ida_destroy(&root->ino_ida);
++		idr_destroy(&root->ino_idr);
+ 		kfree(root);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index c5f0fa7..61668d1 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -164,7 +164,7 @@ struct kernfs_root {
+ 	unsigned int		flags;	/* KERNFS_ROOT_* flags */
+ 
+ 	/* private fields, do not use outside kernfs proper */
+-	struct ida		ino_ida;
++	struct idr		ino_idr;
+ 	struct kernfs_syscall_ops *syscall_ops;
+ 
+ 	/* list of kernfs_super_info of this root, protected by kernfs_mutex */
 -- 
 2.9.3
