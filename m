@@ -1,236 +1,158 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52118 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753176AbdFRPWX (ORCPT
+Received: from mail-pf0-f179.google.com ([209.85.192.179]:35212 "EHLO
+        mail-pf0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752833AbdFNXlA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:23 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 09/30] nvme: Move queue_count to the nvme_ctrl
-Date: Sun, 18 Jun 2017 18:21:43 +0300
-Message-Id: <1497799324-19598-10-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+        Wed, 14 Jun 2017 19:41:00 -0400
+Received: by mail-pf0-f179.google.com with SMTP id l89so7565362pfi.2
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2017 16:41:00 -0700 (PDT)
+From: Michael Halcrow <mhalcrow@google.com>
+To: Michael Halcrow <mhalcrow@google.com>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Eric Biggers <ebiggers@google.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-ext4@vger.kernel.org, Tyler Hicks <tyler.hicks@canonical.com>
+Subject: [RFC PATCH 3/4] ext4: Set the bio REQ_NOENCRYPT flag
+Date: Wed, 14 Jun 2017 16:40:39 -0700
+Message-Id: <20170614234040.4326-4-mhalcrow@google.com>
+In-Reply-To: <20170614234040.4326-1-mhalcrow@google.com>
+References: <20170614234040.4326-1-mhalcrow@google.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We are trying to move queues setup and teardown
-to the core, introduce also ctrl max queues which
-will tell us what is the maximum number of queues
-allowed. For now just rdma, the rest will follow.
+When lower layers such as dm-crypt observe the REQ_NOENCRYPT flag, it
+helps the I/O stack avoid redundant encryption, improving performance
+and power utilization.
 
-queue_count was replaced with sed
-s/ctrl->queue_count/ctrl->ctrl.queue_count/g
+Note that lower layers must be consistent in their observation of this
+flag in order to avoid the possibility of data corruption.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Michael Halcrow <mhalcrow@google.com>
 ---
- drivers/nvme/host/nvme.h |  2 ++
- drivers/nvme/host/rdma.c | 47 ++++++++++++++++++++++-------------------------
- 2 files changed, 24 insertions(+), 25 deletions(-)
+ fs/crypto/bio.c    |  2 +-
+ fs/ext4/ext4.h     |  3 +++
+ fs/ext4/inode.c    | 13 ++++++++-----
+ fs/ext4/page-io.c  |  5 +++++
+ fs/ext4/readpage.c |  3 ++-
+ 5 files changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 67147b49d992..415a5ea4759c 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -142,6 +142,8 @@ struct nvme_ctrl {
- 	u16 cntlid;
+diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
+index a409a84f1bca..9093a715d2be 100644
+--- a/fs/crypto/bio.c
++++ b/fs/crypto/bio.c
+@@ -118,7 +118,7 @@ int fscrypt_zeroout_range(const struct inode *inode, pgoff_t lblk,
+ 		bio->bi_bdev = inode->i_sb->s_bdev;
+ 		bio->bi_iter.bi_sector =
+ 			pblk << (inode->i_sb->s_blocksize_bits - 9);
+-		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++		bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_NOENCRYPT);
+ 		ret = bio_add_page(bio, ciphertext_page,
+ 					inode->i_sb->s_blocksize, 0);
+ 		if (ret != inode->i_sb->s_blocksize) {
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index 8e8046104f4d..48c2bc9f8688 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -206,7 +206,10 @@ typedef struct ext4_io_end {
+ 	ssize_t			size;		/* size of the extent */
+ } ext4_io_end_t;
  
- 	u32 ctrl_config;
-+	u32 max_queues;
-+	u32 queue_count;
- 
- 	u32 page_size;
- 	u32 max_hw_sectors;
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 099b3d7b6721..2b23f88bedfe 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -104,7 +104,6 @@ struct nvme_rdma_queue {
- struct nvme_rdma_ctrl {
- 	/* read only in the hot path */
- 	struct nvme_rdma_queue	*queues;
--	u32			queue_count;
- 
- 	/* other member variables */
- 	struct blk_mq_tag_set	tag_set;
-@@ -353,7 +352,7 @@ static int nvme_rdma_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
- 	struct nvme_rdma_ctrl *ctrl = data;
- 	struct nvme_rdma_queue *queue = &ctrl->queues[hctx_idx + 1];
- 
--	BUG_ON(hctx_idx >= ctrl->queue_count);
-+	BUG_ON(hctx_idx >= ctrl->ctrl.max_queues);
- 
- 	hctx->driver_data = queue;
- 	return 0;
-@@ -587,7 +586,7 @@ static void nvme_rdma_free_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
- 	int i;
- 
--	for (i = 1; i < ctrl->queue_count; i++)
-+	for (i = 1; i < ctrl->ctrl.queue_count; i++)
- 		nvme_rdma_free_queue(ctrl, i);
- }
- 
-@@ -595,7 +594,7 @@ static void nvme_rdma_stop_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
- 	int i;
- 
--	for (i = 1; i < ctrl->queue_count; i++)
-+	for (i = 1; i < ctrl->ctrl.queue_count; i++)
- 		nvme_rdma_stop_queue(ctrl, i);
- }
- 
-@@ -629,7 +628,7 @@ static int nvme_rdma_start_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
- 	int i, ret = 0;
- 
--	for (i = 1; i < ctrl->queue_count; i++) {
-+	for (i = 1; i < ctrl->ctrl.queue_count; i++) {
- 		ret = nvme_rdma_start_queue(ctrl, i);
- 		if (ret)
- 			goto out_stop_queues;
-@@ -647,13 +646,11 @@ static int nvme_rdma_start_io_queues(struct nvme_rdma_ctrl *ctrl)
- 
- static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
--	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
-+	unsigned int nr_io_queues = ctrl->ctrl.max_queues - 1;
- 	struct ib_device *ibdev = ctrl->device->dev;
--	unsigned int nr_io_queues;
- 	int i, ret;
- 
--	nr_io_queues = min(opts->nr_io_queues, num_online_cpus());
--
-+	nr_io_queues = min(nr_io_queues, num_online_cpus());
++#define EXT4_IO_ENCRYPTED	1
++
+ struct ext4_io_submit {
++	unsigned int		io_flags;
+ 	struct writeback_control *io_wbc;
+ 	struct bio		*io_bio;
+ 	ext4_io_end_t		*io_end;
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 1bd0bfa547f6..25a9b7265692 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1154,10 +1154,11 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
+ 		    !buffer_unwritten(bh) &&
+ 		    (block_start < from || block_end > to)) {
+-			ll_rw_block(REQ_OP_READ, 0, 1, &bh);
+-			*wait_bh++ = bh;
+ 			decrypt = ext4_encrypted_inode(inode) &&
+ 				S_ISREG(inode->i_mode);
++			ll_rw_block(REQ_OP_READ, (decrypt ? REQ_NOENCRYPT : 0),
++				    1, &bh);
++			*wait_bh++ = bh;
+ 		}
+ 	}
  	/*
- 	 * we map queues according to the device irq vectors for
- 	 * optimal locality so we don't need more queues than
-@@ -666,14 +663,14 @@ static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- 	if (ret)
- 		return ret;
+@@ -3863,6 +3864,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 	struct inode *inode = mapping->host;
+ 	struct buffer_head *bh;
+ 	struct page *page;
++	bool decrypt;
+ 	int err = 0;
  
--	ctrl->queue_count = nr_io_queues + 1;
--	if (ctrl->queue_count < 2)
-+	ctrl->ctrl.queue_count = nr_io_queues + 1;
-+	if (ctrl->ctrl.queue_count < 2)
- 		return 0;
+ 	page = find_or_create_page(mapping, from >> PAGE_SHIFT,
+@@ -3905,13 +3907,14 @@ static int __ext4_block_zero_page_range(handle_t *handle,
  
- 	dev_info(ctrl->ctrl.device,
- 		"creating %d I/O queues.\n", nr_io_queues);
- 
--	for (i = 1; i < ctrl->queue_count; i++) {
-+	for (i = 1; i < ctrl->ctrl.queue_count; i++) {
- 		ret = nvme_rdma_alloc_queue(ctrl, i,
- 				ctrl->ctrl.sqsize + 1);
- 		if (ret)
-@@ -715,7 +712,7 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
- 		ctrl->tag_set.cmd_size = sizeof(struct nvme_rdma_request) +
- 			SG_CHUNK_SIZE * sizeof(struct scatterlist);
- 		ctrl->tag_set.driver_data = ctrl;
--		ctrl->tag_set.nr_hw_queues = ctrl->queue_count - 1;
-+		ctrl->tag_set.nr_hw_queues = ctrl->ctrl.max_queues - 1;
- 		ctrl->tag_set.timeout = NVME_IO_TIMEOUT;
- 
- 		ret = blk_mq_alloc_tag_set(&ctrl->tag_set);
-@@ -925,7 +922,7 @@ static void nvme_rdma_reconnect_ctrl_work(struct work_struct *work)
- 
- 	++ctrl->ctrl.nr_reconnects;
- 
--	if (ctrl->ctrl.opts->nr_io_queues)
-+	if (ctrl->ctrl.max_queues > 1)
- 		nvme_rdma_destroy_io_queues(ctrl, false);
- 
- 	nvme_rdma_destroy_admin_queue(ctrl, false);
-@@ -934,7 +931,7 @@ static void nvme_rdma_reconnect_ctrl_work(struct work_struct *work)
- 	if (ret)
- 		goto requeue;
- 
--	if (ctrl->ctrl.opts->nr_io_queues) {
-+	if (ctrl->ctrl.max_queues > 1) {
- 		ret = nvme_rdma_configure_io_queues(ctrl, false);
- 		if (ret)
- 			goto requeue;
-@@ -961,15 +958,15 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
- 
- 	nvme_stop_keep_alive(&ctrl->ctrl);
- 
--	for (i = 0; i < ctrl->queue_count; i++)
-+	for (i = 0; i < ctrl->ctrl.queue_count; i++)
- 		clear_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[i].flags);
- 
--	if (ctrl->queue_count > 1)
-+	if (ctrl->ctrl.queue_count > 1)
- 		nvme_stop_queues(&ctrl->ctrl);
- 	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
- 
- 	/* We must take care of fastfail/requeue all our inflight requests */
--	if (ctrl->queue_count > 1)
-+	if (ctrl->ctrl.queue_count > 1)
- 		blk_mq_tagset_busy_iter(&ctrl->tag_set,
- 					nvme_cancel_request, &ctrl->ctrl);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
-@@ -1729,7 +1726,7 @@ static void nvme_rdma_shutdown_ctrl(struct nvme_rdma_ctrl *ctrl, bool shutdown)
- 	cancel_work_sync(&ctrl->err_work);
- 	cancel_delayed_work_sync(&ctrl->reconnect_work);
- 
--	if (ctrl->ctrl.opts->nr_io_queues) {
-+	if (ctrl->ctrl.max_queues > 1) {
- 		nvme_stop_queues(&ctrl->ctrl);
- 		blk_mq_tagset_busy_iter(&ctrl->tag_set,
- 					nvme_cancel_request, &ctrl->ctrl);
-@@ -1797,7 +1794,7 @@ static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
- 	if (ret)
- 		goto out_destroy_admin;
- 
--	if (ctrl->ctrl.opts->nr_io_queues) {
-+	if (ctrl->ctrl.max_queues > 1) {
- 		ret = nvme_rdma_configure_io_queues(ctrl, false);
- 		if (ret)
- 			goto out_destroy_io;
-@@ -1806,7 +1803,7 @@ static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
- 	changed = nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_LIVE);
- 	WARN_ON_ONCE(!changed);
- 
--	if (ctrl->queue_count > 1) {
-+	if (ctrl->ctrl.queue_count > 1) {
- 		nvme_start_queues(&ctrl->ctrl);
- 		nvme_queue_scan(&ctrl->ctrl);
- 		nvme_queue_async_events(&ctrl->ctrl);
-@@ -1884,12 +1881,12 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 	INIT_WORK(&ctrl->delete_work, nvme_rdma_del_ctrl_work);
- 	INIT_WORK(&ctrl->ctrl.reset_work, nvme_rdma_reset_ctrl_work);
- 
--	ctrl->queue_count = opts->nr_io_queues + 1; /* +1 for admin queue */
-+	ctrl->ctrl.max_queues = opts->nr_io_queues + 1;
- 	ctrl->ctrl.sqsize = opts->queue_size - 1;
- 	ctrl->ctrl.kato = opts->kato;
- 
- 	ret = -ENOMEM;
--	ctrl->queues = kcalloc(ctrl->queue_count, sizeof(*ctrl->queues),
-+	ctrl->queues = kcalloc(ctrl->ctrl.max_queues, sizeof(*ctrl->queues),
- 				GFP_KERNEL);
- 	if (!ctrl->queues)
- 		goto out_uninit_ctrl;
-@@ -1928,7 +1925,7 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 		opts->queue_size = ctrl->ctrl.sqsize + 1;
+ 	if (!buffer_uptodate(bh)) {
+ 		err = -EIO;
+-		ll_rw_block(REQ_OP_READ, 0, 1, &bh);
++		decrypt = S_ISREG(inode->i_mode) &&
++			ext4_encrypted_inode(inode);
++		ll_rw_block(REQ_OP_READ, (decrypt ? REQ_NOENCRYPT : 0), 1, &bh);
+ 		wait_on_buffer(bh);
+ 		/* Uhhuh. Read error. Complain and punt. */
+ 		if (!buffer_uptodate(bh))
+ 			goto unlock;
+-		if (S_ISREG(inode->i_mode) &&
+-		    ext4_encrypted_inode(inode)) {
++		if (decrypt) {
+ 			/* We expect the key to be set. */
+ 			BUG_ON(!fscrypt_has_encryption_key(inode));
+ 			BUG_ON(blocksize != PAGE_SIZE);
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 1a82138ba739..e25bf6cb216a 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -349,6 +349,8 @@ void ext4_io_submit(struct ext4_io_submit *io)
+ 	if (bio) {
+ 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
+ 				  REQ_SYNC : 0;
++		if (io->io_flags & EXT4_IO_ENCRYPTED)
++			io_op_flags |= REQ_NOENCRYPT;
+ 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
+ 		submit_bio(io->io_bio);
  	}
+@@ -358,6 +360,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
+ void ext4_io_submit_init(struct ext4_io_submit *io,
+ 			 struct writeback_control *wbc)
+ {
++	io->io_flags = 0;
+ 	io->io_wbc = wbc;
+ 	io->io_bio = NULL;
+ 	io->io_end = NULL;
+@@ -499,6 +502,8 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+ 	do {
+ 		if (!buffer_async_write(bh))
+ 			continue;
++		if (data_page)
++			io->io_flags |= EXT4_IO_ENCRYPTED;
+ 		ret = io_submit_add_bh(io, inode,
+ 				       data_page ? data_page : page, bh);
+ 		if (ret) {
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index a81b829d56de..008d14d74f33 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -258,7 +258,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 			bio->bi_iter.bi_sector = blocks[0] << (blkbits - 9);
+ 			bio->bi_end_io = mpage_end_io;
+ 			bio->bi_private = ctx;
+-			bio_set_op_attrs(bio, REQ_OP_READ, 0);
++			bio_set_op_attrs(bio, REQ_OP_READ,
++					 ctx ? REQ_NOENCRYPT : 0);
+ 		}
  
--	if (opts->nr_io_queues) {
-+	if (ctrl->ctrl.max_queues > 1) {
- 		ret = nvme_rdma_configure_io_queues(ctrl, true);
- 		if (ret)
- 			goto out_remove_admin_queue;
-@@ -1946,7 +1943,7 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 	list_add_tail(&ctrl->list, &nvme_rdma_ctrl_list);
- 	mutex_unlock(&nvme_rdma_ctrl_mutex);
- 
--	if (opts->nr_io_queues) {
-+	if (ctrl->ctrl.max_queues > 1) {
- 		nvme_queue_scan(&ctrl->ctrl);
- 		nvme_queue_async_events(&ctrl->ctrl);
- 	}
+ 		length = first_hole << blkbits;
 -- 
-2.7.4
+2.13.1.508.gb3defc5cc-goog
