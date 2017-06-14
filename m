@@ -1,48 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38757 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751488AbdFWOaG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jun 2017 10:30:06 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests 1/2] rc: add helpers to handle PCI test devices
-Date: Fri, 23 Jun 2017 16:29:50 +0200
-Message-Id: <20170623142951.17189-1-jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Michael Halcrow <mhalcrow@google.com>
+To: Michael Halcrow <mhalcrow@google.com>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Eric Biggers <ebiggers@google.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-ext4@vger.kernel.org, Tyler Hicks <tyler.hicks@canonical.com>
+Subject: [RFC PATCH 1/4] block: Add bio req flag to disable encryption in block
+Date: Wed, 14 Jun 2017 16:40:37 -0700
+Message-Id: <20170614234040.4326-2-mhalcrow@google.com>
+In-Reply-To: <20170614234040.4326-1-mhalcrow@google.com>
+References: <20170614234040.4326-1-mhalcrow@google.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Add two helpers to check whether a device is attached via PCI and to get the
-PCI device from a TEST_DEV
+When both the file system and a lower layer such as dm-crypt encrypt
+the same file contents, it impacts performance and power utilization.
+Depending on how the operating environment manages the encryption
+keys, there is often no significant security benefit to redundantly
+encrypting.
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+File systems that encrypt some of their blocks can set the
+REQ_NOENCRYPT flag as a directive to lower layers to not encrypt.
+
+Lower layers may optionally observe the flag, but once thay do, they
+must continue to observe it on subsequent I/O on the device.
+Otherwise they will decrypt content that they didn't previously
+encrypt, resulting in data corruption.
+
+Signed-off-by: Michael Halcrow <mhalcrow@google.com>
 ---
- common/rc | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ include/linux/blk_types.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/common/rc b/common/rc
-index b01f936b878b..497cf81ec475 100644
---- a/common/rc
-+++ b/common/rc
-@@ -120,3 +120,18 @@ _test_dev_queue_set() {
- 	fi
- 	echo "$2" >"${TEST_DEV_SYSFS}/queue/$1"
- }
-+
-+_test_dev_is_pci() {
-+	if ! readlink -f "$TEST_DEV_SYSFS/device" | grep -q pci; then
-+		SKIP_REASON="$TEST_DEV is not a PCI device"
-+		return 1
-+	fi
-+	return 0
-+}
-+
-+_get_pci_dev_from_blkdev() {
-+	pdev="$(readlink -f "$TEST_DEV_SYSFS/device" | \
-+		grep -Eo '[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]')"
-+
-+	echo "$pdev"
-+}
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 61339bc44400..89da8f5f7be1 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -205,6 +205,7 @@ enum req_flag_bits {
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
++	__REQ_NOENCRYPT,	/* ok to not encrypt */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -223,6 +224,7 @@ enum req_flag_bits {
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
++#define REQ_NOENCRYPT		(1ULL << __REQ_NOENCRYPT)
+ 
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
 -- 
-2.12.3
+2.13.1.508.gb3defc5cc-goog
