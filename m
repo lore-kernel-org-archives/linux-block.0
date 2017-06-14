@@ -7,10 +7,10 @@ Cc: adilger@dilger.ca,
 	martin.petersen@oracle.com,
 	Jens Axboe <axboe@kernel.dk>
 Subject: [PATCH 02/11] blk-mq: expose stream write stats through debugfs
-Date: Wed, 14 Jun 2017 21:45:03 -0600
-Message-Id: <1497498312-17704-3-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
-References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
+Date: Wed, 14 Jun 2017 13:05:25 -0600
+Message-Id: <1497467134-6323-3-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 Useful to verify that things are working the way they should.
