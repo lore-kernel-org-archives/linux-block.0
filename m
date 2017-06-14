@@ -1,168 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47632 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752922AbdFNQMX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2017 12:12:23 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 11/12] blktrace: add an option to allow displying cgroup path
-Date: Wed, 14 Jun 2017 09:12:09 -0700
-Message-Id: <dc5d7d63bb9abdefb73494882d9bd7933a0626a7.1497455937.git.shli@fb.com>
-In-Reply-To: <cover.1497455937.git.shli@fb.com>
-References: <cover.1497455937.git.shli@fb.com>
-In-Reply-To: <cover.1497455937.git.shli@fb.com>
-References: <cover.1497455937.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 07/11] fs: add support for buffered writeback to pass down stream information
+Date: Wed, 14 Jun 2017 13:05:30 -0600
+Message-Id: <1497467134-6323-8-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
-
-By default we output cgroup id in blktrace. This adds an option to
-display cgroup path. Since get cgroup path is a relativly heavy
-operation, we don't enable it by default.
-
-with the option enabled, blktrace will output something like this:
-dd-1353  [007] d..2   293.015252:   8,0   /test/level  D   R 24 + 8 [dd]
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/kernfs/mount.c       | 19 +++++++++++++++++++
- include/linux/cgroup.h  |  6 ++++++
- include/linux/kernfs.h  |  2 ++
- kernel/cgroup/cgroup.c  | 12 ++++++++++++
- kernel/trace/blktrace.c | 14 +++++++++++++-
- 5 files changed, 52 insertions(+), 1 deletion(-)
+ fs/buffer.c | 14 +++++++++-----
+ fs/mpage.c  |  1 +
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
-index 5af73a8..3bbca9c 100644
---- a/fs/kernfs/mount.c
-+++ b/fs/kernfs/mount.c
-@@ -91,6 +91,25 @@ static int kernfs_encode_fh(struct inode *inode, __u32 *fh, int *max_len,
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 161be58c5cb0..8324c24751ca 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -49,7 +49,7 @@
+ 
+ static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
+ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+-			 struct writeback_control *wbc);
++			 unsigned int stream, struct writeback_control *wbc);
+ 
+ #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
+ 
+@@ -1829,7 +1829,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
+ 	do {
+ 		struct buffer_head *next = bh->b_this_page;
+ 		if (buffer_async_write(bh)) {
+-			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
++			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
++					inode_streamid(inode), wbc);
+ 			nr_underway++;
+ 		}
+ 		bh = next;
+@@ -1883,7 +1884,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
+ 		struct buffer_head *next = bh->b_this_page;
+ 		if (buffer_async_write(bh)) {
+ 			clear_buffer_dirty(bh);
+-			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
++			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
++					inode_streamid(inode), wbc);
+ 			nr_underway++;
+ 		}
+ 		bh = next;
+@@ -3091,7 +3093,7 @@ void guard_bio_eod(int op, struct bio *bio)
+ }
+ 
+ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+-			 struct writeback_control *wbc)
++			 unsigned int stream, struct writeback_control *wbc)
+ {
+ 	struct bio *bio;
+ 
+@@ -3130,6 +3132,8 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 	/* Take care of bh's that straddle the end of the device */
+ 	guard_bio_eod(op, bio);
+ 
++	bio_set_streamid(bio, stream);
++
+ 	if (buffer_meta(bh))
+ 		op_flags |= REQ_META;
+ 	if (buffer_prio(bh))
+@@ -3142,7 +3146,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 
+ int submit_bh(int op, int op_flags, struct buffer_head *bh)
+ {
+-	return submit_bh_wbc(op, op_flags, bh, NULL);
++	return submit_bh_wbc(op, op_flags, bh, 0, NULL);
+ }
+ EXPORT_SYMBOL(submit_bh);
+ 
+diff --git a/fs/mpage.c b/fs/mpage.c
+index baff8f820c29..a9d40c0c053e 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -614,6 +614,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
+ 			goto confused;
+ 
+ 		wbc_init_bio(wbc, bio);
++		bio_set_streamid(bio, inode_streamid(inode));
  	}
- }
  
-+/*
-+ * Similar like kernfs_fh_get_inode, this one gets kernfs node from inode
-+ * number and generation
-+ */
-+struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
-+	const struct kernfs_node_id *id)
-+{
-+	struct kernfs_node *kn;
-+
-+	kn = kernfs_find_and_get_node_by_ino(root, id->ino);
-+	if (!kn)
-+		return NULL;
-+	if (kn->id.generation != id->generation) {
-+		kernfs_put(kn);
-+		return NULL;
-+	}
-+	return kn;
-+}
-+
- static struct inode *kernfs_fh_get_inode(struct super_block *sb,
- 		u64 ino, u32 generation)
- {
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 5ebe89f..163e5c4 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -613,6 +613,9 @@ static inline struct kernfs_node_id *cgroup_get_node_id(struct cgroup *cgrp)
- {
- 	return &cgrp->kn->id;
- }
-+
-+void cgroup_path_from_node_id(const struct kernfs_node_id *id,
-+					char *buf, size_t buflen);
- #else /* !CONFIG_CGROUPS */
- 
- struct cgroup_subsys_state;
-@@ -645,6 +648,9 @@ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
- {
- 	return true;
- }
-+
-+static inline void cgroup_path_from_node_id(const struct kernfs_node_id *id,
-+	char *buf, size_t buflen) {}
- #endif /* !CONFIG_CGROUPS */
- 
- /*
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index 3b38bdf..e8c685f 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -358,6 +358,8 @@ struct super_block *kernfs_pin_sb(struct kernfs_root *root, const void *ns);
- 
- void kernfs_init(void);
- 
-+struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
-+	const struct kernfs_node_id *id);
- #else	/* CONFIG_KERNFS */
- 
- static inline enum kernfs_node_type kernfs_type(struct kernfs_node *kn)
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 639e27d..ae5ff1c 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -4606,6 +4606,18 @@ static int __init cgroup_wq_init(void)
- }
- core_initcall(cgroup_wq_init);
- 
-+void cgroup_path_from_node_id(const struct kernfs_node_id *id,
-+					char *buf, size_t buflen)
-+{
-+	struct kernfs_node *kn;
-+
-+	kn = kernfs_get_node_by_id(cgrp_dfl_root.kf_root, id);
-+	if (!kn)
-+		return;
-+	kernfs_path(kn, buf, buflen);
-+	kernfs_put(kn);
-+}
-+
- /*
-  * proc_cgroup_show()
-  *  - Print task's cgroup paths into seq_file, one line for each hierarchy
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 02cfcf2..ad5abb9 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -48,12 +48,14 @@ static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_lock);
- /* Select an alternative, minimalistic output than the original one */
- #define TRACE_BLK_OPT_CLASSIC	0x1
- #define TRACE_BLK_OPT_CGROUP	0x2
-+#define TRACE_BLK_OPT_CGNAME	0x4
- 
- static struct tracer_opt blk_tracer_opts[] = {
- 	/* Default disable the minimalistic output */
- 	{ TRACER_OPT(blk_classic, TRACE_BLK_OPT_CLASSIC) },
- #ifdef CONFIG_BLK_CGROUP
- 	{ TRACER_OPT(blk_cgroup, TRACE_BLK_OPT_CGROUP) },
-+	{ TRACER_OPT(blk_cgname, TRACE_BLK_OPT_CGNAME) },
- #endif
- 	{ }
- };
-@@ -1213,7 +1215,17 @@ static void blk_log_action(struct trace_iterator *iter, const char *act,
- 	if (has_cg) {
- 		const struct kernfs_node_id *id = cgid_start(iter->ent);
- 
--		trace_seq_printf(&iter->seq, "%3d,%-3d %llx,%-x %2s %3s ",
-+		if (blk_tracer_flags.val & TRACE_BLK_OPT_CGNAME) {
-+			char blkcg_name_buf[NAME_MAX + 1] = "<...>";
-+
-+			cgroup_path_from_node_id(id, blkcg_name_buf,
-+				sizeof(blkcg_name_buf));
-+			trace_seq_printf(&iter->seq, "%3d,%-3d %s %2s %3s ",
-+				 MAJOR(t->device), MINOR(t->device),
-+				 blkcg_name_buf, act, rwbs);
-+		} else
-+			trace_seq_printf(&iter->seq,
-+				 "%3d,%-3d %llx,%-x %2s %3s ",
- 				 MAJOR(t->device), MINOR(t->device),
- 				 id->ino, id->generation, act, rwbs);
- 	} else
+ 	/*
 -- 
-2.9.3
+2.7.4
