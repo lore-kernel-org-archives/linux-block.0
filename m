@@ -1,545 +1,161 @@
-Return-Path: <eguan@redhat.com>
-Date: Tue, 13 Jun 2017 16:35:06 +0800
-From: Eryu Guan <eguan@redhat.com>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net,
-	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>,
-	David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [xfstests PATCH v4 1/5] generic: add a writeback error handling
- test
-Message-ID: <20170613083506.GC4788@eguan.usersys.redhat.com>
-References: <20170612124213.14855-1-jlayton@redhat.com>
- <20170612124213.14855-2-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170612124213.14855-2-jlayton@redhat.com>
+Return-Path: <adilger@dilger.ca>
+Return-Path: <adilger@dilger.ca>
+From: Andreas Dilger <adilger@dilger.ca>
+Message-Id: <4184E669-CB34-4CBA-B0F2-39F51D1EA8E8@dilger.ca>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_391001B6-FD2D-4B1A-BACF-D0576FB7BF5A";
+ protocol="application/pgp-signature"; micalg=pgp-sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 04/10] fs: add support for allowing applications to pass
+ in write life time hints
+Date: Tue, 13 Jun 2017 22:06:18 -0600
+In-Reply-To: <1497412919-19400-5-git-send-email-axboe@kernel.dk>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ linux-block@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+References: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
+ <1497412919-19400-5-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 12, 2017 at 08:42:09AM -0400, Jeff Layton wrote:
-> I'm working on a set of kernel patches to change how writeback errors
-> are handled and reported in the kernel. Instead of reporting a
-> writeback error to only the first fsync caller on the file, I aim
-> to make the kernel report them once on every file description.
-> 
-> This patch adds a test for the new behavior. Basically, open many fds
-> to the same file, turn on dm_error, write to each of the fds, and then
-> fsync them all to ensure that they all get an error back.
-> 
-> To do that, I'm adding a new tools/dmerror script that the C program
-> can use to load the error table. For now, that's all it can do, but
-> we can fill it out with other commands as necessary.
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+
+--Apple-Mail=_391001B6-FD2D-4B1A-BACF-D0576FB7BF5A
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
+
+On Jun 13, 2017, at 10:01 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>=20
+> Add four flags for the pwritev2(2) system call, allowing an =
+application
+> to give the kernel a hint about what on-media life times can be
+> expected from a given write.
+>=20
+> The intent is for these values to be relative to each other, no
+> absolute meaning should be attached to these flag names.
+>=20
+> Define IOCB flags to carry this information over, and finally
+> transform them into the block defined stream values.
+>=20
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+
 > ---
->  .gitignore                 |   1 +
->  common/dmerror             |  13 ++-
->  doc/auxiliary-programs.txt |  16 ++++
->  src/Makefile               |   2 +-
->  src/dmerror                |  44 +++++++++
->  src/fsync-err.c            | 223 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/generic/999          |  77 ++++++++++++++++
->  tests/generic/999.out      |   3 +
->  tests/generic/group        |   1 +
->  9 files changed, 374 insertions(+), 6 deletions(-)
->  create mode 100755 src/dmerror
->  create mode 100644 src/fsync-err.c
->  create mode 100755 tests/generic/999
->  create mode 100644 tests/generic/999.out
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 39664b0a7f53..56e863b2c8dc 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -72,6 +72,7 @@
->  /src/fs_perms
->  /src/fssum
->  /src/fstest
-> +/src/fsync-err
->  /src/fsync-tester
->  /src/ftrunc
->  /src/genhashnames
-> diff --git a/common/dmerror b/common/dmerror
-> index d46c5d0b7266..238baa213b1f 100644
-> --- a/common/dmerror
-> +++ b/common/dmerror
-> @@ -23,22 +23,25 @@ if [ $? -eq 0 ]; then
->  	_notrun "Cannot run tests with DAX on dmerror devices"
->  fi
->  
-> -_dmerror_init()
-> +_dmerror_setup()
->  {
->  	local dm_backing_dev=$SCRATCH_DEV
->  
-> -	$DMSETUP_PROG remove error-test > /dev/null 2>&1
-> -
->  	local blk_dev_size=`blockdev --getsz $dm_backing_dev`
->  
->  	DMERROR_DEV='/dev/mapper/error-test'
->  
->  	DMLINEAR_TABLE="0 $blk_dev_size linear $dm_backing_dev 0"
->  
-> +	DMERROR_TABLE="0 $blk_dev_size error $dm_backing_dev 0"
-> +}
+> fs/read_write.c         |  9 ++++++++-
+> include/linux/fs.h      | 12 ++++++++++++
+> include/uapi/linux/fs.h | 10 ++++++++++
+> 3 files changed, 30 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/fs/read_write.c b/fs/read_write.c
+> index 47c1d4484df9..a9b0c3125e0f 100644
+> --- a/fs/read_write.c
+> +++ b/fs/read_write.c
+> @@ -678,7 +678,7 @@ static ssize_t do_iter_readv_writev(struct file =
+*filp, struct iov_iter *iter,
+> 	struct kiocb kiocb;
+> 	ssize_t ret;
+>=20
+> -	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
+> +	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | =
+RWF_WRITE_LIFE_MASK))
+> 		return -EOPNOTSUPP;
+>=20
+> 	init_sync_kiocb(&kiocb, filp);
+> @@ -688,6 +688,13 @@ static ssize_t do_iter_readv_writev(struct file =
+*filp, struct iov_iter *iter,
+> 		kiocb.ki_flags |=3D IOCB_DSYNC;
+> 	if (flags & RWF_SYNC)
+> 		kiocb.ki_flags |=3D (IOCB_DSYNC | IOCB_SYNC);
+> +	if (flags & RWF_WRITE_LIFE_MASK) {
+> +		struct inode *inode =3D file_inode(filp);
 > +
-> +_dmerror_init()
-> +{
-> +	_dmerror_setup
-> +	$DMSETUP_PROG remove error-test > /dev/null 2>&1
->  	$DMSETUP_PROG create error-test --table "$DMLINEAR_TABLE" || \
->  		_fatal "failed to create dm linear device"
-> -
-> -	DMERROR_TABLE="0 $blk_dev_size error $dm_backing_dev 0"
->  }
->  
->  _dmerror_mount()
-> diff --git a/doc/auxiliary-programs.txt b/doc/auxiliary-programs.txt
-> index 21ef118596b6..bcab453c4335 100644
-> --- a/doc/auxiliary-programs.txt
-> +++ b/doc/auxiliary-programs.txt
-> @@ -16,6 +16,8 @@ note the dependency with:
->  Contents:
->  
->   - af_unix		-- Create an AF_UNIX socket
-> + - dmerror		-- fault injection block device control
-> + - fsync-err		-- tests fsync error reporting after failed writeback
->   - open_by_handle	-- open_by_handle_at syscall exercise
->   - stat_test		-- statx syscall exercise
->   - t_dir_type		-- print directory entries and their file type
-> @@ -30,6 +32,20 @@ af_unix
->  
->  	The af_unix program creates an AF_UNIX socket at the given location.
->  
-> +dmerror
-> +
-> +	dmerror is a program for creating, destroying and controlling a
-> +	fault injection device. The device can be set up as initially
-> +	working and then flip to throwing errors for testing purposes.
-> +
-> +fsync-err
-> +
-> +	Specialized program for testing how the kernel reports errors that
-> +	occur during writeback. Works in conjunction with the dmerror script
-> +	in tools/ to write data to a device, and then force it to fail
-> +	writeback and test that errors are reported during fsync and cleared
-> +	afterward.
-> +
->  open_by_handle
->  
->  	The open_by_handle program exercises the open_by_handle_at() system
-> diff --git a/src/Makefile b/src/Makefile
-> index 6b0e4b022485..abd0fff34a64 100644
-> --- a/src/Makefile
-> +++ b/src/Makefile
-> @@ -13,7 +13,7 @@ TARGETS = dirstress fill fill2 getpagesize holes lstat64 \
->  	multi_open_unlink dmiperf unwritten_sync genhashnames t_holes \
->  	t_mmap_writev t_truncate_cmtime dirhash_collide t_rename_overwrite \
->  	holetest t_truncate_self t_mmap_dio af_unix t_mmap_stale_pmd \
-> -	t_mmap_cow_race t_mmap_fallocate
-> +	t_mmap_cow_race t_mmap_fallocate fsync-err
-
-src/dmerror should be installed on 'make install' too.
-
--	$(LTINSTALL) -m 755 fill2attr fill2fs fill2fs_check scaleread.sh $(PKG_LIB_DIR)/src
-+	$(LTINSTALL) -m 755 fill2attr fill2fs fill2fs_check scaleread.sh dmerror $(PKG_LIB_DIR)/src
-
->  
->  LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
->  	preallo_rw_pattern_writer ftrunc trunc fs_perms testx looptest \
-> diff --git a/src/dmerror b/src/dmerror
-> new file mode 100755
-> index 000000000000..4aaf682ee5f9
-> --- /dev/null
-> +++ b/src/dmerror
-> @@ -0,0 +1,44 @@
-> +#!/bin/bash
-> +#-----------------------------------------------------------------------
-> +# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
-> +#
-> +# This program is free software; you can redistribute it and/or
-> +# modify it under the terms of the GNU General Public License as
-> +# published by the Free Software Foundation.
-> +#
-> +# This program is distributed in the hope that it would be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program; if not, write the Free Software Foundation,
-> +# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> +#-----------------------------------------------------------------------
-> +
-> +. ./common/config
-> +. ./common/dmerror
-> +
-> +_dmerror_setup
-> +
-> +case $1 in
-> +cleanup)
-> +	_dmerror_cleanup
-> +	;;
-> +init)
-> +	_dmerror_init
-> +	;;
-> +load_error_table)
-> +	_dmerror_load_error_table
-> +	;;
-> +load_working_table)
-> +	_dmerror_load_working_table
-> +	;;
-> +*)
-> +	echo "Usage: $0 {init|cleanup|load_error_table|load_working_table}"
-> +	exit 1
-> +	;;
-> +esac
-> +
-> +status=0
-> +exit
-> diff --git a/src/fsync-err.c b/src/fsync-err.c
-> new file mode 100644
-> index 000000000000..5b3bdd3ada07
-> --- /dev/null
-> +++ b/src/fsync-err.c
-> @@ -0,0 +1,223 @@
+> +		inode->i_stream =3D (flags & RWF_WRITE_LIFE_MASK) >>
+> +					RWF_WRITE_LIFE_SHIFT;
+> +		kiocb.ki_flags |=3D inode->i_stream << =
+IOCB_WRITE_LIFE_SHIFT;
+> +	}
+> 	kiocb.ki_pos =3D *ppos;
+>=20
+> 	if (type =3D=3D READ)
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 771e172d23d7..751a1046e87b 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -269,6 +269,12 @@ struct writeback_control;
+> #define IOCB_SYNC		(1 << 5)
+> #define IOCB_WRITE		(1 << 6)
+>=20
 > +/*
-> + * fsync-err.c: test whether writeback errors are reported to all open fds
-> + * 		and properly cleared as expected after being seen once on each
-> + *
-> + * Copyright (c) 2017: Jeff Layton <jlayton@redhat.com>
+> + * Steal 4-bits for stream information, this allows 16 valid streams
 > + */
-> +#include <sys/types.h>
-> +#include <sys/stat.h>
-> +#include <errno.h>
-> +#include <fcntl.h>
-> +#include <stdlib.h>
-> +#include <stdio.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include <getopt.h>
+> +#define IOCB_WRITE_LIFE_SHIFT	7
+> +#define IOCB_WRITE_LIFE_MASK	(BIT(7) | BIT(8) | BIT(9) | BIT(10))
 > +
+> struct kiocb {
+> 	struct file		*ki_filp;
+> 	loff_t			ki_pos;
+> @@ -292,6 +298,12 @@ static inline void init_sync_kiocb(struct kiocb =
+*kiocb, struct file *filp)
+> 	};
+> }
+>=20
+> +static inline int iocb_streamid(const struct kiocb *iocb)
+> +{
+> +	return (iocb->ki_flags & IOCB_WRITE_LIFE_MASK) >>
+> +			IOCB_WRITE_LIFE_SHIFT;
+> +}
+> +
+> /*
+>  * "descriptor" for what we're up to with a read.
+>  * This allows us to use the same read code yet
+> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+> index 24e61a54feaa..8a7e6f26f6f5 100644
+> --- a/include/uapi/linux/fs.h
+> +++ b/include/uapi/linux/fs.h
+> @@ -361,4 +361,14 @@ struct fscrypt_key {
+> #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
+> #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
+>=20
 > +/*
-> + * btrfs has a fixed stripewidth of 64k, so we need to write enough data to
-> + * ensure that we hit both stripes by default.
+> + * Data life time write flags, steal 4 bits for that
 > + */
-> +#define DEFAULT_BUFSIZE (65 * 1024)
+> +#define RWF_WRITE_LIFE_SHIFT		3
+> +#define RWF_WRITE_LIFE_MASK		0x000000f0 /* 4 bits of stream =
+ID */
+> +#define RWF_WRITE_LIFE_SHORT		(1 << RWF_WRITE_LIFE_SHIFT)
+> +#define RWF_WRITE_LIFE_MEDIUM		(2 << =
+RWF_WRITE_LIFE_SHIFT)
+> +#define RWF_WRITE_LIFE_LONG		(3 << RWF_WRITE_LIFE_SHIFT)
+> +#define RWF_WRITE_LIFE_EXTREME		(4 << =
+RWF_WRITE_LIFE_SHIFT)
 > +
-> +/* default number of fds to open */
-> +#define DEFAULT_NUM_FDS	10
-> +
-> +static void usage()
-> +{
-> +	printf("Usage: fsync-err [ -b bufsize ] [ -n num_fds ] -d dmerror path <filename>\n");
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	int *fd, ret, i, numfds = DEFAULT_NUM_FDS;
-> +	char *fname, *buf;
-> +	char *dmerror_path = NULL;
-> +	char *cmdbuf;
-> +	size_t cmdsize, bufsize = DEFAULT_BUFSIZE;
-> +
-> +	while ((i = getopt(argc, argv, "b:d:n:")) != -1) {
-> +		switch (i) {
-> +		case 'b':
-> +			bufsize = strtol(optarg, &buf, 0);
-> +			if (*buf != '\0') {
-> +				printf("bad string conversion: %s\n", optarg);
-> +				return 1;
-> +			}
-> +			break;
-> +		case 'd':
-> +			dmerror_path = optarg;
-> +			break;
-> +		case 'n':
-> +			numfds = strtol(optarg, &buf, 0);
-> +			if (*buf != '\0') {
-> +				printf("bad string conversion: %s\n", optarg);
-> +				return 1;
-> +			}
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (argc < 1) {
-> +		usage();
-> +		return 1;
-> +	}
-> +
-> +	if (!dmerror_path) {
-> +		printf("Must specify dmerror path with -d option!\n");
-> +		return 1;
-> +	}
-> +
-> +	/* Remaining argument is filename */
-> +	fname = argv[optind];
-> +
-> +	fd = calloc(numfds, sizeof(*fd));
-> +	if (!fd) {
-> +		printf("malloc failed: %m\n");
-> +		return 1;
-> +	}
-> +
-> +	for (i = 0; i < numfds; ++i) {
-> +		fd[i] = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-> +		if (fd[i] < 0) {
-> +			printf("open of fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	buf = malloc(bufsize);
-> +	if (!buf) {
-> +		printf("malloc failed: %m\n");
-> +		return 1;
-> +	}
-> +
-> +	/* fill it with some junk */
-> +	memset(buf, 0x7c, bufsize);
-> +
-> +	for (i = 0; i < numfds; ++i) {
-> +		ret = write(fd[i], buf, bufsize);
-> +		if (ret < 0) {
-> +			printf("First write on fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	for (i = 0; i < numfds; ++i) {
-> +		ret = fsync(fd[i]);
-> +		if (ret < 0) {
-> +			printf("First fsync on fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	/* enough for path + dmerror command string  (and then some) */
-> +	cmdsize = strlen(dmerror_path) + 64;
-> +
-> +	cmdbuf = malloc(cmdsize);
-> +	if (!cmdbuf) {
-> +		printf("malloc failed: %m\n");
-> +		return 1;
-> +	}
-> +
-> +	ret = snprintf(cmdbuf, cmdsize, "%s load_error_table", dmerror_path);
-> +	if (ret < 0 || ret >= cmdsize) {
-> +		printf("sprintf failure: %d\n", ret);
-> +		return 1;
-> +	}
-> +
-> +	/* flip the device to non-working mode */
-> +	ret = system(cmdbuf);
-> +	if (ret) {
-> +		if (WIFEXITED(ret))
-> +			printf("system: program exited: %d\n",
-> +					WEXITSTATUS(ret));
-> +		else
-> +			printf("system: 0x%x\n", (int)ret);
-> +
-> +		return 1;
-> +	}
-> +
-> +	for (i = 0; i < numfds; ++i) {
-> +		ret = write(fd[i], buf, bufsize);
-> +		if (ret < 0) {
-> +			printf("Second write on fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	for (i = 0; i < numfds; ++i) {
-> +		ret = fsync(fd[i]);
-> +		/* Now, we EXPECT the error! */
-> +		if (ret >= 0) {
-> +			printf("Success on second fsync on fd[%d]!\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	for (i = 0; i < numfds; ++i) {
-> +		ret = fsync(fd[i]);
-> +		if (ret < 0) {
-> +			/*
-> +			 * We did a failed write and fsync on each fd before.
-> +			 * Now the error should be clear since we've not done
-> +			 * any writes since then.
-> +			 */
-> +			printf("Third fsync on fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	/* flip the device to working mode */
-> +	ret = snprintf(cmdbuf, cmdsize, "%s load_working_table", dmerror_path);
-> +	if (ret < 0 || ret >= cmdsize) {
-> +		printf("sprintf failure: %d\n", ret);
-> +		return 1;
-> +	}
-> +
-> +	ret = system(cmdbuf);
-> +	if (ret) {
-> +		if (WIFEXITED(ret))
-> +			printf("system: program exited: %d\n",
-> +					WEXITSTATUS(ret));
-> +		else
-> +			printf("system: 0x%x\n", (int)ret);
-> +
-> +		return 1;
-> +	}
-> +
-> +	for (i = 0; i < numfds; ++i) {
-> +		ret = fsync(fd[i]);
-> +		if (ret < 0) {
-> +			/* The error should still be clear */
-> +			printf("fsync after healing device on fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	/*
-> +	 * reopen each file one at a time to ensure the same inode stays
-> +	 * in core. fsync each one to make sure we see no errors on a fresh
-> +	 * open of the inode.
-> +	 */
-> +	for (i = 0; i < numfds; ++i) {
-> +		ret = close(fd[i]);
-> +		if (ret < 0) {
-> +			printf("Close of fd[%d] returned unexpected error: %m\n", i);
-> +			return 1;
-> +		}
-> +		fd[i] = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-> +		if (fd[i] < 0) {
-> +			printf("Second open of fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +		ret = fsync(fd[i]);
-> +		if (ret < 0) {
-> +			/* New opens should not return an error */
-> +			printf("First fsync after reopen of fd[%d] failed: %m\n", i);
-> +			return 1;
-> +		}
-> +	}
-> +
-> +	printf("Test passed!\n");
-> +	return 0;
-> +}
-> diff --git a/tests/generic/999 b/tests/generic/999
-> new file mode 100755
-> index 000000000000..f998671ef19e
-> --- /dev/null
-> +++ b/tests/generic/999
-> @@ -0,0 +1,77 @@
-> +#! /bin/bash
-> +# FS QA Test No. 999
-> +#
-> +# Open a file several times, write to it, fsync on all fds and make sure that
-> +# they all return 0. Change the device to start throwing errors. Write again
-> +# on all fds and fsync on all fds. Ensure that we get errors on all of them.
-> +# Then fsync on all one last time and verify that all return 0.
-> +#
-> +#-----------------------------------------------------------------------
-> +# Copyright (c) 2017, Jeff Layton <jlayton@redhat.com>
-> +#
-> +# This program is free software; you can redistribute it and/or
-> +# modify it under the terms of the GNU General Public License as
-> +# published by the Free Software Foundation.
-> +#
-> +# This program is distributed in the hope that it would be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program; if not, write the Free Software Foundation,
-> +# Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> +#-----------------------------------------------------------------------
-> +
-> +seq=`basename $0`
-> +seqres=$RESULT_DIR/$seq
-> +echo "QA output created by $seq"
-> +
-> +here=`pwd`
-> +tmp=/tmp/$$
-> +status=1    # failure is the default!
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +_cleanup()
-> +{
-> +    cd /
-> +    rm -rf $tmp.* $testdir
-> +    _dmerror_cleanup
+> #endif /* _UAPI_LINUX_FS_H */
+> --
+> 2.7.4
+>=20
 
-Minor nits, please use tab for indention.
 
-Thanks,
-Eryu
+Cheers, Andreas
 
-> +}
-> +
-> +# get standard environment, filters and checks
-> +. ./common/rc
-> +. ./common/filter
-> +. ./common/dmerror
-> +
-> +# real QA test starts here
-> +_supported_os Linux
-> +_require_scratch
-> +_require_logdev
-> +_require_dm_target error
-> +_require_test_program fsync-err
-> +_require_test_program dmerror
-> +
-> +rm -f $seqres.full
-> +
-> +echo "Format and mount"
-> +_scratch_mkfs > $seqres.full 2>&1
-> +_dmerror_init
-> +_dmerror_mount
-> +
-> +_require_fs_space $SCRATCH_MNT 65536
-> +
-> +testfile=$SCRATCH_MNT/fsync-err-test
-> +
-> +$here/src/fsync-err -d $here/src/dmerror $testfile
-> +
-> +# success, all done
-> +_dmerror_load_working_table
-> +_dmerror_unmount
-> +_dmerror_cleanup
-> +
-> +# fs may be corrupt after this -- attempt to repair it
-> +_repair_scratch_fs >> $seqres.full
-> +
-> +status=0
-> +exit
-> diff --git a/tests/generic/999.out b/tests/generic/999.out
-> new file mode 100644
-> index 000000000000..2e48492ff6d1
-> --- /dev/null
-> +++ b/tests/generic/999.out
-> @@ -0,0 +1,3 @@
-> +QA output created by 999
-> +Format and mount
-> +Test passed!
-> diff --git a/tests/generic/group b/tests/generic/group
-> index 5d3e4dcf732e..b56bae8f04f0 100644
-> --- a/tests/generic/group
-> +++ b/tests/generic/group
-> @@ -442,3 +442,4 @@
->  437 auto quick
->  438 auto
->  439 auto quick punch
-> +999 auto quick
-> -- 
-> 2.13.0
-> 
+
+
+
+
+
+--Apple-Mail=_391001B6-FD2D-4B1A-BACF-D0576FB7BF5A
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iD8DBQFZQLY6pIg59Q01vtYRAixFAKDUfV+QvkQc9MDDoj0tJiD/2HRktACgvjV8
+bs9YMZyiZWYECQxTzam3DY4=
+=UVFv
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_391001B6-FD2D-4B1A-BACF-D0576FB7BF5A--
