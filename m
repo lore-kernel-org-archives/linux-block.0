@@ -1,70 +1,33 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 03/11] fs: add support for an inode to carry stream
+ related data
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ adilger@dilger.ca, martin.petersen@oracle.com
+References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+ <1497467134-6323-4-git-send-email-axboe@kernel.dk>
+ <20170614202546.GA7022@infradead.org>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 03/11] fs: add support for an inode to carry stream related data
-Date: Wed, 14 Jun 2017 21:45:04 -0600
-Message-Id: <1497498312-17704-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
-References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
+Message-ID: <19d75a47-19a3-c6e2-e1f9-cd61ef61ae34@kernel.dk>
+Date: Wed, 14 Jun 2017 14:37:14 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170614202546.GA7022@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-No functional changes in this patch, just in preparation for
-allowing applications to pass in hints about data life times
-for writes.
+On 06/14/2017 02:25 PM, Christoph Hellwig wrote:
+> On Wed, Jun 14, 2017 at 01:05:26PM -0600, Jens Axboe wrote:
+>> No functional changes in this patch, just in preparation for
+>> allowing applications to pass in hints about data life times
+>> for writes.
+>>
+>> Pack the i_stream field into a 2-byte hole, so we don't grow
+>> the size of the inode.
+> 
+> Can't we find space for 4 flags somewhere else?
 
-Pack the i_write_hint field into a 2-byte hole, so we don't grow
-the size of the inode.
+Where? I can stuff them in i_flags? But apart from that, stealing
+space in a hole seems the sanest.
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/inode.c         | 1 +
- include/linux/fs.h | 9 +++++++++
- 2 files changed, 10 insertions(+)
-
-diff --git a/fs/inode.c b/fs/inode.c
-index db5914783a71..bd8bf44f3f31 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -149,6 +149,7 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
- 	inode->i_blocks = 0;
- 	inode->i_bytes = 0;
- 	inode->i_generation = 0;
-+	inode->i_write_hint = 0;
- 	inode->i_pipe = NULL;
- 	inode->i_bdev = NULL;
- 	inode->i_cdev = NULL;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 803e5a9b2654..f4f9df8ed059 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -591,6 +591,7 @@ struct inode {
- 	struct timespec		i_ctime;
- 	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
- 	unsigned short          i_bytes;
-+	unsigned short		i_write_hint;
- 	unsigned int		i_blkbits;
- 	blkcnt_t		i_blocks;
- 
-@@ -655,6 +656,14 @@ struct inode {
- 	void			*i_private; /* fs or device private pointer */
- };
- 
-+static inline unsigned int inode_write_hint(struct inode *inode)
-+{
-+	if (inode)
-+		return inode->i_write_hint;
-+
-+	return 0;
-+}
-+
- static inline unsigned int i_blocksize(const struct inode *node)
- {
- 	return (1 << node->i_blkbits);
 -- 
-2.7.4
+Jens Axboe
