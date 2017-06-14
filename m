@@ -1,86 +1,168 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [xfstests PATCH v5 0/5] new tests for writeback error reporting behavior
-Date: Fri, 16 Jun 2017 15:36:14 -0400
-Message-Id: <20170616193619.14576-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:47632 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752922AbdFNQMX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Jun 2017 12:12:23 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 11/12] blktrace: add an option to allow displying cgroup path
+Date: Wed, 14 Jun 2017 09:12:09 -0700
+Message-Id: <dc5d7d63bb9abdefb73494882d9bd7933a0626a7.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The main changes in this set from the last are:
+From: Shaohua Li <shli@fb.com>
 
-- add a btrfs/999.out file
-- use _supported_fs to whitelist fs' on which the tests should run
-- fix the ext3/4 mount option handling when creating journal device
-- ensure that dmerror is installed on make install
+By default we output cgroup id in blktrace. This adds an option to
+display cgroup path. Since get cgroup path is a relativly heavy
+operation, we don't enable it by default.
 
-These tests are intended to test the new writeback error reporting
-introduced by this kernel patchset:
+with the option enabled, blktrace will output something like this:
+dd-1353  [007] d..2   293.015252:   8,0   /test/level  D   R 24 + 8 [dd]
 
-    [PATCH v7 00/22] fs: enhanced writeback error reporting with errseq_t (pile #1)
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ fs/kernfs/mount.c       | 19 +++++++++++++++++++
+ include/linux/cgroup.h  |  6 ++++++
+ include/linux/kernfs.h  |  2 ++
+ kernel/cgroup/cgroup.c  | 12 ++++++++++++
+ kernel/trace/blktrace.c | 14 +++++++++++++-
+ 5 files changed, 52 insertions(+), 1 deletion(-)
 
-It adds 3 new xfstests for testing kernel behavior when writeback from
-the pagecache fails: one generic filesystem test, one test for raw block
-devices and one test for btrfs.
-
-The tests work with dmerror to make data writeback from the pagecache
-fail, and then tests how the kernel reports errors afterward.
-
-xfs, ext2/3/4 and btrfs all pass on a kernel with the patchset above. "Bare"
-block devices also work correctly.
-
-Jeff Layton (5):
-  ext4: allow ext4 to use $SCRATCH_LOGDEV
-  ext3: allow it to put journal on a separate device when doing
-    scratch_mkfs
-  generic: add a writeback error handling test
-  generic: test writeback error handling on dmerror devices
-  btrfs: make a btrfs version of writeback error reporting test
-
- .gitignore                 |   1 +
- common/dmerror             |  13 ++-
- common/rc                  |  14 ++-
- doc/auxiliary-programs.txt |  16 ++++
- src/Makefile               |   4 +-
- src/dmerror                |  44 +++++++++
- src/fsync-err.c            | 223 +++++++++++++++++++++++++++++++++++++++++++++
- tests/btrfs/999            |  94 +++++++++++++++++++
- tests/btrfs/999.out        |   3 +
- tests/btrfs/group          |   1 +
- tests/generic/998          |  63 +++++++++++++
- tests/generic/998.out      |   2 +
- tests/generic/999          |  84 +++++++++++++++++
- tests/generic/999.out      |   3 +
- tests/generic/group        |   2 +
- 15 files changed, 559 insertions(+), 8 deletions(-)
- create mode 100755 src/dmerror
- create mode 100644 src/fsync-err.c
- create mode 100755 tests/btrfs/999
- create mode 100644 tests/btrfs/999.out
- create mode 100755 tests/generic/998
- create mode 100644 tests/generic/998.out
- create mode 100755 tests/generic/999
- create mode 100644 tests/generic/999.out
-
+diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
+index 5af73a8..3bbca9c 100644
+--- a/fs/kernfs/mount.c
++++ b/fs/kernfs/mount.c
+@@ -91,6 +91,25 @@ static int kernfs_encode_fh(struct inode *inode, __u32 *fh, int *max_len,
+ 	}
+ }
+ 
++/*
++ * Similar like kernfs_fh_get_inode, this one gets kernfs node from inode
++ * number and generation
++ */
++struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
++	const struct kernfs_node_id *id)
++{
++	struct kernfs_node *kn;
++
++	kn = kernfs_find_and_get_node_by_ino(root, id->ino);
++	if (!kn)
++		return NULL;
++	if (kn->id.generation != id->generation) {
++		kernfs_put(kn);
++		return NULL;
++	}
++	return kn;
++}
++
+ static struct inode *kernfs_fh_get_inode(struct super_block *sb,
+ 		u64 ino, u32 generation)
+ {
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 5ebe89f..163e5c4 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -613,6 +613,9 @@ static inline struct kernfs_node_id *cgroup_get_node_id(struct cgroup *cgrp)
+ {
+ 	return &cgrp->kn->id;
+ }
++
++void cgroup_path_from_node_id(const struct kernfs_node_id *id,
++					char *buf, size_t buflen);
+ #else /* !CONFIG_CGROUPS */
+ 
+ struct cgroup_subsys_state;
+@@ -645,6 +648,9 @@ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
+ {
+ 	return true;
+ }
++
++static inline void cgroup_path_from_node_id(const struct kernfs_node_id *id,
++	char *buf, size_t buflen) {}
+ #endif /* !CONFIG_CGROUPS */
+ 
+ /*
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index 3b38bdf..e8c685f 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -358,6 +358,8 @@ struct super_block *kernfs_pin_sb(struct kernfs_root *root, const void *ns);
+ 
+ void kernfs_init(void);
+ 
++struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
++	const struct kernfs_node_id *id);
+ #else	/* CONFIG_KERNFS */
+ 
+ static inline enum kernfs_node_type kernfs_type(struct kernfs_node *kn)
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 639e27d..ae5ff1c 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -4606,6 +4606,18 @@ static int __init cgroup_wq_init(void)
+ }
+ core_initcall(cgroup_wq_init);
+ 
++void cgroup_path_from_node_id(const struct kernfs_node_id *id,
++					char *buf, size_t buflen)
++{
++	struct kernfs_node *kn;
++
++	kn = kernfs_get_node_by_id(cgrp_dfl_root.kf_root, id);
++	if (!kn)
++		return;
++	kernfs_path(kn, buf, buflen);
++	kernfs_put(kn);
++}
++
+ /*
+  * proc_cgroup_show()
+  *  - Print task's cgroup paths into seq_file, one line for each hierarchy
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 02cfcf2..ad5abb9 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -48,12 +48,14 @@ static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_lock);
+ /* Select an alternative, minimalistic output than the original one */
+ #define TRACE_BLK_OPT_CLASSIC	0x1
+ #define TRACE_BLK_OPT_CGROUP	0x2
++#define TRACE_BLK_OPT_CGNAME	0x4
+ 
+ static struct tracer_opt blk_tracer_opts[] = {
+ 	/* Default disable the minimalistic output */
+ 	{ TRACER_OPT(blk_classic, TRACE_BLK_OPT_CLASSIC) },
+ #ifdef CONFIG_BLK_CGROUP
+ 	{ TRACER_OPT(blk_cgroup, TRACE_BLK_OPT_CGROUP) },
++	{ TRACER_OPT(blk_cgname, TRACE_BLK_OPT_CGNAME) },
+ #endif
+ 	{ }
+ };
+@@ -1213,7 +1215,17 @@ static void blk_log_action(struct trace_iterator *iter, const char *act,
+ 	if (has_cg) {
+ 		const struct kernfs_node_id *id = cgid_start(iter->ent);
+ 
+-		trace_seq_printf(&iter->seq, "%3d,%-3d %llx,%-x %2s %3s ",
++		if (blk_tracer_flags.val & TRACE_BLK_OPT_CGNAME) {
++			char blkcg_name_buf[NAME_MAX + 1] = "<...>";
++
++			cgroup_path_from_node_id(id, blkcg_name_buf,
++				sizeof(blkcg_name_buf));
++			trace_seq_printf(&iter->seq, "%3d,%-3d %s %2s %3s ",
++				 MAJOR(t->device), MINOR(t->device),
++				 blkcg_name_buf, act, rwbs);
++		} else
++			trace_seq_printf(&iter->seq,
++				 "%3d,%-3d %llx,%-x %2s %3s ",
+ 				 MAJOR(t->device), MINOR(t->device),
+ 				 id->ino, id->generation, act, rwbs);
+ 	} else
 -- 
-2.13.0
+2.9.3
