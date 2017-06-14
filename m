@@ -1,112 +1,43 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v6 05/20] mm: don't TestClearPageError in __filemap_fdatawait_range
-Date: Mon, 12 Jun 2017 08:22:57 -0400
-Message-Id: <20170612122316.13244-6-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 09/11] xfs: add support for passing in stream information for buffered writes
+Date: Wed, 14 Jun 2017 13:05:32 -0600
+Message-Id: <1497467134-6323-10-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-The -EIO returned here can end up overriding whatever error is marked in
-the address space, and be returned at fsync time, even when there is a
-more appropriate error stored in the mapping.
-
-Read errors are also sometimes tracked on a per-page level using
-PG_error. Suppose we have a read error on a page, and then that page is
-subsequently dirtied by overwriting the whole page. Writeback doesn't
-clear PG_error, so we can then end up successfully writing back that
-page and still return -EIO on fsync.
-
-Worse yet, PG_error is cleared during a sync() syscall, but the -EIO
-return from that is silently discarded. Any subsystem that is relying on
-PG_error to report errors during fsync can easily lose writeback errors
-due to this. All you need is a stray sync() call to wait for writeback
-to complete and you've lost the error.
-
-Since the handling of the PG_error flag is somewhat inconsistent across
-subsystems, let's just rely on marking the address space when there are
-writeback errors. Change the TestClearPageError call to ClearPageError,
-and make __filemap_fdatawait_range a void return function.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- mm/filemap.c | 20 +++++---------------
- 1 file changed, 5 insertions(+), 15 deletions(-)
+ fs/xfs/xfs_aops.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 6f1be573a5e6..1de71753de28 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -376,17 +376,16 @@ int filemap_flush(struct address_space *mapping)
- }
- EXPORT_SYMBOL(filemap_flush);
- 
--static int __filemap_fdatawait_range(struct address_space *mapping,
-+static void __filemap_fdatawait_range(struct address_space *mapping,
- 				     loff_t start_byte, loff_t end_byte)
- {
- 	pgoff_t index = start_byte >> PAGE_SHIFT;
- 	pgoff_t end = end_byte >> PAGE_SHIFT;
- 	struct pagevec pvec;
- 	int nr_pages;
--	int ret = 0;
- 
- 	if (end_byte < start_byte)
--		goto out;
-+		return;
- 
- 	pagevec_init(&pvec, 0);
- 	while ((index <= end) &&
-@@ -403,14 +402,11 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
- 				continue;
- 
- 			wait_on_page_writeback(page);
--			if (TestClearPageError(page))
--				ret = -EIO;
-+			ClearPageError(page);
- 		}
- 		pagevec_release(&pvec);
- 		cond_resched();
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 09af0f7cd55e..9770be0140ad 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -505,6 +505,7 @@ xfs_submit_ioend(
+ 		return status;
  	}
--out:
--	return ret;
- }
  
- /**
-@@ -430,14 +426,8 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
- int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
- 			    loff_t end_byte)
- {
--	int ret, ret2;
--
--	ret = __filemap_fdatawait_range(mapping, start_byte, end_byte);
--	ret2 = filemap_check_errors(mapping);
--	if (!ret)
--		ret = ret2;
--
--	return ret;
-+	__filemap_fdatawait_range(mapping, start_byte, end_byte);
-+	return filemap_check_errors(mapping);
++	bio_set_streamid(ioend->io_bio, inode_streamid(ioend->io_inode));
+ 	submit_bio(ioend->io_bio);
+ 	return 0;
  }
- EXPORT_SYMBOL(filemap_fdatawait_range);
- 
+@@ -564,6 +565,7 @@ xfs_chain_bio(
+ 	bio_chain(ioend->io_bio, new);
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+ 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
++	bio_set_streamid(ioend->io_bio, inode_streamid(ioend->io_inode));
+ 	submit_bio(ioend->io_bio);
+ 	ioend->io_bio = new;
+ }
 -- 
-2.13.0
+2.7.4
