@@ -1,241 +1,382 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44214 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751016AbdFOSR1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2017 14:17:27 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V3 06/12] kernfs: add exportfs operations
-Date: Thu, 15 Jun 2017 11:17:14 -0700
-Message-Id: <7051f2ab31a2e970efd64817f2a579634cc5b915.1497549993.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <adilger@dilger.ca>
+Return-Path: <adilger@dilger.ca>
+From: Andreas Dilger <adilger@dilger.ca>
+Message-Id: <01CC1927-B3E1-446C-9DB5-25DBA43A12CA@dilger.ca>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_1383E3BC-0EB5-48A3-9AD2-D1BB748168FA";
+ protocol="application/pgp-signature"; micalg=pgp-sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 10/10] nvme: add support for streams and directives
+Date: Tue, 13 Jun 2017 22:10:04 -0600
+In-Reply-To: <1497412919-19400-11-git-send-email-axboe@kernel.dk>
+Cc: linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+References: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
+ <1497412919-19400-11-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
 
-Now we have the facilities to implement exportfs operations. The idea is
-cgroup can export the fhandle info to userspace, then userspace uses
-fhandle to find the cgroup name. Another example is userspace can get
-fhandle for a cgroup and BPF uses the fhandle to filter info for the
-cgroup.
+--Apple-Mail=_1383E3BC-0EB5-48A3-9AD2-D1BB748168FA
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- arch/x86/kernel/cpu/intel_rdt_rdtgroup.c |  2 +-
- fs/kernfs/mount.c                        | 65 ++++++++++++++++++++++++++++++--
- fs/sysfs/mount.c                         |  2 +-
- include/linux/kernfs.h                   | 10 +++--
- kernel/cgroup/cgroup.c                   |  3 +-
- 5 files changed, 72 insertions(+), 10 deletions(-)
+On Jun 13, 2017, at 10:01 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>=20
+> This adds support for Directives in NVMe, particular for the Streams
+> directive. Support for Directives is a new feature in NVMe 1.3. It
+> allows a user to pass in information about where to store the data,
+> so that it the device can do so most effiently. If an application is
+> managing and writing data with different life times, mixing =
+differently
+> retentioned data onto the same locations on flash can cause write
+> amplification to grow. This, in turn, will reduce performance and
+> life time of the device.
+>=20
+> We default to allocating 4 streams per name space, but it is
+> configurable with the 'streams_per_ns' module option. If a write =
+stream
+> is set in a write, flag is as such before sending it to the device.
+>=20
+> Some debug stuff in this patch, dumping streams ID params when
+> we load nvme.
+>=20
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-diff --git a/arch/x86/kernel/cpu/intel_rdt_rdtgroup.c b/arch/x86/kernel/cpu/intel_rdt_rdtgroup.c
-index f5af0cc..fee2126 100644
---- a/arch/x86/kernel/cpu/intel_rdt_rdtgroup.c
-+++ b/arch/x86/kernel/cpu/intel_rdt_rdtgroup.c
-@@ -854,7 +854,7 @@ static struct dentry *rdt_mount(struct file_system_type *fs_type,
- 	}
- 
- 	dentry = kernfs_mount(fs_type, flags, rdt_root,
--			      RDTGROUP_SUPER_MAGIC, NULL);
-+			      RDTGROUP_SUPER_MAGIC, NULL, false);
- 	if (IS_ERR(dentry))
- 		goto out_cdp;
- 
-diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
-index 462a40c..d9099f0 100644
---- a/fs/kernfs/mount.c
-+++ b/fs/kernfs/mount.c
-@@ -16,6 +16,7 @@
- #include <linux/pagemap.h>
- #include <linux/namei.h>
- #include <linux/seq_file.h>
-+#include <linux/exportfs.h>
- 
- #include "kernfs-internal.h"
- 
-@@ -64,6 +65,59 @@ const struct super_operations kernfs_sops = {
- 	.show_path	= kernfs_sop_show_path,
- };
- 
-+static struct inode *kernfs_fh_get_inode(struct super_block *sb,
-+		u64 ino, u32 generation)
-+{
-+	struct kernfs_super_info *info = kernfs_info(sb);
-+	struct inode *inode;
-+	struct kernfs_node *kn;
-+
-+	if (ino == 0)
-+		return ERR_PTR(-ESTALE);
-+
-+	kn = kernfs_find_and_get_node_by_ino(info->root, ino);
-+	if (!kn)
-+		return ERR_PTR(-ESTALE);
-+	inode = kernfs_get_inode(sb, kn);
-+	kernfs_put(kn);
-+	if (IS_ERR(inode))
-+		return ERR_CAST(inode);
-+
-+	if (generation && inode->i_generation != generation) {
-+		/* we didn't find the right inode.. */
-+		iput(inode);
-+		return ERR_PTR(-ESTALE);
-+	}
-+	return inode;
-+}
-+
-+static struct dentry *kernfs_fh_to_dentry(struct super_block *sb, struct fid *fid,
-+		int fh_len, int fh_type)
-+{
-+	return generic_fh_to_dentry(sb, fid, fh_len, fh_type,
-+				    kernfs_fh_get_inode);
-+}
-+
-+static struct dentry *kernfs_fh_to_parent(struct super_block *sb, struct fid *fid,
-+		int fh_len, int fh_type)
-+{
-+	return generic_fh_to_parent(sb, fid, fh_len, fh_type,
-+				    kernfs_fh_get_inode);
-+}
-+
-+static struct dentry *kernfs_get_parent_dentry(struct dentry *child)
-+{
-+	struct kernfs_node *kn = kernfs_dentry_node(child);
-+
-+	return d_obtain_alias(kernfs_get_inode(child->d_sb, kn->parent));
-+}
-+
-+static const struct export_operations kernfs_export_ops = {
-+	.fh_to_dentry	= kernfs_fh_to_dentry,
-+	.fh_to_parent	= kernfs_fh_to_parent,
-+	.get_parent	= kernfs_get_parent_dentry,
-+};
-+
- /**
-  * kernfs_root_from_sb - determine kernfs_root associated with a super_block
-  * @sb: the super_block in question
-@@ -145,7 +199,8 @@ struct dentry *kernfs_node_dentry(struct kernfs_node *kn,
- 	} while (true);
- }
- 
--static int kernfs_fill_super(struct super_block *sb, unsigned long magic)
-+static int kernfs_fill_super(struct super_block *sb, unsigned long magic,
-+			     bool enable_expop)
- {
- 	struct kernfs_super_info *info = kernfs_info(sb);
- 	struct inode *inode;
-@@ -159,6 +214,8 @@ static int kernfs_fill_super(struct super_block *sb, unsigned long magic)
- 	sb->s_magic = magic;
- 	sb->s_op = &kernfs_sops;
- 	sb->s_xattr = kernfs_xattr_handlers;
-+	if (enable_expop)
-+		sb->s_export_op = &kernfs_export_ops;
- 	sb->s_time_gran = 1;
- 
- 	/* get root inode, initialize and unlock it */
-@@ -219,6 +276,7 @@ const void *kernfs_super_ns(struct super_block *sb)
-  * @magic: file system specific magic number
-  * @new_sb_created: tell the caller if we allocated a new superblock
-  * @ns: optional namespace tag of the mount
-+ * @enable_expop: if adding fhandle support
-  *
-  * This is to be called from each kernfs user's file_system_type->mount()
-  * implementation, which should pass through the specified @fs_type and
-@@ -229,7 +287,8 @@ const void *kernfs_super_ns(struct super_block *sb)
-  */
- struct dentry *kernfs_mount_ns(struct file_system_type *fs_type, int flags,
- 				struct kernfs_root *root, unsigned long magic,
--				bool *new_sb_created, const void *ns)
-+				bool *new_sb_created, const void *ns,
-+				bool enable_expop)
- {
- 	struct super_block *sb;
- 	struct kernfs_super_info *info;
-@@ -255,7 +314,7 @@ struct dentry *kernfs_mount_ns(struct file_system_type *fs_type, int flags,
- 	if (!sb->s_root) {
- 		struct kernfs_super_info *info = kernfs_info(sb);
- 
--		error = kernfs_fill_super(sb, magic);
-+		error = kernfs_fill_super(sb, magic, enable_expop);
- 		if (error) {
- 			deactivate_locked_super(sb);
- 			return ERR_PTR(error);
-diff --git a/fs/sysfs/mount.c b/fs/sysfs/mount.c
-index 20b8f82..d1a3336b 100644
---- a/fs/sysfs/mount.c
-+++ b/fs/sysfs/mount.c
-@@ -37,7 +37,7 @@ static struct dentry *sysfs_mount(struct file_system_type *fs_type,
- 
- 	ns = kobj_ns_grab_current(KOBJ_NS_TYPE_NET);
- 	root = kernfs_mount_ns(fs_type, flags, sysfs_root,
--				SYSFS_MAGIC, &new_sb, ns);
-+				SYSFS_MAGIC, &new_sb, ns, false);
- 	if (IS_ERR(root) || !new_sb)
- 		kobj_ns_drop(KOBJ_NS_TYPE_NET, ns);
- 	else if (new_sb)
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index c823a84..a901534 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -97,6 +97,7 @@ struct kernfs_elem_attr {
- 
- /* represent a kernfs node */
- struct kernfs_node_id {
-+	/* the layout must match 'struct fid' */
- 	u32			ino;
- 	u32			generation;
- } __attribute__((packed));
-@@ -337,7 +338,8 @@ void kernfs_notify(struct kernfs_node *kn);
- const void *kernfs_super_ns(struct super_block *sb);
- struct dentry *kernfs_mount_ns(struct file_system_type *fs_type, int flags,
- 			       struct kernfs_root *root, unsigned long magic,
--			       bool *new_sb_created, const void *ns);
-+			       bool *new_sb_created, const void *ns,
-+			       bool enable_expop);
- void kernfs_kill_sb(struct super_block *sb);
- struct super_block *kernfs_pin_sb(struct kernfs_root *root, const void *ns);
- 
-@@ -440,7 +442,7 @@ static inline const void *kernfs_super_ns(struct super_block *sb)
- static inline struct dentry *
- kernfs_mount_ns(struct file_system_type *fs_type, int flags,
- 		struct kernfs_root *root, unsigned long magic,
--		bool *new_sb_created, const void *ns)
-+		bool *new_sb_created, const void *ns, bool enable_expop)
- { return ERR_PTR(-ENOSYS); }
- 
- static inline void kernfs_kill_sb(struct super_block *sb) { }
-@@ -521,10 +523,10 @@ static inline int kernfs_rename(struct kernfs_node *kn,
- static inline struct dentry *
- kernfs_mount(struct file_system_type *fs_type, int flags,
- 		struct kernfs_root *root, unsigned long magic,
--		bool *new_sb_created)
-+		bool *new_sb_created, bool enable_expop)
- {
- 	return kernfs_mount_ns(fs_type, flags, root,
--				magic, new_sb_created, NULL);
-+				magic, new_sb_created, NULL, enable_expop);
- }
- 
- #endif	/* __LINUX_KERNFS_H */
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index dbfd702..e177427 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -1755,7 +1755,8 @@ struct dentry *cgroup_do_mount(struct file_system_type *fs_type, int flags,
- 	struct dentry *dentry;
- 	bool new_sb;
- 
--	dentry = kernfs_mount(fs_type, flags, root->kf_root, magic, &new_sb);
-+	dentry = kernfs_mount(fs_type, flags, root->kf_root, magic, &new_sb,
-+			      true);
- 
- 	/*
- 	 * In non-init cgroup namespace, instead of root cgroup's dentry,
--- 
-2.9.3
+You could add my Reviewed-by: but I don't know anything about the NVMe
+functionality.  The stream ID handling looks good now, in an case.
+
+Cheers, Andreas
+
+> ---
+> drivers/nvme/host/core.c | 124 =
++++++++++++++++++++++++++++++++++++++++++++++++
+> drivers/nvme/host/nvme.h |   1 +
+> include/linux/nvme.h     |  48 ++++++++++++++++++
+> 3 files changed, 173 insertions(+)
+>=20
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 903d5813023a..d7cbd050ddf4 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -65,6 +65,10 @@ static bool force_apst;
+> module_param(force_apst, bool, 0644);
+> MODULE_PARM_DESC(force_apst, "allow APST for newly enumerated devices =
+even if quirked off");
+>=20
+> +static char streams_per_ns =3D 4;
+> +module_param(streams_per_ns, byte, 0644);
+> +MODULE_PARM_DESC(streams_per_ns, "if available, allocate this many =
+streams per NS");
+> +
+> static LIST_HEAD(nvme_ctrl_list);
+> static DEFINE_SPINLOCK(dev_list_lock);
+>=20
+> @@ -351,6 +355,15 @@ static inline void nvme_setup_rw(struct nvme_ns =
+*ns, struct request *req,
+> 	cmnd->rw.slba =3D cpu_to_le64(nvme_block_nr(ns, =
+blk_rq_pos(req)));
+> 	cmnd->rw.length =3D cpu_to_le16((blk_rq_bytes(req) >> =
+ns->lba_shift) - 1);
+>=20
+> +	if (req_op(req) =3D=3D REQ_OP_WRITE) {
+> +		if (bio_stream_valid(req->bio) && ns->nr_streams) {
+> +			unsigned stream =3D bio_stream(req->bio) & =
+0xffff;
+> +
+> +			control |=3D NVME_RW_DTYPE_STREAMS;
+> +			dsmgmt |=3D ((stream % (ns->nr_streams + 1)) << =
+16);
+> +		}
+> +	}
+> +
+> 	if (ns->ms) {
+> 		switch (ns->pi_type) {
+> 		case NVME_NS_DPS_PI_TYPE3:
+> @@ -1073,6 +1086,109 @@ static int nvme_revalidate_disk(struct gendisk =
+*disk)
+> 	return 0;
+> }
+>=20
+> +static int nvme_enable_streams(struct nvme_ns *ns)
+> +{
+> +	struct nvme_command c;
+> +
+> +	memset(&c, 0, sizeof(c));
+> +
+> +	c.directive.opcode =3D nvme_admin_directive_send;
+> +	c.directive.nsid =3D cpu_to_le32(ns->ns_id);
+> +	c.directive.doper =3D NVME_DIR_SND_ID_OP_ENABLE;
+> +	c.directive.dtype =3D NVME_DIR_IDENTIFY;
+> +	c.directive.tdtype =3D NVME_DIR_STREAMS;
+> +	c.directive.endir =3D NVME_DIR_ENDIR;
+> +
+> +	return nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, NULL, 0);
+> +}
+> +
+> +static int nvme_streams_params(struct nvme_ns *ns)
+> +{
+> +	struct nvme_ctrl *ctrl =3D ns->ctrl;
+> +	struct streams_directive_params s;
+> +	struct nvme_command c;
+> +	int ret;
+> +
+> +	memset(&c, 0, sizeof(c));
+> +	memset(&s, 0, sizeof(s));
+> +
+> +	c.directive.opcode =3D nvme_admin_directive_recv;
+> +	c.directive.nsid =3D cpu_to_le32(ns->ns_id);
+> +	c.directive.numd =3D sizeof(s);
+> +	c.directive.doper =3D NVME_DIR_RCV_ST_OP_PARAM;
+> +	c.directive.dtype =3D NVME_DIR_STREAMS;
+> +
+> +	ret =3D nvme_submit_sync_cmd(ctrl->admin_q, &c, &s, sizeof(s));
+> +	if (ret)
+> +		return ret;
+> +
+> +	s.msl =3D le16_to_cpu(s.msl);
+> +	s.nssa =3D le16_to_cpu(s.nssa);
+> +	s.nsso =3D le16_to_cpu(s.nsso);
+> +	s.sws =3D le32_to_cpu(s.sws);
+> +	s.sgs =3D le16_to_cpu(s.sgs);
+> +	s.nsa =3D le16_to_cpu(s.nsa);
+> +	s.nso =3D le16_to_cpu(s.nso);
+> +
+> +	dev_info(ctrl->device, "streams: msl=3D%u, nssa=3D%u, nsso=3D%u, =
+sws=3D%u "
+> +				"sgs=3D%u, nsa=3D%u, nso=3D%u\n", s.msl, =
+s.nssa,
+> +				s.nsso, s.sws, s.sgs, s.nsa, s.nso);
+> +	return 0;
+> +}
+> +
+> +static int nvme_streams_allocate(struct nvme_ns *ns, unsigned int =
+streams)
+> +{
+> +	struct nvme_command c;
+> +
+> +	memset(&c, 0, sizeof(c));
+> +
+> +	c.directive.opcode =3D nvme_admin_directive_recv;
+> +	c.directive.nsid =3D cpu_to_le32(ns->ns_id);
+> +	c.directive.doper =3D NVME_DIR_RCV_ST_OP_RESOURCE;
+> +	c.directive.dtype =3D NVME_DIR_STREAMS;
+> +	c.directive.endir =3D streams;
+> +
+> +	return nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, NULL, 0);
+> +}
+> +
+> +static int nvme_streams_deallocate(struct nvme_ns *ns)
+> +{
+> +	struct nvme_command c;
+> +
+> +	memset(&c, 0, sizeof(c));
+> +
+> +	c.directive.opcode =3D nvme_admin_directive_send;
+> +	c.directive.nsid =3D cpu_to_le32(ns->ns_id);
+> +	c.directive.doper =3D NVME_DIR_SND_ST_OP_REL_RSC;
+> +	c.directive.dtype =3D NVME_DIR_STREAMS;
+> +
+> +	return nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, NULL, 0);
+> +}
+> +
+> +static void nvme_config_streams(struct nvme_ns *ns)
+> +{
+> +	int ret;
+> +
+> +	ret =3D nvme_enable_streams(ns);
+> +	if (ret)
+> +		return;
+> +
+> +	ret =3D nvme_streams_params(ns);
+> +	if (ret)
+> +		return;
+> +
+> +	ret =3D nvme_streams_allocate(ns, streams_per_ns);
+> +	if (ret)
+> +		return;
+> +
+> +	ret =3D nvme_streams_params(ns);
+> +	if (ret)
+> +		return;
+> +
+> +	ns->nr_streams =3D streams_per_ns;
+> +	dev_info(ns->ctrl->device, "successfully enabled streams\n");
+> +}
+> +
+> static char nvme_pr_type(enum pr_type type)
+> {
+> 	switch (type) {
+> @@ -1606,6 +1722,9 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
+> 	ctrl->sgls =3D le32_to_cpu(id->sgls);
+> 	ctrl->kas =3D le16_to_cpu(id->kas);
+>=20
+> +	if (ctrl->oacs & NVME_CTRL_OACS_DIRECTIVES)
+> +		dev_info(ctrl->dev, "supports directives\n");
+> +
+> 	ctrl->npss =3D id->npss;
+> 	prev_apsta =3D ctrl->apsta;
+> 	if (ctrl->quirks & NVME_QUIRK_NO_APST) {
+> @@ -2060,6 +2179,9 @@ static void nvme_alloc_ns(struct nvme_ctrl =
+*ctrl, unsigned nsid)
+> 		goto out_free_id;
+> 	}
+>=20
+> +	if (ctrl->oacs & NVME_CTRL_OACS_DIRECTIVES)
+> +		nvme_config_streams(ns);
+> +
+> 	disk =3D alloc_disk_node(0, node);
+> 	if (!disk)
+> 		goto out_free_id;
+> @@ -2112,6 +2234,8 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+> 					&nvme_ns_attr_group);
+> 		if (ns->ndev)
+> 			nvme_nvm_unregister_sysfs(ns);
+> +		if (ns->nr_streams)
+> +			nvme_streams_deallocate(ns);
+> 		del_gendisk(ns->disk);
+> 		blk_cleanup_queue(ns->queue);
+> 	}
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+> index 9d6a070d4391..dc87c8284259 100644
+> --- a/drivers/nvme/host/nvme.h
+> +++ b/drivers/nvme/host/nvme.h
+> @@ -192,6 +192,7 @@ struct nvme_ns {
+> 	u8 uuid[16];
+>=20
+> 	unsigned ns_id;
+> +	unsigned nr_streams;
+> 	int lba_shift;
+> 	u16 ms;
+> 	bool ext;
+> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+> index b625bacf37ef..8b2f5b140134 100644
+> --- a/include/linux/nvme.h
+> +++ b/include/linux/nvme.h
+> @@ -245,6 +245,7 @@ enum {
+> 	NVME_CTRL_ONCS_WRITE_ZEROES		=3D 1 << 3,
+> 	NVME_CTRL_VWC_PRESENT			=3D 1 << 0,
+> 	NVME_CTRL_OACS_SEC_SUPP                 =3D 1 << 0,
+> +	NVME_CTRL_OACS_DIRECTIVES		=3D 1 << 5,
+> 	NVME_CTRL_OACS_DBBUF_SUPP		=3D 1 << 7,
+> };
+>=20
+> @@ -295,6 +296,19 @@ enum {
+> };
+>=20
+> enum {
+> +	NVME_DIR_IDENTIFY		=3D 0x00,
+> +	NVME_DIR_STREAMS		=3D 0x01,
+> +	NVME_DIR_SND_ID_OP_ENABLE	=3D 0x01,
+> +	NVME_DIR_SND_ST_OP_REL_ID	=3D 0x01,
+> +	NVME_DIR_SND_ST_OP_REL_RSC	=3D 0x02,
+> +	NVME_DIR_RCV_ID_OP_PARAM	=3D 0x01,
+> +	NVME_DIR_RCV_ST_OP_PARAM	=3D 0x01,
+> +	NVME_DIR_RCV_ST_OP_STATUS	=3D 0x02,
+> +	NVME_DIR_RCV_ST_OP_RESOURCE	=3D 0x03,
+> +	NVME_DIR_ENDIR			=3D 0x01,
+> +};
+> +
+> +enum {
+> 	NVME_NS_FEAT_THIN	=3D 1 << 0,
+> 	NVME_NS_FLBAS_LBA_MASK	=3D 0xf,
+> 	NVME_NS_FLBAS_META_EXT	=3D 0x10,
+> @@ -535,6 +549,7 @@ enum {
+> 	NVME_RW_PRINFO_PRCHK_APP	=3D 1 << 11,
+> 	NVME_RW_PRINFO_PRCHK_GUARD	=3D 1 << 12,
+> 	NVME_RW_PRINFO_PRACT		=3D 1 << 13,
+> +	NVME_RW_DTYPE_STREAMS		=3D 1 << 4,
+> };
+>=20
+> struct nvme_dsm_cmd {
+> @@ -604,6 +619,8 @@ enum nvme_admin_opcode {
+> 	nvme_admin_download_fw		=3D 0x11,
+> 	nvme_admin_ns_attach		=3D 0x15,
+> 	nvme_admin_keep_alive		=3D 0x18,
+> +	nvme_admin_directive_send	=3D 0x19,
+> +	nvme_admin_directive_recv	=3D 0x1a,
+> 	nvme_admin_dbbuf		=3D 0x7C,
+> 	nvme_admin_format_nvm		=3D 0x80,
+> 	nvme_admin_security_send	=3D 0x81,
+> @@ -756,6 +773,24 @@ struct nvme_get_log_page_command {
+> 	__u32			rsvd14[2];
+> };
+>=20
+> +struct nvme_directive_cmd {
+> +	__u8			opcode;
+> +	__u8			flags;
+> +	__u16			command_id;
+> +	__le32			nsid;
+> +	__u64			rsvd2[2];
+> +	union nvme_data_ptr	dptr;
+> +	__le32			numd;
+> +	__u8			doper;
+> +	__u8			dtype;
+> +	__le16			dspec;
+> +	__u8			endir;
+> +	__u8			tdtype;
+> +	__u16			rsvd15;
+> +
+> +	__u32			rsvd16[3];
+> +};
+> +
+> /*
+>  * Fabrics subcommands.
+>  */
+> @@ -886,6 +921,18 @@ struct nvme_dbbuf {
+> 	__u32			rsvd12[6];
+> };
+>=20
+> +struct streams_directive_params {
+> +	__u16	msl;
+> +	__u16	nssa;
+> +	__u16	nsso;
+> +	__u8	rsvd[10];
+> +	__u32	sws;
+> +	__u16	sgs;
+> +	__u16	nsa;
+> +	__u16	nso;
+> +	__u8	rsvd2[6];
+> +};
+> +
+> struct nvme_command {
+> 	union {
+> 		struct nvme_common_command common;
+> @@ -906,6 +953,7 @@ struct nvme_command {
+> 		struct nvmf_property_set_command prop_set;
+> 		struct nvmf_property_get_command prop_get;
+> 		struct nvme_dbbuf dbbuf;
+> +		struct nvme_directive_cmd directive;
+> 	};
+> };
+>=20
+> --
+> 2.7.4
+>=20
+
+
+Cheers, Andreas
+
+
+
+
+
+
+--Apple-Mail=_1383E3BC-0EB5-48A3-9AD2-D1BB748168FA
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iD8DBQFZQLcdpIg59Q01vtYRAt5NAJ9mcPFK+0krQ9ESD6qC9pNWt1AERgCdEiUN
+VnbRnDZ9QT9To6YKzZRR3eY=
+=aUhy
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_1383E3BC-0EB5-48A3-9AD2-D1BB748168FA--
