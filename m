@@ -1,126 +1,66 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/9] block: add support for write hints in a bio
-Date: Tue, 20 Jun 2017 18:21:59 -0600
-Message-Id: <1498004526-4543-3-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
-References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:47544 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752445AbdFNQM1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Jun 2017 12:12:27 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 10/12] block: call __bio_free in bio_endio
+Date: Wed, 14 Jun 2017 09:12:08 -0700
+Message-Id: <6019e3e30918ea37c262d6dcdc89ee5edf2c84ed.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-No functional changes in this patch, we just set aside 3 bits
-in the bio/request flags, which can be used to hold a WRITE_LIFE_*
-life time hint.
+From: Shaohua Li <shli@fb.com>
 
-Ensure that we don't merge requests that have different life time
-hints assigned to them.
+bio_free isn't a good place to free cgroup/integrity info. There are a
+lot of cases bio is allocated in special way (for example, in stack) and
+never gets called by bio_put hence bio_free, we are leaking memory. This
+patch moves the free to bio endio, which should be called anyway. The
+__bio_free call in bio_free is kept, in case the bio never gets called
+bio endio.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+This assumes ->bi_end_io() doesn't access cgroup/integrity info, which
+seems true in my audit. Otherwise, we probably must add a flag to
+distinguish if bio will be called by bio_put.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-merge.c         | 16 ++++++++++++++++
- include/linux/blk_types.h | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+)
+ block/bio-integrity.c | 1 +
+ block/bio.c           | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index cea544ec5d96..17cd0c3f872d 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -670,6 +670,14 @@ static struct request *attempt_merge(struct request_queue *q,
- 		return NULL;
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index b5009a8..869ac7a 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -120,6 +120,7 @@ void bio_integrity_free(struct bio *bio)
+ 	}
  
- 	/*
-+	 * Don't allow merge of different streams, or for a stream with
-+	 * non-stream IO.
-+	 */
-+	if ((req->cmd_flags & REQ_WRITE_LIFE_MASK) !=
-+	    (next->cmd_flags & REQ_WRITE_LIFE_MASK))
-+		return NULL;
-+
-+	/*
- 	 * If we are allowed to merge, then append bio list
- 	 * from next to rq and release next. merge_requests_fn
- 	 * will have updated segment counts, update sector
-@@ -788,6 +796,14 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 	    !blk_write_same_mergeable(rq->bio, bio))
- 		return false;
- 
-+	/*
-+	 * Don't allow merge of different streams, or for a stream with
-+	 * non-stream IO.
-+	 */
-+	if ((rq->cmd_flags & REQ_WRITE_LIFE_MASK) !=
-+	    (bio->bi_opf & REQ_WRITE_LIFE_MASK))
-+		return false;
-+
- 	return true;
+ 	bio->bi_integrity = NULL;
++	bio->bi_opf &= ~REQ_INTEGRITY;
  }
+ EXPORT_SYMBOL(bio_integrity_free);
  
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index e210da6d14b8..4ce71298e45b 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -7,6 +7,7 @@
+diff --git a/block/bio.c b/block/bio.c
+index 888e780..9bfd8d4 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1823,6 +1823,8 @@ void bio_endio(struct bio *bio)
+ 	}
  
- #include <linux/types.h>
- #include <linux/bvec.h>
-+#include <linux/fs.h>
- 
- struct bio_set;
- struct bio;
-@@ -223,6 +224,10 @@ enum req_flag_bits {
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
- 
-+	__REQ_WRITE_HINT_SHIFT,	/* 3 bits for life time hint */
-+	__REQ_WRITE_HINT_PAD1,
-+	__REQ_WRITE_HINT_PAD2,
-+
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
-@@ -244,6 +249,13 @@ enum req_flag_bits {
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
- 
-+#define REQ_WRITE_SHORT		(WRITE_LIFE_SHORT << __REQ_WRITE_HINT_SHIFT)
-+#define REQ_WRITE_MEDIUM	(WRITE_LIFE_MEDIUM << __REQ_WRITE_HINT_SHIFT)
-+#define REQ_WRITE_LONG		(WRITE_LIFE_LONG << __REQ_WRITE_HINT_SHIFT)
-+#define REQ_WRITE_EXTREME	(WRITE_LIFE_EXTREME << __REQ_WRITE_HINT_SHIFT)
-+
-+#define REQ_WRITE_LIFE_MASK	(0x7 << __REQ_WRITE_HINT_SHIFT)
-+ 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
-@@ -335,4 +347,23 @@ struct blk_rq_stat {
- 	u64 batch;
- };
- 
-+static inline unsigned int write_hint_to_opf(enum rw_hint hint)
-+{
-+	return hint << __REQ_WRITE_HINT_SHIFT;
-+}
-+
-+/*
-+ * Don't let drivers see WRITE_LIFE_NOT_SET, return NONE for that
-+ */
-+static inline enum rw_hint opf_to_write_hint(unsigned int opf)
-+{
-+	enum rw_hint ret;
-+
-+	ret = (opf & REQ_WRITE_LIFE_MASK) >> __REQ_WRITE_HINT_SHIFT;
-+	if (ret == WRITE_LIFE_NOT_SET)
-+		ret = WRITE_LIFE_NONE;
-+
-+	return ret;
-+}
-+
- #endif /* __LINUX_BLK_TYPES_H */
+ 	blk_throtl_bio_endio(bio);
++	/* release cgroup/integrity info */
++	__bio_free(bio);
+ 	if (bio->bi_end_io)
+ 		bio->bi_end_io(bio);
+ }
 -- 
-2.7.4
+2.9.3
