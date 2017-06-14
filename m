@@ -1,49 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59438 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752015AbdFZMPt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:15:49 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 17/51] bvec_iter: introduce BVEC_ITER_ALL_INIT
-Date: Mon, 26 Jun 2017 20:10:00 +0800
-Message-Id: <20170626121034.3051-18-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 03/10] fs: add support for an inode to carry stream related data
+Date: Tue, 13 Jun 2017 22:01:52 -0600
+Message-Id: <1497412919-19400-4-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
+References: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Introduce BVEC_ITER_ALL_INIT for iterating one bio
-from start to end.
+No functional changes in this patch, just in preparation for
+allowing applications to pass in hints about data life times
+for writes.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Pack the i_stream field into a 2-byte hole, so we don't grow
+the size of the inode.
+
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/bvec.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ fs/inode.c         | 1 +
+ include/linux/fs.h | 9 +++++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 89b65b82d98f..162ca7caf510 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -94,4 +94,13 @@ static inline void bvec_iter_advance(const struct bio_vec *bv,
- 		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
- 	     bvec_iter_advance((bio_vec), &(iter), (bvl).bv_len))
+diff --git a/fs/inode.c b/fs/inode.c
+index db5914783a71..5717cb378fda 100644
+--- a/fs/inode.c
++++ b/fs/inode.c
+@@ -149,6 +149,7 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
+ 	inode->i_blocks = 0;
+ 	inode->i_bytes = 0;
+ 	inode->i_generation = 0;
++	inode->i_stream = 0;
+ 	inode->i_pipe = NULL;
+ 	inode->i_bdev = NULL;
+ 	inode->i_cdev = NULL;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 803e5a9b2654..771e172d23d7 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -591,6 +591,7 @@ struct inode {
+ 	struct timespec		i_ctime;
+ 	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
+ 	unsigned short          i_bytes;
++	unsigned short		i_stream;
+ 	unsigned int		i_blkbits;
+ 	blkcnt_t		i_blocks;
  
-+/* for iterating one bio from start to end */
-+#define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
-+{									\
-+	.bi_sector	= 0,						\
-+	.bi_size	= UINT_MAX,					\
-+	.bi_idx		= 0,						\
-+	.bi_bvec_done	= 0,						\
+@@ -655,6 +656,14 @@ struct inode {
+ 	void			*i_private; /* fs or device private pointer */
+ };
+ 
++static inline unsigned int inode_streamid(struct inode *inode)
++{
++	if (inode)
++		return inode->i_stream;
++
++	return 0;
 +}
 +
- #endif /* __LINUX_BVEC_ITER_H */
+ static inline unsigned int i_blocksize(const struct inode *node)
+ {
+ 	return (1 << node->i_blkbits);
 -- 
-2.9.4
+2.7.4
