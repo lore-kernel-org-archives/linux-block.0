@@ -1,74 +1,111 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 08/10] ext4: nowait aio support
-Date: Mon,  5 Jun 2017 00:35:38 -0500
-Message-Id: <20170605053540.19393-9-rgoldwyn@suse.de>
-In-Reply-To: <20170605053540.19393-1-rgoldwyn@suse.de>
-References: <20170605053540.19393-1-rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 01/10] block: add support for carrying stream information in a bio
+Date: Tue, 13 Jun 2017 22:01:50 -0600
+Message-Id: <1497412919-19400-2-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
+References: <1497412919-19400-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+No functional changes in this patch, but it allows each bio to
+carry a stream ID and disallows merging of bio's with different
+stream IDs.
 
-Return EAGAIN if any of the following checks fail for direct I/O:
-  + i_rwsem is lockable
-  + Writing beyond end of file (will trigger allocation)
-  + Blocks are not allocated at the write location
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/ext4/file.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ block/bio.c               |  2 ++
+ block/blk-merge.c         | 14 ++++++++++++++
+ include/linux/blk_types.h | 17 +++++++++++++++++
+ 3 files changed, 33 insertions(+)
 
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 831fd6beebf0..07f08ff2c11b 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -216,7 +216,13 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		return ext4_dax_write_iter(iocb, from);
- #endif
+diff --git a/block/bio.c b/block/bio.c
+index 888e7801c638..77f4be1f7428 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -595,6 +595,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
+ 	bio->bi_opf = bio_src->bi_opf;
+ 	bio->bi_iter = bio_src->bi_iter;
+ 	bio->bi_io_vec = bio_src->bi_io_vec;
++	bio->bi_stream = bio_src->bi_stream;
  
--	inode_lock(inode);
-+	if (iocb->ki_flags & IOCB_NOWAIT) {
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+	} else {
-+		inode_lock(inode);
-+	}
+ 	bio_clone_blkcg_association(bio, bio_src);
+ }
+@@ -678,6 +679,7 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+ 	bio->bi_opf		= bio_src->bi_opf;
+ 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
+ 	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
++	bio->bi_stream		= bio_src->bi_stream;
+ 
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_DISCARD:
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 3990ae406341..28998acdd675 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -693,6 +693,13 @@ static struct request *attempt_merge(struct request_queue *q,
+ 		return NULL;
+ 
+ 	/*
++	 * Don't allow merge of different streams, or for a stream with
++	 * non-stream IO.
++	 */
++	if (req->bio->bi_stream != next->bio->bi_stream)
++		return NULL;
 +
- 	ret = ext4_write_checks(iocb, from);
- 	if (ret <= 0)
- 		goto out;
-@@ -235,9 +241,15 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
++	/*
+ 	 * If we are allowed to merge, then append bio list
+ 	 * from next to rq and release next. merge_requests_fn
+ 	 * will have updated segment counts, update sector
+@@ -811,6 +818,13 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 	    !blk_write_same_mergeable(rq->bio, bio))
+ 		return false;
  
- 	iocb->private = &overwrite;
- 	/* Check whether we do a DIO overwrite or not */
--	if (o_direct && ext4_should_dioread_nolock(inode) && !unaligned_aio &&
--	    ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from)))
--		overwrite = 1;
-+	if (o_direct && !unaligned_aio) {
-+		if (ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from))) {
-+			if (ext4_should_dioread_nolock(inode))
-+				overwrite = 1;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
-+		}
-+	}
++	/*
++	 * Don't allow merge of different streams, or for a stream with
++	 * non-stream IO.
++	 */
++	if (rq->bio->bi_stream != bio->bi_stream)
++		return false;
++
+ 	return true;
+ }
  
- 	ret = __generic_file_write_iter(iocb, from);
- 	inode_unlock(inode);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 61339bc44400..1940876a7fa7 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -36,6 +36,8 @@ struct bio {
+ 	unsigned short		bi_flags;	/* status, etc and bvec pool number */
+ 	unsigned short		bi_ioprio;
+ 
++	unsigned int		bi_stream;	/* write life time hint */
++
+ 	struct bvec_iter	bi_iter;
+ 
+ 	/* Number of segments in this BIO after
+@@ -312,4 +314,19 @@ struct blk_rq_stat {
+ 	u64 batch;
+ };
+ 
++static inline void bio_set_streamid(struct bio *bio, unsigned int stream)
++{
++	bio->bi_stream = stream;
++}
++
++static inline bool bio_stream_valid(struct bio *bio)
++{
++	return bio->bi_stream != 0;
++}
++
++static inline unsigned int bio_stream(struct bio *bio)
++{
++	return bio->bi_stream;
++}
++
+ #endif /* __LINUX_BLK_TYPES_H */
 -- 
-2.12.0
+2.7.4
