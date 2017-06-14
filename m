@@ -1,195 +1,62 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 06/20] mm: drop "wait" parameter from write_one_page
-Date: Mon, 12 Jun 2017 08:22:58 -0400
-Message-Id: <20170612122316.13244-7-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:47632 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752860AbdFNQMU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Jun 2017 12:12:20 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 07/12] cgroup: export fhandle info for a cgroup
+Date: Wed, 14 Jun 2017 09:12:05 -0700
+Message-Id: <8d928141f1e628c31b4502068b35c97987645138.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The callers all set it to 1.
+From: Shaohua Li <shli@fb.com>
 
-Also, make it clear that this function will not set any sort of AS_*
-error, and that the caller must do so if necessary. No existing caller
-uses this on normal files, so none of them need it.
+Add an API to export cgroup fhandle info. We don't export a full 'struct
+file_handle', there are unrequired info. Sepcifically, cgroup is always
+a directory, so we don't need a 'FILEID_KERNFS_WITH_PARENT' type
+fhandle, we only need export the inode number and generation number.
+Since the first part of 'kernfs_fid' and 'kernfs_node_id' have the same
+layout, we can just export a 'kernfs_node_id'.
 
-Also, add __must_check here since, in general, the callers need to
-handle an error here in some fashion.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- fs/exofs/dir.c        |  2 +-
- fs/ext2/dir.c         |  2 +-
- fs/jfs/jfs_metapage.c |  4 ++--
- fs/minix/dir.c        |  2 +-
- fs/sysv/dir.c         |  2 +-
- fs/ufs/dir.c          |  2 +-
- include/linux/mm.h    |  2 +-
- mm/page-writeback.c   | 14 +++++++-------
- 8 files changed, 15 insertions(+), 15 deletions(-)
+ include/linux/cgroup.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/exofs/dir.c b/fs/exofs/dir.c
-index 8eeb694332fe..98233a97b7b8 100644
---- a/fs/exofs/dir.c
-+++ b/fs/exofs/dir.c
-@@ -72,7 +72,7 @@ static int exofs_commit_chunk(struct page *page, loff_t pos, unsigned len)
- 	set_page_dirty(page);
- 
- 	if (IS_DIRSYNC(dir))
--		err = write_one_page(page, 1);
-+		err = write_one_page(page);
- 	else
- 		unlock_page(page);
- 
-diff --git a/fs/ext2/dir.c b/fs/ext2/dir.c
-index d9650c9508e4..e2709695b177 100644
---- a/fs/ext2/dir.c
-+++ b/fs/ext2/dir.c
-@@ -100,7 +100,7 @@ static int ext2_commit_chunk(struct page *page, loff_t pos, unsigned len)
- 	}
- 
- 	if (IS_DIRSYNC(dir)) {
--		err = write_one_page(page, 1);
-+		err = write_one_page(page);
- 		if (!err)
- 			err = sync_inode_metadata(dir, 1);
- 	} else {
-diff --git a/fs/jfs/jfs_metapage.c b/fs/jfs/jfs_metapage.c
-index 489aaa1403e5..744fa3c079e6 100644
---- a/fs/jfs/jfs_metapage.c
-+++ b/fs/jfs/jfs_metapage.c
-@@ -711,7 +711,7 @@ void force_metapage(struct metapage *mp)
- 	get_page(page);
- 	lock_page(page);
- 	set_page_dirty(page);
--	write_one_page(page, 1);
-+	write_one_page(page);
- 	clear_bit(META_forcewrite, &mp->flag);
- 	put_page(page);
- }
-@@ -756,7 +756,7 @@ void release_metapage(struct metapage * mp)
- 		set_page_dirty(page);
- 		if (test_bit(META_sync, &mp->flag)) {
- 			clear_bit(META_sync, &mp->flag);
--			write_one_page(page, 1);
-+			write_one_page(page);
- 			lock_page(page); /* write_one_page unlocks the page */
- 		}
- 	} else if (mp->lsn)	/* discard_metapage doesn't remove it */
-diff --git a/fs/minix/dir.c b/fs/minix/dir.c
-index 7edc9b395700..baa9721f1299 100644
---- a/fs/minix/dir.c
-+++ b/fs/minix/dir.c
-@@ -57,7 +57,7 @@ static int dir_commit_chunk(struct page *page, loff_t pos, unsigned len)
- 		mark_inode_dirty(dir);
- 	}
- 	if (IS_DIRSYNC(dir))
--		err = write_one_page(page, 1);
-+		err = write_one_page(page);
- 	else
- 		unlock_page(page);
- 	return err;
-diff --git a/fs/sysv/dir.c b/fs/sysv/dir.c
-index 5bdae85ceef7..f5191cb2c947 100644
---- a/fs/sysv/dir.c
-+++ b/fs/sysv/dir.c
-@@ -45,7 +45,7 @@ static int dir_commit_chunk(struct page *page, loff_t pos, unsigned len)
- 		mark_inode_dirty(dir);
- 	}
- 	if (IS_DIRSYNC(dir))
--		err = write_one_page(page, 1);
-+		err = write_one_page(page);
- 	else
- 		unlock_page(page);
- 	return err;
-diff --git a/fs/ufs/dir.c b/fs/ufs/dir.c
-index de01b8f2aa78..48609f1d9580 100644
---- a/fs/ufs/dir.c
-+++ b/fs/ufs/dir.c
-@@ -53,7 +53,7 @@ static int ufs_commit_chunk(struct page *page, loff_t pos, unsigned len)
- 		mark_inode_dirty(dir);
- 	}
- 	if (IS_DIRSYNC(dir))
--		err = write_one_page(page, 1);
-+		err = write_one_page(page);
- 	else
- 		unlock_page(page);
- 	return err;
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index b892e95d4929..c0b1759304ec 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2199,7 +2199,7 @@ extern void filemap_map_pages(struct vm_fault *vmf,
- extern int filemap_page_mkwrite(struct vm_fault *vmf);
- 
- /* mm/page-writeback.c */
--int write_one_page(struct page *page, int wait);
-+int __must_check write_one_page(struct page *page);
- void task_dirty_inc(struct task_struct *tsk);
- 
- /* readahead.c */
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 143c1c25d680..b901fe52b153 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2366,15 +2366,16 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 30c6877..5ebe89f 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -609,6 +609,10 @@ static inline void cgroup_kthread_ready(void)
+ 	current->no_cgroup_migration = 0;
  }
  
- /**
-- * write_one_page - write out a single page and optionally wait on I/O
-+ * write_one_page - write out a single page and wait on I/O
-  * @page: the page to write
-- * @wait: if true, wait on writeout
-  *
-  * The page must be locked by the caller and will be unlocked upon return.
-  *
-- * write_one_page() returns a negative error code if I/O failed.
-+ * write_one_page() returns a negative error code if I/O failed. Note that
-+ * the address_space is not marked for error. The caller must do this if
-+ * needed.
-  */
--int write_one_page(struct page *page, int wait)
-+int write_one_page(struct page *page)
- {
- 	struct address_space *mapping = page->mapping;
- 	int ret = 0;
-@@ -2385,13 +2386,12 @@ int write_one_page(struct page *page, int wait)
++static inline struct kernfs_node_id *cgroup_get_node_id(struct cgroup *cgrp)
++{
++	return &cgrp->kn->id;
++}
+ #else /* !CONFIG_CGROUPS */
  
- 	BUG_ON(!PageLocked(page));
+ struct cgroup_subsys_state;
+@@ -631,6 +635,10 @@ static inline int cgroup_init_early(void) { return 0; }
+ static inline int cgroup_init(void) { return 0; }
+ static inline void cgroup_init_kthreadd(void) {}
+ static inline void cgroup_kthread_ready(void) {}
++static inline struct kernfs_node_id *cgroup_get_node_id(struct cgroup *cgrp)
++{
++	return NULL;
++}
  
--	if (wait)
--		wait_on_page_writeback(page);
-+	wait_on_page_writeback(page);
- 
- 	if (clear_page_dirty_for_io(page)) {
- 		get_page(page);
- 		ret = mapping->a_ops->writepage(page, &wbc);
--		if (ret == 0 && wait) {
-+		if (ret == 0) {
- 			wait_on_page_writeback(page);
- 			if (PageError(page))
- 				ret = -EIO;
+ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
+ 					       struct cgroup *ancestor)
 -- 
-2.13.0
+2.9.3
