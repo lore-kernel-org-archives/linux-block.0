@@ -1,61 +1,92 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 12/12] blk-mq: Warn when attempting to run a hardware queue that is not mapped
-Date: Thu, 8 Jun 2017 10:33:55 -0700
-Message-ID: <20170608173355.25898-13-bart.vanassche@sandisk.com>
-In-Reply-To: <20170608173355.25898-1-bart.vanassche@sandisk.com>
-References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:47538 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752956AbdFNQM0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Jun 2017 12:12:26 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 01/12] kernfs: implement i_generation
+Date: Wed, 14 Jun 2017 09:11:59 -0700
+Message-Id: <74c46215969a0506d7529e559c1f7f2d3885d1e2.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+In-Reply-To: <cover.1497455937.git.shli@fb.com>
+References: <cover.1497455937.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A queue must be frozen while the mapped state of a hardware queue
-is changed. Additionally, any change of the mapped state is
-followed by a call to blk_mq_map_swqueue() (see also
-blk_mq_init_allocated_queue() and blk_mq_update_nr_hw_queues()).
-Since blk_mq_map_swqueue() does not map any unmapped hardware
-queue onto any software queue, no attempt will be made to run
-an unmapped hardware queue. Hence issue a warning upon attempts
-to run an unmapped hardware queue.
+From: Shaohua Li <shli@fb.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Set i_generation for kernfs inode. This is required to implement exportfs
+operations.
+
+Note, the generation is 32-bit, so it's possible the generation wraps up
+and we find stale files. The possiblity is low, since fhandle matches
+both inode number and generation. In most fs, the generation is 32-bit.
+fhandle only export 32-bit generation for most fs. So unless we have
+solid reason, we'd live with the possible conflict.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/kernfs/dir.c        | 2 ++
+ fs/kernfs/inode.c      | 1 +
+ include/linux/kernfs.h | 2 ++
+ 3 files changed, 5 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0f8c011eff97..689026d3c4bd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1091,8 +1091,9 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
--	if (unlikely(blk_mq_hctx_stopped(hctx) ||
--		     !blk_mq_hw_queue_mapped(hctx)))
-+	WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx));
-+
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
+diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
+index db5900aaa..09d093e 100644
+--- a/fs/kernfs/dir.c
++++ b/fs/kernfs/dir.c
+@@ -634,6 +634,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 	if (ret < 0)
+ 		goto err_out2;
+ 	kn->ino = ret;
++	kn->generation = atomic_inc_return(&root->next_generation);
  
- 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
-@@ -1252,7 +1253,7 @@ static void blk_mq_run_work_fn(struct work_struct *work)
+ 	atomic_set(&kn->count, 1);
+ 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
+@@ -877,6 +878,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
  
- void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
- {
--	if (unlikely(!blk_mq_hw_queue_mapped(hctx)))
-+	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
- 		return;
+ 	ida_init(&root->ino_ida);
+ 	INIT_LIST_HEAD(&root->supers);
++	atomic_set(&root->next_generation, 0);
  
- 	/*
+ 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
+ 			       KERNFS_DIR);
+diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
+index fb4b4a7..79cdae4 100644
+--- a/fs/kernfs/inode.c
++++ b/fs/kernfs/inode.c
+@@ -220,6 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
+ 	inode->i_private = kn;
+ 	inode->i_mapping->a_ops = &kernfs_aops;
+ 	inode->i_op = &kernfs_iops;
++	inode->i_generation = kn->generation;
+ 
+ 	set_default_inode_attr(inode, kn->mode);
+ 	kernfs_refresh_inode(kn, inode);
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index a9b11b8..c5f0fa7 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -135,6 +135,7 @@ struct kernfs_node {
+ 	umode_t			mode;
+ 	unsigned int		ino;
+ 	struct kernfs_iattrs	*iattr;
++	u32			generation;
+ };
+ 
+ /*
+@@ -170,6 +171,7 @@ struct kernfs_root {
+ 	struct list_head	supers;
+ 
+ 	wait_queue_head_t	deactivate_waitq;
++	atomic_t		next_generation;
+ };
+ 
+ struct kernfs_open_file {
 -- 
-2.12.2
+2.9.3
