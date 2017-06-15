@@ -1,59 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58700 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751462AbdFFPXx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 11:23:53 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org
-Subject: [PATCH v5 07/12] nvme: host: unquiesce queue in nvme_kill_queues()
-Date: Tue,  6 Jun 2017 23:22:05 +0800
-Message-Id: <20170606152210.22806-8-ming.lei@redhat.com>
-In-Reply-To: <20170606152210.22806-1-ming.lei@redhat.com>
-References: <20170606152210.22806-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 0/5] Convert RPMB block device to a character device
+Date: Thu, 15 Jun 2017 14:12:54 +0200
+Message-Id: <20170615121259.8281-1-linus.walleij@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-When nvme_kill_queues() is run, queues may be in
-quiesced state, so we forcibly unquiesce queues to avoid
-blocking dispatch, and I/O hang can be avoided in
-remove path.
+Looking for ways to get rid of the RPMB "block device" and the
+extra block queue. This is one approach, I don't know if it will
+stick, let's discuss it, especially the RFC patch.
 
-Peviously we use blk_mq_start_stopped_hw_queues() as
-counterpart of blk_mq_quiesce_queue(), now we have
-introduced blk_mq_unquiesce_queue(), so use it explicitly.
+Patches 1,2,3 can be applied as cleanups unless they collide with
+something else.
 
-Cc: linux-nvme@lists.infradead.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Patch 5 is a consequence of the character device conversion.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index c3f189e54d10..d4e5fc95da4b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2438,6 +2438,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 	struct nvme_ns *ns;
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
-+
-+	/* Forcibly unquiesce queues to avoid blocking dispatch */
-+	blk_mq_unquiesce_queue(ctrl->admin_q);
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
- 		/*
- 		 * Revalidating a dead namespace sets capacity to 0. This will
-@@ -2448,6 +2451,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 		revalidate_disk(ns->disk);
- 		blk_set_queue_dying(ns->queue);
- 
-+		/* Forcibly unquiesce queues to avoid blocking dispatch */
-+		blk_mq_unquiesce_queue(ns->queue);
-+
- 		/*
- 		 * Forcibly start all queues to avoid having stuck requests.
- 		 * Note that we must ensure the queues are not stopped
+For motivation and in-depth description of the problem I am trying
+to solve, see patch 4, the RFC.
+
+Linus Walleij (5):
+  mmc: block: Move duplicate check
+  mmc: block: Refactor mmc_blk_part_switch()
+  mmc: block: Reparametrize mmc_blk_ioctl_[multi]_cmd()
+  RFC: mmc: block: Convert RPMB to a character device
+  mmc: block: Delete mmc_access_rpmb()
+
+ drivers/mmc/core/block.c | 384 ++++++++++++++++++++++++++++++++++++-----------
+ drivers/mmc/core/queue.c |   2 +-
+ drivers/mmc/core/queue.h |   4 +-
+ 3 files changed, 303 insertions(+), 87 deletions(-)
+
 -- 
 2.9.4
