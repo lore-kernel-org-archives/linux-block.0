@@ -1,70 +1,58 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
 	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 03/11] fs: add support for an inode to carry stream related data
-Date: Wed, 14 Jun 2017 13:05:26 -0600
-Message-Id: <1497467134-6323-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	akpm@linux-foundation.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 06/10] fs: Introduce IOMAP_NOWAIT
+Date: Thu, 15 Jun 2017 10:59:58 -0500
+Message-Id: <20170615160002.17233-7-rgoldwyn@suse.de>
+In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
+References: <20170615160002.17233-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-No functional changes in this patch, just in preparation for
-allowing applications to pass in hints about data life times
-for writes.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Pack the i_stream field into a 2-byte hole, so we don't grow
-the size of the inode.
+IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
+This is used by XFS in the XFS patch.
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- fs/inode.c         | 1 +
- include/linux/fs.h | 9 +++++++++
- 2 files changed, 10 insertions(+)
+ fs/iomap.c            | 2 ++
+ include/linux/iomap.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/fs/inode.c b/fs/inode.c
-index db5914783a71..5717cb378fda 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -149,6 +149,7 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
- 	inode->i_blocks = 0;
- 	inode->i_bytes = 0;
- 	inode->i_generation = 0;
-+	inode->i_stream = 0;
- 	inode->i_pipe = NULL;
- 	inode->i_bdev = NULL;
- 	inode->i_cdev = NULL;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 803e5a9b2654..771e172d23d7 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -591,6 +591,7 @@ struct inode {
- 	struct timespec		i_ctime;
- 	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
- 	unsigned short          i_bytes;
-+	unsigned short		i_stream;
- 	unsigned int		i_blkbits;
- 	blkcnt_t		i_blocks;
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 4b10892967a5..5d85ec6e7b20 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -879,6 +879,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 	} else {
+ 		dio->flags |= IOMAP_DIO_WRITE;
+ 		flags |= IOMAP_WRITE;
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			flags |= IOMAP_NOWAIT;
+ 	}
  
-@@ -655,6 +656,14 @@ struct inode {
- 	void			*i_private; /* fs or device private pointer */
- };
+ 	ret = filemap_write_and_wait_range(mapping, start, end);
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index f753e788da31..69f4e9470084 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -52,6 +52,7 @@ struct iomap {
+ #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
+ #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
+ #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
++#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
  
-+static inline unsigned int inode_streamid(struct inode *inode)
-+{
-+	if (inode)
-+		return inode->i_stream;
-+
-+	return 0;
-+}
-+
- static inline unsigned int i_blocksize(const struct inode *node)
- {
- 	return (1 << node->i_blkbits);
+ struct iomap_ops {
+ 	/*
 -- 
-2.7.4
+2.12.0
