@@ -1,110 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52110 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753111AbdFRPWV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:21 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 08/30] nvme-rdma: cleanup error path in controller reset
-Date: Sun, 18 Jun 2017 18:21:42 +0300
-Message-Id: <1497799324-19598-9-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+Return-Path: <jlayton@redhat.com>
+Message-ID: <1497539004.4607.7.camel@redhat.com>
+Subject: Re: [PATCH v6 12/20] fs: add a new fstype flag to indicate how
+ writeback errors are tracked
+From: Jeff Layton <jlayton@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org,  linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+  linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Date: Thu, 15 Jun 2017 11:03:24 -0400
+In-Reply-To: <20170615145724.GB14028@infradead.org>
+References: <20170612122316.13244-1-jlayton@redhat.com>
+	 <20170612122316.13244-15-jlayton@redhat.com>
+	 <20170612124513.GC18360@infradead.org> <1497349472.5762.1.camel@redhat.com>
+	 <20170614064731.GB3598@infradead.org> <1497461083.6752.7.camel@redhat.com>
+	 <20170615082221.GA22809@infradead.org> <1497523332.4556.1.camel@redhat.com>
+	 <20170615145724.GB14028@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-No need to queue an extra work to indirect controller
-uninit and put the final reference.
+On Thu, 2017-06-15 at 07:57 -0700, Christoph Hellwig wrote:
+> On Thu, Jun 15, 2017 at 06:42:12AM -0400, Jeff Layton wrote:
+> > Correct.
+> > 
+> > But if there is a data writeback error, should we report an error on all
+> > open fds at that time (like we will for fsync)?
+> 
+> We should in theory, but I don't see how to properly do it.  In addition
+> sync_file_range just can't be used for data integrity to start with, so
+> I don't think it's worth it.  At some point we should add a proper
+> fsync_range syscall, though.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 39 ++++++++++++---------------------------
- 1 file changed, 12 insertions(+), 27 deletions(-)
+filemap_report_wb_err will always return 0 if the inode never has
+mapping_set_error called on it. So, I think we should be able to do it
+there once we get all of the fs' converted over. That'll have to happen
+at the end of the series however.
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 86998de90f52..099b3d7b6721 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1745,21 +1745,14 @@ static void nvme_rdma_shutdown_ctrl(struct nvme_rdma_ctrl *ctrl, bool shutdown)
- 	nvme_rdma_destroy_admin_queue(ctrl, shutdown);
- }
- 
--static void __nvme_rdma_remove_ctrl(struct nvme_rdma_ctrl *ctrl, bool shutdown)
--{
--	nvme_uninit_ctrl(&ctrl->ctrl);
--	if (shutdown)
--		nvme_rdma_shutdown_ctrl(ctrl, shutdown);
--
--	nvme_put_ctrl(&ctrl->ctrl);
--}
--
- static void nvme_rdma_del_ctrl_work(struct work_struct *work)
- {
- 	struct nvme_rdma_ctrl *ctrl = container_of(work,
- 				struct nvme_rdma_ctrl, delete_work);
- 
--	__nvme_rdma_remove_ctrl(ctrl, true);
-+	nvme_uninit_ctrl(&ctrl->ctrl);
-+	nvme_rdma_shutdown_ctrl(ctrl, true);
-+	nvme_put_ctrl(&ctrl->ctrl);
- }
- 
- static int __nvme_rdma_del_ctrl(struct nvme_rdma_ctrl *ctrl)
-@@ -1791,14 +1784,6 @@ static int nvme_rdma_del_ctrl(struct nvme_ctrl *nctrl)
- 	return ret;
- }
- 
--static void nvme_rdma_remove_ctrl_work(struct work_struct *work)
--{
--	struct nvme_rdma_ctrl *ctrl = container_of(work,
--				struct nvme_rdma_ctrl, delete_work);
--
--	__nvme_rdma_remove_ctrl(ctrl, false);
--}
--
- static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
- {
- 	struct nvme_rdma_ctrl *ctrl =
-@@ -1809,16 +1794,13 @@ static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
- 	nvme_rdma_shutdown_ctrl(ctrl, false);
- 
- 	ret = nvme_rdma_configure_admin_queue(ctrl, false);
--	if (ret) {
--		/* ctrl is already shutdown, just remove the ctrl */
--		INIT_WORK(&ctrl->delete_work, nvme_rdma_remove_ctrl_work);
--		goto del_dead_ctrl;
--	}
-+	if (ret)
-+		goto out_destroy_admin;
- 
- 	if (ctrl->ctrl.opts->nr_io_queues) {
- 		ret = nvme_rdma_configure_io_queues(ctrl, false);
- 		if (ret)
--			goto del_dead_ctrl;
-+			goto out_destroy_io;
- 	}
- 
- 	changed = nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_LIVE);
-@@ -1832,10 +1814,13 @@ static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
- 
- 	return;
- 
--del_dead_ctrl:
--	/* Deleting this dead controller... */
-+out_destroy_io:
-+	nvme_rdma_destroy_io_queues(ctrl, true);
-+out_destroy_admin:
-+	nvme_rdma_destroy_admin_queue(ctrl, true);
- 	dev_warn(ctrl->ctrl.device, "Removing after reset failure\n");
--	WARN_ON(!queue_work(nvme_wq, &ctrl->delete_work));
-+	nvme_uninit_ctrl(&ctrl->ctrl);
-+	nvme_put_ctrl(&ctrl->ctrl);
- }
- 
- static const struct nvme_ctrl_ops nvme_rdma_ctrl_ops = {
 -- 
-2.7.4
+Jeff Layton <jlayton@redhat.com>
