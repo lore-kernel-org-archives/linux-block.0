@@ -1,203 +1,77 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 26/51] block: use bio_for_each_segment_mp() to compute segments count
-Date: Mon, 26 Jun 2017 20:10:09 +0800
-Message-Id: <20170626121034.3051-27-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	akpm@linux-foundation.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 03/10] fs: Use RWF_* flags for AIO operations
+Date: Thu, 15 Jun 2017 10:59:55 -0500
+Message-Id: <20170615160002.17233-4-rgoldwyn@suse.de>
+In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
+References: <20170615160002.17233-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Firstly it is more efficient to use bio_for_each_segment_mp()
-in both blk_bio_segment_split() and __blk_recalc_rq_segments()
-to compute how many segments there are in the bio.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Secondaly once bio_for_each_segment_mp() is used, the bvec
-may need to be splitted because its length can be very long
-and more than max segment size, so we have to support to split
-one bvec into several segments.
+aio_rw_flags is introduced in struct iocb (using aio_reserved1) which will
+carry the RWF_* flags. We cannot use aio_flags because they are not
+checked for validity which may break existing applications.
 
-Thirdly during splitting mp bvec into segments, max segment
-number may be reached, then the bio need to be splitted when
-this happens.
+Note, the only place RWF_HIPRI comes in effect is dio_await_one().
+All the rest of the locations, aio code return -EIOCBQUEUED before the
+checks for RWF_HIPRI.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/blk-merge.c | 97 ++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 79 insertions(+), 18 deletions(-)
+ fs/aio.c                     | 8 +++++++-
+ include/uapi/linux/aio_abi.h | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index c6fcc49b9aea..8d2c2d763456 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -96,6 +96,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
- 	return sectors;
- }
+diff --git a/fs/aio.c b/fs/aio.c
+index f52d925ee259..020fa0045e3c 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1541,7 +1541,7 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 	ssize_t ret;
  
-+/*
-+ * Split the bvec @bv into segments, and update all kinds of
-+ * variables.
-+ */
-+static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
-+		unsigned *nsegs, unsigned *last_seg_size,
-+		unsigned *front_seg_size, unsigned *sectors)
-+{
-+	bool need_split = false;
-+	unsigned len = bv->bv_len;
-+	unsigned total_len = 0;
-+	unsigned new_nsegs = 0, seg_size = 0;
-+
-+	if ((*nsegs >= queue_max_segments(q)) || !len)
-+		return need_split;
-+
-+	/*
-+	 * Multipage bvec may be too big to hold in one segment,
-+	 * so the current bvec has to be splitted as multiple
-+	 * segments.
-+	 */
-+	while (new_nsegs + *nsegs < queue_max_segments(q)) {
-+		seg_size = min(queue_max_segment_size(q), len);
-+
-+		new_nsegs++;
-+		total_len += seg_size;
-+		len -= seg_size;
-+
-+		if ((queue_virt_boundary(q) && ((bv->bv_offset +
-+		    total_len) & queue_virt_boundary(q))) || !len)
-+			break;
-+	}
-+
-+	/* split in the middle of the bvec */
-+	if (len)
-+		need_split = true;
-+
-+	/* update front segment size */
-+	if (!*nsegs) {
-+		unsigned first_seg_size = seg_size;
-+
-+		if (new_nsegs > 1)
-+			first_seg_size = queue_max_segment_size(q);
-+		if (*front_seg_size < first_seg_size)
-+			*front_seg_size = first_seg_size;
-+	}
-+
-+	/* update other varibles */
-+	*last_seg_size = seg_size;
-+	*nsegs += new_nsegs;
-+	if (sectors)
-+		*sectors += total_len >> 9;
-+
-+	return need_split;
-+}
-+
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -110,7 +166,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	const unsigned max_sectors = get_max_io_size(q, bio);
- 	unsigned advance = 0;
- 
--	bio_for_each_segment(bv, bio, iter) {
-+	bio_for_each_segment_mp(bv, bio, iter) {
- 		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
-@@ -125,8 +181,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			 */
- 			if (nsegs < queue_max_segments(q) &&
- 			    sectors < max_sectors) {
--				nsegs++;
--				sectors = max_sectors;
-+				/* split in the middle of bvec */
-+				bv.bv_len = (max_sectors - sectors) << 9;
-+				bvec_split_segs(q, &bv, &nsegs,
-+						&seg_size,
-+						&front_seg_size,
-+						&sectors);
- 			}
- 			goto split;
- 		}
-@@ -138,10 +198,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 				goto new_segment;
- 			if (seg_size + bv.bv_len > queue_max_segment_size(q)) {
- 				/*
--				 * On assumption is that initial value of
--				 * @seg_size(equals to bv.bv_len) won't be
--				 * bigger than max segment size, but will
--				 * becomes false after multipage bvec comes.
-+				 * The initial value of @seg_size won't be
-+				 * bigger than max segment size, because we
-+				 * split the bvec via bvec_split_segs().
- 				 */
- 				advance = queue_max_segment_size(q) - seg_size;
- 
-@@ -173,11 +232,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		if (nsegs == 1 && seg_size > front_seg_size)
- 			front_seg_size = seg_size;
- 
--		nsegs++;
- 		bvprv = bv;
- 		bvprvp = &bvprv;
--		seg_size = bv.bv_len;
--		sectors += bv.bv_len >> 9;
-+
-+		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
-+					&front_seg_size, &sectors))
-+			goto split;
- 
- 		/* restore the bvec for iterator */
- 		if (advance) {
-@@ -251,6 +311,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	struct bio_vec bv, bvprv = { NULL };
- 	int cluster, prev = 0;
- 	unsigned int seg_size, nr_phys_segs;
-+	unsigned front_seg_size = bio->bi_seg_front_size;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
- 
-@@ -271,7 +332,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	seg_size = 0;
- 	nr_phys_segs = 0;
- 	for_each_bio(bio) {
--		bio_for_each_segment(bv, bio, iter) {
-+		bio_for_each_segment_mp(bv, bio, iter) {
- 			/*
- 			 * If SG merging is disabled, each bio vector is
- 			 * a segment
-@@ -293,20 +354,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				continue;
- 			}
- new_segment:
--			if (nr_phys_segs == 1 && seg_size >
--			    fbio->bi_seg_front_size)
--				fbio->bi_seg_front_size = seg_size;
-+			if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+				front_seg_size = seg_size;
- 
--			nr_phys_segs++;
- 			bvprv = bv;
- 			prev = 1;
--			seg_size = bv.bv_len;
-+			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
-+					&front_seg_size, NULL);
- 		}
- 		bbio = bio;
+ 	/* enforce forwards compatibility on users */
+-	if (unlikely(iocb->aio_reserved1 || iocb->aio_reserved2)) {
++	if (unlikely(iocb->aio_reserved2)) {
+ 		pr_debug("EINVAL: reserve field set\n");
+ 		return -EINVAL;
+ 	}
+@@ -1586,6 +1586,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		req->common.ki_flags |= IOCB_EVENTFD;
  	}
  
--	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
--		fbio->bi_seg_front_size = seg_size;
-+	if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+		front_seg_size = seg_size;
-+	fbio->bi_seg_front_size = front_seg_size;
- 	if (seg_size > bbio->bi_seg_back_size)
- 		bbio->bi_seg_back_size = seg_size;
++	ret = kiocb_set_rw_flags(&req->common, iocb->aio_rw_flags);
++	if (unlikely(ret)) {
++		pr_debug("EINVAL: aio_rw_flags\n");
++		goto out_put_req;
++	}
++
+ 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
+ 	if (unlikely(ret)) {
+ 		pr_debug("EFAULT: aio_key\n");
+diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
+index bb2554f7fbd1..a2d4a8ac94ca 100644
+--- a/include/uapi/linux/aio_abi.h
++++ b/include/uapi/linux/aio_abi.h
+@@ -79,7 +79,7 @@ struct io_event {
+ struct iocb {
+ 	/* these are internal to the kernel/libc. */
+ 	__u64	aio_data;	/* data to be returned in event's data */
+-	__u32	PADDED(aio_key, aio_reserved1);
++	__u32	PADDED(aio_key, aio_rw_flags);
+ 				/* the kernel sets aio_key to the req # */
  
+ 	/* common fields */
 -- 
-2.9.4
+2.12.0
