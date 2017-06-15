@@ -1,310 +1,406 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v7 10/22] lib: add errseq_t type and infrastructure for handling it
-Date: Fri, 16 Jun 2017 15:34:15 -0400
-Message-Id: <20170616193427.13955-11-jlayton@redhat.com>
-In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
-References: <20170616193427.13955-1-jlayton@redhat.com>
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 11/11] nvme: add support for streams and directives
+Date: Wed, 14 Jun 2017 21:45:12 -0600
+Message-Id: <1497498312-17704-12-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
+References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-An errseq_t is a way of recording errors in one place, and allowing any
-number of "subscribers" to tell whether an error has been set again
-since a previous time.
+This adds support for Directives in NVMe, particular for the Streams
+directive. Support for Directives is a new feature in NVMe 1.3. It
+allows a user to pass in information about where to store the data,
+so that it the device can do so most effiently. If an application is
+managing and writing data with different life times, mixing differently
+retentioned data onto the same locations on flash can cause write
+amplification to grow. This, in turn, will reduce performance and
+life time of the device.
 
-It's implemented as an unsigned 32-bit value that is managed with atomic
-operations. The low order bits are designated to hold an error code
-(max size of MAX_ERRNO). The upper bits are used as a counter.
+We default to allocating 4 streams per name space, but it is
+configurable with the 'streams_per_ns' module option. If a write stream
+is set in a write, flag is as such before sending it to the device. The
+streams are allocated lazily - if we get a write request with a life
+time hint, then background allocate streams and use them once that
+is done.
 
-The API works with consumers sampling an errseq_t value at a particular
-point in time. Later, that value can be used to tell whether new errors
-have been set since that time.
-
-Note that there is a 1 in 512k risk of collisions here if new errors
-are being recorded frequently, since we have so few bits to use as a
-counter. To mitigate this, one bit is used as a flag to tell whether the
-value has been sampled since a new value was recorded. That allows
-us to avoid bumping the counter if no one has sampled it since it
-was last bumped.
-
-Later patches will build on this infrastructure to change how writeback
-errors are tracked in the kernel.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: NeilBrown <neilb@suse.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/errseq.h |  19 +++++
- lib/Makefile           |   2 +-
- lib/errseq.c           | 200 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 220 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/errseq.h
- create mode 100644 lib/errseq.c
+ drivers/nvme/host/core.c | 175 +++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/nvme/host/nvme.h |   5 ++
+ include/linux/nvme.h     |  48 +++++++++++++
+ 3 files changed, 228 insertions(+)
 
-diff --git a/include/linux/errseq.h b/include/linux/errseq.h
-new file mode 100644
-index 000000000000..0d2555f310cd
---- /dev/null
-+++ b/include/linux/errseq.h
-@@ -0,0 +1,19 @@
-+#ifndef _LINUX_ERRSEQ_H
-+#define _LINUX_ERRSEQ_H
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 903d5813023a..30a6473b68cc 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -65,6 +65,10 @@ static bool force_apst;
+ module_param(force_apst, bool, 0644);
+ MODULE_PARM_DESC(force_apst, "allow APST for newly enumerated devices even if quirked off");
+ 
++static char streams_per_ns = 4;
++module_param(streams_per_ns, byte, 0644);
++MODULE_PARM_DESC(streams_per_ns, "if available, allocate this many streams per NS");
 +
-+/* See lib/errseq.c for more info */
-+
-+typedef u32	errseq_t;
-+
-+void __errseq_set(errseq_t *eseq, int err);
-+static inline void errseq_set(errseq_t *eseq, int err)
+ static LIST_HEAD(nvme_ctrl_list);
+ static DEFINE_SPINLOCK(dev_list_lock);
+ 
+@@ -331,6 +335,151 @@ static inline int nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+ 	return BLK_MQ_RQ_QUEUE_OK;
+ }
+ 
++static int nvme_enable_streams(struct nvme_ctrl *ctrl)
 +{
-+	/* Optimize for the common case of no error */
-+	if (unlikely(err))
-+		__errseq_set(eseq, err);
++	struct nvme_command c;
++
++	memset(&c, 0, sizeof(c));
++
++	c.directive.opcode = nvme_admin_directive_send;
++	c.directive.nsid = cpu_to_le32(0xffffffff);
++	c.directive.doper = NVME_DIR_SND_ID_OP_ENABLE;
++	c.directive.dtype = NVME_DIR_IDENTIFY;
++	c.directive.tdtype = NVME_DIR_STREAMS;
++	c.directive.endir = NVME_DIR_ENDIR;
++
++	return nvme_submit_sync_cmd(ctrl->admin_q, &c, NULL, 0);
 +}
 +
-+errseq_t errseq_sample(errseq_t *eseq);
-+int errseq_check(errseq_t *eseq, errseq_t since);
-+int errseq_check_and_advance(errseq_t *eseq, errseq_t *since);
-+#endif
-diff --git a/lib/Makefile b/lib/Makefile
-index 1cd21743af14..85e91e51a9fe 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -38,7 +38,7 @@ obj-y += bcd.o div64.o sort.o parser.o debug_locks.o random32.o \
- 	 gcd.o lcm.o list_sort.o uuid.o flex_array.o iov_iter.o clz_ctz.o \
- 	 bsearch.o find_bit.o llist.o memweight.o kfifo.o \
- 	 percpu-refcount.o percpu_ida.o rhashtable.o reciprocal_div.o \
--	 once.o refcount.o usercopy.o
-+	 once.o refcount.o usercopy.o errseq.o
- obj-y += string_helpers.o
- obj-$(CONFIG_TEST_STRING_HELPERS) += test-string_helpers.o
- obj-y += hexdump.o
-diff --git a/lib/errseq.c b/lib/errseq.c
-new file mode 100644
-index 000000000000..d129c0611c1f
---- /dev/null
-+++ b/lib/errseq.c
-@@ -0,0 +1,200 @@
-+#include <linux/err.h>
-+#include <linux/bug.h>
-+#include <linux/atomic.h>
-+#include <linux/errseq.h>
++static int nvme_probe_directives(struct nvme_ctrl *ctrl)
++{
++	struct streams_directive_params s;
++	struct nvme_command c;
++	int ret;
++
++	if (!(ctrl->oacs & NVME_CTRL_OACS_DIRECTIVES))
++		return 0;
++
++	ret = nvme_enable_streams(ctrl);
++	if (ret)
++		return ret;
++
++	memset(&c, 0, sizeof(c));
++	memset(&s, 0, sizeof(s));
++
++	c.directive.opcode = nvme_admin_directive_recv;
++	c.directive.nsid = cpu_to_le32(0xffffffff);
++	c.directive.numd = sizeof(s);
++	c.directive.doper = NVME_DIR_RCV_ST_OP_PARAM;
++	c.directive.dtype = NVME_DIR_STREAMS;
++
++	ret = nvme_submit_sync_cmd(ctrl->admin_q, &c, &s, sizeof(s));
++	if (ret)
++		return ret;
++
++	ctrl->nssa = le16_to_cpu(s.nssa);
++	return 0;
++}
 +
 +/*
-+ * An errseq_t is a way of recording errors in one place, and allowing any
-+ * number of "subscribers" to tell whether it has changed since a previous
-+ * point where it was sampled.
-+ *
-+ * It's implemented as an unsigned 32-bit value. The low order bits are
-+ * designated to hold an error code (between 0 and -MAX_ERRNO). The upper bits
-+ * are used as a counter. This is done with atomics instead of locking so that
-+ * these functions can be called from any context.
-+ *
-+ * The general idea is for consumers to sample an errseq_t value. That value
-+ * can later be used to tell whether any new errors have occurred since that
-+ * sampling was done.
-+ *
-+ * Note that there is a risk of collisions if new errors are being recorded
-+ * frequently, since we have so few bits to use as a counter.
-+ *
-+ * To mitigate this, one bit is used as a flag to tell whether the value has
-+ * been sampled since a new value was recorded. That allows us to avoid bumping
-+ * the counter if no one has sampled it since the last time an error was
-+ * recorded.
-+ *
-+ * A new errseq_t should always be zeroed out.  A errseq_t value of all zeroes
-+ * is the special (but common) case where there has never been an error. An all
-+ * zero value thus serves as the "epoch" if one wishes to know whether there
-+ * has ever been an error set since it was first initialized.
++ * Returns number of streams allocated for use by this ns, or -1 on error.
 + */
-+
-+/* The low bits are designated for error code (max of MAX_ERRNO) */
-+#define ERRSEQ_SHIFT		ilog2(MAX_ERRNO + 1)
-+
-+/* This bit is used as a flag to indicate whether the value has been seen */
-+#define ERRSEQ_SEEN		(1 << ERRSEQ_SHIFT)
-+
-+/* The lowest bit of the counter */
-+#define ERRSEQ_CTR_INC		(1 << (ERRSEQ_SHIFT + 1))
-+
-+/**
-+ * __errseq_set - set a errseq_t for later reporting
-+ * @eseq: errseq_t field that should be set
-+ * @err: error to set
-+ *
-+ * This function sets the error in *eseq, and increments the sequence counter
-+ * if the last sequence was sampled at some point in the past.
-+ *
-+ * Any error set will always overwrite an existing error.
-+ *
-+ * Most callers will want to use the errseq_set inline wrapper to efficiently
-+ * handle the common case where err is 0.
-+ */
-+void __errseq_set(errseq_t *eseq, int err)
++static int nvme_streams_allocate(struct nvme_ns *ns, unsigned int streams)
 +{
-+	errseq_t old;
++	struct nvme_command c;
++	union nvme_result res;
++	int ret;
 +
-+	/* MAX_ERRNO must be able to serve as a mask */
-+	BUILD_BUG_ON_NOT_POWER_OF_2(MAX_ERRNO + 1);
++	memset(&c, 0, sizeof(c));
 +
-+	/*
-+	 * Ensure the error code actually fits where we want it to go. If it
-+	 * doesn't then just throw a warning and don't record anything. We
-+	 * also don't accept zero here as that would effectively clear a
-+	 * previous error.
-+	 */
-+	if (WARN(unlikely(err == 0 || (unsigned int)-err > MAX_ERRNO),
-+				"err = %d\n", err))
++	c.directive.opcode = nvme_admin_directive_recv;
++	c.directive.nsid = cpu_to_le32(ns->ns_id);
++	c.directive.doper = NVME_DIR_RCV_ST_OP_RESOURCE;
++	c.directive.dtype = NVME_DIR_STREAMS;
++	c.directive.endir = streams;
++
++	ret = __nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, &res, NULL, 0, 0,
++					NVME_QID_ANY, 0, 0);
++	if (ret)
++		return -1;
++
++	return le32_to_cpu(res.u32) & 0xffff;
++}
++
++static int nvme_streams_deallocate(struct nvme_ns *ns)
++{
++	struct nvme_command c;
++
++	memset(&c, 0, sizeof(c));
++
++	c.directive.opcode = nvme_admin_directive_send;
++	c.directive.nsid = cpu_to_le32(ns->ns_id);
++	c.directive.doper = NVME_DIR_SND_ST_OP_REL_RSC;
++	c.directive.dtype = NVME_DIR_STREAMS;
++
++	return nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, NULL, 0);
++}
++
++static void nvme_write_hint_work(struct work_struct *work)
++{
++	struct nvme_ns *ns = container_of(work, struct nvme_ns, write_hint_work);
++	int ret, nr_streams;
++
++	if (ns->nr_streams)
 +		return;
 +
-+	old = READ_ONCE(*eseq);
-+	for (;;) {
-+		errseq_t new, cur;
++	nr_streams = streams_per_ns;
++	if (nr_streams > ns->ctrl->nssa)
++		nr_streams = ns->ctrl->nssa;
 +
-+		/* Clear out error bits and set new error */
-+		new = (old & ~(MAX_ERRNO|ERRSEQ_SEEN)) | -err;
++	ret = nvme_streams_allocate(ns, nr_streams);
++	if (ret <= 0)
++		goto err;
 +
-+		/* Only increment if someone has looked at it */
-+		if (old & ERRSEQ_SEEN)
-+			new += ERRSEQ_CTR_INC;
-+
-+		/* If there would be no change, then call it done */
-+		if (new == old)
-+			break;
-+
-+		/* Try to swap the new value into place */
-+		cur = cmpxchg(eseq, old, new);
-+
-+		/*
-+		 * Call it success if we did the swap or someone else beat us
-+		 * to it for the same value.
-+		 */
-+		if (likely(cur == old || cur == new))
-+			break;
-+
-+		/* Raced with an update, try again */
-+		old = cur;
-+	}
++	ns->nr_streams = ret;
++	dev_info(ns->ctrl->device, "successfully enabled %d streams\n", ret);
++	return;
++err:
++	dev_info(ns->ctrl->device, "failed enabling streams\n");
++	ns->ctrl->failed_streams = true;
 +}
-+EXPORT_SYMBOL(__errseq_set);
 +
-+/**
-+ * errseq_sample - grab current errseq_t value
-+ * @eseq: pointer to errseq_t to be sampled
-+ *
-+ * This function allows callers to sample an errseq_t value, marking it as
-+ * "seen" if required.
-+ */
-+errseq_t errseq_sample(errseq_t *eseq)
++static void nvme_configure_streams(struct nvme_ns *ns)
 +{
-+	errseq_t old = READ_ONCE(*eseq);
-+	errseq_t new = old;
-+
 +	/*
-+	 * For the common case of no errors ever having been set, we can skip
-+	 * marking the SEEN bit. Once an error has been set, the value will
-+	 * never go back to zero.
++	 * If we already called this function, we've either marked it
++	 * as a failure or set the number of streams.
 +	 */
-+	if (old != 0) {
-+		new |= ERRSEQ_SEEN;
-+		if (old != new)
-+			cmpxchg(eseq, old, new);
-+	}
-+	return new;
++	if (ns->ctrl->failed_streams)
++		return;
++	if (ns->nr_streams)
++		return;
++	schedule_work(&ns->write_hint_work);
 +}
-+EXPORT_SYMBOL(errseq_sample);
 +
-+/**
-+ * errseq_check - has an error occurred since a particular sample point?
-+ * @eseq: pointer to errseq_t value to be checked
-+ * @since: previously-sampled errseq_t from which to check
-+ *
-+ * Grab the value that eseq points to, and see if it has changed "since"
-+ * the given value was sampled. The "since" value is not advanced, so there
-+ * is no need to mark the value as seen.
-+ *
-+ * Returns the latest error set in the errseq_t or 0 if it hasn't changed.
-+ */
-+int errseq_check(errseq_t *eseq, errseq_t since)
++static unsigned int nvme_get_write_stream(struct nvme_ns *ns,
++					  struct request *req)
 +{
-+	errseq_t cur = READ_ONCE(*eseq);
++	unsigned int streamid = 0;
 +
-+	if (likely(cur == since))
-+		return 0;
-+	return -(cur & MAX_ERRNO);
++	if (req->cmd_flags & REQ_WRITE_SHORT)
++		streamid = 1;
++	else if (req->cmd_flags & REQ_WRITE_MEDIUM)
++		streamid = 2;
++	else if (req->cmd_flags & REQ_WRITE_LONG)
++		streamid = 3;
++	else if (req->cmd_flags & REQ_WRITE_EXTREME)
++		streamid = 4;
++
++	req->q->stream_writes[streamid] += blk_rq_bytes(req) >> 9;
++
++	if (streamid <= ns->nr_streams)
++		return streamid;
++
++	/* for now just round-robin, do something more clever later */
++	return (streamid % (ns->nr_streams + 1));
 +}
-+EXPORT_SYMBOL(errseq_check);
 +
-+/**
-+ * errseq_check_and_advance - check an errseq_t and advance it to the current value
-+ * @eseq: pointer to value being checked and reported
-+ * @since: pointer to previously-sampled errseq_t to check against and advance
-+ *
-+ * Grab the eseq value, and see whether it matches the value that "since"
-+ * points to. If it does, then just return 0.
-+ *
-+ * If it doesn't, then the value has changed. Set the "seen" flag, and try to
-+ * swap it into place as the new eseq value. Then, set that value as the new
-+ * "since" value, and return whatever the error portion is set to.
-+ *
-+ * Note that no locking is provided here for concurrent updates to the "since"
-+ * value. The caller must provide that if necessary. Because of this, callers
-+ * may want to do a lockless errseq_check before taking the lock and calling
-+ * this.
-+ */
-+int errseq_check_and_advance(errseq_t *eseq, errseq_t *since)
-+{
-+	int err = 0;
-+	errseq_t old, new;
-+
+ static inline void nvme_setup_rw(struct nvme_ns *ns, struct request *req,
+ 		struct nvme_command *cmnd)
+ {
+@@ -351,6 +500,25 @@ static inline void nvme_setup_rw(struct nvme_ns *ns, struct request *req,
+ 	cmnd->rw.slba = cpu_to_le64(nvme_block_nr(ns, blk_rq_pos(req)));
+ 	cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
+ 
 +	/*
-+	 * Most callers will want to use the inline wrapper to check this,
-+	 * so that the common case of no error is handled without needing
-+	 * to take the lock that protects the "since" value.
++	 * If we support streams and it isn't enabled, so so now. Until it's
++	 * enabled, we won't flag the write with a stream. If we don't support
++	 * streams, just ignore the life time hint.
 +	 */
-+	old = READ_ONCE(*eseq);
-+	if (old != *since) {
-+		/*
-+		 * Set the flag and try to swap it into place if it has
-+		 * changed.
-+		 *
-+		 * We don't care about the outcome of the swap here. If the
-+		 * swap doesn't occur, then it has either been updated by a
-+		 * writer who is altering the value in some way (updating
-+		 * counter or resetting the error), or another reader who is
-+		 * just setting the "seen" flag. Either outcome is OK, and we
-+		 * can advance "since" and return an error based on what we
-+		 * have.
-+		 */
-+		new = old | ERRSEQ_SEEN;
-+		if (new != old)
-+			cmpxchg(eseq, old, new);
-+		*since = new;
-+		err = -(new & MAX_ERRNO);
++	if (req_op(req) == REQ_OP_WRITE && op_write_hint_valid(req->cmd_flags)) {
++		struct nvme_ctrl *ctrl = ns->ctrl;
++
++		if (ns->nr_streams) {
++			unsigned int stream = nvme_get_write_stream(ns, req);
++
++			if (stream) {
++				control |= NVME_RW_DTYPE_STREAMS;
++				dsmgmt |= (stream << 16);
++			}
++		} else if (ctrl->oacs & NVME_CTRL_OACS_DIRECTIVES)
++			nvme_configure_streams(ns);
 +	}
-+	return err;
-+}
-+EXPORT_SYMBOL(errseq_check_and_advance);
++
+ 	if (ns->ms) {
+ 		switch (ns->pi_type) {
+ 		case NVME_NS_DPS_PI_TYPE3:
+@@ -1650,6 +1818,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
+ 		dev_pm_qos_hide_latency_tolerance(ctrl->device);
+ 
+ 	nvme_configure_apst(ctrl);
++	nvme_probe_directives(ctrl);
+ 
+ 	ctrl->identified = true;
+ 
+@@ -2049,6 +2218,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	blk_queue_logical_block_size(ns->queue, 1 << ns->lba_shift);
+ 	nvme_set_queue_limits(ctrl, ns->queue);
+ 
++	INIT_WORK(&ns->write_hint_work, nvme_write_hint_work);
++
+ 	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
+ 
+ 	if (nvme_revalidate_ns(ns, &id))
+@@ -2105,6 +2276,8 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+ 	if (test_and_set_bit(NVME_NS_REMOVING, &ns->flags))
+ 		return;
+ 
++	flush_work(&ns->write_hint_work);
++
+ 	if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
+ 		if (blk_get_integrity(ns->disk))
+ 			blk_integrity_unregister(ns->disk);
+@@ -2112,6 +2285,8 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+ 					&nvme_ns_attr_group);
+ 		if (ns->ndev)
+ 			nvme_nvm_unregister_sysfs(ns);
++		if (ns->nr_streams)
++			nvme_streams_deallocate(ns);
+ 		del_gendisk(ns->disk);
+ 		blk_cleanup_queue(ns->queue);
+ 	}
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 9d6a070d4391..918b6126d38b 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -118,6 +118,7 @@ enum nvme_ctrl_state {
+ struct nvme_ctrl {
+ 	enum nvme_ctrl_state state;
+ 	bool identified;
++	bool failed_streams;
+ 	spinlock_t lock;
+ 	const struct nvme_ctrl_ops *ops;
+ 	struct request_queue *admin_q;
+@@ -147,6 +148,7 @@ struct nvme_ctrl {
+ 	u16 oncs;
+ 	u16 vid;
+ 	u16 oacs;
++	u16 nssa;
+ 	atomic_t abort_limit;
+ 	u8 event_limit;
+ 	u8 vwc;
+@@ -192,6 +194,7 @@ struct nvme_ns {
+ 	u8 uuid[16];
+ 
+ 	unsigned ns_id;
++	unsigned nr_streams;
+ 	int lba_shift;
+ 	u16 ms;
+ 	bool ext;
+@@ -203,6 +206,8 @@ struct nvme_ns {
+ 
+ 	u64 mode_select_num_blocks;
+ 	u32 mode_select_block_len;
++
++	struct work_struct write_hint_work;
+ };
+ 
+ struct nvme_ctrl_ops {
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index b625bacf37ef..8b2f5b140134 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -245,6 +245,7 @@ enum {
+ 	NVME_CTRL_ONCS_WRITE_ZEROES		= 1 << 3,
+ 	NVME_CTRL_VWC_PRESENT			= 1 << 0,
+ 	NVME_CTRL_OACS_SEC_SUPP                 = 1 << 0,
++	NVME_CTRL_OACS_DIRECTIVES		= 1 << 5,
+ 	NVME_CTRL_OACS_DBBUF_SUPP		= 1 << 7,
+ };
+ 
+@@ -295,6 +296,19 @@ enum {
+ };
+ 
+ enum {
++	NVME_DIR_IDENTIFY		= 0x00,
++	NVME_DIR_STREAMS		= 0x01,
++	NVME_DIR_SND_ID_OP_ENABLE	= 0x01,
++	NVME_DIR_SND_ST_OP_REL_ID	= 0x01,
++	NVME_DIR_SND_ST_OP_REL_RSC	= 0x02,
++	NVME_DIR_RCV_ID_OP_PARAM	= 0x01,
++	NVME_DIR_RCV_ST_OP_PARAM	= 0x01,
++	NVME_DIR_RCV_ST_OP_STATUS	= 0x02,
++	NVME_DIR_RCV_ST_OP_RESOURCE	= 0x03,
++	NVME_DIR_ENDIR			= 0x01,
++};
++
++enum {
+ 	NVME_NS_FEAT_THIN	= 1 << 0,
+ 	NVME_NS_FLBAS_LBA_MASK	= 0xf,
+ 	NVME_NS_FLBAS_META_EXT	= 0x10,
+@@ -535,6 +549,7 @@ enum {
+ 	NVME_RW_PRINFO_PRCHK_APP	= 1 << 11,
+ 	NVME_RW_PRINFO_PRCHK_GUARD	= 1 << 12,
+ 	NVME_RW_PRINFO_PRACT		= 1 << 13,
++	NVME_RW_DTYPE_STREAMS		= 1 << 4,
+ };
+ 
+ struct nvme_dsm_cmd {
+@@ -604,6 +619,8 @@ enum nvme_admin_opcode {
+ 	nvme_admin_download_fw		= 0x11,
+ 	nvme_admin_ns_attach		= 0x15,
+ 	nvme_admin_keep_alive		= 0x18,
++	nvme_admin_directive_send	= 0x19,
++	nvme_admin_directive_recv	= 0x1a,
+ 	nvme_admin_dbbuf		= 0x7C,
+ 	nvme_admin_format_nvm		= 0x80,
+ 	nvme_admin_security_send	= 0x81,
+@@ -756,6 +773,24 @@ struct nvme_get_log_page_command {
+ 	__u32			rsvd14[2];
+ };
+ 
++struct nvme_directive_cmd {
++	__u8			opcode;
++	__u8			flags;
++	__u16			command_id;
++	__le32			nsid;
++	__u64			rsvd2[2];
++	union nvme_data_ptr	dptr;
++	__le32			numd;
++	__u8			doper;
++	__u8			dtype;
++	__le16			dspec;
++	__u8			endir;
++	__u8			tdtype;
++	__u16			rsvd15;
++
++	__u32			rsvd16[3];
++};
++
+ /*
+  * Fabrics subcommands.
+  */
+@@ -886,6 +921,18 @@ struct nvme_dbbuf {
+ 	__u32			rsvd12[6];
+ };
+ 
++struct streams_directive_params {
++	__u16	msl;
++	__u16	nssa;
++	__u16	nsso;
++	__u8	rsvd[10];
++	__u32	sws;
++	__u16	sgs;
++	__u16	nsa;
++	__u16	nso;
++	__u8	rsvd2[6];
++};
++
+ struct nvme_command {
+ 	union {
+ 		struct nvme_common_command common;
+@@ -906,6 +953,7 @@ struct nvme_command {
+ 		struct nvmf_property_set_command prop_set;
+ 		struct nvmf_property_get_command prop_get;
+ 		struct nvme_dbbuf dbbuf;
++		struct nvme_directive_cmd directive;
+ 	};
+ };
+ 
 -- 
-2.13.0
+2.7.4
