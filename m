@@ -6,65 +6,38 @@ Cc: adilger@dilger.ca,
 	hch@infradead.org,
 	martin.petersen@oracle.com,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 06/11] fs: add O_DIRECT support for sending down write life time hints
-Date: Fri, 16 Jun 2017 11:24:38 -0600
-Message-Id: <1497633883-21230-7-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
-References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
+Subject: [PATCH 09/12] ext4: add support for passing in write hints for buffered writes
+Date: Thu, 15 Jun 2017 10:42:07 -0600
+Message-Id: <1497544930-19174-10-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
+References: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 Reviewed-by: Andreas Dilger <adilger@dilger.ca>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/block_dev.c | 2 ++
- fs/direct-io.c | 2 ++
- fs/iomap.c     | 1 +
- 3 files changed, 5 insertions(+)
+ fs/ext4/page-io.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 519599dddd36..b9222a9d285e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -239,6 +239,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 			should_dirty = true;
- 	} else {
- 		bio.bi_opf = dio_bio_write_op(iocb);
-+		bio.bi_opf |= write_hint_to_opf(iocb_write_hint(iocb));
- 		task_io_account_write(ret);
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 1a82138ba739..764bf0ddecd4 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -349,6 +349,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
+ 	if (bio) {
+ 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
+ 				  REQ_SYNC : 0;
++		io_op_flags |= bio_op_write_hint(inode_write_hint(io->io_end->inode));
+ 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
+ 		submit_bio(io->io_bio);
  	}
- 
-@@ -374,6 +375,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 				bio_set_pages_dirty(bio);
- 		} else {
- 			bio->bi_opf = dio_bio_write_op(iocb);
-+			bio->bi_opf |= write_hint_to_opf(iocb_write_hint(iocb));
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		}
- 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a04ebea77de8..1253b059eae6 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -386,6 +386,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 	else
- 		bio->bi_end_io = dio_bio_end_io;
- 
-+	bio->bi_opf |= write_hint_to_opf(iocb_write_hint(dio->iocb));
-+
- 	sdio->bio = bio;
- 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 4b10892967a5..e8639861bd80 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -804,6 +804,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		if (dio->flags & IOMAP_DIO_WRITE) {
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+			bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		} else {
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
+@@ -396,6 +397,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
+ 		ret = io_submit_init_bio(io, bh);
+ 		if (ret)
+ 			return ret;
++		io->io_bio->bi_opf |= bio_op_write_hint(inode_write_hint(inode));
+ 	}
+ 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
+ 	if (ret != bh->b_size)
 -- 
 2.7.4
