@@ -1,57 +1,107 @@
-Return-Path: <akpm@linux-foundation.org>
-Date: Thu, 15 Jun 2017 11:25:28 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
- linux-block@vger.kernel.org, axboe@kernel.dk, linux-api@vger.kernel.org,
- viro@zeniv.linux.org.uk
-Subject: Re: [PATCH 0/10 v12] No wait AIO
-Message-Id: <20170615112528.7cbdfd6cdf26a5c13450acdf@linux-foundation.org>
-In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
-References: <20170615160002.17233-1-rgoldwyn@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	akpm@linux-foundation.org
+Subject: [PATCH 0/10 v12] No wait AIO
+Date: Thu, 15 Jun 2017 10:59:52 -0500
+Message-Id: <20170615160002.17233-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 15 Jun 2017 10:59:52 -0500 Goldwyn Rodrigues <rgoldwyn@suse.de> wrote:
+This series adds nonblocking feature to asynchronous I/O writes.
+io_submit() can be delayed because of a number of reason:
+ - Block allocation for files
+ - Data writebacks for direct I/O
+ - Sleeping because of waiting to acquire i_rwsem
+ - Congested block device
 
-> This series adds nonblocking feature to asynchronous I/O writes.
-> io_submit() can be delayed because of a number of reason:
->  - Block allocation for files
->  - Data writebacks for direct I/O
->  - Sleeping because of waiting to acquire i_rwsem
->  - Congested block device
-> 
-> The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
-> any of these conditions are met. This way userspace can push most
-> of the write()s to the kernel to the best of its ability to complete
-> and if it returns -EAGAIN, can defer it to another thread.
-> 
-> In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
-> uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
-> IOCB_NOWAIT for struct iocb, REQ_NOWAIT for bio.bi_opf and IOMAP_NOWAIT for
-> iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
-> not use aio_flags because it is not currently checked for invalidity
-> in the kernel.
-> 
-> This feature is provided for direct I/O of asynchronous I/O only. I have
-> tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
-> The nowait feature is for request based devices. In the future, I intend to
-> add support to stacked devices such as md.
-> 
-> Applications will have to check supportability by sending a async direct write
-> and any other error besides -EAGAIN would mean it is not supported.
-> 
+The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
+any of these conditions are met. This way userspace can push most
+of the write()s to the kernel to the best of its ability to complete
+and if it returns -EAGAIN, can defer it to another thread.
 
-How accurate it this?  For example, the changes to
-generic_file_direct_write() appear to greatly reduce the chances of
-blocking but there are surely race opportunities which will still
-result in userspace unexpectedly experiencing blocking in a succeednig
-write() call?
+In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
+uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
+IOCB_NOWAIT for struct iocb, REQ_NOWAIT for bio.bi_opf and IOMAP_NOWAIT for
+iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
+not use aio_flags because it is not currently checked for invalidity
+in the kernel.
 
-If correct then I think there should be some discussion and perhaps
-testing results in the changelog.
+This feature is provided for direct I/O of asynchronous I/O only. I have
+tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
+The nowait feature is for request based devices. In the future, I intend to
+add support to stacked devices such as md.
 
+Applications will have to check supportability by sending a async direct write
+and any other error besides -EAGAIN would mean it is not supported.
 
-I have only minor quibbles - I'll grab the patch series for some -next
-testing (at least).
+First two patches are prep patches into nowait I/O.
+
+Changes since v1:
+ + changed name from _NONBLOCKING to *_NOWAIT
+ + filemap_range_has_page call moved to closer to (just before) calling filemap_write_and_wait_range().
+ + BIO_NOWAIT limited to get_request()
+ + XFS fixes 
+	- included reflink 
+	- use of xfs_ilock_nowait() instead of a XFS_IOLOCK_NONBLOCKING flag
+	- Translate the flag through IOMAP_NOWAIT (iomap) to check for
+	  block allocation for the file.
+ + ext4 coding style
+
+Changes since v2:
+ + Using aio_reserved1 as aio_rw_flags instead of aio_flags
+ + blk-mq support
+ + xfs uptodate with kernel and reflink changes
+
+ Changes since v3:
+  + Added FS_NOWAIT, which is set if the filesystem supports NOWAIT feature.
+  + Checks in generic_make_request() to make sure BIO_NOWAIT comes in
+    for async direct writes only.
+  + Added QUEUE_FLAG_NOWAIT, which is set if the device supports BIO_NOWAIT.
+    This is added (rather not set) to block devices such as dm/md currently.
+
+ Changes since v4:
+  + Ported AIO code to use RWF_* flags. Check for RWF_* flags in
+    generic_file_write_iter().
+  + Changed IOCB_RW_FLAGS_NOWAIT to RWF_NOWAIT.
+
+ Changes since v5:
+  + BIO_NOWAIT to REQ_NOWAIT
+  + Common helper for RWF flags.
+
+ Changes since v6:
+  + REQ_NOWAIT will be ignored for request based devices since they
+    cannot block. So, removed QUEUE_FLAG_NOWAIT since it is not
+    required in the current implementation. It will be resurrected
+    when we program for stacked devices.
+  + changed kiocb_rw_flags() to kiocb_set_rw_flags() in order to accomodate
+    for errors. Moved checks in the function.
+
+ Changes since v7:
+  + split patches into prep so the main patches are smaller and easier
+    to understand
+  + All patches are reviewed or acked!
+ 
+ Changes since v8:
+ + Err out AIO reads with -EINVAL flagged as RWF_NOWAIT
+
+ Changes since v9:
+ + Retract - Err out AIO reads with -EINVAL flagged as RWF_NOWAIT
+ + XFS returns EAGAIN if extent list is not in memory
+ + Man page updates to io_submit with iocb description and nowait features.
+
+ Changes since v10:
+ + Corrected comment and subject in "return on congested block device"
+
+ Changes since v11:
+ + FMODE_AIO_NOWAIT to show AIO NOWAIT support. This is to block
+   non-supported filesystems instead of returning ENOTSUPP in each
+   individual filesystem
+
+-- 
+Goldwyn
