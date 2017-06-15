@@ -1,39 +1,107 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        adilger@dilger.ca, hch@infradead.org, martin.petersen@oracle.com
-Subject: Re: [PATCH 05/12] fs: add fcntl() interface for setting/getting write life time hints
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 05/12] fs: add fcntl() interface for setting/getting write life time hints
+Date: Thu, 15 Jun 2017 10:42:03 -0600
+Message-Id: <1497544930-19174-6-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
 References: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
-	<1497544930-19174-6-git-send-email-axboe@kernel.dk>
-Date: Fri, 16 Jun 2017 12:44:09 -0400
-In-Reply-To: <1497544930-19174-6-git-send-email-axboe@kernel.dk> (Jens Axboe's
-	message of "Thu, 15 Jun 2017 10:42:03 -0600")
-Message-ID: <yq1efujq3vq.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
+We have a pwritev2(2) interface based on passing in flags. Add an
+fcntl interface for querying these flags, and also for setting them
+as well:
 
-Jens,
+F_GET_WRITE_LIFE	Returns one of the valid type of write hints,
+			like WRITE_HINT_MEDIUM.
 
-> We have a pwritev2(2) interface based on passing in flags. Add an
-> fcntl interface for querying these flags, and also for setting them
-> as well:
->
-> F_GET_WRITE_LIFE	Returns one of the valid type of write hints,
-> 			like WRITE_HINT_MEDIUM.
->
-> F_SET_WRITE_LIFE	Pass in a WRITE_HINT_* type to set the
-> 			write life time hint for this file/inode.
-> 			Returns 0 on succes, -1 otherwise.
+F_SET_WRITE_LIFE	Pass in a WRITE_HINT_* type to set the
+			write life time hint for this file/inode.
+			Returns 0 on succes, -1 otherwise.
 
-It seems like an overkill to have different fcntls for different
-hints. And since we are expecting more, maybe these should be
-F_{GET,SET}_HINT and then the individual flags can be
-WRITE_LIFETIME_FOOBAR?
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ fs/fcntl.c                 | 38 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/fcntl.h |  6 ++++++
+ 2 files changed, 44 insertions(+)
 
-Otherwise OK with the fnctl approach.
-
+diff --git a/fs/fcntl.c b/fs/fcntl.c
+index f4e7267d117f..f89fef847f73 100644
+--- a/fs/fcntl.c
++++ b/fs/fcntl.c
+@@ -243,6 +243,40 @@ static int f_getowner_uids(struct file *filp, unsigned long arg)
+ }
+ #endif
+ 
++long fcntl_write_life(struct file *file, unsigned int cmd, unsigned long arg)
++{
++	struct inode *inode = file_inode(file);
++	long ret;
++
++	switch (cmd) {
++	case F_GET_WRITE_LIFE:
++		ret = mask_to_write_hint(inode->i_flags, S_WRITE_LIFE_SHIFT);
++		break;
++	case F_SET_WRITE_LIFE: {
++		enum write_hint hint = arg;
++
++		switch (hint) {
++		case WRITE_HINT_NONE:
++		case WRITE_HINT_SHORT:
++		case WRITE_HINT_MEDIUM:
++		case WRITE_HINT_LONG:
++		case WRITE_HINT_EXTREME:
++			inode_set_write_hint(inode, hint);
++			ret = 0;
++			break;
++		default:
++			ret = -EINVAL;
++		}
++		break;
++		}
++	default:
++		ret = -EINVAL;
++		break;
++	}
++
++	return ret;
++}
++
+ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
+ 		struct file *filp)
+ {
+@@ -337,6 +371,10 @@ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
+ 	case F_GET_SEALS:
+ 		err = shmem_fcntl(filp, cmd, arg);
+ 		break;
++	case F_GET_WRITE_LIFE:
++	case F_SET_WRITE_LIFE:
++		err = fcntl_write_life(filp, cmd, arg);
++		break;
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
+index 813afd6eee71..1c5b2a95e9c9 100644
+--- a/include/uapi/linux/fcntl.h
++++ b/include/uapi/linux/fcntl.h
+@@ -43,6 +43,12 @@
+ /* (1U << 31) is reserved for signed error codes */
+ 
+ /*
++ * Set/Get write life time hints
++ */
++#define F_GET_WRITE_LIFE	(F_LINUX_SPECIFIC_BASE + 11)
++#define F_SET_WRITE_LIFE	(F_LINUX_SPECIFIC_BASE + 20)
++
++/*
+  * Types of directory notifications that may be requested.
+  */
+ #define DN_ACCESS	0x00000001	/* File accessed */
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.7.4
