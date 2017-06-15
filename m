@@ -1,34 +1,116 @@
-Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 16 Jun 2017 00:30:31 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	"Darrick J. Wong" <darrick.wong@oracle.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	adilger@dilger.ca, martin.petersen@oracle.com
-Subject: Re: [PATCH 04/11] fs: add support for allowing applications to pass
- in write life time hints
-Message-ID: <20170616073031.GB8682@infradead.org>
-References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
- <1497498312-17704-5-git-send-email-axboe@kernel.dk>
- <20170615041503.GB4521@birch.djwong.org>
- <a0689580-ac50-3e2c-7c00-2d59e130c9a9@kernel.dk>
- <20170615081914.GD10599@infradead.org>
- <7f8e2e3c-fa15-6864-7afd-b82e5afb87b5@kernel.dk>
- <bb49b5a3-ac8e-84ce-1886-62deab29a3a4@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <bb49b5a3-ac8e-84ce-1886-62deab29a3a4@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 04/12] fs: add support for allowing applications to pass in write life time hints
+Date: Thu, 15 Jun 2017 10:42:02 -0600
+Message-Id: <1497544930-19174-5-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
+References: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jun 15, 2017 at 09:23:02AM -0600, Jens Axboe wrote:
-> And then I remembered why fadvise _sucks_. It returns the error value
-> directly. So 0 is success > 0 is some error. That does not work well
-> for adding a set/get interface. Additionally, with fadvise, we have
-> to overload either 'offset' or 'length' for the write hint for the
-> set operation. Not super pretty.
-> 
-> Any objections to making the auxiliary interface fcntl(2) based?
-> That would be a cleaner fit, imho.
+Add four flags for the pwritev2(2) system call, allowing an application
+to give the kernel a hint about what on-media life times can be
+expected from a given write.
 
-fcntl sounds fine to me.
+The intent is for these values to be relative to each other, no
+absolute meaning should be attached to these flag names.
+
+Set aside 3 bits in the iocb flags structure to carry this information
+over from the pwritev2 RWF_WRITE_LIFE_* flags.
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ fs/read_write.c         | 12 +++++++++++-
+ include/linux/fs.h      | 12 ++++++++++++
+ include/uapi/linux/fs.h | 10 ++++++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 47c1d4484df9..871e97ae4147 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -675,10 +675,11 @@ EXPORT_SYMBOL(iov_shorten);
+ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
+ 		loff_t *ppos, int type, int flags)
+ {
++	struct inode *inode = file_inode(filp);
+ 	struct kiocb kiocb;
+ 	ssize_t ret;
+ 
+-	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
++	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_WRITE_LIFE_MASK))
+ 		return -EOPNOTSUPP;
+ 
+ 	init_sync_kiocb(&kiocb, filp);
+@@ -688,6 +689,15 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
+ 		kiocb.ki_flags |= IOCB_DSYNC;
+ 	if (flags & RWF_SYNC)
+ 		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	if ((flags & RWF_WRITE_LIFE_MASK) ||
++	    mask_to_write_hint(inode->i_flags, S_WRITE_LIFE_SHIFT)) {
++		enum write_hint hint;
++
++		hint = mask_to_write_hint(flags, RWF_WRITE_LIFE_SHIFT);
++
++		inode_set_write_hint(inode, hint);
++		kiocb.ki_flags |= write_hint_to_mask(hint, IOCB_WRITE_LIFE_SHIFT);
++	}
+ 	kiocb.ki_pos = *ppos;
+ 
+ 	if (type == READ)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index bef0b350f890..24803ed57ec6 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -269,6 +269,12 @@ struct writeback_control;
+ #define IOCB_SYNC		(1 << 5)
+ #define IOCB_WRITE		(1 << 6)
+ 
++/*
++ * Steal 3 bits for stream information, this allows 8 valid streams
++ */
++#define IOCB_WRITE_LIFE_SHIFT	7
++#define IOCB_WRITE_LIFE_MASK	(BIT(7) | BIT(8) | BIT(9))
++
+ struct kiocb {
+ 	struct file		*ki_filp;
+ 	loff_t			ki_pos;
+@@ -292,6 +298,12 @@ static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
+ 	};
+ }
+ 
++static inline int iocb_write_hint(const struct kiocb *iocb)
++{
++	return (iocb->ki_flags & IOCB_WRITE_LIFE_MASK) >>
++			IOCB_WRITE_LIFE_SHIFT;
++}
++
+ /*
+  * "descriptor" for what we're up to with a read.
+  * This allows us to use the same read code yet
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 58fbe0903016..1feac96b43b9 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -374,4 +374,14 @@ enum write_hint {
+ #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
+ #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
+ 
++/*
++ * Data life time write flags, steal 3 bits for that
++ */
++#define RWF_WRITE_LIFE_SHIFT		4
++#define RWF_WRITE_LIFE_MASK		0x00000070 /* 3 bits of write hints */
++#define RWF_WRITE_LIFE_SHORT		(WRITE_HINT_SHORT << RWF_WRITE_LIFE_SHIFT)
++#define RWF_WRITE_LIFE_MEDIUM		(WRITE_HINT_MEDIUM << RWF_WRITE_LIFE_SHIFT)
++#define RWF_WRITE_LIFE_LONG		(WRITE_HINT_LONG << RWF_WRITE_LIFE_SHIFT)
++#define RWF_WRITE_LIFE_EXTREME		(WRITE_HINT_EXTREME << RWF_WRITE_LIFE_SHIFT)
++
+ #endif /* _UAPI_LINUX_FS_H */
+-- 
+2.7.4
