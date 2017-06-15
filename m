@@ -1,116 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44888 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752538AbdFREkK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:40:10 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:58 +1000
-Subject: [PATCH 07/13] drbd: use bio_clone_fast() instead of bio_clone()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073824.23258.9244455329321242007.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 01/11] block: add support for carrying stream information in a bio
+Date: Wed, 14 Jun 2017 21:45:02 -0600
+Message-Id: <1497498312-17704-2-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
+References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-drbd does not modify the bi_io_vec of the cloned bio,
-so there is no need to clone that part.  So bio_clone_fast()
-is the better choice.
-For bio_clone_fast() we need to specify a bio_set.
-We could use fs_bio_set, which bio_clone() uses, or
-drbd_md_io_bio_set, which drbd uses for metadata, but it is
-generally best to avoid sharing bio_sets unless you can
-be certain that there are no interdependencies.
+No functional changes in this patch, we just add four flags
+that will be used to denote a stream type, and ensure that we
+don't merge across different stream types.
 
-So create a new bio_set, drbd_io_bio_set, and use bio_clone_fast().
-
-Also remove a "XXX cannot fail ???" comment because it definitely
-cannot fail - bio_clone_fast() doesn't fail if the GFP flags allow for
-sleeping.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/block/drbd/drbd_int.h  |    3 +++
- drivers/block/drbd/drbd_main.c |    9 +++++++++
- drivers/block/drbd/drbd_req.h  |    2 +-
- 3 files changed, 13 insertions(+), 1 deletion(-)
+ block/blk-merge.c         | 16 ++++++++++++++++
+ include/linux/blk_types.h | 11 +++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index 76761b4ca13e..d17b6e6393c7 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -1441,6 +1441,9 @@ extern struct bio_set *drbd_md_io_bio_set;
- /* to allocate from that set */
- extern struct bio *bio_alloc_drbd(gfp_t gfp_mask);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 3990ae406341..7d299df3b12b 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -693,6 +693,14 @@ static struct request *attempt_merge(struct request_queue *q,
+ 		return NULL;
  
-+/* And a bio_set for cloning */
-+extern struct bio_set *drbd_io_bio_set;
+ 	/*
++	 * Don't allow merge of different streams, or for a stream with
++	 * non-stream IO.
++	 */
++	if ((req->cmd_flags & REQ_WRITE_LIFE_MASK) !=
++	    (next->cmd_flags & REQ_WRITE_LIFE_MASK))
++		return NULL;
 +
- extern struct mutex resources_mutex;
++	/*
+ 	 * If we are allowed to merge, then append bio list
+ 	 * from next to rq and release next. merge_requests_fn
+ 	 * will have updated segment counts, update sector
+@@ -811,6 +819,14 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 	    !blk_write_same_mergeable(rq->bio, bio))
+ 		return false;
  
- extern int conn_lowest_minor(struct drbd_connection *connection);
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index bdf51b6977cf..90680034ef57 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -128,6 +128,7 @@ mempool_t *drbd_request_mempool;
- mempool_t *drbd_ee_mempool;
- mempool_t *drbd_md_io_page_pool;
- struct bio_set *drbd_md_io_bio_set;
-+struct bio_set *drbd_io_bio_set;
- 
- /* I do not use a standard mempool, because:
-    1) I want to hand out the pre-allocated objects first.
-@@ -2098,6 +2099,8 @@ static void drbd_destroy_mempools(void)
- 
- 	/* D_ASSERT(device, atomic_read(&drbd_pp_vacant)==0); */
- 
-+	if (drbd_io_bio_set)
-+		bioset_free(drbd_io_bio_set);
- 	if (drbd_md_io_bio_set)
- 		bioset_free(drbd_md_io_bio_set);
- 	if (drbd_md_io_page_pool)
-@@ -2115,6 +2118,7 @@ static void drbd_destroy_mempools(void)
- 	if (drbd_al_ext_cache)
- 		kmem_cache_destroy(drbd_al_ext_cache);
- 
-+	drbd_io_bio_set      = NULL;
- 	drbd_md_io_bio_set   = NULL;
- 	drbd_md_io_page_pool = NULL;
- 	drbd_ee_mempool      = NULL;
-@@ -2142,6 +2146,7 @@ static int drbd_create_mempools(void)
- 	drbd_pp_pool         = NULL;
- 	drbd_md_io_page_pool = NULL;
- 	drbd_md_io_bio_set   = NULL;
-+	drbd_io_bio_set      = NULL;
- 
- 	/* caches */
- 	drbd_request_cache = kmem_cache_create(
-@@ -2165,6 +2170,10 @@ static int drbd_create_mempools(void)
- 		goto Enomem;
- 
- 	/* mempools */
-+	drbd_io_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_RESCUER);
-+	if (drbd_io_bio_set == NULL)
-+		goto Enomem;
++	/*
++	 * Don't allow merge of different streams, or for a stream with
++	 * non-stream IO.
++	 */
++	if ((rq->cmd_flags & REQ_WRITE_LIFE_MASK) !=
++	    (bio->bi_opf & REQ_WRITE_LIFE_MASK))
++		return false;
 +
- 	drbd_md_io_bio_set = bioset_create(DRBD_MIN_POOL_PAGES, 0,
- 					   BIOSET_NEED_BVECS |
- 					   BIOSET_NEED_RESCUER);
-diff --git a/drivers/block/drbd/drbd_req.h b/drivers/block/drbd/drbd_req.h
-index eb49e7f2da91..9e1866ab238f 100644
---- a/drivers/block/drbd/drbd_req.h
-+++ b/drivers/block/drbd/drbd_req.h
-@@ -263,7 +263,7 @@ enum drbd_req_state_bits {
- static inline void drbd_req_make_private_bio(struct drbd_request *req, struct bio *bio_src)
- {
- 	struct bio *bio;
--	bio = bio_clone(bio_src, GFP_NOIO); /* XXX cannot fail?? */
-+	bio = bio_clone_fast(bio_src, GFP_NOIO, drbd_io_bio_set);
+ 	return true;
+ }
  
- 	req->private_bio = bio;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 61339bc44400..57d1eb530799 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -201,6 +201,10 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++	__REQ_WRITE_SHORT,	/* short life time write */
++	__REQ_WRITE_MEDIUM,	/* medium life time write */
++	__REQ_WRITE_LONG,	/* long life time write */
++	__REQ_WRITE_EXTREME,	/* extremely long life time write */
  
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+@@ -221,6 +225,13 @@ enum req_flag_bits {
+ #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
++#define REQ_WRITE_SHORT		(1ULL << __REQ_WRITE_SHORT)
++#define REQ_WRITE_MEDIUM	(1ULL << __REQ_WRITE_MEDIUM)
++#define REQ_WRITE_LONG		(1ULL << __REQ_WRITE_LONG)
++#define REQ_WRITE_EXTREME	(1ULL << __REQ_WRITE_EXTREME)
++
++#define REQ_WRITE_LIFE_MASK	(REQ_WRITE_SHORT | REQ_WRITE_MEDIUM | \
++					REQ_WRITE_LONG | REQ_WRITE_EXTREME)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ 
+-- 
+2.7.4
