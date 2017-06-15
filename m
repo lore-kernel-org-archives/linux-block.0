@@ -1,54 +1,92 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v7 02/22] buffer: use mapping_set_error instead of setting the flag
-Date: Fri, 16 Jun 2017 15:34:07 -0400
-Message-Id: <20170616193427.13955-3-jlayton@redhat.com>
-In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
-References: <20170616193427.13955-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:44126 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751016AbdFOSRY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Jun 2017 14:17:24 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V3 00/12] blktrace: output cgroup info
+Date: Thu, 15 Jun 2017 11:17:08 -0700
+Message-Id: <cover.1497549993.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/buffer.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Shaohua Li <shli@fb.com>
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 44172d11efae..7b4f4bfde91e 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -482,7 +482,7 @@ static void __remove_assoc_queue(struct buffer_head *bh)
- 	list_del_init(&bh->b_assoc_buffers);
- 	WARN_ON(!bh->b_assoc_map);
- 	if (buffer_write_io_error(bh))
--		set_bit(AS_EIO, &bh->b_assoc_map->flags);
-+		mapping_set_error(bh->b_assoc_map, -EIO);
- 	bh->b_assoc_map = NULL;
- }
- 
+Hi,
+
+Currently blktrace isn't cgroup aware. blktrace prints out task name of current
+context, but the task of current context isn't always in the cgroup where the
+BIO comes from. We can't use task name to find out IO cgroup. For example,
+Writeback BIOs always comes from flusher thread but the BIOs are for different
+blk cgroups. Request could be requeued and dispatched from completely different
+tasks. MD/DM are another examples. This brings challenges if we want to use
+blktrace for performance tunning with cgroup enabled.
+
+This patchset try to fix the gap. We print out cgroup fhandle info in blktrace.
+Userspace can use open_by_handle_at() syscall to find the cgroup by fhandle. Or
+userspace can use name_to_handle_at() syscall to find fhandle for a cgroup and
+use a BPF program to filter out blktrace for a specific cgroup.
+
+The first 6 patches adds export operation handlers for kernfs, so userspace can
+use open_by_handle_at/name_to_handle_at to a kernfs file. Later patches make
+blktrace output cgroup info.
+
+Last post tries to make inode number 64-bit, but actually we can't simply make
+it 64-bit because inode number must be 32-bit in 32 bit systems. So I switch
+back to use 32-bit inode and change the policy for i_generation accounting,
+which should avoid conflict. Sorry for the noise.
+
+Thanks,
+Shaohua
+
+V2 -> V3:
+- Uses 32 bits inode number
+- Refresh to latest -next tree
+
+V1 -> V2:
+- Fix a bug in cgroup association
+- Fix build errors reported by 0day
+- Address some issues pointed out by Tejun
+
+Shaohua Li (12):
+  kernfs: use idr instead of ida to manage inode number
+  kernfs: implement i_generation
+  kernfs: add an API to get kernfs node from inode number
+  kernfs: don't set dentry->d_fsdata
+  kernfs: introduce kernfs_node_id
+  kernfs: add exportfs operations
+  cgroup: export fhandle info for a cgroup
+  blktrace: export cgroup info in trace
+  block: always attach cgroup info into bio
+  block: call __bio_free in bio_endio
+  blktrace: add an option to allow displying cgroup path
+  block: use standard blktrace API to output cgroup info for debug notes
+
+ arch/x86/kernel/cpu/intel_rdt_rdtgroup.c |   2 +-
+ block/bfq-iosched.h                      |  13 +-
+ block/bio-integrity.c                    |   1 +
+ block/bio.c                              |   2 +
+ block/blk-throttle.c                     |  13 +-
+ block/cfq-iosched.c                      |  15 +-
+ fs/kernfs/dir.c                          | 108 ++++++++++---
+ fs/kernfs/file.c                         |  10 +-
+ fs/kernfs/inode.c                        |   9 +-
+ fs/kernfs/kernfs-internal.h              |   9 ++
+ fs/kernfs/mount.c                        |  96 ++++++++++--
+ fs/kernfs/symlink.c                      |   6 +-
+ fs/sysfs/mount.c                         |   2 +-
+ include/linux/blk-cgroup.h               |  17 +-
+ include/linux/blktrace_api.h             |  13 +-
+ include/linux/cgroup.h                   |  16 +-
+ include/linux/kernfs.h                   |  23 ++-
+ include/uapi/linux/blktrace_api.h        |   3 +
+ kernel/cgroup/cgroup.c                   |  15 +-
+ kernel/trace/blktrace.c                  | 259 ++++++++++++++++++++++---------
+ 20 files changed, 458 insertions(+), 174 deletions(-)
+
 -- 
-2.13.0
+2.9.3
