@@ -1,87 +1,66 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 02/11] blk-mq: expose stream write stats through debugfs
-Date: Wed, 14 Jun 2017 13:05:25 -0600
-Message-Id: <1497467134-6323-3-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:44296 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752870AbdFOSRa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Jun 2017 14:17:30 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V3 10/12] block: call __bio_free in bio_endio
+Date: Thu, 15 Jun 2017 11:17:18 -0700
+Message-Id: <5f77b2dbcb0819a9287de39542cf97654481b63b.1497549993.git.shli@fb.com>
+In-Reply-To: <cover.1497549993.git.shli@fb.com>
+References: <cover.1497549993.git.shli@fb.com>
+In-Reply-To: <cover.1497549993.git.shli@fb.com>
+References: <cover.1497549993.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Useful to verify that things are working the way they should.
-Reading the file will return number of kb written to each
-stream. Writing the file will reset the statistics. No care
-is taken to ensure that we don't race on updates.
+From: Shaohua Li <shli@fb.com>
 
-Drivers will write to q->stream_writes[] if they handle a stream.
+bio_free isn't a good place to free cgroup/integrity info. There are a
+lot of cases bio is allocated in special way (for example, in stack) and
+never gets called by bio_put hence bio_free, we are leaking memory. This
+patch moves the free to bio endio, which should be called anyway. The
+__bio_free call in bio_free is kept, in case the bio never gets called
+bio endio.
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+This assumes ->bi_end_io() doesn't access cgroup/integrity info, which
+seems true in my audit. Otherwise, we probably must add a flag to
+distinguish if bio will be called by bio_put.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq-debugfs.c | 24 ++++++++++++++++++++++++
- include/linux/blkdev.h |  3 +++
- 2 files changed, 27 insertions(+)
+ block/bio-integrity.c | 1 +
+ block/bio.c           | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 803aed4d7221..0a37c848961d 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -133,6 +133,29 @@ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index b8a3a65..e7fa7d0 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -120,6 +120,7 @@ void bio_integrity_free(struct bio *bio)
  	}
+ 
+ 	bio->bi_integrity = NULL;
++	bio->bi_opf &= ~REQ_INTEGRITY;
  }
+ EXPORT_SYMBOL(bio_integrity_free);
  
-+static int queue_streams_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_STREAM; i++)
-+		seq_printf(m, "stream%d: %llu\n", i, q->stream_writes[i]);
-+
-+	return 0;
-+}
-+
-+static ssize_t queue_streams_store(void *data, const char __user *buf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_STREAM; i++)
-+		q->stream_writes[i] = 0;
-+
-+	return count;
-+}
-+
- static int queue_poll_stat_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
-@@ -656,6 +679,7 @@ const struct file_operations blk_mq_debugfs_fops = {
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, queue_poll_stat_show},
- 	{"state", 0600, queue_state_show, queue_state_write},
-+	{"streams", 0600, queue_streams_show, queue_streams_store},
- 	{},
- };
+diff --git a/block/bio.c b/block/bio.c
+index 7a5c8ed..4ee6c55 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1823,6 +1823,8 @@ void bio_endio(struct bio *bio)
+ 	}
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ab92c4ea138b..88719c6f3edf 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -586,6 +586,9 @@ struct request_queue {
- 
- 	size_t			cmd_size;
- 	void			*rq_alloc_data;
-+
-+#define BLK_MAX_STREAM	5
-+	u64			stream_writes[BLK_MAX_STREAM];
- };
- 
- #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
+ 	blk_throtl_bio_endio(bio);
++	/* release cgroup/integrity info */
++	__bio_free(bio);
+ 	if (bio->bi_end_io)
+ 		bio->bi_end_io(bio);
+ }
 -- 
-2.7.4
+2.9.3
