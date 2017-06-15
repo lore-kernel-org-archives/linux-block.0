@@ -1,105 +1,79 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>
-Subject: [PATCH v3 00/12] More patches for kernel v4.13
-Date: Thu, 8 Jun 2017 10:33:43 -0700
-Message-ID: <20170608173355.25898-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	akpm@linux-foundation.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
+Date: Thu, 15 Jun 2017 10:59:53 -0500
+Message-Id: <20170615160002.17233-2-rgoldwyn@suse.de>
+In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
+References: <20170615160002.17233-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-This patch series contains one patch that reduces the size of struct
-blk_mq_hw_ctx, a few patches that simplify some of the block layer code and
-also patches that improve the block layer documentation. Please consider these
-patches for kernel v4.13.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ fs/read_write.c    | 12 +++---------
+ include/linux/fs.h | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+), 9 deletions(-)
 
-The basis for these patches is a merge of your for-next and for-linus
-branches. Please note that the first patch in this series applies fine on top
-of the merge of these two branches but not on top of your for-next branch.
-
-Thanks,
-
-Bart.
-
-Changes between v2 and v3:
-* Added patch "blk-mq: Reduce blk_mq_hw_ctx size".
-* Removed patch "block: Rename blk_mq_rq_{to,from}_pdu()".
-* Addressed Christoph's review comments about patch "block: Introduce
-  request_queue.initialize_rq_fn()".
-* Rebased (and retested) this patch series on top of a merge of Jens'
-  for-next and for-linus branches.
-
-Changes between v1 and v2:
-* Addressed Christoph's comment about moving the .initialize_rq_fn() call
-  from blk_rq_init() / blk_mq_rq_ctx_init() into blk_get_request().
-* Left out patch "scsi: Make scsi_ioctl_reset() pass the request queue pointer
-  to blk_rq_init()" since it's no longer needed.
-* Restored the scsi_req_init() call in ide_prep_sense().
-* Combined the two patches that reduce the blk_mq_hw_ctx size into a single
-  patch.
-* Modified patch "blk-mq: Initialize a request before assigning a tag" such
-  that .tag and .internal_tag are no longer initialized twice.
-* Removed WARN_ON_ONCE(q->mq_ops) from blk_queue_bypass_end() because this
-  function is used by both blk-sq and blk-mq.
-* Added several new patches, e.g. "block: Rename blk_mq_rq_{to,from}_pdu()".
-
-Bart Van Assche (12):
-  blk-mq: Reduce blk_mq_hw_ctx size
-  block: Make request operation type argument declarations consistent
-  block: Introduce request_queue.initialize_rq_fn()
-  block: Make most scsi_req_init() calls implicit
-  block: Change argument type of scsi_req_init()
-  blk-mq: Initialize a request before assigning a tag
-  block: Add a comment above queue_lockdep_assert_held()
-  block: Check locking assumptions at runtime
-  block: Document what queue type each function is intended for
-  blk-mq: Document locking assumptions
-  block: Constify disk_type
-  blk-mq: Warn when attempting to run a hardware queue that is not
-    mapped
-
- block/blk-core.c                   | 130 ++++++++++++++++++++++++++++---------
- block/blk-flush.c                  |   8 ++-
- block/blk-merge.c                  |   3 +
- block/blk-mq-sched.c               |   2 +
- block/blk-mq.c                     |  60 +++++++++++------
- block/blk-tag.c                    |  15 ++---
- block/blk-timeout.c                |   4 +-
- block/blk.h                        |   2 +
- block/bsg.c                        |   1 -
- block/genhd.c                      |   4 +-
- block/scsi_ioctl.c                 |  13 ++--
- drivers/block/pktcdvd.c            |   1 -
- drivers/cdrom/cdrom.c              |   1 -
- drivers/ide/ide-atapi.c            |   3 +-
- drivers/ide/ide-cd.c               |   1 -
- drivers/ide/ide-cd_ioctl.c         |   1 -
- drivers/ide/ide-devsets.c          |   1 -
- drivers/ide/ide-disk.c             |   1 -
- drivers/ide/ide-ioctls.c           |   2 -
- drivers/ide/ide-park.c             |   2 -
- drivers/ide/ide-pm.c               |   2 -
- drivers/ide/ide-probe.c            |   6 +-
- drivers/ide/ide-tape.c             |   1 -
- drivers/ide/ide-taskfile.c         |   1 -
- drivers/scsi/osd/osd_initiator.c   |   2 -
- drivers/scsi/osst.c                |   1 -
- drivers/scsi/scsi_error.c          |   1 -
- drivers/scsi/scsi_lib.c            |  12 +++-
- drivers/scsi/scsi_transport_sas.c  |   6 ++
- drivers/scsi/sg.c                  |   2 -
- drivers/scsi/st.c                  |   1 -
- drivers/target/target_core_pscsi.c |   2 -
- fs/nfsd/blocklayout.c              |   1 -
- include/linux/blk-mq.h             |  13 ++--
- include/linux/blkdev.h             |  14 +++-
- include/scsi/scsi_request.h        |   2 +-
- 36 files changed, 213 insertions(+), 109 deletions(-)
-
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 47c1d4484df9..53c816c61122 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
+ 	struct kiocb kiocb;
+ 	ssize_t ret;
+ 
+-	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
+-		return -EOPNOTSUPP;
+-
+ 	init_sync_kiocb(&kiocb, filp);
+-	if (flags & RWF_HIPRI)
+-		kiocb.ki_flags |= IOCB_HIPRI;
+-	if (flags & RWF_DSYNC)
+-		kiocb.ki_flags |= IOCB_DSYNC;
+-	if (flags & RWF_SYNC)
+-		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	ret = kiocb_set_rw_flags(&kiocb, flags);
++	if (ret)
++		return ret;
+ 	kiocb.ki_pos = *ppos;
+ 
+ 	if (type == READ)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 803e5a9b2654..f53867140f43 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3056,6 +3056,20 @@ static inline int iocb_flags(struct file *file)
+ 	return res;
+ }
+ 
++static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
++{
++	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
++		return -EOPNOTSUPP;
++
++	if (flags & RWF_HIPRI)
++		ki->ki_flags |= IOCB_HIPRI;
++	if (flags & RWF_DSYNC)
++		ki->ki_flags |= IOCB_DSYNC;
++	if (flags & RWF_SYNC)
++		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
++	return 0;
++}
++
+ static inline ino_t parent_ino(struct dentry *dentry)
+ {
+ 	ino_t res;
 -- 
-2.12.2
+2.12.0
