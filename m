@@ -1,51 +1,131 @@
-Return-Path: <ross.zwisler@linux.intel.com>
-Date: Mon, 5 Jun 2017 19:01:53 -0600
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v5 08/17] dax: set errors in mapping when writeback fails
-Message-ID: <20170606010153.GA7489@linux.intel.com>
-References: <20170531124540.8782-1-jlayton@redhat.com>
- <20170531124540.8782-9-jlayton@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170531124540.8782-9-jlayton@redhat.com>
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	akpm@linux-foundation.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 09/10] xfs: nowait aio support
+Date: Thu, 15 Jun 2017 11:00:01 -0500
+Message-Id: <20170615160002.17233-10-rgoldwyn@suse.de>
+In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
+References: <20170615160002.17233-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, May 31, 2017 at 08:45:31AM -0400, Jeff Layton wrote:
-> Jan's description for this patch is much better than mine, so I'm
-> quoting it verbatim here:
-> 
-> -----------------8<-----------------
-> DAX currently doesn't set errors in the mapping when cache flushing
-> fails in dax_writeback_mapping_range(). Since this function can get
-> called only from fsync(2) or sync(2), this is actually as good as it can
-> currently get since we correctly propagate the error up from
-> dax_writeback_mapping_range() to filemap_fdatawrite()
-> 
-> However, in the future better writeback error handling will enable us to
-> properly report these errors on fsync(2) even if there are multiple file
-> descriptors open against the file or if sync(2) gets called before
-> fsync(2). So convert DAX to using standard error reporting through the
-> mapping.
-> -----------------8<-----------------
-> 
-> For now, only do this when the FS_WB_ERRSEQ flag is set. The
-> AS_EIO/AS_ENOSPC flags are not currently cleared in the older code when
-> writeback initiation fails, only when we discover an error after waiting
-> on writeback to complete, so we only want to do this with errseq_t based
-> error handling to prevent seeing duplicate errors on fsync.
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-and-Tested-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Re-tested this version of the series with some injected DAX errors, and it
-looks good.
+If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
+immediately.
+
+IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
+if it needs allocation either due to file extension, writing to a hole,
+or COW or waiting for other DIOs to finish.
+
+Return -EAGAIN if we don't have extent list in memory.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+---
+ fs/xfs/xfs_file.c  | 20 +++++++++++++++-----
+ fs/xfs/xfs_iomap.c | 22 ++++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 5 deletions(-)
+
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 5fb5a0958a14..e159eb381d9f 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
+ 
+-	xfs_ilock(ip, iolock);
+-
++	if (!xfs_ilock_nowait(ip, iolock)) {
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		xfs_ilock(ip, iolock);
++	}
+ 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
+ 	if (ret)
+ 		goto out;
+@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
+ 	 * otherwise demote the lock if we had to take the exclusive lock
+ 	 * for other reasons in xfs_file_aio_write_checks.
+ 	 */
+-	if (unaligned_io)
+-		inode_dio_wait(inode);
+-	else if (iolock == XFS_IOLOCK_EXCL) {
++	if (unaligned_io) {
++		/* If we are going to wait for other DIO to finish, bail */
++		if (iocb->ki_flags & IOCB_NOWAIT) {
++			if (atomic_read(&inode->i_dio_count))
++				return -EAGAIN;
++		} else {
++			inode_dio_wait(inode);
++		}
++	} else if (iolock == XFS_IOLOCK_EXCL) {
+ 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
+@@ -892,6 +901,7 @@ xfs_file_open(
+ 		return -EFBIG;
+ 	if (XFS_FORCED_SHUTDOWN(XFS_M(inode->i_sb)))
+ 		return -EIO;
++	file->f_mode |= FMODE_AIO_NOWAIT;
+ 	return 0;
+ }
+ 
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 94e5bdf7304c..05dc87e8c1f5 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -995,6 +995,11 @@ xfs_file_iomap_begin(
+ 		lockmode = xfs_ilock_data_map_shared(ip);
+ 	}
+ 
++	if ((flags & IOMAP_NOWAIT) && !(ip->i_df.if_flags & XFS_IFEXTENTS)) {
++		error = -EAGAIN;
++		goto out_unlock;
++	}
++
+ 	ASSERT(offset <= mp->m_super->s_maxbytes);
+ 	if ((xfs_fsize_t)offset + length > mp->m_super->s_maxbytes)
+ 		length = mp->m_super->s_maxbytes - offset;
+@@ -1016,6 +1021,15 @@ xfs_file_iomap_begin(
+ 
+ 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
+ 		if (flags & IOMAP_DIRECT) {
++			/*
++			 * A reflinked inode will result in CoW alloc.
++			 * FIXME: It could still overwrite on unshared extents
++			 * and not need allocation.
++			 */
++			if (flags & IOMAP_NOWAIT) {
++				error = -EAGAIN;
++				goto out_unlock;
++			}
+ 			/* may drop and re-acquire the ilock */
+ 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
+ 					&lockmode);
+@@ -1033,6 +1047,14 @@ xfs_file_iomap_begin(
+ 
+ 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
+ 		/*
++		 * If nowait is set bail since we are going to make
++		 * allocations.
++		 */
++		if (flags & IOMAP_NOWAIT) {
++			error = -EAGAIN;
++			goto out_unlock;
++		}
++		/*
+ 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
+ 		 * pages to keep the chunks of work done where somewhat symmetric
+ 		 * with the work writeback does. This is a completely arbitrary
+-- 
+2.12.0
