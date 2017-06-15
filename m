@@ -1,33 +1,27 @@
-Return-Path: <viro@ftp.linux.org.uk>
-Date: Thu, 15 Jun 2017 12:24:20 +0100
-From: Al Viro <viro@ZenIV.linux.org.uk>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, adilger@dilger.ca, hch@infradead.org,
-	martin.petersen@oracle.com
+Return-Path: <BATV+bef0da5e94eb3b03931e+5044+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 15 Jun 2017 01:19:14 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Darrick J. Wong" <darrick.wong@oracle.com>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	adilger@dilger.ca, hch@infradead.org, martin.petersen@oracle.com
 Subject: Re: [PATCH 04/11] fs: add support for allowing applications to pass
  in write life time hints
-Message-ID: <20170615112420.GN31671@ZenIV.linux.org.uk>
+Message-ID: <20170615081914.GD10599@infradead.org>
 References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
  <1497498312-17704-5-git-send-email-axboe@kernel.dk>
  <20170615041503.GB4521@birch.djwong.org>
+ <a0689580-ac50-3e2c-7c00-2d59e130c9a9@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170615041503.GB4521@birch.djwong.org>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <a0689580-ac50-3e2c-7c00-2d59e130c9a9@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jun 14, 2017 at 09:15:03PM -0700, Darrick J. Wong wrote:
-> > + */
-> > +#define RWF_WRITE_LIFE_SHIFT		4
-> > +#define RWF_WRITE_LIFE_MASK		0x000000f0 /* 4 bits of stream ID */
-> > +#define RWF_WRITE_LIFE_SHORT		(1 << RWF_WRITE_LIFE_SHIFT)
-> > +#define RWF_WRITE_LIFE_MEDIUM		(2 << RWF_WRITE_LIFE_SHIFT)
-> > +#define RWF_WRITE_LIFE_LONG		(3 << RWF_WRITE_LIFE_SHIFT)
-> > +#define RWF_WRITE_LIFE_EXTREME		(4 << RWF_WRITE_LIFE_SHIFT)
-> 
-> Should O_TMPFILE files ought to be created with i_write_hint =
-> RWF_WRITE_LIFE_SHORT by default?
+I think Darrick has a very valid concern here - using RWF_* flags
+to affect inode or fd-wide state is extremely counter productive.
 
-Depends...  One of the uses for that is to have them linked into permanent
-place once completely written...
+Combined with the fact that the streams need a special setup in NVMe
+I'm tempted to say that the interface really should be fadvise or
+similar, which would keep the setup out of the I/O path and make clear
+it's a sticky interface.  For direct I/O RWF_* would make some sense,
+but we'd still have to deal with the setup issue.
