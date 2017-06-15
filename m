@@ -1,173 +1,116 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
 	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 17/20] fs: add f_md_wb_err field to struct file for tracking metadata errors
-Date: Mon, 12 Jun 2017 08:23:13 -0400
-Message-Id: <20170612122316.13244-22-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
+	linux-api@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	akpm@linux-foundation.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 10/10] btrfs: nowait aio support
+Date: Thu, 15 Jun 2017 11:00:02 -0500
+Message-Id: <20170615160002.17233-11-rgoldwyn@suse.de>
+In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
+References: <20170615160002.17233-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Some filesystems keep a different mapping for metadata writeback. Add a
-second errseq_t to struct file for tracking metadata writeback errors.
-Also add a new function for checking a mapping of the caller's choosing
-vs. the f_md_wb_err value.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
+
+Acked-by: David Sterba <dsterba@suse.com>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- include/linux/fs.h             |  3 +++
- include/trace/events/filemap.h | 23 ++++++++++-------------
- mm/filemap.c                   | 40 +++++++++++++++++++++++++++++++---------
- 3 files changed, 44 insertions(+), 22 deletions(-)
+ fs/btrfs/file.c  | 33 +++++++++++++++++++++++++++------
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 30 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index ef3feeec80b2..e366835c93b3 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -871,6 +871,7 @@ struct file {
- 	struct list_head	f_tfile_llink;
- #endif /* #ifdef CONFIG_EPOLL */
- 	struct address_space	*f_mapping;
-+	errseq_t		f_md_wb_err; /* optional metadata wb error tracking */
- } __attribute__((aligned(4)));	/* lest something weird decides that 2 is OK */
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index da1096eb1a40..59e2dccdf75b 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1875,12 +1875,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
  
- struct file_handle {
-@@ -2525,6 +2526,8 @@ extern int filemap_fdatawrite_range(struct address_space *mapping,
- extern int filemap_check_errors(struct address_space *mapping);
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
++		}
++	} else
++		inode_lock(inode);
++
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1914,8 +1931,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	 */
+ 	update_time_for_write(inode);
  
- extern int __must_check filemap_report_wb_err(struct file *file);
-+extern int __must_check filemap_report_md_wb_err(struct file *file,
-+					struct address_space *mapping);
- extern void __filemap_set_wb_err(struct address_space *mapping, int err);
- 
- /**
-diff --git a/include/trace/events/filemap.h b/include/trace/events/filemap.h
-index 2af66920f267..6e0d78c01a2e 100644
---- a/include/trace/events/filemap.h
-+++ b/include/trace/events/filemap.h
-@@ -79,12 +79,11 @@ TRACE_EVENT(filemap_set_wb_err,
- );
- 
- TRACE_EVENT(filemap_report_wb_err,
--		TP_PROTO(struct file *file, errseq_t old),
-+		TP_PROTO(struct address_space *mapping, errseq_t old, errseq_t new),
- 
--		TP_ARGS(file, old),
-+		TP_ARGS(mapping, old, new),
- 
- 		TP_STRUCT__entry(
--			__field(struct file *, file);
- 			__field(unsigned long, i_ino)
- 			__field(dev_t, s_dev)
- 			__field(errseq_t, old)
-@@ -92,20 +91,18 @@ TRACE_EVENT(filemap_report_wb_err,
- 		),
- 
- 		TP_fast_assign(
--			__entry->file = file;
--			__entry->i_ino = file->f_mapping->host->i_ino;
--			if (file->f_mapping->host->i_sb)
--				__entry->s_dev = file->f_mapping->host->i_sb->s_dev;
-+			__entry->i_ino = mapping->host->i_ino;
-+			if (mapping->host->i_sb)
-+				__entry->s_dev = mapping->host->i_sb->s_dev;
- 			else
--				__entry->s_dev = file->f_mapping->host->i_rdev;
-+				__entry->s_dev = mapping->host->i_rdev;
- 			__entry->old = old;
--			__entry->new = file->f_wb_err;
-+			__entry->new = new;
- 		),
- 
--		TP_printk("file=%p dev=%d:%d ino=0x%lx old=0x%x new=0x%x",
--			__entry->file, MAJOR(__entry->s_dev),
--			MINOR(__entry->s_dev), __entry->i_ino, __entry->old,
--			__entry->new)
-+		TP_printk("dev=%d:%d ino=0x%lx old=0x%x new=0x%x",
-+			MAJOR(__entry->s_dev), MINOR(__entry->s_dev),
-+			__entry->i_ino, __entry->old, __entry->new)
- );
- #endif /* _TRACE_FILEMAP_H */
- 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index c5e19ea0bf12..ef0ff6b87759 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -564,27 +564,49 @@ EXPORT_SYMBOL(__filemap_set_wb_err);
-  * value is protected by the f_lock since we must ensure that it reflects
-  * the latest value swapped in for this file descriptor.
-  */
--int filemap_report_wb_err(struct file *file)
-+static int __filemap_report_wb_err(errseq_t *cursor, spinlock_t *lock,
-+				struct address_space *mapping)
- {
- 	int err = 0;
--	errseq_t old = READ_ONCE(file->f_wb_err);
--	struct address_space *mapping = file->f_mapping;
-+	errseq_t old = READ_ONCE(*cursor);
- 
- 	/* Locklessly handle the common case where nothing has changed */
- 	if (errseq_check(&mapping->wb_err, old)) {
- 		/* Something changed, must use slow path */
--		spin_lock(&file->f_lock);
--		old = file->f_wb_err;
--		err = errseq_check_and_advance(&mapping->wb_err,
--						&file->f_wb_err);
--		trace_filemap_report_wb_err(file, old);
--		spin_unlock(&file->f_lock);
-+		spin_lock(lock);
-+		old = *cursor;
-+		err = errseq_check_and_advance(&mapping->wb_err, cursor);
-+		trace_filemap_report_wb_err(mapping, old, *cursor);
-+		spin_unlock(lock);
- 	}
- 	return err;
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+@@ -3071,13 +3086,19 @@ static loff_t btrfs_file_llseek(struct file *file, loff_t offset, int whence)
+ 	return offset;
  }
-+EXPORT_SYMBOL(__filemap_report_wb_err);
-+
-+int filemap_report_wb_err(struct file *file)
-+{
-+	return __filemap_report_wb_err(&file->f_wb_err, &file->f_lock,
-+					file->f_mapping);
-+}
- EXPORT_SYMBOL(filemap_report_wb_err);
  
- /**
-+ * filemap_report_md_wb_err - report wb error (if any) that was previously set
-+ * @file: struct file on which the error is being reported
-+ * @mapping: pointer to metadata mapping to check
-+ *
-+ * Many filesystems keep inode metadata in the pagecache, and will use the
-+ * cache to write it back to the backing store. This function is for these
-+ * callers to track metadata writeback.
-+ */
-+int filemap_report_md_wb_err(struct file *file, struct address_space *mapping)
++static int btrfs_file_open(struct inode *inode, struct file *filp)
 +{
-+	return __filemap_report_wb_err(&file->f_md_wb_err, &file->f_lock,
-+					mapping);
++	filp->f_mode |= FMODE_AIO_NOWAIT;
++	return generic_file_open(inode, filp);
 +}
-+EXPORT_SYMBOL(filemap_report_md_wb_err);
 +
-+/**
-  * replace_page_cache_page - replace a pagecache page with a new one
-  * @old:	page to be replaced
-  * @new:	page to replace with
+ const struct file_operations btrfs_file_operations = {
+ 	.llseek		= btrfs_file_llseek,
+ 	.read_iter      = generic_file_read_iter,
+ 	.splice_read	= generic_file_splice_read,
+ 	.write_iter	= btrfs_file_write_iter,
+ 	.mmap		= btrfs_file_mmap,
+-	.open		= generic_file_open,
++	.open		= btrfs_file_open,
+ 	.release	= btrfs_release_file,
+ 	.fsync		= btrfs_sync_file,
+ 	.fallocate	= btrfs_fallocate,
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index ef3c98c527c1..861979802aa3 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8755,6 +8755,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			dio_data.overwrite = 1;
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
 -- 
-2.13.0
+2.12.0
