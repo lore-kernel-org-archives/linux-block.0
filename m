@@ -1,51 +1,43 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
+Return-Path: <prvs=733925e927=clm@fb.com>
+Date: Wed, 14 Jun 2017 18:31:19 -0700
+From: Chris Mason <clm@fb.com>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 07/12] block: Add a comment above queue_lockdep_assert_held()
-Date: Tue, 20 Jun 2017 11:15:44 -0700
-Message-ID: <20170620181549.24903-8-bart.vanassche@wdc.com>
-In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
-References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+CC: <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <adilger@dilger.ca>, <hch@infradead.org>, <martin.petersen@oracle.com>
+Subject: Re: [PATCH 10/11] btrfs: add support for passing in stream
+ information for buffered writes
+Message-ID: <20170615013117.GA32465@clm-mbp.thefacebook.com>
+References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+ <1497467134-6323-11-git-send-email-axboe@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+In-Reply-To: <1497467134-6323-11-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+On Wed, Jun 14, 2017 at 01:05:33PM -0600, Jens Axboe wrote:
+>Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+>Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Add a comment above the queue_lockdep_assert_held() macro that
-explains the purpose of the q->queue_lock test.
+Thanks Jens!
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+Signed-off-by: Chris Mason <clm@fb.com>
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ff0ae83235ea..c00a6b99e77c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -635,6 +635,13 @@ struct request_queue {
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
- 				 (1 << QUEUE_FLAG_POLL))
- 
-+/*
-+ * @q->queue_lock is set while a queue is being initialized. Since we know
-+ * that no other threads access the queue object before @q->queue_lock has
-+ * been set, it is safe to manipulate queue flags without holding the
-+ * queue_lock if @q->queue_lock == NULL. See also blk_alloc_queue_node() and
-+ * blk_init_allocated_queue().
-+ */
- static inline void queue_lockdep_assert_held(struct request_queue *q)
- {
- 	if (q->queue_lock)
--- 
-2.13.1
+>---
+> fs/btrfs/extent_io.c | 1 +
+> 1 file changed, 1 insertion(+)
+>
+>diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+>index d3619e010005..b245085e8f10 100644
+>--- a/fs/btrfs/extent_io.c
+>+++ b/fs/btrfs/extent_io.c
+>@@ -2827,6 +2827,7 @@ static int submit_extent_page(int op, int op_flags, struct extent_io_tree *tree,
+> 	bio->bi_end_io = end_io_func;
+> 	bio->bi_private = tree;
+> 	bio_set_op_attrs(bio, op, op_flags);
+>+	bio_set_streamid(bio, inode_streamid(page->mapping->host));
+> 	if (wbc) {
+> 		wbc_init_bio(wbc, bio);
+> 		wbc_account_io(wbc, page, page_size);
+>-- 
+>2.7.4
+>
