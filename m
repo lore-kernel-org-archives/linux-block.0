@@ -1,116 +1,114 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 11/13] Documentation: flesh out the section in vfs.txt on storing and reporting writeback errors
-Date: Mon, 12 Jun 2017 08:23:04 -0400
-Message-Id: <20170612122316.13244-13-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
+Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Omar Sandoval <osandov@fb.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 08/10] blk-mq: refactor blk_mq_sched_assign_ioc
+Date: Fri, 16 Jun 2017 18:15:25 +0200
+Message-Id: <20170616161527.17649-9-hch@lst.de>
+In-Reply-To: <20170616161527.17649-1-hch@lst.de>
+References: <20170616161527.17649-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-I waxed a little loquacious here, but I figured that more detail was
-better, and writeback error handling is so hard to get right.
+blk_mq_sched_assign_ioc now only handles the assigned of the ioc if
+the schedule needs it (bfq only at the moment).  The caller to the
+per-request initializer is moved out so that it can be merged with
+a similar call for the kyber I/O scheduler.
 
-Although I think we'll eventually remove it once the transition is
-complete, I've gone ahead and documented the FS_WB_ERRSEQ flag as well.
-
-Cc: Jan Kara <jack@suse.cz>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Documentation/filesystems/vfs.txt | 50 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 47 insertions(+), 3 deletions(-)
+ block/blk-mq-sched.c | 28 ++++------------------------
+ block/blk-mq-sched.h |  3 +--
+ block/blk-mq.c       | 14 ++++++++++++--
+ 3 files changed, 17 insertions(+), 28 deletions(-)
 
-diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-index f42b90687d40..c3efdd833a3d 100644
---- a/Documentation/filesystems/vfs.txt
-+++ b/Documentation/filesystems/vfs.txt
-@@ -576,7 +576,49 @@ should clear PG_Dirty and set PG_Writeback.  It can be actually
- written at any point after PG_Dirty is clear.  Once it is known to be
- safe, PG_Writeback is cleared.
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 22601e5c6f19..254d1c164567 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -31,12 +31,10 @@ void blk_mq_sched_free_hctx_data(struct request_queue *q,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_free_hctx_data);
  
--Writeback makes use of a writeback_control structure...
-+Writeback makes use of a writeback_control structure to direct the
-+operations.  This gives the the writepage and writepages operations some
-+information about the nature of and reason for the writeback request,
-+and the constraints under which it is being done.  It is also used to
-+return information back to the caller about the result of a writepage or
-+writepages request.
+-static void __blk_mq_sched_assign_ioc(struct request_queue *q,
+-				      struct request *rq,
+-				      struct bio *bio,
+-				      struct io_context *ioc)
++void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio)
+ {
+-	struct elevator_queue *e = q->elevator;
++	struct request_queue *q = rq->q;
++	struct io_context *ioc = rq_ioc(bio);
+ 	struct io_cq *icq;
+ 
+ 	spin_lock_irq(q->queue_lock);
+@@ -48,26 +46,8 @@ static void __blk_mq_sched_assign_ioc(struct request_queue *q,
+ 		if (!icq)
+ 			return;
+ 	}
+-
+-	rq->elv.icq = icq;
+-	if (e && e->type->ops.mq.get_rq_priv &&
+-	    e->type->ops.mq.get_rq_priv(q, rq, bio)) {
+-		rq->elv.icq = NULL;
+-		return;
+-	}
+-
+-	rq->rq_flags |= RQF_ELVPRIV;
+ 	get_io_context(icq->ioc);
+-}
+-
+-void blk_mq_sched_assign_ioc(struct request_queue *q, struct request *rq,
+-			     struct bio *bio)
+-{
+-	struct io_context *ioc;
+-
+-	ioc = rq_ioc(bio);
+-	if (ioc)
+-		__blk_mq_sched_assign_ioc(q, rq, bio, ioc);
++	rq->elv.icq = icq;
+ }
+ 
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index f34e6a522105..e117edd039b1 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -7,8 +7,7 @@
+ void blk_mq_sched_free_hctx_data(struct request_queue *q,
+ 				 void (*exit)(struct blk_mq_hw_ctx *));
+ 
+-void blk_mq_sched_assign_ioc(struct request_queue *q, struct request *rq,
+-			     struct bio *bio);
++void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio);
+ 
+ void blk_mq_sched_request_inserted(struct request *rq);
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e056725679a8..2f380ab7a603 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -315,8 +315,18 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+ 
+ 	if (!op_is_flush(op)) {
+ 		rq->elv.icq = NULL;
+-		if (e && e->type->icq_cache)
+-			blk_mq_sched_assign_ioc(q, rq, bio);
++		if (e && e->type->ops.mq.get_rq_priv) {
++			if (e->type->icq_cache && rq_ioc(bio))
++				blk_mq_sched_assign_ioc(rq, bio);
 +
-+Handling errors during writeback
-+--------------------------------
-+Most applications that utilize the pagecache will periodically call
-+fsync to ensure that data written has made it to the backing store.
-+When there is an error during writeback, expect that error to be
-+reported when fsync is called.  After an error has been reported to
-+fsync, subsequent fsync calls on the same file descriptor should return
-+0, unless further writeback errors have occurred since the previous
-+fsync.
-+
-+Ideally, the kernel would report an error only on file descriptions on
-+which writes were done that subsequently failed to be written back.  The
-+generic pagecache infrastructure does not track the file descriptions
-+that have dirtied each individual page however, so determining which
-+file descriptors should get back an error is not possible.
-+
-+Instead, the generic writeback error tracking infrastructure in the
-+kernel settles for reporting errors to fsync on all file descriptions
-+that were open at the time that the error occurred.  In a situation with
-+multiple writers, all of them will get back an error on a subsequent fsync,
-+even if all of the writes done through that particular file descriptor
-+succeeded (or even if there were no writes on that file descriptor at all).
-+
-+Filesystems that wish to use this infrastructure should call
-+filemap_set_wb_err to record the error in the address_space when it
-+occurs.  Then, at the end of their fsync operation, they should call
-+filemap_report_wb_err to ensure that the struct file's error cursor
-+has advanced to the correct point in the stream of errors emitted by
-+the backing device(s).
-+
-+Older kernels used a different method for tracking errors, based on flags
-+in the address_space. We're currently switching everything over to use
-+the infrastructure based on errseq_t values. During the transition,
-+filesystem authors will want to also ensure their file_system_type has
-+FS_WB_ERRSEQ set in fs_flags to ensure that shared infrastructure is
-+aware of the model in use.
- 
- struct address_space_operations
- -------------------------------
-@@ -804,7 +846,8 @@ struct address_space_operations {
- The File Object
- ===============
- 
--A file object represents a file opened by a process.
-+A file object represents a file opened by a process. This is also known
-+as an "open file description" in POSIX parlance.
- 
- 
- struct file_operations
-@@ -887,7 +930,8 @@ otherwise noted.
- 
-   release: called when the last reference to an open file is closed
- 
--  fsync: called by the fsync(2) system call
-+  fsync: called by the fsync(2) system call. Also see the section above
-+	 entitled "Handling errors during writeback".
- 
-   fasync: called by the fcntl(2) system call when asynchronous
- 	(non-blocking) mode is enabled for a file
++			if (e->type->ops.mq.get_rq_priv(q, rq, bio)) {
++				if (rq->elv.icq)
++					put_io_context(rq->elv.icq->ioc);
++				rq->elv.icq = NULL;
++			} else {
++				rq->rq_flags |= RQF_ELVPRIV;
++			}
++		}
+ 	}
+ 	data->hctx->queued++;
+ 	return rq;
 -- 
-2.13.0
+2.11.0
