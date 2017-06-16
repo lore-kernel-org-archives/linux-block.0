@@ -2,38 +2,69 @@ Return-Path: <axboe@kernel.dk>
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 0/11] Add support for write life time hints
-Date: Tue, 13 Jun 2017 11:15:12 -0600
-Message-Id: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 06/11] fs: add O_DIRECT support for sending down write life time hints
+Date: Fri, 16 Jun 2017 11:24:38 -0600
+Message-Id: <1497633883-21230-7-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
+References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-A new iteration of this patchset, previously known as write streams.
-Instead of exposing numeric values for streams, I've previously
-advocated for just doing a set of hints that makes sense instead. See
-the coverage from the LSFMM summit this year:
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ fs/block_dev.c | 2 ++
+ fs/direct-io.c | 2 ++
+ fs/iomap.c     | 1 +
+ 3 files changed, 5 insertions(+)
 
-https://lwn.net/Articles/717755/
-
-This patchset attempts to do that. We define 4 flags for the pwritev2
-system call:
-
-RWF_WRITE_LIFE_SHORT	Data written with this flag is expected to have
-			a high overwrite rate, or life time.
-
-RWF_WRITE_LIFE_MEDIUM	Longer life time than SHORT
-
-RWF_WRITE_LIFE_LONG	Longer life time than MEDIUM
-
-RWF_WRITE_LIFE_EXTREME	Longer life time than LONG
-
-The idea is that these are relative values, so an application can
-use them as they see fit. The underlying device can then place
-data appropriately, or be free to ignore the hint. It's just a hint.
-
-Comments appreciated. A branch based on current master can be pulled
-from here:
-
-git://git.kernel.dk/linux-block write-stream.1
-
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 519599dddd36..b9222a9d285e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -239,6 +239,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 			should_dirty = true;
+ 	} else {
+ 		bio.bi_opf = dio_bio_write_op(iocb);
++		bio.bi_opf |= write_hint_to_opf(iocb_write_hint(iocb));
+ 		task_io_account_write(ret);
+ 	}
+ 
+@@ -374,6 +375,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 				bio_set_pages_dirty(bio);
+ 		} else {
+ 			bio->bi_opf = dio_bio_write_op(iocb);
++			bio->bi_opf |= write_hint_to_opf(iocb_write_hint(iocb));
+ 			task_io_account_write(bio->bi_iter.bi_size);
+ 		}
+ 
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index a04ebea77de8..1253b059eae6 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -386,6 +386,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+ 	else
+ 		bio->bi_end_io = dio_bio_end_io;
+ 
++	bio->bi_opf |= write_hint_to_opf(iocb_write_hint(dio->iocb));
++
+ 	sdio->bio = bio;
+ 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
+ }
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 4b10892967a5..e8639861bd80 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -804,6 +804,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 
+ 		if (dio->flags & IOMAP_DIO_WRITE) {
+ 			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
++			bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
+ 			task_io_account_write(bio->bi_iter.bi_size);
+ 		} else {
+ 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
 -- 
-Jens Axboe
+2.7.4
