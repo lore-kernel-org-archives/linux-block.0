@@ -1,67 +1,86 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-ext4@vger.kernel.org
-Subject: [PATCH v2 42/51] ext4: convert to bio_for_each_segment_all_sp()
-Date: Mon, 26 Jun 2017 20:10:25 +0800
-Message-Id: <20170626121034.3051-43-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v7 08/22] mm: clean up error handling in write_one_page
+Date: Fri, 16 Jun 2017 15:34:13 -0400
+Message-Id: <20170616193427.13955-9-jlayton@redhat.com>
+In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
+References: <20170616193427.13955-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Cc: "Theodore Ts'o" <tytso@mit.edu>
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>
-Cc: linux-ext4@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/ext4/page-io.c  | 3 ++-
- fs/ext4/readpage.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Don't try to check PageError since that's potentially racy and not
+necessarily going to be set after writepage errors out.
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 930ca0fc9a0f..0e59404fc530 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -62,8 +62,9 @@ static void ext4_finish_bio(struct bio *bio)
+Instead, check the mapping for an error after writepage returns.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+---
+ mm/page-writeback.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 36c62fda96bc..64b75bd996a4 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2371,14 +2371,13 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
+  *
+  * The page must be locked by the caller and will be unlocked upon return.
+  *
+- * write_one_page() returns a negative error code if I/O failed. Note that
+- * the address_space is not marked for error. The caller must do this if
+- * needed.
++ * Note that the mapping's AS_EIO/AS_ENOSPC flags will be cleared when this
++ * function returns.
+  */
+ int write_one_page(struct page *page)
  {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- #ifdef CONFIG_EXT4_FS_ENCRYPTION
- 		struct page *data_page = NULL;
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index 40a5497b0f60..6bd33c4c1f7f 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -71,6 +71,7 @@ static void mpage_end_io(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (ext4_bio_encrypted(bio)) {
- 		if (bio->bi_status) {
-@@ -80,7 +81,7 @@ static void mpage_end_io(struct bio *bio)
- 			return;
- 		}
+ 	struct address_space *mapping = page->mapping;
+-	int ret = 0;
++	int ret = 0, ret2;
+ 	struct writeback_control wbc = {
+ 		.sync_mode = WB_SYNC_ALL,
+ 		.nr_to_write = 1,
+@@ -2391,15 +2390,15 @@ int write_one_page(struct page *page)
+ 	if (clear_page_dirty_for_io(page)) {
+ 		get_page(page);
+ 		ret = mapping->a_ops->writepage(page, &wbc);
+-		if (ret == 0) {
++		if (ret == 0)
+ 			wait_on_page_writeback(page);
+-			if (PageError(page))
+-				ret = -EIO;
+-		}
+ 		put_page(page);
+ 	} else {
+ 		unlock_page(page);
  	}
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_sp(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 
- 		if (!bio->bi_status) {
++
++	if (!ret)
++		ret = filemap_check_errors(mapping);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(write_one_page);
 -- 
-2.9.4
+2.13.0
