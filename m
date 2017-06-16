@@ -1,92 +1,122 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:38460 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751341AbdFBVy3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Jun 2017 17:54:29 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH 01/11] kernfs: implement i_generation
-Date: Fri,  2 Jun 2017 14:53:54 -0700
-Message-Id: <b7c17173ade56502121bbc13860e293f84e704c6.1496432591.git.shli@fb.com>
-In-Reply-To: <cover.1496432591.git.shli@fb.com>
-References: <cover.1496432591.git.shli@fb.com>
-In-Reply-To: <cover.1496432591.git.shli@fb.com>
-References: <cover.1496432591.git.shli@fb.com>
+Received: from lucky1.263xmail.com ([211.157.147.134]:54232 "EHLO
+        lucky1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751673AbdFPAqq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Jun 2017 20:46:46 -0400
+Cc: shawn.lin@rock-chips.com, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Avri Altman <Avri.Altman@sandisk.com>,
+        Adrian Hunter <adrian.hunter@intel.com>
+Subject: Re: [PATCH 1/5] mmc: block: Move duplicate check
+To: Linus Walleij <linus.walleij@linaro.org>,
+        linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+References: <20170615121259.8281-1-linus.walleij@linaro.org>
+ <20170615121259.8281-2-linus.walleij@linaro.org>
+From: Shawn Lin <shawn.lin@rock-chips.com>
+Message-ID: <25c4809f-c07b-5cfb-8b7a-00308ed8de1e@rock-chips.com>
+Date: Fri, 16 Jun 2017 08:46:39 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170615121259.8281-2-linus.walleij@linaro.org>
+Content-Type: text/plain; charset=gbk; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
+Hi,
 
-Set i_generation for kernfs inode. This is required to implement exportfs
-operations.
+On 2017/6/15 20:12, Linus Walleij wrote:
+> mmc_blk_ioctl() calls either mmc_blk_ioctl_cmd() or
+> mmc_blk_ioctl_multi_cmd() and each of these make the same
+> check. Factor it into a new helper function, call it on
+> both branches of the switch() statement and save a chunk
+> of duplicate code.
+> 
+> Cc: Shawn Lin <shawn.lin@rock-chips.com>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+> ChangeLog v1->v2:
+> - We need to check the block device only if an actual
+>    well-known ioctl() is coming in, on the path of the
+>    switch() statments, only those branches that handle
+>    actual ioctl()s. Create a new helper function to check
+>    the block device and call that.
 
-Note, the generation is 32-bit, so it's possible the generation wraps up
-and we find stale files. The possiblity is low, since fhandle matches
-both inode number and generation. In most fs, the generation is 32-bit.
-fhandle only export 32-bit generation for most fs. So unless we have
-solid reason, we'd live with the possible conflict.
+Reviewed-by: Shawn Lin <shawn.lin@rock-chips.com>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- fs/kernfs/dir.c        | 2 ++
- fs/kernfs/inode.c      | 1 +
- include/linux/kernfs.h | 2 ++
- 3 files changed, 5 insertions(+)
-
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index db5900aaa..09d093e 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -634,6 +634,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 	if (ret < 0)
- 		goto err_out2;
- 	kn->ino = ret;
-+	kn->generation = atomic_inc_return(&root->next_generation);
- 
- 	atomic_set(&kn->count, 1);
- 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
-@@ -877,6 +878,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
- 
- 	ida_init(&root->ino_ida);
- 	INIT_LIST_HEAD(&root->supers);
-+	atomic_set(&root->next_generation, 0);
- 
- 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
- 			       KERNFS_DIR);
-diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
-index fb4b4a7..79cdae4 100644
---- a/fs/kernfs/inode.c
-+++ b/fs/kernfs/inode.c
-@@ -220,6 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
- 	inode->i_private = kn;
- 	inode->i_mapping->a_ops = &kernfs_aops;
- 	inode->i_op = &kernfs_iops;
-+	inode->i_generation = kn->generation;
- 
- 	set_default_inode_attr(inode, kn->mode);
- 	kernfs_refresh_inode(kn, inode);
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index a9b11b8..c5f0fa7 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -135,6 +135,7 @@ struct kernfs_node {
- 	umode_t			mode;
- 	unsigned int		ino;
- 	struct kernfs_iattrs	*iattr;
-+	u32			generation;
- };
- 
- /*
-@@ -170,6 +171,7 @@ struct kernfs_root {
- 	struct list_head	supers;
- 
- 	wait_queue_head_t	deactivate_waitq;
-+	atomic_t		next_generation;
- };
- 
- struct kernfs_open_file {
--- 
-2.9.3
+> ---
+>   drivers/mmc/core/block.c | 36 ++++++++++++++++++++----------------
+>   1 file changed, 20 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index 1ce6012ce3c1..d1b824e65590 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -566,14 +566,6 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
+>   	int err = 0, ioc_err = 0;
+>   	struct request *req;
+>   
+> -	/*
+> -	 * The caller must have CAP_SYS_RAWIO, and must be calling this on the
+> -	 * whole block device, not on a partition.  This prevents overspray
+> -	 * between sibling partitions.
+> -	 */
+> -	if ((!capable(CAP_SYS_RAWIO)) || (bdev != bdev->bd_contains))
+> -		return -EPERM;
+> -
+>   	idata = mmc_blk_ioctl_copy_from_user(ic_ptr);
+>   	if (IS_ERR(idata))
+>   		return PTR_ERR(idata);
+> @@ -626,14 +618,6 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
+>   	__u64 num_of_cmds;
+>   	struct request *req;
+>   
+> -	/*
+> -	 * The caller must have CAP_SYS_RAWIO, and must be calling this on the
+> -	 * whole block device, not on a partition.  This prevents overspray
+> -	 * between sibling partitions.
+> -	 */
+> -	if ((!capable(CAP_SYS_RAWIO)) || (bdev != bdev->bd_contains))
+> -		return -EPERM;
+> -
+>   	if (copy_from_user(&num_of_cmds, &user->num_of_cmds,
+>   			   sizeof(num_of_cmds)))
+>   		return -EFAULT;
+> @@ -697,14 +681,34 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
+>   	return ioc_err ? ioc_err : err;
+>   }
+>   
+> +static int mmc_blk_check_blkdev(struct block_device *bdev)
+> +{
+> +	/*
+> +	 * The caller must have CAP_SYS_RAWIO, and must be calling this on the
+> +	 * whole block device, not on a partition.  This prevents overspray
+> +	 * between sibling partitions.
+> +	 */
+> +	if ((!capable(CAP_SYS_RAWIO)) || (bdev != bdev->bd_contains))
+> +		return -EPERM;
+> +	return 0;
+> +}
+> +
+>   static int mmc_blk_ioctl(struct block_device *bdev, fmode_t mode,
+>   	unsigned int cmd, unsigned long arg)
+>   {
+> +	int ret;
+> +
+>   	switch (cmd) {
+>   	case MMC_IOC_CMD:
+> +		ret = mmc_blk_check_blkdev(bdev);
+> +		if (ret)
+> +			return ret;
+>   		return mmc_blk_ioctl_cmd(bdev,
+>   				(struct mmc_ioc_cmd __user *)arg);
+>   	case MMC_IOC_MULTI_CMD:
+> +		ret = mmc_blk_check_blkdev(bdev);
+> +		if (ret)
+> +			return ret;
+>   		return mmc_blk_ioctl_multi_cmd(bdev,
+>   				(struct mmc_ioc_multi_cmd __user *)arg);
+>   	default:
+> 
