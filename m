@@ -1,29 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:33871 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1753746AbdFPOal (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2017 10:30:41 -0400
-Subject: Re: [PATCH 0/2] Two fixes for loop devices
-To: NeilBrown <neilb@suse.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <149758925866.10006.12779875832895865043.stgit@noble>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <c70dfc69-516c-f1e8-4e39-74eff1bca176@fb.com>
-Date: Fri, 16 Jun 2017 08:29:28 -0600
+Received: from mx2.suse.de ([195.135.220.15]:34035 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750780AbdFPFDn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Jun 2017 01:03:43 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Fri, 16 Jun 2017 15:02:09 +1000
+Subject: [PATCH 0/2] Two fixes for loop devices
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149758925866.10006.12779875832895865043.stgit@noble>
 MIME-Version: 1.0
-In-Reply-To: <149758925866.10006.12779875832895865043.stgit@noble>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 06/15/2017 11:02 PM, NeilBrown wrote:
-> Hi Jens,
->  one of these is a resend of a patch I sent a while back.
->  The other is new - loop closes files differently from close()
->  and in a way that can confuse NFS.
+Hi Jens,
+ one of these is a resend of a patch I sent a while back.
+ The other is new - loop closes files differently from close()
+ and in a way that can confuse NFS.
 
-Are you wanting to get these into 4.12, or defer to 4.13?
+Thanks,
+NeilBrown
 
--- 
-Jens Axboe
+---
+
+NeilBrown (2):
+      loop: use filp_close() rather than fput()
+      loop: Add PF_LESS_THROTTLE to block/loop device thread.
+
+
+ drivers/block/loop.c |   14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+--
+Signature
