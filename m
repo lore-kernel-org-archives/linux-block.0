@@ -1,91 +1,109 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: axboe@kernel.dk
-Cc: viro@ZenIV.linux.org.uk,
-	hch@lst.de,
-	jack@suse.cz,
-	akpm@linux-foundation.org,
-	linux-block@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 05/10] fs: return if direct I/O will trigger writeback
-Date: Mon, 19 Jun 2017 11:33:43 -0500
-Message-Id: <20170619163348.15542-6-rgoldwyn@suse.de>
-In-Reply-To: <20170619163348.15542-1-rgoldwyn@suse.de>
-References: <20170619163348.15542-1-rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 02/11] block: add support for write hints in a bio
+Date: Fri, 16 Jun 2017 11:24:34 -0600
+Message-Id: <1497633883-21230-3-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
+References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+No functional changes in this patch, we just set aside 3 bits
+in the bio/request flags, which can be used to hold a WRITE_HINT_*
+life time hint.
 
-Find out if the I/O will trigger a wait due to writeback. If yes,
-return -EAGAIN.
+Ensure that we don't merge requests that have different life time
+hints assigned to them.
 
-Return -EINVAL for buffered AIO: there are multiple causes of
-delay such as page locks, dirty throttling logic, page loading
-from disk etc. which cannot be taken care of.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- mm/filemap.c | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ block/blk-merge.c         | 16 ++++++++++++++++
+ include/linux/blk_types.h | 15 +++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 9b39a2390b9e..742034e56100 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2070,10 +2070,17 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 		loff_t size;
- 
- 		size = i_size_read(inode);
--		retval = filemap_write_and_wait_range(mapping, iocb->ki_pos,
--					iocb->ki_pos + count - 1);
--		if (retval < 0)
--			goto out;
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (filemap_range_has_page(mapping, iocb->ki_pos,
-+						   iocb->ki_pos + count - 1))
-+				return -EAGAIN;
-+		} else {
-+			retval = filemap_write_and_wait_range(mapping,
-+						iocb->ki_pos,
-+					        iocb->ki_pos + count - 1);
-+			if (retval < 0)
-+				goto out;
-+		}
- 
- 		file_accessed(file);
- 
-@@ -2674,6 +2681,9 @@ inline ssize_t generic_write_checks(struct kiocb *iocb, struct iov_iter *from)
- 
- 	pos = iocb->ki_pos;
- 
-+	if ((iocb->ki_flags & IOCB_NOWAIT) && !(iocb->ki_flags & IOCB_DIRECT))
-+		return -EINVAL;
-+
- 	if (limit != RLIM_INFINITY) {
- 		if (iocb->ki_pos >= limit) {
- 			send_sig(SIGXFSZ, current, 0);
-@@ -2742,9 +2752,17 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
- 	write_len = iov_iter_count(from);
- 	end = (pos + write_len - 1) >> PAGE_SHIFT;
- 
--	written = filemap_write_and_wait_range(mapping, pos, pos + write_len - 1);
--	if (written)
--		goto out;
-+	if (iocb->ki_flags & IOCB_NOWAIT) {
-+		/* If there are pages to writeback, return */
-+		if (filemap_range_has_page(inode->i_mapping, pos,
-+					   pos + iov_iter_count(from)))
-+			return -EAGAIN;
-+	} else {
-+		written = filemap_write_and_wait_range(mapping, pos,
-+							pos + write_len - 1);
-+		if (written)
-+			goto out;
-+	}
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 3990ae406341..7d299df3b12b 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -693,6 +693,14 @@ static struct request *attempt_merge(struct request_queue *q,
+ 		return NULL;
  
  	/*
- 	 * After a write we want buffered reads to be sure to go to disk to get
++	 * Don't allow merge of different streams, or for a stream with
++	 * non-stream IO.
++	 */
++	if ((req->cmd_flags & REQ_WRITE_LIFE_MASK) !=
++	    (next->cmd_flags & REQ_WRITE_LIFE_MASK))
++		return NULL;
++
++	/*
+ 	 * If we are allowed to merge, then append bio list
+ 	 * from next to rq and release next. merge_requests_fn
+ 	 * will have updated segment counts, update sector
+@@ -811,6 +819,14 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 	    !blk_write_same_mergeable(rq->bio, bio))
+ 		return false;
+ 
++	/*
++	 * Don't allow merge of different streams, or for a stream with
++	 * non-stream IO.
++	 */
++	if ((rq->cmd_flags & REQ_WRITE_LIFE_MASK) !=
++	    (bio->bi_opf & REQ_WRITE_LIFE_MASK))
++		return false;
++
+ 	return true;
+ }
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 61339bc44400..0dd8d569d52f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/bvec.h>
++#include <linux/fs.h>
+ 
+ struct bio_set;
+ struct bio;
+@@ -201,6 +202,9 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++	__REQ_WRITE_HINT_SHIFT,	/* 3 bits for life time hint */
++	__REQ_WRITE_HINT_PAD1,
++	__REQ_WRITE_HINT_PAD2,
+ 
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+@@ -221,6 +225,12 @@ enum req_flag_bits {
+ #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
++#define REQ_WRITE_SHORT		(WRITE_LIFE_SHORT << __REQ_WRITE_HINT_SHIFT)
++#define REQ_WRITE_MEDIUM	(WRITE_LIFE_MEDIUM << __REQ_WRITE_HINT_SHIFT)
++#define REQ_WRITE_LONG		(WRITE_LIFE_LONG << __REQ_WRITE_HINT_SHIFT)
++#define REQ_WRITE_EXTREME	(WRITE_LIFE_EXTREME << __REQ_WRITE_HINT_SHIFT)
++
++#define REQ_WRITE_LIFE_MASK	(0x7 << __REQ_WRITE_HINT_SHIFT)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ 
+@@ -312,4 +322,9 @@ struct blk_rq_stat {
+ 	u64 batch;
+ };
+ 
++static inline unsigned int write_hint_to_opf(enum rw_hint hint)
++{
++	return hint << __REQ_WRITE_HINT_SHIFT;
++}
++
+ #endif /* __LINUX_BLK_TYPES_H */
 -- 
-2.12.0
+2.7.4
