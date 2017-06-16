@@ -1,103 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:61471 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751449AbdFFPVY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Jun 2017 11:21:24 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 00/12] blk-mq: fix & improve queue quiescing
-Date: Tue,  6 Jun 2017 23:20:48 +0800
-Message-Id: <20170606152048.22721-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Fri, 16 Jun 2017 10:54:55 +0200
+From: Jan Kara <jack@suse.cz>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Goldwyn Rodrigues <rgoldwyn@suse.de>, linux-fsdevel@vger.kernel.org,
+	jack@suse.com, hch@infradead.org, linux-block@vger.kernel.org,
+	axboe@kernel.dk, linux-api@vger.kernel.org, viro@zeniv.linux.org.uk
+Subject: Re: [PATCH 0/10 v12] No wait AIO
+Message-ID: <20170616085455.GQ1764@quack2.suse.cz>
+References: <20170615160002.17233-1-rgoldwyn@suse.de>
+ <20170615112528.7cbdfd6cdf26a5c13450acdf@linux-foundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170615112528.7cbdfd6cdf26a5c13450acdf@linux-foundation.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On Thu 15-06-17 11:25:28, Andrew Morton wrote:
+> On Thu, 15 Jun 2017 10:59:52 -0500 Goldwyn Rodrigues <rgoldwyn@suse.de> wrote:
+> 
+> > This series adds nonblocking feature to asynchronous I/O writes.
+> > io_submit() can be delayed because of a number of reason:
+> >  - Block allocation for files
+> >  - Data writebacks for direct I/O
+> >  - Sleeping because of waiting to acquire i_rwsem
+> >  - Congested block device
+> > 
+> > The goal of the patch series is to return -EAGAIN/-EWOULDBLOCK if
+> > any of these conditions are met. This way userspace can push most
+> > of the write()s to the kernel to the best of its ability to complete
+> > and if it returns -EAGAIN, can defer it to another thread.
+> > 
+> > In order to enable this, IOCB_RW_FLAG_NOWAIT is introduced in
+> > uapi/linux/aio_abi.h. If set for aio_rw_flags, it translates to
+> > IOCB_NOWAIT for struct iocb, REQ_NOWAIT for bio.bi_opf and IOMAP_NOWAIT for
+> > iomap. aio_rw_flags is a new flag replacing aio_reserved1. We could
+> > not use aio_flags because it is not currently checked for invalidity
+> > in the kernel.
+> > 
+> > This feature is provided for direct I/O of asynchronous I/O only. I have
+> > tested it against xfs, ext4, and btrfs while I intend to add more filesystems.
+> > The nowait feature is for request based devices. In the future, I intend to
+> > add support to stacked devices such as md.
+> > 
+> > Applications will have to check supportability by sending a async direct write
+> > and any other error besides -EAGAIN would mean it is not supported.
+> > 
+> 
+> How accurate it this?  For example, the changes to
+> generic_file_direct_write() appear to greatly reduce the chances of
+> blocking but there are surely race opportunities which will still
+> result in userspace unexpectedly experiencing blocking in a succeednig
+> write() call?
 
-There is one big issue in current blk_mq_quiesce_queue():
+Yes, so you are right that there are still possibilities for blocking -
+e.g. we could get blocked in reclaim when allocating memory somewhere. Now
+we hope what Goldwyn did will be enough for practical purposes as in the
+end this is an API to improve performance and so in the worst case app
+won't get the performance it expects (this just has to be rare enough that
+it all pays off in the end). Also if we spot some place that ends up to
+cause blocking in practice, we'll work on improving that...
+ 
+> If correct then I think there should be some discussion and perhaps
+> testing results in the changelog.
 
-    - in case of direct issue or BLK_MQ_S_START_ON_RUN, dispatch won't
-    be prevented after blk_mq_quiesce_queue() is returned.
+Probably we could add a note to the first paragraph of the changelog of
+patch 4/10 like: Note that we can still block (put the process submitting
+IO to sleep) in some rare cases like when there is not enough free memory
+or when acquiring some fs-internal sleeping locks.
 
+WRT test results, Goldwyn has some functional tests (for xfstests). We also
+have a customer that is working on testing the series with their workload
+however that will take some time given it requires updating their software
+stack. If you are looking for some synthetic benchmark results, I suppose
+we can put something together however it's going to be just a synthetic
+benchmark and as such the relevance is limited.
 
-The 1st two patches fix two problems in direct issue, please consider
-it for v4.12.
-
-The other 10 patches improves blk_mq_quiesce_queue(), and
-make is easy to use, and avoid race between queue restart and
-quiescing. These 10 patches should be for v4.13.
-
-One typical use case of blk_mq_quiesce_queue() is for canceling
-requests when queue is dead. Currently, only NVMe uses this API
-for canceling requests. Actually we have to quiesce queue first
-before canceling requests in other drivers too, such as NBD and
-mtip32xx,
-
-Another use case is for freezing device, for example, virtio-blk
-uses stopping queue in virtblk_freeze(), but that way isn't safe
-becasue dispatch still may happen after blk_mq_stop_hw_queues()
-returns.
-
-Unfortunately blk_mq_quiesce_queue() is implemented via stopping queue,
-we can't switch to blk_mq_quiesce_queue() simply in above cases because
-any queue restart in other pathes may break blk_mq_quiesce_queue().
-For example, we sometimes stops queue when hw can't handle too many
-ongoing requests and restarts queue after requests are completed.
-Meantime when we want to cancel requests if hardware is dead or need
-to suspend, quiescing has to be run first, then the restarting
-in complete path can break quiescing easily. This patch improves this
-interface via removing stopping queue, then it can be easier to use.
-
-V5:
-	- pass correct hctx to blk_mq_try_issue_directly()(patch 1)
-	- add more comment on blk_mq_stop_hw_queue() as suggested by Bart
-	- add Reviewed-by tag
-
-V4:
-	- introduce the 1st patch for fixing direct issue
-	- take Bart's suggestion to deal with quiescing in SCSI
-	- avoid to introduce waitqueue
-
-V3:
-	- wait until queue becomes unquiesced in direct issue path, so
-	we can avoid to queue the current req into sw queue or scheduler
-	queue, then the state of STOPPED needn't to be touched
-	- move checking of !blk_queue_quiesced() into blk_mq_sched_dispatch_requests()
-	as suggested by Bart
-	- NVMe: unquiesce queue in nvme_kill_queues()
-	- misc changes(fix grammer issue in commit log or comment, ...)
-
-V2:
-	- split patch "blk-mq: fix blk_mq_quiesce_queue" into two and
-  	fix one build issue when only applying the 1st two patches.
-	- add kernel oops and hang log into commit log
-	- add 'Revert "blk-mq: don't use sync workqueue flushing from drivers"'
-
-
-Ming Lei (12):
-  blk-mq: pass correct hctx to blk_mq_try_issue_directly
-  blk-mq: fix direct issue
-  blk-mq: move blk_mq_quiesce_queue() into include/linux/blk-mq.h
-  blk-mq: introduce blk_mq_quiesce_queue_nowait()
-  blk-mq: introduce blk_mq_unquiesce_queue
-  blk-mq: use the introduced blk_mq_unquiesce_queue()
-  nvme: host: unquiesce queue in nvme_kill_queues()
-  blk-mq: use QUEUE_FLAG_QUIESCED to quiesce queue
-  blk-mq: update comments on blk_mq_quiesce_queue()
-  blk-mq: don't stop queue for quiescing
-  blk-mq: clarify dispatch may not be drained/blocked by stopping queue
-  Revert "blk-mq: don't use sync workqueue flushing from drivers"
-
- block/blk-mq-sched.c     |  3 +-
- block/blk-mq.c           | 93 ++++++++++++++++++++++++++++++++----------------
- drivers/md/dm-rq.c       |  2 +-
- drivers/nvme/host/core.c |  8 ++++-
- drivers/scsi/scsi_lib.c  |  4 +--
- include/linux/blk-mq.h   | 12 +++++++
- include/linux/blkdev.h   |  3 +-
- 7 files changed, 89 insertions(+), 36 deletions(-)
-
+								Honza
 -- 
-2.9.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
