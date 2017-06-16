@@ -1,5 +1,5 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Al Viro <viro@ZenIV.linux.org.uk>,
 	Jan Kara <jack@suse.cz>,
@@ -16,81 +16,101 @@ Cc: Carlos Maiolino <cmaiolino@redhat.com>,
 	Eryu Guan <eguan@redhat.com>,
 	David Howells <dhowells@redhat.com>,
 	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-ext4@vger.kernel.org,
 	linux-xfs@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v8 11/18] mm: set both AS_EIO/AS_ENOSPC and errseq_t in mapping_set_error
-Date: Thu, 29 Jun 2017 09:19:47 -0400
-Message-Id: <20170629131954.28733-12-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
+Subject: [PATCH v7 07/22] mm: don't TestClearPageError in __filemap_fdatawait_range
+Date: Fri, 16 Jun 2017 15:34:12 -0400
+Message-Id: <20170616193427.13955-8-jlayton@redhat.com>
+In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
+References: <20170616193427.13955-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+The -EIO returned here can end up overriding whatever error is marked in
+the address space, and be returned at fsync time, even when there is a
+more appropriate error stored in the mapping.
 
-When a writeback error occurs, we want later callers to be able to pick
-up that fact when they go to wait on that writeback to complete.
-Traditionally, we've used AS_EIO/AS_ENOSPC flags to track that, but
-that's problematic since only one "checker" will be informed when an
-error occurs.
+Read errors are also sometimes tracked on a per-page level using
+PG_error. Suppose we have a read error on a page, and then that page is
+subsequently dirtied by overwriting the whole page. Writeback doesn't
+clear PG_error, so we can then end up successfully writing back that
+page and still return -EIO on fsync.
 
-In later patches, we're going to want to convert many of these callers
-to check for errors since a well-defined point in time. For now, ensure
-that we can handle both sorts of checks by both setting errors in both
-places when there is a writeback failure.
+Worse yet, PG_error is cleared during a sync() syscall, but the -EIO
+return from that is silently discarded. Any subsystem that is relying on
+PG_error to report errors during fsync can easily lose writeback errors
+due to this. All you need is a stray sync() call to wait for writeback
+to complete and you've lost the error.
+
+Since the handling of the PG_error flag is somewhat inconsistent across
+subsystems, let's just rely on marking the address space when there are
+writeback errors. Change the TestClearPageError call to ClearPageError,
+and make __filemap_fdatawait_range a void return function.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- include/linux/pagemap.h | 31 +++++++++++++++++++++++++------
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ mm/filemap.c | 20 +++++---------------
+ 1 file changed, 5 insertions(+), 15 deletions(-)
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 316a19f6b635..28acc94e0f81 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -28,14 +28,33 @@ enum mapping_flags {
- 	AS_NO_WRITEBACK_TAGS = 5,
- };
+diff --git a/mm/filemap.c b/mm/filemap.c
+index c349a5d3a34b..21e65c6ef1a0 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -388,17 +388,16 @@ int filemap_flush(struct address_space *mapping)
+ }
+ EXPORT_SYMBOL(filemap_flush);
  
-+/**
-+ * mapping_set_error - record a writeback error in the address_space
-+ * @mapping - the mapping in which an error should be set
-+ * @error - the error to set in the mapping
-+ *
-+ * When writeback fails in some way, we must record that error so that
-+ * userspace can be informed when fsync and the like are called.  We endeavor
-+ * to report errors on any file that was open at the time of the error.  Some
-+ * internal callers also need to know when writeback errors have occurred.
-+ *
-+ * When a writeback error occurs, most filesystems will want to call
-+ * mapping_set_error to record the error in the mapping so that it can be
-+ * reported when the application calls fsync(2).
-+ */
- static inline void mapping_set_error(struct address_space *mapping, int error)
+-static int __filemap_fdatawait_range(struct address_space *mapping,
++static void __filemap_fdatawait_range(struct address_space *mapping,
+ 				     loff_t start_byte, loff_t end_byte)
  {
--	if (unlikely(error)) {
--		if (error == -ENOSPC)
--			set_bit(AS_ENOSPC, &mapping->flags);
--		else
--			set_bit(AS_EIO, &mapping->flags);
--	}
-+	if (likely(!error))
+ 	pgoff_t index = start_byte >> PAGE_SHIFT;
+ 	pgoff_t end = end_byte >> PAGE_SHIFT;
+ 	struct pagevec pvec;
+ 	int nr_pages;
+-	int ret = 0;
+ 
+ 	if (end_byte < start_byte)
+-		goto out;
 +		return;
-+
-+	/* Record in wb_err for checkers using errseq_t based tracking */
-+	filemap_set_wb_err(mapping, error);
-+
-+	/* Record it in flags for now, for legacy callers */
-+	if (error == -ENOSPC)
-+		set_bit(AS_ENOSPC, &mapping->flags);
-+	else
-+		set_bit(AS_EIO, &mapping->flags);
+ 
+ 	pagevec_init(&pvec, 0);
+ 	while ((index <= end) &&
+@@ -415,14 +414,11 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 				continue;
+ 
+ 			wait_on_page_writeback(page);
+-			if (TestClearPageError(page))
+-				ret = -EIO;
++			ClearPageError(page);
+ 		}
+ 		pagevec_release(&pvec);
+ 		cond_resched();
+ 	}
+-out:
+-	return ret;
  }
  
- static inline void mapping_set_unevictable(struct address_space *mapping)
+ /**
+@@ -442,14 +438,8 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
+ 			    loff_t end_byte)
+ {
+-	int ret, ret2;
+-
+-	ret = __filemap_fdatawait_range(mapping, start_byte, end_byte);
+-	ret2 = filemap_check_errors(mapping);
+-	if (!ret)
+-		ret = ret2;
+-
+-	return ret;
++	__filemap_fdatawait_range(mapping, start_byte, end_byte);
++	return filemap_check_errors(mapping);
+ }
+ EXPORT_SYMBOL(filemap_fdatawait_range);
+ 
 -- 
 2.13.0
