@@ -1,42 +1,60 @@
-Return-Path: <BATV+8132ee8c7e24eb087ca3+5055+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] nvme: allocate queues for all possible CPUs
-Date: Mon, 26 Jun 2017 12:20:58 +0200
-Message-Id: <20170626102058.10200-4-hch@lst.de>
-In-Reply-To: <20170626102058.10200-1-hch@lst.de>
-References: <20170626102058.10200-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [xfstests PATCH v5 2/5] ext3: allow it to put journal on a separate device when doing scratch_mkfs
+Date: Fri, 16 Jun 2017 15:36:16 -0400
+Message-Id: <20170616193619.14576-3-jlayton@redhat.com>
+In-Reply-To: <20170616193619.14576-1-jlayton@redhat.com>
+References: <20170616193619.14576-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Unlike most drіvers that simply pass the maximum possible vectors to
-pci_alloc_irq_vectors NVMe needs to configure the device before allocting
-the vectors, so it needs a manual update for the new scheme of using
-all present CPUs.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/nvme/host/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ common/rc | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 951042a375d6..b3dcd7abc6d7 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1525,7 +1525,7 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 	int result, nr_io_queues, size;
- 
--	nr_io_queues = num_online_cpus();
-+	nr_io_queues = num_present_cpus();
- 	result = nvme_set_queue_count(&dev->ctrl, &nr_io_queues);
- 	if (result < 0)
- 		return result;
+diff --git a/common/rc b/common/rc
+index 57001b47a8b7..43e160e91360 100644
+--- a/common/rc
++++ b/common/rc
+@@ -840,7 +840,16 @@ _scratch_mkfs()
+ 		mkfs_cmd="$MKFS_BTRFS_PROG"
+ 		mkfs_filter="cat"
+ 		;;
+-	ext2|ext3)
++	ext3)
++		mkfs_cmd="$MKFS_PROG -t $FSTYP -- -F"
++		mkfs_filter="grep -v -e ^Warning: -e \"^mke2fs \""
++
++		# put journal on separate device?
++		[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
++		$mkfs_cmd -O journal_dev $MKFS_OPTIONS $SCRATCH_LOGDEV && \
++		mkfs_cmd="$mkfs_cmd -J device=$SCRATCH_LOGDEV"
++		;;
++	ext2)
+ 		mkfs_cmd="$MKFS_PROG -t $FSTYP -- -F"
+ 		mkfs_filter="grep -v -e ^Warning: -e \"^mke2fs \""
+ 		;;
 -- 
-2.11.0
+2.13.0
