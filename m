@@ -1,95 +1,177 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
 	linux-ext4@vger.kernel.org,
 	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 02/10] fs: Introduce filemap_range_has_page()
-Date: Mon,  5 Jun 2017 00:35:32 -0500
-Message-Id: <20170605053540.19393-3-rgoldwyn@suse.de>
-In-Reply-To: <20170605053540.19393-1-rgoldwyn@suse.de>
-References: <20170605053540.19393-1-rgoldwyn@suse.de>
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v7 18/22] fs: add f_md_wb_err field to struct file for tracking metadata errors
+Date: Fri, 16 Jun 2017 15:34:23 -0400
+Message-Id: <20170616193427.13955-19-jlayton@redhat.com>
+In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
+References: <20170616193427.13955-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Some filesystems keep a different mapping for metadata writeback. Add a
+second errseq_t to struct file for tracking metadata writeback errors.
+Also add a new function for checking a mapping of the caller's choosing
+vs. the f_md_wb_err value.
 
-filemap_range_has_page() return true if the file's mapping has
-a page within the range mentioned. This function will be used
-to check if a write() call will cause a writeback of previous
-writes.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- include/linux/fs.h |  2 ++
- mm/filemap.c       | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ include/linux/fs.h             |  3 +++
+ include/trace/events/filemap.h | 23 ++++++++++-------------
+ mm/filemap.c                   | 40 +++++++++++++++++++++++++++++++---------
+ 3 files changed, 44 insertions(+), 22 deletions(-)
 
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index f53867140f43..dc0ab585cd56 100644
+index 8980e5ce2063..8f6319981b8b 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -2517,6 +2517,8 @@ extern int filemap_fdatawait(struct address_space *);
- extern void filemap_fdatawait_keep_errors(struct address_space *);
- extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
- 				   loff_t lend);
-+extern int filemap_range_has_page(struct address_space *, loff_t lstart,
-+				  loff_t lend);
- extern int filemap_write_and_wait(struct address_space *mapping);
- extern int filemap_write_and_wait_range(struct address_space *mapping,
- 				        loff_t lstart, loff_t lend);
+@@ -872,6 +872,7 @@ struct file {
+ 	struct list_head	f_tfile_llink;
+ #endif /* #ifdef CONFIG_EPOLL */
+ 	struct address_space	*f_mapping;
++	errseq_t		f_md_wb_err; /* optional metadata wb error tracking */
+ } __attribute__((aligned(4)));	/* lest something weird decides that 2 is OK */
+ 
+ struct file_handle {
+@@ -2525,6 +2526,8 @@ extern int filemap_fdatawrite_range(struct address_space *mapping,
+ extern int filemap_check_errors(struct address_space *mapping);
+ 
+ extern int __must_check filemap_report_wb_err(struct file *file);
++extern int __must_check filemap_report_md_wb_err(struct file *file,
++					struct address_space *mapping);
+ extern void __filemap_set_wb_err(struct address_space *mapping, int err);
+ 
+ /**
+diff --git a/include/trace/events/filemap.h b/include/trace/events/filemap.h
+index 2af66920f267..6e0d78c01a2e 100644
+--- a/include/trace/events/filemap.h
++++ b/include/trace/events/filemap.h
+@@ -79,12 +79,11 @@ TRACE_EVENT(filemap_set_wb_err,
+ );
+ 
+ TRACE_EVENT(filemap_report_wb_err,
+-		TP_PROTO(struct file *file, errseq_t old),
++		TP_PROTO(struct address_space *mapping, errseq_t old, errseq_t new),
+ 
+-		TP_ARGS(file, old),
++		TP_ARGS(mapping, old, new),
+ 
+ 		TP_STRUCT__entry(
+-			__field(struct file *, file);
+ 			__field(unsigned long, i_ino)
+ 			__field(dev_t, s_dev)
+ 			__field(errseq_t, old)
+@@ -92,20 +91,18 @@ TRACE_EVENT(filemap_report_wb_err,
+ 		),
+ 
+ 		TP_fast_assign(
+-			__entry->file = file;
+-			__entry->i_ino = file->f_mapping->host->i_ino;
+-			if (file->f_mapping->host->i_sb)
+-				__entry->s_dev = file->f_mapping->host->i_sb->s_dev;
++			__entry->i_ino = mapping->host->i_ino;
++			if (mapping->host->i_sb)
++				__entry->s_dev = mapping->host->i_sb->s_dev;
+ 			else
+-				__entry->s_dev = file->f_mapping->host->i_rdev;
++				__entry->s_dev = mapping->host->i_rdev;
+ 			__entry->old = old;
+-			__entry->new = file->f_wb_err;
++			__entry->new = new;
+ 		),
+ 
+-		TP_printk("file=%p dev=%d:%d ino=0x%lx old=0x%x new=0x%x",
+-			__entry->file, MAJOR(__entry->s_dev),
+-			MINOR(__entry->s_dev), __entry->i_ino, __entry->old,
+-			__entry->new)
++		TP_printk("dev=%d:%d ino=0x%lx old=0x%x new=0x%x",
++			MAJOR(__entry->s_dev), MINOR(__entry->s_dev),
++			__entry->i_ino, __entry->old, __entry->new)
+ );
+ #endif /* _TRACE_FILEMAP_H */
+ 
 diff --git a/mm/filemap.c b/mm/filemap.c
-index 6f1be573a5e6..87aba7698584 100644
+index 879623032016..b0aef0a1ec46 100644
 --- a/mm/filemap.c
 +++ b/mm/filemap.c
-@@ -376,6 +376,39 @@ int filemap_flush(struct address_space *mapping)
- }
- EXPORT_SYMBOL(filemap_flush);
- 
-+/**
-+ * filemap_range_has_page - check if a page exists in range.
-+ * @mapping:           address space structure to wait for
-+ * @start_byte:        offset in bytes where the range starts
-+ * @end_byte:          offset in bytes where the range ends (inclusive)
-+ *
-+ * Find at least one page in the range supplied, usually used to check if
-+ * direct writing in this range will trigger a writeback.
-+ */
-+int filemap_range_has_page(struct address_space *mapping,
-+			   loff_t start_byte, loff_t end_byte)
-+{
-+	pgoff_t index = start_byte >> PAGE_SHIFT;
-+	pgoff_t end = end_byte >> PAGE_SHIFT;
-+	struct pagevec pvec;
-+	int ret;
-+
-+	if (end_byte < start_byte)
-+		return 0;
-+
-+	if (mapping->nrpages == 0)
-+		return 0;
-+
-+	pagevec_init(&pvec, 0);
-+	ret = pagevec_lookup(&pvec, mapping, index, 1);
-+	if (!ret)
-+		return 0;
-+	ret = (pvec.pages[0]->index <= end);
-+	pagevec_release(&pvec);
-+	return ret;
-+}
-+EXPORT_SYMBOL(filemap_range_has_page);
-+
- static int __filemap_fdatawait_range(struct address_space *mapping,
- 				     loff_t start_byte, loff_t end_byte)
+@@ -584,27 +584,49 @@ EXPORT_SYMBOL(__filemap_set_wb_err);
+  * value is protected by the f_lock since we must ensure that it reflects
+  * the latest value swapped in for this file descriptor.
+  */
+-int filemap_report_wb_err(struct file *file)
++static int __filemap_report_wb_err(errseq_t *cursor, spinlock_t *lock,
++				struct address_space *mapping)
  {
+ 	int err = 0;
+-	errseq_t old = READ_ONCE(file->f_wb_err);
+-	struct address_space *mapping = file->f_mapping;
++	errseq_t old = READ_ONCE(*cursor);
+ 
+ 	/* Locklessly handle the common case where nothing has changed */
+ 	if (errseq_check(&mapping->wb_err, old)) {
+ 		/* Something changed, must use slow path */
+-		spin_lock(&file->f_lock);
+-		old = file->f_wb_err;
+-		err = errseq_check_and_advance(&mapping->wb_err,
+-						&file->f_wb_err);
+-		trace_filemap_report_wb_err(file, old);
+-		spin_unlock(&file->f_lock);
++		spin_lock(lock);
++		old = *cursor;
++		err = errseq_check_and_advance(&mapping->wb_err, cursor);
++		trace_filemap_report_wb_err(mapping, old, *cursor);
++		spin_unlock(lock);
+ 	}
+ 	return err;
+ }
++EXPORT_SYMBOL(__filemap_report_wb_err);
++
++int filemap_report_wb_err(struct file *file)
++{
++	return __filemap_report_wb_err(&file->f_wb_err, &file->f_lock,
++					file->f_mapping);
++}
+ EXPORT_SYMBOL(filemap_report_wb_err);
+ 
+ /**
++ * filemap_report_md_wb_err - report wb error (if any) that was previously set
++ * @file: struct file on which the error is being reported
++ * @mapping: pointer to metadata mapping to check
++ *
++ * Many filesystems keep inode metadata in the pagecache, and will use the
++ * cache to write it back to the backing store. This function is for these
++ * callers to track metadata writeback.
++ */
++int filemap_report_md_wb_err(struct file *file, struct address_space *mapping)
++{
++	return __filemap_report_wb_err(&file->f_md_wb_err, &file->f_lock,
++					mapping);
++}
++EXPORT_SYMBOL(filemap_report_md_wb_err);
++
++/**
+  * replace_page_cache_page - replace a pagecache page with a new one
+  * @old:	page to be replaced
+  * @new:	page to replace with
 -- 
-2.12.0
+2.13.0
