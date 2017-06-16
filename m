@@ -1,52 +1,24 @@
-Return-Path: <zwp10758@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:51409 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751956AbdFPGoa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Jun 2017 02:44:30 -0400
+Date: Thu, 15 Jun 2017 23:44:28 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: fstests@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/9] block: T10/DIF Fixes and cleanups v4
+Message-ID: <20170616064428.GA4935@infradead.org>
+References: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
 MIME-Version: 1.0
-From: Erics Di <zwp10758@gmail.com>
-Date: Thu, 22 Jun 2017 17:29:14 +0800
-Message-ID: <CAA70yB4PT=uPio1owQ7AaBnZABid92ywRUcX7kzEqiTGGJJeMw@mail.gmail.com>
-Subject: [PATCH] blk-mq: remove double set queue_num
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1494429652-9488-1-git-send-email-dmonakhov@openvz.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-hwctx's queue_num has been set prior call blk_mq_init_hctx, so no need
+Hi Dmitry,
 
-set it again.
-
-
-Signed-off-by: weiping <zhangweiping@didichuxing.com>
-
----
-
- block/blk-mq.c | 1 -
-
- 1 file changed, 1 deletion(-)
-
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-
-index bb66c96..adcb79c 100644
-
---- a/block/blk-mq.c
-
-+++ b/block/blk-mq.c
-
-@@ -1900,7 +1900,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
-
-  spin_lock_init(&hctx->lock);
-
-  INIT_LIST_HEAD(&hctx->dispatch);
-
-  hctx->queue = q;
-
-- hctx->queue_num = hctx_idx;
-
-  hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
-
-
-
-  cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
-
--- 
-
-1.8.3.1
+can you resend the remaining patches relative to Jens' for-4.13/block
+branch.
