@@ -1,22 +1,17 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: Dedicated error code fixups
+Return-Path: <hch@lst.de>
+Date: Fri, 16 Jun 2017 17:45:07 +0200
+From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: Dedicated error code fixups
+Message-ID: <20170616154507.GA32498@lst.de>
 References: <20170613150733.9245-1-bart.vanassche@sandisk.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6a5e96c9-265a-14dd-9c49-86e5c17c0e1b@kernel.dk>
-Date: Fri, 16 Jun 2017 09:47:50 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170613150733.9245-1-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/13/2017 09:07 AM, Bart Van Assche wrote:
-> This patch fixes two sparse warnings introduced by the "dedicated
-> error codes for the block layer V3" patch series. These changes
-> have not been tested.
+Looks fine,
 
-Added, thanks Bart.
-
--- 
-Jens Axboe
+Reviewed-by: Christoph Hellwig <hch@lst.de>
