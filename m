@@ -7,10 +7,10 @@ Cc: adilger@dilger.ca,
 	martin.petersen@oracle.com,
 	Jens Axboe <axboe@kernel.dk>
 Subject: [PATCH 09/11] xfs: add support for passing in write hints for buffered writes
-Date: Sat, 17 Jun 2017 13:59:52 -0600
-Message-Id: <1497729594-4707-10-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
+Date: Fri, 16 Jun 2017 11:24:41 -0600
+Message-Id: <1497633883-21230-10-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
+References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 Reviewed-by: Andreas Dilger <adilger@dilger.ca>
