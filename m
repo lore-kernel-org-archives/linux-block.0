@@ -22,52 +22,69 @@ Cc: Carlos Maiolino <cmaiolino@redhat.com>,
 	linux-xfs@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v7 22/22] btrfs: minimal conversion to errseq_t writeback error reporting on fsync
-Date: Fri, 16 Jun 2017 15:34:27 -0400
-Message-Id: <20170616193427.13955-23-jlayton@redhat.com>
+Subject: [PATCH v7 17/22] ext4: use errseq_t based error handling for reporting data writeback errors
+Date: Fri, 16 Jun 2017 15:34:22 -0400
+Message-Id: <20170616193427.13955-18-jlayton@redhat.com>
 In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
 References: <20170616193427.13955-1-jlayton@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Just check and advance the errseq_t in the file before returning.
-Internal callers of filemap_* functions are left as-is.
+Add a call to filemap_report_wb_err at the end of ext4_sync_file. This
+will ensure that we check and advance the errseq_t in the file, which
+allows us to track and report errors on all open fds when they occur.
+
+Note that metadata writeback errors are not yet reported on all fds at
+this point. That will be added in a later patch.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- fs/btrfs/file.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ fs/ext4/fsync.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 0f102a1b851f..609226beea43 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -2017,7 +2017,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	struct btrfs_root *root = BTRFS_I(inode)->root;
- 	struct btrfs_trans_handle *trans;
- 	struct btrfs_log_ctx ctx;
--	int ret = 0;
-+	int ret = 0, err;
- 	bool full_sync = 0;
- 	u64 len;
+diff --git a/fs/ext4/fsync.c b/fs/ext4/fsync.c
+index 9d549608fd30..03d6259d8662 100644
+--- a/fs/ext4/fsync.c
++++ b/fs/ext4/fsync.c
+@@ -100,8 +100,10 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+ 	tid_t commit_tid;
+ 	bool needs_barrier = false;
  
-@@ -2036,7 +2036,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	 */
- 	ret = start_ordered_ops(inode, start, end);
+-	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
+-		return -EIO;
++	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb)))) {
++		ret = -EIO;
++		goto out;
++	}
+ 
+ 	J_ASSERT(ext4_journal_current_handle() == NULL);
+ 
+@@ -126,7 +128,8 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+ 
+ 	ret = filemap_write_and_wait_range(inode->i_mapping, start, end);
  	if (ret)
 -		return ret;
 +		goto out;
- 
- 	inode_lock(inode);
- 	atomic_inc(&root->log_batch);
-@@ -2233,6 +2233,9 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 		ret = btrfs_end_transaction(trans);
++
+ 	/*
+ 	 * data=writeback,ordered:
+ 	 *  The caller's filemap_fdatawrite()/wait will sync the data.
+@@ -152,12 +155,16 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+ 		needs_barrier = true;
+ 	ret = jbd2_complete_transaction(journal, commit_tid);
+ 	if (needs_barrier) {
+-	issue_flush:
++issue_flush:
+ 		err = blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL, NULL);
+ 		if (!ret)
+ 			ret = err;
  	}
  out:
++	/* Was there a writeback error of the data since last fsync? */
 +	err = filemap_report_wb_err(file);
 +	if (!ret)
 +		ret = err;
- 	return ret > 0 ? -EIO : ret;
+ 	trace_ext4_sync_file_exit(inode, ret);
+ 	return ret;
  }
- 
 -- 
 2.13.0
