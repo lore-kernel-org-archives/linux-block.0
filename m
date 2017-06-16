@@ -1,224 +1,102 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44863 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752538AbdFREj4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:39:56 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:57 +1000
-Subject: [PATCH 03/13] blk: make the bioset rescue_workqueue optional.
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073739.23258.6283209848327868549.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Omar Sandoval <osandov@fb.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 03/10] blk-mq: remove blk_mq_sched_{get,put}_rq_priv
+Date: Fri, 16 Jun 2017 18:15:20 +0200
+Message-Id: <20170616161527.17649-4-hch@lst.de>
+In-Reply-To: <20170616161527.17649-1-hch@lst.de>
+References: <20170616161527.17649-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch converts bioset_create() to not create a workqueue by
-default, so alloctions will never trigger punt_bios_to_rescuer().  It
-also introduces a new flag BIOSET_NEED_RESCUER which tells
-bioset_create() to preserve the old behavior.
+Having these as separate helpers in a header really does not help
+readability, or my chances to refactor this code sanely.
 
-All callers of bioset_create() that are inside block device drivers,
-are given the BIOSET_NEED_RESCUER flag.
-
-biosets used by filesystems or other top-level users do not
-need rescuing as the bio can never be queued behind other
-bios.  This includes fs_bio_set, blkdev_dio_pool,
-btrfs_bioset, xfs_ioend_bioset, and one allocated by
-target_core_iblock.c.
-
-biosets used by md/raid do not need rescuing as
-their usage was recently audited and revised to never
-risk deadlock.
-
-It is hoped that most, if not all, of the remaining biosets
-can end up being the non-rescued version.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Credit-to: Ming Lei <ming.lei@redhat.com> (minor fixes)
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c                    |   13 +++++++++++--
- block/blk-core.c               |    3 ++-
- drivers/block/drbd/drbd_main.c |    4 +++-
- drivers/md/bcache/super.c      |    8 ++++++--
- drivers/md/dm-crypt.c          |    3 ++-
- drivers/md/dm-io.c             |    3 ++-
- drivers/md/dm.c                |    5 +++--
- include/linux/bio.h            |    1 +
- 8 files changed, 30 insertions(+), 10 deletions(-)
+ block/blk-mq-sched.c | 10 ++++++----
+ block/blk-mq-sched.h | 21 ---------------------
+ block/blk-mq.c       |  3 ++-
+ 3 files changed, 8 insertions(+), 26 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index f81545ba44bf..36984bf382c7 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -363,6 +363,8 @@ static void punt_bios_to_rescuer(struct bio_set *bs)
- 	struct bio_list punt, nopunt;
- 	struct bio *bio;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 62db188595dc..22601e5c6f19 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -36,6 +36,7 @@ static void __blk_mq_sched_assign_ioc(struct request_queue *q,
+ 				      struct bio *bio,
+ 				      struct io_context *ioc)
+ {
++	struct elevator_queue *e = q->elevator;
+ 	struct io_cq *icq;
  
-+	if (WARN_ON_ONCE(!bs->rescue_workqueue))
-+		return;
- 	/*
- 	 * In order to guarantee forward progress we must punt only bios that
- 	 * were allocated from this bio_set; otherwise, if there was a bio on
-@@ -474,7 +476,8 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
- 
- 		if (current->bio_list &&
- 		    (!bio_list_empty(&current->bio_list[0]) ||
--		     !bio_list_empty(&current->bio_list[1])))
-+		     !bio_list_empty(&current->bio_list[1])) &&
-+		    bs->rescue_workqueue)
- 			gfp_mask &= ~__GFP_DIRECT_RECLAIM;
- 
- 		p = mempool_alloc(bs->bio_pool, gfp_mask);
-@@ -1925,7 +1928,8 @@ EXPORT_SYMBOL(bioset_free);
-  * bioset_create  - Create a bio_set
-  * @pool_size:	Number of bio and bio_vecs to cache in the mempool
-  * @front_pad:	Number of bytes to allocate in front of the returned bio
-- * @flags:	Flags to modify behavior, currently only %BIOSET_NEED_BVECS
-+ * @flags:	Flags to modify behavior, currently %BIOSET_NEED_BVECS
-+ *              and %BIOSET_NEED_RESCUER
-  *
-  * Description:
-  *    Set up a bio_set to be used with @bio_alloc_bioset. Allows the caller
-@@ -1936,6 +1940,8 @@ EXPORT_SYMBOL(bioset_free);
-  *    or things will break badly.
-  *    If %BIOSET_NEED_BVECS is set in @flags, a separate pool will be allocated
-  *    for allocating iovecs.  This pool is not needed e.g. for bio_clone_fast().
-+ *    If %BIOSET_NEED_RESCUER is set, a workqueue is created which can be used to
-+ *    dispatch queued requests when the mempool runs out of space.
-  *
-  */
- struct bio_set *bioset_create(unsigned int pool_size,
-@@ -1971,6 +1977,9 @@ struct bio_set *bioset_create(unsigned int pool_size,
- 			goto bad;
+ 	spin_lock_irq(q->queue_lock);
+@@ -49,13 +50,14 @@ static void __blk_mq_sched_assign_ioc(struct request_queue *q,
  	}
  
-+	if (!(flags & BIOSET_NEED_RESCUER))
-+		return bs;
-+
- 	bs->rescue_workqueue = alloc_workqueue("bioset", WQ_MEM_RECLAIM, 0);
- 	if (!bs->rescue_workqueue)
- 		goto bad;
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 62cf92550512..9bd10c46a538 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -790,7 +790,8 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	if (q->id < 0)
- 		goto fail_q;
- 
--	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
-+	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, (BIOSET_NEED_BVECS |
-+							BIOSET_NEED_RESCUER));
- 	if (!q->bio_split)
- 		goto fail_id;
- 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index b395fe391171..bdf51b6977cf 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -2165,7 +2165,9 @@ static int drbd_create_mempools(void)
- 		goto Enomem;
- 
- 	/* mempools */
--	drbd_md_io_bio_set = bioset_create(DRBD_MIN_POOL_PAGES, 0, BIOSET_NEED_BVECS);
-+	drbd_md_io_bio_set = bioset_create(DRBD_MIN_POOL_PAGES, 0,
-+					   BIOSET_NEED_BVECS |
-+					   BIOSET_NEED_RESCUER);
- 	if (drbd_md_io_bio_set == NULL)
- 		goto Enomem;
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index abd6e825b39b..8352fad765f6 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -782,7 +782,9 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 
- 	minor *= BCACHE_MINORS;
- 
--	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio), BIOSET_NEED_BVECS)) ||
-+	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio),
-+					   BIOSET_NEED_BVECS |
-+					   BIOSET_NEED_RESCUER)) ||
- 	    !(d->disk = alloc_disk(BCACHE_MINORS))) {
- 		ida_simple_remove(&bcache_minor, minor);
- 		return -ENOMEM;
-@@ -1516,7 +1518,9 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 				sizeof(struct bbio) + sizeof(struct bio_vec) *
- 				bucket_pages(c))) ||
- 	    !(c->fill_iter = mempool_create_kmalloc_pool(1, iter_size)) ||
--	    !(c->bio_split = bioset_create(4, offsetof(struct bbio, bio), BIOSET_NEED_BVECS)) ||
-+	    !(c->bio_split = bioset_create(4, offsetof(struct bbio, bio),
-+					   BIOSET_NEED_BVECS |
-+					   BIOSET_NEED_RESCUER)) ||
- 	    !(c->uuids = alloc_bucket_pages(GFP_KERNEL, c)) ||
- 	    !(c->moving_gc_wq = alloc_workqueue("bcache_gc",
- 						WQ_MEM_RECLAIM, 0)) ||
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 237ff8e9752a..9e1b72e8f7ef 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -2677,7 +2677,8 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		goto bad;
+ 	rq->elv.icq = icq;
+-	if (!blk_mq_sched_get_rq_priv(q, rq, bio)) {
+-		rq->rq_flags |= RQF_ELVPRIV;
+-		get_io_context(icq->ioc);
++	if (e && e->type->ops.mq.get_rq_priv &&
++	    e->type->ops.mq.get_rq_priv(q, rq, bio)) {
++		rq->elv.icq = NULL;
+ 		return;
  	}
  
--	cc->bs = bioset_create(MIN_IOS, 0, BIOSET_NEED_BVECS);
-+	cc->bs = bioset_create(MIN_IOS, 0, (BIOSET_NEED_BVECS |
-+					    BIOSET_NEED_RESCUER));
- 	if (!cc->bs) {
- 		ti->error = "Cannot allocate crypt bioset";
- 		goto bad;
-diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-index 5c4121024d92..81248a8a8b57 100644
---- a/drivers/md/dm-io.c
-+++ b/drivers/md/dm-io.c
-@@ -58,7 +58,8 @@ struct dm_io_client *dm_io_client_create(void)
- 	if (!client->pool)
- 		goto bad;
+-	rq->elv.icq = NULL;
++	rq->rq_flags |= RQF_ELVPRIV;
++	get_io_context(icq->ioc);
+ }
  
--	client->bios = bioset_create(min_ios, 0, BIOSET_NEED_BVECS);
-+	client->bios = bioset_create(min_ios, 0, (BIOSET_NEED_BVECS |
-+						  BIOSET_NEED_RESCUER));
- 	if (!client->bios)
- 		goto bad;
+ void blk_mq_sched_assign_ioc(struct request_queue *q, struct request *rq,
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 5d12529538d0..f34e6a522105 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -44,27 +44,6 @@ blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+ 	return __blk_mq_sched_bio_merge(q, bio);
+ }
  
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 3394a311de3d..fbd06b9f9467 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1036,7 +1036,8 @@ static void flush_current_bio_list(struct blk_plug_cb *cb, bool from_schedule)
+-static inline int blk_mq_sched_get_rq_priv(struct request_queue *q,
+-					   struct request *rq,
+-					   struct bio *bio)
+-{
+-	struct elevator_queue *e = q->elevator;
+-
+-	if (e && e->type->ops.mq.get_rq_priv)
+-		return e->type->ops.mq.get_rq_priv(q, rq, bio);
+-
+-	return 0;
+-}
+-
+-static inline void blk_mq_sched_put_rq_priv(struct request_queue *q,
+-					    struct request *rq)
+-{
+-	struct elevator_queue *e = q->elevator;
+-
+-	if (e && e->type->ops.mq.put_rq_priv)
+-		e->type->ops.mq.put_rq_priv(q, rq);
+-}
+-
+ static inline bool
+ blk_mq_sched_allow_merge(struct request_queue *q, struct request *rq,
+ 			 struct bio *bio)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 694cbd698507..1a45c287db64 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -438,7 +438,8 @@ void blk_mq_free_request(struct request *rq)
+ 	struct elevator_queue *e = q->elevator;
  
- 		while ((bio = bio_list_pop(&list))) {
- 			struct bio_set *bs = bio->bi_pool;
--			if (unlikely(!bs) || bs == fs_bio_set) {
-+			if (unlikely(!bs) || bs == fs_bio_set ||
-+			    !bs->rescue_workqueue) {
- 				bio_list_add(&current->bio_list[i], bio);
- 				continue;
- 			}
-@@ -2660,7 +2661,7 @@ struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, enum dm_qu
- 		BUG();
- 	}
- 
--	pools->bs = bioset_create(pool_size, front_pad, 0);
-+	pools->bs = bioset_create(pool_size, front_pad, BIOSET_NEED_RESCUER);
- 	if (!pools->bs)
- 		goto out;
- 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 985dc645637e..32c786baa10a 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -376,6 +376,7 @@ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
- extern struct bio_set *bioset_create(unsigned int, unsigned int, int flags);
- enum {
- 	BIOSET_NEED_BVECS = BIT(0),
-+	BIOSET_NEED_RESCUER = BIT(1),
- };
- extern void bioset_free(struct bio_set *);
- extern mempool_t *biovec_create_pool(int pool_entries);
+ 	if (rq->rq_flags & RQF_ELVPRIV) {
+-		blk_mq_sched_put_rq_priv(rq->q, rq);
++		if (e && e->type->ops.mq.put_rq_priv)
++			e->type->ops.mq.put_rq_priv(q, rq);
+ 		if (rq->elv.icq) {
+ 			put_io_context(rq->elv.icq->ioc);
+ 			rq->elv.icq = NULL;
+-- 
+2.11.0
