@@ -1,112 +1,36 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH 1/5] mmc: block: Move duplicate check
-Date: Thu, 15 Jun 2017 14:12:55 +0200
-Message-Id: <20170615121259.8281-2-linus.walleij@linaro.org>
-In-Reply-To: <20170615121259.8281-1-linus.walleij@linaro.org>
-References: <20170615121259.8281-1-linus.walleij@linaro.org>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 10/11] btrfs: add support for passing in write hints for buffered writes
+Date: Fri, 16 Jun 2017 11:24:42 -0600
+Message-Id: <1497633883-21230-11-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
+References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-mmc_blk_ioctl() calls either mmc_blk_ioctl_cmd() or
-mmc_blk_ioctl_multi_cmd() and each of these make the same
-check. Factor it into a new helper function, call it on
-both branches of the switch() statement and save a chunk
-of duplicate code.
-
-Cc: Shawn Lin <shawn.lin@rock-chips.com>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Chris Mason <clm@fb.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
-ChangeLog v1->v2:
-- We need to check the block device only if an actual
-  well-known ioctl() is coming in, on the path of the
-  switch() statments, only those branches that handle
-  actual ioctl()s. Create a new helper function to check
-  the block device and call that.
----
- drivers/mmc/core/block.c | 36 ++++++++++++++++++++----------------
- 1 file changed, 20 insertions(+), 16 deletions(-)
+ fs/btrfs/extent_io.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 1ce6012ce3c1..d1b824e65590 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -566,14 +566,6 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- 	int err = 0, ioc_err = 0;
- 	struct request *req;
- 
--	/*
--	 * The caller must have CAP_SYS_RAWIO, and must be calling this on the
--	 * whole block device, not on a partition.  This prevents overspray
--	 * between sibling partitions.
--	 */
--	if ((!capable(CAP_SYS_RAWIO)) || (bdev != bdev->bd_contains))
--		return -EPERM;
--
- 	idata = mmc_blk_ioctl_copy_from_user(ic_ptr);
- 	if (IS_ERR(idata))
- 		return PTR_ERR(idata);
-@@ -626,14 +618,6 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 	__u64 num_of_cmds;
- 	struct request *req;
- 
--	/*
--	 * The caller must have CAP_SYS_RAWIO, and must be calling this on the
--	 * whole block device, not on a partition.  This prevents overspray
--	 * between sibling partitions.
--	 */
--	if ((!capable(CAP_SYS_RAWIO)) || (bdev != bdev->bd_contains))
--		return -EPERM;
--
- 	if (copy_from_user(&num_of_cmds, &user->num_of_cmds,
- 			   sizeof(num_of_cmds)))
- 		return -EFAULT;
-@@ -697,14 +681,34 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 	return ioc_err ? ioc_err : err;
- }
- 
-+static int mmc_blk_check_blkdev(struct block_device *bdev)
-+{
-+	/*
-+	 * The caller must have CAP_SYS_RAWIO, and must be calling this on the
-+	 * whole block device, not on a partition.  This prevents overspray
-+	 * between sibling partitions.
-+	 */
-+	if ((!capable(CAP_SYS_RAWIO)) || (bdev != bdev->bd_contains))
-+		return -EPERM;
-+	return 0;
-+}
-+
- static int mmc_blk_ioctl(struct block_device *bdev, fmode_t mode,
- 	unsigned int cmd, unsigned long arg)
- {
-+	int ret;
-+
- 	switch (cmd) {
- 	case MMC_IOC_CMD:
-+		ret = mmc_blk_check_blkdev(bdev);
-+		if (ret)
-+			return ret;
- 		return mmc_blk_ioctl_cmd(bdev,
- 				(struct mmc_ioc_cmd __user *)arg);
- 	case MMC_IOC_MULTI_CMD:
-+		ret = mmc_blk_check_blkdev(bdev);
-+		if (ret)
-+			return ret;
- 		return mmc_blk_ioctl_multi_cmd(bdev,
- 				(struct mmc_ioc_multi_cmd __user *)arg);
- 	default:
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index d3619e010005..92e75e4014ea 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2826,6 +2826,7 @@ static int submit_extent_page(int op, int op_flags, struct extent_io_tree *tree,
+ 	bio_add_page(bio, page, page_size, offset);
+ 	bio->bi_end_io = end_io_func;
+ 	bio->bi_private = tree;
++	op_flags |= write_hint_to_opf(inode_write_hint(page->mapping->host));
+ 	bio_set_op_attrs(bio, op, op_flags);
+ 	if (wbc) {
+ 		wbc_init_bio(wbc, bio);
 -- 
-2.9.4
+2.7.4
