@@ -1,46 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f172.google.com ([209.85.192.172]:36079 "EHLO
-        mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751190AbdFGGoK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2017 02:44:10 -0400
-Received: by mail-pf0-f172.google.com with SMTP id x63so2189186pff.3
-        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2017 23:44:10 -0700 (PDT)
-Date: Tue, 6 Jun 2017 23:44:08 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH blktests v2 0/3] Add SCSI generic test group
-Message-ID: <20170607064408.GA9840@vader>
-References: <cover.1495201975.git.jthumshirn@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <cover.1495201975.git.jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v7 06/22] mm: clear AS_EIO/AS_ENOSPC when writeback initiation fails
+Date: Fri, 16 Jun 2017 15:34:11 -0400
+Message-Id: <20170616193427.13955-7-jlayton@redhat.com>
+In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
+References: <20170616193427.13955-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, May 19, 2017 at 03:55:28PM +0200, Johannes Thumshirn wrote:
-> Add a test group for the SCSI generic driver and one syzcaller
-> reproducer for this group.
-> 
-> The reprodcuer is distributed as a C program, so the makefile is
-> amended to build C files to be used in the test.
-> 
-> Changes to v1:
-> * Stripped left over TODO comment
-> * Modified reproducer to accept a device name
-> * Fixed Makefile so it can build more than one target
-> 
-> Johannes Thumshirn (3):
->   Add ability to build test-cases
->   tests/sg: add SCSI generic test grouop
->   sg/001: add regression test for syzcaller generated GPF in sg_read
->     path
+filemap_write_and_wait{_range} will return an error if writeback
+initiation fails, but won't clear errors in the address_space. This is
+particularly problematic on DAX, as it's effectively synchronous. Ensure
+that we clear the AS_EIO/AS_ENOSPC flags when filemap_fdatawrite returns
+an error.
 
-Hey, Johannes,
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ mm/filemap.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Sorry for the delay, I was chasing down a few Btrfs bugs for the last
-couple of weeks. I applied these with some small changes. I stuck with
-running syzkaller on the scsi-debug device like you had here, we can
-revisit that for future tests if it makes sense to run them on a real
-device. Thanks!
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 37f286df7c95..c349a5d3a34b 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -517,6 +517,9 @@ int filemap_write_and_wait(struct address_space *mapping)
+ 			int err2 = filemap_fdatawait(mapping);
+ 			if (!err)
+ 				err = err2;
++		} else {
++			/* Clear any previously stored errors */
++			filemap_check_errors(mapping);
+ 		}
+ 	} else {
+ 		err = filemap_check_errors(mapping);
+@@ -551,6 +554,9 @@ int filemap_write_and_wait_range(struct address_space *mapping,
+ 						lstart, lend);
+ 			if (!err)
+ 				err = err2;
++		} else {
++			/* Clear any previously stored errors */
++			filemap_check_errors(mapping);
+ 		}
+ 	} else {
+ 		err = filemap_check_errors(mapping);
+-- 
+2.13.0
