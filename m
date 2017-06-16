@@ -5,8 +5,8 @@ To: Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>,
 Cc: linux-block@vger.kernel.org
 References: <20170616161527.17649-1-hch@lst.de>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <925130ff-40f4-c4b6-2a1a-31195c5393c5@kernel.dk>
-Date: Sun, 18 Jun 2017 12:35:14 -0600
+Message-ID: <448722b3-b1ec-2854-f4fc-b20ce95c9db8@kernel.dk>
+Date: Fri, 16 Jun 2017 14:30:45 -0600
 MIME-Version: 1.0
 In-Reply-To: <20170616161527.17649-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
@@ -20,7 +20,8 @@ On 06/16/2017 10:15 AM, Christoph Hellwig wrote:
 > my mind.  I've only done basic testing with them, so for now this is
 > a bit of a RFC.
 
-Added for 4.13, thanks.
+Most of these look straight forward and are good cleanups. I'll throw
+some testing at it, too.
 
 -- 
 Jens Axboe
