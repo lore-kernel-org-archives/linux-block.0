@@ -1,66 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47544 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752445AbdFNQM1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2017 12:12:27 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 10/12] block: call __bio_free in bio_endio
-Date: Wed, 14 Jun 2017 09:12:08 -0700
-Message-Id: <6019e3e30918ea37c262d6dcdc89ee5edf2c84ed.1497455937.git.shli@fb.com>
-In-Reply-To: <cover.1497455937.git.shli@fb.com>
-References: <cover.1497455937.git.shli@fb.com>
-In-Reply-To: <cover.1497455937.git.shli@fb.com>
-References: <cover.1497455937.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [xfstests PATCH v5 0/5] new tests for writeback error reporting behavior
+Date: Fri, 16 Jun 2017 15:36:14 -0400
+Message-Id: <20170616193619.14576-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+The main changes in this set from the last are:
 
-bio_free isn't a good place to free cgroup/integrity info. There are a
-lot of cases bio is allocated in special way (for example, in stack) and
-never gets called by bio_put hence bio_free, we are leaking memory. This
-patch moves the free to bio endio, which should be called anyway. The
-__bio_free call in bio_free is kept, in case the bio never gets called
-bio endio.
+- add a btrfs/999.out file
+- use _supported_fs to whitelist fs' on which the tests should run
+- fix the ext3/4 mount option handling when creating journal device
+- ensure that dmerror is installed on make install
 
-This assumes ->bi_end_io() doesn't access cgroup/integrity info, which
-seems true in my audit. Otherwise, we probably must add a flag to
-distinguish if bio will be called by bio_put.
+These tests are intended to test the new writeback error reporting
+introduced by this kernel patchset:
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/bio-integrity.c | 1 +
- block/bio.c           | 2 ++
- 2 files changed, 3 insertions(+)
+    [PATCH v7 00/22] fs: enhanced writeback error reporting with errseq_t (pile #1)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index b5009a8..869ac7a 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -120,6 +120,7 @@ void bio_integrity_free(struct bio *bio)
- 	}
- 
- 	bio->bi_integrity = NULL;
-+	bio->bi_opf &= ~REQ_INTEGRITY;
- }
- EXPORT_SYMBOL(bio_integrity_free);
- 
-diff --git a/block/bio.c b/block/bio.c
-index 888e780..9bfd8d4 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1823,6 +1823,8 @@ void bio_endio(struct bio *bio)
- 	}
- 
- 	blk_throtl_bio_endio(bio);
-+	/* release cgroup/integrity info */
-+	__bio_free(bio);
- 	if (bio->bi_end_io)
- 		bio->bi_end_io(bio);
- }
+It adds 3 new xfstests for testing kernel behavior when writeback from
+the pagecache fails: one generic filesystem test, one test for raw block
+devices and one test for btrfs.
+
+The tests work with dmerror to make data writeback from the pagecache
+fail, and then tests how the kernel reports errors afterward.
+
+xfs, ext2/3/4 and btrfs all pass on a kernel with the patchset above. "Bare"
+block devices also work correctly.
+
+Jeff Layton (5):
+  ext4: allow ext4 to use $SCRATCH_LOGDEV
+  ext3: allow it to put journal on a separate device when doing
+    scratch_mkfs
+  generic: add a writeback error handling test
+  generic: test writeback error handling on dmerror devices
+  btrfs: make a btrfs version of writeback error reporting test
+
+ .gitignore                 |   1 +
+ common/dmerror             |  13 ++-
+ common/rc                  |  14 ++-
+ doc/auxiliary-programs.txt |  16 ++++
+ src/Makefile               |   4 +-
+ src/dmerror                |  44 +++++++++
+ src/fsync-err.c            | 223 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/btrfs/999            |  94 +++++++++++++++++++
+ tests/btrfs/999.out        |   3 +
+ tests/btrfs/group          |   1 +
+ tests/generic/998          |  63 +++++++++++++
+ tests/generic/998.out      |   2 +
+ tests/generic/999          |  84 +++++++++++++++++
+ tests/generic/999.out      |   3 +
+ tests/generic/group        |   2 +
+ 15 files changed, 559 insertions(+), 8 deletions(-)
+ create mode 100755 src/dmerror
+ create mode 100644 src/fsync-err.c
+ create mode 100755 tests/btrfs/999
+ create mode 100644 tests/btrfs/999.out
+ create mode 100755 tests/generic/998
+ create mode 100644 tests/generic/998.out
+ create mode 100755 tests/generic/999
+ create mode 100644 tests/generic/999.out
+
 -- 
-2.9.3
+2.13.0
