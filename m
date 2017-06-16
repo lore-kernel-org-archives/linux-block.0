@@ -1,134 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44877 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752538AbdFREkC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:40:02 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:58 +1000
-Subject: [PATCH 05/13] block: Improvements to bounce-buffer handling
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073780.23258.16187458754319573811.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Omar Sandoval <osandov@fb.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 06/10] blk-mq: streamline blk_mq_get_request
+Date: Fri, 16 Jun 2017 18:15:23 +0200
+Message-Id: <20170616161527.17649-7-hch@lst.de>
+In-Reply-To: <20170616161527.17649-1-hch@lst.de>
+References: <20170616161527.17649-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Since commit 23688bf4f830 ("block: ensure to split after potentially
-bouncing a bio") blk_queue_bounce() is called *before*
-blk_queue_split().
-This means that:
- 1/ the comments blk_queue_split() about bounce buffers are
-    irrelevant, and
- 2/ a very large bio (more than BIO_MAX_PAGES) will no longer be
-    split before it arrives at blk_queue_bounce(), leading to the
-    possibility that bio_clone_bioset() will fail and a NULL
-    will be dereferenced.
-
-Separately, blk_queue_bounce() shouldn't use fs_bio_set as the bio
-being copied could be from the same set, and this could lead to a
-deadlock.
-
-So:
- - allocate 2 private biosets for blk_queue_bounce, one for
-   splitting enormous bios and one for cloning bios.
- - add code to split a bio that exceeds BIO_MAX_PAGES.
- - Fix up the comments in blk_queue_split()
-
-Credit-to: Ming Lei <tom.leiming@gmail.com> (suggested using single bio_for_each_segment loop)
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-merge.c |   14 ++++----------
- block/bounce.c    |   32 ++++++++++++++++++++++++++------
- 2 files changed, 30 insertions(+), 16 deletions(-)
+ block/blk-mq.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d59074556703..51c84540d3bb 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -117,17 +117,11 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		 * each holds at most BIO_MAX_PAGES bvecs because
- 		 * bio_clone() can fail to allocate big bvecs.
- 		 *
--		 * It should have been better to apply the limit per
--		 * request queue in which bio_clone() is involved,
--		 * instead of globally. The biggest blocker is the
--		 * bio_clone() in bio bounce.
-+		 * Those drivers which will need to use bio_clone()
-+		 * should tell us in some way.  For now, impose the
-+		 * BIO_MAX_PAGES limit on all queues.
- 		 *
--		 * If bio is splitted by this reason, we should have
--		 * allowed to continue bios merging, but don't do
--		 * that now for making the change simple.
--		 *
--		 * TODO: deal with bio bounce's bio_clone() gracefully
--		 * and convert the global limit into per-queue limit.
-+		 * TODO: handle users of bio_clone() differently.
- 		 */
- 		if (bvecs++ >= BIO_MAX_PAGES)
- 			goto split;
-diff --git a/block/bounce.c b/block/bounce.c
-index e4703181d97f..17d77613c471 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -26,6 +26,7 @@
- #define POOL_SIZE	64
- #define ISA_POOL_SIZE	16
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0b17351fccfc..e056725679a8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -302,24 +302,24 @@ static struct request *blk_mq_get_request(struct request_queue *q,
+ 			rq = e->type->ops.mq.get_request(q, op, data);
+ 			if (rq)
+ 				rq->rq_flags |= RQF_QUEUED;
+-		} else
+-			rq = __blk_mq_alloc_request(data, op);
+-	} else {
+-		rq = __blk_mq_alloc_request(data, op);
++			goto allocated;
++		}
+ 	}
  
-+struct bio_set *bounce_bio_set, *bounce_bio_split;
- static mempool_t *page_pool, *isa_page_pool;
+-	if (rq) {
+-		if (!op_is_flush(op)) {
+-			rq->elv.icq = NULL;
+-			if (e && e->type->icq_cache)
+-				blk_mq_sched_assign_ioc(q, rq, bio);
+-		}
+-		data->hctx->queued++;
+-		return rq;
++	rq = __blk_mq_alloc_request(data, op);
++allocated:
++	if (!rq) {
++		blk_queue_exit(q);
++		return NULL;
+ 	}
  
- #if defined(CONFIG_HIGHMEM) || defined(CONFIG_NEED_BOUNCE_POOL)
-@@ -40,6 +41,14 @@ static __init int init_emergency_pool(void)
- 	BUG_ON(!page_pool);
- 	pr_info("pool size: %d pages\n", POOL_SIZE);
- 
-+	bounce_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
-+	BUG_ON(!bounce_bio_set);
-+	if (bioset_integrity_create(bounce_bio_set, BIO_POOL_SIZE))
-+		BUG_ON(1);
-+
-+	bounce_bio_split = bioset_create(BIO_POOL_SIZE, 0, 0);
-+	BUG_ON(!bounce_bio_split);
-+
- 	return 0;
+-	blk_queue_exit(q);
+-	return NULL;
++	if (!op_is_flush(op)) {
++		rq->elv.icq = NULL;
++		if (e && e->type->icq_cache)
++			blk_mq_sched_assign_ioc(q, rq, bio);
++	}
++	data->hctx->queued++;
++	return rq;
  }
  
-@@ -186,15 +195,26 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	int rw = bio_data_dir(*bio_orig);
- 	struct bio_vec *to, from;
- 	struct bvec_iter iter;
--	unsigned i;
-+	unsigned i = 0;
-+	bool bounce = false;
-+	int sectors = 0;
- 
--	bio_for_each_segment(from, *bio_orig, iter)
-+	bio_for_each_segment(from, *bio_orig, iter) {
-+		if (i++ < BIO_MAX_PAGES)
-+			sectors += from.bv_len >> 9;
- 		if (page_to_pfn(from.bv_page) > queue_bounce_pfn(q))
--			goto bounce;
-+			bounce = true;
-+	}
-+	if (!bounce)
-+		return;
- 
--	return;
--bounce:
--	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, fs_bio_set);
-+	if (sectors < bio_sectors(*bio_orig)) {
-+		bio = bio_split(*bio_orig, sectors, GFP_NOIO, bounce_bio_split);
-+		bio_chain(bio, *bio_orig);
-+		generic_make_request(*bio_orig);
-+		*bio_orig = bio;
-+	}
-+	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
- 
- 	bio_for_each_segment_all(to, bio, i) {
- 		struct page *page = to->bv_page;
+ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+-- 
+2.11.0
