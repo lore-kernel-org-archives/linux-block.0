@@ -1,60 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ot0-f195.google.com ([74.125.82.195]:34975 "EHLO
-        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751252AbdFGDgV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2017 23:36:21 -0400
-Received: by mail-ot0-f195.google.com with SMTP id t31so116234ota.2
-        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2017 20:36:21 -0700 (PDT)
-From: Joseph Qi <jiangqi903@gmail.com>
-Subject: [PATCH] blk-throttle: fix NULL pointer dereference in
- throtl_schedule_pending_timer
-To: linux-block@vger.kernel.org
-Cc: axboe@fb.com, Shaohua Li <shli@fb.com>, boyu.mt@taobao.com,
-        wenqing.lz@taobao.com, qijiang.qj@alibaba-inc.com
-Message-ID: <ba25ffe3-9db7-2311-51c7-91fce0ce8cfa@gmail.com>
-Date: Wed, 7 Jun 2017 11:36:14 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [xfstests PATCH v5 1/5] ext4: allow ext4 to use $SCRATCH_LOGDEV
+Date: Fri, 16 Jun 2017 15:36:15 -0400
+Message-Id: <20170616193619.14576-2-jlayton@redhat.com>
+In-Reply-To: <20170616193619.14576-1-jlayton@redhat.com>
+References: <20170616193619.14576-1-jlayton@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+The writeback error handling test requires that you put the journal on a
+separate device. This allows us to use dmerror to simulate data
+writeback failure, without affecting the journal.
 
-I have encountered a NULL pointer dereference in
-throtl_schedule_pending_timer:
-  [  413.735396] BUG: unable to handle kernel NULL pointer dereference at 0000000000000038
-  [  413.735535] IP: [<ffffffff812ebbbf>] throtl_schedule_pending_timer+0x3f/0x210
-  [  413.735643] PGD 22c8cf067 PUD 22cb34067 PMD 0
-  [  413.735713] Oops: 0000 [#1] SMP
-  ......
+xfs already has infrastructure for this (a'la $SCRATCH_LOGDEV), so wire
+up the ext4 code so that it can do the same thing when _scratch_mkfs is
+called.
 
-This is caused by the following case:
-  blk_throtl_bio
-    throtl_schedule_next_dispatch  <= sq is top level one without parent
-      throtl_schedule_pending_timer
-        sq_to_tg(sq)->td->throtl_slice  <= sq_to_tg(sq) returns NULL
-
-Fix it by using sq_to_td instead of sq_to_tg(sq)->td, which will always
-return a valid td.
-
-Fixes: 297e3d854784 ("blk-throttle: make throtl_slice tunable")
-Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- block/blk-throttle.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ common/rc | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index fc13dd0..3b751f7 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -698,7 +698,7 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
--	unsigned long max_expire = jiffies + 8 * sq_to_tg(sq)->td->throtl_slice;
-+	unsigned long max_expire = jiffies + 8 * sq_to_td(sq)->throtl_slice;
+diff --git a/common/rc b/common/rc
+index ff1b75c9cd25..57001b47a8b7 100644
+--- a/common/rc
++++ b/common/rc
+@@ -679,6 +679,9 @@ _scratch_mkfs_ext4()
+ 	local tmp=`mktemp`
+ 	local mkfs_status
  
- 	/*
- 	 * Since we are adjusting the throttle limit dynamically, the sleep
++	[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
++	    $mkfs_cmd -O journal_dev $MKFS_OPTIONS $SCRATCH_LOGDEV && \
++	    mkfs_cmd="$mkfs_cmd -J device=$SCRATCH_LOGDEV"
+ 
+ 	_scratch_do_mkfs "$mkfs_cmd" "$mkfs_filter" $* 2>$tmp.mkfserr 1>$tmp.mkfsstd
+ 	mkfs_status=$?
 -- 
-1.9.4
+2.13.0
