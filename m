@@ -1,49 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40300 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751453AbdF0NnF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jun 2017 09:43:05 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Jens Axboe <axboe@fb.com>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests v2 1/2] rc: add helpers to handle PCI test devices
-Date: Tue, 27 Jun 2017 15:42:56 +0200
-Message-Id: <20170627134257.15863-2-jthumshirn@suse.de>
-In-Reply-To: <20170627134257.15863-1-jthumshirn@suse.de>
-References: <20170627134257.15863-1-jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] NVMe updates for Linux 4.13
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+References: <20170616161118.a3h2vc5inincfrmq@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2d0ccf31-79b2-4b19-d44f-e8984cea6f55@kernel.dk>
+Date: Fri, 16 Jun 2017 10:16:29 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170616161118.a3h2vc5inincfrmq@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Add two helpers to check whether a device is attached via PCI and to get the
-PCI device from a TEST_DEV
+On 06/16/2017 10:11 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> here is a large chunk of NVMe updates for 4.13.  I don't think we
+> are quite done for this merge window yet, but I'd like to get
+> this large batch into your tree and linux-next.
+> 
+> Highlights:
+> 
+>  - UUID identifier support from Johannes
+>  - Lots of cleanups from Sagi
+>  - Host Memory Buffer support from me
+> 
+> And lots of cleanups and smaller fixes of course.
+> 
+> Note that the UUID identifier changes are based on top of the uuid tree.
+> I am the maintainer of that tree and will send it to Linus as soon as
+> 4.12 is released as various other trees depend on it as well (and the
+> diffstat includes those changes unfortunately)
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- common/rc | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Pulled in, thanks.
 
-diff --git a/common/rc b/common/rc
-index 088422ce909b..28116b0fc308 100644
---- a/common/rc
-+++ b/common/rc
-@@ -127,3 +127,16 @@ _test_dev_queue_set() {
- 	fi
- 	echo "$2" >"${TEST_DEV_SYSFS}/queue/$1"
- }
-+
-+_test_dev_is_pci() {
-+	if ! readlink -f "$TEST_DEV_SYSFS/device" | grep -q pci; then
-+		SKIP_REASON="$TEST_DEV is not a PCI device"
-+		return 1
-+	fi
-+	return 0
-+}
-+
-+_get_pci_dev_from_blkdev() {
-+	readlink -f "$TEST_DEV_SYSFS/device" | \
-+		grep -Eo '[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]'
-+}
 -- 
-2.12.3
+Jens Axboe
