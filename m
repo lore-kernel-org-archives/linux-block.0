@@ -6,38 +6,38 @@ Cc: adilger@dilger.ca,
 	hch@infradead.org,
 	martin.petersen@oracle.com,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 09/12] ext4: add support for passing in write hints for buffered writes
-Date: Thu, 15 Jun 2017 10:42:07 -0600
-Message-Id: <1497544930-19174-10-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
-References: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
+Subject: [PATCH 09/11] xfs: add support for passing in write hints for buffered writes
+Date: Sat, 17 Jun 2017 13:59:52 -0600
+Message-Id: <1497729594-4707-10-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
+References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 Reviewed-by: Andreas Dilger <adilger@dilger.ca>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/ext4/page-io.c | 2 ++
+ fs/xfs/xfs_aops.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 1a82138ba739..764bf0ddecd4 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -349,6 +349,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 	if (bio) {
- 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
- 				  REQ_SYNC : 0;
-+		io_op_flags |= bio_op_write_hint(inode_write_hint(io->io_end->inode));
- 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
- 		submit_bio(io->io_bio);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 09af0f7cd55e..040789c51930 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -505,6 +505,7 @@ xfs_submit_ioend(
+ 		return status;
  	}
-@@ -396,6 +397,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
- 		ret = io_submit_init_bio(io, bh);
- 		if (ret)
- 			return ret;
-+		io->io_bio->bi_opf |= bio_op_write_hint(inode_write_hint(inode));
- 	}
- 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
- 	if (ret != bh->b_size)
+ 
++	ioend->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(ioend->io_inode));
+ 	submit_bio(ioend->io_bio);
+ 	return 0;
+ }
+@@ -564,6 +565,7 @@ xfs_chain_bio(
+ 	bio_chain(ioend->io_bio, new);
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+ 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
++	ioend->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(ioend->io_inode));
+ 	submit_bio(ioend->io_bio);
+ 	ioend->io_bio = new;
+ }
 -- 
 2.7.4
