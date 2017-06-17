@@ -1,66 +1,42 @@
-Return-Path: <eguan@redhat.com>
-Date: Tue, 13 Jun 2017 16:38:17 +0800
-From: Eryu Guan <eguan@redhat.com>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net,
-	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>,
-	David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [xfstests PATCH v4 2/5] ext4: allow ext4 to use $SCRATCH_LOGDEV
-Message-ID: <20170613083817.GD4788@eguan.usersys.redhat.com>
-References: <20170612124213.14855-1-jlayton@redhat.com>
- <20170612124213.14855-3-jlayton@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:56867 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752872AbdFQLx6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 17 Jun 2017 07:53:58 -0400
+Date: Sat, 17 Jun 2017 04:53:53 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Al Viro <viro@ZenIV.linux.org.uk>
+Cc: Goldwyn Rodrigues <rgoldwyn@suse.de>,
+        linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-api@vger.kernel.org, akpm@linux-foundation.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 04/10] fs: Introduce RWF_NOWAIT and FMODE_AIO_NOWAIT
+Message-ID: <20170617115353.GA8320@infradead.org>
+References: <20170615160002.17233-1-rgoldwyn@suse.de>
+ <20170615160002.17233-5-rgoldwyn@suse.de>
+ <20170617040944.GT31671@ZenIV.linux.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170612124213.14855-3-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170617040944.GT31671@ZenIV.linux.org.uk>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, Jun 12, 2017 at 08:42:10AM -0400, Jeff Layton wrote:
-> The writeback error handling test requires that you put the journal on a
-> separate device. This allows us to use dmerror to simulate data
-> writeback failure, without affecting the journal.
+On Sat, Jun 17, 2017 at 05:09:44AM +0100, Al Viro wrote:
+> On Thu, Jun 15, 2017 at 10:59:56AM -0500, Goldwyn Rodrigues wrote:
+> >  static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
+> >  {
+> > -	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
+> > +	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT)))
 > 
-> xfs already has infrastructure for this (a'la $SCRATCH_LOGDEV), so wire
-> up the ext4 code so that it can do the same thing when _scratch_mkfs is
-> called.
+> Minor nit: that calls for something like
+> 	if (unlikely(flags & ~RWF_ALL)
+> >  		return -EOPNOTSUPP;
 > 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
-> ---
->  common/rc | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/common/rc b/common/rc
-> index 87e6ff08b18d..08807ac7c22a 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -676,6 +676,9 @@ _scratch_mkfs_ext4()
->  	local tmp=`mktemp`
->  	local mkfs_status
->  
-> +	[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
-> +	    $mkfs_cmd -O journal_dev $SCRATCH_LOGDEV && \
-> +	    mkfs_cmd="$mkfs_cmd $MKFS_OPTIONS -J device=$SCRATCH_LOGDEV"
+> with corresponding definition.
 
-This $MKFS_OPTIONS should be added to the first command when creating
-the journal device so that journal dev has the same block size as data
-dev, there's no need to update mkfs_cmd string.
+Possibly.  Note _ALL is not correct - at least RWF_HIPRI is explicitly
+defined a shint that can be ignored.
 
-The external log dev support for ext3 patch has similar issue.
-
-Thanks,
-Eryu
-
->  
->  	_scratch_do_mkfs "$mkfs_cmd" "$mkfs_filter" $* 2>$tmp.mkfserr 1>$tmp.mkfsstd
->  	mkfs_status=$?
-> -- 
-> 2.13.0
-> 
+Maybe RWF_SUPPORTED.
