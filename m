@@ -1,77 +1,65 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	akpm@linux-foundation.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 03/10] fs: Use RWF_* flags for AIO operations
-Date: Thu, 15 Jun 2017 10:59:55 -0500
-Message-Id: <20170615160002.17233-4-rgoldwyn@suse.de>
-In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
-References: <20170615160002.17233-1-rgoldwyn@suse.de>
+Return-Path: <tglx@linutronix.de>
+Date: Sun, 18 Jun 2017 01:21:24 +0200 (CEST)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Christoph Hellwig <hch@lst.de>
+cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+    linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/8] genirq: allow assigning affinity to present but not
+ online CPUs
+In-Reply-To: <20170603140403.27379-2-hch@lst.de>
+Message-ID: <alpine.DEB.2.20.1706180114420.2428@nanos>
+References: <20170603140403.27379-1-hch@lst.de> <20170603140403.27379-2-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Sat, 3 Jun 2017, Christoph Hellwig wrote:
 
-aio_rw_flags is introduced in struct iocb (using aio_reserved1) which will
-carry the RWF_* flags. We cannot use aio_flags because they are not
-checked for validity which may break existing applications.
+> This will allow us to spread MSI/MSI-X affinity over all present CPUs and
+> thus better deal with systems where cpus are take on and offline all the
+> time.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  kernel/irq/manage.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+> index 070be980c37a..5c25d4a5dc46 100644
+> --- a/kernel/irq/manage.c
+> +++ b/kernel/irq/manage.c
+> @@ -361,17 +361,17 @@ static int setup_affinity(struct irq_desc *desc, struct cpumask *mask)
+>  	if (irqd_affinity_is_managed(&desc->irq_data) ||
+>  	    irqd_has_set(&desc->irq_data, IRQD_AFFINITY_SET)) {
+>  		if (cpumask_intersects(desc->irq_common_data.affinity,
+> -				       cpu_online_mask))
+> +				       cpu_present_mask))
+>  			set = desc->irq_common_data.affinity;
+>  		else
+>  			irqd_clear(&desc->irq_data, IRQD_AFFINITY_SET);
+>  	}
+>  
+> -	cpumask_and(mask, cpu_online_mask, set);
+> +	cpumask_and(mask, cpu_present_mask, set);
+>  	if (node != NUMA_NO_NODE) {
+>  		const struct cpumask *nodemask = cpumask_of_node(node);
+>  
+> -		/* make sure at least one of the cpus in nodemask is online */
+> +		/* make sure at least one of the cpus in nodemask is present */
+>  		if (cpumask_intersects(mask, nodemask))
+>  			cpumask_and(mask, mask, nodemask);
+>  	}
 
-Note, the only place RWF_HIPRI comes in effect is dio_await_one().
-All the rest of the locations, aio code return -EIOCBQUEUED before the
-checks for RWF_HIPRI.
+This is a dangerous one. It might break existing setups subtly. Assume the
+AFFINITY_SET flag is set, then this tries to preserve the user supplied
+affinity mask. So that might end up with some random mask which does not
+contain any online CPU. Not what we want.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/aio.c                     | 8 +++++++-
- include/uapi/linux/aio_abi.h | 2 +-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+We really need to seperate the handling of the managed interrupts from the
+regular ones. Otherwise we end up with hard to debug issues. Cramming stuff
+into the existing code, does not solve the problem, but it creates new ones.
 
-diff --git a/fs/aio.c b/fs/aio.c
-index f52d925ee259..020fa0045e3c 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1541,7 +1541,7 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 	ssize_t ret;
- 
- 	/* enforce forwards compatibility on users */
--	if (unlikely(iocb->aio_reserved1 || iocb->aio_reserved2)) {
-+	if (unlikely(iocb->aio_reserved2)) {
- 		pr_debug("EINVAL: reserve field set\n");
- 		return -EINVAL;
- 	}
-@@ -1586,6 +1586,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		req->common.ki_flags |= IOCB_EVENTFD;
- 	}
- 
-+	ret = kiocb_set_rw_flags(&req->common, iocb->aio_rw_flags);
-+	if (unlikely(ret)) {
-+		pr_debug("EINVAL: aio_rw_flags\n");
-+		goto out_put_req;
-+	}
-+
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
-index bb2554f7fbd1..a2d4a8ac94ca 100644
---- a/include/uapi/linux/aio_abi.h
-+++ b/include/uapi/linux/aio_abi.h
-@@ -79,7 +79,7 @@ struct io_event {
- struct iocb {
- 	/* these are internal to the kernel/libc. */
- 	__u64	aio_data;	/* data to be returned in event's data */
--	__u32	PADDED(aio_key, aio_reserved1);
-+	__u32	PADDED(aio_key, aio_rw_flags);
- 				/* the kernel sets aio_key to the req # */
- 
- 	/* common fields */
--- 
-2.12.0
+Thanks,
+
+	tglx
