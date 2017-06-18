@@ -1,139 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:51994 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751532AbdF1Mpa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2017 08:45:30 -0400
-From: Max Gurtovoy <maxg@mellanox.com>
-To: axboe@fb.com, hch@lst.de, sagi@grimberg.me, bvanassche@acm.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH 1/1] blk-mq: map all HWQ also in hyperthreaded system
-Date: Wed, 28 Jun 2017 15:44:40 +0300
-Message-Id: <1498653880-29223-1-git-send-email-maxg@mellanox.com>
+Received: from mx2.suse.de ([195.135.220.15]:44920 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753193AbdFREk4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:40:56 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:59 +1000
+Subject: [PATCH 11/13] bcache: use kmalloc to allocate bio in
+ bch_data_verify()
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073913.23258.16726702836366837284.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch performs sequential mapping between CPUs and queues.
-In case the system has more CPUs than HWQs then there are still
-CPUs to map to HWQs. In hyperthreaded system, map the unmapped CPUs
-and their siblings to the same HWQ.
-This actually fixes a bug that found unmapped HWQs in a system with
-2 sockets, 18 cores per socket, 2 threads per core (total 72 CPUs)
-running NVMEoF (opens upto maximum of 64 HWQs).
+This function allocates a bio, then a collection
+of pages.  It copes with failure.
 
-Performance results running fio (72 jobs, 128 iodepth)
-using null_blk (w/w.o patch):
+It currently uses a mempool() to allocate the bio,
+but alloc_page() to allocate the pages.  These fail
+in different ways, so the usage is inconsistent.
 
-bs      IOPS(read submit_queues=72)   IOPS(write submit_queues=72)   IOPS(read submit_queues=24)  IOPS(write submit_queues=24)
------  ----------------------------  ------------------------------ ---------------------------- -----------------------------
-512    4890.4K/4723.5K                 4524.7K/4324.2K                   4280.2K/4264.3K               3902.4K/3909.5K
-1k     4910.1K/4715.2K                 4535.8K/4309.6K                   4296.7K/4269.1K               3906.8K/3914.9K
-2k     4906.3K/4739.7K                 4526.7K/4330.6K                   4301.1K/4262.4K               3890.8K/3900.1K
-4k     4918.6K/4730.7K                 4556.1K/4343.6K                   4297.6K/4264.5K               3886.9K/3893.9K
-8k     4906.4K/4748.9K                 4550.9K/4346.7K                   4283.2K/4268.8K               3863.4K/3858.2K
-16k    4903.8K/4782.6K                 4501.5K/4233.9K                   4292.3K/4282.3K               3773.1K/3773.5K
-32k    4885.8K/4782.4K                 4365.9K/4184.2K                   4307.5K/4289.4K               3780.3K/3687.3K
-64k    4822.5K/4762.7K                 2752.8K/2675.1K                   4308.8K/4312.3K               2651.5K/2655.7K
-128k   2388.5K/2313.8K                 1391.9K/1375.7K                   2142.8K/2152.2K               1395.5K/1374.2K
+Change the bio_clone() to bio_clone_kmalloc()
+so that no pool is used either for the bio or the pages.
 
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Kent Overstreet <kent.overstreet@gmail.com>
+Reviewed-by : Ming Lei <ming.lei@redhat.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- block/blk-mq-cpumap.c |   68 ++++++++++++++++---------------------------------
- 1 files changed, 22 insertions(+), 46 deletions(-)
+ drivers/md/bcache/debug.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 8e61e86..2cca4fc 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -14,10 +14,15 @@
- #include "blk.h"
- #include "blk-mq.h"
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index 06f55056aaae..35a5a7210e51 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -110,7 +110,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ 	struct bio_vec bv, cbv;
+ 	struct bvec_iter iter, citer = { 0 };
  
--static int cpu_to_queue_index(unsigned int nr_cpus, unsigned int nr_queues,
--			      const int cpu)
-+static int cpu_to_queue_index(unsigned int nr_queues, const int cpu,
-+			      const struct cpumask *online_mask)
- {
--	return cpu * nr_queues / nr_cpus;
-+	/*
-+	 * Non online CPU will be mapped to queue index 0.
-+	 */
-+	if (!cpumask_test_cpu(cpu, online_mask))
-+		return 0;
-+	return cpu % nr_queues;
- }
- 
- static int get_first_sibling(unsigned int cpu)
-@@ -36,55 +41,26 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 	unsigned int *map = set->mq_map;
- 	unsigned int nr_queues = set->nr_hw_queues;
- 	const struct cpumask *online_mask = cpu_online_mask;
--	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
--	cpumask_var_t cpus;
--
--	if (!alloc_cpumask_var(&cpus, GFP_ATOMIC))
--		return -ENOMEM;
--
--	cpumask_clear(cpus);
--	nr_cpus = nr_uniq_cpus = 0;
--	for_each_cpu(i, online_mask) {
--		nr_cpus++;
--		first_sibling = get_first_sibling(i);
--		if (!cpumask_test_cpu(first_sibling, cpus))
--			nr_uniq_cpus++;
--		cpumask_set_cpu(i, cpus);
--	}
--
--	queue = 0;
--	for_each_possible_cpu(i) {
--		if (!cpumask_test_cpu(i, online_mask)) {
--			map[i] = 0;
--			continue;
--		}
-+	unsigned int cpu, first_sibling;
- 
-+	for_each_possible_cpu(cpu) {
- 		/*
--		 * Easy case - we have equal or more hardware queues. Or
--		 * there are no thread siblings to take into account. Do
--		 * 1:1 if enough, or sequential mapping if less.
-+		 * First do sequential mapping between CPUs and queues.
-+		 * In case we still have CPUs to map, and we have some number of
-+		 * threads per cores then map sibling threads to the same queue for
-+		 * performace optimizations.
- 		 */
--		if (nr_queues >= nr_cpus || nr_cpus == nr_uniq_cpus) {
--			map[i] = cpu_to_queue_index(nr_cpus, nr_queues, queue);
--			queue++;
--			continue;
-+		if (cpu < nr_queues) {
-+			map[cpu] = cpu_to_queue_index(nr_queues, cpu, online_mask);
-+		} else {
-+			first_sibling = get_first_sibling(cpu);
-+			if (first_sibling == cpu)
-+				map[cpu] = cpu_to_queue_index(nr_queues, cpu, online_mask);
-+			else
-+				map[cpu] = map[first_sibling];
- 		}
--
--		/*
--		 * Less then nr_cpus queues, and we have some number of
--		 * threads per cores. Map sibling threads to the same
--		 * queue.
--		 */
--		first_sibling = get_first_sibling(i);
--		if (first_sibling == i) {
--			map[i] = cpu_to_queue_index(nr_uniq_cpus, nr_queues,
--							queue);
--			queue++;
--		} else
--			map[i] = map[first_sibling];
- 	}
- 
--	free_cpumask_var(cpus);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(blk_mq_map_queues);
--- 
-1.7.1
+-	check = bio_clone(bio, GFP_NOIO);
++	check = bio_clone_kmalloc(bio, GFP_NOIO);
+ 	if (!check)
+ 		return;
+ 	check->bi_opf = REQ_OP_READ;
