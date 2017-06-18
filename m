@@ -1,96 +1,39 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] Two fixes for loop devices
+To: NeilBrown <neilb@suse.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <149758925866.10006.12779875832895865043.stgit@noble>
+ <c70dfc69-516c-f1e8-4e39-74eff1bca176@fb.com>
+ <87bmpl6hkq.fsf@notabene.neil.brown.name>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/12] fs: add support for buffered writeback to pass down write hints
-Date: Thu, 15 Jun 2017 10:42:06 -0600
-Message-Id: <1497544930-19174-9-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
-References: <1497544930-19174-1-git-send-email-axboe@kernel.dk>
+Message-ID: <56640935-e897-1586-5493-1cf1ffc98ba9@kernel.dk>
+Date: Sun, 18 Jun 2017 09:06:49 -0600
+MIME-Version: 1.0
+In-Reply-To: <87bmpl6hkq.fsf@notabene.neil.brown.name>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/buffer.c | 14 +++++++++-----
- fs/mpage.c  |  1 +
- 2 files changed, 10 insertions(+), 5 deletions(-)
+On 06/17/2017 10:33 PM, NeilBrown wrote:
+> On Fri, Jun 16 2017, Jens Axboe wrote:
+> 
+>> On 06/15/2017 11:02 PM, NeilBrown wrote:
+>>> Hi Jens,
+>>>  one of these is a resend of a patch I sent a while back.
+>>>  The other is new - loop closes files differently from close()
+>>>  and in a way that can confuse NFS.
+>>
+>> Are you wanting to get these into 4.12, or defer to 4.13?
+> 
+> I'm happy either way.  I just want them to land eventually, so I can
+> tick them off my list.
+> 
+> The conversation with Al might result in a different fix for the
+> flip_close() problem, but I think that it is still more correct to call
+> filp_close(), because what loop is doing is a lot like closing a file
+> that it has been writing to.
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 161be58c5cb0..3faf73a71d4b 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -49,7 +49,7 @@
- 
- static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
- static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
--			 struct writeback_control *wbc);
-+			 unsigned int stream, struct writeback_control *wbc);
- 
- #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
- 
-@@ -1829,7 +1829,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 	do {
- 		struct buffer_head *next = bh->b_this_page;
- 		if (buffer_async_write(bh)) {
--			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
-+			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
-+					inode_write_hint(inode), wbc);
- 			nr_underway++;
- 		}
- 		bh = next;
-@@ -1883,7 +1884,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 		struct buffer_head *next = bh->b_this_page;
- 		if (buffer_async_write(bh)) {
- 			clear_buffer_dirty(bh);
--			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
-+			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
-+					inode_write_hint(inode), wbc);
- 			nr_underway++;
- 		}
- 		bh = next;
-@@ -3091,7 +3093,7 @@ void guard_bio_eod(int op, struct bio *bio)
- }
- 
- static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
--			 struct writeback_control *wbc)
-+			 unsigned int write_hint, struct writeback_control *wbc)
- {
- 	struct bio *bio;
- 
-@@ -3134,6 +3136,8 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 		op_flags |= REQ_META;
- 	if (buffer_prio(bh))
- 		op_flags |= REQ_PRIO;
-+
-+	op_flags |= bio_op_write_hint(write_hint);
- 	bio_set_op_attrs(bio, op, op_flags);
- 
- 	submit_bio(bio);
-@@ -3142,7 +3146,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 
- int submit_bh(int op, int op_flags, struct buffer_head *bh)
- {
--	return submit_bh_wbc(op, op_flags, bh, NULL);
-+	return submit_bh_wbc(op, op_flags, bh, 0, NULL);
- }
- EXPORT_SYMBOL(submit_bh);
- 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index baff8f820c29..df0635c8a512 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -614,6 +614,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
- 			goto confused;
- 
- 		wbc_init_bio(wbc, bio);
-+		bio->bi_opf |= bio_op_write_hint(inode_write_hint(inode));
- 	}
- 
- 	/*
+I'll toss 2/2 in for now for 4.13, please resend the other once the issues
+have been ironed out.
+
 -- 
-2.7.4
+Jens Axboe
