@@ -1,26 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:56194 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753141AbdFSMlj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jun 2017 08:41:39 -0400
-Date: Mon, 19 Jun 2017 14:41:38 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+Received: from merlin.infradead.org ([205.233.59.134]:52126 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753176AbdFRPWY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 11:22:24 -0400
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-nvme@lists.infradead.org
+Cc: Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH rfc 10/30] nvme: Add admin_tagset pointer to nvme_ctrl
-Message-ID: <20170619124138.GJ29061@lst.de>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me> <1497799324-19598-11-git-send-email-sagi@grimberg.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1497799324-19598-11-git-send-email-sagi@grimberg.me>
+Subject: [PATCH rfc 10/30] nvme: Add admin_tagset pointer to nvme_ctrl
+Date: Sun, 18 Jun 2017 18:21:44 +0300
+Message-Id: <1497799324-19598-11-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sun, Jun 18, 2017 at 06:21:44PM +0300, Sagi Grimberg wrote:
-> Will be used when we centralize control flows. only
-> rdma for now.
+Will be used when we centralize control flows. only
+rdma for now.
 
-Should we at some point move the tag_sets themselves to the generic
-ctrl instead of just pointers?
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/nvme.h | 1 +
+ drivers/nvme/host/rdma.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 415a5ea4759c..3be59634b4af 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -126,6 +126,7 @@ struct nvme_ctrl {
+ 	struct kref kref;
+ 	int instance;
+ 	struct blk_mq_tag_set *tagset;
++	struct blk_mq_tag_set *admin_tagset;
+ 	struct list_head namespaces;
+ 	struct mutex namespaces_mutex;
+ 	struct device *device;	/* char device */
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 2b23f88bedfe..58ed2ae3cd35 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -801,6 +801,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl, bool new
+ 		error = blk_mq_alloc_tag_set(&ctrl->admin_tag_set);
+ 		if (error)
+ 			goto out_put_dev;
++		ctrl->ctrl.admin_tagset = &ctrl->admin_tag_set;
+ 
+ 		ctrl->ctrl.admin_q = blk_mq_init_queue(&ctrl->admin_tag_set);
+ 		if (IS_ERR(ctrl->ctrl.admin_q)) {
+-- 
+2.7.4
