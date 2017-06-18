@@ -1,93 +1,62 @@
 Return-Path: <neilb@suse.de>
 From: NeilBrown <neilb@suse.com>
 To: Jens Axboe <axboe@kernel.dk>
-Date: Tue, 02 May 2017 13:42:23 +1000
-Subject: [PATCH 00/13] block: assorted cleanup for bio splitting and cloning.
-Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
- linux-kernel@vger.kernel.org, Shaohua Li <shli@kernel.org>
-Cc: Javier Gonzalez <jg@lightnvm.io>
-Message-ID: <149369628671.5146.4865312503373040039.stgit@noble>
+Date: Mon, 19 Jun 2017 07:36:33 +1000
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/13] block: assorted cleanup for bio splitting and cloning.
+In-Reply-To: <20170618184143.GA10920@kernel.dk>
+References: <149776047907.23258.8058071140236879834.stgit@noble> <20170618184143.GA10920@kernel.dk>
+Message-ID: <87poe13rmm.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
 
-This is a revision of my series of patches working
-towards removing the bioset work queues.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-This set is based on Linus' tree as for today (2nd May) plus
-the for-linus branch from Shaohua's md/raid tree.
+On Sun, Jun 18 2017, Jens Axboe wrote:
 
-This series adds a fix for the new lightnvm/pblk-read code
-and discards bioset_create_nobvec() in favor of a flag arg to
-bioset_create().  There are also minor fixes and a little
-code clean-up.
+> On Sun, Jun 18 2017, NeilBrown wrote:
+>> This is a resend of my series of patches working
+>> towards removing the bioset work queues.
+>>=20
+>> This set is based on for-4.13/block.
+>>=20
+>> It incorporates the revised versions of all the patches that were
+>> resent following feedback on the last set.
+>>=20
+>> It also includes a minor grammatic improvement to a comment, and
+>> simple changes to compensate for a couple of changes to the block tree
+>> since the last posting.
+>>=20
+>> I hope to eventually get rid of the new BIOSET_NEED_RESCUER flag,
+>> but that needs work in dm and probably bcache first.
+>
+> Thanks Neil, applied.
 
-I hope to eventually get rid of the new BIOSET_NEED_RESCUER flag,
-but that needs work ing dm and probably bcache first.
+Thanks a lot Jens.
 
-Thanks,
 NeilBrown
 
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
----
+-----BEGIN PGP SIGNATURE-----
 
-NeilBrown (13):
-      blk: remove bio_set arg from blk_queue_split()
-      blk: replace bioset_create_nobvec() with a flags arg to bioset_create()
-      blk: make the bioset rescue_workqueue optional.
-      blk: use non-rescuing bioset for q->bio_split.
-      block: Improvements to bounce-buffer handling
-      rbd: use bio_clone_fast() instead of bio_clone()
-      drbd: use bio_clone_fast() instead of bio_clone()
-      pktcdvd: use bio_clone_fast() instead of bio_clone()
-      lightnvm/pblk-read: use bio_clone_fast()
-      xen-blkfront: remove bio splitting.
-      bcache: use kmalloc to allocate bio in bch_data_verify()
-      block: remove bio_clone() and all references.
-      block: don't check for BIO_MAX_PAGES in blk_bio_segment_split()
-
-
- Documentation/block/biodoc.txt      |    2 -
- block/bio.c                         |   72 ++++++++++++++++-------------------
- block/blk-core.c                    |    4 +-
- block/blk-merge.c                   |   31 ++-------------
- block/blk-mq.c                      |    2 -
- block/bounce.c                      |   32 +++++++++++++---
- drivers/block/drbd/drbd_int.h       |    3 +
- drivers/block/drbd/drbd_main.c      |   11 +++++
- drivers/block/drbd/drbd_req.c       |    2 -
- drivers/block/drbd/drbd_req.h       |    2 -
- drivers/block/pktcdvd.c             |   14 +++++--
- drivers/block/ps3vram.c             |    2 -
- drivers/block/rbd.c                 |   16 +++++++-
- drivers/block/rsxx/dev.c            |    2 -
- drivers/block/umem.c                |    2 -
- drivers/block/xen-blkfront.c        |   54 +-------------------------
- drivers/block/zram/zram_drv.c       |    2 -
- drivers/lightnvm/pblk-init.c        |   16 ++++++--
- drivers/lightnvm/pblk-read.c        |    2 -
- drivers/lightnvm/pblk.h             |    1 
- drivers/lightnvm/rrpc.c             |    2 -
- drivers/md/bcache/debug.c           |    2 -
- drivers/md/bcache/super.c           |    6 ++-
- drivers/md/dm-crypt.c               |    2 -
- drivers/md/dm-io.c                  |    2 -
- drivers/md/dm.c                     |    5 +-
- drivers/md/md.c                     |    6 +--
- drivers/md/raid1.c                  |    2 -
- drivers/md/raid10.c                 |    2 -
- drivers/md/raid5-cache.c            |    2 -
- drivers/md/raid5-ppl.c              |    2 -
- drivers/md/raid5.c                  |    2 -
- drivers/s390/block/dcssblk.c        |    2 -
- drivers/s390/block/xpram.c          |    2 -
- drivers/target/target_core_iblock.c |    2 -
- fs/block_dev.c                      |    2 -
- fs/btrfs/extent_io.c                |    3 +
- fs/xfs/xfs_super.c                  |    3 +
- include/linux/bio.h                 |   12 ++----
- include/linux/blkdev.h              |    3 -
- 40 files changed, 162 insertions(+), 174 deletions(-)
-
---
-Signature
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAllG8mMACgkQOeye3VZi
+gblISw//UFQg1nu+tquc1lAkcPmtFZqvTWRTa1/pgfE3UIinKwQiZJsubYv7nI9T
+RvfK1dEcWbK6EyH+bfkmB98WvIk+p0jns2kK/LU3yWPBbm4oFQ1X3mTmxKahVvQB
+RChLRC6QwaV/29qrYiz6+bWf54h0Ij4hLAKP7RBQRSfU2SZGhmcriMRyRIBAayFS
+hpqm0r5uaDku+XgFbl64ytFbaTYzw/RD24LjAyu9SjgSMKpa+xtBHyWE/ozazTtJ
+s/GpCRjewCGXoV2iFauC5yykbshhbLhg374AVBteRstJkuypCSGPt7puISnwyuDG
+H1DCn1AVPmBtVVw8v8HK/a6QMoKWxV7+dLS3T7OCJyOUKqtbUWn4YvFB2zFsScdy
+9aO6R+X0+jRuZpQwlBNkimBPRVUR0hcPwxDQAdxOhzvnn6wap0cKhTLBdFx+61P4
+/gL/l/i9yjCGKVRSFnH3HH/FVKCDlXgoNccGQPXrjAnwQkp6d/AFX3u9XTj+Wk+G
+ZmU7L9GiFAAIVHyz7te71IC1lLAx6BAnCPA0ReipY1Xu1dvmMbWZLox6ulY3UT0S
+uMhk91NbBS/CKdyRn1r8vO7QqB0govuPdd2ZlU8HfHRUSwDa8qLIERacozQ7dGPF
+vqvQtBrnUqdqoypN/0VOa2dzAYdhLlu6rRSz8y5tNOsj1SILKms=
+=3Uj2
+-----END PGP SIGNATURE-----
+--=-=-=--
