@@ -1,49 +1,39 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, "Omar
- Sandoval" <osandov@fb.com>
-Subject: [PATCH v3 4/4] blk-mq-debugfs: Add 'kick' operation
-Date: Thu, 1 Jun 2017 08:55:13 -0700
-Message-ID: <20170601155513.26712-5-bart.vanassche@sandisk.com>
-In-Reply-To: <20170601155513.26712-1-bart.vanassche@sandisk.com>
-References: <20170601155513.26712-1-bart.vanassche@sandisk.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 05/10] blk-mq: simplify blk_mq_free_request
+To: Christoph Hellwig <hch@lst.de>
+Cc: Omar Sandoval <osandov@fb.com>, Paolo Valente <paolo.valente@linaro.org>,
+ linux-block@vger.kernel.org
+References: <20170616161527.17649-1-hch@lst.de>
+ <20170616161527.17649-6-hch@lst.de>
+ <c077675d-5ff0-a3e4-1caa-23554e0e246d@kernel.dk>
+ <20170618072406.GA25582@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <c632d273-e363-d83d-7f3b-5dea0efd3d47@kernel.dk>
+Date: Sun, 18 Jun 2017 09:05:41 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <20170618072406.GA25582@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Running a queue causes the block layer to examine the per-CPU and
-hw queues but not the requeue list. Hence add a 'kick' operation
-that also examines the requeue list.
+On 06/18/2017 01:24 AM, Christoph Hellwig wrote:
+> On Sat, Jun 17, 2017 at 03:50:40PM -0600, Jens Axboe wrote:
+>> On 06/16/2017 10:15 AM, Christoph Hellwig wrote:
+>>> Merge three functions only tail-called by blk_mq_free_request into
+>>> blk_mq_free_request.
+>>
+>> This doesn't compile, as blk_mq_merge_queue_io() has a call to
+>> __blk_mq_finish_request().
+> 
+> Hmm.  The tree I've based my work on certainly doesn't.  But it doesn't
+> even have blk_mq_merge_queue_io at all either, as does your for-4.13/block
+> block tree.
+> 
+> What am I missing?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-debugfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I tossed it into master for testing by mistake. It's fine against
+for-4.13/block, my fault.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 90c454bbaf92..9edebbdce0bd 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -114,10 +114,12 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
- 		blk_mq_run_hw_queues(q, true);
- 	} else if (strcmp(op, "start") == 0) {
- 		blk_mq_start_stopped_hw_queues(q, true);
-+	} else if (strcmp(op, "kick") == 0) {
-+		blk_mq_kick_requeue_list(q);
- 	} else {
- 		pr_err("%s: unsupported operation '%s'\n", __func__, op);
- inval:
--		pr_err("%s: use either 'run' or 'start'\n", __func__);
-+		pr_err("%s: use 'run', 'start' or 'kick'\n", __func__);
- 		return -EINVAL;
- 	}
- 	return count;
+I ran it through the regular testing and no issues uncovered so far.
+
 -- 
-2.12.2
+Jens Axboe
