@@ -1,75 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52142 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753176AbdFRPW1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:27 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 12/30] nvme-rdma: disable controller in reset instead of shutdown
-Date: Sun, 18 Jun 2017 18:21:46 +0300
-Message-Id: <1497799324-19598-13-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+Received: from mx2.suse.de ([195.135.220.15]:44905 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752998AbdFREke (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:40:34 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:58 +1000
+Subject: [PATCH 09/13] lightnvm/pblk-read: use bio_clone_fast()
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073872.23258.5197619453109200550.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-For controller resets we can avoid a full controller shutdown.
-This makes rdma similar to pci.
+pblk_submit_read() uses bio_clone_bioset() but doesn't change the
+io_vec, so bio_clone_fast() is a better choice.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+It also uses fs_bio_set which is intended for filesystems.  Using it
+in a device driver can deadlock.
+So allocate a new bioset, and and use bio_clone_fast().
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+Tested-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- drivers/nvme/host/rdma.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ drivers/lightnvm/pblk-init.c |   12 +++++++++++-
+ drivers/lightnvm/pblk-read.c |    2 +-
+ drivers/lightnvm/pblk.h      |    1 +
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index cd637e28647b..34518c90609a 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1720,7 +1720,7 @@ static const struct blk_mq_ops nvme_rdma_admin_mq_ops = {
- 	.timeout	= nvme_rdma_timeout,
- };
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index b3fec8ec55b8..aaefbccce30e 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -23,6 +23,7 @@
+ static struct kmem_cache *pblk_blk_ws_cache, *pblk_rec_cache, *pblk_r_rq_cache,
+ 					*pblk_w_rq_cache, *pblk_line_meta_cache;
+ static DECLARE_RWSEM(pblk_lock);
++struct bio_set *pblk_bio_set;
  
--static void nvme_rdma_shutdown_ctrl(struct nvme_rdma_ctrl *ctrl, bool shutdown)
-+static void nvme_rdma_teardown_ctrl(struct nvme_rdma_ctrl *ctrl, bool shutdown)
+ static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
+ 			  struct bio *bio)
+@@ -946,11 +947,20 @@ static struct nvm_tgt_type tt_pblk = {
+ 
+ static int __init pblk_module_init(void)
  {
- 	nvme_stop_keep_alive(&ctrl->ctrl);
- 	cancel_work_sync(&ctrl->err_work);
-@@ -1733,8 +1733,12 @@ static void nvme_rdma_shutdown_ctrl(struct nvme_rdma_ctrl *ctrl, bool shutdown)
- 		nvme_rdma_destroy_io_queues(ctrl, shutdown);
- 	}
- 
--	if (test_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[0].flags))
--		nvme_shutdown_ctrl(&ctrl->ctrl);
-+	if (test_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[0].flags)) {
-+		if (shutdown)
-+			nvme_shutdown_ctrl(&ctrl->ctrl);
-+		else
-+			nvme_disable_ctrl(&ctrl->ctrl, ctrl->ctrl.cap);
-+	}
- 
- 	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
-@@ -1748,7 +1752,7 @@ static void nvme_rdma_del_ctrl_work(struct work_struct *work)
- 				struct nvme_rdma_ctrl, delete_work);
- 
- 	nvme_uninit_ctrl(&ctrl->ctrl);
--	nvme_rdma_shutdown_ctrl(ctrl, true);
-+	nvme_rdma_teardown_ctrl(ctrl, true);
- 	nvme_put_ctrl(&ctrl->ctrl);
+-	return nvm_register_tgt_type(&tt_pblk);
++	int ret;
++
++	pblk_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
++	if (!pblk_bio_set)
++		return -ENOMEM;
++	ret = nvm_register_tgt_type(&tt_pblk);
++	if (ret)
++		bioset_free(pblk_bio_set);
++	return ret;
  }
  
-@@ -1788,7 +1792,7 @@ static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
- 	int ret;
- 	bool changed;
+ static void pblk_module_exit(void)
+ {
++	bioset_free(pblk_bio_set);
+ 	nvm_unregister_tgt_type(&tt_pblk);
+ }
  
--	nvme_rdma_shutdown_ctrl(ctrl, false);
-+	nvme_rdma_teardown_ctrl(ctrl, false);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 762c0b73cb67..74d3fc53022e 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -342,7 +342,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 		struct pblk_r_ctx *r_ctx = nvm_rq_to_pdu(rqd);
  
- 	ret = nvme_rdma_configure_admin_queue(ctrl, false);
- 	if (ret)
--- 
-2.7.4
+ 		/* Clone read bio to deal with read errors internally */
+-		int_bio = bio_clone_bioset(bio, GFP_KERNEL, fs_bio_set);
++		int_bio = bio_clone_fast(bio, GFP_KERNEL, pblk_bio_set);
+ 		if (!int_bio) {
+ 			pr_err("pblk: could not clone read bio\n");
+ 			return NVM_IO_ERR;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 99f3186b5288..95b665f23925 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -702,6 +702,7 @@ void pblk_write_should_kick(struct pblk *pblk);
+ /*
+  * pblk read path
+  */
++extern struct bio_set *pblk_bio_set;
+ int pblk_submit_read(struct pblk *pblk, struct bio *bio);
+ int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
+ 			unsigned int nr_secs, unsigned int *secs_to_gc,
