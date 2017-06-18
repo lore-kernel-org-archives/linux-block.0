@@ -1,156 +1,70 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 02/12] block: Make request operation type argument declarations consistent
-Date: Tue, 20 Jun 2017 11:15:39 -0700
-Message-ID: <20170620181549.24903-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
-References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:44933 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750916AbdFREkw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:40:52 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:59 +1000
+Subject: [PATCH 13/13] block: don't check for BIO_MAX_PAGES in
+ blk_bio_segment_split()
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073949.23258.4498656312654103359.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+blk_bio_segment_split() makes sure bios have no more than
+BIO_MAX_PAGES entries in the bi_io_vec.
+This was done because bio_clone_bioset() (when given a
+mempool bioset) could not handle larger io_vecs.
 
-Instead of declaring the second argument of blk_*_get_request()
-as int and passing it to functions that expect an unsigned int,
-declare that second argument as unsigned int. Also because of
-consistency, rename that second argument from 'rw' into 'op'.
-This patch does not change any functionality.
+No driver uses bio_clone_bioset() any more, they all
+use bio_clone_fast() if anything, and bio_clone_fast()
+doesn't clone the bi_io_vec.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+The main user of of bio_clone_bioset() at this level
+is bounce.c, and bouncing now happens before blk_bio_segment_split(),
+so that is not of concern.
+
+So remove the big helpful comment and the code.
+
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- block/blk-core.c       | 13 +++++++------
- block/blk-mq.c         | 10 +++++-----
- include/linux/blk-mq.h |  6 +++---
- include/linux/blkdev.h |  3 ++-
- 4 files changed, 17 insertions(+), 15 deletions(-)
+ block/blk-merge.c |   16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 279e3c432d7b..21f6f1020303 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1347,8 +1347,8 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	goto retry;
- }
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index e7862e9dcc39..cea544ec5d96 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -108,25 +108,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	bool do_split = true;
+ 	struct bio *new = NULL;
+ 	const unsigned max_sectors = get_max_io_size(q, bio);
+-	unsigned bvecs = 0;
  
--static struct request *blk_old_get_request(struct request_queue *q, int rw,
--		gfp_t gfp_mask)
-+static struct request *blk_old_get_request(struct request_queue *q,
-+					   unsigned int op, gfp_t gfp_mask)
- {
- 	struct request *rq;
- 
-@@ -1356,7 +1356,7 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- 	create_io_context(gfp_mask, q->node);
- 
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, rw, NULL, gfp_mask);
-+	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
- 		return rq;
-@@ -1369,14 +1369,15 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- 	return rq;
- }
- 
--struct request *blk_get_request(struct request_queue *q, int rw, gfp_t gfp_mask)
-+struct request *blk_get_request(struct request_queue *q, unsigned int op,
-+				gfp_t gfp_mask)
- {
- 	if (q->mq_ops)
--		return blk_mq_alloc_request(q, rw,
-+		return blk_mq_alloc_request(q, op,
- 			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
- 				0 : BLK_MQ_REQ_NOWAIT);
- 	else
--		return blk_old_get_request(q, rw, gfp_mask);
-+		return blk_old_get_request(q, op, gfp_mask);
- }
- EXPORT_SYMBOL(blk_get_request);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3e0cc11b1a90..2d21fbccc3a5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -328,7 +328,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	return rq;
- }
- 
--struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
-+struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 		unsigned int flags)
- {
- 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
-@@ -339,7 +339,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- 	if (ret)
- 		return ERR_PTR(ret);
- 
--	rq = blk_mq_get_request(q, NULL, rw, &alloc_data);
-+	rq = blk_mq_get_request(q, NULL, op, &alloc_data);
- 
- 	blk_mq_put_ctx(alloc_data.ctx);
- 	blk_queue_exit(q);
-@@ -354,8 +354,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- }
- EXPORT_SYMBOL(blk_mq_alloc_request);
- 
--struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
--		unsigned int flags, unsigned int hctx_idx)
-+struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
-+		unsigned int op, unsigned int flags, unsigned int hctx_idx)
- {
- 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
- 	struct request *rq;
-@@ -390,7 +390,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- 	cpu = cpumask_first(alloc_data.hctx->cpumask);
- 	alloc_data.ctx = __blk_mq_get_ctx(q, cpu);
- 
--	rq = blk_mq_get_request(q, NULL, rw, &alloc_data);
-+	rq = blk_mq_get_request(q, NULL, op, &alloc_data);
- 
- 	blk_queue_exit(q);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 3f2c22a42df6..3077714250ce 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -202,10 +202,10 @@ enum {
- 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
- };
- 
--struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
-+struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 		unsigned int flags);
--struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int op,
--		unsigned int flags, unsigned int hctx_idx);
-+struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
-+		unsigned int op, unsigned int flags, unsigned int hctx_idx);
- struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
- 
- enum {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 22cfba64ce81..c2844c27ef65 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -934,7 +934,8 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
--extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
-+extern struct request *blk_get_request(struct request_queue *, unsigned int op,
-+				       gfp_t gfp_mask);
- extern void blk_requeue_request(struct request_queue *, struct request *);
- extern int blk_lld_busy(struct request_queue *q);
- extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
--- 
-2.13.1
+ 	bio_for_each_segment(bv, bio, iter) {
+ 		/*
+-		 * With arbitrary bio size, the incoming bio may be very
+-		 * big. We have to split the bio into small bios so that
+-		 * each holds at most BIO_MAX_PAGES bvecs because
+-		 * bio_clone_bioset() can fail to allocate big bvecs.
+-		 *
+-		 * Those drivers which will need to use bio_clone_bioset()
+-		 * should tell us in some way.  For now, impose the
+-		 * BIO_MAX_PAGES limit on all queues.
+-		 *
+-		 * TODO: handle users of bio_clone_bioset() differently.
+-		 */
+-		if (bvecs++ >= BIO_MAX_PAGES)
+-			goto split;
+-
+-		/*
+ 		 * If the queue doesn't support SG gaps and adding this
+ 		 * offset would create a gap, disallow it.
+ 		 */
