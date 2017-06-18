@@ -1,68 +1,116 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52150 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753176AbdFRPW2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:28 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 13/30] nvme-rdma: move queue LIVE/DELETING flags settings to queue routines
-Date: Sun, 18 Jun 2017 18:21:47 +0300
-Message-Id: <1497799324-19598-14-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+Received: from mx2.suse.de ([195.135.220.15]:44888 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752538AbdFREkK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:40:10 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:58 +1000
+Subject: [PATCH 07/13] drbd: use bio_clone_fast() instead of bio_clone()
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073824.23258.9244455329321242007.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+drbd does not modify the bi_io_vec of the cloned bio,
+so there is no need to clone that part.  So bio_clone_fast()
+is the better choice.
+For bio_clone_fast() we need to specify a bio_set.
+We could use fs_bio_set, which bio_clone() uses, or
+drbd_md_io_bio_set, which drbd uses for metadata, but it is
+generally best to avoid sharing bio_sets unless you can
+be certain that there are no interdependencies.
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 34518c90609a..d9524389aedd 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -565,7 +565,7 @@ static void nvme_rdma_stop_queue(struct nvme_rdma_ctrl *ctrl, int qid)
+So create a new bio_set, drbd_io_bio_set, and use bio_clone_fast().
+
+Also remove a "XXX cannot fail ???" comment because it definitely
+cannot fail - bio_clone_fast() doesn't fail if the GFP flags allow for
+sleeping.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: NeilBrown <neilb@suse.com>
+---
+ drivers/block/drbd/drbd_int.h  |    3 +++
+ drivers/block/drbd/drbd_main.c |    9 +++++++++
+ drivers/block/drbd/drbd_req.h  |    2 +-
+ 3 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index 76761b4ca13e..d17b6e6393c7 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -1441,6 +1441,9 @@ extern struct bio_set *drbd_md_io_bio_set;
+ /* to allocate from that set */
+ extern struct bio *bio_alloc_drbd(gfp_t gfp_mask);
+ 
++/* And a bio_set for cloning */
++extern struct bio_set *drbd_io_bio_set;
++
+ extern struct mutex resources_mutex;
+ 
+ extern int conn_lowest_minor(struct drbd_connection *connection);
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index bdf51b6977cf..90680034ef57 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -128,6 +128,7 @@ mempool_t *drbd_request_mempool;
+ mempool_t *drbd_ee_mempool;
+ mempool_t *drbd_md_io_page_pool;
+ struct bio_set *drbd_md_io_bio_set;
++struct bio_set *drbd_io_bio_set;
+ 
+ /* I do not use a standard mempool, because:
+    1) I want to hand out the pre-allocated objects first.
+@@ -2098,6 +2099,8 @@ static void drbd_destroy_mempools(void)
+ 
+ 	/* D_ASSERT(device, atomic_read(&drbd_pp_vacant)==0); */
+ 
++	if (drbd_io_bio_set)
++		bioset_free(drbd_io_bio_set);
+ 	if (drbd_md_io_bio_set)
+ 		bioset_free(drbd_md_io_bio_set);
+ 	if (drbd_md_io_page_pool)
+@@ -2115,6 +2118,7 @@ static void drbd_destroy_mempools(void)
+ 	if (drbd_al_ext_cache)
+ 		kmem_cache_destroy(drbd_al_ext_cache);
+ 
++	drbd_io_bio_set      = NULL;
+ 	drbd_md_io_bio_set   = NULL;
+ 	drbd_md_io_page_pool = NULL;
+ 	drbd_ee_mempool      = NULL;
+@@ -2142,6 +2146,7 @@ static int drbd_create_mempools(void)
+ 	drbd_pp_pool         = NULL;
+ 	drbd_md_io_page_pool = NULL;
+ 	drbd_md_io_bio_set   = NULL;
++	drbd_io_bio_set      = NULL;
+ 
+ 	/* caches */
+ 	drbd_request_cache = kmem_cache_create(
+@@ -2165,6 +2170,10 @@ static int drbd_create_mempools(void)
+ 		goto Enomem;
+ 
+ 	/* mempools */
++	drbd_io_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_RESCUER);
++	if (drbd_io_bio_set == NULL)
++		goto Enomem;
++
+ 	drbd_md_io_bio_set = bioset_create(DRBD_MIN_POOL_PAGES, 0,
+ 					   BIOSET_NEED_BVECS |
+ 					   BIOSET_NEED_RESCUER);
+diff --git a/drivers/block/drbd/drbd_req.h b/drivers/block/drbd/drbd_req.h
+index eb49e7f2da91..9e1866ab238f 100644
+--- a/drivers/block/drbd/drbd_req.h
++++ b/drivers/block/drbd/drbd_req.h
+@@ -263,7 +263,7 @@ enum drbd_req_state_bits {
+ static inline void drbd_req_make_private_bio(struct drbd_request *req, struct bio *bio_src)
  {
- 	struct nvme_rdma_queue *queue = &ctrl->queues[qid];
+ 	struct bio *bio;
+-	bio = bio_clone(bio_src, GFP_NOIO); /* XXX cannot fail?? */
++	bio = bio_clone_fast(bio_src, GFP_NOIO, drbd_io_bio_set);
  
--	if (test_bit(NVME_RDMA_Q_DELETING, &queue->flags))
-+	if (!test_and_clear_bit(NVME_RDMA_Q_LIVE, &queue->flags))
- 		return;
- 	rdma_disconnect(queue->cm_id);
- 	ib_drain_qp(queue->qp);
-@@ -617,7 +617,9 @@ static int nvme_rdma_start_queue(struct nvme_rdma_ctrl *ctrl, int idx)
- 	else
- 		ret = nvmf_connect_admin_queue(&ctrl->ctrl);
+ 	req->private_bio = bio;
  
--	if (ret)
-+	if (!ret)
-+		set_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[idx].flags);
-+	else
- 		dev_info(ctrl->ctrl.device,
- 			"failed to connect queue: %d ret=%d\n", idx, ret);
- 	return ret;
-@@ -631,8 +633,6 @@ static int nvme_rdma_start_io_queues(struct nvme_rdma_ctrl *ctrl)
- 		ret = nvme_rdma_start_queue(ctrl, i);
- 		if (ret)
- 			goto out_stop_queues;
--
--		set_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[i].flags);
- 	}
- 
- 	return 0;
-@@ -823,8 +823,6 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl, bool new
- 	if (error)
- 		goto out_cleanup_connect_queue;
- 
--	set_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[0].flags);
--
- 	error = nvmf_reg_read64(&ctrl->ctrl, NVME_REG_CAP, &ctrl->ctrl.cap);
- 	if (error) {
- 		dev_err(ctrl->ctrl.device,
--- 
-2.7.4
