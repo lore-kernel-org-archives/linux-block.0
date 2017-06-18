@@ -1,43 +1,134 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 09/11] xfs: add support for passing in write hints for buffered writes
-Date: Fri, 16 Jun 2017 11:24:41 -0600
-Message-Id: <1497633883-21230-10-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
-References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:44877 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752538AbdFREkC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:40:02 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:58 +1000
+Subject: [PATCH 05/13] block: Improvements to bounce-buffer handling
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073780.23258.16187458754319573811.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Since commit 23688bf4f830 ("block: ensure to split after potentially
+bouncing a bio") blk_queue_bounce() is called *before*
+blk_queue_split().
+This means that:
+ 1/ the comments blk_queue_split() about bounce buffers are
+    irrelevant, and
+ 2/ a very large bio (more than BIO_MAX_PAGES) will no longer be
+    split before it arrives at blk_queue_bounce(), leading to the
+    possibility that bio_clone_bioset() will fail and a NULL
+    will be dereferenced.
+
+Separately, blk_queue_bounce() shouldn't use fs_bio_set as the bio
+being copied could be from the same set, and this could lead to a
+deadlock.
+
+So:
+ - allocate 2 private biosets for blk_queue_bounce, one for
+   splitting enormous bios and one for cloning bios.
+ - add code to split a bio that exceeds BIO_MAX_PAGES.
+ - Fix up the comments in blk_queue_split()
+
+Credit-to: Ming Lei <tom.leiming@gmail.com> (suggested using single bio_for_each_segment loop)
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- fs/xfs/xfs_aops.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-merge.c |   14 ++++----------
+ block/bounce.c    |   32 ++++++++++++++++++++++++++------
+ 2 files changed, 30 insertions(+), 16 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 09af0f7cd55e..040789c51930 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -505,6 +505,7 @@ xfs_submit_ioend(
- 		return status;
- 	}
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index d59074556703..51c84540d3bb 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -117,17 +117,11 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		 * each holds at most BIO_MAX_PAGES bvecs because
+ 		 * bio_clone() can fail to allocate big bvecs.
+ 		 *
+-		 * It should have been better to apply the limit per
+-		 * request queue in which bio_clone() is involved,
+-		 * instead of globally. The biggest blocker is the
+-		 * bio_clone() in bio bounce.
++		 * Those drivers which will need to use bio_clone()
++		 * should tell us in some way.  For now, impose the
++		 * BIO_MAX_PAGES limit on all queues.
+ 		 *
+-		 * If bio is splitted by this reason, we should have
+-		 * allowed to continue bios merging, but don't do
+-		 * that now for making the change simple.
+-		 *
+-		 * TODO: deal with bio bounce's bio_clone() gracefully
+-		 * and convert the global limit into per-queue limit.
++		 * TODO: handle users of bio_clone() differently.
+ 		 */
+ 		if (bvecs++ >= BIO_MAX_PAGES)
+ 			goto split;
+diff --git a/block/bounce.c b/block/bounce.c
+index e4703181d97f..17d77613c471 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -26,6 +26,7 @@
+ #define POOL_SIZE	64
+ #define ISA_POOL_SIZE	16
  
-+	ioend->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(ioend->io_inode));
- 	submit_bio(ioend->io_bio);
++struct bio_set *bounce_bio_set, *bounce_bio_split;
+ static mempool_t *page_pool, *isa_page_pool;
+ 
+ #if defined(CONFIG_HIGHMEM) || defined(CONFIG_NEED_BOUNCE_POOL)
+@@ -40,6 +41,14 @@ static __init int init_emergency_pool(void)
+ 	BUG_ON(!page_pool);
+ 	pr_info("pool size: %d pages\n", POOL_SIZE);
+ 
++	bounce_bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
++	BUG_ON(!bounce_bio_set);
++	if (bioset_integrity_create(bounce_bio_set, BIO_POOL_SIZE))
++		BUG_ON(1);
++
++	bounce_bio_split = bioset_create(BIO_POOL_SIZE, 0, 0);
++	BUG_ON(!bounce_bio_split);
++
  	return 0;
  }
-@@ -564,6 +565,7 @@ xfs_chain_bio(
- 	bio_chain(ioend->io_bio, new);
- 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
- 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
-+	ioend->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(ioend->io_inode));
- 	submit_bio(ioend->io_bio);
- 	ioend->io_bio = new;
- }
--- 
-2.7.4
+ 
+@@ -186,15 +195,26 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	int rw = bio_data_dir(*bio_orig);
+ 	struct bio_vec *to, from;
+ 	struct bvec_iter iter;
+-	unsigned i;
++	unsigned i = 0;
++	bool bounce = false;
++	int sectors = 0;
+ 
+-	bio_for_each_segment(from, *bio_orig, iter)
++	bio_for_each_segment(from, *bio_orig, iter) {
++		if (i++ < BIO_MAX_PAGES)
++			sectors += from.bv_len >> 9;
+ 		if (page_to_pfn(from.bv_page) > queue_bounce_pfn(q))
+-			goto bounce;
++			bounce = true;
++	}
++	if (!bounce)
++		return;
+ 
+-	return;
+-bounce:
+-	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, fs_bio_set);
++	if (sectors < bio_sectors(*bio_orig)) {
++		bio = bio_split(*bio_orig, sectors, GFP_NOIO, bounce_bio_split);
++		bio_chain(bio, *bio_orig);
++		generic_make_request(*bio_orig);
++		*bio_orig = bio;
++	}
++	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
+ 
+ 	bio_for_each_segment_all(to, bio, i) {
+ 		struct page *page = to->bv_page;
