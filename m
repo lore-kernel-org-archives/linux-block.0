@@ -1,45 +1,55 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@infradead.org"
+	<hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>
 Subject: Re: [PATCH v5 00/12] blk-mq: fix & improve queue quiescing
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "ming.lei@redhat.com" <ming.lei@redhat.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Date: Sun, 18 Jun 2017 23:05:50 +0000
+Message-ID: <1497827149.16169.1.camel@wdc.com>
 References: <20170606152210.22806-1-ming.lei@redhat.com>
- <08a2b32d-866e-a71f-4ac6-9c131edb88e2@fb.com>
- <20170613021518.GB15043@ming.t460p> <20170618202604.GA14417@kernel.dk>
- <1497827149.16169.1.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <547999d5-8231-6dbd-3a79-0716dd070c9b@kernel.dk>
-Date: Sun, 18 Jun 2017 17:48:05 -0600
+	 <08a2b32d-866e-a71f-4ac6-9c131edb88e2@fb.com>
+	 <20170613021518.GB15043@ming.t460p> <20170618202604.GA14417@kernel.dk>
+In-Reply-To: <20170618202604.GA14417@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1497827149.16169.1.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/18/2017 05:05 PM, Bart Van Assche wrote:
-> On Sun, 2017-06-18 at 14:26 -0600, Jens Axboe wrote:
->> On Tue, Jun 13 2017, Ming Lei wrote:
->>> If you are fine with 3-12, could you consider it for v4.13?
->>>
->>> The fixes on uses of blk_mq_tagset_busy_iter() depends on
->>> this patchset.
->>
->> Yes, I think it looks fine. I've applied the rest, except the nvme
->> patch, which no longer applies since start/stop changes have been made
->> there. Please resend that one against for-4.13/block, thanks.
-> 
-> Hello Jens,
-> 
-> Are you aware that these changes conflict with Martin's 4.13/scsi-queue
-> branch? Who should work on resolving this conflict?
-
-Nope. Not a huge problem - send it to Stephen since -next will see this
-conflict shortly. And then Martin should keep it handy for sending his
-pull request to Linus, as I always ship early.
-
-Longer term, basing the scsi tree on the block tree might not be a bad
-idea...
-
--- 
-Jens Axboe
+T24gU3VuLCAyMDE3LTA2LTE4IGF0IDE0OjI2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biBUdWUsIEp1biAxMyAyMDE3LCBNaW5nIExlaSB3cm90ZToNCj4gPiBJZiB5b3UgYXJlIGZpbmUg
+d2l0aCAzLTEyLCBjb3VsZCB5b3UgY29uc2lkZXIgaXQgZm9yIHY0LjEzPw0KPiA+IA0KPiA+IFRo
+ZSBmaXhlcyBvbiB1c2VzIG9mIGJsa19tcV90YWdzZXRfYnVzeV9pdGVyKCkgZGVwZW5kcyBvbg0K
+PiA+IHRoaXMgcGF0Y2hzZXQuDQo+IA0KPiBZZXMsIEkgdGhpbmsgaXQgbG9va3MgZmluZS4gSSd2
+ZSBhcHBsaWVkIHRoZSByZXN0LCBleGNlcHQgdGhlIG52bWUNCj4gcGF0Y2gsIHdoaWNoIG5vIGxv
+bmdlciBhcHBsaWVzIHNpbmNlIHN0YXJ0L3N0b3AgY2hhbmdlcyBoYXZlIGJlZW4gbWFkZQ0KPiB0
+aGVyZS4gUGxlYXNlIHJlc2VuZCB0aGF0IG9uZSBhZ2FpbnN0IGZvci00LjEzL2Jsb2NrLCB0aGFu
+a3MuDQoNCkhlbGxvIEplbnMsDQoNCkFyZSB5b3UgYXdhcmUgdGhhdCB0aGVzZSBjaGFuZ2VzIGNv
+bmZsaWN0IHdpdGggTWFydGluJ3MgNC4xMy9zY3NpLXF1ZXVlDQpicmFuY2g/IFdobyBzaG91bGQg
+d29yayBvbiByZXNvbHZpbmcgdGhpcyBjb25mbGljdD8NCg0KJCBnaXQgY2hlY2tvdXQgbWtwLXNj
+c2kvNC4xMy9zY3NpLXF1ZXVlIC1iIG1rcC1zY3NpLWZvci12NC4xMw0KJCBnaXQgZmV0Y2ggYXhi
+b2UtYmxvY2sNCiQgZ2l0IG1lcmdlIGF4Ym9lLWJsb2NrL2Zvci00LjEzL2Jsb2NrDQpSZW1vdmlu
+ZyBmcy94ZnMvdXVpZC5oDQpSZW1vdmluZyBmcy94ZnMvdXVpZC5jDQpBdXRvLW1lcmdpbmcgZHJp
+dmVycy9zY3NpL3Njc2lfbGliLmMNCkNPTkZMSUNUIChjb250ZW50KTogTWVyZ2UgY29uZmxpY3Qg
+aW4gZHJpdmVycy9zY3NpL3Njc2lfbGliLmMNCkF1dG8tbWVyZ2luZyBkcml2ZXJzL3Njc2kvc2Nz
+aV9lcnJvci5jDQpBdXRvbWF0aWMgbWVyZ2UgZmFpbGVkOyBmaXggY29uZmxpY3RzIGFuZCB0aGVu
+IGNvbW1pdCB0aGUgcmVzdWx0Lg0KJCBQQUdFUj0gZ2l0IGRpZmYgIA0KZGlmZiAtLWNjIGRyaXZl
+cnMvc2NzaS9zY3NpX2xpYi5jDQppbmRleCA0MWMxOWM3NWRhYjQsZmIxOGVkMjg0ZTU1Li4wMDAw
+MDAwMDAwMDANCi0tLSBhL2RyaXZlcnMvc2NzaS9zY3NpX2xpYi5jDQorKysgYi9kcml2ZXJzL3Nj
+c2kvc2NzaV9saWIuYw0KQEBAIC0yOTg5LDcgLTI5NTksMTAgKzI5NzQsMTQgQEBAIGludCBzY3Np
+X2ludGVybmFsX2RldmljZV9ibG9ja19ub3dhaXQocw0KICAJICogcmVxdWVzdCBxdWV1ZS4gDQog
+IAkgKi8NCiAgCWlmIChxLT5tcV9vcHMpIHsNCisrPDw8PDw8PCBIRUFEDQogKwkJYmxrX21xX3N0
+b3BfaHdfcXVldWVzKHEpOw0KKys9PT09PT09DQorIAkJaWYgKHdhaXQpDQorIAkJCWJsa19tcV9x
+dWllc2NlX3F1ZXVlKHEpOw0KKyAJCWVsc2UNCisgCQkJYmxrX21xX3F1aWVzY2VfcXVldWVfbm93
+YWl0KHEpOw0KKys+Pj4+Pj4+IGF4Ym9lLWJsb2NrL2Zvci00LjEzL2Jsb2NrDQogIAl9IGVsc2Ug
+ew0KICAJCXNwaW5fbG9ja19pcnFzYXZlKHEtPnF1ZXVlX2xvY2ssIGZsYWdzKTsNCiAgCQlibGtf
+c3RvcF9xdWV1ZShxKTsNCkBAQCAtMzA4Niw3IC0zMDE1LDEzICszMDc4LDE3IEBAQCBpbnQgc2Nz
+aV9pbnRlcm5hbF9kZXZpY2VfdW5ibG9ja19ub3dhaXQNCiAgCQkgc2Rldi0+c2Rldl9zdGF0ZSAh
+PSBTREVWX09GRkxJTkUpDQogIAkJcmV0dXJuIC1FSU5WQUw7DQogIA0KKys8PDw8PDw8IEhFQUQN
+CiArCXNjc2lfc3RhcnRfcXVldWUoc2Rldik7DQorKz09PT09PT0NCisgCWlmIChxLT5tcV9vcHMp
+IHsNCisgCQlibGtfbXFfdW5xdWllc2NlX3F1ZXVlKHEpOw0KKyAJfSBlbHNlIHsNCisgCQlzcGlu
+X2xvY2tfaXJxc2F2ZShxLT5xdWV1ZV9sb2NrLCBmbGFncyk7DQorIAkJYmxrX3N0YXJ0X3F1ZXVl
+KHEpOw0KKyAJCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUocS0+cXVldWVfbG9jaywgZmxhZ3MpOw0K
+KyAJfQ0KKys+Pj4+Pj4+IGF4Ym9lLWJsb2NrL2Zvci00LjEzL2Jsb2NrDQogIA0KICAJcmV0dXJu
+IDA7DQogIH0NCg0KQmFydC4=
