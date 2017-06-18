@@ -1,117 +1,92 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:35715 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751806AbdFZJ6W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 05:58:22 -0400
-Received: by mail-wm0-f48.google.com with SMTP id w126so2846557wme.0
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:21 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 12/20] lightnvm: pblk: simplify meta. memory allocation
-Date: Mon, 26 Jun 2017 11:57:21 +0200
-Message-Id: <1498471049-25505-13-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
-References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+Received: from mx2.suse.de ([195.135.220.15]:44901 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752998AbdFREk2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:40:28 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:58 +1000
+Subject: [PATCH 08/13] pktcdvd: use bio_clone_fast() instead of bio_clone()
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073849.23258.16678605618298313321.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-smeta size will always be suitable for a kmalloc allocation. Simplify
-the code and leave the vmalloc fallback only for emeta, where the pblk
-configuration has an impact.
+pktcdvd doesn't change the bi_io_vec of the clone bio,
+so it is more efficient to use bio_clone_fast(), and not clone
+the bi_io_vec.
+This requires providing a bio_set, and it is safest to
+provide a dedicated bio_set rather than sharing
+fs_bio_set, which filesytems use.
+This new bio_set, pkt_bio_set, can also be use for the bio_split()
+call as the two allocations (bio_clone_fast, and bio_split) are
+independent, neither can block a bio allocated by the other.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- drivers/lightnvm/pblk-core.c  | 3 ++-
- drivers/lightnvm/pblk-init.c  | 9 ++++-----
- drivers/lightnvm/pblk-write.c | 3 ++-
- drivers/lightnvm/pblk.h       | 1 -
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ drivers/block/pktcdvd.c |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 29565f89a85e..b5f7f3f19105 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -665,7 +665,8 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
- 	}
- 	reinit_completion(&wait);
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 1f363638b453..26c04baae967 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -98,6 +98,7 @@ static int write_congestion_on  = PKT_WRITE_CONGESTION_ON;
+ static int write_congestion_off = PKT_WRITE_CONGESTION_OFF;
+ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
+ static mempool_t *psd_pool;
++static struct bio_set *pkt_bio_set;
  
--	bio_put(bio);
-+	if (likely(pblk->l_mg.emeta_alloc_type == PBLK_VMALLOC_META))
-+		bio_put(bio);
+ static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
+ static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
+@@ -2310,7 +2311,7 @@ static void pkt_end_io_read_cloned(struct bio *bio)
  
- 	if (rqd.error) {
- 		if (dir == WRITE)
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 968c2e390cef..c49115d74e85 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -354,9 +354,9 @@ static void pblk_line_meta_free(struct pblk *pblk)
- 	kfree(l_mg->vsc_list);
+ static void pkt_make_request_read(struct pktcdvd_device *pd, struct bio *bio)
+ {
+-	struct bio *cloned_bio = bio_clone(bio, GFP_NOIO);
++	struct bio *cloned_bio = bio_clone_fast(bio, GFP_NOIO, pkt_bio_set);
+ 	struct packet_stacked_data *psd = mempool_alloc(psd_pool, GFP_NOIO);
  
- 	for (i = 0; i < PBLK_DATA_LINES; i++) {
--		pblk_mfree(&l_mg->sline_meta[i], l_mg->smeta_alloc_type);
-+		kfree(l_mg->sline_meta[i]);
- 		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
--		kfree(&l_mg->eline_meta[i]);
-+		kfree(l_mg->eline_meta[i]);
- 	}
+ 	psd->pd = pd;
+@@ -2455,7 +2456,7 @@ static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
  
- 	kfree(pblk->lines);
-@@ -549,7 +549,6 @@ static int pblk_lines_alloc_metadata(struct pblk *pblk)
- 	/* smeta is always small enough to fit on a kmalloc memory allocation,
- 	 * emeta depends on the number of LUNs allocated to the pblk instance
- 	 */
--	l_mg->smeta_alloc_type = PBLK_KMALLOC_META;
- 	for (i = 0; i < PBLK_DATA_LINES; i++) {
- 		l_mg->sline_meta[i] = kmalloc(lm->smeta_len, GFP_KERNEL);
- 		if (!l_mg->sline_meta[i])
-@@ -603,12 +602,12 @@ static int pblk_lines_alloc_metadata(struct pblk *pblk)
- fail_free_emeta:
- 	while (--i >= 0) {
- 		vfree(l_mg->eline_meta[i]->buf);
--		kfree(&l_mg->eline_meta[i]);
-+		kfree(l_mg->eline_meta[i]);
- 	}
+ 			split = bio_split(bio, last_zone -
+ 					  bio->bi_iter.bi_sector,
+-					  GFP_NOIO, fs_bio_set);
++					  GFP_NOIO, pkt_bio_set);
+ 			bio_chain(split, bio);
+ 		} else {
+ 			split = bio;
+@@ -2924,6 +2925,11 @@ static int __init pkt_init(void)
+ 					sizeof(struct packet_stacked_data));
+ 	if (!psd_pool)
+ 		return -ENOMEM;
++	pkt_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
++	if (!pkt_bio_set) {
++		mempool_destroy(psd_pool);
++		return -ENOMEM;
++	}
  
- fail_free_smeta:
- 	for (i = 0; i < PBLK_DATA_LINES; i++)
--		pblk_mfree(&l_mg->sline_meta[i], l_mg->smeta_alloc_type);
-+		kfree(l_mg->sline_meta[i]);
- 
- 	return -ENOMEM;
- }
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index a29a34786ac5..3db2cbe5b788 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -442,7 +442,8 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	list_add(&meta_line->list, &meta_line->list);
- 	spin_unlock(&l_mg->close_lock);
- fail_free_bio:
--	bio_put(bio);
-+	if (likely(l_mg->emeta_alloc_type == PBLK_VMALLOC_META))
-+		bio_put(bio);
- fail_free_rqd:
- 	pblk_free_rqd(pblk, rqd, READ);
+ 	ret = register_blkdev(pktdev_major, DRIVER_NAME);
+ 	if (ret < 0) {
+@@ -2956,6 +2962,7 @@ static int __init pkt_init(void)
+ 	unregister_blkdev(pktdev_major, DRIVER_NAME);
+ out2:
+ 	mempool_destroy(psd_pool);
++	bioset_free(pkt_bio_set);
  	return ret;
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index eb8515fd9044..6c8d01198e8b 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -446,7 +446,6 @@ struct pblk_line_mgmt {
- 	__le32 *vsc_list;		/* Valid sector counts for all lines */
+ }
  
- 	/* Metadata allocation type: VMALLOC | KMALLOC */
--	int smeta_alloc_type;
- 	int emeta_alloc_type;
+@@ -2969,6 +2976,7 @@ static void __exit pkt_exit(void)
  
- 	/* Pre-allocated metadata for data lines */
--- 
-2.7.4
+ 	unregister_blkdev(pktdev_major, DRIVER_NAME);
+ 	mempool_destroy(psd_pool);
++	bioset_free(pkt_bio_set);
+ }
+ 
+ MODULE_DESCRIPTION("Packet writing layer for CD/DVD drives");
