@@ -1,54 +1,26 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>
-Subject: [PATCH] block: Dedicated error code fixups
-Date: Tue, 13 Jun 2017 08:07:33 -0700
-Message-ID: <20170613150733.9245-1-bart.vanassche@sandisk.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: streamline blk-mq I/O scheduler interaction
+To: Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>,
+ Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org
+References: <20170616161527.17649-1-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <925130ff-40f4-c4b6-2a1a-31195c5393c5@kernel.dk>
+Date: Sun, 18 Jun 2017 12:35:14 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <20170616161527.17649-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch fixes two sparse warnings introduced by the "dedicated
-error codes for the block layer V3" patch series. These changes
-have not been tested.
+On 06/16/2017 10:15 AM, Christoph Hellwig wrote:
+> Hi blk-mq І/O scheduler folks,
+> 
+> I've been trying to re-learn our I/O path after the scheduler additions,
+> and when walking through the code the following optimization came to
+> my mind.  I've only done basic testing with them, so for now this is
+> a bit of a RFC.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
----
- block/bio.c    | 4 ++--
- block/t10-pi.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Added for 4.13, thanks.
 
-diff --git a/block/bio.c b/block/bio.c
-index 7a5c8ed27f42..0e36ca5407b5 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1817,8 +1817,8 @@ void bio_endio(struct bio *bio)
- 	}
- 
- 	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
--		trace_block_bio_complete(bdev_get_queue(bio->bi_bdev),
--					 bio, bio->bi_status);
-+		trace_block_bio_complete(bdev_get_queue(bio->bi_bdev), bio,
-+					 blk_status_to_errno(bio->bi_status));
- 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
- 	}
- 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 350b3cbcf9e5..3416dadf7b15 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -91,7 +91,7 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
- 				       "(rcvd %u)\n", iter->disk_name,
- 				       (unsigned long long)
- 				       iter->seed, be32_to_cpu(pi->ref_tag));
--				return -EILSEQ;
-+				return BLK_STS_PROTECTION;
- 			}
- 			break;
- 		case 3:
 -- 
-2.12.2
+Jens Axboe
