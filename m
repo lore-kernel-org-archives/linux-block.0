@@ -1,104 +1,260 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52066 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753073AbdFRPWP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:15 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 00/30] centralize nvme controller reset, delete and periodic reconnects
-Date: Sun, 18 Jun 2017 18:21:34 +0300
-Message-Id: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+Received: from mx2.suse.de ([195.135.220.15]:44842 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750977AbdFREje (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:39:34 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:57 +1000
+Subject: [PATCH 01/13] blk: remove bio_set arg from blk_queue_split()
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073685.23258.11626485920508963043.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We know for a some time now that ever since NVMe grew additional
-transports, we should really look into centralizing lots of code
-around controller resets, removals, and periodic reconnects for fabrics.
+blk_queue_split() is always called with the last arg being q->bio_split,
+where 'q' is the first arg.
 
-This series is the first attempt to move shared logic to nvme core.
-Controller probe, reset and removal flows are completely driven
-from nvme core while the various transports simply implement hooks
-for alloc/free/start/stop queues, alloc/free tagsets, and some
-sanity post-init checks. Similarly, nvme-fabrics lib drives periodic
-reconnects and fabric error recovery.
+Also blk_queue_split() sometimes uses the passed-in 'bs' and sometimes uses
+q->bio_split.
 
-In this set, rdma and loop drivers are fully converted to delegate
-these flows to the nvme core. The implementation is incremental in
-the sense that it adds the logic to nvme core but does not obligate
-drivers to use it, so pci and fc drivers are left intact.
+This is inconsistent and unnecessary.  Remove the last arg and always use
+q->bio_split inside blk_queue_split()
 
-I tested rdma and loop stress reset, delete and fabric errors
-during live IO and they seem to work (on poor vms though, thanks
-Johannes for fixing up rxe ;)).
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Credit-to: Javier González <jg@lightnvm.io> (Noticed that lightnvm was missed)
+Reviewed-by: Javier González <javier@cnexlabs.com>
+Tested-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
+---
+ block/blk-core.c              |    2 +-
+ block/blk-merge.c             |    9 ++++-----
+ block/blk-mq.c                |    2 +-
+ drivers/block/drbd/drbd_req.c |    2 +-
+ drivers/block/pktcdvd.c       |    2 +-
+ drivers/block/ps3vram.c       |    2 +-
+ drivers/block/rsxx/dev.c      |    2 +-
+ drivers/block/umem.c          |    2 +-
+ drivers/lightnvm/pblk-init.c  |    4 ++--
+ drivers/lightnvm/rrpc.c       |    2 +-
+ drivers/md/md.c               |    2 +-
+ drivers/s390/block/dcssblk.c  |    2 +-
+ drivers/s390/block/xpram.c    |    2 +-
+ include/linux/blkdev.h        |    3 +--
+ 14 files changed, 18 insertions(+), 20 deletions(-)
 
-I've started looking into converting pci and fc, but I don't have
-much time to make real progress at the moment. Assuming that the
-scheme looks fine for everyone (big IFF), I'd like to ask the
-community if it will be acceptable to merge this and incrementally
-enhance it to accommodate pci and fc (pci is more of a challenge in
-my PoV).
-
-About the patch set itself, I sorta worked my way up from rdma.c to
-make the relevant flows and routines generic by slowly removing
-transport dependancies, then made the some routines controller ops,
-and then moved some chunks of the code as-is to core.c and fabrics.c
-respectively, this was mainly for debugging purposes. Each patch of it's
-own, might not make perfect sense (and probably I didn't put too much
-effort in their change logs). when we get closer to inclusion, we can
-squash lots of these together if desired. 
-
-Feedback is appreciated and highly needed!
-
-As a side note, I also had a go with adding queues representation to the
-nvme core (with proper states), but it seemed to be too far out there for
-now... I'll consider proposing it as a follow up series.
-
-Sagi Grimberg (30):
-  nvme: Add admin connect request queue
-  nvme-rdma: Don't alloc/free the tagset on reset
-  nvme-rdma: reuse configure/destroy admin queue
-  nvme-rdma: introduce configure/destroy io queues
-  nvme-rdma: introduce nvme_rdma_start_queue
-  nvme-rdma: rename nvme_rdma_init_queue to nvme_rdma_alloc_queue
-  nvme-rdma: make stop/free queue receive a ctrl and qid struct
-  nvme-rdma: cleanup error path in controller reset
-  nvme: Move queue_count to the nvme_ctrl
-  nvme: Add admin_tagset pointer to nvme_ctrl
-  nvme: move controller cap to struct nvme_ctrl
-  nvme-rdma: disable controller in reset instead of shutdown
-  nvme-rdma: move queue LIVE/DELETING flags settings to queue routines
-  nvme-rdma: stop queues instead of simply flipping their state
-  nvme-rdma: don't check queue state for shutdown/disable
-  nvme-rdma: move tagset allocation to a dedicated routine
-  nvme-rdma: move admin specific resources to alloc_queue
-  nvme-rdma: limit max_queues to rdma device number of completion
-    vectors
-  nvme-rdma: call ops->reg_read64 instead of nvmf_reg_read64
-  nvme: add err, reconnect and delete work items to nvme core
-  nvme-rdma: plumb nvme_ctrl down the calls tack
-  nvme-rdma: Split create_ctrl to transport specific and generic parts
-  nvme: add low level queue and tagset controller ops
-  nvme-pci: rename to nvme_pci_configure_admin_queue
-  nvme: move control plane handling to nvme core
-  nvme-fabrics: handle reconnects in fabrics library
-  nvme-loop: convert to nvme-core control plane management
-  nvme: update tagset nr_hw_queues when reallocating io queues
-  nvme: add sed-opal ctrl manipulation in admin configuration
-  nvme: Add queue freeze/unfreeze handling on controller resets
-
- drivers/nvme/host/core.c    | 415 +++++++++++++++++++++++++
- drivers/nvme/host/fabrics.c | 104 ++++++-
- drivers/nvme/host/fabrics.h |   1 +
- drivers/nvme/host/fc.c      |  11 +-
- drivers/nvme/host/nvme.h    |  31 ++
- drivers/nvme/host/pci.c     |   4 +-
- drivers/nvme/host/rdma.c    | 741 ++++++++++----------------------------------
- drivers/nvme/target/loop.c  | 415 +++++++------------------
- 8 files changed, 840 insertions(+), 882 deletions(-)
-
--- 
-2.7.4
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 8592409db272..31b5ece6b18e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1723,7 +1723,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	 */
+ 	blk_queue_bounce(q, &bio);
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+ 		bio->bi_status = BLK_STS_IOERR;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 3990ae406341..d59074556703 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -202,8 +202,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	return do_split ? new : NULL;
+ }
+ 
+-void blk_queue_split(struct request_queue *q, struct bio **bio,
+-		     struct bio_set *bs)
++void blk_queue_split(struct request_queue *q, struct bio **bio)
+ {
+ 	struct bio *split, *res;
+ 	unsigned nsegs;
+@@ -211,13 +210,13 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
+ 	switch (bio_op(*bio)) {
+ 	case REQ_OP_DISCARD:
+ 	case REQ_OP_SECURE_ERASE:
+-		split = blk_bio_discard_split(q, *bio, bs, &nsegs);
++		split = blk_bio_discard_split(q, *bio, q->bio_split, &nsegs);
+ 		break;
+ 	case REQ_OP_WRITE_ZEROES:
+-		split = blk_bio_write_zeroes_split(q, *bio, bs, &nsegs);
++		split = blk_bio_write_zeroes_split(q, *bio, q->bio_split, &nsegs);
+ 		break;
+ 	case REQ_OP_WRITE_SAME:
+-		split = blk_bio_write_same_split(q, *bio, bs, &nsegs);
++		split = blk_bio_write_same_split(q, *bio, q->bio_split, &nsegs);
+ 		break;
+ 	default:
+ 		split = blk_bio_segment_split(q, *bio, q->bio_split, &nsegs);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 359d2dc0d414..4780200fd11b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1477,7 +1477,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	blk_queue_bounce(q, &bio);
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+ 		bio_io_error(bio);
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index fca6b9914948..f6e865b2d543 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -1560,7 +1560,7 @@ blk_qc_t drbd_make_request(struct request_queue *q, struct bio *bio)
+ 	struct drbd_device *device = (struct drbd_device *) q->queuedata;
+ 	unsigned long start_jif;
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	start_jif = jiffies;
+ 
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index e8a381161db6..1f363638b453 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2414,7 +2414,7 @@ static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	blk_queue_bounce(q, &bio);
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	pd = q->queuedata;
+ 	if (!pd) {
+diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
+index 6fa2b8197013..e0e81cacd781 100644
+--- a/drivers/block/ps3vram.c
++++ b/drivers/block/ps3vram.c
+@@ -606,7 +606,7 @@ static blk_qc_t ps3vram_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	dev_dbg(&dev->core, "%s\n", __func__);
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	spin_lock_irq(&priv->lock);
+ 	busy = !bio_list_empty(&priv->list);
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index 0b0a0a902355..4e8bdfa0aa31 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -151,7 +151,7 @@ static blk_qc_t rsxx_make_request(struct request_queue *q, struct bio *bio)
+ 	struct rsxx_bio_meta *bio_meta;
+ 	blk_status_t st = BLK_STS_IOERR;
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	might_sleep();
+ 
+diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+index 4b3c947697b1..0677d2514665 100644
+--- a/drivers/block/umem.c
++++ b/drivers/block/umem.c
+@@ -529,7 +529,7 @@ static blk_qc_t mm_make_request(struct request_queue *q, struct bio *bio)
+ 		 (unsigned long long)bio->bi_iter.bi_sector,
+ 		 bio->bi_iter.bi_size);
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	spin_lock_irq(&card->lock);
+ 	*card->biotail = bio;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index ae8cd6d5af8b..b3fec8ec55b8 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -33,7 +33,7 @@ static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
+ 	 * constraint. Writes can be of arbitrary size.
+ 	 */
+ 	if (bio_data_dir(bio) == READ) {
+-		blk_queue_split(q, &bio, q->bio_split);
++		blk_queue_split(q, &bio);
+ 		ret = pblk_submit_read(pblk, bio);
+ 		if (ret == NVM_IO_DONE && bio_flagged(bio, BIO_CLONED))
+ 			bio_put(bio);
+@@ -46,7 +46,7 @@ static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
+ 	 * available for user I/O.
+ 	 */
+ 	if (unlikely(pblk_get_secs(bio) >= pblk_rl_sysfs_rate_show(&pblk->rl)))
+-		blk_queue_split(q, &bio, q->bio_split);
++		blk_queue_split(q, &bio);
+ 
+ 	return pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
+ }
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 8d3b53bb3307..267f01ae87e4 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -994,7 +994,7 @@ static blk_qc_t rrpc_make_rq(struct request_queue *q, struct bio *bio)
+ 	struct nvm_rq *rqd;
+ 	int err;
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	if (bio_op(bio) == REQ_OP_DISCARD) {
+ 		rrpc_discard(rrpc, bio);
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 833cc7082034..1c4597d1a3dc 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -265,7 +265,7 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+ 	unsigned int sectors;
+ 	int cpu;
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	if (mddev == NULL || mddev->pers == NULL) {
+ 		bio_io_error(bio);
+diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
+index 36e5280af3e4..06eb1de52d1c 100644
+--- a/drivers/s390/block/dcssblk.c
++++ b/drivers/s390/block/dcssblk.c
+@@ -845,7 +845,7 @@ dcssblk_make_request(struct request_queue *q, struct bio *bio)
+ 	unsigned long source_addr;
+ 	unsigned long bytes_done;
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	bytes_done = 0;
+ 	dev_info = bio->bi_bdev->bd_disk->private_data;
+diff --git a/drivers/s390/block/xpram.c b/drivers/s390/block/xpram.c
+index b9d7e755c8a3..a48f0d40c1d2 100644
+--- a/drivers/s390/block/xpram.c
++++ b/drivers/s390/block/xpram.c
+@@ -190,7 +190,7 @@ static blk_qc_t xpram_make_request(struct request_queue *q, struct bio *bio)
+ 	unsigned long page_addr;
+ 	unsigned long bytes;
+ 
+-	blk_queue_split(q, &bio, q->bio_split);
++	blk_queue_split(q, &bio);
+ 
+ 	if ((bio->bi_iter.bi_sector & 7) != 0 ||
+ 	    (bio->bi_iter.bi_size & 4095) != 0)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 76b6df862a12..670df402bc51 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -944,8 +944,7 @@ extern blk_status_t blk_insert_cloned_request(struct request_queue *q,
+ 				     struct request *rq);
+ extern int blk_rq_append_bio(struct request *rq, struct bio *bio);
+ extern void blk_delay_queue(struct request_queue *, unsigned long);
+-extern void blk_queue_split(struct request_queue *, struct bio **,
+-			    struct bio_set *);
++extern void blk_queue_split(struct request_queue *, struct bio **);
+ extern void blk_recount_segments(struct request_queue *, struct bio *);
+ extern int scsi_verify_blk_ioctl(struct block_device *, unsigned int);
+ extern int scsi_cmd_blk_ioctl(struct block_device *, fmode_t,
