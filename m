@@ -1,76 +1,70 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 15/20] fs: have call_fsync call filemap_report_wb_err if FS_WB_ERRSEQ is set
-Date: Mon, 12 Jun 2017 08:23:11 -0400
-Message-Id: <20170612122316.13244-20-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:44874 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751059AbdFREjw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Jun 2017 00:39:52 -0400
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@fb.com>
+Date: Sun, 18 Jun 2017 14:38:57 +1000
+Subject: [PATCH 04/13] blk: use non-rescuing bioset for q->bio_split.
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <149776073762.23258.10105627316695148099.stgit@noble>
+In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
+References: <149776047907.23258.8058071140236879834.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Allow filesystems to opt-in to a final check of wb_err if FS_WB_ERRSEQ
-is set. Technically, we could just plumb these calls into all of the
-fsync operations, but I think this means less code, changes and churn.
+A rescuing bioset is only useful if there might be bios from
+that same bioset on the bio_list_on_stack queue at a time
+when bio_alloc_bioset() is called.  This never applies to
+q->bio_split.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Allocations from q->bio_split are only ever made from
+blk_queue_split() which is only ever called early in each of
+various make_request_fn()s.  The original bio (call this A)
+is then passed to generic_make_request() and is placed on
+the bio_list_on_stack queue, and the bio that was allocated
+from q->bio_split (B) is processed.
+
+The processing of this may cause other bios to be passed to
+generic_make_request() or may even cause the bio B itself to
+be passed, possible after some prefix has been split off
+(using some other bioset).
+
+generic_make_request() now guarantees that all of these bios
+(B and dependants) will be fully processed before the tail
+of the original bio A gets handled.  None of these early bios
+can possible trigger an allocation from the original
+q->bio_split as they are either too small to require
+splitting or (more likely) are destined for a different queue.
+
+The next time that the original q->bio_split might be used
+by this thread is when A is processed again, as it might
+still be too big to handle directly.  By this time there
+cannot be any other bios allocated from q->bio_split in the
+generic_make_request() queue.  So no rescuing will ever be
+needed.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- include/linux/fs.h | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ block/blk-core.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 17ba6284ab14..ef3feeec80b2 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1742,12 +1742,6 @@ static inline int call_mmap(struct file *file, struct vm_area_struct *vma)
- 	return file->f_op->mmap(file, vma);
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9bd10c46a538..62cf92550512 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -790,8 +790,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ 	if (q->id < 0)
+ 		goto fail_q;
  
--static inline int call_fsync(struct file *file, loff_t start, loff_t end,
--			     int datasync)
--{
--	return file->f_op->fsync(file, start, end, datasync);
--}
--
- ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
- 			      unsigned long nr_segs, unsigned long fast_segs,
- 			      struct iovec *fast_pointer,
-@@ -2583,6 +2577,20 @@ static inline errseq_t filemap_sample_wb_err(struct address_space *mapping)
- 	return errseq_sample(&mapping->wb_err);
- }
+-	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, (BIOSET_NEED_BVECS |
+-							BIOSET_NEED_RESCUER));
++	q->bio_split = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
+ 	if (!q->bio_split)
+ 		goto fail_id;
  
-+static inline int call_fsync(struct file *file, loff_t start, loff_t end,
-+			     int datasync)
-+{
-+	int ret;
-+
-+	ret = file->f_op->fsync(file, start, end, datasync);
-+	if (file->f_mapping->host->i_sb->s_type->fs_flags & FS_WB_ERRSEQ) {
-+		int ret2 = filemap_report_wb_err(file);
-+		if (!ret)
-+			ret = ret2;
-+	}
-+	return ret;
-+}
-+
- extern int vfs_fsync_range(struct file *file, loff_t start, loff_t end,
- 			   int datasync);
- extern int vfs_fsync(struct file *file, int datasync);
--- 
-2.13.0
