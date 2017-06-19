@@ -1,192 +1,150 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	akpm@linux-foundation.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 07/10] block: return on congested block device
-Date: Thu, 15 Jun 2017 10:59:59 -0500
-Message-Id: <20170615160002.17233-8-rgoldwyn@suse.de>
-In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
-References: <20170615160002.17233-1-rgoldwyn@suse.de>
+Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 05/10] block: don't bother with bounce limits for make_request drivers
+Date: Mon, 19 Jun 2017 09:26:23 +0200
+Message-Id: <20170619072628.12894-6-hch@lst.de>
+In-Reply-To: <20170619072628.12894-1-hch@lst.de>
+References: <20170619072628.12894-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+We only call blk_queue_bounce for request-based drivers, so stop messing
+with it for make_request based drivers.
 
-A new bio operation flag REQ_NOWAIT is introduced to identify bio's
-orignating from iocb with IOCB_NOWAIT. This flag indicates
-to return immediately if a request cannot be made instead
-of retrying.
-
-Stacked devices such as md (the ones with make_request_fn hooks)
-currently are not supported because it may block for housekeeping.
-For example, an md can have a part of the device suspended.
-For this reason, only request based devices are supported.
-In the future, this feature will be expanded to stacked devices
-by teaching them how to handle the REQ_NOWAIT flags.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c          | 23 +++++++++++++++++++++--
- block/blk-mq-sched.c      |  3 +++
- block/blk-mq.c            |  2 ++
- fs/direct-io.c            | 10 ++++++++--
- include/linux/bio.h       |  6 ++++++
- include/linux/blk_types.h |  2 ++
- 6 files changed, 42 insertions(+), 4 deletions(-)
+ block/blk-core.c               | 5 +++++
+ block/blk-mq.c                 | 5 +++++
+ block/blk-settings.c           | 5 -----
+ drivers/block/brd.c            | 1 -
+ drivers/block/drbd/drbd_main.c | 1 -
+ drivers/block/rsxx/dev.c       | 1 -
+ drivers/nvdimm/blk.c           | 1 -
+ drivers/nvdimm/btt.c           | 1 -
+ drivers/nvdimm/pmem.c          | 1 -
+ 9 files changed, 10 insertions(+), 11 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index a7421b772d0e..972d6fdb1432 100644
+index 62cf92550512..07b26853ce1e 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -1256,6 +1256,11 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	if (!IS_ERR(rq))
- 		return rq;
- 
-+	if (op & REQ_NOWAIT) {
-+		blk_put_rl(rl);
-+		return ERR_PTR(-EAGAIN);
-+	}
-+
- 	if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
- 		blk_put_rl(rl);
- 		return rq;
-@@ -1900,6 +1905,16 @@ generic_make_request_checks(struct bio *bio)
- 		goto end_io;
- 	}
+@@ -954,6 +954,11 @@ int blk_init_allocated_queue(struct request_queue *q)
+ 	 */
+ 	blk_queue_make_request(q, blk_queue_bio);
  
 +	/*
-+	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
-+	 * if queue is not a request based queue.
++	 * by default assume old behaviour and bounce for any highmem page
 +	 */
++	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
 +
-+	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q)) {
-+		err = -EOPNOTSUPP;
-+		goto end_io;
-+	}
-+
- 	part = bio->bi_bdev->bd_part;
- 	if (should_fail_request(part, bio->bi_iter.bi_size) ||
- 	    should_fail_request(&part_to_disk(part)->part0,
-@@ -2057,7 +2072,7 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	do {
- 		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	q->sg_reserved_size = INT_MAX;
  
--		if (likely(blk_queue_enter(q, false) == 0)) {
-+		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
- 			struct bio_list lower, same;
- 
- 			/* Create a fresh bio_list for all subordinate requests */
-@@ -2082,7 +2097,11 @@ blk_qc_t generic_make_request(struct bio *bio)
- 			bio_list_merge(&bio_list_on_stack[0], &same);
- 			bio_list_merge(&bio_list_on_stack[0], &bio_list_on_stack[1]);
- 		} else {
--			bio_io_error(bio);
-+			if (unlikely(!blk_queue_dying(q) &&
-+					(bio->bi_opf & REQ_NOWAIT)))
-+				bio_wouldblock_error(bio);
-+			else
-+				bio_io_error(bio);
- 		}
- 		bio = bio_list_pop(&bio_list_on_stack[0]);
- 	} while (bio);
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 1f5b692526ae..9a1dea8b964e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -83,6 +83,9 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
- 	if (likely(!data->hctx))
- 		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
- 
-+	if (op & REQ_NOWAIT)
-+		data->flags |= BLK_MQ_REQ_NOWAIT;
-+
- 	if (e) {
- 		data->flags |= BLK_MQ_REQ_INTERNAL;
- 
+ 	/* Protect q->elevator from elevator_change */
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bb66c96850b1..86d86626ef00 100644
+index dd276a9e138e..e26b7435e245 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1562,6 +1562,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	rq = blk_mq_sched_get_request(q, bio, bio->bi_opf, &data);
- 	if (unlikely(!rq)) {
- 		__wbt_done(q->rq_wb, wb_acct);
-+		if (bio->bi_opf & REQ_NOWAIT)
-+			bio_wouldblock_error(bio);
- 		return BLK_QC_T_NONE;
- 	}
+@@ -2300,6 +2300,11 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	blk_queue_make_request(q, blk_mq_make_request);
  
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a04ebea77de8..139ebd5ae1c7 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -480,8 +480,12 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
- 	unsigned i;
- 	int err;
- 
--	if (bio->bi_error)
--		dio->io_error = -EIO;
-+	if (bio->bi_error) {
-+		if (bio->bi_error == -EAGAIN && (bio->bi_opf & REQ_NOWAIT))
-+			dio->io_error = -EAGAIN;
-+		else
-+			dio->io_error = -EIO;
-+	}
- 
- 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
- 		err = bio->bi_error;
-@@ -1197,6 +1201,8 @@ do_blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
- 	if (iov_iter_rw(iter) == WRITE) {
- 		dio->op = REQ_OP_WRITE;
- 		dio->op_flags = REQ_SYNC | REQ_IDLE;
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			dio->op_flags |= REQ_NOWAIT;
- 	} else {
- 		dio->op = REQ_OP_READ;
- 	}
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d1b04b0e99cf..cc0aa4315383 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -418,6 +418,12 @@ static inline void bio_io_error(struct bio *bio)
- 	bio_endio(bio);
- }
- 
-+static inline void bio_wouldblock_error(struct bio *bio)
-+{
-+	bio->bi_error = -EAGAIN;
-+	bio_endio(bio);
-+}
+ 	/*
++	 * by default assume old behaviour and bounce for any highmem page
++	 */
++	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
 +
- struct request_queue;
- extern int bio_phys_segments(struct request_queue *, struct bio *);
++	/*
+ 	 * Do this after blk_queue_make_request() overrides it...
+ 	 */
+ 	q->nr_requests = set->queue_depth;
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 4fa81ed383ca..be1f115b538b 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -172,11 +172,6 @@ void blk_queue_make_request(struct request_queue *q, make_request_fn *mfn)
+ 	q->nr_batching = BLK_BATCH_REQ;
  
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 61339bc44400..c87990aec66e 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -205,6 +205,7 @@ enum req_flag_bits {
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 	blk_set_default_limits(&q->limits);
+-
+-	/*
+-	 * by default assume old behaviour and bounce for any highmem page
+-	 */
+-	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
+ }
+ EXPORT_SYMBOL(blk_queue_make_request);
  
-+	__REQ_NOWAIT,           /* Don't wait if request will block */
- 	__REQ_NR_BITS,		/* stops here */
- };
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 57b574f2f66a..6112e99bedf7 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -418,7 +418,6 @@ static struct brd_device *brd_alloc(int i)
  
-@@ -223,6 +224,7 @@ enum req_flag_bits {
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+ 	blk_queue_make_request(brd->brd_queue, brd_make_request);
+ 	blk_queue_max_hw_sectors(brd->brd_queue, 1024);
+-	blk_queue_bounce_limit(brd->brd_queue, BLK_BOUNCE_ANY);
  
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
-+#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 	/* This is so fdisk will align partitions on 4k, because of
+ 	 * direct_access API needing 4k alignment, returning a PFN
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 90680034ef57..5fb99e06ebe4 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2850,7 +2850,6 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 	/* Setting the max_hw_sectors to an odd value of 8kibyte here
+ 	   This triggers a max_bio_size message upon first attach or connect */
+ 	blk_queue_max_hw_sectors(q, DRBD_MAX_BIO_SIZE_SAFE >> 8);
+-	blk_queue_bounce_limit(q, BLK_BOUNCE_ANY);
+ 	q->queue_lock = &resource->req_lock;
  
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ 	device->md_io.page = alloc_page(GFP_KERNEL);
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index 4e8bdfa0aa31..7f4acebf4657 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -284,7 +284,6 @@ int rsxx_setup_dev(struct rsxx_cardinfo *card)
+ 	}
+ 
+ 	blk_queue_make_request(card->queue, rsxx_make_request);
+-	blk_queue_bounce_limit(card->queue, BLK_BOUNCE_ANY);
+ 	blk_queue_max_hw_sectors(card->queue, blkdev_max_hw_sectors);
+ 	blk_queue_physical_block_size(card->queue, RSXX_HW_BLK_SIZE);
+ 
+diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
+index 79eb9fb358d5..f12d23c49771 100644
+--- a/drivers/nvdimm/blk.c
++++ b/drivers/nvdimm/blk.c
+@@ -273,7 +273,6 @@ static int nsblk_attach_disk(struct nd_namespace_blk *nsblk)
+ 
+ 	blk_queue_make_request(q, nd_blk_make_request);
+ 	blk_queue_max_hw_sectors(q, UINT_MAX);
+-	blk_queue_bounce_limit(q, BLK_BOUNCE_ANY);
+ 	blk_queue_logical_block_size(q, nsblk_sector_size(nsblk));
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
+ 	q->queuedata = nsblk;
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 31b2d14e210d..b6ba0618ea46 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1297,7 +1297,6 @@ static int btt_blk_init(struct btt *btt)
+ 	blk_queue_make_request(btt->btt_queue, btt_make_request);
+ 	blk_queue_logical_block_size(btt->btt_queue, btt->sector_size);
+ 	blk_queue_max_hw_sectors(btt->btt_queue, UINT_MAX);
+-	blk_queue_bounce_limit(btt->btt_queue, BLK_BOUNCE_ANY);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, btt->btt_queue);
+ 	btt->btt_queue->queuedata = btt;
+ 
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 7bd383aeea14..6b577afb1d44 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -343,7 +343,6 @@ static int pmem_attach_disk(struct device *dev,
+ 	blk_queue_make_request(q, pmem_make_request);
+ 	blk_queue_physical_block_size(q, PAGE_SIZE);
+ 	blk_queue_max_hw_sectors(q, UINT_MAX);
+-	blk_queue_bounce_limit(q, BLK_BOUNCE_ANY);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DAX, q);
+ 	q->queuedata = pmem;
 -- 
-2.12.0
+2.11.0
