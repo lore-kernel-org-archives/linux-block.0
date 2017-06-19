@@ -1,92 +1,81 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 07/11] fs: add support for buffered writeback to pass down stream information
-Date: Tue, 13 Jun 2017 11:15:19 -0600
-Message-Id: <1497374123-15286-8-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
-References: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+Return-Path: <ross.zwisler@linux.intel.com>
+Date: Mon, 19 Jun 2017 11:48:31 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com, corbet@lwn.net,
+	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>,
+	Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v7 15/22] dax: set errors in mapping when writeback fails
+Message-ID: <20170619174831.GA16397@linux.intel.com>
+References: <20170616193427.13955-1-jlayton@redhat.com>
+ <20170616193427.13955-16-jlayton@redhat.com>
+ <1497703193.4684.9.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1497703193.4684.9.camel@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/buffer.c | 14 +++++++++-----
- fs/mpage.c  |  1 +
- 2 files changed, 10 insertions(+), 5 deletions(-)
+On Sat, Jun 17, 2017 at 08:39:53AM -0400, Jeff Layton wrote:
+> On Fri, 2017-06-16 at 15:34 -0400, Jeff Layton wrote:
+> > Jan Kara's description for this patch is much better than mine, so I'm
+> > quoting it verbatim here:
+> > 
+> > DAX currently doesn't set errors in the mapping when cache flushing
+> > fails in dax_writeback_mapping_range(). Since this function can get
+> > called only from fsync(2) or sync(2), this is actually as good as it can
+> > currently get since we correctly propagate the error up from
+> > dax_writeback_mapping_range() to filemap_fdatawrite()
+> > 
+> > However, in the future better writeback error handling will enable us to
+> > properly report these errors on fsync(2) even if there are multiple file
+> > descriptors open against the file or if sync(2) gets called before
+> > fsync(2). So convert DAX to using standard error reporting through the
+> > mapping.
+> > 
+> > Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> > Reviewed-by: Jan Kara <jack@suse.cz>
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > Reviewed-and-Tested-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+> > ---
+> >  fs/dax.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/fs/dax.c b/fs/dax.c
+> > index 9899f07acf72..c663e8cc2a76 100644
+> > --- a/fs/dax.c
+> > +++ b/fs/dax.c
+> > @@ -856,8 +856,10 @@ int dax_writeback_mapping_range(struct address_space *mapping,
+> >  
+> >  			ret = dax_writeback_one(bdev, dax_dev, mapping,
+> >  					indices[i], pvec.pages[i]);
+> > -			if (ret < 0)
+> > +			if (ret < 0) {
+> > +				mapping_set_error(mapping, ret);
+> >  				goto out;
+> > +			}
+> >  		}
+> >  	}
+> >  out:
+> 
+> I should point out here that Ross had an issue with this patch in an
+> earlier set, that I addressed with a flag in the last set. The flag is
+> icky though.
+> 
+> In this set, patch #6 should make it unnecessary:
+> 
+>     mm: clear AS_EIO/AS_ENOSPC when writeback initiation fails
+> 
+> Ross, could you test that this set still works ok for you with dax? It
+> should apply reasonably cleanly on top of linux-next.
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 161be58c5cb0..8324c24751ca 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -49,7 +49,7 @@
- 
- static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
- static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
--			 struct writeback_control *wbc);
-+			 unsigned int stream, struct writeback_control *wbc);
- 
- #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
- 
-@@ -1829,7 +1829,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 	do {
- 		struct buffer_head *next = bh->b_this_page;
- 		if (buffer_async_write(bh)) {
--			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
-+			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
-+					inode_streamid(inode), wbc);
- 			nr_underway++;
- 		}
- 		bh = next;
-@@ -1883,7 +1884,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 		struct buffer_head *next = bh->b_this_page;
- 		if (buffer_async_write(bh)) {
- 			clear_buffer_dirty(bh);
--			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
-+			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
-+					inode_streamid(inode), wbc);
- 			nr_underway++;
- 		}
- 		bh = next;
-@@ -3091,7 +3093,7 @@ void guard_bio_eod(int op, struct bio *bio)
- }
- 
- static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
--			 struct writeback_control *wbc)
-+			 unsigned int stream, struct writeback_control *wbc)
- {
- 	struct bio *bio;
- 
-@@ -3130,6 +3132,8 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 	/* Take care of bh's that straddle the end of the device */
- 	guard_bio_eod(op, bio);
- 
-+	bio_set_streamid(bio, stream);
-+
- 	if (buffer_meta(bh))
- 		op_flags |= REQ_META;
- 	if (buffer_prio(bh))
-@@ -3142,7 +3146,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 
- int submit_bh(int op, int op_flags, struct buffer_head *bh)
- {
--	return submit_bh_wbc(op, op_flags, bh, NULL);
-+	return submit_bh_wbc(op, op_flags, bh, 0, NULL);
- }
- EXPORT_SYMBOL(submit_bh);
- 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index baff8f820c29..a9d40c0c053e 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -614,6 +614,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
- 			goto confused;
- 
- 		wbc_init_bio(wbc, bio);
-+		bio_set_streamid(bio, inode_streamid(inode));
- 	}
- 
- 	/*
--- 
-2.7.4
+Yep, v7 passes my DAX testing.
