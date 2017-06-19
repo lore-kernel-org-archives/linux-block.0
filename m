@@ -1,63 +1,70 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: [PATCH v2 44/51] gfs2: convert to bio_for_each_segment_all_sp()
-Date: Mon, 26 Jun 2017 20:10:27 +0800
-Message-Id: <20170626121034.3051-45-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 04/10] block: remove the queue_bounce_pfn helper
+Date: Mon, 19 Jun 2017 09:26:22 +0200
+Message-Id: <20170619072628.12894-5-hch@lst.de>
+In-Reply-To: <20170619072628.12894-1-hch@lst.de>
+References: <20170619072628.12894-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Cc: Steven Whitehouse <swhiteho@redhat.com>
-Cc: Bob Peterson <rpeterso@redhat.com>
-Cc: cluster-devel@redhat.com
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/gfs2/lops.c    | 3 ++-
- fs/gfs2/meta_io.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Only used inside the bounce code, and opencoding it makes it more obvious
+what is going on.
 
-diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
-index d62939f00d53..294f1926d9be 100644
---- a/fs/gfs2/lops.c
-+++ b/fs/gfs2/lops.c
-@@ -206,11 +206,12 @@ static void gfs2_end_log_write(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct page *page;
- 	int i;
-+	struct bvec_iter_all bia;
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bounce.c         | 6 +++---
+ include/linux/blkdev.h | 5 -----
+ 2 files changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/block/bounce.c b/block/bounce.c
+index fc79dd3e0f20..f2b4361fff81 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -203,7 +203,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	bio_for_each_segment(from, *bio_orig, iter) {
+ 		if (i++ < BIO_MAX_PAGES)
+ 			sectors += from.bv_len >> 9;
+-		if (page_to_pfn(from.bv_page) > queue_bounce_pfn(q))
++		if (page_to_pfn(from.bv_page) > q->limits.bounce_pfn)
+ 			bounce = true;
+ 	}
+ 	if (!bounce)
+@@ -220,7 +220,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	bio_for_each_segment_all(to, bio, i) {
+ 		struct page *page = to->bv_page;
  
- 	if (bio->bi_status)
- 		fs_err(sdp, "Error %d writing to log\n", bio->bi_status);
+-		if (page_to_pfn(page) <= queue_bounce_pfn(q))
++		if (page_to_pfn(page) <= q->limits.bounce_pfn)
+ 			continue;
  
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		page = bvec->bv_page;
- 		if (page_has_buffers(page))
- 			gfs2_end_log_write_bh(sdp, bvec, bio->bi_status);
-diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
-index fabe1614f879..6879b0103539 100644
---- a/fs/gfs2/meta_io.c
-+++ b/fs/gfs2/meta_io.c
-@@ -190,8 +190,9 @@ static void gfs2_meta_read_endio(struct bio *bio)
+ 		to->bv_page = mempool_alloc(pool, q->bounce_gfp);
+@@ -272,7 +272,7 @@ void blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+ 	 * don't waste time iterating over bio segments
+ 	 */
+ 	if (!(q->bounce_gfp & GFP_DMA)) {
+-		if (queue_bounce_pfn(q) >= blk_max_pfn)
++		if (q->limits.bounce_pfn >= blk_max_pfn)
+ 			return;
+ 		pool = page_pool;
+ 	} else {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f1a5f82a4d97..db2b7a7450bd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1363,11 +1363,6 @@ enum blk_default_limits {
+ 
+ #define blkdev_entry_to_request(entry) list_entry((entry), struct request, queuelist)
+ 
+-static inline unsigned long queue_bounce_pfn(struct request_queue *q)
+-{
+-	return q->limits.bounce_pfn;
+-}
+-
+ static inline unsigned long queue_segment_boundary(struct request_queue *q)
  {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		struct buffer_head *bh = page_buffers(page);
- 		unsigned int len = bvec->bv_len;
+ 	return q->limits.seg_boundary_mask;
 -- 
-2.9.4
+2.11.0
