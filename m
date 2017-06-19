@@ -1,102 +1,185 @@
-Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Omar Sandoval <osandov@fb.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 03/10] blk-mq: remove blk_mq_sched_{get,put}_rq_priv
-Date: Fri, 16 Jun 2017 18:15:20 +0200
-Message-Id: <20170616161527.17649-4-hch@lst.de>
-In-Reply-To: <20170616161527.17649-1-hch@lst.de>
-References: <20170616161527.17649-1-hch@lst.de>
+Return-Path: <tglx@linutronix.de>
+Message-Id: <20170619235447.585891193@linutronix.de>
+Date: Tue, 20 Jun 2017 01:37:55 +0200
+From: Thomas Gleixner <tglx@linutronix.de>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoph Hellwig <hch@lst.de>,
+ Ingo Molnar <mingo@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [patch 55/55] genirq/affinity: Assign vectors to all present CPUs
+References: <20170619233700.547167146@linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15
 List-ID: <linux-block@vger.kernel.org>
 
-Having these as separate helpers in a header really does not help
-readability, or my chances to refactor this code sanely.
+From: Christoph Hellwig <hch@lst.de>
+
+Currently the irq vector spread algorithm is restricted to online CPUs,
+which ties the IRQ mapping to the currently online devices and doesn't deal
+nicely with the fact that CPUs could come and go rapidly due to e.g. power
+management.
+
+Instead assign vectors to all present CPUs to avoid this churn.
+
+Build a map of all possible CPUs for a given node, as the architectures
+only provide a map of all onlines CPUs. Do this dynamically on each call
+for the vector assingments, which is a bit suboptimal and could be
+optimized in the future by provinding a mapping from the arch code.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-sched.c | 10 ++++++----
- block/blk-mq-sched.h | 21 ---------------------
- block/blk-mq.c       |  3 ++-
- 3 files changed, 8 insertions(+), 26 deletions(-)
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org
+Link: http://lkml.kernel.org/r/20170603140403.27379-5-hch@lst.de
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 62db188595dc..22601e5c6f19 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -36,6 +36,7 @@ static void __blk_mq_sched_assign_ioc(struct request_queue *q,
- 				      struct bio *bio,
- 				      struct io_context *ioc)
+---
+ kernel/irq/affinity.c |   76 +++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 63 insertions(+), 13 deletions(-)
+
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -1,4 +1,7 @@
+-
++/*
++ * Copyright (C) 2016 Thomas Gleixner.
++ * Copyright (C) 2016-2017 Christoph Hellwig.
++ */
+ #include <linux/interrupt.h>
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
+@@ -35,13 +38,54 @@ static void irq_spread_init_one(struct c
+ 	}
+ }
+ 
+-static int get_nodes_in_cpumask(const struct cpumask *mask, nodemask_t *nodemsk)
++static cpumask_var_t *alloc_node_to_present_cpumask(void)
++{
++	cpumask_var_t *masks;
++	int node;
++
++	masks = kcalloc(nr_node_ids, sizeof(cpumask_var_t), GFP_KERNEL);
++	if (!masks)
++		return NULL;
++
++	for (node = 0; node < nr_node_ids; node++) {
++		if (!zalloc_cpumask_var(&masks[node], GFP_KERNEL))
++			goto out_unwind;
++	}
++
++	return masks;
++
++out_unwind:
++	while (--node >= 0)
++		free_cpumask_var(masks[node]);
++	kfree(masks);
++	return NULL;
++}
++
++static void free_node_to_present_cpumask(cpumask_var_t *masks)
++{
++	int node;
++
++	for (node = 0; node < nr_node_ids; node++)
++		free_cpumask_var(masks[node]);
++	kfree(masks);
++}
++
++static void build_node_to_present_cpumask(cpumask_var_t *masks)
++{
++	int cpu;
++
++	for_each_present_cpu(cpu)
++		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
++}
++
++static int get_nodes_in_cpumask(cpumask_var_t *node_to_present_cpumask,
++				const struct cpumask *mask, nodemask_t *nodemsk)
  {
-+	struct elevator_queue *e = q->elevator;
- 	struct io_cq *icq;
+ 	int n, nodes = 0;
  
- 	spin_lock_irq(q->queue_lock);
-@@ -49,13 +50,14 @@ static void __blk_mq_sched_assign_ioc(struct request_queue *q,
- 	}
+ 	/* Calculate the number of nodes in the supplied affinity mask */
+-	for_each_online_node(n) {
+-		if (cpumask_intersects(mask, cpumask_of_node(n))) {
++	for_each_node(n) {
++		if (cpumask_intersects(mask, node_to_present_cpumask[n])) {
+ 			node_set(n, *nodemsk);
+ 			nodes++;
+ 		}
+@@ -64,7 +108,7 @@ irq_create_affinity_masks(int nvecs, con
+ 	int last_affv = affv + affd->pre_vectors;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+ 	struct cpumask *masks;
+-	cpumask_var_t nmsk;
++	cpumask_var_t nmsk, *node_to_present_cpumask;
  
- 	rq->elv.icq = icq;
--	if (!blk_mq_sched_get_rq_priv(q, rq, bio)) {
--		rq->rq_flags |= RQF_ELVPRIV;
--		get_io_context(icq->ioc);
-+	if (e && e->type->ops.mq.get_rq_priv &&
-+	    e->type->ops.mq.get_rq_priv(q, rq, bio)) {
-+		rq->elv.icq = NULL;
- 		return;
- 	}
+ 	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
+ 		return NULL;
+@@ -73,13 +117,19 @@ irq_create_affinity_masks(int nvecs, con
+ 	if (!masks)
+ 		goto out;
  
--	rq->elv.icq = NULL;
-+	rq->rq_flags |= RQF_ELVPRIV;
-+	get_io_context(icq->ioc);
++	node_to_present_cpumask = alloc_node_to_present_cpumask();
++	if (!node_to_present_cpumask)
++		goto out;
++
+ 	/* Fill out vectors at the beginning that don't need affinity */
+ 	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
+ 		cpumask_copy(masks + curvec, irq_default_affinity);
+ 
+ 	/* Stabilize the cpumasks */
+ 	get_online_cpus();
+-	nodes = get_nodes_in_cpumask(cpu_online_mask, &nodemsk);
++	build_node_to_present_cpumask(node_to_present_cpumask);
++	nodes = get_nodes_in_cpumask(node_to_present_cpumask, cpu_present_mask,
++				     &nodemsk);
+ 
+ 	/*
+ 	 * If the number of nodes in the mask is greater than or equal the
+@@ -87,7 +137,8 @@ irq_create_affinity_masks(int nvecs, con
+ 	 */
+ 	if (affv <= nodes) {
+ 		for_each_node_mask(n, nodemsk) {
+-			cpumask_copy(masks + curvec, cpumask_of_node(n));
++			cpumask_copy(masks + curvec,
++				     node_to_present_cpumask[n]);
+ 			if (++curvec == last_affv)
+ 				break;
+ 		}
+@@ -101,7 +152,7 @@ irq_create_affinity_masks(int nvecs, con
+ 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
+ 
+ 		/* Get the cpus on this node which are in the mask */
+-		cpumask_and(nmsk, cpu_online_mask, cpumask_of_node(n));
++		cpumask_and(nmsk, cpu_present_mask, node_to_present_cpumask[n]);
+ 
+ 		/* Calculate the number of cpus per vector */
+ 		ncpus = cpumask_weight(nmsk);
+@@ -133,6 +184,7 @@ irq_create_affinity_masks(int nvecs, con
+ 	/* Fill out vectors at the end that don't need affinity */
+ 	for (; curvec < nvecs; curvec++)
+ 		cpumask_copy(masks + curvec, irq_default_affinity);
++	free_node_to_present_cpumask(node_to_present_cpumask);
+ out:
+ 	free_cpumask_var(nmsk);
+ 	return masks;
+@@ -147,12 +199,10 @@ int irq_calc_affinity_vectors(int maxvec
+ {
+ 	int resv = affd->pre_vectors + affd->post_vectors;
+ 	int vecs = maxvec - resv;
+-	int cpus;
++	int ret;
+ 
+-	/* Stabilize the cpumasks */
+ 	get_online_cpus();
+-	cpus = cpumask_weight(cpu_online_mask);
++	ret = min_t(int, cpumask_weight(cpu_present_mask), vecs) + resv;
+ 	put_online_cpus();
+-
+-	return min(cpus, vecs) + resv;
++	return ret;
  }
- 
- void blk_mq_sched_assign_ioc(struct request_queue *q, struct request *rq,
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 5d12529538d0..f34e6a522105 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -44,27 +44,6 @@ blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- 	return __blk_mq_sched_bio_merge(q, bio);
- }
- 
--static inline int blk_mq_sched_get_rq_priv(struct request_queue *q,
--					   struct request *rq,
--					   struct bio *bio)
--{
--	struct elevator_queue *e = q->elevator;
--
--	if (e && e->type->ops.mq.get_rq_priv)
--		return e->type->ops.mq.get_rq_priv(q, rq, bio);
--
--	return 0;
--}
--
--static inline void blk_mq_sched_put_rq_priv(struct request_queue *q,
--					    struct request *rq)
--{
--	struct elevator_queue *e = q->elevator;
--
--	if (e && e->type->ops.mq.put_rq_priv)
--		e->type->ops.mq.put_rq_priv(q, rq);
--}
--
- static inline bool
- blk_mq_sched_allow_merge(struct request_queue *q, struct request *rq,
- 			 struct bio *bio)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 694cbd698507..1a45c287db64 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -438,7 +438,8 @@ void blk_mq_free_request(struct request *rq)
- 	struct elevator_queue *e = q->elevator;
- 
- 	if (rq->rq_flags & RQF_ELVPRIV) {
--		blk_mq_sched_put_rq_priv(rq->q, rq);
-+		if (e && e->type->ops.mq.put_rq_priv)
-+			e->type->ops.mq.put_rq_priv(q, rq);
- 		if (rq->elv.icq) {
- 			put_io_context(rq->elv.icq->ioc);
- 			rq->elv.icq = NULL;
--- 
-2.11.0
