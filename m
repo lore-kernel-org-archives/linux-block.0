@@ -1,51 +1,27 @@
-Return-Path: <bcache@lists.ewheeler.net>
-From: bcache@lists.ewheeler.net
-To: linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org,
-	hch@infradead.org,
-	axboe@kernel.dk,
-	Liang Chen <liangchen.linux@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 06/19] bcache: explicitly destory mutex while exiting
-Date: Fri, 30 Jun 2017 13:42:55 -0700
-Message-Id: <1498855388-16990-6-git-send-email-bcache@lists.ewheeler.net>
-In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
-References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:56137 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751054AbdFSMfW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Jun 2017 08:35:22 -0400
+Date: Mon, 19 Jun 2017 14:35:20 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        Keith Busch <keith.busch@intel.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH rfc 02/30] nvme-rdma: Don't alloc/free the tagset on
+        reset
+Message-ID: <20170619123520.GC29061@lst.de>
+References: <1497799324-19598-1-git-send-email-sagi@grimberg.me> <1497799324-19598-3-git-send-email-sagi@grimberg.me> <20170619071851.GB13168@lst.de> <4b612cf9-f8ba-f2fa-8f93-c2c46468daf4@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4b612cf9-f8ba-f2fa-8f93-c2c46468daf4@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Liang Chen <liangchen.linux@gmail.com>
+> We can do that, but this tries to eliminate duplicate code as
+> much as possible. It's not like the convention is unprecedented...
 
-mutex_destroy does nothing most of time, but it's better to call
-it to make the code future proof and it also has some meaning
-for like mutex debug.
-
-Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
-Cc: stable@vger.kernel.org
----
- drivers/md/bcache/super.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 48b8c20..1f84791 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2089,6 +2089,7 @@ static void bcache_exit(void)
- 	if (bcache_major)
- 		unregister_blkdev(bcache_major, "bcache");
- 	unregister_reboot_notifier(&reboot);
-+	mutex_destroy(&bch_register_lock);
- }
- 
- static int __init bcache_init(void)
-@@ -2106,6 +2107,7 @@ static int __init bcache_init(void)
- 
- 	bcache_major = register_blkdev(0, "bcache");
- 	if (bcache_major < 0) {
-+		mutex_destroy(&bch_register_lock);
- 		unregister_reboot_notifier(&reboot);
- 		return bcache_major;
- 	}
--- 
-1.8.3.1
+It's fairly nasty to follow.  OTOH I like your overall cleanup,
+so I guess I shouldn't complain about the initial patches to much
+but just possibly do another pass after you are done..
