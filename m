@@ -1,44 +1,34 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Neil Brown <neilb@suse.com>, "Hannes
- Reinecke" <hare@suse.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/3] block: Declare local symbols static
-Date: Wed, 21 Jun 2017 10:55:45 -0700
-Message-ID: <20170621175547.21692-2-bart.vanassche@wdc.com>
-In-Reply-To: <20170621175547.21692-1-bart.vanassche@wdc.com>
-References: <20170621175547.21692-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:34841 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752487AbdFSIAp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Jun 2017 04:00:45 -0400
+Received: by mail-wm0-f68.google.com with SMTP id d64so15318903wmf.2
+        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2017 01:00:44 -0700 (PDT)
+Subject: Re: [PATCH rfc 03/30] nvme-rdma: reuse configure/destroy admin queue
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org,
+        Keith Busch <keith.busch@intel.com>,
+        linux-block@vger.kernel.org
+References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+ <1497799324-19598-4-git-send-email-sagi@grimberg.me>
+ <20170619072004.GC13168@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <71fdef71-24a5-9514-e504-35e7c52b85bc@grimberg.me>
+Date: Mon, 19 Jun 2017 11:00:34 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170619072004.GC13168@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid that building with W=1 causes the compiler to complain that
-a declaration for bounce_bio_set and bounce_bio_split is missing.
 
-References: commit a8821f3f32be ("block: Improvements to bounce-buffer handling")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Neil Brown <neilb@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- block/bounce.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl, bool new)
+> 
+> Too long line..
+> 
+> Also what about moving the helpers into the right place in the
+> previous patch that already re-indented most of this?
 
-diff --git a/block/bounce.c b/block/bounce.c
-index 17d77613c471..916ee9a9a216 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -26,7 +26,7 @@
- #define POOL_SIZE	64
- #define ISA_POOL_SIZE	16
- 
--struct bio_set *bounce_bio_set, *bounce_bio_split;
-+static struct bio_set *bounce_bio_set, *bounce_bio_split;
- static mempool_t *page_pool, *isa_page_pool;
- 
- #if defined(CONFIG_HIGHMEM) || defined(CONFIG_NEED_BOUNCE_POOL)
--- 
-2.13.1
+Sure.
