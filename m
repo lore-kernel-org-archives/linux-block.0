@@ -1,252 +1,114 @@
-Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/8] genirq/affinity: update CPU affinity for CPU hotplug events
-Date: Sat,  3 Jun 2017 16:04:00 +0200
-Message-Id: <20170603140403.27379-6-hch@lst.de>
-In-Reply-To: <20170603140403.27379-1-hch@lst.de>
-References: <20170603140403.27379-1-hch@lst.de>
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 10/10] btrfs: nowait aio support
+Date: Mon, 19 Jun 2017 11:33:48 -0500
+Message-Id: <20170619163348.15542-11-rgoldwyn@suse.de>
+In-Reply-To: <20170619163348.15542-1-rgoldwyn@suse.de>
+References: <20170619163348.15542-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Remove a CPU from the affinity mask when it goes offline and add it
-back when it returns.  In case the vetor was assigned only to the CPU
-going offline it will be shutdown and re-started when the CPU
-reappears.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
+
+Acked-by: David Sterba <dsterba@suse.com>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- arch/x86/kernel/irq.c      |   3 +-
- include/linux/cpuhotplug.h |   1 +
- include/linux/irq.h        |   9 ++++
- kernel/cpu.c               |   6 +++
- kernel/irq/affinity.c      | 127 ++++++++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 144 insertions(+), 2 deletions(-)
+ fs/btrfs/file.c  | 33 +++++++++++++++++++++++++++------
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 30 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index a54eac5d81b3..72c35ed534f1 100644
---- a/arch/x86/kernel/irq.c
-+++ b/arch/x86/kernel/irq.c
-@@ -453,7 +453,8 @@ void fixup_irqs(void)
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index da1096eb1a40..59e2dccdf75b 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1875,12 +1875,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
  
- 		data = irq_desc_get_irq_data(desc);
- 		affinity = irq_data_get_affinity_mask(data);
--		if (!irq_has_action(irq) || irqd_is_per_cpu(data) ||
-+		if (irqd_affinity_is_managed(data) ||
-+		    !irq_has_action(irq) || irqd_is_per_cpu(data) ||
- 		    cpumask_subset(affinity, cpu_online_mask)) {
- 			raw_spin_unlock(&desc->lock);
- 			continue;
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 0f2a80377520..c15f22c54535 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -124,6 +124,7 @@ enum cpuhp_state {
- 	CPUHP_AP_ONLINE_IDLE,
- 	CPUHP_AP_SMPBOOT_THREADS,
- 	CPUHP_AP_X86_VDSO_VMA_ONLINE,
-+	CPUHP_AP_IRQ_AFFINITY_ONLINE,
- 	CPUHP_AP_PERF_ONLINE,
- 	CPUHP_AP_PERF_X86_ONLINE,
- 	CPUHP_AP_PERF_X86_UNCORE_ONLINE,
-diff --git a/include/linux/irq.h b/include/linux/irq.h
-index f887351aa80e..ae15b8582685 100644
---- a/include/linux/irq.h
-+++ b/include/linux/irq.h
-@@ -216,6 +216,7 @@ enum {
- 	IRQD_WAKEUP_ARMED		= (1 << 19),
- 	IRQD_FORWARDED_TO_VCPU		= (1 << 20),
- 	IRQD_AFFINITY_MANAGED		= (1 << 21),
-+	IRQD_AFFINITY_SUSPENDED		= (1 << 22),
- };
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
++		}
++	} else
++		inode_lock(inode);
++
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1914,8 +1931,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	 */
+ 	update_time_for_write(inode);
  
- #define __irqd_to_state(d) ACCESS_PRIVATE((d)->common, state_use_accessors)
-@@ -329,6 +330,11 @@ static inline void irqd_clr_activated(struct irq_data *d)
- 	__irqd_to_state(d) &= ~IRQD_ACTIVATED;
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+@@ -3071,13 +3086,19 @@ static loff_t btrfs_file_llseek(struct file *file, loff_t offset, int whence)
+ 	return offset;
  }
  
-+static inline bool irqd_affinity_is_suspended(struct irq_data *d)
++static int btrfs_file_open(struct inode *inode, struct file *filp)
 +{
-+	return __irqd_to_state(d) & IRQD_AFFINITY_SUSPENDED;
++	filp->f_mode |= FMODE_AIO_NOWAIT;
++	return generic_file_open(inode, filp);
 +}
 +
- #undef __irqd_to_state
- 
- static inline irq_hw_number_t irqd_to_hwirq(struct irq_data *d)
-@@ -1025,4 +1031,7 @@ int __ipi_send_mask(struct irq_desc *desc, const struct cpumask *dest);
- int ipi_send_single(unsigned int virq, unsigned int cpu);
- int ipi_send_mask(unsigned int virq, const struct cpumask *dest);
- 
-+int irq_affinity_online_cpu(unsigned int cpu);
-+int irq_affinity_offline_cpu(unsigned int cpu);
-+
- #endif /* _LINUX_IRQ_H */
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 9ae6fbe5b5cf..ef0c5b63ca0d 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -27,6 +27,7 @@
- #include <linux/smpboot.h>
- #include <linux/relay.h>
- #include <linux/slab.h>
-+#include <linux/irq.h>
- 
- #include <trace/events/power.h>
- #define CREATE_TRACE_POINTS
-@@ -1252,6 +1253,11 @@ static struct cpuhp_step cpuhp_ap_states[] = {
- 		.startup.single		= smpboot_unpark_threads,
- 		.teardown.single	= NULL,
- 	},
-+	[CPUHP_AP_IRQ_AFFINITY_ONLINE] = {
-+		.name			= "irq/affinity:online",
-+		.startup.single		= irq_affinity_online_cpu,
-+		.teardown.single	= irq_affinity_offline_cpu,
-+	},
- 	[CPUHP_AP_PERF_ONLINE] = {
- 		.name			= "perf:online",
- 		.startup.single		= perf_event_init_cpu,
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 337e6ffba93f..e27ecfb4866f 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -1,4 +1,7 @@
--
-+/*
-+ * Copyright (C) 2016 Thomas Gleixner.
-+ * Copyright (C) 2016-2017 Christoph Hellwig.
-+ */
- #include <linux/interrupt.h>
- #include <linux/irq.h>
- #include <linux/kernel.h>
-@@ -227,3 +230,125 @@ int irq_calc_affinity_vectors(int maxvec, const struct irq_affinity *affd)
- 
- 	return min_t(int, cpumask_weight(cpu_present_mask), vecs) + resv;
- }
-+
-+static void irq_affinity_online_irq(unsigned int irq, struct irq_desc *desc,
-+				    unsigned int cpu)
-+{
-+	const struct cpumask *affinity;
-+	struct irq_data *data;
-+	struct irq_chip *chip;
-+	unsigned long flags;
-+	cpumask_var_t mask;
-+
-+	if (!desc)
-+		return;
-+	if (!zalloc_cpumask_var(&mask, GFP_KERNEL))
-+		return;
-+
-+	raw_spin_lock_irqsave(&desc->lock, flags);
-+
-+	data = irq_desc_get_irq_data(desc);
-+	affinity = irq_data_get_affinity_mask(data);
-+	if (!irqd_affinity_is_managed(data) ||
-+	    !irq_has_action(irq) ||
-+	    !cpumask_test_cpu(cpu, affinity))
-+		goto out_free_cpumask;
-+
-+	/*
-+	 * The interrupt descriptor might have been cleaned up
-+	 * already, but it is not yet removed from the radix tree
-+	 */
-+	chip = irq_data_get_irq_chip(data);
-+	if (!chip)
-+		goto out_free_cpumask;
-+
-+	if (WARN_ON_ONCE(!chip->irq_set_affinity))
-+		goto out_free_cpumask;
-+
-+	cpumask_and(mask, affinity, cpu_online_mask);
-+	cpumask_set_cpu(cpu, mask);
-+	if (irqd_has_set(data, IRQD_AFFINITY_SUSPENDED)) {
-+		irq_startup(desc, false);
-+		irqd_clear(data, IRQD_AFFINITY_SUSPENDED);
-+	} else {
-+		irq_affinity_set(irq, desc, mask);
-+	}
-+
-+out_free_cpumask:
-+	free_cpumask_var(mask);
-+	raw_spin_unlock_irqrestore(&desc->lock, flags);
-+}
-+
-+int irq_affinity_online_cpu(unsigned int cpu)
-+{
-+	struct irq_desc *desc;
-+	unsigned int irq;
-+
-+	irq_lock_sparse();
-+	for_each_irq_desc(irq, desc)
-+		irq_affinity_online_irq(irq, desc, cpu);
-+	irq_unlock_sparse();
-+	return 0;
-+}
-+
-+static void irq_affinity_offline_irq(unsigned int irq, struct irq_desc *desc,
-+				     unsigned int cpu)
-+{
-+	const struct cpumask *affinity;
-+	struct irq_data *data;
-+	struct irq_chip *chip;
-+	unsigned long flags;
-+	cpumask_var_t mask;
-+
-+	if (!desc)
-+		return;
-+	if (!zalloc_cpumask_var(&mask, GFP_KERNEL))
-+		return;
-+
-+	raw_spin_lock_irqsave(&desc->lock, flags);
-+
-+	data = irq_desc_get_irq_data(desc);
-+	affinity = irq_data_get_affinity_mask(data);
-+	if (!irqd_affinity_is_managed(data) ||
-+	    !irq_has_action(irq) ||
-+	    irqd_has_set(data, IRQD_AFFINITY_SUSPENDED) ||
-+	    !cpumask_test_cpu(cpu, affinity))
-+		goto out_free_cpumask;
-+
-+	/*
-+	 * The interrupt descriptor might have been cleaned up
-+	 * already, but it is not yet removed from the radix tree
-+	 */
-+	chip = irq_data_get_irq_chip(data);
-+	if (!chip)
-+		goto out_free_cpumask;
-+
-+	if (WARN_ON_ONCE(!chip->irq_set_affinity))
-+		goto out_free_cpumask;
-+
-+
-+	cpumask_copy(mask, affinity);
-+	cpumask_clear_cpu(cpu, mask);
-+	if (cpumask_empty(mask)) {
-+		irqd_set(data, IRQD_AFFINITY_SUSPENDED);
-+		irq_shutdown(desc);
-+	} else {
-+		irq_affinity_set(irq, desc, mask);
-+	}
-+
-+out_free_cpumask:
-+	free_cpumask_var(mask);
-+	raw_spin_unlock_irqrestore(&desc->lock, flags);
-+}
-+
-+int irq_affinity_offline_cpu(unsigned int cpu)
-+{
-+	struct irq_desc *desc;
-+	unsigned int irq;
-+
-+	irq_lock_sparse();
-+	for_each_irq_desc(irq, desc)
-+		irq_affinity_offline_irq(irq, desc, cpu);
-+	irq_unlock_sparse();
-+	return 0;
-+}
+ const struct file_operations btrfs_file_operations = {
+ 	.llseek		= btrfs_file_llseek,
+ 	.read_iter      = generic_file_read_iter,
+ 	.splice_read	= generic_file_splice_read,
+ 	.write_iter	= btrfs_file_write_iter,
+ 	.mmap		= btrfs_file_mmap,
+-	.open		= generic_file_open,
++	.open		= btrfs_file_open,
+ 	.release	= btrfs_release_file,
+ 	.fsync		= btrfs_sync_file,
+ 	.fallocate	= btrfs_fallocate,
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index f942293dd7e7..556c93060606 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8754,6 +8754,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			dio_data.overwrite = 1;
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
 -- 
-2.11.0
+2.12.0
