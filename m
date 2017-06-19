@@ -1,120 +1,95 @@
 Return-Path: <paolo.valente@linaro.org>
 Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH BUGFIX] block, bfq: update wr_busy_queues if needed on a queue split
 From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX V2] block, bfq: update wr_busy_queues if needed on a queue split
-Date: Mon, 19 Jun 2017 13:43:16 +0200
-Message-Id: <20170619114316.2587-1-paolo.valente@linaro.org>
+In-Reply-To: <201706191545.FX1Q7z4r%fengguang.wu@intel.com>
+Date: Mon, 19 Jun 2017 13:42:44 +0200
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Mark Brown <broonie@kernel.org>
+Message-Id: <1AE9BB5E-CF3B-4542-8FCD-91F80B32A0D1@linaro.org>
+References: <201706191545.FX1Q7z4r%fengguang.wu@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This commit fixes a bug triggered by a non-trivial sequence of
-events. These events are briefly described in the next two
-paragraphs. The impatiens, or those who are familiar with queue
-merging and splitting, can jump directly to the last paragraph.
 
-On each I/O-request arrival for a shared bfq_queue, i.e., for a
-bfq_queue that is the result of the merge of two or more bfq_queues,
-BFQ checks whether the shared bfq_queue has become seeky (i.e., if too
-many random I/O requests have arrived for the bfq_queue; if the device
-is non rotational, then random requests must be also small for the
-bfq_queue to be tagged as seeky). If the shared bfq_queue is actually
-detected as seeky, then a split occurs: the bfq I/O context of the
-process that has issued the request is redirected from the shared
-bfq_queue to a new non-shared bfq_queue. As a degenerate case, if the
-shared bfq_queue actually happens to be shared only by one process
-(because of previous splits), then no new bfq_queue is created: the
-state of the shared bfq_queue is just changed from shared to non
-shared.
+> Il giorno 19 giu 2017, alle ore 09:38, kbuild test robot =
+<lkp@intel.com> ha scritto:
+>=20
+> Hi Paolo,
+>=20
+> [auto build test WARNING on v4.12-rc5]
+> [also build test WARNING on next-20170616]
+> [cannot apply to block/for-next]
+> [if your patch is applied to the wrong git tree, please drop us a note =
+to help improve the system]
+>=20
+> url:    =
+https://github.com/0day-ci/linux/commits/Paolo-Valente/block-bfq-update-wr=
+_busy_queues-if-needed-on-a-queue-split/20170619-145003
+> config: i386-randconfig-x000-201725 (attached as .config)
+> compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
+> reproduce:
+>        # save the attached .config to linux build tree
+>        make ARCH=3Di386=20
+>=20
+> Note: it may well be a FALSE warning. FWIW you are at least aware of =
+it now.
+> http://gcc.gnu.org/wiki/Better_Uninitialized_Warnings
+>=20
+> All warnings (new ones prefixed by >>):
+>=20
+>   block/bfq-iosched.c: In function 'bfq_get_rq_private':
+>>> block/bfq-iosched.c:770:10: warning: 'old_wr_coeff' may be used =
+uninitialized in this function [-Wmaybe-uninitialized]
+>     else if (old_wr_coeff > 1 && bfqq->wr_coeff =3D=3D 1)
+>             ^
+>   block/bfq-iosched.c:731:15: note: 'old_wr_coeff' was declared here
+>     unsigned int old_wr_coeff;
+>                  ^~~~~~~~~~~~
+>=20
 
-Regardless of whether a brand new non-shared bfq_queue is created, or
-the pre-existing shared bfq_queue is just turned into a non-shared
-bfq_queue, several parameters of the non-shared bfq_queue are set
-(restored) to the original values they had when the bfq_queue
-associated with the bfq I/O context of the process (that has just
-issued an I/O request) was merged with the shared bfq_queue. One of
-these parameters is the weight-raising state.
+I'm sending a V2, (probably imperceptibly) slower on average, but not
+confusing the compiler.
 
-If, on the split of a shared bfq_queue,
-1) a pre-existing shared bfq_queue is turned into a non-shared
-bfq_queue;
-2) the previously shared bfq_queue happens to be busy;
-3) the weight-raising state of the previously shared bfq_queue happens
-to change;
-the number of weight-raised busy queues changes. The field
-wr_busy_queues must then be updated accordingly, but such an update
-was missing. This commit adds the missing update.
+Thanks,
+Paolo
 
-Reported-by: Luca Miccio <lucmiccio@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ed93da2..bbeaf52 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -725,8 +725,12 @@ static void bfq_updated_next_req(struct bfq_data *bfqd,
- }
- 
- static void
--bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
-+bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
-+		      struct bfq_io_cq *bic, bool bfq_already_existing)
- {
-+	unsigned int old_wr_coeff = bfqq->wr_coeff;
-+	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
-+
- 	if (bic->saved_idle_window)
- 		bfq_mark_bfqq_idle_window(bfqq);
- 	else
-@@ -754,6 +758,14 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 
- 	/* make sure weight will be updated, however we got here */
- 	bfqq->entity.prio_changed = 1;
-+
-+	if (likely(!busy))
-+		return;
-+
-+	if (old_wr_coeff == 1 && bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues++;
-+	else if (old_wr_coeff > 1 && bfqq->wr_coeff == 1)
-+		bfqd->wr_busy_queues--;
- }
- 
- static int bfqq_process_refs(struct bfq_queue *bfqq)
-@@ -4402,7 +4414,7 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 	const int is_sync = rq_is_sync(rq);
- 	struct bfq_queue *bfqq;
- 	bool new_queue = false;
--	bool split = false;
-+	bool bfqq_already_existing = false, split = false;
- 
- 	spin_lock_irq(&bfqd->lock);
- 
-@@ -4432,6 +4444,8 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 				bfqq = bfq_get_bfqq_handle_split(bfqd, bic, bio,
- 								 true, is_sync,
- 								 NULL);
-+			else
-+				bfqq_already_existing = true;
- 		}
- 	}
- 
-@@ -4457,7 +4471,8 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 			 * queue: restore the idle window and the
- 			 * possible weight raising period.
- 			 */
--			bfq_bfqq_resume_state(bfqq, bic);
-+			bfq_bfqq_resume_state(bfqq, bfqd, bic,
-+					      bfqq_already_existing);
- 		}
- 	}
- 
--- 
-2.10.0
+> vim +/old_wr_coeff +770 block/bfq-iosched.c
+>=20
+>   754		    time_is_before_jiffies(bfqq->last_wr_start_finish +
+>   755					   bfqq->wr_cur_max_time))) {
+>   756			bfq_log_bfqq(bfqq->bfqd, bfqq,
+>   757			    "resume state: switching off wr");
+>   758=09
+>   759			bfqq->wr_coeff =3D 1;
+>   760		}
+>   761=09
+>   762		/* make sure weight will be updated, however we got here =
+*/
+>   763		bfqq->entity.prio_changed =3D 1;
+>   764=09
+>   765		if (likely(!busy))
+>   766			return;
+>   767=09
+>   768		if (old_wr_coeff =3D=3D 1 && bfqq->wr_coeff > 1)
+>   769			bfqd->wr_busy_queues++;
+>> 770		else if (old_wr_coeff > 1 && bfqq->wr_coeff =3D=3D 1)
+>   771			bfqd->wr_busy_queues--;
+>   772	}
+>   773=09
+>   774	static int bfqq_process_refs(struct bfq_queue *bfqq)
+>   775	{
+>   776		return bfqq->ref - bfqq->allocated - bfqq->entity.on_st;
+>   777	}
+>   778=09
+>=20
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology =
+Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel =
+Corporation
+> <.config.gz>
