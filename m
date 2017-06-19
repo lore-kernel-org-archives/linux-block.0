@@ -1,128 +1,110 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v7 20/22] ext2: convert to errseq_t based writeback error tracking
-Date: Fri, 16 Jun 2017 15:34:25 -0400
-Message-Id: <20170616193427.13955-21-jlayton@redhat.com>
-In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
-References: <20170616193427.13955-1-jlayton@redhat.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>
+Subject: [PATCH v4 00/12] More patches for kernel v4.13
+Date: Mon, 19 Jun 2017 15:07:49 -0700
+Message-ID: <20170619220801.12557-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-Set the flag to indicate that we want new-style data writeback error
-handling.
+Hello Jens,
 
-This means that we need to override the open routines for files and
-directories so that we can sample the bdev wb_err at open.
+This patch series contains one patch that reduces the size of struct
+blk_mq_hw_ctx, a few patches that simplify some of the block layer code and
+also patches that improve the block layer documentation. Please consider these
+patches for kernel v4.13.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/ext2/dir.c  |  8 ++++++++
- fs/ext2/file.c | 26 +++++++++++++++++++++-----
- 2 files changed, 29 insertions(+), 5 deletions(-)
+The basis for these patches is your for-next branch.
 
-diff --git a/fs/ext2/dir.c b/fs/ext2/dir.c
-index e2709695b177..6e476c9929f8 100644
---- a/fs/ext2/dir.c
-+++ b/fs/ext2/dir.c
-@@ -713,6 +713,13 @@ int ext2_empty_dir (struct inode * inode)
- 	return 0;
- }
- 
-+static int ext2_dir_open(struct inode *inode, struct file *file)
-+{
-+	/* Sample blockdev mapping errseq_t for metadata writeback */
-+	file->f_md_wb_err = filemap_sample_wb_err(inode->i_sb->s_bdev->bd_inode->i_mapping);
-+	return 0;
-+}
-+
- const struct file_operations ext2_dir_operations = {
- 	.llseek		= generic_file_llseek,
- 	.read		= generic_read_dir,
-@@ -721,5 +728,6 @@ const struct file_operations ext2_dir_operations = {
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= ext2_compat_ioctl,
- #endif
-+	.open		= ext2_dir_open,
- 	.fsync		= ext2_fsync,
- };
-diff --git a/fs/ext2/file.c b/fs/ext2/file.c
-index ed00e7ae0ef3..fd44539f6fce 100644
---- a/fs/ext2/file.c
-+++ b/fs/ext2/file.c
-@@ -172,17 +172,23 @@ static int ext2_release_file (struct inode * inode, struct file * filp)
- 
- int ext2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
- {
--	int ret;
-+	int ret, ret2;
- 	struct super_block *sb = file->f_mapping->host->i_sb;
- 	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
- 
- 	ret = generic_file_fsync(file, start, end, datasync);
--	if (ret == -EIO) {
-+	if (ret == -EIO)
- 		/* We don't really know where the IO error happened... */
- 		ext2_error(sb, __func__,
- 			   "detected IO error when writing metadata buffers");
--		ret = -EIO;
--	}
-+
-+	ret2 = filemap_report_wb_err(file);
-+	if (ret == 0)
-+		ret = ret2;
-+
-+	ret2 = filemap_report_md_wb_err(file, mapping);
-+	if (ret == 0)
-+		ret = ret2;
- 	return ret;
- }
- 
-@@ -204,6 +210,16 @@ static ssize_t ext2_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	return generic_file_write_iter(iocb, from);
- }
- 
-+static int ext2_file_open(struct inode *inode, struct file *file)
-+{
-+	int ret;
-+
-+	ret = dquot_file_open(inode, file);
-+	if (likely(ret == 0))
-+		file->f_md_wb_err = filemap_sample_wb_err(inode->i_sb->s_bdev->bd_inode->i_mapping);
-+	return ret;
-+}
-+
- const struct file_operations ext2_file_operations = {
- 	.llseek		= generic_file_llseek,
- 	.read_iter	= ext2_file_read_iter,
-@@ -213,7 +229,7 @@ const struct file_operations ext2_file_operations = {
- 	.compat_ioctl	= ext2_compat_ioctl,
- #endif
- 	.mmap		= ext2_file_mmap,
--	.open		= dquot_file_open,
-+	.open		= ext2_file_open,
- 	.release	= ext2_release_file,
- 	.fsync		= ext2_fsync,
- 	.get_unmapped_area = thp_get_unmapped_area,
+Thanks,
+
+Bart.
+
+Changes between v3 and v4:
+* Rebased on top of Jens' current for-next branch.
+* Renamed patch "blk-mq: Initialize a request before assigning a tag" into
+  "blk-mq: Initialize .rq_flags in blk_mq_rq_ctx_init()" and removed the
+  __blk_mq_alloc_request() changes from that patch since these changes no
+  longer apply to the current block layer code.
+
+Changes between v2 and v3:
+* Added patch "blk-mq: Reduce blk_mq_hw_ctx size".
+* Removed patch "block: Rename blk_mq_rq_{to,from}_pdu()".
+* Addressed Christoph's review comments about patch "block: Introduce
+  request_queue.initialize_rq_fn()".
+* Rebased (and retested) this patch series on top of a merge of Jens'
+  for-next and for-linus branches.
+
+Changes between v1 and v2:
+* Addressed Christoph's comment about moving the .initialize_rq_fn() call
+  from blk_rq_init() / blk_mq_rq_ctx_init() into blk_get_request().
+* Left out patch "scsi: Make scsi_ioctl_reset() pass the request queue pointer
+  to blk_rq_init()" since it's no longer needed.
+* Restored the scsi_req_init() call in ide_prep_sense().
+* Combined the two patches that reduce the blk_mq_hw_ctx size into a single
+  patch.
+* Modified patch "blk-mq: Initialize a request before assigning a tag" such
+  that .tag and .internal_tag are no longer initialized twice.
+* Removed WARN_ON_ONCE(q->mq_ops) from blk_queue_bypass_end() because this
+  function is used by both blk-sq and blk-mq.
+* Added several new patches, e.g. "block: Rename blk_mq_rq_{to,from}_pdu()".
+
+Bart Van Assche (12):
+  blk-mq: Reduce blk_mq_hw_ctx size
+  block: Make request operation type argument declarations consistent
+  block: Introduce request_queue.initialize_rq_fn()
+  block: Make most scsi_req_init() calls implicit
+  block: Change argument type of scsi_req_init()
+  blk-mq: Initialize .rq_flags in blk_mq_rq_ctx_init()
+  block: Add a comment above queue_lockdep_assert_held()
+  block: Check locking assumptions at runtime
+  block: Document what queue type each function is intended for
+  blk-mq: Document locking assumptions
+  block: Constify disk_type
+  blk-mq: Warn when attempting to run a hardware queue that is not
+    mapped
+
+ block/blk-core.c                   | 130 ++++++++++++++++++++++++++++---------
+ block/blk-flush.c                  |   8 ++-
+ block/blk-merge.c                  |   3 +
+ block/blk-mq-sched.c               |   2 +
+ block/blk-mq.c                     |  53 ++++++++++-----
+ block/blk-tag.c                    |  15 ++---
+ block/blk-timeout.c                |   4 +-
+ block/blk.h                        |   2 +
+ block/bsg.c                        |   1 -
+ block/genhd.c                      |   4 +-
+ block/scsi_ioctl.c                 |  13 ++--
+ drivers/block/pktcdvd.c            |   1 -
+ drivers/cdrom/cdrom.c              |   1 -
+ drivers/ide/ide-atapi.c            |   3 +-
+ drivers/ide/ide-cd.c               |   1 -
+ drivers/ide/ide-cd_ioctl.c         |   1 -
+ drivers/ide/ide-devsets.c          |   1 -
+ drivers/ide/ide-disk.c             |   1 -
+ drivers/ide/ide-ioctls.c           |   2 -
+ drivers/ide/ide-park.c             |   2 -
+ drivers/ide/ide-pm.c               |   2 -
+ drivers/ide/ide-probe.c            |   6 +-
+ drivers/ide/ide-tape.c             |   1 -
+ drivers/ide/ide-taskfile.c         |   1 -
+ drivers/scsi/osd/osd_initiator.c   |   2 -
+ drivers/scsi/osst.c                |   1 -
+ drivers/scsi/scsi_error.c          |   1 -
+ drivers/scsi/scsi_lib.c            |  12 +++-
+ drivers/scsi/scsi_transport_sas.c  |   6 ++
+ drivers/scsi/sg.c                  |   2 -
+ drivers/scsi/st.c                  |   1 -
+ drivers/target/target_core_pscsi.c |   2 -
+ fs/nfsd/blocklayout.c              |   1 -
+ include/linux/blk-mq.h             |  13 ++--
+ include/linux/blkdev.h             |  14 +++-
+ include/scsi/scsi_request.h        |   2 +-
+ 36 files changed, 209 insertions(+), 106 deletions(-)
+
 -- 
-2.13.0
+2.13.1
