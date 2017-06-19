@@ -1,34 +1,27 @@
-Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:56211 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751056AbdFSMmw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Jun 2017 08:42:52 -0400
+Date: Mon, 19 Jun 2017 14:42:50 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 09/10] dm: don't set bounce limit
-Date: Mon, 19 Jun 2017 09:26:27 +0200
-Message-Id: <20170619072628.12894-10-hch@lst.de>
-In-Reply-To: <20170619072628.12894-1-hch@lst.de>
-References: <20170619072628.12894-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH rfc 11/30] nvme: move controller cap to struct nvme_ctrl
+Message-ID: <20170619124250.GK29061@lst.de>
+References: <1497799324-19598-1-git-send-email-sagi@grimberg.me> <1497799324-19598-12-git-send-email-sagi@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1497799324-19598-12-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now all queues allocators come without abounce limit by default,
-dm doesn't have to override this anymore.
+On Sun, Jun 18, 2017 at 06:21:45PM +0300, Sagi Grimberg wrote:
+> Will be used in centralized code later. only rdma
+> for now.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index fbd06b9f9467..402946035308 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1534,7 +1534,6 @@ void dm_init_normal_md_queue(struct mapped_device *md)
- 	 * Initialize aspects of queue that aren't relevant for blk-mq
- 	 */
- 	md->queue->backing_dev_info->congested_fn = dm_any_congested;
--	blk_queue_bounce_limit(md->queue, BLK_BOUNCE_ANY);
- }
- 
- static void cleanup_mapped_device(struct mapped_device *md)
--- 
-2.11.0
+It would be great to initialize it early on for all transports, and
+then just use the stored field instead of re-reading CAP in various
+places.
