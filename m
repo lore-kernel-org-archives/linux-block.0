@@ -1,14 +1,13 @@
-Return-Path: <linus.walleij@linaro.org>
+Return-Path: <tomasw@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+i0qc75-YSj6-H5qpPi0f4BF_25k_fL53Nmg7QYu61QaWU9HA@mail.gmail.com>
-References: <20170615121259.8281-1-linus.walleij@linaro.org>
- <20170615121259.8281-3-linus.walleij@linaro.org> <CA+i0qc75-YSj6-H5qpPi0f4BF_25k_fL53Nmg7QYu61QaWU9HA@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 20 Jun 2017 13:23:46 +0200
-Message-ID: <CACRpkdZCjQEQ0FdyfqqiXuNO-TuWdye9iSgztztOhFqMv=z+xw@mail.gmail.com>
+In-Reply-To: <20170615121259.8281-3-linus.walleij@linaro.org>
+References: <20170615121259.8281-1-linus.walleij@linaro.org> <20170615121259.8281-3-linus.walleij@linaro.org>
+From: Tomas Winkler <tomasw@gmail.com>
+Date: Mon, 19 Jun 2017 22:53:24 +0300
+Message-ID: <CA+i0qc75-YSj6-H5qpPi0f4BF_25k_fL53Nmg7QYu61QaWU9HA@mail.gmail.com>
 Subject: Re: [PATCH 2/5] mmc: block: Refactor mmc_blk_part_switch()
-To: Tomas Winkler <tomasw@gmail.com>
-Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
 	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
 	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>,
@@ -17,60 +16,149 @@ Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.ha
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 19, 2017 at 9:53 PM, Tomas Winkler <tomasw@gmail.com> wrote:
-> On Thu, Jun 15, 2017 at 3:12 PM, Linus Walleij <linus.walleij@linaro.org> wrote:
->>
->> Instead of passing a struct mmc_blk_data * to mmc_blk_part_switch()
->> let's pass the actual partition type we want to switch to. This
->> is necessary in order not to have a block device with a backing
->> mmc_blk_data and request queue and all for every hardware partition,
->> such as RPMB.
->>
->> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
->> ---
->>  drivers/mmc/core/block.c | 25 +++++++++++++------------
->>  1 file changed, 13 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
->> index d1b824e65590..94b97f97be1a 100644
->> --- a/drivers/mmc/core/block.c
->> +++ b/drivers/mmc/core/block.c
->> @@ -127,7 +127,7 @@ module_param(perdev_minors, int, 0444);
->>  MODULE_PARM_DESC(perdev_minors, "Minors numbers to allocate per device");
->>
->>  static inline int mmc_blk_part_switch(struct mmc_card *card,
->> -                                     struct mmc_blk_data *md);
->> +                                     unsigned int part_type);
+On Thu, Jun 15, 2017 at 3:12 PM, Linus Walleij <linus.walleij@linaro.org> wrote:
 >
-> Maybe it's time to change this misleading 'part_type' name, this a bit
-> that represent  the actual  partition to
-> access and not a type of an partition. Maybe part_to_access will more
-> reflect the spec wording.
-> Need to change also  in mmc_blk_data;
-
-That would be a separate patch I think (one patch, one technical step)
-what about target_partition or something?
-
->>                 /* Always switch back to main area after RPMB access */
->>                 if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
->> -                       mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
->> +                       mmc_blk_part_switch(card, main_md->part_type);
+> Instead of passing a struct mmc_blk_data * to mmc_blk_part_switch()
+> let's pass the actual partition type we want to switch to. This
+> is necessary in order not to have a block device with a backing
+> mmc_blk_data and request queue and all for every hardware partition,
+> such as RPMB.
 >
-> Actually this switch back should be probably done for any partition
-> which is not user data area.
-> so this should be
->  if (md->area_type != MMC_BLK_DATA_AREA_MAIN)
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  drivers/mmc/core/block.c | 25 +++++++++++++------------
+>  1 file changed, 13 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index d1b824e65590..94b97f97be1a 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -127,7 +127,7 @@ module_param(perdev_minors, int, 0444);
+>  MODULE_PARM_DESC(perdev_minors, "Minors numbers to allocate per device");
+>
+>  static inline int mmc_blk_part_switch(struct mmc_card *card,
+> -                                     struct mmc_blk_data *md);
+> +                                     unsigned int part_type);
 
-That is another technical step so it should be a separate patch as
-well.
+Maybe it's time to change this misleading 'part_type' name, this a bit
+that represent  the actual  partition to
+access and not a type of an partition. Maybe part_to_access will more
+reflect the spec wording.
+Need to change also  in mmc_blk_data;
 
-Actually I think this code is broken in several ways, especially if
-you do something crazy like access the main partition, both boot
-partitions and the RPMB partition at the same time. It will invariably
-screw something up.
+>
+>
+>  static struct mmc_blk_data *mmc_blk_get(struct gendisk *disk)
+>  {
+> @@ -490,7 +490,7 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
+>
+>         mrq.cmd = &cmd;
+>
+> -       err = mmc_blk_part_switch(card, md);
+> +       err = mmc_blk_part_switch(card, md->part_type);
+>         if (err)
+>                 return err;
+>
+> @@ -767,29 +767,29 @@ static int mmc_blk_part_switch_post(struct mmc_card *card,
+>  }
+>
+>  static inline int mmc_blk_part_switch(struct mmc_card *card,
+> -                                     struct mmc_blk_data *md)
+> +                                     unsigned int part_type)
+>  {
+>         int ret = 0;
+>         struct mmc_blk_data *main_md = dev_get_drvdata(&card->dev);
+>
+> -       if (main_md->part_curr == md->part_type)
+> +       if (main_md->part_curr == part_type)
+>                 return 0;
+>
+>         if (mmc_card_mmc(card)) {
+>                 u8 part_config = card->ext_csd.part_config;
+>
+> -               ret = mmc_blk_part_switch_pre(card, md->part_type);
+> +               ret = mmc_blk_part_switch_pre(card, part_type);
+>                 if (ret)
+>                         return ret;
+>
+>                 part_config &= ~EXT_CSD_PART_CONFIG_ACC_MASK;
+> -               part_config |= md->part_type;
+> +               part_config |= part_type;
+>
+>                 ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL,
+>                                  EXT_CSD_PART_CONFIG, part_config,
+>                                  card->ext_csd.part_time);
+>                 if (ret) {
+> -                       mmc_blk_part_switch_post(card, md->part_type);
+> +                       mmc_blk_part_switch_post(card, part_type);
+>                         return ret;
+>                 }
+>
+> @@ -798,7 +798,7 @@ static inline int mmc_blk_part_switch(struct mmc_card *card,
+>                 ret = mmc_blk_part_switch_post(card, main_md->part_curr);
+>         }
+>
+> -       main_md->part_curr = md->part_type;
+> +       main_md->part_curr = part_type;
+>         return ret;
+>  }
+>
+> @@ -1141,7 +1141,7 @@ static int mmc_blk_reset(struct mmc_blk_data *md, struct mmc_host *host,
+>                 int part_err;
+>
+>                 main_md->part_curr = main_md->part_type;
+> -               part_err = mmc_blk_part_switch(host->card, md);
+> +               part_err = mmc_blk_part_switch(host->card, md->part_type);
+>                 if (part_err) {
+>                         /*
+>                          * We have failed to get back into the correct
+> @@ -1180,6 +1180,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+>         struct mmc_queue_req *mq_rq;
+>         struct mmc_card *card = mq->card;
+>         struct mmc_blk_data *md = mq->blkdata;
+> +       struct mmc_blk_data *main_md = dev_get_drvdata(&card->dev);
 
-I am trying to rework this to use the block layer properly, RPMB is
-just the first step...
+Doesn't apply here, maybe need rebase over next or I'm missing some patches.
 
-Yours,
-Linus Walleij
+>         struct mmc_blk_ioc_data **idata;
+>         u8 **ext_csd;
+>         u32 status;
+> @@ -1198,7 +1199,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+>                 }
+>                 /* Always switch back to main area after RPMB access */
+>                 if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
+> -                       mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
+> +                       mmc_blk_part_switch(card, main_md->part_type);
+Actually this switch back should be probably done for any partition
+which is not user data area.
+so this should be
+ if (md->area_type != MMC_BLK_DATA_AREA_MAIN)
+
+>                 break;
+>         case MMC_DRV_OP_BOOT_WP:
+>                 ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_BOOT_WP,
+> @@ -1906,7 +1907,7 @@ void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
+>                 /* claim host only for the first request */
+>                 mmc_get_card(card);
+>
+> -       ret = mmc_blk_part_switch(card, md);
+> +       ret = mmc_blk_part_switch(card, md->part_type);
+>         if (ret) {
+>                 if (req) {
+>                         blk_end_request_all(req, -EIO);
+> @@ -2436,7 +2437,7 @@ static void mmc_blk_remove(struct mmc_card *card)
+>         mmc_blk_remove_parts(card, md);
+>         pm_runtime_get_sync(&card->dev);
+>         mmc_claim_host(card->host);
+> -       mmc_blk_part_switch(card, md);
+> +       mmc_blk_part_switch(card, md->part_type);
+>         mmc_release_host(card->host);
+>         if (card->type != MMC_TYPE_SD_COMBO)
+>                 pm_runtime_disable(&card->dev);
+> --
+> 2.9.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-mmc" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
