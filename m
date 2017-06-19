@@ -1,44 +1,89 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53700 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751491AbdFZMMC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:12:02 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 02/51] block: loop: comment on direct access to bvec table
-Date: Mon, 26 Jun 2017 20:09:45 +0800
-Message-Id: <20170626121034.3051-3-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 02/10] blk-map: call blk_queue_bounce from blk_rq_append_bio
+Date: Mon, 19 Jun 2017 09:26:20 +0200
+Message-Id: <20170619072628.12894-3-hch@lst.de>
+In-Reply-To: <20170619072628.12894-1-hch@lst.de>
+References: <20170619072628.12894-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+This makes moves the knowledge about bouncing out of the callers into the
+block core (just like we do for the normal I/O path), and allows to unexport
+blk_queue_bounce.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/blk-map.c                  | 7 +++----
+ block/bounce.c                   | 2 --
+ drivers/scsi/osd/osd_initiator.c | 5 +----
+ 3 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0de11444e317..88063ab17e9a 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -487,6 +487,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	/* nomerge for loop request queue */
- 	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 3b5cb863318f..2547016aa7aa 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -16,6 +16,8 @@
+  */
+ int blk_rq_append_bio(struct request *rq, struct bio *bio)
+ {
++	blk_queue_bounce(rq->q, &bio);
++
+ 	if (!rq->bio) {
+ 		blk_rq_bio_prep(rq->q, rq, bio);
+ 	} else {
+@@ -72,15 +74,13 @@ static int __blk_rq_map_user_iov(struct request *rq,
+ 		map_data->offset += bio->bi_iter.bi_size;
  
-+	/*
-+	 * For multipage bvec support, it is safe to pass the bvec
-+	 * table to iov iterator, because iov iter still uses bvec
-+	 * iter helpers to travese bvec.
-+	 */
- 	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
- 		      bio_segments(bio), blk_rq_bytes(cmd->rq));
+ 	orig_bio = bio;
+-	blk_queue_bounce(q, &bio);
+ 
+ 	/*
+ 	 * We link the bounce buffer in and could have to traverse it
+ 	 * later so we have to get a ref to prevent it from being freed
+ 	 */
+-	bio_get(bio);
+-
+ 	ret = blk_rq_append_bio(rq, bio);
++	bio_get(bio);
+ 	if (ret) {
+ 		bio_endio(bio);
+ 		__blk_rq_unmap_user(orig_bio);
+@@ -249,7 +249,6 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
+ 		return ret;
+ 	}
+ 
+-	blk_queue_bounce(q, &rq->bio);
+ 	return 0;
+ }
+ EXPORT_SYMBOL(blk_rq_map_kern);
+diff --git a/block/bounce.c b/block/bounce.c
+index 17d77613c471..b7e44bd59d7c 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -284,5 +284,3 @@ void blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+ 	 */
+ 	__blk_queue_bounce(q, bio_orig, pool);
+ }
+-
+-EXPORT_SYMBOL(blk_queue_bounce);
+diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
+index 1e69a43b279d..3754888dc7dd 100644
+--- a/drivers/scsi/osd/osd_initiator.c
++++ b/drivers/scsi/osd/osd_initiator.c
+@@ -1577,10 +1577,7 @@ static struct request *_make_request(struct request_queue *q, bool has_write,
+ 	scsi_req_init(req);
+ 
+ 	for_each_bio(bio) {
+-		struct bio *bounce_bio = bio;
+-
+-		blk_queue_bounce(req->q, &bounce_bio);
+-		ret = blk_rq_append_bio(req, bounce_bio);
++		ret = blk_rq_append_bio(req, bio);
+ 		if (ret)
+ 			return ERR_PTR(ret);
+ 	}
 -- 
-2.9.4
+2.11.0
