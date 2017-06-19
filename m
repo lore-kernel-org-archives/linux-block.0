@@ -1,116 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44146 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752905AbdFOSRa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2017 14:17:30 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V3 02/12] kernfs: implement i_generation
-Date: Thu, 15 Jun 2017 11:17:10 -0700
-Message-Id: <5532cc7d8cac2a1c94b62b63916d1d584ece5078.1497549993.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 06/10] fs: Introduce IOMAP_NOWAIT
+Date: Mon, 19 Jun 2017 11:33:44 -0500
+Message-Id: <20170619163348.15542-7-rgoldwyn@suse.de>
+In-Reply-To: <20170619163348.15542-1-rgoldwyn@suse.de>
+References: <20170619163348.15542-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Set i_generation for kernfs inode. This is required to implement
-exportfs operations. The generation is 32-bit, so it's possible the
-generation wraps up and we find stale files. To reduce the posssibility,
-we don't reuse inode numer immediately. When the inode number allocation
-wraps, we increase generation number. In this way generation/inode
-number consist of a 64-bit number which is unlikely duplicated. This
-does make the idr tree more sparse and waste some memory. Since idr
-manages 32-bit keys, idr uses a 6-level radix tree, each level covers 6
-bits of the key. In a 100k inode kernfs, the worst case will have around
-300k radix tree node. Each node is 576bytes, so the tree will use about
-~150M memory. Sounds not too bad, if this really is a problem, we should
-find better data structure.
+IOCB_NOWAIT translates to IOMAP_NOWAIT for iomaps.
+This is used by XFS in the XFS patch.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- fs/kernfs/dir.c        | 10 +++++++++-
- fs/kernfs/inode.c      |  1 +
- include/linux/kernfs.h |  2 ++
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ fs/iomap.c            | 8 ++++++++
+ include/linux/iomap.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index 8ad7a17..33f711f 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -623,6 +623,8 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 					     unsigned flags)
- {
- 	struct kernfs_node *kn;
-+	u32 gen;
-+	int cursor;
- 	int ret;
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 18f2f2b8ba2c..c71a64b97fba 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -881,6 +881,14 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 		flags |= IOMAP_WRITE;
+ 	}
  
- 	name = kstrdup_const(name, GFP_KERNEL);
-@@ -635,12 +637,17 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
++	if (iocb->ki_flags & IOCB_NOWAIT) {
++		if (filemap_range_has_page(mapping, start, end)) {
++			ret = -EAGAIN;
++			goto out_free_dio;
++		}
++		flags |= IOMAP_NOWAIT;
++	}
++
+ 	ret = filemap_write_and_wait_range(mapping, start, end);
+ 	if (ret)
+ 		goto out_free_dio;
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index f753e788da31..69f4e9470084 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -52,6 +52,7 @@ struct iomap {
+ #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
+ #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
+ #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
++#define IOMAP_NOWAIT		(1 << 5) /* Don't wait for writeback */
  
- 	idr_preload(GFP_KERNEL);
- 	spin_lock(&kernfs_idr_lock);
--	ret = idr_alloc(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
-+	cursor = idr_get_cursor(&root->ino_idr);
-+	ret = idr_alloc_cyclic(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
-+	if (ret >= 0 && ret < cursor)
-+		root->next_generation++;
-+	gen = root->next_generation;
- 	spin_unlock(&kernfs_idr_lock);
- 	idr_preload_end();
- 	if (ret < 0)
- 		goto err_out2;
- 	kn->ino = ret;
-+	kn->generation = gen;
- 
- 	atomic_set(&kn->count, 1);
- 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
-@@ -884,6 +891,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
- 
- 	idr_init(&root->ino_idr);
- 	INIT_LIST_HEAD(&root->supers);
-+	root->next_generation = 1;
- 
- 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
- 			       KERNFS_DIR);
-diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
-index fb4b4a7..79cdae4 100644
---- a/fs/kernfs/inode.c
-+++ b/fs/kernfs/inode.c
-@@ -220,6 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
- 	inode->i_private = kn;
- 	inode->i_mapping->a_ops = &kernfs_aops;
- 	inode->i_op = &kernfs_iops;
-+	inode->i_generation = kn->generation;
- 
- 	set_default_inode_attr(inode, kn->mode);
- 	kernfs_refresh_inode(kn, inode);
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index 5f5d602..8c00d28 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -135,6 +135,7 @@ struct kernfs_node {
- 	umode_t			mode;
- 	unsigned int		ino;
- 	struct kernfs_iattrs	*iattr;
-+	u32			generation;
- };
- 
- /*
-@@ -164,6 +165,7 @@ struct kernfs_root {
- 
- 	/* private fields, do not use outside kernfs proper */
- 	struct idr		ino_idr;
-+	u32			next_generation;
- 	struct kernfs_syscall_ops *syscall_ops;
- 
- 	/* list of kernfs_super_info of this root, protected by kernfs_mutex */
+ struct iomap_ops {
+ 	/*
 -- 
-2.9.3
+2.12.0
