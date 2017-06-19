@@ -1,154 +1,89 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 3/5] mmc: block: Reparametrize mmc_blk_ioctl_[multi]_cmd()
-Date: Thu, 15 Jun 2017 14:12:57 +0200
-Message-Id: <20170615121259.8281-4-linus.walleij@linaro.org>
-In-Reply-To: <20170615121259.8281-1-linus.walleij@linaro.org>
-References: <20170615121259.8281-1-linus.walleij@linaro.org>
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 02/10] fs: Introduce filemap_range_has_page()
+Date: Mon, 19 Jun 2017 11:33:40 -0500
+Message-Id: <20170619163348.15542-3-rgoldwyn@suse.de>
+In-Reply-To: <20170619163348.15542-1-rgoldwyn@suse.de>
+References: <20170619163348.15542-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of passing a block device to
-mmc_blk_ioctl[_multi]_cmd(), let's pass struct mmc_blk_data()
-so we operate ioctl()s on the MMC block device representation
-rather than the vanilla block device.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-This saves a little duplicated code and makes it possible to
-issue ioctl()s not targeted for a specific block device but
-rather for a specific partition/area.
+filemap_range_has_page() return true if the file's mapping has
+a page within the range mentioned. This function will be used
+to check if a write() call will cause a writeback of previous
+writes.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/mmc/core/block.c | 43 ++++++++++++++++++-------------------------
- 1 file changed, 18 insertions(+), 25 deletions(-)
+ include/linux/fs.h |  2 ++
+ mm/filemap.c       | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 94b97f97be1a..b8c71fdb6ed4 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -555,12 +555,11 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
- 	return err;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 96a1a1fa54a9..0d34f5b5a6b0 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2518,6 +2518,8 @@ extern int filemap_fdatawait(struct address_space *);
+ extern void filemap_fdatawait_keep_errors(struct address_space *);
+ extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
+ 				   loff_t lend);
++extern bool filemap_range_has_page(struct address_space *, loff_t lstart,
++				  loff_t lend);
+ extern int filemap_write_and_wait(struct address_space *mapping);
+ extern int filemap_write_and_wait_range(struct address_space *mapping,
+ 				        loff_t lstart, loff_t lend);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 6f1be573a5e6..9b39a2390b9e 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -376,6 +376,38 @@ int filemap_flush(struct address_space *mapping)
  }
+ EXPORT_SYMBOL(filemap_flush);
  
--static int mmc_blk_ioctl_cmd(struct block_device *bdev,
-+static int mmc_blk_ioctl_cmd(struct mmc_blk_data *md,
- 			     struct mmc_ioc_cmd __user *ic_ptr)
++/**
++ * filemap_range_has_page - check if a page exists in range.
++ * @mapping:           address space within which to check
++ * @start_byte:        offset in bytes where the range starts
++ * @end_byte:          offset in bytes where the range ends (inclusive)
++ *
++ * Find at least one page in the range supplied, usually used to check if
++ * direct writing in this range will trigger a writeback.
++ */
++bool filemap_range_has_page(struct address_space *mapping,
++			   loff_t start_byte, loff_t end_byte)
++{
++	pgoff_t index = start_byte >> PAGE_SHIFT;
++	pgoff_t end = end_byte >> PAGE_SHIFT;
++	struct pagevec pvec;
++	bool ret;
++
++	if (end_byte < start_byte)
++		return false;
++
++	if (mapping->nrpages == 0)
++		return false;
++
++	pagevec_init(&pvec, 0);
++	if (!pagevec_lookup(&pvec, mapping, index, 1))
++		return false;
++	ret = (pvec.pages[0]->index <= end);
++	pagevec_release(&pvec);
++	return ret;
++}
++EXPORT_SYMBOL(filemap_range_has_page);
++
+ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 				     loff_t start_byte, loff_t end_byte)
  {
- 	struct mmc_blk_ioc_data *idata;
- 	struct mmc_blk_ioc_data *idatas[1];
--	struct mmc_blk_data *md;
- 	struct mmc_queue *mq;
- 	struct mmc_card *card;
- 	int err = 0, ioc_err = 0;
-@@ -570,12 +569,6 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- 	if (IS_ERR(idata))
- 		return PTR_ERR(idata);
- 
--	md = mmc_blk_get(bdev->bd_disk);
--	if (!md) {
--		err = -EINVAL;
--		goto cmd_err;
--	}
--
- 	card = md->queue.card;
- 	if (IS_ERR(card)) {
- 		err = PTR_ERR(card);
-@@ -599,20 +592,17 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
- 	blk_put_request(req);
- 
- cmd_done:
--	mmc_blk_put(md);
--cmd_err:
- 	kfree(idata->buf);
- 	kfree(idata);
- 	return ioc_err ? ioc_err : err;
- }
- 
--static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
-+static int mmc_blk_ioctl_multi_cmd(struct mmc_blk_data *md,
- 				   struct mmc_ioc_multi_cmd __user *user)
- {
- 	struct mmc_blk_ioc_data **idata = NULL;
- 	struct mmc_ioc_cmd __user *cmds = user->cmds;
- 	struct mmc_card *card;
--	struct mmc_blk_data *md;
- 	struct mmc_queue *mq;
- 	int i, err = 0, ioc_err = 0;
- 	__u64 num_of_cmds;
-@@ -638,16 +628,10 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 		}
- 	}
- 
--	md = mmc_blk_get(bdev->bd_disk);
--	if (!md) {
--		err = -EINVAL;
--		goto cmd_err;
--	}
--
- 	card = md->queue.card;
- 	if (IS_ERR(card)) {
- 		err = PTR_ERR(card);
--		goto cmd_done;
-+		goto cmd_err;
- 	}
- 
- 
-@@ -670,8 +654,6 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
- 
- 	blk_put_request(req);
- 
--cmd_done:
--	mmc_blk_put(md);
- cmd_err:
- 	for (i = 0; i < num_of_cmds; i++) {
- 		kfree(idata[i]->buf);
-@@ -696,6 +678,7 @@ static int mmc_blk_check_blkdev(struct block_device *bdev)
- static int mmc_blk_ioctl(struct block_device *bdev, fmode_t mode,
- 	unsigned int cmd, unsigned long arg)
- {
-+	struct mmc_blk_data *md;
- 	int ret;
- 
- 	switch (cmd) {
-@@ -703,14 +686,24 @@ static int mmc_blk_ioctl(struct block_device *bdev, fmode_t mode,
- 		ret = mmc_blk_check_blkdev(bdev);
- 		if (ret)
- 			return ret;
--		return mmc_blk_ioctl_cmd(bdev,
--				(struct mmc_ioc_cmd __user *)arg);
-+		md = mmc_blk_get(bdev->bd_disk);
-+		if (!md)
-+			return -EINVAL;
-+		ret = mmc_blk_ioctl_cmd(md,
-+					(struct mmc_ioc_cmd __user *)arg);
-+		mmc_blk_put(md);
-+		return ret;
- 	case MMC_IOC_MULTI_CMD:
- 		ret = mmc_blk_check_blkdev(bdev);
- 		if (ret)
- 			return ret;
--		return mmc_blk_ioctl_multi_cmd(bdev,
--				(struct mmc_ioc_multi_cmd __user *)arg);
-+		md = mmc_blk_get(bdev->bd_disk);
-+		if (!md)
-+			return -EINVAL;
-+		ret = mmc_blk_ioctl_multi_cmd(md,
-+					(struct mmc_ioc_multi_cmd __user *)arg);
-+		mmc_blk_put(md);
-+		return ret;
- 	default:
- 		return -EINVAL;
- 	}
 -- 
-2.9.4
+2.12.0
