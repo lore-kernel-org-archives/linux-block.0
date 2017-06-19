@@ -1,64 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43266 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750999AbdFSPQ6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jun 2017 11:16:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9DC8EC0B39F9
-        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2017 15:16:57 +0000 (UTC)
-Subject: Re: [dm-devel] dm integrity tests crash kernel (4.12-rc5)
-To: Mike Snitzer <snitzer@redhat.com>
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:35581 "EHLO
+        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750886AbdFSOUd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Jun 2017 10:20:33 -0400
+Received: by mail-qk0-f194.google.com with SMTP id 16so1646299qkg.2
+        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2017 07:20:33 -0700 (PDT)
+Date: Mon, 19 Jun 2017 10:20:28 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ondrej Kozina <okozina@redhat.com>
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org,
+        mpatocka@redhat.com, mbroz@redhat.com
+Subject: Re: dm integrity tests crash kernel (4.12-rc5)
+Message-ID: <20170619142026.GA92582@redhat.com>
 References: <2b97933e-3f94-8510-cefd-13fae445400e@redhat.com>
  <d32598d1-2ae3-6b0a-690f-7d7dfa43899e@redhat.com>
- <20170619142026.GA92582@redhat.com>
-Cc: linux-block@vger.kernel.org, dm-devel@redhat.com,
-        mpatocka@redhat.com, mbroz@redhat.com
-From: Ondrej Kozina <okozina@redhat.com>
-Message-ID: <ad400234-fde1-5ff7-246e-91ded98764e2@redhat.com>
-Date: Mon, 19 Jun 2017 17:16:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170619142026.GA92582@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <d32598d1-2ae3-6b0a-690f-7d7dfa43899e@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 06/19/2017 04:20 PM, Mike Snitzer wrote:
->
-> Looks like submit_flush_bio() is disabling/enabling interrupts from
-> interrupt context.  Ondrej, does this patch fix the issue?
+On Mon, Jun 19 2017 at  8:11am -0400,
+Ondrej Kozina <okozina@redhat.com> wrote:
 
-I let it spin for 30 minutes on patched dm-integrity and everything 
-seems ok now. The moment I loaded back the old one it fell on face 
-almost immediately again.
+> same log again, hopefully prettier format. Sorry:
+> 
+> [  330.980914] DEBUG_LOCKS_WARN_ON(current->hardirq_context)
+> [  330.980923] ------------[ cut here ]------------
+> [  330.982627] WARNING: CPU: 1 PID: 0 at kernel/locking/lockdep.c:2748 trace_hardirqs_on_caller+0x107/0x180
+...
+> [  331.011968] Call Trace:
+> [  331.012806]  <IRQ>
+> [  331.013684]  trace_hardirqs_on+0xd/0x10
+> [  331.014732]  _raw_spin_unlock_irq+0x27/0x30
+> [  331.015840]  submit_flush_bio+0x4e/0x80 [dm_integrity]
+> [  331.017157]  do_endio_flush+0x41/0x70 [dm_integrity]
+> [  331.018476]  dec_in_flight+0x59/0x110 [dm_integrity]
+> [  331.019767]  integrity_end_io+0x5e/0x70 [dm_integrity]
+> [  331.020965]  bio_endio+0x7c/0x1a0
+> [  331.021917]  blk_update_request+0x9f/0x3d0
+> [  331.023050]  blk_mq_end_request+0x15/0x60
+> [  331.024224]  lo_complete_rq+0x2b/0x80
+> [  331.025406]  __blk_mq_complete_request_remote+0xe/0x10
+> [  331.026813]  flush_smp_call_function_queue+0x4f/0x110
+> [  331.028173]  generic_smp_call_function_single_interrupt+0xe/0x20
+> [  331.029616]  smp_call_function_single_interrupt+0x22/0x30
+> [  331.031125]  call_function_single_interrupt+0x90/0xa0
+> [  331.032819] RIP: 0010:default_idle+0x1b/0x180
 
-Thanks!
+Looks like submit_flush_bio() is disabling/enabling interrupts from
+interrupt context.  Ondrej, does this patch fix the issue?
 
->
-> diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-> index 4ab10cf..93b1810 100644
-> --- a/drivers/md/dm-integrity.c
-> +++ b/drivers/md/dm-integrity.c
-> @@ -1105,10 +1105,13 @@ static void schedule_autocommit(struct dm_integrity_c *ic)
->  static void submit_flush_bio(struct dm_integrity_c *ic, struct dm_integrity_io *dio)
->  {
->  	struct bio *bio;
-> -	spin_lock_irq(&ic->endio_wait.lock);
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&ic->endio_wait.lock, flags);
->  	bio = dm_bio_from_per_bio_data(dio, sizeof(struct dm_integrity_io));
->  	bio_list_add(&ic->flush_bio_list, bio);
-> -	spin_unlock_irq(&ic->endio_wait.lock);
-> +	spin_unlock_irqrestore(&ic->endio_wait.lock, flags);
-> +
->  	queue_work(ic->commit_wq, &ic->commit_work);
->  }
->
->
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
->
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index 4ab10cf..93b1810 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -1105,10 +1105,13 @@ static void schedule_autocommit(struct dm_integrity_c *ic)
+ static void submit_flush_bio(struct dm_integrity_c *ic, struct dm_integrity_io *dio)
+ {
+ 	struct bio *bio;
+-	spin_lock_irq(&ic->endio_wait.lock);
++	unsigned long flags;
++
++	spin_lock_irqsave(&ic->endio_wait.lock, flags);
+ 	bio = dm_bio_from_per_bio_data(dio, sizeof(struct dm_integrity_io));
+ 	bio_list_add(&ic->flush_bio_list, bio);
+-	spin_unlock_irq(&ic->endio_wait.lock);
++	spin_unlock_irqrestore(&ic->endio_wait.lock, flags);
++
+ 	queue_work(ic->commit_wq, &ic->commit_work);
+ }
+ 
