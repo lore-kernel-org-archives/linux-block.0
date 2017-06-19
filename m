@@ -1,27 +1,36 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, martin.petersen@oracle.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: stop using bio_data() in blk_write_same_mergeable
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: martin.petersen@oracle.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/2] block: stop using bio_data() in blk_write_same_mergeable
+Date: Mon, 19 Jun 2017 09:24:41 +0200
+Message-Id: <20170619072441.12835-3-hch@lst.de>
+In-Reply-To: <20170619072441.12835-1-hch@lst.de>
 References: <20170619072441.12835-1-hch@lst.de>
-	<20170619072441.12835-3-hch@lst.de>
-Date: Tue, 20 Jun 2017 21:20:10 -0400
-In-Reply-To: <20170619072441.12835-3-hch@lst.de> (Christoph Hellwig's message
-	of "Mon, 19 Jun 2017 09:24:41 +0200")
-Message-ID: <yq160fqjfw5.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
+While the Write Same page currently always is in low-level it is just
+as easy and safer to just compare the page and offset directly.
 
-Christoph,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blkdev.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> While the Write Same page currently always is in low-level it is just
-> as easy and safer to just compare the page and offset directly.
-
-Also fine.
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index db2b7a7450bd..a61907438139 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -815,7 +815,8 @@ static inline bool rq_mergeable(struct request *rq)
+ 
+ static inline bool blk_write_same_mergeable(struct bio *a, struct bio *b)
+ {
+-	if (bio_data(a) == bio_data(b))
++	if (bio_page(a) == bio_page(b) &&
++	    bio_offset(a) == bio_offset(b))
+ 		return true;
+ 
+ 	return false;
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.11.0
