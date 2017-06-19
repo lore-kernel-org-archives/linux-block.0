@@ -1,260 +1,196 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44842 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750977AbdFREje (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:39:34 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:57 +1000
-Subject: [PATCH 01/13] blk: remove bio_set arg from blk_queue_split()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073685.23258.11626485920508963043.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 08/10] block: don't set bounce limit in blk_init_queue
+Date: Mon, 19 Jun 2017 09:26:26 +0200
+Message-Id: <20170619072628.12894-9-hch@lst.de>
+In-Reply-To: <20170619072628.12894-1-hch@lst.de>
+References: <20170619072628.12894-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-blk_queue_split() is always called with the last arg being q->bio_split,
-where 'q' is the first arg.
+Instead move it to the callers.  Those that either don't use bio_data() or
+page_address() or are specific to architectures that do not support highmem
+are skipped.
 
-Also blk_queue_split() sometimes uses the passed-in 'bs' and sometimes uses
-q->bio_split.
-
-This is inconsistent and unnecessary.  Remove the last arg and always use
-q->bio_split inside blk_queue_split()
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Credit-to: Javier González <jg@lightnvm.io> (Noticed that lightnvm was missed)
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Tested-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c              |    2 +-
- block/blk-merge.c             |    9 ++++-----
- block/blk-mq.c                |    2 +-
- drivers/block/drbd/drbd_req.c |    2 +-
- drivers/block/pktcdvd.c       |    2 +-
- drivers/block/ps3vram.c       |    2 +-
- drivers/block/rsxx/dev.c      |    2 +-
- drivers/block/umem.c          |    2 +-
- drivers/lightnvm/pblk-init.c  |    4 ++--
- drivers/lightnvm/rrpc.c       |    2 +-
- drivers/md/md.c               |    2 +-
- drivers/s390/block/dcssblk.c  |    2 +-
- drivers/s390/block/xpram.c    |    2 +-
- include/linux/blkdev.h        |    3 +--
- 14 files changed, 18 insertions(+), 20 deletions(-)
+ block/blk-core.c            | 5 -----
+ drivers/block/aoe/aoeblk.c  | 1 +
+ drivers/block/floppy.c      | 1 +
+ drivers/block/paride/pcd.c  | 1 +
+ drivers/block/paride/pd.c   | 1 +
+ drivers/block/paride/pf.c   | 1 +
+ drivers/block/skd_main.c    | 1 +
+ drivers/block/swim.c        | 2 ++
+ drivers/block/swim3.c       | 1 +
+ drivers/block/xsysace.c     | 1 +
+ drivers/cdrom/gdrom.c       | 1 +
+ drivers/mtd/mtd_blkdevs.c   | 1 +
+ drivers/sbus/char/jsflash.c | 1 +
+ 13 files changed, 13 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 8592409db272..31b5ece6b18e 100644
+index ef82164c6d82..62cf92550512 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -1723,7 +1723,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 */
- 	blk_queue_bounce(q, &bio);
+@@ -927,11 +927,6 @@ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
+ 		return NULL;
+ 	}
  
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
- 		bio->bi_status = BLK_STS_IOERR;
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 3990ae406341..d59074556703 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -202,8 +202,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	return do_split ? new : NULL;
+-	/*
+-	 * by default assume old behaviour and bounce for any highmem page
+-	 */
+-	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
+-
+ 	return q;
  }
+ EXPORT_SYMBOL(blk_init_queue_node);
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 027b876370bc..6797e6c23c8a 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -388,6 +388,7 @@ aoeblk_gdalloc(void *vp)
+ 			d->aoemajor, d->aoeminor);
+ 		goto err_mempool;
+ 	}
++	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
  
--void blk_queue_split(struct request_queue *q, struct bio **bio,
--		     struct bio_set *bs)
-+void blk_queue_split(struct request_queue *q, struct bio **bio)
- {
- 	struct bio *split, *res;
- 	unsigned nsegs;
-@@ -211,13 +210,13 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
- 	switch (bio_op(*bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
--		split = blk_bio_discard_split(q, *bio, bs, &nsegs);
-+		split = blk_bio_discard_split(q, *bio, q->bio_split, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_ZEROES:
--		split = blk_bio_write_zeroes_split(q, *bio, bs, &nsegs);
-+		split = blk_bio_write_zeroes_split(q, *bio, q->bio_split, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_SAME:
--		split = blk_bio_write_same_split(q, *bio, bs, &nsegs);
-+		split = blk_bio_write_same_split(q, *bio, q->bio_split, &nsegs);
- 		break;
- 	default:
- 		split = blk_bio_segment_split(q, *bio, q->bio_split, &nsegs);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 359d2dc0d414..4780200fd11b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1477,7 +1477,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	spin_lock_irqsave(&d->lock, flags);
+ 	WARN_ON(!(d->flags & DEVFL_GD_NOW));
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 9e3cb32e365d..ce823647a9c4 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4203,6 +4203,7 @@ static int __init do_floppy_init(void)
+ 			goto out_put_disk;
+ 		}
  
- 	blk_queue_bounce(q, &bio);
++		blk_queue_bounce_limit(disks[drive]->queue, BLK_BOUNCE_HIGH);
+ 		blk_queue_max_hw_sectors(disks[drive]->queue, 64);
+ 		disks[drive]->major = FLOPPY_MAJOR;
+ 		disks[drive]->first_minor = TOMINOR(drive);
+diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
+index cffe42d80ce9..7b8c6368beb7 100644
+--- a/drivers/block/paride/pcd.c
++++ b/drivers/block/paride/pcd.c
+@@ -305,6 +305,7 @@ static void pcd_init_units(void)
+ 			put_disk(disk);
+ 			continue;
+ 		}
++		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+ 		cd->disk = disk;
+ 		cd->pi = &cd->pia;
+ 		cd->present = 0;
+diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
+index c98983be4f9c..27a44b97393a 100644
+--- a/drivers/block/paride/pd.c
++++ b/drivers/block/paride/pd.c
+@@ -863,6 +863,7 @@ static void pd_probe_drive(struct pd_unit *disk)
+ 		return;
+ 	}
+ 	blk_queue_max_hw_sectors(p->queue, cluster);
++	blk_queue_bounce_limit(p->queue, BLK_BOUNCE_HIGH);
  
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
+ 	if (disk->drive == -1) {
+ 		for (disk->drive = 0; disk->drive <= 1; disk->drive++)
+diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
+index 5f46da8d05cd..eef7a91f667d 100644
+--- a/drivers/block/paride/pf.c
++++ b/drivers/block/paride/pf.c
+@@ -293,6 +293,7 @@ static void __init pf_init_units(void)
+ 			return;
+ 		}
+ 		blk_queue_max_segments(disk->queue, cluster);
++		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+ 		pf->disk = disk;
+ 		pf->pi = &pf->pia;
+ 		pf->media_status = PF_NM;
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index e6c526861703..d0368682bd43 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -4273,6 +4273,7 @@ static int skd_cons_disk(struct skd_device *skdev)
+ 		rc = -ENOMEM;
+ 		goto err_out;
+ 	}
++	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
  
- 	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
- 		bio_io_error(bio);
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index fca6b9914948..f6e865b2d543 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -1560,7 +1560,7 @@ blk_qc_t drbd_make_request(struct request_queue *q, struct bio *bio)
- 	struct drbd_device *device = (struct drbd_device *) q->queuedata;
- 	unsigned long start_jif;
+ 	skdev->queue = q;
+ 	disk->queue = q;
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 1633aaf24060..84434d3ea19b 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -864,6 +864,8 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 			put_disk(swd->unit[drive].disk);
+ 			goto exit_put_disks;
+ 		}
++		blk_queue_bounce_limit(swd->unit[drive].disk->queue,
++				BLK_BOUNCE_HIGH);
+ 		swd->unit[drive].disk->queue->queuedata = swd;
+ 		swd->unit[drive].swd = swd;
+ 	}
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index e3399a138335..9f931f8f6b4c 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -1223,6 +1223,7 @@ static int swim3_attach(struct macio_dev *mdev,
+ 		put_disk(disk);
+ 		return -ENOMEM;
+ 	}
++	blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+ 	disk->queue->queuedata = &floppy_states[index];
  
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
+ 	if (index == 0) {
+diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
+index 977fdf066017..14459d66ef0c 100644
+--- a/drivers/block/xsysace.c
++++ b/drivers/block/xsysace.c
+@@ -993,6 +993,7 @@ static int ace_setup(struct ace_device *ace)
+ 	if (ace->queue == NULL)
+ 		goto err_blk_initq;
+ 	blk_queue_logical_block_size(ace->queue, 512);
++	blk_queue_bounce_limit(ace->queue, BLK_BOUNCE_HIGH);
  
- 	start_jif = jiffies;
+ 	/*
+ 	 * Allocate and initialize GD structure
+diff --git a/drivers/cdrom/gdrom.c b/drivers/cdrom/gdrom.c
+index 53f8278e66f7..6495b03f576c 100644
+--- a/drivers/cdrom/gdrom.c
++++ b/drivers/cdrom/gdrom.c
+@@ -813,6 +813,7 @@ static int probe_gdrom(struct platform_device *devptr)
+ 		err = -ENOMEM;
+ 		goto probe_fail_requestq;
+ 	}
++	blk_queue_bounce_limit(gd.gdrom_rq, BLK_BOUNCE_HIGH);
  
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index e8a381161db6..1f363638b453 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2414,7 +2414,7 @@ static blk_qc_t pkt_make_request(struct request_queue *q, struct bio *bio)
+ 	err = probe_gdrom_setupqueue();
+ 	if (err)
+diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+index 91c17fba7659..f336a9b85576 100644
+--- a/drivers/mtd/mtd_blkdevs.c
++++ b/drivers/mtd/mtd_blkdevs.c
+@@ -417,6 +417,7 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+ 	new->rq->queuedata = new;
+ 	blk_queue_logical_block_size(new->rq, tr->blksize);
  
- 	blk_queue_bounce(q, &bio);
++	blk_queue_bounce_limit(new->rq, BLK_BOUNCE_HIGH);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, new->rq);
+ 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, new->rq);
  
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
+diff --git a/drivers/sbus/char/jsflash.c b/drivers/sbus/char/jsflash.c
+index 35a69949f92d..14f377ac1280 100644
+--- a/drivers/sbus/char/jsflash.c
++++ b/drivers/sbus/char/jsflash.c
+@@ -592,6 +592,7 @@ static int jsfd_init(void)
+ 			put_disk(disk);
+ 			goto out;
+ 		}
++		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+ 		jsfd_disk[i] = disk;
+ 	}
  
- 	pd = q->queuedata;
- 	if (!pd) {
-diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
-index 6fa2b8197013..e0e81cacd781 100644
---- a/drivers/block/ps3vram.c
-+++ b/drivers/block/ps3vram.c
-@@ -606,7 +606,7 @@ static blk_qc_t ps3vram_make_request(struct request_queue *q, struct bio *bio)
- 
- 	dev_dbg(&dev->core, "%s\n", __func__);
- 
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	spin_lock_irq(&priv->lock);
- 	busy = !bio_list_empty(&priv->list);
-diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
-index 0b0a0a902355..4e8bdfa0aa31 100644
---- a/drivers/block/rsxx/dev.c
-+++ b/drivers/block/rsxx/dev.c
-@@ -151,7 +151,7 @@ static blk_qc_t rsxx_make_request(struct request_queue *q, struct bio *bio)
- 	struct rsxx_bio_meta *bio_meta;
- 	blk_status_t st = BLK_STS_IOERR;
- 
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	might_sleep();
- 
-diff --git a/drivers/block/umem.c b/drivers/block/umem.c
-index 4b3c947697b1..0677d2514665 100644
---- a/drivers/block/umem.c
-+++ b/drivers/block/umem.c
-@@ -529,7 +529,7 @@ static blk_qc_t mm_make_request(struct request_queue *q, struct bio *bio)
- 		 (unsigned long long)bio->bi_iter.bi_sector,
- 		 bio->bi_iter.bi_size);
- 
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	spin_lock_irq(&card->lock);
- 	*card->biotail = bio;
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index ae8cd6d5af8b..b3fec8ec55b8 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -33,7 +33,7 @@ static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
- 	 * constraint. Writes can be of arbitrary size.
- 	 */
- 	if (bio_data_dir(bio) == READ) {
--		blk_queue_split(q, &bio, q->bio_split);
-+		blk_queue_split(q, &bio);
- 		ret = pblk_submit_read(pblk, bio);
- 		if (ret == NVM_IO_DONE && bio_flagged(bio, BIO_CLONED))
- 			bio_put(bio);
-@@ -46,7 +46,7 @@ static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
- 	 * available for user I/O.
- 	 */
- 	if (unlikely(pblk_get_secs(bio) >= pblk_rl_sysfs_rate_show(&pblk->rl)))
--		blk_queue_split(q, &bio, q->bio_split);
-+		blk_queue_split(q, &bio);
- 
- 	return pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
- }
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 8d3b53bb3307..267f01ae87e4 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -994,7 +994,7 @@ static blk_qc_t rrpc_make_rq(struct request_queue *q, struct bio *bio)
- 	struct nvm_rq *rqd;
- 	int err;
- 
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	if (bio_op(bio) == REQ_OP_DISCARD) {
- 		rrpc_discard(rrpc, bio);
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 833cc7082034..1c4597d1a3dc 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -265,7 +265,7 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
- 	unsigned int sectors;
- 	int cpu;
- 
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	if (mddev == NULL || mddev->pers == NULL) {
- 		bio_io_error(bio);
-diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
-index 36e5280af3e4..06eb1de52d1c 100644
---- a/drivers/s390/block/dcssblk.c
-+++ b/drivers/s390/block/dcssblk.c
-@@ -845,7 +845,7 @@ dcssblk_make_request(struct request_queue *q, struct bio *bio)
- 	unsigned long source_addr;
- 	unsigned long bytes_done;
- 
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	bytes_done = 0;
- 	dev_info = bio->bi_bdev->bd_disk->private_data;
-diff --git a/drivers/s390/block/xpram.c b/drivers/s390/block/xpram.c
-index b9d7e755c8a3..a48f0d40c1d2 100644
---- a/drivers/s390/block/xpram.c
-+++ b/drivers/s390/block/xpram.c
-@@ -190,7 +190,7 @@ static blk_qc_t xpram_make_request(struct request_queue *q, struct bio *bio)
- 	unsigned long page_addr;
- 	unsigned long bytes;
- 
--	blk_queue_split(q, &bio, q->bio_split);
-+	blk_queue_split(q, &bio);
- 
- 	if ((bio->bi_iter.bi_sector & 7) != 0 ||
- 	    (bio->bi_iter.bi_size & 4095) != 0)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 76b6df862a12..670df402bc51 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -944,8 +944,7 @@ extern blk_status_t blk_insert_cloned_request(struct request_queue *q,
- 				     struct request *rq);
- extern int blk_rq_append_bio(struct request *rq, struct bio *bio);
- extern void blk_delay_queue(struct request_queue *, unsigned long);
--extern void blk_queue_split(struct request_queue *, struct bio **,
--			    struct bio_set *);
-+extern void blk_queue_split(struct request_queue *, struct bio **);
- extern void blk_recount_segments(struct request_queue *, struct bio *);
- extern int scsi_verify_blk_ioctl(struct block_device *, unsigned int);
- extern int scsi_cmd_blk_ioctl(struct block_device *, fmode_t,
+-- 
+2.11.0
