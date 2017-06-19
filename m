@@ -1,59 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47570 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753236AbdFSCVX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 22:21:23 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org
-Subject: [RESEND PATCH] nvme: host: unquiesce queue in nvme_kill_queues()
-Date: Mon, 19 Jun 2017 10:21:08 +0800
-Message-Id: <20170619022108.21902-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 09/10] xfs: nowait aio support
+Date: Mon, 19 Jun 2017 11:33:47 -0500
+Message-Id: <20170619163348.15542-10-rgoldwyn@suse.de>
+In-Reply-To: <20170619163348.15542-1-rgoldwyn@suse.de>
+References: <20170619163348.15542-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-When nvme_kill_queues() is run, queues may be in
-quiesced state, so we forcibly unquiesce queues to avoid
-blocking dispatch, and I/O hang can be avoided in
-remove path.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Peviously we use blk_mq_start_stopped_hw_queues() as
-counterpart of blk_mq_quiesce_queue(), now we have
-introduced blk_mq_unquiesce_queue(), so use it explicitly.
+If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
+immediately.
 
-Cc: linux-nvme@lists.infradead.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
+if it needs allocation either due to file extension, writing to a hole,
+or COW or waiting for other DIOs to finish.
+
+Return -EAGAIN if we don't have extent list in memory.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
-Rebaed on the latest for-next of block tree.
+ fs/xfs/xfs_file.c  | 20 +++++++++++++++-----
+ fs/xfs/xfs_iomap.c | 22 ++++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 5 deletions(-)
 
- drivers/nvme/host/core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 05f713e866f6..aee37b73231d 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2581,6 +2581,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 5fb5a0958a14..e159eb381d9f 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
  
- 	mutex_lock(&ctrl->namespaces_mutex);
+-	xfs_ilock(ip, iolock);
+-
++	if (!xfs_ilock_nowait(ip, iolock)) {
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		xfs_ilock(ip, iolock);
++	}
+ 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
+ 	if (ret)
+ 		goto out;
+@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
+ 	 * otherwise demote the lock if we had to take the exclusive lock
+ 	 * for other reasons in xfs_file_aio_write_checks.
+ 	 */
+-	if (unaligned_io)
+-		inode_dio_wait(inode);
+-	else if (iolock == XFS_IOLOCK_EXCL) {
++	if (unaligned_io) {
++		/* If we are going to wait for other DIO to finish, bail */
++		if (iocb->ki_flags & IOCB_NOWAIT) {
++			if (atomic_read(&inode->i_dio_count))
++				return -EAGAIN;
++		} else {
++			inode_dio_wait(inode);
++		}
++	} else if (iolock == XFS_IOLOCK_EXCL) {
+ 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
+@@ -892,6 +901,7 @@ xfs_file_open(
+ 		return -EFBIG;
+ 	if (XFS_FORCED_SHUTDOWN(XFS_M(inode->i_sb)))
+ 		return -EIO;
++	file->f_mode |= FMODE_AIO_NOWAIT;
+ 	return 0;
+ }
  
-+	/* Forcibly unquiesce queues to avoid blocking dispatch */
-+	blk_mq_unquiesce_queue(ctrl->admin_q);
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 94e5bdf7304c..05dc87e8c1f5 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -995,6 +995,11 @@ xfs_file_iomap_begin(
+ 		lockmode = xfs_ilock_data_map_shared(ip);
+ 	}
+ 
++	if ((flags & IOMAP_NOWAIT) && !(ip->i_df.if_flags & XFS_IFEXTENTS)) {
++		error = -EAGAIN;
++		goto out_unlock;
++	}
 +
- 	/* Forcibly start all queues to avoid having stuck requests */
- 	blk_mq_start_hw_queues(ctrl->admin_q);
+ 	ASSERT(offset <= mp->m_super->s_maxbytes);
+ 	if ((xfs_fsize_t)offset + length > mp->m_super->s_maxbytes)
+ 		length = mp->m_super->s_maxbytes - offset;
+@@ -1016,6 +1021,15 @@ xfs_file_iomap_begin(
  
-@@ -2594,6 +2597,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 		revalidate_disk(ns->disk);
- 		blk_set_queue_dying(ns->queue);
+ 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
+ 		if (flags & IOMAP_DIRECT) {
++			/*
++			 * A reflinked inode will result in CoW alloc.
++			 * FIXME: It could still overwrite on unshared extents
++			 * and not need allocation.
++			 */
++			if (flags & IOMAP_NOWAIT) {
++				error = -EAGAIN;
++				goto out_unlock;
++			}
+ 			/* may drop and re-acquire the ilock */
+ 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
+ 					&lockmode);
+@@ -1033,6 +1047,14 @@ xfs_file_iomap_begin(
  
-+		/* Forcibly unquiesce queues to avoid blocking dispatch */
-+		blk_mq_unquiesce_queue(ns->queue);
-+
+ 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
  		/*
- 		 * Forcibly start all queues to avoid having stuck requests.
- 		 * Note that we must ensure the queues are not stopped
++		 * If nowait is set bail since we are going to make
++		 * allocations.
++		 */
++		if (flags & IOMAP_NOWAIT) {
++			error = -EAGAIN;
++			goto out_unlock;
++		}
++		/*
+ 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
+ 		 * pages to keep the chunks of work done where somewhat symmetric
+ 		 * with the work writeback does. This is a completely arbitrary
 -- 
-2.9.4
+2.12.0
