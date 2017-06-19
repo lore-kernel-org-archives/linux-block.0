@@ -1,151 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:50647 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751237AbdFDMmr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jun 2017 08:42:47 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Tejun Heo <tj@kernel.org>
-Cc: Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 6/6] sd: add support for TCG OPAL self encrypting disks
-Date: Sun,  4 Jun 2017 14:42:25 +0200
-Message-Id: <20170604124225.27032-7-hch@lst.de>
-In-Reply-To: <20170604124225.27032-1-hch@lst.de>
-References: <20170604124225.27032-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	linux-nvme@lists.infradead.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 4/9] fs: add O_DIRECT support for sending down write life time hints
+Date: Mon, 19 Jun 2017 11:04:57 -0600
+Message-Id: <1497891902-25737-5-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1497891902-25737-1-git-send-email-axboe@kernel.dk>
+References: <1497891902-25737-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Just wire up the generic TCG OPAL infrastructure to the SCSI disk driver
-and the Security In/Out commands.
-
-Note that I don't know of any actual SCSI disks that do support TCG OPAL,
-but this is required to support ATA disks through libata.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/scsi/sd.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- drivers/scsi/sd.h |  2 ++
- 2 files changed, 46 insertions(+)
+ fs/block_dev.c | 2 ++
+ fs/direct-io.c | 2 ++
+ fs/iomap.c     | 1 +
+ 3 files changed, 5 insertions(+)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index b6bb4e0ce0e3..782f909a223c 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -50,6 +50,7 @@
- #include <linux/string_helpers.h>
- #include <linux/async.h>
- #include <linux/slab.h>
-+#include <linux/sed-opal.h>
- #include <linux/pm_runtime.h>
- #include <linux/pr.h>
- #include <linux/t10-pi.h>
-@@ -643,6 +644,26 @@ static void scsi_disk_put(struct scsi_disk *sdkp)
- 	mutex_unlock(&sd_ref_mutex);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index dd91c99e9ba0..30e1fb65c2fa 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -183,6 +183,8 @@ static unsigned int dio_bio_write_op(struct kiocb *iocb)
+ 	/* avoid the need for a I/O completion work item */
+ 	if (iocb->ki_flags & IOCB_DSYNC)
+ 		op |= REQ_FUA;
++
++	op |= write_hint_to_opf(iocb_write_hint(iocb));
+ 	return op;
  }
  
-+#ifdef CONFIG_BLK_SED_OPAL
-+static int sd_sec_submit(void *data, u16 spsp, u8 secp, void *buffer,
-+		size_t len, bool send)
-+{
-+	struct scsi_device *sdev = data;
-+	u8 cdb[12] = { 0, };
-+	int ret;
-+
-+	cdb[0] = send ? SECURITY_PROTOCOL_OUT : SECURITY_PROTOCOL_IN;
-+	cdb[1] = secp;
-+	put_unaligned_be16(spsp, &cdb[2]);
-+	put_unaligned_be32(len, &cdb[6]);
-+
-+	ret = scsi_execute_req(sdev, cdb,
-+			send ? DMA_TO_DEVICE : DMA_FROM_DEVICE,
-+			buffer, len, NULL, SD_TIMEOUT, SD_MAX_RETRIES, NULL);
-+	return ret <= 0 ? ret : -EIO;
-+}
-+#endif /* CONFIG_BLK_SED_OPAL */
-+
- static unsigned char sd_setup_protect_cmnd(struct scsi_cmnd *scmd,
- 					   unsigned int dix, unsigned int dif)
- {
-@@ -1454,6 +1475,9 @@ static int sd_ioctl(struct block_device *bdev, fmode_t mode,
- 	if (error)
- 		goto out;
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index e8baaabebf13..9e9adca0c592 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -385,6 +385,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+ 	else
+ 		bio->bi_end_io = dio_bio_end_io;
  
-+	if (is_sed_ioctl(cmd))
-+		return sed_ioctl(sdkp->opal_dev, cmd, p);
++	bio->bi_opf |= write_hint_to_opf(iocb_write_hint(dio->iocb));
 +
- 	/*
- 	 * Send SCSI addressing ioctls directly to mid level, send other
- 	 * ioctls to block level and then onto mid level if they can't be
-@@ -3014,6 +3038,17 @@ static void sd_read_write_same(struct scsi_disk *sdkp, unsigned char *buffer)
- 		sdkp->ws10 = 1;
+ 	sdio->bio = bio;
+ 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
  }
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 18f2f2b8ba2c..63b9f87d9461 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -804,6 +804,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
  
-+static void sd_read_security(struct scsi_disk *sdkp, unsigned char *buffer)
-+{
-+	struct scsi_device *sdev = sdkp->device;
-+
-+	if (scsi_report_opcode(sdev, buffer, SD_BUF_SIZE,
-+			SECURITY_PROTOCOL_IN) == 1 &&
-+	    scsi_report_opcode(sdev, buffer, SD_BUF_SIZE,
-+			SECURITY_PROTOCOL_OUT) == 1)
-+		sdkp->security = 1;
-+}
-+
- /**
-  *	sd_revalidate_disk - called the first time a new disk is seen,
-  *	performs disk spin up, read_capacity, etc.
-@@ -3067,6 +3102,7 @@ static int sd_revalidate_disk(struct gendisk *disk)
- 		sd_read_cache_type(sdkp, buffer);
- 		sd_read_app_tag_own(sdkp, buffer);
- 		sd_read_write_same(sdkp, buffer);
-+		sd_read_security(sdkp, buffer);
- 	}
- 
- 	sdkp->first_scan = 0;
-@@ -3227,6 +3263,12 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
- 
- 	sd_revalidate_disk(gd);
- 
-+	if (sdkp->security) {
-+		sdkp->opal_dev = init_opal_dev(sdp, &sd_sec_submit);
-+		if (sdkp->opal_dev)
-+			sd_printk(KERN_NOTICE, sdkp, "supports TCG Opal\n");
-+	}
-+
- 	sd_printk(KERN_NOTICE, sdkp, "Attached SCSI %sdisk\n",
- 		  sdp->removable ? "removable " : "");
- 	scsi_autopm_put_device(sdp);
-@@ -3376,6 +3418,8 @@ static int sd_remove(struct device *dev)
- 
- 	sd_zbc_remove(sdkp);
- 
-+	free_opal_dev(sdkp->opal_dev);
-+
- 	blk_register_region(devt, SD_MINORS, NULL,
- 			    sd_default_probe, NULL, NULL);
- 
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 61d02efd366c..99c4dde9b6bf 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -71,6 +71,7 @@ struct scsi_disk {
- 	struct scsi_device *device;
- 	struct device	dev;
- 	struct gendisk	*disk;
-+	struct opal_dev *opal_dev;
- #ifdef CONFIG_BLK_DEV_ZONED
- 	unsigned int	nr_zones;
- 	unsigned int	zone_blocks;
-@@ -114,6 +115,7 @@ struct scsi_disk {
- 	unsigned	rc_basis: 2;
- 	unsigned	zoned: 2;
- 	unsigned	urswrz : 1;
-+	unsigned	security : 1;
- 	unsigned	ignore_medium_access_errors : 1;
- };
- #define to_scsi_disk(obj) container_of(obj,struct scsi_disk,dev)
+ 		if (dio->flags & IOMAP_DIO_WRITE) {
+ 			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
++			bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
+ 			task_io_account_write(bio->bi_iter.bi_size);
+ 		} else {
+ 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
 -- 
-2.11.0
+2.7.4
