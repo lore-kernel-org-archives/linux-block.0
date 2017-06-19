@@ -1,96 +1,75 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 07/11] fs: add support for buffered writeback to pass down write hints
-Date: Sat, 17 Jun 2017 13:59:50 -0600
-Message-Id: <1497729594-4707-8-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33496 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750883AbdFSQY3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Jun 2017 12:24:29 -0400
+Received: by mail-wm0-f66.google.com with SMTP id f90so17392623wmh.0
+        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2017 09:24:29 -0700 (PDT)
+Subject: Re: [PATCH rfc 25/30] nvme: move control plane handling to nvme core
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org,
+        Keith Busch <keith.busch@intel.com>,
+        linux-block@vger.kernel.org
+References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+ <1497799324-19598-26-git-send-email-sagi@grimberg.me>
+ <20170619125505.GS29061@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <ff56bb79-1d57-b565-72a3-cd1e72b468b3@grimberg.me>
+Date: Mon, 19 Jun 2017 19:24:25 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170619125505.GS29061@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/buffer.c | 14 +++++++++-----
- fs/mpage.c  |  1 +
- 2 files changed, 10 insertions(+), 5 deletions(-)
+>> +static void nvme_free_io_queues(struct nvme_ctrl *ctrl)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 1; i < ctrl->queue_count; i++)
+>> +		ctrl->ops->free_hw_queue(ctrl, i);
+>> +}
+>> +
+>> +void nvme_stop_io_queues(struct nvme_ctrl *ctrl)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 1; i < ctrl->queue_count; i++)
+>> +		ctrl->ops->stop_hw_queue(ctrl, i);
+>> +}
+>> +EXPORT_SYMBOL_GPL(nvme_stop_io_queues);
+> 
+> At leasr for PCIe this is going to work very differently, so I'm not
+> sure this part make so much sense in the core.  Maybe in Fabrics?
+> Or at least make the callouts operate on all I/O queues, which would
+> suite PCIe a lot more.
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 161be58c5cb0..187e54fb0382 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -49,7 +49,7 @@
- 
- static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
- static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
--			 struct writeback_control *wbc);
-+			 unsigned int stream, struct writeback_control *wbc);
- 
- #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
- 
-@@ -1829,7 +1829,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 	do {
- 		struct buffer_head *next = bh->b_this_page;
- 		if (buffer_async_write(bh)) {
--			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
-+			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
-+					inode_write_hint(inode), wbc);
- 			nr_underway++;
- 		}
- 		bh = next;
-@@ -1883,7 +1884,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 		struct buffer_head *next = bh->b_this_page;
- 		if (buffer_async_write(bh)) {
- 			clear_buffer_dirty(bh);
--			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
-+			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
-+					inode_write_hint(inode), wbc);
- 			nr_underway++;
- 		}
- 		bh = next;
-@@ -3091,7 +3093,7 @@ void guard_bio_eod(int op, struct bio *bio)
- }
- 
- static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
--			 struct writeback_control *wbc)
-+			 unsigned int write_hint, struct writeback_control *wbc)
- {
- 	struct bio *bio;
- 
-@@ -3134,6 +3136,8 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 		op_flags |= REQ_META;
- 	if (buffer_prio(bh))
- 		op_flags |= REQ_PRIO;
-+
-+	op_flags |= write_hint_to_opf(write_hint);
- 	bio_set_op_attrs(bio, op, op_flags);
- 
- 	submit_bio(bio);
-@@ -3142,7 +3146,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
- 
- int submit_bh(int op, int op_flags, struct buffer_head *bh)
- {
--	return submit_bh_wbc(op, op_flags, bh, NULL);
-+	return submit_bh_wbc(op, op_flags, bh, 0, NULL);
- }
- EXPORT_SYMBOL(submit_bh);
- 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index baff8f820c29..e84dcaee6ec7 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -614,6 +614,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
- 			goto confused;
- 
- 		wbc_init_bio(wbc, bio);
-+		bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
- 	}
- 
- 	/*
--- 
-2.7.4
+Yea, I spent some time thinking on the async nature of queue
+removal for pci... I started from ->stop/free_io_queues callouts
+but hated the fact that we need to iterate exactly the same way
+in every driver...
+
+We could have an optional stop/free_io_queues that the core
+will call instead if implemented?
+
+>> +	error = ctrl->ops->start_hw_queue(ctrl, 0);
+>> +	if (error)
+>> +		goto out_cleanup_connect_queue;
+>> +
+>> +	error = ctrl->ops->reg_read64(ctrl, NVME_REG_CAP, &ctrl->cap);
+>> +	if (error) {
+>> +		dev_err(ctrl->device,
+>> +			"prop_get NVME_REG_CAP failed\n");
+>> +		goto out_cleanup_connect_queue;
+>> +	}
+>> +
+>> +	ctrl->sqsize = min_t(int, NVME_CAP_MQES(ctrl->cap), ctrl->sqsize);
+>> +
+>> +	error = nvme_enable_ctrl(ctrl, ctrl->cap);
+>> +	if (error)
+>> +		goto out_cleanup_connect_queue;
+> 
+> I'm not sure this ordering is going to work for PCIe..
+
+This one is easy to reverse...
