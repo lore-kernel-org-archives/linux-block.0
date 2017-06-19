@@ -1,44 +1,143 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH v4 01/12] blk-mq: Reduce blk_mq_hw_ctx size
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
- <hare@suse.com>, Omar Sandoval <osandov@fb.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
+	<osandov@fb.com>
+Subject: [PATCH v4 01/12] blk-mq: Reduce blk_mq_hw_ctx size
+Date: Mon, 19 Jun 2017 15:07:50 -0700
+Message-ID: <20170619220801.12557-2-bart.vanassche@wdc.com>
+In-Reply-To: <20170619220801.12557-1-bart.vanassche@wdc.com>
 References: <20170619220801.12557-1-bart.vanassche@wdc.com>
- <20170619220801.12557-2-bart.vanassche@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <c5b7cfb5-4de5-7bb9-e20c-e189de65c25a@suse.de>
-Date: Tue, 20 Jun 2017 08:31:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170619220801.12557-2-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/20/2017 12:07 AM, Bart Van Assche wrote:
-> From: Bart Van Assche <bart.vanassche@sandisk.com>
-> 
-> Since the srcu structure is rather large (184 bytes on an x86-64
-> system with kernel debugging disabled), only allocate it if needed.
-> 
-> Reported-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Omar Sandoval <osandov@fb.com>
-> ---
->  block/blk-mq.c         | 30 ++++++++++++++++++++++--------
->  include/linux/blk-mq.h |  5 +++--
->  2 files changed, 25 insertions(+), 10 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
 
-Cheers,
+Since the srcu structure is rather large (184 bytes on an x86-64
+system with kernel debugging disabled), only allocate it if needed.
 
-Hannes
+Reported-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+---
+ block/blk-mq.c         | 30 ++++++++++++++++++++++--------
+ include/linux/blk-mq.h |  5 +++--
+ 2 files changed, 25 insertions(+), 10 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 80b14457cf6c..2dff85cdacba 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -186,7 +186,7 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (hctx->flags & BLK_MQ_F_BLOCKING)
+-			synchronize_srcu(&hctx->queue_rq_srcu);
++			synchronize_srcu(hctx->queue_rq_srcu);
+ 		else
+ 			rcu = true;
+ 	}
+@@ -1106,9 +1106,9 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 	} else {
+ 		might_sleep();
+ 
+-		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
++		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+ 		blk_mq_sched_dispatch_requests(hctx);
+-		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+ 	}
+ }
+ 
+@@ -1517,9 +1517,9 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ 		might_sleep();
+ 
+-		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
++		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+ 		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
+-		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+ 	}
+ }
+ 
+@@ -1863,7 +1863,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 		set->ops->exit_hctx(hctx, hctx_idx);
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+-		cleanup_srcu_struct(&hctx->queue_rq_srcu);
++		cleanup_srcu_struct(hctx->queue_rq_srcu);
+ 
+ 	blk_mq_remove_cpuhp(hctx);
+ 	blk_free_flush_queue(hctx->fq);
+@@ -1936,7 +1936,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 		goto free_fq;
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+-		init_srcu_struct(&hctx->queue_rq_srcu);
++		init_srcu_struct(hctx->queue_rq_srcu);
+ 
+ 	blk_mq_debugfs_register_hctx(q, hctx);
+ 
+@@ -2211,6 +2211,20 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
+ }
+ EXPORT_SYMBOL(blk_mq_init_queue);
+ 
++static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
++{
++	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
++
++	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, queue_rq_srcu),
++			   __alignof__(struct blk_mq_hw_ctx)) !=
++		     sizeof(struct blk_mq_hw_ctx));
++
++	if (tag_set->flags & BLK_MQ_F_BLOCKING)
++		hw_ctx_size += sizeof(struct srcu_struct);
++
++	return hw_ctx_size;
++}
++
+ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 						struct request_queue *q)
+ {
+@@ -2225,7 +2239,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 			continue;
+ 
+ 		node = blk_mq_hw_queue_to_node(q->mq_map, i);
+-		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
++		hctxs[i] = kzalloc_node(blk_mq_hw_ctx_size(set),
+ 					GFP_KERNEL, node);
+ 		if (!hctxs[i])
+ 			break;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index ed1b43045ed6..384a448a92a8 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -39,8 +39,6 @@ struct blk_mq_hw_ctx {
+ 	struct blk_mq_tags	*tags;
+ 	struct blk_mq_tags	*sched_tags;
+ 
+-	struct srcu_struct	queue_rq_srcu;
+-
+ 	unsigned long		queued;
+ 	unsigned long		run;
+ #define BLK_MQ_MAX_DISPATCH_ORDER	7
+@@ -62,6 +60,9 @@ struct blk_mq_hw_ctx {
+ 	struct dentry		*debugfs_dir;
+ 	struct dentry		*sched_debugfs_dir;
+ #endif
++
++	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
++	struct srcu_struct	queue_rq_srcu[0];
+ };
+ 
+ struct blk_mq_tag_set {
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.13.1
