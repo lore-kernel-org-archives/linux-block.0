@@ -1,156 +1,34 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v4 02/12] block: Make request operation type argument declarations consistent
-Date: Mon, 19 Jun 2017 15:07:51 -0700
-Message-ID: <20170619220801.12557-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170619220801.12557-1-bart.vanassche@wdc.com>
-References: <20170619220801.12557-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
+Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 09/10] dm: don't set bounce limit
+Date: Mon, 19 Jun 2017 09:26:27 +0200
+Message-Id: <20170619072628.12894-10-hch@lst.de>
+In-Reply-To: <20170619072628.12894-1-hch@lst.de>
+References: <20170619072628.12894-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Now all queues allocators come without abounce limit by default,
+dm doesn't have to override this anymore.
 
-Instead of declaring the second argument of blk_*_get_request()
-as int and passing it to functions that expect an unsigned int,
-declare that second argument as unsigned int. Also because of
-consistency, rename that second argument from 'rw' into 'op'.
-This patch does not change any functionality.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c       | 13 +++++++------
- block/blk-mq.c         | 10 +++++-----
- include/linux/blk-mq.h |  6 +++---
- include/linux/blkdev.h |  3 ++-
- 4 files changed, 17 insertions(+), 15 deletions(-)
+ drivers/md/dm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 62cf92550512..93edf22009fe 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1341,8 +1341,8 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	goto retry;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index fbd06b9f9467..402946035308 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1534,7 +1534,6 @@ void dm_init_normal_md_queue(struct mapped_device *md)
+ 	 * Initialize aspects of queue that aren't relevant for blk-mq
+ 	 */
+ 	md->queue->backing_dev_info->congested_fn = dm_any_congested;
+-	blk_queue_bounce_limit(md->queue, BLK_BOUNCE_ANY);
  }
  
--static struct request *blk_old_get_request(struct request_queue *q, int rw,
--		gfp_t gfp_mask)
-+static struct request *blk_old_get_request(struct request_queue *q,
-+					   unsigned int op, gfp_t gfp_mask)
- {
- 	struct request *rq;
- 
-@@ -1350,7 +1350,7 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- 	create_io_context(gfp_mask, q->node);
- 
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, rw, NULL, gfp_mask);
-+	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
- 		return rq;
-@@ -1363,14 +1363,15 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- 	return rq;
- }
- 
--struct request *blk_get_request(struct request_queue *q, int rw, gfp_t gfp_mask)
-+struct request *blk_get_request(struct request_queue *q, unsigned int op,
-+				gfp_t gfp_mask)
- {
- 	if (q->mq_ops)
--		return blk_mq_alloc_request(q, rw,
-+		return blk_mq_alloc_request(q, op,
- 			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
- 				0 : BLK_MQ_REQ_NOWAIT);
- 	else
--		return blk_old_get_request(q, rw, gfp_mask);
-+		return blk_old_get_request(q, op, gfp_mask);
- }
- EXPORT_SYMBOL(blk_get_request);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2dff85cdacba..8cd423ba585d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -340,7 +340,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	return rq;
- }
- 
--struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
-+struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 		unsigned int flags)
- {
- 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
-@@ -351,7 +351,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- 	if (ret)
- 		return ERR_PTR(ret);
- 
--	rq = blk_mq_get_request(q, NULL, rw, &alloc_data);
-+	rq = blk_mq_get_request(q, NULL, op, &alloc_data);
- 
- 	blk_mq_put_ctx(alloc_data.ctx);
- 	blk_queue_exit(q);
-@@ -366,8 +366,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- }
- EXPORT_SYMBOL(blk_mq_alloc_request);
- 
--struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
--		unsigned int flags, unsigned int hctx_idx)
-+struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
-+		unsigned int op, unsigned int flags, unsigned int hctx_idx)
- {
- 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
- 	struct request *rq;
-@@ -402,7 +402,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- 	cpu = cpumask_first(alloc_data.hctx->cpumask);
- 	alloc_data.ctx = __blk_mq_get_ctx(q, cpu);
- 
--	rq = blk_mq_get_request(q, NULL, rw, &alloc_data);
-+	rq = blk_mq_get_request(q, NULL, op, &alloc_data);
- 
- 	blk_queue_exit(q);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 384a448a92a8..698015526ca7 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -202,10 +202,10 @@ enum {
- 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
- };
- 
--struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
-+struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 		unsigned int flags);
--struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int op,
--		unsigned int flags, unsigned int hctx_idx);
-+struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
-+		unsigned int op, unsigned int flags, unsigned int hctx_idx);
- struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
- 
- enum {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 22cfba64ce81..c2844c27ef65 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -934,7 +934,8 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
--extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
-+extern struct request *blk_get_request(struct request_queue *, unsigned int op,
-+				       gfp_t gfp_mask);
- extern void blk_requeue_request(struct request_queue *, struct request *);
- extern int blk_lld_busy(struct request_queue *q);
- extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+ static void cleanup_mapped_device(struct mapped_device *md)
 -- 
-2.13.1
+2.11.0
