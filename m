@@ -1,55 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:43971 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751672AbdF1O05 (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:34930 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751736AbdFSOOh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2017 10:26:57 -0400
-Date: Wed, 28 Jun 2017 17:26:45 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: jg@lightnvm.io
-Cc: linux-block@vger.kernel.org
-Subject: [bug report] lightnvm: pblk: sched. metadata on write thread
-Message-ID: <20170628142645.khaab3l43vzd5fpt@mwanda>
+        Mon, 19 Jun 2017 10:14:37 -0400
+Received: by mail-wm0-f68.google.com with SMTP id d64so16624975wmf.2
+        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2017 07:14:36 -0700 (PDT)
+Subject: Re: [PATCH rfc 20/30] nvme: add err, reconnect and delete work items
+ to nvme core
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org,
+        Keith Busch <keith.busch@intel.com>,
+        linux-block@vger.kernel.org
+References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+ <1497799324-19598-21-git-send-email-sagi@grimberg.me>
+ <20170619124910.GR29061@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <81f50d91-1df2-5da9-5576-e64f892f9ab3@grimberg.me>
+Date: Mon, 19 Jun 2017 17:14:32 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170619124910.GR29061@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Javier Gonz�lez,
 
-The patch dd2a43437337: "lightnvm: pblk: sched. metadata on write
-thread" from Jun 26, 2017, leads to the following static checker
-warning:
+>> We intent for these handlers to become generic, thus, add them to
+>> the nvme core controller struct.
+> 
+> Do you remember why we actually need all the different work items?
 
-	drivers/lightnvm/pblk-init.c:822 pblk_lines_init()
-	warn: 'pblk->lines' double freed
+I remember documenting it at some point, but either it got lost
+somewhere or I don't remember...
 
-drivers/lightnvm/pblk-init.c
-   810  
-   811          return 0;
-   812  fail_free_lines:
-   813          while (--i >= 0)
-   814                  pblk_free_line_bitmaps(&pblk->lines[i]);
-   815  
-   816          kfree(pblk->lines);
-                      ^^^^^^^^^^^
-Freed.
+> We need err_work to recover from RDMA QP-level errors.
 
-   817  fail_free_bb_aux:
-   818          kfree(l_mg->bb_aux);
-   819  fail_free_bb_template:
-   820          kfree(l_mg->bb_template);
-   821  fail_free_meta:
-   822          pblk_line_meta_free(pblk);
-                                    ^^^^
-Double freed.
+transport errors usually detected in soft-irq, so we queue up
+err_work to:
+1. stop + drain queues
+2. fail inflight I/O.
+3. queue delayed reconnect (reconnect_work)
 
-   823  fail:
-   824          for (i = 0; i < geo->nr_luns; i++)
-   825                  kfree(pblk->luns[i].bb_list);
-   826  
-   827          return ret;
-   828  }
+> But how is it so different from a reset in that respect?  Similarly why
+> do we need reset to be different from reconnect?  Especially as
+> reconnect sort of is the reset of fabrics.
 
-regards,
-dan carpenter
+Hmm, resets and reconnects are indeed similar, but one difference
+is that in resets we do not fail fast inflight I/O as the expectation
+is that the recovery should be immediate (it also matches pci with
+that respect) while we consider reconnect something that can last
+for a while so we fail fast to allow failover and continue reconnect
+attempts quietly. Another difference is that failed reset results in
+a controller removal while in reconnects we have to exhaust
+ctrl_loss_tmo.
+
+We could change things, like merging reconnect and reset and introduce
+a concept of "on-host reset". Not sure it will be any less confusing
+though...
