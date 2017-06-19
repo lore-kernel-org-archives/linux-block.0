@@ -1,82 +1,41 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
-Date: Mon,  5 Jun 2017 00:35:31 -0500
-Message-Id: <20170605053540.19393-2-rgoldwyn@suse.de>
-In-Reply-To: <20170605053540.19393-1-rgoldwyn@suse.de>
-References: <20170605053540.19393-1-rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 01/11] fs: add support for an inode to carry write hint
+ related data
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ adilger@dilger.ca, martin.petersen@oracle.com
+References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
+ <1497729594-4707-2-git-send-email-axboe@kernel.dk>
+ <20170619062617.GB2311@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5a75b032-e4d7-2463-10dc-094ab9b01751@kernel.dk>
+Date: Mon, 19 Jun 2017 08:55:27 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170619062617.GB2311@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On 06/19/2017 12:26 AM, Christoph Hellwig wrote:
+>> +/*
+>> + * Write life time hint values.
+>> + */
+>> +enum rw_hint {
+>> +	WRITE_LIFE_NONE = 0,
+>> +	WRITE_LIFE_SHORT,
+>> +	WRITE_LIFE_MEDIUM,
+>> +	WRITE_LIFE_LONG,
+>> +	WRITE_LIFE_EXTREME,
+>> +};
+>> +
+>> +#define RW_HINT_MASK		0x7	/* 3 bits */
+> 
+> FYI, exposing enums in a uapi is always a bit problematic, due to
+> different ABI rules.  It might be better to make these explicit defines
+> at least for the uapi.
+> 
+> Btw, I think it might make sense to merge this with patch 5.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/read_write.c    | 12 +++---------
- include/linux/fs.h | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 9 deletions(-)
+OK, I'll change the uapi to be defines.
 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 47c1d4484df9..53c816c61122 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 	struct kiocb kiocb;
- 	ssize_t ret;
- 
--	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
--		return -EOPNOTSUPP;
--
- 	init_sync_kiocb(&kiocb, filp);
--	if (flags & RWF_HIPRI)
--		kiocb.ki_flags |= IOCB_HIPRI;
--	if (flags & RWF_DSYNC)
--		kiocb.ki_flags |= IOCB_DSYNC;
--	if (flags & RWF_SYNC)
--		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	ret = kiocb_set_rw_flags(&kiocb, flags);
-+	if (ret)
-+		return ret;
- 	kiocb.ki_pos = *ppos;
- 
- 	if (type == READ)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 803e5a9b2654..f53867140f43 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3056,6 +3056,20 @@ static inline int iocb_flags(struct file *file)
- 	return res;
- }
- 
-+static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
-+{
-+	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
-+		return -EOPNOTSUPP;
-+
-+	if (flags & RWF_HIPRI)
-+		ki->ki_flags |= IOCB_HIPRI;
-+	if (flags & RWF_DSYNC)
-+		ki->ki_flags |= IOCB_DSYNC;
-+	if (flags & RWF_SYNC)
-+		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	return 0;
-+}
-+
- static inline ino_t parent_ino(struct dentry *dentry)
- {
- 	ino_t res;
 -- 
-2.12.0
+Jens Axboe
