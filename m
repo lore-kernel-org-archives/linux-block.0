@@ -1,64 +1,44 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 06/11] fs: add O_DIRECT support for sending down write
+ life time hints
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ adilger@dilger.ca, martin.petersen@oracle.com
+References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
+ <1497729594-4707-7-git-send-email-axboe@kernel.dk>
+ <20170619062824.GE2311@infradead.org>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/9] fs: add O_DIRECT support for sending down write life time hints
-Date: Mon, 19 Jun 2017 11:04:57 -0600
-Message-Id: <1497891902-25737-5-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497891902-25737-1-git-send-email-axboe@kernel.dk>
-References: <1497891902-25737-1-git-send-email-axboe@kernel.dk>
+Message-ID: <a2c19014-3406-625a-8afd-4f011196c739@kernel.dk>
+Date: Mon, 19 Jun 2017 08:57:41 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170619062824.GE2311@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/block_dev.c | 2 ++
- fs/direct-io.c | 2 ++
- fs/iomap.c     | 1 +
- 3 files changed, 5 insertions(+)
+On 06/19/2017 12:28 AM, Christoph Hellwig wrote:
+> On Sat, Jun 17, 2017 at 01:59:49PM -0600, Jens Axboe wrote:
+>> Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  fs/block_dev.c | 2 ++
+>>  fs/direct-io.c | 2 ++
+>>  fs/iomap.c     | 1 +
+>>  3 files changed, 5 insertions(+)
+>>
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index 519599dddd36..b9222a9d285e 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -239,6 +239,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+>>  			should_dirty = true;
+>>  	} else {
+>>  		bio.bi_opf = dio_bio_write_op(iocb);
+>> +		bio.bi_opf |= write_hint_to_opf(iocb_write_hint(iocb));
+> 
+> Move this into dio_bio_write_op instead of duplicating it?
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index dd91c99e9ba0..30e1fb65c2fa 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -183,6 +183,8 @@ static unsigned int dio_bio_write_op(struct kiocb *iocb)
- 	/* avoid the need for a I/O completion work item */
- 	if (iocb->ki_flags & IOCB_DSYNC)
- 		op |= REQ_FUA;
-+
-+	op |= write_hint_to_opf(iocb_write_hint(iocb));
- 	return op;
- }
- 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index e8baaabebf13..9e9adca0c592 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -385,6 +385,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 	else
- 		bio->bi_end_io = dio_bio_end_io;
- 
-+	bio->bi_opf |= write_hint_to_opf(iocb_write_hint(dio->iocb));
-+
- 	sdio->bio = bio;
- 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 18f2f2b8ba2c..63b9f87d9461 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -804,6 +804,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		if (dio->flags & IOMAP_DIO_WRITE) {
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+			bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		} else {
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
+Good cleanup, will do.
+
+
 -- 
-2.7.4
+Jens Axboe
