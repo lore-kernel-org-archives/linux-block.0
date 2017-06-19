@@ -1,43 +1,52 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/11] ext4: add support for passing in write hints for buffered writes
-Date: Fri, 16 Jun 2017 11:24:40 -0600
-Message-Id: <1497633883-21230-9-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
-References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:34211 "EHLO
+        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751458AbdFSTOt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Jun 2017 15:14:49 -0400
+Date: Mon, 19 Jun 2017 15:14:46 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        gregkh@linuxfoundation.org, hch@lst.de, axboe@fb.com,
+        rostedt@goodmis.org, lizefan@huawei.com, Kernel-team@fb.com,
+        Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH V3 11/12] blktrace: add an option to allow displying
+ cgroup path
+Message-ID: <20170619191446.GM12062@htj.duckdns.org>
+References: <cover.1497549993.git.shli@fb.com>
+ <6943a743192fd1ceb591e60fa02e5347f0320b18.1497549993.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6943a743192fd1ceb591e60fa02e5347f0320b18.1497549993.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/ext4/page-io.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hello,
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 1a82138ba739..fbc04a8cb35a 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -349,6 +349,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 	if (bio) {
- 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
- 				  REQ_SYNC : 0;
-+		io_op_flags |= write_hint_to_opf(inode_write_hint(io->io_end->inode));
- 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
- 		submit_bio(io->io_bio);
- 	}
-@@ -396,6 +397,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
- 		ret = io_submit_init_bio(io, bh);
- 		if (ret)
- 			return ret;
-+		io->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
- 	}
- 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
- 	if (ret != bh->b_size)
+On Thu, Jun 15, 2017 at 11:17:19AM -0700, Shaohua Li wrote:
+> From: Shaohua Li <shli@fb.com>
+> 
+> By default we output cgroup id in blktrace. This adds an option to
+> display cgroup path. Since get cgroup path is a relativly heavy
+> operation, we don't enable it by default.
+> 
+> with the option enabled, blktrace will output something like this:
+> dd-1353  [007] d..2   293.015252:   8,0   /test/level  D   R 24 + 8 [dd]
+> 
+> Signed-off-by: Shaohua Li <shli@fb.com>
+> @@ -613,6 +613,9 @@ static inline struct kernfs_node_id *cgroup_get_node_id(struct cgroup *cgrp)
+>  {
+>  	return &cgrp->kn->id;
+>  }
+> +
+> +void cgroup_path_from_node_id(const struct kernfs_node_id *id,
+> +					char *buf, size_t buflen);
+
+Maybe cgroup_path_from_kernfs_id()?  We eventually can replace
+cgrp->id w/ kernfs id and drop the kernfs qualifier.
+
+Thanks.
+
 -- 
-2.7.4
+tejun
