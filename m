@@ -1,126 +1,147 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 09/10] xfs: nowait aio support
-Date: Tue,  6 Jun 2017 06:19:38 -0500
-Message-Id: <20170606111939.27272-10-rgoldwyn@suse.de>
-In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
-References: <20170606111939.27272-1-rgoldwyn@suse.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 19 Jun 2017 10:26:36 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH v3 01/12] blk-mq: Reduce blk_mq_hw_ctx size
+Message-ID: <20170619022631.GB11219@ming.t460p>
+References: <20170608173355.25898-1-bart.vanassche@sandisk.com>
+ <20170608173355.25898-2-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170608173355.25898-2-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Thu, Jun 08, 2017 at 10:33:44AM -0700, Bart Van Assche wrote:
+> Since the srcu structure is rather large (184 bytes on an x86-64
+> system with kernel debugging disabled), only allocate it if needed.
+> 
+> Reported-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c         | 30 ++++++++++++++++++++++--------
+>  include/linux/blk-mq.h |  5 +++--
+>  2 files changed, 25 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4e8b1bc87274..ef64a3ea4e83 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -172,7 +172,7 @@ void blk_mq_quiesce_queue(struct request_queue *q)
+>  
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+>  		if (hctx->flags & BLK_MQ_F_BLOCKING)
+> -			synchronize_srcu(&hctx->queue_rq_srcu);
+> +			synchronize_srcu(hctx->queue_rq_srcu);
+>  		else
+>  			rcu = true;
+>  	}
+> @@ -1056,9 +1056,9 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+>  	} else {
+>  		might_sleep();
+>  
+> -		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
+> +		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+>  		blk_mq_sched_dispatch_requests(hctx);
+> -		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
+> +		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+>  	}
+>  }
+>  
+> @@ -1460,9 +1460,9 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  
+>  		might_sleep();
+>  
+> -		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
+> +		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+>  		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
+> -		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
+> +		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+>  	}
+>  }
+>  
+> @@ -1806,7 +1806,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>  		set->ops->exit_hctx(hctx, hctx_idx);
+>  
+>  	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> -		cleanup_srcu_struct(&hctx->queue_rq_srcu);
+> +		cleanup_srcu_struct(hctx->queue_rq_srcu);
+>  
+>  	blk_mq_remove_cpuhp(hctx);
+>  	blk_free_flush_queue(hctx->fq);
+> @@ -1879,7 +1879,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+>  		goto free_fq;
+>  
+>  	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> -		init_srcu_struct(&hctx->queue_rq_srcu);
+> +		init_srcu_struct(hctx->queue_rq_srcu);
+>  
+>  	blk_mq_debugfs_register_hctx(q, hctx);
+>  
+> @@ -2154,6 +2154,20 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
+>  }
+>  EXPORT_SYMBOL(blk_mq_init_queue);
+>  
+> +static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+> +{
+> +	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
+> +
+> +	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, queue_rq_srcu),
+> +			   __alignof__(struct blk_mq_hw_ctx)) !=
+> +		     sizeof(struct blk_mq_hw_ctx));
+> +
+> +	if (tag_set->flags & BLK_MQ_F_BLOCKING)
+> +		hw_ctx_size += sizeof(struct srcu_struct);
+> +
+> +	return hw_ctx_size;
+> +}
+> +
+>  static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  						struct request_queue *q)
+>  {
+> @@ -2168,7 +2182,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  			continue;
+>  
+>  		node = blk_mq_hw_queue_to_node(q->mq_map, i);
+> -		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
+> +		hctxs[i] = kzalloc_node(blk_mq_hw_ctx_size(set),
+>  					GFP_KERNEL, node);
+>  		if (!hctxs[i])
+>  			break;
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index fcd641032f8d..c534ec64e214 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -39,8 +39,6 @@ struct blk_mq_hw_ctx {
+>  	struct blk_mq_tags	*tags;
+>  	struct blk_mq_tags	*sched_tags;
+>  
+> -	struct srcu_struct	queue_rq_srcu;
+> -
+>  	unsigned long		queued;
+>  	unsigned long		run;
+>  #define BLK_MQ_MAX_DISPATCH_ORDER	7
+> @@ -62,6 +60,9 @@ struct blk_mq_hw_ctx {
+>  	struct dentry		*debugfs_dir;
+>  	struct dentry		*sched_debugfs_dir;
+>  #endif
+> +
+> +	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
+> +	struct srcu_struct	queue_rq_srcu[0];
+>  };
+>  
+>  struct blk_mq_tag_set {
+> -- 
+> 2.12.2
+> 
 
-If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
-immediately.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
-if it needs allocation either due to file extension, writing to a hole,
-or COW or waiting for other DIOs to finish.
-
-Return -EAGAIN if we don't have extent list in memory.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
----
- fs/xfs/xfs_file.c  | 19 ++++++++++++++-----
- fs/xfs/xfs_iomap.c | 22 ++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 5 deletions(-)
-
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 5fb5a0958a14..f87a8a66e6f7 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
- 
--	xfs_ilock(ip, iolock);
--
-+	if (!xfs_ilock_nowait(ip, iolock)) {
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		xfs_ilock(ip, iolock);
-+	}
- 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
- 	if (ret)
- 		goto out;
-@@ -553,9 +556,15 @@ xfs_file_dio_aio_write(
- 	 * otherwise demote the lock if we had to take the exclusive lock
- 	 * for other reasons in xfs_file_aio_write_checks.
- 	 */
--	if (unaligned_io)
--		inode_dio_wait(inode);
--	else if (iolock == XFS_IOLOCK_EXCL) {
-+	if (unaligned_io) {
-+		/* If we are going to wait for other DIO to finish, bail */
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (atomic_read(&inode->i_dio_count))
-+				return -EAGAIN;
-+		} else {
-+			inode_dio_wait(inode);
-+		}
-+	} else if (iolock == XFS_IOLOCK_EXCL) {
- 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
- 		iolock = XFS_IOLOCK_SHARED;
- 	}
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 94e5bdf7304c..05dc87e8c1f5 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -995,6 +995,11 @@ xfs_file_iomap_begin(
- 		lockmode = xfs_ilock_data_map_shared(ip);
- 	}
- 
-+	if ((flags & IOMAP_NOWAIT) && !(ip->i_df.if_flags & XFS_IFEXTENTS)) {
-+		error = -EAGAIN;
-+		goto out_unlock;
-+	}
-+
- 	ASSERT(offset <= mp->m_super->s_maxbytes);
- 	if ((xfs_fsize_t)offset + length > mp->m_super->s_maxbytes)
- 		length = mp->m_super->s_maxbytes - offset;
-@@ -1016,6 +1021,15 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
- 		if (flags & IOMAP_DIRECT) {
-+			/*
-+			 * A reflinked inode will result in CoW alloc.
-+			 * FIXME: It could still overwrite on unshared extents
-+			 * and not need allocation.
-+			 */
-+			if (flags & IOMAP_NOWAIT) {
-+				error = -EAGAIN;
-+				goto out_unlock;
-+			}
- 			/* may drop and re-acquire the ilock */
- 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
- 					&lockmode);
-@@ -1033,6 +1047,14 @@ xfs_file_iomap_begin(
- 
- 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
- 		/*
-+		 * If nowait is set bail since we are going to make
-+		 * allocations.
-+		 */
-+		if (flags & IOMAP_NOWAIT) {
-+			error = -EAGAIN;
-+			goto out_unlock;
-+		}
-+		/*
- 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
- 		 * pages to keep the chunks of work done where somewhat symmetric
- 		 * with the work writeback does. This is a completely arbitrary
--- 
-2.12.0
+Thanks,
+Ming
