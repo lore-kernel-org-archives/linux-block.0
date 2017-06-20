@@ -1,42 +1,54 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH v5 11/12] block: Constify disk_type
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
- <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
- Ming Lei <ming.lei@redhat.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
+	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v5 11/12] block: Constify disk_type
+Date: Tue, 20 Jun 2017 11:15:48 -0700
+Message-ID: <20170620181549.24903-12-bart.vanassche@wdc.com>
+In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
 References: <20170620181549.24903-1-bart.vanassche@wdc.com>
- <20170620181549.24903-12-bart.vanassche@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <e84cb75d-12e0-3369-aada-6f286fc5583a@suse.de>
-Date: Wed, 21 Jun 2017 08:57:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170620181549.24903-12-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/20/2017 08:15 PM, Bart Van Assche wrote:
-> From: Bart Van Assche <bart.vanassche@sandisk.com>
-> 
-> The variable 'disk_type' is never modified so constify it.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Omar Sandoval <osandov@fb.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/genhd.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
 
-Cheers,
+The variable 'disk_type' is never modified so constify it.
 
-Hannes
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+---
+ block/genhd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index d252d29fe837..7f520fa25d16 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -36,7 +36,7 @@ struct kobject *block_depr;
+ static DEFINE_SPINLOCK(ext_devt_lock);
+ static DEFINE_IDR(ext_devt_idr);
+ 
+-static struct device_type disk_type;
++static const struct device_type disk_type;
+ 
+ static void disk_check_events(struct disk_events *ev,
+ 			      unsigned int *clearing_ptr);
+@@ -1183,7 +1183,7 @@ static char *block_devnode(struct device *dev, umode_t *mode,
+ 	return NULL;
+ }
+ 
+-static struct device_type disk_type = {
++static const struct device_type disk_type = {
+ 	.name		= "disk",
+ 	.groups		= disk_attr_groups,
+ 	.release	= disk_release,
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.13.1
