@@ -1,14 +1,11 @@
-Return-Path: <BATV+36629bb5a09a6c0004be+5049+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 20 Jun 2017 05:43:55 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, adilger@dilger.ca,
-	martin.petersen@oracle.com
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 04/11] fs: add support for allowing applications to pass
  in write life time hints
-Message-ID: <20170620124355.GA6199@infradead.org>
-References: <1497729594-4707-5-git-send-email-axboe@kernel.dk>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ adilger@dilger.ca, martin.petersen@oracle.com
+References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
+ <1497729594-4707-5-git-send-email-axboe@kernel.dk>
  <20170619062706.GC2311@infradead.org>
  <b04642e6-4ecc-f2e8-8184-6fff302d3d0b@kernel.dk>
  <8db675e7-b868-bae1-784a-33cba67d0874@kernel.dk>
@@ -17,18 +14,31 @@ References: <1497729594-4707-5-git-send-email-axboe@kernel.dk>
  <0c3c6a33-77c5-337e-66e0-49fe22d3cc4e@kernel.dk>
  <3e6f7b97-8372-b268-f55a-cc88812c1a68@kernel.dk>
  <20170620085739.GB31386@infradead.org>
- <6f1be22c-b172-3645-f0ab-8124188756df@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6f1be22c-b172-3645-f0ab-8124188756df@kernel.dk>
+Date: Tue, 20 Jun 2017 06:43:10 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6f1be22c-b172-3645-f0ab-8124188756df@kernel.dk>
+In-Reply-To: <20170620085739.GB31386@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jun 20, 2017 at 06:43:10AM -0600, Jens Axboe wrote:
-> > Question:  IFF we can get the per-file hints to propagate to the
-> > writeback code (which I think is pretty easy for ext4/xfs/bdev, not
-> > sure about btrfs) do we even need the per-inode ones at all?
+On 06/20/2017 02:57 AM, Christoph Hellwig wrote:
+> On Mon, Jun 19, 2017 at 02:33:41PM -0600, Jens Axboe wrote:
+>> That doesn't work, in case it's cleared, or for checking whether it has
+>> been set or not. Oh well, I added a NOT_SET variant for this. See below
+>> for an incremental that adds support for file write hints as well. Use
+>> the file write hint, if we have it, otherwise use the inode provided
+>> one.
+>>
+>> Setting hints on a file propagates to the inode, only if the inode doesn't
+>> currently have a hint set.
 > 
-> How is that possible, the file could be long gone by the time
-> the writeback kicks in?
+> Question:  IFF we can get the per-file hints to propagate to the
+> writeback code (which I think is pretty easy for ext4/xfs/bdev, not
+> sure about btrfs) do we even need the per-inode ones at all?
 
-each time a page/buffer is dirtied we can propagate the hint.
+How is that possible, the file could be long gone by the time
+the writeback kicks in?
+
+-- 
+Jens Axboe
