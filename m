@@ -1,79 +1,60 @@
-Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 03/10] block: move bounce declarations to block/blk.h
-Date: Mon, 19 Jun 2017 09:26:21 +0200
-Message-Id: <20170619072628.12894-4-hch@lst.de>
-In-Reply-To: <20170619072628.12894-1-hch@lst.de>
-References: <20170619072628.12894-1-hch@lst.de>
+Return-Path: <jlayton@redhat.com>
+Return-Path: <jlayton@redhat.com>
+Message-ID: <1497963376.4555.4.camel@redhat.com>
+Subject: Re: [PATCH v7 11/22] fs: new infrastructure for writeback error
+ handling and reporting
+From: Jeff Layton <jlayton@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
+ Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-ext4@vger.kernel.org,  linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org,  linux-block@vger.kernel.org
+Date: Tue, 20 Jun 2017 08:56:16 -0400
+In-Reply-To: <20170620123433.GB19781@infradead.org>
+References: <20170616193427.13955-1-jlayton@redhat.com>
+	 <20170616193427.13955-12-jlayton@redhat.com>
+	 <20170620123433.GB19781@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk.h            | 13 +++++++++++++
- block/bounce.c         |  1 +
- include/linux/blkdev.h | 13 -------------
- 3 files changed, 14 insertions(+), 13 deletions(-)
+On Tue, 2017-06-20 at 05:34 -0700, Christoph Hellwig wrote:
+> > @@ -393,6 +394,7 @@ struct address_space {
+> >  	gfp_t			gfp_mask;	/* implicit gfp mask for allocations */
+> >  	struct list_head	private_list;	/* ditto */
+> >  	void			*private_data;	/* ditto */
+> > +	errseq_t		wb_err;
+> >  } __attribute__((aligned(sizeof(long))));
+> >  	/*
+> >  	 * On most architectures that alignment is already the case; but
+> > @@ -847,6 +849,7 @@ struct file {
+> >  	 * Must not be taken from IRQ context.
+> >  	 */
+> >  	spinlock_t		f_lock;
+> > +	errseq_t		f_wb_err;
+> >  	atomic_long_t		f_count;
+> >  	unsigned int 		f_flags;
+> >  	fmode_t			f_mode;
+> 
+> Did you check the sizes of the structure before and after?
+> These places don't look like holes in the packing, but there probably
+> are some available.
+> 
 
-diff --git a/block/blk.h b/block/blk.h
-index 83c8e1100525..4576fb5a8006 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -334,4 +334,17 @@ static inline void blk_throtl_bio_endio(struct bio *bio) { }
- static inline void blk_throtl_stat_add(struct request *rq, u64 time) { }
- #endif
- 
-+#ifdef CONFIG_BOUNCE
-+extern int init_emergency_isa_pool(void);
-+extern void blk_queue_bounce(struct request_queue *q, struct bio **bio);
-+#else
-+static inline int init_emergency_isa_pool(void)
-+{
-+	return 0;
-+}
-+static inline void blk_queue_bounce(struct request_queue *q, struct bio **bio)
-+{
-+}
-+#endif /* CONFIG_BOUNCE */
-+
- #endif /* BLK_INTERNAL_H */
-diff --git a/block/bounce.c b/block/bounce.c
-index b7e44bd59d7c..fc79dd3e0f20 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -22,6 +22,7 @@
- #include <asm/tlbflush.h>
- 
- #include <trace/events/block.h>
-+#include "blk.h"
- 
- #define POOL_SIZE	64
- #define ISA_POOL_SIZE	16
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 22cfba64ce81..f1a5f82a4d97 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -863,19 +863,6 @@ extern unsigned long blk_max_low_pfn, blk_max_pfn;
- #define BLK_DEFAULT_SG_TIMEOUT	(60 * HZ)
- #define BLK_MIN_SG_TIMEOUT	(7 * HZ)
- 
--#ifdef CONFIG_BOUNCE
--extern int init_emergency_isa_pool(void);
--extern void blk_queue_bounce(struct request_queue *q, struct bio **bio);
--#else
--static inline int init_emergency_isa_pool(void)
--{
--	return 0;
--}
--static inline void blk_queue_bounce(struct request_queue *q, struct bio **bio)
--{
--}
--#endif /* CONFIG_MMU */
--
- struct rq_map_data {
- 	struct page **pages;
- 	int page_order;
+Yes. That one actually plugs a 4 byte hole in struct file on x86_64.
+
+> > +static inline int filemap_check_wb_err(struct address_space *mapping, errseq_t since)
+> 
+> Overly long line here (the patch has a few more)
+> 
+
+Ok, I'll fix those up.
+
 -- 
-2.11.0
+Jeff Layton <jlayton@redhat.com>
