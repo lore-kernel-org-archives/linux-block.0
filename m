@@ -1,21 +1,28 @@
-Return-Path: <BATV+8132ee8c7e24eb087ca3+5055+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: block: spread MSI(-X) vectors to all possible CPUs
-Date: Mon, 26 Jun 2017 12:20:55 +0200
-Message-Id: <20170626102058.10200-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/10 v14] merge request: No wait AIO
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: viro@ZenIV.linux.org.uk, hch@lst.de, jack@suse.cz,
+ akpm@linux-foundation.org, linux-block@vger.kernel.org
+References: <20170620120549.23147-1-rgoldwyn@suse.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <340357d1-9c11-7dc0-b223-d5b505f8e04c@kernel.dk>
+Date: Tue, 20 Jun 2017 07:12:33 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On 06/20/2017 06:05 AM, Goldwyn Rodrigues wrote:
+> Jens,
+> 
+> As discussed, here are the patches against the block
+> tree for merge since the block layer changes had the most conflicts.
+> My tree is at https://github.com/goldwynr/linux/tree/nowait-block
+> 
+>  Changes since v13:
+>  + nowait support for dax files in ext4 and xfs
 
-this series contains the left-over block bits to spread the MSI-X
-vectors over all CPU.  Thomas already rewrote and then merged the
-irq bits into the tip irq/core branch, and this is the remainder.
+Added for 4.13, thanks.
 
-As there are no dependencies on other block changes adding them
-to the tip tree might be easiest if Jens could ACK them.
+-- 
+Jens Axboe
