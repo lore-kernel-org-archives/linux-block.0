@@ -1,64 +1,108 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 19/51] block: comments on bio_for_each_segment[_all]
-Date: Mon, 26 Jun 2017 20:10:02 +0800
-Message-Id: <20170626121034.3051-20-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 04/10] fs: Introduce RWF_NOWAIT and FMODE_AIO_NOWAIT
+Date: Tue, 20 Jun 2017 07:05:43 -0500
+Message-Id: <20170620120549.23147-5-rgoldwyn@suse.de>
+In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
+References: <20170620120549.23147-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch clarifies the fact that even though both
-bio_for_each_segment() and bio_for_each_segment_all()
-are named as _segment/_segment_all, they still return
-one page in each vector, instead of real segment(multipage bvec).
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-With comming multipage bvec, both the two helpers
-are capable of returning real segment(multipage bvec),
-but the callers(users) of the two helpers may not be
-capable of handling of the multipage bvec or real
-segment, so we still keep the interfaces of the helpers
-not changed. And new helpers for returning multipage bvec(real segment)
-will be introduced later.
+RWF_NOWAIT informs kernel to bail out if an AIO request will block
+for reasons such as file allocations, or a writeback triggered,
+or would block while allocating requests while performing
+direct I/O.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+RWF_NOWAIT is translated to IOCB_NOWAIT for iocb->ki_flags.
+
+FMODE_AIO_NOWAIT is a flag which identifies the file opened is capable
+of returning -EAGAIN if the AIO call will block. This must be set by
+supporting filesystems in the ->open() call.
+
+Filesystems xfs, btrfs and ext4 would be supported in the following patches.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- include/linux/bio.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ fs/aio.c                | 6 ++++++
+ include/linux/fs.h      | 9 +++++++++
+ include/uapi/linux/fs.h | 4 +++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 4907bea03908..d425be4d1ced 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -155,7 +155,10 @@ static inline void *bio_data(struct bio *bio)
+diff --git a/fs/aio.c b/fs/aio.c
+index 020fa0045e3c..34027b67e2f4 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1592,6 +1592,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		goto out_put_req;
+ 	}
  
++	if ((req->common.ki_flags & IOCB_NOWAIT) &&
++			!(req->common.ki_flags & IOCB_DIRECT)) {
++		ret = -EOPNOTSUPP;
++		goto out_put_req;
++	}
++
+ 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
+ 	if (unlikely(ret)) {
+ 		pr_debug("EFAULT: aio_key\n");
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 0d34f5b5a6b0..4574121f4746 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -143,6 +143,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+ /* File was opened by fanotify and shouldn't generate fanotify events */
+ #define FMODE_NONOTIFY		((__force fmode_t)0x4000000)
+ 
++/* File is capable of returning -EAGAIN if AIO will block */
++#define FMODE_AIO_NOWAIT	((__force fmode_t)0x8000000)
++
  /*
-  * drivers should _never_ use the all version - the bio may have been split
-- * before it got to the driver and the driver won't own all of it
-+ * before it got to the driver and the driver won't own all of it.
-+ *
-+ * Even though the helper is named as _segment_all, it still returns
-+ * page one by one instead of real segment.
-  */
- #define bio_for_each_segment_all(bvl, bio, i)				\
- 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
-@@ -177,6 +180,10 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- 		((bvl = bio_iter_iovec((bio), (iter))), 1);		\
- 	     bio_advance_iter((bio), &(iter), (bvl).bv_len))
+  * Flag for rw_copy_check_uvector and compat_rw_copy_check_uvector
+  * that indicates that they should check the contents of the iovec are
+@@ -269,6 +272,7 @@ struct writeback_control;
+ #define IOCB_DSYNC		(1 << 4)
+ #define IOCB_SYNC		(1 << 5)
+ #define IOCB_WRITE		(1 << 6)
++#define IOCB_NOWAIT		(1 << 7)
  
-+/*
-+ * Even though the helper is named as _segment, it still returns
-+ * page one by one instead of real segment.
-+ */
- #define bio_for_each_segment(bvl, bio, iter)				\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+ struct kiocb {
+ 	struct file		*ki_filp;
+@@ -3064,6 +3068,11 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
+ 	if (unlikely(flags & ~RWF_SUPPORTED))
+ 		return -EOPNOTSUPP;
  
++	if (flags & RWF_NOWAIT) {
++		if (!(ki->ki_filp->f_mode & FMODE_AIO_NOWAIT))
++			return -EOPNOTSUPP;
++		ki->ki_flags |= IOCB_NOWAIT;
++	}
+ 	if (flags & RWF_HIPRI)
+ 		ki->ki_flags |= IOCB_HIPRI;
+ 	if (flags & RWF_DSYNC)
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 937c3e39650a..27d8c36c04af 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -360,7 +360,9 @@ struct fscrypt_key {
+ #define RWF_HIPRI			0x00000001 /* high priority request, poll if possible */
+ #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
+ #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
++#define RWF_NOWAIT			0x00000008 /* per-IO, return -EAGAIN if operation would block */
+ 
+-#define RWF_SUPPORTED			(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)
++#define RWF_SUPPORTED			(RWF_HIPRI | RWF_DSYNC | RWF_SYNC |\
++					 RWF_NOWAIT)
+ 
+ #endif /* _UAPI_LINUX_FS_H */
 -- 
-2.9.4
+2.12.0
