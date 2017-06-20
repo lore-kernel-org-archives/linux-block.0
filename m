@@ -1,373 +1,65 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 9/9] nvme: add support for streams and directives
-Date: Tue, 20 Jun 2017 18:22:06 -0600
-Message-Id: <1498004526-4543-10-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
-References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+Return-Path: <jlayton@redhat.com>
+Return-Path: <jlayton@redhat.com>
+Message-ID: <1497953761.4555.1.camel@redhat.com>
+Subject: Re: [PATCH v7 00/22] fs: enhanced writeback error reporting with
+ errseq_t (pile #1)
+From: Jeff Layton <jlayton@redhat.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
+ Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>, Christoph
+ Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org,  linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+  linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Date: Tue, 20 Jun 2017 06:16:01 -0400
+In-Reply-To: <20170620092507.3998e728@canb.auug.org.au>
+References: <20170616193427.13955-1-jlayton@redhat.com>
+	 <1497889426.4654.7.camel@redhat.com>
+	 <20170620092507.3998e728@canb.auug.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This adds support for Directives in NVMe, particular for the Streams
-directive. Support for Directives is a new feature in NVMe 1.3. It
-allows a user to pass in information about where to store the data, so
-that it the device can do so most effiently. If an application is
-managing and writing data with different life times, mixing differently
-retentioned data onto the same locations on flash can cause write
-amplification to grow. This, in turn, will reduce performance and life
-time of the device.
+On Tue, 2017-06-20 at 09:25 +1000, Stephen Rothwell wrote:
+> Hi Jeff,
+> 
+> On Mon, 19 Jun 2017 12:23:46 -0400 Jeff Layton <jlayton@redhat.com> wrote:
+> > 
+> > If there are no major objections to this set, I'd like to have
+> > linux-next start picking it up to get some wider testing. What's the
+> > right vehicle for this, given that it touches stuff all over the tree?
+> > 
+> > I can see 3 potential options:
+> > 
+> > 1) I could just pull these into the branch that Stephen is already
+> > picking up for file-locks in my tree
+> > 
+> > 2) I could put them into a new branch, and have Stephen pull that one in
+> > addition to the file-locks branch
+> > 
+> > 3) It could go in via someone else's tree entirely (Andrew or Al's
+> > maybe?)
+> > 
+> > I'm fine with any of these. Anyone have thoughts?
+> 
+> Given that this is a one off development, either 1 or 3 (in Al's tree)
+> would be fine.  2 is a possibility (but people forget to ask me to
+> remove one shot trees :-()
+> 
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/nvme/host/core.c | 142 +++++++++++++++++++++++++++++++++++++++++++++--
- drivers/nvme/host/nvme.h |   4 ++
- include/linux/nvme.h     |  48 ++++++++++++++++
- 3 files changed, 190 insertions(+), 4 deletions(-)
+Ok -- yeah, I'd probably be one of those people who forget too...
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index aee37b73231d..fcccc1534f7b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -297,6 +297,100 @@ struct request *nvme_alloc_request(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(nvme_alloc_request);
- 
-+static int nvme_enable_streams(struct nvme_ctrl *ctrl)
-+{
-+	struct nvme_command c;
-+
-+	memset(&c, 0, sizeof(c));
-+
-+	c.directive.opcode = nvme_admin_directive_send;
-+	c.directive.nsid = cpu_to_le32(0xffffffff);
-+	c.directive.doper = NVME_DIR_SND_ID_OP_ENABLE;
-+	c.directive.dtype = NVME_DIR_IDENTIFY;
-+	c.directive.tdtype = NVME_DIR_STREAMS;
-+	c.directive.endir = NVME_DIR_ENDIR;
-+
-+	return nvme_submit_sync_cmd(ctrl->admin_q, &c, NULL, 0);
-+}
-+
-+static int nvme_get_stream_params(struct nvme_ctrl *ctrl,
-+				  struct streams_directive_params *s, u32 nsid)
-+{
-+	struct nvme_command c;
-+
-+	memset(&c, 0, sizeof(c));
-+	memset(s, 0, sizeof(*s));
-+
-+	c.directive.opcode = nvme_admin_directive_recv;
-+	c.directive.nsid = cpu_to_le32(nsid);
-+	c.directive.numd = sizeof(*s);
-+	c.directive.doper = NVME_DIR_RCV_ST_OP_PARAM;
-+	c.directive.dtype = NVME_DIR_STREAMS;
-+
-+	return nvme_submit_sync_cmd(ctrl->admin_q, &c, s, sizeof(*s));
-+}
-+
-+static int nvme_configure_directives(struct nvme_ctrl *ctrl)
-+{
-+	struct streams_directive_params s;
-+	int ret;
-+
-+	if (!(ctrl->oacs & NVME_CTRL_OACS_DIRECTIVES))
-+		return 0;
-+
-+	ret = nvme_enable_streams(ctrl);
-+	if (ret)
-+		return ret;
-+
-+	ret = nvme_get_stream_params(ctrl, &s, 0xffffffff);
-+	if (ret)
-+		return ret;
-+
-+	ctrl->nssa = le16_to_cpu(s.nssa);
-+	ctrl->nr_streams = min_t(unsigned, ctrl->nssa, BLK_MAX_WRITE_HINTS - 1);
-+	return 0;
-+}
-+
-+/*
-+ * Write hint number to stream mappings
-+ */
-+static const unsigned int stream_mappings[BLK_MAX_WRITE_HINTS][BLK_MAX_WRITE_HINTS] = {
-+	/* 0 or 1 stream, we don't use streams */
-+	{ 0, },
-+	{ 0, },
-+	/* collapse short+medium to short, and long+extreme to medium */
-+	{ WRITE_LIFE_NONE, WRITE_LIFE_SHORT, WRITE_LIFE_SHORT,
-+		WRITE_LIFE_MEDIUM, WRITE_LIFE_MEDIUM },
-+	/* collapse long+extreme to long */
-+	{ WRITE_LIFE_NONE, WRITE_LIFE_SHORT, WRITE_LIFE_MEDIUM,
-+		WRITE_LIFE_LONG, WRITE_LIFE_LONG },
-+	/* 4 streams, no collapsing needed */
-+	{ WRITE_LIFE_NONE, WRITE_LIFE_SHORT, WRITE_LIFE_MEDIUM,
-+		WRITE_LIFE_LONG, WRITE_LIFE_EXTREME },
-+};
-+
-+/*
-+ * Check if 'req' has a write hint associated with it. If it does, assign
-+ * a valid namespace stream to the write. If we haven't setup streams yet,
-+ * kick off configuration and ignore the hints until that has completed.
-+ */
-+static void nvme_assign_write_stream(struct nvme_ctrl *ctrl,
-+				     struct request *req, u16 *control,
-+				     u32 *dsmgmt)
-+{
-+	enum rw_hint streamid;
-+
-+	streamid = opf_to_write_hint(req->cmd_flags);
-+	if (streamid != WRITE_LIFE_NONE) {
-+		streamid = stream_mappings[ctrl->nr_streams][streamid - 1];
-+		*control |= NVME_RW_DTYPE_STREAMS;
-+		*dsmgmt |= streamid << 16;
-+	}
-+
-+	if (streamid < ARRAY_SIZE(req->q->write_hints))
-+		req->q->write_hints[streamid] += blk_rq_bytes(req) >> 9;
-+}
-+
- static inline void nvme_setup_flush(struct nvme_ns *ns,
- 		struct nvme_command *cmnd)
- {
-@@ -348,6 +442,7 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
- static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		struct request *req, struct nvme_command *cmnd)
- {
-+	struct nvme_ctrl *ctrl = ns->ctrl;
- 	u16 control = 0;
- 	u32 dsmgmt = 0;
- 
-@@ -375,6 +470,9 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 	cmnd->rw.slba = cpu_to_le64(nvme_block_nr(ns, blk_rq_pos(req)));
- 	cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
- 
-+	if (req_op(req) == REQ_OP_WRITE && ctrl->nr_streams)
-+		nvme_assign_write_stream(ctrl, req, &control, &dsmgmt);
-+
- 	if (ns->ms) {
- 		switch (ns->pi_type) {
- 		case NVME_NS_DPS_PI_TYPE3:
-@@ -1094,8 +1192,15 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct nvme_dsm_range) <
- 			NVME_DSM_MAX_RANGES);
- 
--	ns->queue->limits.discard_alignment = logical_block_size;
--	ns->queue->limits.discard_granularity = logical_block_size;
-+	if (ctrl->nr_streams && ns->sws && ns->sgs) {
-+		unsigned int sz = logical_block_size * ns->sws * ns->sgs;
-+
-+		ns->queue->limits.discard_alignment = sz;
-+		ns->queue->limits.discard_granularity = sz;
-+	} else {
-+		ns->queue->limits.discard_alignment = logical_block_size;
-+		ns->queue->limits.discard_granularity = logical_block_size;
-+	}
- 	blk_queue_max_discard_sectors(ns->queue, UINT_MAX);
- 	blk_queue_max_discard_segments(ns->queue, NVME_DSM_MAX_RANGES);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, ns->queue);
-@@ -1135,6 +1240,7 @@ static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
- static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- {
- 	struct nvme_ns *ns = disk->private_data;
-+	struct nvme_ctrl *ctrl = ns->ctrl;
- 	u16 bs;
- 
- 	/*
-@@ -1149,7 +1255,7 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 
- 	blk_mq_freeze_queue(disk->queue);
- 
--	if (ns->ctrl->ops->flags & NVME_F_METADATA_SUPPORTED)
-+	if (ctrl->ops->flags & NVME_F_METADATA_SUPPORTED)
- 		nvme_prep_integrity(disk, id, bs);
- 	blk_queue_logical_block_size(ns->queue, bs);
- 	if (ns->noiob)
-@@ -1161,7 +1267,7 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 	else
- 		set_capacity(disk, le64_to_cpup(&id->nsze) << (ns->lba_shift - 9));
- 
--	if (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM)
-+	if (ctrl->oncs & NVME_CTRL_ONCS_DSM)
- 		nvme_config_discard(ns);
- 	blk_mq_unfreeze_queue(disk->queue);
- }
-@@ -1766,6 +1872,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
- 		dev_pm_qos_hide_latency_tolerance(ctrl->device);
- 
- 	nvme_configure_apst(ctrl);
-+	nvme_configure_directives(ctrl);
- 
- 	ctrl->identified = true;
- 
-@@ -2158,6 +2265,32 @@ static struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	return ret;
- }
- 
-+static int nvme_setup_streams_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns)
-+{
-+	struct streams_directive_params s;
-+	int ret;
-+
-+	if (!ctrl->nr_streams)
-+		return 0;
-+
-+	ret = nvme_get_stream_params(ctrl, &s, ns->ns_id);
-+	if (ret)
-+		return ret;
-+
-+	ns->sws = le32_to_cpu(s.sws);
-+	ns->sgs = le16_to_cpu(s.sgs);
-+
-+	if (ns->sws) {
-+		unsigned int bs = 1 << ns->lba_shift;
-+
-+		blk_queue_io_min(ns->queue, bs * ns->sws);
-+		if (ns->sgs)
-+			blk_queue_io_opt(ns->queue, bs * ns->sws * ns->sgs);
-+	}
-+
-+	return 0;
-+}
-+
- static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- {
- 	struct nvme_ns *ns;
-@@ -2187,6 +2320,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 
- 	blk_queue_logical_block_size(ns->queue, 1 << ns->lba_shift);
- 	nvme_set_queue_limits(ctrl, ns->queue);
-+	nvme_setup_streams_ns(ctrl, ns);
- 
- 	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ec8c7363934d..f616835afc4c 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -147,6 +147,8 @@ struct nvme_ctrl {
- 	u16 oncs;
- 	u16 vid;
- 	u16 oacs;
-+	u16 nssa;
-+	u16 nr_streams;
- 	atomic_t abort_limit;
- 	u8 event_limit;
- 	u8 vwc;
-@@ -199,6 +201,8 @@ struct nvme_ns {
- 	unsigned ns_id;
- 	int lba_shift;
- 	u16 ms;
-+	u16 sgs;
-+	u32 sws;
- 	bool ext;
- 	u8 pi_type;
- 	unsigned long flags;
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 291587a0743f..f516a975bb21 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -253,6 +253,7 @@ enum {
- 	NVME_CTRL_ONCS_WRITE_ZEROES		= 1 << 3,
- 	NVME_CTRL_VWC_PRESENT			= 1 << 0,
- 	NVME_CTRL_OACS_SEC_SUPP                 = 1 << 0,
-+	NVME_CTRL_OACS_DIRECTIVES		= 1 << 5,
- 	NVME_CTRL_OACS_DBBUF_SUPP		= 1 << 7,
- };
- 
-@@ -304,6 +305,19 @@ enum {
- };
- 
- enum {
-+	NVME_DIR_IDENTIFY		= 0x00,
-+	NVME_DIR_STREAMS		= 0x01,
-+	NVME_DIR_SND_ID_OP_ENABLE	= 0x01,
-+	NVME_DIR_SND_ST_OP_REL_ID	= 0x01,
-+	NVME_DIR_SND_ST_OP_REL_RSC	= 0x02,
-+	NVME_DIR_RCV_ID_OP_PARAM	= 0x01,
-+	NVME_DIR_RCV_ST_OP_PARAM	= 0x01,
-+	NVME_DIR_RCV_ST_OP_STATUS	= 0x02,
-+	NVME_DIR_RCV_ST_OP_RESOURCE	= 0x03,
-+	NVME_DIR_ENDIR			= 0x01,
-+};
-+
-+enum {
- 	NVME_NS_FEAT_THIN	= 1 << 0,
- 	NVME_NS_FLBAS_LBA_MASK	= 0xf,
- 	NVME_NS_FLBAS_META_EXT	= 0x10,
-@@ -560,6 +574,7 @@ enum {
- 	NVME_RW_PRINFO_PRCHK_APP	= 1 << 11,
- 	NVME_RW_PRINFO_PRCHK_GUARD	= 1 << 12,
- 	NVME_RW_PRINFO_PRACT		= 1 << 13,
-+	NVME_RW_DTYPE_STREAMS		= 1 << 4,
- };
- 
- struct nvme_dsm_cmd {
-@@ -634,6 +649,8 @@ enum nvme_admin_opcode {
- 	nvme_admin_download_fw		= 0x11,
- 	nvme_admin_ns_attach		= 0x15,
- 	nvme_admin_keep_alive		= 0x18,
-+	nvme_admin_directive_send	= 0x19,
-+	nvme_admin_directive_recv	= 0x1a,
- 	nvme_admin_dbbuf		= 0x7C,
- 	nvme_admin_format_nvm		= 0x80,
- 	nvme_admin_security_send	= 0x81,
-@@ -797,6 +814,24 @@ struct nvme_get_log_page_command {
- 	__u32			rsvd14[2];
- };
- 
-+struct nvme_directive_cmd {
-+	__u8			opcode;
-+	__u8			flags;
-+	__u16			command_id;
-+	__le32			nsid;
-+	__u64			rsvd2[2];
-+	union nvme_data_ptr	dptr;
-+	__le32			numd;
-+	__u8			doper;
-+	__u8			dtype;
-+	__le16			dspec;
-+	__u8			endir;
-+	__u8			tdtype;
-+	__u16			rsvd15;
-+
-+	__u32			rsvd16[3];
-+};
-+
- /*
-  * Fabrics subcommands.
-  */
-@@ -927,6 +962,18 @@ struct nvme_dbbuf {
- 	__u32			rsvd12[6];
- };
- 
-+struct streams_directive_params {
-+	__u16	msl;
-+	__u16	nssa;
-+	__u16	nsso;
-+	__u8	rsvd[10];
-+	__u32	sws;
-+	__u16	sgs;
-+	__u16	nsa;
-+	__u16	nso;
-+	__u8	rsvd2[6];
-+};
-+
- struct nvme_command {
- 	union {
- 		struct nvme_common_command common;
-@@ -947,6 +994,7 @@ struct nvme_command {
- 		struct nvmf_property_set_command prop_set;
- 		struct nvmf_property_get_command prop_get;
- 		struct nvme_dbbuf dbbuf;
-+		struct nvme_directive_cmd directive;
- 	};
- };
- 
+In that case, I'll plan to go ahead and just merge these into my
+linux-next branch. That's easier than bugging others for it. Hopefully
+we won't have a lot in the way of merge conflicts.
+
+I'll see about getting this into branch later today, and hopefully we
+can get it into linux-next for tomorrow.
+
+Thanks!
 -- 
-2.7.4
+Jeff Layton <jlayton@redhat.com>
