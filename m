@@ -1,92 +1,91 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60006 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751729AbdF2Lk6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2017 07:40:58 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Jens Axboe <axboe@fb.com>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests] tests: use nproc to get number of CPUs for fio jobs
-Date: Thu, 29 Jun 2017 13:40:50 +0200
-Message-Id: <20170629114050.11733-1-jthumshirn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 05/10] fs: return if direct I/O will trigger writeback
+Date: Tue, 20 Jun 2017 07:05:44 -0500
+Message-Id: <20170620120549.23147-6-rgoldwyn@suse.de>
+In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
+References: <20170620120549.23147-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+
+Find out if the I/O will trigger a wait due to writeback. If yes,
+return -EAGAIN.
+
+Return -EINVAL for buffered AIO: there are multiple causes of
+delay such as page locks, dirty throttling logic, page loading
+from disk etc. which cannot be taken care of.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- tests/block/004 | 2 +-
- tests/block/005 | 2 +-
- tests/block/006 | 2 +-
- tests/block/008 | 2 +-
- tests/block/011 | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ mm/filemap.c | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
 
-diff --git a/tests/block/004 b/tests/block/004
-index 754d30260d63..2dc0f25b27cc 100755
---- a/tests/block/004
-+++ b/tests/block/004
-@@ -29,7 +29,7 @@ test_device() {
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 9b39a2390b9e..742034e56100 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2070,10 +2070,17 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 		loff_t size;
  
- 	FIO_PERF_FIELDS=("write iops")
- 	_fio_perf --bs=4k --rw=randwrite --norandommap --fsync=1 \
--		--number_ios=256 --numjobs=64 --name=flushes \
-+		--number_ios=256 --numjobs=$(nproc) --name=flushes \
- 		--filename="$TEST_DEV"
+ 		size = i_size_read(inode);
+-		retval = filemap_write_and_wait_range(mapping, iocb->ki_pos,
+-					iocb->ki_pos + count - 1);
+-		if (retval < 0)
+-			goto out;
++		if (iocb->ki_flags & IOCB_NOWAIT) {
++			if (filemap_range_has_page(mapping, iocb->ki_pos,
++						   iocb->ki_pos + count - 1))
++				return -EAGAIN;
++		} else {
++			retval = filemap_write_and_wait_range(mapping,
++						iocb->ki_pos,
++					        iocb->ki_pos + count - 1);
++			if (retval < 0)
++				goto out;
++		}
  
- 	echo "Test complete"
-diff --git a/tests/block/005 b/tests/block/005
-index 8f8b7065404e..4d4d536324ab 100755
---- a/tests/block/005
-+++ b/tests/block/005
-@@ -38,7 +38,7 @@ test_device() {
- 	# start fio job
- 	_run_fio --bs=4k --rw=randread --norandommap \
- 		--name=reads --filename="$TEST_DEV" --size="$size" \
--		--numjobs=8 --direct=1 &
-+		--numjobs=$(nproc) --direct=1 &
+ 		file_accessed(file);
  
- 	# while job is running, switch between schedulers
- 	while kill -0 $! 2>/dev/null; do
-diff --git a/tests/block/006 b/tests/block/006
-index 18e31cbf3809..2b8450104e46 100755
---- a/tests/block/006
-+++ b/tests/block/006
-@@ -43,7 +43,7 @@ test() {
- 		--filename=/dev/nullb0 --size=5g --direct=1
+@@ -2674,6 +2681,9 @@ inline ssize_t generic_write_checks(struct kiocb *iocb, struct iov_iter *from)
  
- 	# run async test
--	_fio_perf --bs=4k --ioengine=libaio --iodepth=8 --numjobs=4 \
-+	_fio_perf --bs=4k --ioengine=libaio --iodepth=8 --numjobs=$(nproc) \
- 		--rw=randread --norandommap --name=async \
- 		--filename=/dev/nullb0 --size=5g --direct=1
+ 	pos = iocb->ki_pos;
  
-diff --git a/tests/block/008 b/tests/block/008
-index 033fa0d5e7a5..db8fecc54676 100755
---- a/tests/block/008
-+++ b/tests/block/008
-@@ -38,7 +38,7 @@ test_device() {
- 	# start fio job
- 	_run_fio --bs=4k --rw=randread --norandommap \
- 		--name=reads --filename="$TEST_DEV" --size="$size" \
--		--numjobs=8 --direct=1 &
-+		--numjobs=$(nproc) --direct=1 &
++	if ((iocb->ki_flags & IOCB_NOWAIT) && !(iocb->ki_flags & IOCB_DIRECT))
++		return -EINVAL;
++
+ 	if (limit != RLIM_INFINITY) {
+ 		if (iocb->ki_pos >= limit) {
+ 			send_sig(SIGXFSZ, current, 0);
+@@ -2742,9 +2752,17 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
+ 	write_len = iov_iter_count(from);
+ 	end = (pos + write_len - 1) >> PAGE_SHIFT;
  
- 	# while job is running, hotplug CPUs randomly
- 	while kill -0 $! 2>/dev/null; do
-diff --git a/tests/block/011 b/tests/block/011
-index 65ed3dfa7092..53ed7e037d21 100755
---- a/tests/block/011
-+++ b/tests/block/011
-@@ -42,7 +42,7 @@ test_device() {
- 	# start fio job
- 	_run_fio --bs=4k --rw=randread --norandommap \
- 		--name=reads --filename="$TEST_DEV" --size="$size" \
--		--numjobs=8 --direct=1 --ignore_error=EIO,ENXIO,ENODEV &
-+		--numjobs=$(nproc) --direct=1 --ignore_error=EIO,ENXIO,ENODEV &
+-	written = filemap_write_and_wait_range(mapping, pos, pos + write_len - 1);
+-	if (written)
+-		goto out;
++	if (iocb->ki_flags & IOCB_NOWAIT) {
++		/* If there are pages to writeback, return */
++		if (filemap_range_has_page(inode->i_mapping, pos,
++					   pos + iov_iter_count(from)))
++			return -EAGAIN;
++	} else {
++		written = filemap_write_and_wait_range(mapping, pos,
++							pos + write_len - 1);
++		if (written)
++			goto out;
++	}
  
- 	while kill -0 $! 2>/dev/null; do
- 		echo 0 > "/sys/bus/pci/devices/${pdev}/enable"
+ 	/*
+ 	 * After a write we want buffered reads to be sure to go to disk to get
 -- 
-2.12.3
+2.12.0
