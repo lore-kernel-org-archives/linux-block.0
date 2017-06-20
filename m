@@ -1,9 +1,13 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <BATV+36629bb5a09a6c0004be+5049+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 20 Jun 2017 05:43:55 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, adilger@dilger.ca,
+	martin.petersen@oracle.com
 Subject: Re: [PATCH 04/11] fs: add support for allowing applications to pass
  in write life time hints
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- adilger@dilger.ca, martin.petersen@oracle.com
+Message-ID: <20170620124355.GA6199@infradead.org>
 References: <1497729594-4707-5-git-send-email-axboe@kernel.dk>
  <20170619062706.GC2311@infradead.org>
  <b04642e6-4ecc-f2e8-8184-6fff302d3d0b@kernel.dk>
@@ -14,28 +18,17 @@ References: <1497729594-4707-5-git-send-email-axboe@kernel.dk>
  <3e6f7b97-8372-b268-f55a-cc88812c1a68@kernel.dk>
  <20170620085739.GB31386@infradead.org>
  <6f1be22c-b172-3645-f0ab-8124188756df@kernel.dk>
- <20170620124355.GA6199@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6793e5b9-b324-727a-6227-69b5fe233bc4@kernel.dk>
-Date: Tue, 20 Jun 2017 06:45:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170620124355.GA6199@infradead.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6f1be22c-b172-3645-f0ab-8124188756df@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/20/2017 06:43 AM, Christoph Hellwig wrote:
-> On Tue, Jun 20, 2017 at 06:43:10AM -0600, Jens Axboe wrote:
->>> Question:  IFF we can get the per-file hints to propagate to the
->>> writeback code (which I think is pretty easy for ext4/xfs/bdev, not
->>> sure about btrfs) do we even need the per-inode ones at all?
->>
->> How is that possible, the file could be long gone by the time
->> the writeback kicks in?
+On Tue, Jun 20, 2017 at 06:43:10AM -0600, Jens Axboe wrote:
+> > Question:  IFF we can get the per-file hints to propagate to the
+> > writeback code (which I think is pretty easy for ext4/xfs/bdev, not
+> > sure about btrfs) do we even need the per-inode ones at all?
 > 
-> each time a page/buffer is dirtied we can propagate the hint.
+> How is that possible, the file could be long gone by the time
+> the writeback kicks in?
 
-To the page? Where do you want to find room for that?
-
-
--- 
-Jens Axboe
+each time a page/buffer is dirtied we can propagate the hint.
