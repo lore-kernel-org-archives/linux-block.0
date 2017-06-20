@@ -1,97 +1,52 @@
-Return-Path: <elena.reshetova@intel.com>
-From: Elena Reshetova <elena.reshetova@intel.com>
-To: axboe@kernel.dk
-Cc: james.bottomley@hansenpartnership.com,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	gregkh@linuxfoundation.org,
-	keescook@chromium.org,
-	fujita.tomonori@lab.ntt.co.jp,
-	mingo@redhat.com,
-	clm@fb.com,
-	jbacik@fb.com,
-	dsterba@suse.com,
-	Elena Reshetova <elena.reshetova@intel.com>,
-	Hans Liljestrand <ishkamiel@gmail.com>,
-	David Windsor <dwindsor@gmail.com>
-Subject: [PATCH 3/5] block: convert blkcg_gq.refcnt from atomic_t to refcount_t
-Date: Tue, 27 Jun 2017 14:39:58 +0300
-Message-Id: <1498563601-10949-4-git-send-email-elena.reshetova@intel.com>
-In-Reply-To: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
-References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:26062 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751767AbdFTXUj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Jun 2017 19:20:39 -0400
+Date: Tue, 20 Jun 2017 19:29:14 -0400
+From: Keith Busch <keith.busch@intel.com>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, linux-block@vger.kernel.org,
+        stable@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH] pci/vmd: Move srcu cleanup after bus/irq domain removal
+Message-ID: <20170620232913.GF24415@localhost.localdomain>
+References: <1497996784-9177-1-git-send-email-jonathan.derrick@intel.com>
+ <a2ea4fb0-f451-ab6e-05db-1bf0a7a74807@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <a2ea4fb0-f451-ab6e-05db-1bf0a7a74807@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-refcount_t type and corresponding API should be
-used instead of atomic_t when the variable is used as
-a reference counter. This allows to avoid accidental
-refcounter overflows that might lead to use-after-free
-situations.
+> On 06/20/2017 04:13 PM, Jon Derrick wrote:
+> Recent __call_srcu changes have exposed that we need to cleanup srcu
+> structures after pci_stop_root_bus calls into vmd_msi_free.
 
-Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
-Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: David Windsor <dwindsor@gmail.com>
----
- block/blk-cgroup.c         | 2 +-
- include/linux/blk-cgroup.h | 9 ++++-----
- 2 files changed, 5 insertions(+), 6 deletions(-)
+Adding the obligatory:
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 0480892..3762908 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -107,7 +107,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 	blkg->q = q;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
--	atomic_set(&blkg->refcnt, 1);
-+	refcount_set(&blkg->refcnt, 1);
+Fixes: 3906b91844d6 ("PCI: vmd: Use SRCU as a local RCU to prevent delaying global RCU")
  
- 	/* root blkg uses @q->root_rl, init rl only for !root blkgs */
- 	if (blkcg != &blkcg_root) {
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 01b62e7..e54f048 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -19,6 +19,7 @@
- #include <linux/radix-tree.h>
- #include <linux/blkdev.h>
- #include <linux/atomic.h>
-+#include <linux/refcount.h>
- 
- /* percpu_counter batch for blkg_[rw]stats, per-cpu drift doesn't matter */
- #define BLKG_STAT_CPU_BATCH	(INT_MAX / 2)
-@@ -122,7 +123,7 @@ struct blkcg_gq {
- 	struct request_list		rl;
- 
- 	/* reference count */
--	atomic_t			refcnt;
-+	refcount_t			refcnt;
- 
- 	/* is this blkg online? protected by both blkcg and q locks */
- 	bool				online;
-@@ -354,8 +355,7 @@ static inline int blkg_path(struct blkcg_gq *blkg, char *buf, int buflen)
-  */
- static inline void blkg_get(struct blkcg_gq *blkg)
- {
--	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
--	atomic_inc(&blkg->refcnt);
-+	refcount_inc(&blkg->refcnt);
- }
- 
- void __blkg_release_rcu(struct rcu_head *rcu);
-@@ -366,8 +366,7 @@ void __blkg_release_rcu(struct rcu_head *rcu);
-  */
- static inline void blkg_put(struct blkcg_gq *blkg)
- {
--	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
--	if (atomic_dec_and_test(&blkg->refcnt))
-+	if (refcount_dec_and_test(&blkg->refcnt))
- 		call_rcu(&blkg->rcu_head, __blkg_release_rcu);
- }
- 
--- 
-2.7.4
+> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+> Acked-by: Keith Busch <keith.busch@intel.com>
+> Cc: <stable@vger.kernel.org> # 4.11
+> ---
+>  drivers/pci/host/vmd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/pci/host/vmd.c b/drivers/pci/host/vmd.c
+> index e27ad2a..642a182 100644
+> --- a/drivers/pci/host/vmd.c
+> +++ b/drivers/pci/host/vmd.c
+> @@ -733,10 +733,10 @@ static void vmd_remove(struct pci_dev *dev)
+>  	struct vmd_dev *vmd = pci_get_drvdata(dev);
+>  
+>  	vmd_detach_resources(vmd);
+> -	vmd_cleanup_srcu(vmd);
+>  	sysfs_remove_link(&vmd->dev->dev.kobj, "domain");
+>  	pci_stop_root_bus(vmd->bus);
+>  	pci_remove_root_bus(vmd->bus);
+> +	vmd_cleanup_srcu(vmd);
+>  	vmd_teardown_dma_ops(vmd);
+>  	irq_domain_remove(vmd->irq_domain);
+>  }
+> 
