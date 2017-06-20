@@ -1,9 +1,13 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <BATV+36629bb5a09a6c0004be+5049+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 20 Jun 2017 05:47:38 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, adilger@dilger.ca,
+	martin.petersen@oracle.com
 Subject: Re: [PATCH 04/11] fs: add support for allowing applications to pass
  in write life time hints
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- adilger@dilger.ca, martin.petersen@oracle.com
+Message-ID: <20170620124738.GA16917@infradead.org>
 References: <b04642e6-4ecc-f2e8-8184-6fff302d3d0b@kernel.dk>
  <8db675e7-b868-bae1-784a-33cba67d0874@kernel.dk>
  <20170619185805.GC32047@infradead.org>
@@ -14,25 +18,13 @@ References: <b04642e6-4ecc-f2e8-8184-6fff302d3d0b@kernel.dk>
  <6f1be22c-b172-3645-f0ab-8124188756df@kernel.dk>
  <20170620124355.GA6199@infradead.org>
  <6793e5b9-b324-727a-6227-69b5fe233bc4@kernel.dk>
- <20170620124738.GA16917@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6b1897c4-400b-faee-38d1-d677c054debc@kernel.dk>
-Date: Tue, 20 Jun 2017 06:51:34 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170620124738.GA16917@infradead.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6793e5b9-b324-727a-6227-69b5fe233bc4@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/20/2017 06:47 AM, Christoph Hellwig wrote:
-> On Tue, Jun 20, 2017 at 06:45:45AM -0600, Jens Axboe wrote:
->> To the page? Where do you want to find room for that?
-> 
-> In the page we don't.  In the buffer_head we have plenty (as will
-> the replacement for it if I ever get time to get back to that)
+On Tue, Jun 20, 2017 at 06:45:45AM -0600, Jens Axboe wrote:
+> To the page? Where do you want to find room for that?
 
-That sounds fragile... Is it really worth it to avoid stealing three
-bits in the inode? Do we have buffer_heads attached everywhere, that
-sounds surprising to me.
-
--- 
-Jens Axboe
+In the page we don't.  In the buffer_head we have plenty (as will
+the replacement for it if I ever get time to get back to that)
