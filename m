@@ -1,82 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52282 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753255AbdFRPWu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:50 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 30/30] nvme: Add queue freeze/unfreeze handling on controller resets
-Date: Sun, 18 Jun 2017 18:22:04 +0300
-Message-Id: <1497799324-19598-31-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v4 08/12] block: Check locking assumptions at runtime
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
+ <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20170619220801.12557-1-bart.vanassche@wdc.com>
+ <20170619220801.12557-9-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <ea9f57ed-242e-341e-76ec-86d3bc4eda26@suse.de>
+Date: Tue, 20 Jun 2017 08:40:45 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170619220801.12557-9-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Just copy what we have in nvme-pci. It's a generic flow anyway.
+On 06/20/2017 12:07 AM, Bart Van Assche wrote:
+> From: Bart Van Assche <bart.vanassche@sandisk.com>
+> 
+> Instead of documenting the locking assumptions of most block layer
+> functions as a comment, use lockdep_assert_held() to verify locking
+> assumptions at runtime.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c    | 71 +++++++++++++++++++++++++++++++++++------------------
+>  block/blk-flush.c   |  8 +++---
+>  block/blk-merge.c   |  3 +++
+>  block/blk-tag.c     | 15 +++++------
+>  block/blk-timeout.c |  4 ++-
+>  5 files changed, 64 insertions(+), 37 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/core.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+Cheers,
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f4800b8e47a0..959b6c39f22c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2901,15 +2901,40 @@ EXPORT_SYMBOL_GPL(nvme_configure_admin_queue);
- 
- static void nvme_teardown_ctrl(struct nvme_ctrl *ctrl, bool shutdown)
- {
-+	bool dead = true;
-+
- 	nvme_stop_keep_alive(ctrl);
- 	cancel_work_sync(&ctrl->err_work);
- 	cancel_delayed_work_sync(&ctrl->reconnect_work);
- 
- 	if (ctrl->max_queues > 1) {
-+		u32 csts;
-+
-+		if (!ctrl->ops->reg_read32(ctrl, NVME_REG_CSTS, &csts)) {
-+			nvme_start_freeze(ctrl);
-+			dead = !!((csts & NVME_CSTS_CFS) ||
-+				!(csts & NVME_CSTS_RDY));
-+		}
-+
-+		/*
-+		 * Give the controller a chance to complete all entered requests
-+		 * if doing a safe shutdown.
-+		 */
-+		if (!dead && shutdown)
-+			nvme_wait_freeze_timeout(ctrl, NVME_IO_TIMEOUT);
-+
- 		nvme_stop_queues(ctrl);
- 		blk_mq_tagset_busy_iter(ctrl->tagset,
- 					nvme_cancel_request, ctrl);
- 		nvme_destroy_io_queues(ctrl, shutdown);
-+
-+		/*
-+		 * The driver will not be starting up queues again if shutting
-+		 * down so must flush all entered requests to their failed
-+		 * completion to avoid deadlocking blk-mq hot-cpu notifier.
-+		 */
-+		if (shutdown)
-+			nvme_start_queues(ctrl);
- 	}
- 
- 	if (shutdown)
-@@ -2991,6 +3016,8 @@ static void nvme_reset_ctrl_work(struct work_struct *work)
- 
- 	if (ctrl->queue_count > 1) {
- 		nvme_start_queues(ctrl);
-+		nvme_wait_freeze(ctrl);
-+		nvme_unfreeze(ctrl);
- 		nvme_queue_scan(ctrl);
- 		nvme_queue_async_events(ctrl);
- 	}
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
