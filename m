@@ -1,81 +1,89 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH v3 2/4] blk-mq-debugfs: Show requeue list
-Date: Thu, 1 Jun 2017 08:55:11 -0700
-Message-ID: <20170601155513.26712-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170601155513.26712-1-bart.vanassche@sandisk.com>
-References: <20170601155513.26712-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 02/10] fs: Introduce filemap_range_has_page()
+Date: Tue, 20 Jun 2017 07:05:41 -0500
+Message-Id: <20170620120549.23147-3-rgoldwyn@suse.de>
+In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
+References: <20170620120549.23147-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-When verifying whether or not a blk-mq driver forgot to kick the
-requeue list after having requeued a request it is important to
-be able to verify the contents of the requeue list. Hence export
-that list through debugfs.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
+filemap_range_has_page() return true if the file's mapping has
+a page within the range mentioned. This function will be used
+to check if a write() call will cause a writeback of previous
+writes.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/blk-mq-debugfs.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ include/linux/fs.h |  2 ++
+ mm/filemap.c       | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index d56ddd7a1285..8b06a12c1461 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -308,6 +308,37 @@ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 96a1a1fa54a9..0d34f5b5a6b0 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2518,6 +2518,8 @@ extern int filemap_fdatawait(struct address_space *);
+ extern void filemap_fdatawait_keep_errors(struct address_space *);
+ extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
+ 				   loff_t lend);
++extern bool filemap_range_has_page(struct address_space *, loff_t lstart,
++				  loff_t lend);
+ extern int filemap_write_and_wait(struct address_space *mapping);
+ extern int filemap_write_and_wait_range(struct address_space *mapping,
+ 				        loff_t lstart, loff_t lend);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 6f1be573a5e6..9b39a2390b9e 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -376,6 +376,38 @@ int filemap_flush(struct address_space *mapping)
  }
- EXPORT_SYMBOL_GPL(blk_mq_debugfs_rq_show);
+ EXPORT_SYMBOL(filemap_flush);
  
-+static void *queue_requeue_list_start(struct seq_file *m, loff_t *pos)
-+	__acquires(&q->requeue_lock)
++/**
++ * filemap_range_has_page - check if a page exists in range.
++ * @mapping:           address space within which to check
++ * @start_byte:        offset in bytes where the range starts
++ * @end_byte:          offset in bytes where the range ends (inclusive)
++ *
++ * Find at least one page in the range supplied, usually used to check if
++ * direct writing in this range will trigger a writeback.
++ */
++bool filemap_range_has_page(struct address_space *mapping,
++			   loff_t start_byte, loff_t end_byte)
 +{
-+	struct request_queue *q = m->private;
++	pgoff_t index = start_byte >> PAGE_SHIFT;
++	pgoff_t end = end_byte >> PAGE_SHIFT;
++	struct pagevec pvec;
++	bool ret;
 +
-+	spin_lock_irq(&q->requeue_lock);
-+	return seq_list_start(&q->requeue_list, *pos);
++	if (end_byte < start_byte)
++		return false;
++
++	if (mapping->nrpages == 0)
++		return false;
++
++	pagevec_init(&pvec, 0);
++	if (!pagevec_lookup(&pvec, mapping, index, 1))
++		return false;
++	ret = (pvec.pages[0]->index <= end);
++	pagevec_release(&pvec);
++	return ret;
 +}
++EXPORT_SYMBOL(filemap_range_has_page);
 +
-+static void *queue_requeue_list_next(struct seq_file *m, void *v, loff_t *pos)
-+{
-+	struct request_queue *q = m->private;
-+
-+	return seq_list_next(v, &q->requeue_list, pos);
-+}
-+
-+static void queue_requeue_list_stop(struct seq_file *m, void *v)
-+	__releases(&q->requeue_lock)
-+{
-+	struct request_queue *q = m->private;
-+
-+	spin_unlock_irq(&q->requeue_lock);
-+}
-+
-+static const struct seq_operations queue_requeue_list_seq_ops = {
-+	.start	= queue_requeue_list_start,
-+	.next	= queue_requeue_list_next,
-+	.stop	= queue_requeue_list_stop,
-+	.show	= blk_mq_debugfs_rq_show,
-+};
-+
- static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
- 	__acquires(&hctx->lock)
+ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 				     loff_t start_byte, loff_t end_byte)
  {
-@@ -665,6 +696,7 @@ const struct file_operations blk_mq_debugfs_fops = {
- 
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, queue_poll_stat_show},
-+	{"requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops},
- 	{"state", 0600, queue_state_show, queue_state_write},
- 	{},
- };
 -- 
-2.12.2
+2.12.0
