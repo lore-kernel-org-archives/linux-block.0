@@ -1,89 +1,44 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/9] blk-mq: expose stream write hints through debugfs
-Date: Tue, 20 Jun 2017 18:22:00 -0600
-Message-Id: <1498004526-4543-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
-References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v4 01/12] blk-mq: Reduce blk_mq_hw_ctx size
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
+ <hare@suse.com>, Omar Sandoval <osandov@fb.com>
+References: <20170619220801.12557-1-bart.vanassche@wdc.com>
+ <20170619220801.12557-2-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <c5b7cfb5-4de5-7bb9-e20c-e189de65c25a@suse.de>
+Date: Tue, 20 Jun 2017 08:31:48 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170619220801.12557-2-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Useful to verify that things are working the way they should.
-Reading the file will return number of kb written with each
-write hint. Writing the file will reset the statistics. No care
-is taken to ensure that we don't race on updates.
+On 06/20/2017 12:07 AM, Bart Van Assche wrote:
+> From: Bart Van Assche <bart.vanassche@sandisk.com>
+> 
+> Since the srcu structure is rather large (184 bytes on an x86-64
+> system with kernel debugging disabled), only allocate it if needed.
+> 
+> Reported-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq.c         | 30 ++++++++++++++++++++++--------
+>  include/linux/blk-mq.h |  5 +++--
+>  2 files changed, 25 insertions(+), 10 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Drivers will write to q->write_hints[] if they handle a given
-write hint.
+Cheers,
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq-debugfs.c | 24 ++++++++++++++++++++++++
- include/linux/blkdev.h |  3 +++
- 2 files changed, 27 insertions(+)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 9edebbdce0bd..9ebc2945f991 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -135,6 +135,29 @@ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
- 	}
- }
- 
-+static int queue_write_hint_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_WRITE_HINTS; i++)
-+		seq_printf(m, "hint%d: %llu\n", i, q->write_hints[i]);
-+
-+	return 0;
-+}
-+
-+static ssize_t queue_write_hint_store(void *data, const char __user *buf,
-+				      size_t count, loff_t *ppos)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_WRITE_HINTS; i++)
-+		q->write_hints[i] = 0;
-+
-+	return count;
-+}
-+
- static int queue_poll_stat_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
-@@ -730,6 +753,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, queue_poll_stat_show},
- 	{"requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops},
- 	{"state", 0600, queue_state_show, queue_state_write},
-+	{"write_hints", 0600, queue_write_hint_show, queue_write_hint_store},
- 	{},
- };
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 22cfba64ce81..687394b70924 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -586,6 +586,9 @@ struct request_queue {
- 
- 	size_t			cmd_size;
- 	void			*rq_alloc_data;
-+
-+#define BLK_MAX_WRITE_HINTS	5
-+	u64			write_hints[BLK_MAX_WRITE_HINTS];
- };
- 
- #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
