@@ -1,124 +1,155 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>
-Subject: [PATCH v5 00/12] More patches for kernel v4.13
-Date: Tue, 20 Jun 2017 11:15:37 -0700
-Message-ID: <20170620181549.24903-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: axboe@kernel.dk
+Cc: viro@ZenIV.linux.org.uk,
+	hch@lst.de,
+	jack@suse.cz,
+	akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 09/10] xfs: nowait aio support
+Date: Tue, 20 Jun 2017 07:05:48 -0500
+Message-Id: <20170620120549.23147-10-rgoldwyn@suse.de>
+In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
+References: <20170620120549.23147-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-This patch series contains one patch that reduces the size of struct
-blk_mq_hw_ctx, a few patches that simplify some of the block layer code and
-also patches that improve the block layer documentation. Please consider these
-patches for kernel v4.13. This patch series survives the following tests:
+If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
+immediately.
 
-srp-test/run_tests -r 30 -e none
-srp-test/run_tests -r 30 -e deadline
-srp-test/run_tests -r 30 -e kyber
-srp-test/run_tests -r 30 -e bfq
+IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
+if it needs allocation either due to file extension, writing to a hole,
+or COW or waiting for other DIOs to finish.
 
-The basis for these patches is your for-next branch.
+Return -EAGAIN if we don't have extent list in memory.
 
-Thanks,
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+---
+ fs/xfs/xfs_file.c  | 32 ++++++++++++++++++++++++++------
+ fs/xfs/xfs_iomap.c | 22 ++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 6 deletions(-)
 
-Bart.
-
-Changes between v4 and v5:
-* Addressed Jens' and Hannes' review comments for v4 of this patch series.
-  The most significant change is in patch "block: Introduce request_queue
-  .initialize_rq_fn()".
-* Fixed a bug that was introduced in v3 due to rebasing in patch "blk-mq:
-  Initialize .rq_flags in blk_mq_rq_ctx_init()", namely that the new
-  .rq_flags assignment could clear the RQF_MQ_INFLIGHT flag.
-
-Changes between v3 and v4:
-* Rebased on top of Jens' current for-next branch.
-* Renamed patch "blk-mq: Initialize a request before assigning a tag" into
-  "blk-mq: Initialize .rq_flags in blk_mq_rq_ctx_init()" and removed the
-  __blk_mq_alloc_request() changes from that patch since these changes no
-  longer apply to the current block layer code.
-
-Changes between v2 and v3:
-* Added patch "blk-mq: Reduce blk_mq_hw_ctx size".
-* Removed patch "block: Rename blk_mq_rq_{to,from}_pdu()".
-* Addressed Christoph's review comments about patch "block: Introduce
-  request_queue.initialize_rq_fn()".
-* Rebased (and retested) this patch series on top of a merge of Jens'
-  for-next and for-linus branches.
-
-Changes between v1 and v2:
-* Addressed Christoph's comment about moving the .initialize_rq_fn() call
-  from blk_rq_init() / blk_mq_rq_ctx_init() into blk_get_request().
-* Left out patch "scsi: Make scsi_ioctl_reset() pass the request queue pointer
-  to blk_rq_init()" since it's no longer needed.
-* Restored the scsi_req_init() call in ide_prep_sense().
-* Combined the two patches that reduce the blk_mq_hw_ctx size into a single
-  patch.
-* Modified patch "blk-mq: Initialize a request before assigning a tag" such
-  that .tag and .internal_tag are no longer initialized twice.
-* Removed WARN_ON_ONCE(q->mq_ops) from blk_queue_bypass_end() because this
-  function is used by both blk-sq and blk-mq.
-* Added several new patches, e.g. "block: Rename blk_mq_rq_{to,from}_pdu()".
-
-Bart Van Assche (12):
-  blk-mq: Reduce blk_mq_hw_ctx size
-  block: Make request operation type argument declarations consistent
-  block: Introduce request_queue.initialize_rq_fn()
-  block: Make most scsi_req_init() calls implicit
-  block: Change argument type of scsi_req_init()
-  blk-mq: Initialize .rq_flags in blk_mq_rq_ctx_init()
-  block: Add a comment above queue_lockdep_assert_held()
-  block: Check locking assumptions at runtime
-  block: Document what queue type each function is intended for
-  blk-mq: Document locking assumptions
-  block: Constify disk_type
-  blk-mq: Warn when attempting to run a hardware queue that is not
-    mapped
-
- block/blk-core.c                   | 130 ++++++++++++++++++++++++++++---------
- block/blk-flush.c                  |   8 ++-
- block/blk-merge.c                  |   3 +
- block/blk-mq-sched.c               |   2 +
- block/blk-mq.c                     |  55 +++++++++++-----
- block/blk-tag.c                    |  15 ++---
- block/blk-timeout.c                |   4 +-
- block/blk.h                        |   2 +
- block/bsg.c                        |   1 -
- block/genhd.c                      |   4 +-
- block/scsi_ioctl.c                 |  13 ++--
- drivers/block/pktcdvd.c            |   1 -
- drivers/cdrom/cdrom.c              |   1 -
- drivers/ide/ide-atapi.c            |   3 +-
- drivers/ide/ide-cd.c               |   1 -
- drivers/ide/ide-cd_ioctl.c         |   1 -
- drivers/ide/ide-devsets.c          |   1 -
- drivers/ide/ide-disk.c             |   1 -
- drivers/ide/ide-ioctls.c           |   2 -
- drivers/ide/ide-park.c             |   2 -
- drivers/ide/ide-pm.c               |   2 -
- drivers/ide/ide-probe.c            |   6 +-
- drivers/ide/ide-tape.c             |   1 -
- drivers/ide/ide-taskfile.c         |   1 -
- drivers/scsi/osd/osd_initiator.c   |   2 -
- drivers/scsi/osst.c                |   1 -
- drivers/scsi/scsi_error.c          |   1 -
- drivers/scsi/scsi_lib.c            |  17 ++++-
- drivers/scsi/scsi_transport_sas.c  |   2 +
- drivers/scsi/sg.c                  |   2 -
- drivers/scsi/st.c                  |   1 -
- drivers/target/target_core_pscsi.c |   2 -
- fs/nfsd/blocklayout.c              |   1 -
- include/linux/blk-mq.h             |  13 ++--
- include/linux/blkdev.h             |  14 +++-
- include/scsi/scsi_cmnd.h           |   1 +
- include/scsi/scsi_request.h        |   2 +-
- 37 files changed, 211 insertions(+), 108 deletions(-)
-
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 5fb5a0958a14..17f27a2fb5e2 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -237,7 +237,11 @@ xfs_file_dax_read(
+ 	if (!count)
+ 		return 0; /* skip atime */
+ 
+-	xfs_ilock(ip, XFS_IOLOCK_SHARED);
++	if (!xfs_ilock_nowait(ip, XFS_IOLOCK_SHARED)) {
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		xfs_ilock(ip, XFS_IOLOCK_SHARED);
++	}
+ 	ret = dax_iomap_rw(iocb, to, &xfs_iomap_ops);
+ 	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
+ 
+@@ -541,7 +545,11 @@ xfs_file_dio_aio_write(
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
+ 
+-	xfs_ilock(ip, iolock);
++	if (!xfs_ilock_nowait(ip, iolock)) {
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		xfs_ilock(ip, iolock);
++	}
+ 
+ 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
+ 	if (ret)
+@@ -553,9 +561,15 @@ xfs_file_dio_aio_write(
+ 	 * otherwise demote the lock if we had to take the exclusive lock
+ 	 * for other reasons in xfs_file_aio_write_checks.
+ 	 */
+-	if (unaligned_io)
+-		inode_dio_wait(inode);
+-	else if (iolock == XFS_IOLOCK_EXCL) {
++	if (unaligned_io) {
++		/* If we are going to wait for other DIO to finish, bail */
++		if (iocb->ki_flags & IOCB_NOWAIT) {
++			if (atomic_read(&inode->i_dio_count))
++				return -EAGAIN;
++		} else {
++			inode_dio_wait(inode);
++		}
++	} else if (iolock == XFS_IOLOCK_EXCL) {
+ 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
+@@ -585,7 +599,12 @@ xfs_file_dax_write(
+ 	size_t			count;
+ 	loff_t			pos;
+ 
+-	xfs_ilock(ip, iolock);
++	if (!xfs_ilock_nowait(ip, iolock)) {
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		xfs_ilock(ip, iolock);
++	}
++
+ 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
+ 	if (ret)
+ 		goto out;
+@@ -892,6 +911,7 @@ xfs_file_open(
+ 		return -EFBIG;
+ 	if (XFS_FORCED_SHUTDOWN(XFS_M(inode->i_sb)))
+ 		return -EIO;
++	file->f_mode |= FMODE_AIO_NOWAIT;
+ 	return 0;
+ }
+ 
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 94e5bdf7304c..05dc87e8c1f5 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -995,6 +995,11 @@ xfs_file_iomap_begin(
+ 		lockmode = xfs_ilock_data_map_shared(ip);
+ 	}
+ 
++	if ((flags & IOMAP_NOWAIT) && !(ip->i_df.if_flags & XFS_IFEXTENTS)) {
++		error = -EAGAIN;
++		goto out_unlock;
++	}
++
+ 	ASSERT(offset <= mp->m_super->s_maxbytes);
+ 	if ((xfs_fsize_t)offset + length > mp->m_super->s_maxbytes)
+ 		length = mp->m_super->s_maxbytes - offset;
+@@ -1016,6 +1021,15 @@ xfs_file_iomap_begin(
+ 
+ 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
+ 		if (flags & IOMAP_DIRECT) {
++			/*
++			 * A reflinked inode will result in CoW alloc.
++			 * FIXME: It could still overwrite on unshared extents
++			 * and not need allocation.
++			 */
++			if (flags & IOMAP_NOWAIT) {
++				error = -EAGAIN;
++				goto out_unlock;
++			}
+ 			/* may drop and re-acquire the ilock */
+ 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
+ 					&lockmode);
+@@ -1033,6 +1047,14 @@ xfs_file_iomap_begin(
+ 
+ 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
+ 		/*
++		 * If nowait is set bail since we are going to make
++		 * allocations.
++		 */
++		if (flags & IOMAP_NOWAIT) {
++			error = -EAGAIN;
++			goto out_unlock;
++		}
++		/*
+ 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
+ 		 * pages to keep the chunks of work done where somewhat symmetric
+ 		 * with the work writeback does. This is a completely arbitrary
 -- 
-2.13.1
+2.12.0
