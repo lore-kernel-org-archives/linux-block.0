@@ -1,9 +1,13 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <BATV+36629bb5a09a6c0004be+5049+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 20 Jun 2017 05:56:20 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, adilger@dilger.ca,
+	martin.petersen@oracle.com
 Subject: Re: [PATCH 04/11] fs: add support for allowing applications to pass
  in write life time hints
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- adilger@dilger.ca, martin.petersen@oracle.com
+Message-ID: <20170620125620.GA26153@infradead.org>
 References: <20170619185805.GC32047@infradead.org>
  <5259a1ba-1c5f-2d89-3b47-3a81cd0a3e4e@kernel.dk>
  <0c3c6a33-77c5-337e-66e0-49fe22d3cc4e@kernel.dk>
@@ -14,39 +18,19 @@ References: <20170619185805.GC32047@infradead.org>
  <6793e5b9-b324-727a-6227-69b5fe233bc4@kernel.dk>
  <20170620124738.GA16917@infradead.org>
  <6b1897c4-400b-faee-38d1-d677c054debc@kernel.dk>
- <20170620125620.GA26153@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <b99179f7-b6ec-1537-c749-8c11306e64e9@kernel.dk>
-Date: Tue, 20 Jun 2017 07:00:57 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170620125620.GA26153@infradead.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6b1897c4-400b-faee-38d1-d677c054debc@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/20/2017 06:56 AM, Christoph Hellwig wrote:
-> On Tue, Jun 20, 2017 at 06:51:34AM -0600, Jens Axboe wrote:
->> That sounds fragile... Is it really worth it to avoid stealing three
->> bits in the inode? Do we have buffer_heads attached everywhere, that
->> sounds surprising to me.
-> 
-> I'm not concerned about saving a few bits - we'll use those elsewhere
-> anyway.  I'm concerned about settings on one file descriptor having
-> an effect on other fds that doesn't look intended.  It's not the
-> end of the world, as multiple writers to the same file should
-> better be aware of each other, but the semantics of setting these
-> on a per-inode level still stink.
+On Tue, Jun 20, 2017 at 06:51:34AM -0600, Jens Axboe wrote:
+> That sounds fragile... Is it really worth it to avoid stealing three
+> bits in the inode? Do we have buffer_heads attached everywhere, that
+> sounds surprising to me.
 
-For O_DIRECT writes, the file level hints work perfectly fine. For
-buffered writes, we need some way to defer retrieving this hint to
-when the flush happens. Seems very sad and dated to rely on
-storing these in buffer_heads, which we've been trying to kill
-for more than a decade.
-
-The per inode hint isn't perfect for multiple buffered writers in
-a single file. While I think it'd be great to have something bullet
-proof there, I also don't think it's a troublesome use cases for
-streams.
-
-
--- 
-Jens Axboe
+I'm not concerned about saving a few bits - we'll use those elsewhere
+anyway.  I'm concerned about settings on one file descriptor having
+an effect on other fds that doesn't look intended.  It's not the
+end of the world, as multiple writers to the same file should
+better be aware of each other, but the semantics of setting these
+on a per-inode level still stink.
