@@ -1,61 +1,143 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:35635 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751397AbdFZJ6M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 05:58:12 -0400
-Received: by mail-wm0-f54.google.com with SMTP id w126so2843317wme.0
-        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:11 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 01/20] lightnvm: re-convert ppa format on I/O failure
-Date: Mon, 26 Jun 2017 11:57:10 +0200
-Message-Id: <1498471049-25505-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
-References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Bart Van Assche
+	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
+	<osandov@fb.com>
+Subject: [PATCH v5 01/12] blk-mq: Reduce blk_mq_hw_ctx size
+Date: Tue, 20 Jun 2017 11:15:38 -0700
+Message-ID: <20170620181549.24903-2-bart.vanassche@wdc.com>
+In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
+References: <20170620181549.24903-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-In case of a failure when submitting a request, convert the ppa_list
-addresses to the target format so that it can interpret ppas for
-recovery
+From: Bart Van Assche <bart.vanassche@sandisk.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Since the srcu structure is rather large (184 bytes on an x86-64
+system with kernel debugging disabled), only allocate it if needed.
+
+Reported-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Omar Sandoval <osandov@fb.com>
 ---
- drivers/lightnvm/core.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/blk-mq.c         | 30 ++++++++++++++++++++++--------
+ include/linux/blk-mq.h |  5 +++--
+ 2 files changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 440deb54031a..9ff348f69370 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -641,6 +641,7 @@ EXPORT_SYMBOL(nvm_max_phys_sects);
- int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- {
- 	struct nvm_dev *dev = tgt_dev->parent;
-+	int ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ca03cd4b263f..3e0cc11b1a90 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -172,7 +172,7 @@ void blk_mq_quiesce_queue(struct request_queue *q)
  
- 	if (!dev->ops->submit_io)
- 		return -ENODEV;
-@@ -648,7 +649,12 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- 	nvm_rq_tgt_to_dev(tgt_dev, rqd);
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (hctx->flags & BLK_MQ_F_BLOCKING)
+-			synchronize_srcu(&hctx->queue_rq_srcu);
++			synchronize_srcu(hctx->queue_rq_srcu);
+ 		else
+ 			rcu = true;
+ 	}
+@@ -1094,9 +1094,9 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 	} else {
+ 		might_sleep();
  
- 	rqd->dev = tgt_dev;
--	return dev->ops->submit_io(dev, rqd);
-+
-+	/* In case of error, fail with right address format */
-+	ret = dev->ops->submit_io(dev, rqd);
-+	if (ret)
-+		nvm_rq_dev_to_tgt(tgt_dev, rqd);
-+	return ret;
+-		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
++		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+ 		blk_mq_sched_dispatch_requests(hctx);
+-		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+ 	}
  }
- EXPORT_SYMBOL(nvm_submit_io);
  
+@@ -1505,9 +1505,9 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ 		might_sleep();
+ 
+-		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
++		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+ 		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
+-		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+ 	}
+ }
+ 
+@@ -1853,7 +1853,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 		set->ops->exit_hctx(hctx, hctx_idx);
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+-		cleanup_srcu_struct(&hctx->queue_rq_srcu);
++		cleanup_srcu_struct(hctx->queue_rq_srcu);
+ 
+ 	blk_mq_remove_cpuhp(hctx);
+ 	blk_free_flush_queue(hctx->fq);
+@@ -1926,7 +1926,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 		goto free_fq;
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+-		init_srcu_struct(&hctx->queue_rq_srcu);
++		init_srcu_struct(hctx->queue_rq_srcu);
+ 
+ 	blk_mq_debugfs_register_hctx(q, hctx);
+ 
+@@ -2201,6 +2201,20 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
+ }
+ EXPORT_SYMBOL(blk_mq_init_queue);
+ 
++static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
++{
++	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
++
++	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, queue_rq_srcu),
++			   __alignof__(struct blk_mq_hw_ctx)) !=
++		     sizeof(struct blk_mq_hw_ctx));
++
++	if (tag_set->flags & BLK_MQ_F_BLOCKING)
++		hw_ctx_size += sizeof(struct srcu_struct);
++
++	return hw_ctx_size;
++}
++
+ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 						struct request_queue *q)
+ {
+@@ -2215,7 +2229,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 			continue;
+ 
+ 		node = blk_mq_hw_queue_to_node(q->mq_map, i);
+-		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
++		hctxs[i] = kzalloc_node(blk_mq_hw_ctx_size(set),
+ 					GFP_KERNEL, node);
+ 		if (!hctxs[i])
+ 			break;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index f1bd13ae8f57..3f2c22a42df6 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -39,8 +39,6 @@ struct blk_mq_hw_ctx {
+ 	struct blk_mq_tags	*tags;
+ 	struct blk_mq_tags	*sched_tags;
+ 
+-	struct srcu_struct	queue_rq_srcu;
+-
+ 	unsigned long		queued;
+ 	unsigned long		run;
+ #define BLK_MQ_MAX_DISPATCH_ORDER	7
+@@ -62,6 +60,9 @@ struct blk_mq_hw_ctx {
+ 	struct dentry		*debugfs_dir;
+ 	struct dentry		*sched_debugfs_dir;
+ #endif
++
++	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
++	struct srcu_struct	queue_rq_srcu[0];
+ };
+ 
+ struct blk_mq_tag_set {
 -- 
-2.7.4
+2.13.1
