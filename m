@@ -1,70 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44933 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750916AbdFREkw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:40:52 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:59 +1000
-Subject: [PATCH 13/13] block: don't check for BIO_MAX_PAGES in
- blk_bio_segment_split()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073949.23258.4498656312654103359.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 04/11] fs: add support for allowing applications to pass
+ in write life time hints
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ adilger@dilger.ca, martin.petersen@oracle.com
+References: <20170619185805.GC32047@infradead.org>
+ <5259a1ba-1c5f-2d89-3b47-3a81cd0a3e4e@kernel.dk>
+ <0c3c6a33-77c5-337e-66e0-49fe22d3cc4e@kernel.dk>
+ <3e6f7b97-8372-b268-f55a-cc88812c1a68@kernel.dk>
+ <20170620085739.GB31386@infradead.org>
+ <6f1be22c-b172-3645-f0ab-8124188756df@kernel.dk>
+ <20170620124355.GA6199@infradead.org>
+ <6793e5b9-b324-727a-6227-69b5fe233bc4@kernel.dk>
+ <20170620124738.GA16917@infradead.org>
+ <6b1897c4-400b-faee-38d1-d677c054debc@kernel.dk>
+ <20170620125620.GA26153@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b99179f7-b6ec-1537-c749-8c11306e64e9@kernel.dk>
+Date: Tue, 20 Jun 2017 07:00:57 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170620125620.GA26153@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-blk_bio_segment_split() makes sure bios have no more than
-BIO_MAX_PAGES entries in the bi_io_vec.
-This was done because bio_clone_bioset() (when given a
-mempool bioset) could not handle larger io_vecs.
+On 06/20/2017 06:56 AM, Christoph Hellwig wrote:
+> On Tue, Jun 20, 2017 at 06:51:34AM -0600, Jens Axboe wrote:
+>> That sounds fragile... Is it really worth it to avoid stealing three
+>> bits in the inode? Do we have buffer_heads attached everywhere, that
+>> sounds surprising to me.
+> 
+> I'm not concerned about saving a few bits - we'll use those elsewhere
+> anyway.  I'm concerned about settings on one file descriptor having
+> an effect on other fds that doesn't look intended.  It's not the
+> end of the world, as multiple writers to the same file should
+> better be aware of each other, but the semantics of setting these
+> on a per-inode level still stink.
 
-No driver uses bio_clone_bioset() any more, they all
-use bio_clone_fast() if anything, and bio_clone_fast()
-doesn't clone the bi_io_vec.
+For O_DIRECT writes, the file level hints work perfectly fine. For
+buffered writes, we need some way to defer retrieving this hint to
+when the flush happens. Seems very sad and dated to rely on
+storing these in buffer_heads, which we've been trying to kill
+for more than a decade.
 
-The main user of of bio_clone_bioset() at this level
-is bounce.c, and bouncing now happens before blk_bio_segment_split(),
-so that is not of concern.
+The per inode hint isn't perfect for multiple buffered writers in
+a single file. While I think it'd be great to have something bullet
+proof there, I also don't think it's a troublesome use cases for
+streams.
 
-So remove the big helpful comment and the code.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: NeilBrown <neilb@suse.com>
----
- block/blk-merge.c |   16 ----------------
- 1 file changed, 16 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index e7862e9dcc39..cea544ec5d96 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -108,25 +108,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	bool do_split = true;
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
--	unsigned bvecs = 0;
- 
- 	bio_for_each_segment(bv, bio, iter) {
- 		/*
--		 * With arbitrary bio size, the incoming bio may be very
--		 * big. We have to split the bio into small bios so that
--		 * each holds at most BIO_MAX_PAGES bvecs because
--		 * bio_clone_bioset() can fail to allocate big bvecs.
--		 *
--		 * Those drivers which will need to use bio_clone_bioset()
--		 * should tell us in some way.  For now, impose the
--		 * BIO_MAX_PAGES limit on all queues.
--		 *
--		 * TODO: handle users of bio_clone_bioset() differently.
--		 */
--		if (bvecs++ >= BIO_MAX_PAGES)
--			goto split;
--
--		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
- 		 */
+-- 
+Jens Axboe
