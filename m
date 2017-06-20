@@ -1,95 +1,36 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	adam.manzanares@wdc.com,
-	viro@zeniv.linux.org.uk,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 02/10] fs: Introduce filemap_range_has_page()
-Date: Tue,  6 Jun 2017 06:19:31 -0500
-Message-Id: <20170606111939.27272-3-rgoldwyn@suse.de>
-In-Reply-To: <20170606111939.27272-1-rgoldwyn@suse.de>
-References: <20170606111939.27272-1-rgoldwyn@suse.de>
+Return-Path: <hch@lst.de>
+Date: Tue, 20 Jun 2017 08:04:28 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Ye Xiaolong <xiaolong.ye@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org, lkp@01.org,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [lkp-robot] [scsi]  ebc76736f2: fio.write_bw_MBps -4%
+	regression
+Message-ID: <20170620060428.GA7051@lst.de>
+References: <20170616082755.22832-1-hch@lst.de> <20170619060318.GC23108@yexl-desktop> <20170619070923.GA13129@lst.de> <20170619074943.GA20152@yexl-desktop> <20170619084153.GA14788@lst.de> <20170619085236.GB20152@yexl-desktop> <20170619093913.GA15040@lst.de> <20170620021636.GH14764@yexl-desktop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170620021636.GH14764@yexl-desktop>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Tue, Jun 20, 2017 at 10:16:36AM +0800, Ye Xiaolong wrote:
+> Hi, Christoph
+> 
+> On 06/19, Christoph Hellwig wrote:
+> >On Mon, Jun 19, 2017 at 04:52:36PM +0800, Ye Xiaolong wrote:
+> >> >I've not seen a compile-time option for the MQ I/O scheduler (unlike
+> >> >the legacy one), so the way to change it would be to echo the name to
+> >> >/sys/block/<device>/queue/scheduler 
+> >> 
+> >> echo mq-deadline > /sys/block/<device>/queue/scheduler ?
+> >> 
+> >> I'll try and post the results once I get it.
+> >
+> >Thanks!
+> 
+> I've re-run the test and cat /sys/block/sda/queue/scheduler and
+> /sys/block/sda/queue/scheduler, and both showed "[mq-deadline] kyber none",
+> Does it mean they have already set as 'mq-deadline'?
 
-filemap_range_has_page() return true if the file's mapping has
-a page within the range mentioned. This function will be used
-to check if a write() call will cause a writeback of previous
-writes.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- include/linux/fs.h |  2 ++
- mm/filemap.c       | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
-
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index f53867140f43..dc0ab585cd56 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2517,6 +2517,8 @@ extern int filemap_fdatawait(struct address_space *);
- extern void filemap_fdatawait_keep_errors(struct address_space *);
- extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
- 				   loff_t lend);
-+extern int filemap_range_has_page(struct address_space *, loff_t lstart,
-+				  loff_t lend);
- extern int filemap_write_and_wait(struct address_space *mapping);
- extern int filemap_write_and_wait_range(struct address_space *mapping,
- 				        loff_t lstart, loff_t lend);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 6f1be573a5e6..87aba7698584 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -376,6 +376,39 @@ int filemap_flush(struct address_space *mapping)
- }
- EXPORT_SYMBOL(filemap_flush);
- 
-+/**
-+ * filemap_range_has_page - check if a page exists in range.
-+ * @mapping:           address space structure to wait for
-+ * @start_byte:        offset in bytes where the range starts
-+ * @end_byte:          offset in bytes where the range ends (inclusive)
-+ *
-+ * Find at least one page in the range supplied, usually used to check if
-+ * direct writing in this range will trigger a writeback.
-+ */
-+int filemap_range_has_page(struct address_space *mapping,
-+			   loff_t start_byte, loff_t end_byte)
-+{
-+	pgoff_t index = start_byte >> PAGE_SHIFT;
-+	pgoff_t end = end_byte >> PAGE_SHIFT;
-+	struct pagevec pvec;
-+	int ret;
-+
-+	if (end_byte < start_byte)
-+		return 0;
-+
-+	if (mapping->nrpages == 0)
-+		return 0;
-+
-+	pagevec_init(&pvec, 0);
-+	ret = pagevec_lookup(&pvec, mapping, index, 1);
-+	if (!ret)
-+		return 0;
-+	ret = (pvec.pages[0]->index <= end);
-+	pagevec_release(&pvec);
-+	return ret;
-+}
-+EXPORT_SYMBOL(filemap_range_has_page);
-+
- static int __filemap_fdatawait_range(struct address_space *mapping,
- 				     loff_t start_byte, loff_t end_byte)
- {
--- 
-2.12.0
+Yes, it seems like you're already using mq-deadline, but bfq isn't even
+available.
