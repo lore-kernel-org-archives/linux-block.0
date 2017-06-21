@@ -1,234 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44296 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752942AbdFOSRa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2017 14:17:30 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V3 12/12] block: use standard blktrace API to output cgroup info for debug notes
-Date: Thu, 15 Jun 2017 11:17:20 -0700
-Message-Id: <cc428e2498baeb38348d233919e3ba0192673fce.1497549994.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Neil Brown <neilb@suse.com>, "Hannes
+ Reinecke" <hare@suse.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 1/3] block: Declare local symbols static
+Date: Wed, 21 Jun 2017 10:55:45 -0700
+Message-ID: <20170621175547.21692-2-bart.vanassche@wdc.com>
+In-Reply-To: <20170621175547.21692-1-bart.vanassche@wdc.com>
+References: <20170621175547.21692-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+Avoid that building with W=1 causes the compiler to complain that
+a declaration for bounce_bio_set and bounce_bio_split is missing.
 
-Currently cfq/bfq/blk-throttle output cgroup info in trace in their own
-way. Now we have standard blktrace API for this, so convert them to use
-it.
-
-Note, this changes the behavior a little bit. cgroup info isn't output
-by default, we only do this with 'blk_cgroup' option enabled. cgroup
-info isn't output as a string by default too, we only do this with
-'blk_cgname' option enabled. Also cgroup info is output in different
-position of the note string. I think these behavior changes aren't a big
-issue (actually we make trace data shorter which is good), since the
-blktrace note is solely for debugging.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+References: commit a8821f3f32be ("block: Improvements to bounce-buffer handling")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Neil Brown <neilb@suse.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/bfq-iosched.h          | 13 ++++++++-----
- block/blk-throttle.c         |  6 ++----
- block/cfq-iosched.c          | 15 ++++++---------
- include/linux/blk-cgroup.h   | 14 --------------
- include/linux/blktrace_api.h | 13 +++++++++----
- kernel/trace/blktrace.c      | 12 ++++++++++--
- 6 files changed, 35 insertions(+), 38 deletions(-)
+ block/bounce.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 5c3bf98..ea6a6eb 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -916,13 +916,16 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+diff --git a/block/bounce.c b/block/bounce.c
+index 17d77613c471..916ee9a9a216 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -26,7 +26,7 @@
+ #define POOL_SIZE	64
+ #define ISA_POOL_SIZE	16
  
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
--	blk_add_trace_msg((bfqd)->queue, "bfq%d%c %s " fmt, (bfqq)->pid,\
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
--			bfqq_group(bfqq)->blkg_path, ##args);		\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
-+			"bfq%d%c " fmt, (bfqq)->pid,			\
-+			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
- } while (0)
+-struct bio_set *bounce_bio_set, *bounce_bio_split;
++static struct bio_set *bounce_bio_set, *bounce_bio_split;
+ static mempool_t *page_pool, *isa_page_pool;
  
--#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	\
--	blk_add_trace_msg((bfqd)->queue, "%s " fmt, (bfqg)->blkg_path, ##args)
-+#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+		bfqg_to_blkg(bfqg)->blkcg, fmt, ##args);		\
-+} while (0)
- 
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a6ebd2b..6a4c4c4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -373,10 +373,8 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- 	if (likely(!blk_trace_note_message_enabled(__td->queue)))	\
- 		break;							\
- 	if ((__tg)) {							\
--		char __pbuf[128];					\
--									\
--		blkg_path(tg_to_blkg(__tg), __pbuf, sizeof(__pbuf));	\
--		blk_add_trace_msg(__td->queue, "throtl %s " fmt, __pbuf, ##args); \
-+		blk_add_cgroup_trace_msg(__td->queue,			\
-+			tg_to_blkg(__tg)->blkcg, "throtl " fmt, ##args);\
- 	} else {							\
- 		blk_add_trace_msg(__td->queue, "throtl " fmt, ##args);	\
- 	}								\
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 3d5c289..0fb78fb 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -656,20 +656,17 @@ static inline void cfqg_put(struct cfq_group *cfqg)
- }
- 
- #define cfq_log_cfqq(cfqd, cfqq, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg((cfqq)->cfqg), __pbuf, sizeof(__pbuf));	\
--	blk_add_trace_msg((cfqd)->queue, "cfq%d%c%c %s " fmt, (cfqq)->pid, \
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg((cfqq)->cfqg)->blkcg,		\
-+			"cfq%d%c%c " fmt, (cfqq)->pid,			\
- 			cfq_cfqq_sync((cfqq)) ? 'S' : 'A',		\
- 			cfqq_type((cfqq)) == SYNC_NOIDLE_WORKLOAD ? 'N' : ' ',\
--			  __pbuf, ##args);				\
-+			  ##args);					\
- } while (0)
- 
- #define cfq_log_cfqg(cfqd, cfqg, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg(cfqg), __pbuf, sizeof(__pbuf));		\
--	blk_add_trace_msg((cfqd)->queue, "%s " fmt, __pbuf, ##args);	\
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg(cfqg)->blkcg, fmt, ##args);	\
- } while (0)
- 
- static inline void cfqg_stats_update_io_add(struct cfq_group *cfqg,
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index fe10b85..4df5d32 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -334,19 +334,6 @@ static inline struct blkcg *cpd_to_blkcg(struct blkcg_policy_data *cpd)
- }
- 
- /**
-- * blkg_path - format cgroup path of blkg
-- * @blkg: blkg of interest
-- * @buf: target buffer
-- * @buflen: target buffer length
-- *
-- * Format the path of the cgroup of @blkg into @buf.
-- */
--static inline int blkg_path(struct blkcg_gq *blkg, char *buf, int buflen)
--{
--	return cgroup_path(blkg->blkcg->css.cgroup, buf, buflen);
--}
--
--/**
-  * blkg_get - get a blkg reference
-  * @blkg: blkg to get
-  *
-@@ -759,7 +746,6 @@ static inline struct blkcg *bio_blkcg(struct bio *bio) { return NULL; }
- static inline struct blkg_policy_data *blkg_to_pd(struct blkcg_gq *blkg,
- 						  struct blkcg_policy *pol) { return NULL; }
- static inline struct blkcg_gq *pd_to_blkg(struct blkg_policy_data *pd) { return NULL; }
--static inline char *blkg_path(struct blkcg_gq *blkg) { return NULL; }
- static inline void blkg_get(struct blkcg_gq *blkg) { }
- static inline void blkg_put(struct blkcg_gq *blkg) { }
- 
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index d2e9085..67b4d4d 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -28,10 +28,12 @@ struct blk_trace {
- 	atomic_t dropped;
- };
- 
-+struct blkcg;
-+
- extern int blk_trace_ioctl(struct block_device *, unsigned, char __user *);
- extern void blk_trace_shutdown(struct request_queue *);
--extern __printf(2, 3)
--void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-+extern __printf(3, 4)
-+void __trace_note_message(struct blk_trace *, struct blkcg *blkcg, const char *fmt, ...);
- 
- /**
-  * blk_add_trace_msg - Add a (simple) message to the blktrace stream
-@@ -46,12 +48,14 @@ void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-  *     NOTE: Can not use 'static inline' due to presence of var args...
-  *
-  **/
--#define blk_add_trace_msg(q, fmt, ...)					\
-+#define blk_add_cgroup_trace_msg(q, cg, fmt, ...)			\
- 	do {								\
- 		struct blk_trace *bt = (q)->blk_trace;			\
- 		if (unlikely(bt))					\
--			__trace_note_message(bt, fmt, ##__VA_ARGS__);	\
-+			__trace_note_message(bt, cg, fmt, ##__VA_ARGS__);\
- 	} while (0)
-+#define blk_add_trace_msg(q, fmt, ...)					\
-+	blk_add_cgroup_trace_msg(q, NULL, fmt, ##__VA_ARGS__)
- #define BLK_TN_MAX_MSG		128
- 
- static inline bool blk_trace_note_message_enabled(struct request_queue *q)
-@@ -82,6 +86,7 @@ extern struct attribute_group blk_trace_attr_group;
- # define blk_trace_startstop(q, start)			(-ENOTTY)
- # define blk_trace_remove(q)				(-ENOTTY)
- # define blk_add_trace_msg(q, fmt, ...)			do { } while (0)
-+# define blk_add_cgroup_trace_msg(q, cg, fmt, ...)	do { } while (0)
- # define blk_trace_remove_sysfs(dev)			do { } while (0)
- # define blk_trace_note_message_enabled(q)		(false)
- static inline int blk_trace_init_sysfs(struct device *dev)
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 48dd5a3..9e2fa4a 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -154,7 +154,8 @@ static void trace_note_time(struct blk_trace *bt)
- 	local_irq_restore(flags);
- }
- 
--void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
-+void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
-+	const char *fmt, ...)
- {
- 	int n;
- 	va_list args;
-@@ -178,7 +179,14 @@ void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
- 	n = vscnprintf(buf, BLK_TN_MAX_MSG, fmt, args);
- 	va_end(args);
- 
-+	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
-+		blkcg = NULL;
-+#ifdef CONFIG_BLK_CGROUP
-+	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
-+		blkcg ? cgroup_get_node_id(blkcg->css.cgroup) : NULL);
-+#else
- 	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n, NULL);
-+#endif
- 	local_irq_restore(flags);
- }
- EXPORT_SYMBOL_GPL(__trace_note_message);
-@@ -375,7 +383,7 @@ static ssize_t blk_msg_write(struct file *filp, const char __user *buffer,
- 		return PTR_ERR(msg);
- 
- 	bt = filp->private_data;
--	__trace_note_message(bt, "%s", msg);
-+	__trace_note_message(bt, NULL, "%s", msg);
- 	kfree(msg);
- 
- 	return count;
+ #if defined(CONFIG_HIGHMEM) || defined(CONFIG_NEED_BOUNCE_POOL)
 -- 
-2.9.3
+2.13.1
