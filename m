@@ -1,104 +1,49 @@
-Return-Path: <elena.reshetova@intel.com>
-From: Elena Reshetova <elena.reshetova@intel.com>
-To: axboe@kernel.dk
-Cc: james.bottomley@hansenpartnership.com,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	gregkh@linuxfoundation.org,
-	keescook@chromium.org,
-	fujita.tomonori@lab.ntt.co.jp,
-	mingo@redhat.com,
-	clm@fb.com,
-	jbacik@fb.com,
-	dsterba@suse.com,
-	Elena Reshetova <elena.reshetova@intel.com>,
-	Hans Liljestrand <ishkamiel@gmail.com>,
-	David Windsor <dwindsor@gmail.com>
-Subject: [PATCH 2/5] block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
-Date: Tue, 27 Jun 2017 14:39:57 +0300
-Message-Id: <1498563601-10949-3-git-send-email-elena.reshetova@intel.com>
-In-Reply-To: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
-References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v5 06/12] blk-mq: Initialize .rq_flags in
+ blk_mq_rq_ctx_init()
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
+ <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+ <20170620181549.24903-7-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5167ae87-33e4-1c47-2408-8741c997ca75@suse.de>
+Date: Wed, 21 Jun 2017 08:55:17 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170620181549.24903-7-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-refcount_t type and corresponding API should be
-used instead of atomic_t when the variable is used as
-a reference counter. This allows to avoid accidental
-refcounter overflows that might lead to use-after-free
-situations.
+On 06/20/2017 08:15 PM, Bart Van Assche wrote:
+> From: Bart Van Assche <bart.vanassche@sandisk.com>
+> 
+> Initialization of blk-mq requests is a bit weird: blk_mq_rq_ctx_init()
+> is called after a value has been assigned to .rq_flags and .rq_flags
+> is initialized in __blk_mq_finish_request(). Initialize .rq_flags in
+> blk_mq_rq_ctx_init() instead of relying on __blk_mq_finish_request().
+> Moving the initialization of .rq_flags is fine because all changes
+> and tests of .rq_flags occur between blk_get_request() and finishing
+> a request.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
-Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: David Windsor <dwindsor@gmail.com>
----
- block/blk-tag.c        | 8 ++++----
- include/linux/blkdev.h | 3 ++-
- 2 files changed, 6 insertions(+), 5 deletions(-)
+Cheers,
 
-diff --git a/block/blk-tag.c b/block/blk-tag.c
-index 07cc329..d83555e 100644
---- a/block/blk-tag.c
-+++ b/block/blk-tag.c
-@@ -35,7 +35,7 @@ EXPORT_SYMBOL(blk_queue_find_tag);
-  */
- void blk_free_tags(struct blk_queue_tag *bqt)
- {
--	if (atomic_dec_and_test(&bqt->refcnt)) {
-+	if (refcount_dec_and_test(&bqt->refcnt)) {
- 		BUG_ON(find_first_bit(bqt->tag_map, bqt->max_depth) <
- 							bqt->max_depth);
- 
-@@ -130,7 +130,7 @@ static struct blk_queue_tag *__blk_queue_init_tags(struct request_queue *q,
- 	if (init_tag_map(q, tags, depth))
- 		goto fail;
- 
--	atomic_set(&tags->refcnt, 1);
-+	refcount_set(&tags->refcnt, 1);
- 	tags->alloc_policy = alloc_policy;
- 	tags->next_tag = 0;
- 	return tags;
-@@ -180,7 +180,7 @@ int blk_queue_init_tags(struct request_queue *q, int depth,
- 		queue_flag_set(QUEUE_FLAG_QUEUED, q);
- 		return 0;
- 	} else
--		atomic_inc(&tags->refcnt);
-+		refcount_inc(&tags->refcnt);
- 
- 	/*
- 	 * assign it, all done
-@@ -225,7 +225,7 @@ int blk_queue_resize_tags(struct request_queue *q, int new_depth)
- 	 * Currently cannot replace a shared tag map with a new
- 	 * one, so error out if this is the case
- 	 */
--	if (atomic_read(&bqt->refcnt) != 1)
-+	if (refcount_read(&bqt->refcnt) != 1)
- 		return -EBUSY;
- 
- 	/*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ddd36b..3efc8cf 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -26,6 +26,7 @@
- #include <linux/percpu-refcount.h>
- #include <linux/scatterlist.h>
- #include <linux/blkzoned.h>
-+#include <linux/refcount.h>
- 
- struct module;
- struct scsi_ioctl_command;
-@@ -293,7 +294,7 @@ struct blk_queue_tag {
- 	unsigned long *tag_map;		/* bit map of free/busy tags */
- 	int max_depth;			/* what we will send to device */
- 	int real_max_depth;		/* what the array can hold */
--	atomic_t refcnt;		/* map can be shared */
-+	refcount_t refcnt;		/* map can be shared */
- 	int alloc_policy;		/* tag allocation policy */
- 	int next_tag;			/* next tag */
- };
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
