@@ -1,60 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:34863 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752455AbdF3P45 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 11:56:57 -0400
-Received: by mail-wm0-f45.google.com with SMTP id w126so113903697wme.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:56:56 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 05/10] lightnvm: pblk: use right metadata buffer for recovery
-Date: Fri, 30 Jun 2017 17:56:38 +0200
-Message-Id: <1498838203-21539-6-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
-References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	linux-nvme@lists.infradead.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 6/9] ext4: add support for passing in write hints for buffered writes
+Date: Tue, 20 Jun 2017 18:22:03 -0600
+Message-Id: <1498004526-4543-7-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Fix bad metadata buffer assignations introduced when refactoring the
-medatada write path.
-
-Fixes: dd2a43437337 lightnvm: pblk: sched. metadata on write thread
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/lightnvm/pblk-recovery.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/ext4/page-io.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 7e1c314f2766..6d58659fa3da 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -801,7 +801,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 	set_bit(meta_line, &l_mg->meta_bitmap);
- 	smeta = l_mg->sline_meta[meta_line];
- 	emeta = l_mg->eline_meta[meta_line];
--	smeta_buf = smeta->buf;
-+	smeta_buf = (struct line_smeta *)smeta;
- 	spin_unlock(&l_mg->free_lock);
- 
- 	/* Order data lines using their sequence number */
-@@ -888,9 +888,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 		nr_bb = bitmap_weight(line->blk_bitmap, lm->blk_per_line);
- 		off -= nr_bb * geo->sec_per_pl;
- 
--		memset(&emeta->buf, 0, lm->emeta_len[0]);
--		line->emeta = emeta;
- 		line->emeta_ssec = off;
-+		line->emeta = emeta;
-+		memset(line->emeta->buf, 0, lm->emeta_len[0]);
- 
- 		if (pblk_line_read_emeta(pblk, line, line->emeta->buf)) {
- 			pblk_recov_l2p_from_oob(pblk, line);
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 930ca0fc9a0f..92834b702728 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -350,6 +350,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
+ 	if (bio) {
+ 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
+ 				  REQ_SYNC : 0;
++		io_op_flags |= write_hint_to_opf(inode_write_hint(io->io_end->inode));
+ 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
+ 		submit_bio(io->io_bio);
+ 	}
+@@ -397,6 +398,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
+ 		ret = io_submit_init_bio(io, bh);
+ 		if (ret)
+ 			return ret;
++		io->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
+ 	}
+ 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
+ 	if (ret != bh->b_size)
 -- 
 2.7.4
