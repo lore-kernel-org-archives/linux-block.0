@@ -1,91 +1,45 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: axboe@kernel.dk
-Cc: viro@ZenIV.linux.org.uk,
-	hch@lst.de,
-	jack@suse.cz,
-	akpm@linux-foundation.org,
-	linux-block@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 01/10] fs: Separate out kiocb flags setup based on RWF_* flags
-Date: Tue, 20 Jun 2017 07:05:40 -0500
-Message-Id: <20170620120549.23147-2-rgoldwyn@suse.de>
-In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
-References: <20170620120549.23147-1-rgoldwyn@suse.de>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v5 10/12] blk-mq: Document locking assumptions
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
+ <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+ <20170620181549.24903-11-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <795753af-8160-e387-f9ed-ab6392d0bb9b@suse.de>
+Date: Wed, 21 Jun 2017 08:57:08 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170620181549.24903-11-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On 06/20/2017 08:15 PM, Bart Van Assche wrote:
+> From: Bart Van Assche <bart.vanassche@sandisk.com>
+> 
+> Document the locking assumptions in functions that modify
+> blk_mq_ctx.rq_list to make it easier for humans to verify
+> this code.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-sched.c | 2 ++
+>  block/blk-mq.c       | 4 ++++
+>  2 files changed, 6 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Also added RWF_SUPPORTED to encompass all flags.
+Cheers,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/read_write.c         | 12 +++---------
- include/linux/fs.h      | 14 ++++++++++++++
- include/uapi/linux/fs.h |  2 ++
- 3 files changed, 19 insertions(+), 9 deletions(-)
-
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 47c1d4484df9..53c816c61122 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -678,16 +678,10 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 	struct kiocb kiocb;
- 	ssize_t ret;
- 
--	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
--		return -EOPNOTSUPP;
--
- 	init_sync_kiocb(&kiocb, filp);
--	if (flags & RWF_HIPRI)
--		kiocb.ki_flags |= IOCB_HIPRI;
--	if (flags & RWF_DSYNC)
--		kiocb.ki_flags |= IOCB_DSYNC;
--	if (flags & RWF_SYNC)
--		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	ret = kiocb_set_rw_flags(&kiocb, flags);
-+	if (ret)
-+		return ret;
- 	kiocb.ki_pos = *ppos;
- 
- 	if (type == READ)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 023f0324762b..96a1a1fa54a9 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3057,6 +3057,20 @@ static inline int iocb_flags(struct file *file)
- 	return res;
- }
- 
-+static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
-+{
-+	if (unlikely(flags & ~RWF_SUPPORTED))
-+		return -EOPNOTSUPP;
-+
-+	if (flags & RWF_HIPRI)
-+		ki->ki_flags |= IOCB_HIPRI;
-+	if (flags & RWF_DSYNC)
-+		ki->ki_flags |= IOCB_DSYNC;
-+	if (flags & RWF_SYNC)
-+		ki->ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	return 0;
-+}
-+
- static inline ino_t parent_ino(struct dentry *dentry)
- {
- 	ino_t res;
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 24e61a54feaa..937c3e39650a 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -361,4 +361,6 @@ struct fscrypt_key {
- #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
- #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
- 
-+#define RWF_SUPPORTED			(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)
-+
- #endif /* _UAPI_LINUX_FS_H */
+Hannes
 -- 
-2.12.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
