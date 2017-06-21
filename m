@@ -1,108 +1,32 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: axboe@kernel.dk
-Cc: viro@ZenIV.linux.org.uk,
-	hch@lst.de,
-	jack@suse.cz,
-	akpm@linux-foundation.org,
-	linux-block@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 04/10] fs: Introduce RWF_NOWAIT and FMODE_AIO_NOWAIT
-Date: Tue, 20 Jun 2017 07:05:43 -0500
-Message-Id: <20170620120549.23147-5-rgoldwyn@suse.de>
-In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
-References: <20170620120549.23147-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-eopbgr670128.outbound.protection.outlook.com ([40.107.67.128]:13527
+        "EHLO CAN01-TO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751961AbdFURIv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Jun 2017 13:08:51 -0400
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Florian Weimer <fweimer@redhat.com>,
+        Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Jon Derrick" <jonathan.derrick@intel.com>
+CC: GNU C Library <libc-alpha@sourceware.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
+Subject: Re: pwritev2 regression test for invalid flags
+Date: Wed, 21 Jun 2017 17:08:49 +0000
+Message-ID: <F07B9111-86FD-4C5A-8EF3-A270675452D3@raithlin.com>
+References: <A4491A52-483F-47CD-8248-04C519C126C2@raithlin.com>
+ <febd41fd-af60-040d-e16e-a7566b57583b@redhat.com>
+In-Reply-To: <febd41fd-af60-040d-e16e-a7566b57583b@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-
-RWF_NOWAIT informs kernel to bail out if an AIO request will block
-for reasons such as file allocations, or a writeback triggered,
-or would block while allocating requests while performing
-direct I/O.
-
-RWF_NOWAIT is translated to IOCB_NOWAIT for iocb->ki_flags.
-
-FMODE_AIO_NOWAIT is a flag which identifies the file opened is capable
-of returning -EAGAIN if the AIO call will block. This must be set by
-supporting filesystems in the ->open() call.
-
-Filesystems xfs, btrfs and ext4 would be supported in the following patches.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/aio.c                | 6 ++++++
- include/linux/fs.h      | 9 +++++++++
- include/uapi/linux/fs.h | 4 +++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/fs/aio.c b/fs/aio.c
-index 020fa0045e3c..34027b67e2f4 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1592,6 +1592,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		goto out_put_req;
- 	}
- 
-+	if ((req->common.ki_flags & IOCB_NOWAIT) &&
-+			!(req->common.ki_flags & IOCB_DIRECT)) {
-+		ret = -EOPNOTSUPP;
-+		goto out_put_req;
-+	}
-+
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 0d34f5b5a6b0..4574121f4746 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -143,6 +143,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- /* File was opened by fanotify and shouldn't generate fanotify events */
- #define FMODE_NONOTIFY		((__force fmode_t)0x4000000)
- 
-+/* File is capable of returning -EAGAIN if AIO will block */
-+#define FMODE_AIO_NOWAIT	((__force fmode_t)0x8000000)
-+
- /*
-  * Flag for rw_copy_check_uvector and compat_rw_copy_check_uvector
-  * that indicates that they should check the contents of the iovec are
-@@ -269,6 +272,7 @@ struct writeback_control;
- #define IOCB_DSYNC		(1 << 4)
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
-+#define IOCB_NOWAIT		(1 << 7)
- 
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -3064,6 +3068,11 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
- 	if (unlikely(flags & ~RWF_SUPPORTED))
- 		return -EOPNOTSUPP;
- 
-+	if (flags & RWF_NOWAIT) {
-+		if (!(ki->ki_filp->f_mode & FMODE_AIO_NOWAIT))
-+			return -EOPNOTSUPP;
-+		ki->ki_flags |= IOCB_NOWAIT;
-+	}
- 	if (flags & RWF_HIPRI)
- 		ki->ki_flags |= IOCB_HIPRI;
- 	if (flags & RWF_DSYNC)
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 937c3e39650a..27d8c36c04af 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -360,7 +360,9 @@ struct fscrypt_key {
- #define RWF_HIPRI			0x00000001 /* high priority request, poll if possible */
- #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
- #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
-+#define RWF_NOWAIT			0x00000008 /* per-IO, return -EAGAIN if operation would block */
- 
--#define RWF_SUPPORTED			(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)
-+#define RWF_SUPPORTED			(RWF_HIPRI | RWF_DSYNC | RWF_SYNC |\
-+					 RWF_NOWAIT)
- 
- #endif /* _UAPI_LINUX_FS_H */
--- 
-2.12.0
+DQo+IEFzIGZhciBhcyBJIGNhbiB0ZWxsLCBHcmVnIEtyb2FoLUhhcnRtYW4gcXVldWVkIHRoZSBm
+aXggZm9yIDQuOSBhbmQNCj4gNC4xMSwgYW5kIHRoZSBmaXggaXMgaW4gbWFpbmxpbmUsIHRvbzoN
+Cj4NCj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvdG9y
+dmFsZHMvbGludXguZ2l0L2NvbW1pdC8/aWQ9MjAyMjNmMGYzOWVhOWQzMWVjZTA4ZjA0YWM3OWY4
+YzRlOGQ5ODI0Ng0KDQpPaCwgSSBzZWUgdGhhdCBub3cuIFRoYXTigJlzIHN1cGVyYiEgVGhhbmtz
+Lg0KDQoNCg==
