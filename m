@@ -1,66 +1,73 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 06/11] fs: add O_DIRECT support for sending down bio stream information
-Date: Tue, 13 Jun 2017 11:15:18 -0600
-Message-Id: <1497374123-15286-7-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
-References: <1497374123-15286-1-git-send-email-axboe@kernel.dk>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v5 04/12] block: Make most scsi_req_init() calls implicit
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
+ <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+ Nicholas Bellinger <nab@linux-iscsi.org>
+References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+ <20170620181549.24903-5-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <f6651e1c-35fb-b46e-b270-66c98303a4b5@suse.de>
+Date: Wed, 21 Jun 2017 08:54:48 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170620181549.24903-5-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/block_dev.c | 2 ++
- fs/direct-io.c | 2 ++
- fs/iomap.c     | 1 +
- 3 files changed, 5 insertions(+)
+On 06/20/2017 08:15 PM, Bart Van Assche wrote:
+> From: Bart Van Assche <bart.vanassche@sandisk.com>
+> 
+> Instead of explicitly calling scsi_req_init() after blk_get_request(),
+> call that function from inside blk_get_request(). Add an
+> .initialize_rq_fn() callback function to the block drivers that need
+> it. Merge the IDE .init_rq_fn() function into .initialize_rq_fn()
+> because it is too small to keep it as a separate function. Keep the
+> scsi_req_init() call in ide_prep_sense() because it follows a
+> blk_rq_init() call.
+> 
+> References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+> ---
+>  block/bsg.c                        |  1 -
+>  block/scsi_ioctl.c                 |  3 ---
+>  drivers/block/pktcdvd.c            |  1 -
+>  drivers/cdrom/cdrom.c              |  1 -
+>  drivers/ide/ide-atapi.c            |  1 -
+>  drivers/ide/ide-cd.c               |  1 -
+>  drivers/ide/ide-cd_ioctl.c         |  1 -
+>  drivers/ide/ide-devsets.c          |  1 -
+>  drivers/ide/ide-disk.c             |  1 -
+>  drivers/ide/ide-ioctls.c           |  2 --
+>  drivers/ide/ide-park.c             |  2 --
+>  drivers/ide/ide-pm.c               |  2 --
+>  drivers/ide/ide-probe.c            |  6 +++---
+>  drivers/ide/ide-tape.c             |  1 -
+>  drivers/ide/ide-taskfile.c         |  1 -
+>  drivers/scsi/osd/osd_initiator.c   |  2 --
+>  drivers/scsi/osst.c                |  1 -
+>  drivers/scsi/scsi_error.c          |  1 -
+>  drivers/scsi/scsi_lib.c            | 15 ++++++++++++++-
+>  drivers/scsi/scsi_transport_sas.c  |  2 ++
+>  drivers/scsi/sg.c                  |  2 --
+>  drivers/scsi/st.c                  |  1 -
+>  drivers/target/target_core_pscsi.c |  2 --
+>  fs/nfsd/blocklayout.c              |  1 -
+>  include/scsi/scsi_cmnd.h           |  1 +
+>  25 files changed, 20 insertions(+), 33 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 519599dddd36..284b8a786283 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -227,6 +227,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	bio.bi_iter.bi_sector = pos >> 9;
- 	bio.bi_private = current;
- 	bio.bi_end_io = blkdev_bio_end_io_simple;
-+	bio.bi_stream = iocb_streamid(iocb);
- 
- 	ret = bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
-@@ -360,6 +361,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		bio->bi_iter.bi_sector = pos >> 9;
- 		bio->bi_private = dio;
- 		bio->bi_end_io = blkdev_bio_end_io;
-+		bio->bi_stream = iocb_streamid(iocb);
- 
- 		ret = bio_iov_iter_get_pages(bio, iter);
- 		if (unlikely(ret)) {
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a04ebea77de8..c9c8b9fd4329 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -386,6 +386,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 	else
- 		bio->bi_end_io = dio_bio_end_io;
- 
-+	bio->bi_stream = iocb_streamid(dio->iocb);
-+
- 	sdio->bio = bio;
- 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 4b10892967a5..fa7d29632fbc 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -804,6 +804,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		if (dio->flags & IOMAP_DIO_WRITE) {
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+			bio_set_streamid(bio, inode_streamid(inode));
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		} else {
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
+Cheers,
+
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
