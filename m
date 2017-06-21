@@ -1,95 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:36845 "EHLO
-        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752457AbdF3P46 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 11:56:58 -0400
-Received: by mail-wm0-f49.google.com with SMTP id 62so114233390wmw.1
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:56:52 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 01/10] lightnvm: pblk: fix bad le64 assignations
-Date: Fri, 30 Jun 2017 17:56:34 +0200
-Message-Id: <1498838203-21539-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
-References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Hannes Reinecke <hare@suse.com>, Ming Lei
+	<ming.lei@redhat.com>
+Subject: [PATCH 2/3] block: Fix off-by-one errors in blk_status_to_errno() and print_req_error()
+Date: Wed, 21 Jun 2017 10:55:46 -0700
+Message-ID: <20170621175547.21692-3-bart.vanassche@wdc.com>
+In-Reply-To: <20170621175547.21692-1-bart.vanassche@wdc.com>
+References: <20170621175547.21692-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Bart.VanAssche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-Use the right types and conversions on le64 variables. Reported by
-sparse.
+This was detected by the smatch static analyzer.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Fixes: commit 2a842acab109 ("block: introduce new block status code type")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-core.c     | 2 +-
- drivers/lightnvm/pblk-gc.c       | 5 ++++-
- drivers/lightnvm/pblk-map.c      | 2 +-
- drivers/lightnvm/pblk-recovery.c | 2 +-
- 4 files changed, 7 insertions(+), 4 deletions(-)
+ block/blk-core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 7648186bd1b1..a654b34f6f86 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -765,7 +765,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
- 		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
- 
- 		if (dir == WRITE) {
--			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-+			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
- 
- 			meta_list[i].lba = lba_list[paddr] = addr_empty;
- 		}
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 1d289242ab92..9b4059b93855 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -314,10 +314,13 @@ static struct pblk_line *pblk_gc_get_victim_line(struct pblk *pblk,
- 						 struct list_head *group_list)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2e02314ea331..3c18ea60cb1c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -169,7 +169,7 @@ int blk_status_to_errno(blk_status_t status)
  {
- 	struct pblk_line *line, *victim;
-+	int line_vsc, victim_vsc;
+ 	int idx = (__force int)status;
  
- 	victim = list_first_entry(group_list, struct pblk_line, list);
- 	list_for_each_entry(line, group_list, list) {
--		if (*line->vsc < *victim->vsc)
-+		line_vsc = le32_to_cpu(*line->vsc);
-+		victim_vsc = le32_to_cpu(*victim->vsc);
-+		if (line_vsc < victim_vsc)
- 			victim = line;
- 	}
+-	if (WARN_ON_ONCE(idx > ARRAY_SIZE(blk_errors)))
++	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
+ 		return -EIO;
+ 	return blk_errors[idx].errno;
+ }
+@@ -179,7 +179,7 @@ static void print_req_error(struct request *req, blk_status_t status)
+ {
+ 	int idx = (__force int)status;
  
-diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
-index a9be03cd07a8..fddb924f6dde 100644
---- a/drivers/lightnvm/pblk-map.c
-+++ b/drivers/lightnvm/pblk-map.c
-@@ -53,7 +53,7 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
- 			lba_list[paddr] = cpu_to_le64(w_ctx->lba);
- 			line->nr_valid_lbas++;
- 		} else {
--			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-+			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+-	if (WARN_ON_ONCE(idx > ARRAY_SIZE(blk_errors)))
++	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
+ 		return;
  
- 			lba_list[paddr] = meta_list[i].lba = addr_empty;
- 			__pblk_map_invalidate(pblk, line, paddr);
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index abf36f587477..7e1c314f2766 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -395,7 +395,7 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
- 
- 		for (j = 0; j < pblk->min_write_pgs; j++, i++, w_ptr++) {
- 			struct ppa_addr dev_ppa;
--			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-+			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
- 
- 			dev_ppa = addr_to_gen_ppa(pblk, w_ptr, line->id);
- 
+ 	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu\n",
 -- 
-2.7.4
+2.13.1
