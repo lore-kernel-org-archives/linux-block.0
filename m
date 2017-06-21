@@ -1,51 +1,50 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Hannes Reinecke <hare@suse.com>, Ming Lei
-	<ming.lei@redhat.com>
-Subject: [PATCH 2/3] block: Fix off-by-one errors in blk_status_to_errno() and print_req_error()
-Date: Wed, 21 Jun 2017 10:55:46 -0700
-Message-ID: <20170621175547.21692-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170621175547.21692-1-bart.vanassche@wdc.com>
-References: <20170621175547.21692-1-bart.vanassche@wdc.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v5 02/12] block: Make request operation type argument
+ declarations consistent
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Hannes Reinecke
+ <hare@suse.com>, Omar Sandoval <osandov@fb.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+ <20170620181549.24903-3-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <68044f59-364a-eecf-734a-437691f3fde7@suse.de>
+Date: Wed, 21 Jun 2017 08:53:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
+In-Reply-To: <20170620181549.24903-3-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This was detected by the smatch static analyzer.
+On 06/20/2017 08:15 PM, Bart Van Assche wrote:
+> From: Bart Van Assche <bart.vanassche@sandisk.com>
+> 
+> Instead of declaring the second argument of blk_*_get_request()
+> as int and passing it to functions that expect an unsigned int,
+> declare that second argument as unsigned int. Also because of
+> consistency, rename that second argument from 'rw' into 'op'.
+> This patch does not change any functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c       | 13 +++++++------
+>  block/blk-mq.c         | 10 +++++-----
+>  include/linux/blk-mq.h |  6 +++---
+>  include/linux/blkdev.h |  3 ++-
+>  4 files changed, 17 insertions(+), 15 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Fixes: commit 2a842acab109 ("block: introduce new block status code type")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Cheers,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 2e02314ea331..3c18ea60cb1c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -169,7 +169,7 @@ int blk_status_to_errno(blk_status_t status)
- {
- 	int idx = (__force int)status;
- 
--	if (WARN_ON_ONCE(idx > ARRAY_SIZE(blk_errors)))
-+	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
- 		return -EIO;
- 	return blk_errors[idx].errno;
- }
-@@ -179,7 +179,7 @@ static void print_req_error(struct request *req, blk_status_t status)
- {
- 	int idx = (__force int)status;
- 
--	if (WARN_ON_ONCE(idx > ARRAY_SIZE(blk_errors)))
-+	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
- 		return;
- 
- 	printk_ratelimited(KERN_ERR "%s: %s error, dev %s, sector %llu\n",
+Hannes
 -- 
-2.13.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
