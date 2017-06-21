@@ -1,32 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-eopbgr670128.outbound.protection.outlook.com ([40.107.67.128]:13527
-        "EHLO CAN01-TO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751961AbdFURIv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Jun 2017 13:08:51 -0400
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Florian Weimer <fweimer@redhat.com>,
-        Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+Received: from mx1.redhat.com ([209.132.183.28]:57100 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751106AbdFUNTh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Jun 2017 09:19:37 -0400
+From: Florian Weimer <fweimer@redhat.com>
+Subject: Re: pwritev2 regression test for invalid flags
+To: Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+        Stephen Bates <sbates@raithlin.com>,
         Christoph Hellwig <hch@infradead.org>,
-        "Jon Derrick" <jonathan.derrick@intel.com>
-CC: GNU C Library <libc-alpha@sourceware.org>,
+        Jon Derrick <jonathan.derrick@intel.com>
+Cc: GNU C Library <libc-alpha@sourceware.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
         "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>
-Subject: Re: pwritev2 regression test for invalid flags
-Date: Wed, 21 Jun 2017 17:08:49 +0000
-Message-ID: <F07B9111-86FD-4C5A-8EF3-A270675452D3@raithlin.com>
 References: <A4491A52-483F-47CD-8248-04C519C126C2@raithlin.com>
  <febd41fd-af60-040d-e16e-a7566b57583b@redhat.com>
-In-Reply-To: <febd41fd-af60-040d-e16e-a7566b57583b@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <cd8eafd8-76c7-5215-1aea-457e259f85af@linaro.org>
+ <791e2720-aad6-2084-4d47-eb4d6b9acfe2@redhat.com>
+ <a85b46a7-152b-6601-ace2-53acd645119e@linaro.org>
+Message-ID: <5a060977-73b9-9eff-b99e-6019e1333268@redhat.com>
+Date: Wed, 21 Jun 2017 15:19:32 +0200
 MIME-Version: 1.0
+In-Reply-To: <a85b46a7-152b-6601-ace2-53acd645119e@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQo+IEFzIGZhciBhcyBJIGNhbiB0ZWxsLCBHcmVnIEtyb2FoLUhhcnRtYW4gcXVldWVkIHRoZSBm
-aXggZm9yIDQuOSBhbmQNCj4gNC4xMSwgYW5kIHRoZSBmaXggaXMgaW4gbWFpbmxpbmUsIHRvbzoN
-Cj4NCj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvdG9y
-dmFsZHMvbGludXguZ2l0L2NvbW1pdC8/aWQ9MjAyMjNmMGYzOWVhOWQzMWVjZTA4ZjA0YWM3OWY4
-YzRlOGQ5ODI0Ng0KDQpPaCwgSSBzZWUgdGhhdCBub3cuIFRoYXTigJlzIHN1cGVyYiEgVGhhbmtz
-Lg0KDQoNCg==
+On 06/21/2017 03:11 PM, Adhemerval Zanella wrote:
+
+> Yes, we will need to update the testcase in case of newer flags additions. 
+> But since the flags are currently defined within GLIBC not pulling from 
+> kernel header I think we will have more control over it.
+
+But that doesn't really matter because we need something to trigger
+EINVAL from the running kernel.  -1 should be safe for now, though.
+
+Florian
