@@ -1,70 +1,97 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44280 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753238AbdFOSRj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2017 14:17:39 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V3 09/12] block: always attach cgroup info into bio
-Date: Thu, 15 Jun 2017 11:17:17 -0700
-Message-Id: <1f9bf3d57d5fe644f433844354c9af1aedb8442a.1497549993.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-In-Reply-To: <cover.1497549993.git.shli@fb.com>
-References: <cover.1497549993.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: adilger@dilger.ca,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	linux-nvme@lists.infradead.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 5/9] fs: add support for buffered writeback to pass down write hints
+Date: Tue, 20 Jun 2017 18:22:02 -0600
+Message-Id: <1498004526-4543-6-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
-
-blkcg_bio_issue_check() already gets blkcg for a BIO.
-bio_associate_blkcg() uses a percpu refcounter, so it's a very cheap
-operation. There is no point we don't attach the cgroup info into bio at
-blkcg_bio_issue_check. This also makes blktrace outputs correct cgroup
-info.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-throttle.c       | 7 +------
- include/linux/blk-cgroup.h | 3 +++
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ fs/buffer.c | 14 +++++++++-----
+ fs/mpage.c  |  1 +
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a7285bf..a6ebd2b 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2104,14 +2104,9 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
- {
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--	int ret;
--
--	ret = bio_associate_current(bio);
--	if (ret == 0 || ret == -EBUSY)
-+	if (bio->bi_css)
- 		bio->bi_cg_private = tg;
- 	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
--#else
--	bio_associate_current(bio);
- #endif
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 306b720f7383..1259524715c8 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -49,7 +49,7 @@
+ 
+ static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
+ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+-			 struct writeback_control *wbc);
++			 unsigned int stream, struct writeback_control *wbc);
+ 
+ #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
+ 
+@@ -1829,7 +1829,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
+ 	do {
+ 		struct buffer_head *next = bh->b_this_page;
+ 		if (buffer_async_write(bh)) {
+-			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
++			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
++					inode_write_hint(inode), wbc);
+ 			nr_underway++;
+ 		}
+ 		bh = next;
+@@ -1883,7 +1884,8 @@ int __block_write_full_page(struct inode *inode, struct page *page,
+ 		struct buffer_head *next = bh->b_this_page;
+ 		if (buffer_async_write(bh)) {
+ 			clear_buffer_dirty(bh);
+-			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh, wbc);
++			submit_bh_wbc(REQ_OP_WRITE, write_flags, bh,
++					inode_write_hint(inode), wbc);
+ 			nr_underway++;
+ 		}
+ 		bh = next;
+@@ -3091,7 +3093,7 @@ void guard_bio_eod(int op, struct bio *bio)
  }
  
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 01b62e7..fe10b85 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -691,6 +691,9 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 	rcu_read_lock();
- 	blkcg = bio_blkcg(bio);
+ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+-			 struct writeback_control *wbc)
++			 unsigned int write_hint, struct writeback_control *wbc)
+ {
+ 	struct bio *bio;
  
-+	/* associate blkcg if bio hasn't attached one */
-+	bio_associate_blkcg(bio, &blkcg->css);
+@@ -3134,6 +3136,8 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 		op_flags |= REQ_META;
+ 	if (buffer_prio(bh))
+ 		op_flags |= REQ_PRIO;
 +
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg)) {
- 		spin_lock_irq(q->queue_lock);
++	op_flags |= write_hint_to_opf(write_hint);
+ 	bio_set_op_attrs(bio, op, op_flags);
+ 
+ 	submit_bio(bio);
+@@ -3142,7 +3146,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+ 
+ int submit_bh(int op, int op_flags, struct buffer_head *bh)
+ {
+-	return submit_bh_wbc(op, op_flags, bh, NULL);
++	return submit_bh_wbc(op, op_flags, bh, 0, NULL);
+ }
+ EXPORT_SYMBOL(submit_bh);
+ 
+diff --git a/fs/mpage.c b/fs/mpage.c
+index 9524fdde00c2..d8a750873bf4 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -615,6 +615,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
+ 			goto confused;
+ 
+ 		wbc_init_bio(wbc, bio);
++		bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
+ 	}
+ 
+ 	/*
 -- 
-2.9.3
+2.7.4
