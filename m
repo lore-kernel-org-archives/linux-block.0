@@ -1,31 +1,52 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: remove double set queue_num
-To: Erics Di <zwp10758@gmail.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Ming Lei <ming.lei@redhat.com>
-References: <CAA70yB4PT=uPio1owQ7AaBnZABid92ywRUcX7kzEqiTGGJJeMw@mail.gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <05ed445c-b9a1-7bc8-511b-d915fb0e6d17@kernel.dk>
-Date: Thu, 22 Jun 2017 08:10:38 -0600
+Return-Path: <zwp10758@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAA70yB4PT=uPio1owQ7AaBnZABid92ywRUcX7kzEqiTGGJJeMw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+From: Erics Di <zwp10758@gmail.com>
+Date: Thu, 22 Jun 2017 17:29:14 +0800
+Message-ID: <CAA70yB4PT=uPio1owQ7AaBnZABid92ywRUcX7kzEqiTGGJJeMw@mail.gmail.com>
+Subject: [PATCH] blk-mq: remove double set queue_num
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/22/2017 03:29 AM, Erics Di wrote:
-> hwctx's queue_num has been set prior call blk_mq_init_hctx, so no need
-> 
-> set it again.
+hwctx's queue_num has been set prior call blk_mq_init_hctx, so no need
 
-You are right, that is a duplicate setting. But your patch is odd
-in various ways:
+set it again.
 
-1) Your signed-off-by and sender email (and name) have nothing to do
-   with each other.
 
-2) The patch is severely mangled. How are you sending it?
+Signed-off-by: weiping <zhangweiping@didichuxing.com>
 
-#2 I can manually fix up, but I can't fix up #1.
+---
+
+ block/blk-mq.c | 1 -
+
+ 1 file changed, 1 deletion(-)
+
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+
+index bb66c96..adcb79c 100644
+
+--- a/block/blk-mq.c
+
++++ b/block/blk-mq.c
+
+@@ -1900,7 +1900,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
+
+  spin_lock_init(&hctx->lock);
+
+  INIT_LIST_HEAD(&hctx->dispatch);
+
+  hctx->queue = q;
+
+- hctx->queue_num = hctx_idx;
+
+  hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
+
+
+
+  cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
 
 -- 
-Jens Axboe
+
+1.8.3.1
