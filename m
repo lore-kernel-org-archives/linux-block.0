@@ -1,108 +1,88 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: axboe@kernel.dk
-Cc: viro@ZenIV.linux.org.uk,
-	hch@lst.de,
-	jack@suse.cz,
-	akpm@linux-foundation.org,
-	linux-block@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 04/10] fs: Introduce RWF_NOWAIT and FMODE_AIO_NOWAIT
-Date: Mon, 19 Jun 2017 11:33:42 -0500
-Message-Id: <20170619163348.15542-5-rgoldwyn@suse.de>
-In-Reply-To: <20170619163348.15542-1-rgoldwyn@suse.de>
-References: <20170619163348.15542-1-rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [bug report] mtip32xx: convert internal command issue to block IO
+ path
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: linux-block@vger.kernel.org
+References: <20170623090506.GA7127@elgon.mountain>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a40332f0-5e5f-58a0-be47-de2a526ee7ca@kernel.dk>
+Date: Fri, 23 Jun 2017 09:18:16 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170623090506.GA7127@elgon.mountain>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On 06/23/2017 03:05 AM, Dan Carpenter wrote:
+> Hello Jens Axboe,
+> 
+> The patch 3f5e6a35774c: "mtip32xx: convert internal command issue to
+> block IO path" from Apr 28, 2017, leads to the following static
+> checker warning:
+> 
+> 	drivers/block/mtip32xx/mtip32xx.c:1067 mtip_exec_internal_command()
+> 	warn: 'int_cmd->status' is unsigned
+> 
+> drivers/block/mtip32xx/mtip32xx.c
+>   1065  
+>   1066          rv = int_cmd->status;
+>                      ^^^^^^^^^^^^^^^
+> This is a new block error code.
+> 
+>   1067          if (rv < 0) {
+>                     ^^^^^^
+> So this doesn't make sense.  This used to be rv <= 0.
 
-RWF_NOWAIT informs kernel to bail out if an AIO request will block
-for reasons such as file allocations, or a writeback triggered,
-or would block while allocating requests while performing
-direct I/O.
+It's actually two layers of breakage. After the referenced commit, some
+of the below were wonky. But the new breakage is:
 
-RWF_NOWAIT is translated to IOCB_NOWAIT for iocb->ki_flags.
+commit 2a842acab109f40f0d7d10b38e9ca88390628996
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Sat Jun 3 09:38:04 2017 +0200
 
-FMODE_AIO_NOWAIT is a flag which identifies the file opened is capable
-of returning -EAGAIN if the AIO call will block. This must be set by
-supporting filesystems in the ->open() call.
+    block: introduce new block status code type
 
-Filesystems xfs, btrfs and ext4 would be supported in the following patches.
+since that means that int_cmd->status is a blk_status_t, it's not an
+-Exx value at all. And that patch changed the cmd->status field from an
+int to a u8, which is why you are now seeing complaints.
+ 
+The below should do the trick. All we really care about is whether
+->staut is zero or not. Just turn that into EIO, and dump the various
+attempts at clever reporting.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/aio.c                | 6 ++++++
- include/linux/fs.h      | 9 +++++++++
- include/uapi/linux/fs.h | 4 +++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index 020fa0045e3c..34027b67e2f4 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1592,6 +1592,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		goto out_put_req;
- 	}
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index d8618a71da74..61b046f256ca 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -1063,23 +1063,10 @@ static int mtip_exec_internal_command(struct mtip_port *port,
+ 	/* insert request and run queue */
+ 	blk_execute_rq(rq->q, NULL, rq, true);
  
-+	if ((req->common.ki_flags & IOCB_NOWAIT) &&
-+			!(req->common.ki_flags & IOCB_DIRECT)) {
-+		ret = -EOPNOTSUPP;
-+		goto out_put_req;
-+	}
-+
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 0d34f5b5a6b0..4574121f4746 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -143,6 +143,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- /* File was opened by fanotify and shouldn't generate fanotify events */
- #define FMODE_NONOTIFY		((__force fmode_t)0x4000000)
+-	rv = int_cmd->status;
+-	if (rv < 0) {
+-		if (rv == -ERESTARTSYS) { /* interrupted */
+-			dev_err(&dd->pdev->dev,
+-				"Internal command [%02X] was interrupted after %u ms\n",
+-				fis->command,
+-				jiffies_to_msecs(jiffies - start));
+-			rv = -EINTR;
+-			goto exec_ic_exit;
+-		} else if (rv == 0) /* timeout */
+-			dev_err(&dd->pdev->dev,
+-				"Internal command did not complete [%02X] within timeout of  %lu ms\n",
+-				fis->command, timeout);
+-		else
+-			dev_err(&dd->pdev->dev,
+-				"Internal command [%02X] wait returned code [%d] after %lu ms - unhandled\n",
+-				fis->command, rv, timeout);
++	if (int_cmd->status) {
++		dev_err(&dd->pdev->dev, "Internal command [%02X] failed %d\n",
++				fis->command, int_cmd->status);
++		rv = -EIO;
  
-+/* File is capable of returning -EAGAIN if AIO will block */
-+#define FMODE_AIO_NOWAIT	((__force fmode_t)0x8000000)
-+
- /*
-  * Flag for rw_copy_check_uvector and compat_rw_copy_check_uvector
-  * that indicates that they should check the contents of the iovec are
-@@ -269,6 +272,7 @@ struct writeback_control;
- #define IOCB_DSYNC		(1 << 4)
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
-+#define IOCB_NOWAIT		(1 << 7)
- 
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -3064,6 +3068,11 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
- 	if (unlikely(flags & ~RWF_SUPPORTED))
- 		return -EOPNOTSUPP;
- 
-+	if (flags & RWF_NOWAIT) {
-+		if (!(ki->ki_filp->f_mode & FMODE_AIO_NOWAIT))
-+			return -EOPNOTSUPP;
-+		ki->ki_flags |= IOCB_NOWAIT;
-+	}
- 	if (flags & RWF_HIPRI)
- 		ki->ki_flags |= IOCB_HIPRI;
- 	if (flags & RWF_DSYNC)
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 937c3e39650a..27d8c36c04af 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -360,7 +360,9 @@ struct fscrypt_key {
- #define RWF_HIPRI			0x00000001 /* high priority request, poll if possible */
- #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
- #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
-+#define RWF_NOWAIT			0x00000008 /* per-IO, return -EAGAIN if operation would block */
- 
--#define RWF_SUPPORTED			(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)
-+#define RWF_SUPPORTED			(RWF_HIPRI | RWF_DSYNC | RWF_SYNC |\
-+					 RWF_NOWAIT)
- 
- #endif /* _UAPI_LINUX_FS_H */
+ 		if (mtip_check_surprise_removal(dd->pdev) ||
+ 			test_bit(MTIP_DDF_REMOVE_PENDING_BIT,
+
+
 -- 
-2.12.0
+Jens Axboe
