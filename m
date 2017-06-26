@@ -1,56 +1,76 @@
-Return-Path: <BATV+44f69bf97f3b7d1cdb28+5056+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 27 Jun 2017 08:20:00 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jeff Layton <jlayton@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com, corbet@lwn.net,
-	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>,
-	Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Return-Path: <jlayton@redhat.com>
+Return-Path: <jlayton@redhat.com>
+Message-ID: <1498487658.5168.8.camel@redhat.com>
 Subject: Re: [PATCH v7 16/22] block: convert to errseq_t based writeback
  error tracking
-Message-ID: <20170627152000.GA29664@infradead.org>
+From: Jeff Layton <jlayton@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
+ Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-ext4@vger.kernel.org,  linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org,  linux-block@vger.kernel.org
+Date: Mon, 26 Jun 2017 10:34:18 -0400
+In-Reply-To: <1498310166.4796.4.camel@redhat.com>
 References: <20170616193427.13955-1-jlayton@redhat.com>
- <20170616193427.13955-17-jlayton@redhat.com>
- <20170620123544.GC19781@infradead.org>
- <1497980684.4555.16.camel@redhat.com>
- <20170624115946.GA22561@infradead.org>
- <1498310166.4796.4.camel@redhat.com>
- <1498487658.5168.8.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1498487658.5168.8.camel@redhat.com>
+	 <20170616193427.13955-17-jlayton@redhat.com>
+	 <20170620123544.GC19781@infradead.org>
+	 <1497980684.4555.16.camel@redhat.com>
+	 <20170624115946.GA22561@infradead.org> <1498310166.4796.4.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 26, 2017 at 10:34:18AM -0400, Jeff Layton wrote:
-> The bigger question is -- what about more complex filesystems like
-> ext4?  There are a couple of cases where we can return -EIO or -EROFS on
-> fsync before filemap_write_and_wait_range is ever called. Like this one
-> for instance:
+On Sat, 2017-06-24 at 09:16 -0400, Jeff Layton wrote:
+> On Sat, 2017-06-24 at 04:59 -0700, Christoph Hellwig wrote:
+> > On Tue, Jun 20, 2017 at 01:44:44PM -0400, Jeff Layton wrote:
+> > > In order to query for errors with errseq_t, you need a previously-
+> > > sampled point from which to check. When you call
+> > > filemap_write_and_wait_range though you don't have a struct file and so
+> > > no previously-sampled value.
+> > 
+> > So can we simply introduce variants of them that take a struct file?
+> > That would be:
+> > 
+> >  a) less churn
+> >  b) less code
+> >  c) less chance to get data integrity wrong
 > 
->         if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
->                 return -EIO;
+> Yeah, I had that thought after I sent the reply to you earlier.
 > 
-> ...and the EXT4_MF_FS_ABORTED case.
+> The main reason I didn't do that before was that I had myself convinced
+> that we needed to do the check_and_advance as late as possible in the
+> fsync process, after the metadata had been written.
 > 
-> Are those conditions ever recoverable, such that a later fsync could
-> succeed? IOW, could I do a remount or something such that the existing
-> fds are left open and become usable again? 
+> Now that I think about it more, I think you're probably correct. As long
+> as we do the check and advance at some point after doing the
+> write_and_wait, we're fine here and shouldn't violate exactly once
+> semantics on the fsync return.
 
-This looks copied from the xfs forced shutdown code, and in that
-case it's final and permanent - you'll need an unmount to
-clear it.
+So I have a file_write_and_wait_range now that should DTRT for this
+patch.
 
-> If so, then we really ought to advance the errseq_t in the file when we
-> catch those cases as well. If we have to do that, then it probably makes
-> sense to leave the ext4 patch as-is.
+The bigger question is -- what about more complex filesystems like
+ext4?  There are a couple of cases where we can return -EIO or -EROFS on
+fsync before filemap_write_and_wait_range is ever called. Like this one
+for instance:
 
-I think it can switch to the new file helper.
+        if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
+                return -EIO;
+
+...and the EXT4_MF_FS_ABORTED case.
+
+Are those conditions ever recoverable, such that a later fsync could
+succeed? IOW, could I do a remount or something such that the existing
+fds are left open and become usable again? 
+
+If so, then we really ought to advance the errseq_t in the file when we
+catch those cases as well. If we have to do that, then it probably makes
+sense to leave the ext4 patch as-is.
+-- 
+Jeff Layton <jlayton@redhat.com>
