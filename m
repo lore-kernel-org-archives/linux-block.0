@@ -1,90 +1,123 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 01/11] block: add support for carrying stream information in a bio
-Date: Wed, 14 Jun 2017 13:05:24 -0600
-Message-Id: <1497467134-6323-2-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:44420 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752651AbdFZMQK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:16:10 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 20/51] block: introduce multipage/single page bvec helpers
+Date: Mon, 26 Jun 2017 20:10:03 +0800
+Message-Id: <20170626121034.3051-21-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-No functional changes in this patch, we just add four flags
-that will be used to denote a stream type, and ensure that we
-don't merge across different stream types.
+This patch introduces helpers which are suffixed with _mp
+and _sp for the multipage bvec/segment support.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+The helpers with _mp suffix are the interfaces for treating
+one bvec/segment as real multipage one, for example, .bv_len
+is the total length of the multipage segment.
+
+The helpers with _sp suffix are interfaces for supporting
+current bvec iterator which is thought as singlepage only
+by drivers, fs, dm and etc. These _sp helpers are introduced
+to build singlepage bvec in flight, so users of bio/bvec
+iterator still can work well and needn't change even though
+we store multipage into bvec.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-merge.c         | 16 ++++++++++++++++
- include/linux/blk_types.h | 11 +++++++++++
- 2 files changed, 27 insertions(+)
+ include/linux/bvec.h | 56 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 53 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 3990ae406341..7d299df3b12b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -693,6 +693,14 @@ static struct request *attempt_merge(struct request_queue *q,
- 		return NULL;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 162ca7caf510..f52587e283d4 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -24,6 +24,42 @@
+ #include <linux/bug.h>
  
- 	/*
-+	 * Don't allow merge of different streams, or for a stream with
-+	 * non-stream IO.
-+	 */
-+	if ((req->cmd_flags & REQ_WRITE_LIFE_MASK) !=
-+	    (next->cmd_flags & REQ_WRITE_LIFE_MASK))
-+		return NULL;
+ /*
++ * What is multipage bvecs(segment)?
++ *
++ * - bvec stored in bio->bi_io_vec is always multipage style vector
++ *
++ * - bvec(struct bio_vec) represents one physically contiguous I/O
++ *   buffer, now the buffer may include more than one pages since
++ *   multipage(mp) bvec is supported, and all these pages represented
++ *   by one bvec is physically contiguous. Before mp support, at most
++ *   one page can be included in one bvec, we call it singlepage(sp)
++ *   bvec.
++ *
++ * - .bv_page of th bvec represents the 1st page in the mp segment
++ *
++ * - .bv_offset of the bvec represents offset of the buffer in the bvec
++ *
++ * The effect on the current drivers/filesystem/dm/bcache/...:
++ *
++ * - almost everyone supposes that one bvec only includes one single
++ *   page, so we keep the sp interface not changed, for example,
++ *   bio_for_each_segment() still returns bvec with single page
++ *
++ * - bio_for_each_segment_all() will be changed to return singlepage
++ *   bvec too
++ *
++ * - during iterating, iterator variable(struct bvec_iter) is always
++ *   updated in multipage bvec style and that means bvec_iter_advance()
++ *   is kept not changed
++ *
++ * - returned(copied) singlepage bvec is generated in flight by bvec
++ *   helpers from the stored mp bvec
++ *
++ * - In case that some components(such as iov_iter) need to support mp
++ *   segment, we introduce new helpers(suffixed with _mp) for them.
++ */
 +
-+	/*
- 	 * If we are allowed to merge, then append bio list
- 	 * from next to rq and release next. merge_requests_fn
- 	 * will have updated segment counts, update sector
-@@ -811,6 +819,14 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 	    !blk_write_same_mergeable(rq->bio, bio))
- 		return false;
++/*
+  * was unsigned short, but we might as well be ready for > 64kB I/O pages
+  */
+ struct bio_vec {
+@@ -49,16 +85,30 @@ struct bvec_iter {
+  */
+ #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
  
-+	/*
-+	 * Don't allow merge of different streams, or for a stream with
-+	 * non-stream IO.
-+	 */
-+	if ((rq->cmd_flags & REQ_WRITE_LIFE_MASK) !=
-+	    (bio->bi_opf & REQ_WRITE_LIFE_MASK))
-+		return false;
+-#define bvec_iter_page(bvec, iter)				\
++#define bvec_iter_page_mp(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_page)
+ 
+-#define bvec_iter_len(bvec, iter)				\
++#define bvec_iter_len_mp(bvec, iter)				\
+ 	min((iter).bi_size,					\
+ 	    __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_done)
+ 
+-#define bvec_iter_offset(bvec, iter)				\
++#define bvec_iter_offset_mp(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
+ 
++/*
++ * <page, offset,length> of singlepage(sp) segment.
++ *
++ * This helpers will be implemented for building sp bvec in flight.
++ */
++#define bvec_iter_offset_sp(bvec, iter)	bvec_iter_offset_mp((bvec), (iter))
++#define bvec_iter_len_sp(bvec, iter)	bvec_iter_len_mp((bvec), (iter))
++#define bvec_iter_page_sp(bvec, iter)	bvec_iter_page_mp((bvec), (iter))
 +
- 	return true;
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 61339bc44400..57d1eb530799 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -201,6 +201,10 @@ enum req_flag_bits {
- 	__REQ_PREFLUSH,		/* request for cache flush */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
-+	__REQ_WRITE_SHORT,	/* short life time write */
-+	__REQ_WRITE_MEDIUM,	/* medium life time write */
-+	__REQ_WRITE_LONG,	/* long life time write */
-+	__REQ_WRITE_EXTREME,	/* extremely long life time write */
- 
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
-@@ -221,6 +225,13 @@ enum req_flag_bits {
- #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
-+#define REQ_WRITE_SHORT		(1ULL << __REQ_WRITE_SHORT)
-+#define REQ_WRITE_MEDIUM	(1ULL << __REQ_WRITE_MEDIUM)
-+#define REQ_WRITE_LONG		(1ULL << __REQ_WRITE_LONG)
-+#define REQ_WRITE_EXTREME	(1ULL << __REQ_WRITE_EXTREME)
++/* current interfaces support sp style at default */
++#define bvec_iter_page(bvec, iter)	bvec_iter_page_sp((bvec), (iter))
++#define bvec_iter_len(bvec, iter)	bvec_iter_len_sp((bvec), (iter))
++#define bvec_iter_offset(bvec, iter)	bvec_iter_offset_sp((bvec), (iter))
 +
-+#define REQ_WRITE_LIFE_MASK	(REQ_WRITE_SHORT | REQ_WRITE_MEDIUM | \
-+					REQ_WRITE_LONG | REQ_WRITE_EXTREME)
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- 
+ #define bvec_iter_bvec(bvec, iter)				\
+ ((struct bio_vec) {						\
+ 	.bv_page	= bvec_iter_page((bvec), (iter)),	\
 -- 
-2.7.4
+2.9.4
