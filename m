@@ -1,54 +1,105 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52126 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753176AbdFRPWY (ORCPT
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:35659 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751490AbdFZJ6P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:24 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 10/30] nvme: Add admin_tagset pointer to nvme_ctrl
-Date: Sun, 18 Jun 2017 18:21:44 +0300
-Message-Id: <1497799324-19598-11-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+        Mon, 26 Jun 2017 05:58:15 -0400
+Received: by mail-wm0-f41.google.com with SMTP id w126so2844254wme.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:14 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 04/20] lightnvm: pblk: add debug stat for read cache hits
+Date: Mon, 26 Jun 2017 11:57:13 +0200
+Message-Id: <1498471049-25505-5-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Will be used when we centralize control flows. only
-rdma for now.
+Add a new debug counter to measure cache hits on the read path
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/nvme/host/nvme.h | 1 +
- drivers/nvme/host/rdma.c | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/lightnvm/pblk-init.c  | 1 +
+ drivers/lightnvm/pblk-read.c  | 6 ++++++
+ drivers/lightnvm/pblk-sysfs.c | 3 ++-
+ drivers/lightnvm/pblk.h       | 1 +
+ 4 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 415a5ea4759c..3be59634b4af 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -126,6 +126,7 @@ struct nvme_ctrl {
- 	struct kref kref;
- 	int instance;
- 	struct blk_mq_tag_set *tagset;
-+	struct blk_mq_tag_set *admin_tagset;
- 	struct list_head namespaces;
- 	struct mutex namespaces_mutex;
- 	struct device *device;	/* char device */
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 2b23f88bedfe..58ed2ae3cd35 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -801,6 +801,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl, bool new
- 		error = blk_mq_alloc_tag_set(&ctrl->admin_tag_set);
- 		if (error)
- 			goto out_put_dev;
-+		ctrl->ctrl.admin_tagset = &ctrl->admin_tag_set;
- 
- 		ctrl->ctrl.admin_q = blk_mq_init_queue(&ctrl->admin_tag_set);
- 		if (IS_ERR(ctrl->ctrl.admin_q)) {
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index ae8cd6d5af8b..3ec3deff709f 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -838,6 +838,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	atomic_long_set(&pblk->sync_writes, 0);
+ 	atomic_long_set(&pblk->compl_writes, 0);
+ 	atomic_long_set(&pblk->inflight_reads, 0);
++	atomic_long_set(&pblk->cache_reads, 0);
+ 	atomic_long_set(&pblk->sync_reads, 0);
+ 	atomic_long_set(&pblk->recov_writes, 0);
+ 	atomic_long_set(&pblk->recov_writes, 0);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 762c0b73cb67..91307297e444 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -76,6 +76,9 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			}
+ 			WARN_ON(test_and_set_bit(i, read_bitmap));
+ 			advanced_bio = 1;
++#ifdef CONFIG_NVM_DEBUG
++			atomic_long_inc(&pblk->cache_reads);
++#endif
+ 		} else {
+ 			/* Read from media non-cached sectors */
+ 			rqd->ppa_list[j++] = p;
+@@ -280,6 +283,9 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			goto retry;
+ 		}
+ 		WARN_ON(test_and_set_bit(0, read_bitmap));
++#ifdef CONFIG_NVM_DEBUG
++			atomic_long_inc(&pblk->cache_reads);
++#endif
+ 	} else {
+ 		rqd->ppa_addr = ppa;
+ 	}
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index f0af1d1ceeff..3c1a586c09a2 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -294,7 +294,7 @@ static ssize_t pblk_sysfs_lines_info(struct pblk *pblk, char *page)
+ static ssize_t pblk_sysfs_stats_debug(struct pblk *pblk, char *page)
+ {
+ 	return snprintf(page, PAGE_SIZE,
+-		"%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
++		"%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
+ 			atomic_long_read(&pblk->inflight_writes),
+ 			atomic_long_read(&pblk->inflight_reads),
+ 			atomic_long_read(&pblk->req_writes),
+@@ -307,6 +307,7 @@ static ssize_t pblk_sysfs_stats_debug(struct pblk *pblk, char *page)
+ 			atomic_long_read(&pblk->recov_writes),
+ 			atomic_long_read(&pblk->recov_gc_writes),
+ 			atomic_long_read(&pblk->recov_gc_reads),
++			atomic_long_read(&pblk->cache_reads),
+ 			atomic_long_read(&pblk->sync_reads));
+ }
+ #endif
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 99f3186b5288..70b65d308dea 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -513,6 +513,7 @@ struct pblk {
+ 	atomic_long_t sync_writes;	/* Sectors synced to media */
+ 	atomic_long_t compl_writes;	/* Sectors completed in write bio */
+ 	atomic_long_t inflight_reads;	/* Inflight sector read requests */
++	atomic_long_t cache_reads;	/* Read requests that hit the cache */
+ 	atomic_long_t sync_reads;	/* Completed sector read requests */
+ 	atomic_long_t recov_writes;	/* Sectors submitted from recovery */
+ 	atomic_long_t recov_gc_writes;	/* Sectors submitted from write GC */
 -- 
 2.7.4
