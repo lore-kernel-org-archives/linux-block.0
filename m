@@ -1,76 +1,72 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v8 18/18] btrfs: minimal conversion to errseq_t writeback error reporting on fsync
-Date: Thu, 29 Jun 2017 09:19:54 -0400
-Message-Id: <20170629131954.28733-19-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH v2 32/51] btrfs: use bvec_get_last_page to get bio's last page
+Date: Mon, 26 Jun 2017 20:10:15 +0800
+Message-Id: <20170626121034.3051-33-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+Preparing for supporting multipage bvec.
 
-Just check and advance the errseq_t in the file before returning.
-Internal callers of filemap_* functions are left as-is.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/btrfs/file.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ fs/btrfs/compression.c | 5 ++++-
+ fs/btrfs/extent_io.c   | 8 ++++++--
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index da1096eb1a40..1f57e1a523d9 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -2011,7 +2011,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	struct btrfs_root *root = BTRFS_I(inode)->root;
- 	struct btrfs_trans_handle *trans;
- 	struct btrfs_log_ctx ctx;
--	int ret = 0;
-+	int ret = 0, err;
- 	bool full_sync = 0;
- 	u64 len;
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 5972f74354ca..fdab5b821aa8 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -391,8 +391,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ static u64 bio_end_offset(struct bio *bio)
+ {
+ 	struct bio_vec *last = &bio->bi_io_vec[bio->bi_vcnt - 1];
++	struct bio_vec bv;
  
-@@ -2030,7 +2030,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	 */
- 	ret = start_ordered_ops(inode, start, end);
- 	if (ret)
--		return ret;
-+		goto out;
- 
- 	inode_lock(inode);
- 	atomic_inc(&root->log_batch);
-@@ -2227,6 +2227,9 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 		ret = btrfs_end_transaction(trans);
- 	}
- out:
-+	err = file_check_and_advance_wb_err(file);
-+	if (!ret)
-+		ret = err;
- 	return ret > 0 ? -EIO : ret;
+-	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
++	bvec_get_last_page(last, &bv);
++
++	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
  }
  
+ static noinline int add_ra_bio_pages(struct inode *inode,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 5b453cada1ea..7cc6c8a52e49 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2741,11 +2741,15 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+ {
+ 	blk_status_t ret = 0;
+ 	struct bio_vec *bvec = bio->bi_io_vec + bio->bi_vcnt - 1;
+-	struct page *page = bvec->bv_page;
+ 	struct extent_io_tree *tree = bio->bi_private;
++	struct bio_vec bv;
++	struct page *page;
+ 	u64 start;
+ 
+-	start = page_offset(page) + bvec->bv_offset;
++	bvec_get_last_page(bvec, &bv);
++	page = bv.bv_page;
++
++	start = page_offset(page) + bv.bv_offset;
+ 
+ 	bio->bi_private = NULL;
+ 	bio_get(bio);
 -- 
-2.13.0
+2.9.4
