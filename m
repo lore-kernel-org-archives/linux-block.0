@@ -1,108 +1,47 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 10/13] ext4: add more robust reporting of metadata writeback errors
-Date: Mon, 12 Jun 2017 08:23:02 -0400
-Message-Id: <20170612122316.13244-11-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org
+Subject: [PATCH v2 36/51] md: raid1: convert to bio_for_each_segment_all_sp()
+Date: Mon, 26 Jun 2017 20:10:19 +0800
+Message-Id: <20170626121034.3051-37-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-ext4 uses the blockdev mapping for tracking metadata stored in the
-pagecache. Sample its wb_err when opening a file and store that in
-the f_md_wb_err field.
-
-Change ext4_sync_file to check for data errors first, and then check the
-blockdev mapping for metadata errors afterward.
-
-Note that because metadata writeback errors are only tracked on a
-per-device level, this does mean that we'll end up reporting an error on
-all open file descriptors when there is a metadata writeback failure.
-That's not ideal, but we can possibly improve upon it in the future.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Cc: Shaohua Li <shli@kernel.org>
+Cc: linux-raid@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/ext4/dir.c   |  8 ++++++--
- fs/ext4/file.c  |  5 ++++-
- fs/ext4/fsync.c | 13 +++++++++++++
- 3 files changed, 23 insertions(+), 3 deletions(-)
+ drivers/md/raid1.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/ext4/dir.c b/fs/ext4/dir.c
-index e8b365000d73..6bbb19510f74 100644
---- a/fs/ext4/dir.c
-+++ b/fs/ext4/dir.c
-@@ -611,9 +611,13 @@ static int ext4_dx_readdir(struct file *file, struct dir_context *ctx)
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 835c42396861..ca4b9ff8d39b 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -2135,13 +2135,14 @@ static void process_checks(struct r1bio *r1_bio)
+ 		struct page **spages = get_resync_pages(sbio)->pages;
+ 		struct bio_vec *bi;
+ 		int page_len[RESYNC_PAGES] = { 0 };
++		struct bvec_iter_all bia;
  
- static int ext4_dir_open(struct inode * inode, struct file * filp)
- {
-+	int ret = 0;
-+
- 	if (ext4_encrypted_inode(inode))
--		return fscrypt_get_encryption_info(inode) ? -EACCES : 0;
--	return 0;
-+		ret = fscrypt_get_encryption_info(inode) ? -EACCES : 0;
-+	if (!ret)
-+		filp->f_md_wb_err = filemap_sample_wb_err(inode->i_sb->s_bdev->bd_inode->i_mapping);
-+	return ret;
- }
+ 		if (sbio->bi_end_io != end_sync_read)
+ 			continue;
+ 		/* Now we can 'fixup' the error value */
+ 		sbio->bi_status = 0;
  
- static int ext4_release_dir(struct inode *inode, struct file *filp)
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 831fd6beebf0..fe0d6e01c4b7 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -435,7 +435,10 @@ static int ext4_file_open(struct inode * inode, struct file * filp)
- 		if (ret < 0)
- 			return ret;
- 	}
--	return dquot_file_open(inode, filp);
-+	ret = dquot_file_open(inode, filp);
-+	if (!ret)
-+		filp->f_md_wb_err = filemap_sample_wb_err(sb->s_bdev->bd_inode->i_mapping);
-+	return ret;
- }
+-		bio_for_each_segment_all(bi, sbio, j)
++		bio_for_each_segment_all_sp(bi, sbio, j, bia)
+ 			page_len[j] = bi->bv_len;
  
- /*
-diff --git a/fs/ext4/fsync.c b/fs/ext4/fsync.c
-index 03d6259d8662..36363a6730d7 100644
---- a/fs/ext4/fsync.c
-+++ b/fs/ext4/fsync.c
-@@ -165,6 +165,19 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 	err = filemap_report_wb_err(file);
- 	if (!ret)
- 		ret = err;
-+
-+	/*
-+	 * Was there a metadata writeback error since last fsync?
-+	 *
-+	 * FIXME: ext4 tracks metadata with a whole-block device mapping. So,
-+	 * if there is any sort of metadata writeback error, we'll report an
-+	 * error on all open fds, even ones not associated with the inode
-+	 */
-+	err = filemap_report_md_wb_err(file,
-+				inode->i_sb->s_bdev->bd_inode->i_mapping);
-+	if (!ret)
-+		ret = err;
-+
- 	trace_ext4_sync_file_exit(inode, ret);
- 	return ret;
- }
+ 		if (!status) {
 -- 
-2.13.0
+2.9.4
