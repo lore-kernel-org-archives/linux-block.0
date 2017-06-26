@@ -1,158 +1,90 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org,
-	hch@lst.de,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/9] block: add support for write hints in a bio
-Date: Mon, 26 Jun 2017 09:37:53 -0600
-Message-Id: <1498491480-16306-3-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
-References: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:47048 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751461AbdFZMR6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:17:58 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 29/51] block: bio: introduce single/multi page version of bio_for_each_segment_all()
+Date: Mon, 26 Jun 2017 20:10:12 +0800
+Message-Id: <20170626121034.3051-30-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-No functional changes in this patch, we just set aside 3 bits
-in the bio/request flags, which can be used to hold a WRITE_LIFE_*
-life time hint.
+This patches introduce bio_for_each_segment_all_sp() and
+bio_for_each_segment_all_mp().
 
-Ensure that we don't merge requests that have different life time
-hints assigned to them.
+bio_for_each_segment_all_sp() is for replacing bio_for_each_segment_all()
+in case that the returned bvec has to be single page bvec.
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+bio_for_each_segment_all_mp() is for replacing bio_for_each_segment_all()
+in case that user wants to update the returned bvec via the pointer.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-merge.c         | 16 ++++++++++++++++
- fs/inode.c                |  9 +++++++++
- include/linux/blk_types.h | 31 +++++++++++++++++++++++++++++++
- include/linux/fs.h        |  2 ++
- 4 files changed, 58 insertions(+)
+ include/linux/bio.h       | 24 ++++++++++++++++++++++++
+ include/linux/blk_types.h |  6 ++++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 5df13041b851..be1e955db75e 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -673,6 +673,14 @@ static struct request *attempt_merge(struct request_queue *q,
- 		return NULL;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index bdbc9480229d..a4bb694b4da5 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -216,6 +216,30 @@ static inline void bio_advance_iter_mp(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_segment_mp(bvl, bio, iter)				\
+ 	__bio_for_each_segment_mp(bvl, bio, iter, (bio)->bi_iter)
  
- 	/*
-+	 * Don't allow merge of different write hints, or for a hint with
-+	 * non-hint IO.
-+	 */
-+	if ((req->cmd_flags & REQ_WRITE_LIFE_MASK) !=
-+	    (next->cmd_flags & REQ_WRITE_LIFE_MASK))
-+		return NULL;
-+
-+	/*
- 	 * If we are allowed to merge, then append bio list
- 	 * from next to rq and release next. merge_requests_fn
- 	 * will have updated segment counts, update sector
-@@ -791,6 +799,14 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 	    !blk_write_same_mergeable(rq->bio, bio))
- 		return false;
- 
-+	/*
-+	 * Don't allow merge of different write hints, or for a hint with
-+	 * non-hint IO.
-+	 */
-+	if ((rq->cmd_flags & REQ_WRITE_LIFE_MASK) !=
-+	    (bio->bi_opf & REQ_WRITE_LIFE_MASK))
-+		return false;
-+
- 	return true;
- }
- 
-diff --git a/fs/inode.c b/fs/inode.c
-index defb015a2c6d..66cc431c9a96 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -2131,3 +2131,12 @@ void inode_set_write_hint(struct inode *inode, enum rw_hint hint)
- 		inode_unlock(inode);
- 	}
- }
++/*
++ * This helper returns each bvec stored in bvec table directly,
++ * so the returned bvec points to one multipage bvec in the table
++ * and caller can update the bvec via the returnd pointer.
++ */
++#define bio_for_each_segment_all_mp(bvl, bio, i)                       \
++	bio_for_each_segment_all((bvl), (bio), (i))
 +
 +/*
-+ * Returns block write hint mask for the inode
++ * This helper returns singlepage bvec to caller, and the sp bvec
++ * is generated in-flight from multipage bvec stored in bvec table.
++ * So we can _not_ change the bvec stored in bio->bi_io_vec[] via
++ * this helper.
++ *
++ * If someone need to update bvec in the table, please use
++ * bio_for_each_segment_all_mp() and make sure it is correctly used
++ * since the bvec points to one multipage bvec.
 + */
-+unsigned int inode_hint_to_opf(struct inode *inode)
-+{
-+	return write_hint_to_opf(inode_write_hint(inode));
-+}
-+EXPORT_SYMBOL(inode_hint_to_opf);
++#define bio_for_each_segment_all_sp(bvl, bio, i, bi)			\
++	for ((bi).iter = BVEC_ITER_ALL_INIT, i = 0, bvl = &(bi).bv;	\
++	     (bi).iter.bi_idx < (bio)->bi_vcnt &&			\
++		(((bi).bv = bio_iter_iovec((bio), (bi).iter)), 1);	\
++	     bio_advance_iter((bio), &(bi).iter, (bi).bv.bv_len), i++)
++
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+ static inline unsigned bio_segments(struct bio *bio)
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index e210da6d14b8..0d44dce19d9f 100644
+index e210da6d14b8..3650932f2080 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -7,6 +7,7 @@
+@@ -118,6 +118,12 @@ struct bio {
  
- #include <linux/types.h>
- #include <linux/bvec.h>
-+#include <linux/fs.h>
+ #define BIO_RESET_BYTES		offsetof(struct bio, bi_max_vecs)
  
- struct bio_set;
- struct bio;
-@@ -223,6 +224,10 @@ enum req_flag_bits {
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
- 
-+	__REQ_WRITE_HINT_SHIFT,	/* 3 bits for life time hint */
-+	__REQ_WRITE_HINT_PAD1,
-+	__REQ_WRITE_HINT_PAD2,
++/* this iter is only for implementing bio_for_each_segment_rd() */
++struct bvec_iter_all {
++	struct bvec_iter	iter;
++	struct bio_vec		bv;      /* in-flight singlepage bvec */
++};
 +
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
-@@ -244,6 +249,13 @@ enum req_flag_bits {
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
- 
-+#define REQ_WRITE_SHORT		(WRITE_LIFE_SHORT << __REQ_WRITE_HINT_SHIFT)
-+#define REQ_WRITE_MEDIUM	(WRITE_LIFE_MEDIUM << __REQ_WRITE_HINT_SHIFT)
-+#define REQ_WRITE_LONG		(WRITE_LIFE_LONG << __REQ_WRITE_HINT_SHIFT)
-+#define REQ_WRITE_EXTREME	(WRITE_LIFE_EXTREME << __REQ_WRITE_HINT_SHIFT)
-+
-+#define REQ_WRITE_LIFE_MASK	(0x7 << __REQ_WRITE_HINT_SHIFT)
-+
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
-@@ -335,4 +347,23 @@ struct blk_rq_stat {
- 	u64 batch;
- };
- 
-+static inline unsigned int write_hint_to_opf(enum rw_hint hint)
-+{
-+	return hint << __REQ_WRITE_HINT_SHIFT;
-+}
-+
-+/*
-+ * Don't let drivers see WRITE_LIFE_NOT_SET, return NONE for that
-+ */
-+static inline enum rw_hint opf_to_write_hint(unsigned int opf)
-+{
-+	enum rw_hint ret;
-+
-+	ret = (opf & REQ_WRITE_LIFE_MASK) >> __REQ_WRITE_HINT_SHIFT;
-+	if (ret == WRITE_LIFE_NOT_SET)
-+		ret = WRITE_LIFE_NONE;
-+
-+	return ret;
-+}
-+
- #endif /* __LINUX_BLK_TYPES_H */
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 0ef5d110d2bc..86888a6ccad1 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1912,6 +1912,8 @@ static inline bool HAS_UNMAPPED_ID(struct inode *inode)
- 	return !uid_valid(inode->i_uid) || !gid_valid(inode->i_gid);
- }
- 
-+extern unsigned int inode_hint_to_opf(struct inode *inode);
-+
- static inline unsigned int write_hint_to_mask(enum rw_hint hint,
- 					      unsigned int shift)
- {
+ /*
+  * bio flags
+  */
 -- 
-2.7.4
+2.9.4
