@@ -1,111 +1,22 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 04/11] fs: add support for allowing applications to pass in write life time hints
-Date: Wed, 14 Jun 2017 13:05:27 -0600
-Message-Id: <1497467134-6323-5-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
-References: <1497467134-6323-1-git-send-email-axboe@kernel.dk>
+Return-Path: <BATV+8132ee8c7e24eb087ca3+5055+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 26 Jun 2017 02:52:21 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	adilger@dilger.ca, hch@infradead.org, martin.petersen@oracle.com,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 2/9] block: add support for write hints in a bio
+Message-ID: <20170626095221.GC14057@infradead.org>
+References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+ <1498004526-4543-3-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1498004526-4543-3-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Add four flags for the pwritev2(2) system call, allowing an application
-to give the kernel a hint about what on-media life times can be
-expected from a given write.
+Looks fine for now:
 
-The intent is for these values to be relative to each other, no
-absolute meaning should be attached to these flag names.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Define IOCB flags to carry this information over, and finally
-transform them into the block defined stream values.
-
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/read_write.c         |  9 ++++++++-
- include/linux/fs.h      | 12 ++++++++++++
- include/uapi/linux/fs.h | 10 ++++++++++
- 3 files changed, 30 insertions(+), 1 deletion(-)
-
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 47c1d4484df9..a9b0c3125e0f 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -678,7 +678,7 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 	struct kiocb kiocb;
- 	ssize_t ret;
- 
--	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC))
-+	if (flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_WRITE_LIFE_MASK))
- 		return -EOPNOTSUPP;
- 
- 	init_sync_kiocb(&kiocb, filp);
-@@ -688,6 +688,13 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
- 		kiocb.ki_flags |= IOCB_DSYNC;
- 	if (flags & RWF_SYNC)
- 		kiocb.ki_flags |= (IOCB_DSYNC | IOCB_SYNC);
-+	if (flags & RWF_WRITE_LIFE_MASK) {
-+		struct inode *inode = file_inode(filp);
-+
-+		inode->i_stream = (flags & RWF_WRITE_LIFE_MASK) >>
-+					RWF_WRITE_LIFE_SHIFT;
-+		kiocb.ki_flags |= inode->i_stream << IOCB_WRITE_LIFE_SHIFT;
-+	}
- 	kiocb.ki_pos = *ppos;
- 
- 	if (type == READ)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 771e172d23d7..751a1046e87b 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -269,6 +269,12 @@ struct writeback_control;
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
- 
-+/*
-+ * Steal 4-bits for stream information, this allows 16 valid streams
-+ */
-+#define IOCB_WRITE_LIFE_SHIFT	7
-+#define IOCB_WRITE_LIFE_MASK	(BIT(7) | BIT(8) | BIT(9) | BIT(10))
-+
- struct kiocb {
- 	struct file		*ki_filp;
- 	loff_t			ki_pos;
-@@ -292,6 +298,12 @@ static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
- 	};
- }
- 
-+static inline int iocb_streamid(const struct kiocb *iocb)
-+{
-+	return (iocb->ki_flags & IOCB_WRITE_LIFE_MASK) >>
-+			IOCB_WRITE_LIFE_SHIFT;
-+}
-+
- /*
-  * "descriptor" for what we're up to with a read.
-  * This allows us to use the same read code yet
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 24e61a54feaa..58b7ee06b380 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -361,4 +361,14 @@ struct fscrypt_key {
- #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
- #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
- 
-+/*
-+ * Data life time write flags, steal 4 bits for that
-+ */
-+#define RWF_WRITE_LIFE_SHIFT		4
-+#define RWF_WRITE_LIFE_MASK		0x000000f0 /* 4 bits of stream ID */
-+#define RWF_WRITE_LIFE_SHORT		(1 << RWF_WRITE_LIFE_SHIFT)
-+#define RWF_WRITE_LIFE_MEDIUM		(2 << RWF_WRITE_LIFE_SHIFT)
-+#define RWF_WRITE_LIFE_LONG		(3 << RWF_WRITE_LIFE_SHIFT)
-+#define RWF_WRITE_LIFE_EXTREME		(4 << RWF_WRITE_LIFE_SHIFT)
-+
- #endif /* _UAPI_LINUX_FS_H */
--- 
-2.7.4
+(although I suspect we'll eventually move to a hints field
+separate from the REQ_* flags).
