@@ -1,42 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yw0-f196.google.com ([209.85.161.196]:35904 "EHLO
-        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751432AbdFZUwX (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:41927 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751418AbdFZQnl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 16:52:23 -0400
-Date: Mon, 26 Jun 2017 16:52:20 -0400
-From: Tejun Heo <tj@kernel.org>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>,
+        Mon, 26 Jun 2017 12:43:41 -0400
+To: Christoph Hellwig <hch@lst.de>
+Cc: Tejun Heo <tj@kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Scott Bauer <scott.bauer@intel.com>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         Rafael Antognolli <rafael.antognolli@intel.com>,
         Robert Elliott <elliott@hpe.com>, linux-ide@vger.kernel.org,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
 Subject: Re: [PATCH] sd: add support for TCG OPAL self encrypting disks
-Message-ID: <20170626205220.GA27428@htj.duckdns.org>
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20170619122646.32666-1-hch@lst.de>
- <20170619122646.32666-2-hch@lst.de>
- <20170626111047.GA16273@lst.de>
- <yq1tw327l8w.fsf@oracle.com>
+        <20170619122646.32666-2-hch@lst.de> <20170626111047.GA16273@lst.de>
+Date: Mon, 26 Jun 2017 12:43:27 -0400
+In-Reply-To: <20170626111047.GA16273@lst.de> (Christoph Hellwig's message of
+        "Mon, 26 Jun 2017 13:10:47 +0200")
+Message-ID: <yq1tw327l8w.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <yq1tw327l8w.fsf@oracle.com>
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Jun 26, 2017 at 12:43:27PM -0400, Martin K. Petersen wrote:
-> 
-> Christoph,
-> 
-> > ping?
-> 
-> Looks good to me. I'll queue it up for 4.13 as soon as Linus has pulled
-> in the ata bits.
 
-I can route it through libata tree w/ your ack if that's more convenient.
+Christoph,
 
-Thanks.
+> ping?
+
+Looks good to me. I'll queue it up for 4.13 as soon as Linus has pulled
+in the ata bits.
 
 -- 
-tejun
+Martin K. Petersen	Oracle Linux Engineering
