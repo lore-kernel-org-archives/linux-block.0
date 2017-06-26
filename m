@@ -1,89 +1,44 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: axboe@kernel.dk
-Cc: viro@ZenIV.linux.org.uk,
-	hch@lst.de,
-	jack@suse.cz,
-	akpm@linux-foundation.org,
-	linux-block@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 02/10] fs: Introduce filemap_range_has_page()
-Date: Mon, 19 Jun 2017 11:33:40 -0500
-Message-Id: <20170619163348.15542-3-rgoldwyn@suse.de>
-In-Reply-To: <20170619163348.15542-1-rgoldwyn@suse.de>
-References: <20170619163348.15542-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:53700 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751491AbdFZMMC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:12:02 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 02/51] block: loop: comment on direct access to bvec table
+Date: Mon, 26 Jun 2017 20:09:45 +0800
+Message-Id: <20170626121034.3051-3-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-
-filemap_range_has_page() return true if the file's mapping has
-a page within the range mentioned. This function will be used
-to check if a write() call will cause a writeback of previous
-writes.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/fs.h |  2 ++
- mm/filemap.c       | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+ drivers/block/loop.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 96a1a1fa54a9..0d34f5b5a6b0 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2518,6 +2518,8 @@ extern int filemap_fdatawait(struct address_space *);
- extern void filemap_fdatawait_keep_errors(struct address_space *);
- extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
- 				   loff_t lend);
-+extern bool filemap_range_has_page(struct address_space *, loff_t lstart,
-+				  loff_t lend);
- extern int filemap_write_and_wait(struct address_space *mapping);
- extern int filemap_write_and_wait_range(struct address_space *mapping,
- 				        loff_t lstart, loff_t lend);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 6f1be573a5e6..9b39a2390b9e 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -376,6 +376,38 @@ int filemap_flush(struct address_space *mapping)
- }
- EXPORT_SYMBOL(filemap_flush);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0de11444e317..88063ab17e9a 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -487,6 +487,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	/* nomerge for loop request queue */
+ 	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
  
-+/**
-+ * filemap_range_has_page - check if a page exists in range.
-+ * @mapping:           address space within which to check
-+ * @start_byte:        offset in bytes where the range starts
-+ * @end_byte:          offset in bytes where the range ends (inclusive)
-+ *
-+ * Find at least one page in the range supplied, usually used to check if
-+ * direct writing in this range will trigger a writeback.
-+ */
-+bool filemap_range_has_page(struct address_space *mapping,
-+			   loff_t start_byte, loff_t end_byte)
-+{
-+	pgoff_t index = start_byte >> PAGE_SHIFT;
-+	pgoff_t end = end_byte >> PAGE_SHIFT;
-+	struct pagevec pvec;
-+	bool ret;
-+
-+	if (end_byte < start_byte)
-+		return false;
-+
-+	if (mapping->nrpages == 0)
-+		return false;
-+
-+	pagevec_init(&pvec, 0);
-+	if (!pagevec_lookup(&pvec, mapping, index, 1))
-+		return false;
-+	ret = (pvec.pages[0]->index <= end);
-+	pagevec_release(&pvec);
-+	return ret;
-+}
-+EXPORT_SYMBOL(filemap_range_has_page);
-+
- static int __filemap_fdatawait_range(struct address_space *mapping,
- 				     loff_t start_byte, loff_t end_byte)
- {
++	/*
++	 * For multipage bvec support, it is safe to pass the bvec
++	 * table to iov iterator, because iov iter still uses bvec
++	 * iter helpers to travese bvec.
++	 */
+ 	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+ 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
+ 		      bio_segments(bio), blk_rq_bytes(cmd->rq));
 -- 
-2.12.0
+2.9.4
