@@ -1,126 +1,101 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52102 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753111AbdFRPWU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:20 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 07/30] nvme-rdma: make stop/free queue receive a ctrl and qid struct
-Date: Sun, 18 Jun 2017 18:21:41 +0300
-Message-Id: <1497799324-19598-8-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
+Received: from mx1.redhat.com ([209.132.183.28]:46272 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752167AbdFZMN4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:13:56 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>, linux-bcache@vger.kernel.org
+Subject: [PATCH v2 07/51] bcache: comment on direct access to bvec table
+Date: Mon, 26 Jun 2017 20:09:50 +0800
+Message-Id: <20170626121034.3051-8-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Make it symmetrical to alloc/start queue.
+Looks all are safe after multipage bvec is supported.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-bcache@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/rdma.c | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
+ drivers/md/bcache/btree.c | 1 +
+ drivers/md/bcache/super.c | 6 ++++++
+ drivers/md/bcache/util.c  | 7 +++++++
+ 3 files changed, 14 insertions(+)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index c8016150dc21..86998de90f52 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -563,16 +563,20 @@ static int nvme_rdma_alloc_queue(struct nvme_rdma_ctrl *ctrl,
- 	return ret;
- }
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 866dcf78ff8e..3da595ae565b 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -431,6 +431,7 @@ static void do_btree_node_write(struct btree *b)
  
--static void nvme_rdma_stop_queue(struct nvme_rdma_queue *queue)
-+static void nvme_rdma_stop_queue(struct nvme_rdma_ctrl *ctrl, int qid)
+ 		continue_at(cl, btree_node_write_done, NULL);
+ 	} else {
++		/* No harm for multipage bvec since the new is just allocated */
+ 		b->bio->bi_vcnt = 0;
+ 		bch_bio_map(b->bio, i);
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 8352fad765f6..6808f548cd13 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -208,6 +208,7 @@ static void write_bdev_super_endio(struct bio *bio)
+ 
+ static void __write_super(struct cache_sb *sb, struct bio *bio)
  {
-+	struct nvme_rdma_queue *queue = &ctrl->queues[qid];
++	/* single page bio, safe for multipage bvec */
+ 	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
+ 	unsigned i;
+ 
+@@ -1154,6 +1155,8 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 	dc->bdev->bd_holder = dc;
+ 
+ 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
 +
- 	if (test_bit(NVME_RDMA_Q_DELETING, &queue->flags))
- 		return;
- 	rdma_disconnect(queue->cm_id);
- 	ib_drain_qp(queue->qp);
- }
++	/* single page bio, safe for multipage bvec */
+ 	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
+ 	get_page(sb_page);
  
--static void nvme_rdma_free_queue(struct nvme_rdma_queue *queue)
-+static void nvme_rdma_free_queue(struct nvme_rdma_ctrl *ctrl, int qid)
- {
-+	struct nvme_rdma_queue *queue = &ctrl->queues[qid];
+@@ -1799,6 +1802,7 @@ void bch_cache_release(struct kobject *kobj)
+ 	for (i = 0; i < RESERVE_NR; i++)
+ 		free_fifo(&ca->free[i]);
+ 
++	/* single page bio, safe for multipage bvec */
+ 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
+ 		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
+ 
+@@ -1854,6 +1858,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 	ca->bdev->bd_holder = ca;
+ 
+ 	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
 +
- 	if (test_and_set_bit(NVME_RDMA_Q_DELETING, &queue->flags))
- 		return;
- 	nvme_rdma_destroy_queue_ib(queue);
-@@ -584,7 +588,7 @@ static void nvme_rdma_free_io_queues(struct nvme_rdma_ctrl *ctrl)
- 	int i;
++	/* single page bio, safe for multipage bvec */
+ 	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
+ 	get_page(sb_page);
  
- 	for (i = 1; i < ctrl->queue_count; i++)
--		nvme_rdma_free_queue(&ctrl->queues[i]);
-+		nvme_rdma_free_queue(ctrl, i);
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 8c3a938f4bf0..11b4230ea6ad 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -223,6 +223,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
+ 		: 0;
  }
  
- static void nvme_rdma_stop_io_queues(struct nvme_rdma_ctrl *ctrl)
-@@ -592,7 +596,7 @@ static void nvme_rdma_stop_io_queues(struct nvme_rdma_ctrl *ctrl)
- 	int i;
- 
- 	for (i = 1; i < ctrl->queue_count; i++)
--		nvme_rdma_stop_queue(&ctrl->queues[i]);
-+		nvme_rdma_stop_queue(ctrl, i);
- }
- 
- static void nvme_rdma_destroy_io_queues(struct nvme_rdma_ctrl *ctrl, bool remove)
-@@ -637,7 +641,7 @@ static int nvme_rdma_start_io_queues(struct nvme_rdma_ctrl *ctrl)
- 
- out_stop_queues:
- 	for (i--; i >= 1; i--)
--		nvme_rdma_stop_queue(&ctrl->queues[i]);
-+		nvme_rdma_stop_queue(ctrl, i);
- 	return ret;
- }
- 
-@@ -680,7 +684,7 @@ static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- 
- out_free_queues:
- 	for (i--; i >= 1; i--)
--		nvme_rdma_free_queue(&ctrl->queues[i]);
-+		nvme_rdma_free_queue(ctrl, i);
- 
- 	return ret;
- }
-@@ -752,7 +756,7 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
- 
- static void nvme_rdma_destroy_admin_queue(struct nvme_rdma_ctrl *ctrl, bool remove)
++/*
++ * Generally it isn't good to access .bi_io_vec and .bi_vcnt
++ * directly, the preferred way is bio_add_page, but in
++ * this case, bch_bio_map() supposes that the bvec table
++ * is empty, so it is safe to access .bi_vcnt & .bi_io_vec
++ * in this way even after multipage bvec is supported.
++ */
+ void bch_bio_map(struct bio *bio, void *base)
  {
--	nvme_rdma_stop_queue(&ctrl->queues[0]);
-+	nvme_rdma_stop_queue(ctrl, 0);
- 	if (remove) {
- 		blk_cleanup_queue(ctrl->ctrl.admin_connect_q);
- 		blk_cleanup_queue(ctrl->ctrl.admin_q);
-@@ -762,7 +766,7 @@ static void nvme_rdma_destroy_admin_queue(struct nvme_rdma_ctrl *ctrl, bool remo
- 
- 	nvme_rdma_free_qe(ctrl->queues[0].device->dev, &ctrl->async_event_sqe,
- 			sizeof(struct nvme_command), DMA_TO_DEVICE);
--	nvme_rdma_free_queue(&ctrl->queues[0]);
-+	nvme_rdma_free_queue(ctrl, 0);
- }
- 
- static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl, bool new)
-@@ -864,14 +868,14 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl, bool new
- out_free_tagset:
- 	if (new) {
- 		/* disconnect and drain the queue before freeing the tagset */
--		nvme_rdma_stop_queue(&ctrl->queues[0]);
-+		nvme_rdma_stop_queue(ctrl, 0);
- 		blk_mq_free_tag_set(&ctrl->admin_tag_set);
- 	}
- out_put_dev:
- 	if (new)
- 		nvme_rdma_dev_put(ctrl->device);
- out_free_queue:
--	nvme_rdma_free_queue(&ctrl->queues[0]);
-+	nvme_rdma_free_queue(ctrl, 0);
- 	return error;
- }
- 
+ 	size_t size = bio->bi_iter.bi_size;
 -- 
-2.7.4
+2.9.4
