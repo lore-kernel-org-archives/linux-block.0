@@ -1,121 +1,216 @@
-Return-Path: <BATV+4a135d35f30012caeec5+5032+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/8] genirq/affinity: factor out a irq_affinity_set helper
-Date: Sat,  3 Jun 2017 16:03:58 +0200
-Message-Id: <20170603140403.27379-4-hch@lst.de>
-In-Reply-To: <20170603140403.27379-1-hch@lst.de>
-References: <20170603140403.27379-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:37329 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751997AbdFZJ6i (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:38 -0400
+Received: by mail-wm0-f42.google.com with SMTP id i127so3038255wma.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:37 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 19/20] lightnvm: pblk: set mempool and workqueue params.
+Date: Mon, 26 Jun 2017 11:57:28 +0200
+Message-Id: <1498471049-25505-20-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Factor out code from the x86 cpu hot plug code to program the affinity
-for a vector for a hot plug / hot unplug event.
+Make constants to define sizes for internal mempools and workqueues. In
+this process, adjust the values to be more meaningful given the internal
+constrains of the FTL. In order to do this for workqueues, separate the
+current auxiliary workqueue into two dedicated workqueues to manage
+lines being closed and bad blocks.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- arch/x86/kernel/irq.c     | 23 ++---------------------
- include/linux/interrupt.h |  1 +
- kernel/irq/affinity.c     | 28 ++++++++++++++++++++++++++++
- 3 files changed, 31 insertions(+), 21 deletions(-)
+ drivers/lightnvm/pblk-core.c  |  7 ++++---
+ drivers/lightnvm/pblk-init.c  | 39 ++++++++++++++++++++++++++-------------
+ drivers/lightnvm/pblk-write.c |  5 +++--
+ drivers/lightnvm/pblk.h       | 13 +++++++++++--
+ 4 files changed, 44 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index f34fe7444836..a54eac5d81b3 100644
---- a/arch/x86/kernel/irq.c
-+++ b/arch/x86/kernel/irq.c
-@@ -437,7 +437,6 @@ void fixup_irqs(void)
- 	struct irq_desc *desc;
- 	struct irq_data *data;
- 	struct irq_chip *chip;
--	int ret;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index ba3b88f0e1f7..823e53f95a80 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -33,7 +33,7 @@ static void pblk_mark_bb(struct pblk *pblk, struct pblk_line *line,
+ 		pr_err("pblk: attempted to erase bb: line:%d, pos:%d\n",
+ 							line->id, pos);
  
- 	for_each_irq_desc(irq, desc) {
- 		int break_affinity = 0;
-@@ -482,26 +481,8 @@ void fixup_irqs(void)
- 			continue;
- 		}
+-	pblk_line_run_ws(pblk, NULL, ppa, pblk_line_mark_bb);
++	pblk_line_run_ws(pblk, NULL, ppa, pblk_line_mark_bb, pblk->bb_wq);
+ }
  
--		if (!irqd_can_move_in_process_context(data) && chip->irq_mask)
--			chip->irq_mask(data);
--
--		if (chip->irq_set_affinity) {
--			ret = chip->irq_set_affinity(data, affinity, true);
--			if (ret == -ENOSPC)
--				pr_crit("IRQ %d set affinity failed because there are no available vectors.  The device assigned to this IRQ is unstable.\n", irq);
--		} else {
--			if (!(warned++))
--				set_affinity = 0;
--		}
--
--		/*
--		 * We unmask if the irq was not marked masked by the
--		 * core code. That respects the lazy irq disable
--		 * behaviour.
--		 */
--		if (!irqd_can_move_in_process_context(data) &&
--		    !irqd_irq_masked(data) && chip->irq_unmask)
--			chip->irq_unmask(data);
-+		if (!irq_affinity_set(irq, desc, affinity) && !warned++)
-+			set_affinity = 0;
+ static void __pblk_end_io_erase(struct pblk *pblk, struct nvm_rq *rqd)
+@@ -1528,7 +1528,8 @@ void pblk_line_mark_bb(struct work_struct *work)
+ }
  
- 		raw_spin_unlock(&desc->lock);
+ void pblk_line_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+-		      void (*work)(struct work_struct *))
++		      void (*work)(struct work_struct *),
++		      struct workqueue_struct *wq)
+ {
+ 	struct pblk_line_ws *line_ws;
  
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index a6fba4804672..afd3aa33e9b0 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -292,6 +292,7 @@ irq_set_affinity_notifier(unsigned int irq, struct irq_affinity_notify *notify);
+@@ -1541,7 +1542,7 @@ void pblk_line_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 	line_ws->priv = priv;
  
- struct cpumask *irq_create_affinity_masks(int nvec, const struct irq_affinity *affd);
- int irq_calc_affinity_vectors(int maxvec, const struct irq_affinity *affd);
-+bool irq_affinity_set(int irq, struct irq_desc *desc, const cpumask_t *mask);
+ 	INIT_WORK(&line_ws->ws, work);
+-	queue_work(pblk->kw_wq, &line_ws->ws);
++	queue_work(wq, &line_ws->ws);
+ }
  
- #else /* CONFIG_SMP */
+ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 41db12deaa49..78a9bebac1fe 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -250,7 +250,7 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->page_pool)
+ 		return -ENOMEM;
  
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index e2d356dd7581..3cec0042fad2 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -1,8 +1,36 @@
+-	pblk->line_ws_pool = mempool_create_slab_pool(geo->nr_luns,
++	pblk->line_ws_pool = mempool_create_slab_pool(PBLK_WS_POOL_SIZE,
+ 							pblk_blk_ws_cache);
+ 	if (!pblk->line_ws_pool)
+ 		goto free_page_pool;
+@@ -259,35 +259,45 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->rec_pool)
+ 		goto free_blk_ws_pool;
  
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/kernel.h>
- #include <linux/slab.h>
- #include <linux/cpu.h>
-+#include "internals.h"
+-	pblk->g_rq_pool = mempool_create_slab_pool(64, pblk_g_rq_cache);
++	pblk->g_rq_pool = mempool_create_slab_pool(PBLK_READ_REQ_POOL_SIZE,
++							pblk_g_rq_cache);
+ 	if (!pblk->g_rq_pool)
+ 		goto free_rec_pool;
+ 
+-	pblk->w_rq_pool = mempool_create_slab_pool(64, pblk_w_rq_cache);
++	pblk->w_rq_pool = mempool_create_slab_pool(geo->nr_luns * 2,
++							pblk_w_rq_cache);
+ 	if (!pblk->w_rq_pool)
+ 		goto free_g_rq_pool;
+ 
+ 	pblk->line_meta_pool =
+-			mempool_create_slab_pool(16, pblk_line_meta_cache);
++			mempool_create_slab_pool(PBLK_META_POOL_SIZE,
++							pblk_line_meta_cache);
+ 	if (!pblk->line_meta_pool)
+ 		goto free_w_rq_pool;
+ 
+-	pblk->kw_wq = alloc_workqueue("pblk-aux-wq",
+-					WQ_MEM_RECLAIM | WQ_UNBOUND, 1);
+-	if (!pblk->kw_wq)
++	pblk->close_wq = alloc_workqueue("pblk-close-wq",
++			WQ_MEM_RECLAIM | WQ_UNBOUND, PBLK_NR_CLOSE_JOBS);
++	if (!pblk->close_wq)
+ 		goto free_line_meta_pool;
+ 
++	pblk->bb_wq = alloc_workqueue("pblk-bb-wq",
++			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
++	if (!pblk->bb_wq)
++		goto free_close_wq;
 +
-+bool irq_affinity_set(int irq, struct irq_desc *desc, const cpumask_t *mask)
-+{
-+	struct irq_data *data = irq_desc_get_irq_data(desc);
-+	struct irq_chip *chip = irq_data_get_irq_chip(data);
-+	bool ret = false;
-+
-+	if (!irq_can_move_pcntxt(data) && chip->irq_mask)
-+		chip->irq_mask(data);
-+
-+	if (chip->irq_set_affinity) {
-+		if (chip->irq_set_affinity(data, mask, true) == -ENOSPC)
-+			pr_crit("IRQ %d set affinity failed because there are no available vectors.  The device assigned to this IRQ is unstable.\n", irq);
-+		ret = true;
-+	}
-+
-+	/*
-+	 * We unmask if the irq was not marked masked by the core code.
-+	 * That respects the lazy irq disable behaviour.
-+	 */
-+	if (!irq_can_move_pcntxt(data) &&
-+	    !irqd_irq_masked(data) && chip->irq_unmask)
-+		chip->irq_unmask(data);
-+
-+	return ret;
-+}
+ 	if (pblk_set_ppaf(pblk))
+-		goto free_kw_wq;
++		goto free_bb_wq;
  
- static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
- 				int cpus_per_vec)
+ 	if (pblk_rwb_init(pblk))
+-		goto free_kw_wq;
++		goto free_bb_wq;
+ 
+ 	INIT_LIST_HEAD(&pblk->compl_list);
+ 	return 0;
+ 
+-free_kw_wq:
+-	destroy_workqueue(pblk->kw_wq);
++free_bb_wq:
++	destroy_workqueue(pblk->bb_wq);
++free_close_wq:
++	destroy_workqueue(pblk->close_wq);
+ free_line_meta_pool:
+ 	mempool_destroy(pblk->line_meta_pool);
+ free_w_rq_pool:
+@@ -305,8 +315,11 @@ static int pblk_core_init(struct pblk *pblk)
+ 
+ static void pblk_core_free(struct pblk *pblk)
+ {
+-	if (pblk->kw_wq)
+-		destroy_workqueue(pblk->kw_wq);
++	if (pblk->close_wq)
++		destroy_workqueue(pblk->close_wq);
++
++	if (pblk->bb_wq)
++		destroy_workqueue(pblk->bb_wq);
+ 
+ 	mempool_destroy(pblk->page_pool);
+ 	mempool_destroy(pblk->line_ws_pool);
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index a50bfbd12c32..f071fb79e199 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -150,7 +150,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
+ 	}
+ 
+ 	INIT_WORK(&recovery->ws_rec, pblk_submit_rec);
+-	queue_work(pblk->kw_wq, &recovery->ws_rec);
++	queue_work(pblk->close_wq, &recovery->ws_rec);
+ 
+ out:
+ 	pblk_complete_write(pblk, rqd, c_ctx);
+@@ -198,7 +198,8 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
+ 
+ 	sync = atomic_add_return(rqd->nr_ppas, &emeta->sync);
+ 	if (sync == emeta->nr_entries)
+-		pblk_line_run_ws(pblk, line, NULL, pblk_line_close_ws);
++		pblk_line_run_ws(pblk, line, NULL, pblk_line_close_ws,
++								pblk->close_wq);
+ 
+ 	bio_put(rqd->bio);
+ 	pblk_free_rqd(pblk, rqd, READ);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index aaee718f1029..862bca130144 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -40,6 +40,12 @@
+ #define PBLK_MAX_REQ_ADDRS (64)
+ #define PBLK_MAX_REQ_ADDRS_PW (6)
+ 
++#define PBLK_WS_POOL_SIZE (128)
++#define PBLK_META_POOL_SIZE (128)
++#define PBLK_READ_REQ_POOL_SIZE (1024)
++
++#define PBLK_NR_CLOSE_JOBS (4)
++
+ #define PBLK_CACHE_NAME_LEN (DISK_NAME_LEN + 16)
+ 
+ #define PBLK_COMMAND_TIMEOUT_MS 30000
+@@ -599,7 +605,9 @@ struct pblk {
+ 	mempool_t *w_rq_pool;
+ 	mempool_t *line_meta_pool;
+ 
+-	struct workqueue_struct *kw_wq;
++	struct workqueue_struct *close_wq;
++	struct workqueue_struct *bb_wq;
++
+ 	struct timer_list wtimer;
+ 
+ 	struct pblk_gc gc;
+@@ -692,7 +700,8 @@ void pblk_line_close(struct pblk *pblk, struct pblk_line *line);
+ void pblk_line_close_ws(struct work_struct *work);
+ void pblk_line_mark_bb(struct work_struct *work);
+ void pblk_line_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+-		      void (*work)(struct work_struct *));
++		      void (*work)(struct work_struct *),
++		      struct workqueue_struct *wq);
+ u64 pblk_line_smeta_start(struct pblk *pblk, struct pblk_line *line);
+ int pblk_line_read_smeta(struct pblk *pblk, struct pblk_line *line);
+ int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
 -- 
-2.11.0
+2.7.4
