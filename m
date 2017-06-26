@@ -1,21 +1,22 @@
-Return-Path: <darrick.wong@oracle.com>
-Date: Mon, 26 Jun 2017 08:22:41 -0700
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
+Return-Path: <cmaiolino@redhat.com>
+Date: Mon, 26 Jun 2017 15:40:24 +0200
+From: Carlos Maiolino <cmaiolino@redhat.com>
 To: Jeff Layton <jlayton@redhat.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
-        ross.zwisler@linux.intel.com, corbet@lwn.net, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        Carlos Maiolino <cmaiolino@redhat.com>, Eryu Guan <eguan@redhat.com>,
-        David Howells <dhowells@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-block@vger.kernel.org
+	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com, corbet@lwn.net,
+	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>,
+	Eryu Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH v7 21/22] xfs: minimal conversion to errseq_t writeback
  error reporting
-Message-ID: <20170626152241.GC4733@birch.djwong.org>
+Message-ID: <20170626134024.mhnzoz5mjfrzkekd@eorzea.usersys.redhat.com>
 References: <20170616193427.13955-1-jlayton@redhat.com>
  <20170616193427.13955-22-jlayton@redhat.com>
 MIME-Version: 1.0
@@ -28,6 +29,11 @@ On Fri, Jun 16, 2017 at 03:34:26PM -0400, Jeff Layton wrote:
 > before returning from fsync on normal files. Internal filemap_*
 > callers are left as-is.
 > 
+
+Looks good.
+
+Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
+
 > Signed-off-by: Jeff Layton <jlayton@redhat.com>
 > ---
 >  fs/xfs/xfs_file.c | 15 +++++++++++----
@@ -68,21 +74,6 @@ On Fri, Jun 16, 2017 at 03:34:26PM -0400, Jeff Layton wrote:
 >  
 > +out:
 > +	err2 = filemap_report_wb_err(file);
-
-Could we have a comment here to remind anyone reading the code a year
-from now that filemap_report_wb_err has side effects?  Pre-coffee me was
-wondering why we'd bother calling filemap_report_wb_err in the
-XFS_FORCED_SHUTDOWN case, then remembered that it touches data
-structures.
-
-The first sentence of the commit message (really, the word 'advance')
-added as a comment was adequate to remind me of the side effects.
-
-Once that's added,
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
-
---D
-
 > +	if (!error)
 > +		error = err2;
 > +
@@ -92,7 +83,6 @@ Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 > -- 
 > 2.13.0
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-xfs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+-- 
+Carlos
