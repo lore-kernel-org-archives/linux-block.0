@@ -1,96 +1,250 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:44078 "EHLO
-        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751976AbdF3KQY (ORCPT
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:33660 "EHLO
+        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751754AbdFZJ6U (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 06:16:24 -0400
-Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
-        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id BAF0E3E51E4
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:07 -0700 (PDT)
-Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
-        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 11E85B400C4
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:07 -0700 (PDT)
-In-Reply-To: <20170629134510.GA32385@infradead.org>
-References: <20170629134510.GA32385@infradead.org>
-From: Tang Junhui <tang.junhui@zte.com.cn>
-Date: Thu, 1 Jun 2017 16:48:04 +0800
-Subject: [PATCH 10/19] bcache: initialize stripe_sectors_dirty correctly for
- thin flash device
-To: linux-block@vger.kernel.org
-Message-Id: <20170629221206.DE3B810012B@ware.dreamhost.com>
+        Mon, 26 Jun 2017 05:58:20 -0400
+Received: by mail-wm0-f46.google.com with SMTP id z75so816695wmc.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:20 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 10/20] lightnvm: pblk: delete redundant buffer pointer
+Date: Mon, 26 Jun 2017 11:57:19 +0200
+Message-Id: <1498471049-25505-11-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Thin flash device does not initialize stripe_sectors_dirty correctly, this
-patch fixes this issue.
+After refactoring the metadata path, the backpointer controlling
+synced I/Os in a line becomes unnecessary; metadata is scheduled
+on the write thread, thus we know when the end of the line is reached
+and act on it directly.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Cc: stable@vger.kernel.org
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/md/bcache/super.c     | 3 ++-
- drivers/md/bcache/writeback.c | 8 ++++----
- drivers/md/bcache/writeback.h | 2 +-
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 18 +++---------------
+ drivers/lightnvm/pblk-init.c     |  1 -
+ drivers/lightnvm/pblk-map.c      |  2 +-
+ drivers/lightnvm/pblk-recovery.c |  2 --
+ drivers/lightnvm/pblk-sysfs.c    | 10 ++++------
+ drivers/lightnvm/pblk-write.c    | 13 +------------
+ drivers/lightnvm/pblk.h          |  6 ++----
+ 7 files changed, 11 insertions(+), 41 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 1f84791..e06641e 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1030,7 +1030,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 6e4b06f841e7..beae1618483f 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -65,8 +65,8 @@ static void pblk_end_io_erase(struct nvm_rq *rqd)
+ 	mempool_free(rqd, pblk->g_rq_pool);
+ }
+ 
+-static void __pblk_map_invalidate(struct pblk *pblk, struct pblk_line *line,
+-				  u64 paddr)
++void __pblk_map_invalidate(struct pblk *pblk, struct pblk_line *line,
++			   u64 paddr)
+ {
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 	struct list_head *move_list = NULL;
+@@ -129,18 +129,6 @@ void pblk_map_invalidate(struct pblk *pblk, struct ppa_addr ppa)
+ 	__pblk_map_invalidate(pblk, line, paddr);
+ }
+ 
+-void pblk_map_pad_invalidate(struct pblk *pblk, struct pblk_line *line,
+-			     u64 paddr)
+-{
+-	__pblk_map_invalidate(pblk, line, paddr);
+-
+-	pblk_rb_sync_init(&pblk->rwb, NULL);
+-	line->left_ssecs--;
+-	if (!line->left_ssecs)
+-		pblk_line_run_ws(pblk, line, NULL, pblk_line_close_ws);
+-	pblk_rb_sync_end(&pblk->rwb, NULL);
+-}
+-
+ static void pblk_invalidate_range(struct pblk *pblk, sector_t slba,
+ 				  unsigned int nr_secs)
+ {
+@@ -1057,7 +1045,7 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+ 	line->sec_in_line -= lm->emeta_sec[0];
+ 	line->emeta_ssec = off;
+ 	line->nr_valid_lbas = 0;
+-	line->left_ssecs = line->left_msecs = line->sec_in_line;
++	line->left_msecs = line->sec_in_line;
+ 	*line->vsc = cpu_to_le32(line->sec_in_line);
+ 
+ 	if (lm->sec_per_line - line->sec_in_line !=
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index e51b965ae6a9..968c2e390cef 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -889,7 +889,6 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	atomic_long_set(&pblk->req_writes, 0);
+ 	atomic_long_set(&pblk->sub_writes, 0);
+ 	atomic_long_set(&pblk->sync_writes, 0);
+-	atomic_long_set(&pblk->compl_writes, 0);
+ 	atomic_long_set(&pblk->inflight_reads, 0);
+ 	atomic_long_set(&pblk->cache_reads, 0);
+ 	atomic_long_set(&pblk->sync_reads, 0);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 08580a649499..9942d9bc7b3a 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -56,7 +56,7 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+ 
+ 			lba_list[paddr] = meta_list[i].lba = addr_empty;
+-			pblk_map_pad_invalidate(pblk, line, paddr);
++			__pblk_map_invalidate(pblk, line, paddr);
+ 		}
  	}
  
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
--		bch_sectors_dirty_init(dc);
-+		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
- 		atomic_inc(&dc->count);
- 		bch_writeback_queue(dc);
-@@ -1232,6 +1232,7 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
- 		goto err;
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index ba02d0bc3e45..7b0ace2f4957 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -553,7 +553,6 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 		if (ret)
+ 			pr_err("pblk: OOB read failed (err:%d)\n", ret);
  
- 	bcache_device_attach(d, c, u - c->uuids);
-+	bch_sectors_dirty_init(d);
- 	bch_flash_dev_request_init(d);
- 	add_disk(d->disk);
+-		line->left_ssecs = line->left_msecs;
+ 		left_ppas = 0;
+ 	}
  
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 3d463f0..4ac8b13 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -482,17 +482,17 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
- 	return MAP_CONTINUE;
- }
+@@ -659,7 +658,6 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 		/* Roll back failed sectors */
+ 		line->cur_sec -= nr_error_bits;
+ 		line->left_msecs += nr_error_bits;
+-		line->left_ssecs = line->left_msecs;
+ 		bitmap_clear(line->map_bitmap, line->cur_sec, nr_error_bits);
  
--void bch_sectors_dirty_init(struct cached_dev *dc)
-+void bch_sectors_dirty_init(struct bcache_device *d)
+ 		left_ppas = 0;
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 3d9a77646a3d..e1e92c9498a9 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -154,7 +154,7 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
+ 	int d_line_cnt = 0, l_line_cnt = 0;
+ 	int gc_full = 0, gc_high = 0, gc_mid = 0, gc_low = 0, gc_empty = 0;
+ 	int bad = 0, cor = 0;
+-	int msecs = 0, ssecs = 0, cur_sec = 0, vsc = 0, sec_in_line = 0;
++	int msecs = 0, cur_sec = 0, vsc = 0, sec_in_line = 0;
+ 	int map_weight = 0, meta_weight = 0;
+ 
+ 	spin_lock(&l_mg->free_lock);
+@@ -227,7 +227,6 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
+ 	if (l_mg->data_line) {
+ 		cur_sec = l_mg->data_line->cur_sec;
+ 		msecs = l_mg->data_line->left_msecs;
+-		ssecs = l_mg->data_line->left_ssecs;
+ 		vsc = le32_to_cpu(*l_mg->data_line->vsc);
+ 		sec_in_line = l_mg->data_line->sec_in_line;
+ 		meta_weight = bitmap_weight(&l_mg->meta_bitmap,
+@@ -259,8 +258,8 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
+ 			atomic_read(&pblk->gc.inflight_gc));
+ 
+ 	sz += snprintf(page + sz, PAGE_SIZE - sz,
+-		"data (%d) cur:%d, left:%d/%d, vsc:%d, s:%d, map:%d/%d (%d)\n",
+-			cur_data, cur_sec, msecs, ssecs, vsc, sec_in_line,
++		"data (%d) cur:%d, left:%d, vsc:%d, s:%d, map:%d/%d (%d)\n",
++			cur_data, cur_sec, msecs, vsc, sec_in_line,
+ 			map_weight, lm->sec_per_line, meta_weight);
+ 
+ 	return sz;
+@@ -303,7 +302,7 @@ static ssize_t pblk_sysfs_get_sec_per_write(struct pblk *pblk, char *page)
+ static ssize_t pblk_sysfs_stats_debug(struct pblk *pblk, char *page)
  {
- 	struct sectors_dirty_init op;
+ 	return snprintf(page, PAGE_SIZE,
+-		"%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
++		"%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
+ 			atomic_long_read(&pblk->inflight_writes),
+ 			atomic_long_read(&pblk->inflight_reads),
+ 			atomic_long_read(&pblk->req_writes),
+@@ -312,7 +311,6 @@ static ssize_t pblk_sysfs_stats_debug(struct pblk *pblk, char *page)
+ 			atomic_long_read(&pblk->padded_wb),
+ 			atomic_long_read(&pblk->sub_writes),
+ 			atomic_long_read(&pblk->sync_writes),
+-			atomic_long_read(&pblk->compl_writes),
+ 			atomic_long_read(&pblk->recov_writes),
+ 			atomic_long_read(&pblk->recov_gc_writes),
+ 			atomic_long_read(&pblk->recov_gc_reads),
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 1739c970692e..a29a34786ac5 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -17,16 +17,6 @@
  
- 	bch_btree_op_init(&op.op, -1);
--	op.inode = dc->disk.id;
-+	op.inode = d->id;
+ #include "pblk.h"
  
--	bch_btree_map_keys(&op.op, dc->disk.c, &KEY(op.inode, 0, 0),
-+	bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
- 			   sectors_dirty_init_fn, 0);
+-static void pblk_sync_line(struct pblk *pblk, struct pblk_line *line)
+-{
+-#ifdef CONFIG_NVM_DEBUG
+-	atomic_long_inc(&pblk->sync_writes);
+-#endif
+-
+-	/* Counter protected by rb sync lock */
+-	line->left_ssecs--;
+-}
+-
+ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 				    struct pblk_c_ctx *c_ctx)
+ {
+@@ -44,14 +34,13 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
  
--	dc->disk.sectors_dirty_last = bcache_dev_sectors_dirty(&dc->disk);
-+	d->sectors_dirty_last = bcache_dev_sectors_dirty(d);
- }
+ 		p = rqd->ppa_list[i];
+ 		line = &pblk->lines[pblk_dev_ppa_to_line(p)];
+-		pblk_sync_line(pblk, line);
  
- void bch_cached_dev_writeback_init(struct cached_dev *dc)
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index ea2f92e..c2ab4b4 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -109,7 +109,7 @@ static inline void bch_writeback_add(struct cached_dev *dc)
+ 		while ((original_bio = bio_list_pop(&w_ctx->bios)))
+ 			bio_endio(original_bio);
+ 	}
  
- void bcache_dev_sectors_dirty_add(struct cache_set *, unsigned, uint64_t, int);
+ #ifdef CONFIG_NVM_DEBUG
+-	atomic_long_add(c_ctx->nr_valid, &pblk->compl_writes);
++	atomic_long_add(c_ctx->nr_valid, &pblk->sync_writes);
+ #endif
  
--void bch_sectors_dirty_init(struct cached_dev *dc);
-+void bch_sectors_dirty_init(struct bcache_device *);
- void bch_cached_dev_writeback_init(struct cached_dev *);
- int bch_cached_dev_writeback_start(struct cached_dev *);
+ 	ret = pblk_rb_sync_advance(&pblk->rwb, c_ctx->nr_valid);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 954a0733510b..407d15c69fb4 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -395,7 +395,6 @@ struct pblk_line {
+ 	atomic_t left_seblks;		/* Blocks left for sync erasing */
  
+ 	int left_msecs;			/* Sectors left for mapping */
+-	int left_ssecs;			/* Sectors left to sync */
+ 	unsigned int cur_sec;		/* Sector map pointer */
+ 	unsigned int nr_valid_lbas;	/* Number of valid lbas in line */
+ 
+@@ -555,7 +554,6 @@ struct pblk {
+ 	atomic_long_t req_writes;	/* Sectors stored on write buffer */
+ 	atomic_long_t sub_writes;	/* Sectors submitted from buffer */
+ 	atomic_long_t sync_writes;	/* Sectors synced to media */
+-	atomic_long_t compl_writes;	/* Sectors completed in write bio */
+ 	atomic_long_t inflight_reads;	/* Inflight sector read requests */
+ 	atomic_long_t cache_reads;	/* Read requests that hit the cache */
+ 	atomic_long_t sync_reads;	/* Completed sector read requests */
+@@ -706,11 +704,11 @@ void pblk_end_bio_sync(struct bio *bio);
+ void pblk_end_io_sync(struct nvm_rq *rqd);
+ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
+ 		       int nr_pages);
+-void pblk_map_pad_invalidate(struct pblk *pblk, struct pblk_line *line,
+-			     u64 paddr);
+ void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
+ 			 int nr_pages);
+ void pblk_map_invalidate(struct pblk *pblk, struct ppa_addr ppa);
++void __pblk_map_invalidate(struct pblk *pblk, struct pblk_line *line,
++			   u64 paddr);
+ void pblk_update_map(struct pblk *pblk, sector_t lba, struct ppa_addr ppa);
+ void pblk_update_map_cache(struct pblk *pblk, sector_t lba,
+ 			   struct ppa_addr ppa);
 -- 
-1.8.3.1
+2.7.4
