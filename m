@@ -1,109 +1,114 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39122 "EHLO mail.kernel.org"
+Received: from mx1.redhat.com ([209.132.183.28]:55408 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751642AbdF1QaG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2017 12:30:06 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V4 01/12] kernfs: use idr instead of ida to manage inode number
-Date: Wed, 28 Jun 2017 09:29:51 -0700
-Message-Id: <5852a3cf1bfcf1900e3453775ccd5d976e300b66.1498666964.git.shli@fb.com>
-In-Reply-To: <cover.1498666964.git.shli@fb.com>
-References: <cover.1498666964.git.shli@fb.com>
-In-Reply-To: <cover.1498666964.git.shli@fb.com>
-References: <cover.1498666964.git.shli@fb.com>
+        id S1751520AbdFZMWJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:22:09 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 51/51] block: bio: pass segments to bio if bio_add_page() is bypassed
+Date: Mon, 26 Jun 2017 20:10:34 +0800
+Message-Id: <20170626121034.3051-52-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
+Under some situations, such as block direct I/O, we can't use
+bio_add_page() for merging pages into multipage bvec, so
+a new function is implemented for converting page array into one
+segment array, then these cases can benefit from multipage bvec
+too.
 
-kernfs uses ida to manage inode number. The problem is we can't get
-kernfs_node from inode number with ida. Switching to use idr, next patch
-will add an API to get kernfs_node from inode number.
-
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/kernfs/dir.c        | 17 ++++++++++++-----
- include/linux/kernfs.h |  2 +-
- 2 files changed, 13 insertions(+), 6 deletions(-)
+ block/bio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 48 insertions(+), 6 deletions(-)
 
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index db5900aaa..8ad7a17 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -21,6 +21,7 @@
- DEFINE_MUTEX(kernfs_mutex);
- static DEFINE_SPINLOCK(kernfs_rename_lock);	/* kn->parent and ->name */
- static char kernfs_pr_cont_buf[PATH_MAX];	/* protected by rename_lock */
-+static DEFINE_SPINLOCK(kernfs_idr_lock);	/* root->ino_idr */
- 
- #define rb_to_kn(X) rb_entry((X), struct kernfs_node, rb)
- 
-@@ -533,7 +534,9 @@ void kernfs_put(struct kernfs_node *kn)
- 		simple_xattrs_free(&kn->iattr->xattrs);
- 	}
- 	kfree(kn->iattr);
--	ida_simple_remove(&root->ino_ida, kn->ino);
-+	spin_lock(&kernfs_idr_lock);
-+	idr_remove(&root->ino_idr, kn->ino);
-+	spin_unlock(&kernfs_idr_lock);
- 	kmem_cache_free(kernfs_node_cache, kn);
- 
- 	kn = parent;
-@@ -542,7 +545,7 @@ void kernfs_put(struct kernfs_node *kn)
- 			goto repeat;
- 	} else {
- 		/* just released the root kn, free @root too */
--		ida_destroy(&root->ino_ida);
-+		idr_destroy(&root->ino_idr);
- 		kfree(root);
- 	}
+diff --git a/block/bio.c b/block/bio.c
+index 436305cde045..e2bcbb842982 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -876,6 +876,41 @@ int bio_add_page(struct bio *bio, struct page *page,
  }
-@@ -630,7 +633,11 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 	if (!kn)
- 		goto err_out1;
+ EXPORT_SYMBOL(bio_add_page);
  
--	ret = ida_simple_get(&root->ino_ida, 1, 0, GFP_KERNEL);
-+	idr_preload(GFP_KERNEL);
-+	spin_lock(&kernfs_idr_lock);
-+	ret = idr_alloc(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
-+	spin_unlock(&kernfs_idr_lock);
-+	idr_preload_end();
- 	if (ret < 0)
- 		goto err_out2;
- 	kn->ino = ret;
-@@ -875,13 +882,13 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
- 	if (!root)
- 		return ERR_PTR(-ENOMEM);
++static unsigned convert_to_segs(struct bio* bio, struct page **pages,
++				unsigned char *page_cnt,
++				unsigned nr_pages)
++{
++
++	unsigned idx;
++	unsigned nr_seg = 0;
++	struct request_queue *q = NULL;
++
++	if (bio->bi_bdev)
++		q = bdev_get_queue(bio->bi_bdev);
++
++	if (!q || !blk_queue_cluster(q)) {
++		memset(page_cnt, 0, nr_pages);
++		return nr_pages;
++	}
++
++	page_cnt[nr_seg] = 0;
++	for (idx = 1; idx < nr_pages; idx++) {
++		struct page *pg_s = pages[nr_seg];
++		struct page *pg = pages[idx];
++
++		if (page_to_pfn(pg_s) + page_cnt[nr_seg] + 1 ==
++		    page_to_pfn(pg)) {
++			page_cnt[nr_seg]++;
++		} else {
++			page_cnt[++nr_seg] = 0;
++			if (nr_seg < idx)
++				pages[nr_seg] = pg;
++		}
++	}
++
++	return nr_seg + 1;
++}
++
+ /**
+  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
+  * @bio: bio to add pages to
+@@ -895,6 +930,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	struct page **pages = (struct page **)bv;
+ 	size_t offset, diff;
+ 	ssize_t size;
++	unsigned short nr_segs;
++	unsigned char page_cnt[nr_pages];	/* at most 256 pages */
  
--	ida_init(&root->ino_ida);
-+	idr_init(&root->ino_idr);
- 	INIT_LIST_HEAD(&root->supers);
- 
- 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
- 			       KERNFS_DIR);
- 	if (!kn) {
--		ida_destroy(&root->ino_ida);
-+		idr_destroy(&root->ino_idr);
- 		kfree(root);
- 		return ERR_PTR(-ENOMEM);
+ 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+ 	if (unlikely(size <= 0))
+@@ -910,13 +947,18 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	 * need to be reflected here as well.
+ 	 */
+ 	bio->bi_iter.bi_size += size;
+-	bio->bi_vcnt += nr_pages;
+-
+ 	diff = (nr_pages * PAGE_SIZE - offset) - size;
+-	while (nr_pages--) {
+-		bv[nr_pages].bv_page = pages[nr_pages];
+-		bv[nr_pages].bv_len = PAGE_SIZE;
+-		bv[nr_pages].bv_offset = 0;
++
++	/* convert into segments */
++	nr_segs = convert_to_segs(bio, pages, page_cnt, nr_pages);
++	bio->bi_vcnt += nr_segs;
++
++	while (nr_segs--) {
++		unsigned cnt = (unsigned)page_cnt[nr_segs] + 1;
++
++		bv[nr_segs].bv_page = pages[nr_segs];
++		bv[nr_segs].bv_len = PAGE_SIZE * cnt;
++		bv[nr_segs].bv_offset = 0;
  	}
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index a9b11b8..5f5d602 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -163,7 +163,7 @@ struct kernfs_root {
- 	unsigned int		flags;	/* KERNFS_ROOT_* flags */
  
- 	/* private fields, do not use outside kernfs proper */
--	struct ida		ino_ida;
-+	struct idr		ino_idr;
- 	struct kernfs_syscall_ops *syscall_ops;
- 
- 	/* list of kernfs_super_info of this root, protected by kernfs_mutex */
+ 	bv[0].bv_offset += offset;
 -- 
-2.9.3
+2.9.4
