@@ -6,73 +6,66 @@ To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>,
-        linux-f2fs-devel@lists.sourceforge.net
-Subject: [PATCH v2 45/51] f2fs: convert to bio_for_each_segment_all_sp()
-Date: Mon, 26 Jun 2017 20:10:28 +0800
-Message-Id: <20170626121034.3051-46-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 23/51] blk-merge: compute bio->bi_seg_front_size efficiently
+Date: Mon, 26 Jun 2017 20:10:06 +0800
+Message-Id: <20170626121034.3051-24-ming.lei@redhat.com>
 In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
 References: <20170626121034.3051-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-Cc: Chao Yu <yuchao0@huawei.com>
-Cc: linux-f2fs-devel@lists.sourceforge.net
+It is enough to check and compute bio->bi_seg_front_size just
+after the 1st segment is found, but current code checks that
+for each bvec, which is inefficient.
+
+This patch follows the way in  __blk_recalc_rq_segments()
+for computing bio->bi_seg_front_size, and it is more efficient
+and code becomes more readable too.
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/f2fs/data.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ block/blk-merge.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 622c44a1be78..57d5a2760bf1 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -54,6 +54,7 @@ static void f2fs_read_end_io(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 5df13041b851..821b9c206308 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -145,22 +145,21 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			bvprvp = &bvprv;
+ 			sectors += bv.bv_len >> 9;
  
- #ifdef CONFIG_F2FS_FAULT_INJECTION
- 	/*
-@@ -75,7 +76,7 @@ static void f2fs_read_end_io(struct bio *bio)
+-			if (nsegs == 1 && seg_size > front_seg_size)
+-				front_seg_size = seg_size;
+ 			continue;
  		}
+ new_segment:
+ 		if (nsegs == queue_max_segments(q))
+ 			goto split;
+ 
++		if (nsegs == 1 && seg_size > front_seg_size)
++			front_seg_size = seg_size;
++
+ 		nsegs++;
+ 		bvprv = bv;
+ 		bvprvp = &bvprv;
+ 		seg_size = bv.bv_len;
+ 		sectors += bv.bv_len >> 9;
+ 
+-		if (nsegs == 1 && seg_size > front_seg_size)
+-			front_seg_size = seg_size;
  	}
  
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
+ 	do_split = false;
+@@ -173,6 +172,8 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			bio = new;
+ 	}
  
- 		if (!bio->bi_status) {
-@@ -95,8 +96,9 @@ static void f2fs_write_end_io(struct bio *bio)
- 	struct f2fs_sb_info *sbi = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		enum count_type type = WB_DATA_TYPE(page);
- 
-@@ -256,6 +258,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	struct bio_vec *bvec;
- 	struct page *target;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (!io->bio)
- 		return false;
-@@ -263,7 +266,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	if (!inode && !ino)
- 		return true;
- 
--	bio_for_each_segment_all(bvec, io->bio, i) {
-+	bio_for_each_segment_all_sp(bvec, io->bio, i, bia) {
- 
- 		if (bvec->bv_page->mapping)
- 			target = bvec->bv_page;
++	if (nsegs == 1 && seg_size > front_seg_size)
++		front_seg_size = seg_size;
+ 	bio->bi_seg_front_size = front_seg_size;
+ 	if (seg_size > bio->bi_seg_back_size)
+ 		bio->bi_seg_back_size = seg_size;
 -- 
 2.9.4
