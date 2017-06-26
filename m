@@ -1,63 +1,141 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:43864 "EHLO
-        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752510AbdF3KQW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 06:16:22 -0400
-Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
-        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id E76F73E51FB
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:11 -0700 (PDT)
-Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
-        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 2D516B400AB
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:06 -0700 (PDT)
-In-Reply-To: <20170629134510.GA32385@infradead.org>
-References: <20170629134510.GA32385@infradead.org>
-From: Tang Junhui <tang.junhui@zte.com.cn>
-Date: Tue, 9 May 2017 12:05:08 -0700
-Subject: [PATCH 02/19] bcache: fix sequential large write IO bypass
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-block@vger.kernel.org
-Message-Id: <20170629221205.C7514100126@ware.dreamhost.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 24/51] block: blk-merge: try to make front segments in full size
+Date: Mon, 26 Jun 2017 20:10:07 +0800
+Message-Id: <20170626121034.3051-25-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Sequential write IOs were tested with bs=1M by FIO in writeback cache
-mode, these IOs were expected to be bypassed, but actually they did not.
-We debug the code, and find in check_should_bypass():
-    if (!congested &&
-        mode == CACHE_MODE_WRITEBACK &&
-        op_is_write(bio_op(bio)) &&
-        (bio-＞bi_opf & REQ_SYNC))
-        goto rescale
-that means, If in writeback mode, a write IO with REQ_SYNC flag will not
-be bypassed though it is a sequential large IO, It's not a correct thing
-to do actually, so this patch remove these codes.
+When merging one bvec into segment, if the bvec is too big
+to merge, current policy is to move the whole bvec into another
+new segment.
 
-Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Kent Overstreet <kent.overstreet@gmail.com>
-Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
-Cc: stable@vger.kernel.org
+This patchset changes the policy into trying to maximize size of
+front segments, that means in above situation, part of bvec
+is merged into current segment, and the remainder is put
+into next segment.
+
+This patch prepares for support multipage bvec because
+it can be quite common to see this case and we should try
+to make front segments in full size.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/request.c | 6 ------
- 1 file changed, 6 deletions(-)
+ block/blk-merge.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 49 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 019b3df..958072a 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -400,12 +400,6 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
- 	if (!congested && !dc->sequential_cutoff)
- 		goto rescale;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 821b9c206308..bf7a0fa0199f 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -108,6 +108,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	bool do_split = true;
+ 	struct bio *new = NULL;
+ 	const unsigned max_sectors = get_max_io_size(q, bio);
++	unsigned advance = 0;
  
--	if (!congested &&
--	    mode == CACHE_MODE_WRITEBACK &&
--	    op_is_write(bio->bi_opf) &&
--	    op_is_sync(bio->bi_opf))
--		goto rescale;
+ 	bio_for_each_segment(bv, bio, iter) {
+ 		/*
+@@ -133,12 +134,32 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		}
+ 
+ 		if (bvprvp && blk_queue_cluster(q)) {
+-			if (seg_size + bv.bv_len > queue_max_segment_size(q))
+-				goto new_segment;
+ 			if (!BIOVEC_PHYS_MERGEABLE(bvprvp, &bv))
+ 				goto new_segment;
+ 			if (!BIOVEC_SEG_BOUNDARY(q, bvprvp, &bv))
+ 				goto new_segment;
++			if (seg_size + bv.bv_len > queue_max_segment_size(q)) {
++				/*
++				 * On assumption is that initial value of
++				 * @seg_size(equals to bv.bv_len) won't be
++				 * bigger than max segment size, but will
++				 * becomes false after multipage bvec comes.
++				 */
++				advance = queue_max_segment_size(q) - seg_size;
++
++				if (advance > 0) {
++					seg_size += advance;
++					sectors += advance >> 9;
++					bv.bv_len -= advance;
++					bv.bv_offset += advance;
++				}
++
++				/*
++				 * Still need to put remainder of current
++				 * bvec into a new segment.
++				 */
++				goto new_segment;
++			}
+ 
+ 			seg_size += bv.bv_len;
+ 			bvprv = bv;
+@@ -160,6 +181,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		seg_size = bv.bv_len;
+ 		sectors += bv.bv_len >> 9;
+ 
++		/* restore the bvec for iterator */
++		if (advance) {
++			bv.bv_len += advance;
++			bv.bv_offset -= advance;
++			advance = 0;
++		}
+ 	}
+ 
+ 	do_split = false;
+@@ -360,16 +387,29 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
+ {
+ 
+ 	int nbytes = bvec->bv_len;
++	unsigned advance = 0;
+ 
+ 	if (*sg && *cluster) {
+-		if ((*sg)->length + nbytes > queue_max_segment_size(q))
+-			goto new_segment;
 -
- 	spin_lock(&dc->io_lock);
+ 		if (!BIOVEC_PHYS_MERGEABLE(bvprv, bvec))
+ 			goto new_segment;
+ 		if (!BIOVEC_SEG_BOUNDARY(q, bvprv, bvec))
+ 			goto new_segment;
  
- 	hlist_for_each_entry(i, iohash(dc, bio->bi_iter.bi_sector), hash)
++		/*
++		 * try best to merge part of the bvec into previous
++		 * segment and follow same policy with
++		 * blk_bio_segment_split()
++		 */
++		if ((*sg)->length + nbytes > queue_max_segment_size(q)) {
++			advance = queue_max_segment_size(q) - (*sg)->length;
++			if (advance) {
++				(*sg)->length += advance;
++				bvec->bv_offset += advance;
++				bvec->bv_len -= advance;
++			}
++			goto new_segment;
++		}
++
+ 		(*sg)->length += nbytes;
+ 	} else {
+ new_segment:
+@@ -392,6 +432,10 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
+ 
+ 		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
+ 		(*nsegs)++;
++
++		/* for making iterator happy */
++		bvec->bv_offset -= advance;
++		bvec->bv_len += advance;
+ 	}
+ 	*bvprv = *bvec;
+ }
 -- 
-1.8.3.1
+2.9.4
