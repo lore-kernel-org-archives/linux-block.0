@@ -1,20 +1,19 @@
 Return-Path: <axboe@kernel.dk>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
+To: linux-block@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org,
+	hch@lst.de,
 	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
 	Jens Axboe <axboe@kernel.dk>
 Subject: [PATCH 5/9] fs: add support for buffered writeback to pass down write hints
-Date: Tue, 20 Jun 2017 18:22:02 -0600
-Message-Id: <1498004526-4543-6-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
-References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+Date: Mon, 26 Jun 2017 09:37:56 -0600
+Message-Id: <1498491480-16306-6-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
+References: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
  fs/buffer.c | 14 +++++++++-----
@@ -22,7 +21,7 @@ Signed-off-by: Jens Axboe <axboe@kernel.dk>
  2 files changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/fs/buffer.c b/fs/buffer.c
-index 306b720f7383..1259524715c8 100644
+index 306b720f7383..307b508c9d60 100644
 --- a/fs/buffer.c
 +++ b/fs/buffer.c
 @@ -49,7 +49,7 @@
@@ -30,7 +29,7 @@ index 306b720f7383..1259524715c8 100644
  static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
  static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
 -			 struct writeback_control *wbc);
-+			 unsigned int stream, struct writeback_control *wbc);
++			 unsigned int hint, struct writeback_control *wbc);
  
  #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
  
@@ -82,14 +81,14 @@ index 306b720f7383..1259524715c8 100644
  EXPORT_SYMBOL(submit_bh);
  
 diff --git a/fs/mpage.c b/fs/mpage.c
-index 9524fdde00c2..d8a750873bf4 100644
+index 9524fdde00c2..07587fd6debf 100644
 --- a/fs/mpage.c
 +++ b/fs/mpage.c
 @@ -615,6 +615,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
  			goto confused;
  
  		wbc_init_bio(wbc, bio);
-+		bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
++		bio->bi_opf |= inode_hint_to_opf(inode);
  	}
  
  	/*
