@@ -6,38 +6,69 @@ To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 09/51] block: comment on bio_iov_iter_get_pages()
-Date: Mon, 26 Jun 2017 20:09:52 +0800
-Message-Id: <20170626121034.3051-10-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org
+Subject: [PATCH v2 12/51] md: raid10: avoid to access bvec table directly
+Date: Mon, 26 Jun 2017 20:09:55 +0800
+Message-Id: <20170626121034.3051-13-ming.lei@redhat.com>
 In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
 References: <20170626121034.3051-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-bio_iov_iter_get_pages() used unused bvec spaces for
-storing page pointer array temporarily, and this patch
-comments on this usage wrt. multipage bvec support.
+Inside sync_request_write(), .bi_vcnt is written after this bio
+is reseted, this way won't work any more after multipage bvec
+is enabled.
 
+So reset_bvec_table() is introduced for re-add these pages into
+bio, then .bi_vcnt needn't to be touched any more.
+
+Cc: Shaohua Li <shli@kernel.org>
+Cc: linux-raid@vger.kernel.org
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/md/raid10.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index a5db117e8dfa..bf7f25889f6e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -870,6 +870,10 @@ EXPORT_SYMBOL(bio_add_page);
-  *
-  * Pins as many pages from *iter and appends them to @bio's bvec array. The
-  * pages will have to be released using put_page() when done.
-+ *
-+ * The hacking way of using bvec table as page pointer array is safe
-+ * even after multipage bvec is introduced because that space can be
-+ * thought as unused by bio_add_page().
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 5026e7ad51d3..2fca1fe67092 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -1995,6 +1995,24 @@ static void end_sync_write(struct bio *bio)
+ 	end_sync_request(r10_bio);
+ }
+ 
++/* called after bio_reset() */
++static void reset_bvec_table(struct bio *bio, struct resync_pages *rp, int size)
++{
++	/* initialize bvec table again */
++	rp->idx = 0;
++	do {
++		struct page *page = resync_fetch_page(rp, rp->idx++);
++		int len = min_t(int, size, PAGE_SIZE);
++
++		/*
++		 * won't fail because the vec table is big
++		 * enough to hold all these pages
++		 */
++		bio_add_page(bio, page, len, 0);
++		size -= len;
++	} while (rp->idx < RESYNC_PAGES && size > 0);
++}
++
+ /*
+  * Note: sync and recover and handled very differently for raid10
+  * This code is for resync.
+@@ -2087,8 +2105,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 		rp = get_resync_pages(tbio);
+ 		bio_reset(tbio);
+ 
+-		tbio->bi_vcnt = vcnt;
+-		tbio->bi_iter.bi_size = fbio->bi_iter.bi_size;
++		reset_bvec_table(tbio, rp, fbio->bi_iter.bi_size);
++
+ 		rp->raid_bio = r10_bio;
+ 		tbio->bi_private = rp;
+ 		tbio->bi_iter.bi_sector = r10_bio->devs[i].addr;
 -- 
 2.9.4
