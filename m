@@ -1,59 +1,69 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v6 16/20] block: convert to errseq_t based writeback error tracking
-Date: Mon, 12 Jun 2017 08:23:12 -0400
-Message-Id: <20170612122316.13244-21-jlayton@redhat.com>
-In-Reply-To: <20170612122316.13244-1-jlayton@redhat.com>
-References: <20170612122316.13244-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:37892 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751477AbdFZJ6O (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:14 -0400
+Received: by mail-wm0-f42.google.com with SMTP id b184so3025722wme.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:13 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 03/20] lightnvm: pblk: spare double cpu_to_le64 calc.
+Date: Mon, 26 Jun 2017 11:57:12 +0200
+Message-Id: <1498471049-25505-4-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is a very minimal conversion to errseq_t based error tracking
-for raw block device access.
+Spare a double calculation on the fast write path.
 
-Only real change that is strictly required is that we must ensure that
-filemap_report_wb_err is unconditionally called after fsync, which is
-now done if FS_WB_ERRSEQ is set in fs_flags. That ensures that the
-errseq_t in the file is advanced to the latest value in the mapping.
-
-Note that there are internal callers that call sync_blockdev and the
-like that are not affected by this. They'll continue to use the
-AS_EIO/AS_ENOSPC flags for error reporting like they always have for
-now.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- fs/block_dev.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/lightnvm/pblk-map.c      | 5 +++--
+ drivers/lightnvm/pblk-recovery.c | 4 ++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 4d62fe771587..4bf865cc99de 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -801,6 +801,7 @@ static struct file_system_type bd_type = {
- 	.name		= "bdev",
- 	.mount		= bd_mount,
- 	.kill_sb	= kill_anon_super,
-+	.fs_flags	= FS_WB_ERRSEQ,
- };
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 17c16955284d..18291c238930 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -53,8 +53,9 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 			lba_list[paddr] = cpu_to_le64(w_ctx->lba);
+ 			le64_add_cpu(&line->emeta->nr_valid_lbas, 1);
+ 		} else {
+-			meta_list[i].lba = cpu_to_le64(ADDR_EMPTY);
+-			lba_list[paddr] = cpu_to_le64(ADDR_EMPTY);
++			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
++
++			lba_list[paddr] = meta_list[i].lba = addr_empty;
+ 			pblk_map_pad_invalidate(pblk, line, paddr);
+ 		}
+ 	}
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index f8f85087cd3c..82787006b865 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -390,12 +390,12 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
  
- struct super_block *blockdev_superblock __read_mostly;
+ 		for (j = 0; j < pblk->min_write_pgs; j++, i++, w_ptr++) {
+ 			struct ppa_addr dev_ppa;
++			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+ 
+ 			dev_ppa = addr_to_gen_ppa(pblk, w_ptr, line->id);
+ 
+ 			pblk_map_invalidate(pblk, dev_ppa);
+-			meta_list[i].lba = cpu_to_le64(ADDR_EMPTY);
+-			lba_list[w_ptr] = cpu_to_le64(ADDR_EMPTY);
++			lba_list[w_ptr] = meta_list[i].lba = addr_empty;
+ 			rqd->ppa_list[i] = dev_ppa;
+ 		}
+ 	}
 -- 
-2.13.0
+2.7.4
