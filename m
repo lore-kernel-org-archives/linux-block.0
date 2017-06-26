@@ -1,88 +1,67 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 03/11] blk-mq: expose stream write hints through debugfs
-Date: Fri, 16 Jun 2017 11:24:35 -0600
-Message-Id: <1497633883-21230-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
-References: <1497633883-21230-1-git-send-email-axboe@kernel.dk>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-ext4@vger.kernel.org
+Subject: [PATCH v2 42/51] ext4: convert to bio_for_each_segment_all_sp()
+Date: Mon, 26 Jun 2017 20:10:25 +0800
+Message-Id: <20170626121034.3051-43-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Useful to verify that things are working the way they should.
-Reading the file will return number of kb written with each
-write hint. Writing the file will reset the statistics. No care
-is taken to ensure that we don't race on updates.
-
-Drivers will write to q->write_hints[] if they handle a given
-write hint.
-
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Cc: "Theodore Ts'o" <tytso@mit.edu>
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>
+Cc: linux-ext4@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c | 24 ++++++++++++++++++++++++
- include/linux/blkdev.h |  3 +++
- 2 files changed, 27 insertions(+)
+ fs/ext4/page-io.c  | 3 ++-
+ fs/ext4/readpage.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 803aed4d7221..b069a76f7fc7 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -133,6 +133,29 @@ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
- 	}
- }
- 
-+static int queue_write_hint_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_WRITE_HINTS; i++)
-+		seq_printf(m, "hint%d: %llu\n", i, q->write_hints[i]);
-+
-+	return 0;
-+}
-+
-+static ssize_t queue_write_hint_store(void *data, const char __user *buf,
-+				      size_t count, loff_t *ppos)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_WRITE_HINTS; i++)
-+		q->write_hints[i] = 0;
-+
-+	return count;
-+}
-+
- static int queue_poll_stat_show(void *data, struct seq_file *m)
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 930ca0fc9a0f..0e59404fc530 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -62,8 +62,9 @@ static void ext4_finish_bio(struct bio *bio)
  {
- 	struct request_queue *q = data;
-@@ -656,6 +679,7 @@ const struct file_operations blk_mq_debugfs_fops = {
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, queue_poll_stat_show},
- 	{"state", 0600, queue_state_show, queue_state_write},
-+	{"write_hints", 0600, queue_write_hint_show, queue_write_hint_store},
- 	{},
- };
+ 	int i;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b74a3edcb3da..ab36068f6129 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -588,6 +588,9 @@ struct request_queue {
- 	void			*rq_alloc_data;
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ #ifdef CONFIG_EXT4_FS_ENCRYPTION
+ 		struct page *data_page = NULL;
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index 40a5497b0f60..6bd33c4c1f7f 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -71,6 +71,7 @@ static void mpage_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_iter_all bia;
  
- 	struct work_struct	release_work;
-+
-+#define BLK_MAX_WRITE_HINTS	5
-+	u64			write_hints[BLK_MAX_WRITE_HINTS];
- };
+ 	if (ext4_bio_encrypted(bio)) {
+ 		if (bio->bi_status) {
+@@ -80,7 +81,7 @@ static void mpage_end_io(struct bio *bio)
+ 			return;
+ 		}
+ 	}
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_segment_all_sp(bv, bio, i, bia) {
+ 		struct page *page = bv->bv_page;
  
- #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
+ 		if (!bio->bi_status) {
 -- 
-2.7.4
+2.9.4
