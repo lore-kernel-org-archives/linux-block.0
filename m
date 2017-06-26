@@ -1,89 +1,39 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org,
-	hch@lst.de,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/9] blk-mq: expose write hints through debugfs
-Date: Mon, 26 Jun 2017 09:37:54 -0600
-Message-Id: <1498491480-16306-4-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
-References: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 49/51] fs/direct-io: convert to bio_for_each_segment_all_sp()
+Date: Mon, 26 Jun 2017 20:10:32 +0800
+Message-Id: <20170626121034.3051-50-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Useful to verify that things are working the way they should.
-Reading the file will return number of kb written with each
-write hint. Writing the file will reset the statistics. No care
-is taken to ensure that we don't race on updates.
-
-Drivers will write to q->write_hints[] if they handle a given
-write hint.
-
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c | 24 ++++++++++++++++++++++++
- include/linux/blkdev.h |  3 +++
- 2 files changed, 27 insertions(+)
+ fs/direct-io.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 9edebbdce0bd..9ebc2945f991 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -135,6 +135,29 @@ static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
- 	}
- }
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index c87077d1dc33..a139b3bbad8e 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -489,7 +489,9 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
+ 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
+ 		bio_check_pages_dirty(bio);	/* transfers ownership */
+ 	} else {
+-		bio_for_each_segment_all(bvec, bio, i) {
++		struct bvec_iter_all bia;
++
++		bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 			struct page *page = bvec->bv_page;
  
-+static int queue_write_hint_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_WRITE_HINTS; i++)
-+		seq_printf(m, "hint%d: %llu\n", i, q->write_hints[i]);
-+
-+	return 0;
-+}
-+
-+static ssize_t queue_write_hint_store(void *data, const char __user *buf,
-+				      size_t count, loff_t *ppos)
-+{
-+	struct request_queue *q = data;
-+	int i;
-+
-+	for (i = 0; i < BLK_MAX_WRITE_HINTS; i++)
-+		q->write_hints[i] = 0;
-+
-+	return count;
-+}
-+
- static int queue_poll_stat_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
-@@ -730,6 +753,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
- 	{"poll_stat", 0400, queue_poll_stat_show},
- 	{"requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops},
- 	{"state", 0600, queue_state_show, queue_state_write},
-+	{"write_hints", 0600, queue_write_hint_show, queue_write_hint_store},
- 	{},
- };
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bf2157141d53..596de77b9a0a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -594,6 +594,9 @@ struct request_queue {
- 	void			*rq_alloc_data;
- 
- 	struct work_struct	release_work;
-+
-+#define BLK_MAX_WRITE_HINTS	5
-+	u64			write_hints[BLK_MAX_WRITE_HINTS];
- };
- 
- #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
+ 			if (dio->op == REQ_OP_READ && !PageCompound(page) &&
 -- 
-2.7.4
+2.9.4
