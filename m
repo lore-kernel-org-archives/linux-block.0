@@ -1,48 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:43861 "EHLO
-        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751659AbdF3KQ1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 06:16:27 -0400
-Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
-        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id ED5DA3E51D7
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:06 -0700 (PDT)
-Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
-        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 2D43FB400A8
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:06 -0700 (PDT)
-In-Reply-To: <20170629134510.GA32385@infradead.org>
-References: <20170629134510.GA32385@infradead.org>
-From: Jan Kara <jack@suse.cz>
-Date: Tue, 9 May 2017 12:03:11 -0700
-Subject: [PATCH 01/19] bcache: Fix leak of bdev reference
-To: linux-block@vger.kernel.org
-Message-Id: <20170629221205.B41DC100127@ware.dreamhost.com>
+Received: from mx1.redhat.com ([209.132.183.28]:37224 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752792AbdFZMSI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:18:08 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 31/51] fs/buffer.c: use bvec iterator to truncate the bio
+Date: Mon, 26 Jun 2017 20:10:14 +0800
+Message-Id: <20170626121034.3051-32-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If blkdev_get_by_path() in register_bcache() fails, we try to lookup the
-block device using lookup_bdev() to detect which situation we are in to
-properly report error. However we never drop the reference returned to
-us from lookup_bdev(). Fix that.
+Once multipage bvec is enabled, the last bvec may include
+more than one page, this patch use bvec_get_last_page()
+to truncate the bio.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
-Cc: stable@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/super.c | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/buffer.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8352fad..9a2c190 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1964,6 +1964,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
- 			else
- 				err = "device busy";
- 			mutex_unlock(&bch_register_lock);
-+			if (!IS_ERR(bdev))
-+				bdput(bdev);
- 			if (attr == &ksysfs_register_quiet)
- 				goto out;
- 		}
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 1910f539770b..53b8a29f4525 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3055,8 +3055,7 @@ void guard_bio_eod(int op, struct bio *bio)
+ 	unsigned truncated_bytes;
+ 	/*
+ 	 * It is safe to truncate the last bvec in the following way
+-	 * even though multipage bvec is supported, but we need to
+-	 * fix the parameters passed to zero_user().
++	 * even though multipage bvec is supported.
+ 	 */
+ 	struct bio_vec *bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 
+@@ -3085,7 +3084,10 @@ void guard_bio_eod(int op, struct bio *bio)
+ 
+ 	/* ..and clear the end of the buffer for reads */
+ 	if (op == REQ_OP_READ) {
+-		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
++		struct bio_vec bv;
++
++		bvec_get_last_page(bvec, &bv);
++		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
+ 				truncated_bytes);
+ 	}
+ }
 -- 
-1.8.3.1
+2.9.4
