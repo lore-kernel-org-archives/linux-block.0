@@ -1,79 +1,39 @@
-Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: viro@zeniv.linux.org.uk,
-	axboe@kernel.dk
-Cc: Milosz Tanski <milosz@adfin.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>,
-	mgorman@suse.de,
-	Volker.Lendecke@sernet.de,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/3] fs: support IOCB_NOWAIT in generic_file_buffered_read
-Date: Thu, 29 Jun 2017 14:25:02 -0700
-Message-Id: <20170629212503.15110-3-hch@lst.de>
-In-Reply-To: <20170629212503.15110-1-hch@lst.de>
-References: <20170629212503.15110-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43388 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751353AbdFZIFb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 04:05:31 -0400
+Date: Mon, 26 Jun 2017 10:05:26 +0200
+From: Carlos Maiolino <cmaiolino@redhat.com>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v7 01/22] fs: remove call_fsync helper function
+Message-ID: <20170626080526.ufetu6blf2kllihn@eorzea.usersys.redhat.com>
+References: <20170616193427.13955-1-jlayton@redhat.com>
+ <20170616193427.13955-2-jlayton@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170616193427.13955-2-jlayton@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Milosz Tanski <milosz@adfin.com>
+On Fri, Jun 16, 2017 at 03:34:06PM -0400, Jeff Layton wrote:
+> Requested-by: Christoph Hellwig <hch@infradead.org>
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> ---
+>  fs/sync.c          | 2 +-
+>  include/linux/fs.h | 6 ------
+>  ipc/shm.c          | 2 +-
+>  3 files changed, 2 insertions(+), 8 deletions(-)
+> 
+> 2.13.0
+If it's worth to have one more reviewer, you can add:
 
-Allow generic_file_buffered_read to bail out early instead of waiting for
-the page lock or reading a page if IOCB_NOWAIT is specified.
+Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
 
-Signed-off-by: Milosz Tanski <milosz@adfin.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-Acked-by: Sage Weil <sage@redhat.com>
----
- mm/filemap.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+> 
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 3df0a57cd48e..d021931c8e74 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1843,6 +1843,8 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 
- 		page = find_get_page(mapping, index);
- 		if (!page) {
-+			if (iocb->ki_flags & IOCB_NOWAIT)
-+				goto would_block;
- 			page_cache_sync_readahead(mapping,
- 					ra, filp,
- 					index, last_index - index);
-@@ -1948,6 +1950,11 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 		continue;
- 
- page_not_up_to_date:
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			put_page(page);
-+			goto would_block;
-+		}
-+
- 		/* Get exclusive access to the page ... */
- 		error = lock_page_killable(page);
- 		if (unlikely(error))
-@@ -1967,6 +1974,12 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 			goto page_ok;
- 		}
- 
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			unlock_page(page);
-+			put_page(page);
-+			goto would_block;
-+		}
-+
- readpage:
- 		/*
- 		 * A previous I/O error may have been due to temporary
-@@ -2037,6 +2050,8 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 		goto readpage;
- 	}
- 
-+would_block:
-+	error = -EAGAIN;
- out:
- 	ra->prev_pos = prev_index;
- 	ra->prev_pos <<= PAGE_SHIFT;
 -- 
-2.11.0
+Carlos
