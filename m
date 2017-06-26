@@ -1,109 +1,60 @@
-Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Omar Sandoval <osandov@fb.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 05/10] blk-mq: simplify blk_mq_free_request
-Date: Fri, 16 Jun 2017 18:15:22 +0200
-Message-Id: <20170616161527.17649-6-hch@lst.de>
-In-Reply-To: <20170616161527.17649-1-hch@lst.de>
-References: <20170616161527.17649-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:48048 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752398AbdFZMTw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:19:52 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 40/51] fs/block: convert to bio_for_each_segment_all_sp()
+Date: Mon, 26 Jun 2017 20:10:23 +0800
+Message-Id: <20170626121034.3051-41-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Merge three functions only tail-called by blk_mq_free_request into
-blk_mq_free_request.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 50 +++++++++++++++-----------------------------------
- block/blk-mq.h |  3 ---
- 2 files changed, 15 insertions(+), 38 deletions(-)
+ fs/block_dev.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9df7e0394a48..0b17351fccfc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -395,12 +395,24 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- }
- EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index a57c26bcb970..d82e43bd8e82 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -209,6 +209,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	ssize_t ret;
+ 	blk_qc_t qc;
+ 	int i;
++	struct bvec_iter_all bia;
  
--void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
--			     struct request *rq)
-+void blk_mq_free_request(struct request *rq)
- {
--	const int sched_tag = rq->internal_tag;
- 	struct request_queue *q = rq->q;
-+	struct elevator_queue *e = q->elevator;
-+	struct blk_mq_ctx *ctx = rq->mq_ctx;
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
-+	const int sched_tag = rq->internal_tag;
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+@@ -253,7 +254,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	}
+ 	__set_current_state(TASK_RUNNING);
  
-+	if (rq->rq_flags & (RQF_ELVPRIV | RQF_QUEUED)) {
-+		if (e && e->type->ops.mq.finish_request)
-+			e->type->ops.mq.finish_request(rq);
-+		if (rq->elv.icq) {
-+			put_io_context(rq->elv.icq->ioc);
-+			rq->elv.icq = NULL;
-+		}
-+	}
-+
-+	ctx->rq_completed[rq_is_sync(rq)]++;
- 	if (rq->rq_flags & RQF_MQ_INFLIGHT)
- 		atomic_dec(&hctx->nr_active);
+-	bio_for_each_segment_all(bvec, &bio, i) {
++	bio_for_each_segment_all_sp(bvec, &bio, i, bia) {
+ 		if (should_dirty && !PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+ 		put_page(bvec->bv_page);
+@@ -317,8 +318,9 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 	} else {
+ 		struct bio_vec *bvec;
+ 		int i;
++		struct bvec_iter_all bia;
  
-@@ -416,38 +428,6 @@ void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 	blk_mq_sched_restart(hctx);
- 	blk_queue_exit(q);
- }
--
--static void blk_mq_finish_hctx_request(struct blk_mq_hw_ctx *hctx,
--				     struct request *rq)
--{
--	struct blk_mq_ctx *ctx = rq->mq_ctx;
--
--	ctx->rq_completed[rq_is_sync(rq)]++;
--	__blk_mq_finish_request(hctx, ctx, rq);
--}
--
--void blk_mq_finish_request(struct request *rq)
--{
--	blk_mq_finish_hctx_request(blk_mq_map_queue(rq->q, rq->mq_ctx->cpu), rq);
--}
--EXPORT_SYMBOL_GPL(blk_mq_finish_request);
--
--void blk_mq_free_request(struct request *rq)
--{
--	struct request_queue *q = rq->q;
--	struct elevator_queue *e = q->elevator;
--
--	if (rq->rq_flags & (RQF_ELVPRIV | RQF_QUEUED)) {
--		if (e && e->type->ops.mq.finish_request)
--			e->type->ops.mq.finish_request(rq);
--		if (rq->elv.icq) {
--			put_io_context(rq->elv.icq->ioc);
--			rq->elv.icq = NULL;
--		}
--	}
--
--	blk_mq_finish_request(rq);
--}
- EXPORT_SYMBOL_GPL(blk_mq_free_request);
- 
- inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 806fed53f607..6a509a8eb3fb 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -131,9 +131,6 @@ static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data
- /*
-  * Internal helpers for request allocation/init/free
-  */
--void __blk_mq_finish_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
--				struct request *rq);
--void blk_mq_finish_request(struct request *rq);
- struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
- 					unsigned int op);
- 
+-		bio_for_each_segment_all(bvec, bio, i)
++		bio_for_each_segment_all_sp(bvec, bio, i, bia)
+ 			put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
 -- 
-2.11.0
+2.9.4
