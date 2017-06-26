@@ -1,116 +1,39 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	akpm@linux-foundation.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 10/10] btrfs: nowait aio support
-Date: Thu, 15 Jun 2017 11:00:02 -0500
-Message-Id: <20170615160002.17233-11-rgoldwyn@suse.de>
-In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
-References: <20170615160002.17233-1-rgoldwyn@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 47/51] fs: crypto: convert to bio_for_each_segment_all_sp()
+Date: Mon, 26 Jun 2017 20:10:30 +0800
+Message-Id: <20170626121034.3051-48-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-
-Return EAGAIN if any of the following checks fail
- + i_rwsem is not lockable
- + NODATACOW or PREALLOC is not set
- + Cannot nocow at the desired location
- + Writing beyond end of file which is not allocated
-
-Acked-by: David Sterba <dsterba@suse.com>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/btrfs/file.c  | 33 +++++++++++++++++++++++++++------
- fs/btrfs/inode.c |  3 +++
- 2 files changed, 30 insertions(+), 6 deletions(-)
+ fs/crypto/bio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index da1096eb1a40..59e2dccdf75b 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1875,12 +1875,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	ssize_t num_written = 0;
- 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
- 	ssize_t err;
--	loff_t pos;
--	size_t count;
-+	loff_t pos = iocb->ki_pos;
-+	size_t count = iov_iter_count(from);
- 	loff_t oldsize;
- 	int clean_page = 0;
+diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
+index 6181e9526860..d5516ed19166 100644
+--- a/fs/crypto/bio.c
++++ b/fs/crypto/bio.c
+@@ -36,8 +36,9 @@ static void completion_pages(struct work_struct *work)
+ 	struct bio *bio = ctx->r.bio;
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_iter_all bia;
  
--	inode_lock(inode);
-+	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-+			(iocb->ki_flags & IOCB_DIRECT)) {
-+		/* Don't sleep on inode rwsem */
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+		/*
-+		 * We will allocate space in case nodatacow is not set,
-+		 * so bail
-+		 */
-+		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
-+					      BTRFS_INODE_PREALLOC)) ||
-+		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
-+			inode_unlock(inode);
-+			return -EAGAIN;
-+		}
-+	} else
-+		inode_lock(inode);
-+
- 	err = generic_write_checks(iocb, from);
- 	if (err <= 0) {
- 		inode_unlock(inode);
-@@ -1914,8 +1931,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	 */
- 	update_time_for_write(inode);
- 
--	pos = iocb->ki_pos;
--	count = iov_iter_count(from);
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
- 	if (start_pos > oldsize) {
-@@ -3071,13 +3086,19 @@ static loff_t btrfs_file_llseek(struct file *file, loff_t offset, int whence)
- 	return offset;
- }
- 
-+static int btrfs_file_open(struct inode *inode, struct file *filp)
-+{
-+	filp->f_mode |= FMODE_AIO_NOWAIT;
-+	return generic_file_open(inode, filp);
-+}
-+
- const struct file_operations btrfs_file_operations = {
- 	.llseek		= btrfs_file_llseek,
- 	.read_iter      = generic_file_read_iter,
- 	.splice_read	= generic_file_splice_read,
- 	.write_iter	= btrfs_file_write_iter,
- 	.mmap		= btrfs_file_mmap,
--	.open		= generic_file_open,
-+	.open		= btrfs_file_open,
- 	.release	= btrfs_release_file,
- 	.fsync		= btrfs_sync_file,
- 	.fallocate	= btrfs_fallocate,
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index ef3c98c527c1..861979802aa3 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8755,6 +8755,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			dio_data.overwrite = 1;
- 			inode_unlock(inode);
- 			relock = true;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
- 		}
- 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
- 		if (ret)
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_segment_all_sp(bv, bio, i, bia) {
+ 		struct page *page = bv->bv_page;
+ 		int ret = fscrypt_decrypt_page(page->mapping->host, page,
+ 				PAGE_SIZE, 0, page->index);
 -- 
-2.12.0
+2.9.4
