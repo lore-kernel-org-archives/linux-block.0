@@ -1,156 +1,469 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 05/11] fs: add fcntl() interface for setting/getting write life time hints
-Date: Sat, 17 Jun 2017 13:59:48 -0600
-Message-Id: <1497729594-4707-6-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:34519 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751815AbdFZJ6W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:22 -0400
+Received: by mail-wm0-f44.google.com with SMTP id t129so815389wmt.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:16 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 06/20] lightnvm: pblk: generalize erase path
+Date: Mon, 26 Jun 2017 11:57:15 +0200
+Message-Id: <1498471049-25505-7-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We have a pwritev2(2) interface based on passing in flags. Add an
-fcntl interface for querying these flags, and also for setting them
-as well:
+Erase I/Os are scheduled with the following goals in mind: (i) minimize
+LUNs collisions with write I/Os, and (ii) even out the price of erasing
+on every write, instead of putting all the burden on when garbage
+collection runs. This works well on the current design, but is specific
+to the default mapping algorithm.
 
-F_GET_RW_HINT		Returns the read/write hint set. Right now it
-			will be one of the WRITE_LIFE_* values.
+This patch generalizes the erase path so that other mapping algorithms
+can select an arbitrary line to be erased instead. It also gets rid of
+the erase semaphore since it creates jittering for user writes.
 
-F_SET_RW_HINT		Pass in rw_hint type to set the read/write hint.
-			Only WRITE_LIFE_* hints are currently supported.
-			Returns 0 on succes, -1 otherwise.
-
-Sample program testing/implementing basic setting/getting of write
-hints is below.
-
-/*
- * writehint.c: check or set a file/inode write hint
- */
-
-static char *str[] = { "WRITE_LIFE_NONE", "WRITE_LIFE_SHORT",
-			"WRITE_LIFE_MEDIUM", "WRITE_LIFE_LONG",
-			"WRITE_LIFE_EXTREME" };
-
-int main(int argc, char *argv[])
-{
-	int hint = -1, fd, ret;
-
-	if (argc < 2) {
-		fprintf(stderr, "%s: dev <hint>\n", argv[0]);
-		return 1;
-	}
-
-	fd = open(argv[1], O_RDONLY);
-	if (fd < 0) {
-		perror("open");
-		return 2;
-	}
-
-	if (argc > 2)
-		hint = atoi(argv[2]);
-
-	if (hint == -1) {
-		ret = fcntl(fd, F_GET_RW_HINT);
-		if (ret < 0) {
-			perror("fcntl: F_GET_RW_HINT");
-			return 3;
-		}
-		hint = ret;
-	} else {
-		ret = fcntl(fd, F_SET_RW_HINT, hint);
-		if (ret < 0) {
-			perror("fcntl: F_SET_RW_HINT");
-			return 4;
-		}
-	}
-
-	printf("%s: %shint %s\n", argv[1], hint != -1 ? "set " : "", str[hint]);
-	close(fd);
-	return 0;
-}
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- fs/fcntl.c                 | 38 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/fcntl.h |  6 ++++++
- 2 files changed, 44 insertions(+)
+ drivers/lightnvm/pblk-core.c  |   4 +-
+ drivers/lightnvm/pblk-init.c  |   9 ++--
+ drivers/lightnvm/pblk-map.c   |  38 +++++++++++----
+ drivers/lightnvm/pblk-rb.c    |  33 +++++++------
+ drivers/lightnvm/pblk-write.c | 109 +++++++++++++++++++++++-------------------
+ drivers/lightnvm/pblk.h       |  11 ++---
+ 6 files changed, 115 insertions(+), 89 deletions(-)
 
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index f4e7267d117f..417ce336c875 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -243,6 +243,40 @@ static int f_getowner_uids(struct file *filp, unsigned long arg)
- }
- #endif
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 567ed5aa5a0f..a1125547e638 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -61,7 +61,6 @@ static void pblk_end_io_erase(struct nvm_rq *rqd)
+ {
+ 	struct pblk *pblk = rqd->private;
  
-+long fcntl_rw_hint(struct file *file, unsigned int cmd, unsigned long arg)
-+{
-+	struct inode *inode = file_inode(file);
-+	long ret;
+-	up(&pblk->erase_sem);
+ 	__pblk_end_io_erase(pblk, rqd);
+ 	mempool_free(rqd, pblk->r_rq_pool);
+ }
+@@ -1373,7 +1372,8 @@ struct pblk_line *pblk_line_get_data(struct pblk *pblk)
+ 	return pblk->l_mg.data_line;
+ }
+ 
+-struct pblk_line *pblk_line_get_data_next(struct pblk *pblk)
++/* For now, always erase next line */
++struct pblk_line *pblk_line_get_erase(struct pblk *pblk)
+ {
+ 	return pblk->l_mg.data_next;
+ }
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 6dd85860e419..5ea610957fb3 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -544,7 +544,7 @@ static int pblk_lines_init(struct pblk *pblk)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_line *line;
+ 	unsigned int smeta_len, emeta_len;
+-	long nr_bad_blks, nr_meta_blks, nr_free_blks;
++	long nr_bad_blks, nr_free_blks;
+ 	int bb_distance;
+ 	int i;
+ 	int ret;
+@@ -590,9 +590,8 @@ static int pblk_lines_init(struct pblk *pblk)
+ 	}
+ 	lm->emeta_bb = geo->nr_luns - i;
+ 
+-	nr_meta_blks = (lm->smeta_sec + lm->emeta_sec +
+-				(geo->sec_per_blk / 2)) / geo->sec_per_blk;
+-	lm->min_blk_line = nr_meta_blks + 1;
++	lm->min_blk_line = 1 + DIV_ROUND_UP(lm->smeta_sec + lm->emeta_sec,
++							geo->sec_per_blk);
+ 
+ 	l_mg->nr_lines = geo->blks_per_lun;
+ 	l_mg->log_line = l_mg->data_line = NULL;
+@@ -715,8 +714,6 @@ static int pblk_lines_init(struct pblk *pblk)
+ 
+ 	pblk_set_provision(pblk, nr_free_blks);
+ 
+-	sema_init(&pblk->erase_sem, 1);
+-
+ 	/* Cleanup per-LUN bad block lists - managed within lines on run-time */
+ 	for (i = 0; i < geo->nr_luns; i++)
+ 		kfree(pblk->luns[i].bb_list);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 18291c238930..84309bd400d5 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -92,8 +92,9 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+-	struct pblk_line *e_line = pblk_line_get_data_next(pblk);
++	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_sec_meta *meta_list = rqd->meta_list;
++	struct pblk_line *e_line, *d_line;
+ 	unsigned int map_secs;
+ 	int min = pblk->min_write_pgs;
+ 	int i, erase_lun;
+@@ -106,32 +107,49 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 		erase_lun = rqd->ppa_list[i].g.lun * geo->nr_chnls +
+ 							rqd->ppa_list[i].g.ch;
+ 
++		/* line can change after page map */
++		e_line = pblk_line_get_erase(pblk);
++		spin_lock(&e_line->lock);
+ 		if (!test_bit(erase_lun, e_line->erase_bitmap)) {
+-			if (down_trylock(&pblk->erase_sem))
+-				continue;
+-
+ 			set_bit(erase_lun, e_line->erase_bitmap);
+ 			atomic_dec(&e_line->left_eblks);
 +
-+	switch (cmd) {
-+	case F_GET_RW_HINT:
-+		ret = mask_to_write_hint(inode->i_flags, S_WRITE_LIFE_SHIFT);
-+		break;
-+	case F_SET_RW_HINT: {
-+		enum rw_hint hint = arg;
+ 			*erase_ppa = rqd->ppa_list[i];
+ 			erase_ppa->g.blk = e_line->id;
+ 
++			spin_unlock(&e_line->lock);
 +
-+		switch (hint) {
-+		case WRITE_LIFE_NONE:
-+		case WRITE_LIFE_SHORT:
-+		case WRITE_LIFE_MEDIUM:
-+		case WRITE_LIFE_LONG:
-+		case WRITE_LIFE_EXTREME:
-+			inode_set_write_hint(inode, hint);
-+			ret = 0;
-+			break;
-+		default:
-+			ret = -EINVAL;
+ 			/* Avoid evaluating e_line->left_eblks */
+ 			return pblk_map_rq(pblk, rqd, sentry, lun_bitmap,
+ 							valid_secs, i + min);
+ 		}
++		spin_unlock(&e_line->lock);
+ 	}
+ 
++	e_line = pblk_line_get_erase(pblk);
++	d_line = pblk_line_get_data(pblk);
++
+ 	/* Erase blocks that are bad in this line but might not be in next */
+-	if (unlikely(ppa_empty(*erase_ppa))) {
+-		struct pblk_line_meta *lm = &pblk->lm;
++	if (unlikely(ppa_empty(*erase_ppa)) &&
++			bitmap_weight(d_line->blk_bitmap, lm->blk_per_line)) {
++		int bit = -1;
+ 
+-		i = find_first_zero_bit(e_line->erase_bitmap, lm->blk_per_line);
+-		if (i == lm->blk_per_line)
++retry:
++		bit = find_next_bit(d_line->blk_bitmap,
++						lm->blk_per_line, bit + 1);
++		if (bit >= lm->blk_per_line)
+ 			return;
+ 
+-		set_bit(i, e_line->erase_bitmap);
++		spin_lock(&e_line->lock);
++		if (test_bit(bit, e_line->erase_bitmap)) {
++			spin_unlock(&e_line->lock);
++			goto retry;
 +		}
-+		break;
++		spin_unlock(&e_line->lock);
++
++		set_bit(bit, e_line->erase_bitmap);
+ 		atomic_dec(&e_line->left_eblks);
+-		*erase_ppa = pblk->luns[i].bppa; /* set ch and lun */
++		*erase_ppa = pblk->luns[bit].bppa; /* set ch and lun */
+ 		erase_ppa->g.blk = e_line->id;
+ 	}
+ }
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 045384ddc1f9..d293af12aa7a 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -521,20 +521,19 @@ unsigned int pblk_rb_read_to_bio_list(struct pblk_rb *rb, struct bio *bio,
+  * This function is used by the write thread to form the write bio that will
+  * persist data on the write buffer to the media.
+  */
+-unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct bio *bio,
+-				 struct pblk_c_ctx *c_ctx,
+-				 unsigned int pos,
+-				 unsigned int nr_entries,
+-				 unsigned int count)
++unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
++				 struct bio *bio, unsigned int pos,
++				 unsigned int nr_entries, unsigned int count)
+ {
+ 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
++	struct request_queue *q = pblk->dev->q;
++	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
+ 	struct pblk_rb_entry *entry;
+ 	struct page *page;
+-	unsigned int pad = 0, read = 0, to_read = nr_entries;
++	unsigned int pad = 0, to_read = nr_entries;
+ 	unsigned int user_io = 0, gc_io = 0;
+ 	unsigned int i;
+ 	int flags;
+-	int ret;
+ 
+ 	if (count < nr_entries) {
+ 		pad = nr_entries - count;
+@@ -570,17 +569,17 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct bio *bio,
+ 			flags |= PBLK_SUBMITTED_ENTRY;
+ 			/* Release flags on context. Protect from writes */
+ 			smp_store_release(&entry->w_ctx.flags, flags);
+-			goto out;
++			return NVM_IO_ERR;
+ 		}
+ 
+-		ret = bio_add_page(bio, page, rb->seg_size, 0);
+-		if (ret != rb->seg_size) {
++		if (bio_add_pc_page(q, bio, page, rb->seg_size, 0) !=
++								rb->seg_size) {
+ 			pr_err("pblk: could not add page to write bio\n");
+ 			flags &= ~PBLK_WRITTEN_DATA;
+ 			flags |= PBLK_SUBMITTED_ENTRY;
+ 			/* Release flags on context. Protect from writes */
+ 			smp_store_release(&entry->w_ctx.flags, flags);
+-			goto out;
++			return NVM_IO_ERR;
+ 		}
+ 
+ 		if (flags & PBLK_FLUSH_ENTRY) {
+@@ -607,14 +606,20 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct bio *bio,
+ 		pos = (pos + 1) & (rb->nr_entries - 1);
+ 	}
+ 
+-	read = to_read;
++	if (pad) {
++		if (pblk_bio_add_pages(pblk, bio, GFP_KERNEL, pad)) {
++			pr_err("pblk: could not pad page in write bio\n");
++			return NVM_IO_ERR;
 +		}
-+	default:
-+		ret = -EINVAL;
-+		break;
 +	}
 +
-+	return ret;
-+}
+ 	pblk_rl_out(&pblk->rl, user_io, gc_io);
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(pad, &((struct pblk *)
+ 			(container_of(rb, struct pblk, rwb)))->padded_writes);
+ #endif
+-out:
+-	return read;
 +
- static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
- 		struct file *filp)
- {
-@@ -337,6 +371,10 @@ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
- 	case F_GET_SEALS:
- 		err = shmem_fcntl(filp, cmd, arg);
- 		break;
-+	case F_GET_RW_HINT:
-+	case F_SET_RW_HINT:
-+		err = fcntl_rw_hint(filp, cmd, arg);
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
-index 813afd6eee71..f1a0fbc5bff1 100644
---- a/include/uapi/linux/fcntl.h
-+++ b/include/uapi/linux/fcntl.h
-@@ -43,6 +43,12 @@
- /* (1U << 31) is reserved for signed error codes */
++	return NVM_IO_OK;
+ }
  
  /*
-+ * Set/Get write life time hints
-+ */
-+#define F_GET_RW_HINT		(F_LINUX_SPECIFIC_BASE + 11)
-+#define F_SET_RW_HINT		(F_LINUX_SPECIFIC_BASE + 12)
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 79b90d8dbcb3..c745a22057f8 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -219,11 +219,10 @@ static int pblk_alloc_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ }
+ 
+ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+-			   struct pblk_c_ctx *c_ctx)
++			   struct pblk_c_ctx *c_ctx, struct ppa_addr *erase_ppa)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+-	struct pblk_line *e_line = pblk_line_get_data_next(pblk);
+-	struct ppa_addr erase_ppa;
++	struct pblk_line *e_line = pblk_line_get_erase(pblk);
+ 	unsigned int valid = c_ctx->nr_valid;
+ 	unsigned int padded = c_ctx->nr_padded;
+ 	unsigned int nr_secs = valid + padded;
+@@ -231,40 +230,23 @@ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	int ret = 0;
+ 
+ 	lun_bitmap = kzalloc(lm->lun_bitmap_len, GFP_KERNEL);
+-	if (!lun_bitmap) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
++	if (!lun_bitmap)
++		return -ENOMEM;
+ 	c_ctx->lun_bitmap = lun_bitmap;
+ 
+ 	ret = pblk_alloc_w_rq(pblk, rqd, nr_secs);
+ 	if (ret) {
+ 		kfree(lun_bitmap);
+-		goto out;
++		return ret;
+ 	}
+ 
+-	ppa_set_empty(&erase_ppa);
+-	if (likely(!e_line || !atomic_read(&e_line->left_eblks)))
++	if (likely(!atomic_read(&e_line->left_eblks) || !e_line))
+ 		pblk_map_rq(pblk, rqd, c_ctx->sentry, lun_bitmap, valid, 0);
+ 	else
+ 		pblk_map_erase_rq(pblk, rqd, c_ctx->sentry, lun_bitmap,
+-							valid, &erase_ppa);
++							valid, erase_ppa);
+ 
+-out:
+-	if (unlikely(e_line && !ppa_empty(erase_ppa))) {
+-		if (pblk_blk_erase_async(pblk, erase_ppa)) {
+-			struct nvm_tgt_dev *dev = pblk->dev;
+-			struct nvm_geo *geo = &dev->geo;
+-			int bit;
+-
+-			atomic_inc(&e_line->left_eblks);
+-			bit = erase_ppa.g.lun * geo->nr_chnls + erase_ppa.g.ch;
+-			WARN_ON(!test_and_clear_bit(bit, e_line->erase_bitmap));
+-			up(&pblk->erase_sem);
+-		}
+-	}
+-
+-	return ret;
++	return 0;
+ }
+ 
+ int pblk_setup_w_rec_rq(struct pblk *pblk, struct nvm_rq *rqd,
+@@ -311,16 +293,60 @@ static int pblk_calc_secs_to_sync(struct pblk *pblk, unsigned int secs_avail,
+ 	return secs_to_sync;
+ }
+ 
++static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
++	struct ppa_addr erase_ppa;
++	int err;
 +
-+/*
-  * Types of directory notifications that may be requested.
-  */
- #define DN_ACCESS	0x00000001	/* File accessed */
++	ppa_set_empty(&erase_ppa);
++
++	/* Assign lbas to ppas and populate request structure */
++	err = pblk_setup_w_rq(pblk, rqd, c_ctx, &erase_ppa);
++	if (err) {
++		pr_err("pblk: could not setup write request: %d\n", err);
++		return NVM_IO_ERR;
++	}
++
++	/* Submit write for current data line */
++	err = pblk_submit_io(pblk, rqd);
++	if (err) {
++		pr_err("pblk: I/O submission failed: %d\n", err);
++		return NVM_IO_ERR;
++	}
++
++	/* Submit available erase for next data line */
++	if (unlikely(!ppa_empty(erase_ppa)) &&
++				pblk_blk_erase_async(pblk, erase_ppa)) {
++		struct pblk_line *e_line = pblk_line_get_erase(pblk);
++		struct nvm_tgt_dev *dev = pblk->dev;
++		struct nvm_geo *geo = &dev->geo;
++		int bit;
++
++		atomic_inc(&e_line->left_eblks);
++		bit = erase_ppa.g.lun * geo->nr_chnls + erase_ppa.g.ch;
++		WARN_ON(!test_and_clear_bit(bit, e_line->erase_bitmap));
++	}
++
++	return NVM_IO_OK;
++}
++
++static void pblk_free_write_rqd(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
++	struct bio *bio = rqd->bio;
++
++	if (c_ctx->nr_padded)
++		pblk_bio_free_pages(pblk, bio, rqd->nr_ppas, c_ctx->nr_padded);
++}
++
+ static int pblk_submit_write(struct pblk *pblk)
+ {
+ 	struct bio *bio;
+ 	struct nvm_rq *rqd;
+-	struct pblk_c_ctx *c_ctx;
+-	unsigned int pgs_read;
+ 	unsigned int secs_avail, secs_to_sync, secs_to_com;
+ 	unsigned int secs_to_flush;
+ 	unsigned long pos;
+-	int err;
+ 
+ 	/* If there are no sectors in the cache, flushes (bios without data)
+ 	 * will be cleared on the cache threads
+@@ -338,7 +364,6 @@ static int pblk_submit_write(struct pblk *pblk)
+ 		pr_err("pblk: cannot allocate write req.\n");
+ 		return 1;
+ 	}
+-	c_ctx = nvm_rq_to_pdu(rqd);
+ 
+ 	bio = bio_alloc(GFP_KERNEL, pblk->max_write_pgs);
+ 	if (!bio) {
+@@ -358,29 +383,14 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	secs_to_com = (secs_to_sync > secs_avail) ? secs_avail : secs_to_sync;
+ 	pos = pblk_rb_read_commit(&pblk->rwb, secs_to_com);
+ 
+-	pgs_read = pblk_rb_read_to_bio(&pblk->rwb, bio, c_ctx, pos,
+-						secs_to_sync, secs_avail);
+-	if (!pgs_read) {
++	if (pblk_rb_read_to_bio(&pblk->rwb, rqd, bio, pos, secs_to_sync,
++								secs_avail)) {
+ 		pr_err("pblk: corrupted write bio\n");
+ 		goto fail_put_bio;
+ 	}
+ 
+-	if (c_ctx->nr_padded)
+-		if (pblk_bio_add_pages(pblk, bio, GFP_KERNEL, c_ctx->nr_padded))
+-			goto fail_put_bio;
+-
+-	/* Assign lbas to ppas and populate request structure */
+-	err = pblk_setup_w_rq(pblk, rqd, c_ctx);
+-	if (err) {
+-		pr_err("pblk: could not setup write request\n");
++	if (pblk_submit_io_set(pblk, rqd))
+ 		goto fail_free_bio;
+-	}
+-
+-	err = pblk_submit_io(pblk, rqd);
+-	if (err) {
+-		pr_err("pblk: I/O submission failed: %d\n", err);
+-		goto fail_free_bio;
+-	}
+ 
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(secs_to_sync, &pblk->sub_writes);
+@@ -389,8 +399,7 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	return 0;
+ 
+ fail_free_bio:
+-	if (c_ctx->nr_padded)
+-		pblk_bio_free_pages(pblk, bio, secs_to_sync, c_ctx->nr_padded);
++	pblk_free_write_rqd(pblk, rqd);
+ fail_put_bio:
+ 	bio_put(bio);
+ fail_free_rqd:
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index c18fda522b34..de0361988bfb 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -500,7 +500,6 @@ struct pblk {
+ 	struct pblk_rl rl;
+ 
+ 	int sec_per_write;
+-	struct semaphore erase_sem;
+ 
+ 	unsigned char instance_uuid[16];
+ #ifdef CONFIG_NVM_DEBUG
+@@ -583,11 +582,9 @@ void pblk_rb_write_entry_gc(struct pblk_rb *rb, void *data,
+ struct pblk_w_ctx *pblk_rb_w_ctx(struct pblk_rb *rb, unsigned int pos);
+ 
+ void pblk_rb_sync_l2p(struct pblk_rb *rb);
+-unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct bio *bio,
+-				 struct pblk_c_ctx *c_ctx,
+-				 unsigned int pos,
+-				 unsigned int nr_entries,
+-				 unsigned int count);
++unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
++				 struct bio *bio, unsigned int pos,
++				 unsigned int nr_entries, unsigned int count);
+ unsigned int pblk_rb_read_to_bio_list(struct pblk_rb *rb, struct bio *bio,
+ 				      struct list_head *list,
+ 				      unsigned int max);
+@@ -633,7 +630,7 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk);
+ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line);
+ void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line);
+ struct pblk_line *pblk_line_get_data(struct pblk *pblk);
+-struct pblk_line *pblk_line_get_data_next(struct pblk *pblk);
++struct pblk_line *pblk_line_get_erase(struct pblk *pblk);
+ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line);
+ int pblk_line_is_full(struct pblk_line *line);
+ void pblk_line_free(struct pblk *pblk, struct pblk_line *line);
 -- 
 2.7.4
