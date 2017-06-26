@@ -1,70 +1,239 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 10/12] blk-mq: Document locking assumptions
-Date: Tue, 20 Jun 2017 11:15:47 -0700
-Message-ID: <20170620181549.24903-11-bart.vanassche@wdc.com>
-In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
-References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:37979 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751887AbdFZJ6Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:25 -0400
+Received: by mail-wm0-f49.google.com with SMTP id b184so3029236wme.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:24 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 15/20] lightnvm: pblk: set metadata list for all I/Os
+Date: Mon, 26 Jun 2017 11:57:24 +0200
+Message-Id: <1498471049-25505-16-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Set a dma area for all I/Os in order to read/write from/to the metadata
+stored on the per-sector out-of-bound area.
 
-Document the locking assumptions in functions that modify
-blk_mq_ctx.rq_list to make it easier for humans to verify
-this code.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- block/blk-mq-sched.c | 2 ++
- block/blk-mq.c       | 4 ++++
- 2 files changed, 6 insertions(+)
+ drivers/lightnvm/pblk-core.c | 47 +++++++++++++++++++++++++++++++-------------
+ drivers/lightnvm/pblk-read.c | 45 ++++++++++++++++++++----------------------
+ 2 files changed, 54 insertions(+), 38 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 9f025289da63..191bf82d185e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -150,6 +150,8 @@ static bool blk_mq_attempt_merge(struct request_queue *q,
- 	struct request *rq;
- 	int checked = 8;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index b5f7f3f19105..cba7cd78e4a6 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -555,10 +555,10 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+ 	struct pblk_line_meta *lm = &pblk->lm;
++	void *ppa_list, *meta_list;
+ 	struct bio *bio;
+ 	struct nvm_rq rqd;
+-	struct ppa_addr *ppa_list;
+-	dma_addr_t dma_ppa_list;
++	dma_addr_t dma_ppa_list, dma_meta_list;
+ 	int min = pblk->min_write_pgs;
+ 	int left_ppas = lm->emeta_sec[0];
+ 	int id = line->id;
+@@ -577,10 +577,14 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	} else
+ 		return -EINVAL;
  
-+	lockdep_assert_held(&ctx->lock);
+-	ppa_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL, &dma_ppa_list);
+-	if (!ppa_list)
++	meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
++							&dma_meta_list);
++	if (!meta_list)
+ 		return -ENOMEM;
+ 
++	ppa_list = meta_list + pblk_dma_meta_size;
++	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
 +
- 	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
- 		bool merged = false;
+ next_rq:
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6268380c680f..1d8050e49a94 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1317,6 +1317,8 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+@@ -597,22 +601,28 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	bio_set_op_attrs(bio, bio_op, 0);
  
-+	lockdep_assert_held(&ctx->lock);
+ 	rqd.bio = bio;
+-	rqd.opcode = cmd_op;
+-	rqd.nr_ppas = rq_ppas;
++	rqd.meta_list = meta_list;
+ 	rqd.ppa_list = ppa_list;
++	rqd.dma_meta_list = dma_meta_list;
+ 	rqd.dma_ppa_list = dma_ppa_list;
++	rqd.opcode = cmd_op;
++	rqd.nr_ppas = rq_ppas;
+ 	rqd.end_io = pblk_end_io_sync;
+ 	rqd.private = &wait;
+ 
+ 	if (dir == WRITE) {
++		struct pblk_sec_meta *meta_list = rqd.meta_list;
 +
- 	trace_block_rq_insert(hctx->queue, rq);
+ 		rqd.flags = pblk_set_progr_mode(pblk, WRITE);
+ 		for (i = 0; i < rqd.nr_ppas; ) {
+ 			spin_lock(&line->lock);
+ 			paddr = __pblk_alloc_page(pblk, line, min);
+ 			spin_unlock(&line->lock);
+-			for (j = 0; j < min; j++, i++, paddr++)
++			for (j = 0; j < min; j++, i++, paddr++) {
++				meta_list[i].lba = cpu_to_le64(ADDR_EMPTY);
+ 				rqd.ppa_list[i] =
+ 					addr_to_gen_ppa(pblk, paddr, id);
++			}
+ 		}
+ 	} else {
+ 		for (i = 0; i < rqd.nr_ppas; ) {
+@@ -680,7 +690,7 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	if (left_ppas)
+ 		goto next_rq;
+ free_rqd_dma:
+-	nvm_dev_dma_free(dev->parent, ppa_list, dma_ppa_list);
++	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+ 	return ret;
+ }
  
- 	if (at_head)
-@@ -1330,6 +1332,8 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+@@ -726,11 +736,14 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
  
-+	lockdep_assert_held(&ctx->lock);
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+-	rqd.ppa_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
+-							&rqd.dma_ppa_list);
+-	if (!rqd.ppa_list)
++	rqd.meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
++							&rqd.dma_meta_list);
++	if (!rqd.meta_list)
+ 		return -ENOMEM;
+ 
++	rqd.ppa_list = rqd.meta_list + pblk_dma_meta_size;
++	rqd.dma_ppa_list = rqd.dma_meta_list + pblk_dma_meta_size;
 +
- 	__blk_mq_insert_req_list(hctx, rq, at_head);
- 	blk_mq_hctx_mark_pending(hctx, ctx);
+ 	bio = bio_map_kern(dev->q, line->smeta, lm->smeta_len, GFP_KERNEL);
+ 	if (IS_ERR(bio)) {
+ 		ret = PTR_ERR(bio);
+@@ -748,9 +761,15 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	rqd.private = &wait;
+ 
+ 	for (i = 0; i < lm->smeta_sec; i++, paddr++) {
++		struct pblk_sec_meta *meta_list = rqd.meta_list;
++
+ 		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
+-		if (dir == WRITE)
+-			lba_list[paddr] = cpu_to_le64(ADDR_EMPTY);
++
++		if (dir == WRITE) {
++			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
++
++			meta_list[i].lba = lba_list[paddr] = addr_empty;
++		}
+ 	}
+ 
+ 	/*
+@@ -778,7 +797,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	}
+ 
+ free_ppa_list:
+-	nvm_dev_dma_free(dev->parent, rqd.ppa_list, rqd.dma_ppa_list);
++	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+ 
+ 	return ret;
+ }
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index d6499cdb7d33..292cbd290eea 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -123,8 +123,7 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
+ #endif
+ 
+-	if (rqd->nr_ppas > 1)
+-		nvm_dev_dma_free(dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
++	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ 
+ 	bio_put(bio);
+ 	if (r_ctx->private) {
+@@ -329,13 +328,16 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	 */
+ 	bio_init_idx = pblk_get_bi_idx(bio);
+ 
++	rqd->meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
++							&rqd->dma_meta_list);
++	if (!rqd->meta_list) {
++		pr_err("pblk: not able to allocate ppa list\n");
++		goto fail_rqd_free;
++	}
++
+ 	if (nr_secs > 1) {
+-		rqd->ppa_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
+-						&rqd->dma_ppa_list);
+-		if (!rqd->ppa_list) {
+-			pr_err("pblk: not able to allocate ppa list\n");
+-			goto fail_rqd_free;
+-		}
++		rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
++		rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
+ 
+ 		pblk_read_ppalist_rq(pblk, rqd, &read_bitmap);
+ 	} else {
+@@ -466,22 +468,19 @@ int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
+ 
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
++	rqd.meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
++							&rqd.dma_meta_list);
++	if (!rqd.meta_list)
++		return NVM_IO_ERR;
++
+ 	if (nr_secs > 1) {
+-		rqd.ppa_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL,
+-							&rqd.dma_ppa_list);
+-		if (!rqd.ppa_list)
+-			return NVM_IO_ERR;
++		rqd.ppa_list = rqd.meta_list + pblk_dma_meta_size;
++		rqd.dma_ppa_list = rqd.dma_meta_list + pblk_dma_meta_size;
+ 
+ 		*secs_to_gc = read_ppalist_rq_gc(pblk, &rqd, line, lba_list,
+ 								nr_secs);
+-		if (*secs_to_gc == 1) {
+-			struct ppa_addr ppa;
+-
+-			ppa = rqd.ppa_list[0];
+-			nvm_dev_dma_free(dev->parent, rqd.ppa_list,
+-							rqd.dma_ppa_list);
+-			rqd.ppa_addr = ppa;
+-		}
++		if (*secs_to_gc == 1)
++			rqd.ppa_addr = rqd.ppa_list[0];
+ 	} else {
+ 		*secs_to_gc = read_rq_gc(pblk, &rqd, line, lba_list[0]);
+ 	}
+@@ -532,12 +531,10 @@ int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
+ #endif
+ 
+ out:
+-	if (rqd.nr_ppas > 1)
+-		nvm_dev_dma_free(dev->parent, rqd.ppa_list, rqd.dma_ppa_list);
++	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+ 	return NVM_IO_OK;
+ 
+ err_free_dma:
+-	if (rqd.nr_ppas > 1)
+-		nvm_dev_dma_free(dev->parent, rqd.ppa_list, rqd.dma_ppa_list);
++	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
+ 	return NVM_IO_ERR;
  }
 -- 
-2.13.1
+2.7.4
