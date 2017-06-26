@@ -1,110 +1,77 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH v5 05/12] block: Change argument type of scsi_req_init()
-Date: Tue, 20 Jun 2017 11:15:42 -0700
-Message-ID: <20170620181549.24903-6-bart.vanassche@wdc.com>
-In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
-References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:34535 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751858AbdFZJ6X (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:23 -0400
+Received: by mail-wm0-f50.google.com with SMTP id t129so816080wmt.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:23 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 14/20] lightnvm: pblk: choose optimal victim GC line
+Date: Mon, 26 Jun 2017 11:57:23 +0200
+Message-Id: <1498471049-25505-15-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+At the moment, we separate the closed lines on three different list
+based on their number of valid sectors. GC recycles lines from each list
+based on capacity. Lines from each list are taken in a FIFO fashion.
 
-Since scsi_req_init() works on a struct scsi_request, change the
-argument type into struct scsi_request *.
+Since the number of lines is limited (it corresponds to the number of
+blocks in a LUN, which is somewhere between 1000-2000), we can afford
+scanning the lists to choose the optimal line to be recycled. This helps
+specially in lines with a high number of valid sectors.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+If the number of blocks per LUN increases, we will consider a more
+efficient policy.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- block/scsi_ioctl.c          | 10 +++++++---
- drivers/ide/ide-atapi.c     |  2 +-
- drivers/ide/ide-probe.c     |  2 +-
- drivers/scsi/scsi_lib.c     |  4 +++-
- include/scsi/scsi_request.h |  2 +-
- 5 files changed, 13 insertions(+), 7 deletions(-)
+ drivers/lightnvm/pblk-gc.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index f96c51f5df40..7440de44dd85 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -741,10 +741,14 @@ int scsi_cmd_blk_ioctl(struct block_device *bd, fmode_t mode,
- }
- EXPORT_SYMBOL(scsi_cmd_blk_ioctl);
- 
--void scsi_req_init(struct request *rq)
-+/**
-+ * scsi_req_init - initialize certain fields of a scsi_request structure
-+ * @req: Pointer to a scsi_request structure.
-+ * Initializes .__cmd[], .cmd, .cmd_len and .sense_len but no other members
-+ * of struct scsi_request.
-+ */
-+void scsi_req_init(struct scsi_request *req)
- {
--	struct scsi_request *req = scsi_req(rq);
--
- 	memset(req->__cmd, 0, sizeof(req->__cmd));
- 	req->cmd = req->__cmd;
- 	req->cmd_len = BLK_MAX_CDB;
-diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
-index 37f61acf5a35..14d1e7d9a1d6 100644
---- a/drivers/ide/ide-atapi.c
-+++ b/drivers/ide/ide-atapi.c
-@@ -199,7 +199,7 @@ void ide_prep_sense(ide_drive_t *drive, struct request *rq)
- 	memset(sense, 0, sizeof(*sense));
- 
- 	blk_rq_init(rq->q, sense_rq);
--	scsi_req_init(sense_rq);
-+	scsi_req_init(req);
- 
- 	err = blk_rq_map_kern(drive->queue, sense_rq, sense, sense_len,
- 			      GFP_NOIO);
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index c60e5ffc9231..01b2adfd8226 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -745,7 +745,7 @@ static void ide_initialize_rq(struct request *rq)
- {
- 	struct ide_request *req = blk_mq_rq_to_pdu(rq);
- 
--	scsi_req_init(rq);
-+	scsi_req_init(&req->sreq);
- 	req->sreq.sense = req->sense;
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 2e7fb7a51854..f811e4ca63f4 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -287,6 +287,20 @@ static void pblk_gc_lines(struct pblk *pblk, struct list_head *gc_list)
+ 	}
  }
  
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 301a7f706c9a..550e29f903b7 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1123,7 +1123,9 @@ EXPORT_SYMBOL(scsi_init_io);
-  */
- void scsi_initialize_rq(struct request *rq)
- {
--	scsi_req_init(rq);
-+	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
++static struct pblk_line *pblk_gc_get_victim_line(struct pblk *pblk,
++						 struct list_head *group_list)
++{
++	struct pblk_line *line, *victim;
 +
-+	scsi_req_init(&cmd->req);
- }
- EXPORT_SYMBOL(scsi_initialize_rq);
++	victim = list_first_entry(group_list, struct pblk_line, list);
++	list_for_each_entry(line, group_list, list) {
++		if (*line->vsc < *victim->vsc)
++			victim = line;
++	}
++
++	return victim;
++}
++
+ /*
+  * Lines with no valid sectors will be returned to the free list immediately. If
+  * GC is activated - either because the free block count is under the determined
+@@ -332,7 +346,7 @@ static void pblk_gc_run(struct pblk *pblk)
+ 			return;
+ 		}
  
-diff --git a/include/scsi/scsi_request.h b/include/scsi/scsi_request.h
-index f0c76f9dc285..e0afa445ee4e 100644
---- a/include/scsi/scsi_request.h
-+++ b/include/scsi/scsi_request.h
-@@ -27,6 +27,6 @@ static inline void scsi_req_free_cmd(struct scsi_request *req)
- 		kfree(req->cmd);
- }
+-		line = list_first_entry(group_list, struct pblk_line, list);
++		line = pblk_gc_get_victim_line(pblk, group_list);
+ 		nr_blocks_free += atomic_read(&line->blk_in_line);
  
--void scsi_req_init(struct request *);
-+void scsi_req_init(struct scsi_request *req);
- 
- #endif /* _SCSI_SCSI_REQUEST_H */
+ 		spin_lock(&line->lock);
 -- 
-2.13.1
+2.7.4
