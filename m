@@ -1,59 +1,69 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 06/12] blk-mq: Initialize .rq_flags in blk_mq_rq_ctx_init()
-Date: Tue, 20 Jun 2017 11:15:43 -0700
-Message-ID: <20170620181549.24903-7-bart.vanassche@wdc.com>
-In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
-References: <20170620181549.24903-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:35692 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751704AbdFZJ6U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:20 -0400
+Received: by mail-wm0-f53.google.com with SMTP id w126so2845662wme.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:18 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 09/20] lightnvm: pblk: delete redundant debug line stat
+Date: Mon, 26 Jun 2017 11:57:18 +0200
+Message-Id: <1498471049-25505-10-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Remove a legacy variable that helped verifying the consistency of the
+run-time metadata for the free line list. With the new metadata layout,
+this check is no longer necessary.
 
-Initialization of blk-mq requests is a bit weird: blk_mq_rq_ctx_init()
-is called after a value has been assigned to .rq_flags and .rq_flags
-is initialized in __blk_mq_finish_request(). Initialize .rq_flags in
-blk_mq_rq_ctx_init() instead of relying on __blk_mq_finish_request().
-Moving the initialization of .rq_flags is fine because all changes
-and tests of .rq_flags occur between blk_get_request() and finishing
-a request.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/lightnvm/pblk-sysfs.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2d21fbccc3a5..6268380c680f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -228,6 +228,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct request *rq = tags->static_rqs[tag];
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 707d1b91bde6..3d9a77646a3d 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -153,7 +153,7 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
+ 	int free_line_cnt = 0, closed_line_cnt = 0, emeta_line_cnt = 0;
+ 	int d_line_cnt = 0, l_line_cnt = 0;
+ 	int gc_full = 0, gc_high = 0, gc_mid = 0, gc_low = 0, gc_empty = 0;
+-	int free = 0, bad = 0, cor = 0;
++	int bad = 0, cor = 0;
+ 	int msecs = 0, ssecs = 0, cur_sec = 0, vsc = 0, sec_in_line = 0;
+ 	int map_weight = 0, meta_weight = 0;
  
-+	rq->rq_flags = 0;
-+
- 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
- 		rq->tag = -1;
- 		rq->internal_tag = tag;
-@@ -423,7 +425,6 @@ void blk_mq_free_request(struct request *rq)
- 		atomic_dec(&hctx->nr_active);
+@@ -217,8 +217,6 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
+ 		gc_empty++;
+ 	}
  
- 	wbt_done(q->rq_wb, &rq->issue_stat);
--	rq->rq_flags = 0;
+-	list_for_each_entry(line, &l_mg->free_list, list)
+-		free++;
+ 	list_for_each_entry(line, &l_mg->bad_list, list)
+ 		bad++;
+ 	list_for_each_entry(line, &l_mg->corrupt_list, list)
+@@ -247,9 +245,9 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
+ 		geo->nr_luns, lm->blk_per_line, lm->sec_per_line);
  
- 	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
- 	clear_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
+ 	sz += snprintf(page + sz, PAGE_SIZE - sz,
+-		"lines:d:%d,l:%d-f:%d(%d),m:%d,c:%d,b:%d,co:%d(d:%d,l:%d)t:%d\n",
++		"lines:d:%d,l:%d-f:%d,m:%d,c:%d,b:%d,co:%d(d:%d,l:%d)t:%d\n",
+ 					cur_data, cur_log,
+-					free, nr_free_lines, emeta_line_cnt,
++					nr_free_lines, emeta_line_cnt,
+ 					closed_line_cnt,
+ 					bad, cor,
+ 					d_line_cnt, l_line_cnt,
 -- 
-2.13.1
+2.7.4
