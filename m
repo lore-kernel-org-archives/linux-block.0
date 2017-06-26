@@ -1,63 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from fieldses.org ([173.255.197.46]:51368 "EHLO fieldses.org"
+Received: from mx1.redhat.com ([209.132.183.28]:32206 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750952AbdFAN32 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Jun 2017 09:29:28 -0400
-Date: Thu, 1 Jun 2017 09:29:27 -0400
-From: "J . Bruce Fields" <bfields@fieldses.org>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Jeff Layton <jlayton@poochiereds.net>,
-        Omar Sandoval <osandov@fb.com>, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH v2 6/6] nfsd: Check queue type before submitting a SCSI
- request
-Message-ID: <20170601132927.GO18523@fieldses.org>
-References: <20170531214350.31157-1-bart.vanassche@sandisk.com>
- <20170531214350.31157-7-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170531214350.31157-7-bart.vanassche@sandisk.com>
+        id S1752026AbdFZMMj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 08:12:39 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 04/51] mm: page_io.c: comment on direct access to bvec table
+Date: Mon, 26 Jun 2017 20:09:47 +0800
+Message-Id: <20170626121034.3051-5-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Feel free to add
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-mm@kvack.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ mm/page_io.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-	Acked-by: J. Bruce Fields <bfields@redhat.com>
-
-if you need it.--b.
-
-On Wed, May 31, 2017 at 02:43:50PM -0700, Bart Van Assche wrote:
-> Since using scsi_req() is only allowed against request queues for
-> which struct scsi_request is the first member of their private
-> request data, refuse to submit SCSI commands against a queue for
-> which this is not the case.
-> 
-> References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: J. Bruce Fields <bfields@fieldses.org>
-> Cc: Jeff Layton <jlayton@poochiereds.net>
-> Cc: Omar Sandoval <osandov@fb.com>
-> Cc: linux-nfs@vger.kernel.org
-> ---
->  fs/nfsd/blocklayout.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/fs/nfsd/blocklayout.c b/fs/nfsd/blocklayout.c
-> index fb5213afc854..47ed19c53f2e 100644
-> --- a/fs/nfsd/blocklayout.c
-> +++ b/fs/nfsd/blocklayout.c
-> @@ -219,6 +219,9 @@ static int nfsd4_scsi_identify_device(struct block_device *bdev,
->  	u8 *buf, *d, type, assoc;
->  	int error;
->  
-> +	if (WARN_ON_ONCE(!blk_queue_scsi_passthrough(q)))
-> +		return -EINVAL;
-> +
->  	buf = kzalloc(bufflen, GFP_KERNEL);
->  	if (!buf)
->  		return -ENOMEM;
-> -- 
-> 2.12.2
+diff --git a/mm/page_io.c b/mm/page_io.c
+index b6c4ac388209..11c6f4a9a25b 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -43,6 +43,7 @@ static struct bio *get_swap_bio(gfp_t gfp_flags,
+ 
+ void end_swap_bio_write(struct bio *bio)
+ {
++	/* single page bio, safe for multipage bvec */
+ 	struct page *page = bio->bi_io_vec[0].bv_page;
+ 
+ 	if (bio->bi_status) {
+@@ -116,6 +117,7 @@ static void swap_slot_free_notify(struct page *page)
+ 
+ static void end_swap_bio_read(struct bio *bio)
+ {
++	/* single page bio, safe for multipage bvec */
+ 	struct page *page = bio->bi_io_vec[0].bv_page;
+ 	struct task_struct *waiter = bio->bi_private;
+ 
+-- 
+2.9.4
