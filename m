@@ -1,120 +1,186 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:39007 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750822AbdFHM3J (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Thu, 8 Jun 2017 08:29:09 -0400
-From: James Wang <jnwang@suse.com>
-To: osandov@fb.com, hch@infradead.org
-Cc: axboe@fb.com, hare@suse.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mgorman@suse.com,
-        James Wang <jnwang@suse.com>
-Subject: [PATCH blktests] loop/002: Regression testing for loop device flush
-Date: Thu,  8 Jun 2017 20:28:12 +0800
-Message-Id: <20170608122812.24225-1-jnwang@suse.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH v2 48/51] fs/btrfs: convert to bio_for_each_segment_all_sp()
+Date: Mon, 26 Jun 2017 20:10:31 +0800
+Message-Id: <20170626121034.3051-49-ming.lei@redhat.com>
+In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
+References: <20170626121034.3051-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Add a regression testing for loop device. when an unbound device
-be close that take too long time. kernel will consume serveral orders
-of magnitude more wall time than it does for a mounted device.
-
-Signed-off-by: James Wang <jnwang@suse.com>
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tests/loop/002     | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/loop/002.out |  2 ++
- 2 files changed, 79 insertions(+)
+ fs/btrfs/compression.c |  3 ++-
+ fs/btrfs/disk-io.c     |  3 ++-
+ fs/btrfs/extent_io.c   | 12 ++++++++----
+ fs/btrfs/inode.c       |  6 ++++--
+ fs/btrfs/raid56.c      |  6 ++++--
+ 5 files changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/tests/loop/002 b/tests/loop/002
-new file mode 100755
-index 0000000..fd607d1
---- /dev/null
-+++ b/tests/loop/002
-@@ -0,0 +1,77 @@
-+#!/bin/bash
-+#
-+# Test if close()ing a unbound loop device is too slow
-+# Copyright (C) 2017 James Wang
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+DESCRIPTION="Test if close()ing a unbound loop device is too slow"
-+
-+QUICK=1
-+
-+function run_test() {
-+	TIMEFORMAT='%5R'
-+	time {
-+		for f in `ls /dev/loop[0-9]*|sort`; do dd if=$f of=/dev/null  bs=512 count=1 >/dev/null 2>&1; done
-+	}
-+}
-+function clean_up() {
-+	if lsmod | grep loop >/dev/null 2>&1; then
-+		umount /dev/loop* >/dev/null 2>&1
-+		losetup -D
-+		sleep 5
-+		
-+		if ! rmmod loop;then
-+			return 2;
-+		fi
-+	fi
-+}
-+
-+function prepare() {
-+	modprobe loop max_loop=64
-+	dd if=/dev/zero of=${TMPDIR}/disk bs=512 count=200K >/dev/null 2>&1
-+	for((i=0;i<4;i++))
-+	do
-+	        losetup -f ${TMPDIR}/disk;
-+	done
-+	mkfs.ext4 -F /dev/loop0 >/dev/null 2>&1
-+	for((i=0;i<4;i++))
-+	do
-+	        mkdir -p t$i;
-+	        mount /dev/loop$i t$i;
-+	done
-+
-+}
-+
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	prepare
-+	SECONDS=0
-+	run_test >/dev/null 2>&1
-+	DURATION=${SECONDS}
-+
-+	clean_up
-+	if ! clean_up; then
-+		echo "Test complete"
-+		return 2
-+	fi
-+	echo "Test complete"
-+	if [[ "${DURATION}" -gt 1 ]]; then
-+		return 1
-+	else
-+		return 0
-+	fi
-+}
-diff --git a/tests/loop/002.out b/tests/loop/002.out
-new file mode 100644
-index 0000000..5c34a37
---- /dev/null
-+++ b/tests/loop/002.out
-@@ -0,0 +1,2 @@
-+Running loop/002
-+Test complete
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index fdab5b821aa8..9d1693ecf468 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -147,12 +147,13 @@ static void end_compressed_bio_read(struct bio *bio)
+ 	} else {
+ 		int i;
+ 		struct bio_vec *bvec;
++		struct bvec_iter_all bia;
+ 
+ 		/*
+ 		 * we have verified the checksum already, set page
+ 		 * checked so the end_io handlers know about it
+ 		 */
+-		bio_for_each_segment_all(bvec, cb->orig_bio, i)
++		bio_for_each_segment_all_sp(bvec, cb->orig_bio, i, bia)
+ 			SetPageChecked(bvec->bv_page);
+ 
+ 		bio_endio(cb->orig_bio);
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index f4f54d13db6d..e7efbaa3566c 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -963,8 +963,9 @@ static blk_status_t btree_csum_one_bio(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct btrfs_root *root;
+ 	int i, ret = 0;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		root = BTRFS_I(bvec->bv_page->mapping->host)->root;
+ 		ret = csum_dirty_buffer(root->fs_info, bvec->bv_page);
+ 		if (ret)
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 7cc6c8a52e49..8e51452894ba 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2359,8 +2359,9 @@ static unsigned int get_bio_pages(struct bio *bio)
+ {
+ 	unsigned i;
+ 	struct bio_vec *bv;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bv, bio, i)
++	bio_for_each_segment_all_sp(bv, bio, i, bia)
+ 		;
+ 
+ 	return i;
+@@ -2468,8 +2469,9 @@ static void end_bio_extent_writepage(struct bio *bio)
+ 	u64 start;
+ 	u64 end;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -2538,8 +2540,9 @@ static void end_bio_extent_readpage(struct bio *bio)
+ 	int mirror;
+ 	int ret;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct inode *inode = page->mapping->host;
+ 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -3695,8 +3698,9 @@ static void end_bio_extent_buffer_writepage(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_buffer *eb;
+ 	int i, done;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		eb = (struct extent_buffer *)page->private;
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 7e725d84917b..61cc6d899ae5 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8051,6 +8051,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct extent_io_tree *io_tree, *failure_tree;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -8067,7 +8068,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(inode));
+ 
+ 	done->uptodate = 1;
+-	bio_for_each_segment_all(bvec, bio, i)
++	bio_for_each_segment_all_sp(bvec, bio, i, bia)
+ 		clean_io_failure(BTRFS_I(inode)->root->fs_info, failure_tree,
+ 				 io_tree, done->start, bvec->bv_page,
+ 				 btrfs_ino(BTRFS_I(inode)), 0);
+@@ -8146,6 +8147,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	int uptodate;
+ 	int ret;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (bio->bi_status)
+ 		goto end;
+@@ -8164,7 +8166,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	io_tree = &BTRFS_I(inode)->io_tree;
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
+ 					     bvec->bv_offset, done->start,
+ 					     bvec->bv_len);
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index 6f845d219cd6..9c68f1c88b40 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -1141,6 +1141,7 @@ static void index_rbio_pages(struct btrfs_raid_bio *rbio)
+ 	unsigned long stripe_offset;
+ 	unsigned long page_index;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	spin_lock_irq(&rbio->bio_list_lock);
+ 	bio_list_for_each(bio, &rbio->bio_list) {
+@@ -1148,7 +1149,7 @@ static void index_rbio_pages(struct btrfs_raid_bio *rbio)
+ 		stripe_offset = start - rbio->bbio->raid_map[0];
+ 		page_index = stripe_offset >> PAGE_SHIFT;
+ 
+-		bio_for_each_segment_all(bvec, bio, i)
++		bio_for_each_segment_all_sp(bvec, bio, i, bia)
+ 			rbio->bio_pages[page_index + i] = bvec->bv_page;
+ 	}
+ 	spin_unlock_irq(&rbio->bio_list_lock);
+@@ -1425,8 +1426,9 @@ static void set_bio_pages_uptodate(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i)
++	bio_for_each_segment_all_sp(bvec, bio, i, bia)
+ 		SetPageUptodate(bvec->bv_page);
+ }
+ 
 -- 
-2.12.3
+2.9.4
