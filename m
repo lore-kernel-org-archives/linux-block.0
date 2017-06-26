@@ -1,74 +1,260 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org
-Subject: [PATCH v2 12/51] md: raid10: avoid to access bvec table directly
-Date: Mon, 26 Jun 2017 20:09:55 +0800
-Message-Id: <20170626121034.3051-13-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+8132ee8c7e24eb087ca3+5055+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Thomas Gleixner <tglx@linutronix.de>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] blk-mq: create hctx for each present CPU
+Date: Mon, 26 Jun 2017 12:20:57 +0200
+Message-Id: <20170626102058.10200-3-hch@lst.de>
+In-Reply-To: <20170626102058.10200-1-hch@lst.de>
+References: <20170626102058.10200-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Inside sync_request_write(), .bi_vcnt is written after this bio
-is reseted, this way won't work any more after multipage bvec
-is enabled.
+Currently we only create hctx for online CPUs, which can lead to a lot
+of churn due to frequent soft offline / online operations.  Instead
+allocate one for each present CPU to avoid this and dramatically simplify
+the code.
 
-So reset_bvec_table() is introduced for re-add these pages into
-bio, then .bi_vcnt needn't to be touched any more.
-
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/raid10.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ block/blk-mq.c             | 120 +++++----------------------------------------
+ block/blk-mq.h             |   5 --
+ include/linux/cpuhotplug.h |   1 -
+ 3 files changed, 11 insertions(+), 115 deletions(-)
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 5026e7ad51d3..2fca1fe67092 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -1995,6 +1995,24 @@ static void end_sync_write(struct bio *bio)
- 	end_sync_request(r10_bio);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bb66c96850b1..dd390e27824d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -37,9 +37,6 @@
+ #include "blk-wbt.h"
+ #include "blk-mq-sched.h"
+ 
+-static DEFINE_MUTEX(all_q_mutex);
+-static LIST_HEAD(all_q_list);
+-
+ static void blk_mq_poll_stats_start(struct request_queue *q);
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+ static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
+@@ -1975,8 +1972,8 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
+ 		INIT_LIST_HEAD(&__ctx->rq_list);
+ 		__ctx->queue = q;
+ 
+-		/* If the cpu isn't online, the cpu is mapped to first hctx */
+-		if (!cpu_online(i))
++		/* If the cpu isn't present, the cpu is mapped to first hctx */
++		if (!cpu_present(i))
+ 			continue;
+ 
+ 		hctx = blk_mq_map_queue(q, i);
+@@ -2019,8 +2016,7 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+ 	}
  }
  
-+/* called after bio_reset() */
-+static void reset_bvec_table(struct bio *bio, struct resync_pages *rp, int size)
-+{
-+	/* initialize bvec table again */
-+	rp->idx = 0;
-+	do {
-+		struct page *page = resync_fetch_page(rp, rp->idx++);
-+		int len = min_t(int, size, PAGE_SIZE);
-+
-+		/*
-+		 * won't fail because the vec table is big
-+		 * enough to hold all these pages
-+		 */
-+		bio_add_page(bio, page, len, 0);
-+		size -= len;
-+	} while (rp->idx < RESYNC_PAGES && size > 0);
-+}
-+
- /*
-  * Note: sync and recover and handled very differently for raid10
-  * This code is for resync.
-@@ -2087,8 +2105,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 		rp = get_resync_pages(tbio);
- 		bio_reset(tbio);
+-static void blk_mq_map_swqueue(struct request_queue *q,
+-			       const struct cpumask *online_mask)
++static void blk_mq_map_swqueue(struct request_queue *q)
+ {
+ 	unsigned int i, hctx_idx;
+ 	struct blk_mq_hw_ctx *hctx;
+@@ -2038,13 +2034,11 @@ static void blk_mq_map_swqueue(struct request_queue *q,
+ 	}
  
--		tbio->bi_vcnt = vcnt;
--		tbio->bi_iter.bi_size = fbio->bi_iter.bi_size;
-+		reset_bvec_table(tbio, rp, fbio->bi_iter.bi_size);
-+
- 		rp->raid_bio = r10_bio;
- 		tbio->bi_private = rp;
- 		tbio->bi_iter.bi_sector = r10_bio->devs[i].addr;
+ 	/*
+-	 * Map software to hardware queues
++	 * Map software to hardware queues.
++	 *
++	 * If the cpu isn't present, the cpu is mapped to first hctx.
+ 	 */
+-	for_each_possible_cpu(i) {
+-		/* If the cpu isn't online, the cpu is mapped to first hctx */
+-		if (!cpumask_test_cpu(i, online_mask))
+-			continue;
+-
++	for_each_present_cpu(i) {
+ 		hctx_idx = q->mq_map[i];
+ 		/* unmapped hw queue can be remapped after CPU topo changed */
+ 		if (!set->tags[hctx_idx] &&
+@@ -2330,16 +2324,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 		blk_queue_softirq_done(q, set->ops->complete);
+ 
+ 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
+-
+-	get_online_cpus();
+-	mutex_lock(&all_q_mutex);
+-
+-	list_add_tail(&q->all_q_node, &all_q_list);
+ 	blk_mq_add_queue_tag_set(set, q);
+-	blk_mq_map_swqueue(q, cpu_online_mask);
+-
+-	mutex_unlock(&all_q_mutex);
+-	put_online_cpus();
++	blk_mq_map_swqueue(q);
+ 
+ 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
+ 		int ret;
+@@ -2365,18 +2351,12 @@ void blk_mq_free_queue(struct request_queue *q)
+ {
+ 	struct blk_mq_tag_set	*set = q->tag_set;
+ 
+-	mutex_lock(&all_q_mutex);
+-	list_del_init(&q->all_q_node);
+-	mutex_unlock(&all_q_mutex);
+-
+ 	blk_mq_del_queue_tag_set(q);
+-
+ 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
+ }
+ 
+ /* Basically redo blk_mq_init_queue with queue frozen */
+-static void blk_mq_queue_reinit(struct request_queue *q,
+-				const struct cpumask *online_mask)
++static void blk_mq_queue_reinit(struct request_queue *q)
+ {
+ 	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
+ 
+@@ -2389,76 +2369,12 @@ static void blk_mq_queue_reinit(struct request_queue *q,
+ 	 * involves free and re-allocate memory, worthy doing?)
+ 	 */
+ 
+-	blk_mq_map_swqueue(q, online_mask);
++	blk_mq_map_swqueue(q);
+ 
+ 	blk_mq_sysfs_register(q);
+ 	blk_mq_debugfs_register_hctxs(q);
+ }
+ 
+-/*
+- * New online cpumask which is going to be set in this hotplug event.
+- * Declare this cpumasks as global as cpu-hotplug operation is invoked
+- * one-by-one and dynamically allocating this could result in a failure.
+- */
+-static struct cpumask cpuhp_online_new;
+-
+-static void blk_mq_queue_reinit_work(void)
+-{
+-	struct request_queue *q;
+-
+-	mutex_lock(&all_q_mutex);
+-	/*
+-	 * We need to freeze and reinit all existing queues.  Freezing
+-	 * involves synchronous wait for an RCU grace period and doing it
+-	 * one by one may take a long time.  Start freezing all queues in
+-	 * one swoop and then wait for the completions so that freezing can
+-	 * take place in parallel.
+-	 */
+-	list_for_each_entry(q, &all_q_list, all_q_node)
+-		blk_freeze_queue_start(q);
+-	list_for_each_entry(q, &all_q_list, all_q_node)
+-		blk_mq_freeze_queue_wait(q);
+-
+-	list_for_each_entry(q, &all_q_list, all_q_node)
+-		blk_mq_queue_reinit(q, &cpuhp_online_new);
+-
+-	list_for_each_entry(q, &all_q_list, all_q_node)
+-		blk_mq_unfreeze_queue(q);
+-
+-	mutex_unlock(&all_q_mutex);
+-}
+-
+-static int blk_mq_queue_reinit_dead(unsigned int cpu)
+-{
+-	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
+-	blk_mq_queue_reinit_work();
+-	return 0;
+-}
+-
+-/*
+- * Before hotadded cpu starts handling requests, new mappings must be
+- * established.  Otherwise, these requests in hw queue might never be
+- * dispatched.
+- *
+- * For example, there is a single hw queue (hctx) and two CPU queues (ctx0
+- * for CPU0, and ctx1 for CPU1).
+- *
+- * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
+- * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
+- *
+- * And then while running hw queue, blk_mq_flush_busy_ctxs() finds bit0 is set
+- * in pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
+- * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list is
+- * ignored.
+- */
+-static int blk_mq_queue_reinit_prepare(unsigned int cpu)
+-{
+-	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
+-	cpumask_set_cpu(cpu, &cpuhp_online_new);
+-	blk_mq_queue_reinit_work();
+-	return 0;
+-}
+-
+ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ {
+ 	int i;
+@@ -2669,7 +2585,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	blk_mq_update_queue_map(set);
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_realloc_hw_ctxs(set, q);
+-		blk_mq_queue_reinit(q, cpu_online_mask);
++		blk_mq_queue_reinit(q);
+ 	}
+ 
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+@@ -2885,24 +2801,10 @@ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_poll);
+ 
+-void blk_mq_disable_hotplug(void)
+-{
+-	mutex_lock(&all_q_mutex);
+-}
+-
+-void blk_mq_enable_hotplug(void)
+-{
+-	mutex_unlock(&all_q_mutex);
+-}
+-
+ static int __init blk_mq_init(void)
+ {
+ 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
+ 				blk_mq_hctx_notify_dead);
+-
+-	cpuhp_setup_state_nocalls(CPUHP_BLK_MQ_PREPARE, "block/mq:prepare",
+-				  blk_mq_queue_reinit_prepare,
+-				  blk_mq_queue_reinit_dead);
+ 	return 0;
+ }
+ subsys_initcall(blk_mq_init);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index cc67b48e3551..558df56544d2 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -56,11 +56,6 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 				bool at_head);
+ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 				struct list_head *list);
+-/*
+- * CPU hotplug helpers
+- */
+-void blk_mq_enable_hotplug(void);
+-void blk_mq_disable_hotplug(void);
+ 
+ /*
+  * CPU -> queue mappings
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index c15f22c54535..7f815d915977 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -58,7 +58,6 @@ enum cpuhp_state {
+ 	CPUHP_XEN_EVTCHN_PREPARE,
+ 	CPUHP_ARM_SHMOBILE_SCU_PREPARE,
+ 	CPUHP_SH_SH3X_PREPARE,
+-	CPUHP_BLK_MQ_PREPARE,
+ 	CPUHP_NET_FLOW_PREPARE,
+ 	CPUHP_TOPOLOGY_PREPARE,
+ 	CPUHP_NET_IUCV_PREPARE,
 -- 
-2.9.4
+2.11.0
