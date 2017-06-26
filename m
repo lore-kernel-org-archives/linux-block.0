@@ -1,39 +1,44 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 49/51] fs/direct-io: convert to bio_for_each_segment_all_sp()
-Date: Mon, 26 Jun 2017 20:10:32 +0800
-Message-Id: <20170626121034.3051-50-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org,
+	hch@lst.de,
+	martin.petersen@oracle.com,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 7/9] xfs: add support for passing in write hints for buffered writes
+Date: Mon, 26 Jun 2017 09:37:58 -0600
+Message-Id: <1498491480-16306-8-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
+References: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/direct-io.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ fs/xfs/xfs_aops.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index c87077d1dc33..a139b3bbad8e 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -489,7 +489,9 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
- 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
- 		bio_check_pages_dirty(bio);	/* transfers ownership */
- 	} else {
--		bio_for_each_segment_all(bvec, bio, i) {
-+		struct bvec_iter_all bia;
-+
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 			struct page *page = bvec->bv_page;
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 76b6f988e2fa..ceb124bd8f80 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -506,6 +506,7 @@ xfs_submit_ioend(
+ 		return status;
+ 	}
  
- 			if (dio->op == REQ_OP_READ && !PageCompound(page) &&
++	ioend->io_bio->bi_opf |= inode_hint_to_opf(ioend->io_inode);
+ 	submit_bio(ioend->io_bio);
+ 	return 0;
+ }
+@@ -565,6 +566,7 @@ xfs_chain_bio(
+ 	bio_chain(ioend->io_bio, new);
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+ 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
++	ioend->io_bio->bi_opf |= inode_hint_to_opf(ioend->io_inode);
+ 	submit_bio(ioend->io_bio);
+ 	ioend->io_bio = new;
+ }
 -- 
-2.9.4
+2.7.4
