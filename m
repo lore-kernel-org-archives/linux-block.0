@@ -1,127 +1,61 @@
-Return-Path: <jlayton@redhat.com>
-From: Jeff Layton <jlayton@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v7 05/22] jbd2: don't clear and reset errors after waiting on writeback
-Date: Fri, 16 Jun 2017 15:34:10 -0400
-Message-Id: <20170616193427.13955-6-jlayton@redhat.com>
-In-Reply-To: <20170616193427.13955-1-jlayton@redhat.com>
-References: <20170616193427.13955-1-jlayton@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:35635 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751397AbdFZJ6M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:12 -0400
+Received: by mail-wm0-f54.google.com with SMTP id w126so2843317wme.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:11 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 01/20] lightnvm: re-convert ppa format on I/O failure
+Date: Mon, 26 Jun 2017 11:57:10 +0200
+Message-Id: <1498471049-25505-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Resetting this flag is almost certainly racy, and will be problematic
-with some coming changes.
+In case of a failure when submitting a request, convert the ppa_list
+addresses to the target format so that it can interpret ppas for
+recovery
 
-Make filemap_fdatawait_keep_errors return int, but not clear the flag(s).
-Have jbd2 call it instead of filemap_fdatawait and don't attempt to
-re-set the error flag if it fails.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- fs/jbd2/commit.c   | 15 +++------------
- include/linux/fs.h |  2 +-
- mm/filemap.c       | 16 ++++++++++++++--
- 3 files changed, 18 insertions(+), 15 deletions(-)
+ drivers/lightnvm/core.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/fs/jbd2/commit.c b/fs/jbd2/commit.c
-index b6b194ec1b4f..502110540598 100644
---- a/fs/jbd2/commit.c
-+++ b/fs/jbd2/commit.c
-@@ -263,18 +263,9 @@ static int journal_finish_inode_data_buffers(journal_t *journal,
- 			continue;
- 		jinode->i_flags |= JI_COMMIT_RUNNING;
- 		spin_unlock(&journal->j_list_lock);
--		err = filemap_fdatawait(jinode->i_vfs_inode->i_mapping);
--		if (err) {
--			/*
--			 * Because AS_EIO is cleared by
--			 * filemap_fdatawait_range(), set it again so
--			 * that user process can get -EIO from fsync().
--			 */
--			mapping_set_error(jinode->i_vfs_inode->i_mapping, -EIO);
--
--			if (!ret)
--				ret = err;
--		}
-+		err = filemap_fdatawait_keep_errors(jinode->i_vfs_inode->i_mapping);
-+		if (!ret)
-+			ret = err;
- 		spin_lock(&journal->j_list_lock);
- 		jinode->i_flags &= ~JI_COMMIT_RUNNING;
- 		smp_mb();
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 1a135274b4f8..1b1233a1db1e 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2509,7 +2509,7 @@ extern int write_inode_now(struct inode *, int);
- extern int filemap_fdatawrite(struct address_space *);
- extern int filemap_flush(struct address_space *);
- extern int filemap_fdatawait(struct address_space *);
--extern void filemap_fdatawait_keep_errors(struct address_space *);
-+extern int filemap_fdatawait_keep_errors(struct address_space *);
- extern int filemap_fdatawait_range(struct address_space *, loff_t lstart,
- 				   loff_t lend);
- extern int filemap_write_and_wait(struct address_space *mapping);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index b9e870600572..37f286df7c95 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -311,6 +311,16 @@ int filemap_check_errors(struct address_space *mapping)
- }
- EXPORT_SYMBOL(filemap_check_errors);
- 
-+static int filemap_check_and_keep_errors(struct address_space *mapping)
-+{
-+	/* Check for outstanding write errors */
-+	if (test_bit(AS_EIO, &mapping->flags))
-+		return -EIO;
-+	if (test_bit(AS_ENOSPC, &mapping->flags))
-+		return -ENOSPC;
-+	return 0;
-+}
-+
- /**
-  * __filemap_fdatawrite_range - start writeback on mapping dirty pages in range
-  * @mapping:	address space structure to write
-@@ -455,15 +465,17 @@ EXPORT_SYMBOL(filemap_fdatawait_range);
-  * call sites are system-wide / filesystem-wide data flushers: e.g. sync(2),
-  * fsfreeze(8)
-  */
--void filemap_fdatawait_keep_errors(struct address_space *mapping)
-+int filemap_fdatawait_keep_errors(struct address_space *mapping)
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 440deb54031a..9ff348f69370 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -641,6 +641,7 @@ EXPORT_SYMBOL(nvm_max_phys_sects);
+ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
  {
- 	loff_t i_size = i_size_read(mapping->host);
+ 	struct nvm_dev *dev = tgt_dev->parent;
++	int ret;
  
- 	if (i_size == 0)
--		return;
-+		return 0;
+ 	if (!dev->ops->submit_io)
+ 		return -ENODEV;
+@@ -648,7 +649,12 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ 	nvm_rq_tgt_to_dev(tgt_dev, rqd);
  
- 	__filemap_fdatawait_range(mapping, 0, i_size - 1);
-+	return filemap_check_and_keep_errors(mapping);
+ 	rqd->dev = tgt_dev;
+-	return dev->ops->submit_io(dev, rqd);
++
++	/* In case of error, fail with right address format */
++	ret = dev->ops->submit_io(dev, rqd);
++	if (ret)
++		nvm_rq_dev_to_tgt(tgt_dev, rqd);
++	return ret;
  }
-+EXPORT_SYMBOL(filemap_fdatawait_keep_errors);
+ EXPORT_SYMBOL(nvm_submit_io);
  
- /**
-  * filemap_fdatawait - wait for all under-writeback pages to complete
 -- 
-2.13.0
+2.7.4
