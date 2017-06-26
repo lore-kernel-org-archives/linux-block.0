@@ -1,144 +1,305 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 2/5] mmc: block: Refactor mmc_blk_part_switch()
-Date: Thu, 15 Jun 2017 14:12:56 +0200
-Message-Id: <20170615121259.8281-3-linus.walleij@linaro.org>
-In-Reply-To: <20170615121259.8281-1-linus.walleij@linaro.org>
-References: <20170615121259.8281-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:35678 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751615AbdFZJ6R (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Jun 2017 05:58:17 -0400
+Received: by mail-wm0-f54.google.com with SMTP id w126so2845099wme.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jun 2017 02:58:17 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 07/20] lightnvm: pblk: rename read request pool
+Date: Mon, 26 Jun 2017 11:57:16 +0200
+Message-Id: <1498471049-25505-8-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Instead of passing a struct mmc_blk_data * to mmc_blk_part_switch()
-let's pass the actual partition type we want to switch to. This
-is necessary in order not to have a block device with a backing
-mmc_blk_data and request queue and all for every hardware partition,
-such as RPMB.
+Read requests allocate some extra memory to store its per I/O context.
+Instead of requiring yet another memory pool for other type of requests,
+generalize this context allocation (and change naming accordingly).
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/mmc/core/block.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 12 ++++++------
+ drivers/lightnvm/pblk-init.c     | 24 ++++++++++++------------
+ drivers/lightnvm/pblk-read.c     | 17 +++++++++--------
+ drivers/lightnvm/pblk-recovery.c |  8 ++++----
+ drivers/lightnvm/pblk.h          | 12 ++++++------
+ 5 files changed, 37 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index d1b824e65590..94b97f97be1a 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -127,7 +127,7 @@ module_param(perdev_minors, int, 0444);
- MODULE_PARM_DESC(perdev_minors, "Minors numbers to allocate per device");
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index a1125547e638..6fa51eb9d681 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -62,7 +62,7 @@ static void pblk_end_io_erase(struct nvm_rq *rqd)
+ 	struct pblk *pblk = rqd->private;
  
- static inline int mmc_blk_part_switch(struct mmc_card *card,
--				      struct mmc_blk_data *md);
-+				      unsigned int part_type);
- 
- static struct mmc_blk_data *mmc_blk_get(struct gendisk *disk)
- {
-@@ -490,7 +490,7 @@ static int __mmc_blk_ioctl_cmd(struct mmc_card *card, struct mmc_blk_data *md,
- 
- 	mrq.cmd = &cmd;
- 
--	err = mmc_blk_part_switch(card, md);
-+	err = mmc_blk_part_switch(card, md->part_type);
- 	if (err)
- 		return err;
- 
-@@ -767,29 +767,29 @@ static int mmc_blk_part_switch_post(struct mmc_card *card,
+ 	__pblk_end_io_erase(pblk, rqd);
+-	mempool_free(rqd, pblk->r_rq_pool);
++	mempool_free(rqd, pblk->g_rq_pool);
  }
  
- static inline int mmc_blk_part_switch(struct mmc_card *card,
--				      struct mmc_blk_data *md)
-+				      unsigned int part_type)
- {
- 	int ret = 0;
- 	struct mmc_blk_data *main_md = dev_get_drvdata(&card->dev);
- 
--	if (main_md->part_curr == md->part_type)
-+	if (main_md->part_curr == part_type)
- 		return 0;
- 
- 	if (mmc_card_mmc(card)) {
- 		u8 part_config = card->ext_csd.part_config;
- 
--		ret = mmc_blk_part_switch_pre(card, md->part_type);
-+		ret = mmc_blk_part_switch_pre(card, part_type);
- 		if (ret)
- 			return ret;
- 
- 		part_config &= ~EXT_CSD_PART_CONFIG_ACC_MASK;
--		part_config |= md->part_type;
-+		part_config |= part_type;
- 
- 		ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL,
- 				 EXT_CSD_PART_CONFIG, part_config,
- 				 card->ext_csd.part_time);
- 		if (ret) {
--			mmc_blk_part_switch_post(card, md->part_type);
-+			mmc_blk_part_switch_post(card, part_type);
- 			return ret;
- 		}
- 
-@@ -798,7 +798,7 @@ static inline int mmc_blk_part_switch(struct mmc_card *card,
- 		ret = mmc_blk_part_switch_post(card, main_md->part_curr);
+ static void __pblk_map_invalidate(struct pblk *pblk, struct pblk_line *line,
+@@ -171,8 +171,8 @@ struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int rw)
+ 		pool = pblk->w_rq_pool;
+ 		rq_size = pblk_w_rq_size;
+ 	} else {
+-		pool = pblk->r_rq_pool;
+-		rq_size = pblk_r_rq_size;
++		pool = pblk->g_rq_pool;
++		rq_size = pblk_g_rq_size;
  	}
  
--	main_md->part_curr = md->part_type;
-+	main_md->part_curr = part_type;
- 	return ret;
+ 	rqd = mempool_alloc(pool, GFP_KERNEL);
+@@ -188,7 +188,7 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int rw)
+ 	if (rw == WRITE)
+ 		pool = pblk->w_rq_pool;
+ 	else
+-		pool = pblk->r_rq_pool;
++		pool = pblk->g_rq_pool;
+ 
+ 	mempool_free(rqd, pool);
  }
+@@ -1343,8 +1343,8 @@ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
+ 	struct nvm_rq *rqd;
+ 	int err;
  
-@@ -1141,7 +1141,7 @@ static int mmc_blk_reset(struct mmc_blk_data *md, struct mmc_host *host,
- 		int part_err;
+-	rqd = mempool_alloc(pblk->r_rq_pool, GFP_KERNEL);
+-	memset(rqd, 0, pblk_r_rq_size);
++	rqd = mempool_alloc(pblk->g_rq_pool, GFP_KERNEL);
++	memset(rqd, 0, pblk_g_rq_size);
  
- 		main_md->part_curr = main_md->part_type;
--		part_err = mmc_blk_part_switch(host->card, md);
-+		part_err = mmc_blk_part_switch(host->card, md->part_type);
- 		if (part_err) {
- 			/*
- 			 * We have failed to get back into the correct
-@@ -1180,6 +1180,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 	struct mmc_queue_req *mq_rq;
- 	struct mmc_card *card = mq->card;
- 	struct mmc_blk_data *md = mq->blkdata;
-+	struct mmc_blk_data *main_md = dev_get_drvdata(&card->dev);
- 	struct mmc_blk_ioc_data **idata;
- 	u8 **ext_csd;
- 	u32 status;
-@@ -1198,7 +1199,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 	pblk_setup_e_rq(pblk, rqd, ppa);
+ 
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 5ea610957fb3..51dd42c7e852 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -20,7 +20,7 @@
+ 
+ #include "pblk.h"
+ 
+-static struct kmem_cache *pblk_blk_ws_cache, *pblk_rec_cache, *pblk_r_rq_cache,
++static struct kmem_cache *pblk_blk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
+ 					*pblk_w_rq_cache, *pblk_line_meta_cache;
+ static DECLARE_RWSEM(pblk_lock);
+ 
+@@ -199,9 +199,9 @@ static int pblk_init_global_caches(struct pblk *pblk)
+ 		return -ENOMEM;
+ 	}
+ 
+-	pblk_r_rq_cache = kmem_cache_create("pblk_r_rq", pblk_r_rq_size,
++	pblk_g_rq_cache = kmem_cache_create("pblk_g_rq", pblk_g_rq_size,
+ 				0, 0, NULL);
+-	if (!pblk_r_rq_cache) {
++	if (!pblk_g_rq_cache) {
+ 		kmem_cache_destroy(pblk_blk_ws_cache);
+ 		kmem_cache_destroy(pblk_rec_cache);
+ 		up_write(&pblk_lock);
+@@ -213,7 +213,7 @@ static int pblk_init_global_caches(struct pblk *pblk)
+ 	if (!pblk_w_rq_cache) {
+ 		kmem_cache_destroy(pblk_blk_ws_cache);
+ 		kmem_cache_destroy(pblk_rec_cache);
+-		kmem_cache_destroy(pblk_r_rq_cache);
++		kmem_cache_destroy(pblk_g_rq_cache);
+ 		up_write(&pblk_lock);
+ 		return -ENOMEM;
+ 	}
+@@ -225,7 +225,7 @@ static int pblk_init_global_caches(struct pblk *pblk)
+ 	if (!pblk_line_meta_cache) {
+ 		kmem_cache_destroy(pblk_blk_ws_cache);
+ 		kmem_cache_destroy(pblk_rec_cache);
+-		kmem_cache_destroy(pblk_r_rq_cache);
++		kmem_cache_destroy(pblk_g_rq_cache);
+ 		kmem_cache_destroy(pblk_w_rq_cache);
+ 		up_write(&pblk_lock);
+ 		return -ENOMEM;
+@@ -278,13 +278,13 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->rec_pool)
+ 		goto free_blk_ws_pool;
+ 
+-	pblk->r_rq_pool = mempool_create_slab_pool(64, pblk_r_rq_cache);
+-	if (!pblk->r_rq_pool)
++	pblk->g_rq_pool = mempool_create_slab_pool(64, pblk_g_rq_cache);
++	if (!pblk->g_rq_pool)
+ 		goto free_rec_pool;
+ 
+ 	pblk->w_rq_pool = mempool_create_slab_pool(64, pblk_w_rq_cache);
+ 	if (!pblk->w_rq_pool)
+-		goto free_r_rq_pool;
++		goto free_g_rq_pool;
+ 
+ 	pblk->line_meta_pool =
+ 			mempool_create_slab_pool(16, pblk_line_meta_cache);
+@@ -311,8 +311,8 @@ static int pblk_core_init(struct pblk *pblk)
+ 	mempool_destroy(pblk->line_meta_pool);
+ free_w_rq_pool:
+ 	mempool_destroy(pblk->w_rq_pool);
+-free_r_rq_pool:
+-	mempool_destroy(pblk->r_rq_pool);
++free_g_rq_pool:
++	mempool_destroy(pblk->g_rq_pool);
+ free_rec_pool:
+ 	mempool_destroy(pblk->rec_pool);
+ free_blk_ws_pool:
+@@ -330,13 +330,13 @@ static void pblk_core_free(struct pblk *pblk)
+ 	mempool_destroy(pblk->page_pool);
+ 	mempool_destroy(pblk->line_ws_pool);
+ 	mempool_destroy(pblk->rec_pool);
+-	mempool_destroy(pblk->r_rq_pool);
++	mempool_destroy(pblk->g_rq_pool);
+ 	mempool_destroy(pblk->w_rq_pool);
+ 	mempool_destroy(pblk->line_meta_pool);
+ 
+ 	kmem_cache_destroy(pblk_blk_ws_cache);
+ 	kmem_cache_destroy(pblk_rec_cache);
+-	kmem_cache_destroy(pblk_r_rq_cache);
++	kmem_cache_destroy(pblk_g_rq_cache);
+ 	kmem_cache_destroy(pblk_w_rq_cache);
+ 	kmem_cache_destroy(pblk_line_meta_cache);
+ }
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 91307297e444..cea958e96fc3 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -110,7 +110,7 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ {
+ 	struct pblk *pblk = rqd->private;
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct pblk_r_ctx *r_ctx = nvm_rq_to_pdu(rqd);
++	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+ 	struct bio *bio = rqd->bio;
+ 
+ 	if (rqd->error)
+@@ -124,13 +124,14 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 		nvm_dev_dma_free(dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
+ 
+ 	bio_put(bio);
+-	if (r_ctx->orig_bio) {
++	if (r_ctx->private) {
++		struct bio *orig_bio = r_ctx->private;
++
+ #ifdef CONFIG_NVM_DEBUG
+-		WARN_ONCE(r_ctx->orig_bio->bi_status,
+-						"pblk: corrupted read bio\n");
++		WARN_ONCE(orig_bio->bi_status, "pblk: corrupted read bio\n");
+ #endif
+-		bio_endio(r_ctx->orig_bio);
+-		bio_put(r_ctx->orig_bio);
++		bio_endio(orig_bio);
++		bio_put(orig_bio);
+ 	}
+ 
+ #ifdef CONFIG_NVM_DEBUG
+@@ -345,7 +346,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	/* All sectors are to be read from the device */
+ 	if (bitmap_empty(&read_bitmap, rqd->nr_ppas)) {
+ 		struct bio *int_bio = NULL;
+-		struct pblk_r_ctx *r_ctx = nvm_rq_to_pdu(rqd);
++		struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+ 
+ 		/* Clone read bio to deal with read errors internally */
+ 		int_bio = bio_clone_bioset(bio, GFP_KERNEL, fs_bio_set);
+@@ -355,7 +356,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
  		}
- 		/* Always switch back to main area after RPMB access */
- 		if (md->area_type & MMC_BLK_DATA_AREA_RPMB)
--			mmc_blk_part_switch(card, dev_get_drvdata(&card->dev));
-+			mmc_blk_part_switch(card, main_md->part_type);
- 		break;
- 	case MMC_DRV_OP_BOOT_WP:
- 		ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_BOOT_WP,
-@@ -1906,7 +1907,7 @@ void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
- 		/* claim host only for the first request */
- 		mmc_get_card(card);
  
--	ret = mmc_blk_part_switch(card, md);
-+	ret = mmc_blk_part_switch(card, md->part_type);
- 	if (ret) {
- 		if (req) {
- 			blk_end_request_all(req, -EIO);
-@@ -2436,7 +2437,7 @@ static void mmc_blk_remove(struct mmc_card *card)
- 	mmc_blk_remove_parts(card, md);
- 	pm_runtime_get_sync(&card->dev);
- 	mmc_claim_host(card->host);
--	mmc_blk_part_switch(card, md);
-+	mmc_blk_part_switch(card, md->part_type);
- 	mmc_release_host(card->host);
- 	if (card->type != MMC_TYPE_SD_COMBO)
- 		pm_runtime_disable(&card->dev);
+ 		rqd->bio = int_bio;
+-		r_ctx->orig_bio = bio;
++		r_ctx->private = bio;
+ 
+ 		ret = pblk_submit_read_io(pblk, rqd);
+ 		if (ret) {
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 82787006b865..84671b44bddb 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -240,7 +240,7 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	r_ptr_int = r_ptr;
+ 
+ next_read_rq:
+-	memset(rqd, 0, pblk_r_rq_size);
++	memset(rqd, 0, pblk_g_rq_size);
+ 
+ 	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0);
+ 	if (!rq_ppas)
+@@ -361,7 +361,7 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+ 
+-	memset(rqd, 0, pblk_r_rq_size);
++	memset(rqd, 0, pblk_g_rq_size);
+ 
+ 	rqd->bio = bio;
+ 	rqd->opcode = NVM_OP_PWRITE;
+@@ -456,7 +456,7 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rec_round = 0;
+ 
+ next_rq:
+-	memset(rqd, 0, pblk_r_rq_size);
++	memset(rqd, 0, pblk_g_rq_size);
+ 
+ 	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0);
+ 	if (!rq_ppas)
+@@ -591,7 +591,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 	*done = 1;
+ 
+ next_rq:
+-	memset(rqd, 0, pblk_r_rq_size);
++	memset(rqd, 0, pblk_g_rq_size);
+ 
+ 	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0);
+ 	if (!rq_ppas)
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index de0361988bfb..136cc2ed5b2f 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -91,7 +91,7 @@ struct pblk_sec_meta {
+ 
+ #define pblk_dma_meta_size (sizeof(struct pblk_sec_meta) * PBLK_MAX_REQ_ADDRS)
+ 
+-/* write completion context */
++/* write buffer completion context */
+ struct pblk_c_ctx {
+ 	struct list_head list;		/* Head for out-of-order completion */
+ 
+@@ -101,9 +101,9 @@ struct pblk_c_ctx {
+ 	unsigned int nr_padded;
+ };
+ 
+-/* Read context */
+-struct pblk_r_ctx {
+-	struct bio *orig_bio;
++/* generic context */
++struct pblk_g_ctx {
++	void *private;
+ };
+ 
+ /* Recovery context */
+@@ -543,7 +543,7 @@ struct pblk {
+ 	mempool_t *page_pool;
+ 	mempool_t *line_ws_pool;
+ 	mempool_t *rec_pool;
+-	mempool_t *r_rq_pool;
++	mempool_t *g_rq_pool;
+ 	mempool_t *w_rq_pool;
+ 	mempool_t *line_meta_pool;
+ 
+@@ -560,7 +560,7 @@ struct pblk_line_ws {
+ 	struct work_struct ws;
+ };
+ 
+-#define pblk_r_rq_size (sizeof(struct nvm_rq) + sizeof(struct pblk_r_ctx))
++#define pblk_g_rq_size (sizeof(struct nvm_rq) + sizeof(struct pblk_g_ctx))
+ #define pblk_w_rq_size (sizeof(struct nvm_rq) + sizeof(struct pblk_c_ctx))
+ 
+ /*
 -- 
-2.9.4
+2.7.4
