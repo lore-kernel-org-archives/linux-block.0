@@ -1,41 +1,32 @@
-Return-Path: <keescook@google.com>
-MIME-Version: 1.0
-Sender: keescook@google.com
-In-Reply-To: <cbbb6a1f-3203-9523-f47b-227fd646fd29@kernel.dk>
-References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com> <cbbb6a1f-3203-9523-f47b-227fd646fd29@kernel.dk>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 27 Jun 2017 15:13:31 -0700
-Message-ID: <CAGXu5jJeTAoy1mh1qy0reP_H=u8D86AN=Aj7G6k2cafz76+8NA@mail.gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 0/5] v3 block subsystem refcounter conversions
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Elena Reshetova <elena.reshetova@intel.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>, LKML <linux-kernel@vger.kernel.org>,
-	linux-block@vger.kernel.org,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, Linux Btrfs <linux-btrfs@vger.kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>, Greg KH <gregkh@linuxfoundation.org>,
-	fujita.tomonori@lab.ntt.co.jp, Ingo Molnar <mingo@redhat.com>, Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Elena Reshetova <elena.reshetova@intel.com>
+Cc: james.bottomley@hansenpartnership.com, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, peterz@infradead.org,
+ gregkh@linuxfoundation.org, keescook@chromium.org,
+ fujita.tomonori@lab.ntt.co.jp, mingo@redhat.com, clm@fb.com, jbacik@fb.com,
+ dsterba@suse.com
+References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <cbbb6a1f-3203-9523-f47b-227fd646fd29@kernel.dk>
+Date: Tue, 27 Jun 2017 07:26:55 -0600
+MIME-Version: 1.0
+In-Reply-To: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jun 27, 2017 at 6:26 AM, Jens Axboe <axboe@kernel.dk> wrote:
-> On 06/27/2017 05:39 AM, Elena Reshetova wrote:
->> Changes in v3:
->> No changes in patches apart from trivial rebases, but now by
->> default refcount_t = atomic_t and uses all atomic standard operations
->> unless CONFIG_REFCOUNT_FULL is enabled. This is a compromize for the
->> systems that are critical on performance and cannot accept even
->> slight delay on the refcounter operations.
->
-> Is that true in 4.12-rc, or is that true in a later release once
-> Linus has pulled those changes in? If the latter, please resend
-> this when those changes are in, thanks.
+On 06/27/2017 05:39 AM, Elena Reshetova wrote:
+> Changes in v3:
+> No changes in patches apart from trivial rebases, but now by
+> default refcount_t = atomic_t and uses all atomic standard operations
+> unless CONFIG_REFCOUNT_FULL is enabled. This is a compromize for the
+> systems that are critical on performance and cannot accept even
+> slight delay on the refcounter operations.
 
-It's in -next currently ("locking/refcount: Create unchecked atomic_t
-implementation")
-
--Kees
+Is that true in 4.12-rc, or is that true in a later release once
+Linus has pulled those changes in? If the latter, please resend
+this when those changes are in, thanks.
 
 -- 
-Kees Cook
-Pixel Security
+Jens Axboe
