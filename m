@@ -1,112 +1,109 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v8 12/18] Documentation: flesh out the section in vfs.txt on storing and reporting writeback errors
-Date: Thu, 29 Jun 2017 09:19:48 -0400
-Message-Id: <20170629131954.28733-13-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtp.nue.novell.com ([195.135.221.5]:60907 "EHLO
+        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750742AbdF0EC1 (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Tue, 27 Jun 2017 00:02:27 -0400
+From: James Wang <jnwang@suse.com>
+To: osandov@fb.com
+Cc: osandov@osandov.com, hch@infradead.org, axboe@fb.com,
+        hare@suse.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mgorman@suse.com,
+        James Wang <jnwang@suse.com>
+Subject: [PATCH blktests v2] loop/002: Regression testing for loop device flush
+Date: Tue, 27 Jun 2017 12:01:47 +0800
+Message-Id: <20170627040147.8823-1-jnwang@suse.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jeff Layton <jlayton@redhat.com>
+Add a regression testing for loop device. when an unbound device
+be close that take too long time. kernel will consume serveral orders
+of magnitude more wall time than it does for a mounted device.
 
-Let's try to make this extra clear for fs authors.
-
-Cc: Jan Kara <jack@suse.cz>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: James Wang <jnwang@suse.com>
 ---
- Documentation/filesystems/vfs.txt | 43 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 40 insertions(+), 3 deletions(-)
+ tests/loop/002     | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/loop/002.out |  2 ++
+ 2 files changed, 65 insertions(+)
+ create mode 100755 tests/loop/002
+ create mode 100644 tests/loop/002.out
 
-diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-index f42b90687d40..1366043b3942 100644
---- a/Documentation/filesystems/vfs.txt
-+++ b/Documentation/filesystems/vfs.txt
-@@ -576,7 +576,42 @@ should clear PG_Dirty and set PG_Writeback.  It can be actually
- written at any point after PG_Dirty is clear.  Once it is known to be
- safe, PG_Writeback is cleared.
- 
--Writeback makes use of a writeback_control structure...
-+Writeback makes use of a writeback_control structure to direct the
-+operations.  This gives the the writepage and writepages operations some
-+information about the nature of and reason for the writeback request,
-+and the constraints under which it is being done.  It is also used to
-+return information back to the caller about the result of a writepage or
-+writepages request.
+diff --git a/tests/loop/002 b/tests/loop/002
+new file mode 100755
+index 0000000..ef69729
+--- /dev/null
++++ b/tests/loop/002
+@@ -0,0 +1,63 @@
++#!/bin/bash
++#
++# Test if close()ing a unbound loop device is too slow
++# Copyright (C) 2017 James Wang <jnwang@suse.com>
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +
-+Handling errors during writeback
-+--------------------------------
-+Most applications that utilize the pagecache will periodically call
-+fsync to ensure that data written has made it to the backing store.
-+When there is an error during writeback, they expect that error to be
-+reported when fsync is called.  After an error has been reported on one
-+fsync, subsequent fsync calls on the same file descriptor should return
-+0, unless further writeback errors have occurred since the previous
-+fsync.
++DESCRIPTION="Test if close()ing a unbound loop device is too slow"
 +
-+Ideally, the kernel would report an error only on file descriptions on
-+which writes were done that subsequently failed to be written back.  The
-+generic pagecache infrastructure does not track the file descriptions
-+that have dirtied each individual page however, so determining which
-+file descriptors should get back an error is not possible.
++QUICK=1
 +
-+Instead, the generic writeback error tracking infrastructure in the
-+kernel settles for reporting errors to fsync on all file descriptions
-+that were open at the time that the error occurred.  In a situation with
-+multiple writers, all of them will get back an error on a subsequent fsync,
-+even if all of the writes done through that particular file descriptor
-+succeeded (or even if there were no writes on that file descriptor at all).
++run_test() {
++	TIMEFORMAT='%5R'
++	time {
++		for ((i=0;i<200;i++)); do dd if=/dev/loop0 of=/dev/null  bs=512 count=1 >/dev/null 2>&1; done
++	}
++}
++clean_up() {
++	if lsmod | grep loop >/dev/null 2>&1; then
++		if ! rmmod loop;then
++			return 2;
++		fi
++	fi
++}
 +
-+Filesystems that wish to use this infrastructure should call
-+mapping_set_error to record the error in the address_space when it
-+occurs.  Then, at the end of their fsync operation, they should call
-+file_check_and_advance_wb_err to ensure that the struct file's error
-+cursor has advanced to the correct point in the stream of errors emitted
-+by the backing device(s).
- 
- struct address_space_operations
- -------------------------------
-@@ -804,7 +839,8 @@ struct address_space_operations {
- The File Object
- ===============
- 
--A file object represents a file opened by a process.
-+A file object represents a file opened by a process. This is also known
-+as an "open file description" in POSIX parlance.
- 
- 
- struct file_operations
-@@ -887,7 +923,8 @@ otherwise noted.
- 
-   release: called when the last reference to an open file is closed
- 
--  fsync: called by the fsync(2) system call
-+  fsync: called by the fsync(2) system call. Also see the section above
-+	 entitled "Handling errors during writeback".
- 
-   fasync: called by the fcntl(2) system call when asynchronous
- 	(non-blocking) mode is enabled for a file
++prepare() {
++	modprobe loop max_loop=1
++}
++
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	clean_up
++	prepare
++	SECONDS=0
++	run_test >/dev/null 2>&1
++	DURATION=${SECONDS}
++
++	clean_up
++	if ! clean_up; then
++		echo "Test complete"
++		return 2
++	fi
++	echo "Test complete"
++	if [[ "${DURATION}" -gt 1 ]]; then
++		echo "test took too long ($URATION seconds)"
++		return 1
++	else
++		return 0
++	fi
++}
+diff --git a/tests/loop/002.out b/tests/loop/002.out
+new file mode 100644
+index 0000000..5c34a37
+--- /dev/null
++++ b/tests/loop/002.out
+@@ -0,0 +1,2 @@
++Running loop/002
++Test complete
 -- 
-2.13.0
+2.12.3
