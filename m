@@ -1,54 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35638 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753551AbdFWIPA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Jun 2017 04:15:00 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH blktests] sg/001: don't require scsi_debug
-Date: Fri, 23 Jun 2017 10:14:48 +0200
-Message-Id: <20170623081448.8121-1-jthumshirn@suse.de>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:36503 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752704AbdF0IkQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Jun 2017 04:40:16 -0400
+Received: by mail-wm0-f45.google.com with SMTP id 62so17902626wmw.1
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2017 01:40:15 -0700 (PDT)
+From: "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH] Small patch for 4.13 window
+Date: Tue, 27 Jun 2017 10:39:49 +0200
+Message-Id: <20170627083950.11312-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Don't require scsi_debug but check if TEST_DEV is a SCSI device and use it
-instead.
+Hi Jens,
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- tests/sg/001 | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+Thanks for picking up the pblk changes. I have just a small one that
+wasn't part of the batch. Would you pick this one up as well for the
+4.13 window?
 
-diff --git a/tests/sg/001 b/tests/sg/001
-index a4cfabe25ba0..fc883ebd1c8a 100755
---- a/tests/sg/001
-+++ b/tests/sg/001
-@@ -24,13 +24,13 @@ DESCRIPTION="try triggering a kernel GPF with 0 byte SG reads"
- QUICK=1
- 
- requires() {
--	_have_src_program sg/syzkaller1 && _have_scsi_debug
-+	_have_src_program sg/syzkaller1
- }
- 
--test() {
-+test_device() {
- 	echo "Running ${TEST_NAME}"
- 
--	if ! _get_scsi_debug_dev; then
-+	if ! _test_dev_is_scsi; then
- 		return 1
- 	fi
- 
-@@ -38,7 +38,5 @@ test() {
- 	cd "$TMPDIR" || return 1
- 	timeout -s INT 10s "$SRCDIR/sg/syzkaller1" "$SG_DEV"
- 
--	_put_scsi_debug_dev
--
- 	echo "Test complete"
- }
+-Matias
+
+Rakesh Pandit (1):
+  ligtnvm: if LUNs are already allocated fix return
+
+ drivers/lightnvm/core.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
 -- 
-2.12.3
+2.9.3
