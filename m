@@ -1,91 +1,104 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
 To: axboe@kernel.dk
-Cc: viro@ZenIV.linux.org.uk,
-	hch@lst.de,
-	jack@suse.cz,
-	akpm@linux-foundation.org,
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 05/10] fs: return if direct I/O will trigger writeback
-Date: Tue, 20 Jun 2017 07:05:44 -0500
-Message-Id: <20170620120549.23147-6-rgoldwyn@suse.de>
-In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
-References: <20170620120549.23147-1-rgoldwyn@suse.de>
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	keescook@chromium.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 2/5] block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
+Date: Tue, 27 Jun 2017 14:39:57 +0300
+Message-Id: <1498563601-10949-3-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-Find out if the I/O will trigger a wait due to writeback. If yes,
-return -EAGAIN.
-
-Return -EINVAL for buffered AIO: there are multiple causes of
-delay such as page locks, dirty throttling logic, page loading
-from disk etc. which cannot be taken care of.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- mm/filemap.c | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ block/blk-tag.c        | 8 ++++----
+ include/linux/blkdev.h | 3 ++-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 9b39a2390b9e..742034e56100 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2070,10 +2070,17 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 		loff_t size;
+diff --git a/block/blk-tag.c b/block/blk-tag.c
+index 07cc329..d83555e 100644
+--- a/block/blk-tag.c
++++ b/block/blk-tag.c
+@@ -35,7 +35,7 @@ EXPORT_SYMBOL(blk_queue_find_tag);
+  */
+ void blk_free_tags(struct blk_queue_tag *bqt)
+ {
+-	if (atomic_dec_and_test(&bqt->refcnt)) {
++	if (refcount_dec_and_test(&bqt->refcnt)) {
+ 		BUG_ON(find_first_bit(bqt->tag_map, bqt->max_depth) <
+ 							bqt->max_depth);
  
- 		size = i_size_read(inode);
--		retval = filemap_write_and_wait_range(mapping, iocb->ki_pos,
--					iocb->ki_pos + count - 1);
--		if (retval < 0)
--			goto out;
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (filemap_range_has_page(mapping, iocb->ki_pos,
-+						   iocb->ki_pos + count - 1))
-+				return -EAGAIN;
-+		} else {
-+			retval = filemap_write_and_wait_range(mapping,
-+						iocb->ki_pos,
-+					        iocb->ki_pos + count - 1);
-+			if (retval < 0)
-+				goto out;
-+		}
+@@ -130,7 +130,7 @@ static struct blk_queue_tag *__blk_queue_init_tags(struct request_queue *q,
+ 	if (init_tag_map(q, tags, depth))
+ 		goto fail;
  
- 		file_accessed(file);
- 
-@@ -2674,6 +2681,9 @@ inline ssize_t generic_write_checks(struct kiocb *iocb, struct iov_iter *from)
- 
- 	pos = iocb->ki_pos;
- 
-+	if ((iocb->ki_flags & IOCB_NOWAIT) && !(iocb->ki_flags & IOCB_DIRECT))
-+		return -EINVAL;
-+
- 	if (limit != RLIM_INFINITY) {
- 		if (iocb->ki_pos >= limit) {
- 			send_sig(SIGXFSZ, current, 0);
-@@ -2742,9 +2752,17 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
- 	write_len = iov_iter_count(from);
- 	end = (pos + write_len - 1) >> PAGE_SHIFT;
- 
--	written = filemap_write_and_wait_range(mapping, pos, pos + write_len - 1);
--	if (written)
--		goto out;
-+	if (iocb->ki_flags & IOCB_NOWAIT) {
-+		/* If there are pages to writeback, return */
-+		if (filemap_range_has_page(inode->i_mapping, pos,
-+					   pos + iov_iter_count(from)))
-+			return -EAGAIN;
-+	} else {
-+		written = filemap_write_and_wait_range(mapping, pos,
-+							pos + write_len - 1);
-+		if (written)
-+			goto out;
-+	}
+-	atomic_set(&tags->refcnt, 1);
++	refcount_set(&tags->refcnt, 1);
+ 	tags->alloc_policy = alloc_policy;
+ 	tags->next_tag = 0;
+ 	return tags;
+@@ -180,7 +180,7 @@ int blk_queue_init_tags(struct request_queue *q, int depth,
+ 		queue_flag_set(QUEUE_FLAG_QUEUED, q);
+ 		return 0;
+ 	} else
+-		atomic_inc(&tags->refcnt);
++		refcount_inc(&tags->refcnt);
  
  	/*
- 	 * After a write we want buffered reads to be sure to go to disk to get
+ 	 * assign it, all done
+@@ -225,7 +225,7 @@ int blk_queue_resize_tags(struct request_queue *q, int new_depth)
+ 	 * Currently cannot replace a shared tag map with a new
+ 	 * one, so error out if this is the case
+ 	 */
+-	if (atomic_read(&bqt->refcnt) != 1)
++	if (refcount_read(&bqt->refcnt) != 1)
+ 		return -EBUSY;
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1ddd36b..3efc8cf 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -26,6 +26,7 @@
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
+ #include <linux/blkzoned.h>
++#include <linux/refcount.h>
+ 
+ struct module;
+ struct scsi_ioctl_command;
+@@ -293,7 +294,7 @@ struct blk_queue_tag {
+ 	unsigned long *tag_map;		/* bit map of free/busy tags */
+ 	int max_depth;			/* what we will send to device */
+ 	int real_max_depth;		/* what the array can hold */
+-	atomic_t refcnt;		/* map can be shared */
++	refcount_t refcnt;		/* map can be shared */
+ 	int alloc_policy;		/* tag allocation policy */
+ 	int next_tag;			/* next tag */
+ };
 -- 
-2.12.0
+2.7.4
