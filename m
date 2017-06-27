@@ -1,87 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52094 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753113AbdFRPWT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:19 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 06/30] nvme-rdma: rename nvme_rdma_init_queue to nvme_rdma_alloc_queue
-Date: Sun, 18 Jun 2017 18:21:40 +0300
-Message-Id: <1497799324-19598-7-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	keescook@chromium.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 1/5] block: convert bio.__bi_cnt from atomic_t to refcount_t
+Date: Tue, 27 Jun 2017 14:39:56 +0300
+Message-Id: <1498563601-10949-2-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Give it a name symmetric to nvme_rdma_free_queue. Also pass in
-the ctrl sqsize+1 and not the opts queue_size. And suppress
-failure message that has prior verbosity.
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- drivers/nvme/host/rdma.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ block/bio.c               | 6 +++---
+ fs/btrfs/volumes.c        | 2 +-
+ include/linux/bio.h       | 4 ++--
+ include/linux/blk_types.h | 3 ++-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 69ebfb61d599..c8016150dc21 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -508,7 +508,7 @@ static int nvme_rdma_create_queue_ib(struct nvme_rdma_queue *queue)
- 	return ret;
- }
- 
--static int nvme_rdma_init_queue(struct nvme_rdma_ctrl *ctrl,
-+static int nvme_rdma_alloc_queue(struct nvme_rdma_ctrl *ctrl,
- 		int idx, size_t queue_size)
+diff --git a/block/bio.c b/block/bio.c
+index 888e780..80032f3 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -276,7 +276,7 @@ void bio_init(struct bio *bio, struct bio_vec *table,
  {
- 	struct nvme_rdma_queue *queue;
-@@ -641,7 +641,7 @@ static int nvme_rdma_start_io_queues(struct nvme_rdma_ctrl *ctrl)
- 	return ret;
- }
+ 	memset(bio, 0, sizeof(*bio));
+ 	atomic_set(&bio->__bi_remaining, 1);
+-	atomic_set(&bio->__bi_cnt, 1);
++	refcount_set(&bio->__bi_cnt, 1);
  
--static int nvme_rdma_init_io_queues(struct nvme_rdma_ctrl *ctrl)
-+static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
- 	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
- 	struct ib_device *ibdev = ctrl->device->dev;
-@@ -670,13 +670,10 @@ static int nvme_rdma_init_io_queues(struct nvme_rdma_ctrl *ctrl)
- 		"creating %d I/O queues.\n", nr_io_queues);
+ 	bio->bi_io_vec = table;
+ 	bio->bi_max_vecs = max_vecs;
+@@ -551,12 +551,12 @@ void bio_put(struct bio *bio)
+ 	if (!bio_flagged(bio, BIO_REFFED))
+ 		bio_free(bio);
+ 	else {
+-		BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
++		BIO_BUG_ON(!refcount_read(&bio->__bi_cnt));
  
- 	for (i = 1; i < ctrl->queue_count; i++) {
--		ret = nvme_rdma_init_queue(ctrl, i,
--					   ctrl->ctrl.opts->queue_size);
--		if (ret) {
--			dev_info(ctrl->ctrl.device,
--				"failed to initialize i/o queue: %d\n", ret);
-+		ret = nvme_rdma_alloc_queue(ctrl, i,
-+				ctrl->ctrl.sqsize + 1);
-+		if (ret)
- 			goto out_free_queues;
--		}
+ 		/*
+ 		 * last put frees it
+ 		 */
+-		if (atomic_dec_and_test(&bio->__bi_cnt))
++		if (refcount_dec_and_test(&bio->__bi_cnt))
+ 			bio_free(bio);
  	}
+ }
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index 017b67d..cd8a5d5 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -446,7 +446,7 @@ static noinline void run_scheduled_bios(struct btrfs_device *device)
+ 		    waitqueue_active(&fs_info->async_submit_wait))
+ 			wake_up(&fs_info->async_submit_wait);
  
- 	return 0;
-@@ -692,7 +689,7 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
+-		BUG_ON(atomic_read(&cur->__bi_cnt) == 0);
++		BUG_ON(refcount_read(&cur->__bi_cnt) == 0);
+ 
+ 		/*
+ 		 * if we're doing the sync list, record that our
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d1b04b0..bfd0661 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -229,7 +229,7 @@ static inline void bio_get(struct bio *bio)
  {
- 	int ret;
+ 	bio->bi_flags |= (1 << BIO_REFFED);
+ 	smp_mb__before_atomic();
+-	atomic_inc(&bio->__bi_cnt);
++	refcount_inc(&bio->__bi_cnt);
+ }
  
--	ret = nvme_rdma_init_io_queues(ctrl);
-+	ret = nvme_rdma_alloc_io_queues(ctrl);
- 	if (ret)
- 		return ret;
+ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+@@ -238,7 +238,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+ 		bio->bi_flags |= (1 << BIO_REFFED);
+ 		smp_mb__before_atomic();
+ 	}
+-	atomic_set(&bio->__bi_cnt, count);
++	refcount_set(&bio->__bi_cnt, count);
+ }
  
-@@ -772,7 +769,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl, bool new
- {
- 	int error;
+ static inline bool bio_flagged(struct bio *bio, unsigned int bit)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 61339bc..f6e5daa 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -7,6 +7,7 @@
  
--	error = nvme_rdma_init_queue(ctrl, 0, NVME_AQ_DEPTH);
-+	error = nvme_rdma_alloc_queue(ctrl, 0, NVME_AQ_DEPTH);
- 	if (error)
- 		return error;
+ #include <linux/types.h>
+ #include <linux/bvec.h>
++#include <linux/refcount.h>
+ 
+ struct bio_set;
+ struct bio;
+@@ -81,7 +82,7 @@ struct bio {
+ 
+ 	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
+ 
+-	atomic_t		__bi_cnt;	/* pin count */
++	refcount_t		__bi_cnt;	/* pin count */
+ 
+ 	struct bio_vec		*bi_io_vec;	/* the actual vec list */
  
 -- 
 2.7.4
