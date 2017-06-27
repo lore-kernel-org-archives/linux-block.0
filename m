@@ -1,42 +1,34 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 25/51] block: blk-merge: remove unnecessary check
-Date: Mon, 26 Jun 2017 20:10:08 +0800
-Message-Id: <20170626121034.3051-26-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 3/9] blk-mq: expose write hints through debugfs
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ martin.petersen@oracle.com
+References: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
+ <1498491480-16306-4-git-send-email-axboe@kernel.dk>
+ <20170627151725.GA28403@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b4dad806-8bc9-f414-6d4f-c486e9b23a58@kernel.dk>
+Date: Tue, 27 Jun 2017 09:20:27 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170627151725.GA28403@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-In this case, 'sectors' can't be zero at all, so remove the check
-and let the bio be splitted.
+On 06/27/2017 09:17 AM, Christoph Hellwig wrote:
+> On Mon, Jun 26, 2017 at 09:37:54AM -0600, Jens Axboe wrote:
+>> Useful to verify that things are working the way they should.
+>> Reading the file will return number of kb written with each
+>> write hint. Writing the file will reset the statistics. No care
+>> is taken to ensure that we don't race on updates.
+>>
+>> Drivers will write to q->write_hints[] if they handle a given
+>> write hint.
+> 
+> How about moving the accounting itself to blk-mq as well?  Just noticed
+> that it's completely generic while looking over the nvme patch.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+I didn't want to do it, unless the driver is using streams.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index bf7a0fa0199f..c6fcc49b9aea 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -128,9 +128,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 				nsegs++;
- 				sectors = max_sectors;
- 			}
--			if (sectors)
--				goto split;
--			/* Make this single bvec as the 1st segment */
-+			goto split;
- 		}
- 
- 		if (bvprvp && blk_queue_cluster(q)) {
+
 -- 
-2.9.4
+Jens Axboe
