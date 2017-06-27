@@ -1,114 +1,92 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: axboe@kernel.dk
-Cc: viro@ZenIV.linux.org.uk,
-	hch@lst.de,
-	jack@suse.cz,
-	akpm@linux-foundation.org,
-	linux-block@vger.kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 10/10] btrfs: nowait aio support
-Date: Tue, 20 Jun 2017 07:05:49 -0500
-Message-Id: <20170620120549.23147-11-rgoldwyn@suse.de>
-In-Reply-To: <20170620120549.23147-1-rgoldwyn@suse.de>
-References: <20170620120549.23147-1-rgoldwyn@suse.de>
+Return-Path: <jg@lightnvm.io>
+Return-Path: <jg@lightnvm.io>
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <74679E1A-1CDF-45CF-99A0-A4BB057540A3@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_5013611D-24F5-4DF9-9F09-E13AB58ABC49";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 00/20] LightNVM: pblk patches for 4.13
+Date: Tue, 27 Jun 2017 10:00:52 +0200
+In-Reply-To: <20170626222920.GA9175@kernel.dk>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+ linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
+ <20170626222920.GA9175@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Return EAGAIN if any of the following checks fail
- + i_rwsem is not lockable
- + NODATACOW or PREALLOC is not set
- + Cannot nocow at the desired location
- + Writing beyond end of file which is not allocated
+--Apple-Mail=_5013611D-24F5-4DF9-9F09-E13AB58ABC49
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Acked-by: David Sterba <dsterba@suse.com>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/btrfs/file.c  | 33 +++++++++++++++++++++++++++------
- fs/btrfs/inode.c |  3 +++
- 2 files changed, 30 insertions(+), 6 deletions(-)
+> On 27 Jun 2017, at 00.29, Jens Axboe <axboe@kernel.dk> wrote:
+>=20
+> On Mon, Jun 26 2017, Javier Gonz=C3=A1lez wrote:
+>> Hi Matias,
+>>=20
+>> Here you have the pblk patchset for this window.
+>>=20
+>> Apart from small fixes for LightNVM core and pblk, there are three
+>> relevant changes:
+>>=20
+>> - Metadata for each line is no longer issued on a separate workqueue,
+>>   but instead, all I/Os are scheduled on the write thread. This =
+allows
+>>   to have more control over LUN collisions. The result is that we can
+>>   use the full bandwidth of the device for user data. In the 4.12 =
+pblk,
+>>   we use ~25% of the bandwidth for metadata.
+>>=20
+>> - The rate-limiter and GC have been tuned to keep the GC writer busy.
+>>   Also, capacity per line is guaranteed for GC I/O as we reach
+>>   capacity.
+>>=20
+>> - We have now a FTL state machine. This allows to fail gracefully to
+>>   user space in case of irrecoverable errors. This state machine will
+>>   be the base for the pblk's FTL log.
+>>=20
+>> The patches apply into your for-4.13/core. You can also find them in:
+>=20
+> Nope, they do not. Patch #7 fails, because it's not on top of the
+> bio_set changes that went in a week or two ago. I hand applied that =
+one,
+> didn't find issues with the rest.
+>=20
+> But please remember to ensure that it applies on top of the current
+> branch.
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index da1096eb1a40..59e2dccdf75b 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1875,12 +1875,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	ssize_t num_written = 0;
- 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
- 	ssize_t err;
--	loff_t pos;
--	size_t count;
-+	loff_t pos = iocb->ki_pos;
-+	size_t count = iov_iter_count(from);
- 	loff_t oldsize;
- 	int clean_page = 0;
- 
--	inode_lock(inode);
-+	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-+			(iocb->ki_flags & IOCB_DIRECT)) {
-+		/* Don't sleep on inode rwsem */
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+		/*
-+		 * We will allocate space in case nodatacow is not set,
-+		 * so bail
-+		 */
-+		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
-+					      BTRFS_INODE_PREALLOC)) ||
-+		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
-+			inode_unlock(inode);
-+			return -EAGAIN;
-+		}
-+	} else
-+		inode_lock(inode);
-+
- 	err = generic_write_checks(iocb, from);
- 	if (err <= 0) {
- 		inode_unlock(inode);
-@@ -1914,8 +1931,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	 */
- 	update_time_for_write(inode);
- 
--	pos = iocb->ki_pos;
--	count = iov_iter_count(from);
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
- 	if (start_pos > oldsize) {
-@@ -3071,13 +3086,19 @@ static loff_t btrfs_file_llseek(struct file *file, loff_t offset, int whence)
- 	return offset;
- }
- 
-+static int btrfs_file_open(struct inode *inode, struct file *filp)
-+{
-+	filp->f_mode |= FMODE_AIO_NOWAIT;
-+	return generic_file_open(inode, filp);
-+}
-+
- const struct file_operations btrfs_file_operations = {
- 	.llseek		= btrfs_file_llseek,
- 	.read_iter      = generic_file_read_iter,
- 	.splice_read	= generic_file_splice_read,
- 	.write_iter	= btrfs_file_write_iter,
- 	.mmap		= btrfs_file_mmap,
--	.open		= generic_file_open,
-+	.open		= btrfs_file_open,
- 	.release	= btrfs_release_file,
- 	.fsync		= btrfs_sync_file,
- 	.fallocate	= btrfs_fallocate,
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index f942293dd7e7..556c93060606 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8754,6 +8754,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			dio_data.overwrite = 1;
- 			inode_unlock(inode);
- 			relock = true;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
- 		}
- 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
- 		if (ret)
--- 
-2.12.0
+Thanks Jens. Won't happen again.
+
+Javier
+
+
+--Apple-Mail=_5013611D-24F5-4DF9-9F09-E13AB58ABC49
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJZUhC0AAoJEGMfBTt1mRjKwxkQAITA2E7hwnAX0DqfFcZb5fX7
+vzYgAEiXfCsDC4MaVouJ/8cb39boxri5WCPseqs8sbZC29doOB1cyq/YWmwh5NBt
+HSHUURD66bmPA5J56/BxSOTFQxpBWLpfAYXHS7f2G9Ifj8m8pDQDku43s5aPhy/3
+kcbIGA7zOSlNBgHeGFSRi1tW1v0KxRrn7U0K25emwTRo6PKRa6h62bdFl0QYJt+k
+mZx5WV4vOCYhsAPUoZH0kuXRtVSz0jEq2XbcvWyMsvfuWCh8h21ndpXga+YDkces
+AVEbkDSg6fkKh/q9aUM1IqJ+b7qznkV6ZZufcFtqrO5tRn/JKs590/LSl4jiEVcb
+4bJeI2emJyxjNhQGOQoKTGvxqrqDWuJ4b2htFIZ/heY8+weC7eueDeJe8l64Lal4
+ujjKlrc+/vEWp7z7GpRJRBpNO0tOBIPjdBJILrR3UOfOhPDxMGTiPxJH0mC8rfOB
+pmvHRrrqTywKepdONJYpkGnCsnFYNYB3LM7nhx5GApSMCbmYfXQ7NBxF8MAdLbwY
+x42aOVKVCyQCyhD4uX05sxkju6IGDdHk8ItZ68FlBIOvjmTD3YQ9poTHprJN4qlv
+Cu50PqnYOPv/E2sORQ5dk0IIIrdmFhB+uTDh4Dr2ezhvR88Ny2H2po0eWYQ9AhQt
+wOe+elWSJ5rvs2iLTosn
+=s/s0
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_5013611D-24F5-4DF9-9F09-E13AB58ABC49--
