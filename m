@@ -1,141 +1,134 @@
-Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 5/9] t10-pi: Move opencoded contants to common header
-Date: Thu, 29 Jun 2017 11:31:12 -0700
-Message-Id: <20170629183116.28685-6-hch@lst.de>
-In-Reply-To: <20170629183116.28685-1-hch@lst.de>
-References: <20170629183116.28685-1-hch@lst.de>
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	keescook@chromium.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 4/5] block: convert io_context.active_ref from atomic_t to refcount_t
+Date: Tue, 27 Jun 2017 14:39:59 +0300
+Message-Id: <1498563601-10949-5-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dmitry Monakhov <dmonakhov@openvz.org>
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- block/t10-pi.c                   | 9 +++------
- drivers/scsi/lpfc/lpfc_scsi.c    | 5 +++--
- drivers/scsi/qla2xxx/qla_isr.c   | 8 ++++----
- drivers/target/target_core_sbc.c | 2 +-
- include/linux/t10-pi.h           | 2 ++
- 5 files changed, 13 insertions(+), 13 deletions(-)
+ block/bfq-iosched.c       | 2 +-
+ block/blk-ioc.c           | 4 ++--
+ block/cfq-iosched.c       | 4 ++--
+ include/linux/iocontext.h | 6 +++---
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 3416dadf7b15..a98db384048f 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -28,9 +28,6 @@
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index ed93da2..3a525ab 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3988,7 +3988,7 @@ static void bfq_update_idle_window(struct bfq_data *bfqd,
  
- typedef __be16 (csum_fn) (void *, unsigned int);
+ 	enable_idle = bfq_bfqq_idle_window(bfqq);
  
--static const __be16 APP_ESCAPE = (__force __be16) 0xffff;
--static const __be32 REF_ESCAPE = (__force __be32) 0xffffffff;
--
- static __be16 t10_pi_crc_fn(void *data, unsigned int len)
- {
- 	return cpu_to_be16(crc_t10dif(data, len));
-@@ -82,7 +79,7 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
- 		switch (type) {
- 		case 1:
- 		case 2:
--			if (pi->app_tag == APP_ESCAPE)
-+			if (pi->app_tag == T10_PI_APP_ESCAPE)
- 				goto next;
+-	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
++	if (refcount_read(&bic->icq.ioc->active_ref) == 0 ||
+ 	    bfqd->bfq_slice_idle == 0 ||
+ 		(bfqd->hw_tag && BFQQ_SEEKY(bfqq) &&
+ 			bfqq->wr_coeff == 1))
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index 63898d2..69704d2 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -176,7 +176,7 @@ void put_io_context_active(struct io_context *ioc)
+ 	unsigned long flags;
+ 	struct io_cq *icq;
  
- 			if (be32_to_cpu(pi->ref_tag) !=
-@@ -95,8 +92,8 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
- 			}
- 			break;
- 		case 3:
--			if (pi->app_tag == APP_ESCAPE &&
--			    pi->ref_tag == REF_ESCAPE)
-+			if (pi->app_tag == T10_PI_APP_ESCAPE &&
-+			    pi->ref_tag == T10_PI_REF_ESCAPE)
- 				goto next;
- 			break;
- 		}
-diff --git a/drivers/scsi/lpfc/lpfc_scsi.c b/drivers/scsi/lpfc/lpfc_scsi.c
-index 54fd0c81ceaf..99d2e990b231 100644
---- a/drivers/scsi/lpfc/lpfc_scsi.c
-+++ b/drivers/scsi/lpfc/lpfc_scsi.c
-@@ -26,6 +26,7 @@
- #include <linux/export.h>
- #include <linux/delay.h>
- #include <asm/unaligned.h>
-+#include <linux/t10-pi.h>
- #include <linux/crc-t10dif.h>
- #include <net/checksum.h>
- 
-@@ -2934,8 +2935,8 @@ lpfc_calc_bg_err(struct lpfc_hba *phba, struct lpfc_scsi_buf *lpfc_cmd)
- 				 * First check to see if a protection data
- 				 * check is valid
- 				 */
--				if ((src->ref_tag == 0xffffffff) ||
--				    (src->app_tag == 0xffff)) {
-+				if ((src->ref_tag == T10_PI_REF_ESCAPE) ||
-+				    (src->app_tag == T10_PI_APP_ESCAPE)) {
- 					start_ref_tag++;
- 					goto skipit;
- 				}
-diff --git a/drivers/scsi/qla2xxx/qla_isr.c b/drivers/scsi/qla2xxx/qla_isr.c
-index 2572121b765b..de031aed94f6 100644
---- a/drivers/scsi/qla2xxx/qla_isr.c
-+++ b/drivers/scsi/qla2xxx/qla_isr.c
-@@ -1950,9 +1950,9 @@ qla2x00_handle_dif_error(srb_t *sp, struct sts_entry_24xx *sts24)
- 	 * For type     3: ref & app tag is all 'f's
- 	 * For type 0,1,2: app tag is all 'f's
+-	if (!atomic_dec_and_test(&ioc->active_ref)) {
++	if (!refcount_dec_and_test(&ioc->active_ref)) {
+ 		put_io_context(ioc);
+ 		return;
+ 	}
+@@ -275,7 +275,7 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_flags, int node)
+ 	/* initialize */
+ 	atomic_long_set(&ioc->refcount, 1);
+ 	atomic_set(&ioc->nr_tasks, 1);
+-	atomic_set(&ioc->active_ref, 1);
++	refcount_set(&ioc->active_ref, 1);
+ 	spin_lock_init(&ioc->lock);
+ 	INIT_RADIX_TREE(&ioc->icq_tree, GFP_ATOMIC | __GFP_HIGH);
+ 	INIT_HLIST_HEAD(&ioc->icq_list);
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index b7e9c7f..07c416a 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -2973,7 +2973,7 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
+ 	 * task has exited, don't wait
  	 */
--	if ((a_app_tag == 0xffff) &&
-+	if ((a_app_tag == T10_PI_APP_ESCAPE) &&
- 	    ((scsi_get_prot_type(cmd) != SCSI_PROT_DIF_TYPE3) ||
--	     (a_ref_tag == 0xffffffff))) {
-+	     (a_ref_tag == T10_PI_REF_ESCAPE))) {
- 		uint32_t blocks_done, resid;
- 		sector_t lba_s = scsi_get_lba(cmd);
+ 	cic = cfqd->active_cic;
+-	if (!cic || !atomic_read(&cic->icq.ioc->active_ref))
++	if (!cic || !refcount_read(&cic->icq.ioc->active_ref))
+ 		return;
  
-@@ -1994,9 +1994,9 @@ qla2x00_handle_dif_error(srb_t *sp, struct sts_entry_24xx *sts24)
- 			spt = page_address(sg_page(sg)) + sg->offset;
- 			spt += j;
+ 	/*
+@@ -3965,7 +3965,7 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
  
--			spt->app_tag = 0xffff;
-+			spt->app_tag = T10_PI_APP_ESCAPE;
- 			if (scsi_get_prot_type(cmd) == SCSI_PROT_DIF_TYPE3)
--				spt->ref_tag = 0xffffffff;
-+				spt->ref_tag = T10_PI_REF_ESCAPE;
- 		}
+ 	if (cfqq->next_rq && req_noidle(cfqq->next_rq))
+ 		enable_idle = 0;
+-	else if (!atomic_read(&cic->icq.ioc->active_ref) ||
++	else if (!refcount_read(&cic->icq.ioc->active_ref) ||
+ 		 !cfqd->cfq_slice_idle ||
+ 		 (!cfq_cfqq_deep(cfqq) && CFQQ_SEEKY(cfqq)))
+ 		enable_idle = 0;
+diff --git a/include/linux/iocontext.h b/include/linux/iocontext.h
+index df38db2..e47b907 100644
+--- a/include/linux/iocontext.h
++++ b/include/linux/iocontext.h
+@@ -3,6 +3,7 @@
  
- 		return 0;
-diff --git a/drivers/target/target_core_sbc.c b/drivers/target/target_core_sbc.c
-index 4316f7b65fb7..dc9456e7dac9 100644
---- a/drivers/target/target_core_sbc.c
-+++ b/drivers/target/target_core_sbc.c
-@@ -1450,7 +1450,7 @@ sbc_dif_verify(struct se_cmd *cmd, sector_t start, unsigned int sectors,
- 				 (unsigned long long)sector, sdt->guard_tag,
- 				 sdt->app_tag, be32_to_cpu(sdt->ref_tag));
+ #include <linux/radix-tree.h>
+ #include <linux/rcupdate.h>
++#include <linux/refcount.h>
+ #include <linux/workqueue.h>
  
--			if (sdt->app_tag == cpu_to_be16(0xffff)) {
-+			if (sdt->app_tag == T10_PI_APP_ESCAPE) {
- 				dsg_off += block_size;
- 				goto next;
- 			}
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 9375d23a24e7..635a3c5706bd 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -33,6 +33,8 @@ struct t10_pi_tuple {
- 	__be32 ref_tag;		/* Target LBA or indirect LBA */
- };
+ enum {
+@@ -96,7 +97,7 @@ struct io_cq {
+  */
+ struct io_context {
+ 	atomic_long_t refcount;
+-	atomic_t active_ref;
++	refcount_t active_ref;
+ 	atomic_t nr_tasks;
  
-+#define T10_PI_APP_ESCAPE cpu_to_be16(0xffff)
-+#define T10_PI_REF_ESCAPE cpu_to_be32(0xffffffff)
+ 	/* all the fields below are protected by this lock */
+@@ -128,9 +129,8 @@ struct io_context {
+ static inline void get_io_context_active(struct io_context *ioc)
+ {
+ 	WARN_ON_ONCE(atomic_long_read(&ioc->refcount) <= 0);
+-	WARN_ON_ONCE(atomic_read(&ioc->active_ref) <= 0);
+ 	atomic_long_inc(&ioc->refcount);
+-	atomic_inc(&ioc->active_ref);
++	refcount_inc(&ioc->active_ref);
+ }
  
- extern const struct blk_integrity_profile t10_pi_type1_crc;
- extern const struct blk_integrity_profile t10_pi_type1_ip;
+ static inline void ioc_task_link(struct io_context *ioc)
 -- 
-2.11.0
+2.7.4
