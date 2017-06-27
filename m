@@ -1,76 +1,44 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH v2 15/51] btrfs: comment on direct access bvec table
-Date: Mon, 26 Jun 2017 20:09:58 +0800
-Message-Id: <20170626121034.3051-16-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 9/9] nvme: add support for streams and directives
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ adilger@dilger.ca, martin.petersen@oracle.com, linux-nvme@lists.infradead.org
+References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+ <1498004526-4543-10-git-send-email-axboe@kernel.dk>
+ <20170626095907.GG14057@infradead.org>
+ <d2dcae41-d0b2-71a7-a63d-b7ef25ae47d2@kernel.dk>
+ <20170627141115.GA2541@infradead.org>
+ <ba468c95-40e0-41e7-0eb5-f5b4b70d3e3e@kernel.dk>
+ <20170627144405.GA4605@infradead.org>
+ <cd3cc640-5eb2-aeaf-a3a9-904436faae77@kernel.dk>
+Message-ID: <b9bd5753-453d-0952-b4a7-cddd4715b933@kernel.dk>
+Date: Tue, 27 Jun 2017 08:56:34 -0600
+MIME-Version: 1.0
+In-Reply-To: <cd3cc640-5eb2-aeaf-a3a9-904436faae77@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Cc: Chris Mason <clm@fb.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/btrfs/compression.c |  4 ++++
- fs/btrfs/inode.c       | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+On 06/27/2017 08:46 AM, Jens Axboe wrote:
+> On 06/27/2017 08:44 AM, Christoph Hellwig wrote:
+>> On Tue, Jun 27, 2017 at 08:16:49AM -0600, Jens Axboe wrote:
+>>> But we have to handle it, not doing so would be fragile. So our
+>>> options are:
+>>>
+>>> 1) Keep the stream_mappings[] array. It's simple, and it'll work
+>>>    for any number of streams.
+>>>
+>>> 2) Kill stream_mappings[] and just do the MOD again.
+>>
+>> 3) print a message and tell streams aren't supported on this device.
+> 
+> Is that your nvme preference - if less than 4 streams, just ignore it?
+> Would seem a shame to lose out with 2 streams, I can think of several
+> hot/cold scenarios that would probably work fine with that. But at the
+> same time, not a big deal to me, if you prefer just turning it off
+> for < 4 streams, that's fine with me.
 
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 2c0b7b57fcd5..5972f74354ca 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -541,6 +541,10 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 
- 	/* we need the actual starting offset of this extent in the file */
- 	read_lock(&em_tree->lock);
-+	/*
-+	 * It is still safe to retrieve the 1st page of the bio
-+	 * in this way after supporting multipage bvec.
-+	 */
- 	em = lookup_extent_mapping(em_tree,
- 				   page_offset(bio->bi_io_vec->bv_page),
- 				   PAGE_SIZE);
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 4ab02b34f029..7e725d84917b 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8055,6 +8055,12 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
- 	if (bio->bi_status)
- 		goto end;
- 
-+	/*
-+	 * WARNING:
-+	 *
-+	 * With multipage bvec, the following way of direct access to
-+	 * bvec table is only safe if the bio includes single page.
-+	 */
- 	ASSERT(bio->bi_vcnt == 1);
- 	io_tree = &BTRFS_I(inode)->io_tree;
- 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
-@@ -8146,6 +8152,12 @@ static void btrfs_retry_endio(struct bio *bio)
- 
- 	uptodate = 1;
- 
-+	/*
-+	 * WARNING:
-+	 *
-+	 * With multipage bvec, the following way of direct access to
-+	 * bvec table is only safe if the bio includes single page.
-+	 */
- 	ASSERT(bio->bi_vcnt == 1);
- 	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(done->inode));
- 
+http://git.kernel.dk/cgit/linux-block/commit/?h=write-stream&id=98335ae1347a9a08adc831e77e8fefcf06ab8282
+
 -- 
-2.9.4
+Jens Axboe
