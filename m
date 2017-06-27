@@ -1,48 +1,40 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:59056 "EHLO mx2.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751632AbdF0KnT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Jun 2017 06:43:19 -0400
-Date: Tue, 27 Jun 2017 13:43:17 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Jens Axboe <axboe@fb.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias@cnexlabs.com>,
-        Frans Klaver <fransklaver@gmail.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH V2] lightnvm: if LUNs are already allocated fix return
-Message-ID: <20170627104315.GA52146@dhcp-216.srv.tuxera.com>
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:33033 "EHLO
+        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751576AbdF0Qze (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Jun 2017 12:55:34 -0400
+Received: by mail-pf0-f171.google.com with SMTP id e7so19442864pfk.0
+        for <linux-block@vger.kernel.org>; Tue, 27 Jun 2017 09:55:34 -0700 (PDT)
+Date: Tue, 27 Jun 2017 09:55:31 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Jens Axboe <axboe@fb.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests v2 0/2] Test I/O to device while resetting PCI
+Message-ID: <20170627165531.GA7343@vader.DHCP.thefacebook.com>
+References: <20170627134257.15863-1-jthumshirn@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170627134257.15863-1-jthumshirn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-While creating new device with NVM_DEV_CREATE if LUNs are already
-allocated ioctl would return -ENOMEM which is wrong.  This patch
-propagates -EBUSY from nvm_reserve_luns which is correct response.
+On Tue, Jun 27, 2017 at 03:42:55PM +0200, Johannes Thumshirn wrote:
+> Changes to v1:
+> * Ignore fio errors
+> * add an additional sleep .2 after re-enabling the pci device
+> * directly call readlink in _get_pci_dev_from_blkdev()
+> 
+> Johannes Thumshirn (2):
+>   rc: add helpers to handle PCI test devices
+>   block/011: Perform PCI reset while doing IO
+> 
+>  common/rc           | 13 +++++++++++++
+>  tests/block/011     | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/block/011.out |  2 ++
+>  3 files changed, 70 insertions(+)
+>  create mode 100755 tests/block/011
+>  create mode 100644 tests/block/011.out
 
-Fixes: ade69e243 ("lightnvm: merge gennvm with core")
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
----
-
-V2: return error code directly instead of using ret variable (Frans)
-
- drivers/lightnvm/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index b8f82f5..c5d71c6 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -253,7 +253,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	mutex_unlock(&dev->mlock);
- 
- 	if (nvm_reserve_luns(dev, s->lun_begin, s->lun_end))
--		return -ENOMEM;
-+		return -EBUSY;
- 
- 	t = kmalloc(sizeof(struct nvm_target), GFP_KERNEL);
- 	if (!t) {
--- 
-2.5.5
+Applied, thanks!
