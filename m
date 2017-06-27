@@ -1,44 +1,90 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 7/9] xfs: add support for passing in write hints for buffered writes
-Date: Tue, 20 Jun 2017 18:22:04 -0600
-Message-Id: <1498004526-4543-8-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
-References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	keescook@chromium.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 5/5] block: convert bsg_device.ref_count from atomic_t to refcount_t
+Date: Tue, 27 Jun 2017 14:40:00 +0300
+Message-Id: <1498563601-10949-6-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/xfs/xfs_aops.c | 2 ++
- 1 file changed, 2 insertions(+)
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 76b6f988e2fa..e4d9d470402c 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -506,6 +506,7 @@ xfs_submit_ioend(
- 		return status;
- 	}
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
+---
+ block/bsg.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/block/bsg.c b/block/bsg.c
+index 6fd0854..f35e721 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -21,6 +21,7 @@
+ #include <linux/idr.h>
+ #include <linux/bsg.h>
+ #include <linux/slab.h>
++#include <linux/refcount.h>
  
-+	ioend->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(ioend->io_inode));
- 	submit_bio(ioend->io_bio);
- 	return 0;
- }
-@@ -565,6 +566,7 @@ xfs_chain_bio(
- 	bio_chain(ioend->io_bio, new);
- 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
- 	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
-+	ioend->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(ioend->io_inode));
- 	submit_bio(ioend->io_bio);
- 	ioend->io_bio = new;
- }
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+@@ -38,7 +39,7 @@ struct bsg_device {
+ 	struct list_head busy_list;
+ 	struct list_head done_list;
+ 	struct hlist_node dev_list;
+-	atomic_t ref_count;
++	refcount_t ref_count;
+ 	int queued_cmds;
+ 	int done_cmds;
+ 	wait_queue_head_t wq_done;
+@@ -711,7 +712,7 @@ static int bsg_put_device(struct bsg_device *bd)
+ 
+ 	mutex_lock(&bsg_mutex);
+ 
+-	do_free = atomic_dec_and_test(&bd->ref_count);
++	do_free = refcount_dec_and_test(&bd->ref_count);
+ 	if (!do_free) {
+ 		mutex_unlock(&bsg_mutex);
+ 		goto out;
+@@ -763,7 +764,7 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
+ 
+ 	bsg_set_block(bd, file);
+ 
+-	atomic_set(&bd->ref_count, 1);
++	refcount_set(&bd->ref_count, 1);
+ 	mutex_lock(&bsg_mutex);
+ 	hlist_add_head(&bd->dev_list, bsg_dev_idx_hash(iminor(inode)));
+ 
+@@ -783,7 +784,7 @@ static struct bsg_device *__bsg_get_device(int minor, struct request_queue *q)
+ 
+ 	hlist_for_each_entry(bd, bsg_dev_idx_hash(minor), dev_list) {
+ 		if (bd->queue == q) {
+-			atomic_inc(&bd->ref_count);
++			refcount_inc(&bd->ref_count);
+ 			goto found;
+ 		}
+ 	}
 -- 
 2.7.4
