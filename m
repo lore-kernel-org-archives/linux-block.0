@@ -1,37 +1,102 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "osandov@fb.com" <osandov@fb.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v2 12/12] block: Rename blk_mq_rq_{to,from}_pdu()
-Date: Thu, 1 Jun 2017 13:11:03 +0000
-Message-ID: <1496322662.2787.1.camel@sandisk.com>
-References: <20170531225246.26261-1-bart.vanassche@sandisk.com>
-	 <20170531225246.26261-13-bart.vanassche@sandisk.com>
-	 <20170601060804.GE16248@lst.de>
-In-Reply-To: <20170601060804.GE16248@lst.de>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:40302 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752128AbdF0NnF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Jun 2017 09:43:05 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Jens Axboe <axboe@fb.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH blktests v2 2/2] block/011: Perform PCI reset while doing IO
+Date: Tue, 27 Jun 2017 15:42:57 +0200
+Message-Id: <20170627134257.15863-3-jthumshirn@suse.de>
+In-Reply-To: <20170627134257.15863-1-jthumshirn@suse.de>
+References: <20170627134257.15863-1-jthumshirn@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDE3LTA2LTAxIGF0IDA4OjA4ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gT24gV2VkLCBNYXkgMzEsIDIwMTcgYXQgMDM6NTI6NDZQTSAtMDcwMCwgQmFydCBWYW4g
-QXNzY2hlIHdyb3RlOg0KPiA+IENvbW1pdCA2ZDI0N2Q3ZjcxZDEgKCJibG9jazogYWxsb3cgc3Bl
-Y2lmeWluZyBzaXplIGZvciBleHRyYSBjb21tYW5kDQo+ID4gZGF0YSIpIGFkZGVkIHN1cHBvcnQg
-Zm9yIC5jbWRfc2l6ZSB0byBibGstc3EuIER1ZSB0byB0aGF0IHBhdGNoIHRoZQ0KPiA+IGJsa19t
-cV9ycV97dG8sZnJvbX1fcGR1KCkgZnVuY3Rpb25zIGFyZSBhbHNvIHVzZWZ1bCBmb3Igc2luZ2xl
-LXF1ZXVlDQo+ID4gYmxvY2sgZHJpdmVycy4gSGVuY2UgcmVtb3ZlICJfbXEiIGZyb20gdGhlIG5h
-bWUgb2YgdGhlc2UgZnVuY3Rpb25zLg0KPiA+IFRoaXMgcGF0Y2ggZG9lcyBub3QgY2hhbmdlIGFu
-eSBmdW5jdGlvbmFsaXR5LiBNb3N0IG9mIHRoaXMgcGF0Y2ggaGFzDQo+ID4gYmVlbiBnZW5lcmF0
-ZWQgYnkgcnVubmluZyB0aGUgZm9sbG93aW5nIHNoZWxsIGNvbW1hbmQ6DQo+IA0KPiBJIGRvbid0
-IHJlYWxseSBzZWUgdGhlIHBvaW50IG9mIHRoaXMgYXMgaXQncyBwcmltYXJpbHkgYSBibGstbXEg
-QVBJDQo+IGFuZCB3ZSBzdGlsbCBob3BlIHRvIGdldCByaWQgb2YgdGhlIG9sZCBjb2RlLiAgQnV0
-IEknbSBub3QgbmVjZXNzYXJpbHkNCj4gYWdhaW5zdCBpdCBlaXRoZXIuDQoNCkhlbGxvIENocmlz
-dG9waCwNCg0KSSB3b3VsZCBsaWtlIHRvIGludHJvZHVjZSBjYWxscyB0byB0aGVzZSBmdW5jdGlv
-bnMgaW4gc2V2ZXJhbCBzY3NpLXNxDQpmdW5jdGlvbnMuIElmIEkgd291bGQgZG8gdGhhdCB3aXRo
-b3V0IHJlbmFtaW5nIHRoZXNlIGZ1bmN0aW9ucyB0aGVuIGFueW9uZQ0Kd2hvIHJlYWRzIHRoZSBj
-b2RlIG9mIHRoZXNlIGZ1bmN0aW9ucyBhbmQgc2VlcyBjYWxscyB0byBmdW5jdGlvbnMgd2l0aCBh
-DQpibGtfbXFfIHByZWZpeCBjb3VsZCBnZXQgcmVhbGx5IGNvbmZ1c2VkIHdoZW4gdHJ5aW5nIHRv
-IGZpZ3VyZSBvdXQgd2hldGhlcg0KdGhlc2UgZnVuY3Rpb25zIGFyZSB1c2VkIGJ5IHNjc2ktc3Es
-IHNjc2ktbXEgb3IgcGVyaGFwcyBib3RoLg0KDQpCYXJ0Lg==
+This test-case performs I/O with fio while doing PCI disable/enable
+cycles.
+
+In the results we don't care for I/O errors but for hiccups in dmesg only.
+
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ tests/block/011     | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/011.out |  2 ++
+ 2 files changed, 57 insertions(+)
+ create mode 100755 tests/block/011
+ create mode 100644 tests/block/011.out
+
+diff --git a/tests/block/011 b/tests/block/011
+new file mode 100755
+index 000000000000..65ed3dfa7092
+--- /dev/null
++++ b/tests/block/011
+@@ -0,0 +1,55 @@
++#!/bin/bash
++#
++# Do disable PCI device while doing I/O to it
++#
++# Copyright (C) 2017 Johannes Thumshirn <jthumshirn@suse.de>
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++DESCRIPTION="disable PCI device while doing I/O"
++TIMED=1
++
++requires() {
++	_have_fio
++}
++
++device_requires() {
++	_test_dev_is_pci
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++
++	pdev=$(_get_pci_dev_from_blkdev)
++
++	if _test_dev_is_rotational; then
++		size="32m"
++	else
++		size="1g"
++	fi
++
++	# start fio job
++	_run_fio --bs=4k --rw=randread --norandommap \
++		--name=reads --filename="$TEST_DEV" --size="$size" \
++		--numjobs=8 --direct=1 --ignore_error=EIO,ENXIO,ENODEV &
++
++	while kill -0 $! 2>/dev/null; do
++		echo 0 > "/sys/bus/pci/devices/${pdev}/enable"
++		sleep .2
++		echo 1 > "/sys/bus/pci/devices/${pdev}/enable"
++		sleep .2
++	done
++
++	echo "Test complete"
++}
+diff --git a/tests/block/011.out b/tests/block/011.out
+new file mode 100644
+index 000000000000..8e067df63097
+--- /dev/null
++++ b/tests/block/011.out
+@@ -0,0 +1,2 @@
++Running block/011
++Test complete
+-- 
+2.12.3
