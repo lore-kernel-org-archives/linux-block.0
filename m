@@ -1,22 +1,24 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx.ewheeler.net ([66.155.3.69]:43922 "EHLO mail.ewheeler.net"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752885AbdF3Un7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 16:43:59 -0400
-From: bcache@lists.ewheeler.net
-To: linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org, hch@infradead.org, axboe@kernel.dk,
-        Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 16/19] bcache: increase the number of open buckets
-Date: Fri, 30 Jun 2017 13:43:05 -0700
-Message-Id: <1498855388-16990-16-git-send-email-bcache@lists.ewheeler.net>
-In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:44992 "EHLO
+        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752416AbdF3KVQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 06:21:16 -0400
+Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
+        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id 4ED853E5687
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:09 -0700 (PDT)
+Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
+        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 4A7F0B400CB
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+In-Reply-To: <20170629134510.GA32385@infradead.org>
 References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+From: Tang Junhui <tang.junhui@zte.com.cn>
+Date: Tue, 27 Jun 2017 17:37:29 -0700
+Subject: [PATCH 16/19] bcache: increase the number of open buckets
+To: linux-block@vger.kernel.org
+Message-Id: <20170629222108.428BB100128@ware.dreamhost.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
-
-From: Tang Junhui <tang.junhui@zte.com.cn>
 
 In currently, we only alloc 6 open buckets for each cache set,
 but in usually, we always attach about 10 or so backend devices for
