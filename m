@@ -1,72 +1,38 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH v2 32/51] btrfs: use bvec_get_last_page to get bio's last page
-Date: Mon, 26 Jun 2017 20:10:15 +0800
-Message-Id: <20170626121034.3051-33-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:55544 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751528AbdF1Qlu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2017 12:41:50 -0400
+Subject: Re: [PATCH V4 11/12] blktrace: add an option to allow displying
+ cgroup path
+To: Shaohua Li <shli@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>
+CC: <tj@kernel.org>, <gregkh@linuxfoundation.org>, <hch@lst.de>,
+        <rostedt@goodmis.org>, <lizefan@huawei.com>, <Kernel-team@fb.com>,
+        Shaohua Li <shli@fb.com>
+References: <cover.1498666964.git.shli@fb.com>
+ <4fd5daa04db8e79e5f9e85e348112af1dc714cc4.1498666964.git.shli@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <209b9d5e-291c-882f-5116-53ad9c6eee2b@fb.com>
+Date: Wed, 28 Jun 2017 10:41:14 -0600
+MIME-Version: 1.0
+In-Reply-To: <4fd5daa04db8e79e5f9e85e348112af1dc714cc4.1498666964.git.shli@fb.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Preparing for supporting multipage bvec.
+On 06/28/2017 10:30 AM, Shaohua Li wrote:
+> From: Shaohua Li <shli@fb.com>
+> 
+> By default we output cgroup id in blktrace. This adds an option to
+> display cgroup path. Since get cgroup path is a relativly heavy
+> operation, we don't enable it by default.
+> 
+> with the option enabled, blktrace will output something like this:
+> dd-1353  [007] d..2   293.015252:   8,0   /test/level  D   R 24 + 8 [dd]
 
-Cc: Chris Mason <clm@fb.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/btrfs/compression.c | 5 ++++-
- fs/btrfs/extent_io.c   | 8 ++++++--
- 2 files changed, 10 insertions(+), 3 deletions(-)
+Typo in your subject, "displaying".
 
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 5972f74354ca..fdab5b821aa8 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -391,8 +391,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
- static u64 bio_end_offset(struct bio *bio)
- {
- 	struct bio_vec *last = &bio->bi_io_vec[bio->bi_vcnt - 1];
-+	struct bio_vec bv;
- 
--	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
-+	bvec_get_last_page(last, &bv);
-+
-+	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
- }
- 
- static noinline int add_ra_bio_pages(struct inode *inode,
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 5b453cada1ea..7cc6c8a52e49 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2741,11 +2741,15 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
- {
- 	blk_status_t ret = 0;
- 	struct bio_vec *bvec = bio->bi_io_vec + bio->bi_vcnt - 1;
--	struct page *page = bvec->bv_page;
- 	struct extent_io_tree *tree = bio->bi_private;
-+	struct bio_vec bv;
-+	struct page *page;
- 	u64 start;
- 
--	start = page_offset(page) + bvec->bv_offset;
-+	bvec_get_last_page(bvec, &bv);
-+	page = bv.bv_page;
-+
-+	start = page_offset(page) + bv.bv_offset;
- 
- 	bio->bi_private = NULL;
- 	bio_get(bio);
 -- 
-2.9.4
+Jens Axboe
