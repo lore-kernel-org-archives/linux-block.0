@@ -1,18 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:41250 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753030AbdF2Muk (ORCPT
+Received: from mail-yb0-f193.google.com ([209.85.213.193]:36005 "EHLO
+        mail-yb0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751690AbdF1SHH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2017 08:50:40 -0400
-Date: Thu, 29 Jun 2017 14:50:38 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
+        Wed, 28 Jun 2017 14:07:07 -0400
+Date: Wed, 28 Jun 2017 14:07:04 -0400
+From: Tejun Heo <tj@kernel.org>
 To: Shaohua Li <shli@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        tj@kernel.org, hch@lst.de, axboe@fb.com, rostedt@goodmis.org,
-        lizefan@huawei.com, Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+        gregkh@linuxfoundation.org, hch@lst.de, axboe@fb.com,
+        rostedt@goodmis.org, lizefan@huawei.com, Kernel-team@fb.com,
+        Shaohua Li <shli@fb.com>
 Subject: Re: [PATCH V4 03/12] kernfs: add an API to get kernfs node from
  inode number
-Message-ID: <20170629125038.GB26046@kroah.com>
+Message-ID: <20170628180704.GA24647@htj.duckdns.org>
 References: <cover.1498666964.git.shli@fb.com>
  <39b16490e3f39fb0f576a0b72d2458d164296766.1498666964.git.shli@fb.com>
 MIME-Version: 1.0
@@ -34,4 +35,9 @@ On Wed, Jun 28, 2017 at 09:29:53AM -0700, Shaohua Li wrote:
 > 
 > Signed-off-by: Shaohua Li <shli@fb.com>
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
