@@ -1,38 +1,168 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:55544 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751528AbdF1Qlu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2017 12:41:50 -0400
-Subject: Re: [PATCH V4 11/12] blktrace: add an option to allow displying
- cgroup path
-To: Shaohua Li <shli@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>
-CC: <tj@kernel.org>, <gregkh@linuxfoundation.org>, <hch@lst.de>,
-        <rostedt@goodmis.org>, <lizefan@huawei.com>, <Kernel-team@fb.com>,
-        Shaohua Li <shli@fb.com>
+Received: from mail.kernel.org ([198.145.29.99]:39268 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751974AbdF1QaM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2017 12:30:12 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V4 11/12] blktrace: add an option to allow displying cgroup path
+Date: Wed, 28 Jun 2017 09:30:01 -0700
+Message-Id: <4fd5daa04db8e79e5f9e85e348112af1dc714cc4.1498666964.git.shli@fb.com>
+In-Reply-To: <cover.1498666964.git.shli@fb.com>
 References: <cover.1498666964.git.shli@fb.com>
- <4fd5daa04db8e79e5f9e85e348112af1dc714cc4.1498666964.git.shli@fb.com>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <209b9d5e-291c-882f-5116-53ad9c6eee2b@fb.com>
-Date: Wed, 28 Jun 2017 10:41:14 -0600
-MIME-Version: 1.0
-In-Reply-To: <4fd5daa04db8e79e5f9e85e348112af1dc714cc4.1498666964.git.shli@fb.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <cover.1498666964.git.shli@fb.com>
+References: <cover.1498666964.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 06/28/2017 10:30 AM, Shaohua Li wrote:
-> From: Shaohua Li <shli@fb.com>
-> 
-> By default we output cgroup id in blktrace. This adds an option to
-> display cgroup path. Since get cgroup path is a relativly heavy
-> operation, we don't enable it by default.
-> 
-> with the option enabled, blktrace will output something like this:
-> dd-1353  [007] d..2   293.015252:   8,0   /test/level  D   R 24 + 8 [dd]
+From: Shaohua Li <shli@fb.com>
 
-Typo in your subject, "displaying".
+By default we output cgroup id in blktrace. This adds an option to
+display cgroup path. Since get cgroup path is a relativly heavy
+operation, we don't enable it by default.
 
+with the option enabled, blktrace will output something like this:
+dd-1353  [007] d..2   293.015252:   8,0   /test/level  D   R 24 + 8 [dd]
+
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ fs/kernfs/mount.c       | 19 +++++++++++++++++++
+ include/linux/cgroup.h  |  6 ++++++
+ include/linux/kernfs.h  |  2 ++
+ kernel/cgroup/cgroup.c  | 12 ++++++++++++
+ kernel/trace/blktrace.c | 14 +++++++++++++-
+ 5 files changed, 52 insertions(+), 1 deletion(-)
+
+diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
+index fa32358..7c452f4 100644
+--- a/fs/kernfs/mount.c
++++ b/fs/kernfs/mount.c
+@@ -65,6 +65,25 @@ const struct super_operations kernfs_sops = {
+ 	.show_path	= kernfs_sop_show_path,
+ };
+ 
++/*
++ * Similar to kernfs_fh_get_inode, this one gets kernfs node from inode
++ * number and generation
++ */
++struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
++	const union kernfs_node_id *id)
++{
++	struct kernfs_node *kn;
++
++	kn = kernfs_find_and_get_node_by_ino(root, id->ino);
++	if (!kn)
++		return NULL;
++	if (kn->id.generation != id->generation) {
++		kernfs_put(kn);
++		return NULL;
++	}
++	return kn;
++}
++
+ static struct inode *kernfs_fh_get_inode(struct super_block *sb,
+ 		u64 ino, u32 generation)
+ {
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 52ef9a6..6144fe9 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -613,6 +613,9 @@ static inline union kernfs_node_id *cgroup_get_kernfs_id(struct cgroup *cgrp)
+ {
+ 	return &cgrp->kn->id;
+ }
++
++void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
++					char *buf, size_t buflen);
+ #else /* !CONFIG_CGROUPS */
+ 
+ struct cgroup_subsys_state;
+@@ -645,6 +648,9 @@ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
+ {
+ 	return true;
+ }
++
++static inline void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
++	char *buf, size_t buflen) {}
+ #endif /* !CONFIG_CGROUPS */
+ 
+ /*
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index d149361..ab25c8b 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -358,6 +358,8 @@ struct super_block *kernfs_pin_sb(struct kernfs_root *root, const void *ns);
+ 
+ void kernfs_init(void);
+ 
++struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
++	const union kernfs_node_id *id);
+ #else	/* CONFIG_KERNFS */
+ 
+ static inline enum kernfs_node_type kernfs_type(struct kernfs_node *kn)
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 4a5cbe9..7fc1eba 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -4614,6 +4614,18 @@ static int __init cgroup_wq_init(void)
+ }
+ core_initcall(cgroup_wq_init);
+ 
++void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
++					char *buf, size_t buflen)
++{
++	struct kernfs_node *kn;
++
++	kn = kernfs_get_node_by_id(cgrp_dfl_root.kf_root, id);
++	if (!kn)
++		return;
++	kernfs_path(kn, buf, buflen);
++	kernfs_put(kn);
++}
++
+ /*
+  * proc_cgroup_show()
+  *  - Print task's cgroup paths into seq_file, one line for each hierarchy
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index f393d7a..e90974e 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -48,12 +48,14 @@ static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_lock);
+ /* Select an alternative, minimalistic output than the original one */
+ #define TRACE_BLK_OPT_CLASSIC	0x1
+ #define TRACE_BLK_OPT_CGROUP	0x2
++#define TRACE_BLK_OPT_CGNAME	0x4
+ 
+ static struct tracer_opt blk_tracer_opts[] = {
+ 	/* Default disable the minimalistic output */
+ 	{ TRACER_OPT(blk_classic, TRACE_BLK_OPT_CLASSIC) },
+ #ifdef CONFIG_BLK_CGROUP
+ 	{ TRACER_OPT(blk_cgroup, TRACE_BLK_OPT_CGROUP) },
++	{ TRACER_OPT(blk_cgname, TRACE_BLK_OPT_CGNAME) },
+ #endif
+ 	{ }
+ };
+@@ -1213,7 +1215,17 @@ static void blk_log_action(struct trace_iterator *iter, const char *act,
+ 	if (has_cg) {
+ 		const union kernfs_node_id *id = cgid_start(iter->ent);
+ 
+-		trace_seq_printf(&iter->seq, "%3d,%-3d %x,%-x %2s %3s ",
++		if (blk_tracer_flags.val & TRACE_BLK_OPT_CGNAME) {
++			char blkcg_name_buf[NAME_MAX + 1] = "<...>";
++
++			cgroup_path_from_kernfs_id(id, blkcg_name_buf,
++				sizeof(blkcg_name_buf));
++			trace_seq_printf(&iter->seq, "%3d,%-3d %s %2s %3s ",
++				 MAJOR(t->device), MINOR(t->device),
++				 blkcg_name_buf, act, rwbs);
++		} else
++			trace_seq_printf(&iter->seq,
++				 "%3d,%-3d %x,%-x %2s %3s ",
+ 				 MAJOR(t->device), MINOR(t->device),
+ 				 id->ino, id->generation, act, rwbs);
+ 	} else
 -- 
-Jens Axboe
+2.9.3
