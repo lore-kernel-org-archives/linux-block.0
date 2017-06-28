@@ -1,20 +1,24 @@
-Return-Path: <bcache@lists.ewheeler.net>
-From: bcache@lists.ewheeler.net
-To: linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org,
-	hch@infradead.org,
-	axboe@kernel.dk,
-	Tang Junhui <tang.junhui@zte.com.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH 17/19] bcache: fix for gc and write-back race
-Date: Fri, 30 Jun 2017 13:43:06 -0700
-Message-Id: <1498855388-16990-17-git-send-email-bcache@lists.ewheeler.net>
-In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:45114 "EHLO
+        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752445AbdF3KVT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 06:21:19 -0400
+Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
+        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id B28B93E56B5
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:09 -0700 (PDT)
+Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
+        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 56CEDB400CF
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+In-Reply-To: <20170629134510.GA32385@infradead.org>
 References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
-List-ID: <linux-block@vger.kernel.org>
-
 From: Tang Junhui <tang.junhui@zte.com.cn>
+Date: Tue, 27 Jun 2017 17:41:35 -0700
+Subject: [PATCH 17/19] bcache: fix for gc and write-back race
+To: linux-block@vger.kernel.org
+Message-Id: <20170629222108.4362D100130@ware.dreamhost.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 gc and write-back get raced (see the email "bcache get stucked" I sended
 before):
