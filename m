@@ -1,31 +1,123 @@
-Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: martin.petersen@oracle.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: remove the unused bio_to_phys macro
-Date: Mon, 19 Jun 2017 09:24:40 +0200
-Message-Id: <20170619072441.12835-2-hch@lst.de>
-In-Reply-To: <20170619072441.12835-1-hch@lst.de>
-References: <20170619072441.12835-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX V2] block, bfq: update wr_busy_queues if needed on
+ a queue split
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, Linux-Kernal <linux-kernel@vger.kernel.org>,
+ ulf.hansson@linaro.org, broonie@kernel.org
+References: <20170619114316.2587-1-paolo.valente@linaro.org>
+ <8520D3AF-C161-439F-A7E8-A6B7202DA2D9@linaro.org>
+ <e070788e-8a62-024d-7aac-8f8801722ffe@kernel.dk>
+ <4AFF2E52-DCE4-4DC7-9CB0-849EEED3A9AB@linaro.org>
+ <3b5987e2-fa11-af94-27f4-5760612c0f22@kernel.dk>
+ <70E1F6F9-407A-4A43-9FC3-D6EBE2980026@linaro.org>
+ <5489829a-1840-cb0c-cfda-d496959aae0a@kernel.dk>
+ <20678610-7D83-4B86-BB74-08F464D35B0F@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6bce435f-b0ef-0812-b833-4b4b69f3c412@kernel.dk>
+Date: Wed, 28 Jun 2017 07:51:09 -0600
+MIME-Version: 1.0
+In-Reply-To: <20678610-7D83-4B86-BB74-08F464D35B0F@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/bio.h | 1 -
- 1 file changed, 1 deletion(-)
+On 06/28/2017 07:44 AM, Paolo Valente wrote:
+> 
+>> Il giorno 28 giu 2017, alle ore 14:42, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>
+>> On 06/27/2017 11:39 PM, Paolo Valente wrote:
+>>>
+>>>> Il giorno 27 giu 2017, alle ore 20:29, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>>>
+>>>> On 06/27/2017 12:27 PM, Paolo Valente wrote:
+>>>>>
+>>>>>> Il giorno 27 giu 2017, alle ore 16:41, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>>>>>
+>>>>>> On 06/27/2017 12:09 AM, Paolo Valente wrote:
+>>>>>>>
+>>>>>>>> Il giorno 19 giu 2017, alle ore 13:43, Paolo Valente <paolo.valente@linaro.org> ha scritto:
+>>>>>>>>
+>>>>>>>> This commit fixes a bug triggered by a non-trivial sequence of
+>>>>>>>> events. These events are briefly described in the next two
+>>>>>>>> paragraphs. The impatiens, or those who are familiar with queue
+>>>>>>>> merging and splitting, can jump directly to the last paragraph.
+>>>>>>>>
+>>>>>>>> On each I/O-request arrival for a shared bfq_queue, i.e., for a
+>>>>>>>> bfq_queue that is the result of the merge of two or more bfq_queues,
+>>>>>>>> BFQ checks whether the shared bfq_queue has become seeky (i.e., if too
+>>>>>>>> many random I/O requests have arrived for the bfq_queue; if the device
+>>>>>>>> is non rotational, then random requests must be also small for the
+>>>>>>>> bfq_queue to be tagged as seeky). If the shared bfq_queue is actually
+>>>>>>>> detected as seeky, then a split occurs: the bfq I/O context of the
+>>>>>>>> process that has issued the request is redirected from the shared
+>>>>>>>> bfq_queue to a new non-shared bfq_queue. As a degenerate case, if the
+>>>>>>>> shared bfq_queue actually happens to be shared only by one process
+>>>>>>>> (because of previous splits), then no new bfq_queue is created: the
+>>>>>>>> state of the shared bfq_queue is just changed from shared to non
+>>>>>>>> shared.
+>>>>>>>>
+>>>>>>>> Regardless of whether a brand new non-shared bfq_queue is created, or
+>>>>>>>> the pre-existing shared bfq_queue is just turned into a non-shared
+>>>>>>>> bfq_queue, several parameters of the non-shared bfq_queue are set
+>>>>>>>> (restored) to the original values they had when the bfq_queue
+>>>>>>>> associated with the bfq I/O context of the process (that has just
+>>>>>>>> issued an I/O request) was merged with the shared bfq_queue. One of
+>>>>>>>> these parameters is the weight-raising state.
+>>>>>>>>
+>>>>>>>> If, on the split of a shared bfq_queue,
+>>>>>>>> 1) a pre-existing shared bfq_queue is turned into a non-shared
+>>>>>>>> bfq_queue;
+>>>>>>>> 2) the previously shared bfq_queue happens to be busy;
+>>>>>>>> 3) the weight-raising state of the previously shared bfq_queue happens
+>>>>>>>> to change;
+>>>>>>>> the number of weight-raised busy queues changes. The field
+>>>>>>>> wr_busy_queues must then be updated accordingly, but such an update
+>>>>>>>> was missing. This commit adds the missing update.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Hi Jens,
+>>>>>>> any idea of the possible fate of this fix?
+>>>>>>
+>>>>>> I sort of missed this one. It looks trivial enough for 4.12, or we
+>>>>>> can defer until 4.13. What do you think?
+>>>>>>
+>>>>>
+>>>>> It should actually be something trivial, and hopefully correct,
+>>>>> because a further throughput improvement (for BFQ), which depends on
+>>>>> this fix, is now working properly, and we didn't see any regression so
+>>>>> far.  In addition, since this improvement is virtually ready for
+>>>>> submission, further steps may be probably easier if this fix gets in
+>>>>> sooner (whatever the luck of the improvement will be).
+>>>>
+>>>> OK, let's queue it up for 4.13 then.
+>>>>
+>>>
+>>> My arguments was in favor of 4.12 actually.  Maybe you did mean 4.12
+>>> here?
+>>
+>> You were talking about further improvements and new development on top
+>> of this, so I assumed you meant 4.13. However, further development is
+>> not the main criteria or concern for whether this fix should go into
+>> 4.12 or not.
+> 
+> Ok, thanks for your explanation and patience.
+> 
+>> The main concern is if this fixes something that is crucial
+>> to have in 4.12. It's late in the cycle, I'd rather not push anything
+>> that isn't a regression fix at this point.
+>>
+> 
+> Hard to assess precisely how crucial this is.  Certainly it fixes a
+> regression.  The practical, negative effects of this regression are
+> systematic when one tries to add the throughput improvement I
+> mentioned: the improvement almost never works.  If BFQ is used as it
+> is, then negative effects on throughput are less likely to happen.
+> 
+> I hope that this piece of information is somehow useful for your
+> decision.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 40d054185277..83f9edb39d3f 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -118,7 +118,6 @@ static inline void *bio_data(struct bio *bio)
- /*
-  * will die
-  */
--#define bio_to_phys(bio)	(page_to_phys(bio_page((bio))) + (unsigned long) bio_offset((bio)))
- #define bvec_to_phys(bv)	(page_to_phys((bv)->bv_page) + (unsigned long) (bv)->bv_offset)
- 
- /*
+If it's only really visible with the other change on top, then I think
+we should defer to 4.13. It's not a kernel regression in the most
+clinical sense, since BFQ wasn't available in 4.12.
+
 -- 
-2.11.0
+Jens Axboe
