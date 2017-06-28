@@ -1,38 +1,139 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55705 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751698AbdF1NHI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2017 09:07:08 -0400
-Date: Wed, 28 Jun 2017 15:07:02 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Max Gurtovoy <maxg@mellanox.com>
-Cc: axboe@fb.com, hch@lst.de, sagi@grimberg.me, bvanassche@acm.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        vladimirk@mellanox.com
-Subject: Re: [PATCH 1/1] blk-mq: map all HWQ also in hyperthreaded system
-Message-ID: <20170628130702.GQ4185@linux-x5ow.site>
-References: <1498653880-29223-1-git-send-email-maxg@mellanox.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1498653880-29223-1-git-send-email-maxg@mellanox.com>
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:51994 "EHLO
+        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751532AbdF1Mpa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2017 08:45:30 -0400
+From: Max Gurtovoy <maxg@mellanox.com>
+To: axboe@fb.com, hch@lst.de, sagi@grimberg.me, bvanassche@acm.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Cc: vladimirk@mellanox.com, Max Gurtovoy <maxg@mellanox.com>
+Subject: [PATCH 1/1] blk-mq: map all HWQ also in hyperthreaded system
+Date: Wed, 28 Jun 2017 15:44:40 +0300
+Message-Id: <1498653880-29223-1-git-send-email-maxg@mellanox.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Jun 28, 2017 at 03:44:40PM +0300, Max Gurtovoy wrote:
-> This patch performs sequential mapping between CPUs and queues.
-> In case the system has more CPUs than HWQs then there are still
-> CPUs to map to HWQs. In hyperthreaded system, map the unmapped CPUs
-> and their siblings to the same HWQ.
-> This actually fixes a bug that found unmapped HWQs in a system with
-> 2 sockets, 18 cores per socket, 2 threads per core (total 72 CPUs)
-> running NVMEoF (opens upto maximum of 64 HWQs).
+This patch performs sequential mapping between CPUs and queues.
+In case the system has more CPUs than HWQs then there are still
+CPUs to map to HWQs. In hyperthreaded system, map the unmapped CPUs
+and their siblings to the same HWQ.
+This actually fixes a bug that found unmapped HWQs in a system with
+2 sockets, 18 cores per socket, 2 threads per core (total 72 CPUs)
+running NVMEoF (opens upto maximum of 64 HWQs).
 
->From a first look at it, it looks good.
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Performance results running fio (72 jobs, 128 iodepth)
+using null_blk (w/w.o patch):
+
+bs      IOPS(read submit_queues=72)   IOPS(write submit_queues=72)   IOPS(read submit_queues=24)  IOPS(write submit_queues=24)
+-----  ----------------------------  ------------------------------ ---------------------------- -----------------------------
+512    4890.4K/4723.5K                 4524.7K/4324.2K                   4280.2K/4264.3K               3902.4K/3909.5K
+1k     4910.1K/4715.2K                 4535.8K/4309.6K                   4296.7K/4269.1K               3906.8K/3914.9K
+2k     4906.3K/4739.7K                 4526.7K/4330.6K                   4301.1K/4262.4K               3890.8K/3900.1K
+4k     4918.6K/4730.7K                 4556.1K/4343.6K                   4297.6K/4264.5K               3886.9K/3893.9K
+8k     4906.4K/4748.9K                 4550.9K/4346.7K                   4283.2K/4268.8K               3863.4K/3858.2K
+16k    4903.8K/4782.6K                 4501.5K/4233.9K                   4292.3K/4282.3K               3773.1K/3773.5K
+32k    4885.8K/4782.4K                 4365.9K/4184.2K                   4307.5K/4289.4K               3780.3K/3687.3K
+64k    4822.5K/4762.7K                 2752.8K/2675.1K                   4308.8K/4312.3K               2651.5K/2655.7K
+128k   2388.5K/2313.8K                 1391.9K/1375.7K                   2142.8K/2152.2K               1395.5K/1374.2K
+
+Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+---
+ block/blk-mq-cpumap.c |   68 ++++++++++++++++---------------------------------
+ 1 files changed, 22 insertions(+), 46 deletions(-)
+
+diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
+index 8e61e86..2cca4fc 100644
+--- a/block/blk-mq-cpumap.c
++++ b/block/blk-mq-cpumap.c
+@@ -14,10 +14,15 @@
+ #include "blk.h"
+ #include "blk-mq.h"
+ 
+-static int cpu_to_queue_index(unsigned int nr_cpus, unsigned int nr_queues,
+-			      const int cpu)
++static int cpu_to_queue_index(unsigned int nr_queues, const int cpu,
++			      const struct cpumask *online_mask)
+ {
+-	return cpu * nr_queues / nr_cpus;
++	/*
++	 * Non online CPU will be mapped to queue index 0.
++	 */
++	if (!cpumask_test_cpu(cpu, online_mask))
++		return 0;
++	return cpu % nr_queues;
+ }
+ 
+ static int get_first_sibling(unsigned int cpu)
+@@ -36,55 +41,26 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
+ 	unsigned int *map = set->mq_map;
+ 	unsigned int nr_queues = set->nr_hw_queues;
+ 	const struct cpumask *online_mask = cpu_online_mask;
+-	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
+-	cpumask_var_t cpus;
+-
+-	if (!alloc_cpumask_var(&cpus, GFP_ATOMIC))
+-		return -ENOMEM;
+-
+-	cpumask_clear(cpus);
+-	nr_cpus = nr_uniq_cpus = 0;
+-	for_each_cpu(i, online_mask) {
+-		nr_cpus++;
+-		first_sibling = get_first_sibling(i);
+-		if (!cpumask_test_cpu(first_sibling, cpus))
+-			nr_uniq_cpus++;
+-		cpumask_set_cpu(i, cpus);
+-	}
+-
+-	queue = 0;
+-	for_each_possible_cpu(i) {
+-		if (!cpumask_test_cpu(i, online_mask)) {
+-			map[i] = 0;
+-			continue;
+-		}
++	unsigned int cpu, first_sibling;
+ 
++	for_each_possible_cpu(cpu) {
+ 		/*
+-		 * Easy case - we have equal or more hardware queues. Or
+-		 * there are no thread siblings to take into account. Do
+-		 * 1:1 if enough, or sequential mapping if less.
++		 * First do sequential mapping between CPUs and queues.
++		 * In case we still have CPUs to map, and we have some number of
++		 * threads per cores then map sibling threads to the same queue for
++		 * performace optimizations.
+ 		 */
+-		if (nr_queues >= nr_cpus || nr_cpus == nr_uniq_cpus) {
+-			map[i] = cpu_to_queue_index(nr_cpus, nr_queues, queue);
+-			queue++;
+-			continue;
++		if (cpu < nr_queues) {
++			map[cpu] = cpu_to_queue_index(nr_queues, cpu, online_mask);
++		} else {
++			first_sibling = get_first_sibling(cpu);
++			if (first_sibling == cpu)
++				map[cpu] = cpu_to_queue_index(nr_queues, cpu, online_mask);
++			else
++				map[cpu] = map[first_sibling];
+ 		}
+-
+-		/*
+-		 * Less then nr_cpus queues, and we have some number of
+-		 * threads per cores. Map sibling threads to the same
+-		 * queue.
+-		 */
+-		first_sibling = get_first_sibling(i);
+-		if (first_sibling == i) {
+-			map[i] = cpu_to_queue_index(nr_uniq_cpus, nr_queues,
+-							queue);
+-			queue++;
+-		} else
+-			map[i] = map[first_sibling];
+ 	}
+ 
+-	free_cpumask_var(cpus);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_map_queues);
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+1.7.1
