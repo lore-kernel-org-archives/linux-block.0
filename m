@@ -1,28 +1,24 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35020 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751492AbdF1OiP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2017 10:38:15 -0400
-Received: by mail-wm0-f66.google.com with SMTP id 131so11889333wmq.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2017 07:38:15 -0700 (PDT)
+Received: from verein.lst.de ([213.95.11.211]:49670 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751881AbdF1OP0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Jun 2017 10:15:26 -0400
+Date: Wed, 28 Jun 2017 16:15:24 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Max Gurtovoy <maxg@mellanox.com>
+Cc: axboe@fb.com, hch@lst.de, sagi@grimberg.me, bvanassche@acm.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        vladimirk@mellanox.com
 Subject: Re: [PATCH 1/1] blk-mq: map all HWQ also in hyperthreaded system
-To: Max Gurtovoy <maxg@mellanox.com>, axboe@fb.com, hch@lst.de,
-        bvanassche@acm.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Cc: vladimirk@mellanox.com
+Message-ID: <20170628141524.GA1894@lst.de>
 References: <1498653880-29223-1-git-send-email-maxg@mellanox.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <37fea86b-ce87-ac03-e465-5daf62a456c4@grimberg.me>
-Date: Wed, 28 Jun 2017 17:38:12 +0300
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1498653880-29223-1-git-send-email-maxg@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Max,
-
+On Wed, Jun 28, 2017 at 03:44:40PM +0300, Max Gurtovoy wrote:
 > This patch performs sequential mapping between CPUs and queues.
 > In case the system has more CPUs than HWQs then there are still
 > CPUs to map to HWQs. In hyperthreaded system, map the unmapped CPUs
@@ -30,18 +26,9 @@ Hi Max,
 > This actually fixes a bug that found unmapped HWQs in a system with
 > 2 sockets, 18 cores per socket, 2 threads per core (total 72 CPUs)
 > running NVMEoF (opens upto maximum of 64 HWQs).
+> 
+> Performance results running fio (72 jobs, 128 iodepth)
+> using null_blk (w/w.o patch):
 
-The explanation can be a bit clearer...
-
-I still need to take a look at the patch itself, but do note that
-ideally we will never get to blk_mq_map_queues since we prefer
-to map queues based on MSIX assignments. for nvme-rdma, this is
-merely a fallback. And looking ahead, MSIX based mapping should
-be the primary mapping logic.
-
-Can you please test with my patchset on converting nvme-rdma to
-MSIX based mapping (I assume you are testing with mlx5 yes)?
-I'd be very much interested to know if the original problem
-exists with this applied.
-
-I'll take a closer look into the patch.
+Can you also tests with Sagi's series to use the proper IRQ
+level mapping?
