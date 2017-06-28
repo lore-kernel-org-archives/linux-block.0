@@ -1,19 +1,24 @@
-Return-Path: <bcache@lists.ewheeler.net>
-From: bcache@lists.ewheeler.net
-To: linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org,
-	hch@infradead.org,
-	axboe@kernel.dk,
-	Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 13/19] bcache: delete redundant calling set_gc_sectors()
-Date: Fri, 30 Jun 2017 13:43:02 -0700
-Message-Id: <1498855388-16990-13-git-send-email-bcache@lists.ewheeler.net>
-In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:44957 "EHLO
+        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752408AbdF3KVP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 06:21:15 -0400
+Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
+        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id 7DB6F3E56A1
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:09 -0700 (PDT)
+Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
+        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 4A0F9B400C4
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+In-Reply-To: <20170629134510.GA32385@infradead.org>
 References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
-List-ID: <linux-block@vger.kernel.org>
-
 From: Tang Junhui <tang.junhui@zte.com.cn>
+Date: Tue, 27 Jun 2017 17:30:39 -0700
+Subject: [PATCH 13/19] bcache: delete redundant calling set_gc_sectors()
+To: linux-block@vger.kernel.org
+Message-Id: <20170629222108.417DE100126@ware.dreamhost.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 set_gc_sectors() has been called in bch_gc_thread(), and it was called
 again in bch_btree_gc_finish() . The following call is unnecessary, so
