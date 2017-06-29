@@ -1,85 +1,339 @@
-Return-Path: <BATV+65e7e9a0a5a64ea7fcea+5059+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: viro@zeniv.linux.org.uk,
-	axboe@kernel.dk
-Cc: Milosz Tanski <milosz@adfin.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>,
-	mgorman@suse.de,
-	Volker.Lendecke@sernet.de,
+Return-Path: <jlayton@kernel.org>
+From: jlayton@kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Liu Bo <bo.li.liu@oracle.com>,
 	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 1/3] fs: pass iocb to do_generic_file_read
-Date: Fri, 30 Jun 2017 11:15:19 -0700
-Message-Id: <20170630181521.29148-2-hch@lst.de>
-In-Reply-To: <20170630181521.29148-1-hch@lst.de>
-References: <20170630181521.29148-1-hch@lst.de>
+Subject: [PATCH v8 09/18] lib: add errseq_t type and infrastructure for handling it
+Date: Thu, 29 Jun 2017 09:19:45 -0400
+Message-Id: <20170629131954.28733-10-jlayton@kernel.org>
+In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
+References: <20170629131954.28733-1-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-And rename it to the more descriptive generic_file_buffered_read while
-at it.
+From: Jeff Layton <jlayton@redhat.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+An errseq_t is a way of recording errors in one place, and allowing any
+number of "subscribers" to tell whether an error has been set again
+since a previous time.
+
+It's implemented as an unsigned 32-bit value that is managed with atomic
+operations. The low order bits are designated to hold an error code
+(max size of MAX_ERRNO). The upper bits are used as a counter.
+
+The API works with consumers sampling an errseq_t value at a particular
+point in time. Later, that value can be used to tell whether new errors
+have been set since that time.
+
+Note that there is a 1 in 512k risk of collisions here if new errors
+are being recorded frequently, since we have so few bits to use as a
+counter. To mitigate this, one bit is used as a flag to tell whether the
+value has been sampled since a new value was recorded. That allows
+us to avoid bumping the counter if no one has sampled it since it
+was last bumped.
+
+Later patches will build on this infrastructure to change how writeback
+errors are tracked in the kernel.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: NeilBrown <neilb@suse.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- mm/filemap.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ MAINTAINERS            |   6 ++
+ include/linux/errseq.h |  19 +++++
+ lib/Makefile           |   2 +-
+ lib/errseq.c           | 208 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 234 insertions(+), 1 deletion(-)
+ create mode 100644 include/linux/errseq.h
+ create mode 100644 lib/errseq.c
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 742034e56100..3df0a57cd48e 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1792,9 +1792,8 @@ static void shrink_readahead_size_eio(struct file *filp,
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9e984645c4b0..c2465dc21946 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4999,6 +4999,12 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kristoffer/linux-hpc.git
+ F:	drivers/video/fbdev/s1d13xxxfb.c
+ F:	include/video/s1d13xxxfb.h
  
- /**
-- * do_generic_file_read - generic file read routine
-- * @filp:	the file to read
-- * @ppos:	current file position
-+ * generic_file_buffered_read - generic file read routine
-+ * @iocb:	the iocb to read
-  * @iter:	data destination
-  * @written:	already copied
-  *
-@@ -1804,12 +1803,14 @@ static void shrink_readahead_size_eio(struct file *filp,
-  * This is really ugly. But the goto's actually try to clarify some
-  * of the logic when it comes to error handling etc.
-  */
--static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
-+static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 		struct iov_iter *iter, ssize_t written)
- {
-+	struct file *filp = iocb->ki_filp;
- 	struct address_space *mapping = filp->f_mapping;
- 	struct inode *inode = mapping->host;
- 	struct file_ra_state *ra = &filp->f_ra;
-+	loff_t *ppos = &iocb->ki_pos;
- 	pgoff_t index;
- 	pgoff_t last_index;
- 	pgoff_t prev_index;
-@@ -2057,14 +2058,14 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
- ssize_t
- generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- {
--	struct file *file = iocb->ki_filp;
--	ssize_t retval = 0;
- 	size_t count = iov_iter_count(iter);
-+	ssize_t retval = 0;
- 
- 	if (!count)
- 		goto out; /* skip atime */
- 
- 	if (iocb->ki_flags & IOCB_DIRECT) {
-+		struct file *file = iocb->ki_filp;
- 		struct address_space *mapping = file->f_mapping;
- 		struct inode *inode = mapping->host;
- 		loff_t size;
-@@ -2105,7 +2106,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 			goto out;
- 	}
- 
--	retval = do_generic_file_read(file, &iocb->ki_pos, iter, retval);
-+	retval = generic_file_buffered_read(iocb, iter, retval);
- out:
- 	return retval;
- }
++ERRSEQ ERROR TRACKING INFRASTRUCTURE
++M:	Jeff Layton <jlayton@poochiereds.net>
++S:	Maintained
++F:	lib/errseq.c
++F:	include/linux/errseq.h
++
+ ET131X NETWORK DRIVER
+ M:	Mark Einon <mark.einon@gmail.com>
+ S:	Odd Fixes
+diff --git a/include/linux/errseq.h b/include/linux/errseq.h
+new file mode 100644
+index 000000000000..9e0d444ac88d
+--- /dev/null
++++ b/include/linux/errseq.h
+@@ -0,0 +1,19 @@
++#ifndef _LINUX_ERRSEQ_H
++#define _LINUX_ERRSEQ_H
++
++/* See lib/errseq.c for more info */
++
++typedef u32	errseq_t;
++
++errseq_t __errseq_set(errseq_t *eseq, int err);
++static inline void errseq_set(errseq_t *eseq, int err)
++{
++	/* Optimize for the common case of no error */
++	if (unlikely(err))
++		__errseq_set(eseq, err);
++}
++
++errseq_t errseq_sample(errseq_t *eseq);
++int errseq_check(errseq_t *eseq, errseq_t since);
++int errseq_check_and_advance(errseq_t *eseq, errseq_t *since);
++#endif
+diff --git a/lib/Makefile b/lib/Makefile
+index 0166fbc0fa81..519782d9ca3f 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -41,7 +41,7 @@ obj-y += bcd.o div64.o sort.o parser.o debug_locks.o random32.o \
+ 	 gcd.o lcm.o list_sort.o uuid.o flex_array.o iov_iter.o clz_ctz.o \
+ 	 bsearch.o find_bit.o llist.o memweight.o kfifo.o \
+ 	 percpu-refcount.o percpu_ida.o rhashtable.o reciprocal_div.o \
+-	 once.o refcount.o usercopy.o
++	 once.o refcount.o usercopy.o errseq.o
+ obj-y += string_helpers.o
+ obj-$(CONFIG_TEST_STRING_HELPERS) += test-string_helpers.o
+ obj-y += hexdump.o
+diff --git a/lib/errseq.c b/lib/errseq.c
+new file mode 100644
+index 000000000000..841fa24e6e00
+--- /dev/null
++++ b/lib/errseq.c
+@@ -0,0 +1,208 @@
++#include <linux/err.h>
++#include <linux/bug.h>
++#include <linux/atomic.h>
++#include <linux/errseq.h>
++
++/*
++ * An errseq_t is a way of recording errors in one place, and allowing any
++ * number of "subscribers" to tell whether it has changed since a previous
++ * point where it was sampled.
++ *
++ * It's implemented as an unsigned 32-bit value. The low order bits are
++ * designated to hold an error code (between 0 and -MAX_ERRNO). The upper bits
++ * are used as a counter. This is done with atomics instead of locking so that
++ * these functions can be called from any context.
++ *
++ * The general idea is for consumers to sample an errseq_t value. That value
++ * can later be used to tell whether any new errors have occurred since that
++ * sampling was done.
++ *
++ * Note that there is a risk of collisions if new errors are being recorded
++ * frequently, since we have so few bits to use as a counter.
++ *
++ * To mitigate this, one bit is used as a flag to tell whether the value has
++ * been sampled since a new value was recorded. That allows us to avoid bumping
++ * the counter if no one has sampled it since the last time an error was
++ * recorded.
++ *
++ * A new errseq_t should always be zeroed out.  A errseq_t value of all zeroes
++ * is the special (but common) case where there has never been an error. An all
++ * zero value thus serves as the "epoch" if one wishes to know whether there
++ * has ever been an error set since it was first initialized.
++ */
++
++/* The low bits are designated for error code (max of MAX_ERRNO) */
++#define ERRSEQ_SHIFT		ilog2(MAX_ERRNO + 1)
++
++/* This bit is used as a flag to indicate whether the value has been seen */
++#define ERRSEQ_SEEN		(1 << ERRSEQ_SHIFT)
++
++/* The lowest bit of the counter */
++#define ERRSEQ_CTR_INC		(1 << (ERRSEQ_SHIFT + 1))
++
++/**
++ * __errseq_set - set a errseq_t for later reporting
++ * @eseq: errseq_t field that should be set
++ * @err: error to set
++ *
++ * This function sets the error in *eseq, and increments the sequence counter
++ * if the last sequence was sampled at some point in the past.
++ *
++ * Any error set will always overwrite an existing error.
++ *
++ * Most callers will want to use the errseq_set inline wrapper to efficiently
++ * handle the common case where err is 0.
++ *
++ * We do return an errseq_t here, primarily for debugging purposes. The return
++ * value should not be used as a previously sampled value in later calls as it
++ * will not have the SEEN flag set.
++ */
++errseq_t __errseq_set(errseq_t *eseq, int err)
++{
++	errseq_t cur, old;
++
++	/* MAX_ERRNO must be able to serve as a mask */
++	BUILD_BUG_ON_NOT_POWER_OF_2(MAX_ERRNO + 1);
++
++	/*
++	 * Ensure the error code actually fits where we want it to go. If it
++	 * doesn't then just throw a warning and don't record anything. We
++	 * also don't accept zero here as that would effectively clear a
++	 * previous error.
++	 */
++	old = READ_ONCE(*eseq);
++
++	if (WARN(unlikely(err == 0 || (unsigned int)-err > MAX_ERRNO),
++				"err = %d\n", err))
++		return old;
++
++	for (;;) {
++		errseq_t new;
++
++		/* Clear out error bits and set new error */
++		new = (old & ~(MAX_ERRNO|ERRSEQ_SEEN)) | -err;
++
++		/* Only increment if someone has looked at it */
++		if (old & ERRSEQ_SEEN)
++			new += ERRSEQ_CTR_INC;
++
++		/* If there would be no change, then call it done */
++		if (new == old) {
++			cur = new;
++			break;
++		}
++
++		/* Try to swap the new value into place */
++		cur = cmpxchg(eseq, old, new);
++
++		/*
++		 * Call it success if we did the swap or someone else beat us
++		 * to it for the same value.
++		 */
++		if (likely(cur == old || cur == new))
++			break;
++
++		/* Raced with an update, try again */
++		old = cur;
++	}
++	return cur;
++}
++EXPORT_SYMBOL(__errseq_set);
++
++/**
++ * errseq_sample - grab current errseq_t value
++ * @eseq: pointer to errseq_t to be sampled
++ *
++ * This function allows callers to sample an errseq_t value, marking it as
++ * "seen" if required.
++ */
++errseq_t errseq_sample(errseq_t *eseq)
++{
++	errseq_t old = READ_ONCE(*eseq);
++	errseq_t new = old;
++
++	/*
++	 * For the common case of no errors ever having been set, we can skip
++	 * marking the SEEN bit. Once an error has been set, the value will
++	 * never go back to zero.
++	 */
++	if (old != 0) {
++		new |= ERRSEQ_SEEN;
++		if (old != new)
++			cmpxchg(eseq, old, new);
++	}
++	return new;
++}
++EXPORT_SYMBOL(errseq_sample);
++
++/**
++ * errseq_check - has an error occurred since a particular sample point?
++ * @eseq: pointer to errseq_t value to be checked
++ * @since: previously-sampled errseq_t from which to check
++ *
++ * Grab the value that eseq points to, and see if it has changed "since"
++ * the given value was sampled. The "since" value is not advanced, so there
++ * is no need to mark the value as seen.
++ *
++ * Returns the latest error set in the errseq_t or 0 if it hasn't changed.
++ */
++int errseq_check(errseq_t *eseq, errseq_t since)
++{
++	errseq_t cur = READ_ONCE(*eseq);
++
++	if (likely(cur == since))
++		return 0;
++	return -(cur & MAX_ERRNO);
++}
++EXPORT_SYMBOL(errseq_check);
++
++/**
++ * errseq_check_and_advance - check an errseq_t and advance to current value
++ * @eseq: pointer to value being checked and reported
++ * @since: pointer to previously-sampled errseq_t to check against and advance
++ *
++ * Grab the eseq value, and see whether it matches the value that "since"
++ * points to. If it does, then just return 0.
++ *
++ * If it doesn't, then the value has changed. Set the "seen" flag, and try to
++ * swap it into place as the new eseq value. Then, set that value as the new
++ * "since" value, and return whatever the error portion is set to.
++ *
++ * Note that no locking is provided here for concurrent updates to the "since"
++ * value. The caller must provide that if necessary. Because of this, callers
++ * may want to do a lockless errseq_check before taking the lock and calling
++ * this.
++ */
++int errseq_check_and_advance(errseq_t *eseq, errseq_t *since)
++{
++	int err = 0;
++	errseq_t old, new;
++
++	/*
++	 * Most callers will want to use the inline wrapper to check this,
++	 * so that the common case of no error is handled without needing
++	 * to take the lock that protects the "since" value.
++	 */
++	old = READ_ONCE(*eseq);
++	if (old != *since) {
++		/*
++		 * Set the flag and try to swap it into place if it has
++		 * changed.
++		 *
++		 * We don't care about the outcome of the swap here. If the
++		 * swap doesn't occur, then it has either been updated by a
++		 * writer who is altering the value in some way (updating
++		 * counter or resetting the error), or another reader who is
++		 * just setting the "seen" flag. Either outcome is OK, and we
++		 * can advance "since" and return an error based on what we
++		 * have.
++		 */
++		new = old | ERRSEQ_SEEN;
++		if (new != old)
++			cmpxchg(eseq, old, new);
++		*since = new;
++		err = -(new & MAX_ERRNO);
++	}
++	return err;
++}
++EXPORT_SYMBOL(errseq_check_and_advance);
 -- 
-2.11.0
+2.13.0
