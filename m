@@ -1,44 +1,71 @@
-Return-Path: <arvind.yadav.cs@gmail.com>
-Return-Path: <arvind.yadav.cs@gmail.com>
-From: Arvind Yadav <arvind.yadav.cs@gmail.com>
-To: axboe@kernel.dk,
-	axboe@fb.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: constify attribute_group structures.
-Date: Fri, 30 Jun 2017 15:36:27 +0530
-Message-Id: <2e7b0369e63edbd7819bdddd0ddb431260e8195a.1498816266.git.arvind.yadav.cs@gmail.com>
+Return-Path: <jlayton@kernel.org>
+From: jlayton@kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Liu Bo <bo.li.liu@oracle.com>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v8 06/18] mm: clear AS_EIO/AS_ENOSPC when writeback initiation fails
+Date: Thu, 29 Jun 2017 09:19:42 -0400
+Message-Id: <20170629131954.28733-7-jlayton@kernel.org>
+In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
+References: <20170629131954.28733-1-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-attribute_groups are not supposed to change at runtime. All functions
-working with attribute_groups provided by <linux/sysfs.h> work with const
-attribute_group. So mark the non-const structs as const.
+From: Jeff Layton <jlayton@redhat.com>
 
-File size before:
-   text	   data	    bss	    dec	    hex	filename
-  11622	    912	   2076	  14610	   3912	block/genhd.o
+filemap_write_and_wait{_range} will return an error if writeback
+initiation fails, but won't clear errors in the address_space. This is
+particularly problematic on DAX, as it's effectively synchronous. Ensure
+that we clear the AS_EIO/AS_ENOSPC flags when filemap_fdatawrite returns
+an error.
 
-File size After adding 'const':
-   text	   data	    bss	    dec	    hex	filename
-  11686	    848	   2076	  14610	   3912	block/genhd.o
-
-Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ mm/filemap.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index d252d29..be42e4a 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1071,7 +1071,7 @@ static umode_t disk_visible(struct kobject *kobj, struct attribute *a, int n)
- 	return a->mode;
- }
- 
--static struct attribute_group disk_attr_group = {
-+static const struct attribute_group disk_attr_group = {
- 	.attrs = disk_attrs,
- 	.is_visible = disk_visible,
- };
+diff --git a/mm/filemap.c b/mm/filemap.c
+index e5711b2728f4..49bc9720fb00 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -515,6 +515,9 @@ int filemap_write_and_wait(struct address_space *mapping)
+ 			int err2 = filemap_fdatawait(mapping);
+ 			if (!err)
+ 				err = err2;
++		} else {
++			/* Clear any previously stored errors */
++			filemap_check_errors(mapping);
+ 		}
+ 	} else {
+ 		err = filemap_check_errors(mapping);
+@@ -549,6 +552,9 @@ int filemap_write_and_wait_range(struct address_space *mapping,
+ 						lstart, lend);
+ 			if (!err)
+ 				err = err2;
++		} else {
++			/* Clear any previously stored errors */
++			filemap_check_errors(mapping);
+ 		}
+ 	} else {
+ 		err = filemap_check_errors(mapping);
 -- 
-1.9.1
+2.13.0
