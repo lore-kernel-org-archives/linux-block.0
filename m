@@ -1,64 +1,86 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/9] fs: add O_DIRECT support for sending down write life time hints
-Date: Tue, 20 Jun 2017 18:22:01 -0600
-Message-Id: <1498004526-4543-5-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
-References: <1498004526-4543-1-git-send-email-axboe@kernel.dk>
+Return-Path: <jlayton@poochiereds.net>
+Return-Path: <jlayton@poochiereds.net>
+Message-ID: <1498768325.5710.6.camel@poochiereds.net>
+Subject: Re: [PATCH v8 18/18] btrfs: minimal conversion to errseq_t
+ writeback error reporting on fsync
+From: Jeff Layton <jlayton@poochiereds.net>
+To: Christoph Hellwig <hch@infradead.org>, jlayton@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
+ Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>, Liu Bo
+ <bo.li.liu@oracle.com>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Date: Thu, 29 Jun 2017 16:32:05 -0400
+In-Reply-To: <20170629141741.GC17251@infradead.org>
+References: <20170629131954.28733-1-jlayton@kernel.org>
+	 <20170629131954.28733-19-jlayton@kernel.org>
+	 <20170629141741.GC17251@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/block_dev.c | 2 ++
- fs/direct-io.c | 2 ++
- fs/iomap.c     | 1 +
- 3 files changed, 5 insertions(+)
+On Thu, 2017-06-29 at 07:17 -0700, Christoph Hellwig wrote:
+> On Thu, Jun 29, 2017 at 09:19:54AM -0400, jlayton@kernel.org wrote:
+> > From: Jeff Layton <jlayton@redhat.com>
+> > 
+> > Just check and advance the errseq_t in the file before returning.
+> > Internal callers of filemap_* functions are left as-is.
+> > 
+> > Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> > ---
+> >  fs/btrfs/file.c | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+> > index da1096eb1a40..1f57e1a523d9 100644
+> > --- a/fs/btrfs/file.c
+> > +++ b/fs/btrfs/file.c
+> > @@ -2011,7 +2011,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+> >  	struct btrfs_root *root = BTRFS_I(inode)->root;
+> >  	struct btrfs_trans_handle *trans;
+> >  	struct btrfs_log_ctx ctx;
+> > -	int ret = 0;
+> > +	int ret = 0, err;
+> >  	bool full_sync = 0;
+> >  	u64 len;
+> >  
+> > @@ -2030,7 +2030,7 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+> >  	 */
+> >  	ret = start_ordered_ops(inode, start, end);
+> >  	if (ret)
+> > -		return ret;
+> > +		goto out;
+> >  
+> >  	inode_lock(inode);
+> >  	atomic_inc(&root->log_batch);
+> > @@ -2227,6 +2227,9 @@ int btrfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+> >  		ret = btrfs_end_transaction(trans);
+> >  	}
+> >  out:
+> > +	err = file_check_and_advance_wb_err(file);
+> > +	if (!ret)
+> > +		ret = err;
+> >  	return ret > 0 ? -EIO : ret;
+> 
+> This means that we'll lose the exact error returned from
+> start_ordered_ops.  Beyond that I can't really provide good feedback
+> as the btrfs fsync code looks so much different from all the other
+> fs fsync code..
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index dd91c99e9ba0..30e1fb65c2fa 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -183,6 +183,8 @@ static unsigned int dio_bio_write_op(struct kiocb *iocb)
- 	/* avoid the need for a I/O completion work item */
- 	if (iocb->ki_flags & IOCB_DSYNC)
- 		op |= REQ_FUA;
-+
-+	op |= write_hint_to_opf(iocb_write_hint(iocb));
- 	return op;
- }
- 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index c87077d1dc33..5fea570551e5 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -385,6 +385,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 	else
- 		bio->bi_end_io = dio_bio_end_io;
- 
-+	bio->bi_opf |= write_hint_to_opf(iocb_write_hint(dio->iocb));
-+
- 	sdio->bio = bio;
- 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index c71a64b97fba..9c9f8406018b 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -804,6 +804,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 
- 		if (dio->flags & IOMAP_DIO_WRITE) {
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+			bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		} else {
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
+Well, no...we'll keep the error from start_ordered_ops if there was one.
+ We just advance the cursor past any stored error in that case without
+returning it.
+
+I have another fix for this patch too: there's a call to
+filemap_check_errors in this function that I think should probably use
+filemap_check_wb_err instead. Fixed in my tree.
+
+I do agree though that while this works in my testing I'd like the btrfs
+guys to ACK this as I don't fully grok the btrfs fsync code at all.
 -- 
-2.7.4
+Jeff Layton <jlayton@poochiereds.net>
