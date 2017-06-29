@@ -23,9 +23,9 @@ Cc: Carlos Maiolino <cmaiolino@redhat.com>,
 	linux-xfs@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v8 15/18] fs: convert __generic_file_fsync to use errseq_t based reporting
-Date: Thu, 29 Jun 2017 09:19:51 -0400
-Message-Id: <20170629131954.28733-16-jlayton@kernel.org>
+Subject: [PATCH v8 02/18] buffer: use mapping_set_error instead of setting the flag
+Date: Thu, 29 Jun 2017 09:19:38 -0400
+Message-Id: <20170629131954.28733-3-jlayton@kernel.org>
 In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
 References: <20170629131954.28733-1-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
@@ -33,36 +33,25 @@ List-ID: <linux-block@vger.kernel.org>
 From: Jeff Layton <jlayton@redhat.com>
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/libfs.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ fs/buffer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/libfs.c b/fs/libfs.c
-index 1dec90819366..3aabe553fc45 100644
---- a/fs/libfs.c
-+++ b/fs/libfs.c
-@@ -974,7 +974,7 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
- 	int err;
- 	int ret;
- 
--	err = filemap_write_and_wait_range(inode->i_mapping, start, end);
-+	err = file_write_and_wait_range(file, start, end);
- 	if (err)
- 		return err;
- 
-@@ -991,8 +991,11 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
- 
- out:
- 	inode_unlock(inode);
--	err = filemap_check_errors(inode->i_mapping);
--	return ret ? ret : err;
-+	/* check and advance again to catch errors after syncing out buffers */
-+	err = file_check_and_advance_wb_err(file);
-+	if (ret == 0)
-+		ret = err;
-+	return ret;
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 161be58c5cb0..4be8b914a222 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -482,7 +482,7 @@ static void __remove_assoc_queue(struct buffer_head *bh)
+ 	list_del_init(&bh->b_assoc_buffers);
+ 	WARN_ON(!bh->b_assoc_map);
+ 	if (buffer_write_io_error(bh))
+-		set_bit(AS_EIO, &bh->b_assoc_map->flags);
++		mapping_set_error(bh->b_assoc_map, -EIO);
+ 	bh->b_assoc_map = NULL;
  }
- EXPORT_SYMBOL(__generic_file_fsync);
  
 -- 
 2.13.0
