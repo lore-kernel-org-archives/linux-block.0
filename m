@@ -1,13 +1,10 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:38537 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753565AbdF2PgY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2017 11:36:24 -0400
-Received: by mail-wm0-f51.google.com with SMTP id b184so18900655wme.1
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 08:36:24 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:56333 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753475AbdF2Pbq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jun 2017 11:31:46 -0400
 Subject: Re: raid0 vs. mkfs
-To: Coly Li <colyli@suse.de>, Shaohua Li <shli@kernel.org>
+To: Avi Kivity <avi@scylladb.com>, Shaohua Li <shli@kernel.org>
 Cc: NeilBrown <neilb@suse.com>, linux-raid@vger.kernel.org,
         linux-block@vger.kernel.org
 References: <56c83c4e-d451-07e5-88e2-40b085d8681c@scylladb.com>
@@ -21,58 +18,56 @@ References: <56c83c4e-d451-07e5-88e2-40b085d8681c@scylladb.com>
  <20161207165933.isq64dbkxye772nz@kernel.org>
  <c384d070-457c-cfee-e35f-53b9195ace10@suse.de>
  <eeae1d04-8c92-c511-8977-5124735646c4@scylladb.com>
- <9a46c760-904a-8318-b06c-0cf19e0651dc@suse.de>
-From: Avi Kivity <avi@scylladb.com>
-Message-ID: <9a513fa3-8b5e-fb64-8b4f-c86dcb38f6f4@scylladb.com>
-Date: Thu, 29 Jun 2017 18:36:19 +0300
+From: Coly Li <colyli@suse.de>
+Message-ID: <9a46c760-904a-8318-b06c-0cf19e0651dc@suse.de>
+Date: Thu, 29 Jun 2017 23:31:38 +0800
 MIME-Version: 1.0
-In-Reply-To: <9a46c760-904a-8318-b06c-0cf19e0651dc@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <eeae1d04-8c92-c511-8977-5124735646c4@scylladb.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
-
-On 06/29/2017 06:31 PM, Coly Li wrote:
-> On 2017/6/29 下午11:15, Avi Kivity wrote:
+On 2017/6/29 下午11:15, Avi Kivity wrote:
+> 
+> 
+> On 12/08/2016 06:44 PM, Coly Li wrote:
+>> On 2016/12/8 上午12:59, Shaohua Li wrote:
+>>> On Wed, Dec 07, 2016 at 07:50:33PM +0800, Coly Li wrote:
+>> [snip]
+>>> Thanks for doing this, Coly! For raid0, this totally makes sense. The
+>>> raid0
+>>> zones make things a little complicated though. I just had a brief
+>>> look of your
+>>> proposed patch, which looks really complicated. I'd suggest something
+>>> like
+>>> this:
+>>> 1. split the bio according to zone boundary.
+>>> 2. handle the splitted bio. since the bio is within zone range,
+>>> calculating
+>>> the start and end sector for each rdev should be easy.
+>>>
+>> Hi Shaohua,
 >>
->> On 12/08/2016 06:44 PM, Coly Li wrote:
->>> On 2016/12/8 上午12:59, Shaohua Li wrote:
->>>> On Wed, Dec 07, 2016 at 07:50:33PM +0800, Coly Li wrote:
->>> [snip]
->>>> Thanks for doing this, Coly! For raid0, this totally makes sense. The
->>>> raid0
->>>> zones make things a little complicated though. I just had a brief
->>>> look of your
->>>> proposed patch, which looks really complicated. I'd suggest something
->>>> like
->>>> this:
->>>> 1. split the bio according to zone boundary.
->>>> 2. handle the splitted bio. since the bio is within zone range,
->>>> calculating
->>>> the start and end sector for each rdev should be easy.
->>>>
->>> Hi Shaohua,
->>>
->>> Thanks for your suggestion! I try to modify the code by your suggestion,
->>> it is even more hard to make the code that way ...
->>>
->>> Because even split bios for each zone, all the corner cases still exist
->>> and should be taken care in every zoon. The code will be more
->>> complicated.
->>>
->> Hi Coly,
+>> Thanks for your suggestion! I try to modify the code by your suggestion,
+>> it is even more hard to make the code that way ...
 >>
->> Did you manage to complete this patch? We are seeing its effect, not
->> only with mkfs, but also with fstrim(8).
-> Hi Avi,
->
-> Shaohua makes another much better patch, which is merged into mainline
-> kernel in v4.12-rc2.
->
-> The commit is '29efc390b946 ("md/md0: optimize raid0 discard handling")'.
->
-> Hope this is informative.
->
+>> Because even split bios for each zone, all the corner cases still exist
+>> and should be taken care in every zoon. The code will be more
+>> complicated.
+>>
+> 
+> Hi Coly,
+> 
+> Did you manage to complete this patch? We are seeing its effect, not
+> only with mkfs, but also with fstrim(8).
 
-Thanks a lot, that's great news.
+Hi Avi,
+
+Shaohua makes another much better patch, which is merged into mainline
+kernel in v4.12-rc2.
+
+The commit is '29efc390b946 ("md/md0: optimize raid0 discard handling")'.
+
+Hope this is informative.
+
+Coly
