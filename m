@@ -1,75 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:52192 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753176AbdFRPWf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 11:22:35 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH rfc 18/30] nvme-rdma: limit max_queues to rdma device number of completion vectors
-Date: Sun, 18 Jun 2017 18:21:52 +0300
-Message-Id: <1497799324-19598-19-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <elena.reshetova@intel.com>
+From: "Reshetova, Elena" <elena.reshetova@intel.com>
+To: Jens Axboe <axboe@kernel.dk>, Kees Cook <keescook@chromium.org>
+CC: James Bottomley <james.bottomley@hansenpartnership.com>, LKML
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, Linux Btrfs <linux-btrfs@vger.kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>, Greg KH <gregkh@linuxfoundation.org>,
+	"fujita.tomonori@lab.ntt.co.jp" <fujita.tomonori@lab.ntt.co.jp>, Ingo Molnar
+	<mingo@redhat.com>, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>
+Subject: RE: [PATCH 0/5] v3 block subsystem refcounter conversions
+Date: Thu, 29 Jun 2017 07:38:04 +0000
+Message-ID: <2236FBA76BA1254E88B949DDB74E612B6FF1F012@IRSMSX102.ger.corp.intel.com>
+References: <1498563601-10949-1-git-send-email-elena.reshetova@intel.com>
+ <cbbb6a1f-3203-9523-f47b-227fd646fd29@kernel.dk>
+ <CAGXu5jJeTAoy1mh1qy0reP_H=u8D86AN=Aj7G6k2cafz76+8NA@mail.gmail.com>
+ <2236FBA76BA1254E88B949DDB74E612B6FF1DA36@IRSMSX102.ger.corp.intel.com>
+ <22e0adc4-3c02-e1f8-9017-213b50fdb8a8@kernel.dk>
+In-Reply-To: <22e0adc4-3c02-e1f8-9017-213b50fdb8a8@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-nvme_rdma_alloc_io_queues is heading to generic code, we want
-to decouple its dependency from the various transports.
-
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 7f4b66cf67cc..ce63dd40e6b4 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -625,6 +625,14 @@ static int nvme_rdma_alloc_queue(struct nvme_rdma_ctrl *ctrl,
- 		ctrl->ctrl.max_hw_sectors =
- 			(ctrl->max_fr_pages - 1) << (PAGE_SHIFT - 9);
- 
-+		/*
-+		 * we map queues according to the device irq vectors for
-+		 * optimal locality so we don't need more queues than
-+		 * completion vectors.
-+		 */
-+		ctrl->ctrl.max_queues = min_t(u32, ctrl->ctrl.max_queues,
-+				ctrl->device->dev->num_comp_vectors + 1);
-+
- 		ret = nvme_rdma_alloc_qe(ctrl->queues[0].device->dev,
- 			&ctrl->async_event_sqe, sizeof(struct nvme_command),
- 			DMA_TO_DEVICE);
-@@ -632,7 +640,6 @@ static int nvme_rdma_alloc_queue(struct nvme_rdma_ctrl *ctrl,
- 			nvme_rdma_destroy_queue_ib(&ctrl->queues[0]);
- 			goto out_destroy_cm_id;
- 		}
--
- 	}
- 
- 	clear_bit(NVME_RDMA_Q_DELETING, &queue->flags);
-@@ -733,18 +740,9 @@ static int nvme_rdma_start_io_queues(struct nvme_rdma_ctrl *ctrl)
- static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
- 	unsigned int nr_io_queues = ctrl->ctrl.max_queues - 1;
--	struct ib_device *ibdev = ctrl->device->dev;
- 	int i, ret;
- 
- 	nr_io_queues = min(nr_io_queues, num_online_cpus());
--	/*
--	 * we map queues according to the device irq vectors for
--	 * optimal locality so we don't need more queues than
--	 * completion vectors.
--	 */
--	nr_io_queues = min_t(unsigned int, nr_io_queues,
--				ibdev->num_comp_vectors);
--
- 	ret = nvme_set_queue_count(&ctrl->ctrl, &nr_io_queues);
- 	if (ret)
- 		return ret;
--- 
-2.7.4
+DQo+IE9uIDA2LzI4LzIwMTcgMDU6NTggQU0sIFJlc2hldG92YSwgRWxlbmEgd3JvdGU6DQo+ID4N
+Cj4gPj4gU3ViamVjdDogUmU6IFtQQVRDSCAwLzVdIHYzIGJsb2NrIHN1YnN5c3RlbSByZWZjb3Vu
+dGVyIGNvbnZlcnNpb25zDQo+ID4+DQo+ID4+IE9uIFR1ZSwgSnVuIDI3LCAyMDE3IGF0IDY6MjYg
+QU0sIEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4gd3JvdGU6DQo+ID4+PiBPbiAwNi8yNy8y
+MDE3IDA1OjM5IEFNLCBFbGVuYSBSZXNoZXRvdmEgd3JvdGU6DQo+ID4+Pj4gQ2hhbmdlcyBpbiB2
+MzoNCj4gPj4+PiBObyBjaGFuZ2VzIGluIHBhdGNoZXMgYXBhcnQgZnJvbSB0cml2aWFsIHJlYmFz
+ZXMsIGJ1dCBub3cgYnkNCj4gPj4+PiBkZWZhdWx0IHJlZmNvdW50X3QgPSBhdG9taWNfdCBhbmQg
+dXNlcyBhbGwgYXRvbWljIHN0YW5kYXJkIG9wZXJhdGlvbnMNCj4gPj4+PiB1bmxlc3MgQ09ORklH
+X1JFRkNPVU5UX0ZVTEwgaXMgZW5hYmxlZC4gVGhpcyBpcyBhIGNvbXByb21pemUgZm9yIHRoZQ0K
+PiA+Pj4+IHN5c3RlbXMgdGhhdCBhcmUgY3JpdGljYWwgb24gcGVyZm9ybWFuY2UgYW5kIGNhbm5v
+dCBhY2NlcHQgZXZlbg0KPiA+Pj4+IHNsaWdodCBkZWxheSBvbiB0aGUgcmVmY291bnRlciBvcGVy
+YXRpb25zLg0KPiA+Pj4NCj4gPj4+IElzIHRoYXQgdHJ1ZSBpbiA0LjEyLXJjLCBvciBpcyB0aGF0
+IHRydWUgaW4gYSBsYXRlciByZWxlYXNlIG9uY2UNCj4gPj4+IExpbnVzIGhhcyBwdWxsZWQgdGhv
+c2UgY2hhbmdlcyBpbj8gSWYgdGhlIGxhdHRlciwgcGxlYXNlIHJlc2VuZA0KPiA+Pj4gdGhpcyB3
+aGVuIHRob3NlIGNoYW5nZXMgYXJlIGluLCB0aGFua3MuDQo+ID4+DQo+ID4+IEl0J3MgaW4gLW5l
+eHQgY3VycmVudGx5ICgibG9ja2luZy9yZWZjb3VudDogQ3JlYXRlIHVuY2hlY2tlZCBhdG9taWNf
+dA0KPiA+PiBpbXBsZW1lbnRhdGlvbiIpDQo+ID4NCj4gPiBJIHdvdWxkIHJlYWxseSBsaWtlIHRv
+IHN0YXJ0IGRpc2N1c3Npb24gb24gdGhlIHRoZXNlIHBhdGNoZXMgYXNhcA0KPiA+IHNpbmNlIGl0
+IG5vcm1hbGx5IHRha2VzIHNvbWUgYWRqdXN0bWVudHMgZXRjLiBiZWZvcmUgdGhleSBjYW4gYmUN
+Cj4gPiBtZXJnZWQgYW5kIHdlIHdhbnQgbWFueSBjaGFuZ2VzIHRvIGdvIGludG8gbmV4dCByZWxl
+YXNlIHJvdW5kIGFuZCBub3QNCj4gPiB0byBtaXNzIHRoZSBtZXJnZSB3aW5kb3cuDQo+IA0KPiBB
+cyBmYXIgYXMgSSdtIGNvbmNlcm5lZCwgdGhlcmUncyBubyBuZWVkIGZvciBhIGRpc2N1c3Npb24g
+b24gdGhlc2UuIElmDQo+IHRoZSBvdGhlciBwYXRjaGVzIGdvIGluIHRvIG1ha2UgaXQgYXMgbGln
+aHQgd2VpZ2h0IGFzIHdoYXQgd2UgY3VycmVudGx5DQo+IGhhdmUsIHRoZW4gSSdtIGZpbmUgd2l0
+aCBpdC4gSSBjYW4gcXVldWUgaXQgdXAgZm9yIHBvc3QgaW5pdGlhbCBtZXJnZQ0KPiBzdWJtaXNz
+aW9uLg0KDQpPaywgZmFpciBlbm91Z2guIFRoYW5rIHlvdSB2ZXJ5IG11Y2ghDQoNCkJlc3QgUmVn
+YXJkcywNCkVsZW5hLg0KDQo+IA0KPiAtLQ0KPiBKZW5zIEF4Ym9lDQoNCg==
