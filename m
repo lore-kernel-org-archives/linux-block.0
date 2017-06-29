@@ -1,43 +1,63 @@
-Return-Path: <jlayton@redhat.com>
-Return-Path: <jlayton@redhat.com>
-Message-ID: <1498841154.4689.1.camel@redhat.com>
+Return-Path: <darrick.wong@oracle.com>
+Date: Thu, 29 Jun 2017 10:13:26 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: jlayton@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
+        ross.zwisler@linux.intel.com, corbet@lwn.net, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        Carlos Maiolino <cmaiolino@redhat.com>, Eryu Guan <eguan@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>, Liu Bo <bo.li.liu@oracle.com>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH v8 17/18] xfs: minimal conversion to errseq_t writeback
  error reporting
-From: Jeff Layton <jlayton@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>, jlayton@kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
- <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
- axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
- corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
- David Sterba <dsterba@suse.com>, "Darrick J . Wong"
- <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
- Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>, Liu Bo
- <bo.li.liu@oracle.com>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
-Date: Fri, 30 Jun 2017 12:45:54 -0400
-In-Reply-To: <20170629141235.GB17251@infradead.org>
+Message-ID: <20170629171326.GF5874@birch.djwong.org>
 References: <20170629131954.28733-1-jlayton@kernel.org>
-	 <20170629131954.28733-18-jlayton@kernel.org>
-	 <20170629141235.GB17251@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <20170629131954.28733-18-jlayton@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170629131954.28733-18-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-06-29 at 07:12 -0700, Christoph Hellwig wrote:
-> Nice and simple, this looks great!
+On Thu, Jun 29, 2017 at 09:19:53AM -0400, jlayton@kernel.org wrote:
+> From: Jeff Layton <jlayton@redhat.com>
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Just check and advance the data errseq_t in struct file before
+> before returning from fsync on normal files. Internal filemap_*
+> callers are left as-is.
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Thanks! I think this turned out to be a lot cleaner too.
+Looks ok,
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 
-For filesystems that use filemap_write_and_wait_range today this now
-becomes a pretty straight conversion to file_write_and_wait_range -- one
-liner patches for the most part.
+--D
 
-I've started rolling patches to do that, but now I'm wondering...
-
-Should I aim to do that with an individual patch for each fs, or is it
-better to do a swath of them all at once in a single patch here?
--- 
-Jeff Layton <jlayton@redhat.com>
+> ---
+>  fs/xfs/xfs_file.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> index 5fb5a0958a14..6600b264b0b6 100644
+> --- a/fs/xfs/xfs_file.c
+> +++ b/fs/xfs/xfs_file.c
+> @@ -140,7 +140,7 @@ xfs_file_fsync(
+>  
+>  	trace_xfs_file_fsync(ip);
+>  
+> -	error = filemap_write_and_wait_range(inode->i_mapping, start, end);
+> +	error = file_write_and_wait_range(file, start, end);
+>  	if (error)
+>  		return error;
+>  
+> -- 
+> 2.13.0
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-xfs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
