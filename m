@@ -1,100 +1,89 @@
-Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Shaohua Li <shli@kernel.org>,
+Return-Path: <jlayton@kernel.org>
+From: jlayton@kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Liu Bo <bo.li.liu@oracle.com>,
 	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 8/9] bio-integrity: Restore original iterator on verify stage
-Date: Thu, 29 Jun 2017 11:31:15 -0700
-Message-Id: <20170629183116.28685-9-hch@lst.de>
-In-Reply-To: <20170629183116.28685-1-hch@lst.de>
-References: <20170629183116.28685-1-hch@lst.de>
+Subject: [PATCH v8 01/18] fs: remove call_fsync helper function
+Date: Thu, 29 Jun 2017 09:19:37 -0400
+Message-Id: <20170629131954.28733-2-jlayton@kernel.org>
+In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
+References: <20170629131954.28733-1-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dmitry Monakhov <dmonakhov@openvz.org>
+From: Jeff Layton <jlayton@redhat.com>
 
-Currently ->verify_fn not woks at all because at the moment it is called
-bio->bi_iter.bi_size == 0, so we do not iterate integrity bvecs at all.
-
-In order to perform verification we need to know original data vector,
-with new bvec rewind API this is trivial.
-
-testcase: https://github.com/dmonakhov/xfstests/commit/3c6509eaa83b9c17cd0bc95d73fcdd76e1c54a85
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-[hch: adopted for new status values]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- block/bio-integrity.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ fs/sync.c          | 2 +-
+ include/linux/fs.h | 6 ------
+ ipc/shm.c          | 2 +-
+ 3 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 44c4c52681c2..8df4eb103ba9 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -184,10 +184,11 @@ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
- /**
-  * bio_integrity_process - Process integrity metadata for a bio
-  * @bio:	bio to generate/verify integrity metadata for
-+ * @proc_iter:  iterator to process
-  * @proc_fn:	Pointer to the relevant processing function
-  */
- static blk_status_t bio_integrity_process(struct bio *bio,
--				 integrity_processing_fn *proc_fn)
-+		struct bvec_iter *proc_iter, integrity_processing_fn *proc_fn)
- {
- 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
- 	struct blk_integrity_iter iter;
-@@ -200,10 +201,10 @@ static blk_status_t bio_integrity_process(struct bio *bio,
- 
- 	iter.disk_name = bio->bi_bdev->bd_disk->disk_name;
- 	iter.interval = 1 << bi->interval_exp;
--	iter.seed = bip_get_seed(bip);
-+	iter.seed = proc_iter->bi_sector;
- 	iter.prot_buf = prot_buf;
- 
--	bio_for_each_segment(bv, bio, bviter) {
-+	__bio_for_each_segment(bv, bio, bviter, *proc_iter) {
- 		void *kaddr = kmap_atomic(bv.bv_page);
- 
- 		iter.data_buf = kaddr + bv.bv_offset;
-@@ -332,8 +333,10 @@ bool bio_integrity_prep(struct bio *bio)
+diff --git a/fs/sync.c b/fs/sync.c
+index 11ba023434b1..2a54c1f22035 100644
+--- a/fs/sync.c
++++ b/fs/sync.c
+@@ -192,7 +192,7 @@ int vfs_fsync_range(struct file *file, loff_t start, loff_t end, int datasync)
+ 		spin_unlock(&inode->i_lock);
+ 		mark_inode_dirty_sync(inode);
  	}
+-	return call_fsync(file, start, end, datasync);
++	return file->f_op->fsync(file, start, end, datasync);
+ }
+ EXPORT_SYMBOL(vfs_fsync_range);
  
- 	/* Auto-generate integrity metadata if this is a write */
--	if (bio_data_dir(bio) == WRITE)
--		bio_integrity_process(bio, bi->profile->generate_fn);
-+	if (bio_data_dir(bio) == WRITE) {
-+		bio_integrity_process(bio, &bio->bi_iter,
-+				      bi->profile->generate_fn);
-+	}
- 	return true;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 1e53cd281437..4ff4498297fa 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1739,12 +1739,6 @@ static inline int call_mmap(struct file *file, struct vm_area_struct *vma)
+ 	return file->f_op->mmap(file, vma);
+ }
  
- err_end_io:
-@@ -358,8 +361,19 @@ static void bio_integrity_verify_fn(struct work_struct *work)
- 		container_of(work, struct bio_integrity_payload, bip_work);
- 	struct bio *bio = bip->bip_bio;
- 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-+	struct bvec_iter iter = bio->bi_iter;
+-static inline int call_fsync(struct file *file, loff_t start, loff_t end,
+-			     int datasync)
+-{
+-	return file->f_op->fsync(file, start, end, datasync);
+-}
+-
+ ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
+ 			      unsigned long nr_segs, unsigned long fast_segs,
+ 			      struct iovec *fast_pointer,
+diff --git a/ipc/shm.c b/ipc/shm.c
+index 34c4344e8d4b..f45c7959b264 100644
+--- a/ipc/shm.c
++++ b/ipc/shm.c
+@@ -452,7 +452,7 @@ static int shm_fsync(struct file *file, loff_t start, loff_t end, int datasync)
  
--	bio->bi_status = bio_integrity_process(bio, bi->profile->verify_fn);
-+	/*
-+	 * At the moment verify is called bio's iterator was advanced
-+	 * during split and completion, we need to rewind iterator to
-+	 * it's original position.
-+	 */
-+	if (bio_rewind_iter(bio, &iter, iter.bi_done)) {
-+		bio->bi_status = bio_integrity_process(bio, &iter,
-+						       bi->profile->verify_fn);
-+	} else {
-+		bio->bi_status = BLK_STS_IOERR;
-+	}
+ 	if (!sfd->file->f_op->fsync)
+ 		return -EINVAL;
+-	return call_fsync(sfd->file, start, end, datasync);
++	return sfd->file->f_op->fsync(sfd->file, start, end, datasync);
+ }
  
- 	/* Restore original bio completion handler */
- 	bio->bi_end_io = bip->bip_end_io;
+ static long shm_fallocate(struct file *file, int mode, loff_t offset,
 -- 
-2.11.0
+2.13.0
