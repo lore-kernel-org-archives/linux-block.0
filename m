@@ -1,58 +1,127 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37224 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752792AbdFZMSI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:18:08 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 31/51] fs/buffer.c: use bvec iterator to truncate the bio
-Date: Mon, 26 Jun 2017 20:10:14 +0800
-Message-Id: <20170626121034.3051-32-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 7/9] bio: add bvec_iter rewind API
+Date: Thu, 29 Jun 2017 11:31:14 -0700
+Message-Id: <20170629183116.28685-8-hch@lst.de>
+In-Reply-To: <20170629183116.28685-1-hch@lst.de>
+References: <20170629183116.28685-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Once multipage bvec is enabled, the last bvec may include
-more than one page, this patch use bvec_get_last_page()
-to truncate the bio.
+From: Dmitry Monakhov <dmonakhov@openvz.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Some ->bi_end_io handlers (for example: pi_verify or decrypt handlers)
+need to know original data vector, but after bio traverse io-stack it may
+be advanced, splited and relocated many times so it is hard to guess
+original iterator. Let's add 'bi_done' conter which accounts number
+of bytes iterator was advanced during it's evolution. Later end_io handler
+may easily restore original iterator by rewinding iterator to
+iter->bi_done.
+
+Note: this change makes sizeof (struct bvec_iter) multiple to 8
+
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+[hch: switched to true/false return]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/buffer.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ include/linux/bio.h  | 19 +++++++++++++++++--
+ include/linux/bvec.h | 27 +++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+), 2 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 1910f539770b..53b8a29f4525 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -3055,8 +3055,7 @@ void guard_bio_eod(int op, struct bio *bio)
- 	unsigned truncated_bytes;
- 	/*
- 	 * It is safe to truncate the last bvec in the following way
--	 * even though multipage bvec is supported, but we need to
--	 * fix the parameters passed to zero_user().
-+	 * even though multipage bvec is supported.
- 	 */
- 	struct bio_vec *bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index f27b22330ae7..7b989233e8d0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -165,14 +165,29 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ {
+ 	iter->bi_sector += bytes >> 9;
  
-@@ -3085,7 +3084,10 @@ void guard_bio_eod(int op, struct bio *bio)
- 
- 	/* ..and clear the end of the buffer for reads */
- 	if (op == REQ_OP_READ) {
--		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
-+		struct bio_vec bv;
-+
-+		bvec_get_last_page(bvec, &bv);
-+		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
- 				truncated_bytes);
+-	if (bio_no_advance_iter(bio))
++	if (bio_no_advance_iter(bio)) {
+ 		iter->bi_size -= bytes;
+-	else {
++		iter->bi_done += bytes;
++	} else {
+ 		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+ 		/* TODO: It is reasonable to complete bio with error here. */
  	}
  }
+ 
++static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
++		unsigned int bytes)
++{
++	iter->bi_sector -= bytes >> 9;
++
++	if (bio_no_advance_iter(bio)) {
++		iter->bi_size += bytes;
++		iter->bi_done -= bytes;
++		return true;
++	}
++
++	return bvec_iter_rewind(bio->bi_io_vec, iter, bytes);
++}
++
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index de317b4c13c1..ec8a4d7af6bd 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -40,6 +40,8 @@ struct bvec_iter {
+ 
+ 	unsigned int		bi_idx;		/* current index into bvl_vec */
+ 
++	unsigned int            bi_done;	/* number of bytes completed */
++
+ 	unsigned int            bi_bvec_done;	/* number of bytes completed in
+ 						   current bvec */
+ };
+@@ -83,6 +85,7 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+ 		iter->bi_bvec_done += len;
++		iter->bi_done += len;
+ 
+ 		if (iter->bi_bvec_done == __bvec_iter_bvec(bv, *iter)->bv_len) {
+ 			iter->bi_bvec_done = 0;
+@@ -92,6 +95,30 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 	return true;
+ }
+ 
++static inline bool bvec_iter_rewind(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned int bytes)
++{
++	while (bytes) {
++		unsigned len = min(bytes, iter->bi_bvec_done);
++
++		if (iter->bi_bvec_done == 0) {
++			if (WARN_ONCE(iter->bi_idx == 0,
++				      "Attempted to rewind iter beyond "
++				      "bvec's boundaries\n")) {
++				return false;
++			}
++			iter->bi_idx--;
++			iter->bi_bvec_done = __bvec_iter_bvec(bv, *iter)->bv_len;
++			continue;
++		}
++		bytes -= len;
++		iter->bi_size += len;
++		iter->bi_bvec_done -= len;
++	}
++	return true;
++}
++
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
 -- 
-2.9.4
+2.11.0
