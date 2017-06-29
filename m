@@ -1,234 +1,78 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47570 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752936AbdFNQMY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2017 12:12:24 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 12/12] block: use standard blktrace API to output cgroup info for debug notes
-Date: Wed, 14 Jun 2017 09:12:10 -0700
-Message-Id: <8085bf3f6afc5f6f676bebdd9e2700ca7be1fb29.1497455937.git.shli@fb.com>
-In-Reply-To: <cover.1497455937.git.shli@fb.com>
-References: <cover.1497455937.git.shli@fb.com>
-In-Reply-To: <cover.1497455937.git.shli@fb.com>
-References: <cover.1497455937.git.shli@fb.com>
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:38537 "EHLO
+        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753565AbdF2PgY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jun 2017 11:36:24 -0400
+Received: by mail-wm0-f51.google.com with SMTP id b184so18900655wme.1
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 08:36:24 -0700 (PDT)
+Subject: Re: raid0 vs. mkfs
+To: Coly Li <colyli@suse.de>, Shaohua Li <shli@kernel.org>
+Cc: NeilBrown <neilb@suse.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <56c83c4e-d451-07e5-88e2-40b085d8681c@scylladb.com>
+ <87oa108a1x.fsf@notabene.neil.brown.name>
+ <286a5fc1-eda3-0421-a88e-b03c09403259@scylladb.com>
+ <87inr880au.fsf@notabene.neil.brown.name>
+ <df73ebc4-9b78-09b5-022b-089c30dea17c@scylladb.com>
+ <87d1he7zv9.fsf@notabene.neil.brown.name>
+ <33bb250a-4dfd-0acc-9958-30fdac10918c@scylladb.com>
+ <ccf447df-e7b5-0a08-7753-67ee4ad574ef@suse.de>
+ <20161207165933.isq64dbkxye772nz@kernel.org>
+ <c384d070-457c-cfee-e35f-53b9195ace10@suse.de>
+ <eeae1d04-8c92-c511-8977-5124735646c4@scylladb.com>
+ <9a46c760-904a-8318-b06c-0cf19e0651dc@suse.de>
+From: Avi Kivity <avi@scylladb.com>
+Message-ID: <9a513fa3-8b5e-fb64-8b4f-c86dcb38f6f4@scylladb.com>
+Date: Thu, 29 Jun 2017 18:36:19 +0300
+MIME-Version: 1.0
+In-Reply-To: <9a46c760-904a-8318-b06c-0cf19e0651dc@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
 
-Currently cfq/bfq/blk-throttle output cgroup info in trace in their own
-way. Now we have standard blktrace API for this, so convert them to use
-it.
 
-Note, this changes the behavior a little bit. cgroup info isn't output
-by default, we only do this with 'blk_cgroup' option enabled. cgroup
-info isn't output as a string by default too, we only do this with
-'blk_cgname' option enabled. Also cgroup info is output in different
-position of the note string. I think these behavior changes aren't a big
-issue (actually we make trace data shorter which is good), since the
-blktrace note is solely for debugging.
+On 06/29/2017 06:31 PM, Coly Li wrote:
+> On 2017/6/29 下午11:15, Avi Kivity wrote:
+>>
+>> On 12/08/2016 06:44 PM, Coly Li wrote:
+>>> On 2016/12/8 上午12:59, Shaohua Li wrote:
+>>>> On Wed, Dec 07, 2016 at 07:50:33PM +0800, Coly Li wrote:
+>>> [snip]
+>>>> Thanks for doing this, Coly! For raid0, this totally makes sense. The
+>>>> raid0
+>>>> zones make things a little complicated though. I just had a brief
+>>>> look of your
+>>>> proposed patch, which looks really complicated. I'd suggest something
+>>>> like
+>>>> this:
+>>>> 1. split the bio according to zone boundary.
+>>>> 2. handle the splitted bio. since the bio is within zone range,
+>>>> calculating
+>>>> the start and end sector for each rdev should be easy.
+>>>>
+>>> Hi Shaohua,
+>>>
+>>> Thanks for your suggestion! I try to modify the code by your suggestion,
+>>> it is even more hard to make the code that way ...
+>>>
+>>> Because even split bios for each zone, all the corner cases still exist
+>>> and should be taken care in every zoon. The code will be more
+>>> complicated.
+>>>
+>> Hi Coly,
+>>
+>> Did you manage to complete this patch? We are seeing its effect, not
+>> only with mkfs, but also with fstrim(8).
+> Hi Avi,
+>
+> Shaohua makes another much better patch, which is merged into mainline
+> kernel in v4.12-rc2.
+>
+> The commit is '29efc390b946 ("md/md0: optimize raid0 discard handling")'.
+>
+> Hope this is informative.
+>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/bfq-iosched.h          | 13 ++++++++-----
- block/blk-throttle.c         |  6 ++----
- block/cfq-iosched.c          | 15 ++++++---------
- include/linux/blk-cgroup.h   | 14 --------------
- include/linux/blktrace_api.h | 13 +++++++++----
- kernel/trace/blktrace.c      | 12 ++++++++++--
- 6 files changed, 35 insertions(+), 38 deletions(-)
-
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 5c3bf98..ea6a6eb 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -916,13 +916,16 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
--	blk_add_trace_msg((bfqd)->queue, "bfq%d%c %s " fmt, (bfqq)->pid,\
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
--			bfqq_group(bfqq)->blkg_path, ##args);		\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
-+			"bfq%d%c " fmt, (bfqq)->pid,			\
-+			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
- } while (0)
- 
--#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	\
--	blk_add_trace_msg((bfqd)->queue, "%s " fmt, (bfqg)->blkg_path, ##args)
-+#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+		bfqg_to_blkg(bfqg)->blkcg, fmt, ##args);		\
-+} while (0)
- 
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a6ebd2b..6a4c4c4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -373,10 +373,8 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- 	if (likely(!blk_trace_note_message_enabled(__td->queue)))	\
- 		break;							\
- 	if ((__tg)) {							\
--		char __pbuf[128];					\
--									\
--		blkg_path(tg_to_blkg(__tg), __pbuf, sizeof(__pbuf));	\
--		blk_add_trace_msg(__td->queue, "throtl %s " fmt, __pbuf, ##args); \
-+		blk_add_cgroup_trace_msg(__td->queue,			\
-+			tg_to_blkg(__tg)->blkcg, "throtl " fmt, ##args);\
- 	} else {							\
- 		blk_add_trace_msg(__td->queue, "throtl " fmt, ##args);	\
- 	}								\
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index b7e9c7f..6df342f 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -656,20 +656,17 @@ static inline void cfqg_put(struct cfq_group *cfqg)
- }
- 
- #define cfq_log_cfqq(cfqd, cfqq, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg((cfqq)->cfqg), __pbuf, sizeof(__pbuf));	\
--	blk_add_trace_msg((cfqd)->queue, "cfq%d%c%c %s " fmt, (cfqq)->pid, \
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg((cfqq)->cfqg)->blkcg,		\
-+			"cfq%d%c%c " fmt, (cfqq)->pid,			\
- 			cfq_cfqq_sync((cfqq)) ? 'S' : 'A',		\
- 			cfqq_type((cfqq)) == SYNC_NOIDLE_WORKLOAD ? 'N' : ' ',\
--			  __pbuf, ##args);				\
-+			  ##args);					\
- } while (0)
- 
- #define cfq_log_cfqg(cfqd, cfqg, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg(cfqg), __pbuf, sizeof(__pbuf));		\
--	blk_add_trace_msg((cfqd)->queue, "%s " fmt, __pbuf, ##args);	\
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg(cfqg)->blkcg, fmt, ##args);	\
- } while (0)
- 
- static inline void cfqg_stats_update_io_add(struct cfq_group *cfqg,
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index fe10b85..4df5d32 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -334,19 +334,6 @@ static inline struct blkcg *cpd_to_blkcg(struct blkcg_policy_data *cpd)
- }
- 
- /**
-- * blkg_path - format cgroup path of blkg
-- * @blkg: blkg of interest
-- * @buf: target buffer
-- * @buflen: target buffer length
-- *
-- * Format the path of the cgroup of @blkg into @buf.
-- */
--static inline int blkg_path(struct blkcg_gq *blkg, char *buf, int buflen)
--{
--	return cgroup_path(blkg->blkcg->css.cgroup, buf, buflen);
--}
--
--/**
-  * blkg_get - get a blkg reference
-  * @blkg: blkg to get
-  *
-@@ -759,7 +746,6 @@ static inline struct blkcg *bio_blkcg(struct bio *bio) { return NULL; }
- static inline struct blkg_policy_data *blkg_to_pd(struct blkcg_gq *blkg,
- 						  struct blkcg_policy *pol) { return NULL; }
- static inline struct blkcg_gq *pd_to_blkg(struct blkg_policy_data *pd) { return NULL; }
--static inline char *blkg_path(struct blkcg_gq *blkg) { return NULL; }
- static inline void blkg_get(struct blkcg_gq *blkg) { }
- static inline void blkg_put(struct blkcg_gq *blkg) { }
- 
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index d2e9085..67b4d4d 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -28,10 +28,12 @@ struct blk_trace {
- 	atomic_t dropped;
- };
- 
-+struct blkcg;
-+
- extern int blk_trace_ioctl(struct block_device *, unsigned, char __user *);
- extern void blk_trace_shutdown(struct request_queue *);
--extern __printf(2, 3)
--void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-+extern __printf(3, 4)
-+void __trace_note_message(struct blk_trace *, struct blkcg *blkcg, const char *fmt, ...);
- 
- /**
-  * blk_add_trace_msg - Add a (simple) message to the blktrace stream
-@@ -46,12 +48,14 @@ void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-  *     NOTE: Can not use 'static inline' due to presence of var args...
-  *
-  **/
--#define blk_add_trace_msg(q, fmt, ...)					\
-+#define blk_add_cgroup_trace_msg(q, cg, fmt, ...)			\
- 	do {								\
- 		struct blk_trace *bt = (q)->blk_trace;			\
- 		if (unlikely(bt))					\
--			__trace_note_message(bt, fmt, ##__VA_ARGS__);	\
-+			__trace_note_message(bt, cg, fmt, ##__VA_ARGS__);\
- 	} while (0)
-+#define blk_add_trace_msg(q, fmt, ...)					\
-+	blk_add_cgroup_trace_msg(q, NULL, fmt, ##__VA_ARGS__)
- #define BLK_TN_MAX_MSG		128
- 
- static inline bool blk_trace_note_message_enabled(struct request_queue *q)
-@@ -82,6 +86,7 @@ extern struct attribute_group blk_trace_attr_group;
- # define blk_trace_startstop(q, start)			(-ENOTTY)
- # define blk_trace_remove(q)				(-ENOTTY)
- # define blk_add_trace_msg(q, fmt, ...)			do { } while (0)
-+# define blk_add_cgroup_trace_msg(q, cg, fmt, ...)	do { } while (0)
- # define blk_trace_remove_sysfs(dev)			do { } while (0)
- # define blk_trace_note_message_enabled(q)		(false)
- static inline int blk_trace_init_sysfs(struct device *dev)
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index ad5abb9..4e3f747 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -154,7 +154,8 @@ static void trace_note_time(struct blk_trace *bt)
- 	local_irq_restore(flags);
- }
- 
--void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
-+void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
-+	const char *fmt, ...)
- {
- 	int n;
- 	va_list args;
-@@ -178,7 +179,14 @@ void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
- 	n = vscnprintf(buf, BLK_TN_MAX_MSG, fmt, args);
- 	va_end(args);
- 
-+	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
-+		blkcg = NULL;
-+#ifdef CONFIG_BLK_CGROUP
-+	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
-+		blkcg ? cgroup_get_node_id(blkcg->css.cgroup) : NULL);
-+#else
- 	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n, NULL);
-+#endif
- 	local_irq_restore(flags);
- }
- EXPORT_SYMBOL_GPL(__trace_note_message);
-@@ -375,7 +383,7 @@ static ssize_t blk_msg_write(struct file *filp, const char __user *buffer,
- 		return PTR_ERR(msg);
- 
- 	bt = filp->private_data;
--	__trace_note_message(bt, "%s", msg);
-+	__trace_note_message(bt, NULL, "%s", msg);
- 	kfree(msg);
- 
- 	return count;
--- 
-2.9.3
+Thanks a lot, that's great news.
