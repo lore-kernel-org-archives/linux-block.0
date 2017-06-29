@@ -1,49 +1,43 @@
-Return-Path: <jlayton@poochiereds.net>
-Return-Path: <jlayton@poochiereds.net>
-Message-ID: <1498767443.5710.1.camel@poochiereds.net>
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 29 Jun 2017 07:19:33 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: jlayton@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com, corbet@lwn.net,
+	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>,
+	Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Liu Bo <bo.li.liu@oracle.com>, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
 Subject: Re: [PATCH v8 03/18] fs: check for writeback errors after syncing
  out buffers in generic_file_fsync
-From: Jeff Layton <jlayton@poochiereds.net>
-To: Christoph Hellwig <hch@infradead.org>, jlayton@kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
- <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
- axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
- corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
- David Sterba <dsterba@suse.com>, "Darrick J . Wong"
- <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
- Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>, Liu Bo
- <bo.li.liu@oracle.com>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
-Date: Thu, 29 Jun 2017 16:17:23 -0400
-In-Reply-To: <20170629141933.GE17251@infradead.org>
+Message-ID: <20170629141933.GE17251@infradead.org>
 References: <20170629131954.28733-1-jlayton@kernel.org>
-	 <20170629131954.28733-4-jlayton@kernel.org>
-	 <20170629141933.GE17251@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <20170629131954.28733-4-jlayton@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170629131954.28733-4-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-06-29 at 07:19 -0700, Christoph Hellwig wrote:
-> On Thu, Jun 29, 2017 at 09:19:39AM -0400, jlayton@kernel.org wrote:
-> > From: Jeff Layton <jlayton@redhat.com>
-> > 
-> > ext2 currently does a test+clear of the AS_EIO flag, which is
-> > is problematic for some coming changes.
-> > 
-> > What we really need to do instead is call filemap_check_errors
-> > in __generic_file_fsync after syncing out the buffers. That
-> > will be sufficient for this case, and help other callers detect
-> > these errors properly as well.
-> > 
-> > With that, we don't need to twiddle it in ext2.
+On Thu, Jun 29, 2017 at 09:19:39AM -0400, jlayton@kernel.org wrote:
+> From: Jeff Layton <jlayton@redhat.com>
 > 
-> Seems like much of this code is getting replaced later in the
-> series..
+> ext2 currently does a test+clear of the AS_EIO flag, which is
+> is problematic for some coming changes.
+> 
+> What we really need to do instead is call filemap_check_errors
+> in __generic_file_fsync after syncing out the buffers. That
+> will be sufficient for this case, and help other callers detect
+> these errors properly as well.
+> 
+> With that, we don't need to twiddle it in ext2.
 
-
-It does. I suppose I could squash this in with the __generic_file_fsync
-patch.
-
--- 
-Jeff Layton <jlayton@poochiereds.net>
+Seems like much of this code is getting replaced later in the
+series..
