@@ -1,90 +1,42 @@
-Return-Path: <bcache@lists.ewheeler.net>
-Date: Wed, 28 Jun 2017 23:06:46 +0000 (UTC)
-From: Eric Wheeler <bcache@lists.ewheeler.net>
-To: Jens Axboe <axboe@kernel.dk>
-cc: dan.carpenter@oracle.com, tasleson@redhat.com,
-    linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-    Jan Kara <jack@suse.cz>, stable@vger.kernel.org,
-    "tang.junhui" <tang.junhui@zte.com.cn>,
-    Kent Overstreet <kent.overstreet@gmail.com>, Coly Li <colyli@suse.de>,
-    Stefan Bader <stefan.bader@canonical.com>,
-    Liang Chen <liangchen.linux@gmail.com>, nix@esperi.org.uk
-Subject: [PULL] bcache fixes and updates for-4.13
-In-Reply-To: <alpine.LRH.2.11.1705251853530.19359@mail.ewheeler.net>
-Message-ID: <alpine.LRH.2.11.1706282258100.17052@mail.ewheeler.net>
-References: <alpine.LRH.2.11.1705251853530.19359@mail.ewheeler.net>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Two block fixes for 4.12 final
+Message-ID: <c75d37a6-8174-4780-5622-b3cb98f2e179@kernel.dk>
+Date: Thu, 29 Jun 2017 09:16:38 -0600
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Hi Linus,
 
-It looks like you're getting ready for 4.13, so here are the bcache 
-updates rebased and ready from git.kernel.dk/linux-block for-4.13/block 
-This tree builds, boots, and works as expected.  Please pull the new fixes 
-and features below.
+Two fixes that should go into this release. One is an nvme regression
+fix from Keith, fixing a missing queue freeze if the controller is being
+reset. This causes the reset to hang. The other is a fix for a leak of
+the bio protection info, if smaller sized O_DIRECT is used. This fix
+should be more involved as we have other problematic paths in the
+kernel, but given as this isn't a regression in this series, we'll
+tackle those for 4.13.
 
-Thank you for your help!
+Please pull!
 
 
-The following changes since commit f1d4ef7d88832444e8dfeb0e85e19d3b6ecb5011:
+  git://git.kernel.dk/linux-block.git for-linus
 
-  nvmet-rdma: register ib_client to not deadlock in device removal (2017-06-28 08:14:13 -0600)
-
-are available in the git repository at:
-
-  https://bitbucket.org/ewheelerinc/linux.git bcache-updates-linux-block-for-4.13
-
-for you to fetch changes up to 960ce81bdbd46bc7faaeb2f9fcddfea1e48ee388:
-
-  bcache: Update continue_at() documentation (2017-06-28 15:18:02 -0700)
 
 ----------------------------------------------------------------
-Dan Carpenter (2):
-      bcache: silence static checker warning
-      bcache: Update continue_at() documentation
+Jens Axboe (1):
+      block: provide bio_uninit() free freeing integrity/task associations
 
-Eric Wheeler (3):
-      bcache: introduce bcache sysfs entries for ioprio-based bypass/writeback hints
-      bcache: documentation for sysfs entries describing bcache cache hinting
-      bcache: update bio->bi_opf bypass/writeback REQ_ flag hints
+Keith Busch (1):
+      nvme/pci: Fix stuck nvme reset
 
-Jan Kara (1):
-      bcache: Fix leak of bdev reference
+ block/bio.c             | 12 +++++++++---
+ drivers/nvme/host/pci.c |  3 ++-
+ fs/block_dev.c          |  5 ++++-
+ include/linux/bio.h     |  1 +
+ 4 files changed, 16 insertions(+), 5 deletions(-)
 
-Liang Chen (1):
-      bcache: explicitly destory mutex while exiting
-
-Tang Junhui (11):
-      bcache: fix sequential large write IO bypass
-      bcache: do not subtract sectors_to_gc for bypassed IO
-      bcache: fix wrong cache_misses statistics
-      bcache: fix calling ida_simple_remove() with incorrect minor
-      bcache: initialize stripe_sectors_dirty correctly for thin flash device
-      bcache: Subtract dirty sectors of thin flash from cache_sectors in calculating writeback rate
-      bcache: update bucket_in_use periodically
-      bcache: delete redundant calling set_gc_sectors()
-      bcache: fix issue of writeback rate at minimum 1 key per second
-      bcache: increase the number of open buckets
-      bcache: fix for gc and write-back race
-
-Tony Asleson (1):
-      bcache: Correct return value for sysfs attach errors
-
- Documentation/bcache.txt      | 80 ++++++++++++++++++++++++++++++++++++++++++
- drivers/md/bcache/alloc.c     |  4 ++-
- drivers/md/bcache/bcache.h    |  4 +++
- drivers/md/bcache/btree.c     | 30 ++++++++++++++--
- drivers/md/bcache/closure.h   |  4 ---
- drivers/md/bcache/request.c   | 45 ++++++++++++++++++------
- drivers/md/bcache/super.c     | 26 +++++++++-----
- drivers/md/bcache/sysfs.c     | 75 +++++++++++++++++++++++++++++++++++++--
- drivers/md/bcache/util.c      |  9 ++++-
- drivers/md/bcache/writeback.c | 37 +++++++++++++------
- drivers/md/bcache/writeback.h | 48 +++++++++++++++++++++++--
- 11 files changed, 319 insertions(+), 43 deletions(-)
-
-
-
---
-Eric Wheeler
+-- 
+Jens Axboe
