@@ -1,48 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:43857 "EHLO
-        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752483AbdF3KQb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 06:16:31 -0400
-Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
-        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id E644F3E5229
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:27 -0700 (PDT)
-Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
-        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 99F37B400C7
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:07 -0700 (PDT)
-In-Reply-To: <20170629134510.GA32385@infradead.org>
-References: <20170629134510.GA32385@infradead.org>
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Date: Wed, 28 Jun 2017 14:47:07 +0300
-Subject: [PATCH 18/19] bcache: silence static checker warning
-To: linux-block@vger.kernel.org
-Message-Id: <20170629221207.897A7100128@ware.dreamhost.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@poochiereds.net>
+Return-Path: <jlayton@poochiereds.net>
+Message-ID: <1498767972.5710.4.camel@poochiereds.net>
+Subject: Re: [PATCH v8 16/18] ext4: use errseq_t based error handling for
+ reporting data writeback errors
+From: Jeff Layton <jlayton@poochiereds.net>
+To: Christoph Hellwig <hch@infradead.org>, jlayton@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
+ Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>, Liu Bo
+ <bo.li.liu@oracle.com>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Date: Thu, 29 Jun 2017 16:26:12 -0400
+In-Reply-To: <20170629141221.GA17251@infradead.org>
+References: <20170629131954.28733-1-jlayton@kernel.org>
+	 <20170629131954.28733-17-jlayton@kernel.org>
+	 <20170629141221.GA17251@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-In olden times, closure_return() used to have a hidden return built in.
-We removed the hidden return but forgot to add a new return here.  If
-"c" were NULL we would oops on the next line, but fortunately "c" is
-never NULL.  Let's just remove the if statement.
+On Thu, 2017-06-29 at 07:12 -0700, Christoph Hellwig wrote:
+> > -	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
+> > -		return -EIO;
+> > +	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb)))) {
+> > +		ret = -EIO;
+> > +		goto out;
+> > +	}
+> 
+> This just seems to add a call to trace_ext4_sync_file_exit for this
+> case, which seems unrelated to the patch.
+> 
+> >  	if (ret)
+> > -		return ret;
+> > +		goto out;
+> > +
+> 
+> Same here.
+> 
+> >  	/*
+> >  	 * data=writeback,ordered:
+> >  	 *  The caller's filemap_fdatawrite()/wait will sync the data.
+> > @@ -152,7 +155,7 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
+> >  		needs_barrier = true;
+> >  	ret = jbd2_complete_transaction(journal, commit_tid);
+> >  	if (needs_barrier) {
+> > -	issue_flush:
+> > +issue_flush:
+> >  		err = blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL, NULL);
+> 
+> And while I much prefer your new label placement it also doesn't
+> seem to belong into this patch.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- drivers/md/bcache/super.c | 3 ---
- 1 file changed, 3 deletions(-)
+I revised the patch description earlier to say:
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 24cb9b7..243391d 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1381,9 +1381,6 @@ static void cache_set_flush(struct closure *cl)
- 	struct btree *b;
- 	unsigned i;
- 
--	if (!c)
--		closure_return(cl);
--
- 	bch_cache_accounting_destroy(&c->accounting);
- 
- 	kobject_put(&c->internal);
+    While we're at it, ensure we always "goto out" instead of just
+    returning directly, so that we always hit the exit tracepoint.
+
+...but I'm fine with taking that out if you prefer.
 -- 
-1.8.3.1
+Jeff Layton <jlayton@poochiereds.net>
