@@ -1,36 +1,31 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org,
-	hch@lst.de,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 8/9] btrfs: add support for passing in write hints for buffered writes
-Date: Mon, 26 Jun 2017 09:37:59 -0600
-Message-Id: <1498491480-16306-9-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
-References: <1498491480-16306-1-git-send-email-axboe@kernel.dk>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 29 Jun 2017 16:13:20 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Omar Sandoval <osandov@osandov.com>,
+	Linux Block Layer Mailinglist <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests] tests: use nproc to get number of CPUs for fio
+ jobs
+Message-ID: <20170629141320.GQ3808@linux-x5ow.site>
+References: <20170629114050.11733-1-jthumshirn@suse.de>
+ <31774cc0-7aa5-7be0-eee4-ea466ac3fd1a@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <31774cc0-7aa5-7be0-eee4-ea466ac3fd1a@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Chris Mason <clm@fb.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/btrfs/extent_io.c | 1 +
- 1 file changed, 1 insertion(+)
+On Thu, Jun 29, 2017 at 08:08:32AM -0600, Jens Axboe wrote:
+> For the other tests in your patch, the change looks fine. But I would
+> greatly prefer if we just turned that into a
+> 
+> __run_fio_mix
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 19eedf2e630b..fde09c6005fc 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2830,6 +2830,7 @@ static int submit_extent_page(int op, int op_flags, struct extent_io_tree *tree,
- 	bio_add_page(bio, page, page_size, offset);
- 	bio->bi_end_io = end_io_func;
- 	bio->bi_private = tree;
-+	op_flags |= inode_hint_to_opf(page->mapping->host);
- 	bio_set_op_attrs(bio, op, op_flags);
- 	if (wbc) {
- 		wbc_init_bio(wbc, bio);
+Sounds reasonable. I'll prepare a v2
+
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
