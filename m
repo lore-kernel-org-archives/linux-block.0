@@ -1,6 +1,6 @@
 Return-Path: <jlayton@redhat.com>
 Return-Path: <jlayton@redhat.com>
-Message-ID: <1498758733.22569.11.camel@redhat.com>
+Message-ID: <1498743924.22569.3.camel@redhat.com>
 Subject: Re: [PATCH v8 10/18] fs: new infrastructure for writeback error
  handling and reporting
 From: Jeff Layton <jlayton@redhat.com>
@@ -15,7 +15,7 @@ Cc: Carlos Maiolino <cmaiolino@redhat.com>, Eryu Guan <eguan@redhat.com>,
  Liu Bo <bo.li.liu@oracle.com>,  linux-fsdevel@vger.kernel.org,
  linux-mm@kvack.org, linux-ext4@vger.kernel.org,  linux-xfs@vger.kernel.org,
  linux-btrfs@vger.kernel.org,  linux-block@vger.kernel.org
-Date: Thu, 29 Jun 2017 13:52:13 -0400
+Date: Thu, 29 Jun 2017 09:45:24 -0400
 In-Reply-To: <20170629131954.28733-11-jlayton@kernel.org>
 References: <20170629131954.28733-1-jlayton@kernel.org>
 	 <20170629131954.28733-11-jlayton@kernel.org>
@@ -173,6 +173,10 @@ On Thu, 2017-06-29 at 09:19 -0400, jlayton@kernel.org wrote:
 >  	 */
 >  	spinlock_t		f_lock;
 > +	errseq_t		f_wb_err;
+
+Ahh, this field needs to be moved to the end of the struct to avoid
+conflict with Jens' work. I'll fix that in my linux-next branch.
+
 >  	atomic_long_t		f_count;
 >  	unsigned int 		f_flags;
 >  	fmode_t			f_mode;
@@ -403,13 +407,6 @@ On Thu, 2017-06-29 at 09:19 -0400, jlayton@kernel.org wrote:
 > +		err2 = file_check_and_advance_wb_err(file);
 > +		if (!err)
 > +			err = err2;
-
-Braino on my part here.
-
-We need to do the check and advance unconditionally in this function to
-handle the case where the nrpages and/or nrexceptional are 0. Fixed in
-my tree.
-
 > +	}
 > +	return err;
 > +}
