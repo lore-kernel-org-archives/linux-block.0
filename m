@@ -1,372 +1,100 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 3/3 v4] mmc: debugfs: Move block debugfs into block module
-Date: Fri, 30 Jun 2017 14:06:49 +0200
-Message-Id: <20170630120649.27007-3-linus.walleij@linaro.org>
-In-Reply-To: <20170630120649.27007-1-linus.walleij@linaro.org>
-References: <20170630120649.27007-1-linus.walleij@linaro.org>
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 8/9] bio-integrity: Restore original iterator on verify stage
+Date: Thu, 29 Jun 2017 11:31:15 -0700
+Message-Id: <20170629183116.28685-9-hch@lst.de>
+In-Reply-To: <20170629183116.28685-1-hch@lst.de>
+References: <20170629183116.28685-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-If we don't have the block layer enabled, we do not present card
-status and extcsd in the debugfs.
+From: Dmitry Monakhov <dmonakhov@openvz.org>
 
-Debugfs is not ABI, and maintaining files of no relevance for
-non-block devices comes at a high maintenance cost if we shall
-support it with the block layer compiled out.
+Currently ->verify_fn not woks at all because at the moment it is called
+bio->bi_iter.bi_size == 0, so we do not iterate integrity bvecs at all.
 
-The debugfs entries suffer from all the same starvation
-issues as the other userspace things, under e.g. a heavy
-dd operation.
+In order to perform verification we need to know original data vector,
+with new bvec rewind API this is trivial.
 
-The expected number of debugfs users utilizing these two
-debugfs files is already low as there is an ioctl() to get the
-same information using the mmc-tools, and of these few users
-the expected number of people using it on SDIO or combo cards
-are expected to be zero.
+testcase: https://github.com/dmonakhov/xfstests/commit/3c6509eaa83b9c17cd0bc95d73fcdd76e1c54a85
 
-It is therefore logical to move this over to the block layer
-when it is enabled, using the new custom requests and issue
-it using the block request queue.
-
-On the other hand it moves some debugfs code from debugfs.c
-and into block.c.
-
-Tested during heavy dd load by cat:in the status file.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+[hch: adopted for new status values]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-ChangeLog v3->v4:
-- Squash all the refactorings of these operations into a big
-  commit simply moving all the debugfs over to the block layer
-  and only creating the files from there.
-- Avoid the whole middle-step of creating #if IS_ENABLED()
-  that was required to move it stepwise from the debugfs file
-  to the block file.
----
- drivers/mmc/core/block.c   | 143 +++++++++++++++++++++++++++++++++++++++++++++
- drivers/mmc/core/debugfs.c |  89 ----------------------------
- drivers/mmc/core/queue.h   |   4 ++
- 3 files changed, 147 insertions(+), 89 deletions(-)
+ block/bio-integrity.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index d410f578b8df..dbfbc76576ea 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -36,6 +36,7 @@
- #include <linux/compat.h>
- #include <linux/pm_runtime.h>
- #include <linux/idr.h>
-+#include <linux/debugfs.h>
- 
- #include <linux/mmc/ioctl.h>
- #include <linux/mmc/card.h>
-@@ -1176,6 +1177,8 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 	struct mmc_card *card = mq->card;
- 	struct mmc_blk_data *md = mq->blkdata;
- 	struct mmc_blk_ioc_data **idata;
-+	u8 **ext_csd;
-+	u32 status;
- 	int ret;
- 	int i;
- 
-@@ -1205,6 +1208,15 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 			card->ext_csd.boot_ro_lock |=
- 				EXT_CSD_BOOT_WP_B_PWR_WP_EN;
- 		break;
-+	case MMC_DRV_OP_GET_CARD_STATUS:
-+		ret = mmc_send_status(card, &status);
-+		if (!ret)
-+			ret = status;
-+		break;
-+	case MMC_DRV_OP_GET_EXT_CSD:
-+		ext_csd = mq_rq->drv_op_data;
-+		ret = mmc_get_ext_csd(card, ext_csd);
-+		break;
- 	default:
- 		pr_err("%s: unknown driver specific operation\n",
- 		       md->disk->disk_name);
-@@ -2236,6 +2248,134 @@ static int mmc_add_disk(struct mmc_blk_data *md)
- 	return ret;
- }
- 
-+#ifdef CONFIG_DEBUG_FS
-+
-+static int mmc_dbg_card_status_get(void *data, u64 *val)
-+{
-+	struct mmc_card *card = data;
-+	struct mmc_blk_data *md = dev_get_drvdata(&card->dev);
-+	struct mmc_queue *mq = &md->queue;
-+	struct request *req;
-+	int ret;
-+
-+	/* Ask the block layer about the card status */
-+	req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_CARD_STATUS;
-+	blk_execute_rq(mq->queue, NULL, req, 0);
-+	ret = req_to_mmc_queue_req(req)->drv_op_result;
-+	if (ret >= 0) {
-+		*val = ret;
-+		ret = 0;
-+	}
-+
-+	return ret;
-+}
-+DEFINE_SIMPLE_ATTRIBUTE(mmc_dbg_card_status_fops, mmc_dbg_card_status_get,
-+		NULL, "%08llx\n");
-+
-+/* That is two digits * 512 + 1 for newline */
-+#define EXT_CSD_STR_LEN 1025
-+
-+static int mmc_ext_csd_open(struct inode *inode, struct file *filp)
-+{
-+	struct mmc_card *card = inode->i_private;
-+	struct mmc_blk_data *md = dev_get_drvdata(&card->dev);
-+	struct mmc_queue *mq = &md->queue;
-+	struct request *req;
-+	char *buf;
-+	ssize_t n = 0;
-+	u8 *ext_csd;
-+	int err, i;
-+
-+	buf = kmalloc(EXT_CSD_STR_LEN + 1, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	/* Ask the block layer for the EXT CSD */
-+	req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_EXT_CSD;
-+	req_to_mmc_queue_req(req)->drv_op_data = &ext_csd;
-+	blk_execute_rq(mq->queue, NULL, req, 0);
-+	err = req_to_mmc_queue_req(req)->drv_op_result;
-+	if (err) {
-+		pr_err("FAILED %d\n", err);
-+		goto out_free;
-+	}
-+
-+	for (i = 0; i < 512; i++)
-+		n += sprintf(buf + n, "%02x", ext_csd[i]);
-+	n += sprintf(buf + n, "\n");
-+
-+	if (n != EXT_CSD_STR_LEN) {
-+		err = -EINVAL;
-+		goto out_free;
-+	}
-+
-+	filp->private_data = buf;
-+	kfree(ext_csd);
-+	return 0;
-+
-+out_free:
-+	kfree(buf);
-+	return err;
-+}
-+
-+static ssize_t mmc_ext_csd_read(struct file *filp, char __user *ubuf,
-+				size_t cnt, loff_t *ppos)
-+{
-+	char *buf = filp->private_data;
-+
-+	return simple_read_from_buffer(ubuf, cnt, ppos,
-+				       buf, EXT_CSD_STR_LEN);
-+}
-+
-+static int mmc_ext_csd_release(struct inode *inode, struct file *file)
-+{
-+	kfree(file->private_data);
-+	return 0;
-+}
-+
-+static const struct file_operations mmc_dbg_ext_csd_fops = {
-+	.open		= mmc_ext_csd_open,
-+	.read		= mmc_ext_csd_read,
-+	.release	= mmc_ext_csd_release,
-+	.llseek		= default_llseek,
-+};
-+
-+static int mmc_blk_add_debugfs(struct mmc_card *card)
-+{
-+	struct dentry *root;
-+
-+	if (!card->debugfs_root)
-+		return 0;
-+
-+	root = card->debugfs_root;
-+
-+	if (mmc_card_mmc(card) || mmc_card_sd(card)) {
-+		if (!debugfs_create_file("status", S_IRUSR, root, card,
-+					 &mmc_dbg_card_status_fops))
-+			return -EIO;
-+	}
-+
-+	if (mmc_card_mmc(card)) {
-+		if (!debugfs_create_file("ext_csd", S_IRUSR, root, card,
-+					 &mmc_dbg_ext_csd_fops))
-+			return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+
-+#else
-+
-+static int mmc_blk_add_debugfs(struct mmc_card *card)
-+{
-+	return 0;
-+}
-+
-+#endif /* CONFIG_DEBUG_FS */
-+
- static int mmc_blk_probe(struct mmc_card *card)
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 44c4c52681c2..8df4eb103ba9 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -184,10 +184,11 @@ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
+ /**
+  * bio_integrity_process - Process integrity metadata for a bio
+  * @bio:	bio to generate/verify integrity metadata for
++ * @proc_iter:  iterator to process
+  * @proc_fn:	Pointer to the relevant processing function
+  */
+ static blk_status_t bio_integrity_process(struct bio *bio,
+-				 integrity_processing_fn *proc_fn)
++		struct bvec_iter *proc_iter, integrity_processing_fn *proc_fn)
  {
- 	struct mmc_blk_data *md, *part_md;
-@@ -2272,6 +2412,9 @@ static int mmc_blk_probe(struct mmc_card *card)
- 			goto out;
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+ 	struct blk_integrity_iter iter;
+@@ -200,10 +201,10 @@ static blk_status_t bio_integrity_process(struct bio *bio,
+ 
+ 	iter.disk_name = bio->bi_bdev->bd_disk->disk_name;
+ 	iter.interval = 1 << bi->interval_exp;
+-	iter.seed = bip_get_seed(bip);
++	iter.seed = proc_iter->bi_sector;
+ 	iter.prot_buf = prot_buf;
+ 
+-	bio_for_each_segment(bv, bio, bviter) {
++	__bio_for_each_segment(bv, bio, bviter, *proc_iter) {
+ 		void *kaddr = kmap_atomic(bv.bv_page);
+ 
+ 		iter.data_buf = kaddr + bv.bv_offset;
+@@ -332,8 +333,10 @@ bool bio_integrity_prep(struct bio *bio)
  	}
  
-+	/* Add two debugfs entries */
-+	mmc_blk_add_debugfs(card);
-+
- 	pm_runtime_set_autosuspend_delay(&card->dev, 3000);
- 	pm_runtime_use_autosuspend(&card->dev);
+ 	/* Auto-generate integrity metadata if this is a write */
+-	if (bio_data_dir(bio) == WRITE)
+-		bio_integrity_process(bio, bi->profile->generate_fn);
++	if (bio_data_dir(bio) == WRITE) {
++		bio_integrity_process(bio, &bio->bi_iter,
++				      bi->profile->generate_fn);
++	}
+ 	return true;
  
-diff --git a/drivers/mmc/core/debugfs.c b/drivers/mmc/core/debugfs.c
-index a1fba5732d66..01e459a34f33 100644
---- a/drivers/mmc/core/debugfs.c
-+++ b/drivers/mmc/core/debugfs.c
-@@ -281,85 +281,6 @@ void mmc_remove_host_debugfs(struct mmc_host *host)
- 	debugfs_remove_recursive(host->debugfs_root);
- }
+ err_end_io:
+@@ -358,8 +361,19 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ 		container_of(work, struct bio_integrity_payload, bip_work);
+ 	struct bio *bio = bip->bip_bio;
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
++	struct bvec_iter iter = bio->bi_iter;
  
--static int mmc_dbg_card_status_get(void *data, u64 *val)
--{
--	struct mmc_card	*card = data;
--	u32		status;
--	int		ret;
--
--	mmc_get_card(card);
--
--	ret = mmc_send_status(data, &status);
--	if (!ret)
--		*val = status;
--
--	mmc_put_card(card);
--
--	return ret;
--}
--DEFINE_SIMPLE_ATTRIBUTE(mmc_dbg_card_status_fops, mmc_dbg_card_status_get,
--		NULL, "%08llx\n");
--
--#define EXT_CSD_STR_LEN 1025
--
--static int mmc_ext_csd_open(struct inode *inode, struct file *filp)
--{
--	struct mmc_card *card = inode->i_private;
--	char *buf;
--	ssize_t n = 0;
--	u8 *ext_csd;
--	int err, i;
--
--	buf = kmalloc(EXT_CSD_STR_LEN + 1, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
--
--	mmc_get_card(card);
--	err = mmc_get_ext_csd(card, &ext_csd);
--	mmc_put_card(card);
--	if (err)
--		goto out_free;
--
--	for (i = 0; i < 512; i++)
--		n += sprintf(buf + n, "%02x", ext_csd[i]);
--	n += sprintf(buf + n, "\n");
--
--	if (n != EXT_CSD_STR_LEN) {
--		err = -EINVAL;
--		goto out_free;
--	}
--
--	filp->private_data = buf;
--	kfree(ext_csd);
--	return 0;
--
--out_free:
--	kfree(buf);
--	return err;
--}
--
--static ssize_t mmc_ext_csd_read(struct file *filp, char __user *ubuf,
--				size_t cnt, loff_t *ppos)
--{
--	char *buf = filp->private_data;
--
--	return simple_read_from_buffer(ubuf, cnt, ppos,
--				       buf, EXT_CSD_STR_LEN);
--}
--
--static int mmc_ext_csd_release(struct inode *inode, struct file *file)
--{
--	kfree(file->private_data);
--	return 0;
--}
--
--static const struct file_operations mmc_dbg_ext_csd_fops = {
--	.open		= mmc_ext_csd_open,
--	.read		= mmc_ext_csd_read,
--	.release	= mmc_ext_csd_release,
--	.llseek		= default_llseek,
--};
--
- void mmc_add_card_debugfs(struct mmc_card *card)
- {
- 	struct mmc_host	*host = card->host;
-@@ -382,16 +303,6 @@ void mmc_add_card_debugfs(struct mmc_card *card)
- 	if (!debugfs_create_x32("state", S_IRUSR, root, &card->state))
- 		goto err;
+-	bio->bi_status = bio_integrity_process(bio, bi->profile->verify_fn);
++	/*
++	 * At the moment verify is called bio's iterator was advanced
++	 * during split and completion, we need to rewind iterator to
++	 * it's original position.
++	 */
++	if (bio_rewind_iter(bio, &iter, iter.bi_done)) {
++		bio->bi_status = bio_integrity_process(bio, &iter,
++						       bi->profile->verify_fn);
++	} else {
++		bio->bi_status = BLK_STS_IOERR;
++	}
  
--	if (mmc_card_mmc(card) || mmc_card_sd(card))
--		if (!debugfs_create_file("status", S_IRUSR, root, card,
--					&mmc_dbg_card_status_fops))
--			goto err;
--
--	if (mmc_card_mmc(card))
--		if (!debugfs_create_file("ext_csd", S_IRUSR, root, card,
--					&mmc_dbg_ext_csd_fops))
--			goto err;
--
- 	return;
- 
- err:
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index cf26a15a64bf..04fc89360a7a 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -36,10 +36,14 @@ struct mmc_blk_request {
-  * enum mmc_drv_op - enumerates the operations in the mmc_queue_req
-  * @MMC_DRV_OP_IOCTL: ioctl operation
-  * @MMC_DRV_OP_BOOT_WP: write protect boot partitions
-+ * @MMC_DRV_OP_GET_CARD_STATUS: get card status
-+ * @MMC_DRV_OP_GET_EXT_CSD: get the EXT CSD from an eMMC card
-  */
- enum mmc_drv_op {
- 	MMC_DRV_OP_IOCTL,
- 	MMC_DRV_OP_BOOT_WP,
-+	MMC_DRV_OP_GET_CARD_STATUS,
-+	MMC_DRV_OP_GET_EXT_CSD,
- };
- 
- struct mmc_queue_req {
+ 	/* Restore original bio completion handler */
+ 	bio->bi_end_io = bip->bip_end_io;
 -- 
-2.9.4
+2.11.0
