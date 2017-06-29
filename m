@@ -1,130 +1,148 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: update wr_busy_queues if needed on a queue split
-Date: Mon, 19 Jun 2017 07:56:12 +0200
-Message-Id: <20170619055612.1106-1-paolo.valente@linaro.org>
+Return-Path: <jlayton@kernel.org>
+From: jlayton@kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Liu Bo <bo.li.liu@oracle.com>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v8 04/18] buffer: set errors in mapping at the time that the error occurs
+Date: Thu, 29 Jun 2017 09:19:40 -0400
+Message-Id: <20170629131954.28733-5-jlayton@kernel.org>
+In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
+References: <20170629131954.28733-1-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This commit fixes a bug triggered by a non-trivial sequence of
-events. These events are briefly described in the next two
-paragraphs. The impatiens, or those who are familiar with queue
-merging and splitting, can jump directly to the last paragraph.
+From: Jeff Layton <jlayton@redhat.com>
 
-On each I/O-request arrival for a shared bfq_queue, i.e., for a
-bfq_queue that is the result of the merge of two or more bfq_queues,
-BFQ checks whether the shared bfq_queue has become seeky (i.e., if too
-many random I/O requests have arrived for the bfq_queue; if the device
-is non rotational, then random requests must be also small for the
-bfq_queue to be tagged as seeky). If the shared bfq_queue is actually
-detected as seeky, then a split occurs: the bfq I/O context of the
-process that has issued the request is redirected from the shared
-bfq_queue to a new non-shared bfq_queue. As a degenerate case, if the
-shared bfq_queue actually happens to be shared only by one process
-(because of previous splits), then no new bfq_queue is created: the
-state of the shared bfq_queue is just changed from shared to non
-shared.
+I noticed on xfs that I could still sometimes get back an error on fsync
+on a fd that was opened after the error condition had been cleared.
 
-Regardless of whether a brand new non-shared bfq_queue is created, or
-the pre-existing shared bfq_queue is just turned into a non-shared
-bfq_queue, several parameters of the non-shared bfq_queue are set
-(restored) to the original values they had when the bfq_queue
-associated with the bfq I/O context of the process (that has just
-issued an I/O request) was merged with the shared bfq_queue. One of
-these parameters is the weight-raising state.
+The problem is that the buffer code sets the write_io_error flag and
+then later checks that flag to set the error in the mapping. That flag
+perisists for quite a while however. If the file is later opened with
+O_TRUNC, the buffers will then be invalidated and the mapping's error
+set such that a subsequent fsync will return error. I think this is
+incorrect, as there was no writeback between the open and fsync.
 
-If, on the split of a shared bfq_queue,
-1) a pre-existing shared bfq_queue is turned into a non-shared
-bfq_queue;
-2) the previously shared bfq_queue happens to be busy;
-3) the weight-raising state of the previously shared bfq_queue happens
-to change;
-the number of weight-raised busy queues changes. The field
-wr_busy_queues must then be updated accordingly, but such an update
-was missing. This commit adds the missing update.
+Add a new mark_buffer_write_io_error operation that sets the flag and
+the error in the mapping at the same time. Replace all calls to
+set_buffer_write_io_error with mark_buffer_write_io_error, and remove
+the places that check this flag in order to set the error in the
+mapping.
 
-Reported-by: Luca Miccio <lucmiccio@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+This sets the error in the mapping earlier, at the time that it's first
+detected.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
 ---
- block/bfq-iosched.c | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
+ fs/buffer.c                 | 20 +++++++++++++-------
+ fs/gfs2/lops.c              |  2 +-
+ include/linux/buffer_head.h |  1 +
+ 3 files changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ed93da2..4731cfb 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -725,8 +725,12 @@ static void bfq_updated_next_req(struct bfq_data *bfqd,
- }
- 
- static void
--bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
-+bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
-+		      struct bfq_io_cq *bic, bool bfq_already_existing)
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 4be8b914a222..b946149e8214 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -178,7 +178,7 @@ void end_buffer_write_sync(struct buffer_head *bh, int uptodate)
+ 		set_buffer_uptodate(bh);
+ 	} else {
+ 		buffer_io_error(bh, ", lost sync page write");
+-		set_buffer_write_io_error(bh);
++		mark_buffer_write_io_error(bh);
+ 		clear_buffer_uptodate(bh);
+ 	}
+ 	unlock_buffer(bh);
+@@ -352,8 +352,7 @@ void end_buffer_async_write(struct buffer_head *bh, int uptodate)
+ 		set_buffer_uptodate(bh);
+ 	} else {
+ 		buffer_io_error(bh, ", lost async page write");
+-		mapping_set_error(page->mapping, -EIO);
+-		set_buffer_write_io_error(bh);
++		mark_buffer_write_io_error(bh);
+ 		clear_buffer_uptodate(bh);
+ 		SetPageError(page);
+ 	}
+@@ -481,8 +480,6 @@ static void __remove_assoc_queue(struct buffer_head *bh)
  {
-+	unsigned int old_wr_coeff;
-+	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
-+
- 	if (bic->saved_idle_window)
- 		bfq_mark_bfqq_idle_window(bfqq);
- 	else
-@@ -737,6 +741,9 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 	else
- 		bfq_clear_bfqq_IO_bound(bfqq);
- 
-+	if (unlikely(busy))
-+		old_wr_coeff = bfqq->wr_coeff;
-+
- 	bfqq->ttime = bic->saved_ttime;
- 	bfqq->wr_coeff = bic->saved_wr_coeff;
- 	bfqq->wr_start_at_switch_to_srt = bic->saved_wr_start_at_switch_to_srt;
-@@ -754,6 +761,14 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 
- 	/* make sure weight will be updated, however we got here */
- 	bfqq->entity.prio_changed = 1;
-+
-+	if (likely(!busy))
-+		return;
-+
-+	if (old_wr_coeff == 1 && bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues++;
-+	else if (old_wr_coeff > 1 && bfqq->wr_coeff == 1)
-+		bfqd->wr_busy_queues--;
+ 	list_del_init(&bh->b_assoc_buffers);
+ 	WARN_ON(!bh->b_assoc_map);
+-	if (buffer_write_io_error(bh))
+-		mapping_set_error(bh->b_assoc_map, -EIO);
+ 	bh->b_assoc_map = NULL;
  }
  
- static int bfqq_process_refs(struct bfq_queue *bfqq)
-@@ -4402,7 +4417,7 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 	const int is_sync = rq_is_sync(rq);
- 	struct bfq_queue *bfqq;
- 	bool new_queue = false;
--	bool split = false;
-+	bool bfqq_already_existing = false, split = false;
+@@ -1181,6 +1178,17 @@ void mark_buffer_dirty(struct buffer_head *bh)
+ }
+ EXPORT_SYMBOL(mark_buffer_dirty);
  
- 	spin_lock_irq(&bfqd->lock);
++void mark_buffer_write_io_error(struct buffer_head *bh)
++{
++	set_buffer_write_io_error(bh);
++	/* FIXME: do we need to set this in both places? */
++	if (bh->b_page && bh->b_page->mapping)
++		mapping_set_error(bh->b_page->mapping, -EIO);
++	if (bh->b_assoc_map)
++		mapping_set_error(bh->b_assoc_map, -EIO);
++}
++EXPORT_SYMBOL(mark_buffer_write_io_error);
++
+ /*
+  * Decrement a buffer_head's reference count.  If all buffers against a page
+  * have zero reference count, are clean and unlocked, and if the page is clean
+@@ -3279,8 +3287,6 @@ drop_buffers(struct page *page, struct buffer_head **buffers_to_free)
  
-@@ -4432,6 +4447,8 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 				bfqq = bfq_get_bfqq_handle_split(bfqd, bic, bio,
- 								 true, is_sync,
- 								 NULL);
-+			else
-+				bfqq_already_existing = true;
- 		}
- 	}
+ 	bh = head;
+ 	do {
+-		if (buffer_write_io_error(bh) && page->mapping)
+-			mapping_set_error(page->mapping, -EIO);
+ 		if (buffer_busy(bh))
+ 			goto failed;
+ 		bh = bh->b_this_page;
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index b1f9144b42c7..cd7857ab1a6a 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -182,7 +182,7 @@ static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp, struct bio_vec *bvec,
+ 		bh = bh->b_this_page;
+ 	do {
+ 		if (error)
+-			set_buffer_write_io_error(bh);
++			mark_buffer_write_io_error(bh);
+ 		unlock_buffer(bh);
+ 		next = bh->b_this_page;
+ 		size -= bh->b_size;
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index bd029e52ef5e..e0abeba3ced7 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -149,6 +149,7 @@ void buffer_check_dirty_writeback(struct page *page,
+  */
  
-@@ -4457,7 +4474,8 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 			 * queue: restore the idle window and the
- 			 * possible weight raising period.
- 			 */
--			bfq_bfqq_resume_state(bfqq, bic);
-+			bfq_bfqq_resume_state(bfqq, bfqd, bic,
-+					      bfqq_already_existing);
- 		}
- 	}
- 
+ void mark_buffer_dirty(struct buffer_head *bh);
++void mark_buffer_write_io_error(struct buffer_head *bh);
+ void init_buffer(struct buffer_head *, bh_end_io_t *, void *);
+ void touch_buffer(struct buffer_head *bh);
+ void set_bh_page(struct buffer_head *bh,
 -- 
-2.10.0
+2.13.0
