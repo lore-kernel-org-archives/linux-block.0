@@ -1,49 +1,119 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:34834 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752472AbdF3P5E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 11:57:04 -0400
-Received: by mail-wm0-f42.google.com with SMTP id w126so113902281wme.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:56:53 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 02/10] lightnvm: pblk: fix double-free on pblk init
-Date: Fri, 30 Jun 2017 17:56:35 +0200
-Message-Id: <1498838203-21539-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
-References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@kernel.org>
+From: jlayton@kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	tytso@mit.edu,
+	axboe@kernel.dk,
+	mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com,
+	corbet@lwn.net,
+	Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>
+Cc: Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Liu Bo <bo.li.liu@oracle.com>,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH v8 07/18] mm: don't TestClearPageError in __filemap_fdatawait_range
+Date: Thu, 29 Jun 2017 09:19:43 -0400
+Message-Id: <20170629131954.28733-8-jlayton@kernel.org>
+In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
+References: <20170629131954.28733-1-jlayton@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Prevent pblk->lines being double freed in case of an error during pblk
-initialization.
+From: Jeff Layton <jlayton@redhat.com>
 
-Fixes: dd2a43437337: "lightnvm: pblk: sched. metadata on write thread"
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+The -EIO returned here can end up overriding whatever error is marked in
+the address space, and be returned at fsync time, even when there is a
+more appropriate error stored in the mapping.
+
+Read errors are also sometimes tracked on a per-page level using
+PG_error. Suppose we have a read error on a page, and then that page is
+subsequently dirtied by overwriting the whole page. Writeback doesn't
+clear PG_error, so we can then end up successfully writing back that
+page and still return -EIO on fsync.
+
+Worse yet, PG_error is cleared during a sync() syscall, but the -EIO
+return from that is silently discarded. Any subsystem that is relying on
+PG_error to report errors during fsync can easily lose writeback errors
+due to this. All you need is a stray sync() call to wait for writeback
+to complete and you've lost the error.
+
+Since the handling of the PG_error flag is somewhat inconsistent across
+subsystems, let's just rely on marking the address space when there are
+writeback errors. Change the TestClearPageError call to ClearPageError,
+and make __filemap_fdatawait_range a void return function.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/lightnvm/pblk-init.c | 2 --
- 1 file changed, 2 deletions(-)
+ mm/filemap.c | 20 +++++---------------
+ 1 file changed, 5 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 8bdaf7e0e00b..b3fc310aa51c 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -812,8 +812,6 @@ static int pblk_lines_init(struct pblk *pblk)
- fail_free_lines:
- 	while (--i >= 0)
- 		pblk_free_line_bitmaps(&pblk->lines[i]);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 49bc9720fb00..eb99b5f23c61 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -386,17 +386,16 @@ int filemap_flush(struct address_space *mapping)
+ }
+ EXPORT_SYMBOL(filemap_flush);
+ 
+-static int __filemap_fdatawait_range(struct address_space *mapping,
++static void __filemap_fdatawait_range(struct address_space *mapping,
+ 				     loff_t start_byte, loff_t end_byte)
+ {
+ 	pgoff_t index = start_byte >> PAGE_SHIFT;
+ 	pgoff_t end = end_byte >> PAGE_SHIFT;
+ 	struct pagevec pvec;
+ 	int nr_pages;
+-	int ret = 0;
+ 
+ 	if (end_byte < start_byte)
+-		goto out;
++		return;
+ 
+ 	pagevec_init(&pvec, 0);
+ 	while ((index <= end) &&
+@@ -413,14 +412,11 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 				continue;
+ 
+ 			wait_on_page_writeback(page);
+-			if (TestClearPageError(page))
+-				ret = -EIO;
++			ClearPageError(page);
+ 		}
+ 		pagevec_release(&pvec);
+ 		cond_resched();
+ 	}
+-out:
+-	return ret;
+ }
+ 
+ /**
+@@ -440,14 +436,8 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ int filemap_fdatawait_range(struct address_space *mapping, loff_t start_byte,
+ 			    loff_t end_byte)
+ {
+-	int ret, ret2;
 -
--	kfree(pblk->lines);
- fail_free_bb_aux:
- 	kfree(l_mg->bb_aux);
- fail_free_bb_template:
+-	ret = __filemap_fdatawait_range(mapping, start_byte, end_byte);
+-	ret2 = filemap_check_errors(mapping);
+-	if (!ret)
+-		ret = ret2;
+-
+-	return ret;
++	__filemap_fdatawait_range(mapping, start_byte, end_byte);
++	return filemap_check_errors(mapping);
+ }
+ EXPORT_SYMBOL(filemap_fdatawait_range);
+ 
 -- 
-2.7.4
+2.13.0
