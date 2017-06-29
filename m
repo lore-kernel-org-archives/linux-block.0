@@ -1,57 +1,41 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v8 02/18] buffer: use mapping_set_error instead of setting the flag
-Date: Thu, 29 Jun 2017 09:19:38 -0400
-Message-Id: <20170629131954.28733-3-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
+Return-Path: <nix@esperi.org.uk>
+From: Nick Alcock <nix@esperi.org.uk>
+To: Eric Wheeler <bcache@lists.ewheeler.net>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        dan.carpenter@oracle.com, tasleson@redhat.com,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, stable@vger.kernel.org,
+        "tang.junhui" <tang.junhui@zte.com.cn>,
+        Kent Overstreet <kent.overstreet@gmail.com>, Coly Li <colyli@suse.de>,
+        Stefan Bader <stefan.bader@canonical.com>,
+        Liang Chen <liangchen.linux@gmail.com>
+Subject: Re: [PULL] bcache fixes and updates for-4.13
+References: <alpine.LRH.2.11.1705251853530.19359@mail.ewheeler.net>
+	<alpine.LRH.2.11.1706282258100.17052@mail.ewheeler.net>
+	<20170629134510.GA32385@infradead.org>
+	<alpine.LRH.2.11.1706292212130.17052@mail.ewheeler.net>
+	<alpine.LRH.2.11.1706292222470.17052@mail.ewheeler.net>
+Date: Fri, 30 Jun 2017 00:28:48 +0100
+In-Reply-To: <alpine.LRH.2.11.1706292222470.17052@mail.ewheeler.net> (Eric
+	Wheeler's message of "Thu, 29 Jun 2017 22:25:09 +0000 (UTC)")
+Message-ID: <87k23uv0en.fsf@esperi.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+On 29 Jun 2017, Eric Wheeler verbalised:
+> Hmm, I think vger might not be letting them in because the From: header 
+> differs from the original sender (ie, I am not @oracle.com) so 
+> DNS/SPF/DKIM and such are wrong.
+>
+> What do you do in these cases?  Should I rewrite the From: header?  
+> Somehow the original author should remain.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- fs/buffer.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If these are patches from 'git format-patch', you do it by putting your
+name in the email From: and the author you want in the commit as a From
+header in the very first line of the email. 'git am' will then ignore
+the header line in favour of the first-line override. I believe 'git
+send-email' should be doing this automatically if your email address is
+not the same as the patch author, but I could be wrong...
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 161be58c5cb0..4be8b914a222 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -482,7 +482,7 @@ static void __remove_assoc_queue(struct buffer_head *bh)
- 	list_del_init(&bh->b_assoc_buffers);
- 	WARN_ON(!bh->b_assoc_map);
- 	if (buffer_write_io_error(bh))
--		set_bit(AS_EIO, &bh->b_assoc_map->flags);
-+		mapping_set_error(bh->b_assoc_map, -EIO);
- 	bh->b_assoc_map = NULL;
- }
- 
--- 
-2.13.0
+See the DISCUSSION section in 'man git-am'.
