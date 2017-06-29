@@ -1,5 +1,5 @@
 Return-Path: <bcache@lists.ewheeler.net>
-Date: Thu, 29 Jun 2017 22:25:09 +0000 (UTC)
+Date: Thu, 29 Jun 2017 22:12:45 +0000 (UTC)
 From: Eric Wheeler <bcache@lists.ewheeler.net>
 To: Christoph Hellwig <hch@infradead.org>
 cc: Jens Axboe <axboe@kernel.dk>, dan.carpenter@oracle.com,
@@ -10,55 +10,39 @@ cc: Jens Axboe <axboe@kernel.dk>, dan.carpenter@oracle.com,
     Stefan Bader <stefan.bader@canonical.com>,
     Liang Chen <liangchen.linux@gmail.com>, nix@esperi.org.uk
 Subject: Re: [PULL] bcache fixes and updates for-4.13
-In-Reply-To: <alpine.LRH.2.11.1706292212130.17052@mail.ewheeler.net>
-Message-ID: <alpine.LRH.2.11.1706292222470.17052@mail.ewheeler.net>
-References: <alpine.LRH.2.11.1705251853530.19359@mail.ewheeler.net> <alpine.LRH.2.11.1706282258100.17052@mail.ewheeler.net> <20170629134510.GA32385@infradead.org> <alpine.LRH.2.11.1706292212130.17052@mail.ewheeler.net>
+In-Reply-To: <20170629134510.GA32385@infradead.org>
+Message-ID: <alpine.LRH.2.11.1706292212130.17052@mail.ewheeler.net>
+References: <alpine.LRH.2.11.1705251853530.19359@mail.ewheeler.net> <alpine.LRH.2.11.1706282258100.17052@mail.ewheeler.net> <20170629134510.GA32385@infradead.org>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 29 Jun 2017, Eric Wheeler wrote:
 
-> 
-> On Thu, 29 Jun 2017, Christoph Hellwig wrote:
-> 
-> > On Wed, Jun 28, 2017 at 11:06:46PM +0000, Eric Wheeler wrote:
-> > > Hi Jens,
-> > > 
-> > > It looks like you're getting ready for 4.13, so here are the bcache 
-> > > updates rebased and ready from git.kernel.dk/linux-block for-4.13/block 
-> > > This tree builds, boots, and works as expected.  Please pull the new fixes 
-> > > and features below.
-> > > 
-> > > Thank you for your help!
+On Thu, 29 Jun 2017, Christoph Hellwig wrote:
+
+> On Wed, Jun 28, 2017 at 11:06:46PM +0000, Eric Wheeler wrote:
+> > Hi Jens,
 > > 
-> > Can you please send all the patches to linux-block for review as
-> > a series?  Some of these subjects sound a little suspect.
+> > It looks like you're getting ready for 4.13, so here are the bcache 
+> > updates rebased and ready from git.kernel.dk/linux-block for-4.13/block 
+> > This tree builds, boots, and works as expected.  Please pull the new fixes 
+> > and features below.
+> > 
+> > Thank you for your help!
 > 
-> 
-> On their way, IRT this thread.
+> Can you please send all the patches to linux-block for review as
+> a series?  Some of these subjects sound a little suspect.
 
-Hmm, I think vger might not be letting them in because the From: header 
-differs from the original sender (ie, I am not @oracle.com) so 
-DNS/SPF/DKIM and such are wrong.
 
-What do you do in these cases?  Should I rewrite the From: header?  
-Somehow the original author should remain.
+On their way, IRT this thread.
 
 --
 Eric Wheeler
 
 
 
-> 
 > --
-> Eric Wheeler
-> 
-> 
-> 
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> > 
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
