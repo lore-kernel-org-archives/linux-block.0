@@ -1,83 +1,31 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 29 Jun 2017 07:18:49 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: jlayton@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	tytso@mit.edu, axboe@kernel.dk, mawilcox@microsoft.com,
+	ross.zwisler@linux.intel.com, corbet@lwn.net,
+	Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
 	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
+	"Darrick J . Wong" <darrick.wong@oracle.com>,
+	Carlos Maiolino <cmaiolino@redhat.com>,
+	Eryu Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>,
 	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
+	Liu Bo <bo.li.liu@oracle.com>, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v8 08/18] mm: clean up error handling in write_one_page
-Date: Thu, 29 Jun 2017 09:19:44 -0400
-Message-Id: <20170629131954.28733-9-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
+Subject: Re: [PATCH v8 14/18] block: convert to errseq_t based writeback
+ error tracking
+Message-ID: <20170629141849.GD17251@infradead.org>
 References: <20170629131954.28733-1-jlayton@kernel.org>
+ <20170629131954.28733-15-jlayton@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170629131954.28733-15-jlayton@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+Looks good,
 
-Don't try to check PageError since that's potentially racy and not
-necessarily going to be set after writepage errors out.
-
-Instead, check the mapping for an error after writepage returns.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- mm/page-writeback.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index b901fe52b153..db30ce0b7d80 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2371,9 +2371,8 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
-  *
-  * The page must be locked by the caller and will be unlocked upon return.
-  *
-- * write_one_page() returns a negative error code if I/O failed. Note that
-- * the address_space is not marked for error. The caller must do this if
-- * needed.
-+ * Note that the mapping's AS_EIO/AS_ENOSPC flags will be cleared when this
-+ * function returns.
-  */
- int write_one_page(struct page *page)
- {
-@@ -2391,15 +2390,15 @@ int write_one_page(struct page *page)
- 	if (clear_page_dirty_for_io(page)) {
- 		get_page(page);
- 		ret = mapping->a_ops->writepage(page, &wbc);
--		if (ret == 0) {
-+		if (ret == 0)
- 			wait_on_page_writeback(page);
--			if (PageError(page))
--				ret = -EIO;
--		}
- 		put_page(page);
- 	} else {
- 		unlock_page(page);
- 	}
-+
-+	if (!ret)
-+		ret = filemap_check_errors(mapping);
- 	return ret;
- }
- EXPORT_SYMBOL(write_one_page);
--- 
-2.13.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
