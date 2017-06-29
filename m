@@ -1,92 +1,200 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:43729 "EHLO
-        iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751605AbdF3KQN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 06:16:13 -0400
-Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
-        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id 2DE083E51DB
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:07 -0700 (PDT)
-Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
-        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 73073B400BE
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:06 -0700 (PDT)
-In-Reply-To: <20170629134510.GA32385@infradead.org>
-References: <20170629134510.GA32385@infradead.org>
-From: Tang Junhui <tang.junhui@zte.com.cn>
-Date: Tue, 9 May 2017 12:14:06 -0700
-Subject: [PATCH 05/19] bcache: fix calling ida_simple_remove() with incorrect
- minor
-To: linux-block@vger.kernel.org
-Message-Id: <20170629221206.2E11F10012B@ware.dreamhost.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 9/9] bio-integrity: stop abusing bi_end_io
+Date: Thu, 29 Jun 2017 11:31:16 -0700
+Message-Id: <20170629183116.28685-10-hch@lst.de>
+In-Reply-To: <20170629183116.28685-1-hch@lst.de>
+References: <20170629183116.28685-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-bcache called ida_simple_remove() with minor which have multiplied by
-BCACHE_MINORS, it would cause minor wrong release and leakage.
+And instead call directly into the integrity code from bio_end_io.
 
-In addition, when adding partition support to bcache, the name assignment
-was not updated, resulting in numbers jumping (bcache0, bcache16,
-bcache32...). This has been fixed implicitly by the rework.
-
-Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
-Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
-Cc: stable@vger.kernel.org # 4.10
-Cc: Stefan Bader <stefan.bader@canonical.com>
-Fixes: b8c0d91 (bcache: partition support: add 16 minors per bcacheN device)
-BugLink: https://bugs.launchpad.net/bugs/1667078
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/bcache/super.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ block/bio-integrity.c | 39 ++++++++++++---------------------------
+ block/bio.c           |  5 ++---
+ block/blk.h           | 11 +++++++++++
+ include/linux/bio.h   |  9 ---------
+ 4 files changed, 25 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 9a2c190..48b8c20 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -58,7 +58,10 @@ static wait_queue_head_t unregister_wait;
- struct workqueue_struct *bcache_wq;
- 
- #define BTREE_MAX_PAGES		(256 * 1024 / PAGE_SIZE)
--#define BCACHE_MINORS		16 /* partition support */
-+#define BCACHE_MINORS_BITS                4 /* bcache partition support */
-+#define BCACHE_MINORS                     (1 << BCACHE_MINORS_BITS)
-+#define BCACHE_TO_IDA_MINORS(first_minor) ((first_minor) >> BCACHE_MINORS_BITS)
-+#define IDA_TO_BCACHE_MINORS(minor)       ((minor) << BCACHE_MINORS_BITS)
- 
- /* Superblock */
- 
-@@ -734,7 +737,8 @@ static void bcache_device_free(struct bcache_device *d)
- 	if (d->disk && d->disk->queue)
- 		blk_cleanup_queue(d->disk->queue);
- 	if (d->disk) {
--		ida_simple_remove(&bcache_minor, d->disk->first_minor);
-+		ida_simple_remove(&bcache_minor,
-+			BCACHE_TO_IDA_MINORS(d->disk->first_minor));
- 		put_disk(d->disk);
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 8df4eb103ba9..f733beab6ca2 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -102,7 +102,7 @@ EXPORT_SYMBOL(bio_integrity_alloc);
+  * Description: Used to free the integrity portion of a bio. Usually
+  * called from bio_free().
+  */
+-void bio_integrity_free(struct bio *bio)
++static void bio_integrity_free(struct bio *bio)
+ {
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 	struct bio_set *bs = bio->bi_pool;
+@@ -120,8 +120,8 @@ void bio_integrity_free(struct bio *bio)
  	}
  
-@@ -776,11 +780,11 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 	if (!d->full_dirty_stripes)
- 		return -ENOMEM;
+ 	bio->bi_integrity = NULL;
++	bio->bi_opf &= ~REQ_INTEGRITY;
+ }
+-EXPORT_SYMBOL(bio_integrity_free);
  
--	minor = ida_simple_get(&bcache_minor, 0, MINORMASK + 1, GFP_KERNEL);
-+	minor = ida_simple_get(&bcache_minor, 0,
-+		BCACHE_TO_IDA_MINORS(MINORMASK) + 1, GFP_KERNEL);
- 	if (minor < 0)
- 		return minor;
+ /**
+  * bio_integrity_add_page - Attach integrity metadata
+@@ -326,12 +326,6 @@ bool bio_integrity_prep(struct bio *bio)
+ 		offset = 0;
+ 	}
  
--	minor *= BCACHE_MINORS;
+-	/* Install custom I/O completion handler if read verify is enabled */
+-	if (bio_data_dir(bio) == READ) {
+-		bip->bip_end_io = bio->bi_end_io;
+-		bio->bi_end_io = bio_integrity_endio;
+-	}
+-
+ 	/* Auto-generate integrity metadata if this is a write */
+ 	if (bio_data_dir(bio) == WRITE) {
+ 		bio_integrity_process(bio, &bio->bi_iter,
+@@ -375,13 +369,12 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ 		bio->bi_status = BLK_STS_IOERR;
+ 	}
  
- 	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio),
- 					   BIOSET_NEED_BVECS |
-@@ -794,7 +798,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 	snprintf(d->disk->disk_name, DISK_NAME_LEN, "bcache%i", minor);
+-	/* Restore original bio completion handler */
+-	bio->bi_end_io = bip->bip_end_io;
++	bio_integrity_free(bio);
+ 	bio_endio(bio);
+ }
  
- 	d->disk->major		= bcache_major;
--	d->disk->first_minor	= minor;
-+	d->disk->first_minor	= IDA_TO_BCACHE_MINORS(minor);
- 	d->disk->fops		= &bcache_ops;
- 	d->disk->private_data	= d;
+ /**
+- * bio_integrity_endio - Integrity I/O completion function
++ * __bio_integrity_endio - Integrity I/O completion function
+  * @bio:	Protected bio
+  * @error:	Pointer to errno
+  *
+@@ -392,27 +385,19 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+  * in process context.	This function postpones completion
+  * accordingly.
+  */
+-void bio_integrity_endio(struct bio *bio)
++bool __bio_integrity_endio(struct bio *bio)
+ {
+-	struct bio_integrity_payload *bip = bio_integrity(bio);
++	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
++		struct bio_integrity_payload *bip = bio_integrity(bio);
  
+-	BUG_ON(bip->bip_bio != bio);
+-
+-	/* In case of an I/O error there is no point in verifying the
+-	 * integrity metadata.  Restore original bio end_io handler
+-	 * and run it.
+-	 */
+-	if (bio->bi_status) {
+-		bio->bi_end_io = bip->bip_end_io;
+-		bio_endio(bio);
+-
+-		return;
++		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
++		queue_work(kintegrityd_wq, &bip->bip_work);
++		return false;
+ 	}
+ 
+-	INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
+-	queue_work(kintegrityd_wq, &bip->bip_work);
++	bio_integrity_free(bio);
++	return true;
+ }
+-EXPORT_SYMBOL(bio_integrity_endio);
+ 
+ /**
+  * bio_integrity_advance - Advance integrity vector
+diff --git a/block/bio.c b/block/bio.c
+index 7a288d344638..48075f671c49 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -243,9 +243,6 @@ struct bio_vec *bvec_alloc(gfp_t gfp_mask, int nr, unsigned long *idx,
+ static void __bio_free(struct bio *bio)
+ {
+ 	bio_disassociate_task(bio);
+-
+-	if (bio_integrity(bio))
+-		bio_integrity_free(bio);
+ }
+ 
+ static void bio_free(struct bio *bio)
+@@ -1807,6 +1804,8 @@ void bio_endio(struct bio *bio)
+ again:
+ 	if (!bio_remaining_done(bio))
+ 		return;
++	if (!bio_integrity_endio(bio))
++		return;
+ 
+ 	/*
+ 	 * Need to have a real endio function for chained bios, otherwise
+diff --git a/block/blk.h b/block/blk.h
+index 01ebb8185f6b..921106babba8 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -81,10 +81,21 @@ static inline void blk_queue_enter_live(struct request_queue *q)
+ 
+ #ifdef CONFIG_BLK_DEV_INTEGRITY
+ void blk_flush_integrity(void);
++bool __bio_integrity_endio(struct bio *);
++static inline bool bio_integrity_endio(struct bio *bio)
++{
++	if (bio_integrity(bio))
++		return __bio_integrity_endio(bio);
++	return true;
++}
+ #else
+ static inline void blk_flush_integrity(void)
+ {
+ }
++static inline bool bio_integrity_endio(struct bio *)
++{
++	return true;
++}
+ #endif
+ 
+ void blk_timeout_work(struct work_struct *work);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 7b989233e8d0..8a56a5057089 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -320,8 +320,6 @@ struct bio_integrity_payload {
+ 
+ 	struct bvec_iter	bip_iter;
+ 
+-	bio_end_io_t		*bip_end_io;	/* saved I/O completion fn */
+-
+ 	unsigned short		bip_slab;	/* slab the bip came from */
+ 	unsigned short		bip_vcnt;	/* # of integrity bio_vecs */
+ 	unsigned short		bip_max_vcnt;	/* integrity bio_vec slots */
+@@ -738,10 +736,8 @@ struct biovec_slab {
+ 		bip_for_each_vec(_bvl, _bio->bi_integrity, _iter)
+ 
+ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
+-extern void bio_integrity_free(struct bio *);
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
+ extern bool bio_integrity_prep(struct bio *);
+-extern void bio_integrity_endio(struct bio *);
+ extern void bio_integrity_advance(struct bio *, unsigned int);
+ extern void bio_integrity_trim(struct bio *);
+ extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
+@@ -771,11 +767,6 @@ static inline bool bio_integrity_prep(struct bio *bio)
+ 	return true;
+ }
+ 
+-static inline void bio_integrity_free(struct bio *bio)
+-{
+-	return;
+-}
+-
+ static inline int bio_integrity_clone(struct bio *bio, struct bio *bio_src,
+ 				      gfp_t gfp_mask)
+ {
 -- 
-1.8.3.1
+2.11.0
