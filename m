@@ -1,71 +1,49 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v8 06/18] mm: clear AS_EIO/AS_ENOSPC when writeback initiation fails
-Date: Thu, 29 Jun 2017 09:19:42 -0400
-Message-Id: <20170629131954.28733-7-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
+Return-Path: <jlayton@poochiereds.net>
+Return-Path: <jlayton@poochiereds.net>
+Message-ID: <1498767443.5710.1.camel@poochiereds.net>
+Subject: Re: [PATCH v8 03/18] fs: check for writeback errors after syncing
+ out buffers in generic_file_fsync
+From: Jeff Layton <jlayton@poochiereds.net>
+To: Christoph Hellwig <hch@infradead.org>, jlayton@kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, tytso@mit.edu,
+ axboe@kernel.dk, mawilcox@microsoft.com,  ross.zwisler@linux.intel.com,
+ corbet@lwn.net, Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
+ David Sterba <dsterba@suse.com>, "Darrick J . Wong"
+ <darrick.wong@oracle.com>, Carlos Maiolino <cmaiolino@redhat.com>, Eryu
+ Guan <eguan@redhat.com>, David Howells <dhowells@redhat.com>, Liu Bo
+ <bo.li.liu@oracle.com>, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
+Date: Thu, 29 Jun 2017 16:17:23 -0400
+In-Reply-To: <20170629141933.GE17251@infradead.org>
 References: <20170629131954.28733-1-jlayton@kernel.org>
+	 <20170629131954.28733-4-jlayton@kernel.org>
+	 <20170629141933.GE17251@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+On Thu, 2017-06-29 at 07:19 -0700, Christoph Hellwig wrote:
+> On Thu, Jun 29, 2017 at 09:19:39AM -0400, jlayton@kernel.org wrote:
+> > From: Jeff Layton <jlayton@redhat.com>
+> > 
+> > ext2 currently does a test+clear of the AS_EIO flag, which is
+> > is problematic for some coming changes.
+> > 
+> > What we really need to do instead is call filemap_check_errors
+> > in __generic_file_fsync after syncing out the buffers. That
+> > will be sufficient for this case, and help other callers detect
+> > these errors properly as well.
+> > 
+> > With that, we don't need to twiddle it in ext2.
+> 
+> Seems like much of this code is getting replaced later in the
+> series..
 
-filemap_write_and_wait{_range} will return an error if writeback
-initiation fails, but won't clear errors in the address_space. This is
-particularly problematic on DAX, as it's effectively synchronous. Ensure
-that we clear the AS_EIO/AS_ENOSPC flags when filemap_fdatawrite returns
-an error.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- mm/filemap.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+It does. I suppose I could squash this in with the __generic_file_fsync
+patch.
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index e5711b2728f4..49bc9720fb00 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -515,6 +515,9 @@ int filemap_write_and_wait(struct address_space *mapping)
- 			int err2 = filemap_fdatawait(mapping);
- 			if (!err)
- 				err = err2;
-+		} else {
-+			/* Clear any previously stored errors */
-+			filemap_check_errors(mapping);
- 		}
- 	} else {
- 		err = filemap_check_errors(mapping);
-@@ -549,6 +552,9 @@ int filemap_write_and_wait_range(struct address_space *mapping,
- 						lstart, lend);
- 			if (!err)
- 				err = err2;
-+		} else {
-+			/* Clear any previously stored errors */
-+			filemap_check_errors(mapping);
- 		}
- 	} else {
- 		err = filemap_check_errors(mapping);
 -- 
-2.13.0
+Jeff Layton <jlayton@poochiereds.net>
