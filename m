@@ -1,64 +1,114 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36056 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752587AbdFZMPe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:15:34 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 16/51] block: bounce: avoid direct access to bvec table
-Date: Mon, 26 Jun 2017 20:09:59 +0800
-Message-Id: <20170626121034.3051-17-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jlayton@poochiereds.net>
+Return-Path: <jlayton@poochiereds.net>
+Message-ID: <1498768934.5710.7.camel@poochiereds.net>
+Subject: Re: [PATCH v8 12/18] Documentation: flesh out the section in
+ vfs.txt on storing and reporting writeback errors
+From: Jeff Layton <jlayton@poochiereds.net>
+To: Matthew Wilcox <mawilcox@microsoft.com>, "Darrick J. Wong"
+	 <darrick.wong@oracle.com>, "jlayton@kernel.org" <jlayton@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Al Viro
+ <viro@ZenIV.linux.org.uk>,  Jan Kara <jack@suse.cz>, "tytso@mit.edu"
+ <tytso@mit.edu>, "axboe@kernel.dk" <axboe@kernel.dk>,
+ "ross.zwisler@linux.intel.com" <ross.zwisler@linux.intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, Chris Mason <clm@fb.com>, Josef Bacik
+ <jbacik@fb.com>, David Sterba <dsterba@suse.com>,  Carlos Maiolino
+ <cmaiolino@redhat.com>, Eryu Guan <eguan@redhat.com>, David Howells
+ <dhowells@redhat.com>,  Christoph Hellwig <hch@infradead.org>, Liu Bo
+ <bo.li.liu@oracle.com>,  "linux-fsdevel@vger.kernel.org"
+ <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+  "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+ "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+ "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date: Thu, 29 Jun 2017 16:42:14 -0400
+In-Reply-To: <BY2PR21MB003653755FD85FCE2C49393ECBD20@BY2PR21MB0036.namprd21.prod.outlook.com>
+References: <20170629131954.28733-1-jlayton@kernel.org>
+	 <20170629131954.28733-13-jlayton@kernel.org>
+	 <20170629171137.GE5874@birch.djwong.org>
+	 <1498760014.22569.13.camel@poochiereds.net>
+	 <BY2PR21MB003653755FD85FCE2C49393ECBD20@BY2PR21MB0036.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-We will support multipage bvecs in the future, so change to
-iterator way for getting bv_page of bvec from original bio.
+On Thu, 2017-06-29 at 18:21 +0000, Matthew Wilcox wrote:
+> From: Jeff Layton [mailto:jlayton@poochiereds.net]
+> > On Thu, 2017-06-29 at 10:11 -0700, Darrick J. Wong wrote:
+> > > On Thu, Jun 29, 2017 at 09:19:48AM -0400, jlayton@kernel.org wrote:
+> > > > +Handling errors during writeback
+> > > > +--------------------------------
+> > > > +Most applications that utilize the pagecache will periodically call
+> > > > +fsync to ensure that data written has made it to the backing store.
+> > > 
+> > > /me wonders if this sentence ought to be worded more strongly, e.g.
+> > > 
+> > > "Applications that utilize the pagecache must call a data
+> > > synchronization syscall such as fsync, fdatasync, or msync to ensure
+> > > that data written has made it to the backing store."
+> > 
+> > Well...only if they care about the data. There are some that don't. :)
+> 
+> Also, applications don't "utilize the pagecache"; filesystems use the pagecache.
+> Applications may or may not use cached I/O.  How about this:
+> 
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bounce.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+I meant "applications that do buffered I/O" as opposed to O_DIRECT, but
+yeah that's not very clear.
 
-diff --git a/block/bounce.c b/block/bounce.c
-index 916ee9a9a216..4eea1b2d8618 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -135,21 +135,22 @@ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
- static void bounce_end_io(struct bio *bio, mempool_t *pool)
- {
- 	struct bio *bio_orig = bio->bi_private;
--	struct bio_vec *bvec, *org_vec;
-+	struct bio_vec *bvec, orig_vec;
- 	int i;
--	int start = bio_orig->bi_iter.bi_idx;
-+	struct bvec_iter orig_iter = bio_orig->bi_iter;
- 
- 	/*
- 	 * free up bounce indirect pages used
- 	 */
- 	bio_for_each_segment_all(bvec, bio, i) {
--		org_vec = bio_orig->bi_io_vec + i + start;
--
--		if (bvec->bv_page == org_vec->bv_page)
--			continue;
-+		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
-+		if (bvec->bv_page == orig_vec.bv_page)
-+			goto next;
- 
- 		dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
- 		mempool_free(bvec->bv_page, pool);
-+ next:
-+		bio_advance_iter(bio_orig, &orig_iter, orig_vec.bv_len);
- 	}
- 
- 	bio_orig->bi_status = bio->bi_status;
+
+> Applications which care about data integrity and use cached I/O will
+> periodically call fsync(), msync() or fdatasync() to ensure that their
+> data is durable.
+> 
+> > What should we do about sync_file_range here? It doesn't currently call
+> > any filesystem operations directly, so we don't have a good way to make
+> > it selectively use errseq_t handling there.
+> > 
+> > I could resurrect the FS_* flag for that, though I don't really like
+> > that. Should I just go ahead and convert it over to use errseq_t under
+> > the theory that most callers will eventually want that anyway?
+> 
+> I think so.
+
+Ok, I'll leave that for the next pile of patches though.
+
+Here's a revised section
+
+------------------------------8<--------------------------------
+Handling errors during writeback
+--------------------------------
+Most applications that do buffered I/O will periodically call a file
+synchronization call (fsync, fdatasync, msync or sync_file_range) to
+ensure that data written has made it to the backing store.  When there
+is an error during writeback, they expect that error to be reported when
+a file sync request is made.  After an error has been reported on one
+request, subsequent requests on the same file descriptor should return
+0, unless further writeback errors have occurred since the previous file
+syncronization.
+
+Ideally, the kernel would report errors only on file descriptions on
+which writes were done that subsequently failed to be written back.  The
+generic pagecache infrastructure does not track the file descriptions
+that have dirtied each individual page however, so determining which
+file descriptors should get back an error is not possible.
+
+Instead, the generic writeback error tracking infrastructure in the
+kernel settles for reporting errors to fsync on all file descriptions
+that were open at the time that the error occurred.  In a situation with
+multiple writers, all of them will get back an error on a subsequent
+fsync,
+even if all of the writes done through that particular file descriptor
+succeeded (or even if there were no writes on that file descriptor at
+all).
+
+Filesystems that wish to use this infrastructure should call
+mapping_set_error to record the error in the address_space when it
+occurs.  Then, after writing back data from the pagecache in their
+file->fsync operation, they should call file_check_and_advance_wb_err to
+ensure that the struct file's error cursor has advanced to the correct
+point in the stream of errors emitted by the backing device(s).
+------------------------------8<--------------------------------
+
+Thanks for the review so far!
 -- 
-2.9.4
+Jeff Layton <jlayton@poochiereds.net>
