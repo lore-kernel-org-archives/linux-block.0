@@ -1,37 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41389 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752042AbdF2Ia0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Jun 2017 04:30:26 -0400
-Date: Thu, 29 Jun 2017 10:30:22 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Max Gurtovoy <maxg@mellanox.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>, axboe@fb.com, hch@lst.de,
-        bvanassche@acm.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, vladimirk@mellanox.com
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:35446 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751591AbdF2Fdg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jun 2017 01:33:36 -0400
+Received: by mail-wr0-f193.google.com with SMTP id z45so35932961wrb.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Jun 2017 22:33:36 -0700 (PDT)
 Subject: Re: [PATCH 1/1] blk-mq: map all HWQ also in hyperthreaded system
-Message-ID: <20170629083022.GD3808@linux-x5ow.site>
+To: Max Gurtovoy <maxg@mellanox.com>, axboe@fb.com, hch@lst.de,
+        bvanassche@acm.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+Cc: vladimirk@mellanox.com
 References: <1498653880-29223-1-git-send-email-maxg@mellanox.com>
- <37fea86b-ce87-ac03-e465-5daf62a456c4@grimberg.me>
- <1cc73f8d-3e9d-0f9f-2b71-60d2bc6ce7b5@mellanox.com>
- <81fe8f2a-1fba-730e-a4af-047a4e06bd1a@grimberg.me>
- <a681644a-95ed-c9c0-99fe-96f8529ec991@mellanox.com>
+ <e9cccad7-804a-f68b-b184-46cc5be2f01d@grimberg.me>
+ <c0e5ca5d-f048-cf9c-27d6-6a2a98a48251@mellanox.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <4da1ee67-052f-a0a1-ac9c-a3cb5f39b750@grimberg.me>
+Date: Thu, 29 Jun 2017 08:33:32 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <a681644a-95ed-c9c0-99fe-96f8529ec991@mellanox.com>
+In-Reply-To: <c0e5ca5d-f048-cf9c-27d6-6a2a98a48251@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Jun 28, 2017 at 08:11:23PM +0300, Max Gurtovoy wrote:
-> Nevertheless, we should review and consider pushing my fixes to the block
-> layer for other users of this mapping function.
 
-Totally agree with it and it's easier to backport to let's say stable kernels.
+>>> +static int cpu_to_queue_index(unsigned int nr_queues, const int cpu,
+>>> +                  const struct cpumask *online_mask)
+>>>   {
+>>> -    return cpu * nr_queues / nr_cpus;
+>>> +    /*
+>>> +     * Non online CPU will be mapped to queue index 0.
+>>> +     */
+>>> +    if (!cpumask_test_cpu(cpu, online_mask))
+>>> +        return 0;
+>>
+>> Why not map offline cpus to what they would've map to if they were
+>> online?
+> 
+> I didn't change logic for offline cpu's.
+> Should it be done in this patch ?
 
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+The patch clearly treats offline cpus differently, maps them
+to queue 0.
