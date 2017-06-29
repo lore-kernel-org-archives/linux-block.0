@@ -1,43 +1,42 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/11] ext4: add support for passing in write hints for buffered writes
-Date: Wed, 14 Jun 2017 21:45:09 -0600
-Message-Id: <1497498312-17704-9-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
-References: <1497498312-17704-1-git-send-email-axboe@kernel.dk>
+Subject: [PATCH 2/9] bio-integrity: bio_integrity_advance must update integrity seed
+Date: Thu, 29 Jun 2017 11:31:09 -0700
+Message-Id: <20170629183116.28685-3-hch@lst.de>
+In-Reply-To: <20170629183116.28685-1-hch@lst.de>
+References: <20170629183116.28685-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/ext4/page-io.c | 2 ++
- 1 file changed, 2 insertions(+)
+From: Dmitry Monakhov <dmonakhov@openvz.org>
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 1a82138ba739..764bf0ddecd4 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -349,6 +349,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 	if (bio) {
- 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
- 				  REQ_SYNC : 0;
-+		io_op_flags |= bio_op_write_hint(inode_write_hint(io->io_end->inode));
- 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
- 		submit_bio(io->io_bio);
- 	}
-@@ -396,6 +397,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
- 		ret = io_submit_init_bio(io, bh);
- 		if (ret)
- 			return ret;
-+		io->io_bio->bi_opf |= bio_op_write_hint(inode_write_hint(inode));
- 	}
- 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
- 	if (ret != bh->b_size)
+SCSI drivers do care about bip_seed so we must update it accordingly.
+
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio-integrity.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index b8a3a65f7364..8c2253c59edb 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -425,6 +425,7 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+ 	unsigned bytes = bio_integrity_bytes(bi, bytes_done >> 9);
+ 
++	bip->bip_iter.bi_sector += bytes_done >> 9;
+ 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
+ }
+ EXPORT_SYMBOL(bio_integrity_advance);
 -- 
-2.7.4
+2.11.0
