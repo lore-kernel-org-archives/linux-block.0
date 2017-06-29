@@ -1,63 +1,85 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: viro@zeniv.linux.org.uk,
+	axboe@kernel.dk
+Cc: Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>,
+	mgorman@suse.de,
+	Volker.Lendecke@sernet.de,
 	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v8 14/18] block: convert to errseq_t based writeback error tracking
-Date: Thu, 29 Jun 2017 09:19:50 -0400
-Message-Id: <20170629131954.28733-15-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
+Subject: [PATCH 1/3] fs: pass iocb to do_generic_file_read
+Date: Thu, 29 Jun 2017 14:25:01 -0700
+Message-Id: <20170629212503.15110-2-hch@lst.de>
+In-Reply-To: <20170629212503.15110-1-hch@lst.de>
+References: <20170629212503.15110-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+And rename it to the more descriptive generic_file_buffered_read while
+at it.
 
-This is a very minimal conversion to errseq_t based error tracking
-for raw block device access. Just have it use the standard
-file_write_and_wait_range call.
-
-Note that there are internal callers that call sync_blockdev
-and the like that are not affected by this. They'll continue
-to use the AS_EIO/AS_ENOSPC flags for error reporting like
-they always have for now.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/block_dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ mm/filemap.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 4d62fe771587..bcb0be6e423a 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -624,7 +624,7 @@ int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
- 	struct block_device *bdev = I_BDEV(bd_inode);
- 	int error;
- 	
--	error = filemap_write_and_wait_range(filp->f_mapping, start, end);
-+	error = file_write_and_wait_range(filp, start, end);
- 	if (error)
- 		return error;
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 742034e56100..3df0a57cd48e 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1792,9 +1792,8 @@ static void shrink_readahead_size_eio(struct file *filp,
+ }
  
+ /**
+- * do_generic_file_read - generic file read routine
+- * @filp:	the file to read
+- * @ppos:	current file position
++ * generic_file_buffered_read - generic file read routine
++ * @iocb:	the iocb to read
+  * @iter:	data destination
+  * @written:	already copied
+  *
+@@ -1804,12 +1803,14 @@ static void shrink_readahead_size_eio(struct file *filp,
+  * This is really ugly. But the goto's actually try to clarify some
+  * of the logic when it comes to error handling etc.
+  */
+-static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
++static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+ 		struct iov_iter *iter, ssize_t written)
+ {
++	struct file *filp = iocb->ki_filp;
+ 	struct address_space *mapping = filp->f_mapping;
+ 	struct inode *inode = mapping->host;
+ 	struct file_ra_state *ra = &filp->f_ra;
++	loff_t *ppos = &iocb->ki_pos;
+ 	pgoff_t index;
+ 	pgoff_t last_index;
+ 	pgoff_t prev_index;
+@@ -2057,14 +2058,14 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ ssize_t
+ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ {
+-	struct file *file = iocb->ki_filp;
+-	ssize_t retval = 0;
+ 	size_t count = iov_iter_count(iter);
++	ssize_t retval = 0;
+ 
+ 	if (!count)
+ 		goto out; /* skip atime */
+ 
+ 	if (iocb->ki_flags & IOCB_DIRECT) {
++		struct file *file = iocb->ki_filp;
+ 		struct address_space *mapping = file->f_mapping;
+ 		struct inode *inode = mapping->host;
+ 		loff_t size;
+@@ -2105,7 +2106,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 			goto out;
+ 	}
+ 
+-	retval = do_generic_file_read(file, &iocb->ki_pos, iter, retval);
++	retval = generic_file_buffered_read(iocb, iter, retval);
+ out:
+ 	return retval;
+ }
 -- 
-2.13.0
+2.11.0
