@@ -1,89 +1,36 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v8 01/18] fs: remove call_fsync helper function
-Date: Thu, 29 Jun 2017 09:19:37 -0400
-Message-Id: <20170629131954.28733-2-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:41280 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753109AbdF2MvQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Jun 2017 08:51:16 -0400
+Date: Thu, 29 Jun 2017 14:51:04 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        tj@kernel.org, hch@lst.de, axboe@fb.com, rostedt@goodmis.org,
+        lizefan@huawei.com, Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH V4 04/12] kernfs: don't set dentry->d_fsdata
+Message-ID: <20170629125104.GD26046@kroah.com>
+References: <cover.1498666964.git.shli@fb.com>
+ <e85bcd9d41636fa2a14dee94db212c3e17e70612.1498666964.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <e85bcd9d41636fa2a14dee94db212c3e17e70612.1498666964.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jeff Layton <jlayton@redhat.com>
+On Wed, Jun 28, 2017 at 09:29:54AM -0700, Shaohua Li wrote:
+> From: Shaohua Li <shli@fb.com>
+> 
+> When working on adding exportfs operations in kernfs, I found it's hard
+> to initialize dentry->d_fsdata in the exportfs operations. Looks there
+> is no way to do it without race condition. Look at the kernfs code
+> closely, there is no point to set dentry->d_fsdata. inode->i_private
+> already points to kernfs_node, and we can get inode from a dentry. So
+> this patch just delete the d_fsdata usage.
+> 
+> Acked-by: Tejun Heo <tj@kernel.org>
+> Signed-off-by: Shaohua Li <shli@fb.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/sync.c          | 2 +-
- include/linux/fs.h | 6 ------
- ipc/shm.c          | 2 +-
- 3 files changed, 2 insertions(+), 8 deletions(-)
-
-diff --git a/fs/sync.c b/fs/sync.c
-index 11ba023434b1..2a54c1f22035 100644
---- a/fs/sync.c
-+++ b/fs/sync.c
-@@ -192,7 +192,7 @@ int vfs_fsync_range(struct file *file, loff_t start, loff_t end, int datasync)
- 		spin_unlock(&inode->i_lock);
- 		mark_inode_dirty_sync(inode);
- 	}
--	return call_fsync(file, start, end, datasync);
-+	return file->f_op->fsync(file, start, end, datasync);
- }
- EXPORT_SYMBOL(vfs_fsync_range);
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 1e53cd281437..4ff4498297fa 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1739,12 +1739,6 @@ static inline int call_mmap(struct file *file, struct vm_area_struct *vma)
- 	return file->f_op->mmap(file, vma);
- }
- 
--static inline int call_fsync(struct file *file, loff_t start, loff_t end,
--			     int datasync)
--{
--	return file->f_op->fsync(file, start, end, datasync);
--}
--
- ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
- 			      unsigned long nr_segs, unsigned long fast_segs,
- 			      struct iovec *fast_pointer,
-diff --git a/ipc/shm.c b/ipc/shm.c
-index 34c4344e8d4b..f45c7959b264 100644
---- a/ipc/shm.c
-+++ b/ipc/shm.c
-@@ -452,7 +452,7 @@ static int shm_fsync(struct file *file, loff_t start, loff_t end, int datasync)
- 
- 	if (!sfd->file->f_op->fsync)
- 		return -EINVAL;
--	return call_fsync(sfd->file, start, end, datasync);
-+	return sfd->file->f_op->fsync(sfd->file, start, end, datasync);
- }
- 
- static long shm_fallocate(struct file *file, int mode, loff_t offset,
--- 
-2.13.0
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
