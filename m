@@ -1,260 +1,141 @@
-Return-Path: <BATV+8132ee8c7e24eb087ca3+5055+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] blk-mq: create hctx for each present CPU
-Date: Mon, 26 Jun 2017 12:20:57 +0200
-Message-Id: <20170626102058.10200-3-hch@lst.de>
-In-Reply-To: <20170626102058.10200-1-hch@lst.de>
-References: <20170626102058.10200-1-hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 5/9] t10-pi: Move opencoded contants to common header
+Date: Thu, 29 Jun 2017 11:31:12 -0700
+Message-Id: <20170629183116.28685-6-hch@lst.de>
+In-Reply-To: <20170629183116.28685-1-hch@lst.de>
+References: <20170629183116.28685-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we only create hctx for online CPUs, which can lead to a lot
-of churn due to frequent soft offline / online operations.  Instead
-allocate one for each present CPU to avoid this and dramatically simplify
-the code.
+From: Dmitry Monakhov <dmonakhov@openvz.org>
 
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c             | 120 +++++----------------------------------------
- block/blk-mq.h             |   5 --
- include/linux/cpuhotplug.h |   1 -
- 3 files changed, 11 insertions(+), 115 deletions(-)
+ block/t10-pi.c                   | 9 +++------
+ drivers/scsi/lpfc/lpfc_scsi.c    | 5 +++--
+ drivers/scsi/qla2xxx/qla_isr.c   | 8 ++++----
+ drivers/target/target_core_sbc.c | 2 +-
+ include/linux/t10-pi.h           | 2 ++
+ 5 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bb66c96850b1..dd390e27824d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -37,9 +37,6 @@
- #include "blk-wbt.h"
- #include "blk-mq-sched.h"
+diff --git a/block/t10-pi.c b/block/t10-pi.c
+index 3416dadf7b15..a98db384048f 100644
+--- a/block/t10-pi.c
++++ b/block/t10-pi.c
+@@ -28,9 +28,6 @@
  
--static DEFINE_MUTEX(all_q_mutex);
--static LIST_HEAD(all_q_list);
+ typedef __be16 (csum_fn) (void *, unsigned int);
+ 
+-static const __be16 APP_ESCAPE = (__force __be16) 0xffff;
+-static const __be32 REF_ESCAPE = (__force __be32) 0xffffffff;
 -
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- static void __blk_mq_stop_hw_queues(struct request_queue *q, bool sync);
-@@ -1975,8 +1972,8 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- 		INIT_LIST_HEAD(&__ctx->rq_list);
- 		__ctx->queue = q;
- 
--		/* If the cpu isn't online, the cpu is mapped to first hctx */
--		if (!cpu_online(i))
-+		/* If the cpu isn't present, the cpu is mapped to first hctx */
-+		if (!cpu_present(i))
- 			continue;
- 
- 		hctx = blk_mq_map_queue(q, i);
-@@ -2019,8 +2016,7 @@ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
- 	}
- }
- 
--static void blk_mq_map_swqueue(struct request_queue *q,
--			       const struct cpumask *online_mask)
-+static void blk_mq_map_swqueue(struct request_queue *q)
+ static __be16 t10_pi_crc_fn(void *data, unsigned int len)
  {
- 	unsigned int i, hctx_idx;
- 	struct blk_mq_hw_ctx *hctx;
-@@ -2038,13 +2034,11 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 	}
+ 	return cpu_to_be16(crc_t10dif(data, len));
+@@ -82,7 +79,7 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+ 		switch (type) {
+ 		case 1:
+ 		case 2:
+-			if (pi->app_tag == APP_ESCAPE)
++			if (pi->app_tag == T10_PI_APP_ESCAPE)
+ 				goto next;
  
- 	/*
--	 * Map software to hardware queues
-+	 * Map software to hardware queues.
-+	 *
-+	 * If the cpu isn't present, the cpu is mapped to first hctx.
+ 			if (be32_to_cpu(pi->ref_tag) !=
+@@ -95,8 +92,8 @@ static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+ 			}
+ 			break;
+ 		case 3:
+-			if (pi->app_tag == APP_ESCAPE &&
+-			    pi->ref_tag == REF_ESCAPE)
++			if (pi->app_tag == T10_PI_APP_ESCAPE &&
++			    pi->ref_tag == T10_PI_REF_ESCAPE)
+ 				goto next;
+ 			break;
+ 		}
+diff --git a/drivers/scsi/lpfc/lpfc_scsi.c b/drivers/scsi/lpfc/lpfc_scsi.c
+index 54fd0c81ceaf..99d2e990b231 100644
+--- a/drivers/scsi/lpfc/lpfc_scsi.c
++++ b/drivers/scsi/lpfc/lpfc_scsi.c
+@@ -26,6 +26,7 @@
+ #include <linux/export.h>
+ #include <linux/delay.h>
+ #include <asm/unaligned.h>
++#include <linux/t10-pi.h>
+ #include <linux/crc-t10dif.h>
+ #include <net/checksum.h>
+ 
+@@ -2934,8 +2935,8 @@ lpfc_calc_bg_err(struct lpfc_hba *phba, struct lpfc_scsi_buf *lpfc_cmd)
+ 				 * First check to see if a protection data
+ 				 * check is valid
+ 				 */
+-				if ((src->ref_tag == 0xffffffff) ||
+-				    (src->app_tag == 0xffff)) {
++				if ((src->ref_tag == T10_PI_REF_ESCAPE) ||
++				    (src->app_tag == T10_PI_APP_ESCAPE)) {
+ 					start_ref_tag++;
+ 					goto skipit;
+ 				}
+diff --git a/drivers/scsi/qla2xxx/qla_isr.c b/drivers/scsi/qla2xxx/qla_isr.c
+index 2572121b765b..de031aed94f6 100644
+--- a/drivers/scsi/qla2xxx/qla_isr.c
++++ b/drivers/scsi/qla2xxx/qla_isr.c
+@@ -1950,9 +1950,9 @@ qla2x00_handle_dif_error(srb_t *sp, struct sts_entry_24xx *sts24)
+ 	 * For type     3: ref & app tag is all 'f's
+ 	 * For type 0,1,2: app tag is all 'f's
  	 */
--	for_each_possible_cpu(i) {
--		/* If the cpu isn't online, the cpu is mapped to first hctx */
--		if (!cpumask_test_cpu(i, online_mask))
--			continue;
--
-+	for_each_present_cpu(i) {
- 		hctx_idx = q->mq_map[i];
- 		/* unmapped hw queue can be remapped after CPU topo changed */
- 		if (!set->tags[hctx_idx] &&
-@@ -2330,16 +2324,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		blk_queue_softirq_done(q, set->ops->complete);
+-	if ((a_app_tag == 0xffff) &&
++	if ((a_app_tag == T10_PI_APP_ESCAPE) &&
+ 	    ((scsi_get_prot_type(cmd) != SCSI_PROT_DIF_TYPE3) ||
+-	     (a_ref_tag == 0xffffffff))) {
++	     (a_ref_tag == T10_PI_REF_ESCAPE))) {
+ 		uint32_t blocks_done, resid;
+ 		sector_t lba_s = scsi_get_lba(cmd);
  
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
--
--	get_online_cpus();
--	mutex_lock(&all_q_mutex);
--
--	list_add_tail(&q->all_q_node, &all_q_list);
- 	blk_mq_add_queue_tag_set(set, q);
--	blk_mq_map_swqueue(q, cpu_online_mask);
--
--	mutex_unlock(&all_q_mutex);
--	put_online_cpus();
-+	blk_mq_map_swqueue(q);
+@@ -1994,9 +1994,9 @@ qla2x00_handle_dif_error(srb_t *sp, struct sts_entry_24xx *sts24)
+ 			spt = page_address(sg_page(sg)) + sg->offset;
+ 			spt += j;
  
- 	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
- 		int ret;
-@@ -2365,18 +2351,12 @@ void blk_mq_free_queue(struct request_queue *q)
- {
- 	struct blk_mq_tag_set	*set = q->tag_set;
+-			spt->app_tag = 0xffff;
++			spt->app_tag = T10_PI_APP_ESCAPE;
+ 			if (scsi_get_prot_type(cmd) == SCSI_PROT_DIF_TYPE3)
+-				spt->ref_tag = 0xffffffff;
++				spt->ref_tag = T10_PI_REF_ESCAPE;
+ 		}
  
--	mutex_lock(&all_q_mutex);
--	list_del_init(&q->all_q_node);
--	mutex_unlock(&all_q_mutex);
--
- 	blk_mq_del_queue_tag_set(q);
--
- 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
- }
+ 		return 0;
+diff --git a/drivers/target/target_core_sbc.c b/drivers/target/target_core_sbc.c
+index 4316f7b65fb7..dc9456e7dac9 100644
+--- a/drivers/target/target_core_sbc.c
++++ b/drivers/target/target_core_sbc.c
+@@ -1450,7 +1450,7 @@ sbc_dif_verify(struct se_cmd *cmd, sector_t start, unsigned int sectors,
+ 				 (unsigned long long)sector, sdt->guard_tag,
+ 				 sdt->app_tag, be32_to_cpu(sdt->ref_tag));
  
- /* Basically redo blk_mq_init_queue with queue frozen */
--static void blk_mq_queue_reinit(struct request_queue *q,
--				const struct cpumask *online_mask)
-+static void blk_mq_queue_reinit(struct request_queue *q)
- {
- 	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
+-			if (sdt->app_tag == cpu_to_be16(0xffff)) {
++			if (sdt->app_tag == T10_PI_APP_ESCAPE) {
+ 				dsg_off += block_size;
+ 				goto next;
+ 			}
+diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
+index 9375d23a24e7..635a3c5706bd 100644
+--- a/include/linux/t10-pi.h
++++ b/include/linux/t10-pi.h
+@@ -33,6 +33,8 @@ struct t10_pi_tuple {
+ 	__be32 ref_tag;		/* Target LBA or indirect LBA */
+ };
  
-@@ -2389,76 +2369,12 @@ static void blk_mq_queue_reinit(struct request_queue *q,
- 	 * involves free and re-allocate memory, worthy doing?)
- 	 */
++#define T10_PI_APP_ESCAPE cpu_to_be16(0xffff)
++#define T10_PI_REF_ESCAPE cpu_to_be32(0xffffffff)
  
--	blk_mq_map_swqueue(q, online_mask);
-+	blk_mq_map_swqueue(q);
- 
- 	blk_mq_sysfs_register(q);
- 	blk_mq_debugfs_register_hctxs(q);
- }
- 
--/*
-- * New online cpumask which is going to be set in this hotplug event.
-- * Declare this cpumasks as global as cpu-hotplug operation is invoked
-- * one-by-one and dynamically allocating this could result in a failure.
-- */
--static struct cpumask cpuhp_online_new;
--
--static void blk_mq_queue_reinit_work(void)
--{
--	struct request_queue *q;
--
--	mutex_lock(&all_q_mutex);
--	/*
--	 * We need to freeze and reinit all existing queues.  Freezing
--	 * involves synchronous wait for an RCU grace period and doing it
--	 * one by one may take a long time.  Start freezing all queues in
--	 * one swoop and then wait for the completions so that freezing can
--	 * take place in parallel.
--	 */
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_freeze_queue_start(q);
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_freeze_queue_wait(q);
--
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_queue_reinit(q, &cpuhp_online_new);
--
--	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_unfreeze_queue(q);
--
--	mutex_unlock(&all_q_mutex);
--}
--
--static int blk_mq_queue_reinit_dead(unsigned int cpu)
--{
--	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
--	blk_mq_queue_reinit_work();
--	return 0;
--}
--
--/*
-- * Before hotadded cpu starts handling requests, new mappings must be
-- * established.  Otherwise, these requests in hw queue might never be
-- * dispatched.
-- *
-- * For example, there is a single hw queue (hctx) and two CPU queues (ctx0
-- * for CPU0, and ctx1 for CPU1).
-- *
-- * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
-- * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
-- *
-- * And then while running hw queue, blk_mq_flush_busy_ctxs() finds bit0 is set
-- * in pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
-- * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list is
-- * ignored.
-- */
--static int blk_mq_queue_reinit_prepare(unsigned int cpu)
--{
--	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
--	cpumask_set_cpu(cpu, &cpuhp_online_new);
--	blk_mq_queue_reinit_work();
--	return 0;
--}
--
- static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- {
- 	int i;
-@@ -2669,7 +2585,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
--		blk_mq_queue_reinit(q, cpu_online_mask);
-+		blk_mq_queue_reinit(q);
- 	}
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
-@@ -2885,24 +2801,10 @@ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
- }
- EXPORT_SYMBOL_GPL(blk_mq_poll);
- 
--void blk_mq_disable_hotplug(void)
--{
--	mutex_lock(&all_q_mutex);
--}
--
--void blk_mq_enable_hotplug(void)
--{
--	mutex_unlock(&all_q_mutex);
--}
--
- static int __init blk_mq_init(void)
- {
- 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
- 				blk_mq_hctx_notify_dead);
--
--	cpuhp_setup_state_nocalls(CPUHP_BLK_MQ_PREPARE, "block/mq:prepare",
--				  blk_mq_queue_reinit_prepare,
--				  blk_mq_queue_reinit_dead);
- 	return 0;
- }
- subsys_initcall(blk_mq_init);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index cc67b48e3551..558df56544d2 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -56,11 +56,6 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 				bool at_head);
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 				struct list_head *list);
--/*
-- * CPU hotplug helpers
-- */
--void blk_mq_enable_hotplug(void);
--void blk_mq_disable_hotplug(void);
- 
- /*
-  * CPU -> queue mappings
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index c15f22c54535..7f815d915977 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -58,7 +58,6 @@ enum cpuhp_state {
- 	CPUHP_XEN_EVTCHN_PREPARE,
- 	CPUHP_ARM_SHMOBILE_SCU_PREPARE,
- 	CPUHP_SH_SH3X_PREPARE,
--	CPUHP_BLK_MQ_PREPARE,
- 	CPUHP_NET_FLOW_PREPARE,
- 	CPUHP_TOPOLOGY_PREPARE,
- 	CPUHP_NET_IUCV_PREPARE,
+ extern const struct blk_integrity_profile t10_pi_type1_crc;
+ extern const struct blk_integrity_profile t10_pi_type1_ip;
 -- 
 2.11.0
