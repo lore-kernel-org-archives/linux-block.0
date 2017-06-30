@@ -1,37 +1,60 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>
-Subject: [PATCH 0/3] Fixes for kernel v4.13
-Date: Wed, 21 Jun 2017 10:55:44 -0700
-Message-ID: <20170621175547.21692-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:34863 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752455AbdF3P45 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 11:56:57 -0400
+Received: by mail-wm0-f45.google.com with SMTP id w126so113903697wme.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:56:56 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 05/10] lightnvm: pblk: use right metadata buffer for recovery
+Date: Fri, 30 Jun 2017 17:56:38 +0200
+Message-Id: <1498838203-21539-6-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+Fix bad metadata buffer assignations introduced when refactoring the
+medatada write path.
 
-The three patches in this series fix issues in the patches that are queued
-for kernel v4.13. Please consider these for kernel v4.13.
+Fixes: dd2a43437337 lightnvm: pblk: sched. metadata on write thread
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-recovery.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks,
-
-Bart.
-
-Bart Van Assche (3):
-  block: Declare local symbols static
-  block: Fix off-by-one errors in blk_status_to_errno() and
-    print_req_error()
-  blk-mq: Make it safe to quiesce and unquiesce from an interrupt
-    handler
-
- block/blk-core.c       |  4 ++--
- block/blk-mq.c         | 20 ++++++++++++++++++--
- block/bounce.c         |  2 +-
- include/linux/blk-mq.h | 10 +---------
- 4 files changed, 22 insertions(+), 14 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 7e1c314f2766..6d58659fa3da 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -801,7 +801,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 	set_bit(meta_line, &l_mg->meta_bitmap);
+ 	smeta = l_mg->sline_meta[meta_line];
+ 	emeta = l_mg->eline_meta[meta_line];
+-	smeta_buf = smeta->buf;
++	smeta_buf = (struct line_smeta *)smeta;
+ 	spin_unlock(&l_mg->free_lock);
+ 
+ 	/* Order data lines using their sequence number */
+@@ -888,9 +888,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 		nr_bb = bitmap_weight(line->blk_bitmap, lm->blk_per_line);
+ 		off -= nr_bb * geo->sec_per_pl;
+ 
+-		memset(&emeta->buf, 0, lm->emeta_len[0]);
+-		line->emeta = emeta;
+ 		line->emeta_ssec = off;
++		line->emeta = emeta;
++		memset(line->emeta->buf, 0, lm->emeta_len[0]);
+ 
+ 		if (pblk_line_read_emeta(pblk, line, line->emeta->buf)) {
+ 			pblk_recov_l2p_from_oob(pblk, line);
 -- 
-2.13.1
+2.7.4
