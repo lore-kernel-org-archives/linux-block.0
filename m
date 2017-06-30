@@ -1,117 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39140 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751654AbdF1QaH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Jun 2017 12:30:07 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V4 02/12] kernfs: implement i_generation
-Date: Wed, 28 Jun 2017 09:29:52 -0700
-Message-Id: <327539f91326b971b9071d518a32435f41013550.1498666964.git.shli@fb.com>
-In-Reply-To: <cover.1498666964.git.shli@fb.com>
-References: <cover.1498666964.git.shli@fb.com>
-In-Reply-To: <cover.1498666964.git.shli@fb.com>
-References: <cover.1498666964.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [PATCH 00/10] lightnvm: pblk fixes for 4.13
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>, mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <e0662596-804a-bf4e-e5c9-9296e14e7087@fb.com>
+Date: Fri, 30 Jun 2017 11:08:51 -0600
+MIME-Version: 1.0
+In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On 06/30/2017 09:56 AM, Javier González wrote:
+> Hi Jens,
+> 
+> Here you have a second round of fixes for pblk. They are in essence bug
+> fixes including a double-free reported by Dan.
+> 
+> There is also regression fix for pblk removal, which was introduced with
+> the new metadata scheduler. This fix makes that removing a pblk instance
+> takes again at most 2 seconds.
+> 
+> Finally, I also included a patch for double checking the L2P to verify a
+> cache hit before reading from the write cache. We have experienced a
+> database not issuing fsync before reading recently written metadata
+> triggering a bad cache read. We verified it this week. This patch is an
+> easy fix that we can make in pblk.
 
-Set i_generation for kernfs inode. This is required to implement
-exportfs operations. The generation is 32-bit, so it's possible the
-generation wraps up and we find stale files. To reduce the posssibility,
-we don't reuse inode numer immediately. When the inode number allocation
-wraps, we increase generation number. In this way generation/inode
-number consist of a 64-bit number which is unlikely duplicated. This
-does make the idr tree more sparse and waste some memory. Since idr
-manages 32-bit keys, idr uses a 6-level radix tree, each level covers 6
-bits of the key. In a 100k inode kernfs, the worst case will have around
-300k radix tree node. Each node is 576bytes, so the tree will use about
-~150M memory. Sounds not too bad, if this really is a problem, we should
-find better data structure.
+Applied for 4.13, thanks.
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- fs/kernfs/dir.c        | 10 +++++++++-
- fs/kernfs/inode.c      |  1 +
- include/linux/kernfs.h |  2 ++
- 3 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index 8ad7a17..33f711f 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -623,6 +623,8 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 					     unsigned flags)
- {
- 	struct kernfs_node *kn;
-+	u32 gen;
-+	int cursor;
- 	int ret;
- 
- 	name = kstrdup_const(name, GFP_KERNEL);
-@@ -635,12 +637,17 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 
- 	idr_preload(GFP_KERNEL);
- 	spin_lock(&kernfs_idr_lock);
--	ret = idr_alloc(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
-+	cursor = idr_get_cursor(&root->ino_idr);
-+	ret = idr_alloc_cyclic(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
-+	if (ret >= 0 && ret < cursor)
-+		root->next_generation++;
-+	gen = root->next_generation;
- 	spin_unlock(&kernfs_idr_lock);
- 	idr_preload_end();
- 	if (ret < 0)
- 		goto err_out2;
- 	kn->ino = ret;
-+	kn->generation = gen;
- 
- 	atomic_set(&kn->count, 1);
- 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
-@@ -884,6 +891,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
- 
- 	idr_init(&root->ino_idr);
- 	INIT_LIST_HEAD(&root->supers);
-+	root->next_generation = 1;
- 
- 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
- 			       KERNFS_DIR);
-diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
-index fb4b4a7..79cdae4 100644
---- a/fs/kernfs/inode.c
-+++ b/fs/kernfs/inode.c
-@@ -220,6 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
- 	inode->i_private = kn;
- 	inode->i_mapping->a_ops = &kernfs_aops;
- 	inode->i_op = &kernfs_iops;
-+	inode->i_generation = kn->generation;
- 
- 	set_default_inode_attr(inode, kn->mode);
- 	kernfs_refresh_inode(kn, inode);
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index 5f5d602..8c00d28 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -135,6 +135,7 @@ struct kernfs_node {
- 	umode_t			mode;
- 	unsigned int		ino;
- 	struct kernfs_iattrs	*iattr;
-+	u32			generation;
- };
- 
- /*
-@@ -164,6 +165,7 @@ struct kernfs_root {
- 
- 	/* private fields, do not use outside kernfs proper */
- 	struct idr		ino_idr;
-+	u32			next_generation;
- 	struct kernfs_syscall_ops *syscall_ops;
- 
- 	/* list of kernfs_super_info of this root, protected by kernfs_mutex */
 -- 
-2.9.3
+Jens Axboe
