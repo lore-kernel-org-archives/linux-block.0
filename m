@@ -1,43 +1,51 @@
-Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/9] bio-integrity: bio_trim should truncate integrity vector accordingly
-Date: Thu, 29 Jun 2017 11:31:08 -0700
-Message-Id: <20170629183116.28685-2-hch@lst.de>
-In-Reply-To: <20170629183116.28685-1-hch@lst.de>
-References: <20170629183116.28685-1-hch@lst.de>
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 2/3 v4] mmc: ops: export mmc_get_status()
+Date: Fri, 30 Jun 2017 14:06:48 +0200
+Message-Id: <20170630120649.27007-2-linus.walleij@linaro.org>
+In-Reply-To: <20170630120649.27007-1-linus.walleij@linaro.org>
+References: <20170630120649.27007-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dmitry Monakhov <dmonakhov@openvz.org>
+This function retrieves the status of the card with the default
+number of retries. Since the block layer wants to use this, and
+since the block layer is a loadable kernel module, we need to
+export this symbol.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- block/bio.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ChangeLog v3->v4:
+- No changes just resending
+ChangeLog v2->v3:
+- New patch to fix a build error, enumerating v3 to keep it
+  together with the other patches.
+---
+ drivers/mmc/core/mmc_ops.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index 9cf98b29588a..8cd995f7d3c0 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1894,6 +1894,10 @@ void bio_trim(struct bio *bio, int offset, int size)
- 	bio_advance(bio, offset << 9);
- 
- 	bio->bi_iter.bi_size = size;
-+
-+	if (bio_integrity(bio))
-+		bio_integrity_trim(bio, 0, size);
-+
+diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
+index 5f7c5920231a..b56fa822ab6b 100644
+--- a/drivers/mmc/core/mmc_ops.c
++++ b/drivers/mmc/core/mmc_ops.c
+@@ -83,6 +83,7 @@ int mmc_send_status(struct mmc_card *card, u32 *status)
+ {
+ 	return __mmc_send_status(card, status, MMC_CMD_RETRIES);
  }
- EXPORT_SYMBOL_GPL(bio_trim);
++EXPORT_SYMBOL_GPL(mmc_send_status);
  
+ static int _mmc_select_card(struct mmc_host *host, struct mmc_card *card)
+ {
 -- 
-2.11.0
+2.9.4
