@@ -1,134 +1,90 @@
-Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Omar Sandoval <osandov@fb.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 04/10] blk-mq-sched: unify request finished methods
-Date: Fri, 16 Jun 2017 18:15:21 +0200
-Message-Id: <20170616161527.17649-5-hch@lst.de>
-In-Reply-To: <20170616161527.17649-1-hch@lst.de>
-References: <20170616161527.17649-1-hch@lst.de>
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 1/3 v4] mmc: block: Anonymize the drv op data pointer
+Date: Fri, 30 Jun 2017 14:06:47 +0200
+Message-Id: <20170630120649.27007-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-No need to have two different callouts of bfq vs kyber.
+We have a data pointer for the ioctl() data, but we need to
+pass other data along with the DRV_OP:s, so make this a
+void * so it can be reused.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- block/bfq-iosched.c      |  6 +++---
- block/blk-mq.c           | 11 ++++-------
- block/kyber-iosched.c    |  8 +++-----
- include/linux/elevator.h |  3 +--
- 4 files changed, 11 insertions(+), 17 deletions(-)
+ChangeLog v3->v4:
+- No changes just resending
+ChangeLog v2->v3:
+- No changes just resending
+---
+ drivers/mmc/core/block.c | 8 +++++---
+ drivers/mmc/core/queue.h | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ed93da2462ab..4f69e39c2f89 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4290,7 +4290,7 @@ static void bfq_put_rq_priv_body(struct bfq_queue *bfqq)
- 	bfq_put_queue(bfqq);
- }
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 3c7efbdc8591..d410f578b8df 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -598,7 +598,7 @@ static int mmc_blk_ioctl_cmd(struct block_device *bdev,
+ 		__GFP_RECLAIM);
+ 	idatas[0] = idata;
+ 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_IOCTL;
+-	req_to_mmc_queue_req(req)->idata = idatas;
++	req_to_mmc_queue_req(req)->drv_op_data = idatas;
+ 	req_to_mmc_queue_req(req)->ioc_count = 1;
+ 	blk_execute_rq(mq->queue, NULL, req, 0);
+ 	ioc_err = req_to_mmc_queue_req(req)->drv_op_result;
+@@ -674,7 +674,7 @@ static int mmc_blk_ioctl_multi_cmd(struct block_device *bdev,
+ 		idata[0]->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
+ 		__GFP_RECLAIM);
+ 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_IOCTL;
+-	req_to_mmc_queue_req(req)->idata = idata;
++	req_to_mmc_queue_req(req)->drv_op_data = idata;
+ 	req_to_mmc_queue_req(req)->ioc_count = num_of_cmds;
+ 	blk_execute_rq(mq->queue, NULL, req, 0);
+ 	ioc_err = req_to_mmc_queue_req(req)->drv_op_result;
+@@ -1175,6 +1175,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 	struct mmc_queue_req *mq_rq;
+ 	struct mmc_card *card = mq->card;
+ 	struct mmc_blk_data *md = mq->blkdata;
++	struct mmc_blk_ioc_data **idata;
+ 	int ret;
+ 	int i;
  
--static void bfq_put_rq_private(struct request_queue *q, struct request *rq)
-+static void bfq_finish_request(struct request *rq)
- {
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
- 	struct bfq_data *bfqd = bfqq->bfqd;
-@@ -4324,7 +4324,7 @@ static void bfq_put_rq_private(struct request_queue *q, struct request *rq)
- 		 */
+@@ -1182,8 +1183,9 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
  
- 		if (!RB_EMPTY_NODE(&rq->rb_node))
--			bfq_remove_request(q, rq);
-+			bfq_remove_request(rq->q, rq);
- 		bfq_put_rq_priv_body(bfqq);
- 	}
- 
-@@ -4951,7 +4951,7 @@ static struct elv_fs_entry bfq_attrs[] = {
- static struct elevator_type iosched_bfq_mq = {
- 	.ops.mq = {
- 		.get_rq_priv		= bfq_get_rq_private,
--		.put_rq_priv		= bfq_put_rq_private,
-+		.finish_request		= bfq_finish_request,
- 		.exit_icq		= bfq_exit_icq,
- 		.insert_requests	= bfq_insert_requests,
- 		.dispatch_request	= bfq_dispatch_request,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1a45c287db64..9df7e0394a48 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -437,19 +437,16 @@ void blk_mq_free_request(struct request *rq)
- 	struct request_queue *q = rq->q;
- 	struct elevator_queue *e = q->elevator;
- 
--	if (rq->rq_flags & RQF_ELVPRIV) {
--		if (e && e->type->ops.mq.put_rq_priv)
--			e->type->ops.mq.put_rq_priv(q, rq);
-+	if (rq->rq_flags & (RQF_ELVPRIV | RQF_QUEUED)) {
-+		if (e && e->type->ops.mq.finish_request)
-+			e->type->ops.mq.finish_request(rq);
- 		if (rq->elv.icq) {
- 			put_io_context(rq->elv.icq->ioc);
- 			rq->elv.icq = NULL;
+ 	switch (mq_rq->drv_op) {
+ 	case MMC_DRV_OP_IOCTL:
++		idata = mq_rq->drv_op_data;
+ 		for (i = 0; i < mq_rq->ioc_count; i++) {
+-			ret = __mmc_blk_ioctl_cmd(card, md, mq_rq->idata[i]);
++			ret = __mmc_blk_ioctl_cmd(card, md, idata[i]);
+ 			if (ret)
+ 				break;
  		}
- 	}
- 
--	if ((rq->rq_flags & RQF_QUEUED) && e && e->type->ops.mq.put_request)
--		e->type->ops.mq.put_request(rq);
--	else
--		blk_mq_finish_request(rq);
-+	blk_mq_finish_request(rq);
- }
- EXPORT_SYMBOL_GPL(blk_mq_free_request);
- 
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index b9faabc75fdb..2557b399f0a8 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -446,13 +446,11 @@ static struct request *kyber_get_request(struct request_queue *q,
- 	return rq;
- }
- 
--static void kyber_put_request(struct request *rq)
-+static void kyber_finish_request(struct request *rq)
- {
--	struct request_queue *q = rq->q;
--	struct kyber_queue_data *kqd = q->elevator->elevator_data;
-+	struct kyber_queue_data *kqd = rq->q->elevator->elevator_data;
- 
- 	rq_clear_domain_token(kqd, rq);
--	blk_mq_finish_request(rq);
- }
- 
- static void kyber_completed_request(struct request *rq)
-@@ -816,7 +814,7 @@ static struct elevator_type kyber_sched = {
- 		.init_hctx = kyber_init_hctx,
- 		.exit_hctx = kyber_exit_hctx,
- 		.get_request = kyber_get_request,
--		.put_request = kyber_put_request,
-+		.finish_request = kyber_finish_request,
- 		.completed_request = kyber_completed_request,
- 		.dispatch_request = kyber_dispatch_request,
- 		.has_work = kyber_has_work,
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 0e306c5a86d6..4acea351d43f 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -105,7 +105,7 @@ struct elevator_mq_ops {
- 	void (*request_merged)(struct request_queue *, struct request *, enum elv_merge);
- 	void (*requests_merged)(struct request_queue *, struct request *, struct request *);
- 	struct request *(*get_request)(struct request_queue *, unsigned int, struct blk_mq_alloc_data *);
--	void (*put_request)(struct request *);
-+	void (*finish_request)(struct request *);
- 	void (*insert_requests)(struct blk_mq_hw_ctx *, struct list_head *, bool);
- 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
- 	bool (*has_work)(struct blk_mq_hw_ctx *);
-@@ -115,7 +115,6 @@ struct elevator_mq_ops {
- 	struct request *(*former_request)(struct request_queue *, struct request *);
- 	struct request *(*next_request)(struct request_queue *, struct request *);
- 	int (*get_rq_priv)(struct request_queue *, struct request *, struct bio *);
--	void (*put_rq_priv)(struct request_queue *, struct request *);
- 	void (*init_icq)(struct io_cq *);
- 	void (*exit_icq)(struct io_cq *);
+diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
+index 361b46408e0f..cf26a15a64bf 100644
+--- a/drivers/mmc/core/queue.h
++++ b/drivers/mmc/core/queue.h
+@@ -51,7 +51,7 @@ struct mmc_queue_req {
+ 	struct mmc_async_req	areq;
+ 	enum mmc_drv_op		drv_op;
+ 	int			drv_op_result;
+-	struct mmc_blk_ioc_data	**idata;
++	void			*drv_op_data;
+ 	unsigned int		ioc_count;
  };
+ 
 -- 
-2.11.0
+2.9.4
