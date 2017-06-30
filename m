@@ -1,162 +1,88 @@
-Return-Path: <BATV+65e7e9a0a5a64ea7fcea+5059+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: viro@zeniv.linux.org.uk,
-	axboe@kernel.dk
-Cc: Milosz Tanski <milosz@adfin.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>,
-	mgorman@suse.de,
-	Volker.Lendecke@sernet.de,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/3] fs: support RWF_NOWAIT for buffered reads
-Date: Fri, 30 Jun 2017 11:15:21 -0700
-Message-Id: <20170630181521.29148-4-hch@lst.de>
-In-Reply-To: <20170630181521.29148-1-hch@lst.de>
-References: <20170630181521.29148-1-hch@lst.de>
+Return-Path: <bcache@lists.ewheeler.net>
+From: bcache@lists.ewheeler.net
+To: linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	Tang Junhui <tang.junhui@zte.com.cn>,
+	stable@vger.kernel.org # 4.10,
+	Stefan Bader <stefan.bader@canonical.com>
+Subject: [PATCH 05/19] bcache: fix calling ida_simple_remove() with incorrect minor
+Date: Fri, 30 Jun 2017 13:42:54 -0700
+Message-Id: <1498855388-16990-5-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
 List-ID: <linux-block@vger.kernel.org>
 
-This is based on the old idea and code from Milosz Tanski.  With the
-aio nowait code it becomes mostly trivial now.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+bcache called ida_simple_remove() with minor which have multiplied by
+BCACHE_MINORS, it would cause minor wrong release and leakage.
+
+In addition, when adding partition support to bcache, the name assignment
+was not updated, resulting in numbers jumping (bcache0, bcache16,
+bcache32...). This has been fixed implicitly by the rework.
+
+Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
+Reviewed-by: Coly Li <colyli@suse.de>
+Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
+Cc: stable@vger.kernel.org # 4.10
+Cc: Stefan Bader <stefan.bader@canonical.com>
+Fixes: b8c0d91 (bcache: partition support: add 16 minors per bcacheN device)
+BugLink: https://bugs.launchpad.net/bugs/1667078
 ---
- fs/aio.c           |  6 ------
- fs/btrfs/file.c    |  9 ++++++---
- fs/ext4/file.c     |  6 +++---
- fs/xfs/xfs_file.c  | 11 +++++++++--
- include/linux/fs.h |  6 +++---
- 5 files changed, 21 insertions(+), 17 deletions(-)
+ drivers/md/bcache/super.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index dcad3a66748c..d93daa076726 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1593,12 +1593,6 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		goto out_put_req;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 9a2c190..48b8c20 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -58,7 +58,10 @@ static wait_queue_head_t unregister_wait;
+ struct workqueue_struct *bcache_wq;
+ 
+ #define BTREE_MAX_PAGES		(256 * 1024 / PAGE_SIZE)
+-#define BCACHE_MINORS		16 /* partition support */
++#define BCACHE_MINORS_BITS                4 /* bcache partition support */
++#define BCACHE_MINORS                     (1 << BCACHE_MINORS_BITS)
++#define BCACHE_TO_IDA_MINORS(first_minor) ((first_minor) >> BCACHE_MINORS_BITS)
++#define IDA_TO_BCACHE_MINORS(minor)       ((minor) << BCACHE_MINORS_BITS)
+ 
+ /* Superblock */
+ 
+@@ -734,7 +737,8 @@ static void bcache_device_free(struct bcache_device *d)
+ 	if (d->disk && d->disk->queue)
+ 		blk_cleanup_queue(d->disk->queue);
+ 	if (d->disk) {
+-		ida_simple_remove(&bcache_minor, d->disk->first_minor);
++		ida_simple_remove(&bcache_minor,
++			BCACHE_TO_IDA_MINORS(d->disk->first_minor));
+ 		put_disk(d->disk);
  	}
  
--	if ((req->common.ki_flags & IOCB_NOWAIT) &&
--			!(req->common.ki_flags & IOCB_DIRECT)) {
--		ret = -EOPNOTSUPP;
--		goto out_put_req;
--	}
--
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 59e2dccdf75b..240615bf0f88 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1880,11 +1880,14 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	loff_t oldsize;
- 	int clean_page = 0;
+@@ -776,11 +780,11 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
+ 	if (!d->full_dirty_stripes)
+ 		return -ENOMEM;
  
--	if ((iocb->ki_flags & IOCB_NOWAIT) &&
--			(iocb->ki_flags & IOCB_DIRECT)) {
-+	if (iocb->ki_flags & IOCB_NOWAIT) {
-+		if (!(iocb->ki_flags & IOCB_DIRECT))
-+			return -EAGAIN;
-+
- 		/* Don't sleep on inode rwsem */
- 		if (!inode_trylock(inode))
- 			return -EAGAIN;
-+
- 		/*
- 		 * We will allocate space in case nodatacow is not set,
- 		 * so bail
-@@ -3088,7 +3091,7 @@ static loff_t btrfs_file_llseek(struct file *file, loff_t offset, int whence)
+-	minor = ida_simple_get(&bcache_minor, 0, MINORMASK + 1, GFP_KERNEL);
++	minor = ida_simple_get(&bcache_minor, 0,
++		BCACHE_TO_IDA_MINORS(MINORMASK) + 1, GFP_KERNEL);
+ 	if (minor < 0)
+ 		return minor;
  
- static int btrfs_file_open(struct inode *inode, struct file *filp)
- {
--	filp->f_mode |= FMODE_AIO_NOWAIT;
-+	filp->f_mode |= FMODE_NOWAIT;
- 	return generic_file_open(inode, filp);
- }
+-	minor *= BCACHE_MINORS;
  
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 58e2eeaa0bc4..5330ea99681a 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -223,6 +223,8 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if (IS_DAX(inode))
- 		return ext4_dax_write_iter(iocb, from);
- #endif
-+	if (!o_direct && (iocb->ki_flags & IOCB_NOWAIT))
-+		return -EAGAIN;
+ 	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio),
+ 					   BIOSET_NEED_BVECS |
+@@ -794,7 +798,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
+ 	snprintf(d->disk->disk_name, DISK_NAME_LEN, "bcache%i", minor);
  
- 	if (!inode_trylock(inode)) {
- 		if (iocb->ki_flags & IOCB_NOWAIT)
-@@ -455,9 +457,7 @@ static int ext4_file_open(struct inode * inode, struct file * filp)
- 			return ret;
- 	}
+ 	d->disk->major		= bcache_major;
+-	d->disk->first_minor	= minor;
++	d->disk->first_minor	= IDA_TO_BCACHE_MINORS(minor);
+ 	d->disk->fops		= &bcache_ops;
+ 	d->disk->private_data	= d;
  
--	/* Set the flags to support nowait AIO */
--	filp->f_mode |= FMODE_AIO_NOWAIT;
--
-+	filp->f_mode |= FMODE_NOWAIT;
- 	return dquot_file_open(inode, filp);
- }
- 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 17f27a2fb5e2..1068f0b01090 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -259,7 +259,11 @@ xfs_file_buffered_aio_read(
- 
- 	trace_xfs_file_buffered_read(ip, iov_iter_count(to), iocb->ki_pos);
- 
--	xfs_ilock(ip, XFS_IOLOCK_SHARED);
-+	if (!xfs_ilock_nowait(ip, XFS_IOLOCK_SHARED)) {
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		xfs_ilock(ip, XFS_IOLOCK_SHARED);
-+	}
- 	ret = generic_file_read_iter(iocb, to);
- 	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
- 
-@@ -636,6 +640,9 @@ xfs_file_buffered_aio_write(
- 	int			enospc = 0;
- 	int			iolock;
- 
-+	if (iocb->ki_flags & IOCB_NOWAIT)
-+		return -EAGAIN;
-+
- write_retry:
- 	iolock = XFS_IOLOCK_EXCL;
- 	xfs_ilock(ip, iolock);
-@@ -911,7 +918,7 @@ xfs_file_open(
- 		return -EFBIG;
- 	if (XFS_FORCED_SHUTDOWN(XFS_M(inode->i_sb)))
- 		return -EIO;
--	file->f_mode |= FMODE_AIO_NOWAIT;
-+	file->f_mode |= FMODE_NOWAIT;
- 	return 0;
- }
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 65adbddb3163..a78834bedb61 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -144,8 +144,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- /* File was opened by fanotify and shouldn't generate fanotify events */
- #define FMODE_NONOTIFY		((__force fmode_t)0x4000000)
- 
--/* File is capable of returning -EAGAIN if AIO will block */
--#define FMODE_AIO_NOWAIT	((__force fmode_t)0x8000000)
-+/* File is capable of returning -EAGAIN if I/O will block */
-+#define FMODE_NOWAIT	((__force fmode_t)0x8000000)
- 
- /*
-  * Flag for rw_copy_check_uvector and compat_rw_copy_check_uvector
-@@ -3092,7 +3092,7 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
- 		return -EOPNOTSUPP;
- 
- 	if (flags & RWF_NOWAIT) {
--		if (!(ki->ki_filp->f_mode & FMODE_AIO_NOWAIT))
-+		if (!(ki->ki_filp->f_mode & FMODE_NOWAIT))
- 			return -EOPNOTSUPP;
- 		ki->ki_flags |= IOCB_NOWAIT;
- 	}
 -- 
-2.11.0
+1.8.3.1
