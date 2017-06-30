@@ -1,166 +1,124 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37292 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752572AbdFZMSv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Jun 2017 08:18:51 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 34/51] block: convert to singe/multi page version of bio_for_each_segment_all()
-Date: Mon, 26 Jun 2017 20:10:17 +0800
-Message-Id: <20170626121034.3051-35-ming.lei@redhat.com>
-In-Reply-To: <20170626121034.3051-1-ming.lei@redhat.com>
-References: <20170626121034.3051-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+65e7e9a0a5a64ea7fcea+5059+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: viro@zeniv.linux.org.uk,
+	axboe@kernel.dk
+Cc: Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>,
+	mgorman@suse.de,
+	Volker.Lendecke@sernet.de,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: non-blockling buffered reads V2
+Date: Fri, 30 Jun 2017 11:15:18 -0700
+Message-Id: <20170630181521.29148-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c       | 17 +++++++++++------
- block/blk-zoned.c |  5 +++--
- block/bounce.c    |  6 ++++--
- 3 files changed, 18 insertions(+), 10 deletions(-)
+This series resurrects the old patches from Milosz to implement
+non-blocking buffered reads.  Thanks to the non-blocking AIO code from
+Goldwyn the implementation becomes pretty much trivial.  As that
+implementation is in the block tree I would suggest that we merge
+these patches through the block tree as well.  I've also forward
+ported the test Milosz sent for recent xfsprogs to verify it works
+properly, but I'll still have to address the review comments for it.
+I'll also volunteer to work with Goldwyn to properly document the
+RWF_NOWAIT flag in the man page including this change.
 
-diff --git a/block/bio.c b/block/bio.c
-index 22e5deec7ec7..c460888f14b5 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -988,7 +988,7 @@ int bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
- 	int i;
- 	struct bio_vec *bv;
- 
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_mp(bv, bio, i) {
- 		bv->bv_page = alloc_page(gfp_mask);
- 		if (!bv->bv_page) {
- 			while (--bv >= bio->bi_io_vec)
-@@ -1089,8 +1089,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter iter)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		ssize_t ret;
- 
- 		ret = copy_page_from_iter(bvec->bv_page,
-@@ -1120,8 +1121,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		ssize_t ret;
- 
- 		ret = copy_page_to_iter(bvec->bv_page,
-@@ -1143,8 +1145,9 @@ void bio_free_pages(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i)
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 		__free_page(bvec->bv_page);
- }
- EXPORT_SYMBOL(bio_free_pages);
-@@ -1435,11 +1438,12 @@ static void __bio_unmap_user(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	/*
- 	 * make sure we dirty pages we wrote to
- 	 */
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		if (bio_data_dir(bio) == READ)
- 			set_page_dirty_lock(bvec->bv_page);
- 
-@@ -1531,8 +1535,9 @@ static void bio_copy_kern_endio_read(struct bio *bio)
- 	char *p = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		memcpy(p, page_address(bvec->bv_page), bvec->bv_len);
- 		p += bvec->bv_len;
- 	}
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 3bd15d8095b1..558b84ae2d86 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -81,6 +81,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	unsigned int ofst;
- 	void *addr;
- 	int ret;
-+	struct bvec_iter_all bia;
- 
- 	if (!q)
- 		return -ENXIO;
-@@ -148,7 +149,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	n = 0;
- 	nz = 0;
- 	nr_rep = 0;
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_sp(bv, bio, i, bia) {
- 
- 		if (!bv->bv_page)
- 			break;
-@@ -181,7 +182,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 
- 	*nr_zones = nz;
- out:
--	bio_for_each_segment_all(bv, bio, i)
-+	bio_for_each_segment_all_sp(bv, bio, i, bia)
- 		__free_page(bv->bv_page);
- 	bio_put(bio);
- 
-diff --git a/block/bounce.c b/block/bounce.c
-index 590dcdb1de76..1f46ba9535c1 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -144,11 +144,12 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
- 	struct bio_vec *bvec, orig_vec;
- 	int i;
- 	struct bvec_iter orig_iter = bio_orig->bi_iter;
-+	struct bvec_iter_all bia;
- 
- 	/*
- 	 * free up bounce indirect pages used
- 	 */
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
- 		if (bvec->bv_page == orig_vec.bv_page)
- 			goto next;
-@@ -205,6 +206,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	unsigned i = 0;
- 	bool bounce = false;
- 	int sectors = 0;
-+	struct bvec_iter_all bia;
- 
- 	bio_for_each_segment(from, *bio_orig, iter) {
- 		if (i++ < BIO_MAX_PAGES)
-@@ -223,7 +225,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	}
- 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
- 
--	bio_for_each_segment_all(to, bio, i) {
-+	bio_for_each_segment_all_sp(to, bio, i, bia) {
- 		struct page *page = to->bv_page;
- 
- 		if (page_to_pfn(page) <= queue_bounce_pfn(q))
--- 
-2.9.4
+Changes from V1:
+ - fix btrfs to reject nowait buffered writes
+ - tested btrfs and ext4 in addition to xfs this time
+
+
+Here are additional details from the original cover letter from Milosz,
+where the flag was still called RWF_NONBLOCK:
+
+
+Background:
+
+ Using a threadpool to emulate non-blocking operations on regular buffered
+ files is a common pattern today (samba, libuv, etc...) Applications split the
+ work between network bound threads (epoll) and IO threadpool. Not every
+ application can use sendfile syscall (TLS / post-processing).
+
+ This common pattern leads to increased request latency. Latency can be due to
+ additional synchronization between the threads or fast (cached data) request
+ stuck behind slow request (large / uncached data).
+
+ The preadv2 syscall with RWF_NONBLOCK lets userspace applications bypass
+ enqueuing operation in the threadpool if it's already available in the
+ pagecache.
+
+
+Performance numbers (newer Samba):
+
+ https://drive.google.com/file/d/0B3maCn0jCvYncndGbXJKbGlhejQ/view?usp=sharing
+ https://docs.google.com/spreadsheets/d/1GGTivi-MfZU0doMzomG4XUo9ioWtRvOGQ5FId042L6s/edit?usp=sharing
+
+
+Performance number (older):
+
+ Some perf data generated using fio comparing the posix aio engine to a version
+ of the posix AIO engine that attempts to performs "fast" reads before
+ submitting the operations to the queue. This workflow is on ext4 partition on
+ raid0 (test / build-rig.) Simulating our database access patern workload using
+ 16kb read accesses. Our database uses a home-spun posix aio like queue (samba
+ does the same thing.)
+
+ f1: ~73% rand read over mostly cached data (zipf med-size dataset)
+ f2: ~18% rand read over mostly un-cached data (uniform large-dataset)
+ f3: ~9% seq-read over large dataset
+
+ before:
+
+ f1:
+     bw (KB  /s): min=   11, max= 9088, per=0.56%, avg=969.54, stdev=827.99
+     lat (msec) : 50=0.01%, 100=1.06%, 250=5.88%, 500=4.08%, 750=12.48%
+     lat (msec) : 1000=17.27%, 2000=49.86%, >=2000=9.42%
+ f2:
+     bw (KB  /s): min=    2, max= 1882, per=0.16%, avg=273.28, stdev=220.26
+     lat (msec) : 250=5.65%, 500=3.31%, 750=15.64%, 1000=24.59%, 2000=46.56%
+     lat (msec) : >=2000=4.33%
+ f3:
+     bw (KB  /s): min=    0, max=265568, per=99.95%, avg=174575.10,
+                  stdev=34526.89
+     lat (usec) : 2=0.01%, 4=0.01%, 10=0.02%, 20=0.27%, 50=10.82%
+     lat (usec) : 100=50.34%, 250=5.05%, 500=7.12%, 750=6.60%, 1000=4.55%
+     lat (msec) : 2=8.73%, 4=3.49%, 10=1.83%, 20=0.89%, 50=0.22%
+     lat (msec) : 100=0.05%, 250=0.02%, 500=0.01%
+ total:
+    READ: io=102365MB, aggrb=174669KB/s, minb=240KB/s, maxb=173599KB/s,
+          mint=600001msec, maxt=600113msec
+
+ after (with fast read using preadv2 before submit):
+
+ f1:
+     bw (KB  /s): min=    3, max=14897, per=1.28%, avg=2276.69, stdev=2930.39
+     lat (usec) : 2=70.63%, 4=0.01%
+     lat (msec) : 250=0.20%, 500=2.26%, 750=1.18%, 2000=0.22%, >=2000=25.53%
+ f2:
+     bw (KB  /s): min=    2, max= 2362, per=0.14%, avg=249.83, stdev=222.00
+     lat (msec) : 250=6.35%, 500=1.78%, 750=9.29%, 1000=20.49%, 2000=52.18%
+     lat (msec) : >=2000=9.99%
+ f3:
+     bw (KB  /s): min=    1, max=245448, per=100.00%, avg=177366.50,
+                  stdev=35995.60
+     lat (usec) : 2=64.04%, 4=0.01%, 10=0.01%, 20=0.06%, 50=0.43%
+     lat (usec) : 100=0.20%, 250=1.27%, 500=2.93%, 750=3.93%, 1000=7.35%
+     lat (msec) : 2=14.27%, 4=2.88%, 10=1.54%, 20=0.81%, 50=0.22%
+     lat (msec) : 100=0.05%, 250=0.02%
+ total:
+    READ: io=103941MB, aggrb=177339KB/s, minb=213KB/s, maxb=176375KB/s,
+          mint=600020msec, maxt=600178msec
+
+ Interpreting the results you can see total bandwidth stays the same but overall
+ request latency is decreased in f1 (random, mostly cached) and f3 (sequential)
+ workloads. There is a slight bump in latency for since it's random data that's
+ unlikely to be cached but we're always trying "fast read".
+
+ In our application we have starting keeping track of "fast read" hits/misses
+ and for files / requests that have a lot hit ratio we don't do "fast reads"
+ mostly getting rid of extra latency in the uncached cases. In our real world
+ work load we were able to reduce average response time by 20 to 30% (depends
+ on amount of IO done by request).
+
+ I've performed other benchmarks and I have no observed any perf regressions in
+ any of the normal (old) code paths.
