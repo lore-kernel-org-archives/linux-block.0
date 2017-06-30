@@ -1,42 +1,55 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Two block fixes for 4.12 final
-Message-ID: <c75d37a6-8174-4780-5622-b3cb98f2e179@kernel.dk>
-Date: Thu, 29 Jun 2017 09:16:38 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:35909 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752055AbdF3P5H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 11:57:07 -0400
+Received: by mail-wm0-f50.google.com with SMTP id 62so114237531wmw.1
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:57:01 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 10/10] lightnvm: pblk: set line bitmap check under debug
+Date: Fri, 30 Jun 2017 17:56:43 +0200
+Message-Id: <1498838203-21539-11-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+Do bitmap checks only when debug mode is enable. The line bitmap used
+for mapping to physical addresses is fairly large (~512KB) and it is
+expensive to do this checks on the fast path.
 
-Two fixes that should go into this release. One is an nvme regression
-fix from Keith, fixing a missing queue freeze if the controller is being
-reset. This causes the reset to hang. The other is a fix for a leak of
-the bio protection info, if smaller sized O_DIRECT is used. This fix
-should be more involved as we have other problematic paths in the
-kernel, but given as this isn't a regression in this series, we'll
-tackle those for 4.13.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      block: provide bio_uninit() free freeing integrity/task associations
-
-Keith Busch (1):
-      nvme/pci: Fix stuck nvme reset
-
- block/bio.c             | 12 +++++++++---
- drivers/nvme/host/pci.c |  3 ++-
- fs/block_dev.c          |  5 ++++-
- include/linux/bio.h     |  1 +
- 4 files changed, 16 insertions(+), 5 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index e6f42cddc8ec..11fe0c5b2a9c 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1561,11 +1561,14 @@ static void pblk_line_should_sync_meta(struct pblk *pblk)
+ void pblk_line_close(struct pblk *pblk, struct pblk_line *line)
+ {
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+-	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct list_head *move_list;
+ 
++#ifdef CONFIG_NVM_DEBUG
++	struct pblk_line_meta *lm = &pblk->lm;
++
+ 	WARN(!bitmap_full(line->map_bitmap, lm->sec_per_line),
+ 				"pblk: corrupt closed line %d\n", line->id);
++#endif
+ 
+ 	spin_lock(&l_mg->free_lock);
+ 	WARN_ON(!test_and_clear_bit(line->meta_line, &l_mg->meta_bitmap));
 -- 
-Jens Axboe
+2.7.4
