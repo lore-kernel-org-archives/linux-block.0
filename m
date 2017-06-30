@@ -1,91 +1,85 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
+Return-Path: <BATV+65e7e9a0a5a64ea7fcea+5059+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: viro@zeniv.linux.org.uk,
+	axboe@kernel.dk
+Cc: Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>,
+	mgorman@suse.de,
+	Volker.Lendecke@sernet.de,
 	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v8 03/18] fs: check for writeback errors after syncing out buffers in generic_file_fsync
-Date: Thu, 29 Jun 2017 09:19:39 -0400
-Message-Id: <20170629131954.28733-4-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
+Subject: [PATCH 1/3] fs: pass iocb to do_generic_file_read
+Date: Fri, 30 Jun 2017 11:15:19 -0700
+Message-Id: <20170630181521.29148-2-hch@lst.de>
+In-Reply-To: <20170630181521.29148-1-hch@lst.de>
+References: <20170630181521.29148-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+And rename it to the more descriptive generic_file_buffered_read while
+at it.
 
-ext2 currently does a test+clear of the AS_EIO flag, which is
-is problematic for some coming changes.
-
-What we really need to do instead is call filemap_check_errors
-in __generic_file_fsync after syncing out the buffers. That
-will be sufficient for this case, and help other callers detect
-these errors properly as well.
-
-With that, we don't need to twiddle it in ext2.
-
-Suggested-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/ext2/file.c | 5 +----
- fs/libfs.c     | 3 ++-
- 2 files changed, 3 insertions(+), 5 deletions(-)
+ mm/filemap.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/fs/ext2/file.c b/fs/ext2/file.c
-index b21891a6bfca..d34d32bdc944 100644
---- a/fs/ext2/file.c
-+++ b/fs/ext2/file.c
-@@ -174,15 +174,12 @@ int ext2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 742034e56100..3df0a57cd48e 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1792,9 +1792,8 @@ static void shrink_readahead_size_eio(struct file *filp,
+ }
+ 
+ /**
+- * do_generic_file_read - generic file read routine
+- * @filp:	the file to read
+- * @ppos:	current file position
++ * generic_file_buffered_read - generic file read routine
++ * @iocb:	the iocb to read
+  * @iter:	data destination
+  * @written:	already copied
+  *
+@@ -1804,12 +1803,14 @@ static void shrink_readahead_size_eio(struct file *filp,
+  * This is really ugly. But the goto's actually try to clarify some
+  * of the logic when it comes to error handling etc.
+  */
+-static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
++static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+ 		struct iov_iter *iter, ssize_t written)
  {
- 	int ret;
- 	struct super_block *sb = file->f_mapping->host->i_sb;
--	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
++	struct file *filp = iocb->ki_filp;
+ 	struct address_space *mapping = filp->f_mapping;
+ 	struct inode *inode = mapping->host;
+ 	struct file_ra_state *ra = &filp->f_ra;
++	loff_t *ppos = &iocb->ki_pos;
+ 	pgoff_t index;
+ 	pgoff_t last_index;
+ 	pgoff_t prev_index;
+@@ -2057,14 +2058,14 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ ssize_t
+ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ {
+-	struct file *file = iocb->ki_filp;
+-	ssize_t retval = 0;
+ 	size_t count = iov_iter_count(iter);
++	ssize_t retval = 0;
  
- 	ret = generic_file_fsync(file, start, end, datasync);
--	if (ret == -EIO || test_and_clear_bit(AS_EIO, &mapping->flags)) {
-+	if (ret == -EIO)
- 		/* We don't really know where the IO error happened... */
- 		ext2_error(sb, __func__,
- 			   "detected IO error when writing metadata buffers");
--		ret = -EIO;
--	}
- 	return ret;
- }
+ 	if (!count)
+ 		goto out; /* skip atime */
  
-diff --git a/fs/libfs.c b/fs/libfs.c
-index a04395334bb1..1dec90819366 100644
---- a/fs/libfs.c
-+++ b/fs/libfs.c
-@@ -991,7 +991,8 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
+ 	if (iocb->ki_flags & IOCB_DIRECT) {
++		struct file *file = iocb->ki_filp;
+ 		struct address_space *mapping = file->f_mapping;
+ 		struct inode *inode = mapping->host;
+ 		loff_t size;
+@@ -2105,7 +2106,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 			goto out;
+ 	}
  
+-	retval = do_generic_file_read(file, &iocb->ki_pos, iter, retval);
++	retval = generic_file_buffered_read(iocb, iter, retval);
  out:
- 	inode_unlock(inode);
--	return ret;
-+	err = filemap_check_errors(inode->i_mapping);
-+	return ret ? ret : err;
+ 	return retval;
  }
- EXPORT_SYMBOL(__generic_file_fsync);
- 
 -- 
-2.13.0
+2.11.0
