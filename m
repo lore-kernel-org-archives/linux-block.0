@@ -1,49 +1,40 @@
-Return-Path: <axboe@kernel.dk>
-To: Max Gurtovoy <maxg@mellanox.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: NVMe induced NULL deref in bt_iter()
-Message-ID: <bcc46757-6027-ed7f-22b4-e6964d0dedf0@kernel.dk>
-Date: Fri, 30 Jun 2017 11:26:49 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <bcache@lists.ewheeler.net>
+From: bcache@lists.ewheeler.net
+To: linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 13/19] bcache: delete redundant calling set_gc_sectors()
+Date: Fri, 30 Jun 2017 13:43:02 -0700
+Message-Id: <1498855388-16990-13-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Max,
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-I remembered you reporting this. I think this is a regression introduced
-with the scheduling, since ->rqs[] isn't static anymore. ->static_rqs[]
-is, but that's not indexable by the tag we find. So I think we need to
-guard those with a NULL check. The actual requests themselves are
-static, so we know the memory itself isn't going away. But if we race
-with completion, we could find a NULL there, validly.
+set_gc_sectors() has been called in bch_gc_thread(), and it was called
+again in bch_btree_gc_finish() . The following call is unnecessary, so
+delete it.
 
-Since you could reproduce it, can you try the below?
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/btree.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index d0be72ccb091..b856b2827157 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -214,7 +214,7 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- 		bitnr += tags->nr_reserved_tags;
- 	rq = tags->rqs[bitnr];
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 77aa20b..66d8036 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -1662,7 +1662,6 @@ static size_t bch_btree_gc_finish(struct cache_set *c)
  
--	if (rq->q == hctx->queue)
-+	if (rq && rq->q == hctx->queue)
- 		iter_data->fn(hctx, rq, iter_data->data, reserved);
- 	return true;
- }
-@@ -249,8 +249,8 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- 	if (!reserved)
- 		bitnr += tags->nr_reserved_tags;
- 	rq = tags->rqs[bitnr];
--
--	iter_data->fn(rq, iter_data->data, reserved);
-+	if (rq)
-+		iter_data->fn(rq, iter_data->data, reserved);
- 	return true;
- }
+ 	mutex_lock(&c->bucket_lock);
  
-
+-	set_gc_sectors(c);
+ 	c->gc_mark_valid = 1;
+ 	c->need_gc	= 0;
+ 
 -- 
-Jens Axboe
+1.8.3.1
