@@ -1,94 +1,95 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44905 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752998AbdFREke (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2017 00:40:34 -0400
-From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@fb.com>
-Date: Sun, 18 Jun 2017 14:38:58 +1000
-Subject: [PATCH 09/13] lightnvm/pblk-read: use bio_clone_fast()
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <149776073872.23258.5197619453109200550.stgit@noble>
-In-Reply-To: <149776047907.23258.8058071140236879834.stgit@noble>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:36845 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752457AbdF3P46 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 11:56:58 -0400
+Received: by mail-wm0-f49.google.com with SMTP id 62so114233390wmw.1
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:56:52 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 01/10] lightnvm: pblk: fix bad le64 assignations
+Date: Fri, 30 Jun 2017 17:56:34 +0200
+Message-Id: <1498838203-21539-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-pblk_submit_read() uses bio_clone_bioset() but doesn't change the
-io_vec, so bio_clone_fast() is a better choice.
+Use the right types and conversions on le64 variables. Reported by
+sparse.
 
-It also uses fs_bio_set which is intended for filesystems.  Using it
-in a device driver can deadlock.
-So allocate a new bioset, and and use bio_clone_fast().
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Tested-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: NeilBrown <neilb@suse.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/lightnvm/pblk-init.c |   12 +++++++++++-
- drivers/lightnvm/pblk-read.c |    2 +-
- drivers/lightnvm/pblk.h      |    1 +
- 3 files changed, 13 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 2 +-
+ drivers/lightnvm/pblk-gc.c       | 5 ++++-
+ drivers/lightnvm/pblk-map.c      | 2 +-
+ drivers/lightnvm/pblk-recovery.c | 2 +-
+ 4 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index b3fec8ec55b8..aaefbccce30e 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -23,6 +23,7 @@
- static struct kmem_cache *pblk_blk_ws_cache, *pblk_rec_cache, *pblk_r_rq_cache,
- 					*pblk_w_rq_cache, *pblk_line_meta_cache;
- static DECLARE_RWSEM(pblk_lock);
-+struct bio_set *pblk_bio_set;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 7648186bd1b1..a654b34f6f86 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -765,7 +765,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
  
- static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
- 			  struct bio *bio)
-@@ -946,11 +947,20 @@ static struct nvm_tgt_type tt_pblk = {
+ 		if (dir == WRITE) {
+-			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
++			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
  
- static int __init pblk_module_init(void)
+ 			meta_list[i].lba = lba_list[paddr] = addr_empty;
+ 		}
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 1d289242ab92..9b4059b93855 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -314,10 +314,13 @@ static struct pblk_line *pblk_gc_get_victim_line(struct pblk *pblk,
+ 						 struct list_head *group_list)
  {
--	return nvm_register_tgt_type(&tt_pblk);
-+	int ret;
-+
-+	pblk_bio_set = bioset_create(BIO_POOL_SIZE, 0, 0);
-+	if (!pblk_bio_set)
-+		return -ENOMEM;
-+	ret = nvm_register_tgt_type(&tt_pblk);
-+	if (ret)
-+		bioset_free(pblk_bio_set);
-+	return ret;
- }
+ 	struct pblk_line *line, *victim;
++	int line_vsc, victim_vsc;
  
- static void pblk_module_exit(void)
- {
-+	bioset_free(pblk_bio_set);
- 	nvm_unregister_tgt_type(&tt_pblk);
- }
+ 	victim = list_first_entry(group_list, struct pblk_line, list);
+ 	list_for_each_entry(line, group_list, list) {
+-		if (*line->vsc < *victim->vsc)
++		line_vsc = le32_to_cpu(*line->vsc);
++		victim_vsc = le32_to_cpu(*victim->vsc);
++		if (line_vsc < victim_vsc)
+ 			victim = line;
+ 	}
  
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 762c0b73cb67..74d3fc53022e 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -342,7 +342,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 		struct pblk_r_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index a9be03cd07a8..fddb924f6dde 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -53,7 +53,7 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 			lba_list[paddr] = cpu_to_le64(w_ctx->lba);
+ 			line->nr_valid_lbas++;
+ 		} else {
+-			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
++			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
  
- 		/* Clone read bio to deal with read errors internally */
--		int_bio = bio_clone_bioset(bio, GFP_KERNEL, fs_bio_set);
-+		int_bio = bio_clone_fast(bio, GFP_KERNEL, pblk_bio_set);
- 		if (!int_bio) {
- 			pr_err("pblk: could not clone read bio\n");
- 			return NVM_IO_ERR;
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 99f3186b5288..95b665f23925 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -702,6 +702,7 @@ void pblk_write_should_kick(struct pblk *pblk);
- /*
-  * pblk read path
-  */
-+extern struct bio_set *pblk_bio_set;
- int pblk_submit_read(struct pblk *pblk, struct bio *bio);
- int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
- 			unsigned int nr_secs, unsigned int *secs_to_gc,
+ 			lba_list[paddr] = meta_list[i].lba = addr_empty;
+ 			__pblk_map_invalidate(pblk, line, paddr);
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index abf36f587477..7e1c314f2766 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -395,7 +395,7 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 
+ 		for (j = 0; j < pblk->min_write_pgs; j++, i++, w_ptr++) {
+ 			struct ppa_addr dev_ppa;
+-			u64 addr_empty = cpu_to_le64(ADDR_EMPTY);
++			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+ 
+ 			dev_ppa = addr_to_gen_ppa(pblk, w_ptr, line->id);
+ 
+-- 
+2.7.4
