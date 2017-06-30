@@ -1,14 +1,59 @@
-Return-Path: <BATV+c839010d8a82889b76e4+5048+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: move bounce limits settings into the drivers
-Date: Mon, 19 Jun 2017 09:26:18 +0200
-Message-Id: <20170619072628.12894-1-hch@lst.de>
+Return-Path: <bcache@lists.ewheeler.net>
+From: bcache@lists.ewheeler.net
+To: linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	Tang Junhui <tang.junhui@zte.com.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH 02/19] bcache: fix sequential large write IO bypass
+Date: Fri, 30 Jun 2017 13:42:51 -0700
+Message-Id: <1498855388-16990-2-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we still default to a bounce all highmem setting for block
-drivers.  This series defaults to no bouncing and instead adds call
-to blk_queue_bounce_limit to those drivers that need it.   It also
-has a few cleanups in that area.
+From: Tang Junhui <tang.junhui@zte.com.cn>
+
+Sequential write IOs were tested with bs=1M by FIO in writeback cache
+mode, these IOs were expected to be bypassed, but actually they did not.
+We debug the code, and find in check_should_bypass():
+    if (!congested &&
+        mode == CACHE_MODE_WRITEBACK &&
+        op_is_write(bio_op(bio)) &&
+        (bio-＞bi_opf & REQ_SYNC))
+        goto rescale
+that means, If in writeback mode, a write IO with REQ_SYNC flag will not
+be bypassed though it is a sequential large IO, It's not a correct thing
+to do actually, so this patch remove these codes.
+
+Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
+Reviewed-by: Kent Overstreet <kent.overstreet@gmail.com>
+Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
+Cc: stable@vger.kernel.org
+---
+ drivers/md/bcache/request.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 019b3df..958072a 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -400,12 +400,6 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 	if (!congested && !dc->sequential_cutoff)
+ 		goto rescale;
+ 
+-	if (!congested &&
+-	    mode == CACHE_MODE_WRITEBACK &&
+-	    op_is_write(bio->bi_opf) &&
+-	    op_is_sync(bio->bi_opf))
+-		goto rescale;
+-
+ 	spin_lock(&dc->io_lock);
+ 
+ 	hlist_for_each_entry(i, iohash(dc, bio->bi_iter.bi_sector), hash)
+-- 
+1.8.3.1
