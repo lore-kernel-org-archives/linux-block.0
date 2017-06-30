@@ -1,419 +1,48 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v4 08/12] block: Check locking assumptions at runtime
-Date: Mon, 19 Jun 2017 15:07:57 -0700
-Message-ID: <20170619220801.12557-9-bart.vanassche@wdc.com>
-In-Reply-To: <20170619220801.12557-1-bart.vanassche@wdc.com>
-References: <20170619220801.12557-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
+Return-Path: <bcache@lists.ewheeler.net>
+From: bcache@lists.ewheeler.net
+To: linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH 19/19] bcache: Update continue_at() documentation
+Date: Fri, 30 Jun 2017 13:43:08 -0700
+Message-Id: <1498855388-16990-19-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
 
-Instead of documenting the locking assumptions of most block layer
-functions as a comment, use lockdep_assert_held() to verify locking
-assumptions at runtime.
+continue_at() doesn't have a return statement anymore.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
- block/blk-core.c    | 71 +++++++++++++++++++++++++++++++++++------------------
- block/blk-flush.c   |  8 +++---
- block/blk-merge.c   |  3 +++
- block/blk-tag.c     | 15 +++++------
- block/blk-timeout.c |  4 ++-
- 5 files changed, 64 insertions(+), 37 deletions(-)
+ drivers/md/bcache/closure.h | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 0c08cf3559c9..5eeca5ac547f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -235,10 +235,12 @@ static void blk_delay_work(struct work_struct *work)
-  * Description:
-  *   Sometimes queueing needs to be postponed for a little while, to allow
-  *   resources to come back. This function will make sure that queueing is
-- *   restarted around the specified time. Queue lock must be held.
-+ *   restarted around the specified time.
-  */
- void blk_delay_queue(struct request_queue *q, unsigned long msecs)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	if (likely(!blk_queue_dead(q)))
- 		queue_delayed_work(kblockd_workqueue, &q->delay_work,
- 				   msecs_to_jiffies(msecs));
-@@ -256,6 +258,8 @@ EXPORT_SYMBOL(blk_delay_queue);
-  **/
- void blk_start_queue_async(struct request_queue *q)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
- 	blk_run_queue_async(q);
- }
-@@ -268,10 +272,11 @@ EXPORT_SYMBOL(blk_start_queue_async);
-  * Description:
-  *   blk_start_queue() will clear the stop flag on the queue, and call
-  *   the request_fn for the queue if it was in a stopped state when
-- *   entered. Also see blk_stop_queue(). Queue lock must be held.
-+ *   entered. Also see blk_stop_queue().
-  **/
- void blk_start_queue(struct request_queue *q)
- {
-+	lockdep_assert_held(q->queue_lock);
- 	WARN_ON(!irqs_disabled());
- 
- 	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
-@@ -291,10 +296,12 @@ EXPORT_SYMBOL(blk_start_queue);
-  *   or if it simply chooses not to queue more I/O at one point, it can
-  *   call this function to prevent the request_fn from being called until
-  *   the driver has signalled it's ready to go again. This happens by calling
-- *   blk_start_queue() to restart queue operations. Queue lock must be held.
-+ *   blk_start_queue() to restart queue operations.
-  **/
- void blk_stop_queue(struct request_queue *q)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	cancel_delayed_work(&q->delay_work);
- 	queue_flag_set(QUEUE_FLAG_STOPPED, q);
- }
-@@ -347,6 +354,8 @@ EXPORT_SYMBOL(blk_sync_queue);
-  */
- inline void __blk_run_queue_uncond(struct request_queue *q)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	if (unlikely(blk_queue_dead(q)))
- 		return;
- 
-@@ -368,11 +377,12 @@ EXPORT_SYMBOL_GPL(__blk_run_queue_uncond);
-  * @q:	The queue to run
+diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
+index 1ec84ca..295b7e4 100644
+--- a/drivers/md/bcache/closure.h
++++ b/drivers/md/bcache/closure.h
+@@ -312,8 +312,6 @@ static inline void closure_wake_up(struct closure_waitlist *list)
+  * been dropped with closure_put()), it will resume execution at @fn running out
+  * of @wq (or, if @wq is NULL, @fn will be called by closure_put() directly).
   *
-  * Description:
-- *    See @blk_run_queue. This variant must be called with the queue lock
-- *    held and interrupts disabled.
-+ *    See @blk_run_queue.
-  */
- void __blk_run_queue(struct request_queue *q)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	if (unlikely(blk_queue_stopped(q)))
- 		return;
- 
-@@ -386,10 +396,17 @@ EXPORT_SYMBOL(__blk_run_queue);
+- * NOTE: This macro expands to a return in the calling function!
+- *
+  * This is because after calling continue_at() you no longer have a ref on @cl,
+  * and whatever @cl owns may be freed out from under you - a running closure fn
+  * has a ref on its own closure which continue_at() drops.
+@@ -340,8 +338,6 @@ do {									\
+  * Causes @fn to be executed out of @cl, in @wq context (or called directly if
+  * @wq is NULL).
   *
-  * Description:
-  *    Tells kblockd to perform the equivalent of @blk_run_queue on behalf
-- *    of us. The caller must hold the queue lock.
-+ *    of us.
-+ *
-+ * Note:
-+ *    Since it is not allowed to run q->delay_work after blk_cleanup_queue()
-+ *    has canceled q->delay_work, callers must hold the queue lock to avoid
-+ *    race conditions between blk_cleanup_queue() and blk_run_queue_async().
-  */
- void blk_run_queue_async(struct request_queue *q)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	if (likely(!blk_queue_stopped(q) && !blk_queue_dead(q)))
- 		mod_delayed_work(kblockd_workqueue, &q->delay_work, 0);
- }
-@@ -1135,6 +1152,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	int may_queue;
- 	req_flags_t rq_flags = RQF_ALLOCED;
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	if (unlikely(blk_queue_dying(q)))
- 		return ERR_PTR(-ENODEV);
- 
-@@ -1308,6 +1327,8 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	struct request_list *rl;
- 	struct request *rq;
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
- retry:
- 	rq = __get_request(rl, op, bio, gfp_mask);
-@@ -1400,6 +1421,8 @@ EXPORT_SYMBOL(blk_get_request);
-  */
- void blk_requeue_request(struct request_queue *q, struct request *rq)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	blk_delete_timer(rq);
- 	blk_clear_rq_complete(rq);
- 	trace_block_rq_requeue(q, rq);
-@@ -1474,9 +1497,6 @@ static void blk_pm_put_request(struct request *rq)
- static inline void blk_pm_put_request(struct request *rq) {}
- #endif
- 
--/*
-- * queue lock must be held
-- */
- void __blk_put_request(struct request_queue *q, struct request *req)
- {
- 	req_flags_t rq_flags = req->rq_flags;
-@@ -1489,6 +1509,8 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 		return;
- 	}
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	blk_pm_put_request(req);
- 
- 	elv_completed_request(q, req);
-@@ -2313,9 +2335,6 @@ EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
-  *
-  * Return:
-  *     The number of bytes to fail.
+- * NOTE: like continue_at(), this macro expands to a return in the caller!
 - *
-- * Context:
-- *     queue_lock must be held.
-  */
- unsigned int blk_rq_err_bytes(const struct request *rq)
- {
-@@ -2455,15 +2474,14 @@ void blk_account_io_start(struct request *rq, bool new_io)
-  * Return:
-  *     Pointer to the request at the top of @q if available.  Null
-  *     otherwise.
-- *
-- * Context:
-- *     queue_lock must be held.
-  */
- struct request *blk_peek_request(struct request_queue *q)
- {
- 	struct request *rq;
- 	int ret;
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	while ((rq = __elv_next_request(q)) != NULL) {
- 
- 		rq = blk_pm_peek_request(q, rq);
-@@ -2579,12 +2597,11 @@ void blk_dequeue_request(struct request *rq)
-  *
-  *     Block internal functions which don't want to start timer should
-  *     call blk_dequeue_request().
-- *
-- * Context:
-- *     queue_lock must be held.
-  */
- void blk_start_request(struct request *req)
- {
-+	lockdep_assert_held(req->q->queue_lock);
-+
- 	blk_dequeue_request(req);
- 
- 	if (test_bit(QUEUE_FLAG_STATS, &req->q->queue_flags)) {
-@@ -2609,14 +2626,13 @@ EXPORT_SYMBOL(blk_start_request);
-  * Return:
-  *     Pointer to the request at the top of @q if available.  Null
-  *     otherwise.
-- *
-- * Context:
-- *     queue_lock must be held.
-  */
- struct request *blk_fetch_request(struct request_queue *q)
- {
- 	struct request *rq;
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	rq = blk_peek_request(q);
- 	if (rq)
- 		blk_start_request(rq);
-@@ -2762,13 +2778,12 @@ void blk_unprep_request(struct request *req)
- }
- EXPORT_SYMBOL_GPL(blk_unprep_request);
- 
--/*
-- * queue lock must be held
-- */
- void blk_finish_request(struct request *req, blk_status_t error)
- {
- 	struct request_queue *q = req->q;
- 
-+	lockdep_assert_held(req->q->queue_lock);
-+
- 	if (req->rq_flags & RQF_STATS)
- 		blk_stat_add(req);
- 
-@@ -2850,6 +2865,8 @@ static bool blk_end_bidi_request(struct request *rq, blk_status_t error,
- static bool __blk_end_bidi_request(struct request *rq, blk_status_t error,
- 				   unsigned int nr_bytes, unsigned int bidi_bytes)
- {
-+	lockdep_assert_held(rq->q->queue_lock);
-+
- 	if (blk_update_bidi_request(rq, error, nr_bytes, bidi_bytes))
- 		return true;
- 
-@@ -2916,6 +2933,8 @@ EXPORT_SYMBOL(blk_end_request_all);
- bool __blk_end_request(struct request *rq, blk_status_t error,
- 		unsigned int nr_bytes)
- {
-+	lockdep_assert_held(rq->q->queue_lock);
-+
- 	return __blk_end_bidi_request(rq, error, nr_bytes, 0);
- }
- EXPORT_SYMBOL(__blk_end_request);
-@@ -2933,6 +2952,8 @@ void __blk_end_request_all(struct request *rq, blk_status_t error)
- 	bool pending;
- 	unsigned int bidi_bytes = 0;
- 
-+	lockdep_assert_held(rq->q->queue_lock);
-+
- 	if (unlikely(blk_bidi_rq(rq)))
- 		bidi_bytes = blk_rq_bytes(rq->next_rq);
- 
-@@ -3197,6 +3218,8 @@ static void queue_unplugged(struct request_queue *q, unsigned int depth,
- 			    bool from_schedule)
- 	__releases(q->queue_lock)
- {
-+	lockdep_assert_held(q->queue_lock);
-+
- 	trace_block_unplug(q, depth, !from_schedule);
- 
- 	if (from_schedule)
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index a572b47fa059..ed5fe322abba 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -346,6 +346,8 @@ static void flush_data_end_io(struct request *rq, blk_status_t error)
- 	struct request_queue *q = rq->q;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, NULL);
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	/*
- 	 * Updating q->in_flight[] here for making this tag usable
- 	 * early. Because in blk_queue_start_tag(),
-@@ -411,9 +413,6 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
-  * or __blk_mq_run_hw_queue() to dispatch request.
-  * @rq is being submitted.  Analyze what needs to be done and put it on the
-  * right queue.
-- *
-- * CONTEXT:
-- * spin_lock_irq(q->queue_lock) in !mq case
-  */
- void blk_insert_flush(struct request *rq)
- {
-@@ -422,6 +421,9 @@ void blk_insert_flush(struct request *rq)
- 	unsigned int policy = blk_flush_policy(fflags, rq);
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
- 
-+	if (!q->mq_ops)
-+		lockdep_assert_held(q->queue_lock);
-+
- 	/*
- 	 * @policy now records what operations need to be done.  Adjust
- 	 * REQ_PREFLUSH and FUA for the driver.
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index cea544ec5d96..5df13041b851 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -648,6 +648,9 @@ static void blk_account_io_merge(struct request *req)
- static struct request *attempt_merge(struct request_queue *q,
- 				     struct request *req, struct request *next)
- {
-+	if (!q->mq_ops)
-+		lockdep_assert_held(q->queue_lock);
-+
- 	if (!rq_mergeable(req) || !rq_mergeable(next))
- 		return NULL;
- 
-diff --git a/block/blk-tag.c b/block/blk-tag.c
-index 07cc329fa4b0..2290f65b9d73 100644
---- a/block/blk-tag.c
-+++ b/block/blk-tag.c
-@@ -258,15 +258,14 @@ EXPORT_SYMBOL(blk_queue_resize_tags);
-  *    all transfers have been done for a request. It's important to call
-  *    this function before end_that_request_last(), as that will put the
-  *    request back on the free list thus corrupting the internal tag list.
-- *
-- *  Notes:
-- *   queue lock must be held.
-  **/
- void blk_queue_end_tag(struct request_queue *q, struct request *rq)
- {
- 	struct blk_queue_tag *bqt = q->queue_tags;
- 	unsigned tag = rq->tag; /* negative tags invalid */
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	BUG_ON(tag >= bqt->real_max_depth);
- 
- 	list_del_init(&rq->queuelist);
-@@ -307,9 +306,6 @@ EXPORT_SYMBOL(blk_queue_end_tag);
-  *    calling this function.  The request will also be removed from
-  *    the request queue, so it's the drivers responsibility to readd
-  *    it if it should need to be restarted for some reason.
-- *
-- *  Notes:
-- *   queue lock must be held.
-  **/
- int blk_queue_start_tag(struct request_queue *q, struct request *rq)
- {
-@@ -317,6 +313,8 @@ int blk_queue_start_tag(struct request_queue *q, struct request *rq)
- 	unsigned max_depth;
- 	int tag;
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	if (unlikely((rq->rq_flags & RQF_QUEUED))) {
- 		printk(KERN_ERR
- 		       "%s: request %p for device [%s] already tagged %d",
-@@ -389,14 +387,13 @@ EXPORT_SYMBOL(blk_queue_start_tag);
-  *   Hardware conditions may dictate a need to stop all pending requests.
-  *   In this case, we will safely clear the block side of the tag queue and
-  *   readd all requests to the request queue in the right order.
-- *
-- *  Notes:
-- *   queue lock must be held.
-  **/
- void blk_queue_invalidate_tags(struct request_queue *q)
- {
- 	struct list_head *tmp, *n;
- 
-+	lockdep_assert_held(q->queue_lock);
-+
- 	list_for_each_safe(tmp, n, &q->tag_busy_list)
- 		blk_requeue_request(q, list_entry_rq(tmp));
- }
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index cbff183f3d9f..17ec83bb0900 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -189,13 +189,15 @@ unsigned long blk_rq_timeout(unsigned long timeout)
-  * Notes:
-  *    Each request has its own timer, and as it is added to the queue, we
-  *    set up the timer. When the request completes, we cancel the timer.
-- *    Queue lock must be held for the non-mq case, mq case doesn't care.
-  */
- void blk_add_timer(struct request *req)
- {
- 	struct request_queue *q = req->q;
- 	unsigned long expiry;
- 
-+	if (!q->mq_ops)
-+		lockdep_assert_held(q->queue_lock);
-+
- 	/* blk-mq has its own handler, so we don't need ->rq_timed_out_fn */
- 	if (!q->mq_ops && !q->rq_timed_out_fn)
- 		return;
+  * The ref the caller of continue_at_nobarrier() had on @cl is now owned by @fn,
+  * thus it's not safe to touch anything protected by @cl after a
+  * continue_at_nobarrier().
 -- 
-2.13.1
+1.8.3.1
