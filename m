@@ -1,143 +1,91 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Hannes Reinecke <hare@suse.com>, Omar Sandoval
-	<osandov@fb.com>
-Subject: [PATCH v5 01/12] blk-mq: Reduce blk_mq_hw_ctx size
-Date: Tue, 20 Jun 2017 11:15:38 -0700
-Message-ID: <20170620181549.24903-2-bart.vanassche@wdc.com>
-In-Reply-To: <20170620181549.24903-1-bart.vanassche@wdc.com>
-References: <20170620181549.24903-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
+Return-Path: <bcache@lists.ewheeler.net>
+From: bcache@lists.ewheeler.net
+To: linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	Tang Junhui <tang.junhui@zte.com.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH 10/19] bcache: initialize stripe_sectors_dirty correctly for thin flash device
+Date: Fri, 30 Jun 2017 13:42:59 -0700
+Message-Id: <1498855388-16990-10-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Since the srcu structure is rather large (184 bytes on an x86-64
-system with kernel debugging disabled), only allocate it if needed.
+Thin flash device does not initialize stripe_sectors_dirty correctly, this
+patch fixes this issue.
 
-Reported-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Cc: stable@vger.kernel.org
 ---
- block/blk-mq.c         | 30 ++++++++++++++++++++++--------
- include/linux/blk-mq.h |  5 +++--
- 2 files changed, 25 insertions(+), 10 deletions(-)
+ drivers/md/bcache/super.c     | 3 ++-
+ drivers/md/bcache/writeback.c | 8 ++++----
+ drivers/md/bcache/writeback.h | 2 +-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ca03cd4b263f..3e0cc11b1a90 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -172,7 +172,7 @@ void blk_mq_quiesce_queue(struct request_queue *q)
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (hctx->flags & BLK_MQ_F_BLOCKING)
--			synchronize_srcu(&hctx->queue_rq_srcu);
-+			synchronize_srcu(hctx->queue_rq_srcu);
- 		else
- 			rcu = true;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 1f84791..e06641e 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1030,7 +1030,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
  	}
-@@ -1094,9 +1094,9 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	} else {
- 		might_sleep();
  
--		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
-+		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
- 		blk_mq_sched_dispatch_requests(hctx);
--		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
-+		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
- 	}
+ 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
+-		bch_sectors_dirty_init(dc);
++		bch_sectors_dirty_init(&dc->disk);
+ 		atomic_set(&dc->has_dirty, 1);
+ 		atomic_inc(&dc->count);
+ 		bch_writeback_queue(dc);
+@@ -1232,6 +1232,7 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
+ 		goto err;
+ 
+ 	bcache_device_attach(d, c, u - c->uuids);
++	bch_sectors_dirty_init(d);
+ 	bch_flash_dev_request_init(d);
+ 	add_disk(d->disk);
+ 
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 3d463f0..4ac8b13 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -482,17 +482,17 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
+ 	return MAP_CONTINUE;
  }
  
-@@ -1505,9 +1505,9 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 
- 		might_sleep();
- 
--		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
-+		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
- 		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
--		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
-+		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
- 	}
- }
- 
-@@ -1853,7 +1853,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 		set->ops->exit_hctx(hctx, hctx_idx);
- 
- 	if (hctx->flags & BLK_MQ_F_BLOCKING)
--		cleanup_srcu_struct(&hctx->queue_rq_srcu);
-+		cleanup_srcu_struct(hctx->queue_rq_srcu);
- 
- 	blk_mq_remove_cpuhp(hctx);
- 	blk_free_flush_queue(hctx->fq);
-@@ -1926,7 +1926,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 		goto free_fq;
- 
- 	if (hctx->flags & BLK_MQ_F_BLOCKING)
--		init_srcu_struct(&hctx->queue_rq_srcu);
-+		init_srcu_struct(hctx->queue_rq_srcu);
- 
- 	blk_mq_debugfs_register_hctx(q, hctx);
- 
-@@ -2201,6 +2201,20 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
- }
- EXPORT_SYMBOL(blk_mq_init_queue);
- 
-+static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
-+{
-+	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
-+
-+	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, queue_rq_srcu),
-+			   __alignof__(struct blk_mq_hw_ctx)) !=
-+		     sizeof(struct blk_mq_hw_ctx));
-+
-+	if (tag_set->flags & BLK_MQ_F_BLOCKING)
-+		hw_ctx_size += sizeof(struct srcu_struct);
-+
-+	return hw_ctx_size;
-+}
-+
- static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 						struct request_queue *q)
+-void bch_sectors_dirty_init(struct cached_dev *dc)
++void bch_sectors_dirty_init(struct bcache_device *d)
  {
-@@ -2215,7 +2229,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			continue;
+ 	struct sectors_dirty_init op;
  
- 		node = blk_mq_hw_queue_to_node(q->mq_map, i);
--		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
-+		hctxs[i] = kzalloc_node(blk_mq_hw_ctx_size(set),
- 					GFP_KERNEL, node);
- 		if (!hctxs[i])
- 			break;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index f1bd13ae8f57..3f2c22a42df6 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -39,8 +39,6 @@ struct blk_mq_hw_ctx {
- 	struct blk_mq_tags	*tags;
- 	struct blk_mq_tags	*sched_tags;
+ 	bch_btree_op_init(&op.op, -1);
+-	op.inode = dc->disk.id;
++	op.inode = d->id;
  
--	struct srcu_struct	queue_rq_srcu;
--
- 	unsigned long		queued;
- 	unsigned long		run;
- #define BLK_MQ_MAX_DISPATCH_ORDER	7
-@@ -62,6 +60,9 @@ struct blk_mq_hw_ctx {
- 	struct dentry		*debugfs_dir;
- 	struct dentry		*sched_debugfs_dir;
- #endif
-+
-+	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
-+	struct srcu_struct	queue_rq_srcu[0];
- };
+-	bch_btree_map_keys(&op.op, dc->disk.c, &KEY(op.inode, 0, 0),
++	bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
+ 			   sectors_dirty_init_fn, 0);
  
- struct blk_mq_tag_set {
+-	dc->disk.sectors_dirty_last = bcache_dev_sectors_dirty(&dc->disk);
++	d->sectors_dirty_last = bcache_dev_sectors_dirty(d);
+ }
+ 
+ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index ea2f92e..c2ab4b4 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -109,7 +109,7 @@ static inline void bch_writeback_add(struct cached_dev *dc)
+ 
+ void bcache_dev_sectors_dirty_add(struct cache_set *, unsigned, uint64_t, int);
+ 
+-void bch_sectors_dirty_init(struct cached_dev *dc);
++void bch_sectors_dirty_init(struct bcache_device *);
+ void bch_cached_dev_writeback_init(struct cached_dev *);
+ int bch_cached_dev_writeback_start(struct cached_dev *);
+ 
 -- 
-2.13.1
+1.8.3.1
