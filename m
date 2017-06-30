@@ -1,110 +1,116 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
+Return-Path: <bcache@lists.ewheeler.net>
+From: bcache@lists.ewheeler.net
+To: linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org,
 	hch@infradead.org,
-	linux-block@vger.kernel.org,
 	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	akpm@linux-foundation.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 04/10] fs: Introduce RWF_NOWAIT and FMODE_AIO_NOWAIT
-Date: Thu, 15 Jun 2017 10:59:56 -0500
-Message-Id: <20170615160002.17233-5-rgoldwyn@suse.de>
-In-Reply-To: <20170615160002.17233-1-rgoldwyn@suse.de>
-References: <20170615160002.17233-1-rgoldwyn@suse.de>
+	Eric Wheeler <git@linux.ewheeler.net>,
+	Eric Wheeler <bcache@linux.ewheeler.net>
+Subject: [PATCH 08/19] bcache: documentation for sysfs entries describing bcache cache hinting
+Date: Fri, 30 Jun 2017 13:42:57 -0700
+Message-Id: <1498855388-16990-8-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Eric Wheeler <git@linux.ewheeler.net>
 
-RWF_NOWAIT informs kernel to bail out if an AIO request will block
-for reasons such as file allocations, or a writeback triggered,
-or would block while allocating requests while performing
-direct I/O.
-
-RWF_NOWAIT is translated to IOCB_NOWAIT for iocb->ki_flags.
-
-FMODE_AIO_NOWAIT is a flag which identifies the file opened is capable
-of returning -EAGAIN if the AIO call will block. This must be set by
-supporting filesystems in the ->open() call.
-
-Filesystems xfs, btrfs and ext4 would be supported in the following patches.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Eric Wheeler <bcache@linux.ewheeler.net>
 ---
- fs/aio.c                |  6 ++++++
- include/linux/fs.h      | 11 ++++++++++-
- include/uapi/linux/fs.h |  1 +
- 3 files changed, 17 insertions(+), 1 deletion(-)
+ Documentation/bcache.txt | 80 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index 020fa0045e3c..34027b67e2f4 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1592,6 +1592,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		goto out_put_req;
- 	}
+diff --git a/Documentation/bcache.txt b/Documentation/bcache.txt
+index a9259b5..c78c012 100644
+--- a/Documentation/bcache.txt
++++ b/Documentation/bcache.txt
+@@ -133,6 +133,86 @@ the backing devices to passthrough mode.
+    writeback mode). It currently doesn't do anything intelligent if it fails to
+    read some of the dirty data, though.
  
-+	if ((req->common.ki_flags & IOCB_NOWAIT) &&
-+			!(req->common.ki_flags & IOCB_DIRECT)) {
-+		ret = -EOPNOTSUPP;
-+		goto out_put_req;
-+	}
++SSD LONGEVITY: PER-PROCESS CACHE HINTING WITH IO PRIORITY
++---------------------------------------------------------
 +
- 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
- 	if (unlikely(ret)) {
- 		pr_debug("EFAULT: aio_key\n");
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index dc0ab585cd56..017aca01c35e 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -142,6 +142,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- /* File was opened by fanotify and shouldn't generate fanotify events */
- #define FMODE_NONOTIFY		((__force fmode_t)0x4000000)
- 
-+/* File is capable of returning -EAGAIN if AIO will block */
-+#define FMODE_AIO_NOWAIT	((__force fmode_t)0x8000000)
++Processes can be assigned an IO priority using `ionice` and bcache will
++either try to writeback or bypass the cache based on the IO priority
++level assigned to the process and the configuration of the syfs ioprio
++hints.  If configured properly for your workload, this can both increase
++performance and reduce SSD wear (erase/write cycles).
 +
- /*
-  * Flag for rw_copy_check_uvector and compat_rw_copy_check_uvector
-  * that indicates that they should check the contents of the iovec are
-@@ -268,6 +271,7 @@ struct writeback_control;
- #define IOCB_DSYNC		(1 << 4)
- #define IOCB_SYNC		(1 << 5)
- #define IOCB_WRITE		(1 << 6)
-+#define IOCB_NOWAIT		(1 << 7)
++Having idle IOs bypass the cache can increase performance elsewhere
++since you probably don't care about their performance.  In addition,
++this prevents idle IOs from promoting into (polluting) your cache and
++evicting blocks that are more important elsewhere.
++
++Default sysfs values:
++	2,7: ioprio_bypass is hinted for process IOs at-or-below best-effort-7.
++	0,0: ioprio_writeback hinting is disabled by default.
++
++Cache hinting is configured by writing 'class,level' pairs to sysfs.
++In this example, we write the following:
++
++    echo 2,7 > /sys/block/bcache0/bcache/ioprio_bypass
++    echo 2,0 > /sys/block/bcache0/bcache/ioprio_writeback
++
++Thus, processes with the following IO class (ionice -c) and level (-n)
++will the behave as shown in this table:
++
++	(-c) IO Class    (-n) Class level       Action
++	-----------------------------------------------------
++	(1) Realtime      0-7                   Writeback
++	(2) Best-effort     0                   Writeback
++	(2) Best-effort   1-6                   Normal, as if hinting were disabled
++	(2) Best-effort     7                   Bypass cache
++	(3) Idle          n/a                   Bypass cache
++
++For processes at-or-below best-effort-7 (ionice -c2 -n7), the
++ioprio_bypass behavior is as follows:
++
++* Reads will come from the backing device and will not promote into
++  (pollute) your cache.  If the block being read was already in the cache,
++  then it will be read from the cache (and remain cached).
++
++* If you are using writeback mode, then low-priority bypass-hinted writes
++  will go directly to the backing device.  If the write was dirty in
++  cache, it will cache-invalidate and write directly to the backing
++  device.  If a high-priority task later writes the same block then it
++  will writeback so no performance is lost for write-after-write.
++
++  For read-after-bypassed-write, the block will be read from the backing
++  device (not cached) so there may be a miss penalty when a low-priority
++  process write bypasses the cache followed by a high-priority read that
++  would otherwise have hit.  In practice, this is not an issue; to date,
++  none have wanted low-priority writes and high-priority reads of the
++  same block.
++
++For processes in our example at-or-above best-effort-0 (ionice -c2 -n0),
++the ioprio_writeback behavior is as follows:
++
++* The writeback hint has no effect unless your 'cache_mode' is writeback.
++  Assuming writeback mode, all writes at this priority will writeback.
++  Of course this will increase SSD wear, so only use writeback hinting
++  if you need it.
++
++* Reads are unaffected by ioprio_writeback, except that read-after-write
++  will of course read from the cache.
++
++Linux assigns processes the best-effort class with a level of 4 if
++no process is assigned  Thus, without `ionice` your processes will
++follow normal bcache should_writeback/should_bypass symantecs as if the
++ioprio_writeback/ioprio_bypass sysfs flags were disabled.
++
++Also note that in order to be hinted by ioprio_writeback/ioprio_bypass,
++the process must have a valid ioprio setting as returned by
++get_task_io_context()->ioprio. Thus, a process without an IO context
++will be ignored by the ioprio_writeback/ioprio_bypass hints even if your
++sysfs hints specify that best-effort-4 should be flagged for bypass
++or writeback.  If in doubt, explicitly set the process IO priority with
++`ionice`.
++
++See `man ionice` for more detail about per-process IO priority in Linux.
  
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -3060,9 +3064,14 @@ static inline int iocb_flags(struct file *file)
- 
- static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
- {
--	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC)))
-+	if (unlikely(flags & ~(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT)))
- 		return -EOPNOTSUPP;
- 
-+	if (flags & RWF_NOWAIT) {
-+		if (!(ki->ki_filp->f_mode & FMODE_AIO_NOWAIT))
-+			return -EOPNOTSUPP;
-+		ki->ki_flags |= IOCB_NOWAIT;
-+	}
- 	if (flags & RWF_HIPRI)
- 		ki->ki_flags |= IOCB_HIPRI;
- 	if (flags & RWF_DSYNC)
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 24e61a54feaa..29969fb7f9a7 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -360,5 +360,6 @@ struct fscrypt_key {
- #define RWF_HIPRI			0x00000001 /* high priority request, poll if possible */
- #define RWF_DSYNC			0x00000002 /* per-IO O_DSYNC */
- #define RWF_SYNC			0x00000004 /* per-IO O_SYNC */
-+#define RWF_NOWAIT			0x00000008 /* per-IO, return -EAGAIN if operation would block */
- 
- #endif /* _UAPI_LINUX_FS_H */
+ HOWTO/COOKBOOK
+ --------------
 -- 
-2.12.0
+1.8.3.1
