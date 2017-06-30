@@ -1,58 +1,44 @@
-Return-Path: <jlayton@kernel.org>
-From: jlayton@kernel.org
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	tytso@mit.edu,
-	axboe@kernel.dk,
-	mawilcox@microsoft.com,
-	ross.zwisler@linux.intel.com,
-	corbet@lwn.net,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <jbacik@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	"Darrick J . Wong" <darrick.wong@oracle.com>
-Cc: Carlos Maiolino <cmaiolino@redhat.com>,
-	Eryu Guan <eguan@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Liu Bo <bo.li.liu@oracle.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v8 17/18] xfs: minimal conversion to errseq_t writeback error reporting
-Date: Thu, 29 Jun 2017 09:19:53 -0400
-Message-Id: <20170629131954.28733-18-jlayton@kernel.org>
-In-Reply-To: <20170629131954.28733-1-jlayton@kernel.org>
-References: <20170629131954.28733-1-jlayton@kernel.org>
+Return-Path: <arvind.yadav.cs@gmail.com>
+Return-Path: <arvind.yadav.cs@gmail.com>
+From: Arvind Yadav <arvind.yadav.cs@gmail.com>
+To: axboe@kernel.dk,
+	axboe@fb.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: constify attribute_group structures.
+Date: Fri, 30 Jun 2017 15:36:27 +0530
+Message-Id: <2e7b0369e63edbd7819bdddd0ddb431260e8195a.1498816266.git.arvind.yadav.cs@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jeff Layton <jlayton@redhat.com>
+attribute_groups are not supposed to change at runtime. All functions
+working with attribute_groups provided by <linux/sysfs.h> work with const
+attribute_group. So mark the non-const structs as const.
 
-Just check and advance the data errseq_t in struct file before
-before returning from fsync on normal files. Internal filemap_*
-callers are left as-is.
+File size before:
+   text	   data	    bss	    dec	    hex	filename
+  11622	    912	   2076	  14610	   3912	block/genhd.o
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+File size After adding 'const':
+   text	   data	    bss	    dec	    hex	filename
+  11686	    848	   2076	  14610	   3912	block/genhd.o
+
+Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 ---
- fs/xfs/xfs_file.c | 2 +-
+ block/genhd.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 5fb5a0958a14..6600b264b0b6 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -140,7 +140,7 @@ xfs_file_fsync(
+diff --git a/block/genhd.c b/block/genhd.c
+index d252d29..be42e4a 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1071,7 +1071,7 @@ static umode_t disk_visible(struct kobject *kobj, struct attribute *a, int n)
+ 	return a->mode;
+ }
  
- 	trace_xfs_file_fsync(ip);
- 
--	error = filemap_write_and_wait_range(inode->i_mapping, start, end);
-+	error = file_write_and_wait_range(file, start, end);
- 	if (error)
- 		return error;
- 
+-static struct attribute_group disk_attr_group = {
++static const struct attribute_group disk_attr_group = {
+ 	.attrs = disk_attrs,
+ 	.is_visible = disk_visible,
+ };
 -- 
-2.13.0
+1.9.1
