@@ -1,227 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:38694 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751497AbdFBVyt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Jun 2017 17:54:49 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH 11/11] block: use standard blktrace API to output cgroup info for debug notes
-Date: Fri,  2 Jun 2017 14:54:04 -0700
-Message-Id: <326d853e83cbaf6ba200c72a7b1801792cbc3886.1496432591.git.shli@fb.com>
-In-Reply-To: <cover.1496432591.git.shli@fb.com>
-References: <cover.1496432591.git.shli@fb.com>
-In-Reply-To: <cover.1496432591.git.shli@fb.com>
-References: <cover.1496432591.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <bcache@lists.ewheeler.net>
+From: bcache@lists.ewheeler.net
+To: linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	Jan Kara <jack@suse.cz>,
+	stable@vger.kernel.org
+Subject: [PATCH 01/19] bcache: Fix leak of bdev reference
+Date: Fri, 30 Jun 2017 13:42:50 -0700
+Message-Id: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <20170629134510.GA32385@infradead.org>
+References: <20170629134510.GA32385@infradead.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+From: Jan Kara <jack@suse.cz>
 
-Currently cfq/bfq/blk-throttle output cgroup info in trace in their own
-way. Now we have standard blktrace API for this, so convert them to use
-it.
+If blkdev_get_by_path() in register_bcache() fails, we try to lookup the
+block device using lookup_bdev() to detect which situation we are in to
+properly report error. However we never drop the reference returned to
+us from lookup_bdev(). Fix that.
 
-Note, this changes the behavior a little bit. cgroup info isn't output
-by default, we only do this with 'blk_cgroup' option enabled. cgroup
-info isn't output as a string by default too, we only do this with
-'blk_cgname' option enabled. Also cgroup info is output in different
-position of the note string. I think these behavior changes aren't a big
-issue (actually we make trace data shorter which is good), since the
-blktrace note is solely for debugging.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+Cc: stable@vger.kernel.org
 ---
- block/bfq-iosched.h          | 16 ++++++----------
- block/blk-throttle.c         |  6 ++----
- block/cfq-iosched.c          | 15 ++++++---------
- include/linux/blk-cgroup.h   | 14 --------------
- include/linux/blktrace_api.h | 12 ++++++++----
- kernel/trace/blktrace.c      | 10 +++++++---
- 6 files changed, 29 insertions(+), 44 deletions(-)
+ drivers/md/bcache/super.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index ae783c0..e4d5b56 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -910,19 +910,15 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(bfqg_to_blkg(bfqq_group(bfqq)), __pbuf, sizeof(__pbuf)); \
--	blk_add_trace_msg((bfqd)->queue, "bfq%d%c %s " fmt, (bfqq)->pid, \
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
--			  __pbuf, ##args);				\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
-+			"bfq%d%c " fmt, (bfqq)->pid,			\
-+			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
- } while (0)
- 
- #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(bfqg_to_blkg(bfqg), __pbuf, sizeof(__pbuf));		\
--	blk_add_trace_msg((bfqd)->queue, "%s " fmt, __pbuf, ##args);	\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+		bfqg_to_blkg(bfqg)->blkcg, fmt, ##args);		\
- } while (0)
- 
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 53d3e3d..46e85e0 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -352,10 +352,8 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- 	if (likely(!blk_trace_note_message_enabled(__td->queue)))	\
- 		break;							\
- 	if ((__tg)) {							\
--		char __pbuf[128];					\
--									\
--		blkg_path(tg_to_blkg(__tg), __pbuf, sizeof(__pbuf));	\
--		blk_add_trace_msg(__td->queue, "throtl %s " fmt, __pbuf, ##args); \
-+		blk_add_cgroup_trace_msg(__td->queue,			\
-+			tg_to_blkg(__tg)->blkcg, "throtl " fmt, ##args);\
- 	} else {							\
- 		blk_add_trace_msg(__td->queue, "throtl " fmt, ##args);	\
- 	}								\
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index da69b07..5f59f37 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -652,20 +652,17 @@ static inline void cfqg_put(struct cfq_group *cfqg)
- }
- 
- #define cfq_log_cfqq(cfqd, cfqq, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg((cfqq)->cfqg), __pbuf, sizeof(__pbuf));	\
--	blk_add_trace_msg((cfqd)->queue, "cfq%d%c%c %s " fmt, (cfqq)->pid, \
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg((cfqq)->cfqg)->blkcg,		\
-+			"cfq%d%c%c " fmt, (cfqq)->pid,			\
- 			cfq_cfqq_sync((cfqq)) ? 'S' : 'A',		\
- 			cfqq_type((cfqq)) == SYNC_NOIDLE_WORKLOAD ? 'N' : ' ',\
--			  __pbuf, ##args);				\
-+			  ##args);					\
- } while (0)
- 
- #define cfq_log_cfqg(cfqd, cfqg, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg(cfqg), __pbuf, sizeof(__pbuf));		\
--	blk_add_trace_msg((cfqd)->queue, "%s " fmt, __pbuf, ##args);	\
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg(cfqg)->blkcg, fmt, ##args);	\
- } while (0)
- 
- static inline void cfqg_stats_update_io_add(struct cfq_group *cfqg,
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index d176247..b06f107 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -334,19 +334,6 @@ static inline struct blkcg *cpd_to_blkcg(struct blkcg_policy_data *cpd)
- }
- 
- /**
-- * blkg_path - format cgroup path of blkg
-- * @blkg: blkg of interest
-- * @buf: target buffer
-- * @buflen: target buffer length
-- *
-- * Format the path of the cgroup of @blkg into @buf.
-- */
--static inline int blkg_path(struct blkcg_gq *blkg, char *buf, int buflen)
--{
--	return cgroup_path(blkg->blkcg->css.cgroup, buf, buflen);
--}
--
--/**
-  * blkg_get - get a blkg reference
-  * @blkg: blkg to get
-  *
-@@ -758,7 +745,6 @@ static inline struct blkcg *bio_blkcg(struct bio *bio) { return NULL; }
- static inline struct blkg_policy_data *blkg_to_pd(struct blkcg_gq *blkg,
- 						  struct blkcg_policy *pol) { return NULL; }
- static inline struct blkcg_gq *pd_to_blkg(struct blkg_policy_data *pd) { return NULL; }
--static inline char *blkg_path(struct blkcg_gq *blkg) { return NULL; }
- static inline void blkg_get(struct blkcg_gq *blkg) { }
- static inline void blkg_put(struct blkcg_gq *blkg) { }
- 
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index d2e9085..cbfadd0 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -28,10 +28,12 @@ struct blk_trace {
- 	atomic_t dropped;
- };
- 
-+struct blkcg;
-+
- extern int blk_trace_ioctl(struct block_device *, unsigned, char __user *);
- extern void blk_trace_shutdown(struct request_queue *);
--extern __printf(2, 3)
--void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-+extern __printf(3, 4)
-+void __trace_note_message(struct blk_trace *, struct blkcg *blkcg, const char *fmt, ...);
- 
- /**
-  * blk_add_trace_msg - Add a (simple) message to the blktrace stream
-@@ -46,12 +48,14 @@ void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-  *     NOTE: Can not use 'static inline' due to presence of var args...
-  *
-  **/
--#define blk_add_trace_msg(q, fmt, ...)					\
-+#define blk_add_cgroup_trace_msg(q, cg, fmt, ...)			\
- 	do {								\
- 		struct blk_trace *bt = (q)->blk_trace;			\
- 		if (unlikely(bt))					\
--			__trace_note_message(bt, fmt, ##__VA_ARGS__);	\
-+			__trace_note_message(bt, cg, fmt, ##__VA_ARGS__);\
- 	} while (0)
-+#define blk_add_trace_msg(q, fmt, ...)					\
-+	blk_add_cgroup_trace_msg(q, NULL, fmt, ##__VA_ARGS__)
- #define BLK_TN_MAX_MSG		128
- 
- static inline bool blk_trace_note_message_enabled(struct request_queue *q)
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 18cbc02..9e135dd 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -154,7 +154,8 @@ static void trace_note_time(struct blk_trace *bt)
- 	local_irq_restore(flags);
- }
- 
--void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
-+void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
-+	const char *fmt, ...)
- {
- 	int n;
- 	va_list args;
-@@ -178,7 +179,10 @@ void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
- 	n = vscnprintf(buf, BLK_TN_MAX_MSG, fmt, args);
- 	va_end(args);
- 
--	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n, NULL);
-+	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
-+		blkcg = NULL;
-+	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
-+		blkcg ? cgroup_get_node_id(blkcg->css.cgroup) : NULL);
- 	local_irq_restore(flags);
- }
- EXPORT_SYMBOL_GPL(__trace_note_message);
-@@ -375,7 +379,7 @@ static ssize_t blk_msg_write(struct file *filp, const char __user *buffer,
- 		return PTR_ERR(msg);
- 
- 	bt = filp->private_data;
--	__trace_note_message(bt, "%s", msg);
-+	__trace_note_message(bt, NULL, "%s", msg);
- 	kfree(msg);
- 
- 	return count;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 8352fad..9a2c190 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1964,6 +1964,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 			else
+ 				err = "device busy";
+ 			mutex_unlock(&bch_register_lock);
++			if (!IS_ERR(bdev))
++				bdput(bdev);
+ 			if (attr == &ksysfs_register_quiet)
+ 				goto out;
+ 		}
 -- 
-2.9.3
+1.8.3.1
