@@ -1,43 +1,51 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: adilger@dilger.ca,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/11] ext4: add support for passing in write hints for buffered writes
-Date: Sat, 17 Jun 2017 13:59:51 -0600
-Message-Id: <1497729594-4707-9-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-References: <1497729594-4707-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:34893 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752012AbdF3P5A (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 11:57:00 -0400
+Received: by mail-wm0-f42.google.com with SMTP id w126so113905023wme.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Jun 2017 08:56:59 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 08/10] lightnvm: pblk: add initialization check
+Date: Fri, 30 Jun 2017 17:56:41 +0200
+Message-Id: <1498838203-21539-9-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+References: <1498838203-21539-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Add a sanity check to the pblk initialization sequence in order to
+ensure that enough LUNs have been allocated to store the line metadata.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- fs/ext4/page-io.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/lightnvm/pblk-init.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 1a82138ba739..fbc04a8cb35a 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -349,6 +349,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 	if (bio) {
- 		int io_op_flags = io->io_wbc->sync_mode == WB_SYNC_ALL ?
- 				  REQ_SYNC : 0;
-+		io_op_flags |= write_hint_to_opf(inode_write_hint(io->io_end->inode));
- 		bio_set_op_attrs(io->io_bio, REQ_OP_WRITE, io_op_flags);
- 		submit_bio(io->io_bio);
- 	}
-@@ -396,6 +397,7 @@ static int io_submit_add_bh(struct ext4_io_submit *io,
- 		ret = io_submit_init_bio(io, bh);
- 		if (ret)
- 			return ret;
-+		io->io_bio->bi_opf |= write_hint_to_opf(inode_write_hint(inode));
- 	}
- 	ret = bio_add_page(io->io_bio, page, bh->b_size, bh_offset(bh));
- 	if (ret != bh->b_size)
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 025d8fe52154..1b0f61233c21 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -716,6 +716,12 @@ static int pblk_lines_init(struct pblk *pblk)
+ 	lm->emeta_bb = geo->nr_luns - i;
+ 	lm->min_blk_line = 1 + DIV_ROUND_UP(lm->smeta_sec + lm->emeta_sec[0],
+ 							geo->sec_per_blk);
++	if (lm->min_blk_line > lm->blk_per_line) {
++		pr_err("pblk: config. not supported. Min. LUN in line:%d\n",
++							lm->blk_per_line);
++		ret = -EINVAL;
++		goto fail;
++	}
+ 
+ 	ret = pblk_lines_alloc_metadata(pblk);
+ 	if (ret)
 -- 
 2.7.4
