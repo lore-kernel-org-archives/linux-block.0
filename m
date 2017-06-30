@@ -1,339 +1,44 @@
-Return-Path: <BATV+a3f5f3e6054314e6ea5e+5058+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 4/9] bio-integrity: fold bio_integrity_enabled to bio_integrity_prep
-Date: Thu, 29 Jun 2017 11:31:11 -0700
-Message-Id: <20170629183116.28685-5-hch@lst.de>
-In-Reply-To: <20170629183116.28685-1-hch@lst.de>
-References: <20170629183116.28685-1-hch@lst.de>
+Return-Path: <arvind.yadav.cs@gmail.com>
+Return-Path: <arvind.yadav.cs@gmail.com>
+From: Arvind Yadav <arvind.yadav.cs@gmail.com>
+To: axboe@kernel.dk,
+	axboe@fb.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: Constify attribute_group structures.
+Date: Fri, 30 Jun 2017 15:44:35 +0530
+Message-Id: <8f55a9617ff8ac9ce8154d5bb7dc0181fd37bee4.1498817631.git.arvind.yadav.cs@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dmitry Monakhov <dmonakhov@openvz.org>
+attribute_groups are not supposed to change at runtime. All functions
+working with attribute_groups provided by <linux/sysfs.h> work with const
+attribute_group. So mark the non-const structs as const.
 
-Currently all integrity prep hooks are open-coded, and if prepare fails
-we ignore it's code and fail bio with EIO. Let's return real error to
-upper layer, so later caller may react accordingly.
+File size before:
+   text	   data	    bss	    dec	    hex	filename
+   5302	    544	      0	   5846	   16d6	block/partition-generic.o
 
-In fact no one want to use bio_integrity_prep() w/o bio_integrity_enabled,
-so it is reasonable to fold it in to one function.
+File size After adding 'const':
+   text	   data	    bss	    dec	    hex	filename
+   5342	    480	      0	   5822	   16be	block/partition-generic.o
 
-Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-[hch: merged with the latest block tree,
-	return bool from bio_integrity_prep]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 ---
- Documentation/block/data-integrity.txt |  6 +--
- block/bio-integrity.c                  | 88 +++++++++++++++-------------------
- block/blk-core.c                       |  5 +-
- block/blk-mq.c                         |  4 +-
- drivers/nvdimm/blk.c                   | 13 +----
- drivers/nvdimm/btt.c                   | 13 +----
- include/linux/bio.h                    | 12 ++---
- 7 files changed, 50 insertions(+), 91 deletions(-)
+ block/partition-generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/block/data-integrity.txt b/Documentation/block/data-integrity.txt
-index f56ec97f0d14..934c44ea0c57 100644
---- a/Documentation/block/data-integrity.txt
-+++ b/Documentation/block/data-integrity.txt
-@@ -192,7 +192,7 @@ will require extra work due to the application tag.
-     supported by the block device.
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index ff07b91..47fa20d 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -196,7 +196,7 @@ static DEVICE_ATTR(discard_alignment, S_IRUGO, part_discard_alignment_show,
+ 	NULL
+ };
  
+-static struct attribute_group part_attr_group = {
++static const struct attribute_group part_attr_group = {
+ 	.attrs = part_attrs,
+ };
  
--    int bio_integrity_prep(bio);
-+    bool bio_integrity_prep(bio);
- 
-       To generate IMD for WRITE and to set up buffers for READ, the
-       filesystem must call bio_integrity_prep(bio).
-@@ -201,9 +201,7 @@ will require extra work due to the application tag.
-       sector must be set, and the bio should have all data pages
-       added.  It is up to the caller to ensure that the bio does not
-       change while I/O is in progress.
--
--      bio_integrity_prep() should only be called if
--      bio_integrity_enabled() returned 1.
-+      Complete bio with error if prepare failed for some reson.
- 
- 
- 5.3 PASSING EXISTING INTEGRITY METADATA
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 3a0d71199fb0..44c4c52681c2 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -160,44 +160,6 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
- EXPORT_SYMBOL(bio_integrity_add_page);
- 
- /**
-- * bio_integrity_enabled - Check whether integrity can be passed
-- * @bio:	bio to check
-- *
-- * Description: Determines whether bio_integrity_prep() can be called
-- * on this bio or not.	bio data direction and target device must be
-- * set prior to calling.  The functions honors the write_generate and
-- * read_verify flags in sysfs.
-- */
--bool bio_integrity_enabled(struct bio *bio)
--{
--	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
--
--	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
--		return false;
--
--	if (!bio_sectors(bio))
--		return false;
--
--	/* Already protected? */
--	if (bio_integrity(bio))
--		return false;
--
--	if (bi == NULL)
--		return false;
--
--	if (bio_data_dir(bio) == READ && bi->profile->verify_fn != NULL &&
--	    (bi->flags & BLK_INTEGRITY_VERIFY))
--		return true;
--
--	if (bio_data_dir(bio) == WRITE && bi->profile->generate_fn != NULL &&
--	    (bi->flags & BLK_INTEGRITY_GENERATE))
--		return true;
--
--	return false;
--}
--EXPORT_SYMBOL(bio_integrity_enabled);
--
--/**
-  * bio_integrity_intervals - Return number of integrity intervals for a bio
-  * @bi:		blk_integrity profile for device
-  * @sectors:	Size of the bio in 512-byte sectors
-@@ -262,14 +224,15 @@ static blk_status_t bio_integrity_process(struct bio *bio,
-  * bio_integrity_prep - Prepare bio for integrity I/O
-  * @bio:	bio to prepare
-  *
-- * Description: Allocates a buffer for integrity metadata, maps the
-- * pages and attaches them to a bio.  The bio must have data
-- * direction, target device and start sector set priot to calling.  In
-- * the WRITE case, integrity metadata will be generated using the
-- * block device's integrity function.  In the READ case, the buffer
-+ * Description:  Checks if the bio already has an integrity payload attached.
-+ * If it does, the payload has been generated by another kernel subsystem,
-+ * and we just pass it through. Otherwise allocates integrity payload.
-+ * The bio must have data direction, target device and start sector set priot
-+ * to calling.  In the WRITE case, integrity metadata will be generated using
-+ * the block device's integrity function.  In the READ case, the buffer
-  * will be prepared for DMA and a suitable end_io handler set up.
-  */
--int bio_integrity_prep(struct bio *bio)
-+bool bio_integrity_prep(struct bio *bio)
- {
- 	struct bio_integrity_payload *bip;
- 	struct blk_integrity *bi;
-@@ -279,20 +242,41 @@ int bio_integrity_prep(struct bio *bio)
- 	unsigned int len, nr_pages;
- 	unsigned int bytes, offset, i;
- 	unsigned int intervals;
-+	blk_status_t status;
- 
- 	bi = bdev_get_integrity(bio->bi_bdev);
- 	q = bdev_get_queue(bio->bi_bdev);
--	BUG_ON(bi == NULL);
--	BUG_ON(bio_integrity(bio));
-+	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
-+		return true;
-+
-+	if (!bio_sectors(bio))
-+		return true;
- 
-+	/* Already protected? */
-+	if (bio_integrity(bio))
-+		return true;
-+
-+	if (bi == NULL)
-+		return true;
-+
-+	if (bio_data_dir(bio) == READ) {
-+		if (!bi->profile->verify_fn ||
-+		    !(bi->flags & BLK_INTEGRITY_VERIFY))
-+			return true;
-+	} else {
-+		if (!bi->profile->generate_fn ||
-+		    !(bi->flags & BLK_INTEGRITY_GENERATE))
-+			return true;
-+	}
- 	intervals = bio_integrity_intervals(bi, bio_sectors(bio));
- 
- 	/* Allocate kernel buffer for protection data */
- 	len = intervals * bi->tuple_size;
- 	buf = kmalloc(len, GFP_NOIO | q->bounce_gfp);
-+	status = BLK_STS_RESOURCE;
- 	if (unlikely(buf == NULL)) {
- 		printk(KERN_ERR "could not allocate integrity buffer\n");
--		return -ENOMEM;
-+		goto err_end_io;
- 	}
- 
- 	end = (((unsigned long) buf) + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-@@ -304,7 +288,8 @@ int bio_integrity_prep(struct bio *bio)
- 	if (IS_ERR(bip)) {
- 		printk(KERN_ERR "could not allocate data integrity bioset\n");
- 		kfree(buf);
--		return PTR_ERR(bip);
-+		status = BLK_STS_RESOURCE;
-+		goto err_end_io;
- 	}
- 
- 	bip->bip_flags |= BIP_BLOCK_INTEGRITY;
-@@ -349,8 +334,13 @@ int bio_integrity_prep(struct bio *bio)
- 	/* Auto-generate integrity metadata if this is a write */
- 	if (bio_data_dir(bio) == WRITE)
- 		bio_integrity_process(bio, bi->profile->generate_fn);
-+	return true;
-+
-+err_end_io:
-+	bio->bi_status = status;
-+	bio_endio(bio);
-+	return false;
- 
--	return 0;
- }
- EXPORT_SYMBOL(bio_integrity_prep);
- 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index af393d5a9680..970b9c9638c5 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1787,11 +1787,8 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 
- 	blk_queue_split(q, &bio);
- 
--	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
--		bio->bi_status = BLK_STS_IOERR;
--		bio_endio(bio);
-+	if (!bio_integrity_prep(bio))
- 		return BLK_QC_T_NONE;
--	}
- 
- 	if (op_is_flush(bio->bi_opf)) {
- 		spin_lock_irq(q->queue_lock);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 05dfa3f270ae..515bba6097fa 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1550,10 +1550,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 
- 	blk_queue_split(q, &bio);
- 
--	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
--		bio_io_error(bio);
-+	if (!bio_integrity_prep(bio))
- 		return BLK_QC_T_NONE;
--	}
- 
- 	if (!is_flush_fua && !blk_queue_nomerges(q) &&
- 	    blk_attempt_plug_merge(q, bio, &request_count, &same_queue_rq))
-diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
-index f12d23c49771..1a578b2a437b 100644
---- a/drivers/nvdimm/blk.c
-+++ b/drivers/nvdimm/blk.c
-@@ -179,16 +179,8 @@ static blk_qc_t nd_blk_make_request(struct request_queue *q, struct bio *bio)
- 	int err = 0, rw;
- 	bool do_acct;
- 
--	/*
--	 * bio_integrity_enabled also checks if the bio already has an
--	 * integrity payload attached. If it does, we *don't* do a
--	 * bio_integrity_prep here - the payload has been generated by
--	 * another kernel subsystem, and we just pass it through.
--	 */
--	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
--		bio->bi_status = BLK_STS_IOERR;
--		goto out;
--	}
-+	if (!bio_integrity_prep(bio))
-+		return BLK_QC_T_NONE;
- 
- 	bip = bio_integrity(bio);
- 	nsblk = q->queuedata;
-@@ -212,7 +204,6 @@ static blk_qc_t nd_blk_make_request(struct request_queue *q, struct bio *bio)
- 	if (do_acct)
- 		nd_iostat_end(bio, start);
- 
-- out:
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
- }
-diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-index b6ba0618ea46..b5caaee78bbf 100644
---- a/drivers/nvdimm/btt.c
-+++ b/drivers/nvdimm/btt.c
-@@ -1203,16 +1203,8 @@ static blk_qc_t btt_make_request(struct request_queue *q, struct bio *bio)
- 	int err = 0;
- 	bool do_acct;
- 
--	/*
--	 * bio_integrity_enabled also checks if the bio already has an
--	 * integrity payload attached. If it does, we *don't* do a
--	 * bio_integrity_prep here - the payload has been generated by
--	 * another kernel subsystem, and we just pass it through.
--	 */
--	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
--		bio->bi_status = BLK_STS_IOERR;
--		goto out;
--	}
-+	if (!bio_integrity_prep(bio))
-+		return BLK_QC_T_NONE;
- 
- 	do_acct = nd_iostat_start(bio, &start);
- 	bio_for_each_segment(bvec, bio, iter) {
-@@ -1239,7 +1231,6 @@ static blk_qc_t btt_make_request(struct request_queue *q, struct bio *bio)
- 	if (do_acct)
- 		nd_iostat_end(bio, start);
- 
--out:
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
- }
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8f11b659a992..a3743b748a62 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -723,8 +723,7 @@ struct biovec_slab {
- extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
- extern void bio_integrity_free(struct bio *);
- extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
--extern bool bio_integrity_enabled(struct bio *bio);
--extern int bio_integrity_prep(struct bio *);
-+extern bool bio_integrity_prep(struct bio *);
- extern void bio_integrity_endio(struct bio *);
- extern void bio_integrity_advance(struct bio *, unsigned int);
- extern void bio_integrity_trim(struct bio *);
-@@ -740,11 +739,6 @@ static inline void *bio_integrity(struct bio *bio)
- 	return NULL;
- }
- 
--static inline bool bio_integrity_enabled(struct bio *bio)
--{
--	return false;
--}
--
- static inline int bioset_integrity_create(struct bio_set *bs, int pool_size)
- {
- 	return 0;
-@@ -755,9 +749,9 @@ static inline void bioset_integrity_free (struct bio_set *bs)
- 	return;
- }
- 
--static inline int bio_integrity_prep(struct bio *bio)
-+static inline bool bio_integrity_prep(struct bio *bio)
- {
--	return 0;
-+	return true;
- }
- 
- static inline void bio_integrity_free(struct bio *bio)
 -- 
-2.11.0
+1.9.1
