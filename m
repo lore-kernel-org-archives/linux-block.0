@@ -1,217 +1,108 @@
-Return-Path: <BATV+48ca1ab4adaecdf09dc3+5045+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Omar Sandoval <osandov@fb.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 09/10] blk-mq-sched: unify request prepare methods
-Date: Fri, 16 Jun 2017 18:15:26 +0200
-Message-Id: <20170616161527.17649-10-hch@lst.de>
-In-Reply-To: <20170616161527.17649-1-hch@lst.de>
-References: <20170616161527.17649-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:34565 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751810AbdF3JHt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Jun 2017 05:07:49 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Jens Axboe <axboe@fb.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH blktests v2] tests: use nproc to get number of CPUs for fio jobs
+Date: Fri, 30 Jun 2017 11:07:35 +0200
+Message-Id: <20170630090735.11709-1-jthumshirn@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch makes sure we always allocate requests in the core blk-mq
-code and use a common prepare_request method to initialize them for
-both mq I/O schedulers.  For Kyber and additional limit_depth method
-is added that is called before allocating the request.
+Use nproc to get number of CPUs for fio jobs and introduce
+_run_fio_rand_io helper for parallel IO which we don't really care about
+the details and just want some IO.
 
-Also because none of the intializations can really fail the new method
-does not return an error - instead the bfq finish method is hardened
-to deal with the no-IOC case.
-
-Last but not least this removes the abuse of RQF_QUEUE by the blk-mq
-scheduling code as RQF_ELFPRIV is all that is needed now.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/bfq-iosched.c      | 19 ++++++++++++-------
- block/blk-mq.c           | 22 ++++++----------------
- block/kyber-iosched.c    | 23 +++++++++++------------
- include/linux/elevator.h |  4 ++--
- 4 files changed, 31 insertions(+), 37 deletions(-)
+ common/fio      | 7 +++++++
+ tests/block/005 | 4 +---
+ tests/block/006 | 2 +-
+ tests/block/008 | 4 +---
+ tests/block/011 | 5 ++---
+ 5 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index f037b005faa1..60d32700f104 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4292,8 +4292,14 @@ static void bfq_put_rq_priv_body(struct bfq_queue *bfqq)
- 
- static void bfq_finish_request(struct request *rq)
- {
--	struct bfq_queue *bfqq = RQ_BFQQ(rq);
--	struct bfq_data *bfqd = bfqq->bfqd;
-+	struct bfq_queue *bfqq;
-+	struct bfq_data *bfqd;
-+
-+	if (!rq->elv.icq)
-+		return;
-+
-+	bfqq = RQ_BFQQ(rq);
-+	bfqd = bfqq->bfqd;
- 
- 	if (rq->rq_flags & RQF_STARTED)
- 		bfqg_stats_update_completion(bfqq_group(bfqq),
-@@ -4394,9 +4400,9 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
- /*
-  * Allocate bfq data structures associated with this request.
-  */
--static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
--			      struct bio *bio)
-+static void bfq_prepare_request(struct request *rq, struct bio *bio)
- {
-+	struct request_queue *q = rq->q;
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
- 	struct bfq_io_cq *bic;
- 	const int is_sync = rq_is_sync(rq);
-@@ -4405,7 +4411,7 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 	bool split = false;
- 
- 	if (!rq->elv.icq)
--		return 1;
-+		return;
- 	bic = icq_to_bic(rq->elv.icq);
- 
- 	spin_lock_irq(&bfqd->lock);
-@@ -4466,7 +4472,6 @@ static int bfq_get_rq_private(struct request_queue *q, struct request *rq,
- 		bfq_handle_burst(bfqd, bfqq);
- 
- 	spin_unlock_irq(&bfqd->lock);
--	return 0;
+diff --git a/common/fio b/common/fio
+index 86ed4b2b7180..2b0759d19f5d 100644
+--- a/common/fio
++++ b/common/fio
+@@ -166,6 +166,13 @@ _run_fio() {
+ 	fio "${args[@]}" "$@"
  }
  
- static void bfq_idle_slice_timer_body(struct bfq_queue *bfqq)
-@@ -4945,7 +4950,7 @@ static struct elv_fs_entry bfq_attrs[] = {
- 
- static struct elevator_type iosched_bfq_mq = {
- 	.ops.mq = {
--		.get_rq_priv		= bfq_get_rq_private,
-+		.prepare_request	= bfq_prepare_request,
- 		.finish_request		= bfq_finish_request,
- 		.exit_icq		= bfq_exit_icq,
- 		.insert_requests	= bfq_insert_requests,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2f380ab7a603..81d05c19d4b3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -298,16 +298,11 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 		 * Flush requests are special and go directly to the
- 		 * dispatch list.
- 		 */
--		if (!op_is_flush(op) && e->type->ops.mq.get_request) {
--			rq = e->type->ops.mq.get_request(q, op, data);
--			if (rq)
--				rq->rq_flags |= RQF_QUEUED;
--			goto allocated;
--		}
-+		if (!op_is_flush(op) && e->type->ops.mq.limit_depth)
-+			e->type->ops.mq.limit_depth(op, data);
- 	}
- 
- 	rq = __blk_mq_alloc_request(data, op);
--allocated:
- 	if (!rq) {
- 		blk_queue_exit(q);
- 		return NULL;
-@@ -315,17 +310,12 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 
- 	if (!op_is_flush(op)) {
- 		rq->elv.icq = NULL;
--		if (e && e->type->ops.mq.get_rq_priv) {
-+		if (e && e->type->ops.mq.prepare_request) {
- 			if (e->type->icq_cache && rq_ioc(bio))
- 				blk_mq_sched_assign_ioc(rq, bio);
- 
--			if (e->type->ops.mq.get_rq_priv(q, rq, bio)) {
--				if (rq->elv.icq)
--					put_io_context(rq->elv.icq->ioc);
--				rq->elv.icq = NULL;
--			} else {
--				rq->rq_flags |= RQF_ELVPRIV;
--			}
-+			e->type->ops.mq.prepare_request(rq, bio);
-+			rq->rq_flags |= RQF_ELVPRIV;
- 		}
- 	}
- 	data->hctx->queued++;
-@@ -413,7 +403,7 @@ void blk_mq_free_request(struct request *rq)
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
- 	const int sched_tag = rq->internal_tag;
- 
--	if (rq->rq_flags & (RQF_ELVPRIV | RQF_QUEUED)) {
-+	if (rq->rq_flags & RQF_ELVPRIV) {
- 		if (e && e->type->ops.mq.finish_request)
- 			e->type->ops.mq.finish_request(rq);
- 		if (rq->elv.icq) {
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 2557b399f0a8..a9f6fd3fab8e 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -426,24 +426,22 @@ static void rq_clear_domain_token(struct kyber_queue_data *kqd,
- 	}
- }
- 
--static struct request *kyber_get_request(struct request_queue *q,
--					 unsigned int op,
--					 struct blk_mq_alloc_data *data)
-+static void kyber_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
- {
--	struct kyber_queue_data *kqd = q->elevator->elevator_data;
--	struct request *rq;
--
- 	/*
- 	 * We use the scheduler tags as per-hardware queue queueing tokens.
- 	 * Async requests can be limited at this stage.
- 	 */
--	if (!op_is_sync(op))
-+	if (!op_is_sync(op)) {
-+		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
-+
- 		data->shallow_depth = kqd->async_depth;
-+	}
++# Wrapper around _run_fio used if you need some I/O but don't really care much
++# about the details
++_run_fio_rand_io() {
++	_run_fio --bs=4k --rw=randread --norandommap --numjobs=$(nproc) \
++		--name=reads --direct=1
 +}
++
+ _fio_perf_report() {
+ 	# If there is more than one group, we don't know what to report.
+ 	if [[ $(wc -l < "$TMPDIR/fio_perf") -gt 1 ]]; then
+diff --git a/tests/block/005 b/tests/block/005
+index 8f8b7065404e..e59a3e35221b 100755
+--- a/tests/block/005
++++ b/tests/block/005
+@@ -36,9 +36,7 @@ test_device() {
+ 	fi
  
--	rq = __blk_mq_alloc_request(data, op);
--	if (rq)
--		rq_set_domain_token(rq, -1);
--	return rq;
-+static void kyber_prepare_request(struct request *rq, struct bio *bio)
-+{
-+	rq_set_domain_token(rq, -1);
- }
+ 	# start fio job
+-	_run_fio --bs=4k --rw=randread --norandommap \
+-		--name=reads --filename="$TEST_DEV" --size="$size" \
+-		--numjobs=8 --direct=1 &
++	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" &
  
- static void kyber_finish_request(struct request *rq)
-@@ -813,7 +811,8 @@ static struct elevator_type kyber_sched = {
- 		.exit_sched = kyber_exit_sched,
- 		.init_hctx = kyber_init_hctx,
- 		.exit_hctx = kyber_exit_hctx,
--		.get_request = kyber_get_request,
-+		.limit_depth = kyber_limit_depth,
-+		.prepare_request = kyber_prepare_request,
- 		.finish_request = kyber_finish_request,
- 		.completed_request = kyber_completed_request,
- 		.dispatch_request = kyber_dispatch_request,
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 4acea351d43f..5bc8f8682a3e 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -104,7 +104,8 @@ struct elevator_mq_ops {
- 	int (*request_merge)(struct request_queue *q, struct request **, struct bio *);
- 	void (*request_merged)(struct request_queue *, struct request *, enum elv_merge);
- 	void (*requests_merged)(struct request_queue *, struct request *, struct request *);
--	struct request *(*get_request)(struct request_queue *, unsigned int, struct blk_mq_alloc_data *);
-+	void (*limit_depth)(unsigned int, struct blk_mq_alloc_data *);
-+	void (*prepare_request)(struct request *, struct bio *bio);
- 	void (*finish_request)(struct request *);
- 	void (*insert_requests)(struct blk_mq_hw_ctx *, struct list_head *, bool);
- 	struct request *(*dispatch_request)(struct blk_mq_hw_ctx *);
-@@ -114,7 +115,6 @@ struct elevator_mq_ops {
- 	void (*requeue_request)(struct request *);
- 	struct request *(*former_request)(struct request_queue *, struct request *);
- 	struct request *(*next_request)(struct request_queue *, struct request *);
--	int (*get_rq_priv)(struct request_queue *, struct request *, struct bio *);
- 	void (*init_icq)(struct io_cq *);
- 	void (*exit_icq)(struct io_cq *);
- };
+ 	# while job is running, switch between schedulers
+ 	while kill -0 $! 2>/dev/null; do
+diff --git a/tests/block/006 b/tests/block/006
+index 18e31cbf3809..2b8450104e46 100755
+--- a/tests/block/006
++++ b/tests/block/006
+@@ -43,7 +43,7 @@ test() {
+ 		--filename=/dev/nullb0 --size=5g --direct=1
+ 
+ 	# run async test
+-	_fio_perf --bs=4k --ioengine=libaio --iodepth=8 --numjobs=4 \
++	_fio_perf --bs=4k --ioengine=libaio --iodepth=8 --numjobs=$(nproc) \
+ 		--rw=randread --norandommap --name=async \
+ 		--filename=/dev/nullb0 --size=5g --direct=1
+ 
+diff --git a/tests/block/008 b/tests/block/008
+index 033fa0d5e7a5..03abf57241bd 100755
+--- a/tests/block/008
++++ b/tests/block/008
+@@ -36,9 +36,7 @@ test_device() {
+ 	fi
+ 
+ 	# start fio job
+-	_run_fio --bs=4k --rw=randread --norandommap \
+-		--name=reads --filename="$TEST_DEV" --size="$size" \
+-		--numjobs=8 --direct=1 &
++	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" &
+ 
+ 	# while job is running, hotplug CPUs randomly
+ 	while kill -0 $! 2>/dev/null; do
+diff --git a/tests/block/011 b/tests/block/011
+index 65ed3dfa7092..920c58bb8ee4 100755
+--- a/tests/block/011
++++ b/tests/block/011
+@@ -40,9 +40,8 @@ test_device() {
+ 	fi
+ 
+ 	# start fio job
+-	_run_fio --bs=4k --rw=randread --norandommap \
+-		--name=reads --filename="$TEST_DEV" --size="$size" \
+-		--numjobs=8 --direct=1 --ignore_error=EIO,ENXIO,ENODEV &
++	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" \
++			--ignore_error=EIO,ENXIO,ENODEV &
+ 
+ 	while kill -0 $! 2>/dev/null; do
+ 		echo 0 > "/sys/bus/pci/devices/${pdev}/enable"
 -- 
-2.11.0
+2.12.3
