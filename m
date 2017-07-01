@@ -1,309 +1,292 @@
-Return-Path: <tom.leiming@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <3053d21a-3619-498f-bf3c-921ee3e8c532@linux.vnet.ibm.com>
-References: <20170628211010.4C8C9124035@b01ledav002.gho.pok.ibm.com>
- <c91629be-26db-96bb-9a55-18a6861888b2@kernel.dk> <CACVXFVMG=gD1Dq2SRKxhfPS33mzCC_dkSpVoYskaLE7PXV7xGQ@mail.gmail.com>
- <7f0a852e-5f90-4c63-9a43-a4180557530c@kernel.dk> <07ba10a8-6369-c1bc-dc9a-b550d9394c22@kernel.dk>
- <8f4ff428-e158-0df5-cf54-ae3cdea7ad1f@kernel.dk> <CACVXFVOW21vSOM0RGa-g0UFPRm91b9U16bruqXXYd=D+u7GKFQ@mail.gmail.com>
- <b462c167-53e9-11f8-583a-9984ef81fe0c@kernel.dk> <3729482c-fcca-2af5-4d05-7e44bcd71159@linux.vnet.ibm.com>
- <0759ff58-caa0-9e55-b5ac-6324d9ba521b@kernel.dk> <ca8ccbe7-beb6-bc0a-046c-b999004f0157@linux.vnet.ibm.com>
- <CACVXFVPpJBB5ieHg5nwyC4NF3Qd+W-TKJMFB-Qm4cVYK2B6M1w@mail.gmail.com>
- <599ba934-902d-d6ce-5a5a-9b32657b4a08@kernel.dk> <3053d21a-3619-498f-bf3c-921ee3e8c532@linux.vnet.ibm.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Tue, 4 Jul 2017 09:20:57 +0800
-Message-ID: <CACVXFVNQa_6Wrnx7Px1VRU+YuXqX+0y5SwyUvWGrv=ZrF_qPFg@mail.gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [dm-devel] [PATCH 1/1] block: Convert hd_struct in_flight from
  atomic to percpu
-To: Brian King <brking@linux.vnet.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
-	"open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>, Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Jens Axboe <axboe@kernel.dk>
+To: Brian King <brking@linux.vnet.ibm.com>, Ming Lei <tom.leiming@gmail.com>
+Cc: linux-block <linux-block@vger.kernel.org>,
+ "open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+ Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>
+References: <20170628211010.4C8C9124035@b01ledav002.gho.pok.ibm.com>
+ <c91629be-26db-96bb-9a55-18a6861888b2@kernel.dk>
+ <CACVXFVMG=gD1Dq2SRKxhfPS33mzCC_dkSpVoYskaLE7PXV7xGQ@mail.gmail.com>
+ <7f0a852e-5f90-4c63-9a43-a4180557530c@kernel.dk>
+ <07ba10a8-6369-c1bc-dc9a-b550d9394c22@kernel.dk>
+ <8f4ff428-e158-0df5-cf54-ae3cdea7ad1f@kernel.dk>
+ <CACVXFVOW21vSOM0RGa-g0UFPRm91b9U16bruqXXYd=D+u7GKFQ@mail.gmail.com>
+ <b462c167-53e9-11f8-583a-9984ef81fe0c@kernel.dk>
+ <3729482c-fcca-2af5-4d05-7e44bcd71159@linux.vnet.ibm.com>
+ <0759ff58-caa0-9e55-b5ac-6324d9ba521b@kernel.dk>
+ <cf23ad83-5938-8256-5b32-f40c0d261508@kernel.dk>
+ <0aedc83b-17a0-14bd-bacd-e11e1b7c263c@kernel.dk>
+Message-ID: <5cfc618b-eb03-fe1b-6429-189c0b3d3fc1@kernel.dk>
+Date: Sat, 1 Jul 2017 10:43:07 -0600
+MIME-Version: 1.0
+In-Reply-To: <0aedc83b-17a0-14bd-bacd-e11e1b7c263c@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Jul 1, 2017 at 10:18 AM, Brian King <brking@linux.vnet.ibm.com> wrote:
-> On 06/30/2017 06:26 PM, Jens Axboe wrote:
->> On 06/30/2017 05:23 PM, Ming Lei wrote:
->>> Hi Bian,
->>>
->>> On Sat, Jul 1, 2017 at 2:33 AM, Brian King <brking@linux.vnet.ibm.com> wrote:
->>>> On 06/30/2017 09:08 AM, Jens Axboe wrote:
->>>>>>>> Compared with the totally percpu approach, this way might help 1:M or
->>>>>>>> N:M mapping, but won't help 1:1 map(NVMe), when hctx is mapped to
->>>>>>>> each CPU(especially there are huge hw queues on a big system), :-(
+On 06/30/2017 10:59 PM, Jens Axboe wrote:
+> On 06/30/2017 10:17 PM, Jens Axboe wrote:
+>> On 06/30/2017 08:08 AM, Jens Axboe wrote:
+>>> On 06/30/2017 07:05 AM, Brian King wrote:
+>>>> On 06/29/2017 09:17 PM, Jens Axboe wrote:
+>>>>> On 06/29/2017 07:20 PM, Ming Lei wrote:
+>>>>>> On Fri, Jun 30, 2017 at 2:42 AM, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>> On 06/29/2017 10:00 AM, Jens Axboe wrote:
+>>>>>>>> On 06/29/2017 09:58 AM, Jens Axboe wrote:
+>>>>>>>>> On 06/29/2017 02:40 AM, Ming Lei wrote:
+>>>>>>>>>> On Thu, Jun 29, 2017 at 5:49 AM, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>>> On 06/28/2017 03:12 PM, Brian King wrote:
+>>>>>>>>>>>> This patch converts the in_flight counter in struct hd_struct from a
+>>>>>>>>>>>> pair of atomics to a pair of percpu counters. This eliminates a couple
+>>>>>>>>>>>> of atomics from the hot path. When running this on a Power system, to
+>>>>>>>>>>>> a single null_blk device with 80 submission queues, irq mode 0, with
+>>>>>>>>>>>> 80 fio jobs, I saw IOPs go from 1.5M IO/s to 11.4 IO/s.
+>>>>>>>>>>>
+>>>>>>>>>>> This has been done before, but I've never really liked it. The reason is
+>>>>>>>>>>> that it means that reading the part stat inflight count now has to
+>>>>>>>>>>> iterate over every possible CPU. Did you use partitions in your testing?
+>>>>>>>>>>> How many CPUs were configured? When I last tested this a few years ago
+>>>>>>>>>>> on even a quad core nehalem (which is notoriously shitty for cross-node
+>>>>>>>>>>> latencies), it was a net loss.
+>>>>>>>>>>
+>>>>>>>>>> One year ago, I saw null_blk's IOPS can be decreased to 10%
+>>>>>>>>>> of non-RQF_IO_STAT on a dual socket ARM64(each CPU has
+>>>>>>>>>> 96 cores, and dual numa nodes) too, the performance can be
+>>>>>>>>>> recovered basically if per numa-node counter is introduced and
+>>>>>>>>>> used in this case, but the patch was never posted out.
+>>>>>>>>>> If anyone is interested in that, I can rebase the patch on current
+>>>>>>>>>> block tree and post out. I guess the performance issue might be
+>>>>>>>>>> related with system cache coherency implementation more or less.
+>>>>>>>>>> This issue on ARM64 can be observed with the following userspace
+>>>>>>>>>> atomic counting test too:
+>>>>>>>>>>
+>>>>>>>>>>        http://kernel.ubuntu.com/~ming/test/cache/
+>>>>>>>>>
+>>>>>>>>> How well did the per-node thing work? Doesn't seem to me like it would
+>>>>>>>>> go far enough. And per CPU is too much. One potential improvement would
+>>>>>>>>> be to change the part_stat_read() to just loop online CPUs, instead of
+>>>>>>>>> all possible CPUs. When CPUs go on/offline, use that as the slow path to
+>>>>>>>>> ensure the stats are sane. Often there's a huge difference between
+>>>>>>>>> NR_CPUS configured and what the system has. As Brian states, RH ships
+>>>>>>>>> with 2048, while I doubt a lot of customers actually run that...
+>>>>>>>>>
+>>>>>>>>> Outside of coming up with a more clever data structure that is fully
+>>>>>>>>> CPU topology aware, one thing that could work is just having X cache
+>>>>>>>>> line separated read/write inflight counters per node, where X is some
+>>>>>>>>> suitable value (like 4). That prevents us from having cross node
+>>>>>>>>> traffic, and it also keeps the cross cpu traffic fairly low. That should
+>>>>>>>>> provide a nice balance between cost of incrementing the inflight
+>>>>>>>>> counting, and the cost of looping for reading it.
+>>>>>>>>>
+>>>>>>>>> And that brings me to the next part...
+>>>>>>>>>
+>>>>>>>>>>> I do agree that we should do something about it, and it's one of those
+>>>>>>>>>>> items I've highlighted in talks about blk-mq on pending issues to fix
+>>>>>>>>>>> up. It's just not great as it currently stands, but I don't think per
+>>>>>>>>>>> CPU counters is the right way to fix it, at least not for the inflight
+>>>>>>>>>>> counter.
+>>>>>>>>>>
+>>>>>>>>>> Yeah, it won't be a issue for non-mq path, and for blk-mq path, maybe
+>>>>>>>>>> we can use some blk-mq knowledge(tagset?) to figure out the
+>>>>>>>>>> 'in_flight' counter. I thought about it before, but never got a
+>>>>>>>>>> perfect solution, and looks it is a bit hard, :-)
+>>>>>>>>>
+>>>>>>>>> The tags are already a bit spread out, so it's worth a shot. That would
+>>>>>>>>> remove the need to do anything in the inc/dec path, as the tags already
+>>>>>>>>> do that. The inlight count could be easily retrieved with
+>>>>>>>>> sbitmap_weight(). The only issue here is that we need separate read and
+>>>>>>>>> write counters, and the weight would obviously only get us the total
+>>>>>>>>> count. But we can have a slower path for that, just iterate the tags and
+>>>>>>>>> count them. The fast path only cares about total count.
+>>>>>>>>>
+>>>>>>>>> Let me try that out real quick.
+>>>>>>>>
+>>>>>>>> Well, that only works for whole disk stats, of course... There's no way
+>>>>>>>> around iterating the tags and checking for this to truly work.
 >>>>>>>
->>>>>>> Not disagreeing with that, without having some mechanism to only
->>>>>>> loop queues that have pending requests. That would be similar to the
->>>>>>> ctx_map for sw to hw queues. But I don't think that would be worthwhile
->>>>>>> doing, I like your pnode approach better. However, I'm still not fully
->>>>>>> convinced that one per node is enough to get the scalability we need.
+>>>>>>> Totally untested proof of concept for using the tags for this. I based
+>>>>>>> this on top of Brian's patch, so it includes his patch plus the
+>>>>>>> _double() stuff I did which is no longer really needed.
 >>>>>>>
->>>>>>> Would be great if Brian could re-test with your updated patch, so we
->>>>>>> know how it works for him at least.
+>>>>>>>
+>>>>>>> diff --git a/block/bio.c b/block/bio.c
+>>>>>>> index 9cf98b29588a..ec99d9ba0f33 100644
+>>>>>>> --- a/block/bio.c
+>>>>>>> +++ b/block/bio.c
+>>>>>>> @@ -1737,7 +1737,7 @@ void generic_start_io_acct(int rw, unsigned long sectors,
+>>>>>>>         part_round_stats(cpu, part);
+>>>>>>>         part_stat_inc(cpu, part, ios[rw]);
+>>>>>>>         part_stat_add(cpu, part, sectors[rw], sectors);
+>>>>>>> -       part_inc_in_flight(part, rw);
+>>>>>>> +       part_inc_in_flight(cpu, part, rw);
+>>>>>>>
+>>>>>>>         part_stat_unlock();
+>>>>>>>  }
+>>>>>>> @@ -1751,7 +1751,7 @@ void generic_end_io_acct(int rw, struct hd_struct *part,
+>>>>>>>
+>>>>>>>         part_stat_add(cpu, part, ticks[rw], duration);
+>>>>>>>         part_round_stats(cpu, part);
+>>>>>>> -       part_dec_in_flight(part, rw);
+>>>>>>> +       part_dec_in_flight(cpu, part, rw);
+>>>>>>>
+>>>>>>>         part_stat_unlock();
+>>>>>>>  }
+>>>>>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>>>>>> index af393d5a9680..6ab2efbe940b 100644
+>>>>>>> --- a/block/blk-core.c
+>>>>>>> +++ b/block/blk-core.c
+>>>>>>> @@ -2434,8 +2434,13 @@ void blk_account_io_done(struct request *req)
+>>>>>>>
+>>>>>>>                 part_stat_inc(cpu, part, ios[rw]);
+>>>>>>>                 part_stat_add(cpu, part, ticks[rw], duration);
+>>>>>>> -               part_round_stats(cpu, part);
+>>>>>>> -               part_dec_in_flight(part, rw);
+>>>>>>> +
+>>>>>>> +               if (req->q->mq_ops)
+>>>>>>> +                       part_round_stats_mq(req->q, cpu, part);
+>>>>>>> +               else {
+>>>>>>> +                       part_round_stats(cpu, part);
+>>>>>>> +                       part_dec_in_flight(cpu, part, rw);
+>>>>>>> +               }
+>>>>>>>
+>>>>>>>                 hd_struct_put(part);
+>>>>>>>                 part_stat_unlock();
+>>>>>>> @@ -2492,8 +2497,12 @@ void blk_account_io_start(struct request *rq, bool new_io)
+>>>>>>>                         part = &rq->rq_disk->part0;
+>>>>>>>                         hd_struct_get(part);
+>>>>>>>                 }
+>>>>>>> -               part_round_stats(cpu, part);
+>>>>>>> -               part_inc_in_flight(part, rw);
+>>>>>>> +               if (rq->q->mq_ops)
+>>>>>>> +                       part_round_stats_mq(rq->q, cpu, part);
+>>>>>>> +               else {
+>>>>>>> +                       part_round_stats(cpu, part);
+>>>>>>> +                       part_inc_in_flight(cpu, part, rw);
+>>>>>>> +               }
+>>>>>>>                 rq->part = part;
+>>>>>>>         }
+>>>>>>>
+>>>>>>> diff --git a/block/blk-merge.c b/block/blk-merge.c
+>>>>>>> index 99038830fb42..3b5eb2d4b964 100644
+>>>>>>> --- a/block/blk-merge.c
+>>>>>>> +++ b/block/blk-merge.c
+>>>>>>> @@ -634,7 +634,7 @@ static void blk_account_io_merge(struct request *req)
+>>>>>>>                 part = req->part;
+>>>>>>>
+>>>>>>>                 part_round_stats(cpu, part);
+>>>>>>> -               part_dec_in_flight(part, rq_data_dir(req));
+>>>>>>> +               part_dec_in_flight(cpu, part, rq_data_dir(req));
+>>>>>>>
+>>>>>>>                 hd_struct_put(part);
+>>>>>>>                 part_stat_unlock();
+>>>>>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>>>>>>> index d0be72ccb091..a7b897740c47 100644
+>>>>>>> --- a/block/blk-mq-tag.c
+>>>>>>> +++ b/block/blk-mq-tag.c
+>>>>>>> @@ -214,7 +214,7 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+>>>>>>>                 bitnr += tags->nr_reserved_tags;
+>>>>>>>         rq = tags->rqs[bitnr];
+>>>>>>>
+>>>>>>> -       if (rq->q == hctx->queue)
+>>>>>>> +       if (rq && rq->q == hctx->queue)
+>>>>>>>                 iter_data->fn(hctx, rq, iter_data->data, reserved);
+>>>>>>>         return true;
+>>>>>>>  }
+>>>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>>>>>> index 05dfa3f270ae..cad4d2c26285 100644
+>>>>>>> --- a/block/blk-mq.c
+>>>>>>> +++ b/block/blk-mq.c
+>>>>>>> @@ -43,6 +43,58 @@ static LIST_HEAD(all_q_list);
+>>>>>>>  static void blk_mq_poll_stats_start(struct request_queue *q);
+>>>>>>>  static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+>>>>>>>
+>>>>>>> +struct mq_inflight {
+>>>>>>> +       struct hd_struct *part;
+>>>>>>> +       unsigned int inflight;
+>>>>>>> +};
+>>>>>>> +
+>>>>>>> +static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
+>>>>>>> +                                 struct request *rq, void *priv,
+>>>>>>> +                                 bool reserved)
+>>>>>>> +{
+>>>>>>> +       struct mq_inflight *mi = priv;
+>>>>>>> +
+>>>>>>> +       if (rq->part == mi->part &&
+>>>>>>> +           test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
+>>>>>>> +               mi->inflight++;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +unsigned long part_in_flight_mq(struct request_queue *q,
+>>>>>>> +                               struct hd_struct *part)
+>>>>>>> +{
+>>>>>>> +       struct mq_inflight mi = { .part = part, .inflight = 0 };
+>>>>>>> +
+>>>>>>> +       blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
+>>>>>>> +       return mi.inflight;
+>>>>>>> +}
 >>>>>>
->>>>>> I'll try running with both approaches today and see how they compare.
+>>>>>> Compared with the totally percpu approach, this way might help 1:M or
+>>>>>> N:M mapping, but won't help 1:1 map(NVMe), when hctx is mapped to
+>>>>>> each CPU(especially there are huge hw queues on a big system), :-(
 >>>>>
->>>>> Focus on Ming's, a variant of that is the most likely path forward,
->>>>> imho. It'd be great to do a quick run on mine as well, just to establish
->>>>> how it compares to mainline, though.
+>>>>> Not disagreeing with that, without having some mechanism to only
+>>>>> loop queues that have pending requests. That would be similar to the
+>>>>> ctx_map for sw to hw queues. But I don't think that would be worthwhile
+>>>>> doing, I like your pnode approach better. However, I'm still not fully
+>>>>> convinced that one per node is enough to get the scalability we need.
+>>>>>
+>>>>> Would be great if Brian could re-test with your updated patch, so we
+>>>>> know how it works for him at least.
 >>>>
->>>> On my initial runs, the one from you Jens, appears to perform a bit better, although
->>>> both are a huge improvement from what I was seeing before.
->>>>
->>>> I ran 4k random reads using fio to nullblk in two configurations on my 20 core
->>>> system with 4 NUMA nodes and 4-way SMT, so 80 logical CPUs. I ran both 80 threads
->>>> to a single null_blk as well as 80 threads to 80 null_block devices, so one thread
+>>>> I'll try running with both approaches today and see how they compare.
 >>>
->>> Could you share what the '80 null_block devices' is?  It means you
->>> create 80 null_blk
->>> devices? Or you create one null_blk and make its hw queue number as 80
->>> via module
->>> parameter of ''submit_queues"?
+>>> Focus on Ming's, a variant of that is the most likely path forward,
+>>> imho. It'd be great to do a quick run on mine as well, just to establish
+>>> how it compares to mainline, though.
 >>
->> That's a valid question, was going to ask that too. But I assumed that Brian
->> used submit_queues to set as many queues as he has logical CPUs in the system.
->>>
->>> I guess we should focus on multi-queue case since it is the normal way of NVMe.
->>>
->>>> per null_blk. This is what I saw on this machine:
->>>>
->>>> Using the Per node atomic change from Ming Lei
->>>> 1 null_blk, 80 threads
->>>> iops=9376.5K
->>>>
->>>> 80 null_blk, 1 thread
->>>> iops=9523.5K
->>>>
->>>>
->>>> Using the alternate patch from Jens using the tags
->>>> 1 null_blk, 80 threads
->>>> iops=9725.8K
->>>>
->>>> 80 null_blk, 1 thread
->>>> iops=9569.4K
->>>
->>> If 1 thread means single fio job, looks the number is too too high, that means
->>> one random IO can complete in about 0.1us(100ns) on single CPU, not sure if it
->>> is possible, :-)
+>> Here's a cleaned up series:
 >>
->> It means either 1 null_blk device, 80 threads running IO to it. Or 80 null_blk
->> devices, each with a thread running IO to it. See above, he details that it's
->> 80 threads on 80 devices for that case.
->
-> Right. So the two modes I'm running in are:
->
-> 1. 80 null_blk devices, each with one submit_queue, with one fio job per null_blk device,
->    so 80 threads total. 80 logical CPUs
-> 2. 1 null_blk device, with 80 submit_queues, 80 fio jobs, 80 logical CPUs.
->
-> In theory, the two should result in similar numbers.
->
-> Here are the commands and fio configurations:
->
-> Scenario #1
-> modprobe null_blk submit_queues=80 nr_devices=1 irqmode=0
->
-> FIO config:
-> [global]
-> buffered=0
-> invalidate=1
-> bs=4k
-> iodepth=64
-> numjobs=80
-> group_reporting=1
-> rw=randrw
-> rwmixread=100
-> rwmixwrite=0
-> ioengine=libaio
-> runtime=60
-> time_based
->
-> [job1]
-> filename=/dev/nullb0
->
->
-> Scenario #2
-> modprobe null_blk submit_queues=1 nr_devices=80 irqmode=0
->
-> FIO config
-> [global]
-> buffered=0
-> invalidate=1
-> bs=4k
-> iodepth=64
-> numjobs=1
-> group_reporting=1
-> rw=randrw
-> rwmixread=100
-> rwmixwrite=0
-> ioengine=libaio
-> runtime=60
-> time_based
->
-> [job1]
-> filename=/dev/nullb0
-> [job2]
-> filename=/dev/nullb1
-> [job3]
-> filename=/dev/nullb2
-> [job4]
-> filename=/dev/nullb3
-> [job5]
-> filename=/dev/nullb4
-> [job6]
-> filename=/dev/nullb5
-> [job7]
-> filename=/dev/nullb6
-> [job8]
-> filename=/dev/nullb7
-> [job9]
-> filename=/dev/nullb8
-> [job10]
-> filename=/dev/nullb9
-> [job11]
-> filename=/dev/nullb10
-> [job12]
-> filename=/dev/nullb11
-> [job13]
-> filename=/dev/nullb12
-> [job14]
-> filename=/dev/nullb13
-> [job15]
-> filename=/dev/nullb14
-> [job16]
-> filename=/dev/nullb15
-> [job17]
-> filename=/dev/nullb16
-> [job18]
-> filename=/dev/nullb17
-> [job19]
-> filename=/dev/nullb18
-> [job20]
-> filename=/dev/nullb19
-> [job21]
-> filename=/dev/nullb20
-> [job22]
-> filename=/dev/nullb21
-> [job23]
-> filename=/dev/nullb22
-> [job24]
-> filename=/dev/nullb23
-> [job25]
-> filename=/dev/nullb24
-> [job26]
-> filename=/dev/nullb25
-> [job27]
-> filename=/dev/nullb26
-> [job28]
-> filename=/dev/nullb27
-> [job29]
-> filename=/dev/nullb28
-> [job30]
-> filename=/dev/nullb29
-> [job31]
-> filename=/dev/nullb30
-> [job32]
-> filename=/dev/nullb31
-> [job33]
-> filename=/dev/nullb32
-> [job34]
-> filename=/dev/nullb33
-> [job35]
-> filename=/dev/nullb34
-> [job36]
-> filename=/dev/nullb35
-> [job37]
-> filename=/dev/nullb36
-> [job38]
-> filename=/dev/nullb37
-> [job39]
-> filename=/dev/nullb38
-> [job40]
-> filename=/dev/nullb39
-> [job41]
-> filename=/dev/nullb40
-> [job42]
-> filename=/dev/nullb41
-> [job43]
-> filename=/dev/nullb42
-> [job44]
-> filename=/dev/nullb43
-> [job45]
-> filename=/dev/nullb44
-> [job46]
-> filename=/dev/nullb45
-> [job47]
-> filename=/dev/nullb46
-> [job48]
-> filename=/dev/nullb47
-> [job49]
-> filename=/dev/nullb48
-> [job50]
-> filename=/dev/nullb49
-> [job51]
-> filename=/dev/nullb50
-> [job52]
-> filename=/dev/nullb51
-> [job53]
-> filename=/dev/nullb52
-> [job54]
-> filename=/dev/nullb53
-> [job55]
-> filename=/dev/nullb54
-> [job56]
-> filename=/dev/nullb55
-> [job57]
-> filename=/dev/nullb56
-> [job58]
-> filename=/dev/nullb57
-> [job59]
-> filename=/dev/nullb58
-> [job60]
-> filename=/dev/nullb59
-> [job61]
-> filename=/dev/nullb60
-> [job62]
-> filename=/dev/nullb61
-> [job63]
-> filename=/dev/nullb62
-> [job64]
-> filename=/dev/nullb63
-> [job65]
-> filename=/dev/nullb64
-> [job66]
-> filename=/dev/nullb65
-> [job67]
-> filename=/dev/nullb66
-> [job68]
-> filename=/dev/nullb67
-> [job69]
-> filename=/dev/nullb68
-> [job70]
-> filename=/dev/nullb69
-> [job71]
-> filename=/dev/nullb70
-> [job72]
-> filename=/dev/nullb71
-> [job73]
-> filename=/dev/nullb72
-> [job74]
-> filename=/dev/nullb73
-> [job75]
-> filename=/dev/nullb74
-> [job76]
-> filename=/dev/nullb75
-> [job77]
-> filename=/dev/nullb76
-> [job78]
-> filename=/dev/nullb77
-> [job79]
-> filename=/dev/nullb78
-> [job80]
-> filename=/dev/nullb79
+>> http://git.kernel.dk/cgit/linux-block/log/?h=mq-inflight
+>>
+>> (it's against mainline for now, I will update it to be against
+>> for-4.13/block in a rebase).
+>>
+>> One optimization on top of this I want to do is to only iterate once,
+>> even for a partition - pass in both parts, and increment two different
+>> counts. If we collapse the two part time stamps, then that's doable, and
+>> it means we only have to iterate once.
+>>
+>> Essentially this series makes the inc/dec a noop, since we don't have to
+>> do anything. The reading is basically no worse than a cpu online
+>> iteration, since we never have more queues than online CPUs. That's an
+>> improvement over per-cpu for-each-possible loops. For a lot of cases,
+>> it's much less, since we have fewer queues than CPUs. I'll need an hour
+>> or two to hone this a bit more, but then it would be great if you can
+>> retest. I'll send out an email when that's done, it'll be some time over
+>> this weekend.
+> 
+> Did the double-read with one iteration change, it was pretty trivial:
+> 
+> http://git.kernel.dk/cgit/linux-block/commit/?h=mq-inflight&id=b841804f826df072f706ae86d0eb533342f0297a
 
-IMO it should be more reasonable to use single null_blk with 80 queues
-via setting submit_queues as 80 than simply 80 null_blks.  So suggest to switch
-to test 80 queues in your future test.
+Now:
 
+http://git.kernel.dk/cgit/linux-block/commit/?h=mq-inflight&id=87f73ef2b9edb6834001df8f7cb48c7a116e8cd3
 
-thanks,
-Ming Lei
+> And updated the branch here:
+> 
+> http://git.kernel.dk/cgit/linux-block/log/?h=mq-inflight
+> 
+> to include that, and be based on top of for-4.13/block. If you prefer just
+> pulling a branch, pull:
+> 
+> git://git.kernel.dk/linux-block mq-inflight
+
+I've tested it, and made a few adjustments and fixes. The branches are
+the same, just rebased. Works fine for me, even with partitions now.
+
+Let me know how it works for you.
+
+-- 
+Jens Axboe
