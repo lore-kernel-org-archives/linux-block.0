@@ -1,38 +1,34 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 3/8] nvme-loop: quiesce admin_q instead of stopping hw queues
-Date: Tue,  4 Jul 2017 10:55:07 +0300
-Message-Id: <1499154912-10420-4-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
-References: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 9/9] bio-integrity: stop abusing bi_end_io
+To: Christoph Hellwig <hch@lst.de>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Shaohua Li <shli@kernel.org>, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20170629183116.28685-1-hch@lst.de>
+ <20170629183116.28685-10-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <bfccf118-59cb-986a-ab7d-b1a010d4c0fe@kernel.dk>
+Date: Mon, 3 Jul 2017 17:00:29 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170629183116.28685-10-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Before we iterate over the tags, we need to make sure that
-no inflight requests are being queued, so use quiesce
-helper for that.
+On 06/29/2017 12:31 PM, Christoph Hellwig wrote:
+> And instead call directly into the integrity code from bio_end_io.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/target/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch doesn't apply to master. But more importantly, it also
+doesn't compile without INTEGRITY:
 
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 3d51341e62ee..891002ee005f 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -434,7 +434,7 @@ static void nvme_loop_shutdown_ctrl(struct nvme_loop_ctrl *ctrl)
- 	if (ctrl->ctrl.state == NVME_CTRL_LIVE)
- 		nvme_shutdown_ctrl(&ctrl->ctrl);
+> +static inline bool bio_integrity_endio(struct bio *)
+> +{
+> +	return true;
+> +}
+
+Oops...
+
+I hand applied and fixed it up.
  
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
- 				nvme_cancel_request, &ctrl->ctrl);
- 	nvme_loop_destroy_admin_queue(ctrl);
 -- 
-2.7.4
+Jens Axboe
