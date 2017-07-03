@@ -1,106 +1,66 @@
-Return-Path: <BATV+fb72f72259c0915ed969+5064+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Wed, 5 Jul 2017 11:47:19 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: bcache@lists.ewheeler.net
-Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-	hch@infradead.org, axboe@kernel.dk,
-	Eric Wheeler <git@linux.ewheeler.net>,
-	Eric Wheeler <bcache@linux.ewheeler.net>, nix@esperi.org.uk
-Subject: Re: [PATCH 07/19] bcache: introduce bcache sysfs entries for
- ioprio-based bypass/writeback hints
-Message-ID: <20170705184719.GA3234@infradead.org>
-References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
- <1498855388-16990-7-git-send-email-bcache@lists.ewheeler.net>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] Core block/IO changes for 4.13-rc
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <c2565c20-527f-72fb-dc5c-bb81f56220f9@kernel.dk>
+ <CA+55aFw4OeKay4Vp7wDkAM+bWepRY88dMRO=KJs8+UNzt9S25Q@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <542c91dc-aaa6-7cc9-068f-bb3ba0495f7c@kernel.dk>
+Date: Mon, 3 Jul 2017 13:04:18 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1498855388-16990-7-git-send-email-bcache@lists.ewheeler.net>
+In-Reply-To: <CA+55aFw4OeKay4Vp7wDkAM+bWepRY88dMRO=KJs8+UNzt9S25Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jun 30, 2017 at 01:42:56PM -0700, bcache@lists.ewheeler.net wrote:
-> From: Eric Wheeler <git@linux.ewheeler.net>
+On 07/03/2017 11:49 AM, Linus Torvalds wrote:
+> On Sun, Jul 2, 2017 at 4:44 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> This is the main pull request for the block layer for 4.13. Not a huge
+>> round in terms of features, but there's a lot of churn related to some
+>> core cleanups. Note that merge request will throw 3 merge failures for
+>> you. I've included how I resolved them in the for-next (or
+>> for-4.13/merge) branch after the pull stats, at the end of this email.
 > 
-> Add sysfs entries to support to hint for bypass/writeback by the ioprio
-> assigned to the bio.  If the bio is unassigned, use current's io-context
-> ioprio for cache writeback or bypass (configured per-process with
-> `ionice`).
+> So Jens, I got a semi-complaint about this constant churn in an
+> entirely unrelated scheduler tracing thread.
 > 
-> Having idle IOs bypass the cache can increase performance elsewhere
-> since you probably don't care about their performance.  In addition,
-> this prevents idle IOs from promoting into (polluting) your cache and
-> evicting blocks that are more important elsewhere.
+> Basically, the block IO layer is apparently really painful to do
+> various instrumentation on, because it keeps having these random
+> idiotic interface churn with the status and flags and various random
+> command bytes changing semantics.
 > 
-> If you really nead the performance at the expense of SSD wearout,
-> then configure ioprio_writeback and set your `ionice` appropriately.
+> Can we stop with the masturbatory "let's just randomly change things
+> around" already?
 > 
-> For example:
-> 	echo 2,7 > /sys/block/bcache0/bcache/ioprio_bypass
-> 	echo 2,0 > /sys/block/bcache0/bcache/ioprio_writeback
+> It doesn't just result in annoying merge conflicts, it's just
+> *confusing* to people when the interfaces keep changing. And confusion
+> is bad.
+
+Not completely disagreeing with that, and we should be mostly done.
+This last annoying churn is unifying the error codes, which I do think
+is (very much) a worth while thing to do. It's also a backport pain,
+so it's not like I love doing them...
+ 
+> And the fact that these things keep changing is also, I think, a sign
+> of something being fundamentally wrong.
 > 
-> See the documentation commit for details.
+> WTF is going on that the block layer *constantly* ends up having these
+> stupid "let's move random command flag bits from one field to another"
+> or randomly changing the error returns?
 
-I'm really worried about this interface, as it basically uses the
-ioprio field for side channel communication - your app must know
-which value it wants, and you need to configure bcache to fit
-exacltly that scheme.
+I'll keep it in mind. This round has been painful on the merge
+conflicts, which is to be expected with the status code returns. It's
+not pointless churn, and the end result is better for it. If not, I
+would be objecting more heavily to doing them. But as I said above, I
+don't expect a lot of this going forward.
 
-> +	/* If the ioprio already exists on the bio, use that.  We assume that
-> +	 * the upper layer properly assigned the calling process's ioprio to
-> +	 * the bio being passed to bcache. Otherwise, use current's ioc. */
+> Anyway, all merged up in my tree, but your "for-4.13/merge" branch did
+> *not* match what I got from you. Your main for-4.13 branch had some
+> additional random lightnvm/pblk changes too.
 
-Please make this fit the normal kernel comment style.
+Thanks! Yes, sorry should have mentioned that, I didn't bring it
+completely up to date since there were no more conflicts. The
+interesting part was just the merge commit, not the rest...
 
-> +	ioprio = bio_prio(bio);
-> +	if (!ioprio_valid(ioprio)) {
-> +		ioc = get_task_io_context(current, GFP_NOIO, NUMA_NO_NODE);
-> +		if (ioc) {
-> +			if (ioprio_valid(ioc->ioprio))
-> +				ioprio = ioc->ioprio;
-> +			put_io_context(ioc);
-> +			ioc = NULL;
-> +		}
-> +	}
-
-While get_task_io_context currently is exported it really should not
-be - we should only allocate on when setting the io priority or when
-forking.
-
-What this code really wants is the ioprio related lines of code from
-blk_init_request_from_bio, which should be factored into a new helper.
-
-> +	if (ioprio_valid(ioprio) && ioprio_valid(dc->ioprio_writeback)
-> +		&& ioprio >= dc->ioprio_bypass) {
-> +		return true;
-> +	}
-
-Incorrect indentation, this shold be:
-
-	if (ioprio_valid(ioprio) && ioprio_valid(dc->ioprio_writeback) &&
-	    ioprio >= dc->ioprio_bypass)
-		return true;
-
-And there is some more of this in this and the following patches.
-Please run them through something like checkpatch.pl
-
-> +
->  SHOW(__bch_cached_dev)
->  {
->  	struct cached_dev *dc = container_of(kobj, struct cached_dev,
-> @@ -183,6 +186,17 @@ SHOW(__bch_cached_dev)
->  		return strlen(buf);
->  	}
->  
-> +	if (attr == &sysfs_ioprio_bypass)
-> +		return snprintf(buf, PAGE_SIZE-1, "%d,%ld\n",
-> +			IOPRIO_PRIO_CLASS(dc->ioprio_bypass),
-> +			IOPRIO_PRIO_DATA(dc->ioprio_bypass));
-> +
-> +	if (attr == &sysfs_ioprio_writeback)
-> +		return snprintf(buf, PAGE_SIZE-1, "%d,%ld\n",
-> +			IOPRIO_PRIO_CLASS(dc->ioprio_writeback),
-> +			IOPRIO_PRIO_DATA(dc->ioprio_writeback));
-> +
-> +
-
-Please implement separate sysfs show and store function for your new
-attributes instead of overloading all of them into a giant mess.
+-- 
+Jens Axboe
