@@ -1,70 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:46718 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932217AbdGJOJh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2017 10:09:37 -0400
-Date: Mon, 10 Jul 2017 17:09:22 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: hch@lst.de
-Cc: Boaz Harrosh <ooo@electrozaur.com>, linux-block@vger.kernel.org
-Subject: [bug report] block: introduce new block status code type
-Message-ID: <20170710140922.pjqyxfiaiczihyic@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=350c9a9f7=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] block: Fix __blkdev_issue_zeroout loop
+Date: Mon,  3 Jul 2017 15:56:34 +0900
+Message-Id: <20170703065634.8311-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello Christoph Hellwig,
+The BIO isuuing loop in __blkdev_issue_zeroout() was allocating BIOs
+with a maximum number of pages equal to
 
-The patch 2a842acab109: "block: introduce new block status code type"
-from Jun 3, 2017, leads to the following static checker warning:
+min(nr_sects, (sector_t)BIO_MAX_PAGES)
 
-	fs/exofs/inode.c:1333 exofs_new_inode()
-	error: passing non negative 255 to ERR_PTR
+This works since the BIO will always be limited to the absolute maximum
+number of pages, but can be ineficient as too many pages may be
+requested since variables with different units (number of sectors vs
+number of pages) are used in the min() operation. Fix this by correctly
+using the same unit (number of pages).
 
-drivers/scsi/osd/osd_initiator.c
-  1909  analyze:
-  1910          if (!osi->key) {
-  1911                  /* scsi sense is Empty, the request was never issued to target
-  1912                   * linux return code might tell us what happened.
-  1913                   */
-  1914                  if (or->async_error == BLK_STS_RESOURCE)
-  1915                          osi->osd_err_pri = OSD_ERR_PRI_RESOURCE;
-  1916                  else
-  1917                          osi->osd_err_pri = OSD_ERR_PRI_UNREACHABLE;
-  1918                  ret = or->async_error;
-                        ^^^^^^^^^^^^^^^^^^^^^
-The problem is that we're mixing the new block codes and normal kernel
-error codes.  It's disapointing that Sparse doesn't seem to complain
-about this assignment.  Anyway, we propagate the error code back and
-eventually pass it through ERR_PTR() and IS_ERR() and then dereference
-it.
+Also remove a trailing space after the bit shift in the internal loop
+min() call.
 
-  1919          } else if (osi->key <= scsi_sk_recovered_error) {
-  1920                  osi->osd_err_pri = 0;
-  1921                  ret = 0;
-  1922          } else if (osi->additional_code == scsi_invalid_field_in_cdb) {
-  1923                  if (osi->cdb_field_offset == OSD_CFO_STARTING_BYTE) {
-  1924                          osi->osd_err_pri = OSD_ERR_PRI_CLEAR_PAGES;
-  1925                          ret = -EFAULT; /* caller should recover from this */
-  1926                  } else if (osi->cdb_field_offset == OSD_CFO_OBJECT_ID) {
-  1927                          osi->osd_err_pri = OSD_ERR_PRI_NOT_FOUND;
-  1928                          ret = -ENOENT;
-  1929                  } else if (osi->cdb_field_offset == OSD_CFO_PERMISSIONS) {
-  1930                          osi->osd_err_pri = OSD_ERR_PRI_NO_ACCESS;
-  1931                          ret = -EACCES;
-  1932                  } else {
-  1933                          osi->osd_err_pri = OSD_ERR_PRI_BAD_CRED;
-  1934                          ret = -EINVAL;
-  1935                  }
-  1936          } else if (osi->additional_code == osd_quota_error) {
-  1937                  osi->osd_err_pri = OSD_ERR_PRI_NO_SPACE;
-  1938                  ret = -ENOSPC;
-  1939          } else if (_is_osd_security_code(osi->additional_code)) {
-  1940                  osi->osd_err_pri = OSD_ERR_PRI_BAD_CRED;
-  1941                  ret = -EINVAL;
-  1942          } else {
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/blk-lib.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-regards,
-dan carpenter
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index e8caecd..7856447 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -307,14 +307,15 @@ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 
+ 	ret = 0;
+ 	while (nr_sects != 0) {
+-		bio = next_bio(bio, min(nr_sects, (sector_t)BIO_MAX_PAGES),
++		bio = next_bio(bio, min((nr_sects << 9) >> PAGE_SHIFT,
++					(sector_t)BIO_MAX_PAGES),
+ 				gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio->bi_bdev   = bdev;
+ 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+ 
+ 		while (nr_sects != 0) {
+-			sz = min((sector_t) PAGE_SIZE >> 9 , nr_sects);
++			sz = min((sector_t) PAGE_SIZE >> 9, nr_sects);
+ 			bi_size = bio_add_page(bio, ZERO_PAGE(0), sz << 9, 0);
+ 			nr_sects -= bi_size >> 9;
+ 			sector += bi_size >> 9;
+-- 
+2.9.4
