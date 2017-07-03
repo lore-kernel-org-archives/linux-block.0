@@ -1,143 +1,158 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48750 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751178AbdGNXSS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2017 19:18:18 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/6] blk-mq: introduce auto restart
-Date: Sat, 15 Jul 2017 07:15:59 +0800
-Message-Id: <20170714231601.14444-5-ming.lei@redhat.com>
-In-Reply-To: <20170714231601.14444-1-ming.lei@redhat.com>
-References: <20170714231601.14444-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX] block, bfq: don't change ioprio class for a bfq_queue on a service tree
+Date: Mon,  3 Jul 2017 10:00:10 +0200
+Message-Id: <20170703080010.1709-2-paolo.valente@linaro.org>
+In-Reply-To: <20170703080010.1709-1-paolo.valente@linaro.org>
+References: <20170703080010.1709-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Both xen-blkfront and virito-blk stops queue when
-the queue becomes busy, and restarts the queue after
-one request is completed.
+On each deactivation or re-scheduling (after being served) of a
+bfq_queue, BFQ invokes the function __bfq_entity_update_weight_prio(),
+to perform pending updates of ioprio, weight and ioprio class for the
+bfq_queue. BFQ also invokes this function on I/O-request dispatches,
+to raise or lower weights more quickly when needed, thereby improving
+latency. However, the entity representing the bfq_queue may be on the
+active (sub)tree of a service tree when this happens, and, although
+with a very low probability, the bfq_queue may happen to also have a
+pending change of its ioprio class. If both conditions hold when
+__bfq_entity_update_weight_prio() is invoked, then the entity moves to
+a sort of hybrid state: the new service tree for the entity, as
+returned by bfq_entity_service_tree(), differs from service tree on
+which the entity still is. The functions that handle activations and
+deactivations of entities do not cope with such a hybrid state (and
+would need to become more complex to cope).
 
-This patch implements this function in blk-mq core
-by introducing BLK_MQ_F_AUTO_RESTART, then we can
-remove stop/start queue related APIs and make 'stopped'
-state invisible to drivers. It has caused lots of trouble
-to expose this state to driver and let driver control
-the state.
+This commit addresses this issue by just making
+__bfq_entity_update_weight_prio() not perform also a possible pending
+change of ioprio class, when invoked on an I/O-request dispatch for a
+bfq_queue. Such a change is thus postponed to when
+__bfq_entity_update_weight_prio() is invoked on deactivation or
+re-scheduling of the bfq_queue.
 
-Given we can't get exact queue depth for one request queue
-in case of TAG_SHARED, we only support this function on
-non-TAG_SHARED devices/drivers.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reported-by: Marco Piazza <mpiazza@gmail.com>
+Reported-by: Laurentiu Nicola <lnicola@dend.ro>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Tested-by: Marco Piazza <mpiazza@gmail.com>
 ---
- block/blk-mq.c         | 41 +++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq.h |  1 +
- 2 files changed, 42 insertions(+)
+ block/bfq-iosched.c | 14 ++++++++++----
+ block/bfq-iosched.h |  3 ++-
+ block/bfq-wf2q.c    | 39 ++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 46 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 041f7b7fa0d6..f3b582eb492f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -416,6 +416,39 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
- 
-+static void blk_mq_handle_auto_stop(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct sbitmap_queue *sbq;
-+
-+	if (!(hctx->flags & BLK_MQ_F_AUTO_RESTART))
-+		return;
-+
-+	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+	sbq = &hctx->tags->bitmap_tags;
-+
-+	/* order setting 'stopped' and reading queue depth */
-+	smp_mb();
-+
-+	/*
-+	 * all requests may be completed just before setting
-+	 * 'stopped', so we have to check queue depth to see
-+	 * if there is pending requests
-+	 */
-+	if (unlikely(!sbitmap_weight(&sbq->sb)))
-+		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+}
-+
-+static void blk_mq_handle_auto_restart(struct blk_mq_hw_ctx *hctx)
-+{
-+	if (!(hctx->flags & BLK_MQ_F_AUTO_RESTART))
-+		return;
-+	/*
-+	 * blk_mq_put_tag() implies one barrier, which is the pair of
-+	 * smp_mb() in blk_mq_handle_auto_stop()
-+	 */
-+	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+}
-+
- void blk_mq_free_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-@@ -446,6 +479,7 @@ void blk_mq_free_request(struct request *rq)
- 	if (sched_tag != -1)
- 		blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
- 	blk_mq_sched_restart(hctx);
-+	blk_mq_handle_auto_restart(hctx);
- 	blk_queue_exit(q);
- }
- EXPORT_SYMBOL_GPL(blk_mq_free_request);
-@@ -1066,6 +1100,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 		list_splice_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
- 
-+		blk_mq_handle_auto_stop(hctx);
-+
- 		/*
- 		 * If SCHED_RESTART was set by the caller of this function and
- 		 * it is no longer set that means that it was cleared by another
-@@ -1502,6 +1538,7 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		return;
- 	case BLK_STS_RESOURCE:
- 		__blk_mq_requeue_request(rq);
-+		blk_mq_handle_auto_stop(hctx);
- 		goto insert;
- 	default:
- 		*cookie = BLK_QC_T_NONE;
-@@ -2112,16 +2149,20 @@ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
-+	struct blk_mq_tag_set *set = q->tag_set;
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (shared) {
- 			if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
- 				atomic_inc(&q->shared_hctx_restart);
- 			hctx->flags |= BLK_MQ_F_TAG_SHARED;
-+			hctx->flags &= ~BLK_MQ_F_AUTO_RESTART;
- 		} else {
- 			if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
- 				atomic_dec(&q->shared_hctx_restart);
- 			hctx->flags &= ~BLK_MQ_F_TAG_SHARED;
-+			if (set->flags & BLK_MQ_F_AUTO_RESTART)
-+				hctx->flags |= BLK_MQ_F_AUTO_RESTART;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index ed93da2..9d4919b 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3471,11 +3471,17 @@ static void bfq_update_wr_data(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 			}
  		}
  	}
+-	/* Update weight both if it must be raised and if it must be lowered */
++	/*
++	 * To improve latency (for this or other queues), immediately
++	 * update weight both if it must be raised and if it must be
++	 * lowered. Since, entity may be on some active tree here, and
++	 * might have a pending change of its ioprio class, invoke
++	 * next function with the last parameter unset (see the
++	 * comments on the function).
++	 */
+ 	if ((entity->weight > entity->orig_weight) != (bfqq->wr_coeff > 1))
+-		__bfq_entity_update_weight_prio(
+-			bfq_entity_service_tree(entity),
+-			entity);
++		__bfq_entity_update_weight_prio(bfq_entity_service_tree(entity),
++						entity, false);
  }
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 14542308d25b..251af99e9ba8 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -162,6 +162,7 @@ enum {
- 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
- 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
- 	BLK_MQ_F_SG_MERGE	= 1 << 2,
-+	BLK_MQ_F_AUTO_RESTART	= 1 << 3,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+ 
+ /*
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 5c3bf98..8fd83b8 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -892,7 +892,8 @@ void bfq_put_idle_entity(struct bfq_service_tree *st,
+ 			 struct bfq_entity *entity);
+ struct bfq_service_tree *
+ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+-				struct bfq_entity *entity);
++				struct bfq_entity *entity,
++				bool update_class_too);
+ void bfq_bfqq_served(struct bfq_queue *bfqq, int served);
+ void bfq_bfqq_charge_time(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			  unsigned long time_ms);
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 8726ede..5ec05cd 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -694,10 +694,28 @@ struct bfq_service_tree *bfq_entity_service_tree(struct bfq_entity *entity)
+ 	return sched_data->service_tree + idx;
+ }
+ 
+-
++/*
++ * Update weight and priority of entity. If update_class_too is true,
++ * then update the ioprio_class of entity too.
++ *
++ * The reason why the update of ioprio_class is controlled through the
++ * last parameter is as follows. Changing the ioprio class of an
++ * entity implies changing the destination service trees for that
++ * entity. If such a change occurred when the entity is already on one
++ * of the service trees for its previous class, then the state of the
++ * entity would become more complex: none of the new possible service
++ * trees for the entity, according to bfq_entity_service_tree(), would
++ * match any of the possible service trees on which the entity
++ * is. Complex operations involving these trees, such as entity
++ * activations and deactivations, should take into account this
++ * additional complexity.  To avoid this issue, this function is
++ * invoked with update_class_too unset in the points in the code where
++ * entity may happen to be on some tree.
++ */
+ struct bfq_service_tree *
+ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+-				struct bfq_entity *entity)
++				struct bfq_entity *entity,
++				bool update_class_too)
+ {
+ 	struct bfq_service_tree *new_st = old_st;
+ 
+@@ -739,9 +757,15 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+ 				  bfq_weight_to_ioprio(entity->orig_weight);
+ 		}
+ 
+-		if (bfqq)
++		if (bfqq && update_class_too)
+ 			bfqq->ioprio_class = bfqq->new_ioprio_class;
+-		entity->prio_changed = 0;
++
++		/*
++		 * Reset prio_changed only if the ioprio_class change
++		 * is not pending any longer.
++		 */
++		if (!bfqq || bfqq->ioprio_class == bfqq->new_ioprio_class)
++			entity->prio_changed = 0;
+ 
+ 		/*
+ 		 * NOTE: here we may be changing the weight too early,
+@@ -867,7 +891,12 @@ static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
+ {
+ 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+ 
+-	st = __bfq_entity_update_weight_prio(st, entity);
++	/*
++	 * When this function is invoked, entity is not in any service
++	 * tree, then it is safe to invoke next function with the last
++	 * parameter set (see the comments on the function).
++	 */
++	st = __bfq_entity_update_weight_prio(st, entity, true);
+ 	bfq_calc_finish(entity, entity->budget);
+ 
+ 	/*
 -- 
-2.9.4
+2.10.0
