@@ -1,43 +1,119 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
+Return-Path: <gregkh@linuxfoundation.org>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org,
+	Roman Pen <roman.penyaev@profitbricks.com>,
+	Gi-Oh Kim <gi-oh.kim@profitbricks.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 0/8] correct quiescing in several block drivers
-Date: Tue,  4 Jul 2017 10:55:04 +0300
-Message-Id: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
+	Jens Axboe <axboe@fb.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>
+Subject: [PATCH 4.4 030/101] block: fix module reference leak on put_disk() call for cgroups throttle
+Date: Mon,  3 Jul 2017 15:34:30 +0200
+Message-Id: <20170703133339.577841921@linuxfoundation.org>
+In-Reply-To: <20170703133334.237346187@linuxfoundation.org>
+References: <20170703133334.237346187@linuxfoundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Before we either iterate on tags or cleanup the request queue
-we must guarantee that the hw queues are stop and no inflight
-.queue_rq is active. Thats what blk_mq_quiesce_queue is for, so
-use it where appropriate.
+4.4-stable review patch.  If anyone has any objections, please let me know.
 
-Sagi Grimberg (8):
-  nvme-rdma: quiesce/unquiesce admin_q instead of start/stop its hw
-    queues
-  nvme-fc: quiesce/unquiesce admin_q instead of start/stop its hw queues
-  nvme-loop: quiesce/unquiesce admin_q instead of start/stop its hw
-    queues
-  nvme-pci: quiesce/unquiesce admin_q instead of start/stop its hw
-    queues
-  nbd: quiesce request queues to make sure no submissions are inflight
-  mtip32xx: quiesce request queues to make sure no submissions are
-    inflight
-  virtio_blk: quiesce/unquiesce live IO when entering PM states
-  xen-blockfront: quiesce IO before device removal
+------------------
 
- drivers/block/mtip32xx/mtip32xx.c |  8 ++++----
- drivers/block/nbd.c               |  4 ++--
- drivers/block/virtio_blk.c        |  4 ++--
- drivers/block/xen-blkfront.c      |  8 ++++----
- drivers/nvme/host/fc.c            |  8 +++++---
- drivers/nvme/host/pci.c           | 10 ++++++----
- drivers/nvme/host/rdma.c          |  7 ++++---
- drivers/nvme/target/loop.c        |  2 +-
- 8 files changed, 28 insertions(+), 23 deletions(-)
+From: Roman Pen <roman.penyaev@profitbricks.com>
 
--- 
-2.7.4
+commit 39a169b62b415390398291080dafe63aec751e0a upstream.
+
+get_disk(),get_gendisk() calls have non explicit side effect: they
+increase the reference on the disk owner module.
+
+The following is the correct sequence how to get a disk reference and
+to put it:
+
+    disk = get_gendisk(...);
+
+    /* use disk */
+
+    owner = disk->fops->owner;
+    put_disk(disk);
+    module_put(owner);
+
+fs/block_dev.c is aware of this required module_put() call, but f.e.
+blkg_conf_finish(), which is located in block/blk-cgroup.c, does not put
+a module reference.  To see a leakage in action cgroups throttle config
+can be used.  In the following script I'm removing throttle for /dev/ram0
+(actually this is NOP, because throttle was never set for this device):
+
+    # lsmod | grep brd
+    brd                     5175  0
+    # i=100; while [ $i -gt 0 ]; do echo "1:0 0" > \
+        /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device; i=$(($i - 1)); \
+    done
+    # lsmod | grep brd
+    brd                     5175  100
+
+Now brd module has 100 references.
+
+The issue is fixed by calling module_put() just right away put_disk().
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Gi-Oh Kim <gi-oh.kim@profitbricks.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Jens Axboe <axboe@fb.com>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ block/blk-cgroup.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -788,6 +788,7 @@ int blkg_conf_prep(struct blkcg *blkcg,
+ {
+ 	struct gendisk *disk;
+ 	struct blkcg_gq *blkg;
++	struct module *owner;
+ 	unsigned int major, minor;
+ 	int key_len, part, ret;
+ 	char *body;
+@@ -804,7 +805,9 @@ int blkg_conf_prep(struct blkcg *blkcg,
+ 	if (!disk)
+ 		return -ENODEV;
+ 	if (part) {
++		owner = disk->fops->owner;
+ 		put_disk(disk);
++		module_put(owner);
+ 		return -ENODEV;
+ 	}
+ 
+@@ -820,7 +823,9 @@ int blkg_conf_prep(struct blkcg *blkcg,
+ 		ret = PTR_ERR(blkg);
+ 		rcu_read_unlock();
+ 		spin_unlock_irq(disk->queue->queue_lock);
++		owner = disk->fops->owner;
+ 		put_disk(disk);
++		module_put(owner);
+ 		/*
+ 		 * If queue was bypassing, we should retry.  Do so after a
+ 		 * short msleep().  It isn't strictly necessary but queue
+@@ -851,9 +856,13 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
+ void blkg_conf_finish(struct blkg_conf_ctx *ctx)
+ 	__releases(ctx->disk->queue->queue_lock) __releases(rcu)
+ {
++	struct module *owner;
++
+ 	spin_unlock_irq(ctx->disk->queue->queue_lock);
+ 	rcu_read_unlock();
++	owner = ctx->disk->fops->owner;
+ 	put_disk(ctx->disk);
++	module_put(owner);
+ }
+ EXPORT_SYMBOL_GPL(blkg_conf_finish);
+ 
