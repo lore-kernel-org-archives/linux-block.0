@@ -1,34 +1,30 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 9/9] bio-integrity: stop abusing bi_end_io
-To: Christoph Hellwig <hch@lst.de>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Shaohua Li <shli@kernel.org>, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <20170629183116.28685-1-hch@lst.de>
- <20170629183116.28685-10-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <bfccf118-59cb-986a-ab7d-b1a010d4c0fe@kernel.dk>
-Date: Mon, 3 Jul 2017 17:00:29 -0600
+Subject: Re: [PATCH] blk-mq-sched: fix performance regression of mq-deadline
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+References: <20170703123714.23138-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <747c006e-f565-56b6-4710-967523dce7aa@fb.com>
+Date: Mon, 3 Jul 2017 16:53:58 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170629183116.28685-10-hch@lst.de>
+In-Reply-To: <20170703123714.23138-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/29/2017 12:31 PM, Christoph Hellwig wrote:
-> And instead call directly into the integrity code from bio_end_io.
+On 07/03/2017 06:37 AM, Ming Lei wrote:
+> When mq-deadline is taken, IOPS of sequential read and
+> seqential write is observed more than 20% drop on sata(scsi-mq)
+> devices, compared with using 'none' scheduler.
+> 
+> The reason is that the default nr_requests for scheduler is
+> too big for small queuedepth devices, and latency is increased
+> much.
+> 
+> Since the principle of taking 256 requests for mq scheduler
+> is based on 128 queue depth, this patch changes into
+> double size of min(hw queue_depth, 128).
 
-This patch doesn't apply to master. But more importantly, it also
-doesn't compile without INTEGRITY:
+That's somewhat odd, but it's a better default than some random
+value. I'll apply it, thanks Ming.
 
-> +static inline bool bio_integrity_endio(struct bio *)
-> +{
-> +	return true;
-> +}
-
-Oops...
-
-I hand applied and fixed it up.
- 
 -- 
 Jens Axboe
