@@ -1,57 +1,50 @@
-Return-Path: <sagi@grimberg.me>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: NVMe induced NULL deref in bt_iter()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Max Gurtovoy <maxg@mellanox.com>, Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <bcc46757-6027-ed7f-22b4-e6964d0dedf0@kernel.dk>
+ <9afc0fd3-e598-dea9-a505-d8fa0f608d16@mellanox.com>
+ <7138df5a-b1ce-7f46-281f-ae15172c61e5@grimberg.me>
+ <20170703093951.GA28651@ming.t460p>
+ <bc6e2ecf-031b-45c0-8fbb-98c12c790ee4@grimberg.me>
+ <20170703120348.GB28651@ming.t460p>
+ <92224329-0933-4e80-94d6-2ba3c88f3f3e@grimberg.me>
+ <20170704080818.GA29053@ming.t460p>
 From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 1/8] nvme-rdma: quiesce/unquiesce admin_q instead of start/stop its hw queues
-Date: Tue,  4 Jul 2017 10:55:05 +0300
-Message-Id: <1499154912-10420-2-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
-References: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
+Message-ID: <767a5187-29fe-246a-d06f-ed71553f9f91@grimberg.me>
+Date: Tue, 4 Jul 2017 12:14:12 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170704080818.GA29053@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-unlike blk_mq_stop_hw_queues and blk_mq_start_stopped_hw_queues
-quiescing/unquiescing respects the submission path rcu grace.
-Also make sure to kick the requeue list when appropriate.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index cfb22531fc16..cec2c89cc8da 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -778,7 +778,7 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
- 
- 	if (ctrl->ctrl.queue_count > 1)
- 		nvme_stop_queues(&ctrl->ctrl);
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 
- 	/* We must take care of fastfail/requeue all our inflight requests */
- 	if (ctrl->ctrl.queue_count > 1)
-@@ -791,7 +791,8 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
- 	 * queues are not a live anymore, so restart the queues to fail fast
- 	 * new IO
- 	 */
--	blk_mq_start_stopped_hw_queues(ctrl->ctrl.admin_q, true);
-+	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
-+	blk_mq_kick_requeue_list(ctrl->ctrl.admin_q);
- 	nvme_start_queues(&ctrl->ctrl);
- 
- 	nvme_rdma_reconnect_or_remove(ctrl);
-@@ -1636,7 +1637,7 @@ static void nvme_rdma_shutdown_ctrl(struct nvme_rdma_ctrl *ctrl)
- 	if (test_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[0].flags))
- 		nvme_shutdown_ctrl(&ctrl->ctrl);
- 
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
- 				nvme_cancel_request, &ctrl->ctrl);
- 	nvme_rdma_destroy_admin_queue(ctrl);
--- 
-2.7.4
+On 04/07/17 11:08, Ming Lei wrote:
+> On Tue, Jul 04, 2017 at 10:56:23AM +0300, Sagi Grimberg wrote:
+>>
+>>> There are at least one case in which we have to use stop queues:
+>>>
+>>> 	- when QUEUE_BUSY(now it becomes BLK_STS_RESOURCE) happens, some drivers
+>>> 	need to stop queues for avoiding to hurt CPU, such as virtio-blk, ...
+>>
+>> Why isn't virtio_blk using blk_mq_delay_run_hw_queue like scsi does?
+> 
+> IMO it shouldn't be easy to figure out one perfect delay time,
+
+It doesn't needs to be perfect, just something that is sufficient
+to not hog the cpu and won't have noticeable effects...
+
+> and it should have been self-adaptive.
+
+But IMO always start the queues on *every* completion is a waste... why
+iterating on all the hw queues on each completion?
+
+> Also I think it might be possible to move this kind of stop action into
+> blk-mq core code, and not let drivers touch stop state. Finally we
+> may kill all stopping in drivers.
+
+That's a good idea!
