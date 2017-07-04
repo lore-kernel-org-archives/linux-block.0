@@ -1,62 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx.ewheeler.net ([66.155.3.69]:49172 "EHLO mail.ewheeler.net"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750718AbdGMDlY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 23:41:24 -0400
-Date: Thu, 13 Jul 2017 03:41:22 +0000 (UTC)
-From: Eric Wheeler <bcache@lists.ewheeler.net>
-To: Tang Junhui <tang.junhui@zte.com.cn>
-cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
-Subject: Re: [PATCH 13/19] bcache: delete redundant calling
- set_gc_sectors()
-In-Reply-To: <1498855388-16990-13-git-send-email-bcache@lists.ewheeler.net>
-Message-ID: <alpine.LRH.2.11.1707130340340.9683@mail.ewheeler.net>
-References: <20170629134510.GA32385@infradead.org> <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net> <1498855388-16990-13-git-send-email-bcache@lists.ewheeler.net>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 4 Jul 2017 16:28:36 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>, Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH 5/8] nbd: quiesce request queues to make sure no
+ submissions are inflight
+Message-ID: <20170704082835.GG29053@ming.t460p>
+References: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
+ <1499154912-10420-6-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1499154912-10420-6-git-send-email-sagi@grimberg.me>
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 30 Jun 2017, bcache@lists.ewheeler.net wrote:
-
-> From: Tang Junhui <tang.junhui@zte.com.cn>
+On Tue, Jul 04, 2017 at 10:55:09AM +0300, Sagi Grimberg wrote:
+> We must make sure that no requests are being queued before we iterate
+> over the tags. quiesce/unquiesce the request queue istead of start/stop
+> hw queues.
 > 
-> set_gc_sectors() has been called in bch_gc_thread(), and it was called
-> again in bch_btree_gc_finish() . The following call is unnecessary, so
-> delete it.
-
-
-I'm trying to follow the call path that proves that this is safe, but I'm 
-not seeing it.  Can you explain this in more detail?
-
---
-Eric Wheeler
-
-
-
-> 
-> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> Cc: Josef Bacik <jbacik@fb.com>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 > ---
->  drivers/md/bcache/btree.c | 1 -
->  1 file changed, 1 deletion(-)
+>  drivers/block/nbd.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-> index 77aa20b..66d8036 100644
-> --- a/drivers/md/bcache/btree.c
-> +++ b/drivers/md/bcache/btree.c
-> @@ -1662,7 +1662,6 @@ static size_t bch_btree_gc_finish(struct cache_set *c)
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 977ec960dd2f..dea7d85134ee 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -661,9 +661,9 @@ static void nbd_clear_req(struct request *req, void *data, bool reserved)
 >  
->  	mutex_lock(&c->bucket_lock);
->  
-> -	set_gc_sectors(c);
->  	c->gc_mark_valid = 1;
->  	c->need_gc	= 0;
->  
-> -- 
-> 1.8.3.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+>  static void nbd_clear_que(struct nbd_device *nbd)
+>  {
+> -	blk_mq_stop_hw_queues(nbd->disk->queue);
+> +	blk_mq_quiesce_queue(nbd->disk->queue);
+>  	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_clear_req, NULL);
+> -	blk_mq_start_hw_queues(nbd->disk->queue);
+> +	blk_mq_unquiesce_queue(nbd->disk->queue);
+>  	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming
