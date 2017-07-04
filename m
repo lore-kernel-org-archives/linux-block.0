@@ -1,48 +1,61 @@
-Return-Path: <su@seds.nl>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-From: Ben Mezger <su@seds.nl>
-Subject: [PATCH] block/Kconfig.iosched: Indent help text with 2 spaces.
-Message-ID: <6b1fb415-92f1-805d-82d2-049a40155fc9@seds.nl>
-Date: Tue, 4 Jul 2017 13:38:18 -0300
+Return-Path: <mst@redhat.com>
+Date: Wed, 5 Jul 2017 00:39:34 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>,
+	Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH 7/8] virtio_blk: quiesce/unquiesce live IO when entering
+ PM states
+Message-ID: <20170705003734-mutt-send-email-mst@kernel.org>
+References: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
+ <1499154912-10420-8-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1499154912-10420-8-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch adds two spaces in the help section, following the Kconfig indentation guideline.
-
-Signed-off-by: Ben Mezger <me@benmezger.nl>
----
- block/Kconfig.iosched | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 5be248ce447c..90e6e7c65c92 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -87,12 +87,12 @@ config IOSCHED_BFQ
-        tristate "BFQ I/O scheduler"
-        default n
-        ---help---
--       BFQ I/O scheduler for BLK-MQ. BFQ distributes the bandwidth of
--       of the device among all processes according to their weights,
--       regardless of the device parameters and with any workload. It
--       also guarantees a low latency to interactive and soft
--       real-time applications.  Details in
--       Documentation/block/bfq-iosched.txt
-+         BFQ I/O scheduler for BLK-MQ. BFQ distributes the bandwidth of
-+         of the device among all processes according to their weights,
-+         regardless of the device parameters and with any workload. It
-+         also guarantees a low latency to interactive and soft
-+         real-time applications.  Details in
-+         Documentation/block/bfq-iosched.txt
-
- config BFQ_GROUP_IOSCHED
-        bool "BFQ hierarchical scheduling support"
---
-2.13.2
+On Tue, Jul 04, 2017 at 10:55:11AM +0300, Sagi Grimberg wrote:
+> We must make sure that no requests are being queued before we iterate
+> delete vqs. quiesce/unquiesce the request queue istead of start/stop
+> hw queues.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 
 
--- 
-- seds
-https://seds.nl
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+But please remember to Cc virtio mailing list on virtio patches.
+
+
+> ---
+>  drivers/block/virtio_blk.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 0297ad7c1452..4e02aa5fdac0 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -840,7 +840,7 @@ static int virtblk_freeze(struct virtio_device *vdev)
+>  	/* Make sure no work handler is accessing the device. */
+>  	flush_work(&vblk->config_work);
+>  
+> -	blk_mq_stop_hw_queues(vblk->disk->queue);
+> +	blk_mq_quiesce_queue(vblk->disk->queue);
+>  
+>  	vdev->config->del_vqs(vdev);
+>  	return 0;
+> @@ -857,7 +857,7 @@ static int virtblk_restore(struct virtio_device *vdev)
+>  
+>  	virtio_device_ready(vdev);
+>  
+> -	blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
+> +	blk_mq_unquiesce_queue(vblk->disk->queue);
+>  	return 0;
+>  }
+>  #endif
+> -- 
+> 2.7.4
