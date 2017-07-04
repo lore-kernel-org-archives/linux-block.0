@@ -1,45 +1,48 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Josef Bacik <jbacik@fb.com>
-Subject: [PATCH v2 6/8] nbd: quiesce request queues to make sure no submissions are inflight
-Date: Wed,  5 Jul 2017 09:53:09 +0300
-Message-Id: <1499237591-15861-7-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
-References: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
+Return-Path: <su@seds.nl>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+From: Ben Mezger <su@seds.nl>
+Subject: [PATCH] block/Kconfig.iosched: Indent help text with 2 spaces.
+Message-ID: <6b1fb415-92f1-805d-82d2-049a40155fc9@seds.nl>
+Date: Tue, 4 Jul 2017 13:38:18 -0300
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Unlike blk_mq_stop_hw_queues, blk_mq_quiesce_queue respects the
-submission path rcu grace. quiesce the queue before iterating
-on live tags.
+This patch adds two spaces in the help section, following the Kconfig indentation guideline.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Ben Mezger <me@benmezger.nl>
 ---
- drivers/block/nbd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/Kconfig.iosched | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 977ec960dd2f..dea7d85134ee 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -661,9 +661,9 @@ static void nbd_clear_req(struct request *req, void *data, bool reserved)
- 
- static void nbd_clear_que(struct nbd_device *nbd)
- {
--	blk_mq_stop_hw_queues(nbd->disk->queue);
-+	blk_mq_quiesce_queue(nbd->disk->queue);
- 	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_clear_req, NULL);
--	blk_mq_start_hw_queues(nbd->disk->queue);
-+	blk_mq_unquiesce_queue(nbd->disk->queue);
- 	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
- }
- 
+diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+index 5be248ce447c..90e6e7c65c92 100644
+--- a/block/Kconfig.iosched
++++ b/block/Kconfig.iosched
+@@ -87,12 +87,12 @@ config IOSCHED_BFQ
+        tristate "BFQ I/O scheduler"
+        default n
+        ---help---
+-       BFQ I/O scheduler for BLK-MQ. BFQ distributes the bandwidth of
+-       of the device among all processes according to their weights,
+-       regardless of the device parameters and with any workload. It
+-       also guarantees a low latency to interactive and soft
+-       real-time applications.  Details in
+-       Documentation/block/bfq-iosched.txt
++         BFQ I/O scheduler for BLK-MQ. BFQ distributes the bandwidth of
++         of the device among all processes according to their weights,
++         regardless of the device parameters and with any workload. It
++         also guarantees a low latency to interactive and soft
++         real-time applications.  Details in
++         Documentation/block/bfq-iosched.txt
+
+ config BFQ_GROUP_IOSCHED
+        bool "BFQ hierarchical scheduling support"
+--
+2.13.2
+
+
 -- 
-2.7.4
+- seds
+https://seds.nl
