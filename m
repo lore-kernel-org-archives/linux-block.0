@@ -1,54 +1,44 @@
-Return-Path: <BATV+49f9428214963ec94ced+5065+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH BUGFIX] block, bfq: fix bug causing crashes
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <b7680e6e-b416-3cf9-c3ef-313da76950a5@kernel.dk>
+Date: Tue, 4 Jul 2017 09:08:14 +0200
+Cc: linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ ulf.hansson@linaro.org,
+ broonie@kernel.org
+Message-Id: <745245EB-0BE6-44E8-B32E-B062638FA620@linaro.org>
+References: <20170703080010.1709-1-paolo.valente@linaro.org> <b7680e6e-b416-3cf9-c3ef-313da76950a5@kernel.dk>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Meelis Roos <mroos@linux.ee>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH] cciss: initialize struct scsi_req
-Date: Thu,  6 Jul 2017 10:32:20 -0700
-Message-Id: <20170706173220.22129-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-The changes in "block: Make most scsi_req_init() calls implicit" mean
-that every driver that supports the generic scsi ioctls needs to
-call scsi_req_init on newly allocated requests, but that commit didn't
-add the call to the ccіss driver.  Fix that to avoid crashes when
-udev issues SG_IO commands.
 
-Fixes: ca18d6f7 ("block: Make most scsi_req_init() calls implicit")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reported-by: Meelis Roos <mroos@linux.ee>
----
- drivers/block/cciss.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> Il giorno 04 lug 2017, alle ore 00:49, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 07/03/2017 02:00 AM, Paolo Valente wrote:
+>> Hi Jens,
+>> I'm writing this short cover letter to hopefully help you decide what
+>> to do with this patch, in this late phase of the development
+>> cycle. This patch fixes a bug causing kernel crashes for at least
+>> one year. Crashes apparently affect only a minority of users, but are
+>> systematic for them (a crash every few tens of minutes for some).
+>=20
+> By the time you wrote that email, 4.12 was already released for hours.
 
-diff --git a/drivers/block/cciss.c b/drivers/block/cciss.c
-index 02a611993bb4..678af946be30 100644
---- a/drivers/block/cciss.c
-+++ b/drivers/block/cciss.c
-@@ -1944,6 +1944,13 @@ static void cciss_get_serial_no(ctlr_info_t *h, int logvol,
- 	return;
- }
- 
-+static void cciss_initialize_rq(struct request *rq)
-+{
-+	struct scsi_request *sreq = blk_mq_rq_to_pdu(rq);
-+
-+	scsi_req_init(sreq);
-+}
-+
- /*
-  * cciss_add_disk sets up the block device queue for a logical drive
-  */
-@@ -1956,6 +1963,7 @@ static int cciss_add_disk(ctlr_info_t *h, struct gendisk *disk,
- 
- 	disk->queue->cmd_size = sizeof(struct scsi_request);
- 	disk->queue->request_fn = do_cciss_request;
-+	disk->queue->initialize_rq_fn = cciss_initialize_rq;
- 	disk->queue->queue_lock = &h->lock;
- 	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, disk->queue);
- 	if (blk_init_allocated_queue(disk->queue) < 0)
--- 
-2.11.0
+Oops ...
+
+> So there's really no choice this time but to queue it up for 4.13.
+>=20
+
+At least, no decision to make :)
+
+Thanks,
+Paolo
+
+> --=20
+> Jens Axboe
+>=20
