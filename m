@@ -1,14 +1,15 @@
-Return-Path: <mst@redhat.com>
-Date: Wed, 5 Jul 2017 00:39:34 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 4 Jul 2017 16:41:01 +0800
+From: Ming Lei <ming.lei@redhat.com>
 To: Sagi Grimberg <sagi@grimberg.me>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
 	Keith Busch <keith.busch@intel.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
 	Jason Wang <jasowang@redhat.com>
 Subject: Re: [PATCH 7/8] virtio_blk: quiesce/unquiesce live IO when entering
  PM states
-Message-ID: <20170705003734-mutt-send-email-mst@kernel.org>
+Message-ID: <20170704084100.GH29053@ming.t460p>
 References: <1499154912-10420-1-git-send-email-sagi@grimberg.me>
  <1499154912-10420-8-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
@@ -24,13 +25,6 @@ On Tue, Jul 04, 2017 at 10:55:11AM +0300, Sagi Grimberg wrote:
 > Cc: Michael S. Tsirkin <mst@redhat.com>
 > Cc: Jason Wang <jasowang@redhat.com>
 > Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-But please remember to Cc virtio mailing list on virtio patches.
-
-
 > ---
 >  drivers/block/virtio_blk.c | 4 ++--
 >  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -59,3 +53,12 @@ But please remember to Cc virtio mailing list on virtio patches.
 >  #endif
 > -- 
 > 2.7.4
+> 
+
+Looks fine, 
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+	
+
+-- 
+Ming
