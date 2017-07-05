@@ -1,54 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49418 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753737AbdGCMhd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Jul 2017 08:37:33 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq-sched: fix performance regression of mq-deadline
-Date: Mon,  3 Jul 2017 20:37:14 +0800
-Message-Id: <20170703123714.23138-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+Date: Wed, 5 Jul 2017 14:08:28 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>,
+	James Smart <james.smart@broadcom.com>,
+	Ming Lei <ming.lei@redhat.com>, Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH v3 6/8] nbd: quiesce request queues to make sure no
+ submissions are inflight
+Message-ID: <20170705180827.GA18539@destiny>
+References: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
+ <1499274037-17438-7-git-send-email-sagi@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1499274037-17438-7-git-send-email-sagi@grimberg.me>
+List-ID: <linux-block@vger.kernel.org>
 
-When mq-deadline is taken, IOPS of sequential read and
-seqential write is observed more than 20% drop on sata(scsi-mq)
-devices, compared with using 'none' scheduler.
+On Wed, Jul 05, 2017 at 08:00:35PM +0300, Sagi Grimberg wrote:
+> Unlike blk_mq_stop_hw_queues, blk_mq_quiesce_queue respects the
+> submission path rcu grace. quiesce the queue before iterating
+> on live tags.
+> 
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Cc: Josef Bacik <jbacik@fb.com>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 
-The reason is that the default nr_requests for scheduler is
-too big for small queuedepth devices, and latency is increased
-much.
+Sounds fine by me, you can add
 
-Since the principle of taking 256 requests for mq scheduler
-is based on 128 queue depth, this patch changes into
-double size of min(hw queue_depth, 128).
+Acked-by: Josef Bacik <jbacik@fb.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Thanks,
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 7f0dc48ffb40..4ab69435708c 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -515,10 +515,12 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 	}
- 
- 	/*
--	 * Default to 256, since we don't split into sync/async like the
--	 * old code did. Additionally, this is a per-hw queue depth.
-+	 * Default to double of smaller one between hw queue_depth and 128,
-+	 * since we don't split into sync/async like the old code did.
-+	 * Additionally, this is a per-hw queue depth.
- 	 */
--	q->nr_requests = 2 * BLKDEV_MAX_RQ;
-+	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
-+				   BLKDEV_MAX_RQ);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
--- 
-2.9.4
+Josef
