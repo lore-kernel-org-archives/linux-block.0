@@ -5,14 +5,13 @@ To: Jens Axboe <axboe@kernel.dk>,
 Cc: linux-nvme@lists.infradead.org,
 	Christoph Hellwig <hch@lst.de>,
 	Keith Busch <keith.busch@intel.com>,
-	James Smart <james.smart@broadcom.com>,
 	Ming Lei <ming.lei@redhat.com>,
 	Josef Bacik <jbacik@fb.com>
-Subject: [PATCH v3 6/8] nbd: quiesce request queues to make sure no submissions are inflight
-Date: Wed,  5 Jul 2017 20:00:35 +0300
-Message-Id: <1499274037-17438-7-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
-References: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
+Subject: [PATCH v2 6/8] nbd: quiesce request queues to make sure no submissions are inflight
+Date: Wed,  5 Jul 2017 09:53:09 +0300
+Message-Id: <1499237591-15861-7-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
+References: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
 Unlike blk_mq_stop_hw_queues, blk_mq_quiesce_queue respects the
