@@ -1,40 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:57297 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750778AbdGGPAr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2017 11:00:47 -0400
-Date: Fri, 7 Jul 2017 08:00:42 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Meelis Roos <mroos@linux.ee>
-Cc: Linux Kernel list <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Don Brace <don.brace@microsemi.com>,
-        Scott Benesh <scott.benesh@microsemi.com>,
-        Scott Teel <scott.teel@microsemi.com>,
-        Kevin Barnett <kevin.barnett@microsemi.com>,
-        linux-scsi@vger.kernel.org
-Subject: device support in hpasa, was: Re: OOPS from cciss_ioctl in 4.12+git
-Message-ID: <20170707150042.GA15445@infradead.org>
-References: <alpine.LRH.2.20.1707051555130.20086@math.ut.ee>
- <20170705225134.GA31786@infradead.org>
- <alpine.LRH.2.20.1707061236010.6514@math.ut.ee>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 5 Jul 2017 15:34:24 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>
+Subject: Re: [PATCH v2 1/8] nvme-rdma: quiesce/unquiesce admin_q instead of
+ start/stop its hw queues
+Message-ID: <20170705073423.GG11084@ming.t460p>
+References: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
+ <1499237591-15861-2-git-send-email-sagi@grimberg.me>
+ <20170705071257.GA11084@ming.t460p>
+ <c349a9f0-d4cb-e19a-acc9-2b7157f6ec21@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LRH.2.20.1707061236010.6514@math.ut.ee>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <c349a9f0-d4cb-e19a-acc9-2b7157f6ec21@grimberg.me>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jul 06, 2017 at 12:55:04PM +0300, Meelis Roos wrote:
-> > Also we're trying to move people away from the cciss driver, can you
-> > check if the hpsa SCSI driver works for you as well?
+On Wed, Jul 05, 2017 at 10:15:28AM +0300, Sagi Grimberg wrote:
 > 
-> I have older adapter:
+> > As I commented yesterday, blk_mq_kick_requeue_list() isn't needed.
 > 
-> Compaq Computer Corporation Smart Array 64xx [0e11:0046] (rev 01)
-> 
-> That does not seem to be supported by hpsa AFAICS.
+> I commented in the cover-letter, I am removing it a two steps to keep
+> bisection. I'm only allowed to remove it in patch 5/8.
 
-Looks like.  Although hpsa has support for various SA5 controllers
-it seems like it decided to skip all Compaq branded controllers.
+The kick requeue list shouldn't be added at the 1st step.
 
-As far as I can tell we could simply add support for those to
-hpsa.  Ccing hpsa folks to figure out if that's the case.
+The thing is simple, we only need to kick request list where the queue
+is restarted. Now quiesce and unquiesce do not touch STOP state, so
+it may make people confused if you add the kick after unquiese.
+
+-- 
+Ming
