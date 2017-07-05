@@ -5,15 +5,14 @@ To: Jens Axboe <axboe@kernel.dk>,
 Cc: linux-nvme@lists.infradead.org,
 	Christoph Hellwig <hch@lst.de>,
 	Keith Busch <keith.busch@intel.com>,
-	James Smart <james.smart@broadcom.com>,
 	Ming Lei <ming.lei@redhat.com>,
 	virtio-dev@lists.oasis-open.org,
 	Jason Wang <jasowang@redhat.com>
-Subject: [PATCH v3 8/8] virtio_blk: quiesce/unquiesce live IO when entering PM states
-Date: Wed,  5 Jul 2017 20:00:37 +0300
-Message-Id: <1499274037-17438-9-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
-References: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
+Subject: [PATCH v2 8/8] virtio_blk: quiesce/unquiesce live IO when entering PM states
+Date: Wed,  5 Jul 2017 09:53:11 +0300
+Message-Id: <1499237591-15861-9-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
+References: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
 Without it its not guaranteed that no .queue_rq is inflight.
