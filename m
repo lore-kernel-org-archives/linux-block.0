@@ -1,168 +1,106 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55762 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753481AbdGLSui (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:38 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 10/11] blktrace: add an option to allow displaying cgroup path
-Date: Wed, 12 Jul 2017 11:49:55 -0700
-Message-Id: <bb09afb7606db79ec4b8925943c54371b9433ff0.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <sagi@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org,
+	Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>,
+	James Smart <james.smart@broadcom.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 7/8] mtip32xx: quiesce request queues to make sure no submissions are inflight
+Date: Wed,  5 Jul 2017 20:00:36 +0300
+Message-Id: <1499274037-17438-8-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
+References: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+Unlike blk_mq_stop_hw_queues, blk_mq_quiesce_queue respects the
+submission path rcu grace. quiesce the queue before iterating
+on live tags, or performing device io quiescing.
 
-By default we output cgroup id in blktrace. This adds an option to
-display cgroup path. Since get cgroup path is a relativly heavy
-operation, we don't enable it by default.
+While were at it, verify that the request started in mtip_abort_cmd
+amd mtip_queue_cmd tag iteration calls.
 
-with the option enabled, blktrace will output something like this:
-dd-1353  [007] d..2   293.015252:   8,0   /test/level  D   R 24 + 8 [dd]
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- fs/kernfs/mount.c       | 19 +++++++++++++++++++
- include/linux/cgroup.h  |  6 ++++++
- include/linux/kernfs.h  |  2 ++
- kernel/cgroup/cgroup.c  | 12 ++++++++++++
- kernel/trace/blktrace.c | 14 +++++++++++++-
- 5 files changed, 52 insertions(+), 1 deletion(-)
+ drivers/block/mtip32xx/mtip32xx.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
-index fa32358..7c452f4 100644
---- a/fs/kernfs/mount.c
-+++ b/fs/kernfs/mount.c
-@@ -65,6 +65,25 @@ const struct super_operations kernfs_sops = {
- 	.show_path	= kernfs_sop_show_path,
- };
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 61b046f256ca..87717a1a5c89 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -950,7 +950,7 @@ static int mtip_quiesce_io(struct mtip_port *port, unsigned long timeout)
+ 	unsigned long to;
+ 	bool active = true;
  
-+/*
-+ * Similar to kernfs_fh_get_inode, this one gets kernfs node from inode
-+ * number and generation
-+ */
-+struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
-+	const union kernfs_node_id *id)
-+{
-+	struct kernfs_node *kn;
-+
-+	kn = kernfs_find_and_get_node_by_ino(root, id->ino);
-+	if (!kn)
-+		return NULL;
-+	if (kn->id.generation != id->generation) {
-+		kernfs_put(kn);
-+		return NULL;
-+	}
-+	return kn;
-+}
-+
- static struct inode *kernfs_fh_get_inode(struct super_block *sb,
- 		u64 ino, u32 generation)
- {
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 52ef9a6..6144fe9 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -613,6 +613,9 @@ static inline union kernfs_node_id *cgroup_get_kernfs_id(struct cgroup *cgrp)
- {
- 	return &cgrp->kn->id;
+-	blk_mq_stop_hw_queues(port->dd->queue);
++	blk_mq_quiesce_queue(port->dd->queue);
+ 
+ 	to = jiffies + msecs_to_jiffies(timeout);
+ 	do {
+@@ -970,10 +970,10 @@ static int mtip_quiesce_io(struct mtip_port *port, unsigned long timeout)
+ 			break;
+ 	} while (time_before(jiffies, to));
+ 
+-	blk_mq_start_stopped_hw_queues(port->dd->queue, true);
++	blk_mq_unquiesce_queue(port->dd->queue);
+ 	return active ? -EBUSY : 0;
+ err_fault:
+-	blk_mq_start_stopped_hw_queues(port->dd->queue, true);
++	blk_mq_unquiesce_queue(port->dd->queue);
+ 	return -EFAULT;
  }
-+
-+void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
-+					char *buf, size_t buflen);
- #else /* !CONFIG_CGROUPS */
  
- struct cgroup_subsys_state;
-@@ -645,6 +648,9 @@ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
- {
- 	return true;
- }
-+
-+static inline void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
-+	char *buf, size_t buflen) {}
- #endif /* !CONFIG_CGROUPS */
+@@ -2737,6 +2737,9 @@ static void mtip_abort_cmd(struct request *req, void *data,
+ 	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
+ 	struct driver_data *dd = data;
  
- /*
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index d149361..ab25c8b 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -358,6 +358,8 @@ struct super_block *kernfs_pin_sb(struct kernfs_root *root, const void *ns);
- 
- void kernfs_init(void);
- 
-+struct kernfs_node *kernfs_get_node_by_id(struct kernfs_root *root,
-+	const union kernfs_node_id *id);
- #else	/* CONFIG_KERNFS */
- 
- static inline enum kernfs_node_type kernfs_type(struct kernfs_node *kn)
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 8f88aac..c7fae93 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -4705,6 +4705,18 @@ static int __init cgroup_wq_init(void)
- }
- core_initcall(cgroup_wq_init);
- 
-+void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
-+					char *buf, size_t buflen)
-+{
-+	struct kernfs_node *kn;
-+
-+	kn = kernfs_get_node_by_id(cgrp_dfl_root.kf_root, id);
-+	if (!kn)
++	if (!blk_mq_request_started(req))
 +		return;
-+	kernfs_path(kn, buf, buflen);
-+	kernfs_put(kn);
-+}
 +
- /*
-  * proc_cgroup_show()
-  *  - Print task's cgroup paths into seq_file, one line for each hierarchy
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index f393d7a..e90974e 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -48,12 +48,14 @@ static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_lock);
- /* Select an alternative, minimalistic output than the original one */
- #define TRACE_BLK_OPT_CLASSIC	0x1
- #define TRACE_BLK_OPT_CGROUP	0x2
-+#define TRACE_BLK_OPT_CGNAME	0x4
+ 	dbg_printk(MTIP_DRV_NAME " Aborting request, tag = %d\n", req->tag);
  
- static struct tracer_opt blk_tracer_opts[] = {
- 	/* Default disable the minimalistic output */
- 	{ TRACER_OPT(blk_classic, TRACE_BLK_OPT_CLASSIC) },
- #ifdef CONFIG_BLK_CGROUP
- 	{ TRACER_OPT(blk_cgroup, TRACE_BLK_OPT_CGROUP) },
-+	{ TRACER_OPT(blk_cgname, TRACE_BLK_OPT_CGNAME) },
- #endif
- 	{ }
- };
-@@ -1213,7 +1215,17 @@ static void blk_log_action(struct trace_iterator *iter, const char *act,
- 	if (has_cg) {
- 		const union kernfs_node_id *id = cgid_start(iter->ent);
+ 	clear_bit(req->tag, dd->port->cmds_to_issue);
+@@ -2749,6 +2752,9 @@ static void mtip_queue_cmd(struct request *req, void *data,
+ {
+ 	struct driver_data *dd = data;
  
--		trace_seq_printf(&iter->seq, "%3d,%-3d %x,%-x %2s %3s ",
-+		if (blk_tracer_flags.val & TRACE_BLK_OPT_CGNAME) {
-+			char blkcg_name_buf[NAME_MAX + 1] = "<...>";
++	if (!blk_mq_request_started(req))
++		return;
 +
-+			cgroup_path_from_kernfs_id(id, blkcg_name_buf,
-+				sizeof(blkcg_name_buf));
-+			trace_seq_printf(&iter->seq, "%3d,%-3d %s %2s %3s ",
-+				 MAJOR(t->device), MINOR(t->device),
-+				 blkcg_name_buf, act, rwbs);
-+		} else
-+			trace_seq_printf(&iter->seq,
-+				 "%3d,%-3d %x,%-x %2s %3s ",
- 				 MAJOR(t->device), MINOR(t->device),
- 				 id->ino, id->generation, act, rwbs);
- 	} else
+ 	set_bit(req->tag, dd->port->cmds_to_issue);
+ 	blk_abort_request(req);
+ }
+@@ -2814,6 +2820,8 @@ static int mtip_service_thread(void *data)
+ 				dev_warn(&dd->pdev->dev,
+ 					"Completion workers still active!");
+ 
++			blk_mq_quiesce_queue(dd->queue);
++
+ 			spin_lock(dd->queue->queue_lock);
+ 			blk_mq_tagset_busy_iter(&dd->tags,
+ 							mtip_queue_cmd, dd);
+@@ -2826,6 +2834,8 @@ static int mtip_service_thread(void *data)
+ 							mtip_abort_cmd, dd);
+ 
+ 			clear_bit(MTIP_PF_TO_ACTIVE_BIT, &dd->port->flags);
++
++			blk_mq_unquiesce_queue(dd->queue);
+ 		}
+ 
+ 		if (test_bit(MTIP_PF_ISSUE_CMDS_BIT, &port->flags)) {
+@@ -3995,8 +4005,9 @@ static int mtip_block_remove(struct driver_data *dd)
+ 						dd->disk->disk_name);
+ 
+ 	blk_freeze_queue_start(dd->queue);
+-	blk_mq_stop_hw_queues(dd->queue);
++	blk_mq_quiesce_queue(dd->queue);
+ 	blk_mq_tagset_busy_iter(&dd->tags, mtip_no_dev_cleanup, dd);
++	blk_mq_unquiesce_queue(dd->queue);
+ 
+ 	/*
+ 	 * Delete our gendisk structure. This also removes the device
 -- 
-2.9.3
+2.7.4
