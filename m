@@ -5,11 +5,10 @@ To: Jens Axboe <axboe@kernel.dk>,
 Cc: linux-nvme@lists.infradead.org,
 	Christoph Hellwig <hch@lst.de>,
 	Keith Busch <keith.busch@intel.com>,
-	James Smart <james.smart@broadcom.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 0/8] correct quiescing in several block drivers
-Date: Wed,  5 Jul 2017 20:00:29 +0300
-Message-Id: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
+Subject: [PATCH v2 0/8] correct quiescing in several block drivers
+Date: Wed,  5 Jul 2017 09:53:03 +0300
+Message-Id: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
 Before we either iterate on tags we must guarantee that the
@@ -19,23 +18,16 @@ Thats what blk_mq_quiesce_queue is for, so use it where appropriate.
 Note that before we cleanup the request queue, we must unquiesce in
 order to guarantee to not block on requests queued during quiescing.
 
-Changes from v2:
-- removed admin_q requeue list kick altogether (suggested by Ming)
-
 Changes from v1:
 - dropped the xen_blockfront patch, not sure if it was helpful at all
-- removed the requeue kick in nvme drivers while making nvme unconditionally
+- Removed the requeue kick in nvme drivers while making nvme unconditionally
   kick the requeue list when requeuing a request instead of doing so when
   unquiescing the queues. Note that this change was a two step change to
   keep bisection possible.
-- fixed possible hangs with unquiescing before cleanup of the request queue
+- Fixed possible hangs with unquiescing before cleanup of the request queue
   in mtip32xx and nvme drivers.
-- added check that the request started in mtip32xx itration callouts.
+- Added check that the request started in mtip32xx itration callouts.
 - collected review tags.
-
-*** SUBJECT HERE ***
-
-*** BLURB HERE ***
 
 Sagi Grimberg (8):
   nvme-rdma: quiesce/unquiesce admin_q instead of start/stop its hw
@@ -57,10 +49,10 @@ Sagi Grimberg (8):
  drivers/block/virtio_blk.c        |  4 ++--
  drivers/nvme/host/core.c          | 19 ++-----------------
  drivers/nvme/host/fc.c            |  5 +++--
- drivers/nvme/host/pci.c           |  6 +++---
+ drivers/nvme/host/pci.c           |  9 +++++----
  drivers/nvme/host/rdma.c          |  7 ++++---
  drivers/nvme/target/loop.c        |  3 ++-
- 8 files changed, 33 insertions(+), 34 deletions(-)
+ 8 files changed, 35 insertions(+), 35 deletions(-)
 
 -- 
 2.7.4
