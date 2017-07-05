@@ -1,36 +1,46 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-Date: Wed, 5 Jul 2017 14:08:28 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+Return-Path: <sagi@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org,
+	Christoph Hellwig <hch@lst.de>,
 	Keith Busch <keith.busch@intel.com>,
 	James Smart <james.smart@broadcom.com>,
-	Ming Lei <ming.lei@redhat.com>, Josef Bacik <jbacik@fb.com>
-Subject: Re: [PATCH v3 6/8] nbd: quiesce request queues to make sure no
- submissions are inflight
-Message-ID: <20170705180827.GA18539@destiny>
+	Ming Lei <ming.lei@redhat.com>,
+	Josef Bacik <jbacik@fb.com>
+Subject: [PATCH v3 6/8] nbd: quiesce request queues to make sure no submissions are inflight
+Date: Wed,  5 Jul 2017 20:00:35 +0300
+Message-Id: <1499274037-17438-7-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
 References: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
- <1499274037-17438-7-git-send-email-sagi@grimberg.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1499274037-17438-7-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jul 05, 2017 at 08:00:35PM +0300, Sagi Grimberg wrote:
-> Unlike blk_mq_stop_hw_queues, blk_mq_quiesce_queue respects the
-> submission path rcu grace. quiesce the queue before iterating
-> on live tags.
-> 
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> Cc: Josef Bacik <jbacik@fb.com>
-> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Unlike blk_mq_stop_hw_queues, blk_mq_quiesce_queue respects the
+submission path rcu grace. quiesce the queue before iterating
+on live tags.
 
-Sounds fine by me, you can add
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/block/nbd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Acked-by: Josef Bacik <jbacik@fb.com>
-
-Thanks,
-
-Josef
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 977ec960dd2f..dea7d85134ee 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -661,9 +661,9 @@ static void nbd_clear_req(struct request *req, void *data, bool reserved)
+ 
+ static void nbd_clear_que(struct nbd_device *nbd)
+ {
+-	blk_mq_stop_hw_queues(nbd->disk->queue);
++	blk_mq_quiesce_queue(nbd->disk->queue);
+ 	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_clear_req, NULL);
+-	blk_mq_start_hw_queues(nbd->disk->queue);
++	blk_mq_unquiesce_queue(nbd->disk->queue);
+ 	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
+ }
+ 
+-- 
+2.7.4
