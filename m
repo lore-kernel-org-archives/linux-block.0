@@ -1,185 +1,128 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55630 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753196AbdGLSue (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:34 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 05/11] kernfs: introduce kernfs_node_id
-Date: Wed, 12 Jul 2017 11:49:50 -0700
-Message-Id: <00088c2b5a1803752735c70dd8dbcf633772caa4.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <bcache@lists.ewheeler.net>
+Date: Wed, 5 Jul 2017 21:49:36 +0000 (UTC)
+From: Eric Wheeler <bcache@lists.ewheeler.net>
+To: Christoph Hellwig <hch@infradead.org>
+cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, axboe@kernel.dk,
+    nix@esperi.org.uk
+Subject: Re: [PATCH 07/19] bcache: introduce bcache sysfs entries for
+ ioprio-based bypass/writeback hints
+In-Reply-To: <20170705184719.GA3234@infradead.org>
+Message-ID: <alpine.LRH.2.11.1707052143470.17052@mail.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org> <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net> <1498855388-16990-7-git-send-email-bcache@lists.ewheeler.net> <20170705184719.GA3234@infradead.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On Wed, 5 Jul 2017, Christoph Hellwig wrote:
+> On Fri, Jun 30, 2017 at 01:42:56PM -0700, bcache@lists.ewheeler.net wrote:
+> > From: Eric Wheeler <git@linux.ewheeler.net>
+> > 
+> > Add sysfs entries to support to hint for bypass/writeback by the ioprio
+> > assigned to the bio.  If the bio is unassigned, use current's io-context
+> > ioprio for cache writeback or bypass (configured per-process with
+> > `ionice`).
+> > 
+> > Having idle IOs bypass the cache can increase performance elsewhere
+> > since you probably don't care about their performance.  In addition,
+> > this prevents idle IOs from promoting into (polluting) your cache and
+> > evicting blocks that are more important elsewhere.
+> > 
+> > If you really nead the performance at the expense of SSD wearout,
+> > then configure ioprio_writeback and set your `ionice` appropriately.
+> > 
+> > For example:
+> > 	echo 2,7 > /sys/block/bcache0/bcache/ioprio_bypass
+> > 	echo 2,0 > /sys/block/bcache0/bcache/ioprio_writeback
+> > 
+> > See the documentation commit for details.
+> 
+> I'm really worried about this interface, as it basically uses the
+> ioprio field for side channel communication - your app must know
+> which value it wants, and you need to configure bcache to fit
+> exacltly that scheme.
+>
+> 
+> > +	/* If the ioprio already exists on the bio, use that.  We assume that
+> > +	 * the upper layer properly assigned the calling process's ioprio to
+> > +	 * the bio being passed to bcache. Otherwise, use current's ioc. */
+> 
+> Please make this fit the normal kernel comment style.
 
-inode number and generation can identify a kernfs node. We are going to
-export the identification by exportfs operations, so put ino and
-generation into a separate structure. It's convenient when later patches
-use the identification.
+ok
+ 
+> > +	ioprio = bio_prio(bio);
+> > +	if (!ioprio_valid(ioprio)) {
+> > +		ioc = get_task_io_context(current, GFP_NOIO, NUMA_NO_NODE);
+> > +		if (ioc) {
+> > +			if (ioprio_valid(ioc->ioprio))
+> > +				ioprio = ioc->ioprio;
+> > +			put_io_context(ioc);
+> > +			ioc = NULL;
+> > +		}
+> > +	}
+> 
+> While get_task_io_context currently is exported it really should not
+> be - we should only allocate on when setting the io priority or when
+> forking.
+> 
+> What this code really wants is the ioprio related lines of code from
+> blk_init_request_from_bio, which should be factored into a new helper.
+> 
+> > +	if (ioprio_valid(ioprio) && ioprio_valid(dc->ioprio_writeback)
+> > +		&& ioprio >= dc->ioprio_bypass) {
+> > +		return true;
+> > +	}
+> 
+> Incorrect indentation, this shold be:
+> 
+> 	if (ioprio_valid(ioprio) && ioprio_valid(dc->ioprio_writeback) &&
+> 	    ioprio >= dc->ioprio_bypass)
+> 		return true;
+> 
+> And there is some more of this in this and the following patches.
+> Please run them through something like checkpatch.pl
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- fs/kernfs/dir.c                  | 10 +++++-----
- fs/kernfs/file.c                 |  4 ++--
- fs/kernfs/inode.c                |  4 ++--
- include/linux/cgroup.h           |  2 +-
- include/linux/kernfs.h           | 12 ++++++++++--
- include/trace/events/writeback.h |  2 +-
- 6 files changed, 21 insertions(+), 13 deletions(-)
+Good idea, will do.
 
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index b61a7ef..89d1dc1 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -539,7 +539,7 @@ void kernfs_put(struct kernfs_node *kn)
- 	}
- 	kfree(kn->iattr);
- 	spin_lock(&kernfs_idr_lock);
--	idr_remove(&root->ino_idr, kn->ino);
-+	idr_remove(&root->ino_idr, kn->id.ino);
- 	spin_unlock(&kernfs_idr_lock);
- 	kmem_cache_free(kernfs_node_cache, kn);
- 
-@@ -645,8 +645,8 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 	idr_preload_end();
- 	if (ret < 0)
- 		goto err_out2;
--	kn->ino = ret;
--	kn->generation = gen;
-+	kn->id.ino = ret;
-+	kn->id.generation = gen;
- 
- 	/*
- 	 * set ino first. This barrier is paired with atomic_inc_not_zero in
-@@ -721,7 +721,7 @@ struct kernfs_node *kernfs_find_and_get_node_by_ino(struct kernfs_root *root,
- 	 * before 'count'. So if 'count' is uptodate, 'ino' should be uptodate,
- 	 * hence we can use 'ino' to filter stale node.
- 	 */
--	if (kn->ino != ino)
-+	if (kn->id.ino != ino)
- 		goto out;
- 	rcu_read_unlock();
- 
-@@ -1654,7 +1654,7 @@ static int kernfs_fop_readdir(struct file *file, struct dir_context *ctx)
- 		const char *name = pos->name;
- 		unsigned int type = dt_type(pos);
- 		int len = strlen(name);
--		ino_t ino = pos->ino;
-+		ino_t ino = pos->id.ino;
- 
- 		ctx->pos = pos->hash;
- 		file->private_data = pos;
-diff --git a/fs/kernfs/file.c b/fs/kernfs/file.c
-index 7f90d4d..7441925 100644
---- a/fs/kernfs/file.c
-+++ b/fs/kernfs/file.c
-@@ -895,7 +895,7 @@ static void kernfs_notify_workfn(struct work_struct *work)
- 		 * have the matching @file available.  Look up the inodes
- 		 * and generate the events manually.
- 		 */
--		inode = ilookup(info->sb, kn->ino);
-+		inode = ilookup(info->sb, kn->id.ino);
- 		if (!inode)
- 			continue;
- 
-@@ -903,7 +903,7 @@ static void kernfs_notify_workfn(struct work_struct *work)
- 		if (parent) {
- 			struct inode *p_inode;
- 
--			p_inode = ilookup(info->sb, parent->ino);
-+			p_inode = ilookup(info->sb, parent->id.ino);
- 			if (p_inode) {
- 				fsnotify(p_inode, FS_MODIFY | FS_EVENT_ON_CHILD,
- 					 inode, FSNOTIFY_EVENT_INODE, kn->name, 0);
-diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
-index 4c8b510..a343039 100644
---- a/fs/kernfs/inode.c
-+++ b/fs/kernfs/inode.c
-@@ -220,7 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
- 	inode->i_private = kn;
- 	inode->i_mapping->a_ops = &kernfs_aops;
- 	inode->i_op = &kernfs_iops;
--	inode->i_generation = kn->generation;
-+	inode->i_generation = kn->id.generation;
- 
- 	set_default_inode_attr(inode, kn->mode);
- 	kernfs_refresh_inode(kn, inode);
-@@ -266,7 +266,7 @@ struct inode *kernfs_get_inode(struct super_block *sb, struct kernfs_node *kn)
- {
- 	struct inode *inode;
- 
--	inode = iget_locked(sb, kn->ino);
-+	inode = iget_locked(sb, kn->id.ino);
- 	if (inode && (inode->i_state & I_NEW))
- 		kernfs_init_inode(kn, inode);
- 
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 710a005..30c6877 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -543,7 +543,7 @@ static inline bool cgroup_is_populated(struct cgroup *cgrp)
- /* returns ino associated with a cgroup */
- static inline ino_t cgroup_ino(struct cgroup *cgrp)
- {
--	return cgrp->kn->ino;
-+	return cgrp->kn->id.ino;
- }
- 
- /* cft/css accessors for cftype->write() operation */
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index 8c00d28..06a0c59 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -95,6 +95,15 @@ struct kernfs_elem_attr {
- 	struct kernfs_node	*notify_next;	/* for kernfs_notify() */
- };
- 
-+/* represent a kernfs node */
-+union kernfs_node_id {
-+	struct {
-+		u32		ino;
-+		u32		generation;
-+	};
-+	u64			id;
-+};
-+
- /*
-  * kernfs_node - the building block of kernfs hierarchy.  Each and every
-  * kernfs node is represented by single kernfs_node.  Most fields are
-@@ -131,11 +140,10 @@ struct kernfs_node {
- 
- 	void			*priv;
- 
-+	union kernfs_node_id	id;
- 	unsigned short		flags;
- 	umode_t			mode;
--	unsigned int		ino;
- 	struct kernfs_iattrs	*iattr;
--	u32			generation;
- };
- 
- /*
-diff --git a/include/trace/events/writeback.h b/include/trace/events/writeback.h
-index 7bd8783..9b57f01 100644
---- a/include/trace/events/writeback.h
-+++ b/include/trace/events/writeback.h
-@@ -136,7 +136,7 @@ DEFINE_EVENT(writeback_dirty_inode_template, writeback_dirty_inode,
- 
- static inline unsigned int __trace_wb_assign_cgroup(struct bdi_writeback *wb)
- {
--	return wb->memcg_css->cgroup->kn->ino;
-+	return wb->memcg_css->cgroup->kn->id.ino;
- }
- 
- static inline unsigned int __trace_wbc_assign_cgroup(struct writeback_control *wbc)
--- 
-2.9.3
+> 
+> > +
+> >  SHOW(__bch_cached_dev)
+> >  {
+> >  	struct cached_dev *dc = container_of(kobj, struct cached_dev,
+> > @@ -183,6 +186,17 @@ SHOW(__bch_cached_dev)
+> >  		return strlen(buf);
+> >  	}
+> >  
+> > +	if (attr == &sysfs_ioprio_bypass)
+> > +		return snprintf(buf, PAGE_SIZE-1, "%d,%ld\n",
+> > +			IOPRIO_PRIO_CLASS(dc->ioprio_bypass),
+> > +			IOPRIO_PRIO_DATA(dc->ioprio_bypass));
+> > +
+> > +	if (attr == &sysfs_ioprio_writeback)
+> > +		return snprintf(buf, PAGE_SIZE-1, "%d,%ld\n",
+> > +			IOPRIO_PRIO_CLASS(dc->ioprio_writeback),
+> > +			IOPRIO_PRIO_DATA(dc->ioprio_writeback));
+> > +
+> > +
+> 
+> Please implement separate sysfs show and store function for your new
+> attributes instead of overloading all of them into a giant mess.
+
+ok.
+
+>>
+
+Christoph, thank you for your commentary and quick turn around on all of 
+these patches!
+
+--
+Eric Wheeler
+
+
+
+
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
