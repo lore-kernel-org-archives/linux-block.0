@@ -1,125 +1,32 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45752 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933243AbdGLI3H (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 04:29:07 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org
-Cc: NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/2] md: remove 'idx' from 'struct resync_pages'
-Date: Wed, 12 Jul 2017 16:28:45 +0800
-Message-Id: <20170712082845.436-1-ming.lei@redhat.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:53657 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751692AbdGESYs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jul 2017 14:24:48 -0400
+Date: Wed, 5 Jul 2017 11:24:47 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: bcache@lists.ewheeler.net
+Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        hch@infradead.org, axboe@kernel.dk, Jan Kara <jack@suse.cz>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 01/19] bcache: Fix leak of bdev reference
+Message-ID: <20170705182447.GA10673@infradead.org>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-bio_add_page() won't fail for resync bio, and the page index for each
-bio is same, so remove it.
+On Fri, Jun 30, 2017 at 01:42:50PM -0700, bcache@lists.ewheeler.net wrote:
+> From: Jan Kara <jack@suse.cz>
+> 
+> If blkdev_get_by_path() in register_bcache() fails, we try to lookup the
+> block device using lookup_bdev() to detect which situation we are in to
+> properly report error. However we never drop the reference returned to
+> us from lookup_bdev(). Fix that.
 
-More importantly the 'idx' of 'struct resync_pages' is initialized in
-mempool allocator function, this way is wrong since mempool is only
-responsible for allocation, we can't use that for initialization.
-
-Suggested-by: NeilBrown <neilb@suse.com>
-Reported-by: NeilBrown <neilb@suse.com>
-Fixes: f0250618361d(md: raid10: don't use bio's vec table to manage resync pages)
-Fixes: 98d30c5812c3(md: raid1: don't use bio's vec table to manage resync pages)
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/md.h     | 1 -
- drivers/md/raid1.c  | 6 +++---
- drivers/md/raid10.c | 6 +++---
- 3 files changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 991f0fe2dcc6..2c780aa8d07f 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -736,7 +736,6 @@ static inline void mddev_check_write_zeroes(struct mddev *mddev, struct bio *bio
- 
- /* for managing resync I/O pages */
- struct resync_pages {
--	unsigned	idx;	/* for get/put page from the pool */
- 	void		*raid_bio;
- 	struct page	*pages[RESYNC_PAGES];
- };
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 3febfc8391fb..7901ddc3362f 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -170,7 +170,6 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- 			resync_get_all_pages(rp);
- 		}
- 
--		rp->idx = 0;
- 		rp->raid_bio = r1_bio;
- 		bio->bi_private = rp;
- 	}
-@@ -2619,6 +2618,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 	int good_sectors = RESYNC_SECTORS;
- 	int min_bad = 0; /* number of sectors that are bad in all devices */
- 	int idx = sector_to_idx(sector_nr);
-+	int page_idx = 0;
- 
- 	if (!conf->r1buf_pool)
- 		if (init_resync(conf))
-@@ -2846,7 +2846,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			bio = r1_bio->bios[i];
- 			rp = get_resync_pages(bio);
- 			if (bio->bi_end_io) {
--				page = resync_fetch_page(rp, rp->idx++);
-+				page = resync_fetch_page(rp, page_idx);
- 
- 				/*
- 				 * won't fail because the vec table is big
-@@ -2858,7 +2858,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
- 		sync_blocks -= (len>>9);
--	} while (get_resync_pages(r1_bio->bios[disk]->bi_private)->idx < RESYNC_PAGES);
-+	} while (page_idx++ < RESYNC_PAGES);
- 
- 	r1_bio->sectors = nr_sectors;
- 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 5026e7ad51d3..e594ca610f27 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -221,7 +221,6 @@ static void * r10buf_pool_alloc(gfp_t gfp_flags, void *data)
- 			resync_get_all_pages(rp);
- 		}
- 
--		rp->idx = 0;
- 		rp->raid_bio = r10_bio;
- 		bio->bi_private = rp;
- 		if (rbio) {
-@@ -2853,6 +2852,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 	sector_t sectors_skipped = 0;
- 	int chunks_skipped = 0;
- 	sector_t chunk_mask = conf->geo.chunk_mask;
-+	int page_idx = 0;
- 
- 	if (!conf->r10buf_pool)
- 		if (init_resync(conf))
-@@ -3355,7 +3355,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			break;
- 		for (bio= biolist ; bio ; bio=bio->bi_next) {
- 			struct resync_pages *rp = get_resync_pages(bio);
--			page = resync_fetch_page(rp, rp->idx++);
-+			page = resync_fetch_page(rp, page_idx);
- 			/*
- 			 * won't fail because the vec table is big enough
- 			 * to hold all these pages
-@@ -3364,7 +3364,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		}
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
--	} while (get_resync_pages(biolist)->idx < RESYNC_PAGES);
-+	} while (page_idx++ < RESYNC_PAGES);
- 	r10_bio->sectors = nr_sectors;
- 
- 	while (biolist) {
--- 
-2.9.4
+This look ok, but I think that whole chunk of code should just go
+away - adding a lookup_bdev and resulting mess just for a slightly
+different error message is just insane.
