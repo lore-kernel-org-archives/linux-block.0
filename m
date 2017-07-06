@@ -1,78 +1,36 @@
-Return-Path: <i@coly.li>
-Subject: Re: [PATCH 16/19] bcache: increase the number of open buckets
-To: bcache@lists.ewheeler.net, linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org, hch@infradead.org, axboe@kernel.dk,
- Tang Junhui <tang.junhui@zte.com.cn>
-References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
- <1498855388-16990-16-git-send-email-bcache@lists.ewheeler.net>
-From: Coly Li <i@coly.li>
-Message-ID: <82ceac54-48b2-853c-a284-7161869853a7@coly.li>
-Date: Thu, 13 Jul 2017 17:56:45 +0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtp2.it.da.ut.ee ([193.40.5.67]:50117 "EHLO smtp2.it.da.ut.ee"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751011AbdGFJzI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Jul 2017 05:55:08 -0400
+Date: Thu, 6 Jul 2017 12:55:04 +0300 (EEST)
+From: Meelis Roos <mroos@linux.ee>
+To: Christoph Hellwig <hch@infradead.org>
+cc: Linux Kernel list <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: OOPS from cciss_ioctl in 4.12+git
+In-Reply-To: <20170705225134.GA31786@infradead.org>
+Message-ID: <alpine.LRH.2.20.1707061236010.6514@math.ut.ee>
+References: <alpine.LRH.2.20.1707051555130.20086@math.ut.ee> <20170705225134.GA31786@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <1498855388-16990-16-git-send-email-bcache@lists.ewheeler.net>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 2017/7/1 上午4:43, bcache@lists.ewheeler.net wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
+> Hi Meelis,
 > 
-> In currently, we only alloc 6 open buckets for each cache set,
-> but in usually, we always attach about 10 or so backend devices for
-> each cache set, and the each bcache device are always accessed by
-> about 10 or so threads in top application layer. So 6 open buckets
-> are too few, It has led to that each of the same thread write data
-> to different buckets, which would cause low efficiency write-back,
-> and also cause buckets inefficient, and would be Very easy to run
-> out of.
-> 
-> I add debug message in bch_open_buckets_alloc() to print alloc bucket
-> info, and test with ten bcache devices with a cache set, and each
-> bcache device is accessed by ten threads.
-> 
-> From the debug message, we can see that, after the modification, One
-> bucket is more likely to assign to the same thread, and the data from
-> the same thread are more likely to write the same bucket. Usually the
-> same thread always write/read the same backend device, so it is good
-> for write-back and also promote the usage efficiency of buckets.
-> 
-> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> can you try the patch below?
 
-Nice catch for performance !
+Yes, the OOPS is gone and everything seems to be working.
 
-Reviewed-by: Coly Li <colyli@suse.de>
+> Also we're trying to move people away from the cciss driver, can you
+> check if the hpsa SCSI driver works for you as well?
 
-Thanks.
+I have older adapter:
 
+Compaq Computer Corporation Smart Array 64xx [0e11:0046] (rev 01)
 
-> ---
->  drivers/md/bcache/alloc.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-> index ca4abe1..cacbe2d 100644
-> --- a/drivers/md/bcache/alloc.c
-> +++ b/drivers/md/bcache/alloc.c
-> @@ -68,6 +68,8 @@
->  #include <linux/random.h>
->  #include <trace/events/bcache.h>
->  
-> +#define MAX_OPEN_BUCKETS 128
-> +
->  /* Bucket heap / gen */
->  
->  uint8_t bch_inc_gen(struct cache *ca, struct bucket *b)
-> @@ -671,7 +673,7 @@ int bch_open_buckets_alloc(struct cache_set *c)
->  
->  	spin_lock_init(&c->data_bucket_lock);
->  
-> -	for (i = 0; i < 6; i++) {
-> +	for (i = 0; i < MAX_OPEN_BUCKETS; i++) {
->  		struct open_bucket *b = kzalloc(sizeof(*b), GFP_KERNEL);
->  		if (!b)
->  			return -ENOMEM;
-> 
-
+That does not seem to be supported by hpsa AFAICS.
 
 -- 
-Coly Li
+Meelis Roos (mroos@linux.ee)
