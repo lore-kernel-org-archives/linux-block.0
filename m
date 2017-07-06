@@ -1,38 +1,17 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <hch@lst.de>
+Date: Thu, 6 Jul 2017 17:28:55 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH v3] block: Fix __blkdev_issue_zeroout loop
-To: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
+Message-ID: <20170706152855.GB2160@lst.de>
 References: <20170706112115.616-1-damien.lemoal@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <f0c6a1ea-8396-b65b-c88f-9785edf57550@kernel.dk>
-Date: Thu, 6 Jul 2017 09:48:52 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170706112115.616-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 07/06/2017 05:21 AM, Damien Le Moal wrote:
-> The BIO issuing loop in __blkdev_issue_zeroout() is allocating BIOs
-> with a maximum number of bvec (pages) equal to
-> 
-> min(nr_sects, (sector_t)BIO_MAX_PAGES)
-> 
-> This works since the requested number of bvecs will always be limited
-> to the absolute maximum number supported (BIO_MAX_PAGES), but this is
-> ineficient as too many bvec entries may be requested due to the
-> different units being used in the min() operation (number of sectors vs
-> number of pages).
-> To fix this, introduce the helper __blkdev_sectors_to_bio_pages() to
-> correctly calculate the number of bvecs for zeroout BIOs as the issuing
-> loop progresses. The calculation is done using consistent units and
-> makes sure that the number of pages return is at least 1 (for cases
-> where the number of sectors is less that the number of sectors in
-> a page).
-> 
-> Also remove a trailing space after the bit shift in the internal loop
-> min() call.
+Looks good,
 
-Thanks, added for 4.13.
-
--- 
-Jens Axboe
+Reviewed-by: Christoph Hellwig <hch@lst.de>
