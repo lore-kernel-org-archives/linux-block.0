@@ -1,78 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:54271 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750970AbdGFPAr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jul 2017 11:00:47 -0400
+Return-Path: <maxg@mellanox.com>
+Subject: Re: [PATCH 1/1] null_blk: fix error flow for shared tags during
+ module_init
+To: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+References: <1499347489-10863-1-git-send-email-maxg@mellanox.com>
+ <636382e7-4413-6695-7f11-8b6a0ca1a80b@kernel.dk>
 From: Max Gurtovoy <maxg@mellanox.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH v2 1/1] null_blk: fix error flow for shared tags during module_init
-Date: Thu,  6 Jul 2017 18:00:07 +0300
-Message-Id: <1499353207-32376-1-git-send-email-maxg@mellanox.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Message-ID: <1ec6cce9-0e4b-fb2b-3562-d744d26e38d5@mellanox.com>
+Date: Thu, 6 Jul 2017 17:32:25 +0300
+MIME-Version: 1.0
+In-Reply-To: <636382e7-4413-6695-7f11-8b6a0ca1a80b@kernel.dk>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Return-Path: maxg@mellanox.com
+List-ID: <linux-block@vger.kernel.org>
 
-In case we use shared tags feature, blk_mq_alloc_tag_set might fail
-during module initialization. In that case, fail the load with the
-suitble error code. Also move the tagset initialization process after
-defining the amount of submition queues.
 
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
----
 
-Changes from v1:
-- fail module loading in case of tagset initialization failure
-- call blk_mq_free_tag_set in error flow
+On 7/6/2017 5:02 PM, Jens Axboe wrote:
+> On 07/06/2017 07:24 AM, Max Gurtovoy wrote:
+>> In case we use shared tags feature, blk_mq_alloc_tag_set might fail
+>> during module initialization. Check the return value and default to run
+>> without shared tag set before continuing. Also move the tagset
+>> initialization process after defining the amount of submition queues.
+>
+> Fail the load instead. For two reasons:
+>
+> 1) We could be loading to test this explicitly. null_blk isn't a regular
+>    driver, it's not like we're bringing up the system on this thing.
+>    Hence I feel it's more important that it loads with what we asked for,
+>    or not load at all.
+>
+> 2) If initializing one tag set fails, the unshared case will surely
+>    fail too.
+>
 
----
- drivers/block/null_blk.c |   18 +++++++++++++-----
- 1 files changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 71f4422..85c24ca 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -844,9 +844,6 @@ static int __init null_init(void)
- 		queue_mode = NULL_Q_MQ;
- 	}
- 
--	if (queue_mode == NULL_Q_MQ && shared_tags)
--		null_init_tag_set(&tag_set);
--
- 	if (queue_mode == NULL_Q_MQ && use_per_node_hctx) {
- 		if (submit_queues < nr_online_nodes) {
- 			pr_warn("null_blk: submit_queues param is set to %u.",
-@@ -858,11 +855,19 @@ static int __init null_init(void)
- 	else if (!submit_queues)
- 		submit_queues = 1;
- 
-+	if (queue_mode == NULL_Q_MQ && shared_tags) {
-+		ret = null_init_tag_set(&tag_set);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	mutex_init(&lock);
- 
- 	null_major = register_blkdev(0, "nullb");
--	if (null_major < 0)
--		return null_major;
-+	if (null_major < 0) {
-+		ret = null_major;
-+		goto err_tagset;
-+	}
- 
- 	if (use_lightnvm) {
- 		ppa_cache = kmem_cache_create("ppa_cache", 64 * sizeof(u64),
-@@ -891,6 +896,9 @@ static int __init null_init(void)
- 	kmem_cache_destroy(ppa_cache);
- err_ppa:
- 	unregister_blkdev(null_major, "nullb");
-+err_tagset:
-+	if (queue_mode == NULL_Q_MQ && shared_tags)
-+		blk_mq_free_tag_set(&tag_set);
- 	return ret;
- }
- 
--- 
-1.7.1
+Ok. I'll send V2 version soon.
