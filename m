@@ -1,28 +1,85 @@
-Return-Path: <mgorman@suse.de>
-Date: Fri, 7 Jul 2017 11:08:15 +0100
-From: Mel Gorman <mgorman@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: viro@zeniv.linux.org.uk, axboe@kernel.dk,
-	Milosz Tanski <milosz@adfin.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>, Volker.Lendecke@sernet.de,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/4] fs: pass iocb to do_generic_file_read
-Message-ID: <20170707100815.utah3a4v3fki6kys@suse.de>
+Return-Path: <BATV+49f9428214963ec94ced+5065+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: viro@zeniv.linux.org.uk,
+	axboe@kernel.dk
+Cc: Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>,
+	mgorman@suse.de,
+	Volker.Lendecke@sernet.de,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/4] fs: pass iocb to do_generic_file_read
+Date: Thu,  6 Jul 2017 08:30:16 -0700
+Message-Id: <20170706153019.11645-2-hch@lst.de>
+In-Reply-To: <20170706153019.11645-1-hch@lst.de>
 References: <20170706153019.11645-1-hch@lst.de>
- <20170706153019.11645-2-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-In-Reply-To: <20170706153019.11645-2-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jul 06, 2017 at 08:30:16AM -0700, Christoph Hellwig wrote:
-> And rename it to the more descriptive generic_file_buffered_read while
-> at it.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+And rename it to the more descriptive generic_file_buffered_read while
+at it.
 
-Acked-by: Mel Gorman <mgorman@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ mm/filemap.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/mm/filemap.c b/mm/filemap.c
+index aea58e983a73..9865350d6b89 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1792,9 +1792,8 @@ static void shrink_readahead_size_eio(struct file *filp,
+ }
+ 
+ /**
+- * do_generic_file_read - generic file read routine
+- * @filp:	the file to read
+- * @ppos:	current file position
++ * generic_file_buffered_read - generic file read routine
++ * @iocb:	the iocb to read
+  * @iter:	data destination
+  * @written:	already copied
+  *
+@@ -1804,12 +1803,14 @@ static void shrink_readahead_size_eio(struct file *filp,
+  * This is really ugly. But the goto's actually try to clarify some
+  * of the logic when it comes to error handling etc.
+  */
+-static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
++static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+ 		struct iov_iter *iter, ssize_t written)
+ {
++	struct file *filp = iocb->ki_filp;
+ 	struct address_space *mapping = filp->f_mapping;
+ 	struct inode *inode = mapping->host;
+ 	struct file_ra_state *ra = &filp->f_ra;
++	loff_t *ppos = &iocb->ki_pos;
+ 	pgoff_t index;
+ 	pgoff_t last_index;
+ 	pgoff_t prev_index;
+@@ -2057,14 +2058,14 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ ssize_t
+ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ {
+-	struct file *file = iocb->ki_filp;
+-	ssize_t retval = 0;
+ 	size_t count = iov_iter_count(iter);
++	ssize_t retval = 0;
+ 
+ 	if (!count)
+ 		goto out; /* skip atime */
+ 
+ 	if (iocb->ki_flags & IOCB_DIRECT) {
++		struct file *file = iocb->ki_filp;
+ 		struct address_space *mapping = file->f_mapping;
+ 		struct inode *inode = mapping->host;
+ 		loff_t size;
+@@ -2105,7 +2106,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 			goto out;
+ 	}
+ 
+-	retval = do_generic_file_read(file, &iocb->ki_pos, iter, retval);
++	retval = generic_file_buffered_read(iocb, iter, retval);
+ out:
+ 	return retval;
+ }
 -- 
-Mel Gorman
-SUSE Labs
+2.11.0
