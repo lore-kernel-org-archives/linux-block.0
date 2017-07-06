@@ -1,198 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46093 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751472AbdGZX6h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2017 19:58:37 -0400
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
-        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 5/9] md: raid10 nowait support
-Date: Wed, 26 Jul 2017 18:58:02 -0500
-Message-Id: <20170726235806.12148-6-rgoldwyn@suse.de>
-In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3] block: Fix __blkdev_issue_zeroout loop
+To: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20170706112115.616-1-damien.lemoal@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f0c6a1ea-8396-b65b-c88f-9785edf57550@kernel.dk>
+Date: Thu, 6 Jul 2017 09:48:52 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170706112115.616-1-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On 07/06/2017 05:21 AM, Damien Le Moal wrote:
+> The BIO issuing loop in __blkdev_issue_zeroout() is allocating BIOs
+> with a maximum number of bvec (pages) equal to
+> 
+> min(nr_sects, (sector_t)BIO_MAX_PAGES)
+> 
+> This works since the requested number of bvecs will always be limited
+> to the absolute maximum number supported (BIO_MAX_PAGES), but this is
+> ineficient as too many bvec entries may be requested due to the
+> different units being used in the min() operation (number of sectors vs
+> number of pages).
+> To fix this, introduce the helper __blkdev_sectors_to_bio_pages() to
+> correctly calculate the number of bvecs for zeroout BIOs as the issuing
+> loop progresses. The calculation is done using consistent units and
+> makes sure that the number of pages return is at least 1 (for cases
+> where the number of sectors is less that the number of sectors in
+> a page).
+> 
+> Also remove a trailing space after the bit shift in the internal loop
+> min() call.
 
-Bail and status to EAGAIN if raid10 is going to wait for:
- + barriers
- + reshape operation
- + Too many queued requests
+Thanks, added for 4.13.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- drivers/md/raid10.c | 62 ++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 47 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 5026e7ad51d3..6d80438c5040 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -978,8 +978,9 @@ static void lower_barrier(struct r10conf *conf)
- 	wake_up(&conf->wait_barrier);
- }
- 
--static void wait_barrier(struct r10conf *conf)
-+static bool wait_barrier(struct r10conf *conf, bool nowait)
- {
-+	bool ret = true;
- 	spin_lock_irq(&conf->resync_lock);
- 	if (conf->barrier) {
- 		conf->nr_waiting++;
-@@ -993,19 +994,23 @@ static void wait_barrier(struct r10conf *conf)
- 		 * count down.
- 		 */
- 		raid10_log(conf->mddev, "wait barrier");
--		wait_event_lock_irq(conf->wait_barrier,
--				    !conf->barrier ||
--				    (atomic_read(&conf->nr_pending) &&
--				     current->bio_list &&
--				     (!bio_list_empty(&current->bio_list[0]) ||
--				      !bio_list_empty(&current->bio_list[1]))),
--				    conf->resync_lock);
-+		if (!nowait)
-+			wait_event_lock_irq(conf->wait_barrier,
-+					    !conf->barrier ||
-+				            (atomic_read(&conf->nr_pending) &&
-+				             current->bio_list &&
-+				             (!bio_list_empty(&current->bio_list[0]) ||
-+				              !bio_list_empty(&current->bio_list[1]))),
-+					    conf->resync_lock);
-+		else
-+			ret = false;
- 		conf->nr_waiting--;
- 		if (!conf->nr_waiting)
- 			wake_up(&conf->wait_barrier);
- 	}
- 	atomic_inc(&conf->nr_pending);
- 	spin_unlock_irq(&conf->resync_lock);
-+	return ret;
- }
- 
- static void allow_barrier(struct r10conf *conf)
-@@ -1158,7 +1163,10 @@ static void raid10_read_request(struct mddev *mddev, struct bio *bio,
- 	 * thread has put up a bar for new requests.
- 	 * Continue immediately if no resync is active currently.
- 	 */
--	wait_barrier(conf);
-+	if (!wait_barrier(conf, bio->bi_opf & REQ_NOWAIT)) {
-+		bio_wouldblock_error(bio);
-+		return;
-+	}
- 
- 	sectors = r10_bio->sectors;
- 	while (test_bit(MD_RECOVERY_RESHAPE, &mddev->recovery) &&
-@@ -1169,12 +1177,16 @@ static void raid10_read_request(struct mddev *mddev, struct bio *bio,
- 		 * pass
- 		 */
- 		raid10_log(conf->mddev, "wait reshape");
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
- 		allow_barrier(conf);
- 		wait_event(conf->wait_barrier,
- 			   conf->reshape_progress <= bio->bi_iter.bi_sector ||
- 			   conf->reshape_progress >= bio->bi_iter.bi_sector +
- 			   sectors);
--		wait_barrier(conf);
-+		wait_barrier(conf, false);
- 	}
- 
- 	rdev = read_balance(conf, r10_bio, &max_sectors);
-@@ -1308,7 +1320,10 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
- 	 * thread has put up a bar for new requests.
- 	 * Continue immediately if no resync is active currently.
- 	 */
--	wait_barrier(conf);
-+	if (!wait_barrier(conf, bio->bi_opf & REQ_NOWAIT)) {
-+		bio_wouldblock_error(bio);
-+		return;
-+	}
- 
- 	sectors = r10_bio->sectors;
- 	while (test_bit(MD_RECOVERY_RESHAPE, &mddev->recovery) &&
-@@ -1319,12 +1334,16 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
- 		 * pass
- 		 */
- 		raid10_log(conf->mddev, "wait reshape");
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
- 		allow_barrier(conf);
- 		wait_event(conf->wait_barrier,
- 			   conf->reshape_progress <= bio->bi_iter.bi_sector ||
- 			   conf->reshape_progress >= bio->bi_iter.bi_sector +
- 			   sectors);
--		wait_barrier(conf);
-+		wait_barrier(conf, false);
- 	}
- 
- 	if (test_bit(MD_RECOVERY_RESHAPE, &mddev->recovery) &&
-@@ -1339,6 +1358,10 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
- 			      BIT(MD_SB_CHANGE_DEVS) | BIT(MD_SB_CHANGE_PENDING));
- 		md_wakeup_thread(mddev->thread);
- 		raid10_log(conf->mddev, "wait reshape metadata");
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
- 		wait_event(mddev->sb_wait,
- 			   !test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags));
- 
-@@ -1348,6 +1371,10 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
- 	if (conf->pending_count >= max_queued_requests) {
- 		md_wakeup_thread(mddev->thread);
- 		raid10_log(mddev, "wait queued");
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
- 		wait_event(conf->wait_barrier,
- 			   conf->pending_count < max_queued_requests);
- 	}
-@@ -1454,6 +1481,11 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
- 		int j;
- 		int d;
- 
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
-+
- 		for (j = 0; j < i; j++) {
- 			if (r10_bio->devs[j].bio) {
- 				d = r10_bio->devs[j].devnum;
-@@ -1474,7 +1506,7 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
- 		allow_barrier(conf);
- 		raid10_log(conf->mddev, "wait rdev %d blocked", blocked_rdev->raid_disk);
- 		md_wait_for_blocked_rdev(blocked_rdev, mddev);
--		wait_barrier(conf);
-+		wait_barrier(conf, false);
- 		goto retry_write;
- 	}
- 
-@@ -1703,7 +1735,7 @@ static void print_conf(struct r10conf *conf)
- 
- static void close_sync(struct r10conf *conf)
- {
--	wait_barrier(conf);
-+	wait_barrier(conf, false);
- 	allow_barrier(conf);
- 
- 	mempool_destroy(conf->r10buf_pool);
-@@ -4347,7 +4379,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 	if (need_flush ||
- 	    time_after(jiffies, conf->reshape_checkpoint + 10*HZ)) {
- 		/* Need to update reshape_position in metadata */
--		wait_barrier(conf);
-+		wait_barrier(conf, false);
- 		mddev->reshape_position = conf->reshape_progress;
- 		if (mddev->reshape_backwards)
- 			mddev->curr_resync_completed = raid10_size(mddev, 0, 0)
 -- 
-2.12.3
+Jens Axboe
