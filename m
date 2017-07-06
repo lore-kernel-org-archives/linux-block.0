@@ -1,33 +1,51 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 1/1] null_blk: fix error flow for shared tags during
- module_init
-To: Max Gurtovoy <maxg@mellanox.com>, linux-block@vger.kernel.org
-References: <1499347489-10863-1-git-send-email-maxg@mellanox.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <636382e7-4413-6695-7f11-8b6a0ca1a80b@kernel.dk>
-Date: Thu, 6 Jul 2017 08:02:06 -0600
-MIME-Version: 1.0
-In-Reply-To: <1499347489-10863-1-git-send-email-maxg@mellanox.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <maxg@mellanox.com>
+From: Max Gurtovoy <maxg@mellanox.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org
+Cc: Max Gurtovoy <maxg@mellanox.com>
+Subject: [PATCH 1/1] null_blk: fix error flow for shared tags during module_init
+Date: Thu,  6 Jul 2017 16:24:49 +0300
+Message-Id: <1499347489-10863-1-git-send-email-maxg@mellanox.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 07/06/2017 07:24 AM, Max Gurtovoy wrote:
-> In case we use shared tags feature, blk_mq_alloc_tag_set might fail
-> during module initialization. Check the return value and default to run
-> without shared tag set before continuing. Also move the tagset
-> initialization process after defining the amount of submition queues.
+In case we use shared tags feature, blk_mq_alloc_tag_set might fail
+during module initialization. Check the return value and default to run
+without shared tag set before continuing. Also move the tagset
+initialization process after defining the amount of submition queues.
 
-Fail the load instead. For two reasons:
+Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+---
+ drivers/block/null_blk.c |   12 +++++++++---
+ 1 files changed, 9 insertions(+), 3 deletions(-)
 
-1) We could be loading to test this explicitly. null_blk isn't a regular
-   driver, it's not like we're bringing up the system on this thing.
-   Hence I feel it's more important that it loads with what we asked for,
-   or not load at all.
-
-2) If initializing one tag set fails, the unshared case will surely
-   fail too.
-
-
-
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 71f4422..0b7e7e1 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -844,9 +844,6 @@ static int __init null_init(void)
+ 		queue_mode = NULL_Q_MQ;
+ 	}
+ 
+-	if (queue_mode == NULL_Q_MQ && shared_tags)
+-		null_init_tag_set(&tag_set);
+-
+ 	if (queue_mode == NULL_Q_MQ && use_per_node_hctx) {
+ 		if (submit_queues < nr_online_nodes) {
+ 			pr_warn("null_blk: submit_queues param is set to %u.",
+@@ -858,6 +855,15 @@ static int __init null_init(void)
+ 	else if (!submit_queues)
+ 		submit_queues = 1;
+ 
++	if (queue_mode == NULL_Q_MQ && shared_tags) {
++		ret = null_init_tag_set(&tag_set);
++		if (ret) {
++			pr_warn("null_blk: Can't use shared tags %d\n", ret);
++			pr_warn("null_blk: defaults to non shared tags\n");
++			shared_tags = false;
++		}
++	}
++
+ 	mutex_init(&lock);
+ 
+ 	null_major = register_blkdev(0, "nullb");
 -- 
-Jens Axboe
+1.7.1
