@@ -1,14 +1,14 @@
-Return-Path: <bo.li.liu@oracle.com>
-Date: Mon, 10 Jul 2017 16:00:10 -0700
-From: Liu Bo <bo.li.liu@oracle.com>
+Return-Path: <dsterba@suse.cz>
+Date: Fri, 7 Jul 2017 18:15:10 +0200
+From: David Sterba <dsterba@suse.cz>
 To: Goldwyn Rodrigues <rgoldwyn@suse.de>
 Cc: linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
-        markus@trippelsdorf.de, linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        dsterba@suse.com, marc.c.dionne@gmail.com,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
+	markus@trippelsdorf.de, linux-kernel@vger.kernel.org,
+	axboe@kernel.dk, dsterba@suse.com, marc.c.dionne@gmail.com,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
 Subject: Re: [PATCH v2] btrfs: Correct assignment of pos
-Message-ID: <20170710230010.GC20647@lim.localdomain>
-Reply-To: bo.li.liu@oracle.com
+Message-ID: <20170707161510.GJ2866@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
 References: <20170705033307.8213-1-rgoldwyn@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -34,60 +34,5 @@ On Tue, Jul 04, 2017 at 10:33:07PM -0500, Goldwyn Rodrigues wrote:
 > 
 > Fixes: edf064e7c6fe ("btrfs: nowait aio support")
 > Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> ---
->  fs/btrfs/file.c | 26 ++++++++++++++------------
->  1 file changed, 14 insertions(+), 12 deletions(-)
-> 
-> diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-> index 59e2dccdf75b..ad53832838b5 100644
-> --- a/fs/btrfs/file.c
-> +++ b/fs/btrfs/file.c
-> @@ -1875,16 +1875,25 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
->  	ssize_t num_written = 0;
->  	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
->  	ssize_t err;
-> -	loff_t pos = iocb->ki_pos;
-> +	loff_t pos;
->  	size_t count = iov_iter_count(from);
->  	loff_t oldsize;
->  	int clean_page = 0;
->  
-> -	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-> -			(iocb->ki_flags & IOCB_DIRECT)) {
-> -		/* Don't sleep on inode rwsem */
-> -		if (!inode_trylock(inode))
-> +	if (!inode_trylock(inode)) {
-> +		if (iocb->ki_flags & IOCB_NOWAIT)
->  			return -EAGAIN;
-> +		inode_lock(inode);
-> +	}
-> +
-> +	err = generic_write_checks(iocb, from);
-> +	if (err <= 0) {
-> +		inode_unlock(inode);
-> +		return err;
-> +	}
-> +
-> +	pos = iocb->ki_pos;
-> +	if (iocb->ki_flags & IOCB_NOWAIT) {
->  		/*
->  		 * We will allocate space in case nodatacow is not set,
->  		 * so bail
-> @@ -1895,13 +1904,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
->  			inode_unlock(inode);
->  			return -EAGAIN;
->  		}
-> -	} else
-> -		inode_lock(inode);
-> -
-> -	err = generic_write_checks(iocb, from);
-> -	if (err <= 0) {
-> -		inode_unlock(inode);
-> -		return err;
->  	}
->  
->  	current->backing_dev_info = inode_to_bdi(inode);
 
-Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
-
--liubo
+Acked-by: David Sterba <dsterba@suse.com>
