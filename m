@@ -1,67 +1,59 @@
-Return-Path: <don.brace@microsemi.com>
-From: Don Brace <don.brace@microsemi.com>
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, "Christoph
- Hellwig" <hch@infradead.org>, Meelis Roos <mroos@linux.ee>
-CC: Linux Kernel list <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Scott Benesh
-	<scott.benesh@microsemi.com>, Scott Teel <scott.teel@microsemi.com>, "Kevin
- Barnett" <kevin.barnett@microsemi.com>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>
-Subject: RE: device support in hpasa, was: Re: OOPS from cciss_ioctl in
+Return-Path: <hare@suse.de>
+Subject: Re: device support in hpasa, was: Re: OOPS from cciss_ioctl in
  4.12+git
-Date: Fri, 7 Jul 2017 19:15:58 +0000
-Message-ID: <4993A297653ECB4581FA5C3C31323D19533CD866@avsrvexchmbx2.microsemi.net>
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+ Meelis Roos <mroos@linux.ee>
+Cc: Linux Kernel list <linux-kernel@vger.kernel.org>,
+ linux-block@vger.kernel.org, Don Brace <don.brace@microsemi.com>,
+ Scott Benesh <scott.benesh@microsemi.com>,
+ Scott Teel <scott.teel@microsemi.com>,
+ Kevin Barnett <kevin.barnett@microsemi.com>, linux-scsi@vger.kernel.org
 References: <alpine.LRH.2.20.1707051555130.20086@math.ut.ee>
  <20170705225134.GA31786@infradead.org>
  <alpine.LRH.2.20.1707061236010.6514@math.ut.ee>
  <20170707150042.GA15445@infradead.org>
  <799cf0d6-658d-4124-1ba0-3962671e3f1e@kernel.dk>
- <248a8eed-84b2-ddbf-793b-76cfdf9f6f21@suse.de>
-In-Reply-To: <248a8eed-84b2-ddbf-793b-76cfdf9f6f21@suse.de>
-Content-Type: text/plain; charset="utf-8"
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <248a8eed-84b2-ddbf-793b-76cfdf9f6f21@suse.de>
+Date: Fri, 7 Jul 2017 18:05:16 +0200
 MIME-Version: 1.0
-Return-Path: don.brace@microsemi.com
+In-Reply-To: <799cf0d6-658d-4124-1ba0-3962671e3f1e@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBIYW5uZXMgUmVpbmVja2UgW21h
-aWx0bzpoYXJlQHN1c2UuZGVdDQo+IFNlbnQ6IEZyaWRheSwgSnVseSAwNywgMjAxNyAxMTowNSBB
-TQ0KPiBUbzogSmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRrPjsgQ2hyaXN0b3BoIEhlbGx3aWcN
-Cj4gPGhjaEBpbmZyYWRlYWQub3JnPjsgTWVlbGlzIFJvb3MgPG1yb29zQGxpbnV4LmVlPg0KPiBD
-YzogTGludXggS2VybmVsIGxpc3QgPGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+OyBsaW51
-eC0NCj4gYmxvY2tAdmdlci5rZXJuZWwub3JnOyBEb24gQnJhY2UgPGRvbi5icmFjZUBtaWNyb3Nl
-bWkuY29tPjsgU2NvdHQNCj4gQmVuZXNoIDxzY290dC5iZW5lc2hAbWljcm9zZW1pLmNvbT47IFNj
-b3R0IFRlZWwNCj4gPHNjb3R0LnRlZWxAbWljcm9zZW1pLmNvbT47IEtldmluIEJhcm5ldHQNCj4g
-PGtldmluLmJhcm5ldHRAbWljcm9zZW1pLmNvbT47IGxpbnV4LXNjc2lAdmdlci5rZXJuZWwub3Jn
-DQo+IFN1YmplY3Q6IFJlOiBkZXZpY2Ugc3VwcG9ydCBpbiBocGFzYSwgd2FzOiBSZTogT09QUyBm
-cm9tIGNjaXNzX2lvY3RsIGluDQo+IDQuMTIrZ2l0DQo+IA0KPiBFWFRFUk5BTCBFTUFJTA0KPiAN
-Cj4gDQo+IE9uIDA3LzA3LzIwMTcgMDU6MDMgUE0sIEplbnMgQXhib2Ugd3JvdGU6DQo+ID4gT24g
-MDcvMDcvMjAxNyAwOTowMCBBTSwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+ID4+IE9uIFRo
-dSwgSnVsIDA2LCAyMDE3IGF0IDEyOjU1OjA0UE0gKzAzMDAsIE1lZWxpcyBSb29zIHdyb3RlOg0K
-PiA+Pj4+IEFsc28gd2UncmUgdHJ5aW5nIHRvIG1vdmUgcGVvcGxlIGF3YXkgZnJvbSB0aGUgY2Np
-c3MgZHJpdmVyLCBjYW4geW91DQo+ID4+Pj4gY2hlY2sgaWYgdGhlIGhwc2EgU0NTSSBkcml2ZXIg
-d29ya3MgZm9yIHlvdSBhcyB3ZWxsPw0KPiA+Pj4NCj4gPj4+IEkgaGF2ZSBvbGRlciBhZGFwdGVy
-Og0KPiA+Pj4NCj4gPj4+IENvbXBhcSBDb21wdXRlciBDb3Jwb3JhdGlvbiBTbWFydCBBcnJheSA2
-NHh4IFswZTExOjAwNDZdIChyZXYgMDEpDQo+ID4+Pg0KPiA+Pj4gVGhhdCBkb2VzIG5vdCBzZWVt
-IHRvIGJlIHN1cHBvcnRlZCBieSBocHNhIEFGQUlDUy4NCj4gPj4NCj4gPj4gTG9va3MgbGlrZS4g
-IEFsdGhvdWdoIGhwc2EgaGFzIHN1cHBvcnQgZm9yIHZhcmlvdXMgU0E1IGNvbnRyb2xsZXJzDQo+
-ID4+IGl0IHNlZW1zIGxpa2UgaXQgZGVjaWRlZCB0byBza2lwIGFsbCBDb21wYXEgYnJhbmRlZCBj
-b250cm9sbGVycy4NCj4gPj4NCj4gPj4gQXMgZmFyIGFzIEkgY2FuIHRlbGwgd2UgY291bGQgc2lt
-cGx5IGFkZCBzdXBwb3J0IGZvciB0aG9zZSB0bw0KPiA+PiBocHNhLiAgQ2NpbmcgaHBzYSBmb2xr
-cyB0byBmaWd1cmUgb3V0IGlmIHRoYXQncyB0aGUgY2FzZS4NCj4gPg0KPiA+IFByZXR0eSBzdXJl
-IEhhbm5lcyBoYWQgYSBwYXRjaCBoZSB0ZXN0ZWQgZm9yIHRoYXQsIGhlIHRhbGtlZCBhYm91dA0K
-PiA+IHRoYXQgYmFjayBhdCBMU0ZNTSBlYXJsaWVyIHRoaXMgeWVhci4gSGFubmVzPw0KPiA+DQo+
-IE9oLCBJIGRvLg0KPiBocHNhIGlzIHdvcmtpbmcgaGFwcGlseSBvbiBTTEVTIGZvciBfYWxsXyBT
-bWFydEFycmF5IGNvbnRyb2xsZXJzLg0KPiBZb3UgbmVlZCB0byBlbmFibGUgJ2hwc2FfYWxsb3df
-YW55PTEnLCB0aG91Z2guDQo+IEJ1dCBJJ20gcGVyZmVjdGx5IGhhcHB5IHdpdGggbWFraW5nIHRo
-YXQgdGhlIGRlZmF1bHQgYW5kIGRyb3AgY2Npc3MNCj4gY29tcGxldGVseS4NCj4gDQo+IENoZWVy
-cywNCj4gDQo+IEhhbm5lcw0KPiAtLQ0KPiBEci4gSGFubmVzIFJlaW5lY2tlICAgICAgICAgICAg
-ICAgIFRlYW1sZWFkIFN0b3JhZ2UgJiBOZXR3b3JraW5nDQo+IGhhcmVAc3VzZS5kZSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgKzQ5IDkxMSA3NDA1MyA2ODgNCj4gU1VTRSBMSU5V
-WCBHbWJILCBNYXhmZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcNCj4gR0Y6IEYuIEltZW5kw7Zy
-ZmZlciwgSi4gU21pdGhhcmQsIEouIEd1aWxkLCBELiBVcG1hbnl1LCBHLiBOb3J0b24NCj4gSFJC
-IDIxMjg0IChBRyBOw7xybmJlcmcpDQoNClRoZSA2NDAwIGNvbnRyb2xsZXJzIGFyZSBxdWl0ZSBv
-bGQgYW5kIGFyZSBubyBsb25nZXIgdGVzdGVkLiANClNvLCBpdCB3b3VsZCBiZSBuaWNlIHRvIGRl
-cHJlY2F0ZSB0aGUgY2Npc3MgZHJpdmVyLCBidXQgd2Ugd291bGQgbm90IHN1cHBvcnQgdGhvc2Ug
-Zm9ybWVybHkgY2Npc3MgZGV2aWNlcyB3aXRoIGhwc2EuDQpJIGRvIG5vdCByZWNhbGwgc2VlaW5n
-IGEgY2Npc3NfaW9jdGwgaXNzdWUsIHdoYXQgd2FzIHRoZSBpc3N1ZT8NCg0KVGhhbmtzLA0KRG9u
-IEJyYWNlDQpFU0MgLSBTbWFydCBTdG9yYWdlDQpNaWNyb3NlbWkgQ29ycG9yYXRpb24NCg0KDQo=
+On 07/07/2017 05:03 PM, Jens Axboe wrote:
+> On 07/07/2017 09:00 AM, Christoph Hellwig wrote:
+>> On Thu, Jul 06, 2017 at 12:55:04PM +0300, Meelis Roos wrote:
+>>>> Also we're trying to move people away from the cciss driver, can you
+>>>> check if the hpsa SCSI driver works for you as well?
+>>>
+>>> I have older adapter:
+>>>
+>>> Compaq Computer Corporation Smart Array 64xx [0e11:0046] (rev 01)
+>>>
+>>> That does not seem to be supported by hpsa AFAICS.
+>>
+>> Looks like.  Although hpsa has support for various SA5 controllers
+>> it seems like it decided to skip all Compaq branded controllers.
+>>
+>> As far as I can tell we could simply add support for those to
+>> hpsa.  Ccing hpsa folks to figure out if that's the case.
+> 
+> Pretty sure Hannes had a patch he tested for that, he talked about
+> that back at LSFMM earlier this year. Hannes?
+> 
+Oh, I do.
+hpsa is working happily on SLES for _all_ SmartArray controllers.
+You need to enable 'hpsa_allow_any=1', though.
+But I'm perfectly happy with making that the default and drop cciss
+completely.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
