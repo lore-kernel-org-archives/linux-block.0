@@ -1,4 +1,5 @@
-Return-Path: <hare@suse.de>
+Return-Path: <loberman@redhat.com>
+Return-Path: <loberman@redhat.com>
 Subject: Re: device support in hpasa, was: Re: OOPS from cciss_ioctl in
  4.12+git
 To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
@@ -7,21 +8,24 @@ Cc: Linux Kernel list <linux-kernel@vger.kernel.org>,
  linux-block@vger.kernel.org, Don Brace <don.brace@microsemi.com>,
  Scott Benesh <scott.benesh@microsemi.com>,
  Scott Teel <scott.teel@microsemi.com>,
- Kevin Barnett <kevin.barnett@microsemi.com>, linux-scsi@vger.kernel.org
+ Kevin Barnett <kevin.barnett@microsemi.com>, linux-scsi@vger.kernel.org,
+ Hannes Reinecke <hare@suse.de>
 References: <alpine.LRH.2.20.1707051555130.20086@math.ut.ee>
  <20170705225134.GA31786@infradead.org>
  <alpine.LRH.2.20.1707061236010.6514@math.ut.ee>
  <20170707150042.GA15445@infradead.org>
  <799cf0d6-658d-4124-1ba0-3962671e3f1e@kernel.dk>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <248a8eed-84b2-ddbf-793b-76cfdf9f6f21@suse.de>
-Date: Fri, 7 Jul 2017 18:05:16 +0200
+From: Laurence Oberman <loberman@redhat.com>
+Message-ID: <1bc9895b-bfcb-9ff5-c046-277b0d67a94e@redhat.com>
+Date: Fri, 7 Jul 2017 11:42:38 -0400
 MIME-Version: 1.0
 In-Reply-To: <799cf0d6-658d-4124-1ba0-3962671e3f1e@kernel.dk>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 07/07/2017 05:03 PM, Jens Axboe wrote:
+
+
+On 07/07/2017 11:03 AM, Jens Axboe wrote:
 > On 07/07/2017 09:00 AM, Christoph Hellwig wrote:
 >> On Thu, Jul 06, 2017 at 12:55:04PM +0300, Meelis Roos wrote:
 >>>> Also we're trying to move people away from the cciss driver, can you
@@ -42,18 +46,6 @@ On 07/07/2017 05:03 PM, Jens Axboe wrote:
 > Pretty sure Hannes had a patch he tested for that, he talked about
 > that back at LSFMM earlier this year. Hannes?
 > 
-Oh, I do.
-hpsa is working happily on SLES for _all_ SmartArray controllers.
-You need to enable 'hpsa_allow_any=1', though.
-But I'm perfectly happy with making that the default and drop cciss
-completely.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+What happens when  hpsa_allow_any=1 with the Smart Array 64xx
+It should probe.
