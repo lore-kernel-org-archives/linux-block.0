@@ -1,61 +1,74 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 1/8] nvme-rdma: quiesce/unquiesce admin_q instead of start/stop its hw queues
-Date: Wed,  5 Jul 2017 09:53:04 +0300
-Message-Id: <1499237591-15861-2-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
-References: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Fri, 7 Jul 2017 18:04:53 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH] block: add io queue depth show
+Message-ID: <20170707100453.GA11827@localhost.didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-unlike blk_mq_stop_hw_queues and blk_mq_start_stopped_hw_queues
-quiescing/unquiescing respects the submission path rcu grace.
-Also make sure to kick the requeue list when appropriate.
+show io queue depth.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- drivers/nvme/host/rdma.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ block/blk-sysfs.c      | 11 +++++++++++
+ include/linux/blkdev.h |  5 +++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index cfb22531fc16..c8bf2606ba64 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -778,7 +778,7 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
- 
- 	if (ctrl->ctrl.queue_count > 1)
- 		nvme_stop_queues(&ctrl->ctrl);
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 
- 	/* We must take care of fastfail/requeue all our inflight requests */
- 	if (ctrl->ctrl.queue_count > 1)
-@@ -791,7 +791,8 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
- 	 * queues are not a live anymore, so restart the queues to fail fast
- 	 * new IO
- 	 */
--	blk_mq_start_stopped_hw_queues(ctrl->ctrl.admin_q, true);
-+	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
-+	blk_mq_kick_requeue_list(ctrl->ctrl.admin_q);
- 	nvme_start_queues(&ctrl->ctrl);
- 
- 	nvme_rdma_reconnect_or_remove(ctrl);
-@@ -1636,9 +1637,10 @@ static void nvme_rdma_shutdown_ctrl(struct nvme_rdma_ctrl *ctrl)
- 	if (test_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[0].flags))
- 		nvme_shutdown_ctrl(&ctrl->ctrl);
- 
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
- 				nvme_cancel_request, &ctrl->ctrl);
-+	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
- 	nvme_rdma_destroy_admin_queue(ctrl);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 27aceab..66cba2b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -256,6 +256,11 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
+ 	return queue_var_show(max_hw_sectors_kb, (page));
  }
  
++static ssize_t queue_io_queue_depth_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(queue_io_queue_depth(q), (page));
++}
++
+ #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
+ static ssize_t								\
+ queue_show_##name(struct request_queue *q, char *page)			\
+@@ -678,6 +683,11 @@ static struct queue_sysfs_entry queue_wb_lat_entry = {
+ 	.store = queue_wb_lat_store,
+ };
+ 
++static struct queue_sysfs_entry queue_io_queue_depth_entry = {
++	.attr = {.name = "io_queue_depth", .mode = S_IRUGO },
++	.show = queue_io_queue_depth_show,
++};
++
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ static struct queue_sysfs_entry throtl_sample_time_entry = {
+ 	.attr = {.name = "throttle_sample_time", .mode = S_IRUGO | S_IWUSR },
+@@ -719,6 +729,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_dax_entry.attr,
+ 	&queue_wb_lat_entry.attr,
+ 	&queue_poll_delay_entry.attr,
++	&queue_io_queue_depth_entry.attr,
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	&throtl_sample_time_entry.attr,
+ #endif
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 25f6a0c..bcd0af4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1405,6 +1405,11 @@ static inline unsigned int queue_max_hw_sectors(struct request_queue *q)
+ 	return q->limits.max_hw_sectors;
+ }
+ 
++static inline unsigned int queue_io_queue_depth(struct request_queue *q)
++{
++	return q->queue_depth;
++}
++
+ static inline unsigned short queue_max_segments(struct request_queue *q)
+ {
+ 	return q->limits.max_segments;
 -- 
-2.7.4
+2.9.4
