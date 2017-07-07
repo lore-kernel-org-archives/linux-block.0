@@ -1,57 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:23676 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751882AbdG1QRz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2017 12:17:55 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>
-CC: "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "toshi.kani@hpe.com" <toshi.kani@hpe.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hch@lst.de" <hch@lst.de>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [resend PATCH v2 11/33] dm: add dax_device and dax_operations
- support
-Date: Fri, 28 Jul 2017 16:17:07 +0000
-Message-ID: <1501258623.2413.3.camel@wdc.com>
-References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
-         <149245618859.10206.13182319600260215993.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <149245618859.10206.13182319600260215993.stgit@dwillia2-desk3.amr.corp.intel.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Return-Path: <mgorman@suse.de>
+Date: Fri, 7 Jul 2017 11:23:13 +0100
+From: Mel Gorman <mgorman@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: viro@zeniv.linux.org.uk, axboe@kernel.dk,
+	Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>, Volker.Lendecke@sernet.de,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] fs: support IOCB_NOWAIT in generic_file_buffered_read
+Message-ID: <20170707102313.fnjq4iv4gq3xldl5@suse.de>
+References: <20170706153019.11645-1-hch@lst.de>
+ <20170706153019.11645-3-hch@lst.de>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-15
+In-Reply-To: <20170706153019.11645-3-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2017-04-17 at 12:09 -0700, Dan Williams wrote:
-> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-> index b7767da50c26..1de8372d9459 100644
-> --- a/drivers/md/Kconfig
-> +++ b/drivers/md/Kconfig
-> @@ -200,6 +200,7 @@ config BLK_DEV_DM_BUILTIN
->  config BLK_DEV_DM
->  	tristate "Device mapper support"
->  	select BLK_DEV_DM_BUILTIN
-> +	select DAX
->  	---help---
->  	  Device-mapper is a low level volume manager.  It works by allowing
->  	  people to specify mappings for ranges of logical sectors.  Various
+On Thu, Jul 06, 2017 at 08:30:17AM -0700, Christoph Hellwig wrote:
+> From: Milosz Tanski <milosz@adfin.com>
+> 
+> Allow generic_file_buffered_read to bail out early instead of waiting for
+> the page lock or reading a page if IOCB_NOWAIT is specified.
+> 
+> Signed-off-by: Milosz Tanski <milosz@adfin.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+> Acked-by: Sage Weil <sage@redhat.com>
 
-(replying to an e-mail of three months ago)
+Acked-by: Mel Gorman <mgorman@suse.de>
+> ---
+>  mm/filemap.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index 9865350d6b89..bb70b64ffb48 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -1843,6 +1843,8 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+>  
+>  		page = find_get_page(mapping, index);
+>  		if (!page) {
+> +			if (iocb->ki_flags & IOCB_NOWAIT)
+> +				goto would_block;
+>  			page_cache_sync_readahead(mapping,
+>  					ra, filp,
+>  					index, last_index - index);
+> @@ -1948,6 +1950,11 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+>  		continue;
+>  
+>  page_not_up_to_date:
+> +		if (iocb->ki_flags & IOCB_NOWAIT) {
+> +			put_page(page);
+> +			goto would_block;
+> +		}
+> +
 
-Hello Dan,
+This potentially could do with a comment to say that from here we will
+either block on the page lock or on the read operation but it's fairly
+obvious from context. What is potentially less obvious is that a page
+lock contention ends up here. That could be due to a read operation taking
+place in parallel but also page migrations, page scanning etc. They are all
+blocking operations but the duration could be anthing from nanoseconds to
+milliseconds. That *might* be surprising to some who notice they got EAGAIN
+on data that should be cache resident due to the page being activated on
+the LRU, being migrated etc.
 
-While building a v4.12 kernel I noticed that enabling device mapper support
-now unconditionally enables DAX. I think there are plenty of systems that u=
-se
-dm but do not need DAX. Have you considered to rework this such that instea=
-d
-of dm selecting DAX that DAX support is only enabled in dm if CONFIG_DAX is
-enabled?
+That sort of gotcha might belong in the man page but it is an implementation
+detail so maybe the man page should note that EAGAIN can occur for cache
+resident data in some circumstances.
 
-Thanks,
+I can't actually see anything wrong with the patch so...
 
-Bart.
+Acked-by: Mel Gorman <mgorman@suse.de>
+
+-- 
+Mel Gorman
+SUSE Labs
