@@ -1,58 +1,315 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 0/8] correct quiescing in several block drivers
-Date: Wed,  5 Jul 2017 09:53:03 +0300
-Message-Id: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wr0-f173.google.com ([209.85.128.173]:35525 "EHLO
+        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752115AbdGGTJA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2017 15:09:00 -0400
+Received: by mail-wr0-f173.google.com with SMTP id k67so59015900wrc.2
+        for <linux-block@vger.kernel.org>; Fri, 07 Jul 2017 12:08:59 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 1/2] lightnvm: pblk: control I/O flow also on tear down
+Date: Fri,  7 Jul 2017 21:08:52 +0200
+Message-Id: <1499454533-14907-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1499454533-14907-1-git-send-email-javier@cnexlabs.com>
+References: <1499454533-14907-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Before we either iterate on tags we must guarantee that the
-hw queues are stopped and no inflight .queue_rq is active.
-Thats what blk_mq_quiesce_queue is for, so use it where appropriate.
+When removing a pblk instance, control the write I/O flow to the
+controller as we do in the fast path.
 
-Note that before we cleanup the request queue, we must unquiesce in
-order to guarantee to not block on requests queued during quiescing.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-core.c     | 69 ++++++++++++++++++++++++++++++----------
+ drivers/lightnvm/pblk-recovery.c | 31 ++++++++++++------
+ drivers/lightnvm/pblk-write.c    | 19 ++++-------
+ drivers/lightnvm/pblk.h          |  2 ++
+ 4 files changed, 82 insertions(+), 39 deletions(-)
 
-Changes from v1:
-- dropped the xen_blockfront patch, not sure if it was helpful at all
-- Removed the requeue kick in nvme drivers while making nvme unconditionally
-  kick the requeue list when requeuing a request instead of doing so when
-  unquiescing the queues. Note that this change was a two step change to
-  keep bisection possible.
-- Fixed possible hangs with unquiescing before cleanup of the request queue
-  in mtip32xx and nvme drivers.
-- Added check that the request started in mtip32xx itration callouts.
-- collected review tags.
-
-Sagi Grimberg (8):
-  nvme-rdma: quiesce/unquiesce admin_q instead of start/stop its hw
-    queues
-  nvme-fc: quiesce/unquiesce admin_q instead of start/stop its hw queues
-  nvme-loop: quiesce/unquiesce admin_q instead of start/stop its hw
-    queues
-  nvme-pci: quiesce/unquiesce admin_q instead of start/stop its hw
-    queues
-  nvme: kick requeue list when requeueing a request instead of when
-    starting the queues
-  nbd: quiesce request queues to make sure no submissions are inflight
-  mtip32xx: quiesce request queues to make sure no submissions are
-    inflight
-  virtio_blk: quiesce/unquiesce live IO when entering PM states
-
- drivers/block/mtip32xx/mtip32xx.c | 19 +++++++++++++++----
- drivers/block/nbd.c               |  4 ++--
- drivers/block/virtio_blk.c        |  4 ++--
- drivers/nvme/host/core.c          | 19 ++-----------------
- drivers/nvme/host/fc.c            |  5 +++--
- drivers/nvme/host/pci.c           |  9 +++++----
- drivers/nvme/host/rdma.c          |  7 ++++---
- drivers/nvme/target/loop.c        |  3 ++-
- 8 files changed, 35 insertions(+), 35 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 11fe0c5b2a9c..81501644fb15 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1670,13 +1670,10 @@ void pblk_line_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 	queue_work(wq, &line_ws->ws);
+ }
+ 
+-void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+-		  unsigned long *lun_bitmap)
++static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
++			     int nr_ppas, int pos)
+ {
+-	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct nvm_geo *geo = &dev->geo;
+-	struct pblk_lun *rlun;
+-	int pos = pblk_ppa_to_pos(geo, ppa_list[0]);
++	struct pblk_lun *rlun = &pblk->luns[pos];
+ 	int ret;
+ 
+ 	/*
+@@ -1690,24 +1687,62 @@ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 		WARN_ON(ppa_list[0].g.lun != ppa_list[i].g.lun ||
+ 				ppa_list[0].g.ch != ppa_list[i].g.ch);
+ #endif
++
++	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(30000));
++	if (ret) {
++		switch (ret) {
++		case -ETIME:
++			pr_err("pblk: lun semaphore timed out\n");
++			break;
++		case -EINTR:
++			pr_err("pblk: lun semaphore timed out\n");
++			break;
++		}
++	}
++}
++
++void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct nvm_geo *geo = &dev->geo;
++	int pos = pblk_ppa_to_pos(geo, ppa_list[0]);
++
++	__pblk_down_page(pblk, ppa_list, nr_ppas, pos);
++}
++
++void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
++		  unsigned long *lun_bitmap)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct nvm_geo *geo = &dev->geo;
++	int pos = pblk_ppa_to_pos(geo, ppa_list[0]);
++
+ 	/* If the LUN has been locked for this same request, do no attempt to
+ 	 * lock it again
+ 	 */
+ 	if (test_and_set_bit(pos, lun_bitmap))
+ 		return;
+ 
++	__pblk_down_page(pblk, ppa_list, nr_ppas, pos);
++}
++
++void pblk_up_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct nvm_geo *geo = &dev->geo;
++	struct pblk_lun *rlun;
++	int pos = pblk_ppa_to_pos(geo, ppa_list[0]);
++
++#ifdef CONFIG_NVM_DEBUG
++	int i;
++
++	for (i = 1; i < nr_ppas; i++)
++		WARN_ON(ppa_list[0].g.lun != ppa_list[i].g.lun ||
++				ppa_list[0].g.ch != ppa_list[i].g.ch);
++#endif
++
+ 	rlun = &pblk->luns[pos];
+-	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(5000));
+-	if (ret) {
+-		switch (ret) {
+-		case -ETIME:
+-			pr_err("pblk: lun semaphore timed out\n");
+-			break;
+-		case -EINTR:
+-			pr_err("pblk: lun semaphore timed out\n");
+-			break;
+-		}
+-	}
++	up(&rlun->wr_sem);
+ }
+ 
+ void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 0e48d3e4e143..cb556e06673e 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -340,9 +340,14 @@ static void pblk_end_io_recov(struct nvm_rq *rqd)
+ 	struct pblk *pblk = pad_rq->pblk;
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 
+-	kref_put(&pad_rq->ref, pblk_recov_complete);
++	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
++
++	bio_put(rqd->bio);
+ 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ 	pblk_free_rqd(pblk, rqd, WRITE);
++
++	atomic_dec(&pblk->inflight_io);
++	kref_put(&pad_rq->ref, pblk_recov_complete);
+ }
+ 
+ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+@@ -385,7 +390,7 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rq_ppas = pblk_calc_secs(pblk, left_ppas, 0);
+ 	if (rq_ppas < pblk->min_write_pgs) {
+ 		pr_err("pblk: corrupted pad line %d\n", line->id);
+-		goto free_rq;
++		goto fail_free_pad;
+ 	}
+ 
+ 	rq_len = rq_ppas * geo->sec_size;
+@@ -393,7 +398,7 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL, &dma_meta_list);
+ 	if (!meta_list) {
+ 		ret = -ENOMEM;
+-		goto free_data;
++		goto fail_free_pad;
+ 	}
+ 
+ 	ppa_list = (void *)(meta_list) + pblk_dma_meta_size;
+@@ -404,9 +409,9 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 		ret = PTR_ERR(rqd);
+ 		goto fail_free_meta;
+ 	}
+-	memset(rqd, 0, pblk_w_rq_size);
+ 
+-	bio = bio_map_kern(dev->q, data, rq_len, GFP_KERNEL);
++	bio = pblk_bio_map_addr(pblk, data, rq_ppas, rq_len,
++						PBLK_VMALLOC_META, GFP_KERNEL);
+ 	if (IS_ERR(bio)) {
+ 		ret = PTR_ERR(bio);
+ 		goto fail_free_rqd;
+@@ -453,15 +458,15 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	}
+ 
+ 	kref_get(&pad_rq->ref);
++	pblk_down_page(pblk, rqd->ppa_list, rqd->nr_ppas);
+ 
+ 	ret = pblk_submit_io(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: I/O submission failed: %d\n", ret);
+-		goto free_data;
++		pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
++		goto fail_free_bio;
+ 	}
+ 
+-	atomic_dec(&pblk->inflight_io);
+-
+ 	left_line_ppas -= rq_ppas;
+ 	left_ppas -= rq_ppas;
+ 	if (left_ppas && left_line_ppas)
+@@ -475,17 +480,23 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 		ret = -ETIME;
+ 	}
+ 
++	if (!pblk_line_is_full(line))
++		pr_err("pblk: corrupted padded line: %d\n", line->id);
++
++	vfree(data);
+ free_rq:
+ 	kfree(pad_rq);
+-free_data:
+-	vfree(data);
+ 	return ret;
+ 
++fail_free_bio:
++	bio_put(bio);
+ fail_free_rqd:
+ 	pblk_free_rqd(pblk, rqd, WRITE);
+ fail_free_meta:
+ 	nvm_dev_dma_free(dev->parent, meta_list, dma_meta_list);
++fail_free_pad:
+ 	kfree(pad_rq);
++	vfree(data);
+ 	return ret;
+ }
+ 
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index d62a8f4faaf4..cc2b9414d17c 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -178,15 +178,12 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
+ {
+ 	struct pblk *pblk = rqd->private;
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct nvm_geo *geo = &dev->geo;
+ 	struct pblk_g_ctx *m_ctx = nvm_rq_to_pdu(rqd);
+ 	struct pblk_line *line = m_ctx->private;
+ 	struct pblk_emeta *emeta = line->emeta;
+-	int pos = pblk_ppa_to_pos(geo, rqd->ppa_list[0]);
+-	struct pblk_lun *rlun = &pblk->luns[pos];
+ 	int sync;
+ 
+-	up(&rlun->wr_sem);
++	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
+ 
+ 	if (rqd->error) {
+ 		pblk_log_write_err(pblk, rqd);
+@@ -203,6 +200,7 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
+ 								pblk->close_wq);
+ 
+ 	bio_put(rqd->bio);
++	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ 	pblk_free_rqd(pblk, rqd, READ);
+ 
+ 	atomic_dec(&pblk->inflight_io);
+@@ -367,7 +365,6 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_emeta *emeta = meta_line->emeta;
+ 	struct pblk_g_ctx *m_ctx;
+-	struct pblk_lun *rlun;
+ 	struct bio *bio;
+ 	struct nvm_rq *rqd;
+ 	void *data;
+@@ -411,13 +408,6 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 			rqd->ppa_list[i] = addr_to_gen_ppa(pblk, paddr, id);
+ 	}
+ 
+-	rlun = &pblk->luns[pblk_ppa_to_pos(geo, rqd->ppa_list[0])];
+-	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(5000));
+-	if (ret) {
+-		pr_err("pblk: lun semaphore timed out (%d)\n", ret);
+-		goto fail_free_bio;
+-	}
+-
+ 	emeta->mem += rq_len;
+ 	if (emeta->mem >= lm->emeta_len[0]) {
+ 		spin_lock(&l_mg->close_lock);
+@@ -427,6 +417,8 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 		spin_unlock(&l_mg->close_lock);
+ 	}
+ 
++	pblk_down_page(pblk, rqd->ppa_list, rqd->nr_ppas);
++
+ 	ret = pblk_submit_io(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: emeta I/O submission failed: %d\n", ret);
+@@ -436,10 +428,13 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	return NVM_IO_OK;
+ 
+ fail_rollback:
++	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
+ 	spin_lock(&l_mg->close_lock);
+ 	pblk_dealloc_page(pblk, meta_line, rq_ppas);
+ 	list_add(&meta_line->list, &meta_line->list);
+ 	spin_unlock(&l_mg->close_lock);
++
++	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ fail_free_bio:
+ 	if (likely(l_mg->emeta_alloc_type == PBLK_VMALLOC_META))
+ 		bio_put(bio);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 15931381348c..0c5692cc2f60 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -739,8 +739,10 @@ u64 pblk_alloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ u64 __pblk_alloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ int pblk_calc_secs(struct pblk *pblk, unsigned long secs_avail,
+ 		   unsigned long secs_to_flush);
++void pblk_up_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
+ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 		  unsigned long *lun_bitmap);
++void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
+ void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 		unsigned long *lun_bitmap);
+ void pblk_end_bio_sync(struct bio *bio);
 -- 
 2.7.4
