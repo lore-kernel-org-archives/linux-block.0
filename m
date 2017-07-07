@@ -1,60 +1,67 @@
-Return-Path: <i@coly.li>
-Subject: Re: [PATCH 03/19] bcache: do not subtract sectors_to_gc for bypassed
- IO
-To: bcache@lists.ewheeler.net, linux-block@vger.kernel.org
-Cc: linux-bcache@vger.kernel.org, hch@infradead.org, axboe@kernel.dk,
- Tang Junhui <tang.junhui@zte.com.cn>, stable@vger.kernel.org
-References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
- <1498855388-16990-3-git-send-email-bcache@lists.ewheeler.net>
-From: Coly Li <i@coly.li>
-Message-ID: <3ae4c22f-ecab-e55a-c59b-d2f95a4b6624@coly.li>
-Date: Sun, 2 Jul 2017 01:26:15 +0800
+Return-Path: <don.brace@microsemi.com>
+From: Don Brace <don.brace@microsemi.com>
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, "Christoph
+ Hellwig" <hch@infradead.org>, Meelis Roos <mroos@linux.ee>
+CC: Linux Kernel list <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Scott Benesh
+	<scott.benesh@microsemi.com>, Scott Teel <scott.teel@microsemi.com>, "Kevin
+ Barnett" <kevin.barnett@microsemi.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>
+Subject: RE: device support in hpasa, was: Re: OOPS from cciss_ioctl in
+ 4.12+git
+Date: Fri, 7 Jul 2017 19:15:58 +0000
+Message-ID: <4993A297653ECB4581FA5C3C31323D19533CD866@avsrvexchmbx2.microsemi.net>
+References: <alpine.LRH.2.20.1707051555130.20086@math.ut.ee>
+ <20170705225134.GA31786@infradead.org>
+ <alpine.LRH.2.20.1707061236010.6514@math.ut.ee>
+ <20170707150042.GA15445@infradead.org>
+ <799cf0d6-658d-4124-1ba0-3962671e3f1e@kernel.dk>
+ <248a8eed-84b2-ddbf-793b-76cfdf9f6f21@suse.de>
+In-Reply-To: <248a8eed-84b2-ddbf-793b-76cfdf9f6f21@suse.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1498855388-16990-3-git-send-email-bcache@lists.ewheeler.net>
-Content-Type: text/plain; charset=utf-8
+Return-Path: don.brace@microsemi.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 2017/7/1 上午4:42, bcache@lists.ewheeler.net wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
-> 
-> Since bypassed IOs use no bucket, so do not subtract sectors_to_gc to
-> trigger gc thread.
-> 
-> Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
-> Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
-> Cc: stable@vger.kernel.org
-
-Acked-by: Coly Li <colyli@suse.de>
-
-Thanks.
-
-> ---
->  drivers/md/bcache/request.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> index 958072a..4b413db 100644
-> --- a/drivers/md/bcache/request.c
-> +++ b/drivers/md/bcache/request.c
-> @@ -196,12 +196,12 @@ static void bch_data_insert_start(struct closure *cl)
->  	struct data_insert_op *op = container_of(cl, struct data_insert_op, cl);
->  	struct bio *bio = op->bio, *n;
->  
-> -	if (atomic_sub_return(bio_sectors(bio), &op->c->sectors_to_gc) < 0)
-> -		wake_up_gc(op->c);
-> -
->  	if (op->bypass)
->  		return bch_data_invalidate(cl);
->  
-> +	if (atomic_sub_return(bio_sectors(bio), &op->c->sectors_to_gc) < 0)
-> +		wake_up_gc(op->c);
-> +
->  	/*
->  	 * Journal writes are marked REQ_PREFLUSH; if the original write was a
->  	 * flush, it'll wait on the journal write.
-> 
-
-
--- 
-Coly Li
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBIYW5uZXMgUmVpbmVja2UgW21h
+aWx0bzpoYXJlQHN1c2UuZGVdDQo+IFNlbnQ6IEZyaWRheSwgSnVseSAwNywgMjAxNyAxMTowNSBB
+TQ0KPiBUbzogSmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRrPjsgQ2hyaXN0b3BoIEhlbGx3aWcN
+Cj4gPGhjaEBpbmZyYWRlYWQub3JnPjsgTWVlbGlzIFJvb3MgPG1yb29zQGxpbnV4LmVlPg0KPiBD
+YzogTGludXggS2VybmVsIGxpc3QgPGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+OyBsaW51
+eC0NCj4gYmxvY2tAdmdlci5rZXJuZWwub3JnOyBEb24gQnJhY2UgPGRvbi5icmFjZUBtaWNyb3Nl
+bWkuY29tPjsgU2NvdHQNCj4gQmVuZXNoIDxzY290dC5iZW5lc2hAbWljcm9zZW1pLmNvbT47IFNj
+b3R0IFRlZWwNCj4gPHNjb3R0LnRlZWxAbWljcm9zZW1pLmNvbT47IEtldmluIEJhcm5ldHQNCj4g
+PGtldmluLmJhcm5ldHRAbWljcm9zZW1pLmNvbT47IGxpbnV4LXNjc2lAdmdlci5rZXJuZWwub3Jn
+DQo+IFN1YmplY3Q6IFJlOiBkZXZpY2Ugc3VwcG9ydCBpbiBocGFzYSwgd2FzOiBSZTogT09QUyBm
+cm9tIGNjaXNzX2lvY3RsIGluDQo+IDQuMTIrZ2l0DQo+IA0KPiBFWFRFUk5BTCBFTUFJTA0KPiAN
+Cj4gDQo+IE9uIDA3LzA3LzIwMTcgMDU6MDMgUE0sIEplbnMgQXhib2Ugd3JvdGU6DQo+ID4gT24g
+MDcvMDcvMjAxNyAwOTowMCBBTSwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+ID4+IE9uIFRo
+dSwgSnVsIDA2LCAyMDE3IGF0IDEyOjU1OjA0UE0gKzAzMDAsIE1lZWxpcyBSb29zIHdyb3RlOg0K
+PiA+Pj4+IEFsc28gd2UncmUgdHJ5aW5nIHRvIG1vdmUgcGVvcGxlIGF3YXkgZnJvbSB0aGUgY2Np
+c3MgZHJpdmVyLCBjYW4geW91DQo+ID4+Pj4gY2hlY2sgaWYgdGhlIGhwc2EgU0NTSSBkcml2ZXIg
+d29ya3MgZm9yIHlvdSBhcyB3ZWxsPw0KPiA+Pj4NCj4gPj4+IEkgaGF2ZSBvbGRlciBhZGFwdGVy
+Og0KPiA+Pj4NCj4gPj4+IENvbXBhcSBDb21wdXRlciBDb3Jwb3JhdGlvbiBTbWFydCBBcnJheSA2
+NHh4IFswZTExOjAwNDZdIChyZXYgMDEpDQo+ID4+Pg0KPiA+Pj4gVGhhdCBkb2VzIG5vdCBzZWVt
+IHRvIGJlIHN1cHBvcnRlZCBieSBocHNhIEFGQUlDUy4NCj4gPj4NCj4gPj4gTG9va3MgbGlrZS4g
+IEFsdGhvdWdoIGhwc2EgaGFzIHN1cHBvcnQgZm9yIHZhcmlvdXMgU0E1IGNvbnRyb2xsZXJzDQo+
+ID4+IGl0IHNlZW1zIGxpa2UgaXQgZGVjaWRlZCB0byBza2lwIGFsbCBDb21wYXEgYnJhbmRlZCBj
+b250cm9sbGVycy4NCj4gPj4NCj4gPj4gQXMgZmFyIGFzIEkgY2FuIHRlbGwgd2UgY291bGQgc2lt
+cGx5IGFkZCBzdXBwb3J0IGZvciB0aG9zZSB0bw0KPiA+PiBocHNhLiAgQ2NpbmcgaHBzYSBmb2xr
+cyB0byBmaWd1cmUgb3V0IGlmIHRoYXQncyB0aGUgY2FzZS4NCj4gPg0KPiA+IFByZXR0eSBzdXJl
+IEhhbm5lcyBoYWQgYSBwYXRjaCBoZSB0ZXN0ZWQgZm9yIHRoYXQsIGhlIHRhbGtlZCBhYm91dA0K
+PiA+IHRoYXQgYmFjayBhdCBMU0ZNTSBlYXJsaWVyIHRoaXMgeWVhci4gSGFubmVzPw0KPiA+DQo+
+IE9oLCBJIGRvLg0KPiBocHNhIGlzIHdvcmtpbmcgaGFwcGlseSBvbiBTTEVTIGZvciBfYWxsXyBT
+bWFydEFycmF5IGNvbnRyb2xsZXJzLg0KPiBZb3UgbmVlZCB0byBlbmFibGUgJ2hwc2FfYWxsb3df
+YW55PTEnLCB0aG91Z2guDQo+IEJ1dCBJJ20gcGVyZmVjdGx5IGhhcHB5IHdpdGggbWFraW5nIHRo
+YXQgdGhlIGRlZmF1bHQgYW5kIGRyb3AgY2Npc3MNCj4gY29tcGxldGVseS4NCj4gDQo+IENoZWVy
+cywNCj4gDQo+IEhhbm5lcw0KPiAtLQ0KPiBEci4gSGFubmVzIFJlaW5lY2tlICAgICAgICAgICAg
+ICAgIFRlYW1sZWFkIFN0b3JhZ2UgJiBOZXR3b3JraW5nDQo+IGhhcmVAc3VzZS5kZSAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgKzQ5IDkxMSA3NDA1MyA2ODgNCj4gU1VTRSBMSU5V
+WCBHbWJILCBNYXhmZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcNCj4gR0Y6IEYuIEltZW5kw7Zy
+ZmZlciwgSi4gU21pdGhhcmQsIEouIEd1aWxkLCBELiBVcG1hbnl1LCBHLiBOb3J0b24NCj4gSFJC
+IDIxMjg0IChBRyBOw7xybmJlcmcpDQoNClRoZSA2NDAwIGNvbnRyb2xsZXJzIGFyZSBxdWl0ZSBv
+bGQgYW5kIGFyZSBubyBsb25nZXIgdGVzdGVkLiANClNvLCBpdCB3b3VsZCBiZSBuaWNlIHRvIGRl
+cHJlY2F0ZSB0aGUgY2Npc3MgZHJpdmVyLCBidXQgd2Ugd291bGQgbm90IHN1cHBvcnQgdGhvc2Ug
+Zm9ybWVybHkgY2Npc3MgZGV2aWNlcyB3aXRoIGhwc2EuDQpJIGRvIG5vdCByZWNhbGwgc2VlaW5n
+IGEgY2Npc3NfaW9jdGwgaXNzdWUsIHdoYXQgd2FzIHRoZSBpc3N1ZT8NCg0KVGhhbmtzLA0KRG9u
+IEJyYWNlDQpFU0MgLSBTbWFydCBTdG9yYWdlDQpNaWNyb3NlbWkgQ29ycG9yYXRpb24NCg0KDQo=
