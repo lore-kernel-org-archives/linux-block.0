@@ -5,8 +5,8 @@ To: "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 References: <20170708190730.avwa2urwjuvohpgg@sasha-lappy>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <92fb7af1-d128-ffe0-bc5c-b7a5ead77b1e@kernel.dk>
-Date: Mon, 10 Jul 2017 10:05:15 -0600
+Message-ID: <720248fc-22fa-1fd3-08a4-e582adb38037@kernel.dk>
+Date: Sat, 8 Jul 2017 19:29:20 -0600
 MIME-Version: 1.0
 In-Reply-To: <20170708190730.avwa2urwjuvohpgg@sasha-lappy>
 Content-Type: text/plain; charset=utf-8
@@ -16,16 +16,12 @@ On 07/08/2017 01:06 PM, Levin, Alexander (Sasha Levin) wrote:
 > Hi all,
 > 
 > syzkaller seems to be hitting a lockup with the reproducer below:
-> 
-> INFO: task syzkaller490361:8788 blocked for more than 120 seconds.
->      Not tainted 4.12.0-next-20170706+ #186
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> syzkaller490361 D18312  8788   5843 0x00080004
-> Call Trace:
 
-I've run this for about an hour now, with mq-deadline and a regular SATA
-drive, and it's still chugging along. I need to know more about your
-setup.
+Thanks for the reproducer, but this is missing a lot of detail that we
+need to debug this issue. Is this a regression since 4.12? What storage
+device is this? Is the device using an IO scheduler?
+
+dmesg after boot and .config would be helpful, too.
 
 -- 
 Jens Axboe
