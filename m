@@ -1,59 +1,51 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	James Smart <james.smart@broadcom.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 2/8] nvme-fc: quiesce/unquiesce admin_q instead of start/stop its hw queues
-Date: Wed,  5 Jul 2017 20:00:31 +0300
-Message-Id: <1499274037-17438-3-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
-References: <1499274037-17438-1-git-send-email-sagi@grimberg.me>
+Return-Path: <nix.or.die@gmail.com>
+MIME-Version: 1.0
+From: Gabriel C <nix.or.die@gmail.com>
+Date: Mon, 10 Jul 2017 17:03:05 +0200
+Message-ID: <CAEJqkgjSVapRO7aTXJ3uTSOEC8UdfLp7+SNeef=888GY6Wye1Q@mail.gmail.com>
+Subject: elevator= seems to be confused with MQ and !MQ scheduler
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-unlike blk_mq_stop_hw_queues and blk_mq_start_stopped_hw_queues
-quiescing/unquiescing respects the submission path rcu grace.
+Hello,
 
-Also, make sure to unquiesce before cleanup the admin queue.
+We are allowed to build all scheduler as modules or build-in setting
+defaults with
+CONFIG_SCSI_MQ_DEFAULT=y/n / CONFIG_DM_MQ_DEFAULT=y/n.
 
-Reviewed-By: James Smart <james.smart@broadcom.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/fc.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 50cc3b2b0e11..8d55e7827932 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -1703,6 +1703,7 @@ nvme_fc_ctrl_free(struct kref *ref)
- 	list_del(&ctrl->ctrl_list);
- 	spin_unlock_irqrestore(&ctrl->rport->lock, flags);
- 
-+	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
- 	blk_cleanup_queue(ctrl->ctrl.admin_q);
- 	blk_mq_free_tag_set(&ctrl->admin_tag_set);
- 
-@@ -2321,7 +2322,7 @@ nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
- 		goto out_delete_hw_queue;
- 
- 	if (ctrl->ctrl.state != NVME_CTRL_NEW)
--		blk_mq_start_stopped_hw_queues(ctrl->ctrl.admin_q, true);
-+		blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
- 
- 	ret = nvmf_connect_admin_queue(&ctrl->ctrl);
- 	if (ret)
-@@ -2475,7 +2476,7 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
- 	 * use blk_mq_tagset_busy_itr() and the transport routine to
- 	 * terminate the exchanges.
- 	 */
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
- 				nvme_fc_terminate_exchange, &ctrl->ctrl);
- 
--- 
-2.7.4
+Following setup:
+
+All scheduler set to Y ( build-in )
+CONFIG_DEFAULT_CFQ=y
+CONFIG_SCSI_MQ_DEFAULT and CONFIG_DM_MQ_DEFAULT set to N
+
+Boot now with elevator=some_mq_schedule
+
+While it should not even try to use any MQ it will try to set values
+from elevator and hang.
+
+Now boot with scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y
+elevator=!some_mq_schedule , hangs too.
+
+This looks better but still some output in  dmesg is wrong:
+
+Build scheduler M ( I have cfq mq-deadline Y to have some defaults)
+CONFIG_DEFAULT_CFQ=y
+CONFIG_SCSI_MQ_DEFAULT and CONFIG_DM_MQ_DEFAULT set to N
+
+Boot with elevator=some_mq_schedule_is_module
+Will give an error since it can't find the module and continue with
+default cfq which is fine.
+Once box is up modprobe the modules you used in elevator= and whatch
+your dmesg..
+
+So how is that meant to work now ? use elevator= only you know what
+your kernel config looks like ( which probably lots users have no clue
+about ) ?
+
+Best Regards,
+
+Gabriel C
