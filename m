@@ -1,64 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55714 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753786AbdGLSuv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:51 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 07/11] cgroup: export fhandle info for a cgroup
-Date: Wed, 12 Jul 2017 11:49:52 -0700
-Message-Id: <4c59c56556b3c4051cb63b8ca2be920be177c0b3.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
+Received: from aserp1040.oracle.com ([141.146.126.69]:46718 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932217AbdGJOJh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Jul 2017 10:09:37 -0400
+Date: Mon, 10 Jul 2017 17:09:22 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: hch@lst.de
+Cc: Boaz Harrosh <ooo@electrozaur.com>, linux-block@vger.kernel.org
+Subject: [bug report] block: introduce new block status code type
+Message-ID: <20170710140922.pjqyxfiaiczihyic@mwanda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
+Hello Christoph Hellwig,
 
-Add an API to export cgroup fhandle info. We don't export a full 'struct
-file_handle', there are unrequired info. Sepcifically, cgroup is always
-a directory, so we don't need a 'FILEID_INO32_GEN_PARENT' type fhandle,
-we only need export the inode number and generation number just like
-what generic_fh_to_dentry does. And we can avoid the overhead of getting
-an inode too, since kernfs_node_id (ino and generation) has all the info
-required.
+The patch 2a842acab109: "block: introduce new block status code type"
+from Jun 3, 2017, leads to the following static checker warning:
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- include/linux/cgroup.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+	fs/exofs/inode.c:1333 exofs_new_inode()
+	error: passing non negative 255 to ERR_PTR
 
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 30c6877..52ef9a6 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -609,6 +609,10 @@ static inline void cgroup_kthread_ready(void)
- 	current->no_cgroup_migration = 0;
- }
- 
-+static inline union kernfs_node_id *cgroup_get_kernfs_id(struct cgroup *cgrp)
-+{
-+	return &cgrp->kn->id;
-+}
- #else /* !CONFIG_CGROUPS */
- 
- struct cgroup_subsys_state;
-@@ -631,6 +635,10 @@ static inline int cgroup_init_early(void) { return 0; }
- static inline int cgroup_init(void) { return 0; }
- static inline void cgroup_init_kthreadd(void) {}
- static inline void cgroup_kthread_ready(void) {}
-+static inline union kernfs_node_id *cgroup_get_kernfs_id(struct cgroup *cgrp)
-+{
-+	return NULL;
-+}
- 
- static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
- 					       struct cgroup *ancestor)
--- 
-2.9.3
+drivers/scsi/osd/osd_initiator.c
+  1909  analyze:
+  1910          if (!osi->key) {
+  1911                  /* scsi sense is Empty, the request was never issued to target
+  1912                   * linux return code might tell us what happened.
+  1913                   */
+  1914                  if (or->async_error == BLK_STS_RESOURCE)
+  1915                          osi->osd_err_pri = OSD_ERR_PRI_RESOURCE;
+  1916                  else
+  1917                          osi->osd_err_pri = OSD_ERR_PRI_UNREACHABLE;
+  1918                  ret = or->async_error;
+                        ^^^^^^^^^^^^^^^^^^^^^
+The problem is that we're mixing the new block codes and normal kernel
+error codes.  It's disapointing that Sparse doesn't seem to complain
+about this assignment.  Anyway, we propagate the error code back and
+eventually pass it through ERR_PTR() and IS_ERR() and then dereference
+it.
+
+  1919          } else if (osi->key <= scsi_sk_recovered_error) {
+  1920                  osi->osd_err_pri = 0;
+  1921                  ret = 0;
+  1922          } else if (osi->additional_code == scsi_invalid_field_in_cdb) {
+  1923                  if (osi->cdb_field_offset == OSD_CFO_STARTING_BYTE) {
+  1924                          osi->osd_err_pri = OSD_ERR_PRI_CLEAR_PAGES;
+  1925                          ret = -EFAULT; /* caller should recover from this */
+  1926                  } else if (osi->cdb_field_offset == OSD_CFO_OBJECT_ID) {
+  1927                          osi->osd_err_pri = OSD_ERR_PRI_NOT_FOUND;
+  1928                          ret = -ENOENT;
+  1929                  } else if (osi->cdb_field_offset == OSD_CFO_PERMISSIONS) {
+  1930                          osi->osd_err_pri = OSD_ERR_PRI_NO_ACCESS;
+  1931                          ret = -EACCES;
+  1932                  } else {
+  1933                          osi->osd_err_pri = OSD_ERR_PRI_BAD_CRED;
+  1934                          ret = -EINVAL;
+  1935                  }
+  1936          } else if (osi->additional_code == osd_quota_error) {
+  1937                  osi->osd_err_pri = OSD_ERR_PRI_NO_SPACE;
+  1938                  ret = -ENOSPC;
+  1939          } else if (_is_osd_security_code(osi->additional_code)) {
+  1940                  osi->osd_err_pri = OSD_ERR_PRI_BAD_CRED;
+  1941                  ret = -EINVAL;
+  1942          } else {
+
+regards,
+dan carpenter
