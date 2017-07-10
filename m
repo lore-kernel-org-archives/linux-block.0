@@ -1,201 +1,153 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55788 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753539AbdGLSuj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:39 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 11/11] block: use standard blktrace API to output cgroup info for debug notes
-Date: Wed, 12 Jul 2017 11:49:56 -0700
-Message-Id: <94895fa87f9dbe2531f9630896d300f850400c85.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <don.brace@microsemi.com>
+From: Don Brace <don.brace@microsemi.com>
+To: Meelis Roos <mroos@linux.ee>, Christoph Hellwig <hch@infradead.org>
+CC: Laurence Oberman <loberman@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Linux Kernel list <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Scott Benesh
+	<scott.benesh@microsemi.com>, Scott Teel <scott.teel@microsemi.com>, "Kevin
+ Barnett" <kevin.barnett@microsemi.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, Hannes Reinecke <hare@suse.de>
+Subject: RE: device support in hpsa, was: Re: OOPS from cciss_ioctl in
+ 4.12+git
+Date: Mon, 10 Jul 2017 21:56:44 +0000
+Message-ID: <4993A297653ECB4581FA5C3C31323D19533CE302@avsrvexchmbx2.microsemi.net>
+References: <alpine.LRH.2.20.1707051555130.20086@math.ut.ee>
+ <20170705225134.GA31786@infradead.org>
+ <alpine.LRH.2.20.1707061236010.6514@math.ut.ee>
+ <20170707150042.GA15445@infradead.org>
+ <799cf0d6-658d-4124-1ba0-3962671e3f1e@kernel.dk>
+ <1bc9895b-bfcb-9ff5-c046-277b0d67a94e@redhat.com>
+ <20170707180857.GA19790@infradead.org>
+ <alpine.LRH.2.20.1707101523470.5280@math.ut.ee>
+In-Reply-To: <alpine.LRH.2.20.1707101523470.5280@math.ut.ee>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Return-Path: don.brace@microsemi.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+So, adding adding  hpsa_allow_any=3D1 did not work...
 
-Currently cfq/bfq/blk-throttle output cgroup info in trace in their own
-way. Now we have standard blktrace API for this, so convert them to use
-it.
+When you added the 0x40800e11, did you add it to both tables?
 
-Note, this changes the behavior a little bit. cgroup info isn't output
-by default, we only do this with 'blk_cgroup' option enabled. cgroup
-info isn't output as a string by default too, we only do this with
-'blk_cgname' option enabled. Also cgroup info is output in different
-position of the note string. I think these behavior changes aren't a big
-issue (actually we make trace data shorter which is good), since the
-blktrace note is solely for debugging.
+/* define the PCI info for the cards we can control */
+static const struct pci_device_id hpsa_pci_device_id[] =3D {
+       {PCI_VENDOR_ID_COMPAQ, PCI_DEVICE_ID_COMPAQ_CISSB, 0x0E11, 0x4080},
+...
+{0,}
+};
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+/*  board_id =3D Subsystem Device ID & Vendor ID
+ *  product =3D Marketing Name for the board
+ *  access =3D Address of the struct of function pointers
+ */
+static struct board_type products[] =3D {
+{0x40800E11, "Smart Array 5i", &SA5B_access},
+
+
+...
+};
+
+I added it at the very first entry to make it easier.
+
+
 ---
- block/bfq-iosched.h          | 13 ++++++++-----
- block/blk-throttle.c         |  6 ++----
- block/cfq-iosched.c          | 15 ++++++---------
- include/linux/blktrace_api.h | 13 +++++++++----
- kernel/trace/blktrace.c      | 12 ++++++++++--
- 5 files changed, 35 insertions(+), 24 deletions(-)
+However, there is not a SA5B_access table in hpsa.h.
 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 8fd83b8..bf69d13 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -917,13 +917,16 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
--	blk_add_trace_msg((bfqd)->queue, "bfq%d%c %s " fmt, (bfqq)->pid,\
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
--			bfqq_group(bfqq)->blkg_path, ##args);		\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
-+			"bfq%d%c " fmt, (bfqq)->pid,			\
-+			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
- } while (0)
- 
--#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	\
--	blk_add_trace_msg((bfqd)->queue, "%s " fmt, (bfqg)->blkg_path, ##args)
-+#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
-+	blk_add_cgroup_trace_msg((bfqd)->queue,				\
-+		bfqg_to_blkg(bfqg)->blkcg, fmt, ##args);		\
-+} while (0)
- 
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a6ebd2b..6a4c4c4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -373,10 +373,8 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- 	if (likely(!blk_trace_note_message_enabled(__td->queue)))	\
- 		break;							\
- 	if ((__tg)) {							\
--		char __pbuf[128];					\
--									\
--		blkg_path(tg_to_blkg(__tg), __pbuf, sizeof(__pbuf));	\
--		blk_add_trace_msg(__td->queue, "throtl %s " fmt, __pbuf, ##args); \
-+		blk_add_cgroup_trace_msg(__td->queue,			\
-+			tg_to_blkg(__tg)->blkcg, "throtl " fmt, ##args);\
- 	} else {							\
- 		blk_add_trace_msg(__td->queue, "throtl " fmt, ##args);	\
- 	}								\
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 3d5c289..0fb78fb 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -656,20 +656,17 @@ static inline void cfqg_put(struct cfq_group *cfqg)
- }
- 
- #define cfq_log_cfqq(cfqd, cfqq, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg((cfqq)->cfqg), __pbuf, sizeof(__pbuf));	\
--	blk_add_trace_msg((cfqd)->queue, "cfq%d%c%c %s " fmt, (cfqq)->pid, \
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg((cfqq)->cfqg)->blkcg,		\
-+			"cfq%d%c%c " fmt, (cfqq)->pid,			\
- 			cfq_cfqq_sync((cfqq)) ? 'S' : 'A',		\
- 			cfqq_type((cfqq)) == SYNC_NOIDLE_WORKLOAD ? 'N' : ' ',\
--			  __pbuf, ##args);				\
-+			  ##args);					\
- } while (0)
- 
- #define cfq_log_cfqg(cfqd, cfqg, fmt, args...)	do {			\
--	char __pbuf[128];						\
--									\
--	blkg_path(cfqg_to_blkg(cfqg), __pbuf, sizeof(__pbuf));		\
--	blk_add_trace_msg((cfqd)->queue, "%s " fmt, __pbuf, ##args);	\
-+	blk_add_cgroup_trace_msg((cfqd)->queue,				\
-+			cfqg_to_blkg(cfqg)->blkcg, fmt, ##args);	\
- } while (0)
- 
- static inline void cfqg_stats_update_io_add(struct cfq_group *cfqg,
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index d2e9085..67b4d4d 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -28,10 +28,12 @@ struct blk_trace {
- 	atomic_t dropped;
- };
- 
-+struct blkcg;
-+
- extern int blk_trace_ioctl(struct block_device *, unsigned, char __user *);
- extern void blk_trace_shutdown(struct request_queue *);
--extern __printf(2, 3)
--void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-+extern __printf(3, 4)
-+void __trace_note_message(struct blk_trace *, struct blkcg *blkcg, const char *fmt, ...);
- 
- /**
-  * blk_add_trace_msg - Add a (simple) message to the blktrace stream
-@@ -46,12 +48,14 @@ void __trace_note_message(struct blk_trace *, const char *fmt, ...);
-  *     NOTE: Can not use 'static inline' due to presence of var args...
-  *
-  **/
--#define blk_add_trace_msg(q, fmt, ...)					\
-+#define blk_add_cgroup_trace_msg(q, cg, fmt, ...)			\
- 	do {								\
- 		struct blk_trace *bt = (q)->blk_trace;			\
- 		if (unlikely(bt))					\
--			__trace_note_message(bt, fmt, ##__VA_ARGS__);	\
-+			__trace_note_message(bt, cg, fmt, ##__VA_ARGS__);\
- 	} while (0)
-+#define blk_add_trace_msg(q, fmt, ...)					\
-+	blk_add_cgroup_trace_msg(q, NULL, fmt, ##__VA_ARGS__)
- #define BLK_TN_MAX_MSG		128
- 
- static inline bool blk_trace_note_message_enabled(struct request_queue *q)
-@@ -82,6 +86,7 @@ extern struct attribute_group blk_trace_attr_group;
- # define blk_trace_startstop(q, start)			(-ENOTTY)
- # define blk_trace_remove(q)				(-ENOTTY)
- # define blk_add_trace_msg(q, fmt, ...)			do { } while (0)
-+# define blk_add_cgroup_trace_msg(q, cg, fmt, ...)	do { } while (0)
- # define blk_trace_remove_sysfs(dev)			do { } while (0)
- # define blk_trace_note_message_enabled(q)		(false)
- static inline int blk_trace_init_sysfs(struct device *dev)
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index e90974e..7724de1 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -154,7 +154,8 @@ static void trace_note_time(struct blk_trace *bt)
- 	local_irq_restore(flags);
- }
- 
--void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
-+void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
-+	const char *fmt, ...)
- {
- 	int n;
- 	va_list args;
-@@ -178,7 +179,14 @@ void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
- 	n = vscnprintf(buf, BLK_TN_MAX_MSG, fmt, args);
- 	va_end(args);
- 
-+	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
-+		blkcg = NULL;
-+#ifdef CONFIG_BLK_CGROUP
-+	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
-+		blkcg ? cgroup_get_kernfs_id(blkcg->css.cgroup) : NULL);
-+#else
- 	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n, NULL);
-+#endif
- 	local_irq_restore(flags);
- }
- EXPORT_SYMBOL_GPL(__trace_note_message);
-@@ -375,7 +383,7 @@ static ssize_t blk_msg_write(struct file *filp, const char __user *buffer,
- 		return PTR_ERR(msg);
- 
- 	bt = filp->private_data;
--	__trace_note_message(bt, "%s", msg);
-+	__trace_note_message(bt, NULL, "%s", msg);
- 	kfree(msg);
- 
- 	return count;
--- 
-2.9.3
+/*
+ *  This card is the opposite of the other cards.
+ *   0 turns interrupts on...
+ *   0x04 turns them off...
+ */
+static void SA5B_intr_mask(ctlr_info_t *h, unsigned long val)
+{
+        if (val)
+        { /* Turn interrupts on */
+                h->interrupts_enabled =3D 1;
+                writel(0, h->vaddr + SA5_REPLY_INTR_MASK_OFFSET);
+                (void) readl(h->vaddr + SA5_REPLY_INTR_MASK_OFFSET);
+        } else /* Turn them off */
+        {
+                h->interrupts_enabled =3D 0;
+                writel( SA5B_INTR_OFF,
+                        h->vaddr + SA5_REPLY_INTR_MASK_OFFSET);
+                (void) readl(h->vaddr + SA5_REPLY_INTR_MASK_OFFSET);
+        }
+}
+
+
+/*
+ *      Returns true if an interrupt is pending..
+ */
+static bool SA5B_intr_pending(ctlr_info_t *h)
+{
+        unsigned long register_value  =3D
+                readl(h->vaddr + SA5_INTR_STATUS);
+#ifdef CCISS_DEBUG
+        printk("cciss: intr_pending %lx\n", register_value);
+#endif  /* CCISS_DEBUG */
+        if( register_value &  SA5B_INTR_PENDING)
+                return  1;
+        return 0 ;
+}
+
+
+static struct access_method SA5B_access =3D {
+        .submit_command =3D SA5_submit_command,
+        .set_intr_mask =3D SA5B_intr_mask,
+        .fifo_full =3D SA5_fifo_full,
+        .intr_pending =3D SA5B_intr_pending,
+        .command_completed =3D SA5_completed,
+};
+
+
+
+Can you try adding the two table entries and the SA5B definitions in hpsa.h=
+?
+
+
+
+> -----Original Message-----
+> From: mroos@math.ut.ee [mailto:mroos@math.ut.ee] On Behalf Of Meelis
+> Roos
+> Sent: Monday, July 10, 2017 9:08 AM
+> To: Christoph Hellwig <hch@infradead.org>
+> Cc: Laurence Oberman <loberman@redhat.com>; Jens Axboe
+> <axboe@kernel.dk>; Linux Kernel list <linux-kernel@vger.kernel.org>; linu=
+x-
+> block@vger.kernel.org; Don Brace <don.brace@microsemi.com>; Scott
+> Benesh <scott.benesh@microsemi.com>; Scott Teel
+> <scott.teel@microsemi.com>; Kevin Barnett
+> <kevin.barnett@microsemi.com>; linux-scsi@vger.kernel.org; Hannes
+> Reinecke <hare@suse.de>
+> Subject: Re: device support in hpsa, was: Re: OOPS from cciss_ioctl in 4.=
+12+git
+>=20
+> EXTERNAL EMAIL
+>=20
+>=20
+> > On Fri, Jul 07, 2017 at 11:42:38AM -0400, Laurence Oberman wrote:
+> > > What happens when  hpsa_allow_any=3D1 with the Smart Array 64xx
+> > > It should probe.
+> >
+> > But only if it has a HP vendor ID as far as I can tell.  We'd
+> > still need to add the compaq ids so that these controllers get
+> > probed.  But maybe it's time to add them and flip the hpsa_allow_any
+> > default (maybe conditionally on a config option?) and mark cciss
+> > deprecated.
+>=20
+> I added hpsa_allow_any=3D1, did not help.
+>=20
+> Added a wildcard Compaq entry with RAID class, like the one for HP,
+> still no go:
+>=20
+> [    5.199125] hpsa 0000:00:04.0: unrecognized board ID: 0x40800e11, igno=
+ring.
+> [    5.282517] hpsa 0000:00:04.0: Board ID not found
+>=20
+> Added specific PCI ID and subdevice ID quad and I still get the same
+> messages and the adapter is ignored.
+>=20
+> What am I doing wrong?
+>=20
+> --
+> Meelis Roos (mroos@linux.ee)
