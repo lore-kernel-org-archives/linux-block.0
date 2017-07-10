@@ -1,66 +1,93 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42130 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756250AbdGKSVZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2017 14:21:25 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/6] blk-mq: introduce congestion control
-Date: Wed, 12 Jul 2017 02:20:57 +0800
-Message-Id: <20170711182103.11461-1-ming.lei@redhat.com>
+Return-Path: <bo.li.liu@oracle.com>
+Date: Mon, 10 Jul 2017 16:00:10 -0700
+From: Liu Bo <bo.li.liu@oracle.com>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+        markus@trippelsdorf.de, linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        dsterba@suse.com, marc.c.dionne@gmail.com,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH v2] btrfs: Correct assignment of pos
+Message-ID: <20170710230010.GC20647@lim.localdomain>
+Reply-To: bo.li.liu@oracle.com
+References: <20170705033307.8213-1-rgoldwyn@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170705033307.8213-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On Tue, Jul 04, 2017 at 10:33:07PM -0500, Goldwyn Rodrigues wrote:
+> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> 
+> Assigning pos for usage early messes up in append mode, where
+> the pos is re-assigned in generic_write_checks(). Assign
+> pos later to get the correct position to write from iocb->ki_pos.
+> 
+> Since check_can_nocow also uses the value of pos, we shift
+> generic_write_checks() before check_can_nocow(). Checks with
+> IOCB_DIRECT are present in generic_write_checks(), so checking
+> for IOCB_NOWAIT is enough.
+> 
+> Also, put locking sequence in the fast path.
+> 
+> Changes since v1:
+>  - Moved pos higher up to encompass check_can_nocow() call.
+> 
+> Fixes: edf064e7c6fe ("btrfs: nowait aio support")
+> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> ---
+>  fs/btrfs/file.c | 26 ++++++++++++++------------
+>  1 file changed, 14 insertions(+), 12 deletions(-)
+> 
+> diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+> index 59e2dccdf75b..ad53832838b5 100644
+> --- a/fs/btrfs/file.c
+> +++ b/fs/btrfs/file.c
+> @@ -1875,16 +1875,25 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+>  	ssize_t num_written = 0;
+>  	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+>  	ssize_t err;
+> -	loff_t pos = iocb->ki_pos;
+> +	loff_t pos;
+>  	size_t count = iov_iter_count(from);
+>  	loff_t oldsize;
+>  	int clean_page = 0;
+>  
+> -	if ((iocb->ki_flags & IOCB_NOWAIT) &&
+> -			(iocb->ki_flags & IOCB_DIRECT)) {
+> -		/* Don't sleep on inode rwsem */
+> -		if (!inode_trylock(inode))
+> +	if (!inode_trylock(inode)) {
+> +		if (iocb->ki_flags & IOCB_NOWAIT)
+>  			return -EAGAIN;
+> +		inode_lock(inode);
+> +	}
+> +
+> +	err = generic_write_checks(iocb, from);
+> +	if (err <= 0) {
+> +		inode_unlock(inode);
+> +		return err;
+> +	}
+> +
+> +	pos = iocb->ki_pos;
+> +	if (iocb->ki_flags & IOCB_NOWAIT) {
+>  		/*
+>  		 * We will allocate space in case nodatacow is not set,
+>  		 * so bail
+> @@ -1895,13 +1904,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+>  			inode_unlock(inode);
+>  			return -EAGAIN;
+>  		}
+> -	} else
+> -		inode_lock(inode);
+> -
+> -	err = generic_write_checks(iocb, from);
+> -	if (err <= 0) {
+> -		inode_unlock(inode);
+> -		return err;
+>  	}
+>  
+>  	current->backing_dev_info = inode_to_bdi(inode);
 
-The 1st patch converts two start/stop queue into quiesce/unquiesce
-in xen-blkfront.
+Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
 
-The 2nd patch uses blk_mq_run_hw_queues() in SCSI becasue the queue
-won't be stopped at all. 
-
-The 3rd patch prepares for introducing congestion control for blk-mq.
-
-The 4th patch uses EWMA to estimate congestion threshold.
-
-The 5th patch uses the estimated congestion threshold to dectect
-congestion. Once the congestion is found, queue is stopped, and will
-be restarted if the condition is invalid.
-
-The 6th patch unexports several APIs for starting/stopping queue,
-then the STOPPED state of queue becomes a internal state, and it
-is invisible to drivers now.
-
-This patchset is against on Sagi Grimberg's patchset of "[PATCH v3 0/8]
-correct quiescing in several block drivers", which can be found
-in:
-	http://marc.info/?t=149927415900006&r=1&w=2
-
-Any comments are welcome!
-
-Ming Lei (6):
-  xen-blkfront: avoid to use start/stop queue
-  SCSI: use blk_mq_run_hw_queues() in scsi_kick_queue()
-  blk-mq: send the request to dispatch list if direct issue returns busy
-  blk-mq: use EWMA to estimate congestion threshold
-  blk-mq: introduce basic congestion control
-  blk-mq: unexport APIs for start/stop queues
-
- block/blk-mq.c               | 143 ++++++++++++++++++-------------------------
- block/blk-mq.h               |  11 ++++
- drivers/block/virtio_blk.c   |   7 ---
- drivers/block/xen-blkfront.c |  28 ++-------
- drivers/md/dm-rq.c           |   1 -
- drivers/nvme/host/fc.c       |   4 --
- drivers/scsi/scsi_lib.c      |   5 +-
- include/linux/blk-mq.h       |  10 +--
- 8 files changed, 79 insertions(+), 130 deletions(-)
-
--- 
-2.9.4
+-liubo
