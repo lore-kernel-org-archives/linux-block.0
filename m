@@ -1,62 +1,66 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 2/8] nvme-fc: quiesce/unquiesce admin_q instead of start/stop its hw queues
-Date: Wed,  5 Jul 2017 09:53:05 +0300
-Message-Id: <1499237591-15861-3-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
-References: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:42130 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756250AbdGKSVZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jul 2017 14:21:25 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/6] blk-mq: introduce congestion control
+Date: Wed, 12 Jul 2017 02:20:57 +0800
+Message-Id: <20170711182103.11461-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-unlike blk_mq_stop_hw_queues and blk_mq_start_stopped_hw_queues
-quiescing/unquiescing respects the submission path rcu grace.
+Hi,
 
-Also, make sure to unquiesce before cleanup the admin queue.
+The 1st patch converts two start/stop queue into quiesce/unquiesce
+in xen-blkfront.
 
-Reviewed-By: James Smart <james.smart@broadcom.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/fc.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+The 2nd patch uses blk_mq_run_hw_queues() in SCSI becasue the queue
+won't be stopped at all. 
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 50cc3b2b0e11..3e35fc622680 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -1703,6 +1703,7 @@ nvme_fc_ctrl_free(struct kref *ref)
- 	list_del(&ctrl->ctrl_list);
- 	spin_unlock_irqrestore(&ctrl->rport->lock, flags);
- 
-+	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
- 	blk_cleanup_queue(ctrl->ctrl.admin_q);
- 	blk_mq_free_tag_set(&ctrl->admin_tag_set);
- 
-@@ -2320,8 +2321,10 @@ nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
- 	if (ret)
- 		goto out_delete_hw_queue;
- 
--	if (ctrl->ctrl.state != NVME_CTRL_NEW)
--		blk_mq_start_stopped_hw_queues(ctrl->ctrl.admin_q, true);
-+	if (ctrl->ctrl.state != NVME_CTRL_NEW) {
-+		blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
-+		blk_mq_kick_requeue_list(ctrl->ctrl.admin_q);
-+	}
- 
- 	ret = nvmf_connect_admin_queue(&ctrl->ctrl);
- 	if (ret)
-@@ -2475,7 +2478,7 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
- 	 * use blk_mq_tagset_busy_itr() and the transport routine to
- 	 * terminate the exchanges.
- 	 */
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
- 				nvme_fc_terminate_exchange, &ctrl->ctrl);
- 
+The 3rd patch prepares for introducing congestion control for blk-mq.
+
+The 4th patch uses EWMA to estimate congestion threshold.
+
+The 5th patch uses the estimated congestion threshold to dectect
+congestion. Once the congestion is found, queue is stopped, and will
+be restarted if the condition is invalid.
+
+The 6th patch unexports several APIs for starting/stopping queue,
+then the STOPPED state of queue becomes a internal state, and it
+is invisible to drivers now.
+
+This patchset is against on Sagi Grimberg's patchset of "[PATCH v3 0/8]
+correct quiescing in several block drivers", which can be found
+in:
+	http://marc.info/?t=149927415900006&r=1&w=2
+
+Any comments are welcome!
+
+Ming Lei (6):
+  xen-blkfront: avoid to use start/stop queue
+  SCSI: use blk_mq_run_hw_queues() in scsi_kick_queue()
+  blk-mq: send the request to dispatch list if direct issue returns busy
+  blk-mq: use EWMA to estimate congestion threshold
+  blk-mq: introduce basic congestion control
+  blk-mq: unexport APIs for start/stop queues
+
+ block/blk-mq.c               | 143 ++++++++++++++++++-------------------------
+ block/blk-mq.h               |  11 ++++
+ drivers/block/virtio_blk.c   |   7 ---
+ drivers/block/xen-blkfront.c |  28 ++-------
+ drivers/md/dm-rq.c           |   1 -
+ drivers/nvme/host/fc.c       |   4 --
+ drivers/scsi/scsi_lib.c      |   5 +-
+ include/linux/blk-mq.h       |  10 +--
+ 8 files changed, 79 insertions(+), 130 deletions(-)
+
 -- 
-2.7.4
+2.9.4
