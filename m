@@ -1,63 +1,185 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f176.google.com ([209.85.220.176]:34780 "EHLO
-        mail-qk0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754009AbdGJSu5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2017 14:50:57 -0400
-Received: by mail-qk0-f176.google.com with SMTP id d78so81670926qkb.1
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2017 11:50:57 -0700 (PDT)
-Subject: Re: [PATCH rfc 02/30] nvme-rdma: Don't alloc/free the tagset on reset
-To: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
- <1497799324-19598-3-git-send-email-sagi@grimberg.me>
- <20170619071851.GB13168@lst.de>
-From: James Smart <james.smart@broadcom.com>
-Message-ID: <47506edd-7e91-0367-1a5c-92d5c1b64621@broadcom.com>
-Date: Mon, 10 Jul 2017 11:50:54 -0700
-MIME-Version: 1.0
-In-Reply-To: <20170619071851.GB13168@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Received: from mx1.redhat.com ([209.132.183.28]:53682 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756414AbdGKSWp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jul 2017 14:22:45 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 6/6] blk-mq: unexport APIs for start/stop queues
+Date: Wed, 12 Jul 2017 02:21:03 +0800
+Message-Id: <20170711182103.11461-7-ming.lei@redhat.com>
+In-Reply-To: <20170711182103.11461-1-ming.lei@redhat.com>
+References: <20170711182103.11461-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 6/19/2017 12:18 AM, Christoph Hellwig wrote:
->> +static void nvme_rdma_destroy_admin_queue(struct nvme_rdma_ctrl *ctrl, bool remove)
->>   {
->> +	nvme_rdma_stop_queue(&ctrl->queues[0]);
->> +	if (remove) {
->> +		blk_cleanup_queue(ctrl->ctrl.admin_connect_q);
->> +		blk_cleanup_queue(ctrl->ctrl.admin_q);
->> +		blk_mq_free_tag_set(&ctrl->admin_tag_set);
->> +		nvme_rdma_dev_put(ctrl->device);
->> +	}
->> +
->>   	nvme_rdma_free_qe(ctrl->queues[0].device->dev, &ctrl->async_event_sqe,
->>   			sizeof(struct nvme_command), DMA_TO_DEVICE);
->> +	nvme_rdma_free_queue(&ctrl->queues[0]);
-> I don't like the calling convention.  We only have have two callers
-> anyway.  So I'd much rather only keep the code inside the if above
-> in the new nvme_rdma_destroy_admin_queue that is only called at shutdown
-> time, and opencode the calls to nvme_rdma_stop_queue, nvme_rdma_free_qe
-> and nvme_rdma_free_queue in the callers.
->
+Now no one uses these APIs anymore, so unexport them.
 
-Any chance you can make the organization like what I did with FC and 
-avoid all the "new" and "remove" flags ?
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c         | 80 --------------------------------------------------
+ block/blk-mq.h         |  2 ++
+ include/linux/blk-mq.h |  8 -----
+ 3 files changed, 2 insertions(+), 88 deletions(-)
 
-e.g. code blocks for:
-- allocation/initialization for the controller and the tag sets. 
-Basically initial allocation/creation of everything that would be the 
-os-facing side of the controller.
-- an association (or call it a session) create. Basically everything 
-that makes the link-side ties to the subsystem and creates the 
-controller and its connections. Does admin queue creation, controller 
-init, and io queue creation, and enablement of the blk-mq queues as it 
-does so.
-- an association teardown. Basically everything that stops the blk-mq 
-queues and tears down the link-side ties to the controller.
-- a final controller teardown, which removes it from the system. 
-Everything that terminates the os-facing side of the controller.
-
--- james
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d994449c154b..e8a3486dc8a2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1208,12 +1208,6 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					 msecs_to_jiffies(msecs));
+ }
+ 
+-void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+-{
+-	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
+-}
+-EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+-
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
+@@ -1255,60 +1249,6 @@ bool blk_mq_queue_stopped(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_mq_queue_stopped);
+ 
+-/*
+- * This function is often used for pausing .queue_rq() by driver when
+- * there isn't enough resource or some conditions aren't satisfied, and
+- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
+- *
+- * We do not guarantee that dispatch can be drained or blocked
+- * after blk_mq_stop_hw_queue() returns. Please use
+- * blk_mq_quiesce_queue() for that requirement.
+- */
+-void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+-{
+-	cancel_delayed_work(&hctx->run_work);
+-
+-	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-}
+-EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+-
+-/*
+- * This function is often used for pausing .queue_rq() by driver when
+- * there isn't enough resource or some conditions aren't satisfied, and
+- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
+- *
+- * We do not guarantee that dispatch can be drained or blocked
+- * after blk_mq_stop_hw_queues() returns. Please use
+- * blk_mq_quiesce_queue() for that requirement.
+- */
+-void blk_mq_stop_hw_queues(struct request_queue *q)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i)
+-		blk_mq_stop_hw_queue(hctx);
+-}
+-EXPORT_SYMBOL(blk_mq_stop_hw_queues);
+-
+-void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx)
+-{
+-	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-
+-	blk_mq_run_hw_queue(hctx, false);
+-}
+-EXPORT_SYMBOL(blk_mq_start_hw_queue);
+-
+-void blk_mq_start_hw_queues(struct request_queue *q)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i)
+-		blk_mq_start_hw_queue(hctx);
+-}
+-EXPORT_SYMBOL(blk_mq_start_hw_queues);
+-
+ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	if (!blk_mq_hctx_stopped(hctx))
+@@ -1317,7 +1257,6 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ 	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
+ 	blk_mq_run_hw_queue(hctx, async);
+ }
+-EXPORT_SYMBOL_GPL(blk_mq_start_stopped_hw_queue);
+ 
+ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
+ {
+@@ -1327,7 +1266,6 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_start_stopped_hw_queue(hctx, async);
+ }
+-EXPORT_SYMBOL(blk_mq_start_stopped_hw_queues);
+ 
+ static void blk_mq_run_work_fn(struct work_struct *work)
+ {
+@@ -1352,24 +1290,6 @@ static void blk_mq_run_work_fn(struct work_struct *work)
+ }
+ 
+ 
+-void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+-{
+-	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
+-		return;
+-
+-	/*
+-	 * Stop the hw queue, then modify currently delayed work.
+-	 * This should prevent us from running the queue prematurely.
+-	 * Mark the queue as auto-clearing STOPPED when it runs.
+-	 */
+-	blk_mq_stop_hw_queue(hctx);
+-	set_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
+-	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
+-					&hctx->run_work,
+-					msecs_to_jiffies(msecs));
+-}
+-EXPORT_SYMBOL(blk_mq_delay_queue);
+-
+ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
+ 					    struct request *rq,
+ 					    bool at_head)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index c4516d2a2d2c..9bc51d43155f 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -25,6 +25,8 @@ struct blk_mq_ctx {
+ 	struct kobject		kobj;
+ } ____cacheline_aligned_in_smp;
+ 
++void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
++void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 8694fb39cd80..a539e38f5a76 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -243,18 +243,10 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs
+ void blk_mq_complete_request(struct request *rq);
+ 
+ bool blk_mq_queue_stopped(struct request_queue *q);
+-void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
+-void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
+-void blk_mq_stop_hw_queues(struct request_queue *q);
+-void blk_mq_start_hw_queues(struct request_queue *q);
+-void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+-void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_quiesce_queue(struct request_queue *q);
+ void blk_mq_unquiesce_queue(struct request_queue *q);
+-void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+-void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
+ void blk_mq_freeze_queue(struct request_queue *q);
+-- 
+2.9.4
