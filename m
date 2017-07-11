@@ -1,158 +1,206 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55630 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752757AbdGLSud (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:33 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 03/11] kernfs: add an API to get kernfs node from inode number
-Date: Wed, 12 Jul 2017 11:49:48 -0700
-Message-Id: <6e9219019e124d6fd9f2a61d30e8feab8b641e06.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <i@coly.li>
+Subject: Re: [PATCH 06/19] bcache: explicitly destory mutex while exiting
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: bcache@lists.ewheeler.net, linux-block@vger.kernel.org,
+ linux-bcache@vger.kernel.org, hch@infradead.org, axboe@kernel.dk,
+ stable@vger.kernel.org
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+ <1498855388-16990-6-git-send-email-bcache@lists.ewheeler.net>
+ <841d6190-61a6-7601-2a00-2404cf0c5a69@coly.li>
+ <CAKhg4tLAiRdujjhh+xUmCzaR9+bTpMgbwtht6TD_bs0zE_61rQ@mail.gmail.com>
+From: Coly Li <i@coly.li>
+Message-ID: <3b64b240-3d0b-6160-7a7e-1d0789d48594@coly.li>
+Date: Tue, 11 Jul 2017 15:22:42 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAKhg4tLAiRdujjhh+xUmCzaR9+bTpMgbwtht6TD_bs0zE_61rQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On 2017/7/5 下午7:58, Liang Chen wrote:
+> Hi Coly,
+> Thanks for reviewing the patch! You raised a good point about the race. I also
+> think it should be addressed. Even though the time window is small, it will
+> still happen sooner or later.
+> 
+> I would like to keep this "destory mutex" patch unchanged, and send another
+> patch to fix the issue based on your approach. Please take a look. Thanks!
+> 
 
-Add an API to get kernfs node from inode number. We will need this to
-implement exportfs operations.
+Sure, good idea. I'd like to review the next fix, and provide my feed
+back together. Thanks.
 
-This API will be used in blktrace too later, so it should be as fast as
-possible. To make the API lock free, kernfs node is freed in RCU
-context. And we depend on kernfs_node count/ino number to filter out
-stale kernfs nodes.
+Coly
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- fs/kernfs/dir.c             | 57 +++++++++++++++++++++++++++++++++++++++++++++
- fs/kernfs/kernfs-internal.h |  2 ++
- fs/kernfs/mount.c           | 11 ++++++++-
- 3 files changed, 69 insertions(+), 1 deletion(-)
 
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index 33f711f..7be37c8 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -508,6 +508,10 @@ void kernfs_put(struct kernfs_node *kn)
- 	struct kernfs_node *parent;
- 	struct kernfs_root *root;
- 
-+	/*
-+	 * kernfs_node is freed with ->count 0, kernfs_find_and_get_node_by_ino
-+	 * depends on this to filter reused stale node
-+	 */
- 	if (!kn || !atomic_dec_and_test(&kn->count))
- 		return;
- 	root = kernfs_root(kn);
-@@ -649,6 +653,11 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 	kn->ino = ret;
- 	kn->generation = gen;
- 
-+	/*
-+	 * set ino first. This barrier is paired with atomic_inc_not_zero in
-+	 * kernfs_find_and_get_node_by_ino
-+	 */
-+	smp_mb__before_atomic();
- 	atomic_set(&kn->count, 1);
- 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
- 	RB_CLEAR_NODE(&kn->rb);
-@@ -680,6 +689,54 @@ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
- 	return kn;
- }
- 
-+/*
-+ * kernfs_find_and_get_node_by_ino - get kernfs_node from inode number
-+ * @root: the kernfs root
-+ * @ino: inode number
-+ *
-+ * RETURNS:
-+ * NULL on failure. Return a kernfs node with reference counter incremented
-+ */
-+struct kernfs_node *kernfs_find_and_get_node_by_ino(struct kernfs_root *root,
-+						    unsigned int ino)
-+{
-+	struct kernfs_node *kn;
-+
-+	rcu_read_lock();
-+	kn = idr_find(&root->ino_idr, ino);
-+	if (!kn)
-+		goto out;
-+
-+	/*
-+	 * Since kernfs_node is freed in RCU, it's possible an old node for ino
-+	 * is freed, but reused before RCU grace period. But a freed node (see
-+	 * kernfs_put) or an incompletedly initialized node (see
-+	 * __kernfs_new_node) should have 'count' 0. We can use this fact to
-+	 * filter out such node.
-+	 */
-+	if (!atomic_inc_not_zero(&kn->count)) {
-+		kn = NULL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * The node could be a new node or a reused node. If it's a new node,
-+	 * we are ok. If it's reused because of RCU (because of
-+	 * SLAB_TYPESAFE_BY_RCU), the __kernfs_new_node always sets its 'ino'
-+	 * before 'count'. So if 'count' is uptodate, 'ino' should be uptodate,
-+	 * hence we can use 'ino' to filter stale node.
-+	 */
-+	if (kn->ino != ino)
-+		goto out;
-+	rcu_read_unlock();
-+
-+	return kn;
-+out:
-+	rcu_read_unlock();
-+	kernfs_put(kn);
-+	return NULL;
-+}
-+
- /**
-  *	kernfs_add_one - add kernfs_node to parent without warning
-  *	@kn: kernfs_node to be added
-diff --git a/fs/kernfs/kernfs-internal.h b/fs/kernfs/kernfs-internal.h
-index 2d5144a..e9c226f 100644
---- a/fs/kernfs/kernfs-internal.h
-+++ b/fs/kernfs/kernfs-internal.h
-@@ -98,6 +98,8 @@ int kernfs_add_one(struct kernfs_node *kn);
- struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
- 				    const char *name, umode_t mode,
- 				    unsigned flags);
-+struct kernfs_node *kernfs_find_and_get_node_by_ino(struct kernfs_root *root,
-+						    unsigned int ino);
- 
- /*
-  * file.c
-diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
-index d5b149a..69c48be 100644
---- a/fs/kernfs/mount.c
-+++ b/fs/kernfs/mount.c
-@@ -330,7 +330,16 @@ struct super_block *kernfs_pin_sb(struct kernfs_root *root, const void *ns)
- 
- void __init kernfs_init(void)
- {
-+
-+	/*
-+	 * the slab is freed in RCU context, so kernfs_find_and_get_node_by_ino
-+	 * can access the slab lock free. This could introduce stale nodes,
-+	 * please see how kernfs_find_and_get_node_by_ino filters out stale
-+	 * nodes.
-+	 */
- 	kernfs_node_cache = kmem_cache_create("kernfs_node_cache",
- 					      sizeof(struct kernfs_node),
--					      0, SLAB_PANIC, NULL);
-+					      0,
-+					      SLAB_PANIC | SLAB_TYPESAFE_BY_RCU,
-+					      NULL);
- }
+
+> Thanks,
+> Liang
+> 
+> On Sun, Jul 2, 2017 at 2:43 AM, Coly Li <i@coly.li> wrote:
+>> On 2017/7/1 上午4:42, bcache@lists.ewheeler.net wrote:
+>>> From: Liang Chen <liangchen.linux@gmail.com>
+>>>
+>>> mutex_destroy does nothing most of time, but it's better to call
+>>> it to make the code future proof and it also has some meaning
+>>> for like mutex debug.
+>>>
+>>> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+>>> Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
+>>> Cc: stable@vger.kernel.org
+>>> ---
+>>>  drivers/md/bcache/super.c | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>>> index 48b8c20..1f84791 100644
+>>> --- a/drivers/md/bcache/super.c
+>>> +++ b/drivers/md/bcache/super.c
+>>> @@ -2089,6 +2089,7 @@ static void bcache_exit(void)
+>>>       if (bcache_major)
+>>>               unregister_blkdev(bcache_major, "bcache");
+>>>       unregister_reboot_notifier(&reboot);
+>>> +     mutex_destroy(&bch_register_lock>  }
+>>>
+>>>  static int __init bcache_init(void)
+>>> @@ -2106,6 +2107,7 @@ static int __init bcache_init(void)
+>>>
+>>>       bcache_major = register_blkdev(0, "bcache");
+>>>       if (bcache_major < 0) {
+>>> +             mutex_destroy(&bch_register_lock);
+>>>               unregister_reboot_notifier(&reboot);
+>>>               return bcache_major;
+>>>       }
+>>>
+>>
+>> Hi Liang,
+>>
+>> Current code might have a potential race in a very corner case, see,
+>> 2084 static int __init bcache_init(void)
+>> 2085 {
+>> 2086         static const struct attribute *files[] = {
+>> 2087                 &ksysfs_register.attr,
+>> 2088                 &ksysfs_register_quiet.attr,
+>> 2089                 NULL
+>> 2090         };
+>> 2091
+>> 2092         mutex_init(&bch_register_lock);
+>> 2093         init_waitqueue_head(&unregister_wait);
+>> 2094         register_reboot_notifier(&reboot);
+>> 2095         closure_debug_init();
+>> 2096
+>> 2097         bcache_major = register_blkdev(0, "bcache");
+>> 2098         if (bcache_major < 0) {
+>> 2099                 unregister_reboot_notifier(&reboot);
+>> 2100                 return bcache_major;
+>> 2101         }
+>> 2102
+>> 2103         if (!(bcache_wq = alloc_workqueue("bcache", WQ_MEM_RECLAIM,
+>> 0)) ||
+>> 2104             !(bcache_kobj = kobject_create_and_add("bcache",
+>> fs_kobj)) ||
+>> 2105             sysfs_create_files(bcache_kobj, files) ||
+>> 2106             bch_request_init() ||
+>> 2107             bch_debug_init(bcache_kobj))
+>> 2108                 goto err;
+>> 2109
+>> 2110         return 0;
+>> 2111 err:
+>> 2112         bcache_exit();
+>> 2113         return -ENOMEM;
+>> 2114 }
+>>
+>> At line 2107, most of bache stuffs are ready to work, only a debugfs
+>> entry not created yet. If in the time gap between line 2106 and line
+>> 2017, another user space tool just registers cache and backing devices.
+>> Then bch_debug_init() failed, and bcache_exit() gets called. In this
+>> case, I doubt bcache_exit() can handle all the references correctly.
+>>
+>> The race is very rare, and almost won't happen in real life. So, if you
+>> don't care about it, the patch can be simpler like this,
+>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>> index e57353e39168..fb5453a46a03 100644
+>> --- a/drivers/md/bcache/super.c
+>> +++ b/drivers/md/bcache/super.c
+>> @@ -2070,6 +2070,7 @@ static struct notifier_block reboot = {
+>>
+>>  static void bcache_exit(void)
+>>  {
+>> +       mutex_destroy(&bch_register_lock);
+>>         bch_debug_exit();
+>>         bch_request_exit();
+>>         if (bcache_kobj)
+>> @@ -2089,7 +2090,6 @@ static int __init bcache_init(void)
+>>                 NULL
+>>         };
+>>
+>> -       mutex_init(&bch_register_lock);
+>>         init_waitqueue_head(&unregister_wait);
+>>         register_reboot_notifier(&reboot);
+>>         closure_debug_init();
+>> @@ -2107,6 +2107,7 @@ static int __init bcache_init(void)
+>>             bch_debug_init(bcache_kobj))
+>>                 goto err;
+>>
+>> +       mutex_init(&bch_register_lock);
+>>         return 0;
+>>  err:
+>>         bcache_exit();
+>> ---
+>> And if you do care about the race, maybe you should do something like this,
+>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>> index e57353e39168..ca1d8b7a7815 100644
+>> --- a/drivers/md/bcache/super.c
+>> +++ b/drivers/md/bcache/super.c
+>> @@ -2079,6 +2079,7 @@ static void bcache_exit(void)
+>>         if (bcache_major)
+>>                 unregister_blkdev(bcache_major, "bcache");
+>>         unregister_reboot_notifier(&reboot);
+>> +       mutex_unlock(&bch_register_lock);
+>>  }
+>>
+>>  static int __init bcache_init(void)
+>> @@ -2090,6 +2091,7 @@ static int __init bcache_init(void)
+>>         };
+>>
+>>         mutex_init(&bch_register_lock);
+>> +       mutex_lock(&bch_register_lock);
+>>         init_waitqueue_head(&unregister_wait);
+>>         register_reboot_notifier(&reboot);
+>>         closure_debug_init();
+>> @@ -2097,6 +2099,8 @@ static int __init bcache_init(void)
+>>         bcache_major = register_blkdev(0, "bcache");
+>>         if (bcache_major < 0) {
+>>                 unregister_reboot_notifier(&reboot);
+>> +               mutex_unlock(&bch_register_lock);
+>> +               mutex_destroy(&bch_register_lock);
+>>                 return bcache_major;
+>>         }
+>>
+>> @@ -2104,9 +2108,12 @@ static int __init bcache_init(void)
+>>             !(bcache_kobj = kobject_create_and_add("bcache", fs_kobj)) ||
+>>             sysfs_create_files(bcache_kobj, files) ||
+>>             bch_request_init() ||
+>> -           bch_debug_init(bcache_kobj))
+>> +           bch_debug_init(bcache_kobj)) {
+>> +               mutex_unlock(&bch_register_lock);
+>>                 goto err;
+>> +       }
+>>
+>> +       mutex_unlock(&bch_register_lock);
+>>         return 0;
+>>  err:
+>>         bcache_exit();
+>> ---
+>>
+>> Personally I think the first approach with only one new line code added,
+>> your original version will add two new lines of code.
+>>
+>> Just FYI. Thanks.
+>>
+>> --
+>> Coly Li
+
+
 -- 
-2.9.3
+Coly Li
