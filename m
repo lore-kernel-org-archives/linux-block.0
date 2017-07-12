@@ -1,186 +1,201 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49028 "EHLO mx1.redhat.com"
+Received: from mail.kernel.org ([198.145.29.99]:55788 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751120AbdGNXSg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2017 19:18:36 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 6/6] blk-mq: unexport APIs for start/stop queues
-Date: Sat, 15 Jul 2017 07:16:01 +0800
-Message-Id: <20170714231601.14444-7-ming.lei@redhat.com>
-In-Reply-To: <20170714231601.14444-1-ming.lei@redhat.com>
-References: <20170714231601.14444-1-ming.lei@redhat.com>
+        id S1753539AbdGLSuj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:50:39 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V5 11/11] block: use standard blktrace API to output cgroup info for debug notes
+Date: Wed, 12 Jul 2017 11:49:56 -0700
+Message-Id: <94895fa87f9dbe2531f9630896d300f850400c85.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now no one uses these APIs anymore, so unexport them.
+From: Shaohua Li <shli@fb.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Currently cfq/bfq/blk-throttle output cgroup info in trace in their own
+way. Now we have standard blktrace API for this, so convert them to use
+it.
+
+Note, this changes the behavior a little bit. cgroup info isn't output
+by default, we only do this with 'blk_cgroup' option enabled. cgroup
+info isn't output as a string by default too, we only do this with
+'blk_cgname' option enabled. Also cgroup info is output in different
+position of the note string. I think these behavior changes aren't a big
+issue (actually we make trace data shorter which is good), since the
+blktrace note is solely for debugging.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq.c         | 83 ++------------------------------------------------
- block/blk-mq.h         |  1 +
- include/linux/blk-mq.h |  8 -----
- 3 files changed, 3 insertions(+), 89 deletions(-)
+ block/bfq-iosched.h          | 13 ++++++++-----
+ block/blk-throttle.c         |  6 ++----
+ block/cfq-iosched.c          | 15 ++++++---------
+ include/linux/blktrace_api.h | 13 +++++++++----
+ kernel/trace/blktrace.c      | 12 ++++++++++--
+ 5 files changed, 35 insertions(+), 24 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f3b582eb492f..70ce222da405 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1200,12 +1200,6 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					 msecs_to_jiffies(msecs));
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 8fd83b8..bf69d13 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -917,13 +917,16 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+ 
+ #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
+-	blk_add_trace_msg((bfqd)->queue, "bfq%d%c %s " fmt, (bfqq)->pid,\
+-			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
+-			bfqq_group(bfqq)->blkg_path, ##args);		\
++	blk_add_cgroup_trace_msg((bfqd)->queue,				\
++			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
++			"bfq%d%c " fmt, (bfqq)->pid,			\
++			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
+ } while (0)
+ 
+-#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	\
+-	blk_add_trace_msg((bfqd)->queue, "%s " fmt, (bfqg)->blkg_path, ##args)
++#define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
++	blk_add_cgroup_trace_msg((bfqd)->queue,				\
++		bfqg_to_blkg(bfqg)->blkcg, fmt, ##args);		\
++} while (0)
+ 
+ #else /* CONFIG_BFQ_GROUP_IOSCHED */
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a6ebd2b..6a4c4c4 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -373,10 +373,8 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ 	if (likely(!blk_trace_note_message_enabled(__td->queue)))	\
+ 		break;							\
+ 	if ((__tg)) {							\
+-		char __pbuf[128];					\
+-									\
+-		blkg_path(tg_to_blkg(__tg), __pbuf, sizeof(__pbuf));	\
+-		blk_add_trace_msg(__td->queue, "throtl %s " fmt, __pbuf, ##args); \
++		blk_add_cgroup_trace_msg(__td->queue,			\
++			tg_to_blkg(__tg)->blkcg, "throtl " fmt, ##args);\
+ 	} else {							\
+ 		blk_add_trace_msg(__td->queue, "throtl " fmt, ##args);	\
+ 	}								\
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 3d5c289..0fb78fb 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -656,20 +656,17 @@ static inline void cfqg_put(struct cfq_group *cfqg)
  }
  
--void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
--{
--	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
--}
--EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
--
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ #define cfq_log_cfqq(cfqd, cfqq, fmt, args...)	do {			\
+-	char __pbuf[128];						\
+-									\
+-	blkg_path(cfqg_to_blkg((cfqq)->cfqg), __pbuf, sizeof(__pbuf));	\
+-	blk_add_trace_msg((cfqd)->queue, "cfq%d%c%c %s " fmt, (cfqq)->pid, \
++	blk_add_cgroup_trace_msg((cfqd)->queue,				\
++			cfqg_to_blkg((cfqq)->cfqg)->blkcg,		\
++			"cfq%d%c%c " fmt, (cfqq)->pid,			\
+ 			cfq_cfqq_sync((cfqq)) ? 'S' : 'A',		\
+ 			cfqq_type((cfqq)) == SYNC_NOIDLE_WORKLOAD ? 'N' : ' ',\
+-			  __pbuf, ##args);				\
++			  ##args);					\
+ } while (0)
+ 
+ #define cfq_log_cfqg(cfqd, cfqg, fmt, args...)	do {			\
+-	char __pbuf[128];						\
+-									\
+-	blkg_path(cfqg_to_blkg(cfqg), __pbuf, sizeof(__pbuf));		\
+-	blk_add_trace_msg((cfqd)->queue, "%s " fmt, __pbuf, ##args);	\
++	blk_add_cgroup_trace_msg((cfqd)->queue,				\
++			cfqg_to_blkg(cfqg)->blkcg, fmt, ##args);	\
+ } while (0)
+ 
+ static inline void cfqg_stats_update_io_add(struct cfq_group *cfqg,
+diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+index d2e9085..67b4d4d 100644
+--- a/include/linux/blktrace_api.h
++++ b/include/linux/blktrace_api.h
+@@ -28,10 +28,12 @@ struct blk_trace {
+ 	atomic_t dropped;
+ };
+ 
++struct blkcg;
++
+ extern int blk_trace_ioctl(struct block_device *, unsigned, char __user *);
+ extern void blk_trace_shutdown(struct request_queue *);
+-extern __printf(2, 3)
+-void __trace_note_message(struct blk_trace *, const char *fmt, ...);
++extern __printf(3, 4)
++void __trace_note_message(struct blk_trace *, struct blkcg *blkcg, const char *fmt, ...);
+ 
+ /**
+  * blk_add_trace_msg - Add a (simple) message to the blktrace stream
+@@ -46,12 +48,14 @@ void __trace_note_message(struct blk_trace *, const char *fmt, ...);
+  *     NOTE: Can not use 'static inline' due to presence of var args...
+  *
+  **/
+-#define blk_add_trace_msg(q, fmt, ...)					\
++#define blk_add_cgroup_trace_msg(q, cg, fmt, ...)			\
+ 	do {								\
+ 		struct blk_trace *bt = (q)->blk_trace;			\
+ 		if (unlikely(bt))					\
+-			__trace_note_message(bt, fmt, ##__VA_ARGS__);	\
++			__trace_note_message(bt, cg, fmt, ##__VA_ARGS__);\
+ 	} while (0)
++#define blk_add_trace_msg(q, fmt, ...)					\
++	blk_add_cgroup_trace_msg(q, NULL, fmt, ##__VA_ARGS__)
+ #define BLK_TN_MAX_MSG		128
+ 
+ static inline bool blk_trace_note_message_enabled(struct request_queue *q)
+@@ -82,6 +86,7 @@ extern struct attribute_group blk_trace_attr_group;
+ # define blk_trace_startstop(q, start)			(-ENOTTY)
+ # define blk_trace_remove(q)				(-ENOTTY)
+ # define blk_add_trace_msg(q, fmt, ...)			do { } while (0)
++# define blk_add_cgroup_trace_msg(q, cg, fmt, ...)	do { } while (0)
+ # define blk_trace_remove_sysfs(dev)			do { } while (0)
+ # define blk_trace_note_message_enabled(q)		(false)
+ static inline int blk_trace_init_sysfs(struct device *dev)
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index e90974e..7724de1 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -154,7 +154,8 @@ static void trace_note_time(struct blk_trace *bt)
+ 	local_irq_restore(flags);
+ }
+ 
+-void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
++void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
++	const char *fmt, ...)
  {
- 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
-@@ -1247,61 +1241,8 @@ bool blk_mq_queue_stopped(struct request_queue *q)
+ 	int n;
+ 	va_list args;
+@@ -178,7 +179,14 @@ void __trace_note_message(struct blk_trace *bt, const char *fmt, ...)
+ 	n = vscnprintf(buf, BLK_TN_MAX_MSG, fmt, args);
+ 	va_end(args);
+ 
++	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
++		blkcg = NULL;
++#ifdef CONFIG_BLK_CGROUP
++	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
++		blkcg ? cgroup_get_kernfs_id(blkcg->css.cgroup) : NULL);
++#else
+ 	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n, NULL);
++#endif
+ 	local_irq_restore(flags);
  }
- EXPORT_SYMBOL(blk_mq_queue_stopped);
+ EXPORT_SYMBOL_GPL(__trace_note_message);
+@@ -375,7 +383,7 @@ static ssize_t blk_msg_write(struct file *filp, const char __user *buffer,
+ 		return PTR_ERR(msg);
  
--/*
-- * This function is often used for pausing .queue_rq() by driver when
-- * there isn't enough resource or some conditions aren't satisfied, and
-- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
-- *
-- * We do not guarantee that dispatch can be drained or blocked
-- * after blk_mq_stop_hw_queue() returns. Please use
-- * blk_mq_quiesce_queue() for that requirement.
-- */
--void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
--{
--	cancel_delayed_work(&hctx->run_work);
--
--	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
--}
--EXPORT_SYMBOL(blk_mq_stop_hw_queue);
--
--/*
-- * This function is often used for pausing .queue_rq() by driver when
-- * there isn't enough resource or some conditions aren't satisfied, and
-- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
-- *
-- * We do not guarantee that dispatch can be drained or blocked
-- * after blk_mq_stop_hw_queues() returns. Please use
-- * blk_mq_quiesce_queue() for that requirement.
-- */
--void blk_mq_stop_hw_queues(struct request_queue *q)
--{
--	struct blk_mq_hw_ctx *hctx;
--	int i;
--
--	queue_for_each_hw_ctx(q, hctx, i)
--		blk_mq_stop_hw_queue(hctx);
--}
--EXPORT_SYMBOL(blk_mq_stop_hw_queues);
--
--void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx)
--{
--	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
--
--	blk_mq_run_hw_queue(hctx, false);
--}
--EXPORT_SYMBOL(blk_mq_start_hw_queue);
--
--void blk_mq_start_hw_queues(struct request_queue *q)
--{
--	struct blk_mq_hw_ctx *hctx;
--	int i;
--
--	queue_for_each_hw_ctx(q, hctx, i)
--		blk_mq_start_hw_queue(hctx);
--}
--EXPORT_SYMBOL(blk_mq_start_hw_queues);
--
--void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
-+static void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx,
-+					  bool async)
- {
- 	if (!blk_mq_hctx_stopped(hctx))
- 		return;
-@@ -1309,7 +1250,6 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
- 	blk_mq_run_hw_queue(hctx, async);
- }
--EXPORT_SYMBOL_GPL(blk_mq_start_stopped_hw_queue);
+ 	bt = filp->private_data;
+-	__trace_note_message(bt, "%s", msg);
++	__trace_note_message(bt, NULL, "%s", msg);
+ 	kfree(msg);
  
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- {
-@@ -1319,7 +1259,6 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_start_stopped_hw_queue(hctx, async);
- }
--EXPORT_SYMBOL(blk_mq_start_stopped_hw_queues);
- 
- static void blk_mq_run_work_fn(struct work_struct *work)
- {
-@@ -1344,24 +1283,6 @@ static void blk_mq_run_work_fn(struct work_struct *work)
- }
- 
- 
--void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
--{
--	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
--		return;
--
--	/*
--	 * Stop the hw queue, then modify currently delayed work.
--	 * This should prevent us from running the queue prematurely.
--	 * Mark the queue as auto-clearing STOPPED when it runs.
--	 */
--	blk_mq_stop_hw_queue(hctx);
--	set_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
--	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
--					&hctx->run_work,
--					msecs_to_jiffies(msecs));
--}
--EXPORT_SYMBOL(blk_mq_delay_queue);
--
- static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
- 					    struct request *rq,
- 					    bool at_head)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 60b01c0309bc..2a26c74eaca1 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -25,6 +25,7 @@ struct blk_mq_ctx {
- 	struct kobject		kobj;
- } ____cacheline_aligned_in_smp;
- 
-+void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_free_queue(struct request_queue *q);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 251af99e9ba8..203bc77fdea9 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -242,18 +242,10 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs
- void blk_mq_complete_request(struct request *rq);
- 
- bool blk_mq_queue_stopped(struct request_queue *q);
--void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
--void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
--void blk_mq_stop_hw_queues(struct request_queue *q);
--void blk_mq_start_hw_queues(struct request_queue *q);
--void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
--void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_quiesce_queue(struct request_queue *q);
- void blk_mq_unquiesce_queue(struct request_queue *q);
--void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
--void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
+ 	return count;
 -- 
-2.9.4
+2.9.3
