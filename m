@@ -1,41 +1,55 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 3/8] nvme-loop: quiesce/unquiesce admin_q instead of start/stop its hw queues
-Date: Wed,  5 Jul 2017 09:53:06 +0300
-Message-Id: <1499237591-15861-4-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
-References: <1499237591-15861-1-git-send-email-sagi@grimberg.me>
+Return-Path: <colyli@suse.de>
+Subject: Re: [PATCH 09/19 v2] bcache: update bio->bi_opf bypass/writeback REQ_
+ flag hints
+To: Coly Li <colyli@suse.de>, bcache@lists.ewheeler.net,
+ Eric Wheeler <git@linux.ewheeler.net>,
+ Eric Wheeler <bcache@linux.ewheeler.net>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+ linux-bcache@vger.kernel.org, axboe@kernel.dk
+References: <a4f5a7e5-97aa-4245-5f96-2df2045fb2a4@coly.li>
+ <1499122284-11016-1-git-send-email-bcache@lists.ewheeler.net>
+ <20170705184814.GB3234@infradead.org>
+ <060c352f-894b-57e0-cdf9-6af716376cb9@coly.li>
+ <20170706152438.GA18245@infradead.org>
+ <e5bf5af0-4374-6d1c-2b57-3529d0e73e92@suse.de>
+From: Coly Li <colyli@suse.de>
+Message-ID: <100f0052-c382-1688-0706-7c3a81e31c4e@suse.de>
+Date: Wed, 12 Jul 2017 17:18:21 +0800
+MIME-Version: 1.0
+In-Reply-To: <e5bf5af0-4374-6d1c-2b57-3529d0e73e92@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-unlike blk_mq_stop_hw_queues and blk_mq_start_stopped_hw_queues
-quiescing/unquiescing respects the submission path rcu grace.
+On 2017/7/11 上午11:48, Coly Li wrote:
+> On 2017/7/6 下午11:24, Christoph Hellwig wrote:
+>> On Thu, Jul 06, 2017 at 03:35:48PM +0800, Coly Li wrote:
+>>> Then gfs2 breaks the above rule ?  in gfs2_metapath_ra() and
+>>> gfs2_dir_readahead(), only REQ_META is used in submit_bh(). It seems an
+>>> extra REQ_PRIO should be there.
+>>
+>> Or maybe not.  E.g. XFS absolutely avoids using REQ_PRIO for any of
+>> the buffer writeback as it does not have priority.  You'll need to
+>> ask gfs2 folks if they want this I/O to have priority or not.
+>>
+> 
+> I see. Just sent a RFC patch to gfs2 development list, and wait for
+> response.
+> 
+> Thanks for the hint.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/target/loop.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Eric,
 
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 3d51341e62ee..6a0b70685e77 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -434,9 +434,10 @@ static void nvme_loop_shutdown_ctrl(struct nvme_loop_ctrl *ctrl)
- 	if (ctrl->ctrl.state == NVME_CTRL_LIVE)
- 		nvme_shutdown_ctrl(&ctrl->ctrl);
- 
--	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
- 	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
- 				nvme_cancel_request, &ctrl->ctrl);
-+	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
- 	nvme_loop_destroy_admin_queue(ctrl);
- }
- 
--- 
-2.7.4
+By comments from Christoph, I think the original version is correct
+enough. gfs2 is the only file system uses REQ_READAHEAD for metadata
+readahead, if gfs2 developers agree to add REQ_PRIO when issue metadata
+bio, we can use another patch to cache its metadata in bcache. Currently
+we can just let this patch go ahead.
+
+Thanks for your patient explaining to my question, and thanks to
+Christoph to correct the concept of REQ_META and REQ_PRIO.
+
+Please add Reviewed-by: Coly Li <colyli@suse.de> to your original
+version patch.
+
+
+Coly Li
