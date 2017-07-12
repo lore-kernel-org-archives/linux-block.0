@@ -1,16 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55616 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:55630 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753156AbdGLSud (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:33 -0400
+        id S1753196AbdGLSue (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:50:34 -0400
 From: Shaohua Li <shli@kernel.org>
 To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
         axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
         Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 04/11] kernfs: don't set dentry->d_fsdata
-Date: Wed, 12 Jul 2017 11:49:49 -0700
-Message-Id: <f36e7234d78760c1b97874627ecc50961827d9f2.1499884836.git.shli@fb.com>
+Subject: [PATCH V5 05/11] kernfs: introduce kernfs_node_id
+Date: Wed, 12 Jul 2017 11:49:50 -0700
+Message-Id: <00088c2b5a1803752735c70dd8dbcf633772caa4.1499884836.git.shli@fb.com>
 In-Reply-To: <cover.1499884836.git.shli@fb.com>
 References: <cover.1499884836.git.shli@fb.com>
 In-Reply-To: <cover.1499884836.git.shli@fb.com>
@@ -20,271 +20,166 @@ List-Id: linux-block@vger.kernel.org
 
 From: Shaohua Li <shli@fb.com>
 
-When working on adding exportfs operations in kernfs, I found it's hard
-to initialize dentry->d_fsdata in the exportfs operations. Looks there
-is no way to do it without race condition. Look at the kernfs code
-closely, there is no point to set dentry->d_fsdata. inode->i_private
-already points to kernfs_node, and we can get inode from a dentry. So
-this patch just delete the d_fsdata usage.
+inode number and generation can identify a kernfs node. We are going to
+export the identification by exportfs operations, so put ino and
+generation into a separate structure. It's convenient when later patches
+use the identification.
 
-Acked-by: Tejun Heo <tj@kernel.org>
 Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- fs/kernfs/dir.c             | 25 +++++++++----------------
- fs/kernfs/file.c            |  6 +++---
- fs/kernfs/inode.c           |  6 +++---
- fs/kernfs/kernfs-internal.h |  7 +++++++
- fs/kernfs/mount.c           |  8 ++------
- fs/kernfs/symlink.c         |  6 +++---
- 6 files changed, 27 insertions(+), 31 deletions(-)
+ fs/kernfs/dir.c                  | 10 +++++-----
+ fs/kernfs/file.c                 |  4 ++--
+ fs/kernfs/inode.c                |  4 ++--
+ include/linux/cgroup.h           |  2 +-
+ include/linux/kernfs.h           | 12 ++++++++++--
+ include/trace/events/writeback.h |  2 +-
+ 6 files changed, 21 insertions(+), 13 deletions(-)
 
 diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index 7be37c8..b61a7ef 100644
+index b61a7ef..89d1dc1 100644
 --- a/fs/kernfs/dir.c
 +++ b/fs/kernfs/dir.c
-@@ -566,7 +566,7 @@ static int kernfs_dop_revalidate(struct dentry *dentry, unsigned int flags)
- 	if (d_really_is_negative(dentry))
- 		goto out_bad_unlocked;
- 
--	kn = dentry->d_fsdata;
-+	kn = kernfs_dentry_node(dentry);
- 	mutex_lock(&kernfs_mutex);
- 
- 	/* The kernfs node has been deactivated */
-@@ -574,7 +574,7 @@ static int kernfs_dop_revalidate(struct dentry *dentry, unsigned int flags)
- 		goto out_bad;
- 
- 	/* The kernfs node has been moved? */
--	if (dentry->d_parent->d_fsdata != kn->parent)
-+	if (kernfs_dentry_node(dentry->d_parent) != kn->parent)
- 		goto out_bad;
- 
- 	/* The kernfs node has been renamed */
-@@ -594,14 +594,8 @@ static int kernfs_dop_revalidate(struct dentry *dentry, unsigned int flags)
- 	return 0;
- }
- 
--static void kernfs_dop_release(struct dentry *dentry)
--{
--	kernfs_put(dentry->d_fsdata);
--}
--
- const struct dentry_operations kernfs_dops = {
- 	.d_revalidate	= kernfs_dop_revalidate,
--	.d_release	= kernfs_dop_release,
- };
- 
- /**
-@@ -617,8 +611,9 @@ const struct dentry_operations kernfs_dops = {
-  */
- struct kernfs_node *kernfs_node_from_dentry(struct dentry *dentry)
- {
--	if (dentry->d_sb->s_op == &kernfs_sops)
--		return dentry->d_fsdata;
-+	if (dentry->d_sb->s_op == &kernfs_sops &&
-+	    !d_really_is_negative(dentry))
-+		return kernfs_dentry_node(dentry);
- 	return NULL;
- }
- 
-@@ -1056,7 +1051,7 @@ static struct dentry *kernfs_iop_lookup(struct inode *dir,
- 					unsigned int flags)
- {
- 	struct dentry *ret;
--	struct kernfs_node *parent = dentry->d_parent->d_fsdata;
-+	struct kernfs_node *parent = dir->i_private;
- 	struct kernfs_node *kn;
- 	struct inode *inode;
- 	const void *ns = NULL;
-@@ -1073,8 +1068,6 @@ static struct dentry *kernfs_iop_lookup(struct inode *dir,
- 		ret = NULL;
- 		goto out_unlock;
+@@ -539,7 +539,7 @@ void kernfs_put(struct kernfs_node *kn)
  	}
--	kernfs_get(kn);
--	dentry->d_fsdata = kn;
+ 	kfree(kn->iattr);
+ 	spin_lock(&kernfs_idr_lock);
+-	idr_remove(&root->ino_idr, kn->ino);
++	idr_remove(&root->ino_idr, kn->id.ino);
+ 	spin_unlock(&kernfs_idr_lock);
+ 	kmem_cache_free(kernfs_node_cache, kn);
  
- 	/* attach dentry and inode */
- 	inode = kernfs_get_inode(dir->i_sb, kn);
-@@ -1111,7 +1104,7 @@ static int kernfs_iop_mkdir(struct inode *dir, struct dentry *dentry,
+@@ -645,8 +645,8 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 	idr_preload_end();
+ 	if (ret < 0)
+ 		goto err_out2;
+-	kn->ino = ret;
+-	kn->generation = gen;
++	kn->id.ino = ret;
++	kn->id.generation = gen;
  
- static int kernfs_iop_rmdir(struct inode *dir, struct dentry *dentry)
- {
--	struct kernfs_node *kn  = dentry->d_fsdata;
-+	struct kernfs_node *kn  = kernfs_dentry_node(dentry);
- 	struct kernfs_syscall_ops *scops = kernfs_root(kn)->syscall_ops;
- 	int ret;
+ 	/*
+ 	 * set ino first. This barrier is paired with atomic_inc_not_zero in
+@@ -721,7 +721,7 @@ struct kernfs_node *kernfs_find_and_get_node_by_ino(struct kernfs_root *root,
+ 	 * before 'count'. So if 'count' is uptodate, 'ino' should be uptodate,
+ 	 * hence we can use 'ino' to filter stale node.
+ 	 */
+-	if (kn->ino != ino)
++	if (kn->id.ino != ino)
+ 		goto out;
+ 	rcu_read_unlock();
  
-@@ -1131,7 +1124,7 @@ static int kernfs_iop_rename(struct inode *old_dir, struct dentry *old_dentry,
- 			     struct inode *new_dir, struct dentry *new_dentry,
- 			     unsigned int flags)
- {
--	struct kernfs_node *kn  = old_dentry->d_fsdata;
-+	struct kernfs_node *kn = kernfs_dentry_node(old_dentry);
- 	struct kernfs_node *new_parent = new_dir->i_private;
- 	struct kernfs_syscall_ops *scops = kernfs_root(kn)->syscall_ops;
- 	int ret;
-@@ -1644,7 +1637,7 @@ static struct kernfs_node *kernfs_dir_next_pos(const void *ns,
- static int kernfs_fop_readdir(struct file *file, struct dir_context *ctx)
- {
- 	struct dentry *dentry = file->f_path.dentry;
--	struct kernfs_node *parent = dentry->d_fsdata;
-+	struct kernfs_node *parent = kernfs_dentry_node(dentry);
- 	struct kernfs_node *pos = file->private_data;
- 	const void *ns = NULL;
+@@ -1654,7 +1654,7 @@ static int kernfs_fop_readdir(struct file *file, struct dir_context *ctx)
+ 		const char *name = pos->name;
+ 		unsigned int type = dt_type(pos);
+ 		int len = strlen(name);
+-		ino_t ino = pos->ino;
++		ino_t ino = pos->id.ino;
  
+ 		ctx->pos = pos->hash;
+ 		file->private_data = pos;
 diff --git a/fs/kernfs/file.c b/fs/kernfs/file.c
-index ac2dfe0..7f90d4d 100644
+index 7f90d4d..7441925 100644
 --- a/fs/kernfs/file.c
 +++ b/fs/kernfs/file.c
-@@ -616,7 +616,7 @@ static void kernfs_put_open_node(struct kernfs_node *kn,
+@@ -895,7 +895,7 @@ static void kernfs_notify_workfn(struct work_struct *work)
+ 		 * have the matching @file available.  Look up the inodes
+ 		 * and generate the events manually.
+ 		 */
+-		inode = ilookup(info->sb, kn->ino);
++		inode = ilookup(info->sb, kn->id.ino);
+ 		if (!inode)
+ 			continue;
  
- static int kernfs_fop_open(struct inode *inode, struct file *file)
- {
--	struct kernfs_node *kn = file->f_path.dentry->d_fsdata;
-+	struct kernfs_node *kn = inode->i_private;
- 	struct kernfs_root *root = kernfs_root(kn);
- 	const struct kernfs_ops *ops;
- 	struct kernfs_open_file *of;
-@@ -768,7 +768,7 @@ static void kernfs_release_file(struct kernfs_node *kn,
+@@ -903,7 +903,7 @@ static void kernfs_notify_workfn(struct work_struct *work)
+ 		if (parent) {
+ 			struct inode *p_inode;
  
- static int kernfs_fop_release(struct inode *inode, struct file *filp)
- {
--	struct kernfs_node *kn = filp->f_path.dentry->d_fsdata;
-+	struct kernfs_node *kn = inode->i_private;
- 	struct kernfs_open_file *of = kernfs_of(filp);
- 
- 	if (kn->flags & KERNFS_HAS_RELEASE) {
-@@ -835,7 +835,7 @@ void kernfs_drain_open_files(struct kernfs_node *kn)
- static unsigned int kernfs_fop_poll(struct file *filp, poll_table *wait)
- {
- 	struct kernfs_open_file *of = kernfs_of(filp);
--	struct kernfs_node *kn = filp->f_path.dentry->d_fsdata;
-+	struct kernfs_node *kn = kernfs_dentry_node(filp->f_path.dentry);
- 	struct kernfs_open_node *on = kn->attr.open;
- 
- 	if (!kernfs_get_active(kn))
+-			p_inode = ilookup(info->sb, parent->ino);
++			p_inode = ilookup(info->sb, parent->id.ino);
+ 			if (p_inode) {
+ 				fsnotify(p_inode, FS_MODIFY | FS_EVENT_ON_CHILD,
+ 					 inode, FSNOTIFY_EVENT_INODE, kn->name, 0);
 diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
-index 79cdae4..4c8b510 100644
+index 4c8b510..a343039 100644
 --- a/fs/kernfs/inode.c
 +++ b/fs/kernfs/inode.c
-@@ -112,7 +112,7 @@ int kernfs_setattr(struct kernfs_node *kn, const struct iattr *iattr)
- int kernfs_iop_setattr(struct dentry *dentry, struct iattr *iattr)
- {
- 	struct inode *inode = d_inode(dentry);
--	struct kernfs_node *kn = dentry->d_fsdata;
-+	struct kernfs_node *kn = inode->i_private;
- 	int error;
+@@ -220,7 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
+ 	inode->i_private = kn;
+ 	inode->i_mapping->a_ops = &kernfs_aops;
+ 	inode->i_op = &kernfs_iops;
+-	inode->i_generation = kn->generation;
++	inode->i_generation = kn->id.generation;
  
- 	if (!kn)
-@@ -154,7 +154,7 @@ static int kernfs_node_setsecdata(struct kernfs_iattrs *attrs, void **secdata,
- 
- ssize_t kernfs_iop_listxattr(struct dentry *dentry, char *buf, size_t size)
- {
--	struct kernfs_node *kn = dentry->d_fsdata;
-+	struct kernfs_node *kn = kernfs_dentry_node(dentry);
- 	struct kernfs_iattrs *attrs;
- 
- 	attrs = kernfs_iattrs(kn);
-@@ -203,8 +203,8 @@ static void kernfs_refresh_inode(struct kernfs_node *kn, struct inode *inode)
- int kernfs_iop_getattr(const struct path *path, struct kstat *stat,
- 		       u32 request_mask, unsigned int query_flags)
- {
--	struct kernfs_node *kn = path->dentry->d_fsdata;
- 	struct inode *inode = d_inode(path->dentry);
-+	struct kernfs_node *kn = inode->i_private;
- 
- 	mutex_lock(&kernfs_mutex);
+ 	set_default_inode_attr(inode, kn->mode);
  	kernfs_refresh_inode(kn, inode);
-diff --git a/fs/kernfs/kernfs-internal.h b/fs/kernfs/kernfs-internal.h
-index e9c226f..0f260dc 100644
---- a/fs/kernfs/kernfs-internal.h
-+++ b/fs/kernfs/kernfs-internal.h
-@@ -70,6 +70,13 @@ struct kernfs_super_info {
+@@ -266,7 +266,7 @@ struct inode *kernfs_get_inode(struct super_block *sb, struct kernfs_node *kn)
+ {
+ 	struct inode *inode;
+ 
+-	inode = iget_locked(sb, kn->ino);
++	inode = iget_locked(sb, kn->id.ino);
+ 	if (inode && (inode->i_state & I_NEW))
+ 		kernfs_init_inode(kn, inode);
+ 
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 710a005..30c6877 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -543,7 +543,7 @@ static inline bool cgroup_is_populated(struct cgroup *cgrp)
+ /* returns ino associated with a cgroup */
+ static inline ino_t cgroup_ino(struct cgroup *cgrp)
+ {
+-	return cgrp->kn->ino;
++	return cgrp->kn->id.ino;
+ }
+ 
+ /* cft/css accessors for cftype->write() operation */
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index 8c00d28..06a0c59 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -95,6 +95,15 @@ struct kernfs_elem_attr {
+ 	struct kernfs_node	*notify_next;	/* for kernfs_notify() */
  };
- #define kernfs_info(SB) ((struct kernfs_super_info *)(SB->s_fs_info))
  
-+static inline struct kernfs_node *kernfs_dentry_node(struct dentry *dentry)
-+{
-+	if (d_really_is_negative(dentry))
-+		return NULL;
-+	return d_inode(dentry)->i_private;
-+}
++/* represent a kernfs node */
++union kernfs_node_id {
++	struct {
++		u32		ino;
++		u32		generation;
++	};
++	u64			id;
++};
 +
- extern const struct super_operations kernfs_sops;
- extern struct kmem_cache *kernfs_node_cache;
+ /*
+  * kernfs_node - the building block of kernfs hierarchy.  Each and every
+  * kernfs node is represented by single kernfs_node.  Most fields are
+@@ -131,11 +140,10 @@ struct kernfs_node {
  
-diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
-index 69c48be..acd5426 100644
---- a/fs/kernfs/mount.c
-+++ b/fs/kernfs/mount.c
-@@ -33,7 +33,7 @@ static int kernfs_sop_remount_fs(struct super_block *sb, int *flags, char *data)
+ 	void			*priv;
  
- static int kernfs_sop_show_options(struct seq_file *sf, struct dentry *dentry)
++	union kernfs_node_id	id;
+ 	unsigned short		flags;
+ 	umode_t			mode;
+-	unsigned int		ino;
+ 	struct kernfs_iattrs	*iattr;
+-	u32			generation;
+ };
+ 
+ /*
+diff --git a/include/trace/events/writeback.h b/include/trace/events/writeback.h
+index 7bd8783..9b57f01 100644
+--- a/include/trace/events/writeback.h
++++ b/include/trace/events/writeback.h
+@@ -136,7 +136,7 @@ DEFINE_EVENT(writeback_dirty_inode_template, writeback_dirty_inode,
+ 
+ static inline unsigned int __trace_wb_assign_cgroup(struct bdi_writeback *wb)
  {
--	struct kernfs_root *root = kernfs_root(dentry->d_fsdata);
-+	struct kernfs_root *root = kernfs_root(kernfs_dentry_node(dentry));
- 	struct kernfs_syscall_ops *scops = root->syscall_ops;
- 
- 	if (scops && scops->show_options)
-@@ -43,7 +43,7 @@ static int kernfs_sop_show_options(struct seq_file *sf, struct dentry *dentry)
- 
- static int kernfs_sop_show_path(struct seq_file *sf, struct dentry *dentry)
- {
--	struct kernfs_node *node = dentry->d_fsdata;
-+	struct kernfs_node *node = kernfs_dentry_node(dentry);
- 	struct kernfs_root *root = kernfs_root(node);
- 	struct kernfs_syscall_ops *scops = root->syscall_ops;
- 
-@@ -176,8 +176,6 @@ static int kernfs_fill_super(struct super_block *sb, unsigned long magic)
- 		pr_debug("%s: could not get root dentry!\n", __func__);
- 		return -ENOMEM;
- 	}
--	kernfs_get(info->root->kn);
--	root->d_fsdata = info->root->kn;
- 	sb->s_root = root;
- 	sb->s_d_op = &kernfs_dops;
- 	return 0;
-@@ -283,7 +281,6 @@ struct dentry *kernfs_mount_ns(struct file_system_type *fs_type, int flags,
- void kernfs_kill_sb(struct super_block *sb)
- {
- 	struct kernfs_super_info *info = kernfs_info(sb);
--	struct kernfs_node *root_kn = sb->s_root->d_fsdata;
- 
- 	mutex_lock(&kernfs_mutex);
- 	list_del(&info->node);
-@@ -295,7 +292,6 @@ void kernfs_kill_sb(struct super_block *sb)
- 	 */
- 	kill_anon_super(sb);
- 	kfree(info);
--	kernfs_put(root_kn);
+-	return wb->memcg_css->cgroup->kn->ino;
++	return wb->memcg_css->cgroup->kn->id.ino;
  }
  
- /**
-diff --git a/fs/kernfs/symlink.c b/fs/kernfs/symlink.c
-index 1684af4..08ccabd 100644
---- a/fs/kernfs/symlink.c
-+++ b/fs/kernfs/symlink.c
-@@ -98,9 +98,9 @@ static int kernfs_get_target_path(struct kernfs_node *parent,
- 	return 0;
- }
- 
--static int kernfs_getlink(struct dentry *dentry, char *path)
-+static int kernfs_getlink(struct inode *inode, char *path)
- {
--	struct kernfs_node *kn = dentry->d_fsdata;
-+	struct kernfs_node *kn = inode->i_private;
- 	struct kernfs_node *parent = kn->parent;
- 	struct kernfs_node *target = kn->symlink.target_kn;
- 	int error;
-@@ -124,7 +124,7 @@ static const char *kernfs_iop_get_link(struct dentry *dentry,
- 	body = kzalloc(PAGE_SIZE, GFP_KERNEL);
- 	if (!body)
- 		return ERR_PTR(-ENOMEM);
--	error = kernfs_getlink(dentry, body);
-+	error = kernfs_getlink(inode, body);
- 	if (unlikely(error < 0)) {
- 		kfree(body);
- 		return ERR_PTR(error);
+ static inline unsigned int __trace_wbc_assign_cgroup(struct writeback_control *wbc)
 -- 
 2.9.3
