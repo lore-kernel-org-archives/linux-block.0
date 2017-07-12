@@ -1,44 +1,158 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: call __bio_free in bio_endio
-To: Shaohua Li <shli@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Shaohua Li <shli@fb.com>,
- linux-block@vger.kernel.org, Kernel-team@fb.com
-References: <a4ff33f2c114d0d0e1d1f41b7524078d2e9fd3f0.1498762065.git.shli@fb.com>
- <20170629202403.GB416@lst.de> <2a683dff-48d7-5182-7ac6-f1865ddf403d@fb.com>
- <20170710182551.dqxqcksyoizw573i@kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <9a2b66ae-68a2-6dc7-82b9-4f755f359386@kernel.dk>
-Date: Mon, 10 Jul 2017 12:26:47 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170710182551.dqxqcksyoizw573i@kernel.org>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55630 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752757AbdGLSud (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:50:33 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V5 03/11] kernfs: add an API to get kernfs node from inode number
+Date: Wed, 12 Jul 2017 11:49:48 -0700
+Message-Id: <6e9219019e124d6fd9f2a61d30e8feab8b641e06.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 07/10/2017 12:25 PM, Shaohua Li wrote:
-> On Thu, Jun 29, 2017 at 03:23:47PM -0600, Jens Axboe wrote:
->> On 06/29/2017 02:24 PM, Christoph Hellwig wrote:
->>> On Thu, Jun 29, 2017 at 11:54:17AM -0700, Shaohua Li wrote:
->>>> bio_free isn't a good place to free cgroup info. There are a
->>>> lot of cases bio is allocated in special way (for example, in stack) and
->>>> never gets called by bio_put hence bio_free, we are leaking memory. This
->>>> patch moves the free to bio endio, which should be called anyway. The
->>>> __bio_free call in bio_free is kept, in case the bio never gets called
->>>> bio endio.
->>>
->>> Jens already renamed __bio_free to bio_uninit in Linus' tree.
->>>
->>> That being said I think we should just kill __bio_free once all
->>> the work is in.  But I think we should defer this post the
->>> initial pull for 4.12-rc to reduce the merge pain.
->>
->> Yes, let's pick up that work after the existing for-4.13/block has
->> been merged upstream.
-> 
-> Jens,
-> should I repost the patch or you can take care of it (eg, change __bio_free to
-> bio_uninit in the patch)?
+From: Shaohua Li <shli@fb.com>
 
-Can you repost it, please?
+Add an API to get kernfs node from inode number. We will need this to
+implement exportfs operations.
 
+This API will be used in blktrace too later, so it should be as fast as
+possible. To make the API lock free, kernfs node is freed in RCU
+context. And we depend on kernfs_node count/ino number to filter out
+stale kernfs nodes.
+
+Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ fs/kernfs/dir.c             | 57 +++++++++++++++++++++++++++++++++++++++++++++
+ fs/kernfs/kernfs-internal.h |  2 ++
+ fs/kernfs/mount.c           | 11 ++++++++-
+ 3 files changed, 69 insertions(+), 1 deletion(-)
+
+diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
+index 33f711f..7be37c8 100644
+--- a/fs/kernfs/dir.c
++++ b/fs/kernfs/dir.c
+@@ -508,6 +508,10 @@ void kernfs_put(struct kernfs_node *kn)
+ 	struct kernfs_node *parent;
+ 	struct kernfs_root *root;
+ 
++	/*
++	 * kernfs_node is freed with ->count 0, kernfs_find_and_get_node_by_ino
++	 * depends on this to filter reused stale node
++	 */
+ 	if (!kn || !atomic_dec_and_test(&kn->count))
+ 		return;
+ 	root = kernfs_root(kn);
+@@ -649,6 +653,11 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 	kn->ino = ret;
+ 	kn->generation = gen;
+ 
++	/*
++	 * set ino first. This barrier is paired with atomic_inc_not_zero in
++	 * kernfs_find_and_get_node_by_ino
++	 */
++	smp_mb__before_atomic();
+ 	atomic_set(&kn->count, 1);
+ 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
+ 	RB_CLEAR_NODE(&kn->rb);
+@@ -680,6 +689,54 @@ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
+ 	return kn;
+ }
+ 
++/*
++ * kernfs_find_and_get_node_by_ino - get kernfs_node from inode number
++ * @root: the kernfs root
++ * @ino: inode number
++ *
++ * RETURNS:
++ * NULL on failure. Return a kernfs node with reference counter incremented
++ */
++struct kernfs_node *kernfs_find_and_get_node_by_ino(struct kernfs_root *root,
++						    unsigned int ino)
++{
++	struct kernfs_node *kn;
++
++	rcu_read_lock();
++	kn = idr_find(&root->ino_idr, ino);
++	if (!kn)
++		goto out;
++
++	/*
++	 * Since kernfs_node is freed in RCU, it's possible an old node for ino
++	 * is freed, but reused before RCU grace period. But a freed node (see
++	 * kernfs_put) or an incompletedly initialized node (see
++	 * __kernfs_new_node) should have 'count' 0. We can use this fact to
++	 * filter out such node.
++	 */
++	if (!atomic_inc_not_zero(&kn->count)) {
++		kn = NULL;
++		goto out;
++	}
++
++	/*
++	 * The node could be a new node or a reused node. If it's a new node,
++	 * we are ok. If it's reused because of RCU (because of
++	 * SLAB_TYPESAFE_BY_RCU), the __kernfs_new_node always sets its 'ino'
++	 * before 'count'. So if 'count' is uptodate, 'ino' should be uptodate,
++	 * hence we can use 'ino' to filter stale node.
++	 */
++	if (kn->ino != ino)
++		goto out;
++	rcu_read_unlock();
++
++	return kn;
++out:
++	rcu_read_unlock();
++	kernfs_put(kn);
++	return NULL;
++}
++
+ /**
+  *	kernfs_add_one - add kernfs_node to parent without warning
+  *	@kn: kernfs_node to be added
+diff --git a/fs/kernfs/kernfs-internal.h b/fs/kernfs/kernfs-internal.h
+index 2d5144a..e9c226f 100644
+--- a/fs/kernfs/kernfs-internal.h
++++ b/fs/kernfs/kernfs-internal.h
+@@ -98,6 +98,8 @@ int kernfs_add_one(struct kernfs_node *kn);
+ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
+ 				    const char *name, umode_t mode,
+ 				    unsigned flags);
++struct kernfs_node *kernfs_find_and_get_node_by_ino(struct kernfs_root *root,
++						    unsigned int ino);
+ 
+ /*
+  * file.c
+diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
+index d5b149a..69c48be 100644
+--- a/fs/kernfs/mount.c
++++ b/fs/kernfs/mount.c
+@@ -330,7 +330,16 @@ struct super_block *kernfs_pin_sb(struct kernfs_root *root, const void *ns)
+ 
+ void __init kernfs_init(void)
+ {
++
++	/*
++	 * the slab is freed in RCU context, so kernfs_find_and_get_node_by_ino
++	 * can access the slab lock free. This could introduce stale nodes,
++	 * please see how kernfs_find_and_get_node_by_ino filters out stale
++	 * nodes.
++	 */
+ 	kernfs_node_cache = kmem_cache_create("kernfs_node_cache",
+ 					      sizeof(struct kernfs_node),
+-					      0, SLAB_PANIC, NULL);
++					      0,
++					      SLAB_PANIC | SLAB_TYPESAFE_BY_RCU,
++					      NULL);
+ }
 -- 
-Jens Axboe
+2.9.3
