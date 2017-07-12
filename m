@@ -1,44 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46143 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751472AbdGZX6l (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2017 19:58:41 -0400
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
-        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 7/9] dm: Add nowait support to raid1
-Date: Wed, 26 Jul 2017 18:58:04 -0500
-Message-Id: <20170726235806.12148-8-rgoldwyn@suse.de>
-In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
+Received: from mail.kernel.org ([198.145.29.99]:55760 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753354AbdGLSui (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:50:38 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V5 09/11] block: always attach cgroup info into bio
+Date: Wed, 12 Jul 2017 11:49:54 -0700
+Message-Id: <087d045383e4ca4ac89300fda32d61ab161b4bea.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Shaohua Li <shli@fb.com>
 
-If the I/O would block because the devices are syncing, bail.
+blkcg_bio_issue_check() already gets blkcg for a BIO.
+bio_associate_blkcg() uses a percpu refcounter, so it's a very cheap
+operation. There is no point we don't attach the cgroup info into bio at
+blkcg_bio_issue_check. This also makes blktrace outputs correct cgroup
+info.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/md/dm-raid1.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/blk-throttle.c       | 7 +------
+ include/linux/blk-cgroup.h | 3 +++
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index a4fbd911d566..446ac581627f 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -1219,6 +1219,11 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
- 		if (bio->bi_opf & REQ_RAHEAD)
- 			return DM_MAPIO_KILL;
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a7285bf..a6ebd2b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2104,14 +2104,9 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ {
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+-	int ret;
+-
+-	ret = bio_associate_current(bio);
+-	if (ret == 0 || ret == -EBUSY)
++	if (bio->bi_css)
+ 		bio->bi_cg_private = tg;
+ 	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
+-#else
+-	bio_associate_current(bio);
+ #endif
+ }
  
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return DM_MAPIO_SUBMITTED;
-+		}
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 7104bea..9d92153 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -691,6 +691,9 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 	rcu_read_lock();
+ 	blkcg = bio_blkcg(bio);
+ 
++	/* associate blkcg if bio hasn't attached one */
++	bio_associate_blkcg(bio, &blkcg->css);
 +
- 		queue_bio(ms, bio, rw);
- 		return DM_MAPIO_SUBMITTED;
- 	}
+ 	blkg = blkg_lookup(blkcg, q);
+ 	if (unlikely(!blkg)) {
+ 		spin_lock_irq(q->queue_lock);
 -- 
-2.12.3
+2.9.3
