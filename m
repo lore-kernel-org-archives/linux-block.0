@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:14387 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:40912 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754512AbdGLDGF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2017 23:06:05 -0400
-Date: Wed, 12 Jul 2017 11:05:53 +0800
+        id S1754769AbdGLC7z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jul 2017 22:59:55 -0400
+Date: Wed, 12 Jul 2017 10:59:42 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Bart Van Assche <Bart.VanAssche@wdc.com>
 Cc: "hch@infradead.org" <hch@infradead.org>,
@@ -16,7 +16,7 @@ Cc: "hch@infradead.org" <hch@infradead.org>,
         "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
         "sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH 1/6] xen-blkfront: avoid to use start/stop queue
-Message-ID: <20170712030552.GE13036@ming.t460p>
+Message-ID: <20170712025942.GD13036@ming.t460p>
 References: <20170711182103.11461-1-ming.lei@redhat.com>
  <20170711182103.11461-2-ming.lei@redhat.com>
  <1499798488.2586.27.camel@wdc.com>
@@ -42,6 +42,9 @@ On Tue, Jul 11, 2017 at 06:41:29PM +0000, Bart Van Assche wrote:
 > that the xen-blkfront driver uses blk_mq_(start|stop)_hw_queues() (with queues in
 > plural form)? Can you please reflect that in the subject of this and related
 > patches?
+
+OK, will do it in V2.
+
 > 
 > Additionally, it's probably a good idea that this is not just an interface change
 > but that this kind of patches fix a (hard to trigger?) race condition.
@@ -70,14 +73,16 @@ On Tue, Jul 11, 2017 at 06:41:29PM +0000, Bart Van Assche wrote:
 > has the above kick_pending_request_queues_locked() call been converted into a
 > blk_mq_run_hw_queues() call and thereby ignores the requeue list?
 
-Looks I forget to reply the question about requeue list.
+kick_pending_request_queues_locked() is used in req completion path,
+which belongs to congestion control, so this patch doesn't touch
+kick_pending_request_queues_locked(), which will be switched to
+generic congestion control in patch 5.
 
-Actually blk_mq_kick_requeue_list() is only needed run where the
-queue is restarted, so this patch moves it after
-blk_mq_start_stopped_hw_queues().
+For kick_pending_request_queues(), this patch replaces
+blk_mq_start_stopped_hw_queues() with blk_mq_run_hw_queues()
+because run queue is often the real purpose of this function,
+especially in non-congestion control path.
 
-In other path, we don't stop queue anymore, so needn't to kick requeue
-list.
 
--- 
+Thanks,
 Ming
