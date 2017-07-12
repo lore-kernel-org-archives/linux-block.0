@@ -1,94 +1,93 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-nvme@lists.infradead.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>,
-	linux-block@vger.kernel.org
-Subject: [GIT PULL] another round of nvme patches for kernel 4.13
-Date: Mon, 10 Jul 2017 20:16:52 +0300
-Message-Id: <1499707012-19014-1-git-send-email-sagi@grimberg.me>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:41036 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754620AbdGLDpr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jul 2017 23:45:47 -0400
+Date: Wed, 12 Jul 2017 11:45:38 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>
+Subject: Re: [PATCH 3/6] blk-mq: send the request to dispatch list if direct
+ issue returns busy
+Message-ID: <20170712034538.GJ13036@ming.t460p>
+References: <20170711182103.11461-1-ming.lei@redhat.com>
+ <20170711182103.11461-4-ming.lei@redhat.com>
+ <1499804330.2586.32.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1499804330.2586.32.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hey Jens,
+On Tue, Jul 11, 2017 at 08:18:51PM +0000, Bart Van Assche wrote:
+> On Wed, 2017-07-12 at 02:21 +0800, Ming Lei wrote:
+> > Before mq IO scheduler is in, we always send the request to
+> > dispatch list if .queue_rq() return busy. After mq IO scheduler
+> > is introduced, we only do this way when scheduler is used in
+> > case of direct issue. Actually we can do that when scheduler
+> > isn't used too.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-mq.c | 18 +++++++++++++++---
+> >  1 file changed, 15 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 041f7b7fa0d6..6e0fc80aa151 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -1463,6 +1463,16 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+> >  	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+> >  }
+> >  
+> > +static void blk_mq_direct_dispatch(struct blk_mq_hw_ctx *hctx,
+> > +				   struct request *rq)
+> > +{
+> > +	spin_lock(&hctx->lock);
+> > +	list_add(&rq->queuelist, &hctx->dispatch);
+> > +	spin_unlock(&hctx->lock);
+> > +
+> > +	blk_mq_run_hw_queue(hctx, false);
+> > +}
+> > +
+> >  static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> >  					struct request *rq,
+> >  					blk_qc_t *cookie, bool may_sleep)
+> > @@ -1499,15 +1509,17 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> >  	switch (ret) {
+> >  	case BLK_STS_OK:
+> >  		*cookie = new_cookie;
+> > -		return;
+> > +		break;
+> >  	case BLK_STS_RESOURCE:
+> >  		__blk_mq_requeue_request(rq);
+> > -		goto insert;
+> > +		blk_mq_direct_dispatch(hctx, rq);
+> > +		break;
+> >  	default:
+> >  		*cookie = BLK_QC_T_NONE;
+> >  		blk_mq_end_request(rq, ret);
+> > -		return;
+> > +		break;
+> >  	}
+> > +	return;
+> >  
+> >  insert:
+> >  	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
+> 
+> Hello Ming,
+> 
+> This patch changes the behavior of blk_mq_try_issue_directly() if a scheduler
+> has been configured and .queue_rq() returns BLK_STS_RESOURCE, namely by skipping
+> the e->type->ops.mq.insert_requests() call. Sorry but I don't think this is what
+> we want.
 
-Another round of early patches for 4.13.
+It does not change behaviour for scheduler, please see
+blk_mq_sched_bypass_insert() which is called from
+blk_mq_sched_insert_request().
 
-I added the quiesce/unquiesce patches in here as it's
-easy for me easily apply changes on top. It has accumulated
-reviews and includes mostly nvme anyway, please tell me if
-you don't want to take them with this.
-
-This includes:
-- quiesce/unquiesce fixes in nvme and others from me
-- nvme-fc add create association padding spec updates from James
-- some more quirking from MKP
-- nvmet nit cleanup from Max
-- Fix nvme-rdma racy RDMA completion signalling from Marta
-- some centralization patches from me
-- add tagset nr_hw_queues updates on controller resets in
-  nvme drivers from me
-- nvme-rdma fix resources recycling when doing error recovery from me
-- minor cleanups in nvme-fc from me
-
-please consider pulling from:
-
-  git://git.infradead.org/nvme.git nvme-4.13
-
-It's rebased on top of your for-4.13/block.
-
-Thanks!
-
-----------------------------------------------------------------
-Dan Carpenter (1):
-      nvme-pci: compile warnings in nvme_alloc_host_mem()
-
-James Smart (2):
-      nvme_fc/nvmet_fc: revise Create Association descriptor length
-      nvmet_fc: Accept variable pad lengths on Create Association LS
-
-Marta Rybczynska (1):
-      nvme-rdma: remove race conditions from IB signalling
-
-Martin K. Petersen (1):
-      nvme: Quirks for PM1725 controllers
-
-Max Gurtovoy (1):
-      nvmet: avoid unneeded assignment of submit_bio return value
-
-Sagi Grimberg (18):
-      nvme: move queue_count to the nvme_ctrl
-      nvme: move ctrl cap to struct nvme_ctrl
-      nvme-pci: rename to nvme_pci_configure_admin_queue
-      nvme-fc: don't override opts->nr_io_queues
-      nvme-rdma: update tagset nr_hw_queues after reconnecting/resetting
-      nvme-loop: update tagset nr_hw_queues after reconnecting/resetting
-      nvme-fc: update tagset nr_hw_queues after queues reinit
-      nvme-fc: use blk_mq_delay_run_hw_queue instead of open-coding it
-      nvme-rdma: quiesce/unquiesce admin_q instead of start/stop its hw queues
-      nvme-fc: quiesce/unquiesce admin_q instead of start/stop its hw queues
-      nvme-loop: quiesce/unquiesce admin_q instead of start/stop its hw queues
-      nvme-pci: quiesce/unquiesce admin_q instead of start/stop its hw queues
-      nvme: kick requeue list when requeueing a request instead of when starting the queues
-      nbd: quiesce request queues to make sure no submissions are inflight
-      mtip32xx: quiesce request queues to make sure no submissions are inflight
-      virtio_blk: quiesce/unquiesce live IO when entering PM states
-      nvme: split nvme_uninit_ctrl into stop and uninit
-      nvme-rdma: unconditionally recycle the request mr
-
-weiping zhang (1):
-      nvme-pci: add module parameter for io queue depth
-
- drivers/block/mtip32xx/mtip32xx.c |  19 +++++--
- drivers/block/nbd.c               |   4 +-
- drivers/block/virtio_blk.c        |   4 +-
- drivers/nvme/host/core.c          |  40 +++++++-------
- drivers/nvme/host/fc.c            |  83 ++++++++++++++---------------
- drivers/nvme/host/nvme.h          |   4 ++
- drivers/nvme/host/pci.c           |  96 +++++++++++++++++++--------------
- drivers/nvme/host/rdma.c          | 108 +++++++++++++++++---------------------
- drivers/nvme/target/fc.c          |  20 ++++---
- drivers/nvme/target/io-cmd.c      |   2 +-
- drivers/nvme/target/loop.c        |  47 ++++++++---------
- include/linux/nvme-fc.h           |  23 +++++++-
- 12 files changed, 248 insertions(+), 202 deletions(-)
+-- 
+Ming
