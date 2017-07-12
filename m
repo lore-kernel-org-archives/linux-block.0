@@ -1,105 +1,163 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:65182 "EHLO mx1.redhat.com"
+Received: from mail.kernel.org ([198.145.29.99]:55616 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756345AbdGKSWO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2017 14:22:14 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/6] blk-mq: use EWMA to estimate congestion threshold
-Date: Wed, 12 Jul 2017 02:21:01 +0800
-Message-Id: <20170711182103.11461-5-ming.lei@redhat.com>
-In-Reply-To: <20170711182103.11461-1-ming.lei@redhat.com>
-References: <20170711182103.11461-1-ming.lei@redhat.com>
+        id S1753354AbdGLSuf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:50:35 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V5 06/11] kernfs: add exportfs operations
+Date: Wed, 12 Jul 2017 11:49:51 -0700
+Message-Id: <b561f6428daba9aeeac7e5f6ffe91bb3cb2cc781.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When .queue_rq() returns BLK_STS_RESOURCE(BUSY), we can
-consider that there is congestion in either low level
-driver or hardware.
+From: Shaohua Li <shli@fb.com>
 
-This patch uses EWMA to estimate this congestion threshold,
-then this threshold can be used to detect/avoid congestion.
+Now we have the facilities to implement exportfs operations. The idea is
+cgroup can export the fhandle info to userspace, then userspace uses
+fhandle to find the cgroup name. Another example is userspace can get
+fhandle for a cgroup and BPF uses the fhandle to filter info for the
+cgroup.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq.c         | 14 ++++++++++++++
- block/blk-mq.h         |  9 +++++++++
- include/linux/blk-mq.h |  2 ++
- 3 files changed, 25 insertions(+)
+ fs/kernfs/mount.c      | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/kernfs.h | 12 +++++++++++
+ kernel/cgroup/cgroup.c |  3 ++-
+ 3 files changed, 70 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6e0fc80aa151..da50c187c508 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -976,6 +976,18 @@ static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
- 	return true;
- }
+diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
+index acd5426..fa32358 100644
+--- a/fs/kernfs/mount.c
++++ b/fs/kernfs/mount.c
+@@ -16,6 +16,7 @@
+ #include <linux/pagemap.h>
+ #include <linux/namei.h>
+ #include <linux/seq_file.h>
++#include <linux/exportfs.h>
  
-+static void blk_mq_update_req_dispatch_busy(struct blk_mq_hw_ctx *hctx)
+ #include "kernfs-internal.h"
+ 
+@@ -64,6 +65,59 @@ const struct super_operations kernfs_sops = {
+ 	.show_path	= kernfs_sop_show_path,
+ };
+ 
++static struct inode *kernfs_fh_get_inode(struct super_block *sb,
++		u64 ino, u32 generation)
 +{
-+	struct sbitmap_queue *sbq;
-+	unsigned depth;
++	struct kernfs_super_info *info = kernfs_info(sb);
++	struct inode *inode;
++	struct kernfs_node *kn;
 +
-+	sbq = &hctx->tags->bitmap_tags;
-+	depth = sbitmap_weight(&sbq->sb);
++	if (ino == 0)
++		return ERR_PTR(-ESTALE);
 +
-+	/* use EWMA to estimate a threshold for detecting congestion */
-+	ewma_add(hctx->avg_busy_threshold, depth, 8, 0);
++	kn = kernfs_find_and_get_node_by_ino(info->root, ino);
++	if (!kn)
++		return ERR_PTR(-ESTALE);
++	inode = kernfs_get_inode(sb, kn);
++	kernfs_put(kn);
++	if (IS_ERR(inode))
++		return ERR_CAST(inode);
++
++	if (generation && inode->i_generation != generation) {
++		/* we didn't find the right inode.. */
++		iput(inode);
++		return ERR_PTR(-ESTALE);
++	}
++	return inode;
 +}
 +
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -1064,6 +1076,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 
- 		spin_lock(&hctx->lock);
- 		list_splice_init(list, &hctx->dispatch);
-+		blk_mq_update_req_dispatch_busy(hctx);
- 		spin_unlock(&hctx->lock);
- 
- 		/*
-@@ -1468,6 +1481,7 @@ static void blk_mq_direct_dispatch(struct blk_mq_hw_ctx *hctx,
- {
- 	spin_lock(&hctx->lock);
- 	list_add(&rq->queuelist, &hctx->dispatch);
-+	blk_mq_update_req_dispatch_busy(hctx);
- 	spin_unlock(&hctx->lock);
- 
- 	blk_mq_run_hw_queue(hctx, false);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 60b01c0309bc..c4516d2a2d2c 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -133,4 +133,13 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- 	return hctx->nr_ctx && hctx->tags;
- }
- 
-+/* borrowed from bcache */
-+#define ewma_add(ewma, val, weight, factor)                             \
-+({                                                                      \
-+        (ewma) *= (weight) - 1;                                         \
-+        (ewma) += (val) << factor;                                      \
-+        (ewma) /= (weight);                                             \
-+        (ewma) >> factor;                                               \
-+})
++static struct dentry *kernfs_fh_to_dentry(struct super_block *sb, struct fid *fid,
++		int fh_len, int fh_type)
++{
++	return generic_fh_to_dentry(sb, fid, fh_len, fh_type,
++				    kernfs_fh_get_inode);
++}
 +
- #endif
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 14542308d25b..8694fb39cd80 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -22,6 +22,8 @@ struct blk_mq_hw_ctx {
- 
- 	unsigned long		flags;		/* BLK_MQ_F_* flags */
- 
-+	unsigned long		avg_busy_threshold;
++static struct dentry *kernfs_fh_to_parent(struct super_block *sb, struct fid *fid,
++		int fh_len, int fh_type)
++{
++	return generic_fh_to_parent(sb, fid, fh_len, fh_type,
++				    kernfs_fh_get_inode);
++}
 +
- 	void			*sched_data;
- 	struct request_queue	*queue;
- 	struct blk_flush_queue	*fq;
++static struct dentry *kernfs_get_parent_dentry(struct dentry *child)
++{
++	struct kernfs_node *kn = kernfs_dentry_node(child);
++
++	return d_obtain_alias(kernfs_get_inode(child->d_sb, kn->parent));
++}
++
++static const struct export_operations kernfs_export_ops = {
++	.fh_to_dentry	= kernfs_fh_to_dentry,
++	.fh_to_parent	= kernfs_fh_to_parent,
++	.get_parent	= kernfs_get_parent_dentry,
++};
++
+ /**
+  * kernfs_root_from_sb - determine kernfs_root associated with a super_block
+  * @sb: the super_block in question
+@@ -159,6 +213,8 @@ static int kernfs_fill_super(struct super_block *sb, unsigned long magic)
+ 	sb->s_magic = magic;
+ 	sb->s_op = &kernfs_sops;
+ 	sb->s_xattr = kernfs_xattr_handlers;
++	if (info->root->flags & KERNFS_ROOT_SUPPORT_EXPORTOP)
++		sb->s_export_op = &kernfs_export_ops;
+ 	sb->s_time_gran = 1;
+ 
+ 	/* get root inode, initialize and unlock it */
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index 06a0c59..d149361 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -69,6 +69,12 @@ enum kernfs_root_flag {
+ 	 * following flag enables that behavior.
+ 	 */
+ 	KERNFS_ROOT_EXTRA_OPEN_PERM_CHECK	= 0x0002,
++
++	/*
++	 * The filesystem supports exportfs operation, so userspace can use
++	 * fhandle to access nodes of the fs.
++	 */
++	KERNFS_ROOT_SUPPORT_EXPORTOP		= 0x0004,
+ };
+ 
+ /* type-specific structures for kernfs_node union members */
+@@ -98,6 +104,12 @@ struct kernfs_elem_attr {
+ /* represent a kernfs node */
+ union kernfs_node_id {
+ 	struct {
++		/*
++		 * blktrace will export this struct as a simplified 'struct
++		 * fid' (which is a big data struction), so userspace can use
++		 * it to find kernfs node. The layout must match the first two
++		 * fields of 'struct fid' exactly.
++		 */
+ 		u32		ino;
+ 		u32		generation;
+ 	};
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index cc53111..8f88aac 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -1737,7 +1737,8 @@ int cgroup_setup_root(struct cgroup_root *root, u16 ss_mask, int ref_flags)
+ 		&cgroup_kf_syscall_ops : &cgroup1_kf_syscall_ops;
+ 
+ 	root->kf_root = kernfs_create_root(kf_sops,
+-					   KERNFS_ROOT_CREATE_DEACTIVATED,
++					   KERNFS_ROOT_CREATE_DEACTIVATED |
++					   KERNFS_ROOT_SUPPORT_EXPORTOP,
+ 					   root_cgrp);
+ 	if (IS_ERR(root->kf_root)) {
+ 		ret = PTR_ERR(root->kf_root);
 -- 
-2.9.4
+2.9.3
