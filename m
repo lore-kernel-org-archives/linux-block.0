@@ -1,97 +1,47 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.13-rc3
-Message-ID: <033841b1-91be-c747-a4f5-64b1217b2118@kernel.dk>
-Date: Fri, 28 Jul 2017 09:31:56 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:51612 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932667AbdGLDMX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jul 2017 23:12:23 -0400
+Date: Wed, 12 Jul 2017 11:12:13 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org
+Subject: Re: [PATCH 1/6] xen-blkfront: avoid to use start/stop queue
+Message-ID: <20170712031212.GF13036@ming.t460p>
+References: <20170711182103.11461-1-ming.lei@redhat.com>
+ <20170711182103.11461-2-ming.lei@redhat.com>
+ <20170711212444.ttmkvlxexuduzfcj@MacBook-Pro-de-Roger.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170711212444.ttmkvlxexuduzfcj@MacBook-Pro-de-Roger.local>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+On Tue, Jul 11, 2017 at 11:24:44PM +0200, Roger Pau Monn� wrote:
+> On Wed, Jul 12, 2017 at 02:20:58AM +0800, Ming Lei wrote:
+> > This interfaces will be removed soon, so use quiesce and
+> > unquiesce instead, which should be more safe.
+> > 
+> > The only one usage will be removed in the following
+> > congestion control patches.
+> 
+> Would it be better to simply fix blk_mq_{start/stop}_stopped_hw_queues
+> rather than introducing a new interface?
 
-A small collection of fixes that should go into this series. This pull
-request contains:
+No, we do not want to expose start/stop state to drivers any more, which
+has caused enough trouble already, so these APIs need to be removed, and
+quiesce/unquiesce is preferred way for this purpose, as you can see
+the work done by Sagi Grimberg:
 
-- NVMe pull request from Christoph, with various fixes for nvme proper
-  and nvme-fc.
-
-- Disabling runtime PM for blk-mq for now. With scsi now defaulting to
-  using blk-mq, this reared it's head as an issue. Longer term we'll fix
-  up runtime PM for blk-mq, for now just disable it to prevent a hang on
-  laptop resume for some folks.
-
-- blk-mq CPU <-> hw queue map fix from Christoph.
-
-- xen/blkfront pull request from Konrad, with two small fixes for the
-  blkfront driver.
-
-- A few fixups for nbd from Joseph.
-
-- A stable fix for pblk from Javier.
-
-Please pull!
+        http://marc.info/?t=149927415900006&r=1&w=2
 
 
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Bart Van Assche (1):
-      xen-blkfront: Fix handling of non-supported operations
-
-Christoph Hellwig (3):
-      block: disable runtime-pm for blk-mq
-      blk-mq: map queues to all present CPUs
-      nvme-pci: fix HMB size calculation
-
-Dongli Zhang (1):
-      xen/blkfront: always allocate grants first from per-queue persistent grants
-
-James Smart (2):
-      nvme-fc: address target disconnect race conditions in fcp io submit
-      nvme-fc: revise TRADDR parsing
-
-Javier González (1):
-      lightnvm: pblk: advance bio according to lba index
-
-Jens Axboe (2):
-      Merge branch 'stable/for-jens-4.13' of git://git.kernel.org/.../konrad/xen into for-linus
-      Merge branch 'nvme-4.13' of git://git.infradead.org/nvme into for-linus
-
-Johannes Thumshirn (1):
-      nvme: also provide a UUID in the WWID sysfs attribute
-
-Jon Derrick (1):
-      nvme: fabrics commands should use the fctype field for data direction
-
-Josef Bacik (4):
-      nbd: allow multiple disconnects to be sent
-      nbd: take tx_lock before disconnecting
-      nbd: only set sndtimeo if we have a timeout set
-      nbd: clear disconnected on reconnect
-
-Junxiao Bi (1):
-      xen-blkfront: fix mq start/stop race
-
-Scott Bauer (1):
-      nvme: validate admin queue before unquiesce
-
- block/blk-core.c             |   4 ++
- block/blk-mq-cpumap.c        |   4 +-
- drivers/block/nbd.c          |  18 +++++--
- drivers/block/xen-blkfront.c |  25 +++++----
- drivers/lightnvm/pblk-rb.c   |   4 +-
- drivers/lightnvm/pblk-read.c |  23 +++++---
- drivers/lightnvm/pblk.h      |   2 +-
- drivers/nvme/host/core.c     |   6 ++-
- drivers/nvme/host/fc.c       | 121 +++++++++++++++++++++++--------------------
- drivers/nvme/host/pci.c      |   6 +--
- drivers/nvme/target/fc.c     | 101 +++++++++++++++++++-----------------
- include/linux/nvme-fc.h      |  19 +++++++
- include/linux/nvme.h         |   2 +-
- 13 files changed, 197 insertions(+), 138 deletions(-)
-
--- 
-Jens Axboe
+Thanks,
+Ming
