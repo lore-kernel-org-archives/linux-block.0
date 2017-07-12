@@ -1,88 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40912 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:54192 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754769AbdGLC7z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2017 22:59:55 -0400
-Date: Wed, 12 Jul 2017 10:59:42 +0800
+        id S1755370AbdGLCw3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jul 2017 22:52:29 -0400
+Date: Wed, 12 Jul 2017 10:52:17 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "roger.pau@citrix.com" <roger.pau@citrix.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org
 Subject: Re: [PATCH 1/6] xen-blkfront: avoid to use start/stop queue
-Message-ID: <20170712025942.GD13036@ming.t460p>
+Message-ID: <20170712025216.GC13036@ming.t460p>
 References: <20170711182103.11461-1-ming.lei@redhat.com>
  <20170711182103.11461-2-ming.lei@redhat.com>
- <1499798488.2586.27.camel@wdc.com>
+ <20170711184105.GC29918@char.us.oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1499798488.2586.27.camel@wdc.com>
+In-Reply-To: <20170711184105.GC29918@char.us.oracle.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Jul 11, 2017 at 06:41:29PM +0000, Bart Van Assche wrote:
-> On Wed, 2017-07-12 at 02:20 +0800, Ming Lei wrote:
+On Tue, Jul 11, 2017 at 02:41:05PM -0400, Konrad Rzeszutek Wilk wrote:
+> On Wed, Jul 12, 2017 at 02:20:58AM +0800, Ming Lei wrote:
 > > This interfaces will be removed soon, so use quiesce and
 > > unquiesce instead, which should be more safe.
-> > 
-> > The only one usage will be removed in the following
-> > congestion control patches.
 > 
-> Hello Ming,
-> 
-> The title of this patch is misleading since this patch does not touch the calls
-> related to queue congestion (blk_mq_stop_hw_queue() and
-> blk_mq_start_stopped_hw_queues()). I assume that you meant that this patch avoids
-> that the xen-blkfront driver uses blk_mq_(start|stop)_hw_queues() (with queues in
-> plural form)? Can you please reflect that in the subject of this and related
-> patches?
+> 'should be'? That does not sound encouraging?
 
-OK, will do it in V2.
+Sorry for the mistake, and will fix it in V2, definitely quiesce
+is the preferred interface, also stop queue may not do what you
+want to do as you can see from comment of blk_mq_stop_hw_queues,
+and has caused much trouble already.
 
-> 
-> Additionally, it's probably a good idea that this is not just an interface change
-> but that this kind of patches fix a (hard to trigger?) race condition.
-> 
-> >  static inline void kick_pending_request_queues_locked(struct blkfront_ring_info *rinfo)
-> >  {
-> > -	if (!RING_FULL(&rinfo->ring))
-> > +	if (!RING_FULL(&rinfo->ring)) {
-> >  		blk_mq_start_stopped_hw_queues(rinfo->dev_info->rq, true);
-> > +		blk_mq_kick_requeue_list(rinfo->dev_info->rq);
-> > +	}
-> >  }
-> >  
-> >  static void kick_pending_request_queues(struct blkfront_ring_info *rinfo)
-> > @@ -1225,7 +1227,8 @@ static void kick_pending_request_queues(struct blkfront_ring_info *rinfo)
-> >  	unsigned long flags;
-> >  
-> >  	spin_lock_irqsave(&rinfo->ring_lock, flags);
-> > -	kick_pending_request_queues_locked(rinfo);
-> > +	if (!RING_FULL(&rinfo->ring))
-> > +		blk_mq_run_hw_queues(rinfo->dev_info->rq, true);
-> >  	spin_unlock_irqrestore(&rinfo->ring_lock, flags);
-> >  }
-> 
-> Why do some kick_pending_request_queues_locked() kick the requeue list and why
-> has the above kick_pending_request_queues_locked() call been converted into a
-> blk_mq_run_hw_queues() call and thereby ignores the requeue list?
+And I appreciate if you guys may review on this patch itself.
 
-kick_pending_request_queues_locked() is used in req completion path,
-which belongs to congestion control, so this patch doesn't touch
-kick_pending_request_queues_locked(), which will be switched to
-generic congestion control in patch 5.
+BTW, this patch should have been included in Sagi Grimberg's
+patchset of "[PATCH v3 0/8] correct quiescing in several block drivers":
 
-For kick_pending_request_queues(), this patch replaces
-blk_mq_start_stopped_hw_queues() with blk_mq_run_hw_queues()
-because run queue is often the real purpose of this function,
-especially in non-congestion control path.
-
+        http://marc.info/?t=149927415900006&r=1&w=2
 
 Thanks,
 Ming
