@@ -1,120 +1,118 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36492 "EHLO mx1.redhat.com"
+Received: from mail.kernel.org ([198.145.29.99]:55616 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750949AbdGaQxl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 12:53:41 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 14/14] blk-mq-sched: improve IO scheduling on SCSI devcie
-Date: Tue,  1 Aug 2017 00:51:11 +0800
-Message-Id: <20170731165111.11536-16-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
-References: <20170731165111.11536-1-ming.lei@redhat.com>
+        id S1753027AbdGLSuc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:50:32 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
+        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
+        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH V5 02/11] kernfs: implement i_generation
+Date: Wed, 12 Jul 2017 11:49:47 -0700
+Message-Id: <238c2dc9ae0fc798859de266226d1a1e486a3f46.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
+In-Reply-To: <cover.1499884836.git.shli@fb.com>
+References: <cover.1499884836.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-SCSI device often has per-request_queue queue depth
-(.cmd_per_lun), which is applied among all hw queues
-actually, and this patchset calls this as shared
-queue depth.
+From: Shaohua Li <shli@fb.com>
 
-One theory of scheduler is that we shouldn't dequeue
-request from sw/scheduler queue and dispatch it to
-driver when the low level queue is busy.
+Set i_generation for kernfs inode. This is required to implement
+exportfs operations. The generation is 32-bit, so it's possible the
+generation wraps up and we find stale files. To reduce the posssibility,
+we don't reuse inode numer immediately. When the inode number allocation
+wraps, we increase generation number. In this way generation/inode
+number consist of a 64-bit number which is unlikely duplicated. This
+does make the idr tree more sparse and waste some memory. Since idr
+manages 32-bit keys, idr uses a 6-level radix tree, each level covers 6
+bits of the key. In a 100k inode kernfs, the worst case will have around
+300k radix tree node. Each node is 576bytes, so the tree will use about
+~150M memory. Sounds not too bad, if this really is a problem, we should
+find better data structure.
 
-For SCSI device, queue being busy depends on the
-per-request_queue limit, so we should hold all
-hw queues if the request queue is busy.
-
-This patch introduces per-request_queue dispatch
-list for this purpose, and only when all requests
-in this list are dispatched out successfully, we
-can restart to dequeue request from sw/scheduler
-queue and dispath it to lld.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq.c         |  8 +++++++-
- block/blk-mq.h         | 14 +++++++++++---
- include/linux/blkdev.h |  5 +++++
- 3 files changed, 23 insertions(+), 4 deletions(-)
+ fs/kernfs/dir.c        | 10 +++++++++-
+ fs/kernfs/inode.c      |  1 +
+ include/linux/kernfs.h |  2 ++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9b8b3a740d18..6d02901d798e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2667,8 +2667,14 @@ int blk_mq_update_sched_queue_depth(struct request_queue *q)
- 	 * this queue depth limit
- 	 */
- 	if (q->queue_depth) {
--		queue_for_each_hw_ctx(q, hctx, i)
-+		queue_for_each_hw_ctx(q, hctx, i) {
- 			hctx->flags |= BLK_MQ_F_SHARED_DEPTH;
-+			hctx->dispatch_lock = &q->__mq_dispatch_lock;
-+			hctx->dispatch_list = &q->__mq_dispatch_list;
-+
-+			spin_lock_init(hctx->dispatch_lock);
-+			INIT_LIST_HEAD(hctx->dispatch_list);
-+		}
- 	}
- 
- 	if (!q->elevator)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index a8788058da56..4853d422836f 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -138,19 +138,27 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- static inline bool blk_mq_hctx_is_busy(struct request_queue *q,
- 		struct blk_mq_hw_ctx *hctx)
+diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
+index 8ad7a17..33f711f 100644
+--- a/fs/kernfs/dir.c
++++ b/fs/kernfs/dir.c
+@@ -623,6 +623,8 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 					     unsigned flags)
  {
--	return test_bit(BLK_MQ_S_BUSY, &hctx->state);
-+	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
-+		return test_bit(BLK_MQ_S_BUSY, &hctx->state);
-+	return q->mq_dispatch_busy;
- }
+ 	struct kernfs_node *kn;
++	u32 gen;
++	int cursor;
+ 	int ret;
  
- static inline void blk_mq_hctx_set_busy(struct request_queue *q,
- 		struct blk_mq_hw_ctx *hctx)
- {
--	set_bit(BLK_MQ_S_BUSY, &hctx->state);
-+	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
-+		set_bit(BLK_MQ_S_BUSY, &hctx->state);
-+	else
-+		q->mq_dispatch_busy = 1;
- }
+ 	name = kstrdup_const(name, GFP_KERNEL);
+@@ -635,12 +637,17 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
  
- static inline void blk_mq_hctx_clear_busy(struct request_queue *q,
- 		struct blk_mq_hw_ctx *hctx)
- {
--	clear_bit(BLK_MQ_S_BUSY, &hctx->state);
-+	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
-+		clear_bit(BLK_MQ_S_BUSY, &hctx->state);
-+	else
-+		q->mq_dispatch_busy = 0;
- }
+ 	idr_preload(GFP_KERNEL);
+ 	spin_lock(&kernfs_idr_lock);
+-	ret = idr_alloc(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
++	cursor = idr_get_cursor(&root->ino_idr);
++	ret = idr_alloc_cyclic(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
++	if (ret >= 0 && ret < cursor)
++		root->next_generation++;
++	gen = root->next_generation;
+ 	spin_unlock(&kernfs_idr_lock);
+ 	idr_preload_end();
+ 	if (ret < 0)
+ 		goto err_out2;
+ 	kn->ino = ret;
++	kn->generation = gen;
  
- static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 25f6a0cb27d3..bc0e607710f2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -395,6 +395,11 @@ struct request_queue {
+ 	atomic_set(&kn->count, 1);
+ 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
+@@ -884,6 +891,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
  
- 	atomic_t		shared_hctx_restart;
+ 	idr_init(&root->ino_idr);
+ 	INIT_LIST_HEAD(&root->supers);
++	root->next_generation = 1;
  
-+	/* blk-mq dispatch list and lock for shared queue depth case */
-+	struct list_head	__mq_dispatch_list;
-+	spinlock_t		__mq_dispatch_lock;
-+	unsigned int		mq_dispatch_busy;
-+
- 	struct blk_queue_stats	*stats;
- 	struct rq_wb		*rq_wb;
+ 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
+ 			       KERNFS_DIR);
+diff --git a/fs/kernfs/inode.c b/fs/kernfs/inode.c
+index fb4b4a7..79cdae4 100644
+--- a/fs/kernfs/inode.c
++++ b/fs/kernfs/inode.c
+@@ -220,6 +220,7 @@ static void kernfs_init_inode(struct kernfs_node *kn, struct inode *inode)
+ 	inode->i_private = kn;
+ 	inode->i_mapping->a_ops = &kernfs_aops;
+ 	inode->i_op = &kernfs_iops;
++	inode->i_generation = kn->generation;
  
+ 	set_default_inode_attr(inode, kn->mode);
+ 	kernfs_refresh_inode(kn, inode);
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index 5f5d602..8c00d28 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -135,6 +135,7 @@ struct kernfs_node {
+ 	umode_t			mode;
+ 	unsigned int		ino;
+ 	struct kernfs_iattrs	*iattr;
++	u32			generation;
+ };
+ 
+ /*
+@@ -164,6 +165,7 @@ struct kernfs_root {
+ 
+ 	/* private fields, do not use outside kernfs proper */
+ 	struct idr		ino_idr;
++	u32			next_generation;
+ 	struct kernfs_syscall_ops *syscall_ops;
+ 
+ 	/* list of kernfs_super_info of this root, protected by kernfs_mutex */
 -- 
-2.9.4
+2.9.3
