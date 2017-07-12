@@ -1,44 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:32818 "EHLO mx1.redhat.com"
+Received: from mail.kernel.org ([198.145.29.99]:52714 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751388AbdGNIPD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2017 04:15:03 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org
-Cc: NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 0/3] md: three misc changes
-Date: Fri, 14 Jul 2017 16:14:41 +0800
-Message-Id: <20170714081444.32645-1-ming.lei@redhat.com>
+        id S1751002AbdGLSB0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:01:26 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org
+Cc: axboe@fb.com, Shaohua Li <shli@fb.com>
+Subject: [PATCH 0/2] block: two cleanup patches
+Date: Wed, 12 Jul 2017 11:00:51 -0700
+Message-Id: <cover.1499881589.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This 1st patch fixes one issue introduced in the following two
-commits:
-	Fixes: f0250618361d(md: raid10: don't use bio's vec table to manage resync pages)
-	Fixes: 98d30c5812c3(md: raid1: don't use bio's vec table to manage resync pages)
+From: Shaohua Li <shli@fb.com>
 
-The 2nd one initializes bvec table of bio via bio_add_page() after bio_reset().
+Hi,
+Cleanup the bio_uninit staff as Christoph suggested. I don't remove
+bio_disassociate_task from bio_free, as bio_associate_blkcg is an exported
+symbol and can be called anywhere.
 
-The 3rd one moves the common definitation and helpers into raid1-10.c. 
+Thanks,
+Shaohua
 
-V2:
-	- fix 'page_idx' increasement in patch 1
-	- move raid1/raid10 common code to raid1-raid10.c, as suggested by Neil
+Shaohua Li (2):
+  block: delete bio_uninit in blockdev
+  block: delete bio_uninit
 
-Ming Lei (3):
-  md: remove 'idx' from 'struct resync_pages'
-  md: raid1/raid10: initialize bvec table via bio_add_page()
-  md: raid1-10: move raid1/raid10 common code into raid1-10.c
-
- drivers/md/md.h       | 54 ----------------------------------
- drivers/md/raid1-10.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/md/raid1.c    | 31 ++++----------------
- drivers/md/raid10.c   | 19 ++++--------
- 4 files changed, 93 insertions(+), 92 deletions(-)
- create mode 100644 drivers/md/raid1-10.c
+ block/bio.c         | 17 +++--------------
+ fs/block_dev.c      |  4 +---
+ include/linux/bio.h |  1 -
+ 3 files changed, 4 insertions(+), 18 deletions(-)
 
 -- 
-2.9.4
+2.9.3
