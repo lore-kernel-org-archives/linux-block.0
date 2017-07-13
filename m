@@ -1,71 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55760 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753354AbdGLSui (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:38 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 09/11] block: always attach cgroup info into bio
-Date: Wed, 12 Jul 2017 11:49:54 -0700
-Message-Id: <087d045383e4ca4ac89300fda32d61ab161b4bea.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <i@coly.li>
+Subject: Re: [PATCH 18/19] bcache: silence static checker warning
+To: bcache@lists.ewheeler.net, linux-block@vger.kernel.org
+Cc: linux-bcache@vger.kernel.org, hch@infradead.org, axboe@kernel.dk,
+ Dan Carpenter <dan.carpenter@oracle.com>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+ <1498855388-16990-18-git-send-email-bcache@lists.ewheeler.net>
+From: Coly Li <i@coly.li>
+Message-ID: <7aaea4a6-b097-6aae-31e9-7851a1016f38@coly.li>
+Date: Thu, 13 Jul 2017 17:44:25 +0800
+MIME-Version: 1.0
+In-Reply-To: <1498855388-16990-18-git-send-email-bcache@lists.ewheeler.net>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On 2017/7/1 上午4:43, bcache@lists.ewheeler.net wrote:
+> From: Dan Carpenter <dan.carpenter@oracle.com>
+> 
+> In olden times, closure_return() used to have a hidden return built in.
+> We removed the hidden return but forgot to add a new return here.  If
+> "c" were NULL we would oops on the next line, but fortunately "c" is
+> never NULL.  Let's just remove the if statement.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>  drivers/md/bcache/super.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 24cb9b7..243391d 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1381,9 +1381,6 @@ static void cache_set_flush(struct closure *cl)
+>  	struct btree *b;
+>  	unsigned i;
+>  
+> -	if (!c)
+> -		closure_return(cl);
+> -
+>  	bch_cache_accounting_destroy(&c->accounting);
+>  
+>  	kobject_put(&c->internal);
+> 
+Agree, cache_set_flush() is only called from a continue_at() in
+__cache_set_unregister(). In this case, cl is always not NULL.
 
-blkcg_bio_issue_check() already gets blkcg for a BIO.
-bio_associate_blkcg() uses a percpu refcounter, so it's a very cheap
-operation. There is no point we don't attach the cgroup info into bio at
-blkcg_bio_issue_check. This also makes blktrace outputs correct cgroup
-info.
+Reviewed-by: Coly Li <colyli@suse.de>
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c       | 7 +------
- include/linux/blk-cgroup.h | 3 +++
- 2 files changed, 4 insertions(+), 6 deletions(-)
+Thanks.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a7285bf..a6ebd2b 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2104,14 +2104,9 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
- {
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
--	int ret;
--
--	ret = bio_associate_current(bio);
--	if (ret == 0 || ret == -EBUSY)
-+	if (bio->bi_css)
- 		bio->bi_cg_private = tg;
- 	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
--#else
--	bio_associate_current(bio);
- #endif
- }
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 7104bea..9d92153 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -691,6 +691,9 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 	rcu_read_lock();
- 	blkcg = bio_blkcg(bio);
- 
-+	/* associate blkcg if bio hasn't attached one */
-+	bio_associate_blkcg(bio, &blkcg->css);
-+
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg)) {
- 		spin_lock_irq(q->queue_lock);
 -- 
-2.9.3
+Coly Li
