@@ -1,110 +1,126 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55604 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752819AbdGLSub (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:50:31 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tj@kernel.org, gregkh@linuxfoundation.org, hch@lst.de,
-        axboe@fb.com, rostedt@goodmis.org, lizefan@huawei.com,
-        Kernel-team@fb.com, Shaohua Li <shli@fb.com>
-Subject: [PATCH V5 01/11] kernfs: use idr instead of ida to manage inode number
-Date: Wed, 12 Jul 2017 11:49:46 -0700
-Message-Id: <922270d47a5aca3aad6484130970dd445d653711.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
-In-Reply-To: <cover.1499884836.git.shli@fb.com>
-References: <cover.1499884836.git.shli@fb.com>
+Received: from mx.ewheeler.net ([66.155.3.69]:49634 "EHLO mail.ewheeler.net"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751133AbdGMEKS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jul 2017 00:10:18 -0400
+Date: Thu, 13 Jul 2017 04:10:17 +0000 (UTC)
+From: Eric Wheeler <bcache@lists.ewheeler.net>
+To: Tang Junhui <tang.junhui@zte.com.cn>
+cc: Coly Li <i@coly.li>, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org
+Subject: Re: [PATCH 10/19] bcache: initialize stripe_sectors_dirty correctly
+ for thin flash device
+In-Reply-To: <46e7b8b2-7fac-6404-a6fc-696bfb1e0c61@coly.li>
+Message-ID: <alpine.LRH.2.11.1707130409430.9683@mail.ewheeler.net>
+References: <20170629134510.GA32385@infradead.org> <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net> <1498855388-16990-10-git-send-email-bcache@lists.ewheeler.net> <46e7b8b2-7fac-6404-a6fc-696bfb1e0c61@coly.li>
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="1641074820-235833014-1499919017=:9683"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-kernfs uses ida to manage inode number. The problem is we can't get
-kernfs_node from inode number with ida. Switching to use idr, next patch
-will add an API to get kernfs_node from inode number.
+--1641074820-235833014-1499919017=:9683
+Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- fs/kernfs/dir.c        | 17 ++++++++++++-----
- include/linux/kernfs.h |  2 +-
- 2 files changed, 13 insertions(+), 6 deletions(-)
+On Sun, 2 Jul 2017, Coly Li wrote:
 
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index db5900aaa..8ad7a17 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -21,6 +21,7 @@
- DEFINE_MUTEX(kernfs_mutex);
- static DEFINE_SPINLOCK(kernfs_rename_lock);	/* kn->parent and ->name */
- static char kernfs_pr_cont_buf[PATH_MAX];	/* protected by rename_lock */
-+static DEFINE_SPINLOCK(kernfs_idr_lock);	/* root->ino_idr */
- 
- #define rb_to_kn(X) rb_entry((X), struct kernfs_node, rb)
- 
-@@ -533,7 +534,9 @@ void kernfs_put(struct kernfs_node *kn)
- 		simple_xattrs_free(&kn->iattr->xattrs);
- 	}
- 	kfree(kn->iattr);
--	ida_simple_remove(&root->ino_ida, kn->ino);
-+	spin_lock(&kernfs_idr_lock);
-+	idr_remove(&root->ino_idr, kn->ino);
-+	spin_unlock(&kernfs_idr_lock);
- 	kmem_cache_free(kernfs_node_cache, kn);
- 
- 	kn = parent;
-@@ -542,7 +545,7 @@ void kernfs_put(struct kernfs_node *kn)
- 			goto repeat;
- 	} else {
- 		/* just released the root kn, free @root too */
--		ida_destroy(&root->ino_ida);
-+		idr_destroy(&root->ino_idr);
- 		kfree(root);
- 	}
- }
-@@ -630,7 +633,11 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 	if (!kn)
- 		goto err_out1;
- 
--	ret = ida_simple_get(&root->ino_ida, 1, 0, GFP_KERNEL);
-+	idr_preload(GFP_KERNEL);
-+	spin_lock(&kernfs_idr_lock);
-+	ret = idr_alloc(&root->ino_idr, kn, 1, 0, GFP_ATOMIC);
-+	spin_unlock(&kernfs_idr_lock);
-+	idr_preload_end();
- 	if (ret < 0)
- 		goto err_out2;
- 	kn->ino = ret;
-@@ -875,13 +882,13 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
- 	if (!root)
- 		return ERR_PTR(-ENOMEM);
- 
--	ida_init(&root->ino_ida);
-+	idr_init(&root->ino_idr);
- 	INIT_LIST_HEAD(&root->supers);
- 
- 	kn = __kernfs_new_node(root, "", S_IFDIR | S_IRUGO | S_IXUGO,
- 			       KERNFS_DIR);
- 	if (!kn) {
--		ida_destroy(&root->ino_ida);
-+		idr_destroy(&root->ino_idr);
- 		kfree(root);
- 		return ERR_PTR(-ENOMEM);
- 	}
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index a9b11b8..5f5d602 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -163,7 +163,7 @@ struct kernfs_root {
- 	unsigned int		flags;	/* KERNFS_ROOT_* flags */
- 
- 	/* private fields, do not use outside kernfs proper */
--	struct ida		ino_ida;
-+	struct idr		ino_idr;
- 	struct kernfs_syscall_ops *syscall_ops;
- 
- 	/* list of kernfs_super_info of this root, protected by kernfs_mutex */
--- 
-2.9.3
+> On 2017/7/1 上午4:42, bcache@lists.ewheeler.net wrote:
+> > From: Tang Junhui <tang.junhui@zte.com.cn>
+> > 
+> > Thin flash device does not initialize stripe_sectors_dirty correctly, this
+> > patch fixes this issue.
+> 
+> Hi Junhui,
+> 
+> Could you please explain why stripe_sectors_ditry is not correctly
+> initialized and how about its negative result ?
+
+Hi Tang,
+   
+I'm waiting to queue this patch pending your response to Coly.  Can you   
+update the message send a v2?
+
+--
+Eric Wheeler
+
+
+
+> 
+> Thanks.
+> 
+> Coly
+> 
+> > 
+> > Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  drivers/md/bcache/super.c     | 3 ++-
+> >  drivers/md/bcache/writeback.c | 8 ++++----
+> >  drivers/md/bcache/writeback.h | 2 +-
+> >  3 files changed, 7 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> > index 1f84791..e06641e 100644
+> > --- a/drivers/md/bcache/super.c
+> > +++ b/drivers/md/bcache/super.c
+> > @@ -1030,7 +1030,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
+> >  	}
+> >  
+> >  	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
+> > -		bch_sectors_dirty_init(dc);
+> > +		bch_sectors_dirty_init(&dc->disk);
+> >  		atomic_set(&dc->has_dirty, 1);
+> >  		atomic_inc(&dc->count);
+> >  		bch_writeback_queue(dc);
+> > @@ -1232,6 +1232,7 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
+> >  		goto err;
+> >  
+> >  	bcache_device_attach(d, c, u - c->uuids);
+> > +	bch_sectors_dirty_init(d);
+> >  	bch_flash_dev_request_init(d);
+> >  	add_disk(d->disk);
+> >  
+> > diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> > index 3d463f0..4ac8b13 100644
+> > --- a/drivers/md/bcache/writeback.c
+> > +++ b/drivers/md/bcache/writeback.c
+> > @@ -482,17 +482,17 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
+> >  	return MAP_CONTINUE;
+> >  }
+> >  
+> > -void bch_sectors_dirty_init(struct cached_dev *dc)
+> > +void bch_sectors_dirty_init(struct bcache_device *d)
+> >  {
+> >  	struct sectors_dirty_init op;
+> >  
+> >  	bch_btree_op_init(&op.op, -1);
+> > -	op.inode = dc->disk.id;
+> > +	op.inode = d->id;
+> >  
+> > -	bch_btree_map_keys(&op.op, dc->disk.c, &KEY(op.inode, 0, 0),
+> > +	bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
+> >  			   sectors_dirty_init_fn, 0);
+> >  
+> > -	dc->disk.sectors_dirty_last = bcache_dev_sectors_dirty(&dc->disk);
+> > +	d->sectors_dirty_last = bcache_dev_sectors_dirty(d);
+> >  }
+> >  
+> >  void bch_cached_dev_writeback_init(struct cached_dev *dc)
+> > diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+> > index ea2f92e..c2ab4b4 100644
+> > --- a/drivers/md/bcache/writeback.h
+> > +++ b/drivers/md/bcache/writeback.h
+> > @@ -109,7 +109,7 @@ static inline void bch_writeback_add(struct cached_dev *dc)
+> >  
+> >  void bcache_dev_sectors_dirty_add(struct cache_set *, unsigned, uint64_t, int);
+> >  
+> > -void bch_sectors_dirty_init(struct cached_dev *dc);
+> > +void bch_sectors_dirty_init(struct bcache_device *);
+> >  void bch_cached_dev_writeback_init(struct cached_dev *);
+> >  int bch_cached_dev_writeback_start(struct cached_dev *);
+> 
+> 
+--1641074820-235833014-1499919017=:9683--
