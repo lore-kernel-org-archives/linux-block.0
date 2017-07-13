@@ -1,44 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from lb1.openmailbox.org ([5.79.108.160]:40326 "EHLO
-        mail.openmailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751369AbdGLWWZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 18:22:25 -0400
-From: Alex Ivanov <yourbestfriend@openmailbox.org>
-To: linux-block@vger.kernel.org
-Subject: [PATCH] elevator: allow specifying elevator by config boot param for blk-mq devices
-Date: Wed, 12 Jul 2017 21:57:08 +0300
-Message-Id: <20170712185708.5987-1-yourbestfriend@openmailbox.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Thu, 13 Jul 2017 22:09:32 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] blk-mq-debugfs: add mapping show for hw queue to cpu
+Message-ID: <20170713140932.GA18971@bogon.didichuxing.com>
+References: <20170712165400.GA9696@localhost.didichuxing.com>
+ <d9e4984e-07f1-c1bd-07be-4e0a4b2a71df@kernel.dk>
+ <20170712171331.GA13374@localhost.didichuxing.com>
+ <3d69dcde-2f8e-b7e3-5a3a-f0cb7f8caee8@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <3d69dcde-2f8e-b7e3-5a3a-f0cb7f8caee8@kernel.dk>
+Return-Path: zhangweiping@didichuxing.com
+List-ID: <linux-block@vger.kernel.org>
 
-It's now makes sense to use elevator boot argument when blk-mq is in use,
-since there is now a bunch of schedulers for it (deadline, kyber, bfq, none).
+On Wed, Jul 12, 2017 at 11:25:12AM -0600, Jens Axboe wrote:
+> On 07/12/2017 11:13 AM, weiping zhang wrote:
+> > On Wed, Jul 12, 2017 at 10:57:37AM -0600, Jens Axboe wrote:
+> >> On 07/12/2017 10:54 AM, weiping zhang wrote:
+> >>> A mapping show as following:
+> >>>
+> >>> hctx		cpus
+> >>> hctx0		  0   1
+> >>> hctx1		  2
+> >>> hctx2		  3
+> >>> hctx3		  4   5
+> >>
+> >> We already have that information in the /sys/block/<dev>/mq/X/cpu_list
+> >>
+> >> where X is the hardware queue number. Why do we need it in debugfs as
+> >> well, presented differently?
+> > 
+> > this arribute give a more obviously showing, only by 1 "cat" command.
+> > /sys/bloc/<dev>/mq/X/cpu_list not easy get mapping for all hctx by 1
+> > command.
+> > also /sys/kernel/debug/block/xxx/hctxN/cpuX can export that info, but
+> > these two methods both not obviously.
+> 
+> The point is the information is there, and I'm sure most people can
+> work out the shell logic to collect this info. I see zero benefit to
+> adding this to debugfs.
+> 
 
-Signed-off-by: Alex Ivanov <yourbestfriend@openmailbox.org>
----
- block/elevator.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Jens,
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 4bb2f0c93fa6..ef6b27f13dfd 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -208,12 +208,12 @@ int elevator_init(struct request_queue *q, char *name)
- 	}
- 
- 	/*
--	 * Use the default elevator specified by config boot param for
--	 * non-mq devices, or by config option. Don't try to load modules
-+	 * Use the default elevator specified by config boot param
-+	 * or by config option. Don't try to load modules
- 	 * as we could be running off async and request_module() isn't
- 	 * allowed from async.
- 	 */
--	if (!e && !q->mq_ops && *chosen_elevator) {
-+	if (!e && *chosen_elevator) {
- 		e = elevator_get(chosen_elevator, false);
- 		if (!e)
- 			printk(KERN_ERR "I/O scheduler %s not found\n",
--- 
-2.13.2
+It seems no other people wanna this patch, please skip it, thanks for
+your replay ^_^.
+
+--
+weiping
