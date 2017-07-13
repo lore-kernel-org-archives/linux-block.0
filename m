@@ -1,51 +1,35 @@
-Return-Path: <maxg@mellanox.com>
-From: Max Gurtovoy <maxg@mellanox.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org
-Cc: Max Gurtovoy <maxg@mellanox.com>
-Subject: [PATCH 1/1] null_blk: fix error flow for shared tags during module_init
-Date: Thu,  6 Jul 2017 16:24:49 +0300
-Message-Id: <1499347489-10863-1-git-send-email-maxg@mellanox.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: only alloc hctx point as many as nr_hw_queues
+To: linux-block@vger.kernel.org
+References: <20170713161020.GA10325@bogon.didichuxing.com>
+ <e03b2bfa-15d3-3d27-15cf-07e65882fc25@kernel.dk>
+ <20170713163015.GA10602@bogon.didichuxing.com>
+From: Jens Axboe <axboe@kernel.dk>
+Cc: weiping <zhangweiping@didichuxing.com>
+Message-ID: <6e472c5c-5461-ccc4-1a50-042a2343a3e7@kernel.dk>
+Date: Thu, 13 Jul 2017 10:38:40 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170713163015.GA10602@bogon.didichuxing.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-In case we use shared tags feature, blk_mq_alloc_tag_set might fail
-during module initialization. Check the return value and default to run
-without shared tag set before continuing. Also move the tagset
-initialization process after defining the amount of submition queues.
+On 07/13/2017 10:30 AM, weiping zhang wrote:
+> On Thu, Jul 13, 2017 at 10:14:31AM -0600, Jens Axboe wrote:
+>> On 07/13/2017 10:10 AM, weiping zhang wrote:
+>>> one hw queue only has one hctx, reduce it's number same as nr_hw_queues.
+>>
+>> What happens if a device registers with eg 4 hw queues, then later
+>> calls blk_mq_update_nr_hw_queues()?
+>>
+> 
+> your means, 10 cpu, and  device has 10 hw queues, but  only register 4,
+> and then update it to 10, no place store new hctx. Am i understanding
+> right ? if yes, could you tell me why driver do that ? thanks.
 
-Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
----
- drivers/block/null_blk.c |   12 +++++++++---
- 1 files changed, 9 insertions(+), 3 deletions(-)
+It doesn't matter why the driver would do that, the fact is that this is
+a feature we support and it's a part of the API. NBD uses it, for
+instance. Your patch breaks it, for saving a bit of memory. So I will
+not include it.
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 71f4422..0b7e7e1 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -844,9 +844,6 @@ static int __init null_init(void)
- 		queue_mode = NULL_Q_MQ;
- 	}
- 
--	if (queue_mode == NULL_Q_MQ && shared_tags)
--		null_init_tag_set(&tag_set);
--
- 	if (queue_mode == NULL_Q_MQ && use_per_node_hctx) {
- 		if (submit_queues < nr_online_nodes) {
- 			pr_warn("null_blk: submit_queues param is set to %u.",
-@@ -858,6 +855,15 @@ static int __init null_init(void)
- 	else if (!submit_queues)
- 		submit_queues = 1;
- 
-+	if (queue_mode == NULL_Q_MQ && shared_tags) {
-+		ret = null_init_tag_set(&tag_set);
-+		if (ret) {
-+			pr_warn("null_blk: Can't use shared tags %d\n", ret);
-+			pr_warn("null_blk: defaults to non shared tags\n");
-+			shared_tags = false;
-+		}
-+	}
-+
- 	mutex_init(&lock);
- 
- 	null_major = register_blkdev(0, "nullb");
 -- 
-1.7.1
+Jens Axboe
