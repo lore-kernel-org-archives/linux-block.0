@@ -1,77 +1,41 @@
-Return-Path: <houtao1@huawei.com>
-From: Hou Tao <houtao1@huawei.com>
-To: <linux-block@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <axboe@kernel.dk>
-Subject: [PATCH] block, bfq: dispatch request to prevent queue stalling after the request completion
-Date: Tue, 11 Jul 2017 21:58:15 +0800
-Message-ID: <1499781495-44090-1-git-send-email-houtao1@huawei.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:40311 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751017AbdGMRop (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jul 2017 13:44:45 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Subject: Re: [PATCH 2/6] SCSI: use blk_mq_run_hw_queues() in scsi_kick_queue()
+Date: Thu, 13 Jul 2017 17:44:41 +0000
+Message-ID: <1499967879.2740.8.camel@wdc.com>
+References: <20170711182103.11461-1-ming.lei@redhat.com>
+         <20170711182103.11461-3-ming.lei@redhat.com>
+         <1499803071.2586.29.camel@wdc.com> <20170712031503.GG13036@ming.t460p>
+         <1499872355.2554.1.camel@wdc.com> <20170713102343.GA19857@ming.t460p>
+In-Reply-To: <20170713102343.GA19857@ming.t460p>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There are mq devices (eg., virtio-blk, nbd and loopback) which don't
-invoke blk_mq_run_hw_queues() after the completion of a request.
-If bfq is enabled on these devices and the slice_idle attribute or
-strict_guarantees attribute is set as zero, it is possible that
-after a request completion the remaining requests of busy bfq queue
-will stalled in the bfq schedule until a new request arrives.
+On Thu, 2017-07-13 at 18:23 +0800, Ming Lei wrote:
+> Please discuss the congestion control in patch 4 and 5.
 
-To fix the scheduler latency problem, we need to check whether or not
-all issued requests have completed and dispatch more requests to driver
-if there is no request in driver.
+Hello Ming,
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
+Since there is a significant risk that this patch series will introduce
+performance and/or functional regressions, I will wait with reviewing this
+patch series further until it has been shown that there is no less risky
+alternative to realize the same performance improvement. I think Jens had
+already suggested a possible alternative, namely by only starting a queue
+if it really has to be started.
 
-The problem can be reproduced by running the following script
-on a virtio-blk device with nr_hw_queues as 1:
-
-#!/bin/sh
-
-dev=vdb
-# mount point for dev
-mp=/tmp/mnt
-cd $mp
-
-job=strict.job
-cat <<EOF > $job
-[global]
-direct=1
-bs=4k
-size=256M
-rw=write
-ioengine=libaio
-iodepth=128
-runtime=5
-time_based
-
-[1]
-filename=1.data
-
-[2]
-new_group
-filename=2.data
-EOF
-
-echo bfq > /sys/block/$dev/queue/scheduler
-echo 1 > /sys/block/$dev/queue/iosched/strict_guarantees
-fio $job
----
- block/bfq-iosched.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 12bbc6b..94cd682 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4293,6 +4293,9 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 			bfq_bfqq_expire(bfqd, bfqq, false,
- 					BFQQE_NO_MORE_REQUESTS);
- 	}
-+
-+	if (!bfqd->rq_in_driver)
-+		bfq_schedule_dispatch(bfqd);
- }
- 
- static void bfq_put_rq_priv_body(struct bfq_queue *bfqq)
--- 
-2.5.0
+Bart.=
