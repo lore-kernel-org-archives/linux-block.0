@@ -1,51 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46111 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751078AbdGZX6j (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2017 19:58:39 -0400
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
-        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 6/9] dm: add nowait support
-Date: Wed, 26 Jul 2017 18:58:03 -0500
-Message-Id: <20170726235806.12148-7-rgoldwyn@suse.de>
-In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
+Subject: Re: [PATCH 4/6] blk-mq: use EWMA to estimate congestion threshold
+Date: Thu, 13 Jul 2017 17:35:29 +0000
+Message-ID: <1499967327.2740.6.camel@wdc.com>
+References: <20170711182103.11461-1-ming.lei@redhat.com>
+	 <20170711182103.11461-5-ming.lei@redhat.com>
+	 <db7526a0-d534-8bc2-93de-546f4dabccfb@kernel.dk>
+	 <20170712023028.GB13036@ming.t460p> <1499873952.2554.5.camel@wdc.com>
+	 <20170713104341.GB19857@ming.t460p> <1499957797.2740.2.camel@wdc.com>
+	 <20170713153240.GA25313@ming.t460p>
+In-Reply-To: <20170713153240.GA25313@ming.t460p>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Thu, 2017-07-13 at 23:32 +0800, Ming Lei wrote:
+> On Thu, Jul 13, 2017 at 02:56:38PM +0000, Bart Van Assche wrote:
+> > hctx_may_queue() severely limits the queue depth if many LUNs are assoc=
+iated
+> > with the same SCSI host. I think that this is a performance regression
+> > compared to scsi-sq and that this performance regression should be fixe=
+d.
+>=20
+> IMO, it is hard to evaluate/compare perf between scsi-mq vs scsi-sq:
+>=20
+> 	- how many LUNs do you run IO on concurrently?
+> 	- evaluate the perf on single LUN or multi LUN?
+>=20
+> BTW, active_queues is a runtime variable which accounts the actual active
+> queues in use.
 
-Add support for bio based dm devices, which exclusively
-sets a make_request_fn(). Request based devices are supported
-by default.
+Hello Ming,
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- drivers/md/dm.c | 3 +++
- 1 file changed, 3 insertions(+)
+What I described can be verified easily by running fio against a single LUN
+of a SCSI host with which a large number of LUNs are associated.
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 2edbcc2d7d3f..aa9c1a5f2966 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1550,6 +1550,8 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
- 
- 		if (!(bio->bi_opf & REQ_RAHEAD))
- 			queue_io(md, bio);
-+		else if (bio->bi_opf & REQ_NOWAIT)
-+			bio_wouldblock_error(bio);
- 		else
- 			bio_io_error(bio);
- 		return BLK_QC_T_NONE;
-@@ -2066,6 +2068,7 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
- 	case DM_TYPE_DAX_BIO_BASED:
- 		dm_init_normal_md_queue(md);
- 		blk_queue_make_request(md->queue, dm_make_request);
-+		queue_flag_set_unlocked(QUEUE_FLAG_NOWAIT, md->queue);
- 		/*
- 		 * DM handles splitting bios as needed.  Free the bio_split bioset
- 		 * since it won't be used (saves 1 process per bio-based DM device).
--- 
-2.12.3
+BTW, something I overlooked in my analysis of the active_queues variable is
+that it is not only decremented if a queue is destroyed but also if a queue
+is idle during (block layer request timeout) seconds. So the problem I
+described will only occur if some software submits I/O requests periodicall=
+y
+to all SCSI LUNs with a shorter interval than the I/O timeout. I'm not sure
+any Linux software does this today. As an example, the time between path
+checks by the multipathd TUR checker typically exceeds the timeout of a
+single TUR check.
+
+Bart.=
