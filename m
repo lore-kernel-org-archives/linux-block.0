@@ -1,74 +1,151 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Fri, 7 Jul 2017 18:04:53 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] block: add io queue depth show
-Message-ID: <20170707100453.GA11827@localhost.didichuxing.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:40582 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750741AbdGMBWa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 21:22:30 -0400
+Date: Thu, 13 Jul 2017 09:22:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Shaohua Li <shli@kernel.org>
+Cc: Ming Lei <tom.leiming@gmail.com>, NeilBrown <neilb@suse.com>,
+        Jens Axboe <axboe@fb.com>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v3 05/14] md: raid1: don't use bio's vec table to manage
+ resync pages
+Message-ID: <20170713012205.GA670@ming.t460p>
+References: <20170316161235.27110-6-tom.leiming@gmail.com>
+ <87mv8d5ht7.fsf@notabene.neil.brown.name>
+ <CACVXFVP69kLQyr0NOY7zXMZ_bdJYCV7fBbDrKdFF9fBPBTsU-g@mail.gmail.com>
+ <20170710041304.GB15321@ming.t460p>
+ <87h8yk6h50.fsf@notabene.neil.brown.name>
+ <20170710072538.GA32208@ming.t460p>
+ <20170710190549.luj7zrnq7mo4x36b@kernel.org>
+ <874luj6g1y.fsf@notabene.neil.brown.name>
+ <CACVXFVOu92NhB+TmytW8Nk6bmL83cDHJFCf=gH5a_+GM6ov5kA@mail.gmail.com>
+ <20170712163050.sxmylv7uq5f2z6gp@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170712163050.sxmylv7uq5f2z6gp@kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-show io queue depth.
+On Wed, Jul 12, 2017 at 09:30:50AM -0700, Shaohua Li wrote:
+> On Wed, Jul 12, 2017 at 09:40:10AM +0800, Ming Lei wrote:
+> > On Tue, Jul 11, 2017 at 7:14 AM, NeilBrown <neilb@suse.com> wrote:
+> > > On Mon, Jul 10 2017, Shaohua Li wrote:
+> > >
+> > >> On Mon, Jul 10, 2017 at 03:25:41PM +0800, Ming Lei wrote:
+> > >>> On Mon, Jul 10, 2017 at 02:38:19PM +1000, NeilBrown wrote:
+> > >>> > On Mon, Jul 10 2017, Ming Lei wrote:
+> > >>> >
+> > >>> > > On Mon, Jul 10, 2017 at 11:35:12AM +0800, Ming Lei wrote:
+> > >>> > >> On Mon, Jul 10, 2017 at 7:09 AM, NeilBrown <neilb@suse.com> wrote:
+> > >>> > ...
+> > >>> > >> >> +
+> > >>> > >> >> +             rp->idx = 0;
+> > >>> > >> >
+> > >>> > >> > This is the only place the ->idx is initialized, in r1buf_pool_alloc().
+> > >>> > >> > The mempool alloc function is suppose to allocate memory, not initialize
+> > >>> > >> > it.
+> > >>> > >> >
+> > >>> > >> > If the mempool_alloc() call cannot allocate memory it will use memory
+> > >>> > >> > from the pool.  If this memory has already been used, then it will no
+> > >>> > >> > longer have the initialized value.
+> > >>> > >> >
+> > >>> > >> > In short: you need to initialise memory *after* calling
+> > >>> > >> > mempool_alloc(), unless you ensure it is reset to the init values before
+> > >>> > >> > calling mempool_free().
+> > >>> > >> >
+> > >>> > >> > https://bugzilla.kernel.org/show_bug.cgi?id=196307
+> > >>> > >>
+> > >>> > >> OK, thanks for posting it out.
+> > >>> > >>
+> > >>> > >> Another fix might be to reinitialize the variable(rp->idx = 0) in
+> > >>> > >> r1buf_pool_free().
+> > >>> > >> Or just set it as zero every time when it is used.
+> > >>> > >>
+> > >>> > >> But I don't understand why mempool_free() calls pool->free() at the end of
+> > >>> > >> this function, which may cause to run pool->free() on a new allocated buf,
+> > >>> > >> seems a bug in mempool?
+> > >>> > >
+> > >>> > > Looks I missed the 'return' in mempool_free(), so it is fine.
+> > >>> > >
+> > >>> > > How about the following fix?
+> > >>> >
+> > >>> > It looks like it would probably work, but it is rather unusual to
+> > >>> > initialise something just before freeing it.
+> > >>> >
+> > >>> > Couldn't you just move the initialization to shortly after the
+> > >>> > mempool_alloc() call.  There looks like a good place that already loops
+> > >>> > over all the bios....
+> > >>>
+> > >>> OK, follows the revised patch according to your suggestion.
+> > >
+> > > Thanks.
+> > >
+> > > That isn't as tidy as I hoped.  So I went deeper into the code to try to
+> > > understand why...
+> > >
+> > > I think that maybe we should just discard the ->idx field completely.
+> > > It is only used in this code:
+> > >
+> > >         do {
+> > >                 struct page *page;
+> > >                 int len = PAGE_SIZE;
+> > >                 if (sector_nr + (len>>9) > max_sector)
+> > >                         len = (max_sector - sector_nr) << 9;
+> > >                 if (len == 0)
+> > >                         break;
+> > >                 for (bio= biolist ; bio ; bio=bio->bi_next) {
+> > >                         struct resync_pages *rp = get_resync_pages(bio);
+> > >                         page = resync_fetch_page(rp, rp->idx++);
+> > >                         /*
+> > >                          * won't fail because the vec table is big enough
+> > >                          * to hold all these pages
+> > >                          */
+> > >                         bio_add_page(bio, page, len, 0);
+> > >                 }
+> > >                 nr_sectors += len>>9;
+> > >                 sector_nr += len>>9;
+> > >         } while (get_resync_pages(biolist)->idx < RESYNC_PAGES);
+> > >
+> > > and all of the different 'rp' always have the same value for 'idx'.
+> > > This code is more complex than it needs to be.  This is because it used
+> > > to be possible for bio_add_page() to fail.  That cannot happen any more.
+> > > So we can make the code something like:
+> > >
+> > >   for (idx = 0; idx < RESYNC_PAGES; idx++) {
+> > >      struct page *page;
+> > >      int len = PAGE_SIZE;
+> > >      if (sector_nr + (len >> 9) > max_sector)
+> > >          len = (max_sector - sector_nr) << 9
+> > >      if (len == 0)
+> > >          break;
+> > >      for (bio = biolist; bio; bio = bio->bi_next) {
+> > >         struct resync_pages *rp = get_resync_pages(bio);
+> > >         page = resync_fetch_page(rp, idx);
+> > >         bio_add_page(bio, page, len, 0);
+> > >      }
+> > >      nr_sectors += len >> 9;
+> > >      sector_nr += len >> 9;
+> > >   }
+> > >
+> > > Or did I miss something?
+> > 
+> > I think this approach is much clean.
+> 
+> Thought I suggested not using the 'idx' in your previous post, but you said
+> there is reason (not because of bio_add_page) not to do it. Is that changed?
+> can't remember the details, I need to dig the mail archives. 
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- block/blk-sysfs.c      | 11 +++++++++++
- include/linux/blkdev.h |  5 +++++
- 2 files changed, 16 insertions(+)
+I found it:
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 27aceab..66cba2b 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -256,6 +256,11 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
- 	return queue_var_show(max_hw_sectors_kb, (page));
- }
- 
-+static ssize_t queue_io_queue_depth_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(queue_io_queue_depth(q), (page));
-+}
-+
- #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
- static ssize_t								\
- queue_show_##name(struct request_queue *q, char *page)			\
-@@ -678,6 +683,11 @@ static struct queue_sysfs_entry queue_wb_lat_entry = {
- 	.store = queue_wb_lat_store,
- };
- 
-+static struct queue_sysfs_entry queue_io_queue_depth_entry = {
-+	.attr = {.name = "io_queue_depth", .mode = S_IRUGO },
-+	.show = queue_io_queue_depth_show,
-+};
-+
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- static struct queue_sysfs_entry throtl_sample_time_entry = {
- 	.attr = {.name = "throttle_sample_time", .mode = S_IRUGO | S_IWUSR },
-@@ -719,6 +729,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_dax_entry.attr,
- 	&queue_wb_lat_entry.attr,
- 	&queue_poll_delay_entry.attr,
-+	&queue_io_queue_depth_entry.attr,
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	&throtl_sample_time_entry.attr,
- #endif
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 25f6a0c..bcd0af4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1405,6 +1405,11 @@ static inline unsigned int queue_max_hw_sectors(struct request_queue *q)
- 	return q->limits.max_hw_sectors;
- }
- 
-+static inline unsigned int queue_io_queue_depth(struct request_queue *q)
-+{
-+	return q->queue_depth;
-+}
-+
- static inline unsigned short queue_max_segments(struct request_queue *q)
- {
- 	return q->limits.max_segments;
+	http://marc.info/?l=linux-raid&m=148847751302825&w=2
+
+Not sure why I didn't change to this way in v3, but the idea is correct.
+Maybe I misunderstood it that time.
+
 -- 
-2.9.4
+Ming
