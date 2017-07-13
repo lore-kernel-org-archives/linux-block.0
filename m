@@ -1,162 +1,119 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:38010 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751964AbdG1NN3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2017 09:13:29 -0400
-Received: by mail-wm0-f52.google.com with SMTP id m85so117194244wma.1
-        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2017 06:13:29 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-Subject: [PATCH] lightnvm: pblk: advance bio according to lba index
-Date: Fri, 28 Jul 2017 15:13:16 +0200
-Message-Id: <1501247596-23999-2-git-send-email-javier@javigon.com>
-In-Reply-To: <1501247596-23999-1-git-send-email-javier@javigon.com>
-References: <1501247596-23999-1-git-send-email-javier@javigon.com>
+Received: from mx.ewheeler.net ([66.155.3.69]:47562 "EHLO mail.ewheeler.net"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750755AbdGMAx7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jul 2017 20:53:59 -0400
+Date: Thu, 13 Jul 2017 00:53:55 +0000 (UTC)
+From: Eric Wheeler <bcache@lists.ewheeler.net>
+To: Coly Li <colyli@suse.de>
+cc: tang.junhui@zte.com.cn, linux-bcache@vger.kernel.org,
+        linux-bcache-owner@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] bcache: only recovery I/O error for writethrough mode
+In-Reply-To: <be0287d1-9af2-659c-0d40-5fb774e3b178@suse.de>
+Message-ID: <alpine.LRH.2.11.1707130012390.9683@mail.ewheeler.net>
+References: <20170710111828.97918-1-colyli@suse.de> <OFCB2AA6A0.E15FCC3D-ON4825815B.0001EEF5-4825815B.00033093@zte.com.cn> <eb85fc2b-91d9-0344-829c-972803572ac1@suse.de> <OFAAA836F5.65C1F846-ON4825815B.00093270-4825815B.0009741B@zte.com.cn>
+ <45926957-5990-6520-7bd7-6de8c2bae7b8@suse.de> <OF7159B9D9.1C66A3AE-ON4825815B.000AD084-4825815B.000B252E@zte.com.cn> <be0287d1-9af2-659c-0d40-5fb774e3b178@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: MULTIPART/MIXED; BOUNDARY="1641074820-235402074-1499907238=:9683"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When a lba either hits the cache or corresponds to an empty entry in the
-L2P table, we need to advance the bio according to the position in which
-the lba is located. Otherwise, we will copy data in the wrong page, thus
-causing data corruption for the application.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-In case of a cache hit, we assumed that bio->bi_iter.bi_idx would
-contain the correct index, but this is no necessarily true. Instead, use
-the local bio advance counter and iterator. This guarantees that lbas
-hitting the cache are copied into the right bv_page.
+--1641074820-235402074-1499907238=:9683
+Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-In case of an empty L2P entry, we omitted to advance the bio. In the
-cases when the same I/O also contains a cache hit, data corresponding
-to this lba will be copied to the wrong bv_page. Fix this by advancing
-the bio as we do in the case of a cache hit.
+On Wed, 12 Jul 2017, Coly Li wrote:
 
-Fixes: a4bd217b4326 lightnvm: physical block device (pblk) target
+> On 2017/7/12 上午10:01, tang.junhui@zte.com.cn wrote:
+> >>I meant "it is very necessary for data base applications which always
+> >>use *writeback* mode and not switch to other mode during all their
+> >>online time."  ^_^
+> > 
+> > I know, it is necessary, but not enough. who can promise they will not
+> > switch during online time? This patch is logical imperfectly.
+> 
+> Yes, I agree with you. Since Eric mentions dirty data map, an improved
+> fix shows up in my head,
+> 
+> When cache device disconnected from system,
+> 0) If in non mode, do nothing.
 
-Signed-off-by: Javier González <javier@javigon.com>
----
- drivers/lightnvm/pblk-rb.c   |  4 ++--
- drivers/lightnvm/pblk-read.c | 23 ++++++++++++++++-------
- drivers/lightnvm/pblk.h      |  2 +-
- 3 files changed, 19 insertions(+), 10 deletions(-)
+Does non mode guarantee that nothing is dirty?  I'm not convinced of that.  
+I think you can set non mode with dirty blocks. (Correct me if I'm wrong 
+here.)
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 5ecc154f6831..9bc32578a766 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -657,7 +657,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
-  * be directed to disk.
-  */
- int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
--			struct ppa_addr ppa, int bio_iter)
-+			struct ppa_addr ppa, int bio_iter, bool advanced_bio)
- {
- 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
- 	struct pblk_rb_entry *entry;
-@@ -694,7 +694,7 @@ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
- 	 * filled with data from the cache). If part of the data resides on the
- 	 * media, we will read later on
- 	 */
--	if (unlikely(!bio->bi_iter.bi_idx))
-+	if (unlikely(!advanced_bio))
- 		bio_advance(bio, bio_iter * PBLK_EXPOSED_PAGE_SIZE);
+> 1) If in writeback/writethough/writearound mode, and dirty map is clean,
+>    - switch to non mode
+>    - continue to handle I/O without cache device
+
+Sure, that makes sense.  
+
+> 2) If in writeback mode, and dirty map is not clean,
+
+You would want to do a dirty map lookup for each IO.  How about this:
+
+2) If in _any_ mode, and dirty map is dirty for *that specific block*:
+
+  If WRITE request completely overlaps the dirty segment then clear 
+	the dirty flag and pass through to the backing dev.
+  otherwise:
+    - return -EIO immediately for WRITE request
+    - return -EIO immediately for READ request (*)
+
+If the WRITE request completely overlaps the dirty segment as indicated 
+from the in-memory metadata, then clear its dirty flag and write to the 
+backing device.  Whatever was dirty isn't important anymore as it was 
+overwritten.
+
+Unless there is a good reason to diverge, we would want this recovery 
+logic would be the same for failed IOs from an existing cachedev (eg, with 
+badblocks), and for cachedevs that are altogether missing.
+
+
+> 3) If not in writeback mode, and dirty map is not clean. It means the
+> cache mode is switched from writeback mode with dirty data lost, then
+>    - returns -EIO immediately for WRITE request
+>    - returns -EIO immediately for READ request (*)
+
+For #2,3, do a dirty map lookup for every IO: if the block is clean, pass 
+it to the backing device.  Only -EIO if the request cannot be recovered 
+(block is dirty) and invoke pr_crit_once() to notify the user.  We want 
+all IO requests to succeed to the extent possible.
+
+I think #3 is the same case as #2.  The logic is the same whether its is 
+now or ever was in writeback mode, regardless of the current mode.
  
- 	data = bio_data(bio);
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 4e5c48f3de62..d682e89e6493 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -26,7 +26,7 @@
-  */
- static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
- 				sector_t lba, struct ppa_addr ppa,
--				int bio_iter)
-+				int bio_iter, bool advanced_bio)
- {
- #ifdef CONFIG_NVM_DEBUG
- 	/* Callers must ensure that the ppa points to a cache address */
-@@ -34,7 +34,8 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
- 	BUG_ON(!pblk_addr_in_cache(ppa));
- #endif
- 
--	return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa, bio_iter);
-+	return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa,
-+						bio_iter, advanced_bio);
- }
- 
- static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
-@@ -44,7 +45,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
- 	sector_t blba = pblk_get_lba(bio);
- 	int nr_secs = rqd->nr_ppas;
--	int advanced_bio = 0;
-+	bool advanced_bio = false;
- 	int i, j = 0;
- 
- 	/* logic error: lba out-of-bounds. Ignore read request */
-@@ -62,19 +63,26 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- retry:
- 		if (pblk_ppa_empty(p)) {
- 			WARN_ON(test_and_set_bit(i, read_bitmap));
--			continue;
-+
-+			if (unlikely(!advanced_bio)) {
-+				bio_advance(bio, (i) * PBLK_EXPOSED_PAGE_SIZE);
-+				advanced_bio = true;
-+			}
-+
-+			goto next;
- 		}
- 
- 		/* Try to read from write buffer. The address is later checked
- 		 * on the write buffer to prevent retrieving overwritten data.
- 		 */
- 		if (pblk_addr_in_cache(p)) {
--			if (!pblk_read_from_cache(pblk, bio, lba, p, i)) {
-+			if (!pblk_read_from_cache(pblk, bio, lba, p, i,
-+								advanced_bio)) {
- 				pblk_lookup_l2p_seq(pblk, &p, lba, 1);
- 				goto retry;
- 			}
- 			WARN_ON(test_and_set_bit(i, read_bitmap));
--			advanced_bio = 1;
-+			advanced_bio = true;
- #ifdef CONFIG_NVM_DEBUG
- 			atomic_long_inc(&pblk->cache_reads);
- #endif
-@@ -83,6 +91,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 			rqd->ppa_list[j++] = p;
- 		}
- 
-+next:
- 		if (advanced_bio)
- 			bio_advance(bio, PBLK_EXPOSED_PAGE_SIZE);
- 	}
-@@ -282,7 +291,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 	 * write buffer to prevent retrieving overwritten data.
- 	 */
- 	if (pblk_addr_in_cache(ppa)) {
--		if (!pblk_read_from_cache(pblk, bio, lba, ppa, 0)) {
-+		if (!pblk_read_from_cache(pblk, bio, lba, ppa, 0, 1)) {
- 			pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
- 			goto retry;
- 		}
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 0c5692cc2f60..67e623bd5c2d 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -670,7 +670,7 @@ unsigned int pblk_rb_read_to_bio_list(struct pblk_rb *rb, struct bio *bio,
- 				      struct list_head *list,
- 				      unsigned int max);
- int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
--			struct ppa_addr ppa, int bio_iter);
-+			struct ppa_addr ppa, int bio_iter, bool advanced_bio);
- unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int entries);
- 
- unsigned int pblk_rb_sync_init(struct pblk_rb *rb, unsigned long *flags);
--- 
-2.7.4
+> (*) NOTE:
+> A sysfs entry "recovery_io_error" can be add here, which is disabled as
+> default. If it is enabled, if a READ request does not hit dirty map,
+> bcache will provide it from backing device.
+
+Resilience first!  This should default on.  
+
+Sometimes systems run for months with bad sectors, and this case is no 
+different.  Let the bcache users' IOs succeed if possible but notify them 
+with pr_crit_once().
+
+A reboot might loose data.  They could be lucky with important data in the 
+page cache; notifying them without killing the device because it is dirty 
+might give them a chance to do a hot backup before rebooting (or 
+stop/starting bcache).
+
+Since the dirty map is still in memory, that information is 
+useful for recovery.  After a reboot the dirty map is lost---and with it 
+the data about what is consistent and what is not. 
+
+For example, if LVM snapshots sit atop of the bcache volume, then you 
+could `dd` them off.  If you hit an error, you know that copy is at least 
+partially inconsistent and can try an older snapshot until one is found 
+which is old enough to be 100% consistent.  Without the dirty map, you 
+would only be guessing at which volume is actually consistent.
+
+Let users set recovery_io_error=0 for those who really want to fail early.
+
+--
+Eric Wheeler
+--1641074820-235402074-1499907238=:9683--
