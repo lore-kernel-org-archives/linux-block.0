@@ -1,41 +1,63 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43464 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753968AbdGNOTd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jul 2017 10:19:33 -0400
+Date: Fri, 14 Jul 2017 10:19:29 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
 Subject: Re: [for-4.14 RFC PATCH 1/2] dm rq: avoid deadlock if dm-mq is
  stacked on old .request_fn device(s)
-From: "Ewan D. Milne" <emilne@redhat.com>
-Reply-To: emilne@redhat.com
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-In-Reply-To: <20170714141929.GB18245@redhat.com>
+Message-ID: <20170714141929.GB18245@redhat.com>
 References: <20170713211217.52361-1-snitzer@redhat.com>
-         <20170713211217.52361-2-snitzer@redhat.com> <20170714072250.GC17046@lst.de>
-         <20170714141929.GB18245@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 14 Jul 2017 13:17:53 -0400
-Message-ID: <1500052673.10198.174.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+ <20170713211217.52361-2-snitzer@redhat.com>
+ <20170714072250.GC17046@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170714072250.GC17046@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, 2017-07-14 at 10:19 -0400, Mike Snitzer wrote:
+On Fri, Jul 14 2017 at  3:22am -0400,
+Christoph Hellwig <hch@lst.de> wrote:
+
+> The problem here is the following:
 > 
-> Do you see a benefit to extracting that portion of your WIP patch
-> (removing the ->complete handler entirely)?
+> blk_finish_request must always be called with the queue lock held,
+> it even has an assert.
 > 
-> Or leave well enough alone and just continue to disable dm-mq's ability
-> to stack on .request_fn paths?
+> Without blk-mq used by dm-rq, dm uses the block softirq to execute the
+> completion, which means we always have a different execution context and
+> can take the queue lock again without issuesi.
 > 
-> Given SCSI's switch to scsi-mq by default I cannot see value in propping
-> up stacking on the old .request_fn devices.
+> With blk-mq used by dm-rq, the the dm .complete handler that is the rough
+> equivalent of the softirq handler is called either directly if were are
+> on the same CPU, or using a IPI (hardirq) if not.  If this handler gets
+> called from a legacy request function it will be called with the
+> queue_lock held, but if it's called from a blk-mq driver or actually
+> uses the IPI no lock will be held.
 
-So, the dm_mod.use_blk_mq flag is global, right?  I guess the question
-is whether all of the block device types used on a system under DM are
-supported under MQ.  If that is the case then we would be OK.
+Yeap, very well explained!  I found exactly that yesterday when I
+developed this patch.  I stopped short of getting into those details in
+my header though, but as you know it comes down to dm_complete_request's
+blk-mq-vs-not branching (blk_mq_complete_request vs blk_complete_request).
 
-The other question is whether there are negative performance
-consequences in any (corner?) cases with MQ that would result in it
-being preferable to run in non-MQ mode (e.g. tag space with lpfc, did
-we ever resolve that?) but the right approach there is to put the effort
-into the MQ path going forward, as has been the case.
+> When I did my blk-mq only for dm-mpath WIP patch my solution to that
+> was that I removed the ->complete handler entirely and just ran the
+> whole dm completion from the original hardirq context.  With that change
+> I know that for blk-mq we'll never hold the queue_lock (and the blk-mq
+> request free path doesn't care), and for legacy we always hold it,
+> so __blk_put_request can always be used.
 
--Ewan
+Do you see a benefit to extracting that portion of your WIP patch
+(removing the ->complete handler entirely)?
+
+Or leave well enough alone and just continue to disable dm-mq's ability
+to stack on .request_fn paths?
+
+Given SCSI's switch to scsi-mq by default I cannot see value in propping
+up stacking on the old .request_fn devices.
+
+But interested to get your thoughts, thanks.
