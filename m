@@ -1,50 +1,135 @@
-Return-Path: <BATV+f91223e0de2c9036fbc6+5086+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Thu, 27 Jul 2017 15:30:11 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Sagi Grimberg <sagi@grimberg.me>, Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [GIT PULL] nvme updates for 4.13-rc3
-Message-ID: <20170727133011.2vyqepblk2oboit4@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34460 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751402AbdGNIPp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jul 2017 04:15:45 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org
+Cc: NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@fb.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 2/3] md: raid1/raid10: initialize bvec table via bio_add_page()
+Date: Fri, 14 Jul 2017 16:14:43 +0800
+Message-Id: <20170714081444.32645-3-ming.lei@redhat.com>
+In-Reply-To: <20170714081444.32645-1-ming.lei@redhat.com>
+References: <20170714081444.32645-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Just a couple small fixes all over.
+We will support multipage bvec soon, so initialize bvec
+table using the standardy way instead of writing the
+talbe directly. Otherwise it won't work any more once
+multipage bvec is enabled.
 
-The following changes since commit 76451d79bde6bed17e113f057e58e1fa5fb79e78:
+Acked-by: Guoqing Jiang <gqjiang@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/raid1-10.c | 19 +++++++++++++++++++
+ drivers/md/raid1.c    | 18 ++++--------------
+ drivers/md/raid10.c   |  6 ++++--
+ 3 files changed, 27 insertions(+), 16 deletions(-)
+ create mode 100644 drivers/md/raid1-10.c
 
-  blk-mq: map queues to all present CPUs (2017-07-24 10:01:31 -0600)
-
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.13
-
-for you to fetch changes up to 7dd1ab163c17e11473a65b11f7e748db30618ebb:
-
-  nvme: validate admin queue before unquiesce (2017-07-26 17:41:41 +0200)
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      nvme-pci: fix HMB size calculation
-
-James Smart (2):
-      nvme-fc: address target disconnect race conditions in fcp io submit
-      nvme-fc: revise TRADDR parsing
-
-Johannes Thumshirn (1):
-      nvme: also provide a UUID in the WWID sysfs attribute
-
-Jon Derrick (1):
-      nvme: fabrics commands should use the fctype field for data direction
-
-Scott Bauer (1):
-      nvme: validate admin queue before unquiesce
-
- drivers/nvme/host/core.c |   6 ++-
- drivers/nvme/host/fc.c   | 121 +++++++++++++++++++++++++----------------------
- drivers/nvme/host/pci.c  |   6 +--
- drivers/nvme/target/fc.c | 101 ++++++++++++++++++++-------------------
- include/linux/nvme-fc.h  |  19 ++++++++
- include/linux/nvme.h     |   2 +-
- 6 files changed, 145 insertions(+), 110 deletions(-)
+diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
+new file mode 100644
+index 000000000000..3adb5b9dc4b4
+--- /dev/null
++++ b/drivers/md/raid1-10.c
+@@ -0,0 +1,19 @@
++/* generally called after bio_reset() for reseting bvec */
++static void md_bio_reset_resync_pages(struct bio *bio, struct resync_pages *rp,
++			       int size)
++{
++	int idx = 0;
++
++	/* initialize bvec table again */
++	do {
++		struct page *page = resync_fetch_page(rp, idx);
++		int len = min_t(int, size, PAGE_SIZE);
++
++		/*
++		 * won't fail because the vec table is big
++		 * enough to hold all these pages
++		 */
++		bio_add_page(bio, page, len, 0);
++		size -= len;
++	} while (idx++ < RESYNC_PAGES && size > 0);
++}
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 0896c772a560..fe86ab18961b 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -81,6 +81,8 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
+ #define raid1_log(md, fmt, args...)				\
+ 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
+ 
++#include "raid1-10.c"
++
+ /*
+  * 'strct resync_pages' stores actual pages used for doing the resync
+  *  IO, and it is per-bio, so make .bi_private points to it.
+@@ -2085,10 +2087,7 @@ static void process_checks(struct r1bio *r1_bio)
+ 	/* Fix variable parts of all bios */
+ 	vcnt = (r1_bio->sectors + PAGE_SIZE / 512 - 1) >> (PAGE_SHIFT - 9);
+ 	for (i = 0; i < conf->raid_disks * 2; i++) {
+-		int j;
+-		int size;
+ 		blk_status_t status;
+-		struct bio_vec *bi;
+ 		struct bio *b = r1_bio->bios[i];
+ 		struct resync_pages *rp = get_resync_pages(b);
+ 		if (b->bi_end_io != end_sync_read)
+@@ -2097,8 +2096,6 @@ static void process_checks(struct r1bio *r1_bio)
+ 		status = b->bi_status;
+ 		bio_reset(b);
+ 		b->bi_status = status;
+-		b->bi_vcnt = vcnt;
+-		b->bi_iter.bi_size = r1_bio->sectors << 9;
+ 		b->bi_iter.bi_sector = r1_bio->sector +
+ 			conf->mirrors[i].rdev->data_offset;
+ 		b->bi_bdev = conf->mirrors[i].rdev->bdev;
+@@ -2106,15 +2103,8 @@ static void process_checks(struct r1bio *r1_bio)
+ 		rp->raid_bio = r1_bio;
+ 		b->bi_private = rp;
+ 
+-		size = b->bi_iter.bi_size;
+-		bio_for_each_segment_all(bi, b, j) {
+-			bi->bv_offset = 0;
+-			if (size > PAGE_SIZE)
+-				bi->bv_len = PAGE_SIZE;
+-			else
+-				bi->bv_len = size;
+-			size -= PAGE_SIZE;
+-		}
++		/* initialize bvec table again */
++		md_bio_reset_resync_pages(b, rp, r1_bio->sectors << 9);
+ 	}
+ 	for (primary = 0; primary < conf->raid_disks * 2; primary++)
+ 		if (r1_bio->bios[primary]->bi_end_io == end_sync_read &&
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index fa8bcf04e791..9952721e1cde 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -110,6 +110,8 @@ static void end_reshape(struct r10conf *conf);
+ #define raid10_log(md, fmt, args...)				\
+ 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid10 " fmt, ##args); } while (0)
+ 
++#include "raid1-10.c"
++
+ /*
+  * 'strct resync_pages' stores actual pages used for doing the resync
+  *  IO, and it is per-bio, so make .bi_private points to it.
+@@ -2086,8 +2088,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 		rp = get_resync_pages(tbio);
+ 		bio_reset(tbio);
+ 
+-		tbio->bi_vcnt = vcnt;
+-		tbio->bi_iter.bi_size = fbio->bi_iter.bi_size;
++		md_bio_reset_resync_pages(tbio, rp, fbio->bi_iter.bi_size);
++
+ 		rp->raid_bio = r10_bio;
+ 		tbio->bi_private = rp;
+ 		tbio->bi_iter.bi_sector = r10_bio->devs[i].addr;
+-- 
+2.9.4
