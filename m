@@ -1,135 +1,186 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34460 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:49028 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751402AbdGNIPp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2017 04:15:45 -0400
+        id S1751120AbdGNXSg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jul 2017 19:18:36 -0400
 From: Ming Lei <ming.lei@redhat.com>
-To: Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org
-Cc: NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 2/3] md: raid1/raid10: initialize bvec table via bio_add_page()
-Date: Fri, 14 Jul 2017 16:14:43 +0800
-Message-Id: <20170714081444.32645-3-ming.lei@redhat.com>
-In-Reply-To: <20170714081444.32645-1-ming.lei@redhat.com>
-References: <20170714081444.32645-1-ming.lei@redhat.com>
+Subject: [PATCH 6/6] blk-mq: unexport APIs for start/stop queues
+Date: Sat, 15 Jul 2017 07:16:01 +0800
+Message-Id: <20170714231601.14444-7-ming.lei@redhat.com>
+In-Reply-To: <20170714231601.14444-1-ming.lei@redhat.com>
+References: <20170714231601.14444-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We will support multipage bvec soon, so initialize bvec
-table using the standardy way instead of writing the
-talbe directly. Otherwise it won't work any more once
-multipage bvec is enabled.
+Now no one uses these APIs anymore, so unexport them.
 
-Acked-by: Guoqing Jiang <gqjiang@suse.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/raid1-10.c | 19 +++++++++++++++++++
- drivers/md/raid1.c    | 18 ++++--------------
- drivers/md/raid10.c   |  6 ++++--
- 3 files changed, 27 insertions(+), 16 deletions(-)
- create mode 100644 drivers/md/raid1-10.c
+ block/blk-mq.c         | 83 ++------------------------------------------------
+ block/blk-mq.h         |  1 +
+ include/linux/blk-mq.h |  8 -----
+ 3 files changed, 3 insertions(+), 89 deletions(-)
 
-diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
-new file mode 100644
-index 000000000000..3adb5b9dc4b4
---- /dev/null
-+++ b/drivers/md/raid1-10.c
-@@ -0,0 +1,19 @@
-+/* generally called after bio_reset() for reseting bvec */
-+static void md_bio_reset_resync_pages(struct bio *bio, struct resync_pages *rp,
-+			       int size)
-+{
-+	int idx = 0;
-+
-+	/* initialize bvec table again */
-+	do {
-+		struct page *page = resync_fetch_page(rp, idx);
-+		int len = min_t(int, size, PAGE_SIZE);
-+
-+		/*
-+		 * won't fail because the vec table is big
-+		 * enough to hold all these pages
-+		 */
-+		bio_add_page(bio, page, len, 0);
-+		size -= len;
-+	} while (idx++ < RESYNC_PAGES && size > 0);
-+}
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 0896c772a560..fe86ab18961b 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -81,6 +81,8 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
- #define raid1_log(md, fmt, args...)				\
- 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f3b582eb492f..70ce222da405 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1200,12 +1200,6 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					 msecs_to_jiffies(msecs));
+ }
  
-+#include "raid1-10.c"
-+
- /*
-  * 'strct resync_pages' stores actual pages used for doing the resync
-  *  IO, and it is per-bio, so make .bi_private points to it.
-@@ -2085,10 +2087,7 @@ static void process_checks(struct r1bio *r1_bio)
- 	/* Fix variable parts of all bios */
- 	vcnt = (r1_bio->sectors + PAGE_SIZE / 512 - 1) >> (PAGE_SHIFT - 9);
- 	for (i = 0; i < conf->raid_disks * 2; i++) {
--		int j;
--		int size;
- 		blk_status_t status;
--		struct bio_vec *bi;
- 		struct bio *b = r1_bio->bios[i];
- 		struct resync_pages *rp = get_resync_pages(b);
- 		if (b->bi_end_io != end_sync_read)
-@@ -2097,8 +2096,6 @@ static void process_checks(struct r1bio *r1_bio)
- 		status = b->bi_status;
- 		bio_reset(b);
- 		b->bi_status = status;
--		b->bi_vcnt = vcnt;
--		b->bi_iter.bi_size = r1_bio->sectors << 9;
- 		b->bi_iter.bi_sector = r1_bio->sector +
- 			conf->mirrors[i].rdev->data_offset;
- 		b->bi_bdev = conf->mirrors[i].rdev->bdev;
-@@ -2106,15 +2103,8 @@ static void process_checks(struct r1bio *r1_bio)
- 		rp->raid_bio = r1_bio;
- 		b->bi_private = rp;
+-void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+-{
+-	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
+-}
+-EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+-
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
+@@ -1247,61 +1241,8 @@ bool blk_mq_queue_stopped(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_mq_queue_stopped);
  
--		size = b->bi_iter.bi_size;
--		bio_for_each_segment_all(bi, b, j) {
--			bi->bv_offset = 0;
--			if (size > PAGE_SIZE)
--				bi->bv_len = PAGE_SIZE;
--			else
--				bi->bv_len = size;
--			size -= PAGE_SIZE;
--		}
-+		/* initialize bvec table again */
-+		md_bio_reset_resync_pages(b, rp, r1_bio->sectors << 9);
- 	}
- 	for (primary = 0; primary < conf->raid_disks * 2; primary++)
- 		if (r1_bio->bios[primary]->bi_end_io == end_sync_read &&
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index fa8bcf04e791..9952721e1cde 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -110,6 +110,8 @@ static void end_reshape(struct r10conf *conf);
- #define raid10_log(md, fmt, args...)				\
- 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid10 " fmt, ##args); } while (0)
+-/*
+- * This function is often used for pausing .queue_rq() by driver when
+- * there isn't enough resource or some conditions aren't satisfied, and
+- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
+- *
+- * We do not guarantee that dispatch can be drained or blocked
+- * after blk_mq_stop_hw_queue() returns. Please use
+- * blk_mq_quiesce_queue() for that requirement.
+- */
+-void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+-{
+-	cancel_delayed_work(&hctx->run_work);
+-
+-	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-}
+-EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+-
+-/*
+- * This function is often used for pausing .queue_rq() by driver when
+- * there isn't enough resource or some conditions aren't satisfied, and
+- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
+- *
+- * We do not guarantee that dispatch can be drained or blocked
+- * after blk_mq_stop_hw_queues() returns. Please use
+- * blk_mq_quiesce_queue() for that requirement.
+- */
+-void blk_mq_stop_hw_queues(struct request_queue *q)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i)
+-		blk_mq_stop_hw_queue(hctx);
+-}
+-EXPORT_SYMBOL(blk_mq_stop_hw_queues);
+-
+-void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx)
+-{
+-	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-
+-	blk_mq_run_hw_queue(hctx, false);
+-}
+-EXPORT_SYMBOL(blk_mq_start_hw_queue);
+-
+-void blk_mq_start_hw_queues(struct request_queue *q)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	int i;
+-
+-	queue_for_each_hw_ctx(q, hctx, i)
+-		blk_mq_start_hw_queue(hctx);
+-}
+-EXPORT_SYMBOL(blk_mq_start_hw_queues);
+-
+-void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
++static void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx,
++					  bool async)
+ {
+ 	if (!blk_mq_hctx_stopped(hctx))
+ 		return;
+@@ -1309,7 +1250,6 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ 	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
+ 	blk_mq_run_hw_queue(hctx, async);
+ }
+-EXPORT_SYMBOL_GPL(blk_mq_start_stopped_hw_queue);
  
-+#include "raid1-10.c"
-+
- /*
-  * 'strct resync_pages' stores actual pages used for doing the resync
-  *  IO, and it is per-bio, so make .bi_private points to it.
-@@ -2086,8 +2088,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 		rp = get_resync_pages(tbio);
- 		bio_reset(tbio);
+ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
+ {
+@@ -1319,7 +1259,6 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_start_stopped_hw_queue(hctx, async);
+ }
+-EXPORT_SYMBOL(blk_mq_start_stopped_hw_queues);
  
--		tbio->bi_vcnt = vcnt;
--		tbio->bi_iter.bi_size = fbio->bi_iter.bi_size;
-+		md_bio_reset_resync_pages(tbio, rp, fbio->bi_iter.bi_size);
-+
- 		rp->raid_bio = r10_bio;
- 		tbio->bi_private = rp;
- 		tbio->bi_iter.bi_sector = r10_bio->devs[i].addr;
+ static void blk_mq_run_work_fn(struct work_struct *work)
+ {
+@@ -1344,24 +1283,6 @@ static void blk_mq_run_work_fn(struct work_struct *work)
+ }
+ 
+ 
+-void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+-{
+-	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
+-		return;
+-
+-	/*
+-	 * Stop the hw queue, then modify currently delayed work.
+-	 * This should prevent us from running the queue prematurely.
+-	 * Mark the queue as auto-clearing STOPPED when it runs.
+-	 */
+-	blk_mq_stop_hw_queue(hctx);
+-	set_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
+-	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
+-					&hctx->run_work,
+-					msecs_to_jiffies(msecs));
+-}
+-EXPORT_SYMBOL(blk_mq_delay_queue);
+-
+ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
+ 					    struct request *rq,
+ 					    bool at_head)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 60b01c0309bc..2a26c74eaca1 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -25,6 +25,7 @@ struct blk_mq_ctx {
+ 	struct kobject		kobj;
+ } ____cacheline_aligned_in_smp;
+ 
++void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 251af99e9ba8..203bc77fdea9 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -242,18 +242,10 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs
+ void blk_mq_complete_request(struct request *rq);
+ 
+ bool blk_mq_queue_stopped(struct request_queue *q);
+-void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
+-void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
+-void blk_mq_stop_hw_queues(struct request_queue *q);
+-void blk_mq_start_hw_queues(struct request_queue *q);
+-void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+-void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_quiesce_queue(struct request_queue *q);
+ void blk_mq_unquiesce_queue(struct request_queue *q);
+-void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+-void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
+ void blk_mq_freeze_queue(struct request_queue *q);
 -- 
 2.9.4
