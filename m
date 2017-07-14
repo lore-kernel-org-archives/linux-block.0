@@ -1,67 +1,143 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:51612 "EHLO
-        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933965AbdGTIxH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2017 04:53:07 -0400
-Date: Thu, 20 Jul 2017 09:52:56 +0100
-From: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-To: Benoit Depail <benoit.depail@nbs-system.com>
-CC: <xen-users@lists.xen.org>, WebDawg <webdawg@gmail.com>,
-        Keith Busch <keith.busch@intel.com>,
-        <linux-block@vger.kernel.org>
-Subject: Re: [Xen-users] File-based domU - Slow storage write since xen 4.8
-Message-ID: <20170720085256.e3m35aalg6jn7qrh@dhcp-3-128.uk.xensource.com>
-References: <5554bd39-6e0a-5c17-2b64-bb80d4a6502b@nbs-system.com>
- <CAKdd5H9f_=NCYMmhLcvHKFw7m_sKvygSVqz3+Z0YPAGiPMxKxQ@mail.gmail.com>
- <5b562ef2-36e2-a08e-1683-6ffc7cfa54de@nbs-system.com>
- <20170717124931.rsiqxkzzkmvfofd7@MacBook-Pro-de-Roger.local>
- <5dd18982-cbcf-a675-1e07-5b4c4e4da50e@nbs-system.com>
- <20170717164658.drliebetcnil3wjb@dhcp-3-128.uk.xensource.com>
- <bba4e389-b975-fbb8-b680-c9c4039617ca@nbs-system.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-In-Reply-To: <bba4e389-b975-fbb8-b680-c9c4039617ca@nbs-system.com>
+Received: from mx1.redhat.com ([209.132.183.28]:48750 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751178AbdGNXSS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jul 2017 19:18:18 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 4/6] blk-mq: introduce auto restart
+Date: Sat, 15 Jul 2017 07:15:59 +0800
+Message-Id: <20170714231601.14444-5-ming.lei@redhat.com>
+In-Reply-To: <20170714231601.14444-1-ming.lei@redhat.com>
+References: <20170714231601.14444-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I'm afraid I'm also not that knowledgeable, so I'm adding the author
-and the Linux block ml.
+Both xen-blkfront and virito-blk stops queue when
+the queue becomes busy, and restarts the queue after
+one request is completed.
 
-On Wed, Jul 19, 2017 at 04:25:02PM +0200, Benoit Depail wrote:
-> Hello,
-> 
-> On 07/17/17 18:46, Roger Pau Monn� wrote:
-> > There are not a huge amount of changes to blkback, so it would be
-> > helpful if you could pinpoint the change that introduced this
-> > regression for you, or if you can get a kernel version that introduced
-> > the regression that would also be helpful.
-> 
-> I used git bisect on the linux-stable source tree to build (a lot of)
-> tests kernels, and was able to find this commit as the first one
-> introducing the regression :
-> 
-> d2081cfe624b5decaaf68088ca256ed1b140672c is the first bad commit
-> commit d2081cfe624b5decaaf68088ca256ed1b140672c
-> Author: Keith Busch <keith.busch@intel.com>
-> Date:   Tue Jan 12 15:08:39 2016 -0700
-> 
->     block: split bios to max possible length
-> 
-> In term of kernel version, the first one showing bad performances in my
-> case is 4.4.2 (with, obviously, 4.4.1 working as expected).
-> 
-> Interestingly, this commit is an improvement of
-> d3805611130af9b911e908af9f67a3f64f4f0914, which is present in 4.4-rc8
-> but do not show any performance issue in our case.
-> 
-> I can also confirm that this issue is still present in the latest
-> unstable kernel (we tested 4.13-rc1).
-> 
-> I think I have reached a point where more competent people should
-> investigate, but I'll be glad to help if needed.
+This patch implements this function in blk-mq core
+by introducing BLK_MQ_F_AUTO_RESTART, then we can
+remove stop/start queue related APIs and make 'stopped'
+state invisible to drivers. It has caused lots of trouble
+to expose this state to driver and let driver control
+the state.
 
-For the sake of the people that I've added, would you mind describing
-the issues you are seeing and the tests that you performed?
+Given we can't get exact queue depth for one request queue
+in case of TAG_SHARED, we only support this function on
+non-TAG_SHARED devices/drivers.
 
-Thanks, Roger.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c         | 41 +++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 42 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 041f7b7fa0d6..f3b582eb492f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -416,6 +416,39 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
+ 
++static void blk_mq_handle_auto_stop(struct blk_mq_hw_ctx *hctx)
++{
++	struct sbitmap_queue *sbq;
++
++	if (!(hctx->flags & BLK_MQ_F_AUTO_RESTART))
++		return;
++
++	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
++	sbq = &hctx->tags->bitmap_tags;
++
++	/* order setting 'stopped' and reading queue depth */
++	smp_mb();
++
++	/*
++	 * all requests may be completed just before setting
++	 * 'stopped', so we have to check queue depth to see
++	 * if there is pending requests
++	 */
++	if (unlikely(!sbitmap_weight(&sbq->sb)))
++		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
++}
++
++static void blk_mq_handle_auto_restart(struct blk_mq_hw_ctx *hctx)
++{
++	if (!(hctx->flags & BLK_MQ_F_AUTO_RESTART))
++		return;
++	/*
++	 * blk_mq_put_tag() implies one barrier, which is the pair of
++	 * smp_mb() in blk_mq_handle_auto_stop()
++	 */
++	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
++}
++
+ void blk_mq_free_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+@@ -446,6 +479,7 @@ void blk_mq_free_request(struct request *rq)
+ 	if (sched_tag != -1)
+ 		blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
+ 	blk_mq_sched_restart(hctx);
++	blk_mq_handle_auto_restart(hctx);
+ 	blk_queue_exit(q);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_free_request);
+@@ -1066,6 +1100,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
+ 		list_splice_init(list, &hctx->dispatch);
+ 		spin_unlock(&hctx->lock);
+ 
++		blk_mq_handle_auto_stop(hctx);
++
+ 		/*
+ 		 * If SCHED_RESTART was set by the caller of this function and
+ 		 * it is no longer set that means that it was cleared by another
+@@ -1502,6 +1538,7 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		return;
+ 	case BLK_STS_RESOURCE:
+ 		__blk_mq_requeue_request(rq);
++		blk_mq_handle_auto_stop(hctx);
+ 		goto insert;
+ 	default:
+ 		*cookie = BLK_QC_T_NONE;
+@@ -2112,16 +2149,20 @@ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
++	struct blk_mq_tag_set *set = q->tag_set;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (shared) {
+ 			if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+ 				atomic_inc(&q->shared_hctx_restart);
+ 			hctx->flags |= BLK_MQ_F_TAG_SHARED;
++			hctx->flags &= ~BLK_MQ_F_AUTO_RESTART;
+ 		} else {
+ 			if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+ 				atomic_dec(&q->shared_hctx_restart);
+ 			hctx->flags &= ~BLK_MQ_F_TAG_SHARED;
++			if (set->flags & BLK_MQ_F_AUTO_RESTART)
++				hctx->flags |= BLK_MQ_F_AUTO_RESTART;
+ 		}
+ 	}
+ }
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 14542308d25b..251af99e9ba8 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -162,6 +162,7 @@ enum {
+ 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+ 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
+ 	BLK_MQ_F_SG_MERGE	= 1 << 2,
++	BLK_MQ_F_AUTO_RESTART	= 1 << 3,
+ 	BLK_MQ_F_BLOCKING	= 1 << 5,
+ 	BLK_MQ_F_NO_SCHED	= 1 << 6,
+ 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+-- 
+2.9.4
