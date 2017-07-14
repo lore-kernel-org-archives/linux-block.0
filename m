@@ -1,59 +1,102 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39868 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753819AbdGJLSl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2017 07:18:41 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Coly Li <colyli@suse.de>
-Subject: [PATCH] bcache: only recovery I/O error for writethrough mode
-Date: Mon, 10 Jul 2017 19:18:28 +0800
-Message-Id: <20170710111828.97918-1-colyli@suse.de>
+Received: from mx1.redhat.com ([209.132.183.28]:41956 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751004AbdGNXSJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jul 2017 19:18:09 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, jejb@linux.vnet.ibm.com,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org
+Subject: [PATCH 3/6] block: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
+Date: Sat, 15 Jul 2017 07:15:58 +0800
+Message-Id: <20170714231601.14444-4-ming.lei@redhat.com>
+In-Reply-To: <20170714231601.14444-1-ming.lei@redhat.com>
+References: <20170714231601.14444-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If a read bio to cache device gets failed, bcache will try to recovery it
-by forward the read bio to backing device. If backing device responses
-read request successfully then the bio contains data from backing device
-will be returned to uppper layer.
+If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun
+the queue in the three situations:
 
-The recovery effort in cached_dev_read_error() is not correct, and there
-is report that corrupted data may returned when a dirty cache device goes
-offline during reading I/O.
+1) if BLK_MQ_S_SCHED_RESTART is set
+- queue is rerun after one rq is completed, see blk_mq_sched_restart()
+which is run from blk_mq_free_request()
 
-For writeback cache mode, before dirty data are wrote back to backing
-device, data blocks on backing device are not updated and consistent. If
-a dirty cache device dropped and a read bio gets failed, bcache will
-return its stale version from backing device. This is mistaken behavior
-that applications don't expected, especially for data base workload.
+2) BLK_MQ_S_TAG_WAITING is set
+- queue is rerun after one tag is freed
 
-This patch fixes the issue by only permit recoverable I/O when cached
-device is in writethough mode, and s->recoverable is set. For other cache
-mode, recovery I/O failure by reading backing device does not make sense,
-bache just simply returns -EIO immediately.
+3) otherwise
+- queue is run immediately in blk_mq_dispatch_rq_list()
 
-Reported-by: Arne Wolf <awolf@lenovo.com>
-Signed-off-by: Coly Li <colyli@suse.de>
+So calling blk_mq_delay_run_hw_queue() inside .queue_rq() doesn't make
+sense because no matter it is called or not, the queue still will be
+rerun soon in above three situations, and the busy req can be dispatched
+again.
+
+Also delay a while radomly is also like a workaround.
+
+Cc: Alasdair Kergon <agk@redhat.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: dm-devel@redhat.com
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-nvme@lists.infradead.org
+Cc: "James E.J. Bottomley"
+Cc: "Martin K. Petersen"
+Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/request.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/md/dm-rq.c      | 1 -
+ drivers/nvme/host/fc.c  | 3 ---
+ drivers/scsi/scsi_lib.c | 4 ----
+ 3 files changed, 8 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 019b3df9f1c6..6edacac9b00d 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -702,8 +702,11 @@ static void cached_dev_read_error(struct closure *cl)
- {
- 	struct search *s = container_of(cl, struct search, cl);
- 	struct bio *bio = &s->bio.bio;
-+	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
-+	unsigned mode = cache_mode(dc, NULL);
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index c6ebc5b1e00e..71422cea1c4a 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -761,7 +761,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		/* Undo dm_start_request() before requeuing */
+ 		rq_end_stats(md, rq);
+ 		rq_completed(md, rq_data_dir(rq), false);
+-		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
+ 		return BLK_STS_RESOURCE;
+ 	}
  
--	if (s->recoverable) {
-+	if (s->recoverable &&
-+	    (mode == CACHE_MODE_WRITETHROUGH)) {
- 		/* Retry from the backing device: */
- 		trace_bcache_read_retry(s->orig_bio);
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index d666ada39a9b..3155bbcd26a2 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1967,9 +1967,6 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
+ 		if (ret != -EBUSY)
+ 			return BLK_STS_IOERR;
  
+-		if (op->rq)
+-			blk_mq_delay_run_hw_queue(queue->hctx, NVMEFC_QUEUE_DELAY);
+-
+ 		return BLK_STS_RESOURCE;
+ 	}
+ 
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 91d890356b78..03a7d7953df2 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1974,11 +1974,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ out:
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+-		break;
+ 	case BLK_STS_RESOURCE:
+-		if (atomic_read(&sdev->device_busy) == 0 &&
+-		    !scsi_device_blocked(sdev))
+-			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
+ 		break;
+ 	default:
+ 		/*
 -- 
-2.12.0
+2.9.4
