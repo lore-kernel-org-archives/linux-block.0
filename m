@@ -1,76 +1,48 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:37586 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751012AbdGNXQk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Jul 2017 19:16:40 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 10/14] blk-mq-sched: introduce helpers for query, change busy state
-Date: Tue,  1 Aug 2017 00:51:07 +0800
-Message-Id: <20170731165111.11536-12-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
-References: <20170731165111.11536-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+        Ming Lei <ming.lei@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Subject: [PATCH 2/6] SCSI: use blk_mq_run_hw_queues() in scsi_kick_queue()
+Date: Sat, 15 Jul 2017 07:15:57 +0800
+Message-Id: <20170714231601.14444-3-ming.lei@redhat.com>
+In-Reply-To: <20170714231601.14444-1-ming.lei@redhat.com>
+References: <20170714231601.14444-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+Now SCSI won't stop queue at all, and not necessary to use
+blk_mq_start_hw_queues() to clear the state of 'stopped',
+so switch to blk_mq_run_hw_queues() instead.
+
+Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-sched.c |  6 +++---
- block/blk-mq.h       | 15 +++++++++++++++
- 2 files changed, 18 insertions(+), 3 deletions(-)
+ drivers/scsi/scsi_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 07ff53187617..112270961af0 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -140,7 +140,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 			 * BUSY won't be cleared until all requests
- 			 * in hctx->dispatch are dispatched successfully
- 			 */
--			set_bit(BLK_MQ_S_BUSY, &hctx->state);
-+			blk_mq_hctx_set_busy(hctx);
- 		}
- 		spin_unlock(&hctx->lock);
- 	}
-@@ -158,11 +158,11 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		blk_mq_sched_mark_restart_hctx(hctx);
- 		can_go = blk_mq_dispatch_rq_list(q, &rq_list);
- 		if (can_go)
--			clear_bit(BLK_MQ_S_BUSY, &hctx->state);
-+			blk_mq_hctx_clear_busy(hctx);
- 	}
- 
- 	/* can't go until ->dispatch is flushed */
--	if (!can_go || test_bit(BLK_MQ_S_BUSY, &hctx->state))
-+	if (!can_go || blk_mq_hctx_is_busy(hctx))
- 		return;
- 
- 	/*
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 44d3aaa03d7c..d9f875093613 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -135,4 +135,19 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- 	return hctx->nr_ctx && hctx->tags;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index f6097b89d5d3..91d890356b78 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -333,7 +333,7 @@ void scsi_device_unbusy(struct scsi_device *sdev)
+ static void scsi_kick_queue(struct request_queue *q)
+ {
+ 	if (q->mq_ops)
+-		blk_mq_start_hw_queues(q);
++		blk_mq_run_hw_queues(q, false);
+ 	else
+ 		blk_run_queue(q);
  }
- 
-+static inline bool blk_mq_hctx_is_busy(struct blk_mq_hw_ctx *hctx)
-+{
-+	return test_bit(BLK_MQ_S_BUSY, &hctx->state);
-+}
-+
-+static inline void blk_mq_hctx_set_busy(struct blk_mq_hw_ctx *hctx)
-+{
-+	set_bit(BLK_MQ_S_BUSY, &hctx->state);
-+}
-+
-+static inline void blk_mq_hctx_clear_busy(struct blk_mq_hw_ctx *hctx)
-+{
-+	clear_bit(BLK_MQ_S_BUSY, &hctx->state);
-+}
-+
- #endif
 -- 
 2.9.4
