@@ -1,58 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f173.google.com ([209.85.128.173]:36092 "EHLO
-        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752360AbdGGTJA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jul 2017 15:09:00 -0400
-Received: by mail-wr0-f173.google.com with SMTP id c11so59218435wrc.3
-        for <linux-block@vger.kernel.org>; Fri, 07 Jul 2017 12:09:00 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 2/2] lightnvm: pblk: remove unnecessary checks
-Date: Fri,  7 Jul 2017 21:08:53 +0200
-Message-Id: <1499454533-14907-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1499454533-14907-1-git-send-email-javier@cnexlabs.com>
-References: <1499454533-14907-1-git-send-email-javier@cnexlabs.com>
+Received: from verein.lst.de ([213.95.11.211]:42451 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751136AbdGOIoN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Jul 2017 04:44:13 -0400
+Date: Sat, 15 Jul 2017 10:44:12 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [for-4.14 RFC PATCH 0/2] dm rq: eliminate historic blk-mq and
+        .request_fn queue stacking restrictions
+Message-ID: <20170715084412.GB23189@lst.de>
+References: <20170713211217.52361-1-snitzer@redhat.com> <20170714071257.GB17046@lst.de> <20170714140206.GA18245@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170714140206.GA18245@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove unnecessary checks when freeing dma memory in the completion
-path.
+On Fri, Jul 14, 2017 at 10:02:06AM -0400, Mike Snitzer wrote:
+> On Fri, Jul 14 2017 at  3:12am -0400,
+> Christoph Hellwig <hch@lst.de> wrote:
+> 
+> > Btw, we might want to expedite this to 4.13, a 4.13 now defaults
+> > to blk-mq for scsi, and this patch would make sure that dm keeps
+> > on just working with that switch.
+> 
+> Don't think we need to rush anything in response to that change in
+> SCSI's default.  old .request_fn DM multipath works happily ontop of
+> blk-mq devices (so long as all paths are blk-mq).
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/pblk-write.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+You're right.  In that case I think we should just skip this series
+and I'll dust of the patch to just kill the non-mq support for 3.14
+if the switch of scsi to default to mq works out for 3.13.
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index cc2b9414d17c..3ad9e56d2473 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -39,9 +39,7 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 
- 	ret = pblk_rb_sync_advance(&pblk->rwb, c_ctx->nr_valid);
- 
--	if (rqd->meta_list)
--		nvm_dev_dma_free(dev->parent, rqd->meta_list,
--							rqd->dma_meta_list);
-+	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
- 
- 	bio_put(rqd->bio);
- 	pblk_free_rqd(pblk, rqd, WRITE);
-@@ -224,9 +222,6 @@ static int pblk_alloc_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 	if (!rqd->meta_list)
- 		return -ENOMEM;
- 
--	if (unlikely(nr_secs == 1))
--		return 0;
--
- 	rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
- 	rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
- 
--- 
-2.7.4
+> It is just blk-mq DM multipath ontop of old .request_fn paths that is
+> disallowed in current upstream code.
+> 
+> But again, I really don't see why we should even want/need to support
+> that mode... hence my question raised in this RFC.
+
+I think this mode makes sense in the long run - to get rid of the
+legacy request code in dm.  But as long as we keep both modes arounds
+the use for it seems a big questionable indeed.
