@@ -1,37 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51866 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933243AbdGLI2W (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 04:28:22 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org
-Cc: NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/2] md: two patches
-Date: Wed, 12 Jul 2017 16:28:09 +0800
-Message-Id: <20170712082809.369-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 17 Jul 2017 08:55:05 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Alex Ivanov <yourbestfriend@openmailbox.org>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] elevator: allow specifying elevator by config boot param
+ for blk-mq devices
+Message-ID: <20170717065505.GB3526@linux-x5ow.site>
+References: <20170712185708.5987-1-yourbestfriend@openmailbox.org>
+ <0661f4cc-a5dc-5747-dd38-de78586843a2@kernel.dk>
+ <20170713101154.GH5212@linux-x5ow.site>
+ <49033d7d-8941-3c17-962f-dab170401bcf@kernel.dk>
+ <20170714064026.GB3484@linux-x5ow.site>
+ <8080a6a6-ccc5-95d8-031b-01a156b2cd65@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <8080a6a6-ccc5-95d8-031b-01a156b2cd65@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-This 1st patch fixes one issue introduced in the following two
-commits:
-	Fixes: f0250618361d(md: raid10: don't use bio's vec table to manage resync pages)
-	Fixes: 98d30c5812c3(md: raid1: don't use bio's vec table to manage resync pages)
+On Fri, Jul 14, 2017 at 08:26:52AM -0600, Jens Axboe wrote:
+ 
+> Maybe we can add something about the API being deprecated, if someone
+> tries to select an mq scheduler. The old scheduler will die in due
+> course once that path goes away, and once that happens, we can kill
+> the parameter.
 
-The 2nd one initializes bvec table of bio via bio_add_page() after bio_reset().
-
-
-Ming Lei (2):
-  md: remove 'idx' from 'struct resync_pages'
-  md: raid1/raid10: initialize bvec table via bio_add_page()
-
- drivers/md/md.c     | 21 +++++++++++++++++++++
- drivers/md/md.h     |  4 +++-
- drivers/md/raid1.c  | 22 +++++-----------------
- drivers/md/raid10.c | 10 +++++-----
- 4 files changed, 34 insertions(+), 23 deletions(-)
+Yes this sounds like a good idea.
 
 -- 
-2.9.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
