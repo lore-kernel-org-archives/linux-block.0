@@ -1,44 +1,35 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f170.google.com ([209.85.128.170]:33309 "EHLO
-        mail-wr0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751303AbdGQPSL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jul 2017 11:18:11 -0400
-Received: by mail-wr0-f170.google.com with SMTP id a10so13517232wrd.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Jul 2017 08:18:11 -0700 (PDT)
-In-Reply-To: 
-From: Evangelos Foutras <evangelos@foutrelis.com>
+Return-Path: <BATV+0dcb2ced70f4a2e24250+5076+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 17 Jul 2017 03:35:19 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Tomi Sarvela <tomi.p.sarvela@intel.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
 Subject: Re: linux-next scsi-mq hang in suspend-resume
-Cc: linux-block@vger.kernel.org
-To: Christoph Hellwig <hch@infradead.org>
-Message-ID: <e2ce0f02-cf79-dc28-9380-3f2c558210c7@foutrelis.com>
-Date: Mon, 17 Jul 2017 18:18:07 +0300
+Message-ID: <20170717103519.GA13473@infradead.org>
+References: <21128504.iYAzanzLsA@fractal.fi.intel.com>
+ <dd9daa92-0c9c-51dd-95b5-961cfd1fca36@kernel.dk>
+ <20170713071220.GA19972@infradead.org>
+ <20170714124424.GA28150@infradead.org>
+ <d455b080-13ff-af9c-c793-7a47356fee6f@intel.com>
+ <20170717075341.GA19733@infradead.org>
+ <6831a724-3b4b-be48-c561-8fd1e8c7ebe0@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6831a724-3b4b-be48-c561-8fd1e8c7ebe0@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-(Hopefully I got the In-Reply-To header right and won't mess up the thread.)
+On Mon, Jul 17, 2017 at 01:30:00PM +0300, Tomi Sarvela wrote:
+> First, tested that next-20170717 still triggers the problem when no extra
+> options given. Adding scsi_mod.use_blk_mq=0 makes tests work.
+> 
+> Then I tried with sd.diff patched next-20170717. Works (still) with
+> use_blk_mq=0. Also works when no options given, so this patch avoids the
+> hang when using the new block-mq.
+> 
+> These tests on generic Haswell 4790K desktop machine.
 
-On 17/07/17 10:53, Christoph Hellwig wrote:
-> I still haven't gotten hold of an i915 machine where I could
-> run the actua ltest suite.
+Thanks Tomi,
 
-At the risk of posting an unproductive "me too" reply, I also got bit by
-the dead disk on resume from S3 when Arch Linux enabled MQ by default in
-the 4.12 kernel (CONFIG_SCSI_MQ_DEFAULT=y). The configuration change was
-later reverted due to this issue.
-
-For me the hang occurs pretty reliably (tested about 5-6 times) on an
-Intel laptop and an AMD desktop, both with HDDs and ext4 on top of LUKS.
-It feels as if the disk stops responding to commands. The machine itself
-wakes up from sleep but even a simple `ls` will hang and do nothing.
-
-> But I did some audit of the code, and it seems blk-mq is lacking
-> support for the RQF_PM flag.  While I can't directly see how
-> this would cause the hang your caused it's a least easy to test.
->
-> Can you apply the patch below and test with the use_blk_mq=0 parameter?
-
-I think the patch needs to be tested with scsi_mod.use_blk_mq=1 (which I
-will try to do and report back).
+this seems to confirm it's runtime PM related, although I don't
+really understand why that's an issue.  Let me spin up an implementation
+of RQF_PM for blk-mq and give it to you for testing.
