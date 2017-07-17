@@ -1,70 +1,51 @@
-Return-Path: <bart@gcc10.fsffrance.org>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	xen-devel@lists.xenproject.org,
-	stable@vger.kernel.org
-Subject: [PATCH] xen-blkfront: Fix handling of non-supported operations
-Date: Fri, 21 Jul 2017 19:11:10 +0200
-Message-Id: <20170721171110.824-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:34358 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751291AbdGQQlt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Jul 2017 12:41:49 -0400
+Date: Mon, 17 Jul 2017 09:41:47 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-raid@vger.kernel.org, NeilBrown <neilb@suse.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 0/3] md: three misc changes
+Message-ID: <20170717164147.unwgwb4ekmwexc3m@kernel.org>
+References: <20170714081444.32645-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170714081444.32645-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch fixes the following sparse warnings:
+On Fri, Jul 14, 2017 at 04:14:41PM +0800, Ming Lei wrote:
+> This 1st patch fixes one issue introduced in the following two
+> commits:
+> 	Fixes: f0250618361d(md: raid10: don't use bio's vec table to manage resync pages)
+> 	Fixes: 98d30c5812c3(md: raid1: don't use bio's vec table to manage resync pages)
+> 
+> The 2nd one initializes bvec table of bio via bio_add_page() after bio_reset().
+> 
+> The 3rd one moves the common definitation and helpers into raid1-10.c. 
 
-drivers/block/xen-blkfront.c:916:45: warning: incorrect type in argument 2 (different base types)
-drivers/block/xen-blkfront.c:916:45:    expected restricted blk_status_t [usertype] error
-drivers/block/xen-blkfront.c:916:45:    got int [signed] error
-drivers/block/xen-blkfront.c:1599:47: warning: incorrect type in assignment (different base types)
-drivers/block/xen-blkfront.c:1599:47:    expected int [signed] error
-drivers/block/xen-blkfront.c:1599:47:    got restricted blk_status_t [usertype] <noident>
-drivers/block/xen-blkfront.c:1607:55: warning: incorrect type in assignment (different base types)
-drivers/block/xen-blkfront.c:1607:55:    expected int [signed] error
-drivers/block/xen-blkfront.c:1607:55:    got restricted blk_status_t [usertype] <noident>
-drivers/block/xen-blkfront.c:1625:55: warning: incorrect type in assignment (different base types)
-drivers/block/xen-blkfront.c:1625:55:    expected int [signed] error
-drivers/block/xen-blkfront.c:1625:55:    got restricted blk_status_t [usertype] <noident>
-drivers/block/xen-blkfront.c:1628:62: warning: restricted blk_status_t degrades to integer
-
-Compile-tested only.
-
-Fixes: commit 2a842acab109 ("block: introduce new block status code type")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Roger Pau Monné <roger.pau@citrix.com>
-Cc: <xen-devel@lists.xenproject.org>
-Cc: <stable@vger.kernel.org>
----
- drivers/block/xen-blkfront.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index c852ed3c01d5..1799bba74390 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -111,7 +111,7 @@ struct blk_shadow {
- };
+applied, thanks!
  
- struct blkif_req {
--	int	error;
-+	blk_status_t	error;
- };
- 
- static inline struct blkif_req *blkif_req(struct request *rq)
-@@ -1616,7 +1616,7 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
- 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
- 				       info->gd->disk_name, op_name(bret->operation));
--				blkif_req(req)->error = -EOPNOTSUPP;
-+				blkif_req(req)->error = BLK_STS_NOTSUPP;
- 			}
- 			if (unlikely(bret->status == BLKIF_RSP_ERROR &&
- 				     rinfo->shadow[id].req.u.rw.nr_segments == 0)) {
--- 
-2.13.2
+> V2:
+> 	- fix 'page_idx' increasement in patch 1
+> 	- move raid1/raid10 common code to raid1-raid10.c, as suggested by Neil
+> 
+> Ming Lei (3):
+>   md: remove 'idx' from 'struct resync_pages'
+>   md: raid1/raid10: initialize bvec table via bio_add_page()
+>   md: raid1-10: move raid1/raid10 common code into raid1-10.c
+> 
+>  drivers/md/md.h       | 54 ----------------------------------
+>  drivers/md/raid1-10.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  drivers/md/raid1.c    | 31 ++++----------------
+>  drivers/md/raid10.c   | 19 ++++--------
+>  4 files changed, 93 insertions(+), 92 deletions(-)
+>  create mode 100644 drivers/md/raid1-10.c
+> 
+> -- 
+> 2.9.4
+> 
