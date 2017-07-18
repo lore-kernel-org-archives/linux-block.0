@@ -1,109 +1,26 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52730 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750960AbdGaQw7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 12:52:59 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 09/14] blk-mq-sched: cleanup blk_mq_sched_dispatch_requests()
-Date: Tue,  1 Aug 2017 00:51:06 +0800
-Message-Id: <20170731165111.11536-11-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
-References: <20170731165111.11536-1-ming.lei@redhat.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:48532 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751596AbdGRPJa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Jul 2017 11:09:30 -0400
+Date: Tue, 18 Jul 2017 08:09:29 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH 2/2] blk-mq-sched: use q->queue_depth as hint for
+ q->nr_requests
+Message-ID: <20170718150929.GB23687@infradead.org>
+References: <20170717083923.22014-1-ming.lei@redhat.com>
+ <20170717083923.22014-3-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170717083923.22014-3-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch split blk_mq_sched_dispatch_requests()
-into two parts:
+This looks pretty reasonable:
 
-1) the 1st part is for checking if queue is busy, and
-handle the busy situation
-
-2) the 2nd part is moved to __blk_mq_sched_dispatch_requests()
-which focuses on dispatch from sw queue or scheduler queue.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 42 +++++++++++++++++++++++++-----------------
- 1 file changed, 25 insertions(+), 17 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index cc0687a4d0ab..07ff53187617 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -89,16 +89,37 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 	return false;
- }
- 
--void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-+static void __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
--	bool can_go = true;
--	LIST_HEAD(rq_list);
- 	struct request *(*dispatch_fn)(struct blk_mq_hw_ctx *) =
- 		has_sched_dispatch ? e->type->ops.mq.dispatch_request :
- 			blk_mq_dispatch_rq_from_ctxs;
-+	LIST_HEAD(rq_list);
-+
-+	if (!has_sched_dispatch && !(hctx->flags & BLK_MQ_F_SHARED_DEPTH)) {
-+		blk_mq_flush_busy_ctxs(hctx, &rq_list);
-+		blk_mq_dispatch_rq_list(q, &rq_list);
-+		return;
-+	}
-+
-+	do {
-+		struct request *rq;
-+
-+		rq = dispatch_fn(hctx);
-+		if (!rq)
-+			break;
-+		list_add(&rq->queuelist, &rq_list);
-+	} while (blk_mq_dispatch_rq_list(q, &rq_list));
-+}
-+
-+void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
-+	bool can_go = true;
-+	LIST_HEAD(rq_list);
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
- 	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
-@@ -144,25 +165,12 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	if (!can_go || test_bit(BLK_MQ_S_BUSY, &hctx->state))
- 		return;
- 
--	if (!has_sched_dispatch && !(hctx->flags & BLK_MQ_F_SHARED_DEPTH)) {
--		blk_mq_flush_busy_ctxs(hctx, &rq_list);
--		blk_mq_dispatch_rq_list(q, &rq_list);
--		return;
--	}
--
- 	/*
- 	 * We want to dispatch from the scheduler if we had no work left
- 	 * on the dispatch list, OR if we did have work but weren't able
- 	 * to make progress.
- 	 */
--	do {
--		struct request *rq;
--
--		rq = dispatch_fn(hctx);
--		if (!rq)
--			break;
--		list_add(&rq->queuelist, &rq_list);
--	} while (blk_mq_dispatch_rq_list(q, &rq_list));
-+	__blk_mq_sched_dispatch_requests(hctx);
- }
- 
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
--- 
-2.9.4
+Reviewed-by: Christoph Hellwig <hch@lst.de>
