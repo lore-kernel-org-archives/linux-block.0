@@ -1,68 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f169.google.com ([209.85.128.169]:36688 "EHLO
-        mail-wr0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754447AbdGJS5M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jul 2017 14:57:12 -0400
-Received: by mail-wr0-f169.google.com with SMTP id c11so150999773wrc.3
-        for <linux-block@vger.kernel.org>; Mon, 10 Jul 2017 11:57:11 -0700 (PDT)
-Subject: Re: [PATCH rfc 08/30] nvme-rdma: cleanup error path in controller
- reset
-To: Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-References: <1497799324-19598-1-git-send-email-sagi@grimberg.me>
- <1497799324-19598-9-git-send-email-sagi@grimberg.me>
-From: James Smart <james.smart@broadcom.com>
-Message-ID: <57675cfb-a63a-3fef-ae63-0f8387b67082@broadcom.com>
-Date: Mon, 10 Jul 2017 11:57:06 -0700
+Received: from mx1.redhat.com ([209.132.183.28]:50362 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751322AbdGRI7y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Jul 2017 04:59:54 -0400
+Date: Tue, 18 Jul 2017 16:59:40 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org
+Subject: Re: [PATCH 1/6] xen-blkfront: quiesce/unquiesce queue instead of
+ start/stop queues
+Message-ID: <20170718085936.GA14364@ming.t460p>
+References: <20170714231601.14444-1-ming.lei@redhat.com>
+ <20170714231601.14444-2-ming.lei@redhat.com>
+ <20170717112056.ysdtuugo5ipayv7e@MacBook-Pro-de-Roger.local>
+ <20170717150621.GB26571@ming.t460p>
+ <20170717160227.x5cmghxgqgyx2ye6@dhcp-3-128.uk.xensource.com>
+ <20170718005316.GA3660@ming.t460p>
+ <20170718074018.a52oya6fl3vyqerg@dhcp-3-128.uk.xensource.com>
 MIME-Version: 1.0
-In-Reply-To: <1497799324-19598-9-git-send-email-sagi@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170718074018.a52oya6fl3vyqerg@dhcp-3-128.uk.xensource.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 6/18/2017 8:21 AM, Sagi Grimberg wrote:
-> No need to queue an extra work to indirect controller
-> uninit and put the final reference.
->
->
->   static void nvme_rdma_del_ctrl_work(struct work_struct *work)
->   {
->   	struct nvme_rdma_ctrl *ctrl = container_of(work,
->   				struct nvme_rdma_ctrl, delete_work);
->   
-> -	__nvme_rdma_remove_ctrl(ctrl, true);
-> +	nvme_uninit_ctrl(&ctrl->ctrl);
-> +	nvme_rdma_shutdown_ctrl(ctrl, true);
-> +	nvme_put_ctrl(&ctrl->ctrl);
->   }
->   
->   static int __nvme_rdma_del_ctrl(struct nvme_rdma_ctrl *ctrl)
-> @@ -1791,14 +1784,6 @@ static int nvme_rdma_del_ctrl(struct nvme_ctrl *nctrl)
->   	return ret;
->   }
->   
-...
+On Tue, Jul 18, 2017 at 08:40:18AM +0100, Roger Pau Monn� wrote:
+> On Tue, Jul 18, 2017 at 08:53:28AM +0800, Ming Lei wrote:
+> > On Mon, Jul 17, 2017 at 05:02:27PM +0100, Roger Pau Monn� wrote:
+> > > On Mon, Jul 17, 2017 at 11:06:28PM +0800, Ming Lei wrote:
+> > > > On Mon, Jul 17, 2017 at 12:20:56PM +0100, Roger Pau Monn� wrote:
+> > > > > seems fairly easy to mess up and call "start" on a "quiesced" queue
+> > > > > (or the other way around).
+> > > > 
+> > > > Definitely it shouldn't be worried because start/stop is removed
+> > > > in this patchset.
+> > > 
+> > > Hm, how is that? I haven't seen any patch to blkfront to remove the
+> > > usage of start/stop, am I missing something?
+> > 
+> > http://secure-web.cisco.com/19iIG2bc3Ce2_t8mSF4YQ2LopepIvjAOqnPAXQ_QahSNOEvLBmechzNZ0pQOPfSRhy3hyC4t6L-JJzu81FvWRyLoBmhtq7F9uEk7XZsTt-XNxLN1KdEJvEeUAWelYSd9NthbvpGad6DmpJ0QCHSOgq4mRcDaqlz5mRmNkTvxls-ri1qCqy6am0jTDdraGINb_BUyV0894BtaFOMGJGEKLjcrBfFfT6C5XHSEdsiuB12ZLIUyaRVyU0TCUz6Sm4uhD/http%3A%2F%2Fmarc.info%2F%3Fl%3Dlinux-block%26m%3D150007418321196%26w%3D2
+> 
+> Sadly I have not been CCed or otherwise I've lost patch #5. Related to
+> that patch AFAICT kick_pending_request_queues can be removed, since
+> it's only used by one caller (or it can even be removed in this patch,
+> #1).
 
-> @@ -1832,10 +1814,13 @@ static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
->   
->   	return;
->   
-> -del_dead_ctrl:
-> -	/* Deleting this dead controller... */
-> +out_destroy_io:
-> +	nvme_rdma_destroy_io_queues(ctrl, true);
-> +out_destroy_admin:
-> +	nvme_rdma_destroy_admin_queue(ctrl, true);
->   	dev_warn(ctrl->ctrl.device, "Removing after reset failure\n");
-> -	WARN_ON(!queue_work(nvme_wq, &ctrl->delete_work));
-> +	nvme_uninit_ctrl(&ctrl->ctrl);
-> +	nvme_put_ctrl(&ctrl->ctrl);
->   }
->   
->   static const struct nvme_ctrl_ops nvme_rdma_ctrl_ops = {
+There are two callers: blkfront_connect() and blkif_restart_queue().
 
-Recommend calls to nvme_stop_keep_alive() prior to nvme_uninit_ctrl().
 
--- james
+-- 
+Ming
