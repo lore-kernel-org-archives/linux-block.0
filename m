@@ -1,22 +1,23 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: map queues to all present CPUs
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 19 Jul 2017 09:08:59 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Christoph Hellwig <hch@lst.de>
-Cc: maxg@mellanox.com, linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, maxg@mellanox.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: map queues to all present CPUs
+Message-ID: <20170719070859.GD4151@linux-x5ow.site>
 References: <20170718150440.27360-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <0a6d5b67-35cd-7c6d-3c1b-6bdda1896a3d@kernel.dk>
-Date: Mon, 24 Jul 2017 10:01:43 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20170718150440.27360-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 07/18/2017 09:04 AM, Christoph Hellwig wrote:
-> We already do this for PCI mappings, and the higher level code now
-> expects that CPU on/offlining doesn't have an affect on the queue
-> mappings.
-
-Applied for 4.13, thanks.
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
 -- 
-Jens Axboe
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
