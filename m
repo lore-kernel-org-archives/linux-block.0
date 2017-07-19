@@ -1,158 +1,69 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: don't change ioprio class for a bfq_queue on a service tree
-Date: Mon,  3 Jul 2017 10:00:10 +0200
-Message-Id: <20170703080010.1709-2-paolo.valente@linaro.org>
-In-Reply-To: <20170703080010.1709-1-paolo.valente@linaro.org>
-References: <20170703080010.1709-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:55859 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932661AbdGSQFf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Jul 2017 12:05:35 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "yagmur.oymak@gmail.com" <yagmur.oymak@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: 4.12 NULL pointer dereference in kmem_cache_free on USB storage
+ removal
+Date: Wed, 19 Jul 2017 16:04:48 +0000
+Message-ID: <1500480287.2494.1.camel@wdc.com>
+References: <alpine.LRH.2.20.1707132319290.24138@math.ut.ee>
+         <1499980058.2740.22.camel@wdc.com>
+         <952856d9-5f6b-98db-98e3-6348d428e894@gmail.com>
+In-Reply-To: <952856d9-5f6b-98db-98e3-6348d428e894@gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On each deactivation or re-scheduling (after being served) of a
-bfq_queue, BFQ invokes the function __bfq_entity_update_weight_prio(),
-to perform pending updates of ioprio, weight and ioprio class for the
-bfq_queue. BFQ also invokes this function on I/O-request dispatches,
-to raise or lower weights more quickly when needed, thereby improving
-latency. However, the entity representing the bfq_queue may be on the
-active (sub)tree of a service tree when this happens, and, although
-with a very low probability, the bfq_queue may happen to also have a
-pending change of its ioprio class. If both conditions hold when
-__bfq_entity_update_weight_prio() is invoked, then the entity moves to
-a sort of hybrid state: the new service tree for the entity, as
-returned by bfq_entity_service_tree(), differs from service tree on
-which the entity still is. The functions that handle activations and
-deactivations of entities do not cope with such a hybrid state (and
-would need to become more complex to cope).
+On Wed, 2017-07-19 at 08:13 +0300, Yagmur Oymak wrote:
+> On 07/14/2017 12:07 AM, Bart Van Assche wrote:
+> > On Thu, 2017-07-13 at 23:24 +0300, Meelis Roos wrote:
+> > > [258062.320700] RIP: 0010:kmem_cache_free+0x12/0x160
+> > > [258062.320886] Call Trace:
+> > > [258062.320897]  scsi_exit_rq+0x4d/0x60
+> > > [258062.320909]  free_request_size+0x1c/0x30
+> > > [258062.320923]  mempool_destroy+0x1d/0x60
+> > > [258062.320935]  blk_exit_rl+0x1b/0x40
+> > > [258062.320946]  __blk_release_queue+0x7d/0x120
+> > > [258062.320959]  process_one_work+0x1af/0x340
+> > > [258062.320972]  worker_thread+0x43/0x3e0
+> > > [258062.320984]  kthread+0xfe/0x130
+> > > [258062.320995]  ? create_worker+0x170/0x170
+> > > [258062.321007]  ? kthread_create_on_node+0x40/0x40
+> > > [258062.321022]  ret_from_fork+0x22/0x30
+> >=20
+> > Thank you for your report. Can you apply commit 8e6882545d8c ("scsi: Av=
+oid
+> > that scsi_exit_rq() triggers a use-after-free") on top of kernel v4.12 =
+and
+> > retest? That commit has been tagged "Cc: stable" so I hope that this pa=
+tch
+> > will be included in kernel v4.12.1. However, that kernel is not yet ava=
+ilable
+> > unfortunately ...
+>=20
+> That patch fixes the problem, as far as I tested. However, it still is
+> not included in stable by 4.12.2. The problem persists there, and is
+> fixed when this patch is applied on top of it. What to to about it?=20
+=20
+Hello Yagmur,
 
-This commit addresses this issue by just making
-__bfq_entity_update_weight_prio() not perform also a possible pending
-change of ioprio class, when invoked on an I/O-request dispatch for a
-bfq_queue. Such a change is thus postponed to when
-__bfq_entity_update_weight_prio() is invoked on deactivation or
-re-scheduling of the bfq_queue.
+[ Please don't top-post -- this is considered annoying in the Linux communi=
+ty ]
 
-Reported-by: Marco Piazza <mpiazza@gmail.com>
-Reported-by: Laurentiu Nicola <lnicola@dend.ro>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Tested-by: Marco Piazza <mpiazza@gmail.com>
----
- block/bfq-iosched.c | 14 ++++++++++----
- block/bfq-iosched.h |  3 ++-
- block/bfq-wf2q.c    | 39 ++++++++++++++++++++++++++++++++++-----
- 3 files changed, 46 insertions(+), 10 deletions(-)
+Since kernel v4.13-rc1 has been released and since commit 8e6882545d8c is i=
+ncluded
+in v4.13-rc1 I assume that it won't take long before a stable kernel is rel=
+eased
+that includes that commit. BTW, Greg just announced that that commit will b=
+e included
+in the next v4.11 stable kernel. See also https://lkml.org/lkml/2017/7/19/4=
+94.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ed93da2..9d4919b 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3471,11 +3471,17 @@ static void bfq_update_wr_data(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 			}
- 		}
- 	}
--	/* Update weight both if it must be raised and if it must be lowered */
-+	/*
-+	 * To improve latency (for this or other queues), immediately
-+	 * update weight both if it must be raised and if it must be
-+	 * lowered. Since, entity may be on some active tree here, and
-+	 * might have a pending change of its ioprio class, invoke
-+	 * next function with the last parameter unset (see the
-+	 * comments on the function).
-+	 */
- 	if ((entity->weight > entity->orig_weight) != (bfqq->wr_coeff > 1))
--		__bfq_entity_update_weight_prio(
--			bfq_entity_service_tree(entity),
--			entity);
-+		__bfq_entity_update_weight_prio(bfq_entity_service_tree(entity),
-+						entity, false);
- }
- 
- /*
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 5c3bf98..8fd83b8 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -892,7 +892,8 @@ void bfq_put_idle_entity(struct bfq_service_tree *st,
- 			 struct bfq_entity *entity);
- struct bfq_service_tree *
- __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
--				struct bfq_entity *entity);
-+				struct bfq_entity *entity,
-+				bool update_class_too);
- void bfq_bfqq_served(struct bfq_queue *bfqq, int served);
- void bfq_bfqq_charge_time(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 			  unsigned long time_ms);
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 8726ede..5ec05cd 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -694,10 +694,28 @@ struct bfq_service_tree *bfq_entity_service_tree(struct bfq_entity *entity)
- 	return sched_data->service_tree + idx;
- }
- 
--
-+/*
-+ * Update weight and priority of entity. If update_class_too is true,
-+ * then update the ioprio_class of entity too.
-+ *
-+ * The reason why the update of ioprio_class is controlled through the
-+ * last parameter is as follows. Changing the ioprio class of an
-+ * entity implies changing the destination service trees for that
-+ * entity. If such a change occurred when the entity is already on one
-+ * of the service trees for its previous class, then the state of the
-+ * entity would become more complex: none of the new possible service
-+ * trees for the entity, according to bfq_entity_service_tree(), would
-+ * match any of the possible service trees on which the entity
-+ * is. Complex operations involving these trees, such as entity
-+ * activations and deactivations, should take into account this
-+ * additional complexity.  To avoid this issue, this function is
-+ * invoked with update_class_too unset in the points in the code where
-+ * entity may happen to be on some tree.
-+ */
- struct bfq_service_tree *
- __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
--				struct bfq_entity *entity)
-+				struct bfq_entity *entity,
-+				bool update_class_too)
- {
- 	struct bfq_service_tree *new_st = old_st;
- 
-@@ -739,9 +757,15 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 				  bfq_weight_to_ioprio(entity->orig_weight);
- 		}
- 
--		if (bfqq)
-+		if (bfqq && update_class_too)
- 			bfqq->ioprio_class = bfqq->new_ioprio_class;
--		entity->prio_changed = 0;
-+
-+		/*
-+		 * Reset prio_changed only if the ioprio_class change
-+		 * is not pending any longer.
-+		 */
-+		if (!bfqq || bfqq->ioprio_class == bfqq->new_ioprio_class)
-+			entity->prio_changed = 0;
- 
- 		/*
- 		 * NOTE: here we may be changing the weight too early,
-@@ -867,7 +891,12 @@ static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
- {
- 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
- 
--	st = __bfq_entity_update_weight_prio(st, entity);
-+	/*
-+	 * When this function is invoked, entity is not in any service
-+	 * tree, then it is safe to invoke next function with the last
-+	 * parameter set (see the comments on the function).
-+	 */
-+	st = __bfq_entity_update_weight_prio(st, entity, true);
- 	bfq_calc_finish(entity, entity->budget);
- 
- 	/*
--- 
-2.10.0
+Bart.=
