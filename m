@@ -1,52 +1,226 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:36074 "EHLO
-        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751745AbdG1NN2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jul 2017 09:13:28 -0400
-Received: by mail-wm0-f53.google.com with SMTP id t201so125443519wmt.1
-        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2017 06:13:28 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-Subject: [PATCH V2] lightnvm: pblk fix for 4.13
-Date: Fri, 28 Jul 2017 15:13:15 +0200
-Message-Id: <1501247596-23999-1-git-send-email-javier@javigon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from smtp2.provo.novell.com ([137.65.250.81]:54628 "EHLO
+        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752911AbdGSBrL (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Tue, 18 Jul 2017 21:47:11 -0400
+From: Davidlohr Bueso <dave@stgolabs.net>
+To: akpm@linux-foundation.org
+Cc: mingo@kernel.org, peterz@infradead.org, jack@suse.cz,
+        torvalds@linux-foundation.org, kirill.shutemov@linux.intel.com,
+        hch@infradead.org, ldufour@linux.vnet.ibm.com, mhocko@suse.com,
+        mgorman@techsingularity.net, dave@stgolabs.net,
+        linux-kernel@vger.kernel.org, axboe@fb.com,
+        linux-block@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>
+Subject: [PATCH 10/17] block/cfq: replace cfq_rb_root leftmost caching
+Date: Tue, 18 Jul 2017 18:45:56 -0700
+Message-Id: <20170719014603.19029-11-dave@stgolabs.net>
+In-Reply-To: <20170719014603.19029-1-dave@stgolabs.net>
+References: <20170719014603.19029-1-dave@stgolabs.net>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+... with the generic rbtree flavor instead. No changes
+in semantics whatsoever.
 
-Can you pick up this fix for 4.13? It is a fix to a read corruption in
-pblk that has been there form the beginning. It is due to a bad bio
-manipulation in the case that an I/O containing lbas that are invalid,
-point to data in the host cache and point to data on the device, all
-three in a single bio.
+Cc: axboe@fb.com
+Cc: linux-block@vger.kernel.org
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
+---
+ block/cfq-iosched.c | 70 +++++++++++++++--------------------------------------
+ 1 file changed, 20 insertions(+), 50 deletions(-)
 
-The patch applies on top of you for-4.13/block and is available too at:
-  - https://github.com/OpenChannelSSD/linux/tree/pblk.for-4.13
-
-I marked the patch to fix the original pblk commit, but it does not
-apply anymore on the original 4.12 code. How do we handle these
-situations? We make a backport when Greg makes 4.12 stable?
-
-Changes since V1:
- - Make advanced_bio a bool to improve readability, as suggested by Jens
-
-Thanks,
-Javier
-
-
-Javier González (1):
-  lightnvm: pblk: advance bio according to lba index
-
- drivers/lightnvm/pblk-rb.c   |  4 ++--
- rivers/lightnvm/pblk-read.c | 23 ++++++++++++++++-------
- drivers/lightnvm/pblk.h      |  2 +-
- 3 files changed, 19 insertions(+), 10 deletions(-)
-
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 3d5c28945719..92c31683a2bb 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -93,13 +93,12 @@ struct cfq_ttime {
+  * move this into the elevator for the rq sorting as well.
+  */
+ struct cfq_rb_root {
+-	struct rb_root rb;
+-	struct rb_node *left;
++	struct rb_root_cached rb;
+ 	unsigned count;
+ 	u64 min_vdisktime;
+ 	struct cfq_ttime ttime;
+ };
+-#define CFQ_RB_ROOT	(struct cfq_rb_root) { .rb = RB_ROOT, \
++#define CFQ_RB_ROOT	(struct cfq_rb_root) { .rb = RB_ROOT_CACHED, \
+ 			.ttime = {.last_end_request = ktime_get_ns(),},}
+ 
+ /*
+@@ -984,10 +983,9 @@ static inline u64 max_vdisktime(u64 min_vdisktime, u64 vdisktime)
+ 
+ static void update_min_vdisktime(struct cfq_rb_root *st)
+ {
+-	struct cfq_group *cfqg;
++	if (!RB_EMPTY_ROOT(&st->rb.rb_root)) {
++		struct cfq_group *cfqg = rb_entry_cfqg(st->rb.rb_leftmost);
+ 
+-	if (st->left) {
+-		cfqg = rb_entry_cfqg(st->left);
+ 		st->min_vdisktime = max_vdisktime(st->min_vdisktime,
+ 						  cfqg->vdisktime);
+ 	}
+@@ -1169,46 +1167,25 @@ cfq_choose_req(struct cfq_data *cfqd, struct request *rq1, struct request *rq2,
+ 	}
+ }
+ 
+-/*
+- * The below is leftmost cache rbtree addon
+- */
+ static struct cfq_queue *cfq_rb_first(struct cfq_rb_root *root)
+ {
+ 	/* Service tree is empty */
+ 	if (!root->count)
+ 		return NULL;
+ 
+-	if (!root->left)
+-		root->left = rb_first(&root->rb);
+-
+-	if (root->left)
+-		return rb_entry(root->left, struct cfq_queue, rb_node);
+-
+-	return NULL;
++	return rb_entry(rb_first_cached(&root->rb), struct cfq_queue, rb_node);
+ }
+ 
+ static struct cfq_group *cfq_rb_first_group(struct cfq_rb_root *root)
+ {
+-	if (!root->left)
+-		root->left = rb_first(&root->rb);
+-
+-	if (root->left)
+-		return rb_entry_cfqg(root->left);
+-
+-	return NULL;
++	return rb_entry_cfqg(rb_first_cached(&root->rb));
+ }
+ 
+-static void rb_erase_init(struct rb_node *n, struct rb_root *root)
++static void cfq_rb_erase(struct rb_node *n, struct cfq_rb_root *root)
+ {
+-	rb_erase(n, root);
++	rb_erase_cached(n, &root->rb);
+ 	RB_CLEAR_NODE(n);
+-}
+ 
+-static void cfq_rb_erase(struct rb_node *n, struct cfq_rb_root *root)
+-{
+-	if (root->left == n)
+-		root->left = NULL;
+-	rb_erase_init(n, &root->rb);
+ 	--root->count;
+ }
+ 
+@@ -1258,11 +1235,11 @@ cfqg_key(struct cfq_rb_root *st, struct cfq_group *cfqg)
+ static void
+ __cfq_group_service_tree_add(struct cfq_rb_root *st, struct cfq_group *cfqg)
+ {
+-	struct rb_node **node = &st->rb.rb_node;
++	struct rb_node **node = &st->rb.rb_root.rb_node;
+ 	struct rb_node *parent = NULL;
+ 	struct cfq_group *__cfqg;
+ 	s64 key = cfqg_key(st, cfqg);
+-	int left = 1;
++	bool leftmost = true;
+ 
+ 	while (*node != NULL) {
+ 		parent = *node;
+@@ -1272,15 +1249,12 @@ __cfq_group_service_tree_add(struct cfq_rb_root *st, struct cfq_group *cfqg)
+ 			node = &parent->rb_left;
+ 		else {
+ 			node = &parent->rb_right;
+-			left = 0;
++			leftmost = false;
+ 		}
+ 	}
+ 
+-	if (left)
+-		st->left = &cfqg->rb_node;
+-
+ 	rb_link_node(&cfqg->rb_node, parent, node);
+-	rb_insert_color(&cfqg->rb_node, &st->rb);
++	rb_insert_color_cached(&cfqg->rb_node, &st->rb, leftmost);
+ }
+ 
+ /*
+@@ -1381,7 +1355,7 @@ cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
+ 	 * so that groups get lesser vtime based on their weights, so that
+ 	 * if group does not loose all if it was not continuously backlogged.
+ 	 */
+-	n = rb_last(&st->rb);
++	n = rb_last(&st->rb.rb_root);
+ 	if (n) {
+ 		__cfqg = rb_entry_cfqg(n);
+ 		cfqg->vdisktime = __cfqg->vdisktime +
+@@ -2223,14 +2197,14 @@ static void cfq_service_tree_add(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 	struct cfq_queue *__cfqq;
+ 	u64 rb_key;
+ 	struct cfq_rb_root *st;
+-	int left;
++	bool leftmost = true;
+ 	int new_cfqq = 1;
+ 	u64 now = ktime_get_ns();
+ 
+ 	st = st_for(cfqq->cfqg, cfqq_class(cfqq), cfqq_type(cfqq));
+ 	if (cfq_class_idle(cfqq)) {
+ 		rb_key = CFQ_IDLE_DELAY;
+-		parent = rb_last(&st->rb);
++		parent = rb_last(&st->rb.rb_root);
+ 		if (parent && parent != &cfqq->rb_node) {
+ 			__cfqq = rb_entry(parent, struct cfq_queue, rb_node);
+ 			rb_key += __cfqq->rb_key;
+@@ -2264,10 +2238,9 @@ static void cfq_service_tree_add(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 		cfqq->service_tree = NULL;
+ 	}
+ 
+-	left = 1;
+ 	parent = NULL;
+ 	cfqq->service_tree = st;
+-	p = &st->rb.rb_node;
++	p = &st->rb.rb_root.rb_node;
+ 	while (*p) {
+ 		parent = *p;
+ 		__cfqq = rb_entry(parent, struct cfq_queue, rb_node);
+@@ -2279,16 +2252,13 @@ static void cfq_service_tree_add(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 			p = &parent->rb_left;
+ 		else {
+ 			p = &parent->rb_right;
+-			left = 0;
++			leftmost = false;
+ 		}
+ 	}
+ 
+-	if (left)
+-		st->left = &cfqq->rb_node;
+-
+ 	cfqq->rb_key = rb_key;
+ 	rb_link_node(&cfqq->rb_node, parent, p);
+-	rb_insert_color(&cfqq->rb_node, &st->rb);
++	rb_insert_color_cached(&cfqq->rb_node, &st->rb, leftmost);
+ 	st->count++;
+ 	if (add_front || !new_cfqq)
+ 		return;
+@@ -2735,7 +2705,7 @@ static struct cfq_queue *cfq_get_next_queue(struct cfq_data *cfqd)
+ 	/* There is nothing to dispatch */
+ 	if (!st)
+ 		return NULL;
+-	if (RB_EMPTY_ROOT(&st->rb))
++	if (RB_EMPTY_ROOT(&st->rb.rb_root))
+ 		return NULL;
+ 	return cfq_rb_first(st);
+ }
+@@ -3221,7 +3191,7 @@ static struct cfq_group *cfq_get_next_cfqg(struct cfq_data *cfqd)
+ 	struct cfq_rb_root *st = &cfqd->grp_service_tree;
+ 	struct cfq_group *cfqg;
+ 
+-	if (RB_EMPTY_ROOT(&st->rb))
++	if (RB_EMPTY_ROOT(&st->rb.rb_root))
+ 		return NULL;
+ 	cfqg = cfq_rb_first_group(st);
+ 	update_min_vdisktime(st);
 -- 
-2.7.4
+2.12.0
