@@ -1,112 +1,92 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:38646 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750762AbdGUMXI (ORCPT
+Received: from tartarus.angband.pl ([89.206.35.136]:47940 "EHLO
+        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750762AbdGUMOv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jul 2017 08:23:08 -0400
-From: Josef Bacik <jbacik@fb.com>
-To: Adam Borowski <kilobyte@angband.pl>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "nbd-general@lists.sourceforge.net"
-        <nbd-general@lists.sourceforge.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: nbd drops connection on most writes
-Date: Fri, 21 Jul 2017 12:22:51 +0000
-Message-ID: <F5862F0D-20D5-4CEC-9FAB-C5ED306DDFB6@fb.com>
-References: <20170721121439.ofwm3lfuzqjsvjok@angband.pl>
-In-Reply-To: <20170721121439.ofwm3lfuzqjsvjok@angband.pl>
-Content-Type: text/plain; charset="utf-8"
+        Fri, 21 Jul 2017 08:14:51 -0400
+Date: Fri, 21 Jul 2017 14:14:39 +0200
+From: Adam Borowski <kilobyte@angband.pl>
+To: Josef Bacik <jbacik@fb.com>, linux-block@vger.kernel.org,
+        nbd-general@lists.sourceforge.net, linux-kernel@vger.kernel.org
+Subject: nbd drops connection on most writes
+Message-ID: <20170721121439.ofwm3lfuzqjsvjok@angband.pl>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T2ggc2hpdCB0aGUgZGVmYXVsdCB0aW1lb3V0IGlzIDAgaWYgeW91IGRvbid0IHNldCBpdCBpbiB0
-aGUgY2xpZW50LiAgVXNlIHRoZSB0aW1lb3V0IG9wdGlvbiB3aXRoIG5iZCBjbGllbnQgYW5kIGl0
-IHNob3VsZCBmaXggaXQgZm9yIHlvdS4gIEknbGwgc2VuZCBzb21ldGhpbmcgdXAgdG8gbWFrZSB0
-aGlzIGEgc2FuZSBkZWZhdWx0LiAgVGhhbmtzLA0KDQpKb3NlZg0KDQpTZW50IGZyb20gbXkgaVBo
-b25lDQoNCj4gT24gSnVsIDIxLCAyMDE3LCBhdCA4OjE1IEFNLCBBZGFtIEJvcm93c2tpIDxraWxv
-Ynl0ZUBhbmdiYW5kLnBsPiB3cm90ZToNCj4gDQo+IEhpIQ0KPiBJJ20gYWZyYWlkIHRoYXQgNC4x
-My1yYzEgbmJkIGFib3J0cyBjb25uZWN0aW9uIG9uIHdyaXRlcyBmb3IgbWU6DQo+IA0KPiBbICAy
-NTEuOTM4Mzg0XSBibG9jayBuYmQwOiBTZW5kIGRhdGEgZmFpbGVkIChyZXN1bHQgLTExKQ0KPiBb
-ICAyNTEuOTQzNDg0XSBibG9jayBuYmQwOiBSZXF1ZXN0IHNlbmQgZmFpbGVkIHRyeWluZyBhbm90
-aGVyIGNvbm5lY3Rpb24NCj4gWyAgMjUxLjk1MDAzNF0gYmxvY2sgbmJkMDogUmVjZWl2ZSBjb250
-cm9sIGZhaWxlZCAocmVzdWx0IC0zMikNCj4gWyAgMjUxLjk1NTY3Nl0gYmxvY2sgbmJkMDogQXR0
-ZW1wdGVkIHNlbmQgb24gaW52YWxpZCBzb2NrZXQNCj4gWyAgMjUxLjk2MTAyMl0gcHJpbnRfcmVx
-X2Vycm9yOiBJL08gZXJyb3IsIGRldiBuYmQwLCBzZWN0b3IgMjIwNjM0NA0KPiBbICAyNTEuOTYx
-MDI1XSBibG9jayBuYmQwOiBzaHV0dGluZyBkb3duIHNvY2tldHMNCj4gDQo+IE5vdCBhbGwga2lu
-ZHMgb2Ygd3JpdGVzIHRyaWdnZXIgdGhlIHByb2JsZW0uICBGb3IgZXhhbXBsZSwgeW91IGNhbiBk
-ZCB0byB0aGUNCj4gbmJkIGJsb2NrIGRldmljZSwgbGlrZXdpc2UgYmFkYmxvY2tzIC13IHN1Y2Nl
-ZWRzIHdpdGhvdXQgYSBoaXRjaC4gIFlldCBhdA0KPiBsZWFzdCBidHJmcyBhbmQgc3dhcCBkaXNj
-b25uZWN0IG5lYXJseSBpbW1lZGlhdGVseS4gIFJlYWRzIHNlZW0gdG8gd29yazogZm9yDQo+IGV4
-YW1wbGUsIGJ0cmZzIGNhbiB1c3VhbGx5IG1vdW50IGFuZCBzY3J1YiBzdWNjZXNzZnVsbHksIHll
-dCBtaW5vciB3cml0ZXMNCj4gdGhhdCBoYXBwZW4gb24gYSBmaWxlc3lzdGVtIG1vdW50ZWQgcncg
-ZXZlbiB3aXRob3V0IGV4cGxpY2l0IHVzZXItbGV2ZWwNCj4gd3JpdGVzIGNhdXNlIGEgZGlzY29u
-bmVjdCBpbiBhIHNob3J0IHRpbWUuICAiUmVhbCIgd3JpdGVzIHRvIHRoZSBmaWxlc3lzdGVtDQo+
-IHRyaWdnZXIgaXQgYXBwYXJlbnRseSBvdXRyaWdodC4gIExpa2V3aXNlLCB0byB1c2Ugc3dhcCB5
-b3UgbmVlZCB0byB3cml0ZSB0bw0KPiBpdCBmaXJzdCwgdGh1cyBpdCBmYWlscyBxdWlja2x5Lg0K
-PiANCj4gUmVwcm9kdWNlZCBvbiBhcm02NCAoUGluZTY0KSBmaXJzdC4gIEFzIHRoaXMgU29DIGp1
-c3Qgc3dpdGNoZWQgZnJvbSBhbg0KPiBvdXQtb2YtdHJlZSBldGhlcm5ldCBkcml2ZXIgdG8gYSBj
-b21wbGV0ZWx5IGRpZmZlcmVudCBuZXcgb25lIChkd21hYy1zdW44aSksDQo+IGFuZCBzdWNoIGEg
-c3dpdGNoIGNhbid0IGJlIGJpc2VjdGVkLCBJIGFzc3VtZWQgdGhhdCdzIHRoZSBjdWxwcml0IGFu
-ZCBkaWQNCj4gbm90IGNvbXBsYWluIHdoaWxlIGluIC1uZXh0Lg0KPiANCj4gSG93ZXZlciwgdHVy
-bnMgb3V0IHRoZSBzYW1lIGhhcHBlbnMgb24gYSBib2ctc3RhbmRhcmQgYW1kNjQsIGJvdGggb24g
-YmFyZQ0KPiBtZXRhbCBhbmQgaW4gcWVtdS4NCj4gDQo+IEluIGFsbCBvZiB0aGVzZSBjYXNlcywg
-dGhlIHNlcnZlciBpcyBhbiBhbWQ2NCBEZWJpYW4gc3RyZXRjaCwga2VybmVsDQo+IDQuOS4zMC0y
-K2RlYjl1MiwgbmJkLXNlcnZlciAxOjMuMTUuMi0zLg0KPiANCj4gQmlzZWN0IGJsYW1lcyBkYzg4
-ZTM0ZCAibmJkOiBzZXQgc2stPnNrX3NuZHRpbWVvIGZvciBvdXIgc29ja2V0cyIsIGFuZA0KPiBp
-bmRlZWQsIHJldmVydGluZyB0aGF0IHBhdGNoIG1ha2VzIGV2ZXJ5dGhpbmcgZmluZSBhZ2Fpbi4N
-Cj4gDQo+IA0KPiBCaXNlY3QgbG9nOg0KPiAjIGJhZDogWzYzYTg2MzYyMTMwZjRjMTdlYWE1N2Yz
-ZWY1MTcxZWM0MzExMWE1NGVdIE1lcmdlIHRhZyAncG0tNC4xMy1yYzInIG9mIGdpdDovL2dpdC5r
-ZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9yYWZhZWwvbGludXgtcG0NCj4gIyBn
-b29kOiBbNmY3ZGEyOTA0MTNiYTcxM2YwY2RkOWZmMWEyYTliYjEyOWVmNGY2Y10gTGludXggNC4x
-Mg0KPiBnaXQgYmlzZWN0IHN0YXJ0ICdsaW51cy9tYXN0ZXInICd2NC4xMicNCj4gIyBiYWQ6IFs1
-NWE3YjIxMjVjZjQ3MzlhODQ3OGQyZDcyMjMzMTBhZTczOTM0MDhjXSBNZXJnZSB0YWcgJ2FybTY0
-LXVwc3RyZWFtJyBvZiBnaXQ6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9n
-aXQvYXJtNjQvbGludXgNCj4gZ2l0IGJpc2VjdCBiYWQgNTVhN2IyMTI1Y2Y0NzM5YTg0NzhkMmQ3
-MjIzMzEwYWU3MzkzNDA4Yw0KPiAjIGJhZDogWzE4NDlmODAwZmJhMzJjZDVhMGI2NDdmODI0ZjEx
-NDI2Yjg1MzEwZDhdIE1lcmdlIHRhZyAnYXJtc29jLWR0JyBvZiBnaXQ6Ly9naXQua2VybmVsLm9y
-Zy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvYXJtL2FybS1zb2MNCj4gZ2l0IGJpc2VjdCBiYWQg
-MTg0OWY4MDBmYmEzMmNkNWEwYjY0N2Y4MjRmMTE0MjZiODUzMTBkOA0KPiAjIGJhZDogW2NiY2Q0
-ZjA4YWE2MzdiNzRmNTc1MjY4NzcwZGE4NmEwMGZhYmRlNmRdIE1lcmdlIHRhZyAnc3RhZ2luZy00
-LjEzLXJjMScgb2YgZ2l0Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0
-L2dyZWdraC9zdGFnaW5nDQo+IGdpdCBiaXNlY3QgYmFkIGNiY2Q0ZjA4YWE2MzdiNzRmNTc1MjY4
-NzcwZGE4NmEwMGZhYmRlNmQNCj4gIyBiYWQ6IFsxYjA0NGYxY2ZjNjVhN2Q5MGIyMDlkZmFiZDU3
-ZTE2ZDk4YjU4YzViXSBNZXJnZSBicmFuY2ggJ3RpbWVycy1jb3JlLWZvci1saW51cycgb2YgZ2l0
-Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3RpcC90aXANCj4gZ2l0
-IGJpc2VjdCBiYWQgMWIwNDRmMWNmYzY1YTdkOTBiMjA5ZGZhYmQ1N2UxNmQ5OGI1OGM1Yg0KPiAj
-IGJhZDogWzg5MmFkNWFjY2EwYjJkZGI1MTRmYWU2M2ZhNDY4NmJmNzI2ZDI0NzFdIE1lcmdlIGJy
-YW5jaCAnbG9ja2luZy1jb3JlLWZvci1saW51cycgb2YgZ2l0Oi8vZ2l0Lmtlcm5lbC5vcmcvcHVi
-L3NjbS9saW51eC9rZXJuZWwvZ2l0L3RpcC90aXANCj4gZ2l0IGJpc2VjdCBiYWQgODkyYWQ1YWNj
-YTBiMmRkYjUxNGZhZTYzZmE0Njg2YmY3MjZkMjQ3MQ0KPiAjIGJhZDogW2U0NDJjYmY5MTBjNzFm
-YmE1OTI2Y2Y3NTdkZDdmOGZjY2UyMmZjNWZdIHBrdGNkdmQ6IHJlbW92ZSB0aGUgY2FsbCB0byBi
-bGtfcXVldWVfYm91bmNlDQo+IGdpdCBiaXNlY3QgYmFkIGU0NDJjYmY5MTBjNzFmYmE1OTI2Y2Y3
-NTdkZDdmOGZjY2UyMmZjNWYNCj4gIyBiYWQ6IFtkODZjNGQ4ZWYzMWIzZDk5YzY4MWM4NTljYjRl
-OTM2ZGFmYzJkN2E0XSBudm1lOiBtb3ZlIHJlc2V0IHdvcmtxdWV1ZSBoYW5kbGluZyB0byBjb21t
-b24gY29kZQ0KPiBnaXQgYmlzZWN0IGJhZCBkODZjNGQ4ZWYzMWIzZDk5YzY4MWM4NTljYjRlOTM2
-ZGFmYzJkN2E0DQo+ICMgYmFkOiBbZmRkMDUwYjViM2M5NjgxM2FlNjc1NmVkNjgxNTdkMzJiYTMx
-YjlmMl0gTWVyZ2UgYnJhbmNoICd1dWlkLXR5cGVzJyBvZiBib21iYWRpbC5pbmZyYWRlYWQub3Jn
-OnB1YmxpY19naXQvdXVpZCBpbnRvIG52bWUtYmFzZQ0KPiBnaXQgYmlzZWN0IGJhZCBmZGQwNTBi
-NWIzYzk2ODEzYWU2NzU2ZWQ2ODE1N2QzMmJhMzFiOWYyDQo+ICMgYmFkOiBbYTEwNGM5ZjIyYzdk
-MDczZDRhZTMwOGNhMzYzODNjZTVjYzQ2MzFjY10gbnZtZS1yZG1hOiBmaXggbWVyZ2UgZXJyb3IN
-Cj4gZ2l0IGJpc2VjdCBiYWQgYTEwNGM5ZjIyYzdkMDczZDRhZTMwOGNhMzYzODNjZTVjYzQ2MzFj
-Yw0KPiAjIGdvb2Q6IFtiMDQwYWQ5Y2Y2YTE2OWNjMDAwYTUzMjRmY2FkYTY5NWRmYTFmNGIzXSBs
-b29wOiBmaXggZXJyb3IgaGFuZGxpbmcgcmVncmVzc2lvbg0KPiBnaXQgYmlzZWN0IGdvb2QgYjA0
-MGFkOWNmNmExNjljYzAwMGE1MzI0ZmNhZGE2OTVkZmExZjRiMw0KPiAjIGJhZDogWzM2ZmZjNmMx
-YzBlNjdhY2RhY2I1MzM0ODM1MGQwYTM3MjA2ZGJhZGZdIGJsb2NrX2RldjogcHJvcGFnYXRlIGJp
-b19pb3ZfaXRlcl9nZXRfcGFnZXMgZXJyb3IgaW4gX19ibGtkZXZfZGlyZWN0X0lPDQo+IGdpdCBi
-aXNlY3QgYmFkIDM2ZmZjNmMxYzBlNjdhY2RhY2I1MzM0ODM1MGQwYTM3MjA2ZGJhZGYNCj4gIyBi
-YWQ6IFtmNzI5YjY2ZmNhNDNkODUwZDU2NGIyNjRjMjAzMzk4MGMwMGExNGIwXSBnZnMyOiByZW1v
-dmUgdGhlIHVudXNlZCBzZF9sb2dfZXJyb3IgZmllbGQNCj4gZ2l0IGJpc2VjdCBiYWQgZjcyOWI2
-NmZjYTQzZDg1MGQ1NjRiMjY0YzIwMzM5ODBjMDBhMTRiMA0KPiAjIGJhZDogWzQwMTc0MTU0N2Y5
-NWMwODgzZmUxNDNhYzQ0NmQ5MmM3NzI5Mzc1NTZdIG52bWUtbGlnaHRudm06IHVzZSBibGtfZXhl
-Y3V0ZV9ycSBpbiBudm1lX252bV9zdWJtaXRfdXNlcl9jbWQNCj4gZ2l0IGJpc2VjdCBiYWQgNDAx
-NzQxNTQ3Zjk1YzA4ODNmZTE0M2FjNDQ2ZDkyYzc3MjkzNzU1Ng0KPiAjIGJhZDogW2RjODhlMzRk
-NjlkODdjMzcwZGVhYTlkNjEzZGFjOGUzYTA0MTFmNTldIG5iZDogc2V0IHNrLT5za19zbmR0aW1l
-byBmb3Igb3VyIHNvY2tldHMNCj4gZ2l0IGJpc2VjdCBiYWQgZGM4OGUzNGQ2OWQ4N2MzNzBkZWFh
-OWQ2MTNkYWM4ZTNhMDQxMWY1OQ0KPiAjIGZpcnN0IGJhZCBjb21taXQ6IFtkYzg4ZTM0ZDY5ZDg3
-YzM3MGRlYWE5ZDYxM2RhYzhlM2EwNDExZjU5XSBuYmQ6IHNldCBzay0+c2tfc25kdGltZW8gZm9y
-IG91ciBzb2NrZXRzDQo+IA0KPiANCj4gTWVvdyENCj4gLS0gDQo+IOKigOKjtOKgvuKgu+KituKj
-puKggCANCj4g4qO+4qCB4qKg4qCS4qCA4qO/4qGBIEEgZHVtYiBzcGVjaWVzIGhhcyBubyB3YXkg
-dG8gb3BlbiBhIHR1bmEgY2FuLg0KPiDior/ioYTioJjioLfioJrioIvioIAgQSBzbWFydCBzcGVj
-aWVzIGludmVudHMgYSBjYW4gb3BlbmVyLg0KPiDioIjioLPio4TioIDioIDioIDioIAgQSBtYXN0
-ZXIgc3BlY2llcyBkZWxlZ2F0ZXMuDQo=
+Hi!
+I'm afraid that 4.13-rc1 nbd aborts connection on writes for me:
+
+[  251.938384] block nbd0: Send data failed (result -11)
+[  251.943484] block nbd0: Request send failed trying another connection
+[  251.950034] block nbd0: Receive control failed (result -32)
+[  251.955676] block nbd0: Attempted send on invalid socket
+[  251.961022] print_req_error: I/O error, dev nbd0, sector 2206344
+[  251.961025] block nbd0: shutting down sockets
+
+Not all kinds of writes trigger the problem.  For example, you can dd to the
+nbd block device, likewise badblocks -w succeeds without a hitch.  Yet at
+least btrfs and swap disconnect nearly immediately.  Reads seem to work: for
+example, btrfs can usually mount and scrub successfully, yet minor writes
+that happen on a filesystem mounted rw even without explicit user-level
+writes cause a disconnect in a short time.  "Real" writes to the filesystem
+trigger it apparently outright.  Likewise, to use swap you need to write to
+it first, thus it fails quickly.
+
+Reproduced on arm64 (Pine64) first.  As this SoC just switched from an
+out-of-tree ethernet driver to a completely different new one (dwmac-sun8i),
+and such a switch can't be bisected, I assumed that's the culprit and did
+not complain while in -next.
+
+However, turns out the same happens on a bog-standard amd64, both on bare
+metal and in qemu.
+
+In all of these cases, the server is an amd64 Debian stretch, kernel
+4.9.30-2+deb9u2, nbd-server 1:3.15.2-3.
+
+Bisect blames dc88e34d "nbd: set sk->sk_sndtimeo for our sockets", and
+indeed, reverting that patch makes everything fine again.
+
+
+Bisect log:
+# bad: [63a86362130f4c17eaa57f3ef5171ec43111a54e] Merge tag 'pm-4.13-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+# good: [6f7da290413ba713f0cdd9ff1a2a9bb129ef4f6c] Linux 4.12
+git bisect start 'linus/master' 'v4.12'
+# bad: [55a7b2125cf4739a8478d2d7223310ae7393408c] Merge tag 'arm64-upstream' of git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux
+git bisect bad 55a7b2125cf4739a8478d2d7223310ae7393408c
+# bad: [1849f800fba32cd5a0b647f824f11426b85310d8] Merge tag 'armsoc-dt' of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc
+git bisect bad 1849f800fba32cd5a0b647f824f11426b85310d8
+# bad: [cbcd4f08aa637b74f575268770da86a00fabde6d] Merge tag 'staging-4.13-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging
+git bisect bad cbcd4f08aa637b74f575268770da86a00fabde6d
+# bad: [1b044f1cfc65a7d90b209dfabd57e16d98b58c5b] Merge branch 'timers-core-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad 1b044f1cfc65a7d90b209dfabd57e16d98b58c5b
+# bad: [892ad5acca0b2ddb514fae63fa4686bf726d2471] Merge branch 'locking-core-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad 892ad5acca0b2ddb514fae63fa4686bf726d2471
+# bad: [e442cbf910c71fba5926cf757dd7f8fcce22fc5f] pktcdvd: remove the call to blk_queue_bounce
+git bisect bad e442cbf910c71fba5926cf757dd7f8fcce22fc5f
+# bad: [d86c4d8ef31b3d99c681c859cb4e936dafc2d7a4] nvme: move reset workqueue handling to common code
+git bisect bad d86c4d8ef31b3d99c681c859cb4e936dafc2d7a4
+# bad: [fdd050b5b3c96813ae6756ed68157d32ba31b9f2] Merge branch 'uuid-types' of bombadil.infradead.org:public_git/uuid into nvme-base
+git bisect bad fdd050b5b3c96813ae6756ed68157d32ba31b9f2
+# bad: [a104c9f22c7d073d4ae308ca36383ce5cc4631cc] nvme-rdma: fix merge error
+git bisect bad a104c9f22c7d073d4ae308ca36383ce5cc4631cc
+# good: [b040ad9cf6a169cc000a5324fcada695dfa1f4b3] loop: fix error handling regression
+git bisect good b040ad9cf6a169cc000a5324fcada695dfa1f4b3
+# bad: [36ffc6c1c0e67acdacb53348350d0a37206dbadf] block_dev: propagate bio_iov_iter_get_pages error in __blkdev_direct_IO
+git bisect bad 36ffc6c1c0e67acdacb53348350d0a37206dbadf
+# bad: [f729b66fca43d850d564b264c2033980c00a14b0] gfs2: remove the unused sd_log_error field
+git bisect bad f729b66fca43d850d564b264c2033980c00a14b0
+# bad: [401741547f95c0883fe143ac446d92c772937556] nvme-lightnvm: use blk_execute_rq in nvme_nvm_submit_user_cmd
+git bisect bad 401741547f95c0883fe143ac446d92c772937556
+# bad: [dc88e34d69d87c370deaa9d613dac8e3a0411f59] nbd: set sk->sk_sndtimeo for our sockets
+git bisect bad dc88e34d69d87c370deaa9d613dac8e3a0411f59
+# first bad commit: [dc88e34d69d87c370deaa9d613dac8e3a0411f59] nbd: set sk->sk_sndtimeo for our sockets
+
+
+Meow!
+-- 
+⢀⣴⠾⠻⢶⣦⠀ 
+⣾⠁⢠⠒⠀⣿⡁ A dumb species has no way to open a tuna can.
+⢿⡄⠘⠷⠚⠋⠀ A smart species invents a can opener.
+⠈⠳⣄⠀⠀⠀⠀ A master species delegates.
