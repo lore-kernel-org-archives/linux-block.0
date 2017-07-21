@@ -1,93 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50214 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750940AbdGaQvZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 12:51:25 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 00/14] blk-mq-sched: fix SCSI-MQ performance regression
-Date: Tue,  1 Aug 2017 00:50:56 +0800
-Message-Id: <20170731165111.11536-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: josef@toxicpanda.com
+To: axboe@kernel.dk,
+	nbd-general@lists.sourceforge.net,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH 2/3] nbd: take tx_lock before disconnecting
+Date: Fri, 21 Jul 2017 10:48:14 -0400
+Message-Id: <1500648495-13337-2-git-send-email-jbacik@fb.com>
+In-Reply-To: <1500648495-13337-1-git-send-email-jbacik@fb.com>
+References: <1500648495-13337-1-git-send-email-jbacik@fb.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In Red Hat internal storage test wrt. blk-mq scheduler, we
-found that its performance is quite bad, especially
-about sequential I/O on some multi-queue SCSI devcies.
+From: Josef Bacik <jbacik@fb.com>
 
-Turns out one big issue causes the performance regression: requests
-are still dequeued from sw queue/scheduler queue even when ldd's
-queue is busy, so I/O merge becomes quite difficult to do, and
-sequential IO degrades a lot.
+We need to take the tx_lock so we don't interleave our disconnect
+request between real data going down the wire.
 
-The 1st five patches improve this situation, and brings back
-some performance loss.
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-But looks they are still not enough. Finally it is caused by
-the shared queue depth among all hw queues. For SCSI devices,
-.cmd_per_lun defines the max number of pending I/O on one
-request queue, which is per-request_queue depth. So during
-dispatch, if one hctx is too busy to move on, all hctxs can't
-dispatch too because of the per-request_queue depth.
-
-Patch 6 ~ 14 use per-request_queue dispatch list to avoid
-to dequeue requests from sw/scheduler queue when lld queue
-is busy.
-
-With this changes, SCSI-MQ performance is brought back
-against block legacy path, follows the test result on lpfc:
-
-- fio(libaio, bs:4k, dio, queue_depth:64, 20 jobs)
-
-
-                   |v4.13-rc3       | v4.13-rc3   | patched v4.13-rc3
-                   |legacy deadline | mq-none     | mq-none
----------------------------------------------------------------------
-read        "iops" | 401749.4001    | 346237.5025 | 387536.4427
-randread    "iops" | 25175.07121    | 21688.64067 | 25578.50374
-write       "iops" | 376168.7578    | 335262.0475 | 370132.4735
-reandwrite  "iops" | 25235.46163    | 24982.63819 | 23934.95610
-
-                   |v4.13-rc3       | v4.13-rc3   | patched v4.13-rc3
-                   |legacy deadline | mq-deadline | mq-deadline
-------------------------------------------------------------------------------
-read        "iops" | 401749.4001    | 35592.48901 | 401681.1137
-randread    "iops" | 25175.07121    | 30029.52618 | 21446.68731
-write       "iops" | 376168.7578    | 27340.56777 | 377356.7286
-randwrite   "iops" | 25235.46163    | 24395.02969 | 24885.66152
-
-Ming Lei (14):
-  blk-mq-sched: fix scheduler bad performance
-  blk-mq: rename flush_busy_ctx_data as ctx_iter_data
-  blk-mq: introduce blk_mq_dispatch_rq_from_ctxs()
-  blk-mq-sched: improve dispatching from sw queue
-  blk-mq-sched: don't dequeue request until all in ->dispatch are
-    flushed
-  blk-mq-sched: introduce blk_mq_sched_queue_depth()
-  blk-mq-sched: use q->queue_depth as hint for q->nr_requests
-  blk-mq: introduce BLK_MQ_F_SHARED_DEPTH
-  blk-mq-sched: cleanup blk_mq_sched_dispatch_requests()
-  blk-mq-sched: introduce helpers for query, change busy state
-  blk-mq: introduce helpers for operating ->dispatch list
-  blk-mq: introduce pointers to dispatch lock & list
-  blk-mq: pass 'request_queue *' to several helpers of operating BUSY
-  blk-mq-sched: improve IO scheduling on SCSI devcie
-
- block/blk-mq-debugfs.c |  11 ++---
- block/blk-mq-sched.c   |  70 +++++++++++++++--------------
- block/blk-mq-sched.h   |  23 ++++++++++
- block/blk-mq.c         | 117 +++++++++++++++++++++++++++++++++++++++++++------
- block/blk-mq.h         |  72 ++++++++++++++++++++++++++++++
- block/blk-settings.c   |   2 +
- include/linux/blk-mq.h |   5 +++
- include/linux/blkdev.h |   5 +++
- 8 files changed, 255 insertions(+), 50 deletions(-)
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index f91e7ac..6aefe9f 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -978,11 +978,15 @@ static void send_disconnects(struct nbd_device *nbd)
+ 	int i, ret;
+ 
+ 	for (i = 0; i < config->num_connections; i++) {
++		struct nbd_sock *nsock = config->socks[i];
++
+ 		iov_iter_kvec(&from, WRITE | ITER_KVEC, &iov, 1, sizeof(request));
++		mutex_lock(&nsock->tx_lock);
+ 		ret = sock_xmit(nbd, i, 1, &from, 0, NULL);
+ 		if (ret <= 0)
+ 			dev_err(disk_to_dev(nbd->disk),
+ 				"Send disconnect failed %d\n", ret);
++		mutex_unlock(&nsock->tx_lock);
+ 	}
+ }
+ 
 -- 
-2.9.4
+2.7.4
