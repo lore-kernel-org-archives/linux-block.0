@@ -1,48 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:35501 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751735AbdG0Ot4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jul 2017 10:49:56 -0400
-Received: by mail-wm0-f50.google.com with SMTP id c184so107426766wmd.0
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2017 07:49:56 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-Subject: [PATCH] lightnvm: pblk fix for 4.13
-Date: Thu, 27 Jul 2017 16:49:49 +0200
-Message-Id: <1501166990-24366-1-git-send-email-javier@javigon.com>
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.13-rc2
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <4fd596b4-82d3-b064-9a67-8269c7377f24@kernel.dk>
+Date: Fri, 21 Jul 2017 09:19:23 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Hi Linus,
 
-Can you pick up this fix for 4.13? It is a fix to a read corruption in
-pblk that has been there form the beginning. It is due to a bad bio
-manipulation in the case that an I/O containing lbas that are invalid,
-point to data in the host cache and point to data on the device, all
-three in a single bio.
+Small set of fixes for -rc2 - two fixes for BFQ, documentation and code,
+and a removal of an unused variable in nbd. Outside of that, a small
+collection of fixes from the usual crew on the nvme side. Please pull!
 
-The patch applies on top of you for-4.13/block and is available too at:
-  - https://github.com/OpenChannelSSD/linux/tree/pblk.for-4.13
 
-I marked the patch to fix the original pblk commit, but it does not
-apply anymore on the original 4.12 code. How do we handle these
-situations? We make a backport when Greg makes 4.12 stable?
+  git://git.kernel.dk/linux-block.git for-linus
 
-Thanks,
-Javier
 
-Javier González (1):
-  lightnvm: pblk: advance bio according to lba index
+----------------------------------------------------------------
+Christoph Hellwig (2):
+      nvme: fix byte swapping in the streams code
+      nvmet-fc: fix byte swapping in nvmet_fc_ls_create_association
 
- drivers/lightnvm/pblk-rb.c   |  4 ++--
- drivers/lightnvm/pblk-read.c | 19 ++++++++++++++-----
- drivers/lightnvm/pblk.h      |  2 +-
- 3 files changed, 17 insertions(+), 8 deletions(-)
+Christophe JAILLET (1):
+      nvme-pci: Fix an error handling path in 'nvme_probe()'
+
+David Wayne Fugate (1):
+      nvme-pci: add another device ID with stripe quirk
+
+Hou Tao (2):
+      bfq: fix typos in comments about B-WF2Q+ algorithm
+      bfq: dispatch request to prevent queue stalling after the request completion
+
+Johannes Thumshirn (3):
+      nvmet: prefix version configfs file with attr
+      nvmet: Move serial number from controller to subsystem
+      nvmet: preserve controller serial number between reboots
+
+Kefeng Wang (1):
+      nbd: kill unused ret in recv_work
+
+Keith Busch (1):
+      nvme-pci: Remove nvme_setup_prps BUG_ON
+
+Martin Wilck (1):
+      nvmet: don't report 0-bytes in serial number
+
+ block/bfq-iosched.c             |  3 +++
+ block/bfq-iosched.h             |  2 +-
+ block/bfq-wf2q.c                |  2 +-
+ drivers/block/nbd.c             |  2 --
+ drivers/nvme/host/core.c        |  2 +-
+ drivers/nvme/host/pci.c         | 43 ++++++++++++++++++++++++++++++-----------
+ drivers/nvme/target/admin-cmd.c | 16 +++++++++++++--
+ drivers/nvme/target/configfs.c  | 30 ++++++++++++++++++++++++----
+ drivers/nvme/target/core.c      |  5 ++---
+ drivers/nvme/target/fc.c        |  8 ++++----
+ drivers/nvme/target/nvmet.h     |  2 +-
+ include/linux/nvme.h            | 14 +++++++-------
+ 12 files changed, 92 insertions(+), 37 deletions(-)
 
 -- 
-2.7.4
+Jens Axboe
