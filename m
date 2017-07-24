@@ -1,67 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50706 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750709AbdGaQvo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 12:51:44 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 01/14] blk-mq-sched: fix scheduler bad performance
-Date: Tue,  1 Aug 2017 00:50:58 +0800
-Message-Id: <20170731165111.11536-3-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
-References: <20170731165111.11536-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH for-4.13] block: disable runtime-pm for blk-mq
+To: Christoph Hellwig <hch@lst.de>
+Cc: ming.lei@redhat.com, tomi.p.sarvela@intel.com, evangelos@foutrelis.com,
+ linux-block@vger.kernel.org
+References: <20170721114610.25582-1-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ffc7b0ae-36e0-90bd-5f50-4e31dc7f64b5@kernel.dk>
+Date: Mon, 24 Jul 2017 08:51:05 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170721114610.25582-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-When hw queue is busy, we shouldn't take requests from
-scheduler queue any more, otherwise IO merge will be
-difficult to do.
+On 07/21/2017 05:46 AM, Christoph Hellwig wrote:
+> The blk-mq code lacks support for looking at the rpm_status field, tracking
+> active requests and the RQF_PM flag.
+> 
+> Due to the default switch to blk-mq for scsi people start to run into
+> suspend / resume issue due to this fact, so make sure we disable the runtime
+> PM functionality until it is properly implemented.
 
-This patch fixes the awful IO performance on some
-SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
-is used by not taking requests if hw queue is busy.
+Added, thanks.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 4ab69435708c..47a25333a136 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
--	bool did_work = false;
-+	bool can_go = true;
- 	LIST_HEAD(rq_list);
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -125,7 +125,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
-+		can_go = blk_mq_dispatch_rq_list(q, &rq_list);
- 	} else if (!has_sched_dispatch) {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list);
-@@ -136,7 +136,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * on the dispatch list, OR if we did have work but weren't able
- 	 * to make progress.
- 	 */
--	if (!did_work && has_sched_dispatch) {
-+	if (can_go && has_sched_dispatch) {
- 		do {
- 			struct request *rq;
- 
 -- 
-2.9.4
+Jens Axboe
