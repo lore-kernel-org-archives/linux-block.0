@@ -1,185 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53682 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756414AbdGKSWp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2017 14:22:45 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 6/6] blk-mq: unexport APIs for start/stop queues
-Date: Wed, 12 Jul 2017 02:21:03 +0800
-Message-Id: <20170711182103.11461-7-ming.lei@redhat.com>
-In-Reply-To: <20170711182103.11461-1-ming.lei@redhat.com>
-References: <20170711182103.11461-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Mon, 24 Jul 2017 14:20:23 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+	"roger.pau@citrix.com" <roger.pau@citrix.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+Subject: Re: [PATCH] xen-blkfront: Fix handling of non-supported operations
+Message-ID: <20170724212023.GA2185@vader>
+References: <20170721171110.824-1-bart.vanassche@wdc.com>
+ <f744ebdd-654c-1d6e-d977-28d2a4ce7be9@kernel.dk>
+ <1500909007.2604.3.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1500909007.2604.3.camel@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Now no one uses these APIs anymore, so unexport them.
+On Mon, Jul 24, 2017 at 03:10:09PM +0000, Bart Van Assche wrote:
+> On Mon, 2017-07-24 at 08:46 -0600, Jens Axboe wrote:
+> > On 07/21/2017 11:11 AM, Bart Van Assche wrote:
+> > > This patch fixes the following sparse warnings:
+> > > 
+> > > drivers/block/xen-blkfront.c:916:45: warning: incorrect type in argument 2 (different base types)
+> > > drivers/block/xen-blkfront.c:916:45:    expected restricted blk_status_t [usertype] error
+> > > drivers/block/xen-blkfront.c:916:45:    got int [signed] error
+> > > drivers/block/xen-blkfront.c:1599:47: warning: incorrect type in assignment (different base types)
+> > > drivers/block/xen-blkfront.c:1599:47:    expected int [signed] error
+> > > drivers/block/xen-blkfront.c:1599:47:    got restricted blk_status_t [usertype] <noident>
+> > > drivers/block/xen-blkfront.c:1607:55: warning: incorrect type in assignment (different base types)
+> > > drivers/block/xen-blkfront.c:1607:55:    expected int [signed] error
+> > > drivers/block/xen-blkfront.c:1607:55:    got restricted blk_status_t [usertype] <noident>
+> > > drivers/block/xen-blkfront.c:1625:55: warning: incorrect type in assignment (different base types)
+> > > drivers/block/xen-blkfront.c:1625:55:    expected int [signed] error
+> > > drivers/block/xen-blkfront.c:1625:55:    got restricted blk_status_t [usertype] <noident>
+> > > drivers/block/xen-blkfront.c:1628:62: warning: restricted blk_status_t degrades to integer
+> > > 
+> > > Compile-tested only.
+> > 
+> > Applied, but I killed your stable tag. Why did you add that?
+> 
+> Hello Jens,
+> 
+> That tag was added based on the output of git describe:
+> $ git describe 2a842acab109
+> v4.12-rc2-199-g2a842acab109
+> 
+> However, the following command shows that the above output is misleading and that the
+> stable tag is indeed not needed:
+> $ git log v4.12..origin/master | grep '^commit 2a842acab109'            
+> commit 2a842acab109f40f0d7d10b38e9ca88390628996
+> 
+> Bart.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c         | 80 --------------------------------------------------
- block/blk-mq.h         |  2 ++
- include/linux/blk-mq.h |  8 -----
- 3 files changed, 2 insertions(+), 88 deletions(-)
+You want git tag --contains:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d994449c154b..e8a3486dc8a2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1208,12 +1208,6 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					 msecs_to_jiffies(msecs));
- }
- 
--void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
--{
--	__blk_mq_delay_run_hw_queue(hctx, true, msecs);
--}
--EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
--
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	__blk_mq_delay_run_hw_queue(hctx, async, 0);
-@@ -1255,60 +1249,6 @@ bool blk_mq_queue_stopped(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_mq_queue_stopped);
- 
--/*
-- * This function is often used for pausing .queue_rq() by driver when
-- * there isn't enough resource or some conditions aren't satisfied, and
-- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
-- *
-- * We do not guarantee that dispatch can be drained or blocked
-- * after blk_mq_stop_hw_queue() returns. Please use
-- * blk_mq_quiesce_queue() for that requirement.
-- */
--void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
--{
--	cancel_delayed_work(&hctx->run_work);
--
--	set_bit(BLK_MQ_S_STOPPED, &hctx->state);
--}
--EXPORT_SYMBOL(blk_mq_stop_hw_queue);
--
--/*
-- * This function is often used for pausing .queue_rq() by driver when
-- * there isn't enough resource or some conditions aren't satisfied, and
-- * BLK_MQ_RQ_QUEUE_BUSY is usually returned.
-- *
-- * We do not guarantee that dispatch can be drained or blocked
-- * after blk_mq_stop_hw_queues() returns. Please use
-- * blk_mq_quiesce_queue() for that requirement.
-- */
--void blk_mq_stop_hw_queues(struct request_queue *q)
--{
--	struct blk_mq_hw_ctx *hctx;
--	int i;
--
--	queue_for_each_hw_ctx(q, hctx, i)
--		blk_mq_stop_hw_queue(hctx);
--}
--EXPORT_SYMBOL(blk_mq_stop_hw_queues);
--
--void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx)
--{
--	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
--
--	blk_mq_run_hw_queue(hctx, false);
--}
--EXPORT_SYMBOL(blk_mq_start_hw_queue);
--
--void blk_mq_start_hw_queues(struct request_queue *q)
--{
--	struct blk_mq_hw_ctx *hctx;
--	int i;
--
--	queue_for_each_hw_ctx(q, hctx, i)
--		blk_mq_start_hw_queue(hctx);
--}
--EXPORT_SYMBOL(blk_mq_start_hw_queues);
--
- void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	if (!blk_mq_hctx_stopped(hctx))
-@@ -1317,7 +1257,6 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
- 	blk_mq_run_hw_queue(hctx, async);
- }
--EXPORT_SYMBOL_GPL(blk_mq_start_stopped_hw_queue);
- 
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- {
-@@ -1327,7 +1266,6 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_start_stopped_hw_queue(hctx, async);
- }
--EXPORT_SYMBOL(blk_mq_start_stopped_hw_queues);
- 
- static void blk_mq_run_work_fn(struct work_struct *work)
- {
-@@ -1352,24 +1290,6 @@ static void blk_mq_run_work_fn(struct work_struct *work)
- }
- 
- 
--void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
--{
--	if (WARN_ON_ONCE(!blk_mq_hw_queue_mapped(hctx)))
--		return;
--
--	/*
--	 * Stop the hw queue, then modify currently delayed work.
--	 * This should prevent us from running the queue prematurely.
--	 * Mark the queue as auto-clearing STOPPED when it runs.
--	 */
--	blk_mq_stop_hw_queue(hctx);
--	set_bit(BLK_MQ_S_START_ON_RUN, &hctx->state);
--	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
--					&hctx->run_work,
--					msecs_to_jiffies(msecs));
--}
--EXPORT_SYMBOL(blk_mq_delay_queue);
--
- static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
- 					    struct request *rq,
- 					    bool at_head)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index c4516d2a2d2c..9bc51d43155f 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -25,6 +25,8 @@ struct blk_mq_ctx {
- 	struct kobject		kobj;
- } ____cacheline_aligned_in_smp;
- 
-+void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
-+void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_free_queue(struct request_queue *q);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8694fb39cd80..a539e38f5a76 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -243,18 +243,10 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs
- void blk_mq_complete_request(struct request *rq);
- 
- bool blk_mq_queue_stopped(struct request_queue *q);
--void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
--void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
--void blk_mq_stop_hw_queues(struct request_queue *q);
--void blk_mq_start_hw_queues(struct request_queue *q);
--void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
--void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_quiesce_queue(struct request_queue *q);
- void blk_mq_unquiesce_queue(struct request_queue *q);
--void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
--void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
--- 
-2.9.4
+$ git tag --contains 2a842acab109
+v4.13-rc1
+v4.13-rc2
