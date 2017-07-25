@@ -1,22 +1,29 @@
-Return-Path: <BATV+0f69485e8eba9f9d9296+5085+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Wed, 26 Jul 2017 10:34:43 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Shaohua Li <shli@kernel.org>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@infradead.org
-Subject: Re: [BUG] nvme driver crash
-Message-ID: <20170726173443.GA25527@infradead.org>
-References: <20170725222408.fq2fncwtid3fhvqh@kernel.org>
+Return-Path: <shli@kernel.org>
+Date: Tue, 25 Jul 2017 15:24:08 -0700
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, hch@infradead.org
+Subject: [BUG] nvme driver crash
+Message-ID: <20170725222408.fq2fncwtid3fhvqh@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170725222408.fq2fncwtid3fhvqh@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jul 25, 2017 at 03:24:08PM -0700, Shaohua Li wrote:
-> Disable CONIFG_SMP, kernel crashes at boot time, here is the log.
+Disable CONIFG_SMP, kernel crashes at boot time, here is the log.
 
-I can reproduce the issue.  Unfortunately the addresss in the bug
-doesn't make any sense to me when resolving it using gdb, as t just
-points to the line where blk_mq_init_queue calls
-blk_alloc_queue_node.
-
-Can you check if you get better results in your build?
+[    9.593590] nvme 0000:00:03.0: can't allocate MSI-X affinity masks for 1 vectors
+[    9.595189] ==================================================================
+[    9.595834] BUG: KASAN: null-ptr-deref in blk_mq_init_queue+0x1c/0x70
+[    9.596010] Read of size 4 at addr 0000000000000020 by task kworker/u2:0/5
+[    9.596010]
+[    9.596010] CPU: 0 PID: 5 Comm: kworker/u2:0 Not tainted 4.13.0-rc1+ #1
+[    9.596010] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.9.1-5.el7_3.3 04/01/2014
+[    9.596010] Workqueue: nvme-wq nvme_scan_work
+[    9.596010] Call Trace:
+[    9.596010]  dump_stack+0x19/0x24
+[    9.596010]  kasan_report+0xe8/0x350
+[    9.596010]  __asan_load4+0x78/0x80
+[    9.596010]  blk_mq_init_queue+0x1c/0x70
+[    9.596010]  nvme_validate_ns+0x17c/0x620
+[    9.596010]  ? nvme_revalidate_disk+0xf0/0xf0
+[    9.596010]  ? nvme_submit_sync_cmd+0x30/0x30
