@@ -1,69 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47904 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751260AbdGQIjm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jul 2017 04:39:42 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/2] blk-mq-sched: introduce blk_mq_sched_queue_depth()
-Date: Mon, 17 Jul 2017 16:39:22 +0800
-Message-Id: <20170717083923.22014-2-ming.lei@redhat.com>
-In-Reply-To: <20170717083923.22014-1-ming.lei@redhat.com>
-References: <20170717083923.22014-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] nbd: clear disconnected on reconnect
+To: josef@toxicpanda.com, nbd-general@lists.sourceforge.net,
+ linux-block@vger.kernel.org, kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+References: <1501003879-18014-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0dee4a36-f33b-078c-d2c5-4ad23c174e7e@kernel.dk>
+Date: Tue, 25 Jul 2017 13:58:22 -0600
+MIME-Version: 1.0
+In-Reply-To: <1501003879-18014-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The following patch will propose some hints to figure out
-default queue depth for scheduler queue, so introduce helper
-of blk_mq_sched_queue_depth() for this purpose.
+On 07/25/2017 11:31 AM, josef@toxicpanda.com wrote:
+> From: Josef Bacik <jbacik@fb.com>
+> 
+> If our device loses its connection for longer than the dead timeout we
+> will set NBD_DISCONNECTED in order to quickly fail any pending IO's that
+> flood in after the IO's that were waiting during the dead timer.
+> However if we re-connect at some point in the future we'll still see
+> this DISCONNECTED flag set if we then lose our connection again after
+> that, which means we won't get notifications for our newly lost
+> connections.  Fix this by just clearing the DISCONNECTED flag on
+> reconnect in order to make sure everything works as it's supposed to.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c |  8 +-------
- block/blk-mq-sched.h | 11 +++++++++++
- 2 files changed, 12 insertions(+), 7 deletions(-)
+Will add for 4.13. Any chance that you can write blktests regression
+tests for some of the bugs that you are fixing for nbd? Would be nice
+to have that be part of the regular regression suite.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 4ab69435708c..9ca63926452a 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -514,13 +514,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 		return 0;
- 	}
- 
--	/*
--	 * Default to double of smaller one between hw queue_depth and 128,
--	 * since we don't split into sync/async like the old code did.
--	 * Additionally, this is a per-hw queue depth.
--	 */
--	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
--				   BLKDEV_MAX_RQ);
-+	q->nr_requests = blk_mq_sched_queue_depth(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 9267d0b7c197..1d47f3fda1d0 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -96,4 +96,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
- 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
- }
- 
-+static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
-+{
-+	/*
-+	 * Default to double of smaller one between hw queue_depth and 128,
-+	 * since we don't split into sync/async like the old code did.
-+	 * Additionally, this is a per-hw queue depth.
-+	 */
-+	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
-+				   BLKDEV_MAX_RQ);
-+}
-+
- #endif
 -- 
-2.9.4
+Jens Axboe
