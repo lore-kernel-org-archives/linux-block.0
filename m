@@ -1,24 +1,48 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: provide an explicit n:1 mapping for single queue
- devices
-To: Christoph Hellwig <hch@lst.de>
-Cc: shli@kernel.org, osandov@osandov.com, linux-block@vger.kernel.org
-References: <20170726201934.4940-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <f0e19316-57b5-3fe7-d410-26a764d66dc3@kernel.dk>
-Date: Wed, 26 Jul 2017 14:40:50 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170726201934.4940-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <BATV+0f69485e8eba9f9d9296+5085+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: shli@kernel.org,
+	osandov@osandov.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH] blk-mq: provide an explicit n:1 mapping for single queue devices
+Date: Wed, 26 Jul 2017 22:19:34 +0200
+Message-Id: <20170726201934.4940-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 07/26/2017 02:19 PM, Christoph Hellwig wrote:
-> This avoids having to deal with the nr_hw_queues = 1 case in the various
-> queue mapping helpers by special casing it in the blk-mq core.
+This avoids having to deal with the nr_hw_queues = 1 case in the various
+queue mapping helpers by special casing it in the blk-mq core.
 
-Why special case it at all? If ->map_queues() is properly written,
-the single queue case should just fall out naturally. I don't see
-why 1 should be any different than 2, 4, or N.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reported-by: Shaohua Li <shli@kernel.org>
+---
+ block/blk-mq.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 041f7b7fa0d6..50d1f069d83b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2458,9 +2458,20 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ 	return 0;
+ }
+ 
++static int blk_mq_map_single_queue(struct blk_mq_tag_set *set)
++{
++	int cpu;
++
++	for_each_possible_cpu(cpu)
++		set->mq_map[cpu] = 0;
++	return 0;
++}
++
+ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ {
+-	if (set->ops->map_queues)
++	if (set->nr_hw_queues == 1)
++		return blk_mq_map_single_queue(set);
++	else if (set->ops->map_queues)
+ 		return set->ops->map_queues(set);
+ 	else
+ 		return blk_mq_map_queues(set);
 -- 
-Jens Axboe
+2.11.0
