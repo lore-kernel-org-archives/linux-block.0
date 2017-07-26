@@ -1,100 +1,214 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41678 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750905AbdGaQwL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 12:52:11 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 04/14] blk-mq-sched: improve dispatching from sw queue
-Date: Tue,  1 Aug 2017 00:51:01 +0800
-Message-Id: <20170731165111.11536-6-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
-References: <20170731165111.11536-1-ming.lei@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:46025 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751078AbdGZX6d (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jul 2017 19:58:33 -0400
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-block@vger.kernel.org
+Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
+        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 3/9] md: raid1 nowait support
+Date: Wed, 26 Jul 2017 18:58:00 -0500
+Message-Id: <20170726235806.12148-4-rgoldwyn@suse.de>
+In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
+References: <20170726235806.12148-1-rgoldwyn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-SCSI devices use host-wide tagset, and the shared
-driver tag space is often quite big. Meantime
-there is also queue depth for each lun(.cmd_per_lun),
-which is often small.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-So lots of requests may stay in sw queue, and we
-always flush all belonging to same hw queue and
-dispatch them all to driver, unfortunately it is
-easy to cause queue busy becasue of the small
-per-lun queue depth. Once these requests are flushed
-out, they have to stay in hctx->dispatch, and no bio
-merge can participate into these requests, and
-sequential IO performance is hurted.
+The RAID1 driver would bail with EAGAIN in case of:
+ + I/O has to wait for a barrier
+ + array is frozen
+ + Area is suspended
+ + There are too many pending I/O that it will be queued.
 
-This patch improves dispatching from sw queue when
-there is per-request-queue queue depth by taking
-request one by one from sw queue, just like the way
-of IO scheduler.
+To facilitate error for wait barriers, wait_barrier() is
+returning bool. True in case if there was a wait (or is not
+required). False in case a wait was required, but was not performed.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/blk-mq-sched.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+ drivers/md/raid1.c | 74 +++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 57 insertions(+), 17 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 47a25333a136..3510c01cb17b 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -96,6 +96,9 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
- 	bool can_go = true;
- 	LIST_HEAD(rq_list);
-+	struct request *(*dispatch_fn)(struct blk_mq_hw_ctx *) =
-+		has_sched_dispatch ? e->type->ops.mq.dispatch_request :
-+			blk_mq_dispatch_rq_from_ctxs;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
- 	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
-@@ -126,26 +129,28 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
- 		can_go = blk_mq_dispatch_rq_list(q, &rq_list);
--	} else if (!has_sched_dispatch) {
-+	} else if (!has_sched_dispatch && !q->queue_depth) {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list);
-+		can_go = false;
- 	}
- 
-+	if (!can_go)
-+		return;
-+
- 	/*
- 	 * We want to dispatch from the scheduler if we had no work left
- 	 * on the dispatch list, OR if we did have work but weren't able
- 	 * to make progress.
- 	 */
--	if (can_go && has_sched_dispatch) {
--		do {
--			struct request *rq;
-+	do {
-+		struct request *rq;
- 
--			rq = e->type->ops.mq.dispatch_request(hctx);
--			if (!rq)
--				break;
--			list_add(&rq->queuelist, &rq_list);
--		} while (blk_mq_dispatch_rq_list(q, &rq_list));
--	}
-+		rq = dispatch_fn(hctx);
-+		if (!rq)
-+			break;
-+		list_add(&rq->queuelist, &rq_list);
-+	} while (blk_mq_dispatch_rq_list(q, &rq_list));
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 3febfc8391fb..66ca4288e3e8 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -903,8 +903,9 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr)
+ 	wake_up(&conf->wait_barrier);
  }
  
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-static void _wait_barrier(struct r1conf *conf, int idx)
++static bool _wait_barrier(struct r1conf *conf, int idx, bool nowait)
+ {
++	bool ret = true;
+ 	/*
+ 	 * We need to increase conf->nr_pending[idx] very early here,
+ 	 * then raise_barrier() can be blocked when it waits for
+@@ -935,7 +936,7 @@ static void _wait_barrier(struct r1conf *conf, int idx)
+ 	 */
+ 	if (!READ_ONCE(conf->array_frozen) &&
+ 	    !atomic_read(&conf->barrier[idx]))
+-		return;
++		return ret;
+ 
+ 	/*
+ 	 * After holding conf->resync_lock, conf->nr_pending[idx]
+@@ -953,18 +954,26 @@ static void _wait_barrier(struct r1conf *conf, int idx)
+ 	 */
+ 	wake_up(&conf->wait_barrier);
+ 	/* Wait for the barrier in same barrier unit bucket to drop. */
+-	wait_event_lock_irq(conf->wait_barrier,
+-			    !conf->array_frozen &&
+-			     !atomic_read(&conf->barrier[idx]),
+-			    conf->resync_lock);
++	if (conf->array_frozen || atomic_read(&conf->barrier[idx])) {
++		if (nowait)
++			ret = false;
++		else
++			wait_event_lock_irq(conf->wait_barrier,
++					!conf->array_frozen &&
++					!atomic_read(&conf->barrier[idx]),
++					conf->resync_lock);
++	}
+ 	atomic_inc(&conf->nr_pending[idx]);
+ 	atomic_dec(&conf->nr_waiting[idx]);
+ 	spin_unlock_irq(&conf->resync_lock);
++	return ret;
+ }
+ 
+-static void wait_read_barrier(struct r1conf *conf, sector_t sector_nr)
++static bool wait_read_barrier(struct r1conf *conf, sector_t sector_nr,
++		bool nowait)
+ {
+ 	int idx = sector_to_idx(sector_nr);
++	bool ret = true;
+ 
+ 	/*
+ 	 * Very similar to _wait_barrier(). The difference is, for read
+@@ -976,7 +985,7 @@ static void wait_read_barrier(struct r1conf *conf, sector_t sector_nr)
+ 	atomic_inc(&conf->nr_pending[idx]);
+ 
+ 	if (!READ_ONCE(conf->array_frozen))
+-		return;
++		return ret;
+ 
+ 	spin_lock_irq(&conf->resync_lock);
+ 	atomic_inc(&conf->nr_waiting[idx]);
+@@ -987,19 +996,28 @@ static void wait_read_barrier(struct r1conf *conf, sector_t sector_nr)
+ 	 */
+ 	wake_up(&conf->wait_barrier);
+ 	/* Wait for array to be unfrozen */
+-	wait_event_lock_irq(conf->wait_barrier,
+-			    !conf->array_frozen,
+-			    conf->resync_lock);
++	if (conf->array_frozen) {
++		/* If nowait flag is set, return false to
++		 * show we did not wait
++		 */
++		if (nowait)
++			ret = false;
++		else
++			wait_event_lock_irq(conf->wait_barrier,
++					!conf->array_frozen,
++					conf->resync_lock);
++	}
+ 	atomic_inc(&conf->nr_pending[idx]);
+ 	atomic_dec(&conf->nr_waiting[idx]);
+ 	spin_unlock_irq(&conf->resync_lock);
++	return ret;
+ }
+ 
+-static void wait_barrier(struct r1conf *conf, sector_t sector_nr)
++static bool wait_barrier(struct r1conf *conf, sector_t sector_nr, bool nowait)
+ {
+ 	int idx = sector_to_idx(sector_nr);
+ 
+-	_wait_barrier(conf, idx);
++	return _wait_barrier(conf, idx, nowait);
+ }
+ 
+ static void wait_all_barriers(struct r1conf *conf)
+@@ -1007,7 +1025,7 @@ static void wait_all_barriers(struct r1conf *conf)
+ 	int idx;
+ 
+ 	for (idx = 0; idx < BARRIER_BUCKETS_NR; idx++)
+-		_wait_barrier(conf, idx);
++		_wait_barrier(conf, idx, false);
+ }
+ 
+ static void _allow_barrier(struct r1conf *conf, int idx)
+@@ -1223,7 +1241,11 @@ static void raid1_read_request(struct mddev *mddev, struct bio *bio,
+ 	 * Still need barrier for READ in case that whole
+ 	 * array is frozen.
+ 	 */
+-	wait_read_barrier(conf, bio->bi_iter.bi_sector);
++	if (!wait_read_barrier(conf, bio->bi_iter.bi_sector,
++				bio->bi_opf & REQ_NOWAIT)) {
++		bio_wouldblock_error(bio);
++		return;
++	}
+ 
+ 	if (!r1_bio)
+ 		r1_bio = alloc_r1bio(mddev, bio);
+@@ -1333,6 +1355,11 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 		 * an interruptible wait.
+ 		 */
+ 		DEFINE_WAIT(w);
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
++
+ 		for (;;) {
+ 			sigset_t full, old;
+ 			prepare_to_wait(&conf->wait_barrier,
+@@ -1351,7 +1378,11 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 		}
+ 		finish_wait(&conf->wait_barrier, &w);
+ 	}
+-	wait_barrier(conf, bio->bi_iter.bi_sector);
++	if (!wait_barrier(conf, bio->bi_iter.bi_sector,
++				bio->bi_opf & REQ_NOWAIT)) {
++		bio_wouldblock_error(bio);
++		return;
++	}
+ 
+ 	r1_bio = alloc_r1bio(mddev, bio);
+ 	r1_bio->sectors = max_write_sectors;
+@@ -1359,6 +1390,10 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 	if (conf->pending_count >= max_queued_requests) {
+ 		md_wakeup_thread(mddev->thread);
+ 		raid1_log(mddev, "wait queued");
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
+ 		wait_event(conf->wait_barrier,
+ 			   conf->pending_count < max_queued_requests);
+ 	}
+@@ -1442,6 +1477,11 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 		/* Wait for this device to become unblocked */
+ 		int j;
+ 
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
++
+ 		for (j = 0; j < i; j++)
+ 			if (r1_bio->bios[j])
+ 				rdev_dec_pending(conf->mirrors[j].rdev, mddev);
+@@ -1449,7 +1489,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 		allow_barrier(conf, bio->bi_iter.bi_sector);
+ 		raid1_log(mddev, "wait rdev %d blocked", blocked_rdev->raid_disk);
+ 		md_wait_for_blocked_rdev(blocked_rdev, mddev);
+-		wait_barrier(conf, bio->bi_iter.bi_sector);
++		wait_barrier(conf, bio->bi_iter.bi_sector, false);
+ 		goto retry_write;
+ 	}
+ 
 -- 
-2.9.4
+2.12.3
