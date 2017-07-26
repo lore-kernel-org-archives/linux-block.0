@@ -1,107 +1,198 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40481 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751201AbdGaQxb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 12:53:31 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 13/14] blk-mq: pass 'request_queue *' to several helpers of operating BUSY
-Date: Tue,  1 Aug 2017 00:51:10 +0800
-Message-Id: <20170731165111.11536-15-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
-References: <20170731165111.11536-1-ming.lei@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:46093 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751472AbdGZX6h (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jul 2017 19:58:37 -0400
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-block@vger.kernel.org
+Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
+        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 5/9] md: raid10 nowait support
+Date: Wed, 26 Jul 2017 18:58:02 -0500
+Message-Id: <20170726235806.12148-6-rgoldwyn@suse.de>
+In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
+References: <20170726235806.12148-1-rgoldwyn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We need to support per-request_queue dispatch list for avoiding
-early dispatch in case of shared queue depth.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Bail and status to EAGAIN if raid10 is going to wait for:
+ + barriers
+ + reshape operation
+ + Too many queued requests
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/blk-mq-sched.c |  6 +++---
- block/blk-mq.h       | 15 +++++++++------
- 2 files changed, 12 insertions(+), 9 deletions(-)
+ drivers/md/raid10.c | 62 ++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 47 insertions(+), 15 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 8ff74efe4172..37702786c6d1 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -132,7 +132,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * more fair dispatch.
- 	 */
- 	if (blk_mq_has_dispatch_rqs(hctx))
--		blk_mq_take_list_from_dispatch(hctx, &rq_list);
-+		blk_mq_take_list_from_dispatch(q, hctx, &rq_list);
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 5026e7ad51d3..6d80438c5040 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -978,8 +978,9 @@ static void lower_barrier(struct r10conf *conf)
+ 	wake_up(&conf->wait_barrier);
+ }
  
- 	/*
- 	 * Only ask the scheduler for requests, if we didn't have residual
-@@ -147,11 +147,11 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		blk_mq_sched_mark_restart_hctx(hctx);
- 		can_go = blk_mq_dispatch_rq_list(q, &rq_list);
- 		if (can_go)
--			blk_mq_hctx_clear_busy(hctx);
-+			blk_mq_hctx_clear_busy(q, hctx);
+-static void wait_barrier(struct r10conf *conf)
++static bool wait_barrier(struct r10conf *conf, bool nowait)
+ {
++	bool ret = true;
+ 	spin_lock_irq(&conf->resync_lock);
+ 	if (conf->barrier) {
+ 		conf->nr_waiting++;
+@@ -993,19 +994,23 @@ static void wait_barrier(struct r10conf *conf)
+ 		 * count down.
+ 		 */
+ 		raid10_log(conf->mddev, "wait barrier");
+-		wait_event_lock_irq(conf->wait_barrier,
+-				    !conf->barrier ||
+-				    (atomic_read(&conf->nr_pending) &&
+-				     current->bio_list &&
+-				     (!bio_list_empty(&current->bio_list[0]) ||
+-				      !bio_list_empty(&current->bio_list[1]))),
+-				    conf->resync_lock);
++		if (!nowait)
++			wait_event_lock_irq(conf->wait_barrier,
++					    !conf->barrier ||
++				            (atomic_read(&conf->nr_pending) &&
++				             current->bio_list &&
++				             (!bio_list_empty(&current->bio_list[0]) ||
++				              !bio_list_empty(&current->bio_list[1]))),
++					    conf->resync_lock);
++		else
++			ret = false;
+ 		conf->nr_waiting--;
+ 		if (!conf->nr_waiting)
+ 			wake_up(&conf->wait_barrier);
+ 	}
+ 	atomic_inc(&conf->nr_pending);
+ 	spin_unlock_irq(&conf->resync_lock);
++	return ret;
+ }
+ 
+ static void allow_barrier(struct r10conf *conf)
+@@ -1158,7 +1163,10 @@ static void raid10_read_request(struct mddev *mddev, struct bio *bio,
+ 	 * thread has put up a bar for new requests.
+ 	 * Continue immediately if no resync is active currently.
+ 	 */
+-	wait_barrier(conf);
++	if (!wait_barrier(conf, bio->bi_opf & REQ_NOWAIT)) {
++		bio_wouldblock_error(bio);
++		return;
++	}
+ 
+ 	sectors = r10_bio->sectors;
+ 	while (test_bit(MD_RECOVERY_RESHAPE, &mddev->recovery) &&
+@@ -1169,12 +1177,16 @@ static void raid10_read_request(struct mddev *mddev, struct bio *bio,
+ 		 * pass
+ 		 */
+ 		raid10_log(conf->mddev, "wait reshape");
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
+ 		allow_barrier(conf);
+ 		wait_event(conf->wait_barrier,
+ 			   conf->reshape_progress <= bio->bi_iter.bi_sector ||
+ 			   conf->reshape_progress >= bio->bi_iter.bi_sector +
+ 			   sectors);
+-		wait_barrier(conf);
++		wait_barrier(conf, false);
  	}
  
- 	/* can't go until ->dispatch is flushed */
--	if (!can_go || blk_mq_hctx_is_busy(hctx))
-+	if (!can_go || blk_mq_hctx_is_busy(q, hctx))
- 		return;
- 
- 	/*
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index d9795cbba1bb..a8788058da56 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -135,17 +135,20 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- 	return hctx->nr_ctx && hctx->tags;
- }
- 
--static inline bool blk_mq_hctx_is_busy(struct blk_mq_hw_ctx *hctx)
-+static inline bool blk_mq_hctx_is_busy(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx)
- {
- 	return test_bit(BLK_MQ_S_BUSY, &hctx->state);
- }
- 
--static inline void blk_mq_hctx_set_busy(struct blk_mq_hw_ctx *hctx)
-+static inline void blk_mq_hctx_set_busy(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx)
- {
- 	set_bit(BLK_MQ_S_BUSY, &hctx->state);
- }
- 
--static inline void blk_mq_hctx_clear_busy(struct blk_mq_hw_ctx *hctx)
-+static inline void blk_mq_hctx_clear_busy(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx)
- {
- 	clear_bit(BLK_MQ_S_BUSY, &hctx->state);
- }
-@@ -179,8 +182,8 @@ static inline void blk_mq_add_list_to_dispatch_tail(struct blk_mq_hw_ctx *hctx,
- 	spin_unlock(hctx->dispatch_lock);
- }
- 
--static inline void blk_mq_take_list_from_dispatch(struct blk_mq_hw_ctx *hctx,
--		struct list_head *list)
-+static inline void blk_mq_take_list_from_dispatch(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx, struct list_head *list)
- {
- 	spin_lock(hctx->dispatch_lock);
- 	list_splice_init(hctx->dispatch_list, list);
-@@ -190,7 +193,7 @@ static inline void blk_mq_take_list_from_dispatch(struct blk_mq_hw_ctx *hctx,
- 	 * in hctx->dispatch are dispatched successfully
+ 	rdev = read_balance(conf, r10_bio, &max_sectors);
+@@ -1308,7 +1320,10 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
+ 	 * thread has put up a bar for new requests.
+ 	 * Continue immediately if no resync is active currently.
  	 */
- 	if (!list_empty(list))
--		blk_mq_hctx_set_busy(hctx);
-+		blk_mq_hctx_set_busy(q, hctx);
- 	spin_unlock(hctx->dispatch_lock);
- }
+-	wait_barrier(conf);
++	if (!wait_barrier(conf, bio->bi_opf & REQ_NOWAIT)) {
++		bio_wouldblock_error(bio);
++		return;
++	}
  
+ 	sectors = r10_bio->sectors;
+ 	while (test_bit(MD_RECOVERY_RESHAPE, &mddev->recovery) &&
+@@ -1319,12 +1334,16 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
+ 		 * pass
+ 		 */
+ 		raid10_log(conf->mddev, "wait reshape");
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
+ 		allow_barrier(conf);
+ 		wait_event(conf->wait_barrier,
+ 			   conf->reshape_progress <= bio->bi_iter.bi_sector ||
+ 			   conf->reshape_progress >= bio->bi_iter.bi_sector +
+ 			   sectors);
+-		wait_barrier(conf);
++		wait_barrier(conf, false);
+ 	}
+ 
+ 	if (test_bit(MD_RECOVERY_RESHAPE, &mddev->recovery) &&
+@@ -1339,6 +1358,10 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
+ 			      BIT(MD_SB_CHANGE_DEVS) | BIT(MD_SB_CHANGE_PENDING));
+ 		md_wakeup_thread(mddev->thread);
+ 		raid10_log(conf->mddev, "wait reshape metadata");
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
+ 		wait_event(mddev->sb_wait,
+ 			   !test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags));
+ 
+@@ -1348,6 +1371,10 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
+ 	if (conf->pending_count >= max_queued_requests) {
+ 		md_wakeup_thread(mddev->thread);
+ 		raid10_log(mddev, "wait queued");
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
+ 		wait_event(conf->wait_barrier,
+ 			   conf->pending_count < max_queued_requests);
+ 	}
+@@ -1454,6 +1481,11 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
+ 		int j;
+ 		int d;
+ 
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return;
++		}
++
+ 		for (j = 0; j < i; j++) {
+ 			if (r10_bio->devs[j].bio) {
+ 				d = r10_bio->devs[j].devnum;
+@@ -1474,7 +1506,7 @@ static void raid10_write_request(struct mddev *mddev, struct bio *bio,
+ 		allow_barrier(conf);
+ 		raid10_log(conf->mddev, "wait rdev %d blocked", blocked_rdev->raid_disk);
+ 		md_wait_for_blocked_rdev(blocked_rdev, mddev);
+-		wait_barrier(conf);
++		wait_barrier(conf, false);
+ 		goto retry_write;
+ 	}
+ 
+@@ -1703,7 +1735,7 @@ static void print_conf(struct r10conf *conf)
+ 
+ static void close_sync(struct r10conf *conf)
+ {
+-	wait_barrier(conf);
++	wait_barrier(conf, false);
+ 	allow_barrier(conf);
+ 
+ 	mempool_destroy(conf->r10buf_pool);
+@@ -4347,7 +4379,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
+ 	if (need_flush ||
+ 	    time_after(jiffies, conf->reshape_checkpoint + 10*HZ)) {
+ 		/* Need to update reshape_position in metadata */
+-		wait_barrier(conf);
++		wait_barrier(conf, false);
+ 		mddev->reshape_position = conf->reshape_progress;
+ 		if (mddev->reshape_backwards)
+ 			mddev->curr_resync_completed = raid10_size(mddev, 0, 0)
 -- 
-2.9.4
+2.12.3
