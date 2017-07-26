@@ -1,59 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:62449 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752857AbdGLOxH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jul 2017 10:53:07 -0400
-From: Tomi Sarvela <tomi.p.sarvela@intel.com>
+Received: from mx2.suse.de ([195.135.220.15]:46143 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751472AbdGZX6l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jul 2017 19:58:41 -0400
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
 To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk
-Subject: linux-next scsi-mq hang in suspend-resume
-Date: Wed, 12 Jul 2017 17:51:50 +0300
-Message-ID: <21128504.iYAzanzLsA@fractal.fi.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
+        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 7/9] dm: Add nowait support to raid1
+Date: Wed, 26 Jul 2017 18:58:04 -0500
+Message-Id: <20170726235806.12148-8-rgoldwyn@suse.de>
+In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
+References: <20170726235806.12148-1-rgoldwyn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello there,
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-I've been running Intel GFX CI testing for linux DRM-Tip i915 driver, 
-and couple of weeks ago we took linux-next for a ride to see what kind 
-of integration problems there might pop up when pulling 4.13-rc1. 
-Latest results can be seen at
+If the I/O would block because the devices are syncing, bail.
 
-https://intel-gfx-ci.01.org/CI/next-issues.html
-https://intel-gfx-ci.01.org/CI/next-all.html
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ drivers/md/dm-raid1.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-The purple blocks are hangs, starting from 20170628 (20170627 was 
-untestable due to locking changes which were reverted). Traces were 
-pointing to ext4 but bisecting between good 20170626 and bad 20170628 
-pointed to:
-
-commit 5c279bd9e40624f4ab6e688671026d6005b066fa
-Date:   Fri Jun 16 10:27:55 2017 +0200
-
-    scsi: default to scsi-mq
-
-Reproduction is 100% or close to it when running two i-g-t tests as a 
-testlist. I'm assuming that it creates the correct amount or pattern 
-of actions to the device. The testlist consists of the following 
-lines:
-
-igt@gem_exec_gttfill@basic
-igt@gem_exec_suspend@basic-s3
-
-Kernel option scsi_mod.use_blk_mq=0 hides the issue on testhosts. 
-Configuration option was copied over on testhosts and 20170712 was re-
-tested, that's why today looks so much greener.
-
-More information including traces and reproduction instructions at
-https://bugzilla.kernel.org/show_bug.cgi?id=196223
-
-I can run patchsets through the farm, if needed. In addition, daily 
-linux-next tags are automatically tested and results published.
-
-Best regards,
-
-Tomi Sarvela
+diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
+index a4fbd911d566..446ac581627f 100644
+--- a/drivers/md/dm-raid1.c
++++ b/drivers/md/dm-raid1.c
+@@ -1219,6 +1219,11 @@ static int mirror_map(struct dm_target *ti, struct bio *bio)
+ 		if (bio->bi_opf & REQ_RAHEAD)
+ 			return DM_MAPIO_KILL;
+ 
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return DM_MAPIO_SUBMITTED;
++		}
++
+ 		queue_bio(ms, bio, rw);
+ 		return DM_MAPIO_SUBMITTED;
+ 	}
 -- 
-Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+2.12.3
