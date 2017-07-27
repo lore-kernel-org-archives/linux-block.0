@@ -1,214 +1,108 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46025 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751078AbdGZX6d (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2017 19:58:33 -0400
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
-        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 3/9] md: raid1 nowait support
-Date: Wed, 26 Jul 2017 18:58:00 -0500
-Message-Id: <20170726235806.12148-4-rgoldwyn@suse.de>
-In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jg@lightnvm.io>
+Return-Path: <jg@lightnvm.io>
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <C20F22B7-262E-4C58-972F-DA71AF8FA3B5@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_3A4DD65C-B589-4081-9474-6844CB3C2CB8";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] lightnvm: pblk: advance bio according to lba index
+Date: Thu, 27 Jul 2017 18:33:17 +0200
+In-Reply-To: <11d126aa-e04c-bec3-80fd-77baa37a0575@kernel.dk>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+ linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+References: <1501166990-24366-1-git-send-email-javier@javigon.com>
+ <1501166990-24366-2-git-send-email-javier@javigon.com>
+ <11d126aa-e04c-bec3-80fd-77baa37a0575@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-The RAID1 driver would bail with EAGAIN in case of:
- + I/O has to wait for a barrier
- + array is frozen
- + Area is suspended
- + There are too many pending I/O that it will be queued.
+--Apple-Mail=_3A4DD65C-B589-4081-9474-6844CB3C2CB8
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-To facilitate error for wait barriers, wait_barrier() is
-returning bool. True in case if there was a wait (or is not
-required). False in case a wait was required, but was not performed.
+> On 27 Jul 2017, at 18.31, Jens Axboe <axboe@kernel.dk> wrote:
+>=20
+> On 07/27/2017 08:49 AM, Javier Gonz=C3=A1lez wrote:
+>> When a lba either hits the cache or corresponds to an empty entry in =
+the
+>> L2P table, we need to advance the bio according to the position in =
+which
+>> the lba is located. Otherwise, we will copy data in the wrong page, =
+thus
+>> causing data corruption for the application.
+>>=20
+>> In case of a cache hit, we assumed that bio->bi_iter.bi_idx would
+>> contain the correct index, but this is no necessarily true. Instead, =
+use
+>> the local bio advance counter and iterator. This guarantees that lbas
+>> hitting the cache are copied into the right bv_page.
+>>=20
+>> In case of an empty L2P entry, we omitted to advance the bio. In the
+>> cases when the same I/O also contains a cache hit, data corresponding
+>> to this lba will be copied to the wrong bv_page. Fix this by =
+advancing
+>> the bio as we do in the case of a cache hit.
+>>=20
+>> Fixes: a4bd217b4326 lightnvm: physical block device (pblk) target
+>>=20
+>> Signed-off-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+>> ---
+>> drivers/lightnvm/pblk-rb.c   |  4 ++--
+>> drivers/lightnvm/pblk-read.c | 19 ++++++++++++++-----
+>> drivers/lightnvm/pblk.h      |  2 +-
+>> 3 files changed, 17 insertions(+), 8 deletions(-)
+>>=20
+>> diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+>> index 5ecc154f6831..2e88c3d6d9a1 100644
+>> --- a/drivers/lightnvm/pblk-rb.c
+>> +++ b/drivers/lightnvm/pblk-rb.c
+>> @@ -657,7 +657,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb =
+*rb, struct nvm_rq *rqd,
+>>  * be directed to disk.
+>>  */
+>> int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t =
+lba,
+>> -			struct ppa_addr ppa, int bio_iter)
+>> +			struct ppa_addr ppa, int bio_iter, int =
+advanced_bio)
+>=20
+> This would be cleaner as a 'bool advance_bio' as both the type and as =
+a
+> reversed info on whether to do the advance or not.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- drivers/md/raid1.c | 74 +++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 57 insertions(+), 17 deletions(-)
+I'll fix it.
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 3febfc8391fb..66ca4288e3e8 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -903,8 +903,9 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr)
- 	wake_up(&conf->wait_barrier);
- }
- 
--static void _wait_barrier(struct r1conf *conf, int idx)
-+static bool _wait_barrier(struct r1conf *conf, int idx, bool nowait)
- {
-+	bool ret = true;
- 	/*
- 	 * We need to increase conf->nr_pending[idx] very early here,
- 	 * then raise_barrier() can be blocked when it waits for
-@@ -935,7 +936,7 @@ static void _wait_barrier(struct r1conf *conf, int idx)
- 	 */
- 	if (!READ_ONCE(conf->array_frozen) &&
- 	    !atomic_read(&conf->barrier[idx]))
--		return;
-+		return ret;
- 
- 	/*
- 	 * After holding conf->resync_lock, conf->nr_pending[idx]
-@@ -953,18 +954,26 @@ static void _wait_barrier(struct r1conf *conf, int idx)
- 	 */
- 	wake_up(&conf->wait_barrier);
- 	/* Wait for the barrier in same barrier unit bucket to drop. */
--	wait_event_lock_irq(conf->wait_barrier,
--			    !conf->array_frozen &&
--			     !atomic_read(&conf->barrier[idx]),
--			    conf->resync_lock);
-+	if (conf->array_frozen || atomic_read(&conf->barrier[idx])) {
-+		if (nowait)
-+			ret = false;
-+		else
-+			wait_event_lock_irq(conf->wait_barrier,
-+					!conf->array_frozen &&
-+					!atomic_read(&conf->barrier[idx]),
-+					conf->resync_lock);
-+	}
- 	atomic_inc(&conf->nr_pending[idx]);
- 	atomic_dec(&conf->nr_waiting[idx]);
- 	spin_unlock_irq(&conf->resync_lock);
-+	return ret;
- }
- 
--static void wait_read_barrier(struct r1conf *conf, sector_t sector_nr)
-+static bool wait_read_barrier(struct r1conf *conf, sector_t sector_nr,
-+		bool nowait)
- {
- 	int idx = sector_to_idx(sector_nr);
-+	bool ret = true;
- 
- 	/*
- 	 * Very similar to _wait_barrier(). The difference is, for read
-@@ -976,7 +985,7 @@ static void wait_read_barrier(struct r1conf *conf, sector_t sector_nr)
- 	atomic_inc(&conf->nr_pending[idx]);
- 
- 	if (!READ_ONCE(conf->array_frozen))
--		return;
-+		return ret;
- 
- 	spin_lock_irq(&conf->resync_lock);
- 	atomic_inc(&conf->nr_waiting[idx]);
-@@ -987,19 +996,28 @@ static void wait_read_barrier(struct r1conf *conf, sector_t sector_nr)
- 	 */
- 	wake_up(&conf->wait_barrier);
- 	/* Wait for array to be unfrozen */
--	wait_event_lock_irq(conf->wait_barrier,
--			    !conf->array_frozen,
--			    conf->resync_lock);
-+	if (conf->array_frozen) {
-+		/* If nowait flag is set, return false to
-+		 * show we did not wait
-+		 */
-+		if (nowait)
-+			ret = false;
-+		else
-+			wait_event_lock_irq(conf->wait_barrier,
-+					!conf->array_frozen,
-+					conf->resync_lock);
-+	}
- 	atomic_inc(&conf->nr_pending[idx]);
- 	atomic_dec(&conf->nr_waiting[idx]);
- 	spin_unlock_irq(&conf->resync_lock);
-+	return ret;
- }
- 
--static void wait_barrier(struct r1conf *conf, sector_t sector_nr)
-+static bool wait_barrier(struct r1conf *conf, sector_t sector_nr, bool nowait)
- {
- 	int idx = sector_to_idx(sector_nr);
- 
--	_wait_barrier(conf, idx);
-+	return _wait_barrier(conf, idx, nowait);
- }
- 
- static void wait_all_barriers(struct r1conf *conf)
-@@ -1007,7 +1025,7 @@ static void wait_all_barriers(struct r1conf *conf)
- 	int idx;
- 
- 	for (idx = 0; idx < BARRIER_BUCKETS_NR; idx++)
--		_wait_barrier(conf, idx);
-+		_wait_barrier(conf, idx, false);
- }
- 
- static void _allow_barrier(struct r1conf *conf, int idx)
-@@ -1223,7 +1241,11 @@ static void raid1_read_request(struct mddev *mddev, struct bio *bio,
- 	 * Still need barrier for READ in case that whole
- 	 * array is frozen.
- 	 */
--	wait_read_barrier(conf, bio->bi_iter.bi_sector);
-+	if (!wait_read_barrier(conf, bio->bi_iter.bi_sector,
-+				bio->bi_opf & REQ_NOWAIT)) {
-+		bio_wouldblock_error(bio);
-+		return;
-+	}
- 
- 	if (!r1_bio)
- 		r1_bio = alloc_r1bio(mddev, bio);
-@@ -1333,6 +1355,11 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 		 * an interruptible wait.
- 		 */
- 		DEFINE_WAIT(w);
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
-+
- 		for (;;) {
- 			sigset_t full, old;
- 			prepare_to_wait(&conf->wait_barrier,
-@@ -1351,7 +1378,11 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 		}
- 		finish_wait(&conf->wait_barrier, &w);
- 	}
--	wait_barrier(conf, bio->bi_iter.bi_sector);
-+	if (!wait_barrier(conf, bio->bi_iter.bi_sector,
-+				bio->bi_opf & REQ_NOWAIT)) {
-+		bio_wouldblock_error(bio);
-+		return;
-+	}
- 
- 	r1_bio = alloc_r1bio(mddev, bio);
- 	r1_bio->sectors = max_write_sectors;
-@@ -1359,6 +1390,10 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 	if (conf->pending_count >= max_queued_requests) {
- 		md_wakeup_thread(mddev->thread);
- 		raid1_log(mddev, "wait queued");
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
- 		wait_event(conf->wait_barrier,
- 			   conf->pending_count < max_queued_requests);
- 	}
-@@ -1442,6 +1477,11 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 		/* Wait for this device to become unblocked */
- 		int j;
- 
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return;
-+		}
-+
- 		for (j = 0; j < i; j++)
- 			if (r1_bio->bios[j])
- 				rdev_dec_pending(conf->mirrors[j].rdev, mddev);
-@@ -1449,7 +1489,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 		allow_barrier(conf, bio->bi_iter.bi_sector);
- 		raid1_log(mddev, "wait rdev %d blocked", blocked_rdev->raid_disk);
- 		md_wait_for_blocked_rdev(blocked_rdev, mddev);
--		wait_barrier(conf, bio->bi_iter.bi_sector);
-+		wait_barrier(conf, bio->bi_iter.bi_sector, false);
- 		goto retry_write;
- 	}
- 
--- 
-2.12.3
+Thanks Jens.
+
+Javier
+
+--Apple-Mail=_3A4DD65C-B589-4081-9474-6844CB3C2CB8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJZehXOAAoJEGMfBTt1mRjKlgoP/3icKly/64VPNl+Oq1kgtDTG
+YguVAacCNwGRkcsTsjyoY+5ffj4i41etzB1+FzxycXmVZzRTpLmJtFqn/G2VdzeC
+TsdBnGIEUuvBbYAPuj7A8hTS2D7LZeKholjUOMaHtYqWQUx4usXMmmJzw+gfURYg
+Kb1qXOy3dBIO/lk7dYc/doy4uJSJLnQak/USuhT4vnREsBf4ruQ9b86IDxbsOin8
+/sYLV6Bc8lHIKkKqMxvATgg1l4hwESvcz9CythbOCUckKyilnqJDpR8fh+TUWeot
+NmZHd9tYT+ud/wmyn4URMqv9Sd/U3jEU9QYWQ3+mdLVRz+nLgzXLvxrP5T9gtfhN
+bkdKIIzXF6aE6sdR5eNtZTPGPBxtmMcraQFD1O3lPJ5qsiN7oMQ7z7XRlWHemop9
+YR4Sza6X1fUIfU1mbwhQAvMYYQcakcU6/FhRKrbt6a0/26fUvklMnaMpZlGiMC8+
+DjjA+5Eqgux7KIqG6qpBqLlv16256mofA4CmxnQJOv4orFtiVzeR6oat2Be8okv0
+fWPoHkAfejFNr5FDIl+oCJIsRddYAQp6bQREolhAvL6BQ5GL/AX/mtvC8FGuMyAf
+cki6ZhR2kLbzjb20IY/0K3mMjHK9BgSrMNxBbGIsgdDFIJnRPWq/qC8LPpxxrHd3
+KYi9EHWhy3o5zb7exPv/
+=9fZj
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_3A4DD65C-B589-4081-9474-6844CB3C2CB8--
