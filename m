@@ -1,69 +1,73 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	lnicola@dend.ro,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: reset in_service_entity if it becomes idle
-Date: Fri, 28 Jul 2017 21:41:18 +0200
-Message-Id: <20170728194118.8249-1-paolo.valente@linaro.org>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [BUG] nvme driver crash
+To: Max Gurtovoy <maxg@mellanox.com>, Omar Sandoval <osandov@osandov.com>,
+ Christoph Hellwig <hch@infradead.org>
+Cc: Shaohua Li <shli@kernel.org>, linux-block@vger.kernel.org,
+ axboe@kernel.dk, Keith Busch <keith.busch@intel.com>
+References: <20170725222408.fq2fncwtid3fhvqh@kernel.org>
+ <20170726173443.GA25527@infradead.org>
+ <20170726191221.GA22421@vader.DHCP.thefacebook.com>
+ <53919f26-3886-350a-119b-59e9c4b8ea4d@mellanox.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <03ed5208-443b-fe5e-5c65-1d67ef371ce0@grimberg.me>
+Date: Thu, 27 Jul 2017 17:05:52 +0300
+MIME-Version: 1.0
+In-Reply-To: <53919f26-3886-350a-119b-59e9c4b8ea4d@mellanox.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-BFQ implements hierarchical scheduling by representing each group of
-queues with a generic parent entity. For each parent entity, BFQ
-maintains an in_service_entity pointer: if one of the child entities
-happens to be in service, in_service_entity points to it.  The
-resetting of these pointers happens only on queue expirations: when
-the in-service queue is expired, i.e., stops to be the queue in
-service, BFQ resets all in_service_entity pointers along the
-parent-entity path from this queue to the root entity.
 
-Functions handling the scheduling of entities assume, naturally, that
-in-service entities are active, i.e., have pending I/O requests (or,
-as a special case, even if they have no pending requests, they are
-expected to receive a new request very soon, with the scheduler idling
-the storage device while waiting for such an event). Unfortunately,
-the above resetting scheme of the in_service_entity pointers may cause
-this assumption to be violated.  For example, the in-service queue may
-happen to remain without requests because of a request merge. In this
-case the queue does become idle, and all related data structures are
-updated accordingly. But in_service_entity still points to the queue
-in the parent entity. This inconsistency may even propagate to
-higher-level parent entities, if they happen to become idle as well,
-as a consequence of the leaf queue becoming idle. For this queue and
-parent entities, scheduling functions have an undefined behaviour,
-and, as reported, may easily lead to kernel crashes or hangs.
+> Adding Sagi and Keith.
+> 
+> Christoph,
+> I've send some fix few months ago to that but haven't got a green light:
+> 
+> 
+> nvme: don't ignore tagset allocation failures
+> 
+> the nvme_dev_add() function silently ignores failures.
+> In case blk_mq_alloc_tag_set fails, we hit NULL deref while
+> calling blk_mq_init_queue during nvme_alloc_ns with tagset == NULL.
+> Instead, we'll not issue the scan_work in case tagset allocation
+> failed and leave the ctrl functional.
+> 
 
-This commit addresses this issue by simply resetting the
-in_service_entity field also when it is detected to point to an entity
-becoming idle (regardless of why the entity becomes idle).
+IIRC I argued that the core should not check the tagset existence,
 
-Reported-by: Laurentiu Nicola <lnicola@dend.ro>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Tested-by: Laurentiu Nicola <lnicola@dend.ro>
----
- block/bfq-wf2q.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Regardless that its the wrong layer to check it, it means that
+all drivers need to make sure to take care of getting this dereference
+correct.
 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 979f8f2..881bbe5 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1158,8 +1158,10 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
- 	st = bfq_entity_service_tree(entity);
- 	is_in_service = entity == sd->in_service_entity;
- 
--	if (is_in_service)
-+	if (is_in_service) {
- 		bfq_calc_finish(entity, entity->service);
-+		sd->in_service_entity = NULL;
-+	}
- 
- 	if (entity->tree == &st->active)
- 		bfq_active_extract(st, entity);
--- 
-2.10.0
+Perhaps we need to come up with a new state for this stage (something
+like CTRL_ADMIN_READY), and state transition is:
+
+NEW -> ADMIN_READY (admin queue configured) -> LIVE (if we have
+one or more IO queues ready).
+
+> Signed-off-by: Max Gurtovoy <maxg@mellanox.com>
+> Reviewed-by: Keith Busch <keith.busch@intel.com>
+> ---
+>   drivers/nvme/host/core.c |    4 ++--
+>   1 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 9b3b57f..493722a 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -2115,9 +2115,9 @@ void nvme_queue_scan(struct nvme_ctrl *ctrl)
+>   {
+>       /*
+>        * Do not queue new scan work when a controller is reset during
+> -     * removal.
+> +     * removal or if the tagset doesn't exist.
+>        */
+> -    if (ctrl->state == NVME_CTRL_LIVE)
+> +    if (ctrl->state == NVME_CTRL_LIVE && ctrl->tagset)
+>           schedule_work(&ctrl->scan_work);
+>   }
+>   EXPORT_SYMBOL_GPL(nvme_queue_scan);
+> 
+> 
+> maybe we can rebase and consider it again ?
+> 
