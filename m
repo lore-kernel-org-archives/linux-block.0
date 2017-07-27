@@ -1,95 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from victor.provo.novell.com ([137.65.250.26]:45456 "EHLO
-        prv3-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752411AbdGUJS1 (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Fri, 21 Jul 2017 05:18:27 -0400
-From: Guoqing Jiang <gqjiang@suse.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@fb.com, Guoqing Jiang <gqjiang@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: [PATCH] block: use bio_io_error directly
-Date: Fri, 21 Jul 2017 17:26:24 +0800
-Message-Id: <20170721092624.7144-1-gqjiang@suse.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme updates for 4.13-rc3
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Sagi Grimberg <sagi@grimberg.me>, Keith Busch <keith.busch@intel.com>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+References: <20170727133011.2vyqepblk2oboit4@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9cce2bc0-85a9-e3bf-0bee-41e17a5906e3@kernel.dk>
+Date: Thu, 27 Jul 2017 08:09:01 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170727133011.2vyqepblk2oboit4@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-bio_io_error is capable of replacing the two lines.
+On 07/27/2017 07:30 AM, Christoph Hellwig wrote:
+> Just a couple small fixes all over.
+> 
+> The following changes since commit 76451d79bde6bed17e113f057e58e1fa5fb79e78:
+> 
+>   blk-mq: map queues to all present CPUs (2017-07-24 10:01:31 -0600)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.13
+> 
+> for you to fetch changes up to 7dd1ab163c17e11473a65b11f7e748db30618ebb:
+> 
+>   nvme: validate admin queue before unquiesce (2017-07-26 17:41:41 +0200)
+> 
+> ----------------------------------------------------------------
+> Christoph Hellwig (1):
+>       nvme-pci: fix HMB size calculation
+> 
+> James Smart (2):
+>       nvme-fc: address target disconnect race conditions in fcp io submit
+>       nvme-fc: revise TRADDR parsing
+> 
+> Johannes Thumshirn (1):
+>       nvme: also provide a UUID in the WWID sysfs attribute
+> 
+> Jon Derrick (1):
+>       nvme: fabrics commands should use the fctype field for data direction
+> 
+> Scott Bauer (1):
+>       nvme: validate admin queue before unquiesce
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: Guoqing Jiang <gqjiang@suse.com>
----
- drivers/block/drbd/drbd_int.h | 3 +--
- drivers/md/dm-mpath.c         | 3 +--
- drivers/nvme/target/io-cmd.c  | 3 +--
- fs/block_dev.c                | 3 +--
- 4 files changed, 4 insertions(+), 8 deletions(-)
+Pulled, thanks.
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index d17b6e6..dd21a1b 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -1630,8 +1630,7 @@ static inline void drbd_generic_make_request(struct drbd_device *device,
- 	__release(local);
- 	if (!bio->bi_bdev) {
- 		drbd_err(device, "drbd_generic_make_request: bio->bi_bdev == NULL\n");
--		bio->bi_status = BLK_STS_IOERR;
--		bio_endio(bio);
-+		bio_io_error(bio);
- 		return;
- 	}
- 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 0e8ab5b..aa6dcc4 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -623,8 +623,7 @@ static void process_queued_bios(struct work_struct *work)
- 		r = __multipath_map_bio(m, bio, get_mpio_from_bio(bio));
- 		switch (r) {
- 		case DM_MAPIO_KILL:
--			bio->bi_status = BLK_STS_IOERR;
--			bio_endio(bio);
-+			bio_io_error(bio);
- 			break;
- 		case DM_MAPIO_REQUEUE:
- 			bio->bi_status = BLK_STS_DM_REQUEUE;
-diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
-index 3b4d47a..46baf19 100644
---- a/drivers/nvme/target/io-cmd.c
-+++ b/drivers/nvme/target/io-cmd.c
-@@ -145,8 +145,7 @@ static void nvmet_execute_discard(struct nvmet_req *req)
- 		bio->bi_private = req;
- 		bio->bi_end_io = nvmet_bio_done;
- 		if (status) {
--			bio->bi_status = BLK_STS_IOERR;
--			bio_endio(bio);
-+			bio_io_error(bio);
- 		} else {
- 			submit_bio(bio);
- 		}
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9941dc8..3ceb8f4 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -370,8 +370,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 
- 		ret = bio_iov_iter_get_pages(bio, iter);
- 		if (unlikely(ret)) {
--			bio->bi_status = BLK_STS_IOERR;
--			bio_endio(bio);
-+			bio_io_error(bio);
- 			break;
- 		}
- 
 -- 
-2.10.0
+Jens Axboe
