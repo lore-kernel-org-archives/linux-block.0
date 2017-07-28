@@ -1,169 +1,162 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f194.google.com ([209.85.220.194]:35528 "EHLO
-        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751153AbdGMVMZ (ORCPT
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:38010 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751964AbdG1NN3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jul 2017 17:12:25 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: hch@lst.de
-Cc: dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: [for-4.14 RFC PATCH 1/2] dm rq: avoid deadlock if dm-mq is stacked on old .request_fn device(s)
-Date: Thu, 13 Jul 2017 17:12:16 -0400
-Message-Id: <20170713211217.52361-2-snitzer@redhat.com>
-In-Reply-To: <20170713211217.52361-1-snitzer@redhat.com>
-References: <20170713211217.52361-1-snitzer@redhat.com>
+        Fri, 28 Jul 2017 09:13:29 -0400
+Received: by mail-wm0-f52.google.com with SMTP id m85so117194244wma.1
+        for <linux-block@vger.kernel.org>; Fri, 28 Jul 2017 06:13:29 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
+Subject: [PATCH] lightnvm: pblk: advance bio according to lba index
+Date: Fri, 28 Jul 2017 15:13:16 +0200
+Message-Id: <1501247596-23999-2-git-send-email-javier@javigon.com>
+In-Reply-To: <1501247596-23999-1-git-send-email-javier@javigon.com>
+References: <1501247596-23999-1-git-send-email-javier@javigon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Conditionally use __blk_put_request() or blk_put_request() instead of
-just blk_put_request() in multipath_release_clone().
+When a lba either hits the cache or corresponds to an empty entry in the
+L2P table, we need to advance the bio according to the position in which
+the lba is located. Otherwise, we will copy data in the wrong page, thus
+causing data corruption for the application.
 
-Otherwise a deadlock will occur because scsi_end_request() will take the
-clone request's queue_lock, around its call to blk_finish_request(), and
-then the later blk_put_request() also tries to take it:
+In case of a cache hit, we assumed that bio->bi_iter.bi_idx would
+contain the correct index, but this is no necessarily true. Instead, use
+the local bio advance counter and iterator. This guarantees that lbas
+hitting the cache are copied into the right bv_page.
 
-[12749.916332]  queued_spin_lock_slowpath+0xb/0xf
-[12749.916335]  _raw_spin_lock_irqsave+0x37/0x40
-[12749.916339]  blk_put_request+0x39/0x60
-[12749.916342]  multipath_release_clone+0xe/0x10 [dm_multipath]
-[12749.916350]  dm_softirq_done+0x156/0x240 [dm_mod]
-[12749.916353]  __blk_mq_complete_request+0x90/0x140
-[12749.916355]  blk_mq_complete_request+0x16/0x20
-[12749.916360]  dm_complete_request+0x23/0x40 [dm_mod]
-[12749.916365]  end_clone_request+0x1d/0x20 [dm_mod]
-[12749.916367]  blk_finish_request+0x83/0x120
-[12749.916370]  scsi_end_request+0x12d/0x1d0
-[12749.916371]  scsi_io_completion+0x13c/0x630
-[12749.916374]  ? set_next_entity+0x7c/0x780
-[12749.916376]  scsi_finish_command+0xd9/0x120
-[12749.916378]  scsi_softirq_done+0x12a/0x150
-[12749.916380]  blk_done_softirq+0x9e/0xd0
-[12749.916382]  __do_softirq+0xc9/0x269
-[12749.916384]  run_ksoftirqd+0x29/0x50
-[12749.916385]  smpboot_thread_fn+0x110/0x160
-[12749.916387]  kthread+0x109/0x140
-[12749.916389]  ? sort_range+0x30/0x30
-[12749.916390]  ? kthread_park+0x60/0x60
-[12749.916391]  ret_from_fork+0x25/0x30
+In case of an empty L2P entry, we omitted to advance the bio. In the
+cases when the same I/O also contains a cache hit, data corresponding
+to this lba will be copied to the wrong bv_page. Fix this by advancing
+the bio as we do in the case of a cache hit.
 
-This "fix" is gross in that the long-term fitness of stacking blk-mq DM
-multipath (dm-mq) ontop of old .request_fn devices is questionable.  The
-above stack trace shows just how ugly it is to have old .request_fn SCSI
-code cascade into blk-mq code during DM multipath request completion.
+Fixes: a4bd217b4326 lightnvm: physical block device (pblk) target
 
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Javier González <javier@javigon.com>
 ---
- drivers/md/dm-mpath.c         | 16 ++++++++++++++--
- drivers/md/dm-rq.c            |  8 +++++---
- drivers/md/dm-target.c        |  4 ++--
- include/linux/device-mapper.h |  3 ++-
- 4 files changed, 23 insertions(+), 8 deletions(-)
+ drivers/lightnvm/pblk-rb.c   |  4 ++--
+ drivers/lightnvm/pblk-read.c | 23 ++++++++++++++++-------
+ drivers/lightnvm/pblk.h      |  2 +-
+ 3 files changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 0e8ab5b..34cf7b6 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -520,9 +520,21 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 	return DM_MAPIO_REMAPPED;
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 5ecc154f6831..9bc32578a766 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -657,7 +657,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+  * be directed to disk.
+  */
+ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
+-			struct ppa_addr ppa, int bio_iter)
++			struct ppa_addr ppa, int bio_iter, bool advanced_bio)
+ {
+ 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
+ 	struct pblk_rb_entry *entry;
+@@ -694,7 +694,7 @@ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
+ 	 * filled with data from the cache). If part of the data resides on the
+ 	 * media, we will read later on
+ 	 */
+-	if (unlikely(!bio->bi_iter.bi_idx))
++	if (unlikely(!advanced_bio))
+ 		bio_advance(bio, bio_iter * PBLK_EXPOSED_PAGE_SIZE);
+ 
+ 	data = bio_data(bio);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 4e5c48f3de62..d682e89e6493 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -26,7 +26,7 @@
+  */
+ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+ 				sector_t lba, struct ppa_addr ppa,
+-				int bio_iter)
++				int bio_iter, bool advanced_bio)
+ {
+ #ifdef CONFIG_NVM_DEBUG
+ 	/* Callers must ensure that the ppa points to a cache address */
+@@ -34,7 +34,8 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+ 	BUG_ON(!pblk_addr_in_cache(ppa));
+ #endif
+ 
+-	return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa, bio_iter);
++	return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa,
++						bio_iter, advanced_bio);
  }
  
--static void multipath_release_clone(struct request *clone)
-+static void multipath_release_clone(struct dm_target *ti, struct request *clone)
- {
--	blk_put_request(clone);
-+	struct multipath *m = ti->private;
-+	struct request_queue *q = clone->q;
+ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+@@ -44,7 +45,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
+ 	sector_t blba = pblk_get_lba(bio);
+ 	int nr_secs = rqd->nr_ppas;
+-	int advanced_bio = 0;
++	bool advanced_bio = false;
+ 	int i, j = 0;
+ 
+ 	/* logic error: lba out-of-bounds. Ignore read request */
+@@ -62,19 +63,26 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ retry:
+ 		if (pblk_ppa_empty(p)) {
+ 			WARN_ON(test_and_set_bit(i, read_bitmap));
+-			continue;
 +
-+	if (!q->mq_ops && m->queue_mode == DM_TYPE_MQ_REQUEST_BASED) {
-+		/*
-+		 * dm-mq on .request_fn already holds clone->q->queue_lock
-+		 * via blk_finish_request()...
-+		 * - true for .request_fn SCSI, but is it _always_ true?
-+		 */
-+		lockdep_assert_held(q->queue_lock);
-+		__blk_put_request(q, clone);
-+	} else
-+		blk_put_request(clone);
- }
- 
- /*
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index c6ebc5b..95bb44c 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -220,11 +220,12 @@ static void dm_end_request(struct request *clone, blk_status_t error)
- {
- 	int rw = rq_data_dir(clone);
- 	struct dm_rq_target_io *tio = clone->end_io_data;
-+	struct dm_target *ti = tio->ti;
- 	struct mapped_device *md = tio->md;
- 	struct request *rq = tio->orig;
- 
- 	blk_rq_unprep_clone(clone);
--	tio->ti->type->release_clone_rq(clone);
-+	ti->type->release_clone_rq(ti, clone);
- 
- 	rq_end_stats(md, rq);
- 	if (!rq->q->mq_ops)
-@@ -267,6 +268,7 @@ static void dm_mq_delay_requeue_request(struct request *rq, unsigned long msecs)
- 
- static void dm_requeue_original_request(struct dm_rq_target_io *tio, bool delay_requeue)
- {
-+	struct dm_target *ti = tio->ti;
- 	struct mapped_device *md = tio->md;
- 	struct request *rq = tio->orig;
- 	int rw = rq_data_dir(rq);
-@@ -274,7 +276,7 @@ static void dm_requeue_original_request(struct dm_rq_target_io *tio, bool delay_
- 	rq_end_stats(md, rq);
- 	if (tio->clone) {
- 		blk_rq_unprep_clone(tio->clone);
--		tio->ti->type->release_clone_rq(tio->clone);
-+		ti->type->release_clone_rq(ti, tio->clone);
- 	}
- 
- 	if (!rq->q->mq_ops)
-@@ -488,7 +490,7 @@ static int map_request(struct dm_rq_target_io *tio)
- 	case DM_MAPIO_REMAPPED:
- 		if (setup_clone(clone, rq, tio, GFP_ATOMIC)) {
- 			/* -ENOMEM */
--			ti->type->release_clone_rq(clone);
-+			ti->type->release_clone_rq(ti, clone);
- 			return DM_MAPIO_REQUEUE;
++			if (unlikely(!advanced_bio)) {
++				bio_advance(bio, (i) * PBLK_EXPOSED_PAGE_SIZE);
++				advanced_bio = true;
++			}
++
++			goto next;
  		}
  
-diff --git a/drivers/md/dm-target.c b/drivers/md/dm-target.c
-index c0d7e60..adbd17b 100644
---- a/drivers/md/dm-target.c
-+++ b/drivers/md/dm-target.c
-@@ -138,12 +138,12 @@ static int io_err_clone_and_map_rq(struct dm_target *ti, struct request *rq,
- 	return DM_MAPIO_KILL;
- }
+ 		/* Try to read from write buffer. The address is later checked
+ 		 * on the write buffer to prevent retrieving overwritten data.
+ 		 */
+ 		if (pblk_addr_in_cache(p)) {
+-			if (!pblk_read_from_cache(pblk, bio, lba, p, i)) {
++			if (!pblk_read_from_cache(pblk, bio, lba, p, i,
++								advanced_bio)) {
+ 				pblk_lookup_l2p_seq(pblk, &p, lba, 1);
+ 				goto retry;
+ 			}
+ 			WARN_ON(test_and_set_bit(i, read_bitmap));
+-			advanced_bio = 1;
++			advanced_bio = true;
+ #ifdef CONFIG_NVM_DEBUG
+ 			atomic_long_inc(&pblk->cache_reads);
+ #endif
+@@ -83,6 +91,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			rqd->ppa_list[j++] = p;
+ 		}
  
--static void io_err_release_clone_rq(struct request *clone)
-+static void io_err_release_clone_rq(struct dm_target *ti, struct request *clone)
- {
- }
++next:
+ 		if (advanced_bio)
+ 			bio_advance(bio, PBLK_EXPOSED_PAGE_SIZE);
+ 	}
+@@ -282,7 +291,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	 * write buffer to prevent retrieving overwritten data.
+ 	 */
+ 	if (pblk_addr_in_cache(ppa)) {
+-		if (!pblk_read_from_cache(pblk, bio, lba, ppa, 0)) {
++		if (!pblk_read_from_cache(pblk, bio, lba, ppa, 0, 1)) {
+ 			pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+ 			goto retry;
+ 		}
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 0c5692cc2f60..67e623bd5c2d 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -670,7 +670,7 @@ unsigned int pblk_rb_read_to_bio_list(struct pblk_rb *rb, struct bio *bio,
+ 				      struct list_head *list,
+ 				      unsigned int max);
+ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
+-			struct ppa_addr ppa, int bio_iter);
++			struct ppa_addr ppa, int bio_iter, bool advanced_bio);
+ unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int entries);
  
- static long io_err_dax_direct_access(struct dm_target *ti, pgoff_t pgoff,
--		long nr_pages, void **kaddr, pfn_t *pfn)
-+				     long nr_pages, void **kaddr, pfn_t *pfn)
- {
- 	return -EIO;
- }
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index 0c1b50ad..f2ca0ab 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -61,7 +61,8 @@ typedef int (*dm_clone_and_map_request_fn) (struct dm_target *ti,
- 					    struct request *rq,
- 					    union map_info *map_context,
- 					    struct request **clone);
--typedef void (*dm_release_clone_request_fn) (struct request *clone);
-+typedef void (*dm_release_clone_request_fn) (struct dm_target *ti,
-+					     struct request *clone);
- 
- /*
-  * Returns:
+ unsigned int pblk_rb_sync_init(struct pblk_rb *rb, unsigned long *flags);
 -- 
-2.10.1
+2.7.4
