@@ -1,108 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtpbg65.qq.com ([103.7.28.233]:53251 "EHLO smtpbg65.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933142AbdGTKQ4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2017 06:16:56 -0400
-From: Zhengyuan Liu <liuzhengyuan@kylinos.cn>
-To: linux-block@vger.kernel.org
-Cc: axboe@fb.com, liuyun01@kylinos.cn
-Subject: [PATCH] block/brd: add a numa_node module parameter
-Date: Thu, 20 Jul 2017 18:16:37 +0800
-Message-Id: <1500545797-13183-1-git-send-email-liuzhengyuan@kylinos.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "dan.j.williams@intel.com" <dan.j.williams@intel.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "toshi.kani@hpe.com" <toshi.kani@hpe.com>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [resend PATCH v2 11/33] dm: add dax_device and dax_operations
+ support
+Date: Sat, 29 Jul 2017 21:24:07 +0000
+Message-ID: <1501363445.3005.1.camel@wdc.com>
+References: <149245612770.10206.15496018295337908594.stgit@dwillia2-desk3.amr.corp.intel.com>
+         <149245618859.10206.13182319600260215993.stgit@dwillia2-desk3.amr.corp.intel.com>
+         <1501258623.2413.3.camel@wdc.com>
+         <CAPcyv4hc9zBHYtXrzS1XP514dMPcjBxjaSwRnPD8zUig1kCKnA@mail.gmail.com>
+In-Reply-To: <CAPcyv4hc9zBHYtXrzS1XP514dMPcjBxjaSwRnPD8zUig1kCKnA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Provide user a way to control which NUMA node the memory for ram
-device is allocated from. The default memory allocation can fall
-into more than one numa node for one raw device, with this patch
-you can specify one device just allocting from one node, if not
-exceed the node's total memory, and another device from a different
-node as the parameter is writable.
-
-Signed-off-by: Zhengyuan Liu <liuzhengyuan@kylinos.cn>
----
- drivers/block/brd.c | 32 +++++++++++++++++++++++++++-----
- 1 file changed, 27 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 17723fd5..a9e5867 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -56,10 +56,28 @@ struct brd_device {
- 	struct radix_tree_root	brd_pages;
- };
- 
-+static DEFINE_MUTEX(brd_mutex);
-+
-+static int rd_numa_node = NUMA_NO_NODE;
-+
-+static int set_rd_numa_node(const char *val, struct kernel_param *kp)
-+{
-+	int ret = param_set_int(val, kp);
-+	if (ret)
-+		return ret;
-+	mutex_lock(&brd_mutex);
-+	if (rd_numa_node < NUMA_NO_NODE)
-+		rd_numa_node = NUMA_NO_NODE;
-+	else if (rd_numa_node > num_online_nodes() - 1)
-+		rd_numa_node = num_online_nodes() - 1;
-+	pr_info("setting rd_numa_node to (%d)\n", rd_numa_node);
-+	mutex_unlock(&brd_mutex);
-+	return 0;
-+}
-+
- /*
-  * Look up and return a brd's page for a given sector.
-  */
--static DEFINE_MUTEX(brd_mutex);
- static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
- {
- 	pgoff_t idx;
-@@ -114,7 +132,7 @@ static struct page *brd_insert_page(struct brd_device *brd, sector_t sector)
- #ifndef CONFIG_BLK_DEV_RAM_DAX
- 	gfp_flags |= __GFP_HIGHMEM;
- #endif
--	page = alloc_page(gfp_flags);
-+	page = alloc_pages_node(rd_numa_node, gfp_flags, 0);
- 	if (!page)
- 		return NULL;
- 
-@@ -413,14 +431,14 @@ static struct brd_device *brd_alloc(int i)
- 	struct brd_device *brd;
- 	struct gendisk *disk;
- 
--	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
-+	brd = kzalloc_node(sizeof(*brd), GFP_KERNEL, rd_numa_node);
- 	if (!brd)
- 		goto out;
- 	brd->brd_number		= i;
- 	spin_lock_init(&brd->brd_lock);
- 	INIT_RADIX_TREE(&brd->brd_pages, GFP_ATOMIC);
- 
--	brd->brd_queue = blk_alloc_queue(GFP_KERNEL);
-+	brd->brd_queue = blk_alloc_queue_node(GFP_KERNEL, rd_numa_node);
- 	if (!brd->brd_queue)
- 		goto out_free_dev;
- 
-@@ -434,7 +452,7 @@ static struct brd_device *brd_alloc(int i)
- 	 *  is harmless)
- 	 */
- 	blk_queue_physical_block_size(brd->brd_queue, PAGE_SIZE);
--	disk = brd->brd_disk = alloc_disk(max_part);
-+	disk = brd->brd_disk = alloc_disk_node(max_part, rd_numa_node);
- 	if (!disk)
- 		goto out_free_queue;
- 	disk->major		= RAMDISK_MAJOR;
-@@ -593,6 +611,10 @@ static void __exit brd_exit(void)
- 	pr_info("brd: module unloaded\n");
- }
- 
-+module_param_call(rd_numa_node, set_rd_numa_node, param_get_int,
-+		&rd_numa_node, S_IRUGO | S_IWUSR);
-+MODULE_PARM_DESC(rd_numa_node, "Numa node to which memeory alloc from");
-+
- module_init(brd_init);
- module_exit(brd_exit);
- 
--- 
-2.7.4
+T24gU2F0LCAyMDE3LTA3LTI5IGF0IDEyOjU3IC0wNzAwLCBEYW4gV2lsbGlhbXMgd3JvdGU6DQo+
+IE9uIEZyaSwgSnVsIDI4LCAyMDE3IGF0IDk6MTcgQU0sIEJhcnQgVmFuIEFzc2NoZSA8QmFydC5W
+YW5Bc3NjaGVAd2RjLmNvbT4gd3JvdGU6DQo+ID4gT24gTW9uLCAyMDE3LTA0LTE3IGF0IDEyOjA5
+IC0wNzAwLCBEYW4gV2lsbGlhbXMgd3JvdGU6DQo+ID4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9t
+ZC9LY29uZmlnIGIvZHJpdmVycy9tZC9LY29uZmlnDQo+ID4gPiBpbmRleCBiNzc2N2RhNTBjMjYu
+LjFkZTgzNzJkOTQ1OSAxMDA2NDQNCj4gPiA+IC0tLSBhL2RyaXZlcnMvbWQvS2NvbmZpZw0KPiA+
+ID4gKysrIGIvZHJpdmVycy9tZC9LY29uZmlnDQo+ID4gPiBAQCAtMjAwLDYgKzIwMCw3IEBAIGNv
+bmZpZyBCTEtfREVWX0RNX0JVSUxUSU4NCj4gPiA+ICBjb25maWcgQkxLX0RFVl9ETQ0KPiA+ID4g
+ICAgICAgdHJpc3RhdGUgIkRldmljZSBtYXBwZXIgc3VwcG9ydCINCj4gPiA+ICAgICAgIHNlbGVj
+dCBCTEtfREVWX0RNX0JVSUxUSU4NCj4gPiA+ICsgICAgIHNlbGVjdCBEQVgNCj4gPiA+ICAgICAg
+IC0tLWhlbHAtLS0NCj4gPiA+ICAgICAgICAgRGV2aWNlLW1hcHBlciBpcyBhIGxvdyBsZXZlbCB2
+b2x1bWUgbWFuYWdlci4gIEl0IHdvcmtzIGJ5IGFsbG93aW5nDQo+ID4gPiAgICAgICAgIHBlb3Bs
+ZSB0byBzcGVjaWZ5IG1hcHBpbmdzIGZvciByYW5nZXMgb2YgbG9naWNhbCBzZWN0b3JzLiAgVmFy
+aW91cw0KPiA+IA0KPiA+IChyZXBseWluZyB0byBhbiBlLW1haWwgb2YgdGhyZWUgbW9udGhzIGFn
+bykNCj4gPiANCj4gPiBIZWxsbyBEYW4sDQo+ID4gDQo+ID4gV2hpbGUgYnVpbGRpbmcgYSB2NC4x
+MiBrZXJuZWwgSSBub3RpY2VkIHRoYXQgZW5hYmxpbmcgZGV2aWNlIG1hcHBlciBzdXBwb3J0DQo+
+ID4gbm93IHVuY29uZGl0aW9uYWxseSBlbmFibGVzIERBWC4gSSB0aGluayB0aGVyZSBhcmUgcGxl
+bnR5IG9mIHN5c3RlbXMgdGhhdCB1c2UNCj4gPiBkbSBidXQgZG8gbm90IG5lZWQgREFYLiBIYXZl
+IHlvdSBjb25zaWRlcmVkIHRvIHJld29yayB0aGlzIHN1Y2ggdGhhdCBpbnN0ZWFkDQo+ID4gb2Yg
+ZG0gc2VsZWN0aW5nIERBWCB0aGF0IERBWCBzdXBwb3J0IGlzIG9ubHkgZW5hYmxlZCBpbiBkbSBp
+ZiBDT05GSUdfREFYIGlzDQo+ID4gZW5hYmxlZD8NCj4gDQo+IEknZCByYXRoZXIgZmxpcCB0aGlz
+IGFyb3VuZCBhbmQgYWRkIGEgQ09ORklHX0RNX0RBWCB0aGF0IGdhdGVzIHdoZXRoZXINCj4gRE0g
+ZW5hYmxlcyAvIGxpbmtzIHRvIHRoZSBEQVggY29yZS4gSSdsbCB0YWtlIGEgbG9vayBhdCBhIHBh
+dGNoLg0KDQpUaGFua3MhIFBsZWFzZSBhbHNvIGNvbnNpZGVyIHRvIG1vdmUgYWxsIERBWC1yZWxh
+dGVkIGRtIGNvZGUgaW50byBhIHNlcGFyYXRlDQpzb3VyY2UgZmlsZSBzdWNoIHRoYXQgdGhlIG51
+bWJlciBvZiAjaWZkZWYgQ09ORklHX0RNX0RBWCBzdGF0ZW1lbnRzIGNhbiBiZQ0Ka2VwdCB0byBh
+biBhYnNvbHV0ZSBtaW5pbXVtLg0KDQpCYXJ0Lg==
