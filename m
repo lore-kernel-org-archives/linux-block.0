@@ -1,45 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46157 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751472AbdGZX6q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jul 2017 19:58:46 -0400
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: hch@infradead.org, jack@suse.cz, linux-raid@vger.kernel.org,
-        dm-devel@redhat.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 9/9] dm-mpath: Add nowait support
-Date: Wed, 26 Jul 2017 18:58:06 -0500
-Message-Id: <20170726235806.12148-10-rgoldwyn@suse.de>
-In-Reply-To: <20170726235806.12148-1-rgoldwyn@suse.de>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <oleksandr@natalenko.name>
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: Mike Galbraith <efault@gmx.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org
+Subject: Re: blk-mq breaks suspend even with runtime PM patch
+Date: Sun, 30 Jul 2017 15:50:15 +0200
+Message-ID: <1662218.y9oETEnj5A@natalenko.name>
+In-Reply-To: <1501391551.17388.31.camel@gmx.de>
+References: <5912148.iRCpNe8Dyb@natalenko.name> <1501391551.17388.31.camel@gmx.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Hello Mike et al.
 
-If there are no queues, bail if REQ_NOWAIT is set instead
-of queueing up I/O.
+On ned=C4=9Ble 30. =C4=8Dervence 2017 7:12:31 CEST Mike Galbraith wrote:
+> FWIW, first thing I'd do is update that 4.12.0 to 4.12.4, and see if
+> stable fixed it.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- drivers/md/dm-mpath.c | 5 +++++
- 1 file changed, 5 insertions(+)
+My build already includes v4.12.4.
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 0e8ab5bb3575..c6572a9967dc 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -543,6 +543,11 @@ static int __multipath_map_bio(struct multipath *m, struct bio *bio, struct dm_m
- 
- 	if ((pgpath && queue_io) ||
- 	    (!pgpath && test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))) {
-+		/* Bail if nowait is set */
-+		if (bio->bi_opf & REQ_NOWAIT) {
-+			bio_wouldblock_error(bio);
-+			return DM_MAPIO_SUBMITTED;
-+		}
- 		/* Queue for the daemon to resubmit */
- 		spin_lock_irqsave(&m->lock, flags);
- 		bio_list_add(&m->queued_bios, bio);
--- 
-2.12.3
+> If not, I'd find these two commits irresistible.
+>=20
+> 5f042e7cbd9eb blk-mq: Include all present CPUs in the default queue mappi=
+ng
+> 4b855ad37194f blk-mq: Create hctx for each present CPU
+
+I've applied these 2 commits, and cannot reproduce the issue anymore. Looks=
+=20
+like a perfect hit, thanks!
+
+> 'course applying random upstream bits does come with some risk, trying
+> a kernel already containing them has less "entertainment" potential.=20
+
+Should you consider applying them to v4.12.x stable series? CC'ing Greg jus=
+t=20
+in case.
