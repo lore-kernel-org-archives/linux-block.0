@@ -1,127 +1,120 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33808 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:36492 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751445AbdGNIP1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jul 2017 04:15:27 -0400
+        id S1750949AbdGaQxl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jul 2017 12:53:41 -0400
 From: Ming Lei <ming.lei@redhat.com>
-To: Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org
-Cc: NeilBrown <neilb@suse.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 1/3] md: remove 'idx' from 'struct resync_pages'
-Date: Fri, 14 Jul 2017 16:14:42 +0800
-Message-Id: <20170714081444.32645-2-ming.lei@redhat.com>
-In-Reply-To: <20170714081444.32645-1-ming.lei@redhat.com>
-References: <20170714081444.32645-1-ming.lei@redhat.com>
+Subject: [PATCH 14/14] blk-mq-sched: improve IO scheduling on SCSI devcie
+Date: Tue,  1 Aug 2017 00:51:11 +0800
+Message-Id: <20170731165111.11536-16-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
+References: <20170731165111.11536-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-bio_add_page() won't fail for resync bio, and the page index for each
-bio is same, so remove it.
+SCSI device often has per-request_queue queue depth
+(.cmd_per_lun), which is applied among all hw queues
+actually, and this patchset calls this as shared
+queue depth.
 
-More importantly the 'idx' of 'struct resync_pages' is initialized in
-mempool allocator function, the current way is wrong since mempool is
-only responsible for allocation, we can't use that for initialization.
+One theory of scheduler is that we shouldn't dequeue
+request from sw/scheduler queue and dispatch it to
+driver when the low level queue is busy.
 
-Suggested-by: NeilBrown <neilb@suse.com>
-Reported-by: NeilBrown <neilb@suse.com>
-Fixes: f0250618361d(md: raid10: don't use bio's vec table to manage resync pages)
-Fixes: 98d30c5812c3(md: raid1: don't use bio's vec table to manage resync pages)
+For SCSI device, queue being busy depends on the
+per-request_queue limit, so we should hold all
+hw queues if the request queue is busy.
+
+This patch introduces per-request_queue dispatch
+list for this purpose, and only when all requests
+in this list are dispatched out successfully, we
+can restart to dequeue request from sw/scheduler
+queue and dispath it to lld.
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/md.h     | 1 -
- drivers/md/raid1.c  | 6 +++---
- drivers/md/raid10.c | 6 +++---
- 3 files changed, 6 insertions(+), 7 deletions(-)
+ block/blk-mq.c         |  8 +++++++-
+ block/blk-mq.h         | 14 +++++++++++---
+ include/linux/blkdev.h |  5 +++++
+ 3 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 991f0fe2dcc6..2c780aa8d07f 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -736,7 +736,6 @@ static inline void mddev_check_write_zeroes(struct mddev *mddev, struct bio *bio
- 
- /* for managing resync I/O pages */
- struct resync_pages {
--	unsigned	idx;	/* for get/put page from the pool */
- 	void		*raid_bio;
- 	struct page	*pages[RESYNC_PAGES];
- };
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 3febfc8391fb..0896c772a560 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -170,7 +170,6 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- 			resync_get_all_pages(rp);
- 		}
- 
--		rp->idx = 0;
- 		rp->raid_bio = r1_bio;
- 		bio->bi_private = rp;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9b8b3a740d18..6d02901d798e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2667,8 +2667,14 @@ int blk_mq_update_sched_queue_depth(struct request_queue *q)
+ 	 * this queue depth limit
+ 	 */
+ 	if (q->queue_depth) {
+-		queue_for_each_hw_ctx(q, hctx, i)
++		queue_for_each_hw_ctx(q, hctx, i) {
+ 			hctx->flags |= BLK_MQ_F_SHARED_DEPTH;
++			hctx->dispatch_lock = &q->__mq_dispatch_lock;
++			hctx->dispatch_list = &q->__mq_dispatch_list;
++
++			spin_lock_init(hctx->dispatch_lock);
++			INIT_LIST_HEAD(hctx->dispatch_list);
++		}
  	}
-@@ -2619,6 +2618,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 	int good_sectors = RESYNC_SECTORS;
- 	int min_bad = 0; /* number of sectors that are bad in all devices */
- 	int idx = sector_to_idx(sector_nr);
-+	int page_idx = 0;
  
- 	if (!conf->r1buf_pool)
- 		if (init_resync(conf))
-@@ -2846,7 +2846,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			bio = r1_bio->bios[i];
- 			rp = get_resync_pages(bio);
- 			if (bio->bi_end_io) {
--				page = resync_fetch_page(rp, rp->idx++);
-+				page = resync_fetch_page(rp, page_idx);
+ 	if (!q->elevator)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index a8788058da56..4853d422836f 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -138,19 +138,27 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ static inline bool blk_mq_hctx_is_busy(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx)
+ {
+-	return test_bit(BLK_MQ_S_BUSY, &hctx->state);
++	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
++		return test_bit(BLK_MQ_S_BUSY, &hctx->state);
++	return q->mq_dispatch_busy;
+ }
  
- 				/*
- 				 * won't fail because the vec table is big
-@@ -2858,7 +2858,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
- 		sync_blocks -= (len>>9);
--	} while (get_resync_pages(r1_bio->bios[disk]->bi_private)->idx < RESYNC_PAGES);
-+	} while (++page_idx < RESYNC_PAGES);
+ static inline void blk_mq_hctx_set_busy(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx)
+ {
+-	set_bit(BLK_MQ_S_BUSY, &hctx->state);
++	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
++		set_bit(BLK_MQ_S_BUSY, &hctx->state);
++	else
++		q->mq_dispatch_busy = 1;
+ }
  
- 	r1_bio->sectors = nr_sectors;
+ static inline void blk_mq_hctx_clear_busy(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx)
+ {
+-	clear_bit(BLK_MQ_S_BUSY, &hctx->state);
++	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
++		clear_bit(BLK_MQ_S_BUSY, &hctx->state);
++	else
++		q->mq_dispatch_busy = 0;
+ }
  
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 5026e7ad51d3..fa8bcf04e791 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -221,7 +221,6 @@ static void * r10buf_pool_alloc(gfp_t gfp_flags, void *data)
- 			resync_get_all_pages(rp);
- 		}
+ static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 25f6a0cb27d3..bc0e607710f2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -395,6 +395,11 @@ struct request_queue {
  
--		rp->idx = 0;
- 		rp->raid_bio = r10_bio;
- 		bio->bi_private = rp;
- 		if (rbio) {
-@@ -2853,6 +2852,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 	sector_t sectors_skipped = 0;
- 	int chunks_skipped = 0;
- 	sector_t chunk_mask = conf->geo.chunk_mask;
-+	int page_idx = 0;
+ 	atomic_t		shared_hctx_restart;
  
- 	if (!conf->r10buf_pool)
- 		if (init_resync(conf))
-@@ -3355,7 +3355,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			break;
- 		for (bio= biolist ; bio ; bio=bio->bi_next) {
- 			struct resync_pages *rp = get_resync_pages(bio);
--			page = resync_fetch_page(rp, rp->idx++);
-+			page = resync_fetch_page(rp, page_idx);
- 			/*
- 			 * won't fail because the vec table is big enough
- 			 * to hold all these pages
-@@ -3364,7 +3364,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		}
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
--	} while (get_resync_pages(biolist)->idx < RESYNC_PAGES);
-+	} while (++page_idx < RESYNC_PAGES);
- 	r10_bio->sectors = nr_sectors;
++	/* blk-mq dispatch list and lock for shared queue depth case */
++	struct list_head	__mq_dispatch_list;
++	spinlock_t		__mq_dispatch_lock;
++	unsigned int		mq_dispatch_busy;
++
+ 	struct blk_queue_stats	*stats;
+ 	struct rq_wb		*rq_wb;
  
- 	while (biolist) {
 -- 
 2.9.4
