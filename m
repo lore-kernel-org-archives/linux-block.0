@@ -1,29 +1,164 @@
-Return-Path: <shli@kernel.org>
-Date: Tue, 25 Jul 2017 15:24:08 -0700
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, hch@infradead.org
-Subject: [BUG] nvme driver crash
-Message-ID: <20170725222408.fq2fncwtid3fhvqh@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:53610 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751438AbdGaQxX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jul 2017 12:53:23 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 12/14] blk-mq: introduce pointers to dispatch lock & list
+Date: Tue,  1 Aug 2017 00:51:09 +0800
+Message-Id: <20170731165111.11536-14-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
+References: <20170731165111.11536-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Disable CONIFG_SMP, kernel crashes at boot time, here is the log.
+Prepare to support per-request-queue dispatch list,
+so introduce dispatch lock and list for avoiding to
+do runtime check.
 
-[    9.593590] nvme 0000:00:03.0: can't allocate MSI-X affinity masks for 1 vectors
-[    9.595189] ==================================================================
-[    9.595834] BUG: KASAN: null-ptr-deref in blk_mq_init_queue+0x1c/0x70
-[    9.596010] Read of size 4 at addr 0000000000000020 by task kworker/u2:0/5
-[    9.596010]
-[    9.596010] CPU: 0 PID: 5 Comm: kworker/u2:0 Not tainted 4.13.0-rc1+ #1
-[    9.596010] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.9.1-5.el7_3.3 04/01/2014
-[    9.596010] Workqueue: nvme-wq nvme_scan_work
-[    9.596010] Call Trace:
-[    9.596010]  dump_stack+0x19/0x24
-[    9.596010]  kasan_report+0xe8/0x350
-[    9.596010]  __asan_load4+0x78/0x80
-[    9.596010]  blk_mq_init_queue+0x1c/0x70
-[    9.596010]  nvme_validate_ns+0x17c/0x620
-[    9.596010]  ? nvme_revalidate_disk+0xf0/0xf0
-[    9.596010]  ? nvme_submit_sync_cmd+0x30/0x30
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-debugfs.c | 10 +++++-----
+ block/blk-mq.c         |  7 +++++--
+ block/blk-mq.h         | 26 +++++++++++++-------------
+ include/linux/blk-mq.h |  3 +++
+ 4 files changed, 26 insertions(+), 20 deletions(-)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index c4f70b453c76..4f8cddb8505f 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -370,23 +370,23 @@ static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
+ {
+ 	struct blk_mq_hw_ctx *hctx = m->private;
+ 
+-	spin_lock(&hctx->lock);
+-	return seq_list_start(&hctx->dispatch, *pos);
++	spin_lock(hctx->dispatch_lock);
++	return seq_list_start(hctx->dispatch_list, *pos);
+ }
+ 
+ static void *hctx_dispatch_next(struct seq_file *m, void *v, loff_t *pos)
+ {
+ 	struct blk_mq_hw_ctx *hctx = m->private;
+ 
+-	return seq_list_next(v, &hctx->dispatch, pos);
++	return seq_list_next(v, hctx->dispatch_list, pos);
+ }
+ 
+ static void hctx_dispatch_stop(struct seq_file *m, void *v)
+-	__releases(&hctx->lock)
++	__releases(hctx->dispatch_lock)
+ {
+ 	struct blk_mq_hw_ctx *hctx = m->private;
+ 
+-	spin_unlock(&hctx->lock);
++	spin_unlock(hctx->dispatch_lock);
+ }
+ 
+ static const struct seq_operations hctx_dispatch_seq_ops = {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 785145f60c1d..9b8b3a740d18 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1925,8 +1925,11 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+ static void blk_mq_init_dispatch(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx)
+ {
+-	spin_lock_init(&hctx->lock);
+-	INIT_LIST_HEAD(&hctx->dispatch);
++	hctx->dispatch_lock = &hctx->lock;
++	hctx->dispatch_list = &hctx->dispatch;
++
++	spin_lock_init(hctx->dispatch_lock);
++	INIT_LIST_HEAD(hctx->dispatch_list);
+ }
+ 
+ static int blk_mq_init_hctx(struct request_queue *q,
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 2ed355881996..d9795cbba1bb 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -152,38 +152,38 @@ static inline void blk_mq_hctx_clear_busy(struct blk_mq_hw_ctx *hctx)
+ 
+ static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
+ {
+-	return !list_empty_careful(&hctx->dispatch);
++	return !list_empty_careful(hctx->dispatch_list);
+ }
+ 
+ static inline void blk_mq_add_rq_to_dispatch(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq)
+ {
+-	spin_lock(&hctx->lock);
+-	list_add(&rq->queuelist, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
++	spin_lock(hctx->dispatch_lock);
++	list_add(&rq->queuelist, hctx->dispatch_list);
++	spin_unlock(hctx->dispatch_lock);
+ }
+ 
+ static inline void blk_mq_add_list_to_dispatch(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *list)
+ {
+-	spin_lock(&hctx->lock);
+-	list_splice_init(list, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
++	spin_lock(hctx->dispatch_lock);
++	list_splice_init(list, hctx->dispatch_list);
++	spin_unlock(hctx->dispatch_lock);
+ }
+ 
+ static inline void blk_mq_add_list_to_dispatch_tail(struct blk_mq_hw_ctx *hctx,
+ 						    struct list_head *list)
+ {
+-	spin_lock(&hctx->lock);
+-	list_splice_tail_init(list, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
++	spin_lock(hctx->dispatch_lock);
++	list_splice_tail_init(list, hctx->dispatch_list);
++	spin_unlock(hctx->dispatch_lock);
+ }
+ 
+ static inline void blk_mq_take_list_from_dispatch(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *list)
+ {
+-	spin_lock(&hctx->lock);
+-	list_splice_init(&hctx->dispatch, list);
++	spin_lock(hctx->dispatch_lock);
++	list_splice_init(hctx->dispatch_list, list);
+ 
+ 	/*
+ 	 * BUSY won't be cleared until all requests
+@@ -191,7 +191,7 @@ static inline void blk_mq_take_list_from_dispatch(struct blk_mq_hw_ctx *hctx,
+ 	 */
+ 	if (!list_empty(list))
+ 		blk_mq_hctx_set_busy(hctx);
+-	spin_unlock(&hctx->lock);
++	spin_unlock(hctx->dispatch_lock);
+ }
+ 
+ #endif
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 14f2ad3af31f..016f16c48f72 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -22,6 +22,9 @@ struct blk_mq_hw_ctx {
+ 
+ 	unsigned long		flags;		/* BLK_MQ_F_* flags */
+ 
++	spinlock_t		*dispatch_lock;
++	struct list_head	*dispatch_list;
++
+ 	void			*sched_data;
+ 	struct request_queue	*queue;
+ 	struct blk_flush_queue	*fq;
+-- 
+2.9.4
