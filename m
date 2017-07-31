@@ -1,47 +1,76 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: josef@toxicpanda.com
-To: axboe@kernel.dk,
-	nbd-general@lists.sourceforge.net,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH 2/3] nbd: take tx_lock before disconnecting
-Date: Fri, 21 Jul 2017 10:48:14 -0400
-Message-Id: <1500648495-13337-2-git-send-email-jbacik@fb.com>
-In-Reply-To: <1500648495-13337-1-git-send-email-jbacik@fb.com>
-References: <1500648495-13337-1-git-send-email-jbacik@fb.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 10/14] blk-mq-sched: introduce helpers for query, change busy state
+Date: Tue,  1 Aug 2017 00:51:07 +0800
+Message-Id: <20170731165111.11536-12-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
+References: <20170731165111.11536-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
-
-We need to take the tx_lock so we don't interleave our disconnect
-request between real data going down the wire.
-
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/nbd.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ block/blk-mq-sched.c |  6 +++---
+ block/blk-mq.h       | 15 +++++++++++++++
+ 2 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index f91e7ac..6aefe9f 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -978,11 +978,15 @@ static void send_disconnects(struct nbd_device *nbd)
- 	int i, ret;
- 
- 	for (i = 0; i < config->num_connections; i++) {
-+		struct nbd_sock *nsock = config->socks[i];
-+
- 		iov_iter_kvec(&from, WRITE | ITER_KVEC, &iov, 1, sizeof(request));
-+		mutex_lock(&nsock->tx_lock);
- 		ret = sock_xmit(nbd, i, 1, &from, 0, NULL);
- 		if (ret <= 0)
- 			dev_err(disk_to_dev(nbd->disk),
- 				"Send disconnect failed %d\n", ret);
-+		mutex_unlock(&nsock->tx_lock);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 07ff53187617..112270961af0 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -140,7 +140,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 			 * BUSY won't be cleared until all requests
+ 			 * in hctx->dispatch are dispatched successfully
+ 			 */
+-			set_bit(BLK_MQ_S_BUSY, &hctx->state);
++			blk_mq_hctx_set_busy(hctx);
+ 		}
+ 		spin_unlock(&hctx->lock);
  	}
+@@ -158,11 +158,11 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+ 		can_go = blk_mq_dispatch_rq_list(q, &rq_list);
+ 		if (can_go)
+-			clear_bit(BLK_MQ_S_BUSY, &hctx->state);
++			blk_mq_hctx_clear_busy(hctx);
+ 	}
+ 
+ 	/* can't go until ->dispatch is flushed */
+-	if (!can_go || test_bit(BLK_MQ_S_BUSY, &hctx->state))
++	if (!can_go || blk_mq_hctx_is_busy(hctx))
+ 		return;
+ 
+ 	/*
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 44d3aaa03d7c..d9f875093613 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -135,4 +135,19 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ 	return hctx->nr_ctx && hctx->tags;
  }
  
++static inline bool blk_mq_hctx_is_busy(struct blk_mq_hw_ctx *hctx)
++{
++	return test_bit(BLK_MQ_S_BUSY, &hctx->state);
++}
++
++static inline void blk_mq_hctx_set_busy(struct blk_mq_hw_ctx *hctx)
++{
++	set_bit(BLK_MQ_S_BUSY, &hctx->state);
++}
++
++static inline void blk_mq_hctx_clear_busy(struct blk_mq_hw_ctx *hctx)
++{
++	clear_bit(BLK_MQ_S_BUSY, &hctx->state);
++}
++
+ #endif
 -- 
-2.7.4
+2.9.4
