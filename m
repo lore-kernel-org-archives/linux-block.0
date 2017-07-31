@@ -1,49 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44762 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756360AbdGKSVs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jul 2017 14:21:48 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Ming Lei <ming.lei@redhat.com>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Subject: [PATCH 2/6] SCSI: use blk_mq_run_hw_queues() in scsi_kick_queue()
-Date: Wed, 12 Jul 2017 02:20:59 +0800
-Message-Id: <20170711182103.11461-3-ming.lei@redhat.com>
-In-Reply-To: <20170711182103.11461-1-ming.lei@redhat.com>
-References: <20170711182103.11461-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <20170705190016.GA7008@lst.de>
+References: <20170518092936.9277-1-linus.walleij@linaro.org>
+ <20170518092936.9277-4-linus.walleij@linaro.org> <20170518093614.GB9250@lst.de>
+ <20170705190016.GA7008@lst.de>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 31 Jul 2017 15:44:07 +0200
+Message-ID: <CACRpkdb-ZpznKqKD8L=YqLrOM4ZH0qc2Lb5=UFxH3DLCV_tTqw@mail.gmail.com>
+Subject: Re: [PATCH 4/6 v2] mmc: block: move single ioctl() commands to block requests
+To: Christoph Hellwig <hch@lst.de>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-Now SCSI won't stop queue, and not necessary to use
-blk_mq_start_hw_queues(), so switch to blk_mq_run_hw_queues()
-instead.
+On Wed, Jul 5, 2017 at 9:00 PM, Christoph Hellwig <hch@lst.de> wrote:
+> On Thu, May 18, 2017 at 11:36:14AM +0200, Christoph Hellwig wrote:
+>> On Thu, May 18, 2017 at 11:29:34AM +0200, Linus Walleij wrote:
+>> > We are storing the ioctl() in/out argument as a pointer in
+>> > the per-request struct mmc_blk_request container.
+>>
+>> Btw, for the main ioctl data (not the little reponse field) it might
+>> make sense to use blk_rq_map_user, which will do a get_user_pages
+>> on the user data if the alignment fits, and otherwise handle the
+>> kernel bounce buffering for you.  This should simplify the code
+>> quite a bit more, and in the case where you can access the user
+>> memory directly provide a nice little performance boost.
+>
+> Did you get a chance to look into this?
 
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sorry, just back from vacation.
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index f6097b89d5d3..91d890356b78 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -333,7 +333,7 @@ void scsi_device_unbusy(struct scsi_device *sdev)
- static void scsi_kick_queue(struct request_queue *q)
- {
- 	if (q->mq_ops)
--		blk_mq_start_hw_queues(q);
-+		blk_mq_run_hw_queues(q, false);
- 	else
- 		blk_run_queue(q);
- }
--- 
-2.9.4
+I am rebasing my MMC patch stack, so I will take this opportunity to
+also look at this during the week. I just need to make sure I find the
+right userspace calls to exercise it.
+
+Yours,
+Linus Walleij
