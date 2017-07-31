@@ -1,147 +1,177 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:36331 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752041AbdG0Ot6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jul 2017 10:49:58 -0400
-Received: by mail-wm0-f52.google.com with SMTP id t201so101621938wmt.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Jul 2017 07:49:57 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-Subject: [PATCH] lightnvm: pblk: advance bio according to lba index
-Date: Thu, 27 Jul 2017 16:49:50 +0200
-Message-Id: <1501166990-24366-2-git-send-email-javier@javigon.com>
-In-Reply-To: <1501166990-24366-1-git-send-email-javier@javigon.com>
-References: <1501166990-24366-1-git-send-email-javier@javigon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:60794 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751102AbdGaQxQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jul 2017 12:53:16 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 11/14] blk-mq: introduce helpers for operating ->dispatch list
+Date: Tue,  1 Aug 2017 00:51:08 +0800
+Message-Id: <20170731165111.11536-13-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
+References: <20170731165111.11536-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When a lba either hits the cache or corresponds to an empty entry in the
-L2P table, we need to advance the bio according to the position in which
-the lba is located. Otherwise, we will copy data in the wrong page, thus
-causing data corruption for the application.
-
-In case of a cache hit, we assumed that bio->bi_iter.bi_idx would
-contain the correct index, but this is no necessarily true. Instead, use
-the local bio advance counter and iterator. This guarantees that lbas
-hitting the cache are copied into the right bv_page.
-
-In case of an empty L2P entry, we omitted to advance the bio. In the
-cases when the same I/O also contains a cache hit, data corresponding
-to this lba will be copied to the wrong bv_page. Fix this by advancing
-the bio as we do in the case of a cache hit.
-
-Fixes: a4bd217b4326 lightnvm: physical block device (pblk) target
-
-Signed-off-by: Javier González <javier@javigon.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-rb.c   |  4 ++--
- drivers/lightnvm/pblk-read.c | 19 ++++++++++++++-----
- drivers/lightnvm/pblk.h      |  2 +-
- 3 files changed, 17 insertions(+), 8 deletions(-)
+ block/blk-mq-sched.c | 19 +++----------------
+ block/blk-mq.c       | 18 +++++++++++-------
+ block/blk-mq.h       | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 58 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 5ecc154f6831..2e88c3d6d9a1 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -657,7 +657,7 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
-  * be directed to disk.
-  */
- int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
--			struct ppa_addr ppa, int bio_iter)
-+			struct ppa_addr ppa, int bio_iter, int advanced_bio)
- {
- 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
- 	struct pblk_rb_entry *entry;
-@@ -694,7 +694,7 @@ int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
- 	 * filled with data from the cache). If part of the data resides on the
- 	 * media, we will read later on
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 112270961af0..8ff74efe4172 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -131,19 +131,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * If we have previous entries on our dispatch list, grab them first for
+ 	 * more fair dispatch.
  	 */
--	if (unlikely(!bio->bi_iter.bi_idx))
-+	if (unlikely(!advanced_bio))
- 		bio_advance(bio, bio_iter * PBLK_EXPOSED_PAGE_SIZE);
+-	if (!list_empty_careful(&hctx->dispatch)) {
+-		spin_lock(&hctx->lock);
+-		if (!list_empty(&hctx->dispatch)) {
+-			list_splice_init(&hctx->dispatch, &rq_list);
+-
+-			/*
+-			 * BUSY won't be cleared until all requests
+-			 * in hctx->dispatch are dispatched successfully
+-			 */
+-			blk_mq_hctx_set_busy(hctx);
+-		}
+-		spin_unlock(&hctx->lock);
+-	}
++	if (blk_mq_has_dispatch_rqs(hctx))
++		blk_mq_take_list_from_dispatch(hctx, &rq_list);
  
- 	data = bio_data(bio);
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 4e5c48f3de62..b1c554e374f7 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -26,7 +26,7 @@
-  */
- static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
- 				sector_t lba, struct ppa_addr ppa,
--				int bio_iter)
-+				int bio_iter, int advanced_bio)
- {
- #ifdef CONFIG_NVM_DEBUG
- 	/* Callers must ensure that the ppa points to a cache address */
-@@ -34,7 +34,8 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
- 	BUG_ON(!pblk_addr_in_cache(ppa));
- #endif
- 
--	return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa, bio_iter);
-+	return pblk_rb_copy_to_bio(&pblk->rwb, bio, lba, ppa,
-+						bio_iter, advanced_bio);
+ 	/*
+ 	 * Only ask the scheduler for requests, if we didn't have residual
+@@ -296,9 +285,7 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+ 	 * If we already have a real request tag, send directly to
+ 	 * the dispatch list.
+ 	 */
+-	spin_lock(&hctx->lock);
+-	list_add(&rq->queuelist, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
++	blk_mq_add_rq_to_dispatch(hctx, rq);
+ 	return true;
  }
  
- static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
-@@ -62,14 +63,21 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- retry:
- 		if (pblk_ppa_empty(p)) {
- 			WARN_ON(test_and_set_bit(i, read_bitmap));
--			continue;
-+
-+			if (unlikely(!advanced_bio)) {
-+				bio_advance(bio, (i) * PBLK_EXPOSED_PAGE_SIZE);
-+				advanced_bio = 1;
-+			}
-+
-+			goto next;
- 		}
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index db635ef06a72..785145f60c1d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -63,7 +63,7 @@ static int blk_mq_poll_stats_bkt(const struct request *rq)
+ bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx)
+ {
+ 	return sbitmap_any_bit_set(&hctx->ctx_map) ||
+-			!list_empty_careful(&hctx->dispatch) ||
++			blk_mq_has_dispatch_rqs(hctx) ||
+ 			blk_mq_sched_has_work(hctx);
+ }
  
- 		/* Try to read from write buffer. The address is later checked
- 		 * on the write buffer to prevent retrieving overwritten data.
- 		 */
- 		if (pblk_addr_in_cache(p)) {
--			if (!pblk_read_from_cache(pblk, bio, lba, p, i)) {
-+			if (!pblk_read_from_cache(pblk, bio, lba, p, i,
-+								advanced_bio)) {
- 				pblk_lookup_l2p_seq(pblk, &p, lba, 1);
- 				goto retry;
- 			}
-@@ -83,6 +91,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 			rqd->ppa_list[j++] = p;
- 		}
+@@ -1097,9 +1097,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
+ 		rq = list_first_entry(list, struct request, queuelist);
+ 		blk_mq_put_driver_tag(rq);
  
-+next:
- 		if (advanced_bio)
- 			bio_advance(bio, PBLK_EXPOSED_PAGE_SIZE);
+-		spin_lock(&hctx->lock);
+-		list_splice_init(list, &hctx->dispatch);
+-		spin_unlock(&hctx->lock);
++		blk_mq_add_list_to_dispatch(hctx, list);
+ 
+ 		/*
+ 		 * If SCHED_RESTART was set by the caller of this function and
+@@ -1874,9 +1872,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+ 	if (list_empty(&tmp))
+ 		return 0;
+ 
+-	spin_lock(&hctx->lock);
+-	list_splice_tail_init(&tmp, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
++	blk_mq_add_list_to_dispatch_tail(hctx, &tmp);
+ 
+ 	blk_mq_run_hw_queue(hctx, true);
+ 	return 0;
+@@ -1926,6 +1922,13 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
  	}
-@@ -282,7 +291,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 	 * write buffer to prevent retrieving overwritten data.
- 	 */
- 	if (pblk_addr_in_cache(ppa)) {
--		if (!pblk_read_from_cache(pblk, bio, lba, ppa, 0)) {
-+		if (!pblk_read_from_cache(pblk, bio, lba, ppa, 0, 1)) {
- 			pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
- 			goto retry;
- 		}
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 0c5692cc2f60..0e77d069f080 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -670,7 +670,7 @@ unsigned int pblk_rb_read_to_bio_list(struct pblk_rb *rb, struct bio *bio,
- 				      struct list_head *list,
- 				      unsigned int max);
- int pblk_rb_copy_to_bio(struct pblk_rb *rb, struct bio *bio, sector_t lba,
--			struct ppa_addr ppa, int bio_iter);
-+			struct ppa_addr ppa, int bio_iter, int advanced_bio);
- unsigned int pblk_rb_read_commit(struct pblk_rb *rb, unsigned int entries);
+ }
  
- unsigned int pblk_rb_sync_init(struct pblk_rb *rb, unsigned long *flags);
++static void blk_mq_init_dispatch(struct request_queue *q,
++		struct blk_mq_hw_ctx *hctx)
++{
++	spin_lock_init(&hctx->lock);
++	INIT_LIST_HEAD(&hctx->dispatch);
++}
++
+ static int blk_mq_init_hctx(struct request_queue *q,
+ 		struct blk_mq_tag_set *set,
+ 		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
+@@ -1939,6 +1942,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	INIT_DELAYED_WORK(&hctx->run_work, blk_mq_run_work_fn);
+ 	spin_lock_init(&hctx->lock);
+ 	INIT_LIST_HEAD(&hctx->dispatch);
++	blk_mq_init_dispatch(q, hctx);
+ 	hctx->queue = q;
+ 	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index d9f875093613..2ed355881996 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -150,4 +150,48 @@ static inline void blk_mq_hctx_clear_busy(struct blk_mq_hw_ctx *hctx)
+ 	clear_bit(BLK_MQ_S_BUSY, &hctx->state);
+ }
+ 
++static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
++{
++	return !list_empty_careful(&hctx->dispatch);
++}
++
++static inline void blk_mq_add_rq_to_dispatch(struct blk_mq_hw_ctx *hctx,
++		struct request *rq)
++{
++	spin_lock(&hctx->lock);
++	list_add(&rq->queuelist, &hctx->dispatch);
++	spin_unlock(&hctx->lock);
++}
++
++static inline void blk_mq_add_list_to_dispatch(struct blk_mq_hw_ctx *hctx,
++		struct list_head *list)
++{
++	spin_lock(&hctx->lock);
++	list_splice_init(list, &hctx->dispatch);
++	spin_unlock(&hctx->lock);
++}
++
++static inline void blk_mq_add_list_to_dispatch_tail(struct blk_mq_hw_ctx *hctx,
++						    struct list_head *list)
++{
++	spin_lock(&hctx->lock);
++	list_splice_tail_init(list, &hctx->dispatch);
++	spin_unlock(&hctx->lock);
++}
++
++static inline void blk_mq_take_list_from_dispatch(struct blk_mq_hw_ctx *hctx,
++		struct list_head *list)
++{
++	spin_lock(&hctx->lock);
++	list_splice_init(&hctx->dispatch, list);
++
++	/*
++	 * BUSY won't be cleared until all requests
++	 * in hctx->dispatch are dispatched successfully
++	 */
++	if (!list_empty(list))
++		blk_mq_hctx_set_busy(hctx);
++	spin_unlock(&hctx->lock);
++}
++
+ #endif
 -- 
-2.7.4
+2.9.4
