@@ -1,113 +1,117 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp2.provo.novell.com ([137.65.250.81]:49246 "EHLO
-        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753118AbdGSBro (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Tue, 18 Jul 2017 21:47:44 -0400
-From: Davidlohr Bueso <dave@stgolabs.net>
-To: akpm@linux-foundation.org
-Cc: mingo@kernel.org, peterz@infradead.org, jack@suse.cz,
-        torvalds@linux-foundation.org, kirill.shutemov@linux.intel.com,
-        hch@infradead.org, ldufour@linux.vnet.ibm.com, mhocko@suse.com,
-        mgorman@techsingularity.net, dave@stgolabs.net,
-        linux-kernel@vger.kernel.org, axboe@fb.com,
-        linux-block@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>
-Subject: [PATCH 17/17] block/cfq: cache rightmost rb_node
-Date: Tue, 18 Jul 2017 18:46:03 -0700
-Message-Id: <20170719014603.19029-18-dave@stgolabs.net>
-In-Reply-To: <20170719014603.19029-1-dave@stgolabs.net>
-References: <20170719014603.19029-1-dave@stgolabs.net>
+Received: from mx1.redhat.com ([209.132.183.28]:47404 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750953AbdGaQwt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jul 2017 12:52:49 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 08/14] blk-mq: introduce BLK_MQ_F_SHARED_DEPTH
+Date: Tue,  1 Aug 2017 00:51:05 +0800
+Message-Id: <20170731165111.11536-10-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
+References: <20170731165111.11536-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-For the same reasons we already cache the leftmost pointer,
-apply the same optimization for rb_last() calls. Users must
-explicitly do this as rb_root_cached only deals with the
-smallest node.
+SCSI devices often provides one per-requeest_queue depth via
+q->queue_depth(.cmd_per_lun), which is a global limit on all
+hw queues. After the pending I/O submitted to one rquest queue
+reaches this limit, BLK_STS_RESOURCE will be returned to all
+dispatch path. That means when one hw queue is stuck, actually
+all hctxs are stuck too.
 
-Cc: axboe@fb.com
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
+This flag is introduced for improving blk-mq IO scheduling
+on this kind of device.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
-This is part of the rbtree internal caching series:
-https://lwn.net/Articles/726809/
+ block/blk-mq-debugfs.c |  1 +
+ block/blk-mq-sched.c   |  2 +-
+ block/blk-mq.c         | 25 ++++++++++++++++++++++---
+ include/linux/blk-mq.h |  1 +
+ 4 files changed, 25 insertions(+), 4 deletions(-)
 
- block/cfq-iosched.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 92c31683a2bb..57ec45fd4590 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -94,11 +94,13 @@ struct cfq_ttime {
-  */
- struct cfq_rb_root {
- 	struct rb_root_cached rb;
-+	struct rb_node *rb_rightmost;
- 	unsigned count;
- 	u64 min_vdisktime;
- 	struct cfq_ttime ttime;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 9ebc2945f991..c4f70b453c76 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -209,6 +209,7 @@ static const char *const hctx_flag_name[] = {
+ 	HCTX_FLAG_NAME(SG_MERGE),
+ 	HCTX_FLAG_NAME(BLOCKING),
+ 	HCTX_FLAG_NAME(NO_SCHED),
++	HCTX_FLAG_NAME(SHARED_DEPTH),
  };
- #define CFQ_RB_ROOT	(struct cfq_rb_root) { .rb = RB_ROOT_CACHED, \
-+			.rb_rightmost = NULL,			     \
- 			.ttime = {.last_end_request = ktime_get_ns(),},}
+ #undef HCTX_FLAG_NAME
  
- /*
-@@ -1183,6 +1185,9 @@ static struct cfq_group *cfq_rb_first_group(struct cfq_rb_root *root)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 3eb524ccb7aa..cc0687a4d0ab 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -144,7 +144,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	if (!can_go || test_bit(BLK_MQ_S_BUSY, &hctx->state))
+ 		return;
  
- static void cfq_rb_erase(struct rb_node *n, struct cfq_rb_root *root)
+-	if (!has_sched_dispatch && !q->queue_depth) {
++	if (!has_sched_dispatch && !(hctx->flags & BLK_MQ_F_SHARED_DEPTH)) {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+ 		return;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7df68d31bc23..db635ef06a72 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2647,12 +2647,31 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ int blk_mq_update_sched_queue_depth(struct request_queue *q)
  {
-+	if (root->rb_rightmost == n)
-+		root->rb_rightmost = rb_next(n);
+ 	unsigned nr;
++	struct blk_mq_hw_ctx *hctx;
++	unsigned int i;
++	int ret = 0;
+ 
+-	if (!q->mq_ops || !q->elevator)
+-		return 0;
++	if (!q->mq_ops)
++		return ret;
 +
- 	rb_erase_cached(n, &root->rb);
- 	RB_CLEAR_NODE(n);
- 
-@@ -1239,20 +1244,24 @@ __cfq_group_service_tree_add(struct cfq_rb_root *st, struct cfq_group *cfqg)
- 	struct rb_node *parent = NULL;
- 	struct cfq_group *__cfqg;
- 	s64 key = cfqg_key(st, cfqg);
--	bool leftmost = true;
-+	bool leftmost = true, rightmost = true;
- 
- 	while (*node != NULL) {
- 		parent = *node;
- 		__cfqg = rb_entry_cfqg(parent);
- 
--		if (key < cfqg_key(st, __cfqg))
-+		if (key < cfqg_key(st, __cfqg)) {
- 			node = &parent->rb_left;
--		else {
-+			rightmost = false;
-+		} else {
- 			node = &parent->rb_right;
- 			leftmost = false;
- 		}
- 	}
- 
-+	if (rightmost)
-+		st->rb_rightmost = &cfqg->rb_node;
++	blk_mq_freeze_queue(q);
++	/*
++	 * if there is q->queue_depth, all hw queues share
++	 * this queue depth limit
++	 */
++	if (q->queue_depth) {
++		queue_for_each_hw_ctx(q, hctx, i)
++			hctx->flags |= BLK_MQ_F_SHARED_DEPTH;
++	}
 +
- 	rb_link_node(&cfqg->rb_node, parent, node);
- 	rb_insert_color_cached(&cfqg->rb_node, &st->rb, leftmost);
++	if (!q->elevator)
++		goto exit;
+ 
+ 	nr = blk_mq_sched_queue_depth(q);
+-	return __blk_mq_update_nr_requests(q, true, nr);
++	ret = __blk_mq_update_nr_requests(q, true, nr);
++ exit:
++	blk_mq_unfreeze_queue(q);
++	return ret;
  }
-@@ -1355,7 +1364,7 @@ cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
- 	 * so that groups get lesser vtime based on their weights, so that
- 	 * if group does not loose all if it was not continuously backlogged.
- 	 */
--	n = rb_last(&st->rb.rb_root);
-+	n = st->rb_rightmost;
- 	if (n) {
- 		__cfqg = rb_entry_cfqg(n);
- 		cfqg->vdisktime = __cfqg->vdisktime +
-@@ -2204,7 +2213,7 @@ static void cfq_service_tree_add(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 	st = st_for(cfqq->cfqg, cfqq_class(cfqq), cfqq_type(cfqq));
- 	if (cfq_class_idle(cfqq)) {
- 		rb_key = CFQ_IDLE_DELAY;
--		parent = rb_last(&st->rb.rb_root);
-+		parent = st->rb_rightmost;
- 		if (parent && parent != &cfqq->rb_node) {
- 			__cfqq = rb_entry(parent, struct cfq_queue, rb_node);
- 			rb_key += __cfqq->rb_key;
+ 
+ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 6d44b242b495..14f2ad3af31f 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -164,6 +164,7 @@ enum {
+ 	BLK_MQ_F_SG_MERGE	= 1 << 2,
+ 	BLK_MQ_F_BLOCKING	= 1 << 5,
+ 	BLK_MQ_F_NO_SCHED	= 1 << 6,
++	BLK_MQ_F_SHARED_DEPTH	= 1 << 7,
+ 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+ 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
+ 
 -- 
-2.12.0
+2.9.4
