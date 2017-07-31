@@ -1,32 +1,61 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 02/14] blk-mq: rename flush_busy_ctx_data as ctx_iter_data
-Date: Mon, 31 Jul 2017 23:03:04 +0000
-Message-ID: <1501542184.2466.24.camel@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:33634 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751108AbdGaQvx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jul 2017 12:51:53 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 02/14] blk-mq: rename flush_busy_ctx_data as ctx_iter_data
+Date: Tue,  1 Aug 2017 00:50:59 +0800
+Message-Id: <20170731165111.11536-4-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
 References: <20170731165111.11536-1-ming.lei@redhat.com>
-         <20170731165111.11536-4-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-4-ming.lei@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, 2017-08-01 at 00:50 +0800, Ming Lei wrote:
-> The following patch need to reuse this data structure,
-> so rename as one generic name.
+The following patch need to reuse this data structure,
+so rename as one generic name.
 
-Hello Ming,
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Please drop this patch (see also my comments on the next patch).
-
-Thanks,
-
-Bart.=
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b70a4ad78b63..94818f78c099 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -808,14 +808,14 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	blk_queue_exit(q);
+ }
+ 
+-struct flush_busy_ctx_data {
++struct ctx_iter_data {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct list_head *list;
+ };
+ 
+ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+ {
+-	struct flush_busy_ctx_data *flush_data = data;
++	struct ctx_iter_data *flush_data = data;
+ 	struct blk_mq_hw_ctx *hctx = flush_data->hctx;
+ 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
+ 
+@@ -832,7 +832,7 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+  */
+ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+ {
+-	struct flush_busy_ctx_data data = {
++	struct ctx_iter_data data = {
+ 		.hctx = hctx,
+ 		.list = list,
+ 	};
+-- 
+2.9.4
