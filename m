@@ -1,115 +1,97 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:31641 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751102AbdGaXnJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 19:43:09 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 05/14] blk-mq-sched: don't dequeue request until all in
- ->dispatch are flushed
-Date: Mon, 31 Jul 2017 23:42:21 +0000
-Message-ID: <1501544540.2466.31.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:51928 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750929AbdGaQwV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jul 2017 12:52:21 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 05/14] blk-mq-sched: don't dequeue request until all in ->dispatch are flushed
+Date: Tue,  1 Aug 2017 00:51:02 +0800
+Message-Id: <20170731165111.11536-7-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
 References: <20170731165111.11536-1-ming.lei@redhat.com>
-         <20170731165111.11536-7-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-7-ming.lei@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 2017-08-01 at 00:51 +0800, Ming Lei wrote:
-> During dispatch, we moved all requests from hctx->dispatch to
-> one temporary list, then dispatch them one by one from this list.
-> Unfortunately duirng this period, run queue from other contexts
-> may think the queue is idle and start to dequeue from sw/scheduler
-> queue and try to dispatch because ->dispatch is empty.
->=20
-> This way will hurt sequential I/O performance because requests are
-> dequeued when queue is busy.
->=20
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq-sched.c   | 24 ++++++++++++++++++------
->  include/linux/blk-mq.h |  1 +
->  2 files changed, 19 insertions(+), 6 deletions(-)
->=20
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 3510c01cb17b..eb638063673f 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -112,8 +112,15 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw=
-_ctx *hctx)
->  	 */
->  	if (!list_empty_careful(&hctx->dispatch)) {
->  		spin_lock(&hctx->lock);
-> -		if (!list_empty(&hctx->dispatch))
-> +		if (!list_empty(&hctx->dispatch)) {
->  			list_splice_init(&hctx->dispatch, &rq_list);
-> +
-> +			/*
-> +			 * BUSY won't be cleared until all requests
-> +			 * in hctx->dispatch are dispatched successfully
-> +			 */
-> +			set_bit(BLK_MQ_S_BUSY, &hctx->state);
-> +		}
->  		spin_unlock(&hctx->lock);
->  	}
-> =20
-> @@ -129,15 +136,20 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_h=
-w_ctx *hctx)
->  	if (!list_empty(&rq_list)) {
->  		blk_mq_sched_mark_restart_hctx(hctx);
->  		can_go =3D blk_mq_dispatch_rq_list(q, &rq_list);
-> -	} else if (!has_sched_dispatch && !q->queue_depth) {
-> -		blk_mq_flush_busy_ctxs(hctx, &rq_list);
-> -		blk_mq_dispatch_rq_list(q, &rq_list);
-> -		can_go =3D false;
-> +		if (can_go)
-> +			clear_bit(BLK_MQ_S_BUSY, &hctx->state);
->  	}
-> =20
-> -	if (!can_go)
-> +	/* can't go until ->dispatch is flushed */
-> +	if (!can_go || test_bit(BLK_MQ_S_BUSY, &hctx->state))
->  		return;
-> =20
-> +	if (!has_sched_dispatch && !q->queue_depth) {
-> +		blk_mq_flush_busy_ctxs(hctx, &rq_list);
-> +		blk_mq_dispatch_rq_list(q, &rq_list);
-> +		return;
-> +	}
+During dispatch, we moved all requests from hctx->dispatch to
+one temporary list, then dispatch them one by one from this list.
+Unfortunately duirng this period, run queue from other contexts
+may think the queue is idle and start to dequeue from sw/scheduler
+queue and try to dispatch because ->dispatch is empty.
 
-Hello Ming,
+This way will hurt sequential I/O performance because requests are
+dequeued when queue is busy.
 
-Since setting, clearing and testing of BLK_MQ_S_BUSY can happen concurrentl=
-y
-and since clearing and testing happens without any locks held I'm afraid th=
-is
-patch introduces the following race conditions:
-* Clearing of BLK_MQ_S_BUSY immediately after this bit has been set, result=
-ing
-  in this bit not being set although there are requests on the dispatch lis=
-t.
-* Checking BLK_MQ_S_BUSY after requests have been added to the dispatch lis=
-t
-  but before that bit is set, resulting in test_bit(BLK_MQ_S_BUSY, &hctx->s=
-tate)
-  reporting that the BLK_MQ_S_BUSY has not been set although there are requ=
-ests
-  on the dispatch list.
-* Checking BLK_MQ_S_BUSY after requests have been removed from the dispatch=
- list
-  but before that bit is cleared, resulting in test_bit(BLK_MQ_S_BUSY, &hct=
-x->state)
-  reporting that the BLK_MQ_S_BUSY
-has been set although there are no requests
-  on the dispatch list.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c   | 24 ++++++++++++++++++------
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 19 insertions(+), 6 deletions(-)
 
-Bart.=
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 3510c01cb17b..eb638063673f 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -112,8 +112,15 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty_careful(&hctx->dispatch)) {
+ 		spin_lock(&hctx->lock);
+-		if (!list_empty(&hctx->dispatch))
++		if (!list_empty(&hctx->dispatch)) {
+ 			list_splice_init(&hctx->dispatch, &rq_list);
++
++			/*
++			 * BUSY won't be cleared until all requests
++			 * in hctx->dispatch are dispatched successfully
++			 */
++			set_bit(BLK_MQ_S_BUSY, &hctx->state);
++		}
+ 		spin_unlock(&hctx->lock);
+ 	}
+ 
+@@ -129,15 +136,20 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+ 		can_go = blk_mq_dispatch_rq_list(q, &rq_list);
+-	} else if (!has_sched_dispatch && !q->queue_depth) {
+-		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+-		blk_mq_dispatch_rq_list(q, &rq_list);
+-		can_go = false;
++		if (can_go)
++			clear_bit(BLK_MQ_S_BUSY, &hctx->state);
+ 	}
+ 
+-	if (!can_go)
++	/* can't go until ->dispatch is flushed */
++	if (!can_go || test_bit(BLK_MQ_S_BUSY, &hctx->state))
+ 		return;
+ 
++	if (!has_sched_dispatch && !q->queue_depth) {
++		blk_mq_flush_busy_ctxs(hctx, &rq_list);
++		blk_mq_dispatch_rq_list(q, &rq_list);
++		return;
++	}
++
+ 	/*
+ 	 * We want to dispatch from the scheduler if we had no work left
+ 	 * on the dispatch list, OR if we did have work but weren't able
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 14542308d25b..6d44b242b495 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -172,6 +172,7 @@ enum {
+ 	BLK_MQ_S_SCHED_RESTART	= 2,
+ 	BLK_MQ_S_TAG_WAITING	= 3,
+ 	BLK_MQ_S_START_ON_RUN	= 4,
++	BLK_MQ_S_BUSY		= 5,
+ 
+ 	BLK_MQ_MAX_DEPTH	= 10240,
+ 
+-- 
+2.9.4
