@@ -1,68 +1,84 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:59029 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935391AbdGTJCv (ORCPT
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:6956 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751329AbdGaXBM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jul 2017 05:02:51 -0400
-Date: Thu, 20 Jul 2017 11:02:42 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@fb.com>
-Cc: Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [GIT PULL] nvme updates for 4.13-rc
-Message-ID: <20170720090242.lektog4im7prs5on@infradead.org>
+        Mon, 31 Jul 2017 19:01:12 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Subject: Re: [PATCH 01/14] blk-mq-sched: fix scheduler bad performance
+Date: Mon, 31 Jul 2017 23:00:24 +0000
+Message-ID: <1501542023.2466.22.camel@wdc.com>
+References: <20170731165111.11536-1-ming.lei@redhat.com>
+         <20170731165111.11536-3-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+On Tue, 2017-08-01 at 00:50 +0800, Ming Lei wrote:
+> When hw queue is busy, we shouldn't take requests from
+> scheduler queue any more, otherwise IO merge will be
+> difficult to do.
+>=20
+> This patch fixes the awful IO performance on some
+> SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
+> is used by not taking requests if hw queue is busy.
+>=20
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-sched.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 4ab69435708c..47a25333a136 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ct=
+x *hctx)
+>  	struct request_queue *q =3D hctx->queue;
+>  	struct elevator_queue *e =3D q->elevator;
+>  	const bool has_sched_dispatch =3D e && e->type->ops.mq.dispatch_request=
+;
+> -	bool did_work =3D false;
+> +	bool can_go =3D true;
+>  	LIST_HEAD(rq_list);
+> =20
+>  	/* RCU or SRCU read lock is needed before checking quiesced flag */
+> @@ -125,7 +125,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_=
+ctx *hctx)
+>  	 */
+>  	if (!list_empty(&rq_list)) {
+>  		blk_mq_sched_mark_restart_hctx(hctx);
+> -		did_work =3D blk_mq_dispatch_rq_list(q, &rq_list);
+> +		can_go =3D blk_mq_dispatch_rq_list(q, &rq_list);
+>  	} else if (!has_sched_dispatch) {
+>  		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+>  		blk_mq_dispatch_rq_list(q, &rq_list);
+> @@ -136,7 +136,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_=
+ctx *hctx)
+>  	 * on the dispatch list, OR if we did have work but weren't able
+>  	 * to make progress.
+>  	 */
+> -	if (!did_work && has_sched_dispatch) {
+> +	if (can_go && has_sched_dispatch) {
+>  		do {
+>  			struct request *rq;
 
-below are a couple nvme fixes for 4.13 that I'd like to get out
-before -rc2.  We have a few more things on the list that still
-need review and should go into 4.13 as well.
+Hello Ming,
 
-The following changes since commit cb8c65ccff7f77d0285f1b126c72d37b2572c865:
+Please chose a better name for the new variable, e.g. "do_sched_dispatch".=
+=20
+Otherwise this patch looks fine to me. Hence:
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/sparc (2017-07-17 15:08:29 -0700)
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
 
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.13
-
-for you to fetch changes up to ed4151f9422706fc0afe09f55f30dd4bbc2ebb49:
-
-  nvmet: don't report 0-bytes in serial number (2017-07-18 19:33:44 +0200)
-
-----------------------------------------------------------------
-Christoph Hellwig (2):
-      nvme: fix byte swapping in the streams code
-      nvmet-fc: fix byte swapping in nvmet_fc_ls_create_association
-
-Christophe JAILLET (1):
-      nvme-pci: Fix an error handling path in 'nvme_probe()'
-
-David Wayne Fugate (1):
-      nvme-pci: add another device ID with stripe quirk
-
-Johannes Thumshirn (3):
-      nvmet: prefix version configfs file with attr
-      nvmet: Move serial number from controller to subsystem
-      nvmet: preserve controller serial number between reboots
-
-Keith Busch (1):
-      nvme-pci: Remove nvme_setup_prps BUG_ON
-
-Martin Wilck (1):
-      nvmet: don't report 0-bytes in serial number
-
- drivers/nvme/host/core.c        |  2 +-
- drivers/nvme/host/pci.c         | 43 ++++++++++++++++++++++++++++++-----------
- drivers/nvme/target/admin-cmd.c | 16 +++++++++++++--
- drivers/nvme/target/configfs.c  | 30 ++++++++++++++++++++++++----
- drivers/nvme/target/core.c      |  5 ++---
- drivers/nvme/target/fc.c        |  8 ++++----
- drivers/nvme/target/nvmet.h     |  2 +-
- include/linux/nvme.h            | 14 +++++++-------
- 8 files changed, 87 insertions(+), 33 deletions(-)
+Bart.=
