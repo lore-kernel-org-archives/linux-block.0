@@ -1,80 +1,115 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38379 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751680AbdGaXKZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jul 2017 19:10:25 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 03/14] blk-mq: introduce blk_mq_dispatch_rq_from_ctxs()
-Date: Mon, 31 Jul 2017 23:09:38 +0000
-Message-ID: <1501542577.2466.26.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:39850 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750947AbdGaQwA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jul 2017 12:52:00 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 03/14] blk-mq: introduce blk_mq_dispatch_rq_from_ctxs()
+Date: Tue,  1 Aug 2017 00:51:00 +0800
+Message-Id: <20170731165111.11536-5-ming.lei@redhat.com>
+In-Reply-To: <20170731165111.11536-1-ming.lei@redhat.com>
 References: <20170731165111.11536-1-ming.lei@redhat.com>
-         <20170731165111.11536-5-ming.lei@redhat.com>
-In-Reply-To: <20170731165111.11536-5-ming.lei@redhat.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 2017-08-01 at 00:51 +0800, Ming Lei wrote:
-> @@ -810,7 +810,11 @@ static void blk_mq_timeout_work(struct work_struct *=
-work)
-> =20
->  struct ctx_iter_data {
->  	struct blk_mq_hw_ctx *hctx;
-> -	struct list_head *list;
-> +
-> +	union {
-> +		struct list_head *list;
-> +		struct request *rq;
-> +	};
->  };
+This function is introduced for picking up request
+from sw queue so that we can dispatch in scheduler's way.
 
-Hello Ming,
+More importantly, for some SCSI devices, driver
+tags are host wide, and the number is quite big,
+but each lun has very limited queue depth. This
+function is introduced for avoiding to take too
+many requests from sw queue when queue is busy,
+and only try to dispatch request when queue
+isn't busy.
 
-Please introduce a new data structure for dispatch_rq_from_ctx() /
-blk_mq_dispatch_rq_from_ctxs() instead of introducing a union in struct
-ctx_iter_data. That will avoid that .list can be used in a context where
-a struct request * pointer has been stored in the structure and vice versa.
-=20
->  static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void =
-*data)
-> @@ -826,6 +830,26 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsig=
-ned int bitnr, void *data)
->  	return true;
->  }
-> =20
-> +static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,=
- void *data)
-> +{
-> +	struct ctx_iter_data *dispatch_data =3D data;
-> +	struct blk_mq_hw_ctx *hctx =3D dispatch_data->hctx;
-> +	struct blk_mq_ctx *ctx =3D hctx->ctxs[bitnr];
-> +	bool empty =3D true;
-> +
-> +	spin_lock(&ctx->lock);
-> +	if (unlikely(!list_empty(&ctx->rq_list))) {
-> +		dispatch_data->rq =3D list_entry_rq(ctx->rq_list.next);
-> +		list_del_init(&dispatch_data->rq->queuelist);
-> +		empty =3D list_empty(&ctx->rq_list);
-> +	}
-> +	spin_unlock(&ctx->lock);
-> +	if (empty)
-> +		sbitmap_clear_bit(sb, bitnr);
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 38 +++++++++++++++++++++++++++++++++++++-
+ block/blk-mq.h |  1 +
+ 2 files changed, 38 insertions(+), 1 deletion(-)
 
-This sbitmap_clear_bit() occurs without holding blk_mq_ctx.lock. Sorry but
-I don't think this is safe. Please either remove this sbitmap_clear_bit() c=
-all
-or make sure that it happens with blk_mq_ctx.lock held.
-
-Thanks,
-
-Bart.=
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 94818f78c099..86b8fdcb8434 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -810,7 +810,11 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 
+ struct ctx_iter_data {
+ 	struct blk_mq_hw_ctx *hctx;
+-	struct list_head *list;
++
++	union {
++		struct list_head *list;
++		struct request *rq;
++	};
+ };
+ 
+ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+@@ -826,6 +830,26 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+ 	return true;
+ }
+ 
++static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
++{
++	struct ctx_iter_data *dispatch_data = data;
++	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
++	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
++	bool empty = true;
++
++	spin_lock(&ctx->lock);
++	if (unlikely(!list_empty(&ctx->rq_list))) {
++		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
++		list_del_init(&dispatch_data->rq->queuelist);
++		empty = list_empty(&ctx->rq_list);
++	}
++	spin_unlock(&ctx->lock);
++	if (empty)
++		sbitmap_clear_bit(sb, bitnr);
++
++	return !dispatch_data->rq;
++}
++
+ /*
+  * Process software queues that have been marked busy, splicing them
+  * to the for-dispatch
+@@ -841,6 +865,18 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
+ 
++struct request *blk_mq_dispatch_rq_from_ctxs(struct blk_mq_hw_ctx *hctx)
++{
++	struct ctx_iter_data data = {
++		.hctx = hctx,
++		.rq   = NULL,
++	};
++
++	sbitmap_for_each_set(&hctx->ctx_map, dispatch_rq_from_ctx, &data);
++
++	return data.rq;
++}
++
+ static inline unsigned int queued_to_index(unsigned int queued)
+ {
+ 	if (!queued)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 60b01c0309bc..0c398f29dc4b 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -35,6 +35,7 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+ bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
+ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
+ 				bool wait);
++struct request *blk_mq_dispatch_rq_from_ctxs(struct blk_mq_hw_ctx *hctx);
+ 
+ /*
+  * Internal helpers for allocating/freeing the request map
+-- 
+2.9.4
