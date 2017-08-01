@@ -1,53 +1,49 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 2 Aug 2017 08:03:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <minlei@redhat.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: don't leak preempt counter/q_usage_counter when
  allocating rq failed
-Message-ID: <20170802000324.GD23633@ming.t460p>
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <minlei@redhat.com>
 References: <20170714084136.24850-1-ming.lei@redhat.com>
- <224ed7ac-d864-c989-5a79-418fa3068825@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <224ed7ac-d864-c989-5a79-418fa3068825@kernel.dk>
+Date: Tue, 1 Aug 2017 09:18:23 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <224ed7ac-d864-c989-5a79-418fa3068825@kernel.dk>
+In-Reply-To: <20170714084136.24850-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Aug 01, 2017 at 09:18:23AM -0600, Jens Axboe wrote:
-> On 07/14/2017 02:41 AM, Ming Lei wrote:
-> > From: Ming Lei <minlei@redhat.com>
-> > 
-> > When blk_mq_get_request() failed, preempt counter isn't
-> > released, and blk_mq_make_request() doesn't release the counter
-> > too.
-> > 
-> > This patch fixes the issue, and makes sure that preempt counter
-> > is only held if rq is allocated successfully. The same policy is
-> > applied on .q_usage_counter too.
+On 07/14/2017 02:41 AM, Ming Lei wrote:
+> From: Ming Lei <minlei@redhat.com>
 > 
-> Can you replace the 'get_cpu' bool with just a ctx, and change
-> the logic to put it if set? I think that would be cleaner to read,
-> generally I hate bool 'do_something' variables that are set. It's
-> much cleaner to have:
+> When blk_mq_get_request() failed, preempt counter isn't
+> released, and blk_mq_make_request() doesn't release the counter
+> too.
 > 
-> if (likely(!data->ctx))
-> 	data->ctx = local_ctx = blk_mq_get_ctx(q);
-> 
-> and have the put case be
-> 
-> if (local_ctx)
-> 	blk_mq_put_ctx(local_ctx);
-> 
-> Either that, or at least just have blk_mq_get_request() do:
-> 
-> drop_ctx = data->ctx == NULL;
-> 
-> instead. The 'get_cpu' naming is confusing, we're worried about dropping
-> the sw queue here, the fact that it's related to get/put_cpu() need not
-> bubble up here.
+> This patch fixes the issue, and makes sure that preempt counter
+> is only held if rq is allocated successfully. The same policy is
+> applied on .q_usage_counter too.
 
-Good point, V2 is sent out with this change. Thanks your suggestion!
+Can you replace the 'get_cpu' bool with just a ctx, and change
+the logic to put it if set? I think that would be cleaner to read,
+generally I hate bool 'do_something' variables that are set. It's
+much cleaner to have:
+
+if (likely(!data->ctx))
+	data->ctx = local_ctx = blk_mq_get_ctx(q);
+
+and have the put case be
+
+if (local_ctx)
+	blk_mq_put_ctx(local_ctx);
+
+Either that, or at least just have blk_mq_get_request() do:
+
+drop_ctx = data->ctx == NULL;
+
+instead. The 'get_cpu' naming is confusing, we're worried about dropping
+the sw queue here, the fact that it's related to get/put_cpu() need not
+bubble up here.
 
 -- 
-Ming
+Jens Axboe
