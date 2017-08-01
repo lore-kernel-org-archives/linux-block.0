@@ -1,110 +1,43 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 49/49] block: bio: pass segments to bio if bio_add_page() is bypassed
-Date: Tue,  8 Aug 2017 16:45:48 +0800
-Message-Id: <20170808084548.18963-50-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: blk_mq_sched_insert_request: inconsistent {SOFTIRQ-ON-W} ->
+ {IN-SOFTIRQ-W} usage
+To: Michael Ellerman <mpe@ellerman.id.au>,
+ Bart Van Assche <Bart.VanAssche@wdc.com>, Brian J King <bjking1@us.ibm.com>
+Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <87a83qfosu.fsf@concordia.ellerman.id.au>
+ <073ed79c-11ce-e86c-a905-91fd28675d47@kernel.dk>
+ <1501166846.2516.1.camel@wdc.com>
+ <5b85a365-faa1-3987-9b6b-270399c30686@kernel.dk>
+ <87lgn9dqx3.fsf@concordia.ellerman.id.au>
+ <92379297-9667-ae52-b05c-6c8a0ce4751c@kernel.dk>
+ <877eynu69j.fsf@concordia.ellerman.id.au>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <c4fb0293-d0cb-ebff-cddf-a4e301826fbc@kernel.dk>
+Date: Tue, 1 Aug 2017 09:26:09 -0600
+MIME-Version: 1.0
+In-Reply-To: <877eynu69j.fsf@concordia.ellerman.id.au>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Under some situations, such as block direct I/O, we can't use
-bio_add_page() for merging pages into multipage bvec, so
-a new function is implemented for converting page array into one
-segment array, then these cases can benefit from multipage bvec
-too.
+On 08/01/2017 12:55 AM, Michael Ellerman wrote:
+> Jens Axboe <axboe@kernel.dk> writes:
+> ...
+>>
+>> Can you try the below fix? Should be more palatable than the previous
+>> one. Brian, maybe you can take a look at the IRQ issue mentioned above?
+> 
+> Given the patch from Brian fixed the lockdep warning, do you still want
+> me to try and test this one?
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 48 insertions(+), 6 deletions(-)
+Nope, we don't have to do that. I'd much rather just add a WARN_ON()
+or similar to make sure we catch buggy users earlier. scsi_run_queue()
+needs a
 
-diff --git a/block/bio.c b/block/bio.c
-index a5f7fd4ef818..aead0e3e36a9 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -881,6 +881,41 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
- 
-+static unsigned convert_to_segs(struct bio* bio, struct page **pages,
-+				unsigned char *page_cnt,
-+				unsigned nr_pages)
-+{
-+
-+	unsigned idx;
-+	unsigned nr_seg = 0;
-+	struct request_queue *q = NULL;
-+
-+	if (bio->bi_bdev)
-+		q = bdev_get_queue(bio->bi_bdev);
-+
-+	if (!q || !blk_queue_cluster(q)) {
-+		memset(page_cnt, 0, nr_pages);
-+		return nr_pages;
-+	}
-+
-+	page_cnt[nr_seg] = 0;
-+	for (idx = 1; idx < nr_pages; idx++) {
-+		struct page *pg_s = pages[nr_seg];
-+		struct page *pg = pages[idx];
-+
-+		if (page_to_pfn(pg_s) + page_cnt[nr_seg] + 1 ==
-+		    page_to_pfn(pg)) {
-+			page_cnt[nr_seg]++;
-+		} else {
-+			page_cnt[++nr_seg] = 0;
-+			if (nr_seg < idx)
-+				pages[nr_seg] = pg;
-+		}
-+	}
-+
-+	return nr_seg + 1;
-+}
-+
- /**
-  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-  * @bio: bio to add pages to
-@@ -900,6 +935,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	struct page **pages = (struct page **)bv;
- 	size_t offset, diff;
- 	ssize_t size;
-+	unsigned short nr_segs;
-+	unsigned char page_cnt[nr_pages];	/* at most 256 pages */
- 
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
-@@ -915,13 +952,18 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	 * need to be reflected here as well.
- 	 */
- 	bio->bi_iter.bi_size += size;
--	bio->bi_vcnt += nr_pages;
--
- 	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
-+
-+	/* convert into segments */
-+	nr_segs = convert_to_segs(bio, pages, page_cnt, nr_pages);
-+	bio->bi_vcnt += nr_segs;
-+
-+	while (nr_segs--) {
-+		unsigned cnt = (unsigned)page_cnt[nr_segs] + 1;
-+
-+		bv[nr_segs].bv_page = pages[nr_segs];
-+		bv[nr_segs].bv_len = PAGE_SIZE * cnt;
-+		bv[nr_segs].bv_offset = 0;
- 	}
- 
- 	bv[0].bv_offset += offset;
+WARN_ON(in_interrupt());
+
+but it might be better to put that in __blk_mq_run_hw_queue().
+
 -- 
-2.9.4
+Jens Axboe
