@@ -1,19 +1,24 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:12309 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750763AbdHAH20 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Aug 2017 03:28:26 -0400
+Date: Tue, 1 Aug 2017 15:28:13 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <minlei@redhat.com>
 Subject: Re: [PATCH] blk-mq: don't leak preempt counter/q_usage_counter when
  allocating rq failed
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <minlei@redhat.com>
+Message-ID: <20170801072812.GA17297@ming.t460p>
 References: <20170714084136.24850-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <224ed7ac-d864-c989-5a79-418fa3068825@kernel.dk>
-Date: Tue, 1 Aug 2017 09:18:23 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170714084136.24850-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 07/14/2017 02:41 AM, Ming Lei wrote:
+On Fri, Jul 14, 2017 at 04:41:36PM +0800, Ming Lei wrote:
 > From: Ming Lei <minlei@redhat.com>
 > 
 > When blk_mq_get_request() failed, preempt counter isn't
@@ -24,26 +29,10 @@ On 07/14/2017 02:41 AM, Ming Lei wrote:
 > is only held if rq is allocated successfully. The same policy is
 > applied on .q_usage_counter too.
 
-Can you replace the 'get_cpu' bool with just a ctx, and change
-the logic to put it if set? I think that would be cleaner to read,
-generally I hate bool 'do_something' variables that are set. It's
-much cleaner to have:
+Hi Jens,
 
-if (likely(!data->ctx))
-	data->ctx = local_ctx = blk_mq_get_ctx(q);
+Given NOWAIT has been merged, could you consider this patch for
+v4.13?
 
-and have the put case be
-
-if (local_ctx)
-	blk_mq_put_ctx(local_ctx);
-
-Either that, or at least just have blk_mq_get_request() do:
-
-drop_ctx = data->ctx == NULL;
-
-instead. The 'get_cpu' naming is confusing, we're worried about dropping
-the sw queue here, the fact that it's related to get/put_cpu() need not
-bubble up here.
-
--- 
-Jens Axboe
+Thanks,
+Ming
