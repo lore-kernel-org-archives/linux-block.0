@@ -1,292 +1,117 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:18420 "EHLO
-        BJEXCAS008.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751475AbdHXRLt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2017 13:11:49 -0400
-Date: Fri, 25 Aug 2017 01:11:33 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] block, scheduler: convert xxx_var_store to void
-Message-ID: <20170824171127.GA25877@localhost.didichuxing.com>
+Received: from mail-oi0-f45.google.com ([209.85.218.45]:36575 "EHLO
+        mail-oi0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751546AbdHAVcj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Aug 2017 17:32:39 -0400
+Received: by mail-oi0-f45.google.com with SMTP id g131so27642830oic.3
+        for <linux-block@vger.kernel.org>; Tue, 01 Aug 2017 14:32:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Thomas Caputi <tcaputi@datto.com>
+Date: Tue, 1 Aug 2017 17:32:38 -0400
+Message-ID: <CAF2oFs9BB0qZ80GaYDk58HX0Lim7yMYRb_4G5WivTZi-9M-W=A@mail.gmail.com>
+Subject: Drives Seizing Under Write Loads
+To: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The last parameter "count" never be used in xxx_var_store,
-convert these functions to void.
+Hello linux-block,
+My company is currently experiencing some problems with one particular
+brand of HDD. The symptoms are that the drive will experience
+extremely long IO wait times, extremely low IOPS, and near 100% disk
+utilization (see the following output from iostat). As a side effect
+of the high utilization, the drives actually heat up enough to trigger
+some temperature warnings on our systems. Sometimes the drives'
+performance returns to normal after a little while, but most of the
+time it requires a reboot.
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- block/bfq-iosched.c      | 33 +++++++++++++++++----------------
- block/cfq-iosched.c      | 13 ++++++-------
- block/deadline-iosched.c |  9 ++++-----
- block/mq-deadline.c      |  9 ++++-----
- 4 files changed, 31 insertions(+), 33 deletions(-)
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           1.77    0.00    0.76   45.71    0.00   51.77
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 436b6ca..7a4085d 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4787,16 +4787,13 @@ static ssize_t bfq_var_show(unsigned int var, char *page)
- 	return sprintf(page, "%u\n", var);
- }
- 
--static ssize_t bfq_var_store(unsigned long *var, const char *page,
--			     size_t count)
-+static void bfq_var_store(unsigned long *var, const char *page)
- {
- 	unsigned long new_val;
- 	int ret = kstrtoul(page, 10, &new_val);
- 
- 	if (ret == 0)
- 		*var = new_val;
--
--	return count;
- }
- 
- #define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
-@@ -4838,7 +4835,7 @@ __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
- {									\
- 	struct bfq_data *bfqd = e->elevator_data;			\
- 	unsigned long uninitialized_var(__data);			\
--	int ret = bfq_var_store(&__data, (page), count);		\
-+	bfq_var_store(&__data, (page));					\
- 	if (__data < (MIN))						\
- 		__data = (MIN);						\
- 	else if (__data > (MAX))					\
-@@ -4849,7 +4846,7 @@ __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
- 		*(__PTR) = (u64)__data * NSEC_PER_MSEC;			\
- 	else								\
- 		*(__PTR) = __data;					\
--	return ret;							\
-+	return count;							\
- }
- STORE_FUNCTION(bfq_fifo_expire_sync_store, &bfqd->bfq_fifo_expire[1], 1,
- 		INT_MAX, 2);
-@@ -4866,13 +4863,13 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)\
- {									\
- 	struct bfq_data *bfqd = e->elevator_data;			\
- 	unsigned long uninitialized_var(__data);			\
--	int ret = bfq_var_store(&__data, (page), count);		\
-+	bfq_var_store(&__data, (page));					\
- 	if (__data < (MIN))						\
- 		__data = (MIN);						\
- 	else if (__data > (MAX))					\
- 		__data = (MAX);						\
- 	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
--	return ret;							\
-+	return count;							\
- }
- USEC_STORE_FUNCTION(bfq_slice_idle_us_store, &bfqd->bfq_slice_idle, 0,
- 		    UINT_MAX);
-@@ -4883,7 +4880,8 @@ static ssize_t bfq_max_budget_store(struct elevator_queue *e,
- {
- 	struct bfq_data *bfqd = e->elevator_data;
- 	unsigned long uninitialized_var(__data);
--	int ret = bfq_var_store(&__data, (page), count);
-+
-+	bfq_var_store(&__data, (page));
- 
- 	if (__data == 0)
- 		bfqd->bfq_max_budget = bfq_calc_max_budget(bfqd);
-@@ -4895,7 +4893,7 @@ static ssize_t bfq_max_budget_store(struct elevator_queue *e,
- 
- 	bfqd->bfq_user_max_budget = __data;
- 
--	return ret;
-+	return count;
- }
- 
- /*
-@@ -4907,7 +4905,8 @@ static ssize_t bfq_timeout_sync_store(struct elevator_queue *e,
- {
- 	struct bfq_data *bfqd = e->elevator_data;
- 	unsigned long uninitialized_var(__data);
--	int ret = bfq_var_store(&__data, (page), count);
-+
-+	bfq_var_store(&__data, (page));
- 
- 	if (__data < 1)
- 		__data = 1;
-@@ -4918,7 +4917,7 @@ static ssize_t bfq_timeout_sync_store(struct elevator_queue *e,
- 	if (bfqd->bfq_user_max_budget == 0)
- 		bfqd->bfq_max_budget = bfq_calc_max_budget(bfqd);
- 
--	return ret;
-+	return count;
- }
- 
- static ssize_t bfq_strict_guarantees_store(struct elevator_queue *e,
-@@ -4926,7 +4925,8 @@ static ssize_t bfq_strict_guarantees_store(struct elevator_queue *e,
- {
- 	struct bfq_data *bfqd = e->elevator_data;
- 	unsigned long uninitialized_var(__data);
--	int ret = bfq_var_store(&__data, (page), count);
-+
-+	bfq_var_store(&__data, (page));
- 
- 	if (__data > 1)
- 		__data = 1;
-@@ -4936,7 +4936,7 @@ static ssize_t bfq_strict_guarantees_store(struct elevator_queue *e,
- 
- 	bfqd->strict_guarantees = __data;
- 
--	return ret;
-+	return count;
- }
- 
- static ssize_t bfq_low_latency_store(struct elevator_queue *e,
-@@ -4944,7 +4944,8 @@ static ssize_t bfq_low_latency_store(struct elevator_queue *e,
- {
- 	struct bfq_data *bfqd = e->elevator_data;
- 	unsigned long uninitialized_var(__data);
--	int ret = bfq_var_store(&__data, (page), count);
-+
-+	bfq_var_store(&__data, (page));
- 
- 	if (__data > 1)
- 		__data = 1;
-@@ -4952,7 +4953,7 @@ static ssize_t bfq_low_latency_store(struct elevator_queue *e,
- 		bfq_end_wr(bfqd);
- 	bfqd->low_latency = __data;
- 
--	return ret;
-+	return count;
- }
- 
- #define BFQ_ATTR(name) \
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 3d5c289..4ae22fb 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -4714,13 +4714,12 @@ cfq_var_show(unsigned int var, char *page)
- 	return sprintf(page, "%u\n", var);
- }
- 
--static ssize_t
--cfq_var_store(unsigned int *var, const char *page, size_t count)
-+static void
-+cfq_var_store(unsigned int *var, const char *page)
- {
- 	char *p = (char *) page;
- 
- 	*var = simple_strtoul(p, &p, 10);
--	return count;
- }
- 
- #define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
-@@ -4766,7 +4765,7 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- {									\
- 	struct cfq_data *cfqd = e->elevator_data;			\
- 	unsigned int __data;						\
--	int ret = cfq_var_store(&__data, (page), count);		\
-+	cfq_var_store(&__data, (page));					\
- 	if (__data < (MIN))						\
- 		__data = (MIN);						\
- 	else if (__data > (MAX))					\
-@@ -4775,7 +4774,7 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- 		*(__PTR) = (u64)__data * NSEC_PER_MSEC;			\
- 	else								\
- 		*(__PTR) = __data;					\
--	return ret;							\
-+	return count;							\
- }
- STORE_FUNCTION(cfq_quantum_store, &cfqd->cfq_quantum, 1, UINT_MAX, 0);
- STORE_FUNCTION(cfq_fifo_expire_sync_store, &cfqd->cfq_fifo_expire[1], 1,
-@@ -4800,13 +4799,13 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- {									\
- 	struct cfq_data *cfqd = e->elevator_data;			\
- 	unsigned int __data;						\
--	int ret = cfq_var_store(&__data, (page), count);		\
-+	cfq_var_store(&__data, (page));					\
- 	if (__data < (MIN))						\
- 		__data = (MIN);						\
- 	else if (__data > (MAX))					\
- 		__data = (MAX);						\
- 	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
--	return ret;							\
-+	return count;							\
- }
- USEC_STORE_FUNCTION(cfq_slice_idle_us_store, &cfqd->cfq_slice_idle, 0, UINT_MAX);
- USEC_STORE_FUNCTION(cfq_group_idle_us_store, &cfqd->cfq_group_idle, 0, UINT_MAX);
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index c68f6bb..b83f774 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -373,13 +373,12 @@ deadline_var_show(int var, char *page)
- 	return sprintf(page, "%d\n", var);
- }
- 
--static ssize_t
--deadline_var_store(int *var, const char *page, size_t count)
-+static void
-+deadline_var_store(int *var, const char *page)
- {
- 	char *p = (char *) page;
- 
- 	*var = simple_strtol(p, &p, 10);
--	return count;
- }
- 
- #define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
-@@ -403,7 +402,7 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- {									\
- 	struct deadline_data *dd = e->elevator_data;			\
- 	int __data;							\
--	int ret = deadline_var_store(&__data, (page), count);		\
-+	deadline_var_store(&__data, (page));				\
- 	if (__data < (MIN))						\
- 		__data = (MIN);						\
- 	else if (__data > (MAX))					\
-@@ -412,7 +411,7 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- 		*(__PTR) = msecs_to_jiffies(__data);			\
- 	else								\
- 		*(__PTR) = __data;					\
--	return ret;							\
-+	return count;							\
- }
- STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[READ], 0, INT_MAX, 1);
- STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[WRITE], 0, INT_MAX, 1);
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 1b964a3..c8dfddc 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -457,13 +457,12 @@ deadline_var_show(int var, char *page)
- 	return sprintf(page, "%d\n", var);
- }
- 
--static ssize_t
--deadline_var_store(int *var, const char *page, size_t count)
-+static void
-+deadline_var_store(int *var, const char *page)
- {
- 	char *p = (char *) page;
- 
- 	*var = simple_strtol(p, &p, 10);
--	return count;
- }
- 
- #define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
-@@ -487,7 +486,7 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- {									\
- 	struct deadline_data *dd = e->elevator_data;			\
- 	int __data;							\
--	int ret = deadline_var_store(&__data, (page), count);		\
-+	deadline_var_store(&__data, (page));				\
- 	if (__data < (MIN))						\
- 		__data = (MIN);						\
- 	else if (__data > (MAX))					\
-@@ -496,7 +495,7 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
- 		*(__PTR) = msecs_to_jiffies(__data);			\
- 	else								\
- 		*(__PTR) = __data;					\
--	return ret;							\
-+	return count;							\
- }
- STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[READ], 0, INT_MAX, 1);
- STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[WRITE], 0, INT_MAX, 1);
--- 
-2.9.4
+Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s
+avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+sda               0.00     0.00    4.00   76.00    76.00  1156.00
+30.80     3.79   94.00  924.00   50.32  12.50 100.00
+
+Our setup is essentially as follows:
+We are using Linux kernel version 4.4.0 on Ubuntu 16.04.
+The system has 16GB of RAM and is not using most of it.
+We have 2 failing configurations (one using a 1TB HDD, one using a 1TB
+SSHD with 8 GB of flash).
+The drive has a 40GB root partition running ext4.
+The rest of the drive is given to a second partition, which is used as
+a zpool for zfs (v0.6.5.6).
+
+We are able to trigger the problem by generating a heavy random write
+workload on ZFS for about 10 minutes. After a few minutes, the system
+dumped a few warning timeouts to dmesg. The most interesting of them
+was this one, which seems to indicate that the block device could not
+allocate a tag for an IO:
+
+[37805.995283] INFO: task umount:3546 blocked for more than 120 seconds.
+[37805.995284]       Tainted: P           OE   4.4.0-24-generic #43-Ubuntu
+[37805.995285] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[37805.995286] umount          D ffff88008c93b778     0  3546      1 0x00000000
+[37805.995289]  ffff88008c93b778 ffffffff81f35000 ffff880035810dc0
+ffff8801ba523700
+[37805.995291]  ffff88008c93c000 ffff88021ed96d00 7fffffffffffffff
+ffff88008c93b950
+[37805.995293]  ffffe8ffffd80080 ffff88008c93b790 ffffffff81821b15
+0000000000000000
+[37805.995295] Call Trace:
+[37805.995297]  [<ffffffff81821b15>] schedule+0x35/0x80
+[37805.995299]  [<ffffffff81824c35>] schedule_timeout+0x1b5/0x270
+[37805.995302]  [<ffffffff813bcd66>] ? blk_flush_plug_list+0xd6/0x240
+[37805.995305]  [<ffffffff810f585c>] ? ktime_get+0x3c/0xb0
+[37805.995307]  [<ffffffff81821044>] io_schedule_timeout+0xa4/0x110
+[37805.995309]  [<ffffffff813c8a2b>] bt_get+0x14b/0x1d0
+[37805.995312]  [<ffffffff810c3b80>] ? wake_atomic_t_function+0x60/0x60
+[37805.995314]  [<ffffffff813c8d95>] blk_mq_get_tag+0x45/0xe0
+[37805.995316]  [<ffffffff813c454b>] __blk_mq_alloc_request+0x1b/0x1f0
+[37805.995318]  [<ffffffff813c64a4>] blk_mq_map_request+0x1a4/0x210
+[37805.995320]  [<ffffffff813c7514>] blk_sq_make_request+0xa4/0x360
+[37805.995323]  [<ffffffff813bb3d2>] generic_make_request+0xf2/0x1d0
+[37805.995325]  [<ffffffff813bb526>] submit_bio+0x76/0x170
+[37805.995327]  [<ffffffff8124506f>] submit_bh_wbc+0x12f/0x160
+[37805.995329]  [<ffffffff81247045>]
+__block_write_full_page.constprop.38+0x115/0x3a0
+[37805.995331]  [<ffffffff81247630>] ? I_BDEV+0x20/0x20
+[37805.995333]  [<ffffffff81247630>] ? I_BDEV+0x20/0x20
+[37805.995336]  [<ffffffff81247415>] block_write_full_page+0x145/0x170
+[37805.995340]  [<ffffffff81248208>] blkdev_writepage+0x18/0x20
+[37805.995343]  [<ffffffff81198813>] __writepage+0x13/0x30
+[37805.995346]  [<ffffffff8119930e>] write_cache_pages+0x1ee/0x510
+[37805.995349]  [<ffffffff81198800>] ? wb_position_ratio+0x1f0/0x1f0
+[37805.995353]  [<ffffffff81199681>] generic_writepages+0x51/0x80
+[37805.995357]  [<ffffffff8119bafe>] do_writepages+0x1e/0x30
+[37805.995361]  [<ffffffff8118ec46>] __filemap_fdatawrite_range+0xc6/0x100
+[37805.995364]  [<ffffffff8118ed3c>] filemap_flush+0x1c/0x20
+[37805.995366]  [<ffffffff81249ae6>] __sync_blockdev+0x26/0x30
+[37805.995369]  [<ffffffff81240cae>] sync_filesystem+0x4e/0xa0
+[37805.995372]  [<ffffffff8120ee37>] generic_shutdown_super+0x27/0x100
+[37805.995374]  [<ffffffff8120f20c>] kill_block_super+0x2c/0xa0
+[37805.995378]  [<ffffffff8131c4a7>] fuse_kill_sb_blk+0x47/0x50
+[37805.995380]  [<ffffffff8120f363>] deactivate_locked_super+0x43/0x70
+[37805.995382]  [<ffffffff8120f83c>] deactivate_super+0x5c/0x60
+[37805.995384]  [<ffffffff8122d0ef>] cleanup_mnt+0x3f/0x90
+[37805.995386]  [<ffffffff8122d182>] __cleanup_mnt+0x12/0x20
+[37805.995389]  [<ffffffff8109eac3>] task_work_run+0x73/0x90
+[37805.995392]  [<ffffffff81003242>] exit_to_usermode_loop+0xc2/0xd0
+[37805.995394]  [<ffffffff81003c6e>] syscall_return_slowpath+0x4e/0x60
+[37805.995397]  [<ffffffff81825d50>] int_ret_from_sys_call+0x25/0x8f
+
+I would like to try to narrow this issue down a bit further. It seems
+fairly likely that this might be an issue with the drive's firmware
+(especially since we have only seen this problem with one brand of
+drives). We have tried different versions of ZFS and the most recent
+release (v0.7.0) seems to stop the problem from happening for several
+more hours, but it hasn't completely gone away. Once the problem
+occurs, the entire drive is effected (not just one of the partitions).
+
+Is anyone aware of any bugs, issues, or fixes that may be related to
+this problem? Is there a good way to narrow this down to a firmware
+issue versus a kernel issue or a ZFS issue?
+
+Thanks for any help,
+Tom Caputi
