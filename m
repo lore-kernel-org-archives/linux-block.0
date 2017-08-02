@@ -1,20 +1,39 @@
-Return-Path: <BATV+08196f5b2bd262a84b8d+5113+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-btrfs@vger.kernel.org
-Subject: don't require a struct block_device to submit a bio
-Date: Wed, 23 Aug 2017 19:10:26 +0200
-Message-Id: <20170823171032.30529-1-hch@lst.de>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Johannes Thumshirn <jth@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 2/4] scsi: Add VENDOR_SPECIFIC sense code definitions
+Date: Wed,  2 Aug 2017 16:13:26 +0200
+Message-Id: <1501683208-5240-3-git-send-email-hare@suse.de>
+In-Reply-To: <1501683208-5240-1-git-send-email-hare@suse.de>
+References: <1501683208-5240-1-git-send-email-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Some older devices will return vendor specific sense codes, so
+we should be adding a definition for it.
 
-this series removes the need to have a struct block_device ready to
-submit a bio.   We basically don't use it anywhere in the block stack
-anyway - we always go for the gendisk or request_queue.  The only
-exception is partition remapping for which we'll now need an additional
-partition index.  This helps with cases where we submit I/O from a
-character device (nvme or lightnvm passthrough) or a different block
-device (upcoming nvme multipath support).
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+---
+ include/scsi/scsi_proto.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
+index 78215fd..06751a9 100644
+--- a/include/scsi/scsi_proto.h
++++ b/include/scsi/scsi_proto.h
+@@ -233,6 +233,7 @@ struct scsi_varlen_cdb_hdr {
+ #define UNIT_ATTENTION      0x06
+ #define DATA_PROTECT        0x07
+ #define BLANK_CHECK         0x08
++#define VENDOR_SPECIFIC     0x09
+ #define COPY_ABORTED        0x0a
+ #define ABORTED_COMMAND     0x0b
+ #define VOLUME_OVERFLOW     0x0d
+-- 
+1.8.5.6
