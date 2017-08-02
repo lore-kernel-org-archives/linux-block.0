@@ -1,101 +1,94 @@
-Return-Path: <regressions@leemhuis.info>
+Return-Path: <gmazyland@gmail.com>
+Return-Path: <gmazyland@gmail.com>
 Subject: Re: [RFC PATCH] bio-integrity: Fix regression if profile verify_fn is
  NULL
-To: Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org
-Cc: hch@lst.de, axboe@kernel.dk, mpatocka@redhat.com, dm-devel@redhat.com
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+ axboe@kernel.dk, mpatocka@redhat.com, dm-devel@redhat.com
 References: <20170802122750.12216-1-gmazyland@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Message-ID: <bd2f8d59-1e2f-c05e-0a4c-df4de17a8db8@leemhuis.info>
-Date: Sun, 6 Aug 2017 15:30:22 +0200
+ <20170802125509.GA18977@lst.de>
+ <f0eb700b-b2cb-1db8-98cb-f26dfb9e31c3@gmail.com> <yq1a83injpl.fsf@oracle.com>
+From: Milan Broz <gmazyland@gmail.com>
+Message-ID: <aa4d5292-8484-f651-930d-84ed2f061a0a@gmail.com>
+Date: Wed, 2 Aug 2017 17:24:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170802122750.12216-1-gmazyland@gmail.com>
+In-Reply-To: <yq1a83injpl.fsf@oracle.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-TWIMC: This issue is tracked in the regression reports for Linux 4.13
-(http://bit.ly/lnxregrep413 ) with this id:
 
-Linux-Regression-ID: lr#35498d
+On 08/02/2017 04:11 PM, Martin K. Petersen wrote:
+>> And the integrity profile is perfect interface for this, we register
+>> own profile through the proper interface.  (Any other solution for
+>> per-sector metadata would be worse, I tried...)
+> 
+> The DM use case seems a bit weird and I would like to take a closer look
+> later (a storm took out my power and internet so I'm a bit logistically
+> impaired right now).
 
-Please include this line in the comment section of patches that are
-supposed to fix the issue. Please also mention the string once in other
-mailinglist threads or different bug tracking entries if you or someone
-else start to discuss the issue there. By including that string you make
-it a whole lot easier to track where an issue gets discussed and how far
-patches to fix it have made it. For more details on this please see
-here: http://bit.ly/lnxregtrackid
+Hi Martin,
 
-Thx for your help. And thx to Milan for pointing me to this regression.
- Ciao, Thorsten
+thanks!
 
-On 02.08.2017 14:27, Milan Broz wrote:
-> In dm-integrity target we register integrity profile that have
-> both generate_fn and verify_fn callbacks set to NULL.
+I think it is actually pretty straightforward (if it can be said
+about anything in the device-mapper little walled garden :-)
+
+For the authenticated encryption (on the sector level) we cannot use
+a length-preserving encryption (as it is dm-crypt in normal mode) but we need
+some per-sector metadata to store additional authentication tag.
+
+This is exactly what DIF/T10-PI already does, just we need more flexibility
+(and larger metadata to use cryptographically sound modes).
+
+So we developed dm-integrity target that takes a normal block device,
+stores per-sector metadata on-disk in special sectors (interleaved with normal
+data sectors).
+(There is a journalling to provide atomicity of data + metadata writes.)
+
+The dm-integrity can calculate some non-cryptographic integrity data itself,
+but this mode does not use block integrity extension at all so it is not important here.
+
+The second use case (that is currently broken by the block layer 4.13 changes)
+is that dm-integrity can register a new integrity profile for the virtual device
+(on top of normal block device) and present data sectors as normal bio layer and
+metadata as the bio-integrity layer (dm-crypt will receive bio with the metadata
+in integrity fields).
+
+IOW dm-integrity is just "emulator" for the integrity-enabled block device,
+just with configurable per-sector metadata size.
+
+Then we can place dm-crypt above this device and process the bio the same way
+as dm-crypt does, just it will add authentication tag mapped to the metadata
+for that special integrity profile.
+
+The dm-crypt already creates bio clones (and already owns the bio clone memory)
+so we do exactly the same for integrity part of bio (clearing the BIP_BLOCK_INTEGRITY
+flag to indicate that block layer should not free this memory).
+
+Otherwise I think we use bio the exact way how the driver should register
+and alloc memory for own integrity profile (see dm_crypt_integrity_io_alloc function).
+
+Milan
+
+
+> But the intent of the integrity infrastructure was
+> to be able to carry arbitrary metadata pinned to an I/O. The callback
+> hooks in the profile were really only intended for the case where the
+> block layer itself needed to generate and verify.
 > 
-> This is used if dm-integrity is stacked under a dm-crypt device
-> for authenticated encryption (integrity payload contains authentication
-> tag and IV seed).
+> We already do sanity checking on the callback pointers in the prep
+> function. I guess don't have a problem doing the same in the completion
+> path.
 > 
-> In this case the verification is done through own crypto API
-> processing inside dm-crypt; integrity profile is only holder
-> of these data. (And memory is owned by dm-crypt as well.)
+> Fundamentally, though, the verify function should only ever be called if
+> the profile has BLK_INTEGRITY_VERIFY set.
 > 
-> After the commit (and previous changes)
->   Commit 7c20f11680a441df09de7235206f70115fbf6290
->   Author: Christoph Hellwig <hch@lst.de>
->   Date:   Mon Jul 3 16:58:43 2017 -0600
+> Previously that was done in the prep function by only adding the verify
+> endio hook when it was needed. Christoph's patch to kill the double
+> endio changed that subtly (FWIW, Jens originally objected to having an
+> integrity conditional in the regular bio completion path. That's why the
+> verification handling abused the endio function).
 > 
->     bio-integrity: stop abusing bi_end_io
-> 
-> we get this crash:
-> 
-> : BUG: unable to handle kernel NULL pointer dereference at   (null)
-> : IP:   (null)
-> : *pde = 00000000
-> ...
-> :
-> : Workqueue: kintegrityd bio_integrity_verify_fn
-> : task: f48ae180 task.stack: f4b5c000
-> : EIP:   (null)
-> : EFLAGS: 00210286 CPU: 0
-> : EAX: f4b5debc EBX: 00001000 ECX: 00000001 EDX: 00000000
-> : ESI: 00001000 EDI: ed25f000 EBP: f4b5dee8 ESP: f4b5dea4
-> :  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-> : CR0: 80050033 CR2: 00000000 CR3: 32823000 CR4: 001406d0
-> : Call Trace:
-> :  ? bio_integrity_process+0xe3/0x1e0
-> :  bio_integrity_verify_fn+0xea/0x150
-> :  process_one_work+0x1c7/0x5c0
-> :  worker_thread+0x39/0x380
-> :  kthread+0xd6/0x110
-> :  ? process_one_work+0x5c0/0x5c0
-> :  ? kthread_worker_fn+0x100/0x100
-> :  ? kthread_worker_fn+0x100/0x100
-> :  ret_from_fork+0x19/0x24
-> : Code:  Bad EIP value.
-> : EIP:   (null) SS:ESP: 0068:f4b5dea4
-> : CR2: 0000000000000000
-> 
-> Patch just skip the whole verify workqueue if verify_fn is set to NULL.
-> 
-> Signed-off-by: Milan Broz <gmazyland@gmail.com>
-> ---
->  block/bio-integrity.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> index 83e92beb3c9f..b9d1580bfc13 100644
-> --- a/block/bio-integrity.c
-> +++ b/block/bio-integrity.c
-> @@ -387,7 +387,9 @@ static void bio_integrity_verify_fn(struct work_struct *work)
->   */
->  bool __bio_integrity_endio(struct bio *bio)
->  {
-> -	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
-> +	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-> +
-> +	if (bi->profile->verify_fn && bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
->  		struct bio_integrity_payload *bip = bio_integrity(bio);
->  
->  		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
+> Anyway. So I think that the BLK_INTEGRITY_VERIFY logic needs to be
+> carried over to __bio_integrity_endio()...
 > 
