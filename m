@@ -1,82 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33716 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG6N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:58:13 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 16/20] block: move actual bio merge code into __elv_merge
-Date: Sat,  5 Aug 2017 14:57:01 +0800
-Message-Id: <20170805065705.12989-17-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Johannes Thumshirn <jth@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 1/4] raid_class: Add 'JBOD' RAID level
+Date: Wed,  2 Aug 2017 16:13:25 +0200
+Message-Id: <1501683208-5240-2-git-send-email-hare@suse.de>
+In-Reply-To: <1501683208-5240-1-git-send-email-hare@suse.de>
+References: <1501683208-5240-1-git-send-email-hare@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-So that we can reuse __elv_merge() to merge bio
-into requests from sw queue in the following patches.
+Not a real RAID level, but some HBAs support JBOD in addition to
+the 'classical' RAID levels.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- block/elevator.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ drivers/scsi/raid_class.c  | 1 +
+ include/linux/raid_class.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 7423e9c9cb27..2fd2f777127b 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -409,8 +409,9 @@ void elv_dispatch_add_tail(struct request_queue *q, struct request *rq)
- }
- EXPORT_SYMBOL(elv_dispatch_add_tail);
+diff --git a/drivers/scsi/raid_class.c b/drivers/scsi/raid_class.c
+index 2c146b4..ea88906 100644
+--- a/drivers/scsi/raid_class.c
++++ b/drivers/scsi/raid_class.c
+@@ -157,6 +157,7 @@ static const char *raid_state_name(enum raid_state state)
+ 	{ RAID_LEVEL_5, "raid5" },
+ 	{ RAID_LEVEL_50, "raid50" },
+ 	{ RAID_LEVEL_6, "raid6" },
++	{ RAID_LEVEL_JBOD, "jbod" },
+ };
  
--enum elv_merge elv_merge(struct request_queue *q, struct request **req,
--		struct bio *bio)
-+static inline enum elv_merge __elv_merge(struct request_queue *q,
-+		struct request **req, struct bio *bio,
-+		struct hlist_head *hash, struct request *last_merge)
- {
- 	struct elevator_queue *e = q->elevator;
- 	struct request *__rq;
-@@ -427,11 +428,11 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	/*
- 	 * First try one-hit cache.
- 	 */
--	if (q->last_merge && elv_bio_merge_ok(q->last_merge, bio)) {
--		enum elv_merge ret = blk_try_merge(q->last_merge, bio);
-+	if (last_merge && elv_bio_merge_ok(last_merge, bio)) {
-+		enum elv_merge ret = blk_try_merge(last_merge, bio);
+ static const char *raid_level_name(enum raid_level level)
+diff --git a/include/linux/raid_class.h b/include/linux/raid_class.h
+index 31e1ff6..ec86555 100644
+--- a/include/linux/raid_class.h
++++ b/include/linux/raid_class.h
+@@ -38,6 +38,7 @@ enum raid_level {
+ 	RAID_LEVEL_5,
+ 	RAID_LEVEL_50,
+ 	RAID_LEVEL_6,
++	RAID_LEVEL_JBOD,
+ };
  
- 		if (ret != ELEVATOR_NO_MERGE) {
--			*req = q->last_merge;
-+			*req = last_merge;
- 			return ret;
- 		}
- 	}
-@@ -442,7 +443,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	/*
- 	 * See if our hash lookup can find a potential backmerge.
- 	 */
--	__rq = elv_rqhash_find(q, bio->bi_iter.bi_sector);
-+	__rq = rqhash_find(hash, bio->bi_iter.bi_sector);
- 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
- 		*req = __rq;
- 		return ELEVATOR_BACK_MERGE;
-@@ -456,6 +457,12 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	return ELEVATOR_NO_MERGE;
- }
- 
-+enum elv_merge elv_merge(struct request_queue *q, struct request **req,
-+		struct bio *bio)
-+{
-+	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
-+}
-+
- /*
-  * Attempt to do an insertion back merge. Only check for the case where
-  * we can append 'rq' to an existing request, so we can throw 'rq' away
+ struct raid_data {
 -- 
-2.9.4
+1.8.5.6
