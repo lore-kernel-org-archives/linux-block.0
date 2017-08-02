@@ -1,11 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:15329 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751727AbdHCBeh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Aug 2017 21:34:37 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Received: from mx1.redhat.com ([209.132.183.28]:52160 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751562AbdHBDBs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Aug 2017 23:01:48 -0400
+Date: Wed, 2 Aug 2017 11:01:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
@@ -13,45 +14,56 @@ CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>
 Subject: Re: [PATCH 05/14] blk-mq-sched: don't dequeue request until all in
  ->dispatch are flushed
-Date: Thu, 3 Aug 2017 01:33:49 +0000
-Message-ID: <1501724027.30887.1.camel@wdc.com>
+Message-ID: <20170802030128.GA7267@ming.t460p>
 References: <20170731165111.11536-1-ming.lei@redhat.com>
-         <20170731165111.11536-7-ming.lei@redhat.com>
-         <1501544540.2466.31.camel@wdc.com> <20170801104433.GC31452@ming.t460p>
-         <1501604045.2475.8.camel@wdc.com> <20170802030128.GA7267@ming.t460p>
-In-Reply-To: <20170802030128.GA7267@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20170731165111.11536-7-ming.lei@redhat.com>
+ <1501544540.2466.31.camel@wdc.com>
+ <20170801104433.GC31452@ming.t460p>
+ <1501604045.2475.8.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1501604045.2475.8.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDE3LTA4LTAyIGF0IDExOjAxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-VHVlLCBBdWcgMDEsIDIwMTcgYXQgMDQ6MTQ6MDdQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IE9uIFR1ZSwgMjAxNy0wOC0wMSBhdCAxODo0NCArMDgwMCwgTWluZyBMZWkgd3Jv
-dGU6DQo+ID4gPiBPbiBNb24sIEp1bCAzMSwgMjAxNyBhdCAxMTo0MjoyMVBNICswMDAwLCBCYXJ0
-IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gPiA+IFNpbmNlIHNldHRpbmcsIGNsZWFyaW5nIGFuZCB0
-ZXN0aW5nIG9mIEJMS19NUV9TX0JVU1kgY2FuIGhhcHBlbiBjb25jdXJyZW50bHkNCj4gPiA+ID4g
-YW5kIHNpbmNlIGNsZWFyaW5nIGFuZCB0ZXN0aW5nIGhhcHBlbnMgd2l0aG91dCBhbnkgbG9ja3Mg
-aGVsZCBJJ20gYWZyYWlkIHRoaXMNCj4gPiA+ID4gcGF0Y2ggaW50cm9kdWNlcyB0aGUgZm9sbG93
-aW5nIHJhY2UgY29uZGl0aW9uczoNCj4gPiA+ID4gWyAuLi4gXQ0KPiA+ID4gPiAqIENoZWNraW5n
-IEJMS19NUV9TX0JVU1kgYWZ0ZXIgcmVxdWVzdHMgaGF2ZSBiZWVuIHJlbW92ZWQgZnJvbSB0aGUg
-ZGlzcGF0Y2ggbGlzdA0KPiA+ID4gPiAgIGJ1dCBiZWZvcmUgdGhhdCBiaXQgaXMgY2xlYXJlZCwg
-cmVzdWx0aW5nIGluIHRlc3RfYml0KEJMS19NUV9TX0JVU1ksICZoY3R4LT5zdGF0ZSkNCj4gPiA+
-ID4gICByZXBvcnRpbmcgdGhhdCB0aGUgQkxLX01RX1NfQlVTWQ0KPiA+ID4gPiBoYXMgYmVlbiBz
-ZXQgYWx0aG91Z2ggdGhlcmUgYXJlIG5vIHJlcXVlc3RzDQo+ID4gPiA+ICAgb24gdGhlIGRpc3Bh
-dGNoIGxpc3QuDQo+ID4gPiANCj4gPiA+IFRoYXQgd29uJ3QgYmUgYSBwcm9ibGVtLCBiZWNhdXNl
-IGRpc3BhdGNoIHdpbGwgYmUgc3RhcnRlZCBpbiB0aGUNCj4gPiA+IGNvbnRleHQgaW4gd2hpY2gg
-ZGlzcGF0Y2ggbGlzdCBpcyBmbHVzaGVkLCBzaW5jZSB0aGUgQlVTWSBiaXQNCj4gPiA+IGlzIGNs
-ZWFyZWQgYWZ0ZXIgYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QoKSByZXR1cm5zLiBTbyBubyBJL08N
-Cj4gPiA+IGhhbmcuDQo+ID4gDQo+ID4gSGVsbG8gTWluZywNCj4gPiANCj4gPiBQbGVhc2UgY29u
-c2lkZXIgY2hhbmdpbmcgdGhlIG5hbWUgb2YgdGhlIEJMS19NUV9TX0JVU1kgY29uc3RhbnQuIFRo
-YXQgYml0DQo+ID4gaXMgdXNlZCB0byBzZXJpYWxpemUgZGlzcGF0Y2hpbmcgcmVxdWVzdHMgZnJv
-bSB0aGUgaGN0eCBkaXNwYXRjaCBsaXN0IGJ1dA0KPiA+IHRoYXQncyBub3QgY2xlYXIgZnJvbSB0
-aGUgbmFtZSBvZiB0aGF0IGNvbnN0YW50Lg0KPiANCj4gQWN0dWFsbHkgd2hhdCB3ZSB3YW50IHRv
-IGRvIGlzIHRvIHN0b3AgdGFraW5nIHJlcXVlc3QgZnJvbSBzdy9zY2hlZHVsZXINCj4gcXVldWUg
-d2hlbiAtPmRpc3BhdGNoIGFyZW4ndCBmbHVzaGVkIGNvbXBsZXRlbHksIEkgdGhpbmsgQlVTWSBp
-c24ndA0KPiBhIGJhZCBuYW1lIGZvciB0aGlzIGNhc2UsIG9yIGhvdyBhYm91dCBESVNQQVRDSF9C
-VVNZPyBvcg0KPiBGTFVTSElOR19ESVNQQVRDSD8NCg0KSGVsbG8gTWluZywNCg0KRkxVU0hJTkdf
-RElTUEFUQ0ggc291bmRzIGZpbmUgdG8gbWUuIEluIGNhc2UgeW91IHdvdWxkIHByZWZlciBhIHNo
-b3J0ZXIgbmFtZSwNCmhvdyBhYm91dCBCTEtfTVFfU19ESVNQQVRDSElORyAocmVmZXJzIHRvIGRp
-c3BhdGNoaW5nIHJlcXVlc3RzIHRvIHRoZSBkcml2ZXIpPw0KDQpCYXJ0Lg==
+On Tue, Aug 01, 2017 at 04:14:07PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-08-01 at 18:44 +0800, Ming Lei wrote:
+> > On Mon, Jul 31, 2017 at 11:42:21PM +0000, Bart Van Assche wrote:
+> > > Since setting, clearing and testing of BLK_MQ_S_BUSY can happen concurrently
+> > > and since clearing and testing happens without any locks held I'm afraid this
+> > > patch introduces the following race conditions:
+> > > [ ... ]
+> > > * Checking BLK_MQ_S_BUSY after requests have been removed from the dispatch list
+> > >   but before that bit is cleared, resulting in test_bit(BLK_MQ_S_BUSY, &hctx->state)
+> > >   reporting that the BLK_MQ_S_BUSY
+> > > has been set although there are no requests
+> > >   on the dispatch list.
+> > 
+> > That won't be a problem, because dispatch will be started in the
+> > context in which dispatch list is flushed, since the BUSY bit
+> > is cleared after blk_mq_dispatch_rq_list() returns. So no I/O
+> > hang.
+> 
+> Hello Ming,
+> 
+> Please consider changing the name of the BLK_MQ_S_BUSY constant. That bit
+> is used to serialize dispatching requests from the hctx dispatch list but
+> that's not clear from the name of that constant.
+
+Actually what we want to do is to stop taking request from sw/scheduler
+queue when ->dispatch aren't flushed completely, I think BUSY isn't
+a bad name for this case, or how about DISPATCH_BUSY? or
+FLUSHING_DISPATCH?
+
+After thinking about the handling further, we can set the
+BUSY bit just when adding requests to ->dispatch, and clear the
+bit after returning from blk_mq_dispatch_rq_list() when the
+current local list(from ->dispatch) is flushed completely and
+->dispatch is empty. This way can minimize the race window, and
+still safe, because we always move on to dispatch either new
+request is added to ->dispatch or ->dispatch is flushed completely.
+
+But anyway comment should be added for clarifying the fact.
+
+-- 
+Ming
