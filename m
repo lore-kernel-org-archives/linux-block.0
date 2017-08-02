@@ -1,43 +1,46 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: blk_mq_sched_insert_request: inconsistent {SOFTIRQ-ON-W} ->
- {IN-SOFTIRQ-W} usage
-To: Michael Ellerman <mpe@ellerman.id.au>,
- Bart Van Assche <Bart.VanAssche@wdc.com>, Brian J King <bjking1@us.ibm.com>
-Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <87a83qfosu.fsf@concordia.ellerman.id.au>
- <073ed79c-11ce-e86c-a905-91fd28675d47@kernel.dk>
- <1501166846.2516.1.camel@wdc.com>
- <5b85a365-faa1-3987-9b6b-270399c30686@kernel.dk>
- <87lgn9dqx3.fsf@concordia.ellerman.id.au>
- <92379297-9667-ae52-b05c-6c8a0ce4751c@kernel.dk>
- <877eynu69j.fsf@concordia.ellerman.id.au>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c4fb0293-d0cb-ebff-cddf-a4e301826fbc@kernel.dk>
-Date: Tue, 1 Aug 2017 09:26:09 -0600
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Thu, 3 Aug 2017 00:26:39 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH 1/2] null_blk: simplify logic for use_per_node_hctx
+Message-ID: <20170802162634.GA30506@bogon.didichuxing.com>
 MIME-Version: 1.0
-In-Reply-To: <877eynu69j.fsf@concordia.ellerman.id.au>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/01/2017 12:55 AM, Michael Ellerman wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
-> ...
->>
->> Can you try the below fix? Should be more palatable than the previous
->> one. Brian, maybe you can take a look at the IRQ issue mentioned above?
-> 
-> Given the patch from Brian fixed the lockdep warning, do you still want
-> me to try and test this one?
+make sure submit_queues equal nr_online_nodes.
 
-Nope, we don't have to do that. I'd much rather just add a WARN_ON()
-or similar to make sure we catch buggy users earlier. scsi_run_queue()
-needs a
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+---
+ drivers/block/null_blk.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-WARN_ON(in_interrupt());
-
-but it might be better to put that in __blk_mq_run_hw_queue().
-
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 85c24ca..72e2bc5 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -733,9 +733,6 @@ static int null_add_dev(void)
+ 
+ 	spin_lock_init(&nullb->lock);
+ 
+-	if (queue_mode == NULL_Q_MQ && use_per_node_hctx)
+-		submit_queues = nr_online_nodes;
+-
+ 	rv = setup_queues(nullb);
+ 	if (rv)
+ 		goto out_free_nullb;
+@@ -845,8 +842,8 @@ static int __init null_init(void)
+ 	}
+ 
+ 	if (queue_mode == NULL_Q_MQ && use_per_node_hctx) {
+-		if (submit_queues < nr_online_nodes) {
+-			pr_warn("null_blk: submit_queues param is set to %u.",
++		if (submit_queues != nr_online_nodes) {
++			pr_warn("null_blk: submit_queues param is set to %u.\n",
+ 							nr_online_nodes);
+ 			submit_queues = nr_online_nodes;
+ 		}
 -- 
-Jens Axboe
+2.9.4
