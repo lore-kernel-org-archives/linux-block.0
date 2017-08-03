@@ -1,13 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:41393 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751144AbdHEIkw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Aug 2017 04:40:52 -0400
-Date: Sat, 5 Aug 2017 01:40:49 -0700
-From: "hch@infradead.org" <hch@infradead.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:30288 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751144AbdHCReC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Aug 2017 13:34:02 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -15,28 +13,61 @@ Cc: "ming.lei@redhat.com" <ming.lei@redhat.com>,
         "loberman@redhat.com" <loberman@redhat.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>
 Subject: Re: [PATCH 04/14] blk-mq-sched: improve dispatching from sw queue
-Message-ID: <20170805084048.GA6643@infradead.org>
+Date: Thu, 3 Aug 2017 17:33:13 +0000
+Message-ID: <1501781583.2922.12.camel@wdc.com>
 References: <20170731165111.11536-1-ming.lei@redhat.com>
- <20170731165111.11536-6-ming.lei@redhat.com>
- <1501544074.2466.29.camel@wdc.com>
- <20170801101718.GB31452@ming.t460p>
- <20170801105013.GD31452@ming.t460p>
- <1501600301.2475.1.camel@wdc.com>
- <20170802033135.GB7267@ming.t460p>
- <1501724126.30887.3.camel@wdc.com>
- <20170803031344.GA8327@ming.t460p>
- <1501781583.2922.12.camel@wdc.com>
+         <20170731165111.11536-6-ming.lei@redhat.com>
+         <1501544074.2466.29.camel@wdc.com> <20170801101718.GB31452@ming.t460p>
+         <20170801105013.GD31452@ming.t460p> <1501600301.2475.1.camel@wdc.com>
+         <20170802033135.GB7267@ming.t460p> <1501724126.30887.3.camel@wdc.com>
+         <20170803031344.GA8327@ming.t460p>
+In-Reply-To: <20170803031344.GA8327@ming.t460p>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1501781583.2922.12.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Aug 03, 2017 at 05:33:13PM +0000, Bart Van Assche wrote:
-> Are you aware that the SCSI core already keeps track of the number of busy requests
-> per LUN? See also the device_busy member of struct scsi_device. How about giving the
-> block layer core access in some way to that counter?
+On Thu, 2017-08-03 at 11:13 +0800, Ming Lei wrote:
+> On Thu, Aug 03, 2017 at 01:35:29AM +0000, Bart Van Assche wrote:
+> > On Wed, 2017-08-02 at 11:31 +0800, Ming Lei wrote:
+> > > On Tue, Aug 01, 2017 at 03:11:42PM +0000, Bart Van Assche wrote:
+> > > > On Tue, 2017-08-01 at 18:50 +0800, Ming Lei wrote:
+> > > > > On Tue, Aug 01, 2017 at 06:17:18PM +0800, Ming Lei wrote:
+> > > > > > How can we get the accurate 'number of requests in progress' ef=
+ficiently?
+> > > >=20
+> > > > Hello Ming,
+> > > >=20
+> > > > How about counting the number of bits that have been set in the tag=
+ set?
+> > > > I am aware that these bits can be set and/or cleared concurrently w=
+ith the
+> > > > dispatch code but that count is probably a good starting point.
+> > >=20
+> > > It has to be atomic_t, which is too too heavy for us, please see the =
+report:
+> > >=20
+> > > 	http://marc.info/?t=3D149868448400003&r=3D1&w=3D2
+> > >=20
+> > > Both Jens and I want to kill hd_struct.in_flight, but looks still no
+> > > good way.=20
+> >=20
+> > Hello Ming,
+> >=20
+> > Sorry but I disagree that a new atomic variable should be added to keep=
+ track
+> > of the number of busy requests. Counting the number of bits that are se=
+t in
+> > the tag set should be good enough in this context.
+>=20
+> That won't work because the tag set is host wide and shared by all LUNs.
 
-I'd love ot move it to blk-mq in a scalable way eventually, as
-we'll run into the same problems with NVMe systems with multiple
-namespaces.
+Hello Ming,
+
+Are you aware that the SCSI core already keeps track of the number of busy =
+requests
+per LUN? See also the device_busy member of struct scsi_device. How about g=
+iving the
+block layer core access in some way to that counter?
+
+Bart.=
