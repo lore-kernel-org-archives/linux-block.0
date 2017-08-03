@@ -1,80 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:23938 "EHLO
-        BJEXCAS003.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752440AbdHJCeb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Aug 2017 22:34:31 -0400
-Date: Thu, 10 Aug 2017 10:34:19 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] blk-sysfs: add io queue depth show
-Message-ID: <20170810023413.GA33798@localhost.didichuxing.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 1/4] blk-mq-tag: check for NULL rq when iterating tags
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: "brking@linux.vnet.ibm.com" <brking@linux.vnet.ibm.com>
+References: <1501790516-6924-1-git-send-email-axboe@kernel.dk>
+ <1501790516-6924-2-git-send-email-axboe@kernel.dk>
+ <1501792140.2922.14.camel@wdc.com>
+ <549d568a-b32a-5d6c-7788-3f26a2ce58a2@kernel.dk>
+ <b1c18f36-87ea-fee8-e88b-03ecdfdf22af@kernel.dk>
+ <1501793402.2922.20.camel@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5bb23d5d-2d09-333f-5570-a0f9925cd44c@kernel.dk>
+Date: Thu, 3 Aug 2017 14:56:45 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1501793402.2922.20.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-show max io queue depth, it may doesn't reflect the real hardware's
-max queue depth which was reduced by some software designs.
+On 08/03/2017 02:50 PM, Bart Van Assche wrote:
+> On Thu, 2017-08-03 at 14:40 -0600, Jens Axboe wrote:
+>> On 08/03/2017 02:35 PM, Jens Axboe wrote:
+>>>> I agree with what you wrote in the description of this patch.
+>>>> However, since I have not yet found the code that clears tags->rqs[],
+>>>> would it be possible to show me that code?
+>>>
+>>> Since it's been a month since I wrote this code, I went and looked
+>>> too.  My memory was that we set/clear it dynamically since we added
+>>> scheduling, but looks like we don't clear it. The race is still valid
+>>> for when someone runs a tag check in parallel with someone allocating
+>>> a tag, since there's a window of time where the tag bit is set, but
+>>> ->rqs[tag] isn't set yet. That's probably the race I hit, not the
+>>> completion race mentioned in the change log.
+>>
+>> Rewrote the commit message:
+>>
+>> http://git.kernel.dk/cgit/linux-block/commit/?h=mq-inflight&id=1908e43118e688e41ac8656edcf3e7a150f3f5081
+> 
+> Hello Jens,
+> 
+> This is what I found in the updated commit:
+> 
+>     blk-mq-tag: check for NULL rq when iterating tags
+>     
+>     Since we introduced blk-mq-sched, the tags->rqs[] array has been
+>     dynamically assigned. So we need to check for NULL when iterating,
+>     since there's a window of time where the bit is set, but we haven't
+>     dynamically assigned the tags->rqs[] array position yet.
+>     
+>     This is perfectly safe, since the memory backing of the request is
+>     never going away while the device is alive.
+> 
+> Does this mean that blk_mq_tagset_busy_iter() can skip requests that it
+> shouldn't skip and also that blk_mq_tagset_busy_iter() can pass a pointer to
+> the previous request that was associated with a tag instead of the current
+> request to its busy_tag_iter_fn argument? Shouldn't these races be fixed,
+> e.g. by swapping the order in which the tag are set and tags->rqs[] are
+> assigned such that the correct request pointer is passed to the
+> busy_tag_iter_fn argument?
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- block/blk-sysfs.c      | 11 +++++++++++
- include/linux/blkdev.h |  5 +++++
- 2 files changed, 16 insertions(+)
+We can't swap them. We need to reserve a bit first, which entails
+setting that bit. Once that's set, we can assign ->rqs[]. The race isn't
+a big deal, and I don't want to add any code to prevent it, since that
+would mean locking. Since we have the luxury of the request itself
+always being valid memory, we can deal with stale info or having a NULL
+because of the ordering. It's a conscious trade off.
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 27aceab..66cba2b 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -256,6 +256,11 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
- 	return queue_var_show(max_hw_sectors_kb, (page));
- }
- 
-+static ssize_t queue_io_queue_depth_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(queue_io_queue_depth(q), (page));
-+}
-+
- #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
- static ssize_t								\
- queue_show_##name(struct request_queue *q, char *page)			\
-@@ -678,6 +683,11 @@ static struct queue_sysfs_entry queue_wb_lat_entry = {
- 	.store = queue_wb_lat_store,
- };
- 
-+static struct queue_sysfs_entry queue_io_queue_depth_entry = {
-+	.attr = {.name = "io_queue_depth", .mode = S_IRUGO },
-+	.show = queue_io_queue_depth_show,
-+};
-+
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- static struct queue_sysfs_entry throtl_sample_time_entry = {
- 	.attr = {.name = "throttle_sample_time", .mode = S_IRUGO | S_IWUSR },
-@@ -719,6 +729,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_dax_entry.attr,
- 	&queue_wb_lat_entry.attr,
- 	&queue_poll_delay_entry.attr,
-+	&queue_io_queue_depth_entry.attr,
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	&throtl_sample_time_entry.attr,
- #endif
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 25f6a0c..bcd0af4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1405,6 +1405,11 @@ static inline unsigned int queue_max_hw_sectors(struct request_queue *q)
- 	return q->limits.max_hw_sectors;
- }
- 
-+static inline unsigned int queue_io_queue_depth(struct request_queue *q)
-+{
-+	return q->queue_depth;
-+}
-+
- static inline unsigned short queue_max_segments(struct request_queue *q)
- {
- 	return q->limits.max_segments;
 -- 
-2.9.4
+Jens Axboe
