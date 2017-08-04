@@ -1,85 +1,296 @@
-Return-Path: <BATV+2002382cc30247dfe025+5112+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: viro@zeniv.linux.org.uk,
-	axboe@kernel.dk
-Cc: Milosz Tanski <milosz@adfin.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>,
-	mgorman@suse.de,
-	Volker.Lendecke@sernet.de,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/4] fs: pass iocb to do_generic_file_read
-Date: Tue, 22 Aug 2017 18:17:09 +0200
-Message-Id: <20170822161712.11716-2-hch@lst.de>
-In-Reply-To: <20170822161712.11716-1-hch@lst.de>
-References: <20170822161712.11716-1-hch@lst.de>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	lucmiccio@gmail.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT V2 1/2] block,bfq: refactor device-idling logic
+Date: Fri,  4 Aug 2017 07:35:10 +0200
+Message-Id: <20170804053511.2389-2-paolo.valente@linaro.org>
+In-Reply-To: <20170804053511.2389-1-paolo.valente@linaro.org>
+References: <20170804053511.2389-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-And rename it to the more descriptive generic_file_buffered_read while
-at it.
+The logic that decides whether to idle the device is scattered across
+three functions. Almost all of the logic is in the function
+bfq_bfqq_may_idle, but (1) part of the decision is made in
+bfq_update_idle_window, and (2) the function bfq_bfqq_must_idle may
+switch off idling regardless of the output of bfq_bfqq_may_idle. In
+addition, both bfq_update_idle_window and bfq_bfqq_must_idle make
+their decisions as a function of parameters that are used, for similar
+purposes, also in bfq_bfqq_may_idle. This commit addresses these
+issues by moving all the logic into bfq_bfqq_may_idle.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- mm/filemap.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ block/bfq-iosched.c | 117 +++++++++++++++++++++++++++-------------------------
+ block/bfq-iosched.h |  12 +++---
+ 2 files changed, 67 insertions(+), 62 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index a49702445ce0..4bcfa74ad802 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1886,9 +1886,8 @@ static void shrink_readahead_size_eio(struct file *filp,
- }
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 436b6ca..ccdc9e6 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -128,7 +128,7 @@ BFQ_BFQQ_FNS(busy);
+ BFQ_BFQQ_FNS(wait_request);
+ BFQ_BFQQ_FNS(non_blocking_wait_rq);
+ BFQ_BFQQ_FNS(fifo_expire);
+-BFQ_BFQQ_FNS(idle_window);
++BFQ_BFQQ_FNS(has_short_ttime);
+ BFQ_BFQQ_FNS(sync);
+ BFQ_BFQQ_FNS(IO_bound);
+ BFQ_BFQQ_FNS(in_large_burst);
+@@ -731,10 +731,10 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
+ 	unsigned int old_wr_coeff = bfqq->wr_coeff;
+ 	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
  
- /**
-- * do_generic_file_read - generic file read routine
-- * @filp:	the file to read
-- * @ppos:	current file position
-+ * generic_file_buffered_read - generic file read routine
-+ * @iocb:	the iocb to read
-  * @iter:	data destination
-  * @written:	already copied
-  *
-@@ -1898,12 +1897,14 @@ static void shrink_readahead_size_eio(struct file *filp,
-  * This is really ugly. But the goto's actually try to clarify some
-  * of the logic when it comes to error handling etc.
-  */
--static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
-+static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 		struct iov_iter *iter, ssize_t written)
- {
-+	struct file *filp = iocb->ki_filp;
- 	struct address_space *mapping = filp->f_mapping;
- 	struct inode *inode = mapping->host;
- 	struct file_ra_state *ra = &filp->f_ra;
-+	loff_t *ppos = &iocb->ki_pos;
- 	pgoff_t index;
- 	pgoff_t last_index;
- 	pgoff_t prev_index;
-@@ -2151,14 +2152,14 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
- ssize_t
- generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- {
--	struct file *file = iocb->ki_filp;
--	ssize_t retval = 0;
- 	size_t count = iov_iter_count(iter);
-+	ssize_t retval = 0;
+-	if (bic->saved_idle_window)
+-		bfq_mark_bfqq_idle_window(bfqq);
++	if (bic->saved_has_short_ttime)
++		bfq_mark_bfqq_has_short_ttime(bfqq);
+ 	else
+-		bfq_clear_bfqq_idle_window(bfqq);
++		bfq_clear_bfqq_has_short_ttime(bfqq);
  
- 	if (!count)
- 		goto out; /* skip atime */
+ 	if (bic->saved_IO_bound)
+ 		bfq_mark_bfqq_IO_bound(bfqq);
+@@ -2012,7 +2012,7 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ 		return;
  
- 	if (iocb->ki_flags & IOCB_DIRECT) {
-+		struct file *file = iocb->ki_filp;
- 		struct address_space *mapping = file->f_mapping;
- 		struct inode *inode = mapping->host;
- 		loff_t size;
-@@ -2199,7 +2200,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 			goto out;
+ 	bic->saved_ttime = bfqq->ttime;
+-	bic->saved_idle_window = bfq_bfqq_idle_window(bfqq);
++	bic->saved_has_short_ttime = bfq_bfqq_has_short_ttime(bfqq);
+ 	bic->saved_IO_bound = bfq_bfqq_IO_bound(bfqq);
+ 	bic->saved_in_large_burst = bfq_bfqq_in_large_burst(bfqq);
+ 	bic->was_in_burst_list = !hlist_unhashed(&bfqq->burst_list_node);
+@@ -3038,8 +3038,8 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
  	}
  
--	retval = do_generic_file_read(file, &iocb->ki_pos, iter, retval);
-+	retval = generic_file_buffered_read(iocb, iter, retval);
- out:
- 	return retval;
+ 	bfq_log_bfqq(bfqd, bfqq,
+-		"expire (%d, slow %d, num_disp %d, idle_win %d)", reason,
+-		slow, bfqq->dispatched, bfq_bfqq_idle_window(bfqq));
++		"expire (%d, slow %d, num_disp %d, short_ttime %d)", reason,
++		slow, bfqq->dispatched, bfq_bfqq_has_short_ttime(bfqq));
+ 
+ 	/*
+ 	 * Increase, decrease or leave budget unchanged according to
+@@ -3122,6 +3122,18 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 		return true;
+ 
+ 	/*
++	 * Idling is performed only if slice_idle > 0. In addition, we
++	 * do not idle if
++	 * (a) bfqq is async
++	 * (b) bfqq is in the idle io prio class: in this case we do
++	 * not idle because we want to minimize the bandwidth that
++	 * queues in this class can steal to higher-priority queues
++	 */
++	if (bfqd->bfq_slice_idle == 0 || !bfq_bfqq_sync(bfqq) ||
++	    bfq_class_idle(bfqq))
++		return false;
++
++	/*
+ 	 * The next variable takes into account the cases where idling
+ 	 * boosts the throughput.
+ 	 *
+@@ -3142,7 +3154,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 */
+ 	idling_boosts_thr = !bfqd->hw_tag ||
+ 		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq) &&
+-		 bfq_bfqq_idle_window(bfqq));
++		 bfq_bfqq_has_short_ttime(bfqq));
+ 
+ 	/*
+ 	 * The value of the next variable,
+@@ -3313,16 +3325,13 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 		asymmetric_scenario && !bfq_bfqq_in_large_burst(bfqq);
+ 
+ 	/*
+-	 * We have now all the components we need to compute the return
+-	 * value of the function, which is true only if both the following
+-	 * conditions hold:
+-	 * 1) bfqq is sync, because idling make sense only for sync queues;
+-	 * 2) idling either boosts the throughput (without issues), or
+-	 *    is necessary to preserve service guarantees.
++	 * We have now all the components we need to compute the
++	 * return value of the function, which is true only if idling
++	 * either boosts the throughput (without issues), or is
++	 * necessary to preserve service guarantees.
+ 	 */
+-	return bfq_bfqq_sync(bfqq) &&
+-		(idling_boosts_thr_without_issues ||
+-		 idling_needed_for_service_guarantees);
++	return idling_boosts_thr_without_issues ||
++		idling_needed_for_service_guarantees;
  }
+ 
+ /*
+@@ -3338,10 +3347,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+  */
+ static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
+ {
+-	struct bfq_data *bfqd = bfqq->bfqd;
+-
+-	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfqd->bfq_slice_idle != 0 &&
+-	       bfq_bfqq_may_idle(bfqq);
++	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_may_idle(bfqq);
+ }
+ 
+ /*
+@@ -3783,7 +3789,6 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
+ 	case IOPRIO_CLASS_IDLE:
+ 		bfqq->new_ioprio_class = IOPRIO_CLASS_IDLE;
+ 		bfqq->new_ioprio = 7;
+-		bfq_clear_bfqq_idle_window(bfqq);
+ 		break;
+ 	}
+ 
+@@ -3843,8 +3848,14 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		bfq_set_next_ioprio_data(bfqq, bic);
+ 
+ 	if (is_sync) {
++		/*
++		 * No need to mark as has_short_ttime if in
++		 * idle_class, because no device idling is performed
++		 * for queues in idle class
++		 */
+ 		if (!bfq_class_idle(bfqq))
+-			bfq_mark_bfqq_idle_window(bfqq);
++			/* tentatively mark as has_short_ttime */
++			bfq_mark_bfqq_has_short_ttime(bfqq);
+ 		bfq_mark_bfqq_sync(bfqq);
+ 		bfq_mark_bfqq_just_created(bfqq);
+ 	} else
+@@ -3985,18 +3996,19 @@ bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		 blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT);
+ }
+ 
+-/*
+- * Disable idle window if the process thinks too long or seeks so much that
+- * it doesn't matter.
+- */
+-static void bfq_update_idle_window(struct bfq_data *bfqd,
+-				   struct bfq_queue *bfqq,
+-				   struct bfq_io_cq *bic)
++static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
++				       struct bfq_queue *bfqq,
++				       struct bfq_io_cq *bic)
+ {
+-	int enable_idle;
++	bool has_short_ttime = true;
+ 
+-	/* Don't idle for async or idle io prio class. */
+-	if (!bfq_bfqq_sync(bfqq) || bfq_class_idle(bfqq))
++	/*
++	 * No need to update has_short_ttime if bfqq is async or in
++	 * idle io prio class, or if bfq_slice_idle is zero, because
++	 * no device idling is performed for bfqq in this case.
++	 */
++	if (!bfq_bfqq_sync(bfqq) || bfq_class_idle(bfqq) ||
++	    bfqd->bfq_slice_idle == 0)
+ 		return;
+ 
+ 	/* Idle window just restored, statistics are meaningless. */
+@@ -4004,27 +4016,22 @@ static void bfq_update_idle_window(struct bfq_data *bfqd,
+ 				     bfqd->bfq_wr_min_idle_time))
+ 		return;
+ 
+-	enable_idle = bfq_bfqq_idle_window(bfqq);
+-
++	/* Think time is infinite if no process is linked to
++	 * bfqq. Otherwise check average think time to
++	 * decide whether to mark as has_short_ttime
++	 */
+ 	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
+-	    bfqd->bfq_slice_idle == 0 ||
+-		(bfqd->hw_tag && BFQQ_SEEKY(bfqq) &&
+-			bfqq->wr_coeff == 1))
+-		enable_idle = 0;
+-	else if (bfq_sample_valid(bfqq->ttime.ttime_samples)) {
+-		if (bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle &&
+-			bfqq->wr_coeff == 1)
+-			enable_idle = 0;
+-		else
+-			enable_idle = 1;
+-	}
+-	bfq_log_bfqq(bfqd, bfqq, "update_idle_window: enable_idle %d",
+-		enable_idle);
++	    (bfq_sample_valid(bfqq->ttime.ttime_samples) &&
++	     bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle))
++		has_short_ttime = false;
++
++	bfq_log_bfqq(bfqd, bfqq, "update_has_short_ttime: has_short_ttime %d",
++		     has_short_ttime);
+ 
+-	if (enable_idle)
+-		bfq_mark_bfqq_idle_window(bfqq);
++	if (has_short_ttime)
++		bfq_mark_bfqq_has_short_ttime(bfqq);
+ 	else
+-		bfq_clear_bfqq_idle_window(bfqq);
++		bfq_clear_bfqq_has_short_ttime(bfqq);
+ }
+ 
+ /*
+@@ -4040,14 +4047,12 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		bfqq->meta_pending++;
+ 
+ 	bfq_update_io_thinktime(bfqd, bfqq);
++	bfq_update_has_short_ttime(bfqd, bfqq, bic);
+ 	bfq_update_io_seektime(bfqd, bfqq, rq);
+-	if (bfqq->entity.service > bfq_max_budget(bfqd) / 8 ||
+-	    !BFQQ_SEEKY(bfqq))
+-		bfq_update_idle_window(bfqd, bfqq, bic);
+ 
+ 	bfq_log_bfqq(bfqd, bfqq,
+-		     "rq_enqueued: idle_window=%d (seeky %d)",
+-		     bfq_bfqq_idle_window(bfqq), BFQQ_SEEKY(bfqq));
++		     "rq_enqueued: has_short_ttime=%d (seeky %d)",
++		     bfq_bfqq_has_short_ttime(bfqq), BFQQ_SEEKY(bfqq));
+ 
+ 	bfqq->last_request_pos = blk_rq_pos(rq) + blk_rq_sectors(rq);
+ 
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 63e771a..53e2907 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -348,11 +348,11 @@ struct bfq_io_cq {
+ 	uint64_t blkcg_serial_nr; /* the current blkcg serial */
+ #endif
+ 	/*
+-	 * Snapshot of the idle window before merging; taken to
+-	 * remember this value while the queue is merged, so as to be
+-	 * able to restore it in case of split.
++	 * Snapshot of the has_short_time flag before merging; taken
++	 * to remember its value while the queue is merged, so as to
++	 * be able to restore it in case of split.
+ 	 */
+-	bool saved_idle_window;
++	bool saved_has_short_ttime;
+ 	/*
+ 	 * Same purpose as the previous two fields for the I/O bound
+ 	 * classification of a queue.
+@@ -626,7 +626,7 @@ enum bfqq_state_flags {
+ 				     * without idling the device
+ 				     */
+ 	BFQQF_fifo_expire,	/* FIFO checked in this slice */
+-	BFQQF_idle_window,	/* slice idling enabled */
++	BFQQF_has_short_ttime,	/* queue has a short think time */
+ 	BFQQF_sync,		/* synchronous queue */
+ 	BFQQF_IO_bound,		/*
+ 				 * bfqq has timed-out at least once
+@@ -655,7 +655,7 @@ BFQ_BFQQ_FNS(busy);
+ BFQ_BFQQ_FNS(wait_request);
+ BFQ_BFQQ_FNS(non_blocking_wait_rq);
+ BFQ_BFQQ_FNS(fifo_expire);
+-BFQ_BFQQ_FNS(idle_window);
++BFQ_BFQQ_FNS(has_short_ttime);
+ BFQ_BFQQ_FNS(sync);
+ BFQ_BFQQ_FNS(IO_bound);
+ BFQ_BFQQ_FNS(in_large_burst);
 -- 
-2.11.0
+2.10.0
