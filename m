@@ -1,175 +1,86 @@
 Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 3/4] blk-mq: provide internal in-flight variant
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, brking@linux.vnet.ibm.com
+References: <1501790516-6924-1-git-send-email-axboe@kernel.dk>
+ <1501790516-6924-4-git-send-email-axboe@kernel.dk>
+ <20170804111728.GB15989@ming.t460p>
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: brking@linux.vnet.ibm.com,
-	bart.vanassche@wdc.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/6] blk-mq: provide internal in-flight variant
-Date: Fri,  4 Aug 2017 09:04:20 -0600
-Message-Id: <1501859062-11120-5-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1501859062-11120-1-git-send-email-axboe@kernel.dk>
-References: <1501859062-11120-1-git-send-email-axboe@kernel.dk>
+Message-ID: <354f5e68-ecba-853d-c6e5-3f5d363a667c@kernel.dk>
+Date: Fri, 4 Aug 2017 07:55:41 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170804111728.GB15989@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We don't have to inc/dec some counter, since we can just
-iterate the tags. That makes inc/dec a noop, but means we
-have to iterate busy tags to get an in-flight count.
+On 08/04/2017 05:17 AM, Ming Lei wrote:
+> On Thu, Aug 03, 2017 at 02:01:55PM -0600, Jens Axboe wrote:
+>> We don't have to inc/dec some counter, since we can just
+>> iterate the tags. That makes inc/dec a noop, but means we
+>> have to iterate busy tags to get an in-flight count.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  block/blk-mq.c        | 24 ++++++++++++++++++++++++
+>>  block/blk-mq.h        |  2 ++
+>>  block/genhd.c         | 29 +++++++++++++++++++++++++++++
+>>  include/linux/genhd.h | 25 +++----------------------
+>>  4 files changed, 58 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 05dfa3f270ae..37035891e120 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -86,6 +86,30 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
+>>  	sbitmap_clear_bit(&hctx->ctx_map, ctx->index_hw);
+>>  }
+>>  
+>> +struct mq_inflight {
+>> +	struct hd_struct *part;
+>> +	unsigned int inflight;
+>> +};
+>> +
+>> +static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
+>> +				  struct request *rq, void *priv,
+>> +				  bool reserved)
+>> +{
+>> +	struct mq_inflight *mi = priv;
+>> +
+>> +	if (rq->part == mi->part)
+>> +		mi->inflight++;
+>> +}
+>> +
+>> +unsigned int blk_mq_in_flight(struct request_queue *q,
+>> +			       struct hd_struct *part)
+>> +{
+>> +	struct mq_inflight mi = { .part = part, .inflight = 0 };
+>> +
+>> +	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
+>> +	return mi.inflight;
+>> +}
+> 
+> IMO it might not be as efficient as per-cpu variable.
+> 
+> For example, NVMe on one 128-core system, if we use percpu variable,
+> it is enough to read 128 local variable from each CPU for accounting
+> one in_flight.
 
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq.c        | 31 +++++++++++++++++++++++++++++++
- block/blk-mq.h        |  3 +++
- block/genhd.c         | 37 +++++++++++++++++++++++++++++++++++++
- include/linux/genhd.h | 34 ++++++----------------------------
- 4 files changed, 77 insertions(+), 28 deletions(-)
+IFF the system is configured with NR_CPUS=128. Most distros go
+much bigger. On the other hand, we know that nr_queues will
+never be bigger than the number of online cpus, not the number
+of possible cpus.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a5d369dc7622..fe1aa1f5f069 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -83,6 +83,37 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- 	sbitmap_clear_bit(&hctx->ctx_map, ctx->index_hw);
- }
- 
-+struct mq_inflight {
-+	struct hd_struct *part;
-+	unsigned int *inflight;
-+};
-+
-+static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
-+				  struct request *rq, void *priv,
-+				  bool reserved)
-+{
-+	struct mq_inflight *mi = priv;
-+
-+	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-+		return;
-+
-+	/*
-+	 * Count as inflight if it either matches the partition we asked
-+	 * for, or if it's the root
-+	 */
-+	if (rq->part == mi->part || mi->part->partno)
-+		mi->inflight[0]++;
-+}
-+
-+void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
-+		      unsigned int inflight[2])
-+{
-+	struct mq_inflight mi = { .part = part, .inflight = inflight, };
-+
-+	inflight[0] = 0;
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
-+}
-+
- void blk_freeze_queue_start(struct request_queue *q)
- {
- 	int freeze_depth;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 60b01c0309bc..98252b79b80b 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -133,4 +133,7 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- 	return hctx->nr_ctx && hctx->tags;
- }
- 
-+void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
-+			unsigned int inflight[2]);
-+
- #endif
-diff --git a/block/genhd.c b/block/genhd.c
-index 822f65f95e2a..3dc4d115480f 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -45,6 +45,43 @@ static void disk_add_events(struct gendisk *disk);
- static void disk_del_events(struct gendisk *disk);
- static void disk_release_events(struct gendisk *disk);
- 
-+void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
-+{
-+	if (q->mq_ops)
-+		return;
-+
-+	atomic_inc(&part->in_flight[rw]);
-+	if (part->partno)
-+		atomic_inc(&part_to_disk(part)->part0.in_flight[rw]);
-+}
-+
-+void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
-+{
-+	if (q->mq_ops)
-+		return;
-+
-+	atomic_dec(&part->in_flight[rw]);
-+	if (part->partno)
-+		atomic_dec(&part_to_disk(part)->part0.in_flight[rw]);
-+}
-+
-+void part_in_flight(struct request_queue *q, struct hd_struct *part,
-+		    unsigned int inflight[2])
-+{
-+	if (q->mq_ops) {
-+		blk_mq_in_flight(q, part, inflight);
-+		return;
-+	}
-+
-+	inflight[0] = atomic_read(&part->in_flight[0]) +
-+			atomic_read(&part->in_flight[1]);
-+	if (part->partno) {
-+		part = &part_to_disk(part)->part0;
-+		inflight[1] = atomic_read(&part->in_flight[0]) +
-+				atomic_read(&part->in_flight[1]);
-+	}
-+}
-+
- /**
-  * disk_get_part - get partition
-  * @disk: disk to look partition from
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index a9c8ea632fdc..ea652bfcd675 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -362,34 +362,12 @@ static inline void free_part_stats(struct hd_struct *part)
- #define part_stat_sub(cpu, gendiskp, field, subnd)			\
- 	part_stat_add(cpu, gendiskp, field, -subnd)
- 
--static inline void part_inc_in_flight(struct request_queue *q,
--				      struct hd_struct *part, int rw)
--{
--	atomic_inc(&part->in_flight[rw]);
--	if (part->partno)
--		atomic_inc(&part_to_disk(part)->part0.in_flight[rw]);
--}
--
--static inline void part_dec_in_flight(struct request_queue *q,
--				      struct hd_struct *part, int rw)
--{
--	atomic_dec(&part->in_flight[rw]);
--	if (part->partno)
--		atomic_dec(&part_to_disk(part)->part0.in_flight[rw]);
--}
--
--static inline void part_in_flight(struct request_queue *q,
--				  struct hd_struct *part,
--				  unsigned int inflight[2])
--{
--	inflight[0] = atomic_read(&part->in_flight[0]) +
--			atomic_read(&part->in_flight[1]);
--	if (part->partno) {
--		part = &part_to_disk(part)->part0;
--		inflight[1] = atomic_read(&part->in_flight[0]) +
--				atomic_read(&part->in_flight[1]);
--	}
--}
-+void part_in_flight(struct request_queue *q, struct hd_struct *part,
-+			unsigned int inflight[2]);
-+void part_dec_in_flight(struct request_queue *q, struct hd_struct *part,
-+			int rw);
-+void part_inc_in_flight(struct request_queue *q, struct hd_struct *part,
-+			int rw);
- 
- static inline struct partition_meta_info *alloc_part_info(struct gendisk *disk)
- {
+> But in this way of blk_mq_in_flight(), we need to do 128 
+> sbitmap search, and one sbitmap search need to read at least
+> 16 words of 'unsigned long',  and total 128*16 read.
+
+If that ends up being a problem, it hasn't in testing, then we
+could always stuff an index in front of the full sbitmap.
+
+> So maybe we need to compare the two approaches first.
+
+We already did, back when this was originally posted. See the
+thread from end may / start june and the results from Brian.
+
 -- 
-2.7.4
+Jens Axboe
