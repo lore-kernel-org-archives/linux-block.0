@@ -1,267 +1,98 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:65468 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755018AbdHYMvY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 08:51:24 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V6 12/12] mmc: sdhci-pci: Add CQHCI support for Intel GLK
-Date: Fri, 25 Aug 2017 15:43:55 +0300
-Message-Id: <1503665035-16231-13-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	lucmiccio@gmail.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT V2 2/2] block, bfq: boost throughput with flash-based non-queueing devices
+Date: Fri,  4 Aug 2017 07:35:11 +0200
+Message-Id: <20170804053511.2389-3-paolo.valente@linaro.org>
+In-Reply-To: <20170804053511.2389-1-paolo.valente@linaro.org>
+References: <20170804053511.2389-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Add CQHCI initialization and implement CQHCI operations for Intel GLK.
+When a queue associated with a process remains empty, there are cases
+where throughput gets boosted if the device is idled to await the
+arrival of a new I/O request for that queue. Currently, BFQ assumes
+that one of these cases is when the device has no internal queueing
+(regardless of the properties of the I/O being served). Unfortunately,
+this condition has proved to be too general. So, this commit refines it
+as "the device has no internal queueing and is rotational".
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+This refinement provides a significant throughput boost with random
+I/O, on flash-based storage without internal queueing. For example, on
+a HiKey board, throughput increases by up to 125%, growing, e.g., from
+6.9MB/s to 15.6MB/s with two or three random readers in parallel.
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Luca Miccio <lucmiccio@gmail.com>
 ---
- drivers/mmc/host/Kconfig          |   1 +
- drivers/mmc/host/sdhci-pci-core.c | 154 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 154 insertions(+), 1 deletion(-)
+ block/bfq-iosched.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-index ccf7dab4a9f8..b8c9ea5cb8cd 100644
---- a/drivers/mmc/host/Kconfig
-+++ b/drivers/mmc/host/Kconfig
-@@ -81,6 +81,7 @@ config MMC_SDHCI_BIG_ENDIAN_32BIT_BYTE_SWAPPER
- config MMC_SDHCI_PCI
- 	tristate "SDHCI support on PCI bus"
- 	depends on MMC_SDHCI && PCI
-+	select MMC_CQHCI
- 	help
- 	  This selects the PCI Secure Digital Host Controller Interface.
- 	  Most controllers found today are PCI devices.
-diff --git a/drivers/mmc/host/sdhci-pci-core.c b/drivers/mmc/host/sdhci-pci-core.c
-index bbaddf18a1b3..e22075f99707 100644
---- a/drivers/mmc/host/sdhci-pci-core.c
-+++ b/drivers/mmc/host/sdhci-pci-core.c
-@@ -30,6 +30,8 @@
- #include <linux/mmc/sdhci-pci-data.h>
- #include <linux/acpi.h>
- 
-+#include "cqhci.h"
-+
- #include "sdhci.h"
- #include "sdhci-pci.h"
- #include "sdhci-pci-o2micro.h"
-@@ -117,6 +119,28 @@ int sdhci_pci_resume_host(struct sdhci_pci_chip *chip)
- 
- 	return 0;
- }
-+
-+static int sdhci_cqhci_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
- 
- #ifdef CONFIG_PM
-@@ -167,8 +191,48 @@ static int sdhci_pci_runtime_resume_host(struct sdhci_pci_chip *chip)
- 
- 	return 0;
- }
-+
-+static int sdhci_cqhci_runtime_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_runtime_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_runtime_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_runtime_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
- 
-+static u32 sdhci_cqhci_irq(struct sdhci_host *host, u32 intmask)
-+{
-+	int cmd_error = 0;
-+	int data_error = 0;
-+
-+	if (!sdhci_cqe_irq(host, intmask, &cmd_error, &data_error))
-+		return intmask;
-+
-+	cqhci_irq(host->mmc, intmask, cmd_error, data_error);
-+
-+	return 0;
-+}
-+
-+static void sdhci_pci_dumpregs(struct mmc_host *mmc)
-+{
-+	sdhci_dumpregs(mmc_priv(mmc));
-+}
-+
- /*****************************************************************************\
-  *                                                                           *
-  * Hardware specific quirk handling                                          *
-@@ -567,6 +631,17 @@ static void intel_hs400_enhanced_strobe(struct mmc_host *mmc,
- 	.hw_reset		= sdhci_pci_hw_reset,
- };
- 
-+static const struct sdhci_ops sdhci_intel_glk_ops = {
-+	.set_clock		= sdhci_set_clock,
-+	.set_power		= sdhci_intel_set_power,
-+	.enable_dma		= sdhci_pci_enable_dma,
-+	.set_bus_width		= sdhci_set_bus_width,
-+	.reset			= sdhci_reset,
-+	.set_uhs_signaling	= sdhci_set_uhs_signaling,
-+	.hw_reset		= sdhci_pci_hw_reset,
-+	.irq			= sdhci_cqhci_irq,
-+};
-+
- static void byt_read_dsm(struct sdhci_pci_slot *slot)
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index ccdc9e6..509f399 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3114,7 +3114,10 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
  {
- 	struct intel_host *intel_host = sdhci_pci_priv(slot);
-@@ -596,15 +671,83 @@ static int glk_emmc_probe_slot(struct sdhci_pci_slot *slot)
- {
- 	int ret = byt_emmc_probe_slot(slot);
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+-	bool idling_boosts_thr, idling_boosts_thr_without_issues,
++	bool rot_without_queueing =
++		!blk_queue_nonrot(bfqd->queue) && !bfqd->hw_tag,
++		bfqq_sequential_and_IO_bound,
++		idling_boosts_thr, idling_boosts_thr_without_issues,
+ 		idling_needed_for_service_guarantees,
+ 		asymmetric_scenario;
  
-+	slot->host->mmc->caps2 |= MMC_CAP2_CQE;
-+
- 	if (slot->chip->pdev->device != PCI_DEVICE_ID_INTEL_GLK_EMMC) {
- 		slot->host->mmc->caps2 |= MMC_CAP2_HS400_ES,
- 		slot->host->mmc_host_ops.hs400_enhanced_strobe =
- 						intel_hs400_enhanced_strobe;
-+		slot->host->mmc->caps2 |= MMC_CAP2_CQE_DCMD;
- 	}
+@@ -3133,28 +3136,34 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	    bfq_class_idle(bfqq))
+ 		return false;
  
- 	return ret;
- }
++	bfqq_sequential_and_IO_bound = !BFQQ_SEEKY(bfqq) &&
++		bfq_bfqq_IO_bound(bfqq) && bfq_bfqq_has_short_ttime(bfqq);
++
+ 	/*
+ 	 * The next variable takes into account the cases where idling
+ 	 * boosts the throughput.
+ 	 *
+ 	 * The value of the variable is computed considering, first, that
+ 	 * idling is virtually always beneficial for the throughput if:
+-	 * (a) the device is not NCQ-capable, or
+-	 * (b) regardless of the presence of NCQ, the device is rotational
+-	 *     and the request pattern for bfqq is I/O-bound and sequential.
++	 * (a) the device is not NCQ-capable and rotational, or
++	 * (b) regardless of the presence of NCQ, the device is rotational and
++	 *     the request pattern for bfqq is I/O-bound and sequential, or
++	 * (c) regardless of whether it is rotational, the device is
++	 *     not NCQ-capable and the request pattern for bfqq is
++	 *     I/O-bound and sequential.
+ 	 *
+ 	 * Secondly, and in contrast to the above item (b), idling an
+ 	 * NCQ-capable flash-based device would not boost the
+ 	 * throughput even with sequential I/O; rather it would lower
+ 	 * the throughput in proportion to how fast the device
+ 	 * is. Accordingly, the next variable is true if any of the
+-	 * above conditions (a) and (b) is true, and, in particular,
+-	 * happens to be false if bfqd is an NCQ-capable flash-based
+-	 * device.
++	 * above conditions (a), (b) or (c) is true, and, in
++	 * particular, happens to be false if bfqd is an NCQ-capable
++	 * flash-based device.
+ 	 */
+-	idling_boosts_thr = !bfqd->hw_tag ||
+-		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq) &&
+-		 bfq_bfqq_has_short_ttime(bfqq));
++	idling_boosts_thr = rot_without_queueing ||
++		((!blk_queue_nonrot(bfqd->queue) || !bfqd->hw_tag) &&
++		 bfqq_sequential_and_IO_bound);
  
-+static void glk_cqe_enable(struct mmc_host *mmc)
-+{
-+	struct sdhci_host *host = mmc_priv(mmc);
-+	u32 reg;
-+
-+	/*
-+	 * CQE gets stuck if it sees Buffer Read Enable bit set, which can be
-+	 * the case after tuning, so ensure the buffer is drained.
-+	 */
-+	reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	while (reg & SDHCI_DATA_AVAILABLE) {
-+		sdhci_readl(host, SDHCI_BUFFER);
-+		reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	}
-+
-+	sdhci_cqe_enable(mmc);
-+}
-+
-+static const struct cqhci_host_ops glk_cqhci_ops = {
-+	.enable		= glk_cqe_enable,
-+	.disable	= sdhci_cqe_disable,
-+	.dumpregs	= sdhci_pci_dumpregs,
-+};
-+
-+static int glk_emmc_add_host(struct sdhci_pci_slot *slot)
-+{
-+	struct device *dev = &slot->chip->pdev->dev;
-+	struct sdhci_host *host = slot->host;
-+	struct cqhci_host *cq_host;
-+	bool dma64;
-+	int ret;
-+
-+	ret = sdhci_setup_host(host);
-+	if (ret)
-+		return ret;
-+
-+	cq_host = devm_kzalloc(dev, sizeof(*cq_host), GFP_KERNEL);
-+	if (!cq_host) {
-+		ret = -ENOMEM;
-+		goto cleanup;
-+	}
-+
-+	cq_host->mmio = host->ioaddr + 0x200;
-+	cq_host->quirks |= CQHCI_QUIRK_SHORT_TXFR_DESC_SZ;
-+	cq_host->ops = &glk_cqhci_ops;
-+
-+	dma64 = host->flags & SDHCI_USE_64_BIT_DMA;
-+	if (dma64)
-+		cq_host->caps |= CQHCI_TASK_DESC_SZ_128;
-+
-+	ret = cqhci_init(cq_host, host->mmc, dma64);
-+	if (ret)
-+		goto cleanup;
-+
-+	ret = __sdhci_add_host(host);
-+	if (ret)
-+		goto cleanup;
-+
-+	return 0;
-+
-+cleanup:
-+	sdhci_cleanup_host(host);
-+	return ret;
-+}
-+
- #ifdef CONFIG_ACPI
- static int ni_set_max_freq(struct sdhci_pci_slot *slot)
- {
-@@ -683,11 +826,20 @@ static int byt_sd_probe_slot(struct sdhci_pci_slot *slot)
- static const struct sdhci_pci_fixes sdhci_intel_glk_emmc = {
- 	.allow_runtime_pm	= true,
- 	.probe_slot		= glk_emmc_probe_slot,
-+	.add_host		= glk_emmc_add_host,
-+#ifdef CONFIG_PM_SLEEP
-+	.suspend		= sdhci_cqhci_suspend,
-+	.resume			= sdhci_cqhci_resume,
-+#endif
-+#ifdef CONFIG_PM
-+	.runtime_suspend	= sdhci_cqhci_runtime_suspend,
-+	.runtime_resume		= sdhci_cqhci_runtime_resume,
-+#endif
- 	.quirks			= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC,
- 	.quirks2		= SDHCI_QUIRK2_PRESET_VALUE_BROKEN |
- 				  SDHCI_QUIRK2_CAPS_BIT63_FOR_HS400 |
- 				  SDHCI_QUIRK2_STOP_WITH_TC,
--	.ops			= &sdhci_intel_byt_ops,
-+	.ops			= &sdhci_intel_glk_ops,
- 	.priv_size		= sizeof(struct intel_host),
- };
- 
+ 	/*
+ 	 * The value of the next variable,
 -- 
-1.9.1
+2.10.0
