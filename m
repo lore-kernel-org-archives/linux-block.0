@@ -1,37 +1,105 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:49673 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752664AbdHVUmD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2017 16:42:03 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V2 10/20] blk-mq-sched: introduce helpers for query,
- change busy state
-Date: Tue, 22 Aug 2017 20:41:14 +0000
-Message-ID: <1503434472.2508.19.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:34976 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751140AbdHEG5w (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:57:52 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 10/20] blk-mq-sched: introduce helpers for query, change busy state
+Date: Sat,  5 Aug 2017 14:56:55 +0800
+Message-Id: <20170805065705.12989-11-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
-         <20170805065705.12989-11-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-11-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA4LTA1IGF0IDE0OjU2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gK3N0
-YXRpYyBpbmxpbmUgYm9vbCBibGtfbXFfaGN0eF9pc19kaXNwYXRjaF9idXN5KHN0cnVjdCBibGtf
-bXFfaHdfY3R4ICpoY3R4KQ0KPiArew0KPiArCXJldHVybiB0ZXN0X2JpdChCTEtfTVFfU19ESVNQ
-QVRDSF9CVVNZLCAmaGN0eC0+c3RhdGUpOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW5saW5lIHZv
-aWQgYmxrX21xX2hjdHhfc2V0X2Rpc3BhdGNoX2J1c3koc3RydWN0IGJsa19tcV9od19jdHggKmhj
-dHgpDQo+ICt7DQo+ICsJc2V0X2JpdChCTEtfTVFfU19ESVNQQVRDSF9CVVNZLCAmaGN0eC0+c3Rh
-dGUpOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQgYmxrX21xX2hjdHhfY2xlYXJf
-ZGlzcGF0Y2hfYnVzeShzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCkNCj4gK3sNCj4gKwljbGVh
-cl9iaXQoQkxLX01RX1NfRElTUEFUQ0hfQlVTWSwgJmhjdHgtPnN0YXRlKTsNCj4gK30NCg0KSGVs
-bG8gTWluZywNCg0KQXJlIHRoZXNlIGhlbHBlciBmdW5jdGlvbnMgbW9kaWZpZWQgaW4gYSBsYXRl
-ciBwYXRjaD8gSWYgbm90LCBwbGVhc2UgZHJvcA0KdGhpcyBwYXRjaC4gT25lIGxpbmUgaGVscGVy
-IGZ1bmN0aW9ucyBhcmUgbm90IHVzZWZ1bCBhbmQgZG8gbm90IGltcHJvdmUNCnJlYWRhYmlsaXR5
-IG9mIHNvdXJjZSBjb2RlLg0KDQpUaGFua3MsDQoNCkJhcnQu
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c |  6 +++---
+ block/blk-mq.c       |  4 ++--
+ block/blk-mq.h       | 15 +++++++++++++++
+ 3 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 18d997679d7d..9fae76275acf 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -181,7 +181,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 		 * effect.
+ 		 */
+ 		if (list_empty_careful(&hctx->dispatch))
+-			clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++			blk_mq_hctx_clear_dispatch_busy(hctx);
+ 	}
+ 
+ 	/*
+@@ -189,7 +189,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * will be run to try to make progress, so it is always
+ 	 * safe to check the state here.
+ 	 */
+-	if (test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state))
++	if (blk_mq_hctx_is_dispatch_busy(hctx))
+ 		return;
+ 
+ 	if (!has_sched_dispatch) {
+@@ -342,7 +342,7 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+ 	 * the dispatch list.
+ 	 */
+ 	spin_lock(&hctx->lock);
+-	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	blk_mq_hctx_set_dispatch_busy(hctx);
+ 	list_add(&rq->queuelist, &hctx->dispatch);
+ 	spin_unlock(&hctx->lock);
+ 	return true;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b535587570b8..11042aa0501d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1105,7 +1105,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
+ 		 * DISPATCH_BUSY won't be cleared until all requests
+ 		 * in hctx->dispatch are dispatched successfully
+ 		 */
+-		set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++		blk_mq_hctx_set_dispatch_busy(hctx);
+ 		list_splice_init(list, &hctx->dispatch);
+ 		spin_unlock(&hctx->lock);
+ 
+@@ -1883,7 +1883,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+ 		return 0;
+ 
+ 	spin_lock(&hctx->lock);
+-	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	blk_mq_hctx_set_dispatch_busy(hctx);
+ 	list_splice_tail_init(&tmp, &hctx->dispatch);
+ 	spin_unlock(&hctx->lock);
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 260b608af336..cadc0c83a140 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -136,4 +136,19 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ 	return hctx->nr_ctx && hctx->tags;
+ }
+ 
++static inline bool blk_mq_hctx_is_dispatch_busy(struct blk_mq_hw_ctx *hctx)
++{
++	return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++}
++
++static inline void blk_mq_hctx_set_dispatch_busy(struct blk_mq_hw_ctx *hctx)
++{
++	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++}
++
++static inline void blk_mq_hctx_clear_dispatch_busy(struct blk_mq_hw_ctx *hctx)
++{
++	clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++}
++
+ #endif
+-- 
+2.9.4
