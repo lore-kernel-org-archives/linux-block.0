@@ -1,259 +1,82 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34496 "EHLO mail.kernel.org"
+Received: from mx1.redhat.com ([209.132.183.28]:33716 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752024AbdHEPvz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 11:51:55 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
-        Kyungchan Koh <kkc6196@fb.com>
-Subject: [PATCH 3/5] testb: implement bandwidth control
-Date: Sat,  5 Aug 2017 08:51:47 -0700
-Message-Id: <dc8e1a2ddd66e3f5a68229a119e8f8ac864b0bfe.1501945859.git.shli@fb.com>
-In-Reply-To: <cover.1501945859.git.shli@fb.com>
-References: <cover.1501945859.git.shli@fb.com>
-In-Reply-To: <cover.1501945859.git.shli@fb.com>
-References: <cover.1501945859.git.shli@fb.com>
+        id S1751140AbdHEG6N (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:58:13 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 16/20] block: move actual bio merge code into __elv_merge
+Date: Sat,  5 Aug 2017 14:57:01 +0800
+Message-Id: <20170805065705.12989-17-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Kyungchan Koh <kkc6196@fb.com>
+So that we can reuse __elv_merge() to merge bio
+into requests from sw queue in the following patches.
 
-In test, we usually expect controllable disk speed. For example, in a
-raid array, we'd like some disks are fast and some are slow. MD RAID
-actually has a feature for this. To test the feature, we'd like to make
-the disk run in specific speed.
-
-block throttling probably can be used for this purpose, but it requires
-cgroup setup. Here we just implement a simple throttling mechanism in
-the driver. There is slight fluctuation in the mechanism, but it's good
-enough for test.
-
-Signed-off-by: Kyungchan Koh <kkc6196@fb.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/test_blk.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 103 insertions(+), 1 deletion(-)
+ block/elevator.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/test_blk.c b/drivers/block/test_blk.c
-index 1b06ce7..c67c73d 100644
---- a/drivers/block/test_blk.c
-+++ b/drivers/block/test_blk.c
-@@ -9,9 +9,11 @@
- 
- #include <linux/init.h>
- #include <linux/module.h>
-+#include <linux/atomic.h>
- #include <linux/blk-mq.h>
- #include <linux/blkdev.h>
- #include <linux/configfs.h>
-+#include <linux/hrtimer.h>
- #include <linux/radix-tree.h>
- #include <linux/idr.h>
- 
-@@ -23,6 +25,14 @@
- 
- #define FREE_BATCH		16
- 
-+#define TICKS_PER_SEC		50ULL
-+#define TIMER_INTERVAL		(NSEC_PER_SEC / TICKS_PER_SEC)
-+
-+static inline u64 mb_per_tick(int mbps)
-+{
-+	return (1 << 20) / TICKS_PER_SEC * ((u64) mbps);
-+}
-+
- struct testb {
- 	unsigned int index;
- 	struct request_queue *q;
-@@ -33,6 +43,9 @@ struct testb {
- 	struct blk_mq_tag_set tag_set;
- 
- 	char disk_name[DISK_NAME_LEN];
-+
-+	atomic_long_t cur_bytes;
-+	struct hrtimer timer;
- };
- 
- /*
-@@ -53,10 +66,12 @@ struct testb_page {
-  *
-  * CONFIGURED:	Device has been configured and turned on. Cannot reconfigure.
-  * UP:		Device is currently on and visible in userspace.
-+ * THROTTLED:	Device is being throttled.
-  */
- enum testb_device_flags {
- 	TESTB_DEV_FL_CONFIGURED	= 0,
- 	TESTB_DEV_FL_UP		= 1,
-+	TESTB_DEV_FL_THROTTLED	= 2,
- };
- 
- /*
-@@ -74,6 +89,7 @@ enum testb_device_flags {
-  * @nr_queues:	The number of queues.
-  * @q_depth:	The depth of each queue.
-  * @discard:	If enable discard
-+ * @mbps:	Bandwidth throttle cap (in mb/s).
-  */
- struct testb_device {
- 	struct config_item item;
-@@ -88,6 +104,7 @@ struct testb_device {
- 	uint nr_queues;
- 	uint q_depth;
- 	uint discard;
-+	uint mbps;
- };
- 
- static int testb_poweron_device(struct testb_device *dev);
-@@ -161,6 +178,7 @@ TESTB_DEVICE_ATTR(blocksize, uint);
- TESTB_DEVICE_ATTR(nr_queues, uint);
- TESTB_DEVICE_ATTR(q_depth, uint);
- TESTB_DEVICE_ATTR(discard, uint);
-+TESTB_DEVICE_ATTR(mbps, uint);
- 
- static ssize_t testb_device_power_show(struct config_item *item, char *page)
- {
-@@ -207,6 +225,7 @@ static struct configfs_attribute *testb_device_attrs[] = {
- 	&testb_device_attr_nr_queues,
- 	&testb_device_attr_q_depth,
- 	&testb_device_attr_discard,
-+	&testb_device_attr_mbps,
- 	NULL,
- };
- 
-@@ -247,6 +266,7 @@ config_item *testb_group_make_item(struct config_group *group, const char *name)
- 	t_dev->nr_queues = 2;
- 	t_dev->q_depth = 64;
- 	t_dev->discard = 1;
-+	t_dev->mbps = -1;
- 
- 	return &t_dev->item;
+diff --git a/block/elevator.c b/block/elevator.c
+index 7423e9c9cb27..2fd2f777127b 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -409,8 +409,9 @@ void elv_dispatch_add_tail(struct request_queue *q, struct request *rq)
  }
-@@ -265,7 +285,7 @@ testb_group_drop_item(struct config_group *group, struct config_item *item)
+ EXPORT_SYMBOL(elv_dispatch_add_tail);
  
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
+-enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+-		struct bio *bio)
++static inline enum elv_merge __elv_merge(struct request_queue *q,
++		struct request **req, struct bio *bio,
++		struct hlist_head *hash, struct request *last_merge)
  {
--	return snprintf(page, PAGE_SIZE, "\n");
-+	return snprintf(page, PAGE_SIZE, "bandwidth\n");
- }
+ 	struct elevator_queue *e = q->elevator;
+ 	struct request *__rq;
+@@ -427,11 +428,11 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	/*
+ 	 * First try one-hit cache.
+ 	 */
+-	if (q->last_merge && elv_bio_merge_ok(q->last_merge, bio)) {
+-		enum elv_merge ret = blk_try_merge(q->last_merge, bio);
++	if (last_merge && elv_bio_merge_ok(last_merge, bio)) {
++		enum elv_merge ret = blk_try_merge(last_merge, bio);
  
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -299,6 +319,11 @@ static DEFINE_IDA(testb_indices);
- static DEFINE_MUTEX(testb_lock);
- static int testb_major;
- 
-+static inline int testb_throttled(struct testb *testb)
-+{
-+	return test_bit(TESTB_DEV_FL_THROTTLED, &testb->t_dev->flags);
-+}
-+
- static struct testb_page *testb_alloc_page(gfp_t gfp_flags)
- {
- 	struct testb_page *t_page;
-@@ -570,6 +595,44 @@ static int testb_handle_rq(struct request *rq)
- 	} else if (req_op(rq) == REQ_OP_FLUSH)
- 		return testb_handle_flush(testb);
- 
-+	len = blk_rq_bytes(rq);
-+	if (testb_throttled(testb)) {
-+		if (!hrtimer_active(&testb->timer))
-+			hrtimer_restart(&testb->timer);
-+
-+		/*
-+		 * The lock is taken here to ensure no race happens
-+		 * between the timer that a) resets the budget and
-+		 * b) starts the queue and the cmd handler that
-+		 * c) spends the budget and d) determines to stop
-+		 * the queue.
-+		 *
-+		 * The race happens when the processes interweave.
-+		 * For example, c, a, b, d. For a whole interval,
-+		 * there may be no I/O occurring due to the race.
-+		 *
-+		 * Solution: Create an isolated region using the
-+		 * device spinlock that ensure a and b occur in
-+		 * isolation to c and d such that no interweaving
-+		 * occurs.
-+		 *
-+		 * This also prevents multiple processes or threads from
-+		 * calling blk_mq_stop_hw_queues.
-+		 */
-+		spin_lock_irqsave(&testb->t_dev->lock, lock_flag);
-+
-+		if (atomic_long_add_negative((int)(-1 * len),
-+						&testb->cur_bytes)) {
-+			if (!blk_mq_queue_stopped(testb->q))
-+				blk_mq_stop_hw_queues(testb->q);
-+
-+			spin_unlock_irqrestore(&testb->t_dev->lock, lock_flag);
-+			/* requeue the request */
-+			return -ENOMEM;
-+		}
-+		spin_unlock_irqrestore(&testb->t_dev->lock, lock_flag);
-+	}
-+
- 	spin_lock_irqsave(&testb->t_dev->lock, lock_flag);
- 	rq_for_each_segment(bvec, rq, iter) {
- 		len = bvec.bv_len;
-@@ -622,6 +685,8 @@ static void testb_free_bdev(struct testb *testb)
- 	ida_simple_remove(&testb_indices, testb->index);
- 	mutex_unlock(&testb_lock);
- 
-+	if (testb_throttled(testb))
-+		hrtimer_cancel(&testb->timer);
- 	blk_cleanup_queue(testb->q);
- 	blk_mq_free_tag_set(&testb->tag_set);
- 
-@@ -657,6 +722,37 @@ static void testb_config_flush(struct testb *testb)
- 	blk_queue_flush_queueable(testb->q, true);
- }
- 
-+static enum hrtimer_restart testb_timer_fn(struct hrtimer *timer)
-+{
-+	struct testb *testb = container_of(timer, struct testb, timer);
-+	ktime_t testb_timer_interval = ktime_set(0, TIMER_INTERVAL);
-+	int testb_mbps = testb->t_dev->mbps;
-+	unsigned long lock_flag;
-+
-+	if (atomic_long_read(&testb->cur_bytes) == mb_per_tick(testb_mbps))
-+		return HRTIMER_NORESTART;
-+
-+	spin_lock_irqsave(&testb->t_dev->lock, lock_flag);
-+	atomic_long_set(&testb->cur_bytes, mb_per_tick(testb_mbps));
-+	if (blk_mq_queue_stopped(testb->q))
-+		blk_mq_start_stopped_hw_queues(testb->q, true);
-+	spin_unlock_irqrestore(&testb->t_dev->lock, lock_flag);
-+
-+	hrtimer_forward_now(&testb->timer, testb_timer_interval);
-+
-+	return HRTIMER_RESTART;
-+}
-+
-+static void testb_setup_timer(struct testb *testb)
-+{
-+	ktime_t testb_timer_interval = ktime_set(0, TIMER_INTERVAL);
-+
-+	hrtimer_init(&testb->timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	testb->timer.function = &testb_timer_fn;
-+	atomic_long_set(&testb->cur_bytes, mb_per_tick(testb->t_dev->mbps));
-+	hrtimer_start(&testb->timer, testb_timer_interval, HRTIMER_MODE_ABS);
-+}
-+
- static int testb_gendisk_register(struct testb *testb)
- {
- 	sector_t size;
-@@ -722,6 +818,12 @@ static int testb_alloc_bdev(struct testb_device *t_dev)
- 		goto out_cleanup_tags;
+ 		if (ret != ELEVATOR_NO_MERGE) {
+-			*req = q->last_merge;
++			*req = last_merge;
+ 			return ret;
+ 		}
  	}
+@@ -442,7 +443,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	/*
+ 	 * See if our hash lookup can find a potential backmerge.
+ 	 */
+-	__rq = elv_rqhash_find(q, bio->bi_iter.bi_sector);
++	__rq = rqhash_find(hash, bio->bi_iter.bi_sector);
+ 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
+ 		*req = __rq;
+ 		return ELEVATOR_BACK_MERGE;
+@@ -456,6 +457,12 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	return ELEVATOR_NO_MERGE;
+ }
  
-+	if (t_dev->mbps && t_dev->mbps != -1) {
-+		t_dev->mbps = (t_dev->mbps >> 10) > 0 ? 1024 : t_dev->mbps;
-+		set_bit(TESTB_DEV_FL_THROTTLED, &t_dev->flags);
-+		testb_setup_timer(testb);
-+	}
++enum elv_merge elv_merge(struct request_queue *q, struct request **req,
++		struct bio *bio)
++{
++	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
++}
 +
- 	testb->q->queuedata = testb;
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, testb->q);
- 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, testb->q);
+ /*
+  * Attempt to do an insertion back merge. Only check for the case where
+  * we can append 'rq' to an existing request, so we can throw 'rq' away
 -- 
-2.9.3
+2.9.4
