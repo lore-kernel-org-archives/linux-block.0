@@ -1,85 +1,189 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:35193 "EHLO mga14.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:48304 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751016AbdHaMDv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 08:03:51 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V7 04/10] mmc: mmc: Enable CQE's
-Date: Thu, 31 Aug 2017 14:56:50 +0300
-Message-Id: <1504180616-14514-5-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
-References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+        id S1751140AbdHEG6a (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:58:30 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 20/20] blk-mq: improve bio merge from blk-mq sw queue
+Date: Sat,  5 Aug 2017 14:57:05 +0800
+Message-Id: <20170805065705.12989-21-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Enable or disable CQE when a card is added or removed respectively.
+This patch uses hash table to do bio merge from sw queue,
+then we can align to blk-mq scheduler/block legacy's way
+for bio merge.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Turns out bio merge via hash table is more efficient than
+simple merge on the last 8 requests in sw queue. On SCSI SRP,
+it is observed ~10% IOPS is increased in sequential IO test
+with this patch.
+
+It is also one step forward to real 'none' scheduler, in which
+way the blk-mq scheduler framework can be more clean.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/mmc/core/bus.c |  7 +++++++
- drivers/mmc/core/mmc.c | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+ block/blk-mq-sched.c | 49 ++++++++++++-------------------------------------
+ block/blk-mq.c       | 28 +++++++++++++++++++++++++---
+ 2 files changed, 37 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
-index 301246513a37..a4b49e25fe96 100644
---- a/drivers/mmc/core/bus.c
-+++ b/drivers/mmc/core/bus.c
-@@ -369,10 +369,17 @@ int mmc_add_card(struct mmc_card *card)
-  */
- void mmc_remove_card(struct mmc_card *card)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 7fb7949ed7ce..f49d131d91ce 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -254,50 +254,25 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
+ 
+-/*
+- * Reverse check our software queue for entries that we could potentially
+- * merge with. Currently includes a hand-wavy stop count of 8, to not spend
+- * too much time checking for merges.
+- */
+-static bool blk_mq_attempt_merge(struct request_queue *q,
++static bool blk_mq_ctx_try_merge(struct request_queue *q,
+ 				 struct blk_mq_ctx *ctx, struct bio *bio)
  {
-+	struct mmc_host *host = card->host;
-+
- #ifdef CONFIG_DEBUG_FS
- 	mmc_remove_card_debugfs(card);
- #endif
+-	struct request *rq;
+-	int checked = 8;
++	struct request *rq, *free = NULL;
++	enum elv_merge type;
++	bool merged;
  
-+	if (host->cqe_enabled) {
-+		host->cqe_ops->cqe_disable(host);
-+		host->cqe_enabled = false;
-+	}
-+
- 	if (mmc_card_present(card)) {
- 		if (mmc_host_is_spi(card->host)) {
- 			pr_info("%s: SPI card removed\n",
-diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index 194cf2082e73..0dcbd25126a1 100644
---- a/drivers/mmc/core/mmc.c
-+++ b/drivers/mmc/core/mmc.c
-@@ -1807,6 +1807,18 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
- 	 */
- 	card->reenable_cmdq = card->ext_csd.cmdq_en;
+ 	lockdep_assert_held(&ctx->lock);
  
-+	if (card->ext_csd.cmdq_en && !host->cqe_enabled) {
-+		err = host->cqe_ops->cqe_enable(host, card);
-+		if (err) {
-+			pr_err("%s: Failed to enable CQE, error %d\n",
-+				mmc_hostname(host), err);
-+		} else {
-+			host->cqe_enabled = true;
-+			pr_info("%s: Command Queue Engine enabled\n",
-+				mmc_hostname(host));
-+		}
-+	}
-+
- 	if (!oldcard)
- 		host->card = card;
+-	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
+-		bool merged = false;
+-
+-		if (!checked--)
+-			break;
+-
+-		if (!blk_rq_merge_ok(rq, bio))
+-			continue;
++	type = elv_merge_ctx(q, &rq, bio, ctx);
++	merged = __blk_mq_try_merge(q, bio, &free, rq, type);
  
+-		switch (blk_try_merge(rq, bio)) {
+-		case ELEVATOR_BACK_MERGE:
+-			if (blk_mq_sched_allow_merge(q, rq, bio))
+-				merged = bio_attempt_back_merge(q, rq, bio);
+-			break;
+-		case ELEVATOR_FRONT_MERGE:
+-			if (blk_mq_sched_allow_merge(q, rq, bio))
+-				merged = bio_attempt_front_merge(q, rq, bio);
+-			break;
+-		case ELEVATOR_DISCARD_MERGE:
+-			merged = bio_attempt_discard_merge(q, rq, bio);
+-			break;
+-		default:
+-			continue;
+-		}
++	if (free)
++		blk_mq_free_request(free);
+ 
+-		if (merged)
+-			ctx->rq_merged++;
+-		return merged;
+-	}
++	if (merged)
++		ctx->rq_merged++;
+ 
+-	return false;
++	return merged;
+ }
+ 
+ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+@@ -315,7 +290,7 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+ 	if (hctx->flags & BLK_MQ_F_SHOULD_MERGE) {
+ 		/* default per sw-queue merge */
+ 		spin_lock(&ctx->lock);
+-		ret = blk_mq_attempt_merge(q, ctx, bio);
++		ret = blk_mq_ctx_try_merge(q, ctx, bio);
+ 		spin_unlock(&ctx->lock);
+ 	}
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index db21e71bb087..6bd960fe11ec 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -809,6 +809,18 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	blk_queue_exit(q);
+ }
+ 
++static void blk_mq_ctx_remove_rq_list(struct blk_mq_ctx *ctx,
++		struct list_head *head)
++{
++	struct request *rq;
++
++	lockdep_assert_held(&ctx->lock);
++
++	list_for_each_entry(rq, head, queuelist)
++		rqhash_del(rq);
++	ctx->last_merge = NULL;
++}
++
+ struct flush_busy_ctx_data {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct list_head *list;
+@@ -823,6 +835,7 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+ 	sbitmap_clear_bit(sb, bitnr);
+ 	spin_lock(&ctx->lock);
+ 	list_splice_tail_init(&ctx->rq_list, flush_data->list);
++	blk_mq_ctx_remove_rq_list(ctx, flush_data->list);
+ 	spin_unlock(&ctx->lock);
+ 	return true;
+ }
+@@ -852,17 +865,23 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *d
+ 	struct dispatch_rq_data *dispatch_data = data;
+ 	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
+ 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
++	struct request *rq = NULL;
+ 
+ 	spin_lock(&ctx->lock);
+ 	if (unlikely(!list_empty(&ctx->rq_list))) {
+-		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
+-		list_del_init(&dispatch_data->rq->queuelist);
++		rq = list_entry_rq(ctx->rq_list.next);
++		list_del_init(&rq->queuelist);
++		rqhash_del(rq);
+ 		if (list_empty(&ctx->rq_list))
+ 			sbitmap_clear_bit(sb, bitnr);
+ 	}
++	if (ctx->last_merge == rq)
++		ctx->last_merge = NULL;
+ 	spin_unlock(&ctx->lock);
+ 
+-	return !dispatch_data->rq;
++	dispatch_data->rq = rq;
++
++	return !rq;
+ }
+ 
+ struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
+@@ -1376,6 +1395,8 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
+ 		list_add(&rq->queuelist, &ctx->rq_list);
+ 	else
+ 		list_add_tail(&rq->queuelist, &ctx->rq_list);
++
++	rqhash_add(ctx->hash, rq);
+ }
+ 
+ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+@@ -1868,6 +1889,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+ 	spin_lock(&ctx->lock);
+ 	if (!list_empty(&ctx->rq_list)) {
+ 		list_splice_init(&ctx->rq_list, &tmp);
++		blk_mq_ctx_remove_rq_list(ctx, &tmp);
+ 		blk_mq_hctx_clear_pending(hctx, ctx);
+ 	}
+ 	spin_unlock(&ctx->lock);
 -- 
-1.9.1
+2.9.4
