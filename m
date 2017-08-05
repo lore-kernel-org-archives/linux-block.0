@@ -1,61 +1,134 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:59899 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752451AbdHVT4n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2017 15:56:43 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V2 05/20] blk-mq-sched: improve dispatching from sw queue
-Date: Tue, 22 Aug 2017 19:55:55 +0000
-Message-ID: <1503431751.2508.13.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:48704 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751140AbdHEG5i (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:57:38 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 05/20] blk-mq-sched: improve dispatching from sw queue
+Date: Sat,  5 Aug 2017 14:56:50 +0800
+Message-Id: <20170805065705.12989-6-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
-         <20170805065705.12989-6-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA4LTA1IGF0IDE0OjU2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZWFz
-eSB0byBjYXVzZSBxdWV1ZSBidXN5IGJlY2FzdWUgb2YgdGhlIHNtYWxsDQogICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeXl5eXl5eDQogICAgICAgICAgICAgICAgICAgICAgICAgICBiZWNhdXNl
-Pw0KIA0KPiAtc3RhdGljIHZvaWQgYmxrX21xX2RvX2Rpc3BhdGNoKHN0cnVjdCByZXF1ZXN0X3F1
-ZXVlICpxLA0KPiAtCQkJICAgICAgIHN0cnVjdCBlbGV2YXRvcl9xdWV1ZSAqZSwNCj4gLQkJCSAg
-ICAgICBzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCkNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCBi
-bGtfbXFfZG9fZGlzcGF0Y2hfc2NoZWQoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsDQo+ICsJCQkJ
-CSAgICBzdHJ1Y3QgZWxldmF0b3JfcXVldWUgKmUsDQo+ICsJCQkJCSAgICBzdHJ1Y3QgYmxrX21x
-X2h3X2N0eCAqaGN0eCkNCj4gIHsNCj4gIAlMSVNUX0hFQUQocnFfbGlzdCk7DQoNCldoeSB0byBk
-ZWNsYXJlIHRoaXMgZnVuY3Rpb24gImlubGluZSI/IEFyZSB5b3Ugc3VyZSB0aGF0IHRoZSBjb21w
-aWxlcg0KaXMgbm90IHNtYXJ0IGVub3VnaCB0byBkZWNpZGUgb24gaXRzIG93biB3aGV0aGVyIG9y
-IG5vdCB0byBpbmxpbmUgdGhpcw0KZnVuY3Rpb24/DQoNCj4gK3N0YXRpYyBpbmxpbmUgc3RydWN0
-IGJsa19tcV9jdHggKmJsa19tcV9uZXh0X2N0eChzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCwN
-Cj4gKwkJCQkJCSBzdHJ1Y3QgYmxrX21xX2N0eCAqY3R4KQ0KPiArew0KPiArCXVuc2lnbmVkIGlk
-eCA9IGN0eC0+aW5kZXhfaHc7DQo+ICsNCj4gKwlpZiAoKytpZHggPT0gaGN0eC0+bnJfY3R4KQ0K
-PiArCQlpZHggPSAwOw0KPiArDQo+ICsJcmV0dXJuIGhjdHgtPmN0eHNbaWR4XTsNCj4gK30NCj4g
-Kw0KPiArc3RhdGljIGlubGluZSB2b2lkIGJsa19tcV9kb19kaXNwYXRjaF9jdHgoc3RydWN0IHJl
-cXVlc3RfcXVldWUgKnEsDQo+ICsJCQkJCSAgc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgpDQo+
-ICt7DQo+ICsJTElTVF9IRUFEKHJxX2xpc3QpOw0KPiArCXN0cnVjdCBibGtfbXFfY3R4ICpjdHgg
-PSBOVUxMOw0KPiArDQo+ICsJZG8gew0KPiArCQlzdHJ1Y3QgcmVxdWVzdCAqcnE7DQo+ICsNCj4g
-KwkJcnEgPSBibGtfbXFfZGlzcGF0Y2hfcnFfZnJvbV9jdHgoaGN0eCwgY3R4KTsNCj4gKwkJaWYg
-KCFycSkNCj4gKwkJCWJyZWFrOw0KPiArCQlsaXN0X2FkZCgmcnEtPnF1ZXVlbGlzdCwgJnJxX2xp
-c3QpOw0KPiArDQo+ICsJCS8qIHJvdW5kIHJvYmluIGZvciBmYWlyIGRpc3BhdGNoICovDQo+ICsJ
-CWN0eCA9IGJsa19tcV9uZXh0X2N0eChoY3R4LCBycS0+bXFfY3R4KTsNCj4gKwl9IHdoaWxlIChi
-bGtfbXFfZGlzcGF0Y2hfcnFfbGlzdChxLCAmcnFfbGlzdCkpOw0KPiArfQ0KDQpQbGVhc2UgY29u
-c2lkZXIgdG8gbW92ZSB0aGUgYmxrX21xX25leHRfY3R4KCkgZnVuY3Rpb25hbGl0eSBpbnRvDQpi
-bGtfbXFfZGlzcGF0Y2hfcnFfZnJvbV9jdHgoKSBhcyByZXF1ZXN0ZWQgaW4gYSBjb21tZW50IG9u
-IGEgcHJldmlvdXMgcGF0Y2guDQoNCj4gIHZvaWQgYmxrX21xX3NjaGVkX2Rpc3BhdGNoX3JlcXVl
-c3RzKHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4KQ0KPiAgew0KPiAgCXN0cnVjdCByZXF1ZXN0
-X3F1ZXVlICpxID0gaGN0eC0+cXVldWU7DQo+IEBAIC0xNDIsMTggKzE3MiwzMSBAQCB2b2lkIGJs
-a19tcV9zY2hlZF9kaXNwYXRjaF9yZXF1ZXN0cyhzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCkN
-Cj4gIAlpZiAoIWxpc3RfZW1wdHkoJnJxX2xpc3QpKSB7DQo+ICAJCWJsa19tcV9zY2hlZF9tYXJr
-X3Jlc3RhcnRfaGN0eChoY3R4KTsNCj4gIAkJZG9fc2NoZWRfZGlzcGF0Y2ggPSBibGtfbXFfZGlz
-cGF0Y2hfcnFfbGlzdChxLCAmcnFfbGlzdCk7DQo+IC0JfSBlbHNlIGlmICghaGFzX3NjaGVkX2Rp
-c3BhdGNoKSB7DQo+ICsJfSBlbHNlIGlmICghaGFzX3NjaGVkX2Rpc3BhdGNoICYgIXEtPnF1ZXVl
-X2RlcHRoKSB7DQoNClBsZWFzZSB1c2UgIiYmIiBpbnN0ZWFkIG9mICImIiB0byByZXByZXNlbnQg
-bG9naWNhbCBhbmQuDQoNCk90aGVyd2lzZSB0aGlzIHBhdGNoIGxvb2tzIGZpbmUgdG8gbWUuDQoN
-ClRoYW5rcywNCg0KQmFydC4=
+SCSI devices use host-wide tagset, and the shared
+driver tag space is often quite big. Meantime
+there is also queue depth for each lun(.cmd_per_lun),
+which is often small.
+
+So lots of requests may stay in sw queue, and we
+always flush all belonging to same hw queue and
+dispatch them all to driver, unfortunately it is
+easy to cause queue busy becasue of the small
+per-lun queue depth. Once these requests are flushed
+out, they have to stay in hctx->dispatch, and no bio
+merge can participate into these requests, and
+sequential IO performance is hurted.
+
+This patch improves dispatching from sw queue when
+there is per-request-queue queue depth by taking
+request one by one from sw queue, just like the way
+of IO scheduler.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 49 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index f69752961a34..e43c9407d653 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -89,9 +89,9 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
+ 
+-static void blk_mq_do_dispatch(struct request_queue *q,
+-			       struct elevator_queue *e,
+-			       struct blk_mq_hw_ctx *hctx)
++static inline void blk_mq_do_dispatch_sched(struct request_queue *q,
++					    struct elevator_queue *e,
++					    struct blk_mq_hw_ctx *hctx)
+ {
+ 	LIST_HEAD(rq_list);
+ 
+@@ -105,6 +105,36 @@ static void blk_mq_do_dispatch(struct request_queue *q,
+ 	} while (blk_mq_dispatch_rq_list(q, &rq_list));
+ }
+ 
++static inline struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
++						 struct blk_mq_ctx *ctx)
++{
++	unsigned idx = ctx->index_hw;
++
++	if (++idx == hctx->nr_ctx)
++		idx = 0;
++
++	return hctx->ctxs[idx];
++}
++
++static inline void blk_mq_do_dispatch_ctx(struct request_queue *q,
++					  struct blk_mq_hw_ctx *hctx)
++{
++	LIST_HEAD(rq_list);
++	struct blk_mq_ctx *ctx = NULL;
++
++	do {
++		struct request *rq;
++
++		rq = blk_mq_dispatch_rq_from_ctx(hctx, ctx);
++		if (!rq)
++			break;
++		list_add(&rq->queuelist, &rq_list);
++
++		/* round robin for fair dispatch */
++		ctx = blk_mq_next_ctx(hctx, rq->mq_ctx);
++	} while (blk_mq_dispatch_rq_list(q, &rq_list));
++}
++
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+@@ -142,18 +172,31 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+ 		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+-	} else if (!has_sched_dispatch) {
++	} else if (!has_sched_dispatch & !q->queue_depth) {
++		/*
++		 * If there is no per-request_queue depth, we
++		 * flush all requests in this hw queue, otherwise
++		 * pick up request one by one from sw queue for
++		 * avoiding to mess up I/O merge when dispatch
++		 * is busy, which can be triggeredd easily by
++		 * limit of of request_queue's queue depth
++		 */
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+ 	}
+ 
++	if (!do_sched_dispatch)
++		return;
++
+ 	/*
+ 	 * We want to dispatch from the scheduler if we had no work left
+ 	 * on the dispatch list, OR if we did have work but weren't able
+ 	 * to make progress.
+ 	 */
+-	if (do_sched_dispatch && has_sched_dispatch)
+-		blk_mq_do_dispatch(q, e, hctx);
++	if (has_sched_dispatch)
++		blk_mq_do_dispatch_sched(q, e, hctx);
++	else
++		blk_mq_do_dispatch_ctx(q, hctx);
+ }
+ 
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-- 
+2.9.4
