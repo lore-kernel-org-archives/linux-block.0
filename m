@@ -1,39 +1,107 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 2/4] scsi: Add VENDOR_SPECIFIC sense code definitions
-Date: Wed,  2 Aug 2017 16:13:26 +0200
-Message-Id: <1501683208-5240-3-git-send-email-hare@suse.de>
-In-Reply-To: <1501683208-5240-1-git-send-email-hare@suse.de>
-References: <1501683208-5240-1-git-send-email-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:48182 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751140AbdHEG6V (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:58:21 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 18/20] block: introduce .last_merge and .hash to blk_mq_ctx
+Date: Sat,  5 Aug 2017 14:57:03 +0800
+Message-Id: <20170805065705.12989-19-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Some older devices will return vendor specific sense codes, so
-we should be adding a definition for it.
+Prepare for supporting bio merge to sw queue if no
+blk-mq io scheduler is taken.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/scsi/scsi_proto.h | 1 +
- 1 file changed, 1 insertion(+)
+ block/blk-mq.h   |  4 ++++
+ block/blk.h      |  3 +++
+ block/elevator.c | 22 +++++++++++++++++++---
+ 3 files changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
-index 78215fd..06751a9 100644
---- a/include/scsi/scsi_proto.h
-+++ b/include/scsi/scsi_proto.h
-@@ -233,6 +233,7 @@ struct scsi_varlen_cdb_hdr {
- #define UNIT_ATTENTION      0x06
- #define DATA_PROTECT        0x07
- #define BLANK_CHECK         0x08
-+#define VENDOR_SPECIFIC     0x09
- #define COPY_ABORTED        0x0a
- #define ABORTED_COMMAND     0x0b
- #define VOLUME_OVERFLOW     0x0d
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 295fd9dfb01d..3400b01a2e4c 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -18,6 +18,10 @@ struct blk_mq_ctx {
+ 	unsigned long		rq_dispatched[2];
+ 	unsigned long		rq_merged;
+ 
++	/* bio merge via request hash table */
++	struct request		*last_merge;
++	DECLARE_HASHTABLE(hash, ELV_HASH_BITS);
++
+ 	/* incremented at completion time */
+ 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 313002c2f666..6847c5435cca 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -199,6 +199,9 @@ static inline struct request *rqhash_find(struct hlist_head *hash, sector_t offs
+ 	return NULL;
+ }
+ 
++enum elv_merge elv_merge_ctx(struct request_queue *q, struct request **req,
++                struct bio *bio, struct blk_mq_ctx *ctx);
++
+ void blk_insert_flush(struct request *rq);
+ 
+ static inline struct request *__elv_next_request(struct request_queue *q)
+diff --git a/block/elevator.c b/block/elevator.c
+index eb56e2709291..cbdbe823d262 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -471,6 +471,13 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
+ }
+ 
++enum elv_merge elv_merge_ctx(struct request_queue *q, struct request **req,
++		struct bio *bio, struct blk_mq_ctx *ctx)
++{
++	WARN_ON_ONCE(!q->mq_ops);
++	return __elv_merge(q, req, bio, ctx->hash, ctx->last_merge);
++}
++
+ /*
+  * Attempt to do an insertion back merge. Only check for the case where
+  * we can append 'rq' to an existing request, so we can throw 'rq' away
+@@ -516,16 +523,25 @@ void elv_merged_request(struct request_queue *q, struct request *rq,
+ 		enum elv_merge type)
+ {
+ 	struct elevator_queue *e = q->elevator;
++	struct hlist_head *hash = e->hash;
++
++	/* we do bio merge on blk-mq sw queue */
++	if (q->mq_ops && !e) {
++		rq->mq_ctx->last_merge = rq;
++		hash = rq->mq_ctx->hash;
++		goto reposition;
++	}
++
++	q->last_merge = rq;
+ 
+ 	if (e->uses_mq && e->type->ops.mq.request_merged)
+ 		e->type->ops.mq.request_merged(q, rq, type);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_merged_fn)
+ 		e->type->ops.sq.elevator_merged_fn(q, rq, type);
+ 
++ reposition:
+ 	if (type == ELEVATOR_BACK_MERGE)
+-		elv_rqhash_reposition(q, rq);
+-
+-	q->last_merge = rq;
++		rqhash_reposition(hash, rq);
+ }
+ 
+ void elv_merge_requests(struct request_queue *q, struct request *rq,
 -- 
-1.8.5.6
+2.9.4
