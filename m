@@ -1,60 +1,78 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54446 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:48238 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752778AbdHHIxZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 04:53:25 -0400
+        id S1751140AbdHEG6R (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:58:17 -0400
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 38/49] fs/block: convert to bio_for_each_segment_all_sp()
-Date: Tue,  8 Aug 2017 16:45:37 +0800
-Message-Id: <20170808084548.18963-39-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
+Subject: [PATCH V2 17/20] block: add check on elevator for supporting bio merge via hashtable from blk-mq sw queue
+Date: Sat,  5 Aug 2017 14:57:02 +0800
+Message-Id: <20170805065705.12989-18-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+blk_mq_sched_try_merge() will be reused in following patches
+to support bio merge to blk-mq sw queue, so add checkes to
+related functions which are called from blk_mq_sched_try_merge().
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/block_dev.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/elevator.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9941dc8342df..489d103ae11b 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -209,6 +209,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	ssize_t ret;
- 	blk_qc_t qc;
- 	int i;
-+	struct bvec_iter_all bia;
+diff --git a/block/elevator.c b/block/elevator.c
+index 2fd2f777127b..eb56e2709291 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -71,6 +71,10 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
+ 	if (!blk_rq_merge_ok(rq, bio))
+ 		return false;
  
- 	if ((pos | iov_iter_alignment(iter)) &
- 	    (bdev_logical_block_size(bdev) - 1))
-@@ -254,7 +255,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
++	/* We need to support to merge bio from sw queue */
++	if (!rq->q->elevator)
++		return true;
++
+ 	if (!elv_iosched_allow_bio_merge(rq, bio))
+ 		return false;
+ 
+@@ -449,6 +453,10 @@ static inline enum elv_merge __elv_merge(struct request_queue *q,
+ 		return ELEVATOR_BACK_MERGE;
  	}
- 	__set_current_state(TASK_RUNNING);
  
--	bio_for_each_segment_all(bvec, &bio, i) {
-+	bio_for_each_segment_all_sp(bvec, &bio, i, bia) {
- 		if (should_dirty && !PageCompound(bvec->bv_page))
- 			set_page_dirty_lock(bvec->bv_page);
- 		put_page(bvec->bv_page);
-@@ -321,8 +322,9 @@ static void blkdev_bio_end_io(struct bio *bio)
- 	} else {
- 		struct bio_vec *bvec;
- 		int i;
-+		struct bvec_iter_all bia;
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return ELEVATOR_NO_MERGE;
++
+ 	if (e->uses_mq && e->type->ops.mq.request_merge)
+ 		return e->type->ops.mq.request_merge(q, req, bio);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_merge_fn)
+@@ -711,6 +719,10 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
  
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 			put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return NULL;
++
+ 	if (e->uses_mq && e->type->ops.mq.next_request)
+ 		return e->type->ops.mq.next_request(q, rq);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_latter_req_fn)
+@@ -723,6 +735,10 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return NULL;
++
+ 	if (e->uses_mq && e->type->ops.mq.former_request)
+ 		return e->type->ops.mq.former_request(q, rq);
+ 	if (!e->uses_mq && e->type->ops.sq.elevator_former_req_fn)
 -- 
 2.9.4
