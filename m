@@ -1,29 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:17159 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752451AbdHVULb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2017 16:11:31 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V2 07/20] blk-mq-sched: introduce
- blk_mq_sched_queue_depth()
-Date: Tue, 22 Aug 2017 20:10:43 +0000
-Message-ID: <1503432642.2508.16.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:59098 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751140AbdHEG5o (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:57:44 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 07/20] blk-mq-sched: introduce blk_mq_sched_queue_depth()
+Date: Sat,  5 Aug 2017 14:56:52 +0800
+Message-Id: <20170805065705.12989-8-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
-         <20170805065705.12989-8-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-8-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA4LTA1IGF0IDE0OjU2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhl
-IGZvbGxvd2luZyBwYXRjaCB3aWxsIHByb3Bvc2Ugc29tZSBoaW50cyB0byBmaWd1cmUgb3V0DQo+
-IGRlZmF1bHQgcXVldWUgZGVwdGggZm9yIHNjaGVkdWxlciBxdWV1ZSwgc28gaW50cm9kdWNlIGhl
-bHBlcg0KPiBvZiBibGtfbXFfc2NoZWRfcXVldWVfZGVwdGgoKSBmb3IgdGhpcyBwdXJwb3NlLg0K
-DQpSZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg==
+The following patch will propose some hints to figure out
+default queue depth for scheduler queue, so introduce helper
+of blk_mq_sched_queue_depth() for this purpose.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c |  8 +-------
+ block/blk-mq-sched.h | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 26dc19204548..2eda942357c3 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -585,13 +585,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 		return 0;
+ 	}
+ 
+-	/*
+-	 * Default to double of smaller one between hw queue_depth and 128,
+-	 * since we don't split into sync/async like the old code did.
+-	 * Additionally, this is a per-hw queue depth.
+-	 */
+-	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
+-				   BLKDEV_MAX_RQ);
++	q->nr_requests = blk_mq_sched_queue_depth(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 9267d0b7c197..1d47f3fda1d0 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -96,4 +96,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+ 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ }
+ 
++static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
++{
++	/*
++	 * Default to double of smaller one between hw queue_depth and 128,
++	 * since we don't split into sync/async like the old code did.
++	 * Additionally, this is a per-hw queue depth.
++	 */
++	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
++				   BLKDEV_MAX_RQ);
++}
++
+ #endif
+-- 
+2.9.4
