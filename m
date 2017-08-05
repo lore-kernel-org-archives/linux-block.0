@@ -1,69 +1,121 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:42576 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751753AbdHVS3n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2017 14:29:43 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "osandov@fb.com" <osandov@fb.com>,
-        "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V2 02/20] sbitmap: introduce __sbitmap_for_each_set()
-Date: Tue, 22 Aug 2017 18:28:54 +0000
-Message-ID: <1503426533.2508.6.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:48540 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751140AbdHEG51 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:57:27 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>
+Subject: [PATCH V2 02/20] sbitmap: introduce __sbitmap_for_each_set()
+Date: Sat,  5 Aug 2017 14:56:47 +0800
+Message-Id: <20170805065705.12989-3-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
-         <20170805065705.12989-3-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA4LTA1IGF0IDE0OjU2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gLyoq
-DQo+ICAgKiBzYml0bWFwX2Zvcl9lYWNoX3NldCgpIC0gSXRlcmF0ZSBvdmVyIGVhY2ggc2V0IGJp
-dCBpbiBhICZzdHJ1Y3Qgc2JpdG1hcC4NCj4gKyAqIEBvZmY6IE9mZnNldCB0byBpdGVyYXRlIGZy
-b20NCj4gICAqIEBzYjogQml0bWFwIHRvIGl0ZXJhdGUgb3Zlci4NCj4gICAqIEBmbjogQ2FsbGJh
-Y2suIFNob3VsZCByZXR1cm4gdHJ1ZSB0byBjb250aW51ZSBvciBmYWxzZSB0byBicmVhayBlYXJs
-eS4NCj4gICAqIEBkYXRhOiBQb2ludGVyIHRvIHBhc3MgdG8gY2FsbGJhY2suDQoNClVzaW5nICdv
-ZmYnIGFzIHRoZSBuYW1lIGZvciB0aGUgbmV3IGFyZ3VtZW50IHNlZW1zIGNvbmZ1c2luZyB0byBt
-ZSBzaW5jZSB0aGF0DQphcmd1bWVudCBzdGFydHMgZnJvbSB6ZXJvIGFuZCBpcyBub3QgYW4gb2Zm
-c2V0IHJlbGF0aXZlIHRvIGFueXRoaW5nLiBQbGVhc2UNCmNvbnNpZGVyIHRvIHVzZSAnc3RhcnQn
-IGFzIHRoZSBuYW1lIGZvciB0aGlzIGFyZ3VtZW50Lg0KDQo+IC1zdGF0aWMgaW5saW5lIHZvaWQg
-c2JpdG1hcF9mb3JfZWFjaF9zZXQoc3RydWN0IHNiaXRtYXAgKnNiLCBzYl9mb3JfZWFjaF9mbiBm
-biwNCj4gLQkJCQkJdm9pZCAqZGF0YSkNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCBfX3NiaXRtYXBf
-Zm9yX2VhY2hfc2V0KHN0cnVjdCBzYml0bWFwICpzYiwNCj4gKwkJCQkJICB1bnNpZ25lZCBpbnQg
-b2ZmLA0KPiArCQkJCQkgIHNiX2Zvcl9lYWNoX2ZuIGZuLCB2b2lkICpkYXRhKQ0KPiAgew0KPiAt
-CXVuc2lnbmVkIGludCBpOw0KPiArCXVuc2lnbmVkIGludCBpbmRleCA9IFNCX05SX1RPX0lOREVY
-KHNiLCBvZmYpOw0KDQpJcyBpdCByZWFsbHkgdXNlZnVsIHRvIHJlbmFtZSAnaScgaW50byAnaW5k
-ZXgnPyBJIHRoaW5rIHRoYXQgY2hhbmdlIG1ha2VzIHRoaXMNCnBhdGNoIGhhcmRlciB0byByZWFk
-IHRoYW4gbmVjZXNzYXJ5Lg0KDQo+ICsJdW5zaWduZWQgaW50IG5yID0gU0JfTlJfVE9fQklUKHNi
-LCBvZmYpOw0KPiArCXVuc2lnbmVkIGludCBzY2FubmVkID0gMDsNCj4gIA0KPiAtCWZvciAoaSA9
-IDA7IGkgPCBzYi0+bWFwX25yOyBpKyspIHsNCj4gLQkJc3RydWN0IHNiaXRtYXBfd29yZCAqd29y
-ZCA9ICZzYi0+bWFwW2ldOw0KPiAtCQl1bnNpZ25lZCBpbnQgb2ZmLCBucjsNCj4gKwl3aGlsZSAo
-MSkgew0KDQpTb3JyeSBidXQgdGhpcyBjaGFuZ2UgbG9va3MgaW5jb3JyZWN0IHRvIG1lLiBJIHRo
-aW5rIHRoZSBmb2xsb3dpbmcgdHdvIHRlc3RzDQpoYXZlIHRvIGJlIHBlcmZvcm1lZCBiZWZvcmUg
-dGhlIHdoaWxlIGxvb3Agc3RhcnRzIHRvIGF2b2lkIHRyaWdnZXJpbmcgYW4NCm91dC1vZi1ib3Vu
-ZHMgcmVmZXJlbmNlIG9mIHNiLT5tYXBbXToNCiogV2hldGhlciBvciBub3Qgc2ItPm1hcF9uciBp
-cyB6ZXJvLg0KKiBXaGV0aGVyIG9yIG5vdCBpbmRleCA+PSBzYi0+bWFwX25yLiBJIHByb3Bvc2Ug
-dG8gc3RhcnQgaXRlcmF0aW5nIGZyb20gdGhlDQogIHN0YXJ0IG9mIEBzYiBpbiB0aGlzIGNhc2Uu
-DQoNCkFkZGl0aW9uYWxseSwgdGhlIG5ldyBsb29wIGluIF9fc2JpdG1hcF9mb3JfZWFjaF9zZXQo
-KSBsb29rcyBtb3JlIGNvbXBsaWNhdGVkDQphbmQgbW9yZSBmcmFnaWxlIHRvIG1lIHRoYW4gbmVj
-ZXNzYXJ5LiBIb3cgYWJvdXQgdXNpbmcgdGhlIGNvZGUgYmVsb3c/IFRoYXQNCmNvZGUgbmVlZHMg
-b25lIGxvY2FsIHZhcmlhYmxlIGxlc3MgdGhhbiB5b3VyIGltcGxlbWVudGF0aW9uLg0KDQpzdGF0
-aWMgaW5saW5lIHZvaWQgX19zYml0bWFwX2Zvcl9lYWNoX3NldChzdHJ1Y3Qgc2JpdG1hcCAqc2Is
-DQoJCQkJCSAgY29uc3QgdW5zaWduZWQgaW50IHN0YXJ0LA0KCQkJCQkgIHNiX2Zvcl9lYWNoX2Zu
-IGZuLCB2b2lkICpkYXRhKQ0Kew0KCXVuc2lnbmVkIGludCBpID0gc3RhcnQgPj4gc2ItPnNoaWZ0
-Ow0KCXVuc2lnbmVkIGludCBuciA9IHN0YXJ0ICYgKCgxIDw8IHNiLT5zaGlmdCkgLSAxKTsNCgli
-b29sIGN5Y2xlZCA9IGZhbHNlOw0KDQoJaWYgKCFzYi0+bWFwX25yKQ0KCQlyZXR1cm47DQoNCglp
-ZiAodW5saWtlbHkoaSA+PSBzYi0+bWFwX25yKSkgew0KCQlpID0gMDsNCgkJbnIgPSAwOw0KCX0N
-Cg0KCXdoaWxlICh0cnVlKSB7DQoJCXN0cnVjdCBzYml0bWFwX3dvcmQgKndvcmQgPSAmc2ItPm1h
-cFtpXTsNCgkJdW5zaWduZWQgaW50IG9mZjsNCg0KCQlvZmYgPSBpIDw8IHNiLT5zaGlmdDsNCgkJ
-d2hpbGUgKDEpIHsNCgkJCW5yID0gZmluZF9uZXh0X2JpdCgmd29yZC0+d29yZCwgd29yZC0+ZGVw
-dGgsIG5yKTsNCgkJCWlmIChjeWNsZWQgJiYgb2ZmICsgbnIgPj0gc3RhcnQpDQoJCQkJcmV0dXJu
-Ow0KDQoJCQlpZiAobnIgPj0gd29yZC0+ZGVwdGgpDQoJCQkJYnJlYWs7DQoNCgkJCWlmICghZm4o
-c2IsIG9mZiArIG5yLCBkYXRhKSkNCgkJCQlyZXR1cm47DQoNCgkJCW5yKys7DQoJCX0NCgkJaWYg
-KCsraSA+PSBzYi0+bWFwX25yKSB7DQoJCQljeWNsZWQgPSB0cnVlOw0KCQkJaSA9IDA7DQoJCX0N
-CgkJbnIgPSAwOw0KCX0NCn0NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+We need to iterate ctx starting from one offset in way
+of round robin, so introduce this helper.
+
+Cc: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/sbitmap.h | 54 ++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 40 insertions(+), 14 deletions(-)
+
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index a1904aadbc45..ace08016f54a 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -211,10 +211,14 @@ bool sbitmap_any_bit_set(const struct sbitmap *sb);
+  */
+ bool sbitmap_any_bit_clear(const struct sbitmap *sb);
+ 
++#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
++#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
++
+ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
+ 
+ /**
+  * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
++ * @off: Offset to iterate from
+  * @sb: Bitmap to iterate over.
+  * @fn: Callback. Should return true to continue or false to break early.
+  * @data: Pointer to pass to callback.
+@@ -222,35 +226,57 @@ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
+  * This is inline even though it's non-trivial so that the function calls to the
+  * callback will hopefully get optimized away.
+  */
+-static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
+-					void *data)
++static inline void __sbitmap_for_each_set(struct sbitmap *sb,
++					  unsigned int off,
++					  sb_for_each_fn fn, void *data)
+ {
+-	unsigned int i;
++	unsigned int index = SB_NR_TO_INDEX(sb, off);
++	unsigned int nr = SB_NR_TO_BIT(sb, off);
++	unsigned int scanned = 0;
+ 
+-	for (i = 0; i < sb->map_nr; i++) {
+-		struct sbitmap_word *word = &sb->map[i];
+-		unsigned int off, nr;
++	while (1) {
++		struct sbitmap_word *word = &sb->map[index];
++		unsigned int start = nr;
++		unsigned int depth = min_t(unsigned int, word->depth - start,
++					   sb->depth - scanned);
+ 
+ 		if (!word->word)
+-			continue;
++			goto next;
+ 
+-		nr = 0;
+-		off = i << sb->shift;
++		off = index << sb->shift;
+ 		while (1) {
+-			nr = find_next_bit(&word->word, word->depth, nr);
+-			if (nr >= word->depth)
++			nr = find_next_bit(&word->word, start + depth, nr);
++			if (nr >= start + depth)
+ 				break;
+-
+ 			if (!fn(sb, off + nr, data))
+ 				return;
+ 
+ 			nr++;
+ 		}
++ next:
++		scanned += depth;
++		if (scanned >= sb->depth)
++			break;
++		nr = 0;
++		if (++index >= sb->map_nr)
++			index = 0;
+ 	}
+ }
+ 
+-#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
+-#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
++/**
++ * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
++ * @sb: Bitmap to iterate over.
++ * @fn: Callback. Should return true to continue or false to break early.
++ * @data: Pointer to pass to callback.
++ *
++ * This is inline even though it's non-trivial so that the function calls to the
++ * callback will hopefully get optimized away.
++ */
++static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
++					void *data)
++{
++	__sbitmap_for_each_set(sb, 0, fn, data);
++}
+ 
+ static inline unsigned long *__sbitmap_word(struct sbitmap *sb,
+ 					    unsigned int bitnr)
+-- 
+2.9.4
