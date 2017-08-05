@@ -1,137 +1,259 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:30641 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753456AbdHQUO7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 16:14:59 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 37/55] skd: Move a function definition
-Date: Thu, 17 Aug 2017 13:13:20 -0700
-Message-Id: <20170817201338.16537-38-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Received: from mail.kernel.org ([198.145.29.99]:34496 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752024AbdHEPvz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 11:51:55 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
+Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
+        Kyungchan Koh <kkc6196@fb.com>
+Subject: [PATCH 3/5] testb: implement bandwidth control
+Date: Sat,  5 Aug 2017 08:51:47 -0700
+Message-Id: <dc8e1a2ddd66e3f5a68229a119e8f8ac864b0bfe.1501945859.git.shli@fb.com>
+In-Reply-To: <cover.1501945859.git.shli@fb.com>
+References: <cover.1501945859.git.shli@fb.com>
+In-Reply-To: <cover.1501945859.git.shli@fb.com>
+References: <cover.1501945859.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality but makes the next
-patch in this series easier to read.
+From: Kyungchan Koh <kkc6196@fb.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+In test, we usually expect controllable disk speed. For example, in a
+raid array, we'd like some disks are fast and some are slow. MD RAID
+actually has a feature for this. To test the feature, we'd like to make
+the disk run in specific speed.
+
+block throttling probably can be used for this purpose, but it requires
+cgroup setup. Here we just implement a simple throttling mechanism in
+the driver. There is slight fluctuation in the mechanism, but it's good
+enough for test.
+
+Signed-off-by: Kyungchan Koh <kkc6196@fb.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/block/skd_main.c | 84 +++++++++++++++++++++++-------------------------
- 1 file changed, 41 insertions(+), 43 deletions(-)
+ drivers/block/test_blk.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 103 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 49e7097dd409..ff2ea37b8fd3 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -506,7 +506,47 @@ skd_prep_zerosize_flush_cdb(struct skd_scsi_request *scsi_req,
- 	scsi_req->cdb[9] = 0;
+diff --git a/drivers/block/test_blk.c b/drivers/block/test_blk.c
+index 1b06ce7..c67c73d 100644
+--- a/drivers/block/test_blk.c
++++ b/drivers/block/test_blk.c
+@@ -9,9 +9,11 @@
+ 
+ #include <linux/init.h>
+ #include <linux/module.h>
++#include <linux/atomic.h>
+ #include <linux/blk-mq.h>
+ #include <linux/blkdev.h>
+ #include <linux/configfs.h>
++#include <linux/hrtimer.h>
+ #include <linux/radix-tree.h>
+ #include <linux/idr.h>
+ 
+@@ -23,6 +25,14 @@
+ 
+ #define FREE_BATCH		16
+ 
++#define TICKS_PER_SEC		50ULL
++#define TIMER_INTERVAL		(NSEC_PER_SEC / TICKS_PER_SEC)
++
++static inline u64 mb_per_tick(int mbps)
++{
++	return (1 << 20) / TICKS_PER_SEC * ((u64) mbps);
++}
++
+ struct testb {
+ 	unsigned int index;
+ 	struct request_queue *q;
+@@ -33,6 +43,9 @@ struct testb {
+ 	struct blk_mq_tag_set tag_set;
+ 
+ 	char disk_name[DISK_NAME_LEN];
++
++	atomic_long_t cur_bytes;
++	struct hrtimer timer;
+ };
+ 
+ /*
+@@ -53,10 +66,12 @@ struct testb_page {
+  *
+  * CONFIGURED:	Device has been configured and turned on. Cannot reconfigure.
+  * UP:		Device is currently on and visible in userspace.
++ * THROTTLED:	Device is being throttled.
+  */
+ enum testb_device_flags {
+ 	TESTB_DEV_FL_CONFIGURED	= 0,
+ 	TESTB_DEV_FL_UP		= 1,
++	TESTB_DEV_FL_THROTTLED	= 2,
+ };
+ 
+ /*
+@@ -74,6 +89,7 @@ enum testb_device_flags {
+  * @nr_queues:	The number of queues.
+  * @q_depth:	The depth of each queue.
+  * @discard:	If enable discard
++ * @mbps:	Bandwidth throttle cap (in mb/s).
+  */
+ struct testb_device {
+ 	struct config_item item;
+@@ -88,6 +104,7 @@ struct testb_device {
+ 	uint nr_queues;
+ 	uint q_depth;
+ 	uint discard;
++	uint mbps;
+ };
+ 
+ static int testb_poweron_device(struct testb_device *dev);
+@@ -161,6 +178,7 @@ TESTB_DEVICE_ATTR(blocksize, uint);
+ TESTB_DEVICE_ATTR(nr_queues, uint);
+ TESTB_DEVICE_ATTR(q_depth, uint);
+ TESTB_DEVICE_ATTR(discard, uint);
++TESTB_DEVICE_ATTR(mbps, uint);
+ 
+ static ssize_t testb_device_power_show(struct config_item *item, char *page)
+ {
+@@ -207,6 +225,7 @@ static struct configfs_attribute *testb_device_attrs[] = {
+ 	&testb_device_attr_nr_queues,
+ 	&testb_device_attr_q_depth,
+ 	&testb_device_attr_discard,
++	&testb_device_attr_mbps,
+ 	NULL,
+ };
+ 
+@@ -247,6 +266,7 @@ config_item *testb_group_make_item(struct config_group *group, const char *name)
+ 	t_dev->nr_queues = 2;
+ 	t_dev->q_depth = 64;
+ 	t_dev->discard = 1;
++	t_dev->mbps = -1;
+ 
+ 	return &t_dev->item;
+ }
+@@ -265,7 +285,7 @@ testb_group_drop_item(struct config_group *group, struct config_item *item)
+ 
+ static ssize_t memb_group_features_show(struct config_item *item, char *page)
+ {
+-	return snprintf(page, PAGE_SIZE, "\n");
++	return snprintf(page, PAGE_SIZE, "bandwidth\n");
  }
  
--static void skd_request_fn_not_online(struct request_queue *q);
-+static void skd_request_fn_not_online(struct request_queue *q)
+ CONFIGFS_ATTR_RO(memb_group_, features);
+@@ -299,6 +319,11 @@ static DEFINE_IDA(testb_indices);
+ static DEFINE_MUTEX(testb_lock);
+ static int testb_major;
+ 
++static inline int testb_throttled(struct testb *testb)
 +{
-+	struct skd_device *skdev = q->queuedata;
++	return test_bit(TESTB_DEV_FL_THROTTLED, &testb->t_dev->flags);
++}
 +
-+	SKD_ASSERT(skdev->state != SKD_DRVR_STATE_ONLINE);
+ static struct testb_page *testb_alloc_page(gfp_t gfp_flags)
+ {
+ 	struct testb_page *t_page;
+@@ -570,6 +595,44 @@ static int testb_handle_rq(struct request *rq)
+ 	} else if (req_op(rq) == REQ_OP_FLUSH)
+ 		return testb_handle_flush(testb);
+ 
++	len = blk_rq_bytes(rq);
++	if (testb_throttled(testb)) {
++		if (!hrtimer_active(&testb->timer))
++			hrtimer_restart(&testb->timer);
 +
-+	skd_log_skdev(skdev, "req_not_online");
-+	switch (skdev->state) {
-+	case SKD_DRVR_STATE_PAUSING:
-+	case SKD_DRVR_STATE_PAUSED:
-+	case SKD_DRVR_STATE_STARTING:
-+	case SKD_DRVR_STATE_RESTARTING:
-+	case SKD_DRVR_STATE_WAIT_BOOT:
-+	/* In case of starting, we haven't started the queue,
-+	 * so we can't get here... but requests are
-+	 * possibly hanging out waiting for us because we
-+	 * reported the dev/skd0 already.  They'll wait
-+	 * forever if connect doesn't complete.
-+	 * What to do??? delay dev/skd0 ??
-+	 */
-+	case SKD_DRVR_STATE_BUSY:
-+	case SKD_DRVR_STATE_BUSY_IMMINENT:
-+	case SKD_DRVR_STATE_BUSY_ERASE:
-+	case SKD_DRVR_STATE_DRAINING_TIMEOUT:
-+		return;
++		/*
++		 * The lock is taken here to ensure no race happens
++		 * between the timer that a) resets the budget and
++		 * b) starts the queue and the cmd handler that
++		 * c) spends the budget and d) determines to stop
++		 * the queue.
++		 *
++		 * The race happens when the processes interweave.
++		 * For example, c, a, b, d. For a whole interval,
++		 * there may be no I/O occurring due to the race.
++		 *
++		 * Solution: Create an isolated region using the
++		 * device spinlock that ensure a and b occur in
++		 * isolation to c and d such that no interweaving
++		 * occurs.
++		 *
++		 * This also prevents multiple processes or threads from
++		 * calling blk_mq_stop_hw_queues.
++		 */
++		spin_lock_irqsave(&testb->t_dev->lock, lock_flag);
 +
-+	case SKD_DRVR_STATE_BUSY_SANITIZE:
-+	case SKD_DRVR_STATE_STOPPING:
-+	case SKD_DRVR_STATE_SYNCING:
-+	case SKD_DRVR_STATE_FAULT:
-+	case SKD_DRVR_STATE_DISAPPEARED:
-+	default:
-+		break;
++		if (atomic_long_add_negative((int)(-1 * len),
++						&testb->cur_bytes)) {
++			if (!blk_mq_queue_stopped(testb->q))
++				blk_mq_stop_hw_queues(testb->q);
++
++			spin_unlock_irqrestore(&testb->t_dev->lock, lock_flag);
++			/* requeue the request */
++			return -ENOMEM;
++		}
++		spin_unlock_irqrestore(&testb->t_dev->lock, lock_flag);
 +	}
 +
-+	/* If we get here, terminate all pending block requeusts
-+	 * with EIO and any scsi pass thru with appropriate sense
-+	 */
-+
-+	skd_fail_all_pending(skdev);
-+}
+ 	spin_lock_irqsave(&testb->t_dev->lock, lock_flag);
+ 	rq_for_each_segment(bvec, rq, iter) {
+ 		len = bvec.bv_len;
+@@ -622,6 +685,8 @@ static void testb_free_bdev(struct testb *testb)
+ 	ida_simple_remove(&testb_indices, testb->index);
+ 	mutex_unlock(&testb_lock);
  
- static void skd_request_fn(struct request_queue *q)
- {
-@@ -810,48 +850,6 @@ static void skd_postop_sg_list(struct skd_device *skdev,
- 	pci_unmap_sg(skdev->pdev, &skreq->sg[0], skreq->n_sg, skreq->data_dir);
++	if (testb_throttled(testb))
++		hrtimer_cancel(&testb->timer);
+ 	blk_cleanup_queue(testb->q);
+ 	blk_mq_free_tag_set(&testb->tag_set);
+ 
+@@ -657,6 +722,37 @@ static void testb_config_flush(struct testb *testb)
+ 	blk_queue_flush_queueable(testb->q, true);
  }
  
--static void skd_request_fn_not_online(struct request_queue *q)
--{
--	struct skd_device *skdev = q->queuedata;
--
--	SKD_ASSERT(skdev->state != SKD_DRVR_STATE_ONLINE);
--
--	skd_log_skdev(skdev, "req_not_online");
--	switch (skdev->state) {
--	case SKD_DRVR_STATE_PAUSING:
--	case SKD_DRVR_STATE_PAUSED:
--	case SKD_DRVR_STATE_STARTING:
--	case SKD_DRVR_STATE_RESTARTING:
--	case SKD_DRVR_STATE_WAIT_BOOT:
--	/* In case of starting, we haven't started the queue,
--	 * so we can't get here... but requests are
--	 * possibly hanging out waiting for us because we
--	 * reported the dev/skd0 already.  They'll wait
--	 * forever if connect doesn't complete.
--	 * What to do??? delay dev/skd0 ??
--	 */
--	case SKD_DRVR_STATE_BUSY:
--	case SKD_DRVR_STATE_BUSY_IMMINENT:
--	case SKD_DRVR_STATE_BUSY_ERASE:
--	case SKD_DRVR_STATE_DRAINING_TIMEOUT:
--		return;
--
--	case SKD_DRVR_STATE_BUSY_SANITIZE:
--	case SKD_DRVR_STATE_STOPPING:
--	case SKD_DRVR_STATE_SYNCING:
--	case SKD_DRVR_STATE_FAULT:
--	case SKD_DRVR_STATE_DISAPPEARED:
--	default:
--		break;
--	}
--
--	/* If we get here, terminate all pending block requeusts
--	 * with EIO and any scsi pass thru with appropriate sense
--	 */
--
--	skd_fail_all_pending(skdev);
--}
--
- /*
-  *****************************************************************************
-  * TIMER
++static enum hrtimer_restart testb_timer_fn(struct hrtimer *timer)
++{
++	struct testb *testb = container_of(timer, struct testb, timer);
++	ktime_t testb_timer_interval = ktime_set(0, TIMER_INTERVAL);
++	int testb_mbps = testb->t_dev->mbps;
++	unsigned long lock_flag;
++
++	if (atomic_long_read(&testb->cur_bytes) == mb_per_tick(testb_mbps))
++		return HRTIMER_NORESTART;
++
++	spin_lock_irqsave(&testb->t_dev->lock, lock_flag);
++	atomic_long_set(&testb->cur_bytes, mb_per_tick(testb_mbps));
++	if (blk_mq_queue_stopped(testb->q))
++		blk_mq_start_stopped_hw_queues(testb->q, true);
++	spin_unlock_irqrestore(&testb->t_dev->lock, lock_flag);
++
++	hrtimer_forward_now(&testb->timer, testb_timer_interval);
++
++	return HRTIMER_RESTART;
++}
++
++static void testb_setup_timer(struct testb *testb)
++{
++	ktime_t testb_timer_interval = ktime_set(0, TIMER_INTERVAL);
++
++	hrtimer_init(&testb->timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
++	testb->timer.function = &testb_timer_fn;
++	atomic_long_set(&testb->cur_bytes, mb_per_tick(testb->t_dev->mbps));
++	hrtimer_start(&testb->timer, testb_timer_interval, HRTIMER_MODE_ABS);
++}
++
+ static int testb_gendisk_register(struct testb *testb)
+ {
+ 	sector_t size;
+@@ -722,6 +818,12 @@ static int testb_alloc_bdev(struct testb_device *t_dev)
+ 		goto out_cleanup_tags;
+ 	}
+ 
++	if (t_dev->mbps && t_dev->mbps != -1) {
++		t_dev->mbps = (t_dev->mbps >> 10) > 0 ? 1024 : t_dev->mbps;
++		set_bit(TESTB_DEV_FL_THROTTLED, &t_dev->flags);
++		testb_setup_timer(testb);
++	}
++
+ 	testb->q->queuedata = testb;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, testb->q);
+ 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, testb->q);
 -- 
-2.14.0
+2.9.3
