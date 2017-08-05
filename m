@@ -1,31 +1,118 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:57322 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752189AbdHVUwU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2017 16:52:20 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V2 14/20] blk-mq-sched: improve IO scheduling on SCSI
- devcie
-Date: Tue, 22 Aug 2017 20:51:32 +0000
-Message-ID: <1503435090.2508.22.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:59336 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751140AbdHEG6G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 5 Aug 2017 02:58:06 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 14/20] blk-mq-sched: improve IO scheduling on SCSI devcie
+Date: Sat,  5 Aug 2017 14:56:59 +0800
+Message-Id: <20170805065705.12989-15-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
-         <20170805065705.12989-15-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-15-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA4LTA1IGF0IDE0OjU2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhp
-cyBwYXRjaCBpbnRyb2R1Y2VzIHBlci1yZXF1ZXN0X3F1ZXVlIGRpc3BhdGNoDQo+IGxpc3QgZm9y
-IHRoaXMgcHVycG9zZSwgYW5kIG9ubHkgd2hlbiBhbGwgcmVxdWVzdHMNCj4gaW4gdGhpcyBsaXN0
-IGFyZSBkaXNwYXRjaGVkIG91dCBzdWNjZXNzZnVsbHksIHdlDQo+IGNhbiByZXN0YXJ0IHRvIGRl
-cXVldWUgcmVxdWVzdCBmcm9tIHN3L3NjaGVkdWxlcg0KPiBxdWV1ZSBhbmQgZGlzcGF0aCBpdCB0
-byBsbGQuDQoNCldhc24ndCBvbmUgb2YgdGhlIGRlc2lnbiBnb2FscyBvZiBibGstbXEgdG8gYXZv
-aWQgYSBwZXItcmVxdWVzdF9xdWV1ZSBsaXN0Pw0KDQpUaGFua3MsDQoNCkJhcnQu
+SCSI device often has per-request_queue queue depth
+(.cmd_per_lun), which is applied among all hw queues
+actually, and this patchset calls this as shared
+queue depth.
+
+One theory of scheduler is that we shouldn't dequeue
+request from sw/scheduler queue and dispatch it to
+driver when the low level queue is busy.
+
+For SCSI device, queue being busy depends on the
+per-request_queue limit, so we should hold all
+hw queues if the request queue is busy.
+
+This patch introduces per-request_queue dispatch
+list for this purpose, and only when all requests
+in this list are dispatched out successfully, we
+can restart to dequeue request from sw/scheduler
+queue and dispath it to lld.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c         |  8 +++++++-
+ block/blk-mq.h         | 14 +++++++++++---
+ include/linux/blkdev.h |  5 +++++
+ 3 files changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c6624154bb37..db21e71bb087 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2670,8 +2670,14 @@ int blk_mq_update_sched_queue_depth(struct request_queue *q)
+ 	 * this queue depth limit
+ 	 */
+ 	if (q->queue_depth) {
+-		queue_for_each_hw_ctx(q, hctx, i)
++		queue_for_each_hw_ctx(q, hctx, i) {
+ 			hctx->flags |= BLK_MQ_F_SHARED_DEPTH;
++			hctx->dispatch_lock = &q->__mq_dispatch_lock;
++			hctx->dispatch_list = &q->__mq_dispatch_list;
++
++			spin_lock_init(hctx->dispatch_lock);
++			INIT_LIST_HEAD(hctx->dispatch_list);
++		}
+ 	}
+ 
+ 	if (!q->elevator)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 86a35c799ca6..295fd9dfb01d 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -139,19 +139,27 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ static inline bool blk_mq_hctx_is_dispatch_busy(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx)
+ {
+-	return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
++		return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	return q->mq_dispatch_busy;
+ }
+ 
+ static inline void blk_mq_hctx_set_dispatch_busy(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx)
+ {
+-	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
++		set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	else
++		q->mq_dispatch_busy = 1;
+ }
+ 
+ static inline void blk_mq_hctx_clear_dispatch_busy(struct request_queue *q,
+ 		struct blk_mq_hw_ctx *hctx)
+ {
+-	clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
++		clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
++	else
++		q->mq_dispatch_busy = 0;
+ }
+ 
+ static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 25f6a0cb27d3..bc0e607710f2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -395,6 +395,11 @@ struct request_queue {
+ 
+ 	atomic_t		shared_hctx_restart;
+ 
++	/* blk-mq dispatch list and lock for shared queue depth case */
++	struct list_head	__mq_dispatch_list;
++	spinlock_t		__mq_dispatch_lock;
++	unsigned int		mq_dispatch_busy;
++
+ 	struct blk_queue_stats	*stats;
+ 	struct rq_wb		*rq_wb;
+ 
+-- 
+2.9.4
