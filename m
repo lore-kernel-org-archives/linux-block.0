@@ -1,47 +1,50 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Milan Broz <gmazyland@gmail.com>,
+Return-Path: <mpatocka@redhat.com>
+Date: Sun, 6 Aug 2017 14:49:23 -0400 (EDT)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+cc: Christoph Hellwig <hch@lst.de>, Milan Broz <gmazyland@gmail.com>,
         linux-block@vger.kernel.org, axboe@kernel.dk, dm-devel@redhat.com
 Subject: Re: [PATCH] bio-integrity: revert "stop abusing bi_end_io"
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20170802122750.12216-1-gmazyland@gmail.com>
-	<20170802125509.GA18977@lst.de>
-	<alpine.LRH.2.02.1708030938110.21391@file01.intranet.prod.int.rdu2.redhat.com>
-	<20170805134418.GB17694@lst.de>
-	<alpine.LRH.2.02.1708051038550.25961@file01.intranet.prod.int.rdu2.redhat.com>
-	<yq1y3qxdano.fsf@oracle.com>
-	<alpine.LRH.2.02.1708061441120.9109@file01.intranet.prod.int.rdu2.redhat.com>
-Date: Mon, 07 Aug 2017 11:48:55 -0400
-In-Reply-To: <alpine.LRH.2.02.1708061441120.9109@file01.intranet.prod.int.rdu2.redhat.com>
-	(Mikulas Patocka's message of "Sun, 6 Aug 2017 14:49:23 -0400 (EDT)")
-Message-ID: <yq1valzbcpk.fsf@oracle.com>
+In-Reply-To: <yq1y3qxdano.fsf@oracle.com>
+Message-ID: <alpine.LRH.2.02.1708061441120.9109@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20170802122750.12216-1-gmazyland@gmail.com> <20170802125509.GA18977@lst.de> <alpine.LRH.2.02.1708030938110.21391@file01.intranet.prod.int.rdu2.redhat.com> <20170805134418.GB17694@lst.de> <alpine.LRH.2.02.1708051038550.25961@file01.intranet.prod.int.rdu2.redhat.com>
+ <yq1y3qxdano.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
 
-Mikulas,
 
-> If you create the integrity tag at or above device mapper level, you
-> will run into problems because the same device can be accessed using
-> device mapper and using physical volume /dev/sd*. If you create
-> integrity tags at device mapper level, they will contain device
-> mapper's logical sector number and the sector number won't match if
-> you access the device directly using /dev/sd*.
+On Sat, 5 Aug 2017, Martin K. Petersen wrote:
 
-For writes, the bip seed value is adjusted every time a bio is cloned,
-sliced and diced as it traverses partitioning/MD/DM. And then at the
-bottom of the stack, the ref tag values in the protection information
-buffer are verified against the adjusted seed value and remapped
-according to the starting logical block number. The reverse is taking
-place for reads.
+> Mikulas,
+> 
+> > The sector number in the integrity tag must match the physical sector 
+> > number. So, it must be verified at the bottom.
+> 
+> The ref tag seed matches the submitter block number (typically block
+> layer sector for the top device) and is remapped to and from the LBA by
+> the SCSI disk driver or HBA firmware.
+> 
+> So the verification is designed to be done by the top level entity that
+> attaches the protection information to the bio. In this case
+> bio_integrity_prep().
 
-This is much faster than doing a remapping of the actual protection
-buffer values every time the I/O transitions from one address space to
-the other. In addition, some HBA hardware allows us to program the PI
-engine with the seed value. So the submitter value to LBA conversion can
-be done on the fly in hardware.
+bio_integrity_prep is called by blk_queue_bio - that is the lowest level 
+physical disk, not the top level. It is not called by device mapper.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Documentation/block/data-integrity.txt says that bio_integrity_prep() can 
+be called by integrity-aware filesystem, but it seems that no such 
+filesystem exists.
+
+If you create the integrity tag at or above device mapper level, you will 
+run into problems because the same device can be accessed using device 
+mapper and using physical volume /dev/sd*. If you create integrity tags at 
+device mapper level, they will contain device mapper's logical sector 
+number and the sector number won't match if you access the device directly 
+using /dev/sd*.
+
+> -- 
+> Martin K. Petersen	Oracle Linux Engineering
+
+Mikulas
