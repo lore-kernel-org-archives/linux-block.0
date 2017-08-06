@@ -1,43 +1,101 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 33/55] skd: Remove a redundant init_timer() call
-Date: Thu, 17 Aug 2017 13:13:16 -0700
-Message-Id: <20170817201338.16537-34-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Return-Path: <regressions@leemhuis.info>
+Subject: Re: [RFC PATCH] bio-integrity: Fix regression if profile verify_fn is
+ NULL
+To: Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org
+Cc: hch@lst.de, axboe@kernel.dk, mpatocka@redhat.com, dm-devel@redhat.com
+References: <20170802122750.12216-1-gmazyland@gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Message-ID: <bd2f8d59-1e2f-c05e-0a4c-df4de17a8db8@leemhuis.info>
+Date: Sun, 6 Aug 2017 15:30:22 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170802122750.12216-1-gmazyland@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Since setup_timer() invokes init_timer(), invoking init_timer()
-just before setup_timer() is redundant. Hence remove the init_timer()
-call.
+TWIMC: This issue is tracked in the regression reports for Linux 4.13
+(http://bit.ly/lnxregrep413 ) with this id:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 1 -
- 1 file changed, 1 deletion(-)
+Linux-Regression-ID: lr#35498d
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 62e06e35ddf5..71158e8b8a2b 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -1057,7 +1057,6 @@ static int skd_start_timer(struct skd_device *skdev)
- {
- 	int rc;
- 
--	init_timer(&skdev->timer);
- 	setup_timer(&skdev->timer, skd_timer_tick, (ulong)skdev);
- 
- 	rc = mod_timer(&skdev->timer, (jiffies + HZ));
--- 
-2.14.0
+Please include this line in the comment section of patches that are
+supposed to fix the issue. Please also mention the string once in other
+mailinglist threads or different bug tracking entries if you or someone
+else start to discuss the issue there. By including that string you make
+it a whole lot easier to track where an issue gets discussed and how far
+patches to fix it have made it. For more details on this please see
+here: http://bit.ly/lnxregtrackid
+
+Thx for your help. And thx to Milan for pointing me to this regression.
+ Ciao, Thorsten
+
+On 02.08.2017 14:27, Milan Broz wrote:
+> In dm-integrity target we register integrity profile that have
+> both generate_fn and verify_fn callbacks set to NULL.
+> 
+> This is used if dm-integrity is stacked under a dm-crypt device
+> for authenticated encryption (integrity payload contains authentication
+> tag and IV seed).
+> 
+> In this case the verification is done through own crypto API
+> processing inside dm-crypt; integrity profile is only holder
+> of these data. (And memory is owned by dm-crypt as well.)
+> 
+> After the commit (and previous changes)
+>   Commit 7c20f11680a441df09de7235206f70115fbf6290
+>   Author: Christoph Hellwig <hch@lst.de>
+>   Date:   Mon Jul 3 16:58:43 2017 -0600
+> 
+>     bio-integrity: stop abusing bi_end_io
+> 
+> we get this crash:
+> 
+> : BUG: unable to handle kernel NULL pointer dereference at   (null)
+> : IP:   (null)
+> : *pde = 00000000
+> ...
+> :
+> : Workqueue: kintegrityd bio_integrity_verify_fn
+> : task: f48ae180 task.stack: f4b5c000
+> : EIP:   (null)
+> : EFLAGS: 00210286 CPU: 0
+> : EAX: f4b5debc EBX: 00001000 ECX: 00000001 EDX: 00000000
+> : ESI: 00001000 EDI: ed25f000 EBP: f4b5dee8 ESP: f4b5dea4
+> :  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+> : CR0: 80050033 CR2: 00000000 CR3: 32823000 CR4: 001406d0
+> : Call Trace:
+> :  ? bio_integrity_process+0xe3/0x1e0
+> :  bio_integrity_verify_fn+0xea/0x150
+> :  process_one_work+0x1c7/0x5c0
+> :  worker_thread+0x39/0x380
+> :  kthread+0xd6/0x110
+> :  ? process_one_work+0x5c0/0x5c0
+> :  ? kthread_worker_fn+0x100/0x100
+> :  ? kthread_worker_fn+0x100/0x100
+> :  ret_from_fork+0x19/0x24
+> : Code:  Bad EIP value.
+> : EIP:   (null) SS:ESP: 0068:f4b5dea4
+> : CR2: 0000000000000000
+> 
+> Patch just skip the whole verify workqueue if verify_fn is set to NULL.
+> 
+> Signed-off-by: Milan Broz <gmazyland@gmail.com>
+> ---
+>  block/bio-integrity.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index 83e92beb3c9f..b9d1580bfc13 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -387,7 +387,9 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+>   */
+>  bool __bio_integrity_endio(struct bio *bio)
+>  {
+> -	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
+> +	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+> +
+> +	if (bi->profile->verify_fn && bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
+>  		struct bio_integrity_payload *bip = bio_integrity(bio);
+>  
+>  		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
+> 
