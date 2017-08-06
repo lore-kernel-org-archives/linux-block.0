@@ -1,52 +1,36 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Tue, 8 Aug 2017 15:48:00 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, brking@linux.vnet.ibm.com,
-	bart.vanassche@wdc.com
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "brking@linux.vnet.ibm.com" <brking@linux.vnet.ibm.com>
 Subject: Re: [PATCH 5/6] blk-mq: enable checking two part inflight counts at
  the same time
-Message-ID: <20170808224800.GG4072@vader.DHCP.thefacebook.com>
+Date: Sun, 6 Aug 2017 00:17:40 +0000
+Message-ID: <1501978658.7361.4.camel@wdc.com>
 References: <1501859062-11120-1-git-send-email-axboe@kernel.dk>
- <1501859062-11120-6-git-send-email-axboe@kernel.dk>
+	 <1501859062-11120-6-git-send-email-axboe@kernel.dk>
+	 <1501875874.2757.28.camel@wdc.com>
+	 <305d965b-ab49-6a5f-9e6f-13fdcbfb87e3@kernel.dk>
+In-Reply-To: <305d965b-ab49-6a5f-9e6f-13fdcbfb87e3@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1501859062-11120-6-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Aug 04, 2017 at 09:04:21AM -0600, Jens Axboe wrote:
-> Modify blk_mq_in_flight() to count both a partition and root at
-> the same time. Then we only have to call it once, instead of
-> potentially looping the tags twice.
-
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-
-One comment below.
-
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-[snip]
-
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index fe1aa1f5f069..410ed246bc9b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -98,11 +98,13 @@ static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
->  		return;
->  
->  	/*
-> -	 * Count as inflight if it either matches the partition we asked
-> -	 * for, or if it's the root
-> +	 * Count as inflight if it matches the partition, count separately
-> +	 * (but all) if we got asked for the root
->  	 */
-> -	if (rq->part == mi->part || mi->part->partno)
-> +	if (rq->part == mi->part)
->  		mi->inflight[0]++;
-
-Similar concern as with patch 3, why special case the part0 case below?
-
-> +	if (mi->part->partno)
-> +		mi->inflight[1]++;
->  }
+T24gRnJpLCAyMDE3LTA4LTA0IGF0IDEzOjU2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAwOC8wNC8yMDE3IDAxOjQ0IFBNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gT24gRnJp
+LCAyMDE3LTA4LTA0IGF0IDA5OjA0IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiA+ID4gQEAg
+LTk4LDExICs5OCwxMyBAQCBzdGF0aWMgdm9pZCBibGtfbXFfY2hlY2tfaW5mbGlnaHQoc3RydWN0
+IGJsa19tcV9od19jdHggKmhjdHgsDQo+ID4gPiAgCQlyZXR1cm47DQo+ID4gPiAgDQo+ID4gPiAg
+CS8qDQo+ID4gPiAtCSAqIENvdW50IGFzIGluZmxpZ2h0IGlmIGl0IGVpdGhlciBtYXRjaGVzIHRo
+ZSBwYXJ0aXRpb24gd2UgYXNrZWQNCj4gPiA+IC0JICogZm9yLCBvciBpZiBpdCdzIHRoZSByb290
+DQo+ID4gPiArCSAqIENvdW50IGFzIGluZmxpZ2h0IGlmIGl0IG1hdGNoZXMgdGhlIHBhcnRpdGlv
+biwgY291bnQgc2VwYXJhdGVseQ0KPiA+ID4gKwkgKiAoYnV0IGFsbCkgaWYgd2UgZ290IGFza2Vk
+IGZvciB0aGUgcm9vdA0KPiA+ID4gIAkgKi8NCj4gPiA+IC0JaWYgKHJxLT5wYXJ0ID09IG1pLT5w
+YXJ0IHx8IG1pLT5wYXJ0LT5wYXJ0bm8pDQo+ID4gPiArCWlmIChycS0+cGFydCA9PSBtaS0+cGFy
+dCkNCj4gPiA+ICAJCW1pLT5pbmZsaWdodFswXSsrOw0KPiA+ID4gKwlpZiAobWktPnBhcnQtPnBh
+cnRubykNCj4gPiA+ICsJCW1pLT5pbmZsaWdodFsxXSsrOw0KPiA+ID4gIH0NCj4gPiANCj4gPiBI
+ZWxsbyBKZW5zLA0KPiA+IA0KPiA+IFNhbWUgcXVlc3Rpb24gaGVyZTogc2hvdWxkICJpZiAobWkt
+PnBhcnQtPnBhcnRubykiIHBlcmhhcHMgYmUgY2hhbmdlZCBpbnRvDQo+ID4gImlmIChtaS0+cGFy
+dC0+cGFydG5vID09IDApIj8NCj4gDQo+IEl0IHNob3VsZCBiZSBjb3JyZWN0IGFzLWlzLg0KDQpB
+Z3JlZWQsIEkgZ290IG1pc2xlZCBieSB0aGUgY29tbWVudCBhYm92ZSB0aGUgY29kZS4NCg0KQmFy
+dC4=
