@@ -1,102 +1,47 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:57916 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751366AbdHGEjM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Aug 2017 00:39:12 -0400
+Date: Sun, 6 Aug 2017 21:39:10 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Dan Williams <dan.j.williams@intel.com>
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 23/55] skd: Simplify the code for allocating DMA message buffers
-Date: Thu, 17 Aug 2017 13:13:06 -0700
-Message-Id: <20170817201338.16537-24-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+        linux-raid <linux-raid@vger.kernel.org>,
+        Kernel Team <kernel-team@fb.com>,
+        Kyungchan Koh <kyungchan.koh@gmail.com>,
+        Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH 5/5] testb: badblock support
+Message-ID: <20170807043910.dyjogknyqrwoogmg@kernel.org>
+References: <cover.1501945859.git.shli@fb.com>
+ <76006963eb89552e91e3d6acf72199a75d45659a.1501945859.git.shli@fb.com>
+ <CAA9_cmdcYq8yr9cO=Tm4bQ25OhFbhy=e2mNWtknFMPc5BqGEDA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAA9_cmdcYq8yr9cO=Tm4bQ25OhFbhy=e2mNWtknFMPc5BqGEDA@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-dma_alloc_coherent() guarantees alignment on a page boundary so
-no explicit alignment is needed to align on a 64 byte boundary.
+On Sat, Aug 05, 2017 at 06:56:31PM -0700, Dan Williams wrote:
+> On Sat, Aug 5, 2017 at 8:51 AM, Shaohua Li <shli@kernel.org> wrote:
+> > From: Shaohua Li <shli@fb.com>
+> >
+> > Sometime disk could have tracks broken and data there is inaccessable,
+> > but data in other parts can be accessed in normal way. MD RAID supports
+> > such disks. But we don't have a good way to test it, because we can't
+> > control which part of a physical disk is bad. For a virtual disk, this
+> > can be easily controlled.
+> >
+> > This patch adds a new 'badblock' attribute. Configure it in this way:
+> > echo "+1-100" > xxx/badblock, this will make sector [1-100] as bad
+> > blocks.
+> > echo "-20-30" > xxx/badblock, this will make sector [20-30] good
+> 
+> Did you happen to overlook block/badblocks.c, or did you find it unsuitable?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c  | 19 ++++++-------------
- drivers/block/skd_s1120.h |  2 +-
- 2 files changed, 7 insertions(+), 14 deletions(-)
+Hmm, I overlooked at it indeed, thought I don't need those features of
+badblocks without double checking the code. Will use badblocks interface in
+next post.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 3fc6ec9477c7..37b900c97b87 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -190,7 +190,6 @@ struct skd_fitmsg_context {
- 	u16 outstanding;
- 
- 	u32 length;
--	u32 offset;
- 
- 	u8 *msg_buf;
- 	dma_addr_t mb_dma_address;
-@@ -2016,8 +2015,7 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- 
- 	dev_dbg(&skdev->pdev->dev, "dma address 0x%llx, busy=%d\n",
- 		skmsg->mb_dma_address, skdev->in_flight);
--	dev_dbg(&skdev->pdev->dev, "msg_buf 0x%p, offset %x\n", skmsg->msg_buf,
--		skmsg->offset);
-+	dev_dbg(&skdev->pdev->dev, "msg_buf %p\n", skmsg->msg_buf);
- 
- 	qcmd = skmsg->mb_dma_address;
- 	qcmd |= FIT_QCMD_QID_NORMAL;
-@@ -3854,7 +3852,7 @@ static int skd_cons_skmsg(struct skd_device *skdev)
- 
- 		skmsg->state = SKD_MSG_STATE_IDLE;
- 		skmsg->msg_buf = pci_alloc_consistent(skdev->pdev,
--						      SKD_N_FITMSG_BYTES + 64,
-+						      SKD_N_FITMSG_BYTES,
- 						      &skmsg->mb_dma_address);
- 
- 		if (skmsg->msg_buf == NULL) {
-@@ -3862,13 +3860,10 @@ static int skd_cons_skmsg(struct skd_device *skdev)
- 			goto err_out;
- 		}
- 
--		skmsg->offset = (u32)((u64)skmsg->msg_buf &
--				      (~FIT_QCMD_BASE_ADDRESS_MASK));
--		skmsg->msg_buf += ~FIT_QCMD_BASE_ADDRESS_MASK;
--		skmsg->msg_buf = (u8 *)((u64)skmsg->msg_buf &
--				       FIT_QCMD_BASE_ADDRESS_MASK);
--		skmsg->mb_dma_address += ~FIT_QCMD_BASE_ADDRESS_MASK;
--		skmsg->mb_dma_address &= FIT_QCMD_BASE_ADDRESS_MASK;
-+		WARN(((uintptr_t)skmsg->msg_buf | skmsg->mb_dma_address) &
-+		     (FIT_QCMD_ALIGN - 1),
-+		     "not aligned: msg_buf %p mb_dma_address %#llx\n",
-+		     skmsg->msg_buf, skmsg->mb_dma_address);
- 		memset(skmsg->msg_buf, 0, SKD_N_FITMSG_BYTES);
- 
- 		skmsg->next = &skmsg[1];
-@@ -4230,8 +4225,6 @@ static void skd_free_skmsg(struct skd_device *skdev)
- 		skmsg = &skdev->skmsg_table[i];
- 
- 		if (skmsg->msg_buf != NULL) {
--			skmsg->msg_buf += skmsg->offset;
--			skmsg->mb_dma_address += skmsg->offset;
- 			pci_free_consistent(skdev->pdev, SKD_N_FITMSG_BYTES,
- 					    skmsg->msg_buf,
- 					    skmsg->mb_dma_address);
-diff --git a/drivers/block/skd_s1120.h b/drivers/block/skd_s1120.h
-index f69d3d97744d..8044705cbbf9 100644
---- a/drivers/block/skd_s1120.h
-+++ b/drivers/block/skd_s1120.h
-@@ -28,7 +28,7 @@
- #define  FIT_QCMD_MSGSIZE_128		(0x1 << 4)
- #define  FIT_QCMD_MSGSIZE_256		(0x2 << 4)
- #define  FIT_QCMD_MSGSIZE_512		(0x3 << 4)
--#define  FIT_QCMD_BASE_ADDRESS_MASK	(0xFFFFFFFFFFFFFFC0ull)
-+#define  FIT_QCMD_ALIGN			L1_CACHE_BYTES
- 
- /*
-  * Control, 32-bit r/w
--- 
-2.14.0
+Thanks,
+Shaohua
