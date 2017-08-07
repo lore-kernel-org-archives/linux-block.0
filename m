@@ -1,43 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34806 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751506AbdHGR3z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Aug 2017 13:29:55 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v77HSd5Z027220
-        for <linux-block@vger.kernel.org>; Mon, 7 Aug 2017 13:29:55 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2c6rw32ff9-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 07 Aug 2017 13:29:55 -0400
-Received: from localhost
-        by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <gpiccoli@linux.vnet.ibm.com>;
-        Mon, 7 Aug 2017 13:29:54 -0400
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
 Subject: Re: nvmf question - synchronization between target/initiator
  regarding partitions
-To: Hannes Reinecke <hare@suse.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Cc: Mauricio pIO <mauricfo@linux.vnet.ibm.com>,
-        Brian J King <bjking1@us.ibm.com>,
-        Murali N Iyer <mniyer@us.ibm.com>, vnarasimhan@in.ibm.com
+To: "Guilherme G. Piccoli" <gpiccoli@linux.vnet.ibm.com>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ linux-block@vger.kernel.org
 References: <82c4d1d8-ffa9-fa99-df58-05e2945eafdc@linux.vnet.ibm.com>
- <c382184a-1621-c6b2-2a20-bd16498be998@suse.de>
-From: "Guilherme G. Piccoli" <gpiccoli@linux.vnet.ibm.com>
-Date: Mon, 7 Aug 2017 14:29:47 -0300
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <c382184a-1621-c6b2-2a20-bd16498be998@suse.de>
+Date: Mon, 7 Aug 2017 16:20:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <c382184a-1621-c6b2-2a20-bd16498be998@suse.de>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <4c199e9e-ed58-5a5b-cedc-2d3c3bc1464c@linux.vnet.ibm.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <82c4d1d8-ffa9-fa99-df58-05e2945eafdc@linux.vnet.ibm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: vnarasimhan@in.ibm.com, Mauricio pIO <mauricfo@linux.vnet.ibm.com>,
+ Brian J King <bjking1@us.ibm.com>, Murali N Iyer <mniyer@us.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Thanks for your feedback Hannes, agreed!
-
-Cheers,
-
-
-Guilherme
+T24gMDgvMDcvMjAxNyAwMzo0MiBQTSwgR3VpbGhlcm1lIEcuIFBpY2NvbGkgd3JvdGU6Cj4gV2Ug
+b2JzZXJ2ZWQgdGhhdCBpdCdzIHBvc3NpYmxlIHRvIHBlcmZvcm0gcGFydGl0aW9uIG9wZXJhdGlv
+bnMgaW4gYm90aAo+IG52bWYgdGFyZ2V0IGFuZCBpbml0aWF0b3IgYmxvY2sgZGV2aWNlcywgbGlr
+ZSBjcmVhdGluZyBhbmQgZGVsZXRpbmcKPiBwYXJ0aXRpb25zLgo+IAo+IEJ1dCB0aGVyZSBpcyBu
+byBzeW5jIG1lY2hhbmlzbSBiZXR3ZWVuIHRhcmdldCBhbmQgaW5pdGlhdG9yIHJlZ2FyZGluZwo+
+IHRoZSBwYXJ0aXRpb25zIG9wZXJhdGlvbnMuIEFmdGVyIGNyZWF0aW5nIGEgcGFydGl0aW9uIG9u
+IGluaXRpYXRvciwgZm9yCj4gZXhhbXBsZSwgd2UgZG9uJ3Qgc2VlIGl0IG9uIHRhcmdldCBzaWRl
+LiBXZSBjb3VsZCBmb3JtYXQgaXQgbGlrZSBleHQ0IG9uCj4gaW5pdGlhdG9yLCBhbmQgc3RpbGwg
+dGFyZ2V0IGNhbm5vdCBzZWUgaXQuIEl0J3MgcG9zc2libGUgdG8gdHJpZ2dlciBhCj4gQkxLUlJQ
+QVJUIGlvY3RsIG9uIHRhcmdldCwgd2hpY2ggZW5kIHVwIGNhbGxpbmcgcmV2YWxpZGF0ZV9kaXNr
+KCkgb24KPiBudm1lIGRyaXZlciBhbmQgdGhlbiBwYXJ0aXRpb25zIGFyZSBwZXJjZWl2ZWQuCj4g
+Cj4gU28sIHF1ZXN0aW9uOiBpcyB0aGlzIGJlaGF2aW9yIGV4cGVjdGVkL2FjY2VwdGFibGU/IElz
+IGl0IGNvbXBsZXRlbHkgdXAKPiB0byB1c2Vyc3BhY2UgdG8gZGVhbCB3aXRoIHRoZSBzeW5jaHJv
+bml6YXRpb24gYmV0d2VlbiBob3N0L3RhcmdldD8KPiBJIHRoaW5rIGFuc3dlciBtaWdodCBiZSB5
+ZXMgc2luY2UgcGFydGl0aW9ucyBhcmUgYSBoaWdoZXIgbGV2ZWwgb2YKPiBhYnN0cmFjdGlvbiB0
+aGFuIG52bWYgKHdoaWNoIGlzIHB1cmVseSBibG9jayBkZXZpY2UgYXdhcmUpLgo+IApZZXMsIHRo
+aXMgaXMgdG8gYmUgZXhwZWN0ZWQuCkFmdGVyIGFsbCwgb25lIGNvdWxkIGFyZ3VlIHRoYXQgbm8g
+cGFydGl0aW9uIGluZm9ybWF0aW9uIHNob3VsZCBldmVyIGJlCnZpc2libGUgb24gdGhlIHRhcmdl
+dCBzZWVpbmcgdGhhdCB0aGUgZGV2aWNlIGlzIGV4cG9ydGVkLgpBcyB0aGUgaW5pdGlhdG9yIGhh
+cyBleGNsdXNpdmUgYWNjZXNzLCB0aGUgdGFyZ2V0IGhhcyBubyBidXNpbmVzcwpsb29raW5nIGF0
+IHRoZSBjb250ZW50czsgaW4gZmFjdCwgdGhpcyBtaWdodCBsZWFkIHRvIHVuZXhwZWN0ZWQKY29y
+cnVwdGlvbnMgaWYgdGhpbmdzIGxpa2UgdWRldiBqdW1wIGluIG9uIHRoZSB0YXJnZXQgc2lkZSBh
+bmQgdHJ5IHRvCidjb3JyZWN0JyB0aGluZ3Mgd2l0aCBqb3VybmFsIHJlcGxheSBldGMuCgo+IEJ1
+dCBpZiBrZXJuZWwgY291bGQvc2hvdWxkIGp1bXAgaW4sIHdlIHBvc3NpYmx5IGNvdWxkIHRyeSB0
+byBpc3N1ZSBhCj4gcmV2YWxpZGF0ZV9kaXNrIG9uIHRhcmdldCB3aGVuZXZlciB0aGlzIG9wZXJh
+dGlvbiBpcyBwZXJmb3JtZWQgb24KPiBpbml0aWF0b3Igc2lkZSAoYW5kIHZpY2UtdmVyc2EpLiBJ
+IGNvbmZlc3MgSSBjb3VsZG4ndCBmaW5kIHN1Y2ggc3luYwo+IGlkZWEgaW4gTlZNZSBvdmVyIGZh
+YnJpY3Mgc3BlYywgdGhvdWdoLgo+IEFsc28sIHJlYWRpbmcgTlZNZSBzcGVjIDEuMywgd2UgZG8g
+aGF2ZSB0aGUgb3B0aW9uYWwgZmVhdHVyZQo+ICJyZXNlcnZhdGlvbnMiLCBidXQgc2VlbXMgaXQg
+ZG9lc24ndCBtZW50aW9uIHRhcmdldCAob25seSBtdWx0aXBsZSBob3N0cykuCj4gClNlZSBhYm92
+ZS4KTmV2ZXIgdHJ5IHRoaXMgOi0pCgpDaGVlcnMsCgpIYW5uZXMKLS0gCkRyLiBIYW5uZXMgUmVp
+bmVja2UJCSAgIFRlYW1sZWFkIFN0b3JhZ2UgJiBOZXR3b3JraW5nCmhhcmVAc3VzZS5kZQkJCSAg
+ICAgICAgICAgICAgICs0OSA5MTEgNzQwNTMgNjg4ClNVU0UgTElOVVggR21iSCwgTWF4ZmVsZHN0
+ci4gNSwgOTA0MDkgTsO8cm5iZXJnCkdGOiBGLiBJbWVuZMO2cmZmZXIsIEouIFNtaXRoYXJkLCBK
+LiBHdWlsZCwgRC4gVXBtYW55dSwgRy4gTm9ydG9uCkhSQiAyMTI4NCAoQUcgTsO8cm5iZXJnKQoK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZt
+ZSBtYWlsaW5nIGxpc3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0
+cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
