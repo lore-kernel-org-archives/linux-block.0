@@ -1,50 +1,43 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 28/49] block: introduce bvec_get_last_page()
-Date: Tue,  8 Aug 2017 16:45:27 +0800
-Message-Id: <20170808084548.18963-29-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: Brian King <brking@linux.vnet.ibm.com>
+Cc: linux-scsi <linux-scsi@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "linuxppc-dev\@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+        Wendy Xiong <wenxiong@linux.vnet.ibm.com>
+Subject: Re: [PATCH] ipr: Fix scsi-mq lockdep issue
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <87a83qfosu.fsf@concordia.ellerman.id.au>
+	<073ed79c-11ce-e86c-a905-91fd28675d47@kernel.dk>
+	<1501166846.2516.1.camel@wdc.com>
+	<5b85a365-faa1-3987-9b6b-270399c30686@kernel.dk>
+	<87lgn9dqx3.fsf@concordia.ellerman.id.au>
+	<92379297-9667-ae52-b05c-6c8a0ce4751c@kernel.dk>
+	<OF186C0C54.7E077412-ON8625816B.0053C88E-8625816B.00540312@notes.na.collabserv.com>
+	<5dcfe3ac-50c7-86a6-e571-fe5a1c1dc316@linux.vnet.ibm.com>
+	<87379c6cfh.fsf@concordia.ellerman.id.au>
+	<87a83ju6av.fsf@concordia.ellerman.id.au>
+	<6d2bbcc8-3f4b-9b41-45b2-160f4817e439@linux.vnet.ibm.com>
+Date: Mon, 07 Aug 2017 13:41:54 -0400
+In-Reply-To: <6d2bbcc8-3f4b-9b41-45b2-160f4817e439@linux.vnet.ibm.com> (Brian
+	King's message of "Tue, 1 Aug 2017 10:21:30 -0500")
+Message-ID: <yq18tiv9swt.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-BTRFS and guard_bio_eod() need to get the last page, so introduce
-this helper to make them happy.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bvec.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Brian,
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 23d3abdf057c..ceb6292750d6 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -238,4 +238,18 @@ static inline bool bvec_iter_advance_mp(const struct bio_vec *bv,
- #define bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter)			\
- 	__bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, BVEC_ITER_ALL_INIT)
- 
-+/*
-+ * get the last page from the multipage bvec and store it
-+ * in @sp_bv
-+ */
-+static inline void bvec_get_last_page(struct bio_vec *mp_bv,
-+				      struct bio_vec *sp_bv)
-+{
-+	struct bvec_iter iter;
-+
-+	*sp_bv = *mp_bv;
-+	bvec_for_each_sp_bvec(*sp_bv, mp_bv, iter)
-+		;
-+}
-+
- #endif /* __LINUX_BVEC_ITER_H */
+> Fixes the following lockdep warning that can occur when scsi-mq is
+> enabled with ipr due to ipr calling scsi_unblock_requests from irq
+> context. The fix is to move the call to scsi_unblock_requests to ipr's
+> existing workqueue.
+
+Applied to 4.13/scsi-fixes. Thank you!
+
 -- 
-2.9.4
+Martin K. Petersen	Oracle Linux Engineering
