@@ -1,65 +1,47 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: Re: nvmf question - synchronization between target/initiator
- regarding partitions
-To: "Guilherme G. Piccoli" <gpiccoli@linux.vnet.ibm.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- linux-block@vger.kernel.org
-References: <82c4d1d8-ffa9-fa99-df58-05e2945eafdc@linux.vnet.ibm.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <c382184a-1621-c6b2-2a20-bd16498be998@suse.de>
-Date: Mon, 7 Aug 2017 16:20:35 +0200
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: "Guilherme G. Piccoli" <gpiccoli@linux.vnet.ibm.com>
+Subject: nvmf question - synchronization between target/initiator regarding
+ partitions
+To: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Cc: Mauricio pIO <mauricfo@linux.vnet.ibm.com>,
+        Brian J King <bjking1@us.ibm.com>,
+        Murali N Iyer <mniyer@us.ibm.com>, vnarasimhan@in.ibm.com,
+        gpiccoli@linux.vnet.ibm.com
+Date: Mon, 7 Aug 2017 10:42:57 -0300
 MIME-Version: 1.0
-In-Reply-To: <82c4d1d8-ffa9-fa99-df58-05e2945eafdc@linux.vnet.ibm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: vnarasimhan@in.ibm.com, Mauricio pIO <mauricfo@linux.vnet.ibm.com>,
- Brian J King <bjking1@us.ibm.com>, Murali N Iyer <mniyer@us.ibm.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Message-Id: <82c4d1d8-ffa9-fa99-df58-05e2945eafdc@linux.vnet.ibm.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-T24gMDgvMDcvMjAxNyAwMzo0MiBQTSwgR3VpbGhlcm1lIEcuIFBpY2NvbGkgd3JvdGU6Cj4gV2Ug
-b2JzZXJ2ZWQgdGhhdCBpdCdzIHBvc3NpYmxlIHRvIHBlcmZvcm0gcGFydGl0aW9uIG9wZXJhdGlv
-bnMgaW4gYm90aAo+IG52bWYgdGFyZ2V0IGFuZCBpbml0aWF0b3IgYmxvY2sgZGV2aWNlcywgbGlr
-ZSBjcmVhdGluZyBhbmQgZGVsZXRpbmcKPiBwYXJ0aXRpb25zLgo+IAo+IEJ1dCB0aGVyZSBpcyBu
-byBzeW5jIG1lY2hhbmlzbSBiZXR3ZWVuIHRhcmdldCBhbmQgaW5pdGlhdG9yIHJlZ2FyZGluZwo+
-IHRoZSBwYXJ0aXRpb25zIG9wZXJhdGlvbnMuIEFmdGVyIGNyZWF0aW5nIGEgcGFydGl0aW9uIG9u
-IGluaXRpYXRvciwgZm9yCj4gZXhhbXBsZSwgd2UgZG9uJ3Qgc2VlIGl0IG9uIHRhcmdldCBzaWRl
-LiBXZSBjb3VsZCBmb3JtYXQgaXQgbGlrZSBleHQ0IG9uCj4gaW5pdGlhdG9yLCBhbmQgc3RpbGwg
-dGFyZ2V0IGNhbm5vdCBzZWUgaXQuIEl0J3MgcG9zc2libGUgdG8gdHJpZ2dlciBhCj4gQkxLUlJQ
-QVJUIGlvY3RsIG9uIHRhcmdldCwgd2hpY2ggZW5kIHVwIGNhbGxpbmcgcmV2YWxpZGF0ZV9kaXNr
-KCkgb24KPiBudm1lIGRyaXZlciBhbmQgdGhlbiBwYXJ0aXRpb25zIGFyZSBwZXJjZWl2ZWQuCj4g
-Cj4gU28sIHF1ZXN0aW9uOiBpcyB0aGlzIGJlaGF2aW9yIGV4cGVjdGVkL2FjY2VwdGFibGU/IElz
-IGl0IGNvbXBsZXRlbHkgdXAKPiB0byB1c2Vyc3BhY2UgdG8gZGVhbCB3aXRoIHRoZSBzeW5jaHJv
-bml6YXRpb24gYmV0d2VlbiBob3N0L3RhcmdldD8KPiBJIHRoaW5rIGFuc3dlciBtaWdodCBiZSB5
-ZXMgc2luY2UgcGFydGl0aW9ucyBhcmUgYSBoaWdoZXIgbGV2ZWwgb2YKPiBhYnN0cmFjdGlvbiB0
-aGFuIG52bWYgKHdoaWNoIGlzIHB1cmVseSBibG9jayBkZXZpY2UgYXdhcmUpLgo+IApZZXMsIHRo
-aXMgaXMgdG8gYmUgZXhwZWN0ZWQuCkFmdGVyIGFsbCwgb25lIGNvdWxkIGFyZ3VlIHRoYXQgbm8g
-cGFydGl0aW9uIGluZm9ybWF0aW9uIHNob3VsZCBldmVyIGJlCnZpc2libGUgb24gdGhlIHRhcmdl
-dCBzZWVpbmcgdGhhdCB0aGUgZGV2aWNlIGlzIGV4cG9ydGVkLgpBcyB0aGUgaW5pdGlhdG9yIGhh
-cyBleGNsdXNpdmUgYWNjZXNzLCB0aGUgdGFyZ2V0IGhhcyBubyBidXNpbmVzcwpsb29raW5nIGF0
-IHRoZSBjb250ZW50czsgaW4gZmFjdCwgdGhpcyBtaWdodCBsZWFkIHRvIHVuZXhwZWN0ZWQKY29y
-cnVwdGlvbnMgaWYgdGhpbmdzIGxpa2UgdWRldiBqdW1wIGluIG9uIHRoZSB0YXJnZXQgc2lkZSBh
-bmQgdHJ5IHRvCidjb3JyZWN0JyB0aGluZ3Mgd2l0aCBqb3VybmFsIHJlcGxheSBldGMuCgo+IEJ1
-dCBpZiBrZXJuZWwgY291bGQvc2hvdWxkIGp1bXAgaW4sIHdlIHBvc3NpYmx5IGNvdWxkIHRyeSB0
-byBpc3N1ZSBhCj4gcmV2YWxpZGF0ZV9kaXNrIG9uIHRhcmdldCB3aGVuZXZlciB0aGlzIG9wZXJh
-dGlvbiBpcyBwZXJmb3JtZWQgb24KPiBpbml0aWF0b3Igc2lkZSAoYW5kIHZpY2UtdmVyc2EpLiBJ
-IGNvbmZlc3MgSSBjb3VsZG4ndCBmaW5kIHN1Y2ggc3luYwo+IGlkZWEgaW4gTlZNZSBvdmVyIGZh
-YnJpY3Mgc3BlYywgdGhvdWdoLgo+IEFsc28sIHJlYWRpbmcgTlZNZSBzcGVjIDEuMywgd2UgZG8g
-aGF2ZSB0aGUgb3B0aW9uYWwgZmVhdHVyZQo+ICJyZXNlcnZhdGlvbnMiLCBidXQgc2VlbXMgaXQg
-ZG9lc24ndCBtZW50aW9uIHRhcmdldCAob25seSBtdWx0aXBsZSBob3N0cykuCj4gClNlZSBhYm92
-ZS4KTmV2ZXIgdHJ5IHRoaXMgOi0pCgpDaGVlcnMsCgpIYW5uZXMKLS0gCkRyLiBIYW5uZXMgUmVp
-bmVja2UJCSAgIFRlYW1sZWFkIFN0b3JhZ2UgJiBOZXR3b3JraW5nCmhhcmVAc3VzZS5kZQkJCSAg
-ICAgICAgICAgICAgICs0OSA5MTEgNzQwNTMgNjg4ClNVU0UgTElOVVggR21iSCwgTWF4ZmVsZHN0
-ci4gNSwgOTA0MDkgTsO8cm5iZXJnCkdGOiBGLiBJbWVuZMO2cmZmZXIsIEouIFNtaXRoYXJkLCBK
-LiBHdWlsZCwgRC4gVXBtYW55dSwgRy4gTm9ydG9uCkhSQiAyMTI4NCAoQUcgTsO8cm5iZXJnKQoK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZt
-ZSBtYWlsaW5nIGxpc3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0
-cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
+We observed that it's possible to perform partition operations in both
+nvmf target and initiator block devices, like creating and deleting
+partitions.
+
+But there is no sync mechanism between target and initiator regarding
+the partitions operations. After creating a partition on initiator, for
+example, we don't see it on target side. We could format it like ext4 on
+initiator, and still target cannot see it. It's possible to trigger a
+BLKRRPART ioctl on target, which end up calling revalidate_disk() on
+nvme driver and then partitions are perceived.
+
+So, question: is this behavior expected/acceptable? Is it completely up
+to userspace to deal with the synchronization between host/target?
+I think answer might be yes since partitions are a higher level of
+abstraction than nvmf (which is purely block device aware).
+
+But if kernel could/should jump in, we possibly could try to issue a
+revalidate_disk on target whenever this operation is performed on
+initiator side (and vice-versa). I confess I couldn't find such sync
+idea in NVMe over fabrics spec, though.
+Also, reading NVMe spec 1.3, we do have the optional feature
+"reservations", but seems it doesn't mention target (only multiple hosts).
+
+Thanks in advance for any ideas on this subject.
+Cheers,
+
+
+
+Guilherme
