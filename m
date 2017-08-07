@@ -1,40 +1,47 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 9 Aug 2017 16:10:49 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Johannes Thumshirn <jth@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH 3/4] scsi: add Mylex RAID controller
-Message-ID: <20170809141049.GB26843@lst.de>
-References: <1501683208-5240-1-git-send-email-hare@suse.de> <1501683208-5240-4-git-send-email-hare@suse.de> <20170805113932.GF16313@lst.de> <17589cb4-9f0c-7d15-8c3a-79bd9b14fdef@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Johannes Thumshirn <jth@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Hannes Reinecke <hare@suse.com>
+References: <1501683208-5240-1-git-send-email-hare@suse.de>
+ <1501683208-5240-4-git-send-email-hare@suse.de>
+ <20170805113932.GF16313@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <17589cb4-9f0c-7d15-8c3a-79bd9b14fdef@suse.de>
+Date: Mon, 7 Aug 2017 08:09:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <17589cb4-9f0c-7d15-8c3a-79bd9b14fdef@suse.de>
+In-Reply-To: <20170805113932.GF16313@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 07, 2017 at 08:09:11AM +0200, Hannes Reinecke wrote:
-> On 08/05/2017 01:39 PM, Christoph Hellwig wrote:
-> > Can you use normal linux style for the code instead of copy and
-> > pasting the weird naming and capitalization from the DAC960 driver?
-> > 
-> Yes; already planned for v2. But first wanted to get some general
-> feedback (like: is anyone interested in that at all?)
-
-Yes, please go ahead and kill off the DAC960 driver.
-
+On 08/05/2017 01:39 PM, Christoph Hellwig wrote:
+> Can you use normal linux style for the code instead of copy and
+> pasting the weird naming and capitalization from the DAC960 driver?
 > 
-> > Also please use the driver name as prefix for the functions.
-> > 
-> Ok.
-> 
-> > Maybe myraid instead of mylex?
-> > 
-> Nah; I'd rather stick with mylex.
-> (Especially as it says 'Mylex' in big fat letters on the board :-)
+Yes; already planned for v2. But first wanted to get some general
+feedback (like: is anyone interested in that at all?)
 
-Naming drivers after the vendor only is usually a bad idea as vendors
-have/had multiple products.  In this case we have plenty other drivers
-that support Mylex products.
+> Also please use the driver name as prefix for the functions.
+> 
+Ok.
+
+> Maybe myraid instead of mylex?
+> 
+Nah; I'd rather stick with mylex.
+(Especially as it says 'Mylex' in big fat letters on the board :-)
+
+> I'll take a more detailed look at the actual driver in a bit.
+> 
+THX.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
