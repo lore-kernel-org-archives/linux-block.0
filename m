@@ -1,60 +1,45 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	stable@vger.kernel.org
-Subject: [PATCH 03/55] skd: Submit requests to firmware before triggering the doorbell
-Date: Thu, 17 Aug 2017 13:12:46 -0700
-Message-Id: <20170817201338.16537-4-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 15/49] bvec_iter: introduce BVEC_ITER_ALL_INIT
+Date: Tue,  8 Aug 2017 16:45:14 +0800
+Message-Id: <20170808084548.18963-16-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Ensure that the members of struct skd_msg_buf have been transferred
-to the PCIe adapter before the doorbell is triggered. This patch
-avoids that I/O fails sporadically and that the following error
-message is reported:
+Introduce BVEC_ITER_ALL_INIT for iterating one bio
+from start to end.
 
-(skd0:STM000196603:[0000:00:09.0]): Completion mismatch comp_id=0x0000 skreq=0x0400 new=0x0000
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/skd_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/linux/bvec.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index edab9c04e8ad..153f20ce318b 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -2160,6 +2160,9 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- 		 */
- 		qcmd |= FIT_QCMD_MSGSIZE_64;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index ec8a4d7af6bd..fe7a22dd133b 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -125,4 +125,13 @@ static inline bool bvec_iter_rewind(const struct bio_vec *bv,
+ 		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
+ 	     bvec_iter_advance((bio_vec), &(iter), (bvl).bv_len))
  
-+	/* Make sure skd_msg_buf is written before the doorbell is triggered. */
-+	smp_wmb();
++/* for iterating one bio from start to end */
++#define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
++{									\
++	.bi_sector	= 0,						\
++	.bi_size	= UINT_MAX,					\
++	.bi_idx		= 0,						\
++	.bi_bvec_done	= 0,						\
++}
 +
- 	SKD_WRITEQ(skdev, qcmd, FIT_Q_COMMAND);
- }
- 
-@@ -2202,6 +2205,9 @@ static void skd_send_special_fitmsg(struct skd_device *skdev,
- 	qcmd = skspcl->mb_dma_address;
- 	qcmd |= FIT_QCMD_QID_NORMAL + FIT_QCMD_MSGSIZE_128;
- 
-+	/* Make sure skd_msg_buf is written before the doorbell is triggered. */
-+	smp_wmb();
-+
- 	SKD_WRITEQ(skdev, qcmd, FIT_Q_COMMAND);
- }
- 
+ #endif /* __LINUX_BVEC_ITER_H */
 -- 
-2.14.0
+2.9.4
