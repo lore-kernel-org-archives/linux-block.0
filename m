@@ -1,45 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42979 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751050AbdHWWa1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2017 18:30:27 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        stable@vger.kernel.org
-Subject: [PATCH 1/2] <linux/uaccess.h>: Fix copy_in_user() declaration
-Date: Wed, 23 Aug 2017 15:29:10 -0700
-Message-Id: <20170823222911.29453-2-bart.vanassche@wdc.com>
-In-Reply-To: <20170823222911.29453-1-bart.vanassche@wdc.com>
-References: <20170823222911.29453-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 28/49] block: introduce bvec_get_last_page()
+Date: Tue,  8 Aug 2017 16:45:27 +0800
+Message-Id: <20170808084548.18963-29-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-copy_in_user() copies data from user-space address @from to user-
-space address @to. Hence declare both @from and @to as user-space
-pointers.
+BTRFS and guard_bio_eod() need to get the last page, so introduce
+this helper to make them happy.
 
-Fixes: commit d597580d3737 ("generic ...copy_..._user primitives")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/uaccess.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/bvec.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
-index acdd6f915a8d..20ef8e6ec2db 100644
---- a/include/linux/uaccess.h
-+++ b/include/linux/uaccess.h
-@@ -156,7 +156,7 @@ copy_to_user(void __user *to, const void *from, unsigned long n)
- }
- #ifdef CONFIG_COMPAT
- static __always_inline unsigned long __must_check
--copy_in_user(void __user *to, const void *from, unsigned long n)
-+copy_in_user(void __user *to, const void __user *from, unsigned long n)
- {
- 	might_fault();
- 	if (access_ok(VERIFY_WRITE, to, n) && access_ok(VERIFY_READ, from, n))
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 23d3abdf057c..ceb6292750d6 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -238,4 +238,18 @@ static inline bool bvec_iter_advance_mp(const struct bio_vec *bv,
+ #define bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter)			\
+ 	__bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, BVEC_ITER_ALL_INIT)
+ 
++/*
++ * get the last page from the multipage bvec and store it
++ * in @sp_bv
++ */
++static inline void bvec_get_last_page(struct bio_vec *mp_bv,
++				      struct bio_vec *sp_bv)
++{
++	struct bvec_iter iter;
++
++	*sp_bv = *mp_bv;
++	bvec_for_each_sp_bvec(*sp_bv, mp_bv, iter)
++		;
++}
++
+ #endif /* __LINUX_BVEC_ITER_H */
 -- 
-2.14.0
+2.9.4
