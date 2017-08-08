@@ -1,101 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56798 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752153AbdHHUeO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 16:34:14 -0400
-Date: Tue, 8 Aug 2017 13:34:12 -0700
-From: Shaohua Li <shli@kernel.org>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: linux-block@vger.kernel.org, hch@infradead.org, jack@suse.cz,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: Re: [PATCH 2/9] md: Add nowait support to md
-Message-ID: <20170808203412.jqqqj73pcoeovbzd@kernel.org>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
- <20170726235806.12148-3-rgoldwyn@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170726235806.12148-3-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>,
+        linux-f2fs-devel@lists.sourceforge.net
+Subject: [PATCH v3 43/49] f2fs: convert to bio_for_each_segment_all_sp()
+Date: Tue,  8 Aug 2017 16:45:42 +0800
+Message-Id: <20170808084548.18963-44-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jul 26, 2017 at 06:57:59PM -0500, Goldwyn Rodrigues wrote:
-> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> 
-> Set queue flags to QUEUE_FLAG_NOWAIT to indicate REQ_NOWAIT
-> will be handled.
-> 
-> If an I/O on the md will be delayed, it would bail by calling
-> bio_wouldblock_error(). The conditions when this could happen are:
-> 
->  + MD is suspended
->  + There is a change pending on the SB, and current I/O would
->    block until that is complete.
-> 
-> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> ---
->  drivers/md/md.c | 27 +++++++++++++++++++++++++--
->  1 file changed, 25 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index 8cdca0296749..d96c27d16841 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -285,6 +285,13 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
->  		bio_endio(bio);
->  		return BLK_QC_T_NONE;
->  	}
-> +
-> +	if (mddev->suspended && (bio->bi_opf & REQ_NOWAIT)) {
-> +		bio_wouldblock_error(bio);
-> +		rcu_read_unlock();
+Cc: Jaegeuk Kim <jaegeuk@kernel.org>
+Cc: Chao Yu <yuchao0@huawei.com>
+Cc: linux-f2fs-devel@lists.sourceforge.net
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/f2fs/data.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-this unlock is not required.
-
-> +		return BLK_QC_T_NONE;
-> +	}
-> +
->  check_suspended:
->  	rcu_read_lock();
->  	if (mddev->suspended) {
-> @@ -5274,6 +5281,10 @@ static int md_alloc(dev_t dev, char *name)
->  		mddev->queue = NULL;
->  		goto abort;
->  	}
-> +
-> +	/* Set the NOWAIT flags to show support */
-> +	queue_flag_set_unlocked(QUEUE_FLAG_NOWAIT, mddev->queue);
-> +
->  	disk->major = MAJOR(mddev->unit);
->  	disk->first_minor = unit << shift;
->  	if (name)
-> @@ -8010,8 +8021,20 @@ bool md_write_start(struct mddev *mddev, struct bio *bi)
->  	rcu_read_unlock();
->  	if (did_change)
->  		sysfs_notify_dirent_safe(mddev->sysfs_state);
-> -	wait_event(mddev->sb_wait,
-> -		   !test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags) && !mddev->suspended);
-> +
-> +	/* Don't wait for sb writes if marked with REQ_NOWAIT */
-> +	if (test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags) ||
-> +			mddev->suspended) {
-> +		if (bi->bi_opf & REQ_NOWAIT) {
-> +			bio_wouldblock_error(bi);
-> +			percpu_ref_put(&mddev->writes_pending);
-> +			return false;
-> +		}
-> +
-> +		wait_event(mddev->sb_wait,
-> +				!test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags) && !mddev->suspended);
-> +	}
-> +
->  	if (test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags)) {
->  		percpu_ref_put(&mddev->writes_pending);
->  		return false;
-> -- 
-> 2.12.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-raid" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 99fa8e9780e8..69aa500834d3 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -54,6 +54,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ #ifdef CONFIG_F2FS_FAULT_INJECTION
+ 	/*
+@@ -75,7 +76,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ 		}
+ 	}
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		if (!bio->bi_status) {
+@@ -95,8 +96,9 @@ static void f2fs_write_end_io(struct bio *bio)
+ 	struct f2fs_sb_info *sbi = bio->bi_private;
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		enum count_type type = WB_DATA_TYPE(page);
+ 
+@@ -256,6 +258,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
+ 	struct bio_vec *bvec;
+ 	struct page *target;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (!io->bio)
+ 		return false;
+@@ -263,7 +266,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
+ 	if (!inode && !ino)
+ 		return true;
+ 
+-	bio_for_each_segment_all(bvec, io->bio, i) {
++	bio_for_each_segment_all_sp(bvec, io->bio, i, bia) {
+ 
+ 		if (bvec->bv_page->mapping)
+ 			target = bvec->bv_page;
+-- 
+2.9.4
