@@ -1,8 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39906 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752278AbdHHIqg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 04:46:36 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Huang Ying <ying.huang@intel.com>,
@@ -11,34 +7,156 @@ To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 02/49] block: loop: comment on direct access to bvec table
-Date: Tue,  8 Aug 2017 16:45:01 +0800
-Message-Id: <20170808084548.18963-3-ming.lei@redhat.com>
+Subject: [PATCH v3 32/49] block: convert to singe/multi page version of bio_for_each_segment_all()
+Date: Tue,  8 Aug 2017 16:45:31 +0800
+Message-Id: <20170808084548.18963-33-ming.lei@redhat.com>
 In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
 References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/bio.c       | 17 +++++++++++------
+ block/blk-zoned.c |  5 +++--
+ block/bounce.c    |  6 ++++--
+ 3 files changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ef8334949b42..58df9ed70328 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -487,6 +487,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	/* nomerge for loop request queue */
- 	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
+diff --git a/block/bio.c b/block/bio.c
+index 716e6917b0fd..fd6a055f491c 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -997,7 +997,7 @@ int bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
+ 	int i;
+ 	struct bio_vec *bv;
  
-+	/*
-+	 * For multipage bvec support, it is safe to pass the bvec
-+	 * table to iov iterator, because iov iter still uses bvec
-+	 * iter helpers to travese bvec.
-+	 */
- 	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
- 		      bio_segments(bio), blk_rq_bytes(cmd->rq));
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_segment_all_mp(bv, bio, i) {
+ 		bv->bv_page = alloc_page(gfp_mask);
+ 		if (!bv->bv_page) {
+ 			while (--bv >= bio->bi_io_vec)
+@@ -1098,8 +1098,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter iter)
+ {
+ 	int i;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		ssize_t ret;
+ 
+ 		ret = copy_page_from_iter(bvec->bv_page,
+@@ -1129,8 +1130,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
+ {
+ 	int i;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		ssize_t ret;
+ 
+ 		ret = copy_page_to_iter(bvec->bv_page,
+@@ -1152,8 +1154,9 @@ void bio_free_pages(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i)
++	bio_for_each_segment_all_sp(bvec, bio, i, bia)
+ 		__free_page(bvec->bv_page);
+ }
+ EXPORT_SYMBOL(bio_free_pages);
+@@ -1444,11 +1447,12 @@ static void __bio_unmap_user(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	/*
+ 	 * make sure we dirty pages we wrote to
+ 	 */
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		if (bio_data_dir(bio) == READ)
+ 			set_page_dirty_lock(bvec->bv_page);
+ 
+@@ -1540,8 +1544,9 @@ static void bio_copy_kern_endio_read(struct bio *bio)
+ 	char *p = bio->bi_private;
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		memcpy(p, page_address(bvec->bv_page), bvec->bv_len);
+ 		p += bvec->bv_len;
+ 	}
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 3bd15d8095b1..558b84ae2d86 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -81,6 +81,7 @@ int blkdev_report_zones(struct block_device *bdev,
+ 	unsigned int ofst;
+ 	void *addr;
+ 	int ret;
++	struct bvec_iter_all bia;
+ 
+ 	if (!q)
+ 		return -ENXIO;
+@@ -148,7 +149,7 @@ int blkdev_report_zones(struct block_device *bdev,
+ 	n = 0;
+ 	nz = 0;
+ 	nr_rep = 0;
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_segment_all_sp(bv, bio, i, bia) {
+ 
+ 		if (!bv->bv_page)
+ 			break;
+@@ -181,7 +182,7 @@ int blkdev_report_zones(struct block_device *bdev,
+ 
+ 	*nr_zones = nz;
+ out:
+-	bio_for_each_segment_all(bv, bio, i)
++	bio_for_each_segment_all_sp(bv, bio, i, bia)
+ 		__free_page(bv->bv_page);
+ 	bio_put(bio);
+ 
+diff --git a/block/bounce.c b/block/bounce.c
+index 50e965a15295..34286abc0a66 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -145,11 +145,12 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
+ 	struct bio_vec *bvec, orig_vec;
+ 	int i;
+ 	struct bvec_iter orig_iter = bio_orig->bi_iter;
++	struct bvec_iter_all bia;
+ 
+ 	/*
+ 	 * free up bounce indirect pages used
+ 	 */
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
+ 		if (bvec->bv_page != orig_vec.bv_page) {
+ 			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
+@@ -204,6 +205,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	unsigned i = 0;
+ 	bool bounce = false;
+ 	int sectors = 0;
++	struct bvec_iter_all bia;
+ 
+ 	bio_for_each_segment(from, *bio_orig, iter) {
+ 		if (i++ < BIO_MAX_PAGES)
+@@ -222,7 +224,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	}
+ 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
+ 
+-	bio_for_each_segment_all(to, bio, i) {
++	bio_for_each_segment_all_sp(to, bio, i, bia) {
+ 		struct page *page = to->bv_page;
+ 
+ 		if (page_to_pfn(page) <= q->limits.bounce_pfn)
 -- 
 2.9.4
