@@ -1,71 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34480 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752024AbdHEPvx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 11:51:53 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
-        Shaohua Li <shli@fb.com>
-Subject: [PATCH 0/5] block: a virtual block device driver for testing
-Date: Sat,  5 Aug 2017 08:51:44 -0700
-Message-Id: <cover.1501945859.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 29/49] fs/buffer.c: use bvec iterator to truncate the bio
+Date: Tue,  8 Aug 2017 16:45:28 +0800
+Message-Id: <20170808084548.18963-30-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+Once multipage bvec is enabled, the last bvec may include
+more than one page, this patch use bvec_get_last_page()
+to truncate the bio.
 
-In testing software RAID, I usually found it's hard to cover specific cases.
-RAID is supposed to work even disk is in semi good state, for example, some
-sectors are broken. Since we can't control the behavior of hardware, it's
-difficult to create test suites to do destructive tests. But we can control the
-behavior of software, software based disk is an obvious choice for such tests.
-While we already have several software based disks for testing (eg, null_blk,
-scsi_debug), none is for destructive testing, this is the reason we create a
-new test block device.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/buffer.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Currently the driver can create disk with following features:
-- Bandwidth control. A raid array consists of several disks. The disks could
-  run in different speed, for example, one disk is SSD and the other is HD.
-  Actually raid1 has a feature called write behind just for this. To test such
-  raid1 feature, we'd like the disks speed could be controlled.
-- Emulate disk cache. Software must flush disk cache to guarantee data is
-  safely stored in media after a power failure. To verify if software works
-  well, we can't simply use physical disk, because even software doesn't flush
-  cache, the hardware probably will flush the cache. With a software
-  implementation of disk cache, we can fully control how we flush disk cache in a
-  power failure.
-- Badblock. If only part of a disk is broken, software raid continues working.
-  To test if software raid works well, disks must include some broken parts or
-  bad blocks. Bad blocks can be easily implemented in software.
-
-While this is inspired by software raid testing, the driver is very flexible
-for extension. We can easily add new features into the driver. The interface is
-configfs, which can be configured with a shell script. There is a 'features'
-attribute exposing all supported features. By checking this, we don't need to
-worry about compability issues. For configuration details, please check the
-first patch.
-
-This is William's intern project. I made some changes, all errors are mine. You
-are more than welcomed to test and add new features!
-
-Thanks,
-Shaohua
-
-Kyungchan Koh (4):
-  testb: add interface
-  testb: implement block device operations
-  testb: implement bandwidth control
-  testb: emulate disk cache
-
-Shaohua Li (1):
-  testb: badblock support
-
- drivers/block/Kconfig    |    8 +
- drivers/block/Makefile   |    2 +
- drivers/block/test_blk.c | 1294 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 1304 insertions(+)
- create mode 100644 drivers/block/test_blk.c
-
+diff --git a/fs/buffer.c b/fs/buffer.c
+index c821ed6a6f0e..32a63e5b00f3 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3057,8 +3057,7 @@ void guard_bio_eod(int op, struct bio *bio)
+ 	unsigned truncated_bytes;
+ 	/*
+ 	 * It is safe to truncate the last bvec in the following way
+-	 * even though multipage bvec is supported, but we need to
+-	 * fix the parameters passed to zero_user().
++	 * even though multipage bvec is supported.
+ 	 */
+ 	struct bio_vec *bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 
+@@ -3087,7 +3086,10 @@ void guard_bio_eod(int op, struct bio *bio)
+ 
+ 	/* ..and clear the end of the buffer for reads */
+ 	if (op == REQ_OP_READ) {
+-		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
++		struct bio_vec bv;
++
++		bvec_get_last_page(bvec, &bv);
++		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
+ 				truncated_bytes);
+ 	}
+ }
 -- 
-2.9.3
+2.9.4
