@@ -1,71 +1,101 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57106 "EHLO mx1.redhat.com"
+Received: from mail.kernel.org ([198.145.29.99]:56798 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752944AbdHHIxh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 04:53:37 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-ext4@vger.kernel.org
-Subject: [PATCH v3 40/49] ext4: convert to bio_for_each_segment_all_sp()
-Date: Tue,  8 Aug 2017 16:45:39 +0800
-Message-Id: <20170808084548.18963-41-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
+        id S1752153AbdHHUeO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Aug 2017 16:34:14 -0400
+Date: Tue, 8 Aug 2017 13:34:12 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-block@vger.kernel.org, hch@infradead.org, jack@suse.cz,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 2/9] md: Add nowait support to md
+Message-ID: <20170808203412.jqqqj73pcoeovbzd@kernel.org>
+References: <20170726235806.12148-1-rgoldwyn@suse.de>
+ <20170726235806.12148-3-rgoldwyn@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170726235806.12148-3-rgoldwyn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Cc: "Theodore Ts'o" <tytso@mit.edu>
-Cc: Andreas Dilger <adilger.kernel@dilger.ca>
-Cc: linux-ext4@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/ext4/page-io.c  | 3 ++-
- fs/ext4/readpage.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+On Wed, Jul 26, 2017 at 06:57:59PM -0500, Goldwyn Rodrigues wrote:
+> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> 
+> Set queue flags to QUEUE_FLAG_NOWAIT to indicate REQ_NOWAIT
+> will be handled.
+> 
+> If an I/O on the md will be delayed, it would bail by calling
+> bio_wouldblock_error(). The conditions when this could happen are:
+> 
+>  + MD is suspended
+>  + There is a change pending on the SB, and current I/O would
+>    block until that is complete.
+> 
+> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> ---
+>  drivers/md/md.c | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 8cdca0296749..d96c27d16841 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -285,6 +285,13 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+>  		bio_endio(bio);
+>  		return BLK_QC_T_NONE;
+>  	}
+> +
+> +	if (mddev->suspended && (bio->bi_opf & REQ_NOWAIT)) {
+> +		bio_wouldblock_error(bio);
+> +		rcu_read_unlock();
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index c2fce4478cca..5a36ad110f14 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -62,8 +62,9 @@ static void ext4_finish_bio(struct bio *bio)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- #ifdef CONFIG_EXT4_FS_ENCRYPTION
- 		struct page *data_page = NULL;
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index 40a5497b0f60..6bd33c4c1f7f 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -71,6 +71,7 @@ static void mpage_end_io(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (ext4_bio_encrypted(bio)) {
- 		if (bio->bi_status) {
-@@ -80,7 +81,7 @@ static void mpage_end_io(struct bio *bio)
- 			return;
- 		}
- 	}
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_sp(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 
- 		if (!bio->bi_status) {
--- 
-2.9.4
+this unlock is not required.
+
+> +		return BLK_QC_T_NONE;
+> +	}
+> +
+>  check_suspended:
+>  	rcu_read_lock();
+>  	if (mddev->suspended) {
+> @@ -5274,6 +5281,10 @@ static int md_alloc(dev_t dev, char *name)
+>  		mddev->queue = NULL;
+>  		goto abort;
+>  	}
+> +
+> +	/* Set the NOWAIT flags to show support */
+> +	queue_flag_set_unlocked(QUEUE_FLAG_NOWAIT, mddev->queue);
+> +
+>  	disk->major = MAJOR(mddev->unit);
+>  	disk->first_minor = unit << shift;
+>  	if (name)
+> @@ -8010,8 +8021,20 @@ bool md_write_start(struct mddev *mddev, struct bio *bi)
+>  	rcu_read_unlock();
+>  	if (did_change)
+>  		sysfs_notify_dirent_safe(mddev->sysfs_state);
+> -	wait_event(mddev->sb_wait,
+> -		   !test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags) && !mddev->suspended);
+> +
+> +	/* Don't wait for sb writes if marked with REQ_NOWAIT */
+> +	if (test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags) ||
+> +			mddev->suspended) {
+> +		if (bi->bi_opf & REQ_NOWAIT) {
+> +			bio_wouldblock_error(bi);
+> +			percpu_ref_put(&mddev->writes_pending);
+> +			return false;
+> +		}
+> +
+> +		wait_event(mddev->sb_wait,
+> +				!test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags) && !mddev->suspended);
+> +	}
+> +
+>  	if (test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags)) {
+>  		percpu_ref_put(&mddev->writes_pending);
+>  		return false;
+> -- 
+> 2.12.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-raid" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
