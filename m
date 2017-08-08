@@ -1,33 +1,45 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Thu, 3 Aug 2017 00:26:00 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH 0/2] null_blk: make sure submit_queues > 0
-Message-ID: <20170802162555.GA30489@bogon.didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:45510 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752093AbdHHIrg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Aug 2017 04:47:36 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 08/49] block: comment on bio_alloc_pages()
+Date: Tue,  8 Aug 2017 16:45:07 +0800
+Message-Id: <20170808084548.18963-9-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi,
+This patch adds comment on usage of bio_alloc_pages().
 
-two misc patch for null_blk,
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-null_blk: simplify logic for use_per_node_hctx
-simplify code logic, if use_per_node_hctx set submit_queues same as
-nr_online_nodes.
-
-null_blk: make sure submit_queues > 0
-set submit_queues to 1 by default, and add a handle for it's value < 0,
-no matter what user want, otherwise kmalloc has a negtive parameters.
-
-weiping zhang (2):
-  null_blk: simplify logic for use_per_node_hctx
-  null_blk: make sure submit_queues > 0
-
- drivers/block/null_blk.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
-
+diff --git a/block/bio.c b/block/bio.c
+index e241bbc49f14..826b5d173416 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -981,7 +981,9 @@ EXPORT_SYMBOL(bio_advance);
+  * @bio: bio to allocate pages for
+  * @gfp_mask: flags for allocation
+  *
+- * Allocates pages up to @bio->bi_vcnt.
++ * Allocates pages up to @bio->bi_vcnt, and this function should only
++ * be called on a new initialized bio, which means all pages aren't added
++ * to the bio via bio_add_page() yet.
+  *
+  * Returns 0 on success, -ENOMEM on failure. On failure, any allocated pages are
+  * freed.
 -- 
 2.9.4
