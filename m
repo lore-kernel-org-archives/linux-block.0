@@ -1,35 +1,119 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:41901 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752012AbdHJMAf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2017 08:00:35 -0400
-Date: Thu, 10 Aug 2017 05:00:29 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Huang Ying <ying.huang@intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 18/49] block: introduce multipage/single page bvec
- helpers
-Message-ID: <20170810120029.GA14607@infradead.org>
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 18/49] block: introduce multipage/single page bvec helpers
+Date: Tue,  8 Aug 2017 16:45:17 +0800
+Message-Id: <20170808084548.18963-19-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
 References: <20170808084548.18963-1-ming.lei@redhat.com>
- <20170808084548.18963-19-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170808084548.18963-19-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Please skip adding the _sp names for the single page ones - those
-are the only used to implement the non postfixed ones anyway.
+This patch introduces helpers which are suffixed with _mp
+and _sp for the multipage bvec/segment support.
 
-The _mp ones should have bio_iter_segment_* names instead.
+The helpers with _mp suffix are the interfaces for treating
+one bvec/segment as real multipage one, for example, .bv_len
+is the total length of the multipage segment.
 
-And while you're at it - I think this code would massively benefit
-from turning it into inline functions in a prep step before doing these
-changes, including passing the iter by reference for all these functions
-instead of the odd by value calling convention.
+The helpers with _sp suffix are interfaces for supporting
+current bvec iterator which is thought as singlepage only
+by drivers, fs, dm and etc. These _sp helpers are introduced
+to build singlepage bvec in flight, so users of bio/bvec
+iterator still can work well and needn't change even though
+we store multipage into bvec.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/bvec.h | 56 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 53 insertions(+), 3 deletions(-)
+
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index fe7a22dd133b..1eaf7ca5cab3 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -25,6 +25,42 @@
+ #include <linux/errno.h>
+ 
+ /*
++ * What is multipage bvecs(segment)?
++ *
++ * - bvec stored in bio->bi_io_vec is always multipage style vector
++ *
++ * - bvec(struct bio_vec) represents one physically contiguous I/O
++ *   buffer, now the buffer may include more than one pages since
++ *   multipage(mp) bvec is supported, and all these pages represented
++ *   by one bvec is physically contiguous. Before mp support, at most
++ *   one page can be included in one bvec, we call it singlepage(sp)
++ *   bvec.
++ *
++ * - .bv_page of th bvec represents the 1st page in the mp segment
++ *
++ * - .bv_offset of the bvec represents offset of the buffer in the bvec
++ *
++ * The effect on the current drivers/filesystem/dm/bcache/...:
++ *
++ * - almost everyone supposes that one bvec only includes one single
++ *   page, so we keep the sp interface not changed, for example,
++ *   bio_for_each_segment() still returns bvec with single page
++ *
++ * - bio_for_each_segment_all() will be changed to return singlepage
++ *   bvec too
++ *
++ * - during iterating, iterator variable(struct bvec_iter) is always
++ *   updated in multipage bvec style and that means bvec_iter_advance()
++ *   is kept not changed
++ *
++ * - returned(copied) singlepage bvec is generated in flight by bvec
++ *   helpers from the stored mp bvec
++ *
++ * - In case that some components(such as iov_iter) need to support mp
++ *   segment, we introduce new helpers(suffixed with _mp) for them.
++ */
++
++/*
+  * was unsigned short, but we might as well be ready for > 64kB I/O pages
+  */
+ struct bio_vec {
+@@ -52,16 +88,30 @@ struct bvec_iter {
+  */
+ #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
+ 
+-#define bvec_iter_page(bvec, iter)				\
++#define bvec_iter_page_mp(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_page)
+ 
+-#define bvec_iter_len(bvec, iter)				\
++#define bvec_iter_len_mp(bvec, iter)				\
+ 	min((iter).bi_size,					\
+ 	    __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_done)
+ 
+-#define bvec_iter_offset(bvec, iter)				\
++#define bvec_iter_offset_mp(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
+ 
++/*
++ * <page, offset,length> of singlepage(sp) segment.
++ *
++ * This helpers will be implemented for building sp bvec in flight.
++ */
++#define bvec_iter_offset_sp(bvec, iter)	bvec_iter_offset_mp((bvec), (iter))
++#define bvec_iter_len_sp(bvec, iter)	bvec_iter_len_mp((bvec), (iter))
++#define bvec_iter_page_sp(bvec, iter)	bvec_iter_page_mp((bvec), (iter))
++
++/* current interfaces support sp style at default */
++#define bvec_iter_page(bvec, iter)	bvec_iter_page_sp((bvec), (iter))
++#define bvec_iter_len(bvec, iter)	bvec_iter_len_sp((bvec), (iter))
++#define bvec_iter_offset(bvec, iter)	bvec_iter_offset_sp((bvec), (iter))
++
+ #define bvec_iter_bvec(bvec, iter)				\
+ ((struct bio_vec) {						\
+ 	.bv_page	= bvec_iter_page((bvec), (iter)),	\
+-- 
+2.9.4
