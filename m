@@ -1,27 +1,27 @@
-Return-Path: <efault@gmx.de>
-Message-ID: <1502211054.7877.9.camel@gmx.de>
-Subject: Re: blk-mq breaks suspend even with runtime PM patch
-From: Mike Galbraith <efault@gmx.de>
+Return-Path: <oleksandr@natalenko.name>
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
 To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>, Jens Axboe
- <axboe@kernel.dk>,  Christoph Hellwig <hch@lst.de>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 08 Aug 2017 18:50:54 +0200
-In-Reply-To: <20170808164400.GC7415@kroah.com>
-References: <5912148.iRCpNe8Dyb@natalenko.name>
-	 <1501391551.17388.31.camel@gmx.de> <1662218.y9oETEnj5A@natalenko.name>
-	 <20170808162252.GC23338@kroah.com> <1502210041.7877.5.camel@gmx.de>
-	 <20170808164400.GC7415@kroah.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Cc: Jens Axboe <axboe@kernel.dk>, Mike Galbraith <efault@gmx.de>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: blk-mq breaks suspend even with runtime PM patch
+Date: Tue, 08 Aug 2017 18:46:10 +0200
+Message-ID: <2028625.4MXuxr7LpB@natalenko.name>
+In-Reply-To: <20170808164333.GB7415@kroah.com>
+References: <5912148.iRCpNe8Dyb@natalenko.name> <2416479.dXsOYsr7UT@natalenko.name> <20170808164333.GB7415@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, 2017-08-08 at 09:44 -0700, Greg KH wrote:
-> 
-> Should these go back farther than 4.12?  Looks like they apply cleanly
-> to 4.9, didn't look older than that...
+Greg,
 
-I met prerequisites at 4.11, but I wasn't patching anything remotely
-resembling virgin source.
+this is 765e40b675a9566459ddcb8358ad16f3b8344bbe.
 
-	-Mike
+On =FAter=FD 8. srpna 2017 18:43:33 CEST Greg KH wrote:
+> On Tue, Aug 08, 2017 at 06:36:01PM +0200, Oleksandr Natalenko wrote:
+> > Could you queue "block: disable runtime-pm for blk-mq" too please? It is
+> > also related to suspend-resume freezes that were observed by multiple
+> > users.
+> What is the git commit id of that patch?
+>=20
+> thanks,
+>=20
+> greg k-h
