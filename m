@@ -1,36 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:41550 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751709AbdHJL3G (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2017 07:29:06 -0400
-Date: Thu, 10 Aug 2017 04:29:00 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+Received: from mx1.redhat.com ([209.132.183.28]:43952 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752064AbdHHIr6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Aug 2017 04:47:58 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Huang Ying <ying.huang@intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH v3 10/49] dm: limit the max bio size as BIO_MAX_PAGES *
- PAGE_SIZE
-Message-ID: <20170810112900.GF20308@infradead.org>
+Subject: [PATCH v3 10/49] dm: limit the max bio size as BIO_MAX_PAGES * PAGE_SIZE
+Date: Tue,  8 Aug 2017 16:45:09 +0800
+Message-Id: <20170808084548.18963-11-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
 References: <20170808084548.18963-1-ming.lei@redhat.com>
- <20170808084548.18963-11-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170808084548.18963-11-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> +	ti->max_io_len = min_t(uint32_t, len,
-> +			       (BIO_MAX_PAGES * PAGE_SIZE));
+For BIO based DM, some targets aren't ready for dealing with
+bigger incoming bio than 1Mbyte, such as crypt target.
 
-No need for the inner braces.  Also all of the above fits nicely
-onto a single < 80 char line.
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc:dm-devel@redhat.com
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-Otherwise this looks fine:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 2edbcc2d7d3f..631348699fb8 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -922,7 +922,16 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
+ 		return -EINVAL;
+ 	}
+ 
+-	ti->max_io_len = (uint32_t) len;
++	/*
++	 * BIO based queue uses its own splitting. When multipage bvecs
++	 * is switched on, size of the incoming bio may be too big to
++	 * be handled in some targets, such as crypt.
++	 *
++	 * When these targets are ready for the big bio, we can remove
++	 * the limit.
++	 */
++	ti->max_io_len = min_t(uint32_t, len,
++			       (BIO_MAX_PAGES * PAGE_SIZE));
+ 
+ 	return 0;
+ }
+-- 
+2.9.4
