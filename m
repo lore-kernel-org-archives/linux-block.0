@@ -1,43 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57888 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752866AbdHHIy3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 04:54:29 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 45/49] fs: crypto: convert to bio_for_each_segment_all_sp()
-Date: Tue,  8 Aug 2017 16:45:44 +0800
-Message-Id: <20170808084548.18963-46-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 2/5] testb: implement block device operations
+To: Shaohua Li <shli@kernel.org>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org
+Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
+ Kyungchan Koh <kkc6196@fb.com>
+References: <cover.1501945859.git.shli@fb.com>
+ <971572972425927f702b33da37be14a9ab646a94.1501945859.git.shli@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <c8e6bbbd-d938-abb7-1e15-b17ce92d91ba@kernel.dk>
+Date: Tue, 8 Aug 2017 14:34:16 -0600
+MIME-Version: 1.0
+In-Reply-To: <971572972425927f702b33da37be14a9ab646a94.1501945859.git.shli@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/crypto/bio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 08/05/2017 09:51 AM, Shaohua Li wrote:
+> +static struct testb_page *testb_insert_page(struct testb *testb,
+> +	sector_t sector, unsigned long *lock_flag)
+> +{
+> +	u64 idx;
+> +	struct testb_page *t_page;
+> +
+> +	assert_spin_locked(&testb->t_dev->lock);
+> +
+> +	t_page = testb_lookup_page(testb, sector, true);
+> +	if (t_page)
+> +		return t_page;
+> +
+> +	spin_unlock_irqrestore(&testb->t_dev->lock, *lock_flag);
 
-diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
-index 6181e9526860..d5516ed19166 100644
---- a/fs/crypto/bio.c
-+++ b/fs/crypto/bio.c
-@@ -36,8 +36,9 @@ static void completion_pages(struct work_struct *work)
- 	struct bio *bio = ctx->r.bio;
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_sp(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 		int ret = fscrypt_decrypt_page(page->mapping->host, page,
- 				PAGE_SIZE, 0, page->index);
+Passing in lock flags through several functions is kind of iffy. It also
+used to break on some architectures, though I don't think that's the
+case anymore. The problem is that it usually ends up being a code
+locking, instead of a data structure locking. The latter is much
+cleaner.
+
+> +static int copy_from_testb(struct testb *testb, struct page *dest,
+> +	unsigned int off, sector_t sector, size_t n, unsigned long *lock_flag)
+
+This also gets the lock flags passed in, but doesn't use it.
+
 -- 
-2.9.4
+Jens Axboe
