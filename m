@@ -1,43 +1,44 @@
-Return-Path: <BATV+eb4e61afd325b22435ea+5099+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mpatocka@redhat.com,
-	gmazyland@gmail.com,
-	martin.petersen@oracle.com,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 2/2] bio-integrity: only verify integrity on the lowest stacked driver
-Date: Wed,  9 Aug 2017 17:47:27 +0200
-Message-Id: <20170809154727.2085-3-hch@lst.de>
-In-Reply-To: <20170809154727.2085-1-hch@lst.de>
-References: <20170809154727.2085-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:39906 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752278AbdHHIqg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Aug 2017 04:46:36 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 02/49] block: loop: comment on direct access to bvec table
+Date: Tue,  8 Aug 2017 16:45:01 +0800
+Message-Id: <20170808084548.18963-3-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This gets us back to the behavior in 4.12 and earlier.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Fixes: 7c20f116 ("bio-integrity: stop abusing bi_end_io")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio-integrity.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/block/loop.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index dcfb968c8259..9b1ea478577b 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -388,11 +388,10 @@ static void bio_integrity_verify_fn(struct work_struct *work)
- bool __bio_integrity_endio(struct bio *bio)
- {
- 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-+	struct bio_integrity_payload *bip = bio_integrity(bio);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ef8334949b42..58df9ed70328 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -487,6 +487,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	/* nomerge for loop request queue */
+ 	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
  
- 	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status &&
--	    bi->profile->verify_fn)
--		struct bio_integrity_payload *bip = bio_integrity(bio);
--
-+	    (bip->bip_flags & BIP_BLOCK_INTEGRITY) && bi->profile->verify_fn) {
- 		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
- 		queue_work(kintegrityd_wq, &bip->bip_work);
- 		return false;
++	/*
++	 * For multipage bvec support, it is safe to pass the bvec
++	 * table to iov iterator, because iov iter still uses bvec
++	 * iter helpers to travese bvec.
++	 */
+ 	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+ 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
+ 		      bio_segments(bio), blk_rq_bytes(cmd->rq));
 -- 
-2.11.0
+2.9.4
