@@ -1,198 +1,121 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56982 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752605AbdHNWFH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2017 18:05:07 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
-        Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 9/9] nullb: badbblocks support
-Date: Mon, 14 Aug 2017 15:05:00 -0700
-Message-Id: <0f2420944c74de6f60c0134cc3af1422da17ac49.1502746933.git.shli@fb.com>
-In-Reply-To: <cover.1502746933.git.shli@fb.com>
-References: <cover.1502746933.git.shli@fb.com>
-In-Reply-To: <cover.1502746933.git.shli@fb.com>
-References: <cover.1502746933.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 31/49] block: deal with dirtying pages for multipage bvec
+Date: Tue,  8 Aug 2017 16:45:30 +0800
+Message-Id: <20170808084548.18963-32-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+In bio_check_pages_dirty(), bvec->bv_page is used as flag
+for marking if the page has been dirtied & released, and if
+no, it will be dirtied in deferred workqueue.
 
-Sometime disk could have tracks broken and data there is inaccessable,
-but data in other parts can be accessed in normal way. MD RAID supports
-such disks. But we don't have a good way to test it, because we can't
-control which part of a physical disk is bad. For a virtual disk, this
-can be easily controlled.
+With multipage bvec, we can't do that any more, so change
+the logic into checking all pages in one mp bvec, and only
+release all these pages if all are dirtied, otherwise dirty
+them all in deferred wrokqueue.
 
-This patch adds a new 'badblock' attribute. Configure it in this way:
-echo "+1-100" > xxx/badblock, this will make sector [1-100] as bad
-blocks.
-echo "-20-30" > xxx/badblock, this will make sector [20-30] good
-
-If badblocks are accessed, the nullb disk will return IO error. Other
-parts of the disk can accessed in normal way.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/null_blk.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 88 insertions(+), 1 deletion(-)
+ block/bio.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 37 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index e138a67..2032360 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -14,6 +14,7 @@
- #include <linux/hrtimer.h>
- #include <linux/lightnvm.h>
- #include <linux/configfs.h>
-+#include <linux/badblocks.h>
- 
- #define SECTOR_SHIFT		9
- #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
-@@ -93,6 +94,7 @@ struct nullb_device {
- 	struct radix_tree_root cache; /* disk cache data */
- 	unsigned long flags; /* device flags */
- 	unsigned int curr_cache;
-+	struct badblocks badblocks;
- 
- 	unsigned long size; /* device size in MB */
- 	unsigned long completion_nsec; /* time in ns to complete a request */
-@@ -386,6 +388,59 @@ static ssize_t nullb_device_power_store(struct config_item *item,
- 
- CONFIGFS_ATTR(nullb_device_, power);
- 
-+static ssize_t nullb_device_badblocks_show(struct config_item *item, char *page)
-+{
-+	struct nullb_device *t_dev = to_nullb_device(item);
-+
-+	return badblocks_show(&t_dev->badblocks, page, 0);
-+}
-+
-+static ssize_t nullb_device_badblocks_store(struct config_item *item,
-+				     const char *page, size_t count)
-+{
-+	struct nullb_device *t_dev = to_nullb_device(item);
-+	char *orig, *buf, *tmp;
-+	u64 start, end;
-+	int ret;
-+
-+	orig = kstrndup(page, count, GFP_KERNEL);
-+	if (!orig)
-+		return -ENOMEM;
-+
-+	buf = strstrip(orig);
-+
-+	ret = -EINVAL;
-+	if (buf[0] != '+' && buf[0] != '-')
-+		goto out;
-+	tmp = strchr(&buf[1], '-');
-+	if (!tmp)
-+		goto out;
-+	*tmp = '\0';
-+	ret = kstrtoull(buf + 1, 0, &start);
-+	if (ret)
-+		goto out;
-+	ret = kstrtoull(tmp + 1, 0, &end);
-+	if (ret)
-+		goto out;
-+	ret = -EINVAL;
-+	if (start > end)
-+		goto out;
-+	/* enable badblocks */
-+	cmpxchg(&t_dev->badblocks.shift, -1, 0);
-+	if (buf[0] == '+')
-+		ret = badblocks_set(&t_dev->badblocks, start,
-+			end - start + 1, 1);
-+	else
-+		ret = badblocks_clear(&t_dev->badblocks, start,
-+			end - start + 1);
-+	if (ret == 0)
-+		ret = count;
-+out:
-+	kfree(orig);
-+	return ret;
-+}
-+CONFIGFS_ATTR(nullb_device_, badblocks);
-+
- static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_size,
- 	&nullb_device_attr_completion_nsec,
-@@ -404,6 +459,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_discard,
- 	&nullb_device_attr_mbps,
- 	&nullb_device_attr_cache_size,
-+	&nullb_device_attr_badblocks,
- 	NULL,
- };
- 
-@@ -411,6 +467,7 @@ static void nullb_device_release(struct config_item *item)
+diff --git a/block/bio.c b/block/bio.c
+index 28697e3c8ce3..716e6917b0fd 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1650,8 +1650,9 @@ void bio_set_pages_dirty(struct bio *bio)
  {
- 	struct nullb_device *dev = to_nullb_device(item);
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
  
-+	badblocks_exit(&dev->badblocks);
- 	null_free_device_storage(dev, false);
- 	null_free_dev(dev);
- }
-@@ -456,7 +513,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
  
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
--	return snprintf(page, PAGE_SIZE, "memory_backed,discard,bandwidth,cache\n");
-+	return snprintf(page, PAGE_SIZE, "memory_backed,discard,bandwidth,cache,badblocks\n");
+ 		if (page && !PageCompound(page))
+@@ -1659,16 +1660,26 @@ void bio_set_pages_dirty(struct bio *bio)
+ 	}
  }
  
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -500,6 +557,11 @@ static struct nullb_device *null_alloc_dev(void)
- 		return NULL;
- 	INIT_RADIX_TREE(&dev->data, GFP_ATOMIC);
- 	INIT_RADIX_TREE(&dev->cache, GFP_ATOMIC);
-+	if (badblocks_init(&dev->badblocks, 0)) {
-+		kfree(dev);
-+		return NULL;
++static inline void release_mp_bvec_pages(struct bio_vec *bvec)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++
++	bvec_for_each_sp_bvec(bv, bvec, iter)
++		put_page(bv.bv_page);
++}
++
+ static void bio_release_pages(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	/* iterate each mp bvec */
++	bio_for_each_segment_all_mp(bvec, bio, i) {
+ 		struct page *page = bvec->bv_page;
+ 
+ 		if (page)
+-			put_page(page);
++			release_mp_bvec_pages(bvec);
+ 	}
+ }
+ 
+@@ -1712,20 +1723,38 @@ static void bio_dirty_fn(struct work_struct *work)
+ 	}
+ }
+ 
++static inline void check_mp_bvec_pages(struct bio_vec *bvec,
++		int *nr_dirty, int *nr_pages)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++
++	bvec_for_each_sp_bvec(bv, bvec, iter) {
++		struct page *page = bv.bv_page;
++
++		if (PageDirty(page) || PageCompound(page))
++			(*nr_dirty)++;
++		(*nr_pages)++;
 +	}
++}
 +
- 	dev->size = g_gb * 1024;
- 	dev->completion_nsec = g_completion_nsec;
- 	dev->submit_queues = g_submit_queues;
-@@ -1166,6 +1228,30 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
+ void bio_check_pages_dirty(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int nr_clean_pages = 0;
+ 	int i;
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
+-		struct page *page = bvec->bv_page;
++	bio_for_each_segment_all_mp(bvec, bio, i) {
++		int nr_dirty = 0, nr_pages = 0;
++
++		check_mp_bvec_pages(bvec, &nr_dirty, &nr_pages);
+ 
+-		if (PageDirty(page) || PageCompound(page)) {
+-			put_page(page);
++		/* release all pages in the mp bvec if all are dirtied */
++		if (nr_dirty == nr_pages) {
++			release_mp_bvec_pages(bvec);
+ 			bvec->bv_page = NULL;
+ 		} else {
+-			nr_clean_pages++;
++			nr_clean_pages += nr_pages;
  		}
  	}
  
-+	if (nullb->dev->badblocks.shift != -1) {
-+		int bad_sectors;
-+		sector_t sector, size, first_bad;
-+		bool is_flush = true;
-+
-+		if (dev->queue_mode == NULL_Q_BIO &&
-+				bio_op(cmd->bio) != REQ_OP_FLUSH) {
-+			is_flush = false;
-+			sector = cmd->bio->bi_iter.bi_sector;
-+			size = bio_sectors(cmd->bio);
-+		}
-+		if (dev->queue_mode != NULL_Q_BIO &&
-+				req_op(cmd->rq) != REQ_OP_FLUSH) {
-+			is_flush = false;
-+			sector = blk_rq_pos(cmd->rq);
-+			size = blk_rq_sectors(cmd->rq);
-+		}
-+		if (!is_flush && badblocks_check(&nullb->dev->badblocks, sector,
-+				size, &first_bad, &bad_sectors)) {
-+			cmd->error = BLK_STS_IOERR;
-+			goto out;
-+		}
-+	}
-+
- 	if (dev->memory_backed) {
- 		if (dev->queue_mode == NULL_Q_BIO) {
- 			if (bio_op(cmd->bio) == REQ_OP_FLUSH)
-@@ -1180,6 +1266,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
- 		}
- 	}
- 	cmd->error = errno_to_blk_status(err);
-+out:
- 	/* Complete IO by inline, softirq or timer */
- 	switch (dev->irqmode) {
- 	case NULL_IRQ_SOFTIRQ:
 -- 
-2.9.5
+2.9.4
