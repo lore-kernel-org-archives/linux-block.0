@@ -1,106 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35008 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:51396 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751566AbdHaR3N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 13:29:13 -0400
+        id S1752267AbdHHIwj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Aug 2017 04:52:39 -0400
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 6/9] blk-mq: rename blk_mq_freeze_queue_wait as blk_freeze_queue_wait
-Date: Fri,  1 Sep 2017 01:27:25 +0800
-Message-Id: <20170831172728.15817-7-ming.lei@redhat.com>
-In-Reply-To: <20170831172728.15817-1-ming.lei@redhat.com>
-References: <20170831172728.15817-1-ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org
+Subject: [PATCH v3 34/49] md: raid1: convert to bio_for_each_segment_all_sp()
+Date: Tue,  8 Aug 2017 16:45:33 +0800
+Message-Id: <20170808084548.18963-35-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The only change on legacy is that blk_drain_queue() is run
-from blk_freeze_queue(), which is called in blk_cleanup_queue().
-
-So this patch removes the explicite __blk_drain_queue() in
-blk_cleanup_queue().
-
+Cc: Shaohua Li <shli@kernel.org>
+Cc: linux-raid@vger.kernel.org
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c         | 2 --
- block/blk-mq.c           | 8 +++++---
- drivers/nvme/host/core.c | 2 +-
- include/linux/blk-mq.h   | 2 +-
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/md/raid1.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 636452f151ea..7a9f93889669 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -669,8 +669,6 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 */
- 	blk_freeze_queue(q);
- 	spin_lock_irq(lock);
--	if (!q->mq_ops)
--		__blk_drain_queue(q, true);
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index f50958ded9f0..e34080bd91cb 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -2107,13 +2107,14 @@ static void process_checks(struct r1bio *r1_bio)
+ 		struct page **spages = get_resync_pages(sbio)->pages;
+ 		struct bio_vec *bi;
+ 		int page_len[RESYNC_PAGES] = { 0 };
++		struct bvec_iter_all bia;
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4c532d8612e1..24de78afbe9a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -131,11 +131,13 @@ void blk_freeze_queue_start(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+ 		if (sbio->bi_end_io != end_sync_read)
+ 			continue;
+ 		/* Now we can 'fixup' the error value */
+ 		sbio->bi_status = 0;
  
--void blk_mq_freeze_queue_wait(struct request_queue *q)
-+void blk_freeze_queue_wait(struct request_queue *q)
- {
-+	if (!q->mq_ops)
-+		blk_drain_queue(q);
- 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
- }
--EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait);
-+EXPORT_SYMBOL_GPL(blk_freeze_queue_wait);
+-		bio_for_each_segment_all(bi, sbio, j)
++		bio_for_each_segment_all_sp(bi, sbio, j, bia)
+ 			page_len[j] = bi->bv_len;
  
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout)
-@@ -160,7 +162,7 @@ void blk_freeze_queue(struct request_queue *q)
- 	 * exported to drivers as the only user for unfreeze is blk_mq.
- 	 */
- 	blk_freeze_queue_start(q);
--	blk_mq_freeze_queue_wait(q);
-+	blk_freeze_queue_wait(q);
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue);
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 986f2b4f9760..d34a9ffaa940 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2778,7 +2778,7 @@ void nvme_wait_freeze(struct nvme_ctrl *ctrl)
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_freeze_queue_wait(ns->queue);
-+		blk_freeze_queue_wait(ns->queue);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_wait_freeze);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8ae77e088c01..f90d78eb85df 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -259,7 +259,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- void blk_freeze_queue(struct request_queue *q);
- void blk_unfreeze_queue(struct request_queue *q);
- void blk_freeze_queue_start(struct request_queue *q);
--void blk_mq_freeze_queue_wait(struct request_queue *q);
-+void blk_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
+ 		if (!status) {
 -- 
-2.9.5
+2.9.4
