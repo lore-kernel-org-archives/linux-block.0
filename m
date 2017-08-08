@@ -1,98 +1,63 @@
-Return-Path: <prvs=401b34db8=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 3/5] skd: Inline skd_process_request()
-Date: Wed, 23 Aug 2017 10:56:31 -0700
-Message-Id: <20170823175633.12680-4-bart.vanassche@wdc.com>
-In-Reply-To: <20170823175633.12680-1-bart.vanassche@wdc.com>
-References: <20170823175633.12680-1-bart.vanassche@wdc.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>,
+        Boaz Harrosh <ooo@electrozaur.com>
+Subject: [PATCH v3 44/49] exofs: convert to bio_for_each_segment_all_sp()
+Date: Tue,  8 Aug 2017 16:45:43 +0800
+Message-Id: <20170808084548.18963-45-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes the skd
-driver code more similar to that of other blk-mq kernel drivers.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Boaz Harrosh <ooo@electrozaur.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/skd_main.c | 30 ++++++++++--------------------
- 1 file changed, 10 insertions(+), 20 deletions(-)
+ fs/exofs/ore.c      | 3 ++-
+ fs/exofs/ore_raid.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index d21fc76c5ed9..0d6340884009 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -478,8 +478,10 @@ static bool skd_fail_all(struct request_queue *q)
- 	}
- }
- 
--static void skd_process_request(struct request *req, bool last)
-+static blk_status_t skd_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				    const struct blk_mq_queue_data *mqd)
+diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
+index 8bb72807e70d..38a7d8bfdd4c 100644
+--- a/fs/exofs/ore.c
++++ b/fs/exofs/ore.c
+@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
  {
-+	struct request *const req = mqd->rq;
- 	struct request_queue *const q = req->q;
- 	struct skd_device *skdev = q->queuedata;
- 	struct skd_fitmsg_context *skmsg;
-@@ -492,6 +494,11 @@ static void skd_process_request(struct request *req, bool last)
- 	const u32 count = blk_rq_sectors(req);
- 	const int data_dir = rq_data_dir(req);
+ 	struct bio_vec *bv;
+ 	unsigned i;
++	struct bvec_iter_all bia;
  
-+	if (unlikely(skdev->state != SKD_DRVR_STATE_ONLINE))
-+		return skd_fail_all(q) ? BLK_STS_IOERR : BLK_STS_RESOURCE;
-+
-+	blk_mq_start_request(req);
-+
- 	WARN_ONCE(tag >= skd_max_queue_depth, "%#x > %#x (nr_requests = %lu)\n",
- 		  tag, skd_max_queue_depth, q->nr_requests);
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_segment_all_sp(bv, bio, i, bia) {
+ 		unsigned this_count = bv->bv_len;
  
-@@ -514,7 +521,7 @@ static void skd_process_request(struct request *req, bool last)
- 		dev_dbg(&skdev->pdev->dev, "error Out\n");
- 		skd_end_request(skdev, blk_mq_rq_from_pdu(skreq),
- 				BLK_STS_RESOURCE);
--		return;
-+		return BLK_STS_OK;
- 	}
+ 		if (likely(PAGE_SIZE == this_count))
+diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
+index 27cbdb697649..37c0a9aa2ec2 100644
+--- a/fs/exofs/ore_raid.c
++++ b/fs/exofs/ore_raid.c
+@@ -429,6 +429,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
+ {
+ 	struct bio_vec *bv;
+ 	unsigned i, d;
++	struct bvec_iter_all bia;
  
- 	dma_sync_single_for_device(&skdev->pdev->dev, skreq->sksg_dma_address,
-@@ -578,30 +585,13 @@ static void skd_process_request(struct request *req, bool last)
- 	if (skd_max_req_per_msg == 1) {
- 		skd_send_fitmsg(skdev, skmsg);
- 	} else {
--		if (last ||
-+		if (mqd->last ||
- 		    fmh->num_protocol_cmds_coalesced >= skd_max_req_per_msg) {
- 			skd_send_fitmsg(skdev, skmsg);
- 			skdev->skmsg = NULL;
- 		}
- 		spin_unlock_irqrestore(&skdev->lock, flags);
- 	}
--}
--
--static blk_status_t skd_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
--				    const struct blk_mq_queue_data *mqd)
--{
--	struct request *req = mqd->rq;
--	struct request_queue *q = req->q;
--	struct skd_device *skdev = q->queuedata;
--
--	if (skdev->state == SKD_DRVR_STATE_ONLINE) {
--		blk_mq_start_request(req);
--		skd_process_request(req, mqd->last);
--
--		return BLK_STS_OK;
--	} else {
--		return skd_fail_all(q) ? BLK_STS_IOERR : BLK_STS_RESOURCE;
--	}
+ 	/* loop on all devices all pages */
+ 	for (d = 0; d < ios->numdevs; d++) {
+@@ -437,7 +438,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
+ 		if (!bio)
+ 			continue;
  
- 	return BLK_STS_OK;
- }
+-		bio_for_each_segment_all(bv, bio, i) {
++		bio_for_each_segment_all_sp(bv, bio, i, bia) {
+ 			struct page *page = bv->bv_page;
+ 
+ 			SetPageUptodate(page);
 -- 
-2.14.0
+2.9.4
