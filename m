@@ -1,48 +1,77 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Tue, 8 Aug 2017 09:22:52 -0700
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Mike Galbraith <efault@gmx.de>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: blk-mq breaks suspend even with runtime PM patch
-Message-ID: <20170808162252.GC23338@kroah.com>
-References: <5912148.iRCpNe8Dyb@natalenko.name>
- <1501391551.17388.31.camel@gmx.de>
- <1662218.y9oETEnj5A@natalenko.name>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1662218.y9oETEnj5A@natalenko.name>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH v3 13/49] btrfs: comment on direct access bvec table
+Date: Tue,  8 Aug 2017 16:45:12 +0800
+Message-Id: <20170808084548.18963-14-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Jul 30, 2017 at 03:50:15PM +0200, Oleksandr Natalenko wrote:
-> Hello Mike et al.
-> 
-> On neděle 30. července 2017 7:12:31 CEST Mike Galbraith wrote:
-> > FWIW, first thing I'd do is update that 4.12.0 to 4.12.4, and see if
-> > stable fixed it.
-> 
-> My build already includes v4.12.4.
-> 
-> > If not, I'd find these two commits irresistible.
-> > 
-> > 5f042e7cbd9eb blk-mq: Include all present CPUs in the default queue mapping
-> > 4b855ad37194f blk-mq: Create hctx for each present CPU
-> 
-> I've applied these 2 commits, and cannot reproduce the issue anymore. Looks 
-> like a perfect hit, thanks!
-> 
-> > 'course applying random upstream bits does come with some risk, trying
-> > a kernel already containing them has less "entertainment" potential. 
-> 
-> Should you consider applying them to v4.12.x stable series? CC'ing Greg just 
-> in case.
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Acked: David Sterba <dsterba@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/btrfs/compression.c |  4 ++++
+ fs/btrfs/inode.c       | 12 ++++++++++++
+ 2 files changed, 16 insertions(+)
 
-I can queue these up if I get an ack from the developers/maintainers
-that it is ok to do so...
-
-{hint}
-
-thanks,
-
-greg k-h
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index d2ef9ac2a630..f795d0a6d176 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -542,6 +542,10 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 
+ 	/* we need the actual starting offset of this extent in the file */
+ 	read_lock(&em_tree->lock);
++	/*
++	 * It is still safe to retrieve the 1st page of the bio
++	 * in this way after supporting multipage bvec.
++	 */
+ 	em = lookup_extent_mapping(em_tree,
+ 				   page_offset(bio->bi_io_vec->bv_page),
+ 				   PAGE_SIZE);
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 5cf320ee7ea0..084ed99dd308 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8051,6 +8051,12 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	if (bio->bi_status)
+ 		goto end;
+ 
++	/*
++	 * WARNING:
++	 *
++	 * With multipage bvec, the following way of direct access to
++	 * bvec table is only safe if the bio includes single page.
++	 */
+ 	ASSERT(bio->bi_vcnt == 1);
+ 	io_tree = &BTRFS_I(inode)->io_tree;
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+@@ -8143,6 +8149,12 @@ static void btrfs_retry_endio(struct bio *bio)
+ 
+ 	uptodate = 1;
+ 
++	/*
++	 * WARNING:
++	 *
++	 * With multipage bvec, the following way of direct access to
++	 * bvec table is only safe if the bio includes single page.
++	 */
+ 	ASSERT(bio->bi_vcnt == 1);
+ 	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(done->inode));
+ 
+-- 
+2.9.4
