@@ -1,69 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:49933 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751025AbdHMRo0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2017 13:44:26 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: martin.petersen@oracle.com
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH] Revert "scsi: default to scsi-mq"
-Date: Sun, 13 Aug 2017 19:44:22 +0200
-Message-Id: <20170813174422.16197-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: blk-mq breaks suspend even with runtime PM patch
+To: Mike Galbraith <efault@gmx.de>, Greg KH <gregkh@linuxfoundation.org>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <5912148.iRCpNe8Dyb@natalenko.name>
+ <1501391551.17388.31.camel@gmx.de> <1662218.y9oETEnj5A@natalenko.name>
+ <20170808162252.GC23338@kroah.com> <1502210041.7877.5.camel@gmx.de>
+ <20170808164400.GC7415@kroah.com> <1502211054.7877.9.camel@gmx.de>
+ <1502217234.9604.26.camel@gmx.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f454297b-1557-4e81-0e78-e40fd9c444c7@kernel.dk>
+Date: Tue, 8 Aug 2017 12:35:07 -0600
+MIME-Version: 1.0
+In-Reply-To: <1502217234.9604.26.camel@gmx.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Defaulting to scsi-mq in 4.13-rc has shown various regressions
-on setups that we didn't previously consider.  Fixes for them are
-in progress, but too invasive to make it in this cycle.  So for
-now revert the commit that defaults to blk-mq for SCSI.  For 4.14
-we'll plan to try again with these fixes.
+On 08/08/2017 12:33 PM, Mike Galbraith wrote:
+> On Tue, 2017-08-08 at 18:50 +0200, Mike Galbraith wrote:
+>> On Tue, 2017-08-08 at 09:44 -0700, Greg KH wrote:
+>>>
+>>> Should these go back farther than 4.12?  Looks like they apply cleanly
+>>> to 4.9, didn't look older than that...
+>>
+>> I met prerequisites at 4.11...
+> 
+> FWIW, I took/modified 2d0364c8c1a9.  Dunno if the suspend regression
+> exists in 4.11 though, without which you'll likely want nothing.
 
-This reverts commit 5c279bd9e40624f4ab6e688671026d6005b066fa.
+It does exist, the only change here is that we default people to
+scsi-mq in 4.12+. Honestly, nobody complained since we've had scsi-mq,
+so I could pivot both ways on whether we really need the changes in
+earlier versions or not.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/Kconfig | 11 +++++++++++
- drivers/scsi/scsi.c  |  4 ++++
- 2 files changed, 15 insertions(+)
-
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index f4538d7a3016..d145e0d90227 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -47,6 +47,17 @@ config SCSI_NETLINK
- 	default	n
- 	depends on NET
- 
-+config SCSI_MQ_DEFAULT
-+	bool "SCSI: use blk-mq I/O path by default"
-+	depends on SCSI
-+	---help---
-+	  This option enables the new blk-mq based I/O path for SCSI
-+	  devices by default.  With the option the scsi_mod.use_blk_mq
-+	  module/boot option defaults to Y, without it to N, but it can
-+	  still be overridden either way.
-+
-+	  If unsure say N.
-+
- config SCSI_PROC_FS
- 	bool "legacy /proc/scsi/ support"
- 	depends on SCSI && PROC_FS
-diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-index 3d38c6d463b8..1bf274e3b2b6 100644
---- a/drivers/scsi/scsi.c
-+++ b/drivers/scsi/scsi.c
-@@ -800,7 +800,11 @@ MODULE_LICENSE("GPL");
- module_param(scsi_logging_level, int, S_IRUGO|S_IWUSR);
- MODULE_PARM_DESC(scsi_logging_level, "a bit mask of logging levels");
- 
-+#ifdef CONFIG_SCSI_MQ_DEFAULT
- bool scsi_use_blk_mq = true;
-+#else
-+bool scsi_use_blk_mq = false;
-+#endif
- module_param_named(use_blk_mq, scsi_use_blk_mq, bool, S_IWUSR | S_IRUGO);
- 
- static int __init init_scsi(void)
 -- 
-2.11.0
+Jens Axboe
