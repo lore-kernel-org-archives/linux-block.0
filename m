@@ -1,54 +1,61 @@
-Return-Path: <bblock@linux.vnet.ibm.com>
-From: Benjamin Block <bblock@linux.vnet.ibm.com>
-To: "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: Benjamin Block <bblock@linux.vnet.ibm.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>,
-        Steffen Maier <maier@linux.vnet.ibm.com>, open-iscsi@googlegroups.com
-Subject: [RFC PATCH 2/6] bsg: assign sense_len instead of fixed SCSI_SENSE_BUFFERSIZE
-Date: Wed,  9 Aug 2017 16:11:16 +0200
-In-Reply-To: <cover.1502120928.git.bblock@linux.vnet.ibm.com>
-References: <cover.1502120928.git.bblock@linux.vnet.ibm.com>
-In-Reply-To: <cover.1502120928.git.bblock@linux.vnet.ibm.com>
-References: <cover.1502120928.git.bblock@linux.vnet.ibm.com>
-Message-Id: <2dd8381929af2037a6eec3086256f54f55c01e78.1502120928.git.bblock@linux.vnet.ibm.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 3/6] block: make part_in_flight() take an array of two
+ ints
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, brking@linux.vnet.ibm.com,
+ bart.vanassche@wdc.com
+References: <1501859062-11120-1-git-send-email-axboe@kernel.dk>
+ <1501859062-11120-4-git-send-email-axboe@kernel.dk>
+ <20170808224256.GE4072@vader.DHCP.thefacebook.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7a99b84f-3f2e-85cc-ee1f-f4dfcc30f46d@kernel.dk>
+Date: Tue, 8 Aug 2017 17:45:31 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170808224256.GE4072@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We do set rq->sense_len when we assigne the reply-buffer in
-blk_fill_sgv4_hdr_rq(). No point in possibly deviating from this value
-later on.
+On 08/08/2017 04:42 PM, Omar Sandoval wrote:
+> On Fri, Aug 04, 2017 at 09:04:19AM -0600, Jens Axboe wrote:
+>> Instead of returning the count that matches the partition, pass
+>> in an array of two ints. Index 0 will be filled with the inflight
+>> count for the partition in question, and index 1 will filled
+>> with the root infligh count, if the partition passed in is not the
+>> root.
+>>
+>> This is in preparation for being able to calculate both in one
+>> go.
+> 
+> One tiny comment below, besides that
+> 
+> Reviewed-by: Omar Sandoval <osandov@fb.com>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+>> index 7f7427e00f9c..a9c8ea632fdc 100644
+>> --- a/include/linux/genhd.h
+>> +++ b/include/linux/genhd.h
+>> @@ -378,11 +378,17 @@ static inline void part_dec_in_flight(struct request_queue *q,
+>>  		atomic_dec(&part_to_disk(part)->part0.in_flight[rw]);
+>>  }
+>>  
+>> -static inline int part_in_flight(struct request_queue *q,
+>> -				 struct hd_struct *part)
+>> +static inline void part_in_flight(struct request_queue *q,
+>> +				  struct hd_struct *part,
+>> +				  unsigned int inflight[2])
+>>  {
+>> -	return atomic_read(&part->in_flight[0]) +
+>> +	inflight[0] = atomic_read(&part->in_flight[0]) +
+>>  			atomic_read(&part->in_flight[1]);
+> 
+> It makes me a little nervous here that we only initialize inflight[1] if
+> part is not part0, that seems a little subtle and easy to miss. Can we
+> change the line above to this?
+> 
+> inflight[0] = inflight[1] = (atomic_read(&part->in_flight[0]) +
+> 			     atomic_read(&part->in_flight[1]));
 
-bsg-lib.h specifies:
-    unsigned int reply_len;
-    /*
-     * On entry : reply_len indicates the buffer size allocated for
-     * the reply.
-     *
-     * ...
-     */
+Yes good point, I'll make that change.
 
-Signed-off-by: Benjamin Block <bblock@linux.vnet.ibm.com>
----
- block/bsg-lib.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index c4513b23f57a..c7c2c6bbb5ae 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -147,8 +147,8 @@ static int bsg_create_job(struct device *dev, struct request *req)
- 	job->request = rq->cmd;
- 	job->request_len = rq->cmd_len;
- 	job->reply = rq->sense;
--	job->reply_len = SCSI_SENSE_BUFFERSIZE;	/* Size of sense buffer
--						 * allocated */
-+	job->reply_len = rq->sense_len;
-+
- 	if (req->bio) {
- 		ret = bsg_map_buffer(&job->request_payload, req);
- 		if (ret)
 -- 
-2.12.2
+Jens Axboe
