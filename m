@@ -1,28 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:48253 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752688AbdHJMMc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2017 08:12:32 -0400
-Date: Thu, 10 Aug 2017 05:12:27 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Huang Ying <ying.huang@intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 23/49] block: blk-merge: remove unnecessary check
-Message-ID: <20170810121227.GF14607@infradead.org>
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 23/49] block: blk-merge: remove unnecessary check
+Date: Tue,  8 Aug 2017 16:45:22 +0800
+Message-Id: <20170808084548.18963-24-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
 References: <20170808084548.18963-1-ming.lei@redhat.com>
- <20170808084548.18963-24-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170808084548.18963-24-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Looks good, and another candidate for a prep series:
+In this case, 'sectors' can't be zero at all, so remove the check
+and let the bio be splitted.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-merge.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index aeb8933e6cae..ac217fce4921 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -128,9 +128,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 				nsegs++;
+ 				sectors = max_sectors;
+ 			}
+-			if (sectors)
+-				goto split;
+-			/* Make this single bvec as the 1st segment */
++			goto split;
+ 		}
+ 
+ 		if (bvprvp && blk_queue_cluster(q)) {
+-- 
+2.9.4
