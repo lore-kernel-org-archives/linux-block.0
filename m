@@ -1,78 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48238 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG6R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:58:17 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 17/20] block: add check on elevator for supporting bio merge via hashtable from blk-mq sw queue
-Date: Sat,  5 Aug 2017 14:57:02 +0800
-Message-Id: <20170805065705.12989-18-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 8 Aug 2017 15:08:39 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "shli@kernel.org" <shli@kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"kernel-team@fb.com" <kernel-team@fb.com>,
+	"hare@suse.de" <hare@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"kyungchan.koh@gmail.com" <kyungchan.koh@gmail.com>,
+	"shli@fb.com" <shli@fb.com>
+Subject: Re: [PATCH 0/5] block: a virtual block device driver for testing
+Message-ID: <20170808220839.GB4072@vader.DHCP.thefacebook.com>
+References: <cover.1501945859.git.shli@fb.com>
+ <42bfcce1-8329-c0df-7457-107b388491ff@suse.de>
+ <20170807163607.msflun2r4q5tlpsk@kernel.org>
+ <f6896ce5-1752-feba-fadb-dbc89dbf4e20@kernel.dk>
+ <20170808210507.setdwunzrad4t7xp@kernel.org>
+ <73342715-25af-da8e-ae7e-f24015432055@kernel.dk>
+ <1502229619.2686.1.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1502229619.2686.1.camel@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_sched_try_merge() will be reused in following patches
-to support bio merge to blk-mq sw queue, so add checkes to
-related functions which are called from blk_mq_sched_try_merge().
+On Tue, Aug 08, 2017 at 10:00:21PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-08-08 at 15:13 -0600, Jens Axboe wrote:
+> > On 08/08/2017 03:05 PM, Shaohua Li wrote:
+> > > > I'm curious why null_blk isn't a good fit? You'd just need to add RAM
+> > > > storage to it. That would just be a separate option that should be
+> > > > set,
+> > > > ram_backing=1 or something like that. That would make it less critical
+> > > > than using the RAM disk driver as well, since only people that want a
+> > > > "real"
+> > > > data backing would enable it.
+> > > > 
+> > > > It's not that I'm extremely opposed to adding a(nother) test block
+> > > > driver,
+> > > > but we at least need some sort of reasoning behind why, which isn't
+> > > > just
+> > > > "not a good fit".
+> > > 
+> > > Ah, I thought the 'null' of null_blk means we do nothing for the
+> > > disks. Of course we can rename it, which means this point less
+> > > meaningful. I think the main reason is the interface. We will
+> > > configure the disks with different parameters and do power on/off for
+> > > each disks (which is the key we can emulate disk cache and power
+> > > loss). The module paramter interface of null_blk doesn't work for the
+> > > usage. Of course, these issues can be fixed, for example, we can make
+> > > null_blk use the configfs interface. If you really prefer a single
+> > > driver for all test purpose, I can move the test_blk functionalities
+> > > to null_blk.
+> > 
+> > The idea with null_blk is just that it's a test vehicle. As such, it
+> > would actually be useful to have a mode where it does store the data in
+> > RAM, since that enables you to do other kinds of testing as well. I'd be
+> > fine with augmenting it with configfs for certain things.
+> 
+> Hello Jens,
+> 
+> Would you consider it acceptable to make the mode in which null_blk stores
+> data the default? I know several people who got confused by null_blk by
+> default not retaining data ...
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/elevator.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/block/elevator.c b/block/elevator.c
-index 2fd2f777127b..eb56e2709291 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -71,6 +71,10 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
- 	if (!blk_rq_merge_ok(rq, bio))
- 		return false;
- 
-+	/* We need to support to merge bio from sw queue */
-+	if (!rq->q->elevator)
-+		return true;
-+
- 	if (!elv_iosched_allow_bio_merge(rq, bio))
- 		return false;
- 
-@@ -449,6 +453,10 @@ static inline enum elv_merge __elv_merge(struct request_queue *q,
- 		return ELEVATOR_BACK_MERGE;
- 	}
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return ELEVATOR_NO_MERGE;
-+
- 	if (e->uses_mq && e->type->ops.mq.request_merge)
- 		return e->type->ops.mq.request_merge(q, req, bio);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_merge_fn)
-@@ -711,6 +719,10 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.next_request)
- 		return e->type->ops.mq.next_request(q, rq);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_latter_req_fn)
-@@ -723,6 +735,10 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.former_request)
- 		return e->type->ops.mq.former_request(q, rq);
- 	if (!e->uses_mq && e->type->ops.sq.elevator_former_req_fn)
--- 
-2.9.4
+My minor issue with that is that I'd have to change all of my
+performance testing scripts to override the default :) I'd prefer that
+it stay as-is.
