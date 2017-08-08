@@ -1,107 +1,27 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 8 Aug 2017 15:28:07 -0700
+From: Omar Sandoval <osandov@osandov.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 35/55] skd: Use kcalloc() instead of kzalloc() with multiply
-Date: Thu, 17 Aug 2017 13:13:18 -0700
-Message-Id: <20170817201338.16537-36-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, brking@linux.vnet.ibm.com,
+	bart.vanassche@wdc.com
+Subject: Re: [PATCH 1/6] blk-mq-tag: check for NULL rq when iterating tags
+Message-ID: <20170808222807.GC4072@vader.DHCP.thefacebook.com>
+References: <1501859062-11120-1-git-send-email-axboe@kernel.dk>
+ <1501859062-11120-2-git-send-email-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1501859062-11120-2-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality.
+On Fri, Aug 04, 2017 at 09:04:17AM -0600, Jens Axboe wrote:
+> Since we introduced blk-mq-sched, the tags->rqs[] array has been
+> dynamically assigned. So we need to check for NULL when iterating,
+> since there's a window of time where the bit is set, but we haven't
+> dynamically assigned the tags->rqs[] array position yet.
+> 
+> This is perfectly safe, since the memory backing of the request is
+> never going away while the device is alive.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 0639c9f89984..ae66171ef10a 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -3815,12 +3815,13 @@ static int skd_cons_skmsg(struct skd_device *skdev)
- 	u32 i;
- 
- 	dev_dbg(&skdev->pdev->dev,
--		"skmsg_table kzalloc, struct %lu, count %u total %lu\n",
-+		"skmsg_table kcalloc, struct %lu, count %u total %lu\n",
- 		sizeof(struct skd_fitmsg_context), skdev->num_fitmsg_context,
- 		sizeof(struct skd_fitmsg_context) * skdev->num_fitmsg_context);
- 
--	skdev->skmsg_table = kzalloc(sizeof(struct skd_fitmsg_context)
--				     *skdev->num_fitmsg_context, GFP_KERNEL);
-+	skdev->skmsg_table = kcalloc(skdev->num_fitmsg_context,
-+				     sizeof(struct skd_fitmsg_context),
-+				     GFP_KERNEL);
- 	if (skdev->skmsg_table == NULL) {
- 		rc = -ENOMEM;
- 		goto err_out;
-@@ -3895,12 +3896,13 @@ static int skd_cons_skreq(struct skd_device *skdev)
- 	u32 i;
- 
- 	dev_dbg(&skdev->pdev->dev,
--		"skreq_table kzalloc, struct %lu, count %u total %lu\n",
-+		"skreq_table kcalloc, struct %lu, count %u total %lu\n",
- 		sizeof(struct skd_request_context), skdev->num_req_context,
- 		sizeof(struct skd_request_context) * skdev->num_req_context);
- 
--	skdev->skreq_table = kzalloc(sizeof(struct skd_request_context)
--				     * skdev->num_req_context, GFP_KERNEL);
-+	skdev->skreq_table = kcalloc(skdev->num_req_context,
-+				     sizeof(struct skd_request_context),
-+				     GFP_KERNEL);
- 	if (skdev->skreq_table == NULL) {
- 		rc = -ENOMEM;
- 		goto err_out;
-@@ -3918,8 +3920,8 @@ static int skd_cons_skreq(struct skd_device *skdev)
- 		skreq->id = i + SKD_ID_RW_REQUEST;
- 		skreq->state = SKD_REQ_STATE_IDLE;
- 
--		skreq->sg = kzalloc(sizeof(struct scatterlist) *
--				    skdev->sgs_per_request, GFP_KERNEL);
-+		skreq->sg = kcalloc(skdev->sgs_per_request,
-+				    sizeof(struct scatterlist), GFP_KERNEL);
- 		if (skreq->sg == NULL) {
- 			rc = -ENOMEM;
- 			goto err_out;
-@@ -3952,12 +3954,13 @@ static int skd_cons_skspcl(struct skd_device *skdev)
- 	u32 i, nbytes;
- 
- 	dev_dbg(&skdev->pdev->dev,
--		"skspcl_table kzalloc, struct %lu, count %u total %lu\n",
-+		"skspcl_table kcalloc, struct %lu, count %u total %lu\n",
- 		sizeof(struct skd_special_context), skdev->n_special,
- 		sizeof(struct skd_special_context) * skdev->n_special);
- 
--	skdev->skspcl_table = kzalloc(sizeof(struct skd_special_context)
--				      * skdev->n_special, GFP_KERNEL);
-+	skdev->skspcl_table = kcalloc(skdev->n_special,
-+				      sizeof(struct skd_special_context),
-+				      GFP_KERNEL);
- 	if (skdev->skspcl_table == NULL) {
- 		rc = -ENOMEM;
- 		goto err_out;
-@@ -3983,8 +3986,9 @@ static int skd_cons_skspcl(struct skd_device *skdev)
- 			goto err_out;
- 		}
- 
--		skspcl->req.sg = kzalloc(sizeof(struct scatterlist) *
--					 SKD_N_SG_PER_SPECIAL, GFP_KERNEL);
-+		skspcl->req.sg = kcalloc(SKD_N_SG_PER_SPECIAL,
-+					 sizeof(struct scatterlist),
-+					 GFP_KERNEL);
- 		if (skspcl->req.sg == NULL) {
- 			rc = -ENOMEM;
- 			goto err_out;
--- 
-2.14.0
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
