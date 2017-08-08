@@ -1,84 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52014 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751061AbdHZQfQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Aug 2017 12:35:16 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 10/14] block: move actual bio merge code into __elv_merge
-Date: Sun, 27 Aug 2017 00:33:28 +0800
-Message-Id: <20170826163332.28971-11-ming.lei@redhat.com>
-In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
-References: <20170826163332.28971-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: [PATCH v3 26/49] block: introduce bvec_for_each_sp_bvec()
+Date: Tue,  8 Aug 2017 16:45:25 +0800
+Message-Id: <20170808084548.18963-27-ming.lei@redhat.com>
+In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-So that we can reuse __elv_merge() to merge bio
-into requests from sw queue in the following patches.
+This helper can be used to iterate each singlepage bvec
+from one multipage bvec.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/elevator.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ include/linux/bvec.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 7423e9c9cb27..4ac437b5fc0c 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -409,8 +409,9 @@ void elv_dispatch_add_tail(struct request_queue *q, struct request *rq)
- }
- EXPORT_SYMBOL(elv_dispatch_add_tail);
- 
--enum elv_merge elv_merge(struct request_queue *q, struct request **req,
--		struct bio *bio)
-+static enum elv_merge __elv_merge(struct request_queue *q,
-+		struct request **req, struct bio *bio,
-+		struct hlist_head *hash, struct request *last_merge)
- {
- 	struct elevator_queue *e = q->elevator;
- 	struct request *__rq;
-@@ -427,11 +428,11 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	/*
- 	 * First try one-hit cache.
- 	 */
--	if (q->last_merge && elv_bio_merge_ok(q->last_merge, bio)) {
--		enum elv_merge ret = blk_try_merge(q->last_merge, bio);
-+	if (last_merge && elv_bio_merge_ok(last_merge, bio)) {
-+		enum elv_merge ret = blk_try_merge(last_merge, bio);
- 
- 		if (ret != ELEVATOR_NO_MERGE) {
--			*req = q->last_merge;
-+			*req = last_merge;
- 			return ret;
- 		}
- 	}
-@@ -442,7 +443,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	/*
- 	 * See if our hash lookup can find a potential backmerge.
- 	 */
--	__rq = elv_rqhash_find(q, bio->bi_iter.bi_sector);
-+	__rq = rqhash_find(hash, bio->bi_iter.bi_sector);
- 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
- 		*req = __rq;
- 		return ELEVATOR_BACK_MERGE;
-@@ -456,6 +457,12 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	return ELEVATOR_NO_MERGE;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index c1ec0945451a..23d3abdf057c 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -224,4 +224,18 @@ static inline bool bvec_iter_advance_mp(const struct bio_vec *bv,
+ 	.bi_bvec_done	= 0,						\
  }
  
-+enum elv_merge elv_merge(struct request_queue *q, struct request **req,
-+		struct bio *bio)
-+{
-+	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
-+}
++/*
++ * This helper iterates over the multipage bvec of @mp_bvec and
++ * returns each singlepage bvec via @sp_bvl.
++ */
++#define __bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, start)		\
++	for (iter = start,						\
++	     (iter).bi_size = (mp_bvec)->bv_len  - (iter).bi_bvec_done;	\
++	     (iter).bi_size &&						\
++		((sp_bvl = bvec_iter_bvec((mp_bvec), (iter))), 1);	\
++	     bvec_iter_advance((mp_bvec), &(iter), (sp_bvl).bv_len))
 +
- /*
-  * Attempt to do an insertion back merge. Only check for the case where
-  * we can append 'rq' to an existing request, so we can throw 'rq' away
++#define bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter)			\
++	__bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, BVEC_ITER_ALL_INIT)
++
+ #endif /* __LINUX_BVEC_ITER_H */
 -- 
-2.9.5
+2.9.4
