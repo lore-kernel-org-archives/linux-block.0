@@ -1,39 +1,39 @@
-Return-Path: <BATV+eb4e61afd325b22435ea+5099+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mpatocka@redhat.com,
-	gmazyland@gmail.com,
-	martin.petersen@oracle.com,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 2/2] dm-crypt: don't mess with BIP_BLOCK_INTEGRITY
-Date: Wed,  9 Aug 2017 17:48:09 +0200
-Message-Id: <20170809154809.2168-3-hch@lst.de>
-In-Reply-To: <20170809154809.2168-1-hch@lst.de>
-References: <20170809154809.2168-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.13-rc
+Message-ID: <feb795dd-1bcf-e79a-22ed-3a829f5beeb8@kernel.dk>
+Date: Wed, 9 Aug 2017 08:19:03 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This flag is never set right after calling bio_integrity_alloc,
-so don't clear it and confuse the reader.
+Hi Linus,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-crypt.c | 3 ---
- 1 file changed, 3 deletions(-)
+Three patches that should go into this release. Two of them are from
+Paolo and fix up some corner cases with BFQ, and the last patch is from
+Ming and fixes up a potential usage count imbalance regression in this
+series, due to the NOWAIT work that went in.
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index cdf6b1e12460..73c2e270cda6 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -933,9 +933,6 @@ static int dm_crypt_integrity_io_alloc(struct dm_crypt_io *io, struct bio *bio)
- 	bip->bip_iter.bi_size = tag_len;
- 	bip->bip_iter.bi_sector = io->cc->start + io->sector;
- 
--	/* We own the metadata, do not let bio_free to release it */
--	bip->bip_flags &= ~BIP_BLOCK_INTEGRITY;
--
- 	ret = bio_integrity_add_page(bio, virt_to_page(io->integrity_metadata),
- 				     tag_len, offset_in_page(io->integrity_metadata));
- 	if (unlikely(ret != tag_len))
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Ming Lei (1):
+      blk-mq: don't leak preempt counter/q_usage_counter when allocating rq failed
+
+Paolo Valente (2):
+      block, bfq: reset in_service_entity if it becomes idle
+      block, bfq: consider also in_service_entity to state whether an entity is active
+
+ block/bfq-iosched.h |  22 ++++++--
+ block/bfq-wf2q.c    | 146 +++++++++++++++++++++++++++++-----------------------
+ block/blk-mq.c      |  17 +++---
+ 3 files changed, 109 insertions(+), 76 deletions(-)
+
 -- 
-2.11.0
+Jens Axboe
