@@ -1,58 +1,39 @@
-Return-Path: <bblock@linux.vnet.ibm.com>
-From: Benjamin Block <bblock@linux.vnet.ibm.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Benjamin Block <bblock@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>,
-        Steffen Maier <maier@linux.vnet.ibm.com>
-Subject: [PATCH v2 0/1] bsg: fix regression resulting in panics when sending commands via BSG
-Date: Thu, 24 Aug 2017 01:57:55 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <cover.1503528302.git.bblock@linux.vnet.ibm.com>
+Return-Path: <BATV+eb4e61afd325b22435ea+5099+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mpatocka@redhat.com,
+	gmazyland@gmail.com,
+	martin.petersen@oracle.com,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 2/2] dm-crypt: don't mess with BIP_BLOCK_INTEGRITY
+Date: Wed,  9 Aug 2017 17:48:09 +0200
+Message-Id: <20170809154809.2168-3-hch@lst.de>
+In-Reply-To: <20170809154809.2168-1-hch@lst.de>
+References: <20170809154809.2168-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello all,
+This flag is never set right after calling bio_integrity_alloc,
+so don't clear it and confuse the reader.
 
-This is the second try for fixing the regression in the BSG-interface that
-exists since v4.11 (for more infos see the first series).
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/dm-crypt.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-I separated my other changes from the bug-fix so that it is easier to apply
-if judged good. I will rebase my cleanups I sent in v1 and send them when I
-get a bit more time. But the regression-fix is more important, so here's
-that.
-
-I did some more tests on it than on v1, including some heavy parallel I/O
-on the same blk-queue using both BSG and the normal SCSI-stack at the same
-time (throwing some intentional bad commands in it too). That seemed to
-work all well enough - i.e. it didn't crash and got the expected results. I
-haven't done any external error-inject, but IMO that would be beyond the
-scope right now.
-
-The fix is based on Christoph's idea, I discussed this with him off-list
-already.
-
-I rebased the series on Jens' for-next.
-
-Reviews are more than welcome :)
-
-
-                                                Beste Grüße / Best regards,
-                                                  - Benjamin Block
-
-Benjamin Block (1):
-  bsg-lib: fix kernel panic resulting from missing allocation of
-    reply-buffer
-
- block/bsg-lib.c         | 74 +++++++++++++++++++++++++++++--------------------
- include/linux/blkdev.h  |  1 -
- include/linux/bsg-lib.h |  2 ++
- 3 files changed, 46 insertions(+), 31 deletions(-)
-
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index cdf6b1e12460..73c2e270cda6 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -933,9 +933,6 @@ static int dm_crypt_integrity_io_alloc(struct dm_crypt_io *io, struct bio *bio)
+ 	bip->bip_iter.bi_size = tag_len;
+ 	bip->bip_iter.bi_sector = io->cc->start + io->sector;
+ 
+-	/* We own the metadata, do not let bio_free to release it */
+-	bip->bip_flags &= ~BIP_BLOCK_INTEGRITY;
+-
+ 	ret = bio_integrity_add_page(bio, virt_to_page(io->integrity_metadata),
+ 				     tag_len, offset_in_page(io->integrity_metadata));
+ 	if (unlikely(ret != tag_len))
 -- 
-Linux on z Systems Development         /         IBM Systems & Technology Group
-               IBM Deutschland Research & Development GmbH 
-Vorsitz. AufsR.: Martina Koederitz     /        Geschäftsführung: Dirk Wittkopp
-Sitz der Gesellschaft: Böblingen / Registergericht: AmtsG Stuttgart, HRB 243294
+2.11.0
