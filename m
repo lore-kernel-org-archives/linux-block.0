@@ -1,124 +1,58 @@
-Return-Path: <prvs=401b34db8=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 4/5] skd: Avoid double completions in case of a timeout
-Date: Wed, 23 Aug 2017 10:56:32 -0700
-Message-Id: <20170823175633.12680-5-bart.vanassche@wdc.com>
-In-Reply-To: <20170823175633.12680-1-bart.vanassche@wdc.com>
-References: <20170823175633.12680-1-bart.vanassche@wdc.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 3/4] scsi: add Mylex RAID controller
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Johannes Thumshirn <jth@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Hannes Reinecke <hare@suse.com>
+References: <1501683208-5240-1-git-send-email-hare@suse.de>
+ <1501683208-5240-4-git-send-email-hare@suse.de>
+ <20170805113932.GF16313@lst.de>
+ <17589cb4-9f0c-7d15-8c3a-79bd9b14fdef@suse.de>
+ <20170809141049.GB26843@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e2bbe433-3368-916c-1e88-07eabd9876e7@suse.de>
+Date: Wed, 9 Aug 2017 17:11:02 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170809141049.GB26843@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid that normal request completion and the timeout handler can
-run concurrently by calling blk_mq_complete_request() instead of
-blk_mq_end_request() from skd_end_request(). Avoid that the block
-layer can reuse a request while the firmware is still processing
-it. Convert skd_softirq_done() to blk-mq. Pass the pointer to
-skd_softirq_done() to the block layer core through
-blk_mq_ops.complete instead of by calling blk_queue_softirq_done().
-Pass the pointer to skd_timed_out() to the block layer core
-through blk_mq_ops.timeout instead of by calling
-blk_queue_timed_out(). The timeout handler has been tested as
-follows:
+On 08/09/2017 04:10 PM, Christoph Hellwig wrote:
+> On Mon, Aug 07, 2017 at 08:09:11AM +0200, Hannes Reinecke wrote:
+>> On 08/05/2017 01:39 PM, Christoph Hellwig wrote:
+>>> Can you use normal linux style for the code instead of copy and
+>>> pasting the weird naming and capitalization from the DAC960 driver?
+>>>
+>> Yes; already planned for v2. But first wanted to get some general
+>> feedback (like: is anyone interested in that at all?)
+> 
+> Yes, please go ahead and kill off the DAC960 driver.
+> 
+I knew you would be saying that :-)
 
-    echo 1 > /sys/block/skd0/io-timeout-fail &&
-    (cd /sys/kernel/debug/fail_io_timeout &&
-      echo 100 > probability &&
-      echo N > task-filter &&
-      echo 1 > times)
+>>
+>>> Also please use the driver name as prefix for the functions.
+>>>
+>> Ok.
+>>
+>>> Maybe myraid instead of mylex?
+>>>
+>> Nah; I'd rather stick with mylex.
+>> (Especially as it says 'Mylex' in big fat letters on the board :-)
+> 
+> Naming drivers after the vendor only is usually a bad idea as vendors
+> have/had multiple products.  In this case we have plenty other drivers
+> that support Mylex products.
+> 
+Okay. Make it 'myraid_pio' and 'myraid_mmio' then.
 
-Fixes: commit a74d5b76fab9 ("skd: Switch to block layer timeout mechanism")
-Reported-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+Cheers,
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 0d6340884009..ff288f1a5dec 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -184,6 +184,7 @@ struct skd_request_context {
- 
- 	struct fit_comp_error_info err_info;
- 
-+	blk_status_t status;
- };
- 
- struct skd_special_context {
-@@ -596,19 +597,22 @@ static blk_status_t skd_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
--static enum blk_eh_timer_return skd_timed_out(struct request *req)
-+static enum blk_eh_timer_return skd_timed_out(struct request *req,
-+					      bool reserved)
- {
- 	struct skd_device *skdev = req->q->queuedata;
- 
- 	dev_err(&skdev->pdev->dev, "request with tag %#x timed out\n",
- 		blk_mq_unique_tag(req));
- 
--	return BLK_EH_HANDLED;
-+	return BLK_EH_RESET_TIMER;
- }
- 
- static void skd_end_request(struct skd_device *skdev, struct request *req,
- 			    blk_status_t error)
- {
-+	struct skd_request_context *skreq = blk_mq_rq_to_pdu(req);
-+
- 	if (unlikely(error)) {
- 		char *cmd = (rq_data_dir(req) == READ) ? "read" : "write";
- 		u32 lba = (u32)blk_rq_pos(req);
-@@ -621,19 +625,15 @@ static void skd_end_request(struct skd_device *skdev, struct request *req,
- 		dev_dbg(&skdev->pdev->dev, "id=0x%x error=%d\n", req->tag,
- 			error);
- 
--	blk_mq_end_request(req, error);
-+	skreq->status = error;
-+	blk_mq_complete_request(req);
- }
- 
--/* Only called in case of a request timeout */
- static void skd_softirq_done(struct request *req)
- {
--	struct skd_device *skdev = req->q->queuedata;
- 	struct skd_request_context *skreq = blk_mq_rq_to_pdu(req);
--	unsigned long flags;
- 
--	spin_lock_irqsave(&skdev->lock, flags);
--	skd_end_request(skdev, blk_mq_rq_from_pdu(skreq), BLK_STS_TIMEOUT);
--	spin_unlock_irqrestore(&skdev->lock, flags);
-+	blk_mq_end_request(req, skreq->status);
- }
- 
- static bool skd_preop_sg_list(struct skd_device *skdev,
-@@ -2821,6 +2821,8 @@ static int skd_cons_sksb(struct skd_device *skdev)
- 
- static const struct blk_mq_ops skd_mq_ops = {
- 	.queue_rq	= skd_mq_queue_rq,
-+	.complete	= skd_softirq_done,
-+	.timeout	= skd_timed_out,
- 	.init_request	= skd_init_request,
- 	.exit_request	= skd_exit_request,
- };
-@@ -2884,8 +2886,6 @@ static int skd_cons_disk(struct skd_device *skdev)
- 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, q);
- 
- 	blk_queue_rq_timeout(q, 8 * HZ);
--	blk_queue_rq_timed_out(q, skd_timed_out);
--	blk_queue_softirq_done(q, skd_softirq_done);
- 
- 	spin_lock_irqsave(&skdev->lock, flags);
- 	dev_dbg(&skdev->pdev->dev, "stopping queue\n");
+Hannes
 -- 
-2.14.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
