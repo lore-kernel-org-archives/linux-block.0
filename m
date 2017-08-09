@@ -1,63 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:26342 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753760AbdHWLVG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2017 07:21:06 -0400
-Date: Wed, 23 Aug 2017 14:20:57 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] skd: error pointer dereference in skd_cons_disk()
-Message-ID: <20170823065122.pqju3ks5rxpymllz@mwanda>
+Received: from mx2.suse.de ([195.135.220.15]:46551 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752260AbdHILpN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Aug 2017 07:45:13 -0400
+Subject: Re: [PATCH 4/9] md: raid5 nowait support
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-block@vger.kernel.org, hch@infradead.org, jack@suse.cz,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+References: <20170726235806.12148-1-rgoldwyn@suse.de>
+ <20170726235806.12148-5-rgoldwyn@suse.de>
+ <20170808204343.mzt5ujazevrkyro3@kernel.org>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Message-ID: <4cb8677e-7717-2f00-b5d9-c7aa3ab1c51d@suse.de>
+Date: Wed, 9 Aug 2017 06:45:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170808204343.mzt5ujazevrkyro3@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-My initial impulse was to check for IS_ERR_OR_NULL() but when I looked
-at this code a bit more closely, we should only need to check for
-IS_ERR().
 
-The blk_mq_alloc_tag_set() returns negative error codes and zero on
-success so we can just do an "if (rc) goto err_out;".  It's better to
-preserve the error code anyhow.  The blk_mq_init_queue() returns error
-pointers on failure, it never returns NULL.  We can also remove the
-"q = NULL;" at the start because that's no longer needed.
 
-Fixes: ca33dd92968b ("skd: Convert to blk-mq")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+On 08/08/2017 03:43 PM, Shaohua Li wrote:
+> On Wed, Jul 26, 2017 at 06:58:01PM -0500, Goldwyn Rodrigues wrote:
+>> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>>
+>> Return EAGAIN in case RAID5 would block because of waiting due to:
+>>  + Reshaping
+>>  + Suspension
+>>  + Stripe Expansion
+>>
+>> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>> ---
+>>  drivers/md/raid5.c | 20 ++++++++++++++++++++
+>>  1 file changed, 20 insertions(+)
+>>
+>> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+>> index aeeb8d6854e2..d1b3bcf26d29 100644
+>> --- a/drivers/md/raid5.c
+>> +++ b/drivers/md/raid5.c
+>> @@ -5635,6 +5635,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
+>>  				    ? logical_sector < conf->reshape_safe
+>>  				    : logical_sector >= conf->reshape_safe) {
+>>  					spin_unlock_irq(&conf->device_lock);
+>> +					if (bi->bi_opf & REQ_NOWAIT) {
+>> +						bio_wouldblock_error(bi);
+>> +						finish_wait(&conf->wait_for_overlap, &w);
+>> +						return true;
+>> +					}
+> 
+> A bio could use several stripes. If one stripe block, simpliy return bio here
+> doesn't really make the whole bio finish.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 9b99081a623c..8579eef80ef1 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -2862,7 +2862,6 @@ static int skd_cons_disk(struct skd_device *skdev)
- 	disk->fops = &skd_blockdev_ops;
- 	disk->private_data = skdev;
- 
--	q = NULL;
- 	memset(&skdev->tag_set, 0, sizeof(skdev->tag_set));
- 	skdev->tag_set.ops = &skd_mq_ops;
- 	skdev->tag_set.nr_hw_queues = 1;
-@@ -2874,13 +2873,13 @@ static int skd_cons_disk(struct skd_device *skdev)
- 		BLK_MQ_F_SG_MERGE |
- 		BLK_ALLOC_POLICY_TO_MQ_FLAG(BLK_TAG_ALLOC_FIFO);
- 	skdev->tag_set.driver_data = skdev;
--	if (blk_mq_alloc_tag_set(&skdev->tag_set) >= 0) {
--		q = blk_mq_init_queue(&skdev->tag_set);
--		if (!q)
--			blk_mq_free_tag_set(&skdev->tag_set);
--	}
--	if (!q) {
--		rc = -ENOMEM;
-+	rc = blk_mq_alloc_tag_set(&skdev->tag_set);
-+	if (rc)
-+		goto err_out;
-+	q = blk_mq_init_queue(&skdev->tag_set);
-+	if (IS_ERR(q)) {
-+		blk_mq_free_tag_set(&skdev->tag_set);
-+		rc = PTR_ERR(q);
- 		goto err_out;
- 	}
- 	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
+My understanding is a little weak here.
+How would you have to terminate the entire bio since one of the stripes
+is blocking?
+
+> 
+>>  					schedule();
+>>  					do_prepare = true;
+>>  					goto retry;
+>> @@ -5672,6 +5677,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
+>>  				spin_unlock_irq(&conf->device_lock);
+>>  				if (must_retry) {
+>>  					raid5_release_stripe(sh);
+>> +					if (bi->bi_opf & REQ_NOWAIT) {
+>> +						bio_wouldblock_error(bi);
+>> +						finish_wait(&conf->wait_for_overlap, &w);
+>> +						return true;
+>> +					}
+>>  					schedule();
+>>  					do_prepare = true;
+>>  					goto retry;
+>> @@ -5700,6 +5710,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
+>>  					sigset_t full, old;
+>>  					sigfillset(&full);
+>>  					sigprocmask(SIG_BLOCK, &full, &old);
+>> +					if (bi->bi_opf & REQ_NOWAIT) {
+>> +						bio_wouldblock_error(bi);
+>> +						finish_wait(&conf->wait_for_overlap, &w);
+>> +						return true;
+>> +					}
+>>  					schedule();
+>>  					sigprocmask(SIG_SETMASK, &old, NULL);
+>>  					do_prepare = true;
+>> @@ -5715,6 +5730,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
+>>  				 */
+>>  				md_wakeup_thread(mddev->thread);
+>>  				raid5_release_stripe(sh);
+>> +				if (bi->bi_opf & REQ_NOWAIT) {
+>> +					bio_wouldblock_error(bi);
+>> +					finish_wait(&conf->wait_for_overlap, &w);
+>> +					return true;
+>> +				}
+>>  				schedule();
+>>  				do_prepare = true;
+>>  				goto retry;
+>> -- 
+>> 2.12.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-raid" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+-- 
+Goldwyn
