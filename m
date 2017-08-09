@@ -1,66 +1,76 @@
-Return-Path: <prvs=400f95d56=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
+Return-Path: <gregkh@linuxfoundation.org>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
 	Jens Axboe <axboe@kernel.dk>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	Michal Hocko <mhocko@kernel.org>
-Subject: [PATCH 2/2] block: Make I/O timeout failure injection support again task-independent
-Date: Tue, 22 Aug 2017 09:52:36 -0700
-Message-Id: <20170822165236.12275-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170822165236.12275-1-bart.vanassche@wdc.com>
-References: <20170822165236.12275-1-bart.vanassche@wdc.com>
+	Keith Busch <keith.busch@intel.com>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Mike Galbraith <efault@gmx.de>
+Subject: [PATCH 4.12 054/106] blk-mq: Include all present CPUs in the default queue mapping
+Date: Wed,  9 Aug 2017 09:52:38 -0700
+Message-Id: <20170809164524.037800602@linuxfoundation.org>
+In-Reply-To: <20170809164515.714288642@linuxfoundation.org>
+References: <20170809164515.714288642@linuxfoundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Commit e41d58185f14 made all faults that are triggered from task
-context, including I/O timeouts, dependent on the failure
-injection settings for that task. Make it again possible to inject
-I/O timeout failures independent of task context. An example for a
-fault injection for which this patch makes a difference (from a VM
-booted with the 'threadirqs' command line parameter):
+4.12-stable review patch.  If anyone has any objections, please let me know.
 
-FAULT_INJECTION: forcing a failure. name fail_io_timeout, interval 1, probability 100, space 0, times 1
-CPU: 6 PID: 1253 Comm: irq/36-skd0-msi Not tainted 4.13.0-rc2-dbg+ #5
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1.fc26 04/01/2014
-Call Trace:
- dump_stack+0x8e/0xcd
- should_fail+0x154/0x160
- blk_should_fake_timeout+0x27/0x30
- blk_mq_complete_request+0x11/0x30
- skd_end_request+0x32/0xc0 [skd]
- skd_isr_completion_posted.isra.30+0x14a/0x400 [skd]
- skd_comp_q+0x40/0xb0 [skd]
- irq_forced_thread_fn+0x2a/0x70
- irq_thread+0x144/0x1a0
- kthread+0x125/0x140
- ret_from_fork+0x2a/0x40
+------------------
 
-Fixes: commit e41d58185f14 ("fault-inject: support systematic fault injection")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Vyukov <dvyukov@google.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Michal Hocko <mhocko@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
+From: Christoph Hellwig <hch@lst.de>
+
+commit 5f042e7cbd9ebd3580077dcdc21f35e68c2adf5f upstream.
+
+This way we get a nice distribution independent of the current cpu
+online / offline state.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org
+Link: http://lkml.kernel.org/r/20170626102058.10200-2-hch@lst.de
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc: Mike Galbraith <efault@gmx.de>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
 ---
- block/blk-timeout.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq-cpumap.c |    5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 17ec83bb0900..2e92b20b125f 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -11,7 +11,7 @@
- 
- #ifdef CONFIG_FAIL_IO_TIMEOUT
- 
--static DECLARE_FAULT_ATTR(fail_io_timeout);
-+static DECLARE_GLOBAL_FAULT_ATTR(fail_io_timeout);
- 
- static int __init setup_fail_io_timeout(char *str)
+--- a/block/blk-mq-cpumap.c
++++ b/block/blk-mq-cpumap.c
+@@ -35,7 +35,6 @@ int blk_mq_map_queues(struct blk_mq_tag_
  {
--- 
-2.14.0
+ 	unsigned int *map = set->mq_map;
+ 	unsigned int nr_queues = set->nr_hw_queues;
+-	const struct cpumask *online_mask = cpu_online_mask;
+ 	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
+ 	cpumask_var_t cpus;
+ 
+@@ -44,7 +43,7 @@ int blk_mq_map_queues(struct blk_mq_tag_
+ 
+ 	cpumask_clear(cpus);
+ 	nr_cpus = nr_uniq_cpus = 0;
+-	for_each_cpu(i, online_mask) {
++	for_each_present_cpu(i) {
+ 		nr_cpus++;
+ 		first_sibling = get_first_sibling(i);
+ 		if (!cpumask_test_cpu(first_sibling, cpus))
+@@ -54,7 +53,7 @@ int blk_mq_map_queues(struct blk_mq_tag_
+ 
+ 	queue = 0;
+ 	for_each_possible_cpu(i) {
+-		if (!cpumask_test_cpu(i, online_mask)) {
++		if (!cpumask_test_cpu(i, cpu_present_mask)) {
+ 			map[i] = 0;
+ 			continue;
+ 		}
