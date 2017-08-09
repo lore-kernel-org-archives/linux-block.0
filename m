@@ -1,68 +1,43 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 16/49] block: bounce: don't access bio->bi_io_vec in copy_to_high_bio_irq
-Date: Tue,  8 Aug 2017 16:45:15 +0800
-Message-Id: <20170808084548.18963-17-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+eb4e61afd325b22435ea+5099+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mpatocka@redhat.com,
+	gmazyland@gmail.com,
+	martin.petersen@oracle.com,
+	linux-block@vger.kernel.org,
+	dm-devel@redhat.com
+Subject: [PATCH 2/2] bio-integrity: only verify integrity on the lowest stacked driver
+Date: Wed,  9 Aug 2017 17:47:27 +0200
+Message-Id: <20170809154727.2085-3-hch@lst.de>
+In-Reply-To: <20170809154727.2085-1-hch@lst.de>
+References: <20170809154727.2085-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-As we need to support multipage bvecs, so don't access bio->bi_io_vec
-in copy_to_high_bio_irq(), and just use the standard iterator
-to do that.
+This gets us back to the behavior in 4.12 and earlier.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Fixes: 7c20f116 ("bio-integrity: stop abusing bi_end_io")
 ---
- block/bounce.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ block/bio-integrity.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/bounce.c b/block/bounce.c
-index e57cf2bdcd27..50e965a15295 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -112,24 +112,30 @@ int init_emergency_isa_pool(void)
- static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index dcfb968c8259..9b1ea478577b 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -388,11 +388,10 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ bool __bio_integrity_endio(struct bio *bio)
  {
- 	unsigned char *vfrom;
--	struct bio_vec tovec, *fromvec = from->bi_io_vec;
-+	struct bio_vec tovec, fromvec;
- 	struct bvec_iter iter;
-+	/*
-+	 * The bio of @from is created by bounce, so we can iterate
-+	 * its bvec from start to end, but the @from->bi_iter can't be
-+	 * trusted because it might be changed by splitting.
-+	 */
-+	struct bvec_iter from_iter = BVEC_ITER_ALL_INIT;
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
++	struct bio_integrity_payload *bip = bio_integrity(bio);
  
- 	bio_for_each_segment(tovec, to, iter) {
--		if (tovec.bv_page != fromvec->bv_page) {
-+		fromvec = bio_iter_iovec(from, from_iter);
-+		if (tovec.bv_page != fromvec.bv_page) {
- 			/*
- 			 * fromvec->bv_offset and fromvec->bv_len might have
- 			 * been modified by the block layer, so use the original
- 			 * copy, bounce_copy_vec already uses tovec->bv_len
- 			 */
--			vfrom = page_address(fromvec->bv_page) +
-+			vfrom = page_address(fromvec.bv_page) +
- 				tovec.bv_offset;
- 
- 			bounce_copy_vec(&tovec, vfrom);
- 			flush_dcache_page(tovec.bv_page);
- 		}
+ 	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status &&
+-	    bi->profile->verify_fn)
+-		struct bio_integrity_payload *bip = bio_integrity(bio);
 -
--		fromvec++;
-+		bio_advance_iter(from, &from_iter, tovec.bv_len);
- 	}
- }
- 
++	    (bip->bip_flags & BIP_BLOCK_INTEGRITY) && bi->profile->verify_fn) {
+ 		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
+ 		queue_work(kintegrityd_wq, &bip->bip_work);
+ 		return false;
 -- 
-2.9.4
+2.11.0
