@@ -1,6 +1,7 @@
-Return-Path: <rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 1/9] QUEUE_FLAG_NOWAIT to indicate device supports nowait
-To: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+To: Shaohua Li <shli@kernel.org>, Goldwyn Rodrigues <rgoldwyn@suse.de>
 Cc: linux-block@vger.kernel.org, hch@infradead.org, jack@suse.cz,
  linux-raid@vger.kernel.org, dm-devel@redhat.com,
  Goldwyn Rodrigues <rgoldwyn@suse.com>
@@ -8,38 +9,28 @@ References: <20170726235806.12148-1-rgoldwyn@suse.de>
  <20170726235806.12148-2-rgoldwyn@suse.de>
  <20170808203246.sdjnpzixxz5brjaf@kernel.org>
  <10dbe9f0-e2a0-456f-b271-7cf0312aa1d5@kernel.dk>
- <284fb7b3-9265-229f-4c66-bd043b94ec9f@kernel.dk>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <f8d2c0e3-e81f-55e7-2645-4598af34b367@suse.de>
-Date: Thu, 10 Aug 2017 06:38:53 -0500
+Message-ID: <284fb7b3-9265-229f-4c66-bd043b94ec9f@kernel.dk>
+Date: Wed, 9 Aug 2017 20:18:21 -0600
 MIME-Version: 1.0
-In-Reply-To: <284fb7b3-9265-229f-4c66-bd043b94ec9f@kernel.dk>
+In-Reply-To: <10dbe9f0-e2a0-456f-b271-7cf0312aa1d5@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-On 08/09/2017 09:18 PM, Jens Axboe wrote:
-> On 08/08/2017 02:36 PM, Jens Axboe wrote:
->> On 08/08/2017 02:32 PM, Shaohua Li wrote:
->>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->>>> index 25f6a0cb27d3..fae021ebec1b 100644
->>>> --- a/include/linux/blkdev.h
->>>> +++ b/include/linux/blkdev.h
->>>> @@ -633,6 +633,7 @@ struct request_queue {
->>>>  #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
->>>>  #define QUEUE_FLAG_SCSI_PASSTHROUGH 30	/* queue supports SCSI commands */
->>>>  #define QUEUE_FLAG_QUIESCED    31	/* queue has been quiesced */
->>>> +#define QUEUE_FLAG_NOWAIT      32	/* stack device driver supports REQ_NOWAIT */
->>
->> Does this work on 32-bit, where sizeof(unsigned long) == 32?
+On 08/08/2017 02:36 PM, Jens Axboe wrote:
+> On 08/08/2017 02:32 PM, Shaohua Li wrote:
+>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>>> index 25f6a0cb27d3..fae021ebec1b 100644
+>>> --- a/include/linux/blkdev.h
+>>> +++ b/include/linux/blkdev.h
+>>> @@ -633,6 +633,7 @@ struct request_queue {
+>>>  #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
+>>>  #define QUEUE_FLAG_SCSI_PASSTHROUGH 30	/* queue supports SCSI commands */
+>>>  #define QUEUE_FLAG_QUIESCED    31	/* queue has been quiesced */
+>>> +#define QUEUE_FLAG_NOWAIT      32	/* stack device driver supports REQ_NOWAIT */
 > 
-> I didn't get an answer to this one.
-> 
+> Does this work on 32-bit, where sizeof(unsigned long) == 32?
 
-Oh, I assumed the question is rhetorical.
-No, it will not work on 32-bit. I was planning to change the field
-queue_flags to u64. Is that okay?
+I didn't get an answer to this one.
 
 -- 
-Goldwyn
+Jens Axboe
