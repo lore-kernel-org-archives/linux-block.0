@@ -1,49 +1,63 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:34071 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751418AbdHJL0G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Aug 2017 07:26:06 -0400
+Date: Thu, 10 Aug 2017 04:26:03 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Huang Ying <ying.huang@intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org
-Subject: [PATCH v3 41/49] xfs: convert to bio_for_each_segment_all_sp()
-Date: Tue,  8 Aug 2017 16:45:40 +0800
-Message-Id: <20170808084548.18963-42-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
+        linux-bcache@vger.kernel.org
+Subject: Re: [PATCH v3 07/49] bcache: comment on direct access to bvec table
+Message-ID: <20170810112603.GD20308@infradead.org>
 References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+ <20170808084548.18963-8-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170808084548.18963-8-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: linux-xfs@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/xfs/xfs_aops.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I think all this bcache code needs bigger attention.  For one
+bio_alloc_pages is only used in bcache, so we should move it in there.
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 6bf120bb1a17..94df43dcae0b 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -139,6 +139,7 @@ xfs_destroy_ioend(
- 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
- 		struct bio_vec	*bvec;
- 		int		i;
-+		struct bvec_iter_all bia;
- 
- 		/*
- 		 * For the last bio, bi_private points to the ioend, so we
-@@ -150,7 +151,7 @@ xfs_destroy_ioend(
- 			next = bio->bi_private;
- 
- 		/* walk each page on bio, ending page IO on them */
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 			xfs_finish_page_writeback(inode, bvec, error);
- 
- 		bio_put(bio);
--- 
-2.9.4
+Second the way  bio_alloc_pages is currently written looks potentially
+dangerous for multi-page biovecs, so we should think about a better
+calling convention.  The way bcache seems to generally use it is by
+allocating a bio, then calling bch_bio_map on it and then calling
+bio_alloc_pages.  I think it just needs a new bio_alloc_pages calling
+convention that passes the size to be allocated and stop looking into
+the segment count.
+
+Second bch_bio_map isn't something we should be doing in a driver,
+it should be rewritten using bio_add_page.
+
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 866dcf78ff8e..3da595ae565b 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -431,6 +431,7 @@ static void do_btree_node_write(struct btree *b)
+>  
+>  		continue_at(cl, btree_node_write_done, NULL);
+>  	} else {
+> +		/* No harm for multipage bvec since the new is just allocated */
+>  		b->bio->bi_vcnt = 0;
+
+This should go away - bio_alloc_pages or it's replacement should not
+modify bi_vcnt on failure.
+
+> +	/* single page bio, safe for multipage bvec */
+>  	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
+
+needs to use bio_add_page.
+
+> +	/* single page bio, safe for multipage bvec */
+>  	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
+
+needs to use bio_add_page.
