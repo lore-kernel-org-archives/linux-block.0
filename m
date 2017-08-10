@@ -1,42 +1,80 @@
-Return-Path: <prvs=407911b14=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 1/2] skd: Remove blk_queue_bounce_limit() call
-Date: Tue, 29 Aug 2017 08:32:09 -0700
-Message-Id: <20170829153211.6257-2-bart.vanassche@wdc.com>
-In-Reply-To: <20170829153211.6257-1-bart.vanassche@wdc.com>
-References: <20170829153211.6257-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.didichuxing.com ([111.202.154.82]:23938 "EHLO
+        BJEXCAS003.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752440AbdHJCeb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Aug 2017 22:34:31 -0400
+Date: Thu, 10 Aug 2017 10:34:19 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH] blk-sysfs: add io queue depth show
+Message-ID: <20170810023413.GA33798@localhost.didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Since sTec s1120 devices support 64-bit DMA it is not necessary
-to request data buffer bouncing. Hence remove the
-blk_queue_bounce_limit() call.
+show max io queue depth, it may doesn't reflect the real hardware's
+max queue depth which was reduced by some software designs.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- drivers/block/skd_main.c | 1 -
- 1 file changed, 1 deletion(-)
+ block/blk-sysfs.c      | 11 +++++++++++
+ include/linux/blkdev.h |  5 +++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 00a86252b3c5..f987ff601a4c 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -2844,7 +2844,6 @@ static int skd_cons_disk(struct skd_device *skdev)
- 		rc = PTR_ERR(q);
- 		goto err_out;
- 	}
--	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
- 	q->queuedata = skdev;
- 	q->nr_requests = skd_max_queue_depth / 2;
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 27aceab..66cba2b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -256,6 +256,11 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
+ 	return queue_var_show(max_hw_sectors_kb, (page));
+ }
  
++static ssize_t queue_io_queue_depth_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(queue_io_queue_depth(q), (page));
++}
++
+ #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
+ static ssize_t								\
+ queue_show_##name(struct request_queue *q, char *page)			\
+@@ -678,6 +683,11 @@ static struct queue_sysfs_entry queue_wb_lat_entry = {
+ 	.store = queue_wb_lat_store,
+ };
+ 
++static struct queue_sysfs_entry queue_io_queue_depth_entry = {
++	.attr = {.name = "io_queue_depth", .mode = S_IRUGO },
++	.show = queue_io_queue_depth_show,
++};
++
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ static struct queue_sysfs_entry throtl_sample_time_entry = {
+ 	.attr = {.name = "throttle_sample_time", .mode = S_IRUGO | S_IWUSR },
+@@ -719,6 +729,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_dax_entry.attr,
+ 	&queue_wb_lat_entry.attr,
+ 	&queue_poll_delay_entry.attr,
++	&queue_io_queue_depth_entry.attr,
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	&throtl_sample_time_entry.attr,
+ #endif
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 25f6a0c..bcd0af4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1405,6 +1405,11 @@ static inline unsigned int queue_max_hw_sectors(struct request_queue *q)
+ 	return q->limits.max_hw_sectors;
+ }
+ 
++static inline unsigned int queue_io_queue_depth(struct request_queue *q)
++{
++	return q->queue_depth;
++}
++
+ static inline unsigned short queue_max_segments(struct request_queue *q)
+ {
+ 	return q->limits.max_segments;
 -- 
-2.14.1
+2.9.4
