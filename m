@@ -1,44 +1,47 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>,
-        linux-f2fs-devel@lists.sourceforge.net
-Subject: [PATCH v3 06/49] f2fs: f2fs_read_end_io: comment on direct access to bvec table
-Date: Tue,  8 Aug 2017 16:45:05 +0800
-Message-Id: <20170808084548.18963-7-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
+From: Joseph Qi <jiangqi903@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, boyu.mt@taobao.com, wenqing.lz@taobao.com,
+ qijiang.qj@alibaba-inc.com
+Subject: blk-throttle: fix potential NULL pointer dereference in
+ throtl_select_dispatch
+Message-ID: <9b5dd19b-7dfd-7f10-fe7d-ff80e0440b99@gmail.com>
+Date: Thu, 10 Aug 2017 09:22:48 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-Cc: Chao Yu <yuchao0@huawei.com>
-Cc: linux-f2fs-devel@lists.sourceforge.net
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/f2fs/data.c | 4 ++++
- 1 file changed, 4 insertions(+)
+From: Joseph Qi <qijiang.qj@alibaba-inc.com>
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 87c1f4150c64..99fa8e9780e8 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -56,6 +56,10 @@ static void f2fs_read_end_io(struct bio *bio)
- 	int i;
+Since throtl_rb_first may return NULL, so it should check tg first and
+then use it.
+
+Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
+---
+ block/blk-throttle.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a7285bf..c1d2c5b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1201,7 +1201,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
  
- #ifdef CONFIG_F2FS_FAULT_INJECTION
-+	/*
-+	 * It is still safe to retrieve the 1st page of the bio
-+	 * in this way after supporting multipage bvec.
-+	 */
- 	if (time_to_inject(F2FS_P_SB(bio->bi_io_vec->bv_page), FAULT_IO)) {
- 		f2fs_show_injection_info(FAULT_IO);
- 		bio->bi_status = BLK_STS_IOERR;
+ 	while (1) {
+ 		struct throtl_grp *tg = throtl_rb_first(parent_sq);
+-		struct throtl_service_queue *sq = &tg->service_queue;
++		struct throtl_service_queue *sq;
+ 
+ 		if (!tg)
+ 			break;
+@@ -1213,6 +1213,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 
+ 		nr_disp += throtl_dispatch_tg(tg);
+ 
++		sq = &tg->service_queue;
+ 		if (sq->nr_queued[0] || sq->nr_queued[1])
+ 			tg_update_disptime(tg);
+ 
 -- 
-2.9.4
+1.9.4
