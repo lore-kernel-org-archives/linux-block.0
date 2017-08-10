@@ -1,207 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38373 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752536AbdHJWKo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Aug 2017 18:10:44 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7AM8eFc187882
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2017 18:10:43 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2c8ssk1qju-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2017 18:10:43 -0400
-Received: from localhost
-        by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <bblock@linux.vnet.ibm.com>;
-        Thu, 10 Aug 2017 23:10:41 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id v7AMAdH516908398
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2017 22:10:39 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8DBD711C050
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2017 23:07:36 +0100 (BST)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 58D1111C04A
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2017 23:07:36 +0100 (BST)
-Received: from bblock-ThinkPad-W530 (unknown [9.145.23.127])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP
-        for <linux-block@vger.kernel.org>; Thu, 10 Aug 2017 23:07:36 +0100 (BST)
-Date: Fri, 11 Aug 2017 00:10:38 +0200
-From: Benjamin Block <bblock@linux.vnet.ibm.com>
-To: Christoph Hellwig <hch@lst.de>
+Return-Path: <hch@lst.de>
+Date: Thu, 10 Aug 2017 11:32:17 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Benjamin Block <bblock@linux.vnet.ibm.com>
 Cc: "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Steffen Maier <maier@linux.vnet.ibm.com>,
-        open-iscsi@googlegroups.com
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Christoph Hellwig <hch@lst.de>,
+	Steffen Maier <maier@linux.vnet.ibm.com>,
+	open-iscsi@googlegroups.com
 Subject: Re: [RFC PATCH 1/6] bsg: fix kernel panic resulting from missing
- allocation of a reply-buffer
-References: <cover.1502120928.git.bblock@linux.vnet.ibm.com>
- <9e67ce3fc2f3cd42e9e05b2753b00d6676f46ee1.1502120928.git.bblock@linux.vnet.ibm.com>
- <20170810093217.GL24539@lst.de>
+	allocation of a reply-buffer
+Message-ID: <20170810093217.GL24539@lst.de>
+References: <cover.1502120928.git.bblock@linux.vnet.ibm.com> <9e67ce3fc2f3cd42e9e05b2753b00d6676f46ee1.1502120928.git.bblock@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170810093217.GL24539@lst.de>
-Message-Id: <20170810221038.GA918@bblock-ThinkPad-W530>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9e67ce3fc2f3cd42e9e05b2753b00d6676f46ee1.1502120928.git.bblock@linux.vnet.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 10, 2017 at 11:32:17AM +0200, Christoph Hellwig wrote:
-> We can't use an on-stack buffer for the sense data, as drivers will
-> dma to it.  So we should reuse the SCSI init_rq_fn() for the BSG
-> queues and/or implement the same scheme.
-> 
-
-BSG is odd in this regard. Here is the data model as far as I understood
-it from reading the source.
-
-The user of the interface provides his input via a sg_io_v4 object.
-
- struct sg_io_v4
- +--------------+
- |              |  
- | request-------->+----------------------------+
- |   + _len     |  |                            |
- |   (A)        |  | BSG Request                |
- |              |  | e.g. struct fc_bsg_request | Depends on BSG implementation
- |              |  |                            | FC vs. iSCSI vs. ...
- |              |  +----------------------------+
- |              |
- | response------->+----------------------------+ Used as _Output_
- |   + max_len  |  |                            | User doesn't initialize
- |   (B)        |  | BSG Reply                  | User provides (optional)
- |              |  | e.g. struct fc_bsg_reply   |   memory; May be NULL.
- |              |  |                            |
- |              |  +----------------------------+
- |              |
- | dout_xferp----->+-----------------------+ Stuff send on the wire by
- |   + _len     |  |                       |   the LLD
- |   (C)        |  | Transport Protocol IU | Aligned on PAGE_SIZE
- |              |  | e.g. FC-GS-7 CT_IU    |
- |              |  |                       |
- |              |  +-----------------------+
- |              |
- | din_xferp------>+-----------------------+ Buffer for response data by
- |   + _len     |  |                       |   the LLD
- |   (D)        |  | Transport Protocol IU | Aligned on PAGE_SIZE
- |              |  | e.g. FC-GS-7 CT_IU    |
- |              |  |                       |
- |              |  +-----------------------+
- +--------------+
-
-This is just a part of it, but the most important for this issue. The
-BSG driver then encapsulates this into two linked block-requests he
-passes down to the LLDs. The first block-request (E) is for the Request
-Data, and the second request (F) for the Response Data. (F) is optional,
-depending on the whether the user passes both dout_xferp and din_xferp.
-
- struct request (E)
- +--------------+
- |              |  struct scsi_request
- | scsi_request--->+-----------------+
- |              |  |                 |
- |              |  | cmd---------------------> Copy of (A)
- |              |  |  + _len         |         Space in struct or kzalloc
- |              |  |  (G)            |
- |              |  |                 |
- |              |  | sense-------------------> Space for BSG Reply
- |              |  |  + _len         |         Same Data-Structure as (B)
- |              |  |  (H)            |         NOT actually pointer (B)
- |              |  |                 |         'reply_buffer' in my patch 
- |              |  +-----------------+
- |              |
- | bio------------> Mapped via blk_rq_map_user() to (C) dout_xferp
- |              |
- | next_rq---------+
- |              |  |
- +--------------+  |
-                   |
- struct request (F)|(if used)
- +--------------+<-+
- |              |
- | scsi_request---> Unused here
- |              |
- | bio------------> Mapped via blk_rq_map_user() to (D) din_xferp
- |              |
- +--------------+
-
-This is enqueued in the (legacy) blk-queue. In bsg-lib.c this is
-processed and encapsulated into an other data-structure struct bsg_job
-
- struct bsg_job
- +-----------------+
- |                 |
- | request-----------> (G) scsi_request->cmd -> Copy of (A)
- |   + _len        |       e.g. struct fc_bsg_request
- |                 |
- | reply-------------> (H) scsi_request->sense -> 'reply_buffer'
- |   + _len        |       e.g. struct fc_bsg_reply
- |                 |
- | request_payload---> struct scatterlist ... map (E)->bio
- |   + _len        |
- |   (I)           |
- |                 |
- | reply_payload-----> struct scatterlist ... map (F)->bio
- |   + _len        |
- |   (J)           |
- |                 |
- +-----------------+
-
-This then is finally what the LLD gets to work with, with the callback
-from the request-queue. Depending on contents of (G) the LLD gets to
-decide whatever the user-space wants him to do. This depends highly on
-the transport.
-
-In case of zFCP we map (I) and (J) directly into the ring that passes
-the data to our hardware and the one that the hardware uses to pass back
-the responses.
-
-(This is actually pretty cool if you think about it. Apart from the copy
-we make of (A) into (G), this whole send was completely 'zero-copy'.
-Depending on the hardware it can directly DMA onto the wire... I guess
-most modern cards can do such a thing.)
-
-When the answer is coming back, the payload data is expected to be put
-into (J). If your HW can DMA into this, no more effort.
-
-Again, depending on (H), the LLD fills in some information for
-accounting and such. In case of FC, there is also some
-protocol-information, but this is by no means a standard IU.
-
-This is then passed up the stack pretty quick and if the user passed
-something with (B), data from (H) is copied into (B). But this is
-optional. The main payload is transferred to the user via (J) which is a
-remap of (D).
-
-So this is my understanding here. (I don't wanna say that this is
-necessarily completely correct ;-), pleas correct me, if I am wrong. The
-lack of proper documentation is also not helping at all.)
-
-This worked till it broke. Right now every driver that tries to access
-(H) will panic the system, or cause very undefined behavior. I suspect
-no driver right now tries to do any DMA into (H); before the regression,
-this has been also an on-stack variable (I suspect since BSG was
-introduced, haven't checked though).
-
-The asymmetries between the first struct request (E) and the following
-(F) also makes it hard to use the same scheme as in other drivers, where
-init_rq_fn() gets to initialize each request in the same'ish way. Or?
-Just looking at it right now, this would require some bigger rework that
-is not appropriate for a stable bug-fix.
-
-I think it would be best if we fix the possible panics every user of
-this is gonna experience and after that we can still think about
-improving it further beyond what the rest of the patch set already does,
-if that is necessary.
-
-
-                                                    Beste Gr��e / Best regards,
-                                                      - Benjamin Block
--- 
-Linux on z Systems Development         /         IBM Systems & Technology Group
-                  IBM Deutschland Research & Development GmbH 
-Vorsitz. AufsR.: Martina Koederitz     /        Gesch�ftsf�hrung: Dirk Wittkopp
-Sitz der Gesellschaft: B�blingen / Registergericht: AmtsG Stuttgart, HRB 243294
+We can't use an on-stack buffer for the sense data, as drivers will
+dma to it.  So we should reuse the SCSI init_rq_fn() for the BSG
+queues and/or implement the same scheme.
