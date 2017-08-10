@@ -1,97 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:57440 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752367AbdHHUnq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 16:43:46 -0400
-Date: Tue, 8 Aug 2017 13:43:43 -0700
-From: Shaohua Li <shli@kernel.org>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: linux-block@vger.kernel.org, hch@infradead.org, jack@suse.cz,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: Re: [PATCH 4/9] md: raid5 nowait support
-Message-ID: <20170808204343.mzt5ujazevrkyro3@kernel.org>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
- <20170726235806.12148-5-rgoldwyn@suse.de>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "loberman@redhat.com"
+	<loberman@redhat.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"snitzer@redhat.com" <snitzer@redhat.com>
+Subject: Re: [PATCH] block: Make blk_mq_delay_kick_requeue_list() rerun the
+ queue at a quiet time
+Date: Thu, 10 Aug 2017 15:14:26 +0000
+Message-ID: <1502378060.2309.3.camel@wdc.com>
+References: <20170809182806.32741-1-bart.vanassche@wdc.com>
+	 <20170810071408.GA20981@lst.de>
+In-Reply-To: <20170810071408.GA20981@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170726235806.12148-5-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jul 26, 2017 at 06:58:01PM -0500, Goldwyn Rodrigues wrote:
-> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> 
-> Return EAGAIN in case RAID5 would block because of waiting due to:
->  + Reshaping
->  + Suspension
->  + Stripe Expansion
-> 
-> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> ---
->  drivers/md/raid5.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> index aeeb8d6854e2..d1b3bcf26d29 100644
-> --- a/drivers/md/raid5.c
-> +++ b/drivers/md/raid5.c
-> @@ -5635,6 +5635,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
->  				    ? logical_sector < conf->reshape_safe
->  				    : logical_sector >= conf->reshape_safe) {
->  					spin_unlock_irq(&conf->device_lock);
-> +					if (bi->bi_opf & REQ_NOWAIT) {
-> +						bio_wouldblock_error(bi);
-> +						finish_wait(&conf->wait_for_overlap, &w);
-> +						return true;
-> +					}
-
-A bio could use several stripes. If one stripe block, simpliy return bio here
-doesn't really make the whole bio finish.
-
->  					schedule();
->  					do_prepare = true;
->  					goto retry;
-> @@ -5672,6 +5677,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
->  				spin_unlock_irq(&conf->device_lock);
->  				if (must_retry) {
->  					raid5_release_stripe(sh);
-> +					if (bi->bi_opf & REQ_NOWAIT) {
-> +						bio_wouldblock_error(bi);
-> +						finish_wait(&conf->wait_for_overlap, &w);
-> +						return true;
-> +					}
->  					schedule();
->  					do_prepare = true;
->  					goto retry;
-> @@ -5700,6 +5710,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
->  					sigset_t full, old;
->  					sigfillset(&full);
->  					sigprocmask(SIG_BLOCK, &full, &old);
-> +					if (bi->bi_opf & REQ_NOWAIT) {
-> +						bio_wouldblock_error(bi);
-> +						finish_wait(&conf->wait_for_overlap, &w);
-> +						return true;
-> +					}
->  					schedule();
->  					sigprocmask(SIG_SETMASK, &old, NULL);
->  					do_prepare = true;
-> @@ -5715,6 +5730,11 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
->  				 */
->  				md_wakeup_thread(mddev->thread);
->  				raid5_release_stripe(sh);
-> +				if (bi->bi_opf & REQ_NOWAIT) {
-> +					bio_wouldblock_error(bi);
-> +					finish_wait(&conf->wait_for_overlap, &w);
-> +					return true;
-> +				}
->  				schedule();
->  				do_prepare = true;
->  				goto retry;
-> -- 
-> 2.12.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-raid" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+T24gVGh1LCAyMDE3LTA4LTEwIGF0IDA5OjE0ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gT24gV2VkLCBBdWcgMDksIDIwMTcgYXQgMTE6Mjg6MDZBTSAtMDcwMCwgQmFydCBWYW4g
+QXNzY2hlIHdyb3RlOg0KPiA+IFRoZSBibGtfbXFfZGVsYXlfa2lja19yZXF1ZXVlX2xpc3QoKSBm
+dW5jdGlvbiBpcyB1c2VkIGJ5IHRoZSBkZXZpY2UNCj4gPiBtYXBwZXIgYW5kIG9ubHkgYnkgdGhl
+IGRldmljZSBtYXBwZXIgdG8gcmVydW4gdGhlIHF1ZXVlIGFuZCByZXF1ZXVlDQo+ID4gbGlzdCBh
+ZnRlciBhIGRlbGF5LiBUaGlzIGZ1bmN0aW9uIGlzIGNhbGxlZCBvbmNlIHBlciByZXF1ZXN0IHRo
+YXQNCj4gPiBnZXRzIHJlcXVldWVkLiBNb2RpZnkgdGhpcyBmdW5jdGlvbiBzdWNoIHRoYXQgdGhl
+IHF1ZXVlIGlzIHJ1biBvbmNlDQo+ID4gcGVyIHBhdGggY2hhbmdlIGV2ZW50IGluc3RlYWQgb2Yg
+b25jZSBwZXIgcmVxdWVzdCB0aGF0IGlzIHJlcXVldWVkLg0KPiANCj4gSXMgdGhlcmUgYSBjaGFu
+Y2Ugd2UgY291bGQgbG9vayBpbnRvIGtpbGxpbmcgdGhpcyBmdW5jdGlvbiBhbmQgbW92aW5nDQo+
+IGRtIHRvIHJ1biBpdCBldmVyeSB0aW1lIHdlIHJlcXVldWUgYSByZXF1ZXN0IGxpa2UgYWxsIHRo
+ZSBvdGhlciBkcml2ZXJzPw0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNClRoYXQncyBhbiBpbnRlcmVz
+dGluZyBxdWVzdGlvbi4gSSB0aGluayBpdCdzIG5vdCBwb3NzaWJsZSB0byByZW1vdmUgdGhpcw0K
+ZnVuY3Rpb24gd2l0aG91dCBhZGRpbmcgbW9yZSBpbmZyYXN0cnVjdHVyZSB0byB0aGUgYmxvY2sg
+bGF5ZXIuIEFzIGFuDQpleGFtcGxlLCBpZiB0aGUgLmxsZF9idXN5X2ZuKCkgcmVxdWVzdCBxdWV1
+ZSBjYWxsYmFjayBmdW5jdGlvbiByZXBvcnRzIHRoYXQNCmEgcmVxdWVzdCBxdWV1ZSBpcyBidXN5
+IHRoZSBvbmx5IHdheSBmb3IgdGhlIGRtLW1wYXRoIGRyaXZlciB0byBkZXRlY3QgdGhhdA0KYW4g
+dW5kZXJseWluZyByZXF1ZXN0IHF1ZXVlIGlzIG5vIGxvbmdlciBidXN5IGlzIGJ5IGNhbGxpbmcg
+dGhhdCBmdW5jdGlvbg0KYWdhaW4gYWZ0ZXIgYSBjZXJ0YWluIHRpbWUgKHNlZSBhbHNvIG11bHRp
+cGF0aF9idXN5KCkgaW4gZG0tbXBhdGguYykuIEluDQpvdGhlciB3b3JkcywgaWYgd2Ugd2FudCB0
+byBnZXQgcmlkIG9mIGJsa19tcV9kZWxheV9raWNrX3JlcXVldWVfbGlzdCgpIHRoZW4NCm5vdGlm
+aWNhdGlvbiBtZWNoYW5pc21zIHdpbGwgaGF2ZSB0byBiZSBhZGRlZCBmb3IgZXZlcnkgdHlwZSBv
+ZiBzdGF0ZQ0KaW5mb3JtYXRpb24gdGhhdCBjYW4gY2F1c2UgdGhlIHN0YXRlIG9mIGEgbXVsdGlw
+YXRoIGZyb20gIm5vdCByZWFkeSIgaW50bw0KInJlYWR5Ii4NCg0KQmFydC4=
