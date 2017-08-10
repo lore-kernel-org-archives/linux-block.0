@@ -1,88 +1,33 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 46/55] skd: Split skd_recover_requests()
-Date: Thu, 17 Aug 2017 13:13:29 -0700
-Message-Id: <20170817201338.16537-47-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: nvmf question - synchronization between target/initiator
+ regarding partitions
+To: Christoph Hellwig <hch@infradead.org>
+Cc: vnarasimhan@in.ibm.com, Brian J King <bjking1@us.ibm.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-block@vger.kernel.org, Murali N Iyer <mniyer@us.ibm.com>,
+        Mauricio pIO <mauricfo@linux.vnet.ibm.com>,
+        Hannes Reinecke <hare@suse.de>
+References: <82c4d1d8-ffa9-fa99-df58-05e2945eafdc@linux.vnet.ibm.com>
+ <c382184a-1621-c6b2-2a20-bd16498be998@suse.de>
+ <4c199e9e-ed58-5a5b-cedc-2d3c3bc1464c@linux.vnet.ibm.com>
+ <20170810091626.GA21958@infradead.org>
+From: "Guilherme G. Piccoli" <gpiccoli@linux.vnet.ibm.com>
+Date: Thu, 10 Aug 2017 09:37:03 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170810091626.GA21958@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <1cd07b48-7d63-a636-eca5-2fd5201c69a0@linux.vnet.ibm.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes the blk-mq
-conversion patch easier to read.
+On 08/10/2017 06:16 AM, Christoph Hellwig wrote:
+> On Mon, Aug 07, 2017 at 02:29:47PM -0300, Guilherme G. Piccoli wrote:
+>> Thanks for your feedback Hannes, agreed!
+> 
+> And btw, you'll see similar results with the SCSI target or nbd,
+> so it's not really nvme specific.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 39 ++++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 1d10373b0da3..451974138b32 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -2031,31 +2031,36 @@ static void skd_isr_fwstate(struct skd_device *skdev)
- 		skd_skdev_state_to_str(skdev->state), skdev->state);
- }
- 
--static void skd_recover_requests(struct skd_device *skdev)
-+static void skd_recover_request(struct skd_device *skdev,
-+				struct skd_request_context *skreq)
- {
--	int i;
-+	struct request *req = skreq->req;
- 
--	for (i = 0; i < skdev->num_req_context; i++) {
--		struct skd_request_context *skreq = &skdev->skreq_table[i];
--		struct request *req = skreq->req;
-+	if (skreq->state != SKD_REQ_STATE_BUSY)
-+		return;
-+
-+	skd_log_skreq(skdev, skreq, "recover");
-+
-+	SKD_ASSERT(req != NULL);
- 
--		if (skreq->state == SKD_REQ_STATE_BUSY) {
--			skd_log_skreq(skdev, skreq, "recover");
-+	/* Release DMA resources for the request. */
-+	if (skreq->n_sg > 0)
-+		skd_postop_sg_list(skdev, skreq);
- 
--			SKD_ASSERT((skreq->id & SKD_ID_INCR) != 0);
--			SKD_ASSERT(req != NULL);
-+	skreq->req = NULL;
-+	skreq->state = SKD_REQ_STATE_IDLE;
- 
--			/* Release DMA resources for the request. */
--			if (skreq->n_sg > 0)
--				skd_postop_sg_list(skdev, skreq);
-+	skd_end_request(skdev, req, BLK_STS_IOERR);
-+}
- 
--			skreq->req = NULL;
-+static void skd_recover_requests(struct skd_device *skdev)
-+{
-+	int i;
- 
--			skreq->state = SKD_REQ_STATE_IDLE;
--			skreq->id += SKD_ID_INCR;
-+	for (i = 0; i < skdev->num_req_context; i++) {
-+		struct skd_request_context *skreq = &skdev->skreq_table[i];
- 
--			skd_end_request(skdev, req, BLK_STS_IOERR);
--		}
-+		skd_recover_request(skdev, skreq);
- 	}
- 
- 	for (i = 0; i < SKD_N_TIMEOUT_SLOT; i++)
--- 
-2.14.0
+Thanks, I agree - noticed the same stuff. I've used nvmf as a "trigger"
+to the subject, in order to discuss a possible generic solution. But
+since everything is working as expected, no need to pursue a "fix" heheh
