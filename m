@@ -1,92 +1,36 @@
-Return-Path: <BATV+eb4e61afd325b22435ea+5099+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mpatocka@redhat.com,
-	gmazyland@gmail.com,
-	martin.petersen@oracle.com,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 1/2] bio-integrity: Fix regression if profile verify_fn is NULL
-Date: Wed,  9 Aug 2017 17:47:26 +0200
-Message-Id: <20170809154727.2085-2-hch@lst.de>
-In-Reply-To: <20170809154727.2085-1-hch@lst.de>
-References: <20170809154727.2085-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:41550 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751709AbdHJL3G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Aug 2017 07:29:06 -0400
+Date: Thu, 10 Aug 2017 04:29:00 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH v3 10/49] dm: limit the max bio size as BIO_MAX_PAGES *
+ PAGE_SIZE
+Message-ID: <20170810112900.GF20308@infradead.org>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+ <20170808084548.18963-11-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170808084548.18963-11-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Milan Broz <gmazyland@gmail.com>
+> +	ti->max_io_len = min_t(uint32_t, len,
+> +			       (BIO_MAX_PAGES * PAGE_SIZE));
 
-In dm-integrity target we register integrity profile that have
-both generate_fn and verify_fn callbacks set to NULL.
+No need for the inner braces.  Also all of the above fits nicely
+onto a single < 80 char line.
 
-This is used if dm-integrity is stacked under a dm-crypt device
-for authenticated encryption (integrity payload contains authentication
-tag and IV seed).
+Otherwise this looks fine:
 
-In this case the verification is done through own crypto API
-processing inside dm-crypt; integrity profile is only holder
-of these data. (And memory is owned by dm-crypt as well.)
-
-After the commit (and previous changes)
-  Commit 7c20f11680a441df09de7235206f70115fbf6290
-  Author: Christoph Hellwig <hch@lst.de>
-  Date:   Mon Jul 3 16:58:43 2017 -0600
-
-    bio-integrity: stop abusing bi_end_io
-
-we get this crash:
-
-: BUG: unable to handle kernel NULL pointer dereference at   (null)
-: IP:   (null)
-: *pde = 00000000
-...
-:
-: Workqueue: kintegrityd bio_integrity_verify_fn
-: task: f48ae180 task.stack: f4b5c000
-: EIP:   (null)
-: EFLAGS: 00210286 CPU: 0
-: EAX: f4b5debc EBX: 00001000 ECX: 00000001 EDX: 00000000
-: ESI: 00001000 EDI: ed25f000 EBP: f4b5dee8 ESP: f4b5dea4
-:  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-: CR0: 80050033 CR2: 00000000 CR3: 32823000 CR4: 001406d0
-: Call Trace:
-:  ? bio_integrity_process+0xe3/0x1e0
-:  bio_integrity_verify_fn+0xea/0x150
-:  process_one_work+0x1c7/0x5c0
-:  worker_thread+0x39/0x380
-:  kthread+0xd6/0x110
-:  ? process_one_work+0x5c0/0x5c0
-:  ? kthread_worker_fn+0x100/0x100
-:  ? kthread_worker_fn+0x100/0x100
-:  ret_from_fork+0x19/0x24
-: Code:  Bad EIP value.
-: EIP:   (null) SS:ESP: 0068:f4b5dea4
-: CR2: 0000000000000000
-
-Patch just skip the whole verify workqueue if verify_fn is set to NULL.
-
-Fixes: 7c20f116 ("bio-integrity: stop abusing bi_end_io")
-Signed-off-by: Milan Broz <gmazyland@gmail.com>
-[hch: trivial whitespace fix]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio-integrity.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 83e92beb3c9f..dcfb968c8259 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -387,7 +387,10 @@ static void bio_integrity_verify_fn(struct work_struct *work)
-  */
- bool __bio_integrity_endio(struct bio *bio)
- {
--	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
-+	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-+
-+	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status &&
-+	    bi->profile->verify_fn)
- 		struct bio_integrity_payload *bip = bio_integrity(bio);
- 
- 		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
--- 
-2.11.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
