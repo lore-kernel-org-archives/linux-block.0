@@ -1,37 +1,32 @@
-Return-Path: <prvs=401b34db8=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 0/5] skd fixes for kernel v4.14
-Date: Wed, 23 Aug 2017 10:56:28 -0700
-Message-Id: <20170823175633.12680-1-bart.vanassche@wdc.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Thu, 10 Aug 2017 05:11:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v3 21/49] blk-merge: compute bio->bi_seg_front_size
+ efficiently
+Message-ID: <20170810121139.GD14607@infradead.org>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+ <20170808084548.18963-22-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170808084548.18963-22-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+On Tue, Aug 08, 2017 at 04:45:20PM +0800, Ming Lei wrote:
+> It is enough to check and compute bio->bi_seg_front_size just
+> after the 1st segment is found, but current code checks that
+> for each bvec, which is inefficient.
+> 
+> This patch follows the way in  __blk_recalc_rq_segments()
+> for computing bio->bi_seg_front_size, and it is more efficient
+> and code becomes more readable too.
 
-Code review resulted in five more patches for the skd (sTec s1120) kernel
-driver. These patches have been tested on top of the for-next branch from this
-morning of your block layer git repository. That means that Dan Carpenter's
-patches were included in the kernel tree used for testing. Please consider
-these patches for kernel v4.14.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (5):
-  block: Warn if blk_queue_rq_timed_out() is called for a blk-mq queue
-  skd: Report completion mismatches once
-  skd: Inline skd_process_request()
-  skd: Avoid double completions in case of a timeout
-  skd: Change default interrupt mode to MSI-X
-
- block/blk-settings.c     |  1 +
- drivers/block/skd_main.c | 68 ++++++++++++++++++------------------------------
- 2 files changed, 27 insertions(+), 42 deletions(-)
-
--- 
-2.14.0
+As far as I can tell this doesn't depend on anything else in the
+series and could be sent standalone?
