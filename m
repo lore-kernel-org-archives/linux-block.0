@@ -1,79 +1,38 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 19/55] skd: Introduce SKD_SKCOMP_SIZE
-Date: Thu, 17 Aug 2017 13:13:02 -0700
-Message-Id: <20170817201338.16537-20-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qt0-f171.google.com ([209.85.216.171]:35406 "EHLO
+        mail-qt0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752968AbdHKPRp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Aug 2017 11:17:45 -0400
+Received: by mail-qt0-f171.google.com with SMTP id p3so22768113qtg.2
+        for <linux-block@vger.kernel.org>; Fri, 11 Aug 2017 08:17:45 -0700 (PDT)
+MIME-Version: 1.0
+From: Thanos Makatos <thanos.makatos@onapp.com>
+Date: Fri, 11 Aug 2017 16:17:24 +0100
+Message-ID: <CAM2wQBup_G1QsyUmJByZAN6WGpUJsUxV5Ria+4ETj9B7VQtZYA@mail.gmail.com>
+Subject: forcing merging of block requests on NVMe
+To: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality.
+In my environment I have large, sequential I/O requests (e.g. 4 MB)
+split into much smaller requests (e.g. 8 KB) and passed to a kernel
+module, which in turn submits them to an NVMe device. This splitting
+of requests seems to hurt performance badly. Because of architectural
+reasons I cannot avoid the splitting of the requests by the issuer so
+I have to find a way to reconstruct the original, large request.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
+The only way I can see to achieve this is to directly implement this
+functionality in that kernel module of mine, however before proceeding
+with the implementation I'd like to see some proof that merging the
+requests does solve the performance problem. The trouble is that I
+can't think of an easy way to do this as the NVMe device doesn't have
+a block queue interface, and I can't seem to find some virtual block
+layer that does it for me (e.g. dm-linear, mdadm linear, loopback).
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 98dc16073072..53090a10150f 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -103,6 +103,10 @@ MODULE_VERSION(DRV_VERSION "-" DRV_BUILD_ID);
- 
- #define SKD_N_INTERNAL_BYTES    (512u)
- 
-+#define SKD_SKCOMP_SIZE							\
-+	((sizeof(struct fit_completion_entry_v1) +			\
-+	  sizeof(struct fit_comp_error_info)) * SKD_N_COMPLETION_ENTRY)
-+
- /* 5 bits of uniqifier, 0xF800 */
- #define SKD_ID_INCR             (0x400)
- #define SKD_ID_TABLE_MASK       (3u << 8u)
-@@ -2834,13 +2838,7 @@ static void skd_release_special(struct skd_device *skdev,
- 
- static void skd_reset_skcomp(struct skd_device *skdev)
- {
--	u32 nbytes;
--	struct fit_completion_entry_v1 *skcomp;
--
--	nbytes = sizeof(*skcomp) * SKD_N_COMPLETION_ENTRY;
--	nbytes += sizeof(struct fit_comp_error_info) * SKD_N_COMPLETION_ENTRY;
--
--	memset(skdev->skcomp_table, 0, nbytes);
-+	memset(skdev->skcomp_table, 0, SKD_SKCOMP_SIZE);
- 
- 	skdev->skcomp_ix = 0;
- 	skdev->skcomp_cycle = 1;
-@@ -3851,16 +3849,12 @@ static int skd_cons_skcomp(struct skd_device *skdev)
- {
- 	int rc = 0;
- 	struct fit_completion_entry_v1 *skcomp;
--	u32 nbytes;
--
--	nbytes = sizeof(*skcomp) * SKD_N_COMPLETION_ENTRY;
--	nbytes += sizeof(struct fit_comp_error_info) * SKD_N_COMPLETION_ENTRY;
- 
- 	dev_dbg(&skdev->pdev->dev,
--		"comp pci_alloc, total bytes %d entries %d\n",
--		nbytes, SKD_N_COMPLETION_ENTRY);
-+		"comp pci_alloc, total bytes %zd entries %d\n",
-+		SKD_SKCOMP_SIZE, SKD_N_COMPLETION_ENTRY);
- 
--	skcomp = pci_zalloc_consistent(skdev->pdev, nbytes,
-+	skcomp = pci_zalloc_consistent(skdev->pdev, SKD_SKCOMP_SIZE,
- 				       &skdev->cq_dma_address);
- 
- 	if (skcomp == NULL) {
+Is there any way I can effectively merge these requests?
+
+
 -- 
-2.14.0
+Thanos Makatos
