@@ -1,46 +1,32 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:40598 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752915AbdHKOZx (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:52440 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751370AbdHKILh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Aug 2017 10:25:53 -0400
-Message-ID: <1502461550.2647.4.camel@HansenPartnership.com>
-Subject: Re: [PATCH V2 00/20] blk-mq-sched: improve SCSI-MQ performance
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
+        Fri, 11 Aug 2017 04:11:37 -0400
+Date: Fri, 11 Aug 2017 01:11:35 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
         Bart Van Assche <bart.vanassche@sandisk.com>,
         Laurence Oberman <loberman@redhat.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         linux-scsi@vger.kernel.org
-Date: Fri, 11 Aug 2017 07:25:50 -0700
-In-Reply-To: <20170811081135.GA4260@infradead.org>
+Subject: Re: [PATCH V2 00/20] blk-mq-sched: improve SCSI-MQ performance
+Message-ID: <20170811081135.GA4260@infradead.org>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
-         <20170811081135.GA4260@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, 2017-08-11 at 01:11 -0700, Christoph Hellwig wrote:
-> [+ Martin and linux-scsi]
-> 
-> Given that we need this big pile and a few bfq fixes to avoid
-> major regressesions I'm tempted to revert the default to scsi-mq
-> for 4.14, but bring it back a little later for 4.15.
-> 
-> What do you think?  Maybe for 4.15 we could also do it through the
-> block tree where all the fixes will be queued.
+[+ Martin and linux-scsi]
 
-Given the severe workload regressions Mel reported, I think that's
-wise.
+Given that we need this big pile and a few bfq fixes to avoid
+major regressesions I'm tempted to revert the default to scsi-mq
+for 4.14, but bring it back a little later for 4.15.
 
-I also think we wouldn't have found all these problems if it hadn't
-been the default, so the original patch was the best way of trying to
-find out if we were ready for the switch and forcing all the issues
-out.
-
-Thanks,
-
-James
+What do you think?  Maybe for 4.15 we could also do it through the
+block tree where all the fixes will be queued.
