@@ -1,62 +1,37 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: brking@linux.vnet.ibm.com
-Subject: [PATCH 0/4] block: more scalable inflight tracking
-Date: Thu,  3 Aug 2017 14:01:52 -0600
-Message-Id: <1501790516-6924-1-git-send-email-axboe@kernel.dk>
+Return-Path: <riteshh@codeaurora.org>
+Subject: Re: [RFC PATCH] cfq: Give a chance for arming slice idle timer in
+ case of group_idle
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stummala@codeaurora.org, ankijain@codeaurora.org
+References: <1502283512-4379-1-git-send-email-riteshh@codeaurora.org>
+ <016b90bd-8fde-7494-0a1c-3bf623b53714@codeaurora.org>
+ <25fef483-9f23-0d59-908d-868d34642ee4@kernel.dk>
+From: Ritesh Harjani <riteshh@codeaurora.org>
+Message-ID: <3fab2871-20f6-2b96-704e-05cc24af80ce@codeaurora.org>
+Date: Fri, 11 Aug 2017 21:03:56 +0530
+MIME-Version: 1.0
+In-Reply-To: <25fef483-9f23-0d59-908d-868d34642ee4@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-One scaling issue we currently have in the block code is the
-inflight accounting. It's based on a per-device atomic count
-for reads and writes, which means that even for an mq device
-with lots of hardware queues, we end up dirtying a per-device
-cacheline for each IO. The issue can easily be observed by
-using null_blk:
 
-modprobe null_blk submit_queues=48 queue_mode=2
 
-and running a fio job that has 32 jobs doing sync reads on
-the device (average of 3 runs, though deviation is low):
+On 8/11/2017 8:30 PM, Jens Axboe wrote:
+> On 08/10/2017 11:15 PM, Ritesh Harjani wrote:
+>> Hi Jens,
+>>
+>> Could you please take a look at below patch and the issue it is trying
+>> to solve. Please let us know your thoughts on the below problem and the
+>> patch.
+> 
+> It looks reasonable to me. I'll queue it up for 4.14.
+> 
 
-stats		IOPS		usr		sys
-------------------------------------------------------
-on		 2.6M		 5.4%		94.6%
-off		21.0M		33.7%		67.3%
-
-which shows a 10x slowdown with stats enabled. If we look at
-the profile for stats on, the top entries are:
-
-37.38%  fio      [kernel.vmlinux]    [k] blk_account_io_done
-14.65%  fio      [kernel.vmlinux]    [k] blk_account_io_start
-14.29%  fio      [kernel.vmlinux]    [k] part_round_stats_single
-11.81%  fio      [kernel.vmlinux]    [k] blk_account_io_completion
- 3.62%  fio      [kernel.vmlinux]    [k] part_round_stats
- 0.81%  fio      [kernel.vmlinux]    [k] __blkdev_direct_IO_simple
-
-which shows the system time being dominated by the stats accounting.
-
-This patch series replaces the atomic counter with using the tags
-hamming weight for tracking infligh counts. This means we don't have
-to do anything when IO starts or completes, and for reading the value
-we just have to check how many bits we have set in the tag maps on
-the queues. This part is limited to 1000 per second (for HZ=1000).
-Using this approach, running the same test again results in:
-
-stats		IOPS		usr		sys
-------------------------------------------------------
-on		20.4M		30.9%		69.0%
-off		21.4M		32.4%		67.4%
-
-and doing a profiled run with stats on, the top of stats reporting is
-now:
-
-1.23%  fio  [kernel.vmlinux]  [k] blk_account_io_done
-0.83%  fio  [kernel.vmlinux]  [k] blk_account_io_start
-0.55%  fio  [kernel.vmlinux]  [k] blk_account_io_completion
-
-which is a lot more reasonable. The difference between stats on and
-off is now also neglible.
+Thanks.
 
 -- 
-Jens Axboe
+Qualcomm India Private Limited, on behalf of Qualcomm Innovation Center, 
+Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, a 
+Linux Foundation Collaborative Project.
