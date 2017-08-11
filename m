@@ -1,137 +1,46 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 51/55] skd: Remove skd_device.in_flight
-Date: Thu, 17 Aug 2017 13:13:34 -0700
-Message-Id: <20170817201338.16537-52-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT V2 0/2] block, bfq: improve and
+ refactor throughput-boosting logic
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block <linux-block@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, broonie@kernel.org, lucmiccio@gmail.com
+References: <20170804053511.2389-1-paolo.valente@linaro.org>
+ <66099037-D7F7-4803-B9A6-8A4866EAE43A@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <edf973bd-a99c-868e-4889-eea489dd975e@kernel.dk>
+Date: Fri, 11 Aug 2017 08:58:30 -0600
+MIME-Version: 1.0
+In-Reply-To: <66099037-D7F7-4803-B9A6-8A4866EAE43A@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Since skd_device.in_flight is only used to display the number of
-in-flight requests in debug messages, remove that member and
-introduce skd_in_flight(). That last function relies on the block
-layer to determine the number of in flight requests.
+On 08/10/2017 01:55 PM, Paolo Valente wrote:
+> 
+>> Il giorno 04 ago 2017, alle ore 07:35, Paolo Valente <paolo.valente@linaro.org> ha scritto:
+>>
+>> Hi,
+>> these two patches improve throughput-boosting logic in two
+>> aspects. The first patch refactors the parts of the device-idling
+>> logic, related to throughput boosting, that are still scattered across
+>> the source file bfq-iosched.c. The patch concetrates all the logic in
+>> one function. The second patch fixes/improves device idling for
+>> flash-based devices that have no internal queueing of I/O requests.
+>>
+>> The contribution in the first patch has been triggered by that in the
+>> second patch: finding the change made by the second patch has been
+>> more difficult than it had to be, because the logic that decides
+>> whether to idle the device is scattered across three functions.
+>>
+>> The second patch provides a significant throghput boost, for random
+>> I/O with flash-based non-queueing devices. For example, on a HiKey
+>> board, throughput increases by up to 125%, growing, e.g., from 6.9MB/s
+>> to 15.6MB/s with two or three random readers in parallel.
+>>
+> 
+> Hi Jens,
+> any idea about the fate of these two patches?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 37 +++++++++++++++++++++----------------
- 1 file changed, 21 insertions(+), 16 deletions(-)
+Queued up for 4.14.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index a982de2014cc..a20434ca3e18 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -238,7 +238,6 @@ struct skd_device {
- 	enum skd_drvr_state state;
- 	u32 drive_state;
- 
--	atomic_t in_flight;
- 	u32 cur_max_queue_depth;
- 	u32 queue_low_water_mark;
- 	u32 dev_max_queue_depth;
-@@ -391,6 +390,22 @@ static void skd_log_skreq(struct skd_device *skdev,
-  * READ/WRITE REQUESTS
-  *****************************************************************************
-  */
-+static void skd_inc_in_flight(struct request *rq, void *data, bool reserved)
-+{
-+	int *count = data;
-+
-+	count++;
-+}
-+
-+static int skd_in_flight(struct skd_device *skdev)
-+{
-+	int count = 0;
-+
-+	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_inc_in_flight, &count);
-+
-+	return count;
-+}
-+
- static void
- skd_prep_rw_cdb(struct skd_scsi_request *scsi_req,
- 		int data_dir, unsigned lba,
-@@ -567,9 +582,8 @@ static void skd_process_request(struct request *req, bool last)
- 	skmsg->length += sizeof(struct skd_scsi_request);
- 	fmh->num_protocol_cmds_coalesced++;
- 
--	atomic_inc(&skdev->in_flight);
- 	dev_dbg(&skdev->pdev->dev, "req=0x%x busy=%d\n", skreq->id,
--		atomic_read(&skdev->in_flight));
-+		skd_in_flight(skdev));
- 
- 	/*
- 	 * If the FIT msg buffer is full send it.
-@@ -1218,7 +1232,7 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- 	u64 qcmd;
- 
- 	dev_dbg(&skdev->pdev->dev, "dma address 0x%llx, busy=%d\n",
--		skmsg->mb_dma_address, atomic_read(&skdev->in_flight));
-+		skmsg->mb_dma_address, skd_in_flight(skdev));
- 	dev_dbg(&skdev->pdev->dev, "msg_buf %p\n", skmsg->msg_buf);
- 
- 	qcmd = skmsg->mb_dma_address;
-@@ -1451,13 +1465,6 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
- static void skd_release_skreq(struct skd_device *skdev,
- 			      struct skd_request_context *skreq)
- {
--	/*
--	 * Decrease the number of active requests.
--	 * Also decrements the count in the timeout slot.
--	 */
--	SKD_ASSERT(atomic_read(&skdev->in_flight) > 0);
--	atomic_dec(&skdev->in_flight);
--
- 	/*
- 	 * Reclaim the skd_request_context
- 	 */
-@@ -1498,7 +1505,7 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
- 		dev_dbg(&skdev->pdev->dev,
- 			"cycle=%d ix=%d got cycle=%d cmdctxt=0x%x stat=%d busy=%d rbytes=0x%x proto=%d\n",
- 			skdev->skcomp_cycle, skdev->skcomp_ix, cmp_cycle,
--			cmp_cntxt, cmp_status, atomic_read(&skdev->in_flight),
-+			cmp_cntxt, cmp_status, skd_in_flight(skdev),
- 			cmp_bytes, skdev->proto_ver);
- 
- 		if (cmp_cycle != skdev->skcomp_cycle) {
-@@ -1590,7 +1597,7 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
- 	}
- 
- 	if (skdev->state == SKD_DRVR_STATE_PAUSING &&
--	    atomic_read(&skdev->in_flight) == 0) {
-+	    skd_in_flight(skdev) == 0) {
- 		skdev->state = SKD_DRVR_STATE_PAUSED;
- 		wake_up_interruptible(&skdev->waitq);
- 	}
-@@ -1929,8 +1936,6 @@ static void skd_recover_request(struct request *req, void *data, bool reserved)
- static void skd_recover_requests(struct skd_device *skdev)
- {
- 	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_recover_request, skdev);
--
--	atomic_set(&skdev->in_flight, 0);
- }
- 
- static void skd_isr_msg_from_dev(struct skd_device *skdev)
-@@ -3560,7 +3565,7 @@ static void skd_log_skdev(struct skd_device *skdev, const char *event)
- 		skd_drive_state_to_str(skdev->drive_state), skdev->drive_state,
- 		skd_skdev_state_to_str(skdev->state), skdev->state);
- 	dev_dbg(&skdev->pdev->dev, "  busy=%d limit=%d dev=%d lowat=%d\n",
--		atomic_read(&skdev->in_flight), skdev->cur_max_queue_depth,
-+		skd_in_flight(skdev), skdev->cur_max_queue_depth,
- 		skdev->dev_max_queue_depth, skdev->queue_low_water_mark);
- 	dev_dbg(&skdev->pdev->dev, "  cycle=%d cycle_ix=%d\n",
- 		skdev->skcomp_cycle, skdev->skcomp_ix);
 -- 
-2.14.0
+Jens Axboe
