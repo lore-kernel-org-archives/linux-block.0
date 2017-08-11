@@ -1,124 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48160 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG6C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:58:02 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 13/20] blk-mq: pass 'request_queue *' to several helpers of operating BUSY
-Date: Sat,  5 Aug 2017 14:56:58 +0800
-Message-Id: <20170805065705.12989-14-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [GIT PULL] nvme updates for 4.13-rc
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+References: <20170811080058.k4ws7xgrbgaaavj7@infradead.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <f0dd4e18-86ce-8232-a25f-9786029946d2@fb.com>
+Date: Fri, 11 Aug 2017 08:08:08 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170811080058.k4ws7xgrbgaaavj7@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-We need to support per-request_queue dispatch list for avoiding
-early dispatch in case of shared queue depth.
+On 08/11/2017 02:00 AM, Christoph Hellwig wrote:
+> A few more small fixes - the fc/lpfc update is the biggest by far.
+> 
+> The following changes since commit 7dd1ab163c17e11473a65b11f7e748db30618ebb:
+> 
+>   nvme: validate admin queue before unquiesce (2017-07-26 17:41:41 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.13
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c |  4 ++--
- block/blk-mq.c       |  2 +-
- block/blk-mq.h       | 19 +++++++++++--------
- 3 files changed, 14 insertions(+), 11 deletions(-)
+Pulled, thanks.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 53d6d5acd71c..b11f53d1e1f3 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -177,7 +177,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		 * effect.
- 		 */
- 		if (list_empty_careful(hctx->dispatch_list))
--			blk_mq_hctx_clear_dispatch_busy(hctx);
-+			blk_mq_hctx_clear_dispatch_busy(q, hctx);
- 	}
- 
- 	/*
-@@ -185,7 +185,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * will be run to try to make progress, so it is always
- 	 * safe to check the state here.
- 	 */
--	if (blk_mq_hctx_is_dispatch_busy(hctx))
-+	if (blk_mq_hctx_is_dispatch_busy(q, hctx))
- 		return;
- 
- 	if (!has_sched_dispatch) {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 86e4bb44f054..c6624154bb37 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1100,7 +1100,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 		rq = list_first_entry(list, struct request, queuelist);
- 		blk_mq_put_driver_tag(rq);
- 
--		blk_mq_add_list_to_dispatch(hctx, list);
-+		blk_mq_add_list_to_dispatch(q, hctx, list);
- 
- 		/*
- 		 * If SCHED_RESTART was set by the caller of this function and
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 474e1c2aa8c4..86a35c799ca6 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -136,17 +136,20 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- 	return hctx->nr_ctx && hctx->tags;
- }
- 
--static inline bool blk_mq_hctx_is_dispatch_busy(struct blk_mq_hw_ctx *hctx)
-+static inline bool blk_mq_hctx_is_dispatch_busy(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx)
- {
- 	return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
- }
- 
--static inline void blk_mq_hctx_set_dispatch_busy(struct blk_mq_hw_ctx *hctx)
-+static inline void blk_mq_hctx_set_dispatch_busy(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx)
- {
- 	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
- }
- 
--static inline void blk_mq_hctx_clear_dispatch_busy(struct blk_mq_hw_ctx *hctx)
-+static inline void blk_mq_hctx_clear_dispatch_busy(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx)
- {
- 	clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
- }
-@@ -161,16 +164,16 @@ static inline void blk_mq_add_rq_to_dispatch(struct blk_mq_hw_ctx *hctx,
- {
- 	spin_lock(hctx->dispatch_lock);
- 	list_add(&rq->queuelist, hctx->dispatch_list);
--	blk_mq_hctx_set_dispatch_busy(hctx);
-+	blk_mq_hctx_set_dispatch_busy(rq->q, hctx);
- 	spin_unlock(hctx->dispatch_lock);
- }
- 
--static inline void blk_mq_add_list_to_dispatch(struct blk_mq_hw_ctx *hctx,
--		struct list_head *list)
-+static inline void blk_mq_add_list_to_dispatch(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx, struct list_head *list)
- {
- 	spin_lock(hctx->dispatch_lock);
- 	list_splice_init(list, hctx->dispatch_list);
--	blk_mq_hctx_set_dispatch_busy(hctx);
-+	blk_mq_hctx_set_dispatch_busy(q, hctx);
- 	spin_unlock(hctx->dispatch_lock);
- }
- 
-@@ -179,7 +182,7 @@ static inline void blk_mq_add_list_to_dispatch_tail(struct blk_mq_hw_ctx *hctx,
- {
- 	spin_lock(hctx->dispatch_lock);
- 	list_splice_tail_init(list, hctx->dispatch_list);
--	blk_mq_hctx_set_dispatch_busy(hctx);
-+	blk_mq_hctx_set_dispatch_busy(hctx->queue, hctx);
- 	spin_unlock(hctx->dispatch_lock);
- }
- 
 -- 
-2.9.4
+Jens Axboe
