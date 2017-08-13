@@ -1,38 +1,69 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33097 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750936AbdHNGXf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2017 02:23:35 -0400
-Subject: Re: [PATCH] Revert "scsi: default to scsi-mq"
-To: Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
+Received: from bombadil.infradead.org ([65.50.211.133]:49933 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751025AbdHMRo0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 13 Aug 2017 13:44:26 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: martin.petersen@oracle.com
 Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20170813174422.16197-1-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <a86e5829-8292-9aa1-c354-54b27c0abb17@suse.de>
-Date: Mon, 14 Aug 2017 08:23:33 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170813174422.16197-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+Subject: [PATCH] Revert "scsi: default to scsi-mq"
+Date: Sun, 13 Aug 2017 19:44:22 +0200
+Message-Id: <20170813174422.16197-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 08/13/2017 07:44 PM, Christoph Hellwig wrote:
-> Defaulting to scsi-mq in 4.13-rc has shown various regressions
-> on setups that we didn't previously consider.  Fixes for them are
-> in progress, but too invasive to make it in this cycle.  So for
-> now revert the commit that defaults to blk-mq for SCSI.  For 4.14
-> we'll plan to try again with these fixes.
-> 
-> This reverts commit 5c279bd9e40624f4ab6e688671026d6005b066fa.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>Reviewed-by: Hannes Reinecke <hare@suse.com>
+Defaulting to scsi-mq in 4.13-rc has shown various regressions
+on setups that we didn't previously consider.  Fixes for them are
+in progress, but too invasive to make it in this cycle.  So for
+now revert the commit that defaults to blk-mq for SCSI.  For 4.14
+we'll plan to try again with these fixes.
 
-Cheers,
+This reverts commit 5c279bd9e40624f4ab6e688671026d6005b066fa.
 
-Hannes
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/Kconfig | 11 +++++++++++
+ drivers/scsi/scsi.c  |  4 ++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
+index f4538d7a3016..d145e0d90227 100644
+--- a/drivers/scsi/Kconfig
++++ b/drivers/scsi/Kconfig
+@@ -47,6 +47,17 @@ config SCSI_NETLINK
+ 	default	n
+ 	depends on NET
+ 
++config SCSI_MQ_DEFAULT
++	bool "SCSI: use blk-mq I/O path by default"
++	depends on SCSI
++	---help---
++	  This option enables the new blk-mq based I/O path for SCSI
++	  devices by default.  With the option the scsi_mod.use_blk_mq
++	  module/boot option defaults to Y, without it to N, but it can
++	  still be overridden either way.
++
++	  If unsure say N.
++
+ config SCSI_PROC_FS
+ 	bool "legacy /proc/scsi/ support"
+ 	depends on SCSI && PROC_FS
+diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+index 3d38c6d463b8..1bf274e3b2b6 100644
+--- a/drivers/scsi/scsi.c
++++ b/drivers/scsi/scsi.c
+@@ -800,7 +800,11 @@ MODULE_LICENSE("GPL");
+ module_param(scsi_logging_level, int, S_IRUGO|S_IWUSR);
+ MODULE_PARM_DESC(scsi_logging_level, "a bit mask of logging levels");
+ 
++#ifdef CONFIG_SCSI_MQ_DEFAULT
+ bool scsi_use_blk_mq = true;
++#else
++bool scsi_use_blk_mq = false;
++#endif
+ module_param_named(use_blk_mq, scsi_use_blk_mq, bool, S_IWUSR | S_IRUGO);
+ 
+ static int __init init_scsi(void)
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.11.0
