@@ -1,54 +1,345 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 29/49] fs/buffer.c: use bvec iterator to truncate the bio
-Date: Tue,  8 Aug 2017 16:45:28 +0800
-Message-Id: <20170808084548.18963-30-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56964 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752573AbdHNWFE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Aug 2017 18:05:04 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
+Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
+        Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 2/9] nullb: add configfs interface
+Date: Mon, 14 Aug 2017 15:04:53 -0700
+Message-Id: <156192ac0cf3a91e1fb112514a8682ecf5fb3f11.1502746933.git.shli@fb.com>
+In-Reply-To: <cover.1502746933.git.shli@fb.com>
+References: <cover.1502746933.git.shli@fb.com>
+In-Reply-To: <cover.1502746933.git.shli@fb.com>
+References: <cover.1502746933.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Once multipage bvec is enabled, the last bvec may include
-more than one page, this patch use bvec_get_last_page()
-to truncate the bio.
+From: Shaohua Li <shli@fb.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Add configfs interface for nullb. configfs interface is more flexible
+and easy to configure in a per-disk basis.
+
+Configuration is something like this:
+mount -t configfs none /mnt
+
+Checking which features the driver supports:
+cat /mnt/nullb/features
+
+The 'features' attribute is for future extension. We probably will add
+new features into the driver, userspace can check this attribute to find
+the supported features.
+
+Create/remove a device:
+mkdir/rmdir /mnt/nullb/a
+
+Then configure the device by setting attributes under /mnt/nullb/a, most
+of nullb supported module parameters are converted to attributes:
+size; /* device size in MB */
+completion_nsec; /* time in ns to complete a request */
+submit_queues; /* number of submission queues */
+home_node; /* home node for the device */
+queue_mode; /* block interface */
+blocksize; /* block size */
+irqmode; /* IRQ completion handler */
+hw_queue_depth; /* queue depth */
+use_lightnvm; /* register as a LightNVM device */
+blocking; /* blocking blk-mq device */
+use_per_node_hctx; /* use per-node allocation for hardware context */
+
+Note, creating a device doesn't create a disk immediately. Creating a
+disk is done in two phases: create a device and then power on the
+device. Next patch will introduce device power on.
+
+Based on original patch from Kyungchan Koh
+
+Signed-off-by: Kyungchan Koh <kkc6196@fb.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- fs/buffer.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/block/Kconfig    |   1 +
+ drivers/block/null_blk.c | 210 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 210 insertions(+), 1 deletion(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index c821ed6a6f0e..32a63e5b00f3 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -3057,8 +3057,7 @@ void guard_bio_eod(int op, struct bio *bio)
- 	unsigned truncated_bytes;
- 	/*
- 	 * It is safe to truncate the last bvec in the following way
--	 * even though multipage bvec is supported, but we need to
--	 * fix the parameters passed to zero_user().
-+	 * even though multipage bvec is supported.
- 	 */
- 	struct bio_vec *bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 8ddc982..5dd62a8 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -17,6 +17,7 @@ if BLK_DEV
  
-@@ -3087,7 +3086,10 @@ void guard_bio_eod(int op, struct bio *bio)
+ config BLK_DEV_NULL_BLK
+ 	tristate "Null test block driver"
++	depends on CONFIGFS_FS
  
- 	/* ..and clear the end of the buffer for reads */
- 	if (op == REQ_OP_READ) {
--		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
-+		struct bio_vec bv;
+ config BLK_DEV_FD
+ 	tristate "Normal floppy disk support"
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 73938cd..c782492 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -1,3 +1,7 @@
++/*
++ * Add configfs and memory store: Kyungchan Koh <kkc6196@fb.com> and
++ * Shaohua Li <shli@fb.com>
++ */
+ #include <linux/module.h>
+ 
+ #include <linux/moduleparam.h>
+@@ -9,6 +13,7 @@
+ #include <linux/blk-mq.h>
+ #include <linux/hrtimer.h>
+ #include <linux/lightnvm.h>
++#include <linux/configfs.h>
+ 
+ struct nullb_cmd {
+ 	struct list_head list;
+@@ -30,8 +35,21 @@ struct nullb_queue {
+ 	struct nullb_cmd *cmds;
+ };
+ 
++/*
++ * Status flags for nullb_device.
++ *
++ * CONFIGURED:	Device has been configured and turned on. Cannot reconfigure.
++ * UP:		Device is currently on and visible in userspace.
++ */
++enum nullb_device_flags {
++	NULLB_DEV_FL_CONFIGURED	= 0,
++	NULLB_DEV_FL_UP		= 1,
++};
 +
-+		bvec_get_last_page(bvec, &bv);
-+		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
- 				truncated_bytes);
+ struct nullb_device {
+ 	struct nullb *nullb;
++	struct config_item item;
++	unsigned long flags; /* device flags */
+ 
+ 	unsigned long size; /* device size in MB */
+ 	unsigned long completion_nsec; /* time in ns to complete a request */
+@@ -173,6 +191,185 @@ static bool g_use_per_node_hctx;
+ module_param_named(use_per_node_hctx, g_use_per_node_hctx, bool, S_IRUGO);
+ MODULE_PARM_DESC(use_per_node_hctx, "Use per-node allocation for hardware context queues. Default: false");
+ 
++static struct nullb_device *null_alloc_dev(void);
++static void null_free_dev(struct nullb_device *dev);
++
++static inline struct nullb_device *to_nullb_device(struct config_item *item)
++{
++	return item ? container_of(item, struct nullb_device, item) : NULL;
++}
++
++static inline ssize_t nullb_device_uint_attr_show(unsigned int val, char *page)
++{
++	return snprintf(page, PAGE_SIZE, "%u\n", val);
++}
++
++static inline ssize_t nullb_device_ulong_attr_show(unsigned long val,
++	char *page)
++{
++	return snprintf(page, PAGE_SIZE, "%lu\n", val);
++}
++
++static inline ssize_t nullb_device_bool_attr_show(bool val, char *page)
++{
++	return snprintf(page, PAGE_SIZE, "%u\n", val);
++}
++
++static ssize_t nullb_device_uint_attr_store(unsigned int *val,
++	const char *page, size_t count)
++{
++	unsigned int tmp;
++	int result;
++
++	result = kstrtouint(page, 0, &tmp);
++	if (result)
++		return result;
++
++	*val = tmp;
++	return count;
++}
++
++static ssize_t nullb_device_ulong_attr_store(unsigned long *val,
++	const char *page, size_t count)
++{
++	int result;
++	unsigned long tmp;
++
++	result = kstrtoul(page, 0, &tmp);
++	if (result)
++		return result;
++
++	*val = tmp;
++	return count;
++}
++
++static ssize_t nullb_device_bool_attr_store(bool *val, const char *page,
++	size_t count)
++{
++	bool tmp;
++	int result;
++
++	result = kstrtobool(page,  &tmp);
++	if (result)
++		return result;
++
++	*val = tmp;
++	return count;
++}
++
++/* The following macro should only be used with TYPE = {uint, ulong, bool}. */
++#define NULLB_DEVICE_ATTR(NAME, TYPE)						\
++static ssize_t									\
++nullb_device_##NAME##_show(struct config_item *item, char *page)		\
++{										\
++	return nullb_device_##TYPE##_attr_show(					\
++				to_nullb_device(item)->NAME, page);		\
++}										\
++static ssize_t									\
++nullb_device_##NAME##_store(struct config_item *item, const char *page,		\
++			    size_t count)					\
++{										\
++	if (test_bit(NULLB_DEV_FL_CONFIGURED, &to_nullb_device(item)->flags))	\
++		return -EBUSY;							\
++	return nullb_device_##TYPE##_attr_store(				\
++			&to_nullb_device(item)->NAME, page, count);		\
++}										\
++CONFIGFS_ATTR(nullb_device_, NAME);
++
++NULLB_DEVICE_ATTR(size, ulong);
++NULLB_DEVICE_ATTR(completion_nsec, ulong);
++NULLB_DEVICE_ATTR(submit_queues, uint);
++NULLB_DEVICE_ATTR(home_node, uint);
++NULLB_DEVICE_ATTR(queue_mode, uint);
++NULLB_DEVICE_ATTR(blocksize, uint);
++NULLB_DEVICE_ATTR(irqmode, uint);
++NULLB_DEVICE_ATTR(hw_queue_depth, uint);
++NULLB_DEVICE_ATTR(use_lightnvm, bool);
++NULLB_DEVICE_ATTR(blocking, bool);
++NULLB_DEVICE_ATTR(use_per_node_hctx, bool);
++
++static struct configfs_attribute *nullb_device_attrs[] = {
++	&nullb_device_attr_size,
++	&nullb_device_attr_completion_nsec,
++	&nullb_device_attr_submit_queues,
++	&nullb_device_attr_home_node,
++	&nullb_device_attr_queue_mode,
++	&nullb_device_attr_blocksize,
++	&nullb_device_attr_irqmode,
++	&nullb_device_attr_hw_queue_depth,
++	&nullb_device_attr_use_lightnvm,
++	&nullb_device_attr_blocking,
++	&nullb_device_attr_use_per_node_hctx,
++	NULL,
++};
++
++static void nullb_device_release(struct config_item *item)
++{
++	null_free_dev(to_nullb_device(item));
++}
++
++static struct configfs_item_operations nullb_device_ops = {
++	.release	= nullb_device_release,
++};
++
++static struct config_item_type nullb_device_type = {
++	.ct_item_ops	= &nullb_device_ops,
++	.ct_attrs	= nullb_device_attrs,
++	.ct_owner	= THIS_MODULE,
++};
++
++static struct
++config_item *nullb_group_make_item(struct config_group *group, const char *name)
++{
++	struct nullb_device *dev;
++
++	dev = null_alloc_dev();
++	if (!dev)
++		return ERR_PTR(-ENOMEM);
++
++	config_item_init_type_name(&dev->item, name, &nullb_device_type);
++
++	return &dev->item;
++}
++
++static void
++nullb_group_drop_item(struct config_group *group, struct config_item *item)
++{
++	config_item_put(item);
++}
++
++static ssize_t memb_group_features_show(struct config_item *item, char *page)
++{
++	return snprintf(page, PAGE_SIZE, "\n");
++}
++
++CONFIGFS_ATTR_RO(memb_group_, features);
++
++static struct configfs_attribute *nullb_group_attrs[] = {
++	&memb_group_attr_features,
++	NULL,
++};
++
++static struct configfs_group_operations nullb_group_ops = {
++	.make_item	= nullb_group_make_item,
++	.drop_item	= nullb_group_drop_item,
++};
++
++static struct config_item_type nullb_group_type = {
++	.ct_group_ops	= &nullb_group_ops,
++	.ct_attrs	= nullb_group_attrs,
++	.ct_owner	= THIS_MODULE,
++};
++
++static struct configfs_subsystem nullb_subsys = {
++	.su_group = {
++		.cg_item = {
++			.ci_namebuf = "nullb",
++			.ci_type = &nullb_group_type,
++		},
++	},
++};
++
+ static struct nullb_device *null_alloc_dev(void)
+ {
+ 	struct nullb_device *dev;
+@@ -919,12 +1116,19 @@ static int __init null_init(void)
+ 			return ret;
  	}
- }
+ 
++	config_group_init(&nullb_subsys.su_group);
++	mutex_init(&nullb_subsys.su_mutex);
++
++	ret = configfs_register_subsystem(&nullb_subsys);
++	if (ret)
++		goto err_tagset;
++
+ 	mutex_init(&lock);
+ 
+ 	null_major = register_blkdev(0, "nullb");
+ 	if (null_major < 0) {
+ 		ret = null_major;
+-		goto err_tagset;
++		goto err_conf;
+ 	}
+ 
+ 	if (g_use_lightnvm) {
+@@ -961,6 +1165,8 @@ static int __init null_init(void)
+ 	kmem_cache_destroy(ppa_cache);
+ err_ppa:
+ 	unregister_blkdev(null_major, "nullb");
++err_conf:
++	configfs_unregister_subsystem(&nullb_subsys);
+ err_tagset:
+ 	if (g_queue_mode == NULL_Q_MQ && shared_tags)
+ 		blk_mq_free_tag_set(&tag_set);
+@@ -971,6 +1177,8 @@ static void __exit null_exit(void)
+ {
+ 	struct nullb *nullb;
+ 
++	configfs_unregister_subsystem(&nullb_subsys);
++
+ 	unregister_blkdev(null_major, "nullb");
+ 
+ 	mutex_lock(&lock);
 -- 
-2.9.4
+2.9.5
