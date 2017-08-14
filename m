@@ -1,86 +1,30 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:51221 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752787AbdHNPVx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Aug 2017 11:21:53 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH] Revert "scsi: default to scsi-mq"
-To: Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Date: Mon, 14 Aug 2017 15:21:06 +0000
+Message-ID: <1502724064.2333.5.camel@wdc.com>
 References: <20170813174422.16197-1-hch@lst.de>
-From: Dave Kleikamp <dave.kleikamp@oracle.com>
-Message-ID: <d89724d1-b358-7aa4-ba1d-65a7972a4518@oracle.com>
-Date: Mon, 14 Aug 2017 10:50:47 -0500
-MIME-Version: 1.0
 In-Reply-To: <20170813174422.16197-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 08/13/2017 12:44 PM, Christoph Hellwig wrote:
-> Defaulting to scsi-mq in 4.13-rc has shown various regressions
-> on setups that we didn't previously consider.  Fixes for them are
-> in progress, but too invasive to make it in this cycle.  So for
-> now revert the commit that defaults to blk-mq for SCSI.  For 4.14
-> we'll plan to try again with these fixes.
-
-I'm not sure if this is one of your known regressions, but I've had a
-problem on my Lenovo T410 with the 4.13-rc kernels. When unplugging the
-power cord, the hard disk gets suspended.
-
-[ 1499.629415] thinkpad_acpi: EC reports that Thermal Table has changed
-[ 1499.832116] sd 0:0:0:0: [sda] Synchronizing SCSI cache
-[ 1499.885831] e1000e: eth0 NIC Link is Down
-[ 1499.897531] sd 0:0:0:0: [sda] Stopping disk
-[ 1499.923736] EXT4-fs (sda5): re-mounted. Opts: data=ordered,commit=600
-[ 1504.240444] thinkpad_acpi: EC reports that Thermal Table has changed
-[ 1515.502561] sd 0:0:0:0: timing out command, waited 15s
-
-Adding "scsi_mod.use_blk_mq=0" to the command line fixes it.
-
-Thanks,
-Shaggy
-
-> 
-> This reverts commit 5c279bd9e40624f4ab6e688671026d6005b066fa.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/scsi/Kconfig | 11 +++++++++++
->  drivers/scsi/scsi.c  |  4 ++++
->  2 files changed, 15 insertions(+)
-> 
-> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> index f4538d7a3016..d145e0d90227 100644
-> --- a/drivers/scsi/Kconfig
-> +++ b/drivers/scsi/Kconfig
-> @@ -47,6 +47,17 @@ config SCSI_NETLINK
->  	default	n
->  	depends on NET
->  
-> +config SCSI_MQ_DEFAULT
-> +	bool "SCSI: use blk-mq I/O path by default"
-> +	depends on SCSI
-> +	---help---
-> +	  This option enables the new blk-mq based I/O path for SCSI
-> +	  devices by default.  With the option the scsi_mod.use_blk_mq
-> +	  module/boot option defaults to Y, without it to N, but it can
-> +	  still be overridden either way.
-> +
-> +	  If unsure say N.
-> +
->  config SCSI_PROC_FS
->  	bool "legacy /proc/scsi/ support"
->  	depends on SCSI && PROC_FS
-> diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-> index 3d38c6d463b8..1bf274e3b2b6 100644
-> --- a/drivers/scsi/scsi.c
-> +++ b/drivers/scsi/scsi.c
-> @@ -800,7 +800,11 @@ MODULE_LICENSE("GPL");
->  module_param(scsi_logging_level, int, S_IRUGO|S_IWUSR);
->  MODULE_PARM_DESC(scsi_logging_level, "a bit mask of logging levels");
->  
-> +#ifdef CONFIG_SCSI_MQ_DEFAULT
->  bool scsi_use_blk_mq = true;
-> +#else
-> +bool scsi_use_blk_mq = false;
-> +#endif
->  module_param_named(use_blk_mq, scsi_use_blk_mq, bool, S_IWUSR | S_IRUGO);
->  
->  static int __init init_scsi(void)
-> 
+T24gU3VuLCAyMDE3LTA4LTEzIGF0IDE5OjQ0ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gRGVmYXVsdGluZyB0byBzY3NpLW1xIGluIDQuMTMtcmMgaGFzIHNob3duIHZhcmlvdXMg
+cmVncmVzc2lvbnMNCj4gb24gc2V0dXBzIHRoYXQgd2UgZGlkbid0IHByZXZpb3VzbHkgY29uc2lk
+ZXIuICBGaXhlcyBmb3IgdGhlbSBhcmUNCj4gaW4gcHJvZ3Jlc3MsIGJ1dCB0b28gaW52YXNpdmUg
+dG8gbWFrZSBpdCBpbiB0aGlzIGN5Y2xlLiAgU28gZm9yDQo+IG5vdyByZXZlcnQgdGhlIGNvbW1p
+dCB0aGF0IGRlZmF1bHRzIHRvIGJsay1tcSBmb3IgU0NTSS4gIEZvciA0LjE0DQo+IHdlJ2xsIHBs
+YW4gdG8gdHJ5IGFnYWluIHdpdGggdGhlc2UgZml4ZXMuDQoNClNob3VsZCBhIHBhdGNoIGZvciB2
+NC4xNCBwZXJoYXBzIGJlIHF1ZXVlZCBub3c/IEFueXdheToNCg0KUmV2aWV3ZWQtYnk6IEJhcnQg
+VmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAd2RjLmNvbT4NCg0K
