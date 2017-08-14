@@ -1,67 +1,67 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 16 Aug 2017 12:53:18 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Benjamin Block <bblock@linux.vnet.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Steffen Maier <maier@linux.vnet.ibm.com>,
-	open-iscsi@googlegroups.com
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 14 Aug 2017 18:33:38 +0200
+From: Benjamin Block <bblock@linux.vnet.ibm.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Steffen Maier <maier@linux.vnet.ibm.com>,
+        open-iscsi@googlegroups.com
 Subject: Re: [RFC PATCH 1/6] bsg: fix kernel panic resulting from missing
-	allocation of a reply-buffer
-Message-ID: <20170816105318.GA30759@lst.de>
-References: <20170810093217.GL24539@lst.de> <20170810221038.GA918@bblock-ThinkPad-W530> <20170811083808.GA5497@lst.de> <20170811091415.GA8099@lst.de> <20170811134929.GA1249@bblock-ThinkPad-W530> <20170811143649.GA32381@lst.de> <20170811153203.GA31625@bblock-ThinkPad-W530> <20170811153553.GA6372@lst.de> <20170811160142.GB31625@bblock-ThinkPad-W530> <20170814163217.GA18228@bblock-ThinkPad-W530>
+ allocation of a reply-buffer
+References: <20170810093217.GL24539@lst.de>
+ <20170810221038.GA918@bblock-ThinkPad-W530>
+ <20170811083808.GA5497@lst.de>
+ <20170811091415.GA8099@lst.de>
+ <20170811134929.GA1249@bblock-ThinkPad-W530>
+ <20170811143649.GA32381@lst.de>
+ <20170811153203.GA31625@bblock-ThinkPad-W530>
+ <20170811153553.GA6372@lst.de>
+ <20170811160142.GB31625@bblock-ThinkPad-W530>
+ <20170813143940.GA3772@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170814163217.GA18228@bblock-ThinkPad-W530>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170813143940.GA3772@lst.de>
+Message-Id: <20170814163338.GB18228@bblock-ThinkPad-W530>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 14, 2017 at 06:32:17PM +0200, Benjamin Block wrote:
-> > -	blk_end_request_all(rq, BLK_STS_OK);
-> > -
-> >  	put_device(job->dev);	/* release reference for the request */
-> >
-> >  	kfree(job->request_payload.sg_list);
-> >  	kfree(job->reply_payload.sg_list);
-> > -	kfree(job);
-> > +	blk_end_request_all(rq, BLK_STS_OK);
+On Sun, Aug 13, 2017 at 04:39:40PM +0200, Christoph Hellwig wrote:
+> On Fri, Aug 11, 2017 at 06:01:42PM +0200, Benjamin Block wrote:
+> > When the BSG interface is used with bsg-lib, and the user sends a
+> > Bidirectional command - so when he gives an input- and output-buffer
+> > (most users of our interface will likely do that, if they wanna get the
+> > transport-level response data) - bsg will allocate two requests from the
+> > queue. The first request's bio is used to map the input and the second
+> > request's bio for the output (see bsg_map_hdr() in the if-statement with
+> > (op == REQ_OP_SCSI_OUT && hdr->din_xfer_len)).
+> > 
+> > When we now allocate the full space of bsg_job, sense, dd_data for each
+> > request, these will be wasted on the (linked) second request. They will
+> > go unused all the time, as only the first request's bsg_job, sense and
+> > dd_data is used by the LLDs and BSG itself.
+> > 
+> > Right now, because we don't allocate this on each request, those spaces
+> > are only allocated for the first request in bsg-lib.
+> > 
+> > Maybe we can ignore this, if it gets to complicated, I don't wanne
+> > prolong this unnecessary.
 > 
-> What is the reason for moving that last line? Just wondering whether
-> that might change the behavior somehow, although it doesn't look like it
-> from the code.
+> We have the same 'issue' with bidirection scsi commands - it's a side
+> effect of having two request structures for these commands, and the
+> only real fix would be to have a single request structure, which would
+> be nice especially if we can't do it without growing struct request.
+> 
 
-The job is now allocated as part of the request, so we must fre
-it last.  The only change in behavior is that the reference gets dropped
-a bit earlier, but once ownership is handed to the block layer
-it's not needed, as are the memory allocations for the S/G lists.
+Alright, I was not aware of that. That is fair then. Thx.
 
-> > +{
-> > +	struct bsg_job *job = blk_mq_rq_to_pdu(req);
-> > +
-> > +	memset(job, 0, sizeof(*job));
-> > +	job->req = req;
-> > +	job->request = job->sreq.cmd;
-> 
-> That doesn't work with bsg.c if the request submitted by the user is
-> bigger than BLK_MAX_CDB. There is code in blk_fill_sgv4_hdr_rq() that
-> will reassign the req->cmd point in that case to something else.
-> 
-> This is maybe wrong in the same vein as my Patch 1 is. If not for the
-> legacy code in bsg.c, setting this here, will miss changes to that
-> pointer between request-allocation and job-submission.
-> 
-> So maybe just move this to bsg_create_job().
 
-Yes, this should be in  indeed.
-
-> 
-> > +	job->dd_data = job + 1;
-> > +	job->reply = job->sreq.sense = kzalloc(job->reply_len, gfp);
-> 
-> job->reply_len will be 0 here, won't it? You probably have to pull the
-> "job->reply_len = SCSI_SENSE_BUFFERSIZE" here from bsg_create_job().
-
-True.
+                                                    Beste Gr��e / Best regards,
+                                                      - Benjamin Block
+-- 
+Linux on z Systems Development         /         IBM Systems & Technology Group
+		  IBM Deutschland Research & Development GmbH 
+Vorsitz. AufsR.: Martina Koederitz     /        Gesch�ftsf�hrung: Dirk Wittkopp
+Sitz der Gesellschaft: B�blingen / Registergericht: AmtsG Stuttgart, HRB 243294
