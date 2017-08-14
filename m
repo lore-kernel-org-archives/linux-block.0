@@ -1,75 +1,62 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.13-rc5
-Message-ID: <a5c92e41-d981-b7d1-a70b-c0aa939b9538@kernel.dk>
-Date: Fri, 11 Aug 2017 12:44:23 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56980 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752561AbdHNWFF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Aug 2017 18:05:05 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
+Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
+        Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 4/9] nullb: use ida to manage index
+Date: Mon, 14 Aug 2017 15:04:55 -0700
+Message-Id: <0f5862935338b4dca65f606a7dadb8480017815c.1502746933.git.shli@fb.com>
+In-Reply-To: <cover.1502746933.git.shli@fb.com>
+References: <cover.1502746933.git.shli@fb.com>
+In-Reply-To: <cover.1502746933.git.shli@fb.com>
+References: <cover.1502746933.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+From: Shaohua Li <shli@fb.com>
 
-A set of fixes that should go into this series. This pull request
-contains:
+We now dynamically create disks. Managing the disk index with ida to
+avoid bump up the index too much.
 
-- Fix from Bart for blk-mq requeue queue running, preventing a continued
-  loop of run/restart.
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ drivers/block/null_blk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-- Fix for a bio/blk-integrity issue, in two parts. One from Christoph,
-  fixing where verification happens, and one from Milan, for a NULL
-  profile.
-
-- NVMe pull request, most of the changes being for nvme-fc, but also a
-  few trivial core/pci fixes.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Bart Van Assche (1):
-      block: Make blk_mq_delay_kick_requeue_list() rerun the queue at a quiet time
-
-Christoph Hellwig (1):
-      bio-integrity: only verify integrity on the lowest stacked driver
-
-James Smart (2):
-      nvmet_fc: add defer_req callback for deferment of cmd buffer return
-      lpfc: support nvmet_fc defer_rcv callback
-
-Jens Axboe (1):
-      Merge branch 'nvme-4.13' of git://git.infradead.org/nvme into for-linus
-
-Keith Busch (1):
-      nvme: fix nvme reset command timeout handling
-
-Kwan (Hingkwan) Huen-SSI (1):
-      nvme: fix directive command numd calculation
-
-Martin Wilck (1):
-      nvme: strip trailing 0-bytes in wwid_show
-
-Max Gurtovoy (1):
-      nvme-pci: fix CMB sysfs file removal in reset path
-
-Milan Broz (1):
-      bio-integrity: Fix regression if profile verify_fn is NULL
-
- block/bio-integrity.c            |   6 +-
- block/blk-mq.c                   |   4 +-
- drivers/nvme/host/core.c         |  35 +++++--
- drivers/nvme/host/pci.c          |  18 ++--
- drivers/nvme/target/fc.c         | 212 +++++++++++++++++++++++++++++++++------
- drivers/scsi/lpfc/lpfc_attr.c    |   4 +-
- drivers/scsi/lpfc/lpfc_debugfs.c |   5 +-
- drivers/scsi/lpfc/lpfc_nvmet.c   |  30 ++++++
- drivers/scsi/lpfc/lpfc_nvmet.h   |   1 +
- include/linux/nvme-fc-driver.h   |   7 ++
- 10 files changed, 267 insertions(+), 55 deletions(-)
-
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index cf14c46..2f66627 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -87,7 +87,7 @@ struct nullb {
+ static LIST_HEAD(nullb_list);
+ static struct mutex lock;
+ static int null_major;
+-static int nullb_indexes;
++static DEFINE_IDA(nullb_indexes);
+ static struct kmem_cache *ppa_cache;
+ static struct blk_mq_tag_set tag_set;
+ 
+@@ -871,6 +871,8 @@ static void null_del_dev(struct nullb *nullb)
+ {
+ 	struct nullb_device *dev = nullb->dev;
+ 
++	ida_simple_remove(&nullb_indexes, nullb->index);
++
+ 	list_del_init(&nullb->list);
+ 
+ 	if (dev->use_lightnvm)
+@@ -1118,7 +1120,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, nullb->q);
+ 
+ 	mutex_lock(&lock);
+-	nullb->index = nullb_indexes++;
++	nullb->index = ida_simple_get(&nullb_indexes, 0, 0, GFP_KERNEL);
+ 	dev->index = nullb->index;
+ 	mutex_unlock(&lock);
+ 
 -- 
-Jens Axboe
+2.9.5
