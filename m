@@ -1,30 +1,145 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:39292 "EHLO newverein.lst.de"
+Received: from mail.kernel.org ([198.145.29.99]:56964 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751517AbdHPJRf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2017 05:17:35 -0400
-Date: Wed, 16 Aug 2017 11:17:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Omar Sandoval <osandov@fb.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Dmitry Monakhov <dmonakhov@openvz.org>
-Cc: linux-block@vger.kernel.org
-Subject: migrate the block tests from Dimity to blktests?
-Message-ID: <20170816091733.GA22832@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        id S1752581AbdHNWFG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Aug 2017 18:05:06 -0400
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
+Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
+        Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 6/9] nullb: support discard
+Date: Mon, 14 Aug 2017 15:04:57 -0700
+Message-Id: <d49a25c655fa7b2df85ea0b605f30b38f13e5dac.1502746933.git.shli@fb.com>
+In-Reply-To: <cover.1502746933.git.shli@fb.com>
+References: <cover.1502746933.git.shli@fb.com>
+In-Reply-To: <cover.1502746933.git.shli@fb.com>
+References: <cover.1502746933.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi all,
+From: Shaohua Li <shli@fb.com>
 
-Dmitry Monakhov wrote a few very useful block layers tests a while
-ago and wired them up for xfstests at that point:
+discard makes sense for memory backed disk. And also it's useful to test
+if upper layer supports dicard correctly.
 
-	https://github.com/dmonakhov/xfstests/commits/dif-dix-tests-v2
+User configures 'discard' attribute to enable/disable dicard support.
 
-Is anyone interested in migrating them over to blktests?  Doing
-so has been on my todo list for a while, but given that said
-lists keeps growing I'd like to check if anyone else might be
-interested.
+Based on original patch from Kyungchan Koh
+
+Signed-off-by: Kyungchan Koh <kkc6196@fb.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ drivers/block/null_blk.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 45e0b56..1f3cf25 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -88,6 +88,7 @@ struct nullb_device {
+ 	bool use_per_node_hctx; /* use per-node allocation for hardware context */
+ 	bool power; /* power on/off the device */
+ 	bool memory_backed; /* if data is stored in memory */
++	bool discard; /* if support discard */
+ };
+ 
+ struct nullb {
+@@ -318,6 +319,7 @@ NULLB_DEVICE_ATTR(use_lightnvm, bool);
+ NULLB_DEVICE_ATTR(blocking, bool);
+ NULLB_DEVICE_ATTR(use_per_node_hctx, bool);
+ NULLB_DEVICE_ATTR(memory_backed, bool);
++NULLB_DEVICE_ATTR(discard, bool);
+ 
+ static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+ {
+@@ -373,6 +375,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
+ 	&nullb_device_attr_use_per_node_hctx,
+ 	&nullb_device_attr_power,
+ 	&nullb_device_attr_memory_backed,
++	&nullb_device_attr_discard,
+ 	NULL,
+ };
+ 
+@@ -425,7 +428,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
+ 
+ static ssize_t memb_group_features_show(struct config_item *item, char *page)
+ {
+-	return snprintf(page, PAGE_SIZE, "memory_backed\n");
++	return snprintf(page, PAGE_SIZE, "memory_backed,discard\n");
+ }
+ 
+ CONFIGFS_ATTR_RO(memb_group_, features);
+@@ -815,6 +818,20 @@ static int copy_from_nullb(struct nullb *nullb, struct page *dest,
+ 	return 0;
+ }
+ 
++static void null_handle_discard(struct nullb *nullb, sector_t sector, size_t n)
++{
++	size_t temp;
++
++	spin_lock_irq(&nullb->lock);
++	while (n > 0) {
++		temp = min_t(size_t, n, nullb->dev->blocksize);
++		null_free_sector(nullb, sector);
++		sector += temp >> SECTOR_SHIFT;
++		n -= temp;
++	}
++	spin_unlock_irq(&nullb->lock);
++}
++
+ static int null_transfer(struct nullb *nullb, struct page *page,
+ 	unsigned int len, unsigned int off, bool is_write, sector_t sector)
+ {
+@@ -843,6 +860,11 @@ static int null_handle_rq(struct nullb_cmd *cmd)
+ 
+ 	sector = blk_rq_pos(rq);
+ 
++	if (req_op(rq) == REQ_OP_DISCARD) {
++		null_handle_discard(nullb, sector, blk_rq_bytes(rq));
++		return 0;
++	}
++
+ 	spin_lock_irq(&nullb->lock);
+ 	rq_for_each_segment(bvec, rq, iter) {
+ 		len = bvec.bv_len;
+@@ -871,6 +893,12 @@ static int null_handle_bio(struct nullb_cmd *cmd)
+ 
+ 	sector = bio->bi_iter.bi_sector;
+ 
++	if (bio_op(bio) == REQ_OP_DISCARD) {
++		null_handle_discard(nullb, sector,
++			bio_sectors(bio) << SECTOR_SHIFT);
++		return 0;
++	}
++
+ 	spin_lock_irq(&nullb->lock);
+ 	bio_for_each_segment(bvec, bio, iter) {
+ 		len = bvec.bv_len;
+@@ -1207,6 +1235,16 @@ static void null_del_dev(struct nullb *nullb)
+ 	dev->nullb = NULL;
+ }
+ 
++static void null_config_discard(struct nullb *nullb)
++{
++	if (nullb->dev->discard == false)
++		return;
++	nullb->q->limits.discard_granularity = nullb->dev->blocksize;
++	nullb->q->limits.discard_alignment = nullb->dev->blocksize;
++	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> 9);
++	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, nullb->q);
++}
++
+ static int null_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	return 0;
+@@ -1448,6 +1486,8 @@ static int null_add_dev(struct nullb_device *dev)
+ 	blk_queue_logical_block_size(nullb->q, dev->blocksize);
+ 	blk_queue_physical_block_size(nullb->q, dev->blocksize);
+ 
++	null_config_discard(nullb);
++
+ 	sprintf(nullb->disk_name, "nullb%d", nullb->index);
+ 
+ 	if (dev->use_lightnvm)
+-- 
+2.9.5
