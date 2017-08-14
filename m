@@ -1,30 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:51221 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752787AbdHNPVx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2017 11:21:53 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:33097 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750936AbdHNGXf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Aug 2017 02:23:35 -0400
 Subject: Re: [PATCH] Revert "scsi: default to scsi-mq"
-Date: Mon, 14 Aug 2017 15:21:06 +0000
-Message-ID: <1502724064.2333.5.camel@wdc.com>
+To: Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 References: <20170813174422.16197-1-hch@lst.de>
-In-Reply-To: <20170813174422.16197-1-hch@lst.de>
-Content-Type: text/plain; charset="utf-8"
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a86e5829-8292-9aa1-c354-54b27c0abb17@suse.de>
+Date: Mon, 14 Aug 2017 08:23:33 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170813174422.16197-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDE3LTA4LTEzIGF0IDE5OjQ0ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gRGVmYXVsdGluZyB0byBzY3NpLW1xIGluIDQuMTMtcmMgaGFzIHNob3duIHZhcmlvdXMg
-cmVncmVzc2lvbnMNCj4gb24gc2V0dXBzIHRoYXQgd2UgZGlkbid0IHByZXZpb3VzbHkgY29uc2lk
-ZXIuICBGaXhlcyBmb3IgdGhlbSBhcmUNCj4gaW4gcHJvZ3Jlc3MsIGJ1dCB0b28gaW52YXNpdmUg
-dG8gbWFrZSBpdCBpbiB0aGlzIGN5Y2xlLiAgU28gZm9yDQo+IG5vdyByZXZlcnQgdGhlIGNvbW1p
-dCB0aGF0IGRlZmF1bHRzIHRvIGJsay1tcSBmb3IgU0NTSS4gIEZvciA0LjE0DQo+IHdlJ2xsIHBs
-YW4gdG8gdHJ5IGFnYWluIHdpdGggdGhlc2UgZml4ZXMuDQoNClNob3VsZCBhIHBhdGNoIGZvciB2
-NC4xNCBwZXJoYXBzIGJlIHF1ZXVlZCBub3c/IEFueXdheToNCg0KUmV2aWV3ZWQtYnk6IEJhcnQg
-VmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAd2RjLmNvbT4NCg0K
+On 08/13/2017 07:44 PM, Christoph Hellwig wrote:
+> Defaulting to scsi-mq in 4.13-rc has shown various regressions
+> on setups that we didn't previously consider.  Fixes for them are
+> in progress, but too invasive to make it in this cycle.  So for
+> now revert the commit that defaults to blk-mq for SCSI.  For 4.14
+> we'll plan to try again with these fixes.
+> 
+> This reverts commit 5c279bd9e40624f4ab6e688671026d6005b066fa.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
