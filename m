@@ -1,136 +1,336 @@
-Return-Path: <BATV+2972572aac770b70d036+5119+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: viro@zeniv.linux.org.uk,
-	axboe@kernel.dk
-Cc: Milosz Tanski <milosz@adfin.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>,
-	mgorman@suse.de,
-	Volker.Lendecke@sernet.de,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: non-blocking buffered reads V5
-Date: Tue, 29 Aug 2017 16:13:17 +0200
-Message-Id: <20170829141321.4482-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:55768 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753473AbdHOJwu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Aug 2017 05:52:50 -0400
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 10/12] nvme-fabrics: handle reconnects in fabrics library
+Date: Tue, 15 Aug 2017 12:52:23 +0300
+Message-Id: <1502790745-12569-11-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+References: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series resurrects the old patches from Milosz to implement
-non-blocking buffered reads.  Thanks to the non-blocking AIO code from
-Goldwyn the implementation becomes pretty much trivial.
+Rip the nvme-rdma equivalent.
 
-I've also forward ported the test Milosz sent for recent xfsprogs to
-verify that this series works properly, but I'll still have to address
-the review comments for it. I'll also volunteer to work with Goldwyn to
-properly document the RWF_NOWAIT flag in the man page including this
-change.
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/fabrics.c | 103 +++++++++++++++++++++++++++++++++++++++
+ drivers/nvme/host/fabrics.h |   1 +
+ drivers/nvme/host/rdma.c    | 114 +++-----------------------------------------
+ 3 files changed, 110 insertions(+), 108 deletions(-)
 
-Changes from V4:
- - improve conditionals in generic_file_buffered_read
-
-Changes from V3:
- - forward ported to the latest kernel
- - fixed a compiler warning
-
-Changes from V2:
- - keep returning -EOPNOTSUPP for the not supported buffered write case
- - add block device node support
- - rebase against current Linus' tree, which has all the requirements
-
-Changes from V1:
- - fix btrfs to reject nowait buffered writes
- - tested btrfs and ext4 in addition to xfs this time
-
-
-Here are additional details from the original cover letter from Milosz,
-where the flag was still called RWF_NONBLOCK:
-
-
-Background:
-
- Using a threadpool to emulate non-blocking operations on regular buffered
- files is a common pattern today (samba, libuv, etc...) Applications split the
- work between network bound threads (epoll) and IO threadpool. Not every
- application can use sendfile syscall (TLS / post-processing).
-
- This common pattern leads to increased request latency. Latency can be due to
- additional synchronization between the threads or fast (cached data) request
- stuck behind slow request (large / uncached data).
-
- The preadv2 syscall with RWF_NONBLOCK lets userspace applications bypass
- enqueuing operation in the threadpool if it's already available in the
- pagecache.
-
-
-Performance numbers (newer Samba):
-
- https://drive.google.com/file/d/0B3maCn0jCvYncndGbXJKbGlhejQ/view?usp=sharing
- https://docs.google.com/spreadsheets/d/1GGTivi-MfZU0doMzomG4XUo9ioWtRvOGQ5FId042L6s/edit?usp=sharing
-
-
-Performance number (older):
-
- Some perf data generated using fio comparing the posix aio engine to a version
- of the posix AIO engine that attempts to performs "fast" reads before
- submitting the operations to the queue. This workflow is on ext4 partition on
- raid0 (test / build-rig.) Simulating our database access patern workload using
- 16kb read accesses. Our database uses a home-spun posix aio like queue (samba
- does the same thing.)
-
- f1: ~73% rand read over mostly cached data (zipf med-size dataset)
- f2: ~18% rand read over mostly un-cached data (uniform large-dataset)
- f3: ~9% seq-read over large dataset
-
- before:
-
- f1:
-     bw (KB  /s): min=   11, max= 9088, per=0.56%, avg=969.54, stdev=827.99
-     lat (msec) : 50=0.01%, 100=1.06%, 250=5.88%, 500=4.08%, 750=12.48%
-     lat (msec) : 1000=17.27%, 2000=49.86%, >=2000=9.42%
- f2:
-     bw (KB  /s): min=    2, max= 1882, per=0.16%, avg=273.28, stdev=220.26
-     lat (msec) : 250=5.65%, 500=3.31%, 750=15.64%, 1000=24.59%, 2000=46.56%
-     lat (msec) : >=2000=4.33%
- f3:
-     bw (KB  /s): min=    0, max=265568, per=99.95%, avg=174575.10,
-                  stdev=34526.89
-     lat (usec) : 2=0.01%, 4=0.01%, 10=0.02%, 20=0.27%, 50=10.82%
-     lat (usec) : 100=50.34%, 250=5.05%, 500=7.12%, 750=6.60%, 1000=4.55%
-     lat (msec) : 2=8.73%, 4=3.49%, 10=1.83%, 20=0.89%, 50=0.22%
-     lat (msec) : 100=0.05%, 250=0.02%, 500=0.01%
- total:
-    READ: io=102365MB, aggrb=174669KB/s, minb=240KB/s, maxb=173599KB/s,
-          mint=600001msec, maxt=600113msec
-
- after (with fast read using preadv2 before submit):
-
- f1:
-     bw (KB  /s): min=    3, max=14897, per=1.28%, avg=2276.69, stdev=2930.39
-     lat (usec) : 2=70.63%, 4=0.01%
-     lat (msec) : 250=0.20%, 500=2.26%, 750=1.18%, 2000=0.22%, >=2000=25.53%
- f2:
-     bw (KB  /s): min=    2, max= 2362, per=0.14%, avg=249.83, stdev=222.00
-     lat (msec) : 250=6.35%, 500=1.78%, 750=9.29%, 1000=20.49%, 2000=52.18%
-     lat (msec) : >=2000=9.99%
- f3:
-     bw (KB  /s): min=    1, max=245448, per=100.00%, avg=177366.50,
-                  stdev=35995.60
-     lat (usec) : 2=64.04%, 4=0.01%, 10=0.01%, 20=0.06%, 50=0.43%
-     lat (usec) : 100=0.20%, 250=1.27%, 500=2.93%, 750=3.93%, 1000=7.35%
-     lat (msec) : 2=14.27%, 4=2.88%, 10=1.54%, 20=0.81%, 50=0.22%
-     lat (msec) : 100=0.05%, 250=0.02%
- total:
-    READ: io=103941MB, aggrb=177339KB/s, minb=213KB/s, maxb=176375KB/s,
-          mint=600020msec, maxt=600178msec
-
- Interpreting the results you can see total bandwidth stays the same but overall
- request latency is decreased in f1 (random, mostly cached) and f3 (sequential)
- workloads. There is a slight bump in latency for since it's random data that's
- unlikely to be cached but we're always trying "fast read".
-
- In our application we have starting keeping track of "fast read" hits/misses
- and for files / requests that have a lot hit ratio we don't do "fast reads"
- mostly getting rid of extra latency in the uncached cases. In our real world
- work load we were able to reduce average response time by 20 to 30% (depends
- on amount of IO done by request).
-
- I've performed other benchmarks and I have no observed any perf regressions in
- any of the normal (old) code paths.
+diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+index cf8c6163db9e..8e03360f45b3 100644
+--- a/drivers/nvme/host/fabrics.c
++++ b/drivers/nvme/host/fabrics.c
+@@ -819,6 +819,105 @@ void nvmf_free_options(struct nvmf_ctrl_options *opts)
+ }
+ EXPORT_SYMBOL_GPL(nvmf_free_options);
+ 
++static void nvmf_reconnect_or_remove(struct nvme_ctrl *ctrl)
++{
++	/* If we are resetting/deleting then do nothing */
++	if (ctrl->state != NVME_CTRL_RECONNECTING) {
++		WARN_ON_ONCE(ctrl->state == NVME_CTRL_NEW ||
++			ctrl->state == NVME_CTRL_LIVE);
++		return;
++	}
++
++	if (nvmf_should_reconnect(ctrl)) {
++		dev_info(ctrl->device, "Reconnecting in %d seconds...\n",
++			ctrl->opts->reconnect_delay);
++		queue_delayed_work(nvme_wq, &ctrl->reconnect_work,
++				ctrl->opts->reconnect_delay * HZ);
++	} else {
++		dev_info(ctrl->device, "Removing controller...\n");
++		__nvme_del_ctrl(ctrl);
++	}
++}
++
++static void nvmf_reconnect_ctrl_work(struct work_struct *work)
++{
++	struct nvme_ctrl *ctrl = container_of(to_delayed_work(work),
++			struct nvme_ctrl, reconnect_work);
++	bool changed;
++	int ret;
++
++	++ctrl->nr_reconnects;
++
++	if (ctrl->queue_count > 1)
++		nvme_destroy_io_queues(ctrl, false);
++
++	nvme_destroy_admin_queue(ctrl, false);
++	ret = nvme_configure_admin_queue(ctrl, false);
++	if (ret)
++		goto requeue;
++
++	if (ctrl->queue_count > 1) {
++		ret = nvme_configure_io_queues(ctrl, false);
++		if (ret)
++			goto requeue;
++	}
++
++	changed = nvme_change_ctrl_state(ctrl, NVME_CTRL_LIVE);
++	WARN_ON_ONCE(!changed);
++	ctrl->nr_reconnects = 0;
++
++	nvme_start_ctrl(ctrl);
++
++	dev_info(ctrl->device, "Successfully reconnected\n");
++
++	return;
++
++requeue:
++	dev_info(ctrl->device, "Failed reconnect attempt %d\n",
++			ctrl->nr_reconnects);
++	nvmf_reconnect_or_remove(ctrl);
++}
++
++static void nvmf_error_recovery_work(struct work_struct *work)
++{
++	struct nvme_ctrl *ctrl = container_of(work,
++			struct nvme_ctrl, err_work);
++
++	nvme_stop_keep_alive(ctrl);
++
++	if (ctrl->queue_count > 1) {
++		nvme_stop_queues(ctrl);
++		ctrl->ops->stop_io_queues(ctrl);
++	}
++	blk_mq_quiesce_queue(ctrl->admin_q);
++	ctrl->ops->stop_admin_queue(ctrl);
++
++	/* We must take care of fastfail/requeue all our inflight requests */
++	if (ctrl->queue_count > 1)
++		blk_mq_tagset_busy_iter(ctrl->tagset,
++					nvme_cancel_request, ctrl);
++	blk_mq_tagset_busy_iter(ctrl->admin_tagset,
++				nvme_cancel_request, ctrl);
++
++	/*
++	 * queues are not a live anymore, so restart the queues to fail fast
++	 * new IO
++	 */
++	nvme_start_queues(ctrl);
++	blk_mq_unquiesce_queue(ctrl->admin_q);
++
++	nvmf_reconnect_or_remove(ctrl);
++}
++
++void nvmf_error_recovery(struct nvme_ctrl *ctrl)
++{
++	if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_RECONNECTING))
++		return;
++
++	queue_work(nvme_wq, &ctrl->err_work);
++}
++EXPORT_SYMBOL_GPL(nvmf_error_recovery);
++
+ #define NVMF_REQUIRED_OPTS	(NVMF_OPT_TRANSPORT | NVMF_OPT_NQN)
+ #define NVMF_ALLOWED_OPTS	(NVMF_OPT_QUEUE_SIZE | NVMF_OPT_NR_IO_QUEUES | \
+ 				 NVMF_OPT_KATO | NVMF_OPT_HOSTNQN | \
+@@ -882,6 +981,10 @@ nvmf_create_ctrl(struct device *dev, const char *buf, size_t count)
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
++	INIT_DELAYED_WORK(&ctrl->reconnect_work,
++			nvmf_reconnect_ctrl_work);
++	INIT_WORK(&ctrl->err_work, nvmf_error_recovery_work);
++
+ 	mutex_unlock(&nvmf_transports_mutex);
+ 	return ctrl;
+ 
+diff --git a/drivers/nvme/host/fabrics.h b/drivers/nvme/host/fabrics.h
+index bf33663218cd..20e9f45b8658 100644
+--- a/drivers/nvme/host/fabrics.h
++++ b/drivers/nvme/host/fabrics.h
+@@ -140,6 +140,7 @@ int nvmf_register_transport(struct nvmf_transport_ops *ops);
+ void nvmf_unregister_transport(struct nvmf_transport_ops *ops);
+ void nvmf_free_options(struct nvmf_ctrl_options *opts);
+ int nvmf_get_address(struct nvme_ctrl *ctrl, char *buf, int size);
++void nvmf_error_recovery(struct nvme_ctrl *ctrl);
+ bool nvmf_should_reconnect(struct nvme_ctrl *ctrl);
+ 
+ #endif /* _NVME_FABRICS_H */
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 35459f2eea74..3bdf1ab7c2f3 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -799,104 +799,6 @@ static void nvme_rdma_free_ctrl(struct nvme_ctrl *nctrl)
+ 	kfree(ctrl);
+ }
+ 
+-static void nvme_rdma_reconnect_or_remove(struct nvme_ctrl *ctrl)
+-{
+-	/* If we are resetting/deleting then do nothing */
+-	if (ctrl->state != NVME_CTRL_RECONNECTING) {
+-		WARN_ON_ONCE(ctrl->state == NVME_CTRL_NEW ||
+-			ctrl->state == NVME_CTRL_LIVE);
+-		return;
+-	}
+-
+-	if (nvmf_should_reconnect(ctrl)) {
+-		dev_info(ctrl->device, "Reconnecting in %d seconds...\n",
+-			ctrl->opts->reconnect_delay);
+-		queue_delayed_work(nvme_wq, &ctrl->reconnect_work,
+-				ctrl->opts->reconnect_delay * HZ);
+-	} else {
+-		dev_info(ctrl->device, "Removing controller...\n");
+-		queue_work(nvme_wq, &ctrl->delete_work);
+-	}
+-}
+-
+-static void nvme_rdma_reconnect_ctrl_work(struct work_struct *work)
+-{
+-	struct nvme_ctrl *ctrl = container_of(to_delayed_work(work),
+-			struct nvme_ctrl, reconnect_work);
+-	bool changed;
+-	int ret;
+-
+-	++ctrl->nr_reconnects;
+-
+-	if (ctrl->queue_count > 1)
+-		nvme_destroy_io_queues(ctrl, false);
+-
+-	nvme_destroy_admin_queue(ctrl, false);
+-	ret = nvme_configure_admin_queue(ctrl, false);
+-	if (ret)
+-		goto requeue;
+-
+-	if (ctrl->queue_count > 1) {
+-		ret = nvme_configure_io_queues(ctrl, false);
+-		if (ret)
+-			goto requeue;
+-	}
+-
+-	changed = nvme_change_ctrl_state(ctrl, NVME_CTRL_LIVE);
+-	WARN_ON_ONCE(!changed);
+-	ctrl->nr_reconnects = 0;
+-
+-	nvme_start_ctrl(ctrl);
+-
+-	dev_info(ctrl->device, "Successfully reconnected\n");
+-
+-	return;
+-
+-requeue:
+-	dev_info(ctrl->device, "Failed reconnect attempt %d\n",
+-			ctrl->nr_reconnects);
+-	nvme_rdma_reconnect_or_remove(ctrl);
+-}
+-
+-static void nvme_rdma_error_recovery_work(struct work_struct *work)
+-{
+-	struct nvme_ctrl *ctrl = container_of(work,
+-			struct nvme_ctrl, err_work);
+-
+-	nvme_stop_ctrl(ctrl);
+-
+-	if (ctrl->queue_count > 1) {
+-		nvme_stop_queues(ctrl);
+-		ctrl->ops->stop_io_queues(ctrl);
+-	}
+-	blk_mq_quiesce_queue(ctrl->admin_q);
+-	ctrl->ops->stop_admin_queue(ctrl);
+-
+-	/* We must take care of fastfail/requeue all our inflight requests */
+-	if (ctrl->queue_count > 1)
+-		blk_mq_tagset_busy_iter(ctrl->tagset,
+-					nvme_cancel_request, ctrl);
+-	blk_mq_tagset_busy_iter(ctrl->admin_tagset,
+-				nvme_cancel_request, ctrl);
+-
+-	/*
+-	 * queues are not a live anymore, so restart the queues to fail fast
+-	 * new IO
+-	 */
+-	blk_mq_unquiesce_queue(ctrl->admin_q);
+-	nvme_start_queues(ctrl);
+-
+-	nvme_rdma_reconnect_or_remove(ctrl);
+-}
+-
+-static void nvme_rdma_error_recovery(struct nvme_ctrl *ctrl)
+-{
+-	if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_RECONNECTING))
+-		return;
+-
+-	queue_work(nvme_wq, &ctrl->err_work);
+-}
+-
+ static void nvme_rdma_wr_error(struct ib_cq *cq, struct ib_wc *wc,
+ 		const char *op)
+ {
+@@ -908,7 +810,7 @@ static void nvme_rdma_wr_error(struct ib_cq *cq, struct ib_wc *wc,
+ 			     "%s for CQE 0x%p failed with status %s (%d)\n",
+ 			     op, wc->wr_cqe,
+ 			     ib_wc_status_msg(wc->status), wc->status);
+-	nvme_rdma_error_recovery(&ctrl->ctrl);
++	nvmf_error_recovery(&ctrl->ctrl);
+ }
+ 
+ static void nvme_rdma_memreg_done(struct ib_cq *cq, struct ib_wc *wc)
+@@ -959,7 +861,7 @@ static void nvme_rdma_unmap_data(struct nvme_rdma_queue *queue,
+ 			dev_err(ctrl->ctrl.device,
+ 				"Queueing INV WR for rkey %#x failed (%d)\n",
+ 				req->mr->rkey, res);
+-			nvme_rdma_error_recovery(&queue->ctrl->ctrl);
++			nvmf_error_recovery(&queue->ctrl->ctrl);
+ 		}
+ 	}
+ 
+@@ -1238,7 +1140,7 @@ static int nvme_rdma_process_nvme_rsp(struct nvme_rdma_queue *queue,
+ 		dev_err(queue->ctrl->ctrl.device,
+ 			"tag 0x%x on QP %#x not found\n",
+ 			cqe->command_id, queue->qp->qp_num);
+-		nvme_rdma_error_recovery(&queue->ctrl->ctrl);
++		nvmf_error_recovery(&queue->ctrl->ctrl);
+ 		return ret;
+ 	}
+ 	req = blk_mq_rq_to_pdu(rq);
+@@ -1449,7 +1351,7 @@ static int nvme_rdma_cm_handler(struct rdma_cm_id *cm_id,
+ 	case RDMA_CM_EVENT_TIMEWAIT_EXIT:
+ 		dev_dbg(queue->ctrl->ctrl.device,
+ 			"disconnect received - connection closed\n");
+-		nvme_rdma_error_recovery(&queue->ctrl->ctrl);
++		nvmf_error_recovery(&queue->ctrl->ctrl);
+ 		break;
+ 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
+ 		/* device removal is handled via the ib_client API */
+@@ -1457,7 +1359,7 @@ static int nvme_rdma_cm_handler(struct rdma_cm_id *cm_id,
+ 	default:
+ 		dev_err(queue->ctrl->ctrl.device,
+ 			"Unexpected RDMA CM event (%d)\n", ev->event);
+-		nvme_rdma_error_recovery(&queue->ctrl->ctrl);
++		nvmf_error_recovery(&queue->ctrl->ctrl);
+ 		break;
+ 	}
+ 
+@@ -1475,7 +1377,7 @@ nvme_rdma_timeout(struct request *rq, bool reserved)
+ 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
+ 
+ 	/* queue error recovery */
+-	nvme_rdma_error_recovery(&req->queue->ctrl->ctrl);
++	nvmf_error_recovery(&req->queue->ctrl->ctrl);
+ 
+ 	/* fail with DNR on cmd timeout */
+ 	nvme_req(rq)->status = NVME_SC_ABORT_REQ | NVME_SC_DNR;
+@@ -1730,10 +1632,6 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
+ 		goto out_free_ctrl;
+ 	}
+ 
+-	INIT_DELAYED_WORK(&ctrl->ctrl.reconnect_work,
+-			nvme_rdma_reconnect_ctrl_work);
+-	INIT_WORK(&ctrl->ctrl.err_work, nvme_rdma_error_recovery_work);
+-
+ 	ret = nvme_probe_ctrl(&ctrl->ctrl, dev, &nvme_rdma_ctrl_ops, 0);
+ 	if (!ctrl->queues)
+ 		goto out_kfree_queues;
+-- 
+2.7.4
