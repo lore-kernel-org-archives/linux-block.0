@@ -1,55 +1,46 @@
-Return-Path: <prvs=401b34db8=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 2/5] skd: Report completion mismatches once
-Date: Wed, 23 Aug 2017 10:56:30 -0700
-Message-Id: <20170823175633.12680-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170823175633.12680-1-bart.vanassche@wdc.com>
-References: <20170823175633.12680-1-bart.vanassche@wdc.com>
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, qijiang.qj@alibaba-inc.com
+From: Joseph Qi <jiangqi903@gmail.com>
+Subject: [PATCH RESEND] blk-throttle: fix potential NULL pointer dereference
+ in throtl_select_dispatch
+Message-ID: <43a4a32d-4eb2-4b1b-541f-f0593ad90851@gmail.com>
+Date: Tue, 15 Aug 2017 08:54:24 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch removes one debug statement but otherwise does not change
-any functionality.
+From: Joseph Qi <qijiang.qj@alibaba-inc.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Since throtl_rb_first may return NULL, so it should check tg first and
+then use it.
+
+Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
 ---
- drivers/block/skd_main.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ block/blk-throttle.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index a467c18cc047..d21fc76c5ed9 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -1564,17 +1564,11 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
- 		 * Make sure the request ID for the slot matches.
- 		 */
- 		if (skreq->id != req_id) {
--			dev_dbg(&skdev->pdev->dev,
--				"mismatch comp_id=0x%x req_id=0x%x\n", req_id,
--				skreq->id);
--			{
--				u16 new_id = cmp_cntxt;
--				dev_err(&skdev->pdev->dev,
--					"Completion mismatch comp_id=0x%04x skreq=0x%04x new=0x%04x\n",
--					req_id, skreq->id, new_id);
-+			dev_err(&skdev->pdev->dev,
-+				"Completion mismatch comp_id=0x%04x skreq=0x%04x new=0x%04x\n",
-+				req_id, skreq->id, cmp_cntxt);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a7285bf..c1d2c5b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1201,7 +1201,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
  
--				continue;
--			}
-+			continue;
- 		}
+ 	while (1) {
+ 		struct throtl_grp *tg = throtl_rb_first(parent_sq);
+-		struct throtl_service_queue *sq = &tg->service_queue;
++		struct throtl_service_queue *sq;
  
- 		SKD_ASSERT(skreq->state == SKD_REQ_STATE_BUSY);
+ 		if (!tg)
+ 			break;
+@@ -1213,6 +1213,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 
+ 		nr_disp += throtl_dispatch_tg(tg);
+ 
++		sq = &tg->service_queue;
+ 		if (sq->nr_queued[0] || sq->nr_queued[1])
+ 			tg_update_disptime(tg);
+ 
 -- 
-2.14.0
+1.9.4
