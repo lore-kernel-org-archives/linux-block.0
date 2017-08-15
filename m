@@ -1,38 +1,23 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Omar Sandoval <osandov@fb.com>
-Subject: [PATCH 05/12] blk-mq-debugfs: Declare a local symbol static
-Date: Thu, 17 Aug 2017 16:23:04 -0700
-Message-Id: <20170817232311.25948-6-bart.vanassche@wdc.com>
-In-Reply-To: <20170817232311.25948-1-bart.vanassche@wdc.com>
-References: <20170817232311.25948-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: Fix queue usage on failed request allocation
+To: Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
+Cc: Max Gurtovoy <maxg@mellanox.com>, Ming Lei <minlei@redhat.com>
+References: <1502743211-14992-1-git-send-email-keith.busch@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5fe259b8-540e-573f-ba23-50a66712c20d@kernel.dk>
+Date: Tue, 15 Aug 2017 07:22:50 -0600
+MIME-Version: 1.0
+In-Reply-To: <1502743211-14992-1-git-send-email-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This was detected by sparse.
+On 08/14/2017 02:40 PM, Keith Busch wrote:
+> blk_mq_get_request() does not release the callers queue usage counter
+> when allocation fails. The caller still needs to account for its own
+> queue usage when it is unable to allocate a request.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks Keith, applied.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 55940ddacd96..e53b6129ca5a 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -739,7 +739,7 @@ static int blk_mq_debugfs_release(struct inode *inode, struct file *file)
- 		return seq_release(inode, file);
- }
- 
--const struct file_operations blk_mq_debugfs_fops = {
-+static const struct file_operations blk_mq_debugfs_fops = {
- 	.open		= blk_mq_debugfs_open,
- 	.read		= seq_read,
- 	.write		= blk_mq_debugfs_write,
 -- 
-2.14.0
+Jens Axboe
