@@ -1,98 +1,167 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	lucmiccio@gmail.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT V2 2/2] block, bfq: boost throughput with flash-based non-queueing devices
-Date: Fri,  4 Aug 2017 07:35:11 +0200
-Message-Id: <20170804053511.2389-3-paolo.valente@linaro.org>
-In-Reply-To: <20170804053511.2389-1-paolo.valente@linaro.org>
-References: <20170804053511.2389-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:50535 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753012AbdHOJwd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Aug 2017 05:52:33 -0400
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 01/12] nvme: move err and reconnect work to nvme ctrl
+Date: Tue, 15 Aug 2017 12:52:14 +0300
+Message-Id: <1502790745-12569-2-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+References: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When a queue associated with a process remains empty, there are cases
-where throughput gets boosted if the device is idled to await the
-arrival of a new I/O request for that queue. Currently, BFQ assumes
-that one of these cases is when the device has no internal queueing
-(regardless of the properties of the I/O being served). Unfortunately,
-this condition has proved to be too general. So, this commit refines it
-as "the device has no internal queueing and is rotational".
+In theory, all fabric transports can/should use these.
 
-This refinement provides a significant throughput boost with random
-I/O, on flash-based storage without internal queueing. For example, on
-a HiKey board, throughput increases by up to 125%, growing, e.g., from
-6.9MB/s to 15.6MB/s with two or three random readers in parallel.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Luca Miccio <lucmiccio@gmail.com>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- block/bfq-iosched.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ drivers/nvme/host/core.c |  4 ++++
+ drivers/nvme/host/nvme.h |  3 +++
+ drivers/nvme/host/rdma.c | 29 +++++++++++------------------
+ 3 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ccdc9e6..509f399 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3114,7 +3114,10 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
- static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index a2ac892f470e..bbaf5b98f2fe 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2703,6 +2703,10 @@ static void nvme_release_instance(struct nvme_ctrl *ctrl)
+ void nvme_stop_ctrl(struct nvme_ctrl *ctrl)
  {
- 	struct bfq_data *bfqd = bfqq->bfqd;
--	bool idling_boosts_thr, idling_boosts_thr_without_issues,
-+	bool rot_without_queueing =
-+		!blk_queue_nonrot(bfqd->queue) && !bfqd->hw_tag,
-+		bfqq_sequential_and_IO_bound,
-+		idling_boosts_thr, idling_boosts_thr_without_issues,
- 		idling_needed_for_service_guarantees,
- 		asymmetric_scenario;
+ 	nvme_stop_keep_alive(ctrl);
++	if (ctrl->ops->flags & NVME_F_FABRICS) {
++		cancel_work_sync(&ctrl->err_work);
++		cancel_delayed_work_sync(&ctrl->reconnect_work);
++	}
+ 	flush_work(&ctrl->async_event_work);
+ 	flush_work(&ctrl->scan_work);
+ 	cancel_work_sync(&ctrl->fw_act_work);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 2c8a02be46fd..c52ba1405788 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -186,6 +186,9 @@ struct nvme_ctrl {
+ 	u16 maxcmd;
+ 	int nr_reconnects;
+ 	struct nvmf_ctrl_options *opts;
++	struct delayed_work reconnect_work;
++	struct work_struct delete_work;
++	struct work_struct err_work;
+ };
  
-@@ -3133,28 +3136,34 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	    bfq_class_idle(bfqq))
- 		return false;
+ struct nvme_ns {
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 74fd62062377..10e54f81e3d9 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -105,13 +105,9 @@ struct nvme_rdma_ctrl {
  
-+	bfqq_sequential_and_IO_bound = !BFQQ_SEEKY(bfqq) &&
-+		bfq_bfqq_IO_bound(bfqq) && bfq_bfqq_has_short_ttime(bfqq);
-+
- 	/*
- 	 * The next variable takes into account the cases where idling
- 	 * boosts the throughput.
- 	 *
- 	 * The value of the variable is computed considering, first, that
- 	 * idling is virtually always beneficial for the throughput if:
--	 * (a) the device is not NCQ-capable, or
--	 * (b) regardless of the presence of NCQ, the device is rotational
--	 *     and the request pattern for bfqq is I/O-bound and sequential.
-+	 * (a) the device is not NCQ-capable and rotational, or
-+	 * (b) regardless of the presence of NCQ, the device is rotational and
-+	 *     the request pattern for bfqq is I/O-bound and sequential, or
-+	 * (c) regardless of whether it is rotational, the device is
-+	 *     not NCQ-capable and the request pattern for bfqq is
-+	 *     I/O-bound and sequential.
- 	 *
- 	 * Secondly, and in contrast to the above item (b), idling an
- 	 * NCQ-capable flash-based device would not boost the
- 	 * throughput even with sequential I/O; rather it would lower
- 	 * the throughput in proportion to how fast the device
- 	 * is. Accordingly, the next variable is true if any of the
--	 * above conditions (a) and (b) is true, and, in particular,
--	 * happens to be false if bfqd is an NCQ-capable flash-based
--	 * device.
-+	 * above conditions (a), (b) or (c) is true, and, in
-+	 * particular, happens to be false if bfqd is an NCQ-capable
-+	 * flash-based device.
- 	 */
--	idling_boosts_thr = !bfqd->hw_tag ||
--		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq) &&
--		 bfq_bfqq_has_short_ttime(bfqq));
-+	idling_boosts_thr = rot_without_queueing ||
-+		((!blk_queue_nonrot(bfqd->queue) || !bfqd->hw_tag) &&
-+		 bfqq_sequential_and_IO_bound);
+ 	/* other member variables */
+ 	struct blk_mq_tag_set	tag_set;
+-	struct work_struct	delete_work;
+-	struct work_struct	err_work;
  
- 	/*
- 	 * The value of the next variable,
+ 	struct nvme_rdma_qe	async_event_sqe;
+ 
+-	struct delayed_work	reconnect_work;
+-
+ 	struct list_head	list;
+ 
+ 	struct blk_mq_tag_set	admin_tag_set;
+@@ -908,18 +904,18 @@ static void nvme_rdma_reconnect_or_remove(struct nvme_rdma_ctrl *ctrl)
+ 	if (nvmf_should_reconnect(&ctrl->ctrl)) {
+ 		dev_info(ctrl->ctrl.device, "Reconnecting in %d seconds...\n",
+ 			ctrl->ctrl.opts->reconnect_delay);
+-		queue_delayed_work(nvme_wq, &ctrl->reconnect_work,
++		queue_delayed_work(nvme_wq, &ctrl->ctrl.reconnect_work,
+ 				ctrl->ctrl.opts->reconnect_delay * HZ);
+ 	} else {
+ 		dev_info(ctrl->ctrl.device, "Removing controller...\n");
+-		queue_work(nvme_wq, &ctrl->delete_work);
++		queue_work(nvme_wq, &ctrl->ctrl.delete_work);
+ 	}
+ }
+ 
+ static void nvme_rdma_reconnect_ctrl_work(struct work_struct *work)
+ {
+ 	struct nvme_rdma_ctrl *ctrl = container_of(to_delayed_work(work),
+-			struct nvme_rdma_ctrl, reconnect_work);
++			struct nvme_rdma_ctrl, ctrl.reconnect_work);
+ 	bool changed;
+ 	int ret;
+ 
+@@ -958,7 +954,7 @@ static void nvme_rdma_reconnect_ctrl_work(struct work_struct *work)
+ static void nvme_rdma_error_recovery_work(struct work_struct *work)
+ {
+ 	struct nvme_rdma_ctrl *ctrl = container_of(work,
+-			struct nvme_rdma_ctrl, err_work);
++			struct nvme_rdma_ctrl, ctrl.err_work);
+ 
+ 	nvme_stop_ctrl(&ctrl->ctrl);
+ 
+@@ -991,7 +987,7 @@ static void nvme_rdma_error_recovery(struct nvme_rdma_ctrl *ctrl)
+ 	if (!nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_RECONNECTING))
+ 		return;
+ 
+-	queue_work(nvme_wq, &ctrl->err_work);
++	queue_work(nvme_wq, &ctrl->ctrl.err_work);
+ }
+ 
+ static void nvme_rdma_wr_error(struct ib_cq *cq, struct ib_wc *wc,
+@@ -1725,9 +1721,6 @@ static const struct blk_mq_ops nvme_rdma_admin_mq_ops = {
+ 
+ static void nvme_rdma_shutdown_ctrl(struct nvme_rdma_ctrl *ctrl, bool shutdown)
+ {
+-	cancel_work_sync(&ctrl->err_work);
+-	cancel_delayed_work_sync(&ctrl->reconnect_work);
+-
+ 	if (ctrl->ctrl.queue_count > 1) {
+ 		nvme_stop_queues(&ctrl->ctrl);
+ 		blk_mq_tagset_busy_iter(&ctrl->tag_set,
+@@ -1758,7 +1751,7 @@ static void nvme_rdma_remove_ctrl(struct nvme_rdma_ctrl *ctrl)
+ static void nvme_rdma_del_ctrl_work(struct work_struct *work)
+ {
+ 	struct nvme_rdma_ctrl *ctrl = container_of(work,
+-				struct nvme_rdma_ctrl, delete_work);
++				struct nvme_rdma_ctrl, ctrl.delete_work);
+ 
+ 	nvme_stop_ctrl(&ctrl->ctrl);
+ 	nvme_rdma_remove_ctrl(ctrl);
+@@ -1769,7 +1762,7 @@ static int __nvme_rdma_del_ctrl(struct nvme_rdma_ctrl *ctrl)
+ 	if (!nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_DELETING))
+ 		return -EBUSY;
+ 
+-	if (!queue_work(nvme_wq, &ctrl->delete_work))
++	if (!queue_work(nvme_wq, &ctrl->ctrl.delete_work))
+ 		return -EBUSY;
+ 
+ 	return 0;
+@@ -1788,7 +1781,7 @@ static int nvme_rdma_del_ctrl(struct nvme_ctrl *nctrl)
+ 		return -EBUSY;
+ 	ret = __nvme_rdma_del_ctrl(ctrl);
+ 	if (!ret)
+-		flush_work(&ctrl->delete_work);
++		flush_work(&ctrl->ctrl.delete_work);
+ 	nvme_put_ctrl(&ctrl->ctrl);
+ 	return ret;
+ }
+@@ -1879,10 +1872,10 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
+ 	if (ret)
+ 		goto out_free_ctrl;
+ 
+-	INIT_DELAYED_WORK(&ctrl->reconnect_work,
++	INIT_DELAYED_WORK(&ctrl->ctrl.reconnect_work,
+ 			nvme_rdma_reconnect_ctrl_work);
+-	INIT_WORK(&ctrl->err_work, nvme_rdma_error_recovery_work);
+-	INIT_WORK(&ctrl->delete_work, nvme_rdma_del_ctrl_work);
++	INIT_WORK(&ctrl->ctrl.err_work, nvme_rdma_error_recovery_work);
++	INIT_WORK(&ctrl->ctrl.delete_work, nvme_rdma_del_ctrl_work);
+ 	INIT_WORK(&ctrl->ctrl.reset_work, nvme_rdma_reset_ctrl_work);
+ 
+ 	ctrl->ctrl.queue_count = opts->nr_io_queues + 1; /* +1 for admin queue */
 -- 
-2.10.0
+2.7.4
