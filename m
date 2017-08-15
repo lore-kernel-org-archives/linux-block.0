@@ -1,53 +1,183 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Roger Pau Monn303251 <roger.pau@citrix.com>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH 11/12] xen-blkback: Avoid that gcc 7 warns about fall-through when building with W=1
-Date: Thu, 17 Aug 2017 16:23:10 -0700
-Message-Id: <20170817232311.25948-12-bart.vanassche@wdc.com>
-In-Reply-To: <20170817232311.25948-1-bart.vanassche@wdc.com>
-References: <20170817232311.25948-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:44863 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753395AbdHOJwl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Aug 2017 05:52:41 -0400
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 05/12] nvme-rdma: introduce nvme_rdma_alloc/stop/free_admin_queue
+Date: Tue, 15 Aug 2017 12:52:18 +0300
+Message-Id: <1502790745-12569-6-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+References: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Roger Pau Monn303251 <roger.pau@citrix.com>
-Cc: xen-devel@lists.xenproject.org
+The core will eventually call this type of callouts
+to allocate/stop/free the HW admin queue.
+
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/block/xen-blkback/blkback.c | 1 +
- drivers/block/xen-blkback/xenbus.c  | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ drivers/nvme/host/rdma.c | 81 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 55 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index 68157a84bf4d..5f3a813e7ae0 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -1251,6 +1251,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
- 		break;
- 	case BLKIF_OP_WRITE_BARRIER:
- 		drain = true;
-+		/* fall through */
- 	case BLKIF_OP_FLUSH_DISKCACHE:
- 		ring->st_f_req++;
- 		operation = REQ_OP_WRITE;
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 792da683e70d..88eaea6475d7 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -810,7 +810,8 @@ static void frontend_changed(struct xenbus_device *dev,
- 		xenbus_switch_state(dev, XenbusStateClosed);
- 		if (xenbus_dev_is_online(dev))
- 			break;
--		/* fall through if not online */
-+		/* fall through */
-+		/* if not online */
- 	case XenbusStateUnknown:
- 		/* implies xen_blkif_disconnect() via xen_blkbk_remove() */
- 		device_unregister(&dev->dev);
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index dc903625a759..8a8163c82733 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -544,23 +544,6 @@ static int nvme_rdma_alloc_queue(struct nvme_rdma_ctrl *ctrl,
+ 		goto out_destroy_cm_id;
+ 	}
+ 
+-	if (!idx) {
+-		ctrl->device = ctrl->queues[0].device;
+-		ctrl->max_fr_pages = min_t(u32, NVME_RDMA_MAX_SEGMENTS,
+-			ctrl->device->dev->attrs.max_fast_reg_page_list_len);
+-		ctrl->ctrl.max_hw_sectors =
+-			(ctrl->max_fr_pages - 1) << (PAGE_SHIFT - 9);
+-
+-		ret = nvme_rdma_alloc_qe(ctrl->queues[0].device->dev,
+-			&ctrl->async_event_sqe, sizeof(struct nvme_command),
+-			DMA_TO_DEVICE);
+-		if (ret) {
+-			nvme_rdma_destroy_queue_ib(&ctrl->queues[0]);
+-			goto out_destroy_cm_id;
+-		}
+-
+-	}
+-
+ 	clear_bit(NVME_RDMA_Q_DELETING, &queue->flags);
+ 
+ 	return 0;
+@@ -579,19 +562,32 @@ static void nvme_rdma_stop_queue(struct nvme_rdma_queue *queue)
+ 	ib_drain_qp(queue->qp);
+ }
+ 
++static void nvme_rdma_stop_admin_queue(struct nvme_ctrl *ctrl)
++{
++	nvme_rdma_stop_queue(&to_rdma_ctrl(ctrl)->queues[0]);
++}
++
+ static void nvme_rdma_free_queue(struct nvme_rdma_queue *queue)
+ {
+ 	if (test_and_set_bit(NVME_RDMA_Q_DELETING, &queue->flags))
+ 		return;
+ 
+-	if (!nvme_rdma_queue_idx(queue))
+-		nvme_rdma_free_qe(queue->device->dev,
+-			&queue->ctrl->async_event_sqe,
+-			sizeof(struct nvme_command), DMA_TO_DEVICE);
+ 	nvme_rdma_destroy_queue_ib(queue);
+ 	rdma_destroy_id(queue->cm_id);
+ }
+ 
++static void nvme_rdma_free_admin_queue(struct nvme_ctrl *nctrl)
++{
++	struct nvme_rdma_ctrl *ctrl = to_rdma_ctrl(nctrl);
++	struct nvme_rdma_queue *queue = &ctrl->queues[0];
++
++	nvme_rdma_free_qe(queue->device->dev,
++		&queue->ctrl->async_event_sqe,
++		sizeof(struct nvme_command), DMA_TO_DEVICE);
++
++	nvme_rdma_free_queue(queue);
++}
++
+ static void nvme_rdma_free_io_queues(struct nvme_rdma_ctrl *ctrl)
+ {
+ 	int i;
+@@ -625,6 +621,11 @@ static int nvme_rdma_start_queue(struct nvme_rdma_ctrl *ctrl, int idx)
+ 	return ret;
+ }
+ 
++static int nvme_rdma_start_admin_queue(struct nvme_ctrl *ctrl)
++{
++	return nvme_rdma_start_queue(to_rdma_ctrl(ctrl), 0);
++}
++
+ static int nvme_rdma_start_io_queues(struct nvme_rdma_ctrl *ctrl)
+ {
+ 	int i, ret = 0;
+@@ -751,12 +752,40 @@ static struct blk_mq_tag_set *nvme_rdma_alloc_tagset(struct nvme_ctrl *nctrl,
+ static void nvme_rdma_destroy_admin_queue(struct nvme_rdma_ctrl *ctrl,
+ 		bool remove)
+ {
+-	nvme_rdma_stop_queue(&ctrl->queues[0]);
++	nvme_rdma_stop_admin_queue(&ctrl->ctrl);
+ 	if (remove) {
+ 		blk_cleanup_queue(ctrl->ctrl.admin_q);
+ 		nvme_rdma_free_tagset(&ctrl->ctrl, true);
+ 	}
++	nvme_rdma_free_admin_queue(&ctrl->ctrl);
++}
++
++static int nvme_rdma_alloc_admin_queue(struct nvme_ctrl *nctrl)
++{
++	struct nvme_rdma_ctrl *ctrl = to_rdma_ctrl(nctrl);
++	int ret;
++
++	ret = nvme_rdma_alloc_queue(ctrl, 0, NVME_AQ_DEPTH);
++	if (ret)
++		return ret;
++
++	ctrl->device = ctrl->queues[0].device;
++	ctrl->max_fr_pages = min_t(u32, NVME_RDMA_MAX_SEGMENTS,
++		ctrl->device->dev->attrs.max_fast_reg_page_list_len);
++	ctrl->ctrl.max_hw_sectors =
++		(ctrl->max_fr_pages - 1) << (PAGE_SHIFT - 9);
++
++	ret = nvme_rdma_alloc_qe(ctrl->queues[0].device->dev,
++		&ctrl->async_event_sqe, sizeof(struct nvme_command),
++		DMA_TO_DEVICE);
++	if (ret)
++		goto out_free_queue;
++
++	return 0;
++
++out_free_queue:
+ 	nvme_rdma_free_queue(&ctrl->queues[0]);
++	return ret;
+ }
+ 
+ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
+@@ -764,7 +793,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
+ {
+ 	int error;
+ 
+-	error = nvme_rdma_alloc_queue(ctrl, 0, NVME_AQ_DEPTH);
++	error = nvme_rdma_alloc_admin_queue(&ctrl->ctrl);
+ 	if (error)
+ 		return error;
+ 
+@@ -784,7 +813,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
+ 			goto out_free_queue;
+ 	}
+ 
+-	error = nvme_rdma_start_queue(ctrl, 0);
++	error = nvme_rdma_start_admin_queue(&ctrl->ctrl);
+ 	if (error)
+ 		goto out_cleanup_queue;
+ 
+@@ -816,7 +845,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
+ 	if (new)
+ 		nvme_rdma_free_tagset(&ctrl->ctrl, true);
+ out_free_queue:
+-	nvme_rdma_free_queue(&ctrl->queues[0]);
++	nvme_rdma_free_admin_queue(&ctrl->ctrl);
+ 	return error;
+ }
+ 
+@@ -976,7 +1005,7 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
+ 		nvme_rdma_stop_io_queues(ctrl);
+ 	}
+ 	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
+-	nvme_rdma_stop_queue(&ctrl->queues[0]);
++	nvme_rdma_stop_admin_queue(&ctrl->ctrl);
+ 
+ 	/* We must take care of fastfail/requeue all our inflight requests */
+ 	if (ctrl->ctrl.queue_count > 1)
 -- 
-2.14.0
+2.7.4
