@@ -1,254 +1,256 @@
-Return-Path: <BATV+08196f5b2bd262a84b8d+5113+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 06/10] nvme: track subsystems
-Date: Wed, 23 Aug 2017 19:58:11 +0200
-Message-Id: <20170823175815.3646-7-hch@lst.de>
-In-Reply-To: <20170823175815.3646-1-hch@lst.de>
-References: <20170823175815.3646-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:43628 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753473AbdHOJwr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Aug 2017 05:52:47 -0400
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 08/12] nvme: add some ctrl ops for centralizing control plane logic.
+Date: Tue, 15 Aug 2017 12:52:21 +0300
+Message-Id: <1502790745-12569-9-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+References: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This adds a new nvme_subsystem structure so that we can track multiple
-controllers that belong to a single subsystem.  For now we only use it
-to store the NQN, and to check that we don't have duplicate NQNs unless
-the involved subsystems support multiple controllers.
+The goal is to move a larger portion of the logic to nvme
+core, thus add admin/io queue and tagset callouts.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+1. for queues we start with admin/io queues:
+->alloc
+->free
+->start
+->stop
+
+we separate admin and IO mostly to allow pci driver
+to free the queue in batches rather than one by one (to
+speed up the process).
+
+2. for tagset we have:
+->alloc_tagset
+->free_tagset
+
+which accepts admin boolean.
+
+3. we also has some misc ops:
+->post_configure
+->nr_hw_queues
+
+And I think we'll have more as we go.
+
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/host/core.c    | 111 ++++++++++++++++++++++++++++++++++++++++----
- drivers/nvme/host/fabrics.c |   4 +-
- drivers/nvme/host/nvme.h    |  12 ++++-
- 3 files changed, 116 insertions(+), 11 deletions(-)
+ drivers/nvme/host/nvme.h | 13 +++++++++
+ drivers/nvme/host/rdma.c | 76 ++++++++++++++++++++++++++++--------------------
+ 2 files changed, 57 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 179ade01745b..8884000dfbdd 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -71,6 +71,9 @@ MODULE_PARM_DESC(streams, "turn on support for Streams write directives");
- struct workqueue_struct *nvme_wq;
- EXPORT_SYMBOL_GPL(nvme_wq);
- 
-+static LIST_HEAD(nvme_subsystems);
-+static DEFINE_MUTEX(nvme_subsystems_lock);
-+
- static LIST_HEAD(nvme_ctrl_list);
- static DEFINE_SPINLOCK(dev_list_lock);
- 
-@@ -1741,14 +1744,15 @@ static bool quirk_matches(const struct nvme_id_ctrl *id,
- 		string_matches(id->fr, q->fr, sizeof(id->fr));
- }
- 
--static void nvme_init_subnqn(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
-+static void nvme_init_subnqn(struct nvme_subsystem *subsys, struct nvme_ctrl *ctrl,
-+		struct nvme_id_ctrl *id)
- {
- 	size_t nqnlen;
- 	int off;
- 
- 	nqnlen = strnlen(id->subnqn, NVMF_NQN_SIZE);
- 	if (nqnlen > 0 && nqnlen < NVMF_NQN_SIZE) {
--		strcpy(ctrl->subnqn, id->subnqn);
-+		strcpy(subsys->subnqn, id->subnqn);
- 		return;
- 	}
- 
-@@ -1756,14 +1760,91 @@ static void nvme_init_subnqn(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
- 		dev_warn(ctrl->device, "missing or invalid SUBNQN field.\n");
- 
- 	/* Generate a "fake" NQN per Figure 254 in NVMe 1.3 + ECN 001 */
--	off = snprintf(ctrl->subnqn, NVMF_NQN_SIZE,
-+	off = snprintf(subsys->subnqn, NVMF_NQN_SIZE,
- 			"nqn.2014.08.org.nvmexpress:%4x%4x",
- 			le16_to_cpu(id->vid), le16_to_cpu(id->ssvid));
--	memcpy(ctrl->subnqn + off, id->sn, sizeof(id->sn));
-+	memcpy(subsys->subnqn + off, id->sn, sizeof(id->sn));
- 	off += sizeof(id->sn);
--	memcpy(ctrl->subnqn + off, id->mn, sizeof(id->mn));
-+	memcpy(subsys->subnqn + off, id->mn, sizeof(id->mn));
- 	off += sizeof(id->mn);
--	memset(ctrl->subnqn + off, 0, sizeof(ctrl->subnqn) - off);
-+	memset(subsys->subnqn + off, 0, sizeof(subsys->subnqn) - off);
-+}
-+
-+static void nvme_destroy_subsystem(struct kref *ref)
-+{
-+	struct nvme_subsystem *subsys =
-+			container_of(ref, struct nvme_subsystem, ref);
-+
-+	mutex_lock(&nvme_subsystems_lock);
-+	list_del(&subsys->entry);
-+	mutex_unlock(&nvme_subsystems_lock);
-+
-+	kfree(subsys);
-+}
-+
-+static void nvme_put_subsystem(struct nvme_subsystem *subsys)
-+{
-+	kref_put(&subsys->ref, nvme_destroy_subsystem);
-+}
-+
-+static struct nvme_subsystem *__nvme_find_get_subsystem(const char *subsysnqn)
-+{
-+	struct nvme_subsystem *subsys;
-+
-+	lockdep_assert_held(&nvme_subsystems_lock);
-+
-+	list_for_each_entry(subsys, &nvme_subsystems, entry) {
-+		if (strcmp(subsys->subnqn, subsysnqn))
-+			continue;
-+		if (!kref_get_unless_zero(&subsys->ref))
-+			continue;
-+		return subsys;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int nvme_init_subsystem(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
-+{
-+	struct nvme_subsystem *subsys, *found;
-+
-+	subsys = kzalloc(sizeof(*subsys), GFP_KERNEL);
-+	if (!subsys)
-+		return -ENOMEM;
-+	INIT_LIST_HEAD(&subsys->ctrls);
-+	kref_init(&subsys->ref);
-+	nvme_init_subnqn(subsys, ctrl, id);
-+	mutex_init(&subsys->lock);
-+
-+	mutex_lock(&nvme_subsystems_lock);
-+	found = __nvme_find_get_subsystem(subsys->subnqn);
-+	if (found) {
-+		/*
-+		 * Verify that the subsystem actually supports multiple
-+		 * controllers, else bail out.
-+		 */
-+		kfree(subsys);
-+		if (!(id->cmic & (1 << 1))) {
-+			dev_err(ctrl->device,
-+				"ignoring ctrl due to duplicate subnqn (%s).\n",
-+				found->subnqn);
-+			mutex_unlock(&nvme_subsystems_lock);
-+			return -EINVAL;
-+		}
-+
-+		subsys = found;
-+	} else {
-+		list_add_tail(&subsys->entry, &nvme_subsystems);
-+	}
-+
-+	ctrl->subsys = subsys;
-+	mutex_unlock(&nvme_subsystems_lock);
-+
-+	mutex_lock(&subsys->lock);
-+	list_add_tail(&ctrl->subsys_entry, &subsys->ctrls);
-+	mutex_unlock(&subsys->lock);
-+
-+	return 0;
- }
- 
- /*
-@@ -1801,7 +1882,11 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
- 		return -EIO;
- 	}
- 
--	nvme_init_subnqn(ctrl, id);
-+	ret = nvme_init_subsystem(ctrl, id);
-+	if (ret) {
-+		kfree(id);
-+		return ret;
-+	}
- 
- 	if (!ctrl->identified) {
- 		/*
-@@ -2219,7 +2304,7 @@ static ssize_t nvme_sysfs_show_subsysnqn(struct device *dev,
- {
- 	struct nvme_ctrl *ctrl = dev_get_drvdata(dev);
- 
--	return snprintf(buf, PAGE_SIZE, "%s\n", ctrl->subnqn);
-+	return snprintf(buf, PAGE_SIZE, "%s\n", ctrl->subsys->subnqn);
- }
- static DEVICE_ATTR(subsysnqn, S_IRUGO, nvme_sysfs_show_subsysnqn, NULL);
- 
-@@ -2757,12 +2842,22 @@ EXPORT_SYMBOL_GPL(nvme_uninit_ctrl);
- static void nvme_free_ctrl(struct kref *kref)
- {
- 	struct nvme_ctrl *ctrl = container_of(kref, struct nvme_ctrl, kref);
-+	struct nvme_subsystem *subsys = ctrl->subsys;
- 
- 	put_device(ctrl->device);
- 	nvme_release_instance(ctrl);
- 	ida_destroy(&ctrl->ns_ida);
- 
-+	if (subsys) {
-+		mutex_lock(&subsys->lock);
-+		list_del(&ctrl->subsys_entry);
-+		mutex_unlock(&subsys->lock);
-+	}
-+
- 	ctrl->ops->free_ctrl(ctrl);
-+
-+	if (subsys)
-+		nvme_put_subsystem(subsys);
- }
- 
- void nvme_put_ctrl(struct nvme_ctrl *ctrl)
-diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
-index cf8c6163db9e..6238452af6a4 100644
---- a/drivers/nvme/host/fabrics.c
-+++ b/drivers/nvme/host/fabrics.c
-@@ -873,10 +873,10 @@ nvmf_create_ctrl(struct device *dev, const char *buf, size_t count)
- 		goto out_unlock;
- 	}
- 
--	if (strcmp(ctrl->subnqn, opts->subsysnqn)) {
-+	if (strcmp(ctrl->subsys->subnqn, opts->subsysnqn)) {
- 		dev_warn(ctrl->device,
- 			"controller returned incorrect NQN: \"%s\".\n",
--			ctrl->subnqn);
-+			ctrl->subsys->subnqn);
- 		mutex_unlock(&nvmf_transports_mutex);
- 		ctrl->ops->delete_ctrl(ctrl);
- 		return ERR_PTR(-EINVAL);
 diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 82074b68f36f..913eaef6fc33 100644
+index c52ba1405788..7b8e57b3e634 100644
 --- a/drivers/nvme/host/nvme.h
 +++ b/drivers/nvme/host/nvme.h
-@@ -133,13 +133,15 @@ struct nvme_ctrl {
- 	struct ida ns_ida;
- 	struct work_struct reset_work;
- 
-+	struct nvme_subsystem *subsys;
-+	struct list_head subsys_entry;
-+
- 	struct opal_dev *opal_dev;
- 
- 	char name[12];
- 	char serial[20];
- 	char model[40];
- 	char firmware_rev[8];
--	char subnqn[NVMF_NQN_SIZE];
- 	u16 cntlid;
- 
- 	u32 ctrl_config;
-@@ -188,6 +190,14 @@ struct nvme_ctrl {
- 	struct nvmf_ctrl_options *opts;
+@@ -235,6 +235,19 @@ struct nvme_ctrl_ops {
+ 	void (*submit_async_event)(struct nvme_ctrl *ctrl, int aer_idx);
+ 	int (*delete_ctrl)(struct nvme_ctrl *ctrl);
+ 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
++	int (*alloc_admin_queue)(struct nvme_ctrl *ctrl);
++	void (*free_admin_queue)(struct nvme_ctrl *ctrl);
++	int (*start_admin_queue)(struct nvme_ctrl *ctrl);
++	void (*stop_admin_queue)(struct nvme_ctrl *ctrl);
++	int (*alloc_io_queues)(struct nvme_ctrl *ctrl);
++	void (*free_io_queues)(struct nvme_ctrl *ctrl);
++	int (*start_io_queues)(struct nvme_ctrl *ctrl);
++	void (*stop_io_queues)(struct nvme_ctrl *ctrl);
++	struct blk_mq_tag_set *(*alloc_tagset)(struct nvme_ctrl *ctrl,
++		bool admin);
++	void (*free_tagset)(struct nvme_ctrl *ctrl, bool admin);
++	int (*post_configure)(struct nvme_ctrl *ctrl);
++	unsigned int (*nr_hw_queues)(struct nvme_ctrl *ctrl);
  };
  
-+struct nvme_subsystem {
-+	struct list_head	entry;
-+	struct mutex		lock;
-+	struct list_head	ctrls;
-+	struct kref		ref;
-+	char			subnqn[NVMF_NQN_SIZE];
+ static inline bool nvme_ctrl_ready(struct nvme_ctrl *ctrl)
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index b03c4a2a1172..cf4e4371c2db 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -757,12 +757,12 @@ static struct blk_mq_tag_set *nvme_rdma_alloc_tagset(struct nvme_ctrl *nctrl,
+ static void nvme_rdma_destroy_admin_queue(struct nvme_ctrl *ctrl,
+ 		bool remove)
+ {
+-	nvme_rdma_stop_admin_queue(ctrl);
++	ctrl->ops->stop_admin_queue(ctrl);
+ 	if (remove) {
+ 		blk_cleanup_queue(ctrl->admin_q);
+-		nvme_rdma_free_tagset(ctrl, true);
++		ctrl->ops->free_tagset(ctrl, true);
+ 	}
+-	nvme_rdma_free_admin_queue(ctrl);
++	ctrl->ops->free_admin_queue(ctrl);
+ }
+ 
+ static int nvme_rdma_alloc_admin_queue(struct nvme_ctrl *nctrl)
+@@ -798,12 +798,12 @@ static int nvme_rdma_configure_admin_queue(struct nvme_ctrl *ctrl,
+ {
+ 	int error;
+ 
+-	error = nvme_rdma_alloc_admin_queue(ctrl);
++	error = ctrl->ops->alloc_admin_queue(ctrl);
+ 	if (error)
+ 		return error;
+ 
+ 	if (new) {
+-		ctrl->admin_tagset = nvme_rdma_alloc_tagset(ctrl, true);
++		ctrl->admin_tagset = ctrl->ops->alloc_tagset(ctrl, true);
+ 		if (IS_ERR(ctrl->admin_tagset))
+ 			goto out_free_queue;
+ 
+@@ -818,7 +818,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_ctrl *ctrl,
+ 			goto out_free_queue;
+ 	}
+ 
+-	error = nvme_rdma_start_admin_queue(ctrl);
++	error = ctrl->ops->start_admin_queue(ctrl);
+ 	if (error)
+ 		goto out_cleanup_queue;
+ 
+@@ -846,21 +846,21 @@ static int nvme_rdma_configure_admin_queue(struct nvme_ctrl *ctrl,
+ 		blk_cleanup_queue(ctrl->admin_q);
+ out_free_tagset:
+ 	if (new)
+-		nvme_rdma_free_tagset(ctrl, true);
++		ctrl->ops->free_tagset(ctrl, true);
+ out_free_queue:
+-	nvme_rdma_free_admin_queue(ctrl);
++	ctrl->ops->free_admin_queue(ctrl);
+ 	return error;
+ }
+ 
+ static void nvme_rdma_destroy_io_queues(struct nvme_ctrl *ctrl,
+ 		bool remove)
+ {
+-	nvme_rdma_stop_io_queues(ctrl);
++	ctrl->ops->stop_io_queues(ctrl);
+ 	if (remove) {
+ 		blk_cleanup_queue(ctrl->connect_q);
+-		nvme_rdma_free_tagset(ctrl, false);
++		ctrl->ops->free_tagset(ctrl, false);
+ 	}
+-	nvme_rdma_free_io_queues(ctrl);
++	ctrl->ops->free_io_queues(ctrl);
+ }
+ 
+ static int nvme_rdma_configure_io_queues(struct nvme_ctrl *ctrl, bool new)
+@@ -868,7 +868,7 @@ static int nvme_rdma_configure_io_queues(struct nvme_ctrl *ctrl, bool new)
+ 	unsigned int nr_io_queues;
+ 	int ret;
+ 
+-	nr_io_queues = nvme_rdma_nr_io_queues(ctrl);
++	nr_io_queues = ctrl->ops->nr_hw_queues(ctrl);
+ 	ret = nvme_set_queue_count(ctrl, &nr_io_queues);
+ 	if (ret)
+ 		return ret;
+@@ -880,12 +880,12 @@ static int nvme_rdma_configure_io_queues(struct nvme_ctrl *ctrl, bool new)
+ 	dev_info(ctrl->device,
+ 		"creating %d I/O queues.\n", nr_io_queues);
+ 
+-	ret = nvme_rdma_alloc_io_queues(ctrl);
++	ret = ctrl->ops->alloc_io_queues(ctrl);
+ 	if (ret)
+ 		return ret;
+ 
+ 	if (new) {
+-		ctrl->tagset = nvme_rdma_alloc_tagset(ctrl, false);
++		ctrl->tagset = ctrl->ops->alloc_tagset(ctrl, false);
+ 		if (IS_ERR(ctrl->tagset))
+ 			goto out_free_io_queues;
+ 
+@@ -914,9 +914,9 @@ static int nvme_rdma_configure_io_queues(struct nvme_ctrl *ctrl, bool new)
+ 		blk_cleanup_queue(ctrl->connect_q);
+ out_free_tag_set:
+ 	if (new)
+-		nvme_rdma_free_tagset(ctrl, false);
++		ctrl->ops->free_tagset(ctrl, false);
+ out_free_io_queues:
+-	nvme_rdma_free_io_queues(ctrl);
++	ctrl->ops->free_io_queues(ctrl);
+ 	return ret;
+ }
+ 
+@@ -1005,10 +1005,10 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
+ 
+ 	if (ctrl->queue_count > 1) {
+ 		nvme_stop_queues(ctrl);
+-		nvme_rdma_stop_io_queues(ctrl);
++		ctrl->ops->stop_io_queues(ctrl);
+ 	}
+ 	blk_mq_quiesce_queue(ctrl->admin_q);
+-	nvme_rdma_stop_admin_queue(ctrl);
++	ctrl->ops->stop_admin_queue(ctrl);
+ 
+ 	/* We must take care of fastfail/requeue all our inflight requests */
+ 	if (ctrl->queue_count > 1)
+@@ -1862,19 +1862,6 @@ static void nvme_rdma_reset_ctrl_work(struct work_struct *work)
+ 	nvme_rdma_remove_ctrl(ctrl);
+ }
+ 
+-static const struct nvme_ctrl_ops nvme_rdma_ctrl_ops = {
+-	.name			= "rdma",
+-	.module			= THIS_MODULE,
+-	.flags			= NVME_F_FABRICS,
+-	.reg_read32		= nvmf_reg_read32,
+-	.reg_read64		= nvmf_reg_read64,
+-	.reg_write32		= nvmf_reg_write32,
+-	.free_ctrl		= nvme_rdma_free_ctrl,
+-	.submit_async_event	= nvme_rdma_submit_async_event,
+-	.delete_ctrl		= nvme_rdma_del_ctrl,
+-	.get_address		= nvmf_get_address,
+-};
+-
+ static int nvme_rdma_post_configure(struct nvme_ctrl *ctrl)
+ {
+ 	/* sanity check icdoff */
+@@ -1908,6 +1895,31 @@ static int nvme_rdma_post_configure(struct nvme_ctrl *ctrl)
+ 	return 0;
+ }
+ 
++static const struct nvme_ctrl_ops nvme_rdma_ctrl_ops = {
++	.name			= "rdma",
++	.module			= THIS_MODULE,
++	.flags			= NVME_F_FABRICS,
++	.reg_read32		= nvmf_reg_read32,
++	.reg_read64		= nvmf_reg_read64,
++	.reg_write32		= nvmf_reg_write32,
++	.free_ctrl		= nvme_rdma_free_ctrl,
++	.submit_async_event	= nvme_rdma_submit_async_event,
++	.delete_ctrl		= nvme_rdma_del_ctrl,
++	.get_address		= nvmf_get_address,
++	.alloc_admin_queue	= nvme_rdma_alloc_admin_queue,
++	.free_admin_queue	= nvme_rdma_free_admin_queue,
++	.start_admin_queue	= nvme_rdma_start_admin_queue,
++	.stop_admin_queue	= nvme_rdma_stop_admin_queue,
++	.alloc_io_queues	= nvme_rdma_alloc_io_queues,
++	.free_io_queues		= nvme_rdma_free_io_queues,
++	.start_io_queues	= nvme_rdma_start_io_queues,
++	.stop_io_queues		= nvme_rdma_stop_io_queues,
++	.alloc_tagset		= nvme_rdma_alloc_tagset,
++	.free_tagset		= nvme_rdma_free_tagset,
++	.post_configure		= nvme_rdma_post_configure,
++	.nr_hw_queues		= nvme_rdma_nr_io_queues,
 +};
 +
- struct nvme_ns {
- 	struct list_head list;
+ static int nvme_rdma_probe_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 		const struct nvme_ctrl_ops *ops, unsigned long quirks)
+ {
+@@ -1925,7 +1937,7 @@ static int nvme_rdma_probe_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	if (ret)
+ 		goto out_uninit_ctrl;
+ 
+-	ret = nvme_rdma_post_configure(ctrl);
++	ret = ctrl->ops->post_configure(ctrl);
+ 	if (ret)
+ 		goto out_remove_admin_queue;
  
 -- 
-2.11.0
+2.7.4
