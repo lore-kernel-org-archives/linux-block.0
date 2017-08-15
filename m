@@ -1,47 +1,62 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
-	<dm-devel@redhat.com>, Bart Van Assche <bart.vanassche@wdc.com>, Mike Snitzer
-	<snitzer@redhat.com>, Laurence Oberman <loberman@redhat.com>,
-	<stable@vger.kernel.org>
-Subject: [PATCH] block: Make blk_mq_delay_kick_requeue_list() rerun the queue at a quiet time
-Date: Wed, 9 Aug 2017 11:28:06 -0700
-Message-ID: <20170809182806.32741-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:36026 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753473AbdHOJwv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Aug 2017 05:52:51 -0400
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 11/12] nvme: add sed-opal ctrl manipulation in admin configuration
+Date: Tue, 15 Aug 2017 12:52:24 +0300
+Message-Id: <1502790745-12569-12-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+References: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The blk_mq_delay_kick_requeue_list() function is used by the device
-mapper and only by the device mapper to rerun the queue and requeue
-list after a delay. This function is called once per request that
-gets requeued. Modify this function such that the queue is run once
-per path change event instead of once per request that is requeued.
-
-Fixes: commit 2849450ad39d ("blk-mq: introduce blk_mq_delay_kick_requeue_list()")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- block/blk-mq.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/nvme/host/core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 041f7b7fa0d6..8bfea36e92f9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -679,8 +679,8 @@ EXPORT_SYMBOL(blk_mq_kick_requeue_list);
- void blk_mq_delay_kick_requeue_list(struct request_queue *q,
- 				    unsigned long msecs)
- {
--	kblockd_schedule_delayed_work(&q->requeue_work,
--				      msecs_to_jiffies(msecs));
-+	kblockd_mod_delayed_work_on(WORK_CPU_UNBOUND, &q->requeue_work,
-+				    msecs_to_jiffies(msecs));
- }
- EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 4344adff7134..19aa68f1fb4a 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2743,6 +2743,7 @@ static void nvme_free_ctrl(struct kref *kref)
+ 	put_device(ctrl->device);
+ 	nvme_release_instance(ctrl);
+ 	ida_destroy(&ctrl->ns_ida);
++	free_opal_dev(ctrl->opal_dev);
  
+ 	ctrl->ops->free_ctrl(ctrl);
+ }
+@@ -3007,6 +3008,7 @@ EXPORT_SYMBOL_GPL(nvme_destroy_admin_queue);
+ 
+ int nvme_configure_admin_queue(struct nvme_ctrl *ctrl, bool new)
+ {
++	bool was_suspend = !!(ctrl->ctrl_config & NVME_CC_SHN_NORMAL);
+ 	int error;
+ 
+ 	error = ctrl->ops->alloc_admin_queue(ctrl);
+@@ -3052,6 +3054,16 @@ int nvme_configure_admin_queue(struct nvme_ctrl *ctrl, bool new)
+ 	if (error)
+ 		goto out_cleanup_queue;
+ 
++	if (ctrl->oacs & NVME_CTRL_OACS_SEC_SUPP) {
++		if (!ctrl->opal_dev)
++			ctrl->opal_dev = init_opal_dev(ctrl, &nvme_sec_submit);
++		else if (was_suspend)
++			opal_unlock_from_suspend(ctrl->opal_dev);
++	} else {
++		free_opal_dev(ctrl->opal_dev);
++		ctrl->opal_dev = NULL;
++	}
++
+ 	return 0;
+ 
+ out_cleanup_queue:
 -- 
-2.13.3
+2.7.4
