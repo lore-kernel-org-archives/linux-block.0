@@ -1,284 +1,130 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:38214 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750970AbdHaHYa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 03:24:30 -0400
-Received: by mail-wm0-f48.google.com with SMTP id 187so14257597wmn.1
-        for <linux-block@vger.kernel.org>; Thu, 31 Aug 2017 00:24:29 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH V6 00/18] blk-throttle: add .low limit
-From: Paolo VALENTE <paolo.valente@unimore.it>
-In-Reply-To: <cover.1484451062.git.shli@fb.com>
-Date: Thu, 31 Aug 2017 09:24:23 +0200
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, Kernel-team@fb.com,
-        tj@kernel.org, axboe@fb.com, vgoyal@redhat.com
-Message-Id: <A6F2F3C7-8020-4912-BB31-C4E6CD3EC858@unimore.it>
-References: <cover.1484451062.git.shli@fb.com>
-To: Shaohua Li <shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=393fc9523=damien.lemoal@wdc.com>
+Subject: Re: [PATCH] fix an integer overflow in __blkdev_sectors_to_bio_pages
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: "hch@lst.de" <hch@lst.de>, "tom.ty89@gmail.com" <tom.ty89@gmail.com>,
+ "dm-devel@redhat.com" <dm-devel@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "gmazyland@gmail.com" <gmazyland@gmail.com>, "axboe@fb.com" <axboe@fb.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+References: <CAGnHSEngW1Ugf66V5henR9fMEev0xcJnKVY9MjJb19gy3CkgNA@mail.gmail.com>
+ <20170809133833.GA25681@lst.de>
+ <alpine.LRH.2.02.1708132245190.18210@file01.intranet.prod.int.rdu2.redhat.com>
+ <1502683489.903.1.camel@wdc.com>
+ <alpine.LRH.2.02.1708141926170.24994@file01.intranet.prod.int.rdu2.redhat.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <87d37dc1-74c0-47c0-4cdd-0c5c826b4199@wdc.com>
+Date: Tue, 15 Aug 2017 12:43:38 +0900
+MIME-Version: 1.0
+In-Reply-To: <alpine.LRH.2.02.1708141926170.24994@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
 
-> Il giorno 15 gen 2017, alle ore 04:42, Shaohua Li <shli@fb.com> ha =
-scritto:
->=20
-> Hi,
->=20
-> cgroup still lacks a good iocontroller. CFQ works well for hard disk, =
-but not
-> much for SSD. This patch set try to add a conservative limit for =
-blk-throttle.
-> It isn't a proportional scheduling, but can help prioritize cgroups. =
-There are
-> several advantages we choose blk-throttle:
-> - blk-throttle resides early in the block stack. It works for both bio =
-and
->  request based queues.
-> - blk-throttle is light weight in general. It still takes queue lock, =
-but it's
->  not hard to implement a per-cpu cache and remove the lock contention.
-> - blk-throttle doesn't use 'idle disk' mechanism, which is used by =
-CFQ/BFQ. The
->  mechanism is proved to harm performance for fast SSD.
->=20
-> The patch set add a new io.low limit for blk-throttle. It's only for =
-cgroup2.
-> The existing io.max is a hard limit throttling. cgroup with a max =
-limit never
-> dispatch more IO than its max limit. While io.low is a best effort =
-throttling.
-> cgroups with 'low' limit can run above their 'low' limit at =
-appropriate time.
-> Specifically, if all cgroups reach their 'low' limit, all cgroups can =
-run above
-> their 'low' limit. If any cgroup runs under its 'low' limit, all other =
-cgroups
-> will run according to their 'low' limit. So the 'low' limit could act =
-as two
-> roles, it allows cgroups using free bandwidth and it protects cgroups =
-from
-> their 'low' limit.
->=20
-> An example usage is we have a high prio cgroup with high 'low' limit =
-and a low
-> prio cgroup with low 'low' limit. If the high prio cgroup isn't =
-running, the low
-> prio can run above its 'low' limit, so we don't waste the bandwidth. =
-When the
-> high prio cgroup runs and is below its 'low' limit, low prio cgroup =
-will run
-> under its 'low' limit. This will protect high prio cgroup to get more
-> resources.
->=20
+On 8/15/17 09:01, Mikulas Patocka wrote:
+> 
+> 
+> On Mon, 14 Aug 2017, Damien Le Moal wrote:
+> 
+>> On Sun, 2017-08-13 at 22:47 -0400, Mikulas Patocka wrote:
+>>>
+>>> On Wed, 9 Aug 2017, hch@lst.de wrote:
+>>>
+>>>> Does commit 615d22a51c04856efe62af6e1d5b450aaf5cc2c0
+>>>> "block: Fix __blkdev_issue_zeroout loop" fix the issue for you?
+>>>>
+>>>> --
+>>>> dm-devel mailing list
+>>>> dm-devel@redhat.com
+>>>> https://www.redhat.com/mailman/listinfo/dm-devel
+>>>
+>>> I think that patch is incorrect. sector_t may be a 32-bit type and 
+>>> nr_sects << 9 may overflow.
+>>>
+>>> static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
+>>> {
+>>>        sector_t bytes = (nr_sects << 9) + PAGE_SIZE - 1;
+>>>
+>>>        return min(bytes >> PAGE_SHIFT, (sector_t)BIO_MAX_PAGES);
+>>> }
+>>>
+>>> Mikulas
+>>
+>> Mikulas,
+>>
+>> Does the follwing patch fix the problem ?
+>>
+>> From 947b3cf41e759b2b23f684e215e651d0c8037f88 Mon Sep 17 00:00:00 2001
+>> From: Damien Le Moal <damien.lemoal@wdc.com>
+>> Date: Mon, 14 Aug 2017 13:01:16 +0900
+>> Subject: [PATCH] block: Fix __blkdev_sectors_to_bio_pages()
+>>
+>> On 32bit systems where sector_t is a 32bits type, the calculation of
+>> bytes may overflow. Use the u64 type for the local calculation to avoid
+>> overflows.
+>>
+>> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+>> ---
+>>  block/blk-lib.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-lib.c b/block/blk-lib.c
+>> index 3fe0aec90597..ccf22dba21f0 100644
+>> --- a/block/blk-lib.c
+>> +++ b/block/blk-lib.c
+>> @@ -269,9 +269,9 @@ static int __blkdev_issue_write_zeroes(struct block_device
+>> *bdev,
+>>   */
+>>  static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
+>>  {
+>> -	sector_t bytes = (nr_sects << 9) + PAGE_SIZE - 1;
+>> +	u64 bytes = ((u64)nr_sects << 9) + PAGE_SIZE - 1;
+>>  
+>> -	return min(bytes >> PAGE_SHIFT, (sector_t)BIO_MAX_PAGES);
+>> +	return min(bytes >> PAGE_SHIFT, (u64)BIO_MAX_PAGES);
+>>  }
+>>  
+> 
+> It's OK, but it is not needed to use 64-bit arithmetic here if all we need 
+> is to shift the value right. Here I submit a simplified patch, using the 
+> macro DIV_ROUND_UP_SECTOR_T (the macro gets optimized to just an addition 
+> and right shift).
+> 
+> 
+> 
+> From: Mikulas Patocka <mpatocka@redhat.com>
+> 
+> Fix possible integer overflow in __blkdev_sectors_to_bio_pages if sector_t 
+> is 32-bit.
+> 
+> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> Fixes: 615d22a51c04 ("block: Fix __blkdev_issue_zeroout loop")
+> 
+> ---
+>  block/blk-lib.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> Index: linux-2.6/block/blk-lib.c
+> ===================================================================
+> --- linux-2.6.orig/block/blk-lib.c
+> +++ linux-2.6/block/blk-lib.c
+> @@ -269,9 +269,9 @@ static int __blkdev_issue_write_zeroes(s
+>   */
+>  static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
+>  {
+> -	sector_t bytes = (nr_sects << 9) + PAGE_SIZE - 1;
+> +	sector_t pages = DIV_ROUND_UP_SECTOR_T(nr_sects, PAGE_SIZE / 512);
+>  
+> -	return min(bytes >> PAGE_SHIFT, (sector_t)BIO_MAX_PAGES);
+> +	return min(pages, (sector_t)BIO_MAX_PAGES);
+>  }
+>  
+>  /**
+> 
 
-Hi Shaohua,
-I would like to ask you some questions, to make sure I fully
-understand how the 'low' limit and the idle-group detection work in
-your above scenario.  Suppose that: the drive has a random-I/O peak
-rate of 100MB/s, the high prio group has a 'low' limit of 90 MB/s, and
-the low prio group has a 'low' limit of 10 MB/s.  If
-- the high prio process happens to do, say, only 5 MB/s for a given
-  long time
-- the low prio process constantly does greedy I/O
-- the idle-group detection is not being used
-then the low prio process is limited to 10 MB/s during all this time
-interval.  And only 10% of the device bandwidth is utilized.
+Nice ! Thank you.
 
-To recover lost bandwidth through idle-group detection, we need to set
-a target IO latency for the high-prio group.  The high prio group
-should happen to be below the threshold, and thus to be detected as
-idle, leaving the low prio group free too use all the bandwidth.
+Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
 
-Here are my questions:
-1) Is all I wrote above correct?
-2) In particular, maybe there are other better mechanism to saturate
-the bandwidth in the above scenario?
-
-If what I wrote above is correct:
-3) Doesn't fluctuation occur?  I mean: when the low prio group gets
-full bandwidth, the latency threshold of the high prio group may be
-overcome, causing the high prio group to not be considered idle any
-longer, and thus the low prio group to be limited again; this in turn
-will cause the threshold to not be overcome any longer, and so on.
-4) Is there a way to compute an appropriate target latency of the high
-prio group, if it is a generic group, for which the latency
-requirements of the processes it contains are only partially known or
-completely unknown?  By appropriate target latency, I mean a target
-latency that enables the framework to fully utilize the device
-bandwidth while the high prio group is doing less I/O than its limit.
-
-Thanks,
-Paolo
-
-> The implementation is simple. The disk queue has a state machine. We =
-have 2
-> states LIMIT_LOW and LIMIT_MAX. In each disk state, we throttle =
-cgroups
-> according to the limit of the state. That is io.low limit for =
-LIMIT_LOW state,
-> io.max limit for LIMIT_MAX. The disk state can be upgraded/downgraded =
-between
-> LIMIT_LOW and LIMIT_MAX according to the rule aboe. Initially disk =
-state is
-> LIMIT_MAX. And if no cgroup sets io.low, the disk state will remain in
-> LIMIT_MAX state. Systems with only io.max set will find nothing =
-changed with the
-> patches.
->=20
-> The first 10 patches implement the basic framework. Add interface, =
-handle
-> upgrade and downgrade logic. The patch 10 detects a special case a =
-cgroup is
-> completely idle. In this case, we ignore the cgroup's limit. The patch =
-11-18
-> adds more heuristics.
->=20
-> The basic framework has 2 major issues.
->=20
-> 1. fluctuation. When the state is upgraded from LIMIT_LOW to =
-LIMIT_MAX, the
-> cgroup's bandwidth can change dramatically, sometimes in a way we are =
-not
-> expected. For example, one cgroup's bandwidth will drop below its =
-io.low limit
-> very soon after a upgrade. patch 10 has more details about the issue.
->=20
-> 2. idle cgroup. cgroup with a io.low limit doesn't always dispatch =
-enough IO.
-> In above upgrade rule, the disk will remain in LIMIT_LOW state and all =
-other
-> cgroups can't dispatch more IO above their 'low' limit. Hence there is =
-waste.
-> patch 11 has more details about the issue.
->=20
-> For issue 1, we make cgroup bandwidth increase/decrease smoothly after =
-a
-> upgrade/downgrade. This will reduce the chance a cgroup's bandwidth =
-drop under
-> its 'low' limit rapidly. The smoothness means we could waste some =
-bandwidth in
-> the transition though. But we must pay something for sharing.
->=20
-> The issue 2 is very hard. We introduce two mechanisms for this. One is =
-'idle
-> time' or 'think time' borrowed from CFQ. If a cgroup's average idle =
-time is
-> high, we treat it's idle and its 'low' limit isn't respected. Please =
-see patch
-> 12 - 14 for details. The other is 'latency target'. If a cgroup's io =
-latency is
-> low, we treat it's idle and its 'low' limit isn't resptected. Please =
-see patch
-> 15 - 18 for fetails. Both mechanisms only happen when a cgroup runs =
-below its
-> 'low' limit.
->=20
-> The disadvantages of blk-throttle is it exports a kind of low level =
-knobs.
-> Configuration would not be easy for normal users. It would be powerful =
-for
-> experienced users though.
->=20
-> More tuning is required of course, but otherwise this works well. =
-Please
-> review, test and consider merge.
->=20
-> Thanks,
-> Shaohua
->=20
-> V5->V6:
-> - Change default setting for io.low limit. It's 0 now, which makes =
-more sense
-> - The default setting for latency is still 0, the default setting for =
-idle time
->  becomes bigger. So with the default settings, cgroups have small =
-latency but
->  disk sharing could be harmed
-> - Addressed other issues pointed out by Tejun
->=20
-> V4->V5, basically address Tejun's comments:
-> - Change interface from 'io.high' to 'io.low' so consistent with memcg
-> - Change interface for 'idle time' and 'latency target'
-> - Make 'idle time' per-cgroup-disk instead of per-cgroup
-> - Chnage interface name for 'throttle slice'. It's not a real slice
-> - Make downgrade smooth too
-> - Make latency sampling work for both bio and request based queue
-> - Change latency estimation method from 'line fitting' to 'bucket =
-based
->  calculation'
-> - Rebase and fix other problems
->=20
-> Issue pointed out by Tejun isn't fixed yet:
-> - .pd_offline_fn vs .pd_free_fn. .pd_free_fn seems too late to change =
-states
-> http://marc.info/?l=3Dlinux-kernel&m=3D148183437022975&w=3D2
->=20
-> V3->V4:
-> - Add latency target for cgroup
-> - Fix bugs
-> http://marc.info/?l=3Dlinux-block&m=3D147916216512915&w=3D2
->=20
-> V2->V3:
-> - Rebase
-> - Fix several bugs
-> - Make harddisk think time threshold bigger
-> http://marc.info/?l=3Dlinux-kernel&m=3D147552964708965&w=3D2
->=20
-> V1->V2:
-> - Drop io.low interface for simplicity and the interface isn't a =
-must-have to
->  prioritize cgroups.
-> - Remove the 'trial' logic, which creates too much fluctuation
-> - Add a new idle cgroup detection
-> - Other bug fixes and improvements
-> http://marc.info/?l=3Dlinux-block&m=3D147395674732335&w=3D2
->=20
-> V1:
-> http://marc.info/?l=3Dlinux-block&m=3D146292596425689&w=3D2
->=20
->=20
-> Shaohua Li (18):
->  blk-throttle: use U64_MAX/UINT_MAX to replace -1
->  blk-throttle: prepare support multiple limits
->  blk-throttle: add .low interface
->  blk-throttle: configure bps/iops limit for cgroup in low limit
->  blk-throttle: add upgrade logic for LIMIT_LOW state
->  blk-throttle: add downgrade logic
->  blk-throttle: make sure expire time isn't too big
->  blk-throttle: make throtl_slice tunable
->  blk-throttle: choose a small throtl_slice for SSD
->  blk-throttle: detect completed idle cgroup
->  blk-throttle: make bandwidth change smooth
->  blk-throttle: add a simple idle detection
->  blk-throttle: add interface to configure idle time threshold
->  blk-throttle: ignore idle cgroup limit
->  blk-throttle: add interface for per-cgroup target latency
->  block: track request size in blk_issue_stat
->  blk-throttle: add a mechanism to estimate IO latency
->  blk-throttle: add latency target support
->=20
-> Documentation/block/queue-sysfs.txt |   6 +
-> block/bio.c                         |   2 +
-> block/blk-core.c                    |   2 +-
-> block/blk-mq.c                      |   2 +-
-> block/blk-stat.c                    |  11 +-
-> block/blk-stat.h                    |  29 +-
-> block/blk-sysfs.c                   |  12 +
-> block/blk-throttle.c                | 961 =
-+++++++++++++++++++++++++++++++++---
-> block/blk-wbt.h                     |  10 +-
-> block/blk.h                         |   9 +
-> include/linux/blk_types.h           |  10 +-
-> 11 files changed, 959 insertions(+), 95 deletions(-)
->=20
-> --=20
-> 2.9.3
->=20
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-block" =
-in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Damien Le Moal,
+Western Digital
