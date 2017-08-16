@@ -1,38 +1,164 @@
-Return-Path: <SRS0=d975=7S=goodmis.org=rostedt@kernel.org>
-Date: Wed, 16 Aug 2017 14:17:49 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Waiman Long <longman@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@poochiereds.net>, "J.
- Bruce Fields" <bfields@fieldses.org>, Ingo Molnar <mingo@kernel.org>,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org
+Return-Path: <longman@redhat.com>
 Subject: Re: [PATCH] blktrace: Fix potentail deadlock between delete & sysfs
  ops
-Message-ID: <20170816141749.6c11d14c@gandalf.local.home>
-In-Reply-To: <6fa9f560-e1c2-f164-779f-aeefc5aa7017@redhat.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@poochiereds.net>,
+ "J. Bruce Fields" <bfields@fieldses.org>, Ingo Molnar <mingo@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org
 References: <1502384553-14442-1-git-send-email-longman@redhat.com>
-	<20170815191145.3c95680e@gandalf.local.home>
-	<6fa9f560-e1c2-f164-779f-aeefc5aa7017@redhat.com>
+ <20170815191145.3c95680e@gandalf.local.home>
+From: Waiman Long <longman@redhat.com>
+Message-ID: <6fa9f560-e1c2-f164-779f-aeefc5aa7017@redhat.com>
+Date: Wed, 16 Aug 2017 14:14:36 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170815191145.3c95680e@gandalf.local.home>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 16 Aug 2017 14:14:36 -0400
-Waiman Long <longman@redhat.com> wrote:
+On 08/15/2017 07:11 PM, Steven Rostedt wrote:
+> On Thu, 10 Aug 2017 13:02:33 -0400
+> Waiman Long <longman@redhat.com> wrote:
+>
+>> The lockdep code had reported the following unsafe locking scenario:
+>>
+>>        CPU0                    CPU1
+>>        ----                    ----
+>>   lock(s_active#228);
+>>                                lock(&bdev->bd_mutex/1);
+>>                                lock(s_active#228);
+>>   lock(&bdev->bd_mutex);
+>>
+>>  *** DEADLOCK ***
+>>
+>> The deadlock may happen when one task (CPU1) is trying to delete
+>> a partition in a block device and another task (CPU0) is accessing
+>> tracing sysfs file in that partition.
+>>
+>> To avoid that, accessing tracing sysfs file will now use a mutex
+>> trylock loop and the operation will fail if a delete operation is
+>> in progress.
+>>
+> This is wrong at a lot of levels.
+>
+>> Signed-off-by: Waiman Long <longman@redhat.com>
+>> ---
+>>  block/ioctl.c           |  3 +++
+>>  include/linux/fs.h      |  1 +
+>>  kernel/trace/blktrace.c | 24 ++++++++++++++++++++++--
+>>  3 files changed, 26 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/ioctl.c b/block/ioctl.c
+>> index 0de02ee..7211608 100644
+>> --- a/block/ioctl.c
+>> +++ b/block/ioctl.c
+>> @@ -86,12 +86,15 @@ static int blkpg_ioctl(struct block_device *bdev, =
+struct blkpg_ioctl_arg __user
+>>  				return -EBUSY;
+>>  			}
+>>  			/* all seems OK */
+>> +			bdev->bd_deleting =3D 1;
+> Note, one would need a  memory barrier here. But I'm not sure how much
+> of a fast path this location is.
+>
+> 			/*
+> 			 * Make sure bd_deleting is set before taking
+> 			 * mutex.
+> 			 */
+> 			smp_mb();
+>
 
-> > You also just turned the mutex into a spinlock. What happens if we just
-> > preempted the owner of bdev->bd_mutex and are an RT task with higher
-> > priority? This will turn into a live lock.
-> >  
-> >> +		schedule();
-> >> +	}
-> >>    
-> 
-> That is OK because I used schedule() instead of cpu_relax() for
-> inserting delay.
+You are right. Some sort of memory barrier is needed to make sure that
+the setting of bd_deleting won't get reordered into the
+mutex_lock/mutex_unlock critical section.
 
-Please explain to me how that is OK? schedule is a nop if the current
-task is the highest priority task running, and it preempted the owner
-of the lock. Nothing will actually schedule.
+>>  			fsync_bdev(bdevp);
+>>  			invalidate_bdev(bdevp);
+>> =20
+>>  			mutex_lock_nested(&bdev->bd_mutex, 1);
+>>  			delete_partition(disk, partno);
+>>  			mutex_unlock(&bdev->bd_mutex);
+>> +			bdev->bd_deleting =3D 0;
+>> +
+>>  			mutex_unlock(&bdevp->bd_mutex);
+>>  			bdput(bdevp);
+>> =20
+>> diff --git a/include/linux/fs.h b/include/linux/fs.h
+>> index 7b5d681..5d4ae9d 100644
+>> --- a/include/linux/fs.h
+>> +++ b/include/linux/fs.h
+>> @@ -427,6 +427,7 @@ struct block_device {
+>>  #endif
+>>  	struct block_device *	bd_contains;
+>>  	unsigned		bd_block_size;
+>> +	int			bd_deleting;
+>>  	struct hd_struct *	bd_part;
+>>  	/* number of times partitions within this device have been opened. *=
+/
+>>  	unsigned		bd_part_count;
+>> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+>> index bc364f8..715e77e 100644
+>> --- a/kernel/trace/blktrace.c
+>> +++ b/kernel/trace/blktrace.c
+>> @@ -1605,6 +1605,18 @@ static struct request_queue *blk_trace_get_queu=
+e(struct block_device *bdev)
+>>  	return bdev_get_queue(bdev);
+>>  }
+>> =20
+>> +/*
+>> + * Read/write to the tracing sysfs file requires taking references to=
+ the
+>> + * sysfs file and then acquiring the bd_mutex. Deleting a block devic=
+e
+>> + * requires acquiring the bd_mutex and then waiting for all the sysfs=
 
--- Steve
+>> + * references to be gone. This can lead to deadlock if both operation=
+s
+>> + * happen simultaneously. To avoid this problem, read/write to the
+>> + * the tracing sysfs files can now fail if the bd_mutex cannot be
+>> + * acquired while a deletion operation is in progress.
+>> + *
+>> + * A mutex trylock loop is used assuming that tracing sysfs operation=
+s
+>> + * aren't frequently enough to cause any contention problem.
+>> + */
+>>  static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
+>>  					 struct device_attribute *attr,
+>>  					 char *buf)
+>> @@ -1622,7 +1634,11 @@ static ssize_t sysfs_blk_trace_attr_show(struct=
+ device *dev,
+>>  	if (q =3D=3D NULL)
+>>  		goto out_bdput;
+>> =20
+>> -	mutex_lock(&bdev->bd_mutex);
+>> +	while (!mutex_trylock(&bdev->bd_mutex)) {
+> 		/* Make sure trylock happens before reading bd_deleting */
+> 		smp_mb();
+>
+> Since we don't take the lock, there's nothing that prevents the CPU
+> from fetching bd_deleting early, and this going into an infinite spin
+> even though bd_deleting is clear (without the memory barriers).
+>
+>> +		if (bdev->bd_deleting)
+>> +			goto out_bdput;
+
+We don't need a memory barrier here. Just a READ_ONCE() to make sure
+that the compiler won't optimize the read out of the mutex_trylock()
+loop is enough.
+
+> You also just turned the mutex into a spinlock. What happens if we just=
+
+> preempted the owner of bdev->bd_mutex and are an RT task with higher
+> priority? This will turn into a live lock.
+>
+>> +		schedule();
+>> +	}
+>> =20
+
+That is OK because I used schedule() instead of cpu_relax() for
+inserting delay.
+
+Thanks for the comment. I will send out an updated patch later today.
+
+Cheers,
+Longman
