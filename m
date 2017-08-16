@@ -1,99 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43096 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751847AbdHPUKo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Aug 2017 16:10:44 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7GK8rXG138671
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2017 16:10:44 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ccs47csas-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 16 Aug 2017 16:10:43 -0400
-Received: from localhost
-        by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <brking@linux.vnet.ibm.com>;
-        Wed, 16 Aug 2017 16:10:43 -0400
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>
+CC: "sachinp@linux.vnet.ibm.com" <sachinp@linux.vnet.ibm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"brking@us.ibm.com" <brking@us.ibm.com>, "sfr@canb.auug.org.au"
+	<sfr@canb.auug.org.au>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: WARNING: CPU: 15 PID: 0 at block/blk-mq.c:1111
  __blk_mq_run_hw_queue+0x1d8/0x1f0
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>
-Cc: "sachinp@linux.vnet.ibm.com" <sachinp@linux.vnet.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "brking@us.ibm.com" <brking@us.ibm.com>,
-        "sfr@canb.auug.org.au" <sfr@canb.auug.org.au>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
+Date: Wed, 16 Aug 2017 18:15:46 +0000
+Message-ID: <1502907345.2421.8.camel@wdc.com>
 References: <1502906852.3305.33.camel@abdul.in.ibm.com>
- <1502907345.2421.8.camel@wdc.com>
-From: Brian King <brking@linux.vnet.ibm.com>
-Date: Wed, 16 Aug 2017 15:10:39 -0500
+In-Reply-To: <1502906852.3305.33.camel@abdul.in.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1502907345.2421.8.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <4fe35be3-c631-e4ed-a135-110e536823bc@linux.vnet.ibm.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 08/16/2017 01:15 PM, Bart Van Assche wrote:
-> On Wed, 2017-08-16 at 23:37 +0530, Abdul Haleem wrote:
->> Linux-next booted with the below warnings on powerpc
->>
->> [ ... ]
->>
->> boot warnings:
->> --------------
->> kvm: exiting hardware virtualization
->> ------------[ cut here ]------------
->> WARNING: CPU: 15 PID: 0 at block/blk-mq.c:1111 __blk_mq_run_hw_queue
->> +0x1d8/0x1f0
->> Modules linked in: iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4
->> Call Trace:
->> [c000000ffff37990] [c00000000088f7b0] __blk_mq_delay_run_hw_queue
->> +0x1f0/0x210
->> [c000000ffff379d0] [c00000000088fcb8] blk_mq_start_hw_queue+0x58/0x80
->> [c000000ffff379f0] [c00000000088fd40] blk_mq_start_hw_queues+0x60/0xb0
->> [c000000ffff37a30] [c000000000ae2b54] scsi_kick_queue+0x34/0xa0
->> [c000000ffff37a50] [c000000000ae2f70] scsi_run_queue+0x3b0/0x660
->> [c000000ffff37ac0] [c000000000ae7ed4] scsi_run_host_queues+0x64/0xc0
->> [c000000ffff37b00] [c000000000ae7f64] scsi_unblock_requests+0x34/0x60
->> [c000000ffff37b20] [c000000000b14998] ipr_ioa_bringdown_done+0xf8/0x3a0
->> [c000000ffff37bc0] [c000000000b12528] ipr_reset_ioa_job+0xd8/0x170
->> [c000000ffff37c00] [c000000000b18790] ipr_reset_timer_done+0x110/0x160
->> [c000000ffff37c50] [c00000000024db50] call_timer_fn+0xa0/0x3a0
->> [c000000ffff37ce0] [c00000000024e058] expire_timers+0x1b8/0x350
->> [c000000ffff37d50] [c00000000024e2f0] run_timer_softirq+0x100/0x3e0
->> [c000000ffff37df0] [c000000000162edc] __do_softirq+0x20c/0x620
->> [c000000ffff37ee0] [c000000000163a80] irq_exit+0x230/0x290
->> [c000000ffff37f10] [c00000000001d770] __do_irq+0x170/0x410
->> [c000000ffff37f90] [c00000000003ea20] call_do_irq+0x14/0x24
->> [c0000007f84e3a70] [c00000000001dae0] do_IRQ+0xd0/0x190
->> [c0000007f84e3ac0] [c000000000008c58] hardware_interrupt_common
->> +0x158/0x160
-> 
-> Hello Brian,
-> 
-> In the MAINTAINERS file I found the following:
-> 
-> IBM Power Linux RAID adapter
-> M:      Brian King <brking@us.ibm.com>
-> S:      Supported
-> F:      drivers/scsi/ipr.*
-> 
-> Is that information up-to-date? Do you agree that the above message indicates
-> a bug in the ipr driver?
-
-Yes. Can you try with this patch that is in 4.13/scsi-fixes:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git/commit/?h=4.13/scsi-fixes&id=b0e17a9b0df29590c45dfb296f541270a5941f41
-
-Thanks,
-
-Brian
-
--- 
-Brian King
-Power Linux I/O
-IBM Linux Technology Center
+T24gV2VkLCAyMDE3LTA4LTE2IGF0IDIzOjM3ICswNTMwLCBBYmR1bCBIYWxlZW0gd3JvdGU6DQo+
+IExpbnV4LW5leHQgYm9vdGVkIHdpdGggdGhlIGJlbG93IHdhcm5pbmdzIG9uIHBvd2VycGMNCj4g
+DQo+IFsgLi4uIF0NCj4gDQo+IGJvb3Qgd2FybmluZ3M6DQo+IC0tLS0tLS0tLS0tLS0tDQo+IGt2
+bTogZXhpdGluZyBoYXJkd2FyZSB2aXJ0dWFsaXphdGlvbg0KPiAtLS0tLS0tLS0tLS1bIGN1dCBo
+ZXJlIF0tLS0tLS0tLS0tLS0NCj4gV0FSTklORzogQ1BVOiAxNSBQSUQ6IDAgYXQgYmxvY2svYmxr
+LW1xLmM6MTExMSBfX2Jsa19tcV9ydW5faHdfcXVldWUNCj4gKzB4MWQ4LzB4MWYwDQo+IE1vZHVs
+ZXMgbGlua2VkIGluOiBpcHRhYmxlX21hbmdsZSBpcHRfTUFTUVVFUkFERSBuZl9uYXRfbWFzcXVl
+cmFkZV9pcHY0DQo+IENhbGwgVHJhY2U6DQo+IFtjMDAwMDAwZmZmZjM3OTkwXSBbYzAwMDAwMDAw
+MDg4ZjdiMF0gX19ibGtfbXFfZGVsYXlfcnVuX2h3X3F1ZXVlDQo+ICsweDFmMC8weDIxMA0KPiBb
+YzAwMDAwMGZmZmYzNzlkMF0gW2MwMDAwMDAwMDA4OGZjYjhdIGJsa19tcV9zdGFydF9od19xdWV1
+ZSsweDU4LzB4ODANCj4gW2MwMDAwMDBmZmZmMzc5ZjBdIFtjMDAwMDAwMDAwODhmZDQwXSBibGtf
+bXFfc3RhcnRfaHdfcXVldWVzKzB4NjAvMHhiMA0KPiBbYzAwMDAwMGZmZmYzN2EzMF0gW2MwMDAw
+MDAwMDBhZTJiNTRdIHNjc2lfa2lja19xdWV1ZSsweDM0LzB4YTANCj4gW2MwMDAwMDBmZmZmMzdh
+NTBdIFtjMDAwMDAwMDAwYWUyZjcwXSBzY3NpX3J1bl9xdWV1ZSsweDNiMC8weDY2MA0KPiBbYzAw
+MDAwMGZmZmYzN2FjMF0gW2MwMDAwMDAwMDBhZTdlZDRdIHNjc2lfcnVuX2hvc3RfcXVldWVzKzB4
+NjQvMHhjMA0KPiBbYzAwMDAwMGZmZmYzN2IwMF0gW2MwMDAwMDAwMDBhZTdmNjRdIHNjc2lfdW5i
+bG9ja19yZXF1ZXN0cysweDM0LzB4NjANCj4gW2MwMDAwMDBmZmZmMzdiMjBdIFtjMDAwMDAwMDAw
+YjE0OTk4XSBpcHJfaW9hX2JyaW5nZG93bl9kb25lKzB4ZjgvMHgzYTANCj4gW2MwMDAwMDBmZmZm
+MzdiYzBdIFtjMDAwMDAwMDAwYjEyNTI4XSBpcHJfcmVzZXRfaW9hX2pvYisweGQ4LzB4MTcwDQo+
+IFtjMDAwMDAwZmZmZjM3YzAwXSBbYzAwMDAwMDAwMGIxODc5MF0gaXByX3Jlc2V0X3RpbWVyX2Rv
+bmUrMHgxMTAvMHgxNjANCj4gW2MwMDAwMDBmZmZmMzdjNTBdIFtjMDAwMDAwMDAwMjRkYjUwXSBj
+YWxsX3RpbWVyX2ZuKzB4YTAvMHgzYTANCj4gW2MwMDAwMDBmZmZmMzdjZTBdIFtjMDAwMDAwMDAw
+MjRlMDU4XSBleHBpcmVfdGltZXJzKzB4MWI4LzB4MzUwDQo+IFtjMDAwMDAwZmZmZjM3ZDUwXSBb
+YzAwMDAwMDAwMDI0ZTJmMF0gcnVuX3RpbWVyX3NvZnRpcnErMHgxMDAvMHgzZTANCj4gW2MwMDAw
+MDBmZmZmMzdkZjBdIFtjMDAwMDAwMDAwMTYyZWRjXSBfX2RvX3NvZnRpcnErMHgyMGMvMHg2MjAN
+Cj4gW2MwMDAwMDBmZmZmMzdlZTBdIFtjMDAwMDAwMDAwMTYzYTgwXSBpcnFfZXhpdCsweDIzMC8w
+eDI5MA0KPiBbYzAwMDAwMGZmZmYzN2YxMF0gW2MwMDAwMDAwMDAwMWQ3NzBdIF9fZG9faXJxKzB4
+MTcwLzB4NDEwDQo+IFtjMDAwMDAwZmZmZjM3ZjkwXSBbYzAwMDAwMDAwMDAzZWEyMF0gY2FsbF9k
+b19pcnErMHgxNC8weDI0DQo+IFtjMDAwMDAwN2Y4NGUzYTcwXSBbYzAwMDAwMDAwMDAxZGFlMF0g
+ZG9fSVJRKzB4ZDAvMHgxOTANCj4gW2MwMDAwMDA3Zjg0ZTNhYzBdIFtjMDAwMDAwMDAwMDA4YzU4
+XSBoYXJkd2FyZV9pbnRlcnJ1cHRfY29tbW9uDQo+ICsweDE1OC8weDE2MA0KDQpIZWxsbyBCcmlh
+biwNCg0KSW4gdGhlIE1BSU5UQUlORVJTIGZpbGUgSSBmb3VuZCB0aGUgZm9sbG93aW5nOg0KDQpJ
+Qk0gUG93ZXIgTGludXggUkFJRCBhZGFwdGVyDQpNOiAgICAgIEJyaWFuIEtpbmcgPGJya2luZ0B1
+cy5pYm0uY29tPg0KUzogICAgICBTdXBwb3J0ZWQNCkY6ICAgICAgZHJpdmVycy9zY3NpL2lwci4q
+DQoNCklzIHRoYXQgaW5mb3JtYXRpb24gdXAtdG8tZGF0ZT8gRG8geW91IGFncmVlIHRoYXQgdGhl
+IGFib3ZlIG1lc3NhZ2UgaW5kaWNhdGVzDQphIGJ1ZyBpbiB0aGUgaXByIGRyaXZlcj8NCg0KVGhh
+bmtzLA0KDQpCYXJ0Lg==
