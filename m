@@ -1,296 +1,275 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	lucmiccio@gmail.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT V2 1/2] block,bfq: refactor device-idling logic
-Date: Fri,  4 Aug 2017 07:35:10 +0200
-Message-Id: <20170804053511.2389-2-paolo.valente@linaro.org>
-In-Reply-To: <20170804053511.2389-1-paolo.valente@linaro.org>
-References: <20170804053511.2389-1-paolo.valente@linaro.org>
+Return-Path: <chrism@mellanox.com>
+From: Chris Mi <chrism@mellanox.com>
+To: netdev@vger.kernel.org
+Cc: aditr@vmware.com, stern@rowland.harvard.edu, agk@redhat.com,
+        alexander.shishkin@linux.intel.com, alexandre.bounine@idt.com,
+        alexander.deucher@amd.com, oakad@yahoo.com, ast@kernel.org,
+        elder@kernel.org, adobriyan@gmail.com, alex.williamson@redhat.com,
+        AlexBin.Xie@amd.com, viro@zeniv.linux.org.uk,
+        amd-gfx@lists.freedesktop.org, amitkarwar@gmail.com,
+        andresx7@gmail.com, andrew.donnellan@au1.ibm.com, afd@ti.com,
+        akpm@linux-foundation.org, anil.gurumurthy@qlogic.com,
+        anna.schumaker@netapp.com, acme@kernel.org, arnd@arndb.de,
+        dedekind1@gmail.com, ashutosh.dixit@intel.com,
+        ath10k@lists.infradead.org, Bart.VanAssche@sandisk.com,
+        bhaktipriya96@gmail.com, bjorn.andersson@linaro.org,
+        boris.brezillon@free-electrons.com, computersforpeace@gmail.com,
+        bryan.thompson@unisys.com, cgroups@vger.kernel.org, 3chas3@gmail.com,
+        chrism@mellanox.com, christian.koenig@amd.com, ccaulfie@redhat.com,
+        chris@chris-wilson.co.uk, david1.zhou@amd.com,
+        cluster-devel@redhat.com, colin.king@canonical.com,
+        xiyou.wangcong@gmail.com, cyrille.pitchen@wedev4u.fr,
+        daniel@iogearbox.net, daniel.vetter@intel.com,
+        dasaratharaman.chandramouli@intel.com, airlied@redhat.com,
+        dsa@cumulusnetworks.com, airlied@linux.ie, david.binder@unisys.com,
+        dhowells@redhat.com, david.kershner@unisys.com, dtwlin@gmail.com,
+        dave@stgolabs.net, davem@davemloft.net, teigland@redhat.com,
+        dwindsor@gmail.com, dwmw2@infradead.org, dennis.dalessandro@intel.com,
+        devel@driverdev.osuosl.org, devesh.sharma@broadcom.com,
+        devicetree@vger.kernel.org, dick.kennedy@broadcom.com,
+        dm-devel@redhat.com, don.hiatt@intel.com, dgilbert@interlog.com,
+        dledford@redhat.com, drbd-dev@lists.linbit.com,
+        dri-devel@lists.freedesktop.org, elena.reshetova@intel.com,
+        edumazet@google.com, eparis@parisplace.org, ericvh@gmail.com,
+        ebiederm@xmission.com, evan.quan@amd.com, felipe.balbi@linux.intel.com,
+        Felix.Kuehling@amd.com, f.fainelli@gmail.com, fw@strlen.de,
+        frowand.list@gmail.com, fbarrat@linux.vnet.ibm.com,
+        fujita.tomonori@lab.ntt.co.jp, gbhat@marvell.com,
+        geliangtang@gmail.com, kraxel@redhat.com, gregkh@linuxfoundation.org,
+        greybus-dev@lists.linaro.org, linux@roeck-us.net,
+        gustavo.padovan@collabora.co.uk, hal.rosenstock@gmail.com,
+        hannes@stressinduktion.org, hare@suse.de, ishkamiel@gmail.com,
+        hans.westgaard.ry@oracle.com, ray.huang@amd.com, mingo@redhat.com,
+        inki.dae@samsung.com, intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux-foundation.org,
+        ira.weiny@intel.com, jinpu.wang@profitbricks.com, jhs@mojatatu.com,
+        jejb@linux.vnet.ibm.com, james.smart@broadcom.com,
+        jani.nikula@linux.intel.com, jack@suse.cz,
+        jarkko.sakkinen@linux.intel.com, jarno@ovn.org, Jason@zx2c4.com,
+        jgunthorpe@obsidianresearch.com, jasowang@redhat.com,
+        javier@osg.samsung.com, bfields@fieldses.org, jlayton@poochiereds.net,
+        axboe@kernel.dk, jens.wiklander@linaro.org, jiangyilism@gmail.com,
+        jiri@mellanox.com, jiri@resnulli.us, jlbec@evilplan.org,
+        joro@8bytes.org, johan@kernel.org, johannes@sipsolutions.net,
+        hannes@cmpxchg.org, john@johnmccutchan.com, jonathanh@nvidia.com,
+        jon.maloy@ericsson.com, joonas.lahtinen@linux.intel.com,
+        jy0922.shim@samsung.com, jbacik@fb.com, Jerry.Zhang@amd.com,
+        jsarha@ti.com, Kai.Makisara@kolumbus.fi, kvalo@qca.qualcomm.com,
+        keescook@chromium.org, krzk@kernel.org, kgene@kernel.org,
+        kvm@vger.kernel.org, kyungmin.park@samsung.com, jiangshanlai@gmail.com,
+        lars.ellenberg@linbit.com, lucho@ionkov.net, lee.jones@linaro.org,
+        leo.liu@amd.com, leon@kernel.org,
+        linux1394-devel@lists.sourceforge.net,
+        linux-arm-kernel@lists.infradead.org,
+        linux-atm-general@lists.sourceforge.net, linux-block@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-mtd@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-pm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-ppp@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, logang@deltatee.com, majd@mellanox.com,
+        manfred@colorfullife.com, tpmdd@selhorst.net,
+        marcos.souza.org@gmail.com, marek.vasut@gmail.com,
+        mario.kleiner.de@gmail.com, markb@mellanox.com, mfasheh@versity.com,
+        elfring@users.sourceforge.net, martin.petersen@oracle.com,
+        matan@mellanox.com, mawilcox@microsoft.com,
+        mporter@kernel.crashing.org, mchehab@kernel.org,
+        maximlevitsky@gmail.com, mst@redhat.com, mhocko@kernel.org,
+        michel.daenzer@amd.com, mike.marciniszyn@intel.com,
+        rppt@linux.vnet.ibm.com, snitzer@redhat.com, mszeredi@redhat.com,
+        minchan@kernel.org, tom.leiming@gmail.com, monis@mellanox.com,
+        Monk.Liu@amd.com, nbd-general@lists.sourceforge.net, neilb@suse.com,
+        nhorman@tuxdriver.com, nab@linux-iscsi.org, nicolai.haehnle@amd.com,
+        nicolas.dichtel@6wind.com, niranjana.vishwanathapura@intel.com,
+        nishants@marvell.com, ngupta@vflare.org, ocfs2-devel@oss.oracle.com,
+        ohad@wizery.com, oneukum@suse.com, osandov@fb.com,
+        ogerlitz@mellanox.com, pali.rohar@gmail.com,
+        pantelis.antoniou@konsulko.com, paulus@samba.org, paul@paul-moore.com,
+        peterhuewe@gmx.de, peterz@infradead.org, pmladek@suse.com,
+        philipp.reisner@linbit.com, pshelar@ovn.org, rjw@rjwysocki.net,
+        richard@nod.at, rlove@rlove.org, robh+dt@kernel.org,
+        giometti@enneenne.com, rogerq@ti.com, roman.kapl@sysgo.com,
+        rminnich@sandia.gov, rmk+kernel@armlinux.org.uk,
+        sainath.grandhi@intel.com, sameer.wadgaonkar@unisys.com,
+        sean.hefty@intel.com, seanpaul@chromium.org, bigeasy@linutronix.de,
+        sre@kernel.org, nsekhar@ti.com, selvin.xavier@broadcom.com,
+        sergey.senozhatsky.work@gmail.com, sw0312.kim@samsung.com,
+        p.shailesh@samsung.com, shli@kernel.org, shaun.tancheff@seagate.com,
+        syeh@vmware.com, sparmaintainer@unisys.com, stefanr@s5r6.in-berlin.de,
+        sboyd@codeaurora.org, stephen@networkplumber.org, swise@chelsio.com,
+        sudarsana.kalluru@qlogic.com, sudeep.dutt@intel.com,
+        sumit.semwal@linaro.org, target-devel@vger.kernel.org, tj@kernel.org,
+        thierry.reding@gmail.com, thellstrom@vmware.com,
+        timothy.sell@unisys.com, tipc-discussion@lists.sourceforge.net,
+        tomas.winkler@intel.com, tomi.valkeinen@ti.com,
+        tpmdd-devel@lists.sourceforge.net, trond.myklebust@primarydata.com,
+        v9fs-developer@lists.sourceforge.net, varun@chelsio.com,
+        virtualization@lists.linux-foundation.org, vdavydov.dev@gmail.com,
+        vyasevich@gmail.com, linux-graphics-maintainer@vmware.com,
+        longman@redhat.com, weiyj.lk@gmail.com, wsa@the-dreams.de,
+        huxm@marvell.com, ying.xue@windriver.com, yishaih@mellanox.com,
+        yuval.shaia@oracle.com, lizefan@huawei.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com
+Subject: [patch net-next 2/3] net/sched: Change cls_flower to use IDR
+Date: Tue, 15 Aug 2017 22:12:17 -0400
+Message-Id: <1502849538-14284-3-git-send-email-chrism@mellanox.com>
+In-Reply-To: <1502849538-14284-1-git-send-email-chrism@mellanox.com>
+References: <1502849538-14284-1-git-send-email-chrism@mellanox.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The logic that decides whether to idle the device is scattered across
-three functions. Almost all of the logic is in the function
-bfq_bfqq_may_idle, but (1) part of the decision is made in
-bfq_update_idle_window, and (2) the function bfq_bfqq_must_idle may
-switch off idling regardless of the output of bfq_bfqq_may_idle. In
-addition, both bfq_update_idle_window and bfq_bfqq_must_idle make
-their decisions as a function of parameters that are used, for similar
-purposes, also in bfq_bfqq_may_idle. This commit addresses these
-issues by moving all the logic into bfq_bfqq_may_idle.
+Currently, all filters with the same priority are linked in a doubly
+linked list. Every filter should have a unique handle. To make the
+handle unique, we need to iterate the list every time to see if the
+handle exists or not when inserting a new filter. It is time-consuming.
+For example, it takes about 5m3.169s to insert 64K rules.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+This patch changes cls_flower to use IDR. With this patch, it
+takes about 0m1.127s to insert 64K rules. The improvement is huge.
+
+But please note that in this testing, all filters share the same action.
+If every filter has a unique action, that is another bottleneck.
+Follow-up patch in this patchset addresses that.
+
+Signed-off-by: Chris Mi <chrism@mellanox.com>
+Signed-off-by: Jiri Pirko <jiri@mellanox.com>
 ---
- block/bfq-iosched.c | 117 +++++++++++++++++++++++++++-------------------------
- block/bfq-iosched.h |  12 +++---
- 2 files changed, 67 insertions(+), 62 deletions(-)
+ net/sched/cls_flower.c | 55 +++++++++++++++++++++-----------------------------
+ 1 file changed, 23 insertions(+), 32 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 436b6ca..ccdc9e6 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -128,7 +128,7 @@ BFQ_BFQQ_FNS(busy);
- BFQ_BFQQ_FNS(wait_request);
- BFQ_BFQQ_FNS(non_blocking_wait_rq);
- BFQ_BFQQ_FNS(fifo_expire);
--BFQ_BFQQ_FNS(idle_window);
-+BFQ_BFQQ_FNS(has_short_ttime);
- BFQ_BFQQ_FNS(sync);
- BFQ_BFQQ_FNS(IO_bound);
- BFQ_BFQQ_FNS(in_large_burst);
-@@ -731,10 +731,10 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
- 	unsigned int old_wr_coeff = bfqq->wr_coeff;
- 	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index 052e902..071f0ef 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -68,7 +68,6 @@ struct cls_fl_head {
+ 	struct rhashtable ht;
+ 	struct fl_flow_mask mask;
+ 	struct flow_dissector dissector;
+-	u32 hgen;
+ 	bool mask_assigned;
+ 	struct list_head filters;
+ 	struct rhashtable_params ht_params;
+@@ -76,6 +75,7 @@ struct cls_fl_head {
+ 		struct work_struct work;
+ 		struct rcu_head	rcu;
+ 	};
++	struct idr handle_idr;
+ };
  
--	if (bic->saved_idle_window)
--		bfq_mark_bfqq_idle_window(bfqq);
-+	if (bic->saved_has_short_ttime)
-+		bfq_mark_bfqq_has_short_ttime(bfqq);
- 	else
--		bfq_clear_bfqq_idle_window(bfqq);
-+		bfq_clear_bfqq_has_short_ttime(bfqq);
+ struct cls_fl_filter {
+@@ -210,6 +210,7 @@ static int fl_init(struct tcf_proto *tp)
  
- 	if (bic->saved_IO_bound)
- 		bfq_mark_bfqq_IO_bound(bfqq);
-@@ -2012,7 +2012,7 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- 		return;
+ 	INIT_LIST_HEAD_RCU(&head->filters);
+ 	rcu_assign_pointer(tp->root, head);
++	idr_init(&head->handle_idr);
  
- 	bic->saved_ttime = bfqq->ttime;
--	bic->saved_idle_window = bfq_bfqq_idle_window(bfqq);
-+	bic->saved_has_short_ttime = bfq_bfqq_has_short_ttime(bfqq);
- 	bic->saved_IO_bound = bfq_bfqq_IO_bound(bfqq);
- 	bic->saved_in_large_burst = bfq_bfqq_in_large_burst(bfqq);
- 	bic->was_in_burst_list = !hlist_unhashed(&bfqq->burst_list_node);
-@@ -3038,8 +3038,8 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 	}
+ 	return 0;
+ }
+@@ -295,6 +296,9 @@ static void fl_hw_update_stats(struct tcf_proto *tp, struct cls_fl_filter *f)
  
- 	bfq_log_bfqq(bfqd, bfqq,
--		"expire (%d, slow %d, num_disp %d, idle_win %d)", reason,
--		slow, bfqq->dispatched, bfq_bfqq_idle_window(bfqq));
-+		"expire (%d, slow %d, num_disp %d, short_ttime %d)", reason,
-+		slow, bfqq->dispatched, bfq_bfqq_has_short_ttime(bfqq));
- 
- 	/*
- 	 * Increase, decrease or leave budget unchanged according to
-@@ -3122,6 +3122,18 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 		return true;
- 
- 	/*
-+	 * Idling is performed only if slice_idle > 0. In addition, we
-+	 * do not idle if
-+	 * (a) bfqq is async
-+	 * (b) bfqq is in the idle io prio class: in this case we do
-+	 * not idle because we want to minimize the bandwidth that
-+	 * queues in this class can steal to higher-priority queues
-+	 */
-+	if (bfqd->bfq_slice_idle == 0 || !bfq_bfqq_sync(bfqq) ||
-+	    bfq_class_idle(bfqq))
-+		return false;
+ static void __fl_delete(struct tcf_proto *tp, struct cls_fl_filter *f)
+ {
++	struct cls_fl_head *head = rtnl_dereference(tp->root);
 +
-+	/*
- 	 * The next variable takes into account the cases where idling
- 	 * boosts the throughput.
- 	 *
-@@ -3142,7 +3154,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 */
- 	idling_boosts_thr = !bfqd->hw_tag ||
- 		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq) &&
--		 bfq_bfqq_idle_window(bfqq));
-+		 bfq_bfqq_has_short_ttime(bfqq));
++	idr_remove(&head->handle_idr, f->handle);
+ 	list_del_rcu(&f->list);
+ 	if (!tc_skip_hw(f->flags))
+ 		fl_hw_destroy_filter(tp, f);
+@@ -327,6 +331,7 @@ static void fl_destroy(struct tcf_proto *tp)
  
- 	/*
- 	 * The value of the next variable,
-@@ -3313,16 +3325,13 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 		asymmetric_scenario && !bfq_bfqq_in_large_burst(bfqq);
+ 	list_for_each_entry_safe(f, next, &head->filters, list)
+ 		__fl_delete(tp, f);
++	idr_destroy(&head->handle_idr);
  
- 	/*
--	 * We have now all the components we need to compute the return
--	 * value of the function, which is true only if both the following
--	 * conditions hold:
--	 * 1) bfqq is sync, because idling make sense only for sync queues;
--	 * 2) idling either boosts the throughput (without issues), or
--	 *    is necessary to preserve service guarantees.
-+	 * We have now all the components we need to compute the
-+	 * return value of the function, which is true only if idling
-+	 * either boosts the throughput (without issues), or is
-+	 * necessary to preserve service guarantees.
- 	 */
--	return bfq_bfqq_sync(bfqq) &&
--		(idling_boosts_thr_without_issues ||
--		 idling_needed_for_service_guarantees);
-+	return idling_boosts_thr_without_issues ||
-+		idling_needed_for_service_guarantees;
- }
- 
- /*
-@@ -3338,10 +3347,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
-  */
- static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
+ 	__module_get(THIS_MODULE);
+ 	call_rcu(&head->rcu, fl_destroy_rcu);
+@@ -335,12 +340,8 @@ static void fl_destroy(struct tcf_proto *tp)
+ static void *fl_get(struct tcf_proto *tp, u32 handle)
  {
--	struct bfq_data *bfqd = bfqq->bfqd;
--
--	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfqd->bfq_slice_idle != 0 &&
--	       bfq_bfqq_may_idle(bfqq);
-+	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_may_idle(bfqq);
+ 	struct cls_fl_head *head = rtnl_dereference(tp->root);
+-	struct cls_fl_filter *f;
+ 
+-	list_for_each_entry(f, &head->filters, list)
+-		if (f->handle == handle)
+-			return f;
+-	return NULL;
++	return idr_find(&head->handle_idr, handle);
  }
  
- /*
-@@ -3783,7 +3789,6 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 	case IOPRIO_CLASS_IDLE:
- 		bfqq->new_ioprio_class = IOPRIO_CLASS_IDLE;
- 		bfqq->new_ioprio = 7;
--		bfq_clear_bfqq_idle_window(bfqq);
- 		break;
- 	}
- 
-@@ -3843,8 +3848,14 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		bfq_set_next_ioprio_data(bfqq, bic);
- 
- 	if (is_sync) {
-+		/*
-+		 * No need to mark as has_short_ttime if in
-+		 * idle_class, because no device idling is performed
-+		 * for queues in idle class
-+		 */
- 		if (!bfq_class_idle(bfqq))
--			bfq_mark_bfqq_idle_window(bfqq);
-+			/* tentatively mark as has_short_ttime */
-+			bfq_mark_bfqq_has_short_ttime(bfqq);
- 		bfq_mark_bfqq_sync(bfqq);
- 		bfq_mark_bfqq_just_created(bfqq);
- 	} else
-@@ -3985,18 +3996,19 @@ bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		 blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT);
+ static const struct nla_policy fl_policy[TCA_FLOWER_MAX + 1] = {
+@@ -859,27 +860,6 @@ static int fl_set_parms(struct net *net, struct tcf_proto *tp,
+ 	return 0;
  }
  
--/*
-- * Disable idle window if the process thinks too long or seeks so much that
-- * it doesn't matter.
-- */
--static void bfq_update_idle_window(struct bfq_data *bfqd,
--				   struct bfq_queue *bfqq,
--				   struct bfq_io_cq *bic)
-+static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
-+				       struct bfq_queue *bfqq,
-+				       struct bfq_io_cq *bic)
- {
--	int enable_idle;
-+	bool has_short_ttime = true;
- 
--	/* Don't idle for async or idle io prio class. */
--	if (!bfq_bfqq_sync(bfqq) || bfq_class_idle(bfqq))
-+	/*
-+	 * No need to update has_short_ttime if bfqq is async or in
-+	 * idle io prio class, or if bfq_slice_idle is zero, because
-+	 * no device idling is performed for bfqq in this case.
-+	 */
-+	if (!bfq_bfqq_sync(bfqq) || bfq_class_idle(bfqq) ||
-+	    bfqd->bfq_slice_idle == 0)
- 		return;
- 
- 	/* Idle window just restored, statistics are meaningless. */
-@@ -4004,27 +4016,22 @@ static void bfq_update_idle_window(struct bfq_data *bfqd,
- 				     bfqd->bfq_wr_min_idle_time))
- 		return;
- 
--	enable_idle = bfq_bfqq_idle_window(bfqq);
+-static u32 fl_grab_new_handle(struct tcf_proto *tp,
+-			      struct cls_fl_head *head)
+-{
+-	unsigned int i = 0x80000000;
+-	u32 handle;
 -
-+	/* Think time is infinite if no process is linked to
-+	 * bfqq. Otherwise check average think time to
-+	 * decide whether to mark as has_short_ttime
-+	 */
- 	if (atomic_read(&bic->icq.ioc->active_ref) == 0 ||
--	    bfqd->bfq_slice_idle == 0 ||
--		(bfqd->hw_tag && BFQQ_SEEKY(bfqq) &&
--			bfqq->wr_coeff == 1))
--		enable_idle = 0;
--	else if (bfq_sample_valid(bfqq->ttime.ttime_samples)) {
--		if (bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle &&
--			bfqq->wr_coeff == 1)
--			enable_idle = 0;
--		else
--			enable_idle = 1;
+-	do {
+-		if (++head->hgen == 0x7FFFFFFF)
+-			head->hgen = 1;
+-	} while (--i > 0 && fl_get(tp, head->hgen));
+-
+-	if (unlikely(i == 0)) {
+-		pr_err("Insufficient number of handles\n");
+-		handle = 0;
+-	} else {
+-		handle = head->hgen;
 -	}
--	bfq_log_bfqq(bfqd, bfqq, "update_idle_window: enable_idle %d",
--		enable_idle);
-+	    (bfq_sample_valid(bfqq->ttime.ttime_samples) &&
-+	     bfqq->ttime.ttime_mean > bfqd->bfq_slice_idle))
-+		has_short_ttime = false;
+-
+-	return handle;
+-}
+-
+ static int fl_change(struct net *net, struct sk_buff *in_skb,
+ 		     struct tcf_proto *tp, unsigned long base,
+ 		     u32 handle, struct nlattr **tca,
+@@ -890,6 +870,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
+ 	struct cls_fl_filter *fnew;
+ 	struct nlattr **tb;
+ 	struct fl_flow_mask mask = {};
++	unsigned long idr_index;
+ 	int err;
+ 
+ 	if (!tca[TCA_OPTIONS])
+@@ -920,13 +901,21 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
+ 		goto errout;
+ 
+ 	if (!handle) {
+-		handle = fl_grab_new_handle(tp, head);
+-		if (!handle) {
+-			err = -EINVAL;
++		err = idr_alloc(&head->handle_idr, fnew, &idr_index,
++				1, 0x80000000, GFP_KERNEL);
++		if (err)
+ 			goto errout;
+-		}
++		fnew->handle = idr_index;
++	}
 +
-+	bfq_log_bfqq(bfqd, bfqq, "update_has_short_ttime: has_short_ttime %d",
-+		     has_short_ttime);
++	/* user specifies a handle and it doesn't exist */
++	if (handle && !fold) {
++		err = idr_alloc(&head->handle_idr, fnew, &idr_index,
++				handle, handle + 1, GFP_KERNEL);
++		if (err)
++			goto errout;
++		fnew->handle = idr_index;
+ 	}
+-	fnew->handle = handle;
  
--	if (enable_idle)
--		bfq_mark_bfqq_idle_window(bfqq);
-+	if (has_short_ttime)
-+		bfq_mark_bfqq_has_short_ttime(bfqq);
- 	else
--		bfq_clear_bfqq_idle_window(bfqq);
-+		bfq_clear_bfqq_has_short_ttime(bfqq);
- }
+ 	if (tb[TCA_FLOWER_FLAGS]) {
+ 		fnew->flags = nla_get_u32(tb[TCA_FLOWER_FLAGS]);
+@@ -980,6 +969,8 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
+ 	*arg = fnew;
  
- /*
-@@ -4040,14 +4047,12 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		bfqq->meta_pending++;
- 
- 	bfq_update_io_thinktime(bfqd, bfqq);
-+	bfq_update_has_short_ttime(bfqd, bfqq, bic);
- 	bfq_update_io_seektime(bfqd, bfqq, rq);
--	if (bfqq->entity.service > bfq_max_budget(bfqd) / 8 ||
--	    !BFQQ_SEEKY(bfqq))
--		bfq_update_idle_window(bfqd, bfqq, bic);
- 
- 	bfq_log_bfqq(bfqd, bfqq,
--		     "rq_enqueued: idle_window=%d (seeky %d)",
--		     bfq_bfqq_idle_window(bfqq), BFQQ_SEEKY(bfqq));
-+		     "rq_enqueued: has_short_ttime=%d (seeky %d)",
-+		     bfq_bfqq_has_short_ttime(bfqq), BFQQ_SEEKY(bfqq));
- 
- 	bfqq->last_request_pos = blk_rq_pos(rq) + blk_rq_sectors(rq);
- 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 63e771a..53e2907 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -348,11 +348,11 @@ struct bfq_io_cq {
- 	uint64_t blkcg_serial_nr; /* the current blkcg serial */
- #endif
- 	/*
--	 * Snapshot of the idle window before merging; taken to
--	 * remember this value while the queue is merged, so as to be
--	 * able to restore it in case of split.
-+	 * Snapshot of the has_short_time flag before merging; taken
-+	 * to remember its value while the queue is merged, so as to
-+	 * be able to restore it in case of split.
- 	 */
--	bool saved_idle_window;
-+	bool saved_has_short_ttime;
- 	/*
- 	 * Same purpose as the previous two fields for the I/O bound
- 	 * classification of a queue.
-@@ -626,7 +626,7 @@ enum bfqq_state_flags {
- 				     * without idling the device
- 				     */
- 	BFQQF_fifo_expire,	/* FIFO checked in this slice */
--	BFQQF_idle_window,	/* slice idling enabled */
-+	BFQQF_has_short_ttime,	/* queue has a short think time */
- 	BFQQF_sync,		/* synchronous queue */
- 	BFQQF_IO_bound,		/*
- 				 * bfqq has timed-out at least once
-@@ -655,7 +655,7 @@ BFQ_BFQQ_FNS(busy);
- BFQ_BFQQ_FNS(wait_request);
- BFQ_BFQQ_FNS(non_blocking_wait_rq);
- BFQ_BFQQ_FNS(fifo_expire);
--BFQ_BFQQ_FNS(idle_window);
-+BFQ_BFQQ_FNS(has_short_ttime);
- BFQ_BFQQ_FNS(sync);
- BFQ_BFQQ_FNS(IO_bound);
- BFQ_BFQQ_FNS(in_large_burst);
+ 	if (fold) {
++		fnew->handle = handle;
++		idr_replace(&head->handle_idr, fnew, fnew->handle);
+ 		list_replace_rcu(&fold->list, &fnew->list);
+ 		tcf_unbind_filter(tp, &fold->res);
+ 		call_rcu(&fold->rcu, fl_destroy_filter);
 -- 
-2.10.0
+1.8.3.1
