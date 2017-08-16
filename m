@@ -1,49 +1,31 @@
-Return-Path: <BATV+eb4e61afd325b22435ea+5099+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mpatocka@redhat.com,
-	gmazyland@gmail.com,
-	martin.petersen@oracle.com,
-	linux-block@vger.kernel.org,
-	dm-devel@redhat.com
-Subject: [PATCH 1/2] bio-integrity: move the bio integrity profile check earlier in bio_integrity_prep
-Date: Wed,  9 Aug 2017 17:48:08 +0200
-Message-Id: <20170809154809.2168-2-hch@lst.de>
-In-Reply-To: <20170809154809.2168-1-hch@lst.de>
-References: <20170809154809.2168-1-hch@lst.de>
+Return-Path: <adrian.hunter@intel.com>
+Subject: Re: [PATCH] Revert "scsi: default to scsi-mq"
+To: "hch@lst.de" <hch@lst.de>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Vinayak Holikatti <vinholikatti@gmail.com>,
+ Subhash Jadavani <subhashj@codeaurora.org>
+References: <20170813174422.16197-1-hch@lst.de>
+ <1502724064.2333.5.camel@wdc.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <c9cb1e15-ccd7-94e3-f064-a89c71237ff8@intel.com>
+Date: Wed, 16 Aug 2017 14:13:43 +0300
+MIME-Version: 1.0
+In-Reply-To: <1502724064.2333.5.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This makes the code more obvious, and moves the most likely branch first
-in the function.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio-integrity.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 9b1ea478577b..fafd19c540b0 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -246,6 +246,9 @@ bool bio_integrity_prep(struct bio *bio)
- 	blk_status_t status;
- 
- 	bi = bdev_get_integrity(bio->bi_bdev);
-+	if (!bi)
-+		return true;
-+
- 	q = bdev_get_queue(bio->bi_bdev);
- 	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
- 		return true;
-@@ -257,9 +260,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	if (bio_integrity(bio))
- 		return true;
- 
--	if (bi == NULL)
--		return true;
--
- 	if (bio_data_dir(bio) == READ) {
- 		if (!bi->profile->verify_fn ||
- 		    !(bi->flags & BLK_INTEGRITY_VERIFY))
--- 
-2.11.0
+On 14/08/17 18:21, Bart Van Assche wrote:
+> On Sun, 2017-08-13 at 19:44 +0200, Christoph Hellwig wrote:
+>> Defaulting to scsi-mq in 4.13-rc has shown various regressions
+>> on setups that we didn't previously consider.  Fixes for them are
+>> in progress, but too invasive to make it in this cycle.  So for
+>> now revert the commit that defaults to blk-mq for SCSI.  For 4.14
+>> we'll plan to try again with these fixes.
+> 
+> Should a patch for v4.14 perhaps be queued now?
+Please consider adding support for runtime pm first.  For people using
+scsi/ufs/ufshcd it might be an essential feature.
