@@ -1,110 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54101 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752632AbdHQTS1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 15:18:27 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7HJDYbc139896
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2017 15:18:26 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2cdawyx60r-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 17 Aug 2017 15:18:26 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <brking@linux.vnet.ibm.com>;
-        Thu, 17 Aug 2017 15:18:25 -0400
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>,
+	"brking@linux.vnet.ibm.com" <brking@linux.vnet.ibm.com>
+CC: "sachinp@linux.vnet.ibm.com" <sachinp@linux.vnet.ibm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"sfr@canb.auug.org.au" <sfr@canb.auug.org.au>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "brking@us.ibm.com" <brking@us.ibm.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: WARNING: CPU: 15 PID: 0 at block/blk-mq.c:1111
  __blk_mq_run_hw_queue+0x1d8/0x1f0
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "abdhalee@linux.vnet.ibm.com" <abdhalee@linux.vnet.ibm.com>
-Cc: "sachinp@linux.vnet.ibm.com" <sachinp@linux.vnet.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "sfr@canb.auug.org.au" <sfr@canb.auug.org.au>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "brking@us.ibm.com" <brking@us.ibm.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
+Date: Thu, 17 Aug 2017 15:32:22 +0000
+Message-ID: <1502983941.2615.5.camel@wdc.com>
 References: <1502906852.3305.33.camel@abdul.in.ibm.com>
- <1502907345.2421.8.camel@wdc.com>
- <4fe35be3-c631-e4ed-a135-110e536823bc@linux.vnet.ibm.com>
- <1502983941.2615.5.camel@wdc.com>
-From: Brian King <brking@linux.vnet.ibm.com>
-Date: Thu, 17 Aug 2017 14:18:18 -0500
+	 <1502907345.2421.8.camel@wdc.com>
+	 <4fe35be3-c631-e4ed-a135-110e536823bc@linux.vnet.ibm.com>
+In-Reply-To: <4fe35be3-c631-e4ed-a135-110e536823bc@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1502983941.2615.5.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <072f9589-7489-ac6a-2899-0f12aed3e2fe@linux.vnet.ibm.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 08/17/2017 10:32 AM, Bart Van Assche wrote:
-> On Wed, 2017-08-16 at 15:10 -0500, Brian King wrote:
->> On 08/16/2017 01:15 PM, Bart Van Assche wrote:
->>> On Wed, 2017-08-16 at 23:37 +0530, Abdul Haleem wrote:
->>>> Linux-next booted with the below warnings on powerpc
->>>>
->>>> [ ... ]
->>>>
->>>> boot warnings:
->>>> --------------
->>>> kvm: exiting hardware virtualization
->>>> ------------[ cut here ]------------
->>>> WARNING: CPU: 15 PID: 0 at block/blk-mq.c:1111 __blk_mq_run_hw_queue
->>>> +0x1d8/0x1f0
->>>> Modules linked in: iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4
->>>> Call Trace:
->>>> [c000000ffff37990] [c00000000088f7b0] __blk_mq_delay_run_hw_queue
->>>> +0x1f0/0x210
->>>> [c000000ffff379d0] [c00000000088fcb8] blk_mq_start_hw_queue+0x58/0x80
->>>> [c000000ffff379f0] [c00000000088fd40] blk_mq_start_hw_queues+0x60/0xb0
->>>> [c000000ffff37a30] [c000000000ae2b54] scsi_kick_queue+0x34/0xa0
->>>> [c000000ffff37a50] [c000000000ae2f70] scsi_run_queue+0x3b0/0x660
->>>> [c000000ffff37ac0] [c000000000ae7ed4] scsi_run_host_queues+0x64/0xc0
->>>> [c000000ffff37b00] [c000000000ae7f64] scsi_unblock_requests+0x34/0x60
->>>> [c000000ffff37b20] [c000000000b14998] ipr_ioa_bringdown_done+0xf8/0x3a0
->>>> [c000000ffff37bc0] [c000000000b12528] ipr_reset_ioa_job+0xd8/0x170
->>>> [c000000ffff37c00] [c000000000b18790] ipr_reset_timer_done+0x110/0x160
->>>> [c000000ffff37c50] [c00000000024db50] call_timer_fn+0xa0/0x3a0
->>>> [c000000ffff37ce0] [c00000000024e058] expire_timers+0x1b8/0x350
->>>> [c000000ffff37d50] [c00000000024e2f0] run_timer_softirq+0x100/0x3e0
->>>> [c000000ffff37df0] [c000000000162edc] __do_softirq+0x20c/0x620
->>>> [c000000ffff37ee0] [c000000000163a80] irq_exit+0x230/0x290
->>>> [c000000ffff37f10] [c00000000001d770] __do_irq+0x170/0x410
->>>> [c000000ffff37f90] [c00000000003ea20] call_do_irq+0x14/0x24
->>>> [c0000007f84e3a70] [c00000000001dae0] do_IRQ+0xd0/0x190
->>>> [c0000007f84e3ac0] [c000000000008c58] hardware_interrupt_common
->>>> +0x158/0x160
->>>
->>> Hello Brian,
->>>
->>> In the MAINTAINERS file I found the following:
->>>
->>> IBM Power Linux RAID adapter
->>> M:      Brian King <brking@us.ibm.com>
->>> S:      Supported
->>> F:      drivers/scsi/ipr.*
->>>
->>> Is that information up-to-date? Do you agree that the above message indicates
->>> a bug in the ipr driver?
->>
->> Yes. Can you try with this patch that is in 4.13/scsi-fixes:
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git/commit/?h=4.13/scsi-fixes&id=b0e17a9b0df29590c45dfb296f541270a5941f41
-> 
-> Hello Brian,
-> 
-> Sorry but I don't have access to a setup on which I can test the ipr driver ...
-
-Understood. That request was intended for Abdul, who reported the issue.
-I should have just cc'ed you...
-
-Thanks,
-
-Brian
-
--- 
-Brian King
-Power Linux I/O
-IBM Linux Technology Center
+T24gV2VkLCAyMDE3LTA4LTE2IGF0IDE1OjEwIC0wNTAwLCBCcmlhbiBLaW5nIHdyb3RlOg0KPiBP
+biAwOC8xNi8yMDE3IDAxOjE1IFBNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gT24gV2Vk
+LCAyMDE3LTA4LTE2IGF0IDIzOjM3ICswNTMwLCBBYmR1bCBIYWxlZW0gd3JvdGU6DQo+ID4gPiBM
+aW51eC1uZXh0IGJvb3RlZCB3aXRoIHRoZSBiZWxvdyB3YXJuaW5ncyBvbiBwb3dlcnBjDQo+ID4g
+PiANCj4gPiA+IFsgLi4uIF0NCj4gPiA+IA0KPiA+ID4gYm9vdCB3YXJuaW5nczoNCj4gPiA+IC0t
+LS0tLS0tLS0tLS0tDQo+ID4gPiBrdm06IGV4aXRpbmcgaGFyZHdhcmUgdmlydHVhbGl6YXRpb24N
+Cj4gPiA+IC0tLS0tLS0tLS0tLVsgY3V0IGhlcmUgXS0tLS0tLS0tLS0tLQ0KPiA+ID4gV0FSTklO
+RzogQ1BVOiAxNSBQSUQ6IDAgYXQgYmxvY2svYmxrLW1xLmM6MTExMSBfX2Jsa19tcV9ydW5faHdf
+cXVldWUNCj4gPiA+ICsweDFkOC8weDFmMA0KPiA+ID4gTW9kdWxlcyBsaW5rZWQgaW46IGlwdGFi
+bGVfbWFuZ2xlIGlwdF9NQVNRVUVSQURFIG5mX25hdF9tYXNxdWVyYWRlX2lwdjQNCj4gPiA+IENh
+bGwgVHJhY2U6DQo+ID4gPiBbYzAwMDAwMGZmZmYzNzk5MF0gW2MwMDAwMDAwMDA4OGY3YjBdIF9f
+YmxrX21xX2RlbGF5X3J1bl9od19xdWV1ZQ0KPiA+ID4gKzB4MWYwLzB4MjEwDQo+ID4gPiBbYzAw
+MDAwMGZmZmYzNzlkMF0gW2MwMDAwMDAwMDA4OGZjYjhdIGJsa19tcV9zdGFydF9od19xdWV1ZSsw
+eDU4LzB4ODANCj4gPiA+IFtjMDAwMDAwZmZmZjM3OWYwXSBbYzAwMDAwMDAwMDg4ZmQ0MF0gYmxr
+X21xX3N0YXJ0X2h3X3F1ZXVlcysweDYwLzB4YjANCj4gPiA+IFtjMDAwMDAwZmZmZjM3YTMwXSBb
+YzAwMDAwMDAwMGFlMmI1NF0gc2NzaV9raWNrX3F1ZXVlKzB4MzQvMHhhMA0KPiA+ID4gW2MwMDAw
+MDBmZmZmMzdhNTBdIFtjMDAwMDAwMDAwYWUyZjcwXSBzY3NpX3J1bl9xdWV1ZSsweDNiMC8weDY2
+MA0KPiA+ID4gW2MwMDAwMDBmZmZmMzdhYzBdIFtjMDAwMDAwMDAwYWU3ZWQ0XSBzY3NpX3J1bl9o
+b3N0X3F1ZXVlcysweDY0LzB4YzANCj4gPiA+IFtjMDAwMDAwZmZmZjM3YjAwXSBbYzAwMDAwMDAw
+MGFlN2Y2NF0gc2NzaV91bmJsb2NrX3JlcXVlc3RzKzB4MzQvMHg2MA0KPiA+ID4gW2MwMDAwMDBm
+ZmZmMzdiMjBdIFtjMDAwMDAwMDAwYjE0OTk4XSBpcHJfaW9hX2JyaW5nZG93bl9kb25lKzB4Zjgv
+MHgzYTANCj4gPiA+IFtjMDAwMDAwZmZmZjM3YmMwXSBbYzAwMDAwMDAwMGIxMjUyOF0gaXByX3Jl
+c2V0X2lvYV9qb2IrMHhkOC8weDE3MA0KPiA+ID4gW2MwMDAwMDBmZmZmMzdjMDBdIFtjMDAwMDAw
+MDAwYjE4NzkwXSBpcHJfcmVzZXRfdGltZXJfZG9uZSsweDExMC8weDE2MA0KPiA+ID4gW2MwMDAw
+MDBmZmZmMzdjNTBdIFtjMDAwMDAwMDAwMjRkYjUwXSBjYWxsX3RpbWVyX2ZuKzB4YTAvMHgzYTAN
+Cj4gPiA+IFtjMDAwMDAwZmZmZjM3Y2UwXSBbYzAwMDAwMDAwMDI0ZTA1OF0gZXhwaXJlX3RpbWVy
+cysweDFiOC8weDM1MA0KPiA+ID4gW2MwMDAwMDBmZmZmMzdkNTBdIFtjMDAwMDAwMDAwMjRlMmYw
+XSBydW5fdGltZXJfc29mdGlycSsweDEwMC8weDNlMA0KPiA+ID4gW2MwMDAwMDBmZmZmMzdkZjBd
+IFtjMDAwMDAwMDAwMTYyZWRjXSBfX2RvX3NvZnRpcnErMHgyMGMvMHg2MjANCj4gPiA+IFtjMDAw
+MDAwZmZmZjM3ZWUwXSBbYzAwMDAwMDAwMDE2M2E4MF0gaXJxX2V4aXQrMHgyMzAvMHgyOTANCj4g
+PiA+IFtjMDAwMDAwZmZmZjM3ZjEwXSBbYzAwMDAwMDAwMDAxZDc3MF0gX19kb19pcnErMHgxNzAv
+MHg0MTANCj4gPiA+IFtjMDAwMDAwZmZmZjM3ZjkwXSBbYzAwMDAwMDAwMDAzZWEyMF0gY2FsbF9k
+b19pcnErMHgxNC8weDI0DQo+ID4gPiBbYzAwMDAwMDdmODRlM2E3MF0gW2MwMDAwMDAwMDAwMWRh
+ZTBdIGRvX0lSUSsweGQwLzB4MTkwDQo+ID4gPiBbYzAwMDAwMDdmODRlM2FjMF0gW2MwMDAwMDAw
+MDAwMDhjNThdIGhhcmR3YXJlX2ludGVycnVwdF9jb21tb24NCj4gPiA+ICsweDE1OC8weDE2MA0K
+PiA+IA0KPiA+IEhlbGxvIEJyaWFuLA0KPiA+IA0KPiA+IEluIHRoZSBNQUlOVEFJTkVSUyBmaWxl
+IEkgZm91bmQgdGhlIGZvbGxvd2luZzoNCj4gPiANCj4gPiBJQk0gUG93ZXIgTGludXggUkFJRCBh
+ZGFwdGVyDQo+ID4gTTogICAgICBCcmlhbiBLaW5nIDxicmtpbmdAdXMuaWJtLmNvbT4NCj4gPiBT
+OiAgICAgIFN1cHBvcnRlZA0KPiA+IEY6ICAgICAgZHJpdmVycy9zY3NpL2lwci4qDQo+ID4gDQo+
+ID4gSXMgdGhhdCBpbmZvcm1hdGlvbiB1cC10by1kYXRlPyBEbyB5b3UgYWdyZWUgdGhhdCB0aGUg
+YWJvdmUgbWVzc2FnZSBpbmRpY2F0ZXMNCj4gPiBhIGJ1ZyBpbiB0aGUgaXByIGRyaXZlcj8NCj4g
+DQo+IFllcy4gQ2FuIHlvdSB0cnkgd2l0aCB0aGlzIHBhdGNoIHRoYXQgaXMgaW4gNC4xMy9zY3Np
+LWZpeGVzOg0KPiANCj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5l
+bC9naXQvbWtwL3Njc2kuZ2l0L2NvbW1pdC8/aD00LjEzL3Njc2ktZml4ZXMmaWQ9YjBlMTdhOWIw
+ZGYyOTU5MGM0NWRmYjI5NmY1NDEyNzBhNTk0MWY0MQ0KDQpIZWxsbyBCcmlhbiwNCg0KU29ycnkg
+YnV0IEkgZG9uJ3QgaGF2ZSBhY2Nlc3MgdG8gYSBzZXR1cCBvbiB3aGljaCBJIGNhbiB0ZXN0IHRo
+ZSBpcHIgZHJpdmVyIC4uLg0KDQpCYXJ0Lg==
