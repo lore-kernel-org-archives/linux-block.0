@@ -1,323 +1,101 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42664 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753451AbdHQUP2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Aug 2017 16:15:28 -0400
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 52/55] skd: Reduce memory usage
-Date: Thu, 17 Aug 2017 13:13:35 -0700
-Message-Id: <20170817201338.16537-53-bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 12/55] skd: Remove set-but-not-used local variables
+Date: Thu, 17 Aug 2017 13:12:55 -0700
+Message-Id: <20170817201338.16537-13-bart.vanassche@wdc.com>
 In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
 References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Every single coherent DMA memory buffer occupies at least one page.
-Reduce memory usage by switching from coherent buffers to streaming
-DMA for I/O requests (struct skd_fitmsg_context) and S/G-lists
-(struct fit_sg_descriptor[]).
+These variables have been detected by building with W=1. Declare
+'acc' as __maybe_unused because most access_ok() implementations
+ignore their first argument. This patch does not change any
+functionality.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/skd_main.c | 145 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 108 insertions(+), 37 deletions(-)
+ drivers/block/skd_main.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
 diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index a20434ca3e18..610c8979dc7e 100644
+index 5a88116efc97..ef7c0384e9a8 100644
 --- a/drivers/block/skd_main.c
 +++ b/drivers/block/skd_main.c
-@@ -32,6 +32,7 @@
- #include <linux/aer.h>
- #include <linux/wait.h>
- #include <linux/stringify.h>
-+#include <linux/slab_def.h>
- #include <scsi/scsi.h>
- #include <scsi/sg.h>
- #include <linux/io.h>
-@@ -256,6 +257,9 @@ struct skd_device {
+@@ -537,8 +537,6 @@ static void skd_request_fn(struct request_queue *q)
+ 	u32 lba;
+ 	u32 count;
+ 	int data_dir;
+-	u32 be_lba;
+-	u32 be_count;
+ 	u64 be_dmaa;
+ 	u64 cmdctxt;
+ 	u32 timo_slot;
+@@ -676,8 +674,6 @@ static void skd_request_fn(struct request_queue *q)
+ 		cmd_ptr = &skmsg->msg_buf[skmsg->length];
+ 		memset(cmd_ptr, 0, 32);
  
- 	u8 skcomp_cycle;
- 	u32 skcomp_ix;
-+	struct kmem_cache *msgbuf_cache;
-+	struct kmem_cache *sglist_cache;
-+	struct kmem_cache *databuf_cache;
- 	struct fit_completion_entry_v1 *skcomp_table;
- 	struct fit_comp_error_info *skerr_table;
- 	dma_addr_t cq_dma_address;
-@@ -538,6 +542,11 @@ static void skd_process_request(struct request *req, bool last)
- 		return;
+-		be_lba = cpu_to_be32(lba);
+-		be_count = cpu_to_be32(count);
+ 		be_dmaa = cpu_to_be64((u64)skreq->sksg_dma_address);
+ 		cmdctxt = skreq->id + SKD_ID_INCR;
+ 
+@@ -889,7 +885,6 @@ static void skd_postop_sg_list(struct skd_device *skdev,
+ static void skd_request_fn_not_online(struct request_queue *q)
+ {
+ 	struct skd_device *skdev = q->queuedata;
+-	int error;
+ 
+ 	SKD_ASSERT(skdev->state != SKD_DRVR_STATE_ONLINE);
+ 
+@@ -919,7 +914,6 @@ static void skd_request_fn_not_online(struct request_queue *q)
+ 	case SKD_DRVR_STATE_FAULT:
+ 	case SKD_DRVR_STATE_DISAPPEARED:
+ 	default:
+-		error = -EIO;
+ 		break;
  	}
  
-+	dma_sync_single_for_device(&skdev->pdev->dev, skreq->sksg_dma_address,
-+				   skreq->n_sg *
-+				   sizeof(struct fit_sg_descriptor),
-+				   DMA_TO_DEVICE);
-+
- 	spin_lock_irqsave(&skdev->lock, flags);
- 	/* Either a FIT msg is in progress or we have to start one. */
- 	skmsg = skdev->skmsg;
-@@ -1078,6 +1087,11 @@ static void skd_complete_internal(struct skd_device *skdev,
+@@ -943,7 +937,6 @@ static void skd_timer_tick(ulong arg)
+ 	struct skd_device *skdev = (struct skd_device *)arg;
  
- 	dev_dbg(&skdev->pdev->dev, "complete internal %x\n", scsi->cdb[0]);
+ 	u32 timo_slot;
+-	u32 overdue_timestamp;
+ 	unsigned long reqflags;
+ 	u32 state;
  
-+	dma_sync_single_for_cpu(&skdev->pdev->dev,
-+				skspcl->db_dma_address,
-+				skspcl->req.sksg_list[0].byte_count,
-+				DMA_BIDIRECTIONAL);
-+
- 	skspcl->req.completion = *skcomp;
- 	skspcl->req.state = SKD_REQ_STATE_IDLE;
- 	skspcl->req.id += SKD_ID_INCR;
-@@ -1263,6 +1277,9 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- 		 */
- 		qcmd |= FIT_QCMD_MSGSIZE_64;
+@@ -976,8 +969,6 @@ static void skd_timer_tick(ulong arg)
+ 		goto timer_func_out;
  
-+	dma_sync_single_for_device(&skdev->pdev->dev, skmsg->mb_dma_address,
-+				   skmsg->length, DMA_TO_DEVICE);
-+
- 	/* Make sure skd_msg_buf is written before the doorbell is triggered. */
- 	smp_wmb();
- 
-@@ -1274,6 +1291,8 @@ static void skd_send_special_fitmsg(struct skd_device *skdev,
- {
- 	u64 qcmd;
- 
-+	WARN_ON_ONCE(skspcl->req.n_sg != 1);
-+
- 	if (unlikely(skdev->dbg_level > 1)) {
- 		u8 *bp = (u8 *)skspcl->msg_buf;
- 		int i;
-@@ -1307,6 +1326,17 @@ static void skd_send_special_fitmsg(struct skd_device *skdev,
- 	qcmd = skspcl->mb_dma_address;
- 	qcmd |= FIT_QCMD_QID_NORMAL + FIT_QCMD_MSGSIZE_128;
- 
-+	dma_sync_single_for_device(&skdev->pdev->dev, skspcl->mb_dma_address,
-+				   SKD_N_SPECIAL_FITMSG_BYTES, DMA_TO_DEVICE);
-+	dma_sync_single_for_device(&skdev->pdev->dev,
-+				   skspcl->req.sksg_dma_address,
-+				   1 * sizeof(struct fit_sg_descriptor),
-+				   DMA_TO_DEVICE);
-+	dma_sync_single_for_device(&skdev->pdev->dev,
-+				   skspcl->db_dma_address,
-+				   skspcl->req.sksg_list[0].byte_count,
-+				   DMA_BIDIRECTIONAL);
-+
- 	/* Make sure skd_msg_buf is written before the doorbell is triggered. */
- 	smp_wmb();
- 
-@@ -2619,6 +2649,35 @@ static void skd_release_irq(struct skd_device *skdev)
-  *****************************************************************************
-  */
- 
-+static void *skd_alloc_dma(struct skd_device *skdev, struct kmem_cache *s,
-+			   dma_addr_t *dma_handle, gfp_t gfp,
-+			   enum dma_data_direction dir)
-+{
-+	struct device *dev = &skdev->pdev->dev;
-+	void *buf;
-+
-+	buf = kmem_cache_alloc(s, gfp);
-+	if (!buf)
-+		return NULL;
-+	*dma_handle = dma_map_single(dev, buf, s->size, dir);
-+	if (dma_mapping_error(dev, *dma_handle)) {
-+		kfree(buf);
-+		buf = NULL;
-+	}
-+	return buf;
-+}
-+
-+static void skd_free_dma(struct skd_device *skdev, struct kmem_cache *s,
-+			 void *vaddr, dma_addr_t dma_handle,
-+			 enum dma_data_direction dir)
-+{
-+	if (!vaddr)
-+		return;
-+
-+	dma_unmap_single(&skdev->pdev->dev, dma_handle, s->size, dir);
-+	kmem_cache_free(s, vaddr);
-+}
-+
- static int skd_cons_skcomp(struct skd_device *skdev)
- {
- 	int rc = 0;
-@@ -2695,18 +2754,14 @@ static struct fit_sg_descriptor *skd_cons_sg_list(struct skd_device *skdev,
- 						  dma_addr_t *ret_dma_addr)
- {
- 	struct fit_sg_descriptor *sg_list;
--	u32 nbytes;
- 
--	nbytes = sizeof(*sg_list) * n_sg;
+ 	/* Something is overdue */
+-	overdue_timestamp = skdev->timeout_stamp - SKD_N_TIMEOUT_SLOT;
 -
--	sg_list = pci_alloc_consistent(skdev->pdev, nbytes, ret_dma_addr);
-+	sg_list = skd_alloc_dma(skdev, skdev->sglist_cache, ret_dma_addr,
-+				GFP_DMA | __GFP_ZERO, DMA_TO_DEVICE);
- 
- 	if (sg_list != NULL) {
- 		uint64_t dma_address = *ret_dma_addr;
- 		u32 i;
- 
--		memset(sg_list, 0, nbytes);
--
- 		for (i = 0; i < n_sg - 1; i++) {
- 			uint64_t ndp_off;
- 			ndp_off = (i + 1) * sizeof(struct fit_sg_descriptor);
-@@ -2720,15 +2775,14 @@ static struct fit_sg_descriptor *skd_cons_sg_list(struct skd_device *skdev,
- }
- 
- static void skd_free_sg_list(struct skd_device *skdev,
--			     struct fit_sg_descriptor *sg_list, u32 n_sg,
-+			     struct fit_sg_descriptor *sg_list,
- 			     dma_addr_t dma_addr)
+ 	pr_debug("%s:%s:%d found %d timeouts, draining busy=%d\n",
+ 		 skdev->name, __func__, __LINE__,
+ 		 skdev->timeout_slot[timo_slot], skdev->in_flight);
+@@ -1297,7 +1288,7 @@ static int skd_sg_io_get_and_check_args(struct skd_device *skdev,
+ 					struct skd_sg_io *sksgio)
  {
--	u32 nbytes = sizeof(*sg_list) * n_sg;
--
- 	if (WARN_ON_ONCE(!sg_list))
- 		return;
+ 	struct sg_io_hdr *sgp = &sksgio->sg;
+-	int i, acc;
++	int i, __maybe_unused acc;
  
--	pci_free_consistent(skdev->pdev, nbytes, sg_list, dma_addr);
-+	skd_free_dma(skdev, skdev->sglist_cache, sg_list, dma_addr,
-+		     DMA_TO_DEVICE);
- }
- 
- static int skd_init_request(struct blk_mq_tag_set *set, struct request *rq,
-@@ -2752,34 +2806,31 @@ static void skd_exit_request(struct blk_mq_tag_set *set, struct request *rq,
- 	struct skd_device *skdev = set->driver_data;
- 	struct skd_request_context *skreq = blk_mq_rq_to_pdu(rq);
- 
--	skd_free_sg_list(skdev, skreq->sksg_list,
--			 skdev->sgs_per_request,
--			 skreq->sksg_dma_address);
-+	skd_free_sg_list(skdev, skreq->sksg_list, skreq->sksg_dma_address);
- }
- 
- static int skd_cons_sksb(struct skd_device *skdev)
- {
- 	int rc = 0;
- 	struct skd_special_context *skspcl;
--	u32 nbytes;
- 
- 	skspcl = &skdev->internal_skspcl;
- 
- 	skspcl->req.id = 0 + SKD_ID_INTERNAL;
- 	skspcl->req.state = SKD_REQ_STATE_IDLE;
- 
--	nbytes = SKD_N_INTERNAL_BYTES;
--
--	skspcl->data_buf = pci_zalloc_consistent(skdev->pdev, nbytes,
--						 &skspcl->db_dma_address);
-+	skspcl->data_buf = skd_alloc_dma(skdev, skdev->databuf_cache,
-+					 &skspcl->db_dma_address,
-+					 GFP_DMA | __GFP_ZERO,
-+					 DMA_BIDIRECTIONAL);
- 	if (skspcl->data_buf == NULL) {
- 		rc = -ENOMEM;
- 		goto err_out;
- 	}
- 
--	nbytes = SKD_N_SPECIAL_FITMSG_BYTES;
--	skspcl->msg_buf = pci_zalloc_consistent(skdev->pdev, nbytes,
--						&skspcl->mb_dma_address);
-+	skspcl->msg_buf = skd_alloc_dma(skdev, skdev->msgbuf_cache,
-+					&skspcl->mb_dma_address,
-+					GFP_DMA | __GFP_ZERO, DMA_TO_DEVICE);
- 	if (skspcl->msg_buf == NULL) {
- 		rc = -ENOMEM;
- 		goto err_out;
-@@ -2886,6 +2937,7 @@ static struct skd_device *skd_construct(struct pci_dev *pdev)
- {
- 	struct skd_device *skdev;
- 	int blk_major = skd_major;
-+	size_t size;
- 	int rc;
- 
- 	skdev = kzalloc(sizeof(*skdev), GFP_KERNEL);
-@@ -2914,6 +2966,31 @@ static struct skd_device *skd_construct(struct pci_dev *pdev)
- 	INIT_WORK(&skdev->start_queue, skd_start_queue);
- 	INIT_WORK(&skdev->completion_worker, skd_completion_worker);
- 
-+	size = max(SKD_N_FITMSG_BYTES, SKD_N_SPECIAL_FITMSG_BYTES);
-+	skdev->msgbuf_cache = kmem_cache_create("skd-msgbuf", size, 0,
-+						SLAB_HWCACHE_ALIGN, NULL);
-+	if (!skdev->msgbuf_cache)
-+		goto err_out;
-+	WARN_ONCE(kmem_cache_size(skdev->msgbuf_cache) < size,
-+		  "skd-msgbuf: %d < %zd\n",
-+		  kmem_cache_size(skdev->msgbuf_cache), size);
-+	size = skd_sgs_per_request * sizeof(struct fit_sg_descriptor);
-+	skdev->sglist_cache = kmem_cache_create("skd-sglist", size, 0,
-+						SLAB_HWCACHE_ALIGN, NULL);
-+	if (!skdev->sglist_cache)
-+		goto err_out;
-+	WARN_ONCE(kmem_cache_size(skdev->sglist_cache) < size,
-+		  "skd-sglist: %d < %zd\n",
-+		  kmem_cache_size(skdev->sglist_cache), size);
-+	size = SKD_N_INTERNAL_BYTES;
-+	skdev->databuf_cache = kmem_cache_create("skd-databuf", size, 0,
-+						 SLAB_HWCACHE_ALIGN, NULL);
-+	if (!skdev->databuf_cache)
-+		goto err_out;
-+	WARN_ONCE(kmem_cache_size(skdev->databuf_cache) < size,
-+		  "skd-databuf: %d < %zd\n",
-+		  kmem_cache_size(skdev->databuf_cache), size);
-+
- 	dev_dbg(&skdev->pdev->dev, "skcomp\n");
- 	rc = skd_cons_skcomp(skdev);
- 	if (rc < 0)
-@@ -2986,31 +3063,21 @@ static void skd_free_skmsg(struct skd_device *skdev)
- 
- static void skd_free_sksb(struct skd_device *skdev)
- {
--	struct skd_special_context *skspcl;
--	u32 nbytes;
--
--	skspcl = &skdev->internal_skspcl;
--
--	if (skspcl->data_buf != NULL) {
--		nbytes = SKD_N_INTERNAL_BYTES;
-+	struct skd_special_context *skspcl = &skdev->internal_skspcl;
- 
--		pci_free_consistent(skdev->pdev, nbytes,
--				    skspcl->data_buf, skspcl->db_dma_address);
--	}
-+	skd_free_dma(skdev, skdev->databuf_cache, skspcl->data_buf,
-+		     skspcl->db_dma_address, DMA_BIDIRECTIONAL);
- 
- 	skspcl->data_buf = NULL;
- 	skspcl->db_dma_address = 0;
- 
--	if (skspcl->msg_buf != NULL) {
--		nbytes = SKD_N_SPECIAL_FITMSG_BYTES;
--		pci_free_consistent(skdev->pdev, nbytes,
--				    skspcl->msg_buf, skspcl->mb_dma_address);
--	}
-+	skd_free_dma(skdev, skdev->msgbuf_cache, skspcl->msg_buf,
-+		     skspcl->mb_dma_address, DMA_TO_DEVICE);
- 
- 	skspcl->msg_buf = NULL;
- 	skspcl->mb_dma_address = 0;
- 
--	skd_free_sg_list(skdev, skspcl->req.sksg_list, 1,
-+	skd_free_sg_list(skdev, skspcl->req.sksg_list,
- 			 skspcl->req.sksg_dma_address);
- 
- 	skspcl->req.sksg_list = NULL;
-@@ -3056,6 +3123,10 @@ static void skd_destruct(struct skd_device *skdev)
- 	dev_dbg(&skdev->pdev->dev, "skcomp\n");
- 	skd_free_skcomp(skdev);
- 
-+	kmem_cache_destroy(skdev->databuf_cache);
-+	kmem_cache_destroy(skdev->sglist_cache);
-+	kmem_cache_destroy(skdev->msgbuf_cache);
-+
- 	dev_dbg(&skdev->pdev->dev, "skdev\n");
- 	kfree(skdev);
- }
+ 	if (!access_ok(VERIFY_WRITE, sksgio->argp, sizeof(sg_io_hdr_t))) {
+ 		pr_debug("%s:%s:%d access sg failed %p\n",
 -- 
 2.14.0
