@@ -1,48 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52132 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751317AbdH3PTy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2017 11:19:54 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/2] blk-mq: fix I/O hang during system resume
-Date: Wed, 30 Aug 2017 23:19:32 +0800
-Message-Id: <20170830151935.24253-1-ming.lei@redhat.com>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:56344 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753818AbdHQUPH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Aug 2017 16:15:07 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 36/55] skb: Use symbolic names for SCSI opcodes
+Date: Thu, 17 Aug 2017 13:13:19 -0700
+Message-Id: <20170817201338.16537-37-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
+This patch does not change any functionality.
 
-This two patches fix SCSI I/O hang during system resume.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/skd_main.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-The cause is that when SCSI device is put into SCSI's
-quiesce state, normal I/O request can't be dispatched to lld
-any more, only request with RQF_PREEMPT is allowed to be
-sent to drive.
-
-In current blk-mq implementation, if there is request in ->dispatch,
-no new request can't be dispatched to driver any more.
-
-This two patches fix the issue reported by Oleksandr.
-
-Thanks,
-Ming
-
-Ming Lei (2):
-  blk-mq: add requests in the tail of hctx->dispatch
-  blk-mq: align to legacy's implementation of blk_execute_rq
-
- block/blk-core.c     |  2 +-
- block/blk-exec.c     |  2 +-
- block/blk-flush.c    |  2 +-
- block/blk-mq-sched.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- block/blk-mq-sched.h |  2 ++
- block/blk-mq.c       |  2 +-
- 6 files changed, 65 insertions(+), 5 deletions(-)
-
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index ae66171ef10a..49e7097dd409 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -473,9 +473,9 @@ skd_prep_rw_cdb(struct skd_scsi_request *scsi_req,
+ 		unsigned count)
+ {
+ 	if (data_dir == READ)
+-		scsi_req->cdb[0] = 0x28;
++		scsi_req->cdb[0] = READ_10;
+ 	else
+-		scsi_req->cdb[0] = 0x2a;
++		scsi_req->cdb[0] = WRITE_10;
+ 
+ 	scsi_req->cdb[1] = 0;
+ 	scsi_req->cdb[2] = (lba & 0xff000000) >> 24;
+@@ -494,7 +494,7 @@ skd_prep_zerosize_flush_cdb(struct skd_scsi_request *scsi_req,
+ {
+ 	skreq->flush_cmd = 1;
+ 
+-	scsi_req->cdb[0] = 0x35;
++	scsi_req->cdb[0] = SYNCHRONIZE_CACHE;
+ 	scsi_req->cdb[1] = 0;
+ 	scsi_req->cdb[2] = 0;
+ 	scsi_req->cdb[3] = 0;
+@@ -1880,7 +1880,8 @@ static void skd_complete_internal(struct skd_device *skdev,
+ 			}
+ 			dev_dbg(&skdev->pdev->dev,
+ 				"**** TUR failed, retry skerr\n");
+-			skd_send_internal_skspcl(skdev, skspcl, 0x00);
++			skd_send_internal_skspcl(skdev, skspcl,
++						 TEST_UNIT_READY);
+ 		}
+ 		break;
+ 
+@@ -1896,7 +1897,8 @@ static void skd_complete_internal(struct skd_device *skdev,
+ 			}
+ 			dev_dbg(&skdev->pdev->dev,
+ 				"**** write buffer failed, retry skerr\n");
+-			skd_send_internal_skspcl(skdev, skspcl, 0x00);
++			skd_send_internal_skspcl(skdev, skspcl,
++						 TEST_UNIT_READY);
+ 		}
+ 		break;
+ 
+@@ -1929,7 +1931,8 @@ static void skd_complete_internal(struct skd_device *skdev,
+ 			}
+ 			dev_dbg(&skdev->pdev->dev,
+ 				"**** read buffer failed, retry skerr\n");
+-			skd_send_internal_skspcl(skdev, skspcl, 0x00);
++			skd_send_internal_skspcl(skdev, skspcl,
++						 TEST_UNIT_READY);
+ 		}
+ 		break;
+ 
 -- 
-2.9.5
+2.14.0
