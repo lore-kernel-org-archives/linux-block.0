@@ -1,52 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35114 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751194AbdH1Utd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2017 16:49:33 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7SKipow025954
-        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2017 13:49:32 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2cmsfcg8xf-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2017 13:49:32 -0700
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.99) with ESMTP id
- 64453bbe8c3211e7b40b0002c99293a0-cef20150 for <linux-block@vger.kernel.org>;
-        Mon, 28 Aug 2017 13:49:31 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <dan.carpenter@oracle.com>, <axboe@kernel.dk>
-Subject: [PATCH] block/nullb: delete unnecessary memory free
-Date: Mon, 28 Aug 2017 13:49:31 -0700
-Message-ID: <9df1970109b84fc170530a5ffa5c07e4480e445f.1503953204.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 47/55] skd: Move skd_free_sg_list() up
+Date: Thu, 17 Aug 2017 13:13:30 -0700
+Message-Id: <20170817201338.16537-48-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Commit 2984c86(nullb: factor disk parameters) has a typo. The
-nullb_device allocation/free is done outside of null_add_dev. The commit
-accidentally frees the nullb_device in error code path.
+Issue a warning if a NULL argument is passed to skd_free_sg_list().
+Move this function up to make the blk-mq conversion patch easier
+to read.
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/null_blk.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/block/skd_main.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 4d328e3..18f2cb3 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -1909,7 +1909,6 @@ static int null_add_dev(struct nullb_device *dev)
- out_free_nullb:
- 	kfree(nullb);
- out:
--	null_free_dev(dev);
- 	return rv;
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 451974138b32..b69b1a041c8f 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -2850,6 +2850,18 @@ static struct fit_sg_descriptor *skd_cons_sg_list(struct skd_device *skdev,
+ 	return sg_list;
  }
  
++static void skd_free_sg_list(struct skd_device *skdev,
++			     struct fit_sg_descriptor *sg_list, u32 n_sg,
++			     dma_addr_t dma_addr)
++{
++	u32 nbytes = sizeof(*sg_list) * n_sg;
++
++	if (WARN_ON_ONCE(!sg_list))
++		return;
++
++	pci_free_consistent(skdev->pdev, nbytes, sg_list, dma_addr);
++}
++
+ static int skd_cons_skreq(struct skd_device *skdev)
+ {
+ 	int rc = 0;
+@@ -3105,19 +3117,6 @@ static void skd_free_skmsg(struct skd_device *skdev)
+ 	skdev->skmsg_table = NULL;
+ }
+ 
+-static void skd_free_sg_list(struct skd_device *skdev,
+-			     struct fit_sg_descriptor *sg_list,
+-			     u32 n_sg, dma_addr_t dma_addr)
+-{
+-	if (sg_list != NULL) {
+-		u32 nbytes;
+-
+-		nbytes = sizeof(*sg_list) * n_sg;
+-
+-		pci_free_consistent(skdev->pdev, nbytes, sg_list, dma_addr);
+-	}
+-}
+-
+ static void skd_free_skreq(struct skd_device *skdev)
+ {
+ 	u32 i;
 -- 
-2.9.5
+2.14.0
