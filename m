@@ -1,85 +1,61 @@
-Return-Path: <gmazyland@gmail.com>
-Return-Path: <gmazyland@gmail.com>
-From: Milan Broz <gmazyland@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: hch@lst.de,
-	axboe@kernel.dk,
-	mpatocka@redhat.com,
-	dm-devel@redhat.com,
-	Milan Broz <gmazyland@gmail.com>
-Subject: [RFC PATCH] bio-integrity: Fix regression if profile verify_fn is NULL
-Date: Wed,  2 Aug 2017 14:27:50 +0200
-Message-Id: <20170802122750.12216-1-gmazyland@gmail.com>
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 05/55] skd: Update maintainer information
+Date: Thu, 17 Aug 2017 13:12:48 -0700
+Message-Id: <20170817201338.16537-6-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-In dm-integrity target we register integrity profile that have
-both generate_fn and verify_fn callbacks set to NULL.
+E-mails sent to support@stec-inc.com bounce. Hence remove that
+e-mail address from the driver. Add an entry to the MAINTAINERS
+file instead.
 
-This is used if dm-integrity is stacked under a dm-crypt device
-for authenticated encryption (integrity payload contains authentication
-tag and IV seed).
-
-In this case the verification is done through own crypto API
-processing inside dm-crypt; integrity profile is only holder
-of these data. (And memory is owned by dm-crypt as well.)
-
-After the commit (and previous changes)
-  Commit 7c20f11680a441df09de7235206f70115fbf6290
-  Author: Christoph Hellwig <hch@lst.de>
-  Date:   Mon Jul 3 16:58:43 2017 -0600
-
-    bio-integrity: stop abusing bi_end_io
-
-we get this crash:
-
-: BUG: unable to handle kernel NULL pointer dereference at   (null)
-: IP:   (null)
-: *pde = 00000000
-...
-:
-: Workqueue: kintegrityd bio_integrity_verify_fn
-: task: f48ae180 task.stack: f4b5c000
-: EIP:   (null)
-: EFLAGS: 00210286 CPU: 0
-: EAX: f4b5debc EBX: 00001000 ECX: 00000001 EDX: 00000000
-: ESI: 00001000 EDI: ed25f000 EBP: f4b5dee8 ESP: f4b5dea4
-:  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-: CR0: 80050033 CR2: 00000000 CR3: 32823000 CR4: 001406d0
-: Call Trace:
-:  ? bio_integrity_process+0xe3/0x1e0
-:  bio_integrity_verify_fn+0xea/0x150
-:  process_one_work+0x1c7/0x5c0
-:  worker_thread+0x39/0x380
-:  kthread+0xd6/0x110
-:  ? process_one_work+0x5c0/0x5c0
-:  ? kthread_worker_fn+0x100/0x100
-:  ? kthread_worker_fn+0x100/0x100
-:  ret_from_fork+0x19/0x24
-: Code:  Bad EIP value.
-: EIP:   (null) SS:ESP: 0068:f4b5dea4
-: CR2: 0000000000000000
-
-Patch just skip the whole verify workqueue if verify_fn is set to NULL.
-
-Signed-off-by: Milan Broz <gmazyland@gmail.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/bio-integrity.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ MAINTAINERS              | 6 ++++++
+ drivers/block/skd_main.c | 1 -
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 83e92beb3c9f..b9d1580bfc13 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -387,7 +387,9 @@ static void bio_integrity_verify_fn(struct work_struct *work)
-  */
- bool __bio_integrity_endio(struct bio *bio)
- {
--	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
-+	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-+
-+	if (bi->profile->verify_fn && bio_op(bio) == REQ_OP_READ && !bio->bi_status) {
- 		struct bio_integrity_payload *bip = bio_integrity(bio);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f66488dfdbc9..1164f93a19f2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12482,6 +12482,12 @@ M:	Ion Badulescu <ionut@badula.org>
+ S:	Odd Fixes
+ F:	drivers/net/ethernet/adaptec/starfire*
  
- 		INIT_WORK(&bip->bip_work, bio_integrity_verify_fn);
++STEC S1220 SKD DRIVER
++M:	Bart Van Assche <bart.vanassche@wdc.com>
++L:	linux-block@vger.kernel.org
++S:	Maintained
++F:	drivers/block/skd*[ch]
++
+ STI CEC DRIVER
+ M:	Benjamin Gaignard <benjamin.gaignard@linaro.org>
+ S:	Maintained
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 95a528f1fb9c..a77a6550d6ea 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -72,7 +72,6 @@ enum {
+ #define DRV_BIN_VERSION 0x100
+ #define DRV_VER_COMPL   "2.2.1." DRV_BUILD_ID
+ 
+-MODULE_AUTHOR("bug-reports: support@stec-inc.com");
+ MODULE_LICENSE("GPL");
+ 
+ MODULE_DESCRIPTION("STEC s1120 PCIe SSD block driver (b" DRV_BUILD_ID ")");
 -- 
-2.13.3
+2.14.0
