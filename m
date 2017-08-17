@@ -1,125 +1,59 @@
-Return-Path: <longman@redhat.com>
-From: Waiman Long <longman@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Waiman Long <longman@redhat.com>
-Subject: [PATCH] blktrace: Fix potentail deadlock between delete & sysfs ops
-Date: Thu, 10 Aug 2017 13:02:33 -0400
-Message-Id: <1502384553-14442-1-git-send-email-longman@redhat.com>
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 26/55] skd: Use __packed only when needed
+Date: Thu, 17 Aug 2017 13:13:09 -0700
+Message-Id: <20170817201338.16537-27-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The lockdep code had reported the following unsafe locking scenario:
+Since needless use of __packed slows down access to data structures,
+only use __packed when needed.
 
-       CPU0                    CPU1
-       ----                    ----
-  lock(s_active#228);
-                               lock(&bdev->bd_mutex/1);
-                               lock(s_active#228);
-  lock(&bdev->bd_mutex);
-
- *** DEADLOCK ***
-
-The deadlock may happen when one task (CPU1) is trying to delete
-a partition in a block device and another task (CPU0) is accessing
-tracing sysfs file in that partition.
-
-To avoid that, accessing tracing sysfs file will now use a mutex
-trylock loop and the operation will fail if a delete operation is
-in progress.
-
-Signed-off-by: Waiman Long <longman@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/ioctl.c           |  3 +++
- include/linux/fs.h      |  1 +
- kernel/trace/blktrace.c | 24 ++++++++++++++++++++++--
- 3 files changed, 26 insertions(+), 2 deletions(-)
+ drivers/block/skd_s1120.h | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 0de02ee..7211608 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -86,12 +86,15 @@ static int blkpg_ioctl(struct block_device *bdev, struct blkpg_ioctl_arg __user
- 				return -EBUSY;
- 			}
- 			/* all seems OK */
-+			bdev->bd_deleting = 1;
- 			fsync_bdev(bdevp);
- 			invalidate_bdev(bdevp);
+diff --git a/drivers/block/skd_s1120.h b/drivers/block/skd_s1120.h
+index 8044705cbbf9..de35f47e953c 100644
+--- a/drivers/block/skd_s1120.h
++++ b/drivers/block/skd_s1120.h
+@@ -10,8 +10,6 @@
+ #ifndef SKD_S1120_H
+ #define SKD_S1120_H
  
- 			mutex_lock_nested(&bdev->bd_mutex, 1);
- 			delete_partition(disk, partno);
- 			mutex_unlock(&bdev->bd_mutex);
-+			bdev->bd_deleting = 0;
-+
- 			mutex_unlock(&bdevp->bd_mutex);
- 			bdput(bdevp);
+-#pragma pack(push, s1120_h, 1)
+-
+ /*
+  * Q-channel, 64-bit r/w
+  */
+@@ -276,7 +274,7 @@ struct fit_comp_error_info {
+ 	uint16_t	sks_low; /* 10: Sense Key Specific (LSW) */
+ 	uint16_t	reserved3; /* 12: Part of additional sense bytes (unused) */
+ 	uint16_t	uec; /* 14: Additional Sense Bytes */
+-	uint64_t	per; /* 16: Additional Sense Bytes */
++	uint64_t	per __packed; /* 16: Additional Sense Bytes */
+ 	uint8_t		reserved4[2]; /* 1E: Additional Sense Bytes (unused) */
+ };
  
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 7b5d681..5d4ae9d 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -427,6 +427,7 @@ struct block_device {
- #endif
- 	struct block_device *	bd_contains;
- 	unsigned		bd_block_size;
-+	int			bd_deleting;
- 	struct hd_struct *	bd_part;
- 	/* number of times partitions within this device have been opened. */
- 	unsigned		bd_part_count;
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index bc364f8..715e77e 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1605,6 +1605,18 @@ static struct request_queue *blk_trace_get_queue(struct block_device *bdev)
- 	return bdev_get_queue(bdev);
- }
+@@ -323,6 +321,4 @@ struct driver_inquiry_data {
+ 	uint8_t		driver_version[0x14];
+ };
  
-+/*
-+ * Read/write to the tracing sysfs file requires taking references to the
-+ * sysfs file and then acquiring the bd_mutex. Deleting a block device
-+ * requires acquiring the bd_mutex and then waiting for all the sysfs
-+ * references to be gone. This can lead to deadlock if both operations
-+ * happen simultaneously. To avoid this problem, read/write to the
-+ * the tracing sysfs files can now fail if the bd_mutex cannot be
-+ * acquired while a deletion operation is in progress.
-+ *
-+ * A mutex trylock loop is used assuming that tracing sysfs operations
-+ * aren't frequently enough to cause any contention problem.
-+ */
- static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
- 					 struct device_attribute *attr,
- 					 char *buf)
-@@ -1622,7 +1634,11 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
- 	if (q == NULL)
- 		goto out_bdput;
- 
--	mutex_lock(&bdev->bd_mutex);
-+	while (!mutex_trylock(&bdev->bd_mutex)) {
-+		if (bdev->bd_deleting)
-+			goto out_bdput;
-+		schedule();
-+	}
- 
- 	if (attr == &dev_attr_enable) {
- 		ret = sprintf(buf, "%u\n", !!q->blk_trace);
-@@ -1683,7 +1699,11 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 	if (q == NULL)
- 		goto out_bdput;
- 
--	mutex_lock(&bdev->bd_mutex);
-+	while (!mutex_trylock(&bdev->bd_mutex)) {
-+		if (bdev->bd_deleting)
-+			goto out_bdput;
-+		schedule();
-+	}
- 
- 	if (attr == &dev_attr_enable) {
- 		if (value)
+-#pragma pack(pop, s1120_h)
+-
+ #endif /* SKD_S1120_H */
 -- 
-1.8.3.1
+2.14.0
