@@ -1,34 +1,98 @@
-Return-Path: <prvs=408be853d=bart.vanassche@wdc.com>
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 0/5] Five BFQ patches for kernel v4.14
-Date: Wed, 30 Aug 2017 11:42:06 -0700
-Message-Id: <20170830184211.12471-1-bart.vanassche@wdc.com>
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 14/55] skd: Remove useless barrier() calls
+Date: Thu, 17 Aug 2017 13:12:57 -0700
+Message-Id: <20170817201338.16537-15-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+The purpose of barrier() is to prevent reordering by the compiler.
+Since the compiler does not reorder calls to non-pure functions,
+remove the barrier() calls from skd_reg_{read,write}{32,64}().
 
-This series consists of five small patches. Three patches address compiler
-warnings, one patch is a fix for the BFQ sysfs interface and a fifth patch
-makes the BFQ code slightly more consistent. Please consider these patches
-for kernel v4.14.
+Since pr_debug() is able to report file name and line number
+information, remove __FILE__ and __LINE__ from the pr_debug() calls.
 
-Thanks,
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/skd_main.c | 42 ++++++++++--------------------------------
+ 1 file changed, 10 insertions(+), 32 deletions(-)
 
-Bart.
-
-Bart Van Assche (5):
-  bfq: Annotate fall-through in a switch statement
-  bfq: Declare local functions static
-  bfq: Check kstrtoul() return value
-  bfq: Suppress compiler warnings about comparisons
-  bfq: Use icq_to_bic() consistently
-
- block/bfq-cgroup.c  | 18 +++++++-------
- block/bfq-iosched.c | 71 +++++++++++++++++++++++++++++++++++------------------
- 2 files changed, 56 insertions(+), 33 deletions(-)
-
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 53c84c846a5e..54c6711a42d1 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -341,49 +341,27 @@ struct skd_device {
+ 
+ static inline u32 skd_reg_read32(struct skd_device *skdev, u32 offset)
+ {
+-	u32 val;
+-
+-	if (likely(skdev->dbg_level < 2))
+-		return readl(skdev->mem_map[1] + offset);
+-	else {
+-		barrier();
+-		val = readl(skdev->mem_map[1] + offset);
+-		barrier();
+-		pr_debug("%s:%s:%d offset %x = %x\n",
+-			 skdev->name, __func__, __LINE__, offset, val);
+-		return val;
+-	}
++	u32 val = readl(skdev->mem_map[1] + offset);
+ 
++	if (unlikely(skdev->dbg_level >= 2))
++		pr_debug("%s offset %x = %x\n", skdev->name, offset, val);
++	return val;
+ }
+ 
+ static inline void skd_reg_write32(struct skd_device *skdev, u32 val,
+ 				   u32 offset)
+ {
+-	if (likely(skdev->dbg_level < 2)) {
+-		writel(val, skdev->mem_map[1] + offset);
+-		barrier();
+-	} else {
+-		barrier();
+-		writel(val, skdev->mem_map[1] + offset);
+-		barrier();
+-		pr_debug("%s:%s:%d offset %x = %x\n",
+-			 skdev->name, __func__, __LINE__, offset, val);
+-	}
++	writel(val, skdev->mem_map[1] + offset);
++	if (unlikely(skdev->dbg_level >= 2))
++		pr_debug("%s offset %x = %x\n", skdev->name, offset, val);
+ }
+ 
+ static inline void skd_reg_write64(struct skd_device *skdev, u64 val,
+ 				   u32 offset)
+ {
+-	if (likely(skdev->dbg_level < 2)) {
+-		writeq(val, skdev->mem_map[1] + offset);
+-		barrier();
+-	} else {
+-		barrier();
+-		writeq(val, skdev->mem_map[1] + offset);
+-		barrier();
+-		pr_debug("%s:%s:%d offset %x = %016llx\n",
+-			 skdev->name, __func__, __LINE__, offset, val);
+-	}
++	writeq(val, skdev->mem_map[1] + offset);
++	if (unlikely(skdev->dbg_level >= 2))
++		pr_debug("%s offset %x = %016llx\n", skdev->name, offset, val);
+ }
+ 
+ 
 -- 
-2.14.1
+2.14.0
