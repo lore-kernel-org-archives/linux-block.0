@@ -8,91 +8,38 @@ Cc: linux-block@vger.kernel.org,
 	Bart Van Assche <bart.vanassche@wdc.com>,
 	Hannes Reinecke <hare@suse.de>,
 	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 14/55] skd: Remove useless barrier() calls
-Date: Thu, 17 Aug 2017 13:12:57 -0700
-Message-Id: <20170817201338.16537-15-bart.vanassche@wdc.com>
+Subject: [PATCH 42/55] skd: Initialize skd_special_context.req.n_sg to one
+Date: Thu, 17 Aug 2017 13:13:25 -0700
+Message-Id: <20170817201338.16537-43-bart.vanassche@wdc.com>
 In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
 References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The purpose of barrier() is to prevent reordering by the compiler.
-Since the compiler does not reorder calls to non-pure functions,
-remove the barrier() calls from skd_reg_{read,write}{32,64}().
-
-Since pr_debug() is able to report file name and line number
-information, remove __FILE__ and __LINE__ from the pr_debug() calls.
+The debug code in skd_send_special_fitmsg() assumes that req.n_sg
+represents the number of S/G descriptors. However, skd_construct()
+initializes that member variable to zero. Set req.n_sg to one such
+that the debugging code in skd_send_special_fitmsg() works as
+expected.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/skd_main.c | 42 ++++++++++--------------------------------
- 1 file changed, 10 insertions(+), 32 deletions(-)
+ drivers/block/skd_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 53c84c846a5e..54c6711a42d1 100644
+index c7f531e99ede..392c898d86e2 100644
 --- a/drivers/block/skd_main.c
 +++ b/drivers/block/skd_main.c
-@@ -341,49 +341,27 @@ struct skd_device {
- 
- static inline u32 skd_reg_read32(struct skd_device *skdev, u32 offset)
- {
--	u32 val;
--
--	if (likely(skdev->dbg_level < 2))
--		return readl(skdev->mem_map[1] + offset);
--	else {
--		barrier();
--		val = readl(skdev->mem_map[1] + offset);
--		barrier();
--		pr_debug("%s:%s:%d offset %x = %x\n",
--			 skdev->name, __func__, __LINE__, offset, val);
--		return val;
--	}
-+	u32 val = readl(skdev->mem_map[1] + offset);
- 
-+	if (unlikely(skdev->dbg_level >= 2))
-+		pr_debug("%s offset %x = %x\n", skdev->name, offset, val);
-+	return val;
- }
- 
- static inline void skd_reg_write32(struct skd_device *skdev, u32 val,
- 				   u32 offset)
- {
--	if (likely(skdev->dbg_level < 2)) {
--		writel(val, skdev->mem_map[1] + offset);
--		barrier();
--	} else {
--		barrier();
--		writel(val, skdev->mem_map[1] + offset);
--		barrier();
--		pr_debug("%s:%s:%d offset %x = %x\n",
--			 skdev->name, __func__, __LINE__, offset, val);
--	}
-+	writel(val, skdev->mem_map[1] + offset);
-+	if (unlikely(skdev->dbg_level >= 2))
-+		pr_debug("%s offset %x = %x\n", skdev->name, offset, val);
- }
- 
- static inline void skd_reg_write64(struct skd_device *skdev, u64 val,
- 				   u32 offset)
- {
--	if (likely(skdev->dbg_level < 2)) {
--		writeq(val, skdev->mem_map[1] + offset);
--		barrier();
--	} else {
--		barrier();
--		writeq(val, skdev->mem_map[1] + offset);
--		barrier();
--		pr_debug("%s:%s:%d offset %x = %016llx\n",
--			 skdev->name, __func__, __LINE__, offset, val);
--	}
-+	writeq(val, skdev->mem_map[1] + offset);
-+	if (unlikely(skdev->dbg_level >= 2))
-+		pr_debug("%s offset %x = %016llx\n", skdev->name, offset, val);
- }
- 
- 
+@@ -1050,6 +1050,7 @@ static int skd_format_internal_skspcl(struct skd_device *skdev)
+ 	memset(scsi, 0, sizeof(*scsi));
+ 	dma_address = skspcl->req.sksg_dma_address;
+ 	scsi->hdr.sg_list_dma_address = cpu_to_be64(dma_address);
++	skspcl->req.n_sg = 1;
+ 	sgd->control = FIT_SGD_CONTROL_LAST;
+ 	sgd->byte_count = 0;
+ 	sgd->host_side_addr = skspcl->db_dma_address;
 -- 
 2.14.0
