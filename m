@@ -1,86 +1,137 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:14527 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753456AbdHQUO6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 16:14:58 -0400
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 38/55] skd: Rework request failing code path
-Date: Thu, 17 Aug 2017 13:13:21 -0700
-Message-Id: <20170817201338.16537-39-bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 51/55] skd: Remove skd_device.in_flight
+Date: Thu, 17 Aug 2017 13:13:34 -0700
+Message-Id: <20170817201338.16537-52-bart.vanassche@wdc.com>
 In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
 References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Move the skd_fail_all_pending() call out of skd_request_fn_not_online()
-such that this function can be reused in the blk-mq code path.
+Since skd_device.in_flight is only used to display the number of
+in-flight requests in debug messages, remove that member and
+introduce skd_in_flight(). That last function relies on the block
+layer to determine the number of in flight requests.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/skd_main.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ drivers/block/skd_main.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index ff2ea37b8fd3..8040500ba09c 100644
+index a982de2014cc..a20434ca3e18 100644
 --- a/drivers/block/skd_main.c
 +++ b/drivers/block/skd_main.c
-@@ -506,7 +506,10 @@ skd_prep_zerosize_flush_cdb(struct skd_scsi_request *scsi_req,
- 	scsi_req->cdb[9] = 0;
- }
+@@ -238,7 +238,6 @@ struct skd_device {
+ 	enum skd_drvr_state state;
+ 	u32 drive_state;
  
--static void skd_request_fn_not_online(struct request_queue *q)
-+/*
-+ * Return true if and only if all pending requests should be failed.
-+ */
-+static bool skd_fail_all(struct request_queue *q)
+-	atomic_t in_flight;
+ 	u32 cur_max_queue_depth;
+ 	u32 queue_low_water_mark;
+ 	u32 dev_max_queue_depth;
+@@ -391,6 +390,22 @@ static void skd_log_skreq(struct skd_device *skdev,
+  * READ/WRITE REQUESTS
+  *****************************************************************************
+  */
++static void skd_inc_in_flight(struct request *rq, void *data, bool reserved)
++{
++	int *count = data;
++
++	count++;
++}
++
++static int skd_in_flight(struct skd_device *skdev)
++{
++	int count = 0;
++
++	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_inc_in_flight, &count);
++
++	return count;
++}
++
+ static void
+ skd_prep_rw_cdb(struct skd_scsi_request *scsi_req,
+ 		int data_dir, unsigned lba,
+@@ -567,9 +582,8 @@ static void skd_process_request(struct request *req, bool last)
+ 	skmsg->length += sizeof(struct skd_scsi_request);
+ 	fmh->num_protocol_cmds_coalesced++;
+ 
+-	atomic_inc(&skdev->in_flight);
+ 	dev_dbg(&skdev->pdev->dev, "req=0x%x busy=%d\n", skreq->id,
+-		atomic_read(&skdev->in_flight));
++		skd_in_flight(skdev));
+ 
+ 	/*
+ 	 * If the FIT msg buffer is full send it.
+@@ -1218,7 +1232,7 @@ static void skd_send_fitmsg(struct skd_device *skdev,
+ 	u64 qcmd;
+ 
+ 	dev_dbg(&skdev->pdev->dev, "dma address 0x%llx, busy=%d\n",
+-		skmsg->mb_dma_address, atomic_read(&skdev->in_flight));
++		skmsg->mb_dma_address, skd_in_flight(skdev));
+ 	dev_dbg(&skdev->pdev->dev, "msg_buf %p\n", skmsg->msg_buf);
+ 
+ 	qcmd = skmsg->mb_dma_address;
+@@ -1451,13 +1465,6 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
+ static void skd_release_skreq(struct skd_device *skdev,
+ 			      struct skd_request_context *skreq)
  {
- 	struct skd_device *skdev = q->queuedata;
- 
-@@ -530,7 +533,7 @@ static void skd_request_fn_not_online(struct request_queue *q)
- 	case SKD_DRVR_STATE_BUSY_IMMINENT:
- 	case SKD_DRVR_STATE_BUSY_ERASE:
- 	case SKD_DRVR_STATE_DRAINING_TIMEOUT:
--		return;
-+		return false;
- 
- 	case SKD_DRVR_STATE_BUSY_SANITIZE:
- 	case SKD_DRVR_STATE_STOPPING:
-@@ -538,14 +541,8 @@ static void skd_request_fn_not_online(struct request_queue *q)
- 	case SKD_DRVR_STATE_FAULT:
- 	case SKD_DRVR_STATE_DISAPPEARED:
- 	default:
--		break;
-+		return true;
- 	}
--
--	/* If we get here, terminate all pending block requeusts
--	 * with EIO and any scsi pass thru with appropriate sense
+-	/*
+-	 * Decrease the number of active requests.
+-	 * Also decrements the count in the timeout slot.
 -	 */
+-	SKD_ASSERT(atomic_read(&skdev->in_flight) > 0);
+-	atomic_dec(&skdev->in_flight);
 -
--	skd_fail_all_pending(skdev);
+ 	/*
+ 	 * Reclaim the skd_request_context
+ 	 */
+@@ -1498,7 +1505,7 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
+ 		dev_dbg(&skdev->pdev->dev,
+ 			"cycle=%d ix=%d got cycle=%d cmdctxt=0x%x stat=%d busy=%d rbytes=0x%x proto=%d\n",
+ 			skdev->skcomp_cycle, skdev->skcomp_ix, cmp_cycle,
+-			cmp_cntxt, cmp_status, atomic_read(&skdev->in_flight),
++			cmp_cntxt, cmp_status, skd_in_flight(skdev),
+ 			cmp_bytes, skdev->proto_ver);
+ 
+ 		if (cmp_cycle != skdev->skcomp_cycle) {
+@@ -1590,7 +1597,7 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
+ 	}
+ 
+ 	if (skdev->state == SKD_DRVR_STATE_PAUSING &&
+-	    atomic_read(&skdev->in_flight) == 0) {
++	    skd_in_flight(skdev) == 0) {
+ 		skdev->state = SKD_DRVR_STATE_PAUSED;
+ 		wake_up_interruptible(&skdev->waitq);
+ 	}
+@@ -1929,8 +1936,6 @@ static void skd_recover_request(struct request *req, void *data, bool reserved)
+ static void skd_recover_requests(struct skd_device *skdev)
+ {
+ 	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_recover_request, skdev);
+-
+-	atomic_set(&skdev->in_flight, 0);
  }
  
- static void skd_request_fn(struct request_queue *q)
-@@ -566,7 +563,8 @@ static void skd_request_fn(struct request_queue *q)
- 	int flush, fua;
- 
- 	if (skdev->state != SKD_DRVR_STATE_ONLINE) {
--		skd_request_fn_not_online(q);
-+		if (skd_fail_all(q))
-+			skd_fail_all_pending(skdev);
- 		return;
- 	}
- 
+ static void skd_isr_msg_from_dev(struct skd_device *skdev)
+@@ -3560,7 +3565,7 @@ static void skd_log_skdev(struct skd_device *skdev, const char *event)
+ 		skd_drive_state_to_str(skdev->drive_state), skdev->drive_state,
+ 		skd_skdev_state_to_str(skdev->state), skdev->state);
+ 	dev_dbg(&skdev->pdev->dev, "  busy=%d limit=%d dev=%d lowat=%d\n",
+-		atomic_read(&skdev->in_flight), skdev->cur_max_queue_depth,
++		skd_in_flight(skdev), skdev->cur_max_queue_depth,
+ 		skdev->dev_max_queue_depth, skdev->queue_low_water_mark);
+ 	dev_dbg(&skdev->pdev->dev, "  cycle=%d cycle_ix=%d\n",
+ 		skdev->skcomp_cycle, skdev->skcomp_ix);
 -- 
 2.14.0
