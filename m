@@ -8,33 +8,38 @@ Cc: linux-block@vger.kernel.org,
 	Bart Van Assche <bart.vanassche@wdc.com>,
 	Hannes Reinecke <hare@suse.de>,
 	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 09/55] skd: Avoid that gcc 7 warns about fall-through when building with W=1
-Date: Thu, 17 Aug 2017 13:12:52 -0700
-Message-Id: <20170817201338.16537-10-bart.vanassche@wdc.com>
+Subject: [PATCH 25/55] skd: Check structure sizes at build time
+Date: Thu, 17 Aug 2017 13:13:08 -0700
+Message-Id: <20170817201338.16537-26-bart.vanassche@wdc.com>
 In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
 References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
+
+This patch will help to verify the changes made by the next patch.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/skd_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/skd_main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index aa6bfd1391da..1d0ad31d2256 100644
+index 6ba6103f53dd..e2d205b58fe2 100644
 --- a/drivers/block/skd_main.c
 +++ b/drivers/block/skd_main.c
-@@ -2340,7 +2340,7 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
- 			blk_requeue_request(skdev->queue, skreq->req);
- 			break;
- 		}
--	/* fall through to report error */
-+		/* fall through */
+@@ -4959,6 +4959,11 @@ static void skd_log_skreq(struct skd_device *skdev,
  
- 	case SKD_CHECK_STATUS_REPORT_ERROR:
- 	default:
+ static int __init skd_init(void)
+ {
++	BUILD_BUG_ON(sizeof(struct fit_completion_entry_v1) != 8);
++	BUILD_BUG_ON(sizeof(struct fit_comp_error_info) != 32);
++	BUILD_BUG_ON(sizeof(struct skd_command_header) != 16);
++	BUILD_BUG_ON(sizeof(struct skd_scsi_request) != 32);
++	BUILD_BUG_ON(sizeof(struct driver_inquiry_data) != 44);
+ 	BUILD_BUG_ON(offsetof(struct skd_msg_buf, fmh) != 0);
+ 	BUILD_BUG_ON(offsetof(struct skd_msg_buf, scsi) != 64);
+ 	BUILD_BUG_ON(sizeof(struct skd_msg_buf) != SKD_N_FITMSG_BYTES);
 -- 
 2.14.0
