@@ -1,77 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59136 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG5e (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:57:34 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 04/20] blk-mq-sched: move actual dispatching into one helper
-Date: Sat,  5 Aug 2017 14:56:49 +0800
-Message-Id: <20170805065705.12989-5-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 41/55] skd: Remove dead code
+Date: Thu, 17 Aug 2017 13:13:24 -0700
+Message-Id: <20170817201338.16537-42-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-So that it becomes easy to support to dispatch from
-sw queue in the following patch.
+Removing the SG IO code also removed the code that sets
+SKD_REQ_STATE_ABORTED. Hence also remove the code that checks for
+this state.
 
-No functional change.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-mq-sched.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ drivers/block/skd_main.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 845e5baf8af1..f69752961a34 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -89,6 +89,22 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 	return false;
- }
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 13d06598c1b7..c7f531e99ede 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -152,7 +152,6 @@ enum skd_req_state {
+ 	SKD_REQ_STATE_BUSY,
+ 	SKD_REQ_STATE_COMPLETED,
+ 	SKD_REQ_STATE_TIMEOUT,
+-	SKD_REQ_STATE_ABORTED,
+ };
  
-+static void blk_mq_do_dispatch(struct request_queue *q,
-+			       struct elevator_queue *e,
-+			       struct blk_mq_hw_ctx *hctx)
-+{
-+	LIST_HEAD(rq_list);
-+
-+	do {
-+		struct request *rq;
-+
-+		rq = e->type->ops.mq.dispatch_request(hctx);
-+		if (!rq)
-+			break;
-+		list_add(&rq->queuelist, &rq_list);
-+	} while (blk_mq_dispatch_rq_list(q, &rq_list));
-+}
-+
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
-@@ -136,16 +152,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * on the dispatch list, OR if we did have work but weren't able
- 	 * to make progress.
- 	 */
--	if (do_sched_dispatch && has_sched_dispatch) {
--		do {
--			struct request *rq;
+ enum skd_fit_msg_state {
+@@ -1734,15 +1733,6 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
+ 
+ 		SKD_ASSERT(skreq->state == SKD_REQ_STATE_BUSY);
+ 
+-		if (skreq->state == SKD_REQ_STATE_ABORTED) {
+-			dev_dbg(&skdev->pdev->dev, "reclaim req %p id=%04x\n",
+-				skreq, skreq->id);
+-			/* a previously timed out command can
+-			 * now be cleaned up */
+-			skd_release_skreq(skdev, skreq);
+-			continue;
+-		}
 -
--			rq = e->type->ops.mq.dispatch_request(hctx);
--			if (!rq)
--				break;
--			list_add(&rq->queuelist, &rq_list);
--		} while (blk_mq_dispatch_rq_list(q, &rq_list));
--	}
-+	if (do_sched_dispatch && has_sched_dispatch)
-+		blk_mq_do_dispatch(q, e, hctx);
- }
- 
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ 		skreq->completion = *skcmp;
+ 		if (unlikely(cmp_status == SAM_STAT_CHECK_CONDITION)) {
+ 			skreq->err_info = *skerr;
+@@ -3823,8 +3813,6 @@ static const char *skd_skreq_state_to_str(enum skd_req_state state)
+ 		return "COMPLETED";
+ 	case SKD_REQ_STATE_TIMEOUT:
+ 		return "TIMEOUT";
+-	case SKD_REQ_STATE_ABORTED:
+-		return "ABORTED";
+ 	default:
+ 		return "???";
+ 	}
 -- 
-2.9.4
+2.14.0
