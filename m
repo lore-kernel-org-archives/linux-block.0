@@ -1,63 +1,107 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        Boaz Harrosh <ooo@electrozaur.com>
-Subject: [PATCH v3 44/49] exofs: convert to bio_for_each_segment_all_sp()
-Date: Tue,  8 Aug 2017 16:45:43 +0800
-Message-Id: <20170808084548.18963-45-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 35/55] skd: Use kcalloc() instead of kzalloc() with multiply
+Date: Thu, 17 Aug 2017 13:13:18 -0700
+Message-Id: <20170817201338.16537-36-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Cc: Boaz Harrosh <ooo@electrozaur.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/exofs/ore.c      | 3 ++-
- fs/exofs/ore_raid.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+This patch does not change any functionality.
 
-diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
-index 8bb72807e70d..38a7d8bfdd4c 100644
---- a/fs/exofs/ore.c
-+++ b/fs/exofs/ore.c
-@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	unsigned i;
-+	struct bvec_iter_all bia;
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/skd_main.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 0639c9f89984..ae66171ef10a 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -3815,12 +3815,13 @@ static int skd_cons_skmsg(struct skd_device *skdev)
+ 	u32 i;
  
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_sp(bv, bio, i, bia) {
- 		unsigned this_count = bv->bv_len;
+ 	dev_dbg(&skdev->pdev->dev,
+-		"skmsg_table kzalloc, struct %lu, count %u total %lu\n",
++		"skmsg_table kcalloc, struct %lu, count %u total %lu\n",
+ 		sizeof(struct skd_fitmsg_context), skdev->num_fitmsg_context,
+ 		sizeof(struct skd_fitmsg_context) * skdev->num_fitmsg_context);
  
- 		if (likely(PAGE_SIZE == this_count))
-diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
-index 27cbdb697649..37c0a9aa2ec2 100644
---- a/fs/exofs/ore_raid.c
-+++ b/fs/exofs/ore_raid.c
-@@ -429,6 +429,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
- {
- 	struct bio_vec *bv;
- 	unsigned i, d;
-+	struct bvec_iter_all bia;
+-	skdev->skmsg_table = kzalloc(sizeof(struct skd_fitmsg_context)
+-				     *skdev->num_fitmsg_context, GFP_KERNEL);
++	skdev->skmsg_table = kcalloc(skdev->num_fitmsg_context,
++				     sizeof(struct skd_fitmsg_context),
++				     GFP_KERNEL);
+ 	if (skdev->skmsg_table == NULL) {
+ 		rc = -ENOMEM;
+ 		goto err_out;
+@@ -3895,12 +3896,13 @@ static int skd_cons_skreq(struct skd_device *skdev)
+ 	u32 i;
  
- 	/* loop on all devices all pages */
- 	for (d = 0; d < ios->numdevs; d++) {
-@@ -437,7 +438,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
- 		if (!bio)
- 			continue;
+ 	dev_dbg(&skdev->pdev->dev,
+-		"skreq_table kzalloc, struct %lu, count %u total %lu\n",
++		"skreq_table kcalloc, struct %lu, count %u total %lu\n",
+ 		sizeof(struct skd_request_context), skdev->num_req_context,
+ 		sizeof(struct skd_request_context) * skdev->num_req_context);
  
--		bio_for_each_segment_all(bv, bio, i) {
-+		bio_for_each_segment_all_sp(bv, bio, i, bia) {
- 			struct page *page = bv->bv_page;
+-	skdev->skreq_table = kzalloc(sizeof(struct skd_request_context)
+-				     * skdev->num_req_context, GFP_KERNEL);
++	skdev->skreq_table = kcalloc(skdev->num_req_context,
++				     sizeof(struct skd_request_context),
++				     GFP_KERNEL);
+ 	if (skdev->skreq_table == NULL) {
+ 		rc = -ENOMEM;
+ 		goto err_out;
+@@ -3918,8 +3920,8 @@ static int skd_cons_skreq(struct skd_device *skdev)
+ 		skreq->id = i + SKD_ID_RW_REQUEST;
+ 		skreq->state = SKD_REQ_STATE_IDLE;
  
- 			SetPageUptodate(page);
+-		skreq->sg = kzalloc(sizeof(struct scatterlist) *
+-				    skdev->sgs_per_request, GFP_KERNEL);
++		skreq->sg = kcalloc(skdev->sgs_per_request,
++				    sizeof(struct scatterlist), GFP_KERNEL);
+ 		if (skreq->sg == NULL) {
+ 			rc = -ENOMEM;
+ 			goto err_out;
+@@ -3952,12 +3954,13 @@ static int skd_cons_skspcl(struct skd_device *skdev)
+ 	u32 i, nbytes;
+ 
+ 	dev_dbg(&skdev->pdev->dev,
+-		"skspcl_table kzalloc, struct %lu, count %u total %lu\n",
++		"skspcl_table kcalloc, struct %lu, count %u total %lu\n",
+ 		sizeof(struct skd_special_context), skdev->n_special,
+ 		sizeof(struct skd_special_context) * skdev->n_special);
+ 
+-	skdev->skspcl_table = kzalloc(sizeof(struct skd_special_context)
+-				      * skdev->n_special, GFP_KERNEL);
++	skdev->skspcl_table = kcalloc(skdev->n_special,
++				      sizeof(struct skd_special_context),
++				      GFP_KERNEL);
+ 	if (skdev->skspcl_table == NULL) {
+ 		rc = -ENOMEM;
+ 		goto err_out;
+@@ -3983,8 +3986,9 @@ static int skd_cons_skspcl(struct skd_device *skdev)
+ 			goto err_out;
+ 		}
+ 
+-		skspcl->req.sg = kzalloc(sizeof(struct scatterlist) *
+-					 SKD_N_SG_PER_SPECIAL, GFP_KERNEL);
++		skspcl->req.sg = kcalloc(SKD_N_SG_PER_SPECIAL,
++					 sizeof(struct scatterlist),
++					 GFP_KERNEL);
+ 		if (skspcl->req.sg == NULL) {
+ 			rc = -ENOMEM;
+ 			goto err_out;
 -- 
-2.9.4
+2.14.0
