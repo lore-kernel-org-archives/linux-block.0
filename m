@@ -1,80 +1,79 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35972 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751061AbdHZQfX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Aug 2017 12:35:23 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 11/14] block: add check on elevator for supporting bio merge via hashtable from blk-mq sw queue
-Date: Sun, 27 Aug 2017 00:33:29 +0800
-Message-Id: <20170826163332.28971-12-ming.lei@redhat.com>
-In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
-References: <20170826163332.28971-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 19/55] skd: Introduce SKD_SKCOMP_SIZE
+Date: Thu, 17 Aug 2017 13:13:02 -0700
+Message-Id: <20170817201338.16537-20-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_sched_try_merge() will be reused in following patches
-to support bio merge to blk-mq sw queue, so add checkes to
-related functions which are called from blk_mq_sched_try_merge().
+This patch does not change any functionality.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/elevator.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/block/skd_main.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 4ac437b5fc0c..a4e35419cf9a 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -71,6 +71,10 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
- 	if (!blk_rq_merge_ok(rq, bio))
- 		return false;
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 98dc16073072..53090a10150f 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -103,6 +103,10 @@ MODULE_VERSION(DRV_VERSION "-" DRV_BUILD_ID);
  
-+	/* We need to support to merge bio from sw queue */
-+	if (!rq->q->elevator)
-+		return true;
+ #define SKD_N_INTERNAL_BYTES    (512u)
+ 
++#define SKD_SKCOMP_SIZE							\
++	((sizeof(struct fit_completion_entry_v1) +			\
++	  sizeof(struct fit_comp_error_info)) * SKD_N_COMPLETION_ENTRY)
 +
- 	if (!elv_iosched_allow_bio_merge(rq, bio))
- 		return false;
+ /* 5 bits of uniqifier, 0xF800 */
+ #define SKD_ID_INCR             (0x400)
+ #define SKD_ID_TABLE_MASK       (3u << 8u)
+@@ -2834,13 +2838,7 @@ static void skd_release_special(struct skd_device *skdev,
  
-@@ -449,6 +453,10 @@ static enum elv_merge __elv_merge(struct request_queue *q,
- 		return ELEVATOR_BACK_MERGE;
- 	}
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return ELEVATOR_NO_MERGE;
-+
- 	if (e->uses_mq && e->type->ops.mq.request_merge)
- 		return e->type->ops.mq.request_merge(q, req, bio);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_merge_fn)
-@@ -711,6 +719,10 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
+ static void skd_reset_skcomp(struct skd_device *skdev)
  {
- 	struct elevator_queue *e = q->elevator;
+-	u32 nbytes;
+-	struct fit_completion_entry_v1 *skcomp;
+-
+-	nbytes = sizeof(*skcomp) * SKD_N_COMPLETION_ENTRY;
+-	nbytes += sizeof(struct fit_comp_error_info) * SKD_N_COMPLETION_ENTRY;
+-
+-	memset(skdev->skcomp_table, 0, nbytes);
++	memset(skdev->skcomp_table, 0, SKD_SKCOMP_SIZE);
  
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.next_request)
- 		return e->type->ops.mq.next_request(q, rq);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_latter_req_fn)
-@@ -723,6 +735,10 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
+ 	skdev->skcomp_ix = 0;
+ 	skdev->skcomp_cycle = 1;
+@@ -3851,16 +3849,12 @@ static int skd_cons_skcomp(struct skd_device *skdev)
  {
- 	struct elevator_queue *e = q->elevator;
+ 	int rc = 0;
+ 	struct fit_completion_entry_v1 *skcomp;
+-	u32 nbytes;
+-
+-	nbytes = sizeof(*skcomp) * SKD_N_COMPLETION_ENTRY;
+-	nbytes += sizeof(struct fit_comp_error_info) * SKD_N_COMPLETION_ENTRY;
  
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.former_request)
- 		return e->type->ops.mq.former_request(q, rq);
- 	if (!e->uses_mq && e->type->ops.sq.elevator_former_req_fn)
+ 	dev_dbg(&skdev->pdev->dev,
+-		"comp pci_alloc, total bytes %d entries %d\n",
+-		nbytes, SKD_N_COMPLETION_ENTRY);
++		"comp pci_alloc, total bytes %zd entries %d\n",
++		SKD_SKCOMP_SIZE, SKD_N_COMPLETION_ENTRY);
+ 
+-	skcomp = pci_zalloc_consistent(skdev->pdev, nbytes,
++	skcomp = pci_zalloc_consistent(skdev->pdev, SKD_SKCOMP_SIZE,
+ 				       &skdev->cq_dma_address);
+ 
+ 	if (skcomp == NULL) {
 -- 
-2.9.5
+2.14.0
