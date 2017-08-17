@@ -1,66 +1,106 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45108 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG5X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:57:23 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 01/20] blk-mq-sched: fix scheduler bad performance
-Date: Sat,  5 Aug 2017 14:56:46 +0800
-Message-Id: <20170805065705.12989-2-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 53/55] skd: Remove several local variables
+Date: Thu, 17 Aug 2017 13:13:36 -0700
+Message-Id: <20170817201338.16537-54-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When hw queue is busy, we shouldn't take requests from
-scheduler queue any more, otherwise IO merge will be
-difficult to do.
+This patch does not change any functionality but makes the code
+more brief.
 
-This patch fixes the awful IO performance on some
-SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
-is used by not taking requests if hw queue is busy.
-
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-mq-sched.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/block/skd_main.c | 37 +++++++------------------------------
+ 1 file changed, 7 insertions(+), 30 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 4ab69435708c..845e5baf8af1 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
--	bool did_work = false;
-+	bool do_sched_dispatch = true;
- 	LIST_HEAD(rq_list);
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 610c8979dc7e..a732bb8040f4 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -44,12 +44,6 @@
+ static int skd_dbg_level;
+ static int skd_isr_comp_limit = 4;
  
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -125,7 +125,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
-+		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
- 	} else if (!has_sched_dispatch) {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list);
-@@ -136,7 +136,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * on the dispatch list, OR if we did have work but weren't able
- 	 * to make progress.
- 	 */
--	if (!did_work && has_sched_dispatch) {
-+	if (do_sched_dispatch && has_sched_dispatch) {
- 		do {
- 			struct request *rq;
+-enum {
+-	SKD_FLUSH_INITIALIZER,
+-	SKD_FLUSH_ZERO_SIZE_FIRST,
+-	SKD_FLUSH_DATA_SECOND,
+-};
+-
+ #define SKD_ASSERT(expr) \
+ 	do { \
+ 		if (unlikely(!(expr))) { \
+@@ -497,31 +491,15 @@ static void skd_process_request(struct request *req, bool last)
+ 	struct skd_request_context *const skreq = blk_mq_rq_to_pdu(req);
+ 	struct skd_scsi_request *scsi_req;
+ 	unsigned long flags;
+-	unsigned long io_flags;
+-	u32 lba;
+-	u32 count;
+-	int data_dir;
+-	__be64 be_dmaa;
+-	int flush, fua;
++	const u32 lba = blk_rq_pos(req);
++	const u32 count = blk_rq_sectors(req);
++	const int data_dir = rq_data_dir(req);
  
+ 	WARN_ONCE(tag >= skd_max_queue_depth, "%#x > %#x (nr_requests = %lu)\n",
+ 		  tag, skd_max_queue_depth, q->nr_requests);
+ 
+ 	SKD_ASSERT(skreq->state == SKD_REQ_STATE_IDLE);
+ 
+-	flush = fua = 0;
+-
+-	lba = (u32)blk_rq_pos(req);
+-	count = blk_rq_sectors(req);
+-	data_dir = rq_data_dir(req);
+-	io_flags = req->cmd_flags;
+-
+-	if (req_op(req) == REQ_OP_FLUSH)
+-		flush++;
+-
+-	if (io_flags & REQ_FUA)
+-		fua++;
+-
+ 	dev_dbg(&skdev->pdev->dev,
+ 		"new req=%p lba=%u(0x%x) count=%u(0x%x) dir=%d\n", req, lba,
+ 		lba, count, count, data_dir);
+@@ -568,19 +546,18 @@ static void skd_process_request(struct request *req, bool last)
+ 	scsi_req = &skmsg->msg_buf->scsi[fmh->num_protocol_cmds_coalesced];
+ 	memset(scsi_req, 0, sizeof(*scsi_req));
+ 
+-	be_dmaa = cpu_to_be64(skreq->sksg_dma_address);
+-
+ 	scsi_req->hdr.tag = skreq->id;
+-	scsi_req->hdr.sg_list_dma_address = be_dmaa;
++	scsi_req->hdr.sg_list_dma_address =
++		cpu_to_be64(skreq->sksg_dma_address);
+ 
+-	if (flush == SKD_FLUSH_ZERO_SIZE_FIRST) {
++	if (req_op(req) == REQ_OP_FLUSH) {
+ 		skd_prep_zerosize_flush_cdb(scsi_req, skreq);
+ 		SKD_ASSERT(skreq->flush_cmd == 1);
+ 	} else {
+ 		skd_prep_rw_cdb(scsi_req, data_dir, lba, count);
+ 	}
+ 
+-	if (fua)
++	if (req->cmd_flags & REQ_FUA)
+ 		scsi_req->cdb[1] |= SKD_FUA_NV;
+ 
+ 	scsi_req->hdr.sg_list_len_bytes = cpu_to_be32(skreq->sg_byte_count);
 -- 
-2.9.4
+2.14.0
