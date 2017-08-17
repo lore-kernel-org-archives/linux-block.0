@@ -1,72 +1,59 @@
-Return-Path: <SRS0=q5lJ=7T=goodmis.org=rostedt@kernel.org>
-Date: Thu, 17 Aug 2017 16:56:52 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "longman@redhat.com" <longman@redhat.com>, "bfields@fieldses.org"
- <bfields@fieldses.org>, "mingo@kernel.org" <mingo@kernel.org>,
- "jlayton@poochiereds.net" <jlayton@poochiereds.net>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "axboe@kernel.dk" <axboe@kernel.dk>, "linux-fsdevel@vger.kernel.org"
- <linux-fsdevel@vger.kernel.org>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "longman@redhat.com" <longman@redhat.com>, "rostedt@goodmis.org"
+	<rostedt@goodmis.org>
+CC: "bfields@fieldses.org" <bfields@fieldses.org>, "mingo@kernel.org"
+	<mingo@kernel.org>, "jlayton@poochiereds.net" <jlayton@poochiereds.net>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>
 Subject: Re: [PATCH v2] blktrace: Fix potentail deadlock between delete &
  sysfs ops
-Message-ID: <20170817165652.5eeca878@gandalf.local.home>
-In-Reply-To: <1503002469.2615.13.camel@wdc.com>
+Date: Thu, 17 Aug 2017 20:41:10 +0000
+Message-ID: <1503002469.2615.13.camel@wdc.com>
 References: <1502916040-18067-1-git-send-email-longman@redhat.com>
-	<20170817093444.3276f7ab@gandalf.local.home>
-	<b0719c60-5c07-d121-1c84-d5993d36afb0@redhat.com>
-	<20170817163056.19ea42c8@gandalf.local.home>
-	<1503002469.2615.13.camel@wdc.com>
+	 <20170817093444.3276f7ab@gandalf.local.home>
+	 <b0719c60-5c07-d121-1c84-d5993d36afb0@redhat.com>
+	 <20170817163056.19ea42c8@gandalf.local.home>
+In-Reply-To: <20170817163056.19ea42c8@gandalf.local.home>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 17 Aug 2017 20:41:10 +0000
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Thu, 2017-08-17 at 16:30 -0400, Steven Rostedt wrote:
-> > On Thu, 17 Aug 2017 12:24:39 -0400
-> > Waiman Long <longman@redhat.com> wrote:
-> >   
-> > > On 08/17/2017 09:34 AM, Steven Rostedt wrote:  
-> > > > On Wed, 16 Aug 2017 16:40:40 -0400
-> > > > Waiman Long <longman@redhat.com> wrote:
-> > > >    
-> > > > > The lockdep code had reported the following unsafe locking scenario:
-> > > > > 
-> > > > >        CPU0                    CPU1
-> > > > >        ----                    ----
-> > > > >   lock(s_active#228);
-> > > > >                                lock(&bdev->bd_mutex/1);
-> > > > >                                lock(s_active#228);
-> > > > >   lock(&bdev->bd_mutex);    
-> > > > 
-> > > > Can you show the exact locations of these locks. I have no idea where
-> > > > this "s_active" is.    
-> > > 
-> > > The s_active isn't an actual lock. It is a reference count (kn->count)
-> > > on the sysfs (kernfs) file. Removal of a sysfs file, however, require
-> > > a wait until all the references are gone. The reference count is
-> > > treated like a rwsem using lockdep instrumentation code.  
-> > 
-> > Which kernel is this? I don't see any lockdep annotation around
-> > kn->count (doing a git grep, I find it referenced in fs/kernfs/dir.c)  
-> 
-> As far as I know the s_active lockdep annotations were introduced in 2007
-> through commit 0ab66088c855 ("sysfs: implement sysfs_dirent active reference
-> and immediate disconnect"). Today these annotations exist in kernfs:
-> $ git grep -nHw dep_map fs/kernfs
-> fs/kernfs/dir.c:421:		rwsem_acquire_read(&kn->dep_map, 0, 1, _RET_IP_);
-> fs/kernfs/dir.c:441:		rwsem_release(&kn->dep_map, 1, _RET_IP_);
-> fs/kernfs/dir.c:468:		rwsem_acquire(&kn->dep_map, 0, 0, _RET_IP_);
-> fs/kernfs/dir.c:470:			lock_contended(&kn->dep_map, _RET_IP_);
-> fs/kernfs/dir.c:478:		lock_acquired(&kn->dep_map, _RET_IP_);
-> fs/kernfs/dir.c:479:		rwsem_release(&kn->dep_map, 1, _RET_IP_);
-> fs/kernfs/dir.c:1385:		rwsem_acquire(&kn->dep_map, 0, 1, _RET_IP_);
-> fs/kernfs/file.c:1000:		lockdep_init_map(&kn->dep_map, "s_active", key, 0);
-> 
-
-Ah thanks. I was searching for the wrong thing. :-/
-
--- Steve
+T24gVGh1LCAyMDE3LTA4LTE3IGF0IDE2OjMwIC0wNDAwLCBTdGV2ZW4gUm9zdGVkdCB3cm90ZToN
+Cj4gT24gVGh1LCAxNyBBdWcgMjAxNyAxMjoyNDozOSAtMDQwMA0KPiBXYWltYW4gTG9uZyA8bG9u
+Z21hbkByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+ID4gT24gMDgvMTcvMjAxNyAwOTozNCBBTSwg
+U3RldmVuIFJvc3RlZHQgd3JvdGU6DQo+ID4gPiBPbiBXZWQsIDE2IEF1ZyAyMDE3IDE2OjQwOjQw
+IC0wNDAwDQo+ID4gPiBXYWltYW4gTG9uZyA8bG9uZ21hbkByZWRoYXQuY29tPiB3cm90ZToNCj4g
+PiA+ICANCj4gPiA+ID4gVGhlIGxvY2tkZXAgY29kZSBoYWQgcmVwb3J0ZWQgdGhlIGZvbGxvd2lu
+ZyB1bnNhZmUgbG9ja2luZyBzY2VuYXJpbzoNCj4gPiA+ID4gDQo+ID4gPiA+ICAgICAgICBDUFUw
+ICAgICAgICAgICAgICAgICAgICBDUFUxDQo+ID4gPiA+ICAgICAgICAtLS0tICAgICAgICAgICAg
+ICAgICAgICAtLS0tDQo+ID4gPiA+ICAgbG9jayhzX2FjdGl2ZSMyMjgpOw0KPiA+ID4gPiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgbG9jaygmYmRldi0+YmRfbXV0ZXgvMSk7DQo+ID4g
+PiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsb2NrKHNfYWN0aXZlIzIyOCk7DQo+
+ID4gPiA+ICAgbG9jaygmYmRldi0+YmRfbXV0ZXgpOyAgDQo+ID4gPiANCj4gPiA+IENhbiB5b3Ug
+c2hvdyB0aGUgZXhhY3QgbG9jYXRpb25zIG9mIHRoZXNlIGxvY2tzLiBJIGhhdmUgbm8gaWRlYSB3
+aGVyZQ0KPiA+ID4gdGhpcyAic19hY3RpdmUiIGlzLiAgDQo+ID4gDQo+ID4gVGhlIHNfYWN0aXZl
+IGlzbid0IGFuIGFjdHVhbCBsb2NrLiBJdCBpcyBhIHJlZmVyZW5jZSBjb3VudCAoa24tPmNvdW50
+KQ0KPiA+IG9uIHRoZSBzeXNmcyAoa2VybmZzKSBmaWxlLiBSZW1vdmFsIG9mIGEgc3lzZnMgZmls
+ZSwgaG93ZXZlciwgcmVxdWlyZQ0KPiA+IGEgd2FpdCB1bnRpbCBhbGwgdGhlIHJlZmVyZW5jZXMg
+YXJlIGdvbmUuIFRoZSByZWZlcmVuY2UgY291bnQgaXMNCj4gPiB0cmVhdGVkIGxpa2UgYSByd3Nl
+bSB1c2luZyBsb2NrZGVwIGluc3RydW1lbnRhdGlvbiBjb2RlLg0KPiANCj4gV2hpY2gga2VybmVs
+IGlzIHRoaXM/IEkgZG9uJ3Qgc2VlIGFueSBsb2NrZGVwIGFubm90YXRpb24gYXJvdW5kDQo+IGtu
+LT5jb3VudCAoZG9pbmcgYSBnaXQgZ3JlcCwgSSBmaW5kIGl0IHJlZmVyZW5jZWQgaW4gZnMva2Vy
+bmZzL2Rpci5jKQ0KDQpBcyBmYXIgYXMgSSBrbm93IHRoZSBzX2FjdGl2ZSBsb2NrZGVwIGFubm90
+YXRpb25zIHdlcmUgaW50cm9kdWNlZCBpbiAyMDA3DQp0aHJvdWdoIGNvbW1pdCAwYWI2NjA4OGM4
+NTUgKCJzeXNmczogaW1wbGVtZW50IHN5c2ZzX2RpcmVudCBhY3RpdmUgcmVmZXJlbmNlDQphbmQg
+aW1tZWRpYXRlIGRpc2Nvbm5lY3QiKS4gVG9kYXkgdGhlc2UgYW5ub3RhdGlvbnMgZXhpc3QgaW4g
+a2VybmZzOg0KJCBnaXQgZ3JlcCAtbkh3IGRlcF9tYXAgZnMva2VybmZzDQpmcy9rZXJuZnMvZGly
+LmM6NDIxOgkJcndzZW1fYWNxdWlyZV9yZWFkKCZrbi0+ZGVwX21hcCwgMCwgMSwgX1JFVF9JUF8p
+Ow0KZnMva2VybmZzL2Rpci5jOjQ0MToJCXJ3c2VtX3JlbGVhc2UoJmtuLT5kZXBfbWFwLCAxLCBf
+UkVUX0lQXyk7DQpmcy9rZXJuZnMvZGlyLmM6NDY4OgkJcndzZW1fYWNxdWlyZSgma24tPmRlcF9t
+YXAsIDAsIDAsIF9SRVRfSVBfKTsNCmZzL2tlcm5mcy9kaXIuYzo0NzA6CQkJbG9ja19jb250ZW5k
+ZWQoJmtuLT5kZXBfbWFwLCBfUkVUX0lQXyk7DQpmcy9rZXJuZnMvZGlyLmM6NDc4OgkJbG9ja19h
+Y3F1aXJlZCgma24tPmRlcF9tYXAsIF9SRVRfSVBfKTsNCmZzL2tlcm5mcy9kaXIuYzo0Nzk6CQly
+d3NlbV9yZWxlYXNlKCZrbi0+ZGVwX21hcCwgMSwgX1JFVF9JUF8pOw0KZnMva2VybmZzL2Rpci5j
+OjEzODU6CQlyd3NlbV9hY3F1aXJlKCZrbi0+ZGVwX21hcCwgMCwgMSwgX1JFVF9JUF8pOw0KZnMv
+a2VybmZzL2ZpbGUuYzoxMDAwOgkJbG9ja2RlcF9pbml0X21hcCgma24tPmRlcF9tYXAsICJzX2Fj
+dGl2ZSIsIGtleSwgMCk7DQoNCkJhcnQu
