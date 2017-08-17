@@ -1,81 +1,102 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49872 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751375AbdHAKHh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Aug 2017 06:07:37 -0400
-Date: Tue, 1 Aug 2017 18:07:27 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 03/14] blk-mq: introduce blk_mq_dispatch_rq_from_ctxs()
-Message-ID: <20170801100725.GA31452@ming.t460p>
-References: <20170731165111.11536-1-ming.lei@redhat.com>
- <20170731165111.11536-5-ming.lei@redhat.com>
- <1501542577.2466.26.camel@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1501542577.2466.26.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 23/55] skd: Simplify the code for allocating DMA message buffers
+Date: Thu, 17 Aug 2017 13:13:06 -0700
+Message-Id: <20170817201338.16537-24-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jul 31, 2017 at 11:09:38PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-08-01 at 00:51 +0800, Ming Lei wrote:
-> > @@ -810,7 +810,11 @@ static void blk_mq_timeout_work(struct work_struct *work)
-> >  
-> >  struct ctx_iter_data {
-> >  	struct blk_mq_hw_ctx *hctx;
-> > -	struct list_head *list;
-> > +
-> > +	union {
-> > +		struct list_head *list;
-> > +		struct request *rq;
-> > +	};
-> >  };
-> 
-> Hello Ming,
-> 
-> Please introduce a new data structure for dispatch_rq_from_ctx() /
-> blk_mq_dispatch_rq_from_ctxs() instead of introducing a union in struct
-> ctx_iter_data. That will avoid that .list can be used in a context where
-> a struct request * pointer has been stored in the structure and vice versa.
+dma_alloc_coherent() guarantees alignment on a page boundary so
+no explicit alignment is needed to align on a 64 byte boundary.
 
-Looks there isn't such usage now, or we can just both 'list' and 'rq' in
-this data structure if there is.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/skd_main.c  | 19 ++++++-------------
+ drivers/block/skd_s1120.h |  2 +-
+ 2 files changed, 7 insertions(+), 14 deletions(-)
 
->  
-> >  static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
-> > @@ -826,6 +830,26 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
-> >  	return true;
-> >  }
-> >  
-> > +static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
-> > +{
-> > +	struct ctx_iter_data *dispatch_data = data;
-> > +	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
-> > +	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
-> > +	bool empty = true;
-> > +
-> > +	spin_lock(&ctx->lock);
-> > +	if (unlikely(!list_empty(&ctx->rq_list))) {
-> > +		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
-> > +		list_del_init(&dispatch_data->rq->queuelist);
-> > +		empty = list_empty(&ctx->rq_list);
-> > +	}
-> > +	spin_unlock(&ctx->lock);
-> > +	if (empty)
-> > +		sbitmap_clear_bit(sb, bitnr);
-> 
-> This sbitmap_clear_bit() occurs without holding blk_mq_ctx.lock. Sorry but
-> I don't think this is safe. Please either remove this sbitmap_clear_bit() call
-> or make sure that it happens with blk_mq_ctx.lock held.
-
-Good catch, sbitmap_clear_bit() should have been done with holding
-ctx->lock, otherwise a new pending bit may be cleared.
-
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 3fc6ec9477c7..37b900c97b87 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -190,7 +190,6 @@ struct skd_fitmsg_context {
+ 	u16 outstanding;
+ 
+ 	u32 length;
+-	u32 offset;
+ 
+ 	u8 *msg_buf;
+ 	dma_addr_t mb_dma_address;
+@@ -2016,8 +2015,7 @@ static void skd_send_fitmsg(struct skd_device *skdev,
+ 
+ 	dev_dbg(&skdev->pdev->dev, "dma address 0x%llx, busy=%d\n",
+ 		skmsg->mb_dma_address, skdev->in_flight);
+-	dev_dbg(&skdev->pdev->dev, "msg_buf 0x%p, offset %x\n", skmsg->msg_buf,
+-		skmsg->offset);
++	dev_dbg(&skdev->pdev->dev, "msg_buf %p\n", skmsg->msg_buf);
+ 
+ 	qcmd = skmsg->mb_dma_address;
+ 	qcmd |= FIT_QCMD_QID_NORMAL;
+@@ -3854,7 +3852,7 @@ static int skd_cons_skmsg(struct skd_device *skdev)
+ 
+ 		skmsg->state = SKD_MSG_STATE_IDLE;
+ 		skmsg->msg_buf = pci_alloc_consistent(skdev->pdev,
+-						      SKD_N_FITMSG_BYTES + 64,
++						      SKD_N_FITMSG_BYTES,
+ 						      &skmsg->mb_dma_address);
+ 
+ 		if (skmsg->msg_buf == NULL) {
+@@ -3862,13 +3860,10 @@ static int skd_cons_skmsg(struct skd_device *skdev)
+ 			goto err_out;
+ 		}
+ 
+-		skmsg->offset = (u32)((u64)skmsg->msg_buf &
+-				      (~FIT_QCMD_BASE_ADDRESS_MASK));
+-		skmsg->msg_buf += ~FIT_QCMD_BASE_ADDRESS_MASK;
+-		skmsg->msg_buf = (u8 *)((u64)skmsg->msg_buf &
+-				       FIT_QCMD_BASE_ADDRESS_MASK);
+-		skmsg->mb_dma_address += ~FIT_QCMD_BASE_ADDRESS_MASK;
+-		skmsg->mb_dma_address &= FIT_QCMD_BASE_ADDRESS_MASK;
++		WARN(((uintptr_t)skmsg->msg_buf | skmsg->mb_dma_address) &
++		     (FIT_QCMD_ALIGN - 1),
++		     "not aligned: msg_buf %p mb_dma_address %#llx\n",
++		     skmsg->msg_buf, skmsg->mb_dma_address);
+ 		memset(skmsg->msg_buf, 0, SKD_N_FITMSG_BYTES);
+ 
+ 		skmsg->next = &skmsg[1];
+@@ -4230,8 +4225,6 @@ static void skd_free_skmsg(struct skd_device *skdev)
+ 		skmsg = &skdev->skmsg_table[i];
+ 
+ 		if (skmsg->msg_buf != NULL) {
+-			skmsg->msg_buf += skmsg->offset;
+-			skmsg->mb_dma_address += skmsg->offset;
+ 			pci_free_consistent(skdev->pdev, SKD_N_FITMSG_BYTES,
+ 					    skmsg->msg_buf,
+ 					    skmsg->mb_dma_address);
+diff --git a/drivers/block/skd_s1120.h b/drivers/block/skd_s1120.h
+index f69d3d97744d..8044705cbbf9 100644
+--- a/drivers/block/skd_s1120.h
++++ b/drivers/block/skd_s1120.h
+@@ -28,7 +28,7 @@
+ #define  FIT_QCMD_MSGSIZE_128		(0x1 << 4)
+ #define  FIT_QCMD_MSGSIZE_256		(0x2 << 4)
+ #define  FIT_QCMD_MSGSIZE_512		(0x3 << 4)
+-#define  FIT_QCMD_BASE_ADDRESS_MASK	(0xFFFFFFFFFFFFFFC0ull)
++#define  FIT_QCMD_ALIGN			L1_CACHE_BYTES
+ 
+ /*
+  * Control, 32-bit r/w
 -- 
-Ming
+2.14.0
