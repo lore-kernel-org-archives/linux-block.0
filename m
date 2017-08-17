@@ -1,46 +1,140 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 07/12] genhd: Annotate all part and part_tbl pointer
- dereferences
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Bart Van Assche <bart.vanassche@sandisk.com>, Tejun Heo <tj@kernel.org>,
- Jan Kara <jack@suse.cz>, Dan Williams <dan.j.williams@intel.com>
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Dan Williams <dan.j.williams@intel.com>
+Subject: [PATCH 07/12] genhd: Annotate all part and part_tbl pointer dereferences
+Date: Thu, 17 Aug 2017 16:23:06 -0700
+Message-Id: <20170817232311.25948-8-bart.vanassche@wdc.com>
+In-Reply-To: <20170817232311.25948-1-bart.vanassche@wdc.com>
 References: <20170817232311.25948-1-bart.vanassche@wdc.com>
- <20170817232311.25948-8-bart.vanassche@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <efffa7df-7610-fd04-7dae-5ef426f9c2f7@suse.de>
-Date: Fri, 18 Aug 2017 09:39:01 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170817232311.25948-8-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/18/2017 01:23 AM, Bart Van Assche wrote:
-> Annotate gendisk.part_tbl and disk_part_tbl.part dereferences with
-> rcu_dereference_protected(). This patch does not change the behavior
-> of the modified code but ensures that sparse does not complain about
-> disk->part_tbl manipulations nor about part_tbl->part accesses.
-> Additionally, improve documentation of the locking requirements of
-> the modified functions.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> ---
->  block/genhd.c             | 15 ++++++++++-----
->  block/partition-generic.c | 15 ++++++++++++---
->  2 files changed, 22 insertions(+), 8 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Annotate gendisk.part_tbl and disk_part_tbl.part dereferences with
+rcu_dereference_protected(). This patch does not change the behavior
+of the modified code but ensures that sparse does not complain about
+disk->part_tbl manipulations nor about part_tbl->part accesses.
+Additionally, improve documentation of the locking requirements of
+the modified functions.
 
-Cheers,
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c             | 15 ++++++++++-----
+ block/partition-generic.c | 15 ++++++++++++---
+ 2 files changed, 22 insertions(+), 8 deletions(-)
 
-Hannes
+diff --git a/block/genhd.c b/block/genhd.c
+index 3dc4d115480f..2367087cdb7c 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1127,12 +1127,13 @@ static const struct attribute_group *disk_attr_groups[] = {
+  * original ptbl is freed using RCU callback.
+  *
+  * LOCKING:
+- * Matching bd_mutx locked.
++ * Matching bd_mutex locked or the caller is the only user of @disk.
+  */
+ static void disk_replace_part_tbl(struct gendisk *disk,
+ 				  struct disk_part_tbl *new_ptbl)
+ {
+-	struct disk_part_tbl *old_ptbl = disk->part_tbl;
++	struct disk_part_tbl *old_ptbl =
++		rcu_dereference_protected(disk->part_tbl, 1);
+ 
+ 	rcu_assign_pointer(disk->part_tbl, new_ptbl);
+ 
+@@ -1151,14 +1152,16 @@ static void disk_replace_part_tbl(struct gendisk *disk,
+  * uses RCU to allow unlocked dereferencing for stats and other stuff.
+  *
+  * LOCKING:
+- * Matching bd_mutex locked, might sleep.
++ * Matching bd_mutex locked or the caller is the only user of @disk.
++ * Might sleep.
+  *
+  * RETURNS:
+  * 0 on success, -errno on failure.
+  */
+ int disk_expand_part_tbl(struct gendisk *disk, int partno)
+ {
+-	struct disk_part_tbl *old_ptbl = disk->part_tbl;
++	struct disk_part_tbl *old_ptbl =
++		rcu_dereference_protected(disk->part_tbl, 1);
+ 	struct disk_part_tbl *new_ptbl;
+ 	int len = old_ptbl ? old_ptbl->len : 0;
+ 	int i, target;
+@@ -1352,6 +1355,7 @@ EXPORT_SYMBOL(alloc_disk);
+ struct gendisk *alloc_disk_node(int minors, int node_id)
+ {
+ 	struct gendisk *disk;
++	struct disk_part_tbl *ptbl;
+ 
+ 	disk = kzalloc_node(sizeof(struct gendisk), GFP_KERNEL, node_id);
+ 	if (disk) {
+@@ -1365,7 +1369,8 @@ struct gendisk *alloc_disk_node(int minors, int node_id)
+ 			kfree(disk);
+ 			return NULL;
+ 		}
+-		disk->part_tbl->part[0] = &disk->part0;
++		ptbl = rcu_dereference_protected(disk->part_tbl, 1);
++		rcu_assign_pointer(ptbl->part[0], &disk->part0);
+ 
+ 		/*
+ 		 * set_capacity() and get_capacity() currently don't use
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index fa5049a4d99b..1745a9659517 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -252,15 +252,20 @@ void __delete_partition(struct percpu_ref *ref)
+ 	call_rcu(&part->rcu_head, delete_partition_rcu_cb);
+ }
+ 
++/*
++ * Must be called either with bd_mutex held, before a disk can be opened or
++ * after all disk users are gone.
++ */
+ void delete_partition(struct gendisk *disk, int partno)
+ {
+-	struct disk_part_tbl *ptbl = disk->part_tbl;
++	struct disk_part_tbl *ptbl =
++		rcu_dereference_protected(disk->part_tbl, 1);
+ 	struct hd_struct *part;
+ 
+ 	if (partno >= ptbl->len)
+ 		return;
+ 
+-	part = ptbl->part[partno];
++	part = rcu_dereference_protected(ptbl->part[partno], 1);
+ 	if (!part)
+ 		return;
+ 
+@@ -280,6 +285,10 @@ static ssize_t whole_disk_show(struct device *dev,
+ static DEVICE_ATTR(whole_disk, S_IRUSR | S_IRGRP | S_IROTH,
+ 		   whole_disk_show, NULL);
+ 
++/*
++ * Must be called either with bd_mutex held, before a disk can be opened or
++ * after all disk users are gone.
++ */
+ struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 				sector_t start, sector_t len, int flags,
+ 				struct partition_meta_info *info)
+@@ -295,7 +304,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 	err = disk_expand_part_tbl(disk, partno);
+ 	if (err)
+ 		return ERR_PTR(err);
+-	ptbl = disk->part_tbl;
++	ptbl = rcu_dereference_protected(disk->part_tbl, 1);
+ 
+ 	if (ptbl->part[partno])
+ 		return ERR_PTR(-EBUSY);
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.0
