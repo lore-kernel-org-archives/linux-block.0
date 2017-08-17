@@ -1,41 +1,54 @@
-Return-Path: <SRS0=2VWl=72=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	Kernel-team@fb.com,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 1/2] block/loop: set hw_sectors
-Date: Thu, 24 Aug 2017 12:24:52 -0700
-Message-Id: <92dafefc8c0b64eaaf51298734ebe4aa7d880046.1503602376.git.shli@fb.com>
-In-Reply-To: <cover.1503602376.git.shli@fb.com>
-References: <cover.1503602376.git.shli@fb.com>
-In-Reply-To: <cover.1503602376.git.shli@fb.com>
-References: <cover.1503602376.git.shli@fb.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:30641 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753737AbdHQUOd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Aug 2017 16:14:33 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 27/55] skd: Make the skd_isr() code more brief
+Date: Thu, 17 Aug 2017 13:13:10 -0700
+Message-Id: <20170817201338.16537-28-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
+This patch does not change any functionality.
 
-Loop can handle any size of request. Limiting it to 255 sectors just
-burns the CPU for bio split and request merge for underlayer disk and
-also cause bad fs block allocation in directio mode.
-
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/loop.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/skd_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index b55a1f8..428da07 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1799,6 +1799,7 @@ static int loop_add(struct loop_device **l, int i)
- 	}
- 	lo->lo_queue->queuedata = lo;
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index e2d205b58fe2..7d5048d95037 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -2830,14 +2830,13 @@ static void skd_isr_msg_from_dev(struct skd_device *skdev);
+ static irqreturn_t
+ skd_isr(int irq, void *ptr)
+ {
+-	struct skd_device *skdev;
++	struct skd_device *skdev = ptr;
+ 	u32 intstat;
+ 	u32 ack;
+ 	int rc = 0;
+ 	int deferred = 0;
+ 	int flush_enqueued = 0;
  
-+	blk_queue_max_hw_sectors(lo->lo_queue, BLK_DEF_MAX_SECTORS);
- 	/*
- 	 * It doesn't make sense to enable merge because the I/O
- 	 * submitted to backing file is handled page by page.
+-	skdev = (struct skd_device *)ptr;
+ 	spin_lock(&skdev->lock);
+ 
+ 	for (;; ) {
 -- 
-2.9.5
+2.14.0
