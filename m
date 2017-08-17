@@ -3,138 +3,127 @@ From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
 	Bart Van Assche <bart.vanassche@wdc.com>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Dan Williams <dan.j.williams@intel.com>
-Subject: [PATCH 07/12] genhd: Annotate all part and part_tbl pointer dereferences
-Date: Thu, 17 Aug 2017 16:23:06 -0700
-Message-Id: <20170817232311.25948-8-bart.vanassche@wdc.com>
-In-Reply-To: <20170817232311.25948-1-bart.vanassche@wdc.com>
-References: <20170817232311.25948-1-bart.vanassche@wdc.com>
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 08/55] skd: Remove unnecessary blank lines
+Date: Thu, 17 Aug 2017 13:12:51 -0700
+Message-Id: <20170817201338.16537-9-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Annotate gendisk.part_tbl and disk_part_tbl.part dereferences with
-rcu_dereference_protected(). This patch does not change the behavior
-of the modified code but ensures that sparse does not complain about
-disk->part_tbl manipulations nor about part_tbl->part accesses.
-Additionally, improve documentation of the locking requirements of
-the modified functions.
+This patch does not change any functionality but makes the skd
+driver source code more uniform with that of other kernel drivers.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/genhd.c             | 15 ++++++++++-----
- block/partition-generic.c | 15 ++++++++++++---
- 2 files changed, 22 insertions(+), 8 deletions(-)
+ drivers/block/skd_main.c | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 3dc4d115480f..2367087cdb7c 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1127,12 +1127,13 @@ static const struct attribute_group *disk_attr_groups[] = {
-  * original ptbl is freed using RCU callback.
-  *
-  * LOCKING:
-- * Matching bd_mutx locked.
-+ * Matching bd_mutex locked or the caller is the only user of @disk.
-  */
- static void disk_replace_part_tbl(struct gendisk *disk,
- 				  struct disk_part_tbl *new_ptbl)
- {
--	struct disk_part_tbl *old_ptbl = disk->part_tbl;
-+	struct disk_part_tbl *old_ptbl =
-+		rcu_dereference_protected(disk->part_tbl, 1);
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 74489da762a1..aa6bfd1391da 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -333,7 +333,6 @@ struct skd_device {
  
- 	rcu_assign_pointer(disk->part_tbl, new_ptbl);
+ 	u32 timo_slot;
  
-@@ -1151,14 +1152,16 @@ static void disk_replace_part_tbl(struct gendisk *disk,
-  * uses RCU to allow unlocked dereferencing for stats and other stuff.
-  *
-  * LOCKING:
-- * Matching bd_mutex locked, might sleep.
-+ * Matching bd_mutex locked or the caller is the only user of @disk.
-+ * Might sleep.
-  *
-  * RETURNS:
-  * 0 on success, -errno on failure.
-  */
- int disk_expand_part_tbl(struct gendisk *disk, int partno)
- {
--	struct disk_part_tbl *old_ptbl = disk->part_tbl;
-+	struct disk_part_tbl *old_ptbl =
-+		rcu_dereference_protected(disk->part_tbl, 1);
- 	struct disk_part_tbl *new_ptbl;
- 	int len = old_ptbl ? old_ptbl->len : 0;
- 	int i, target;
-@@ -1352,6 +1355,7 @@ EXPORT_SYMBOL(alloc_disk);
- struct gendisk *alloc_disk_node(int minors, int node_id)
- {
- 	struct gendisk *disk;
-+	struct disk_part_tbl *ptbl;
+-
+ 	struct work_struct completion_worker;
+ };
  
- 	disk = kzalloc_node(sizeof(struct gendisk), GFP_KERNEL, node_id);
- 	if (disk) {
-@@ -1365,7 +1369,8 @@ struct gendisk *alloc_disk_node(int minors, int node_id)
- 			kfree(disk);
- 			return NULL;
+@@ -694,7 +693,6 @@ static void skd_request_fn(struct request_queue *q)
+ 		if (flush == SKD_FLUSH_ZERO_SIZE_FIRST) {
+ 			skd_prep_zerosize_flush_cdb(scsi_req, skreq);
+ 			SKD_ASSERT(skreq->flush_cmd == 1);
+-
+ 		} else {
+ 			skd_prep_rw_cdb(scsi_req, data_dir, lba, count);
  		}
--		disk->part_tbl->part[0] = &disk->part0;
-+		ptbl = rcu_dereference_protected(disk->part_tbl, 1);
-+		rcu_assign_pointer(ptbl->part[0], &disk->part0);
- 
- 		/*
- 		 * set_capacity() and get_capacity() currently don't use
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index fa5049a4d99b..1745a9659517 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -252,15 +252,20 @@ void __delete_partition(struct percpu_ref *ref)
- 	call_rcu(&part->rcu_head, delete_partition_rcu_cb);
+@@ -2004,16 +2002,14 @@ static void skd_complete_internal(struct skd_device *skdev,
+ 				skd_send_internal_skspcl(skdev, skspcl,
+ 							 READ_CAPACITY);
+ 			else {
+-				pr_err(
+-				       "(%s):*** W/R Buffer mismatch %d ***\n",
++				pr_err("(%s):*** W/R Buffer mismatch %d ***\n",
+ 				       skd_name(skdev), skdev->connect_retries);
+ 				if (skdev->connect_retries <
+ 				    SKD_MAX_CONNECT_RETRIES) {
+ 					skdev->connect_retries++;
+ 					skd_soft_reset(skdev);
+ 				} else {
+-					pr_err(
+-					       "(%s): W/R Buffer Connect Error\n",
++					pr_err("(%s): W/R Buffer Connect Error\n",
+ 					       skd_name(skdev));
+ 					return;
+ 				}
+@@ -2621,7 +2617,6 @@ static void skd_process_scsi_inq(struct skd_device *skdev,
+ 		skd_do_driver_inq(skdev, skcomp, skerr, scsi_req->cdb, buf);
  }
  
-+/*
-+ * Must be called either with bd_mutex held, before a disk can be opened or
-+ * after all disk users are gone.
-+ */
- void delete_partition(struct gendisk *disk, int partno)
+-
+ static int skd_isr_completion_posted(struct skd_device *skdev,
+ 					int limit, int *enqueued)
  {
--	struct disk_part_tbl *ptbl = disk->part_tbl;
-+	struct disk_part_tbl *ptbl =
-+		rcu_dereference_protected(disk->part_tbl, 1);
- 	struct hd_struct *part;
- 
- 	if (partno >= ptbl->len)
+@@ -3083,8 +3078,7 @@ static void skd_isr_fwstate(struct skd_device *skdev)
+ 			skdev->cur_max_queue_depth * 2 / 3 + 1;
+ 		if (skdev->queue_low_water_mark < 1)
+ 			skdev->queue_low_water_mark = 1;
+-		pr_info(
+-		       "(%s): Queue depth limit=%d dev=%d lowat=%d\n",
++		pr_info("(%s): Queue depth limit=%d dev=%d lowat=%d\n",
+ 		       skd_name(skdev),
+ 		       skdev->cur_max_queue_depth,
+ 		       skdev->dev_max_queue_depth, skdev->queue_low_water_mark);
+@@ -4553,7 +4547,6 @@ static void skd_destruct(struct skd_device *skdev)
+ 	if (skdev == NULL)
  		return;
  
--	part = ptbl->part[partno];
-+	part = rcu_dereference_protected(ptbl->part[partno], 1);
- 	if (!part)
- 		return;
+-
+ 	pr_debug("%s:%s:%d disk\n", skdev->name, __func__, __LINE__);
+ 	skd_free_disk(skdev);
  
-@@ -280,6 +285,10 @@ static ssize_t whole_disk_show(struct device *dev,
- static DEVICE_ATTR(whole_disk, S_IRUSR | S_IRGRP | S_IROTH,
- 		   whole_disk_show, NULL);
+@@ -4617,7 +4610,6 @@ static const struct block_device_operations skd_blockdev_ops = {
+ 	.getgeo		= skd_bdev_getgeo,
+ };
  
-+/*
-+ * Must be called either with bd_mutex held, before a disk can be opened or
-+ * after all disk users are gone.
-+ */
- struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 				sector_t start, sector_t len, int flags,
- 				struct partition_meta_info *info)
-@@ -295,7 +304,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 	err = disk_expand_part_tbl(disk, partno);
- 	if (err)
- 		return ERR_PTR(err);
--	ptbl = disk->part_tbl;
-+	ptbl = rcu_dereference_protected(disk->part_tbl, 1);
+-
+ /*
+  *****************************************************************************
+  * PCIe DRIVER GLUE
+@@ -4716,14 +4708,12 @@ static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	pci_set_master(pdev);
+ 	rc = pci_enable_pcie_error_reporting(pdev);
+ 	if (rc) {
+-		pr_err(
+-		       "(%s): bad enable of PCIe error reporting rc=%d\n",
++		pr_err("(%s): bad enable of PCIe error reporting rc=%d\n",
+ 		       skd_name(skdev), rc);
+ 		skdev->pcie_error_reporting_is_enabled = 0;
+ 	} else
+ 		skdev->pcie_error_reporting_is_enabled = 1;
  
- 	if (ptbl->part[partno])
- 		return ERR_PTR(-EBUSY);
+-
+ 	pci_set_drvdata(pdev, skdev);
+ 
+ 	for (i = 0; i < SKD_MAX_BARS; i++) {
+@@ -4768,8 +4758,7 @@ static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	} else {
+ 		/* we timed out, something is wrong with the device,
+ 		   don't add the disk structure */
+-		pr_err(
+-		       "(%s): error: waiting for s1120 timed out %d!\n",
++		pr_err("(%s): error: waiting for s1120 timed out %d!\n",
+ 		       skd_name(skdev), rc);
+ 		/* in case of no error; we timeout with ENXIO */
+ 		if (!rc)
 -- 
 2.14.0
