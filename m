@@ -1,168 +1,321 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754704AbdHYMua (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 08:50:30 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V6 00/12] mmc: Add Command Queue support
-Date: Fri, 25 Aug 2017 15:43:43 +0300
-Message-Id: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 45/55] skd: Introduce skd_process_request()
+Date: Thu, 17 Aug 2017 13:13:28 -0700
+Message-Id: <20170817201338.16537-46-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi
+The only functional change in this patch is that the skd_fitmsg_context
+in which requests are accumulated is changed from a local variable into
+a member of struct skd_device. This patch will make the blk-mq conversion
+easier.
 
-Here is V6 of the hardware command queue patches without the software
-command queue patches.  Patches "mmc: host: Add CQE interface" and
-"mmc: core: Turn off CQE before sending commands" have been applied to Ulf's
-next branch.  "mmc: host: Add CQE interface" needs to be dropped in favour
-of the new version.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/skd_main.c | 237 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 119 insertions(+), 118 deletions(-)
 
-HW CMDQ offers 25% - 50% better random multi-threaded I/O.  I see a slight
-2% drop in sequential read speed but no change to sequential write.
-
-We need to start with the legacy block API because people want to backport
-CQ to earlier kernels (we really need to get features upstream more
-quickly), but blk-mq has been evolving a lot (e.g. elevator support), so
-backporters face having either something quite different from upstream or
-trying to backport great chunks of the block layer.
-
-We also don't know how blk-mq will perform so it would be prudent to start
-with support for both the legacy API and blk-mq (as scsi does) so that we
-can find out first.
-
-RFC patches to support blk-mq can be found here:
-	https://marc.info/?l=linux-block&m=150349582124880
-
-
-Changes since V5:
-	Re-based
-      mmc: core: Add mmc_retune_hold_now()
-	Dropped because it has been applied
-      mmc: core: Add members to mmc_request and mmc_data for CQE's
-	Dropped because it has been applied
-      mmc: core: Move mmc_start_areq() declaration
-	New patch at Ulf's request
-      mmc: block: Fix block status codes
-	Another un-related patch
-      mmc: host: Add CQE interface
-	Move recovery_notifier() callback to struct mmc_request
-      mmc: core: Add support for handling CQE requests
-	Roll __mmc_cqe_request_done() into mmc_cqe_request_done()
-	Move function declarations requested by Ulf
-      mmc: core: Remove unused MMC_CAP2_PACKED_CMD
-	Dropped because it has been applied
-      mmc: block: Add CQE support
-	Add explanation to commit message
-	Adjustment for changed recovery_notifier() callback
-      mmc: cqhci: support for command queue enabled host
-	Adjustment for changed recovery_notifier() callback
-      mmc: sdhci-pci: Add CQHCI support for Intel GLK
-	Add DCMD capability for Intel controllers except GLK
-
-Changes since V4:
-      mmc: core: Add mmc_retune_hold_now()
-	Add explanation to commit message.
-      mmc: host: Add CQE interface
-	Add comments to callback declarations.
-      mmc: core: Turn off CQE before sending commands
-	Add explanation to commit message.
-      mmc: core: Add support for handling CQE requests
-	Add comments as requested by Ulf.
-      mmc: core: Remove unused MMC_CAP2_PACKED_CMD
-	New patch.
-      mmc: mmc: Enable Command Queuing
-	Adjust for removal of MMC_CAP2_PACKED_CMD.
-	Add a comment about Packed Commands.
-      mmc: mmc: Enable CQE's
-	Remove un-necessary check for MMC_CAP2_CQE
-      mmc: block: Use local variables in mmc_blk_data_prep()
-	New patch.
-      mmc: block: Prepare CQE data
-	Adjust due to "mmc: block: Use local variables in mmc_blk_data_prep()"
-	Remove priority setting.
-	Add explanation to commit message.
-      mmc: cqhci: support for command queue enabled host
-	Fix transfer descriptor setting in cqhci_set_tran_desc() for 32-bit DMA
-
-Changes since V3:
-	Adjusted ...blk_end_request...() for new block status codes
-	Fixed CQHCI transaction descriptor for "no DCMD" case
-
-Changes since V2:
-	Dropped patches that have been applied.
-	Re-based
-	Added "mmc: sdhci-pci: Add CQHCI support for Intel GLK"
-
-Changes since V1:
-
-	"Share mmc request array between partitions" is dependent
-	on changes in "Introduce queue semantics", so added that
-	and block fixes:
-
-	Added "Fix is_waiting_last_req set incorrectly"
-	Added "Fix cmd error reset failure path"
-	Added "Use local var for mqrq_cur"
-	Added "Introduce queue semantics"
-
-Changes since RFC:
-
-	Re-based on next.
-	Added comment about command queue priority.
-	Added some acks and reviews.
-
-
-Adrian Hunter (11):
-      mmc: core: Move mmc_start_areq() declaration
-      mmc: block: Fix block status codes
-      mmc: host: Add CQE interface
-      mmc: core: Turn off CQE before sending commands
-      mmc: core: Add support for handling CQE requests
-      mmc: mmc: Enable Command Queuing
-      mmc: mmc: Enable CQE's
-      mmc: block: Use local variables in mmc_blk_data_prep()
-      mmc: block: Prepare CQE data
-      mmc: block: Add CQE support
-      mmc: sdhci-pci: Add CQHCI support for Intel GLK
-
-Venkat Gopalakrishnan (1):
-      mmc: cqhci: support for command queue enabled host
-
- drivers/mmc/core/block.c          |  246 +++++++-
- drivers/mmc/core/block.h          |    7 +
- drivers/mmc/core/bus.c            |    7 +
- drivers/mmc/core/core.c           |  172 +++++-
- drivers/mmc/core/core.h           |   10 +
- drivers/mmc/core/mmc.c            |   29 +
- drivers/mmc/core/queue.c          |  270 ++++++++-
- drivers/mmc/core/queue.h          |   43 +-
- drivers/mmc/host/Kconfig          |   14 +
- drivers/mmc/host/Makefile         |    1 +
- drivers/mmc/host/cqhci.c          | 1154 +++++++++++++++++++++++++++++++++++++
- drivers/mmc/host/cqhci.h          |  240 ++++++++
- drivers/mmc/host/sdhci-pci-core.c |  154 ++++-
- include/linux/mmc/core.h          |   10 +-
- include/linux/mmc/host.h          |   55 ++
- 15 files changed, 2381 insertions(+), 31 deletions(-)
- create mode 100644 drivers/mmc/host/cqhci.c
- create mode 100644 drivers/mmc/host/cqhci.h
-
-
-Regards
-Adrian
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 4b92d711d2d3..1d10373b0da3 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -232,6 +232,7 @@ struct skd_device {
+ 	spinlock_t lock;
+ 	struct gendisk *disk;
+ 	struct request_queue *queue;
++	struct skd_fitmsg_context *skmsg;
+ 	struct device *class_dev;
+ 	int gendisk_on;
+ 	int sync_done;
+@@ -492,23 +493,128 @@ static bool skd_fail_all(struct request_queue *q)
+ 	}
+ }
+ 
+-static void skd_request_fn(struct request_queue *q)
++static void skd_process_request(struct request *req)
+ {
++	struct request_queue *const q = req->q;
+ 	struct skd_device *skdev = q->queuedata;
+-	struct skd_fitmsg_context *skmsg = NULL;
+-	struct fit_msg_hdr *fmh = NULL;
+-	struct skd_request_context *skreq;
+-	struct request *req = NULL;
++	struct skd_fitmsg_context *skmsg;
++	struct fit_msg_hdr *fmh;
++	const u32 tag = blk_mq_unique_tag(req);
++	struct skd_request_context *const skreq = &skdev->skreq_table[tag];
+ 	struct skd_scsi_request *scsi_req;
+ 	unsigned long io_flags;
+ 	u32 lba;
+ 	u32 count;
+ 	int data_dir;
+ 	__be64 be_dmaa;
+-	u64 cmdctxt;
+ 	u32 timo_slot;
+ 	int flush, fua;
+-	u32 tag;
++
++	WARN_ONCE(tag >= skd_max_queue_depth, "%#x > %#x (nr_requests = %lu)\n",
++		  tag, skd_max_queue_depth, q->nr_requests);
++
++	SKD_ASSERT(skreq->state == SKD_REQ_STATE_IDLE);
++
++	flush = fua = 0;
++
++	lba = (u32)blk_rq_pos(req);
++	count = blk_rq_sectors(req);
++	data_dir = rq_data_dir(req);
++	io_flags = req->cmd_flags;
++
++	if (req_op(req) == REQ_OP_FLUSH)
++		flush++;
++
++	if (io_flags & REQ_FUA)
++		fua++;
++
++	dev_dbg(&skdev->pdev->dev,
++		"new req=%p lba=%u(0x%x) count=%u(0x%x) dir=%d\n", req, lba,
++		lba, count, count, data_dir);
++
++	skreq->id = tag + SKD_ID_RW_REQUEST;
++	skreq->flush_cmd = 0;
++	skreq->n_sg = 0;
++	skreq->sg_byte_count = 0;
++
++	skreq->req = req;
++	skreq->fitmsg_id = 0;
++
++	skreq->data_dir = data_dir == READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
++
++	if (req->bio && !skd_preop_sg_list(skdev, skreq)) {
++		dev_dbg(&skdev->pdev->dev, "error Out\n");
++		skd_end_request(skdev, skreq->req, BLK_STS_RESOURCE);
++		return;
++	}
++
++	/* Either a FIT msg is in progress or we have to start one. */
++	skmsg = skdev->skmsg;
++	if (!skmsg) {
++		skmsg = &skdev->skmsg_table[tag];
++		skdev->skmsg = skmsg;
++
++		/* Initialize the FIT msg header */
++		fmh = &skmsg->msg_buf->fmh;
++		memset(fmh, 0, sizeof(*fmh));
++		fmh->protocol_id = FIT_PROTOCOL_ID_SOFIT;
++		skmsg->length = sizeof(*fmh);
++	} else {
++		fmh = &skmsg->msg_buf->fmh;
++	}
++
++	skreq->fitmsg_id = skmsg->id;
++
++	scsi_req = &skmsg->msg_buf->scsi[fmh->num_protocol_cmds_coalesced];
++	memset(scsi_req, 0, sizeof(*scsi_req));
++
++	be_dmaa = cpu_to_be64(skreq->sksg_dma_address);
++
++	scsi_req->hdr.tag = skreq->id;
++	scsi_req->hdr.sg_list_dma_address = be_dmaa;
++
++	if (flush == SKD_FLUSH_ZERO_SIZE_FIRST) {
++		skd_prep_zerosize_flush_cdb(scsi_req, skreq);
++		SKD_ASSERT(skreq->flush_cmd == 1);
++	} else {
++		skd_prep_rw_cdb(scsi_req, data_dir, lba, count);
++	}
++
++	if (fua)
++		scsi_req->cdb[1] |= SKD_FUA_NV;
++
++	scsi_req->hdr.sg_list_len_bytes = cpu_to_be32(skreq->sg_byte_count);
++
++	/* Complete resource allocations. */
++	skreq->state = SKD_REQ_STATE_BUSY;
++
++	skmsg->length += sizeof(struct skd_scsi_request);
++	fmh->num_protocol_cmds_coalesced++;
++
++	/*
++	 * Update the active request counts.
++	 * Capture the timeout timestamp.
++	 */
++	skreq->timeout_stamp = atomic_read(&skdev->timeout_stamp);
++	timo_slot = skreq->timeout_stamp & SKD_TIMEOUT_SLOT_MASK;
++	atomic_inc(&skdev->timeout_slot[timo_slot]);
++	atomic_inc(&skdev->in_flight);
++	dev_dbg(&skdev->pdev->dev, "req=0x%x busy=%d\n", skreq->id,
++		atomic_read(&skdev->in_flight));
++
++	/*
++	 * If the FIT msg buffer is full send it.
++	 */
++	if (fmh->num_protocol_cmds_coalesced >= skd_max_req_per_msg) {
++		skd_send_fitmsg(skdev, skmsg);
++		skdev->skmsg = NULL;
++	}
++}
++
++static void skd_request_fn(struct request_queue *q)
++{
++	struct skd_device *skdev = q->queuedata;
++	struct request *req;
+ 
+ 	if (skdev->state != SKD_DRVR_STATE_ONLINE) {
+ 		if (skd_fail_all(q))
+@@ -533,30 +639,12 @@ static void skd_request_fn(struct request_queue *q)
+ 	 *  - There are no more FIT msg buffers
+ 	 */
+ 	for (;; ) {
+-
+-		flush = fua = 0;
+-
+ 		req = blk_peek_request(q);
+ 
+ 		/* Are there any native requests to start? */
+ 		if (req == NULL)
+ 			break;
+ 
+-		lba = (u32)blk_rq_pos(req);
+-		count = blk_rq_sectors(req);
+-		data_dir = rq_data_dir(req);
+-		io_flags = req->cmd_flags;
+-
+-		if (req_op(req) == REQ_OP_FLUSH)
+-			flush++;
+-
+-		if (io_flags & REQ_FUA)
+-			fua++;
+-
+-		dev_dbg(&skdev->pdev->dev,
+-			"new req=%p lba=%u(0x%x) count=%u(0x%x) dir=%d\n",
+-			req, lba, lba, count, count, data_dir);
+-
+ 		/* At this point we know there is a request */
+ 
+ 		/* Are too many requets already in progress? */
+@@ -576,103 +664,16 @@ static void skd_request_fn(struct request_queue *q)
+ 		 * available but is still at the head of the free list.
+ 		 */
+ 		WARN_ON_ONCE(blk_queue_start_tag(q, req));
+-
+-		tag = blk_mq_unique_tag(req);
+-		WARN_ONCE(tag >= skd_max_queue_depth,
+-			  "%#x > %#x (nr_requests = %lu)\n", tag,
+-			  skd_max_queue_depth, q->nr_requests);
+-
+-		skreq = &skdev->skreq_table[tag];
+-		SKD_ASSERT(skreq->state == SKD_REQ_STATE_IDLE);
+-		SKD_ASSERT((skreq->id & SKD_ID_INCR) == 0);
+-
+-		skreq->id = tag + SKD_ID_RW_REQUEST;
+-		skreq->flush_cmd = 0;
+-		skreq->n_sg = 0;
+-		skreq->sg_byte_count = 0;
+-
+-		skreq->req = req;
+-		skreq->fitmsg_id = 0;
+-
+-		skreq->data_dir = data_dir == READ ? DMA_FROM_DEVICE :
+-			DMA_TO_DEVICE;
+-
+-		if (req->bio && !skd_preop_sg_list(skdev, skreq)) {
+-			dev_dbg(&skdev->pdev->dev, "error Out\n");
+-			skd_end_request(skdev, skreq->req, BLK_STS_RESOURCE);
+-			continue;
+-		}
+-
+-		/* Either a FIT msg is in progress or we have to start one. */
+-		if (skmsg == NULL) {
+-			skmsg = &skdev->skmsg_table[tag];
+-
+-			/* Initialize the FIT msg header */
+-			fmh = &skmsg->msg_buf->fmh;
+-			memset(fmh, 0, sizeof(*fmh));
+-			fmh->protocol_id = FIT_PROTOCOL_ID_SOFIT;
+-			skmsg->length = sizeof(*fmh);
+-		}
+-
+-		skreq->fitmsg_id = skmsg->id;
+-
+-		scsi_req =
+-			&skmsg->msg_buf->scsi[fmh->num_protocol_cmds_coalesced];
+-		memset(scsi_req, 0, sizeof(*scsi_req));
+-
+-		be_dmaa = cpu_to_be64(skreq->sksg_dma_address);
+-		cmdctxt = skreq->id + SKD_ID_INCR;
+-
+-		scsi_req->hdr.tag = cmdctxt;
+-		scsi_req->hdr.sg_list_dma_address = be_dmaa;
+-
+-		if (flush == SKD_FLUSH_ZERO_SIZE_FIRST) {
+-			skd_prep_zerosize_flush_cdb(scsi_req, skreq);
+-			SKD_ASSERT(skreq->flush_cmd == 1);
+-		} else {
+-			skd_prep_rw_cdb(scsi_req, data_dir, lba, count);
+-		}
+-
+-		if (fua)
+-			scsi_req->cdb[1] |= SKD_FUA_NV;
+-
+-		scsi_req->hdr.sg_list_len_bytes =
+-			cpu_to_be32(skreq->sg_byte_count);
+-
+-		/* Complete resource allocations. */
+-		skreq->state = SKD_REQ_STATE_BUSY;
+-		skreq->id += SKD_ID_INCR;
+-
+-		skmsg->length += sizeof(struct skd_scsi_request);
+-		fmh->num_protocol_cmds_coalesced++;
+-
+-		/*
+-		 * Update the active request counts.
+-		 * Capture the timeout timestamp.
+-		 */
+-		skreq->timeout_stamp = atomic_read(&skdev->timeout_stamp);
+-		timo_slot = skreq->timeout_stamp & SKD_TIMEOUT_SLOT_MASK;
+-		atomic_inc(&skdev->timeout_slot[timo_slot]);
+-		atomic_inc(&skdev->in_flight);
+-		dev_dbg(&skdev->pdev->dev, "req=0x%x busy=%d\n", skreq->id,
+-			atomic_read(&skdev->in_flight));
+-
+-		/*
+-		 * If the FIT msg buffer is full send it.
+-		 */
+-		if (fmh->num_protocol_cmds_coalesced >= skd_max_req_per_msg) {
+-			skd_send_fitmsg(skdev, skmsg);
+-			skmsg = NULL;
+-			fmh = NULL;
+-		}
++		skd_process_request(req);
+ 	}
+ 
+ 	/* If the FIT msg buffer is not empty send what we got. */
+-	if (skmsg) {
++	if (skdev->skmsg) {
++		struct fit_msg_hdr *fmh = &skdev->skmsg->msg_buf->fmh;
++
+ 		WARN_ON_ONCE(!fmh->num_protocol_cmds_coalesced);
+-		skd_send_fitmsg(skdev, skmsg);
+-		skmsg = NULL;
+-		fmh = NULL;
++		skd_send_fitmsg(skdev, skdev->skmsg);
++		skdev->skmsg = NULL;
+ 	}
+ 
+ 	/*
+-- 
+2.14.0
