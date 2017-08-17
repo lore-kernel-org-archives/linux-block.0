@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:41304 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753822AbdHQUPI (ORCPT
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42664 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753812AbdHQUO5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 16:15:08 -0400
+        Thu, 17 Aug 2017 16:14:57 -0400
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -12,164 +12,37 @@ Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bart.vanassche@wdc.com>,
         Hannes Reinecke <hare@suse.de>,
         Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 34/55] skd: Remove superfluous occurrences of the 'volatile' keyword
-Date: Thu, 17 Aug 2017 13:13:17 -0700
-Message-Id: <20170817201338.16537-35-bart.vanassche@wdc.com>
+Subject: [PATCH 10/55] skd: Fix spelling in a source code comment
+Date: Thu, 17 Aug 2017 13:12:53 -0700
+Message-Id: <20170817201338.16537-11-bart.vanassche@wdc.com>
 In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
 References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-mem_map[i] is accessed through readl() / writel() hence declaring
-mem_map as volatile is not necessary.
-
-Remove the volatile declarations from struct fit_completion_entry_v1
-pointers and struct fit_comp_error_info since reading these structures
-multiple times is safe.
+Change "ptimal" into "optimal" and remove the misleading reference
+to sysfs.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/skd_main.c | 48 ++++++++++++++++++++++--------------------------
- 1 file changed, 22 insertions(+), 26 deletions(-)
+ drivers/block/skd_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 71158e8b8a2b..0639c9f89984 100644
+index 1d0ad31d2256..6c7cf5327d22 100644
 --- a/drivers/block/skd_main.c
 +++ b/drivers/block/skd_main.c
-@@ -263,7 +263,7 @@ typedef enum skd_irq_type {
- #define SKD_MAX_BARS                    2
+@@ -4273,7 +4273,7 @@ static int skd_cons_disk(struct skd_device *skdev)
+ 	blk_queue_max_segments(q, skdev->sgs_per_request);
+ 	blk_queue_max_hw_sectors(q, SKD_N_MAX_SECTORS);
  
- struct skd_device {
--	volatile void __iomem *mem_map[SKD_MAX_BARS];
-+	void __iomem *mem_map[SKD_MAX_BARS];
- 	resource_size_t mem_phys[SKD_MAX_BARS];
- 	u32 mem_size[SKD_MAX_BARS];
+-	/* set sysfs ptimal_io_size to 8K */
++	/* set optimal I/O size to 8KB */
+ 	blk_queue_io_opt(q, 8192);
  
-@@ -1094,9 +1094,8 @@ static int skd_sg_io_put_status(struct skd_device *skdev,
- 				struct skd_sg_io *sksgio);
- 
- static void skd_complete_special(struct skd_device *skdev,
--				 volatile struct fit_completion_entry_v1
--				 *skcomp,
--				 volatile struct fit_comp_error_info *skerr,
-+				 struct fit_completion_entry_v1 *skcomp,
-+				 struct fit_comp_error_info *skerr,
- 				 struct skd_special_context *skspcl);
- 
- static int skd_bdev_ioctl(struct block_device *bdev, fmode_t mode,
-@@ -1841,9 +1840,8 @@ static void skd_log_check_status(struct skd_device *skdev, u8 status, u8 key,
- }
- 
- static void skd_complete_internal(struct skd_device *skdev,
--				  volatile struct fit_completion_entry_v1
--				  *skcomp,
--				  volatile struct fit_comp_error_info *skerr,
-+				  struct fit_completion_entry_v1 *skcomp,
-+				  struct fit_comp_error_info *skerr,
- 				  struct skd_special_context *skspcl)
- {
- 	u8 *buf = skspcl->data_buf;
-@@ -2100,8 +2098,8 @@ static void skd_send_special_fitmsg(struct skd_device *skdev,
-  */
- 
- static void skd_complete_other(struct skd_device *skdev,
--			       volatile struct fit_completion_entry_v1 *skcomp,
--			       volatile struct fit_comp_error_info *skerr);
-+			       struct fit_completion_entry_v1 *skcomp,
-+			       struct fit_comp_error_info *skerr);
- 
- struct sns_info {
- 	u8 type;
-@@ -2150,7 +2148,7 @@ static struct sns_info skd_chkstat_table[] = {
- 
- static enum skd_check_status_action
- skd_check_status(struct skd_device *skdev,
--		 u8 cmp_status, volatile struct fit_comp_error_info *skerr)
-+		 u8 cmp_status, struct fit_comp_error_info *skerr)
- {
- 	int i;
- 
-@@ -2311,8 +2309,8 @@ static void skd_release_skreq(struct skd_device *skdev,
- #define DRIVER_INQ_EVPD_PAGE_CODE   0xDA
- 
- static void skd_do_inq_page_00(struct skd_device *skdev,
--			       volatile struct fit_completion_entry_v1 *skcomp,
--			       volatile struct fit_comp_error_info *skerr,
-+			       struct fit_completion_entry_v1 *skcomp,
-+			       struct fit_comp_error_info *skerr,
- 			       uint8_t *cdb, uint8_t *buf)
- {
- 	uint16_t insert_pt, max_bytes, drive_pages, drive_bytes, new_size;
-@@ -2408,8 +2406,8 @@ static void skd_get_link_info(struct pci_dev *pdev, u8 *speed, u8 *width)
- }
- 
- static void skd_do_inq_page_da(struct skd_device *skdev,
--			       volatile struct fit_completion_entry_v1 *skcomp,
--			       volatile struct fit_comp_error_info *skerr,
-+			       struct fit_completion_entry_v1 *skcomp,
-+			       struct fit_comp_error_info *skerr,
- 			       uint8_t *cdb, uint8_t *buf)
- {
- 	struct pci_dev *pdev = skdev->pdev;
-@@ -2461,8 +2459,8 @@ static void skd_do_inq_page_da(struct skd_device *skdev,
- }
- 
- static void skd_do_driver_inq(struct skd_device *skdev,
--			      volatile struct fit_completion_entry_v1 *skcomp,
--			      volatile struct fit_comp_error_info *skerr,
-+			      struct fit_completion_entry_v1 *skcomp,
-+			      struct fit_comp_error_info *skerr,
- 			      uint8_t *cdb, uint8_t *buf)
- {
- 	if (!buf)
-@@ -2489,9 +2487,8 @@ static unsigned char *skd_sg_1st_page_ptr(struct scatterlist *sg)
- }
- 
- static void skd_process_scsi_inq(struct skd_device *skdev,
--				 volatile struct fit_completion_entry_v1
--				 *skcomp,
--				 volatile struct fit_comp_error_info *skerr,
-+				 struct fit_completion_entry_v1 *skcomp,
-+				 struct fit_comp_error_info *skerr,
- 				 struct skd_special_context *skspcl)
- {
- 	uint8_t *buf;
-@@ -2508,8 +2505,8 @@ static void skd_process_scsi_inq(struct skd_device *skdev,
- static int skd_isr_completion_posted(struct skd_device *skdev,
- 					int limit, int *enqueued)
- {
--	volatile struct fit_completion_entry_v1 *skcmp;
--	volatile struct fit_comp_error_info *skerr;
-+	struct fit_completion_entry_v1 *skcmp;
-+	struct fit_comp_error_info *skerr;
- 	u16 req_id;
- 	u32 req_slot;
- 	struct skd_request_context *skreq;
-@@ -2651,8 +2648,8 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
- }
- 
- static void skd_complete_other(struct skd_device *skdev,
--			       volatile struct fit_completion_entry_v1 *skcomp,
--			       volatile struct fit_comp_error_info *skerr)
-+			       struct fit_completion_entry_v1 *skcomp,
-+			       struct fit_comp_error_info *skerr)
- {
- 	u32 req_id = 0;
- 	u32 req_table;
-@@ -2729,9 +2726,8 @@ static void skd_complete_other(struct skd_device *skdev,
- }
- 
- static void skd_complete_special(struct skd_device *skdev,
--				 volatile struct fit_completion_entry_v1
--				 *skcomp,
--				 volatile struct fit_comp_error_info *skerr,
-+				 struct fit_completion_entry_v1 *skcomp,
-+				 struct fit_comp_error_info *skerr,
- 				 struct skd_special_context *skspcl)
- {
- 	lockdep_assert_held(&skdev->lock);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
 -- 
 2.14.0
