@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42664 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753451AbdHQUP2 (ORCPT
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:14527 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753342AbdHQUOc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 16:15:28 -0400
+        Thu, 17 Aug 2017 16:14:32 -0400
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -12,90 +12,112 @@ Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bart.vanassche@wdc.com>,
         Hannes Reinecke <hare@suse.de>,
         Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 12/55] skd: Remove set-but-not-used local variables
-Date: Thu, 17 Aug 2017 13:12:55 -0700
-Message-Id: <20170817201338.16537-13-bart.vanassche@wdc.com>
+Subject: [PATCH 31/55] skd: Drop second argument of skd_recover_requests()
+Date: Thu, 17 Aug 2017 13:13:14 -0700
+Message-Id: <20170817201338.16537-32-bart.vanassche@wdc.com>
 In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
 References: <20170817201338.16537-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-These variables have been detected by building with W=1. Declare
-'acc' as __maybe_unused because most access_ok() implementations
-ignore their first argument. This patch does not change any
-functionality.
+Since all callers pass zero as second argument to skd_recover_requests(),
+drop that second argument.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/skd_main.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ drivers/block/skd_main.c | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 5a88116efc97..ef7c0384e9a8 100644
+index 008fa7231159..a363d5f6bcb5 100644
 --- a/drivers/block/skd_main.c
 +++ b/drivers/block/skd_main.c
-@@ -537,8 +537,6 @@ static void skd_request_fn(struct request_queue *q)
- 	u32 lba;
- 	u32 count;
- 	int data_dir;
--	u32 be_lba;
--	u32 be_count;
- 	u64 be_dmaa;
- 	u64 cmdctxt;
- 	u32 timo_slot;
-@@ -676,8 +674,6 @@ static void skd_request_fn(struct request_queue *q)
- 		cmd_ptr = &skmsg->msg_buf[skmsg->length];
- 		memset(cmd_ptr, 0, 32);
+@@ -437,7 +437,7 @@ static void skd_release_special(struct skd_device *skdev,
+ 				struct skd_special_context *skspcl);
+ static void skd_disable_interrupts(struct skd_device *skdev);
+ static void skd_isr_fwstate(struct skd_device *skdev);
+-static void skd_recover_requests(struct skd_device *skdev, int requeue);
++static void skd_recover_requests(struct skd_device *skdev);
+ static void skd_soft_reset(struct skd_device *skdev);
  
--		be_lba = cpu_to_be32(lba);
--		be_count = cpu_to_be32(count);
- 		be_dmaa = cpu_to_be64((u64)skreq->sksg_dma_address);
- 		cmdctxt = skreq->id + SKD_ID_INCR;
- 
-@@ -889,7 +885,6 @@ static void skd_postop_sg_list(struct skd_device *skdev,
- static void skd_request_fn_not_online(struct request_queue *q)
- {
- 	struct skd_device *skdev = q->queuedata;
--	int error;
- 
- 	SKD_ASSERT(skdev->state != SKD_DRVR_STATE_ONLINE);
- 
-@@ -919,7 +914,6 @@ static void skd_request_fn_not_online(struct request_queue *q)
- 	case SKD_DRVR_STATE_FAULT:
- 	case SKD_DRVR_STATE_DISAPPEARED:
- 	default:
--		error = -EIO;
+ const char *skd_drive_state_to_str(int state);
+@@ -930,7 +930,7 @@ static void skd_timer_tick_not_online(struct skd_device *skdev)
+ 			skdev->timer_countdown--;
+ 			return;
+ 		}
+-		skd_recover_requests(skdev, 0);
++		skd_recover_requests(skdev);
  		break;
- 	}
  
-@@ -943,7 +937,6 @@ static void skd_timer_tick(ulong arg)
- 	struct skd_device *skdev = (struct skd_device *)arg;
+ 	case SKD_DRVR_STATE_BUSY:
+@@ -1027,13 +1027,13 @@ static void skd_timer_tick_not_online(struct skd_device *skdev)
+ 			/* It never came out of soft reset. Try to
+ 			 * recover the requests and then let them
+ 			 * fail. This is to mitigate hung processes. */
+-			skd_recover_requests(skdev, 0);
++			skd_recover_requests(skdev);
+ 		else {
+ 			dev_err(&skdev->pdev->dev, "Disable BusMaster (%x)\n",
+ 				skdev->drive_state);
+ 			pci_disable_device(skdev->pdev);
+ 			skd_disable_interrupts(skdev);
+-			skd_recover_requests(skdev, 0);
++			skd_recover_requests(skdev);
+ 		}
  
- 	u32 timo_slot;
--	u32 overdue_timestamp;
- 	unsigned long reqflags;
- 	u32 state;
+ 		/*start the queue so we can respond with error to requests */
+@@ -2935,7 +2935,7 @@ static void skd_isr_fwstate(struct skd_device *skdev)
+ 			break;
+ 		}
+ 		if (skdev->state == SKD_DRVR_STATE_RESTARTING)
+-			skd_recover_requests(skdev, 0);
++			skd_recover_requests(skdev);
+ 		if (skdev->state == SKD_DRVR_STATE_WAIT_BOOT) {
+ 			skdev->timer_countdown = SKD_STARTING_TIMO;
+ 			skdev->state = SKD_DRVR_STATE_STARTING;
+@@ -3009,7 +3009,7 @@ static void skd_isr_fwstate(struct skd_device *skdev)
  
-@@ -976,8 +969,6 @@ static void skd_timer_tick(ulong arg)
- 		goto timer_func_out;
+ 	case FIT_SR_DRIVE_FAULT:
+ 		skd_drive_fault(skdev);
+-		skd_recover_requests(skdev, 0);
++		skd_recover_requests(skdev);
+ 		blk_start_queue(skdev->queue);
+ 		break;
  
- 	/* Something is overdue */
--	overdue_timestamp = skdev->timeout_stamp - SKD_N_TIMEOUT_SLOT;
--
- 	pr_debug("%s:%s:%d found %d timeouts, draining busy=%d\n",
- 		 skdev->name, __func__, __LINE__,
- 		 skdev->timeout_slot[timo_slot], skdev->in_flight);
-@@ -1297,7 +1288,7 @@ static int skd_sg_io_get_and_check_args(struct skd_device *skdev,
- 					struct skd_sg_io *sksgio)
+@@ -3018,7 +3018,7 @@ static void skd_isr_fwstate(struct skd_device *skdev)
+ 		dev_info(&skdev->pdev->dev, "state=0x%x sense=0x%x\n", state,
+ 			 sense);
+ 		skd_drive_disappeared(skdev);
+-		skd_recover_requests(skdev, 0);
++		skd_recover_requests(skdev);
+ 		blk_start_queue(skdev->queue);
+ 		break;
+ 	default:
+@@ -3032,7 +3032,7 @@ static void skd_isr_fwstate(struct skd_device *skdev)
+ 		skd_skdev_state_to_str(skdev->state), skdev->state);
+ }
+ 
+-static void skd_recover_requests(struct skd_device *skdev, int requeue)
++static void skd_recover_requests(struct skd_device *skdev)
  {
- 	struct sg_io_hdr *sgp = &sksgio->sg;
--	int i, acc;
-+	int i, __maybe_unused acc;
+ 	int i;
  
- 	if (!access_ok(VERIFY_WRITE, sksgio->argp, sizeof(sg_io_hdr_t))) {
- 		pr_debug("%s:%s:%d access sg failed %p\n",
+@@ -3049,12 +3049,7 @@ static void skd_recover_requests(struct skd_device *skdev, int requeue)
+ 			if (skreq->n_sg > 0)
+ 				skd_postop_sg_list(skdev, skreq);
+ 
+-			if (requeue &&
+-			    (unsigned long) ++skreq->req->special <
+-			    SKD_MAX_RETRIES)
+-				blk_requeue_request(skdev->queue, skreq->req);
+-			else
+-				skd_end_request(skdev, skreq, BLK_STS_IOERR);
++			skd_end_request(skdev, skreq, BLK_STS_IOERR);
+ 
+ 			skreq->req = NULL;
+ 
 -- 
 2.14.0
