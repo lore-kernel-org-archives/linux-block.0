@@ -1,86 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:38191 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752709AbdHULni (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2017 07:43:38 -0400
-From: Bhumika Goyal <bhumirks@gmail.com>
-To: julia.lawall@lip6.fr, rjw@rjwysocki.net, lenb@kernel.org,
-        jbacik@fb.com, jikos@kernel.org, benjamin.tissoires@redhat.com,
-        manish.chopra@cavium.com, rahul.verma@cavium.com,
-        Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
-        cascardo@holoscopio.com, don@syst.com.br, dvhart@infradead.org,
-        andy@infradead.org, sre@kernel.org, linux-acpi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        nbd-general@lists.sourceforge.net, linux-input@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-pm@vger.kernel.org
-Cc: Bhumika Goyal <bhumirks@gmail.com>
-Subject: [PATCH 0/6] drivers:  make device_attribute const
-Date: Mon, 21 Aug 2017 17:13:06 +0530
-Message-Id: <1503315792-14837-1-git-send-email-bhumirks@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 29/55] skd: Simplify the code for handling data direction
+Date: Thu, 17 Aug 2017 13:13:12 -0700
+Message-Id: <20170817201338.16537-30-bart.vanassche@wdc.com>
+In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
+References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Make these const. Done using Coccinelle.
+Use DMA_FROM_DEVICE and DMA_TO_DEVICE directly instead of
+introducing driver-private constants with the same numerical
+value.
 
-@match disable optional_qualifier@
-identifier s;
-@@
-static struct device_attribute s = {...};
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/block/skd_main.c | 25 +++++++++----------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
 
-@ref@
-position p;
-identifier match.s;
-@@
-s@p
-
-@good1@
-identifier match.s;
-expression e1;
-position ref.p;
-@@
-device_remove_file(e1,&s@p,...)
-
-@good2@
-identifier match.s;
-expression e1;
-position ref.p;
-@@
-device_create_file(e1,&s@p,...)
-
-
-@bad depends on  !good1 && !good2@
-position ref.p;
-identifier match.s;
-@@
-s@p
-
-@depends on forall !bad disable optional_qualifier@
-identifier match.s;
-@@
-static
-+ const
-struct device_attribute s;
-
-Bhumika Goyal (6):
-  ACPI: make device_attribute const
-  nbd: make device_attribute const
-  hid: make device_attribute const
-  qlogic:  make device_attribute const
-  platform/x86: make device_attribute const
-  power: supply: make device_attribute const
-
- drivers/acpi/battery.c                               | 2 +-
- drivers/acpi/sbs.c                                   | 2 +-
- drivers/block/nbd.c                                  | 2 +-
- drivers/hid/hid-core.c                               | 2 +-
- drivers/net/ethernet/qlogic/netxen/netxen_nic_main.c | 4 ++--
- drivers/net/ethernet/qlogic/qlcnic/qlcnic_sysfs.c    | 6 +++---
- drivers/platform/x86/classmate-laptop.c              | 6 +++---
- drivers/platform/x86/intel-rst.c                     | 4 ++--
- drivers/power/supply/olpc_battery.c                  | 2 +-
- 9 files changed, 15 insertions(+), 15 deletions(-)
-
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 96d7b43cfcf2..e54089315a7a 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -212,7 +212,7 @@ struct skd_request_context {
+ 	u8 flush_cmd;
+ 
+ 	u32 timeout_stamp;
+-	u8 sg_data_dir;
++	enum dma_data_direction data_dir;
+ 	struct scatterlist *sg;
+ 	u32 n_sg;
+ 	u32 sg_byte_count;
+@@ -225,8 +225,6 @@ struct skd_request_context {
+ 	struct fit_comp_error_info err_info;
+ 
+ };
+-#define SKD_DATA_DIR_HOST_TO_CARD       1
+-#define SKD_DATA_DIR_CARD_TO_HOST       2
+ 
+ struct skd_special_context {
+ 	struct skd_request_context req;
+@@ -615,8 +613,8 @@ static void skd_request_fn(struct request_queue *q)
+ 		skreq->req = req;
+ 		skreq->fitmsg_id = 0;
+ 
+-		skreq->sg_data_dir = data_dir == READ ?
+-			SKD_DATA_DIR_CARD_TO_HOST : SKD_DATA_DIR_HOST_TO_CARD;
++		skreq->data_dir = data_dir == READ ? DMA_FROM_DEVICE :
++			DMA_TO_DEVICE;
+ 
+ 		if (req->bio && !skd_preop_sg_list(skdev, skreq)) {
+ 			dev_dbg(&skdev->pdev->dev, "error Out\n");
+@@ -742,16 +740,14 @@ static bool skd_preop_sg_list(struct skd_device *skdev,
+ 			     struct skd_request_context *skreq)
+ {
+ 	struct request *req = skreq->req;
+-	int writing = skreq->sg_data_dir == SKD_DATA_DIR_HOST_TO_CARD;
+-	int pci_dir = writing ? PCI_DMA_TODEVICE : PCI_DMA_FROMDEVICE;
+ 	struct scatterlist *sg = &skreq->sg[0];
+ 	int n_sg;
+ 	int i;
+ 
+ 	skreq->sg_byte_count = 0;
+ 
+-	/* SKD_ASSERT(skreq->sg_data_dir == SKD_DATA_DIR_HOST_TO_CARD ||
+-		   skreq->sg_data_dir == SKD_DATA_DIR_CARD_TO_HOST); */
++	WARN_ON_ONCE(skreq->data_dir != DMA_TO_DEVICE &&
++		     skreq->data_dir != DMA_FROM_DEVICE);
+ 
+ 	n_sg = blk_rq_map_sg(skdev->queue, req, sg);
+ 	if (n_sg <= 0)
+@@ -761,7 +757,7 @@ static bool skd_preop_sg_list(struct skd_device *skdev,
+ 	 * Map scatterlist to PCI bus addresses.
+ 	 * Note PCI might change the number of entries.
+ 	 */
+-	n_sg = pci_map_sg(skdev->pdev, sg, n_sg, pci_dir);
++	n_sg = pci_map_sg(skdev->pdev, sg, n_sg, skreq->data_dir);
+ 	if (n_sg <= 0)
+ 		return false;
+ 
+@@ -804,9 +800,6 @@ static bool skd_preop_sg_list(struct skd_device *skdev,
+ static void skd_postop_sg_list(struct skd_device *skdev,
+ 			       struct skd_request_context *skreq)
+ {
+-	int writing = skreq->sg_data_dir == SKD_DATA_DIR_HOST_TO_CARD;
+-	int pci_dir = writing ? PCI_DMA_TODEVICE : PCI_DMA_FROMDEVICE;
+-
+ 	/*
+ 	 * restore the next ptr for next IO request so we
+ 	 * don't have to set it every time.
+@@ -814,7 +807,7 @@ static void skd_postop_sg_list(struct skd_device *skdev,
+ 	skreq->sksg_list[skreq->n_sg - 1].next_desc_ptr =
+ 		skreq->sksg_dma_address +
+ 		((skreq->n_sg) * sizeof(struct fit_sg_descriptor));
+-	pci_unmap_sg(skdev->pdev, &skreq->sg[0], skreq->n_sg, pci_dir);
++	pci_unmap_sg(skdev->pdev, &skreq->sg[0], skreq->n_sg, skreq->data_dir);
+ }
+ 
+ static void skd_request_fn_not_online(struct request_queue *q)
+@@ -2506,7 +2499,7 @@ static void skd_process_scsi_inq(struct skd_device *skdev,
+ 	struct skd_scsi_request *scsi_req = &skspcl->msg_buf->scsi[0];
+ 
+ 	dma_sync_sg_for_cpu(skdev->class_dev, skspcl->req.sg, skspcl->req.n_sg,
+-			    skspcl->req.sg_data_dir);
++			    skspcl->req.data_dir);
+ 	buf = skd_sg_1st_page_ptr(skspcl->req.sg);
+ 
+ 	if (buf)
+@@ -4935,7 +4928,7 @@ static void skd_log_skreq(struct skd_device *skdev,
+ 		skd_skreq_state_to_str(skreq->state), skreq->state, skreq->id,
+ 		skreq->fitmsg_id);
+ 	dev_dbg(&skdev->pdev->dev, "  timo=0x%x sg_dir=%d n_sg=%d\n",
+-		skreq->timeout_stamp, skreq->sg_data_dir, skreq->n_sg);
++		skreq->timeout_stamp, skreq->data_dir, skreq->n_sg);
+ 
+ 	if (skreq->req != NULL) {
+ 		struct request *req = skreq->req;
 -- 
-1.9.1
+2.14.0
