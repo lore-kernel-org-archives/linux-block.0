@@ -1,70 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49098 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG6Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:58:25 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 19/20] blk-mq-sched: refactor blk_mq_sched_try_merge()
-Date: Sat,  5 Aug 2017 14:57:04 +0800
-Message-Id: <20170805065705.12989-20-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Date: Fri, 18 Aug 2017 08:34:47 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH 03/12] blk-mq: Explain when 'active_queues' is decremented
+Message-ID: <20170818143446.GA20707@kernel.dk>
+References: <20170817232311.25948-1-bart.vanassche@wdc.com>
+ <20170817232311.25948-4-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170817232311.25948-4-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces one function __blk_mq_try_merge()
-which will be resued for bio merge to sw queue in
-the following patch.
+On Thu, Aug 17 2017, Bart Van Assche wrote:
+> It is nontrivial to derive from the blk-mq source code when
+> blk_mq_tags.active_queues is decremented. Hence add a comment that
+> explains this.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/blk-mq.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f84d145490bf..b86d2cafc355 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -834,6 +834,10 @@ static void blk_mq_timeout_work(struct work_struct *work)
+>  	} else {
+>  		struct blk_mq_hw_ctx *hctx;
+>  
+> +		/*
+> +		 * All requests finished (latest request timeout) seconds ago,
+> +		 * so mark each hctx as idle.
+> +		 */
+>  		queue_for_each_hw_ctx(q, hctx, i) {
 
-No functional change.
+I don't think that's a great comment, what does 'latest request timeout'
+refer to? We hit this case when the device has gone idle, I think a more
+useful comment would be something about how blk-mq implements timeouts.
+How about something ala:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+/*
+ * Request timeouts are handled as a forward rolling timer. If we
+ * end up here, there are no more requests pending, and there hasn't
+ * been for a while. Mark each hctx as idle.
+ */
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index b11f53d1e1f3..7fb7949ed7ce 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -214,12 +214,13 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	}
- }
- 
--bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
--			    struct request **merged_request)
-+static inline bool __blk_mq_try_merge(struct request_queue *q,
-+		struct bio *bio, struct request **merged_request,
-+		struct request *candidate, enum elv_merge type)
- {
--	struct request *rq;
-+	struct request *rq = candidate;
- 
--	switch (elv_merge(q, &rq, bio)) {
-+	switch (type) {
- 	case ELEVATOR_BACK_MERGE:
- 		if (!blk_mq_sched_allow_merge(q, rq, bio))
- 			return false;
-@@ -242,6 +243,15 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- 		return false;
- 	}
- }
-+
-+bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-+		struct request **merged_request)
-+{
-+	struct request *rq;
-+	enum elv_merge type = elv_merge(q, &rq, bio);
-+
-+	return __blk_mq_try_merge(q, bio, merged_request, rq, type);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
- 
- /*
 -- 
-2.9.4
+Jens Axboe
