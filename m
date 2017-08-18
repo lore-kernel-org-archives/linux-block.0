@@ -1,119 +1,47 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 18/49] block: introduce multipage/single page bvec helpers
-Date: Tue,  8 Aug 2017 16:45:17 +0800
-Message-Id: <20170808084548.18963-19-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <prvs=396ff485d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v2] blk-mq: Explain when 'active_queues' is decremented
+Date: Fri, 18 Aug 2017 08:48:35 -0700
+Message-Id: <20170818154835.12034-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces helpers which are suffixed with _mp
-and _sp for the multipage bvec/segment support.
+It is nontrivial to derive from the blk-mq source code when
+blk_mq_tags.active_queues is decremented. Hence add a comment that
+explains this.
 
-The helpers with _mp suffix are the interfaces for treating
-one bvec/segment as real multipage one, for example, .bv_len
-is the total length of the multipage segment.
-
-The helpers with _sp suffix are interfaces for supporting
-current bvec iterator which is thought as singlepage only
-by drivers, fs, dm and etc. These _sp helpers are introduced
-to build singlepage bvec in flight, so users of bio/bvec
-iterator still can work well and needn't change even though
-we store multipage into bvec.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- include/linux/bvec.h | 56 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 53 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index fe7a22dd133b..1eaf7ca5cab3 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -25,6 +25,42 @@
- #include <linux/errno.h>
+v2: Rewrote the comment based on feedback from Jens.
+
+ block/blk-mq.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f84d145490bf..09ee74056f93 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -834,6 +834,12 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	} else {
+ 		struct blk_mq_hw_ctx *hctx;
  
- /*
-+ * What is multipage bvecs(segment)?
-+ *
-+ * - bvec stored in bio->bi_io_vec is always multipage style vector
-+ *
-+ * - bvec(struct bio_vec) represents one physically contiguous I/O
-+ *   buffer, now the buffer may include more than one pages since
-+ *   multipage(mp) bvec is supported, and all these pages represented
-+ *   by one bvec is physically contiguous. Before mp support, at most
-+ *   one page can be included in one bvec, we call it singlepage(sp)
-+ *   bvec.
-+ *
-+ * - .bv_page of th bvec represents the 1st page in the mp segment
-+ *
-+ * - .bv_offset of the bvec represents offset of the buffer in the bvec
-+ *
-+ * The effect on the current drivers/filesystem/dm/bcache/...:
-+ *
-+ * - almost everyone supposes that one bvec only includes one single
-+ *   page, so we keep the sp interface not changed, for example,
-+ *   bio_for_each_segment() still returns bvec with single page
-+ *
-+ * - bio_for_each_segment_all() will be changed to return singlepage
-+ *   bvec too
-+ *
-+ * - during iterating, iterator variable(struct bvec_iter) is always
-+ *   updated in multipage bvec style and that means bvec_iter_advance()
-+ *   is kept not changed
-+ *
-+ * - returned(copied) singlepage bvec is generated in flight by bvec
-+ *   helpers from the stored mp bvec
-+ *
-+ * - In case that some components(such as iov_iter) need to support mp
-+ *   segment, we introduce new helpers(suffixed with _mp) for them.
-+ */
-+
-+/*
-  * was unsigned short, but we might as well be ready for > 64kB I/O pages
-  */
- struct bio_vec {
-@@ -52,16 +88,30 @@ struct bvec_iter {
-  */
- #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
- 
--#define bvec_iter_page(bvec, iter)				\
-+#define bvec_iter_page_mp(bvec, iter)				\
- 	(__bvec_iter_bvec((bvec), (iter))->bv_page)
- 
--#define bvec_iter_len(bvec, iter)				\
-+#define bvec_iter_len_mp(bvec, iter)				\
- 	min((iter).bi_size,					\
- 	    __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_done)
- 
--#define bvec_iter_offset(bvec, iter)				\
-+#define bvec_iter_offset_mp(bvec, iter)				\
- 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
- 
-+/*
-+ * <page, offset,length> of singlepage(sp) segment.
-+ *
-+ * This helpers will be implemented for building sp bvec in flight.
-+ */
-+#define bvec_iter_offset_sp(bvec, iter)	bvec_iter_offset_mp((bvec), (iter))
-+#define bvec_iter_len_sp(bvec, iter)	bvec_iter_len_mp((bvec), (iter))
-+#define bvec_iter_page_sp(bvec, iter)	bvec_iter_page_mp((bvec), (iter))
-+
-+/* current interfaces support sp style at default */
-+#define bvec_iter_page(bvec, iter)	bvec_iter_page_sp((bvec), (iter))
-+#define bvec_iter_len(bvec, iter)	bvec_iter_len_sp((bvec), (iter))
-+#define bvec_iter_offset(bvec, iter)	bvec_iter_offset_sp((bvec), (iter))
-+
- #define bvec_iter_bvec(bvec, iter)				\
- ((struct bio_vec) {						\
- 	.bv_page	= bvec_iter_page((bvec), (iter)),	\
++		/*
++		 * Request timeouts are handled as a forward rolling timer. If
++		 * we end up here it means that no requests are pending and
++		 * also that no request has been pending for a while. Mark
++		 * each hctx as idle.
++		 */
+ 		queue_for_each_hw_ctx(q, hctx, i) {
+ 			/* the hctx may be unmapped, so check it here */
+ 			if (blk_mq_hw_queue_mapped(hctx))
 -- 
-2.9.4
+2.14.0
