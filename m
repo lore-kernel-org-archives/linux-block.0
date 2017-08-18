@@ -1,25 +1,84 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH V2] blk-throttle: cap discard request size
-To: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org
-Cc: Kernel-team@fb.com
-References: <13d341052771b20f5d538dd32510f1403af7475e.1503097540.git.shli@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <7df31333-ecca-ddbe-33a8-b4e57d245ede@kernel.dk>
-Date: Wed, 23 Aug 2017 08:52:09 -0600
+Return-Path: <prvs=9403a763c3=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <Kernel-team@fb.com>, <axboe@kernel.dk>
+Subject: [PATCH V2] blk-throttle: cap discard request size
+Date: Fri, 18 Aug 2017 16:08:13 -0700
+Message-ID: <13d341052771b20f5d538dd32510f1403af7475e.1503097540.git.shli@fb.com>
 MIME-Version: 1.0
-In-Reply-To: <13d341052771b20f5d538dd32510f1403af7475e.1503097540.git.shli@fb.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/18/2017 05:08 PM, Shaohua Li wrote:
-> discard request usually is very big and easily use all bandwidth budget
-> of a cgroup. discard request size doesn't really mean the size of data
-> written, so it doesn't make sense to account it into bandwidth budget.
-> Jens pointed out treating the size 0 doesn't make sense too, because
-> discard request does have cost. But it's not easy to find the actual
-> cost. This patch simply makes the size one sector.
+discard request usually is very big and easily use all bandwidth budget
+of a cgroup. discard request size doesn't really mean the size of data
+written, so it doesn't make sense to account it into bandwidth budget.
+Jens pointed out treating the size 0 doesn't make sense too, because
+discard request does have cost. But it's not easy to find the actual
+cost. This patch simply makes the size one sector.
 
-This looks good to me now, applied for 4.13.
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 6a4c4c4..0fea76a 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -380,6 +380,14 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ 	}								\
+ } while (0)
+ 
++static inline unsigned int throtl_bio_data_size(struct bio *bio)
++{
++	/* assume it's one sector */
++	if (unlikely(bio_op(bio) == REQ_OP_DISCARD))
++		return 512;
++	return bio->bi_iter.bi_size;
++}
++
+ static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
+ {
+ 	INIT_LIST_HEAD(&qn->node);
+@@ -932,6 +940,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	bool rw = bio_data_dir(bio);
+ 	u64 bytes_allowed, extra_bytes, tmp;
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
++	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
+ 
+@@ -945,14 +954,14 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	do_div(tmp, HZ);
+ 	bytes_allowed = tmp;
+ 
+-	if (tg->bytes_disp[rw] + bio->bi_iter.bi_size <= bytes_allowed) {
++	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+ 	}
+ 
+ 	/* Calc approx time to dispatch */
+-	extra_bytes = tg->bytes_disp[rw] + bio->bi_iter.bi_size - bytes_allowed;
++	extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
+ 	jiffy_wait = div64_u64(extra_bytes * HZ, tg_bps_limit(tg, rw));
+ 
+ 	if (!jiffy_wait)
+@@ -1032,11 +1041,12 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ {
+ 	bool rw = bio_data_dir(bio);
++	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	/* Charge the bio to the group */
+-	tg->bytes_disp[rw] += bio->bi_iter.bi_size;
++	tg->bytes_disp[rw] += bio_size;
+ 	tg->io_disp[rw]++;
+-	tg->last_bytes_disp[rw] += bio->bi_iter.bi_size;
++	tg->last_bytes_disp[rw] += bio_size;
+ 	tg->last_io_disp[rw]++;
+ 
+ 	/*
 -- 
-Jens Axboe
+2.9.5
