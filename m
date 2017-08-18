@@ -1,154 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:44559 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753395AbdHOJwp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Aug 2017 05:52:45 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 07/12] nvme-rdma: split generic probe out of create_ctrl
-Date: Tue, 15 Aug 2017 12:52:20 +0300
-Message-Id: <1502790745-12569-8-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
-References: <1502790745-12569-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=396e6b0ec=roger.pau@citrix.com>
+Date: Fri, 18 Aug 2017 12:57:10 +0100
+From: Roger Pau Monn303251 <roger.pau@citrix.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+CC: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
+	<linux-block@vger.kernel.org>, <xen-devel@lists.xenproject.org>, Christoph
+ Hellwig <hch@lst.de>
+Subject: Re: [Xen-devel] [PATCH 12/12] xen-blkfront: Avoid that gcc 7 warns
+ about fall-through when building with W=1
+Message-ID: <20170818115710.eis4lhjciriy4tgt@MacBook-Pro-de-Roger.local>
+References: <20170817232311.25948-1-bart.vanassche@wdc.com>
+ <20170817232311.25948-13-bart.vanassche@wdc.com>
+ <20170818085401.5fokhfurydomfxow@MacBook-Pro-de-Roger.local>
+ <20170818114623.GF1475@perard.uk.xensource.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20170818114623.GF1475@perard.uk.xensource.com>
+Return-Path: roger.pau@citrix.com
+List-ID: <linux-block@vger.kernel.org>
 
-This code is replicated for several transports, prepare
-to move it to the core.
+On Fri, Aug 18, 2017 at 12:46:23PM +0100, Anthony PERARD wrote:
+> On Fri, Aug 18, 2017 at 09:54:01AM +0100, Roger Pau Monn303251 wrote:
+> > On Thu, Aug 17, 2017 at 04:23:11PM -0700, Bart Van Assche wrote:
+> > > Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> > > Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> > > Cc: Roger Pau Monn303251 <roger.pau@citrix.com>
+> > > Cc: xen-devel@lists.xenproject.org
+> > > ---
+> > >  drivers/block/xen-blkfront.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> > > index 98e34e4c62b8..270019e3e5d8 100644
+> > > --- a/drivers/block/xen-blkfront.c
+> > > +++ b/drivers/block/xen-blkfront.c
+> > > @@ -2456,7 +2456,7 @@ static void blkback_changed(struct xenbus_device *dev,
+> > >  	case XenbusStateClosed:
+> > >  		if (dev->state == XenbusStateClosed)
+> > >  			break;
+> > > -		/* Missed the backend's Closing state -- fallthrough */
+> > > +		/* fall through */
+> > 
+> > This is losing information present in the original comment. Would
+> > splitting the comment into two make gcc happy?
+> 
+> What about:
+> 
+> -		/* Missed the backend's Closing state -- fallthrough */
+> +		/* fallthrough -- Missed the backend's Closing state */
+> 
+> FIY:
+> https://gcc.gnu.org/onlinedocs/gcc-7.2.0/gcc/Warning-Options.html#index-Wimplicit-fallthrough
+> 
+> A dash seems to be needed between "fall through" and a extra comment,
+> with fallthrough first.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 81 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 47 insertions(+), 34 deletions(-)
+I think so, according to the documentation -Wimplicit-fallthrough=3 is
+enabled with -Wextra, and requires having "fallthrough" first. Your
+proposed change seems fine to me.
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 2591b0ce155e..b03c4a2a1172 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1908,12 +1908,51 @@ static int nvme_rdma_post_configure(struct nvme_ctrl *ctrl)
- 	return 0;
- }
- 
-+static int nvme_rdma_probe_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
-+		const struct nvme_ctrl_ops *ops, unsigned long quirks)
-+{
-+	bool changed;
-+	int ret;
-+
-+	ret = nvme_init_ctrl(ctrl, dev, ops, quirks);
-+	if (ret)
-+		return ret;
-+
-+	INIT_WORK(&ctrl->delete_work, nvme_rdma_del_ctrl_work);
-+	INIT_WORK(&ctrl->reset_work, nvme_rdma_reset_ctrl_work);
-+
-+	ret = nvme_rdma_configure_admin_queue(ctrl, true);
-+	if (ret)
-+		goto out_uninit_ctrl;
-+
-+	ret = nvme_rdma_post_configure(ctrl);
-+	if (ret)
-+		goto out_remove_admin_queue;
-+
-+	if (ctrl->queue_count > 1) {
-+		ret = nvme_rdma_configure_io_queues(ctrl, true);
-+		if (ret)
-+			goto out_remove_admin_queue;
-+	}
-+
-+	changed = nvme_change_ctrl_state(ctrl, NVME_CTRL_LIVE);
-+	WARN_ON_ONCE(!changed);
-+
-+	nvme_start_ctrl(ctrl);
-+
-+	return 0;
-+out_remove_admin_queue:
-+	nvme_rdma_destroy_admin_queue(ctrl, true);
-+out_uninit_ctrl:
-+	nvme_uninit_ctrl(ctrl);
-+	return ret;
-+}
-+
- static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 		struct nvmf_ctrl_options *opts)
- {
- 	struct nvme_rdma_ctrl *ctrl;
- 	int ret;
--	bool changed;
- 	char *port;
- 
- 	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
-@@ -1948,39 +1987,20 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 		}
- 	}
- 
--	ret = -ENOMEM;
- 	ctrl->queues = kcalloc(ctrl->ctrl.queue_count, sizeof(*ctrl->queues),
- 				GFP_KERNEL);
--	if (!ctrl->queues)
-+	if (!ctrl->queues) {
-+		ret = -ENOMEM;
- 		goto out_free_ctrl;
--
--	ret = nvme_init_ctrl(&ctrl->ctrl, dev, &nvme_rdma_ctrl_ops,
--				0 /* no quirks, we're perfect! */);
--	if (ret)
--		goto out_kfree_queues;
-+	}
- 
- 	INIT_DELAYED_WORK(&ctrl->ctrl.reconnect_work,
- 			nvme_rdma_reconnect_ctrl_work);
- 	INIT_WORK(&ctrl->ctrl.err_work, nvme_rdma_error_recovery_work);
--	INIT_WORK(&ctrl->ctrl.delete_work, nvme_rdma_del_ctrl_work);
--	INIT_WORK(&ctrl->ctrl.reset_work, nvme_rdma_reset_ctrl_work);
--
--	ret = nvme_rdma_configure_admin_queue(&ctrl->ctrl, true);
--	if (ret)
--		goto out_uninit_ctrl;
--
--	ret = nvme_rdma_post_configure(&ctrl->ctrl);
--	if (ret)
--		goto out_uninit_ctrl;
- 
--	if (opts->nr_io_queues) {
--		ret = nvme_rdma_configure_io_queues(&ctrl->ctrl, true);
--		if (ret)
--			goto out_remove_admin_queue;
--	}
--
--	changed = nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_LIVE);
--	WARN_ON_ONCE(!changed);
-+	ret = nvme_rdma_probe_ctrl(&ctrl->ctrl, dev, &nvme_rdma_ctrl_ops, 0);
-+	if (!ctrl->queues)
-+		goto out_kfree_queues;
- 
- 	dev_info(ctrl->ctrl.device, "new ctrl: NQN \"%s\", addr %pISpcs\n",
- 		ctrl->ctrl.opts->subsysnqn, &ctrl->addr);
-@@ -1991,21 +2011,14 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 	list_add_tail(&ctrl->list, &nvme_rdma_ctrl_list);
- 	mutex_unlock(&nvme_rdma_ctrl_mutex);
- 
--	nvme_start_ctrl(&ctrl->ctrl);
--
- 	return &ctrl->ctrl;
- 
--out_remove_admin_queue:
--	nvme_rdma_destroy_admin_queue(&ctrl->ctrl, true);
- out_kfree_queues:
- 	kfree(ctrl->queues);
--out_uninit_ctrl:
--	nvme_uninit_ctrl(&ctrl->ctrl);
-+out_free_ctrl:
- 	nvme_put_ctrl(&ctrl->ctrl);
- 	if (ret > 0)
- 		ret = -EIO;
--	return ERR_PTR(ret);
--out_free_ctrl:
- 	kfree(ctrl);
- 	return ERR_PTR(ret);
- }
--- 
-2.7.4
+Roger.
