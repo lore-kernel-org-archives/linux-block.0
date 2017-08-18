@@ -1,46 +1,49 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	lucmiccio@gmail.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT V2 0/2] block, bfq: improve and refactor throughput-boosting logic
-Date: Fri,  4 Aug 2017 07:35:09 +0200
-Message-Id: <20170804053511.2389-1-paolo.valente@linaro.org>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 05/12] blk-mq-debugfs: Declare a local symbol static
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
+References: <20170817232311.25948-1-bart.vanassche@wdc.com>
+ <20170817232311.25948-6-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <8e938dee-99b3-76bd-f8c5-1babfa769b1c@suse.de>
+Date: Fri, 18 Aug 2017 09:33:11 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170817232311.25948-6-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
-these two patches improve throughput-boosting logic in two
-aspects. The first patch refactors the parts of the device-idling
-logic, related to throughput boosting, that are still scattered across
-the source file bfq-iosched.c. The patch concetrates all the logic in
-one function. The second patch fixes/improves device idling for
-flash-based devices that have no internal queueing of I/O requests.
+On 08/18/2017 01:23 AM, Bart Van Assche wrote:
+> This was detected by sparse.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq-debugfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 55940ddacd96..e53b6129ca5a 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -739,7 +739,7 @@ static int blk_mq_debugfs_release(struct inode *inode, struct file *file)
+>  		return seq_release(inode, file);
+>  }
+>  
+> -const struct file_operations blk_mq_debugfs_fops = {
+> +static const struct file_operations blk_mq_debugfs_fops = {
+>  	.open		= blk_mq_debugfs_open,
+>  	.read		= seq_read,
+>  	.write		= blk_mq_debugfs_write,
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-The contribution in the first patch has been triggered by that in the
-second patch: finding the change made by the second patch has been
-more difficult than it had to be, because the logic that decides
-whether to idle the device is scattered across three functions.
+Cheers,
 
-The second patch provides a significant throghput boost, for random
-I/O with flash-based non-queueing devices. For example, on a HiKey
-board, throughput increases by up to 125%, growing, e.g., from 6.9MB/s
-to 15.6MB/s with two or three random readers in parallel.
-
-Thanks,
-Paolo
-
-Paolo Valente (2):
-  block,bfq: refactor device-idling logic
-  block, bfq: boost throughput with flash-based non-queueing devices
-
- block/bfq-iosched.c | 144 ++++++++++++++++++++++++++++------------------------
- block/bfq-iosched.h |  12 ++---
- 2 files changed, 85 insertions(+), 71 deletions(-)
-
---
-2.10.0
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
