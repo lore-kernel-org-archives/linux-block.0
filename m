@@ -1,145 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56964 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752581AbdHNWFG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2017 18:05:06 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
-        Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 6/9] nullb: support discard
-Date: Mon, 14 Aug 2017 15:04:57 -0700
-Message-Id: <d49a25c655fa7b2df85ea0b605f30b38f13e5dac.1502746933.git.shli@fb.com>
-In-Reply-To: <cover.1502746933.git.shli@fb.com>
-References: <cover.1502746933.git.shli@fb.com>
-In-Reply-To: <cover.1502746933.git.shli@fb.com>
-References: <cover.1502746933.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 11/12] xen-blkback: Avoid that gcc 7 warns about
+ fall-through when building with W=1
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ Roger Pau Monn303251 <roger.pau@citrix.com>, xen-devel@lists.xenproject.org
+References: <20170817232311.25948-1-bart.vanassche@wdc.com>
+ <20170817232311.25948-12-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <8ccf374c-226b-aad0-54c3-60b2c39390c4@suse.de>
+Date: Fri, 18 Aug 2017 09:40:41 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170817232311.25948-12-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On 08/18/2017 01:23 AM, Bart Van Assche wrote:
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> Cc: Roger Pau Monn303251 <roger.pau@citrix.com>
+> Cc: xen-devel@lists.xenproject.org
+> ---
+>  drivers/block/xen-blkback/blkback.c | 1 +
+>  drivers/block/xen-blkback/xenbus.c  | 3 ++-
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+> index 68157a84bf4d..5f3a813e7ae0 100644
+> --- a/drivers/block/xen-blkback/blkback.c
+> +++ b/drivers/block/xen-blkback/blkback.c
+> @@ -1251,6 +1251,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+>  		break;
+>  	case BLKIF_OP_WRITE_BARRIER:
+>  		drain = true;
+> +		/* fall through */
+>  	case BLKIF_OP_FLUSH_DISKCACHE:
+>  		ring->st_f_req++;
+>  		operation = REQ_OP_WRITE;
+> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> index 792da683e70d..88eaea6475d7 100644
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -810,7 +810,8 @@ static void frontend_changed(struct xenbus_device *dev,
+>  		xenbus_switch_state(dev, XenbusStateClosed);
+>  		if (xenbus_dev_is_online(dev))
+>  			break;
+> -		/* fall through if not online */
+> +		/* fall through */
+> +		/* if not online */
+>  	case XenbusStateUnknown:
+>  		/* implies xen_blkif_disconnect() via xen_blkbk_remove() */
+>  		device_unregister(&dev->dev);
+> 
+Oh well, gcc again.
 
-discard makes sense for memory backed disk. And also it's useful to test
-if upper layer supports dicard correctly.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-User configures 'discard' attribute to enable/disable dicard support.
+Cheers,
 
-Based on original patch from Kyungchan Koh
-
-Signed-off-by: Kyungchan Koh <kkc6196@fb.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/null_blk.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 45e0b56..1f3cf25 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -88,6 +88,7 @@ struct nullb_device {
- 	bool use_per_node_hctx; /* use per-node allocation for hardware context */
- 	bool power; /* power on/off the device */
- 	bool memory_backed; /* if data is stored in memory */
-+	bool discard; /* if support discard */
- };
- 
- struct nullb {
-@@ -318,6 +319,7 @@ NULLB_DEVICE_ATTR(use_lightnvm, bool);
- NULLB_DEVICE_ATTR(blocking, bool);
- NULLB_DEVICE_ATTR(use_per_node_hctx, bool);
- NULLB_DEVICE_ATTR(memory_backed, bool);
-+NULLB_DEVICE_ATTR(discard, bool);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
- {
-@@ -373,6 +375,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_use_per_node_hctx,
- 	&nullb_device_attr_power,
- 	&nullb_device_attr_memory_backed,
-+	&nullb_device_attr_discard,
- 	NULL,
- };
- 
-@@ -425,7 +428,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
- 
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
--	return snprintf(page, PAGE_SIZE, "memory_backed\n");
-+	return snprintf(page, PAGE_SIZE, "memory_backed,discard\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -815,6 +818,20 @@ static int copy_from_nullb(struct nullb *nullb, struct page *dest,
- 	return 0;
- }
- 
-+static void null_handle_discard(struct nullb *nullb, sector_t sector, size_t n)
-+{
-+	size_t temp;
-+
-+	spin_lock_irq(&nullb->lock);
-+	while (n > 0) {
-+		temp = min_t(size_t, n, nullb->dev->blocksize);
-+		null_free_sector(nullb, sector);
-+		sector += temp >> SECTOR_SHIFT;
-+		n -= temp;
-+	}
-+	spin_unlock_irq(&nullb->lock);
-+}
-+
- static int null_transfer(struct nullb *nullb, struct page *page,
- 	unsigned int len, unsigned int off, bool is_write, sector_t sector)
- {
-@@ -843,6 +860,11 @@ static int null_handle_rq(struct nullb_cmd *cmd)
- 
- 	sector = blk_rq_pos(rq);
- 
-+	if (req_op(rq) == REQ_OP_DISCARD) {
-+		null_handle_discard(nullb, sector, blk_rq_bytes(rq));
-+		return 0;
-+	}
-+
- 	spin_lock_irq(&nullb->lock);
- 	rq_for_each_segment(bvec, rq, iter) {
- 		len = bvec.bv_len;
-@@ -871,6 +893,12 @@ static int null_handle_bio(struct nullb_cmd *cmd)
- 
- 	sector = bio->bi_iter.bi_sector;
- 
-+	if (bio_op(bio) == REQ_OP_DISCARD) {
-+		null_handle_discard(nullb, sector,
-+			bio_sectors(bio) << SECTOR_SHIFT);
-+		return 0;
-+	}
-+
- 	spin_lock_irq(&nullb->lock);
- 	bio_for_each_segment(bvec, bio, iter) {
- 		len = bvec.bv_len;
-@@ -1207,6 +1235,16 @@ static void null_del_dev(struct nullb *nullb)
- 	dev->nullb = NULL;
- }
- 
-+static void null_config_discard(struct nullb *nullb)
-+{
-+	if (nullb->dev->discard == false)
-+		return;
-+	nullb->q->limits.discard_granularity = nullb->dev->blocksize;
-+	nullb->q->limits.discard_alignment = nullb->dev->blocksize;
-+	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> 9);
-+	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, nullb->q);
-+}
-+
- static int null_open(struct block_device *bdev, fmode_t mode)
- {
- 	return 0;
-@@ -1448,6 +1486,8 @@ static int null_add_dev(struct nullb_device *dev)
- 	blk_queue_logical_block_size(nullb->q, dev->blocksize);
- 	blk_queue_physical_block_size(nullb->q, dev->blocksize);
- 
-+	null_config_discard(nullb);
-+
- 	sprintf(nullb->disk_name, "nullb%d", nullb->index);
- 
- 	if (dev->use_lightnvm)
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
