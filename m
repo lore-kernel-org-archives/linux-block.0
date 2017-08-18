@@ -1,66 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:32961 "EHLO
-        BJEXCAS007.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751867AbdH2QI1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Aug 2017 12:08:27 -0400
-Date: Wed, 30 Aug 2017 00:08:17 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] blkcg: check pol->cpd_free_fn before free cpd
-Message-ID: <20170829160811.GA1324@localhost.didichuxing.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 08/12] ide-floppy: Use blk_rq_is_scsi()
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ "David S . Miller" <davem@davemloft.net>, linux-ide@vger.kernel.org
+References: <20170817232311.25948-1-bart.vanassche@wdc.com>
+ <20170817232311.25948-9-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e9a0027d-84bd-f189-acf2-efb871ec6b55@suse.de>
+Date: Fri, 18 Aug 2017 09:39:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170817232311.25948-9-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-check pol->cpd_free_fn() instead of pol->cpd_alloc_fn() when free cpd.
+On 08/18/2017 01:23 AM, Bart Van Assche wrote:
+> This patch does not change any functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: linux-ide@vger.kernel.org
+> ---
+>  drivers/ide/ide-floppy.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/ide/ide-floppy.c b/drivers/ide/ide-floppy.c
+> index 627b1f62a749..3ddd88219906 100644
+> --- a/drivers/ide/ide-floppy.c
+> +++ b/drivers/ide/ide-floppy.c
+> @@ -72,7 +72,7 @@ static int ide_floppy_callback(ide_drive_t *drive, int dsc)
+>  		drive->failed_pc = NULL;
+>  
+>  	if (pc->c[0] == GPCMD_READ_10 || pc->c[0] == GPCMD_WRITE_10 ||
+> -	    (req_op(rq) == REQ_OP_SCSI_IN || req_op(rq) == REQ_OP_SCSI_OUT))
+> +	    blk_rq_is_scsi(rq))
+>  		uptodate = 1; /* FIXME */
+>  	else if (pc->c[0] == GPCMD_REQUEST_SENSE) {
+>  
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- block/blk-cgroup.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Cheers,
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 0480892..adcbc3e 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1044,7 +1044,7 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
- 	list_del(&blkcg->all_blkcgs_node);
- 
- 	for (i = 0; i < BLKCG_MAX_POLS; i++)
--		if (blkcg->cpd[i])
-+		if (blkcg->cpd[i] && blkcg_policy[i]->cpd_free_fn)
- 			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
- 
- 	mutex_unlock(&blkcg_pol_mutex);
-@@ -1109,7 +1109,7 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
- 
- free_pd_blkcg:
- 	for (i--; i >= 0; i--)
--		if (blkcg->cpd[i])
-+		if (blkcg->cpd[i] && blkcg_policy[i]->cpd_free_fn)
- 			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
- free_blkcg:
- 	kfree(blkcg);
-@@ -1450,7 +1450,7 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 	return 0;
- 
- err_free_cpds:
--	if (pol->cpd_alloc_fn) {
-+	if (pol->cpd_free_fn) {
- 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
- 			if (blkcg->cpd[pol->plid]) {
- 				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
-@@ -1490,7 +1490,7 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
- 	/* remove cpds and unregister */
- 	mutex_lock(&blkcg_pol_mutex);
- 
--	if (pol->cpd_alloc_fn) {
-+	if (pol->cpd_free_fn) {
- 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
- 			if (blkcg->cpd[pol->plid]) {
- 				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
+Hannes
 -- 
-2.9.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
