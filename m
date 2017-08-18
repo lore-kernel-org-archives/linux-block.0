@@ -1,22 +1,51 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
-	"hare@suse.com" <hare@suse.com>
-Subject: Re: [PATCH v2] blk-mq-debugfs: Add names for recently added flags
-Date: Thu, 24 Aug 2017 23:30:46 +0000
-Message-ID: <1503617445.2899.129.camel@wdc.com>
-References: <20170818225254.30706-1-bart.vanassche@wdc.com>
-In-Reply-To: <20170818225254.30706-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <prvs=396ff485d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v2] blk-mq-debugfs: Add names for recently added flags
+Date: Fri, 18 Aug 2017 15:52:54 -0700
+Message-Id: <20170818225254.30706-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTA4LTE4IGF0IDE1OjUyIC0wNzAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
-DQo+IFRoZSBzeW1ib2xpYyBjb25zdGFudHMgUVVFVUVfRkxBR19TQ1NJX1BBU1NUSFJPVUdILCBR
-VUVVRV9GTEFHX1FVSUVTQ0VEDQo+IGFuZCBSRVFfTk9XQUlUIGFyZSBtaXNzaW5nIGZyb20gYmxr
-LW1xLWRlYnVnZnMuYy4gQWRkIHRoZXNlIHRvDQo+IGJsay1tcS1kZWJ1Z2ZzLmMgc3VjaCB0aGF0
-IHRoZXNlIGFwcGVhciBhcyBuYW1lcyBpbiBkZWJ1Z2ZzIGluc3RlYWQgb2YNCj4gYXMgbnVtYmVy
-cy4NCg0KSGkgSmVucywNCg0KSGF2ZSB5b3UgYWxyZWFkeSBoYWQgdGhlIHRpbWUgdG8gaGF2ZSBh
-IGxvb2sgYXQgdGhpcyBwYXRjaD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+The symbolic constants QUEUE_FLAG_SCSI_PASSTHROUGH, QUEUE_FLAG_QUIESCED
+and REQ_NOWAIT are missing from blk-mq-debugfs.c. Add these to
+blk-mq-debugfs.c such that these appear as names in debugfs instead of
+as numbers.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.com>
+---
+
+v2: changed "PASSTHROUGH" into "SCSI_PASSTHROUGH".
+
+ block/blk-mq-debugfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index e53b6129ca5a..980e73095643 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -73,6 +73,8 @@ static const char *const blk_queue_flag_name[] = {
+ 	QUEUE_FLAG_NAME(STATS),
+ 	QUEUE_FLAG_NAME(POLL_STATS),
+ 	QUEUE_FLAG_NAME(REGISTERED),
++	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
++	QUEUE_FLAG_NAME(QUIESCED),
+ };
+ #undef QUEUE_FLAG_NAME
+ 
+@@ -263,6 +265,7 @@ static const char *const cmd_flag_name[] = {
+ 	CMD_FLAG_NAME(RAHEAD),
+ 	CMD_FLAG_NAME(BACKGROUND),
+ 	CMD_FLAG_NAME(NOUNMAP),
++	CMD_FLAG_NAME(NOWAIT),
+ };
+ #undef CMD_FLAG_NAME
+ 
+-- 
+2.14.0
