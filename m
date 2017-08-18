@@ -1,20 +1,19 @@
-Return-Path: <axboe@kernel.dk>
-Date: Fri, 18 Aug 2017 08:34:47 -0600
-From: Jens Axboe <axboe@kernel.dk>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH 03/12] blk-mq: Explain when 'active_queues' is decremented
-Message-ID: <20170818143446.GA20707@kernel.dk>
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Johannes Thumshirn <jthumshirn@suse.de>
 References: <20170817232311.25948-1-bart.vanassche@wdc.com>
  <20170817232311.25948-4-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <8d3922ef-25ce-5e4a-4f68-d8aa29afa589@suse.de>
+Date: Fri, 18 Aug 2017 09:32:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170817232311.25948-4-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 17 2017, Bart Van Assche wrote:
+On 08/18/2017 01:23 AM, Bart Van Assche wrote:
 > It is nontrivial to derive from the blk-mq source code when
 > blk_mq_tags.active_queues is decremented. Hence add a comment that
 > explains this.
@@ -40,17 +39,17 @@ On Thu, Aug 17 2017, Bart Van Assche wrote:
 > +		 * so mark each hctx as idle.
 > +		 */
 >  		queue_for_each_hw_ctx(q, hctx, i) {
+>  			/* the hctx may be unmapped, so check it here */
+>  			if (blk_mq_hw_queue_mapped(hctx))
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-I don't think that's a great comment, what does 'latest request timeout'
-refer to? We hit this case when the device has gone idle, I think a more
-useful comment would be something about how blk-mq implements timeouts.
-How about something ala:
+Cheers,
 
-/*
- * Request timeouts are handled as a forward rolling timer. If we
- * end up here, there are no more requests pending, and there hasn't
- * been for a while. Mark each hctx as idle.
- */
-
+Hannes
 -- 
-Jens Axboe
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
