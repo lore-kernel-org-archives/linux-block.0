@@ -1,15 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34924 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:40184 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750729AbdHRJjj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2017 05:39:39 -0400
-Date: Fri, 18 Aug 2017 11:39:31 +0200
+        id S1750807AbdHRJWp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Aug 2017 05:22:45 -0400
+Date: Fri, 18 Aug 2017 11:22:39 +0200
 From: Karel Zak <kzak@redhat.com>
 To: Omar Sandoval <osandov@osandov.com>
 Cc: Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
         kernel-team@fb.com, Ming Lei <ming.lei@redhat.com>
 Subject: Re: [PATCH 1/2] loop: always return block size in LOOP_GET_STATUS
-Message-ID: <20170818093931.ziztn5oerb6u6bmz@ws.net.home>
+Message-ID: <20170818092239.sxdpayiyukpwaoge@ws.net.home>
 References: <cover.1503036471.git.osandov@fb.com>
  <9ff9b291e3e872698a040a281549c39c0637565f.1503036471.git.osandov@fb.com>
  <c54bc65f-7106-0dee-77dc-32bbaf1a3d1d@suse.de>
@@ -49,14 +49,33 @@ On Fri, Aug 18, 2017 at 01:22:26AM -0700, Omar Sandoval wrote:
 > work fine with the behavior I implemented here. Unless there's an actual
 > issue someone can point out, I see no reason to not do it this way.
 
-BTW guys, it seems the current LO_FLAGS_BLOCKSIZE implementation does not
-care about images from disks where is non-zero alignment offset. It
-mean disks where is extra offset between logical and physical sectors
-mapping. Something like:
+ Hmm.. we have loopdev API enhancement in Linus' tree and losetup
+ maintainer have no clue about it ;-)
 
-    modprobe scsi_debug dev_size_mb=100 sector_size=512 physblk_exp=3 lowest_aligned=7
 
-...just pedantic note; IMHO it's fine to ignore this use-case ;-)
+ Anyway, I like the idea with LO_FLAGS_BLOCKSIZE and lo_init[]. It
+ seems like a backwardly compatible way how to make loopdevs usable
+ for dd(1) images from non-512 devices, etc.
+
+ For now nothing uses lo_init[], so it seems no problem to use it for
+ LOOP_GET_STATUS64. 
+ 
+ Note that we use LOOP_GET_STATUS64 and struct loop_info64 only, old API 
+ around "struct loop_info" is no more used by util-linux.
+
+ The important detail is that for losetup (to show mapped devices) is
+ more important /sys than LOOP_GET_STATUS64. The /sys is better
+ because it does not require root permissions and it makes losetup
+ (and lsblk) usable for regular users. 
+ 
+ I guess /sys/block/loopN/queue/minimum_io_size is affected by Hannes'
+ LO_FLAGS_BLOCKSIZE patches, so non-512 I/O sizes for loopdevs are 
+ visible in "lsblk -t /dev/loopN" output, right?
+
+ I'll add --blocksize <size> to losetup, and BLKSZ column to output to
+ make the new feature usable also for end-users.
+
+ Thanks for CC:
 
     Karel
 
