@@ -1,42 +1,30 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH 06/12] blk-mq-debugfs: Generate name-to-text translation
  tables
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>
+Date: Fri, 18 Aug 2017 15:11:04 +0000
+Message-ID: <1503069063.2622.2.camel@wdc.com>
 References: <20170817232311.25948-1-bart.vanassche@wdc.com>
- <20170817232311.25948-7-bart.vanassche@wdc.com>
- <20170818143545.GB20707@kernel.dk> <1503069063.2622.2.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <98500f25-55ed-09c7-d924-ff9c643f181c@kernel.dk>
-Date: Fri, 18 Aug 2017 09:36:33 -0600
+	 <20170817232311.25948-7-bart.vanassche@wdc.com>
+	 <20170818143545.GB20707@kernel.dk>
+In-Reply-To: <20170818143545.GB20707@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1503069063.2622.2.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/18/2017 09:11 AM, Bart Van Assche wrote:
-> On Fri, 2017-08-18 at 08:35 -0600, Jens Axboe wrote:
->> On Thu, Aug 17 2017, Bart Van Assche wrote:
->>> It is easy to add a flag to one of the block layer headers and to
->>> forget to update blk-mq-debugfs.c. E.g. QUEUE_FLAG_SCSI_PASSTHROUGH,
->>> QUEUE_FLAG_QUIESCED and REQ_NOWAIT are missing from blk-mq-debugfs.c.
->>> Hence generate the symbol-to-text translation tables.
->>
->> This is just too ugly to live...
-> 
-> Hello Jens,
-> 
-> How about adding rules to the makefile that check for missing symbols and
-> that issue a warning if a symbol is missing from blk-mq-debugfs.c? Would
-> you consider that approach acceptable?
-
-If it's small and clean, I'd consider it. The problem with this
-version is that it's massive and really nasty. It better be solving
-a huge problem to warrant that, and it doesn't. It's really a minor
-thing. I'd like to ensure that we keep them synced, but the solution
-complexity has to match the problem.
-
--- 
-Jens Axboe
+T24gRnJpLCAyMDE3LTA4LTE4IGF0IDA4OjM1IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biBUaHUsIEF1ZyAxNyAyMDE3LCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gSXQgaXMgZWFz
+eSB0byBhZGQgYSBmbGFnIHRvIG9uZSBvZiB0aGUgYmxvY2sgbGF5ZXIgaGVhZGVycyBhbmQgdG8N
+Cj4gPiBmb3JnZXQgdG8gdXBkYXRlIGJsay1tcS1kZWJ1Z2ZzLmMuIEUuZy4gUVVFVUVfRkxBR19T
+Q1NJX1BBU1NUSFJPVUdILA0KPiA+IFFVRVVFX0ZMQUdfUVVJRVNDRUQgYW5kIFJFUV9OT1dBSVQg
+YXJlIG1pc3NpbmcgZnJvbSBibGstbXEtZGVidWdmcy5jLg0KPiA+IEhlbmNlIGdlbmVyYXRlIHRo
+ZSBzeW1ib2wtdG8tdGV4dCB0cmFuc2xhdGlvbiB0YWJsZXMuDQo+IA0KPiBUaGlzIGlzIGp1c3Qg
+dG9vIHVnbHkgdG8gbGl2ZS4uLg0KDQpIZWxsbyBKZW5zLA0KDQpIb3cgYWJvdXQgYWRkaW5nIHJ1
+bGVzIHRvIHRoZSBtYWtlZmlsZSB0aGF0IGNoZWNrIGZvciBtaXNzaW5nIHN5bWJvbHMgYW5kDQp0
+aGF0IGlzc3VlIGEgd2FybmluZyBpZiBhIHN5bWJvbCBpcyBtaXNzaW5nIGZyb20gYmxrLW1xLWRl
+YnVnZnMuYz8gV291bGQNCnlvdSBjb25zaWRlciB0aGF0IGFwcHJvYWNoIGFjY2VwdGFibGU/DQoN
+CkJhcnQu
