@@ -1,76 +1,87 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [RFC PATCH] nvme: always return IRQ_HANDLED
-Message-ID: <06b85884-efb4-e419-4b31-3aa4751bb338@kernel.dk>
-Date: Thu, 17 Aug 2017 13:32:20 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:55799 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750920AbdHRHUf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Aug 2017 03:20:35 -0400
+Subject: Re: [PATCH 2/2] loop: fix hang if LOOP_SET_STATUS gets invalid
+ blocksize or encrypt type
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Ming Lei <ming.lei@redhat.com>
+References: <cover.1503036471.git.osandov@fb.com>
+ <1ae3e2efdaf3f16bfdd4cf12b1350d49bb6a9026.1503036471.git.osandov@fb.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <9a7fac37-1833-1546-b308-2a0e15bef6e7@suse.de>
+Date: Fri, 18 Aug 2017 09:20:33 +0200
 MIME-Version: 1.0
+In-Reply-To: <1ae3e2efdaf3f16bfdd4cf12b1350d49bb6a9026.1503036471.git.osandov@fb.com>
 Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We currently have an issue with nvme when polling is used. Just
-ran some testing on 4.13-rc5, and it's trivial to trigger an IRQ
-disable ala:
+On 08/18/2017 08:15 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> In both of these error cases, we need to make sure to unfreeze the queue
+> before we return.
+> 
+> Fixes: ecdd09597a57 ("block/loop: fix race between I/O and set_status")
+> Fixes: f2c6df7dbf9a ("loop: support 4k physical blocksize")
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  drivers/block/loop.c | 24 ++++++++++++++++--------
+>  1 file changed, 16 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 39fa7f48e0c7..6c7609b3305d 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1125,11 +1125,15 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	if (info->lo_encrypt_type) {
+>  		unsigned int type = info->lo_encrypt_type;
+>  
+> -		if (type >= MAX_LO_CRYPT)
+> -			return -EINVAL;
+> +		if (type >= MAX_LO_CRYPT) {
+> +			err = -EINVAL;
+> +			goto exit;
+> +		}
+>  		xfer = xfer_funcs[type];
+> -		if (xfer == NULL)
+> -			return -EINVAL;
+> +		if (xfer == NULL) {
+> +			err = -EINVAL;
+> +			goto exit;
+> +		}
+>  	} else
+>  		xfer = NULL;
+>  
+> @@ -1142,10 +1146,14 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  		if (lo_logical_blocksize != 512 &&
+>  		    lo_logical_blocksize != 1024 &&
+>  		    lo_logical_blocksize != 2048 &&
+> -		    lo_logical_blocksize != 4096)
+> -			return -EINVAL;
+> -		if (lo_logical_blocksize > lo->lo_blocksize)
+> -			return -EINVAL;
+> +		    lo_logical_blocksize != 4096) {
+> +			err = -EINVAL;
+> +			goto exit;
+> +		}
+> +		if (lo_logical_blocksize > lo->lo_blocksize) {
+> +			err = -EINVAL;
+> +			goto exit;
+> +		}
+>  	} else {
+>  		lo_logical_blocksize = lo->lo_logical_blocksize;
+>  	}
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-[   52.412851] irq 77: nobody cared (try booting with the "irqpoll" option)
-[   52.415310] irq 70: nobody cared (try booting with the "irqpoll" option)
+Cheers,
 
-when running a few processes polling. The reason is pretty obvious - if
-we're effective at polling, the triggered IRQ will never find any
-events. If this happens enough times in a row, the kernel disables our
-IRQ since we keep returning IRQ_NONE.
-
-Question is, what's the best way to solve this. Ideally we should not be
-triggering an IRQ at all, but that's still not in mainline. Can we
-safely just return IRQ_HANDLED always? That should work except for the
-case where we happen to run into an IRQ flood where DO want to turn off
-the nvme irq. For now, I think that's small price to pay, since the
-current issue is much worse and leaves the device in a weird non-working
-state where some queue interrupts are turned off.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 74a124a06264..21a35faff86f 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -160,7 +160,6 @@ struct nvme_queue {
- 	u16 cq_head;
- 	u16 qid;
- 	u8 cq_phase;
--	u8 cqe_seen;
- 	u32 *dbbuf_sq_db;
- 	u32 *dbbuf_cq_db;
- 	u32 *dbbuf_sq_ei;
-@@ -830,22 +829,19 @@ static void nvme_process_cq(struct nvme_queue *nvmeq)
- 		consumed++;
- 	}
- 
--	if (consumed) {
-+	if (consumed)
- 		nvme_ring_cq_doorbell(nvmeq);
--		nvmeq->cqe_seen = 1;
--	}
- }
- 
- static irqreturn_t nvme_irq(int irq, void *data)
- {
--	irqreturn_t result;
- 	struct nvme_queue *nvmeq = data;
-+
- 	spin_lock(&nvmeq->q_lock);
- 	nvme_process_cq(nvmeq);
--	result = nvmeq->cqe_seen ? IRQ_HANDLED : IRQ_NONE;
--	nvmeq->cqe_seen = 0;
- 	spin_unlock(&nvmeq->q_lock);
--	return result;
-+
-+	return IRQ_HANDLED;
- }
- 
- static irqreturn_t nvme_irq_check(int irq, void *data)
-
+Hannes
 -- 
-Jens Axboe
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
