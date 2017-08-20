@@ -1,17 +1,21 @@
-Return-Path: <pbonzini@redhat.com>
+Return-Path: <paulmck@linux.vnet.ibm.com>
+Date: Sun, 20 Aug 2017 13:56:58 -0700
+From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
+To: Jeffrey Hugo <jhugo@codeaurora.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        pprakash@codeaurora.org, Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Richard Cochran <rcochran@linutronix.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Richard Weinberger <richard@nod.at>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [BUG] Deadlock due due to interactions of block, RCU, and cpu
  offline
-To: paulmck@linux.vnet.ibm.com, Jeffrey Hugo <jhugo@codeaurora.org>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- pprakash@codeaurora.org, Josh Triplett <josh@joshtriplett.org>,
- Steven Rostedt <rostedt@goodmis.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Lai Jiangshan <jiangshanlai@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Thomas Gleixner <tglx@linutronix.de>,
- Richard Cochran <rcochran@linutronix.de>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Richard Weinberger <richard@nod.at>
+Reply-To: paulmck@linux.vnet.ibm.com
 References: <20170327181711.GF3637@linux.vnet.ibm.com>
  <20170620234623.GA16200@linux.vnet.ibm.com>
  <df080eec-62b8-7d19-c201-e1a44febb96d@codeaurora.org>
@@ -22,43 +26,98 @@ References: <20170327181711.GF3637@linux.vnet.ibm.com>
  <d64c9d16-3b91-2081-0633-7f6a5196fd45@codeaurora.org>
  <20170630001855.GL2393@linux.vnet.ibm.com>
  <ec57e246-8b16-5db3-45d7-527627fb964c@codeaurora.org>
- <20170820205658.GS11320@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a0627c12-3406-5e13-8346-649bd8e27edf@redhat.com>
-Date: Tue, 22 Aug 2017 18:12:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170820205658.GS11320@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <ec57e246-8b16-5db3-45d7-527627fb964c@codeaurora.org>
+Message-Id: <20170820205658.GS11320@linux.vnet.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 20/08/2017 22:56, Paul E. McKenney wrote:
->>       KVM: async_pf: avoid async pf injection when in guest mode
->>       KVM: cpuid: Fix read/write out-of-bounds vulnerability in cpuid emulation
->>       arm: KVM: Allow unaligned accesses at HYP
->>       arm64: KVM: Allow unaligned accesses at EL2
->>       arm64: KVM: Preserve RES1 bits in SCTLR_EL2
->>       KVM: arm/arm64: Handle possible NULL stage2 pud when ageing pages
->>       KVM: nVMX: Fix exception injection
->>       kvm: async_pf: fix rcu_irq_enter() with irqs enabled
->>       KVM: arm/arm64: vgic-v3: Fix nr_pre_bits bitfield extraction
->>       KVM: s390: fix ais handling vs cpu model
->>       KVM: arm/arm64: Fix isues with GICv2 on GICv3 migration
->>
->> Nothing really stands out to me which would "fix" the issue.
->
-> My guess would be an undo of the change that provoked the problem
-> in the first place.  Did you try bisecting within the above group
-> of commits?
+On Sun, Aug 20, 2017 at 01:31:01PM -0600, Jeffrey Hugo wrote:
+> On 6/29/2017 6:18 PM, Paul E. McKenney wrote:
+> >On Thu, Jun 29, 2017 at 10:29:12AM -0600, Jeffrey Hugo wrote:
+> >>On 6/27/2017 6:11 PM, Paul E. McKenney wrote:
+> >>>On Tue, Jun 27, 2017 at 04:32:09PM -0600, Jeffrey Hugo wrote:
+> >>>>On 6/22/2017 9:34 PM, Paul E. McKenney wrote:
+> >>>>>On Wed, Jun 21, 2017 at 09:18:53AM -0700, Paul E. McKenney wrote:
+> >>>>>>No worries, and I am very much looking forward to seeing the results of
+> >>>>>>your testing.
+> >>>>>
+> >>>>>And please see below for an updated patch based on LKML review and
+> >>>>>more intensive testing.
+> >>>>>
+> >>>>
+> >>>>I spent some time on this today.  It didn't go as I expected.  I
+> >>>>validated the issue is reproducible as before on 4.11 and 4.12 rcs 1
+> >>>>through 4.  However, the version of stress-ng that I was using ran
+> >>>>into constant errors starting with rc5, making it nearly impossible
+> >>>>to make progress toward reproduction.  Upgrading stress-ng to tip
+> >>>>fixes the issue, however, I've still been unable to repro the issue.
+> >>>>
+> >>>>Its my unfounded suspicion that something went in between rc4 and
+> >>>>rc5 which changed the timing, and didn't actually fix the issue.  I
+> >>>>will run the test overnight for 5 hours to try to repro.
+> >>>>
+> >>>>The patch you sent appears to be based on linux-next, and appears to
+> >>>>have a number of dependencies which prevent it from cleanly applying
+> >>>>on anything current that I'm able to repro on at this time.  Do you
+> >>>>want to provide a rebased version of the patch which applies to say
+> >>>>4.11?  I could easily test that and report back.
+> >>>
+> >>>Here is a very lightly tested backport to v4.11.
+> >>>
+> >>
+> >>Works for me. Always reproduced the lockup within 2 minutes on stock
+> >>4.11.  With the change applied, I was able to test for 2 hours in
+> >>the same conditions, and 4 hours with the full system and not
+> >>encounter an issue.
+> >>
+> >>Feel free to add:
+> >>Tested-by: Jeffrey Hugo <jhugo@codeaurora.org>
+> >
+> >Applied, thank you!
+> >
+> >>I'm going to go back to 4.12-rc5 and see if I can get either repro
+> >>the issue, or identify what changed.  Hopefully I can get to
+> >>linux-next and double check the original version of the change as
+> >>well.
+> >
+> >Looking forward to hearing what you find!
+> >
+> >							Thanx, Paul
+> >
 > 
-> Either way, CCing Paolo for his thoughts?
+> According to git bisect, the following is what "changed"
+> 
+> commit 9d0eb4624601ac978b9e89be4aeadbd51ab2c830
+> Merge: 5faab9e 9bc1f09
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Sun Jun 11 11:07:25 2017 -0700
+> 
+>     Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm
+> 
+>     Pull KVM fixes from Paolo Bonzini:
+>      "Bug fixes (ARM, s390, x86)"
+> 
+>     * tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm:
+>       KVM: async_pf: avoid async pf injection when in guest mode
+>       KVM: cpuid: Fix read/write out-of-bounds vulnerability in
+> cpuid emulation
+>       arm: KVM: Allow unaligned accesses at HYP
+>       arm64: KVM: Allow unaligned accesses at EL2
+>       arm64: KVM: Preserve RES1 bits in SCTLR_EL2
+>       KVM: arm/arm64: Handle possible NULL stage2 pud when ageing pages
+>       KVM: nVMX: Fix exception injection
+>       kvm: async_pf: fix rcu_irq_enter() with irqs enabled
+>       KVM: arm/arm64: vgic-v3: Fix nr_pre_bits bitfield extraction
+>       KVM: s390: fix ais handling vs cpu model
+>       KVM: arm/arm64: Fix isues with GICv2 on GICv3 migration
+> 
+> Nothing really stands out to me which would "fix" the issue.
 
-There is "kvm: async_pf: fix rcu_irq_enter() with irqs enabled", but it
-would have caused splats, not deadlocks.
+My guess would be an undo of the change that provoked the problem
+in the first place.  Did you try bisecting within the above group
+of commits?
 
-If you are using nested virtualization, "KVM: async_pf: avoid async pf
-injection when in guest mode" can be a wildcard, but only if you have
-memory pressure.
+Either way, CCing Paolo for his thoughts?
 
-My bet is still on the former changing the timing just a little bit.
-
-Paolo
+							Thanx, Paul
