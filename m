@@ -1,129 +1,103 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 08/55] skd: Remove unnecessary blank lines
-Date: Thu, 17 Aug 2017 13:12:51 -0700
-Message-Id: <20170817201338.16537-9-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f196.google.com ([209.85.223.196]:34838 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752482AbdHUM5e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Aug 2017 08:57:34 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAJZ5v0jo6q5mniU2HihHcOSqggZ8HFy3mtuo0vXYwuc2tLQ7=w@mail.gmail.com>
+References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com> <CAJZ5v0jo6q5mniU2HihHcOSqggZ8HFy3mtuo0vXYwuc2tLQ7=w@mail.gmail.com>
+From: Bhumika Goyal <bhumirks@gmail.com>
+Date: Mon, 21 Aug 2017 18:27:31 +0530
+Message-ID: <CAOH+1jGD1XSAqTHsq_9LEQKKMTNXA63f3vbB1cY9WR39WVh9tQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] drivers: make device_attribute const
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Julia Lawall <julia.lawall@lip6.fr>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>, jbacik@fb.com,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        manish.chopra@cavium.com, rahul.verma@cavium.com,
+        Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
+        cascardo@holoscopio.com, don@syst.com.br,
+        Darren Hart <dvhart@infradead.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
+        linux-input@vger.kernel.org, netdev@vger.kernel.org,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality but makes the skd
-driver source code more uniform with that of other kernel drivers.
+On Mon, Aug 21, 2017 at 5:58 PM, Rafael J. Wysocki <rafael@kernel.org> wrote:
+> On Mon, Aug 21, 2017 at 1:43 PM, Bhumika Goyal <bhumirks@gmail.com> wrote:
+>> Make these const. Done using Coccinelle.
+>>
+>> @match disable optional_qualifier@
+>> identifier s;
+>> @@
+>> static struct device_attribute s = {...};
+>>
+>> @ref@
+>> position p;
+>> identifier match.s;
+>> @@
+>> s@p
+>>
+>> @good1@
+>> identifier match.s;
+>> expression e1;
+>> position ref.p;
+>> @@
+>> device_remove_file(e1,&s@p,...)
+>>
+>> @good2@
+>> identifier match.s;
+>> expression e1;
+>> position ref.p;
+>> @@
+>> device_create_file(e1,&s@p,...)
+>>
+>>
+>> @bad depends on  !good1 && !good2@
+>> position ref.p;
+>> identifier match.s;
+>> @@
+>> s@p
+>>
+>> @depends on forall !bad disable optional_qualifier@
+>> identifier match.s;
+>> @@
+>> static
+>> + const
+>> struct device_attribute s;
+>>
+>> Bhumika Goyal (6):
+>>   ACPI: make device_attribute const
+>>   nbd: make device_attribute const
+>>   hid: make device_attribute const
+>>   qlogic:  make device_attribute const
+>>   platform/x86: make device_attribute const
+>>   power: supply: make device_attribute const
+>
+> It would be better to send these patches separately, because they
+> touch code maintained by different people and I guess no one will take
+> the whole series.
+>
+> I'll take care of the ACPI one, but the rest needs to go in via their
+> proper trees.
+>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 21 +++++----------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
+Thanks for the note. From now onwards, I will send it separately
+depending on the maintainers. But is possible please consider it this
+time.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 74489da762a1..aa6bfd1391da 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -333,7 +333,6 @@ struct skd_device {
- 
- 	u32 timo_slot;
- 
--
- 	struct work_struct completion_worker;
- };
- 
-@@ -694,7 +693,6 @@ static void skd_request_fn(struct request_queue *q)
- 		if (flush == SKD_FLUSH_ZERO_SIZE_FIRST) {
- 			skd_prep_zerosize_flush_cdb(scsi_req, skreq);
- 			SKD_ASSERT(skreq->flush_cmd == 1);
--
- 		} else {
- 			skd_prep_rw_cdb(scsi_req, data_dir, lba, count);
- 		}
-@@ -2004,16 +2002,14 @@ static void skd_complete_internal(struct skd_device *skdev,
- 				skd_send_internal_skspcl(skdev, skspcl,
- 							 READ_CAPACITY);
- 			else {
--				pr_err(
--				       "(%s):*** W/R Buffer mismatch %d ***\n",
-+				pr_err("(%s):*** W/R Buffer mismatch %d ***\n",
- 				       skd_name(skdev), skdev->connect_retries);
- 				if (skdev->connect_retries <
- 				    SKD_MAX_CONNECT_RETRIES) {
- 					skdev->connect_retries++;
- 					skd_soft_reset(skdev);
- 				} else {
--					pr_err(
--					       "(%s): W/R Buffer Connect Error\n",
-+					pr_err("(%s): W/R Buffer Connect Error\n",
- 					       skd_name(skdev));
- 					return;
- 				}
-@@ -2621,7 +2617,6 @@ static void skd_process_scsi_inq(struct skd_device *skdev,
- 		skd_do_driver_inq(skdev, skcomp, skerr, scsi_req->cdb, buf);
- }
- 
--
- static int skd_isr_completion_posted(struct skd_device *skdev,
- 					int limit, int *enqueued)
- {
-@@ -3083,8 +3078,7 @@ static void skd_isr_fwstate(struct skd_device *skdev)
- 			skdev->cur_max_queue_depth * 2 / 3 + 1;
- 		if (skdev->queue_low_water_mark < 1)
- 			skdev->queue_low_water_mark = 1;
--		pr_info(
--		       "(%s): Queue depth limit=%d dev=%d lowat=%d\n",
-+		pr_info("(%s): Queue depth limit=%d dev=%d lowat=%d\n",
- 		       skd_name(skdev),
- 		       skdev->cur_max_queue_depth,
- 		       skdev->dev_max_queue_depth, skdev->queue_low_water_mark);
-@@ -4553,7 +4547,6 @@ static void skd_destruct(struct skd_device *skdev)
- 	if (skdev == NULL)
- 		return;
- 
--
- 	pr_debug("%s:%s:%d disk\n", skdev->name, __func__, __LINE__);
- 	skd_free_disk(skdev);
- 
-@@ -4617,7 +4610,6 @@ static const struct block_device_operations skd_blockdev_ops = {
- 	.getgeo		= skd_bdev_getgeo,
- };
- 
--
- /*
-  *****************************************************************************
-  * PCIe DRIVER GLUE
-@@ -4716,14 +4708,12 @@ static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	pci_set_master(pdev);
- 	rc = pci_enable_pcie_error_reporting(pdev);
- 	if (rc) {
--		pr_err(
--		       "(%s): bad enable of PCIe error reporting rc=%d\n",
-+		pr_err("(%s): bad enable of PCIe error reporting rc=%d\n",
- 		       skd_name(skdev), rc);
- 		skdev->pcie_error_reporting_is_enabled = 0;
- 	} else
- 		skdev->pcie_error_reporting_is_enabled = 1;
- 
--
- 	pci_set_drvdata(pdev, skdev);
- 
- 	for (i = 0; i < SKD_MAX_BARS; i++) {
-@@ -4768,8 +4758,7 @@ static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	} else {
- 		/* we timed out, something is wrong with the device,
- 		   don't add the disk structure */
--		pr_err(
--		       "(%s): error: waiting for s1120 timed out %d!\n",
-+		pr_err("(%s): error: waiting for s1120 timed out %d!\n",
- 		       skd_name(skdev), rc);
- 		/* in case of no error; we timeout with ENXIO */
- 		if (!rc)
--- 
-2.14.0
+Thanks,
+Bhumika
+
+> Thanks,
+> Rafael
