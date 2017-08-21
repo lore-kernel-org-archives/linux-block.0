@@ -1,60 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:38057 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753913AbdHUR06 (ORCPT
+Received: from shards.monkeyblade.net ([184.105.139.130]:37140 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754341AbdHURZI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2017 13:26:58 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170821.102506.1119648270525550825.davem@davemloft.net>
-References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com>
- <1503315792-14837-5-git-send-email-bhumirks@gmail.com> <20170821.102506.1119648270525550825.davem@davemloft.net>
-From: Bhumika Goyal <bhumirks@gmail.com>
-Date: Mon, 21 Aug 2017 22:56:56 +0530
-Message-ID: <CAOH+1jEieKFo0=+xb-8FUJgaQpa_FNyvipCuokeFQmYANby2iw@mail.gmail.com>
-Subject: Re: [PATCH 4/6] qlogic: make device_attribute const
-To: David Miller <davem@davemloft.net>
-Cc: Julia Lawall <julia.lawall@lip6.fr>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>, jbacik@fb.com,
-        Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Mon, 21 Aug 2017 13:25:08 -0400
+Date: Mon, 21 Aug 2017 10:25:06 -0700 (PDT)
+Message-Id: <20170821.102506.1119648270525550825.davem@davemloft.net>
+To: bhumirks@gmail.com
+Cc: julia.lawall@lip6.fr, rjw@rjwysocki.net, lenb@kernel.org,
+        jbacik@fb.com, jikos@kernel.org, benjamin.tissoires@redhat.com,
         manish.chopra@cavium.com, rahul.verma@cavium.com,
         Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
-        cascardo@holoscopio.com, don@syst.com.br,
-        Darren Hart <dvhart@infradead.org>,
-        Andy Shevchenko <andy@infradead.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
-        linux-input@vger.kernel.org, netdev@vger.kernel.org,
-        Platform Driver <platform-driver-x86@vger.kernel.org>,
-        Linux PM <linux-pm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        cascardo@holoscopio.com, don@syst.com.br, dvhart@infradead.org,
+        andy@infradead.org, sre@kernel.org, linux-acpi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        nbd-general@lists.sourceforge.net, linux-input@vger.kernel.org,
+        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-pm@vger.kernel.org
+Subject: Re: [PATCH 4/6] qlogic: make device_attribute const
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1503315792-14837-5-git-send-email-bhumirks@gmail.com>
+References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com>
+        <1503315792-14837-5-git-send-email-bhumirks@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Aug 21, 2017 at 10:55 PM, David Miller <davem@davemloft.net> wrote:
-> From: Bhumika Goyal <bhumirks@gmail.com>
-> Date: Mon, 21 Aug 2017 17:13:10 +0530
->
->> Make these const as they are only passed as an argument to the
->> function device_create_file and device_remove_file and the corresponding
->> arguments are of type const.
->> Done using Coccinelle
->>
->> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
->
-> Applied.
->
-> But I would seriously suggest that when you have to cross subsystems
-> like this, just send the patches individually to the respective
-> maintainers rather than trying to make a "series" out of it.
->
+From: Bhumika Goyal <bhumirks@gmail.com>
+Date: Mon, 21 Aug 2017 17:13:10 +0530
 
-Yes, noted. Thanks for the pointer.
+> Make these const as they are only passed as an argument to the
+> function device_create_file and device_remove_file and the corresponding
+> arguments are of type const.
+> Done using Coccinelle
+> 
+> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
 
-Thanks,
-Bhumika
+Applied.
 
-> Thanks.
+But I would seriously suggest that when you have to cross subsystems
+like this, just send the patches individually to the respective
+maintainers rather than trying to make a "series" out of it.
+
+Thanks.
