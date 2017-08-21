@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38724 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:44362 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753386AbdHWHtK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2017 03:49:10 -0400
-Date: Wed, 23 Aug 2017 15:48:51 +0800
+        id S1751069AbdHUISp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Aug 2017 04:18:45 -0400
+Date: Mon, 21 Aug 2017 16:18:37 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Omar Sandoval <osandov@osandov.com>
 Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
@@ -12,7 +12,7 @@ Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
         Bart Van Assche <bart.vanassche@sandisk.com>,
         Laurence Oberman <loberman@redhat.com>
 Subject: Re: [PATCH V2 01/20] blk-mq-sched: fix scheduler bad performance
-Message-ID: <20170823074847.GC11479@ming.t460p>
+Message-ID: <20170821081836.GB9167@ming.t460p>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
  <20170805065705.12989-2-ming.lei@redhat.com>
  <20170809001143.GH4072@vader.DHCP.thefacebook.com>
@@ -49,15 +49,6 @@ On Wed, Aug 09, 2017 at 12:11:18AM -0700, Omar Sandoval wrote:
 > discussion). The test case was xfs/297 from xfstests: after
 > 64765a75ef25, the test went from taking ~300 seconds to ~200 seconds on
 > his SCSI device.
-
-Just run xfs/297 on virtio-scsi device with this patch, and use
-mq-deadline scheduler:
-
-	v4.13-rc6 + block for-next: 				83s
-	v4.13-rc6 + block for-next + this patch:	79s
-
-So looks no big difference.
-
 > 
 > > In theory, if hw queue is busy and requests are left in ->dispatch,
 > > we should not have continued to dequeue requests from sw/scheduler queue
@@ -73,11 +64,8 @@ So looks no big difference.
 > xfs/297 does a lot of fsyncs and hence a lot of flushes, that could be
 > the special case.
 
-IMO, this patch shouldn't degrade flush in theory, and actually in
-Paolo's dbench test[1], flush latency is decreased a lot with this
-patchset, and Paolo's test is on SATA device.
+OK, thanks a lot for this input, and I will run xfs/297 with this
+patchset to see if performance is degraded.
 
-[1] https://marc.info/?l=linux-block&m=150217980602843&w=2
-
---
+-- 
 Ming
