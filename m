@@ -1,66 +1,48 @@
-Return-Path: <prvs=400f95d56=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	Michal Hocko <mhocko@kernel.org>
-Subject: [PATCH v2 2/2] block: Make I/O timeout failure injection again task-independent
-Date: Tue, 22 Aug 2017 16:00:43 -0700
-Message-Id: <20170822230043.9968-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170822230043.9968-1-bart.vanassche@wdc.com>
-References: <20170822230043.9968-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:8641 "EHLO
+        BJEXCAS006.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753126AbdHUPNI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Aug 2017 11:13:08 -0400
+Date: Mon, 21 Aug 2017 23:12:43 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH] blkcg: add a cleanup when active policy fail
+Message-ID: <20170821151238.GA28794@localhost.didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Commit e41d58185f14 made all faults that are triggered from task
-context, including I/O timeouts, dependent on the failure
-injection settings for that task. Make it again possible to inject
-I/O timeout failures independent of task context. An example for a
-fault injection for which this patch makes a difference (from a VM
-booted with the 'threadirqs' command line parameter):
+if alloc memory fail, all cpds which were allocated before should be cleaned up.
 
-FAULT_INJECTION: forcing a failure. name fail_io_timeout, interval 1, probability 100, space 0, times 1
-CPU: 6 PID: 1253 Comm: irq/36-skd0-msi Not tainted 4.13.0-rc2-dbg+ #5
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1.fc26 04/01/2014
-Call Trace:
- dump_stack+0x8e/0xcd
- should_fail+0x154/0x160
- blk_should_fake_timeout+0x27/0x30
- blk_mq_complete_request+0x11/0x30
- skd_end_request+0x32/0xc0 [skd]
- skd_isr_completion_posted.isra.30+0x14a/0x400 [skd]
- skd_comp_q+0x40/0xb0 [skd]
- irq_forced_thread_fn+0x2a/0x70
- irq_thread+0x144/0x1a0
- kthread+0x125/0x140
- ret_from_fork+0x2a/0x40
-
-Fixes: commit e41d58185f14 ("fault-inject: support systematic fault injection")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Dmitry Vyukov <dvyukov@google.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Michal Hocko <mhocko@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- block/blk-timeout.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-cgroup.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 17ec83bb0900..2e92b20b125f 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -11,7 +11,7 @@
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 0480892..7e21c4b 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1336,6 +1336,17 @@ int blkcg_activate_policy(struct request_queue *q,
  
- #ifdef CONFIG_FAIL_IO_TIMEOUT
- 
--static DECLARE_FAULT_ATTR(fail_io_timeout);
-+static DECLARE_GLOBAL_FAULT_ATTR(fail_io_timeout);
- 
- static int __init setup_fail_io_timeout(char *str)
- {
+ 	spin_unlock_irq(q->queue_lock);
+ out_bypass_end:
++	if (ret) {
++		spin_lock_irq(q->queue_lock);
++		list_for_each_entry(blkg, &q->blkg_list, q_node) {
++			if (blkg->pd[pol->plid]) {
++				if (pol->pd_free_fn)
++					pol->pd_free_fn(blkg->pd[pol->plid]);
++				blkg->pd[pol->plid] = NULL;
++			}
++		}
++		spin_unlock_irq(q->queue_lock);
++	}
+ 	if (q->mq_ops)
+ 		blk_mq_unfreeze_queue(q);
+ 	else
 -- 
-2.14.0
+2.9.4
