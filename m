@@ -1,46 +1,60 @@
-Return-Path: <BATV+08196f5b2bd262a84b8d+5113+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 02/10] nvme: allow calling nvme_change_ctrl_state from irq context
-Date: Wed, 23 Aug 2017 19:58:07 +0200
-Message-Id: <20170823175815.3646-3-hch@lst.de>
-In-Reply-To: <20170823175815.3646-1-hch@lst.de>
-References: <20170823175815.3646-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f193.google.com ([209.85.223.193]:38057 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753913AbdHUR06 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Aug 2017 13:26:58 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170821.102506.1119648270525550825.davem@davemloft.net>
+References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com>
+ <1503315792-14837-5-git-send-email-bhumirks@gmail.com> <20170821.102506.1119648270525550825.davem@davemloft.net>
+From: Bhumika Goyal <bhumirks@gmail.com>
+Date: Mon, 21 Aug 2017 22:56:56 +0530
+Message-ID: <CAOH+1jEieKFo0=+xb-8FUJgaQpa_FNyvipCuokeFQmYANby2iw@mail.gmail.com>
+Subject: Re: [PATCH 4/6] qlogic: make device_attribute const
+To: David Miller <davem@davemloft.net>
+Cc: Julia Lawall <julia.lawall@lip6.fr>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>, jbacik@fb.com,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        manish.chopra@cavium.com, rahul.verma@cavium.com,
+        Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
+        cascardo@holoscopio.com, don@syst.com.br,
+        Darren Hart <dvhart@infradead.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
+        linux-input@vger.kernel.org, netdev@vger.kernel.org,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On Mon, Aug 21, 2017 at 10:55 PM, David Miller <davem@davemloft.net> wrote:
+> From: Bhumika Goyal <bhumirks@gmail.com>
+> Date: Mon, 21 Aug 2017 17:13:10 +0530
+>
+>> Make these const as they are only passed as an argument to the
+>> function device_create_file and device_remove_file and the corresponding
+>> arguments are of type const.
+>> Done using Coccinelle
+>>
+>> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+>
+> Applied.
+>
+> But I would seriously suggest that when you have to cross subsystems
+> like this, just send the patches individually to the respective
+> maintainers rather than trying to make a "series" out of it.
+>
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index b8ecd155be19..f91c649c9ca5 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -176,9 +176,10 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		enum nvme_ctrl_state new_state)
- {
- 	enum nvme_ctrl_state old_state;
-+	unsigned long flags;
- 	bool changed = false;
- 
--	spin_lock_irq(&ctrl->lock);
-+	spin_lock_irqsave(&ctrl->lock, flags);
- 
- 	old_state = ctrl->state;
- 	switch (new_state) {
-@@ -239,7 +240,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 	if (changed)
- 		ctrl->state = new_state;
- 
--	spin_unlock_irq(&ctrl->lock);
-+	spin_unlock_irqrestore(&ctrl->lock, flags);
- 
- 	return changed;
- }
--- 
-2.11.0
+Yes, noted. Thanks for the pointer.
+
+Thanks,
+Bhumika
+
+> Thanks.
