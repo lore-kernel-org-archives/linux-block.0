@@ -1,74 +1,65 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 19/49] block: implement sp version of bvec iterator helpers
-Date: Tue,  8 Aug 2017 16:45:18 +0800
-Message-Id: <20170808084548.18963-20-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:15550 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751172AbdHUJcx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Aug 2017 05:32:53 -0400
+Subject: Re: [PATCH V5 02/13] mmc: core: Add members to mmc_request and
+ mmc_data for CQE's
+To: Linus Walleij <linus.walleij@linaro.org>,
+        linux-block@vger.kernel.org
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+References: <1502366898-23691-1-git-send-email-adrian.hunter@intel.com>
+ <1502366898-23691-3-git-send-email-adrian.hunter@intel.com>
+ <CACRpkda=q=9UhKnvK5Z2PF+kqa1L4CSdTzcr=xuiOUgG7z6sww@mail.gmail.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <9143f524-13ba-94a6-ec80-0b2a9275f95e@intel.com>
+Date: Mon, 21 Aug 2017 12:26:19 +0300
+MIME-Version: 1.0
+In-Reply-To: <CACRpkda=q=9UhKnvK5Z2PF+kqa1L4CSdTzcr=xuiOUgG7z6sww@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch implements singlepage version of the following
-3 helpers:
-	- bvec_iter_offset_sp()
-	- bvec_iter_len_sp()
-	- bvec_iter_page_sp()
+On 20/08/17 14:29, Linus Walleij wrote:
+> On Thu, Aug 10, 2017 at 2:08 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> 
+>> Most of the information needed to issue requests to a CQE is already in
+>> struct mmc_request and struct mmc_data. Add data block address, some flags,
+>> and the task id (tag), and allow for cmd being NULL which it is for CQE
+>> tasks.
+>>
+>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> 
+>> +       int                     tag;
+> 
+> Is this consistent with the block layer idea of "tag"?
 
-So that one multipage bvec can be splited to singlepage
-bvec, and make users of current bvec iterator happy.
+It is named "tag" because it is the block layer tag.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/bvec.h | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> I am asking because I get confused.
+> 
+> I thought the block layers idea of a "tag" was some metadata
+> associated with a request. Not that I am a block layer expert.
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 1eaf7ca5cab3..d5f999a493de 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -23,6 +23,7 @@
- #include <linux/kernel.h>
- #include <linux/bug.h>
- #include <linux/errno.h>
-+#include <linux/mm.h>
- 
- /*
-  * What is multipage bvecs(segment)?
-@@ -98,14 +99,25 @@ struct bvec_iter {
- #define bvec_iter_offset_mp(bvec, iter)				\
- 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
- 
-+#define bvec_iter_page_idx_mp(bvec, iter)			\
-+	(bvec_iter_offset_mp((bvec), (iter)) / PAGE_SIZE)
-+
-+
- /*
-  * <page, offset,length> of singlepage(sp) segment.
-  *
-  * This helpers will be implemented for building sp bvec in flight.
-  */
--#define bvec_iter_offset_sp(bvec, iter)	bvec_iter_offset_mp((bvec), (iter))
--#define bvec_iter_len_sp(bvec, iter)	bvec_iter_len_mp((bvec), (iter))
--#define bvec_iter_page_sp(bvec, iter)	bvec_iter_page_mp((bvec), (iter))
-+#define bvec_iter_offset_sp(bvec, iter)					\
-+	(bvec_iter_offset_mp((bvec), (iter)) % PAGE_SIZE)
-+
-+#define bvec_iter_len_sp(bvec, iter)					\
-+	min_t(unsigned, bvec_iter_len_mp((bvec), (iter)),		\
-+	    (PAGE_SIZE - (bvec_iter_offset_sp((bvec), (iter)))))
-+
-+#define bvec_iter_page_sp(bvec, iter)					\
-+	nth_page(bvec_iter_page_mp((bvec), (iter)),			\
-+		 bvec_iter_page_idx_mp((bvec), (iter)))
- 
- /* current interfaces support sp style at default */
- #define bvec_iter_page(bvec, iter)	bvec_iter_page_sp((bvec), (iter))
--- 
-2.9.4
+The block layer tag is a unique number to identify the task to the hardware
+queue.  It is typically a number from 0 up to queue depth - 1.
+
+> Why can't we just name this "task_id" if that is what it is in
+> Linux terms? Does the specification call it "tag"?
+
+The eMMC specification calls it "task id" but the block layer calls it
+"tag".  I went with "tag" to be easier for block layer people to understand.
