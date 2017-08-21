@@ -1,89 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:56344 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753818AbdHQUPH (ORCPT
+Received: from mail-pg0-f43.google.com ([74.125.83.43]:37663 "EHLO
+        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753899AbdHUQp3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 16:15:07 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 36/55] skb: Use symbolic names for SCSI opcodes
-Date: Thu, 17 Aug 2017 13:13:19 -0700
-Message-Id: <20170817201338.16537-37-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+        Mon, 21 Aug 2017 12:45:29 -0400
+Received: by mail-pg0-f43.google.com with SMTP id y129so102969329pgy.4
+        for <linux-block@vger.kernel.org>; Mon, 21 Aug 2017 09:45:29 -0700 (PDT)
+Date: Mon, 21 Aug 2017 09:45:07 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com,
+        Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>
+Subject: Re: [PATCH v2 2/3] loop: use queue limit instead of private
+ lo_logical_blocksize
+Message-ID: <20170821164507.GA7079@vader.DHCP.thefacebook.com>
+References: <cover.1503084216.git.osandov@fb.com>
+ <561f8505816afb6d0dacd4697087141c95566225.1503084216.git.osandov@fb.com>
+ <645c909a-4f93-30d2-4d10-28b131b686df@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <645c909a-4f93-30d2-4d10-28b131b686df@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality.
+On Mon, Aug 21, 2017 at 07:58:52AM +0200, Hannes Reinecke wrote:
+> On 08/18/2017 09:27 PM, Omar Sandoval wrote:
+> > From: Omar Sandoval <osandov@fb.com>
+> > 
+> > There's no reason to track this separately; just use the
+> > logical_block_size queue limit.
+> > 
+> > Signed-off-by: Omar Sandoval <osandov@fb.com>
+> > ---
+> >  drivers/block/loop.c | 44 ++++++++++++++++++--------------------------
+> >  drivers/block/loop.h |  1 -
+> >  2 files changed, 18 insertions(+), 27 deletions(-)
+> > 
+> 
+> Curiously enough, this is what I attempted initially.
+> But that got shut down due to incompability.
+> In the hope that you'll succeed:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+Is that thread archived anywhere? I don't see how this would be a
+compatability problem, it doesn't change the behavior if you're not
+using the new option, and if you are using the new option then there's
+no compatability to speak of.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index ae66171ef10a..49e7097dd409 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -473,9 +473,9 @@ skd_prep_rw_cdb(struct skd_scsi_request *scsi_req,
- 		unsigned count)
- {
- 	if (data_dir == READ)
--		scsi_req->cdb[0] = 0x28;
-+		scsi_req->cdb[0] = READ_10;
- 	else
--		scsi_req->cdb[0] = 0x2a;
-+		scsi_req->cdb[0] = WRITE_10;
- 
- 	scsi_req->cdb[1] = 0;
- 	scsi_req->cdb[2] = (lba & 0xff000000) >> 24;
-@@ -494,7 +494,7 @@ skd_prep_zerosize_flush_cdb(struct skd_scsi_request *scsi_req,
- {
- 	skreq->flush_cmd = 1;
- 
--	scsi_req->cdb[0] = 0x35;
-+	scsi_req->cdb[0] = SYNCHRONIZE_CACHE;
- 	scsi_req->cdb[1] = 0;
- 	scsi_req->cdb[2] = 0;
- 	scsi_req->cdb[3] = 0;
-@@ -1880,7 +1880,8 @@ static void skd_complete_internal(struct skd_device *skdev,
- 			}
- 			dev_dbg(&skdev->pdev->dev,
- 				"**** TUR failed, retry skerr\n");
--			skd_send_internal_skspcl(skdev, skspcl, 0x00);
-+			skd_send_internal_skspcl(skdev, skspcl,
-+						 TEST_UNIT_READY);
- 		}
- 		break;
- 
-@@ -1896,7 +1897,8 @@ static void skd_complete_internal(struct skd_device *skdev,
- 			}
- 			dev_dbg(&skdev->pdev->dev,
- 				"**** write buffer failed, retry skerr\n");
--			skd_send_internal_skspcl(skdev, skspcl, 0x00);
-+			skd_send_internal_skspcl(skdev, skspcl,
-+						 TEST_UNIT_READY);
- 		}
- 		break;
- 
-@@ -1929,7 +1931,8 @@ static void skd_complete_internal(struct skd_device *skdev,
- 			}
- 			dev_dbg(&skdev->pdev->dev,
- 				"**** read buffer failed, retry skerr\n");
--			skd_send_internal_skspcl(skdev, skspcl, 0x00);
-+			skd_send_internal_skspcl(skdev, skspcl,
-+						 TEST_UNIT_READY);
- 		}
- 		break;
- 
--- 
-2.14.0
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Thanks!
