@@ -1,118 +1,68 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59336 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG6G (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:58:06 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 14/20] blk-mq-sched: improve IO scheduling on SCSI devcie
-Date: Sat,  5 Aug 2017 14:56:59 +0800
-Message-Id: <20170805065705.12989-15-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
+Received: from mail-pg0-f44.google.com ([74.125.83.44]:35736 "EHLO
+        mail-pg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751877AbdHVRdS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Aug 2017 13:33:18 -0400
+Received: by mail-pg0-f44.google.com with SMTP id u191so43290431pgc.2
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2017 10:33:18 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Hannes Reinecke <hare@suse.de>,
+        Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH v3 4/4] loop: always return block size in LOOP_GET_STATUS
+Date: Tue, 22 Aug 2017 10:33:01 -0700
+Message-Id: <778264213d9a05c70fc99e067eab2105230aa95e.1503422996.git.osandov@fb.com>
+In-Reply-To: <cover.1503422996.git.osandov@fb.com>
+References: <cover.1503422996.git.osandov@fb.com>
+In-Reply-To: <cover.1503422996.git.osandov@fb.com>
+References: <cover.1503422996.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-SCSI device often has per-request_queue queue depth
-(.cmd_per_lun), which is applied among all hw queues
-actually, and this patchset calls this as shared
-queue depth.
+From: Omar Sandoval <osandov@fb.com>
 
-One theory of scheduler is that we shouldn't dequeue
-request from sw/scheduler queue and dispatch it to
-driver when the low level queue is busy.
+When I was writing a test for the new loop device block size
+functionality, I noticed a couple of issues with how LOOP_GET_STATUS
+handles the block size:
 
-For SCSI device, queue being busy depends on the
-per-request_queue limit, so we should hold all
-hw queues if the request queue is busy.
+- lo_init[0] is never filled in with the logical block size we
+  previously set
+- lo_flags returned from LOOP_GET_STATUS will have LO_FLAGS_BLOCKSIZE
+  set if we previously called LOOP_SET_STATUS with LO_FLAGS_BLOCKSIZE
+  set, which doesn't really mean anything
 
-This patch introduces per-request_queue dispatch
-list for this purpose, and only when all requests
-in this list are dispatched out successfully, we
-can restart to dequeue request from sw/scheduler
-queue and dispath it to lld.
+Instead, for LOOP_GET_STATUS, let's always fill in lo_init[0] and set
+the LO_FLAGS_BLOCKSIZE flag to indicate we support it.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Tested-by: Milan Broz <gmazyland@gmail.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-mq.c         |  8 +++++++-
- block/blk-mq.h         | 14 +++++++++++---
- include/linux/blkdev.h |  5 +++++
- 3 files changed, 23 insertions(+), 4 deletions(-)
+ drivers/block/loop.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c6624154bb37..db21e71bb087 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2670,8 +2670,14 @@ int blk_mq_update_sched_queue_depth(struct request_queue *q)
- 	 * this queue depth limit
- 	 */
- 	if (q->queue_depth) {
--		queue_for_each_hw_ctx(q, hctx, i)
-+		queue_for_each_hw_ctx(q, hctx, i) {
- 			hctx->flags |= BLK_MQ_F_SHARED_DEPTH;
-+			hctx->dispatch_lock = &q->__mq_dispatch_lock;
-+			hctx->dispatch_list = &q->__mq_dispatch_list;
-+
-+			spin_lock_init(hctx->dispatch_lock);
-+			INIT_LIST_HEAD(hctx->dispatch_list);
-+		}
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 28026f0abaa9..b55a1f82f561 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1222,7 +1222,7 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ 	info->lo_rdevice = huge_encode_dev(lo->lo_device ? stat.rdev : stat.dev);
+ 	info->lo_offset = lo->lo_offset;
+ 	info->lo_sizelimit = lo->lo_sizelimit;
+-	info->lo_flags = lo->lo_flags;
++	info->lo_flags = lo->lo_flags | LO_FLAGS_BLOCKSIZE;
+ 	memcpy(info->lo_file_name, lo->lo_file_name, LO_NAME_SIZE);
+ 	memcpy(info->lo_crypt_name, lo->lo_crypt_name, LO_NAME_SIZE);
+ 	info->lo_encrypt_type =
+@@ -1232,6 +1232,7 @@ loop_get_status(struct loop_device *lo, struct loop_info64 *info)
+ 		memcpy(info->lo_encrypt_key, lo->lo_encrypt_key,
+ 		       lo->lo_encrypt_key_size);
  	}
- 
- 	if (!q->elevator)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 86a35c799ca6..295fd9dfb01d 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -139,19 +139,27 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- static inline bool blk_mq_hctx_is_dispatch_busy(struct request_queue *q,
- 		struct blk_mq_hw_ctx *hctx)
- {
--	return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-+	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
-+		return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-+	return q->mq_dispatch_busy;
++	LO_INFO_BLOCKSIZE(info) = queue_logical_block_size(lo->lo_queue);
+ 	return 0;
  }
- 
- static inline void blk_mq_hctx_set_dispatch_busy(struct request_queue *q,
- 		struct blk_mq_hw_ctx *hctx)
- {
--	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-+	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
-+		set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-+	else
-+		q->mq_dispatch_busy = 1;
- }
- 
- static inline void blk_mq_hctx_clear_dispatch_busy(struct request_queue *q,
- 		struct blk_mq_hw_ctx *hctx)
- {
--	clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-+	if (!(hctx->flags & BLK_MQ_F_SHARED_DEPTH))
-+		clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-+	else
-+		q->mq_dispatch_busy = 0;
- }
- 
- static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 25f6a0cb27d3..bc0e607710f2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -395,6 +395,11 @@ struct request_queue {
- 
- 	atomic_t		shared_hctx_restart;
- 
-+	/* blk-mq dispatch list and lock for shared queue depth case */
-+	struct list_head	__mq_dispatch_list;
-+	spinlock_t		__mq_dispatch_lock;
-+	unsigned int		mq_dispatch_busy;
-+
- 	struct blk_queue_stats	*stats;
- 	struct rq_wb		*rq_wb;
  
 -- 
-2.9.4
+2.14.1
