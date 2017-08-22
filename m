@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:18467 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752659AbdHVXCL (ORCPT
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:24498 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750962AbdHVQxw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Aug 2017 19:02:11 -0400
+        Tue, 22 Aug 2017 12:53:52 -0400
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -11,11 +11,11 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Dmitry Vyukov <dvyukov@google.com>,
         Akinobu Mita <akinobu.mita@gmail.com>,
         Michal Hocko <mhocko@kernel.org>
-Subject: [PATCH v2 1/2] fault-inject: Restore support for task-independent fault injection
-Date: Tue, 22 Aug 2017 16:00:42 -0700
-Message-Id: <20170822230043.9968-2-bart.vanassche@wdc.com>
-In-Reply-To: <20170822230043.9968-1-bart.vanassche@wdc.com>
-References: <20170822230043.9968-1-bart.vanassche@wdc.com>
+Subject: [PATCH 1/2] fault-inject: Restore support for task-independent fault injection
+Date: Tue, 22 Aug 2017 09:52:35 -0700
+Message-Id: <20170822165236.12275-2-bart.vanassche@wdc.com>
+In-Reply-To: <20170822165236.12275-1-bart.vanassche@wdc.com>
+References: <20170822165236.12275-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -31,12 +31,12 @@ Cc: Akinobu Mita <akinobu.mita@gmail.com>
 Cc: Michal Hocko <mhocko@kernel.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>
 ---
- include/linux/fault-inject.h | 11 +++++++++--
- lib/fault-inject.c           |  4 +++-
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ include/linux/fault-inject.h | 9 +++++++--
+ lib/fault-inject.c           | 4 +++-
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/include/linux/fault-inject.h b/include/linux/fault-inject.h
-index 728d4e0292aa..88dae2f21881 100644
+index 728d4e0292aa..8851646d2698 100644
 --- a/include/linux/fault-inject.h
 +++ b/include/linux/fault-inject.h
 @@ -18,6 +18,7 @@ struct fault_attr {
@@ -47,12 +47,12 @@ index 728d4e0292aa..88dae2f21881 100644
  	bool task_filter;
  	unsigned long stacktrace_depth;
  	unsigned long require_start;
-@@ -30,17 +31,23 @@ struct fault_attr {
+@@ -30,17 +31,21 @@ struct fault_attr {
  	struct dentry *dname;
  };
  
 -#define FAULT_ATTR_INITIALIZER {					\
-+#define __FAULT_ATTR_INITIALIZER(__global) {				\
++#define FAULT_ATTR_INITIALIZER(__global) {				\
  		.interval = 1,						\
  		.times = ATOMIC_INIT(1),				\
  		.require_end = ULONG_MAX,				\
@@ -64,12 +64,10 @@ index 728d4e0292aa..88dae2f21881 100644
  	}
  
 -#define DECLARE_FAULT_ATTR(name) struct fault_attr name = FAULT_ATTR_INITIALIZER
-+#define FAULT_ATTR_INITIALIZER __FAULT_ATTR_INITIALIZER(false)
-+
 +#define DECLARE_FAULT_ATTR(name)				\
-+	struct fault_attr name = __FAULT_ATTR_INITIALIZER(false)
++	struct fault_attr name = FAULT_ATTR_INITIALIZER(false)
 +#define DECLARE_GLOBAL_FAULT_ATTR(name)				\
-+	struct fault_attr name = __FAULT_ATTR_INITIALIZER(true)
++	struct fault_attr name = FAULT_ATTR_INITIALIZER(true)
  int setup_fault_attr(struct fault_attr *attr, char *str);
  bool should_fail(struct fault_attr *attr, ssize_t size);
  
