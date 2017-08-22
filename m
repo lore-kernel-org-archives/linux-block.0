@@ -1,97 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:25141 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751026AbdHXBAH (ORCPT
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:34771 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752477AbdHVUoA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2017 21:00:07 -0400
-Subject: Re: [PATCH V2 11/20] blk-mq: introduce helpers for operating
- ->dispatch list
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "hch@infradead.org" <hch@infradead.org>,
+        Tue, 22 Aug 2017 16:44:00 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
         "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: [PATCH V2 11/20] blk-mq: introduce helpers for operating
+ ->dispatch list
+Date: Tue, 22 Aug 2017 20:43:12 +0000
+Message-ID: <1503434591.2508.20.camel@wdc.com>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
- <20170805065705.12989-12-ming.lei@redhat.com>
- <1503434591.2508.20.camel@wdc.com>
-Cc: "loberman@redhat.com" <loberman@redhat.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <12634573-89fa-90cc-f481-464a490f7915@wdc.com>
-Date: Thu, 24 Aug 2017 09:59:13 +0900
+         <20170805065705.12989-12-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-12-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1503434591.2508.20.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
-On 8/23/17 05:43, Bart Van Assche wrote:
-> On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
->> +static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
->> +{
->> +	return !list_empty_careful(&hctx->dispatch);
->> +}
->> +
->> +static inline void blk_mq_add_rq_to_dispatch(struct blk_mq_hw_ctx *hctx,
->> +		struct request *rq)
->> +{
->> +	spin_lock(&hctx->lock);
->> +	list_add(&rq->queuelist, &hctx->dispatch);
->> +	blk_mq_hctx_set_dispatch_busy(hctx);
->> +	spin_unlock(&hctx->lock);
->> +}
->> +
->> +static inline void blk_mq_add_list_to_dispatch(struct blk_mq_hw_ctx *hctx,
->> +		struct list_head *list)
->> +{
->> +	spin_lock(&hctx->lock);
->> +	list_splice_init(list, &hctx->dispatch);
->> +	blk_mq_hctx_set_dispatch_busy(hctx);
->> +	spin_unlock(&hctx->lock);
->> +}
->> +
->> +static inline void blk_mq_add_list_to_dispatch_tail(struct blk_mq_hw_ctx *hctx,
->> +						    struct list_head *list)
->> +{
->> +	spin_lock(&hctx->lock);
->> +	list_splice_tail_init(list, &hctx->dispatch);
->> +	blk_mq_hctx_set_dispatch_busy(hctx);
->> +	spin_unlock(&hctx->lock);
->> +}
->> +
->> +static inline void blk_mq_take_list_from_dispatch(struct blk_mq_hw_ctx *hctx,
->> +		struct list_head *list)
->> +{
->> +	spin_lock(&hctx->lock);
->> +	list_splice_init(&hctx->dispatch, list);
->> +	spin_unlock(&hctx->lock);
->> +}
-> 
-> Same comment for this patch: these helper functions are so short that I'm not
-> sure it is useful to introduce these helper functions.
-> 
-> Bart.
-
-Personally, I like those very much as they give a place to hook up
-different dispatch_list handling without having to change blk-mq.c and
-blk-mq-sched.c all over the place.
-
-I am thinking of SMR (zoned block device) support here since we need to
-to sort insert write requests in blk_mq_add_rq_to_dispatch() and
-blk_mq_add_list_to_dispatch_tail(). For this last one, the name would
-become a little awkward though. This sort insert would be to avoid
-breaking a sequential write request sequence sent by the disk user. This
-is needed since this reordering breakage cannot be solved only from the
-SCSI layer.
-
-blk_mq_add_list_to_dispatch() and blk_mq_add_list_to_dispatch_tail()
-could be combined together into blk_mq_add_list_to_dispatch() with the
-addition of a "where" argument (BLK_MQ_INSERT_HEAD or
-BLK_MQ_INSERT_TAIL), or like some other functions in blk-mq, the
-addition of a simple "bool at_head" argument.
-
-Best regards.
-
--- 
-Damien Le Moal,
-Western Digital Research
+T24gU2F0LCAyMDE3LTA4LTA1IGF0IDE0OjU2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gK3N0
+YXRpYyBpbmxpbmUgYm9vbCBibGtfbXFfaGFzX2Rpc3BhdGNoX3JxcyhzdHJ1Y3QgYmxrX21xX2h3
+X2N0eCAqaGN0eCkNCj4gK3sNCj4gKwlyZXR1cm4gIWxpc3RfZW1wdHlfY2FyZWZ1bCgmaGN0eC0+
+ZGlzcGF0Y2gpOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQgYmxrX21xX2FkZF9y
+cV90b19kaXNwYXRjaChzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCwNCj4gKwkJc3RydWN0IHJl
+cXVlc3QgKnJxKQ0KPiArew0KPiArCXNwaW5fbG9jaygmaGN0eC0+bG9jayk7DQo+ICsJbGlzdF9h
+ZGQoJnJxLT5xdWV1ZWxpc3QsICZoY3R4LT5kaXNwYXRjaCk7DQo+ICsJYmxrX21xX2hjdHhfc2V0
+X2Rpc3BhdGNoX2J1c3koaGN0eCk7DQo+ICsJc3Bpbl91bmxvY2soJmhjdHgtPmxvY2spOw0KPiAr
+fQ0KPiArDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQgYmxrX21xX2FkZF9saXN0X3RvX2Rpc3BhdGNo
+KHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4LA0KPiArCQlzdHJ1Y3QgbGlzdF9oZWFkICpsaXN0
+KQ0KPiArew0KPiArCXNwaW5fbG9jaygmaGN0eC0+bG9jayk7DQo+ICsJbGlzdF9zcGxpY2VfaW5p
+dChsaXN0LCAmaGN0eC0+ZGlzcGF0Y2gpOw0KPiArCWJsa19tcV9oY3R4X3NldF9kaXNwYXRjaF9i
+dXN5KGhjdHgpOw0KPiArCXNwaW5fdW5sb2NrKCZoY3R4LT5sb2NrKTsNCj4gK30NCj4gKw0KPiAr
+c3RhdGljIGlubGluZSB2b2lkIGJsa19tcV9hZGRfbGlzdF90b19kaXNwYXRjaF90YWlsKHN0cnVj
+dCBibGtfbXFfaHdfY3R4ICpoY3R4LA0KPiArCQkJCQkJICAgIHN0cnVjdCBsaXN0X2hlYWQgKmxp
+c3QpDQo+ICt7DQo+ICsJc3Bpbl9sb2NrKCZoY3R4LT5sb2NrKTsNCj4gKwlsaXN0X3NwbGljZV90
+YWlsX2luaXQobGlzdCwgJmhjdHgtPmRpc3BhdGNoKTsNCj4gKwlibGtfbXFfaGN0eF9zZXRfZGlz
+cGF0Y2hfYnVzeShoY3R4KTsNCj4gKwlzcGluX3VubG9jaygmaGN0eC0+bG9jayk7DQo+ICt9DQo+
+ICsNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCBibGtfbXFfdGFrZV9saXN0X2Zyb21fZGlzcGF0Y2go
+c3RydWN0IGJsa19tcV9od19jdHggKmhjdHgsDQo+ICsJCXN0cnVjdCBsaXN0X2hlYWQgKmxpc3Qp
+DQo+ICt7DQo+ICsJc3Bpbl9sb2NrKCZoY3R4LT5sb2NrKTsNCj4gKwlsaXN0X3NwbGljZV9pbml0
+KCZoY3R4LT5kaXNwYXRjaCwgbGlzdCk7DQo+ICsJc3Bpbl91bmxvY2soJmhjdHgtPmxvY2spOw0K
+PiArfQ0KDQpTYW1lIGNvbW1lbnQgZm9yIHRoaXMgcGF0Y2g6IHRoZXNlIGhlbHBlciBmdW5jdGlv
+bnMgYXJlIHNvIHNob3J0IHRoYXQgSSdtIG5vdA0Kc3VyZSBpdCBpcyB1c2VmdWwgdG8gaW50cm9k
+dWNlIHRoZXNlIGhlbHBlciBmdW5jdGlvbnMuDQoNCkJhcnQu
