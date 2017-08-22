@@ -1,71 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59098 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG5o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:57:44 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 07/20] blk-mq-sched: introduce blk_mq_sched_queue_depth()
-Date: Sat,  5 Aug 2017 14:56:52 +0800
-Message-Id: <20170805065705.12989-8-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:18467 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751290AbdHVXBl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Aug 2017 19:01:41 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v2 0/2] Make I/O timeout failure injection again task-independent
+Date: Tue, 22 Aug 2017 16:00:41 -0700
+Message-Id: <20170822230043.9968-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The following patch will propose some hints to figure out
-default queue depth for scheduler queue, so introduce helper
-of blk_mq_sched_queue_depth() for this purpose.
+Hello Andrew,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c |  8 +-------
- block/blk-mq-sched.h | 11 +++++++++++
- 2 files changed, 12 insertions(+), 7 deletions(-)
+A recent change in the fault injection code introduced an undesired change
+in the behavior of the I/O timeout failure injection code. This series
+restores the original behavior. Please consider these patches for kernel
+v4.14.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 26dc19204548..2eda942357c3 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -585,13 +585,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 		return 0;
- 	}
- 
--	/*
--	 * Default to double of smaller one between hw queue_depth and 128,
--	 * since we don't split into sync/async like the old code did.
--	 * Additionally, this is a per-hw queue depth.
--	 */
--	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
--				   BLKDEV_MAX_RQ);
-+	q->nr_requests = blk_mq_sched_queue_depth(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 9267d0b7c197..1d47f3fda1d0 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -96,4 +96,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
- 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
- }
- 
-+static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
-+{
-+	/*
-+	 * Default to double of smaller one between hw queue_depth and 128,
-+	 * since we don't split into sync/async like the old code did.
-+	 * Additionally, this is a per-hw queue depth.
-+	 */
-+	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
-+				   BLKDEV_MAX_RQ);
-+}
-+
- #endif
+Thanks,
+
+Bart.
+
+Changes compared to v1:
+- Fixed build with CONFIG_FAIL_PAGE_ALLOC, CONFIG_FAIL_IO_TIMEOUT and/or
+  CONFIG_FAIL_FUTEX enabled.
+
+Bart Van Assche (2):
+  fault-inject: Restore support for task-independent fault injection
+  block: Make I/O timeout failure injection again task-independent
+
+ block/blk-timeout.c          |  2 +-
+ include/linux/fault-inject.h | 11 +++++++++--
+ lib/fault-inject.c           |  4 +++-
+ 3 files changed, 13 insertions(+), 4 deletions(-)
+
 -- 
-2.9.4
+2.14.0
