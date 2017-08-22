@@ -1,171 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33540 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG54 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:57:56 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 11/20] blk-mq: introduce helpers for operating ->dispatch list
-Date: Sat,  5 Aug 2017 14:56:56 +0800
-Message-Id: <20170805065705.12989-12-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
+Received: from mail-pf0-f175.google.com ([209.85.192.175]:35548 "EHLO
+        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752377AbdHVRdN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Aug 2017 13:33:13 -0400
+Received: by mail-pf0-f175.google.com with SMTP id w127so17864973pfd.2
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2017 10:33:13 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Hannes Reinecke <hare@suse.de>,
+        Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH v3 1/4] loop: fix hang if LOOP_SET_STATUS gets invalid blocksize or encrypt type
+Date: Tue, 22 Aug 2017 10:32:58 -0700
+Message-Id: <cca214843b2555d1bb8b758bb0e5598094010b8a.1503422996.git.osandov@fb.com>
+In-Reply-To: <cover.1503422996.git.osandov@fb.com>
+References: <cover.1503422996.git.osandov@fb.com>
+In-Reply-To: <cover.1503422996.git.osandov@fb.com>
+References: <cover.1503422996.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 13 +++----------
- block/blk-mq.c       | 24 +++++++++++-------------
- block/blk-mq.h       | 40 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 54 insertions(+), 23 deletions(-)
+From: Omar Sandoval <osandov@fb.com>
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 9fae76275acf..5d435f01ecc8 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -152,12 +152,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * If we have previous entries on our dispatch list, grab them first for
- 	 * more fair dispatch.
- 	 */
--	if (!list_empty_careful(&hctx->dispatch)) {
--		spin_lock(&hctx->lock);
--		if (!list_empty(&hctx->dispatch))
--			list_splice_init(&hctx->dispatch, &rq_list);
--		spin_unlock(&hctx->lock);
--	}
-+	if (blk_mq_has_dispatch_rqs(hctx))
-+		blk_mq_take_list_from_dispatch(hctx, &rq_list);
+In both of these error cases, we need to make sure to unfreeze the queue
+before we return.
+
+Fixes: ecdd09597a57 ("block/loop: fix race between I/O and set_status")
+Fixes: f2c6df7dbf9a ("loop: support 4k physical blocksize")
+Tested-by: Milan Broz <gmazyland@gmail.com>
+Reviewed-by: Milan Broz <gmazyland@gmail.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ drivers/block/loop.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ef8334949b42..26548e07bc31 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1125,11 +1125,15 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	if (info->lo_encrypt_type) {
+ 		unsigned int type = info->lo_encrypt_type;
  
- 	/*
- 	 * Only ask the scheduler for requests, if we didn't have residual
-@@ -341,10 +337,7 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
- 	 * If we already have a real request tag, send directly to
- 	 * the dispatch list.
- 	 */
--	spin_lock(&hctx->lock);
--	blk_mq_hctx_set_dispatch_busy(hctx);
--	list_add(&rq->queuelist, &hctx->dispatch);
--	spin_unlock(&hctx->lock);
-+	blk_mq_add_rq_to_dispatch(hctx, rq);
- 	return true;
- }
+-		if (type >= MAX_LO_CRYPT)
+-			return -EINVAL;
++		if (type >= MAX_LO_CRYPT) {
++			err = -EINVAL;
++			goto exit;
++		}
+ 		xfer = xfer_funcs[type];
+-		if (xfer == NULL)
+-			return -EINVAL;
++		if (xfer == NULL) {
++			err = -EINVAL;
++			goto exit;
++		}
+ 	} else
+ 		xfer = NULL;
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 11042aa0501d..2392a813f5ee 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -63,7 +63,7 @@ static int blk_mq_poll_stats_bkt(const struct request *rq)
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx)
- {
- 	return sbitmap_any_bit_set(&hctx->ctx_map) ||
--			!list_empty_careful(&hctx->dispatch) ||
-+			blk_mq_has_dispatch_rqs(hctx) ||
- 			blk_mq_sched_has_work(hctx);
- }
- 
-@@ -1100,14 +1100,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 		rq = list_first_entry(list, struct request, queuelist);
- 		blk_mq_put_driver_tag(rq);
- 
--		spin_lock(&hctx->lock);
--		/*
--		 * DISPATCH_BUSY won't be cleared until all requests
--		 * in hctx->dispatch are dispatched successfully
--		 */
--		blk_mq_hctx_set_dispatch_busy(hctx);
--		list_splice_init(list, &hctx->dispatch);
--		spin_unlock(&hctx->lock);
-+		blk_mq_add_list_to_dispatch(hctx, list);
- 
- 		/*
- 		 * If SCHED_RESTART was set by the caller of this function and
-@@ -1882,10 +1875,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	if (list_empty(&tmp))
- 		return 0;
- 
--	spin_lock(&hctx->lock);
--	blk_mq_hctx_set_dispatch_busy(hctx);
--	list_splice_tail_init(&tmp, &hctx->dispatch);
--	spin_unlock(&hctx->lock);
-+	blk_mq_add_list_to_dispatch_tail(hctx, &tmp);
- 
- 	blk_mq_run_hw_queue(hctx, true);
- 	return 0;
-@@ -1935,6 +1925,13 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+@@ -1144,10 +1148,14 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		if (LO_INFO_BLOCKSIZE(info) != 512 &&
+ 		    LO_INFO_BLOCKSIZE(info) != 1024 &&
+ 		    LO_INFO_BLOCKSIZE(info) != 2048 &&
+-		    LO_INFO_BLOCKSIZE(info) != 4096)
+-			return -EINVAL;
+-		if (LO_INFO_BLOCKSIZE(info) > lo->lo_blocksize)
+-			return -EINVAL;
++		    LO_INFO_BLOCKSIZE(info) != 4096) {
++			err = -EINVAL;
++			goto exit;
++		}
++		if (LO_INFO_BLOCKSIZE(info) > lo->lo_blocksize) {
++			err = -EINVAL;
++			goto exit;
++		}
  	}
- }
  
-+static void blk_mq_init_dispatch(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx)
-+{
-+	spin_lock_init(&hctx->lock);
-+	INIT_LIST_HEAD(&hctx->dispatch);
-+}
-+
- static int blk_mq_init_hctx(struct request_queue *q,
- 		struct blk_mq_tag_set *set,
- 		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
-@@ -1948,6 +1945,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	INIT_DELAYED_WORK(&hctx->run_work, blk_mq_run_work_fn);
- 	spin_lock_init(&hctx->lock);
- 	INIT_LIST_HEAD(&hctx->dispatch);
-+	blk_mq_init_dispatch(q, hctx);
- 	hctx->queue = q;
- 	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index cadc0c83a140..7f0d35ca5fea 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -151,4 +151,44 @@ static inline void blk_mq_hctx_clear_dispatch_busy(struct blk_mq_hw_ctx *hctx)
- 	clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
- }
- 
-+static inline bool blk_mq_has_dispatch_rqs(struct blk_mq_hw_ctx *hctx)
-+{
-+	return !list_empty_careful(&hctx->dispatch);
-+}
-+
-+static inline void blk_mq_add_rq_to_dispatch(struct blk_mq_hw_ctx *hctx,
-+		struct request *rq)
-+{
-+	spin_lock(&hctx->lock);
-+	list_add(&rq->queuelist, &hctx->dispatch);
-+	blk_mq_hctx_set_dispatch_busy(hctx);
-+	spin_unlock(&hctx->lock);
-+}
-+
-+static inline void blk_mq_add_list_to_dispatch(struct blk_mq_hw_ctx *hctx,
-+		struct list_head *list)
-+{
-+	spin_lock(&hctx->lock);
-+	list_splice_init(list, &hctx->dispatch);
-+	blk_mq_hctx_set_dispatch_busy(hctx);
-+	spin_unlock(&hctx->lock);
-+}
-+
-+static inline void blk_mq_add_list_to_dispatch_tail(struct blk_mq_hw_ctx *hctx,
-+						    struct list_head *list)
-+{
-+	spin_lock(&hctx->lock);
-+	list_splice_tail_init(list, &hctx->dispatch);
-+	blk_mq_hctx_set_dispatch_busy(hctx);
-+	spin_unlock(&hctx->lock);
-+}
-+
-+static inline void blk_mq_take_list_from_dispatch(struct blk_mq_hw_ctx *hctx,
-+		struct list_head *list)
-+{
-+	spin_lock(&hctx->lock);
-+	list_splice_init(&hctx->dispatch, list);
-+	spin_unlock(&hctx->lock);
-+}
-+
- #endif
+ 	if (lo->lo_offset != info->lo_offset ||
 -- 
-2.9.4
+2.14.1
