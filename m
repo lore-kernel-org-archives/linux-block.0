@@ -1,80 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56704 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752188AbdHHUcu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 16:32:50 -0400
-Date: Tue, 8 Aug 2017 13:32:46 -0700
-From: Shaohua Li <shli@kernel.org>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: linux-block@vger.kernel.org, hch@infradead.org, jack@suse.cz,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: Re: [PATCH 1/9] QUEUE_FLAG_NOWAIT to indicate device supports nowait
-Message-ID: <20170808203246.sdjnpzixxz5brjaf@kernel.org>
-References: <20170726235806.12148-1-rgoldwyn@suse.de>
- <20170726235806.12148-2-rgoldwyn@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170726235806.12148-2-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=400f95d56=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Michal Hocko <mhocko@kernel.org>
+Subject: [PATCH 2/2] block: Make I/O timeout failure injection support again task-independent
+Date: Tue, 22 Aug 2017 09:52:36 -0700
+Message-Id: <20170822165236.12275-3-bart.vanassche@wdc.com>
+In-Reply-To: <20170822165236.12275-1-bart.vanassche@wdc.com>
+References: <20170822165236.12275-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jul 26, 2017 at 06:57:58PM -0500, Goldwyn Rodrigues wrote:
-> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> 
-> Nowait is a feature of direct AIO, where users can request
-> to return immediately if the I/O is going to block. This translates
-> to REQ_NOWAIT in bio.bi_opf flags. While request based devices
-> don't wait, stacked devices such as md/dm will.
-> 
-> In order to explicitly mark stacked devices as supported, we
-> set the QUEUE_FLAG_NOWAIT in the queue_flags and return -EAGAIN
-> whenever the device would block.
+Commit e41d58185f14 made all faults that are triggered from task
+context, including I/O timeouts, dependent on the failure
+injection settings for that task. Make it again possible to inject
+I/O timeout failures independent of task context. An example for a
+fault injection for which this patch makes a difference (from a VM
+booted with the 'threadirqs' command line parameter):
 
-probably you should route this patch to Jens first, DM/MD are different trees.
+FAULT_INJECTION: forcing a failure. name fail_io_timeout, interval 1, probability 100, space 0, times 1
+CPU: 6 PID: 1253 Comm: irq/36-skd0-msi Not tainted 4.13.0-rc2-dbg+ #5
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1.fc26 04/01/2014
+Call Trace:
+ dump_stack+0x8e/0xcd
+ should_fail+0x154/0x160
+ blk_should_fake_timeout+0x27/0x30
+ blk_mq_complete_request+0x11/0x30
+ skd_end_request+0x32/0xc0 [skd]
+ skd_isr_completion_posted.isra.30+0x14a/0x400 [skd]
+ skd_comp_q+0x40/0xb0 [skd]
+ irq_forced_thread_fn+0x2a/0x70
+ irq_thread+0x144/0x1a0
+ kthread+0x125/0x140
+ ret_from_fork+0x2a/0x40
+
+Fixes: commit e41d58185f14 ("fault-inject: support systematic fault injection")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Akinobu Mita <akinobu.mita@gmail.com>
+Cc: Michal Hocko <mhocko@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+---
+ block/blk-timeout.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 17ec83bb0900..2e92b20b125f 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -11,7 +11,7 @@
  
-> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-> ---
->  block/blk-core.c       | 3 ++-
->  include/linux/blkdev.h | 2 ++
->  2 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 970b9c9638c5..1c9a981d88e5 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -2025,7 +2025,8 @@ generic_make_request_checks(struct bio *bio)
->  	 * if queue is not a request based queue.
->  	 */
->  
-> -	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
-> +	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q) &&
-> +	    !blk_queue_supports_nowait(q))
->  		goto not_supported;
->  
->  	part = bio->bi_bdev->bd_part;
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 25f6a0cb27d3..fae021ebec1b 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -633,6 +633,7 @@ struct request_queue {
->  #define QUEUE_FLAG_REGISTERED  29	/* queue has been registered to a disk */
->  #define QUEUE_FLAG_SCSI_PASSTHROUGH 30	/* queue supports SCSI commands */
->  #define QUEUE_FLAG_QUIESCED    31	/* queue has been quiesced */
-> +#define QUEUE_FLAG_NOWAIT      32	/* stack device driver supports REQ_NOWAIT */
->  
->  #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
->  				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-> @@ -732,6 +733,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
->  #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
->  #define blk_queue_scsi_passthrough(q)	\
->  	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
-> +#define blk_queue_supports_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
-
-Should this bit consider under layer disks? For example, one raid array disk
-doesn't support NOWAIT, shouldn't we disable NOWAIT for the array?
+ #ifdef CONFIG_FAIL_IO_TIMEOUT
  
-I have another generic question. If a bio is splitted into 2 bios, one bio
-doesn't need to wait but the other need to wait. We will return -EAGAIN for the
-second bio, so the whole bio will return -EAGAIN, but the first bio is already
-dispatched to disk. Is this correct behavior?
+-static DECLARE_FAULT_ATTR(fail_io_timeout);
++static DECLARE_GLOBAL_FAULT_ATTR(fail_io_timeout);
+ 
+ static int __init setup_fail_io_timeout(char *str)
+ {
+-- 
+2.14.0
