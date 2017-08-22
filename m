@@ -1,39 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f51.google.com ([74.125.83.51]:36937 "EHLO
-        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750993AbdHRT1p (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2017 15:27:45 -0400
-Received: by mail-pg0-f51.google.com with SMTP id y129so70018811pgy.4
-        for <linux-block@vger.kernel.org>; Fri, 18 Aug 2017 12:27:44 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Hannes Reinecke <hare@suse.de>,
-        Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>
-Subject: [PATCH v2 0/3] loop: LO_FLAGS_BLOCKSIZE fixes
-Date: Fri, 18 Aug 2017 12:27:34 -0700
-Message-Id: <cover.1503084216.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=400f95d56=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Michal Hocko <mhocko@kernel.org>
+Subject: [PATCH v2 2/2] block: Make I/O timeout failure injection again task-independent
+Date: Tue, 22 Aug 2017 16:00:43 -0700
+Message-Id: <20170822230043.9968-3-bart.vanassche@wdc.com>
+In-Reply-To: <20170822230043.9968-1-bart.vanassche@wdc.com>
+References: <20170822230043.9968-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Commit e41d58185f14 made all faults that are triggered from task
+context, including I/O timeouts, dependent on the failure
+injection settings for that task. Make it again possible to inject
+I/O timeout failures independent of task context. An example for a
+fault injection for which this patch makes a difference (from a VM
+booted with the 'threadirqs' command line parameter):
 
-Patches 1 and 3 are from the original series.
+FAULT_INJECTION: forcing a failure. name fail_io_timeout, interval 1, probability 100, space 0, times 1
+CPU: 6 PID: 1253 Comm: irq/36-skd0-msi Not tainted 4.13.0-rc2-dbg+ #5
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1.fc26 04/01/2014
+Call Trace:
+ dump_stack+0x8e/0xcd
+ should_fail+0x154/0x160
+ blk_should_fake_timeout+0x27/0x30
+ blk_mq_complete_request+0x11/0x30
+ skd_end_request+0x32/0xc0 [skd]
+ skd_isr_completion_posted.isra.30+0x14a/0x400 [skd]
+ skd_comp_q+0x40/0xb0 [skd]
+ irq_forced_thread_fn+0x2a/0x70
+ irq_thread+0x144/0x1a0
+ kthread+0x125/0x140
+ ret_from_fork+0x2a/0x40
 
-Patch 2 gets rid of the redundant struct loop_device.lo_logical_blocksize
-in favor of using the queue's own logical_block_size. Karel, I decided
-against adding another sysfs entry since it will always be the same as
-queue/logical_block_size, is that alright with you?
+Fixes: commit e41d58185f14 ("fault-inject: support systematic fault injection")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Akinobu Mita <akinobu.mita@gmail.com>
+Cc: Michal Hocko <mhocko@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+---
+ block/blk-timeout.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Omar Sandoval (3):
-  loop: fix hang if LOOP_SET_STATUS gets invalid blocksize or encrypt
-    type
-  loop: use queue limit instead of private lo_logical_blocksize
-  loop: always return block size in LOOP_GET_STATUS
-
- drivers/block/loop.c | 71 ++++++++++++++++++++++++++--------------------------
- drivers/block/loop.h |  1 -
- 2 files changed, 36 insertions(+), 36 deletions(-)
-
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 17ec83bb0900..2e92b20b125f 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -11,7 +11,7 @@
+ 
+ #ifdef CONFIG_FAIL_IO_TIMEOUT
+ 
+-static DECLARE_FAULT_ATTR(fail_io_timeout);
++static DECLARE_GLOBAL_FAULT_ATTR(fail_io_timeout);
+ 
+ static int __init setup_fail_io_timeout(char *str)
+ {
 -- 
-2.14.1
+2.14.0
