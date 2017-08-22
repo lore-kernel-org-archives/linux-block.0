@@ -1,75 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0096.outbound.protection.outlook.com ([104.47.41.96]:17185
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751670AbdH2PdR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Aug 2017 11:33:17 -0400
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: "osandov@fb.com" <osandov@fb.com>,
-        "damien.lemoal@wdc.com" <damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: Improvements to the hybrid polling sleep time
  calculation
-Date: Tue, 29 Aug 2017 15:33:15 +0000
-Message-ID: <B1195188-245E-42BE-AC5D-2070F33E1D93@raithlin.com>
+To: sbates@raithlin.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: osandov@fb.com, damien.lemoal@wdc.com
 References: <1503326134-3862-1-git-send-email-sbates@raithlin.com>
- <54dad77e-18d7-eb64-35fb-670fecc83ce7@kernel.dk>
-In-Reply-To: <54dad77e-18d7-eb64-35fb-670fecc83ce7@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <54dad77e-18d7-eb64-35fb-670fecc83ce7@kernel.dk>
+Date: Tue, 22 Aug 2017 14:22:49 -0600
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1503326134-3862-1-git-send-email-sbates@raithlin.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Pj4gRnJvbTogU3RlcGhlbiBCYXRlcyA8c2JhdGVzQHJhaXRobGluLmNvbT4NCj4+IA0KPj4gSHli
-cmlkIHBvbGxpbmcgY3VycmVudGx5IHVzZXMgaGFsZiB0aGUgYXZlcmFnZSBjb21wbGV0aW9uIHRp
-bWUgYXMgYW4NCj4+IGVzdGltYXRlIG9mIGhvdyBsb25nIHRvIHBvbGwgZm9yLiBXZSBjYW4gaW1w
-cm92ZSB1cG9uIHRoaXMgYnkgbm90aW5nDQo+PiB0aGF0IHBvbGxpbmcgYmVmb3JlIHRoZSBtaW5p
-bXVtIGNvbXBsZXRpb24gdGltZSBtYWtlcyBubyBzZW5zZS4gQWRkIGENCj4+IHN5c2ZzIGVudHJ5
-IHRvIHVzZSB0aGlzIGZhY3QgdG8gaW1wcm92ZSBDUFUgdXRpbGl6YXRpb24gaW4gY2VydGFpbg0K
-Pj4gY2FzZXMuDQo+PiANCj4+IEF0IHRoZSBzYW1lIHRpbWUgdGhlIG1pbmltdW0gaXMgYSBiaXQg
-dG9vIGxvbmcgdG8gc2xlZXAgZm9yIHNpbmNlIHdlDQo+PiBtdXN0IGZhY3RvciBpbiBPUyB3YWtl
-IHRpbWUgZm9yIHRoZSB0aHJlYWQuIEZvciBub3cgYWxsb3cgdGhlIHVzZXIgdG8NCj4+IHNldCB0
-aGlzIHZpYSBhIHNlY29uZCBzeXNmcyBlbnRyeSAoaW4gbmFub3NlY29uZHMpLg0KPj4gDQo+PiBU
-ZXN0aW5nIHRoaXMgcGF0Y2ggb24gSW50ZWwgT3B0YW5lIFNTRHMgc2hvd2VkIHRoYXQgdXNpbmcg
-dGhlIG1pbmltdW0NCj4+IHJhdGhlciB0aGFuIGhhbGYgcmVkdWNlZCBDUFUgdXRpbGl6YXRpb24g
-ZnJvbSA1OSUgdG8gMzglLiBUdW5pbmcNCj4+IHRoaXMgdmlhIHRoZSB3YWtlIHRpbWUgYWRqdXN0
-bWVudCBhbGxvd2VkIHVzIHRvIHRyYWRlIENQVSBsb2FkIGZvcg0KPj4gbGF0ZW5jeS4gRm9yIGV4
-YW1wbGUNCj4+IA0KPj4gaW9fcG9sbAkgZGVsYXkJaHliX3VzZV9taW4gYWRqdXN0CWxhdGVuY3kJ
-Q1BVIGxvYWQNCj4+IDEJIC0xCU4vQQkgICAgTi9BCQk4LjQJMTAwJQ0KPj4gMQkgMAkwCSAgICBO
-L0EJCTguNAk1NyUNCj4+IDEJIDAJMQkgICAgMAkJMTAuMwkzNCUNCj4+IDEJIDkJMQkgICAgMTAw
-MAk5LjkJMzclDQo+PiAxCSAwCTEJICAgIDIwMDAJOC40CTQ3JQ0KPj4gMQkgMAkxCSAgICAxMDAw
-MAk4LjQJMTAwJQ0KPj4gDQo+PiBJZGVhbGx5IHdlIHdpbGwgZXh0ZW5kIHRoaXMgdG8gYXV0by1j
-YWxjdWxhdGUgdGhlIHdha2UgdGltZSByYXRoZXINCj4+IHRoYW4gaGF2ZSBpdCBzZXQgYnkgdGhl
-IHVzZXIuDQo+DQo+IEkgZG9uJ3QgbGlrZSB0aGlzLCBpdCdzIGFub3RoZXIgd2VpcmQga25vYiB0
-aGF0IHdpbGwgZXhpc3QgYnV0IHRoYXQNCj4gbm8gb25lIHdpbGwga25vdyBob3cgdG8gdXNlLiBG
-b3IgbW9zdCBvZiB0aGUgdGVzdGluZyBJJ3ZlIGRvbmUNCj4gcmVjZW50bHksIGh5YnJpZCBpcyBh
-IHdpbiBvdmVyIGJ1c3kgcG9sbGluZyAtIGhlbmNlIEkgdGhpbmsgd2Ugc2hvdWxkDQo+IG1ha2Ug
-dGhhdCB0aGUgZGVmYXVsdC4gNjAlIG9mIG1lYW4gaGFzIGFsc28sIGluIHRlc3RpbmcsIGJlZW4g
-c2hvd24NCj4gdG8gYmUgYSB3aW4uIFNvIHRoYXQncyBhbiBlYXN5IGZpeC9jaGFuZ2Ugd2UgY2Fu
-IGNvbnNpZGVyLg0KDQpJIGRvIGFncmVlIHRoYXQgdGhlIHRoaXMgaXMgYSBoYXJkIGtub2IgdG8g
-dHVuZS4gSSBhbSBob3dldmVyIG5vdCBoYXBweSB0aGF0IHRoZSBjdXJyZW50IGh5YnJpZCBkZWZh
-dWx0IG1heSBtZWFuIHdlIGFyZSBwb2xsaW5nIHdlbGwgYmVmb3JlIHRoZSBtaW5pbXVtIGNvbXBs
-ZXRpb24gdGltZS4gVGhhdCBqdXN0IHNlZW1zIGxpa2UgYSB3YXN0ZSBvZiBDUFUgcmVzb3VyY2Vz
-IHRvIG1lLiBJIGRvIGFncmVlIHRoYXQgdHVybmluZyBvbiBoeWJyaWQgYXMgdGhlIGRlZmF1bHQg
-YW5kIHBlcmhhcHMgYnVtcGluZyB1cCB0aGUgZGVmYXVsdCBpcyBhIGdvb2QgaWRlYS4NCg0KPiBU
-byBnbyBiZXlvbmQgdGhhdCwgSSdkIG11Y2ggcmF0aGVyIHNlZSB1cyB0cmFja2luZyB0aGUgdGlt
-ZSB3YXN0ZS4NCj4gSWYgd2UgY29uc2lkZXIgdGhlIHRvdGFsIGNvbXBsZXRpb24gdGltZSBvZiBh
-biBJTyB0byBiZSBBK0IrQywgd2hlcmU6DQo+DQo+IEEJVGltZSBuZWVkZWQgdG8gZ28gdG8gc2xl
-ZXANCj4gQglTbGVlcCB0aW1lDQo+IEMJVGltZSBuZWVkZWQgdG8gd2FrZSB1cA0KPg0KPiB0aGVu
-IHdlIGNvdWxkIGZlYXNpYmx5IHRyYWNrIEErQy4gV2UgYWxyZWFkeSBrbm93IGhvdyBsb25nIHRo
-ZSBJTw0KPiB3aWxsIHRha2UgdG8gY29tcGxldGUsIGFzIHdlIHRyYWNrIHRoYXQuIEF0IHRoYXQg
-cG9pbnQgd2UnZCBoYXZlDQo+IGEgZnVsbCBwaWN0dXJlIG9mIGhvdyBsb25nIHdlIHNob3VsZCBz
-bGVlcC4NCg0KWWVzLCB0aGlzIGlzIHdoZXJlIEkgd2FzIHRoaW5raW5nIG9mIHRha2luZyB0aGlz
-IGZ1bmN0aW9uYWxpdHkgaW4gdGhlIGxvbmcgdGVybS4gSXQgc2VlbXMgbGlrZSB0cmFja2luZyBD
-IGlzIHNvbWV0aGluZyBvdGhlciBwYXJ0cyBvZiB0aGUga2VybmVsIG1pZ2h0IG5lZWQuIERvZXMg
-YW55b25lIGtub3cgb2YgYW55IGV4aXN0aW5nIGNvZGUgaW4gdGhpcyBzcGFjZT8NCg0KPiBCb251
-cyBwb2ludHMgZm9yIGluZm9ybWluZyB0aGUgbG93ZXIgbGV2ZWwgc2NoZWR1bGVyIG9mIHRoaXMg
-YXMNCj4gd2VsbC4gSWYgdGhlIENQVSBpcyBnb2luZyBpZGxlLCB3ZSdsbCBlbnRlciBzb21lIHNv
-cnQgb2YgcG93ZXINCj4gc3RhdGUgaW4gdGhlIHByb2Nlc3Nvci4gSWYgd2Ugd2VyZSBhYmxlIHRv
-IHBhc3MgaW4gaG93IGxvbmcgd2UNCj4gZXhwZWN0IHRvIHNsZWVwLCB3ZSBjb3VsZCBiZSBtYWtp
-bmcgYmV0dGVyIGRlY2lzaW9ucyBoZXJlLg0KDQpZdXAuIEFnYWluLCB0aGlzIHNlZW1zIGxpa2Ug
-c29tZXRoaW5nIG1vcmUgZ2VuZXJhbCB0aGF0IGp1c3QgdGhlIGJsb2NrLWxheWVyLiBJIHdpbGwg
-ZG8gc29tZSBkaWdnaW5nIGFuZCBzZWUvaWYgYW55dGhpbmcgaXMgYXZhaWxhYmxlIHRvIGxldmVy
-YWdlIGhlcmUuDQoNCkNoZWVycw0KU3RlcGhlbg0KDQoNCg0K
+On 08/21/2017 08:35 AM, sbates@raithlin.com wrote:
+> From: Stephen Bates <sbates@raithlin.com>
+> 
+> Hybrid polling currently uses half the average completion time as an
+> estimate of how long to poll for. We can improve upon this by noting
+> that polling before the minimum completion time makes no sense. Add a
+> sysfs entry to use this fact to improve CPU utilization in certain
+> cases.
+> 
+> At the same time the minimum is a bit too long to sleep for since we
+> must factor in OS wake time for the thread. For now allow the user to
+> set this via a second sysfs entry (in nanoseconds).
+> 
+> Testing this patch on Intel Optane SSDs showed that using the minimum
+> rather than half reduced CPU utilization from 59% to 38%. Tuning
+> this via the wake time adjustment allowed us to trade CPU load for
+> latency. For example
+> 
+> io_poll	 delay	hyb_use_min adjust	latency	CPU load
+> 1	 -1	N/A	    N/A		8.4	100%
+> 1	 0	0	    N/A		8.4	57%
+> 1	 0	1	    0		10.3	34%
+> 1	 9	1	    1000	9.9	37%
+> 1	 0	1	    2000	8.4	47%
+> 1	 0	1	    10000	8.4	100%
+> 
+> Ideally we will extend this to auto-calculate the wake time rather
+> than have it set by the user.
+
+I don't like this, it's another weird knob that will exist but that
+no one will know how to use. For most of the testing I've done
+recently, hybrid is a win over busy polling - hence I think we should
+make that the default. 60% of mean has also, in testing, been shown
+to be a win. So that's an easy fix/change we can consider.
+
+To go beyond that, I'd much rather see us tracking the time waste.
+If we consider the total completion time of an IO to be A+B+C, where:
+
+A	Time needed to go to sleep
+B	Sleep time
+C	Time needed to wake up
+
+then we could feasibly track A+C. We already know how long the IO
+will take to complete, as we track that. At that point we'd have
+a full picture of how long we should sleep.
+
+Bonus points for informing the lower level scheduler of this as
+well. If the CPU is going idle, we'll enter some sort of power
+state in the processor. If we were able to pass in how long we
+expect to sleep, we could be making better decisions here.
+
+-- 
+Jens Axboe
