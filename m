@@ -1,58 +1,37 @@
-Return-Path: <axboe@kernel.dk>
-Date: Wed, 23 Aug 2017 14:02:20 -0600
-From: Jens Axboe <axboe@kernel.dk>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"loberman@redhat.com" <loberman@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:49673 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752664AbdHVUmD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Aug 2017 16:42:03 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH V2 10/20] blk-mq-sched: introduce helpers for query,
  change busy state
-Message-ID: <20170823200219.GC15083@kernel.dk>
+Date: Tue, 22 Aug 2017 20:41:14 +0000
+Message-ID: <1503434472.2508.19.camel@wdc.com>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
- <20170805065705.12989-11-ming.lei@redhat.com>
- <1503434472.2508.19.camel@wdc.com>
+         <20170805065705.12989-11-ming.lei@redhat.com>
+In-Reply-To: <20170805065705.12989-11-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1503434472.2508.19.camel@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, Aug 22 2017, Bart Van Assche wrote:
-> On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
-> > +static inline bool blk_mq_hctx_is_dispatch_busy(struct blk_mq_hw_ctx *hctx)
-> > +{
-> > +	return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-> > +}
-> > +
-> > +static inline void blk_mq_hctx_set_dispatch_busy(struct blk_mq_hw_ctx *hctx)
-> > +{
-> > +	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-> > +}
-> > +
-> > +static inline void blk_mq_hctx_clear_dispatch_busy(struct blk_mq_hw_ctx *hctx)
-> > +{
-> > +	clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-> > +}
-> 
-> Hello Ming,
-> 
-> Are these helper functions modified in a later patch? If not, please drop
-> this patch. One line helper functions are not useful and do not improve
-> readability of source code.
-
-Agree, they just obfuscate the code. Only reason to do this is to do
-things like:
-
-static inline void blk_mq_hctx_clear_dispatch_busy(struct blk_mq_hw_ctx *hctx)
-{
-        if (test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state))
-	        clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-}
-
-to avoid unecessary RMW (and locked instruction). At least then you can
-add a single comment as to why it's done that way. Apart from that, I
-prefer to open-code it so people don't have to grep to figure out wtf
-blk_mq_hctx_clear_dispatch_busy() does.
-
--- 
-Jens Axboe
+T24gU2F0LCAyMDE3LTA4LTA1IGF0IDE0OjU2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gK3N0
+YXRpYyBpbmxpbmUgYm9vbCBibGtfbXFfaGN0eF9pc19kaXNwYXRjaF9idXN5KHN0cnVjdCBibGtf
+bXFfaHdfY3R4ICpoY3R4KQ0KPiArew0KPiArCXJldHVybiB0ZXN0X2JpdChCTEtfTVFfU19ESVNQ
+QVRDSF9CVVNZLCAmaGN0eC0+c3RhdGUpOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW5saW5lIHZv
+aWQgYmxrX21xX2hjdHhfc2V0X2Rpc3BhdGNoX2J1c3koc3RydWN0IGJsa19tcV9od19jdHggKmhj
+dHgpDQo+ICt7DQo+ICsJc2V0X2JpdChCTEtfTVFfU19ESVNQQVRDSF9CVVNZLCAmaGN0eC0+c3Rh
+dGUpOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQgYmxrX21xX2hjdHhfY2xlYXJf
+ZGlzcGF0Y2hfYnVzeShzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCkNCj4gK3sNCj4gKwljbGVh
+cl9iaXQoQkxLX01RX1NfRElTUEFUQ0hfQlVTWSwgJmhjdHgtPnN0YXRlKTsNCj4gK30NCg0KSGVs
+bG8gTWluZywNCg0KQXJlIHRoZXNlIGhlbHBlciBmdW5jdGlvbnMgbW9kaWZpZWQgaW4gYSBsYXRl
+ciBwYXRjaD8gSWYgbm90LCBwbGVhc2UgZHJvcA0KdGhpcyBwYXRjaC4gT25lIGxpbmUgaGVscGVy
+IGZ1bmN0aW9ucyBhcmUgbm90IHVzZWZ1bCBhbmQgZG8gbm90IGltcHJvdmUNCnJlYWRhYmlsaXR5
+IG9mIHNvdXJjZSBjb2RlLg0KDQpUaGFua3MsDQoNCkJhcnQu
