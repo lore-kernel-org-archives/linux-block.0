@@ -1,6 +1,6 @@
 Return-Path: <sergey.senozhatsky.work@gmail.com>
 Return-Path: <sergey.senozhatsky.work@gmail.com>
-Date: Wed, 23 Aug 2017 14:55:17 +0900
+Date: Wed, 23 Aug 2017 14:44:38 +0900
 From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
 To: Boqun Feng <boqun.feng@gmail.com>
 Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
@@ -16,7 +16,7 @@ Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
 	kernel-team@lge.com
 Subject: Re: possible circular locking dependency detected [was: linux-next:
  Tree for Aug 22]
-Message-ID: <20170823055517.GB728@jagdpanzerIV.localdomain>
+Message-ID: <20170823054438.GA728@jagdpanzerIV.localdomain>
 References: <20170822183816.7925e0f8@canb.auug.org.au>
  <20170822104708.GA491@jagdpanzerIV.localdomain>
  <1503438234.2508.27.camel@wdc.com>
@@ -31,6 +31,9 @@ In-Reply-To: <20170823053501.GJ11771@tardis>
 List-ID: <linux-block@vger.kernel.org>
 
 On (08/23/17 13:35), Boqun Feng wrote:
+[..]
+> > >  		printk(KERN_CONT ");\n");
+> > 
 > > KERN_CONT and "\n" should not be together. "\n" flushes the cont
 > > buffer immediately.
 > > 
@@ -39,34 +42,24 @@ On (08/23/17 13:35), Boqun Feng wrote:
 > usages of printk(KERN_CONT "...\n") in kernel.
 > 
 > Did a bit research myself, and I now think the inappropriate use is to
-> use a KERN_CONT printk *after* another printk ending with a "\n".
+> use a KERN_CONT printk *after* another printk ending with a "\n". Am I
+> missing some recent changes or rules of KERN_CONT?
 
-ah... I didn't check __print_lock_name(): it leaves unflushed cont buffer
-upon the return. sorry, your code is correct.
+has been this way for quite some time (if not always).
+
+LOG_NEWLINE results in cont_flush(), which log_store() the content
+of KERN_CONT buffer.
+
+if we see that supplied message has no \n then we store it in a
+dedicated buffer (cont buffer)
+
+	if (!(lflags & LOG_NEWLINE))
+		return cont_add();
+	
+	return log_store();
+
+we flush that buffer (move its content to the kernel log buffer) when
+we receive a message with a \n or when printk() from another task/context
+interrupts the current cont line and, thus, forces us to flush.
 
 	-ss
-
-> > >  		printk("\n *** DEADLOCK ***\n\n");
-> > > +	} else if (cross_lock(src->instance)) {
-> > > +		printk(" Possible unsafe locking scenario by crosslock:\n\n");
-> > > +		printk("       CPU0                    CPU1\n");
-> > > +		printk("       ----                    ----\n");
-> > > +		printk("  lock(");
-> > > +		__print_lock_name(target);
-> > > +		printk(KERN_CONT ");\n");
-> > > +		printk("  lock(");
-> > > +		__print_lock_name(source);
-> > > +		printk(KERN_CONT ");\n");
-> > > +		printk("                               lock(");
-> > > +		__print_lock_name(parent == source ? target : parent);
-> > > +		printk(KERN_CONT ");\n");
-> > > +		printk("                               unlock(");
-> > > +		__print_lock_name(source);
-> > > +		printk(KERN_CONT ");\n");
-> > > +		printk("\n *** DEADLOCK ***\n\n");
-> > >  	} else {
-> > >  		printk(" Possible unsafe locking scenario:\n\n");
-> > >  		printk("       CPU0                    CPU1\n");
-> > > -- 
-> > > 2.14.1
-> > > 
