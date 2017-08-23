@@ -1,19 +1,48 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Wed, 23 Aug 2017 23:25:15 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <paolo.valente@linaro.org>, <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
 Subject: Re: [PATCH] block, bfq: fix error handle in bfq_init
-To: paolo.valente@linaro.org, linux-block@vger.kernel.org
+Message-ID: <20170823152515.GA9294@localhost.didichuxing.com>
 References: <20170818163714.GA40576@localhost.didichuxing.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c11e3747-27b9-75bc-9e4d-d9a665a83741@kernel.dk>
-Date: Wed, 23 Aug 2017 15:35:38 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 In-Reply-To: <20170818163714.GA40576@localhost.didichuxing.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/18/2017 10:37 AM, weiping zhang wrote:
+On Sat, Aug 19, 2017 at 12:37:20AM +0800, weiping zhang wrote:
 > if elv_register fail, bfq_pool should be free.
+> 
+> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> ---
+>  block/bfq-iosched.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 436b6ca..bdb072f 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5048,10 +5048,12 @@ static int __init bfq_init(void)
+>  
+>  	ret = elv_register(&iosched_bfq_mq);
+>  	if (ret)
+> -		goto err_pol_unreg;
+> +		goto slab_kill;
+>  
+>  	return 0;
+>  
+> +slab_kill:
+> +	bfq_slab_kill();
+>  err_pol_unreg:
+>  #ifdef CONFIG_BFQ_GROUP_IOSCHED
+>  	blkcg_policy_unregister(&blkcg_policy_bfq);
+> -- 
+> 2.9.4
+> 
+Hi Paolo, Jens,
 
-Looks correct to me, I'll add it. Thanks.
+could you give some comments for this patch ?
 
--- 
-Jens Axboe
+Thanks
