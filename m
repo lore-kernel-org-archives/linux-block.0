@@ -1,29 +1,28 @@
-Return-Path: <SRS0=1zCZ=7Z=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	Kernel-team@fb.com,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH 0/2] block/loop: improve performance
-Date: Wed, 23 Aug 2017 16:49:22 -0700
-Message-Id: <cover.1503531709.git.shli@fb.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 23 Aug 2017 20:06:01 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH 5/5] skd: Change default interrupt mode to MSI-X
+Message-ID: <20170823180601.GE5802@lst.de>
+References: <20170823175633.12680-1-bart.vanassche@wdc.com> <20170823175633.12680-6-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170823175633.12680-6-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On Wed, Aug 23, 2017 at 10:56:33AM -0700, Bart Van Assche wrote:
+> Since MSI support on some motherboards is unreliable, change the
+> default interrupt mode from MSI to MSI-X. This patch avoids that
+> the following message appears sporadially in the kernel logs of
+> my test setup:
 
-two small patches to improve performance for loop in directio mode. The goal is
-to increase IO size sending to underlayer disks.
+It might be worth noting that the driver still supports MSI
+and INTX interrupts in this mode, which makes it match what most
+other drivers do.
 
-Thanks,
-Shaohua
-
-Shaohua Li (2):
-  block/loop: set hw_sectors
-  block/loop: allow request merge for directio mode
-
- drivers/block/loop.c | 44 ++++++++++++++++++++++++++++++++++++--------
- drivers/block/loop.h |  1 +
- 2 files changed, 37 insertions(+), 8 deletions(-)
-
--- 
-2.9.5
+Signed-off-by: Christoph Hellwig <hch@lst.de>
