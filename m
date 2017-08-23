@@ -1,258 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56974 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752586AbdHNWFG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Aug 2017 18:05:06 -0400
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Cc: kernel-team@fb.com, Kyungchan Koh <kyungchan.koh@gmail.com>,
-        Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 7/9] nullb: bandwidth control
-Date: Mon, 14 Aug 2017 15:04:58 -0700
-Message-Id: <4847db4ee8b5476daf39a5e3bf1358164f237f30.1502746933.git.shli@fb.com>
-In-Reply-To: <cover.1502746933.git.shli@fb.com>
-References: <cover.1502746933.git.shli@fb.com>
-In-Reply-To: <cover.1502746933.git.shli@fb.com>
-References: <cover.1502746933.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] skd: error pointer dereference in skd_cons_disk()
+To: Dan Carpenter <dan.carpenter@oracle.com>,
+ Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20170823065122.pqju3ks5rxpymllz@mwanda>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2e42aaf6-2b6a-5dd7-23a8-a6301b829ae6@kernel.dk>
+Date: Wed, 23 Aug 2017 08:37:02 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170823065122.pqju3ks5rxpymllz@mwanda>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On 08/23/2017 05:20 AM, Dan Carpenter wrote:
+> My initial impulse was to check for IS_ERR_OR_NULL() but when I looked
+> at this code a bit more closely, we should only need to check for
+> IS_ERR().
+> 
+> The blk_mq_alloc_tag_set() returns negative error codes and zero on
+> success so we can just do an "if (rc) goto err_out;".  It's better to
+> preserve the error code anyhow.  The blk_mq_init_queue() returns error
+> pointers on failure, it never returns NULL.  We can also remove the
+> "q = NULL;" at the start because that's no longer needed.
 
-In test, we usually expect controllable disk speed. For example, in a
-raid array, we'd like some disks are fast and some are slow. MD RAID
-actually has a feature for this. To test the feature, we'd like to make
-the disk run in specific speed.
+Applied, thanks Dan.
 
-block throttling probably can be used for this purpose, but it requires
-cgroup setup. Here we just implement a simple throttling mechanism in
-the driver. There is slight fluctuation in the mechanism, but it's good
-enough for test.
-
-To configure the bandwidth cap, user sets the 'mbps' attribute. mbps is
-MB/s.
-
-Based on original patch from Kyungchan Koh
-
-Signed-off-by: Kyungchan Koh <kkc6196@fb.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/null_blk.c | 116 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 114 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 1f3cf25..7e6332e 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -23,6 +23,14 @@
- 
- #define FREE_BATCH		16
- 
-+#define TICKS_PER_SEC		50ULL
-+#define TIMER_INTERVAL		(NSEC_PER_SEC / TICKS_PER_SEC)
-+
-+static inline u64 mb_per_tick(int mbps)
-+{
-+	return (1 << 20) / TICKS_PER_SEC * ((u64) mbps);
-+}
-+
- struct nullb_cmd {
- 	struct list_head list;
- 	struct llist_node ll_list;
-@@ -49,10 +57,12 @@ struct nullb_queue {
-  *
-  * CONFIGURED:	Device has been configured and turned on. Cannot reconfigure.
-  * UP:		Device is currently on and visible in userspace.
-+ * THROTTLED:	Device is being throttled.
-  */
- enum nullb_device_flags {
- 	NULLB_DEV_FL_CONFIGURED	= 0,
- 	NULLB_DEV_FL_UP		= 1,
-+	NULLB_DEV_FL_THROTTLED	= 2,
- };
- 
- /*
-@@ -83,6 +93,7 @@ struct nullb_device {
- 	unsigned int irqmode; /* IRQ completion handler */
- 	unsigned int hw_queue_depth; /* queue depth */
- 	unsigned int index; /* index of the disk, only valid with a disk */
-+	unsigned int mbps; /* Bandwidth throttle cap (in MB/s) */
- 	bool use_lightnvm; /* register as a LightNVM device */
- 	bool blocking; /* blocking blk-mq device */
- 	bool use_per_node_hctx; /* use per-node allocation for hardware context */
-@@ -100,8 +111,9 @@ struct nullb {
- 	struct nvm_dev *ndev;
- 	struct blk_mq_tag_set *tag_set;
- 	struct blk_mq_tag_set __tag_set;
--	struct hrtimer timer;
- 	unsigned int queue_depth;
-+	atomic_long_t cur_bytes;
-+	struct hrtimer bw_timer;
- 	spinlock_t lock;
- 
- 	struct nullb_queue *queues;
-@@ -320,6 +332,7 @@ NULLB_DEVICE_ATTR(blocking, bool);
- NULLB_DEVICE_ATTR(use_per_node_hctx, bool);
- NULLB_DEVICE_ATTR(memory_backed, bool);
- NULLB_DEVICE_ATTR(discard, bool);
-+NULLB_DEVICE_ATTR(mbps, uint);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
- {
-@@ -376,6 +389,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_power,
- 	&nullb_device_attr_memory_backed,
- 	&nullb_device_attr_discard,
-+	&nullb_device_attr_mbps,
- 	NULL,
- };
- 
-@@ -428,7 +442,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
- 
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
--	return snprintf(page, PAGE_SIZE, "memory_backed,discard\n");
-+	return snprintf(page, PAGE_SIZE, "memory_backed,discard,bandwidth\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -914,11 +928,65 @@ static int null_handle_bio(struct nullb_cmd *cmd)
- 	return 0;
- }
- 
-+static void null_stop_queue(struct nullb *nullb)
-+{
-+	struct request_queue *q = nullb->q;
-+
-+	if (nullb->dev->queue_mode == NULL_Q_MQ)
-+		blk_mq_stop_hw_queues(q);
-+	else {
-+		spin_lock_irq(q->queue_lock);
-+		blk_stop_queue(q);
-+		spin_unlock_irq(q->queue_lock);
-+	}
-+}
-+
-+static void null_restart_queue_async(struct nullb *nullb)
-+{
-+	struct request_queue *q = nullb->q;
-+	unsigned long flags;
-+
-+	if (nullb->dev->queue_mode == NULL_Q_MQ)
-+		blk_mq_start_stopped_hw_queues(q, true);
-+	else {
-+		spin_lock_irqsave(q->queue_lock, flags);
-+		blk_start_queue_async(q);
-+		spin_unlock_irqrestore(q->queue_lock, flags);
-+	}
-+}
-+
- static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
-+	struct nullb *nullb = dev->nullb;
- 	int err = 0;
- 
-+	if (test_bit(NULLB_DEV_FL_THROTTLED, &dev->flags)) {
-+		struct request *rq = cmd->rq;
-+
-+		if (!hrtimer_active(&nullb->bw_timer))
-+			hrtimer_restart(&nullb->bw_timer);
-+
-+		if (atomic_long_sub_return(blk_rq_bytes(rq),
-+				&nullb->cur_bytes) < 0) {
-+			null_stop_queue(nullb);
-+			/* race with timer */
-+			if (atomic_long_read(&nullb->cur_bytes) > 0)
-+				null_restart_queue_async(nullb);
-+			if (dev->queue_mode == NULL_Q_RQ) {
-+				struct request_queue *q = nullb->q;
-+
-+				spin_lock_irq(q->queue_lock);
-+				rq->rq_flags |= RQF_DONTPREP;
-+				blk_requeue_request(q, rq);
-+				spin_unlock_irq(q->queue_lock);
-+				return BLK_STS_OK;
-+			} else
-+				/* requeue request */
-+				return BLK_STS_RESOURCE;
-+		}
-+	}
-+
- 	if (dev->memory_backed) {
- 		if (dev->queue_mode == NULL_Q_BIO)
- 			err = null_handle_bio(cmd);
-@@ -954,6 +1022,33 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
- 	return BLK_STS_OK;
- }
- 
-+static enum hrtimer_restart nullb_bwtimer_fn(struct hrtimer *timer)
-+{
-+	struct nullb *nullb = container_of(timer, struct nullb, bw_timer);
-+	ktime_t timer_interval = ktime_set(0, TIMER_INTERVAL);
-+	unsigned int mbps = nullb->dev->mbps;
-+
-+	if (atomic_long_read(&nullb->cur_bytes) == mb_per_tick(mbps))
-+		return HRTIMER_NORESTART;
-+
-+	atomic_long_set(&nullb->cur_bytes, mb_per_tick(mbps));
-+	null_restart_queue_async(nullb);
-+
-+	hrtimer_forward_now(&nullb->bw_timer, timer_interval);
-+
-+	return HRTIMER_RESTART;
-+}
-+
-+static void nullb_setup_bwtimer(struct nullb *nullb)
-+{
-+	ktime_t timer_interval = ktime_set(0, TIMER_INTERVAL);
-+
-+	hrtimer_init(&nullb->bw_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-+	nullb->bw_timer.function = nullb_bwtimer_fn;
-+	atomic_long_set(&nullb->cur_bytes, mb_per_tick(nullb->dev->mbps));
-+	hrtimer_start(&nullb->bw_timer, timer_interval, HRTIMER_MODE_REL);
-+}
-+
- static struct nullb_queue *nullb_to_queue(struct nullb *nullb)
- {
- 	int index = 0;
-@@ -1224,6 +1319,13 @@ static void null_del_dev(struct nullb *nullb)
- 		null_nvm_unregister(nullb);
- 	else
- 		del_gendisk(nullb->disk);
-+
-+	if (test_bit(NULLB_DEV_FL_THROTTLED, &nullb->dev->flags)) {
-+		hrtimer_cancel(&nullb->bw_timer);
-+		atomic_long_set(&nullb->cur_bytes, LONG_MAX);
-+		null_restart_queue_async(nullb);
-+	}
-+
- 	blk_cleanup_queue(nullb->q);
- 	if (dev->queue_mode == NULL_Q_MQ &&
- 	    nullb->tag_set == &nullb->__tag_set)
-@@ -1409,6 +1511,11 @@ static void null_validate_conf(struct nullb_device *dev)
- 	/* Do memory allocation, so set blocking */
- 	if (dev->memory_backed)
- 		dev->blocking = true;
-+
-+	dev->mbps = min_t(unsigned int, 1024 * 40, dev->mbps);
-+	/* can not stop a queue */
-+	if (dev->queue_mode == NULL_Q_BIO)
-+		dev->mbps = 0;
- }
- 
- static int null_add_dev(struct nullb_device *dev)
-@@ -1474,6 +1581,11 @@ static int null_add_dev(struct nullb_device *dev)
- 			goto out_cleanup_blk_queue;
- 	}
- 
-+	if (dev->mbps) {
-+		set_bit(NULLB_DEV_FL_THROTTLED, &dev->flags);
-+		nullb_setup_bwtimer(nullb);
-+	}
-+
- 	nullb->q->queuedata = nullb;
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, nullb->q);
- 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, nullb->q);
 -- 
-2.9.5
+Jens Axboe
