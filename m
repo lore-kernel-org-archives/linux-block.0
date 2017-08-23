@@ -1,59 +1,23 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Max Gurtovoy <maxg@mellanox.com>,
-	Ming Lei <minlei@redhat.com>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH] blk-mq: Fix queue usage on failed request allocation
-Date: Mon, 14 Aug 2017 16:40:11 -0400
-Message-Id: <1502743211-14992-1-git-send-email-keith.busch@intel.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] skd: Uninitialized variable in
+ skd_isr_completion_posted()
+To: Dan Carpenter <dan.carpenter@oracle.com>,
+ Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20170823104048.w4vdvlp72ug5ackq@mwanda>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ed05cb0e-4dd8-fdbe-3a9c-6edcb5e5f9d2@kernel.dk>
+Date: Wed, 23 Aug 2017 08:36:14 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170823104048.w4vdvlp72ug5ackq@mwanda>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_get_request() does not release the callers queue usage counter
-when allocation fails. The caller still needs to account for its own
-queue usage when it is unable to allocate a request.
+On 08/23/2017 04:44 AM, Dan Carpenter wrote:
+> Someone got too agressive about removing initializations and
+> accidentally removed the "rc = 0;" which is required.
 
-Fixes: 1ad43c0078b7 ("blk-mq: don't leak preempt counter/q_usage_counter when allocating rq failed")
+Thanks Dan, applied.
 
-Reported-by: Max Gurtovoy <maxg@mellanox.com>
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- block/blk-mq.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 535cbdf..4603b11 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -360,12 +360,12 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 		return ERR_PTR(ret);
- 
- 	rq = blk_mq_get_request(q, NULL, op, &alloc_data);
-+	blk_queue_exit(q);
- 
- 	if (!rq)
- 		return ERR_PTR(-EWOULDBLOCK);
- 
- 	blk_mq_put_ctx(alloc_data.ctx);
--	blk_queue_exit(q);
- 
- 	rq->__data_len = 0;
- 	rq->__sector = (sector_t) -1;
-@@ -411,12 +411,11 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	alloc_data.ctx = __blk_mq_get_ctx(q, cpu);
- 
- 	rq = blk_mq_get_request(q, NULL, op, &alloc_data);
-+	blk_queue_exit(q);
- 
- 	if (!rq)
- 		return ERR_PTR(-EWOULDBLOCK);
- 
--	blk_queue_exit(q);
--
- 	return rq;
- }
- EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
 -- 
-2.5.5
+Jens Axboe
