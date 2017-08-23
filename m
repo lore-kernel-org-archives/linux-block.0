@@ -1,24 +1,35 @@
-Return-Path: <hch@lst.de>
-Date: Thu, 24 Aug 2017 10:41:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block <linux-block@vger.kernel.org>
+Cc: Keith Busch <keith.busch@intel.com>,
 	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH for-next] block: Fix left-over bi_bdev usage
-Message-ID: <20170824084133.GA19313@lst.de>
-References: <1503531955-2626-1-git-send-email-keith.busch@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1503531955-2626-1-git-send-email-keith.busch@intel.com>
+Subject: [PATCH for-next] block: Fix left-over bi_bdev usage
+Date: Wed, 23 Aug 2017 19:45:55 -0400
+Message-Id: <1503531955-2626-1-git-send-email-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Aug 23, 2017 at 07:45:55PM -0400, Keith Busch wrote:
-> The bi_bdev field was replaced with the gendisk. This patch just fixes
-> an omission.
+The bi_bdev field was replaced with the gendisk. This patch just fixes
+an omission.
 
-Thanks Keith.  I'm pretty sure I fixed exactly this one when
-rebasing from my nvme tree to the block tree.  But I guess I didn't
-finish the rebase fully, as usual - git rebase considered harmful :)
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ block/bio-integrity.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Acked-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index b4737af..5df3290 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -385,7 +385,7 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+  */
+ bool __bio_integrity_endio(struct bio *bio)
+ {
+-	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
++	struct blk_integrity *bi = blk_get_integrity(bio->bi_disk);
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 
+ 	if (bio_op(bio) == REQ_OP_READ && !bio->bi_status &&
+-- 
+2.5.5
