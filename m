@@ -1,45 +1,64 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
+Return-Path: <BATV+08196f5b2bd262a84b8d+5113+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 42/55] skd: Initialize skd_special_context.req.n_sg to one
-Date: Thu, 17 Aug 2017 13:13:25 -0700
-Message-Id: <20170817201338.16537-43-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: RFC: nvme multipath support
+Date: Wed, 23 Aug 2017 19:58:05 +0200
+Message-Id: <20170823175815.3646-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The debug code in skd_send_special_fitmsg() assumes that req.n_sg
-represents the number of S/G descriptors. However, skd_construct()
-initializes that member variable to zero. Set req.n_sg to one such
-that the debugging code in skd_send_special_fitmsg() works as
-expected.
+Hi all,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 1 +
- 1 file changed, 1 insertion(+)
+this series adds support for multipathing, that is accessing nvme
+namespaces through multiple controllers to the nvme core driver.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index c7f531e99ede..392c898d86e2 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -1050,6 +1050,7 @@ static int skd_format_internal_skspcl(struct skd_device *skdev)
- 	memset(scsi, 0, sizeof(*scsi));
- 	dma_address = skspcl->req.sksg_dma_address;
- 	scsi->hdr.sg_list_dma_address = cpu_to_be64(dma_address);
-+	skspcl->req.n_sg = 1;
- 	sgd->control = FIT_SGD_CONTROL_LAST;
- 	sgd->byte_count = 0;
- 	sgd->host_side_addr = skspcl->db_dma_address;
--- 
-2.14.0
+It is a very thin and efficient implementation that relies on
+close cooperation with other bits of the nvme driver, and few small
+and simple block helpers.
+
+Compared to dm-multipath the important differences are how management
+of the paths is done, and how the I/O path works.
+
+Management of the paths is fully integrated into the nvme driver,
+for each newly found nvme controller we check if there are other
+controllers that refer to the same subsystem, and if so we link them
+up in the nvme driver.  Then for each namespace found we check if
+the namespace id and identifiers match to check if we have multiple
+controllers that refer to the same namespaces.  For now path
+availability is based entirely on the controller status, which at
+least for fabrics will be continuously updated based on the mandatory
+keep alive timer.  Once the Asynchronous Namespace Access (ANA)
+proposal passes in NVMe we will also get per-namespace states in
+addition to that, but for now any details of that remain confidential
+to NVMe members.
+
+The I/O path is very different from the existing multipath drivers,
+which is enabled by the fact that NVMe (unlike SCSI) does not support
+partial completions - a controller will either complete a whole
+command or not, but never only complete parts of it.  Because of that
+there is no need to clone bios or requests - the I/O path simply
+redirects the I/O to a suitable path.  For successful commands
+multipath is not in the completion stack at all.  For failed commands
+we decide if the error could be a path failure, and if yes remove
+the bios from the request structure and requeue them before completing
+the request.  All together this means there is no performance
+degradation compared to normal nvme operation when using the multipath
+device node (at least not until I find a dual ported DRAM backed
+device :))
+
+There are a couple questions left in the individual patches, comments
+welcome.
+
+Note that this series requires the previous series to remove bi_bdev,
+in doubt use the git tree below for testing.
+
+A git tree is available at:
+
+   git://git.infradead.org/users/hch/block.git nvme-mpath
+
+gitweb:
+
+   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
