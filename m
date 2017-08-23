@@ -1,6 +1,6 @@
 Return-Path: <boqun.feng@gmail.com>
 Return-Path: <boqun.feng@gmail.com>
-Date: Wed, 23 Aug 2017 12:38:13 +0800
+Date: Wed, 23 Aug 2017 11:49:51 +0800
 From: Boqun Feng <boqun.feng@gmail.com>
 To: Byungchul Park <byungchul.park@lge.com>
 Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, peterz@infradead.org,
@@ -15,122 +15,114 @@ Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, peterz@infradead.org,
 	kernel-team@lge.com
 Subject: Re: possible circular locking dependency detected [was: linux-next:
  Tree for Aug 22]
-Message-ID: <20170823043813.GH11771@tardis>
+Message-ID: <20170823034951.GG11771@tardis>
 References: <20170822183816.7925e0f8@canb.auug.org.au>
  <20170822104708.GA491@jagdpanzerIV.localdomain>
  <1503438234.2508.27.camel@wdc.com>
  <20170823000304.GK20323@X58A-UD3R>
- <20170823034951.GG11771@tardis>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170823034951.GG11771@tardis>
+In-Reply-To: <20170823000304.GK20323@X58A-UD3R>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Aug 23, 2017 at 11:49:51AM +0800, Boqun Feng wrote:
-> Hi Byungchul,
-> 
-> On Wed, Aug 23, 2017 at 09:03:04AM +0900, Byungchul Park wrote:
-> > On Tue, Aug 22, 2017 at 09:43:56PM +0000, Bart Van Assche wrote:
-> > > On Tue, 2017-08-22 at 19:47 +0900, Sergey Senozhatsky wrote:
-> > > > ======================================================
-> > > > WARNING: possible circular locking dependency detected
-> > > > 4.13.0-rc6-next-20170822-dbg-00020-g39758ed8aae0-dirty #1746 Not tainted
-> > > > ------------------------------------------------------
-> > > > fsck.ext4/148 is trying to acquire lock:
-> > > >  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8116e73e>] __blkdev_put+0x33/0x190
-> > > > 
-> > > >  but now in release context of a crosslock acquired at the following:
-> > > >  ((complete)&wait#2){+.+.}, at: [<ffffffff812159e0>] blk_execute_rq+0xbb/0xda
-> > > > 
-> > > >  which lock already depends on the new lock.
-> > > > 
-> 
-> I felt this message really misleading, because the deadlock is detected
-> at the commit time of "((complete)&wait#2)" rather than the acquisition
-> time of "(&bdev->bd_mutex)", so I made the following improvement.
-> 
-> Thoughts?
-> 
-> Regards,
-> Boqun
-> 
+Hi Byungchul,
 
-While I'm on this one, I think we should also add a case in @check_src
-is a cross lock, i.e. we detect cross deadlock at the acquisition time
-of the cross lock. How about the following?
+On Wed, Aug 23, 2017 at 09:03:04AM +0900, Byungchul Park wrote:
+> On Tue, Aug 22, 2017 at 09:43:56PM +0000, Bart Van Assche wrote:
+> > On Tue, 2017-08-22 at 19:47 +0900, Sergey Senozhatsky wrote:
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+> > > WARNING: possible circular locking dependency detected
+> > > 4.13.0-rc6-next-20170822-dbg-00020-g39758ed8aae0-dirty #1746 Not tain=
+ted
+> > > ------------------------------------------------------
+> > > fsck.ext4/148 is trying to acquire lock:
+> > >  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8116e73e>] __blkdev_put+0x33/=
+0x190
+> > >=20
+> > >  but now in release context of a crosslock acquired at the following:
+> > >  ((complete)&wait#2){+.+.}, at: [<ffffffff812159e0>] blk_execute_rq+0=
+xbb/0xda
+> > >=20
+> > >  which lock already depends on the new lock.
+> > >=20
+
+I felt this message really misleading, because the deadlock is detected
+at the commit time of "((complete)&wait#2)" rather than the acquisition
+time of "(&bdev->bd_mutex)", so I made the following improvement.
+
+Thoughts?
 
 Regards,
 Boqun
 
---------------------------------------->8
-From: Boqun Feng <boqun.feng@gmail.com>
-Date: Wed, 23 Aug 2017 12:12:16 +0800
-Subject: [PATCH] lockdep: Print proper scenario if cross deadlock detected at
- acquisition time
+----------------------->8
+=46rom: Boqun Feng <boqun.feng@gmail.com>
+Date: Wed, 23 Aug 2017 10:18:30 +0800
+Subject: [PATCH] lockdep: Improve the readibility of crossrelease related
+ splats
 
-For a potential deadlock about CROSSRELEASE as follow:
+When a crossrelease related deadlock is detected in a commit, the
+current implemention makes splats like:
 
-	P1		P2
-	===========	=============
-	lock(A)
-	lock(X)
-			lock(A)
-			commit(X)
+> fsck.ext4/148 is trying to acquire lock:
+>  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8116e73e>] __blkdev_put+0x33/0x190
+>
+>  but now in release context of a crosslock acquired at the following:
+>  ((complete)&wait#2){+.+.}, at: [<ffffffff812159e0>] blk_execute_rq+0xbb/=
+0xda
+>
+>  which lock already depends on the new lock.
+> ...
 
-	A: normal lock, X: cross lock
-
-, we could detect it at two places:
-
-1. commit time:
-
-	We have run P1 first, and have dependency A --> X in graph, and
-	then we run P2, and find the deadlock.
-
-2. acquisition time:
-
-	We have run P2 first, and have dependency A --> X, in
-	graph(because another P3 may run previously and is acquiring for
-	lock X), and then we run P1 and find the deadlock.
-
-In current print_circular_lock_scenario(), for 1) we could print the
-right scenario and note that's a deadlock related to CROSSRELEASE,
-however for 2) we print the scenario as a normal lockdep deadlock.
-
-It's better to print a proper scenario related to CROSSRELEASE to help
-users find their bugs more easily, so improve this.
+However, it could be misleading because the current task has got the
+lock already, and in fact the deadlock is detected when it is doing the
+commit of the crossrelease lock. So make the splats more accurate to
+describe the deadlock case.
 
 Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
 ---
- kernel/locking/lockdep.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ kernel/locking/lockdep.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 642fb5362507..a3709e15f609 100644
+index 66011c9f5df3..642fb5362507 100644
 --- a/kernel/locking/lockdep.c
 +++ b/kernel/locking/lockdep.c
-@@ -1156,6 +1156,23 @@ print_circular_lock_scenario(struct held_lock *src,
- 		__print_lock_name(target);
- 		printk(KERN_CONT ");\n");
- 		printk("\n *** DEADLOCK ***\n\n");
-+	} else if (cross_lock(src->instance)) {
-+		printk(" Possible unsafe locking scenario by crosslock:\n\n");
-+		printk("       CPU0                    CPU1\n");
-+		printk("       ----                    ----\n");
-+		printk("  lock(");
-+		__print_lock_name(target);
-+		printk(KERN_CONT ");\n");
-+		printk("  lock(");
-+		__print_lock_name(source);
-+		printk(KERN_CONT ");\n");
-+		printk("                               lock(");
-+		__print_lock_name(parent == source ? target : parent);
-+		printk(KERN_CONT ");\n");
-+		printk("                               unlock(");
-+		__print_lock_name(source);
-+		printk(KERN_CONT ");\n");
-+		printk("\n *** DEADLOCK ***\n\n");
- 	} else {
- 		printk(" Possible unsafe locking scenario:\n\n");
- 		printk("       CPU0                    CPU1\n");
--- 
+@@ -1195,17 +1195,23 @@ print_circular_bug_header(struct lock_list *entry, =
+unsigned int depth,
+ 	pr_warn("WARNING: possible circular locking dependency detected\n");
+ 	print_kernel_ident();
+ 	pr_warn("------------------------------------------------------\n");
+-	pr_warn("%s/%d is trying to acquire lock:\n",
+-		curr->comm, task_pid_nr(curr));
+-	print_lock(check_src);
+=20
+-	if (cross_lock(check_tgt->instance))
+-		pr_warn("\nbut now in release context of a crosslock acquired at the fol=
+lowing:\n");
+-	else
++	if (cross_lock(check_tgt->instance)) {
++		pr_warn("%s/%d is committing a crossrelease lock:\n",
++			curr->comm, task_pid_nr(curr));
++		print_lock(check_tgt);
++		pr_warn("\n, with the following lock held:\n");
++		print_lock(check_src);
++		pr_warn("\non which lock the crossrelease lock already depends.\n\n");
++	} else {
++		pr_warn("%s/%d is trying to acquire lock:\n",
++			curr->comm, task_pid_nr(curr));
++		print_lock(check_src);
+ 		pr_warn("\nbut task is already holding lock:\n");
++		print_lock(check_tgt);
++		pr_warn("\nwhich lock already depends on the new lock.\n\n");
++	}
+=20
+-	print_lock(check_tgt);
+-	pr_warn("\nwhich lock already depends on the new lock.\n\n");
+ 	pr_warn("\nthe existing dependency chain (in reverse order) is:\n");
+=20
+ 	print_circular_bug_entry(entry, depth);
+--=20
 2.14.1
