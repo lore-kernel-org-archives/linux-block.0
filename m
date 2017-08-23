@@ -1,11 +1,13 @@
-Return-Path: <peterz@infradead.org>
-Date: Wed, 23 Aug 2017 09:53:00 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Byungchul Park <byungchul.park@lge.com>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+Return-Path: <sergey.senozhatsky.work@gmail.com>
+Return-Path: <sergey.senozhatsky.work@gmail.com>
+Date: Wed, 23 Aug 2017 14:55:17 +0900
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Byungchul Park <byungchul.park@lge.com>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>, peterz@infradead.org,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"sergey.senozhatsky.work@gmail.com" <sergey.senozhatsky.work@gmail.com>,
 	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
 	"axboe@kernel.dk" <axboe@kernel.dk>,
 	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
@@ -14,38 +16,57 @@ Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
 	kernel-team@lge.com
 Subject: Re: possible circular locking dependency detected [was: linux-next:
  Tree for Aug 22]
-Message-ID: <20170823075300.xhdwevdnvncezlol@hirez.programming.kicks-ass.net>
+Message-ID: <20170823055517.GB728@jagdpanzerIV.localdomain>
 References: <20170822183816.7925e0f8@canb.auug.org.au>
  <20170822104708.GA491@jagdpanzerIV.localdomain>
  <1503438234.2508.27.camel@wdc.com>
  <20170823000304.GK20323@X58A-UD3R>
+ <20170823034951.GG11771@tardis>
+ <20170823043813.GH11771@tardis>
+ <20170823044648.GE10329@jagdpanzerIV.localdomain>
+ <20170823053501.GJ11771@tardis>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170823000304.GK20323@X58A-UD3R>
+In-Reply-To: <20170823053501.GJ11771@tardis>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Aug 23, 2017 at 09:03:04AM +0900, Byungchul Park wrote:
-> On Tue, Aug 22, 2017 at 09:43:56PM +0000, Bart Van Assche wrote:
+On (08/23/17 13:35), Boqun Feng wrote:
+> > KERN_CONT and "\n" should not be together. "\n" flushes the cont
+> > buffer immediately.
+> > 
+> 
+> Hmm.. Not quite familiar with printk() stuffs, but I could see several
+> usages of printk(KERN_CONT "...\n") in kernel.
+> 
+> Did a bit research myself, and I now think the inappropriate use is to
+> use a KERN_CONT printk *after* another printk ending with a "\n".
 
-> The report is talking about the following lockup:
-> 
-> A work in a worker                     A task work on exit to user
-> ------------------                     ---------------------------
-> mutex_lock(&bdev->bd_mutex)
->                                        mutext_lock(&bdev->bd_mutex)
-> blk_execute_rq()
->    wait_for_completion_io_timeout(&A)
->                                        complete(&A)
-> 
-> Is this impossible?
-> 
-> To Peterz,
-> 
-> Anyway I wanted to avoid lockdep reports in the case using a timeout
-> interface. Do you think it's still worth reporting the kind of lockup?
+ah... I didn't check __print_lock_name(): it leaves unflushed cont buffer
+upon the return. sorry, your code is correct.
 
-Yes, people might not have expected to hit the timeout on this. They
-might think timeout means a dead device or something like that.
+	-ss
 
-I'd like to heard from the block folks if this was constructed thus on
-purpose though.
+> > >  		printk("\n *** DEADLOCK ***\n\n");
+> > > +	} else if (cross_lock(src->instance)) {
+> > > +		printk(" Possible unsafe locking scenario by crosslock:\n\n");
+> > > +		printk("       CPU0                    CPU1\n");
+> > > +		printk("       ----                    ----\n");
+> > > +		printk("  lock(");
+> > > +		__print_lock_name(target);
+> > > +		printk(KERN_CONT ");\n");
+> > > +		printk("  lock(");
+> > > +		__print_lock_name(source);
+> > > +		printk(KERN_CONT ");\n");
+> > > +		printk("                               lock(");
+> > > +		__print_lock_name(parent == source ? target : parent);
+> > > +		printk(KERN_CONT ");\n");
+> > > +		printk("                               unlock(");
+> > > +		__print_lock_name(source);
+> > > +		printk(KERN_CONT ");\n");
+> > > +		printk("\n *** DEADLOCK ***\n\n");
+> > >  	} else {
+> > >  		printk(" Possible unsafe locking scenario:\n\n");
+> > >  		printk("       CPU0                    CPU1\n");
+> > > -- 
+> > > 2.14.1
+> > > 
