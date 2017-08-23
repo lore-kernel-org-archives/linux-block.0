@@ -1,106 +1,27 @@
-Return-Path: <tom.ty89@outlook.com>
-From: Tom Yan <tom.ty89@outlook.com>
-To: "dm-devel@redhat.com" <dm-devel@redhat.com>, "gmazyland@gmail.com"
-	<gmazyland@gmail.com>, "axboe@fb.com" <axboe@fb.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-Subject: Re: [BUG] BLKZEROOUT on dm-crypt container cause OOM / kernel panic
-Date: Tue, 8 Aug 2017 09:42:31 +0000
-Message-ID: <HK2PR04MB064465B738C469017E3E533D888A0@HK2PR04MB0644.apcprd04.prod.outlook.com>
-References: <HK2PR04MB064468C0371547D1D17C9C5488B50@HK2PR04MB0644.apcprd04.prod.outlook.com>
-In-Reply-To: <HK2PR04MB064468C0371547D1D17C9C5488B50@HK2PR04MB0644.apcprd04.prod.outlook.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/5] skd fixes for kernel v4.14
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <Damien.LeMoal@wdc.com>
+References: <20170823175633.12680-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ae46ec68-c2ea-b1e9-7942-3d61d1337ae7@kernel.dk>
+Date: Wed, 23 Aug 2017 12:03:23 -0600
 MIME-Version: 1.0
+In-Reply-To: <20170823175633.12680-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi again,
+On 08/23/2017 11:56 AM, Bart Van Assche wrote:
+> Hello Jens,
+> 
+> Code review resulted in five more patches for the skd (sTec s1120) kernel
+> driver. These patches have been tested on top of the for-next branch from this
+> morning of your block layer git repository. That means that Dan Carpenter's
+> patches were included in the kernel tree used for testing. Please consider
+> these patches for kernel v4.14.
 
-I think I have sort of identified the problem. It appears to me that both t=
-he block layer and dm-crypt is defected on handling this.
+Looks fine to me, added. Thanks Blart.
 
-First of all, check out the "fallback" zero out implementation, which is us=
-ed in this case, here:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/blo=
-ck/blk-lib.c?h=3Dv4.12#n309
-
->From the outer loop, it seem to imply that this should be done in multiple =
-"bio"s, if the request (original "nr_sects") is larger than BIO_MAX_PAGES:
-
-...
-while (nr_sects !=3D 0) {
-	bio =3D next_bio(bio, min(nr_sects, (sector_t)BIO_MAX_PAGES),
-			gfp_mask);
-...
-}
-...
-
-However, there is a inner loop:
-
-...
-	while (nr_sects !=3D 0) {
-		sz =3D min((sector_t) PAGE_SIZE >> 9 , nr_sects);
-		bi_size =3D bio_add_page(bio, ZERO_PAGE(0), sz << 9, 0);
-		nr_sects -=3D bi_size >> 9;
-		sector +=3D bi_size >> 9;
-		if (bi_size < (sz << 9))
-			break;
-	}
-...
-
-which apparently would loop over the whole request on its own, making the o=
-uter loop a bogus one.
-
-The request ends up being done in a single (huge) bio. When the bio is pass=
-ed on to dm-crypt, it appears that dm-crypt will not split the bio either w=
-hen it allocates buffer for conversion/encryption:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dri=
-vers/md/dm-crypt.c?h=3Dv4.12#n1694
-
-which leads to possible enormous uptake of memory, causing OOM / kernel pan=
-ic.
-
-There seems to be some measure that is suppose to split large bio though:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dri=
-vers/md/dm-crypt.c?h=3Dv4.12#n2787
-
-Apparently it is called before kcryptd_crypt_write_convert() / crypt_alloc_=
-buffer(). However, I don't really parse dm_accept_partial_bio() (or the com=
-ment about it) so I don't really know what it actually does or how it does =
-it. Neither can I see it helps in reality anyway.
-
-Here is another test case that shows the problem:
-https://ptpb.pw/BWWo.png
-https://ptpb.pw/aRTE.png
-
-Regards,
-Tom Yan
-
-
-From: Tom Yan
-Sent: Monday, August 7, 2017 9:58 AM
-To: dm-devel@redhat.com
-Subject: [BUG] BLKZEROOUT on dm-crypt container cause OOM / kernel panic
-=A0  =20
-Hi all,
-
-When I do the following:
-
-cryptsetup open /dev/sdX[Y] rand --type plain --key-file /dev/random;
-blkdiscard -z /dev/mapper/rand
-
-Some OOM killings and a kernel panic occur. Here is a screenshot:
-https://gitlab.com/cryptsetup/cryptsetup/uploads/207ffdada52f3172f54a014c67=
-159625/DSC_0129.JPGhttps://gitlab.com/cryptsetup/cryptsetup/uploads/207ffda=
-da52f3172f54a014c67159625/DSC_0129.JPG=20
-
-
-Similar issue is NOT found in doing `cat /dev/zero > /dev/mapper/rand`, or =
-`blkdiscard -z /dev/sdX[Y]` (without opening a dm-crypt on it), on the same=
- hardware and configuration.
-
-Note that `blkdiscard -z` does not trigger the BLKDISCARD ioctl but the BLK=
-ZEROOUT ioctl. And the devices I have been testing on are USB devices that =
-does NOT support WRITE SAME or UNMAP.
-
-Regards,
-Tom Yan    =
+-- 
+Jens Axboe
