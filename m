@@ -1,120 +1,38 @@
-Return-Path: <jhugo@codeaurora.org>
-Subject: Re: [BUG] Deadlock due due to interactions of block, RCU, and cpu
- offline
-To: paulmck@linux.vnet.ibm.com
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- pprakash@codeaurora.org, Josh Triplett <josh@joshtriplett.org>,
- Steven Rostedt <rostedt@goodmis.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Lai Jiangshan <jiangshanlai@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Thomas Gleixner <tglx@linutronix.de>,
- Richard Cochran <rcochran@linutronix.de>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Richard Weinberger <richard@nod.at>
-References: <20170326232843.GA3637@linux.vnet.ibm.com>
- <d23f3f77-8158-24a4-727d-123ec526dffa@codeaurora.org>
- <20170327181711.GF3637@linux.vnet.ibm.com>
- <20170620234623.GA16200@linux.vnet.ibm.com>
- <df080eec-62b8-7d19-c201-e1a44febb96d@codeaurora.org>
- <20170621161853.GB3721@linux.vnet.ibm.com>
- <20170623033456.GA15959@linux.vnet.ibm.com>
- <c367a3a4-6fac-957a-5a5e-ac4a68bc4648@codeaurora.org>
- <20170628001130.GB3721@linux.vnet.ibm.com>
- <d64c9d16-3b91-2081-0633-7f6a5196fd45@codeaurora.org>
- <20170630001855.GL2393@linux.vnet.ibm.com>
-From: Jeffrey Hugo <jhugo@codeaurora.org>
-Message-ID: <ec57e246-8b16-5db3-45d7-527627fb964c@codeaurora.org>
-Date: Sun, 20 Aug 2017 13:31:01 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170630001855.GL2393@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <BATV+08196f5b2bd262a84b8d+5113+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH 3/6] block: reject attempts to allocate more than DISK_MAX_PARTS partitions
+Date: Wed, 23 Aug 2017 19:10:29 +0200
+Message-Id: <20170823171032.30529-4-hch@lst.de>
+In-Reply-To: <20170823171032.30529-1-hch@lst.de>
+References: <20170823171032.30529-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 6/29/2017 6:18 PM, Paul E. McKenney wrote:
-> On Thu, Jun 29, 2017 at 10:29:12AM -0600, Jeffrey Hugo wrote:
->> On 6/27/2017 6:11 PM, Paul E. McKenney wrote:
->>> On Tue, Jun 27, 2017 at 04:32:09PM -0600, Jeffrey Hugo wrote:
->>>> On 6/22/2017 9:34 PM, Paul E. McKenney wrote:
->>>>> On Wed, Jun 21, 2017 at 09:18:53AM -0700, Paul E. McKenney wrote:
->>>>>> No worries, and I am very much looking forward to seeing the results of
->>>>>> your testing.
->>>>>
->>>>> And please see below for an updated patch based on LKML review and
->>>>> more intensive testing.
->>>>>
->>>>
->>>> I spent some time on this today.  It didn't go as I expected.  I
->>>> validated the issue is reproducible as before on 4.11 and 4.12 rcs 1
->>>> through 4.  However, the version of stress-ng that I was using ran
->>>> into constant errors starting with rc5, making it nearly impossible
->>>> to make progress toward reproduction.  Upgrading stress-ng to tip
->>>> fixes the issue, however, I've still been unable to repro the issue.
->>>>
->>>> Its my unfounded suspicion that something went in between rc4 and
->>>> rc5 which changed the timing, and didn't actually fix the issue.  I
->>>> will run the test overnight for 5 hours to try to repro.
->>>>
->>>> The patch you sent appears to be based on linux-next, and appears to
->>>> have a number of dependencies which prevent it from cleanly applying
->>>> on anything current that I'm able to repro on at this time.  Do you
->>>> want to provide a rebased version of the patch which applies to say
->>>> 4.11?  I could easily test that and report back.
->>>
->>> Here is a very lightly tested backport to v4.11.
->>>
->>
->> Works for me. Always reproduced the lockup within 2 minutes on stock
->> 4.11.  With the change applied, I was able to test for 2 hours in
->> the same conditions, and 4 hours with the full system and not
->> encounter an issue.
->>
->> Feel free to add:
->> Tested-by: Jeffrey Hugo <jhugo@codeaurora.org>
-> 
-> Applied, thank you!
-> 
->> I'm going to go back to 4.12-rc5 and see if I can get either repro
->> the issue, or identify what changed.  Hopefully I can get to
->> linux-next and double check the original version of the change as
->> well.
-> 
-> Looking forward to hearing what you find!
-> 
-> 							Thanx, Paul
-> 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-According to git bisect, the following is what "changed"
-
-commit 9d0eb4624601ac978b9e89be4aeadbd51ab2c830
-Merge: 5faab9e 9bc1f09
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun Jun 11 11:07:25 2017 -0700
-
-     Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm
-
-     Pull KVM fixes from Paolo Bonzini:
-      "Bug fixes (ARM, s390, x86)"
-
-     * tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm:
-       KVM: async_pf: avoid async pf injection when in guest mode
-       KVM: cpuid: Fix read/write out-of-bounds vulnerability in cpuid 
-emulation
-       arm: KVM: Allow unaligned accesses at HYP
-       arm64: KVM: Allow unaligned accesses at EL2
-       arm64: KVM: Preserve RES1 bits in SCTLR_EL2
-       KVM: arm/arm64: Handle possible NULL stage2 pud when ageing pages
-       KVM: nVMX: Fix exception injection
-       kvm: async_pf: fix rcu_irq_enter() with irqs enabled
-       KVM: arm/arm64: vgic-v3: Fix nr_pre_bits bitfield extraction
-       KVM: s390: fix ais handling vs cpu model
-       KVM: arm/arm64: Fix isues with GICv2 on GICv3 migration
-
-Nothing really stands out to me which would "fix" the issue.
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 2367087cdb7c..3380a1e73ea0 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1357,6 +1357,13 @@ struct gendisk *alloc_disk_node(int minors, int node_id)
+ 	struct gendisk *disk;
+ 	struct disk_part_tbl *ptbl;
+ 
++	if (minors > DISK_MAX_PARTS) {
++		printk(KERN_ERR
++			"block: can't allocated more than %d partitions\n",
++			DISK_MAX_PARTS);
++		minors = DISK_MAX_PARTS;
++	}
++
+ 	disk = kzalloc_node(sizeof(struct gendisk), GFP_KERNEL, node_id);
+ 	if (disk) {
+ 		if (!init_part_stats(&disk->part0)) {
 -- 
-Jeffrey Hugo
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm 
-Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+2.11.0
