@@ -1,45 +1,20 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH] nbd: allow device creation at a specific index
-Date: Mon, 14 Aug 2017 18:25:33 +0000
-Message-Id: <1502735133-15841-1-git-send-email-josef@toxicpanda.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 23 Aug 2017 20:03:27 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <Damien.LeMoal@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH 2/5] skd: Report completion mismatches once
+Message-ID: <20170823180327.GC5802@lst.de>
+References: <20170823175633.12680-1-bart.vanassche@wdc.com> <20170823175633.12680-3-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170823175633.12680-3-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+Looks good,
 
-If users really want to use a particular index for their nbd device and it
-doesn't already exist there's no reason we can't just create it for them.  Do
-this instead of erroring out.
-
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 5bdf923..d816ae7 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1584,6 +1584,15 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 		}
- 	} else {
- 		nbd = idr_find(&nbd_index_idr, index);
-+		if (!nbd) {
-+			ret = nbd_dev_add(index);
-+			if (ret < 0) {
-+				mutex_unlock(&nbd_index_mutex);
-+				printk(KERN_ERR "nbd: failed to add new device\n");
-+				return ret;
-+			}
-+			nbd = idr_find(&nbd_index_idr, index);
-+		}
- 	}
- 	if (!nbd) {
- 		printk(KERN_ERR "nbd: couldn't find device at index %d\n",
--- 
-2.9.5
+Reviewed-by: Christoph Hellwig <hch@lst.de>
