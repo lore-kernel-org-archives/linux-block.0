@@ -1,51 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:38339 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753610AbdHULoC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2017 07:44:02 -0400
-From: Bhumika Goyal <bhumirks@gmail.com>
-To: julia.lawall@lip6.fr, rjw@rjwysocki.net, lenb@kernel.org,
-        jbacik@fb.com, jikos@kernel.org, benjamin.tissoires@redhat.com,
-        manish.chopra@cavium.com, rahul.verma@cavium.com,
-        Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
-        cascardo@holoscopio.com, don@syst.com.br, dvhart@infradead.org,
-        andy@infradead.org, sre@kernel.org, linux-acpi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        nbd-general@lists.sourceforge.net, linux-input@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-pm@vger.kernel.org
-Cc: Bhumika Goyal <bhumirks@gmail.com>
-Subject: [PATCH 2/6] nbd: make device_attribute const
-Date: Mon, 21 Aug 2017 17:13:08 +0530
-Message-Id: <1503315792-14837-3-git-send-email-bhumirks@gmail.com>
-In-Reply-To: <1503315792-14837-1-git-send-email-bhumirks@gmail.com>
-References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:37624 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751050AbdHWXvR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Aug 2017 19:51:17 -0400
+Date: Wed, 23 Aug 2017 19:51:12 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "loberman@redhat.com" <loberman@redhat.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: [v4.13-rc BUG] system lockup when running big buffered write(4M)
+ to IB SRP via mpath
+Message-ID: <20170823235112.GB23028@redhat.com>
+References: <20170808141715.GB22763@ming.t460p>
+ <1502237504.4017.1.camel@redhat.com>
+ <1502245693.6511.3.camel@redhat.com>
+ <c072e942-0265-f0ad-561d-0e50d50e3cb1@redhat.com>
+ <1502298599.2356.7.camel@wdc.com>
+ <20170823113526.GA8130@ming.t460p>
+ <1503501161.2484.3.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1503501161.2484.3.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Make this const as is is only passed as an argument to the
-function device_create_file and device_remove_file and the corresponding
-arguments are of type const.
-Done using Coccinelle
+On Wed, Aug 23 2017 at 11:12am -0400,
+Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
 
-Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
----
- drivers/block/nbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On Wed, 2017-08-23 at 19:35 +0800, Ming Lei wrote:
+> > soft lockup still can be observed easily with patch d4acf3650c7c(
+> > block: Make blk_mq_delay_kick_requeue_list() rerun the queue at a quiet time),
+> > but no hard lockup.
+> 
+> Hello Ming,
+> 
+> I never claimed that commit d4acf3650c7c was a full solution to avoid these
+> soft lockups. I assume these results mean that patch series "[PATCH 0/7]
+> Device mapper and dm-mpath fixes" was not applied to the kernel used in your
+> tests? A colleague of you has reported that that patch series is sufficient
+> to avoid these soft lockups. See also
+> https://www.redhat.com/archives/dm-devel/2017-August/msg00122.html.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 5bdf923..49d7763 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -165,7 +165,7 @@ static ssize_t pid_show(struct device *dev,
- 	return sprintf(buf, "%d\n", task_pid_nr(nbd->task_recv));
- }
- 
--static struct device_attribute pid_attr = {
-+static const struct device_attribute pid_attr = {
- 	.attr = { .name = "pid", .mode = S_IRUGO},
- 	.show = pid_show,
- };
--- 
-1.9.1
+FYI, I'll try to review/stage that patchset for 4.14 over the next few
+days.
+
+(I'm not yet back to working full-time but will try to handle my
+upstream responsibilities)
+
+Mike
