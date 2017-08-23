@@ -1,97 +1,144 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f43.google.com ([74.125.83.43]:38803 "EHLO
-        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751183AbdHXHDx (ORCPT
+Received: from h19-45-4-185.rev.hosting.nbs-system.com ([185.4.45.19]:38895
+        "EHLO owa.groupeot.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932134AbdHWPyf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2017 03:03:53 -0400
-Received: by mail-pg0-f43.google.com with SMTP id m133so12451466pga.5
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2017 00:03:53 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Hannes Reinecke <hare@suse.de>,
-        Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH 1/4] loop: get rid of lo_blocksize
-Date: Thu, 24 Aug 2017 00:03:41 -0700
-Message-Id: <ef0f206cb2c75da3b850c59ea7b7efc0b94f4b32.1503558155.git.osandov@fb.com>
-In-Reply-To: <cover.1503558155.git.osandov@fb.com>
-References: <cover.1503558155.git.osandov@fb.com>
-In-Reply-To: <cover.1503558155.git.osandov@fb.com>
-References: <cover.1503558155.git.osandov@fb.com>
+        Wed, 23 Aug 2017 11:54:35 -0400
+From: Benoit Depail <benoit.depail@nbs-system.com>
+Subject: Re: [Xen-users] File-based domU - Slow storage write since xen 4.8
+To: =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
+CC: Keith Busch <keith.busch@intel.com>, <linux-block@vger.kernel.org>,
+        <xen-users@lists.xen.org>, WebDawg <webdawg@gmail.com>
+References: <bba4e389-b975-fbb8-b680-c9c4039617ca@nbs-system.com>
+ <20170720085256.e3m35aalg6jn7qrh@dhcp-3-128.uk.xensource.com>
+ <7205d904-44a3-631f-fbd8-8b62d43ca4e0@nbs-system.com>
+ <20170720173606.GD1202@localhost.localdomain>
+ <3443d6ac-9011-85fb-3613-bacdee184fcc@nbs-system.com>
+ <20170721155333.GG1202@localhost.localdomain>
+ <20170721160712.74ee5f3xztbecanw@dhcp-3-128.uk.xensource.com>
+ <6d76c489-1f1a-205f-434d-8fa1a486d2c4@nbs-system.com>
+ <20170725222505.GH11979@localhost.localdomain>
+ <1642cf06-d9a3-1037-e3c9-6b6b3fc9db2d@nbs-system.com>
+ <20170801094831.cr2brqudqubcinxt@dhcp-3-128.uk.xensource.com>
+ <46b4bdb3-25c4-076e-3401-0506688e2d83@nbs-system.com>
+Message-ID: <f647e1d9-7527-96c5-7f65-774dbf6cef66@nbs-system.com>
+Date: Wed, 23 Aug 2017 17:54:20 +0200
+MIME-Version: 1.0
+In-Reply-To: <46b4bdb3-25c4-076e-3401-0506688e2d83@nbs-system.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On 08/02/17 18:29, Benoit Depail wrote:
+> On 08/01/2017 11:48 AM, Roger Pau Monné wrote:
+>> On Fri, Jul 28, 2017 at 04:50:27PM +0200, Benoit Depail wrote:
+>>> On 07/26/17 00:25, Keith Busch wrote:
+>>>> On Fri, Jul 21, 2017 at 07:07:06PM +0200, Benoit Depail wrote:
+>>>>> On 07/21/17 18:07, Roger Pau Monné wrote:
+>>>>>>
+>>>>>> Hm, I'm not sure I follow either. AFAIK this problem came from
+>>>>>> changing the Linux version in the Dom0 (where the backend, blkback is
+>>>>>> running), rather than in the DomU right?
+>>>>>>
+>>>>>> Regarding the queue/sectors stuff, blkfront uses several blk_queue
+>>>>>> functions to set those parameters, maybe there's something wrong
+>>>>>> there, but I cannot really spot what it is:
+>>>>>>
+>>>>>> http://elixir.free-electrons.com/linux/latest/source/drivers/block/xen-blkfront.c#L929
+>>>>>>
+>>>>>> In the past the number of pages that could fit in a single ring
+>>>>>> request was limited to 11, but some time ago indirect descriptors
+>>>>>> where introduced in order to lift this limit, and now requests can
+>>>>>> have a much bigger number of pages.
+>>>>>>
+>>>>>> Could you check the max_sectors_kb of the underlying storage you are
+>>>>>> using in Dom0?
+>>>>>>
+>>>>>> Roger.
+>>>>>>
+>>>>> I checked the value for the loop device as well
+>>>>>
+>>>>> With 4.4.77 (bad write performance)
+>>>>> $ cat /sys/block/sda/queue/max_sectors_kb
+>>>>> 1280
+>>>>> $ cat /sys/block/loop1/queue/max_sectors_kb
+>>>>> 127
+>>>>>
+>>>>>
+>>>>> With 4.1.42 (normal write performance)
+>>>>> $ cat /sys/block/sda/queue/max_sectors_kb
+>>>>> 4096
+>>>>> $ cat /sys/block/loop1/queue/max_sectors_kb
+>>>>> 127
+>>>>
+>>>> Thank you for the confirmations so far. Could you confirm performance dom0
+>>>> running 4.4.77 with domU running 4.1.42, and the other way around? Would
+>>>> like to verify if this is just isolated to blkfront.
+>>>>
+>>> Hi,
+>>>
+>>> I've ran the tests, and I can tell that the domU kernel version have no
+>>> influence on the performance.
+>>>
+>>> Dom0 with 4.4.77 always shows bad performance, wether the domU runs
+>>> 4.1.42 or 4.4.77.
+>>>
+>>> Dom0 with 4.1.42 always shows good performance, wether the domU runs
+>>> 4.1.42 or 4.4.77.
+>>
+>> Hello,
+>>
+>> I haven't yet got time to look into this sadly. Can you please try to
+>> use fio [0] in order to run the tests against the loop device in Dom0?
+>>
+>> If possible, could you test several combinations of block sizes, I/O
+>> sizes and I/O depths?
+>>
+>> Thanks, Roger.
+>>
+>> [0] http://git.kernel.dk/?p=fio.git;a=summary
+>>
+> 
+> Ok I'll give a try later when I have more time. Probably next week.
+> 
+> Thanks,
+> 
 
-This is only used for setting the soft block size on the struct
-block_device once and then never used again.
+Hi,
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- drivers/block/loop.c | 10 ++--------
- drivers/block/loop.h |  1 -
- 2 files changed, 2 insertions(+), 9 deletions(-)
+I had some time to play around with fio. I am not really sure what I was
+supposed to do with it so I made a wild guess.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f321b96405f5..54e091887199 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -573,8 +573,6 @@ static void do_loop_switch(struct loop_device *lo, struct switch_request *p)
- 	mapping = file->f_mapping;
- 	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
- 	lo->lo_backing_file = file;
--	lo->lo_blocksize = S_ISBLK(mapping->host->i_mode) ?
--		mapping->host->i_bdev->bd_block_size : PAGE_SIZE;
- 	lo->old_gfp_mask = mapping_gfp_mask(mapping);
- 	mapping_set_gfp_mask(mapping, lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
- 	loop_update_dio(lo);
-@@ -867,7 +865,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	struct file	*file, *f;
- 	struct inode	*inode;
- 	struct address_space *mapping;
--	unsigned lo_blocksize;
- 	int		lo_flags = 0;
- 	int		error;
- 	loff_t		size;
-@@ -911,9 +908,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	    !file->f_op->write_iter)
- 		lo_flags |= LO_FLAGS_READ_ONLY;
- 
--	lo_blocksize = S_ISBLK(inode->i_mode) ?
--		inode->i_bdev->bd_block_size : PAGE_SIZE;
--
- 	error = -EFBIG;
- 	size = get_loop_size(lo, file);
- 	if ((loff_t)(sector_t)size != size)
-@@ -927,7 +921,6 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	set_device_ro(bdev, (lo_flags & LO_FLAGS_READ_ONLY) != 0);
- 
- 	lo->use_dio = false;
--	lo->lo_blocksize = lo_blocksize;
- 	lo->lo_device = bdev;
- 	lo->lo_flags = lo_flags;
- 	lo->lo_backing_file = file;
-@@ -947,7 +940,8 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	/* let user-space know about the new size */
- 	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
- 
--	set_blocksize(bdev, lo_blocksize);
-+	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
-+		      block_size(inode->i_bdev) : PAGE_SIZE);
- 
- 	lo->lo_state = Lo_bound;
- 	if (part_shift)
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index fecd3f97ef8c..efe57189d01e 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -48,7 +48,6 @@ struct loop_device {
- 
- 	struct file *	lo_backing_file;
- 	struct block_device *lo_device;
--	unsigned	lo_blocksize;
- 	void		*key_data; 
- 
- 	gfp_t		old_gfp_mask;
+Using the setup showing bad write performances (dom0 with v4.4.77), I
+ran a fio job with the following parameters :
+
+[global]
+size=5g
+filename=<device>
+direct=1
+readwrite=write
+
+[job1]
+runtime=1m
+
+
+I then used a loop to change the blocksize from 512 to 8192, steps 512,
+and the io depth from 1 to 32, steps 4.
+
+On the loop device (from the dom0), write speed was about 34MB/s most of
+the time, reaching 110MB/s with a blocksize multiple of 4096 (4096 and
+8192).
+
+On the domU, write speed was the same, but reaching only 52MB/s when the
+blocksize is a multiple of 4096.
+
+Io depth did not show any significant change.
+
+Feel free to suggest any improvment on my bench suit.
+
+Thansk,
+
 -- 
-2.14.1
+Benoit Depail
+Senior Infrastructures Architect
+NBS System
