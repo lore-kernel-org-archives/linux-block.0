@@ -5,8 +5,8 @@ Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
  linux-btrfs@vger.kernel.org
 References: <20170823171032.30529-1-hch@lst.de>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <5e4171a6-1cbe-5753-e35d-6c9b89a9c9e5@kernel.dk>
-Date: Wed, 23 Aug 2017 12:50:12 -0600
+Message-ID: <e94c9d00-824e-a90e-87b4-7791714dd96b@kernel.dk>
+Date: Wed, 23 Aug 2017 12:04:45 -0600
 MIME-Version: 1.0
 In-Reply-To: <20170823171032.30529-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
@@ -23,7 +23,8 @@ On 08/23/2017 11:10 AM, Christoph Hellwig wrote:
 > character device (nvme or lightnvm passthrough) or a different block
 > device (upcoming nvme multipath support).
 
-Added for 4.14, thanks.
+Looks fine to me. I can take it through the block tree, when the md/btrfs
+parts are reviewed by the right parties.
 
 -- 
 Jens Axboe
