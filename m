@@ -1,46 +1,123 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:41951 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932216AbdHWRbs (ORCPT
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:35693 "EHLO
+        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751462AbdHWF7v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2017 13:31:48 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "akinobu.mita@gmail.com" <akinobu.mita@gmail.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dvyukov@google.com" <dvyukov@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "mhocko@kernel.org" <mhocko@kernel.org>
+        Wed, 23 Aug 2017 01:59:51 -0400
+Received: by mail-pf0-f171.google.com with SMTP id x137so3368799pfd.2
+        for <linux-block@vger.kernel.org>; Tue, 22 Aug 2017 22:59:51 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAC5umyh5r-nmKisg7bavbm320Gd1puZmPOv7q+q0yonYbzr+ZA@mail.gmail.com>
+References: <20170822230043.9968-1-bart.vanassche@wdc.com> <20170822230043.9968-2-bart.vanassche@wdc.com>
+ <CAC5umyh5r-nmKisg7bavbm320Gd1puZmPOv7q+q0yonYbzr+ZA@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Wed, 23 Aug 2017 07:59:30 +0200
+Message-ID: <CACT4Y+b4gmmzQh+AQi0Gcy8Tg+Vr4KPhAxL8kOC21LAPVK9N8g@mail.gmail.com>
 Subject: Re: [PATCH v2 1/2] fault-inject: Restore support for task-independent
  fault injection
-Date: Wed, 23 Aug 2017 17:31:00 +0000
-Message-ID: <1503509459.2484.13.camel@wdc.com>
-References: <20170822230043.9968-1-bart.vanassche@wdc.com>
-         <20170822230043.9968-2-bart.vanassche@wdc.com>
-         <CAC5umyh5r-nmKisg7bavbm320Gd1puZmPOv7q+q0yonYbzr+ZA@mail.gmail.com>
-In-Reply-To: <CAC5umyh5r-nmKisg7bavbm320Gd1puZmPOv7q+q0yonYbzr+ZA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+To: Akinobu Mita <akinobu.mita@gmail.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Michal Hocko <mhocko@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDE3LTA4LTIzIGF0IDA5OjEwICswOTAwLCBBa2lub2J1IE1pdGEgd3JvdGU6DQo+
-IDIwMTctMDgtMjMgODowMCBHTVQrMDk6MDAgQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2No
-ZUB3ZGMuY29tPjoNCj4gPiBDZXJ0YWluIGZhdWx0cyBzaG91bGQgYmUgaW5qZWN0ZWQgaW5kZXBl
-bmRlbnQgb2YgdGhlIGNvbnRleHQNCj4gPiBpbiB3aGljaCB0aGVzZSBvY2N1ci4gQ29tbWl0IGU0
-MWQ1ODE4NWYxNCBtYWRlIGl0IGltcG9zc2libGUgdG8NCj4gPiBpbmplY3QgZmF1bHRzIGluZGVw
-ZW5kZW50IG9mIHRoZWlyIGNvbnRleHQuIFJlc3RvcmUgc3VwcG9ydCBmb3INCj4gPiB0YXNrLWlu
-ZGVwZW5kZW50IGZhdWx0IGluamVjdGlvbiBieSBhZGRpbmcgdGhlIGF0dHJpYnV0ZSAnZ2xvYmFs
-Jy4NCj4gDQo+IFRoZXJlIHdhcyBhIHRoZSBwcm9ibGVtIHJlcG9ydGVkIGJ5IGZhaWwtbWFrZS1y
-ZXF1ZXN0IHVzZXIgYW5kIHRoZQ0KPiBwcm9ibGVtIGlzIGludHJvZHVjZWQgYnkgdGhlIGZvbGxv
-dy11cCBwYXRjaGVzIGZvciBzeXN0ZW1hdGljDQo+IGZhdWx0IGluamVjdGlvbi4NCj4gDQo+IFBs
-ZWFzZSBjaGVjayB0aGUgY29tbWl0IDllZWI1MmFlNzEyZSAoImZhdWx0LWluamVjdDogZml4IHdy
-b25nDQo+IHNob3VsZF9mYWlsKCkgZGVjaXNpb24gaW4gdGFzayBjb250ZXh0IikgYW5kIHNlZSBp
-ZiB0aGUgcHJvYmxlbQ0KPiB5b3UgcmVwb3J0ZWQgaXMgaWRlbnRpY2FsIHRvIHRoZSBjb21taXQu
-DQoNCkhlbGxvIEFraW5vYnUsDQoNClNpbmNlIEkgd2FzIHVzaW5nIHRoZSBibG9jayBsYXllciBm
-b3ItbmV4dCBicmFuY2ggYXMgdGhlIGJhc2lzIG9mIG15IHRlc3RzLA0KY29tbWl0IDllZWI1MmFl
-NzEyZSB3YXMgbm90IHByZXNlbnQgaW4gdGhlIGtlcm5lbCB0cmVlIHVzZWQgaW4gbXkgdGVzdHMu
-DQpIb3dldmVyLCB3aXRoIHRoYXQgY29tbWl0IDllZWI1MmFlNzEyZSBhcHBsaWVkIEkgZG9uJ3Qg
-bmVlZCBteSB0d28gcGF0Y2hlcw0KYW55bW9yZSB0byBpbmplY3QgYmxvY2sgbGF5ZXIgdGltZW91
-dCBmYXVsdHMgc3VjY2Vzc2Z1bGx5LiBTbyBJJ20gZmluZSB3aXRoDQpkcm9wcGluZyBteSB0d28g
-cGF0Y2hlcy4NCg0KU29ycnkgZm9yIHRoZSBub2lzZS4NCg0KQmFydC4=
+On Wed, Aug 23, 2017 at 2:10 AM, Akinobu Mita <akinobu.mita@gmail.com> wrote:
+> 2017-08-23 8:00 GMT+09:00 Bart Van Assche <bart.vanassche@wdc.com>:
+>> Certain faults should be injected independent of the context
+>> in which these occur. Commit e41d58185f14 made it impossible to
+>> inject faults independent of their context. Restore support for
+>> task-independent fault injection by adding the attribute 'global'.
+>
+> There was a the problem reported by fail-make-request user and the
+> problem is introduced by the follow-up patches for systematic
+> fault injection.
+>
+> Please check the commit 9eeb52ae712e ("fault-inject: fix wrong
+> should_fail() decision in task context") and see if the problem
+> you reported is identical to the commit.
+
+Agree.
+Otherwise I don't understand this commit. We now have 2 orthogonal
+injection mechanisms: one global (original) and the new local. If one
+needs global injection, he/she just enables the global one. We don't
+seem to need the global flag on fault attributes.
+
+
+
+>> References: commit e41d58185f14 ("fault-inject: support systematic fault injection")
+>> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+>> Cc: Dmitry Vyukov <dvyukov@google.com>
+>> Cc: Akinobu Mita <akinobu.mita@gmail.com>
+>> Cc: Michal Hocko <mhocko@kernel.org>
+>> Cc: Andrew Morton <akpm@linux-foundation.org>
+>> ---
+>>  include/linux/fault-inject.h | 11 +++++++++--
+>>  lib/fault-inject.c           |  4 +++-
+>>  2 files changed, 12 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/linux/fault-inject.h b/include/linux/fault-inject.h
+>> index 728d4e0292aa..88dae2f21881 100644
+>> --- a/include/linux/fault-inject.h
+>> +++ b/include/linux/fault-inject.h
+>> @@ -18,6 +18,7 @@ struct fault_attr {
+>>         atomic_t times;
+>>         atomic_t space;
+>>         unsigned long verbose;
+>> +       bool global;
+>>         bool task_filter;
+>>         unsigned long stacktrace_depth;
+>>         unsigned long require_start;
+>> @@ -30,17 +31,23 @@ struct fault_attr {
+>>         struct dentry *dname;
+>>  };
+>>
+>> -#define FAULT_ATTR_INITIALIZER {                                       \
+>> +#define __FAULT_ATTR_INITIALIZER(__global) {                           \
+>>                 .interval = 1,                                          \
+>>                 .times = ATOMIC_INIT(1),                                \
+>>                 .require_end = ULONG_MAX,                               \
+>> +               .global = (__global),                                   \
+>>                 .stacktrace_depth = 32,                                 \
+>>                 .ratelimit_state = RATELIMIT_STATE_INIT_DISABLED,       \
+>>                 .verbose = 2,                                           \
+>>                 .dname = NULL,                                          \
+>>         }
+>>
+>> -#define DECLARE_FAULT_ATTR(name) struct fault_attr name = FAULT_ATTR_INITIALIZER
+>> +#define FAULT_ATTR_INITIALIZER __FAULT_ATTR_INITIALIZER(false)
+>> +
+>> +#define DECLARE_FAULT_ATTR(name)                               \
+>> +       struct fault_attr name = __FAULT_ATTR_INITIALIZER(false)
+>> +#define DECLARE_GLOBAL_FAULT_ATTR(name)                                \
+>> +       struct fault_attr name = __FAULT_ATTR_INITIALIZER(true)
+>>  int setup_fault_attr(struct fault_attr *attr, char *str);
+>>  bool should_fail(struct fault_attr *attr, ssize_t size);
+>>
+>> diff --git a/lib/fault-inject.c b/lib/fault-inject.c
+>> index 7d315fdb9f13..c8f6ef5df3c6 100644
+>> --- a/lib/fault-inject.c
+>> +++ b/lib/fault-inject.c
+>> @@ -107,7 +107,7 @@ static inline bool fail_stacktrace(struct fault_attr *attr)
+>>
+>>  bool should_fail(struct fault_attr *attr, ssize_t size)
+>>  {
+>> -       if (in_task()) {
+>> +       if (!attr->global && in_task()) {
+>>                 unsigned int fail_nth = READ_ONCE(current->fail_nth);
+>>
+>>                 if (fail_nth && !WRITE_ONCE(current->fail_nth, fail_nth - 1))
+>> @@ -224,6 +224,8 @@ struct dentry *fault_create_debugfs_attr(const char *name,
+>>         if (!debugfs_create_u32("verbose_ratelimit_burst", mode, dir,
+>>                                 &attr->ratelimit_state.burst))
+>>                 goto fail;
+>> +       if (!debugfs_create_bool("global", mode, dir, &attr->global))
+>> +               goto fail;
+>>         if (!debugfs_create_bool("task-filter", mode, dir, &attr->task_filter))
+>>                 goto fail;
+>>
+>> --
+>> 2.14.0
+>>
