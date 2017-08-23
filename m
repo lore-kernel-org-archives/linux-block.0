@@ -1,35 +1,49 @@
-Return-Path: <keith.busch@intel.com>
-Date: Wed, 23 Aug 2017 18:53:00 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH 10/10] nvme: implement multipath access to nvme subsystems
-Message-ID: <20170823225259.GD16596@localhost.localdomain>
+Date: Wed, 23 Aug 2017 18:21:55 +0000
+Message-ID: <1503512512.2484.16.camel@wdc.com>
 References: <20170823175815.3646-1-hch@lst.de>
- <20170823175815.3646-11-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	 <20170823175815.3646-11-hch@lst.de>
 In-Reply-To: <20170823175815.3646-11-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Aug 23, 2017 at 07:58:15PM +0200, Christoph Hellwig wrote:
-> 
-> TODO: implement sysfs interfaces for the new subsystem and
-> subsystem-namespace object.  Unless we can come up with something
-> better than sysfs here..
-
-Can we get symlinks from the multipath'ed nvme block device to the
-individual paths? I think it should be something like the following:
- 
-> @@ -2616,6 +2821,10 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
->  	if (ns->ndev && nvme_nvm_register_sysfs(ns))
->  		pr_warn("%s: failed to register lightnvm sysfs group for identification\n",
->  			ns->disk->disk_name);
-> +
-> +	if (new)
-> +		add_disk(ns->head->disk);
-+
-+	sysfs_create_link(&disk_to_dev(ns->head->disk)->kobj,
-+			  &disk_to_dev(ns->disk)->kobj,
-+			  ns->disk->name);
+T24gV2VkLCAyMDE3LTA4LTIzIGF0IDE5OjU4ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gK3N0YXRpYyBibGtfcWNfdCBudm1lX21ha2VfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9x
+dWV1ZSAqcSwgc3RydWN0IGJpbyAqYmlvKQ0KPiArew0KPiArCXN0cnVjdCBudm1lX25zX2hlYWQg
+KmhlYWQgPSBxLT5xdWV1ZWRhdGE7DQo+ICsJc3RydWN0IG52bWVfbnMgKm5zOw0KPiArCWJsa19x
+Y190IHJldCA9IEJMS19RQ19UX05PTkU7DQo+ICsJaW50IHNyY3VfaWR4Ow0KPiArDQo+ICsJc3Jj
+dV9pZHggPSBzcmN1X3JlYWRfbG9jaygmaGVhZC0+c3JjdSk7DQo+ICsJbnMgPSBzcmN1X2RlcmVm
+ZXJlbmNlKGhlYWQtPmN1cnJlbnRfcGF0aCwgJmhlYWQtPnNyY3UpOw0KPiArCWlmICh1bmxpa2Vs
+eSghbnMgfHwgbnMtPmN0cmwtPnN0YXRlICE9IE5WTUVfQ1RSTF9MSVZFKSkNCj4gKwkJbnMgPSBu
+dm1lX2ZpbmRfcGF0aChoZWFkKTsNCj4gKwlpZiAobGlrZWx5KG5zKSkgew0KPiArCQliaW8tPmJp
+X2Rpc2sgPSBucy0+ZGlzazsNCj4gKwkJYmlvLT5iaV9vcGYgfD0gUkVRX0ZBSUxGQVNUX1RSQU5T
+UE9SVDsNCj4gKwkJcmV0ID0gZ2VuZXJpY19tYWtlX3JlcXVlc3RfZmFzdChiaW8pOw0KPiArCX0g
+ZWxzZSBpZiAoIWxpc3RfZW1wdHlfY2FyZWZ1bCgmaGVhZC0+bGlzdCkpIHsNCj4gKwkJcHJpbnRr
+X3JhdGVsaW1pdGVkKCJubyBwYXRoIGF2YWlsYWJsZSAtIHJlcXVlaW5nIEkvT1xuIik7DQo+ICsN
+Cj4gKwkJc3Bpbl9sb2NrX2lycSgmaGVhZC0+cmVxdWV1ZV9sb2NrKTsNCj4gKwkJYmlvX2xpc3Rf
+YWRkKCZoZWFkLT5yZXF1ZXVlX2xpc3QsIGJpbyk7DQo+ICsJCXNwaW5fdW5sb2NrX2lycSgmaGVh
+ZC0+cmVxdWV1ZV9sb2NrKTsNCj4gKwl9IGVsc2Ugew0KPiArCQlwcmludGtfcmF0ZWxpbWl0ZWQo
+Im5vIHBhdGggLSBmYWlsaW5nIEkvT1xuIik7DQo+ICsNCj4gKwkJYmlvLT5iaV9zdGF0dXMgPSBC
+TEtfU1RTX0lPRVJSOw0KPiArCQliaW9fZW5kaW8oYmlvKTsNCj4gKwl9DQo+ICsNCj4gKwlzcmN1
+X3JlYWRfdW5sb2NrKCZoZWFkLT5zcmN1LCBzcmN1X2lkeCk7DQo+ICsJcmV0dXJuIHJldDsNCj4g
+K30NCg0KSGVsbG8gQ2hyaXN0b3BoLA0KDQpTaW5jZSBnZW5lcmljX21ha2VfcmVxdWVzdF9mYXN0
+KCkgcmV0dXJucyBCTEtfU1RTX0FHQUlOIGZvciBhIGR5aW5nIHBhdGg6DQpjYW4gdGhlIHNhbWUg
+a2luZCBvZiBzb2Z0IGxvY2t1cHMgb2NjdXIgd2l0aCB0aGUgTlZNZSBtdWx0aXBhdGhpbmcgY29k
+ZSBhcw0Kd2l0aCB0aGUgY3VycmVudCB1cHN0cmVhbSBkZXZpY2UgbWFwcGVyIG11bHRpcGF0aGlu
+ZyBjb2RlPyBTZWUgZS5nLg0KIltQQVRDSCAzLzddIGRtLW1wYXRoOiBEbyBub3QgbG9jayB1cCBh
+IENQVSB3aXRoIHJlcXVldWluZyBhY3Rpdml0eSINCihodHRwczovL3d3dy5yZWRoYXQuY29tL2Fy
+Y2hpdmVzL2RtLWRldmVsLzIwMTctQXVndXN0L21zZzAwMTI0Lmh0bWwpLg0KDQpBbm90aGVyIHF1
+ZXN0aW9uIGFib3V0IHRoaXMgY29kZSBpcyB3aGF0IHdpbGwgaGFwcGVuIGlmDQpnZW5lcmljX21h
+a2VfcmVxdWVzdF9mYXN0KCkgcmV0dXJucyBCTEtfU1RTX0FHQUlOIGFuZCB0aGUgc3VibWl0X2Jp
+bygpIG9yDQpnZW5lcmljX21ha2VfcmVxdWVzdCgpIGNhbGxlciBpZ25vcmVzIHRoZSByZXR1cm4g
+dmFsdWUgb2YgdGhlIGNhbGxlZA0KZnVuY3Rpb24/IEEgcXVpY2sgZ3JlcCByZXZlYWxlZCB0aGF0
+IHRoZXJlIGlzIHBsZW50eSBvZiBjb2RlIHRoYXQgaWdub3Jlcw0KdGhlIHJldHVybiB2YWx1ZSBv
+ZiB0aGVzZSBsYXN0IHR3byBmdW5jdGlvbnMuDQoNClRoYW5rcywNCg0KQmFydC4=
