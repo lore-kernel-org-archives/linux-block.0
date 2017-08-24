@@ -1,43 +1,80 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "keith.busch@intel.com" <keith.busch@intel.com>,
+Return-Path: <hch@lst.de>
+Date: Thu, 24 Aug 2017 10:59:54 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"keith.busch@intel.com" <keith.busch@intel.com>,
 	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "sagi@grimberg.me" <sagi@grimberg.me>
-Subject: Re: [PATCH 10/10] nvme: implement multipath access to nvme subsystems
-Date: Thu, 24 Aug 2017 20:17:32 +0000
-Message-ID: <1503605798.2899.43.camel@wdc.com>
-References: <20170823175815.3646-1-hch@lst.de>
-	 <20170823175815.3646-11-hch@lst.de> <1503512512.2484.16.camel@wdc.com>
-	 <20170824085954.GD19504@lst.de>
-In-Reply-To: <20170824085954.GD19504@lst.de>
-Content-Type: text/plain; charset="utf-8"
+	"sagi@grimberg.me" <sagi@grimberg.me>
+Subject: Re: [PATCH 10/10] nvme: implement multipath access to nvme
+	subsystems
+Message-ID: <20170824085954.GD19504@lst.de>
+References: <20170823175815.3646-1-hch@lst.de> <20170823175815.3646-11-hch@lst.de> <1503512512.2484.16.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1503512512.2484.16.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE3LTA4LTI0IGF0IDEwOjU5ICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
-biBXZWQsIEF1ZyAyMywgMjAxNyBhdCAwNjoyMTo1NVBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
-d3JvdGU6DQo+ID4gU2luY2UgZ2VuZXJpY19tYWtlX3JlcXVlc3RfZmFzdCgpIHJldHVybnMgQkxL
-X1NUU19BR0FJTiBmb3IgYSBkeWluZyBwYXRoOg0KPiA+IGNhbiB0aGUgc2FtZSBraW5kIG9mIHNv
-ZnQgbG9ja3VwcyBvY2N1ciB3aXRoIHRoZSBOVk1lIG11bHRpcGF0aGluZyBjb2RlIGFzDQo+ID4g
-d2l0aCB0aGUgY3VycmVudCB1cHN0cmVhbSBkZXZpY2UgbWFwcGVyIG11bHRpcGF0aGluZyBjb2Rl
-PyBTZWUgZS5nLg0KPiA+ICJbUEFUQ0ggMy83XSBkbS1tcGF0aDogRG8gbm90IGxvY2sgdXAgYSBD
-UFUgd2l0aCByZXF1ZXVpbmcgYWN0aXZpdHkiDQo+ID4gKGh0dHBzOi8vd3d3LnJlZGhhdC5jb20v
-YXJjaGl2ZXMvZG0tZGV2ZWwvMjAxNy1BdWd1c3QvbXNnMDAxMjQuaHRtbCkuDQo+IA0KPiBJIHN1
-c3BlY3QgdGhlIGNvZGUgaXMgbm90IGdvaW5nIHRvIGhpdCBpdCBiZWNhdXNlIHdlIGNoZWNrIHRo
-ZSBjb250cm9sbGVyDQo+IHN0YXRlIGJlZm9yZSB0cnlpbmcgdG8gcXVldWUgSS9PIG9uIHRoZSBs
-b3dlciBxdWV1ZS4gIEJ1dCBpZiB5b3UgcG9pbnQNCj4gbWUgdG8gYSBnb29kIHJlcHJvZHVjZXIg
-dGVzdCBjYXNlIEknZCBsaWtlIHRvIGNoZWNrLg0KDQpGb3IgTlZNZSBvdmVyIFJETUEsIGhvdyBh
-Ym91dCB0aGUgc2ltdWxhdGVfbmV0d29ya19mYWlsdXJlX2xvb3AoKSBmdW5jdGlvbiBpbg0KaHR0
-cHM6Ly9naXRodWIuY29tL2J2YW5hc3NjaGUvc3JwLXRlc3QvYmxvYi9tYXN0ZXIvbGliL2Z1bmN0
-aW9ucz8gSXQgc2ltdWxhdGVzDQphIG5ldHdvcmsgZmFpbHVyZSBieSB3cml0aW5nIGludG8gdGhl
-IHJlc2V0X2NvbnRyb2xsZXIgc3lzZnMgYXR0cmlidXRlLg0KDQo+IEFsc28gZG9lcyB0aGUgInNp
-bmdsZSBxdWV1ZSIgY2FzZSBpbiB5b3VyIG1haWwgcmVmZXIgdG8gdGhlIG9sZA0KPiByZXF1ZXN0
-IGNvZGU/ICBudm1lIG9ubHkgdXNlcyBibGstbXEgc28gaXQgd291bGQgbm90IGhpdCB0aGF0Lg0K
-PiBCdXQgZWl0aGVyIHdheSBJIHRoaW5rIGdldF9yZXF1ZXN0IHNob3VsZCBiZSBmaXhlZCB0byBy
-ZXR1cm4NCj4gQkxLX1NUU19JT0VSUiBpZiB0aGUgcXVldWUgaXMgZHlpbmcgaW5zdGVhZCBvZiBC
-TEtfU1RTX0FHQUlOLg0KDQpUaGUgZGVzY3JpcHRpb24gaW4gdGhlIHBhdGNoIEkgcmVmZXJyZWQg
-dG8gaW5kZWVkIHJlZmVycyB0byB0aGUgb2xkIHJlcXVlc3QNCmNvZGUgaW4gdGhlIGJsb2NrIGxh
-eWVyLiBXaGVuIEkgcHJlcGFyZWQgdGhhdCBwYXRjaCBJIGhhZCBhbmFseXplZCB0aGUNCmJlaGF2
-aW9yIG9mIHRoZSBvbGQgcmVxdWVzdCBjb2RlIG9ubHkuDQoNCkJhcnQu
+On Wed, Aug 23, 2017 at 06:21:55PM +0000, Bart Van Assche wrote:
+> On Wed, 2017-08-23 at 19:58 +0200, Christoph Hellwig wrote:
+> > +static blk_qc_t nvme_make_request(struct request_queue *q, struct bio *bio)
+> > +{
+> > +	struct nvme_ns_head *head = q->queuedata;
+> > +	struct nvme_ns *ns;
+> > +	blk_qc_t ret = BLK_QC_T_NONE;
+> > +	int srcu_idx;
+> > +
+> > +	srcu_idx = srcu_read_lock(&head->srcu);
+> > +	ns = srcu_dereference(head->current_path, &head->srcu);
+> > +	if (unlikely(!ns || ns->ctrl->state != NVME_CTRL_LIVE))
+> > +		ns = nvme_find_path(head);
+> > +	if (likely(ns)) {
+> > +		bio->bi_disk = ns->disk;
+> > +		bio->bi_opf |= REQ_FAILFAST_TRANSPORT;
+> > +		ret = generic_make_request_fast(bio);
+> > +	} else if (!list_empty_careful(&head->list)) {
+> > +		printk_ratelimited("no path available - requeing I/O\n");
+> > +
+> > +		spin_lock_irq(&head->requeue_lock);
+> > +		bio_list_add(&head->requeue_list, bio);
+> > +		spin_unlock_irq(&head->requeue_lock);
+> > +	} else {
+> > +		printk_ratelimited("no path - failing I/O\n");
+> > +
+> > +		bio->bi_status = BLK_STS_IOERR;
+> > +		bio_endio(bio);
+> > +	}
+> > +
+> > +	srcu_read_unlock(&head->srcu, srcu_idx);
+> > +	return ret;
+> > +}
+> 
+> Hello Christoph,
+> 
+> Since generic_make_request_fast() returns BLK_STS_AGAIN for a dying path:
+> can the same kind of soft lockups occur with the NVMe multipathing code as
+> with the current upstream device mapper multipathing code? See e.g.
+> "[PATCH 3/7] dm-mpath: Do not lock up a CPU with requeuing activity"
+> (https://www.redhat.com/archives/dm-devel/2017-August/msg00124.html).
+
+I suspect the code is not going to hit it because we check the controller
+state before trying to queue I/O on the lower queue.  But if you point
+me to a good reproducer test case I'd like to check.
+
+Also does the "single queue" case in your mail refer to the old
+request code?  nvme only uses blk-mq so it would not hit that.
+But either way I think get_request should be fixed to return
+BLK_STS_IOERR if the queue is dying instead of BLK_STS_AGAIN.
+
+> Another question about this code is what will happen if
+> generic_make_request_fast() returns BLK_STS_AGAIN and the submit_bio() or
+> generic_make_request() caller ignores the return value of the called
+> function? A quick grep revealed that there is plenty of code that ignores
+> the return value of these last two functions.
+
+generic_make_request and generic_make_request_fast only return
+the polling cookie (blk_qc_t), not a block status.  Note that we do
+not use blk_get_request / blk_mq_alloc_request for the request allocation
+of the request on the lower device, so unless the caller passed REQ_NOWAIT
+and is able to handle BLK_STS_AGAIN we won't ever return it.
