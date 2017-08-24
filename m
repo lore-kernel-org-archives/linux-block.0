@@ -1,45 +1,73 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:57871 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751230AbdH1Rh2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2017 13:37:28 -0400
-Received: from clnet-p099-196.ikbnet.co.at ([83.175.99.196] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.87 #1 (Red Hat Linux))
-        id 1dmNya-0006Dx-4g
-        for linux-block@vger.kernel.org; Mon, 28 Aug 2017 17:37:28 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: linux-block@vger.kernel.org
-Subject: ALPSS: reminder and submission deadline
-Date: Mon, 28 Aug 2017 19:37:25 +0200
-Message-Id: <20170828173725.25666-1-hch@lst.de>
+Received: from mx1.redhat.com ([209.132.183.28]:45056 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751191AbdHXG4L (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Aug 2017 02:56:11 -0400
+Date: Thu, 24 Aug 2017 14:55:58 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: [PATCH V2 10/20] blk-mq-sched: introduce helpers for query,
+ change busy state
+Message-ID: <20170824065557.GL12966@ming.t460p>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
+ <20170805065705.12989-11-ming.lei@redhat.com>
+ <1503434472.2508.19.camel@wdc.com>
+ <20170823200219.GC15083@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170823200219.GC15083@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Just one more month to go until the Alpine Linux Persistence and Storage
-Summit (ALPSS) will be held from September 27-29 at the Lizumerhuette
-in Austria!
+On Wed, Aug 23, 2017 at 02:02:20PM -0600, Jens Axboe wrote:
+> On Tue, Aug 22 2017, Bart Van Assche wrote:
+> > On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
+> > > +static inline bool blk_mq_hctx_is_dispatch_busy(struct blk_mq_hw_ctx *hctx)
+> > > +{
+> > > +	return test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
+> > > +}
+> > > +
+> > > +static inline void blk_mq_hctx_set_dispatch_busy(struct blk_mq_hw_ctx *hctx)
+> > > +{
+> > > +	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
+> > > +}
+> > > +
+> > > +static inline void blk_mq_hctx_clear_dispatch_busy(struct blk_mq_hw_ctx *hctx)
+> > > +{
+> > > +	clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
+> > > +}
+> > 
+> > Hello Ming,
+> > 
+> > Are these helper functions modified in a later patch? If not, please drop
+> > this patch. One line helper functions are not useful and do not improve
+> > readability of source code.
+> 
+> Agree, they just obfuscate the code. Only reason to do this is to do
+> things like:
 
-If you want to submit a 30-minute talk please do so until Sep 1st, as we
-plan to finalize our schedule.  BOFs and team meetings will be scheduled
-ad-hoc in the available meeting rooms or outside with a beautiful mountain
-panorama.
+If you look at the following patch, these introduced functions are
+modified a lot.
 
-If you only want to attend you can do so until last minute as long as
-space doesn't run.
+> 
+> static inline void blk_mq_hctx_clear_dispatch_busy(struct blk_mq_hw_ctx *hctx)
+> {
+>         if (test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state))
+> 	        clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
+> }
+> 
+> to avoid unecessary RMW (and locked instruction). At least then you can
+> add a single comment as to why it's done that way. Apart from that, I
+> prefer to open-code it so people don't have to grep to figure out wtf
+> blk_mq_hctx_clear_dispatch_busy() does.
 
-To submit a talk or request attendance please send a mail to:
+Ok, will do that in this way.
 
-	alpss-pc@lists.infradead.org
 
-More details are available on our website:
 
-	http://www.alpss.at/
-
-Thank you on behalf of the program committee:
-
-    Stephen Bates
-    Sagi Grimberg
-    Christoph Hellwig
-    Johannes Thumshirn
-    Richard Weinberger
+-- 
+Ming
