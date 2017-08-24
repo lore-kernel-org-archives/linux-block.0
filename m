@@ -1,77 +1,48 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 22/55] skd: Simplify the code for deciding whether or not to send a FIT msg
-Date: Thu, 17 Aug 2017 13:13:05 -0700
-Message-Id: <20170817201338.16537-23-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 24 Aug 2017 10:36:25 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, Kernel-team@fb.com,
+	Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH 1/2] block/loop: set hw_sectors
+Message-ID: <20170824173625.GB6964@vader.DHCP.thefacebook.com>
+References: <cover.1503531709.git.shli@fb.com>
+ <3742ed80f48b4ca55ad4ed7dcee6a667f0e82024.1503531709.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <3742ed80f48b4ca55ad4ed7dcee6a667f0e82024.1503531709.git.shli@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Due to the previous patch it is guaranteed that the FIT msg contains
-at least one request after the for-loop has finished. Use this to
-simplify the code.
+On Wed, Aug 23, 2017 at 04:49:23PM -0700, Shaohua Li wrote:
+> From: Shaohua Li <shli@fb.com>
+> 
+> Loop can handle any size of request. Limiting it to 255 sectors just
+> burns the CPU for bio split and request merge for underlayer disk and
+> also cause bad fs block allocation in directio mode.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 29 +++++------------------------
- 1 file changed, 5 insertions(+), 24 deletions(-)
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index cbebaf4b0878..3fc6ec9477c7 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -693,36 +693,17 @@ static void skd_request_fn(struct request_queue *q)
- 		/*
- 		 * If the FIT msg buffer is full send it.
- 		 */
--		if (skmsg->length >= SKD_N_FITMSG_BYTES ||
--		    fmh->num_protocol_cmds_coalesced >= skd_max_req_per_msg) {
-+		if (fmh->num_protocol_cmds_coalesced >= skd_max_req_per_msg) {
- 			skd_send_fitmsg(skdev, skmsg);
- 			skmsg = NULL;
- 			fmh = NULL;
- 		}
- 	}
- 
--	/*
--	 * Is a FIT msg in progress? If it is empty put the buffer back
--	 * on the free list. If it is non-empty send what we got.
--	 * This minimizes latency when there are fewer requests than
--	 * what fits in a FIT msg.
--	 */
--	if (skmsg != NULL) {
--		/* Bigger than just a FIT msg header? */
--		if (skmsg->length > sizeof(struct fit_msg_hdr)) {
--			dev_dbg(&skdev->pdev->dev, "sending msg=%p, len %d\n",
--				skmsg, skmsg->length);
--			skd_send_fitmsg(skdev, skmsg);
--		} else {
--			/*
--			 * The FIT msg is empty. It means we got started
--			 * on the msg, but the requests were rejected.
--			 */
--			skmsg->state = SKD_MSG_STATE_IDLE;
--			skmsg->id += SKD_ID_INCR;
--			skmsg->next = skdev->skmsg_free_list;
--			skdev->skmsg_free_list = skmsg;
--		}
-+	/* If the FIT msg buffer is not empty send what we got. */
-+	if (skmsg) {
-+		WARN_ON_ONCE(!fmh->num_protocol_cmds_coalesced);
-+		skd_send_fitmsg(skdev, skmsg);
- 		skmsg = NULL;
- 		fmh = NULL;
- 	}
--- 
-2.14.0
+Note that this will conflict with my loop blocksize series, we can fix
+up whichever series goes in second.
+
+> Signed-off-by: Shaohua Li <shli@fb.com>
+> ---
+>  drivers/block/loop.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index b55a1f8..428da07 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1799,6 +1799,7 @@ static int loop_add(struct loop_device **l, int i)
+>  	}
+>  	lo->lo_queue->queuedata = lo;
+>  
+> +	blk_queue_max_hw_sectors(lo->lo_queue, BLK_DEF_MAX_SECTORS);
+>  	/*
+>  	 * It doesn't make sense to enable merge because the I/O
+>  	 * submitted to backing file is handled page by page.
+> -- 
+> 2.9.5
+> 
