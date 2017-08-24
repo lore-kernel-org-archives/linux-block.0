@@ -1,140 +1,170 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46570 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750931AbdHZQdu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Aug 2017 12:33:50 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 00/14] blk-mq-sched: improve SCSI-MQ performance
-Date: Sun, 27 Aug 2017 00:33:18 +0800
-Message-Id: <20170826163332.28971-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Thu, 24 Aug 2017 16:38:00 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christoph Hellwig <hch@lst.de>
+Cc: viro@zeniv.linux.org.uk, axboe@kernel.dk,
+	Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>, mgorman@suse.de,
+	Volker.Lendecke@sernet.de, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/4] fs: support RWF_NOWAIT for buffered reads
+Message-ID: <20170824143800.GC8969@quack2.suse.cz>
+References: <20170822161712.11716-1-hch@lst.de>
+ <20170822161712.11716-4-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170822161712.11716-4-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-In Red Hat internal storage test wrt. blk-mq scheduler, we
-found that I/O performance is much bad with mq-deadline, especially
-about sequential I/O on some multi-queue SCSI devcies(lpfc, qla2xxx,
-SRP...)
+On Tue 22-08-17 18:17:11, Christoph Hellwig wrote:
+> This is based on the old idea and code from Milosz Tanski.  With the aio
+> nowait code it becomes mostly trivial now.  Buffered writes continue to
+> return -EOPNOTSUPP if RWF_NOWAIT is passed.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Turns out one big issue causes the performance regression: requests
-are still dequeued from sw queue/scheduler queue even when ldd's
-queue is busy, so I/O merge becomes quite difficult to make, then
-sequential IO degrades a lot.
+Looks good. You can add:
 
-The 1st five patches improve this situation, and brings back
-some performance loss.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Patch 6 ~ 7 uses q->queue_depth as hint for setting up
-scheduler queue depth.
+								Honza
 
-Patch 8 ~ 15 improve bio merge via hash table in sw queue,
-which makes bio merge more efficient than current approch
-in which only the last 8 requests are checked. Since patch
-6~14 converts to the scheduler way of dequeuing one request
-from sw queue one time for SCSI device, and the times of
-acquring ctx->lock is increased, and merging bio via hash
-table decreases holding time of ctx->lock and should eliminate
-effect from patch 14. 
-
-With this changes, SCSI-MQ sequential I/O performance is
-improved much, Paolo reported that mq-deadline performance
-improved much[2] in his dbench test wrt V2. Also performanc
-improvement on lpfc/qla2xx was observed with V1.[1]
-
-Also Bart worried that this patchset may affect SRP, so provide
-test data on SCSI SRP this time:
-
-- fio(libaio, bs:4k, dio, queue_depth:64, 64 jobs)
-- system(16 cores, dual sockets, mem: 96G)
-
-          |v4.13-rc6+*  |v4.13-rc6+   | patched v4.13-rc6+ 
------------------------------------------------------
- IOPS(K)  |  DEADLINE   |    NONE     |    NONE     
------------------------------------------------------
-read      |      587.81 |      511.96 |      518.51 
------------------------------------------------------
-randread  |      116.44 |      142.99 |      142.46 
------------------------------------------------------
-write     |      580.87 |       536.4 |      582.15 
------------------------------------------------------
-randwrite |      104.95 |      124.89 |      123.99 
------------------------------------------------------
-
-
-          |v4.13-rc6+   |v4.13-rc6+   | patched v4.13-rc6+ 
------------------------------------------------------
- IOPS(K)  |  DEADLINE   |MQ-DEADLINE  |MQ-DEADLINE  
------------------------------------------------------
-read      |      587.81 |       158.7 |      450.41 
------------------------------------------------------
-randread  |      116.44 |      142.04 |      142.72 
------------------------------------------------------
-write     |      580.87 |      136.61 |      569.37 
------------------------------------------------------
-randwrite |      104.95 |      123.14 |      124.36 
------------------------------------------------------
-
-*: v4.13-rc6+ means v4.13-rc6 with block for-next
-
-
-[1] http://marc.info/?l=linux-block&m=150151989915776&w=2
-[2] https://marc.info/?l=linux-block&m=150217980602843&w=2
-
-V3:
-	- totally round robin for picking req from ctx, as suggested
-	by Bart
-	- remove one local variable in __sbitmap_for_each_set()
-	- drop patches of single dispatch list, which can improve
-	performance on mq-deadline, but cause a bit degrade on
-	none because all hctxs need to be checked after ->dispatch
-	is flushed. Will post it again once it is mature.
-	- rebase on v4.13-rc6 with block for-next
-
-V2:
-	- dequeue request from sw queues in round roubin's style
-	as suggested by Bart, and introduces one helper in sbitmap
-	for this purpose
-	- improve bio merge via hash table from sw queue
-	- add comments about using DISPATCH_BUSY state in lockless way,
-	simplifying handling on busy state,
-	- hold ctx->lock when clearing ctx busy bit as suggested
-	by Bart
-
-Ming Lei (14):
-  blk-mq-sched: fix scheduler bad performance
-  sbitmap: introduce __sbitmap_for_each_set()
-  blk-mq: introduce blk_mq_dispatch_rq_from_ctx()
-  blk-mq-sched: move actual dispatching into one helper
-  blk-mq-sched: improve dispatching from sw queue
-  blk-mq-sched: don't dequeue request until all in ->dispatch are
-    flushed
-  blk-mq-sched: introduce blk_mq_sched_queue_depth()
-  blk-mq-sched: use q->queue_depth as hint for q->nr_requests
-  block: introduce rqhash helpers
-  block: move actual bio merge code into __elv_merge
-  block: add check on elevator for supporting bio merge via hashtable
-    from blk-mq sw queue
-  block: introduce .last_merge and .hash to blk_mq_ctx
-  blk-mq-sched: refactor blk_mq_sched_try_merge()
-  blk-mq: improve bio merge from blk-mq sw queue
-
- block/blk-mq-debugfs.c  |   1 +
- block/blk-mq-sched.c    | 186 ++++++++++++++++++++++++++++++++----------------
- block/blk-mq-sched.h    |  23 ++++++
- block/blk-mq.c          |  93 +++++++++++++++++++++++-
- block/blk-mq.h          |   7 ++
- block/blk-settings.c    |   2 +
- block/blk.h             |  55 ++++++++++++++
- block/elevator.c        |  93 ++++++++++++++----------
- include/linux/blk-mq.h  |   3 +
- include/linux/sbitmap.h |  56 +++++++++++----
- 10 files changed, 401 insertions(+), 118 deletions(-)
-
+> ---
+>  fs/aio.c           |  6 ------
+>  fs/btrfs/file.c    |  6 +++++-
+>  fs/ext4/file.c     |  6 +++---
+>  fs/xfs/xfs_file.c  | 11 +++++++++--
+>  include/linux/fs.h |  6 +++---
+>  5 files changed, 20 insertions(+), 15 deletions(-)
+> 
+> diff --git a/fs/aio.c b/fs/aio.c
+> index dcad3a66748c..d93daa076726 100644
+> --- a/fs/aio.c
+> +++ b/fs/aio.c
+> @@ -1593,12 +1593,6 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+>  		goto out_put_req;
+>  	}
+>  
+> -	if ((req->common.ki_flags & IOCB_NOWAIT) &&
+> -			!(req->common.ki_flags & IOCB_DIRECT)) {
+> -		ret = -EOPNOTSUPP;
+> -		goto out_put_req;
+> -	}
+> -
+>  	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
+>  	if (unlikely(ret)) {
+>  		pr_debug("EFAULT: aio_key\n");
+> diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+> index 9e75d8a39aac..e62dd55b4079 100644
+> --- a/fs/btrfs/file.c
+> +++ b/fs/btrfs/file.c
+> @@ -1886,6 +1886,10 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+>  	loff_t oldsize;
+>  	int clean_page = 0;
+>  
+> +	if (!(iocb->ki_flags & IOCB_DIRECT) &&
+> +	    (iocb->ki_flags & IOCB_NOWAIT))
+> +		return -EOPNOTSUPP;
+> +
+>  	if (!inode_trylock(inode)) {
+>  		if (iocb->ki_flags & IOCB_NOWAIT)
+>  			return -EAGAIN;
+> @@ -3105,7 +3109,7 @@ static loff_t btrfs_file_llseek(struct file *file, loff_t offset, int whence)
+>  
+>  static int btrfs_file_open(struct inode *inode, struct file *filp)
+>  {
+> -	filp->f_mode |= FMODE_AIO_NOWAIT;
+> +	filp->f_mode |= FMODE_NOWAIT;
+>  	return generic_file_open(inode, filp);
+>  }
+>  
+> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+> index 0d7cf0cc9b87..f83521337b8f 100644
+> --- a/fs/ext4/file.c
+> +++ b/fs/ext4/file.c
+> @@ -223,6 +223,8 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  	if (IS_DAX(inode))
+>  		return ext4_dax_write_iter(iocb, from);
+>  #endif
+> +	if (!o_direct && (iocb->ki_flags & IOCB_NOWAIT))
+> +		return -EOPNOTSUPP;
+>  
+>  	if (!inode_trylock(inode)) {
+>  		if (iocb->ki_flags & IOCB_NOWAIT)
+> @@ -448,9 +450,7 @@ static int ext4_file_open(struct inode * inode, struct file * filp)
+>  			return ret;
+>  	}
+>  
+> -	/* Set the flags to support nowait AIO */
+> -	filp->f_mode |= FMODE_AIO_NOWAIT;
+> -
+> +	filp->f_mode |= FMODE_NOWAIT;
+>  	return dquot_file_open(inode, filp);
+>  }
+>  
+> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> index c4893e226fd8..1a09104b3eb0 100644
+> --- a/fs/xfs/xfs_file.c
+> +++ b/fs/xfs/xfs_file.c
+> @@ -259,7 +259,11 @@ xfs_file_buffered_aio_read(
+>  
+>  	trace_xfs_file_buffered_read(ip, iov_iter_count(to), iocb->ki_pos);
+>  
+> -	xfs_ilock(ip, XFS_IOLOCK_SHARED);
+> +	if (!xfs_ilock_nowait(ip, XFS_IOLOCK_SHARED)) {
+> +		if (iocb->ki_flags & IOCB_NOWAIT)
+> +			return -EAGAIN;
+> +		xfs_ilock(ip, XFS_IOLOCK_SHARED);
+> +	}
+>  	ret = generic_file_read_iter(iocb, to);
+>  	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
+>  
+> @@ -636,6 +640,9 @@ xfs_file_buffered_aio_write(
+>  	int			enospc = 0;
+>  	int			iolock;
+>  
+> +	if (iocb->ki_flags & IOCB_NOWAIT)
+> +		return -EOPNOTSUPP;
+> +
+>  write_retry:
+>  	iolock = XFS_IOLOCK_EXCL;
+>  	xfs_ilock(ip, iolock);
+> @@ -912,7 +919,7 @@ xfs_file_open(
+>  		return -EFBIG;
+>  	if (XFS_FORCED_SHUTDOWN(XFS_M(inode->i_sb)))
+>  		return -EIO;
+> -	file->f_mode |= FMODE_AIO_NOWAIT;
+> +	file->f_mode |= FMODE_NOWAIT;
+>  	return 0;
+>  }
+>  
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 6e1fd5d21248..ded258edc425 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -146,8 +146,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+>  /* File was opened by fanotify and shouldn't generate fanotify events */
+>  #define FMODE_NONOTIFY		((__force fmode_t)0x4000000)
+>  
+> -/* File is capable of returning -EAGAIN if AIO will block */
+> -#define FMODE_AIO_NOWAIT	((__force fmode_t)0x8000000)
+> +/* File is capable of returning -EAGAIN if I/O will block */
+> +#define FMODE_NOWAIT	((__force fmode_t)0x8000000)
+>  
+>  /*
+>   * Flag for rw_copy_check_uvector and compat_rw_copy_check_uvector
+> @@ -3149,7 +3149,7 @@ static inline int kiocb_set_rw_flags(struct kiocb *ki, int flags)
+>  		return -EOPNOTSUPP;
+>  
+>  	if (flags & RWF_NOWAIT) {
+> -		if (!(ki->ki_filp->f_mode & FMODE_AIO_NOWAIT))
+> +		if (!(ki->ki_filp->f_mode & FMODE_NOWAIT))
+>  			return -EOPNOTSUPP;
+>  		ki->ki_flags |= IOCB_NOWAIT;
+>  	}
+> -- 
+> 2.11.0
+> 
 -- 
-2.9.5
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
