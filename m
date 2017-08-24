@@ -1,117 +1,61 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41714 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933386AbdHYP2M (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 11:28:12 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH] dm-rq: do not update rq partially in each ending bio
-Date: Fri, 25 Aug 2017 23:27:49 +0800
-Message-Id: <20170825152749.14435-1-ming.lei@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:39097 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751348AbdHXMXj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Aug 2017 08:23:39 -0400
+Subject: Re: [PATCH 2/4] loop: set physical block size to PAGE_SIZE
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Ming Lei <ming.lei@redhat.com>,
+        Karel Zak <kzak@redhat.com>, Milan Broz <gmazyland@gmail.com>
+References: <cover.1503558155.git.osandov@fb.com>
+ <378ae3760bd37441fd60a5188eae75f39babb6aa.1503558155.git.osandov@fb.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <b6066a0b-ee02-609a-1d5b-867ba6af2e38@suse.de>
+Date: Thu, 24 Aug 2017 14:23:37 +0200
+MIME-Version: 1.0
+In-Reply-To: <378ae3760bd37441fd60a5188eae75f39babb6aa.1503558155.git.osandov@fb.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We don't need to update orignal dm request partially
-when ending each cloned bio, and this patch just
-updates orignal dm request once when the whole
-cloned request is finished.
+On 08/24/2017 09:03 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> The physical block size is "the lowest possible sector size that the
+> hardware can operate on without reverting to read-modify-write
+> operations" (from the comment on blk_queue_physical_block_size()). Since
+> loop does buffered I/O on the backing file by default, the RMW unit is a
+> page. This isn't the case for direct I/O mode, but let's keep it simple.
+> 
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  drivers/block/loop.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 54e091887199..1a5b4ecf54ec 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1764,6 +1764,8 @@ static int loop_add(struct loop_device **l, int i)
+>  	}
+>  	lo->lo_queue->queuedata = lo;
+>  
+> +	blk_queue_physical_block_size(lo->lo_queue, PAGE_SIZE);
+> +
+>  	/*
+>  	 * It doesn't make sense to enable merge because the I/O
+>  	 * submitted to backing file is handled page by page.
+> 
+Let's see it this one goes through ...
 
-Partial request update can be a bit expensive, so
-we should try to avoid it, especially it is run
-in softirq context.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-After this patch is applied, both hard lockup and
-soft lockup aren't reproduced any more in one hour
-of running Laurence's test[1] on IB/SRP. Without
-this patch, the lockup can be reproduced in several
-minutes.
+Cheers,
 
-BTW, after d4acf3650c7c(block: Make blk_mq_delay_kick_requeue_list()
-rerun the queue at a quiet time), we need to make the
-test more aggressive for reproducing the lockup:
-
-	1) run hammer_write.sh 32 or 64 concurrently.
-	2) write 8M each time
-
-[1] https://marc.info/?l=linux-block&m=150220185510245&w=2
-
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Alasdair Kergon <agk@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-rq.c | 15 +++++----------
- drivers/md/dm-rq.h |  1 +
- 2 files changed, 6 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index c6ebc5b1e00e..50cd96c7de45 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -117,9 +117,9 @@ static void end_clone_bio(struct bio *clone)
- 	struct dm_rq_clone_bio_info *info =
- 		container_of(clone, struct dm_rq_clone_bio_info, clone);
- 	struct dm_rq_target_io *tio = info->tio;
--	struct bio *bio = info->orig;
- 	unsigned int nr_bytes = info->orig->bi_iter.bi_size;
- 	blk_status_t error = clone->bi_status;
-+	bool is_last = !clone->bi_next;
- 
- 	bio_put(clone);
- 
-@@ -144,21 +144,15 @@ static void end_clone_bio(struct bio *clone)
- 	 * I/O for the bio successfully completed.
- 	 * Notice the data completion to the upper layer.
- 	 */
--
--	/*
--	 * bios are processed from the head of the list.
--	 * So the completing bio should always be rq->bio.
--	 * If it's not, something wrong is happening.
--	 */
--	if (tio->orig->bio != bio)
--		DMERR("bio completion is going in the middle of the request");
-+	tio->completed += nr_bytes;
- 
- 	/*
- 	 * Update the original request.
- 	 * Do not use blk_end_request() here, because it may complete
- 	 * the original request before the clone, and break the ordering.
- 	 */
--	blk_update_request(tio->orig, BLK_STS_OK, nr_bytes);
-+	if (is_last)
-+		blk_update_request(tio->orig, BLK_STS_OK, tio->completed);
- }
- 
- static struct dm_rq_target_io *tio_from_request(struct request *rq)
-@@ -455,6 +449,7 @@ static void init_tio(struct dm_rq_target_io *tio, struct request *rq,
- 	tio->clone = NULL;
- 	tio->orig = rq;
- 	tio->error = 0;
-+	tio->completed = 0;
- 	/*
- 	 * Avoid initializing info for blk-mq; it passes
- 	 * target-specific data through info.ptr
-diff --git a/drivers/md/dm-rq.h b/drivers/md/dm-rq.h
-index 9813922e4fe5..f43c45460aac 100644
---- a/drivers/md/dm-rq.h
-+++ b/drivers/md/dm-rq.h
-@@ -29,6 +29,7 @@ struct dm_rq_target_io {
- 	struct dm_stats_aux stats_aux;
- 	unsigned long duration_jiffies;
- 	unsigned n_sectors;
-+	unsigned completed;
- };
- 
- /*
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
