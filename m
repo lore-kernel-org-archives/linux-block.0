@@ -1,148 +1,138 @@
-Return-Path: <SRS0=2VWl=72=fb.com=shli@kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:53968 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753201AbdHXSNN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Aug 2017 14:13:13 -0400
+Date: Thu, 24 Aug 2017 11:13:11 -0700
 From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	Kernel-team@fb.com,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 2/2] block/loop: allow request merge for directio mode
-Date: Thu, 24 Aug 2017 12:24:53 -0700
-Message-Id: <cafa738c4f61d9b549b7d4675903e8c61962480b.1503602376.git.shli@fb.com>
-In-Reply-To: <cover.1503602376.git.shli@fb.com>
-References: <cover.1503602376.git.shli@fb.com>
-In-Reply-To: <cover.1503602376.git.shli@fb.com>
-References: <cover.1503602376.git.shli@fb.com>
-List-ID: <linux-block@vger.kernel.org>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, Kernel-team@fb.com,
+        Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH 2/2] block/loop: allow request merge for directio mode
+Message-ID: <20170824181311.xcf4hclt6yjkhkn4@kernel.org>
+References: <cover.1503531709.git.shli@fb.com>
+ <2fbfb61a927561c3c251fff8f6e75d7544df9eed.1503531709.git.shli@fb.com>
+ <20170824175739.GC6964@vader.DHCP.thefacebook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170824175739.GC6964@vader.DHCP.thefacebook.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
+On Thu, Aug 24, 2017 at 10:57:39AM -0700, Omar Sandoval wrote:
+> On Wed, Aug 23, 2017 at 04:49:24PM -0700, Shaohua Li wrote:
+> > From: Shaohua Li <shli@fb.com>
+> > 
+> > Currently loop disables merge. While it makes sense for buffer IO mode,
+> > directio mode can benefit from request merge. Without merge, loop could
+> > send small size IO to underlayer disk and harm performance.
+> 
+> A couple of nits on comments below, besides that
+> 
+> Reviewed-by: Omar Sandoval <osandov@fb.com>
+> 
+> > Signed-off-by: Shaohua Li <shli@fb.com>
+> > ---
+> >  drivers/block/loop.c | 43 +++++++++++++++++++++++++++++++++++--------
+> >  drivers/block/loop.h |  1 +
+> >  2 files changed, 36 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > index 428da07..1bfa3ff 100644
+> > --- a/drivers/block/loop.c
+> > +++ b/drivers/block/loop.c
+> > @@ -213,10 +213,13 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+> >  	 */
+> >  	blk_mq_freeze_queue(lo->lo_queue);
+> >  	lo->use_dio = use_dio;
+> > -	if (use_dio)
+> > +	if (use_dio) {
+> > +		queue_flag_clear_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
+> >  		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
+> > -	else
+> > +	} else {
+> > +		queue_flag_set_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
+> >  		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
+> > +	}
+> 
+> Could you please also update the comment in loop_add() where we set
+> QUEUE_FLAG_NOMERGES to say something like
+> 
+> 	/*
+> 	 * By default we do buffered I/O, so it doesn't make sense to
+> 	 * enable merging because the I/O submitted to backing file is
+> 	 * handled page by page. We enable merging when switching to
+> 	 * direct I/O mode.
+> 	 */
 
-Currently loop disables merge. While it makes sense for buffer IO mode,
-directio mode can benefit from request merge. Without merge, loop could
-send small size IO to underlayer disk and harm performance.
+sure, will add
+ 
+> >  	blk_mq_unfreeze_queue(lo->lo_queue);
+> >  }
+> >  
+> > @@ -464,6 +467,8 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
+> >  {
+> >  	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+> >  
+> > +	kfree(cmd->bvec);
+> > +	cmd->bvec = NULL;
+> >  	cmd->ret = ret;
+> >  	blk_mq_complete_request(cmd->rq);
+> >  }
+> > @@ -473,22 +478,44 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+> >  {
+> >  	struct iov_iter iter;
+> >  	struct bio_vec *bvec;
+> > -	struct bio *bio = cmd->rq->bio;
+> > +	struct request *rq = cmd->rq;
+> > +	struct bio *bio = rq->bio;
+> >  	struct file *file = lo->lo_backing_file;
+> > +	unsigned int offset;
+> > +	int segments = 0;
+> >  	int ret;
+> >  
+> > -	/* nomerge for loop request queue */
+> > -	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
+> > +	if (rq->bio != rq->biotail) {
+> > +		struct req_iterator iter;
+> > +		struct bio_vec tmp;
+> > +
+> > +		__rq_for_each_bio(bio, rq)
+> > +			segments += bio_segments(bio);
+> > +		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_KERNEL);
+> > +		if (!bvec)
+> > +			return -EIO;
+> > +		cmd->bvec = bvec;
+> > +
+> > +		rq_for_each_segment(tmp, rq, iter) {
+> > +			*bvec = tmp;
+> > +			bvec++;
+> > +		}
+> > +		bvec = cmd->bvec;
+> > +		offset = 0;
+> > +	} else {
+> > +		offset = bio->bi_iter.bi_bvec_done;
+> > +		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> > +		segments = bio_segments(bio);
+> > +	}
+> >  
+> > -	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> >  	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
+> > -		      bio_segments(bio), blk_rq_bytes(cmd->rq));
+> > +		      segments, blk_rq_bytes(rq));
+> >  	/*
+> >  	 * This bio may be started from the middle of the 'bvec'
+> >  	 * because of bio splitting, so offset from the bvec must
+> >  	 * be passed to iov iterator
+> >  	 */
+> 
+> This comment should be moved above to where you do
+> 
+> 		offset = bio->bi_iter.bi_bvec_done;
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/loop.c | 66 ++++++++++++++++++++++++++++++++++++++++------------
- drivers/block/loop.h |  1 +
- 2 files changed, 52 insertions(+), 15 deletions(-)
+This comment actually applies to 'rq->bio != rq->biotail' case too for
+each bio of the request. That's why I don't just copy bio->bi_io_vec.
+I'll explain this in different way.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 428da07..75a8f6e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -213,10 +213,13 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- 	 */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 	lo->use_dio = use_dio;
--	if (use_dio)
-+	if (use_dio) {
-+		queue_flag_clear_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
- 		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
--	else
-+	} else {
-+		queue_flag_set_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
- 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
-+	}
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- }
- 
-@@ -464,6 +467,8 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
- 
-+	kfree(cmd->bvec);
-+	cmd->bvec = NULL;
- 	cmd->ret = ret;
- 	blk_mq_complete_request(cmd->rq);
- }
-@@ -473,22 +478,50 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- {
- 	struct iov_iter iter;
- 	struct bio_vec *bvec;
--	struct bio *bio = cmd->rq->bio;
-+	struct request *rq = cmd->rq;
-+	struct bio *bio = rq->bio;
- 	struct file *file = lo->lo_backing_file;
-+	unsigned int offset;
-+	int segments = 0;
- 	int ret;
- 
--	/* nomerge for loop request queue */
--	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
-+	if (rq->bio != rq->biotail) {
-+		struct req_iterator iter;
-+		struct bio_vec tmp;
-+
-+		__rq_for_each_bio(bio, rq)
-+			segments += bio_segments(bio);
-+		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_KERNEL);
-+		if (!bvec)
-+			return -EIO;
-+		cmd->bvec = bvec;
-+
-+		/*
-+		 * The bios of the request may be started from the middle of
-+		 * the 'bvec' because of bio splitting, so we can't directly
-+		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_segment
-+		 * API will take care of all details for us.
-+		 */
-+		rq_for_each_segment(tmp, rq, iter) {
-+			*bvec = tmp;
-+			bvec++;
-+		}
-+		bvec = cmd->bvec;
-+		offset = 0;
-+	} else {
-+		/*
-+		 * Same here, this bio may be started from the middle of the
-+		 * 'bvec' because of bio splitting, so offset from the bvec
-+		 * must be passed to iov iterator
-+		 */
-+		offset = bio->bi_iter.bi_bvec_done;
-+		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
-+		segments = bio_segments(bio);
-+	}
- 
--	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
--		      bio_segments(bio), blk_rq_bytes(cmd->rq));
--	/*
--	 * This bio may be started from the middle of the 'bvec'
--	 * because of bio splitting, so offset from the bvec must
--	 * be passed to iov iterator
--	 */
--	iter.iov_offset = bio->bi_iter.bi_bvec_done;
-+		      segments, blk_rq_bytes(rq));
-+	iter.iov_offset = offset;
- 
- 	cmd->iocb.ki_pos = pos;
- 	cmd->iocb.ki_filp = file;
-@@ -1800,9 +1833,12 @@ static int loop_add(struct loop_device **l, int i)
- 	lo->lo_queue->queuedata = lo;
- 
- 	blk_queue_max_hw_sectors(lo->lo_queue, BLK_DEF_MAX_SECTORS);
-+
- 	/*
--	 * It doesn't make sense to enable merge because the I/O
--	 * submitted to backing file is handled page by page.
-+	 * By default, we do buffer IO, so it doesn't make sense to enable
-+	 * merge because the I/O submitted to backing file is handled page by
-+	 * page. For directio mode, merge does help to dispatch bigger request
-+	 * to underlayer disk. We will enable merge once directio is enabled.
- 	 */
- 	queue_flag_set_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
- 
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index fecd3f9..bc9cf91 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -72,6 +72,7 @@ struct loop_cmd {
- 	bool use_aio;           /* use AIO interface to handle I/O */
- 	long ret;
- 	struct kiocb iocb;
-+	struct bio_vec *bvec;
- };
- 
- /* Support for loadable transfer modules */
--- 
-2.9.5
+Thanks,
+Shaohua
