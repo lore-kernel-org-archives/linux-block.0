@@ -1,71 +1,107 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:49072 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751024AbdHMRDR (ORCPT
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:35741 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753469AbdHXQbE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Aug 2017 13:03:17 -0400
-Date: Sun, 13 Aug 2017 18:03:15 +0100
-From: Ben Hutchings <ben@decadent.org.uk>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Message-ID: <20170813170315.GH18698@decadent.org.uk>
+        Thu, 24 Aug 2017 12:31:04 -0400
+Received: by mail-pg0-f51.google.com with SMTP id s11so6355127pgf.2
+        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2017 09:31:04 -0700 (PDT)
+Date: Thu, 24 Aug 2017 09:31:01 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Karel Zak <kzak@redhat.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH 3/4] loop: add ioctl for changing logical block size
+Message-ID: <20170824163101.GA6964@vader.DHCP.thefacebook.com>
+References: <cover.1503558155.git.osandov@fb.com>
+ <f82c988df9c0e3c543089360e3d562c751b63d0f.1503558155.git.osandov@fb.com>
+ <20170824080657.wtgydfatbbirm34b@ws.net.home>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="0FRtVia6Q6lt+M0P"
-In-Reply-To: <20170813170219.GG18698@decadent.org.uk>
-Subject: [PATCH 2/2] mq-deadline: Enable auto-loading when built as module
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170824080657.wtgydfatbbirm34b@ws.net.home>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+On Thu, Aug 24, 2017 at 10:06:57AM +0200, Karel Zak wrote:
+> On Thu, Aug 24, 2017 at 12:03:43AM -0700, Omar Sandoval wrote:
+> > From: Omar Sandoval <osandov@fb.com>
+> > 
+> > This is a different approach from the first attempt in f2c6df7dbf9a
+> > ("loop: support 4k physical blocksize"). Rather than extending
+> > LOOP_{GET,SET}_STATUS, add a separate ioctl just for setting the block
+> > size.
+> > 
+> > Signed-off-by: Omar Sandoval <osandov@fb.com>
+> > ---
+> >  drivers/block/loop.c      | 24 ++++++++++++++++++++++++
+> >  include/uapi/linux/loop.h |  1 +
+> >  2 files changed, 25 insertions(+)
+> > 
+> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > index 1a5b4ecf54ec..6b1d932028e3 100644
+> > --- a/drivers/block/loop.c
+> > +++ b/drivers/block/loop.c
+> > @@ -1047,6 +1047,7 @@ static int loop_clr_fd(struct loop_device *lo)
+> >  	memset(lo->lo_encrypt_key, 0, LO_KEY_SIZE);
+> >  	memset(lo->lo_crypt_name, 0, LO_NAME_SIZE);
+> >  	memset(lo->lo_file_name, 0, LO_NAME_SIZE);
+> > +	blk_queue_logical_block_size(lo->lo_queue, 512);
+> >  	if (bdev) {
+> >  		bdput(bdev);
+> >  		invalidate_bdev(bdev);
+> > @@ -1330,6 +1331,24 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+> >  	return error;
+> >  }
+> >  
+> > +static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+> > +{
+> > +	if (lo->lo_state != Lo_bound)
+> > +		return -ENXIO;
+> > +
+> > +	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
+> > +		return -EINVAL;
+> 
+> I'm not sure if the PAGE_SIZE is the right limit for the use-case
+> where backing file is a block device ...but it's nothing important.
 
---0FRtVia6Q6lt+M0P
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+A bigger logical block size just means we'll send bigger I/Os down to
+the backing file, so I think it should be okay.
 
-The block core requests modules with the "-iosched" name suffix, but
-mq-deadline does not have that suffix.  Add an alias.
+> > +	blk_mq_freeze_queue(lo->lo_queue);
+> > +
+> > +	blk_queue_logical_block_size(lo->lo_queue, arg);
+> 
+> Just note that this function also updates physical_block_size if the
+> 'arg' is greater than the current setting. That's good thing :-)
 
-Fixes: 945ffb60c11d ("mq-deadline: add blk-mq adaptation of the deadline ..=
-=2E")
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
----
- block/mq-deadline.c | 1 +
- 1 file changed, 1 insertion(+)
+Patch 2 sets the physical block size to PAGE_SIZE, and we cap the
+logical block size to PAGE_SIZE, so we won't actually hit that case
+anyways :)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 1b964a387afe..78e7698fa4ed 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -660,6 +660,7 @@ static struct elevator_type mq_deadline =3D {
- 	.elevator_name =3D "mq-deadline",
- 	.elevator_owner =3D THIS_MODULE,
- };
-+MODULE_ALIAS("mq-deadline-iosched");
-=20
- static int __init deadline_init(void)
- {
+> > +	loop_update_dio(lo);
+> > +
+> > +	blk_mq_unfreeze_queue(lo->lo_queue);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+> >  	unsigned int cmd, unsigned long arg)
+> >  {
+> > @@ -1378,6 +1397,11 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+> >  		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+> >  			err = loop_set_dio(lo, arg);
+> >  		break;
+> > +	case LOOP_SET_BLOCK_SIZE:
+> > +		err = -EPERM;
+> > +		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
+> > +			err = loop_set_block_size(lo, arg);
+> > +		break;
+> 
+> I like it this ioctl idea. It makes loop based tests more comfortable
+> as we can change sector size on the fly without loop device reset.
+> 
+> I did not test it yet, but this implementation seems the best. Thanks.
 
---0FRtVia6Q6lt+M0P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIVAwUBWZCGU+e/yOyVhhEJAQqitg//VhG282B/H24V+9TCIB1T27Ms3cRStBK2
-BtFIaXRz9Qo7uh6OQIIo8jWgafwMCeHbGgYiSmKh5u2NYK559ABSSs3zpgPj6K9P
-BJ85eNYriinAl/Xt06sognkGvFTJydw86MxejY+Q4eP5jObKKcZrm2sdWQFrE0U+
-jSiXQrWhn3LE56XtIYk+4iZ51gXe0I0vS5n0WfGZWqBvqAKTJ7ye+rMfCvbAtEaD
-qzORo1O1OS3J1yWXFOUVtiChwuYAhKbQYUaaFixyMqrmigPmLeU94WiIdj0spDXg
-tBHPcG0ifFYynM5slDmPiOVc9GTaP7JS8gPAoL0dr1R6+aQz/1oQYichRW915N5H
-BXOfQV3In7moJUOEkAAPN6mvkc+pOyZ1BWufto0VPSF5kLSde81z3V75FgnOePAO
-J8Ncc+RreCKCYQ6TaSA/vJATYkUAgbZKMZijkfe6Xm2taSLIauCNQyXBQas5Wo0z
-Ln5CaaKH2E+QeNVmYcnOB0IaALsN9+LXdK6/hfRsZ9Z9r7gI25kS9bio1hhsx1h1
-imXxz90k9wD5WGy6t8vltCV5Ga9/RMHVuMWP8RyYC8QBWdRqibYe0tqGT6YHFU9e
-VOtMus2gmPTarhlfR3Lj2INd1wDIT4NE36V1IzK7wuEMvDcXOA+hGkWVyh07TqWi
-XPlVXZn22pQ=
-=Z3fg
------END PGP SIGNATURE-----
-
---0FRtVia6Q6lt+M0P--
+Thanks! Let me know if you spot any issues when you test it.
