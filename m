@@ -1,48 +1,43 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH 10/10] nvme: implement multipath access to nvme subsystems
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
+Date: Thu, 24 Aug 2017 20:17:32 +0000
+Message-ID: <1503605798.2899.43.camel@wdc.com>
 References: <20170823175815.3646-1-hch@lst.de>
- <20170823175815.3646-11-hch@lst.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <84429b00-300f-a36b-c4ac-b7d930ca6c7e@grimberg.me>
-Date: Mon, 28 Aug 2017 10:23:33 +0300
+	 <20170823175815.3646-11-hch@lst.de> <1503512512.2484.16.camel@wdc.com>
+	 <20170824085954.GD19504@lst.de>
+In-Reply-To: <20170824085954.GD19504@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170823175815.3646-11-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-
-> This patch adds initial multipath support to the nvme driver.  For each
-> namespace we create a new block device node, which can be used to access
-> that namespace through any of the controllers that refer to it.
-> 
-> Currently we will always send I/O to the first available path, this will
-> be changed once the NVMe Asynchronous Namespace Access (ANA) TP is
-> ratified and implemented, at which point we will look at the ANA state
-> for each namespace.  Another possibility that was prototyped is to
-> use the path that is closes to the submitting NUMA code, which will be
-> mostly interesting for PCI, but might also be useful for RDMA or FC
-> transports in the future.  There is not plan to implement round robin
-> or I/O service time path selectors, as those are not scalable with
-> the performance rates provided by NVMe.
-> 
-> The multipath device will go away once all paths to it disappear,
-> any delay to keep it alive needs to be implemented at the controller
-> level.
-> 
-> TODO: implement sysfs interfaces for the new subsystem and
-> subsystem-namespace object.  Unless we can come up with something
-> better than sysfs here..
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Christoph,
-
-This is really taking a lot into the nvme driver. I'm not sure if
-this approach will be used in other block driver, but would it
-make sense to place the block_device node creation, the make_request
-and failover logic and maybe the path selection in the block layer
-leaving just the construction of the path mappings in nvme?
+T24gVGh1LCAyMDE3LTA4LTI0IGF0IDEwOjU5ICswMjAwLCBoY2hAbHN0LmRlIHdyb3RlOg0KPiBP
+biBXZWQsIEF1ZyAyMywgMjAxNyBhdCAwNjoyMTo1NVBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4gU2luY2UgZ2VuZXJpY19tYWtlX3JlcXVlc3RfZmFzdCgpIHJldHVybnMgQkxL
+X1NUU19BR0FJTiBmb3IgYSBkeWluZyBwYXRoOg0KPiA+IGNhbiB0aGUgc2FtZSBraW5kIG9mIHNv
+ZnQgbG9ja3VwcyBvY2N1ciB3aXRoIHRoZSBOVk1lIG11bHRpcGF0aGluZyBjb2RlIGFzDQo+ID4g
+d2l0aCB0aGUgY3VycmVudCB1cHN0cmVhbSBkZXZpY2UgbWFwcGVyIG11bHRpcGF0aGluZyBjb2Rl
+PyBTZWUgZS5nLg0KPiA+ICJbUEFUQ0ggMy83XSBkbS1tcGF0aDogRG8gbm90IGxvY2sgdXAgYSBD
+UFUgd2l0aCByZXF1ZXVpbmcgYWN0aXZpdHkiDQo+ID4gKGh0dHBzOi8vd3d3LnJlZGhhdC5jb20v
+YXJjaGl2ZXMvZG0tZGV2ZWwvMjAxNy1BdWd1c3QvbXNnMDAxMjQuaHRtbCkuDQo+IA0KPiBJIHN1
+c3BlY3QgdGhlIGNvZGUgaXMgbm90IGdvaW5nIHRvIGhpdCBpdCBiZWNhdXNlIHdlIGNoZWNrIHRo
+ZSBjb250cm9sbGVyDQo+IHN0YXRlIGJlZm9yZSB0cnlpbmcgdG8gcXVldWUgSS9PIG9uIHRoZSBs
+b3dlciBxdWV1ZS4gIEJ1dCBpZiB5b3UgcG9pbnQNCj4gbWUgdG8gYSBnb29kIHJlcHJvZHVjZXIg
+dGVzdCBjYXNlIEknZCBsaWtlIHRvIGNoZWNrLg0KDQpGb3IgTlZNZSBvdmVyIFJETUEsIGhvdyBh
+Ym91dCB0aGUgc2ltdWxhdGVfbmV0d29ya19mYWlsdXJlX2xvb3AoKSBmdW5jdGlvbiBpbg0KaHR0
+cHM6Ly9naXRodWIuY29tL2J2YW5hc3NjaGUvc3JwLXRlc3QvYmxvYi9tYXN0ZXIvbGliL2Z1bmN0
+aW9ucz8gSXQgc2ltdWxhdGVzDQphIG5ldHdvcmsgZmFpbHVyZSBieSB3cml0aW5nIGludG8gdGhl
+IHJlc2V0X2NvbnRyb2xsZXIgc3lzZnMgYXR0cmlidXRlLg0KDQo+IEFsc28gZG9lcyB0aGUgInNp
+bmdsZSBxdWV1ZSIgY2FzZSBpbiB5b3VyIG1haWwgcmVmZXIgdG8gdGhlIG9sZA0KPiByZXF1ZXN0
+IGNvZGU/ICBudm1lIG9ubHkgdXNlcyBibGstbXEgc28gaXQgd291bGQgbm90IGhpdCB0aGF0Lg0K
+PiBCdXQgZWl0aGVyIHdheSBJIHRoaW5rIGdldF9yZXF1ZXN0IHNob3VsZCBiZSBmaXhlZCB0byBy
+ZXR1cm4NCj4gQkxLX1NUU19JT0VSUiBpZiB0aGUgcXVldWUgaXMgZHlpbmcgaW5zdGVhZCBvZiBC
+TEtfU1RTX0FHQUlOLg0KDQpUaGUgZGVzY3JpcHRpb24gaW4gdGhlIHBhdGNoIEkgcmVmZXJyZWQg
+dG8gaW5kZWVkIHJlZmVycyB0byB0aGUgb2xkIHJlcXVlc3QNCmNvZGUgaW4gdGhlIGJsb2NrIGxh
+eWVyLiBXaGVuIEkgcHJlcGFyZWQgdGhhdCBwYXRjaCBJIGhhZCBhbmFseXplZCB0aGUNCmJlaGF2
+aW9yIG9mIHRoZSBvbGQgcmVxdWVzdCBjb2RlIG9ubHkuDQoNCkJhcnQu
