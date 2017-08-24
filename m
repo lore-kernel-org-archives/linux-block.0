@@ -1,127 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:18403 "EHLO mga14.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:59261 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754006AbdHWNnm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Aug 2017 09:43:42 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: [PATCH RFC 1/3] mmc: core: Add parameter use_blk_mq
-Date: Wed, 23 Aug 2017 16:37:06 +0300
-Message-Id: <1503495428-11999-2-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1503495428-11999-1-git-send-email-adrian.hunter@intel.com>
-References: <1503495428-11999-1-git-send-email-adrian.hunter@intel.com>
+        id S1751111AbdHXHOn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Aug 2017 03:14:43 -0400
+Date: Thu, 24 Aug 2017 15:14:27 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: [PATCH V2 14/20] blk-mq-sched: improve IO scheduling on SCSI
+ devcie
+Message-ID: <20170824071426.GO12966@ming.t460p>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
+ <20170805065705.12989-15-ming.lei@redhat.com>
+ <1503435090.2508.22.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1503435090.2508.22.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Until mmc has blk-mq support fully implemented and tested, add a
-parameter use_blk_mq, default to false unless config option MMC_MQ_DEFAULT
-is selected.
+On Tue, Aug 22, 2017 at 08:51:32PM +0000, Bart Van Assche wrote:
+> On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
+> > This patch introduces per-request_queue dispatch
+> > list for this purpose, and only when all requests
+> > in this list are dispatched out successfully, we
+> > can restart to dequeue request from sw/scheduler
+> > queue and dispath it to lld.
+> 
+> Wasn't one of the design goals of blk-mq to avoid a per-request_queue list?
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/Kconfig      | 11 +++++++++++
- drivers/mmc/core/core.c  |  7 +++++++
- drivers/mmc/core/core.h  |  2 ++
- drivers/mmc/core/host.c  |  2 ++
- drivers/mmc/core/host.h  |  4 ++++
- include/linux/mmc/host.h |  1 +
- 6 files changed, 27 insertions(+)
+Yes, but why does scsi device have per-request_queue depth?
 
-diff --git a/drivers/mmc/Kconfig b/drivers/mmc/Kconfig
-index ec21388311db..98202934bd29 100644
---- a/drivers/mmc/Kconfig
-+++ b/drivers/mmc/Kconfig
-@@ -12,6 +12,17 @@ menuconfig MMC
- 	  If you want MMC/SD/SDIO support, you should say Y here and
- 	  also to your specific host controller driver.
- 
-+config MMC_MQ_DEFAULT
-+	bool "MMC: use blk-mq I/O path by default"
-+	depends on MMC && BLOCK
-+	---help---
-+	  This option enables the new blk-mq based I/O path for MMC block
-+	  devices by default.  With the option the mmc_core.use_blk_mq
-+	  module/boot option defaults to Y, without it to N, but it can
-+	  still be overridden either way.
-+
-+	  If unsure say N.
-+
- if MMC
- 
- source "drivers/mmc/core/Kconfig"
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 61322a0eff2a..f59c976cc96c 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -66,6 +66,13 @@
- bool use_spi_crc = 1;
- module_param(use_spi_crc, bool, 0);
- 
-+#ifdef CONFIG_MMC_MQ_DEFAULT
-+bool mmc_use_blk_mq = true;
-+#else
-+bool mmc_use_blk_mq = false;
-+#endif
-+module_param_named(use_blk_mq, mmc_use_blk_mq, bool, S_IWUSR | S_IRUGO);
-+
- static int mmc_schedule_delayed_work(struct delayed_work *work,
- 				     unsigned long delay)
- {
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 55f543fd37c4..c30da856b4d4 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -35,6 +35,8 @@ struct mmc_bus_ops {
- 	int (*reset)(struct mmc_host *);
- };
- 
-+extern bool mmc_use_blk_mq;
-+
- void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops);
- void mmc_detach_bus(struct mmc_host *host);
- 
-diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
-index ad88deb2e8f3..b624dbb6cd15 100644
---- a/drivers/mmc/core/host.c
-+++ b/drivers/mmc/core/host.c
-@@ -398,6 +398,8 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
- 	host->max_blk_size = 512;
- 	host->max_blk_count = PAGE_SIZE / 512;
- 
-+	host->use_blk_mq = mmc_use_blk_mq;
-+
- 	return host;
- }
- 
-diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
-index 77d6f60d1bf9..170fe5947087 100644
---- a/drivers/mmc/core/host.h
-+++ b/drivers/mmc/core/host.h
-@@ -69,6 +69,10 @@ static inline bool mmc_card_hs400es(struct mmc_card *card)
- 	return card->host->ios.enhanced_strobe;
- }
- 
-+static inline bool mmc_host_use_blk_mq(struct mmc_host *host)
-+{
-+	return host->use_blk_mq;
-+}
- 
- #endif
- 
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index 5f3eb4a0373f..b7f5a66e0652 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -374,6 +374,7 @@ struct mmc_host {
- 	unsigned int		doing_retune:1;	/* re-tuning in progress */
- 	unsigned int		retune_now:1;	/* do re-tuning at next req */
- 	unsigned int		retune_paused:1; /* re-tuning is temporarily disabled */
-+	unsigned int		use_blk_mq:1;	/* use blk-mq */
- 
- 	int			rescan_disable;	/* disable card detection */
- 	int			rescan_entered;	/* used with nonremovable devices */
+Anyway this single dispatch list won't hurt devices which doesn't have
+per-request_queue depth.
+
+For scsi device which has q->queue_depth, if one hctx is stuck, all
+hctxs are stuck actually, the single dispatch list just fits this
+kind of use case, doesn't it?
+
 -- 
-1.9.1
+Ming
