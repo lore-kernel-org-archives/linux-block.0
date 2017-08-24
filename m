@@ -1,41 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:3350 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755288AbdHYVhN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 17:37:13 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@infradead.org" <hch@infradead.org>,
+Received: from mx1.redhat.com ([209.132.183.28]:54974 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750806AbdHXECk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Aug 2017 00:02:40 -0400
+Date: Thu, 24 Aug 2017 12:02:26 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
+        "axboe@fb.com" <axboe@fb.com>, "osandov@fb.com" <osandov@fb.com>,
         "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH V2 02/20] sbitmap: introduce __sbitmap_for_each_set()
-Date: Fri, 25 Aug 2017 21:36:26 +0000
-Message-ID: <1503696985.2680.33.camel@wdc.com>
+Message-ID: <20170824040225.GB12966@ming.t460p>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
-         <20170805065705.12989-3-ming.lei@redhat.com>
-         <1503426533.2508.6.camel@wdc.com> <20170824035743.GA12966@ming.t460p>
-In-Reply-To: <20170824035743.GA12966@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20170805065705.12989-3-ming.lei@redhat.com>
+ <1503427020.2508.8.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1503427020.2508.8.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDE3LTA4LTI0IGF0IDExOjU3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-VHVlLCBBdWcgMjIsIDIwMTcgYXQgMDY6Mjg6NTRQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+ICogV2hldGhlciBvciBub3QgaW5kZXggPj0gc2ItPm1hcF9uci4gSSBwcm9wb3Nl
-IHRvIHN0YXJ0IGl0ZXJhdGluZyBmcm9tIHRoZQ0KPiA+ICAgc3RhcnQgb2YgQHNiIGluIHRoaXMg
-Y2FzZS4NCj4gDQo+IEl0IGhhcyBiZWVuIGNoZWNrZWQgYXQgdGhlIGVuZCBvZiB0aGUgbG9vcC4N
-Cg0KVGhhdCdzIG5vdCBzdWZmaWNpZW50IHRvIGF2b2lkIGFuIG91dC1vZi1ib3VuZHMgYWNjZXNz
-IGlmIHRoZSBzdGFydCBpbmRleCBpcw0KbGFyZ2UuIElmIF9fc2JpdG1hcF9mb3JfZWFjaF9zZXQo
-KSB3b3VsZCBhY2NlcHQgdmFsdWVzIGZvciB0aGUgc3RhcnQgaW5kZXgNCmFyZ3VtZW50IHRoYXQg
-cmVzdWx0IGluIGluZGV4ID49IHNiLT5tYXBfbnIgdGhlbiB0aGF0IHdpbGwgc2ltcGxpZnkgY29k
-ZSB0aGF0DQphY2Nlc3NlcyBhbiBzYml0bWFwIGluIGEgcm91bmQtcm9iaW4gZmFzaGlvbi4NCg0K
-PiA+IAl9DQo+ID4gDQo+ID4gCXdoaWxlICh0cnVlKSB7DQo+ID4gCQlzdHJ1Y3Qgc2JpdG1hcF93
-b3JkICp3b3JkID0gJnNiLT5tYXBbaV07DQo+ID4gCQl1bnNpZ25lZCBpbnQgb2ZmOw0KPiANCj4g
-TG9va3MgeW91IHJlbW92ZWQgdGhlIGNoZWNrIG9uICd3b3JkLT53b3JkJy4NCg0KWWVzLCBhbmQg
-SSBkaWQgdGhhdCBvbiBwdXJwb3NlLiBJZiB0aGUgc3RhcnQgaW5kZXggcmVmZXJzIHRvIGEgd29y
-ZCB0aGF0IGlzDQp6ZXJvIHRoZW4gdGhlICJpZiAod29yZC0+d29yZCkgY29udGludWU7IiBjb2Rl
-IHdpbGwgY2F1c2UgdGhlIGVuZC1vZi1sb29wDQpjaGVjayB0byBiZSBza2lwcGVkIGFuZCBoZW5j
-ZSB3aWxsIGNhdXNlIGFuIGluZmluaXRlIGxvb3AuDQoNCkJhcnQu
+On Tue, Aug 22, 2017 at 06:37:02PM +0000, Bart Van Assche wrote:
+> On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
+> > -static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
+> > -					void *data)
+> > +static inline void __sbitmap_for_each_set(struct sbitmap *sb,
+> > +					  unsigned int off,
+> > +					  sb_for_each_fn fn, void *data)
+> >  {
+> 
+> An additional comment: if a function name starts with a double underscore
+> usually that either means that it should be called with a specific lock
+> held or that it is an implementation function that should not be called by
+> other modules. Since neither is the case for __sbitmap_for_each_set(),
+> please consider to use another name for this function.
+
+We have lots of this kind of naming, please see __blk_mq_end_request(),
+__free_pages(), ....
+
+-- 
+Ming
