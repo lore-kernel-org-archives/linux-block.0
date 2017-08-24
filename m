@@ -1,59 +1,39 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:35075 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751085AbdHXBuU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Aug 2017 21:50:20 -0400
+Received: by mail-pg0-f67.google.com with SMTP id b3so1610932pga.2
+        for <linux-block@vger.kernel.org>; Wed, 23 Aug 2017 18:50:20 -0700 (PDT)
+Content-Type: text/plain; charset=gb2312
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
 Subject: Re: [PATCH] block, bfq: fix error handle in bfq_init
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20170823152515.GA9294@localhost.didichuxing.com>
-Date: Wed, 30 Aug 2017 17:04:35 +0200
-Cc: axboe@kernel.dk,
- linux-block@vger.kernel.org
-Message-Id: <E5F6017E-62BA-41F9-8926-8BDB75034A95@linaro.org>
-References: <20170818163714.GA40576@localhost.didichuxing.com> <20170823152515.GA9294@localhost.didichuxing.com>
-To: weiping zhang <zhangweiping@didichuxing.com>
-List-ID: <linux-block@vger.kernel.org>
+From: weiping zhang <zwp10758@gmail.com>
+In-Reply-To: <c11e3747-27b9-75bc-9e4d-d9a665a83741@kernel.dk>
+Date: Thu, 24 Aug 2017 09:50:13 +0800
+Cc: paolo.valente@linaro.org, linux-block@vger.kernel.org
+Message-Id: <79599821-E259-4B4C-BFB5-63F4A35C15DF@gmail.com>
+References: <20170818163714.GA40576@localhost.didichuxing.com>
+ <c11e3747-27b9-75bc-9e4d-d9a665a83741@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 
-> Il giorno 23 ago 2017, alle ore 17:25, weiping zhang =
-<zhangweiping@didichuxing.com> ha scritto:
+> =D4=DA 2017=C4=EA8=D4=C224=C8=D5=A3=AC05:35=A3=ACJens Axboe =
+<axboe@kernel.dk> =D0=B4=B5=C0=A3=BA
 >=20
-> On Sat, Aug 19, 2017 at 12:37:20AM +0800, weiping zhang wrote:
+> On 08/18/2017 10:37 AM, weiping zhang wrote:
 >> if elv_register fail, bfq_pool should be free.
->>=20
->> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
->> ---
->> block/bfq-iosched.c | 4 +++-
->> 1 file changed, 3 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->> index 436b6ca..bdb072f 100644
->> --- a/block/bfq-iosched.c
->> +++ b/block/bfq-iosched.c
->> @@ -5048,10 +5048,12 @@ static int __init bfq_init(void)
->>=20
->> 	ret =3D elv_register(&iosched_bfq_mq);
->> 	if (ret)
->> -		goto err_pol_unreg;
->> +		goto slab_kill;
->>=20
->> 	return 0;
->>=20
->> +slab_kill:
->> +	bfq_slab_kill();
->> err_pol_unreg:
->> #ifdef CONFIG_BFQ_GROUP_IOSCHED
->> 	blkcg_policy_unregister(&blkcg_policy_bfq);
->> --=20
->> 2.9.4
->>=20
-> Hi Paolo, Jens,
 >=20
-> could you give some comments for this patch ?
+> Looks correct to me, I'll add it. Thanks.
+>=20
+> --=20
+> Jens Axboe
 >=20
 
-Sorry for not making it in time (vacation), and thanks for fixing this
-bug.
 
-Paolo
+Jens,
 
-> Thanks
+Thanks a lot=
