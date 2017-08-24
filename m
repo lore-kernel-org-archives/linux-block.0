@@ -1,72 +1,47 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Thu, 24 Aug 2017 14:38:36 +0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:47844 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751038AbdHXGSq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Aug 2017 02:18:46 -0400
+Date: Thu, 24 Aug 2017 14:18:34 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Laurence Oberman <loberman@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH V2 06/20] blk-mq-sched: don't dequeue request until all
  in ->dispatch are flushed
-Message-ID: <20170824063835.GH12966@ming.t460p>
+Message-ID: <20170824061833.GG12966@ming.t460p>
 References: <20170805065705.12989-1-ming.lei@redhat.com>
  <20170805065705.12989-7-ming.lei@redhat.com>
- <20170823195648.GA15083@kernel.dk>
+ <1503432571.2508.15.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170823195648.GA15083@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1503432571.2508.15.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Aug 23, 2017 at 01:56:50PM -0600, Jens Axboe wrote:
-> On Sat, Aug 05 2017, Ming Lei wrote:
-> > During dispatching, we moved all requests from hctx->dispatch to
-> > one temporary list, then dispatch them one by one from this list.
-> > Unfortunately duirng this period, run queue from other contexts
-> > may think the queue is idle, then start to dequeue from sw/scheduler
-> > queue and still try to dispatch because ->dispatch is empty. This way
-> > hurts sequential I/O performance because requests are dequeued when
-> > lld queue is busy.
-> > 
-> > This patch introduces the state of BLK_MQ_S_DISPATCH_BUSY to
-> > make sure that request isn't dequeued until ->dispatch is
-> > flushed.
+On Tue, Aug 22, 2017 at 08:09:32PM +0000, Bart Van Assche wrote:
+> On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
+> > +	/*
+> > +	 * Wherever DISPATCH_BUSY is set, blk_mq_run_hw_queue()
+> > +	 * will be run to try to make progress, so it is always
+> > +	 * safe to check the state here.
+> > +	 */
+> > +	if (test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state))
+> > +		return;
 > 
-> I don't like how this patch introduces a bunch of locked setting of a
-> flag under the hctx lock. Especially since I think we can easily avoid
-> it.
+> The comment above test_bit() is useful but does not explain the purpose of
+> the early return. Is the purpose of the early return perhaps to serialize
+> blk_mq_sched_dispatch_requests() calls? If so, please mention this.
 
-Actually the lock isn't needed for setting the flag, will move it out
-in V3.
+If the bit is set, that means there are requests in hctx->dispatch, so
+return early for avoiding to dequeue requests from sw/scheduler queue
+unnecessarily.
 
-> 
-> > -	} else if (!has_sched_dispatch & !q->queue_depth) {
-> > +		blk_mq_dispatch_rq_list(q, &rq_list);
-> > +
-> > +		/*
-> > +		 * We may clear DISPATCH_BUSY just after it
-> > +		 * is set from another context, the only cost
-> > +		 * is that one request is dequeued a bit early,
-> > +		 * we can survive that. Given the window is
-> > +		 * too small, no need to worry about performance
-> > +		 * effect.
-> > +		 */
-> > +		if (list_empty_careful(&hctx->dispatch))
-> > +			clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-> 
-> This is basically the only place where we modify it without holding the
-> hctx lock. Can we move it into blk_mq_dispatch_rq_list()? The list is
-
-The problem is that blk_mq_dispatch_rq_list() don't know if it is
-handling requests from hctx->dispatch or sw/scheduler queue. We only
-need to clear the bit after hctx->dispatch is flushed. So the clearing
-can't be moved into blk_mq_dispatch_rq_list().
-
-> generally empty, unless for the case where we splice residuals back. If
-> we splice them back, we grab the lock anyway.
-> 
-> The other places it's set under the hctx lock, yet we end up using an
-> atomic operation to do it.
-
-As the comment explained, it needn't to be atomic.
+I thought the code is self-comment, so not explain it, will add the
+comment.
 
 -- 
 Ming
