@@ -1,121 +1,98 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 31/49] block: deal with dirtying pages for multipage bvec
-Date: Tue,  8 Aug 2017 16:45:30 +0800
-Message-Id: <20170808084548.18963-32-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Thu, 24 Aug 2017 16:23:14 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christoph Hellwig <hch@lst.de>
+Cc: viro@zeniv.linux.org.uk, axboe@kernel.dk,
+	Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>, mgorman@suse.de,
+	Volker.Lendecke@sernet.de, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] fs: pass iocb to do_generic_file_read
+Message-ID: <20170824142314.GA8969@quack2.suse.cz>
+References: <20170822161712.11716-1-hch@lst.de>
+ <20170822161712.11716-2-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170822161712.11716-2-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-In bio_check_pages_dirty(), bvec->bv_page is used as flag
-for marking if the page has been dirtied & released, and if
-no, it will be dirtied in deferred workqueue.
+On Tue 22-08-17 18:17:09, Christoph Hellwig wrote:
+> And rename it to the more descriptive generic_file_buffered_read while
+> at it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-With multipage bvec, we can't do that any more, so change
-the logic into checking all pages in one mp bvec, and only
-release all these pages if all are dirtied, otherwise dirty
-them all in deferred wrokqueue.
+Looks good. You can add:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-diff --git a/block/bio.c b/block/bio.c
-index 28697e3c8ce3..716e6917b0fd 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1650,8 +1650,9 @@ void bio_set_pages_dirty(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 
- 		if (page && !PageCompound(page))
-@@ -1659,16 +1660,26 @@ void bio_set_pages_dirty(struct bio *bio)
- 	}
- }
- 
-+static inline void release_mp_bvec_pages(struct bio_vec *bvec)
-+{
-+	struct bio_vec bv;
-+	struct bvec_iter iter;
-+
-+	bvec_for_each_sp_bvec(bv, bvec, iter)
-+		put_page(bv.bv_page);
-+}
-+
- static void bio_release_pages(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	/* iterate each mp bvec */
-+	bio_for_each_segment_all_mp(bvec, bio, i) {
- 		struct page *page = bvec->bv_page;
- 
- 		if (page)
--			put_page(page);
-+			release_mp_bvec_pages(bvec);
- 	}
- }
- 
-@@ -1712,20 +1723,38 @@ static void bio_dirty_fn(struct work_struct *work)
- 	}
- }
- 
-+static inline void check_mp_bvec_pages(struct bio_vec *bvec,
-+		int *nr_dirty, int *nr_pages)
-+{
-+	struct bio_vec bv;
-+	struct bvec_iter iter;
-+
-+	bvec_for_each_sp_bvec(bv, bvec, iter) {
-+		struct page *page = bv.bv_page;
-+
-+		if (PageDirty(page) || PageCompound(page))
-+			(*nr_dirty)++;
-+		(*nr_pages)++;
-+	}
-+}
-+
- void bio_check_pages_dirty(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int nr_clean_pages = 0;
- 	int i;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
--		struct page *page = bvec->bv_page;
-+	bio_for_each_segment_all_mp(bvec, bio, i) {
-+		int nr_dirty = 0, nr_pages = 0;
-+
-+		check_mp_bvec_pages(bvec, &nr_dirty, &nr_pages);
- 
--		if (PageDirty(page) || PageCompound(page)) {
--			put_page(page);
-+		/* release all pages in the mp bvec if all are dirtied */
-+		if (nr_dirty == nr_pages) {
-+			release_mp_bvec_pages(bvec);
- 			bvec->bv_page = NULL;
- 		} else {
--			nr_clean_pages++;
-+			nr_clean_pages += nr_pages;
- 		}
- 	}
- 
+								Honza
+
+> ---
+>  mm/filemap.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index a49702445ce0..4bcfa74ad802 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -1886,9 +1886,8 @@ static void shrink_readahead_size_eio(struct file *filp,
+>  }
+>  
+>  /**
+> - * do_generic_file_read - generic file read routine
+> - * @filp:	the file to read
+> - * @ppos:	current file position
+> + * generic_file_buffered_read - generic file read routine
+> + * @iocb:	the iocb to read
+>   * @iter:	data destination
+>   * @written:	already copied
+>   *
+> @@ -1898,12 +1897,14 @@ static void shrink_readahead_size_eio(struct file *filp,
+>   * This is really ugly. But the goto's actually try to clarify some
+>   * of the logic when it comes to error handling etc.
+>   */
+> -static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+> +static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+>  		struct iov_iter *iter, ssize_t written)
+>  {
+> +	struct file *filp = iocb->ki_filp;
+>  	struct address_space *mapping = filp->f_mapping;
+>  	struct inode *inode = mapping->host;
+>  	struct file_ra_state *ra = &filp->f_ra;
+> +	loff_t *ppos = &iocb->ki_pos;
+>  	pgoff_t index;
+>  	pgoff_t last_index;
+>  	pgoff_t prev_index;
+> @@ -2151,14 +2152,14 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+>  ssize_t
+>  generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+>  {
+> -	struct file *file = iocb->ki_filp;
+> -	ssize_t retval = 0;
+>  	size_t count = iov_iter_count(iter);
+> +	ssize_t retval = 0;
+>  
+>  	if (!count)
+>  		goto out; /* skip atime */
+>  
+>  	if (iocb->ki_flags & IOCB_DIRECT) {
+> +		struct file *file = iocb->ki_filp;
+>  		struct address_space *mapping = file->f_mapping;
+>  		struct inode *inode = mapping->host;
+>  		loff_t size;
+> @@ -2199,7 +2200,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+>  			goto out;
+>  	}
+>  
+> -	retval = do_generic_file_read(file, &iocb->ki_pos, iter, retval);
+> +	retval = generic_file_buffered_read(iocb, iter, retval);
+>  out:
+>  	return retval;
+>  }
+> -- 
+> 2.11.0
+> 
 -- 
-2.9.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
