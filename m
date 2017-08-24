@@ -1,98 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43688 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753222AbdHUNtz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Aug 2017 09:49:55 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 1/2] powerpc/workqueue: update list of possible CPUs
-Date: Mon, 21 Aug 2017 15:49:50 +0200
-Message-Id: <20170821134951.18848-1-lvivier@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Thu, 24 Aug 2017 16:39:23 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christoph Hellwig <hch@lst.de>
+Cc: viro@zeniv.linux.org.uk, axboe@kernel.dk,
+	Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>, mgorman@suse.de,
+	Volker.Lendecke@sernet.de, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/4] block_dev: support RFW_NOWAIT on block device nodes
+Message-ID: <20170824143923.GD8969@quack2.suse.cz>
+References: <20170822161712.11716-1-hch@lst.de>
+ <20170822161712.11716-5-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170822161712.11716-5-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-In wq_numa_init() a list of NUMA nodes with their list of possible CPUs
-is built.
+On Tue 22-08-17 18:17:12, Christoph Hellwig wrote:
+> All support is already there in the generic code, we just need to wire
+> it up.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Unfortunately, on powerpc, the Firmware is only able to provide the
-node of a CPU if the CPU is present. So, in our case (possible CPU)
-CPU ids are known, but as the CPU is not present, the node id is
-unknown and all the unplugged CPUs are attached to node 0.
+Looks good. You can add:
 
-When we hotplugged CPU, there can be an inconsistency between
-the node id known by the workqueue, and the real node id of
-the CPU.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-This patch adds a hotplug handler to add the hotplugged CPU to
-update the node entry in wq_numa_possible_cpumask array.
+								Honza
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- arch/powerpc/kernel/smp.c |  1 +
- include/linux/workqueue.h |  1 +
- kernel/workqueue.c        | 21 +++++++++++++++++++++
- 3 files changed, 23 insertions(+)
-
-diff --git a/arch/powerpc/kernel/smp.c b/arch/powerpc/kernel/smp.c
-index 8d3320562c70..abc533146514 100644
---- a/arch/powerpc/kernel/smp.c
-+++ b/arch/powerpc/kernel/smp.c
-@@ -964,6 +964,7 @@ void start_secondary(void *unused)
- 
- 	set_numa_node(numa_cpu_lookup_table[cpu]);
- 	set_numa_mem(local_memory_node(numa_cpu_lookup_table[cpu]));
-+	wq_numa_add_possible_cpu(cpu);
- 
- 	smp_wmb();
- 	notify_cpu_starting(cpu);
-diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-index db6dc9dc0482..4ef030dae22c 100644
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
-@@ -644,6 +644,7 @@ int workqueue_online_cpu(unsigned int cpu);
- int workqueue_offline_cpu(unsigned int cpu);
- #endif
- 
-+void wq_numa_add_possible_cpu(unsigned int cpu);
- int __init workqueue_init_early(void);
- int __init workqueue_init(void);
- 
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index ca937b0c3a96..d1a99e25d5da 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -5486,6 +5486,27 @@ static inline void wq_watchdog_init(void) { }
- 
- #endif	/* CONFIG_WQ_WATCHDOG */
- 
-+void wq_numa_add_possible_cpu(unsigned int cpu)
-+{
-+	int node;
-+
-+	if (num_possible_nodes() <= 1)
-+		return;
-+
-+	if (wq_disable_numa)
-+		return;
-+
-+	if (!wq_numa_enabled)
-+		return;
-+
-+	node = cpu_to_node(cpu);
-+	if (node == NUMA_NO_NODE)
-+		return;
-+
-+	cpumask_set_cpu(cpu, wq_numa_possible_cpumask[node]);
-+}
-+EXPORT_SYMBOL_GPL(wq_numa_add_possible_cpu);
-+
- static void __init wq_numa_init(void)
- {
- 	cpumask_var_t *tbl;
+> ---
+>  fs/block_dev.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 9941dc8342df..ea21d18d8e79 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -1739,6 +1739,8 @@ static int blkdev_open(struct inode * inode, struct file * filp)
+>  	 */
+>  	filp->f_flags |= O_LARGEFILE;
+>  
+> +	filp->f_mode |= FMODE_NOWAIT;
+> +
+>  	if (filp->f_flags & O_NDELAY)
+>  		filp->f_mode |= FMODE_NDELAY;
+>  	if (filp->f_flags & O_EXCL)
+> @@ -1891,6 +1893,9 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  	if (iocb->ki_pos >= size)
+>  		return -ENOSPC;
+>  
+> +	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
+> +		return -EOPNOTSUPP;
+> +
+>  	iov_iter_truncate(from, size - iocb->ki_pos);
+>  
+>  	blk_start_plug(&plug);
+> -- 
+> 2.11.0
+> 
 -- 
-2.13.5
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
