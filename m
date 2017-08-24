@@ -1,38 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:12309 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750763AbdHAH20 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Aug 2017 03:28:26 -0400
-Date: Tue, 1 Aug 2017 15:28:13 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <minlei@redhat.com>
-Subject: Re: [PATCH] blk-mq: don't leak preempt counter/q_usage_counter when
- allocating rq failed
-Message-ID: <20170801072812.GA17297@ming.t460p>
-References: <20170714084136.24850-1-ming.lei@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:39014 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751272AbdHXMWv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Aug 2017 08:22:51 -0400
+Subject: Re: [PATCH 1/4] loop: get rid of lo_blocksize
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Ming Lei <ming.lei@redhat.com>,
+        Karel Zak <kzak@redhat.com>, Milan Broz <gmazyland@gmail.com>
+References: <cover.1503558155.git.osandov@fb.com>
+ <ef0f206cb2c75da3b850c59ea7b7efc0b94f4b32.1503558155.git.osandov@fb.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <d4e08c2c-0954-a8fd-e72d-db511df1cf45@suse.de>
+Date: Thu, 24 Aug 2017 14:22:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170714084136.24850-1-ming.lei@redhat.com>
+In-Reply-To: <ef0f206cb2c75da3b850c59ea7b7efc0b94f4b32.1503558155.git.osandov@fb.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Jul 14, 2017 at 04:41:36PM +0800, Ming Lei wrote:
-> From: Ming Lei <minlei@redhat.com>
+On 08/24/2017 09:03 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
 > 
-> When blk_mq_get_request() failed, preempt counter isn't
-> released, and blk_mq_make_request() doesn't release the counter
-> too.
+> This is only used for setting the soft block size on the struct
+> block_device once and then never used again.
 > 
-> This patch fixes the issue, and makes sure that preempt counter
-> is only held if rq is allocated successfully. The same policy is
-> applied on .q_usage_counter too.
+> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> ---
+>  drivers/block/loop.c | 10 ++--------
+>  drivers/block/loop.h |  1 -
+>  2 files changed, 2 insertions(+), 9 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Hi Jens,
+Cheers,
 
-Given NOWAIT has been merged, could you consider this patch for
-v4.13?
-
-Thanks,
-Ming
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
