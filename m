@@ -1,232 +1,162 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f179.google.com ([209.85.128.179]:35712 "EHLO
-        mail-wr0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751409AbdH3Qb6 (ORCPT
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:62883 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753684AbdHXXRh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2017 12:31:58 -0400
-Received: by mail-wr0-f179.google.com with SMTP id j29so19056706wre.2
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 09:31:57 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: BFQ + dm-mpath
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1503611578.2899.69.camel@wdc.com>
-Date: Wed, 30 Aug 2017 18:31:53 +0200
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-Id: <AE77899A-0365-4C7C-91E4-5ACCC396B26B@linaro.org>
-References: <1503611578.2899.69.camel@wdc.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
+        Thu, 24 Aug 2017 19:17:37 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: BFQ + dm-mpath
+Date: Thu, 24 Aug 2017 23:16:49 +0000
+Message-ID: <1503611578.2899.69.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
-> Il giorno 25 ago 2017, alle ore 01:16, Bart Van Assche =
-<bart.vanassche@wdc.com> ha scritto:
->=20
-> Hello Paolo,
->=20
-
-Hi Bart
-
-> Has BFQ ever been tested in combination with dm-mpath?
-
-Unfortunately no.
-
-> A few seconds
-> after I had started a run of the srp-tests software with BFQ a kernel
-> oops appeared on the console. The command I ran is:
->=20
-> $ while true; do ~bart/software/infiniband/srp-test/run_tests -d -r 30 =
--e bfq; done
->=20
-> And this is what appeared on the console:
->=20
-> [89251.977201] BUG: unable to handle kernel NULL pointer dereference =
-at 0000000000000018=20
-> [89251.977201] BUG: unable to handle kernel NULL pointer dereference =
-at 0000000000000018=20
-> [89251.987831] IP: bfq_setup_cooperator+0x16/0x2e0 [bfq]=20
-> [89251.987831] IP: bfq_setup_cooperator+0x16/0x2e0 [bfq]=20
-> [89251.995241] PGD 0 =20
-> [89251.995241] PGD 0 =20
-> [89251.995243] P4D 0 =20
-> [89251.995243] P4D 0 =20
-> [89251.999194] =20
-> [89251.999194] =20
-> [89252.006423] Oops: 0000 [#1] PREEMPT SMP=20
-> [89252.006423] Oops: 0000 [#1] PREEMPT SMP=20
-> [89252.012354] Modules linked in: ib_srp libcrc32c scsi_transport_srp =
-target_core_file ib_srpt target_core_iblock target_core_mod scsi_debug =
-brd bfq dm_service_time rdma_cm
-> iw_cm bridge stp llc ip6table_filter ip=20
-> 6_tables iptable_filter intel_rapl sb_edac x86_pkg_temp_thermal =
-intel_powerclamp coretemp kvm_intel kvm af_packet irqbypass ipmi_ssif =
-dcdbas crct10dif_pclmul ioatdma
-> crc32_pclmul mei_me joydev ghash_clmulni_intel=20
-> mei aesni_intel sg shpchp ipmi_si aes_x86_64 ipmi_devintf crypto_simd =
-dca cryptd glue_helper lpc_ich ipmi_msghandler acpi_power_meter acpi_pad =
-wmi mfd_core ib_ipoib ib_cm
-> ib_uverbs ib_umad mlx4_ib ib_core dm_mul=20
-> tipath dm_mod scsi_dh_rdac scsi_dh_emc scsi_dh_alua netconsole =
-configfs ip_tables x_tables autofs4 ext4 mbcache jbd2 mlx4_en =
-hid_generic usbhid mgag200 i2c_algo_bit
-> drm_kms_helper=20
-> [89252.012354] Modules linked in: ib_srp libcrc32c scsi_transport_srp =
-target_core_file ib_srpt target_core_iblock target_core_mod scsi_debug =
-brd bfq dm_service_time rdma_cm
-> iw_cm bridge stp llc ip6table_filter ip=20
-> 6_tables iptable_filter intel_rapl sb_edac x86_pkg_temp_thermal =
-intel_powerclamp coretemp kvm_intel kvm af_packet irqbypass ipmi_ssif =
-dcdbas crct10dif_pclmul ioatdma
-> crc32_pclmul mei_me joydev ghash_clmulni_intel=20
-> mei aesni_intel sg shpchp ipmi_si aes_x86_64 ipmi_devintf crypto_simd =
-dca cryptd glue_helper lpc_ich ipmi_msghandler acpi_power_meter acpi_pad =
-wmi mfd_core ib_ipoib ib_cm
-> ib_uverbs ib_umad mlx4_ib ib_core dm_mul=20
-> tipath dm_mod scsi_dh_rdac scsi_dh_emc scsi_dh_alua netconsole =
-configfs ip_tables x_tables autofs4 ext4 mbcache jbd2 mlx4_en =
-hid_generic usbhid mgag200 i2c_algo_bit
-> drm_kms_helper=20
-> [89252.103941]  syscopyarea sysfillrect sysimgblt fb_sys_fops ttm =
-ehci_pci mlx4_core tg3 ehci_hcd crc32c_intel devlink drm ptp usbcore =
-usb_common pps_core megaraid_sas libphy
-> [last unloaded: scsi_transport_srp]=20
-> [89252.103941]  syscopyarea sysfillrect sysimgblt fb_sys_fops ttm =
-ehci_pci mlx4_core tg3 ehci_hcd crc32c_intel devlink drm ptp usbcore =
-usb_common pps_core megaraid_sas libphy
-> [last unloaded: scsi_transport_srp]=20
-> [89252.128375] CPU: 13 PID: 352 Comm: kworker/13:1H Tainted: G        =
-W       4.13.0-rc6-dbg+ #2=20
-> [89252.128375] CPU: 13 PID: 352 Comm: kworker/13:1H Tainted: G        =
-W       4.13.0-rc6-dbg+ #2=20
-> [89252.139884] Hardware name: Dell Inc. PowerEdge R720/0VWT90, BIOS =
-1.3.6 09/11/2012=20
-> [89252.139884] Hardware name: Dell Inc. PowerEdge R720/0VWT90, BIOS =
-1.3.6 09/11/2012=20
-> [89252.150243] Workqueue: kblockd blk_mq_run_work_fn=20
-> [89252.150243] Workqueue: kblockd blk_mq_run_work_fn=20
-> [89252.157449] task: ffff880911d80040 task.stack: ffffc90007c64000=20
-> [89252.157449] task: ffff880911d80040 task.stack: ffffc90007c64000=20
-> [89252.166038] RIP: 0010:bfq_setup_cooperator+0x16/0x2e0 [bfq]=20
-> [89252.166038] RIP: 0010:bfq_setup_cooperator+0x16/0x2e0 [bfq]=20
-> [89252.174222] RSP: 0018:ffffc90007c67b20 EFLAGS: 00010082=20
-> [89252.174222] RSP: 0018:ffffc90007c67b20 EFLAGS: 00010082=20
-> [89252.182026] RAX: 00000000ffffffe0 RBX: ffff8807b9988700 RCX: =
-0000000000000001=20
-> [89252.182026] RAX: 00000000ffffffe0 RBX: ffff8807b9988700 RCX: =
-0000000000000001=20
-> [89252.191990] RDX: ffff8807b9988700 RSI: 0000000000000000 RDI: =
-ffff880288554a68=20
-> [89252.191990] RDX: ffff8807b9988700 RSI: 0000000000000000 RDI: =
-ffff880288554a68=20
-> [89252.201956] RBP: ffffc90007c67b68 R08: ffffffff825820c0 R09: =
-0000000000000000=20
-> [89252.201956] RBP: ffffc90007c67b68 R08: ffffffff825820c0 R09: =
-0000000000000000=20
-> [89252.211899] R10: ffffc90007c67ae8 R11: ffffffffa05a5ad5 R12: =
-ffff880288554dc8=20
-> [89252.211899] R10: ffffc90007c67ae8 R11: ffffffffa05a5ad5 R12: =
-ffff880288554dc8=20
-> [89252.221821] R13: ffff880288554a68 R14: ffff880928078bd0 R15: =
-ffff8807bbe03528=20
-> [89252.221821] R13: ffff880288554a68 R14: ffff880928078bd0 R15: =
-ffff8807bbe03528=20
-> [89252.231715] FS:  0000000000000000(0000) GS:ffff88093f780000(0000) =
-knlGS:0000000000000000=20
-> [89252.231715] FS:  0000000000000000(0000) GS:ffff88093f780000(0000) =
-knlGS:0000000000000000=20
-> [89252.242667] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=20
-> [89252.242667] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=20
-> [89252.250958] CR2: 0000000000000018 CR3: 00000004aa731000 CR4: =
-00000000000406e0
-> [89252.250958] CR2: 0000000000000018 CR3: 00000004aa731000 CR4: =
-00000000000406e0=20
-> [89252.260774] Call Trace:=20
-> [89252.260774] Call Trace:=20
-> [89252.265341]  bfq_insert_requests+0x10d/0xf20 [bfq]=20
-> [89252.265341]  bfq_insert_requests+0x10d/0xf20 [bfq]=20
-> [89252.272549]  ? lock_acquire+0xdc/0x1d0=20
-> [89252.272549]  ? lock_acquire+0xdc/0x1d0=20
-> [89252.278566]  blk_mq_sched_insert_request+0x123/0x170=20
-> [89252.278566]  blk_mq_sched_insert_request+0x123/0x170=20
-> [89252.285936]  blk_insert_cloned_request+0xae/0x1f0=20
-> [89252.285936]  blk_insert_cloned_request+0xae/0x1f0=20
-> [89252.293026]  map_request+0x123/0x290 [dm_mod]=20
-> [89252.293026]  map_request+0x123/0x290 [dm_mod]=20
-> [89252.299705]  dm_mq_queue_rq+0x94/0x110 [dm_mod]=20
-> [89252.299705]  dm_mq_queue_rq+0x94/0x110 [dm_mod]=20
-> [89252.306557]  blk_mq_dispatch_rq_list+0x1f1/0x3a0=20
-> [89252.306557]  blk_mq_dispatch_rq_list+0x1f1/0x3a0=20
-> [89252.313520]  blk_mq_sched_dispatch_requests+0x16d/0x1e0=20
-> [89252.313520]  blk_mq_sched_dispatch_requests+0x16d/0x1e0=20
-> [89252.321183]  __blk_mq_run_hw_queue+0x11d/0x1c0=20
-> [89252.321183]  __blk_mq_run_hw_queue+0x11d/0x1c0=20
-> [89252.327987]  blk_mq_run_work_fn+0x2c/0x30=20
-> [89252.327987]  blk_mq_run_work_fn+0x2c/0x30=20
-> [89252.334284]  process_one_work+0x200/0x630=20
-> [89252.334284]  process_one_work+0x200/0x630=20
-> [89252.340515]  worker_thread+0x4e/0x3b0=20
-> [89252.340515]  worker_thread+0x4e/0x3b0=20
-> [89252.346317]  kthread+0x113/0x150=20
-> [89252.346317]  kthread+0x113/0x150=20
-> [89252.351572]  ? process_one_work+0x630/0x630=20
-> [89252.351572]  ? process_one_work+0x630/0x630=20
-> [89252.357890]  ? kthread_create_on_node+0x40/0x40=20
-> [89252.357890]  ? kthread_create_on_node+0x40/0x40=20
-> [89252.364607]  ? kthread_create_on_node+0x40/0x40=20
-> [89252.364607]  ? kthread_create_on_node+0x40/0x40=20
-> [89252.371303]  ret_from_fork+0x27/0x40=20
-> [89252.371303]  ret_from_fork+0x27/0x40=20
-> [89252.376912] Code: 96 08 01 00 00 48 c1 ea 06 83 e2 01 89 d0 5d c3 =
-0f 1f 44 00 00 66 66 66 66 90 55 48 89 e5 41 57 41 56 41 55 41 54 53 48 =
-83 ec 20 <4c> 8b 66 18 4d 85 e4 74
-> 12 48 83 c4 20 4c 89 e0 5b 41 5c 41=20
-> 5d =20
-> [89252.376912] Code: 96 08 01 00 00 48 c1 ea 06 83 e2 01 89 d0 5d c3 =
-0f 1f 44 00 00 66 66 66 66 90 55 48 89 e5 41 57 41 56 41 55 41 54 53 48 =
-83 ec 20 <4c> 8b 66 18 4d 85 e4 74
-> 12 48 83 c4 20 4c 89 e0 5b 41 5c 41=20
-> 5d =20
-> [89252.401319] RIP: bfq_setup_cooperator+0x16/0x2e0 [bfq] RSP: =
-ffffc90007c67b20=20
-> [89252.401319] RIP: bfq_setup_cooperator+0x16/0x2e0 [bfq] RSP: =
-ffffc90007c67b20=20
-> [89252.410858] CR2: 0000000000000018=20
-> [89252.410858] CR2: 0000000000000018=20
-> [89252.416257] ---[ end trace ec48e99a50d88cb4 ]---=20
-> [89252.416257] ---[ end trace ec48e99a50d88cb4 ]---
->=20
-> $ gdb bfq.ko
-> (gdb) list *(bfq_setup_cooperator+0x16)
-> 0x1d76 is in bfq_setup_cooperator (block/bfq-iosched.c:1959).
-> 1954    bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue =
-*bfqq,
-> 1955                         void *io_struct, bool request)
-> 1956    {
-> 1957            struct bfq_queue *in_service_bfqq, *new_bfqq;
-> 1958
-> 1959            if (bfqq->new_bfqq)
-> 1960                    return bfqq->new_bfqq;
-> 1961
-> 1962            if (!io_struct ||
-> 1963                wr_from_too_long(bfqq) ||
->=20
-
-At a first glance, bfq_insert_request seems to get a request that has
-not been properly initialized: the field (rq)->elv.priv[1], where bfq
-stores the bfq_queue the request belongs to (in the function
-bfq_prepare_request) happens to be null.  Then the parameter bfqq at
-line 1959 is null, and the oops follows.
-
-This lets me suspect that something wrong happens around
-dm_mq_queue_rq, map_request and blk_insert_cloned_request.
-Unfortunately, I don't remember having ever read the code of those
-function.  So I have written this short, preliminary report just to
-see whether it rings any bell for anyone reading this email.  If not,
-I'll dig into these functions to check whether the bug is really where
-I suspect.
-
-Thanks,
-Paolo
-=20
-> Bart.
+SGVsbG8gUGFvbG8sDQoNCkhhcyBCRlEgZXZlciBiZWVuIHRlc3RlZCBpbiBjb21iaW5hdGlvbiB3
+aXRoIGRtLW1wYXRoPyBBIGZldyBzZWNvbmRzDQphZnRlciBJIGhhZCBzdGFydGVkIGEgcnVuIG9m
+IHRoZSBzcnAtdGVzdHMgc29mdHdhcmUgd2l0aCBCRlEgYSBrZXJuZWwNCm9vcHMgYXBwZWFyZWQg
+b24gdGhlIGNvbnNvbGUuIFRoZSBjb21tYW5kIEkgcmFuIGlzOg0KDQokIHdoaWxlIHRydWU7IGRv
+IH5iYXJ0L3NvZnR3YXJlL2luZmluaWJhbmQvc3JwLXRlc3QvcnVuX3Rlc3RzIC1kIC1yIDMwIC1l
+IGJmcTsgZG9uZQ0KDQpBbmQgdGhpcyBpcyB3aGF0IGFwcGVhcmVkIG9uIHRoZSBjb25zb2xlOg0K
+DQpbODkyNTEuOTc3MjAxXSBCVUc6IHVuYWJsZSB0byBoYW5kbGUga2VybmVsIE5VTEwgcG9pbnRl
+ciBkZXJlZmVyZW5jZSBhdCAwMDAwMDAwMDAwMDAwMDE4IA0KWzg5MjUxLjk3NzIwMV0gQlVHOiB1
+bmFibGUgdG8gaGFuZGxlIGtlcm5lbCBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2UgYXQgMDAwMDAw
+MDAwMDAwMDAxOCANCls4OTI1MS45ODc4MzFdIElQOiBiZnFfc2V0dXBfY29vcGVyYXRvcisweDE2
+LzB4MmUwIFtiZnFdIA0KWzg5MjUxLjk4NzgzMV0gSVA6IGJmcV9zZXR1cF9jb29wZXJhdG9yKzB4
+MTYvMHgyZTAgW2JmcV0gDQpbODkyNTEuOTk1MjQxXSBQR0QgMCAgDQpbODkyNTEuOTk1MjQxXSBQ
+R0QgMCAgDQpbODkyNTEuOTk1MjQzXSBQNEQgMCAgDQpbODkyNTEuOTk1MjQzXSBQNEQgMCAgDQpb
+ODkyNTEuOTk5MTk0XSAgDQpbODkyNTEuOTk5MTk0XSAgDQpbODkyNTIuMDA2NDIzXSBPb3BzOiAw
+MDAwIFsjMV0gUFJFRU1QVCBTTVAgDQpbODkyNTIuMDA2NDIzXSBPb3BzOiAwMDAwIFsjMV0gUFJF
+RU1QVCBTTVAgDQpbODkyNTIuMDEyMzU0XSBNb2R1bGVzIGxpbmtlZCBpbjogaWJfc3JwIGxpYmNy
+YzMyYyBzY3NpX3RyYW5zcG9ydF9zcnAgdGFyZ2V0X2NvcmVfZmlsZSBpYl9zcnB0IHRhcmdldF9j
+b3JlX2libG9jayB0YXJnZXRfY29yZV9tb2Qgc2NzaV9kZWJ1ZyBicmQgYmZxIGRtX3NlcnZpY2Vf
+dGltZSByZG1hX2NtDQppd19jbSBicmlkZ2Ugc3RwIGxsYyBpcDZ0YWJsZV9maWx0ZXIgaXAgDQo2
+X3RhYmxlcyBpcHRhYmxlX2ZpbHRlciBpbnRlbF9yYXBsIHNiX2VkYWMgeDg2X3BrZ190ZW1wX3Ro
+ZXJtYWwgaW50ZWxfcG93ZXJjbGFtcCBjb3JldGVtcCBrdm1faW50ZWwga3ZtIGFmX3BhY2tldCBp
+cnFieXBhc3MgaXBtaV9zc2lmIGRjZGJhcyBjcmN0MTBkaWZfcGNsbXVsIGlvYXRkbWENCmNyYzMy
+X3BjbG11bCBtZWlfbWUgam95ZGV2IGdoYXNoX2NsbXVsbmlfaW50ZWwgDQptZWkgYWVzbmlfaW50
+ZWwgc2cgc2hwY2hwIGlwbWlfc2kgYWVzX3g4Nl82NCBpcG1pX2RldmludGYgY3J5cHRvX3NpbWQg
+ZGNhIGNyeXB0ZCBnbHVlX2hlbHBlciBscGNfaWNoIGlwbWlfbXNnaGFuZGxlciBhY3BpX3Bvd2Vy
+X21ldGVyIGFjcGlfcGFkIHdtaSBtZmRfY29yZSBpYl9pcG9pYiBpYl9jbQ0KaWJfdXZlcmJzIGli
+X3VtYWQgbWx4NF9pYiBpYl9jb3JlIGRtX211bCANCnRpcGF0aCBkbV9tb2Qgc2NzaV9kaF9yZGFj
+IHNjc2lfZGhfZW1jIHNjc2lfZGhfYWx1YSBuZXRjb25zb2xlIGNvbmZpZ2ZzIGlwX3RhYmxlcyB4
+X3RhYmxlcyBhdXRvZnM0IGV4dDQgbWJjYWNoZSBqYmQyIG1seDRfZW4gaGlkX2dlbmVyaWMgdXNi
+aGlkIG1nYWcyMDAgaTJjX2FsZ29fYml0DQpkcm1fa21zX2hlbHBlciANCls4OTI1Mi4wMTIzNTRd
+IE1vZHVsZXMgbGlua2VkIGluOiBpYl9zcnAgbGliY3JjMzJjIHNjc2lfdHJhbnNwb3J0X3NycCB0
+YXJnZXRfY29yZV9maWxlIGliX3NycHQgdGFyZ2V0X2NvcmVfaWJsb2NrIHRhcmdldF9jb3JlX21v
+ZCBzY3NpX2RlYnVnIGJyZCBiZnEgZG1fc2VydmljZV90aW1lIHJkbWFfY20NCml3X2NtIGJyaWRn
+ZSBzdHAgbGxjIGlwNnRhYmxlX2ZpbHRlciBpcCANCjZfdGFibGVzIGlwdGFibGVfZmlsdGVyIGlu
+dGVsX3JhcGwgc2JfZWRhYyB4ODZfcGtnX3RlbXBfdGhlcm1hbCBpbnRlbF9wb3dlcmNsYW1wIGNv
+cmV0ZW1wIGt2bV9pbnRlbCBrdm0gYWZfcGFja2V0IGlycWJ5cGFzcyBpcG1pX3NzaWYgZGNkYmFz
+IGNyY3QxMGRpZl9wY2xtdWwgaW9hdGRtYQ0KY3JjMzJfcGNsbXVsIG1laV9tZSBqb3lkZXYgZ2hh
+c2hfY2xtdWxuaV9pbnRlbCANCm1laSBhZXNuaV9pbnRlbCBzZyBzaHBjaHAgaXBtaV9zaSBhZXNf
+eDg2XzY0IGlwbWlfZGV2aW50ZiBjcnlwdG9fc2ltZCBkY2EgY3J5cHRkIGdsdWVfaGVscGVyIGxw
+Y19pY2ggaXBtaV9tc2doYW5kbGVyIGFjcGlfcG93ZXJfbWV0ZXIgYWNwaV9wYWQgd21pIG1mZF9j
+b3JlIGliX2lwb2liIGliX2NtDQppYl91dmVyYnMgaWJfdW1hZCBtbHg0X2liIGliX2NvcmUgZG1f
+bXVsIA0KdGlwYXRoIGRtX21vZCBzY3NpX2RoX3JkYWMgc2NzaV9kaF9lbWMgc2NzaV9kaF9hbHVh
+IG5ldGNvbnNvbGUgY29uZmlnZnMgaXBfdGFibGVzIHhfdGFibGVzIGF1dG9mczQgZXh0NCBtYmNh
+Y2hlIGpiZDIgbWx4NF9lbiBoaWRfZ2VuZXJpYyB1c2JoaWQgbWdhZzIwMCBpMmNfYWxnb19iaXQN
+CmRybV9rbXNfaGVscGVyIA0KWzg5MjUyLjEwMzk0MV0gIHN5c2NvcHlhcmVhIHN5c2ZpbGxyZWN0
+IHN5c2ltZ2JsdCBmYl9zeXNfZm9wcyB0dG0gZWhjaV9wY2kgbWx4NF9jb3JlIHRnMyBlaGNpX2hj
+ZCBjcmMzMmNfaW50ZWwgZGV2bGluayBkcm0gcHRwIHVzYmNvcmUgdXNiX2NvbW1vbiBwcHNfY29y
+ZSBtZWdhcmFpZF9zYXMgbGlicGh5DQpbbGFzdCB1bmxvYWRlZDogc2NzaV90cmFuc3BvcnRfc3Jw
+XSANCls4OTI1Mi4xMDM5NDFdICBzeXNjb3B5YXJlYSBzeXNmaWxscmVjdCBzeXNpbWdibHQgZmJf
+c3lzX2ZvcHMgdHRtIGVoY2lfcGNpIG1seDRfY29yZSB0ZzMgZWhjaV9oY2QgY3JjMzJjX2ludGVs
+IGRldmxpbmsgZHJtIHB0cCB1c2Jjb3JlIHVzYl9jb21tb24gcHBzX2NvcmUgbWVnYXJhaWRfc2Fz
+IGxpYnBoeQ0KW2xhc3QgdW5sb2FkZWQ6IHNjc2lfdHJhbnNwb3J0X3NycF0gDQpbODkyNTIuMTI4
+Mzc1XSBDUFU6IDEzIFBJRDogMzUyIENvbW06IGt3b3JrZXIvMTM6MUggVGFpbnRlZDogRyAgICAg
+ICAgVyAgICAgICA0LjEzLjAtcmM2LWRiZysgIzIgDQpbODkyNTIuMTI4Mzc1XSBDUFU6IDEzIFBJ
+RDogMzUyIENvbW06IGt3b3JrZXIvMTM6MUggVGFpbnRlZDogRyAgICAgICAgVyAgICAgICA0LjEz
+LjAtcmM2LWRiZysgIzIgDQpbODkyNTIuMTM5ODg0XSBIYXJkd2FyZSBuYW1lOiBEZWxsIEluYy4g
+UG93ZXJFZGdlIFI3MjAvMFZXVDkwLCBCSU9TIDEuMy42IDA5LzExLzIwMTIgDQpbODkyNTIuMTM5
+ODg0XSBIYXJkd2FyZSBuYW1lOiBEZWxsIEluYy4gUG93ZXJFZGdlIFI3MjAvMFZXVDkwLCBCSU9T
+IDEuMy42IDA5LzExLzIwMTIgDQpbODkyNTIuMTUwMjQzXSBXb3JrcXVldWU6IGtibG9ja2QgYmxr
+X21xX3J1bl93b3JrX2ZuIA0KWzg5MjUyLjE1MDI0M10gV29ya3F1ZXVlOiBrYmxvY2tkIGJsa19t
+cV9ydW5fd29ya19mbiANCls4OTI1Mi4xNTc0NDldIHRhc2s6IGZmZmY4ODA5MTFkODAwNDAgdGFz
+ay5zdGFjazogZmZmZmM5MDAwN2M2NDAwMCANCls4OTI1Mi4xNTc0NDldIHRhc2s6IGZmZmY4ODA5
+MTFkODAwNDAgdGFzay5zdGFjazogZmZmZmM5MDAwN2M2NDAwMCANCls4OTI1Mi4xNjYwMzhdIFJJ
+UDogMDAxMDpiZnFfc2V0dXBfY29vcGVyYXRvcisweDE2LzB4MmUwIFtiZnFdIA0KWzg5MjUyLjE2
+NjAzOF0gUklQOiAwMDEwOmJmcV9zZXR1cF9jb29wZXJhdG9yKzB4MTYvMHgyZTAgW2JmcV0gDQpb
+ODkyNTIuMTc0MjIyXSBSU1A6IDAwMTg6ZmZmZmM5MDAwN2M2N2IyMCBFRkxBR1M6IDAwMDEwMDgy
+IA0KWzg5MjUyLjE3NDIyMl0gUlNQOiAwMDE4OmZmZmZjOTAwMDdjNjdiMjAgRUZMQUdTOiAwMDAx
+MDA4MiANCls4OTI1Mi4xODIwMjZdIFJBWDogMDAwMDAwMDBmZmZmZmZlMCBSQlg6IGZmZmY4ODA3
+Yjk5ODg3MDAgUkNYOiAwMDAwMDAwMDAwMDAwMDAxIA0KWzg5MjUyLjE4MjAyNl0gUkFYOiAwMDAw
+MDAwMGZmZmZmZmUwIFJCWDogZmZmZjg4MDdiOTk4ODcwMCBSQ1g6IDAwMDAwMDAwMDAwMDAwMDEg
+DQpbODkyNTIuMTkxOTkwXSBSRFg6IGZmZmY4ODA3Yjk5ODg3MDAgUlNJOiAwMDAwMDAwMDAwMDAw
+MDAwIFJESTogZmZmZjg4MDI4ODU1NGE2OCANCls4OTI1Mi4xOTE5OTBdIFJEWDogZmZmZjg4MDdi
+OTk4ODcwMCBSU0k6IDAwMDAwMDAwMDAwMDAwMDAgUkRJOiBmZmZmODgwMjg4NTU0YTY4IA0KWzg5
+MjUyLjIwMTk1Nl0gUkJQOiBmZmZmYzkwMDA3YzY3YjY4IFIwODogZmZmZmZmZmY4MjU4MjBjMCBS
+MDk6IDAwMDAwMDAwMDAwMDAwMDAgDQpbODkyNTIuMjAxOTU2XSBSQlA6IGZmZmZjOTAwMDdjNjdi
+NjggUjA4OiBmZmZmZmZmZjgyNTgyMGMwIFIwOTogMDAwMDAwMDAwMDAwMDAwMCANCls4OTI1Mi4y
+MTE4OTldIFIxMDogZmZmZmM5MDAwN2M2N2FlOCBSMTE6IGZmZmZmZmZmYTA1YTVhZDUgUjEyOiBm
+ZmZmODgwMjg4NTU0ZGM4IA0KWzg5MjUyLjIxMTg5OV0gUjEwOiBmZmZmYzkwMDA3YzY3YWU4IFIx
+MTogZmZmZmZmZmZhMDVhNWFkNSBSMTI6IGZmZmY4ODAyODg1NTRkYzggDQpbODkyNTIuMjIxODIx
+XSBSMTM6IGZmZmY4ODAyODg1NTRhNjggUjE0OiBmZmZmODgwOTI4MDc4YmQwIFIxNTogZmZmZjg4
+MDdiYmUwMzUyOCANCls4OTI1Mi4yMjE4MjFdIFIxMzogZmZmZjg4MDI4ODU1NGE2OCBSMTQ6IGZm
+ZmY4ODA5MjgwNzhiZDAgUjE1OiBmZmZmODgwN2JiZTAzNTI4IA0KWzg5MjUyLjIzMTcxNV0gRlM6
+ICAwMDAwMDAwMDAwMDAwMDAwKDAwMDApIEdTOmZmZmY4ODA5M2Y3ODAwMDAoMDAwMCkga25sR1M6
+MDAwMDAwMDAwMDAwMDAwMCANCls4OTI1Mi4yMzE3MTVdIEZTOiAgMDAwMDAwMDAwMDAwMDAwMCgw
+MDAwKSBHUzpmZmZmODgwOTNmNzgwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDAgDQpb
+ODkyNTIuMjQyNjY3XSBDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgw
+MDUwMDMzIA0KWzg5MjUyLjI0MjY2N10gQ1M6ICAwMDEwIERTOiAwMDAwIEVTOiAwMDAwIENSMDog
+MDAwMDAwMDA4MDA1MDAzMyANCls4OTI1Mi4yNTA5NThdIENSMjogMDAwMDAwMDAwMDAwMDAxOCBD
+UjM6IDAwMDAwMDA0YWE3MzEwMDAgQ1I0OiAwMDAwMDAwMDAwMDQwNmUwDQpbODkyNTIuMjUwOTU4
+XSBDUjI6IDAwMDAwMDAwMDAwMDAwMTggQ1IzOiAwMDAwMDAwNGFhNzMxMDAwIENSNDogMDAwMDAw
+MDAwMDA0MDZlMCANCls4OTI1Mi4yNjA3NzRdIENhbGwgVHJhY2U6IA0KWzg5MjUyLjI2MDc3NF0g
+Q2FsbCBUcmFjZTogDQpbODkyNTIuMjY1MzQxXSAgYmZxX2luc2VydF9yZXF1ZXN0cysweDEwZC8w
+eGYyMCBbYmZxXSANCls4OTI1Mi4yNjUzNDFdICBiZnFfaW5zZXJ0X3JlcXVlc3RzKzB4MTBkLzB4
+ZjIwIFtiZnFdIA0KWzg5MjUyLjI3MjU0OV0gID8gbG9ja19hY3F1aXJlKzB4ZGMvMHgxZDAgDQpb
+ODkyNTIuMjcyNTQ5XSAgPyBsb2NrX2FjcXVpcmUrMHhkYy8weDFkMCANCls4OTI1Mi4yNzg1NjZd
+ICBibGtfbXFfc2NoZWRfaW5zZXJ0X3JlcXVlc3QrMHgxMjMvMHgxNzAgDQpbODkyNTIuMjc4NTY2
+XSAgYmxrX21xX3NjaGVkX2luc2VydF9yZXF1ZXN0KzB4MTIzLzB4MTcwIA0KWzg5MjUyLjI4NTkz
+Nl0gIGJsa19pbnNlcnRfY2xvbmVkX3JlcXVlc3QrMHhhZS8weDFmMCANCls4OTI1Mi4yODU5MzZd
+ICBibGtfaW5zZXJ0X2Nsb25lZF9yZXF1ZXN0KzB4YWUvMHgxZjAgDQpbODkyNTIuMjkzMDI2XSAg
+bWFwX3JlcXVlc3QrMHgxMjMvMHgyOTAgW2RtX21vZF0gDQpbODkyNTIuMjkzMDI2XSAgbWFwX3Jl
+cXVlc3QrMHgxMjMvMHgyOTAgW2RtX21vZF0gDQpbODkyNTIuMjk5NzA1XSAgZG1fbXFfcXVldWVf
+cnErMHg5NC8weDExMCBbZG1fbW9kXSANCls4OTI1Mi4yOTk3MDVdICBkbV9tcV9xdWV1ZV9ycSsw
+eDk0LzB4MTEwIFtkbV9tb2RdIA0KWzg5MjUyLjMwNjU1N10gIGJsa19tcV9kaXNwYXRjaF9ycV9s
+aXN0KzB4MWYxLzB4M2EwIA0KWzg5MjUyLjMwNjU1N10gIGJsa19tcV9kaXNwYXRjaF9ycV9saXN0
+KzB4MWYxLzB4M2EwIA0KWzg5MjUyLjMxMzUyMF0gIGJsa19tcV9zY2hlZF9kaXNwYXRjaF9yZXF1
+ZXN0cysweDE2ZC8weDFlMCANCls4OTI1Mi4zMTM1MjBdICBibGtfbXFfc2NoZWRfZGlzcGF0Y2hf
+cmVxdWVzdHMrMHgxNmQvMHgxZTAgDQpbODkyNTIuMzIxMTgzXSAgX19ibGtfbXFfcnVuX2h3X3F1
+ZXVlKzB4MTFkLzB4MWMwIA0KWzg5MjUyLjMyMTE4M10gIF9fYmxrX21xX3J1bl9od19xdWV1ZSsw
+eDExZC8weDFjMCANCls4OTI1Mi4zMjc5ODddICBibGtfbXFfcnVuX3dvcmtfZm4rMHgyYy8weDMw
+IA0KWzg5MjUyLjMyNzk4N10gIGJsa19tcV9ydW5fd29ya19mbisweDJjLzB4MzAgDQpbODkyNTIu
+MzM0Mjg0XSAgcHJvY2Vzc19vbmVfd29yaysweDIwMC8weDYzMCANCls4OTI1Mi4zMzQyODRdICBw
+cm9jZXNzX29uZV93b3JrKzB4MjAwLzB4NjMwIA0KWzg5MjUyLjM0MDUxNV0gIHdvcmtlcl90aHJl
+YWQrMHg0ZS8weDNiMCANCls4OTI1Mi4zNDA1MTVdICB3b3JrZXJfdGhyZWFkKzB4NGUvMHgzYjAg
+DQpbODkyNTIuMzQ2MzE3XSAga3RocmVhZCsweDExMy8weDE1MCANCls4OTI1Mi4zNDYzMTddICBr
+dGhyZWFkKzB4MTEzLzB4MTUwIA0KWzg5MjUyLjM1MTU3Ml0gID8gcHJvY2Vzc19vbmVfd29yaysw
+eDYzMC8weDYzMCANCls4OTI1Mi4zNTE1NzJdICA/IHByb2Nlc3Nfb25lX3dvcmsrMHg2MzAvMHg2
+MzAgDQpbODkyNTIuMzU3ODkwXSAgPyBrdGhyZWFkX2NyZWF0ZV9vbl9ub2RlKzB4NDAvMHg0MCAN
+Cls4OTI1Mi4zNTc4OTBdICA/IGt0aHJlYWRfY3JlYXRlX29uX25vZGUrMHg0MC8weDQwIA0KWzg5
+MjUyLjM2NDYwN10gID8ga3RocmVhZF9jcmVhdGVfb25fbm9kZSsweDQwLzB4NDAgDQpbODkyNTIu
+MzY0NjA3XSAgPyBrdGhyZWFkX2NyZWF0ZV9vbl9ub2RlKzB4NDAvMHg0MCANCls4OTI1Mi4zNzEz
+MDNdICByZXRfZnJvbV9mb3JrKzB4MjcvMHg0MCANCls4OTI1Mi4zNzEzMDNdICByZXRfZnJvbV9m
+b3JrKzB4MjcvMHg0MCANCls4OTI1Mi4zNzY5MTJdIENvZGU6IDk2IDA4IDAxIDAwIDAwIDQ4IGMx
+IGVhIDA2IDgzIGUyIDAxIDg5IGQwIDVkIGMzIDBmIDFmIDQ0IDAwIDAwIDY2IDY2IDY2IDY2IDkw
+IDU1IDQ4IDg5IGU1IDQxIDU3IDQxIDU2IDQxIDU1IDQxIDU0IDUzIDQ4IDgzIGVjIDIwIDw0Yz4g
+OGIgNjYgMTggNGQgODUgZTQgNzQNCjEyIDQ4IDgzIGM0IDIwIDRjIDg5IGUwIDViIDQxIDVjIDQx
+IA0KNWQgIA0KWzg5MjUyLjM3NjkxMl0gQ29kZTogOTYgMDggMDEgMDAgMDAgNDggYzEgZWEgMDYg
+ODMgZTIgMDEgODkgZDAgNWQgYzMgMGYgMWYgNDQgMDAgMDAgNjYgNjYgNjYgNjYgOTAgNTUgNDgg
+ODkgZTUgNDEgNTcgNDEgNTYgNDEgNTUgNDEgNTQgNTMgNDggODMgZWMgMjAgPDRjPiA4YiA2NiAx
+OCA0ZCA4NSBlNCA3NA0KMTIgNDggODMgYzQgMjAgNGMgODkgZTAgNWIgNDEgNWMgNDEgDQo1ZCAg
+DQpbODkyNTIuNDAxMzE5XSBSSVA6IGJmcV9zZXR1cF9jb29wZXJhdG9yKzB4MTYvMHgyZTAgW2Jm
+cV0gUlNQOiBmZmZmYzkwMDA3YzY3YjIwIA0KWzg5MjUyLjQwMTMxOV0gUklQOiBiZnFfc2V0dXBf
+Y29vcGVyYXRvcisweDE2LzB4MmUwIFtiZnFdIFJTUDogZmZmZmM5MDAwN2M2N2IyMCANCls4OTI1
+Mi40MTA4NThdIENSMjogMDAwMDAwMDAwMDAwMDAxOCANCls4OTI1Mi40MTA4NThdIENSMjogMDAw
+MDAwMDAwMDAwMDAxOCANCls4OTI1Mi40MTYyNTddIC0tLVsgZW5kIHRyYWNlIGVjNDhlOTlhNTBk
+ODhjYjQgXS0tLSANCls4OTI1Mi40MTYyNTddIC0tLVsgZW5kIHRyYWNlIGVjNDhlOTlhNTBkODhj
+YjQgXS0tLQ0KDQokIGdkYiBiZnEua28NCihnZGIpIGxpc3QgKihiZnFfc2V0dXBfY29vcGVyYXRv
+cisweDE2KQ0KMHgxZDc2IGlzIGluIGJmcV9zZXR1cF9jb29wZXJhdG9yIChibG9jay9iZnEtaW9z
+Y2hlZC5jOjE5NTkpLg0KMTk1NCAgICBiZnFfc2V0dXBfY29vcGVyYXRvcihzdHJ1Y3QgYmZxX2Rh
+dGEgKmJmcWQsIHN0cnVjdCBiZnFfcXVldWUgKmJmcXEsDQoxOTU1ICAgICAgICAgICAgICAgICAg
+ICAgICAgIHZvaWQgKmlvX3N0cnVjdCwgYm9vbCByZXF1ZXN0KQ0KMTk1NiAgICB7DQoxOTU3ICAg
+ICAgICAgICAgc3RydWN0IGJmcV9xdWV1ZSAqaW5fc2VydmljZV9iZnFxLCAqbmV3X2JmcXE7DQox
+OTU4DQoxOTU5ICAgICAgICAgICAgaWYgKGJmcXEtPm5ld19iZnFxKQ0KMTk2MCAgICAgICAgICAg
+ICAgICAgICAgcmV0dXJuIGJmcXEtPm5ld19iZnFxOw0KMTk2MQ0KMTk2MiAgICAgICAgICAgIGlm
+ICghaW9fc3RydWN0IHx8DQoxOTYzICAgICAgICAgICAgICAgIHdyX2Zyb21fdG9vX2xvbmcoYmZx
+cSkgfHwNCg0KQmFydC4=
