@@ -1,52 +1,27 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: brking@linux.vnet.ibm.com,
-	bart.vanassche@wdc.com,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/6] blk-mq-tag: check for NULL rq when iterating tags
-Date: Fri,  4 Aug 2017 09:04:17 -0600
-Message-Id: <1501859062-11120-2-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1501859062-11120-1-git-send-email-axboe@kernel.dk>
-References: <1501859062-11120-1-git-send-email-axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "hare@suse.de" <hare@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Damien Le Moal <Damien.LeMoal@wdc.com>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+Subject: Re: [PATCH 4/5] skd: Avoid double completions in case of a timeout
+Date: Thu, 24 Aug 2017 15:12:07 +0000
+Message-ID: <1503587526.2702.5.camel@wdc.com>
+References: <20170823175633.12680-1-bart.vanassche@wdc.com>
+	 <20170823175633.12680-5-bart.vanassche@wdc.com>
+	 <20170823180837.GF5802@lst.de>
+In-Reply-To: <20170823180837.GF5802@lst.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Since we introduced blk-mq-sched, the tags->rqs[] array has been
-dynamically assigned. So we need to check for NULL when iterating,
-since there's a window of time where the bit is set, but we haven't
-dynamically assigned the tags->rqs[] array position yet.
-
-This is perfectly safe, since the memory backing of the request is
-never going away while the device is alive.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq-tag.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index d0be72ccb091..b856b2827157 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -214,7 +214,7 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- 		bitnr += tags->nr_reserved_tags;
- 	rq = tags->rqs[bitnr];
- 
--	if (rq->q == hctx->queue)
-+	if (rq && rq->q == hctx->queue)
- 		iter_data->fn(hctx, rq, iter_data->data, reserved);
- 	return true;
- }
-@@ -249,8 +249,8 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- 	if (!reserved)
- 		bitnr += tags->nr_reserved_tags;
- 	rq = tags->rqs[bitnr];
--
--	iter_data->fn(rq, iter_data->data, reserved);
-+	if (rq)
-+		iter_data->fn(rq, iter_data->data, reserved);
- 	return true;
- }
- 
--- 
-2.7.4
+T24gV2VkLCAyMDE3LTA4LTIzIGF0IDIwOjA4ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gQWx0aG91Z2ggYXMgYSBmb2xsb3cgb24gSSB3b3VsZCBhbHNvIG1vdmUgdGhlIGRlYnVn
+IHByaW50a3MNCj4gZnJvbSBza2RfZW5kX3JlcXVlc3QgdG8gc2tkX3NvZnRpcnFfZG9uZSwgdGhl
+biByZW1vdmUgc2tkX2VuZF9yZXF1ZXN0DQo+IGFuZCByZW5hbWUgc2tkX3NvZnRpcnFfZG9uZSB0
+byBza2RfY29tcGxldGVfcnEgdG8gZml0IHdoYXQgb3RoZXINCj4gZHJpdmVycyBhcmUgZG9pbmcg
+YSBsaXR0bGUgbW9yZSBjbG9zZWx5Lg0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNClRoYW5rcyBmb3Ig
+dGhlIHJldmlldyBvZiB0aGlzIHBhdGNoIHNlcmllcy4gSSB3aWxsIGluY2x1ZGUgdGhlIGFib3Zl
+IGNoYW5nZXMNCndoZW4gSSBwb3N0IG15IG5leHQgcGF0Y2ggc2VyaWVzIGZvciB0aGUgc2tkIGRy
+aXZlci4NCg0KQmFydC4=
