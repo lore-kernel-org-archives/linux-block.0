@@ -1,42 +1,45 @@
-Return-Path: <BATV+08196f5b2bd262a84b8d+5113+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <hch@lst.de>
+Date: Thu, 24 Aug 2017 11:18:23 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 01/10] nvme: report more detailed status codes to the block layer
-Date: Wed, 23 Aug 2017 19:58:06 +0200
-Message-Id: <20170823175815.3646-2-hch@lst.de>
-In-Reply-To: <20170823175815.3646-1-hch@lst.de>
-References: <20170823175815.3646-1-hch@lst.de>
+To: Shaohua Li <shli@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH 2/6] raid5: remove a call to get_start_sect
+Message-ID: <20170824091823.GC20189@lst.de>
+References: <20170823171032.30529-1-hch@lst.de> <20170823171032.30529-3-hch@lst.de> <20170823182338.einsyonnfucyn73y@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170823182338.einsyonnfucyn73y@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On Wed, Aug 23, 2017 at 11:23:38AM -0700, Shaohua Li wrote:
+> On Wed, Aug 23, 2017 at 07:10:28PM +0200, Christoph Hellwig wrote:
+> > The block layer always remaps partitions before calling into the
+> > ->make_request methods of drivers.  Thus the call to get_start_sect in
+> > in_chunk_boundary will always return 0 and can be removed.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >  drivers/md/raid5.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+> > index 0fc2748aaf95..d687aeb1b538 100644
+> > --- a/drivers/md/raid5.c
+> > +++ b/drivers/md/raid5.c
+> > @@ -5092,10 +5092,12 @@ static int raid5_congested(struct mddev *mddev, int bits)
+> >  static int in_chunk_boundary(struct mddev *mddev, struct bio *bio)
+> >  {
+> >  	struct r5conf *conf = mddev->private;
+> > -	sector_t sector = bio->bi_iter.bi_sector + get_start_sect(bio->bi_bdev);
+> > +	sector_t sector = bio->bi_iter.bi_sector;
+> >  	unsigned int chunk_sectors;
+> >  	unsigned int bio_sectors = bio_sectors(bio);
+> >  
+> > +	WARN_ON_ONCE(bio->bi_partno);
+> > +
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1db8de0bee87..b8ecd155be19 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -113,7 +113,16 @@ static blk_status_t nvme_error_status(struct request *req)
- 	case NVME_SC_WRITE_FAULT:
- 	case NVME_SC_READ_ERROR:
- 	case NVME_SC_UNWRITTEN_BLOCK:
-+	case NVME_SC_ACCESS_DENIED:
-+	case NVME_SC_READ_ONLY:
- 		return BLK_STS_MEDIUM;
-+	case NVME_SC_GUARD_CHECK:
-+	case NVME_SC_APPTAG_CHECK:
-+	case NVME_SC_REFTAG_CHECK:
-+	case NVME_SC_INVALID_PI:
-+		return BLK_STS_PROTECTION;
-+	case NVME_SC_RESERVATION_CONFLICT:
-+		return BLK_STS_NEXUS;
- 	default:
- 		return BLK_STS_IOERR;
- 	}
--- 
-2.11.0
+Meh, of course bi_partno is only added a few patches later, so this
+breaks bisectability.  But given that the patch is already in there's
+probably nothing I can do here.
