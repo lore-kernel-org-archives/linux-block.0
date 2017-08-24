@@ -1,12 +1,13 @@
 Return-Path: <sergey.senozhatsky.work@gmail.com>
 Return-Path: <sergey.senozhatsky.work@gmail.com>
-Date: Wed, 30 Aug 2017 14:20:37 +0900
+Date: Thu, 24 Aug 2017 13:49:12 +0900
 From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To: Byungchul Park <byungchul.park@lge.com>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, peterz@infradead.org,
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Byungchul Park <byungchul.park@lge.com>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>, peterz@infradead.org,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"sergey.senozhatsky.work@gmail.com" <sergey.senozhatsky.work@gmail.com>,
 	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
 	"axboe@kernel.dk" <axboe@kernel.dk>,
 	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
@@ -15,73 +16,50 @@ Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, peterz@infradead.org,
 	kernel-team@lge.com
 Subject: Re: possible circular locking dependency detected [was: linux-next:
  Tree for Aug 22]
-Message-ID: <20170830052037.GA432@jagdpanzerIV.localdomain>
+Message-ID: <20170824044912.GB3569@jagdpanzerIV.localdomain>
 References: <20170822183816.7925e0f8@canb.auug.org.au>
  <20170822104708.GA491@jagdpanzerIV.localdomain>
  <1503438234.2508.27.camel@wdc.com>
  <20170823000304.GK20323@X58A-UD3R>
+ <20170823034951.GG11771@tardis>
+ <20170823043813.GH11771@tardis>
+ <20170823044648.GE10329@jagdpanzerIV.localdomain>
+ <20170823053501.GJ11771@tardis>
+ <20170823055517.GB728@jagdpanzerIV.localdomain>
+ <20170824043909.GL11771@tardis>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170823000304.GK20323@X58A-UD3R>
+In-Reply-To: <20170824043909.GL11771@tardis>
 List-ID: <linux-block@vger.kernel.org>
 
-On (08/23/17 09:03), Byungchul Park wrote:
-[..]
-> > Byungchul, did you add the crosslock checks to lockdep? Can you have a look at
-> > the above report? That report namely doesn't make sense to me.
+Hi,
+
+On (08/24/17 12:39), Boqun Feng wrote:
+> On Wed, Aug 23, 2017 at 02:55:17PM +0900, Sergey Senozhatsky wrote:
+> > On (08/23/17 13:35), Boqun Feng wrote:
+> > > > KERN_CONT and "\n" should not be together. "\n" flushes the cont
+> > > > buffer immediately.
+> > > > 
+> > > 
+> > > Hmm.. Not quite familiar with printk() stuffs, but I could see several
+> > > usages of printk(KERN_CONT "...\n") in kernel.
+> > > 
+> > > Did a bit research myself, and I now think the inappropriate use is to
+> > > use a KERN_CONT printk *after* another printk ending with a "\n".
+> > 
+> > ah... I didn't check __print_lock_name(): it leaves unflushed cont buffer
+> > upon the return. sorry, your code is correct.
+> > 
 > 
-> The report is talking about the following lockup:
-> 
-> A work in a worker                     A task work on exit to user
-> ------------------                     ---------------------------
-> mutex_lock(&bdev->bd_mutex)
->                                        mutext_lock(&bdev->bd_mutex)
-> blk_execute_rq()
->    wait_for_completion_io_timeout(&A)
->                                        complete(&A)
-> 
-[..]
-> To Peterz,
-> 
-> Anyway I wanted to avoid lockdep reports in the case using a timeout
-> interface. Do you think it's still worth reporting the kind of lockup?
-> I'm ok if you do.
+> So means printk(KERN_CON "..."); + printk(KERN_CONT "...\n") is a
+> correct usage, right?
 
-Byungchul, a quick question.
-have you measured the performance impact? somehow my linux-next is
-notably slower than earlier 4.13 linux-next. (e.g. scrolling in vim
-is irritatingly slow)
+well, yes. with one precondition - there should be no printk-s from other
+CPUs/tasks in between
 
-
-`time dmesg' shows some difference, but probably that's not a good
-test.
-
-	!LOCKDEP	LOCKDEP		LOCKDEP -CROSSRELEASE -COMPLETIONS
-	real 0m0.661s	0m2.290s	0m1.920s
-	user 0m0.010s	0m0.105s	0m0.000s
-	sys  0m0.636s	0m2.224s	0m1.888s
-
-anyone else "sees"/"can confirm" the slow down?
-
-
-it gets back to "usual normal" when I disable CROSSRELEASE and COMPLETIONS.
-
----
-
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index b19c491cbc4e..cdc30ef81c5e 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1091,8 +1091,6 @@ config PROVE_LOCKING
-        select DEBUG_MUTEXES
-        select DEBUG_RT_MUTEXES if RT_MUTEXES
-        select DEBUG_LOCK_ALLOC
--       select LOCKDEP_CROSSRELEASE
--       select LOCKDEP_COMPLETIONS
-        select TRACE_IRQFLAGS
-        default n
-        help
-
----
+	printk(KERN_CON "...");  +  printk(KERN_CONT "...\n")
+                               ^^^^^
+			here we can have a preliminary flush and broken
+			cont line. but it's been this way forever.
 
 	-ss
