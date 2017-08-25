@@ -1,11 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36032 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:33276 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756747AbdHYR51 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 13:57:27 -0400
-Date: Fri, 25 Aug 2017 13:57:22 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
+        id S1756349AbdHYRPO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Aug 2017 13:15:14 -0400
+Date: Sat, 26 Aug 2017 01:14:50 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
 Cc: dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
         Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
@@ -13,7 +13,7 @@ Cc: dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
         Laurence Oberman <loberman@redhat.com>,
         Bart Van Assche <Bart.VanAssche@wdc.com>
 Subject: Re: dm-rq: do not update rq partially in each ending bio
-Message-ID: <20170825175722.GA2298@redhat.com>
+Message-ID: <20170825171449.GC13937@ming.t460p>
 References: <20170825152749.14435-1-ming.lei@redhat.com>
  <20170825154839.GA1695@redhat.com>
  <20170825160850.GA13937@ming.t460p>
@@ -25,9 +25,7 @@ In-Reply-To: <20170825170752.GB13937@ming.t460p>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Aug 25 2017 at  1:07pm -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
-
+On Sat, Aug 26, 2017 at 01:07:53AM +0800, Ming Lei wrote:
 > On Fri, Aug 25, 2017 at 12:32:33PM -0400, Mike Snitzer wrote:
 > > On Fri, Aug 25 2017 at 12:08pm -0400,
 > > Ming Lei <ming.lei@redhat.com> wrote:
@@ -74,21 +72,9 @@ Ming Lei <ming.lei@redhat.com> wrote:
 > 
 > Just done the test with Bart's patch, still can
 > see soft lockup when running the test described
-> in commit log for a couple of minutes. BTW, my
-> test is much more aggressive than Laurence's, I
-> write 8M each time, and run 64 hammer_write.sh
-> concurrently.
 
-OK, thanks for verifying as much.
- 
-> I don't think the two are contradictory. Anyway,
-> this patch will decrease CPU utilization of SOFTIRQ, and
-> it is a improvement.
+Looks no difference, hard lockup can be observed too 
+following soft lockup after a while with Bart's patch.
 
-OK, looking closer I can see you accomplish the same (retaining partial
-completion) in a more optimal way.
-
-I'll include this in my review/staging of dm-multipath patches for 4.14.
-
-Thanks,
-Mike
+-- 
+Ming
