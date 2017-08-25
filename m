@@ -1,77 +1,24 @@
-Return-Path: <riteshh@codeaurora.org>
-From: Ritesh Harjani <riteshh@codeaurora.org>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	stummala@codeaurora.org,
-	ankijain@codeaurora.org,
-	Ritesh Harjani <riteshh@codeaurora.org>
-Subject: [RFC PATCH] cfq: Give a chance for arming slice idle timer in case of group_idle
-Date: Wed,  9 Aug 2017 18:28:32 +0530
-Message-Id: <1502283512-4379-1-git-send-email-riteshh@codeaurora.org>
+Return-Path: <hch@lst.de>
+Date: Fri, 25 Aug 2017 09:36:23 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Jan Kara <jack@suse.cz>
+Cc: Christoph Hellwig <hch@lst.de>, viro@zeniv.linux.org.uk,
+	axboe@kernel.dk, Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>, mgorman@suse.de,
+	Volker.Lendecke@sernet.de, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/4] fs: support IOCB_NOWAIT in
+	generic_file_buffered_read
+Message-ID: <20170825073623.GA9548@lst.de>
+References: <20170822161712.11716-1-hch@lst.de> <20170822161712.11716-3-hch@lst.de> <20170824143141.GB8969@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170824143141.GB8969@quack2.suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-In below scenario blkio cgroup does not work as per their assigned
-weights :-
-1. When the underlying device is nonrotational with a single HW queue
-with depth of >= CFQ_HW_QUEUE_MIN
-2. When the use case is forming two blkio cgroups cg1(weight 1000) &
-cg2(wight 100) and two processes(file1 and file2) doing sync IO in
-their respective blkio cgroups.
+On Thu, Aug 24, 2017 at 04:31:41PM +0200, Jan Kara wrote:
+> And wait_on_page_locked_killable() above does not seem to be handled in
+> your patch. I would just check IOCB_NOWAIT in !PageUptodate(page) branch
+> above and bail - which also removes the need for the two checks below...
 
-For above usecase result of fio (without this patch):-
-file1: (groupid=0, jobs=1): err= 0: pid=685: Thu Jan  1 19:41:49 1970
-  write: IOPS=1315, BW=41.1MiB/s (43.1MB/s)(1024MiB/24906msec)
-<...>
-file2: (groupid=0, jobs=1): err= 0: pid=686: Thu Jan  1 19:41:49 1970
-  write: IOPS=1295, BW=40.5MiB/s (42.5MB/s)(1024MiB/25293msec)
-<...>
-// both the process BW is equal even though they belong to diff.
-cgroups with weight of 1000(cg1) and 100(cg2)
-
-In above case (for non rotational NCQ devices),
-as soon as the request from cg1 is completed and even
-though it is provided with higher set_slice=10, because of CFQ
-algorithm when the driver tries to fetch the request, CFQ expires
-this group without providing any idle time nor weight priority
-and schedules another cfq group (in this case cg2).
-And thus both cfq groups(cg1 & cg2) keep alternating to get the
-disk time and hence loses the cgroup weight based scheduling.
-
-Below patch gives a chance to cfq algorithm (cfq_arm_slice_timer)
-to arm the slice timer in case group_idle is enabled.
-In case if group_idle is also not required (including for nonrotational
-NCQ drives), we need to explicitly set group_idle = 0 from sysfs for
-such cases.
-
-With this patch result of fio(for above usecase) :-
-file1: (groupid=0, jobs=1): err= 0: pid=690: Thu Jan  1 00:06:08 1970
-  write: IOPS=1706, BW=53.3MiB/s (55.9MB/s)(1024MiB/19197msec)
-<..>
-file2: (groupid=0, jobs=1): err= 0: pid=691: Thu Jan  1 00:06:08 1970
-  write: IOPS=1043, BW=32.6MiB/s (34.2MB/s)(1024MiB/31401msec)
-<..>
-// In this processes BW is as per their respective cgroups weight.
-
-Signed-off-by: Ritesh Harjani <riteshh@codeaurora.org>
----
- block/cfq-iosched.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 0fb78fb..15cad96 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -2934,7 +2934,8 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
- 	 * for devices that support queuing, otherwise we still have a problem
- 	 * with sync vs async workloads.
- 	 */
--	if (blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag)
-+	if (blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag &&
-+		!cfqd->cfq_group_idle)
- 		return;
- 
- 	WARN_ON(!RB_EMPTY_ROOT(&cfqq->sort_list));
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Yes, that makes sense.
