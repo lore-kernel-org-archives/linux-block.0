@@ -1,85 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755018AbdHYMvA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 08:51:00 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V6 07/12] mmc: mmc: Enable CQE's
-Date: Fri, 25 Aug 2017 15:43:50 +0300
-Message-Id: <1503665035-16231-8-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] blk-mq-debugfs: Add names for recently added flags
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+References: <20170818225254.30706-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a779f150-ccb9-48dd-2266-486b4166cc4b@kernel.dk>
+Date: Fri, 25 Aug 2017 08:07:53 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170818225254.30706-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Enable or disable CQE when a card is added or removed respectively.
+On 08/18/2017 04:52 PM, Bart Van Assche wrote:
+> The symbolic constants QUEUE_FLAG_SCSI_PASSTHROUGH, QUEUE_FLAG_QUIESCED
+> and REQ_NOWAIT are missing from blk-mq-debugfs.c. Add these to
+> blk-mq-debugfs.c such that these appear as names in debugfs instead of
+> as numbers.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/bus.c |  7 +++++++
- drivers/mmc/core/mmc.c | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+Added for 4.13, thanks.
 
-diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
-index 301246513a37..a4b49e25fe96 100644
---- a/drivers/mmc/core/bus.c
-+++ b/drivers/mmc/core/bus.c
-@@ -369,10 +369,17 @@ int mmc_add_card(struct mmc_card *card)
-  */
- void mmc_remove_card(struct mmc_card *card)
- {
-+	struct mmc_host *host = card->host;
-+
- #ifdef CONFIG_DEBUG_FS
- 	mmc_remove_card_debugfs(card);
- #endif
- 
-+	if (host->cqe_enabled) {
-+		host->cqe_ops->cqe_disable(host);
-+		host->cqe_enabled = false;
-+	}
-+
- 	if (mmc_card_present(card)) {
- 		if (mmc_host_is_spi(card->host)) {
- 			pr_info("%s: SPI card removed\n",
-diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index 194cf2082e73..0dcbd25126a1 100644
---- a/drivers/mmc/core/mmc.c
-+++ b/drivers/mmc/core/mmc.c
-@@ -1807,6 +1807,18 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
- 	 */
- 	card->reenable_cmdq = card->ext_csd.cmdq_en;
- 
-+	if (card->ext_csd.cmdq_en && !host->cqe_enabled) {
-+		err = host->cqe_ops->cqe_enable(host, card);
-+		if (err) {
-+			pr_err("%s: Failed to enable CQE, error %d\n",
-+				mmc_hostname(host), err);
-+		} else {
-+			host->cqe_enabled = true;
-+			pr_info("%s: Command Queue Engine enabled\n",
-+				mmc_hostname(host));
-+		}
-+	}
-+
- 	if (!oldcard)
- 		host->card = card;
- 
 -- 
-1.9.1
+Jens Axboe
