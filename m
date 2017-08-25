@@ -1,50 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:36947 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751232AbdH1PJ0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Aug 2017 11:09:26 -0400
-Received: by mail-pg0-f42.google.com with SMTP id 83so2217684pgb.4
-        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2017 08:09:26 -0700 (PDT)
+Received: from mx1.redhat.com ([209.132.183.28]:36032 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756747AbdHYR51 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Aug 2017 13:57:27 -0400
+Date: Fri, 25 Aug 2017 13:57:22 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: dm-rq: do not update rq partially in each ending bio
+Message-ID: <20170825175722.GA2298@redhat.com>
+References: <20170825152749.14435-1-ming.lei@redhat.com>
+ <20170825154839.GA1695@redhat.com>
+ <20170825160850.GA13937@ming.t460p>
+ <20170825163233.GB1900@redhat.com>
+ <20170825170752.GB13937@ming.t460p>
 MIME-Version: 1.0
-From: John Groves <John@groves.net>
-Date: Mon, 28 Aug 2017 10:09:04 -0500
-Message-ID: <CALz7SpXrV2KLNJ+jOvuYkx7HDDxGt19g4ByTyZn_f1UAqmAhsQ@mail.gmail.com>
-Subject: FUA, PREFLUSH, VWC redux
-To: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170825170752.GB13937@ming.t460p>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I'm hoping somebody can clarify the correct PREFLUSH and FUA behavior from a
-block stack client.  I'm starting to suspect that some of my devices are
-failing to inform the block stack correctly of their capabilities - leading
-to expensive and unnecessary flushes.
+On Fri, Aug 25 2017 at  1:07pm -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-My understanding is this:
+> On Fri, Aug 25, 2017 at 12:32:33PM -0400, Mike Snitzer wrote:
+> > On Fri, Aug 25 2017 at 12:08pm -0400,
+> > Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> > > On Fri, Aug 25, 2017 at 11:48:39AM -0400, Mike Snitzer wrote:
+> > > > On Fri, Aug 25 2017 at 11:27am -0400,
+> > > > Ming Lei <ming.lei@redhat.com> wrote:
+> > > > 
+> > > > > We don't need to update orignal dm request partially
+> > > > > when ending each cloned bio, and this patch just
+> > > > > updates orignal dm request once when the whole
+> > > > > cloned request is finished.
+> > > > > 
+> > > > > Partial request update can be a bit expensive, so
+> > > > > we should try to avoid it, especially it is run
+> > > > > in softirq context.
+> > > > > 
+> > > > > After this patch is applied, both hard lockup and
+> > > > > soft lockup aren't reproduced any more in one hour
+> > > > > of running Laurence's test[1] on IB/SRP. Without
+> > > > > this patch, the lockup can be reproduced in several
+> > > > > minutes.
+> > > > > 
+> > > > > BTW, after d4acf3650c7c(block: Make blk_mq_delay_kick_requeue_list()
+> > > > > rerun the queue at a quiet time), we need to make the
+> > > > > test more aggressive for reproducing the lockup:
+> > > > > 
+> > > > > 	1) run hammer_write.sh 32 or 64 concurrently.
+> > > > > 	2) write 8M each time
+> > > > > 
+> > > > > [1] https://marc.info/?l=linux-block&m=150220185510245&w=2
+> > > > 
+> > > > Bart said he cannot reproduce the lockups with his patchset applied.
+> > > > Have you tested using Bart's patchset?
+> > > 
+> > > d4acf3650c7c(block: Make blk_mq_delay_kick_requeue_list() rerun the
+> > > queue at a quiet time) has been in linus tree.
+> > > 
+> > > For other patches, I didn't test it yet. Because every time
+> > > when the lockup is triggered, it is always in blk_recalc_rq_segments(),
+> > > and not see any patch is dealing with that.
+> > 
+> > Please test with all of Bart's patches applied!
+> 
+> Just done the test with Bart's patch, still can
+> see soft lockup when running the test described
+> in commit log for a couple of minutes. BTW, my
+> test is much more aggressive than Laurence's, I
+> write 8M each time, and run 64 hammer_write.sh
+> concurrently.
 
-* If I require confirmation that a single write is durable upon
-completion, attach REQ_FUA to the bio.
-* If I require that the current write plus all previously completed
-writes be durable as of completion of the current write, attach
-REQ_FUA and REQ_PREFLUSH to the bio.
-* Both REQ_FUA and REQ_PREFLUSH should be NOPs on a device with with a
-non-volatile write cache.
+OK, thanks for verifying as much.
+ 
+> I don't think the two are contradictory. Anyway,
+> this patch will decrease CPU utilization of SOFTIRQ, and
+> it is a improvement.
 
-But I have a small problem - I don't know which write is last, until I
-receive a Commit call.  That means that at Commit time, I should send
-a "FLUSH".
+OK, looking closer I can see you accomplish the same (retaining partial
+completion) in a more optimal way.
 
-I am calling a function based on blkdev_issue_flush(), but this causes
-I big performance penalty even though my nvme ssd has VWC==0.
+I'll include this in my review/staging of dm-multipath patches for 4.14.
 
-Does this make sense?
-
-Perhaps blkdev_issue_flush() is intended to flush caches even if they
-are non-volatile?
-
-What is the "correct" way to get a "REQ_PREFLUSH" with a zero length
-write, if not via blkdev_issue_flush()?
-
-Thanks for any tips,
-John Groves
+Thanks,
+Mike
