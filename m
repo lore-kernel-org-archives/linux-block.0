@@ -1,146 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:29855 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753747AbdHQUOi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 16:14:38 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 16/55] skd: Fix endianness annotations
-Date: Thu, 17 Aug 2017 13:12:59 -0700
-Message-Id: <20170817201338.16537-17-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block/nullb: fix NULL deference
+To: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org
+Cc: dan.carpenter@oracle.com
+References: <b70eb4a71a01a72a75f2f1efb1fadc4ef77fc7ff.1503693884.git.shli@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <02caab6e-ad03-807c-47a6-b69fd8f81b26@kernel.dk>
+Date: Fri, 25 Aug 2017 14:52:25 -0600
+MIME-Version: 1.0
+In-Reply-To: <b70eb4a71a01a72a75f2f1efb1fadc4ef77fc7ff.1503693884.git.shli@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Ensure that sparse does not report any warnings when building the
-skd driver with sparse verification enabled (C=1 or C=2).
+On 08/25/2017 02:46 PM, Shaohua Li wrote:
+> Dan reported this:
+> 
+> The patch 2984c8684f96: "nullb: factor disk parameters" from Aug 14,
+> 2017, leads to the following Smatch complaint:
+> 
+> drivers/block/null_blk.c:1759 null_init_tag_set()
+> 	 error: we previously assumed 'nullb' could be null (see line
+> 1750)
+> 
+>   1755		set->cmd_size	= sizeof(struct nullb_cmd);
+>   1756		set->flags = BLK_MQ_F_SHOULD_MERGE;
+>   1757		set->driver_data = NULL;
+>   1758
+>   1759		if (nullb->dev->blocking)
+>                     ^^^^^^^^^^^^^^^^^^^^
+> And an unchecked dereference.
+> 
+> nullb could be NULL here.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c  | 14 ++++++--------
- drivers/block/skd_s1120.h | 18 +++++++++---------
- 2 files changed, 15 insertions(+), 17 deletions(-)
+Applied, thanks. Fixed up your subject line typo.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 5174303d7db7..5a69e3288ab7 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -512,7 +512,7 @@ static void skd_request_fn(struct request_queue *q)
- 	u32 lba;
- 	u32 count;
- 	int data_dir;
--	u64 be_dmaa;
-+	__be64 be_dmaa;
- 	u64 cmdctxt;
- 	u32 timo_slot;
- 	void *cmd_ptr;
-@@ -645,7 +645,7 @@ static void skd_request_fn(struct request_queue *q)
- 		cmd_ptr = &skmsg->msg_buf[skmsg->length];
- 		memset(cmd_ptr, 0, 32);
- 
--		be_dmaa = cpu_to_be64((u64)skreq->sksg_dma_address);
-+		be_dmaa = cpu_to_be64(skreq->sksg_dma_address);
- 		cmdctxt = skreq->id + SKD_ID_INCR;
- 
- 		scsi_req = cmd_ptr;
-@@ -2402,9 +2402,7 @@ static void skd_do_inq_page_00(struct skd_device *skdev,
- 
- 		/* SCSI byte order increment of num_returned_bytes by 1 */
- 		skcomp->num_returned_bytes =
--			be32_to_cpu(skcomp->num_returned_bytes) + 1;
--		skcomp->num_returned_bytes =
--			be32_to_cpu(skcomp->num_returned_bytes);
-+			cpu_to_be32(be32_to_cpu(skcomp->num_returned_bytes) + 1);
- 	}
- 
- 	/* update page length field to reflect the driver's page too */
-@@ -2502,7 +2500,7 @@ static void skd_do_inq_page_da(struct skd_device *skdev,
- 	memcpy(buf, &inq, min_t(unsigned, max_bytes, sizeof(inq)));
- 
- 	skcomp->num_returned_bytes =
--		be32_to_cpu(min_t(uint16_t, max_bytes, sizeof(inq)));
-+		cpu_to_be32(min_t(uint16_t, max_bytes, sizeof(inq)));
- }
- 
- static void skd_do_driver_inq(struct skd_device *skdev,
-@@ -4674,7 +4672,7 @@ static void skd_pci_remove(struct pci_dev *pdev)
- 
- 	for (i = 0; i < SKD_MAX_BARS; i++)
- 		if (skdev->mem_map[i])
--			iounmap((u32 *)skdev->mem_map[i]);
-+			iounmap(skdev->mem_map[i]);
- 
- 	if (skdev->pcie_error_reporting_is_enabled)
- 		pci_disable_pcie_error_reporting(pdev);
-@@ -4705,7 +4703,7 @@ static int skd_pci_suspend(struct pci_dev *pdev, pm_message_t state)
- 
- 	for (i = 0; i < SKD_MAX_BARS; i++)
- 		if (skdev->mem_map[i])
--			iounmap((u32 *)skdev->mem_map[i]);
-+			iounmap(skdev->mem_map[i]);
- 
- 	if (skdev->pcie_error_reporting_is_enabled)
- 		pci_disable_pcie_error_reporting(pdev);
-diff --git a/drivers/block/skd_s1120.h b/drivers/block/skd_s1120.h
-index 82ce34454dbf..f69d3d97744d 100644
---- a/drivers/block/skd_s1120.h
-+++ b/drivers/block/skd_s1120.h
-@@ -248,7 +248,7 @@ struct fit_msg_hdr {
-  *  20-23 of the FIT_MTD_FITFW_INIT response.
-  */
- struct fit_completion_entry_v1 {
--	uint32_t	num_returned_bytes;
-+	__be32		num_returned_bytes;
- 	uint16_t	tag;
- 	uint8_t		status;  /* SCSI status */
- 	uint8_t		cycle;
-@@ -290,11 +290,11 @@ struct fit_comp_error_info {
-  * Version one has the last 32 bits sg_list_len_bytes;
-  */
- struct skd_command_header {
--	uint64_t	sg_list_dma_address;
-+	__be64		sg_list_dma_address;
- 	uint16_t	tag;
- 	uint8_t		attribute;
- 	uint8_t		add_cdb_len;     /* In 32 bit words */
--	uint32_t	sg_list_len_bytes;
-+	__be32		sg_list_len_bytes;
- };
- 
- struct skd_scsi_request {
-@@ -307,16 +307,16 @@ struct driver_inquiry_data {
- 	uint8_t		peripheral_device_type:5;
- 	uint8_t		qualifier:3;
- 	uint8_t		page_code;
--	uint16_t	page_length;
--	uint16_t	pcie_bus_number;
-+	__be16		page_length;
-+	__be16		pcie_bus_number;
- 	uint8_t		pcie_device_number;
- 	uint8_t		pcie_function_number;
- 	uint8_t		pcie_link_speed;
- 	uint8_t		pcie_link_lanes;
--	uint16_t	pcie_vendor_id;
--	uint16_t	pcie_device_id;
--	uint16_t	pcie_subsystem_vendor_id;
--	uint16_t	pcie_subsystem_device_id;
-+	__be16		pcie_vendor_id;
-+	__be16		pcie_device_id;
-+	__be16		pcie_subsystem_vendor_id;
-+	__be16		pcie_subsystem_device_id;
- 	uint8_t		reserved1[2];
- 	uint8_t		reserved2[3];
- 	uint8_t		driver_version_length;
 -- 
-2.14.0
+Jens Axboe
