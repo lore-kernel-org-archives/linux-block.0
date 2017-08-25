@@ -1,189 +1,267 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48304 "EHLO mx1.redhat.com"
+Received: from mga14.intel.com ([192.55.52.115]:65468 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG6a (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:58:30 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 20/20] blk-mq: improve bio merge from blk-mq sw queue
-Date: Sat,  5 Aug 2017 14:57:05 +0800
-Message-Id: <20170805065705.12989-21-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
+        id S1755018AbdHYMvY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Aug 2017 08:51:24 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH V6 12/12] mmc: sdhci-pci: Add CQHCI support for Intel GLK
+Date: Fri, 25 Aug 2017 15:43:55 +0300
+Message-Id: <1503665035-16231-13-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch uses hash table to do bio merge from sw queue,
-then we can align to blk-mq scheduler/block legacy's way
-for bio merge.
+Add CQHCI initialization and implement CQHCI operations for Intel GLK.
 
-Turns out bio merge via hash table is more efficient than
-simple merge on the last 8 requests in sw queue. On SCSI SRP,
-it is observed ~10% IOPS is increased in sequential IO test
-with this patch.
-
-It is also one step forward to real 'none' scheduler, in which
-way the blk-mq scheduler framework can be more clean.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/blk-mq-sched.c | 49 ++++++++++++-------------------------------------
- block/blk-mq.c       | 28 +++++++++++++++++++++++++---
- 2 files changed, 37 insertions(+), 40 deletions(-)
+ drivers/mmc/host/Kconfig          |   1 +
+ drivers/mmc/host/sdhci-pci-core.c | 154 +++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 154 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 7fb7949ed7ce..f49d131d91ce 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -254,50 +254,25 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index ccf7dab4a9f8..b8c9ea5cb8cd 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -81,6 +81,7 @@ config MMC_SDHCI_BIG_ENDIAN_32BIT_BYTE_SWAPPER
+ config MMC_SDHCI_PCI
+ 	tristate "SDHCI support on PCI bus"
+ 	depends on MMC_SDHCI && PCI
++	select MMC_CQHCI
+ 	help
+ 	  This selects the PCI Secure Digital Host Controller Interface.
+ 	  Most controllers found today are PCI devices.
+diff --git a/drivers/mmc/host/sdhci-pci-core.c b/drivers/mmc/host/sdhci-pci-core.c
+index bbaddf18a1b3..e22075f99707 100644
+--- a/drivers/mmc/host/sdhci-pci-core.c
++++ b/drivers/mmc/host/sdhci-pci-core.c
+@@ -30,6 +30,8 @@
+ #include <linux/mmc/sdhci-pci-data.h>
+ #include <linux/acpi.h>
+ 
++#include "cqhci.h"
++
+ #include "sdhci.h"
+ #include "sdhci-pci.h"
+ #include "sdhci-pci-o2micro.h"
+@@ -117,6 +119,28 @@ int sdhci_pci_resume_host(struct sdhci_pci_chip *chip)
+ 
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
- 
--/*
-- * Reverse check our software queue for entries that we could potentially
-- * merge with. Currently includes a hand-wavy stop count of 8, to not spend
-- * too much time checking for merges.
-- */
--static bool blk_mq_attempt_merge(struct request_queue *q,
-+static bool blk_mq_ctx_try_merge(struct request_queue *q,
- 				 struct blk_mq_ctx *ctx, struct bio *bio)
- {
--	struct request *rq;
--	int checked = 8;
-+	struct request *rq, *free = NULL;
-+	enum elv_merge type;
-+	bool merged;
- 
- 	lockdep_assert_held(&ctx->lock);
- 
--	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
--		bool merged = false;
--
--		if (!checked--)
--			break;
--
--		if (!blk_rq_merge_ok(rq, bio))
--			continue;
-+	type = elv_merge_ctx(q, &rq, bio, ctx);
-+	merged = __blk_mq_try_merge(q, bio, &free, rq, type);
- 
--		switch (blk_try_merge(rq, bio)) {
--		case ELEVATOR_BACK_MERGE:
--			if (blk_mq_sched_allow_merge(q, rq, bio))
--				merged = bio_attempt_back_merge(q, rq, bio);
--			break;
--		case ELEVATOR_FRONT_MERGE:
--			if (blk_mq_sched_allow_merge(q, rq, bio))
--				merged = bio_attempt_front_merge(q, rq, bio);
--			break;
--		case ELEVATOR_DISCARD_MERGE:
--			merged = bio_attempt_discard_merge(q, rq, bio);
--			break;
--		default:
--			continue;
--		}
-+	if (free)
-+		blk_mq_free_request(free);
- 
--		if (merged)
--			ctx->rq_merged++;
--		return merged;
--	}
-+	if (merged)
-+		ctx->rq_merged++;
- 
--	return false;
-+	return merged;
- }
- 
- bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
-@@ -315,7 +290,7 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- 	if (hctx->flags & BLK_MQ_F_SHOULD_MERGE) {
- 		/* default per sw-queue merge */
- 		spin_lock(&ctx->lock);
--		ret = blk_mq_attempt_merge(q, ctx, bio);
-+		ret = blk_mq_ctx_try_merge(q, ctx, bio);
- 		spin_unlock(&ctx->lock);
- 	}
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index db21e71bb087..6bd960fe11ec 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -809,6 +809,18 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	blk_queue_exit(q);
- }
- 
-+static void blk_mq_ctx_remove_rq_list(struct blk_mq_ctx *ctx,
-+		struct list_head *head)
++
++static int sdhci_cqhci_suspend(struct sdhci_pci_chip *chip)
 +{
-+	struct request *rq;
++	int ret;
 +
-+	lockdep_assert_held(&ctx->lock);
++	ret = cqhci_suspend(chip->slots[0]->host->mmc);
++	if (ret)
++		return ret;
 +
-+	list_for_each_entry(rq, head, queuelist)
-+		rqhash_del(rq);
-+	ctx->last_merge = NULL;
++	return sdhci_pci_suspend_host(chip);
 +}
 +
- struct flush_busy_ctx_data {
- 	struct blk_mq_hw_ctx *hctx;
- 	struct list_head *list;
-@@ -823,6 +835,7 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
- 	sbitmap_clear_bit(sb, bitnr);
- 	spin_lock(&ctx->lock);
- 	list_splice_tail_init(&ctx->rq_list, flush_data->list);
-+	blk_mq_ctx_remove_rq_list(ctx, flush_data->list);
- 	spin_unlock(&ctx->lock);
- 	return true;
- }
-@@ -852,17 +865,23 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *d
- 	struct dispatch_rq_data *dispatch_data = data;
- 	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
- 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
-+	struct request *rq = NULL;
- 
- 	spin_lock(&ctx->lock);
- 	if (unlikely(!list_empty(&ctx->rq_list))) {
--		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
--		list_del_init(&dispatch_data->rq->queuelist);
-+		rq = list_entry_rq(ctx->rq_list.next);
-+		list_del_init(&rq->queuelist);
-+		rqhash_del(rq);
- 		if (list_empty(&ctx->rq_list))
- 			sbitmap_clear_bit(sb, bitnr);
- 	}
-+	if (ctx->last_merge == rq)
-+		ctx->last_merge = NULL;
- 	spin_unlock(&ctx->lock);
- 
--	return !dispatch_data->rq;
-+	dispatch_data->rq = rq;
++static int sdhci_cqhci_resume(struct sdhci_pci_chip *chip)
++{
++	int ret;
 +
-+	return !rq;
- }
- 
- struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-@@ -1376,6 +1395,8 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
- 		list_add(&rq->queuelist, &ctx->rq_list);
- 	else
- 		list_add_tail(&rq->queuelist, &ctx->rq_list);
++	ret = sdhci_pci_resume_host(chip);
++	if (ret)
++		return ret;
 +
-+	rqhash_add(ctx->hash, rq);
++	return cqhci_resume(chip->slots[0]->host->mmc);
++}
+ #endif
+ 
+ #ifdef CONFIG_PM
+@@ -167,8 +191,48 @@ static int sdhci_pci_runtime_resume_host(struct sdhci_pci_chip *chip)
+ 
+ 	return 0;
+ }
++
++static int sdhci_cqhci_runtime_suspend(struct sdhci_pci_chip *chip)
++{
++	int ret;
++
++	ret = cqhci_suspend(chip->slots[0]->host->mmc);
++	if (ret)
++		return ret;
++
++	return sdhci_pci_runtime_suspend_host(chip);
++}
++
++static int sdhci_cqhci_runtime_resume(struct sdhci_pci_chip *chip)
++{
++	int ret;
++
++	ret = sdhci_pci_runtime_resume_host(chip);
++	if (ret)
++		return ret;
++
++	return cqhci_resume(chip->slots[0]->host->mmc);
++}
+ #endif
+ 
++static u32 sdhci_cqhci_irq(struct sdhci_host *host, u32 intmask)
++{
++	int cmd_error = 0;
++	int data_error = 0;
++
++	if (!sdhci_cqe_irq(host, intmask, &cmd_error, &data_error))
++		return intmask;
++
++	cqhci_irq(host->mmc, intmask, cmd_error, data_error);
++
++	return 0;
++}
++
++static void sdhci_pci_dumpregs(struct mmc_host *mmc)
++{
++	sdhci_dumpregs(mmc_priv(mmc));
++}
++
+ /*****************************************************************************\
+  *                                                                           *
+  * Hardware specific quirk handling                                          *
+@@ -567,6 +631,17 @@ static void intel_hs400_enhanced_strobe(struct mmc_host *mmc,
+ 	.hw_reset		= sdhci_pci_hw_reset,
+ };
+ 
++static const struct sdhci_ops sdhci_intel_glk_ops = {
++	.set_clock		= sdhci_set_clock,
++	.set_power		= sdhci_intel_set_power,
++	.enable_dma		= sdhci_pci_enable_dma,
++	.set_bus_width		= sdhci_set_bus_width,
++	.reset			= sdhci_reset,
++	.set_uhs_signaling	= sdhci_set_uhs_signaling,
++	.hw_reset		= sdhci_pci_hw_reset,
++	.irq			= sdhci_cqhci_irq,
++};
++
+ static void byt_read_dsm(struct sdhci_pci_slot *slot)
+ {
+ 	struct intel_host *intel_host = sdhci_pci_priv(slot);
+@@ -596,15 +671,83 @@ static int glk_emmc_probe_slot(struct sdhci_pci_slot *slot)
+ {
+ 	int ret = byt_emmc_probe_slot(slot);
+ 
++	slot->host->mmc->caps2 |= MMC_CAP2_CQE;
++
+ 	if (slot->chip->pdev->device != PCI_DEVICE_ID_INTEL_GLK_EMMC) {
+ 		slot->host->mmc->caps2 |= MMC_CAP2_HS400_ES,
+ 		slot->host->mmc_host_ops.hs400_enhanced_strobe =
+ 						intel_hs400_enhanced_strobe;
++		slot->host->mmc->caps2 |= MMC_CAP2_CQE_DCMD;
+ 	}
+ 
+ 	return ret;
  }
  
- void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
-@@ -1868,6 +1889,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	spin_lock(&ctx->lock);
- 	if (!list_empty(&ctx->rq_list)) {
- 		list_splice_init(&ctx->rq_list, &tmp);
-+		blk_mq_ctx_remove_rq_list(ctx, &tmp);
- 		blk_mq_hctx_clear_pending(hctx, ctx);
- 	}
- 	spin_unlock(&ctx->lock);
++static void glk_cqe_enable(struct mmc_host *mmc)
++{
++	struct sdhci_host *host = mmc_priv(mmc);
++	u32 reg;
++
++	/*
++	 * CQE gets stuck if it sees Buffer Read Enable bit set, which can be
++	 * the case after tuning, so ensure the buffer is drained.
++	 */
++	reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
++	while (reg & SDHCI_DATA_AVAILABLE) {
++		sdhci_readl(host, SDHCI_BUFFER);
++		reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
++	}
++
++	sdhci_cqe_enable(mmc);
++}
++
++static const struct cqhci_host_ops glk_cqhci_ops = {
++	.enable		= glk_cqe_enable,
++	.disable	= sdhci_cqe_disable,
++	.dumpregs	= sdhci_pci_dumpregs,
++};
++
++static int glk_emmc_add_host(struct sdhci_pci_slot *slot)
++{
++	struct device *dev = &slot->chip->pdev->dev;
++	struct sdhci_host *host = slot->host;
++	struct cqhci_host *cq_host;
++	bool dma64;
++	int ret;
++
++	ret = sdhci_setup_host(host);
++	if (ret)
++		return ret;
++
++	cq_host = devm_kzalloc(dev, sizeof(*cq_host), GFP_KERNEL);
++	if (!cq_host) {
++		ret = -ENOMEM;
++		goto cleanup;
++	}
++
++	cq_host->mmio = host->ioaddr + 0x200;
++	cq_host->quirks |= CQHCI_QUIRK_SHORT_TXFR_DESC_SZ;
++	cq_host->ops = &glk_cqhci_ops;
++
++	dma64 = host->flags & SDHCI_USE_64_BIT_DMA;
++	if (dma64)
++		cq_host->caps |= CQHCI_TASK_DESC_SZ_128;
++
++	ret = cqhci_init(cq_host, host->mmc, dma64);
++	if (ret)
++		goto cleanup;
++
++	ret = __sdhci_add_host(host);
++	if (ret)
++		goto cleanup;
++
++	return 0;
++
++cleanup:
++	sdhci_cleanup_host(host);
++	return ret;
++}
++
+ #ifdef CONFIG_ACPI
+ static int ni_set_max_freq(struct sdhci_pci_slot *slot)
+ {
+@@ -683,11 +826,20 @@ static int byt_sd_probe_slot(struct sdhci_pci_slot *slot)
+ static const struct sdhci_pci_fixes sdhci_intel_glk_emmc = {
+ 	.allow_runtime_pm	= true,
+ 	.probe_slot		= glk_emmc_probe_slot,
++	.add_host		= glk_emmc_add_host,
++#ifdef CONFIG_PM_SLEEP
++	.suspend		= sdhci_cqhci_suspend,
++	.resume			= sdhci_cqhci_resume,
++#endif
++#ifdef CONFIG_PM
++	.runtime_suspend	= sdhci_cqhci_runtime_suspend,
++	.runtime_resume		= sdhci_cqhci_runtime_resume,
++#endif
+ 	.quirks			= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC,
+ 	.quirks2		= SDHCI_QUIRK2_PRESET_VALUE_BROKEN |
+ 				  SDHCI_QUIRK2_CAPS_BIT63_FOR_HS400 |
+ 				  SDHCI_QUIRK2_STOP_WITH_TC,
+-	.ops			= &sdhci_intel_byt_ops,
++	.ops			= &sdhci_intel_glk_ops,
+ 	.priv_size		= sizeof(struct intel_host),
+ };
+ 
 -- 
-2.9.4
+1.9.1
