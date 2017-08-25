@@ -1,74 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754704AbdHYMue (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 08:50:34 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V6 01/12] mmc: core: Move mmc_start_areq() declaration
-Date: Fri, 25 Aug 2017 15:43:44 +0300
-Message-Id: <1503665035-16231-2-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=403a468a2=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 1/4] skd: Rename skd_softirq_done() into skd_complete_rq()
+Date: Fri, 25 Aug 2017 14:24:11 -0700
+Message-Id: <20170825212414.28322-2-bart.vanassche@wdc.com>
+In-Reply-To: <20170825212414.28322-1-bart.vanassche@wdc.com>
+References: <20170825212414.28322-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-mmc_start_areq() is an internal mmc core API. Move the declaration
-accordingly.
+The latter name follows more closely the function names used in
+other blk-mq drivers.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/mmc/core/core.h  | 6 ++++++
- include/linux/mmc/core.h | 4 ----
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ drivers/block/skd_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 55f543fd37c4..ca861091a776 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -107,6 +107,12 @@ static inline void mmc_unregister_pm_notifier(struct mmc_host *host) { }
- void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq);
- bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq);
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 577618c57975..a55c8ef1a21d 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -629,7 +629,7 @@ static void skd_end_request(struct skd_device *skdev, struct request *req,
+ 	blk_mq_complete_request(req);
+ }
  
-+struct mmc_async_req;
-+
-+struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
-+				     struct mmc_async_req *areq,
-+				     enum mmc_blk_status *ret_stat);
-+
- int mmc_erase(struct mmc_card *card, unsigned int from, unsigned int nr,
- 		unsigned int arg);
- int mmc_can_erase(struct mmc_card *card);
-diff --git a/include/linux/mmc/core.h b/include/linux/mmc/core.h
-index bf1788a224e6..178f699ac172 100644
---- a/include/linux/mmc/core.h
-+++ b/include/linux/mmc/core.h
-@@ -165,11 +165,7 @@ struct mmc_request {
- };
+-static void skd_softirq_done(struct request *req)
++static void skd_complete_rq(struct request *req)
+ {
+ 	struct skd_request_context *skreq = blk_mq_rq_to_pdu(req);
  
- struct mmc_card;
--struct mmc_async_req;
+@@ -2821,7 +2821,7 @@ static int skd_cons_sksb(struct skd_device *skdev)
  
--struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
--				struct mmc_async_req *areq,
--				enum mmc_blk_status *ret_stat);
- void mmc_wait_for_req(struct mmc_host *host, struct mmc_request *mrq);
- int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd,
- 		int retries);
+ static const struct blk_mq_ops skd_mq_ops = {
+ 	.queue_rq	= skd_mq_queue_rq,
+-	.complete	= skd_softirq_done,
++	.complete	= skd_complete_rq,
+ 	.timeout	= skd_timed_out,
+ 	.init_request	= skd_init_request,
+ 	.exit_request	= skd_exit_request,
 -- 
-1.9.1
+2.14.1
