@@ -1,84 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bran.ispras.ru ([83.149.199.196]:34252 "EHLO smtp.ispras.ru"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751704AbdHGMsC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Aug 2017 08:48:02 -0400
-From: Anton Volkov <avolkov@ispras.ru>
-To: tom.leiming@gmail.com
-Cc: axboe@fb.com, osandov@fb.com, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, ldv-project@linuxtesting.org,
-        khoroshilov@ispras.ru, Anton Volkov <avolkov@ispras.ru>
-Subject: [PATCH] loop: fix to a race condition due to the early registration of device
-Date: Mon,  7 Aug 2017 15:37:50 +0300
-Message-Id: <1502109470-2945-1-git-send-email-avolkov@ispras.ru>
-In-Reply-To: <CACVXFVN-pKP5zePBvUtKkpEkOi=1fr+ePsudxbciN993BHGzNA@mail.gmail.com>
-References: <CACVXFVN-pKP5zePBvUtKkpEkOi=1fr+ePsudxbciN993BHGzNA@mail.gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=403a468a2=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 2/4] skd: Inline skd_end_request()
+Date: Fri, 25 Aug 2017 14:24:12 -0700
+Message-Id: <20170825212414.28322-3-bart.vanassche@wdc.com>
+In-Reply-To: <20170825212414.28322-1-bart.vanassche@wdc.com>
+References: <20170825212414.28322-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The early device registration made possible a race leading to allocations
-of disks with wrong minors.
+It is not worth to keep the debug statements in skd_end_request().
+Without debug statements that function only consists of two
+statements. Hence inline skd_end_request().
 
-This patch moves the device registration further down the loop_init
-function to make the race infeasible.
-
-Found by Linux Driver Verification project (linuxtesting.org).
-
-Signed-off-by: Anton Volkov <avolkov@ispras.ru>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/loop.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/block/skd_main.c | 45 +++++++++++++--------------------------------
+ 1 file changed, 13 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ef83349..2fbd4089 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1996,10 +1996,6 @@ static int __init loop_init(void)
- 	struct loop_device *lo;
- 	int err;
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index a55c8ef1a21d..8ae0320f02b5 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -360,8 +360,6 @@ static void skd_send_fitmsg(struct skd_device *skdev,
+ 			    struct skd_fitmsg_context *skmsg);
+ static void skd_send_special_fitmsg(struct skd_device *skdev,
+ 				    struct skd_special_context *skspcl);
+-static void skd_end_request(struct skd_device *skdev, struct request *req,
+-			    blk_status_t status);
+ static bool skd_preop_sg_list(struct skd_device *skdev,
+ 			     struct skd_request_context *skreq);
+ static void skd_postop_sg_list(struct skd_device *skdev,
+@@ -520,8 +518,8 @@ static blk_status_t skd_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
  
--	err = misc_register(&loop_misc);
--	if (err < 0)
--		return err;
--
- 	part_shift = 0;
- 	if (max_part > 0) {
- 		part_shift = fls(max_part);
-@@ -2017,12 +2013,12 @@ static int __init loop_init(void)
- 
- 	if ((1UL << part_shift) > DISK_MAX_PARTS) {
- 		err = -EINVAL;
--		goto misc_out;
-+		goto err_out;
+ 	if (req->bio && !skd_preop_sg_list(skdev, skreq)) {
+ 		dev_dbg(&skdev->pdev->dev, "error Out\n");
+-		skd_end_request(skdev, blk_mq_rq_from_pdu(skreq),
+-				BLK_STS_RESOURCE);
++		skreq->status = BLK_STS_RESOURCE;
++		blk_mq_complete_request(req);
+ 		return BLK_STS_OK;
  	}
  
- 	if (max_loop > 1UL << (MINORBITS - part_shift)) {
- 		err = -EINVAL;
--		goto misc_out;
-+		goto err_out;
- 	}
- 
- 	/*
-@@ -2041,6 +2037,11 @@ static int __init loop_init(void)
- 		range = 1UL << MINORBITS;
- 	}
- 
-+	err = misc_register(&loop_misc);
-+	if (err < 0)
-+		goto err_out;
-+
-+
- 	if (register_blkdev(LOOP_MAJOR, "loop")) {
- 		err = -EIO;
- 		goto misc_out;
-@@ -2060,6 +2061,7 @@ static int __init loop_init(void)
- 
- misc_out:
- 	misc_deregister(&loop_misc);
-+err_out:
- 	return err;
+@@ -608,27 +606,6 @@ static enum blk_eh_timer_return skd_timed_out(struct request *req,
+ 	return BLK_EH_RESET_TIMER;
  }
  
+-static void skd_end_request(struct skd_device *skdev, struct request *req,
+-			    blk_status_t error)
+-{
+-	struct skd_request_context *skreq = blk_mq_rq_to_pdu(req);
+-
+-	if (unlikely(error)) {
+-		char *cmd = (rq_data_dir(req) == READ) ? "read" : "write";
+-		u32 lba = (u32)blk_rq_pos(req);
+-		u32 count = blk_rq_sectors(req);
+-
+-		dev_err(&skdev->pdev->dev,
+-			"Error cmd=%s sect=%u count=%u id=0x%x\n", cmd, lba,
+-			count, req->tag);
+-	} else
+-		dev_dbg(&skdev->pdev->dev, "id=0x%x error=%d\n", req->tag,
+-			error);
+-
+-	skreq->status = error;
+-	blk_mq_complete_request(req);
+-}
+-
+ static void skd_complete_rq(struct request *req)
+ {
+ 	struct skd_request_context *skreq = blk_mq_rq_to_pdu(req);
+@@ -1438,7 +1415,8 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
+ 	switch (skd_check_status(skdev, cmp_status, &skreq->err_info)) {
+ 	case SKD_CHECK_STATUS_REPORT_GOOD:
+ 	case SKD_CHECK_STATUS_REPORT_SMART_ALERT:
+-		skd_end_request(skdev, req, BLK_STS_OK);
++		skreq->status = BLK_STS_OK;
++		blk_mq_complete_request(req);
+ 		break;
+ 
+ 	case SKD_CHECK_STATUS_BUSY_IMMINENT:
+@@ -1460,7 +1438,8 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
+ 
+ 	case SKD_CHECK_STATUS_REPORT_ERROR:
+ 	default:
+-		skd_end_request(skdev, req, BLK_STS_IOERR);
++		skreq->status = BLK_STS_IOERR;
++		blk_mq_complete_request(req);
+ 		break;
+ 	}
+ }
+@@ -1579,10 +1558,12 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
+ 		/*
+ 		 * Capture the outcome and post it back to the native request.
+ 		 */
+-		if (likely(cmp_status == SAM_STAT_GOOD))
+-			skd_end_request(skdev, rq, BLK_STS_OK);
+-		else
++		if (likely(cmp_status == SAM_STAT_GOOD)) {
++			skreq->status = BLK_STS_OK;
++			blk_mq_complete_request(rq);
++		} else {
+ 			skd_resolve_req_exception(skdev, skreq, rq);
++		}
+ 
+ 		/* skd_isr_comp_limit equal zero means no limit */
+ 		if (limit) {
+@@ -1926,8 +1907,8 @@ static void skd_recover_request(struct request *req, void *data, bool reserved)
+ 		skd_postop_sg_list(skdev, skreq);
+ 
+ 	skreq->state = SKD_REQ_STATE_IDLE;
+-
+-	skd_end_request(skdev, req, BLK_STS_IOERR);
++	skreq->status = BLK_STS_IOERR;
++	blk_mq_complete_request(req);
+ }
+ 
+ static void skd_recover_requests(struct skd_device *skdev)
 -- 
-2.7.4
+2.14.1
