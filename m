@@ -1,79 +1,73 @@
-Return-Path: <gmazyland@gmail.com>
-Return-Path: <gmazyland@gmail.com>
-From: Milan Broz <gmazyland@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: kzak@redhat.com,
-	axboe@kernel.dk,
-	hare@suse.de,
-	Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH] loop: Fix freeze if configured block size is not supported
-Date: Fri, 18 Aug 2017 15:07:33 +0200
-Message-Id: <20170818130733.11254-1-gmazyland@gmail.com>
+Return-Path: <prvs=403a468a2=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 4/4] skd: Remove SKD_ID_INCR
+Date: Fri, 25 Aug 2017 14:24:14 -0700
+Message-Id: <20170825212414.28322-5-bart.vanassche@wdc.com>
+In-Reply-To: <20170825212414.28322-1-bart.vanassche@wdc.com>
+References: <20170825212414.28322-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The commit f2c6df7dbf9a60e1cd9941f9fb376d4d9ad1e8dd
+The SKD_ID_INCR flag in skd_request_context.id duplicates information
+that is already available otherwise, e.g. through the block layer
+request state and through skd_request_context.state. Hence remove
+the code that manipulates this flag and also the flag itself.
+Since skd_isr_completion_posted() only uses the lower bits of
+skd_request_context.id as hardware tag, this patch does not change
+the behavior of the skd driver. I'm referring to the following code:
 
-    loop: support 4k physical blocksize
+    tag = req_id & SKD_ID_SLOT_AND_TABLE_MASK;
 
-adds support for loop block size with only specific block sizes.
-
-If the size is not supported, the code returns -EINVAL keeping
-the loop queue frozen. This causes that device could be locked
-for a long time by processes trying to scan device (udev).
-(And also causing subsequent LOOP_CLR_FD operations noop.)
-
-Fix it by using goto to proper exit location with queue unfreeze.
-
-(The same bug is for setting crypt attribute but this code is
-probably no more used. Patch fixes it as well though.)
-
-Signed-off-by: Milan Broz <gmazyland@gmail.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/loop.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ drivers/block/skd_main.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ef8334949b42..26548e07bc31 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1125,11 +1125,15 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	if (info->lo_encrypt_type) {
- 		unsigned int type = info->lo_encrypt_type;
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 34188a600bfa..00a86252b3c5 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -89,7 +89,6 @@ MODULE_DESCRIPTION("STEC s1120 PCIe SSD block driver");
+ 	  sizeof(struct fit_comp_error_info)) * SKD_N_COMPLETION_ENTRY)
  
--		if (type >= MAX_LO_CRYPT)
--			return -EINVAL;
-+		if (type >= MAX_LO_CRYPT) {
-+			err = -EINVAL;
-+			goto exit;
-+		}
- 		xfer = xfer_funcs[type];
--		if (xfer == NULL)
--			return -EINVAL;
-+		if (xfer == NULL) {
-+			err = -EINVAL;
-+			goto exit;
-+		}
- 	} else
- 		xfer = NULL;
+ /* 5 bits of uniqifier, 0xF800 */
+-#define SKD_ID_INCR             (0x400)
+ #define SKD_ID_TABLE_MASK       (3u << 8u)
+ #define  SKD_ID_RW_REQUEST      (0u << 8u)
+ #define  SKD_ID_INTERNAL        (1u << 8u)
+@@ -921,9 +920,7 @@ static void skd_send_internal_skspcl(struct skd_device *skdev,
+ 		 */
+ 		return;
  
-@@ -1144,10 +1148,14 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 		if (LO_INFO_BLOCKSIZE(info) != 512 &&
- 		    LO_INFO_BLOCKSIZE(info) != 1024 &&
- 		    LO_INFO_BLOCKSIZE(info) != 2048 &&
--		    LO_INFO_BLOCKSIZE(info) != 4096)
--			return -EINVAL;
--		if (LO_INFO_BLOCKSIZE(info) > lo->lo_blocksize)
--			return -EINVAL;
-+		    LO_INFO_BLOCKSIZE(info) != 4096) {
-+			err = -EINVAL;
-+			goto exit;
-+		}
-+		if (LO_INFO_BLOCKSIZE(info) > lo->lo_blocksize) {
-+			err = -EINVAL;
-+			goto exit;
-+		}
- 	}
+-	SKD_ASSERT((skspcl->req.id & SKD_ID_INCR) == 0);
+ 	skspcl->req.state = SKD_REQ_STATE_BUSY;
+-	skspcl->req.id += SKD_ID_INCR;
  
- 	if (lo->lo_offset != info->lo_offset ||
+ 	scsi = &skspcl->msg_buf->scsi[0];
+ 	scsi->hdr.tag = skspcl->req.id;
+@@ -1044,7 +1041,6 @@ static void skd_complete_internal(struct skd_device *skdev,
+ 
+ 	skspcl->req.completion = *skcomp;
+ 	skspcl->req.state = SKD_REQ_STATE_IDLE;
+-	skspcl->req.id += SKD_ID_INCR;
+ 
+ 	status = skspcl->req.completion.status;
+ 
+@@ -1451,7 +1447,6 @@ static void skd_release_skreq(struct skd_device *skdev,
+ 	 * Reclaim the skd_request_context
+ 	 */
+ 	skreq->state = SKD_REQ_STATE_IDLE;
+-	skreq->id += SKD_ID_INCR;
+ }
+ 
+ static int skd_isr_completion_posted(struct skd_device *skdev,
 -- 
 2.14.1
