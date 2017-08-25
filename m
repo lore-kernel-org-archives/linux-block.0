@@ -1,47 +1,69 @@
-Return-Path: <BATV+4b2e7721c4e8fe5c453d+5107+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] blk-mq-pci: add a fallback when pci_irq_get_affinity returns NULL
-Date: Thu, 17 Aug 2017 12:24:47 +0200
-Message-Id: <20170817102447.28819-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755018AbdHYMu4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Aug 2017 08:50:56 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH V6 06/12] mmc: mmc: Enable Command Queuing
+Date: Fri, 25 Aug 2017 15:43:49 +0300
+Message-Id: <1503665035-16231-7-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-While pci_irq_get_affinity should never fail for SMP kernel that
-implement the affinity mapping, it will always return NULL in the
-UP case, so provide a fallback mapping of all queues to CPU 0 in
-that case.
+Enable the Command Queue if the host controller supports a command queue
+engine. It is not compatible with Packed Commands, so make a note of that in the
+comment.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Cc: stable@vger.kernel.org
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/blk-mq-pci.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/mmc/core/mmc.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
-index 0c3354cf3552..76944e3271bf 100644
---- a/block/blk-mq-pci.c
-+++ b/block/blk-mq-pci.c
-@@ -36,12 +36,18 @@ int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev)
- 	for (queue = 0; queue < set->nr_hw_queues; queue++) {
- 		mask = pci_irq_get_affinity(pdev, queue);
- 		if (!mask)
--			return -EINVAL;
-+			goto fallback;
- 
- 		for_each_cpu(cpu, mask)
- 			set->mq_map[cpu] = queue;
+diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
+index a7eb623f8daa..194cf2082e73 100644
+--- a/drivers/mmc/core/mmc.c
++++ b/drivers/mmc/core/mmc.c
+@@ -1784,6 +1784,23 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
  	}
  
- 	return 0;
-+
-+fallback:
-+	WARN_ON_ONCE(set->nr_hw_queues > 1);
-+	for_each_possible_cpu(cpu)
-+		set->mq_map[cpu] = 0;
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(blk_mq_pci_map_queues);
+ 	/*
++	 * Enable Command Queue if supported. Note that Packed Commands cannot
++	 * be used with Command Queue.
++	 */
++	card->ext_csd.cmdq_en = false;
++	if (card->ext_csd.cmdq_support && host->caps2 & MMC_CAP2_CQE) {
++		err = mmc_cmdq_enable(card);
++		if (err && err != -EBADMSG)
++			goto free_card;
++		if (err) {
++			pr_warn("%s: Enabling CMDQ failed\n",
++				mmc_hostname(card->host));
++			card->ext_csd.cmdq_support = false;
++			card->ext_csd.cmdq_depth = 0;
++			err = 0;
++		}
++	}
++	/*
+ 	 * In some cases (e.g. RPMB or mmc_test), the Command Queue must be
+ 	 * disabled for a time, so a flag is needed to indicate to re-enable the
+ 	 * Command Queue.
 -- 
-2.11.0
+1.9.1
