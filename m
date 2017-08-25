@@ -1,135 +1,110 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	jeremywh7@gmail.com,
-	lnicola@dend.ro,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 1/2] doc, block, bfq: fix some typos and remove stale stuff
-Date: Thu, 31 Aug 2017 20:00:30 +0200
-Message-Id: <20170831180031.3747-2-paolo.valente@linaro.org>
-In-Reply-To: <20170831180031.3747-1-paolo.valente@linaro.org>
-References: <20170831180031.3747-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755018AbdHYMvE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Aug 2017 08:51:04 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH V6 08/12] mmc: block: Use local variables in mmc_blk_data_prep()
+Date: Fri, 25 Aug 2017 15:43:51 +0300
+Message-Id: <1503665035-16231-9-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In addition to containing some typos and stale sentences, the file
-bfq-iosched.txt still mentioned a set of sysfs parameters that have
-been removed from this version of bfq. This commit fixes all these
-issues.
+Use local variables in mmc_blk_data_prep() in preparation for adding CQE
+support which doesn't use the output variables.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Reviewed-by: Jeremy Hickman <jeremywh7@gmail.com>
-Reviewed-by: Laurentiu Nicola <lnicola@dend.ro>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- Documentation/block/bfq-iosched.txt | 66 ++++++-------------------------------
- 1 file changed, 10 insertions(+), 56 deletions(-)
+ drivers/mmc/core/block.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
-index 05e2822..03ff4cc 100644
---- a/Documentation/block/bfq-iosched.txt
-+++ b/Documentation/block/bfq-iosched.txt
-@@ -16,14 +16,16 @@ throughput. So, when needed for achieving a lower latency, BFQ builds
- schedules that may lead to a lower throughput. If your main or only
- goal, for a given device, is to achieve the maximum-possible
- throughput at all times, then do switch off all low-latency heuristics
--for that device, by setting low_latency to 0. Full details in Section 3.
-+for that device, by setting low_latency to 0. See Section 3 for
-+details on how to configure BFQ for the desired tradeoff between
-+latency and throughput, or on how to maximize throughput.
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 2f00d11adfa9..cc950cb1cfd7 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1534,21 +1534,22 @@ static enum mmc_blk_status mmc_blk_err_check(struct mmc_card *card,
+ }
  
- On average CPUs, the current version of BFQ can handle devices
- performing at most ~30K IOPS; at most ~50 KIOPS on faster CPUs. As a
- reference, 30-50 KIOPS correspond to very high bandwidths with
- sequential I/O (e.g., 8-12 GB/s if I/O requests are 256 KB large), and
--to 120-200 MB/s with 4KB random I/O. BFQ has not yet been tested on
--multi-queue devices.
-+to 120-200 MB/s with 4KB random I/O. BFQ is currently being tested on
-+multi-queue devices too.
+ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+-			      int disable_multi, bool *do_rel_wr,
+-			      bool *do_data_tag)
++			      int disable_multi, bool *do_rel_wr_p,
++			      bool *do_data_tag_p)
+ {
+ 	struct mmc_blk_data *md = mq->blkdata;
+ 	struct mmc_card *card = md->queue.card;
+ 	struct mmc_blk_request *brq = &mqrq->brq;
+ 	struct request *req = mmc_queue_req_to_req(mqrq);
++	bool do_rel_wr, do_data_tag;
  
- The table of contents follow. Impatients can just jump to Section 3.
+ 	/*
+ 	 * Reliable writes are used to implement Forced Unit Access and
+ 	 * are supported only on MMCs.
+ 	 */
+-	*do_rel_wr = (req->cmd_flags & REQ_FUA) &&
+-		     rq_data_dir(req) == WRITE &&
+-		     (md->flags & MMC_BLK_REL_WR);
++	do_rel_wr = (req->cmd_flags & REQ_FUA) &&
++		    rq_data_dir(req) == WRITE &&
++		    (md->flags & MMC_BLK_REL_WR);
  
-@@ -154,10 +156,10 @@ plus a lot of code, are borrowed from CFQ.
+ 	memset(brq, 0, sizeof(struct mmc_blk_request));
  
-       - With respect to idling for service guarantees, if several
- 	processes are competing for the device at the same time, but
--	all processes (and groups, after the following commit) have
--	the same weight, then BFQ guarantees the expected throughput
--	distribution without ever idling the device. Throughput is
--	thus as high as possible in this common scenario.
-+	all processes and groups have the same weight, then BFQ
-+	guarantees the expected throughput distribution without ever
-+	idling the device. Throughput is thus as high as possible in
-+	this common scenario.
+@@ -1596,18 +1597,18 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 						brq->data.blocks);
+ 	}
  
-   - If low-latency mode is enabled (default configuration), BFQ
-     executes some special heuristics to detect interactive and soft
-@@ -191,10 +193,7 @@ plus a lot of code, are borrowed from CFQ.
-   - Queues are scheduled according to a variant of WF2Q+, named
-     B-WF2Q+, and implemented using an augmented rb-tree to preserve an
-     O(log N) overall complexity.  See [2] for more details. B-WF2Q+ is
--    also ready for hierarchical scheduling. However, for a cleaner
--    logical breakdown, the code that enables and completes
--    hierarchical support is provided in the next commit, which focuses
--    exactly on this feature.
-+    also ready for hierarchical scheduling, details in Section 4.
+-	if (*do_rel_wr)
++	if (do_rel_wr)
+ 		mmc_apply_rel_rw(brq, card, req);
  
-   - B-WF2Q+ guarantees a tight deviation with respect to an ideal,
-     perfectly fair, and smooth service. In particular, B-WF2Q+
-@@ -427,51 +426,6 @@ Read-only parameter, used to show the weights of the currently active
- BFQ queues.
+ 	/*
+ 	 * Data tag is used only during writing meta data to speed
+ 	 * up write and any subsequent read of this meta data
+ 	 */
+-	*do_data_tag = card->ext_csd.data_tag_unit_size &&
+-		       (req->cmd_flags & REQ_META) &&
+-		       (rq_data_dir(req) == WRITE) &&
+-		       ((brq->data.blocks * brq->data.blksz) >=
+-			card->ext_csd.data_tag_unit_size);
++	do_data_tag = card->ext_csd.data_tag_unit_size &&
++		      (req->cmd_flags & REQ_META) &&
++		      (rq_data_dir(req) == WRITE) &&
++		      ((brq->data.blocks * brq->data.blksz) >=
++		       card->ext_csd.data_tag_unit_size);
  
+ 	mmc_set_data_timeout(&brq->data, card);
  
--wr_ tunables
--------------
--
--BFQ exports a few parameters to control/tune the behavior of
--low-latency heuristics.
--
--wr_coeff
--
--Factor by which the weight of a weight-raised queue is multiplied. If
--the queue is deemed soft real-time, then the weight is further
--multiplied by an additional, constant factor.
--
--wr_max_time
--
--Maximum duration of a weight-raising period for an interactive task
--(ms). If set to zero (default value), then this value is computed
--automatically, as a function of the peak rate of the device. In any
--case, when the value of this parameter is read, it always reports the
--current duration, regardless of whether it has been set manually or
--computed automatically.
--
--wr_max_softrt_rate
--
--Maximum service rate below which a queue is deemed to be associated
--with a soft real-time application, and is then weight-raised
--accordingly (sectors/sec).
--
--wr_min_idle_time
--
--Minimum idle period after which interactive weight-raising may be
--reactivated for a queue (in ms).
--
--wr_rt_max_time
--
--Maximum weight-raising duration for soft real-time queues (in ms). The
--start time from which this duration is considered is automatically
--moved forward if the queue is detected to be still soft real-time
--before the current soft real-time weight-raising period finishes.
--
--wr_min_inter_arr_async
--
--Minimum period between I/O request arrivals after which weight-raising
--may be reactivated for an already busy async queue (in ms).
--
--
- 4. Group scheduling with BFQ
- ============================
+@@ -1636,6 +1637,12 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 	mqrq->areq.mrq = &brq->mrq;
  
+ 	mmc_queue_bounce_pre(mqrq);
++
++	if (do_rel_wr_p)
++		*do_rel_wr_p = do_rel_wr;
++
++	if (do_data_tag_p)
++		*do_data_tag_p = do_data_tag;
+ }
+ 
+ static void mmc_blk_rw_rq_prep(struct mmc_queue_req *mqrq,
 -- 
-2.10.0
+1.9.1
