@@ -1,141 +1,78 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:45414 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751925AbdHZIxg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Aug 2017 04:53:36 -0400
+Date: Sat, 26 Aug 2017 16:53:21 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 22/49] block: blk-merge: try to make front segments in full size
-Date: Tue,  8 Aug 2017 16:45:21 +0800
-Message-Id: <20170808084548.18963-23-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: [PATCH V2 09/20] blk-mq: introduce BLK_MQ_F_SHARED_DEPTH
+Message-ID: <20170826085319.GC28380@ming.t460p>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
+ <20170805065705.12989-10-ming.lei@redhat.com>
+ <1503438955.2508.30.camel@wdc.com>
+ <20170824065215.GJ12966@ming.t460p>
+ <1503699788.2680.52.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1503699788.2680.52.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When merging one bvec into segment, if the bvec is too big
-to merge, current policy is to move the whole bvec into another
-new segment.
+On Fri, Aug 25, 2017 at 10:23:09PM +0000, Bart Van Assche wrote:
+> On Thu, 2017-08-24 at 14:52 +0800, Ming Lei wrote:
+> > On Tue, Aug 22, 2017 at 09:55:57PM +0000, Bart Van Assche wrote:
+> > > On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
+> > > > +	/*
+> > > > +	 * if there is q->queue_depth, all hw queues share
+> > > > +	 * this queue depth limit
+> > > > +	 */
+> > > > +	if (q->queue_depth) {
+> > > > +		queue_for_each_hw_ctx(q, hctx, i)
+> > > > +			hctx->flags |= BLK_MQ_F_SHARED_DEPTH;
+> > > > +	}
+> > > > +
+> > > > +	if (!q->elevator)
+> > > > +		goto exit;
+> > > 
+> > > Hello Ming,
+> > > 
+> > > It seems very fragile to me to set BLK_MQ_F_SHARED_DEPTH if and only if
+> > > q->queue_depth != 0. Wouldn't it be better to let the block driver tell the
+> > > block layer whether or not there is a queue depth limit across hardware
+> > > queues, e.g. through a tag set flag?
+> > 
+> > One reason for not doing in that way is because q->queue_depth can be
+> > changed via sysfs interface.
+> 
+> Only the SCSI core allows the queue depth to be changed through sysfs. The
+> other block drivers I am familiar with set the queue depth when the block
+> layer queue is created and do not allow the queue depth to be changed later
+> on.
 
-This patchset changes the policy into trying to maximize size of
-front segments, that means in above situation, part of bvec
-is merged into current segment, and the remainder is put
-into next segment.
+Actually SCSI core is the only user of q->queue_depth, and it supports
+to change it via sysfs.
 
-This patch prepares for support multipage bvec because
-it can be quite common to see this case and we should try
-to make front segments in full size.
+> 
+> > Another reason is that better to not exposing this flag to drivers since
+> > it isn't necessary, that said it is an internal flag actually.
+> 
+> As far as I know only the SCSI core can create request queues that have a
+> queue depth that is lower than the number of tags in the tag set. So for all
+> block drivers except the SCSI core it is OK to dispatch all requests at once
+> to which a hardware tag has been assigned. My proposal is either to let
+> drivers like the SCSI core set BLK_MQ_F_SHARED_DEPTH or to modify
+> blk_mq_sched_dispatch_requests() such that it flushes all requests if the
+> request queue depth is not lower than the hardware tag set size instead of if
+> q->queue_depth == 0.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 49 insertions(+), 5 deletions(-)
+As I mentioned, SCSI core is the only user of q->queue_depth, so no
+affect on other drivers.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d91f07813dee..aeb8933e6cae 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -108,6 +108,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	bool do_split = true;
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
-+	unsigned advance = 0;
- 
- 	bio_for_each_segment(bv, bio, iter) {
- 		/*
-@@ -133,12 +134,32 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		}
- 
- 		if (bvprvp && blk_queue_cluster(q)) {
--			if (seg_size + bv.bv_len > queue_max_segment_size(q))
--				goto new_segment;
- 			if (!BIOVEC_PHYS_MERGEABLE(bvprvp, &bv))
- 				goto new_segment;
- 			if (!BIOVEC_SEG_BOUNDARY(q, bvprvp, &bv))
- 				goto new_segment;
-+			if (seg_size + bv.bv_len > queue_max_segment_size(q)) {
-+				/*
-+				 * On assumption is that initial value of
-+				 * @seg_size(equals to bv.bv_len) won't be
-+				 * bigger than max segment size, but will
-+				 * becomes false after multipage bvec comes.
-+				 */
-+				advance = queue_max_segment_size(q) - seg_size;
-+
-+				if (advance > 0) {
-+					seg_size += advance;
-+					sectors += advance >> 9;
-+					bv.bv_len -= advance;
-+					bv.bv_offset += advance;
-+				}
-+
-+				/*
-+				 * Still need to put remainder of current
-+				 * bvec into a new segment.
-+				 */
-+				goto new_segment;
-+			}
- 
- 			seg_size += bv.bv_len;
- 			bvprv = bv;
-@@ -160,6 +181,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		seg_size = bv.bv_len;
- 		sectors += bv.bv_len >> 9;
- 
-+		/* restore the bvec for iterator */
-+		if (advance) {
-+			bv.bv_len += advance;
-+			bv.bv_offset -= advance;
-+			advance = 0;
-+		}
- 	}
- 
- 	do_split = false;
-@@ -360,16 +387,29 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- {
- 
- 	int nbytes = bvec->bv_len;
-+	unsigned advance = 0;
- 
- 	if (*sg && *cluster) {
--		if ((*sg)->length + nbytes > queue_max_segment_size(q))
--			goto new_segment;
--
- 		if (!BIOVEC_PHYS_MERGEABLE(bvprv, bvec))
- 			goto new_segment;
- 		if (!BIOVEC_SEG_BOUNDARY(q, bvprv, bvec))
- 			goto new_segment;
- 
-+		/*
-+		 * try best to merge part of the bvec into previous
-+		 * segment and follow same policy with
-+		 * blk_bio_segment_split()
-+		 */
-+		if ((*sg)->length + nbytes > queue_max_segment_size(q)) {
-+			advance = queue_max_segment_size(q) - (*sg)->length;
-+			if (advance) {
-+				(*sg)->length += advance;
-+				bvec->bv_offset += advance;
-+				bvec->bv_len -= advance;
-+			}
-+			goto new_segment;
-+		}
-+
- 		(*sg)->length += nbytes;
- 	} else {
- new_segment:
-@@ -392,6 +432,10 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 
- 		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
- 		(*nsegs)++;
-+
-+		/* for making iterator happy */
-+		bvec->bv_offset -= advance;
-+		bvec->bv_len += advance;
- 	}
- 	*bvprv = *bvec;
- }
+
 -- 
-2.9.4
+Ming
