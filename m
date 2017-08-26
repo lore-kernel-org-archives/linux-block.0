@@ -1,78 +1,173 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 18/55] skd: Introduce the symbolic constant SKD_MAX_REQ_PER_MSG
-Date: Thu, 17 Aug 2017 13:13:01 -0700
-Message-Id: <20170817201338.16537-19-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34596 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751061AbdHZQfG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Aug 2017 12:35:06 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 09/14] block: introduce rqhash helpers
+Date: Sun, 27 Aug 2017 00:33:27 +0800
+Message-Id: <20170826163332.28971-10-ming.lei@redhat.com>
+In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
+References: <20170826163332.28971-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality.
+We need this helpers for supporting to use hashtable to improve
+bio merge from sw queue in the following patches.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+No functional change.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/skd_main.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ block/blk.h      | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/elevator.c | 36 +++++++-----------------------------
+ 2 files changed, 59 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 5c69e9210a62..98dc16073072 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -31,6 +31,7 @@
- #include <linux/aer.h>
- #include <linux/wait.h>
- #include <linux/uio.h>
-+#include <linux/stringify.h>
- #include <scsi/scsi.h>
- #include <scsi/sg.h>
- #include <linux/io.h>
-@@ -86,6 +87,7 @@ MODULE_VERSION(DRV_VERSION "-" DRV_BUILD_ID);
- #define SKD_PAUSE_TIMEOUT       (5 * 1000)
+diff --git a/block/blk.h b/block/blk.h
+index 3a3d715bd725..313002c2f666 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -147,6 +147,58 @@ static inline void blk_clear_rq_complete(struct request *rq)
+  */
+ #define ELV_ON_HASH(rq) ((rq)->rq_flags & RQF_HASHED)
  
- #define SKD_N_FITMSG_BYTES      (512u)
-+#define SKD_MAX_REQ_PER_MSG	14
- 
- #define SKD_N_SPECIAL_CONTEXT   32u
- #define SKD_N_SPECIAL_FITMSG_BYTES      (128u)
-@@ -377,7 +379,7 @@ static int skd_max_req_per_msg = SKD_MAX_REQ_PER_MSG_DEFAULT;
- module_param(skd_max_req_per_msg, int, 0444);
- MODULE_PARM_DESC(skd_max_req_per_msg,
- 		 "Maximum SCSI requests packed in a single message."
--		 " (1-14, default==1)");
-+		 " (1-" __stringify(SKD_MAX_REQ_PER_MSG) ", default==1)");
- 
- #define SKD_MAX_QUEUE_DEPTH_DEFAULT 64
- #define SKD_MAX_QUEUE_DEPTH_DEFAULT_STR "64"
-@@ -5016,6 +5018,9 @@ static void skd_log_skreq(struct skd_device *skdev,
- 
- static int __init skd_init(void)
- {
-+	BUILD_BUG_ON(sizeof(struct fit_msg_hdr) + SKD_MAX_REQ_PER_MSG *
-+		     sizeof(struct skd_scsi_request) != SKD_N_FITMSG_BYTES);
++/*
++ * Merge hash stuff.
++ */
++#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
 +
- 	pr_info(PFX " v%s-b%s loaded\n", DRV_VERSION, DRV_BUILD_ID);
++#define bucket(head, key)	&((head)[hash_min((key), ELV_HASH_BITS)])
++
++static inline void __rqhash_del(struct request *rq)
++{
++	hash_del(&rq->hash);
++	rq->rq_flags &= ~RQF_HASHED;
++}
++
++static inline void rqhash_del(struct request *rq)
++{
++	if (ELV_ON_HASH(rq))
++		__rqhash_del(rq);
++}
++
++static inline void rqhash_add(struct hlist_head *hash, struct request *rq)
++{
++	BUG_ON(ELV_ON_HASH(rq));
++	hlist_add_head(&rq->hash, bucket(hash, rq_hash_key(rq)));
++	rq->rq_flags |= RQF_HASHED;
++}
++
++static inline void rqhash_reposition(struct hlist_head *hash, struct request *rq)
++{
++	__rqhash_del(rq);
++	rqhash_add(hash, rq);
++}
++
++static inline struct request *rqhash_find(struct hlist_head *hash, sector_t offset)
++{
++	struct hlist_node *next;
++	struct request *rq = NULL;
++
++	hlist_for_each_entry_safe(rq, next, bucket(hash, offset), hash) {
++		BUG_ON(!ELV_ON_HASH(rq));
++
++		if (unlikely(!rq_mergeable(rq))) {
++			__rqhash_del(rq);
++			continue;
++		}
++
++		if (rq_hash_key(rq) == offset)
++			return rq;
++	}
++
++	return NULL;
++}
++
+ void blk_insert_flush(struct request *rq);
  
- 	switch (skd_isr_type) {
-@@ -5036,7 +5041,8 @@ static int __init skd_init(void)
- 		skd_max_queue_depth = SKD_MAX_QUEUE_DEPTH_DEFAULT;
- 	}
+ static inline struct request *__elv_next_request(struct request_queue *q)
+diff --git a/block/elevator.c b/block/elevator.c
+index 4bb2f0c93fa6..7423e9c9cb27 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -47,11 +47,6 @@ static DEFINE_SPINLOCK(elv_list_lock);
+ static LIST_HEAD(elv_list);
  
--	if (skd_max_req_per_msg < 1 || skd_max_req_per_msg > 14) {
-+	if (skd_max_req_per_msg < 1 ||
-+	    skd_max_req_per_msg > SKD_MAX_REQ_PER_MSG) {
- 		pr_err(PFX "skd_max_req_per_msg %d invalid, re-set to %d\n",
- 		       skd_max_req_per_msg, SKD_MAX_REQ_PER_MSG_DEFAULT);
- 		skd_max_req_per_msg = SKD_MAX_REQ_PER_MSG_DEFAULT;
+ /*
+- * Merge hash stuff.
+- */
+-#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
+-
+-/*
+  * Query io scheduler to see if the current process issuing bio may be
+  * merged with rq.
+  */
+@@ -268,14 +263,12 @@ EXPORT_SYMBOL(elevator_exit);
+ 
+ static inline void __elv_rqhash_del(struct request *rq)
+ {
+-	hash_del(&rq->hash);
+-	rq->rq_flags &= ~RQF_HASHED;
++	__rqhash_del(rq);
+ }
+ 
+ void elv_rqhash_del(struct request_queue *q, struct request *rq)
+ {
+-	if (ELV_ON_HASH(rq))
+-		__elv_rqhash_del(rq);
++	rqhash_del(rq);
+ }
+ EXPORT_SYMBOL_GPL(elv_rqhash_del);
+ 
+@@ -283,37 +276,22 @@ void elv_rqhash_add(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
+-	BUG_ON(ELV_ON_HASH(rq));
+-	hash_add(e->hash, &rq->hash, rq_hash_key(rq));
+-	rq->rq_flags |= RQF_HASHED;
++	rqhash_add(e->hash, rq);
+ }
+ EXPORT_SYMBOL_GPL(elv_rqhash_add);
+ 
+ void elv_rqhash_reposition(struct request_queue *q, struct request *rq)
+ {
+-	__elv_rqhash_del(rq);
+-	elv_rqhash_add(q, rq);
++	struct elevator_queue *e = q->elevator;
++
++	rqhash_reposition(e->hash, rq);
+ }
+ 
+ struct request *elv_rqhash_find(struct request_queue *q, sector_t offset)
+ {
+ 	struct elevator_queue *e = q->elevator;
+-	struct hlist_node *next;
+-	struct request *rq;
+-
+-	hash_for_each_possible_safe(e->hash, rq, next, hash, offset) {
+-		BUG_ON(!ELV_ON_HASH(rq));
+ 
+-		if (unlikely(!rq_mergeable(rq))) {
+-			__elv_rqhash_del(rq);
+-			continue;
+-		}
+-
+-		if (rq_hash_key(rq) == offset)
+-			return rq;
+-	}
+-
+-	return NULL;
++	return rqhash_find(e->hash, offset);
+ }
+ 
+ /*
 -- 
-2.14.0
+2.9.5
