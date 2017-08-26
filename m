@@ -1,102 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59074 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:55342 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751063AbdHZQeP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Aug 2017 12:34:15 -0400
+        id S1751925AbdHZIr7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Aug 2017 04:47:59 -0400
+Date: Sat, 26 Aug 2017 16:47:42 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 03/14] blk-mq: introduce blk_mq_dispatch_rq_from_ctx()
-Date: Sun, 27 Aug 2017 00:33:21 +0800
-Message-Id: <20170826163332.28971-4-ming.lei@redhat.com>
-In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
-References: <20170826163332.28971-1-ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: [PATCH V2 03/20] blk-mq: introduce blk_mq_dispatch_rq_from_ctx()
+Message-ID: <20170826084737.GB28380@ming.t460p>
+References: <20170805065705.12989-1-ming.lei@redhat.com>
+ <20170805065705.12989-4-ming.lei@redhat.com>
+ <1503427542.2508.10.camel@wdc.com>
+ <20170824045226.GC12966@ming.t460p>
+ <1503697267.2680.36.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1503697267.2680.36.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This function is introduced for dequeuing request
-from sw queue so that we can dispatch it in
-scheduler's way.
+On Fri, Aug 25, 2017 at 09:41:08PM +0000, Bart Van Assche wrote:
+> On Thu, 2017-08-24 at 12:52 +0800, Ming Lei wrote:
+> > On Tue, Aug 22, 2017 at 06:45:46PM +0000, Bart Van Assche wrote:
+> > > On Sat, 2017-08-05 at 14:56 +0800, Ming Lei wrote:
+> > > > More importantly, for some SCSI devices, driver
+> > > > tags are host wide, and the number is quite big,
+> > > > but each lun has very limited queue depth.
+> > > 
+> > > This may be the case but is not always the case. Another important use-case
+> > > is one LUN per host and where the queue depth per LUN is identical to the
+> > > number of host tags.
+> > 
+> > This patchset won't hurt this case because the BUSY info is returned
+> > from driver.  In this case, BLK_STS_RESOURCE should seldom be returned
+> > from .queue_rq generally.
+> > 
+> > Also one important fact is that once q->queue_depth is set, that
+> > means there is per-request_queue limit on pending I/Os, and the
+> > single LUN is just the special case which is covered by this whole
+> > patchset. We don't need to pay special attention in this special case
+> > at all.
+> 
+> The purpose of my comment was not to ask for further clarification but to
+> report that the description of this patch is not correct.
 
-More importantly, some SCSI devices may set
-q->queue_depth, which is a per-request_queue limit,
-and applied on pending I/O from all hctxs. This
-function is introduced for avoiding to dequeue too
-many requests from sw queue when ->dispatch isn't
-flushed completely.
+OK, will change the commit log in V3.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 38 ++++++++++++++++++++++++++++++++++++++
- block/blk-mq.h |  2 ++
- 2 files changed, 40 insertions(+)
+> 
+> > > 
+> > > > +struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
+> > > > +					    struct blk_mq_ctx *start)
+> > > > +{
+> > > > +	unsigned off = start ? start->index_hw : 0;
+> > > 
+> > > Please consider to rename this function into blk_mq_dispatch_rq_from_next_ctx()
+> > > and to start from start->index_hw + 1 instead of start->index_hw. I think that
+> > > will not only result in simpler but also in faster code.
+> > 
+> > I believe this helper with blk_mq_next_ctx(hctx, rq->mq_ctx) together
+> > will be much simpler and easier to implement, and code can be much
+> > readable too.
+> > 
+> > blk_mq_dispatch_rq_from_next_ctx() is ugly and mixing two things
+> > together.
+> 
+> Sorry but I disagree with both of the above statements.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3f18cff80050..f063dd0f197f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -880,6 +880,44 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- }
- EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
- 
-+struct dispatch_rq_data {
-+	struct blk_mq_hw_ctx *hctx;
-+	struct request *rq;
-+};
-+
-+static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
-+{
-+	struct dispatch_rq_data *dispatch_data = data;
-+	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
-+	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
-+
-+	spin_lock(&ctx->lock);
-+	if (unlikely(!list_empty(&ctx->rq_list))) {
-+		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
-+		list_del_init(&dispatch_data->rq->queuelist);
-+		if (list_empty(&ctx->rq_list))
-+			sbitmap_clear_bit(sb, bitnr);
-+	}
-+	spin_unlock(&ctx->lock);
-+
-+	return !dispatch_data->rq;
-+}
-+
-+struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					    struct blk_mq_ctx *start)
-+{
-+	unsigned off = start ? start->index_hw : 0;
-+	struct dispatch_rq_data data = {
-+		.hctx = hctx,
-+		.rq   = NULL,
-+	};
-+
-+	__sbitmap_for_each_set(&hctx->ctx_map, off,
-+			       dispatch_rq_from_ctx, &data);
-+
-+	return data.rq;
-+}
-+
- static inline unsigned int queued_to_index(unsigned int queued)
- {
- 	if (!queued)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 98252b79b80b..e42748bfb959 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -35,6 +35,8 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
- bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 				bool wait);
-+struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					    struct blk_mq_ctx *start);
- 
- /*
-  * Internal helpers for allocating/freeing the request map
+I will post out V3, please comment it on that patch about this issue,
+especially total round robin is added.
+
 -- 
-2.9.5
+Ming
