@@ -1,84 +1,84 @@
-Return-Path: <prvs=9403a763c3=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@kernel.dk>
-Subject: [PATCH V2] blk-throttle: cap discard request size
-Date: Fri, 18 Aug 2017 16:08:13 -0700
-Message-ID: <13d341052771b20f5d538dd32510f1403af7475e.1503097540.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52014 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751061AbdHZQfQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Aug 2017 12:35:16 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 10/14] block: move actual bio merge code into __elv_merge
+Date: Sun, 27 Aug 2017 00:33:28 +0800
+Message-Id: <20170826163332.28971-11-ming.lei@redhat.com>
+In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
+References: <20170826163332.28971-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-discard request usually is very big and easily use all bandwidth budget
-of a cgroup. discard request size doesn't really mean the size of data
-written, so it doesn't make sense to account it into bandwidth budget.
-Jens pointed out treating the size 0 doesn't make sense too, because
-discard request does have cost. But it's not easy to find the actual
-cost. This patch simply makes the size one sector.
+So that we can reuse __elv_merge() to merge bio
+into requests from sw queue in the following patches.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-throttle.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ block/elevator.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 6a4c4c4..0fea76a 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -380,6 +380,14 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- 	}								\
- } while (0)
+diff --git a/block/elevator.c b/block/elevator.c
+index 7423e9c9cb27..4ac437b5fc0c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -409,8 +409,9 @@ void elv_dispatch_add_tail(struct request_queue *q, struct request *rq)
+ }
+ EXPORT_SYMBOL(elv_dispatch_add_tail);
  
-+static inline unsigned int throtl_bio_data_size(struct bio *bio)
+-enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+-		struct bio *bio)
++static enum elv_merge __elv_merge(struct request_queue *q,
++		struct request **req, struct bio *bio,
++		struct hlist_head *hash, struct request *last_merge)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 	struct request *__rq;
+@@ -427,11 +428,11 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	/*
+ 	 * First try one-hit cache.
+ 	 */
+-	if (q->last_merge && elv_bio_merge_ok(q->last_merge, bio)) {
+-		enum elv_merge ret = blk_try_merge(q->last_merge, bio);
++	if (last_merge && elv_bio_merge_ok(last_merge, bio)) {
++		enum elv_merge ret = blk_try_merge(last_merge, bio);
+ 
+ 		if (ret != ELEVATOR_NO_MERGE) {
+-			*req = q->last_merge;
++			*req = last_merge;
+ 			return ret;
+ 		}
+ 	}
+@@ -442,7 +443,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	/*
+ 	 * See if our hash lookup can find a potential backmerge.
+ 	 */
+-	__rq = elv_rqhash_find(q, bio->bi_iter.bi_sector);
++	__rq = rqhash_find(hash, bio->bi_iter.bi_sector);
+ 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
+ 		*req = __rq;
+ 		return ELEVATOR_BACK_MERGE;
+@@ -456,6 +457,12 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	return ELEVATOR_NO_MERGE;
+ }
+ 
++enum elv_merge elv_merge(struct request_queue *q, struct request **req,
++		struct bio *bio)
 +{
-+	/* assume it's one sector */
-+	if (unlikely(bio_op(bio) == REQ_OP_DISCARD))
-+		return 512;
-+	return bio->bi_iter.bi_size;
++	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
 +}
 +
- static void throtl_qnode_init(struct throtl_qnode *qn, struct throtl_grp *tg)
- {
- 	INIT_LIST_HEAD(&qn->node);
-@@ -932,6 +940,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	bool rw = bio_data_dir(bio);
- 	u64 bytes_allowed, extra_bytes, tmp;
- 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
-+	unsigned int bio_size = throtl_bio_data_size(bio);
- 
- 	jiffy_elapsed = jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
- 
-@@ -945,14 +954,14 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	do_div(tmp, HZ);
- 	bytes_allowed = tmp;
- 
--	if (tg->bytes_disp[rw] + bio->bi_iter.bi_size <= bytes_allowed) {
-+	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
- 		if (wait)
- 			*wait = 0;
- 		return true;
- 	}
- 
- 	/* Calc approx time to dispatch */
--	extra_bytes = tg->bytes_disp[rw] + bio->bi_iter.bi_size - bytes_allowed;
-+	extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
- 	jiffy_wait = div64_u64(extra_bytes * HZ, tg_bps_limit(tg, rw));
- 
- 	if (!jiffy_wait)
-@@ -1032,11 +1041,12 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
- {
- 	bool rw = bio_data_dir(bio);
-+	unsigned int bio_size = throtl_bio_data_size(bio);
- 
- 	/* Charge the bio to the group */
--	tg->bytes_disp[rw] += bio->bi_iter.bi_size;
-+	tg->bytes_disp[rw] += bio_size;
- 	tg->io_disp[rw]++;
--	tg->last_bytes_disp[rw] += bio->bi_iter.bi_size;
-+	tg->last_bytes_disp[rw] += bio_size;
- 	tg->last_io_disp[rw]++;
- 
- 	/*
+ /*
+  * Attempt to do an insertion back merge. Only check for the case where
+  * we can append 'rq' to an existing request, so we can throw 'rq' away
 -- 
 2.9.5
