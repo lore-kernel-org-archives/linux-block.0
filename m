@@ -1,39 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:27826 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752253AbdH3RRs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2017 13:17:48 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "mgorman@techsingularity.net" <mgorman@techsingularity.net>,
-        "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-        "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V3 13/14] blk-mq-sched: refactor blk_mq_sched_try_merge()
-Date: Wed, 30 Aug 2017 17:17:05 +0000
-Message-ID: <1504113417.2526.57.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:40636 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751061AbdHZQfk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Aug 2017 12:35:40 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 13/14] blk-mq-sched: refactor blk_mq_sched_try_merge()
+Date: Sun, 27 Aug 2017 00:33:31 +0800
+Message-Id: <20170826163332.28971-14-ming.lei@redhat.com>
+In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
 References: <20170826163332.28971-1-ming.lei@redhat.com>
-         <20170826163332.28971-14-ming.lei@redhat.com>
-In-Reply-To: <20170826163332.28971-14-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDE3LTA4LTI3IGF0IDAwOjMzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gLWJv
-b2wgYmxrX21xX3NjaGVkX3RyeV9tZXJnZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0
-IGJpbyAqYmlvLA0KPiAtCQkJICAgIHN0cnVjdCByZXF1ZXN0ICoqbWVyZ2VkX3JlcXVlc3QpDQo+
-ICtzdGF0aWMgYm9vbCBfX2Jsa19tcV90cnlfbWVyZ2Uoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEs
-DQo+ICsJCXN0cnVjdCBiaW8gKmJpbywgc3RydWN0IHJlcXVlc3QgKiptZXJnZWRfcmVxdWVzdCwN
-Cj4gKwkJc3RydWN0IHJlcXVlc3QgKmNhbmRpZGF0ZSwgZW51bSBlbHZfbWVyZ2UgdHlwZSkNCj4g
-IHsNCj4gLQlzdHJ1Y3QgcmVxdWVzdCAqcnE7DQo+ICsJc3RydWN0IHJlcXVlc3QgKnJxID0gY2Fu
-ZGlkYXRlOw0KDQpJdCBzZWVtcyB3ZWlyZCB0byBtZSB0aGF0IHRoZSBhcmd1bWVudCAnY2FuZGlk
-YXRlJyBpcyBub3QgdXNlZCBvdGhlciB0aGFuIHRvDQpjb3B5IGl0cyB2YWx1ZSBpbnRvIHRoZSBs
-b2NhbCB2YXJpYWJsZSAncnEnPyBIb3cgYWJvdXQgcmVtb3ZpbmcgdGhhdCBsb2NhbA0KdmFyaWFi
-bGUgYW5kIHJlbmFtaW5nIHRoZSAnY2FuZGlkYXRlJyBhcmd1bWVudCBpbnRvICdycSc/IEFueXdh
-eSwgd2l0aCBvcg0Kd2l0aG91dCB0aGF0IGNoYW5nZToNCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFu
-IEFzc2NoZSA8YmFydC52YW5hc3NjaGVAd2RjLmNvbT4=
+This patch introduces one function __blk_mq_try_merge()
+which will be resued for bio merge to sw queue in
+the following patch.
+
+No functional change.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 28054e49df5d..5af0ff71730c 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -228,12 +228,13 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	}
+ }
+ 
+-bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-			    struct request **merged_request)
++static bool __blk_mq_try_merge(struct request_queue *q,
++		struct bio *bio, struct request **merged_request,
++		struct request *candidate, enum elv_merge type)
+ {
+-	struct request *rq;
++	struct request *rq = candidate;
+ 
+-	switch (elv_merge(q, &rq, bio)) {
++	switch (type) {
+ 	case ELEVATOR_BACK_MERGE:
+ 		if (!blk_mq_sched_allow_merge(q, rq, bio))
+ 			return false;
+@@ -256,6 +257,15 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ 		return false;
+ 	}
+ }
++
++bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
++		struct request **merged_request)
++{
++	struct request *rq;
++	enum elv_merge type = elv_merge(q, &rq, bio);
++
++	return __blk_mq_try_merge(q, bio, merged_request, rq, type);
++}
+ EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
+ 
+ /*
+-- 
+2.9.5
