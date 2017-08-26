@@ -1,602 +1,74 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 43/55] skd: Enable request tags for the block layer queue
-Date: Thu, 17 Aug 2017 13:13:26 -0700
-Message-Id: <20170817201338.16537-44-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52552 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751063AbdHZQet (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Aug 2017 12:34:49 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 07/14] blk-mq-sched: introduce blk_mq_sched_queue_depth()
+Date: Sun, 27 Aug 2017 00:33:25 +0800
+Message-Id: <20170826163332.28971-8-ming.lei@redhat.com>
+In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
+References: <20170826163332.28971-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the request tag when allocating a skd_fitmsg_context or
-skd_request_context such that the lists used to track free elements
-can be eliminated. Swap the skd_end_request() and skd_release_req()
-calls to avoid triggering a use-after-free. Remove
-skd_fitmsg_context.state and .outstanding because FIT messages are
-shared among requests and because updating a FIT message after a
-request has finished whould trigger a use-after-free.
+The following patch will use one hint to figure out
+default queue depth for scheduler queue, so introduce
+the helper of blk_mq_sched_queue_depth() for this purpose.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/skd_main.c | 267 +++++++++++++----------------------------------
- 1 file changed, 73 insertions(+), 194 deletions(-)
+ block/blk-mq-sched.c |  8 +-------
+ block/blk-mq-sched.h | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 392c898d86e2..35343fbf4144 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -16,6 +16,7 @@
- #include <linux/slab.h>
- #include <linux/spinlock.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-mq.h>
- #include <linux/sched.h>
- #include <linux/interrupt.h>
- #include <linux/compiler.h>
-@@ -154,11 +155,6 @@ enum skd_req_state {
- 	SKD_REQ_STATE_TIMEOUT,
- };
- 
--enum skd_fit_msg_state {
--	SKD_MSG_STATE_IDLE,
--	SKD_MSG_STATE_BUSY,
--};
--
- enum skd_check_status_action {
- 	SKD_CHECK_STATUS_REPORT_GOOD,
- 	SKD_CHECK_STATUS_REPORT_SMART_ALERT,
-@@ -173,12 +169,7 @@ struct skd_msg_buf {
- };
- 
- struct skd_fitmsg_context {
--	enum skd_fit_msg_state state;
--
--	struct skd_fitmsg_context *next;
--
- 	u32 id;
--	u16 outstanding;
- 
- 	u32 length;
- 
-@@ -189,8 +180,6 @@ struct skd_fitmsg_context {
- struct skd_request_context {
- 	enum skd_req_state state;
- 
--	struct skd_request_context *next;
--
- 	u16 id;
- 	u32 fitmsg_id;
- 
-@@ -264,10 +253,8 @@ struct skd_device {
- 
- 	u32 timeout_slot[SKD_N_TIMEOUT_SLOT];
- 	u32 timeout_stamp;
--	struct skd_fitmsg_context *skmsg_free_list;
- 	struct skd_fitmsg_context *skmsg_table;
- 
--	struct skd_request_context *skreq_free_list;
- 	struct skd_request_context *skreq_table;
- 
- 	struct skd_special_context internal_skspcl;
-@@ -387,8 +374,8 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- static void skd_send_special_fitmsg(struct skd_device *skdev,
- 				    struct skd_special_context *skspcl);
- static void skd_request_fn(struct request_queue *rq);
--static void skd_end_request(struct skd_device *skdev,
--		struct skd_request_context *skreq, blk_status_t status);
-+static void skd_end_request(struct skd_device *skdev, struct request *req,
-+			    blk_status_t status);
- static bool skd_preop_sg_list(struct skd_device *skdev,
- 			     struct skd_request_context *skreq);
- static void skd_postop_sg_list(struct skd_device *skdev,
-@@ -405,8 +392,6 @@ static void skd_soft_reset(struct skd_device *skdev);
- const char *skd_drive_state_to_str(int state);
- const char *skd_skdev_state_to_str(enum skd_drvr_state state);
- static void skd_log_skdev(struct skd_device *skdev, const char *event);
--static void skd_log_skmsg(struct skd_device *skdev,
--			  struct skd_fitmsg_context *skmsg, const char *event);
- static void skd_log_skreq(struct skd_device *skdev,
- 			  struct skd_request_context *skreq, const char *event);
- 
-@@ -424,7 +409,7 @@ static void skd_fail_all_pending(struct skd_device *skdev)
- 		req = blk_peek_request(q);
- 		if (req == NULL)
- 			break;
--		blk_start_request(req);
-+		WARN_ON_ONCE(blk_queue_start_tag(q, req));
- 		__blk_end_request_all(req, BLK_STS_IOERR);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4d7bea8c2594..28054e49df5d 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -595,13 +595,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 		return 0;
  	}
- }
-@@ -523,6 +508,7 @@ static void skd_request_fn(struct request_queue *q)
- 	u64 cmdctxt;
- 	u32 timo_slot;
- 	int flush, fua;
-+	u32 tag;
- 
- 	if (skdev->state != SKD_DRVR_STATE_ONLINE) {
- 		if (skd_fail_all(q))
-@@ -531,9 +517,7 @@ static void skd_request_fn(struct request_queue *q)
- 	}
- 
- 	if (blk_queue_stopped(skdev->queue)) {
--		if (skdev->skmsg_free_list == NULL ||
--		    skdev->skreq_free_list == NULL ||
--		    skdev->in_flight >= skdev->queue_low_water_mark)
-+		if (skdev->in_flight >= skdev->queue_low_water_mark)
- 			/* There is still some kind of shortage */
- 			return;
- 
-@@ -581,27 +565,6 @@ static void skd_request_fn(struct request_queue *q)
- 			break;
- 		}
- 
--		/* Is a skd_request_context available? */
--		skreq = skdev->skreq_free_list;
--		if (skreq == NULL) {
--			dev_dbg(&skdev->pdev->dev, "Out of req=%p\n", q);
--			break;
--		}
--		SKD_ASSERT(skreq->state == SKD_REQ_STATE_IDLE);
--		SKD_ASSERT((skreq->id & SKD_ID_INCR) == 0);
--
--		/* Now we check to see if we can get a fit msg */
--		if (skmsg == NULL) {
--			if (skdev->skmsg_free_list == NULL) {
--				dev_dbg(&skdev->pdev->dev, "Out of msg\n");
--				break;
--			}
--		}
--
--		skreq->flush_cmd = 0;
--		skreq->n_sg = 0;
--		skreq->sg_byte_count = 0;
--
- 		/*
- 		 * OK to now dequeue request from q.
- 		 *
-@@ -609,7 +572,22 @@ static void skd_request_fn(struct request_queue *q)
- 		 * the native request. Note that skd_request_context is
- 		 * available but is still at the head of the free list.
- 		 */
--		blk_start_request(req);
-+		WARN_ON_ONCE(blk_queue_start_tag(q, req));
-+
-+		tag = blk_mq_unique_tag(req);
-+		WARN_ONCE(tag >= skd_max_queue_depth,
-+			  "%#x > %#x (nr_requests = %lu)\n", tag,
-+			  skd_max_queue_depth, q->nr_requests);
-+
-+		skreq = &skdev->skreq_table[tag];
-+		SKD_ASSERT(skreq->state == SKD_REQ_STATE_IDLE);
-+		SKD_ASSERT((skreq->id & SKD_ID_INCR) == 0);
-+
-+		skreq->id = tag + SKD_ID_RW_REQUEST;
-+		skreq->flush_cmd = 0;
-+		skreq->n_sg = 0;
-+		skreq->sg_byte_count = 0;
-+
- 		skreq->req = req;
- 		skreq->fitmsg_id = 0;
- 
-@@ -618,27 +596,13 @@ static void skd_request_fn(struct request_queue *q)
- 
- 		if (req->bio && !skd_preop_sg_list(skdev, skreq)) {
- 			dev_dbg(&skdev->pdev->dev, "error Out\n");
--			skd_end_request(skdev, skreq, BLK_STS_RESOURCE);
-+			skd_end_request(skdev, skreq->req, BLK_STS_RESOURCE);
- 			continue;
- 		}
- 
- 		/* Either a FIT msg is in progress or we have to start one. */
- 		if (skmsg == NULL) {
--			/* Are there any FIT msg buffers available? */
--			skmsg = skdev->skmsg_free_list;
--			if (skmsg == NULL) {
--				dev_dbg(&skdev->pdev->dev,
--					"Out of msg skdev=%p\n",
--					skdev);
--				break;
--			}
--			SKD_ASSERT(skmsg->state == SKD_MSG_STATE_IDLE);
--			SKD_ASSERT((skmsg->id & SKD_ID_INCR) == 0);
--
--			skdev->skmsg_free_list = skmsg->next;
--
--			skmsg->state = SKD_MSG_STATE_BUSY;
--			skmsg->id += SKD_ID_INCR;
-+			skmsg = &skdev->skmsg_table[tag];
- 
- 			/* Initialize the FIT msg header */
- 			fmh = &skmsg->msg_buf->fmh;
-@@ -673,7 +637,6 @@ static void skd_request_fn(struct request_queue *q)
- 			cpu_to_be32(skreq->sg_byte_count);
- 
- 		/* Complete resource allocations. */
--		skdev->skreq_free_list = skreq->next;
- 		skreq->state = SKD_REQ_STATE_BUSY;
- 		skreq->id += SKD_ID_INCR;
- 
-@@ -717,23 +680,22 @@ static void skd_request_fn(struct request_queue *q)
- 		blk_stop_queue(skdev->queue);
- }
- 
--static void skd_end_request(struct skd_device *skdev,
--		struct skd_request_context *skreq, blk_status_t error)
-+static void skd_end_request(struct skd_device *skdev, struct request *req,
-+			    blk_status_t error)
- {
- 	if (unlikely(error)) {
--		struct request *req = skreq->req;
- 		char *cmd = (rq_data_dir(req) == READ) ? "read" : "write";
- 		u32 lba = (u32)blk_rq_pos(req);
- 		u32 count = blk_rq_sectors(req);
- 
- 		dev_err(&skdev->pdev->dev,
- 			"Error cmd=%s sect=%u count=%u id=0x%x\n", cmd, lba,
--			count, skreq->id);
-+			count, req->tag);
- 	} else
--		dev_dbg(&skdev->pdev->dev, "id=0x%x error=%d\n", skreq->id,
-+		dev_dbg(&skdev->pdev->dev, "id=0x%x error=%d\n", req->tag,
- 			error);
- 
--	__blk_end_request_all(skreq->req, error);
-+	__blk_end_request_all(req, error);
- }
- 
- static bool skd_preop_sg_list(struct skd_device *skdev,
-@@ -1346,7 +1308,6 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- 			    struct skd_fitmsg_context *skmsg)
- {
- 	u64 qcmd;
--	struct fit_msg_hdr *fmh;
- 
- 	dev_dbg(&skdev->pdev->dev, "dma address 0x%llx, busy=%d\n",
- 		skmsg->mb_dma_address, skdev->in_flight);
-@@ -1355,9 +1316,6 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- 	qcmd = skmsg->mb_dma_address;
- 	qcmd |= FIT_QCMD_QID_NORMAL;
- 
--	fmh = &skmsg->msg_buf->fmh;
--	skmsg->outstanding = fmh->num_protocol_cmds_coalesced;
--
- 	if (unlikely(skdev->dbg_level > 1)) {
- 		u8 *bp = (u8 *)skmsg->msg_buf;
- 		int i;
-@@ -1547,19 +1505,20 @@ skd_check_status(struct skd_device *skdev,
- }
- 
- static void skd_resolve_req_exception(struct skd_device *skdev,
--				      struct skd_request_context *skreq)
-+				      struct skd_request_context *skreq,
-+				      struct request *req)
- {
- 	u8 cmp_status = skreq->completion.status;
- 
- 	switch (skd_check_status(skdev, cmp_status, &skreq->err_info)) {
- 	case SKD_CHECK_STATUS_REPORT_GOOD:
- 	case SKD_CHECK_STATUS_REPORT_SMART_ALERT:
--		skd_end_request(skdev, skreq, BLK_STS_OK);
-+		skd_end_request(skdev, req, BLK_STS_OK);
- 		break;
- 
- 	case SKD_CHECK_STATUS_BUSY_IMMINENT:
- 		skd_log_skreq(skdev, skreq, "retry(busy)");
--		blk_requeue_request(skdev->queue, skreq->req);
-+		blk_requeue_request(skdev->queue, req);
- 		dev_info(&skdev->pdev->dev, "drive BUSY imminent\n");
- 		skdev->state = SKD_DRVR_STATE_BUSY_IMMINENT;
- 		skdev->timer_countdown = SKD_TIMER_MINUTES(20);
-@@ -1567,16 +1526,16 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
- 		break;
- 
- 	case SKD_CHECK_STATUS_REQUEUE_REQUEST:
--		if ((unsigned long) ++skreq->req->special < SKD_MAX_RETRIES) {
-+		if ((unsigned long) ++req->special < SKD_MAX_RETRIES) {
- 			skd_log_skreq(skdev, skreq, "retry");
--			blk_requeue_request(skdev->queue, skreq->req);
-+			blk_requeue_request(skdev->queue, req);
- 			break;
- 		}
- 		/* fall through */
- 
- 	case SKD_CHECK_STATUS_REPORT_ERROR:
- 	default:
--		skd_end_request(skdev, skreq, BLK_STS_IOERR);
-+		skd_end_request(skdev, req, BLK_STS_IOERR);
- 		break;
- 	}
- }
-@@ -1585,44 +1544,8 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
- static void skd_release_skreq(struct skd_device *skdev,
- 			      struct skd_request_context *skreq)
- {
--	u32 msg_slot;
--	struct skd_fitmsg_context *skmsg;
--
- 	u32 timo_slot;
  
 -	/*
--	 * Reclaim the FIT msg buffer if this is
--	 * the first of the requests it carried to
--	 * be completed. The FIT msg buffer used to
--	 * send this request cannot be reused until
--	 * we are sure the s1120 card has copied
--	 * it to its memory. The FIT msg might have
--	 * contained several requests. As soon as
--	 * any of them are completed we know that
--	 * the entire FIT msg was transferred.
--	 * Only the first completed request will
--	 * match the FIT msg buffer id. The FIT
--	 * msg buffer id is immediately updated.
--	 * When subsequent requests complete the FIT
--	 * msg buffer id won't match, so we know
--	 * quite cheaply that it is already done.
+-	 * Default to double of smaller one between hw queue_depth and 128,
+-	 * since we don't split into sync/async like the old code did.
+-	 * Additionally, this is a per-hw queue depth.
 -	 */
--	msg_slot = skreq->fitmsg_id & SKD_ID_SLOT_MASK;
--	SKD_ASSERT(msg_slot < skdev->num_fitmsg_context);
--
--	skmsg = &skdev->skmsg_table[msg_slot];
--	if (skmsg->id == skreq->fitmsg_id) {
--		SKD_ASSERT(skmsg->state == SKD_MSG_STATE_BUSY);
--		SKD_ASSERT(skmsg->outstanding > 0);
--		skmsg->outstanding--;
--		if (skmsg->outstanding == 0) {
--			skmsg->state = SKD_MSG_STATE_IDLE;
--			skmsg->id += SKD_ID_INCR;
--			skmsg->next = skdev->skmsg_free_list;
--			skdev->skmsg_free_list = skmsg;
--		}
--	}
--
- 	/*
- 	 * Decrease the number of active requests.
- 	 * Also decrements the count in the timeout slot.
-@@ -1644,8 +1567,20 @@ static void skd_release_skreq(struct skd_device *skdev,
- 	 */
- 	skreq->state = SKD_REQ_STATE_IDLE;
- 	skreq->id += SKD_ID_INCR;
--	skreq->next = skdev->skreq_free_list;
--	skdev->skreq_free_list = skreq;
+-	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
+-				   BLKDEV_MAX_RQ);
++	q->nr_requests = blk_mq_sched_queue_depth(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 9267d0b7c197..1d47f3fda1d0 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -96,4 +96,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+ 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ }
+ 
++static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
++{
++	/*
++	 * Default to double of smaller one between hw queue_depth and 128,
++	 * since we don't split into sync/async like the old code did.
++	 * Additionally, this is a per-hw queue depth.
++	 */
++	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
++				   BLKDEV_MAX_RQ);
 +}
 +
-+static struct skd_request_context *skd_skreq_from_rq(struct skd_device *skdev,
-+						     struct request *rq)
-+{
-+	struct skd_request_context *skreq;
-+	int i;
-+
-+	for (i = 0, skreq = skdev->skreq_table; i < skdev->num_fitmsg_context;
-+	     i++, skreq++)
-+		if (skreq->req == rq)
-+			return skreq;
-+
-+	return NULL;
- }
- 
- static int skd_isr_completion_posted(struct skd_device *skdev,
-@@ -1654,7 +1589,8 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
- 	struct fit_completion_entry_v1 *skcmp;
- 	struct fit_comp_error_info *skerr;
- 	u16 req_id;
--	u32 req_slot;
-+	u32 tag;
-+	struct request *rq;
- 	struct skd_request_context *skreq;
- 	u16 cmp_cntxt;
- 	u8 cmp_status;
-@@ -1702,18 +1638,24 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
- 		 * r/w request (see skd_start() above) or a special request.
- 		 */
- 		req_id = cmp_cntxt;
--		req_slot = req_id & SKD_ID_SLOT_AND_TABLE_MASK;
-+		tag = req_id & SKD_ID_SLOT_AND_TABLE_MASK;
- 
- 		/* Is this other than a r/w request? */
--		if (req_slot >= skdev->num_req_context) {
-+		if (tag >= skdev->num_req_context) {
- 			/*
- 			 * This is not a completion for a r/w request.
- 			 */
-+			WARN_ON_ONCE(blk_map_queue_find_tag(skdev->queue->
-+							    queue_tags, tag));
- 			skd_complete_other(skdev, skcmp, skerr);
- 			continue;
- 		}
- 
--		skreq = &skdev->skreq_table[req_slot];
-+		rq = blk_map_queue_find_tag(skdev->queue->queue_tags, tag);
-+		if (WARN(!rq, "No request for tag %#x -> %#x\n", cmp_cntxt,
-+			 tag))
-+			continue;
-+		skreq = skd_skreq_from_rq(skdev, rq);
- 
- 		/*
- 		 * Make sure the request ID for the slot matches.
-@@ -1745,26 +1687,16 @@ static int skd_isr_completion_posted(struct skd_device *skdev,
- 		if (skreq->n_sg > 0)
- 			skd_postop_sg_list(skdev, skreq);
- 
--		if (!skreq->req) {
--			dev_dbg(&skdev->pdev->dev,
--				"NULL backptr skdreq %p, req=0x%x req_id=0x%x\n",
--				skreq, skreq->id, req_id);
--		} else {
--			/*
--			 * Capture the outcome and post it back to the
--			 * native request.
--			 */
--			if (likely(cmp_status == SAM_STAT_GOOD))
--				skd_end_request(skdev, skreq, BLK_STS_OK);
--			else
--				skd_resolve_req_exception(skdev, skreq);
--		}
-+		/* Mark the FIT msg and timeout slot as free. */
-+		skd_release_skreq(skdev, skreq);
- 
- 		/*
--		 * Release the skreq, its FIT msg (if one), timeout slot,
--		 * and queue depth.
-+		 * Capture the outcome and post it back to the native request.
- 		 */
--		skd_release_skreq(skdev, skreq);
-+		if (likely(cmp_status == SAM_STAT_GOOD))
-+			skd_end_request(skdev, rq, BLK_STS_OK);
-+		else
-+			skd_resolve_req_exception(skdev, skreq, rq);
- 
- 		/* skd_isr_comp_limit equal zero means no limit */
- 		if (limit) {
-@@ -2099,44 +2031,26 @@ static void skd_recover_requests(struct skd_device *skdev)
- 
- 	for (i = 0; i < skdev->num_req_context; i++) {
- 		struct skd_request_context *skreq = &skdev->skreq_table[i];
-+		struct request *req = skreq->req;
- 
- 		if (skreq->state == SKD_REQ_STATE_BUSY) {
- 			skd_log_skreq(skdev, skreq, "recover");
- 
- 			SKD_ASSERT((skreq->id & SKD_ID_INCR) != 0);
--			SKD_ASSERT(skreq->req != NULL);
-+			SKD_ASSERT(req != NULL);
- 
- 			/* Release DMA resources for the request. */
- 			if (skreq->n_sg > 0)
- 				skd_postop_sg_list(skdev, skreq);
- 
--			skd_end_request(skdev, skreq, BLK_STS_IOERR);
--
- 			skreq->req = NULL;
- 
- 			skreq->state = SKD_REQ_STATE_IDLE;
- 			skreq->id += SKD_ID_INCR;
--		}
--		if (i > 0)
--			skreq[-1].next = skreq;
--		skreq->next = NULL;
--	}
--	skdev->skreq_free_list = skdev->skreq_table;
--
--	for (i = 0; i < skdev->num_fitmsg_context; i++) {
--		struct skd_fitmsg_context *skmsg = &skdev->skmsg_table[i];
- 
--		if (skmsg->state == SKD_MSG_STATE_BUSY) {
--			skd_log_skmsg(skdev, skmsg, "salvaged");
--			SKD_ASSERT((skmsg->id & SKD_ID_INCR) != 0);
--			skmsg->state = SKD_MSG_STATE_IDLE;
--			skmsg->id += SKD_ID_INCR;
-+			skd_end_request(skdev, req, BLK_STS_IOERR);
- 		}
--		if (i > 0)
--			skmsg[-1].next = skmsg;
--		skmsg->next = NULL;
- 	}
--	skdev->skmsg_free_list = skdev->skmsg_table;
- 
- 	for (i = 0; i < SKD_N_TIMEOUT_SLOT; i++)
- 		skdev->timeout_slot[i] = 0;
-@@ -2876,7 +2790,6 @@ static int skd_cons_skmsg(struct skd_device *skdev)
- 
- 		skmsg->id = i + SKD_ID_FIT_MSG;
- 
--		skmsg->state = SKD_MSG_STATE_IDLE;
- 		skmsg->msg_buf = pci_alloc_consistent(skdev->pdev,
- 						      SKD_N_FITMSG_BYTES,
- 						      &skmsg->mb_dma_address);
-@@ -2891,14 +2804,8 @@ static int skd_cons_skmsg(struct skd_device *skdev)
- 		     "not aligned: msg_buf %p mb_dma_address %#llx\n",
- 		     skmsg->msg_buf, skmsg->mb_dma_address);
- 		memset(skmsg->msg_buf, 0, SKD_N_FITMSG_BYTES);
--
--		skmsg->next = &skmsg[1];
- 	}
- 
--	/* Free list is in order starting with the 0th entry. */
--	skdev->skmsg_table[i - 1].next = NULL;
--	skdev->skmsg_free_list = skdev->skmsg_table;
--
- err_out:
- 	return rc;
- }
-@@ -2958,10 +2865,7 @@ static int skd_cons_skreq(struct skd_device *skdev)
- 		struct skd_request_context *skreq;
- 
- 		skreq = &skdev->skreq_table[i];
--
--		skreq->id = i + SKD_ID_RW_REQUEST;
- 		skreq->state = SKD_REQ_STATE_IDLE;
--
- 		skreq->sg = kcalloc(skdev->sgs_per_request,
- 				    sizeof(struct scatterlist), GFP_KERNEL);
- 		if (skreq->sg == NULL) {
-@@ -2978,14 +2882,8 @@ static int skd_cons_skreq(struct skd_device *skdev)
- 			rc = -ENOMEM;
- 			goto err_out;
- 		}
--
--		skreq->next = &skreq[1];
- 	}
- 
--	/* Free list is in order starting with the 0th entry. */
--	skdev->skreq_table[i - 1].next = NULL;
--	skdev->skreq_free_list = skdev->skreq_table;
--
- err_out:
- 	return rc;
- }
-@@ -3061,6 +2959,8 @@ static int skd_cons_disk(struct skd_device *skdev)
- 		goto err_out;
- 	}
- 	blk_queue_bounce_limit(q, BLK_BOUNCE_HIGH);
-+	q->nr_requests = skd_max_queue_depth / 2;
-+	blk_queue_init_tags(q, skd_max_queue_depth, NULL, BLK_TAG_ALLOC_FIFO);
- 
- 	skdev->queue = q;
- 	disk->queue = q;
-@@ -3789,18 +3689,6 @@ const char *skd_skdev_state_to_str(enum skd_drvr_state state)
- 	}
- }
- 
--static const char *skd_skmsg_state_to_str(enum skd_fit_msg_state state)
--{
--	switch (state) {
--	case SKD_MSG_STATE_IDLE:
--		return "IDLE";
--	case SKD_MSG_STATE_BUSY:
--		return "BUSY";
--	default:
--		return "???";
--	}
--}
--
- static const char *skd_skreq_state_to_str(enum skd_req_state state)
- {
- 	switch (state) {
-@@ -3832,15 +3720,6 @@ static void skd_log_skdev(struct skd_device *skdev, const char *event)
- 		skdev->timeout_stamp, skdev->skcomp_cycle, skdev->skcomp_ix);
- }
- 
--static void skd_log_skmsg(struct skd_device *skdev,
--			  struct skd_fitmsg_context *skmsg, const char *event)
--{
--	dev_dbg(&skdev->pdev->dev, "skmsg=%p event='%s'\n", skmsg, event);
--	dev_dbg(&skdev->pdev->dev, "  state=%s(%d) id=0x%04x length=%d\n",
--		skd_skmsg_state_to_str(skmsg->state), skmsg->state, skmsg->id,
--		skmsg->length);
--}
--
- static void skd_log_skreq(struct skd_device *skdev,
- 			  struct skd_request_context *skreq, const char *event)
- {
+ #endif
 -- 
-2.14.0
+2.9.5
