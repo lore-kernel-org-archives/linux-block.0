@@ -1,48 +1,68 @@
-Return-Path: <prvs=396ff485d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] blk-mq-debugfs: Add names for recently added flags
-Date: Fri, 18 Aug 2017 08:47:11 -0700
-Message-Id: <20170818154711.11906-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:54276 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751056AbdHZQd5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Aug 2017 12:33:57 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 01/14] blk-mq-sched: fix scheduler bad performance
+Date: Sun, 27 Aug 2017 00:33:19 +0800
+Message-Id: <20170826163332.28971-2-ming.lei@redhat.com>
+In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
+References: <20170826163332.28971-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The symbolic constants QUEUE_FLAG_SCSI_PASSTHROUGH, QUEUE_FLAG_QUIESCED
-and REQ_NOWAIT are missing from blk-mq-debugfs.c. Add these to
-blk-mq-debugfs.c such that these appear as names in debugfs instead of
-as numbers.
+When hw queue is busy, we shouldn't take requests from
+scheduler queue any more, otherwise it is difficult to do
+IO merge.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
+This patch fixes the awful IO performance on some
+SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
+is used by not taking requests if hw queue is busy.
+
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/blk-mq-sched.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index e53b6129ca5a..9fac2915d897 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -73,6 +73,8 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(STATS),
- 	QUEUE_FLAG_NAME(POLL_STATS),
- 	QUEUE_FLAG_NAME(REGISTERED),
-+	QUEUE_FLAG_NAME(PASSTHROUGH),
-+	QUEUE_FLAG_NAME(QUIESCED),
- };
- #undef QUEUE_FLAG_NAME
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4ab69435708c..845e5baf8af1 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+-	bool did_work = false;
++	bool do_sched_dispatch = true;
+ 	LIST_HEAD(rq_list);
  
-@@ -263,6 +265,7 @@ static const char *const cmd_flag_name[] = {
- 	CMD_FLAG_NAME(RAHEAD),
- 	CMD_FLAG_NAME(BACKGROUND),
- 	CMD_FLAG_NAME(NOUNMAP),
-+	CMD_FLAG_NAME(NOWAIT),
- };
- #undef CMD_FLAG_NAME
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -125,7 +125,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
++		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+ 	} else if (!has_sched_dispatch) {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+@@ -136,7 +136,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * on the dispatch list, OR if we did have work but weren't able
+ 	 * to make progress.
+ 	 */
+-	if (!did_work && has_sched_dispatch) {
++	if (do_sched_dispatch && has_sched_dispatch) {
+ 		do {
+ 			struct request *rq;
  
 -- 
-2.14.0
+2.9.5
