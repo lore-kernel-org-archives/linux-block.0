@@ -1,41 +1,30 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 29 Aug 2017 08:24:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Shaohua Li <shli@kernel.org>
+Return-Path: <oleksandr@natalenko.name>
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org, Shaohua Li <shli@kernel.org>
 Subject: Re: I/O hangs after resuming from suspend-to-ram
-Message-ID: <20170829002425.GA28904@ming.t460p>
-References: <3926917.BCSovyVWdL@natalenko.name>
- <4174287.OjL0pO8MRx@natalenko.name>
- <20170828125822.GA19670@ming.t460p>
- <1615033.Xza1AIGLzP@natalenko.name>
+Date: Mon, 28 Aug 2017 20:22:26 +0200
+Message-ID: <1615033.Xza1AIGLzP@natalenko.name>
+In-Reply-To: <20170828125822.GA19670@ming.t460p>
+References: <3926917.BCSovyVWdL@natalenko.name> <4174287.OjL0pO8MRx@natalenko.name> <20170828125822.GA19670@ming.t460p>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1615033.Xza1AIGLzP@natalenko.name>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 28, 2017 at 08:22:26PM +0200, Oleksandr Natalenko wrote:
-> Hi.
-> 
-> On pondělí 28. srpna 2017 14:58:28 CEST Ming Lei wrote:
-> > Could you verify if the following patch fixes your issue?
-> > …SNIP…
-> 
-> I've applied it to v4.12.9 and rechecked — the issue is still there, 
-> unfortunately. Stacktrace is the same as before.
-> 
-> Were you able to reproduce it in a VM?
+Hi.
 
-Yes, I can.
+On pond=C4=9Bl=C3=AD 28. srpna 2017 14:58:28 CEST Ming Lei wrote:
+> Could you verify if the following patch fixes your issue?
+> =E2=80=A6SNIP=E2=80=A6
 
-> 
-> Should I re-check it with v4.13-rc7?
-> 
-> Any other suggestions?
+I've applied it to v4.12.9 and rechecked =E2=80=94 the issue is still there=
+,=20
+unfortunately. Stacktrace is the same as before.
 
-Please test it with v4.13-rc7 first.
+Were you able to reproduce it in a VM?
 
--- 
-Ming
+Should I re-check it with v4.13-rc7?
+
+Any other suggestions?
+
+Thanks.
