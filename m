@@ -1,43 +1,44 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <bo.li.liu@oracle.com>
+Date: Mon, 28 Aug 2017 12:07:37 -0600
+From: Liu Bo <bo.li.liu@oracle.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
 Subject: Re: [PATCH RFC] Block/blk-wbt: do not let background writes block
  sync writes
-To: bo.li.liu@oracle.com
-Cc: linux-block@vger.kernel.org
+Message-ID: <20170828180737.GA27599@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
+Reply-To: bo.li.liu@oracle.com
 References: <20170826001427.23012-1-bo.li.liu@oracle.com>
  <b73a59d9-952b-d1f0-aa0a-86ba2b60a52c@kernel.dk>
  <20170828174531.GA21790@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6d776a8d-e7ba-341e-33a7-bed0455d6e75@kernel.dk>
-Date: Mon, 28 Aug 2017 15:05:14 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170828174531.GA21790@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/28/2017 11:45 AM, Liu Bo wrote:
+On Mon, Aug 28, 2017 at 11:45:31AM -0600, Liu Bo wrote:
 > On Sun, Aug 27, 2017 at 11:14:20AM -0600, Jens Axboe wrote:
->> On 08/25/2017 06:14 PM, Liu Bo wrote:
->>> While using blk-wbt, sometimes sync writes are blocked by background
->>> writes, for example,
->>>
->>> a) a background write reaches the (background) limit returned by
->>> get_limit(), so it's added into the rqw->wait (non kswapd's rqw in
->>> this case) and goes to sleep.
->>>
->>> b) then a sync write gets queued and goes to sleep when finding that
->>> waitqueue_active() returns true and someone else is already on the
->>> waiting list.
->>>
->>> Thus, the sync write will get its rq after the background write
->>> getting rq.
->>>
->>> With this, only background writes will check waitqueue's status and
->>> sync writes will only be throttled by the (max) limit returned by
->>> get_limit().
->>
->> Curious how you ran into this. Is this just speculation, or is it
->> observed behavior?
->>
+> > On 08/25/2017 06:14 PM, Liu Bo wrote:
+> > > While using blk-wbt, sometimes sync writes are blocked by background
+> > > writes, for example,
+> > > 
+> > > a) a background write reaches the (background) limit returned by
+> > > get_limit(), so it's added into the rqw->wait (non kswapd's rqw in
+> > > this case) and goes to sleep.
+> > > 
+> > > b) then a sync write gets queued and goes to sleep when finding that
+> > > waitqueue_active() returns true and someone else is already on the
+> > > waiting list.
+> > > 
+> > > Thus, the sync write will get its rq after the background write
+> > > getting rq.
+> > > 
+> > > With this, only background writes will check waitqueue's status and
+> > > sync writes will only be throttled by the (max) limit returned by
+> > > get_limit().
+> > 
+> > Curious how you ran into this. Is this just speculation, or is it
+> > observed behavior?
+> >
 > 
 > I got that from a simple test,
 > 
@@ -134,17 +135,17 @@ On 08/28/2017 11:45 AM, Liu Bo wrote:
 > 						(wb write and write with O_SYNC got waked up one by one)
 > 
 > 
->> I don't think the patch makes sense, conceptually. If you end up in
->> may_queue(), you are (by definition) in a class of writes that
->> should be throttled. Skipping the wait line would be unfair.
->>
+> > I don't think the patch makes sense, conceptually. If you end up in
+> > may_queue(), you are (by definition) in a class of writes that
+> > should be throttled. Skipping the wait line would be unfair.
+> >
 > 
 > OK, got it.
 > 
->> One modification would be to check the depth, as we assign
->> different allowances to different types of writes. If the sync
->> write isn't above it's limit, we should not sleep.
->>
+> > One modification would be to check the depth, as we assign
+> > different allowances to different types of writes. If the sync
+> > write isn't above it's limit, we should not sleep.
+> >
 > 
 > Yeah, that seems better, so it'd be like
 > 
@@ -155,24 +156,15 @@ On 08/28/2017 11:45 AM, Liu Bo wrote:
 > if (waitqueue_active(&rqw->wait) &&
 >     rqw->wait.head.next != &wait->entry)
 > 	return false;
-
-I thought a bit more about this, and one potential issue with doing it
-this way, is that we'll potentially starve the background writes
-forever. Let's say in the current system the stable limits are 4/8/16
-for background/normal/high priority writes. Let's further assume that we
-have some normal or sync writers that keep the queue depth at eg 6.
-Background writes would be added to the wait queue, and the normal write
-would proceed. If the normal write keeps the queue depth over the
-background limit, then we'll never do any background writes. That's
-probably worse than the current approach, since at least'll we'll ensure
-forward progress.
-
-We could split the wait queues for the bg/normal/high priority writes,
-and add some heuristics to ensure fairness.
-
+> 
+> 
 > What about kswapd?  It's also a high priority write, isn't it?
 
-As you discovered in the next email, kswapd has its own wait queue.
+I think it would be fine without checking kswapd as it has a different
+%rqw.
 
--- 
-Jens Axboe
+I'll send a updated one if the above code looks OK.
+
+Thanks,
+
+-liubo
