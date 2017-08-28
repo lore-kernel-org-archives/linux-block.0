@@ -1,121 +1,54 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 29 Aug 2017 19:16:20 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Call .initialize_rq_fn() also for filesystem
  requests
-Message-ID: <20170829111619.GE32439@ming.t460p>
+Date: Mon, 28 Aug 2017 18:31:33 +0000
+Message-ID: <1503945091.2841.50.camel@wdc.com>
 References: <20170825190057.15592-1-bart.vanassche@wdc.com>
- <20170828081017.GC2851@lst.de>
- <1503945091.2841.50.camel@wdc.com>
+	 <20170828081017.GC2851@lst.de>
+In-Reply-To: <20170828081017.GC2851@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1503945091.2841.50.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 28, 2017 at 06:31:33PM +0000, Bart Van Assche wrote:
-> On Mon, 2017-08-28 at 10:10 +0200, Christoph Hellwig wrote:
-> > I still disagree that we should have an indirect function call like this
-> > in the fast path.
-> > 
-> > All that can be done by clearing or setting a flag on the first call to
-> > ->queue_rq or ->queuecommand instead.  In NVMe we use RQF_DONTPREP for
-> > that, but for SCSI we probably can't use that given that it has more
-> > meaning for the old request path.  But how about just adding a new
-> > RQD_DRV_INITIALIZED or similar flag?
-> 
-> Hello Christoph,
-> 
-> Sorry but I'm not enthusiast about the proposal to introduce a
-> RQD_DRV_INITIALIZED or similar flag. That approach involves an annoying
-> behavior difference, namely that .initialize_rq_fn() would be called from
-> inside blk_get_request() for pass-through requests and from inside the prep
-> function for filesystem requests. Another disadvantage of that approach is
-> that the block layer core never clears request.atomic_flags completely but
-> only sets and clears individual flags. The SCSI core would have to follow
-> that model and hence code for clearing RQD_DRV_INITIALIZED would have to be
-> added to all request completion paths in the SCSI core.
-> 
-> Have you noticed that Ming Lei's patch series introduces several new atomic
-> operations in the hot path? I'm referring here to the BLK_MQ_S_DISPATCH_BUSY
-> manipulations. Have you noticed that for SCSI drivers these patches introduce
-> an overhead between 0.1 and 1.0 microseconds per I/O request in the hot path?
-> I have derived these numbers from the random write SRP performance numbers
-> as follows: 1/142460 - 1/142990 = 2.6 microseconds. That number has to be
-> multiplied with the number of I/O requests processed in parallel. The number
-> of jobs in Ming Lei's test was 64 but that's probably way higher than the
-> actual I/O parallelism.
-
-Hi Bart,
-
-Did you see perf regression on SRP with smaller jobs after applying
-my patchset V3?
-
-I just run the test with 16 jobs(the system has 16 CPU cores) instead of 64,
-looks not see perf regression on SRP about v4.13-rc6+blk-next(2nd column) VS.
-v4.13-rc6+blk-next+patch V3(3rd column):
-
-
----------------------------------------
- IOPS(K)  |    NONE     |    NONE
----------------------------------------
-read      |      475.83 |      485.88
----------------------------------------
-randread  |      142.86 |      141.96
----------------------------------------
-write     |       483.9 |      492.39
----------------------------------------
-randwrite |      124.83 |      124.53
----------------------------------------
-
-
-
----------------------------------------
- CPU(%)   |    NONE     |    NONE
----------------------------------------
-read      |       15.43 |       15.81
----------------------------------------
-randread  |        9.87 |        9.75
----------------------------------------
-write     |       17.67 |       18.34
----------------------------------------
-randwrite |       10.96 |       10.56
----------------------------------------
-
-
-
----------------------------------------
- LAT(us)  |    NONE     |    NONE
----------------------------------------
-read      |        2.15 |        2.11
----------------------------------------
-randread  |        7.17 |        7.21
----------------------------------------
-write     |        2.11 |        2.08
----------------------------------------
-randwrite |         8.2 |        8.22
----------------------------------------
-
-
-
----------------------------------------
-MERGE(K)  |    NONE     |    NONE
----------------------------------------
-read      |     8798.59 |     9064.09
----------------------------------------
-randread  |        0.02 |        0.19
----------------------------------------
-write     |     8847.73 |     9102.18
----------------------------------------
-randwrite |        0.03 |        0.13
----------------------------------------
-
-
-
--- 
-Ming
+T24gTW9uLCAyMDE3LTA4LTI4IGF0IDEwOjEwICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gSSBzdGlsbCBkaXNhZ3JlZSB0aGF0IHdlIHNob3VsZCBoYXZlIGFuIGluZGlyZWN0IGZ1
+bmN0aW9uIGNhbGwgbGlrZSB0aGlzDQo+IGluIHRoZSBmYXN0IHBhdGguDQo+IA0KPiBBbGwgdGhh
+dCBjYW4gYmUgZG9uZSBieSBjbGVhcmluZyBvciBzZXR0aW5nIGEgZmxhZyBvbiB0aGUgZmlyc3Qg
+Y2FsbCB0bw0KPiAtPnF1ZXVlX3JxIG9yIC0+cXVldWVjb21tYW5kIGluc3RlYWQuICBJbiBOVk1l
+IHdlIHVzZSBSUUZfRE9OVFBSRVAgZm9yDQo+IHRoYXQsIGJ1dCBmb3IgU0NTSSB3ZSBwcm9iYWJs
+eSBjYW4ndCB1c2UgdGhhdCBnaXZlbiB0aGF0IGl0IGhhcyBtb3JlDQo+IG1lYW5pbmcgZm9yIHRo
+ZSBvbGQgcmVxdWVzdCBwYXRoLiAgQnV0IGhvdyBhYm91dCBqdXN0IGFkZGluZyBhIG5ldw0KPiBS
+UURfRFJWX0lOSVRJQUxJWkVEIG9yIHNpbWlsYXIgZmxhZz8NCg0KSGVsbG8gQ2hyaXN0b3BoLA0K
+DQpTb3JyeSBidXQgSSdtIG5vdCBlbnRodXNpYXN0IGFib3V0IHRoZSBwcm9wb3NhbCB0byBpbnRy
+b2R1Y2UgYQ0KUlFEX0RSVl9JTklUSUFMSVpFRCBvciBzaW1pbGFyIGZsYWcuIFRoYXQgYXBwcm9h
+Y2ggaW52b2x2ZXMgYW4gYW5ub3lpbmcNCmJlaGF2aW9yIGRpZmZlcmVuY2UsIG5hbWVseSB0aGF0
+IC5pbml0aWFsaXplX3JxX2ZuKCkgd291bGQgYmUgY2FsbGVkIGZyb20NCmluc2lkZSBibGtfZ2V0
+X3JlcXVlc3QoKSBmb3IgcGFzcy10aHJvdWdoIHJlcXVlc3RzIGFuZCBmcm9tIGluc2lkZSB0aGUg
+cHJlcA0KZnVuY3Rpb24gZm9yIGZpbGVzeXN0ZW0gcmVxdWVzdHMuIEFub3RoZXIgZGlzYWR2YW50
+YWdlIG9mIHRoYXQgYXBwcm9hY2ggaXMNCnRoYXQgdGhlIGJsb2NrIGxheWVyIGNvcmUgbmV2ZXIg
+Y2xlYXJzIHJlcXVlc3QuYXRvbWljX2ZsYWdzIGNvbXBsZXRlbHkgYnV0DQpvbmx5IHNldHMgYW5k
+IGNsZWFycyBpbmRpdmlkdWFsIGZsYWdzLiBUaGUgU0NTSSBjb3JlIHdvdWxkIGhhdmUgdG8gZm9s
+bG93DQp0aGF0IG1vZGVsIGFuZCBoZW5jZSBjb2RlIGZvciBjbGVhcmluZyBSUURfRFJWX0lOSVRJ
+QUxJWkVEIHdvdWxkIGhhdmUgdG8gYmUNCmFkZGVkIHRvIGFsbCByZXF1ZXN0IGNvbXBsZXRpb24g
+cGF0aHMgaW4gdGhlIFNDU0kgY29yZS4NCg0KSGF2ZSB5b3Ugbm90aWNlZCB0aGF0IE1pbmcgTGVp
+J3MgcGF0Y2ggc2VyaWVzIGludHJvZHVjZXMgc2V2ZXJhbCBuZXcgYXRvbWljDQpvcGVyYXRpb25z
+IGluIHRoZSBob3QgcGF0aD8gSSdtIHJlZmVycmluZyBoZXJlIHRvIHRoZSBCTEtfTVFfU19ESVNQ
+QVRDSF9CVVNZDQptYW5pcHVsYXRpb25zLiBIYXZlIHlvdSBub3RpY2VkIHRoYXQgZm9yIFNDU0kg
+ZHJpdmVycyB0aGVzZSBwYXRjaGVzIGludHJvZHVjZQ0KYW4gb3ZlcmhlYWQgYmV0d2VlbiAwLjEg
+YW5kIDEuMCBtaWNyb3NlY29uZHMgcGVyIEkvTyByZXF1ZXN0IGluIHRoZSBob3QgcGF0aD8NCkkg
+aGF2ZSBkZXJpdmVkIHRoZXNlIG51bWJlcnMgZnJvbSB0aGUgcmFuZG9tIHdyaXRlIFNSUCBwZXJm
+b3JtYW5jZSBudW1iZXJzDQphcyBmb2xsb3dzOiAxLzE0MjQ2MCAtIDEvMTQyOTkwID0gMi42IG1p
+Y3Jvc2Vjb25kcy4gVGhhdCBudW1iZXIgaGFzIHRvIGJlDQptdWx0aXBsaWVkIHdpdGggdGhlIG51
+bWJlciBvZiBJL08gcmVxdWVzdHMgcHJvY2Vzc2VkIGluIHBhcmFsbGVsLiBUaGUgbnVtYmVyDQpv
+ZiBqb2JzIGluIE1pbmcgTGVpJ3MgdGVzdCB3YXMgNjQgYnV0IHRoYXQncyBwcm9iYWJseSB3YXkg
+aGlnaGVyIHRoYW4gdGhlDQphY3R1YWwgSS9PIHBhcmFsbGVsaXNtLg0KDQpIYXZlIHlvdSBub3Rp
+Y2VkIHRoYXQgbXkgcGF0Y2ggZGlkIG5vdCBhZGQgYW55IGF0b21pYyBpbnN0cnVjdGlvbnMgdG8g
+dGhlIGhvdA0KcGF0aCBidXQgb25seSBhIHJlYWQgb2YgYSBmdW5jdGlvbiBwb2ludGVyIHRoYXQg
+c2hvdWxkIGFscmVhZHkgYmUgY2FjaGUgaG90Pw0KQXMgeW91IGtub3cgbW9kZXJuIENQVXMgYXJl
+IGdvb2QgYXQgcHJlZGljdGluZyBicmFuY2hlcy4gQXJlIHlvdSBzdXJlIHRoYXQgbXkNCnBhdGNo
+IHdpbGwgaGF2ZSBhIG1lYXN1cmFibGUgcGVyZm9ybWFuY2UgaW1wYWN0Pw0KDQpCYXJ0Lg==
