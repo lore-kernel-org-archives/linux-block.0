@@ -1,54 +1,25 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <hch@lst.de>
+Date: Mon, 28 Aug 2017 10:10:17 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.com>
 Subject: Re: [PATCH] block: Call .initialize_rq_fn() also for filesystem
- requests
-Date: Mon, 28 Aug 2017 18:31:33 +0000
-Message-ID: <1503945091.2841.50.camel@wdc.com>
+	requests
+Message-ID: <20170828081017.GC2851@lst.de>
 References: <20170825190057.15592-1-bart.vanassche@wdc.com>
-	 <20170828081017.GC2851@lst.de>
-In-Reply-To: <20170828081017.GC2851@lst.de>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170825190057.15592-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTA4LTI4IGF0IDEwOjEwICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gSSBzdGlsbCBkaXNhZ3JlZSB0aGF0IHdlIHNob3VsZCBoYXZlIGFuIGluZGlyZWN0IGZ1
-bmN0aW9uIGNhbGwgbGlrZSB0aGlzDQo+IGluIHRoZSBmYXN0IHBhdGguDQo+IA0KPiBBbGwgdGhh
-dCBjYW4gYmUgZG9uZSBieSBjbGVhcmluZyBvciBzZXR0aW5nIGEgZmxhZyBvbiB0aGUgZmlyc3Qg
-Y2FsbCB0bw0KPiAtPnF1ZXVlX3JxIG9yIC0+cXVldWVjb21tYW5kIGluc3RlYWQuICBJbiBOVk1l
-IHdlIHVzZSBSUUZfRE9OVFBSRVAgZm9yDQo+IHRoYXQsIGJ1dCBmb3IgU0NTSSB3ZSBwcm9iYWJs
-eSBjYW4ndCB1c2UgdGhhdCBnaXZlbiB0aGF0IGl0IGhhcyBtb3JlDQo+IG1lYW5pbmcgZm9yIHRo
-ZSBvbGQgcmVxdWVzdCBwYXRoLiAgQnV0IGhvdyBhYm91dCBqdXN0IGFkZGluZyBhIG5ldw0KPiBS
-UURfRFJWX0lOSVRJQUxJWkVEIG9yIHNpbWlsYXIgZmxhZz8NCg0KSGVsbG8gQ2hyaXN0b3BoLA0K
-DQpTb3JyeSBidXQgSSdtIG5vdCBlbnRodXNpYXN0IGFib3V0IHRoZSBwcm9wb3NhbCB0byBpbnRy
-b2R1Y2UgYQ0KUlFEX0RSVl9JTklUSUFMSVpFRCBvciBzaW1pbGFyIGZsYWcuIFRoYXQgYXBwcm9h
-Y2ggaW52b2x2ZXMgYW4gYW5ub3lpbmcNCmJlaGF2aW9yIGRpZmZlcmVuY2UsIG5hbWVseSB0aGF0
-IC5pbml0aWFsaXplX3JxX2ZuKCkgd291bGQgYmUgY2FsbGVkIGZyb20NCmluc2lkZSBibGtfZ2V0
-X3JlcXVlc3QoKSBmb3IgcGFzcy10aHJvdWdoIHJlcXVlc3RzIGFuZCBmcm9tIGluc2lkZSB0aGUg
-cHJlcA0KZnVuY3Rpb24gZm9yIGZpbGVzeXN0ZW0gcmVxdWVzdHMuIEFub3RoZXIgZGlzYWR2YW50
-YWdlIG9mIHRoYXQgYXBwcm9hY2ggaXMNCnRoYXQgdGhlIGJsb2NrIGxheWVyIGNvcmUgbmV2ZXIg
-Y2xlYXJzIHJlcXVlc3QuYXRvbWljX2ZsYWdzIGNvbXBsZXRlbHkgYnV0DQpvbmx5IHNldHMgYW5k
-IGNsZWFycyBpbmRpdmlkdWFsIGZsYWdzLiBUaGUgU0NTSSBjb3JlIHdvdWxkIGhhdmUgdG8gZm9s
-bG93DQp0aGF0IG1vZGVsIGFuZCBoZW5jZSBjb2RlIGZvciBjbGVhcmluZyBSUURfRFJWX0lOSVRJ
-QUxJWkVEIHdvdWxkIGhhdmUgdG8gYmUNCmFkZGVkIHRvIGFsbCByZXF1ZXN0IGNvbXBsZXRpb24g
-cGF0aHMgaW4gdGhlIFNDU0kgY29yZS4NCg0KSGF2ZSB5b3Ugbm90aWNlZCB0aGF0IE1pbmcgTGVp
-J3MgcGF0Y2ggc2VyaWVzIGludHJvZHVjZXMgc2V2ZXJhbCBuZXcgYXRvbWljDQpvcGVyYXRpb25z
-IGluIHRoZSBob3QgcGF0aD8gSSdtIHJlZmVycmluZyBoZXJlIHRvIHRoZSBCTEtfTVFfU19ESVNQ
-QVRDSF9CVVNZDQptYW5pcHVsYXRpb25zLiBIYXZlIHlvdSBub3RpY2VkIHRoYXQgZm9yIFNDU0kg
-ZHJpdmVycyB0aGVzZSBwYXRjaGVzIGludHJvZHVjZQ0KYW4gb3ZlcmhlYWQgYmV0d2VlbiAwLjEg
-YW5kIDEuMCBtaWNyb3NlY29uZHMgcGVyIEkvTyByZXF1ZXN0IGluIHRoZSBob3QgcGF0aD8NCkkg
-aGF2ZSBkZXJpdmVkIHRoZXNlIG51bWJlcnMgZnJvbSB0aGUgcmFuZG9tIHdyaXRlIFNSUCBwZXJm
-b3JtYW5jZSBudW1iZXJzDQphcyBmb2xsb3dzOiAxLzE0MjQ2MCAtIDEvMTQyOTkwID0gMi42IG1p
-Y3Jvc2Vjb25kcy4gVGhhdCBudW1iZXIgaGFzIHRvIGJlDQptdWx0aXBsaWVkIHdpdGggdGhlIG51
-bWJlciBvZiBJL08gcmVxdWVzdHMgcHJvY2Vzc2VkIGluIHBhcmFsbGVsLiBUaGUgbnVtYmVyDQpv
-ZiBqb2JzIGluIE1pbmcgTGVpJ3MgdGVzdCB3YXMgNjQgYnV0IHRoYXQncyBwcm9iYWJseSB3YXkg
-aGlnaGVyIHRoYW4gdGhlDQphY3R1YWwgSS9PIHBhcmFsbGVsaXNtLg0KDQpIYXZlIHlvdSBub3Rp
-Y2VkIHRoYXQgbXkgcGF0Y2ggZGlkIG5vdCBhZGQgYW55IGF0b21pYyBpbnN0cnVjdGlvbnMgdG8g
-dGhlIGhvdA0KcGF0aCBidXQgb25seSBhIHJlYWQgb2YgYSBmdW5jdGlvbiBwb2ludGVyIHRoYXQg
-c2hvdWxkIGFscmVhZHkgYmUgY2FjaGUgaG90Pw0KQXMgeW91IGtub3cgbW9kZXJuIENQVXMgYXJl
-IGdvb2QgYXQgcHJlZGljdGluZyBicmFuY2hlcy4gQXJlIHlvdSBzdXJlIHRoYXQgbXkNCnBhdGNo
-IHdpbGwgaGF2ZSBhIG1lYXN1cmFibGUgcGVyZm9ybWFuY2UgaW1wYWN0Pw0KDQpCYXJ0Lg==
+I still disagree that we should have an indirect function call like this
+in the fast path.
+
+All that can be done by clearing or setting a flag on the first call to
+->queue_rq or ->queuecommand instead.  In NVMe we use RQF_DONTPREP for
+that, but for SCSI we probablt can't use that given that it has more
+meaning for the old request path.  But how about just adding a new
+RQD_DRV_INITIALIZED or similar flag?
