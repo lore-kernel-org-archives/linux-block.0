@@ -1,69 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754704AbdHYMui (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 08:50:38 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V6 02/12] mmc: block: Fix block status codes
-Date: Fri, 25 Aug 2017 15:43:45 +0300
-Message-Id: <1503665035-16231-3-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+Received: from mail-pg0-f42.google.com ([74.125.83.42]:36947 "EHLO
+        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751232AbdH1PJ0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Aug 2017 11:09:26 -0400
+Received: by mail-pg0-f42.google.com with SMTP id 83so2217684pgb.4
+        for <linux-block@vger.kernel.org>; Mon, 28 Aug 2017 08:09:26 -0700 (PDT)
+MIME-Version: 1.0
+From: John Groves <John@groves.net>
+Date: Mon, 28 Aug 2017 10:09:04 -0500
+Message-ID: <CALz7SpXrV2KLNJ+jOvuYkx7HDDxGt19g4ByTyZn_f1UAqmAhsQ@mail.gmail.com>
+Subject: FUA, PREFLUSH, VWC redux
+To: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Commit 2a842acab109 ("block: introduce new block status code type") changed
-the error type but not in patches merged through the mmc tree, like
-commit 0493f6fe5bde ("mmc: block: Move boot partition locking into a driver
-op"). Fix one error code that is incorrect and also use BLK_STS_OK in
-preference to 0.
+I'm hoping somebody can clarify the correct PREFLUSH and FUA behavior from a
+block stack client.  I'm starting to suspect that some of my devices are
+failing to inform the block stack correctly of their capabilities - leading
+to expensive and unnecessary flushes.
 
-Fixes: 17ece345a042 ("Merge tag 'mmc-v4.13' of git://git.kernel.org/pub/scm/linux/kernel/git/ulfh/mmc")
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+My understanding is this:
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 0eebc2f726c3..2f00d11adfa9 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1223,7 +1223,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
- 		break;
- 	}
- 	mq_rq->drv_op_result = ret;
--	blk_end_request_all(req, ret);
-+	blk_end_request_all(req, ret ? BLK_STS_IOERR : BLK_STS_OK);
- }
- 
- static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
-@@ -1728,9 +1728,9 @@ static bool mmc_blk_rw_cmd_err(struct mmc_blk_data *md, struct mmc_card *card,
- 		if (err)
- 			req_pending = old_req_pending;
- 		else
--			req_pending = blk_end_request(req, 0, blocks << 9);
-+			req_pending = blk_end_request(req, BLK_STS_OK, blocks << 9);
- 	} else {
--		req_pending = blk_end_request(req, 0, brq->data.bytes_xfered);
-+		req_pending = blk_end_request(req, BLK_STS_OK, brq->data.bytes_xfered);
- 	}
- 	return req_pending;
- }
--- 
-1.9.1
+* If I require confirmation that a single write is durable upon
+completion, attach REQ_FUA to the bio.
+* If I require that the current write plus all previously completed
+writes be durable as of completion of the current write, attach
+REQ_FUA and REQ_PREFLUSH to the bio.
+* Both REQ_FUA and REQ_PREFLUSH should be NOPs on a device with with a
+non-volatile write cache.
+
+But I have a small problem - I don't know which write is last, until I
+receive a Commit call.  That means that at Commit time, I should send
+a "FLUSH".
+
+I am calling a function based on blkdev_issue_flush(), but this causes
+I big performance penalty even though my nvme ssd has VWC==0.
+
+Does this make sense?
+
+Perhaps blkdev_issue_flush() is intended to flush caches even if they
+are non-volatile?
+
+What is the "correct" way to get a "REQ_PREFLUSH" with a zero length
+write, if not via blkdev_issue_flush()?
+
+Thanks for any tips,
+John Groves
