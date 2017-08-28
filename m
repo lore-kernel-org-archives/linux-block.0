@@ -1,142 +1,178 @@
-Return-Path: <mgorman@techsingularity.net>
-Date: Thu, 3 Aug 2017 09:51:16 +0100
-From: Mel Gorman <mgorman@techsingularity.net>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: Switching to MQ by default may generate some bug reports
-Message-ID: <20170803085115.r2jfz2lofy5spfdb@techsingularity.net>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH RFC] Block/blk-wbt: do not let background writes block
+ sync writes
+To: bo.li.liu@oracle.com
+Cc: linux-block@vger.kernel.org
+References: <20170826001427.23012-1-bo.li.liu@oracle.com>
+ <b73a59d9-952b-d1f0-aa0a-86ba2b60a52c@kernel.dk>
+ <20170828174531.GA21790@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6d776a8d-e7ba-341e-33a7-bed0455d6e75@kernel.dk>
+Date: Mon, 28 Aug 2017 15:05:14 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+In-Reply-To: <20170828174531.GA21790@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Christoph,
+On 08/28/2017 11:45 AM, Liu Bo wrote:
+> On Sun, Aug 27, 2017 at 11:14:20AM -0600, Jens Axboe wrote:
+>> On 08/25/2017 06:14 PM, Liu Bo wrote:
+>>> While using blk-wbt, sometimes sync writes are blocked by background
+>>> writes, for example,
+>>>
+>>> a) a background write reaches the (background) limit returned by
+>>> get_limit(), so it's added into the rqw->wait (non kswapd's rqw in
+>>> this case) and goes to sleep.
+>>>
+>>> b) then a sync write gets queued and goes to sleep when finding that
+>>> waitqueue_active() returns true and someone else is already on the
+>>> waiting list.
+>>>
+>>> Thus, the sync write will get its rq after the background write
+>>> getting rq.
+>>>
+>>> With this, only background writes will check waitqueue's status and
+>>> sync writes will only be throttled by the (max) limit returned by
+>>> get_limit().
+>>
+>> Curious how you ran into this. Is this just speculation, or is it
+>> observed behavior?
+>>
+> 
+> I got that from a simple test,
+> 
+> xfs_io -f -c "falloc 0 4K" /mnt/btrfs/foobar
+> xfs_io -f -c "falloc 0 5G" /mnt/btrfs/dummy
+> xfs_io -f -c "pwrite -b 128M 0 5G" /mnt/btrfs/dummy &
+> 
+> off=0
+> while true; do
+>         date
+> 	let $((off = off + 1))
+>         xfs_io -s -c "pwrite $off 1"  /mnt/btrfs/foobar > /dev/null
+>         sleep 1
+> done
+> 
+> ---
+> 
+> So a lot of writeback is happening in background, and a write with
+> O_SYNC is issued every 1 sec.
+> 
+> My ftrace observation shows that, write with O_SYNC is waiting in
+> may_queue() because of the running writeback writes.
+> 
+>    kworker/u16:2-137   [003] ....  3104.193996: block_bio_queue: 8,64 W 8751312 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.194003: may_queue.part.12: inflight 23 limit 24 wait ffffc900007cb500
+>    kworker/u16:2-137   [003] ....  3104.194003: block_getrq: 8,64 W 8751312 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.194004: blk_mq_flush_plug_list <-blk_flush_plug_list
+>    kworker/u16:2-137   [003] ....  3104.194004: block_unplug: [kworker/u16:2] 1
+>    kworker/u16:2-137   [003] ....  3104.194005: block_rq_insert: 8,64 W 1048576 () 8749264 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.194006: block_rq_issue: 8,64 W 1048576 () 8749264 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.194017: block_plug: [kworker/u16:2]
+>    kworker/u16:2-137   [003] d.h.  3104.194454: block_rq_complete: 8,64 W () 8704208 + 2048 [0]
+>    kworker/u16:2-137   [003] ....  3104.194978: block_bio_queue: 8,64 W 8753360 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.194985: may_queue.part.12: inflight 23 limit 24 wait ffffc900007cb500
+>    kworker/u16:2-137   [003] ....  3104.194985: block_getrq: 8,64 W 8753360 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.194986: blk_mq_flush_plug_list <-blk_flush_plug_list
+>    kworker/u16:2-137   [003] ....  3104.194987: block_unplug: [kworker/u16:2] 1
+>    kworker/u16:2-137   [003] ....  3104.194987: block_rq_insert: 8,64 W 1048576 () 8751312 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.194990: block_rq_issue: 8,64 W 1048576 () 8751312 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.195001: block_plug: [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.195654: block_bio_queue: 8,64 W 8755408 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.195661: may_queue.part.12: inflight 24 limit 24 wait ffffc900007cb500
+>    kworker/u16:2-137   [003] ....  3104.195662: may_queue.part.12: inflight 24 limit 24 wait ffffc900007cb500
+>                                                                    ^^^^^^^^^^^^^^^
+> 								   (wb write puts itself on rqw->wait when reaching the limit)
+> 								   
+>    kworker/u16:2-137   [003] ....  3104.195662: io_schedule <-wbt_wait
+>    kworker/u16:2-137   [003] ....  3104.195662: blk_mq_flush_plug_list <-blk_flush_plug_list
+>    kworker/u16:2-137   [003] ....  3104.195663: block_unplug: [kworker/u16:2] 1
+>    kworker/u16:2-137   [003] ....  3104.195663: block_rq_insert: 8,64 W 1048576 () 8753360 + 2048 [kworker/u16:2]
+>     kworker/3:1H-162   [003] ....  3104.195680: block_rq_issue: 8,64 W 1048576 () 8753360 + 2048 [kworker/3:1H]
+>           <idle>-0     [003] d.h.  3104.200533: block_rq_complete: 8,64 W () 8706256 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.205473: block_rq_complete: 8,64 W () 8708304 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.211451: block_rq_complete: 8,64 W () 8710352 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.216163: block_rq_complete: 8,64 W () 8712400 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.222072: block_rq_complete: 8,64 W () 8714448 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.226931: block_rq_complete: 8,64 W () 8716496 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.232915: block_rq_complete: 8,64 W () 8718544 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.238851: block_rq_complete: 8,64 W () 8720592 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.243593: block_rq_complete: 8,64 W () 8722640 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.249667: block_rq_complete: 8,64 W () 8724688 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.254248: block_rq_complete: 8,64 W () 8726736 + 2048 [0]
+>           xfs_io-1045  [007] ....  3104.254347: btrfs_sync_file: 77102a7b-fc17-42cb-afb7-ac57020b6bfb: root=5(FS_TREE) ino=257 parent=256 datasync=0
+>           xfs_io-1045  [007] ....  3104.254384: cow_file_range.isra.58: ino 257 start 0x0 disk_num_bytes 0x1000
+>           xfs_io-1045  [007] ....  3104.254402: btrfs_ordered_extent_add: 77102a7b-fc17-42cb-afb7-ac57020b6bfb: root=5(FS_TREE) ino=257 file_offset=0 start=12615680 len=4096 disk_len=4096 truncated_len=18446744073709551615 bytes_left=4096 flags= compress_type=0 refs=1
+>           xfs_io-1045  [007] ....  3104.254441: block_bio_queue: 8,64 WS 24640 + 8 [xfs_io]
+>           xfs_io-1045  [007] ....  3104.254446: wbt_wait: someone is waiting ffffc900007cb500
+>           xfs_io-1045  [007] ....  3104.254448: wbt_wait: someone is waiting ffffc900007cb500
+>           xfs_io-1045  [007] ....  3104.254449: io_schedule <-wbt_wait
+> 	                                                    ^^^^^^^^^^^^^^^^^^^
+> 							    (write with O_SYNC waits for wb write,
+> 							    while the sync limit is more than 24)
+> 
+>           <idle>-0     [003] d.h.  3104.260393: block_rq_complete: 8,64 W () 8728784 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.266310: block_rq_complete: 8,64 W () 8730832 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.271152: block_rq_complete: 8,64 W () 8732880 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.277141: block_rq_complete: 8,64 W () 8734928 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.281908: block_rq_complete: 8,64 W () 8736976 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.287744: block_rq_complete: 8,64 W () 8739024 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.292584: block_rq_complete: 8,64 W () 8741072 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.298541: block_rq_complete: 8,64 W () 8743120 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.303266: block_rq_complete: 8,64 W () 8745168 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.309273: block_rq_complete: 8,64 W () 8747216 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.315312: block_rq_complete: 8,64 W () 8749264 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.320060: block_rq_complete: 8,64 W () 8751312 + 2048 [0]
+>           <idle>-0     [003] d.h.  3104.326148: block_rq_complete: 8,64 W () 8753360 + 2048 [0]
+>    kworker/u16:2-137   [003] ....  3104.326534: may_queue.part.12: inflight 0 limit 24 wait ffffc900007cb500
+>    kworker/u16:2-137   [003] ....  3104.326537: block_getrq: 8,64 W 8755408 + 2048 [kworker/u16:2]
+>    kworker/u16:2-137   [003] ....  3104.326543: block_plug: [kworker/u16:2]
+>           xfs_io-1045  [007] ....  3104.326546: may_queue.part.12: inflight 1 limit 96 wait ffffc90000ab7890
+>           xfs_io-1045  [007] ....  3104.326548: block_getrq: 8,64 WS 24640 + 8 [xfs_io]
+>           xfs_io-1045  [007] ....  3104.326553: block_rq_insert: 8,64 WS 4096 () 24640 + 8 [xfs_io]
+> 	                                        ^^^^^^^^^^^^^^^^^
+> 						(wb write and write with O_SYNC got waked up one by one)
+> 
+> 
+>> I don't think the patch makes sense, conceptually. If you end up in
+>> may_queue(), you are (by definition) in a class of writes that
+>> should be throttled. Skipping the wait line would be unfair.
+>>
+> 
+> OK, got it.
+> 
+>> One modification would be to check the depth, as we assign
+>> different allowances to different types of writes. If the sync
+>> write isn't above it's limit, we should not sleep.
+>>
+> 
+> Yeah, that seems better, so it'd be like
+> 
+> if ((rw & REQ_HIPRIO) &&
+>     atomic_inc_below(&rqw->inflight, get_limit(rwb, rw)))
+>     return true;
+> 
+> if (waitqueue_active(&rqw->wait) &&
+>     rqw->wait.head.next != &wait->entry)
+> 	return false;
 
-I know the reasons for switching to MQ by default but just be aware that it's
-not without hazards albeit it the biggest issues I've seen are switching
-CFQ to BFQ. On my home grid, there is some experimental automatic testing
-running every few weeks searching for regressions. Yesterday, it noticed
-that creating some work files for a postgres simulator called pgioperf
-was 38.33% slower and it auto-bisected to the switch to MQ. This is just
-linearly writing two files for testing on another benchmark and is not
-remarkable. The relevant part of the report is
+I thought a bit more about this, and one potential issue with doing it
+this way, is that we'll potentially starve the background writes
+forever. Let's say in the current system the stable limits are 4/8/16
+for background/normal/high priority writes. Let's further assume that we
+have some normal or sync writers that keep the queue depth at eg 6.
+Background writes would be added to the wait queue, and the normal write
+would proceed. If the normal write keeps the queue depth over the
+background limit, then we'll never do any background writes. That's
+probably worse than the current approach, since at least'll we'll ensure
+forward progress.
 
-Last good/First bad commit
-==========================
-Last good commit: 6d311fa7d2c18659d040b9beba5e41fe24c2a6f5
-First bad commit: 5c279bd9e40624f4ab6e688671026d6005b066fa
->From 5c279bd9e40624f4ab6e688671026d6005b066fa Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Fri, 16 Jun 2017 10:27:55 +0200
-Subject: [PATCH] scsi: default to scsi-mq
-Remove the SCSI_MQ_DEFAULT config option and default to the blk-mq I/O
-path now that we had plenty of testing, and have I/O schedulers for
-blk-mq.  The module option to disable the blk-mq path is kept around for
-now.
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
- drivers/scsi/Kconfig | 11 -----------
- drivers/scsi/scsi.c  |  4 ----
- 2 files changed, 15 deletions(-)
+We could split the wait queues for the bg/normal/high priority writes,
+and add some heuristics to ensure fairness.
 
-Comparison
-==========
-                                initial                initial                   last                  penup                  first
-                             good-v4.12       bad-16f73eb02d7e          good-6d311fa7          good-d06c587d           bad-5c279bd9
-User    min             0.06 (   0.00%)        0.14 (-133.33%)        0.14 (-133.33%)        0.06 (   0.00%)        0.19 (-216.67%)
-User    mean            0.06 (   0.00%)        0.14 (-133.33%)        0.14 (-133.33%)        0.06 (   0.00%)        0.19 (-216.67%)
-User    stddev          0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-User    coeffvar        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-User    max             0.06 (   0.00%)        0.14 (-133.33%)        0.14 (-133.33%)        0.06 (   0.00%)        0.19 (-216.67%)
-System  min            10.04 (   0.00%)       10.75 (  -7.07%)       10.05 (  -0.10%)       10.16 (  -1.20%)       10.73 (  -6.87%)
-System  mean           10.04 (   0.00%)       10.75 (  -7.07%)       10.05 (  -0.10%)       10.16 (  -1.20%)       10.73 (  -6.87%)
-System  stddev          0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-System  coeffvar        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-System  max            10.04 (   0.00%)       10.75 (  -7.07%)       10.05 (  -0.10%)       10.16 (  -1.20%)       10.73 (  -6.87%)
-Elapsed min           251.53 (   0.00%)      351.05 ( -39.57%)      252.83 (  -0.52%)      252.96 (  -0.57%)      347.93 ( -38.33%)
-Elapsed mean          251.53 (   0.00%)      351.05 ( -39.57%)      252.83 (  -0.52%)      252.96 (  -0.57%)      347.93 ( -38.33%)
-Elapsed stddev          0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-Elapsed coeffvar        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-Elapsed max           251.53 (   0.00%)      351.05 ( -39.57%)      252.83 (  -0.52%)      252.96 (  -0.57%)      347.93 ( -38.33%)
-CPU     min             4.00 (   0.00%)        3.00 (  25.00%)        4.00 (   0.00%)        4.00 (   0.00%)        3.00 (  25.00%)
-CPU     mean            4.00 (   0.00%)        3.00 (  25.00%)        4.00 (   0.00%)        4.00 (   0.00%)        3.00 (  25.00%)
-CPU     stddev          0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-CPU     coeffvar        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)        0.00 (   0.00%)
-CPU     max             4.00 (   0.00%)        3.00 (  25.00%)        4.00 (   0.00%)        4.00 (   0.00%)        3.00 (  25.00%)
+> What about kswapd?  It's also a high priority write, isn't it?
 
-The "Elapsed mean" line is what the testing and auto-bisection was paying
-attention to. Commit 16f73eb02d7e is simply the head commit at the time
-the continuous testing started. The first "bad commit" is the last column.
-
-It's not the only slowdown that has been observed from other testing when
-examining whether it's ok to switch to MQ by default. The biggest slowdown
-observed was with a modified version of dbench4 -- the modifications use
-shorter, but representative, load files to avoid timing artifacts and
-reports time to complete a load file instead of throughput as throughput
-is kind of meaningless for dbench4
-
-dbench4 Loadfile Execution Time
-                             4.12.0                 4.12.0
-                         legacy-cfq                 mq-bfq
-Amean     1        80.67 (   0.00%)       83.68 (  -3.74%)
-Amean     2        92.87 (   0.00%)      121.63 ( -30.96%)
-Amean     4       102.72 (   0.00%)      474.33 (-361.77%)
-Amean     32     2543.93 (   0.00%)     1927.65 (  24.23%)
-
-The units are "milliseconds to complete a load file" so as thread count
-increased, there were some fairly bad slowdowns. The most dramatic
-slowdown was observed on a machine with a controller with on-board cache
-
-                              4.12.0                 4.12.0
-                          legacy-cfq                 mq-bfq
-Amean     1        289.09 (   0.00%)      128.43 (  55.57%)
-Amean     2        491.32 (   0.00%)      794.04 ( -61.61%)
-Amean     4        875.26 (   0.00%)     9331.79 (-966.17%)
-Amean     8       2074.30 (   0.00%)      317.79 (  84.68%)
-Amean     16      3380.47 (   0.00%)      669.51 (  80.19%)
-Amean     32      7427.25 (   0.00%)     8821.75 ( -18.78%)
-Amean     256    53376.81 (   0.00%)    69006.94 ( -29.28%)
-
-The slowdown wasn't universal but at 4 threads, it was severe. There
-are other examples but it'd just be a lot of noise and not change the
-central point.
-
-The major problems were all observed switching from CFQ to BFQ on single disk
-rotary storage. It's not machine specific as 5 separate machines noticed
-problems with dbench and fio when switching to MQ on kernel 4.12. Weirdly,
-I've seen cases of read starvation in the presence of heavy writers
-using fio to generate the workload which was surprising to me. Jan Kara
-suggested that it may be because the read workload is not being identified
-as "interactive" but I didn't dig into the details myself and have zero
-understanding of BFQ. I was only interested in answering the question "is
-it safe to switch the default and will the performance be similar enough
-to avoid bug reports?" and concluded that the answer is "no".
-
-For what it's worth, I've noticed on SSDs that switching from legacy-mq
-to deadline-mq also slowed down but in many cases the slowdown was small
-enough that it may be tolerable and not generate many bug reports. Also,
-mq-deadline appears to receive more attention so issues there are probably
-going to be noticed faster.
-
-I'm not suggesting for a second that you fix this or switch back to legacy
-by default because it's BFQ, Paulo is cc'd and it'll have to be fixed
-eventually but you might see "workload foo is slower on 4.13" reports that
-bisect to this commit. What filesystem is used changes the results but at
-least btrfs, ext3, ext4 and xfs experience slowdowns.
-
-For Paulo, if you want to try preemptively dealing with regression reports
-before 4.13 releases then all the tests in question can be reproduced with
-https://github.com/gormanm/mmtests . The most relevant test configurations
-I've seen so far are
-
-configs/config-global-dhp__io-dbench4-async
-configs/config-global-dhp__io-fio-randread-async-randwrite
-configs/config-global-dhp__io-fio-randread-async-seqwrite
-configs/config-global-dhp__io-fio-randread-sync-heavywrite
-configs/config-global-dhp__io-fio-randread-sync-randwrite
-configs/config-global-dhp__pgioperf
+As you discovered in the next email, kswapd has its own wait queue.
 
 -- 
-Mel Gorman
-SUSE Labs
+Jens Axboe
