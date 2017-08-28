@@ -1,62 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:34410 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750851AbdH3VvH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2017 17:51:07 -0400
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7ULnfX7018895
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 14:51:07 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2cp12g98fn-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 14:51:07 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@kernel.dk>
-Subject: [PATCH] block/loop: fix use after free
-Date: Wed, 30 Aug 2017 14:51:06 -0700
-Message-ID: <e2e2ac0d5f87e79ee9038de9ce709732a7e1ab29.1504129849.git.shli@fb.com>
-In-Reply-To: <e1da431a2f961cc0b04241808a31bb58b120fc07.1504129490.git.shli@fb.com>
-References: <e1da431a2f961cc0b04241808a31bb58b120fc07.1504129490.git.shli@fb.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 2/6] nbd: make device_attribute const
+To: Bhumika Goyal <bhumirks@gmail.com>, julia.lawall@lip6.fr,
+ rjw@rjwysocki.net, lenb@kernel.org, jbacik@fb.com, jikos@kernel.org,
+ benjamin.tissoires@redhat.com, manish.chopra@cavium.com,
+ rahul.verma@cavium.com, Dept-GELinuxNICDev@cavium.com,
+ harish.patil@cavium.com, cascardo@holoscopio.com, don@syst.com.br,
+ dvhart@infradead.org, andy@infradead.org, sre@kernel.org,
+ linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org, linux-pm@vger.kernel.org
+References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com>
+ <1503315792-14837-3-git-send-email-bhumirks@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a9b22497-4bbb-d765-249e-5bcddc70fdb6@kernel.dk>
+Date: Mon, 28 Aug 2017 15:21:46 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1503315792-14837-3-git-send-email-bhumirks@gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-lo_rw_aio->call_read_iter->
-1	aops->direct_IO
-2	iov_iter_revert
-lo_rw_aio_complete could happen between 1 and 2, the bio and bvec could
-be freed before 2, which accesses bvec.
+On 08/21/2017 05:43 AM, Bhumika Goyal wrote:
+> Make this const as is is only passed as an argument to the
+> function device_create_file and device_remove_file and the corresponding
+> arguments are of type const.
+> Done using Coccinelle
 
-This conflicts with my direcio performance improvement patches, which
-I'll resend.
+Added for 4.14, thanks.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/loop.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ef83349..153ab3c 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -490,6 +490,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
- 		      bio_segments(bio), blk_rq_bytes(cmd->rq));
-+	bio_inc_remaining(bio);
- 	/*
- 	 * This bio may be started from the middle of the 'bvec'
- 	 * because of bio splitting, so offset from the bvec must
-@@ -507,6 +508,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	else
- 		ret = call_read_iter(file, &cmd->iocb, &iter);
- 
-+	bio_endio(bio);
- 	if (ret != -EIOCBQUEUED)
- 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
- 	return 0;
 -- 
-2.9.5
+Jens Axboe
