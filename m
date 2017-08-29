@@ -1,63 +1,109 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43818 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751240AbdH3Cvg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Aug 2017 22:51:36 -0400
-Date: Wed, 30 Aug 2017 10:51:21 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Shaohua Li <shli@kernel.org>
+Return-Path: <shli@kernel.org>
+Date: Tue, 29 Aug 2017 08:13:39 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
 Cc: linux-block@vger.kernel.org, axboe@kernel.dk, Kernel-team@fb.com,
-        Shaohua Li <shli@fb.com>
+	Shaohua Li <shli@fb.com>
 Subject: Re: [PATCH V2 2/2] block/loop: allow request merge for directio mode
-Message-ID: <20170830025120.GC4897@ming.t460p>
+Message-ID: <20170829151339.7zc2qv32qsfknpjh@kernel.org>
 References: <cover.1503602376.git.shli@fb.com>
  <cafa738c4f61d9b549b7d4675903e8c61962480b.1503602376.git.shli@fb.com>
  <20170829095604.GB32439@ming.t460p>
- <20170829151339.7zc2qv32qsfknpjh@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170829151339.7zc2qv32qsfknpjh@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170829095604.GB32439@ming.t460p>
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Aug 29, 2017 at 08:13:39AM -0700, Shaohua Li wrote:
-> On Tue, Aug 29, 2017 at 05:56:05PM +0800, Ming Lei wrote:
-> > On Thu, Aug 24, 2017 at 12:24:53PM -0700, Shaohua Li wrote:
-> > > From: Shaohua Li <shli@fb.com>
-> > > 
-> > > Currently loop disables merge. While it makes sense for buffer IO mode,
-> > > directio mode can benefit from request merge. Without merge, loop could
-> > > send small size IO to underlayer disk and harm performance.
+On Tue, Aug 29, 2017 at 05:56:05PM +0800, Ming Lei wrote:
+> On Thu, Aug 24, 2017 at 12:24:53PM -0700, Shaohua Li wrote:
+> > From: Shaohua Li <shli@fb.com>
 > > 
-> > Hi Shaohua,
+> > Currently loop disables merge. While it makes sense for buffer IO mode,
+> > directio mode can benefit from request merge. Without merge, loop could
+> > send small size IO to underlayer disk and harm performance.
+> 
+> Hi Shaohua,
+> 
+> IMO no matter if merge is used, loop always sends page by page
+> to VFS in both dio or buffer I/O.
+
+Why do you think so?
+ 
+> Also if merge is enabled on loop, that means merge is run
+> on both loop and low level block driver, and not sure if we
+> can benefit from that.
+
+why does merge still happen in low level block driver?
+
+> 
+> So Could you provide some performance data about this patch?
+
+In my virtual machine, a workload improves from ~20M/s to ~50M/s. And I clearly
+see the request size becomes bigger.
+
 > > 
-> > IMO no matter if merge is used, loop always sends page by page
-> > to VFS in both dio or buffer I/O.
-> 
-> Why do you think so?
-
-do_blockdev_direct_IO() still handles page by page from iov_iter, and
-with bigger request, I guess it might be the plug merge working.
-
->  
-> > Also if merge is enabled on loop, that means merge is run
-> > on both loop and low level block driver, and not sure if we
-> > can benefit from that.
-> 
-> why does merge still happen in low level block driver?
-
-Because scheduler is still working on low level disk. My question
-is that why the scheduler in low level disk doesn't work now
-if scheduler on loop can merge?
-
-> 
+> > Reviewed-by: Omar Sandoval <osandov@fb.com>
+> > Signed-off-by: Shaohua Li <shli@fb.com>
+> > ---
+> >  drivers/block/loop.c | 66 ++++++++++++++++++++++++++++++++++++++++------------
+> >  drivers/block/loop.h |  1 +
+> >  2 files changed, 52 insertions(+), 15 deletions(-)
 > > 
-> > So Could you provide some performance data about this patch?
+> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > index 428da07..75a8f6e 100644
+> > --- a/drivers/block/loop.c
+> > +++ b/drivers/block/loop.c
+> > @@ -213,10 +213,13 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+> >  	 */
+> >  	blk_mq_freeze_queue(lo->lo_queue);
+> >  	lo->use_dio = use_dio;
+> > -	if (use_dio)
+> > +	if (use_dio) {
+> > +		queue_flag_clear_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
+> >  		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
+> > -	else
+> > +	} else {
+> > +		queue_flag_set_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
+> >  		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
+> > +	}
+> >  	blk_mq_unfreeze_queue(lo->lo_queue);
+> >  }
+> >  
+> > @@ -464,6 +467,8 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
+> >  {
+> >  	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+> >  
+> > +	kfree(cmd->bvec);
+> > +	cmd->bvec = NULL;
+> >  	cmd->ret = ret;
+> >  	blk_mq_complete_request(cmd->rq);
+> >  }
+> > @@ -473,22 +478,50 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+> >  {
+> >  	struct iov_iter iter;
+> >  	struct bio_vec *bvec;
+> > -	struct bio *bio = cmd->rq->bio;
+> > +	struct request *rq = cmd->rq;
+> > +	struct bio *bio = rq->bio;
+> >  	struct file *file = lo->lo_backing_file;
+> > +	unsigned int offset;
+> > +	int segments = 0;
+> >  	int ret;
+> >  
+> > -	/* nomerge for loop request queue */
+> > -	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
+> > +	if (rq->bio != rq->biotail) {
+> > +		struct req_iterator iter;
+> > +		struct bio_vec tmp;
+> > +
+> > +		__rq_for_each_bio(bio, rq)
+> > +			segments += bio_segments(bio);
+> > +		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_KERNEL);
 > 
-> In my virtual machine, a workload improves from ~20M/s to ~50M/s. And I clearly
-> see the request size becomes bigger.
+> The allocation should have been GFP_NOIO.
 
-Could you share us what the low level disk is?
+Sounds good. To make this completely correct isn't easy though, we are calling
+into the underlayer fs operations which can do allocation.
 
--- 
-Ming
+Thanks,
+Shaohua
