@@ -1,19 +1,24 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le
- Moal <Damien.LeMoal@wdc.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
+Return-Path: <hch@lst.de>
+Date: Tue, 29 Aug 2017 14:49:59 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
 Subject: Re: [PATCH] block: Make blk_dequeue_request() static
-Date: Tue, 29 Aug 2017 15:27:43 +0000
-Message-ID: <1504020462.2653.4.camel@wdc.com>
+Message-ID: <20170829124959.GA27877@lst.de>
 References: <20170829025437.26726-1-damien.lemoal@wdc.com>
-In-Reply-To: <20170829025437.26726-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170829025437.26726-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTA4LTI5IGF0IDExOjU0ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gVGhlIG9ubHkgY2FsbGVyIG9mIHRoaXMgZnVuY3Rpb24gaXMgYmxrX3N0YXJ0X3JlcXVlc3Qo
-KSBpbiB0aGUgc2FtZQ0KPiBmaWxlLiBGaXggYmxrX3N0YXJ0X3JlcXVlc3QoKSBkZXNjcmlwdGlv
-biBhY2NvcmRpbmdseS4NCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5h
-c3NjaGVAd2RjLmNvbT4=
+On Tue, Aug 29, 2017 at 11:54:37AM +0900, Damien Le Moal wrote:
+> The only caller of this function is blk_start_request() in the same
+> file. Fix blk_start_request() description accordingly.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+
+Looks good,
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
