@@ -1,45 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:29188 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751009AbdHaUmw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 16:42:52 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Memory leak in BFQ?
-Date: Thu, 31 Aug 2017 20:42:02 +0000
-Message-ID: <1504212121.31872.44.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+2972572aac770b70d036+5119+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: viro@zeniv.linux.org.uk,
+	axboe@kernel.dk
+Cc: Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>,
+	mgorman@suse.de,
+	Volker.Lendecke@sernet.de,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/4] fs: support IOCB_NOWAIT in generic_file_buffered_read
+Date: Tue, 29 Aug 2017 16:13:19 +0200
+Message-Id: <20170829141321.4482-3-hch@lst.de>
+In-Reply-To: <20170829141321.4482-1-hch@lst.de>
+References: <20170829141321.4482-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-SGVsbG8gUGFvbG8sDQoNCklmIEkgcnVuIHRoZSBmb2xsb3dpbmcgY29tbWFuZHM6DQoNCiMgZWNo
-byBiZnEgPiAvc3lzL2Jsb2NrL3NkYS9xdWV1ZS9zY2hlZHVsZXIgDQojIGVjaG8gMyA+L3Byb2Mv
-c3lzL3ZtL2Ryb3BfY2FjaGVzOyBmaW5kIC8gLXhkZXYgPi9kZXYvbnVsbA0KIyBlY2hvIG5vbmUg
-PiAvc3lzL2Jsb2NrL3NkYS9xdWV1ZS9zY2hlZHVsZXINCiMgZWNobyBzY2FuID4gL3N5cy9rZXJu
-ZWwvZGVidWcva21lbWxlYWsNCg0KVGhlbiBrbWVtbGVhayByZXBvcnRzIHRoZSBmb2xsb3dpbmc6
-DQoNCnVucmVmZXJlbmNlZCBvYmplY3QgMHhmZmZmODgwNDA1MTQ5MTU4IChzaXplIDQwOTYpOg0K
-ICBjb21tICJiYXNoIiwgcGlkIDE3MTYsIGppZmZpZXMgNDI5NDk2MDM4NiAoYWdlIDc1MjU2Ljk3
-MHMpDQogIGhleCBkdW1wIChmaXJzdCAzMiBieXRlcyk6DQogICAgNDggYTUgZjQgYTMgMDQgODgg
-ZmYgZmYgMDEgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIEguLi4uLi4uLi4uLi4uLi4NCiAgICAwMCAw
-MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4u
-Li4uLg0KICBiYWNrdHJhY2U6DQogICAgWzxmZmZmZmZmZjgxNjVhNTBhPl0ga21lbWxlYWtfYWxs
-b2MrMHg0YS8weGEwDQogICAgWzxmZmZmZmZmZjgxMWY1MTE0Pl0ga21lbV9jYWNoZV9hbGxvY19u
-b2RlX3RyYWNlKzB4MTU0LzB4MzEwDQogICAgWzxmZmZmZmZmZmEwNzA4N2JjPl0gYmZxX3BkX2Fs
-bG9jKzB4M2MvMHgzZjAgW2JmcV0NCiAgICBbPGZmZmZmZmZmODEzMGU0YmM+XSBibGtjZ19hY3Rp
-dmF0ZV9wb2xpY3krMHhhYy8weDE3MA0KICAgIFs8ZmZmZmZmZmZhMDcwOWI0Yz5dIGJmcV9jcmVh
-dGVfZ3JvdXBfaGllcmFyY2h5KzB4MWMvMHg2NiBbYmZxXQ0KICAgIFs8ZmZmZmZmZmZhMDcwMjc3
-Yj5dIGJmcV9pbml0X3F1ZXVlKzB4MjhiLzB4MzUwIFtiZnFdDQogICAgWzxmZmZmZmZmZjgxMzAy
-MjNiPl0gYmxrX21xX2luaXRfc2NoZWQrMHhiYi8weDE1MA0KICAgIFs8ZmZmZmZmZmY4MTJlNmI0
-Mj5dIGVsZXZhdG9yX3N3aXRjaCsweDYyLzB4MjEwDQogICAgWzxmZmZmZmZmZjgxMmU3Y2EyPl0g
-ZWx2X2lvc2NoZWRfc3RvcmUrMHhlMi8weDE4MA0KICAgIFs8ZmZmZmZmZmY4MTJmMjNhOT5dIHF1
-ZXVlX2F0dHJfc3RvcmUrMHg1OS8weDkwDQogICAgWzxmZmZmZmZmZjgxMmFjNzE1Pl0gc3lzZnNf
-a2Zfd3JpdGUrMHg0NS8weDYwDQogICAgWzxmZmZmZmZmZjgxMmFiZmQ0Pl0ga2VybmZzX2ZvcF93
-cml0ZSsweDEyNC8weDFjMA0KICAgIFs8ZmZmZmZmZmY4MTIxZDIxOD5dIF9fdmZzX3dyaXRlKzB4
-MjgvMHgxNTANCiAgICBbPGZmZmZmZmZmODEyMWU3ZTc+XSB2ZnNfd3JpdGUrMHhjNy8weDFiMA0K
-ICAgIFs8ZmZmZmZmZmY4MTIxZmQ2OT5dIFN5U193cml0ZSsweDQ5LzB4YTANCiAgICBbPGZmZmZm
-ZmZmODE2NjdjMmE+XSBlbnRyeV9TWVNDQUxMXzY0X2Zhc3RwYXRoKzB4MTgvMHhhZA0KDQpDb3Vs
-ZCB0aGlzIGluZGljYXRlIGEgbWVtb3J5IGxlYWsgaW4gdGhlIEJGUSBjb2RlPw0KDQpUaGFua3Ms
-DQoNCkJhcnQu
+From: Milosz Tanski <milosz@adfin.com>
+
+Allow generic_file_buffered_read to bail out early instead of waiting for
+the page lock or reading a page if IOCB_NOWAIT is specified.
+
+Signed-off-by: Milosz Tanski <milosz@adfin.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+Acked-by: Sage Weil <sage@redhat.com>
+---
+ mm/filemap.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 4bcfa74ad802..eed394fd331c 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1937,6 +1937,8 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+ 
+ 		page = find_get_page(mapping, index);
+ 		if (!page) {
++			if (iocb->ki_flags & IOCB_NOWAIT)
++				goto would_block;
+ 			page_cache_sync_readahead(mapping,
+ 					ra, filp,
+ 					index, last_index - index);
+@@ -1950,6 +1952,11 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+ 					index, last_index - index);
+ 		}
+ 		if (!PageUptodate(page)) {
++			if (iocb->ki_flags & IOCB_NOWAIT) {
++				put_page(page);
++				goto would_block;
++			}
++
+ 			/*
+ 			 * See comment in do_read_cache_page on why
+ 			 * wait_on_page_locked is used to avoid unnecessarily
+@@ -2131,6 +2138,8 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+ 		goto readpage;
+ 	}
+ 
++would_block:
++	error = -EAGAIN;
+ out:
+ 	ra->prev_pos = prev_index;
+ 	ra->prev_pos <<= PAGE_SHIFT;
+-- 
+2.11.0
