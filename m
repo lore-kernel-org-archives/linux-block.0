@@ -1,35 +1,41 @@
-Return-Path: <bo.li.liu@oracle.com>
-Date: Wed, 30 Aug 2017 16:06:18 -0600
-From: Liu Bo <bo.li.liu@oracle.com>
-To: linux-block@vger.kernel.org
-Cc: Chris Mason <clm@fb.com>, axboe@kernel.dk
-Subject: About btrfs on top of wb_throttle
-Message-ID: <20170830220618.GC17166@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
-Reply-To: bo.li.liu@oracle.com
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga05.intel.com ([192.55.52.43]:26771 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751323AbdH2PhF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Aug 2017 11:37:05 -0400
+Date: Tue, 29 Aug 2017 11:41:38 -0400
+From: Keith Busch <keith.busch@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 10/10] nvme: implement multipath access to nvme subsystems
+Message-ID: <20170829154138.GB4428@localhost.localdomain>
+References: <20170823175815.3646-1-hch@lst.de>
+ <20170823175815.3646-11-hch@lst.de>
+ <20170829145417.GA4428@localhost.localdomain>
+ <20170829145559.GA32760@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170829145559.GA32760@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi,
+On Tue, Aug 29, 2017 at 04:55:59PM +0200, Christoph Hellwig wrote:
+> On Tue, Aug 29, 2017 at 10:54:17AM -0400, Keith Busch wrote:
+> > It also looks like new submissions will get a new path only from the
+> > fact that the original/primary is being reset. The controller reset
+> > itself seems a bit heavy-handed. Can we just set head->current_path to
+> > the next active controller in the list?
+> 
+> For ANA we'll have to do that anyway, but if we got a failure
+> that clearly indicates a path failure what benefit is there in not
+> resetting the controller?  But yeah, maybe we can just switch the
+> path for non-ANA controllers and wait for timeouts to do their work.
 
-While playing with btrfs on top of wb_throttle, an interesting thing
-is that writeback from btrfs always falls into %rwb->wb_background
-even if there're no other writers.
+Okay, sounds reasonable.
 
-The peculiarity of btrfs is that, it owns the ability of mananging
-disks so that it creates a private bdi stored in sb->s_bdi, which is
-different from %queue->backing_device_info.
-
-So running balance_dirty_pages() during btrfs's buffered writes
-doesn't take any effect on %queue->backing_device_info->wb, thus it's
-got into the wb_background bucket all the time.
-
-Haven't measure the performance numbers with a real test, but in
-theory this problem will let buffered writer spend more time in
-balance_dirty_pages()'s for(;;) loop.
-
-Chris, Jens, thoughts?
-
-Thanks,
-
--liubo
+Speaking of timeouts, nvme_req_needs_retry will fail the command
+immediately rather than try the alternate path if it was cancelled due
+to timeout handling. Should we create a new construct for a command's
+total time separate from recovery timeout so we may try an alternate
+paths?
