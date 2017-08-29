@@ -1,77 +1,75 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755018AbdHYMur (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 08:50:47 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V6 04/12] mmc: core: Turn off CQE before sending commands
-Date: Fri, 25 Aug 2017 15:43:47 +0300
-Message-Id: <1503665035-16231-5-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+Received: from mail-dm3nam03on0096.outbound.protection.outlook.com ([104.47.41.96]:17185
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751670AbdH2PdR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Aug 2017 11:33:17 -0400
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: "osandov@fb.com" <osandov@fb.com>,
+        "damien.lemoal@wdc.com" <damien.lemoal@wdc.com>
+Subject: Re: [PATCH] blk-mq: Improvements to the hybrid polling sleep time
+ calculation
+Date: Tue, 29 Aug 2017 15:33:15 +0000
+Message-ID: <B1195188-245E-42BE-AC5D-2070F33E1D93@raithlin.com>
+References: <1503326134-3862-1-git-send-email-sbates@raithlin.com>
+ <54dad77e-18d7-eb64-35fb-670fecc83ce7@kernel.dk>
+In-Reply-To: <54dad77e-18d7-eb64-35fb-670fecc83ce7@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-CQE needs to be off for the host controller to accept non-CQ commands. Turn
-off the CQE before sending commands, and ensure it is off in any reset or
-power management paths, or re-tuning.
-
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
----
- drivers/mmc/core/core.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 5dd1c00d95f5..66c9cf49ad2f 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -260,6 +260,9 @@ static void __mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
- 
- 	trace_mmc_request_start(host, mrq);
- 
-+	if (host->cqe_on)
-+		host->cqe_ops->cqe_off(host);
-+
- 	host->ops->request(host, mrq);
- }
- 
-@@ -979,6 +982,9 @@ int mmc_execute_tuning(struct mmc_card *card)
- 	if (!host->ops->execute_tuning)
- 		return 0;
- 
-+	if (host->cqe_on)
-+		host->cqe_ops->cqe_off(host);
-+
- 	if (mmc_card_mmc(card))
- 		opcode = MMC_SEND_TUNING_BLOCK_HS200;
- 	else
-@@ -1018,6 +1024,9 @@ void mmc_set_bus_width(struct mmc_host *host, unsigned int width)
-  */
- void mmc_set_initial_state(struct mmc_host *host)
- {
-+	if (host->cqe_on)
-+		host->cqe_ops->cqe_off(host);
-+
- 	mmc_retune_disable(host);
- 
- 	if (mmc_host_is_spi(host))
--- 
-1.9.1
+Pj4gRnJvbTogU3RlcGhlbiBCYXRlcyA8c2JhdGVzQHJhaXRobGluLmNvbT4NCj4+IA0KPj4gSHli
+cmlkIHBvbGxpbmcgY3VycmVudGx5IHVzZXMgaGFsZiB0aGUgYXZlcmFnZSBjb21wbGV0aW9uIHRp
+bWUgYXMgYW4NCj4+IGVzdGltYXRlIG9mIGhvdyBsb25nIHRvIHBvbGwgZm9yLiBXZSBjYW4gaW1w
+cm92ZSB1cG9uIHRoaXMgYnkgbm90aW5nDQo+PiB0aGF0IHBvbGxpbmcgYmVmb3JlIHRoZSBtaW5p
+bXVtIGNvbXBsZXRpb24gdGltZSBtYWtlcyBubyBzZW5zZS4gQWRkIGENCj4+IHN5c2ZzIGVudHJ5
+IHRvIHVzZSB0aGlzIGZhY3QgdG8gaW1wcm92ZSBDUFUgdXRpbGl6YXRpb24gaW4gY2VydGFpbg0K
+Pj4gY2FzZXMuDQo+PiANCj4+IEF0IHRoZSBzYW1lIHRpbWUgdGhlIG1pbmltdW0gaXMgYSBiaXQg
+dG9vIGxvbmcgdG8gc2xlZXAgZm9yIHNpbmNlIHdlDQo+PiBtdXN0IGZhY3RvciBpbiBPUyB3YWtl
+IHRpbWUgZm9yIHRoZSB0aHJlYWQuIEZvciBub3cgYWxsb3cgdGhlIHVzZXIgdG8NCj4+IHNldCB0
+aGlzIHZpYSBhIHNlY29uZCBzeXNmcyBlbnRyeSAoaW4gbmFub3NlY29uZHMpLg0KPj4gDQo+PiBU
+ZXN0aW5nIHRoaXMgcGF0Y2ggb24gSW50ZWwgT3B0YW5lIFNTRHMgc2hvd2VkIHRoYXQgdXNpbmcg
+dGhlIG1pbmltdW0NCj4+IHJhdGhlciB0aGFuIGhhbGYgcmVkdWNlZCBDUFUgdXRpbGl6YXRpb24g
+ZnJvbSA1OSUgdG8gMzglLiBUdW5pbmcNCj4+IHRoaXMgdmlhIHRoZSB3YWtlIHRpbWUgYWRqdXN0
+bWVudCBhbGxvd2VkIHVzIHRvIHRyYWRlIENQVSBsb2FkIGZvcg0KPj4gbGF0ZW5jeS4gRm9yIGV4
+YW1wbGUNCj4+IA0KPj4gaW9fcG9sbAkgZGVsYXkJaHliX3VzZV9taW4gYWRqdXN0CWxhdGVuY3kJ
+Q1BVIGxvYWQNCj4+IDEJIC0xCU4vQQkgICAgTi9BCQk4LjQJMTAwJQ0KPj4gMQkgMAkwCSAgICBO
+L0EJCTguNAk1NyUNCj4+IDEJIDAJMQkgICAgMAkJMTAuMwkzNCUNCj4+IDEJIDkJMQkgICAgMTAw
+MAk5LjkJMzclDQo+PiAxCSAwCTEJICAgIDIwMDAJOC40CTQ3JQ0KPj4gMQkgMAkxCSAgICAxMDAw
+MAk4LjQJMTAwJQ0KPj4gDQo+PiBJZGVhbGx5IHdlIHdpbGwgZXh0ZW5kIHRoaXMgdG8gYXV0by1j
+YWxjdWxhdGUgdGhlIHdha2UgdGltZSByYXRoZXINCj4+IHRoYW4gaGF2ZSBpdCBzZXQgYnkgdGhl
+IHVzZXIuDQo+DQo+IEkgZG9uJ3QgbGlrZSB0aGlzLCBpdCdzIGFub3RoZXIgd2VpcmQga25vYiB0
+aGF0IHdpbGwgZXhpc3QgYnV0IHRoYXQNCj4gbm8gb25lIHdpbGwga25vdyBob3cgdG8gdXNlLiBG
+b3IgbW9zdCBvZiB0aGUgdGVzdGluZyBJJ3ZlIGRvbmUNCj4gcmVjZW50bHksIGh5YnJpZCBpcyBh
+IHdpbiBvdmVyIGJ1c3kgcG9sbGluZyAtIGhlbmNlIEkgdGhpbmsgd2Ugc2hvdWxkDQo+IG1ha2Ug
+dGhhdCB0aGUgZGVmYXVsdC4gNjAlIG9mIG1lYW4gaGFzIGFsc28sIGluIHRlc3RpbmcsIGJlZW4g
+c2hvd24NCj4gdG8gYmUgYSB3aW4uIFNvIHRoYXQncyBhbiBlYXN5IGZpeC9jaGFuZ2Ugd2UgY2Fu
+IGNvbnNpZGVyLg0KDQpJIGRvIGFncmVlIHRoYXQgdGhlIHRoaXMgaXMgYSBoYXJkIGtub2IgdG8g
+dHVuZS4gSSBhbSBob3dldmVyIG5vdCBoYXBweSB0aGF0IHRoZSBjdXJyZW50IGh5YnJpZCBkZWZh
+dWx0IG1heSBtZWFuIHdlIGFyZSBwb2xsaW5nIHdlbGwgYmVmb3JlIHRoZSBtaW5pbXVtIGNvbXBs
+ZXRpb24gdGltZS4gVGhhdCBqdXN0IHNlZW1zIGxpa2UgYSB3YXN0ZSBvZiBDUFUgcmVzb3VyY2Vz
+IHRvIG1lLiBJIGRvIGFncmVlIHRoYXQgdHVybmluZyBvbiBoeWJyaWQgYXMgdGhlIGRlZmF1bHQg
+YW5kIHBlcmhhcHMgYnVtcGluZyB1cCB0aGUgZGVmYXVsdCBpcyBhIGdvb2QgaWRlYS4NCg0KPiBU
+byBnbyBiZXlvbmQgdGhhdCwgSSdkIG11Y2ggcmF0aGVyIHNlZSB1cyB0cmFja2luZyB0aGUgdGlt
+ZSB3YXN0ZS4NCj4gSWYgd2UgY29uc2lkZXIgdGhlIHRvdGFsIGNvbXBsZXRpb24gdGltZSBvZiBh
+biBJTyB0byBiZSBBK0IrQywgd2hlcmU6DQo+DQo+IEEJVGltZSBuZWVkZWQgdG8gZ28gdG8gc2xl
+ZXANCj4gQglTbGVlcCB0aW1lDQo+IEMJVGltZSBuZWVkZWQgdG8gd2FrZSB1cA0KPg0KPiB0aGVu
+IHdlIGNvdWxkIGZlYXNpYmx5IHRyYWNrIEErQy4gV2UgYWxyZWFkeSBrbm93IGhvdyBsb25nIHRo
+ZSBJTw0KPiB3aWxsIHRha2UgdG8gY29tcGxldGUsIGFzIHdlIHRyYWNrIHRoYXQuIEF0IHRoYXQg
+cG9pbnQgd2UnZCBoYXZlDQo+IGEgZnVsbCBwaWN0dXJlIG9mIGhvdyBsb25nIHdlIHNob3VsZCBz
+bGVlcC4NCg0KWWVzLCB0aGlzIGlzIHdoZXJlIEkgd2FzIHRoaW5raW5nIG9mIHRha2luZyB0aGlz
+IGZ1bmN0aW9uYWxpdHkgaW4gdGhlIGxvbmcgdGVybS4gSXQgc2VlbXMgbGlrZSB0cmFja2luZyBD
+IGlzIHNvbWV0aGluZyBvdGhlciBwYXJ0cyBvZiB0aGUga2VybmVsIG1pZ2h0IG5lZWQuIERvZXMg
+YW55b25lIGtub3cgb2YgYW55IGV4aXN0aW5nIGNvZGUgaW4gdGhpcyBzcGFjZT8NCg0KPiBCb251
+cyBwb2ludHMgZm9yIGluZm9ybWluZyB0aGUgbG93ZXIgbGV2ZWwgc2NoZWR1bGVyIG9mIHRoaXMg
+YXMNCj4gd2VsbC4gSWYgdGhlIENQVSBpcyBnb2luZyBpZGxlLCB3ZSdsbCBlbnRlciBzb21lIHNv
+cnQgb2YgcG93ZXINCj4gc3RhdGUgaW4gdGhlIHByb2Nlc3Nvci4gSWYgd2Ugd2VyZSBhYmxlIHRv
+IHBhc3MgaW4gaG93IGxvbmcgd2UNCj4gZXhwZWN0IHRvIHNsZWVwLCB3ZSBjb3VsZCBiZSBtYWtp
+bmcgYmV0dGVyIGRlY2lzaW9ucyBoZXJlLg0KDQpZdXAuIEFnYWluLCB0aGlzIHNlZW1zIGxpa2Ug
+c29tZXRoaW5nIG1vcmUgZ2VuZXJhbCB0aGF0IGp1c3QgdGhlIGJsb2NrLWxheWVyLiBJIHdpbGwg
+ZG8gc29tZSBkaWdnaW5nIGFuZCBzZWUvaWYgYW55dGhpbmcgaXMgYXZhaWxhYmxlIHRvIGxldmVy
+YWdlIGhlcmUuDQoNCkNoZWVycw0KU3RlcGhlbg0KDQoNCg0K
