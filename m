@@ -1,21 +1,19 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le
+ Moal <Damien.LeMoal@wdc.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
 Subject: Re: [PATCH] block: Make blk_dequeue_request() static
-To: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@wdc.com>
+Date: Tue, 29 Aug 2017 15:27:43 +0000
+Message-ID: <1504020462.2653.4.camel@wdc.com>
 References: <20170829025437.26726-1-damien.lemoal@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <9a34aec4-8bcf-e133-f82f-8d31454abba1@kernel.dk>
-Date: Tue, 29 Aug 2017 09:49:52 -0600
-MIME-Version: 1.0
 In-Reply-To: <20170829025437.26726-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/28/2017 08:54 PM, Damien Le Moal wrote:
-> The only caller of this function is blk_start_request() in the same
-> file. Fix blk_start_request() description accordingly.
-
-Applied, thanks.
-
--- 
-Jens Axboe
+T24gVHVlLCAyMDE3LTA4LTI5IGF0IDExOjU0ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gVGhlIG9ubHkgY2FsbGVyIG9mIHRoaXMgZnVuY3Rpb24gaXMgYmxrX3N0YXJ0X3JlcXVlc3Qo
+KSBpbiB0aGUgc2FtZQ0KPiBmaWxlLiBGaXggYmxrX3N0YXJ0X3JlcXVlc3QoKSBkZXNjcmlwdGlv
+biBhY2NvcmRpbmdseS4NCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5h
+c3NjaGVAd2RjLmNvbT4=
