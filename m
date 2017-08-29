@@ -1,24 +1,57 @@
-Return-Path: <hch@lst.de>
-Date: Tue, 29 Aug 2017 14:49:59 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+Return-Path: <prvs=407fe0e57=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH] block: Make blk_dequeue_request() static
-Message-ID: <20170829124959.GA27877@lst.de>
-References: <20170829025437.26726-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170829025437.26726-1-damien.lemoal@wdc.com>
+Subject: [PATCH] block: Make blk_dequeue_request() static
+Date: Tue, 29 Aug 2017 11:54:37 +0900
+Message-Id: <20170829025437.26726-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Aug 29, 2017 at 11:54:37AM +0900, Damien Le Moal wrote:
-> The only caller of this function is blk_start_request() in the same
-> file. Fix blk_start_request() description accordingly.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+The only caller of this function is blk_start_request() in the same
+file. Fix blk_start_request() description accordingly.
 
-Looks good,
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/blk-core.c | 5 +----
+ block/blk.h      | 1 -
+ 2 files changed, 1 insertion(+), 5 deletions(-)
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fc1af9097dff..d709c0e3a2ac 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2615,7 +2615,7 @@ struct request *blk_peek_request(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_peek_request);
+ 
+-void blk_dequeue_request(struct request *rq)
++static void blk_dequeue_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+ 
+@@ -2642,9 +2642,6 @@ void blk_dequeue_request(struct request *rq)
+  * Description:
+  *     Dequeue @req and start timeout timer on it.  This hands off the
+  *     request to the driver.
+- *
+- *     Block internal functions which don't want to start timer should
+- *     call blk_dequeue_request().
+  */
+ void blk_start_request(struct request *req)
+ {
+diff --git a/block/blk.h b/block/blk.h
+index fde8b351c166..fcb9775b997d 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -64,7 +64,6 @@ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 			struct bio *bio);
+ void blk_queue_bypass_start(struct request_queue *q);
+ void blk_queue_bypass_end(struct request_queue *q);
+-void blk_dequeue_request(struct request *rq);
+ void __blk_queue_free_tags(struct request_queue *q);
+ void blk_freeze_queue(struct request_queue *q);
+ 
+-- 
+2.13.5
