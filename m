@@ -1,59 +1,42 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 26/55] skd: Use __packed only when needed
-Date: Thu, 17 Aug 2017 13:13:09 -0700
-Message-Id: <20170817201338.16537-27-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Return-Path: <hch@lst.de>
+Date: Tue, 29 Aug 2017 10:30:42 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Guan Junxiong <guanjunxiong@huawei.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	"Shenhong (C)" <shenhong09@huawei.com>,
+	niuhaoxin <niuhaoxin@huawei.com>, Lilangbo <lilangbo@huawei.com>
+Subject: Re: [PATCH 07/10] nvme: track shared namespaces
+Message-ID: <20170829083042.GC10487@lst.de>
+References: <20170823175815.3646-1-hch@lst.de> <20170823175815.3646-8-hch@lst.de> <ec2a91f0-5825-9cfc-50ca-afea27fd8ef3@huawei.com> <20170828143011.GA29260@lst.de> <33a56620-f615-71b0-9321-bde8494132db@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <33a56620-f615-71b0-9321-bde8494132db@huawei.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Since needless use of __packed slows down access to data structures,
-only use __packed when needed.
+On Tue, Aug 29, 2017 at 10:42:18AM +0800, Guan Junxiong wrote:
+> As for the __nvme_find_ns_head function, can it lookup the namespace
+> globally, not in the current subsytem.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_s1120.h | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+No.
 
-diff --git a/drivers/block/skd_s1120.h b/drivers/block/skd_s1120.h
-index 8044705cbbf9..de35f47e953c 100644
---- a/drivers/block/skd_s1120.h
-+++ b/drivers/block/skd_s1120.h
-@@ -10,8 +10,6 @@
- #ifndef SKD_S1120_H
- #define SKD_S1120_H
- 
--#pragma pack(push, s1120_h, 1)
--
- /*
-  * Q-channel, 64-bit r/w
-  */
-@@ -276,7 +274,7 @@ struct fit_comp_error_info {
- 	uint16_t	sks_low; /* 10: Sense Key Specific (LSW) */
- 	uint16_t	reserved3; /* 12: Part of additional sense bytes (unused) */
- 	uint16_t	uec; /* 14: Additional Sense Bytes */
--	uint64_t	per; /* 16: Additional Sense Bytes */
-+	uint64_t	per __packed; /* 16: Additional Sense Bytes */
- 	uint8_t		reserved4[2]; /* 1E: Additional Sense Bytes (unused) */
- };
- 
-@@ -323,6 +321,4 @@ struct driver_inquiry_data {
- 	uint8_t		driver_version[0x14];
- };
- 
--#pragma pack(pop, s1120_h)
--
- #endif /* SKD_S1120_H */
--- 
-2.14.0
+> Take hypermetro scenario for
+
+Please define "hypermetro"
+
+> example, two namespaces which should be viewed as the same namespaces
+> from the database application but exist in two different cities respectively.
+> Some vendors maybe specify those two namespaces with the same UUID.
+
+Then these vendors are non-compliant IFF the controllers don't belong
+to the same subsystem.
+
+> In addition, could you add a switch to turn on/off finding namespaces in
+> a subsystem-wide level or globally?
+
+No.
+
+> Can namespace be shared between two subsystem?
+
+No - if you share namespace access you are in the same subsystem.
