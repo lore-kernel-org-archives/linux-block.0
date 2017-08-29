@@ -1,19 +1,24 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:46520 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751774AbdH2Ld0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Aug 2017 07:33:26 -0400
+Date: Tue, 29 Aug 2017 19:33:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com,
+        Hannes Reinecke <hare@suse.de>, Karel Zak <kzak@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>
 Subject: Re: [PATCH 0/4] loop: support different logical block sizes
-To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Hannes Reinecke <hare@suse.de>,
- Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>,
- Milan Broz <gmazyland@gmail.com>
+Message-ID: <20170829113314.GF32439@ming.t460p>
 References: <cover.1503558155.git.osandov@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <4c6d35ca-df8a-a998-8c4e-ef5177a6109c@kernel.dk>
-Date: Thu, 31 Aug 2017 13:51:50 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <cover.1503558155.git.osandov@fb.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 08/24/2017 01:03 AM, Omar Sandoval wrote:
+On Thu, Aug 24, 2017 at 12:03:40AM -0700, Omar Sandoval wrote:
 > From: Omar Sandoval <osandov@fb.com>
 > 
 > Hi, everyone,
@@ -53,8 +58,21 @@ On 08/24/2017 01:03 AM, Omar Sandoval wrote:
 > 
 > This is based on my patch reverting the original block size support,
 > targeting 4.14. Thanks!
+> 
+> Omar Sandoval (4):
+>   loop: get rid of lo_blocksize
+>   loop: set physical block size to PAGE_SIZE
+>   loop: add ioctl for changing logical block size
+>   loop: fold loop_switch() into callers
+> 
+>  drivers/block/loop.c      | 112 ++++++++++++++++------------------------------
+>  drivers/block/loop.h      |   1 -
+>  include/uapi/linux/loop.h |   1 +
+>  3 files changed, 40 insertions(+), 74 deletions(-)
 
-Applied for 4.14, thanks Omar.
+Looks fine,
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 -- 
-Jens Axboe
+Ming
