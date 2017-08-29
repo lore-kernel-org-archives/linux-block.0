@@ -1,136 +1,86 @@
-Return-Path: <BATV+08196f5b2bd262a84b8d+5113+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+2972572aac770b70d036+5119+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH 1/6] btrfs: index check-integrity state hash by a dev_t
-Date: Wed, 23 Aug 2017 19:10:27 +0200
-Message-Id: <20170823171032.30529-2-hch@lst.de>
-In-Reply-To: <20170823171032.30529-1-hch@lst.de>
-References: <20170823171032.30529-1-hch@lst.de>
+To: viro@zeniv.linux.org.uk,
+	axboe@kernel.dk
+Cc: Milosz Tanski <milosz@adfin.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>,
+	mgorman@suse.de,
+	Volker.Lendecke@sernet.de,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/4] fs: pass iocb to do_generic_file_read
+Date: Tue, 29 Aug 2017 16:13:18 +0200
+Message-Id: <20170829141321.4482-2-hch@lst.de>
+In-Reply-To: <20170829141321.4482-1-hch@lst.de>
+References: <20170829141321.4482-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-We won't have the struct block_device available in the bio soon, so switch
-to the numerical dev_t instead of the block_device pointer for looking up
-the check-integrity state.
+And rename it to the more descriptive generic_file_buffered_read while
+at it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- fs/btrfs/check-integrity.c | 31 +++++++++++++------------------
- 1 file changed, 13 insertions(+), 18 deletions(-)
+ mm/filemap.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/fs/btrfs/check-integrity.c b/fs/btrfs/check-integrity.c
-index 11d37c94ce05..9d3854839038 100644
---- a/fs/btrfs/check-integrity.c
-+++ b/fs/btrfs/check-integrity.c
-@@ -296,8 +296,7 @@ static void btrfsic_dev_state_hashtable_add(
- 		struct btrfsic_dev_state *ds,
- 		struct btrfsic_dev_state_hashtable *h);
- static void btrfsic_dev_state_hashtable_remove(struct btrfsic_dev_state *ds);
--static struct btrfsic_dev_state *btrfsic_dev_state_hashtable_lookup(
--		struct block_device *bdev,
-+static struct btrfsic_dev_state *btrfsic_dev_state_hashtable_lookup(dev_t dev,
- 		struct btrfsic_dev_state_hashtable *h);
- static struct btrfsic_stack_frame *btrfsic_stack_frame_alloc(void);
- static void btrfsic_stack_frame_free(struct btrfsic_stack_frame *sf);
-@@ -385,8 +384,7 @@ static int btrfsic_process_superblock_dev_mirror(
- 		int superblock_mirror_num,
- 		struct btrfsic_dev_state **selected_dev_state,
- 		struct btrfs_super_block *selected_super);
--static struct btrfsic_dev_state *btrfsic_dev_state_lookup(
--		struct block_device *bdev);
-+static struct btrfsic_dev_state *btrfsic_dev_state_lookup(dev_t dev);
- static void btrfsic_cmp_log_and_dev_bytenr(struct btrfsic_state *state,
- 					   u64 bytenr,
- 					   struct btrfsic_dev_state *dev_state,
-@@ -626,17 +624,15 @@ static void btrfsic_dev_state_hashtable_remove(struct btrfsic_dev_state *ds)
- 	list_del(&ds->collision_resolving_node);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index a49702445ce0..4bcfa74ad802 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1886,9 +1886,8 @@ static void shrink_readahead_size_eio(struct file *filp,
  }
  
--static struct btrfsic_dev_state *btrfsic_dev_state_hashtable_lookup(
--		struct block_device *bdev,
-+static struct btrfsic_dev_state *btrfsic_dev_state_hashtable_lookup(dev_t dev,
- 		struct btrfsic_dev_state_hashtable *h)
+ /**
+- * do_generic_file_read - generic file read routine
+- * @filp:	the file to read
+- * @ppos:	current file position
++ * generic_file_buffered_read - generic file read routine
++ * @iocb:	the iocb to read
+  * @iter:	data destination
+  * @written:	already copied
+  *
+@@ -1898,12 +1897,14 @@ static void shrink_readahead_size_eio(struct file *filp,
+  * This is really ugly. But the goto's actually try to clarify some
+  * of the logic when it comes to error handling etc.
+  */
+-static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
++static ssize_t generic_file_buffered_read(struct kiocb *iocb,
+ 		struct iov_iter *iter, ssize_t written)
  {
- 	const unsigned int hashval =
--	    (((unsigned int)((uintptr_t)bdev)) &
--	     (BTRFSIC_DEV2STATE_HASHTABLE_SIZE - 1));
-+		dev & (BTRFSIC_DEV2STATE_HASHTABLE_SIZE - 1);
- 	struct btrfsic_dev_state *ds;
- 
- 	list_for_each_entry(ds, h->table + hashval, collision_resolving_node) {
--		if (ds->bdev == bdev)
-+		if (ds->bdev->bd_dev == dev)
- 			return ds;
- 	}
- 
-@@ -668,7 +664,7 @@ static int btrfsic_process_superblock(struct btrfsic_state *state,
- 		if (!device->bdev || !device->name)
- 			continue;
- 
--		dev_state = btrfsic_dev_state_lookup(device->bdev);
-+		dev_state = btrfsic_dev_state_lookup(device->bdev->bd_dev);
- 		BUG_ON(NULL == dev_state);
- 		for (i = 0; i < BTRFS_SUPER_MIRROR_MAX; i++) {
- 			ret = btrfsic_process_superblock_dev_mirror(
-@@ -1556,7 +1552,7 @@ static int btrfsic_map_block(struct btrfsic_state *state, u64 bytenr, u32 len,
- 	}
- 
- 	device = multi->stripes[0].dev;
--	block_ctx_out->dev = btrfsic_dev_state_lookup(device->bdev);
-+	block_ctx_out->dev = btrfsic_dev_state_lookup(device->bdev->bd_dev);
- 	block_ctx_out->dev_bytenr = multi->stripes[0].physical;
- 	block_ctx_out->start = bytenr;
- 	block_ctx_out->len = len;
-@@ -2654,7 +2650,7 @@ static struct btrfsic_block *btrfsic_block_lookup_or_add(
- 			pr_info("btrfsic: error, kmalloc failed!\n");
- 			return NULL;
- 		}
--		dev_state = btrfsic_dev_state_lookup(block_ctx->dev->bdev);
-+		dev_state = btrfsic_dev_state_lookup(block_ctx->dev->bdev->bd_dev);
- 		if (NULL == dev_state) {
- 			pr_info("btrfsic: error, lookup dev_state failed!\n");
- 			btrfsic_block_free(block);
-@@ -2734,10 +2730,9 @@ static void btrfsic_cmp_log_and_dev_bytenr(struct btrfsic_state *state,
- 	}
- }
- 
--static struct btrfsic_dev_state *btrfsic_dev_state_lookup(
--		struct block_device *bdev)
-+static struct btrfsic_dev_state *btrfsic_dev_state_lookup(dev_t dev)
++	struct file *filp = iocb->ki_filp;
+ 	struct address_space *mapping = filp->f_mapping;
+ 	struct inode *inode = mapping->host;
+ 	struct file_ra_state *ra = &filp->f_ra;
++	loff_t *ppos = &iocb->ki_pos;
+ 	pgoff_t index;
+ 	pgoff_t last_index;
+ 	pgoff_t prev_index;
+@@ -2151,14 +2152,14 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ ssize_t
+ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
  {
--	return btrfsic_dev_state_hashtable_lookup(bdev,
-+	return btrfsic_dev_state_hashtable_lookup(dev,
- 						  &btrfsic_dev_state_hashtable);
+-	struct file *file = iocb->ki_filp;
+-	ssize_t retval = 0;
+ 	size_t count = iov_iter_count(iter);
++	ssize_t retval = 0;
+ 
+ 	if (!count)
+ 		goto out; /* skip atime */
+ 
+ 	if (iocb->ki_flags & IOCB_DIRECT) {
++		struct file *file = iocb->ki_filp;
+ 		struct address_space *mapping = file->f_mapping;
+ 		struct inode *inode = mapping->host;
+ 		loff_t size;
+@@ -2199,7 +2200,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 			goto out;
+ 	}
+ 
+-	retval = do_generic_file_read(file, &iocb->ki_pos, iter, retval);
++	retval = generic_file_buffered_read(iocb, iter, retval);
+ out:
+ 	return retval;
  }
- 
-@@ -2751,7 +2746,7 @@ int btrfsic_submit_bh(int op, int op_flags, struct buffer_head *bh)
- 	mutex_lock(&btrfsic_mutex);
- 	/* since btrfsic_submit_bh() might also be called before
- 	 * btrfsic_mount(), this might return NULL */
--	dev_state = btrfsic_dev_state_lookup(bh->b_bdev);
-+	dev_state = btrfsic_dev_state_lookup(bh->b_bdev->bd_dev);
- 
- 	/* Only called to write the superblock (incl. FLUSH/FUA) */
- 	if (NULL != dev_state &&
-@@ -2808,7 +2803,7 @@ static void __btrfsic_submit_bio(struct bio *bio)
- 	mutex_lock(&btrfsic_mutex);
- 	/* since btrfsic_submit_bio() is also called before
- 	 * btrfsic_mount(), this might return NULL */
--	dev_state = btrfsic_dev_state_lookup(bio->bi_bdev);
-+	dev_state = btrfsic_dev_state_lookup(bio->bi_bdev->bd_dev);
- 	if (NULL != dev_state &&
- 	    (bio_op(bio) == REQ_OP_WRITE) && bio_has_data(bio)) {
- 		unsigned int i = 0;
-@@ -2998,7 +2993,7 @@ void btrfsic_unmount(struct btrfs_fs_devices *fs_devices)
- 			continue;
- 
- 		ds = btrfsic_dev_state_hashtable_lookup(
--				device->bdev,
-+				device->bdev->bd_dev,
- 				&btrfsic_dev_state_hashtable);
- 		if (NULL != ds) {
- 			state = ds->state;
 -- 
 2.11.0
