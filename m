@@ -1,49 +1,35 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <hch@lst.de>
+Date: Tue, 29 Aug 2017 15:12:27 +0200
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Call .initialize_rq_fn() also for filesystem
- requests
-Date: Tue, 29 Aug 2017 20:15:23 +0000
-Message-ID: <1504037722.2653.47.camel@wdc.com>
-References: <20170825190057.15592-1-bart.vanassche@wdc.com>
-	 <20170828081017.GC2851@lst.de> <1503945091.2841.50.camel@wdc.com>
-	 <20170829111619.GE32439@ming.t460p>
-In-Reply-To: <20170829111619.GE32439@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+	requests
+Message-ID: <20170829131227.GB29153@lst.de>
+References: <20170825190057.15592-1-bart.vanassche@wdc.com> <20170828081017.GC2851@lst.de> <1503945091.2841.50.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1503945091.2841.50.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTA4LTI5IGF0IDE5OjE2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSGkg
-QmFydCwNCj4gDQo+IERpZCB5b3Ugc2VlIHBlcmYgcmVncmVzc2lvbiBvbiBTUlAgd2l0aCBzbWFs
-bGVyIGpvYnMgYWZ0ZXIgYXBwbHlpbmcNCj4gbXkgcGF0Y2hzZXQgVjM/DQo+IA0KPiBJIGp1c3Qg
-cnVuIHRoZSB0ZXN0IHdpdGggMTYgam9icyh0aGUgc3lzdGVtIGhhcyAxNiBDUFUgY29yZXMpIGlu
-c3RlYWQgb2YgNjQsDQo+IGxvb2tzIG5vdCBzZWUgcGVyZiByZWdyZXNzaW9uIG9uIFNSUCBhYm91
-dCB2NC4xMy1yYzYrYmxrLW5leHQoMm5kIGNvbHVtbikgVlMuDQo+IHY0LjEzLXJjNitibGstbmV4
-dCtwYXRjaCBWMygzcmQgY29sdW1uKToNCj4gDQo+IA0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0NCj4gIElPUFMoSykgIHwgICAgTk9ORSAgICAgfCAgICBOT05FDQo+
-IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiByZWFkICAgICAgfCAg
-ICAgIDQ3NS44MyB8ICAgICAgNDg1Ljg4DQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLQ0KPiByYW5kcmVhZCAgfCAgICAgIDE0Mi44NiB8ICAgICAgMTQxLjk2DQo+IC0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiB3cml0ZSAgICAgfCAgICAg
-ICA0ODMuOSB8ICAgICAgNDkyLjM5DQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLQ0KPiByYW5kd3JpdGUgfCAgICAgIDEyNC44MyB8ICAgICAgMTI0LjUzDQo+IC0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiBbIC4uLiBdDQo+IC0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgTEFUKHVzKSAgfCAgICBOT05FICAg
-ICB8ICAgIE5PTkUNCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+
-IHJlYWQgICAgICB8ICAgICAgICAyLjE1IHwgICAgICAgIDIuMTENCj4gLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IHJhbmRyZWFkICB8ICAgICAgICA3LjE3IHwgICAg
-ICAgIDcuMjENCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IHdy
-aXRlICAgICB8ICAgICAgICAyLjExIHwgICAgICAgIDIuMDgNCj4gLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IHJhbmR3cml0ZSB8ICAgICAgICAgOC4yIHwgICAgICAg
-IDguMjINCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IFsgLi4u
-IF0NCg0KSGVsbG8gTWluZywNCg0KQWx0aG91Z2ggSSB3b3VsZCBwcmVmZXIgdG8gc2VlIG1lYXN1
-cmVtZW50IGRhdGEgYWdhaW5zdCBhbiBTUlAgdGFyZ2V0IHN5c3RlbQ0KdGhhdCBzdXBwb3J0cyBh
-IGhpZ2hlciB3b3JrbG9hZCAoPjFNIElPUFMpIGFuZCBhbHNvIGZvciBhIGhpZ2gtZW5kIE5WTWUg
-ZHJpdmUsDQpJIHRoaW5rIHRoZSBhYm92ZSBkYXRhIGlzIHN1ZmZpY2llbnQgdG8gc2hvdyB0aGF0
-IHRoZSBwZXJmb3JtYW5jZSBpbXBhY3Qgb2YNCnlvdXIgcGF0Y2ggc2VyaWVzIGlzIG1vc3QgbGlr
-ZWx5IHNtYWxsIGVub3VnaCBldmVuIGZvciBoaWdoLWVuZCBTQ1NJIGluaXRpYXRvcg0KZHJpdmVy
-cy4NCg0KQmFydC4=
+Hi Bart,
+
+this isn't just about performance - it's about understanability of
+the I/O path.
+
+The legacy request path already has the prep_fn, which is intended
+for exactly this sort of prep work, but even that led to a lot
+of confusion.  For blk-mq we decided to not add it but let the called
+driver in control.  I really don't want to move away from that.
+
+The passthrough requests using blk_get_requst are a special case
+as the caller allocates the requests, stuffs data into them and only
+then hands control to the driver, and thus we need some way to
+initialize the request before handing controller to the driver in
+this particular special case.  And if needed would could actually
+do that with explicit calls instead of the callback, although you
+changed it to save a bit of code.
