@@ -1,53 +1,40 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Call .initialize_rq_fn() also for filesystem
  requests
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "hare@suse.com" <hare@suse.com>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Date: Tue, 29 Aug 2017 20:57:59 +0000
+Message-ID: <1504040278.2653.66.camel@wdc.com>
 References: <20170825190057.15592-1-bart.vanassche@wdc.com>
- <20170828081017.GC2851@lst.de> <1504040278.2653.66.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <ebbccce0-aef7-08bb-24f7-aa1f26fcd993@kernel.dk>
-Date: Tue, 29 Aug 2017 15:24:36 -0600
+	 <20170828081017.GC2851@lst.de>
+In-Reply-To: <20170828081017.GC2851@lst.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1504040278.2653.66.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/29/2017 02:57 PM, Bart Van Assche wrote:
-> On Mon, 2017-08-28 at 10:10 +0200, Christoph Hellwig wrote:
->> All that can be done by clearing or setting a flag on the first call to
->> ->queue_rq or ->queuecommand instead.  In NVMe we use RQF_DONTPREP for
->> that, but for SCSI we probablt can't use that given that it has more
->> meaning for the old request path.  But how about just adding a new
->> RQD_DRV_INITIALIZED or similar flag?
-> 
-> Hello Christoph,
-> 
-> More changes would have to be made to implement the above proposal
-> than just setting a flag at the start of .queue_rq() / .queuecommand()
-> for all filesystem requests. The numerous code paths that lead to a
-> request not being executed immediately, e.g. a SCSI host being busy or
-> a preparation status != BLKPREP_OK, would have to be inspected and
-> code would have to be added to clear the "command initialized" flag to
-> ensure that initialization occurs shortly before the first time a
-> command is executed.
-> 
-> The choice we have to make is to add more state information and
-> complicated code for keeping that state information up-to-date to the
-> SCSI core or making a small and easy to maintain change to the block
-> layer core that does not involve any new state information. That's why
-> I'm asking you to reconsider the patch at the start of this e-mail
-> thread.
-
-I don't like this addition, and honestly I wasn't a huge fan of adding
-->init() hooks to the alloc path when we initially added this earlier
-this summer. The fact that we now have to make this more invasive
-doesn't improve the situation at all.
-
-So fwiw, I too would much rather see an implementation based on an RQF_
-flag instead.
-
--- 
-Jens Axboe
+T24gTW9uLCAyMDE3LTA4LTI4IGF0IDEwOjEwICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gQWxsIHRoYXQgY2FuIGJlIGRvbmUgYnkgY2xlYXJpbmcgb3Igc2V0dGluZyBhIGZsYWcg
+b24gdGhlIGZpcnN0IGNhbGwgdG8NCj4gLT5xdWV1ZV9ycSBvciAtPnF1ZXVlY29tbWFuZCBpbnN0
+ZWFkLiAgSW4gTlZNZSB3ZSB1c2UgUlFGX0RPTlRQUkVQIGZvcg0KPiB0aGF0LCBidXQgZm9yIFND
+U0kgd2UgcHJvYmFibHQgY2FuJ3QgdXNlIHRoYXQgZ2l2ZW4gdGhhdCBpdCBoYXMgbW9yZQ0KPiBt
+ZWFuaW5nIGZvciB0aGUgb2xkIHJlcXVlc3QgcGF0aC4gIEJ1dCBob3cgYWJvdXQganVzdCBhZGRp
+bmcgYSBuZXcNCj4gUlFEX0RSVl9JTklUSUFMSVpFRCBvciBzaW1pbGFyIGZsYWc/DQoNCkhlbGxv
+IENocmlzdG9waCwNCg0KTW9yZSBjaGFuZ2VzIHdvdWxkIGhhdmUgdG8gYmUgbWFkZSB0byBpbXBs
+ZW1lbnQgdGhlIGFib3ZlIHByb3Bvc2FsIHRoYW4ganVzdA0Kc2V0dGluZyBhIGZsYWcgYXQgdGhl
+IHN0YXJ0IG9mIC5xdWV1ZV9ycSgpIC8gLnF1ZXVlY29tbWFuZCgpIGZvciBhbGwNCmZpbGVzeXN0
+ZW0gcmVxdWVzdHMuIFRoZSBudW1lcm91cyBjb2RlIHBhdGhzIHRoYXQgbGVhZCB0byBhIHJlcXVl
+c3Qgbm90IGJlaW5nDQpleGVjdXRlZCBpbW1lZGlhdGVseSwgZS5nLiBhIFNDU0kgaG9zdCBiZWlu
+ZyBidXN5IG9yIGEgcHJlcGFyYXRpb24gc3RhdHVzICE9DQpCTEtQUkVQX09LLCB3b3VsZCBoYXZl
+IHRvIGJlIGluc3BlY3RlZCBhbmQgY29kZSB3b3VsZCBoYXZlIHRvIGJlIGFkZGVkIHRvIGNsZWFy
+DQp0aGUgImNvbW1hbmQgaW5pdGlhbGl6ZWQiIGZsYWcgdG8gZW5zdXJlIHRoYXQgaW5pdGlhbGl6
+YXRpb24gb2NjdXJzIHNob3J0bHkNCmJlZm9yZSB0aGUgZmlyc3QgdGltZSBhIGNvbW1hbmQgaXMg
+ZXhlY3V0ZWQuDQoNClRoZSBjaG9pY2Ugd2UgaGF2ZSB0byBtYWtlIGlzIHRvIGFkZCBtb3JlIHN0
+YXRlIGluZm9ybWF0aW9uIGFuZCBjb21wbGljYXRlZA0KY29kZSBmb3Iga2VlcGluZyB0aGF0IHN0
+YXRlIGluZm9ybWF0aW9uIHVwLXRvLWRhdGUgdG8gdGhlIFNDU0kgY29yZSBvciBtYWtpbmcgYQ0K
+c21hbGwgYW5kIGVhc3kgdG8gbWFpbnRhaW4gY2hhbmdlIHRvIHRoZSBibG9jayBsYXllciBjb3Jl
+IHRoYXQgZG9lcyBub3QgaW52b2x2ZQ0KYW55IG5ldyBzdGF0ZSBpbmZvcm1hdGlvbi4gVGhhdCdz
+IHdoeSBJJ20gYXNraW5nIHlvdSB0byByZWNvbnNpZGVyIHRoZSBwYXRjaCBhdA0KdGhlIHN0YXJ0
+IG9mIHRoaXMgZS1tYWlsIHRocmVhZC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
