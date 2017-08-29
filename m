@@ -1,94 +1,66 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 04/55] skd: Switch to GPLv2
-Date: Thu, 17 Aug 2017 13:12:47 -0700
-Message-Id: <20170817201338.16537-5-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.didichuxing.com ([111.202.154.82]:32961 "EHLO
+        BJEXCAS007.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751867AbdH2QI1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Aug 2017 12:08:27 -0400
+Date: Wed, 30 Aug 2017 00:08:17 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH] blkcg: check pol->cpd_free_fn before free cpd
+Message-ID: <20170829160811.GA1324@localhost.didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This change does not affect any skd driver version derived from a
-dual licensed code base but makes all code derived from future
-upstream skd driver versions GPLv2 only.
+check pol->cpd_free_fn() instead of pol->cpd_alloc_fn() when free cpd.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- drivers/block/skd_main.c  | 25 +++++++++----------------
- drivers/block/skd_s1120.h | 12 +++++-------
- 2 files changed, 14 insertions(+), 23 deletions(-)
+ block/blk-cgroup.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 153f20ce318b..95a528f1fb9c 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -1,19 +1,12 @@
--/* Copyright 2012 STEC, Inc.
-+/*
-+ * Driver for sTec s1120 PCIe SSDs. sTec was acquired in 2013 by HGST and HGST
-+ * was acquired by Western Digital in 2012.
-+ *
-+ * Copyright 2012 sTec, Inc.
-+ * Copyright (c) 2017 Western Digital Corporation or its affiliates.
-  *
-- * This file is licensed under the terms of the 3-clause
-- * BSD License (http://opensource.org/licenses/BSD-3-Clause)
-- * or the GNU GPL-2.0 (http://www.gnu.org/licenses/gpl-2.0.html),
-- * at your option. Both licenses are also available in the LICENSE file
-- * distributed with this project. This file may not be copied, modified,
-- * or distributed except in accordance with those terms.
-- * Gordoni Waidhofer <gwaidhofer@stec-inc.com>
-- * Initial Driver Design!
-- * Thomas Swann <tswann@stec-inc.com>
-- * Interrupt handling.
-- * Ramprasad Chinthekindi <rchinthekindi@stec-inc.com>
-- * biomode implementation.
-- * Akhil Bhansali <abhansali@stec-inc.com>
-- * Added support for DISCARD / FLUSH and FUA.
-+ * This file is part of the Linux kernel, and is made available under
-+ * the terms of the GNU General Public License version 2.
-  */
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 0480892..adcbc3e 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1044,7 +1044,7 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
+ 	list_del(&blkcg->all_blkcgs_node);
  
- #include <linux/kernel.h>
-@@ -80,7 +73,7 @@ enum {
- #define DRV_VER_COMPL   "2.2.1." DRV_BUILD_ID
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++)
+-		if (blkcg->cpd[i])
++		if (blkcg->cpd[i] && blkcg_policy[i]->cpd_free_fn)
+ 			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
  
- MODULE_AUTHOR("bug-reports: support@stec-inc.com");
--MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_LICENSE("GPL");
+ 	mutex_unlock(&blkcg_pol_mutex);
+@@ -1109,7 +1109,7 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
  
- MODULE_DESCRIPTION("STEC s1120 PCIe SSD block driver (b" DRV_BUILD_ID ")");
- MODULE_VERSION(DRV_VERSION "-" DRV_BUILD_ID);
-diff --git a/drivers/block/skd_s1120.h b/drivers/block/skd_s1120.h
-index 61c757ff0161..82ce34454dbf 100644
---- a/drivers/block/skd_s1120.h
-+++ b/drivers/block/skd_s1120.h
-@@ -1,11 +1,9 @@
--/* Copyright 2012 STEC, Inc.
-+/*
-+ * Copyright 2012 STEC, Inc.
-+ * Copyright (c) 2017 Western Digital Corporation or its affiliates.
-  *
-- * This file is licensed under the terms of the 3-clause
-- * BSD License (http://opensource.org/licenses/BSD-3-Clause)
-- * or the GNU GPL-2.0 (http://www.gnu.org/licenses/gpl-2.0.html),
-- * at your option. Both licenses are also available in the LICENSE file
-- * distributed with this project. This file may not be copied, modified,
-- * or distributed except in accordance with those terms.
-+ * This file is part of the Linux kernel, and is made available under
-+ * the terms of the GNU General Public License version 2.
-  */
+ free_pd_blkcg:
+ 	for (i--; i >= 0; i--)
+-		if (blkcg->cpd[i])
++		if (blkcg->cpd[i] && blkcg_policy[i]->cpd_free_fn)
+ 			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
+ free_blkcg:
+ 	kfree(blkcg);
+@@ -1450,7 +1450,7 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 	return 0;
  
+ err_free_cpds:
+-	if (pol->cpd_alloc_fn) {
++	if (pol->cpd_free_fn) {
+ 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
+ 			if (blkcg->cpd[pol->plid]) {
+ 				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
+@@ -1490,7 +1490,7 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
+ 	/* remove cpds and unregister */
+ 	mutex_lock(&blkcg_pol_mutex);
  
+-	if (pol->cpd_alloc_fn) {
++	if (pol->cpd_free_fn) {
+ 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
+ 			if (blkcg->cpd[pol->plid]) {
+ 				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
 -- 
-2.14.0
+2.9.4
