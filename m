@@ -1,172 +1,40 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 24/55] skd: Use a structure instead of hardcoding structure offsets
-Date: Thu, 17 Aug 2017 13:13:07 -0700
-Message-Id: <20170817201338.16537-25-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:50539 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750941AbdH3HBe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 03:01:34 -0400
+Subject: Re: [PATCH V6 00/12] mmc: Add Command Queue support
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <713feb73-e7c6-1e3c-f591-17fa16002384@intel.com>
+Date: Wed, 30 Aug 2017 09:54:55 +0300
+MIME-Version: 1.0
+In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This change makes the source code easier to read.
+On 25/08/17 15:43, Adrian Hunter wrote:
+> Here is V6 of the hardware command queue patches without the software
+> command queue patches.  Patches "mmc: host: Add CQE interface" and
+> "mmc: core: Turn off CQE before sending commands" have been applied to Ulf's
+> next branch.  "mmc: host: Add CQE interface" needs to be dropped in favour
+> of the new version.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 41 ++++++++++++++++++++++-------------------
- 1 file changed, 22 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 37b900c97b87..6ba6103f53dd 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -181,6 +181,11 @@ enum skd_check_status_action {
- 	SKD_CHECK_STATUS_BUSY_IMMINENT,
- };
- 
-+struct skd_msg_buf {
-+	struct fit_msg_hdr	fmh;
-+	struct skd_scsi_request	scsi[SKD_MAX_REQ_PER_MSG];
-+};
-+
- struct skd_fitmsg_context {
- 	enum skd_fit_msg_state state;
- 
-@@ -191,7 +196,7 @@ struct skd_fitmsg_context {
- 
- 	u32 length;
- 
--	u8 *msg_buf;
-+	struct skd_msg_buf *msg_buf;
- 	dma_addr_t mb_dma_address;
- };
- 
-@@ -231,7 +236,7 @@ struct skd_special_context {
- 	void *data_buf;
- 	dma_addr_t db_dma_address;
- 
--	u8 *msg_buf;
-+	struct skd_msg_buf *msg_buf;
- 	dma_addr_t mb_dma_address;
- };
- 
-@@ -520,7 +525,6 @@ static void skd_request_fn(struct request_queue *q)
- 	__be64 be_dmaa;
- 	u64 cmdctxt;
- 	u32 timo_slot;
--	void *cmd_ptr;
- 	int flush, fua;
- 
- 	if (skdev->state != SKD_DRVR_STATE_ONLINE) {
-@@ -639,7 +643,7 @@ static void skd_request_fn(struct request_queue *q)
- 			skmsg->id += SKD_ID_INCR;
- 
- 			/* Initialize the FIT msg header */
--			fmh = (struct fit_msg_hdr *)skmsg->msg_buf;
-+			fmh = &skmsg->msg_buf->fmh;
- 			memset(fmh, 0, sizeof(*fmh));
- 			fmh->protocol_id = FIT_PROTOCOL_ID_SOFIT;
- 			skmsg->length = sizeof(*fmh);
-@@ -647,13 +651,13 @@ static void skd_request_fn(struct request_queue *q)
- 
- 		skreq->fitmsg_id = skmsg->id;
- 
--		cmd_ptr = &skmsg->msg_buf[skmsg->length];
--		memset(cmd_ptr, 0, 32);
-+		scsi_req =
-+			&skmsg->msg_buf->scsi[fmh->num_protocol_cmds_coalesced];
-+		memset(scsi_req, 0, sizeof(*scsi_req));
- 
- 		be_dmaa = cpu_to_be64(skreq->sksg_dma_address);
- 		cmdctxt = skreq->id + SKD_ID_INCR;
- 
--		scsi_req = cmd_ptr;
- 		scsi_req->hdr.tag = cmdctxt;
- 		scsi_req->hdr.sg_list_dma_address = be_dmaa;
- 
-@@ -1549,8 +1553,8 @@ static int skd_sg_io_send_fitmsg(struct skd_device *skdev,
- 				 struct skd_sg_io *sksgio)
- {
- 	struct skd_special_context *skspcl = sksgio->skspcl;
--	struct fit_msg_hdr *fmh = (struct fit_msg_hdr *)skspcl->msg_buf;
--	struct skd_scsi_request *scsi_req = (struct skd_scsi_request *)&fmh[1];
-+	struct fit_msg_hdr *fmh = &skspcl->msg_buf->fmh;
-+	struct skd_scsi_request *scsi_req = &skspcl->msg_buf->scsi[0];
- 
- 	memset(skspcl->msg_buf, 0, SKD_N_SPECIAL_FITMSG_BYTES);
- 
-@@ -1709,11 +1713,11 @@ static int skd_format_internal_skspcl(struct skd_device *skdev)
- 	uint64_t dma_address;
- 	struct skd_scsi_request *scsi;
- 
--	fmh = (struct fit_msg_hdr *)&skspcl->msg_buf[0];
-+	fmh = &skspcl->msg_buf->fmh;
- 	fmh->protocol_id = FIT_PROTOCOL_ID_SOFIT;
- 	fmh->num_protocol_cmds_coalesced = 1;
- 
--	scsi = (struct skd_scsi_request *)&skspcl->msg_buf[64];
-+	scsi = &skspcl->msg_buf->scsi[0];
- 	memset(scsi, 0, sizeof(*scsi));
- 	dma_address = skspcl->req.sksg_dma_address;
- 	scsi->hdr.sg_list_dma_address = cpu_to_be64(dma_address);
-@@ -1748,7 +1752,7 @@ static void skd_send_internal_skspcl(struct skd_device *skdev,
- 	skspcl->req.state = SKD_REQ_STATE_BUSY;
- 	skspcl->req.id += SKD_ID_INCR;
- 
--	scsi = (struct skd_scsi_request *)&skspcl->msg_buf[64];
-+	scsi = &skspcl->msg_buf->scsi[0];
- 	scsi->hdr.tag = skspcl->req.id;
- 
- 	memset(scsi->cdb, 0, sizeof(scsi->cdb));
-@@ -1853,8 +1857,7 @@ static void skd_complete_internal(struct skd_device *skdev,
- 	u8 *buf = skspcl->data_buf;
- 	u8 status;
- 	int i;
--	struct skd_scsi_request *scsi =
--		(struct skd_scsi_request *)&skspcl->msg_buf[64];
-+	struct skd_scsi_request *scsi = &skspcl->msg_buf->scsi[0];
- 
- 	lockdep_assert_held(&skdev->lock);
- 
-@@ -2020,7 +2023,7 @@ static void skd_send_fitmsg(struct skd_device *skdev,
- 	qcmd = skmsg->mb_dma_address;
- 	qcmd |= FIT_QCMD_QID_NORMAL;
- 
--	fmh = (struct fit_msg_hdr *)skmsg->msg_buf;
-+	fmh = &skmsg->msg_buf->fmh;
- 	skmsg->outstanding = fmh->num_protocol_cmds_coalesced;
- 
- 	if (unlikely(skdev->dbg_level > 1)) {
-@@ -2501,8 +2504,7 @@ static void skd_process_scsi_inq(struct skd_device *skdev,
- 				 struct skd_special_context *skspcl)
- {
- 	uint8_t *buf;
--	struct fit_msg_hdr *fmh = (struct fit_msg_hdr *)skspcl->msg_buf;
--	struct skd_scsi_request *scsi_req = (struct skd_scsi_request *)&fmh[1];
-+	struct skd_scsi_request *scsi_req = &skspcl->msg_buf->scsi[0];
- 
- 	dma_sync_sg_for_cpu(skdev->class_dev, skspcl->req.sg, skspcl->req.n_sg,
- 			    skspcl->req.sg_data_dir);
-@@ -4957,8 +4959,9 @@ static void skd_log_skreq(struct skd_device *skdev,
- 
- static int __init skd_init(void)
- {
--	BUILD_BUG_ON(sizeof(struct fit_msg_hdr) + SKD_MAX_REQ_PER_MSG *
--		     sizeof(struct skd_scsi_request) != SKD_N_FITMSG_BYTES);
-+	BUILD_BUG_ON(offsetof(struct skd_msg_buf, fmh) != 0);
-+	BUILD_BUG_ON(offsetof(struct skd_msg_buf, scsi) != 64);
-+	BUILD_BUG_ON(sizeof(struct skd_msg_buf) != SKD_N_FITMSG_BYTES);
- 
- 	pr_info(PFX " v%s-b%s loaded\n", DRV_VERSION, DRV_BUILD_ID);
- 
--- 
-2.14.0
+Any comments?
