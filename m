@@ -1,52 +1,149 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:42230 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750890AbdH3TRV (ORCPT
+Received: from mail-io0-f172.google.com ([209.85.223.172]:33424 "EHLO
+        mail-io0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751600AbdH3NOb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2017 15:17:21 -0400
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.21/8.16.0.21) with SMTP id v7UJGvDR003702
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 12:17:21 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 2cnywks06r-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 12:17:21 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@kernel.dk>
-Subject: [PATCH 2/3] block/loop: use FALLOC_FL_ZERO_RANGE for REQ_OP_WRITE_ZEROES
-Date: Wed, 30 Aug 2017 12:17:17 -0700
-Message-ID: <d2ceb45ef504bb78ba19725fc55eff327ff9f3ed.1504120418.git.shli@fb.com>
-In-Reply-To: <cover.1504120418.git.shli@fb.com>
-References: <cover.1504120418.git.shli@fb.com>
+        Wed, 30 Aug 2017 09:14:31 -0400
+Received: by mail-io0-f172.google.com with SMTP id s101so4959873ioe.0
+        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 06:14:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1503665035-16231-4-git-send-email-adrian.hunter@intel.com>
+References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com> <1503665035-16231-4-git-send-email-adrian.hunter@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Wed, 30 Aug 2017 15:14:29 +0200
+Message-ID: <CAPDyKFqn0yjM55QdojqPGiSJB_ccPxNX4U2rvoP7c+g1Maej9w@mail.gmail.com>
+Subject: Re: [PATCH V6 03/12] mmc: host: Add CQE interface
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-REQ_OP_WRITE_ZEROES really means zero the data. And the in
-blkdev_fallocate, FALLOC_FL_ZERO_RANGE will retry but
-FALLOC_FL_PUNCH_HOLE not, even loop request doesn't have
-BLKDEV_ZERO_NOFALLBACK set.
+On 25 August 2017 at 14:43, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> Add CQE host operations, capabilities, and host members.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/loop.c | 3 +++
- 1 file changed, 3 insertions(+)
+I have now replaced the previous version with this one, applied for
+next! Thanks!
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 054dccc..a30aa45 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -430,6 +430,9 @@ static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
- 	int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
- 	int ret;
- 
-+	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
-+		mode = FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE;
-+
- 	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
--- 
-2.9.5
+Kind regards
+Uffe
+
+> ---
+>  include/linux/mmc/core.h |  6 ++++++
+>  include/linux/mmc/host.h | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 59 insertions(+)
+>
+> diff --git a/include/linux/mmc/core.h b/include/linux/mmc/core.h
+> index 178f699ac172..927519385482 100644
+> --- a/include/linux/mmc/core.h
+> +++ b/include/linux/mmc/core.h
+> @@ -156,6 +156,12 @@ struct mmc_request {
+>         struct completion       completion;
+>         struct completion       cmd_completion;
+>         void                    (*done)(struct mmc_request *);/* completion function */
+> +       /*
+> +        * Notify uppers layers (e.g. mmc block driver) that recovery is needed
+> +        * due to an error associated with the mmc_request. Currently used only
+> +        * by CQE.
+> +        */
+> +       void                    (*recovery_notifier)(struct mmc_request *);
+>         struct mmc_host         *host;
+>
+>         /* Allow other commands during this ongoing data transfer or busy wait */
+> diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+> index e92629518f68..f3f2d07feb2a 100644
+> --- a/include/linux/mmc/host.h
+> +++ b/include/linux/mmc/host.h
+> @@ -162,6 +162,50 @@ struct mmc_host_ops {
+>                                   unsigned int direction, int blk_size);
+>  };
+>
+> +struct mmc_cqe_ops {
+> +       /* Allocate resources, and make the CQE operational */
+> +       int     (*cqe_enable)(struct mmc_host *host, struct mmc_card *card);
+> +       /* Free resources, and make the CQE non-operational */
+> +       void    (*cqe_disable)(struct mmc_host *host);
+> +       /*
+> +        * Issue a read, write or DCMD request to the CQE. Also deal with the
+> +        * effect of ->cqe_off().
+> +        */
+> +       int     (*cqe_request)(struct mmc_host *host, struct mmc_request *mrq);
+> +       /* Free resources (e.g. DMA mapping) associated with the request */
+> +       void    (*cqe_post_req)(struct mmc_host *host, struct mmc_request *mrq);
+> +       /*
+> +        * Prepare the CQE and host controller to accept non-CQ commands. There
+> +        * is no corresponding ->cqe_on(), instead ->cqe_request() is required
+> +        * to deal with that.
+> +        */
+> +       void    (*cqe_off)(struct mmc_host *host);
+> +       /*
+> +        * Wait for all CQE tasks to complete. Return an error if recovery
+> +        * becomes necessary.
+> +        */
+> +       int     (*cqe_wait_for_idle)(struct mmc_host *host);
+> +       /*
+> +        * Notify CQE that a request has timed out. Return false if the request
+> +        * completed or true if a timeout happened in which case indicate if
+> +        * recovery is needed.
+> +        */
+> +       bool    (*cqe_timeout)(struct mmc_host *host, struct mmc_request *mrq,
+> +                              bool *recovery_needed);
+> +       /*
+> +        * Stop all CQE activity and prepare the CQE and host controller to
+> +        * accept recovery commands.
+> +        */
+> +       void    (*cqe_recovery_start)(struct mmc_host *host);
+> +       /*
+> +        * Clear the queue and call mmc_cqe_request_done() on all requests.
+> +        * Requests that errored will have the error set on the mmc_request
+> +        * (data->error or cmd->error for DCMD).  Requests that did not error
+> +        * will have zero data bytes transferred.
+> +        */
+> +       void    (*cqe_recovery_finish)(struct mmc_host *host);
+> +};
+> +
+>  struct mmc_async_req {
+>         /* active mmc request */
+>         struct mmc_request      *mrq;
+> @@ -303,6 +347,8 @@ struct mmc_host {
+>  #define MMC_CAP2_HS400_ES      (1 << 20)       /* Host supports enhanced strobe */
+>  #define MMC_CAP2_NO_SD         (1 << 21)       /* Do not send SD commands during initialization */
+>  #define MMC_CAP2_NO_MMC                (1 << 22)       /* Do not send (e)MMC commands during initialization */
+> +#define MMC_CAP2_CQE           (1 << 23)       /* Has eMMC command queue engine */
+> +#define MMC_CAP2_CQE_DCMD      (1 << 24)       /* CQE can issue a direct command */
+>
+>         mmc_pm_flag_t           pm_caps;        /* supported pm features */
+>
+> @@ -386,6 +432,13 @@ struct mmc_host {
+>         int                     dsr_req;        /* DSR value is valid */
+>         u32                     dsr;    /* optional driver stage (DSR) value */
+>
+> +       /* Command Queue Engine (CQE) support */
+> +       const struct mmc_cqe_ops *cqe_ops;
+> +       void                    *cqe_private;
+> +       int                     cqe_qdepth;
+> +       bool                    cqe_enabled;
+> +       bool                    cqe_on;
+> +
+>         unsigned long           private[0] ____cacheline_aligned;
+>  };
+>
+> --
+> 1.9.1
+>
