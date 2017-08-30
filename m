@@ -1,90 +1,32 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	mgorman@techsingularity.net,
-	lee.tibbert@gmail.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 2/3] block, bfq: remove direct switch to an entity in higher class
-Date: Thu, 31 Aug 2017 08:10:19 +0200
-Message-Id: <20170831061020.4426-3-paolo.valente@linaro.org>
-In-Reply-To: <20170831061020.4426-1-paolo.valente@linaro.org>
-References: <20170831061020.4426-1-paolo.valente@linaro.org>
+Return-Path: <prvs=0415d39c2a=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <Kernel-team@fb.com>, <axboe@kernel.dk>
+Subject: [PATCH 0/3]block/loop: handle discard/zeroout error
+Date: Wed, 30 Aug 2017 12:17:15 -0700
+Message-ID: <cover.1504120418.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-If the function bfq_update_next_in_service is invoked as a consequence
-of the activation or requeueing of an entity, say E, and finds out
-that E belongs to a higher-priority class than that of the current
-next-in-service entity, then it sets next_in_service directly to
-E. But this may lead to anomalous schedules, because E may happen not
-be eligible for service, because its virtual start time is higher than
-the system virtual time for its service tree.
+Fix some problems when setting up loop device with a block device as back file
+and create/mount ext4 in the loop device.
 
-This commit addresses this issue by simply removing this direct
-switch.
+BTW: blkdev_issue_zeroout retries if we immediately find the device doesn't
+support zeroout, but it doesn't retry if submit_bio_wait returns -EOPNOTSUPP.
+Is this correct behavior?
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
-Tested-by: Oleksander Natalenko <oleksandr@natalenko.name>
----
- block/bfq-wf2q.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
+Thanks,
+Shaohua
 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 138732e..eeaf326 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -86,9 +86,8 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- 	 * or repositiong of an entity that does not coincide with
- 	 * sd->next_in_service, then a full lookup in the active tree
- 	 * can be avoided. In fact, it is enough to check whether the
--	 * just-modified entity has a higher priority than
--	 * sd->next_in_service, or, even if it has the same priority
--	 * as sd->next_in_service, is eligible and has a lower virtual
-+	 * just-modified entity has the same priority as
-+	 * sd->next_in_service, is eligible and has a lower virtual
- 	 * finish time than sd->next_in_service. If this compound
- 	 * condition holds, then the new entity becomes the new
- 	 * next_in_service. Otherwise no change is needed.
-@@ -104,9 +103,8 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- 
- 		/*
- 		 * If there is already a next_in_service candidate
--		 * entity, then compare class priorities or timestamps
--		 * to decide whether to replace sd->service_tree with
--		 * new_entity.
-+		 * entity, then compare timestamps to decide whether
-+		 * to replace sd->service_tree with new_entity.
- 		 */
- 		if (next_in_service) {
- 			unsigned int new_entity_class_idx =
-@@ -114,10 +112,6 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- 			struct bfq_service_tree *st =
- 				sd->service_tree + new_entity_class_idx;
- 
--			/*
--			 * For efficiency, evaluate the most likely
--			 * sub-condition first.
--			 */
- 			replace_next =
- 				(new_entity_class_idx ==
- 				 bfq_class_idx(next_in_service)
-@@ -125,10 +119,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- 				 !bfq_gt(new_entity->start, st->vtime)
- 				 &&
- 				 bfq_gt(next_in_service->finish,
--					new_entity->finish))
--				||
--				new_entity_class_idx <
--				bfq_class_idx(next_in_service);
-+					new_entity->finish));
- 		}
- 
- 		if (replace_next)
+
+Shaohua Li (3):
+  block/loop: don't hijack error number
+  block/loop: use FALLOC_FL_ZERO_RANGE for REQ_OP_WRITE_ZEROES
+  block/loop: suppress discard IO error message
+
+ drivers/block/loop.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
 -- 
-2.10.0
+2.9.5
