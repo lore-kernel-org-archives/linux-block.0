@@ -1,126 +1,94 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:33279 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750815AbdHaSAc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 14:00:32 -0400
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-block@vger.kernel.org
-Cc: jonathan.derrick@intel.com, david.fugate@intel.com, axboe@fb.com,
-        hch@infradead.org, rafael.antognolli@intel.com,
-        Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH] block: sed-opal: Set MBRDone on S3 resume path if TPER is MBREnabled
-Date: Thu, 31 Aug 2017 11:42:38 -0600
-Message-Id: <20170831174238.2714-1-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=408be853d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 4/5] bfq: Suppress compiler warnings about comparisons
+Date: Wed, 30 Aug 2017 11:42:10 -0700
+Message-Id: <20170830184211.12471-5-bart.vanassche@wdc.com>
+In-Reply-To: <20170830184211.12471-1-bart.vanassche@wdc.com>
+References: <20170830184211.12471-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Users who are booting off their Opal enabled drives are having
-issues when they have a shadow MBR set up after s3/resume cycle.
-When the Drive has a shadow MBR setup the MBRDone flag is set to
-false upon power loss (S3/S4/S5). When the MBRDone flag is false
-I/O to LBA 0 -> LBA_END_MBR are remapped to the shadow mbr
-of the drive. If the drive contains useful data in the 0 -> end_mbr
-range upon s3 resume the user can never get to that data as the
-drive will keep remapping it to the MBR. To fix this when we unlock
-on S3 resume, we need to tell the drive that we're done with the
-shadow mbr (even though we didnt use it) by setting true to MBRDone.
-This way the drive will stop the remapping and the user can access
-their data.
+This patch avoids that the following warnings are reported when
+building with W=1:
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+block/bfq-iosched.c: In function 'bfq_back_seek_max_store':
+block/bfq-iosched.c:4860:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/bfq-iosched.c:4876:1: note: in expansion of macro 'STORE_FUNCTION'
+ STORE_FUNCTION(bfq_back_seek_max_store, &bfqd->bfq_back_max, 0, INT_MAX, 0);
+ ^~~~~~~~~~~~~~
+block/bfq-iosched.c: In function 'bfq_slice_idle_store':
+block/bfq-iosched.c:4860:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/bfq-iosched.c:4879:1: note: in expansion of macro 'STORE_FUNCTION'
+ STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, INT_MAX, 2);
+ ^~~~~~~~~~~~~~
+block/bfq-iosched.c: In function 'bfq_slice_idle_us_store':
+block/bfq-iosched.c:4892:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+  if (__data < (MIN))      \
+             ^
+block/bfq-iosched.c:4899:1: note: in expansion of macro 'USEC_STORE_FUNCTION'
+ USEC_STORE_FUNCTION(bfq_slice_idle_us_store, &bfqd->bfq_slice_idle, 0,
+ ^~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/opal_proto.h |  1 +
- block/sed-opal.c   | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
+ block/bfq-iosched.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index f40c9acf8895..e20be8258854 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -46,6 +46,7 @@ enum opal_response_token {
- #define GENERIC_HOST_SESSION_NUM 0x41
- 
- #define TPER_SYNC_SUPPORTED 0x01
-+#define MBR_ENABLED_MASK 0x10
- 
- #define TINY_ATOM_DATA_MASK 0x3F
- #define TINY_ATOM_SIGNED 0x40
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9b30ae5ab843..35ddb6026334 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -80,6 +80,7 @@ struct parsed_resp {
- 
- struct opal_dev {
- 	bool supported;
-+	bool mbr_enabled;
- 
- 	void *data;
- 	sec_send_recv *send_recv;
-@@ -283,6 +284,14 @@ static bool check_tper(const void *data)
- 	return true;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index cf92f16eb5f2..d375b29ad085 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4851,16 +4851,16 @@ static ssize_t								\
+ __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
+ {									\
+ 	struct bfq_data *bfqd = e->elevator_data;			\
+-	unsigned long __data;						\
++	unsigned long __data, __min = (MIN), __max = (MAX);		\
+ 	int ret;							\
+ 									\
+ 	ret = bfq_var_store(&__data, (page));				\
+ 	if (ret)							\
+ 		return ret;						\
+-	if (__data < (MIN))						\
+-		__data = (MIN);						\
+-	else if (__data > (MAX))					\
+-		__data = (MAX);						\
++	if (__data < __min)						\
++		__data = __min;						\
++	else if (__data > __max)					\
++		__data = __max;						\
+ 	if (__CONV == 1)						\
+ 		*(__PTR) = msecs_to_jiffies(__data);			\
+ 	else if (__CONV == 2)						\
+@@ -4883,16 +4883,16 @@ STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, INT_MAX, 2);
+ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)\
+ {									\
+ 	struct bfq_data *bfqd = e->elevator_data;			\
+-	unsigned long __data;						\
++	unsigned long __data, __min = (MIN), __max = (MAX);		\
+ 	int ret;							\
+ 									\
+ 	ret = bfq_var_store(&__data, (page));				\
+ 	if (ret)							\
+ 		return ret;						\
+-	if (__data < (MIN))						\
+-		__data = (MIN);						\
+-	else if (__data > (MAX))					\
+-		__data = (MAX);						\
++	if (__data < __min)						\
++		__data = __min;						\
++	else if (__data > __max)					\
++		__data = __max;						\
+ 	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
+ 	return count;							\
  }
- 
-+static bool check_mbrenabled(const void *data)
-+{
-+	const struct d0_locking_features *lfeat = data;
-+	u8 sup_feat = lfeat->supported_features;
-+
-+	return !!(sup_feat & MBR_ENABLED_MASK);
-+}
-+
- static bool check_sum(const void *data)
- {
- 	const struct d0_single_user_mode *sum = data;
-@@ -417,6 +426,7 @@ static int opal_discovery0_end(struct opal_dev *dev)
- 	u32 hlen = be32_to_cpu(hdr->length);
- 
- 	print_buffer(dev->resp, hlen);
-+	dev->mbr_enabled = false;
- 
- 	if (hlen > IO_BUFFER_LENGTH - sizeof(*hdr)) {
- 		pr_debug("Discovery length overflows buffer (%zu+%u)/%u\n",
-@@ -442,6 +452,8 @@ static int opal_discovery0_end(struct opal_dev *dev)
- 			check_geometry(dev, body);
- 			break;
- 		case FC_LOCKING:
-+			dev->mbr_enabled = check_mbrenabled(body->features);
-+			break;
- 		case FC_ENTERPRISE:
- 		case FC_DATASTORE:
- 			/* some ignored properties */
-@@ -2190,6 +2202,20 @@ static int __opal_lock_unlock(struct opal_dev *dev,
- 	return next(dev);
- }
- 
-+static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
-+{
-+	u8 mbr_done_tf = 1;
-+	const struct opal_step mbrdone_step [] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, key },
-+		{ set_mbr_done, &mbr_done_tf },
-+		{ NULL, }
-+	};
-+
-+	dev->steps = mbrdone_step;
-+	return next(dev);
-+}
-+
- static int opal_lock_unlock(struct opal_dev *dev,
- 			    struct opal_lock_unlock *lk_unlk)
- {
-@@ -2345,6 +2371,11 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
- 				 suspend->unlk.session.sum);
- 			was_failure = true;
- 		}
-+		if (dev->mbr_enabled) {
-+			ret = __opal_set_mbr_done(dev, &suspend->unlk.session.opal_key);
-+			if (ret)
-+				pr_debug("Failed to set MBR Done in S3 resume\n");
-+		}
- 	}
- 	mutex_unlock(&dev->dev_lock);
- 	return was_failure;
 -- 
-2.11.0
+2.14.1
