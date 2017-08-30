@@ -1,43 +1,38 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 Subject: Re: [GIT PULL] nvme update for Linux 4.14, take 2
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "hch@infradead.org" <hch@infradead.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Date: Wed, 30 Aug 2017 16:11:54 +0000
+Message-ID: <1504109513.2526.28.camel@wdc.com>
 References: <20170829150507.rjixn6uf3id6kltx@infradead.org>
- <9a27048d-1252-985f-c905-b738d709b204@kernel.dk>
- <38ddd70f-3fec-09c0-dafb-eba1e8f9cc18@grimberg.me>
- <1504106914.2526.5.camel@wdc.com>
- <a798247e-cc89-f189-4ad9-92095a86106e@grimberg.me>
- <1504107991.2526.16.camel@wdc.com>
- <30e386a2-aac7-e9b7-59e2-52c481247e4e@kernel.dk>
- <0ca15e8f-fc04-7694-a471-379103c6428d@grimberg.me>
- <1504109513.2526.28.camel@wdc.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <a2945cf7-93e5-11da-0780-3472b29f18bc@grimberg.me>
-Date: Wed, 30 Aug 2017 19:47:52 +0300
+	 <9a27048d-1252-985f-c905-b738d709b204@kernel.dk>
+	 <38ddd70f-3fec-09c0-dafb-eba1e8f9cc18@grimberg.me>
+	 <1504106914.2526.5.camel@wdc.com>
+	 <a798247e-cc89-f189-4ad9-92095a86106e@grimberg.me>
+	 <1504107991.2526.16.camel@wdc.com>
+	 <30e386a2-aac7-e9b7-59e2-52c481247e4e@kernel.dk>
+	 <0ca15e8f-fc04-7694-a471-379103c6428d@grimberg.me>
+In-Reply-To: <0ca15e8f-fc04-7694-a471-379103c6428d@grimberg.me>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1504109513.2526.28.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-
->> If we get to choose, my preference would be to restore the old behavior
->> because currently existing nvme transports keep their internal ctrl
->> representation in the tagset->driver_data as they implement
->> init/exit_request. Bouncing in nvme core would require to change that
->> and always keep struct nvme_ctrl as the tagset->driver_data and convert
->> it on every handler...
->>
->> Everything is doable but it seems like an unneeded hassle to me...
-> 
-> Sorry but I'm not convinced that it would be necessary to change what
-> tagset->driver_data points at. How about moving blk_mq_reinit_tagset() from
-> the block layer core to the NVMe core, to rename it and to pass a pointer
-> to the nvme_ctrl data structure to that function instead of only block layer
-> information?
-
-That would mean that I need to open-code the tagset iteration in nvme
-which does not feel like something a driver should do.
+T24gV2VkLCAyMDE3LTA4LTMwIGF0IDE5OjA1ICswMzAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
+PiBJZiB3ZSBnZXQgdG8gY2hvb3NlLCBteSBwcmVmZXJlbmNlIHdvdWxkIGJlIHRvIHJlc3RvcmUg
+dGhlIG9sZCBiZWhhdmlvcg0KPiBiZWNhdXNlIGN1cnJlbnRseSBleGlzdGluZyBudm1lIHRyYW5z
+cG9ydHMga2VlcCB0aGVpciBpbnRlcm5hbCBjdHJsDQo+IHJlcHJlc2VudGF0aW9uIGluIHRoZSB0
+YWdzZXQtPmRyaXZlcl9kYXRhIGFzIHRoZXkgaW1wbGVtZW50DQo+IGluaXQvZXhpdF9yZXF1ZXN0
+LiBCb3VuY2luZyBpbiBudm1lIGNvcmUgd291bGQgcmVxdWlyZSB0byBjaGFuZ2UgdGhhdA0KPiBh
+bmQgYWx3YXlzIGtlZXAgc3RydWN0IG52bWVfY3RybCBhcyB0aGUgdGFnc2V0LT5kcml2ZXJfZGF0
+YSBhbmQgY29udmVydA0KPiBpdCBvbiBldmVyeSBoYW5kbGVyLi4uDQo+IA0KPiBFdmVyeXRoaW5n
+IGlzIGRvYWJsZSBidXQgaXQgc2VlbXMgbGlrZSBhbiB1bm5lZWRlZCBoYXNzbGUgdG8gbWUuLi4N
+Cg0KU29ycnkgYnV0IEknbSBub3QgY29udmluY2VkIHRoYXQgaXQgd291bGQgYmUgbmVjZXNzYXJ5
+IHRvIGNoYW5nZSB3aGF0DQp0YWdzZXQtPmRyaXZlcl9kYXRhIHBvaW50cyBhdC4gSG93IGFib3V0
+IG1vdmluZyBibGtfbXFfcmVpbml0X3RhZ3NldCgpIGZyb20NCnRoZSBibG9jayBsYXllciBjb3Jl
+IHRvIHRoZSBOVk1lIGNvcmUsIHRvIHJlbmFtZSBpdCBhbmQgdG8gcGFzcyBhIHBvaW50ZXINCnRv
+IHRoZSBudm1lX2N0cmwgZGF0YSBzdHJ1Y3R1cmUgdG8gdGhhdCBmdW5jdGlvbiBpbnN0ZWFkIG9m
+IG9ubHkgYmxvY2sgbGF5ZXINCmluZm9ybWF0aW9uPw0KDQpCYXJ0Lg==
