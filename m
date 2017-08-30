@@ -1,76 +1,52 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "keith.busch@intel.com" <keith.busch@intel.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 Subject: Re: [GIT PULL] nvme update for Linux 4.14, take 2
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "hch@infradead.org" <hch@infradead.org>, "sagi@grimberg.me"
- <sagi@grimberg.me>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Date: Wed, 30 Aug 2017 15:46:33 +0000
+Message-ID: <1504107991.2526.16.camel@wdc.com>
 References: <20170829150507.rjixn6uf3id6kltx@infradead.org>
- <9a27048d-1252-985f-c905-b738d709b204@kernel.dk>
- <38ddd70f-3fec-09c0-dafb-eba1e8f9cc18@grimberg.me>
- <1504106914.2526.5.camel@wdc.com>
- <a798247e-cc89-f189-4ad9-92095a86106e@grimberg.me>
- <1504107991.2526.16.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <30e386a2-aac7-e9b7-59e2-52c481247e4e@kernel.dk>
-Date: Wed, 30 Aug 2017 09:53:40 -0600
+	 <9a27048d-1252-985f-c905-b738d709b204@kernel.dk>
+	 <38ddd70f-3fec-09c0-dafb-eba1e8f9cc18@grimberg.me>
+	 <1504106914.2526.5.camel@wdc.com>
+	 <a798247e-cc89-f189-4ad9-92095a86106e@grimberg.me>
+In-Reply-To: <a798247e-cc89-f189-4ad9-92095a86106e@grimberg.me>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1504107991.2526.16.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 08/30/2017 09:46 AM, Bart Van Assche wrote:
-> On Wed, 2017-08-30 at 18:33 +0300, Sagi Grimberg wrote:
->>>> I just realized that patch:
->>>> --
->>>> commit d352ae205d8b05f3f7558d10f474d8436581b3e2
->>>> Author: Bart Van Assche <bart.vanassche@wdc.com>
->>>> Date:   Thu Aug 17 16:23:03 2017 -0700
->>>>
->>>>       blk-mq: Make blk_mq_reinit_tagset() calls easier to read
->>>>
->>>>       Since blk_mq_ops.reinit_request is only called from inside
->>>>       blk_mq_reinit_tagset(), make this function pointer an argument of
->>>>       blk_mq_reinit_tagset() instead of a member of struct blk_mq_ops.
->>>>       This patch does not change any functionality but makes
->>>>       blk_mq_reinit_tagset() calls easier to read and to analyze.
->>>> --
->>>>
->>>> Makes it impossible for me to move controller reset flow to
->>>> nvme-core without adding a trampoline (as the reinit_request
->>>> is transport specific)...
->>>
->>> Hello Sagi,
->>>
->>> Sorry but I doubt that that patch makes it "impossible" to move controller
->>> reset flow to the NVMe core. There are already several function pointers in
->>> the nvme_ctrl_ops data structure and there is one such data structure per
->>> transport. Had you already considered to add a function pointer to that
->>> structure?
->>
->> I have, that's the trampoline function that I was referring to, it feels
->> a bit funny to have aa nvme core function that would look like:
->>
->> int nvme_reinit_request()
->> {
->> 	return ctrl->ops->reinit_request()
->> }
->>
->> I can easily do that, but doesn't it defeat the purpose of blk_mq_ops?
-> 
-> I don't think so. Request reinitialization is an NVMe concept that is
-> not used by any other block driver, so why should the pointer to the
-> reinitialization function exist in blk_mq_ops?
-
-The point of blk-mq is to provide all the functionality that drivers
-need, even if it is for just a single driver. Functionality that can be
-removed from drivers is good. The smaller/simpler we can make the
-driver, the better off we are, even if that means adding a bit of
-complexity to the core.
-
-Obviously this is a case-by-case decision. For this particular case, I'm
-happy with either solution.
-
--- 
-Jens Axboe
+T24gV2VkLCAyMDE3LTA4LTMwIGF0IDE4OjMzICswMzAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
+PiA+ID4gSSBqdXN0IHJlYWxpemVkIHRoYXQgcGF0Y2g6DQo+ID4gPiAtLQ0KPiA+ID4gY29tbWl0
+IGQzNTJhZTIwNWQ4YjA1ZjNmNzU1OGQxMGY0NzRkODQzNjU4MWIzZTINCj4gPiA+IEF1dGhvcjog
+QmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KPiA+ID4gRGF0ZTogICBU
+aHUgQXVnIDE3IDE2OjIzOjAzIDIwMTcgLTA3MDANCj4gPiA+IA0KPiA+ID4gICAgICAgYmxrLW1x
+OiBNYWtlIGJsa19tcV9yZWluaXRfdGFnc2V0KCkgY2FsbHMgZWFzaWVyIHRvIHJlYWQNCj4gPiA+
+IA0KPiA+ID4gICAgICAgU2luY2UgYmxrX21xX29wcy5yZWluaXRfcmVxdWVzdCBpcyBvbmx5IGNh
+bGxlZCBmcm9tIGluc2lkZQ0KPiA+ID4gICAgICAgYmxrX21xX3JlaW5pdF90YWdzZXQoKSwgbWFr
+ZSB0aGlzIGZ1bmN0aW9uIHBvaW50ZXIgYW4gYXJndW1lbnQgb2YNCj4gPiA+ICAgICAgIGJsa19t
+cV9yZWluaXRfdGFnc2V0KCkgaW5zdGVhZCBvZiBhIG1lbWJlciBvZiBzdHJ1Y3QgYmxrX21xX29w
+cy4NCj4gPiA+ICAgICAgIFRoaXMgcGF0Y2ggZG9lcyBub3QgY2hhbmdlIGFueSBmdW5jdGlvbmFs
+aXR5IGJ1dCBtYWtlcw0KPiA+ID4gICAgICAgYmxrX21xX3JlaW5pdF90YWdzZXQoKSBjYWxscyBl
+YXNpZXIgdG8gcmVhZCBhbmQgdG8gYW5hbHl6ZS4NCj4gPiA+IC0tDQo+ID4gPiANCj4gPiA+IE1h
+a2VzIGl0IGltcG9zc2libGUgZm9yIG1lIHRvIG1vdmUgY29udHJvbGxlciByZXNldCBmbG93IHRv
+DQo+ID4gPiBudm1lLWNvcmUgd2l0aG91dCBhZGRpbmcgYSB0cmFtcG9saW5lIChhcyB0aGUgcmVp
+bml0X3JlcXVlc3QNCj4gPiA+IGlzIHRyYW5zcG9ydCBzcGVjaWZpYykuLi4NCj4gPiANCj4gPiBI
+ZWxsbyBTYWdpLA0KPiA+IA0KPiA+IFNvcnJ5IGJ1dCBJIGRvdWJ0IHRoYXQgdGhhdCBwYXRjaCBt
+YWtlcyBpdCAiaW1wb3NzaWJsZSIgdG8gbW92ZSBjb250cm9sbGVyDQo+ID4gcmVzZXQgZmxvdyB0
+byB0aGUgTlZNZSBjb3JlLiBUaGVyZSBhcmUgYWxyZWFkeSBzZXZlcmFsIGZ1bmN0aW9uIHBvaW50
+ZXJzIGluDQo+ID4gdGhlIG52bWVfY3RybF9vcHMgZGF0YSBzdHJ1Y3R1cmUgYW5kIHRoZXJlIGlz
+IG9uZSBzdWNoIGRhdGEgc3RydWN0dXJlIHBlcg0KPiA+IHRyYW5zcG9ydC4gSGFkIHlvdSBhbHJl
+YWR5IGNvbnNpZGVyZWQgdG8gYWRkIGEgZnVuY3Rpb24gcG9pbnRlciB0byB0aGF0DQo+ID4gc3Ry
+dWN0dXJlPw0KPiANCj4gSSBoYXZlLCB0aGF0J3MgdGhlIHRyYW1wb2xpbmUgZnVuY3Rpb24gdGhh
+dCBJIHdhcyByZWZlcnJpbmcgdG8sIGl0IGZlZWxzDQo+IGEgYml0IGZ1bm55IHRvIGhhdmUgYWEg
+bnZtZSBjb3JlIGZ1bmN0aW9uIHRoYXQgd291bGQgbG9vayBsaWtlOg0KPiANCj4gaW50IG52bWVf
+cmVpbml0X3JlcXVlc3QoKQ0KPiB7DQo+IAlyZXR1cm4gY3RybC0+b3BzLT5yZWluaXRfcmVxdWVz
+dCgpDQo+IH0NCj4gDQo+IEkgY2FuIGVhc2lseSBkbyB0aGF0LCBidXQgZG9lc24ndCBpdCBkZWZl
+YXQgdGhlIHB1cnBvc2Ugb2YgYmxrX21xX29wcz8NCg0KSSBkb24ndCB0aGluayBzby4gUmVxdWVz
+dCByZWluaXRpYWxpemF0aW9uIGlzIGFuIE5WTWUgY29uY2VwdCB0aGF0IGlzIG5vdCB1c2VkDQpi
+eSBhbnkgb3RoZXIgYmxvY2sgZHJpdmVyLCBzbyB3aHkgc2hvdWxkIHRoZSBwb2ludGVyIHRvIHRo
+ZSByZWluaXRpYWxpemF0aW9uDQpmdW5jdGlvbiBleGlzdCBpbiBibGtfbXFfb3BzPw0KDQpCYXJ0
+Lg==
