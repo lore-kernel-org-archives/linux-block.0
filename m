@@ -1,110 +1,82 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	mgorman@techsingularity.net,
-	lee.tibbert@gmail.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 3/3] block, bfq: guarantee update_next_in_service always returns an eligible entity
-Date: Thu, 31 Aug 2017 08:10:20 +0200
-Message-Id: <20170831061020.4426-4-paolo.valente@linaro.org>
-In-Reply-To: <20170831061020.4426-1-paolo.valente@linaro.org>
-References: <20170831061020.4426-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f176.google.com ([209.85.223.176]:33912 "EHLO
+        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751623AbdH3NMw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 09:12:52 -0400
+Received: by mail-io0-f176.google.com with SMTP id n71so4932202iod.1
+        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 06:12:51 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1503665035-16231-3-git-send-email-adrian.hunter@intel.com>
+References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com> <1503665035-16231-3-git-send-email-adrian.hunter@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Wed, 30 Aug 2017 15:12:50 +0200
+Message-ID: <CAPDyKFqj6+wj-DCo115s+MRvY1MhfihJGX1nCyyEnTUCcrtRCA@mail.gmail.com>
+Subject: Re: [PATCH V6 02/12] mmc: block: Fix block status codes
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If the function bfq_update_next_in_service is invoked as a consequence
-of the activation or requeueing of an entity, say E, then it doesn't
-invoke bfq_lookup_next_entity to get the next-in-service entity. In
-contrast, it follows a shorter path: if E happens to be eligible (see
-commit "bfq-sq-mq: make lookup_next_entity push up vtime on
-expirations" for details on eligibility) and to have a lower virtual
-finish time than the current candidate as next-in-service entity, then
-E directly becomes the next-in-service entity. Unfortunately, there is
-a corner case for which this shorter path makes
-bfq_update_next_in_service choose a non eligible entity: it occurs if
-both E and the current next-in-service entity happen to be non
-eligible when bfq_update_next_in_service is invoked. In this case, E
-is not set as next-in-service, and, since bfq_lookup_next_entity is
-not invoked, the state of the parent entity is not updated so as to
-end up with an eligible entity as the proper next-in-service entity.
+On 25 August 2017 at 14:43, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> Commit 2a842acab109 ("block: introduce new block status code type") changed
+> the error type but not in patches merged through the mmc tree, like
+> commit 0493f6fe5bde ("mmc: block: Move boot partition locking into a driver
+> op"). Fix one error code that is incorrect and also use BLK_STS_OK in
+> preference to 0.
+>
+> Fixes: 17ece345a042 ("Merge tag 'mmc-v4.13' of git://git.kernel.org/pub/scm/linux/kernel/git/ulfh/mmc")
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-In this respect, next-in-service is actually allowed to be non
-eligible while some queue is in service: since no system-virtual-time
-push-up can be performed in that case (see again commit "bfq-sq-mq:
-make lookup_next_entity push up vtime on expirations" for details),
-next-in-service is chosen, speculatively, as a function of the
-possible value that the system virtual time may get after a push
-up. But the correctness of the schedule breaks if next-in-service is
-still a non eligible entity when it is time to set in service the next
-entity. Unfortunately, this may happen in the above corner case.
+Thanks, applied for fixes!
 
-This commit fixes this problem by making bfq_update_next_in_service
-invoke bfq_lookup_next_entity not only if the above shorter path
-cannot be taken, but also if the shorter path is taken but fails to
-yield an eligible next-in-service entity.
+Kind regards
+Uffe
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
-Tested-by: Oleksander Natalenko <oleksandr@natalenko.name>
----
- block/bfq-wf2q.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index eeaf326..add54f2 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -80,6 +80,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- {
- 	struct bfq_entity *next_in_service = sd->next_in_service;
- 	bool parent_sched_may_change = false;
-+	bool change_without_lookup = false;
- 
- 	/*
- 	 * If this update is triggered by the activation, requeueing
-@@ -99,7 +100,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- 		 * set to true, and left as true if
- 		 * sd->next_in_service is NULL.
- 		 */
--		bool replace_next = true;
-+		change_without_lookup = true;
- 
- 		/*
- 		 * If there is already a next_in_service candidate
-@@ -112,7 +113,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- 			struct bfq_service_tree *st =
- 				sd->service_tree + new_entity_class_idx;
- 
--			replace_next =
-+			change_without_lookup =
- 				(new_entity_class_idx ==
- 				 bfq_class_idx(next_in_service)
- 				 &&
-@@ -122,15 +123,16 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
- 					new_entity->finish));
- 		}
- 
--		if (replace_next)
-+		if (change_without_lookup)
- 			next_in_service = new_entity;
--	} else /* invoked because of a deactivation: lookup needed */
-+	}
-+
-+	if (!change_without_lookup) /* lookup needed */
- 		next_in_service = bfq_lookup_next_entity(sd, expiration);
- 
--	if (next_in_service) {
-+	if (next_in_service)
- 		parent_sched_may_change = !sd->next_in_service ||
- 			bfq_update_parent_budget(next_in_service);
--	}
- 
- 	sd->next_in_service = next_in_service;
- 
--- 
-2.10.0
+> ---
+>  drivers/mmc/core/block.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index 0eebc2f726c3..2f00d11adfa9 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -1223,7 +1223,7 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+>                 break;
+>         }
+>         mq_rq->drv_op_result = ret;
+> -       blk_end_request_all(req, ret);
+> +       blk_end_request_all(req, ret ? BLK_STS_IOERR : BLK_STS_OK);
+>  }
+>
+>  static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
+> @@ -1728,9 +1728,9 @@ static bool mmc_blk_rw_cmd_err(struct mmc_blk_data *md, struct mmc_card *card,
+>                 if (err)
+>                         req_pending = old_req_pending;
+>                 else
+> -                       req_pending = blk_end_request(req, 0, blocks << 9);
+> +                       req_pending = blk_end_request(req, BLK_STS_OK, blocks << 9);
+>         } else {
+> -               req_pending = blk_end_request(req, 0, brq->data.bytes_xfered);
+> +               req_pending = blk_end_request(req, BLK_STS_OK, brq->data.bytes_xfered);
+>         }
+>         return req_pending;
+>  }
+> --
+> 1.9.1
+>
