@@ -1,76 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33840 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751507AbdHaR2C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 13:28:02 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/9] block/scsi: safe SCSI quiescing
-Date: Fri,  1 Sep 2017 01:27:19 +0800
-Message-Id: <20170831172728.15817-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [RFC] block: deprecate choosing elevator via boot param
+To: Oleksandr Natalenko <oleksandr@redhat.com>, linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+References: <20170814092712.14062-1-oleksandr@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3efb4cb6-a545-9e1e-8c6e-c2faee7dd8f4@kernel.dk>
+Date: Wed, 30 Aug 2017 08:24:28 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170814092712.14062-1-oleksandr@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The current SCSI quiesce isn't safe and easy to trigger I/O deadlock.
+On 08/14/2017 03:27 AM, Oleksandr Natalenko wrote:
+> Setting I/O scheduler via kernel command line is not flexible enough
+> anymore. Different schedulers might be desirable for different types
+> of devices (SSDs and HDDs, for instance). Moreover, setting elevator
+> while using blk-mq framework does not work in this way already.
+> 
+> This commit enables warning if user specifies "elevator" boot param.
+> Removing this option at all might be considered in some future.
 
-Once SCSI device is put into QUIESCE, no new request except for RQF_PREEMPT
-can be dispatched to SCSI successfully, and scsi_device_quiesce() just simply
-waits for completion of I/Os dispatched to SCSI stack. It isn't enough at all.
+Not a huge fan of doing it like this, it'll just add a bunch of noise to
+the dmesg output that people will ignore. It doesn't bring us closer to
+being able to remove the option.
 
-Because new request still can be allocated, but all the allocated
-requests can't be dispatched successfully, so request pool can be
-consumed up easily.
-
-Then request with RQF_PREEMPT can't be allocated, and system may
-hang forever, such as during system suspend or SCSI domain alidation.
-
-Both IO hang inside system suspend[1] or SCSI domain validation
-were reported before.
-
-This patch tries to solve the issue by freezing block queue during
-SCSI quiescing, and allowing to allocate request of RQF_PREEMPT
-when queue is frozen.
-
-Both SCSI and SCSI_MQ have this IO deadlock issue, this patch fixes
-them all by unifying blk_freeze_queue() and blk_unfreeze_queue().
-
-
-[1] https://marc.info/?t=150340250100013&r=3&w=2
-
-Ming Lei (9):
-  percpu-refcount: introduce percpu_ref_is_dead()
-  blk-mq: rename blk_mq_unfreeze_queue as blk_unfreeze_queue
-  blk-mq: rename blk_mq_freeze_queue as blk_freeze_queue
-  blk-mq: only run hw queues for blk-mq
-  block: introduce blk_drain_queue()
-  blk-mq: rename blk_mq_freeze_queue_wait as blk_freeze_queue_wait
-  block: tracking request allocation with q_usage_counter
-  block: allow to allocate req with REQF_PREEMPT when queue is frozen
-  SCSI: freeze block queue when SCSI device is put into quiesce
-
- block/bfq-iosched.c             |  2 +-
- block/blk-cgroup.c              |  8 +++----
- block/blk-core.c                | 49 +++++++++++++++++++++++++++++++++--------
- block/blk-mq.c                  | 49 +++++++++++++++++++++--------------------
- block/blk-mq.h                  |  1 -
- block/blk.h                     |  5 +++++
- block/elevator.c                |  4 ++--
- drivers/block/loop.c            | 16 +++++++-------
- drivers/block/rbd.c             |  2 +-
- drivers/ide/ide-pm.c            |  3 ++-
- drivers/nvme/host/core.c        |  8 +++----
- drivers/scsi/scsi_lib.c         | 23 +++++++++++++++++--
- include/linux/blk-mq.h          | 13 ++++++-----
- include/linux/blkdev.h          | 18 +++++++++++++--
- include/linux/percpu-refcount.h | 17 ++++++++++++++
- 15 files changed, 153 insertions(+), 65 deletions(-)
+I think we should just let it die over time. This will happen naturally
+since the blk-mq scheduling framework does not support it. Once we have
+everything converted, the option will end up doing nothing. Then we can
+eventually kill it.
 
 -- 
-2.9.5
+Jens Axboe
