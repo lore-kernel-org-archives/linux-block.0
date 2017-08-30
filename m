@@ -1,44 +1,59 @@
-Return-Path: <prvs=0415d39c2a=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@kernel.dk>
-Subject: [PATCH 1/3] block/loop: don't hijack error number
-Date: Wed, 30 Aug 2017 12:17:16 -0700
-Message-ID: <89923d5cd897c8c8f53d0ea4022414b30bd7eeb7.1504120418.git.shli@fb.com>
-In-Reply-To: <cover.1504120418.git.shli@fb.com>
-References: <cover.1504120418.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] block, bfq: fix error handle in bfq_init
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20170823152515.GA9294@localhost.didichuxing.com>
+Date: Wed, 30 Aug 2017 17:04:35 +0200
+Cc: axboe@kernel.dk,
+ linux-block@vger.kernel.org
+Message-Id: <E5F6017E-62BA-41F9-8926-8BDB75034A95@linaro.org>
+References: <20170818163714.GA40576@localhost.didichuxing.com> <20170823152515.GA9294@localhost.didichuxing.com>
+To: weiping zhang <zhangweiping@didichuxing.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If the bio returns -EOPNOTSUPP, we shouldn't hijack it and return -EIO
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/loop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> Il giorno 23 ago 2017, alle ore 17:25, weiping zhang =
+<zhangweiping@didichuxing.com> ha scritto:
+>=20
+> On Sat, Aug 19, 2017 at 12:37:20AM +0800, weiping zhang wrote:
+>> if elv_register fail, bfq_pool should be free.
+>>=20
+>> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+>> ---
+>> block/bfq-iosched.c | 4 +++-
+>> 1 file changed, 3 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 436b6ca..bdb072f 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -5048,10 +5048,12 @@ static int __init bfq_init(void)
+>>=20
+>> 	ret =3D elv_register(&iosched_bfq_mq);
+>> 	if (ret)
+>> -		goto err_pol_unreg;
+>> +		goto slab_kill;
+>>=20
+>> 	return 0;
+>>=20
+>> +slab_kill:
+>> +	bfq_slab_kill();
+>> err_pol_unreg:
+>> #ifdef CONFIG_BFQ_GROUP_IOSCHED
+>> 	blkcg_policy_unregister(&blkcg_policy_bfq);
+>> --=20
+>> 2.9.4
+>>=20
+> Hi Paolo, Jens,
+>=20
+> could you give some comments for this patch ?
+>=20
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ef83349..054dccc 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -464,7 +464,7 @@ static void lo_complete_rq(struct request *rq)
- 		zero_fill_bio(bio);
- 	}
- 
--	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
-+	blk_mq_end_request(rq, errno_to_blk_status(cmd->ret));
- }
- 
- static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
-@@ -1725,7 +1725,7 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
--		cmd->ret = ret ? -EIO : 0;
-+		cmd->ret = ret;
- 		blk_mq_complete_request(cmd->rq);
- 	}
- }
--- 
-2.9.5
+Sorry for not making it in time (vacation), and thanks for fixing this
+bug.
+
+Paolo
+
+> Thanks
