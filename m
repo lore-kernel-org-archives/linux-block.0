@@ -1,129 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33934 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750711AbdHaEBl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 00:01:41 -0400
-Date: Thu, 31 Aug 2017 12:01:24 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:49783 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751351AbdH3RLs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 13:11:48 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "mgorman@techsingularity.net" <mgorman@techsingularity.net>,
         "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
         "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V3 06/14] blk-mq-sched: don't dequeue request until all
- in ->dispatch are flushed
-Message-ID: <20170831040123.GE12246@ming.t460p>
+Subject: Re: [PATCH V3 06/14] blk-mq-sched: don't dequeue request until all in
+ ->dispatch are flushed
+Date: Wed, 30 Aug 2017 17:11:00 +0000
+Message-ID: <1504113058.2526.54.camel@wdc.com>
 References: <20170826163332.28971-1-ming.lei@redhat.com>
- <20170826163332.28971-7-ming.lei@redhat.com>
- <1504113058.2526.54.camel@wdc.com>
+         <20170826163332.28971-7-ming.lei@redhat.com>
+In-Reply-To: <20170826163332.28971-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504113058.2526.54.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Aug 30, 2017 at 05:11:00PM +0000, Bart Van Assche wrote:
-> On Sun, 2017-08-27 at 00:33 +0800, Ming Lei wrote:
-> > During dispatching, we moved all requests from hctx->dispatch to
-> > one temporary list, then dispatch them one by one from this list.
-> > Unfortunately duirng this period, run queue from other contexts
->                 ^^^^^^
->                 during?
-
-OK.
-
-> > may think the queue is idle, then start to dequeue from sw/scheduler
-> > queue and still try to dispatch because ->dispatch is empty. This way
-> > hurts sequential I/O performance because requests are dequeued when
-> > lld queue is busy.
-> > [ ... ]
-> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > index 735e432294ab..4d7bea8c2594 100644
-> > --- a/block/blk-mq-sched.c
-> > +++ b/block/blk-mq-sched.c
-> > @@ -146,7 +146,6 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-> >  	struct request_queue *q = hctx->queue;
-> >  	struct elevator_queue *e = q->elevator;
-> >  	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
-> > -	bool do_sched_dispatch = true;
-> >  	LIST_HEAD(rq_list);
-> >  
-> >  	/* RCU or SRCU read lock is needed before checking quiesced flag */
-> 
-> Shouldn't blk_mq_sched_dispatch_requests() set BLK_MQ_S_DISPATCH_BUSY just after
-> the following statement because this statement makes the dispatch list empty?
-
-Actually that is what I did in V1.
-
-I changed to this way because setting the BUSY flag here will increase
-the race window a bit, for example, if one request is added to ->dispatch
-just after it is flushed(), the check on the BUSY bit won't catch this
-case. Then we can avoid to check both the bit and list_empty_careful(&hctx->dispatch)
-in blk_mq_sched_dispatch_requests(), so code becomes simpler and more
-readable if we set the flag simply from the beginning.
-
-> 
-> 			list_splice_init(&hctx->dispatch, &rq_list);
-> 
-> > @@ -177,8 +176,33 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-> >  	 */
-> >  	if (!list_empty(&rq_list)) {
-> >  		blk_mq_sched_mark_restart_hctx(hctx);
-> > -		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
-> > -	} else if (!has_sched_dispatch && !q->queue_depth) {
-> > +		blk_mq_dispatch_rq_list(q, &rq_list);
-> > +
-> > +		/*
-> > +		 * We may clear DISPATCH_BUSY just after it
-> > +		 * is set from another context, the only cost
-> > +		 * is that one request is dequeued a bit early,
-> > +		 * we can survive that. Given the window is
-> > +		 * too small, no need to worry about performance
->                    ^^^
-> The word "too" seems extraneous to me in this sentence.
-
-Maybe 'extremely' is better, or just remove it?
-
-> 
-> >  bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-> > @@ -330,6 +353,7 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
-> >  	 */
-> >  	spin_lock(&hctx->lock);
-> >  	list_add(&rq->queuelist, &hctx->dispatch);
-> > +	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-> >  	spin_unlock(&hctx->lock);
-> >  	return true;
-> >  }
-> 
-> Is it necessary to make blk_mq_sched_bypass_insert() set BLK_MQ_S_DISPATCH_BUSY?
-> My understanding is that only code that makes the dispatch list empty should
-> set BLK_MQ_S_DISPATCH_BUSY. However, blk_mq_sched_bypass_insert() adds an element
-> to the dispatch list so that guarantees that that list is not empty.
-
-I believe my above comment has explained it already.
-
-> 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index f063dd0f197f..6af56a71c1cd 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1140,6 +1140,11 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
-> >  
-> >  		spin_lock(&hctx->lock);
-> >  		list_splice_init(list, &hctx->dispatch);
-> > +		/*
-> > +		 * DISPATCH_BUSY won't be cleared until all requests
-> > +		 * in hctx->dispatch are dispatched successfully
-> > +		 */
-> > +		set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-> >  		spin_unlock(&hctx->lock);
-> 
-> Same comment here - since this code adds one or more requests to the dispatch list,
-> is it really needed to set the DISPATCH_BUSY flag?
-
-See same comment above, :-)
-
--- 
-Ming
+T24gU3VuLCAyMDE3LTA4LTI3IGF0IDAwOjMzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gRHVy
+aW5nIGRpc3BhdGNoaW5nLCB3ZSBtb3ZlZCBhbGwgcmVxdWVzdHMgZnJvbSBoY3R4LT5kaXNwYXRj
+aCB0bw0KPiBvbmUgdGVtcG9yYXJ5IGxpc3QsIHRoZW4gZGlzcGF0Y2ggdGhlbSBvbmUgYnkgb25l
+IGZyb20gdGhpcyBsaXN0Lg0KPiBVbmZvcnR1bmF0ZWx5IGR1aXJuZyB0aGlzIHBlcmlvZCwgcnVu
+IHF1ZXVlIGZyb20gb3RoZXIgY29udGV4dHMNCiAgICAgICAgICAgICAgICBeXl5eXl4NCiAgICAg
+ICAgICAgICAgICBkdXJpbmc/DQo+IG1heSB0aGluayB0aGUgcXVldWUgaXMgaWRsZSwgdGhlbiBz
+dGFydCB0byBkZXF1ZXVlIGZyb20gc3cvc2NoZWR1bGVyDQo+IHF1ZXVlIGFuZCBzdGlsbCB0cnkg
+dG8gZGlzcGF0Y2ggYmVjYXVzZSAtPmRpc3BhdGNoIGlzIGVtcHR5LiBUaGlzIHdheQ0KPiBodXJ0
+cyBzZXF1ZW50aWFsIEkvTyBwZXJmb3JtYW5jZSBiZWNhdXNlIHJlcXVlc3RzIGFyZSBkZXF1ZXVl
+ZCB3aGVuDQo+IGxsZCBxdWV1ZSBpcyBidXN5Lg0KPiBbIC4uLiBdDQo+IGRpZmYgLS1naXQgYS9i
+bG9jay9ibGstbXEtc2NoZWQuYyBiL2Jsb2NrL2Jsay1tcS1zY2hlZC5jDQo+IGluZGV4IDczNWU0
+MzIyOTRhYi4uNGQ3YmVhOGMyNTk0IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9ibGstbXEtc2NoZWQu
+Yw0KPiArKysgYi9ibG9jay9ibGstbXEtc2NoZWQuYw0KPiBAQCAtMTQ2LDcgKzE0Niw2IEBAIHZv
+aWQgYmxrX21xX3NjaGVkX2Rpc3BhdGNoX3JlcXVlc3RzKHN0cnVjdCBibGtfbXFfaHdfY3R4ICpo
+Y3R4KQ0KPiAgCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gaGN0eC0+cXVldWU7DQo+ICAJc3Ry
+dWN0IGVsZXZhdG9yX3F1ZXVlICplID0gcS0+ZWxldmF0b3I7DQo+ICAJY29uc3QgYm9vbCBoYXNf
+c2NoZWRfZGlzcGF0Y2ggPSBlICYmIGUtPnR5cGUtPm9wcy5tcS5kaXNwYXRjaF9yZXF1ZXN0Ow0K
+PiAtCWJvb2wgZG9fc2NoZWRfZGlzcGF0Y2ggPSB0cnVlOw0KPiAgCUxJU1RfSEVBRChycV9saXN0
+KTsNCj4gIA0KPiAgCS8qIFJDVSBvciBTUkNVIHJlYWQgbG9jayBpcyBuZWVkZWQgYmVmb3JlIGNo
+ZWNraW5nIHF1aWVzY2VkIGZsYWcgKi8NCg0KU2hvdWxkbid0IGJsa19tcV9zY2hlZF9kaXNwYXRj
+aF9yZXF1ZXN0cygpIHNldCBCTEtfTVFfU19ESVNQQVRDSF9CVVNZIGp1c3QgYWZ0ZXINCnRoZSBm
+b2xsb3dpbmcgc3RhdGVtZW50IGJlY2F1c2UgdGhpcyBzdGF0ZW1lbnQgbWFrZXMgdGhlIGRpc3Bh
+dGNoIGxpc3QgZW1wdHk/DQoNCgkJCWxpc3Rfc3BsaWNlX2luaXQoJmhjdHgtPmRpc3BhdGNoLCAm
+cnFfbGlzdCk7DQoNCj4gQEAgLTE3Nyw4ICsxNzYsMzMgQEAgdm9pZCBibGtfbXFfc2NoZWRfZGlz
+cGF0Y2hfcmVxdWVzdHMoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgpDQo+ICAJICovDQo+ICAJ
+aWYgKCFsaXN0X2VtcHR5KCZycV9saXN0KSkgew0KPiAgCQlibGtfbXFfc2NoZWRfbWFya19yZXN0
+YXJ0X2hjdHgoaGN0eCk7DQo+IC0JCWRvX3NjaGVkX2Rpc3BhdGNoID0gYmxrX21xX2Rpc3BhdGNo
+X3JxX2xpc3QocSwgJnJxX2xpc3QpOw0KPiAtCX0gZWxzZSBpZiAoIWhhc19zY2hlZF9kaXNwYXRj
+aCAmJiAhcS0+cXVldWVfZGVwdGgpIHsNCj4gKwkJYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QocSwg
+JnJxX2xpc3QpOw0KPiArDQo+ICsJCS8qDQo+ICsJCSAqIFdlIG1heSBjbGVhciBESVNQQVRDSF9C
+VVNZIGp1c3QgYWZ0ZXIgaXQNCj4gKwkJICogaXMgc2V0IGZyb20gYW5vdGhlciBjb250ZXh0LCB0
+aGUgb25seSBjb3N0DQo+ICsJCSAqIGlzIHRoYXQgb25lIHJlcXVlc3QgaXMgZGVxdWV1ZWQgYSBi
+aXQgZWFybHksDQo+ICsJCSAqIHdlIGNhbiBzdXJ2aXZlIHRoYXQuIEdpdmVuIHRoZSB3aW5kb3cg
+aXMNCj4gKwkJICogdG9vIHNtYWxsLCBubyBuZWVkIHRvIHdvcnJ5IGFib3V0IHBlcmZvcm1hbmNl
+DQogICAgICAgICAgICAgICAgICAgXl5eDQpUaGUgd29yZCAidG9vIiBzZWVtcyBleHRyYW5lb3Vz
+IHRvIG1lIGluIHRoaXMgc2VudGVuY2UuDQoNCj4gIGJvb2wgYmxrX21xX3NjaGVkX3RyeV9tZXJn
+ZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGJpbyAqYmlvLA0KPiBAQCAtMzMwLDYg
+KzM1Myw3IEBAIHN0YXRpYyBib29sIGJsa19tcV9zY2hlZF9ieXBhc3NfaW5zZXJ0KHN0cnVjdCBi
+bGtfbXFfaHdfY3R4ICpoY3R4LA0KPiAgCSAqLw0KPiAgCXNwaW5fbG9jaygmaGN0eC0+bG9jayk7
+DQo+ICAJbGlzdF9hZGQoJnJxLT5xdWV1ZWxpc3QsICZoY3R4LT5kaXNwYXRjaCk7DQo+ICsJc2V0
+X2JpdChCTEtfTVFfU19ESVNQQVRDSF9CVVNZLCAmaGN0eC0+c3RhdGUpOw0KPiAgCXNwaW5fdW5s
+b2NrKCZoY3R4LT5sb2NrKTsNCj4gIAlyZXR1cm4gdHJ1ZTsNCj4gIH0NCg0KSXMgaXQgbmVjZXNz
+YXJ5IHRvIG1ha2UgYmxrX21xX3NjaGVkX2J5cGFzc19pbnNlcnQoKSBzZXQgQkxLX01RX1NfRElT
+UEFUQ0hfQlVTWT8NCk15IHVuZGVyc3RhbmRpbmcgaXMgdGhhdCBvbmx5IGNvZGUgdGhhdCBtYWtl
+cyB0aGUgZGlzcGF0Y2ggbGlzdCBlbXB0eSBzaG91bGQNCnNldCBCTEtfTVFfU19ESVNQQVRDSF9C
+VVNZLiBIb3dldmVyLCBibGtfbXFfc2NoZWRfYnlwYXNzX2luc2VydCgpIGFkZHMgYW4gZWxlbWVu
+dA0KdG8gdGhlIGRpc3BhdGNoIGxpc3Qgc28gdGhhdCBndWFyYW50ZWVzIHRoYXQgdGhhdCBsaXN0
+IGlzIG5vdCBlbXB0eS4NCg0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLW1xLmMgYi9ibG9jay9i
+bGstbXEuYw0KPiBpbmRleCBmMDYzZGQwZjE5N2YuLjZhZjU2YTcxYzFjZCAxMDA2NDQNCj4gLS0t
+IGEvYmxvY2svYmxrLW1xLmMNCj4gKysrIGIvYmxvY2svYmxrLW1xLmMNCj4gQEAgLTExNDAsNiAr
+MTE0MCwxMSBAQCBib29sIGJsa19tcV9kaXNwYXRjaF9ycV9saXN0KHN0cnVjdCByZXF1ZXN0X3F1
+ZXVlICpxLCBzdHJ1Y3QgbGlzdF9oZWFkICpsaXN0KQ0KPiAgDQo+ICAJCXNwaW5fbG9jaygmaGN0
+eC0+bG9jayk7DQo+ICAJCWxpc3Rfc3BsaWNlX2luaXQobGlzdCwgJmhjdHgtPmRpc3BhdGNoKTsN
+Cj4gKwkJLyoNCj4gKwkJICogRElTUEFUQ0hfQlVTWSB3b24ndCBiZSBjbGVhcmVkIHVudGlsIGFs
+bCByZXF1ZXN0cw0KPiArCQkgKiBpbiBoY3R4LT5kaXNwYXRjaCBhcmUgZGlzcGF0Y2hlZCBzdWNj
+ZXNzZnVsbHkNCj4gKwkJICovDQo+ICsJCXNldF9iaXQoQkxLX01RX1NfRElTUEFUQ0hfQlVTWSwg
+JmhjdHgtPnN0YXRlKTsNCj4gIAkJc3Bpbl91bmxvY2soJmhjdHgtPmxvY2spOw0KDQpTYW1lIGNv
+bW1lbnQgaGVyZSAtIHNpbmNlIHRoaXMgY29kZSBhZGRzIG9uZSBvciBtb3JlIHJlcXVlc3RzIHRv
+IHRoZSBkaXNwYXRjaCBsaXN0LA0KaXMgaXQgcmVhbGx5IG5lZWRlZCB0byBzZXQgdGhlIERJU1BB
+VENIX0JVU1kgZmxhZz8NCg0KQmFydC4=
