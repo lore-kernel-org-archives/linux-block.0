@@ -1,42 +1,52 @@
-Return-Path: <prvs=407911b14=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 2/2] skd: Let the block layer core choose .nr_requests
-Date: Tue, 29 Aug 2017 08:32:10 -0700
-Message-Id: <20170829153211.6257-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170829153211.6257-1-bart.vanassche@wdc.com>
-References: <20170829153211.6257-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:42230 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750890AbdH3TRV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 15:17:21 -0400
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.16.0.21/8.16.0.21) with SMTP id v7UJGvDR003702
+        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 12:17:21 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by m0001303.ppops.net with ESMTP id 2cnywks06r-2
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 12:17:21 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <Kernel-team@fb.com>, <axboe@kernel.dk>
+Subject: [PATCH 2/3] block/loop: use FALLOC_FL_ZERO_RANGE for REQ_OP_WRITE_ZEROES
+Date: Wed, 30 Aug 2017 12:17:17 -0700
+Message-ID: <d2ceb45ef504bb78ba19725fc55eff327ff9f3ed.1504120418.git.shli@fb.com>
+In-Reply-To: <cover.1504120418.git.shli@fb.com>
+References: <cover.1504120418.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Since blk_mq_init_queue() initializes .nr_requests to the tag set
-size and since that value is a good default for the skd driver, do
-not overwrite the value set by blk_mq_init_queue(). This change
-doubles the default value of .nr_requests.
+REQ_OP_WRITE_ZEROES really means zero the data. And the in
+blkdev_fallocate, FALLOC_FL_ZERO_RANGE will retry but
+FALLOC_FL_PUNCH_HOLE not, even loop request doesn't have
+BLKDEV_ZERO_NOFALLBACK set.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/block/skd_main.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/block/loop.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index f987ff601a4c..7cedb4295e9d 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -2845,7 +2845,6 @@ static int skd_cons_disk(struct skd_device *skdev)
- 		goto err_out;
- 	}
- 	q->queuedata = skdev;
--	q->nr_requests = skd_max_queue_depth / 2;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 054dccc..a30aa45 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -430,6 +430,9 @@ static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
+ 	int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
+ 	int ret;
  
- 	skdev->queue = q;
- 	disk->queue = q;
++	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
++		mode = FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE;
++
+ 	if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+ 		ret = -EOPNOTSUPP;
+ 		goto out;
 -- 
-2.14.1
+2.9.5
