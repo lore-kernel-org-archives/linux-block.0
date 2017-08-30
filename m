@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34498 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:52132 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751480AbdH3PUB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Aug 2017 11:20:01 -0400
+        id S1751317AbdH3PTy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 11:19:54 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
@@ -10,16 +10,14 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
         Ming Lei <ming.lei@redhat.com>
 Subject: [PATCH 0/2] blk-mq: fix I/O hang during system resume
-Date: Wed, 30 Aug 2017 23:19:33 +0800
-Message-Id: <20170830151935.24253-2-ming.lei@redhat.com>
-In-Reply-To: <20170830151935.24253-1-ming.lei@redhat.com>
-References: <20170830151935.24253-1-ming.lei@redhat.com>
+Date: Wed, 30 Aug 2017 23:19:32 +0800
+Message-Id: <20170830151935.24253-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 Hi,
 
-This two patches fix I/O hang of SCSI-MQ during system resume.
+This two patches fix SCSI I/O hang during system resume.
 
 The cause is that when SCSI device is put into SCSI's
 quiesce state, normal I/O request can't be dispatched to lld
