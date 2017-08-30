@@ -1,10 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:35193 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751057AbdHaMDi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 08:03:38 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
+Received: from mail-io0-f169.google.com ([209.85.223.169]:36433 "EHLO
+        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751889AbdH3NOX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 09:14:23 -0400
+Received: by mail-io0-f169.google.com with SMTP id g33so4868880ioj.3
+        for <linux-block@vger.kernel.org>; Wed, 30 Aug 2017 06:14:23 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1503665035-16231-2-git-send-email-adrian.hunter@intel.com>
+References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com> <1503665035-16231-2-git-send-email-adrian.hunter@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Wed, 30 Aug 2017 15:14:22 +0200
+Message-ID: <CAPDyKFpH7k7tTYSsMZpy25YJ4U8-Nz3_jhO8-RmvpjyqXsd0=w@mail.gmail.com>
+Subject: Re: [PATCH V6 01/12] mmc: core: Move mmc_start_areq() declaration
+To: Adrian Hunter <adrian.hunter@intel.com>
 Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -20,259 +29,59 @@ Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
         Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V7 01/10] mmc: core: Introduce host claiming by context
-Date: Thu, 31 Aug 2017 14:56:47 +0300
-Message-Id: <1504180616-14514-2-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
-References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Currently the host can be claimed by a task.  Change this so that the host
-can be claimed by a context that may or may not be a task.  This provides
-for the host to be claimed by a block driver queue to support blk-mq, while
-maintaining compatibility with the existing use of mmc_claim_host().
+On 25 August 2017 at 14:43, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> mmc_start_areq() is an internal mmc core API. Move the declaration
+> accordingly.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/core.c  | 109 ++++++++++++++++++++++++++++++++++++++++++++---
- drivers/mmc/core/core.h  |   8 ++++
- include/linux/mmc/host.h |   7 ++-
- 3 files changed, 116 insertions(+), 8 deletions(-)
+Thanks, applied for next!
 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 66c9cf49ad2f..6a0ca128a520 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -832,9 +832,38 @@ unsigned int mmc_align_data_size(struct mmc_card *card, unsigned int sz)
- }
- EXPORT_SYMBOL(mmc_align_data_size);
- 
-+/*
-+ * Allow claiming an already claimed host if the context is the same or there is
-+ * no context but the task is the same.
-+ */
-+static inline bool mmc_ctx_matches(struct mmc_host *host, struct mmc_ctx *ctx,
-+				   struct task_struct *task)
-+{
-+	return host->claimer == ctx ||
-+	       (!ctx && task && host->claimer->task == task);
-+}
-+
-+static inline void mmc_ctx_set_claimer(struct mmc_host *host,
-+				       struct mmc_ctx *ctx,
-+				       struct task_struct *task)
-+{
-+	if (!host->claimer) {
-+		if (ctx)
-+			host->claimer = ctx;
-+		else
-+			host->claimer = &host->default_ctx;
-+	}
-+	if (task)
-+		host->claimer->task = task;
-+}
-+
- /**
-- *	__mmc_claim_host - exclusively claim a host
-+ *	__mmc_ctx_task_claim_host - exclusively claim a host
-  *	@host: mmc host to claim
-+ *	@ctx: context that claims the host or NULL in which case the default
-+ *	context will be used
-+ *	@task: task that claims the host or NULL in which case @ctx must be
-+ *	provided
-  *	@abort: whether or not the operation should be aborted
-  *
-  *	Claim a host for a set of operations.  If @abort is non null and
-@@ -842,7 +871,8 @@ unsigned int mmc_align_data_size(struct mmc_card *card, unsigned int sz)
-  *	that non-zero value without acquiring the lock.  Returns zero
-  *	with the lock held otherwise.
-  */
--int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
-+static int __mmc_ctx_task_claim_host(struct mmc_host *host, struct mmc_ctx *ctx,
-+				     struct task_struct *task, atomic_t *abort)
- {
- 	DECLARE_WAITQUEUE(wait, current);
- 	unsigned long flags;
-@@ -856,7 +886,7 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
- 	while (1) {
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 		stop = abort ? atomic_read(abort) : 0;
--		if (stop || !host->claimed || host->claimer == current)
-+		if (stop || !host->claimed || mmc_ctx_matches(host, ctx, task))
- 			break;
- 		spin_unlock_irqrestore(&host->lock, flags);
- 		schedule();
-@@ -865,7 +895,7 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
- 	set_current_state(TASK_RUNNING);
- 	if (!stop) {
- 		host->claimed = 1;
--		host->claimer = current;
-+		mmc_ctx_set_claimer(host, ctx, task);
- 		host->claim_cnt += 1;
- 		if (host->claim_cnt == 1)
- 			pm = true;
-@@ -879,8 +909,25 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
- 
- 	return stop;
- }
-+
-+int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
-+{
-+	return __mmc_ctx_task_claim_host(host, NULL, current, abort);
-+}
- EXPORT_SYMBOL(__mmc_claim_host);
- 
-+void mmc_ctx_claim_host(struct mmc_host *host, struct mmc_ctx *ctx)
-+{
-+	__mmc_ctx_task_claim_host(host, ctx, NULL, NULL);
-+}
-+EXPORT_SYMBOL(mmc_ctx_claim_host);
-+
-+void mmc_ctx_task_claim_host(struct mmc_host *host, struct mmc_ctx *ctx)
-+{
-+	__mmc_ctx_task_claim_host(host, ctx, current, NULL);
-+}
-+EXPORT_SYMBOL(mmc_ctx_task_claim_host);
-+
- /**
-  *	mmc_release_host - release a host
-  *	@host: mmc host to release
-@@ -888,18 +935,19 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
-  *	Release a MMC host, allowing others to claim the host
-  *	for their operations.
-  */
--void mmc_release_host(struct mmc_host *host)
-+static void __mmc_release_host(struct mmc_host *host, bool task_release)
- {
- 	unsigned long flags;
- 
--	WARN_ON(!host->claimed);
--
- 	spin_lock_irqsave(&host->lock, flags);
- 	if (--host->claim_cnt) {
- 		/* Release for nested claim */
-+		if (task_release)
-+			host->claimer->task = NULL;
- 		spin_unlock_irqrestore(&host->lock, flags);
- 	} else {
- 		host->claimed = 0;
-+		host->claimer->task = NULL;
- 		host->claimer = NULL;
- 		spin_unlock_irqrestore(&host->lock, flags);
- 		wake_up(&host->wq);
-@@ -907,8 +955,32 @@ void mmc_release_host(struct mmc_host *host)
- 		pm_runtime_put_autosuspend(mmc_dev(host));
- 	}
- }
-+
-+void mmc_release_host(struct mmc_host *host)
-+{
-+	WARN_ON(!host->claimed);
-+
-+	__mmc_release_host(host, false);
-+}
- EXPORT_SYMBOL(mmc_release_host);
- 
-+void mmc_ctx_release_host(struct mmc_host *host, struct mmc_ctx *ctx)
-+{
-+	WARN_ON(!host->claimed || host->claimer != ctx);
-+
-+	__mmc_release_host(host, false);
-+}
-+EXPORT_SYMBOL(mmc_ctx_release_host);
-+
-+void mmc_ctx_task_release_host(struct mmc_host *host, struct mmc_ctx *ctx)
-+{
-+	WARN_ON(!host->claimed || host->claimer != ctx ||
-+		host->claimer->task != current);
-+
-+	__mmc_release_host(host, true);
-+}
-+EXPORT_SYMBOL(mmc_ctx_task_release_host);
-+
- /*
-  * This is a helper function, which fetches a runtime pm reference for the
-  * card device and also claims the host.
-@@ -921,6 +993,17 @@ void mmc_get_card(struct mmc_card *card)
- EXPORT_SYMBOL(mmc_get_card);
- 
- /*
-+ * This is a helper function, which fetches a runtime pm reference for the
-+ * card device and also claims the host for the mmc context.
-+ */
-+void mmc_ctx_get_card(struct mmc_card *card, struct mmc_ctx *ctx)
-+{
-+	pm_runtime_get_sync(&card->dev);
-+	mmc_ctx_claim_host(card->host, ctx);
-+}
-+EXPORT_SYMBOL(mmc_ctx_get_card);
-+
-+/*
-  * This is a helper function, which releases the host and drops the runtime
-  * pm reference for the card device.
-  */
-@@ -933,6 +1016,18 @@ void mmc_put_card(struct mmc_card *card)
- EXPORT_SYMBOL(mmc_put_card);
- 
- /*
-+ * This is a helper function, which releases the host and drops the runtime
-+ * pm reference for the card device.
-+ */
-+void mmc_ctx_put_card(struct mmc_card *card, struct mmc_ctx *ctx)
-+{
-+	mmc_ctx_release_host(card->host, ctx);
-+	pm_runtime_mark_last_busy(&card->dev);
-+	pm_runtime_put_autosuspend(&card->dev);
-+}
-+EXPORT_SYMBOL(mmc_ctx_put_card);
-+
-+/*
-  * Internal function that does the actual ios call to the host driver,
-  * optionally printing some debug output.
-  */
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index ca861091a776..a79b6054a7b2 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -144,4 +144,12 @@ static inline void mmc_claim_host(struct mmc_host *host)
- 	__mmc_claim_host(host, NULL);
- }
- 
-+void mmc_ctx_claim_host(struct mmc_host *host, struct mmc_ctx *ctx);
-+void mmc_ctx_release_host(struct mmc_host *host, struct mmc_ctx *ctx);
-+void mmc_ctx_task_claim_host(struct mmc_host *host, struct mmc_ctx *ctx);
-+void mmc_ctx_task_release_host(struct mmc_host *host, struct mmc_ctx *ctx);
-+
-+void mmc_ctx_get_card(struct mmc_card *card, struct mmc_ctx *ctx);
-+void mmc_ctx_put_card(struct mmc_card *card, struct mmc_ctx *ctx);
-+
- #endif
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index f3f2d07feb2a..228a493c3b25 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -255,6 +255,10 @@ struct mmc_supply {
- 	struct regulator *vqmmc;	/* Optional Vccq supply */
- };
- 
-+struct mmc_ctx {
-+	struct task_struct *task;
-+};
-+
- struct mmc_host {
- 	struct device		*parent;
- 	struct device		class_dev;
-@@ -388,8 +392,9 @@ struct mmc_host {
- 	struct mmc_card		*card;		/* device attached to this host */
- 
- 	wait_queue_head_t	wq;
--	struct task_struct	*claimer;	/* task that has host claimed */
-+	struct mmc_ctx		*claimer;	/* context that has host claimed */
- 	int			claim_cnt;	/* "claim" nesting count */
-+	struct mmc_ctx		default_ctx;	/* default context */
- 
- 	struct delayed_work	detect;
- 	int			detect_change;	/* card detect flag */
--- 
-1.9.1
+Kind regards
+Uffe
+
+> ---
+>  drivers/mmc/core/core.h  | 6 ++++++
+>  include/linux/mmc/core.h | 4 ----
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
+> index 55f543fd37c4..ca861091a776 100644
+> --- a/drivers/mmc/core/core.h
+> +++ b/drivers/mmc/core/core.h
+> @@ -107,6 +107,12 @@ static inline void mmc_unregister_pm_notifier(struct mmc_host *host) { }
+>  void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq);
+>  bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq);
+>
+> +struct mmc_async_req;
+> +
+> +struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
+> +                                    struct mmc_async_req *areq,
+> +                                    enum mmc_blk_status *ret_stat);
+> +
+>  int mmc_erase(struct mmc_card *card, unsigned int from, unsigned int nr,
+>                 unsigned int arg);
+>  int mmc_can_erase(struct mmc_card *card);
+> diff --git a/include/linux/mmc/core.h b/include/linux/mmc/core.h
+> index bf1788a224e6..178f699ac172 100644
+> --- a/include/linux/mmc/core.h
+> +++ b/include/linux/mmc/core.h
+> @@ -165,11 +165,7 @@ struct mmc_request {
+>  };
+>
+>  struct mmc_card;
+> -struct mmc_async_req;
+>
+> -struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
+> -                               struct mmc_async_req *areq,
+> -                               enum mmc_blk_status *ret_stat);
+>  void mmc_wait_for_req(struct mmc_host *host, struct mmc_request *mrq);
+>  int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd,
+>                 int retries);
+> --
+> 1.9.1
+>
