@@ -1,99 +1,165 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45146 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:31273 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG53 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:57:29 -0400
+        id S1751760AbdH3PU3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 11:20:29 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 03/20] blk-mq: introduce blk_mq_dispatch_rq_from_ctx()
-Date: Sat,  5 Aug 2017 14:56:48 +0800
-Message-Id: <20170805065705.12989-4-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
+Subject: [PATCH 2/2] blk-mq: align to legacy's implementation of blk_execute_rq
+Date: Wed, 30 Aug 2017 23:19:35 +0800
+Message-Id: <20170830151935.24253-4-ming.lei@redhat.com>
+In-Reply-To: <20170830151935.24253-1-ming.lei@redhat.com>
+References: <20170830151935.24253-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This function is introduced for dequeuing request
-from sw queue so that we can dispatch it in scheduler's way.
+In legacy path, when one request is executed via blk_execute_rq(),
+the request is added to the front of q->queue_head directly,
+and I/O scheduler's queue is bypassed because either merging
+or sorting isn't needed.
 
-More importantly, for some SCSI devices, driver
-tags are host wide, and the number is quite big,
-but each lun has very limited queue depth. This
-function is introduced for avoiding to dequeue too
-many requests from sw queue when ->dispatch isn't
-flushed completely.
+When SCSI device is put into quiece state, such as during
+system suspend, we need to add the RQF_PM request into
+front of the queue.
 
+This patch fixes I/O hang after system resume by taking
+the similar implementation of legacy path.
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 38 ++++++++++++++++++++++++++++++++++++++
- block/blk-mq.h |  2 ++
- 2 files changed, 40 insertions(+)
+ block/blk-core.c     |  2 +-
+ block/blk-exec.c     |  2 +-
+ block/blk-flush.c    |  2 +-
+ block/blk-mq-sched.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-mq-sched.h |  2 ++
+ 5 files changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 041f7b7fa0d6..d7a89d009f62 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -842,6 +842,44 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index dbecbf4a64e0..fb75bc646ebc 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2330,7 +2330,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
+ 	if (q->mq_ops) {
+ 		if (blk_queue_io_stat(q))
+ 			blk_account_io_start(rq, true);
+-		blk_mq_sched_insert_request(rq, false, true, false, false);
++		blk_mq_sched_insert_request_bypass(rq, false, true, false, false);
+ 		return BLK_STS_OK;
+ 	}
+ 
+diff --git a/block/blk-exec.c b/block/blk-exec.c
+index 5c0f3dc446dc..4565aa6bb624 100644
+--- a/block/blk-exec.c
++++ b/block/blk-exec.c
+@@ -61,7 +61,7 @@ void blk_execute_rq_nowait(struct request_queue *q, struct gendisk *bd_disk,
+ 	 * be reused after dying flag is set
+ 	 */
+ 	if (q->mq_ops) {
+-		blk_mq_sched_insert_request(rq, at_head, true, false, false);
++		blk_mq_sched_insert_request_bypass(rq, at_head, true, false, false);
+ 		return;
+ 	}
+ 
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index ed5fe322abba..51e89e5c525a 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -463,7 +463,7 @@ void blk_insert_flush(struct request *rq)
+ 	if ((policy & REQ_FSEQ_DATA) &&
+ 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
+ 		if (q->mq_ops)
+-			blk_mq_sched_insert_request(rq, false, true, false, false);
++			blk_mq_sched_insert_request_bypass(rq, false, true, false, false);
+ 		else
+ 			list_add_tail(&rq->queuelist, &q->queue_head);
+ 		return;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 8d97df40fc28..b40dd063d61f 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -354,6 +354,64 @@ static void blk_mq_sched_insert_flush(struct blk_mq_hw_ctx *hctx,
+ 		blk_mq_add_to_requeue_list(rq, false, true);
  }
- EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
  
-+struct dispatch_rq_data {
-+	struct blk_mq_hw_ctx *hctx;
-+	struct request *rq;
-+};
-+
-+static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
++static void blk_mq_flush_hctx(struct blk_mq_hw_ctx *hctx,
++			      struct elevator_queue *e,
++			      const bool has_sched_dispatch,
++			      struct list_head *rqs)
 +{
-+	struct dispatch_rq_data *dispatch_data = data;
-+	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
-+	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
++	LIST_HEAD(list);
 +
-+	spin_lock(&ctx->lock);
-+	if (unlikely(!list_empty(&ctx->rq_list))) {
-+		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
-+		list_del_init(&dispatch_data->rq->queuelist);
-+		if (list_empty(&ctx->rq_list))
-+			sbitmap_clear_bit(sb, bitnr);
++	if (!has_sched_dispatch)
++		blk_mq_flush_busy_ctxs(hctx, &list);
++	else {
++		while (true) {
++			struct request *rq;
++
++			rq = e->type->ops.mq.dispatch_request(hctx);
++			if (!rq)
++				break;
++			list_add_tail(&rq->queuelist, &list);
++		}
 +	}
-+	spin_unlock(&ctx->lock);
 +
-+	return !dispatch_data->rq;
++	list_splice_tail(&list, rqs);
 +}
 +
-+struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					    struct blk_mq_ctx *start)
++void blk_mq_sched_insert_request_bypass(struct request *rq, bool at_head,
++					bool run_queue, bool async,
++					bool can_block)
 +{
-+	unsigned off = start ? start->index_hw : 0;
-+	struct dispatch_rq_data data = {
-+		.hctx = hctx,
-+		.rq   = NULL,
-+	};
++	struct request_queue *q = rq->q;
++	struct elevator_queue *e = q->elevator;
++	struct blk_mq_ctx *ctx = rq->mq_ctx;
++	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
++	LIST_HEAD(list);
++	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
 +
-+	__sbitmap_for_each_set(&hctx->ctx_map, off,
-+			       dispatch_rq_from_ctx, &data);
++	if (rq->tag == -1 && op_is_flush(rq->cmd_flags)) {
++		blk_mq_sched_insert_flush(hctx, rq, can_block);
++		return;
++	}
 +
-+	return data.rq;
++	if (at_head)
++		list_add_tail(&rq->queuelist, &list);
++	else {
++		blk_mq_flush_hctx(hctx, e, has_sched_dispatch, &list);
++		list_add_tail(&rq->queuelist, &list);
++		run_queue = true;
++	}
++
++	spin_lock(&hctx->lock);
++	if (at_head)
++		list_splice(&list, &hctx->dispatch);
++	else
++		list_splice_tail(&list, &hctx->dispatch);
++	spin_unlock(&hctx->lock);
++
++	if (run_queue)
++		blk_mq_run_hw_queue(hctx, async);
 +}
 +
- static inline unsigned int queued_to_index(unsigned int queued)
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 				 bool run_queue, bool async, bool can_block)
  {
- 	if (!queued)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 60b01c0309bc..2bfb1254841b 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -35,6 +35,8 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
- bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 				bool wait);
-+struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					    struct blk_mq_ctx *start);
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 9267d0b7c197..4d01697a627f 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -18,6 +18,8 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
  
- /*
-  * Internal helpers for allocating/freeing the request map
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 				 bool run_queue, bool async, bool can_block);
++void blk_mq_sched_insert_request_bypass(struct request *rq, bool at_head,
++					bool run_queue, bool async, bool can_block);
+ void blk_mq_sched_insert_requests(struct request_queue *q,
+ 				  struct blk_mq_ctx *ctx,
+ 				  struct list_head *list, bool run_queue_async);
 -- 
-2.9.4
+2.9.5
