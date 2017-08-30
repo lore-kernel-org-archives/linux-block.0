@@ -1,61 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34590 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751507AbdHaR2N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 13:28:13 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/9] percpu-refcount: introduce percpu_ref_is_dead()
-Date: Fri,  1 Sep 2017 01:27:20 +0800
-Message-Id: <20170831172728.15817-2-ming.lei@redhat.com>
-In-Reply-To: <20170831172728.15817-1-ming.lei@redhat.com>
-References: <20170831172728.15817-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=408be853d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 5/5] bfq: Use icq_to_bic() consistently
+Date: Wed, 30 Aug 2017 11:42:11 -0700
+Message-Id: <20170830184211.12471-6-bart.vanassche@wdc.com>
+In-Reply-To: <20170830184211.12471-1-bart.vanassche@wdc.com>
+References: <20170830184211.12471-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Inside block layer, we need to support to allocate request with
-RQF_PREEMPT even though queue is frozen.
+Some code uses icq_to_bic() to convert an io_cq pointer to a
+bfq_io_cq pointer while other code uses a direct cast. Convert
+the code that uses a direct cast such that it uses icq_to_bic().
 
-So introduce this helper for checking if queue is frozen.
-
-Cc: Tejun Heo <tj@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Paolo Valente <paolo.valente@linaro.org>
 ---
- include/linux/percpu-refcount.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ block/bfq-iosched.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-index c13dceb87b60..08549bbf4080 100644
---- a/include/linux/percpu-refcount.h
-+++ b/include/linux/percpu-refcount.h
-@@ -324,4 +324,21 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
- 	return !atomic_long_read(&ref->count);
- }
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index d375b29ad085..7d1b85e393b2 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -239,7 +239,7 @@ static int T_slow[2];
+ static int T_fast[2];
+ static int device_speed_thresh[2];
  
-+/**
-+ * percpu_ref_is_dead - test whether a percpu refcount is killed
-+ * @ref: percpu_ref to test
-+ *
-+ * Returns %true if @ref is dead
-+ *
-+ * This function is safe to call as long as @ref is between init and exit.
-+ */
-+static inline bool percpu_ref_is_dead(struct percpu_ref *ref)
-+{
-+	unsigned long __percpu *percpu_count;
-+
-+	if (__ref_is_percpu(ref, &percpu_count))
-+		return false;
-+	return ref->percpu_count_ptr & __PERCPU_REF_DEAD;
-+}
-+
- #endif
+-#define RQ_BIC(rq)		((struct bfq_io_cq *) (rq)->elv.priv[0])
++#define RQ_BIC(rq)		icq_to_bic((rq)->elv.priv[0])
+ #define RQ_BFQQ(rq)		((rq)->elv.priv[1])
+ 
+ struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync)
 -- 
-2.9.5
+2.14.1
