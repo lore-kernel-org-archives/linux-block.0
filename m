@@ -1,73 +1,59 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 30 Aug 2017 22:37:58 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: oleksandr@natalenko.name
+Return-Path: <oleksandr@natalenko.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Wed, 30 Aug 2017 12:58:21 +0200
+From: oleksandr@natalenko.name
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Shaohua Li <shli@kernel.org>
+ linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Shaohua Li <shli@kernel.org>
 Subject: Re: I/O hangs after resuming from suspend-to-ram
-Message-ID: <20170830143752.GA14684@ming.t460p>
+In-Reply-To: <20170830080628.GA2402@ming.t460p>
 References: <3926917.BCSovyVWdL@natalenko.name>
- <1615033.Xza1AIGLzP@natalenko.name>
- <20170829002425.GA28904@ming.t460p>
- <2329566.kid2YYBOAQ@natalenko.name>
- <20170830021537.GA4897@ming.t460p>
+ <1615033.Xza1AIGLzP@natalenko.name> <20170829002425.GA28904@ming.t460p>
+ <2329566.kid2YYBOAQ@natalenko.name> <20170830021537.GA4897@ming.t460p>
  <20170830051725.GA5840@ming.t460p>
  <692537117e26fe71b5e07cd8c86b38e4@natalenko.name>
  <20170830080628.GA2402@ming.t460p>
- <ae216831876b8b71ebc1590a44731db7@natalenko.name>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <ae216831876b8b71ebc1590a44731db7@natalenko.name>
+Message-ID: <ae216831876b8b71ebc1590a44731db7@natalenko.name>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Hi.
 
-On Wed, Aug 30, 2017 at 12:58:21PM +0200, oleksandr@natalenko.name wrote:
-> Hi.
-> 
-> So, current summary:
-> 
-> 1) first patch + debug patch: I can reproduce the issue in wild, but not
-> with pm_test set;
+So, current summary:
 
-That is interesting, since I always test via pm_test.
+1) first patch + debug patch: I can reproduce the issue in wild, but not 
+with pm_test set;
+2) first patch + debug patch + second patch: I cannot reproduce issue at 
+all, neither with "none", nor with "mq-deadline".
 
-> 2) first patch + debug patch + second patch: I cannot reproduce issue at
-> all, neither with "none", nor with "mq-deadline".
-> 
-> Thus, "blk-mq: align to legacy path for implementing blk_execute_rq" +
-> "blk-mq: add requests in the tail of hctx->dispatch" look like a proper fix.
-> Thanks for that!
+Thus, "blk-mq: align to legacy path for implementing blk_execute_rq" + 
+"blk-mq: add requests in the tail of hctx->dispatch" look like a proper 
+fix. Thanks for that!
 
-That is great, will prepare a formal one for merge.
+> I setup dm-crypt on /dev/md0 directly, could you show me how to setup 
+> lvm on raid10?
 
-> 
-> > I setup dm-crypt on /dev/md0 directly, could you show me how to setup
-> > lvm on raid10?
-> 
-> If still relevant, here is a layout:
+If still relevant, here is a layout:
 
-Looks not relevant, just because I use pm_test.
+===
+sda                 8:0    0    8G  0 disk
+|-sda1              8:1    0  128M  0 part   /boot/EFI
+`-sda2              8:2    0  7.9G  0 part
+   `-md0             9:0    0  7.9G  0 raid10
+     `-system-root 253:0    0  7.9G  0 lvm    /
+sdb                 8:16   0    8G  0 disk
+|-sdb1              8:17   0  128M  0 part
+`-sdb2              8:18   0  7.9G  0 part
+   `-md0             9:0    0  7.9G  0 raid10
+     `-system-root 253:0    0  7.9G  0 lvm    /
+===
 
-> 
-> ===
-> sda                 8:0    0    8G  0 disk
-> |-sda1              8:1    0  128M  0 part   /boot/EFI
-> `-sda2              8:2    0  7.9G  0 part
->   `-md0             9:0    0  7.9G  0 raid10
->     `-system-root 253:0    0  7.9G  0 lvm    /
-> sdb                 8:16   0    8G  0 disk
-> |-sdb1              8:17   0  128M  0 part
-> `-sdb2              8:18   0  7.9G  0 part
->   `-md0             9:0    0  7.9G  0 raid10
->     `-system-root 253:0    0  7.9G  0 lvm    /
-> ===
-> 
-> Anything else you'd like /me to test?
+Anything else you'd like /me to test?
 
-You have done enough, thanks a lot for your report and test!
-
-
--- 
-Ming
+30.08.2017 10:06, Ming Lei написав:
+> …SNIP…
+> Please try the following patch and previous patch together and see
+> if they make a difference:
+> …SNIP…
