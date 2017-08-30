@@ -1,8 +1,8 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [GIT PULL] nvme update for Linux 4.14, take 2
-To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <Bart.VanAssche@wdc.com>,
- "hch@infradead.org" <hch@infradead.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "hch@infradead.org" <hch@infradead.org>, "sagi@grimberg.me"
+ <sagi@grimberg.me>
 Cc: "keith.busch@intel.com" <keith.busch@intel.com>,
  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
  "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
@@ -12,52 +12,65 @@ References: <20170829150507.rjixn6uf3id6kltx@infradead.org>
  <1504106914.2526.5.camel@wdc.com>
  <a798247e-cc89-f189-4ad9-92095a86106e@grimberg.me>
  <1504107991.2526.16.camel@wdc.com>
- <30e386a2-aac7-e9b7-59e2-52c481247e4e@kernel.dk>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <0ca15e8f-fc04-7694-a471-379103c6428d@grimberg.me>
-Date: Wed, 30 Aug 2017 19:05:36 +0300
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <30e386a2-aac7-e9b7-59e2-52c481247e4e@kernel.dk>
+Date: Wed, 30 Aug 2017 09:53:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <30e386a2-aac7-e9b7-59e2-52c481247e4e@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1504107991.2526.16.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-
->>>> Hello Sagi,
+On 08/30/2017 09:46 AM, Bart Van Assche wrote:
+> On Wed, 2017-08-30 at 18:33 +0300, Sagi Grimberg wrote:
+>>>> I just realized that patch:
+>>>> --
+>>>> commit d352ae205d8b05f3f7558d10f474d8436581b3e2
+>>>> Author: Bart Van Assche <bart.vanassche@wdc.com>
+>>>> Date:   Thu Aug 17 16:23:03 2017 -0700
 >>>>
->>>> Sorry but I doubt that that patch makes it "impossible" to move controller
->>>> reset flow to the NVMe core. There are already several function pointers in
->>>> the nvme_ctrl_ops data structure and there is one such data structure per
->>>> transport. Had you already considered to add a function pointer to that
->>>> structure?
+>>>>       blk-mq: Make blk_mq_reinit_tagset() calls easier to read
+>>>>
+>>>>       Since blk_mq_ops.reinit_request is only called from inside
+>>>>       blk_mq_reinit_tagset(), make this function pointer an argument of
+>>>>       blk_mq_reinit_tagset() instead of a member of struct blk_mq_ops.
+>>>>       This patch does not change any functionality but makes
+>>>>       blk_mq_reinit_tagset() calls easier to read and to analyze.
+>>>> --
+>>>>
+>>>> Makes it impossible for me to move controller reset flow to
+>>>> nvme-core without adding a trampoline (as the reinit_request
+>>>> is transport specific)...
 >>>
->>> I have, that's the trampoline function that I was referring to, it feels
->>> a bit funny to have aa nvme core function that would look like:
+>>> Hello Sagi,
 >>>
->>> int nvme_reinit_request()
->>> {
->>> 	return ctrl->ops->reinit_request()
->>> }
->>>
->>> I can easily do that, but doesn't it defeat the purpose of blk_mq_ops?
+>>> Sorry but I doubt that that patch makes it "impossible" to move controller
+>>> reset flow to the NVMe core. There are already several function pointers in
+>>> the nvme_ctrl_ops data structure and there is one such data structure per
+>>> transport. Had you already considered to add a function pointer to that
+>>> structure?
 >>
->> I don't think so. Request reinitialization is an NVMe concept that is
->> not used by any other block driver, so why should the pointer to the
->> reinitialization function exist in blk_mq_ops?
+>> I have, that's the trampoline function that I was referring to, it feels
+>> a bit funny to have aa nvme core function that would look like:
+>>
+>> int nvme_reinit_request()
+>> {
+>> 	return ctrl->ops->reinit_request()
+>> }
+>>
+>> I can easily do that, but doesn't it defeat the purpose of blk_mq_ops?
 > 
-> The point of blk-mq is to provide all the functionality that drivers
-> need, even if it is for just a single driver. Functionality that can be
-> removed from drivers is good. The smaller/simpler we can make the
-> driver, the better off we are, even if that means adding a bit of
-> complexity to the core.
-> 
-> Obviously this is a case-by-case decision. For this particular case, I'm
-> happy with either solution.
+> I don't think so. Request reinitialization is an NVMe concept that is
+> not used by any other block driver, so why should the pointer to the
+> reinitialization function exist in blk_mq_ops?
 
-If we get to choose, my preference would be to restore the old behavior
-because currently existing nvme transports keep their internal ctrl
-representation in the tagset->driver_data as they implement
-init/exit_request. Bouncing in nvme core would require to change that
-and always keep struct nvme_ctrl as the tagset->driver_data and convert
-it on every handler...
+The point of blk-mq is to provide all the functionality that drivers
+need, even if it is for just a single driver. Functionality that can be
+removed from drivers is good. The smaller/simpler we can make the
+driver, the better off we are, even if that means adding a bit of
+complexity to the core.
 
-Everything is doable but it seems like an unneeded hassle to me...
+Obviously this is a case-by-case decision. For this particular case, I'm
+happy with either solution.
+
+-- 
+Jens Axboe
