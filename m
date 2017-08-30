@@ -1,48 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42664 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753812AbdHQUO5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Aug 2017 16:14:57 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 10/55] skd: Fix spelling in a source code comment
-Date: Thu, 17 Aug 2017 13:12:53 -0700
-Message-Id: <20170817201338.16537-11-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:34498 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751480AbdH3PUB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 11:20:01 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/2] blk-mq: fix I/O hang during system resume
+Date: Wed, 30 Aug 2017 23:19:33 +0800
+Message-Id: <20170830151935.24253-2-ming.lei@redhat.com>
+In-Reply-To: <20170830151935.24253-1-ming.lei@redhat.com>
+References: <20170830151935.24253-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Change "ptimal" into "optimal" and remove the misleading reference
-to sysfs.
+Hi,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This two patches fix I/O hang of SCSI-MQ during system resume.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 1d0ad31d2256..6c7cf5327d22 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -4273,7 +4273,7 @@ static int skd_cons_disk(struct skd_device *skdev)
- 	blk_queue_max_segments(q, skdev->sgs_per_request);
- 	blk_queue_max_hw_sectors(q, SKD_N_MAX_SECTORS);
- 
--	/* set sysfs ptimal_io_size to 8K */
-+	/* set optimal I/O size to 8KB */
- 	blk_queue_io_opt(q, 8192);
- 
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
+The cause is that when SCSI device is put into SCSI's
+quiesce state, normal I/O request can't be dispatched to lld
+any more, only request with RQF_PREEMPT is allowed to be
+sent to drive.
+
+In current blk-mq implementation, if there is request in ->dispatch,
+no new request can't be dispatched to driver any more.
+
+This two patches fix the issue reported by Oleksandr.
+
+Thanks,
+Ming
+
+Ming Lei (2):
+  blk-mq: add requests in the tail of hctx->dispatch
+  blk-mq: align to legacy's implementation of blk_execute_rq
+
+ block/blk-core.c     |  2 +-
+ block/blk-exec.c     |  2 +-
+ block/blk-flush.c    |  2 +-
+ block/blk-mq-sched.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ block/blk-mq-sched.h |  2 ++
+ block/blk-mq.c       |  2 +-
+ 6 files changed, 65 insertions(+), 5 deletions(-)
+
 -- 
-2.14.0
+2.9.5
