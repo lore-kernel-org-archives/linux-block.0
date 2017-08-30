@@ -1,106 +1,34 @@
-Return-Path: <prvs=395369d0d=bart.vanassche@wdc.com>
+Return-Path: <prvs=408be853d=bart.vanassche@wdc.com>
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <Damien.LeMoal@wdc.com>,
-	Akhil Bhansali <Akhil.Bhansali@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 53/55] skd: Remove several local variables
-Date: Thu, 17 Aug 2017 13:13:36 -0700
-Message-Id: <20170817201338.16537-54-bart.vanassche@wdc.com>
-In-Reply-To: <20170817201338.16537-1-bart.vanassche@wdc.com>
-References: <20170817201338.16537-1-bart.vanassche@wdc.com>
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 0/5] Five BFQ patches for kernel v4.14
+Date: Wed, 30 Aug 2017 11:42:06 -0700
+Message-Id: <20170830184211.12471-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes the code
-more brief.
+Hello Jens,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/skd_main.c | 37 +++++++------------------------------
- 1 file changed, 7 insertions(+), 30 deletions(-)
+This series consists of five small patches. Three patches address compiler
+warnings, one patch is a fix for the BFQ sysfs interface and a fifth patch
+makes the BFQ code slightly more consistent. Please consider these patches
+for kernel v4.14.
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 610c8979dc7e..a732bb8040f4 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -44,12 +44,6 @@
- static int skd_dbg_level;
- static int skd_isr_comp_limit = 4;
- 
--enum {
--	SKD_FLUSH_INITIALIZER,
--	SKD_FLUSH_ZERO_SIZE_FIRST,
--	SKD_FLUSH_DATA_SECOND,
--};
--
- #define SKD_ASSERT(expr) \
- 	do { \
- 		if (unlikely(!(expr))) { \
-@@ -497,31 +491,15 @@ static void skd_process_request(struct request *req, bool last)
- 	struct skd_request_context *const skreq = blk_mq_rq_to_pdu(req);
- 	struct skd_scsi_request *scsi_req;
- 	unsigned long flags;
--	unsigned long io_flags;
--	u32 lba;
--	u32 count;
--	int data_dir;
--	__be64 be_dmaa;
--	int flush, fua;
-+	const u32 lba = blk_rq_pos(req);
-+	const u32 count = blk_rq_sectors(req);
-+	const int data_dir = rq_data_dir(req);
- 
- 	WARN_ONCE(tag >= skd_max_queue_depth, "%#x > %#x (nr_requests = %lu)\n",
- 		  tag, skd_max_queue_depth, q->nr_requests);
- 
- 	SKD_ASSERT(skreq->state == SKD_REQ_STATE_IDLE);
- 
--	flush = fua = 0;
--
--	lba = (u32)blk_rq_pos(req);
--	count = blk_rq_sectors(req);
--	data_dir = rq_data_dir(req);
--	io_flags = req->cmd_flags;
--
--	if (req_op(req) == REQ_OP_FLUSH)
--		flush++;
--
--	if (io_flags & REQ_FUA)
--		fua++;
--
- 	dev_dbg(&skdev->pdev->dev,
- 		"new req=%p lba=%u(0x%x) count=%u(0x%x) dir=%d\n", req, lba,
- 		lba, count, count, data_dir);
-@@ -568,19 +546,18 @@ static void skd_process_request(struct request *req, bool last)
- 	scsi_req = &skmsg->msg_buf->scsi[fmh->num_protocol_cmds_coalesced];
- 	memset(scsi_req, 0, sizeof(*scsi_req));
- 
--	be_dmaa = cpu_to_be64(skreq->sksg_dma_address);
--
- 	scsi_req->hdr.tag = skreq->id;
--	scsi_req->hdr.sg_list_dma_address = be_dmaa;
-+	scsi_req->hdr.sg_list_dma_address =
-+		cpu_to_be64(skreq->sksg_dma_address);
- 
--	if (flush == SKD_FLUSH_ZERO_SIZE_FIRST) {
-+	if (req_op(req) == REQ_OP_FLUSH) {
- 		skd_prep_zerosize_flush_cdb(scsi_req, skreq);
- 		SKD_ASSERT(skreq->flush_cmd == 1);
- 	} else {
- 		skd_prep_rw_cdb(scsi_req, data_dir, lba, count);
- 	}
- 
--	if (fua)
-+	if (req->cmd_flags & REQ_FUA)
- 		scsi_req->cdb[1] |= SKD_FUA_NV;
- 
- 	scsi_req->hdr.sg_list_len_bytes = cpu_to_be32(skreq->sg_byte_count);
+Thanks,
+
+Bart.
+
+Bart Van Assche (5):
+  bfq: Annotate fall-through in a switch statement
+  bfq: Declare local functions static
+  bfq: Check kstrtoul() return value
+  bfq: Suppress compiler warnings about comparisons
+  bfq: Use icq_to_bic() consistently
+
+ block/bfq-cgroup.c  | 18 +++++++-------
+ block/bfq-iosched.c | 71 +++++++++++++++++++++++++++++++++++------------------
+ 2 files changed, 56 insertions(+), 33 deletions(-)
+
 -- 
-2.14.0
+2.14.1
