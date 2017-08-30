@@ -1,99 +1,113 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f54.google.com ([74.125.83.54]:33375 "EHLO
-        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751183AbdHXHD4 (ORCPT
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:37627 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750757AbdH3TSb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Aug 2017 03:03:56 -0400
-Received: by mail-pg0-f54.google.com with SMTP id t3so12573991pgt.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Aug 2017 00:03:56 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Hannes Reinecke <hare@suse.de>,
-        Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH 3/4] loop: add ioctl for changing logical block size
-Date: Thu, 24 Aug 2017 00:03:43 -0700
-Message-Id: <f82c988df9c0e3c543089360e3d562c751b63d0f.1503558155.git.osandov@fb.com>
-In-Reply-To: <cover.1503558155.git.osandov@fb.com>
-References: <cover.1503558155.git.osandov@fb.com>
-In-Reply-To: <cover.1503558155.git.osandov@fb.com>
-References: <cover.1503558155.git.osandov@fb.com>
+        Wed, 30 Aug 2017 15:18:31 -0400
+MIME-Version: 1.0
+In-Reply-To: <1503315792-14837-6-git-send-email-bhumirks@gmail.com>
+References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com> <1503315792-14837-6-git-send-email-bhumirks@gmail.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 30 Aug 2017 22:18:29 +0300
+Message-ID: <CAHp75VfohACiOR7XGd5o7LOMPQdDarfgN8HqvEqcg_oiCf-+VA@mail.gmail.com>
+Subject: Re: [PATCH 5/6] platform/x86: make device_attribute const
+To: Bhumika Goyal <bhumirks@gmail.com>
+Cc: Julia Lawall <julia.lawall@lip6.fr>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>, Josef Bacik <jbacik@fb.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        manish.chopra@cavium.com, rahul.verma@cavium.com,
+        Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
+        cascardo@holoscopio.com, don@syst.com.br,
+        "dvhart@infradead.org" <dvhart@infradead.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net,
+        linux-input <linux-input@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On Mon, Aug 21, 2017 at 2:43 PM, Bhumika Goyal <bhumirks@gmail.com> wrote:
+> Make these const as they are only passed as an argument to the
+> function device_create_file and device_remove_file and the corresponding
+> arguments are of type const.
+> Done using Coccinelle
+>
 
-This is a different approach from the first attempt in f2c6df7dbf9a
-("loop: support 4k physical blocksize"). Rather than extending
-LOOP_{GET,SET}_STATUS, add a separate ioctl just for setting the block
-size.
+Split on per driver basis.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- drivers/block/loop.c      | 24 ++++++++++++++++++++++++
- include/uapi/linux/loop.h |  1 +
- 2 files changed, 25 insertions(+)
+> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+> ---
+>  drivers/platform/x86/classmate-laptop.c | 6 +++---
+>  drivers/platform/x86/intel-rst.c        | 4 ++--
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/platform/x86/classmate-laptop.c b/drivers/platform/x86/classmate-laptop.c
+> index 55cf10b..d3715e2 100644
+> --- a/drivers/platform/x86/classmate-laptop.c
+> +++ b/drivers/platform/x86/classmate-laptop.c
+> @@ -254,7 +254,7 @@ static ssize_t cmpc_accel_sensitivity_store_v4(struct device *dev,
+>         return strnlen(buf, count);
+>  }
+>
+> -static struct device_attribute cmpc_accel_sensitivity_attr_v4 = {
+> +static const struct device_attribute cmpc_accel_sensitivity_attr_v4 = {
+>         .attr = { .name = "sensitivity", .mode = 0660 },
+>         .show = cmpc_accel_sensitivity_show_v4,
+>         .store = cmpc_accel_sensitivity_store_v4
+> @@ -303,7 +303,7 @@ static ssize_t cmpc_accel_g_select_store_v4(struct device *dev,
+>         return strnlen(buf, count);
+>  }
+>
+> -static struct device_attribute cmpc_accel_g_select_attr_v4 = {
+> +static const struct device_attribute cmpc_accel_g_select_attr_v4 = {
+>         .attr = { .name = "g_select", .mode = 0660 },
+>         .show = cmpc_accel_g_select_show_v4,
+>         .store = cmpc_accel_g_select_store_v4
+> @@ -599,7 +599,7 @@ static ssize_t cmpc_accel_sensitivity_store(struct device *dev,
+>         return strnlen(buf, count);
+>  }
+>
+> -static struct device_attribute cmpc_accel_sensitivity_attr = {
+> +static const struct device_attribute cmpc_accel_sensitivity_attr = {
+>         .attr = { .name = "sensitivity", .mode = 0660 },
+>         .show = cmpc_accel_sensitivity_show,
+>         .store = cmpc_accel_sensitivity_store
+> diff --git a/drivers/platform/x86/intel-rst.c b/drivers/platform/x86/intel-rst.c
+> index 7344d84..760a9bf 100644
+> --- a/drivers/platform/x86/intel-rst.c
+> +++ b/drivers/platform/x86/intel-rst.c
+> @@ -65,7 +65,7 @@ static ssize_t irst_store_wakeup_events(struct device *dev,
+>         return count;
+>  }
+>
+> -static struct device_attribute irst_wakeup_attr = {
+> +static const struct device_attribute irst_wakeup_attr = {
+>         .attr = { .name = "wakeup_events", .mode = 0600 },
+>         .show = irst_show_wakeup_events,
+>         .store = irst_store_wakeup_events
+> @@ -111,7 +111,7 @@ static ssize_t irst_store_wakeup_time(struct device *dev,
+>         return count;
+>  }
+>
+> -static struct device_attribute irst_timeout_attr = {
+> +static const struct device_attribute irst_timeout_attr = {
+>         .attr = { .name = "wakeup_time", .mode = 0600 },
+>         .show = irst_show_wakeup_time,
+>         .store = irst_store_wakeup_time
+> --
+> 1.9.1
+>
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1a5b4ecf54ec..6b1d932028e3 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1047,6 +1047,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	memset(lo->lo_encrypt_key, 0, LO_KEY_SIZE);
- 	memset(lo->lo_crypt_name, 0, LO_NAME_SIZE);
- 	memset(lo->lo_file_name, 0, LO_NAME_SIZE);
-+	blk_queue_logical_block_size(lo->lo_queue, 512);
- 	if (bdev) {
- 		bdput(bdev);
- 		invalidate_bdev(bdev);
-@@ -1330,6 +1331,24 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
- 	return error;
- }
- 
-+static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
-+{
-+	if (lo->lo_state != Lo_bound)
-+		return -ENXIO;
-+
-+	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
-+		return -EINVAL;
-+
-+	blk_mq_freeze_queue(lo->lo_queue);
-+
-+	blk_queue_logical_block_size(lo->lo_queue, arg);
-+	loop_update_dio(lo);
-+
-+	blk_mq_unfreeze_queue(lo->lo_queue);
-+
-+	return 0;
-+}
-+
- static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	unsigned int cmd, unsigned long arg)
- {
-@@ -1378,6 +1397,11 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
- 			err = loop_set_dio(lo, arg);
- 		break;
-+	case LOOP_SET_BLOCK_SIZE:
-+		err = -EPERM;
-+		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
-+			err = loop_set_block_size(lo, arg);
-+		break;
- 	default:
- 		err = lo->ioctl ? lo->ioctl(lo, cmd, arg) : -EINVAL;
- 	}
-diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
-index c8125ec1f4f2..23158dbe2424 100644
---- a/include/uapi/linux/loop.h
-+++ b/include/uapi/linux/loop.h
-@@ -88,6 +88,7 @@ struct loop_info64 {
- #define LOOP_CHANGE_FD		0x4C06
- #define LOOP_SET_CAPACITY	0x4C07
- #define LOOP_SET_DIRECT_IO	0x4C08
-+#define LOOP_SET_BLOCK_SIZE	0x4C09
- 
- /* /dev/loop-control interface */
- #define LOOP_CTL_ADD		0x4C80
+
+
 -- 
-2.14.1
+With Best Regards,
+Andy Shevchenko
