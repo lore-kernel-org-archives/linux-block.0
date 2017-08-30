@@ -1,101 +1,73 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44712 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752093AbdHHIrZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 04:47:25 -0400
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 30 Aug 2017 22:37:58 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>, linux-bcache@vger.kernel.org
-Subject: [PATCH v3 07/49] bcache: comment on direct access to bvec table
-Date: Tue,  8 Aug 2017 16:45:06 +0800
-Message-Id: <20170808084548.18963-8-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: oleksandr@natalenko.name
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Shaohua Li <shli@kernel.org>
+Subject: Re: I/O hangs after resuming from suspend-to-ram
+Message-ID: <20170830143752.GA14684@ming.t460p>
+References: <3926917.BCSovyVWdL@natalenko.name>
+ <1615033.Xza1AIGLzP@natalenko.name>
+ <20170829002425.GA28904@ming.t460p>
+ <2329566.kid2YYBOAQ@natalenko.name>
+ <20170830021537.GA4897@ming.t460p>
+ <20170830051725.GA5840@ming.t460p>
+ <692537117e26fe71b5e07cd8c86b38e4@natalenko.name>
+ <20170830080628.GA2402@ming.t460p>
+ <ae216831876b8b71ebc1590a44731db7@natalenko.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <ae216831876b8b71ebc1590a44731db7@natalenko.name>
+List-ID: <linux-block@vger.kernel.org>
 
-Looks all are safe after multipage bvec is supported.
+Hi,
 
-Cc: linux-bcache@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/bcache/btree.c | 1 +
- drivers/md/bcache/super.c | 6 ++++++
- drivers/md/bcache/util.c  | 7 +++++++
- 3 files changed, 14 insertions(+)
+On Wed, Aug 30, 2017 at 12:58:21PM +0200, oleksandr@natalenko.name wrote:
+> Hi.
+> 
+> So, current summary:
+> 
+> 1) first patch + debug patch: I can reproduce the issue in wild, but not
+> with pm_test set;
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 866dcf78ff8e..3da595ae565b 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -431,6 +431,7 @@ static void do_btree_node_write(struct btree *b)
- 
- 		continue_at(cl, btree_node_write_done, NULL);
- 	} else {
-+		/* No harm for multipage bvec since the new is just allocated */
- 		b->bio->bi_vcnt = 0;
- 		bch_bio_map(b->bio, i);
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8352fad765f6..6808f548cd13 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -208,6 +208,7 @@ static void write_bdev_super_endio(struct bio *bio)
- 
- static void __write_super(struct cache_sb *sb, struct bio *bio)
- {
-+	/* single page bio, safe for multipage bvec */
- 	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
- 	unsigned i;
- 
-@@ -1154,6 +1155,8 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 	dc->bdev->bd_holder = dc;
- 
- 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
-+
-+	/* single page bio, safe for multipage bvec */
- 	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
- 	get_page(sb_page);
- 
-@@ -1799,6 +1802,7 @@ void bch_cache_release(struct kobject *kobj)
- 	for (i = 0; i < RESERVE_NR; i++)
- 		free_fifo(&ca->free[i]);
- 
-+	/* single page bio, safe for multipage bvec */
- 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
- 		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
- 
-@@ -1854,6 +1858,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
- 	ca->bdev->bd_holder = ca;
- 
- 	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
-+
-+	/* single page bio, safe for multipage bvec */
- 	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
- 	get_page(sb_page);
- 
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 8c3a938f4bf0..11b4230ea6ad 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -223,6 +223,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
- 		: 0;
- }
- 
-+/*
-+ * Generally it isn't good to access .bi_io_vec and .bi_vcnt
-+ * directly, the preferred way is bio_add_page, but in
-+ * this case, bch_bio_map() supposes that the bvec table
-+ * is empty, so it is safe to access .bi_vcnt & .bi_io_vec
-+ * in this way even after multipage bvec is supported.
-+ */
- void bch_bio_map(struct bio *bio, void *base)
- {
- 	size_t size = bio->bi_iter.bi_size;
+That is interesting, since I always test via pm_test.
+
+> 2) first patch + debug patch + second patch: I cannot reproduce issue at
+> all, neither with "none", nor with "mq-deadline".
+> 
+> Thus, "blk-mq: align to legacy path for implementing blk_execute_rq" +
+> "blk-mq: add requests in the tail of hctx->dispatch" look like a proper fix.
+> Thanks for that!
+
+That is great, will prepare a formal one for merge.
+
+> 
+> > I setup dm-crypt on /dev/md0 directly, could you show me how to setup
+> > lvm on raid10?
+> 
+> If still relevant, here is a layout:
+
+Looks not relevant, just because I use pm_test.
+
+> 
+> ===
+> sda                 8:0    0    8G  0 disk
+> |-sda1              8:1    0  128M  0 part   /boot/EFI
+> `-sda2              8:2    0  7.9G  0 part
+>   `-md0             9:0    0  7.9G  0 raid10
+>     `-system-root 253:0    0  7.9G  0 lvm    /
+> sdb                 8:16   0    8G  0 disk
+> |-sdb1              8:17   0  128M  0 part
+> `-sdb2              8:18   0  7.9G  0 part
+>   `-md0             9:0    0  7.9G  0 raid10
+>     `-system-root 253:0    0  7.9G  0 lvm    /
+> ===
+> 
+> Anything else you'd like /me to test?
+
+You have done enough, thanks a lot for your report and test!
+
+
 -- 
-2.9.4
+Ming
