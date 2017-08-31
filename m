@@ -1,73 +1,85 @@
-Return-Path: <prvs=403a468a2=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 4/4] skd: Remove SKD_ID_INCR
-Date: Fri, 25 Aug 2017 14:24:14 -0700
-Message-Id: <20170825212414.28322-5-bart.vanassche@wdc.com>
-In-Reply-To: <20170825212414.28322-1-bart.vanassche@wdc.com>
-References: <20170825212414.28322-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:35193 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751016AbdHaMDv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 08:03:51 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH V7 04/10] mmc: mmc: Enable CQE's
+Date: Thu, 31 Aug 2017 14:56:50 +0300
+Message-Id: <1504180616-14514-5-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The SKD_ID_INCR flag in skd_request_context.id duplicates information
-that is already available otherwise, e.g. through the block layer
-request state and through skd_request_context.state. Hence remove
-the code that manipulates this flag and also the flag itself.
-Since skd_isr_completion_posted() only uses the lower bits of
-skd_request_context.id as hardware tag, this patch does not change
-the behavior of the skd driver. I'm referring to the following code:
+Enable or disable CQE when a card is added or removed respectively.
 
-    tag = req_id & SKD_ID_SLOT_AND_TABLE_MASK;
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- drivers/block/skd_main.c | 5 -----
- 1 file changed, 5 deletions(-)
+ drivers/mmc/core/bus.c |  7 +++++++
+ drivers/mmc/core/mmc.c | 12 ++++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 34188a600bfa..00a86252b3c5 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -89,7 +89,6 @@ MODULE_DESCRIPTION("STEC s1120 PCIe SSD block driver");
- 	  sizeof(struct fit_comp_error_info)) * SKD_N_COMPLETION_ENTRY)
+diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
+index 301246513a37..a4b49e25fe96 100644
+--- a/drivers/mmc/core/bus.c
++++ b/drivers/mmc/core/bus.c
+@@ -369,10 +369,17 @@ int mmc_add_card(struct mmc_card *card)
+  */
+ void mmc_remove_card(struct mmc_card *card)
+ {
++	struct mmc_host *host = card->host;
++
+ #ifdef CONFIG_DEBUG_FS
+ 	mmc_remove_card_debugfs(card);
+ #endif
  
- /* 5 bits of uniqifier, 0xF800 */
--#define SKD_ID_INCR             (0x400)
- #define SKD_ID_TABLE_MASK       (3u << 8u)
- #define  SKD_ID_RW_REQUEST      (0u << 8u)
- #define  SKD_ID_INTERNAL        (1u << 8u)
-@@ -921,9 +920,7 @@ static void skd_send_internal_skspcl(struct skd_device *skdev,
- 		 */
- 		return;
- 
--	SKD_ASSERT((skspcl->req.id & SKD_ID_INCR) == 0);
- 	skspcl->req.state = SKD_REQ_STATE_BUSY;
--	skspcl->req.id += SKD_ID_INCR;
- 
- 	scsi = &skspcl->msg_buf->scsi[0];
- 	scsi->hdr.tag = skspcl->req.id;
-@@ -1044,7 +1041,6 @@ static void skd_complete_internal(struct skd_device *skdev,
- 
- 	skspcl->req.completion = *skcomp;
- 	skspcl->req.state = SKD_REQ_STATE_IDLE;
--	skspcl->req.id += SKD_ID_INCR;
- 
- 	status = skspcl->req.completion.status;
- 
-@@ -1451,7 +1447,6 @@ static void skd_release_skreq(struct skd_device *skdev,
- 	 * Reclaim the skd_request_context
++	if (host->cqe_enabled) {
++		host->cqe_ops->cqe_disable(host);
++		host->cqe_enabled = false;
++	}
++
+ 	if (mmc_card_present(card)) {
+ 		if (mmc_host_is_spi(card->host)) {
+ 			pr_info("%s: SPI card removed\n",
+diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
+index 194cf2082e73..0dcbd25126a1 100644
+--- a/drivers/mmc/core/mmc.c
++++ b/drivers/mmc/core/mmc.c
+@@ -1807,6 +1807,18 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
  	 */
- 	skreq->state = SKD_REQ_STATE_IDLE;
--	skreq->id += SKD_ID_INCR;
- }
+ 	card->reenable_cmdq = card->ext_csd.cmdq_en;
  
- static int skd_isr_completion_posted(struct skd_device *skdev,
++	if (card->ext_csd.cmdq_en && !host->cqe_enabled) {
++		err = host->cqe_ops->cqe_enable(host, card);
++		if (err) {
++			pr_err("%s: Failed to enable CQE, error %d\n",
++				mmc_hostname(host), err);
++		} else {
++			host->cqe_enabled = true;
++			pr_info("%s: Command Queue Engine enabled\n",
++				mmc_hostname(host));
++		}
++	}
++
+ 	if (!oldcard)
+ 		host->card = card;
+ 
 -- 
-2.14.1
+1.9.1
