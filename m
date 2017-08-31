@@ -1,207 +1,135 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58346 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752098AbdHHIuz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 04:50:55 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 24/49] block: use bio_for_each_segment_mp() to compute segments count
-Date: Tue,  8 Aug 2017 16:45:23 +0800
-Message-Id: <20170808084548.18963-25-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	jeremywh7@gmail.com,
+	lnicola@dend.ro,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/2] doc, block, bfq: fix some typos and remove stale stuff
+Date: Thu, 31 Aug 2017 20:00:30 +0200
+Message-Id: <20170831180031.3747-2-paolo.valente@linaro.org>
+In-Reply-To: <20170831180031.3747-1-paolo.valente@linaro.org>
+References: <20170831180031.3747-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Firstly it is more efficient to use bio_for_each_segment_mp()
-in both blk_bio_segment_split() and __blk_recalc_rq_segments()
-to compute how many segments there are in the bio.
+In addition to containing some typos and stale sentences, the file
+bfq-iosched.txt still mentioned a set of sysfs parameters that have
+been removed from this version of bfq. This commit fixes all these
+issues.
 
-Secondaly once bio_for_each_segment_mp() is used, the bvec
-may need to be splitted because its length can be very long
-and more than max segment size, so we have to support to split
-one bvec into several segments.
-
-Thirdly during splitting mp bvec into segments, max segment
-number may be reached, then the bio need to be splitted when
-this happens.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Reviewed-by: Jeremy Hickman <jeremywh7@gmail.com>
+Reviewed-by: Laurentiu Nicola <lnicola@dend.ro>
 ---
- block/blk-merge.c | 97 ++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 79 insertions(+), 18 deletions(-)
+ Documentation/block/bfq-iosched.txt | 66 ++++++-------------------------------
+ 1 file changed, 10 insertions(+), 56 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index ac217fce4921..c9b300f91fba 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -96,6 +96,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
- 	return sectors;
- }
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+index 05e2822..03ff4cc 100644
+--- a/Documentation/block/bfq-iosched.txt
++++ b/Documentation/block/bfq-iosched.txt
+@@ -16,14 +16,16 @@ throughput. So, when needed for achieving a lower latency, BFQ builds
+ schedules that may lead to a lower throughput. If your main or only
+ goal, for a given device, is to achieve the maximum-possible
+ throughput at all times, then do switch off all low-latency heuristics
+-for that device, by setting low_latency to 0. Full details in Section 3.
++for that device, by setting low_latency to 0. See Section 3 for
++details on how to configure BFQ for the desired tradeoff between
++latency and throughput, or on how to maximize throughput.
  
-+/*
-+ * Split the bvec @bv into segments, and update all kinds of
-+ * variables.
-+ */
-+static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
-+		unsigned *nsegs, unsigned *last_seg_size,
-+		unsigned *front_seg_size, unsigned *sectors)
-+{
-+	bool need_split = false;
-+	unsigned len = bv->bv_len;
-+	unsigned total_len = 0;
-+	unsigned new_nsegs = 0, seg_size = 0;
-+
-+	if ((*nsegs >= queue_max_segments(q)) || !len)
-+		return need_split;
-+
-+	/*
-+	 * Multipage bvec may be too big to hold in one segment,
-+	 * so the current bvec has to be splitted as multiple
-+	 * segments.
-+	 */
-+	while (new_nsegs + *nsegs < queue_max_segments(q)) {
-+		seg_size = min(queue_max_segment_size(q), len);
-+
-+		new_nsegs++;
-+		total_len += seg_size;
-+		len -= seg_size;
-+
-+		if ((queue_virt_boundary(q) && ((bv->bv_offset +
-+		    total_len) & queue_virt_boundary(q))) || !len)
-+			break;
-+	}
-+
-+	/* split in the middle of the bvec */
-+	if (len)
-+		need_split = true;
-+
-+	/* update front segment size */
-+	if (!*nsegs) {
-+		unsigned first_seg_size = seg_size;
-+
-+		if (new_nsegs > 1)
-+			first_seg_size = queue_max_segment_size(q);
-+		if (*front_seg_size < first_seg_size)
-+			*front_seg_size = first_seg_size;
-+	}
-+
-+	/* update other varibles */
-+	*last_seg_size = seg_size;
-+	*nsegs += new_nsegs;
-+	if (sectors)
-+		*sectors += total_len >> 9;
-+
-+	return need_split;
-+}
-+
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -110,7 +166,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	const unsigned max_sectors = get_max_io_size(q, bio);
- 	unsigned advance = 0;
+ On average CPUs, the current version of BFQ can handle devices
+ performing at most ~30K IOPS; at most ~50 KIOPS on faster CPUs. As a
+ reference, 30-50 KIOPS correspond to very high bandwidths with
+ sequential I/O (e.g., 8-12 GB/s if I/O requests are 256 KB large), and
+-to 120-200 MB/s with 4KB random I/O. BFQ has not yet been tested on
+-multi-queue devices.
++to 120-200 MB/s with 4KB random I/O. BFQ is currently being tested on
++multi-queue devices too.
  
--	bio_for_each_segment(bv, bio, iter) {
-+	bio_for_each_segment_mp(bv, bio, iter) {
- 		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
-@@ -125,8 +181,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			 */
- 			if (nsegs < queue_max_segments(q) &&
- 			    sectors < max_sectors) {
--				nsegs++;
--				sectors = max_sectors;
-+				/* split in the middle of bvec */
-+				bv.bv_len = (max_sectors - sectors) << 9;
-+				bvec_split_segs(q, &bv, &nsegs,
-+						&seg_size,
-+						&front_seg_size,
-+						&sectors);
- 			}
- 			goto split;
- 		}
-@@ -138,10 +198,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 				goto new_segment;
- 			if (seg_size + bv.bv_len > queue_max_segment_size(q)) {
- 				/*
--				 * On assumption is that initial value of
--				 * @seg_size(equals to bv.bv_len) won't be
--				 * bigger than max segment size, but will
--				 * becomes false after multipage bvec comes.
-+				 * The initial value of @seg_size won't be
-+				 * bigger than max segment size, because we
-+				 * split the bvec via bvec_split_segs().
- 				 */
- 				advance = queue_max_segment_size(q) - seg_size;
+ The table of contents follow. Impatients can just jump to Section 3.
  
-@@ -173,11 +232,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		if (nsegs == 1 && seg_size > front_seg_size)
- 			front_seg_size = seg_size;
+@@ -154,10 +156,10 @@ plus a lot of code, are borrowed from CFQ.
  
--		nsegs++;
- 		bvprv = bv;
- 		bvprvp = &bvprv;
--		seg_size = bv.bv_len;
--		sectors += bv.bv_len >> 9;
-+
-+		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
-+					&front_seg_size, &sectors))
-+			goto split;
+       - With respect to idling for service guarantees, if several
+ 	processes are competing for the device at the same time, but
+-	all processes (and groups, after the following commit) have
+-	the same weight, then BFQ guarantees the expected throughput
+-	distribution without ever idling the device. Throughput is
+-	thus as high as possible in this common scenario.
++	all processes and groups have the same weight, then BFQ
++	guarantees the expected throughput distribution without ever
++	idling the device. Throughput is thus as high as possible in
++	this common scenario.
  
- 		/* restore the bvec for iterator */
- 		if (advance) {
-@@ -251,6 +311,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	struct bio_vec bv, bvprv = { NULL };
- 	int cluster, prev = 0;
- 	unsigned int seg_size, nr_phys_segs;
-+	unsigned front_seg_size = bio->bi_seg_front_size;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
+   - If low-latency mode is enabled (default configuration), BFQ
+     executes some special heuristics to detect interactive and soft
+@@ -191,10 +193,7 @@ plus a lot of code, are borrowed from CFQ.
+   - Queues are scheduled according to a variant of WF2Q+, named
+     B-WF2Q+, and implemented using an augmented rb-tree to preserve an
+     O(log N) overall complexity.  See [2] for more details. B-WF2Q+ is
+-    also ready for hierarchical scheduling. However, for a cleaner
+-    logical breakdown, the code that enables and completes
+-    hierarchical support is provided in the next commit, which focuses
+-    exactly on this feature.
++    also ready for hierarchical scheduling, details in Section 4.
  
-@@ -271,7 +332,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	seg_size = 0;
- 	nr_phys_segs = 0;
- 	for_each_bio(bio) {
--		bio_for_each_segment(bv, bio, iter) {
-+		bio_for_each_segment_mp(bv, bio, iter) {
- 			/*
- 			 * If SG merging is disabled, each bio vector is
- 			 * a segment
-@@ -293,20 +354,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				continue;
- 			}
- new_segment:
--			if (nr_phys_segs == 1 && seg_size >
--			    fbio->bi_seg_front_size)
--				fbio->bi_seg_front_size = seg_size;
-+			if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+				front_seg_size = seg_size;
+   - B-WF2Q+ guarantees a tight deviation with respect to an ideal,
+     perfectly fair, and smooth service. In particular, B-WF2Q+
+@@ -427,51 +426,6 @@ Read-only parameter, used to show the weights of the currently active
+ BFQ queues.
  
--			nr_phys_segs++;
- 			bvprv = bv;
- 			prev = 1;
--			seg_size = bv.bv_len;
-+			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
-+					&front_seg_size, NULL);
- 		}
- 		bbio = bio;
- 	}
  
--	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
--		fbio->bi_seg_front_size = seg_size;
-+	if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+		front_seg_size = seg_size;
-+	fbio->bi_seg_front_size = front_seg_size;
- 	if (seg_size > bbio->bi_seg_back_size)
- 		bbio->bi_seg_back_size = seg_size;
+-wr_ tunables
+-------------
+-
+-BFQ exports a few parameters to control/tune the behavior of
+-low-latency heuristics.
+-
+-wr_coeff
+-
+-Factor by which the weight of a weight-raised queue is multiplied. If
+-the queue is deemed soft real-time, then the weight is further
+-multiplied by an additional, constant factor.
+-
+-wr_max_time
+-
+-Maximum duration of a weight-raising period for an interactive task
+-(ms). If set to zero (default value), then this value is computed
+-automatically, as a function of the peak rate of the device. In any
+-case, when the value of this parameter is read, it always reports the
+-current duration, regardless of whether it has been set manually or
+-computed automatically.
+-
+-wr_max_softrt_rate
+-
+-Maximum service rate below which a queue is deemed to be associated
+-with a soft real-time application, and is then weight-raised
+-accordingly (sectors/sec).
+-
+-wr_min_idle_time
+-
+-Minimum idle period after which interactive weight-raising may be
+-reactivated for a queue (in ms).
+-
+-wr_rt_max_time
+-
+-Maximum weight-raising duration for soft real-time queues (in ms). The
+-start time from which this duration is considered is automatically
+-moved forward if the queue is detected to be still soft real-time
+-before the current soft real-time weight-raising period finishes.
+-
+-wr_min_inter_arr_async
+-
+-Minimum period between I/O request arrivals after which weight-raising
+-may be reactivated for an already busy async queue (in ms).
+-
+-
+ 4. Group scheduling with BFQ
+ ============================
  
 -- 
-2.9.4
+2.10.0
