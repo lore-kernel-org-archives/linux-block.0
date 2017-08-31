@@ -1,135 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:58129 "EHLO mga03.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:63399 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755018AbdHYMun (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 08:50:43 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V6 03/12] mmc: host: Add CQE interface
-Date: Fri, 25 Aug 2017 15:43:46 +0300
-Message-Id: <1503665035-16231-4-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
-References: <1503665035-16231-1-git-send-email-adrian.hunter@intel.com>
+        id S1751566AbdHaR3o (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 13:29:44 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 9/9] SCSI: freeze block queue when SCSI device is put into quiesce
+Date: Fri,  1 Sep 2017 01:27:28 +0800
+Message-Id: <20170831172728.15817-10-ming.lei@redhat.com>
+In-Reply-To: <20170831172728.15817-1-ming.lei@redhat.com>
+References: <20170831172728.15817-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add CQE host operations, capabilities, and host members.
+Simply quiesing SCSI device and waiting for completeion of IO
+dispatched to SCSI queue isn't safe, it is easy to use up
+requests because all these allocated requests can't be dispatched
+when device is put in QIUESCE. Then no request can be allocated
+for RQF_PREEMPT, and system may hang somewhere, such as
+When sending commands of sync_cache or start_stop during
+system suspend path.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Before quiesing SCSI, this patch freezes block queue first,
+so no new request can enter queue any more, and all pending
+requests are drained too once blk_freeze_queue is returned.
+
+This patch also uses __blk_get_request() for allocating
+request with RQF_PREEMPT, so that the allocation can
+succeed even though block queue is frozen.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/mmc/core.h |  6 ++++++
- include/linux/mmc/host.h | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+)
+ drivers/ide/ide-pm.c    |  3 ++-
+ drivers/scsi/scsi_lib.c | 23 +++++++++++++++++++++--
+ 2 files changed, 23 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/mmc/core.h b/include/linux/mmc/core.h
-index 178f699ac172..927519385482 100644
---- a/include/linux/mmc/core.h
-+++ b/include/linux/mmc/core.h
-@@ -156,6 +156,12 @@ struct mmc_request {
- 	struct completion	completion;
- 	struct completion	cmd_completion;
- 	void			(*done)(struct mmc_request *);/* completion function */
-+	/*
-+	 * Notify uppers layers (e.g. mmc block driver) that recovery is needed
-+	 * due to an error associated with the mmc_request. Currently used only
-+	 * by CQE.
-+	 */
-+	void			(*recovery_notifier)(struct mmc_request *);
- 	struct mmc_host		*host;
+diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
+index 544f02d673ca..4970e3561b13 100644
+--- a/drivers/ide/ide-pm.c
++++ b/drivers/ide/ide-pm.c
+@@ -89,7 +89,8 @@ int generic_ide_resume(struct device *dev)
+ 	}
  
- 	/* Allow other commands during this ongoing data transfer or busy wait */
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index e92629518f68..f3f2d07feb2a 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -162,6 +162,50 @@ struct mmc_host_ops {
- 				  unsigned int direction, int blk_size);
- };
+ 	memset(&rqpm, 0, sizeof(rqpm));
+-	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
++	rq = __blk_get_request(drive->queue, REQ_OP_DRV_IN,
++			       __GFP_RECLAIM, BLK_REQ_PREEMPT);
+ 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
+ 	rq->rq_flags |= RQF_PREEMPT;
+ 	rq->special = &rqpm;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index f6097b89d5d3..b9ad8aeb456f 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -244,9 +244,10 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
  
-+struct mmc_cqe_ops {
-+	/* Allocate resources, and make the CQE operational */
-+	int	(*cqe_enable)(struct mmc_host *host, struct mmc_card *card);
-+	/* Free resources, and make the CQE non-operational */
-+	void	(*cqe_disable)(struct mmc_host *host);
+-	req = blk_get_request(sdev->request_queue,
++	req = __blk_get_request(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM,
++			BLK_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -2890,6 +2891,19 @@ scsi_device_quiesce(struct scsi_device *sdev)
+ {
+ 	int err;
+ 
 +	/*
-+	 * Issue a read, write or DCMD request to the CQE. Also deal with the
-+	 * effect of ->cqe_off().
++	 * Simply quiesing SCSI device isn't safe, it is easy
++	 * to use up requests because all these allocated requests
++	 * can't be dispatched when device is put in QIUESCE.
++	 * Then no request can be allocated and we may hang
++	 * somewhere, such as system suspend/resume.
++	 *
++	 * So we freeze block queue first, no new request can
++	 * enter queue any more, and pending requests are drained
++	 * once blk_freeze_queue is returned.
 +	 */
-+	int	(*cqe_request)(struct mmc_host *host, struct mmc_request *mrq);
-+	/* Free resources (e.g. DMA mapping) associated with the request */
-+	void	(*cqe_post_req)(struct mmc_host *host, struct mmc_request *mrq);
-+	/*
-+	 * Prepare the CQE and host controller to accept non-CQ commands. There
-+	 * is no corresponding ->cqe_on(), instead ->cqe_request() is required
-+	 * to deal with that.
-+	 */
-+	void	(*cqe_off)(struct mmc_host *host);
-+	/*
-+	 * Wait for all CQE tasks to complete. Return an error if recovery
-+	 * becomes necessary.
-+	 */
-+	int	(*cqe_wait_for_idle)(struct mmc_host *host);
-+	/*
-+	 * Notify CQE that a request has timed out. Return false if the request
-+	 * completed or true if a timeout happened in which case indicate if
-+	 * recovery is needed.
-+	 */
-+	bool	(*cqe_timeout)(struct mmc_host *host, struct mmc_request *mrq,
-+			       bool *recovery_needed);
-+	/*
-+	 * Stop all CQE activity and prepare the CQE and host controller to
-+	 * accept recovery commands.
-+	 */
-+	void	(*cqe_recovery_start)(struct mmc_host *host);
-+	/*
-+	 * Clear the queue and call mmc_cqe_request_done() on all requests.
-+	 * Requests that errored will have the error set on the mmc_request
-+	 * (data->error or cmd->error for DCMD).  Requests that did not error
-+	 * will have zero data bytes transferred.
-+	 */
-+	void	(*cqe_recovery_finish)(struct mmc_host *host);
-+};
++	blk_freeze_queue(sdev->request_queue);
 +
- struct mmc_async_req {
- 	/* active mmc request */
- 	struct mmc_request	*mrq;
-@@ -303,6 +347,8 @@ struct mmc_host {
- #define MMC_CAP2_HS400_ES	(1 << 20)	/* Host supports enhanced strobe */
- #define MMC_CAP2_NO_SD		(1 << 21)	/* Do not send SD commands during initialization */
- #define MMC_CAP2_NO_MMC		(1 << 22)	/* Do not send (e)MMC commands during initialization */
-+#define MMC_CAP2_CQE		(1 << 23)	/* Has eMMC command queue engine */
-+#define MMC_CAP2_CQE_DCMD	(1 << 24)	/* CQE can issue a direct command */
- 
- 	mmc_pm_flag_t		pm_caps;	/* supported pm features */
- 
-@@ -386,6 +432,13 @@ struct mmc_host {
- 	int			dsr_req;	/* DSR value is valid */
- 	u32			dsr;	/* optional driver stage (DSR) value */
- 
-+	/* Command Queue Engine (CQE) support */
-+	const struct mmc_cqe_ops *cqe_ops;
-+	void			*cqe_private;
-+	int			cqe_qdepth;
-+	bool			cqe_enabled;
-+	bool			cqe_on;
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+ 	mutex_unlock(&sdev->state_mutex);
+@@ -2917,6 +2931,11 @@ EXPORT_SYMBOL(scsi_device_quiesce);
+  */
+ void scsi_device_resume(struct scsi_device *sdev)
+ {
++	/* wait for completion of IO issued during SCSI quiese */
++	blk_freeze_queue_wait(sdev->request_queue);
 +
- 	unsigned long		private[0] ____cacheline_aligned;
- };
- 
++	blk_unfreeze_queue(sdev->request_queue);
++
+ 	/* check if the device state was mutated prior to resume, and if
+ 	 * so assume the state is being managed elsewhere (for example
+ 	 * device deleted during suspend)
 -- 
-1.9.1
+2.9.5
