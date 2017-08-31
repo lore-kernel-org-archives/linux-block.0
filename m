@@ -1,72 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40636 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751061AbdHZQfk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Aug 2017 12:35:40 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 13/14] blk-mq-sched: refactor blk_mq_sched_try_merge()
-Date: Sun, 27 Aug 2017 00:33:31 +0800
-Message-Id: <20170826163332.28971-14-ming.lei@redhat.com>
-In-Reply-To: <20170826163332.28971-1-ming.lei@redhat.com>
-References: <20170826163332.28971-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <efault@gmx.de>
+Message-ID: <1504200711.666.27.camel@gmx.de>
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT V2 0/3] three bfq fixes restoring
+ service guarantees with random sync writes in bg
+From: Mike Galbraith <efault@gmx.de>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Mel Gorman <mgorman@techsingularity.net>, Jens Axboe <axboe@kernel.dk>,
+ linux-block <linux-block@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>,  Ulf Hansson <ulf.hansson@linaro.org>,
+ broonie@kernel.org, lee.tibbert@gmail.com, oleksandr@natalenko.name
+Date: Thu, 31 Aug 2017 19:31:51 +0200
+In-Reply-To: <970115C1-6336-458D-BBD5-3E5054C4553D@linaro.org>
+References: <20170831064631.2223-1-paolo.valente@linaro.org>
+	 <20170831144257.oa5nm6vzihpam6kw@techsingularity.net>
+	 <1504199166.666.11.camel@gmx.de>
+	 <970115C1-6336-458D-BBD5-3E5054C4553D@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces one function __blk_mq_try_merge()
-which will be resued for bio merge to sw queue in
-the following patch.
+On Thu, 2017-08-31 at 19:12 +0200, Paolo Valente wrote:
+> > Il giorno 31 ago 2017, alle ore 19:06, Mike Galbraith <efault@gmx.de> h=
+a scritto:
+> >=20
+> > On Thu, 2017-08-31 at 15:42 +0100, Mel Gorman wrote:
+> >> On Thu, Aug 31, 2017 at 08:46:28AM +0200, Paolo Valente wrote:
+> >>> [SECOND TAKE, with just the name of one of the tester fixed]
+> >>>=20
+> >>> Hi,
+> >>> while testing the read-write unfairness issues reported by Mel, I
+> >>> found BFQ failing to guarantee good responsiveness against heavy
+> >>> random sync writes in the background, i.e., multiple writers doing
+> >>> random writes and systematic fdatasync [1]. The failure was caused by
+> >>> three related bugs, because of which BFQ failed to guarantee to
+> >>> high-weight processes the expected fraction of the throughput.
+> >>>=20
+> >>=20
+> >> Queued on top of Ming's most recent series even though that's still a =
+work
+> >> in progress. I should know in a few days how things stand.
+> >=20
+> > It seems to have cured an interactivity issue I regularly meet during
+> > kbuild final link/depmod phase of fat kernel kbuild, especially bad
+> > with evolution mail usage during that on spinning rust.  Can't really
+> > say for sure given this is not based on measurement.
+> >
+>=20
+>=20
+> Great!  Actually, when I found these bugs, I thought also about the
+> issues you told me you experienced with updatedb running.  But then I
+> forgot to tell you that these fixes might help.
 
-No functional change.
+I'm going to actively test that, because that is every bit as
+infuriating as the evolution thing, only updatedb is nukable. =C2=A0In fact=
+,
+it infuriated me to the point that it no longer has a crontab entry,
+runs only when I decide to run it. =C2=A0At this point, I'll be pretty
+surprised if that rotten <naughty words> is still alive.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 28054e49df5d..5af0ff71730c 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -228,12 +228,13 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	}
- }
- 
--bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
--			    struct request **merged_request)
-+static bool __blk_mq_try_merge(struct request_queue *q,
-+		struct bio *bio, struct request **merged_request,
-+		struct request *candidate, enum elv_merge type)
- {
--	struct request *rq;
-+	struct request *rq = candidate;
- 
--	switch (elv_merge(q, &rq, bio)) {
-+	switch (type) {
- 	case ELEVATOR_BACK_MERGE:
- 		if (!blk_mq_sched_allow_merge(q, rq, bio))
- 			return false;
-@@ -256,6 +257,15 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- 		return false;
- 	}
- }
-+
-+bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-+		struct request **merged_request)
-+{
-+	struct request *rq;
-+	enum elv_merge type = elv_merge(q, &rq, bio);
-+
-+	return __blk_mq_try_merge(q, bio, merged_request, rq, type);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
- 
- /*
--- 
-2.9.5
+	-Mike
