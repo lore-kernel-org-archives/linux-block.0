@@ -1,45 +1,93 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34970 "EHLO mx1.redhat.com"
+Received: from mga14.intel.com ([192.55.52.115]:35193 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751566AbdHaR2v (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 13:28:51 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/9] blk-mq: only run hw queues for blk-mq
-Date: Fri,  1 Sep 2017 01:27:23 +0800
-Message-Id: <20170831172728.15817-5-ming.lei@redhat.com>
-In-Reply-To: <20170831172728.15817-1-ming.lei@redhat.com>
-References: <20170831172728.15817-1-ming.lei@redhat.com>
+        id S1751237AbdHaMEB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 08:04:01 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH V7 06/10] mmc: block: Prepare CQE data
+Date: Thu, 31 Aug 2017 14:56:52 +0300
+Message-Id: <1504180616-14514-7-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch just makes it explicitely.
+Enhance mmc_blk_data_prep() to support CQE requests. That means adding
+some things that for non-CQE requests would be encoded into the command
+arguments - such as the block address, reliable-write flag, and data tag
+flag. Also the request tag is needed to provide the command queue task id,
+and a comment is added to explain the future possibility of defining a
+priority.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/mmc/core/block.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8cf1f7cbef2b..4c532d8612e1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 1ec5f0bc98d2..2424c7360687 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1554,6 +1554,7 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 	memset(brq, 0, sizeof(struct mmc_blk_request));
+ 
+ 	brq->mrq.data = &brq->data;
++	brq->mrq.tag = req->tag;
+ 
+ 	brq->stop.opcode = MMC_STOP_TRANSMISSION;
+ 	brq->stop.arg = 0;
+@@ -1568,6 +1569,14 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 
+ 	brq->data.blksz = 512;
+ 	brq->data.blocks = blk_rq_sectors(req);
++	brq->data.blk_addr = blk_rq_pos(req);
++
++	/*
++	 * The command queue supports 2 priorities: "high" (1) and "simple" (0).
++	 * The eMMC will give "high" priority tasks priority over "simple"
++	 * priority tasks. Here we always set "simple" priority by not setting
++	 * MMC_DATA_PRIO.
++	 */
+ 
+ 	/*
+ 	 * The block layer doesn't support all sector count
+@@ -1597,8 +1606,10 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 						brq->data.blocks);
  	}
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+ 
+-	if (do_rel_wr)
++	if (do_rel_wr) {
+ 		mmc_apply_rel_rw(brq, card, req);
++		brq->data.flags |= MMC_DATA_REL_WR;
++	}
+ 
+ 	/*
+ 	 * Data tag is used only during writing meta data to speed
+@@ -1610,6 +1621,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 		      ((brq->data.blocks * brq->data.blksz) >=
+ 		       card->ext_csd.data_tag_unit_size);
+ 
++	if (do_data_tag)
++		brq->data.flags |= MMC_DATA_DAT_TAG;
++
+ 	mmc_set_data_timeout(&brq->data, card);
+ 
+ 	brq->data.sg = mqrq->sg;
 -- 
-2.9.5
+1.9.1
