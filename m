@@ -10,11 +10,11 @@ Cc: linux-block@vger.kernel.org,
 	lee.tibbert@gmail.com,
 	oleksandr@natalenko.name,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT V2 3/3] block, bfq: guarantee update_next_in_service always returns an eligible entity
-Date: Thu, 31 Aug 2017 08:46:31 +0200
-Message-Id: <20170831064631.2223-4-paolo.valente@linaro.org>
-In-Reply-To: <20170831064631.2223-1-paolo.valente@linaro.org>
-References: <20170831064631.2223-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 3/3] block, bfq: guarantee update_next_in_service always returns an eligible entity
+Date: Thu, 31 Aug 2017 08:10:20 +0200
+Message-Id: <20170831061020.4426-4-paolo.valente@linaro.org>
+In-Reply-To: <20170831061020.4426-1-paolo.valente@linaro.org>
+References: <20170831061020.4426-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
 If the function bfq_update_next_in_service is invoked as a consequence
@@ -50,7 +50,7 @@ yield an eligible next-in-service entity.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Oleksander Natalenko <oleksandr@natalenko.name>
 ---
  block/bfq-wf2q.c | 14 ++++++++------
  1 file changed, 8 insertions(+), 6 deletions(-)
