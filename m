@@ -1,121 +1,289 @@
-Return-Path: <SRS0=1zCZ=7Z=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	Kernel-team@fb.com,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH 2/2] block/loop: allow request merge for directio mode
-Date: Wed, 23 Aug 2017 16:49:24 -0700
-Message-Id: <2fbfb61a927561c3c251fff8f6e75d7544df9eed.1503531709.git.shli@fb.com>
-In-Reply-To: <cover.1503531709.git.shli@fb.com>
-References: <cover.1503531709.git.shli@fb.com>
-In-Reply-To: <cover.1503531709.git.shli@fb.com>
-References: <cover.1503531709.git.shli@fb.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	mgorman@techsingularity.net,
+	lee.tibbert@gmail.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT V2 1/3] block, bfq: make lookup_next_entity push up vtime on expirations
+Date: Thu, 31 Aug 2017 08:46:29 +0200
+Message-Id: <20170831064631.2223-2-paolo.valente@linaro.org>
+In-Reply-To: <20170831064631.2223-1-paolo.valente@linaro.org>
+References: <20170831064631.2223-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+To provide a very smooth service, bfq starts to serve a bfq_queue
+only if the queue is 'eligible', i.e., if the same queue would
+have started to be served in the ideal, perfectly fair system that
+bfq simulates internally. This is obtained by associating each
+queue with a virtual start time, and by computing a special system
+virtual time quantity: a queue is eligible only if the system
+virtual time has reached the virtual start time of the
+queue. Finally, bfq guarantees that, when a new queue must be set
+in service, there is always at least one eligible entity for each
+active parent entity in the scheduler. To provide this guarantee,
+the function __bfq_lookup_next_entity pushes up, for each parent
+entity on which it is invoked, the system virtual time to the
+minimum among the virtual start times of the entities in the
+active tree for the parent entity (more precisely, the push up
+occurs if the system virtual time happens to be lower than all
+such virtual start times).
 
-Currently loop disables merge. While it makes sense for buffer IO mode,
-directio mode can benefit from request merge. Without merge, loop could
-send small size IO to underlayer disk and harm performance.
+There is however a circumstance in which __bfq_lookup_next_entity
+cannot push up the system virtual time for a parent entity, even
+if the system virtual time is lower than the virtual start times
+of all the child entities in the active tree. It happens if one of
+the child entities is in service. In fact, in such a case, there
+is already an eligible entity, the in-service one, even if it may
+not be not present in the active tree (because in-service entities
+may be removed from the active tree).
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Unfortunately, in the last re-design of the
+hierarchical-scheduling engine, the reset of the pointer to the
+in-service entity for a given parent entity--reset to be done as a
+consequence of the expiration of the in-service entity--always
+happens after the function __bfq_lookup_next_entity has been
+invoked. This causes the function to think that there is still an
+entity in service for the parent entity, and then that the system
+virtual time cannot be pushed up, even if actually such a
+no-more-in-service entity has already been properly reinserted
+into the active tree (or in some other tree if no more
+active). Yet, the system virtual time *had* to be pushed up, to be
+ready to correctly choose the next queue to serve. Because of the
+lack of this push up, bfq may wrongly set in service a queue that
+had been speculatively pre-computed as the possible
+next-in-service queue, but that would no more be the one to serve
+after the expiration and the reinsertion into the active trees of
+the previously in-service entities.
+
+This commit addresses this issue by making
+__bfq_lookup_next_entity properly push up the system virtual time
+if an expiration is occurring.
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 ---
- drivers/block/loop.c | 43 +++++++++++++++++++++++++++++++++++--------
- drivers/block/loop.h |  1 +
- 2 files changed, 36 insertions(+), 8 deletions(-)
+ block/bfq-iosched.c |  4 ++--
+ block/bfq-iosched.h |  4 ++--
+ block/bfq-wf2q.c    | 58 +++++++++++++++++++++++++++++++++++++++--------------
+ 3 files changed, 47 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 428da07..1bfa3ff 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -213,10 +213,13 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- 	 */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 	lo->use_dio = use_dio;
--	if (use_dio)
-+	if (use_dio) {
-+		queue_flag_clear_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
- 		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
--	else
-+	} else {
-+		queue_flag_set_unlocked(QUEUE_FLAG_NOMERGES, lo->lo_queue);
- 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
-+	}
- 	blk_mq_unfreeze_queue(lo->lo_queue);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 436b6ca..a10f147 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -720,7 +720,7 @@ static void bfq_updated_next_req(struct bfq_data *bfqd,
+ 		entity->budget = new_budget;
+ 		bfq_log_bfqq(bfqd, bfqq, "updated next rq: new budget %lu",
+ 					 new_budget);
+-		bfq_requeue_bfqq(bfqd, bfqq);
++		bfq_requeue_bfqq(bfqd, bfqq, false);
+ 	}
  }
  
-@@ -464,6 +467,8 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+@@ -2563,7 +2563,7 @@ static void __bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq)
  
-+	kfree(cmd->bvec);
-+	cmd->bvec = NULL;
- 	cmd->ret = ret;
- 	blk_mq_complete_request(cmd->rq);
+ 		bfq_del_bfqq_busy(bfqd, bfqq, true);
+ 	} else {
+-		bfq_requeue_bfqq(bfqd, bfqq);
++		bfq_requeue_bfqq(bfqd, bfqq, true);
+ 		/*
+ 		 * Resort priority tree of potential close cooperators.
+ 		 */
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 859f0a8..3e2659c 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -817,7 +817,6 @@ extern const int bfq_timeout;
+ struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync);
+ void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync);
+ struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
+-void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+ void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_entity *entity,
+ 			  struct rb_root *root);
+@@ -917,7 +916,8 @@ void __bfq_bfqd_reset_in_service(struct bfq_data *bfqd);
+ void bfq_deactivate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			 bool ins_into_idle_tree, bool expiration);
+ void bfq_activate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+-void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq);
++void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++		      bool expiration);
+ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		       bool expiration);
+ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 3183b39..138732e 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -44,7 +44,8 @@ static unsigned int bfq_class_idx(struct bfq_entity *entity)
+ 		BFQ_DEFAULT_GRP_CLASS - 1;
  }
-@@ -473,22 +478,44 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 
+-static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd);
++static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
++						 bool expiration);
+ 
+ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service);
+ 
+@@ -54,6 +55,8 @@ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service);
+  * @new_entity: if not NULL, pointer to the entity whose activation,
+  *		requeueing or repositionig triggered the invocation of
+  *		this function.
++ * @expiration: id true, this function is being invoked after the
++ *             expiration of the in-service entity
+  *
+  * This function is called to update sd->next_in_service, which, in
+  * its turn, may change as a consequence of the insertion or
+@@ -72,7 +75,8 @@ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service);
+  * entity.
+  */
+ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+-				       struct bfq_entity *new_entity)
++				       struct bfq_entity *new_entity,
++				       bool expiration)
  {
- 	struct iov_iter iter;
- 	struct bio_vec *bvec;
--	struct bio *bio = cmd->rq->bio;
-+	struct request *rq = cmd->rq;
-+	struct bio *bio = rq->bio;
- 	struct file *file = lo->lo_backing_file;
-+	unsigned int offset;
-+	int segments = 0;
- 	int ret;
+ 	struct bfq_entity *next_in_service = sd->next_in_service;
+ 	bool parent_sched_may_change = false;
+@@ -130,7 +134,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+ 		if (replace_next)
+ 			next_in_service = new_entity;
+ 	} else /* invoked because of a deactivation: lookup needed */
+-		next_in_service = bfq_lookup_next_entity(sd);
++		next_in_service = bfq_lookup_next_entity(sd, expiration);
  
--	/* nomerge for loop request queue */
--	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
-+	if (rq->bio != rq->biotail) {
-+		struct req_iterator iter;
-+		struct bio_vec tmp;
-+
-+		__rq_for_each_bio(bio, rq)
-+			segments += bio_segments(bio);
-+		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_KERNEL);
-+		if (!bvec)
-+			return -EIO;
-+		cmd->bvec = bvec;
-+
-+		rq_for_each_segment(tmp, rq, iter) {
-+			*bvec = tmp;
-+			bvec++;
-+		}
-+		bvec = cmd->bvec;
-+		offset = 0;
-+	} else {
-+		offset = bio->bi_iter.bi_bvec_done;
-+		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
-+		segments = bio_segments(bio);
-+	}
+ 	if (next_in_service) {
+ 		parent_sched_may_change = !sd->next_in_service ||
+@@ -1134,10 +1138,12 @@ static void __bfq_activate_requeue_entity(struct bfq_entity *entity,
+  * @requeue: true if this is a requeue, which implies that bfqq is
+  *	     being expired; thus ALL its ancestors stop being served and must
+  *	     therefore be requeued
++ * @expiration: true if this function is being invoked in the expiration path
++ *             of the in-service queue
+  */
+ static void bfq_activate_requeue_entity(struct bfq_entity *entity,
+ 					bool non_blocking_wait_rq,
+-					bool requeue)
++					bool requeue, bool expiration)
+ {
+ 	struct bfq_sched_data *sd;
  
--	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
--		      bio_segments(bio), blk_rq_bytes(cmd->rq));
-+		      segments, blk_rq_bytes(rq));
- 	/*
- 	 * This bio may be started from the middle of the 'bvec'
- 	 * because of bio splitting, so offset from the bvec must
- 	 * be passed to iov iterator
+@@ -1145,7 +1151,8 @@ static void bfq_activate_requeue_entity(struct bfq_entity *entity,
+ 		sd = entity->sched_data;
+ 		__bfq_activate_requeue_entity(entity, sd, non_blocking_wait_rq);
+ 
+-		if (!bfq_update_next_in_service(sd, entity) && !requeue)
++		if (!bfq_update_next_in_service(sd, entity, expiration) &&
++		    !requeue)
+ 			break;
+ 	}
+ }
+@@ -1201,6 +1208,8 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
+  * bfq_deactivate_entity - deactivate an entity representing a bfq_queue.
+  * @entity: the entity to deactivate.
+  * @ins_into_idle_tree: true if the entity can be put into the idle tree
++ * @expiration: true if this function is being invoked in the expiration path
++ *             of the in-service queue
+  */
+ static void bfq_deactivate_entity(struct bfq_entity *entity,
+ 				  bool ins_into_idle_tree,
+@@ -1229,7 +1238,7 @@ static void bfq_deactivate_entity(struct bfq_entity *entity,
+ 			 * then, since entity has just been
+ 			 * deactivated, a new one must be found.
+ 			 */
+-			bfq_update_next_in_service(sd, NULL);
++			bfq_update_next_in_service(sd, NULL, expiration);
+ 
+ 		if (sd->next_in_service || sd->in_service_entity) {
+ 			/*
+@@ -1288,7 +1297,7 @@ static void bfq_deactivate_entity(struct bfq_entity *entity,
+ 		__bfq_requeue_entity(entity);
+ 
+ 		sd = entity->sched_data;
+-		if (!bfq_update_next_in_service(sd, entity) &&
++		if (!bfq_update_next_in_service(sd, entity, expiration) &&
+ 		    !expiration)
+ 			/*
+ 			 * next_in_service unchanged or not causing
+@@ -1423,12 +1432,14 @@ __bfq_lookup_next_entity(struct bfq_service_tree *st, bool in_service)
+ /**
+  * bfq_lookup_next_entity - return the first eligible entity in @sd.
+  * @sd: the sched_data.
++ * @expiration: true if we are on the expiration path of the in-service queue
+  *
+  * This function is invoked when there has been a change in the trees
+- * for sd, and we need know what is the new next entity after this
+- * change.
++ * for sd, and we need to know what is the new next entity to serve
++ * after this change.
+  */
+-static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd)
++static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
++						 bool expiration)
+ {
+ 	struct bfq_service_tree *st = sd->service_tree;
+ 	struct bfq_service_tree *idle_class_st = st + (BFQ_IOPRIO_CLASSES - 1);
+@@ -1455,8 +1466,24 @@ static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd)
+ 	 * class, unless the idle class needs to be served.
  	 */
--	iter.iov_offset = bio->bi_iter.bi_bvec_done;
-+	iter.iov_offset = offset;
+ 	for (; class_idx < BFQ_IOPRIO_CLASSES; class_idx++) {
++		/*
++		 * If expiration is true, then bfq_lookup_next_entity
++		 * is being invoked as a part of the expiration path
++		 * of the in-service queue. In this case, even if
++		 * sd->in_service_entity is not NULL,
++		 * sd->in_service_entiy at this point is actually not
++		 * in service any more, and, if needed, has already
++		 * been properly queued or requeued into the right
++		 * tree. The reason why sd->in_service_entity is still
++		 * not NULL here, even if expiration is true, is that
++		 * sd->in_service_entiy is reset as a last step in the
++		 * expiration path. So, if expiration is true, tell
++		 * __bfq_lookup_next_entity that there is no
++		 * sd->in_service_entity.
++		 */
+ 		entity = __bfq_lookup_next_entity(st + class_idx,
+-						  sd->in_service_entity);
++						  sd->in_service_entity &&
++						  !expiration);
  
- 	cmd->iocb.ki_pos = pos;
- 	cmd->iocb.ki_filp = file;
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index fecd3f9..bc9cf91 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -72,6 +72,7 @@ struct loop_cmd {
- 	bool use_aio;           /* use AIO interface to handle I/O */
- 	long ret;
- 	struct kiocb iocb;
-+	struct bio_vec *bvec;
- };
+ 		if (entity)
+ 			break;
+@@ -1569,7 +1596,7 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
+ 	for_each_entity(entity) {
+ 		struct bfq_sched_data *sd = entity->sched_data;
  
- /* Support for loadable transfer modules */
+-		if (!bfq_update_next_in_service(sd, NULL))
++		if (!bfq_update_next_in_service(sd, NULL, false))
+ 			break;
+ 	}
+ 
+@@ -1617,16 +1644,17 @@ void bfq_activate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	struct bfq_entity *entity = &bfqq->entity;
+ 
+ 	bfq_activate_requeue_entity(entity, bfq_bfqq_non_blocking_wait_rq(bfqq),
+-				    false);
++				    false, false);
+ 	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
+ }
+ 
+-void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
++void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
++		      bool expiration)
+ {
+ 	struct bfq_entity *entity = &bfqq->entity;
+ 
+ 	bfq_activate_requeue_entity(entity, false,
+-				    bfqq == bfqd->in_service_queue);
++				    bfqq == bfqd->in_service_queue, expiration);
+ }
+ 
+ /*
 -- 
-2.9.5
+2.10.0
