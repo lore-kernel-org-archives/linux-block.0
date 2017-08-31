@@ -1,57 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48996 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751086AbdIADzz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 23:55:55 -0400
-Date: Fri, 1 Sep 2017 11:55:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:48897 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750925AbdHaWvO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 18:51:14 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+CC: "oleksandr@natalenko.name" <oleksandr@natalenko.name>
 Subject: Re: [PATCH 8/9] block: allow to allocate req with REQF_PREEMPT when
  queue is frozen
-Message-ID: <20170901035537.GI16525@ming.t460p>
+Date: Thu, 31 Aug 2017 22:50:25 +0000
+Message-ID: <1504219824.31872.74.camel@wdc.com>
 References: <20170831172728.15817-1-ming.lei@redhat.com>
- <20170831172728.15817-9-ming.lei@redhat.com>
- <1504219824.31872.74.camel@wdc.com>
+         <20170831172728.15817-9-ming.lei@redhat.com>
+In-Reply-To: <20170831172728.15817-9-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504219824.31872.74.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Aug 31, 2017 at 10:50:25PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-09-01 at 01:27 +0800, Ming Lei wrote:
-> > @@ -1413,9 +1414,17 @@ static struct request *blk_old_get_request(struct request_queue *q,
-> >  	/* create ioc upfront */
-> >  	create_io_context(gfp_mask, q->node);
-> >  
-> > -	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
-> > +	/*
-> > +	 * When queue is frozen, we still need to allocate req for
-> > +	 * REQF_PREEMPT.
-> > +	 */
-> > +	if ((flags & BLK_MQ_REQ_PREEMPT) && blk_queue_is_frozen(q))
-> > +		blk_queue_enter_live(q);
-> > +	else
-> > +		ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
-> 
-> Hello Ming,
-> 
-> Sorry but I doubt that calling blk_queue_enter_live() from inside
-> blk_old_get_request() is safe. Calling blk_queue_enter_live() is only safe
-> before a request queue has been marked dead. What prevents a kernel thread
-> that holds a reference on a request queue and that is running concurrently
-> with blk_cleanup_queue() to call blk_old_get_request() after a queue has
-> been marked dead?
-
-I have sent one delta patch in list, which will only call
-blk_queue_enter_live() iff SCSI device is in QUIESCE.
-
--- 
-Ming
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDAxOjI3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQEAg
+LTE0MTMsOSArMTQxNCwxNyBAQCBzdGF0aWMgc3RydWN0IHJlcXVlc3QgKmJsa19vbGRfZ2V0X3Jl
+cXVlc3Qoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsDQo+ICAJLyogY3JlYXRlIGlvYyB1cGZyb250
+ICovDQo+ICAJY3JlYXRlX2lvX2NvbnRleHQoZ2ZwX21hc2ssIHEtPm5vZGUpOw0KPiAgDQo+IC0J
+cmV0ID0gYmxrX3F1ZXVlX2VudGVyKHEsICEoZ2ZwX21hc2sgJiBfX0dGUF9ESVJFQ1RfUkVDTEFJ
+TSkpOw0KPiArCS8qDQo+ICsJICogV2hlbiBxdWV1ZSBpcyBmcm96ZW4sIHdlIHN0aWxsIG5lZWQg
+dG8gYWxsb2NhdGUgcmVxIGZvcg0KPiArCSAqIFJFUUZfUFJFRU1QVC4NCj4gKwkgKi8NCj4gKwlp
+ZiAoKGZsYWdzICYgQkxLX01RX1JFUV9QUkVFTVBUKSAmJiBibGtfcXVldWVfaXNfZnJvemVuKHEp
+KQ0KPiArCQlibGtfcXVldWVfZW50ZXJfbGl2ZShxKTsNCj4gKwllbHNlDQo+ICsJCXJldCA9IGJs
+a19xdWV1ZV9lbnRlcihxLCAhKGdmcF9tYXNrICYgX19HRlBfRElSRUNUX1JFQ0xBSU0pKTsNCg0K
+SGVsbG8gTWluZywNCg0KU29ycnkgYnV0IEkgZG91YnQgdGhhdCBjYWxsaW5nIGJsa19xdWV1ZV9l
+bnRlcl9saXZlKCkgZnJvbSBpbnNpZGUNCmJsa19vbGRfZ2V0X3JlcXVlc3QoKSBpcyBzYWZlLiBD
+YWxsaW5nIGJsa19xdWV1ZV9lbnRlcl9saXZlKCkgaXMgb25seSBzYWZlDQpiZWZvcmUgYSByZXF1
+ZXN0IHF1ZXVlIGhhcyBiZWVuIG1hcmtlZCBkZWFkLiBXaGF0IHByZXZlbnRzIGEga2VybmVsIHRo
+cmVhZA0KdGhhdCBob2xkcyBhIHJlZmVyZW5jZSBvbiBhIHJlcXVlc3QgcXVldWUgYW5kIHRoYXQg
+aXMgcnVubmluZyBjb25jdXJyZW50bHkNCndpdGggYmxrX2NsZWFudXBfcXVldWUoKSB0byBjYWxs
+IGJsa19vbGRfZ2V0X3JlcXVlc3QoKSBhZnRlciBhIHF1ZXVlIGhhcw0KYmVlbiBtYXJrZWQgZGVh
+ZD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
