@@ -1,69 +1,79 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:35193 "EHLO mga14.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:60312 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751057AbdHaMDr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 08:03:47 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH V7 03/10] mmc: mmc: Enable Command Queuing
-Date: Thu, 31 Aug 2017 14:56:49 +0300
-Message-Id: <1504180616-14514-4-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
-References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+        id S1750814AbdHaDdz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Aug 2017 23:33:55 -0400
+Date: Thu, 31 Aug 2017 11:33:40 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>, "osandov@fb.com" <osandov@fb.com>,
+        "mgorman@techsingularity.net" <mgorman@techsingularity.net>,
+        "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+        "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: [PATCH V3 02/14] sbitmap: introduce __sbitmap_for_each_set()
+Message-ID: <20170831033339.GC12246@ming.t460p>
+References: <20170826163332.28971-1-ming.lei@redhat.com>
+ <20170826163332.28971-3-ming.lei@redhat.com>
+ <1504108512.2526.23.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1504108512.2526.23.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Enable the Command Queue if the host controller supports a command queue
-engine. It is not compatible with Packed Commands, so make a note of that in the
-comment.
+On Wed, Aug 30, 2017 at 03:55:13PM +0000, Bart Van Assche wrote:
+> On Sun, 2017-08-27 at 00:33 +0800, Ming Lei wrote:
+> >  /**
+> >   * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
+> > + * @start: Where to start the iteration
+> 
+> Thanks for having changed the name of this argument ...
+> 
+> > -static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
+> > -					void *data)
+> > +static inline void __sbitmap_for_each_set(struct sbitmap *sb,
+> > +					  unsigned int start,
+> > +					  sb_for_each_fn fn, void *data)
+> >  {
+> > -	unsigned int i;
+> > +	unsigned int index = SB_NR_TO_INDEX(sb, start);
+> > +	unsigned int nr = SB_NR_TO_BIT(sb, start);
+> > +	unsigned int scanned = 0;
+> 
+> ... but I'm still missing a check here whether or not index >= sb->map_nr.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/mmc.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+The reason I didn't do that is because the only one user is always to
+pass correct 'start'.
 
-diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index a7eb623f8daa..194cf2082e73 100644
---- a/drivers/mmc/core/mmc.c
-+++ b/drivers/mmc/core/mmc.c
-@@ -1784,6 +1784,23 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
- 	}
- 
- 	/*
-+	 * Enable Command Queue if supported. Note that Packed Commands cannot
-+	 * be used with Command Queue.
-+	 */
-+	card->ext_csd.cmdq_en = false;
-+	if (card->ext_csd.cmdq_support && host->caps2 & MMC_CAP2_CQE) {
-+		err = mmc_cmdq_enable(card);
-+		if (err && err != -EBADMSG)
-+			goto free_card;
-+		if (err) {
-+			pr_warn("%s: Enabling CMDQ failed\n",
-+				mmc_hostname(card->host));
-+			card->ext_csd.cmdq_support = false;
-+			card->ext_csd.cmdq_depth = 0;
-+			err = 0;
-+		}
-+	}
-+	/*
- 	 * In some cases (e.g. RPMB or mmc_test), the Command Queue must be
- 	 * disabled for a time, so a flag is needed to indicate to re-enable the
- 	 * Command Queue.
+OK, will add it.
+
+>  
+> > -	for (i = 0; i < sb->map_nr; i++) {
+> > -		struct sbitmap_word *word = &sb->map[i];
+> > -		unsigned int off, nr;
+> > +	while (1) {
+> > +		struct sbitmap_word *word = &sb->map[index];
+> > +		unsigned int depth = min_t(unsigned int, word->depth - nr,
+> > +					   sb->depth - scanned);
+> >  
+> > +		scanned += depth;
+> >  		if (!word->word)
+> > -			continue;
+> > +			goto next;
+> >  
+> > -		nr = 0;
+> > -		off = i << sb->shift;
+> > +		depth += nr;
+> > +		start = index << sb->shift;
+> 
+> The above statement reuses the argument 'start' for a new purpose. This is
+> confusing - please don't do this. Why not to keep the name 'off'? That will
+> keep the changes minimal.
+
+OK, that will rename the parameter of 'start' as 'off', so that we can
+save one local variable.
+
 -- 
-1.9.1
+Ming
