@@ -1,38 +1,61 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:1428 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751794AbdHaXIS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 19:08:18 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
-CC: "tj@kernel.org" <tj@kernel.org>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>
-Subject: Re: [PATCH 1/9] percpu-refcount: introduce percpu_ref_is_dead()
-Date: Thu, 31 Aug 2017 23:07:30 +0000
-Message-ID: <1504220849.31872.78.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:34590 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751507AbdHaR2N (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 13:28:13 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Ming Lei <ming.lei@redhat.com>, Tejun Heo <tj@kernel.org>
+Subject: [PATCH 1/9] percpu-refcount: introduce percpu_ref_is_dead()
+Date: Fri,  1 Sep 2017 01:27:20 +0800
+Message-Id: <20170831172728.15817-2-ming.lei@redhat.com>
+In-Reply-To: <20170831172728.15817-1-ming.lei@redhat.com>
 References: <20170831172728.15817-1-ming.lei@redhat.com>
-         <20170831172728.15817-2-ming.lei@redhat.com>
-In-Reply-To: <20170831172728.15817-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE3LTA5LTAxIGF0IDAxOjI3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSW5z
-aWRlIGJsb2NrIGxheWVyLCB3ZSBuZWVkIHRvIHN1cHBvcnQgdG8gYWxsb2NhdGUgcmVxdWVzdCB3
-aXRoDQo+IFJRRl9QUkVFTVBUIGV2ZW4gdGhvdWdoIHF1ZXVlIGlzIGZyb3plbi4NCg0KSGVsbG8g
-TWluZywNCg0KQ2FuIHBhdGNoIDgvOSBiZSByZXdvcmtlZCBzdWNoIHRoYXQgaXQgZG9lc24ndCBu
-ZWVkIHRoZSBuZXcNCnBlcmNwdV9yZWZfaXNfZGVhZCgpIGhlbHBlciBmdW5jdGlvbiwgZS5nLiBi
-eSBjaGVja2luZyBxLT5tcV9mcmVlemVfZGVwdGgNCnRvIGNoZWNrIHdoZXRoZXIgb3Igbm90IHJl
-cXVlc3QgcHJvY2Vzc2luZyBoYXMgYmVlbiBmcm96ZW4/IEhhdmUgeW91IG5vdGljZWQNCnRoYXQg
-c2V2ZXJhbCBibGstbXEgY29kZSBwYXRocyBhbHJlYWR5IGNoZWNrIHEtPm1xX2ZyZWV6ZV9kZXB0
-aCB0byBjaGVjaw0Kd2hldGhlciBvciBub3QgYSBxdWV1ZSBpcyBmcm96ZW4/DQoNClRoYW5rcywN
-Cg0KQmFydC4=
+Inside block layer, we need to support to allocate request with
+RQF_PREEMPT even though queue is frozen.
+
+So introduce this helper for checking if queue is frozen.
+
+Cc: Tejun Heo <tj@kernel.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/percpu-refcount.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
+index c13dceb87b60..08549bbf4080 100644
+--- a/include/linux/percpu-refcount.h
++++ b/include/linux/percpu-refcount.h
+@@ -324,4 +324,21 @@ static inline bool percpu_ref_is_zero(struct percpu_ref *ref)
+ 	return !atomic_long_read(&ref->count);
+ }
+ 
++/**
++ * percpu_ref_is_dead - test whether a percpu refcount is killed
++ * @ref: percpu_ref to test
++ *
++ * Returns %true if @ref is dead
++ *
++ * This function is safe to call as long as @ref is between init and exit.
++ */
++static inline bool percpu_ref_is_dead(struct percpu_ref *ref)
++{
++	unsigned long __percpu *percpu_count;
++
++	if (__ref_is_percpu(ref, &percpu_count))
++		return false;
++	return ref->percpu_count_ptr & __PERCPU_REF_DEAD;
++}
++
+ #endif
+-- 
+2.9.5
