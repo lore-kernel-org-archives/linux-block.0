@@ -1,50 +1,110 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:39095 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756469AbdHYUY0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Aug 2017 16:24:26 -0400
-Date: Fri, 25 Aug 2017 23:24:00 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: shli@fb.com
-Cc: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org
-Subject: [bug report] nullb: factor disk parameters
-Message-ID: <20170825202400.7zj3ouyryojj2wxl@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	mgorman@techsingularity.net,
+	lee.tibbert@gmail.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT V2 3/3] block, bfq: guarantee update_next_in_service always returns an eligible entity
+Date: Thu, 31 Aug 2017 08:46:31 +0200
+Message-Id: <20170831064631.2223-4-paolo.valente@linaro.org>
+In-Reply-To: <20170831064631.2223-1-paolo.valente@linaro.org>
+References: <20170831064631.2223-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello Shaohua Li,
+If the function bfq_update_next_in_service is invoked as a consequence
+of the activation or requeueing of an entity, say E, then it doesn't
+invoke bfq_lookup_next_entity to get the next-in-service entity. In
+contrast, it follows a shorter path: if E happens to be eligible (see
+commit "bfq-sq-mq: make lookup_next_entity push up vtime on
+expirations" for details on eligibility) and to have a lower virtual
+finish time than the current candidate as next-in-service entity, then
+E directly becomes the next-in-service entity. Unfortunately, there is
+a corner case for which this shorter path makes
+bfq_update_next_in_service choose a non eligible entity: it occurs if
+both E and the current next-in-service entity happen to be non
+eligible when bfq_update_next_in_service is invoked. In this case, E
+is not set as next-in-service, and, since bfq_lookup_next_entity is
+not invoked, the state of the parent entity is not updated so as to
+end up with an eligible entity as the proper next-in-service entity.
 
-This is a semi-automatic email about new static checker warnings.
+In this respect, next-in-service is actually allowed to be non
+eligible while some queue is in service: since no system-virtual-time
+push-up can be performed in that case (see again commit "bfq-sq-mq:
+make lookup_next_entity push up vtime on expirations" for details),
+next-in-service is chosen, speculatively, as a function of the
+possible value that the system virtual time may get after a push
+up. But the correctness of the schedule breaks if next-in-service is
+still a non eligible entity when it is time to set in service the next
+entity. Unfortunately, this may happen in the above corner case.
 
-The patch 2984c8684f96: "nullb: factor disk parameters" from Aug 14, 
-2017, leads to the following Smatch complaint:
+This commit fixes this problem by making bfq_update_next_in_service
+invoke bfq_lookup_next_entity not only if the above shorter path
+cannot be taken, but also if the shorter path is taken but fails to
+yield an eligible next-in-service entity.
 
-drivers/block/null_blk.c:1759 null_init_tag_set()
-	 error: we previously assumed 'nullb' could be null (see line 1750)
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+---
+ block/bfq-wf2q.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-drivers/block/null_blk.c
-  1749		set->ops = &null_mq_ops;
-  1750		set->nr_hw_queues = nullb ? nullb->dev->submit_queues :
-  1751							g_submit_queues;
-  1752		set->queue_depth = nullb ? nullb->dev->hw_queue_depth :
-  1753							g_hw_queue_depth;
-  1754		set->numa_node = nullb ? nullb->dev->home_node : g_home_node;
-                                 ^^^^^
-The patch introduces a series of new NULL checks
-
-  1755		set->cmd_size	= sizeof(struct nullb_cmd);
-  1756		set->flags = BLK_MQ_F_SHOULD_MERGE;
-  1757		set->driver_data = NULL;
-  1758	
-  1759		if (nullb->dev->blocking)
-                    ^^^^^^^^^^^^^^^^^^^^
-And an unchecked dereference.
-
-  1760			set->flags |= BLK_MQ_F_BLOCKING;
-  1761	
-
-regards,
-dan carpenter
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index eeaf326..add54f2 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -80,6 +80,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+ {
+ 	struct bfq_entity *next_in_service = sd->next_in_service;
+ 	bool parent_sched_may_change = false;
++	bool change_without_lookup = false;
+ 
+ 	/*
+ 	 * If this update is triggered by the activation, requeueing
+@@ -99,7 +100,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+ 		 * set to true, and left as true if
+ 		 * sd->next_in_service is NULL.
+ 		 */
+-		bool replace_next = true;
++		change_without_lookup = true;
+ 
+ 		/*
+ 		 * If there is already a next_in_service candidate
+@@ -112,7 +113,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+ 			struct bfq_service_tree *st =
+ 				sd->service_tree + new_entity_class_idx;
+ 
+-			replace_next =
++			change_without_lookup =
+ 				(new_entity_class_idx ==
+ 				 bfq_class_idx(next_in_service)
+ 				 &&
+@@ -122,15 +123,16 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+ 					new_entity->finish));
+ 		}
+ 
+-		if (replace_next)
++		if (change_without_lookup)
+ 			next_in_service = new_entity;
+-	} else /* invoked because of a deactivation: lookup needed */
++	}
++
++	if (!change_without_lookup) /* lookup needed */
+ 		next_in_service = bfq_lookup_next_entity(sd, expiration);
+ 
+-	if (next_in_service) {
++	if (next_in_service)
+ 		parent_sched_may_change = !sd->next_in_service ||
+ 			bfq_update_parent_budget(next_in_service);
+-	}
+ 
+ 	sd->next_in_service = next_in_service;
+ 
+-- 
+2.10.0
