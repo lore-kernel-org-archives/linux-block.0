@@ -1,148 +1,110 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59226 "EHLO mx1.redhat.com"
+Received: from mga14.intel.com ([192.55.52.115]:35193 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdHEG5s (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Aug 2017 02:57:48 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 08/20] blk-mq-sched: use q->queue_depth as hint for q->nr_requests
-Date: Sat,  5 Aug 2017 14:56:53 +0800
-Message-Id: <20170805065705.12989-9-ming.lei@redhat.com>
-In-Reply-To: <20170805065705.12989-1-ming.lei@redhat.com>
-References: <20170805065705.12989-1-ming.lei@redhat.com>
+        id S1751237AbdHaMD4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 08:03:56 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH V7 05/10] mmc: block: Use local variables in mmc_blk_data_prep()
+Date: Thu, 31 Aug 2017 14:56:51 +0300
+Message-Id: <1504180616-14514-6-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-SCSI sets q->queue_depth from shost->cmd_per_lun, and
-q->queue_depth is per request_queue and more related to
-scheduler queue compared with hw queue depth, which can be
-shared by queues, such as TAG_SHARED.
+Use local variables in mmc_blk_data_prep() in preparation for adding CQE
+support which doesn't use the output variables.
 
-This patch trys to use q->queue_depth as hint for computing
-q->nr_requests, which should be more effective than
-current way.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/blk-mq-sched.h | 18 +++++++++++++++---
- block/blk-mq.c       | 27 +++++++++++++++++++++++++--
- block/blk-mq.h       |  1 +
- block/blk-settings.c |  2 ++
- 4 files changed, 43 insertions(+), 5 deletions(-)
+ drivers/mmc/core/block.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 1d47f3fda1d0..906b10c54f78 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -99,12 +99,24 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
- static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 29fc1e662891..1ec5f0bc98d2 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1534,21 +1534,22 @@ static enum mmc_blk_status mmc_blk_err_check(struct mmc_card *card,
+ }
+ 
+ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+-			      int disable_multi, bool *do_rel_wr,
+-			      bool *do_data_tag)
++			      int disable_multi, bool *do_rel_wr_p,
++			      bool *do_data_tag_p)
  {
+ 	struct mmc_blk_data *md = mq->blkdata;
+ 	struct mmc_card *card = md->queue.card;
+ 	struct mmc_blk_request *brq = &mqrq->brq;
+ 	struct request *req = mmc_queue_req_to_req(mqrq);
++	bool do_rel_wr, do_data_tag;
+ 
  	/*
--	 * Default to double of smaller one between hw queue_depth and 128,
-+	 * q->queue_depth is more close to scheduler queue, so use it
-+	 * as hint for computing scheduler queue depth if it is valid
-+	 */
-+	unsigned q_depth = q->queue_depth ?: q->tag_set->queue_depth;
-+
-+	/*
-+	 * Default to double of smaller one between queue depth and 128,
- 	 * since we don't split into sync/async like the old code did.
- 	 * Additionally, this is a per-hw queue depth.
+ 	 * Reliable writes are used to implement Forced Unit Access and
+ 	 * are supported only on MMCs.
  	 */
--	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
--				   BLKDEV_MAX_RQ);
-+	q_depth = 2 * min_t(unsigned int, q_depth, BLKDEV_MAX_RQ);
+-	*do_rel_wr = (req->cmd_flags & REQ_FUA) &&
+-		     rq_data_dir(req) == WRITE &&
+-		     (md->flags & MMC_BLK_REL_WR);
++	do_rel_wr = (req->cmd_flags & REQ_FUA) &&
++		    rq_data_dir(req) == WRITE &&
++		    (md->flags & MMC_BLK_REL_WR);
+ 
+ 	memset(brq, 0, sizeof(struct mmc_blk_request));
+ 
+@@ -1596,18 +1597,18 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 						brq->data.blocks);
+ 	}
+ 
+-	if (*do_rel_wr)
++	if (do_rel_wr)
+ 		mmc_apply_rel_rw(brq, card, req);
+ 
+ 	/*
+ 	 * Data tag is used only during writing meta data to speed
+ 	 * up write and any subsequent read of this meta data
+ 	 */
+-	*do_data_tag = card->ext_csd.data_tag_unit_size &&
+-		       (req->cmd_flags & REQ_META) &&
+-		       (rq_data_dir(req) == WRITE) &&
+-		       ((brq->data.blocks * brq->data.blksz) >=
+-			card->ext_csd.data_tag_unit_size);
++	do_data_tag = card->ext_csd.data_tag_unit_size &&
++		      (req->cmd_flags & REQ_META) &&
++		      (rq_data_dir(req) == WRITE) &&
++		      ((brq->data.blocks * brq->data.blksz) >=
++		       card->ext_csd.data_tag_unit_size);
+ 
+ 	mmc_set_data_timeout(&brq->data, card);
+ 
+@@ -1636,6 +1637,12 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 	mqrq->areq.mrq = &brq->mrq;
+ 
+ 	mmc_queue_bounce_pre(mqrq);
 +
-+	/*
-+	 * when queue depth of driver is too small, we set queue depth
-+	 * of scheduler queue as 128 which is the default setting of
-+	 * block legacy code.
-+	 */
-+	return max_t(unsigned, q_depth, BLKDEV_MAX_RQ);
++	if (do_rel_wr_p)
++		*do_rel_wr_p = do_rel_wr;
++
++	if (do_data_tag_p)
++		*do_data_tag_p = do_data_tag;
  }
  
- #endif
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a6b23e51893c..da2fa175d78f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2602,7 +2602,9 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
- }
- EXPORT_SYMBOL(blk_mq_free_tag_set);
- 
--int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
-+static int __blk_mq_update_nr_requests(struct request_queue *q,
-+				       bool sched_only,
-+				       unsigned int nr)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
- 	struct blk_mq_hw_ctx *hctx;
-@@ -2621,7 +2623,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		 * If we're using an MQ scheduler, just update the scheduler
- 		 * queue depth. This is similar to what the old code would do.
- 		 */
--		if (!hctx->sched_tags) {
-+		if (!sched_only && !hctx->sched_tags) {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
- 							min(nr, set->queue_depth),
- 							false);
-@@ -2641,6 +2643,27 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 	return ret;
- }
- 
-+int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
-+{
-+	return __blk_mq_update_nr_requests(q, false, nr);
-+}
-+
-+/*
-+ * When drivers update q->queue_depth, this API is called so that
-+ * we can use this queue depth as hint for adjusting scheduler
-+ * queue depth.
-+ */
-+int blk_mq_update_sched_queue_depth(struct request_queue *q)
-+{
-+	unsigned nr;
-+
-+	if (!q->mq_ops || !q->elevator)
-+		return 0;
-+
-+	nr = blk_mq_sched_queue_depth(q);
-+	return __blk_mq_update_nr_requests(q, true, nr);
-+}
-+
- static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 							int nr_hw_queues)
- {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 2bfb1254841b..260b608af336 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -37,6 +37,7 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 				bool wait);
- struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
- 					    struct blk_mq_ctx *start);
-+int blk_mq_update_sched_queue_depth(struct request_queue *q);
- 
- /*
-  * Internal helpers for allocating/freeing the request map
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index be1f115b538b..94a349601545 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -877,6 +877,8 @@ void blk_set_queue_depth(struct request_queue *q, unsigned int depth)
- {
- 	q->queue_depth = depth;
- 	wbt_set_queue_depth(q->rq_wb, depth);
-+
-+	WARN_ON(blk_mq_update_sched_queue_depth(q));
- }
- EXPORT_SYMBOL(blk_set_queue_depth);
- 
+ static void mmc_blk_rw_rq_prep(struct mmc_queue_req *mqrq,
 -- 
-2.9.4
+1.9.1
