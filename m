@@ -10,11 +10,11 @@ Cc: linux-block@vger.kernel.org,
 	lee.tibbert@gmail.com,
 	oleksandr@natalenko.name,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT V2 1/3] block, bfq: make lookup_next_entity push up vtime on expirations
-Date: Thu, 31 Aug 2017 08:46:29 +0200
-Message-Id: <20170831064631.2223-2-paolo.valente@linaro.org>
-In-Reply-To: <20170831064631.2223-1-paolo.valente@linaro.org>
-References: <20170831064631.2223-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/3] block, bfq: make lookup_next_entity push up vtime on expirations
+Date: Thu, 31 Aug 2017 08:10:18 +0200
+Message-Id: <20170831061020.4426-2-paolo.valente@linaro.org>
+In-Reply-To: <20170831061020.4426-1-paolo.valente@linaro.org>
+References: <20170831061020.4426-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
 To provide a very smooth service, bfq starts to serve a bfq_queue
@@ -67,7 +67,7 @@ if an expiration is occurring.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Oleksander Natalenko <oleksandr@natalenko.name>
 ---
  block/bfq-iosched.c |  4 ++--
  block/bfq-iosched.h |  4 ++--
