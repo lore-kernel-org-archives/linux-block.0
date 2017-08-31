@@ -1,44 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:10735 "EHLO
-        BJEXMBX012.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750984AbdHRQh3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Aug 2017 12:37:29 -0400
-Date: Sat, 19 Aug 2017 00:37:20 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <paolo.valente@linaro.org>, <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] block, bfq: fix error handle in bfq_init
-Message-ID: <20170818163714.GA40576@localhost.didichuxing.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/4] loop: support different logical block sizes
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Hannes Reinecke <hare@suse.de>,
+ Ming Lei <ming.lei@redhat.com>, Karel Zak <kzak@redhat.com>,
+ Milan Broz <gmazyland@gmail.com>
+References: <cover.1503558155.git.osandov@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <4c6d35ca-df8a-a998-8c4e-ef5177a6109c@kernel.dk>
+Date: Thu, 31 Aug 2017 13:51:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <cover.1503558155.git.osandov@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-if elv_register fail, bfq_pool should be free.
+On 08/24/2017 01:03 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> Hi, everyone,
+> 
+> Here's another attempt at supporting different logical block sizes for
+> loop devices. First, some terminology:
+> 
+>  * Logical block size: the lowest possible block size that the storage
+>    device can address.
+>  * Physical block size: the lowest possible sector size that the
+>    hardware can operate on without reverting to read-modify-write
+>    operations. Always greater than or equal to the logical block size.
+> 
+> These are characteristics of the device itself tracked in the
+> request_queue. For loop devices, both are currently always 512 bytes.
+> 
+> struct block_device also has another block size, basically a "soft"
+> block size which is the preferred I/O size and can be changed from
+> userspace. For loop devices, this is PAGE_SIZE if the backing file is a
+> regular file or otherwise the soft block size of the backing block
+> device.
+> 
+> Patch 1 simplifies how the soft block size is set. I'm tempted to not
+> set it at all and use the default of PAGE_SIZE, but maybe someone is
+> depending on inheriting the soft block size from the backing block
+> device...
+> 
+> Patch 2 sets the physical block size of loop devices to a more
+> meaningful value for loop, PAGE_SIZE.
+> 
+> Patch 3 allows us to change the logical block size. It adds a new ioctl
+> instead of the previous approach (which extends LOOP_{GET,SET}_STATUS).
+> Hannes, I assume you had a specific reason for doing it the way you did,
+> care to explain?
+> 
+> Patch 4 is a cleanup.
+> 
+> This is based on my patch reverting the original block size support,
+> targeting 4.14. Thanks!
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- block/bfq-iosched.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Applied for 4.14, thanks Omar.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 436b6ca..bdb072f 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5048,10 +5048,12 @@ static int __init bfq_init(void)
- 
- 	ret = elv_register(&iosched_bfq_mq);
- 	if (ret)
--		goto err_pol_unreg;
-+		goto slab_kill;
- 
- 	return 0;
- 
-+slab_kill:
-+	bfq_slab_kill();
- err_pol_unreg:
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	blkcg_policy_unregister(&blkcg_policy_bfq);
 -- 
-2.9.4
+Jens Axboe
