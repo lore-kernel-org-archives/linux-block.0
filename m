@@ -1,72 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43354 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750762AbdIADwx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Aug 2017 23:52:53 -0400
-Date: Fri, 1 Sep 2017 11:52:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:6172 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751001AbdHaWfi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 18:35:38 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+CC: "oleksandr@natalenko.name" <oleksandr@natalenko.name>
 Subject: Re: [PATCH 5/9] block: introduce blk_drain_queue()
-Message-ID: <20170901035237.GG16525@ming.t460p>
+Date: Thu, 31 Aug 2017 22:34:49 +0000
+Message-ID: <1504218887.31872.66.camel@wdc.com>
 References: <20170831172728.15817-1-ming.lei@redhat.com>
- <20170831172728.15817-6-ming.lei@redhat.com>
- <1504218887.31872.66.camel@wdc.com>
+         <20170831172728.15817-6-ming.lei@redhat.com>
+In-Reply-To: <20170831172728.15817-6-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504218887.31872.66.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Aug 31, 2017 at 10:34:49PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-09-01 at 01:27 +0800, Ming Lei wrote:
-> > So that we can support legacy version of freezing queue,
-> > which is required by safe SCSI quiescing.
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-core.c       | 16 ++++++++++++++++
-> >  include/linux/blkdev.h |  1 +
-> >  2 files changed, 17 insertions(+)
-> > 
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index d579501f24ba..636452f151ea 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -530,6 +530,22 @@ static void __blk_drain_queue(struct request_queue *q, bool drain_all)
-> >  }
-> >  
-> >  /**
-> > + * blk_drain_queue - drain requests from request_queue
-> > + * @q: queue to drain
-> > + *
-> > + * Drain requests from @q.  All pending requests are drained.
-> > + * The caller is responsible for ensuring that no new requests
-> > + * which need to be drained are queued.
-> > + */
-> > +void blk_drain_queue(struct request_queue *q)
-> > +{
-> > +	spin_lock_irq(q->queue_lock);
-> > +	__blk_drain_queue(q, true);
-> > +	spin_unlock_irq(q->queue_lock);
-> > +}
-> > +EXPORT_SYMBOL(blk_drain_queue);
-> 
-> Hello Ming,
-> 
-> Please drop this patch. As far as I can see this patch series introduces only
-> one call to blk_drain_queue(), namely in blk_freeze_queue_wait() in patch 6.
-> My proposal is to inline the body of blk_drain_queue() in blk_freeze_queue_wait()
-> instead of reintroducing blk_drain_queue() (see also commit 807592a4fafb;
-> "block: Let blk_drain_queue() caller obtain the queue lock").
-
-Looks good, will do it in V2.
-
--- 
-Ming
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDAxOjI3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gU28g
+dGhhdCB3ZSBjYW4gc3VwcG9ydCBsZWdhY3kgdmVyc2lvbiBvZiBmcmVlemluZyBxdWV1ZSwNCj4g
+d2hpY2ggaXMgcmVxdWlyZWQgYnkgc2FmZSBTQ1NJIHF1aWVzY2luZy4NCj4gDQo+IFNpZ25lZC1v
+ZmYtYnk6IE1pbmcgTGVpIDxtaW5nLmxlaUByZWRoYXQuY29tPg0KPiAtLS0NCj4gIGJsb2NrL2Js
+ay1jb3JlLmMgICAgICAgfCAxNiArKysrKysrKysrKysrKysrDQo+ICBpbmNsdWRlL2xpbnV4L2Js
+a2Rldi5oIHwgIDEgKw0KPiAgMiBmaWxlcyBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspDQo+IA0K
+PiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLWNvcmUuYyBiL2Jsb2NrL2Jsay1jb3JlLmMNCj4gaW5k
+ZXggZDU3OTUwMWYyNGJhLi42MzY0NTJmMTUxZWEgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1j
+b3JlLmMNCj4gKysrIGIvYmxvY2svYmxrLWNvcmUuYw0KPiBAQCAtNTMwLDYgKzUzMCwyMiBAQCBz
+dGF0aWMgdm9pZCBfX2Jsa19kcmFpbl9xdWV1ZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgYm9v
+bCBkcmFpbl9hbGwpDQo+ICB9DQo+ICANCj4gIC8qKg0KPiArICogYmxrX2RyYWluX3F1ZXVlIC0g
+ZHJhaW4gcmVxdWVzdHMgZnJvbSByZXF1ZXN0X3F1ZXVlDQo+ICsgKiBAcTogcXVldWUgdG8gZHJh
+aW4NCj4gKyAqDQo+ICsgKiBEcmFpbiByZXF1ZXN0cyBmcm9tIEBxLiAgQWxsIHBlbmRpbmcgcmVx
+dWVzdHMgYXJlIGRyYWluZWQuDQo+ICsgKiBUaGUgY2FsbGVyIGlzIHJlc3BvbnNpYmxlIGZvciBl
+bnN1cmluZyB0aGF0IG5vIG5ldyByZXF1ZXN0cw0KPiArICogd2hpY2ggbmVlZCB0byBiZSBkcmFp
+bmVkIGFyZSBxdWV1ZWQuDQo+ICsgKi8NCj4gK3ZvaWQgYmxrX2RyYWluX3F1ZXVlKHN0cnVjdCBy
+ZXF1ZXN0X3F1ZXVlICpxKQ0KPiArew0KPiArCXNwaW5fbG9ja19pcnEocS0+cXVldWVfbG9jayk7
+DQo+ICsJX19ibGtfZHJhaW5fcXVldWUocSwgdHJ1ZSk7DQo+ICsJc3Bpbl91bmxvY2tfaXJxKHEt
+PnF1ZXVlX2xvY2spOw0KPiArfQ0KPiArRVhQT1JUX1NZTUJPTChibGtfZHJhaW5fcXVldWUpOw0K
+DQpIZWxsbyBNaW5nLA0KDQpQbGVhc2UgZHJvcCB0aGlzIHBhdGNoLiBBcyBmYXIgYXMgSSBjYW4g
+c2VlIHRoaXMgcGF0Y2ggc2VyaWVzIGludHJvZHVjZXMgb25seQ0Kb25lIGNhbGwgdG8gYmxrX2Ry
+YWluX3F1ZXVlKCksIG5hbWVseSBpbiBibGtfZnJlZXplX3F1ZXVlX3dhaXQoKSBpbiBwYXRjaCA2
+Lg0KTXkgcHJvcG9zYWwgaXMgdG8gaW5saW5lIHRoZSBib2R5IG9mIGJsa19kcmFpbl9xdWV1ZSgp
+IGluIGJsa19mcmVlemVfcXVldWVfd2FpdCgpDQppbnN0ZWFkIG9mIHJlaW50cm9kdWNpbmcgYmxr
+X2RyYWluX3F1ZXVlKCkgKHNlZSBhbHNvIGNvbW1pdCA4MDc1OTJhNGZhZmI7DQoiYmxvY2s6IExl
+dCBibGtfZHJhaW5fcXVldWUoKSBjYWxsZXIgb2J0YWluIHRoZSBxdWV1ZSBsb2NrIikuDQoNCkJh
+cnQu
