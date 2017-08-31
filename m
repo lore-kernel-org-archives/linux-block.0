@@ -1,278 +1,171 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f47.google.com ([209.85.218.47]:35436 "EHLO
-        mail-oi0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752769AbdHTMNE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Aug 2017 08:13:04 -0400
-Received: by mail-oi0-f47.google.com with SMTP id e124so132748406oig.2
-        for <linux-block@vger.kernel.org>; Sun, 20 Aug 2017 05:13:04 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1502366898-23691-12-git-send-email-adrian.hunter@intel.com>
-References: <1502366898-23691-1-git-send-email-adrian.hunter@intel.com> <1502366898-23691-12-git-send-email-adrian.hunter@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 20 Aug 2017 14:13:03 +0200
-Message-ID: <CACRpkdZ2=D2tLD0L0M1T_z0_5gMhiPKqUHuOcMgdA72PHLHG8A@mail.gmail.com>
-Subject: Re: [PATCH V5 11/13] mmc: block: Add CQE support
-To: Adrian Hunter <adrian.hunter@intel.com>,
-        linux-block@vger.kernel.org
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	jeremywh7@gmail.com,
+	lnicola@dend.ro,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 2/2] doc, block, bfq: better describe how to properly configure bfq
+Date: Thu, 31 Aug 2017 20:00:31 +0200
+Message-Id: <20170831180031.3747-3-paolo.valente@linaro.org>
+In-Reply-To: <20170831180031.3747-1-paolo.valente@linaro.org>
+References: <20170831180031.3747-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 10, 2017 at 2:08 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+Many users have reported the lack of an HOWTO for properly configuring
+bfq as a function of the goal one wants to achieve (max
+responsiveness, max throughput, ...). In fact, all needed details are
+already provided in the documentation file bfq-iosched.txt. Yet the
+document lacks guidance on which parameter descriptions to look
+at. This commit adds some simple direction.
 
-> Add CQE support to the block driver, including:
->         - optionally using DCMD for flush requests
->         - manually issuing discard requests
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Reviewed-by: Jeremy Hickman <jeremywh7@gmail.com>
+Reviewed-by: Laurentiu Nicola <lnicola@dend.ro>
+---
+ Documentation/block/bfq-iosched.txt | 78 +++++++++++++++++++++++++------------
+ 1 file changed, 54 insertions(+), 24 deletions(-)
 
-"Manually" has no place in computer code IMO since there is no
-man there. But I may be especially grumpy. But I don't understand the
-comment anyway.
-
->         - issuing read / write requests to the CQE
->         - supporting block-layer timeouts
->         - handling recovery
->         - supporting re-tuning
->
-> CQE offers 25% - 50% better random multi-threaded I/O.  There is a slight
-> (e.g. 2%) drop in sequential read speed but no observable change to sequential
-> write.
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-
-This commit message seriously needs to detail the design of the
-request handling thread/engine.
-
-So adding a new (in effect) invasive block driver needs to at least
-be CC:ed to the block maintainers so we don't sneak anything like
-that in under the radar.
-
-This duplicates the "thread that sucks out requests" from the
-MMC core, and doubles the problem of replacing it with
-something like blk-mq.
-
-Especially these two snippets I would personally NOT merge
-without the explicit consent of a block layer maintainer:
-
-> +static void mmc_cqe_request_fn(struct request_queue *q)
-> +{
-> +       struct mmc_queue *mq = q->queuedata;
-> +       struct request *req;
-> +
-> +       if (!mq) {
-> +               while ((req = blk_fetch_request(q)) != NULL) {
-> +                       req->rq_flags |= RQF_QUIET;
-> +                       __blk_end_request_all(req, BLK_STS_IOERR);
-> +               }
-> +               return;
-> +       }
-> +
-> +       if (mq->asleep && !mq->cqe_busy)
-> +               wake_up_process(mq->thread);
-> +}
-(...)
-> +static int mmc_cqe_thread(void *d)
-> +{
-> +       struct mmc_queue *mq = d;
-> +       struct request_queue *q = mq->queue;
-> +       struct mmc_card *card = mq->card;
-> +       struct mmc_host *host = card->host;
-> +       unsigned long flags;
-> +       int get_put = 0;
-> +
-> +       current->flags |= PF_MEMALLOC;
-> +
-> +       down(&mq->thread_sem);
-> +       spin_lock_irqsave(q->queue_lock, flags);
-> +       while (1) {
-> +               struct request *req = NULL;
-> +               enum mmc_issue_type issue_type;
-> +               bool retune_ok = false;
-> +
-> +               if (mq->cqe_recovery_needed) {
-> +                       spin_unlock_irqrestore(q->queue_lock, flags);
-> +                       mmc_blk_cqe_recovery(mq);
-> +                       spin_lock_irqsave(q->queue_lock, flags);
-> +                       mq->cqe_recovery_needed = false;
-> +               }
-> +
-> +               set_current_state(TASK_INTERRUPTIBLE);
-> +
-> +               if (!kthread_should_stop())
-> +                       req = blk_peek_request(q);
-
-Why are you using blk_peek_request() instead of blk_fetch_request()
-when the other thread just goes with fetch?
-
-Am I right in assuming that also this request queue replies on the
-implicit semantic that blk_peek_request(q) shall return NULL
-if there are no requests in the queue, and that it is pulling out a
-few NULLs to flush the request-handling machinery? Or did it
-fix this? (Put that in the commit message in that case.)
-
-> +
-> +               if (req) {
-> +                       issue_type = mmc_cqe_issue_type(host, req);
-> +                       switch (issue_type) {
-> +                       case MMC_ISSUE_DCMD:
-> +                               if (mmc_cqe_dcmd_busy(mq)) {
-> +                                       mq->cqe_busy |= MMC_CQE_DCMD_BUSY;
-> +                                       req = NULL;
-> +                                       break;
-> +                               }
-
-I guess peek is used becaue you want to have the option to give it up here.
-
-> +                               /* Fall through */
-> +                       case MMC_ISSUE_ASYNC:
-> +                               if (blk_queue_start_tag(q, req)) {
-> +                                       mq->cqe_busy |= MMC_CQE_QUEUE_FULL;
-> +                                       req = NULL;
-> +                               }
-
-Then you start it with blk_queue_start_tag(), now does "tag" in this
-function call mean the same as the "tag" you just added to the
-MMC request struct?
-
-> +                               break;
-> +                       default:
-> +                               /*
-> +                                * Timeouts are handled by mmc core, so set a
-> +                                * large value to avoid races.
-> +                                */
-> +                               req->timeout = 600 * HZ;
-> +                               blk_start_request(req);
-
-And here it just starts.
-
-> +                               break;
-> +                       }
-> +                       if (req) {
-> +                               mq->cqe_in_flight[issue_type] += 1;
-> +                               if (mmc_cqe_tot_in_flight(mq) == 1)
-> +                                       get_put += 1;
-> +                               if (mmc_cqe_qcnt(mq) == 1)
-> +                                       retune_ok = true;
-> +                       }
-> +               }
-> +
-> +               mq->asleep = !req;
-> +
-> +               spin_unlock_irqrestore(q->queue_lock, flags);
-> +
-> +               if (req) {
-> +                       enum mmc_issued issued;
-> +
-> +                       set_current_state(TASK_RUNNING);
-> +
-> +                       if (get_put) {
-> +                               get_put = 0;
-> +                               mmc_get_card(card);
-> +                       }
-> +
-> +                       if (host->need_retune && retune_ok &&
-> +                           !host->hold_retune)
-> +                               host->retune_now = true;
-> +                       else
-> +                               host->retune_now = false;
-> +
-> +                       issued = mmc_blk_cqe_issue_rq(mq, req);
-> +
-> +                       cond_resched();
-> +
-> +                       spin_lock_irqsave(q->queue_lock, flags);
-> +
-> +                       switch (issued) {
-> +                       case MMC_REQ_STARTED:
-> +                               break;
-> +                       case MMC_REQ_BUSY:
-> +                               blk_requeue_request(q, req);
-
-Here it is requeued.
-
-> +                               goto finished;
-> +                       case MMC_REQ_FAILED_TO_START:
-> +                               __blk_end_request_all(req, BLK_STS_IOERR);
-
-Or ended.
-
-> +                               /* Fall through */
-> +                       case MMC_REQ_FINISHED:
-> +finished:
-> +                               mq->cqe_in_flight[issue_type] -= 1;
-> +                               if (mmc_cqe_tot_in_flight(mq) == 0)
-> +                                       get_put = -1;
-> +                       }
-> +               } else {
-> +                       if (get_put < 0) {
-> +                               get_put = 0;
-> +                               mmc_put_card(card);
-> +                       }
-> +                       /*
-> +                        * Do not stop with requests in flight in case recovery
-> +                        * is needed.
-> +                        */
-> +                       if (kthread_should_stop() &&
-> +                           !mmc_cqe_tot_in_flight(mq)) {
-> +                               set_current_state(TASK_RUNNING);
-> +                               break;
-> +                       }
-> +                       up(&mq->thread_sem);
-> +                       schedule();
-> +                       down(&mq->thread_sem);
-> +                       spin_lock_irqsave(q->queue_lock, flags);
-
-And this semaphoring and threading is just as confusing as ever and now
-we have two of them. (Sorry, I'm grumpy.)
-
-I think I said in the beginning maybe not in response to this series but
-another that I don't like the idea of making a second copy of the
-whole request thread. I would much rather see that ONE request thread
-is used for both regular requests and CQE.
-
-Atleast I wanna see a serious rebuttal of why my claim that we should
-keep this code down is such a pipe dream that we just have to go ahead
-and make a second instance of all the core request mechanics.
-And that this should be part of the commit message: "I'm duplicating
-the queue thread because (...)" etc.
-
-I'm sorry for being so conservative, but I am plain scared, I had serious
-trouble refactoring this code already, and I got the feeling that several
-people think the MMC stack has grown unapproachable for average
-developers (my Googledoc where I tried to pry it apart got very popular
-with developers I respect), and this is making that situation worse. Soon
-only you and Ulf will understand this piece of code.
-
-I do not know if I'm especially stupid when I feel the MMC stack code
-is already hard to grasp, if that is the case I need to be told.
-
-What we need is an MMC stack where it is clear where blocks come in
-and out and how they are processed by the block layer, but now we
-already have a scary Rube Goldberg-machine and it is not getting better.
-If people have different feelings they can tell me off right now.
-
-I have my hopes up that we can get the code lesser and more readable
-with MQ, as I tried to illustrate in my attempts, which are indeed lame
-because they don't work because of misc and SDIO use cases, but
-I'm honestly doing my best. Currently with other clean-ups to get a
-clean surface to do that.
-
-As it stands, the MQ migration work size is in some spots doubled or
-more than doubled after this commit :(
-
-Yours,
-Linus Walleij
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+index 03ff4cc..3d6951d 100644
+--- a/Documentation/block/bfq-iosched.txt
++++ b/Documentation/block/bfq-iosched.txt
+@@ -35,7 +35,7 @@ CONTENTS
+  1-1 Personal systems
+  1-2 Server systems
+ 2. How does BFQ work?
+-3. What are BFQ's tunable?
++3. What are BFQ's tunables and how to properly configure BFQ?
+ 4. BFQ group scheduling
+  4-1 Service guarantees provided
+  4-2 Interface
+@@ -147,12 +147,12 @@ plus a lot of code, are borrowed from CFQ.
+       contrast, BFQ may idle the device for a short time interval,
+       giving the process the chance to go on being served if it issues
+       a new request in time. Device idling typically boosts the
+-      throughput on rotational devices, if processes do synchronous
+-      and sequential I/O. In addition, under BFQ, device idling is
+-      also instrumental in guaranteeing the desired throughput
+-      fraction to processes issuing sync requests (see the description
+-      of the slice_idle tunable in this document, or [1, 2], for more
+-      details).
++      throughput on rotational devices and on non-queueing flash-based
++      devices, if processes do synchronous and sequential I/O. In
++      addition, under BFQ, device idling is also instrumental in
++      guaranteeing the desired throughput fraction to processes
++      issuing sync requests (see the description of the slice_idle
++      tunable in this document, or [1, 2], for more details).
+ 
+       - With respect to idling for service guarantees, if several
+ 	processes are competing for the device at the same time, but
+@@ -161,6 +161,15 @@ plus a lot of code, are borrowed from CFQ.
+ 	idling the device. Throughput is thus as high as possible in
+ 	this common scenario.
+ 
++     - On flash-based storage with internal queueing of commands
++       (typically NCQ), device idling happens to be always detrimental
++       for throughput. So, with these devices, BFQ performs idling
++       only when strictly needed for service guarantees, i.e., for
++       guaranteeing low latency or fairness. In these cases, overall
++       throughput may be sub-optimal. No solution currently exists to
++       provide both strong service guarantees and optimal throughput
++       on devices with internal queueing.
++
+   - If low-latency mode is enabled (default configuration), BFQ
+     executes some special heuristics to detect interactive and soft
+     real-time applications (e.g., video or audio players/streamers),
+@@ -248,13 +257,24 @@ plus a lot of code, are borrowed from CFQ.
+   the Idle class, to prevent it from starving.
+ 
+ 
+-3. What are BFQ's tunable?
+-==========================
++3. What are BFQ's tunables and how to properly configure BFQ?
++=============================================================
+ 
+-The tunables back_seek-max, back_seek_penalty, fifo_expire_async and
+-fifo_expire_sync below are the same as in CFQ. Their description is
+-just copied from that for CFQ. Some considerations in the description
+-of slice_idle are copied from CFQ too.
++Most BFQ tunables affect service guarantees (basically latency and
++fairness) and throughput. For full details on how to choose the
++desired tradeoff between service guarantees and throughput, see the
++parameters slice_idle, strict_guarantees and low_latency. For details
++on how to maximise throughput, see slice_idle, timeout_sync and
++max_budget. The other performance-related parameters have been
++inherited from, and have been preserved mostly for compatibility with
++CFQ. So far, no performance improvement has been reported after
++changing the latter parameters in BFQ.
++
++In particular, the tunables back_seek-max, back_seek_penalty,
++fifo_expire_async and fifo_expire_sync below are the same as in
++CFQ. Their description is just copied from that for CFQ. Some
++considerations in the description of slice_idle are copied from CFQ
++too.
+ 
+ per-process ioprio and weight
+ -----------------------------
+@@ -284,15 +304,17 @@ number of seeks and see improved throughput.
+ 
+ Setting slice_idle to 0 will remove all the idling on queues and one
+ should see an overall improved throughput on faster storage devices
+-like multiple SATA/SAS disks in hardware RAID configuration.
++like multiple SATA/SAS disks in hardware RAID configuration, as well
++as flash-based storage with internal command queueing (and
++parallelism).
+ 
+ So depending on storage and workload, it might be useful to set
+ slice_idle=0.  In general for SATA/SAS disks and software RAID of
+ SATA/SAS disks keeping slice_idle enabled should be useful. For any
+ configurations where there are multiple spindles behind single LUN
+-(Host based hardware RAID controller or for storage arrays), setting
+-slice_idle=0 might end up in better throughput and acceptable
+-latencies.
++(Host based hardware RAID controller or for storage arrays), or with
++flash-based fast storage, setting slice_idle=0 might end up in better
++throughput and acceptable latencies.
+ 
+ Idling is however necessary to have service guarantees enforced in
+ case of differentiated weights or differentiated I/O-request lengths.
+@@ -311,13 +333,14 @@ There is an important flipside for idling: apart from the above cases
+ where it is beneficial also for throughput, idling can severely impact
+ throughput. One important case is random workload. Because of this
+ issue, BFQ tends to avoid idling as much as possible, when it is not
+-beneficial also for throughput. As a consequence of this behavior, and
+-of further issues described for the strict_guarantees tunable,
+-short-term service guarantees may be occasionally violated. And, in
+-some cases, these guarantees may be more important than guaranteeing
+-maximum throughput. For example, in video playing/streaming, a very
+-low drop rate may be more important than maximum throughput. In these
+-cases, consider setting the strict_guarantees parameter.
++beneficial also for throughput (as detailed in Section 2). As a
++consequence of this behavior, and of further issues described for the
++strict_guarantees tunable, short-term service guarantees may be
++occasionally violated. And, in some cases, these guarantees may be
++more important than guaranteeing maximum throughput. For example, in
++video playing/streaming, a very low drop rate may be more important
++than maximum throughput. In these cases, consider setting the
++strict_guarantees parameter.
+ 
+ strict_guarantees
+ -----------------
+@@ -419,6 +442,13 @@ The default value is 0, which enables auto-tuning: BFQ sets max_budget
+ to the maximum number of sectors that can be served during
+ timeout_sync, according to the estimated peak rate.
+ 
++For specific devices, some users have occasionally reported to have
++reached a higher throughput by setting max_budget explicitly, i.e., by
++setting max_budget to a higher value than 0. In particular, they have
++set max_budget to higher values than those to which BFQ would have set
++it with auto-tuning. An alternative way to achieve this goal is to
++just increase the value of timeout_sync, leaving max_budget equal to 0.
++
+ weights
+ -------
+ 
+-- 
+2.10.0
