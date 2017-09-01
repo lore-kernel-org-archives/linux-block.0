@@ -1,35 +1,45 @@
-Return-Path: <zwp10758@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <1504287714.14386.53.camel@wdc.com>
-References: <20170830184211.12471-1-bart.vanassche@wdc.com>
- <20170830184211.12471-4-bart.vanassche@wdc.com> <C7E01FF1-7311-449B-A410-E5F5C7369B9A@linaro.org>
- <CAA70yB7tzAmCmxjc=JmcQt8xZ7xMbYoQKsfkxU+uUvtBt5SUEA@mail.gmail.com> <1504287714.14386.53.camel@wdc.com>
-From: weiping zhang <zwp10758@gmail.com>
-Date: Sat, 2 Sep 2017 02:06:49 +0800
-Message-ID: <CAA70yB7_cMQahevon1f4Q2EK0rgNNuv7H1bfXBCvYEBsVL+WCA@mail.gmail.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "zwp10758@gmail.com" <zwp10758@gmail.com>, "paolo.valente@linaro.org"
+	<paolo.valente@linaro.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH 3/5] bfq: Check kstrtoul() return value
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 1 Sep 2017 17:41:55 +0000
+Message-ID: <1504287714.14386.53.camel@wdc.com>
+References: <20170830184211.12471-1-bart.vanassche@wdc.com>
+	 <20170830184211.12471-4-bart.vanassche@wdc.com>
+	 <C7E01FF1-7311-449B-A410-E5F5C7369B9A@linaro.org>
+	 <CAA70yB7tzAmCmxjc=JmcQt8xZ7xMbYoQKsfkxU+uUvtBt5SUEA@mail.gmail.com>
+In-Reply-To: <CAA70yB7tzAmCmxjc=JmcQt8xZ7xMbYoQKsfkxU+uUvtBt5SUEA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-> Sorry but I do not like this proposal because:
-> * If invalid input is provided writing into a sysfs attribute should fail
->   instead of ignoring the invalid input silently.
-> * simple_strtoul() is considered obsolete and must not be used in new code.
->   From include/linux/kernel.h:
->
-> /* Obsolete, do not use.  Use kstrto<foo> instead */
->
-> extern unsigned long simple_strtoul(const char *,char **,unsigned int);
-> extern long simple_strtol(const char *,char **,unsigned int);
-> extern unsigned long long simple_strtoull(const char *,char **,unsigned int);
-> extern long long simple_strtoll(const char *,char **,unsigned int);
->
-
-Hello Bart,
-
-Agree with you, it seems more reasonable to give error message to user.
-
-Thanks
+T24gU2F0LCAyMDE3LTA5LTAyIGF0IDAxOjM3ICswODAwLCB3ZWlwaW5nIHpoYW5nIHdyb3RlOg0K
+PiAyMDE3LTA5LTAyIDE6MTQgR01UKzA4OjAwIFBhb2xvIFZhbGVudGUgPHBhb2xvLnZhbGVudGVA
+bGluYXJvLm9yZz46DQo+ID4gSWwgZ2lvcm5vIDMwIGFnbyAyMDE3LCBhbGxlIG9yZSAyMDo0Miwg
+QmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPiBoYSBzY3JpdHRvOg0KPiA+
+ID4gDQo+ID4gPiBNYWtlIHN5c2ZzIHdyaXRlcyBmYWlsIGZvciBpbnZhbGlkIG51bWJlcnMgaW5z
+dGVhZCBvZiBzdG9yaW5nDQo+ID4gPiB1bmluaXRpYWxpemVkIGRhdGEgY29waWVkIGZyb20gdGhl
+IHN0YWNrLiBUaGlzIHBhdGNoIHJlbW92ZXMNCj4gPiA+IGFsbCB1bmluaXRpYWxpemVkX3Zhcigp
+IG9jY3VycmVuY2VzIGZyb20gdGhlIEJGUSBzb3VyY2UgY29kZS4NCj4gPiA+IA0KPiA+ID4gU2ln
+bmVkLW9mZi1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KPiA+
+ID4gQ2M6IFBhb2xvIFZhbGVudGUgPHBhb2xvLnZhbGVudGVAbGluYXJvLm9yZz4NCj4gPiANCj4g
+PiBBY2tlZC1ieTogUGFvbG8gVmFsZW50ZSA8cGFvbG8udmFsZW50ZUBsaW5hcm8ub3JnPg0KPiAN
+Cj4gaG93IGFib3V0IHVzaW5nIHNpbXBsZV9zdHJ0b3VsICB3aGljaCB3YXMgdXNlZCBpbiBjZnEv
+bXEtaW9zY2hlZC5jDQo+ICp2YXIgPSBzaW1wbGVfc3RydG91bChwLCAmcCwgMTApOw0KPiANCj4g
+aWYgaW52YWxpZCBzdHJpbmcgY2FtZSBmcm9tIHN5c2ZzLCB0aGlzIGZ1bmN0aW9uIGp1c3QgcmV0
+dXJuIDAsDQo+IGFuZCB0aGVyZSBhcmUgdmFsaWRhdGlvbnMgYWZ0ZXIgZXZlcnkgY2FsbGluZyBi
+ZnFfdmFyX3N0b3JlLg0KDQpIZWxsbyBXZWlwaW5nLA0KDQpTb3JyeSBidXQgSSBkbyBub3QgbGlr
+ZSB0aGlzIHByb3Bvc2FsIGJlY2F1c2U6DQoqIElmIGludmFsaWQgaW5wdXQgaXMgcHJvdmlkZWQg
+d3JpdGluZyBpbnRvIGEgc3lzZnMgYXR0cmlidXRlIHNob3VsZCBmYWlsDQogIGluc3RlYWQgb2Yg
+aWdub3JpbmcgdGhlIGludmFsaWQgaW5wdXQgc2lsZW50bHkuDQoqIHNpbXBsZV9zdHJ0b3VsKCkg
+aXMgY29uc2lkZXJlZCBvYnNvbGV0ZSBhbmQgbXVzdCBub3QgYmUgdXNlZCBpbiBuZXcgY29kZS4N
+CiAgRnJvbSBpbmNsdWRlL2xpbnV4L2tlcm5lbC5oOg0KDQovKiBPYnNvbGV0ZSwgZG8gbm90IHVz
+ZS4gIFVzZSBrc3RydG88Zm9vPiBpbnN0ZWFkICovDQoNCmV4dGVybiB1bnNpZ25lZCBsb25nIHNp
+bXBsZV9zdHJ0b3VsKGNvbnN0IGNoYXIgKixjaGFyICoqLHVuc2lnbmVkIGludCk7DQpleHRlcm4g
+bG9uZyBzaW1wbGVfc3RydG9sKGNvbnN0IGNoYXIgKixjaGFyICoqLHVuc2lnbmVkIGludCk7DQpl
+eHRlcm4gdW5zaWduZWQgbG9uZyBsb25nIHNpbXBsZV9zdHJ0b3VsbChjb25zdCBjaGFyICosY2hh
+ciAqKix1bnNpZ25lZCBpbnQpOw0KZXh0ZXJuIGxvbmcgbG9uZyBzaW1wbGVfc3RydG9sbChjb25z
+dCBjaGFyICosY2hhciAqKix1bnNpZ25lZCBpbnQpOw0KDQpCYXJ0Lg==
