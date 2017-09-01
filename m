@@ -1,80 +1,94 @@
-Return-Path: <jack@suse.cz>
-Date: Mon, 4 Sep 2017 14:47:06 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christoph Hellwig <hch@lst.de>
-Cc: viro@zeniv.linux.org.uk, axboe@kernel.dk,
-	Milosz Tanski <milosz@adfin.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>, mgorman@suse.de,
-	Volker.Lendecke@sernet.de, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/4] fs: support IOCB_NOWAIT in generic_file_buffered_read
-Message-ID: <20170904124706.GB5664@quack2.suse.cz>
-References: <20170829141321.4482-1-hch@lst.de>
- <20170829141321.4482-3-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170829141321.4482-3-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52588 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752180AbdIASwP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 14:52:15 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 8/8] SCSI: freeze block queue when SCSI device is put into quiesce
+Date: Sat,  2 Sep 2017 02:49:58 +0800
+Message-Id: <20170901184958.19452-10-ming.lei@redhat.com>
+In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
+References: <20170901184958.19452-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue 29-08-17 16:13:19, Christoph Hellwig wrote:
-> From: Milosz Tanski <milosz@adfin.com>
-> 
-> Allow generic_file_buffered_read to bail out early instead of waiting for
-> the page lock or reading a page if IOCB_NOWAIT is specified.
-> 
-> Signed-off-by: Milosz Tanski <milosz@adfin.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-> Acked-by: Sage Weil <sage@redhat.com>
+Simply quiesing SCSI device and waiting for completeion of IO
+dispatched to SCSI queue isn't safe, it is easy to use up
+requests because all these allocated requests can't be dispatched
+when device is put in QIUESCE. Then no request can be allocated
+for RQF_PREEMPT, and system may hang somewhere, such as
+When sending commands of sync_cache or start_stop during
+system suspend path.
 
-This looks good to me now. You can add:
+Before quiesing SCSI, this patch freezes block queue first,
+so no new request can enter queue any more, and all pending
+requests are drained too once blk_freeze_queue is returned.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+This patch also uses __blk_get_request() for allocating
+request with RQF_PREEMPT, so that the allocation can
+succeed even though block queue is frozen.
 
-								Honza
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/scsi_lib.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-
-> ---
->  mm/filemap.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index 4bcfa74ad802..eed394fd331c 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -1937,6 +1937,8 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
->  
->  		page = find_get_page(mapping, index);
->  		if (!page) {
-> +			if (iocb->ki_flags & IOCB_NOWAIT)
-> +				goto would_block;
->  			page_cache_sync_readahead(mapping,
->  					ra, filp,
->  					index, last_index - index);
-> @@ -1950,6 +1952,11 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
->  					index, last_index - index);
->  		}
->  		if (!PageUptodate(page)) {
-> +			if (iocb->ki_flags & IOCB_NOWAIT) {
-> +				put_page(page);
-> +				goto would_block;
-> +			}
-> +
->  			/*
->  			 * See comment in do_read_cache_page on why
->  			 * wait_on_page_locked is used to avoid unnecessarily
-> @@ -2131,6 +2138,8 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
->  		goto readpage;
->  	}
->  
-> +would_block:
-> +	error = -EAGAIN;
->  out:
->  	ra->prev_pos = prev_index;
->  	ra->prev_pos <<= PAGE_SHIFT;
-> -- 
-> 2.11.0
-> 
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index f6097b89d5d3..a59544012b68 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -243,10 +243,12 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct request *req;
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
++	unsigned flag = sdev->sdev_state == SDEV_QUIESCE ? BLK_REQ_PREEMPT : 0;
+ 
+-	req = blk_get_request(sdev->request_queue,
++	req = __blk_get_request(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM,
++			flag);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -2890,6 +2892,19 @@ scsi_device_quiesce(struct scsi_device *sdev)
+ {
+ 	int err;
+ 
++	/*
++	 * Simply quiesing SCSI device isn't safe, it is easy
++	 * to use up requests because all these allocated requests
++	 * can't be dispatched when device is put in QIUESCE.
++	 * Then no request can be allocated and we may hang
++	 * somewhere, such as system suspend/resume.
++	 *
++	 * So we freeze block queue first, no new request can
++	 * enter queue any more, and pending requests are drained
++	 * once blk_freeze_queue is returned.
++	 */
++	blk_freeze_queue_preempt(sdev->request_queue);
++
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+ 	mutex_unlock(&sdev->state_mutex);
+@@ -2926,6 +2941,8 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+ 		scsi_run_queue(sdev->request_queue);
+ 	mutex_unlock(&sdev->state_mutex);
++
++	blk_unfreeze_queue_preempt(sdev->request_queue);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
+ 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.9.5
