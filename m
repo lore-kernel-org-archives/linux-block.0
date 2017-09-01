@@ -1,58 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37472 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751945AbdIAQFi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 12:05:38 -0400
-Date: Sat, 2 Sep 2017 00:05:20 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH 1/9] percpu-refcount: introduce percpu_ref_is_dead()
-Message-ID: <20170901160519.GB20709@ming.t460p>
+Date: Fri, 1 Sep 2017 15:44:56 +0000
+Message-ID: <1504280694.14386.18.camel@wdc.com>
 References: <20170831172728.15817-1-ming.lei@redhat.com>
- <20170831172728.15817-2-ming.lei@redhat.com>
- <20170901135915.GD1599492@devbig577.frc2.facebook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+         <20170831172728.15817-2-ming.lei@redhat.com>
+         <20170901135915.GD1599492@devbig577.frc2.facebook.com>
 In-Reply-To: <20170901135915.GD1599492@devbig577.frc2.facebook.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 01, 2017 at 06:59:15AM -0700, Tejun Heo wrote:
-> Hello, Ming.
-> 
-> > +/**
-> > + * percpu_ref_is_dead - test whether a percpu refcount is killed
-> > + * @ref: percpu_ref to test
-> > + *
-> > + * Returns %true if @ref is dead
-> > + *
-> > + * This function is safe to call as long as @ref is between init and exit.
-> > + */
-> > +static inline bool percpu_ref_is_dead(struct percpu_ref *ref)
-> > +{
-> > +	unsigned long __percpu *percpu_count;
-> > +
-> > +	if (__ref_is_percpu(ref, &percpu_count))
-> > +		return false;
-> > +	return ref->percpu_count_ptr & __PERCPU_REF_DEAD;
-> > +}
-> 
-> Can you please explain why percpu_ref_is_dying() isn't enough for your
-> use case?
-
-Hi Tejun,
-
-You are right, looks percpu_ref_is_dying() is enough,
-percpu_ref_get_many() works fine no matter the ref is dying or not.
-
-Thanks!
-
--- 
-Ming
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDA2OjU5IC0wNzAwLCBUZWp1biBIZW8gd3JvdGU6DQo+ID4g
+Ky8qKg0KPiA+ICsgKiBwZXJjcHVfcmVmX2lzX2RlYWQgLSB0ZXN0IHdoZXRoZXIgYSBwZXJjcHUg
+cmVmY291bnQgaXMga2lsbGVkDQo+ID4gKyAqIEByZWY6IHBlcmNwdV9yZWYgdG8gdGVzdA0KPiA+
+ICsgKg0KPiA+ICsgKiBSZXR1cm5zICV0cnVlIGlmIEByZWYgaXMgZGVhZA0KPiA+ICsgKg0KPiA+
+ICsgKiBUaGlzIGZ1bmN0aW9uIGlzIHNhZmUgdG8gY2FsbCBhcyBsb25nIGFzIEByZWYgaXMgYmV0
+d2VlbiBpbml0IGFuZCBleGl0Lg0KPiA+ICsgKi8NCj4gPiArc3RhdGljIGlubGluZSBib29sIHBl
+cmNwdV9yZWZfaXNfZGVhZChzdHJ1Y3QgcGVyY3B1X3JlZiAqcmVmKQ0KPiA+ICt7DQo+ID4gKwl1
+bnNpZ25lZCBsb25nIF9fcGVyY3B1ICpwZXJjcHVfY291bnQ7DQo+ID4gKw0KPiA+ICsJaWYgKF9f
+cmVmX2lzX3BlcmNwdShyZWYsICZwZXJjcHVfY291bnQpKQ0KPiA+ICsJCXJldHVybiBmYWxzZTsN
+Cj4gPiArCXJldHVybiByZWYtPnBlcmNwdV9jb3VudF9wdHIgJiBfX1BFUkNQVV9SRUZfREVBRDsN
+Cj4gPiArfQ0KPiANCj4gQ2FuIHlvdSBwbGVhc2UgZXhwbGFpbiB3aHkgcGVyY3B1X3JlZl9pc19k
+eWluZygpIGlzbid0IGVub3VnaCBmb3IgeW91cg0KPiB1c2UgY2FzZT8NCg0KSGVsbG8gVGVqdW4s
+DQoNClRoZSBhcHByb2FjaCBvZiB0aGUgd2hvbGUgc2VyaWVzIGlzIHdyb25nIHNvIEkgdGhpbmsg
+dGhhdCB5b3UgY2FuIGlnbm9yZSB0aGlzIHBhdGNoLg0KDQpCYXJ0Lg==
