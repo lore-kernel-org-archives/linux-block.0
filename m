@@ -1,29 +1,47 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH 7/8] scsi: sd_zbc: Disable zone write locking with scsi-mq
-Date: Fri, 1 Sep 2017 16:26:46 +0000
-Message-ID: <1504283205.14386.36.camel@wdc.com>
+Return-Path: <prvs=410ad2225=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH 7/8] scsi: sd_zbc: Disable zone write locking with scsi-mq
+Date: Fri,  1 Sep 2017 20:36:30 +0900
+Message-Id: <20170901113631.12323-8-damien.lemoal@wdc.com>
+In-Reply-To: <20170901113631.12323-1-damien.lemoal@wdc.com>
 References: <20170901113631.12323-1-damien.lemoal@wdc.com>
-	 <20170901113631.12323-8-damien.lemoal@wdc.com>
-In-Reply-To: <20170901113631.12323-8-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTA5LTAxIGF0IDIwOjM2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gSW4gdGhlIGNhc2Ugb2YgYSBaQkMgZGlzayB1c2VkIHdpdGggc2NzaS1tcSwgem9uZSB3cml0
-ZSBsb2NraW5nIGRvZXMNCj4gbm90IHByZXZlbnQgd3JpdGUgcmVvcmRlcmluZyBpbiBzZXF1ZW50
-aWFsIHpvbmVzLiBVbmxpa2UgdGhlIGxlZ2FjeQ0KPiBjYXNlLCB6b25lIGxvY2tpbmcgY2FuIG9u
-bHkgYmUgZG9uZSBhZnRlciB0aGUgY29tbWFuZCByZXF1ZXN0IGlzDQo+IHJlbW92ZWQgZnJvbSB0
-aGUgc2NoZWR1bGVyIGRpc3BhdGNoIHF1ZXVlLiBUaGF0IGlzLCBhdCB0aGUgdGltZSBvZg0KPiB6
-b25lIGxvY2tpbmcsIHRoZSB3cml0ZSBjb21tYW5kIG1heSBhbHJlYWR5IGJlIG91dCBvZiBvcmRl
-ci4NCj4gDQo+IERpc2FibGUgem9uZSB3cml0ZSBsb2NraW5nIGluIHNkX3piY193cml0ZV9sb2Nr
-X3pvbmUoKSBpZiB0aGUgZGlzayBpcw0KPiB1c2VkIHdpdGggc2NzaS1tcS4gV3JpdGUgb3JkZXIg
-Z3VhcmFudGVlcyBjYW4gYmUgcHJvdmlkZWQgYnkgYW4NCj4gYWRhcHRlZCBJL08gc2NoZWR1bGVy
-Lg0KDQpSZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29t
-Pg0KDQo=
+In the case of a ZBC disk used with scsi-mq, zone write locking does
+not prevent write reordering in sequential zones. Unlike the legacy
+case, zone locking can only be done after the command request is
+removed from the scheduler dispatch queue. That is, at the time of
+zone locking, the write command may already be out of order.
+
+Disable zone write locking in sd_zbc_write_lock_zone() if the disk is
+used with scsi-mq. Write order guarantees can be provided by an
+adapted I/O scheduler.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/scsi/sd_zbc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 3a9feadcc133..0f0a74fbd9c5 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -258,6 +258,10 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
+ 	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
+ 		return BLKPREP_KILL;
+ 
++	/* No write locking with scsi-mq */
++	if (rq->q->mq_ops)
++		return BLKPREP_OK;
++
+ 	/*
+ 	 * There is no write constraint on conventional zones, but do not issue
+ 	 * more than one write at a time per sequential zone. This avoids write
+-- 
+2.13.5
