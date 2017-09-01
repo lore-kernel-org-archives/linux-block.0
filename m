@@ -1,249 +1,228 @@
-Return-Path: <prvs=410ad2225=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH 6/8] scsi: sd_zbc: Limit zone write locking to sequential zones
-Date: Fri,  1 Sep 2017 20:36:29 +0900
-Message-Id: <20170901113631.12323-7-damien.lemoal@wdc.com>
-In-Reply-To: <20170901113631.12323-1-damien.lemoal@wdc.com>
-References: <20170901113631.12323-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:42084 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752185AbdIASu7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 14:50:59 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 2/8] blk-mq: rename blk_mq_freeze_queue as blk_freeze_queue
+Date: Sat,  2 Sep 2017 02:49:52 +0800
+Message-Id: <20170901184958.19452-4-ming.lei@redhat.com>
+In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
+References: <20170901184958.19452-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Zoned block devices have no write constraints for conventional zones
-so write locking of conventional zones is not necessary and can hurt
-performance. To avoid this, introduce the seq_zones bitmap to indicate
-if a zone is a sequential one. Use this information to allow any write
-to be issued to conventional zones, locking only sequential zones.
+This APIs will be used by legacy path too.
 
-As the zone bitmap allocation for seq_zones is identical to the zones
-write lock bitmap, introduce the helper sd_zbc_alloc_zone_bitmap().
-Using this helper, wait for the disk capacity and number of zones to
-stabilize on the second revalidation pass to allocate and initialize
-the bitmaps.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/sd.h     |   1 +
- drivers/scsi/sd_zbc.c | 113 ++++++++++++++++++++++++++++++++++++++++++--------
- drivers/scsi/sd_zbc.h |   9 ++++
- 3 files changed, 106 insertions(+), 17 deletions(-)
+ block/bfq-iosched.c      |  2 +-
+ block/blk-cgroup.c       |  4 ++--
+ block/blk-mq.c           | 17 ++++-------------
+ block/blk-mq.h           |  1 -
+ block/elevator.c         |  2 +-
+ drivers/block/loop.c     |  8 ++++----
+ drivers/block/rbd.c      |  2 +-
+ drivers/nvme/host/core.c |  2 +-
+ include/linux/blk-mq.h   |  2 +-
+ 9 files changed, 15 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 5940390d30f3..761d3fbf72ef 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -77,6 +77,7 @@ struct scsi_disk {
- 	unsigned int	zone_blocks;
- 	unsigned int	zone_shift;
- 	unsigned long	*zones_wlock;
-+	unsigned long	*seq_zones;
- 	unsigned int	zones_optimal_open;
- 	unsigned int	zones_optimal_nonseq;
- 	unsigned int	zones_max_open;
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 0e6b5f5d14e7..3a9feadcc133 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -246,7 +246,7 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
- 	sector_t sector = blk_rq_pos(rq);
- 	sector_t zone_sectors = sd_zbc_zone_sectors(sdkp);
--	unsigned int zno = sd_zbc_zone_no(sdkp, sector);
-+	unsigned int zno;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 509f39998011..ce2b00e897e2 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4757,7 +4757,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	 * The invocation of the next bfq_create_group_hierarchy
+ 	 * function is the head of a chain of function calls
+ 	 * (bfq_create_group_hierarchy->blkcg_activate_policy->
+-	 * blk_mq_freeze_queue) that may lead to the invocation of the
++	 * blk_freeze_queue) that may lead to the invocation of the
+ 	 * has_work hook function. For this reason,
+ 	 * bfq_create_group_hierarchy is invoked only after all
+ 	 * scheduler data has been initialized, apart from the fields
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 02e8a47ac77c..87c15f3947d5 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1296,7 +1296,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		return 0;
  
- 	/*
- 	 * Note: Checks of the alignment of the write command on
-@@ -254,21 +254,20 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	 */
+ 	if (q->mq_ops)
+-		blk_mq_freeze_queue(q);
++		blk_freeze_queue(q);
+ 	else
+ 		blk_queue_bypass_start(q);
+ pd_prealloc:
+@@ -1363,7 +1363,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
+ 		return;
  
- 	/* Do not allow zone boundaries crossing on host-managed drives */
--	if (blk_queue_zoned_model(sdkp->disk->queue) == BLK_ZONED_HM &&
-+	if (blk_queue_zoned_model(rq->q) == BLK_ZONED_HM &&
- 	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
- 		return BLKPREP_KILL;
+ 	if (q->mq_ops)
+-		blk_mq_freeze_queue(q);
++		blk_freeze_queue(q);
+ 	else
+ 		blk_queue_bypass_start(q);
  
- 	/*
--	 * Do not issue more than one write at a time per
--	 * zone. This solves write ordering problems due to
--	 * the unlocking of the request queue in the dispatch
--	 * path in the non scsi-mq case. For scsi-mq, this
--	 * also avoids potential write reordering when multiple
--	 * threads running on different CPUs write to the same
--	 * zone (with a synchronized sequential pattern).
-+	 * There is no write constraint on conventional zones, but do not issue
-+	 * more than one write at a time per sequential zone. This avoids write
-+	 * ordering problems due to the unlocking of the request queue in the
-+	 * dispatch path of the non scsi-mq (legacy) case.
- 	 */
--	if (sdkp->zones_wlock &&
--	    test_and_set_bit(zno, sdkp->zones_wlock))
-+	zno = sd_zbc_zone_no(sdkp, sector);
-+	if (!test_bit(zno, sdkp->seq_zones))
-+		return BLKPREP_OK;
-+	if (test_and_set_bit(zno, sdkp->zones_wlock))
- 		return BLKPREP_DEFER;
- 
- 	WARN_ON_ONCE(cmd->flags & SCMD_ZONE_WRITE_LOCK);
-@@ -286,8 +285,9 @@ void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd)
- 	struct request *rq = cmd->request;
- 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
- 
--	if (sdkp->zones_wlock && cmd->flags & SCMD_ZONE_WRITE_LOCK) {
-+	if (cmd->flags & SCMD_ZONE_WRITE_LOCK) {
- 		unsigned int zno = sd_zbc_zone_no(sdkp, blk_rq_pos(rq));
-+
- 		WARN_ON_ONCE(!test_bit(zno, sdkp->zones_wlock));
- 		cmd->flags &= ~SCMD_ZONE_WRITE_LOCK;
- 		clear_bit_unlock(zno, sdkp->zones_wlock);
-@@ -510,8 +510,67 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 	return 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 82136e83951d..8cf1f7cbef2b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -161,16 +161,7 @@ void blk_freeze_queue(struct request_queue *q)
+ 	blk_freeze_queue_start(q);
+ 	blk_mq_freeze_queue_wait(q);
  }
+-
+-void blk_mq_freeze_queue(struct request_queue *q)
+-{
+-	/*
+-	 * ...just an alias to keep freeze and unfreeze actions balanced
+-	 * in the blk_mq_* namespace
+-	 */
+-	blk_freeze_queue(q);
+-}
+-EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
++EXPORT_SYMBOL_GPL(blk_freeze_queue);
  
-+/*
-+ * Initialize the sequential zone bitmap to allow identifying sequential zones.
-+ */
-+static int sd_zbc_setup_seq_zones(struct scsi_disk *sdkp)
-+{
-+	unsigned long *seq_zones;
-+	sector_t block = 0;
-+	unsigned char *buf;
-+	unsigned char *rec;
-+	unsigned int buf_len;
-+	unsigned int list_length;
-+	unsigned int n = 0;
-+	int ret = -ENOMEM;
-+
-+	/* Allocate zone type bitmap */
-+	seq_zones = sd_zbc_alloc_zone_bitmap(sdkp);
-+	if (!seq_zones)
-+		return -ENOMEM;
-+
-+	buf = kmalloc(SD_ZBC_BUF_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		goto out;
-+
-+	while (block < sdkp->capacity) {
-+
-+		ret = sd_zbc_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, block);
-+		if (ret)
-+			goto out;
-+
-+		/* Parse reported zone descriptors */
-+		list_length = get_unaligned_be32(&buf[0]) + 64;
-+		rec = buf + 64;
-+		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
-+		while (rec < buf + buf_len) {
-+			if ((rec[0] & 0x0f) != ZBC_ZONE_TYPE_CONV)
-+				set_bit(n, seq_zones);
-+			block += get_unaligned_be64(&rec[8]);
-+			rec += 64;
-+			n++;
-+		}
-+
-+	}
-+
-+	if (n != sdkp->nr_zones)
-+		ret = -EIO;
-+
-+out:
-+	kfree(buf);
-+	if (ret) {
-+		kfree(seq_zones);
-+		return ret;
-+	}
-+
-+	sdkp->seq_zones = seq_zones;
-+
-+	return 0;
-+}
-+
- static int sd_zbc_setup(struct scsi_disk *sdkp)
+ void blk_unfreeze_queue(struct request_queue *q)
  {
-+	int ret;
+@@ -2248,7 +2239,7 @@ static void blk_mq_update_tag_set_depth(struct blk_mq_tag_set *set,
+ 	lockdep_assert_held(&set->tag_list_lock);
  
- 	/* READ16/WRITE16 is mandatory for ZBC disks */
- 	sdkp->device->use_16_for_rw = 1;
-@@ -523,17 +582,37 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	sdkp->nr_zones =
- 		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
- 
-+	/*
-+	 * Wait for the disk capacity to stabilize before
-+	 * initializing zone related information.
-+	 */
-+	if (sdkp->first_scan)
-+		return 0;
-+
- 	if (!sdkp->zones_wlock) {
--		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
--					    sizeof(unsigned long),
--					    GFP_KERNEL);
-+		sdkp->zones_wlock = sd_zbc_alloc_zone_bitmap(sdkp);
- 		if (!sdkp->zones_wlock)
- 			return -ENOMEM;
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+-		blk_mq_freeze_queue(q);
++		blk_freeze_queue(q);
+ 		queue_set_hctx_shared(q, shared);
+ 		blk_unfreeze_queue(q);
  	}
+@@ -2683,7 +2674,7 @@ static int __blk_mq_update_nr_requests(struct request_queue *q,
+ 	if (!set)
+ 		return -EINVAL;
  
-+	if (!sdkp->seq_zones) {
-+		ret = sd_zbc_setup_seq_zones(sdkp);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	return 0;
- }
+-	blk_mq_freeze_queue(q);
++	blk_freeze_queue(q);
  
-+static void sd_zbc_cleanup(struct scsi_disk *sdkp)
-+{
-+	kfree(sdkp->seq_zones);
-+	sdkp->seq_zones = NULL;
-+
-+	kfree(sdkp->zones_wlock);
-+	sdkp->zones_wlock = NULL;
-+}
-+
- int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ 	ret = 0;
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+@@ -2747,7 +2738,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		return;
+ 
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		blk_mq_freeze_queue(q);
++		blk_freeze_queue(q);
+ 
+ 	set->nr_hw_queues = nr_hw_queues;
+ 	blk_mq_update_queue_map(set);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 1b9742eb7399..7ce29ef1e6f3 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -30,7 +30,6 @@ struct blk_mq_ctx {
+ } ____cacheline_aligned_in_smp;
+ 
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+-void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+ void blk_mq_wake_waiters(struct request_queue *q);
+diff --git a/block/elevator.c b/block/elevator.c
+index 371c8165c9e8..1164c8a3720f 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -967,7 +967,7 @@ static int elevator_switch_mq(struct request_queue *q,
  {
  	int ret;
-@@ -585,14 +664,14 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
  
- err:
- 	sdkp->capacity = 0;
-+	sd_zbc_cleanup(sdkp);
+-	blk_mq_freeze_queue(q);
++	blk_freeze_queue(q);
  
- 	return ret;
- }
+ 	if (q->elevator) {
+ 		if (q->elevator->registered)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 5c11ea44d470..b2e708b7e1e6 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -211,7 +211,7 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+ 	 * LO_FLAGS_READ_ONLY, both are set from kernel, and losetup
+ 	 * will get updated by ioctl(LOOP_GET_STATUS)
+ 	 */
+-	blk_mq_freeze_queue(lo->lo_queue);
++	blk_freeze_queue(lo->lo_queue);
+ 	lo->use_dio = use_dio;
+ 	if (use_dio)
+ 		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
+@@ -599,7 +599,7 @@ static int loop_switch(struct loop_device *lo, struct file *file)
+ 	w.file = file;
  
- void sd_zbc_remove(struct scsi_disk *sdkp)
- {
--	kfree(sdkp->zones_wlock);
--	sdkp->zones_wlock = NULL;
-+	sd_zbc_cleanup(sdkp);
- }
+ 	/* freeze queue and wait for completion of scheduled requests */
+-	blk_mq_freeze_queue(lo->lo_queue);
++	blk_freeze_queue(lo->lo_queue);
  
- void sd_zbc_print_zones(struct scsi_disk *sdkp)
-diff --git a/drivers/scsi/sd_zbc.h b/drivers/scsi/sd_zbc.h
-index c120672d56d6..bf2126e96ded 100644
---- a/drivers/scsi/sd_zbc.h
-+++ b/drivers/scsi/sd_zbc.h
-@@ -24,6 +24,15 @@ static inline unsigned int sd_zbc_zone_no(struct scsi_disk *sdkp,
- 	return sectors_to_logical(sdkp->device, sector) >> sdkp->zone_shift;
- }
+ 	/* do the switch action */
+ 	do_loop_switch(lo, &w);
+@@ -1046,7 +1046,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 		return -EINVAL;
  
-+static inline unsigned long *sd_zbc_alloc_zone_bitmap(struct scsi_disk *sdkp)
-+{
-+	struct request_queue *q = sdkp->disk->queue;
-+
-+	return kzalloc_node(BITS_TO_LONGS(sdkp->nr_zones)
-+			    * sizeof(unsigned long),
-+			    GFP_KERNEL, q->node);
-+}
-+
- extern int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
- extern void sd_zbc_remove(struct scsi_disk *sdkp);
- extern void sd_zbc_print_zones(struct scsi_disk *sdkp);
+ 	/* freeze request queue during the transition */
+-	blk_mq_freeze_queue(lo->lo_queue);
++	blk_freeze_queue(lo->lo_queue);
+ 
+ 	spin_lock_irq(&lo->lo_lock);
+ 	lo->lo_state = Lo_rundown;
+@@ -1116,7 +1116,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		return -EINVAL;
+ 
+ 	/* I/O need to be drained during transfer transition */
+-	blk_mq_freeze_queue(lo->lo_queue);
++	blk_freeze_queue(lo->lo_queue);
+ 
+ 	err = loop_release_xfer(lo);
+ 	if (err)
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index b008b6a98098..3a97ffcb3a81 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -6347,7 +6347,7 @@ static ssize_t do_rbd_remove(struct bus_type *bus,
+ 		 * Prevent new IO from being queued and wait for existing
+ 		 * IO to complete/fail.
+ 		 */
+-		blk_mq_freeze_queue(rbd_dev->disk->queue);
++		blk_freeze_queue(rbd_dev->disk->queue);
+ 		blk_set_queue_dying(rbd_dev->disk->queue);
+ 	}
+ 
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 5c76b0a96be2..986f2b4f9760 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1210,7 +1210,7 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ 	bs = 1 << ns->lba_shift;
+ 	ns->noiob = le16_to_cpu(id->noiob);
+ 
+-	blk_mq_freeze_queue(disk->queue);
++	blk_freeze_queue(disk->queue);
+ 
+ 	if (ctrl->ops->flags & NVME_F_METADATA_SUPPORTED)
+ 		nvme_prep_integrity(disk, id, bs);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 2572e5641568..8ae77e088c01 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -256,7 +256,7 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
+-void blk_mq_freeze_queue(struct request_queue *q);
++void blk_freeze_queue(struct request_queue *q);
+ void blk_unfreeze_queue(struct request_queue *q);
+ void blk_freeze_queue_start(struct request_queue *q);
+ void blk_mq_freeze_queue_wait(struct request_queue *q);
 -- 
-2.13.5
+2.9.5
