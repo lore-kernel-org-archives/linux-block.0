@@ -1,52 +1,35 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58076 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750892AbdIBCxJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 22:53:09 -0400
-Date: Sat, 2 Sep 2017 10:52:54 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "tj@kernel.org" <tj@kernel.org>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+CC: "tj@kernel.org" <tj@kernel.org>,
         "jthumshirn@suse.de" <jthumshirn@suse.de>,
         "oleksandr@natalenko.name" <oleksandr@natalenko.name>
 Subject: Re: [PATCH V2 6/8] block: allow to allocate req with REQF_PREEMPT
  when queue is frozen
-Message-ID: <20170902025253.GA20047@ming.t460p>
+Date: Fri, 1 Sep 2017 20:07:04 +0000
+Message-ID: <1504296423.14386.62.camel@wdc.com>
 References: <20170901184958.19452-1-ming.lei@redhat.com>
- <20170901184958.19452-8-ming.lei@redhat.com>
- <1504296423.14386.62.camel@wdc.com>
+         <20170901184958.19452-8-ming.lei@redhat.com>
+In-Reply-To: <20170901184958.19452-8-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504296423.14386.62.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 01, 2017 at 08:07:04PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-09-02 at 02:49 +0800, Ming Lei wrote:
-> > +	if ((flags & BLK_MQ_REQ_PREEMPT) && blk_queue_is_freezing(q))
-> > +		blk_queue_enter_live(q);
-> > +	else
-> > +		ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
-> 
-> Why did you repost this patch series without trying to reach an agreement
-> about the approach?
-> 
-> Anyway, because of the unsafe blk_queue_enter_live() call introduced by this
-> patch, please add the following to the description of this patch whenever you
-> repost it:
-> 
-> NAK-ed-by: Bart Van Assche <bart.vanassche@wdc.com>
-
-Did you take a look at the patch 7 or cover letter? In that patch,
-if preempt freezing is on-progressing, any other freeze can't be
-started at all, so that is definitely safe to use blk_queue_enter_live()
-here, isn't it?
-
--- 
-Ming
+T24gU2F0LCAyMDE3LTA5LTAyIGF0IDAyOjQ5ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gKwlp
+ZiAoKGZsYWdzICYgQkxLX01RX1JFUV9QUkVFTVBUKSAmJiBibGtfcXVldWVfaXNfZnJlZXppbmco
+cSkpDQo+ICsJCWJsa19xdWV1ZV9lbnRlcl9saXZlKHEpOw0KPiArCWVsc2UNCj4gKwkJcmV0ID0g
+YmxrX3F1ZXVlX2VudGVyKHEsICEoZ2ZwX21hc2sgJiBfX0dGUF9ESVJFQ1RfUkVDTEFJTSkpOw0K
+DQpXaHkgZGlkIHlvdSByZXBvc3QgdGhpcyBwYXRjaCBzZXJpZXMgd2l0aG91dCB0cnlpbmcgdG8g
+cmVhY2ggYW4gYWdyZWVtZW50DQphYm91dCB0aGUgYXBwcm9hY2g/DQoNCkFueXdheSwgYmVjYXVz
+ZSBvZiB0aGUgdW5zYWZlIGJsa19xdWV1ZV9lbnRlcl9saXZlKCkgY2FsbCBpbnRyb2R1Y2VkIGJ5
+IHRoaXMNCnBhdGNoLCBwbGVhc2UgYWRkIHRoZSBmb2xsb3dpbmcgdG8gdGhlIGRlc2NyaXB0aW9u
+IG9mIHRoaXMgcGF0Y2ggd2hlbmV2ZXIgeW91DQpyZXBvc3QgaXQ6DQoNCk5BSy1lZC1ieTogQmFy
+dCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KDQo=
