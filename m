@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47378 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:38992 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752297AbdIASuq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 14:50:46 -0400
+        id S1751824AbdIASkL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 14:40:11 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
@@ -14,10 +14,10 @@ Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
 Subject: [PATCH V2 1/8] blk-mq: rename blk_mq_unfreeze_queue as blk_unfreeze_queue
-Date: Sat,  2 Sep 2017 02:49:51 +0800
-Message-Id: <20170901184958.19452-3-ming.lei@redhat.com>
-In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
-References: <20170901184958.19452-1-ming.lei@redhat.com>
+Date: Sat,  2 Sep 2017 02:39:36 +0800
+Message-Id: <20170901183943.27415-2-ming.lei@redhat.com>
+In-Reply-To: <20170901183943.27415-1-ming.lei@redhat.com>
+References: <20170901183943.27415-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
