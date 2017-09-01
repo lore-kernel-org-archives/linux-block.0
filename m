@@ -1,153 +1,95 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.14-rc2
-Message-ID: <bb904bc0-e73e-2920-29a2-283380676296@kernel.dk>
-Date: Fri, 22 Sep 2017 13:32:52 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=410ad2225=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH 0/8] blk-mq/scsi-mq support for ZBC disks
+Date: Fri,  1 Sep 2017 20:36:23 +0900
+Message-Id: <20170901113631.12323-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+This series implements support for ZBC disks used through the blk-mq/scsi-mq
+I/O path.
 
-A round of fixes for this series. This pull request contains:
+The current scsi level support of ZBC disks guarantees write request ordering
+using a per-zone write lock which prevents issuing simultaneously multiple
+write commands to a zone, doing so avoid reordering of sequential writes to
+sequential zones. This method is however ineffective when scsi-mq is used with
+zoned block devices. This is due to the different execution model of blk-mq
+which passes a request to the scsi layer for dispatching after the request has
+been removed from the I/O scheduler queue. That is, when the scsi layer tries
+to lock the target zone of the request, the request may already be out of
+order and zone write locking fails to prevent that.
 
-- Two sets of NVMe pull requests from Christoph:
+Various approaches have been tried to solve this problem. All of them had the
+serious disadvantage of cluttering blk-mq code with zoned block device specific
+conditions and processing. As such extensive changes can only transform into
+maintenance nightmares, a radically different solution is proposed here.
 
-	- Fixes for the Fibre Channel host/target to fix spec
-	  compliance
-	- Allow a zero keep alive timeout
-	- Make the debug printk for broken SGLs work better
-	- Fix queue zeroing during initialization
-	- Set of RDMA and FC fixes
-	- Target div-by-zero fix
+This series support implementation is in the form of a new "zoned" I/O
+scheduler based on mq-deadline. Zoned is mostly identical to the mq-deadline
+scheduler. It only differs from mq-deadline from the addition of a per zone
+write locking mechanism similar to that implemented in sd_zbc.c. The zoned
+scheduler zone write locking mechanism is used for the exact same purpose as
+the one in the scsi disk driver: limit writes per zone to one to avoid
+reordering. The locking context however changes and is moved to the
+dispatch_request method of the scheduler, that is, target zones of write
+requests can be locked before the requests are issued. In effect, this results
+in the same behavior as the legacy scsi path. Sequential write ordering is
+preserved.
 
-- bsg double-free fix.
+The zoned scheduler is added as part of the scsi code under driver/scsi. This
+allows access to information on the disk zones maintained within the device
+scsi_disk structure as this information (e.g. zone types) cannot be retreived
+from the context of an I/O scheduler initialization method (init_queue()
+method).
 
-- Series fixing a production softlockup for repeated flusher thread
-  wakeups. This is larger than it looks, each patch is trivial.
+the series patches are as follows:
+- The first 2 patches fix exported symbols declaration to allow compiling an
+  I/O scheduler outside of the block/ directory. No functional changes from
+  these patches.
+- Patch 3 and 4 reorganize and cleanup the scsi ZBC support to facilitate the
+  intorduction of the scheduler. No functional changes from these patches.
+- Path 5 fixes a bug
+- Patch 6 is an optimization for the legacy scsi path which avoids zone
+  locking if a write request targets a conventional zone. 
+- Path 7 disables zone write locking for disks accessed through scsi-mq.
+- Patch 8 introduces the zoned scheduler.
 
-- ndb unknown ioctl fix from Josef.
+Comments are as always very much appreciated.
 
-- Buffered vs O_DIRECT page cache inconsistency fix. Has been floating
-  around for a long time, well reviewed. From Lukas.
-
-- brd overflow fix from Mikulas.
-
-- Fix for a loop regression in this merge window, where using a union
-  for two members of the loop_cmd turned out to be a really bad idea.
-  From Omar.
-
-- Fix for an iostat regression fix in this series, using the wrong API
-  to get at the block queue. From Shaohua.
-
-- Fix for a potential blktrace delection deadlock. From Waiman.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
+Thank you.
 
 
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      bsg-lib: don't free job in bsg_prepare_job
+Damien Le Moal (8):
+  block: Fix declaration of blk-mq debugfs functions
+  block: Fix declaration of blk-mq scheduler functions
+  scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
+  scsi: sd_zbc: Reorganize and cleanup
+  scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
+  scsi: sd_zbc: Limit zone write locking to sequential zones
+  scsi: sd_zbc: Disable zone write locking with scsi-mq
+  scsi: Introduce ZBC disk I/O scheduler
 
-Guilherme G. Piccoli (1):
-      nvme-fabrics: Allow 0 as KATO value
-
-James Smart (17):
-      nvme-fc: remove use of FC-specific error codes
-      nvmet-fc: remove use of FC-specific error codes
-      nvmet-fcloop: remove use of FC-specific error codes
-      lpfc: remove use of FC-specific error codes
-      qla2xxx: remove use of FC-specific error codes
-      nvme.h: remove FC transport-specific error values
-      nvme: add transport SGL definitions
-      nvme-fc: use transport-specific sgl format
-      nvmet-fc: fix failing max io queue connections
-      nvme: stop aer posting if controller state not live
-      nvme: allow timed-out ios to retry
-      nvmet: implement valid sqhd values in completions
-      nvme: fix sqhd reference when admin queue connect fails
-      nvmet-fc: on port remove call put outside lock
-      nvmet-fc: ensure target queue id within range.
-      nvmet-fc: sync header templates with comments
-      nvme-fcloop: fix port deletes and callbacks
-
-Jens Axboe (9):
-      buffer: cleanup free_more_memory() flusher wakeup
-      fs: kill 'nr_pages' argument from wakeup_flusher_threads()
-      fs-writeback: provide a wakeup_flusher_threads_bdi()
-      page-writeback: pass in '0' for nr_pages writeback in laptop mode
-      fs-writeback: make wb_start_writeback() static
-      fs-writeback: move nr_pages == 0 logic to one location
-      fs-writeback: only allow one inflight and pending full flush
-      Merge branch 'wb-start-all' into for-linus
-      Merge branch 'nvme-4.14' of git://git.infradead.org/nvme into for-linus
-
-Josef Bacik (1):
-      nbd: ignore non-nbd ioctl's
-
-Keith Busch (2):
-      nvme-pci: initialize queue memory before interrupts
-      nvme-pci: Print invalid SGL only once
-
-Lukas Czerner (1):
-      fs: Fix page cache inconsistency when mixing buffered and AIO DIO
-
-Mikulas Patocka (1):
-      brd: fix overflow in __brd_direct_access
-
-Omar Sandoval (1):
-      loop: remove union of use_aio and ref in struct loop_cmd
-
-Sagi Grimberg (3):
-      nvme-core: Use nvme_wq to queue async events and fw activation
-      nvme-rdma: give up reconnect if state change fails
-      nvme-rdma: don't fully stop the controller in error recovery
-
-Shaohua Li (1):
-      block: fix a crash caused by wrong API
-
-Waiman Long (1):
-      blktrace: Fix potential deadlock between delete & sysfs ops
-
- block/blk-core.c                  |   3 ++
- block/bsg-lib.c                   |   1 -
- block/partition-generic.c         |   2 +-
- drivers/block/brd.c               |   2 +-
- drivers/block/loop.h              |   6 +--
- drivers/block/nbd.c               |   6 +++
- drivers/nvme/host/core.c          |   9 ++--
- drivers/nvme/host/fabrics.c       |  18 +++----
- drivers/nvme/host/fc.c            |  21 ++++----
- drivers/nvme/host/pci.c           |  34 ++++++++-----
- drivers/nvme/host/rdma.c          |   9 +++-
- drivers/nvme/target/core.c        |   9 ++--
- drivers/nvme/target/fabrics-cmd.c |   9 +++-
- drivers/nvme/target/fc.c          |  24 +++++----
- drivers/nvme/target/fcloop.c      | 104 ++++++++++++++------------------------
- drivers/nvme/target/nvmet.h       |   1 +
- drivers/scsi/lpfc/lpfc_nvme.c     |   2 +-
- drivers/scsi/qla2xxx/qla_nvme.c   |   2 +-
- fs/buffer.c                       |   2 +-
- fs/direct-io.c                    |  49 +++++++++++++++---
- fs/fs-writeback.c                 |  96 ++++++++++++++++++++++++-----------
- fs/iomap.c                        |  29 ++++++-----
- fs/sync.c                         |   2 +-
- include/linux/backing-dev-defs.h  |   1 +
- include/linux/backing-dev.h       |   2 -
- include/linux/blkdev.h            |   1 +
- include/linux/nvme-fc-driver.h    |  13 +++--
- include/linux/nvme.h              |  19 +++----
- include/linux/writeback.h         |   4 +-
- kernel/trace/blktrace.c           |  18 ++++---
- mm/filemap.c                      |  10 +++-
- mm/page-writeback.c               |  17 +------
- mm/vmscan.c                       |   2 +-
- 33 files changed, 300 insertions(+), 227 deletions(-)
+ Documentation/block/zoned-iosched.txt |  48 ++
+ block/Kconfig.iosched                 |  12 +
+ block/blk-mq-debugfs.h                |  14 -
+ block/blk-mq-sched.h                  |   7 -
+ drivers/scsi/Makefile                 |   1 +
+ drivers/scsi/sd.c                     |   1 +
+ drivers/scsi/sd.h                     |  57 +--
+ drivers/scsi/sd_zbc.c                 | 236 +++++----
+ drivers/scsi/sd_zbc.h                 |  79 +++
+ drivers/scsi/sd_zbc_iosched.c         | 934 ++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h                |  30 ++
+ include/scsi/scsi_proto.h             |  46 +-
+ 12 files changed, 1293 insertions(+), 172 deletions(-)
+ create mode 100644 Documentation/block/zoned-iosched.txt
+ create mode 100644 drivers/scsi/sd_zbc.h
+ create mode 100644 drivers/scsi/sd_zbc_iosched.c
 
 -- 
-Jens Axboe
+2.13.5
