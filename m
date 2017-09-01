@@ -1,48 +1,72 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	mgorman@techsingularity.net,
-	lee.tibbert@gmail.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 0/3] three bfq fixes restoring service guarantees with random sync writes in bg
-Date: Thu, 31 Aug 2017 08:10:17 +0200
-Message-Id: <20170831061020.4426-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43354 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750762AbdIADwx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 23:52:53 -0400
+Date: Fri, 1 Sep 2017 11:52:38 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+Subject: Re: [PATCH 5/9] block: introduce blk_drain_queue()
+Message-ID: <20170901035237.GG16525@ming.t460p>
+References: <20170831172728.15817-1-ming.lei@redhat.com>
+ <20170831172728.15817-6-ming.lei@redhat.com>
+ <1504218887.31872.66.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1504218887.31872.66.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi,
-while testing the read-write unfairness issues reported by Mel, I
-found BFQ failing to guarantee good responsiveness against heavy
-random sync writes in the background, i.e., multiple writers doing
-random writes and systematic fdatasync [1]. The failure was caused by
-three related bugs, because of which BFQ failed to guarantee to
-high-weight processes the expected fraction of the throughput.
+On Thu, Aug 31, 2017 at 10:34:49PM +0000, Bart Van Assche wrote:
+> On Fri, 2017-09-01 at 01:27 +0800, Ming Lei wrote:
+> > So that we can support legacy version of freezing queue,
+> > which is required by safe SCSI quiescing.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-core.c       | 16 ++++++++++++++++
+> >  include/linux/blkdev.h |  1 +
+> >  2 files changed, 17 insertions(+)
+> > 
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index d579501f24ba..636452f151ea 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -530,6 +530,22 @@ static void __blk_drain_queue(struct request_queue *q, bool drain_all)
+> >  }
+> >  
+> >  /**
+> > + * blk_drain_queue - drain requests from request_queue
+> > + * @q: queue to drain
+> > + *
+> > + * Drain requests from @q.  All pending requests are drained.
+> > + * The caller is responsible for ensuring that no new requests
+> > + * which need to be drained are queued.
+> > + */
+> > +void blk_drain_queue(struct request_queue *q)
+> > +{
+> > +	spin_lock_irq(q->queue_lock);
+> > +	__blk_drain_queue(q, true);
+> > +	spin_unlock_irq(q->queue_lock);
+> > +}
+> > +EXPORT_SYMBOL(blk_drain_queue);
+> 
+> Hello Ming,
+> 
+> Please drop this patch. As far as I can see this patch series introduces only
+> one call to blk_drain_queue(), namely in blk_freeze_queue_wait() in patch 6.
+> My proposal is to inline the body of blk_drain_queue() in blk_freeze_queue_wait()
+> instead of reintroducing blk_drain_queue() (see also commit 807592a4fafb;
+> "block: Let blk_drain_queue() caller obtain the queue lock").
 
-The three patches in this series fix these bugs. These fixes restore
-the usual BFQ service guarantees (and thus optimal responsiveness
-too), against the above background workload and, probably, against
-other similar workloads.
+Looks good, will do it in V2.
 
-Thanks,
-Paolo
-
-[1] https://lkml.org/lkml/2017/8/9/957
-
-Paolo Valente (3):
-  block, bfq: make lookup_next_entity push up vtime on expirations
-  block, bfq: remove direct switch to an entity in higher class
-  block, bfq: guarantee update_next_in_service always returns an
-    eligible entity
-
- block/bfq-iosched.c |  4 +--
- block/bfq-iosched.h |  4 +--
- block/bfq-wf2q.c    | 91 ++++++++++++++++++++++++++++++++---------------------
- 3 files changed, 60 insertions(+), 39 deletions(-)
-
---
-2.10.0
+-- 
+Ming
