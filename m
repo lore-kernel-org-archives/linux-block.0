@@ -1,65 +1,309 @@
-Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V2 07/12] scsi: sd_zbc.c: Use well defined macros
-Date: Fri,  8 Sep 2017 01:16:35 +0900
-Message-Id: <20170907161640.30465-8-damien.lemoal@wdc.com>
-In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
-References: <20170907161640.30465-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.didichuxing.com ([111.202.154.82]:16570 "EHLO
+        BJEXCAS002.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751924AbdIAOSW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 10:18:22 -0400
+Date: Fri, 1 Sep 2017 22:18:13 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH v2 2/2] blkcg: add wrappers for struct blkcg_policy operations
+Message-ID: <ad07bbf2ee0a7ccb879241ab2bbc7a7915f3a5a8.1504275001.git.zhangweiping@didichuxing.com>
+References: <cover.1504275001.git.zhangweiping@didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1504275001.git.zhangweiping@didichuxing.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-instead of open coding, use the min() macro to calculate a report zones
-reply buffer length in sd_zbc_check_zone_size() and the round_up()
-macro for calculating the number of zones in sd_zbc_setup().
+Some blkcg policies may not implement all operations in struct blkcg_policy,
+add wrappers for these pol->xxx_fn.
 
-No functional change is introduced by this patch.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- drivers/scsi/sd_zbc.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ block/blk-cgroup.c         | 53 ++++++++++++++++------------------
+ include/linux/blk-cgroup.h | 72 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index a25a940243a9..8a45db8bd6e7 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -403,7 +403,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
- 	return 0;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 0c45870..8588739 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -71,7 +71,7 @@ static void blkg_free(struct blkcg_gq *blkg)
+ 
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++)
+ 		if (blkg->pd[i])
+-			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
++			blkg_pol_free_pd(blkcg_policy[i], blkg->pd[i]);
+ 
+ 	if (blkg->blkcg != &blkcg_root)
+ 		blk_exit_rl(blkg->q, &blkg->rl);
+@@ -124,7 +124,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 			continue;
+ 
+ 		/* alloc per-policy data and attach it to blkg */
+-		pd = pol->pd_alloc_fn(gfp_mask, q->node);
++		pd = blkg_pol_alloc_pd(pol, gfp_mask, q->node);
+ 		if (!pd)
+ 			goto err_free;
+ 
+@@ -218,8 +218,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 		struct blkcg_policy *pol = blkcg_policy[i];
+ 
+-		if (blkg->pd[i] && pol->pd_init_fn)
+-			pol->pd_init_fn(blkg->pd[i]);
++		if (blkg->pd[i])
++			blkg_pol_init_pd(pol, blkg->pd[i]);
+ 	}
+ 
+ 	/* insert */
+@@ -232,8 +232,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 			struct blkcg_policy *pol = blkcg_policy[i];
+ 
+-			if (blkg->pd[i] && pol->pd_online_fn)
+-				pol->pd_online_fn(blkg->pd[i]);
++			if (blkg->pd[i])
++				blkg_pol_online_pd(pol, blkg->pd[i]);
+ 		}
+ 	}
+ 	blkg->online = true;
+@@ -323,8 +323,8 @@ static void blkg_destroy(struct blkcg_gq *blkg)
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 		struct blkcg_policy *pol = blkcg_policy[i];
+ 
+-		if (blkg->pd[i] && pol->pd_offline_fn)
+-			pol->pd_offline_fn(blkg->pd[i]);
++		if (blkg->pd[i])
++			blkg_pol_offline_pd(pol, blkg->pd[i]);
+ 	}
+ 
+ 	if (parent) {
+@@ -457,8 +457,8 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+ 		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 			struct blkcg_policy *pol = blkcg_policy[i];
+ 
+-			if (blkg->pd[i] && pol->pd_reset_stats_fn)
+-				pol->pd_reset_stats_fn(blkg->pd[i]);
++			if (blkg->pd[i])
++				blkg_pol_reset_pd_stats(pol, blkg->pd[i]);
+ 		}
+ 	}
+ 
+@@ -1045,7 +1045,7 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
+ 
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++)
+ 		if (blkcg->cpd[i])
+-			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
++			blkcg_pol_free_cpd(blkcg_policy[i], blkcg->cpd[i]);
+ 
+ 	mutex_unlock(&blkcg_pol_mutex);
+ 
+@@ -1084,7 +1084,7 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
+ 		if (!pol || !pol->cpd_alloc_fn)
+ 			continue;
+ 
+-		cpd = pol->cpd_alloc_fn(GFP_KERNEL);
++		cpd = blkcg_pol_alloc_cpd(pol, GFP_KERNEL);
+ 		if (!cpd) {
+ 			ret = ERR_PTR(-ENOMEM);
+ 			goto free_pd_blkcg;
+@@ -1092,8 +1092,7 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
+ 		blkcg->cpd[i] = cpd;
+ 		cpd->blkcg = blkcg;
+ 		cpd->plid = i;
+-		if (pol->cpd_init_fn)
+-			pol->cpd_init_fn(cpd);
++		blkcg_pol_init_cpd(pol, cpd);
+ 	}
+ 
+ 	spin_lock_init(&blkcg->lock);
+@@ -1110,7 +1109,7 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
+ free_pd_blkcg:
+ 	for (i--; i >= 0; i--)
+ 		if (blkcg->cpd[i])
+-			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
++			blkcg_pol_free_cpd(blkcg_policy[i], blkcg->cpd[i]);
+ free_blkcg:
+ 	kfree(blkcg);
+ 	mutex_unlock(&blkcg_pol_mutex);
+@@ -1244,7 +1243,7 @@ static void blkcg_bind(struct cgroup_subsys_state *root_css)
+ 
+ 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node)
+ 			if (blkcg->cpd[pol->plid])
+-				pol->cpd_bind_fn(blkcg->cpd[pol->plid]);
++				blkcg_pol_bind_cpd(pol, blkcg->cpd[pol->plid]);
+ 	}
+ 	mutex_unlock(&blkcg_pol_mutex);
  }
+@@ -1301,7 +1300,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		blk_queue_bypass_start(q);
+ pd_prealloc:
+ 	if (!pd_prealloc) {
+-		pd_prealloc = pol->pd_alloc_fn(GFP_KERNEL, q->node);
++		pd_prealloc = blkg_pol_alloc_pd(pol, GFP_KERNEL, q->node);
+ 		if (!pd_prealloc) {
+ 			ret = -ENOMEM;
+ 			goto out_bypass_end;
+@@ -1316,7 +1315,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		if (blkg->pd[pol->plid])
+ 			continue;
  
--#define SD_ZBC_BUF_SIZE 131072
-+#define SD_ZBC_BUF_SIZE 131072U
+-		pd = pol->pd_alloc_fn(GFP_NOWAIT | __GFP_NOWARN, q->node);
++		pd = blkg_pol_alloc_pd(pol, GFP_NOWAIT | __GFP_NOWARN, q->node);
+ 		if (!pd)
+ 			swap(pd, pd_prealloc);
+ 		if (!pd) {
+@@ -1327,8 +1326,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 		blkg->pd[pol->plid] = pd;
+ 		pd->blkg = blkg;
+ 		pd->plid = pol->plid;
+-		if (pol->pd_init_fn)
+-			pol->pd_init_fn(pd);
++		blkg_pol_init_pd(pol, pd);
+ 	}
  
- static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- {
-@@ -447,10 +447,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 		/* Parse REPORT ZONES header */
- 		list_length = get_unaligned_be32(&buf[0]) + 64;
- 		rec = buf + 64;
--		if (list_length < SD_ZBC_BUF_SIZE)
--			buf_len = list_length;
--		else
--			buf_len = SD_ZBC_BUF_SIZE;
-+		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
+ 	__set_bit(pol->plid, q->blkcg_pols);
+@@ -1341,7 +1339,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 	else
+ 		blk_queue_bypass_end(q);
+ 	if (pd_prealloc)
+-		pol->pd_free_fn(pd_prealloc);
++		blkg_pol_free_pd(pol, pd_prealloc);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(blkcg_activate_policy);
+@@ -1376,9 +1374,8 @@ void blkcg_deactivate_policy(struct request_queue *q,
+ 		spin_lock(&blkg->blkcg->lock);
  
- 		/* Parse zone descriptors */
- 		while (rec < buf + buf_len) {
-@@ -520,9 +517,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
--	if (sdkp->capacity & (sdkp->zone_blocks - 1))
--		sdkp->nr_zones++;
-+	sdkp->nr_zones =
-+		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
+ 		if (blkg->pd[pol->plid]) {
+-			if (pol->pd_offline_fn)
+-				pol->pd_offline_fn(blkg->pd[pol->plid]);
+-			pol->pd_free_fn(blkg->pd[pol->plid]);
++			blkg_pol_offline_pd(pol, blkg->pd[pol->plid]);
++			blkg_pol_free_pd(pol, blkg->pd[pol->plid]);
+ 			blkg->pd[pol->plid] = NULL;
+ 		}
  
- 	if (!sdkp->zones_wlock) {
- 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
+@@ -1426,14 +1423,14 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
+ 			struct blkcg_policy_data *cpd;
+ 
+-			cpd = pol->cpd_alloc_fn(GFP_KERNEL);
++			cpd = blkcg_pol_alloc_cpd(pol, GFP_KERNEL);
+ 			if (!cpd)
+ 				goto err_free_cpds;
+ 
+ 			blkcg->cpd[pol->plid] = cpd;
+ 			cpd->blkcg = blkcg;
+ 			cpd->plid = pol->plid;
+-			pol->cpd_init_fn(cpd);
++			blkcg_pol_init_cpd(pol, cpd);
+ 		}
+ 	}
+ 
+@@ -1453,7 +1450,7 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 	if (pol->cpd_free_fn) {
+ 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
+ 			if (blkcg->cpd[pol->plid]) {
+-				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
++				blkcg_pol_free_cpd(pol, blkcg->cpd[pol->plid]);
+ 				blkcg->cpd[pol->plid] = NULL;
+ 			}
+ 		}
+@@ -1493,7 +1490,7 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
+ 	if (pol->cpd_free_fn) {
+ 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
+ 			if (blkcg->cpd[pol->plid]) {
+-				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
++				blkcg_pol_free_cpd(pol, blkcg->cpd[pol->plid]);
+ 				blkcg->cpd[pol->plid] = NULL;
+ 			}
+ 		}
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 7104bea..08904d6 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -166,6 +166,78 @@ struct blkcg_policy {
+ 	blkcg_pol_reset_pd_stats_fn	*pd_reset_stats_fn;
+ };
+ 
++static inline struct blkcg_policy_data *
++blkcg_pol_alloc_cpd(struct blkcg_policy *pol, gfp_t gfp)
++{
++	if(pol->cpd_alloc_fn)
++		return pol->cpd_alloc_fn(gfp);
++	return NULL;
++}
++
++static inline void
++blkcg_pol_init_cpd(struct blkcg_policy *pol, struct blkcg_policy_data * cpd)
++{
++	if (pol->cpd_init_fn)
++		pol->cpd_init_fn(cpd);
++}
++
++static inline void
++blkcg_pol_free_cpd(struct blkcg_policy *pol, struct blkcg_policy_data * cpd)
++{
++	if (pol->cpd_free_fn)
++		pol->cpd_free_fn(cpd);
++}
++
++static inline void
++blkcg_pol_bind_cpd(struct blkcg_policy *pol, struct blkcg_policy_data * cpd)
++{
++	if (pol->cpd_bind_fn)
++		pol->cpd_bind_fn(cpd);
++}
++
++static inline struct blkg_policy_data *
++blkg_pol_alloc_pd(const struct blkcg_policy *pol, gfp_t gfp, int node)
++{
++	if (pol->pd_alloc_fn)
++		return pol->pd_alloc_fn(gfp, node);
++	return NULL;
++}
++
++static inline void
++blkg_pol_init_pd(const struct blkcg_policy *pol, struct blkg_policy_data *pd)
++{
++	if (pol->pd_init_fn)
++		pol->pd_init_fn(pd);
++}
++
++static inline void
++blkg_pol_online_pd(struct blkcg_policy *pol, struct blkg_policy_data *pd)
++{
++	if (pol->pd_online_fn)
++		pol->pd_online_fn(pd);
++}
++
++static inline void
++blkg_pol_offline_pd(const struct blkcg_policy *pol, struct blkg_policy_data *pd)
++{
++	if (pol->pd_offline_fn)
++		pol->pd_offline_fn(pd);
++}
++
++static inline void
++blkg_pol_free_pd(const struct blkcg_policy *pol, struct blkg_policy_data *pd)
++{
++	if (pol->pd_free_fn)
++		pol->pd_free_fn(pd);
++}
++
++static inline void
++blkg_pol_reset_pd_stats(struct blkcg_policy *pol, struct blkg_policy_data *pd)
++{
++	if (pol->pd_reset_stats_fn)
++		pol->pd_reset_stats_fn(pd);
++}
++
+ extern struct blkcg blkcg_root;
+ extern struct cgroup_subsys_state * const blkcg_root_css;
+ 
 -- 
-2.13.5
+2.9.4
