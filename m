@@ -1,24 +1,53 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: Re: [PATCH 5/8] scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
-Date: Fri, 1 Sep 2017 16:15:49 +0000
-Message-ID: <1504282546.14386.34.camel@wdc.com>
+Return-Path: <prvs=410ad2225=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 5/8] scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
+Date: Fri,  1 Sep 2017 20:36:28 +0900
+Message-Id: <20170901113631.12323-6-damien.lemoal@wdc.com>
+In-Reply-To: <20170901113631.12323-1-damien.lemoal@wdc.com>
 References: <20170901113631.12323-1-damien.lemoal@wdc.com>
-	 <20170901113631.12323-6-damien.lemoal@wdc.com>
-In-Reply-To: <20170901113631.12323-6-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTA5LTAxIGF0IDIwOjM2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gVGhlIHRocmVlIHZhbHVlcyBzdGFydGluZyBhdCBieXRlIDggb2YgdGhlIFpvbmVkIEJsb2Nr
-IERldmljZQ0KPiBDaGFyYWN0ZXJpc3RpY3MgVlBEIHBhZ2UgQjZoIGFyZSAzMiBiaXRzIHZhbHVl
-cywgbm90IDY0Yml0cy4gU28gdXNlDQo+IGdldF91bmFsaWduZWRfYmUzMigpIHRvIHJldHJpZXZl
-IHRoZSB2YWx1ZXMgYW5kIG5vdCBnZXRfdW5hbGlnbmVkX2JlNjQoKQ0KDQpSZXZpZXdlZC1ieTog
-QmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg==
+The three values starting at byte 8 of the Zoned Block Device
+Characteristics VPD page B6h are 32 bits values, not 64bits. So use
+get_unaligned_be32() to retrieve the values and not get_unaligned_be64()
+
+Fixes: 89d947561077 ("sd: Implement support for ZBC devices")
+Cc: <stable@vger.kernel.org>
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/scsi/sd_zbc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 810377007665..0e6b5f5d14e7 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -356,15 +356,15 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
+ 	if (sdkp->device->type != TYPE_ZBC) {
+ 		/* Host-aware */
+ 		sdkp->urswrz = 1;
+-		sdkp->zones_optimal_open = get_unaligned_be64(&buf[8]);
+-		sdkp->zones_optimal_nonseq = get_unaligned_be64(&buf[12]);
++		sdkp->zones_optimal_open = get_unaligned_be32(&buf[8]);
++		sdkp->zones_optimal_nonseq = get_unaligned_be32(&buf[12]);
+ 		sdkp->zones_max_open = 0;
+ 	} else {
+ 		/* Host-managed */
+ 		sdkp->urswrz = buf[4] & 1;
+ 		sdkp->zones_optimal_open = 0;
+ 		sdkp->zones_optimal_nonseq = 0;
+-		sdkp->zones_max_open = get_unaligned_be64(&buf[16]);
++		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
+ 	}
+ 
+ 	return 0;
+-- 
+2.13.5
