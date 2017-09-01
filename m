@@ -1,44 +1,24 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 09/10] SCSI: transport_spi: resume a quiesced device
-Date: Mon, 11 Sep 2017 19:10:20 +0800
-Message-Id: <20170911111021.25810-10-ming.lei@redhat.com>
-In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
-References: <20170911111021.25810-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: Re: [PATCH 5/8] scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
+Date: Fri, 1 Sep 2017 16:15:49 +0000
+Message-ID: <1504282546.14386.34.camel@wdc.com>
+References: <20170901113631.12323-1-damien.lemoal@wdc.com>
+	 <20170901113631.12323-6-damien.lemoal@wdc.com>
+In-Reply-To: <20170901113631.12323-6-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-We have to preempt freeze queue in scsi_device_quiesce(),
-and unfreeze in scsi_device_resume(), so call scsi_device_resume()
-for the device which is quiesced by scsi_device_quiesce().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_transport_spi.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
-index d0219e36080c..bdecf99b6ab1 100644
---- a/drivers/scsi/scsi_transport_spi.c
-+++ b/drivers/scsi/scsi_transport_spi.c
-@@ -1040,6 +1040,9 @@ spi_dv_device(struct scsi_device *sdev)
- 
- 	scsi_target_resume(starget);
- 
-+	/* undo what scsi_device_quiesce() did */
-+	scsi_device_resume(sdev);
-+
- 	spi_initial_dv(starget) = 1;
- 
-  out_free:
--- 
-2.9.5
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDIwOjM2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gVGhlIHRocmVlIHZhbHVlcyBzdGFydGluZyBhdCBieXRlIDggb2YgdGhlIFpvbmVkIEJsb2Nr
+IERldmljZQ0KPiBDaGFyYWN0ZXJpc3RpY3MgVlBEIHBhZ2UgQjZoIGFyZSAzMiBiaXRzIHZhbHVl
+cywgbm90IDY0Yml0cy4gU28gdXNlDQo+IGdldF91bmFsaWduZWRfYmUzMigpIHRvIHJldHJpZXZl
+IHRoZSB2YWx1ZXMgYW5kIG5vdCBnZXRfdW5hbGlnbmVkX2JlNjQoKQ0KDQpSZXZpZXdlZC1ieTog
+QmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg==
