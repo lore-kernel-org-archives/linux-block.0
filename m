@@ -1,105 +1,41 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Cc: Tang Junhui <tang.junhui@zte.com.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH 13/13] bcache: initialize dirty stripes in flash_dev_run()
-Date: Thu,  7 Sep 2017 01:28:53 +0800
-Message-Id: <20170906172853.123310-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:41220 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751778AbdIAMo4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 08:44:56 -0400
+Date: Fri, 1 Sep 2017 14:44:54 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>
+Subject: Re: [PATCH 4/9] blk-mq: only run hw queues for blk-mq
+Message-ID: <20170901124454.pfo37ycozp5knubw@linux-x5ow.site>
+References: <20170831172728.15817-1-ming.lei@redhat.com>
+ <20170831172728.15817-5-ming.lei@redhat.com>
+ <20170901081634.gliggrnp3wlrysrv@linux-x5ow.site>
+ <20170901123339.GA20709@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170901123339.GA20709@ming.t460p>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On Fri, Sep 01, 2017 at 08:33:40PM +0800, Ming Lei wrote:
+> Given it is the only case that blk_mq_run_hw_queues() is run on
+> !q->mq_ops now, I suggest to check q->mq_ops outside, otherwise
+> it can be a bit overkill.
 
-bcache uses a Proportion-Differentiation Controller algorithm to control
-writeback rate to cached devices. In the PD controller algorithm, dirty
-stripes of thin flash device should not be counted in, because flash only
-volumes never write back dirty data.
-
-Currently dirty stripe counter for thin flash device is not initialized
-when the thin flash device starts. Which means the following calculation
-in PD controller will reference an undefined dirty stripes number, and
-all cached devices attached to the same cache set where the thin flash
-device lies on may have an inaccurate writeback rate.
-
-This patch calles bch_sectors_dirty_init() in flash_dev_run(), to
-correctly initialize dirty stripe counter when the thin flash device
-starts to run. This patch also does following parameter data type change,
- -void bch_sectors_dirty_init(struct cached_dev *dc);
- +void bch_sectors_dirty_init(struct bcache_device *);
-to call this function conveniently in flash_dev_run().
-
-(Commit log is composed by Coly Li)
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
-Cc: stable@vger.kernel.org
----
- drivers/md/bcache/super.c     | 3 ++-
- drivers/md/bcache/writeback.c | 8 ++++----
- drivers/md/bcache/writeback.h | 2 +-
- 3 files changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8352fad765f6..60d2c3ce192e 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1026,7 +1026,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
- 	}
- 
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
--		bch_sectors_dirty_init(dc);
-+		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
- 		atomic_inc(&dc->count);
- 		bch_writeback_queue(dc);
-@@ -1228,6 +1228,7 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
- 		goto err;
- 
- 	bcache_device_attach(d, c, u - c->uuids);
-+	bch_sectors_dirty_init(d);
- 	bch_flash_dev_request_init(d);
- 	add_disk(d->disk);
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 42c66e76f05e..4fd332a7402e 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -482,17 +482,17 @@ static int sectors_dirty_init_fn(struct btree_op *_op, struct btree *b,
- 	return MAP_CONTINUE;
- }
- 
--void bch_sectors_dirty_init(struct cached_dev *dc)
-+void bch_sectors_dirty_init(struct bcache_device *d)
- {
- 	struct sectors_dirty_init op;
- 
- 	bch_btree_op_init(&op.op, -1);
--	op.inode = dc->disk.id;
-+	op.inode = d->id;
- 
--	bch_btree_map_keys(&op.op, dc->disk.c, &KEY(op.inode, 0, 0),
-+	bch_btree_map_keys(&op.op, d->c, &KEY(op.inode, 0, 0),
- 			   sectors_dirty_init_fn, 0);
- 
--	dc->disk.sectors_dirty_last = bcache_dev_sectors_dirty(&dc->disk);
-+	d->sectors_dirty_last = bcache_dev_sectors_dirty(d);
- }
- 
- void bch_cached_dev_writeback_init(struct cached_dev *dc)
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 629bd1a502fd..c992f06c1e9a 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -84,7 +84,7 @@ static inline void bch_writeback_add(struct cached_dev *dc)
- 
- void bcache_dev_sectors_dirty_add(struct cache_set *, unsigned, uint64_t, int);
- 
--void bch_sectors_dirty_init(struct cached_dev *dc);
-+void bch_sectors_dirty_init(struct bcache_device *);
- void bch_cached_dev_writeback_init(struct cached_dev *);
- int bch_cached_dev_writeback_start(struct cached_dev *);
- 
+Fair enough,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.13.5
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
