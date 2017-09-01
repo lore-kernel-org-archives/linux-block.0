@@ -1,80 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42746 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752660AbdIBPTg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Sep 2017 11:19:36 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 11/14] block: add check on elevator for supporting bio merge via hashtable from blk-mq sw queue
-Date: Sat,  2 Sep 2017 23:17:26 +0800
-Message-Id: <20170902151729.6162-12-ming.lei@redhat.com>
-In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
-References: <20170902151729.6162-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH 4/8] scsi: sd_zbc: Reorganize and cleanup
+Date: Fri, 1 Sep 2017 16:14:02 +0000
+Message-ID: <1504282441.14386.32.camel@wdc.com>
+References: <20170901113631.12323-1-damien.lemoal@wdc.com>
+	 <20170901113631.12323-5-damien.lemoal@wdc.com>
+In-Reply-To: <20170901113631.12323-5-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_sched_try_merge() will be reused in following patches
-to support bio merge to blk-mq sw queue, so add checkes to
-related functions which are called from blk_mq_sched_try_merge().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/elevator.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/block/elevator.c b/block/elevator.c
-index e11c7873fc21..2424aea85393 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -71,6 +71,10 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
- 	if (!blk_rq_merge_ok(rq, bio))
- 		return false;
- 
-+	/* We need to support to merge bio from sw queue */
-+	if (!rq->q->elevator)
-+		return true;
-+
- 	if (!elv_iosched_allow_bio_merge(rq, bio))
- 		return false;
- 
-@@ -449,6 +453,10 @@ static enum elv_merge __elv_merge(struct request_queue *q,
- 		return ELEVATOR_BACK_MERGE;
- 	}
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return ELEVATOR_NO_MERGE;
-+
- 	if (e->uses_mq && e->type->ops.mq.request_merge)
- 		return e->type->ops.mq.request_merge(q, req, bio);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_merge_fn)
-@@ -711,6 +719,10 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.next_request)
- 		return e->type->ops.mq.next_request(q, rq);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_latter_req_fn)
-@@ -723,6 +735,10 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.former_request)
- 		return e->type->ops.mq.former_request(q, rq);
- 	if (!e->uses_mq && e->type->ops.sq.elevator_former_req_fn)
--- 
-2.9.5
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDIwOjM2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gSW50cm9kdWNlIHNkX3piYy5oIGZvciB6YmMgcmVsYXRlZCBkZWNsYXJhdGlvbnMgKGF2b2lk
+IGNsdXR0ZXJpbmcgc2QuaCkuDQo+IA0KPiBGaXggY29tbWVudHMgc3R5bGUgaW4gc2RfemJjLmMg
+KGRvIG5vdCB1c2UgZG9jdW1lbnRhdGlvbiBmb3JtYXQpIGFuZA0KPiBhZGQvZml4IGNvbW1lbnRz
+IHRvIGVuaGFuY2UgZXhwbGFuYXRpb25zLiBBbHNvIHJlbW92ZSBhIHVzZWxlc3MgYmxhbmsNCj4g
+bGluZSBpbiBzZF96YmNfcmVhZF96b25lcygpLg0KPiANCj4gUmVhcnJhbmdlIHNkX3piY19zZXR1
+cCgpIHRvIGluY2x1ZGUgdXNlXzE2X2Zvcl9ydyBhbmQgdXNlXzEwX2Zvcl9ydw0KPiBhc3NpZ25t
+ZW50IGFuZCBzaW1wbGlmeSBucl96b25lcyBjYWxjdWxhdGlvbi4NCj4gDQo+IEZpbmFsbHksIHVz
+ZSB0aGUgbWluKCkgbWFjcm8gc2RfemJjX2NoZWNrX3pvbmVfc2l6ZSgpIHRvIGdldCBhIHJlcG9y
+dA0KPiB6b25lIHJlcGx5IHNpemUgaW5zdGVhZCBvZiB0aGUgb3BlbiBjb2RlZCB2ZXJzaW9uLg0K
+DQpIZWxsbyBEYW1pZW4sDQoNClNob3VsZCB0aGlzIHBhdGNoIHBlcmhhcHMgYmUgc3BsaXQgaW50
+byBtdWx0aXBsZSBwYXRjaGVzIHRvIG1ha2UgcmV2aWV3DQplYXNpZXI/DQoNCj4gK3N0YXRpYyBp
+bmxpbmUgdm9pZCBzZF96YmNfcmVtb3ZlKHN0cnVjdCBzY3NpX2Rpc2sgKnNka3ApIHt9DQoNClBs
+ZWFzZSB1c2UgdGhlIHNhbWUgY29kaW5nIHN0eWxlIGFzIGluIG90aGVyIExpbnV4IGtlcm5lbCBo
+ZWFkZXIgZmlsZXMsDQpuYW1lbHkgJ3snIGFuZCAnfScgYm90aCBhdCB0aGUgc3RhcnQgb2YgYSBs
+aW5lLiBTZWUgZS5nLiBpbmNsdWRlL2xpbnV4L3N5c2ZzLmguDQoNClRoYW5rcywNCg0KQmFydC4=
