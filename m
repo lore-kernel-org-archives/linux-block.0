@@ -1,83 +1,29 @@
-Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V2 11/12] scsi: sd: Introduce scsi_disk_from_queue()
-Date: Fri,  8 Sep 2017 01:16:39 +0900
-Message-Id: <20170907161640.30465-12-damien.lemoal@wdc.com>
-In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
-References: <20170907161640.30465-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:19076 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752072AbdIAPwd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2017 11:52:33 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "surajschoudhari@gmail.com" <surajschoudhari@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: blk_get_request sleeps in schedule
+Date: Fri, 1 Sep 2017 15:51:45 +0000
+Message-ID: <1504281104.14386.20.camel@wdc.com>
+References: <CAGvB2rNiyP58+TTgc-D9RzesvQWx1RgjjepQBujhZQa5Cx-f9A@mail.gmail.com>
+In-Reply-To: <CAGvB2rNiyP58+TTgc-D9RzesvQWx1RgjjepQBujhZQa5Cx-f9A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Using scsi_device_from_queue(), return the scsi_disk structure
-associated with a request queue if the device is a disk.
-Export this function to make it available to modules.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/scsi/sd.c | 32 ++++++++++++++++++++++++++++++++
- drivers/scsi/sd.h |  2 ++
- 2 files changed, 34 insertions(+)
-
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 1cd113df2d3a..ff9fff4de3e6 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -631,6 +631,38 @@ static void scsi_disk_put(struct scsi_disk *sdkp)
- 	mutex_unlock(&sd_ref_mutex);
- }
- 
-+static int scsi_disk_lookup(struct device *dev, void *data)
-+{
-+	struct scsi_disk **sdkp = data;
-+
-+	if (!*sdkp && dev->class == &sd_disk_class)
-+		*sdkp = to_scsi_disk(dev);
-+
-+	return 0;
-+}
-+
-+/**
-+ * scsi_disk_from_queue - return scsi disk associated with a request_queue
-+ * @q: The request queue to return the scsi disk from
-+ *
-+ * Return the struct scsi_disk associated with a request queue or NULL if the
-+ * request_queue does not reference a SCSI device or a if the device is
-+ * not a disk.
-+ */
-+struct scsi_disk *scsi_disk_from_queue(struct request_queue *q)
-+{
-+	struct scsi_device *sdev = scsi_device_from_queue(q);
-+	struct scsi_disk *sdkp = NULL;
-+
-+	if (!sdev)
-+		return NULL;
-+
-+	device_for_each_child(&sdev->sdev_gendev, &sdkp, scsi_disk_lookup);
-+
-+	return sdkp;
-+}
-+EXPORT_SYMBOL_GPL(scsi_disk_from_queue);
-+
- #ifdef CONFIG_BLK_SED_OPAL
- static int sd_sec_submit(void *data, u16 spsp, u8 secp, void *buffer,
- 		size_t len, bool send)
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 3ea82c8cecd5..92113a9e2b20 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -126,6 +126,8 @@ static inline struct scsi_disk *scsi_disk(struct gendisk *disk)
- 	return container_of(disk->private_data, struct scsi_disk, driver);
- }
- 
-+struct scsi_disk *scsi_disk_from_queue(struct request_queue *q);
-+
- #define sd_printk(prefix, sdsk, fmt, a...)				\
-         (sdsk)->disk ?							\
- 	      sdev_prefix_printk(prefix, (sdsk)->device,		\
--- 
-2.13.5
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDA4OjA3ICswNTMwLCBTdXJhaiBDaG91ZGhhcmkgd3JvdGU6
+DQo+IE9uIG15IHRlc3Qgc3lzdGVtLCBibGtfZ2V0X3JlcXVlc3QoKSBjb250aW51b3VzbHkgaGFu
+Z3MgaW4gc2NoZWR1bGUoKS4NCj4gDQo+IHNjaGVkdWxlKzB4MzUvMHg4MA0KPiBzY2hlZHVsZV90
+aW1lb3V0KzB4MjM3LzB4MmQwDQo+IGlvX3NjaGVkdWxlX3RpbWVvdXQrMHhhNi8weDExMA0KPiBn
+ZXRfcmVxdWVzdCsweDI1OC8weDc2MA0KPiBibGtfZ2V0X3JlcXVlc3QrMHg3Zi8weDEwMA0KPiAN
+Cj4gSSBzdXNwZWN0IHRoZSBwcm9ibGVtIG1pZ2h0IGJlIGR1ZSB0byBfX2dldF9yZXF1ZXN0IHJl
+dHVybmluZyBFTk9NRU0sDQo+IGxlYWRpbmcgdG8gc2xlZXAgaW4gc2NoZWR1bGUoKS4NCg0KSGVs
+bG8gU3VyYWosDQoNCkluIGFkZGl0aW9uIHRvIHdoYXQgSmVucyB3cm90ZTogcGxlYXNlIGNvbnNp
+ZGVyIHN3aXRjaGluZyB0byBibGstbXEgc3VjaA0KdGhhdCB5b3UgY2FuIHVzZSB0aGUgaW5mb3Jt
+YXRpb24gaW4gL3N5cy9rZXJuZWwvZGVidWcvYmxvY2sgdG8gYW5hbHl6ZQ0KdGhpcyBmdXJ0aGVy
+Lg0KDQpCYXJ0Lg==
