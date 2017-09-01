@@ -1,356 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:44767 "EHLO
-        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751898AbdINKeS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2017 06:34:18 -0400
-Received: by mail-wm0-f47.google.com with SMTP id 189so5002141wmh.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 03:34:17 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/5] lightnvm: pblk: simplify work_queue mempool
-Date: Thu, 14 Sep 2017 12:33:44 +0200
-Message-Id: <1505385227-28706-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
-References: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:46108 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752328AbdIASvK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 14:51:10 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 3/8] blk-mq: only run hw queues for blk-mq
+Date: Sat,  2 Sep 2017 02:49:53 +0800
+Message-Id: <20170901184958.19452-5-ming.lei@redhat.com>
+In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
+References: <20170901184958.19452-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In pblk, we have a mempool to allocate a generic structure that we
-pass along workqueues. This is heavily used in the GC path in order
-to have enough inflight reads and fully utilize the GC bandwidth.
+This patch just makes it explicitely.
 
-However, the current GC path copies data to the host memory and puts it
-back into the write buffer. This requires a vmalloc allocation for the
-data and a memory copy. Thus, guaranteeing the allocation by using a
-mempool for the structure in itself does not give us much. Until we
-implement support for vector copy to avoid moving data through the host,
-just allocate the workqueue structure using kmalloc.
-
-This allows us to have a much smaller mempool.
-
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-core.c  | 13 +++++++------
- drivers/lightnvm/pblk-gc.c    | 32 ++++++++++++++++----------------
- drivers/lightnvm/pblk-init.c  | 32 ++++++++++++++++----------------
- drivers/lightnvm/pblk-write.c |  4 ++--
- drivers/lightnvm/pblk.h       | 11 ++++++-----
- 5 files changed, 47 insertions(+), 45 deletions(-)
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index b114b57af0c3..b7a6b223b1a5 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -33,7 +33,8 @@ static void pblk_mark_bb(struct pblk *pblk, struct pblk_line *line,
- 		pr_err("pblk: attempted to erase bb: line:%d, pos:%d\n",
- 							line->id, pos);
- 
--	pblk_line_run_ws(pblk, NULL, ppa, pblk_line_mark_bb, pblk->bb_wq);
-+	pblk_gen_run_ws(pblk, NULL, ppa, pblk_line_mark_bb,
-+						GFP_ATOMIC, pblk->bb_wq);
- }
- 
- static void __pblk_end_io_erase(struct pblk *pblk, struct nvm_rq *rqd)
-@@ -1627,7 +1628,7 @@ void pblk_line_close_ws(struct work_struct *work)
- 	struct pblk_line *line = line_ws->line;
- 
- 	pblk_line_close(pblk, line);
--	mempool_free(line_ws, pblk->line_ws_pool);
-+	mempool_free(line_ws, pblk->gen_ws_pool);
- }
- 
- void pblk_line_mark_bb(struct work_struct *work)
-@@ -1652,16 +1653,16 @@ void pblk_line_mark_bb(struct work_struct *work)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8cf1f7cbef2b..4c532d8612e1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+ 	if (freeze_depth == 1) {
+ 		percpu_ref_kill(&q->q_usage_counter);
+-		blk_mq_run_hw_queues(q, false);
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, false);
  	}
- 
- 	kfree(ppa);
--	mempool_free(line_ws, pblk->line_ws_pool);
-+	mempool_free(line_ws, pblk->gen_ws_pool);
  }
- 
--void pblk_line_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
--		      void (*work)(struct work_struct *),
-+void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
-+		      void (*work)(struct work_struct *), gfp_t gfp_mask,
- 		      struct workqueue_struct *wq)
- {
- 	struct pblk_line_ws *line_ws;
- 
--	line_ws = mempool_alloc(pblk->line_ws_pool, GFP_ATOMIC);
-+	line_ws = mempool_alloc(pblk->gen_ws_pool, gfp_mask);
- 	if (!line_ws)
- 		return;
- 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 6090d28f7995..f163829ecca8 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -136,12 +136,12 @@ static void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
- 
- static void pblk_gc_line_ws(struct work_struct *work)
- {
--	struct pblk_line_ws *line_rq_ws = container_of(work,
-+	struct pblk_line_ws *gc_rq_ws = container_of(work,
- 						struct pblk_line_ws, ws);
--	struct pblk *pblk = line_rq_ws->pblk;
-+	struct pblk *pblk = gc_rq_ws->pblk;
- 	struct pblk_gc *gc = &pblk->gc;
--	struct pblk_line *line = line_rq_ws->line;
--	struct pblk_gc_rq *gc_rq = line_rq_ws->priv;
-+	struct pblk_line *line = gc_rq_ws->line;
-+	struct pblk_gc_rq *gc_rq = gc_rq_ws->priv;
- 
- 	up(&gc->gc_sem);
- 
-@@ -151,7 +151,7 @@ static void pblk_gc_line_ws(struct work_struct *work)
- 						gc_rq->nr_secs);
- 	}
- 
--	mempool_free(line_rq_ws, pblk->line_ws_pool);
-+	kfree(gc_rq_ws);
- }
- 
- static void pblk_gc_line_prepare_ws(struct work_struct *work)
-@@ -164,7 +164,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct pblk_gc *gc = &pblk->gc;
- 	struct line_emeta *emeta_buf;
--	struct pblk_line_ws *line_rq_ws;
-+	struct pblk_line_ws *gc_rq_ws;
- 	struct pblk_gc_rq *gc_rq;
- 	__le64 *lba_list;
- 	int sec_left, nr_secs, bit;
-@@ -223,19 +223,19 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	gc_rq->nr_secs = nr_secs;
- 	gc_rq->line = line;
- 
--	line_rq_ws = mempool_alloc(pblk->line_ws_pool, GFP_KERNEL);
--	if (!line_rq_ws)
-+	gc_rq_ws = kmalloc(sizeof(struct pblk_line_ws), GFP_KERNEL);
-+	if (!gc_rq_ws)
- 		goto fail_free_gc_rq;
- 
--	line_rq_ws->pblk = pblk;
--	line_rq_ws->line = line;
--	line_rq_ws->priv = gc_rq;
-+	gc_rq_ws->pblk = pblk;
-+	gc_rq_ws->line = line;
-+	gc_rq_ws->priv = gc_rq;
- 
- 	down(&gc->gc_sem);
- 	kref_get(&line->ref);
- 
--	INIT_WORK(&line_rq_ws->ws, pblk_gc_line_ws);
--	queue_work(gc->gc_line_reader_wq, &line_rq_ws->ws);
-+	INIT_WORK(&gc_rq_ws->ws, pblk_gc_line_ws);
-+	queue_work(gc->gc_line_reader_wq, &gc_rq_ws->ws);
- 
- 	sec_left -= nr_secs;
- 	if (sec_left > 0)
-@@ -243,7 +243,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 
- out:
- 	pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
--	mempool_free(line_ws, pblk->line_ws_pool);
-+	kfree(line_ws);
- 
- 	kref_put(&line->ref, pblk_line_put);
- 	atomic_dec(&gc->inflight_gc);
-@@ -256,7 +256,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	pblk_mfree(emeta_buf, l_mg->emeta_alloc_type);
- 	pblk_put_line_back(pblk, line);
- 	kref_put(&line->ref, pblk_line_put);
--	mempool_free(line_ws, pblk->line_ws_pool);
-+	kfree(line_ws);
- 	atomic_dec(&gc->inflight_gc);
- 
- 	pr_err("pblk: Failed to GC line %d\n", line->id);
-@@ -269,7 +269,7 @@ static int pblk_gc_line(struct pblk *pblk, struct pblk_line *line)
- 
- 	pr_debug("pblk: line '%d' being reclaimed for GC\n", line->id);
- 
--	line_ws = mempool_alloc(pblk->line_ws_pool, GFP_KERNEL);
-+	line_ws = kmalloc(sizeof(struct pblk_line_ws), GFP_KERNEL);
- 	if (!line_ws)
- 		return -ENOMEM;
- 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 19cb1906a56a..0c65abb96dc6 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -20,7 +20,7 @@
- 
- #include "pblk.h"
- 
--static struct kmem_cache *pblk_blk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
-+static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
- 				*pblk_w_rq_cache, *pblk_line_meta_cache;
- static DECLARE_RWSEM(pblk_lock);
- struct bio_set *pblk_bio_set;
-@@ -184,9 +184,9 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 	char cache_name[PBLK_CACHE_NAME_LEN];
- 
- 	down_write(&pblk_lock);
--	pblk_blk_ws_cache = kmem_cache_create("pblk_blk_ws",
-+	pblk_ws_cache = kmem_cache_create("pblk_blk_ws",
- 				sizeof(struct pblk_line_ws), 0, 0, NULL);
--	if (!pblk_blk_ws_cache) {
-+	if (!pblk_ws_cache) {
- 		up_write(&pblk_lock);
- 		return -ENOMEM;
- 	}
-@@ -194,7 +194,7 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 	pblk_rec_cache = kmem_cache_create("pblk_rec",
- 				sizeof(struct pblk_rec_ctx), 0, 0, NULL);
- 	if (!pblk_rec_cache) {
--		kmem_cache_destroy(pblk_blk_ws_cache);
-+		kmem_cache_destroy(pblk_ws_cache);
- 		up_write(&pblk_lock);
- 		return -ENOMEM;
- 	}
-@@ -202,7 +202,7 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 	pblk_g_rq_cache = kmem_cache_create("pblk_g_rq", pblk_g_rq_size,
- 				0, 0, NULL);
- 	if (!pblk_g_rq_cache) {
--		kmem_cache_destroy(pblk_blk_ws_cache);
-+		kmem_cache_destroy(pblk_ws_cache);
- 		kmem_cache_destroy(pblk_rec_cache);
- 		up_write(&pblk_lock);
- 		return -ENOMEM;
-@@ -211,7 +211,7 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 	pblk_w_rq_cache = kmem_cache_create("pblk_w_rq", pblk_w_rq_size,
- 				0, 0, NULL);
- 	if (!pblk_w_rq_cache) {
--		kmem_cache_destroy(pblk_blk_ws_cache);
-+		kmem_cache_destroy(pblk_ws_cache);
- 		kmem_cache_destroy(pblk_rec_cache);
- 		kmem_cache_destroy(pblk_g_rq_cache);
- 		up_write(&pblk_lock);
-@@ -223,7 +223,7 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 	pblk_line_meta_cache = kmem_cache_create(cache_name,
- 				pblk->lm.sec_bitmap_len, 0, 0, NULL);
- 	if (!pblk_line_meta_cache) {
--		kmem_cache_destroy(pblk_blk_ws_cache);
-+		kmem_cache_destroy(pblk_ws_cache);
- 		kmem_cache_destroy(pblk_rec_cache);
- 		kmem_cache_destroy(pblk_g_rq_cache);
- 		kmem_cache_destroy(pblk_w_rq_cache);
-@@ -246,20 +246,20 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (pblk_init_global_caches(pblk))
- 		return -ENOMEM;
- 
--	/* internal bios can be at most the sectors signaled by the device. */
-+	/* Internal bios can be at most the sectors signaled by the device. */
- 	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
- 									0);
- 	if (!pblk->page_bio_pool)
- 		return -ENOMEM;
- 
--	pblk->line_ws_pool = mempool_create_slab_pool(PBLK_WS_POOL_SIZE,
--							pblk_blk_ws_cache);
--	if (!pblk->line_ws_pool)
-+	pblk->gen_ws_pool = mempool_create_slab_pool(PBLK_GEN_WS_POOL_SIZE,
-+							pblk_ws_cache);
-+	if (!pblk->gen_ws_pool)
- 		goto free_page_bio_pool;
- 
- 	pblk->rec_pool = mempool_create_slab_pool(geo->nr_luns, pblk_rec_cache);
- 	if (!pblk->rec_pool)
--		goto free_blk_ws_pool;
-+		goto free_gen_ws_pool;
- 
- 	pblk->g_rq_pool = mempool_create_slab_pool(PBLK_READ_REQ_POOL_SIZE,
- 							pblk_g_rq_cache);
-@@ -308,8 +308,8 @@ static int pblk_core_init(struct pblk *pblk)
- 	mempool_destroy(pblk->g_rq_pool);
- free_rec_pool:
- 	mempool_destroy(pblk->rec_pool);
--free_blk_ws_pool:
--	mempool_destroy(pblk->line_ws_pool);
-+free_gen_ws_pool:
-+	mempool_destroy(pblk->gen_ws_pool);
- free_page_bio_pool:
- 	mempool_destroy(pblk->page_bio_pool);
- 	return -ENOMEM;
-@@ -324,13 +324,13 @@ static void pblk_core_free(struct pblk *pblk)
- 		destroy_workqueue(pblk->bb_wq);
- 
- 	mempool_destroy(pblk->page_bio_pool);
--	mempool_destroy(pblk->line_ws_pool);
-+	mempool_destroy(pblk->gen_ws_pool);
- 	mempool_destroy(pblk->rec_pool);
- 	mempool_destroy(pblk->g_rq_pool);
- 	mempool_destroy(pblk->w_rq_pool);
- 	mempool_destroy(pblk->line_meta_pool);
- 
--	kmem_cache_destroy(pblk_blk_ws_cache);
-+	kmem_cache_destroy(pblk_ws_cache);
- 	kmem_cache_destroy(pblk_rec_cache);
- 	kmem_cache_destroy(pblk_g_rq_cache);
- 	kmem_cache_destroy(pblk_w_rq_cache);
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index b48d52b2ae38..81d1f1035fa3 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -201,8 +201,8 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
- 
- 	sync = atomic_add_return(rqd->nr_ppas, &emeta->sync);
- 	if (sync == emeta->nr_entries)
--		pblk_line_run_ws(pblk, line, NULL, pblk_line_close_ws,
--								pblk->close_wq);
-+		pblk_gen_run_ws(pblk, line, NULL, pblk_line_close_ws,
-+						GFP_ATOMIC, pblk->close_wq);
- 
- 	bio_put(rqd->bio);
- 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index b2df4e707c36..dee8f66e6ce2 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -40,7 +40,6 @@
- #define PBLK_MAX_REQ_ADDRS (64)
- #define PBLK_MAX_REQ_ADDRS_PW (6)
- 
--#define PBLK_WS_POOL_SIZE (128)
- #define PBLK_META_POOL_SIZE (128)
- #define PBLK_READ_REQ_POOL_SIZE (1024)
- 
-@@ -61,6 +60,8 @@
- 
- #define ERASE 2 /* READ = 0, WRITE = 1 */
- 
-+#define PBLK_GEN_WS_POOL_SIZE (2)
-+
- enum {
- 	/* IO Types */
- 	PBLK_IOTYPE_USER	= 1 << 0,
-@@ -620,7 +621,7 @@ struct pblk {
- 	struct list_head compl_list;
- 
- 	mempool_t *page_bio_pool;
--	mempool_t *line_ws_pool;
-+	mempool_t *gen_ws_pool;
- 	mempool_t *rec_pool;
- 	mempool_t *g_rq_pool;
- 	mempool_t *w_rq_pool;
-@@ -724,9 +725,9 @@ void pblk_line_close_meta_sync(struct pblk *pblk);
- void pblk_line_close_ws(struct work_struct *work);
- void pblk_pipeline_stop(struct pblk *pblk);
- void pblk_line_mark_bb(struct work_struct *work);
--void pblk_line_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
--		      void (*work)(struct work_struct *),
--		      struct workqueue_struct *wq);
-+void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
-+		     void (*work)(struct work_struct *), gfp_t gfp_mask,
-+		     struct workqueue_struct *wq);
- u64 pblk_line_smeta_start(struct pblk *pblk, struct pblk_line *line);
- int pblk_line_read_smeta(struct pblk *pblk, struct pblk_line *line);
- int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
 -- 
-2.7.4
+2.9.5
