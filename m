@@ -1,117 +1,196 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:33263 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753269AbdIFKwh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:52:37 -0400
-Received: by mail-wm0-f54.google.com with SMTP id f145so15984272wme.0
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:52:37 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 01/18] lightnvm: pblk: improve naming for internal req.
-Date: Wed,  6 Sep 2017 12:50:54 +0200
-Message-Id: <1504695071-25928-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
-References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:47378 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752297AbdIASuq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 14:50:46 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 1/8] blk-mq: rename blk_mq_unfreeze_queue as blk_unfreeze_queue
+Date: Sat,  2 Sep 2017 02:49:51 +0800
+Message-Id: <20170901184958.19452-3-ming.lei@redhat.com>
+In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
+References: <20170901184958.19452-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Each request type sent to the LightNVM subsystem requires different
-metadata. Until now, we have tailored this metadata based on write, read
-and erase commands. However, pblk uses different metadata for internal
-writes that do not hit the write buffer. Instead of abusing the metadata
-for reads, create a new request type - internal write. This improves
-code readability.
+We will support to freeze queue on block legacy path too.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-recovery.c | 6 +++---
- drivers/lightnvm/pblk-write.c    | 6 +++---
- drivers/lightnvm/pblk.h          | 5 ++++-
- 3 files changed, 10 insertions(+), 7 deletions(-)
+ block/blk-cgroup.c       |  4 ++--
+ block/blk-mq.c           | 10 +++++-----
+ block/elevator.c         |  2 +-
+ drivers/block/loop.c     |  8 ++++----
+ drivers/nvme/host/core.c |  4 ++--
+ include/linux/blk-mq.h   |  2 +-
+ 6 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index cb556e06673e..279638309d9a 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -344,7 +344,7 @@ static void pblk_end_io_recov(struct nvm_rq *rqd)
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 0480892e97e5..02e8a47ac77c 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1337,7 +1337,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 	spin_unlock_irq(q->queue_lock);
+ out_bypass_end:
+ 	if (q->mq_ops)
+-		blk_mq_unfreeze_queue(q);
++		blk_unfreeze_queue(q);
+ 	else
+ 		blk_queue_bypass_end(q);
+ 	if (pd_prealloc)
+@@ -1388,7 +1388,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
+ 	spin_unlock_irq(q->queue_lock);
  
- 	bio_put(rqd->bio);
- 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
--	pblk_free_rqd(pblk, rqd, WRITE);
-+	pblk_free_rqd(pblk, rqd, WRITE_INT);
- 
- 	atomic_dec(&pblk->inflight_io);
- 	kref_put(&pad_rq->ref, pblk_recov_complete);
-@@ -404,7 +404,7 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
- 	ppa_list = (void *)(meta_list) + pblk_dma_meta_size;
- 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
- 
--	rqd = pblk_alloc_rqd(pblk, WRITE);
-+	rqd = pblk_alloc_rqd(pblk, WRITE_INT);
- 	if (IS_ERR(rqd)) {
- 		ret = PTR_ERR(rqd);
- 		goto fail_free_meta;
-@@ -491,7 +491,7 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
- fail_free_bio:
- 	bio_put(bio);
- fail_free_rqd:
--	pblk_free_rqd(pblk, rqd, WRITE);
-+	pblk_free_rqd(pblk, rqd, WRITE_INT);
- fail_free_meta:
- 	nvm_dev_dma_free(dev->parent, meta_list, dma_meta_list);
- fail_free_pad:
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 3ad9e56d2473..920b93fb15d5 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -199,7 +199,7 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
- 
- 	bio_put(rqd->bio);
- 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
--	pblk_free_rqd(pblk, rqd, READ);
-+	pblk_free_rqd(pblk, rqd, WRITE_INT);
- 
- 	atomic_dec(&pblk->inflight_io);
+ 	if (q->mq_ops)
+-		blk_mq_unfreeze_queue(q);
++		blk_unfreeze_queue(q);
+ 	else
+ 		blk_queue_bypass_end(q);
  }
-@@ -370,7 +370,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	int i, j;
- 	int ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d935f15c54da..82136e83951d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -172,7 +172,7 @@ void blk_mq_freeze_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
  
--	rqd = pblk_alloc_rqd(pblk, READ);
-+	rqd = pblk_alloc_rqd(pblk, WRITE_INT);
- 	if (IS_ERR(rqd)) {
- 		pr_err("pblk: cannot allocate write req.\n");
- 		return PTR_ERR(rqd);
-@@ -434,7 +434,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	if (likely(l_mg->emeta_alloc_type == PBLK_VMALLOC_META))
- 		bio_put(bio);
- fail_free_rqd:
--	pblk_free_rqd(pblk, rqd, READ);
-+	pblk_free_rqd(pblk, rqd, WRITE_INT);
+-void blk_mq_unfreeze_queue(struct request_queue *q)
++void blk_unfreeze_queue(struct request_queue *q)
+ {
+ 	int freeze_depth;
+ 
+@@ -183,7 +183,7 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
+ 		wake_up_all(&q->mq_freeze_wq);
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
++EXPORT_SYMBOL_GPL(blk_unfreeze_queue);
+ 
+ /*
+  * FIXME: replace the scsi_internal_device_*block_nowait() calls in the
+@@ -2250,7 +2250,7 @@ static void blk_mq_update_tag_set_depth(struct blk_mq_tag_set *set,
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_freeze_queue(q);
+ 		queue_set_hctx_shared(q, shared);
+-		blk_mq_unfreeze_queue(q);
++		blk_unfreeze_queue(q);
+ 	}
+ }
+ 
+@@ -2708,7 +2708,7 @@ static int __blk_mq_update_nr_requests(struct request_queue *q,
+ 	if (!ret)
+ 		q->nr_requests = nr;
+ 
+-	blk_mq_unfreeze_queue(q);
++	blk_unfreeze_queue(q);
+ 
+ 	return ret;
+ }
+@@ -2757,7 +2757,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	}
+ 
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		blk_mq_unfreeze_queue(q);
++		blk_unfreeze_queue(q);
+ }
+ 
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+diff --git a/block/elevator.c b/block/elevator.c
+index 0e465809d3f3..371c8165c9e8 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -994,7 +994,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 		blk_add_trace_msg(q, "elv switch: none");
+ 
+ out:
+-	blk_mq_unfreeze_queue(q);
++	blk_unfreeze_queue(q);
  	return ret;
  }
  
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 67e623bd5c2d..08a463fe855f 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -59,7 +59,10 @@
- 		for ((i) = 0, rlun = &(pblk)->luns[0]; \
- 			(i) < (pblk)->nr_luns; (i)++, rlun = &(pblk)->luns[(i)])
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 2fbd4089c20e..5c11ea44d470 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -217,7 +217,7 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+ 		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
+ 	else
+ 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
+-	blk_mq_unfreeze_queue(lo->lo_queue);
++	blk_unfreeze_queue(lo->lo_queue);
+ }
  
--#define ERASE 2 /* READ = 0, WRITE = 1 */
-+/* READ = 0, WRITE (user) = 1 */
-+#define ERASE 2
-+#define WRITE_INT 3 /* Internal write. Not through write buffer */
-+
+ static int
+@@ -605,7 +605,7 @@ static int loop_switch(struct loop_device *lo, struct file *file)
+ 	do_loop_switch(lo, &w);
  
- enum {
- 	/* IO Types */
+ 	/* unfreeze */
+-	blk_mq_unfreeze_queue(lo->lo_queue);
++	blk_unfreeze_queue(lo->lo_queue);
+ 
+ 	return 0;
+ }
+@@ -1079,7 +1079,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	lo->lo_state = Lo_unbound;
+ 	/* This is safe: open() is still holding a reference. */
+ 	module_put(THIS_MODULE);
+-	blk_mq_unfreeze_queue(lo->lo_queue);
++	blk_unfreeze_queue(lo->lo_queue);
+ 
+ 	if (lo->lo_flags & LO_FLAGS_PARTSCAN && bdev)
+ 		loop_reread_partitions(lo, bdev);
+@@ -1191,7 +1191,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	__loop_update_dio(lo, lo->use_dio);
+ 
+  exit:
+-	blk_mq_unfreeze_queue(lo->lo_queue);
++	blk_unfreeze_queue(lo->lo_queue);
+ 
+ 	if (!err && (info->lo_flags & LO_FLAGS_PARTSCAN) &&
+ 	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 37046ac2c441..5c76b0a96be2 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1226,7 +1226,7 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ 
+ 	if (ctrl->oncs & NVME_CTRL_ONCS_DSM)
+ 		nvme_config_discard(ns);
+-	blk_mq_unfreeze_queue(disk->queue);
++	blk_unfreeze_queue(disk->queue);
+ }
+ 
+ static int nvme_revalidate_disk(struct gendisk *disk)
+@@ -2753,7 +2753,7 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl)
+ 
+ 	mutex_lock(&ctrl->namespaces_mutex);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list)
+-		blk_mq_unfreeze_queue(ns->queue);
++		blk_unfreeze_queue(ns->queue);
+ 	mutex_unlock(&ctrl->namespaces_mutex);
+ }
+ EXPORT_SYMBOL_GPL(nvme_unfreeze);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 13f6c25fa461..2572e5641568 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -257,7 +257,7 @@ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
+ void blk_mq_freeze_queue(struct request_queue *q);
+-void blk_mq_unfreeze_queue(struct request_queue *q);
++void blk_unfreeze_queue(struct request_queue *q);
+ void blk_freeze_queue_start(struct request_queue *q);
+ void blk_mq_freeze_queue_wait(struct request_queue *q);
+ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
 -- 
-2.7.4
+2.9.5
