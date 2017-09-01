@@ -1,63 +1,53 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:54028 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751000AbdIAGaZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 02:30:25 -0400
+Date: Fri, 1 Sep 2017 14:30:08 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: [PATCH v3 42/49] gfs2: convert to bio_for_each_segment_all_sp()
-Date: Tue,  8 Aug 2017 16:45:41 +0800
-Message-Id: <20170808084548.18963-43-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+To: oleksandr@natalenko.name
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Subject: Re: [PATCH 0/9] block/scsi: safe SCSI quiescing
+Message-ID: <20170901063007.GA2424@ming.t460p>
+References: <20170831172728.15817-1-ming.lei@redhat.com>
+ <1576539.niWZoWEnd8@natalenko.name>
+ <20170831173833.GC5928@ming.t460p>
+ <14328863.IIXMb7O2AM@natalenko.name>
+ <20170901034532.GD16525@ming.t460p>
+ <eeb514d8aab51d4713f18636adb6be03@natalenko.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <eeb514d8aab51d4713f18636adb6be03@natalenko.name>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Cc: Steven Whitehouse <swhiteho@redhat.com>
-Cc: Bob Peterson <rpeterso@redhat.com>
-Cc: cluster-devel@redhat.com
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/gfs2/lops.c    | 3 ++-
- fs/gfs2/meta_io.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+On Fri, Sep 01, 2017 at 08:24:46AM +0200, oleksandr@natalenko.name wrote:
+> Hi.
+> 
+> 01.09.2017 05:45, Ming Lei wrote:
+> > Could you try the following patch against this patchset to see
+> > if there is still the warning?
+> 
+> With this patch I wasn't able to trigger per-CPU-related warning.
 
-diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
-index 3010f9edd177..d1fd8ed01b9e 100644
---- a/fs/gfs2/lops.c
-+++ b/fs/gfs2/lops.c
-@@ -206,11 +206,12 @@ static void gfs2_end_log_write(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct page *page;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (bio->bi_status)
- 		fs_err(sdp, "Error %d writing to log\n", bio->bi_status);
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		page = bvec->bv_page;
- 		if (page_has_buffers(page))
- 			gfs2_end_log_write_bh(sdp, bvec, bio->bi_status);
-diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
-index fabe1614f879..6879b0103539 100644
---- a/fs/gfs2/meta_io.c
-+++ b/fs/gfs2/meta_io.c
-@@ -190,8 +190,9 @@ static void gfs2_meta_read_endio(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		struct buffer_head *bh = page_buffers(page);
- 		unsigned int len = bvec->bv_len;
+That is great!
+
+> 
+> Also, for 8th patch you've written:
+> 
+> > I have sent one delta patch in list, which will only call
+> > blk_queue_enter_live() iff SCSI device is in QUIESCE.
+> 
+> This refers to the patch I've just tested, right?
+
+Yeah, you are right, thanks again for your test!
+
+I will prepare V2 and send it out soon.
+
 -- 
-2.9.4
+Ming
