@@ -1,30 +1,155 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:49980 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751566AbdIAHb2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2017 03:31:28 -0400
-Date: Fri, 1 Sep 2017 00:31:27 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Scott Bauer <scott.bauer@intel.com>
-Cc: Jon Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, david.fugate@intel.com, axboe@fb.com,
-        hch@infradead.org, rafael.antognolli@intel.com
-Subject: Re: [PATCH] block: sed-opal: Set MBRDone on S3 resume path if TPER
- is MBREnabled
-Message-ID: <20170901073127.GA9417@infradead.org>
-References: <20170831174238.2714-1-scott.bauer@intel.com>
- <f8da2845-bc33-8afb-2695-958b0a7425f1@intel.com>
- <20170831195759.nsnwys2lvgrxbvg4@sbauer-Z170X-UD5>
-MIME-Version: 1.0
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170831195759.nsnwys2lvgrxbvg4@sbauer-Z170X-UD5>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH 4/5] bfq: Suppress compiler warnings about comparisons
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20170830184211.12471-5-bart.vanassche@wdc.com>
+Date: Fri, 1 Sep 2017 19:15:23 +0200
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Message-Id: <3E68E56E-EFA9-4D81-AC12-4F54760541E9@linaro.org>
+References: <20170830184211.12471-1-bart.vanassche@wdc.com> <20170830184211.12471-5-bart.vanassche@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 31, 2017 at 01:58:01PM -0600, Scott Bauer wrote:
-> > > +		{ set_mbr_done, &mbr_done_tf },
-> > Do you need to end_opal_session here?
-> >
-> Yep, sure do. I'll wait for Christoph to look at it tonight before spinning another.
 
-No additional comment from me, please just resend with that fix.
+> Il giorno 30 ago 2017, alle ore 20:42, Bart Van Assche =
+<bart.vanassche@wdc.com> ha scritto:
+>=20
+> This patch avoids that the following warnings are reported when
+> building with W=3D1:
+>=20
+> block/bfq-iosched.c: In function 'bfq_back_seek_max_store':
+> block/bfq-iosched.c:4860:13: warning: comparison of unsigned =
+expression < 0 is always false [-Wtype-limits]
+>  if (__data < (MIN))      \
+>             ^
+> block/bfq-iosched.c:4876:1: note: in expansion of macro =
+'STORE_FUNCTION'
+> STORE_FUNCTION(bfq_back_seek_max_store, &bfqd->bfq_back_max, 0, =
+INT_MAX, 0);
+> ^~~~~~~~~~~~~~
+> block/bfq-iosched.c: In function 'bfq_slice_idle_store':
+> block/bfq-iosched.c:4860:13: warning: comparison of unsigned =
+expression < 0 is always false [-Wtype-limits]
+>  if (__data < (MIN))      \
+>             ^
+> block/bfq-iosched.c:4879:1: note: in expansion of macro =
+'STORE_FUNCTION'
+> STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, =
+INT_MAX, 2);
+> ^~~~~~~~~~~~~~
+> block/bfq-iosched.c: In function 'bfq_slice_idle_us_store':
+> block/bfq-iosched.c:4892:13: warning: comparison of unsigned =
+expression < 0 is always false [-Wtype-limits]
+>  if (__data < (MIN))      \
+>             ^
+> block/bfq-iosched.c:4899:1: note: in expansion of macro =
+'USEC_STORE_FUNCTION'
+> USEC_STORE_FUNCTION(bfq_slice_idle_us_store, &bfqd->bfq_slice_idle, 0,
+> ^~~~~~~~~~~~~~~~~~~
+>=20
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Paolo Valente <paolo.valente@linaro.org>
+
+Acked-by: Paolo Valente <paolo.valente@linaro.org>
+
+> ---
+> block/bfq-iosched.c | 20 ++++++++++----------
+> 1 file changed, 10 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index cf92f16eb5f2..d375b29ad085 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -4851,16 +4851,16 @@ static ssize_t					=
+			\
+> __FUNC(struct elevator_queue *e, const char *page, size_t count)	=
+\
+> {									=
+\
+> 	struct bfq_data *bfqd =3D e->elevator_data;			=
+\
+> -	unsigned long __data;						=
+\
+> +	unsigned long __data, __min =3D (MIN), __max =3D (MAX);		=
+\
+> 	int ret;							=
+\
+> 									=
+\
+> 	ret =3D bfq_var_store(&__data, (page));				=
+\
+> 	if (ret)							=
+\
+> 		return ret;						=
+\
+> -	if (__data < (MIN))						=
+\
+> -		__data =3D (MIN);						=
+\
+> -	else if (__data > (MAX))					=
+\
+> -		__data =3D (MAX);						=
+\
+> +	if (__data < __min)						=
+\
+> +		__data =3D __min;						=
+\
+> +	else if (__data > __max)					=
+\
+> +		__data =3D __max;						=
+\
+> 	if (__CONV =3D=3D 1)						=
+\
+> 		*(__PTR) =3D msecs_to_jiffies(__data);			=
+\
+> 	else if (__CONV =3D=3D 2)						=
+\
+> @@ -4883,16 +4883,16 @@ STORE_FUNCTION(bfq_slice_idle_store, =
+&bfqd->bfq_slice_idle, 0, INT_MAX, 2);
+> static ssize_t __FUNC(struct elevator_queue *e, const char *page, =
+size_t count)\
+> {									=
+\
+> 	struct bfq_data *bfqd =3D e->elevator_data;			=
+\
+> -	unsigned long __data;						=
+\
+> +	unsigned long __data, __min =3D (MIN), __max =3D (MAX);		=
+\
+> 	int ret;							=
+\
+> 									=
+\
+> 	ret =3D bfq_var_store(&__data, (page));				=
+\
+> 	if (ret)							=
+\
+> 		return ret;						=
+\
+> -	if (__data < (MIN))						=
+\
+> -		__data =3D (MIN);						=
+\
+> -	else if (__data > (MAX))					=
+\
+> -		__data =3D (MAX);						=
+\
+> +	if (__data < __min)						=
+\
+> +		__data =3D __min;						=
+\
+> +	else if (__data > __max)					=
+\
+> +		__data =3D __max;						=
+\
+> 	*(__PTR) =3D (u64)__data * NSEC_PER_USEC;				=
+\
+> 	return count;							=
+\
+> }
+> --=20
+> 2.14.1
+>=20
