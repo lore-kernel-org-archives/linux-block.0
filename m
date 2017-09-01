@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38768 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:33930 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752213AbdIASuU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 14:50:20 -0400
+        id S1751824AbdIASkA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 14:40:00 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
@@ -14,8 +14,8 @@ Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
 Subject: [PATCH V2 0/8] block/scsi: safe SCSI quiescing
-Date: Sat,  2 Sep 2017 02:49:49 +0800
-Message-Id: <20170901184958.19452-1-ming.lei@redhat.com>
+Date: Sat,  2 Sep 2017 02:39:35 +0800
+Message-Id: <20170901183943.27415-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -56,8 +56,8 @@ V2:
 	- fix warning from percpu-refcount as reported by Oleksandr
 
 
-[1] https://marc.info/?t=150340250100013&r=3&w=2
 
+[1] https://marc.info/?t=150340250100013&r=3&w=2
 
 
 Ming Lei (8):
@@ -82,8 +82,8 @@ Ming Lei (8):
  drivers/nvme/host/core.c |   8 ++--
  drivers/scsi/scsi_lib.c  |  21 ++++++++-
  include/linux/blk-mq.h   |  15 +++---
- include/linux/blkdev.h   |  20 +++++++-
- 13 files changed, 206 insertions(+), 66 deletions(-)
+ include/linux/blkdev.h   |  17 ++++++-
+ 13 files changed, 203 insertions(+), 66 deletions(-)
 
 -- 
 2.9.5
