@@ -1,29 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:19076 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752072AbdIAPwd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2017 11:52:33 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "surajschoudhari@gmail.com" <surajschoudhari@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: blk_get_request sleeps in schedule
-Date: Fri, 1 Sep 2017 15:51:45 +0000
-Message-ID: <1504281104.14386.20.camel@wdc.com>
+To: Suraj Choudhari <surajschoudhari@gmail.com>,
+ linux-block <linux-block@vger.kernel.org>
 References: <CAGvB2rNiyP58+TTgc-D9RzesvQWx1RgjjepQBujhZQa5Cx-f9A@mail.gmail.com>
-In-Reply-To: <CAGvB2rNiyP58+TTgc-D9RzesvQWx1RgjjepQBujhZQa5Cx-f9A@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1640da78-2453-6523-416a-b59995554f88@kernel.dk>
+Date: Fri, 1 Sep 2017 08:46:36 -0600
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <CAGvB2rNiyP58+TTgc-D9RzesvQWx1RgjjepQBujhZQa5Cx-f9A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTA5LTAxIGF0IDA4OjA3ICswNTMwLCBTdXJhaiBDaG91ZGhhcmkgd3JvdGU6
-DQo+IE9uIG15IHRlc3Qgc3lzdGVtLCBibGtfZ2V0X3JlcXVlc3QoKSBjb250aW51b3VzbHkgaGFu
-Z3MgaW4gc2NoZWR1bGUoKS4NCj4gDQo+IHNjaGVkdWxlKzB4MzUvMHg4MA0KPiBzY2hlZHVsZV90
-aW1lb3V0KzB4MjM3LzB4MmQwDQo+IGlvX3NjaGVkdWxlX3RpbWVvdXQrMHhhNi8weDExMA0KPiBn
-ZXRfcmVxdWVzdCsweDI1OC8weDc2MA0KPiBibGtfZ2V0X3JlcXVlc3QrMHg3Zi8weDEwMA0KPiAN
-Cj4gSSBzdXNwZWN0IHRoZSBwcm9ibGVtIG1pZ2h0IGJlIGR1ZSB0byBfX2dldF9yZXF1ZXN0IHJl
-dHVybmluZyBFTk9NRU0sDQo+IGxlYWRpbmcgdG8gc2xlZXAgaW4gc2NoZWR1bGUoKS4NCg0KSGVs
-bG8gU3VyYWosDQoNCkluIGFkZGl0aW9uIHRvIHdoYXQgSmVucyB3cm90ZTogcGxlYXNlIGNvbnNp
-ZGVyIHN3aXRjaGluZyB0byBibGstbXEgc3VjaA0KdGhhdCB5b3UgY2FuIHVzZSB0aGUgaW5mb3Jt
-YXRpb24gaW4gL3N5cy9rZXJuZWwvZGVidWcvYmxvY2sgdG8gYW5hbHl6ZQ0KdGhpcyBmdXJ0aGVy
-Lg0KDQpCYXJ0Lg==
+On 08/31/2017 08:37 PM, Suraj Choudhari wrote:
+> Hello,
+> 
+> On my test system, blk_get_request() continuously hangs in schedule().
+> 
+> schedule+0x35/0x80
+> schedule_timeout+0x237/0x2d0
+> io_schedule_timeout+0xa6/0x110
+> get_request+0x258/0x760
+> blk_get_request+0x7f/0x100
+> 
+> I suspect the problem might be due to __get_request returning ENOMEM,
+> leading to sleep in schedule().
+> 
+> static struct request *__get_request(struct request_list *rl, unsigned
+> int op, struct bio *bio, gfp_t gfp_mask)   {
+> ...
+> /*
+> * The queue is full and the allocating
+> * process is not a "batcher", and not
+> * exempted by the IO scheduler
+> */
+> return ERR_PTR(-ENOMEM);
+> ...
+> 
+> if (rl->count[is_sync] >= (3 * q->nr_requests / 2))
+> return ERR_PTR(-ENOMEM);
+> ...
+> 
+> }
+> 
+> However, there is no significant memory pressure or IO load on my test
+> system, I wonder why the __get_request might be failing leading to
+> sleep.
+> 
+> Any possible cause?   Any suggestions are welcome!
+
+You're missing a lot of detail here. What kernel are you using? What
+storage device hw/driver are you seeing this on? What are you doing
+to reproduce it?
+
+Basically all the things that someone would need to know, to have
+any sort of educated guess as to what is going on.
+
+-- 
+Jens Axboe
