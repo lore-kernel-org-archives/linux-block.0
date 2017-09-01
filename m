@@ -1,53 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:31203 "EHLO mga09.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:37472 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752530AbdIVMoo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2017 08:44:44 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V9 10/15] mmc: core: Export mmc_start_bkops()
-Date: Fri, 22 Sep 2017 15:36:59 +0300
-Message-Id: <1506083824-4024-11-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+        id S1751945AbdIAQFi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Sep 2017 12:05:38 -0400
+Date: Sat, 2 Sep 2017 00:05:20 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>
+Subject: Re: [PATCH 1/9] percpu-refcount: introduce percpu_ref_is_dead()
+Message-ID: <20170901160519.GB20709@ming.t460p>
+References: <20170831172728.15817-1-ming.lei@redhat.com>
+ <20170831172728.15817-2-ming.lei@redhat.com>
+ <20170901135915.GD1599492@devbig577.frc2.facebook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170901135915.GD1599492@devbig577.frc2.facebook.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Export mmc_start_bkops() so that the block driver can use it.
+On Fri, Sep 01, 2017 at 06:59:15AM -0700, Tejun Heo wrote:
+> Hello, Ming.
+> 
+> > +/**
+> > + * percpu_ref_is_dead - test whether a percpu refcount is killed
+> > + * @ref: percpu_ref to test
+> > + *
+> > + * Returns %true if @ref is dead
+> > + *
+> > + * This function is safe to call as long as @ref is between init and exit.
+> > + */
+> > +static inline bool percpu_ref_is_dead(struct percpu_ref *ref)
+> > +{
+> > +	unsigned long __percpu *percpu_count;
+> > +
+> > +	if (__ref_is_percpu(ref, &percpu_count))
+> > +		return false;
+> > +	return ref->percpu_count_ptr & __PERCPU_REF_DEAD;
+> > +}
+> 
+> Can you please explain why percpu_ref_is_dying() isn't enough for your
+> use case?
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/mmc_ops.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi Tejun,
 
-diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
-index a6b0a232f24a..908e4db03535 100644
---- a/drivers/mmc/core/mmc_ops.c
-+++ b/drivers/mmc/core/mmc_ops.c
-@@ -1007,6 +1007,7 @@ void mmc_start_bkops(struct mmc_card *card, bool from_exception)
- 	else
- 		mmc_retune_release(card->host);
- }
-+EXPORT_SYMBOL(mmc_start_bkops);
- 
- /*
-  * Flush the cache to the non-volatile storage.
+You are right, looks percpu_ref_is_dying() is enough,
+percpu_ref_get_many() works fine no matter the ref is dying or not.
+
+Thanks!
+
 -- 
-1.9.1
+Ming
