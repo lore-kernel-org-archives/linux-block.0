@@ -1,26 +1,89 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH V2 1/2] block/loop: fix use after free
-To: Shaohua Li <shli@kernel.org>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Shaohua Li <shli@fb.com>
-References: <1a1c70b8fd5044e11bd152686a742a017ebea99e.1504289520.git.shli@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <f591cd96-b6de-9865-119f-598176387f66@kernel.dk>
-Date: Fri, 1 Sep 2017 13:58:02 -0600
-MIME-Version: 1.0
-In-Reply-To: <1a1c70b8fd5044e11bd152686a742a017ebea99e.1504289520.git.shli@fb.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <SRS0=upyn=AC=fb.com=shli@kernel.org>
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org
+Cc: kernel-team@fb.com,
+	axboe@kernel.dk,
+	Shaohua Li <shli@fb.com>
+Subject: [PATCH V2 1/2] block/loop: fix use after free
+Date: Fri,  1 Sep 2017 11:15:17 -0700
+Message-Id: <1a1c70b8fd5044e11bd152686a742a017ebea99e.1504289520.git.shli@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/01/2017 12:15 PM, Shaohua Li wrote:
-> From: Shaohua Li <shli@fb.com>
-> 
-> lo_rw_aio->call_read_iter->
-> 1       aops->direct_IO
-> 2       iov_iter_revert
-> lo_rw_aio_complete could happen between 1 and 2, the bio and bvec could
-> be freed before 2, which accesses bvec.
+From: Shaohua Li <shli@fb.com>
 
-Applied 1-2, thanks.
+lo_rw_aio->call_read_iter->
+1       aops->direct_IO
+2       iov_iter_revert
+lo_rw_aio_complete could happen between 1 and 2, the bio and bvec could
+be freed before 2, which accesses bvec.
 
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ drivers/block/loop.c | 16 +++++++++++++---
+ drivers/block/loop.h |  5 ++++-
+ 2 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 3a35121..78c47c4 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -463,14 +463,21 @@ static void lo_complete_rq(struct request *rq)
+ 	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
+ }
+ 
++static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
++{
++	if (!atomic_dec_and_test(&cmd->ref))
++		return;
++	kfree(cmd->bvec);
++	cmd->bvec = NULL;
++	blk_mq_complete_request(cmd->rq);
++}
++
+ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
+ {
+ 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+ 
+-	kfree(cmd->bvec);
+-	cmd->bvec = NULL;
+ 	cmd->ret = ret;
+-	blk_mq_complete_request(cmd->rq);
++	lo_rw_aio_do_completion(cmd);
+ }
+ 
+ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+@@ -518,6 +525,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+ 		segments = bio_segments(bio);
+ 	}
++	atomic_set(&cmd->ref, 2);
+ 
+ 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
+ 		      segments, blk_rq_bytes(rq));
+@@ -533,6 +541,8 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	else
+ 		ret = call_read_iter(file, &cmd->iocb, &iter);
+ 
++	lo_rw_aio_do_completion(cmd);
++
+ 	if (ret != -EIOCBQUEUED)
+ 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
+ 	return 0;
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 43d20d3..b0ba4a5 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -68,7 +68,10 @@ struct loop_cmd {
+ 	struct kthread_work work;
+ 	struct request *rq;
+ 	struct list_head list;
+-	bool use_aio;           /* use AIO interface to handle I/O */
++	union {
++		bool use_aio; /* use AIO interface to handle I/O */
++		atomic_t ref; /* only for aio */
++	};
+ 	long ret;
+ 	struct kiocb iocb;
+ 	struct bio_vec *bvec;
 -- 
-Jens Axboe
+2.9.5
