@@ -1,94 +1,48 @@
-Return-Path: <prvs=408be853d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 4/5] bfq: Suppress compiler warnings about comparisons
-Date: Wed, 30 Aug 2017 11:42:10 -0700
-Message-Id: <20170830184211.12471-5-bart.vanassche@wdc.com>
-In-Reply-To: <20170830184211.12471-1-bart.vanassche@wdc.com>
-References: <20170830184211.12471-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:50654 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751086AbdIADt5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Aug 2017 23:49:57 -0400
+Date: Fri, 1 Sep 2017 11:49:42 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "tj@kernel.org" <tj@kernel.org>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+Subject: Re: [PATCH 1/9] percpu-refcount: introduce percpu_ref_is_dead()
+Message-ID: <20170901034941.GE16525@ming.t460p>
+References: <20170831172728.15817-1-ming.lei@redhat.com>
+ <20170831172728.15817-2-ming.lei@redhat.com>
+ <1504220849.31872.78.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1504220849.31872.78.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch avoids that the following warnings are reported when
-building with W=1:
+On Thu, Aug 31, 2017 at 11:07:30PM +0000, Bart Van Assche wrote:
+> On Fri, 2017-09-01 at 01:27 +0800, Ming Lei wrote:
+> > Inside block layer, we need to support to allocate request with
+> > RQF_PREEMPT even though queue is frozen.
+> 
+> Hello Ming,
+> 
+> Can patch 8/9 be reworked such that it doesn't need the new
+> percpu_ref_is_dead() helper function, e.g. by checking q->mq_freeze_depth
+> to check whether or not request processing has been frozen? Have you noticed
+> that several blk-mq code paths already check q->mq_freeze_depth to check
+> whether or not a queue is frozen?
 
-block/bfq-iosched.c: In function 'bfq_back_seek_max_store':
-block/bfq-iosched.c:4860:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
-  if (__data < (MIN))      \
-             ^
-block/bfq-iosched.c:4876:1: note: in expansion of macro 'STORE_FUNCTION'
- STORE_FUNCTION(bfq_back_seek_max_store, &bfqd->bfq_back_max, 0, INT_MAX, 0);
- ^~~~~~~~~~~~~~
-block/bfq-iosched.c: In function 'bfq_slice_idle_store':
-block/bfq-iosched.c:4860:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
-  if (__data < (MIN))      \
-             ^
-block/bfq-iosched.c:4879:1: note: in expansion of macro 'STORE_FUNCTION'
- STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, INT_MAX, 2);
- ^~~~~~~~~~~~~~
-block/bfq-iosched.c: In function 'bfq_slice_idle_us_store':
-block/bfq-iosched.c:4892:13: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
-  if (__data < (MIN))      \
-             ^
-block/bfq-iosched.c:4899:1: note: in expansion of macro 'USEC_STORE_FUNCTION'
- USEC_STORE_FUNCTION(bfq_slice_idle_us_store, &bfqd->bfq_slice_idle, 0,
- ^~~~~~~~~~~~~~~~~~~
+Strictly speaking, that way is wrong, or at least one lock is required
+to check the counter, because the percpu-refcount isn't killed yet after
+the atomic counter is increased by 1.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+So I prefer to use this new helper.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index cf92f16eb5f2..d375b29ad085 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4851,16 +4851,16 @@ static ssize_t								\
- __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
- {									\
- 	struct bfq_data *bfqd = e->elevator_data;			\
--	unsigned long __data;						\
-+	unsigned long __data, __min = (MIN), __max = (MAX);		\
- 	int ret;							\
- 									\
- 	ret = bfq_var_store(&__data, (page));				\
- 	if (ret)							\
- 		return ret;						\
--	if (__data < (MIN))						\
--		__data = (MIN);						\
--	else if (__data > (MAX))					\
--		__data = (MAX);						\
-+	if (__data < __min)						\
-+		__data = __min;						\
-+	else if (__data > __max)					\
-+		__data = __max;						\
- 	if (__CONV == 1)						\
- 		*(__PTR) = msecs_to_jiffies(__data);			\
- 	else if (__CONV == 2)						\
-@@ -4883,16 +4883,16 @@ STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, INT_MAX, 2);
- static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)\
- {									\
- 	struct bfq_data *bfqd = e->elevator_data;			\
--	unsigned long __data;						\
-+	unsigned long __data, __min = (MIN), __max = (MAX);		\
- 	int ret;							\
- 									\
- 	ret = bfq_var_store(&__data, (page));				\
- 	if (ret)							\
- 		return ret;						\
--	if (__data < (MIN))						\
--		__data = (MIN);						\
--	else if (__data > (MAX))					\
--		__data = (MAX);						\
-+	if (__data < __min)						\
-+		__data = __min;						\
-+	else if (__data > __max)					\
-+		__data = __max;						\
- 	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
- 	return count;							\
- }
 -- 
-2.14.1
+Ming
