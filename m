@@ -1,108 +1,42 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <keith.busch@intel.com>
-Subject: [RFC PATCH] blk-mq: Fix lost request during timeout
-Date: Mon, 18 Sep 2017 18:03:06 -0400
-Message-Id: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH 1/8] block: Fix declaration of blk-mq debugfs functions
+Date: Fri, 1 Sep 2017 16:00:30 +0000
+Message-ID: <1504281628.14386.23.camel@wdc.com>
+References: <20170901113631.12323-1-damien.lemoal@wdc.com>
+	 <20170901113631.12323-2-damien.lemoal@wdc.com>
+In-Reply-To: <20170901113631.12323-2-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-I think we've always known it's possible to lose a request during timeout
-handling, but just accepted that possibility. It seems to be causing
-problems, though, leading to unnecessary error escalation and IO failures.
-
-The possiblity arises when the block layer marks the request complete
-prior to running the timeout handler. If that request happens to complete
-while the handler is running, the request will be lost, inevitably
-triggering a second timeout.
-
-This patch attempts to shorten the window for this race condition by
-clearing the started flag when the driver completes a request. The block
-layer's timeout handler will then complete the command if it observes
-the started flag is no longer set.
-
-Note it's possible to lose the command even with this patch. It's just
-less likely to happen.
-
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- block/blk-mq.c | 37 +++++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 18 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 98a1860..37144ef 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -566,6 +566,7 @@ void blk_mq_complete_request(struct request *rq)
- 
- 	if (unlikely(blk_should_fake_timeout(q)))
- 		return;
-+	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
- 	if (!blk_mark_rq_complete(rq))
- 		__blk_mq_complete_request(rq);
- }
-@@ -605,19 +606,19 @@ void blk_mq_start_request(struct request *rq)
- 	 * complete. So be sure to clear complete again when we start
- 	 * the request, otherwise we'll ignore the completion event.
- 	 */
--	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-+	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
- 		set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
-+		if (q->dma_drain_size && blk_rq_bytes(rq)) {
-+			/*
-+			 * Make sure space for the drain appears.  We know we can do
-+			 * this because max_hw_segments has been adjusted to be one
-+			 * fewer than the device can handle.
-+			 */
-+			rq->nr_phys_segments++;
-+		}
-+	}
- 	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
- 		clear_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags);
--
--	if (q->dma_drain_size && blk_rq_bytes(rq)) {
--		/*
--		 * Make sure space for the drain appears.  We know we can do
--		 * this because max_hw_segments has been adjusted to be one
--		 * fewer than the device can handle.
--		 */
--		rq->nr_phys_segments++;
--	}
- }
- EXPORT_SYMBOL(blk_mq_start_request);
- 
-@@ -637,11 +638,6 @@ static void __blk_mq_requeue_request(struct request *rq)
- 	trace_block_rq_requeue(q, rq);
- 	wbt_requeue(q->rq_wb, &rq->issue_stat);
- 	blk_mq_sched_requeue_request(rq);
--
--	if (test_and_clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
--		if (q->dma_drain_size && blk_rq_bytes(rq))
--			rq->nr_phys_segments--;
--	}
- }
- 
- void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
-@@ -763,10 +759,15 @@ void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		__blk_mq_complete_request(req);
- 		break;
- 	case BLK_EH_RESET_TIMER:
--		blk_add_timer(req);
--		blk_clear_rq_complete(req);
--		break;
-+		if (test_bit(REQ_ATOM_STARTED, &req->atomic_flags)) {
-+			blk_add_timer(req);
-+			blk_clear_rq_complete(req);
-+			break;
-+		}
-+		/* Fall through */
- 	case BLK_EH_NOT_HANDLED:
-+		if (!test_bit(REQ_ATOM_STARTED, &req->atomic_flags))
-+			__blk_mq_complete_request(req);
- 		break;
- 	default:
- 		printk(KERN_ERR "block: bad eh return: %d\n", ret);
--- 
-2.5.5
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDIwOjM2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvYmxrLW1xLmggYi9pbmNsdWRlL2xpbnV4L2Js
+ay1tcS5oDQo+IGluZGV4IDE0NTQyMzA4ZDI1Yi4uYTM2OTE3NGE5Njc5IDEwMDY0NA0KPiAtLS0g
+YS9pbmNsdWRlL2xpbnV4L2Jsay1tcS5oDQo+ICsrKyBiL2luY2x1ZGUvbGludXgvYmxrLW1xLmgN
+Cj4gQEAgLTUsNiArNSwyMSBAQA0KPiAgI2luY2x1ZGUgPGxpbnV4L3NiaXRtYXAuaD4NCj4gICNp
+bmNsdWRlIDxsaW51eC9zcmN1Lmg+DQo+ICANCj4gKyNpZmRlZiBDT05GSUdfQkxLX0RFQlVHX0ZT
+DQo+ICsNCj4gKyNpbmNsdWRlIDxsaW51eC9zZXFfZmlsZS5oPg0KPiArDQo+ICtzdHJ1Y3QgYmxr
+X21xX2RlYnVnZnNfYXR0ciB7DQo+ICsJY29uc3QgY2hhciAqbmFtZTsNCj4gKwl1bW9kZV90IG1v
+ZGU7DQo+ICsJaW50ICgqc2hvdykodm9pZCAqLCBzdHJ1Y3Qgc2VxX2ZpbGUgKik7DQo+ICsJc3Np
+emVfdCAoKndyaXRlKSh2b2lkICosIGNvbnN0IGNoYXIgX191c2VyICosIHNpemVfdCwgbG9mZl90
+ICopOw0KPiArCS8qIFNldCBlaXRoZXIgLnNob3cgb3IgLnNlcV9vcHMuICovDQo+ICsJY29uc3Qg
+c3RydWN0IHNlcV9vcGVyYXRpb25zICpzZXFfb3BzOw0KPiArfTsNCj4gKw0KPiArI2VuZGlmDQo+
+ICsNCj4gIHN0cnVjdCBibGtfbXFfdGFnczsNCj4gIHN0cnVjdCBibGtfZmx1c2hfcXVldWU7DQo+
+ICANCj4gQEAgLTI4OSw0ICszMDQsOSBAQCBzdGF0aWMgaW5saW5lIHZvaWQgKmJsa19tcV9ycV90
+b19wZHUoc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiAgCWZvciAoKGkpID0gMDsgKGkpIDwgKGhjdHgp
+LT5ucl9jdHggJiYJCQkJXA0KPiAgCSAgICAgKHsgY3R4ID0gKGhjdHgpLT5jdHhzWyhpKV07IDE7
+IH0pOyAoaSkrKykNCj4gIA0KPiArI2lmZGVmIENPTkZJR19CTEtfREVCVUdfRlMNCj4gK2ludCBf
+X2Jsa19tcV9kZWJ1Z2ZzX3JxX3Nob3coc3RydWN0IHNlcV9maWxlICptLCBzdHJ1Y3QgcmVxdWVz
+dCAqcnEpOw0KPiAraW50IGJsa19tcV9kZWJ1Z2ZzX3JxX3Nob3coc3RydWN0IHNlcV9maWxlICpt
+LCB2b2lkICp2KTsNCj4gKyNlbmRpZg0KPiArDQo+ICAjZW5kaWYNCg0KSGVsbG8gRGFtaWVuLA0K
+DQpTaG91bGQgdGhlc2UgZGVmaW5pdGlvbnMgcGVyaGFwcyBiZSBtb3ZlZCB0byBhIG5ldyBoZWFk
+ZXIgZmlsZSwgZS5nLg0KaW5jbHVkZS9saW51eC9ibGstbXEtZGVidWdmcy5oLCBzdWNoIHRoYXQg
+dGhlIGludHJvZHVjdGlvbiBvZiBtb3JlICNpZmRlZnMNCmFuZCAjaW5jbHVkZSA8bGludXgvc2Vx
+X2ZpbGUuaD4gaW4gaW5jbHVkZS9saW51eC9ibGstbXEuaCBjYW4gYmUgYXZvaWRlZD8NCg0KVGhh
+bmtzLA0KDQpCYXJ0Lg==
