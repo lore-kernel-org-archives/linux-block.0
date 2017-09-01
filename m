@@ -1,56 +1,41 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>,
-	stable@vger.kernel.org
-Subject: [PATCH V5 05/14] scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
-Date: Mon, 25 Sep 2017 15:14:45 +0900
-Message-Id: <20170925061454.5533-6-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH 2/8] block: Fix declaration of blk-mq scheduler functions
+Date: Fri, 1 Sep 2017 16:04:18 +0000
+Message-ID: <1504281856.14386.27.camel@wdc.com>
+References: <20170901113631.12323-1-damien.lemoal@wdc.com>
+	 <20170901113631.12323-3-damien.lemoal@wdc.com>
+In-Reply-To: <20170901113631.12323-3-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-The three values starting at byte 8 of the Zoned Block Device
-Characteristics VPD page B6h are 32 bits values, not 64bits. So use
-get_unaligned_be32() to retrieve the values and not get_unaligned_be64()
-
-Fixes: 89d947561077 ("sd: Implement support for ZBC devices")
-Cc: <stable@vger.kernel.org>
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/sd_zbc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index bbad851c1789..27793b9f54c0 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -423,15 +423,15 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
- 	if (sdkp->device->type != TYPE_ZBC) {
- 		/* Host-aware */
- 		sdkp->urswrz = 1;
--		sdkp->zones_optimal_open = get_unaligned_be64(&buf[8]);
--		sdkp->zones_optimal_nonseq = get_unaligned_be64(&buf[12]);
-+		sdkp->zones_optimal_open = get_unaligned_be32(&buf[8]);
-+		sdkp->zones_optimal_nonseq = get_unaligned_be32(&buf[12]);
- 		sdkp->zones_max_open = 0;
- 	} else {
- 		/* Host-managed */
- 		sdkp->urswrz = buf[4] & 1;
- 		sdkp->zones_optimal_open = 0;
- 		sdkp->zones_optimal_nonseq = 0;
--		sdkp->zones_max_open = get_unaligned_be64(&buf[16]);
-+		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
- 	}
- 
- 	return 0;
--- 
-2.13.5
+T24gRnJpLCAyMDE3LTA5LTAxIGF0IDIwOjM2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gLS0tIGEvaW5jbHVkZS9saW51eC9ibGstbXEuaA0KPiArKysgYi9pbmNsdWRlL2xpbnV4L2Js
+ay1tcS5oDQo+IEBAIC0yODQsNiArMjg0LDE2IEBAIHZvaWQgYmxrX21xX3VwZGF0ZV9ucl9od19x
+dWV1ZXMoc3RydWN0IGJsa19tcV90YWdfc2V0ICpzZXQsIGludCBucl9od19xdWV1ZXMpOw0KPiAg
+dm9pZCBibGtfbXFfcXVpZXNjZV9xdWV1ZV9ub3dhaXQoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEp
+Ow0KPiAgDQo+ICAvKg0KPiArICogU2NoZWR1bGVyIGhlbHBlciBmdW5jdGlvbnMuDQo+ICsgKi8N
+Cj4gK3ZvaWQgYmxrX21xX3NjaGVkX2ZyZWVfaGN0eF9kYXRhKHN0cnVjdCByZXF1ZXN0X3F1ZXVl
+ICpxLA0KPiArCQkJCSB2b2lkICgqZXhpdCkoc3RydWN0IGJsa19tcV9od19jdHggKikpOw0KPiAr
+Ym9vbCBibGtfbXFfc2NoZWRfdHJ5X21lcmdlKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBzdHJ1
+Y3QgYmlvICpiaW8sDQo+ICsJCQkgICAgc3RydWN0IHJlcXVlc3QgKiptZXJnZWRfcmVxdWVzdCk7
+DQo+ICtib29sIGJsa19tcV9zY2hlZF90cnlfaW5zZXJ0X21lcmdlKHN0cnVjdCByZXF1ZXN0X3F1
+ZXVlICpxLCBzdHJ1Y3QgcmVxdWVzdCAqcnEpOw0KPiArdm9pZCBibGtfbXFfc2NoZWRfcmVxdWVz
+dF9pbnNlcnRlZChzdHJ1Y3QgcmVxdWVzdCAqcnEpOw0KPiArDQo+ICsvKg0KPiAgICogRHJpdmVy
+IGNvbW1hbmQgZGF0YSBpcyBpbW1lZGlhdGVseSBhZnRlciB0aGUgcmVxdWVzdC4gU28gc3VidHJh
+Y3QgcmVxdWVzdA0KPiAgICogc2l6ZSB0byBnZXQgYmFjayB0byB0aGUgb3JpZ2luYWwgcmVxdWVz
+dCwgYWRkIHJlcXVlc3Qgc2l6ZSB0byBnZXQgdGhlIFBEVS4NCj4gICAqLw0KDQpIZWxsbyBEYW1p
+ZW4sDQoNCkEgc2ltaWxhciBjb21tZW50IGFzIGZvciBwYXRjaCAxLzggZm9yIHRoaXMgcGF0Y2g6
+IHNob3VsZCB0aGVzZSBkZWNsYXJhdGlvbnMNCnBlcmhhcHMgYmUgbW92ZWQgdG8gYSBuZXcgaGVh
+ZGVyIGZpbGUsIGUuZy4gaW5jbHVkZS9saW51eC9ibGstbXEtc2NoZWQuaA0KYmVjYXVzZSB0aGVz
+ZSBmdW5jdGlvbnMgYXJlIG9ubHkgdXNlZCBieSBJL08gc2NoZWR1bGVycyBhbmQgbm90IGluIHRo
+ZQ0KaW1wbGVtZW50YXRpb24gb2YgYmxvY2sgZHJpdmVycz8gVGhhdCB3aWxsIGhlbHAgdG8gYXZv
+aWQgdGhhdCBibG9jayBkcml2ZXINCmF1dGhvcnMgc3RhcnQgd29uZGVyaW5nIHdoZXRoZXIgb3Ig
+bm90IHRoZXkgaGF2ZSB0byBjYWxsIHVzZSB0aGVzZSBmdW5jdGlvbnMNCndoaWxlIHRoZXkgYXJl
+IHJlYWRpbmcgaW5jbHVkZS9saW51eC9ibGstbXEuaC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
