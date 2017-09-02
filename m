@@ -1,155 +1,80 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH 4/5] bfq: Suppress compiler warnings about comparisons
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20170830184211.12471-5-bart.vanassche@wdc.com>
-Date: Fri, 1 Sep 2017 19:15:23 +0200
-Cc: Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Message-Id: <3E68E56E-EFA9-4D81-AC12-4F54760541E9@linaro.org>
-References: <20170830184211.12471-1-bart.vanassche@wdc.com> <20170830184211.12471-5-bart.vanassche@wdc.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:42746 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752660AbdIBPTg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 11:19:36 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 11/14] block: add check on elevator for supporting bio merge via hashtable from blk-mq sw queue
+Date: Sat,  2 Sep 2017 23:17:26 +0800
+Message-Id: <20170902151729.6162-12-ming.lei@redhat.com>
+In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+blk_mq_sched_try_merge() will be reused in following patches
+to support bio merge to blk-mq sw queue, so add checkes to
+related functions which are called from blk_mq_sched_try_merge().
 
-> Il giorno 30 ago 2017, alle ore 20:42, Bart Van Assche =
-<bart.vanassche@wdc.com> ha scritto:
->=20
-> This patch avoids that the following warnings are reported when
-> building with W=3D1:
->=20
-> block/bfq-iosched.c: In function 'bfq_back_seek_max_store':
-> block/bfq-iosched.c:4860:13: warning: comparison of unsigned =
-expression < 0 is always false [-Wtype-limits]
->  if (__data < (MIN))      \
->             ^
-> block/bfq-iosched.c:4876:1: note: in expansion of macro =
-'STORE_FUNCTION'
-> STORE_FUNCTION(bfq_back_seek_max_store, &bfqd->bfq_back_max, 0, =
-INT_MAX, 0);
-> ^~~~~~~~~~~~~~
-> block/bfq-iosched.c: In function 'bfq_slice_idle_store':
-> block/bfq-iosched.c:4860:13: warning: comparison of unsigned =
-expression < 0 is always false [-Wtype-limits]
->  if (__data < (MIN))      \
->             ^
-> block/bfq-iosched.c:4879:1: note: in expansion of macro =
-'STORE_FUNCTION'
-> STORE_FUNCTION(bfq_slice_idle_store, &bfqd->bfq_slice_idle, 0, =
-INT_MAX, 2);
-> ^~~~~~~~~~~~~~
-> block/bfq-iosched.c: In function 'bfq_slice_idle_us_store':
-> block/bfq-iosched.c:4892:13: warning: comparison of unsigned =
-expression < 0 is always false [-Wtype-limits]
->  if (__data < (MIN))      \
->             ^
-> block/bfq-iosched.c:4899:1: note: in expansion of macro =
-'USEC_STORE_FUNCTION'
-> USEC_STORE_FUNCTION(bfq_slice_idle_us_store, &bfqd->bfq_slice_idle, 0,
-> ^~~~~~~~~~~~~~~~~~~
->=20
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/elevator.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-
-> ---
-> block/bfq-iosched.c | 20 ++++++++++----------
-> 1 file changed, 10 insertions(+), 10 deletions(-)
->=20
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index cf92f16eb5f2..d375b29ad085 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -4851,16 +4851,16 @@ static ssize_t					=
-			\
-> __FUNC(struct elevator_queue *e, const char *page, size_t count)	=
-\
-> {									=
-\
-> 	struct bfq_data *bfqd =3D e->elevator_data;			=
-\
-> -	unsigned long __data;						=
-\
-> +	unsigned long __data, __min =3D (MIN), __max =3D (MAX);		=
-\
-> 	int ret;							=
-\
-> 									=
-\
-> 	ret =3D bfq_var_store(&__data, (page));				=
-\
-> 	if (ret)							=
-\
-> 		return ret;						=
-\
-> -	if (__data < (MIN))						=
-\
-> -		__data =3D (MIN);						=
-\
-> -	else if (__data > (MAX))					=
-\
-> -		__data =3D (MAX);						=
-\
-> +	if (__data < __min)						=
-\
-> +		__data =3D __min;						=
-\
-> +	else if (__data > __max)					=
-\
-> +		__data =3D __max;						=
-\
-> 	if (__CONV =3D=3D 1)						=
-\
-> 		*(__PTR) =3D msecs_to_jiffies(__data);			=
-\
-> 	else if (__CONV =3D=3D 2)						=
-\
-> @@ -4883,16 +4883,16 @@ STORE_FUNCTION(bfq_slice_idle_store, =
-&bfqd->bfq_slice_idle, 0, INT_MAX, 2);
-> static ssize_t __FUNC(struct elevator_queue *e, const char *page, =
-size_t count)\
-> {									=
-\
-> 	struct bfq_data *bfqd =3D e->elevator_data;			=
-\
-> -	unsigned long __data;						=
-\
-> +	unsigned long __data, __min =3D (MIN), __max =3D (MAX);		=
-\
-> 	int ret;							=
-\
-> 									=
-\
-> 	ret =3D bfq_var_store(&__data, (page));				=
-\
-> 	if (ret)							=
-\
-> 		return ret;						=
-\
-> -	if (__data < (MIN))						=
-\
-> -		__data =3D (MIN);						=
-\
-> -	else if (__data > (MAX))					=
-\
-> -		__data =3D (MAX);						=
-\
-> +	if (__data < __min)						=
-\
-> +		__data =3D __min;						=
-\
-> +	else if (__data > __max)					=
-\
-> +		__data =3D __max;						=
-\
-> 	*(__PTR) =3D (u64)__data * NSEC_PER_USEC;				=
-\
-> 	return count;							=
-\
-> }
-> --=20
-> 2.14.1
->=20
+diff --git a/block/elevator.c b/block/elevator.c
+index e11c7873fc21..2424aea85393 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -71,6 +71,10 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
+ 	if (!blk_rq_merge_ok(rq, bio))
+ 		return false;
+ 
++	/* We need to support to merge bio from sw queue */
++	if (!rq->q->elevator)
++		return true;
++
+ 	if (!elv_iosched_allow_bio_merge(rq, bio))
+ 		return false;
+ 
+@@ -449,6 +453,10 @@ static enum elv_merge __elv_merge(struct request_queue *q,
+ 		return ELEVATOR_BACK_MERGE;
+ 	}
+ 
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return ELEVATOR_NO_MERGE;
++
+ 	if (e->uses_mq && e->type->ops.mq.request_merge)
+ 		return e->type->ops.mq.request_merge(q, req, bio);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_merge_fn)
+@@ -711,6 +719,10 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return NULL;
++
+ 	if (e->uses_mq && e->type->ops.mq.next_request)
+ 		return e->type->ops.mq.next_request(q, rq);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_latter_req_fn)
+@@ -723,6 +735,10 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return NULL;
++
+ 	if (e->uses_mq && e->type->ops.mq.former_request)
+ 		return e->type->ops.mq.former_request(q, rq);
+ 	if (!e->uses_mq && e->type->ops.sq.elevator_former_req_fn)
+-- 
+2.9.5
