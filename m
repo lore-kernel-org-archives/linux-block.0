@@ -1,107 +1,84 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 00/16] scsi-mq support for ZBC disks
-Date: Mon, 25 Sep 2017 01:33:41 +0900
-Message-Id: <20170924163341.26377-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34160 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752660AbdIBPT0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 11:19:26 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 10/14] block: move actual bio merge code into __elv_merge
+Date: Sat,  2 Sep 2017 23:17:25 +0800
+Message-Id: <20170902151729.6162-11-ming.lei@redhat.com>
+In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series implements support for ZBC disks used through the scsi-mq I/O path.
+So that we can reuse __elv_merge() to merge bio
+into requests from sw queue in the following patches.
 
-The current scsi level support of ZBC disks guarantees write request ordering
-using a per-zone write lock which prevents issuing simultaneously multiple
-write commands to a zone, doing so avoid reordering of sequential writes to
-sequential zones. This method is however ineffective when scsi-mq is used with
-zoned block devices. This is due to the different execution model of blk-mq
-which passes a request to the scsi layer for dispatching after the request has
-been removed from the I/O scheduler queue. That is, when the scsi layer tries
-to lock the target zone of the request, the request may already be out of
-order and zone write locking fails to prevent that.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/elevator.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Various approaches have been tried to solve this problem. All of them had the
-serious disadvantage of cluttering blk-mq code with zoned block device specific
-conditions and processing. As such extensive changes can only turn into a
-maintenance nightmares, a radically different solution is proposed here.
-
-This series proposes implementing scsi-mq support for zoned block devices at
-the I/O scheduler level with simple modifications of the mq-deadline scheduler.
-the modifications are the addition of a per zone write locking mechanism
-similar to that implemented in sd_zbc.c for the legacy scsi path. The zone
-write locking mechanism is used for the exact same purpose, that is, to limit
-writes per zone to at most one request to avoid reordering. The locking context
-however changes from that of scsi-sq and is moved to the dispatch_request
-method of the scheduler. Within this context, under a spin lock guaranteeing
-atomicity against other dispatch contexts, target zones of write requests can
-be locked before write requests removal from the scheduler. In effect, this
-results in the same behavior as the legacy scsi path. Sequential write ordering
-is preserved.
-
-The changes to mq-deadline do not affect regular disks: the same scheduling
-behavior is maintained for these. The modification are also optimized to not
-lock conventional zones. To do so, additional data is introduced in the
-request queue structure so that the low level scsi code can pass upward
-information such as the total number of zones and zone types of the device.
-The availability of this new data avoids difficulties in accessing this
-information from the I/O scheduler initialization method (init_queue() method)
-context.
-
-Of note is that patch 15 of this series removes setting mq-deadline as the
-default scheduler for block devices with a single hardware queue. The reason for
-this is that setting the default scheduler is done very early in the device
-initialization sequence, when the disk characteristics are not yet known. This
-results in mq-deadline not correctly setting the default zones write locking
-behavior nased on the device zoning model. Setting of a default I/O scheduler
-can be done easily with udev rules later in the system initialization process,
-leading to correct default settings for zoned block devices.
-
-Comments are as always very much appreciated.
-
-Changes from v3:
-* Integrated support directly into mq-deadline instead of creating a new I/O
-  scheduler.
-* Disable setting of default mq scheduler for single queue devices
-
-Changes from v2:
-* Introduced blk_zoned structure
-* Moved I/O scheduler from drivers/scsi to block 
-
-Changes from v1:
-* Addressed Bart's comments for the blk-mq patches (declarations files)
-* Split (former) patch 4 into multiple patches to facilitate review
-* Fixed scsi disk lookup from io scheduler by introducing
-  scsi_disk_from_queue()
-
-Damien Le Moal (16):
-  scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
-  scsi: sd_zbc: Fix comments and indentation
-  scsi: sd_zbc: Rearrange code
-  scsi: sd_zbc: Use well defined macros
-  scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
-  block: Add zoned block device information to request queue
-  scsi: sd_zbc: Initialize device request queue zoned data
-  scsi: sd_zbc: Limit zone write locking to sequential zones
-  scsi: sd_zbc: Disable zone write locking with scsi-mq
-  block: mq-deadline: Add zoned block device data
-  block: mq-deadline: Introduce zones_wlock attribute
-  blokc: mq-deadline: Introduce dispatch helpers
-  block: mq-deadline: Introduce zone locking support
-  block: mq-deadline: Limit write dispatch for zoned block devices
-  block: do not set mq defaulte scheduler
-  block: mq-deadline: Update documentation
-
- Documentation/block/deadline-iosched.txt |  17 ++
- block/elevator.c                         |  17 +-
- block/mq-deadline.c                      | 302 +++++++++++++++++++++++++++-
- drivers/scsi/scsi_lib.c                  |   5 +-
- drivers/scsi/sd_zbc.c                    | 325 ++++++++++++++++++++++++-------
- include/linux/blkdev.h                   |  48 +++++
- include/scsi/scsi_proto.h                |  45 +++--
- 7 files changed, 656 insertions(+), 103 deletions(-)
-
+diff --git a/block/elevator.c b/block/elevator.c
+index 824cc3e69ac3..e11c7873fc21 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -409,8 +409,9 @@ void elv_dispatch_add_tail(struct request_queue *q, struct request *rq)
+ }
+ EXPORT_SYMBOL(elv_dispatch_add_tail);
+ 
+-enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+-		struct bio *bio)
++static enum elv_merge __elv_merge(struct request_queue *q,
++		struct request **req, struct bio *bio,
++		struct hlist_head *hash, struct request *last_merge)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 	struct request *__rq;
+@@ -427,11 +428,11 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	/*
+ 	 * First try one-hit cache.
+ 	 */
+-	if (q->last_merge && elv_bio_merge_ok(q->last_merge, bio)) {
+-		enum elv_merge ret = blk_try_merge(q->last_merge, bio);
++	if (last_merge && elv_bio_merge_ok(last_merge, bio)) {
++		enum elv_merge ret = blk_try_merge(last_merge, bio);
+ 
+ 		if (ret != ELEVATOR_NO_MERGE) {
+-			*req = q->last_merge;
++			*req = last_merge;
+ 			return ret;
+ 		}
+ 	}
+@@ -442,7 +443,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	/*
+ 	 * See if our hash lookup can find a potential backmerge.
+ 	 */
+-	__rq = elv_rqhash_find(q, bio->bi_iter.bi_sector);
++	__rq = rqhash_find(hash, bio->bi_iter.bi_sector);
+ 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
+ 		*req = __rq;
+ 		return ELEVATOR_BACK_MERGE;
+@@ -456,6 +457,12 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	return ELEVATOR_NO_MERGE;
+ }
+ 
++enum elv_merge elv_merge(struct request_queue *q, struct request **req,
++		struct bio *bio)
++{
++	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
++}
++
+ /*
+  * Attempt to do an insertion back merge. Only check for the case where
+  * we can append 'rq' to an existing request, so we can throw 'rq' away
 -- 
-2.13.5
+2.9.5
