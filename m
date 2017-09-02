@@ -1,115 +1,99 @@
-Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V2 06/12] scsi: sd_zbc: Rearrange code
-Date: Fri,  8 Sep 2017 01:16:34 +0900
-Message-Id: <20170907161640.30465-7-damien.lemoal@wdc.com>
-In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
-References: <20170907161640.30465-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from vulcan.natalenko.name ([104.207.131.136]:55368 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750980AbdIBHM3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Sep 2017 03:12:29 -0400
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH V2 0/8] block/scsi: safe SCSI quiescing
+Date: Sat, 02 Sep 2017 09:12:25 +0200
+Message-ID: <2212118.DtQQmenjk6@natalenko.name>
+In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
+References: <20170901184958.19452-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Move inline functions sd_zbc_zone_sectors() and sd_zbc_zone_no()
-declarations to sd_zbc.h and rearrange sd_zbc_setup() to include
-use_16_for_rw and use_10_for_rw assignment.
-Also move calculation of sdkp->zone_shift together with the assignment
-of the verified zone_blocks value in sd_zbc_check_zone_size().
+With regard to suspend/resume cycle:
 
-No functional change is introduced by this patch.
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/scsi/sd_zbc.c | 21 +++++----------------
- drivers/scsi/sd_zbc.h | 17 +++++++++++++++++
- 2 files changed, 22 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index e0927f8fb829..a25a940243a9 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -206,17 +206,6 @@ static void sd_zbc_report_zones_complete(struct scsi_cmnd *scmd,
- 	local_irq_restore(flags);
- }
- 
--static inline sector_t sd_zbc_zone_sectors(struct scsi_disk *sdkp)
--{
--	return logical_to_sectors(sdkp->device, sdkp->zone_blocks);
--}
--
--static inline unsigned int sd_zbc_zone_no(struct scsi_disk *sdkp,
--					  sector_t sector)
--{
--	return sectors_to_logical(sdkp->device, sector) >> sdkp->zone_shift;
--}
--
- /*
-  * Prepare a RESET WRITE POINTER scsi command for a REQ_OP_ZONE_RESET request.
-  */
-@@ -516,6 +505,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 	}
- 
- 	sdkp->zone_blocks = zone_blocks;
-+	sdkp->zone_shift = ilog2(zone_blocks);
- 
- 	return 0;
- }
-@@ -523,10 +513,13 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- static int sd_zbc_setup(struct scsi_disk *sdkp)
- {
- 
-+	/* READ16/WRITE16 is mandatory for ZBC disks */
-+	sdkp->device->use_16_for_rw = 1;
-+	sdkp->device->use_10_for_rw = 0;
-+
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->zone_shift = ilog2(sdkp->zone_blocks);
- 	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
- 	if (sdkp->capacity & (sdkp->zone_blocks - 1))
- 		sdkp->nr_zones++;
-@@ -589,10 +582,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 	if (ret)
- 		goto err;
- 
--	/* READ16/WRITE16 is mandatory for ZBC disks */
--	sdkp->device->use_16_for_rw = 1;
--	sdkp->device->use_10_for_rw = 0;
--
- 	return 0;
- 
- err:
-diff --git a/drivers/scsi/sd_zbc.h b/drivers/scsi/sd_zbc.h
-index 5e7ecc9b2966..b34002f0acbe 100644
---- a/drivers/scsi/sd_zbc.h
-+++ b/drivers/scsi/sd_zbc.h
-@@ -15,6 +15,23 @@ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd);
- void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
- 		     struct scsi_sense_hdr *sshdr);
- 
-+/*
-+ * Zone size in number of 512B sectors.
-+ */
-+static inline sector_t sd_zbc_zone_sectors(struct scsi_disk *sdkp)
-+{
-+	return logical_to_sectors(sdkp->device, sdkp->zone_blocks);
-+}
-+
-+/*
-+ * Zone number of the specified sector.
-+ */
-+static inline unsigned int sd_zbc_zone_no(struct scsi_disk *sdkp,
-+					  sector_t sector)
-+{
-+	return sectors_to_logical(sdkp->device, sector) >> sdkp->zone_shift;
-+}
-+
- #else /* CONFIG_BLK_DEV_ZONED */
- 
- static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
--- 
-2.13.5
+On p=C3=A1tek 1. z=C3=A1=C5=99=C3=AD 2017 20:49:49 CEST Ming Lei wrote:
+> Hi,
+>=20
+> The current SCSI quiesce isn't safe and easy to trigger I/O deadlock.
+>=20
+> Once SCSI device is put into QUIESCE, no new request except for RQF_PREEM=
+PT
+> can be dispatched to SCSI successfully, and scsi_device_quiesce() just
+> simply waits for completion of I/Os dispatched to SCSI stack. It isn't
+> enough at all.
+>=20
+> Because new request still can be allocated, but all the allocated
+> requests can't be dispatched successfully, so request pool can be
+> consumed up easily.
+>=20
+> Then request with RQF_PREEMPT can't be allocated, and system may
+> hang forever, such as during system suspend or SCSI domain alidation.
+>=20
+> Both IO hang inside system suspend[1] or SCSI domain validation
+> were reported before.
+>=20
+> This patch tries to solve the issue by freezing block queue during
+> SCSI quiescing, and allowing to allocate request of RQF_PREEMPT
+> when queue is frozen.
+>=20
+> Both SCSI and SCSI_MQ have this IO deadlock issue, this patch fixes
+> them all by introducing preempt version of blk_freeze_queue() and
+> blk_unfreeze_queue().
+>=20
+> V2:
+> 	- drop the 1st patch in V1 because percpu_ref_is_dying() is
+> 	enough as pointed by Tejun
+>=20
+> 	- introduce preempt version of blk_[freeze|unfreeze]_queue
+>=20
+> 	- sync between preempt freeze and normal freeze
+>=20
+> 	- fix warning from percpu-refcount as reported by Oleksandr
+>=20
+>=20
+> [1] https://marc.info/?t=3D150340250100013&r=3D3&w=3D2
+>=20
+>=20
+>=20
+> Ming Lei (8):
+>   blk-mq: rename blk_mq_unfreeze_queue as blk_unfreeze_queue
+>   blk-mq: rename blk_mq_freeze_queue as blk_freeze_queue
+>   blk-mq: only run hw queues for blk-mq
+>   blk-mq: rename blk_mq_freeze_queue_wait as blk_freeze_queue_wait
+>   block: tracking request allocation with q_usage_counter
+>   block: allow to allocate req with REQF_PREEMPT when queue is frozen
+>   block: introduce preempt version of blk_[freeze|unfreeze]_queue
+>   SCSI: freeze block queue when SCSI device is put into quiesce
+>=20
+>  block/bfq-iosched.c      |   2 +-
+>  block/blk-cgroup.c       |   8 ++--
+>  block/blk-core.c         |  50 ++++++++++++++++----
+>  block/blk-mq.c           | 119
+> ++++++++++++++++++++++++++++++++++++----------- block/blk-mq.h           =
+|=20
+>  1 -
+>  block/blk.h              |   6 +++
+>  block/elevator.c         |   4 +-
+>  drivers/block/loop.c     |  16 +++----
+>  drivers/block/rbd.c      |   2 +-
+>  drivers/nvme/host/core.c |   8 ++--
+>  drivers/scsi/scsi_lib.c  |  21 ++++++++-
+>  include/linux/blk-mq.h   |  15 +++---
+>  include/linux/blkdev.h   |  20 +++++++-
+>  13 files changed, 206 insertions(+), 66 deletions(-)
