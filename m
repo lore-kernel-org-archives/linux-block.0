@@ -1,51 +1,109 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Cc: bcache@lists.ewheeler.net,
-	Tang Junhui <tang.junhui@zte.com.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH 03/12] bcache: do not subtract sectors_to_gc for bypassed IO
-Date: Wed,  6 Sep 2017 14:25:53 +0800
-Message-Id: <20170906062602.50497-4-colyli@suse.de>
-In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
-References: <20170906062602.50497-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34304 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752660AbdIBPTo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 11:19:44 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 12/14] block: introduce .last_merge and .hash to blk_mq_ctx
+Date: Sat,  2 Sep 2017 23:17:27 +0800
+Message-Id: <20170902151729.6162-13-ming.lei@redhat.com>
+In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+Prepare for supporting bio merge to sw queue if no
+blk-mq io scheduler is taken.
 
-Since bypassed IOs use no bucket, so do not subtract sectors_to_gc to
-trigger gc thread.
-
-Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
-Acked-by: Coly Li <colyli@suse.de>
-Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: stable@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/request.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/blk-mq.h   |  4 ++++
+ block/blk.h      |  3 +++
+ block/elevator.c | 22 +++++++++++++++++++---
+ 3 files changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 958072a11347..4b413db99276 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -196,12 +196,12 @@ static void bch_data_insert_start(struct closure *cl)
- 	struct data_insert_op *op = container_of(cl, struct data_insert_op, cl);
- 	struct bio *bio = op->bio, *n;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 0277f9771fab..1b9742eb7399 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -18,6 +18,10 @@ struct blk_mq_ctx {
+ 	unsigned long		rq_dispatched[2];
+ 	unsigned long		rq_merged;
  
--	if (atomic_sub_return(bio_sectors(bio), &op->c->sectors_to_gc) < 0)
--		wake_up_gc(op->c);
--
- 	if (op->bypass)
- 		return bch_data_invalidate(cl);
- 
-+	if (atomic_sub_return(bio_sectors(bio), &op->c->sectors_to_gc) < 0)
-+		wake_up_gc(op->c);
++	/* bio merge via request hash table */
++	struct request		*last_merge;
++	DECLARE_HASHTABLE(hash, ELV_HASH_BITS);
 +
- 	/*
- 	 * Journal writes are marked REQ_PREFLUSH; if the original write was a
- 	 * flush, it'll wait on the journal write.
+ 	/* incremented at completion time */
+ 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
+ 
+diff --git a/block/blk.h b/block/blk.h
+index eb3436d4a73f..fa4f232afc18 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -198,6 +198,9 @@ static inline struct request *rqhash_find(struct hlist_head *hash, sector_t offs
+ 	return NULL;
+ }
+ 
++enum elv_merge elv_merge_ctx(struct request_queue *q, struct request **req,
++                struct bio *bio, struct blk_mq_ctx *ctx);
++
+ void blk_insert_flush(struct request *rq);
+ 
+ static inline struct request *__elv_next_request(struct request_queue *q)
+diff --git a/block/elevator.c b/block/elevator.c
+index 2424aea85393..0e13e5c18982 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -471,6 +471,13 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
+ }
+ 
++enum elv_merge elv_merge_ctx(struct request_queue *q, struct request **req,
++		struct bio *bio, struct blk_mq_ctx *ctx)
++{
++	WARN_ON_ONCE(!q->mq_ops);
++	return __elv_merge(q, req, bio, ctx->hash, ctx->last_merge);
++}
++
+ /*
+  * Attempt to do an insertion back merge. Only check for the case where
+  * we can append 'rq' to an existing request, so we can throw 'rq' away
+@@ -516,16 +523,25 @@ void elv_merged_request(struct request_queue *q, struct request *rq,
+ 		enum elv_merge type)
+ {
+ 	struct elevator_queue *e = q->elevator;
++	struct hlist_head *hash = e->hash;
++
++	/* we do bio merge on blk-mq sw queue */
++	if (q->mq_ops && !e) {
++		rq->mq_ctx->last_merge = rq;
++		hash = rq->mq_ctx->hash;
++		goto reposition;
++	}
++
++	q->last_merge = rq;
+ 
+ 	if (e->uses_mq && e->type->ops.mq.request_merged)
+ 		e->type->ops.mq.request_merged(q, rq, type);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_merged_fn)
+ 		e->type->ops.sq.elevator_merged_fn(q, rq, type);
+ 
++ reposition:
+ 	if (type == ELEVATOR_BACK_MERGE)
+-		elv_rqhash_reposition(q, rq);
+-
+-	q->last_merge = rq;
++		rqhash_reposition(hash, rq);
+ }
+ 
+ void elv_merge_requests(struct request_queue *q, struct request *rq,
 -- 
-2.13.5
+2.9.5
