@@ -1,85 +1,96 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60752 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:56336 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752157AbdI3Lrq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:47:46 -0400
+        id S1752441AbdIBNKW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 09:10:22 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/5] dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
-Date: Sat, 30 Sep 2017 19:46:49 +0800
-Message-Id: <20170930114652.32441-3-ming.lei@redhat.com>
-In-Reply-To: <20170930114652.32441-1-ming.lei@redhat.com>
-References: <20170930114652.32441-1-ming.lei@redhat.com>
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 8/8] SCSI: preempt freeze block queue when SCSI device is put into quiesce
+Date: Sat,  2 Sep 2017 21:08:40 +0800
+Message-Id: <20170902130840.24609-9-ming.lei@redhat.com>
+In-Reply-To: <20170902130840.24609-1-ming.lei@redhat.com>
+References: <20170902130840.24609-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun
-the queue in the three situations:
+Simply quiesing SCSI device and waiting for completeion of IO
+dispatched to SCSI queue isn't safe, it is easy to use up
+requests because all these allocated requests can't be dispatched
+when device is put in QIUESCE. Then no request can be allocated
+for RQF_PREEMPT, and system may hang somewhere, such as
+When sending commands of sync_cache or start_stop during
+system suspend path.
 
-1) if BLK_MQ_S_SCHED_RESTART is set
-- queue is rerun after one rq is completed, see blk_mq_sched_restart()
-which is run from blk_mq_free_request()
+Before quiesing SCSI, this patch freezes block queue in preempt
+mode first, so no new normal request can enter queue any more,
+and all pending requests are drained too once blk_freeze_queue_preempt
+is returned. And only RQF_PREEMPT can be allocated in preempt freeze.
 
-2) BLK_MQ_S_TAG_WAITING is set
-- queue is rerun after one tag is freed
-
-3) otherwise
-- queue is run immediately in blk_mq_dispatch_rq_list()
-
-This random dealy of running hw queue is introduced by commit
-6077c2d706097c0(dm rq: Avoid that request processing stalls sporadically),
-which claimed one request processing stalling is fixed,
-but never explained the behind idea, and it is a workaound at most.
-Even the question isn't explained by anyone in recent discussion.
-
-Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is
-a horrible hack because it makes BLK_MQ_S_SCHED_RESTART not
-working, and will degrade I/O peformance a lot.
-
-Finally this patch makes sure that dm-rq returns
-BLK_STS_RESOURCE to blk-mq only when underlying queue is
-out of resource, so we switch to return DM_MAPIO_DELAY_REQUEU
-if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED is set in
-multipath_clone_and_map().
+This patch also uses __blk_get_request() for allocating
+request with RQF_PREEMPT, so that the allocation can
+succeed even though block queue is preempt frozen.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/dm-mpath.c | 4 +---
- drivers/md/dm-rq.c    | 1 -
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ drivers/scsi/scsi_lib.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index e8094d8fbe0d..97e4bd100fa1 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -484,9 +484,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 		return DM_MAPIO_KILL;
- 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
- 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
--		if (pg_init_all_paths(m))
--			return DM_MAPIO_DELAY_REQUEUE;
--		return DM_MAPIO_REQUEUE;
-+		return DM_MAPIO_DELAY_REQUEUE;
- 	}
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index f6097b89d5d3..e1ad135cb209 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -243,10 +243,12 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct request *req;
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
++	unsigned flag = sdev->sdev_state == SDEV_QUIESCE ? BLK_REQ_PREEMPT : 0;
  
- 	memset(mpio, 0, sizeof(*mpio));
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index f5e2b6967357..46f012185b43 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -758,7 +758,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
--		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
- 		return BLK_STS_RESOURCE;
- 	}
+-	req = blk_get_request(sdev->request_queue,
++	req = __blk_get_request(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM,
++			flag);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -2890,6 +2892,20 @@ scsi_device_quiesce(struct scsi_device *sdev)
+ {
+ 	int err;
+ 
++	/*
++	 * Simply quiesing SCSI device isn't safe, it is easy
++	 * to use up requests because all these allocated requests
++	 * can't be dispatched when device is put in QIUESCE.
++	 * Then no request can be allocated and we may hang
++	 * somewhere, such as system suspend/resume.
++	 *
++	 * So we freeze block queue in preempt mode first, no new
++	 * normal request can enter queue any more, and all pending
++	 * requests are drained once blk_freeze_queue is returned.
++	 * Only RQF_PREEMPT is allowed in preempt freeze.
++	 */
++	blk_freeze_queue_preempt(sdev->request_queue);
++
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+ 	mutex_unlock(&sdev->state_mutex);
+@@ -2926,6 +2942,8 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+ 		scsi_run_queue(sdev->request_queue);
+ 	mutex_unlock(&sdev->state_mutex);
++
++	blk_unfreeze_queue_preempt(sdev->request_queue);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
  
 -- 
 2.9.5
