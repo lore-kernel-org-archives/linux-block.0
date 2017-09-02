@@ -1,37 +1,72 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Thu, 21 Sep 2017 23:16:27 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH v2 0/2] fix wrong value when user modify nr_request by sysfs
-Message-ID: <cover.1506006064.git.zhangweiping@didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:44414 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752660AbdIBPTy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 11:19:54 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 13/14] blk-mq-sched: refactor blk_mq_sched_try_merge()
+Date: Sat,  2 Sep 2017 23:17:28 +0800
+Message-Id: <20170902151729.6162-14-ming.lei@redhat.com>
+In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+This patch introduces one function __blk_mq_try_merge()
+which will be resued for bio merge to sw queue in
+the following patch.
 
-This is v2 of fixing nr_request.
+No functional change.
 
-v1 -> v2:
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-blk-mq: fix nr_requests wrong value when modify it from sysfs
-this patch return -EINVAL when user write a value that's too large.
-
-blk-sysfs: return EINVAL when user modify nr_request less than
-  BLKDEV_MIN_RQ
-In order to keep same behavior with former patch, also return EINVAL 
-when user write a value less than BLKDEV_MIN_RQ
-
-weiping zhang (2):
-  blk-mq: fix nr_requests wrong value when modify it from sysfs
-  blk-sysfs: return EINVAL when user modify nr_request less than
-    BLKDEV_MIN_RQ
-
- block/blk-mq.c    | 8 ++++++--
- block/blk-sysfs.c | 2 +-
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 1ff6f9bedd1a..afa7d9a258e4 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -228,12 +228,11 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	}
+ }
+ 
+-bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-			    struct request **merged_request)
++static bool __blk_mq_try_merge(struct request_queue *q,
++		struct bio *bio, struct request **merged_request,
++		struct request *rq, enum elv_merge type)
+ {
+-	struct request *rq;
+-
+-	switch (elv_merge(q, &rq, bio)) {
++	switch (type) {
+ 	case ELEVATOR_BACK_MERGE:
+ 		if (!blk_mq_sched_allow_merge(q, rq, bio))
+ 			return false;
+@@ -256,6 +255,15 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ 		return false;
+ 	}
+ }
++
++bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
++		struct request **merged_request)
++{
++	struct request *rq;
++	enum elv_merge type = elv_merge(q, &rq, bio);
++
++	return __blk_mq_try_merge(q, bio, merged_request, rq, type);
++}
+ EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
+ 
+ /*
 -- 
-2.9.4
+2.9.5
