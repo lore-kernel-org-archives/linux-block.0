@@ -1,43 +1,78 @@
-Return-Path: <mgorman@techsingularity.net>
-Date: Mon, 4 Sep 2017 09:14:51 +0100
-From: Mel Gorman <mgorman@techsingularity.net>
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
-	broonie@kernel.org, lee.tibbert@gmail.com, oleksandr@natalenko.name
-Subject: Re: [PATCH BUGFIX/IMPROVEMENT V2 0/3] three bfq fixes restoring
- service guarantees with random sync writes in bg
-Message-ID: <20170904081451.swq52kn2x24guphz@techsingularity.net>
-References: <20170831064631.2223-1-paolo.valente@linaro.org>
- <20170831144257.oa5nm6vzihpam6kw@techsingularity.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-In-Reply-To: <20170831144257.oa5nm6vzihpam6kw@techsingularity.net>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:35108 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752596AbdIBNJu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 09:09:50 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 5/8] block: tracking request allocation with q_usage_counter
+Date: Sat,  2 Sep 2017 21:08:37 +0800
+Message-Id: <20170902130840.24609-6-ming.lei@redhat.com>
+In-Reply-To: <20170902130840.24609-1-ming.lei@redhat.com>
+References: <20170902130840.24609-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, Aug 31, 2017 at 03:42:57PM +0100, Mel Gorman wrote:
-> On Thu, Aug 31, 2017 at 08:46:28AM +0200, Paolo Valente wrote:
-> > [SECOND TAKE, with just the name of one of the tester fixed]
-> > 
-> > Hi,
-> > while testing the read-write unfairness issues reported by Mel, I
-> > found BFQ failing to guarantee good responsiveness against heavy
-> > random sync writes in the background, i.e., multiple writers doing
-> > random writes and systematic fdatasync [1]. The failure was caused by
-> > three related bugs, because of which BFQ failed to guarantee to
-> > high-weight processes the expected fraction of the throughput.
-> > 
-> 
-> Queued on top of Ming's most recent series even though that's still a work
-> in progress. I should know in a few days how things stand.
-> 
+This usage is basically same with blk-mq, so that we can
+support to freeze queue easily.
 
-The problems with parallel heavy writers seem to have disappeared with this
-series. There are still revisions taking place on Ming's to overall setting
-of legacy vs mq is still a work in progress but this series looks good.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Thanks.
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ce2d3b6f6c62..85b15833a7a5 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1405,16 +1405,21 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 					   unsigned int op, gfp_t gfp_mask)
+ {
+ 	struct request *rq;
++	int ret = 0;
+ 
+ 	WARN_ON_ONCE(q->mq_ops);
+ 
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
++	if (ret)
++		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+ 	rq = get_request(q, op, NULL, gfp_mask);
+ 	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
++		blk_queue_exit(q);
+ 		return rq;
+ 	}
+ 
+@@ -1586,6 +1591,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 		blk_free_request(rl, req);
+ 		freed_request(rl, sync, rq_flags);
+ 		blk_put_rl(rl);
++		blk_queue_exit(q);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__blk_put_request);
+@@ -1867,8 +1873,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	 * Grab a free request. This is might sleep but can not fail.
+ 	 * Returns with the queue unlocked.
+ 	 */
++	blk_queue_enter_live(q);
+ 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
+ 	if (IS_ERR(req)) {
++		blk_queue_exit(q);
+ 		__wbt_done(q->rq_wb, wb_acct);
+ 		if (PTR_ERR(req) == -ENOMEM)
+ 			bio->bi_status = BLK_STS_RESOURCE;
 -- 
-Mel Gorman
-SUSE Labs
+2.9.5
