@@ -1,93 +1,74 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:33852 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752660AbdIBPSz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 11:18:55 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 0/8] block/scsi: safe SCSI quiescing
-Date: Sat,  2 Sep 2017 21:08:32 +0800
-Message-Id: <20170902130840.24609-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 07/14] blk-mq-sched: introduce blk_mq_sched_queue_depth()
+Date: Sat,  2 Sep 2017 23:17:22 +0800
+Message-Id: <20170902151729.6162-8-ming.lei@redhat.com>
+In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi,
+The following patch will use one hint to figure out
+default queue depth for scheduler queue, so introduce
+the helper of blk_mq_sched_queue_depth() for this purpose.
 
-The current SCSI quiesce isn't safe and easy to trigger I/O deadlock.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c |  8 +-------
+ block/blk-mq-sched.h | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-Once SCSI device is put into QUIESCE, no new request except for RQF_PREEMPT
-can be dispatched to SCSI successfully, and scsi_device_quiesce() just simply
-waits for completion of I/Os dispatched to SCSI stack. It isn't enough at all.
-
-Because new request still can be allocated, but all the allocated
-requests can't be dispatched successfully, so request pool can be
-consumed up easily.
-
-Then request with RQF_PREEMPT can't be allocated, and system may
-hang forever, such as during system suspend or SCSI domain alidation.
-
-Both IO hang inside system suspend[1] or SCSI domain validation
-were reported before.
-
-This patch introduces preempt freez, and tries to solve the issue
-by preempt freezing block queue during SCSI quiesce, and allows
-to allocate request of RQF_PREEMPT when queue is preempt-frozen.
-
-Both SCSI and SCSI_MQ have this IO deadlock issue, this patch fixes
-them all by introducing blk_freeze_queue_preempt() and
-blk_unfreeze_queue_preempt(), also unifying current interfaces for
-freezing queue between block legacy and blk-mq.
-
-Oleksandr has verified that this patchset V2 fixes his I/O hang
-during suspend/resume cycle.
-
-V3:
-	- introduce q->preempt_unfreezing to fix one bug of preempt freeze
-	- call blk_queue_enter_live() only when queue is preempt frozen
-	- cleanup a bit on the implementation of preempt freeze
-	- only patch 6 and 7 are changed
-
-V2:
-	- drop the 1st patch in V1 because percpu_ref_is_dying() is
-	enough as pointed by Tejun
-	- introduce preempt version of blk_[freeze|unfreeze]_queue
-	- sync between preempt freeze and normal freeze
-	- fix warning from percpu-refcount as reported by Oleksandr
-
-
-[1] https://marc.info/?t=150340250100013&r=3&w=2
-
-
-
-Ming Lei (8):
-  blk-mq: rename blk_mq_unfreeze_queue as blk_unfreeze_queue
-  blk-mq: rename blk_mq_freeze_queue as blk_freeze_queue
-  blk-mq: only run hw queues for blk-mq
-  blk-mq: rename blk_mq_freeze_queue_wait as blk_freeze_queue_wait
-  block: tracking request allocation with q_usage_counter
-  block: introduce preempt version of blk_[freeze|unfreeze]_queue
-  block: allow to allocate req with REQF_PREEMPT when queue is preempt
-    frozen
-  SCSI: preempt freeze block queue when SCSI device is put into quiesce
-
- block/bfq-iosched.c      |   2 +-
- block/blk-cgroup.c       |   8 +--
- block/blk-core.c         |  53 ++++++++++++---
- block/blk-mq.c           | 170 +++++++++++++++++++++++++++++++++++++++--------
- block/blk-mq.h           |   1 -
- block/blk.h              |  17 +++++
- block/elevator.c         |   4 +-
- drivers/block/loop.c     |  16 ++---
- drivers/block/rbd.c      |   2 +-
- drivers/nvme/host/core.c |   8 +--
- drivers/scsi/scsi_lib.c  |  22 +++++-
- include/linux/blk-mq.h   |  15 +++--
- include/linux/blkdev.h   |  21 +++++-
- 13 files changed, 273 insertions(+), 66 deletions(-)
-
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 97e7a4fe3a32..1ff6f9bedd1a 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -595,13 +595,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 		return 0;
+ 	}
+ 
+-	/*
+-	 * Default to double of smaller one between hw queue_depth and 128,
+-	 * since we don't split into sync/async like the old code did.
+-	 * Additionally, this is a per-hw queue depth.
+-	 */
+-	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
+-				   BLKDEV_MAX_RQ);
++	q->nr_requests = blk_mq_sched_queue_depth(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 9267d0b7c197..1d47f3fda1d0 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -96,4 +96,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+ 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ }
+ 
++static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
++{
++	/*
++	 * Default to double of smaller one between hw queue_depth and 128,
++	 * since we don't split into sync/async like the old code did.
++	 * Additionally, this is a per-hw queue depth.
++	 */
++	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
++				   BLKDEV_MAX_RQ);
++}
++
+ #endif
 -- 
 2.9.5
