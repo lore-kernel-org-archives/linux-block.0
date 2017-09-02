@@ -1,87 +1,173 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:36798 "EHLO mga14.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:41154 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752448AbdIVMoR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2017 08:44:17 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V9 05/15] mmc: mmc: Enable CQE's
-Date: Fri, 22 Sep 2017 15:36:54 +0300
-Message-Id: <1506083824-4024-6-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+        id S1752660AbdIBPTQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Sep 2017 11:19:16 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 09/14] block: introduce rqhash helpers
+Date: Sat,  2 Sep 2017 23:17:24 +0800
+Message-Id: <20170902151729.6162-10-ming.lei@redhat.com>
+In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Enable or disable CQE when a card is added or removed respectively.
+We need this helpers for supporting to use hashtable to improve
+bio merge from sw queue in the following patches.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+No functional change.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/mmc/core/bus.c |  7 +++++++
- drivers/mmc/core/mmc.c | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+ block/blk.h      | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/elevator.c | 36 +++++++-----------------------------
+ 2 files changed, 59 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
-index 301246513a37..a4b49e25fe96 100644
---- a/drivers/mmc/core/bus.c
-+++ b/drivers/mmc/core/bus.c
-@@ -369,10 +369,17 @@ int mmc_add_card(struct mmc_card *card)
+diff --git a/block/blk.h b/block/blk.h
+index fcb9775b997d..eb3436d4a73f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -146,6 +146,58 @@ static inline void blk_clear_rq_complete(struct request *rq)
   */
- void mmc_remove_card(struct mmc_card *card)
- {
-+	struct mmc_host *host = card->host;
-+
- #ifdef CONFIG_DEBUG_FS
- 	mmc_remove_card_debugfs(card);
- #endif
+ #define ELV_ON_HASH(rq) ((rq)->rq_flags & RQF_HASHED)
  
-+	if (host->cqe_enabled) {
-+		host->cqe_ops->cqe_disable(host);
-+		host->cqe_enabled = false;
-+	}
++/*
++ * Merge hash stuff.
++ */
++#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
 +
- 	if (mmc_card_present(card)) {
- 		if (mmc_host_is_spi(card->host)) {
- 			pr_info("%s: SPI card removed\n",
-diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index 454a5079a90f..de817ac80383 100644
---- a/drivers/mmc/core/mmc.c
-+++ b/drivers/mmc/core/mmc.c
-@@ -1807,6 +1807,18 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
- 	 */
- 	card->reenable_cmdq = card->ext_csd.cmdq_en;
- 
-+	if (card->ext_csd.cmdq_en && !host->cqe_enabled) {
-+		err = host->cqe_ops->cqe_enable(host, card);
-+		if (err) {
-+			pr_err("%s: Failed to enable CQE, error %d\n",
-+				mmc_hostname(host), err);
-+		} else {
-+			host->cqe_enabled = true;
-+			pr_info("%s: Command Queue Engine enabled\n",
-+				mmc_hostname(host));
++#define bucket(head, key)	&((head)[hash_min((key), ELV_HASH_BITS)])
++
++static inline void __rqhash_del(struct request *rq)
++{
++	hash_del(&rq->hash);
++	rq->rq_flags &= ~RQF_HASHED;
++}
++
++static inline void rqhash_del(struct request *rq)
++{
++	if (ELV_ON_HASH(rq))
++		__rqhash_del(rq);
++}
++
++static inline void rqhash_add(struct hlist_head *hash, struct request *rq)
++{
++	BUG_ON(ELV_ON_HASH(rq));
++	hlist_add_head(&rq->hash, bucket(hash, rq_hash_key(rq)));
++	rq->rq_flags |= RQF_HASHED;
++}
++
++static inline void rqhash_reposition(struct hlist_head *hash, struct request *rq)
++{
++	__rqhash_del(rq);
++	rqhash_add(hash, rq);
++}
++
++static inline struct request *rqhash_find(struct hlist_head *hash, sector_t offset)
++{
++	struct hlist_node *next;
++	struct request *rq = NULL;
++
++	hlist_for_each_entry_safe(rq, next, bucket(hash, offset), hash) {
++		BUG_ON(!ELV_ON_HASH(rq));
++
++		if (unlikely(!rq_mergeable(rq))) {
++			__rqhash_del(rq);
++			continue;
 +		}
++
++		if (rq_hash_key(rq) == offset)
++			return rq;
 +	}
 +
- 	if (!oldcard)
- 		host->card = card;
++	return NULL;
++}
++
+ void blk_insert_flush(struct request *rq);
  
+ static inline struct request *__elv_next_request(struct request_queue *q)
+diff --git a/block/elevator.c b/block/elevator.c
+index 153926a90901..824cc3e69ac3 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -47,11 +47,6 @@ static DEFINE_SPINLOCK(elv_list_lock);
+ static LIST_HEAD(elv_list);
+ 
+ /*
+- * Merge hash stuff.
+- */
+-#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
+-
+-/*
+  * Query io scheduler to see if the current process issuing bio may be
+  * merged with rq.
+  */
+@@ -268,14 +263,12 @@ EXPORT_SYMBOL(elevator_exit);
+ 
+ static inline void __elv_rqhash_del(struct request *rq)
+ {
+-	hash_del(&rq->hash);
+-	rq->rq_flags &= ~RQF_HASHED;
++	__rqhash_del(rq);
+ }
+ 
+ void elv_rqhash_del(struct request_queue *q, struct request *rq)
+ {
+-	if (ELV_ON_HASH(rq))
+-		__elv_rqhash_del(rq);
++	rqhash_del(rq);
+ }
+ EXPORT_SYMBOL_GPL(elv_rqhash_del);
+ 
+@@ -283,37 +276,22 @@ void elv_rqhash_add(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
+-	BUG_ON(ELV_ON_HASH(rq));
+-	hash_add(e->hash, &rq->hash, rq_hash_key(rq));
+-	rq->rq_flags |= RQF_HASHED;
++	rqhash_add(e->hash, rq);
+ }
+ EXPORT_SYMBOL_GPL(elv_rqhash_add);
+ 
+ void elv_rqhash_reposition(struct request_queue *q, struct request *rq)
+ {
+-	__elv_rqhash_del(rq);
+-	elv_rqhash_add(q, rq);
++	struct elevator_queue *e = q->elevator;
++
++	rqhash_reposition(e->hash, rq);
+ }
+ 
+ struct request *elv_rqhash_find(struct request_queue *q, sector_t offset)
+ {
+ 	struct elevator_queue *e = q->elevator;
+-	struct hlist_node *next;
+-	struct request *rq;
+-
+-	hash_for_each_possible_safe(e->hash, rq, next, hash, offset) {
+-		BUG_ON(!ELV_ON_HASH(rq));
+ 
+-		if (unlikely(!rq_mergeable(rq))) {
+-			__elv_rqhash_del(rq);
+-			continue;
+-		}
+-
+-		if (rq_hash_key(rq) == offset)
+-			return rq;
+-	}
+-
+-	return NULL;
++	return rqhash_find(e->hash, offset);
+ }
+ 
+ /*
 -- 
-1.9.1
+2.9.5
