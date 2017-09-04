@@ -1,42 +1,56 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "zhangweiping@didichuxing.com" <zhangweiping@didichuxing.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] blk-mq: fix nr_requests wrong value when modify it from
- sysfs
-Date: Tue, 5 Sep 2017 15:42:45 +0000
-Message-ID: <1504626163.4135.33.camel@wdc.com>
-References: <20170903134634.GA27411@localhost.didichuxing.com>
-In-Reply-To: <20170903134634.GA27411@localhost.didichuxing.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <20170903134634.GA27411@localhost.didichuxing.com>
+References: <20170903134634.GA27411@localhost.didichuxing.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Mon, 4 Sep 2017 18:02:36 +0800
+Message-ID: <CACVXFVM43v40OOjCCdVk42=bsszXWcyEidScnmFDZ0OHVmn59A@mail.gmail.com>
+Subject: Re: [PATCH] blk-mq: fix nr_requests wrong value when modify it from sysfs
+To: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU3VuLCAyMDE3LTA5LTAzIGF0IDIxOjQ2ICswODAwLCB3ZWlwaW5nIHpoYW5nIHdyb3RlOg0K
-PiBpZiBibGstbXEgdXNlICJub25lIiBpbyBzY2hlZHVsZXIsIG5yX3JlcXVlc3QgZ2V0IGEgd3Jv
-bmcgdmFsdWUgd2hlbg0KPiBpbnB1dCBhIG51bWJlciA+IHRhZ19zZXQtPnF1ZXVlX2RlcHRoLiBi
-bGtfbXFfdGFnX3VwZGF0ZV9kZXB0aCB3aWxsIGdldA0KPiB0aGUgc21hbGxlciBvbmUgbWluKG5y
-LCBzZXQtPnF1ZXVlX2RlcHRoKSwgYW5kIHRoZW4gcS0+bnJfcmVxdWVzdCBnZXQgYQ0KPiB3cm9u
-ZyB2YWx1ZS4NCj4gDQo+IFJlcHJvZHVjZToNCj4gDQo+IGVjaG8gbm9uZSA+IC9zeXMvYmxvY2sv
-bnZtZTBuMS9xdWV1ZS9pb3NjaGVkdWxlcg0KPiBlY2hvIDEwMDAwMDAgPiAvc3lzL2Jsb2NrL252
-bWUwbjEvcXVldWUvbnJfcmVxdWVzdHMNCj4gY2F0IC9zeXMvYmxvY2svbnZtZTBuMS9xdWV1ZS9u
-cl9yZXF1ZXN0cw0KPiAxMDAwMDAwDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiB3ZWlwaW5nIHpoYW5n
-IDx6aGFuZ3dlaXBpbmdAZGlkaWNodXhpbmcuY29tPg0KPiAtLS0NCj4gIGJsb2NrL2Jsay1tcS5j
-IHwgNyArKysrKy0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAyIGRlbGV0
-aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1x
-LmMNCj4gaW5kZXggZjg0ZDE0NS4uODMwM2U1ZSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmxrLW1x
-LmMNCj4gKysrIGIvYmxvY2svYmxrLW1xLmMNCj4gQEAgLTI2MjIsOCArMjYyMiwxMSBAQCBpbnQg
-YmxrX21xX3VwZGF0ZV9ucl9yZXF1ZXN0cyhzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgdW5zaWdu
-ZWQgaW50IG5yKQ0KPiAgCQkgKiBxdWV1ZSBkZXB0aC4gVGhpcyBpcyBzaW1pbGFyIHRvIHdoYXQg
-dGhlIG9sZCBjb2RlIHdvdWxkIGRvLg0KPiAgCQkgKi8NCj4gIAkJaWYgKCFoY3R4LT5zY2hlZF90
-YWdzKSB7DQo+IC0JCQlyZXQgPSBibGtfbXFfdGFnX3VwZGF0ZV9kZXB0aChoY3R4LCAmaGN0eC0+
-dGFncywNCj4gLQkJCQkJCQltaW4obnIsIHNldC0+cXVldWVfZGVwdGgpLA0KPiArCQkJaWYgKG5y
-ID4gc2V0LT5xdWV1ZV9kZXB0aCkgew0KPiArCQkJCW5yID0gc2V0LT5xdWV1ZV9kZXB0aDsNCj4g
-KwkJCQlwcl93YXJuKCJyZWR1Y2UgbnJfcmVxdWVzdCB0byAldVxuIiwgbnIpOw0KPiArCQkJfQ0K
-PiArCQkJcmV0ID0gYmxrX21xX3RhZ191cGRhdGVfZGVwdGgoaGN0eCwgJmhjdHgtPnRhZ3MsIG5y
-LA0KPiAgCQkJCQkJCWZhbHNlKTsNCj4gIAkJfSBlbHNlIHsNCj4gIAkJCXJldCA9IGJsa19tcV90
-YWdfdXBkYXRlX2RlcHRoKGhjdHgsICZoY3R4LT5zY2hlZF90YWdzLA0KDQpTaG91bGRuJ3QgdGhp
-cyBjb2RlIHJldHVybiAtRUlOVkFMIG9yIC1FUkFOR0UgaWYgJ25yJyBpcyB0b28gbGFyZ2U/IFRo
-YXQgd2lsbCBoZWxwIHRvDQprZWVwIHVzZXIgc3BhY2UgY29kZSBzaW1wbGUgdGhhdCB1cGRhdGVz
-IHRoZSBxdWV1ZSBkZXB0aC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+On Sun, Sep 3, 2017 at 9:46 PM, weiping zhang
+<zhangweiping@didichuxing.com> wrote:
+> if blk-mq use "none" io scheduler, nr_request get a wrong value when
+> input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
+> the smaller one min(nr, set->queue_depth), and then q->nr_request get a
+> wrong value.
+>
+> Reproduce:
+>
+> echo none > /sys/block/nvme0n1/queue/ioscheduler
+> echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
+> cat /sys/block/nvme0n1/queue/nr_requests
+> 1000000
+>
+> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> ---
+>  block/blk-mq.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f84d145..8303e5e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2622,8 +2622,11 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+>                  * queue depth. This is similar to what the old code would do.
+>                  */
+>                 if (!hctx->sched_tags) {
+> -                       ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
+> -                                                       min(nr, set->queue_depth),
+> +                       if (nr > set->queue_depth) {
+> +                               nr = set->queue_depth;
+> +                               pr_warn("reduce nr_request to %u\n", nr);
+> +                       }
+> +                       ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
+>                                                         false);
+>                 } else {
+>                         ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+
+Not sure if the pr_warn() is useful, but the idea is correct:
+
+          Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming Lei
