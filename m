@@ -1,67 +1,40 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51491 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753853AbdIDQUo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Sep 2017 12:20:44 -0400
-Date: Tue, 5 Sep 2017 00:20:24 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:30603 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753669AbdIDPV4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Sep 2017 11:21:56 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "tj@kernel.org" <tj@kernel.org>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+CC: "tj@kernel.org" <tj@kernel.org>,
         "jthumshirn@suse.de" <jthumshirn@suse.de>,
         "oleksandr@natalenko.name" <oleksandr@natalenko.name>
 Subject: Re: [PATCH V3 6/8] block: introduce preempt version of
  blk_[freeze|unfreeze]_queue
-Message-ID: <20170904162023.GB21757@ming.t460p>
+Date: Mon, 4 Sep 2017 15:21:08 +0000
+Message-ID: <1504538467.3189.2.camel@wdc.com>
 References: <20170902130840.24609-1-ming.lei@redhat.com>
- <20170902130840.24609-7-ming.lei@redhat.com>
- <1504538467.3189.2.camel@wdc.com>
+         <20170902130840.24609-7-ming.lei@redhat.com>
+In-Reply-To: <20170902130840.24609-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504538467.3189.2.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Sep 04, 2017 at 03:21:08PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-09-02 at 21:08 +0800, Ming Lei wrote:
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -565,6 +565,10 @@ struct request_queue {
-> >  
-> >  	int			bypass_depth;
-> >  	atomic_t		mq_freeze_depth;
-> > +	spinlock_t		freeze_lock;
-> > +	unsigned		normal_freezing:1;
-> > +	unsigned		preempt_freezing:1;
-> > +	unsigned		preempt_unfreezing:1;
-> >  
-> >  #if defined(CONFIG_BLK_DEV_BSG)
-> >  	bsg_job_fn		*bsg_job_fn;
-> 
-> Requests queues already have to many states and you want to make request queues
-> even more complicated by introducing several new state variables? Yikes!
-
-The three flags are used in freeze/unfreeze path only, and I don't think
-they are too complicated to maintain. Actually each state are simply
-enough:
-
-	- normal_freezing means the queue is in normal freezing, it is set
-	before blk_queue_freeze() returns. In this state, no any request
-	can be allocated from the queue, just like current blk queue
-	freezing.
-
-	- preempt_freezing means the queue is in preempt freezing, the flag
-	is set before blk_queue_freeze_preempt() returns successfully. In
-	this state, only RQF_PREEMPT is allowed to be allocated.
-
-	- preempt_unfreezing means the queue is in preempt unfreezing, just
-	set in the entry of blk_queue_unfreeze_preempt(). In this state,
-	no any request can be allocated from the queue.
-
--- 
-Ming
+T24gU2F0LCAyMDE3LTA5LTAyIGF0IDIxOjA4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gLS0t
+IGEvaW5jbHVkZS9saW51eC9ibGtkZXYuaA0KPiArKysgYi9pbmNsdWRlL2xpbnV4L2Jsa2Rldi5o
+DQo+IEBAIC01NjUsNiArNTY1LDEwIEBAIHN0cnVjdCByZXF1ZXN0X3F1ZXVlIHsNCj4gIA0KPiAg
+CWludAkJCWJ5cGFzc19kZXB0aDsNCj4gIAlhdG9taWNfdAkJbXFfZnJlZXplX2RlcHRoOw0KPiAr
+CXNwaW5sb2NrX3QJCWZyZWV6ZV9sb2NrOw0KPiArCXVuc2lnbmVkCQlub3JtYWxfZnJlZXppbmc6
+MTsNCj4gKwl1bnNpZ25lZAkJcHJlZW1wdF9mcmVlemluZzoxOw0KPiArCXVuc2lnbmVkCQlwcmVl
+bXB0X3VuZnJlZXppbmc6MTsNCj4gIA0KPiAgI2lmIGRlZmluZWQoQ09ORklHX0JMS19ERVZfQlNH
+KQ0KPiAgCWJzZ19qb2JfZm4JCSpic2dfam9iX2ZuOw0KDQpSZXF1ZXN0cyBxdWV1ZXMgYWxyZWFk
+eSBoYXZlIHRvIG1hbnkgc3RhdGVzIGFuZCB5b3Ugd2FudCB0byBtYWtlIHJlcXVlc3QgcXVldWVz
+DQpldmVuIG1vcmUgY29tcGxpY2F0ZWQgYnkgaW50cm9kdWNpbmcgc2V2ZXJhbCBuZXcgc3RhdGUg
+dmFyaWFibGVzPyBZaWtlcyENCg0KQmFydC4=
