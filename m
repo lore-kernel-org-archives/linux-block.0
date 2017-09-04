@@ -1,52 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:51840 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750718AbdIEGnv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2017 02:43:51 -0400
-Date: Mon, 4 Sep 2017 23:43:48 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Coly Li <i@coly.li>
-Cc: Christoph Hellwig <hch@infradead.org>, bcache@lists.ewheeler.net,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        axboe@kernel.dk, Jan Kara <jack@suse.cz>
+Return-Path: <i@coly.li>
 Subject: Re: [PATCH 01/19] bcache: Fix leak of bdev reference
-Message-ID: <20170905064348.GA23716@infradead.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: bcache@lists.ewheeler.net, linux-block@vger.kernel.org,
+ linux-bcache@vger.kernel.org, axboe@kernel.dk, Jan Kara <jack@suse.cz>
 References: <20170629134510.GA32385@infradead.org>
  <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
  <20170705182447.GA10673@infradead.org>
- <e9019647-62b5-1c14-8b2f-66528b972b5c@coly.li>
+From: Coly Li <i@coly.li>
+Message-ID: <e9019647-62b5-1c14-8b2f-66528b972b5c@coly.li>
+Date: Tue, 5 Sep 2017 01:30:04 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e9019647-62b5-1c14-8b2f-66528b972b5c@coly.li>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170705182447.GA10673@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 05, 2017 at 01:30:04AM +0800, Coly Li wrote:
+On 2017/7/6 上午2:24, Christoph Hellwig wrote:
+> On Fri, Jun 30, 2017 at 01:42:50PM -0700, bcache@lists.ewheeler.net wrote:
+>> From: Jan Kara <jack@suse.cz>
+>>
+>> If blkdev_get_by_path() in register_bcache() fails, we try to lookup the
+>> block device using lookup_bdev() to detect which situation we are in to
+>> properly report error. However we never drop the reference returned to
+>> us from lookup_bdev(). Fix that.
 > 
-> When you mentioned "whole chunk of code", do you mean the following
-> block of code ?
-> 
-> 
-> 1960         if (IS_ERR(bdev)) {
-> ========= start of whole chunk of code ============
-> 1961                 if (bdev == ERR_PTR(-EBUSY)) {
-> 1962                         bdev = lookup_bdev(strim(path));
-> 1963                         mutex_lock(&bch_register_lock);
-> 1964                         if (!IS_ERR(bdev) && bch_is_open(bdev))
-> 1965                                 err = "device already registered";
-> 1966                         else
-> 1967                                 err = "device busy";
-> 1968                         mutex_unlock(&bch_register_lock);
-> 1969                         if (!IS_ERR(bdev))
-> 1970                                 bdput(bdev);
-> 1971                         if (attr == &ksysfs_register_quiet)
-> 1972                                 goto out;
-> 1973                 }
-> ========= end of whole chunk of code ============
-> 1974                 goto err;
-> 1975         }
-> 
-> I don't mind to remove it, just double check I don't misunderstand what
-> you meant.
+> This look ok, but I think that whole chunk of code should just go
+> away - adding a lookup_bdev and resulting mess just for a slightly
+> different error message is just insane.
 
-Yes, that's the problematic block.
+Hi Christoph,
+
+When you mentioned "whole chunk of code", do you mean the following
+block of code ?
+
+
+1960         if (IS_ERR(bdev)) {
+========= start of whole chunk of code ============
+1961                 if (bdev == ERR_PTR(-EBUSY)) {
+1962                         bdev = lookup_bdev(strim(path));
+1963                         mutex_lock(&bch_register_lock);
+1964                         if (!IS_ERR(bdev) && bch_is_open(bdev))
+1965                                 err = "device already registered";
+1966                         else
+1967                                 err = "device busy";
+1968                         mutex_unlock(&bch_register_lock);
+1969                         if (!IS_ERR(bdev))
+1970                                 bdput(bdev);
+1971                         if (attr == &ksysfs_register_quiet)
+1972                                 goto out;
+1973                 }
+========= end of whole chunk of code ============
+1974                 goto err;
+1975         }
+
+I don't mind to remove it, just double check I don't misunderstand what
+you meant.
+
+Thanks.
+
+
+-- 
+Coly Li
