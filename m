@@ -1,7 +1,12 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:50748 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753847AbdIDQ2p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Sep 2017 12:28:45 -0400
+Date: Tue, 5 Sep 2017 00:28:25 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "jthumshirn@suse.de" <jthumshirn@suse.de>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
@@ -12,36 +17,79 @@ CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH V3 7/8] block: allow to allocate req with REQF_PREEMPT
  when queue is preempt frozen
-Date: Tue, 5 Sep 2017 01:40:11 +0000
-Message-ID: <1504575610.3360.7.camel@wdc.com>
+Message-ID: <20170904162824.GC21757@ming.t460p>
 References: <20170902130840.24609-1-ming.lei@redhat.com>
-         <20170902130840.24609-8-ming.lei@redhat.com>
-         <20170902131208.GA10940@ming.t460p> <1504498405.10804.10.camel@wdc.com>
-         <20170904071653.GD7959@ming.t460p> <1504539634.3189.15.camel@wdc.com>
-         <20170904160813.GA21757@ming.t460p>
-In-Reply-To: <20170904160813.GA21757@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20170902130840.24609-8-ming.lei@redhat.com>
+ <20170902131208.GA10940@ming.t460p>
+ <1504498405.10804.10.camel@wdc.com>
+ <20170904071653.GD7959@ming.t460p>
+ <1504539634.3189.15.camel@wdc.com>
+ <20170904160813.GA21757@ming.t460p>
+ <1504541911.3189.18.camel@wdc.com>
 MIME-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1504541911.3189.18.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE3LTA5LTA1IGF0IDAwOjA4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-TW9uLCBTZXAgMDQsIDIwMTcgYXQgMDM6NDA6MzVQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IEhhdmUgeW91IGNvbnNpZGVyZWQgdG8gdXNlIHRoZSBibGstbXEgInJlc2VydmVk
-IHJlcXVlc3QiIG1lY2hhbmlzbSB0byBhdm9pZA0KPiA+IHN0YXJ2YXRpb24gb2YgcG93ZXIgbWFu
-YWdlbWVudCByZXF1ZXN0cyBpbnN0ZWFkIG9mIG1ha2luZyB0aGUgYmxvY2sgbGF5ZXINCj4gPiBl
-dmVuIG1vcmUgY29tcGxpY2F0ZWQgdGhhbiBpdCBhbHJlYWR5IGlzPw0KPiANCj4gcmVzZXJ2ZWQg
-cmVxdWVzdCBpcyByZWFsbHkgYSBiYWQgaWRlYSwgdGhhdCBtZWFucyB0aGUgcmVzZXJ2ZWQgcmVx
-dWVzdA0KPiBjYW4ndCBiZSB1c2VkIGZvciBub3JtYWwgSS9PLCB3ZSBhbGwga25vdyB0aGUgcmVx
-dWVzdC90YWcgc3BhY2UgaXMNCj4gcHJlY2lvdXMsIGFuZCBzb21lIGRldmljZSBoYXMgYSBxdWl0
-ZSBzbWFsbCB0YWcgc3BhY2UsIHN1Y2ggYXMgc2F0YS4NCj4gVGhpcyB3YXkgd2lsbCBhZmZlY3Qg
-cGVyZm9ybWFuY2UgZGVmaW5pdGVseS4NCg0KU29ycnkgYnV0IEknbSBuZWl0aGVyIGNvbnZpbmNl
-ZCB0aGF0IHJlc2VydmluZyBhIHJlcXVlc3QgZm9yIHBvd2VyIG1hbmFnZW1lbnQgDQp3b3VsZCBi
-ZSBhIGJhZCBpZGVhIG5vciB0aGF0IGl0IHdvdWxkIGhhdmUgYSBzaWduaWZpY2FudCBwZXJmb3Jt
-YW5jZSBpbXBhY3Qgbm9yDQp0aGF0IGl0IHdvdWxkIGJlIGNvbXBsaWNhdGVkIHRvIGltcGxlbWVu
-dC4gSGF2ZSB5b3Ugbm90aWNlZCB0aGF0IHRoZSBMaW51eCBBVEENCmltcGxlbWVudGF0aW9uIGFs
-cmVhZHkgcmVzZXJ2ZXMgYSByZXF1ZXN0IGZvciBpbnRlcm5hbCB1c2UgYW5kIHRoZXJlYnkgcmVk
-dWNlcw0KdGhlIHF1ZXVlIGRlcHRoIGZyb20gMzIgdG8gMzEgKHNlZSBhbHNvIEFUQV9UQUdfSU5U
-RVJOQUwpPyBXaGF0IEkgd291bGQgbGlrZSB0bw0Ka25vdyBpZiBpcyB3aGV0aGVyIHRoZSBwZXJm
-b3JtYW5jZSBpbXBhY3Qgb2YgcmVzZXJ2aW5nIGEgcmVxdWVzdCBpcyBtb3JlIG9yIGxlc3MNCnRo
-YW4gMSUuDQoNCkJhcnQu
+On Mon, Sep 04, 2017 at 04:18:32PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-09-05 at 00:08 +0800, Ming Lei wrote:
+> > On Mon, Sep 04, 2017 at 03:40:35PM +0000, Bart Van Assche wrote:
+> > > On Mon, 2017-09-04 at 15:16 +0800, Ming Lei wrote:
+> > > > On Mon, Sep 04, 2017 at 04:13:26AM +0000, Bart Van Assche wrote:
+> > > > > Allowing blk_get_request() to succeed after the DYING flag has been set is
+> > > > > completely wrong because that could result in a request being queued after
+> > > > > the DEAD flag has been set, resulting in either a hanging request or a kernel
+> > > > > crash. This is why it's completely wrong to add a blk_queue_enter_live() call
+> > > > > in blk_old_get_request() or blk_mq_alloc_request(). Hence my NAK for any
+> > > > > patch that adds a blk_queue_enter_live() call to any function called from
+> > > > > blk_get_request(). That includes the patch at the start of this e-mail thread.
+> > > > 
+> > > > See above, this patch changes nothing about this fact, please look at
+> > > > the patch carefully next time just before posting your long comment.
+> > > 
+> > > Are you really sure that your patch does not allow blk_get_request() to
+> > > succeed after the DYING flag has been set? blk_mq_alloc_request() calls both
+> > > blk_queue_is_preempt_frozen() and blk_queue_enter_live() without holding
+> > > any lock. A thread that is running concurrently with blk_mq_get_request()
+> > > can unfreeze the queue after blk_queue_is_preempt_frozen() returned and
+> > > before blk_queue_enter_live() is called. This means that with your patch
+> > > series applied blk_get_request() can succeed after the DYING flag has been
+> > > set, which is something we don't want. Additionally, I don't think we want
+> > > to introduce any kind of locking in blk_mq_get_request() because that would
+> > > be a serialization point.
+> >
+> > Yeah, I am pretty sure.
+> > 
+> > Firstly blk_queue_freeze_preempt() is exclusive, that means it will wait
+> > for completion of all pending freezing(both normal and preempt), and other
+> > freezing can't be started too if there is in-progress preempt
+> > freezing, actually it is a typical read/write lock use case, but
+> > we need to support nested normal freezing, so we can't use rwsem. 
+> 
+> You seem to overlook that blk_get_request() can be called from another thread
+> than the thread that is performing the freezing and unfreezing.
+
+The freezing state of queue can be observed in all context, so this
+issue isn't related with context, please see blk_queue_is_preempt_frozen()
+which is called from blk_get_request():
+
+        if (!percpu_ref_is_dying(&q->q_usage_counter))
+                return false;
+
+        spin_lock(&q->freeze_lock);
+        preempt_frozen = q->preempt_freezing;
+        preempt_unfreezing = q->preempt_unfreezing;
+        spin_unlock(&q->freeze_lock);
+
+        return preempt_frozen && !preempt_unfreezing;
+
+
+If the queue is in preempt freezing, blk_queue_enter_live() is called
+before allocating request, otherwise blk_queue_enter() is called.
+
+BTW, we can add the check of queue dying in this helper as one
+improvement.
+
+-- 
+Ming
