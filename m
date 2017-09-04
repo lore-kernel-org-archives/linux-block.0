@@ -1,12 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50748 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753847AbdIDQ2p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Sep 2017 12:28:45 -0400
-Date: Tue, 5 Sep 2017 00:28:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:6594 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753814AbdIDQTU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Sep 2017 12:19:20 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "jthumshirn@suse.de" <jthumshirn@suse.de>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
@@ -17,79 +16,57 @@ Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH V3 7/8] block: allow to allocate req with REQF_PREEMPT
  when queue is preempt frozen
-Message-ID: <20170904162824.GC21757@ming.t460p>
+Date: Mon, 4 Sep 2017 16:18:32 +0000
+Message-ID: <1504541911.3189.18.camel@wdc.com>
 References: <20170902130840.24609-1-ming.lei@redhat.com>
- <20170902130840.24609-8-ming.lei@redhat.com>
- <20170902131208.GA10940@ming.t460p>
- <1504498405.10804.10.camel@wdc.com>
- <20170904071653.GD7959@ming.t460p>
- <1504539634.3189.15.camel@wdc.com>
- <20170904160813.GA21757@ming.t460p>
- <1504541911.3189.18.camel@wdc.com>
+         <20170902130840.24609-8-ming.lei@redhat.com>
+         <20170902131208.GA10940@ming.t460p> <1504498405.10804.10.camel@wdc.com>
+         <20170904071653.GD7959@ming.t460p> <1504539634.3189.15.camel@wdc.com>
+         <20170904160813.GA21757@ming.t460p>
+In-Reply-To: <20170904160813.GA21757@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504541911.3189.18.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Sep 04, 2017 at 04:18:32PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-09-05 at 00:08 +0800, Ming Lei wrote:
-> > On Mon, Sep 04, 2017 at 03:40:35PM +0000, Bart Van Assche wrote:
-> > > On Mon, 2017-09-04 at 15:16 +0800, Ming Lei wrote:
-> > > > On Mon, Sep 04, 2017 at 04:13:26AM +0000, Bart Van Assche wrote:
-> > > > > Allowing blk_get_request() to succeed after the DYING flag has been set is
-> > > > > completely wrong because that could result in a request being queued after
-> > > > > the DEAD flag has been set, resulting in either a hanging request or a kernel
-> > > > > crash. This is why it's completely wrong to add a blk_queue_enter_live() call
-> > > > > in blk_old_get_request() or blk_mq_alloc_request(). Hence my NAK for any
-> > > > > patch that adds a blk_queue_enter_live() call to any function called from
-> > > > > blk_get_request(). That includes the patch at the start of this e-mail thread.
-> > > > 
-> > > > See above, this patch changes nothing about this fact, please look at
-> > > > the patch carefully next time just before posting your long comment.
-> > > 
-> > > Are you really sure that your patch does not allow blk_get_request() to
-> > > succeed after the DYING flag has been set? blk_mq_alloc_request() calls both
-> > > blk_queue_is_preempt_frozen() and blk_queue_enter_live() without holding
-> > > any lock. A thread that is running concurrently with blk_mq_get_request()
-> > > can unfreeze the queue after blk_queue_is_preempt_frozen() returned and
-> > > before blk_queue_enter_live() is called. This means that with your patch
-> > > series applied blk_get_request() can succeed after the DYING flag has been
-> > > set, which is something we don't want. Additionally, I don't think we want
-> > > to introduce any kind of locking in blk_mq_get_request() because that would
-> > > be a serialization point.
-> >
-> > Yeah, I am pretty sure.
-> > 
-> > Firstly blk_queue_freeze_preempt() is exclusive, that means it will wait
-> > for completion of all pending freezing(both normal and preempt), and other
-> > freezing can't be started too if there is in-progress preempt
-> > freezing, actually it is a typical read/write lock use case, but
-> > we need to support nested normal freezing, so we can't use rwsem. 
-> 
-> You seem to overlook that blk_get_request() can be called from another thread
-> than the thread that is performing the freezing and unfreezing.
-
-The freezing state of queue can be observed in all context, so this
-issue isn't related with context, please see blk_queue_is_preempt_frozen()
-which is called from blk_get_request():
-
-        if (!percpu_ref_is_dying(&q->q_usage_counter))
-                return false;
-
-        spin_lock(&q->freeze_lock);
-        preempt_frozen = q->preempt_freezing;
-        preempt_unfreezing = q->preempt_unfreezing;
-        spin_unlock(&q->freeze_lock);
-
-        return preempt_frozen && !preempt_unfreezing;
-
-
-If the queue is in preempt freezing, blk_queue_enter_live() is called
-before allocating request, otherwise blk_queue_enter() is called.
-
-BTW, we can add the check of queue dying in this helper as one
-improvement.
-
--- 
-Ming
+T24gVHVlLCAyMDE3LTA5LTA1IGF0IDAwOjA4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+TW9uLCBTZXAgMDQsIDIwMTcgYXQgMDM6NDA6MzVQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IE9uIE1vbiwgMjAxNy0wOS0wNCBhdCAxNToxNiArMDgwMCwgTWluZyBMZWkgd3Jv
+dGU6DQo+ID4gPiBPbiBNb24sIFNlcCAwNCwgMjAxNyBhdCAwNDoxMzoyNkFNICswMDAwLCBCYXJ0
+IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gPiA+IEFsbG93aW5nIGJsa19nZXRfcmVxdWVzdCgpIHRv
+IHN1Y2NlZWQgYWZ0ZXIgdGhlIERZSU5HIGZsYWcgaGFzIGJlZW4gc2V0IGlzDQo+ID4gPiA+IGNv
+bXBsZXRlbHkgd3JvbmcgYmVjYXVzZSB0aGF0IGNvdWxkIHJlc3VsdCBpbiBhIHJlcXVlc3QgYmVp
+bmcgcXVldWVkIGFmdGVyDQo+ID4gPiA+IHRoZSBERUFEIGZsYWcgaGFzIGJlZW4gc2V0LCByZXN1
+bHRpbmcgaW4gZWl0aGVyIGEgaGFuZ2luZyByZXF1ZXN0IG9yIGEga2VybmVsDQo+ID4gPiA+IGNy
+YXNoLiBUaGlzIGlzIHdoeSBpdCdzIGNvbXBsZXRlbHkgd3JvbmcgdG8gYWRkIGEgYmxrX3F1ZXVl
+X2VudGVyX2xpdmUoKSBjYWxsDQo+ID4gPiA+IGluIGJsa19vbGRfZ2V0X3JlcXVlc3QoKSBvciBi
+bGtfbXFfYWxsb2NfcmVxdWVzdCgpLiBIZW5jZSBteSBOQUsgZm9yIGFueQ0KPiA+ID4gPiBwYXRj
+aCB0aGF0IGFkZHMgYSBibGtfcXVldWVfZW50ZXJfbGl2ZSgpIGNhbGwgdG8gYW55IGZ1bmN0aW9u
+IGNhbGxlZCBmcm9tDQo+ID4gPiA+IGJsa19nZXRfcmVxdWVzdCgpLiBUaGF0IGluY2x1ZGVzIHRo
+ZSBwYXRjaCBhdCB0aGUgc3RhcnQgb2YgdGhpcyBlLW1haWwgdGhyZWFkLg0KPiA+ID4gDQo+ID4g
+PiBTZWUgYWJvdmUsIHRoaXMgcGF0Y2ggY2hhbmdlcyBub3RoaW5nIGFib3V0IHRoaXMgZmFjdCwg
+cGxlYXNlIGxvb2sgYXQNCj4gPiA+IHRoZSBwYXRjaCBjYXJlZnVsbHkgbmV4dCB0aW1lIGp1c3Qg
+YmVmb3JlIHBvc3RpbmcgeW91ciBsb25nIGNvbW1lbnQuDQo+ID4gDQo+ID4gQXJlIHlvdSByZWFs
+bHkgc3VyZSB0aGF0IHlvdXIgcGF0Y2ggZG9lcyBub3QgYWxsb3cgYmxrX2dldF9yZXF1ZXN0KCkg
+dG8NCj4gPiBzdWNjZWVkIGFmdGVyIHRoZSBEWUlORyBmbGFnIGhhcyBiZWVuIHNldD8gYmxrX21x
+X2FsbG9jX3JlcXVlc3QoKSBjYWxscyBib3RoDQo+ID4gYmxrX3F1ZXVlX2lzX3ByZWVtcHRfZnJv
+emVuKCkgYW5kIGJsa19xdWV1ZV9lbnRlcl9saXZlKCkgd2l0aG91dCBob2xkaW5nDQo+ID4gYW55
+IGxvY2suIEEgdGhyZWFkIHRoYXQgaXMgcnVubmluZyBjb25jdXJyZW50bHkgd2l0aCBibGtfbXFf
+Z2V0X3JlcXVlc3QoKQ0KPiA+IGNhbiB1bmZyZWV6ZSB0aGUgcXVldWUgYWZ0ZXIgYmxrX3F1ZXVl
+X2lzX3ByZWVtcHRfZnJvemVuKCkgcmV0dXJuZWQgYW5kDQo+ID4gYmVmb3JlIGJsa19xdWV1ZV9l
+bnRlcl9saXZlKCkgaXMgY2FsbGVkLiBUaGlzIG1lYW5zIHRoYXQgd2l0aCB5b3VyIHBhdGNoDQo+
+ID4gc2VyaWVzIGFwcGxpZWQgYmxrX2dldF9yZXF1ZXN0KCkgY2FuIHN1Y2NlZWQgYWZ0ZXIgdGhl
+IERZSU5HIGZsYWcgaGFzIGJlZW4NCj4gPiBzZXQsIHdoaWNoIGlzIHNvbWV0aGluZyB3ZSBkb24n
+dCB3YW50LiBBZGRpdGlvbmFsbHksIEkgZG9uJ3QgdGhpbmsgd2Ugd2FudA0KPiA+IHRvIGludHJv
+ZHVjZSBhbnkga2luZCBvZiBsb2NraW5nIGluIGJsa19tcV9nZXRfcmVxdWVzdCgpIGJlY2F1c2Ug
+dGhhdCB3b3VsZA0KPiA+IGJlIGEgc2VyaWFsaXphdGlvbiBwb2ludC4NCj4NCj4gWWVhaCwgSSBh
+bSBwcmV0dHkgc3VyZS4NCj4gDQo+IEZpcnN0bHkgYmxrX3F1ZXVlX2ZyZWV6ZV9wcmVlbXB0KCkg
+aXMgZXhjbHVzaXZlLCB0aGF0IG1lYW5zIGl0IHdpbGwgd2FpdA0KPiBmb3IgY29tcGxldGlvbiBv
+ZiBhbGwgcGVuZGluZyBmcmVlemluZyhib3RoIG5vcm1hbCBhbmQgcHJlZW1wdCksIGFuZCBvdGhl
+cg0KPiBmcmVlemluZyBjYW4ndCBiZSBzdGFydGVkIHRvbyBpZiB0aGVyZSBpcyBpbi1wcm9ncmVz
+cyBwcmVlbXB0DQo+IGZyZWV6aW5nLCBhY3R1YWxseSBpdCBpcyBhIHR5cGljYWwgcmVhZC93cml0
+ZSBsb2NrIHVzZSBjYXNlLCBidXQNCj4gd2UgbmVlZCB0byBzdXBwb3J0IG5lc3RlZCBub3JtYWwg
+ZnJlZXppbmcsIHNvIHdlIGNhbid0IHVzZSByd3NlbS4gDQoNCllvdSBzZWVtIHRvIG92ZXJsb29r
+IHRoYXQgYmxrX2dldF9yZXF1ZXN0KCkgY2FuIGJlIGNhbGxlZCBmcm9tIGFub3RoZXIgdGhyZWFk
+DQp0aGFuIHRoZSB0aHJlYWQgdGhhdCBpcyBwZXJmb3JtaW5nIHRoZSBmcmVlemluZyBhbmQgdW5m
+cmVlemluZy4NCg0KQmFydC4=
