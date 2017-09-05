@@ -1,59 +1,34 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Thu, 7 Sep 2017 11:52:55 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	dm-devel@redhat.com, axboe@kernel.dk
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:42063 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751488AbdIEOQJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2017 10:16:09 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
 Subject: Re: BFQ + dm-mpath
-Message-ID: <20170907155255.GA22848@redhat.com>
+Date: Tue, 5 Sep 2017 14:15:15 +0000
+Message-ID: <1504620914.4135.11.camel@wdc.com>
 References: <1503611578.2899.69.camel@wdc.com>
- <AE77899A-0365-4C7C-91E4-5ACCC396B26B@linaro.org>
- <ED23C7AC-F202-40E3-8421-E714BF446399@linaro.org>
- <1504620914.4135.11.camel@wdc.com>
+         <AE77899A-0365-4C7C-91E4-5ACCC396B26B@linaro.org>
+         <ED23C7AC-F202-40E3-8421-E714BF446399@linaro.org>
+In-Reply-To: <ED23C7AC-F202-40E3-8421-E714BF446399@linaro.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504620914.4135.11.camel@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, Sep 05 2017 at 10:15am -0400,
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Tue, 2017-09-05 at 09:56 +0200, Paolo Valente wrote:
-> > Ok, my suspects seem confirmed: the path dm_mq_queue_rq -> map_request
-> > -> setup_clone -> blk_rq_prep_clone creates a cloned request without
-> > invoking e->type->ops.mq.prepare_request for the target elevator e.
-> > The cloned request is therefore not initialized for the scheduler, but
-> > it is however inserted into the scheduler by
-> > blk_mq_sched_insert_request.  This seems an error for any scheduler
-> > that needs to initialize fields in the incoming request, or in general
-> > to take some preliminary action.
-> > 
-> > Am I missing something here?
-> 
-> (+Mike Snitzer)
-> 
-> Mike, do you perhaps have the time to look into this memory leak?
-
-It isn't a memory leak, it is missing initialization in the case of
-cloned requests (if I'm understanding Paolo correctly).
-
-But cloned requests shouldn't be going through the scheduler.  Only the
-original requests should.
-
-Commit bd166ef18 ("blk-mq-sched: add framework for MQ capable IO
-schedulers") switched from blk_mq_insert_request() to
-blk_mq_sched_insert_request() and in doing so it opened dm-mpath up to
-this bug.
-
-Could be we need to take steps to ensure the block layer still
-supports bypassing the elevator by using direct insertion?
-
-Or blk_mq_sched_insert_request() needs updating to check if
-e->type->ops.mq.prepare_request were actually performed and to fallback
-to the !elevator case if not..
-
-Not sure on the fix, but I can look closer if others (like Jens or
-Paolo) don't have quicker suggestions.
-
-Mike
+T24gVHVlLCAyMDE3LTA5LTA1IGF0IDA5OjU2ICswMjAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
+PiBPaywgbXkgc3VzcGVjdHMgc2VlbSBjb25maXJtZWQ6IHRoZSBwYXRoIGRtX21xX3F1ZXVlX3Jx
+IC0+IG1hcF9yZXF1ZXN0DQo+IC0+IHNldHVwX2Nsb25lIC0+IGJsa19ycV9wcmVwX2Nsb25lIGNy
+ZWF0ZXMgYSBjbG9uZWQgcmVxdWVzdCB3aXRob3V0DQo+IGludm9raW5nIGUtPnR5cGUtPm9wcy5t
+cS5wcmVwYXJlX3JlcXVlc3QgZm9yIHRoZSB0YXJnZXQgZWxldmF0b3IgZS4NCj4gVGhlIGNsb25l
+ZCByZXF1ZXN0IGlzIHRoZXJlZm9yZSBub3QgaW5pdGlhbGl6ZWQgZm9yIHRoZSBzY2hlZHVsZXIs
+IGJ1dA0KPiBpdCBpcyBob3dldmVyIGluc2VydGVkIGludG8gdGhlIHNjaGVkdWxlciBieQ0KPiBi
+bGtfbXFfc2NoZWRfaW5zZXJ0X3JlcXVlc3QuICBUaGlzIHNlZW1zIGFuIGVycm9yIGZvciBhbnkg
+c2NoZWR1bGVyDQo+IHRoYXQgbmVlZHMgdG8gaW5pdGlhbGl6ZSBmaWVsZHMgaW4gdGhlIGluY29t
+aW5nIHJlcXVlc3QsIG9yIGluIGdlbmVyYWwNCj4gdG8gdGFrZSBzb21lIHByZWxpbWluYXJ5IGFj
+dGlvbi4NCj4gDQo+IEFtIEkgbWlzc2luZyBzb21ldGhpbmcgaGVyZT8NCg0KKCtNaWtlIFNuaXR6
+ZXIpDQoNCk1pa2UsIGRvIHlvdSBwZXJoYXBzIGhhdmUgdGhlIHRpbWUgdG8gbG9vayBpbnRvIHRo
+aXMgbWVtb3J5IGxlYWs/DQoNClRoYW5rcywNCg0KQmFydC4=
