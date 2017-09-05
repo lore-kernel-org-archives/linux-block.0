@@ -1,18 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ipmail01.adl6.internode.on.net ([150.101.137.136]:64506 "EHLO
-        ipmail01.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750704AbdIEGte (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Sep 2017 02:49:34 -0400
-Date: Tue, 5 Sep 2017 16:44:12 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Christoph Hellwig <hch@infradead.org>
+Received: from mail-io0-f181.google.com ([209.85.223.181]:38860 "EHLO
+        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750805AbdIEGmN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2017 02:42:13 -0400
+Received: by mail-io0-f181.google.com with SMTP id q64so10942875iod.5
+        for <linux-block@vger.kernel.org>; Mon, 04 Sep 2017 23:42:12 -0700 (PDT)
+Date: Mon, 4 Sep 2017 23:42:08 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>
 Cc: Chandan Rajendra <chandan@linux.vnet.ibm.com>,
         linux-xfs@vger.kernel.org, sandeen@sandeen.net,
         Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
 Subject: Re: [PATCH] mkfs: Remove messages printed when blocksize < physical
  sectorsize
-Message-ID: <20170905064412.GK17782@dastard>
+Message-ID: <20170905064208.GB15686@vader>
 References: <20170905054442.28615-1-chandan@linux.vnet.ibm.com>
  <20170905063139.GA679@infradead.org>
 MIME-Version: 1.0
@@ -30,20 +31,6 @@ On Mon, Sep 04, 2017 at 11:31:39PM -0700, Christoph Hellwig wrote:
 > 
 > Eek.  We'll need to revert the loop change ASAP!
 
-And, FWIW, making the warning go away if probably a bad idea,
-because XFS only supports devices with sector sizes up
-to 32k:
-
-#define XFS_MIN_SECTORSIZE_LOG  9       /* i.e. 512 bytes */
-#define XFS_MAX_SECTORSIZE_LOG  15      /* i.e. 32768 bytes */
-
-And so it should be warning about devices trying to tell it to use
-something larger....
-
-Cheers,
-
-Dave.
-
--- 
-Dave Chinner
-david@fromorbit.com
+Most annoying patch series ever. It hasn't made it to Linus' tree yet,
+right? We can revert (although the later change depends on that), fold
+in a fix, or apply a fix on top of it, whatever Jens prefers.
