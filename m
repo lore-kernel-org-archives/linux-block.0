@@ -9,8 +9,8 @@ References: <20170629134510.GA32385@infradead.org>
  <e9019647-62b5-1c14-8b2f-66528b972b5c@coly.li>
  <20170905064348.GA23716@infradead.org>
 From: Coly Li <i@coly.li>
-Message-ID: <14051b81-4184-8efa-6e90-74693e2dd18d@coly.li>
-Date: Wed, 6 Sep 2017 13:25:10 +0800
+Message-ID: <164b1a85-1753-cff4-9571-bb1cf085d4ac@coly.li>
+Date: Tue, 5 Sep 2017 14:55:53 +0800
 MIME-Version: 1.0
 In-Reply-To: <20170905064348.GA23716@infradead.org>
 Content-Type: text/plain; charset=utf-8
@@ -47,20 +47,10 @@ On 2017/9/5 下午2:43, Christoph Hellwig wrote:
 > 
 > Yes, that's the problematic block.
 > 
-Hi Christoph,
+Understand, I will send out a patch, hopefully it can catch up 4.14
+merge window.
 
-I tested the code, and my patch which removes the above code. The result
-is, I feel the above chunk of code is useful. When I tried to register a
-device and it was already registered. Without the above code, I only saw
-"failed to open device", didn't realize it was because this device is
-registered already. After adding the above code back, I knew where the
-problem was.
-
-The above chunk of code improves user experience and provides more
-detailed diagnose information, it is useful. Then I suggest to keep the
-code here and pick up Jan's patch.
-
-Thanks.
+Thanks for the hint.
 
 -- 
 Coly Li
