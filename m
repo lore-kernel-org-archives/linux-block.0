@@ -1,32 +1,25 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: Archiving linux-block
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <1504621159.4135.15.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <bf188724-545c-aad3-16f5-1b452ab63cd8@kernel.dk>
-Date: Tue, 5 Sep 2017 08:33:42 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:17265 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751488AbdIEOUI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2017 10:20:08 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Archiving linux-block
+Date: Tue, 5 Sep 2017 14:19:20 +0000
+Message-ID: <1504621159.4135.15.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1504621159.4135.15.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 09/05/2017 08:19 AM, Bart Van Assche wrote:
-> Hello,
-> 
-> Since gmane.org is no longer operational linux-block messages are no longer
-> archived. I think it's useful to archive linux-block messages because it
-> makes it possible to review past discussions, especially for people who are
-> not subscribed to the list. How about activating archival by mail-archive.com
-> and spinics.net? As far as I know this can only be done by someone who is list
-> administrator. But I don't know who the linux-block list administrator(s) are?
-
-I always use marc.info:
-
-https://marc.info/?l=linux-block
-
-If we want to add it elsewhere, that's fine with me. I'm probably the admin,
-I was the one that asked for the list to be created.
-
--- 
-Jens Axboe
+SGVsbG8sDQoNClNpbmNlIGdtYW5lLm9yZyBpcyBubyBsb25nZXIgb3BlcmF0aW9uYWwgbGludXgt
+YmxvY2sgbWVzc2FnZXMgYXJlIG5vIGxvbmdlcg0KYXJjaGl2ZWQuIEkgdGhpbmsgaXQncyB1c2Vm
+dWwgdG8gYXJjaGl2ZSBsaW51eC1ibG9jayBtZXNzYWdlcyBiZWNhdXNlIGl0DQptYWtlcyBpdCBw
+b3NzaWJsZSB0byByZXZpZXcgcGFzdCBkaXNjdXNzaW9ucywgZXNwZWNpYWxseSBmb3IgcGVvcGxl
+IHdobyBhcmUNCm5vdCBzdWJzY3JpYmVkIHRvIHRoZSBsaXN0LiBIb3cgYWJvdXQgYWN0aXZhdGlu
+ZyBhcmNoaXZhbCBieSBtYWlsLWFyY2hpdmUuY29tDQphbmQgc3Bpbmljcy5uZXQ/IEFzIGZhciBh
+cyBJIGtub3cgdGhpcyBjYW4gb25seSBiZSBkb25lIGJ5IHNvbWVvbmUgd2hvIGlzIGxpc3QNCmFk
+bWluaXN0cmF0b3IuIEJ1dCBJIGRvbid0IGtub3cgd2hvIHRoZSBsaW51eC1ibG9jayBsaXN0IGFk
+bWluaXN0cmF0b3IocykgYXJlPw0KDQpUaGFua3MsDQoNCkJhcnQu
