@@ -1,35 +1,32 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: Archiving linux-block
-Date: Wed, 6 Sep 2017 13:13:31 +0000
-Message-ID: <1504703610.7750.3.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <1504621159.4135.15.camel@wdc.com>
-	 <bf188724-545c-aad3-16f5-1b452ab63cd8@kernel.dk>
-In-Reply-To: <bf188724-545c-aad3-16f5-1b452ab63cd8@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <bf188724-545c-aad3-16f5-1b452ab63cd8@kernel.dk>
+Date: Tue, 5 Sep 2017 08:33:42 -0600
 MIME-Version: 1.0
+In-Reply-To: <1504621159.4135.15.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTA5LTA1IGF0IDA4OjMzIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biAwOS8wNS8yMDE3IDA4OjE5IEFNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gU2luY2Ug
-Z21hbmUub3JnIGlzIG5vIGxvbmdlciBvcGVyYXRpb25hbCBsaW51eC1ibG9jayBtZXNzYWdlcyBh
-cmUgbm8gbG9uZ2VyDQo+ID4gYXJjaGl2ZWQuIEkgdGhpbmsgaXQncyB1c2VmdWwgdG8gYXJjaGl2
-ZSBsaW51eC1ibG9jayBtZXNzYWdlcyBiZWNhdXNlIGl0DQo+ID4gbWFrZXMgaXQgcG9zc2libGUg
-dG8gcmV2aWV3IHBhc3QgZGlzY3Vzc2lvbnMsIGVzcGVjaWFsbHkgZm9yIHBlb3BsZSB3aG8gYXJl
-DQo+ID4gbm90IHN1YnNjcmliZWQgdG8gdGhlIGxpc3QuIEhvdyBhYm91dCBhY3RpdmF0aW5nIGFy
-Y2hpdmFsIGJ5IG1haWwtYXJjaGl2ZS5jb20NCj4gPiBhbmQgc3Bpbmljcy5uZXQ/IEFzIGZhciBh
-cyBJIGtub3cgdGhpcyBjYW4gb25seSBiZSBkb25lIGJ5IHNvbWVvbmUgd2hvIGlzIGxpc3QNCj4g
-PiBhZG1pbmlzdHJhdG9yLiBCdXQgSSBkb24ndCBrbm93IHdobyB0aGUgbGludXgtYmxvY2sgbGlz
-dCBhZG1pbmlzdHJhdG9yKHMpIGFyZT8NCj4gDQo+IEkgYWx3YXlzIHVzZSBtYXJjLmluZm86DQo+
-IA0KPiBodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jaw0KPiANCj4gSWYgd2Ugd2FudCB0
-byBhZGQgaXQgZWxzZXdoZXJlLCB0aGF0J3MgZmluZSB3aXRoIG1lLiBJJ20gcHJvYmFibHkgdGhl
-IGFkbWluLA0KPiBJIHdhcyB0aGUgb25lIHRoYXQgYXNrZWQgZm9yIHRoZSBsaXN0IHRvIGJlIGNy
-ZWF0ZWQuDQoNClRoYW5rcyBKZW5zIGZvciB0aGUgZmVlZGJhY2suIFdoYXQgSSB0cmllZCB5ZXN0
-ZXJkYXkgbW9ybmluZyB3YXMgdG8gbG9vayB1cCBhDQpsaW51eC1ibG9jayBtZXNzYWdlIGJ5IHNl
-YXJjaGluZyBmb3IgaXRzIGNvbnRlbnRzIHdpdGggYSB3ZWIgc2VhcmNoIGVuZ2luZS4gVGhhdA0K
-c2VhcmNoIGRpZCBub3QgeWllbGQgYW55IHJlc3VsdHMuIERvZXMgdGhpcyBtZWFuIHRoYXQgbWVz
-c2FnZXMgb24gbWFyYy5pbmZvIGFyZQ0Kbm90IGluZGV4ZWQgYnkgR29vZ2xlPyBJcyB0aGlzIGEg
-c3VmZmljaWVudCByZWFzb24gdG8gbGV0IGFuIGFkZGl0aW9uYWwgd2ViIHNpdGUNCmFyY2hpdmUg
-dGhlIGxpbnV4LWJsb2NrIG1lc3NhZ2VzPw0KDQpUaGFua3MsDQoNCkJhcnQu
+On 09/05/2017 08:19 AM, Bart Van Assche wrote:
+> Hello,
+> 
+> Since gmane.org is no longer operational linux-block messages are no longer
+> archived. I think it's useful to archive linux-block messages because it
+> makes it possible to review past discussions, especially for people who are
+> not subscribed to the list. How about activating archival by mail-archive.com
+> and spinics.net? As far as I know this can only be done by someone who is list
+> administrator. But I don't know who the linux-block list administrator(s) are?
+
+I always use marc.info:
+
+https://marc.info/?l=linux-block
+
+If we want to add it elsewhere, that's fine with me. I'm probably the admin,
+I was the one that asked for the list to be created.
+
+-- 
+Jens Axboe
