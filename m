@@ -6,126 +6,53 @@ To: linux-bcache@vger.kernel.org,
 Cc: bcache@lists.ewheeler.net,
 	Tang Junhui <tang.junhui@zte.com.cn>,
 	stable@vger.kernel.org
-Subject: [PATCH 09/12] bcache: fix for gc and write-back race
-Date: Wed,  6 Sep 2017 14:25:59 +0800
-Message-Id: <20170906062602.50497-10-colyli@suse.de>
+Subject: [PATCH 02/12] bcache: fix sequential large write IO bypass
+Date: Wed,  6 Sep 2017 14:25:52 +0800
+Message-Id: <20170906062602.50497-3-colyli@suse.de>
 In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
 References: <20170906062602.50497-1-colyli@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
 From: Tang Junhui <tang.junhui@zte.com.cn>
 
-gc and write-back get raced (see the email "bcache get stucked" I sended
-before):
-gc thread                               write-back thread
-|                                       |bch_writeback_thread()
-|bch_gc_thread()                        |
-|                                       |==>read_dirty()
-|==>bch_btree_gc()                      |
-|==>btree_root() //get btree root       |
-|                //node write locker    |
-|==>bch_btree_gc_root()                 |
-|                                       |==>read_dirty_submit()
-|                                       |==>write_dirty()
-|                                       |==>continue_at(cl,
-|                                       |               write_dirty_finish,
-|                                       |               system_wq);
-|                                       |==>write_dirty_finish()//excute
-|                                       |               //in system_wq
-|                                       |==>bch_btree_insert()
-|                                       |==>bch_btree_map_leaf_nodes()
-|                                       |==>__bch_btree_map_nodes()
-|                                       |==>btree_root //try to get btree
-|                                       |              //root node read
-|                                       |              //lock
-|                                       |-----stuck here
-|==>bch_btree_set_root()
-|==>bch_journal_meta()
-|==>bch_journal()
-|==>journal_try_write()
-|==>journal_write_unlocked() //journal_full(&c->journal)
-|                            //condition satisfied
-|==>continue_at(cl, journal_write, system_wq); //try to excute
-|                               //journal_write in system_wq
-|                               //but work queue is excuting
-|                               //write_dirty_finish()
-|==>closure_sync(); //wait journal_write execute
-|                   //over and wake up gc,
-|-------------stuck here
-|==>release root node write locker
+Sequential write IOs were tested with bs=1M by FIO in writeback cache
+mode, these IOs were expected to be bypassed, but actually they did not.
+We debug the code, and find in check_should_bypass():
+    if (!congested &&
+        mode == CACHE_MODE_WRITEBACK &&
+        op_is_write(bio_op(bio)) &&
+        (bio-＞bi_opf & REQ_SYNC))
+        goto rescale
+that means, If in writeback mode, a write IO with REQ_SYNC flag will not
+be bypassed though it is a sequential large IO, It's not a correct thing
+to do actually, so this patch remove these codes.
 
-This patch alloc a separate work-queue for write-back thread to avoid such
-race.
-
-(Commit log re-organized by Coly Li to pass checkpatch.pl checking)
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
+Reviewed-by: Kent Overstreet <kent.overstreet@gmail.com>
+Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
 Cc: stable@vger.kernel.org
 ---
- drivers/md/bcache/bcache.h    | 1 +
- drivers/md/bcache/super.c     | 2 ++
- drivers/md/bcache/writeback.c | 9 +++++++--
- 3 files changed, 10 insertions(+), 2 deletions(-)
+ drivers/md/bcache/request.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index dee542fff68e..2ed9bd231d84 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -333,6 +333,7 @@ struct cached_dev {
- 	/* Limit number of writeback bios in flight */
- 	struct semaphore	in_flight;
- 	struct task_struct	*writeback_thread;
-+	struct workqueue_struct	*writeback_write_wq;
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 019b3df9f1c6..958072a11347 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -400,12 +400,6 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 	if (!congested && !dc->sequential_cutoff)
+ 		goto rescale;
  
- 	struct keybuf		writeback_keys;
+-	if (!congested &&
+-	    mode == CACHE_MODE_WRITEBACK &&
+-	    op_is_write(bio->bi_opf) &&
+-	    op_is_sync(bio->bi_opf))
+-		goto rescale;
+-
+ 	spin_lock(&dc->io_lock);
  
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 9a2c190745b6..253918972335 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1059,6 +1059,8 @@ static void cached_dev_free(struct closure *cl)
- 	cancel_delayed_work_sync(&dc->writeback_rate_update);
- 	if (!IS_ERR_OR_NULL(dc->writeback_thread))
- 		kthread_stop(dc->writeback_thread);
-+	if (dc->writeback_write_wq)
-+		destroy_workqueue(dc->writeback_write_wq);
- 
- 	mutex_lock(&bch_register_lock);
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index b533c2292ba5..323551f7cb28 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -187,7 +187,7 @@ static void write_dirty(struct closure *cl)
- 
- 	closure_bio_submit(&io->bio, cl);
- 
--	continue_at(cl, write_dirty_finish, system_wq);
-+	continue_at(cl, write_dirty_finish, io->dc->writeback_write_wq);
- }
- 
- static void read_dirty_endio(struct bio *bio)
-@@ -207,7 +207,7 @@ static void read_dirty_submit(struct closure *cl)
- 
- 	closure_bio_submit(&io->bio, cl);
- 
--	continue_at(cl, write_dirty, system_wq);
-+	continue_at(cl, write_dirty, io->dc->writeback_write_wq);
- }
- 
- static void read_dirty(struct cached_dev *dc)
-@@ -517,6 +517,11 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
- 
- int bch_cached_dev_writeback_start(struct cached_dev *dc)
- {
-+	dc->writeback_write_wq = alloc_workqueue("bcache_writeback_wq",
-+						WQ_MEM_RECLAIM, 0);
-+	if (!dc->writeback_write_wq)
-+		return -ENOMEM;
-+
- 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
- 					      "bcache_writeback");
- 	if (IS_ERR(dc->writeback_thread))
+ 	hlist_for_each_entry(i, iohash(dc, bio->bi_iter.bi_sector), hash)
 -- 
 2.13.5
