@@ -1,57 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53667 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752111AbdIFI5f (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Sep 2017 04:57:35 -0400
-Date: Wed, 6 Sep 2017 10:57:29 +0200 (CEST)
-From: Jiri Kosina <jikos@kernel.org>
-To: Bhumika Goyal <bhumirks@gmail.com>
-cc: julia.lawall@lip6.fr, rjw@rjwysocki.net, lenb@kernel.org,
-        jbacik@fb.com, benjamin.tissoires@redhat.com,
-        manish.chopra@cavium.com, rahul.verma@cavium.com,
-        Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
-        cascardo@holoscopio.com, don@syst.com.br, dvhart@infradead.org,
-        andy@infradead.org, sre@kernel.org, linux-acpi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        nbd-general@lists.sourceforge.net, linux-input@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-pm@vger.kernel.org
-Subject: Re: [PATCH 3/6] hid: make device_attribute const
-In-Reply-To: <1503315792-14837-4-git-send-email-bhumirks@gmail.com>
-Message-ID: <nycvar.YFH.7.76.1709061057200.4077@jbgna.fhfr.qr>
-References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com> <1503315792-14837-4-git-send-email-bhumirks@gmail.com>
+Return-Path: <i@coly.li>
+Subject: Re: [PATCH 01/19] bcache: Fix leak of bdev reference
+To: Christoph Hellwig <hch@infradead.org>
+Cc: bcache@lists.ewheeler.net, linux-block@vger.kernel.org,
+ linux-bcache@vger.kernel.org, axboe@kernel.dk, Jan Kara <jack@suse.cz>
+References: <20170629134510.GA32385@infradead.org>
+ <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
+ <20170705182447.GA10673@infradead.org>
+ <e9019647-62b5-1c14-8b2f-66528b972b5c@coly.li>
+ <20170905064348.GA23716@infradead.org>
+From: Coly Li <i@coly.li>
+Message-ID: <14051b81-4184-8efa-6e90-74693e2dd18d@coly.li>
+Date: Wed, 6 Sep 2017 13:25:10 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170905064348.GA23716@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 21 Aug 2017, Bhumika Goyal wrote:
-
-> Make this const as it is only passed as an argument to the
-> function device_create_file and device_remove_file and the corresponding
-> arguments are of type const.
-> Done using Coccinelle
+On 2017/9/5 下午2:43, Christoph Hellwig wrote:
+> On Tue, Sep 05, 2017 at 01:30:04AM +0800, Coly Li wrote:
+>>
+>> When you mentioned "whole chunk of code", do you mean the following
+>> block of code ?
+>>
+>>
+>> 1960         if (IS_ERR(bdev)) {
+>> ========= start of whole chunk of code ============
+>> 1961                 if (bdev == ERR_PTR(-EBUSY)) {
+>> 1962                         bdev = lookup_bdev(strim(path));
+>> 1963                         mutex_lock(&bch_register_lock);
+>> 1964                         if (!IS_ERR(bdev) && bch_is_open(bdev))
+>> 1965                                 err = "device already registered";
+>> 1966                         else
+>> 1967                                 err = "device busy";
+>> 1968                         mutex_unlock(&bch_register_lock);
+>> 1969                         if (!IS_ERR(bdev))
+>> 1970                                 bdput(bdev);
+>> 1971                         if (attr == &ksysfs_register_quiet)
+>> 1972                                 goto out;
+>> 1973                 }
+>> ========= end of whole chunk of code ============
+>> 1974                 goto err;
+>> 1975         }
+>>
+>> I don't mind to remove it, just double check I don't misunderstand what
+>> you meant.
 > 
-> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
-> ---
->  drivers/hid/hid-core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Yes, that's the problematic block.
 > 
-> diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
-> index 9bc9116..24e929c 100644
-> --- a/drivers/hid/hid-core.c
-> +++ b/drivers/hid/hid-core.c
-> @@ -1662,7 +1662,7 @@ static bool hid_hiddev(struct hid_device *hdev)
->  	.size = HID_MAX_DESCRIPTOR_SIZE,
->  };
->  
-> -static struct device_attribute dev_attr_country = {
-> +static const struct device_attribute dev_attr_country = {
->  	.attr = { .name = "country", .mode = 0444 },
->  	.show = show_country,
+Hi Christoph,
 
-Applied, thanks.
+I tested the code, and my patch which removes the above code. The result
+is, I feel the above chunk of code is useful. When I tried to register a
+device and it was already registered. Without the above code, I only saw
+"failed to open device", didn't realize it was because this device is
+registered already. After adding the above code back, I knew where the
+problem was.
+
+The above chunk of code improves user experience and provides more
+detailed diagnose information, it is useful. Then I suggest to keep the
+code here and pick up Jan's patch.
+
+Thanks.
 
 -- 
-Jiri Kosina
-SUSE Labs
+Coly Li
