@@ -1,148 +1,155 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f179.google.com ([209.85.192.179]:35998 "EHLO
-        mail-pf0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755684AbdIGSkT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Sep 2017 14:40:19 -0400
-Received: by mail-pf0-f179.google.com with SMTP id e199so790839pfh.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Sep 2017 11:40:19 -0700 (PDT)
-Date: Thu, 7 Sep 2017 11:40:17 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: =?utf-8?B?5p+l5paM?= <zhabinecho@gmail.com>
-Cc: linux-block@vger.kernel.org, osandov@fb.com, axboe@fb.com,
-        boyu.mt@taobao.com, wenqing.lz@taobao.com,
-        qijiang.qj@alibaba-inc.com
-Subject: Re: [PATCH]blk-mq-sched: remove the empty entry in token wait list
-Message-ID: <20170907184017.GC17057@vader.DHCP.thefacebook.com>
-References: <CAPr6Aj9n6z0Cw_QoaSL1vYQnMSU9VnMQi6SPwnMdYTYubzH6mg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CAPr6Aj9n6z0Cw_QoaSL1vYQnMSU9VnMQi6SPwnMdYTYubzH6mg@mail.gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jg@lightnvm.io>
+Return-Path: <jg@lightnvm.io>
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <2559C6D1-3661-48EC-A3F6-11AE30F6C3F1@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_9E813B3F-1098-4BA1-BECA-5CC095590668";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 1/6] lightnvm: pblk: check for failed mempool alloc.
+Date: Wed, 6 Sep 2017 20:28:55 +0200
+In-Reply-To: <d644f8f8-cb67-38a5-53d9-7b32f7e42902@kernel.dk>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+ =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+ linux-block@vger.kernel.org,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ =?utf-8?Q?Matias_Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: Jens Axboe <axboe@kernel.dk>
+References: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
+ <1504710066-4699-2-git-send-email-javier@cnexlabs.com>
+ <20170906150811.sa3vrrkbpv5rffeb@linux-x5ow.site>
+ <d8295f1b-5021-e20b-ffcf-4fbbbe7c70b4@kernel.dk>
+ <B52A428A-99AA-4CE3-8C30-3C2BAA30678D@lightnvm.io>
+ <086e6df7-65d8-57b7-6605-d585985a3ddf@kernel.dk>
+ <d644f8f8-cb67-38a5-53d9-7b32f7e42902@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Aug 29, 2017 at 10:52:13PM +0800, 查斌 wrote:
-> From:  Bin Zha <zhabin.zb@alibaba-inc.com>
-> 
-> 
-> When the kyber adjusts the sync and other write depth to the
-> minimum(1), there is a case that maybe cause the requests to
-> be stalled in the kyber_hctx_data list.
-> 
-> The following example I have tested:
-> 
-> 
-> CPU7
-> block_rq_insert
-> add_wait_queue
-> __sbitmap_queue_get              CPU23
-> block_rq_issue                   block_rq_insert
-> block_rq_complete ------>  waiting token free
->                                           block_rq_issue
->           /|\                            block_rq_complete
->            |                                        |
->            |                                        |
->            |                                       \|/
->            |                                     CPU29
->            |                            block_rq_insert
->            |                           waiting token free
->            |                             block_rq_issue
->            |---------------------- block_rq_complete
-> 
->                                                 CPU1
->                                        block_rq_insert
->                                       waiting token free
-> 
-> 
-> The IO request complete in CPU29 will wake up CPU7,
-> because it has been added to the waitqueue in
-> kyber_get_domain_token. But it is empty waiter, and won't
-> wake up the CPU1.If no other requests issue to push it,
-> the requests will stall in kyber_hctx_data list.
-> 
-> 
-> Signed-off-by: Bin Zha <zhabin.zb@alibaba-inc.com>
-> 
-> diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-> index b9faabc..584bfd5 100644
-> --- a/block/kyber-iosched.c
-> +++ b/block/kyber-iosched.c
-> @@ -548,6 +548,10 @@ static int kyber_get_domain_token(struct
-> kyber_queue_data *kqd,
->                  * queue.
->                  */
->                 nr = __sbitmap_queue_get(domain_tokens);
-> +               if (nr >= 0) {
-> +                       remove_wait_queue(&ws->wait, wait);
-> +                       INIT_LIST_HEAD(&wait->task_list);
-> +               }
->         }
->         return nr;
->  }
 
-Hm... I could've sworn I thought about this case when I wrote this code,
-but your analysis looks correct. I do remember that I didn't do this
-because I was worried about a race like so:
+--Apple-Mail=_9E813B3F-1098-4BA1-BECA-5CC095590668
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-add_wait_queue()
-                        kyber_domain_wake()
-			\_ list_del_init()
-remove_wait_queue()
-\_ list_del()
+> On 6 Sep 2017, at 17.20, Jens Axboe <axboe@kernel.dk> wrote:
+>=20
+> On 09/06/2017 09:13 AM, Jens Axboe wrote:
+>> On 09/06/2017 09:12 AM, Javier Gonz=C3=A1lez wrote:
+>>>> On 6 Sep 2017, at 17.09, Jens Axboe <axboe@kernel.dk> wrote:
+>>>>=20
+>>>> On 09/06/2017 09:08 AM, Johannes Thumshirn wrote:
+>>>>> On Wed, Sep 06, 2017 at 05:01:01PM +0200, Javier Gonz=C3=A1lez =
+wrote:
+>>>>>> Check for failed mempool allocations and act accordingly.
+>>>>>=20
+>>>>> Are you sure it is needed? Quoting from mempool_alloc()s =
+Documentation:
+>>>>> "[...] Note that due to preallocation, this function *never* fails =
+when called
+>>>>> from process contexts. (it might fail if called from an IRQ =
+context.) [...]"
+>>>>=20
+>>>> It's not needed, mempool() will never fail if __GFP_WAIT is set in =
+the
+>>>> mask. The use case here is GFP_KERNEL, which does include =
+__GFP_WAIT.
+>>>=20
+>>> Thanks for the clarification. Do you just drop the patch, or do you =
+want
+>>> me to re-send the series?
+>>=20
+>> No need to resend. I'll pick up the others in a day or two, once =
+people
+>> have had some time to go over them.
+>=20
+> I took a quick look at your mempool usage, and I'm not sure it's
+> correct.  For a mempool to work, you have to ensure that you provide a
+> forward progress guarantee. With that guarantee, you know that if you =
+do
+> end up sleeping on allocation, you already have items inflight that =
+will
+> be freed when that operation completes. In other words, all =
+allocations
+> must have a defined and finite life time, as any allocation can
+> potentially sleep/block for that life time. You can't allocate =
+something
+> and hold on to it forever, then you are violating the terms of =
+agreement
+> that makes a mempool work.
 
-But thinking about it some more, list_del() is probably safe after
-list_del_init()?
+I understood the part of guaranteeing the number of inflight items to
+keep the mempool active without waiting, but I must admit that I assumed
+that the mempool would resize when getting pressure and that the penalty
+would be increased latency, not the mempool giving up and causing a
+deadlock.
 
-Have you been able to reproduce this? I have the following patch to
-force the domain token pools to one token, I imagine with the right
-workload we can hit it:
+>=20
+> The first one that caught my eye is pblk->page_pool. You have this =
+loop:
+>=20
+> for (i =3D 0; i < nr_pages; i++) {
+>        page =3D mempool_alloc(pblk->page_pool, flags);
+>        if (!page)
+>                goto err;
+>=20
+>        ret =3D bio_add_pc_page(q, bio, page, PBLK_EXPOSED_PAGE_SIZE, =
+0);
+>        if (ret !=3D PBLK_EXPOSED_PAGE_SIZE) {
+>                pr_err("pblk: could not add page to bio\n");
+>                mempool_free(page, pblk->page_pool);
+>                goto err;
+>        }
+> }
+>=20
+> which looks suspect. This mempool is created with a reserve pool of
+> PAGE_POOL_SIZE (16) members. Do we know if the bio has 16 pages or =
+less?
+> If not, then this is broken and can deadlock forever.
 
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index f58cab8..b4e1bd7 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -58,9 +58,9 @@ enum {
-  * So, we cap these to a reasonable value.
-  */
- static const unsigned int kyber_depth[] = {
--       [KYBER_READ] = 256,
--       [KYBER_SYNC_WRITE] = 128,
--       [KYBER_OTHER] = 64,
-+       [KYBER_READ] = 1,
-+       [KYBER_SYNC_WRITE] = 1,
-+       [KYBER_OTHER] = 1,
- };
+I can see that in this case, the 16 elements do not hold. In the read
+path, we can guarantee that a read will be <=3D 64 sectors (4KB pages), =
+so
+this is definitely wrong. I'll fix it tomorrow.
 
- /*
-@@ -126,6 +126,7 @@ enum {
- #define IS_GOOD(status) ((status) > 0)
- #define IS_BAD(status) ((status) < 0)
+Since we are at it, I have for some time wondered what's the right way
+to balance the mempool sizes so that we are a good citizen and perform
+at the same time. I don't see a lot of code using mempool_resize to tune
+the min_nr based on load. For example, in our write path, the numbers
+are easy to calculate, but on the read path I completely
+over-dimensioned the mempool to ensure not having to wait for the
+completion path. Any good rule of thumb here?
 
-+#if 0
- static int kyber_lat_status(struct blk_stat_callback *cb,
-                            unsigned int sched_domain, u64 target)
- {
-@@ -243,6 +244,7 @@ static void kyber_adjust_other_depth(struct kyber_queue_data *kqd,
-        if (depth != orig_depth)
-                sbitmap_queue_resize(&kqd->domain_tokens[KYBER_OTHER], depth);
- }
-+#endif
+> You have a lot of mempool usage in the code, would probably not hurt =
+to
+> audit all of them.
 
- /*
-  * Apply heuristics for limiting queue depths based on gathered latency
-@@ -250,6 +252,8 @@ static void kyber_adjust_other_depth(struct kyber_queue_data *kqd,
-  */
- static void kyber_stat_timer_fn(struct blk_stat_callback *cb)
- {
-+       return;
-+#if 0
-        struct kyber_queue_data *kqd = cb->data;
-        int read_status, write_status;
+Yes. I will take a look and add comments to the sizes.
 
-@@ -269,6 +273,7 @@ static void kyber_stat_timer_fn(struct blk_stat_callback *cb)
-            ((IS_BAD(read_status) || IS_BAD(write_status) ||
-              kqd->domain_tokens[KYBER_OTHER].sb.depth < kyber_depth[KYBER_OTHER])))
-                blk_stat_activate_msecs(kqd->cb, 100);
-+#endif
- }
+Thanks Jens,
+Javier
 
- static unsigned int kyber_sched_tags_shift(struct kyber_queue_data *kqd)
+--Apple-Mail=_9E813B3F-1098-4BA1-BECA-5CC095590668
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJZsD5oAAoJEGMfBTt1mRjK55EP/RkYbnT61DbDGIMOT35K586r
+SNwOBzcYaQb9hoCt7Q/7o5BJJxxHl7wY6vQdq8HdDsTrWZ133bVMiaR+52Mhfkjg
+OAxJ6Gy0DNghJpz5Y0ntx7N08aKTMekgjItREQChzDw7sijqqkpgZbiVLyLuhxGG
+rjws1aInkNaXsBfmLSVXZ/iINo481PdnguL6/v/1PQyW1CcJmLIelyqwOAL3NnNx
+UiHdTyMLY9ywpHzj41VfvBLgUVD15ZWGfGMW9bQ6klo7/SgbvlK4wpQVzJVBUfgT
+b0Ib+/InrZgaBI7XsZBwSVw+TnXpetMNGOk43hTNtUpcYZW+UDTNVdggcanjotXT
+2vEfZxnJJoRBEs8yofeNcjBbFDyDfbbWqYQL9qsVm5pMS6WjiNGQltuAieYC7K95
+CnBevW69uQFBESnHNCVwMfTlZpyAWvM+dHR82LR50+yKp+jXH+RA1DpvxjjE9qbg
+n9UzfzbdG8A+Q4ZhgpRN7lxfApsN1ZGGQkQtmM5oeEHt5H9EsyrfAUEZ8t9ChN3G
+SVwhXyLIjn9KINxhQG9izuOkmLrGkmabOImiZhL+XAmXg7g6ir/U91QSA6c3GguE
+ywjo5fMMDdkK0itXF3PnmC0P7bZ/qekaeMzN5BKoYE5cgNdJfbOfpHfNeOMGT4cO
+CMuDbfZjbK259TTHQB0G
+=dFGg
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_9E813B3F-1098-4BA1-BECA-5CC095590668--
