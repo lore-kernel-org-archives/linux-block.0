@@ -1,25 +1,56 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 7 Sep 2017 11:43:07 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <sagi@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
 	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 3/3] block: remove blk_mq_reinit_tagset
-Message-ID: <20170907094307.24aaswad43wwum2v@linux-x5ow.site>
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 3/3] block: remove blk_mq_reinit_tagset
+Date: Wed,  6 Sep 2017 18:30:32 +0300
+Message-Id: <1504711832-28425-4-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1504711832-28425-1-git-send-email-sagi@grimberg.me>
 References: <1504711832-28425-1-git-send-email-sagi@grimberg.me>
- <1504711832-28425-4-git-send-email-sagi@grimberg.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1504711832-28425-4-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+No callers left.
+
+Suggested-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ block/blk-mq-tag.c     | 7 -------
+ include/linux/blk-mq.h | 2 --
+ 2 files changed, 9 deletions(-)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index bce1c76fc768..c81b40ecd3f1 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -327,13 +327,6 @@ int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_tagset_iter);
+ 
+-int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
+-			 int (reinit_request)(void *, struct request *))
+-{
+-	return blk_mq_tagset_iter(set, set->driver_data, reinit_request);
+-}
+-EXPORT_SYMBOL_GPL(blk_mq_reinit_tagset);
+-
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 6bc29f73a9aa..cfd64e500d82 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -261,8 +261,6 @@ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+ 				     unsigned long timeout);
+ int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
+ 		int (reinit_request)(void *, struct request *));
+-int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
+-			 int (reinit_request)(void *, struct request *));
+ 
+ int blk_mq_map_queues(struct blk_mq_tag_set *set);
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
