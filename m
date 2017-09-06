@@ -1,66 +1,119 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:50251 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752063AbdIAPoZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2017 11:44:25 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "axboe@fb.com" <axboe@fb.com>
-Subject: Re: [PATCH 8/9] block: allow to allocate req with REQF_PREEMPT when
- queue is frozen
-Date: Fri, 1 Sep 2017 15:43:39 +0000
-Message-ID: <1504280618.14386.16.camel@wdc.com>
-References: <20170831172728.15817-1-ming.lei@redhat.com>
-         <20170831172728.15817-9-ming.lei@redhat.com>
-         <1504219824.31872.74.camel@wdc.com> <20170901035537.GI16525@ming.t460p>
-In-Reply-To: <20170901035537.GI16525@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+Received: from mga02.intel.com ([134.134.136.20]:53959 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753007AbdIFKfq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Sep 2017 06:35:46 -0400
+Subject: Re: [PATCH V7 00/10] mmc: Add Command Queue support
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
+ <ff9eeab1-199a-3ab3-9fa8-cc2f08d52a54@intel.com>
+ <CAPDyKFriJLD-Q76tyUwXkAWJ8D3g=KOMt1rAtmufg97=Wh3jAQ@mail.gmail.com>
+ <19b101f2-f4ea-8360-ccd2-99a085ecc416@intel.com>
+ <8e636dd3-89e1-30b2-2c16-626ea33a12fd@intel.com>
+ <CAPDyKFqVmaTeyA4e3J2ck6tFmO4fnEyOxAkS7zNGtx811MXRMA@mail.gmail.com>
+ <e3610014-7eab-6b9f-759a-39771ea2d8df@intel.com>
+ <CAPDyKFo9=eXzgQ=VwrkbgV_U5OwC7-yCb42wee-7zcRW=NVQAQ@mail.gmail.com>
+ <9c7a50c5-b0a4-efae-442e-b331f93e1a8f@intel.com>
+ <CAPDyKFp28BJuFq2jBVTYBAaeE4AnD8e2Ywj74SyA4wmG=BV9SQ@mail.gmail.com>
+ <e6ae92d2-b3a5-2d5a-28fd-4793bab20914@intel.com>
+ <CAPDyKFp1=oDo2GvGnTq99FmsxFfs_LrbJUvc6PAUwZ1pS9kT=A@mail.gmail.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <a6f895e5-0c6d-5154-3a8f-9050315143eb@intel.com>
+Date: Wed, 6 Sep 2017 13:29:07 +0300
 MIME-Version: 1.0
+In-Reply-To: <CAPDyKFp1=oDo2GvGnTq99FmsxFfs_LrbJUvc6PAUwZ1pS9kT=A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE3LTA5LTAxIGF0IDExOjU1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-VGh1LCBBdWcgMzEsIDIwMTcgYXQgMTA6NTA6MjVQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IE9uIEZyaSwgMjAxNy0wOS0wMSBhdCAwMToyNyArMDgwMCwgTWluZyBMZWkgd3Jv
-dGU6DQo+ID4gPiBAQCAtMTQxMyw5ICsxNDE0LDE3IEBAIHN0YXRpYyBzdHJ1Y3QgcmVxdWVzdCAq
-YmxrX29sZF9nZXRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwNCj4gPiA+ICAJLyog
-Y3JlYXRlIGlvYyB1cGZyb250ICovDQo+ID4gPiAgCWNyZWF0ZV9pb19jb250ZXh0KGdmcF9tYXNr
-LCBxLT5ub2RlKTsNCj4gPiA+ICANCj4gPiA+IC0JcmV0ID0gYmxrX3F1ZXVlX2VudGVyKHEsICEo
-Z2ZwX21hc2sgJiBfX0dGUF9ESVJFQ1RfUkVDTEFJTSkpOw0KPiA+ID4gKwkvKg0KPiA+ID4gKwkg
-KiBXaGVuIHF1ZXVlIGlzIGZyb3plbiwgd2Ugc3RpbGwgbmVlZCB0byBhbGxvY2F0ZSByZXEgZm9y
-DQo+ID4gPiArCSAqIFJFUUZfUFJFRU1QVC4NCj4gPiA+ICsJICovDQo+ID4gPiArCWlmICgoZmxh
-Z3MgJiBCTEtfTVFfUkVRX1BSRUVNUFQpICYmIGJsa19xdWV1ZV9pc19mcm96ZW4ocSkpDQo+ID4g
-PiArCQlibGtfcXVldWVfZW50ZXJfbGl2ZShxKTsNCj4gPiA+ICsJZWxzZQ0KPiA+ID4gKwkJcmV0
-ID0gYmxrX3F1ZXVlX2VudGVyKHEsICEoZ2ZwX21hc2sgJiBfX0dGUF9ESVJFQ1RfUkVDTEFJTSkp
-Ow0KPiA+IA0KPiA+IFNvcnJ5IGJ1dCBJIGRvdWJ0IHRoYXQgY2FsbGluZyBibGtfcXVldWVfZW50
-ZXJfbGl2ZSgpIGZyb20gaW5zaWRlDQo+ID4gYmxrX29sZF9nZXRfcmVxdWVzdCgpIGlzIHNhZmUu
-IENhbGxpbmcgYmxrX3F1ZXVlX2VudGVyX2xpdmUoKSBpcyBvbmx5IHNhZmUNCj4gPiBiZWZvcmUg
-YSByZXF1ZXN0IHF1ZXVlIGhhcyBiZWVuIG1hcmtlZCBkZWFkLiBXaGF0IHByZXZlbnRzIGEga2Vy
-bmVsIHRocmVhZA0KPiA+IHRoYXQgaG9sZHMgYSByZWZlcmVuY2Ugb24gYSByZXF1ZXN0IHF1ZXVl
-IGFuZCB0aGF0IGlzIHJ1bm5pbmcgY29uY3VycmVudGx5DQo+ID4gd2l0aCBibGtfY2xlYW51cF9x
-dWV1ZSgpIHRvIGNhbGwgYmxrX29sZF9nZXRfcmVxdWVzdCgpIGFmdGVyIGEgcXVldWUgaGFzDQo+
-ID4gYmVlbiBtYXJrZWQgZGVhZD8NCj4gDQo+IEkgaGF2ZSBzZW50IG9uZSBkZWx0YSBwYXRjaCBp
-biBsaXN0LCB3aGljaCB3aWxsIG9ubHkgY2FsbA0KPiBibGtfcXVldWVfZW50ZXJfbGl2ZSgpIGlm
-ZiBTQ1NJIGRldmljZSBpcyBpbiBRVUlFU0NFLg0KDQpUaGF0IHdvdWxkbid0IG1ha2UgdGhpcyBo
-YWNrIGxlc3MgdWdseS4NCg0KSXQgaXMgcG9zc2libGUgdG8gdHJpZ2dlciB0aGUgcnVubmluZyAt
-PiBxdWllc2NlIHN0YXRlIHRyYW5zaXRpb24gdGhyb3VnaA0KL3N5cy9jbGFzcy9zY3NpX2Rldmlj
-ZS8qL2RldmljZS9zdGF0ZSBhbmQgdGhlIHF1aWVzY2UgLT4gcmVtb3ZlZCB0cmFuc2l0aW9uDQp0
-aHJvdWdoIC9zeXMvY2xhc3Mvc2NzaV9kZXZpY2UvKi9kZXZpY2UvZGVsZXRlLiBBbiBleGFtcGxl
-Og0KDQptb2Rwcm9iZSBzY3NpX2RlYnVnIGRlbGF5PTAgZGV2X3NpemVfbWI9MTYNCmxzc2NzaSB8
-IGdyZXAgc2NzaV9kZWJ1Zw0KY2QgL3N5cy9jbGFzcy9zY3NpX2RldmljZS84OjA6MDowL2Rldmlj
-ZQ0KZWNobyBxdWllc2NlID4gc3RhdGUNCmVjaG8gMSA+IGRlbGV0ZQ0KDQpTbyB0aGUgY29kZSBm
-cm9tIHlvdXIgcGF0Y2ggOC85IGNhbiByYWNlIGFnYWluc3QgZGV2aWNlIHJlbW92YWwuDQoNCkkg
-dGhpbmsgd2UgbmVlZCBhIGJldHRlciBhcHByb2FjaCB0aGFuIHRoZSBSRVFfUFJFRU1QVCBoYWNr
-LiBIb3cgYWJvdXQNCmltcGxlbWVudGluZyByZXN1bWUgYXMgYSBjYWxsYmFjayBieSBhZGRpbmcg
-YW4gYWRkaXRpb25hbCBmdW5jdGlvbiBwb2ludGVyDQp0byBzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAv
-IHN0cnVjdCBibGtfbXFfb3BzIGluc3RlYWQgb2YgaW1wbGVtZW50aW5nIGl0IGFzDQphIHJlcXVl
-c3Q/IEZvciBTQ1NJIGRldmljZXMgcmFjZXMgb2YgcmVzdW1lIGFnYWluc3QgcmVtb3ZhbCBjYW4g
-ZS5nLiBiZQ0KaGFuZGxlZCBieSBjaGVja2luZyB0aGUgc2NzaV9kZXZpY2Vfc2V0X3N0YXRlKCkg
-cmV0dXJuIHZhbHVlLiBUaGF0IGZ1bmN0aW9uDQpuYW1lbHkgZG9lcyBub3QgYWxsb3cgdGhlIHJl
-bW92aW5nL3JlbW92ZWQgdG8gcnVubmluZyBzdGF0ZSB0cmFuc2l0aW9uLg0KDQpCYXJ0Lg==
+On 06/09/17 12:54, Ulf Hansson wrote:
+> On 6 September 2017 at 09:20, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>> On 05/09/17 20:54, Ulf Hansson wrote:
+>>> On 5 September 2017 at 10:10, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>>>> On 05/09/17 10:24, Ulf Hansson wrote:
+>>>>> [...]
+>>>>>
+>>>>>>>>
+>>>>>>>> I can send blk-mq support for legacy requests in a few days if you like, but
+>>>>>>>> I want to hear a better explanation of why you are delaying CQE support.
+>>>>>>>
+>>>>>>> That would be very nice, however be aware of that we are in the merge
+>>>>>>> window, so I am not picking new material for 4.14 from this point. I
+>>>>>>> assume you understand why.
+>>>>>>
+>>>>>> Nope.  This is new functionality - doesn't affect anyone who doesn't have a
+>>>>>> command queue engine.  Next to no chance of regressions.  Tested by several
+>>>>>> in the community.  Substantially unchanged since February.  It is not even
+>>>>>> very much code in the block driver.
+>>>>>
+>>>>> Let me make it clear, once more - I don't want to maintain more hacks
+>>>>> in mmc block layer code.
+>>>>>
+>>>>> This series add blkmq support, using a method (which may be considered
+>>>>> as intermediate) via a new change in patch1 - but only for the new CQE
+>>>>> path. That means the old legacy mmc block path is still there. So, for
+>>>>> the reason stated above - no thanks!
+>>>>
+>>>> And where is your alternative.  When I pointed out you need a way to
+>>>> arbitrate between internal partitions, you went silent again.
+>>>>
+>>>> Can't have CQE without blk-mq but can't have blk-mq because you don't
+>>>> understand it, is hardly acceptable.
+>>>
+>>> Adrian, this discussion seems to lead nowhere. Can we please stop and
+>>> be constructive instead!
+>>
+>> If you want to be constructive you will queue CQE support for v4.15 now!
+>>
+>>>
+>>> Regarding the arbitration issue. We have been moving forward,
+>>> re-factoring the mmc block driver code, soon also solving the problem
+>>> for the rpmb internal partition [1]. Maybe the background to why Linus
+>>> is working on mmc block re-factoring, hasn't been entirely clear.
+>>> Anyway, it's exactly because of moving closer to address these issues.
+>>
+>> Nope, wrt blk-mq you are moving sideways with no clear idea where you're going.
+>>
+>>> Even if the problems certainly becomes a step harder to resolve for
+>>> the boot and the general purpose partitions, it's still a path we
+>>> should try to find a solution for. Yeah, that may mean we need to
+>>> suggest changes for the generic block layer, to teach it to better
+>>> deal with these kind of devices.
+>>
+>> You mean you have no idea how to do it but we are still expected to wait.
+>> How is that acceptable!
+>>
+>>> Finally, I have never said the arbitration issue *must* be solved
+>>> before converting to blkmq. Only that we should avoid performance
+>>> regressions, but that of course applies to whatever changes we do.
+>>
+>> Then there is no problem in queuing up the CQE patches now!
+> 
+> Either you are not paying attention or just being grumpy.
+> 
+> So for the last time, I don't want to pick CQE, prior the existing mmc
+> block code has converted to blkmq.
+
+Which is unreasonable and unacceptable.
+
+> End of discussion!
+
+Hardly.  I plan to submit blk-mq patches in a few days and I expect a proper
+response.  Not silence.  Not "consensus".  And especially not "we want to do
+it a different way but we don't know what that is".
