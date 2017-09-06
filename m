@@ -1,94 +1,111 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52588 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752180AbdIASwP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 14:52:15 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 8/8] SCSI: freeze block queue when SCSI device is put into quiesce
-Date: Sat,  2 Sep 2017 02:49:58 +0800
-Message-Id: <20170901184958.19452-10-ming.lei@redhat.com>
-In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
-References: <20170901184958.19452-1-ming.lei@redhat.com>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:33268 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753270AbdIFKwi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:52:38 -0400
+Received: by mail-wm0-f45.google.com with SMTP id f145so15984338wme.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:52:38 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 02/18] lightnvm: pblk: refactor read lba sanity check
+Date: Wed,  6 Sep 2017 12:50:55 +0200
+Message-Id: <1504695071-25928-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Simply quiesing SCSI device and waiting for completeion of IO
-dispatched to SCSI queue isn't safe, it is easy to use up
-requests because all these allocated requests can't be dispatched
-when device is put in QIUESCE. Then no request can be allocated
-for RQF_PREEMPT, and system may hang somewhere, such as
-When sending commands of sync_cache or start_stop during
-system suspend path.
+Refactor lba sanity check on read path to avoid code duplication.
 
-Before quiesing SCSI, this patch freezes block queue first,
-so no new request can enter queue any more, and all pending
-requests are drained too once blk_freeze_queue is returned.
-
-This patch also uses __blk_get_request() for allocating
-request with RQF_PREEMPT, so that the allocation can
-succeed even though block queue is frozen.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/scsi/scsi_lib.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-read.c | 29 ++++++++++-------------------
+ 1 file changed, 10 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index f6097b89d5d3..a59544012b68 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -243,10 +243,12 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	struct request *req;
- 	struct scsi_request *rq;
- 	int ret = DRIVER_ERROR << 24;
-+	unsigned flag = sdev->sdev_state == SDEV_QUIESCE ? BLK_REQ_PREEMPT : 0;
- 
--	req = blk_get_request(sdev->request_queue,
-+	req = __blk_get_request(sdev->request_queue,
- 			data_direction == DMA_TO_DEVICE ?
--			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
-+			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM,
-+			flag);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
-@@ -2890,6 +2892,19 @@ scsi_device_quiesce(struct scsi_device *sdev)
- {
- 	int err;
- 
-+	/*
-+	 * Simply quiesing SCSI device isn't safe, it is easy
-+	 * to use up requests because all these allocated requests
-+	 * can't be dispatched when device is put in QIUESCE.
-+	 * Then no request can be allocated and we may hang
-+	 * somewhere, such as system suspend/resume.
-+	 *
-+	 * So we freeze block queue first, no new request can
-+	 * enter queue any more, and pending requests are drained
-+	 * once blk_freeze_queue is returned.
-+	 */
-+	blk_freeze_queue_preempt(sdev->request_queue);
-+
- 	mutex_lock(&sdev->state_mutex);
- 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
- 	mutex_unlock(&sdev->state_mutex);
-@@ -2926,6 +2941,8 @@ void scsi_device_resume(struct scsi_device *sdev)
- 	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
- 		scsi_run_queue(sdev->request_queue);
- 	mutex_unlock(&sdev->state_mutex);
-+
-+	blk_unfreeze_queue_preempt(sdev->request_queue);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index d682e89e6493..db9a3b575f62 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -39,21 +39,14 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
  }
- EXPORT_SYMBOL(scsi_device_resume);
  
+ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+-				 unsigned long *read_bitmap)
++				 sector_t blba, unsigned long *read_bitmap)
+ {
+ 	struct bio *bio = rqd->bio;
+ 	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
+-	sector_t blba = pblk_get_lba(bio);
+ 	int nr_secs = rqd->nr_ppas;
+ 	bool advanced_bio = false;
+ 	int i, j = 0;
+ 
+-	/* logic error: lba out-of-bounds. Ignore read request */
+-	if (blba + nr_secs >= pblk->rl.nr_secs) {
+-		WARN(1, "pblk: read lbas out of bounds\n");
+-		return;
+-	}
+-
+ 	pblk_lookup_l2p_seq(pblk, ppas, blba, nr_secs);
+ 
+ 	for (i = 0; i < nr_secs; i++) {
+@@ -263,17 +256,10 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ }
+ 
+ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+-			 unsigned long *read_bitmap)
++			 sector_t lba, unsigned long *read_bitmap)
+ {
+ 	struct bio *bio = rqd->bio;
+ 	struct ppa_addr ppa;
+-	sector_t lba = pblk_get_lba(bio);
+-
+-	/* logic error: lba out-of-bounds. Ignore read request */
+-	if (lba >= pblk->rl.nr_secs) {
+-		WARN(1, "pblk: read lba out of bounds\n");
+-		return;
+-	}
+ 
+ 	pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+ 
+@@ -309,14 +295,19 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
++	sector_t blba = pblk_get_lba(bio);
+ 	unsigned int nr_secs = pblk_get_secs(bio);
+ 	struct nvm_rq *rqd;
+ 	unsigned long read_bitmap; /* Max 64 ppas per request */
+ 	unsigned int bio_init_idx;
+ 	int ret = NVM_IO_ERR;
+ 
+-	if (nr_secs > PBLK_MAX_REQ_ADDRS)
++	/* logic error: lba out-of-bounds. Ignore read request */
++	if (blba >= pblk->rl.nr_secs || nr_secs > PBLK_MAX_REQ_ADDRS) {
++		WARN(1, "pblk: read lba out of bounds (lba:%llu, nr:%d)\n",
++					(unsigned long long)blba, nr_secs);
+ 		return NVM_IO_ERR;
++	}
+ 
+ 	bitmap_zero(&read_bitmap, nr_secs);
+ 
+@@ -348,9 +339,9 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 		rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
+ 		rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
+ 
+-		pblk_read_ppalist_rq(pblk, rqd, &read_bitmap);
++		pblk_read_ppalist_rq(pblk, rqd, blba, &read_bitmap);
+ 	} else {
+-		pblk_read_rq(pblk, rqd, &read_bitmap);
++		pblk_read_rq(pblk, rqd, blba, &read_bitmap);
+ 	}
+ 
+ 	bio_get(bio);
 -- 
-2.9.5
+2.7.4
