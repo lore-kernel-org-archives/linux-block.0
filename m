@@ -1,155 +1,100 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:34178 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753332AbdIFKws (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:52:48 -0400
-Received: by mail-wm0-f42.google.com with SMTP id 137so27135903wmj.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:52:47 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 11/18] lightnvm: pblk: refactor read path on GC
-Date: Wed,  6 Sep 2017 12:51:04 +0200
-Message-Id: <1504695071-25928-12-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
-References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 5 Sep 2017 17:01:26 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Chandan Rajendra <chandan@linux.vnet.ibm.com>,
+	Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org,
+	sandeen@sandeen.net, Omar Sandoval <osandov@fb.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] mkfs: Remove messages printed when blocksize < physical
+ sectorsize
+Message-ID: <20170906000126.GB4779@vader>
+References: <20170905054442.28615-1-chandan@linux.vnet.ibm.com>
+ <20170905063139.GA679@infradead.org>
+ <20170905064208.GB15686@vader>
+ <2656563.n056MvCHVb@localhost.localdomain>
+ <89dbce28-5798-f404-4dc8-a85aae36cdec@kernel.dk>
+ <20170905220631.GL17782@dastard>
+ <20170905221851.GA4779@vader>
+ <20170905232449.GO17782@dastard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170905232449.GO17782@dastard>
+List-ID: <linux-block@vger.kernel.org>
 
-Simplify the part of the garbage collector where data is read from the
-line being recycled and moved into an internal queue before being copied
-to the memory buffer. This allows to get rid of a dedicated function,
-which introduces an unnecessary dependency on the code.
+On Wed, Sep 06, 2017 at 09:24:49AM +1000, Dave Chinner wrote:
+> On Tue, Sep 05, 2017 at 03:18:51PM -0700, Omar Sandoval wrote:
+> > On Wed, Sep 06, 2017 at 08:06:31AM +1000, Dave Chinner wrote:
+> > > On Tue, Sep 05, 2017 at 09:00:26AM -0600, Jens Axboe wrote:
+> > > > On 09/05/2017 01:37 AM, Chandan Rajendra wrote:
+> > > > > On Tuesday, September 5, 2017 12:12:08 PM IST Omar Sandoval wrote:
+> > > > >> On Mon, Sep 04, 2017 at 11:31:39PM -0700, Christoph Hellwig wrote:
+> > > > >>> On Tue, Sep 05, 2017 at 11:14:42AM +0530, Chandan Rajendra wrote:
+> > > > >>>> Linux kernel commit 6c6b6f28b3335fd85ec833ee0005d9c9dca6c003 (loop: set
+> > > > >>>> physical block size to PAGE_SIZE) now sets PAGE_SIZE as the default
+> > > > >>>> physical sector size of loop devices. On ppc64, this causes loop devices
+> > > > >>>> to have 64k as the physical sector size.
+> > > > >>>
+> > > > >>> Eek.  We'll need to revert the loop change ASAP!
+> > > > >>
+> > > > >> Most annoying patch series ever. It hasn't made it to Linus' tree yet,
+> > > > >> right? We can revert (although the later change depends on that), fold
+> > > > >> in a fix, or apply a fix on top of it, whatever Jens prefers.
+> > > > >>
+> > > > >>
+> > > > > 
+> > > > > My bad. 6c6b6f28b3335fd85ec833ee0005d9c9dca6c003 is the commit id from 
+> > > > > Linux-next. I don't see this commit in Linus's git tree.
+> > > > 
+> > > > Right, it's only queued up, and scheduled for the 2nd part of the
+> > > > block changes for 4.14. It should have been PAGE_CACHE_SIZE, but
+> > > > we don't have that anymore...
+> > > 
+> > > But PAGE_CACHE_SIZE was equal to PAGE_SIZE, so that would have been
+> > > wrong, too.
+> > > 
+> > > I just don't see why this is necessary, given that buffered IO
+> > > through the upper filesystem will already be doing page
+> > > sized/aligned IO where possible (because that's what the page cache
+> > > does!). And for direct IO the loop device should just export the
+> > > underlying host filesystem logical/physical sector sizes, which
+> > > should be optimal for the backing storage to begin with.
+> > > 
+> > > Someone want to enlighten me as to what problem is being solved
+> > > here?
+> > 
+> > I already sent a patch to fix this:
+> > https://marc.info/?l=linux-block&m=150464670510301&w=2
+> > 
+> > Loop was using the default physical block size of 512, which is a lie
+> > according to the definition of the physical block size:
+> 
+> Loop devices are special. They /have to lie/ because they are the
+> only mechanism we have for mounting image files with sector sizes
+> smaller than the host storage sizes.  i.e. loop devices require
+> compatibility and flexibility first and so need to default to 
+> "most compatible" behaviour, not "most performant".
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/pblk-gc.c | 94 +++++++++++++++++++---------------------------
- 1 file changed, 39 insertions(+), 55 deletions(-)
+And that's why the logical block size is 512 by default. The physical
+block size doesn't have any bearing on what you can do with the device,
+it's a _hint_ for the application. But again, I'm just being overly
+pedantic, I should've checked how tools were actually using the physical
+block size.
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 27ee1f9b19c6..efa86295fbd1 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -56,57 +56,6 @@ static void pblk_gc_writer_kick(struct pblk_gc *gc)
- 	wake_up_process(gc->gc_writer_ts);
- }
- 
--/*
-- * Responsible for managing all memory related to a gc request. Also in case of
-- * failure
-- */
--static int pblk_gc_move_valid_secs(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
--{
--	struct nvm_tgt_dev *dev = pblk->dev;
--	struct nvm_geo *geo = &dev->geo;
--	struct pblk_gc *gc = &pblk->gc;
--	struct pblk_line *line = gc_rq->line;
--	void *data;
--	int ret = 0;
--
--	data = vmalloc(gc_rq->nr_secs * geo->sec_size);
--	if (!data) {
--		ret = -ENOMEM;
--		goto fail;
--	}
--
--	gc_rq->data = data;
--
--	/* Read from GC victim block */
--	ret = pblk_submit_read_gc(pblk, gc_rq);
--	if (ret)
--		goto fail;
--
--	if (!gc_rq->secs_to_gc)
--		goto fail;
--
--retry:
--	spin_lock(&gc->w_lock);
--	if (gc->w_entries >= PBLK_GC_RQ_QD) {
--		spin_unlock(&gc->w_lock);
--		pblk_gc_writer_kick(&pblk->gc);
--		usleep_range(128, 256);
--		goto retry;
--	}
--	gc->w_entries++;
--	list_add_tail(&gc_rq->list, &gc->w_list);
--	spin_unlock(&gc->w_lock);
--
--	pblk_gc_writer_kick(&pblk->gc);
--
--	return 0;
--
--fail:
--	pblk_gc_free_gc_rq(gc_rq);
--	kref_put(&line->ref, pblk_line_put);
--	return ret;
--}
--
- static void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-@@ -130,18 +79,53 @@ static void pblk_gc_line_ws(struct work_struct *work)
- 	struct pblk_line_ws *line_rq_ws = container_of(work,
- 						struct pblk_line_ws, ws);
- 	struct pblk *pblk = line_rq_ws->pblk;
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_gc *gc = &pblk->gc;
- 	struct pblk_line *line = line_rq_ws->line;
- 	struct pblk_gc_rq *gc_rq = line_rq_ws->priv;
-+	int ret;
- 
- 	up(&gc->gc_sem);
- 
--	if (pblk_gc_move_valid_secs(pblk, gc_rq)) {
--		pr_err("pblk: could not GC all sectors: line:%d (%d/%d)\n",
--						line->id, *line->vsc,
--						gc_rq->nr_secs);
-+	gc_rq->data = vmalloc(gc_rq->nr_secs * geo->sec_size);
-+	if (!gc_rq->data) {
-+		pr_err("pblk: could not GC line:%d (%d/%d)\n",
-+					line->id, *line->vsc, gc_rq->nr_secs);
-+		goto out;
- 	}
- 
-+	/* Read from GC victim block */
-+	ret = pblk_submit_read_gc(pblk, gc_rq);
-+	if (ret) {
-+		pr_err("pblk: failed GC read in line:%d (err:%d)\n",
-+								line->id, ret);
-+		goto out;
-+	}
-+
-+	if (!gc_rq->secs_to_gc)
-+		goto out;
-+
-+retry:
-+	spin_lock(&gc->w_lock);
-+	if (gc->w_entries >= PBLK_GC_RQ_QD) {
-+		spin_unlock(&gc->w_lock);
-+		pblk_gc_writer_kick(&pblk->gc);
-+		usleep_range(128, 256);
-+		goto retry;
-+	}
-+	gc->w_entries++;
-+	list_add_tail(&gc_rq->list, &gc->w_list);
-+	spin_unlock(&gc->w_lock);
-+
-+	pblk_gc_writer_kick(&pblk->gc);
-+
-+	mempool_free(line_rq_ws, pblk->line_ws_pool);
-+	return;
-+
-+out:
-+	pblk_gc_free_gc_rq(gc_rq);
-+	kref_put(&line->ref, pblk_line_put);
- 	mempool_free(line_rq_ws, pblk->line_ws_pool);
- }
- 
--- 
-2.7.4
+> If you're really "sick of these stupid changes" then perhaps you
+> should consider cc'ing linux-fsdevel for loop device changes so
+> filesystem developers have a chance to catch these filesystem side
+> problems in new loopdev code before it's merged anywhere....
+
+Yup, loop changes haven't been going outside of linux-block but at least
+this one should have gone to fsdevel, sorry.
+
+> FWIW, if you're going to set some kind of optimal default for the
+> loop devices then - like all other stacked block devices - the
+> defaults need to be pulled from the underlying storage (i.e. the
+> filesystem that hosts the file) rather than making them up out of
+> thin air.
+
+Not worth the trouble for now, I'll just leave this alone now.
