@@ -1,177 +1,80 @@
-Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V2 05/12] scsi: sd_zbc: Fix comments and indentation
-Date: Fri,  8 Sep 2017 01:16:33 +0900
-Message-Id: <20170907161640.30465-6-damien.lemoal@wdc.com>
-In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
-References: <20170907161640.30465-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:37407 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754873AbdIFOBr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 10:01:47 -0400
+Received: by mail-wm0-f48.google.com with SMTP id u26so31537413wma.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 07:01:46 -0700 (PDT)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <7C9D69B3-96AC-4038-9395-FAA618B88EE4@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_B7A1EF50-077B-4E7E-A7A5-0A3C33AA8178";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 01/18] lightnvm: pblk: improve naming for internal req.
+Date: Wed, 6 Sep 2017 16:01:43 +0200
+In-Reply-To: <20170906134607.GC3960@infradead.org>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        =?utf-8?Q?Matias_Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: Christoph Hellwig <hch@infradead.org>
+References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+ <1504695071-25928-2-git-send-email-javier@cnexlabs.com>
+ <20170906134607.GC3960@infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Fix comments style (do not use documented comment style) and add some
-comments to clarify some functions. Also fix some functions signature
-indentation and remove a useless blank line.
 
-No functional change is introduced by this patch.
+--Apple-Mail=_B7A1EF50-077B-4E7E-A7A5-0A3C33AA8178
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=us-ascii
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/scsi/sd_zbc.c | 50 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 32 insertions(+), 18 deletions(-)
+> On 6 Sep 2017, at 15.46, Christoph Hellwig <hch@infradead.org> wrote:
+> 
+>> -#define ERASE 2 /* READ = 0, WRITE = 1 */
+>> +/* READ = 0, WRITE (user) = 1 */
+>> +#define ERASE 2
+>> +#define WRITE_INT 3 /* Internal write. Not through write buffer */
+> 
+> enum {
+> 	PBLK_READ,
+> 	PBLK_WRITE,
+> 	PBLK_ERASE,
+> 	PBLK_WRITE,
+> };
+> 
+> please.  Don't abuse and overload the messy READ/WRITE macros in any
+> new code.
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index a62f8e256a26..e0927f8fb829 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -32,11 +32,11 @@
- #include "sd.h"
- #include "sd_zbc.h"
- 
--/**
-- * Convert a zone descriptor to a zone struct.
-+/*
-+ * Convert a zone descriptor to a struct blk_zone,
-+ * taking care of converting LBA sized values to 512B sectors.
-  */
--static void sd_zbc_parse_report(struct scsi_disk *sdkp,
--				u8 *buf,
-+static void sd_zbc_parse_report(struct scsi_disk *sdkp, u8 *buf,
- 				struct blk_zone *zone)
- {
- 	struct scsi_device *sdp = sdkp->device;
-@@ -58,8 +58,9 @@ static void sd_zbc_parse_report(struct scsi_disk *sdkp,
- 		zone->wp = zone->start + zone->len;
- }
- 
--/**
-+/*
-  * Issue a REPORT ZONES scsi command.
-+ * For internal use during device validation.
-  */
- static int sd_zbc_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
- 			       unsigned int buflen, sector_t lba)
-@@ -100,6 +101,9 @@ static int sd_zbc_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
- 	return 0;
- }
- 
-+/*
-+ * Prepare a REPORT ZONES scsi command for a REQ_OP_ZONE_REPORT request.
-+ */
- int sd_zbc_setup_report_cmnd(struct scsi_cmnd *cmd)
- {
- 	struct request *rq = cmd->request;
-@@ -142,6 +146,11 @@ int sd_zbc_setup_report_cmnd(struct scsi_cmnd *cmd)
- 	return BLKPREP_OK;
- }
- 
-+/*
-+ * Process a REPORT ZONES scsi command reply, converting all reported
-+ * zone descriptors to struct blk_zone. The conversion is done in-place,
-+ * directly in the request specified sg buffer.
-+ */
- static void sd_zbc_report_zones_complete(struct scsi_cmnd *scmd,
- 					 unsigned int good_bytes)
- {
-@@ -208,6 +217,9 @@ static inline unsigned int sd_zbc_zone_no(struct scsi_disk *sdkp,
- 	return sectors_to_logical(sdkp->device, sector) >> sdkp->zone_shift;
- }
- 
-+/*
-+ * Prepare a RESET WRITE POINTER scsi command for a REQ_OP_ZONE_RESET request.
-+ */
- int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
- {
- 	struct request *rq = cmd->request;
-@@ -240,6 +252,11 @@ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
- 	return BLKPREP_OK;
- }
- 
-+/*
-+ * Write lock a sequential zone.
-+ * Called from sd_init_cmd() for write requests
-+ * (standard write, write same or write zeroes operations).
-+ */
- int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- {
- 	struct request *rq = cmd->request;
-@@ -262,10 +279,7 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	 * Do not issue more than one write at a time per
- 	 * zone. This solves write ordering problems due to
- 	 * the unlocking of the request queue in the dispatch
--	 * path in the non scsi-mq case. For scsi-mq, this
--	 * also avoids potential write reordering when multiple
--	 * threads running on different CPUs write to the same
--	 * zone (with a synchronized sequential pattern).
-+	 * path in the non scsi-mq case.
- 	 */
- 	if (sdkp->zones_wlock &&
- 	    test_and_set_bit(zno, sdkp->zones_wlock))
-@@ -277,6 +291,10 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	return BLKPREP_OK;
- }
- 
-+/*
-+ * Write unlock a sequential zone.
-+ * Called from sd_uninit_cmd().
-+ */
- void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd)
- {
- 	struct request *rq = cmd->request;
-@@ -291,8 +309,7 @@ void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd)
- 	}
- }
- 
--void sd_zbc_complete(struct scsi_cmnd *cmd,
--		     unsigned int good_bytes,
-+void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
- 		     struct scsi_sense_hdr *sshdr)
- {
- 	int result = cmd->result;
-@@ -336,7 +353,7 @@ void sd_zbc_complete(struct scsi_cmnd *cmd,
- 	}
- }
- 
--/**
-+/*
-  * Read zoned block device characteristics (VPD page B6).
-  */
- static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
-@@ -366,11 +383,10 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
- 	return 0;
- }
- 
--/**
-+/*
-  * Check reported capacity.
-  */
--static int sd_zbc_check_capacity(struct scsi_disk *sdkp,
--				 unsigned char *buf)
-+static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
- {
- 	sector_t lba;
- 	int ret;
-@@ -526,8 +542,7 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	return 0;
- }
- 
--int sd_zbc_read_zones(struct scsi_disk *sdkp,
--		      unsigned char *buf)
-+int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- {
- 	int ret;
- 
-@@ -538,7 +553,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp,
- 		 */
- 		return 0;
- 
--
- 	/* Get zoned block device characteristics */
- 	ret = sd_zbc_read_zoned_characteristics(sdkp, buf);
- 	if (ret)
--- 
-2.13.5
+Ok. I'll resend.
+
+Javier
+
+--Apple-Mail=_B7A1EF50-077B-4E7E-A7A5-0A3C33AA8178
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJZr//HAAoJEGMfBTt1mRjK1OIP/jqBXgLloo3kjoia7MsaHDn4
+dNMJ/aeOK/OWtM2mgeA824jbMzZXuBCS4/j6h9VqFRTbeRivINFV39XX/E5zHlM5
+hRFhyUG5Hqp3upVHXE5WwAh6LLeyonxWkqLCST6ilOQF2s/6gVg+ATXGCwYWKgWA
+GQvF2MBXraE7AF5Ltjhn1w2JaOrKOPbHh1bChekAttbmWi4mon3viGPLjdigtDdx
+XIWH3p/Tw8hlQluxNc7gajS8D7z/hRh3b2Z5H+3RGYOQ0DiI9P431CZjpLAs6fXJ
+aSnL1BVhYfdtLI4o67gOeNldz6K40pDD+93h/0zd/kpsGOMVNbrFO+1+IWPCucm/
+nUCE8QXj/qNJdo/oxDiCLwaJ1QiJShlKtO0V2UVWIQy0lsO3tnAXzRijJ8frIe84
++gavowgIcxdwiISofQk21fGF2FT3Ptaz7OsksI7MTeN7MCbxk58rjJN2f4EhINNf
+plc1yR2LBlt2daJiFbfxBjJqYA9uifmOoBxZ/ROuRg5Zd6zM+g42AVR/Dc4B1YhS
+UNIcpfdIwV5b+M3MEoZPdAaYnLAsnGgBezx5yvlw5n+Xcn/RSC4h6FmcXI/JZee6
+nBE2BfTw9GR2fD4i9DmrfYhzE8wCt7Zn1Jet6S+24ACvUVXczrQytPDl7i1TBJsz
+7rl5TR5KYsGTqsYbJYAb
+=78AZ
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_B7A1EF50-077B-4E7E-A7A5-0A3C33AA8178--
