@@ -1,31 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37098 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932263AbdIFPXd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Sep 2017 11:23:33 -0400
-Date: Wed, 6 Sep 2017 17:23:31 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Cc: mb@lightnvm.io, axboe@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@cnexlabs.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias@cnexlabs.com>
-Subject: Re: [PATCH 5/6] lightnvm: pblk: fix write I/O sync stat
-Message-ID: <20170906152331.ps5a5lfw74pnb6ke@linux-x5ow.site>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:37536 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932787AbdIFPBT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 11:01:19 -0400
+Received: by mail-wm0-f50.google.com with SMTP id u26so32206850wma.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 08:01:19 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 5/6] lightnvm: pblk: fix write I/O sync stat
+Date: Wed,  6 Sep 2017 17:01:05 +0200
+Message-Id: <1504710066-4699-6-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
 References: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
- <1504710066-4699-6-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1504710066-4699-6-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+Fix stat counter to collect the right number of I/Os being synced on the
+completion path.
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Fixes: 0880a9aa2d91f ("lightnvm: pblk: delete redundant buffer pointer")
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-write.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 6acb4a92435f..b48d52b2ae38 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -41,7 +41,7 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 							c_ctx->nr_padded);
+ 
+ #ifdef CONFIG_NVM_DEBUG
+-	atomic_long_add(c_ctx->nr_valid, &pblk->sync_writes);
++	atomic_long_add(rqd->nr_ppas, &pblk->sync_writes);
+ #endif
+ 
+ 	ret = pblk_rb_sync_advance(&pblk->rwb, c_ctx->nr_valid);
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
