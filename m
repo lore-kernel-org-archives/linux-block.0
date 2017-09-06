@@ -1,101 +1,51 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 11/16] block: mq-deadline: Introduce zones_wlock attribute
-Date: Sun, 24 Sep 2017 16:02:42 +0900
-Message-Id: <20170924070247.25560-12-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+	axboe@kernel.dk
+Cc: bcache@lists.ewheeler.net,
+	Tang Junhui <tang.junhui@zte.com.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH 03/12] bcache: do not subtract sectors_to_gc for bypassed IO
+Date: Wed,  6 Sep 2017 14:25:53 +0800
+Message-Id: <20170906062602.50497-4-colyli@suse.de>
+In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
+References: <20170906062602.50497-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Zone write locking is mandatory for host managed zoned block devices so
-that sequential write order can be maintained. This is however optional
-for host aware devices as the device firmware can handle random writes.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-The default initialization always enable zones write locking for any
-zoned block device. Introduce the zones_wlock sysfs attribute to allow
-users to change this default setting for host aware disks. Changes to
-zones write locking state are not allowed for host managed disks (zones
-write locking is always enabled) and for regular disks (zones write
-locking is always disabled).
+Since bypassed IOs use no bucket, so do not subtract sectors_to_gc to
+trigger gc thread.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
+Acked-by: Coly Li <colyli@suse.de>
+Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: stable@vger.kernel.org
 ---
- block/mq-deadline.c | 43 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 41 insertions(+), 2 deletions(-)
+ drivers/md/bcache/request.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 53b1d16179ad..fb88fee0fb54 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -339,8 +339,7 @@ static void dd_exit_queue(struct elevator_queue *e)
- static int deadline_zoned_init_queue(struct request_queue *q,
- 				     struct deadline_data *dd)
- {
--	if (!blk_queue_is_zoned(q) ||
--	    !blk_queue_nr_zones(q)) {
-+	if (!blk_queue_is_zoned(q) || !blk_queue_nr_zones(q)) {
- 		/*
- 		 * Regular drive, or non-conforming zoned block device.
- 		 * Do not use zone write locking.
-@@ -559,6 +558,45 @@ STORE_FUNCTION(deadline_front_merges_store, &dd->front_merges, 0, 1, 0);
- STORE_FUNCTION(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX, 0);
- #undef STORE_FUNCTION
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 958072a11347..4b413db99276 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -196,12 +196,12 @@ static void bch_data_insert_start(struct closure *cl)
+ 	struct data_insert_op *op = container_of(cl, struct data_insert_op, cl);
+ 	struct bio *bio = op->bio, *n;
  
-+static ssize_t deadline_zones_wlock_show(struct elevator_queue *e, char *page)
-+{
-+	struct deadline_data *dd = e->elevator_data;
-+
-+	return deadline_var_show(dd->zones_wlock ? 1 : 0, page);
-+}
-+
-+static ssize_t deadline_zones_wlock_store(struct elevator_queue *e,
-+					  const char *page, size_t count)
-+{
-+	struct deadline_data *dd = e->elevator_data;
-+	int ret, enable_zones_wlock;
-+
-+	deadline_var_store(&enable_zones_wlock, page);
-+	if (enable_zones_wlock != 0 && enable_zones_wlock != 1)
-+		return -EINVAL;
-+
-+	if ((enable_zones_wlock && dd->zones_wlock) ||
-+	    (!enable_zones_wlock && !dd->zones_wlock))
-+		return count;
-+
-+	/* Changes are allowed only for host-aware disks */
-+	if (blk_queue_zoned_model(dd->q) != BLK_ZONED_HA)
-+		return -EPERM;
-+
-+	blk_mq_freeze_queue(dd->q);
-+
-+	if (enable_zones_wlock) {
-+		ret = deadline_enable_zones_wlock(dd, GFP_NOIO);
-+	} else {
-+		deadline_disable_zones_wlock(dd);
-+		ret = 0;
-+	}
-+
-+	blk_mq_unfreeze_queue(dd->q);
-+
-+	return ret ? ret : count;
-+}
-+
- #define DD_ATTR(name) \
- 	__ATTR(name, S_IRUGO|S_IWUSR, deadline_##name##_show, \
- 				      deadline_##name##_store)
-@@ -569,6 +607,7 @@ static struct elv_fs_entry deadline_attrs[] = {
- 	DD_ATTR(writes_starved),
- 	DD_ATTR(front_merges),
- 	DD_ATTR(fifo_batch),
-+	DD_ATTR(zones_wlock),
- 	__ATTR_NULL
- };
+-	if (atomic_sub_return(bio_sectors(bio), &op->c->sectors_to_gc) < 0)
+-		wake_up_gc(op->c);
+-
+ 	if (op->bypass)
+ 		return bch_data_invalidate(cl);
  
++	if (atomic_sub_return(bio_sectors(bio), &op->c->sectors_to_gc) < 0)
++		wake_up_gc(op->c);
++
+ 	/*
+ 	 * Journal writes are marked REQ_PREFLUSH; if the original write was a
+ 	 * flush, it'll wait on the journal write.
 -- 
 2.13.5
