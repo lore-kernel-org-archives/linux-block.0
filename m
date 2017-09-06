@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:37543 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932740AbdIFPBU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 11:01:20 -0400
-Received: by mail-wm0-f54.google.com with SMTP id u26so32207031wma.0
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 08:01:20 -0700 (PDT)
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:35653 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753366AbdIFKww (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:52:52 -0400
+Received: by mail-wm0-f41.google.com with SMTP id f199so7945594wme.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:52:51 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io, axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 6/6] lightnvm: pblk: avoid deadlock on low LUN config
-Date: Wed,  6 Sep 2017 17:01:06 +0200
-Message-Id: <1504710066-4699-7-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
-References: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
+Subject: [PATCH 15/18] lightnvm: pblk: avoid deadlock on low LUN config
+Date: Wed,  6 Sep 2017 12:51:08 +0200
+Message-Id: <1504695071-25928-16-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -23,7 +23,6 @@ List-Id: linux-block@vger.kernel.org
 On low LUN configurations, make sure not to send bios that are bigger
 than the buffer size.
 
-Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
 Signed-off-by: Javier González <javier@cnexlabs.com>
 Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
@@ -70,10 +69,10 @@ index 2e6a5361baf0..596bdec433c3 100644
  	rl->rb_state = PBLK_RL_HIGH;
  
 diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 67e623bd5c2d..a2753f9da830 100644
+index 2304a4891f20..2ae9d94e9852 100644
 --- a/drivers/lightnvm/pblk.h
 +++ b/drivers/lightnvm/pblk.h
-@@ -267,6 +267,7 @@ struct pblk_rl {
+@@ -273,6 +273,7 @@ struct pblk_rl {
  	int rb_gc_max;		/* Max buffer entries available for GC I/O */
  	int rb_gc_rsv;		/* Reserved buffer entries for GC I/O */
  	int rb_state;		/* Rate-limiter current state */
@@ -81,7 +80,7 @@ index 67e623bd5c2d..a2753f9da830 100644
  
  	atomic_t rb_user_cnt;	/* User I/O buffer counter */
  	atomic_t rb_gc_cnt;	/* GC I/O buffer counter */
-@@ -844,6 +845,7 @@ int pblk_rl_gc_may_insert(struct pblk_rl *rl, int nr_entries);
+@@ -846,6 +847,7 @@ int pblk_rl_gc_may_insert(struct pblk_rl *rl, int nr_entries);
  void pblk_rl_gc_in(struct pblk_rl *rl, int nr_entries);
  void pblk_rl_out(struct pblk_rl *rl, int nr_user, int nr_gc);
  int pblk_rl_sysfs_rate_show(struct pblk_rl *rl);
