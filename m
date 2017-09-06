@@ -1,59 +1,57 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Cc: bcache@lists.ewheeler.net,
-	Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 05/12] bcache: gc does not work when triggering by manual command
-Date: Wed,  6 Sep 2017 14:25:55 +0800
-Message-Id: <20170906062602.50497-6-colyli@suse.de>
-In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
-References: <20170906062602.50497-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:53667 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752111AbdIFI5f (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Sep 2017 04:57:35 -0400
+Date: Wed, 6 Sep 2017 10:57:29 +0200 (CEST)
+From: Jiri Kosina <jikos@kernel.org>
+To: Bhumika Goyal <bhumirks@gmail.com>
+cc: julia.lawall@lip6.fr, rjw@rjwysocki.net, lenb@kernel.org,
+        jbacik@fb.com, benjamin.tissoires@redhat.com,
+        manish.chopra@cavium.com, rahul.verma@cavium.com,
+        Dept-GELinuxNICDev@cavium.com, harish.patil@cavium.com,
+        cascardo@holoscopio.com, don@syst.com.br, dvhart@infradead.org,
+        andy@infradead.org, sre@kernel.org, linux-acpi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        nbd-general@lists.sourceforge.net, linux-input@vger.kernel.org,
+        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-pm@vger.kernel.org
+Subject: Re: [PATCH 3/6] hid: make device_attribute const
+In-Reply-To: <1503315792-14837-4-git-send-email-bhumirks@gmail.com>
+Message-ID: <nycvar.YFH.7.76.1709061057200.4077@jbgna.fhfr.qr>
+References: <1503315792-14837-1-git-send-email-bhumirks@gmail.com> <1503315792-14837-4-git-send-email-bhumirks@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On Mon, 21 Aug 2017, Bhumika Goyal wrote:
 
-I try to execute the following command to trigger gc thread:
-[root@localhost internal]# echo 1 > trigger_gc
-But it does not work, I debug the code in gc_should_run(), It works only
-if in invalidating or sectors_to_gc < 0. So set sectors_to_gc to -1 to
-meet the condition when we trigger gc by manual command.
+> Make this const as it is only passed as an argument to the
+> function device_create_file and device_remove_file and the corresponding
+> arguments are of type const.
+> Done using Coccinelle
+> 
+> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+> ---
+>  drivers/hid/hid-core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+> index 9bc9116..24e929c 100644
+> --- a/drivers/hid/hid-core.c
+> +++ b/drivers/hid/hid-core.c
+> @@ -1662,7 +1662,7 @@ static bool hid_hiddev(struct hid_device *hdev)
+>  	.size = HID_MAX_DESCRIPTOR_SIZE,
+>  };
+>  
+> -static struct device_attribute dev_attr_country = {
+> +static const struct device_attribute dev_attr_country = {
+>  	.attr = { .name = "country", .mode = 0444 },
+>  	.show = show_country,
 
-(Code comments aded by Coly Li)
+Applied, thanks.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/sysfs.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index f90f13616980..09295c07ea88 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -615,8 +615,21 @@ STORE(__bch_cache_set)
- 		bch_cache_accounting_clear(&c->accounting);
- 	}
- 
--	if (attr == &sysfs_trigger_gc)
-+	if (attr == &sysfs_trigger_gc) {
-+		/*
-+		 * Garbage collection thread only works when sectors_to_gc < 0,
-+		 * when users write to sysfs entry trigger_gc, most of time
-+		 * they want to forcibly triger gargage collection. Here -1 is
-+		 * set to c->sectors_to_gc, to make gc_should_run() give a
-+		 * chance to permit gc thread to run. "give a chance" means
-+		 * before going into gc_should_run(), there is still chance
-+		 * that c->sectors_to_gc being set to other positive value. So
-+		 * writing sysfs entry trigger_gc won't always make sure gc
-+		 * thread takes effect.
-+		 */
-+		atomic_set(&c->sectors_to_gc, -1);
- 		wake_up_gc(c);
-+	}
- 
- 	if (attr == &sysfs_prune_cache) {
- 		struct shrink_control sc;
 -- 
-2.13.5
+Jiri Kosina
+SUSE Labs
