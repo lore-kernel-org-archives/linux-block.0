@@ -1,35 +1,49 @@
-Return-Path: <rdunlap@infradead.org>
-To: LKML <linux-kernel@vger.kernel.org>, axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] block: fix bio.c kernel-doc notation warning
-Message-ID: <187e2dfe-56b9-e112-cd4c-81b279df3528@infradead.org>
-Date: Mon, 4 Sep 2017 19:44:06 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: bcache@lists.ewheeler.net,
+	Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH 11/12] bcache: Update continue_at() documentation
+Date: Wed,  6 Sep 2017 14:26:01 +0800
+Message-Id: <20170906062602.50497-12-colyli@suse.de>
+In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
+References: <20170906062602.50497-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Randy Dunlap <rdunlap@infradead.org>
+From: Dan Carpenter <dan.carpenter@oracle.com>
 
-Sphinx treats symbols that end with '_' as some kind of special
-documentation indicator, so fix that by adding an ending '*'
-to it.
+continue_at() doesn't have a return statement anymore.
 
-../block/bio.c:404: ERROR: Unknown target name: "gfp".
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Acked-by: Coly Li <colyli@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/bcache/closure.h | 4 ----
+ 1 file changed, 4 deletions(-)
 
---- lnx-413.orig/block/bio.c
-+++ lnx-413/block/bio.c
-@@ -400,7 +400,7 @@ static void punt_bios_to_rescuer(struct
- 
- /**
-  * bio_alloc_bioset - allocate a bio for I/O
-- * @gfp_mask:   the GFP_ mask given to the slab allocator
-+ * @gfp_mask:   the GFP_* mask given to the slab allocator
-  * @nr_iovecs:	number of iovecs to pre-allocate
-  * @bs:		the bio_set to allocate from.
+diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
+index 1ec84ca81146..295b7e43f92c 100644
+--- a/drivers/md/bcache/closure.h
++++ b/drivers/md/bcache/closure.h
+@@ -312,8 +312,6 @@ static inline void closure_wake_up(struct closure_waitlist *list)
+  * been dropped with closure_put()), it will resume execution at @fn running out
+  * of @wq (or, if @wq is NULL, @fn will be called by closure_put() directly).
   *
+- * NOTE: This macro expands to a return in the calling function!
+- *
+  * This is because after calling continue_at() you no longer have a ref on @cl,
+  * and whatever @cl owns may be freed out from under you - a running closure fn
+  * has a ref on its own closure which continue_at() drops.
+@@ -340,8 +338,6 @@ do {									\
+  * Causes @fn to be executed out of @cl, in @wq context (or called directly if
+  * @wq is NULL).
+  *
+- * NOTE: like continue_at(), this macro expands to a return in the caller!
+- *
+  * The ref the caller of continue_at_nobarrier() had on @cl is now owned by @fn,
+  * thus it's not safe to touch anything protected by @cl after a
+  * continue_at_nobarrier().
+-- 
+2.13.5
