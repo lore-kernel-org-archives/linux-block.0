@@ -1,40 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:8243 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751499AbdIALtL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 07:49:11 -0400
-Subject: Re: [PATCH V7 00/10] mmc: Add Command Queue support
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>
-References: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
-From: Adrian Hunter <adrian.hunter@intel.com>
-Message-ID: <ff9eeab1-199a-3ab3-9fa8-cc2f08d52a54@intel.com>
-Date: Fri, 1 Sep 2017 14:42:34 +0300
-MIME-Version: 1.0
-In-Reply-To: <1504180616-14514-1-git-send-email-adrian.hunter@intel.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: bcache@lists.ewheeler.net,
+	Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 08/12] bcache: increase the number of open buckets
+Date: Wed,  6 Sep 2017 14:25:58 +0800
+Message-Id: <20170906062602.50497-9-colyli@suse.de>
+In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
+References: <20170906062602.50497-1-colyli@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On 31/08/17 14:56, Adrian Hunter wrote:
-> Here is V7 of the hardware command queue patches without the software
-> command queue patches, now using blk-mq.
-> 
-> HW CMDQ offers 25% - 50% better random multi-threaded I/O.  I see a slight
-> 2% drop in sequential read speed but no change to sequential write.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Any comments?
+In currently, we only alloc 6 open buckets for each cache set,
+but in usually, we always attach about 10 or so backend devices for
+each cache set, and the each bcache device are always accessed by
+about 10 or so threads in top application layer. So 6 open buckets
+are too few, It has led to that each of the same thread write data
+to different buckets, which would cause low efficiency write-back,
+and also cause buckets inefficient, and would be Very easy to run
+out of.
+
+I add debug message in bch_open_buckets_alloc() to print alloc bucket
+info, and test with ten bcache devices with a cache set, and each
+bcache device is accessed by ten threads.
+
+>From the debug message, we can see that, after the modification, One
+bucket is more likely to assign to the same thread, and the data from
+the same thread are more likely to write the same bucket. Usually the
+same thread always write/read the same backend device, so it is good
+for write-back and also promote the usage efficiency of buckets.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Reviewed-by: Coly Li <colyli@suse.de>
+---
+ drivers/md/bcache/alloc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index ca4abe1ccd8d..cacbe2dbd5c3 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -68,6 +68,8 @@
+ #include <linux/random.h>
+ #include <trace/events/bcache.h>
+ 
++#define MAX_OPEN_BUCKETS 128
++
+ /* Bucket heap / gen */
+ 
+ uint8_t bch_inc_gen(struct cache *ca, struct bucket *b)
+@@ -671,7 +673,7 @@ int bch_open_buckets_alloc(struct cache_set *c)
+ 
+ 	spin_lock_init(&c->data_bucket_lock);
+ 
+-	for (i = 0; i < 6; i++) {
++	for (i = 0; i < MAX_OPEN_BUCKETS; i++) {
+ 		struct open_bucket *b = kzalloc(sizeof(*b), GFP_KERNEL);
+ 		if (!b)
+ 			return -ENOMEM;
+-- 
+2.13.5
