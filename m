@@ -1,40 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34036 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932657AbdIFPIN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Sep 2017 11:08:13 -0400
-Date: Wed, 6 Sep 2017 17:08:11 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Cc: mb@lightnvm.io, axboe@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@cnexlabs.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias@cnexlabs.com>
-Subject: Re: [PATCH 1/6] lightnvm: pblk: check for failed mempool alloc.
-Message-ID: <20170906150811.sa3vrrkbpv5rffeb@linux-x5ow.site>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:36805 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932650AbdIFPBP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 11:01:15 -0400
+Received: by mail-wm0-f45.google.com with SMTP id i145so30539409wmf.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 08:01:15 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io, axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 1/6] lightnvm: pblk: check for failed mempool alloc.
+Date: Wed,  6 Sep 2017 17:01:01 +0200
+Message-Id: <1504710066-4699-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
 References: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
- <1504710066-4699-2-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1504710066-4699-2-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Sep 06, 2017 at 05:01:01PM +0200, Javier Gonz�lez wrote:
-> Check for failed mempool allocations and act accordingly.
+Check for failed mempool allocations and act accordingly.
 
-Are you sure it is needed? Quoting from mempool_alloc()s Documentation:
-"[...] Note that due to preallocation, this function *never* fails when called
-from process contexts. (it might fail if called from an IRQ context.) [...]"
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
-Byte,
-	Johannes
-
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 81501644fb15..acb07bbcb416 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -165,6 +165,8 @@ struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int rw)
+ 	}
+ 
+ 	rqd = mempool_alloc(pool, GFP_KERNEL);
++	if (!rqd)
++		return NULL;
+ 	memset(rqd, 0, rq_size);
+ 
+ 	return rqd;
+@@ -1478,6 +1480,8 @@ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
+ 	int err;
+ 
+ 	rqd = mempool_alloc(pblk->g_rq_pool, GFP_KERNEL);
++	if (!rqd)
++		return -ENOMEM;
+ 	memset(rqd, 0, pblk_g_rq_size);
+ 
+ 	pblk_setup_e_rq(pblk, rqd, ppa);
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
