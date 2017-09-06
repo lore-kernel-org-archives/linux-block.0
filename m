@@ -1,114 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44782 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752872AbdI3LcR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:32:17 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41030 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1754689AbdIFRFn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Sep 2017 13:05:43 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v86H4XYr128492
+        for <linux-block@vger.kernel.org>; Wed, 6 Sep 2017 13:05:43 -0400
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2ctmrw9rvc-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 13:05:42 -0400
+Received: from localhost
+        by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <chandan@linux.vnet.ibm.com>;
+        Thu, 7 Sep 2017 03:05:39 +1000
+From: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Karel Zak <kzak@redhat.com>, Milan Broz <gmazyland@gmail.com>,
         Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 6/8] block: introduce .last_merge and .hash to blk_mq_ctx
-Date: Sat, 30 Sep 2017 19:26:53 +0800
-Message-Id: <20170930112655.31451-7-ming.lei@redhat.com>
-In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
-References: <20170930112655.31451-1-ming.lei@redhat.com>
+        linux-xfs@vger.kernel.org
+Subject: Re: [PATCH] loop: set physical block size to logical block size
+Date: Wed, 06 Sep 2017 22:36:19 +0530
+In-Reply-To: <8b3faca77b098c23827e48fc8f5b2ad973f3c23d.1504646604.git.osandov@fb.com>
+References: <8b3faca77b098c23827e48fc8f5b2ad973f3c23d.1504646604.git.osandov@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <3802744.FJbvtTQ0bG@localhost.localdomain>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Prepare for supporting bio merge to sw queue if no
-blk-mq io scheduler is taken.
+On Wednesday, September 6, 2017 2:54:47 AM IST Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> Commit 6c6b6f28b333 ("loop: set physical block size to PAGE_SIZE")
+> caused mkfs.xfs to barf on ppc64 [1]. Always using PAGE_SIZE as the
+> physical block size still makes the most sense semantically, but let's
+> just lie and always set it to the same value as the logical block size
+> (same goes for io_min). In the future we might want to at least bump up
+> io_min to PAGE_SIZE but I'm sick of these stupid changes so let's play
+> it safe.
+> 
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.h   |  4 ++++
- block/blk.h      |  3 +++
- block/elevator.c | 22 +++++++++++++++++++---
- 3 files changed, 26 insertions(+), 3 deletions(-)
+With this patch applied, On ppc64 I get,
 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 5bca6ce1f01d..85ea8615fecf 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -18,6 +18,10 @@ struct blk_mq_ctx {
- 	unsigned long		rq_dispatched[2];
- 	unsigned long		rq_merged;
- 
-+	/* bio merge via request hash table */
-+	struct request		*last_merge;
-+	DECLARE_HASHTABLE(hash, ELV_HASH_BITS);
-+
- 	/* incremented at completion time */
- 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
- 
-diff --git a/block/blk.h b/block/blk.h
-index eb3436d4a73f..fa4f232afc18 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -198,6 +198,9 @@ static inline struct request *rqhash_find(struct hlist_head *hash, sector_t offs
- 	return NULL;
- }
- 
-+enum elv_merge elv_merge_ctx(struct request_queue *q, struct request **req,
-+                struct bio *bio, struct blk_mq_ctx *ctx);
-+
- void blk_insert_flush(struct request *rq);
- 
- static inline struct request *__elv_next_request(struct request_queue *q)
-diff --git a/block/elevator.c b/block/elevator.c
-index 2424aea85393..0e13e5c18982 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -471,6 +471,13 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
- }
- 
-+enum elv_merge elv_merge_ctx(struct request_queue *q, struct request **req,
-+		struct bio *bio, struct blk_mq_ctx *ctx)
-+{
-+	WARN_ON_ONCE(!q->mq_ops);
-+	return __elv_merge(q, req, bio, ctx->hash, ctx->last_merge);
-+}
-+
- /*
-  * Attempt to do an insertion back merge. Only check for the case where
-  * we can append 'rq' to an existing request, so we can throw 'rq' away
-@@ -516,16 +523,25 @@ void elv_merged_request(struct request_queue *q, struct request *rq,
- 		enum elv_merge type)
- {
- 	struct elevator_queue *e = q->elevator;
-+	struct hlist_head *hash = e->hash;
-+
-+	/* we do bio merge on blk-mq sw queue */
-+	if (q->mq_ops && !e) {
-+		rq->mq_ctx->last_merge = rq;
-+		hash = rq->mq_ctx->hash;
-+		goto reposition;
-+	}
-+
-+	q->last_merge = rq;
- 
- 	if (e->uses_mq && e->type->ops.mq.request_merged)
- 		e->type->ops.mq.request_merged(q, rq, type);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_merged_fn)
- 		e->type->ops.sq.elevator_merged_fn(q, rq, type);
- 
-+ reposition:
- 	if (type == ELEVATOR_BACK_MERGE)
--		elv_rqhash_reposition(q, rq);
--
--	q->last_merge = rq;
-+		rqhash_reposition(hash, rq);
- }
- 
- void elv_merge_requests(struct request_queue *q, struct request *rq,
+# blockdev --getss /dev/loop0    
+512                                                           
+# blockdev --getpbsz /dev/loop0  
+512                                                           
+
+i.e. we are back to what was being reported before commit 6c6b6f28b333 
+was applied.
+
+I also executed xfstests on xfs filesystems with 4k and 32k block sizes and 
+did not notice any regressions.
+
+Tested-by: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+
 -- 
-2.9.5
+chandan
