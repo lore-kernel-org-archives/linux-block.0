@@ -1,163 +1,73 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34590 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751432AbdIKLMW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2017 07:12:22 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 06/10] block: pass flags to blk_queue_enter()
-Date: Mon, 11 Sep 2017 19:10:17 +0800
-Message-Id: <20170911111021.25810-7-ming.lei@redhat.com>
-In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
-References: <20170911111021.25810-1-ming.lei@redhat.com>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:33974 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932553AbdIFOo2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 10:44:28 -0400
+Received: by mail-wm0-f49.google.com with SMTP id 137so28267474wmj.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 07:44:28 -0700 (PDT)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <F6BEA387-01C8-41F8-A8A6-5A2930E1F97B@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_6CDABC81-DD3A-4A79-AC5C-A7FAD0524E28";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] lightnvm: Add error code for bad write pointer
+Date: Wed, 6 Sep 2017 16:44:25 +0200
+In-Reply-To: <20170906134456.GB3960@infradead.org>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@infradead.org>
+References: <1504693358-12702-1-git-send-email-javier@cnexlabs.com>
+ <20170906134456.GB3960@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We need to pass PREEMPT flags to blk_queue_enter()
-for allocating request with RQF_PREEMPT in the
-following patch.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c       | 10 ++++++----
- block/blk-mq.c         |  5 +++--
- block/blk-timeout.c    |  2 +-
- fs/block_dev.c         |  4 ++--
- include/linux/blkdev.h |  7 ++++++-
- 5 files changed, 18 insertions(+), 10 deletions(-)
+--Apple-Mail=_6CDABC81-DD3A-4A79-AC5C-A7FAD0524E28
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index eec5881a9e74..04327a60061e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -779,7 +779,7 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
- }
- EXPORT_SYMBOL(blk_alloc_queue);
- 
--int blk_queue_enter(struct request_queue *q, bool nowait)
-+int blk_queue_enter(struct request_queue *q, unsigned flags)
- {
- 	while (true) {
- 		int ret;
-@@ -787,7 +787,7 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
- 		if (percpu_ref_tryget_live(&q->q_usage_counter))
- 			return 0;
- 
--		if (nowait)
-+		if (flags & BLK_REQ_NOWAIT)
- 			return -EBUSY;
- 
- 		/*
-@@ -1418,7 +1418,8 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
--	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
-+	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ?
-+			BLK_REQ_NOWAIT : 0);
- 	if (ret)
- 		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
-@@ -2225,7 +2226,8 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	do {
- 		struct request_queue *q = bio->bi_disk->queue;
- 
--		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
-+		if (likely(blk_queue_enter(q, (bio->bi_opf & REQ_NOWAIT) ?
-+						BLK_REQ_NOWAIT : 0) == 0)) {
- 			struct bio_list lower, same;
- 
- 			/* Create a fresh bio_list for all subordinate requests */
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 205ae2d3da14..358b2ca33010 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -377,7 +377,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 	struct request *rq;
- 	int ret;
- 
--	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
-+	ret = blk_queue_enter(q, (flags & BLK_MQ_REQ_NOWAIT) ?
-+			BLK_REQ_NOWAIT : 0);
- 	if (ret)
- 		return ERR_PTR(ret);
- 
-@@ -416,7 +417,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	if (hctx_idx >= q->nr_hw_queues)
- 		return ERR_PTR(-EIO);
- 
--	ret = blk_queue_enter(q, true);
-+	ret = blk_queue_enter(q, BLK_REQ_NOWAIT);
- 	if (ret)
- 		return ERR_PTR(ret);
- 
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 17ec83bb0900..e803106a5e5b 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -134,7 +134,7 @@ void blk_timeout_work(struct work_struct *work)
- 	struct request *rq, *tmp;
- 	int next_set = 0;
- 
--	if (blk_queue_enter(q, true))
-+	if (blk_queue_enter(q, BLK_REQ_NOWAIT))
- 		return;
- 	spin_lock_irqsave(q->queue_lock, flags);
- 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index bb715b2fcfb8..44e6502e377e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -674,7 +674,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
- 	if (!ops->rw_page || bdev_get_integrity(bdev))
- 		return result;
- 
--	result = blk_queue_enter(bdev->bd_queue, false);
-+	result = blk_queue_enter(bdev->bd_queue, 0);
- 	if (result)
- 		return result;
- 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
-@@ -710,7 +710,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
- 
- 	if (!ops->rw_page || bdev_get_integrity(bdev))
- 		return -EOPNOTSUPP;
--	result = blk_queue_enter(bdev->bd_queue, false);
-+	result = blk_queue_enter(bdev->bd_queue, 0);
- 	if (result)
- 		return result;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b8053bcc6b5f..54450715915b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -857,6 +857,11 @@ enum {
- 	BLKPREP_INVALID,	/* invalid command, kill, return -EREMOTEIO */
- };
- 
-+/* passed to blk_queue_enter */
-+enum {
-+	BLK_REQ_NOWAIT = (1 << 0),
-+};
-+
- extern unsigned long blk_max_low_pfn, blk_max_pfn;
- 
- /*
-@@ -962,7 +967,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- 			 struct scsi_ioctl_command __user *);
- 
--extern int blk_queue_enter(struct request_queue *q, bool nowait);
-+extern int blk_queue_enter(struct request_queue *q, unsigned flags);
- extern void blk_queue_exit(struct request_queue *q);
- extern void blk_start_queue(struct request_queue *q);
- extern void blk_start_queue_async(struct request_queue *q);
--- 
-2.9.5
+> On 6 Sep 2017, at 15.44, Christoph Hellwig <hch@infradead.org> wrote:
+>=20
+> On Wed, Sep 06, 2017 at 12:22:38PM +0200, Javier Gonz=C3=A1lez wrote:
+>> Add new error code introduced on the OCSSD spec 2.0 for write pointer
+>> mismatch on the device side. This indicates to the host that a write =
+on
+>> a block (chunk) is not respecting the required sequentiality.
+>=20
+> Do you have a pointer to that spec?
+
+No yet. Still writing it up nicely.
+
+I'll wait to re-post until we have the spec out.
+
+Javier
+
+--Apple-Mail=_6CDABC81-DD3A-4A79-AC5C-A7FAD0524E28
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJZsAnJAAoJEGMfBTt1mRjKFhEQANFZBPNW1ElXmgUozwDwIJPQ
+q0RDX4PGHBPvNeoKeh6ANgzRg8jXASf77W37DiRTaI4XBig5DJYkoQNFCh49FpYy
+zqDAtPu3UnjNSu6R0Wtyg3GY+LJUjWloZjDinyXfIYZA+7BBahWa5USmcBydceld
+vn3FaJYDTBXRZ67cm8WyXp2ygWv83X8wLAD3xXyDjdjkD/k2cm87wFXY39WlJRI2
+ARqxUpqd0ytCD0T9w5vuPTEmnE6iQ0wlxDCGWQXgz4IjfBu9UYMru0+S3bCve6iV
+HgCtWpKbYTJoR8UrTkg2wQ1jM7PRRIISoxY3pi+woiEqW0Z05EFH7WykgbS3trpQ
+bMVbOudfFhGErAbv74EwQgtls0ugpGhB8968k5MrQuWWWYMUeoGq7/lqMMboNI54
+p6lutSNyLrKyHzDi7mDj1peq4JHbcZ1cMERJ6ipa5ZaZjd5zRH9ctanRD4Ruu8en
+pXHzNC7g8cPBnHPBPQNSXPAohGe253Bmdm0RoGxbECFt1nLSVHoK9sa6i4cVBvv2
+OMmiMmG6UByMgelCWz4yWOTHQRyRTjmg3HD7q1CijoqPlFgGvk1f9cNoHJ+bjwjy
+augNSvtJIZR0usF1V3NDcPJwfd9Yaa4BZbmcuePBh8KJKoLGlM62sOf9yN2o/GWD
+Oe6pGCmVsEOyer5LRLDm
+=vK10
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_6CDABC81-DD3A-4A79-AC5C-A7FAD0524E28--
