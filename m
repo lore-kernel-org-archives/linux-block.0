@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:38677 "EHLO
-        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932747AbdIFPBS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 11:01:18 -0400
-Received: by mail-wm0-f47.google.com with SMTP id 187so32068531wmn.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 08:01:18 -0700 (PDT)
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:35631 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753348AbdIFKwt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:52:49 -0400
+Received: by mail-wm0-f44.google.com with SMTP id f199so7945140wme.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:52:49 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io, axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 4/6] lightnvm: pblk: free padded entries in write buffer
-Date: Wed,  6 Sep 2017 17:01:04 +0200
-Message-Id: <1504710066-4699-5-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
-References: <1504710066-4699-1-git-send-email-javier@cnexlabs.com>
+Subject: [PATCH 12/18] lightnvm: pblk: free padded entries in write buffer
+Date: Wed,  6 Sep 2017 12:51:05 +0200
+Message-Id: <1504695071-25928-13-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -38,10 +38,10 @@ Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
  2 files changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index acb07bbcb416..84bff271abd8 100644
+index e69e8829b093..1f746e31e379 100644
 --- a/drivers/lightnvm/pblk-core.c
 +++ b/drivers/lightnvm/pblk-core.c
-@@ -192,7 +192,6 @@ void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
+@@ -187,7 +187,6 @@ void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
  
  	WARN_ON(off + nr_pages != bio->bi_vcnt);
  
@@ -50,7 +50,7 @@ index acb07bbcb416..84bff271abd8 100644
  		bv = bio->bi_io_vec[i];
  		mempool_free(bv.bv_page, pblk->page_pool);
 diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 3ad9e56d2473..6acb4a92435f 100644
+index e5d77af1aad1..33dd90251a60 100644
 --- a/drivers/lightnvm/pblk-write.c
 +++ b/drivers/lightnvm/pblk-write.c
 @@ -25,13 +25,20 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
@@ -76,7 +76,7 @@ index 3ad9e56d2473..6acb4a92435f 100644
  
  #ifdef CONFIG_NVM_DEBUG
  	atomic_long_add(c_ctx->nr_valid, &pblk->sync_writes);
-@@ -521,7 +528,8 @@ static void pblk_free_write_rqd(struct pblk *pblk, struct nvm_rq *rqd)
+@@ -516,7 +523,8 @@ static void pblk_free_write_rqd(struct pblk *pblk, struct nvm_rq *rqd)
  	struct bio *bio = rqd->bio;
  
  	if (c_ctx->nr_padded)
