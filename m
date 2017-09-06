@@ -1,100 +1,63 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Tue, 12 Sep 2017 21:57:32 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>, Bart Van Assche <Bart.VanAssche@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "zhangweiping@didichuxing.com" <zhangweiping@didichuxing.com>
 CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: fix nr_requests wrong value when modify it from
  sysfs
-Message-ID: <20170912135732.GA7025@bogon.didichuxing.com>
+Date: Wed, 6 Sep 2017 13:00:44 +0000
+Message-ID: <1504702843.7750.0.camel@wdc.com>
 References: <20170903134634.GA27411@localhost.didichuxing.com>
- <1504626163.4135.33.camel@wdc.com>
- <20170906073355.GA37455@localhost.didichuxing.com>
- <1504702843.7750.0.camel@wdc.com>
+	 <1504626163.4135.33.camel@wdc.com>
+	 <20170906073355.GA37455@localhost.didichuxing.com>
+In-Reply-To: <20170906073355.GA37455@localhost.didichuxing.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <1504702843.7750.0.camel@wdc.com>
-Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 06, 2017 at 01:00:44PM +0000, Bart Van Assche wrote:
-> On Wed, 2017-09-06 at 15:34 +0800, weiping zhang wrote:
-> > On Tue, Sep 05, 2017 at 03:42:45PM +0000, Bart Van Assche wrote:
-> > > On Sun, 2017-09-03 at 21:46 +0800, weiping zhang wrote:
-> > > > if blk-mq use "none" io scheduler, nr_request get a wrong value when
-> > > > input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
-> > > > the smaller one min(nr, set->queue_depth), and then q->nr_request get a
-> > > > wrong value.
-> > > > 
-> > > > Reproduce:
-> > > > 
-> > > > echo none > /sys/block/nvme0n1/queue/ioscheduler
-> > > > echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
-> > > > cat /sys/block/nvme0n1/queue/nr_requests
-> > > > 1000000
-> > > > 
-> > > > Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
-> > > > ---
-> > > >  block/blk-mq.c | 7 +++++--
-> > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > > > index f84d145..8303e5e 100644
-> > > > --- a/block/blk-mq.c
-> > > > +++ b/block/blk-mq.c
-> > > > @@ -2622,8 +2622,11 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
-> > > >  		 * queue depth. This is similar to what the old code would do.
-> > > >  		 */
-> > > >  		if (!hctx->sched_tags) {
-> > > > -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
-> > > > -							min(nr, set->queue_depth),
-> > > > +			if (nr > set->queue_depth) {
-> > > > +				nr = set->queue_depth;
-> > > > +				pr_warn("reduce nr_request to %u\n", nr);
-> > > > +			}
-> > > > +			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
-> > > >  							false);
-> > > >  		} else {
-> > > >  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
-> > > 
-> > > Shouldn't this code return -EINVAL or -ERANGE if 'nr' is too large? That will help to
-> > > keep user space code simple that updates the queue depth.
-> > 
-> > Hi Bart,
-> > 
-> > The reason why not return -EINVAL is keeping alin with minimum checking in queue_requests_store,
-> > if you insist return -EINVAL/-ERANGE, minimum checking should also keep
-> > same behavior. Both return error meesage and quietly changing are okey
-> > for me. Which way do you prefer ?
-> > 
-> > static ssize_t
-> > queue_requests_store(struct request_queue *q, const char *page, size_t count)
-> > {
-> > 	unsigned long nr;
-> > 	int ret, err;
-> > 
-> > 	if (!q->request_fn && !q->mq_ops)
-> > 		return -EINVAL;
-> > 
-> > 	ret = queue_var_store(&nr, page, count);
-> > 	if (ret < 0)
-> > 		return ret;
-> > 
-> > 	if (nr < BLKDEV_MIN_RQ)
-> > 		nr = BLKDEV_MIN_RQ;
-> 
-> Hello Jens,
-> 
-> Do you perhaps have a preference for one of the approaches that have been discussed
-> in this e-mail thread?
-> 
-> Thanks,
-> 
-> Bart.
-
-Hello Jens,
-
-Would you please give some comments about this patch,
-
-Thanks
-Weiping.
+T24gV2VkLCAyMDE3LTA5LTA2IGF0IDE1OjM0ICswODAwLCB3ZWlwaW5nIHpoYW5nIHdyb3RlOg0K
+PiBPbiBUdWUsIFNlcCAwNSwgMjAxNyBhdCAwMzo0Mjo0NVBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
+aGUgd3JvdGU6DQo+ID4gT24gU3VuLCAyMDE3LTA5LTAzIGF0IDIxOjQ2ICswODAwLCB3ZWlwaW5n
+IHpoYW5nIHdyb3RlOg0KPiA+ID4gaWYgYmxrLW1xIHVzZSAibm9uZSIgaW8gc2NoZWR1bGVyLCBu
+cl9yZXF1ZXN0IGdldCBhIHdyb25nIHZhbHVlIHdoZW4NCj4gPiA+IGlucHV0IGEgbnVtYmVyID4g
+dGFnX3NldC0+cXVldWVfZGVwdGguIGJsa19tcV90YWdfdXBkYXRlX2RlcHRoIHdpbGwgZ2V0DQo+
+ID4gPiB0aGUgc21hbGxlciBvbmUgbWluKG5yLCBzZXQtPnF1ZXVlX2RlcHRoKSwgYW5kIHRoZW4g
+cS0+bnJfcmVxdWVzdCBnZXQgYQ0KPiA+ID4gd3JvbmcgdmFsdWUuDQo+ID4gPiANCj4gPiA+IFJl
+cHJvZHVjZToNCj4gPiA+IA0KPiA+ID4gZWNobyBub25lID4gL3N5cy9ibG9jay9udm1lMG4xL3F1
+ZXVlL2lvc2NoZWR1bGVyDQo+ID4gPiBlY2hvIDEwMDAwMDAgPiAvc3lzL2Jsb2NrL252bWUwbjEv
+cXVldWUvbnJfcmVxdWVzdHMNCj4gPiA+IGNhdCAvc3lzL2Jsb2NrL252bWUwbjEvcXVldWUvbnJf
+cmVxdWVzdHMNCj4gPiA+IDEwMDAwMDANCj4gPiA+IA0KPiA+ID4gU2lnbmVkLW9mZi1ieTogd2Vp
+cGluZyB6aGFuZyA8emhhbmd3ZWlwaW5nQGRpZGljaHV4aW5nLmNvbT4NCj4gPiA+IC0tLQ0KPiA+
+ID4gIGJsb2NrL2Jsay1tcS5jIHwgNyArKysrKy0tDQo+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDUg
+aW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPiA+IA0KPiA+ID4gZGlmZiAtLWdpdCBh
+L2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gPiA+IGluZGV4IGY4NGQxNDUuLjgz
+MDNlNWUgMTAwNjQ0DQo+ID4gPiAtLS0gYS9ibG9jay9ibGstbXEuYw0KPiA+ID4gKysrIGIvYmxv
+Y2svYmxrLW1xLmMNCj4gPiA+IEBAIC0yNjIyLDggKzI2MjIsMTEgQEAgaW50IGJsa19tcV91cGRh
+dGVfbnJfcmVxdWVzdHMoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHVuc2lnbmVkIGludCBucikN
+Cj4gPiA+ICAJCSAqIHF1ZXVlIGRlcHRoLiBUaGlzIGlzIHNpbWlsYXIgdG8gd2hhdCB0aGUgb2xk
+IGNvZGUgd291bGQgZG8uDQo+ID4gPiAgCQkgKi8NCj4gPiA+ICAJCWlmICghaGN0eC0+c2NoZWRf
+dGFncykgew0KPiA+ID4gLQkJCXJldCA9IGJsa19tcV90YWdfdXBkYXRlX2RlcHRoKGhjdHgsICZo
+Y3R4LT50YWdzLA0KPiA+ID4gLQkJCQkJCQltaW4obnIsIHNldC0+cXVldWVfZGVwdGgpLA0KPiA+
+ID4gKwkJCWlmIChuciA+IHNldC0+cXVldWVfZGVwdGgpIHsNCj4gPiA+ICsJCQkJbnIgPSBzZXQt
+PnF1ZXVlX2RlcHRoOw0KPiA+ID4gKwkJCQlwcl93YXJuKCJyZWR1Y2UgbnJfcmVxdWVzdCB0byAl
+dVxuIiwgbnIpOw0KPiA+ID4gKwkJCX0NCj4gPiA+ICsJCQlyZXQgPSBibGtfbXFfdGFnX3VwZGF0
+ZV9kZXB0aChoY3R4LCAmaGN0eC0+dGFncywgbnIsDQo+ID4gPiAgCQkJCQkJCWZhbHNlKTsNCj4g
+PiA+ICAJCX0gZWxzZSB7DQo+ID4gPiAgCQkJcmV0ID0gYmxrX21xX3RhZ191cGRhdGVfZGVwdGgo
+aGN0eCwgJmhjdHgtPnNjaGVkX3RhZ3MsDQo+ID4gDQo+ID4gU2hvdWxkbid0IHRoaXMgY29kZSBy
+ZXR1cm4gLUVJTlZBTCBvciAtRVJBTkdFIGlmICducicgaXMgdG9vIGxhcmdlPyBUaGF0IHdpbGwg
+aGVscCB0bw0KPiA+IGtlZXAgdXNlciBzcGFjZSBjb2RlIHNpbXBsZSB0aGF0IHVwZGF0ZXMgdGhl
+IHF1ZXVlIGRlcHRoLg0KPiANCj4gSGkgQmFydCwNCj4gDQo+IFRoZSByZWFzb24gd2h5IG5vdCBy
+ZXR1cm4gLUVJTlZBTCBpcyBrZWVwaW5nIGFsaW4gd2l0aCBtaW5pbXVtIGNoZWNraW5nIGluIHF1
+ZXVlX3JlcXVlc3RzX3N0b3JlLA0KPiBpZiB5b3UgaW5zaXN0IHJldHVybiAtRUlOVkFMLy1FUkFO
+R0UsIG1pbmltdW0gY2hlY2tpbmcgc2hvdWxkIGFsc28ga2VlcA0KPiBzYW1lIGJlaGF2aW9yLiBC
+b3RoIHJldHVybiBlcnJvciBtZWVzYWdlIGFuZCBxdWlldGx5IGNoYW5naW5nIGFyZSBva2V5DQo+
+IGZvciBtZS4gV2hpY2ggd2F5IGRvIHlvdSBwcmVmZXIgPw0KPiANCj4gc3RhdGljIHNzaXplX3QN
+Cj4gcXVldWVfcmVxdWVzdHNfc3RvcmUoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIGNvbnN0IGNo
+YXIgKnBhZ2UsIHNpemVfdCBjb3VudCkNCj4gew0KPiAJdW5zaWduZWQgbG9uZyBucjsNCj4gCWlu
+dCByZXQsIGVycjsNCj4gDQo+IAlpZiAoIXEtPnJlcXVlc3RfZm4gJiYgIXEtPm1xX29wcykNCj4g
+CQlyZXR1cm4gLUVJTlZBTDsNCj4gDQo+IAlyZXQgPSBxdWV1ZV92YXJfc3RvcmUoJm5yLCBwYWdl
+LCBjb3VudCk7DQo+IAlpZiAocmV0IDwgMCkNCj4gCQlyZXR1cm4gcmV0Ow0KPiANCj4gCWlmIChu
+ciA8IEJMS0RFVl9NSU5fUlEpDQo+IAkJbnIgPSBCTEtERVZfTUlOX1JROw0KDQpIZWxsbyBKZW5z
+LA0KDQpEbyB5b3UgcGVyaGFwcyBoYXZlIGEgcHJlZmVyZW5jZSBmb3Igb25lIG9mIHRoZSBhcHBy
+b2FjaGVzIHRoYXQgaGF2ZSBiZWVuIGRpc2N1c3NlZA0KaW4gdGhpcyBlLW1haWwgdGhyZWFkPw0K
+DQpUaGFua3MsDQoNCkJhcnQu
