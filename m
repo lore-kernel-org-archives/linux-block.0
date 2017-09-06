@@ -1,113 +1,37 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V5 11/14] blokc: mq-deadline: Introduce dispatch helpers
-Date: Mon, 25 Sep 2017 15:14:51 +0900
-Message-Id: <20170925061454.5533-12-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 6 Sep 2017 16:18:04 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Benjamin Block <bblock@linux.vnet.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	"#4 . 11+" <stable@vger.kernel.org>
+Subject: Re: [PATCH 1/2] bsg-lib: fix kernel panic resulting from missing
+	allocation of reply-buffer
+Message-ID: <20170906141804.GA29765@lst.de>
+References: <20170906134416.19980-1-hch@lst.de> <20170906134416.19980-2-hch@lst.de> <42e9ef4d-6981-2b0c-bdc3-afb5b1750666@kernel.dk> <20170906141509.GB8702@bblock-ThinkPad-W530>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170906141509.GB8702@bblock-ThinkPad-W530>
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid directly referencing the next_rq and fifo_list arrays using the
-helper functions deadline_next_request() and deadline_fifo_request() to
-facilitate changes in the dispatch request selection in
-__dd_dispatch_request().
+On Wed, Sep 06, 2017 at 04:15:09PM +0200, Benjamin Block wrote:
+> On Wed, Sep 06, 2017 at 08:07:43AM -0600, Jens Axboe wrote:
+> > On 09/06/2017 07:44 AM, Christoph Hellwig wrote:
+> > > From: Benjamin Block <bblock@linux.vnet.ibm.com>
+> > > 
+> > > Since we split the scsi_request out of struct request bsg fails to
+> > > provide a reply-buffer for the drivers. This was done via the pointer
+> > > for sense-data, that is not preallocated anymore.
+> > 
+> > Confused, this is already in master, was included before 4.13 was
+> > finalized.
+> > 
+> 
+> I think this is the backport for 4.11 and 4.12 as requested by Greg. I
+> just send a mail as answer that I would do it, but I guess Christoph
+> already had something in the pipe.
+> 
+> Or? I'll take a look.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index af2eb9b3936e..296880e2471f 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -195,13 +195,42 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- }
- 
- /*
-+ * For the specified data direction, return the next request to
-+ * dispatch using arrival ordered lists.
-+ */
-+static struct request *
-+deadline_fifo_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	if (list_empty(&dd->fifo_list[data_dir]))
-+		return NULL;
-+
-+	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+}
-+
-+/*
-+ * For the specified data direction, return the next request to
-+ * dispatch using sector position sorted lists.
-+ */
-+static struct request *
-+deadline_next_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	return dd->next_rq[data_dir];
-+}
-+
-+/*
-  * deadline_dispatch_requests selects the best request according to
-  * read/write expire, fifo_batch, etc
-  */
- static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
--	struct request *rq;
-+	struct request *rq, *next_rq;
- 	bool reads, writes;
- 	int data_dir;
- 
-@@ -217,10 +246,9 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	if (dd->next_rq[WRITE])
--		rq = dd->next_rq[WRITE];
--	else
--		rq = dd->next_rq[READ];
-+	rq = deadline_next_request(dd, WRITE);
-+	if (!rq)
-+		rq = deadline_next_request(dd, READ);
- 
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -263,19 +291,20 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
--	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+	next_rq = deadline_next_request(dd, data_dir);
-+	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
- 		 * direction, or we have run out of higher-sectored requests.
- 		 * Start again from the request with the earliest expiry time.
- 		 */
--		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+		rq = deadline_fifo_request(dd, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
- 		 * sort order. No expired requests so continue on from here.
- 		 */
--		rq = dd->next_rq[data_dir];
-+		rq = next_rq;
- 	}
- 
- 	dd->batching = 0;
--- 
-2.13.5
+No, I sent the wrong patch - this was in my queue before the patches
+I wanted to send.
