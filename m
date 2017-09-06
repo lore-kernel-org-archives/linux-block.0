@@ -1,35 +1,45 @@
-Return-Path: <axboe@kernel.dk>
-Date: Wed, 6 Sep 2017 08:20:04 -0600
-From: Jens Axboe <axboe@kernel.dk>
-To: Coly Li <colyli@suse.de>
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-	bcache@lists.ewheeler.net
-Subject: Re: [PATCH 00/13] bcache: fixes and update for 4.14
-Message-ID: <20170906142002.GA19380@kernel.dk>
-References: <20170906062602.50497-1-colyli@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
+Return-Path: <colyli@suse.de>
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	axboe@kernel.dk
+Cc: bcache@lists.ewheeler.net,
+	Coly Li <colyli@suse.de>
+Subject: [PATCH 00/13] bcache: fixes and update for 4.14
+Date: Wed,  6 Sep 2017 14:25:50 +0800
+Message-Id: <20170906062602.50497-1-colyli@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 06 2017, Coly Li wrote:
-> Hi Jens,
-> 
-> Here are 12 patchs for bcache fixes and updates, most of them were posted
-> by Eric Wheeler in 4.13 merge window, but delayed due to lack of code
-> review.
+Hi Jens,
 
-Next time, please send this _before_ the merge window opens. Not a huge
-problem for this series, since it has been posted numerous times in the
-past and already has good review coverage, but it really should have
-been in linux-next for a week or two before heading upstream.
+Here are 12 patchs for bcache fixes and updates, most of them were posted
+by Eric Wheeler in 4.13 merge window, but delayed due to lack of code
+review.
 
-> There are some other patches which does not pass my test currently,
-> once they are fixed and reviewed by peer developers I will send them
-> to you for 4.14 merge window.
+The following patches are reviewed or acked by peer developers,
+	0001-bcache-Fix-leak-of-bdev-reference.patch
+	0002-bcache-fix-sequential-large-write-IO-bypass.patch
+	0003-bcache-do-not-subtract-sectors_to_gc-for-bypassed-IO.patch
+	0004-bcache-Don-t-reinvent-the-wheel-but-use-existing-lli.patch
+	0005-bcache-gc-does-not-work-when-triggering-by-manual-co.patch
+	0006-bcache-correct-cache_dirty_target-in-__update_writeb.patch
+	0007-bcache-Correct-return-value-for-sysfs-attach-errors.patch
+	0008-bcache-increase-the-number-of-open-buckets.patch
+	0009-bcache-fix-for-gc-and-write-back-race.patch
+	0010-bcache-silence-static-checker-warning.patch
+	0011-bcache-Update-continue_at-documentation.patch
+	0012-bcache-fix-bch_hprint-crash-and-improve-output.patch
+You may consider to pick them up if no other comments come up, especially
+0012-bcache-fix-bch_hprint-crash-and-improve-output.patch which fixes a
+potential serious security issue as author declears.
 
-If they are not passing tests etc before the merge window opens, they
-are not for this cycle.
+I do basic test on the whole patch set, bcache works and behaves as
+expected. For futher bcache bug reports, I will follow up them.
 
--- 
-Jens Axboe
+There are some other patches which does not pass my test currently,
+once they are fixed and reviewed by peer developers I will send them
+to you for 4.14 merge window.
+
+Thanks in advance.
+
+Coly Li
