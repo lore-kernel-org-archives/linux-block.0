@@ -1,89 +1,97 @@
-Return-Path: <SRS0=upyn=AC=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com,
-	axboe@kernel.dk,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 1/2] block/loop: fix use after free
-Date: Fri,  1 Sep 2017 11:15:17 -0700
-Message-Id: <1a1c70b8fd5044e11bd152686a742a017ebea99e.1504289520.git.shli@fb.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 00/13] bcache: fixes and update for 4.14
+To: Eddie Chapman <eddie@ehuk.net>
+Cc: Coly Li <i@coly.li>, linux-bcache@vger.kernel.org,
+ linux-block@vger.kernel.org, bcache@lists.ewheeler.net
+References: <20170906062602.50497-1-colyli@suse.de>
+ <20170906142002.GA19380@kernel.dk>
+ <d2a5b042-a81d-71c4-1f8c-8fc6416ed363@coly.li>
+ <ffeb8364-a0ac-009c-5430-f047457d1272@kernel.dk>
+ <c60bdc9a-cd8b-66c2-33c1-d9587499745d@coly.li>
+ <47ffe60a-7f05-4193-1f98-f3e56e28e0b0@ehuk.net>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <54b17f24-2e94-ab1a-6a35-130684504ddf@kernel.dk>
+Date: Thu, 7 Sep 2017 13:31:36 -0600
+MIME-Version: 1.0
+In-Reply-To: <47ffe60a-7f05-4193-1f98-f3e56e28e0b0@ehuk.net>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On 09/07/2017 12:51 PM, Eddie Chapman wrote:
+> On 06/09/17 18:38, Coly Li wrote:
+>> On 2017/9/6 下午11:46, Jens Axboe wrote:
+>>> On 09/06/2017 09:41 AM, Coly Li wrote:
+>>>> On 2017/9/6 下午10:20, Jens Axboe wrote:
+>>>>> On Wed, Sep 06 2017, Coly Li wrote:
+>>>>>> Hi Jens,
+>>>>>>
+>>>>>> Here are 12 patchs for bcache fixes and updates, most of them were posted
+>>>>>> by Eric Wheeler in 4.13 merge window, but delayed due to lack of code
+>>>>>> review.
+>>>>>
+>>>>> Next time, please send this _before_ the merge window opens. Not a huge
+>>>>> problem for this series, since it has been posted numerous times in the
+>>>>> past and already has good review coverage, but it really should have
+>>>>> been in linux-next for a week or two before heading upstream.
+>>>>>
+>>>> Hi Jens,
+>>>>
+>>>> Copied, send patches _before_ merge window opens.
+>>>>
+>>>> But could you please to give me a hint, how can I find when a specific
+>>>> merge window will open ? I search LKML, and see people send pull
+>>>> requests for 4.14 merge window, but I don't see any announcement for
+>>>> 4.14 merge window time slot.
+>>>
+>>> The merge window opens when Linus releases the previous kernel. So you
+>>> have to try and keep track of when he expects to do that. That really
+>>> isn't that difficult - Linus always cuts a release on Sundays. We always
+>>> have 7 or 8 rc releases, so a good time to check is his mail on -rc6 or
+>>> -rc7 release, that usually gives a good indication of when he expects to
+>>> release the final.
+>>>
+>>> To keep things simple, if you always have things ready when -rc7 is
+>>> released, then you are at least one week out from the merge window,
+>>> possibly two if we end up doing an -rc8. That means you don't have to
+>>> track anything, you know the exact date of when -rc7 is released since
+>>> Linus's schedule is usually reliable.
+>>>
+>>
+>> Hi Jens,
+>>
+>> Copied, I will follow the above rule in next cycle.
+>>
+>> And I just post the last patch
+>> (0013-bcache-initialize-stripe_sectors_dirty-correctly-for.patch) to you
+>> for 4.14 cycle.
+>>
+>> This patch is an important fix for bcache writeback rate calculation, it
+>> is depended by another patch I sent to you
+>> (0006-bcache-correct-cache_dirty_target-in-__update_writeb.patch),
+>> please have it in 4.14.
+>>
+>> Thanks in advance.
+> 
+> Hello Jens,
+> 
+> FWIW I'd like to support Coly by reporting that patches 0001, 0002, 0006 
+> and 0013 (the last one mentioned above) have been tested by me on 2 
+> production servers with a good deal of bcache activity for the last 6 
+> weeks without any issues having arisen.
+> 
+> But this may not be much use to you to know, as these are running 
+> vanilla kernel.org kernel 4.4.77.  Still, these 4 patches exactly as 
+> Coly has sent them to you apply without any changes to the code, so I 
+> guess it vouches for the code at least somewhat.
 
-lo_rw_aio->call_read_iter->
-1       aops->direct_IO
-2       iov_iter_revert
-lo_rw_aio_complete could happen between 1 and 2, the bio and bvec could
-be freed before 2, which accesses bvec.
+That's all good and fine, and it's better than no testing at all. But it
+doesn't change the fact that anyone using bcache on -next would have
+been using the changes for a while before release, instead of just one
+or two people. Additionally, your base is drastically different than
+mainline, since you're running a kernel that's a year and a half old.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/loop.c | 16 +++++++++++++---
- drivers/block/loop.h |  5 ++++-
- 2 files changed, 17 insertions(+), 4 deletions(-)
+Next time I'm not adding anything post merge window open, unless it's
+addressing a problem that was added in the merge window.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 3a35121..78c47c4 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -463,14 +463,21 @@ static void lo_complete_rq(struct request *rq)
- 	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
- }
- 
-+static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
-+{
-+	if (!atomic_dec_and_test(&cmd->ref))
-+		return;
-+	kfree(cmd->bvec);
-+	cmd->bvec = NULL;
-+	blk_mq_complete_request(cmd->rq);
-+}
-+
- static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
- 
--	kfree(cmd->bvec);
--	cmd->bvec = NULL;
- 	cmd->ret = ret;
--	blk_mq_complete_request(cmd->rq);
-+	lo_rw_aio_do_completion(cmd);
- }
- 
- static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
-@@ -518,6 +525,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 		segments = bio_segments(bio);
- 	}
-+	atomic_set(&cmd->ref, 2);
- 
- 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
- 		      segments, blk_rq_bytes(rq));
-@@ -533,6 +541,8 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	else
- 		ret = call_read_iter(file, &cmd->iocb, &iter);
- 
-+	lo_rw_aio_do_completion(cmd);
-+
- 	if (ret != -EIOCBQUEUED)
- 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
- 	return 0;
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 43d20d3..b0ba4a5 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -68,7 +68,10 @@ struct loop_cmd {
- 	struct kthread_work work;
- 	struct request *rq;
- 	struct list_head list;
--	bool use_aio;           /* use AIO interface to handle I/O */
-+	union {
-+		bool use_aio; /* use AIO interface to handle I/O */
-+		atomic_t ref; /* only for aio */
-+	};
- 	long ret;
- 	struct kiocb iocb;
- 	struct bio_vec *bvec;
 -- 
-2.9.5
+Jens Axboe
