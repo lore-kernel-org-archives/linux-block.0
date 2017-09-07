@@ -1,22 +1,25 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "sagi@grimberg.me" <sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 7 Sep 2017 11:39:46 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
 Subject: Re: [PATCH 1/3] block: introduce blk_mq_tagset_iter
-Date: Thu, 7 Sep 2017 14:59:14 +0000
-Message-ID: <1504796352.2646.2.camel@wdc.com>
+Message-ID: <20170907093946.tktinwz4ay2qoxrn@linux-x5ow.site>
 References: <1504711832-28425-1-git-send-email-sagi@grimberg.me>
-	 <1504711832-28425-2-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1504711832-28425-2-git-send-email-sagi@grimberg.me>
-Content-Type: text/plain; charset="utf-8"
+ <1504711832-28425-2-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1504711832-28425-2-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTA5LTA2IGF0IDE4OjMwICswMzAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
-PiBJdGVyYXRvciBoZWxwZXIgdG8gYXBwbHkgYSBmdW5jdGlvbiBvbiBhbGwgdGhlDQo+IHRhZ3Mg
-aW4gYSBnaXZlbiB0YWdzZXQuIGV4cG9ydCBpdCBhcyBpdCB3aWxsIGJlIHVzZWQNCj4gb3V0c2lk
-ZSB0aGUgYmxvY2sgbGF5ZXIgbGF0ZXIgb24uDQoNClRoYW5rcyBTYWdpIGZvciBoYXZpbmcgZG9u
-ZSB0aGlzIHdvcmsuDQoNClJldmlld2VkLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNz
-Y2hlQHdkYy5jb20+DQo=
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
