@@ -1,27 +1,65 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Fri, 8 Sep 2017 10:15:42 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V2 07/12] scsi: sd_zbc.c: Use well defined macros
-Message-ID: <20170908081542.slghfheier56b643@linux-x5ow.site>
+Subject: [PATCH V2 07/12] scsi: sd_zbc.c: Use well defined macros
+Date: Fri,  8 Sep 2017 01:16:35 +0900
+Message-Id: <20170907161640.30465-8-damien.lemoal@wdc.com>
+In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
 References: <20170907161640.30465-1-damien.lemoal@wdc.com>
- <20170907161640.30465-8-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170907161640.30465-8-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+instead of open coding, use the min() macro to calculate a report zones
+reply buffer length in sd_zbc_check_zone_size() and the round_up()
+macro for calculating the number of zones in sd_zbc_setup().
+
+No functional change is introduced by this patch.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/scsi/sd_zbc.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index a25a940243a9..8a45db8bd6e7 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -403,7 +403,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
+ 	return 0;
+ }
+ 
+-#define SD_ZBC_BUF_SIZE 131072
++#define SD_ZBC_BUF_SIZE 131072U
+ 
+ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ {
+@@ -447,10 +447,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 		/* Parse REPORT ZONES header */
+ 		list_length = get_unaligned_be32(&buf[0]) + 64;
+ 		rec = buf + 64;
+-		if (list_length < SD_ZBC_BUF_SIZE)
+-			buf_len = list_length;
+-		else
+-			buf_len = SD_ZBC_BUF_SIZE;
++		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
+ 
+ 		/* Parse zone descriptors */
+ 		while (rec < buf + buf_len) {
+@@ -520,9 +517,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ 	/* chunk_sectors indicates the zone size */
+ 	blk_queue_chunk_sectors(sdkp->disk->queue,
+ 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
+-	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
+-	if (sdkp->capacity & (sdkp->zone_blocks - 1))
+-		sdkp->nr_zones++;
++	sdkp->nr_zones =
++		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
+ 
+ 	if (!sdkp->zones_wlock) {
+ 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.13.5
