@@ -1,34 +1,90 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Fri, 8 Sep 2017 10:05:03 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V2 01/12] block: Fix declaration of blk-mq debugfs
- functions
-Message-ID: <20170908080503.caywdsvmpxsvmhwa@linux-x5ow.site>
+Subject: [PATCH V2 01/12] block: Fix declaration of blk-mq debugfs functions
+Date: Fri,  8 Sep 2017 01:16:29 +0900
+Message-Id: <20170907161640.30465-2-damien.lemoal@wdc.com>
+In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
 References: <20170907161640.30465-1-damien.lemoal@wdc.com>
- <20170907161640.30465-2-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170907161640.30465-2-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 08, 2017 at 01:16:29AM +0900, Damien Le Moal wrote:
-> __blk_mq_debugfs_rq_show() and blk_mq_debugfs_rq_show() are exported
-> symbols but ar eonly declared in the block internal file
-             are only
+__blk_mq_debugfs_rq_show() and blk_mq_debugfs_rq_show() are exported
+symbols but ar eonly declared in the block internal file
+block/blk-mq-debugfs.h. which is not cleanly accessible to files outside
+of the block directory.
+Move the declaration of these functions to the new file
+include/linux/blk-mq-debugfs.h file to make the declarations cleanly
+available to other modules.
 
-Otherwise this looks good to me,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+While at it, also move the definition of the blk_mq_debugfs_attr
+structure to allow scheduler modules outside of the block directory to
+define debugfs attributes.
 
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/blk-mq-debugfs.h         | 14 +-------------
+ include/linux/blk-mq-debugfs.h | 23 +++++++++++++++++++++++
+ 2 files changed, 24 insertions(+), 13 deletions(-)
+ create mode 100644 include/linux/blk-mq-debugfs.h
+
+diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+index a182e6f97565..4ffeae84b83a 100644
+--- a/block/blk-mq-debugfs.h
++++ b/block/blk-mq-debugfs.h
+@@ -3,19 +3,7 @@
+ 
+ #ifdef CONFIG_BLK_DEBUG_FS
+ 
+-#include <linux/seq_file.h>
+-
+-struct blk_mq_debugfs_attr {
+-	const char *name;
+-	umode_t mode;
+-	int (*show)(void *, struct seq_file *);
+-	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
+-	/* Set either .show or .seq_ops. */
+-	const struct seq_operations *seq_ops;
+-};
+-
+-int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
+-int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
++#include <linux/blk-mq-debugfs.h>
+ 
+ int blk_mq_debugfs_register(struct request_queue *q);
+ void blk_mq_debugfs_unregister(struct request_queue *q);
+diff --git a/include/linux/blk-mq-debugfs.h b/include/linux/blk-mq-debugfs.h
+new file mode 100644
+index 000000000000..211537f61dce
+--- /dev/null
++++ b/include/linux/blk-mq-debugfs.h
+@@ -0,0 +1,23 @@
++#ifndef BLK_MQ_DEBUGFS_H
++#define BLK_MQ_DEBUGFS_H
++
++#ifdef CONFIG_BLK_DEBUG_FS
++
++#include <linux/blkdev.h>
++#include <linux/seq_file.h>
++
++struct blk_mq_debugfs_attr {
++	const char *name;
++	umode_t mode;
++	int (*show)(void *, struct seq_file *);
++	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
++	/* Set either .show or .seq_ops. */
++	const struct seq_operations *seq_ops;
++};
++
++int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
++int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
++
++#endif
++
++#endif
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.13.5
