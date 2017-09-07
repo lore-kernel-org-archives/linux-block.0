@@ -1,70 +1,51 @@
-Return-Path: <BATV+efe86d5870596b20d79e+5139+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 5/9] block: add a blk_steal_bios helper
-Date: Mon, 18 Sep 2017 16:14:49 -0700
-Message-Id: <20170918231453.27128-6-hch@lst.de>
-In-Reply-To: <20170918231453.27128-1-hch@lst.de>
-References: <20170918231453.27128-1-hch@lst.de>
+Return-Path: <tom.leiming@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <4bedc1416a9cfbb4547cc0fb4c67e77462f407f1.1504742003.git.shli@fb.com>
+References: <cover.1504742003.git.shli@fb.com> <4bedc1416a9cfbb4547cc0fb4c67e77462f407f1.1504742003.git.shli@fb.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 7 Sep 2017 17:05:35 +0800
+Message-ID: <CACVXFVOHwjw1-ZdLYrAMoa68FufG3Jk0AD_V0w+h6A=_wbzaFQ@mail.gmail.com>
+Subject: Re: [PATCH V2 2/3] block/loop: use FALLOC_FL_ZERO_RANGE for REQ_OP_WRITE_ZEROES
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-block <linux-block@vger.kernel.org>, FB Kernel Team <kernel-team@fb.com>,
+	Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@fb.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-This helpers allows to bounce steal the uncompleted bios from a request so
-that they can be reissued on another path.
+On Thu, Sep 7, 2017 at 8:13 AM, Shaohua Li <shli@kernel.org> wrote:
+> From: Shaohua Li <shli@fb.com>
+>
+> REQ_OP_WRITE_ZEROES really means zero the data. And in blkdev_fallocate,
+> FALLOC_FL_ZERO_RANGE will retry but FALLOC_FL_PUNCH_HOLE not, even loop
+> request doesn't have BLKDEV_ZERO_NOFALLBACK set.
+>
+> Signed-off-by: Shaohua Li <shli@fb.com>
+> ---
+>  drivers/block/loop.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 715b762..8934e25 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -426,6 +426,9 @@ static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
+>         int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
+>         int ret;
+>
+> +       if (req_op(rq) == REQ_OP_WRITE_ZEROES)
+> +               mode = FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE;
+> +
+>         if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+>                 ret = -EOPNOTSUPP;
+>                 goto out;
+> --
+> 2.9.5
+>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
----
- block/blk-core.c       | 20 ++++++++++++++++++++
- include/linux/blkdev.h |  2 ++
- 2 files changed, 22 insertions(+)
+Looks fine,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f02eb346c910..6f3db2c14843 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2724,6 +2724,26 @@ struct request *blk_fetch_request(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_fetch_request);
- 
-+/*
-+ * Steal bios from a request.  The request must not have been partially
-+ * completed before.
-+ */
-+void blk_steal_bios(struct bio_list *list, struct request *rq)
-+{
-+	if (rq->bio) {
-+		if (list->tail)
-+			list->tail->bi_next = rq->bio;
-+		else
-+			list->head = rq->bio;
-+		list->tail = rq->biotail;
-+	}
-+
-+	rq->bio = NULL;
-+	rq->biotail = NULL;
-+	rq->__data_len = 0;
-+}
-+EXPORT_SYMBOL_GPL(blk_steal_bios);
-+
- /**
-  * blk_update_request - Special helper function for request stacking drivers
-  * @req:      the request being processed
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 86dfeea16d4c..0ca5525ee5ce 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1109,6 +1109,8 @@ extern struct request *blk_peek_request(struct request_queue *q);
- extern void blk_start_request(struct request *rq);
- extern struct request *blk_fetch_request(struct request_queue *q);
- 
-+void blk_steal_bios(struct bio_list *list, struct request *rq);
-+
- /*
-  * Request completion related functions.
-  *
+      Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+
 -- 
-2.14.1
+Ming Lei
