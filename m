@@ -10,8 +10,8 @@ References: <20170906062602.50497-1-colyli@suse.de>
  <c60bdc9a-cd8b-66c2-33c1-d9587499745d@coly.li>
 From: Eddie Chapman <eddie@ehuk.net>
 Reply-To: Eddie Chapman <eddie@ehuk.net>
-Message-ID: <40598504-edbb-2efa-5b7f-95043ae66ce7@ehuk.net>
-Date: Thu, 7 Sep 2017 20:01:21 +0100
+Message-ID: <47ffe60a-7f05-4193-1f98-f3e56e28e0b0@ehuk.net>
+Date: Thu, 7 Sep 2017 19:51:17 +0100
 MIME-Version: 1.0
 In-Reply-To: <c60bdc9a-cd8b-66c2-33c1-d9587499745d@coly.li>
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -71,5 +71,16 @@ On 06/09/17 18:38, Coly Li wrote:
 > 
 > Thanks in advance.
 
-I'm sorry, correction to my last mail, the patches I have tested should 
-read: 0002, 0003, 0006 and 0013.
+Hello Jens,
+
+FWIW I'd like to support Coly by reporting that patches 0001, 0002, 0006 
+and 0013 (the last one mentioned above) have been tested by me on 2 
+production servers with a good deal of bcache activity for the last 6 
+weeks without any issues having arisen.
+
+But this may not be much use to you to know, as these are running 
+vanilla kernel.org kernel 4.4.77.  Still, these 4 patches exactly as 
+Coly has sent them to you apply without any changes to the code, so I 
+guess it vouches for the code at least somewhat.
+
+Eddie
