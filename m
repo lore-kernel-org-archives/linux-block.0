@@ -1,59 +1,87 @@
-Return-Path: <linus971@gmail.com>
-MIME-Version: 1.0
-Sender: linus971@gmail.com
-In-Reply-To: <dfc0dc22-00c3-a28b-93d5-15dad2e55d9f@kernel.dk>
-References: <c1aab1af-4dba-b324-0972-c3933816ecc8@kernel.dk>
- <CA+55aFwrpd+fz3jxK3d6dckFcApc=aCZOrsKogxRYZozwUdHrg@mail.gmail.com> <dfc0dc22-00c3-a28b-93d5-15dad2e55d9f@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 7 Sep 2017 12:38:39 -0700
-Message-ID: <CA+55aFyFYX0XAQdqXs65KP-TpBCh7buhzq-HC7ZJ_9p81oOc+w@mail.gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [GIT PULL] First set of block changes for 4.14-rc1
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+ Christoph Hellwig <hch@lst.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <c1aab1af-4dba-b324-0972-c3933816ecc8@kernel.dk>
+ <CA+55aFwrpd+fz3jxK3d6dckFcApc=aCZOrsKogxRYZozwUdHrg@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <dfc0dc22-00c3-a28b-93d5-15dad2e55d9f@kernel.dk>
+Date: Thu, 7 Sep 2017 13:27:58 -0600
+MIME-Version: 1.0
+In-Reply-To: <CA+55aFwrpd+fz3jxK3d6dckFcApc=aCZOrsKogxRYZozwUdHrg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 7, 2017 at 12:27 PM, Jens Axboe <axboe@kernel.dk> wrote:
->
-> Which was committed yesterday? It was not from my tree. I try to keep
-> an eye out for potential conflicts or issues.
+On 09/07/2017 01:04 PM, Linus Torvalds wrote:
+> On Tue, Sep 5, 2017 at 7:31 AM, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> Note that you'll hit a conflict in block/bio-integrity.c and
+>> mm/page_io.c, since we had fixes later in the 4.13 series for both of
+>> those that ended up conflicting with new changes. Both are trivial to
+>> fix up, I've included my resolution at the end of this email.
+> 
+> Actually, the _real_ conflict is with commit 8e654f8fbff5 ("zram: read
+> page from backing device") and the preceding code, which added a
+> "zram->bdev" that is the backing dev for the zram device.
 
-It was from Andrew, so I'm assuming it was in linux-next. Not as a git
-tree, but as the usual akpm branch.
+Which was committed yesterday? It was not from my tree. I try to keep
+an eye out for potential conflicts or issues.
 
-I'm not sure why I didn't see any reports from linux-next about it,
-though - and I looked.
+> And then it does
+> 
+>      bio->bi_bdev = zram->bdev;
+> 
+> but now the block layer has AGAIN changed some stupid internal detail
+> for no obvious reason, so now it doesn't work.
+> 
+> My initial thought was to just do
+> 
+>     bio->bi_disk = zram->disk;
+> 
+> instead, which *syntactically* seems to make sense, and match things
+> up in the obvious way.
+> 
+> But when I actually thought about it more, I decided that's bullshit.
+> "zram->disk" is not the backing device at all, it's the zram interface
+> itself.
+> 
+> The correct resolution seems to be
+> 
+>     bio_set_dev(bio, zram->bdev);
+> 
+> but *dammit*, Jens, this insane crazy constant "let's randomly change
+> block layer details around" needs to STOP.
+> 
+> This has been going on for too many releases by now. What the f*ck is
+> *wrong* with you and Christoph that you can't just leave this thing
+> alone?
+> 
+> Stop the pointless churn already.
+> 
+> When I saw your comment:
+> 
+>   It's a quiet series this round, which I think we needed after
+>   the churn of the last few series.
+> 
+> I was like "finally". And then this shows that you were just lying,
+> and the pointless churn is still happening.
+> 
+> Stop it. Really.
+> 
+> Here's a hint: if some stupid change requires you to mindlessly do 150
+> changes using a wrapper helper, it's churn.
+> 
+> We need *stability* by now, after these crazy changes. Make sure that happens.
 
-There was no actual visible merge problem, because the conflict was
-not a data conflict but a semantic one.
+I am pushing back, but I can't embargo any sort of API change. This one has
+good reasoning behind it, which is actually nicely explained in the commit
+itself. It's not pointless churn, which I would define as change just for
+the sake of change itself. Or pointless cleanups.
 
-But the issue showed up for a trivial allmodconfig build, so it
-*should* have been caught automatically.
+That said, there are no plans to mix anything up for the next release.
+We've had more frivolous changes in past releases, I don't expect that
+to happen again. 
 
-But it's not even the conflict that annoys me.
-
-It's the *reason* for the conflict - the block layer churn that you
-said was done. We've had too much of it.
-
->> We need *stability* by now, after these crazy changes. Make sure that happens.
->
-> I am pushing back, but I can't embargo any sort of API change. This one has
-> good reasoning behind it, which is actually nicely explained in the commit
-> itself. It's not pointless churn, which I would define as change just for
-> the sake of change itself. Or pointless cleanups.
-
-You can definitely put your foot down on any more random changes to
-the bio infrastructure. Including for good reasons.
-
-We have had some serious issues in the block layer - and I'm not
-talking about the merge conflicts. I'm talking about just the
-collateral damage, with things like SCSI having to revert using blk-mq
-by default etc.
-
-Christ, things like that are pretty *fundamnetal*, wouldn't you say.
-Get those right before doing more churn. And aim to have one or two
-releases literally just fixing things, with a "no churn" rule.
-
-Because the block layer really has been a black spot lately.
-
-          Linus
+-- 
+Jens Axboe
