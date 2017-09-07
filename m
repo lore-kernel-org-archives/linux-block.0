@@ -1,57 +1,38 @@
-Return-Path: <SRS0=Wszy=AI=fb.com=shli@kernel.org>
+Return-Path: <shli@kernel.org>
+Date: Thu, 7 Sep 2017 14:52:36 -0700
 From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com,
-	axboe@kernel.dk,
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: linux-block <linux-block@vger.kernel.org>,
+	FB Kernel Team <kernel-team@fb.com>, Jens Axboe <axboe@kernel.dk>,
 	Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 1/3] block/loop: don't hijack error number
-Date: Wed,  6 Sep 2017 17:13:24 -0700
-Message-Id: <61457d9c4399baaf20f151eed4d5971625953504.1504742003.git.shli@fb.com>
-In-Reply-To: <cover.1504742003.git.shli@fb.com>
+Subject: Re: [PATCH V2 3/3] block/loop: suppress discard IO error message
+Message-ID: <20170907215236.wty5hwudyn52znme@kernel.org>
 References: <cover.1504742003.git.shli@fb.com>
-In-Reply-To: <cover.1504742003.git.shli@fb.com>
-References: <cover.1504742003.git.shli@fb.com>
+ <93626ad390557b27c872bb8325485c9d56cc4e06.1504742003.git.shli@fb.com>
+ <CACVXFVO3UaHn32E+kNjRkUHUwn3d=goWA9HFNXqgYHNr+7ZbxA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACVXFVO3UaHn32E+kNjRkUHUwn3d=goWA9HFNXqgYHNr+7ZbxA@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On Thu, Sep 07, 2017 at 05:16:21PM +0800, Ming Lei wrote:
+> On Thu, Sep 7, 2017 at 8:13 AM, Shaohua Li <shli@kernel.org> wrote:
+> > From: Shaohua Li <shli@fb.com>
+> >
+> > We don't know if fallocate really supports FALLOC_FL_PUNCH_HOLE till
+> > fallocate is called. If it doesn't support, loop will return -EOPNOTSUPP
+> > and we see a lot of error message printed by blk_update_request. Failure
+> > for discard IO isn't a big problem, so we just return 0 in loop which
+> > will suppress the IO error message.
+> 
+> Setting RQF_QUIET for discard IO should be more clean for suppressing error,
+> and upper layer can get the failure notification too.
 
-If the bio returns -EOPNOTSUPP, we shouldn't hijack it and return -EIO
+Hmm, forgot why I didn't do this, did consider it before. Probably because
+nobody check the return value of discard request. Probably we should skip the
+error message for all discard IO in block layer.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- drivers/block/loop.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I'll repost a patch to fix this issue.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 85de673..715b762 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -460,7 +460,7 @@ static void lo_complete_rq(struct request *rq)
- 		zero_fill_bio(bio);
- 	}
- 
--	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
-+	blk_mq_end_request(rq, errno_to_blk_status(cmd->ret));
- }
- 
- static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
-@@ -476,7 +476,7 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
- 
--	cmd->ret = ret;
-+	cmd->ret = ret > 0 ? 0 : ret;
- 	lo_rw_aio_do_completion(cmd);
- }
- 
-@@ -1706,7 +1706,7 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
--		cmd->ret = ret ? -EIO : 0;
-+		cmd->ret = ret;
- 		blk_mq_complete_request(cmd->rq);
- 	}
- }
--- 
-2.9.5
+Thanks,
+Shaohua
