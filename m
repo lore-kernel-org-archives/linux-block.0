@@ -1,28 +1,78 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Fri, 8 Sep 2017 10:05:44 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V2 02/12] block: Fix declaration of blk-mq scheduler
- functions
-Message-ID: <20170908080544.pylaltcccjebtsfz@linux-x5ow.site>
+Subject: [PATCH V2 02/12] block: Fix declaration of blk-mq scheduler functions
+Date: Fri,  8 Sep 2017 01:16:30 +0900
+Message-Id: <20170907161640.30465-3-damien.lemoal@wdc.com>
+In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
 References: <20170907161640.30465-1-damien.lemoal@wdc.com>
- <20170907161640.30465-3-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170907161640.30465-3-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+The functions blk_mq_sched_free_hctx_data(), blk_mq_sched_try_merge(),
+blk_mq_sched_try_insert_merge() and blk_mq_sched_request_inserted() are
+all exported symbols but are declared only internally in
+block/blk-mq-sched.h. Move these declarations to the new file
+include/linux/blk-mq-sched.h to make them available to block scheduler
+modules implemented outside of the block directory.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/blk-mq-sched.h         | 11 +++--------
+ include/linux/blk-mq-sched.h | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+), 8 deletions(-)
+ create mode 100644 include/linux/blk-mq-sched.h
+
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 9267d0b7c197..f48f3c8edcb3 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -1,19 +1,14 @@
+-#ifndef BLK_MQ_SCHED_H
+-#define BLK_MQ_SCHED_H
++#ifndef INT_BLK_MQ_SCHED_H
++#define INT_BLK_MQ_SCHED_H
+ 
+ #include "blk-mq.h"
+ #include "blk-mq-tag.h"
+ 
+-void blk_mq_sched_free_hctx_data(struct request_queue *q,
+-				 void (*exit)(struct blk_mq_hw_ctx *));
++#include <linux/blk-mq-sched.h>
+ 
+ void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio);
+ 
+-void blk_mq_sched_request_inserted(struct request *rq);
+-bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-				struct request **merged_request);
+ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio);
+-bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq);
+ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+diff --git a/include/linux/blk-mq-sched.h b/include/linux/blk-mq-sched.h
+new file mode 100644
+index 000000000000..8ae1992e02c6
+--- /dev/null
++++ b/include/linux/blk-mq-sched.h
+@@ -0,0 +1,14 @@
++#ifndef BLK_MQ_SCHED_H
++#define BLK_MQ_SCHED_H
++
++/*
++ * Scheduler helper functions.
++ */
++void blk_mq_sched_free_hctx_data(struct request_queue *q,
++				 void (*exit)(struct blk_mq_hw_ctx *));
++void blk_mq_sched_request_inserted(struct request *rq);
++bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
++			    struct request **merged_request);
++bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq);
++
++#endif
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.13.5
