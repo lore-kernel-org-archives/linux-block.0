@@ -1,30 +1,83 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Sun, 10 Sep 2017 13:16:56 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V2 11/12] scsi: sd: Introduce scsi_disk_from_queue()
-Message-ID: <20170910051655.GC11628@ming.t460p>
+Subject: [PATCH V2 11/12] scsi: sd: Introduce scsi_disk_from_queue()
+Date: Fri,  8 Sep 2017 01:16:39 +0900
+Message-Id: <20170907161640.30465-12-damien.lemoal@wdc.com>
+In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
 References: <20170907161640.30465-1-damien.lemoal@wdc.com>
- <20170907161640.30465-12-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170907161640.30465-12-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 08, 2017 at 01:16:39AM +0900, Damien Le Moal wrote:
-> Using scsi_device_from_queue(), return the scsi_disk structure
-> associated with a request queue if the device is a disk.
-> Export this function to make it available to modules.
-> 
+Using scsi_device_from_queue(), return the scsi_disk structure
+associated with a request queue if the device is a disk.
+Export this function to make it available to modules.
 
-This approach may be a little over-kill, actually gendisk is the
-parent of request queue in kobject tree(see blk_register_queue()),
-that might be an easy way to retrieve disk attached to the queue.
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/scsi/sd.c | 32 ++++++++++++++++++++++++++++++++
+ drivers/scsi/sd.h |  2 ++
+ 2 files changed, 34 insertions(+)
 
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 1cd113df2d3a..ff9fff4de3e6 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -631,6 +631,38 @@ static void scsi_disk_put(struct scsi_disk *sdkp)
+ 	mutex_unlock(&sd_ref_mutex);
+ }
+ 
++static int scsi_disk_lookup(struct device *dev, void *data)
++{
++	struct scsi_disk **sdkp = data;
++
++	if (!*sdkp && dev->class == &sd_disk_class)
++		*sdkp = to_scsi_disk(dev);
++
++	return 0;
++}
++
++/**
++ * scsi_disk_from_queue - return scsi disk associated with a request_queue
++ * @q: The request queue to return the scsi disk from
++ *
++ * Return the struct scsi_disk associated with a request queue or NULL if the
++ * request_queue does not reference a SCSI device or a if the device is
++ * not a disk.
++ */
++struct scsi_disk *scsi_disk_from_queue(struct request_queue *q)
++{
++	struct scsi_device *sdev = scsi_device_from_queue(q);
++	struct scsi_disk *sdkp = NULL;
++
++	if (!sdev)
++		return NULL;
++
++	device_for_each_child(&sdev->sdev_gendev, &sdkp, scsi_disk_lookup);
++
++	return sdkp;
++}
++EXPORT_SYMBOL_GPL(scsi_disk_from_queue);
++
+ #ifdef CONFIG_BLK_SED_OPAL
+ static int sd_sec_submit(void *data, u16 spsp, u8 secp, void *buffer,
+ 		size_t len, bool send)
+diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
+index 3ea82c8cecd5..92113a9e2b20 100644
+--- a/drivers/scsi/sd.h
++++ b/drivers/scsi/sd.h
+@@ -126,6 +126,8 @@ static inline struct scsi_disk *scsi_disk(struct gendisk *disk)
+ 	return container_of(disk->private_data, struct scsi_disk, driver);
+ }
+ 
++struct scsi_disk *scsi_disk_from_queue(struct request_queue *q);
++
+ #define sd_printk(prefix, sdsk, fmt, a...)				\
+         (sdsk)->disk ?							\
+ 	      sdev_prefix_printk(prefix, (sdsk)->device,		\
 -- 
-Ming
+2.13.5
