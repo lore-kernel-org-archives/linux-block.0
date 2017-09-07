@@ -1,53 +1,35 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: About btrfs on top of wb_throttle
-To: bo.li.liu@oracle.com, linux-block@vger.kernel.org
-Cc: Chris Mason <clm@fb.com>
-References: <20170830220618.GC17166@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6319b2f5-7eca-5746-e4b0-88f9a45bf311@kernel.dk>
-Date: Fri, 8 Sep 2017 15:41:41 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:60612 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755840AbdIGVyU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Sep 2017 17:54:20 -0400
+Date: Thu, 7 Sep 2017 14:54:18 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V2 0/3] block/loop: handle discard/zeroout error
+Message-ID: <20170907215418.32b7o4jfkvwx2w4g@kernel.org>
+References: <CAOi1vP-vbr+wnQAP24p3RHuHaS_4s1kQ1p=h8CjHKd_EAtc4uQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170830220618.GC17166@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAOi1vP-vbr+wnQAP24p3RHuHaS_4s1kQ1p=h8CjHKd_EAtc4uQ@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 08/30/2017 04:06 PM, Liu Bo wrote:
-> Hi,
+On Thu, Sep 07, 2017 at 03:20:01PM +0200, Ilya Dryomov wrote:
+> Hi Shaohua,
 > 
-> While playing with btrfs on top of wb_throttle, an interesting thing
-> is that writeback from btrfs always falls into %rwb->wb_background
-> even if there're no other writers.
+> You wrote:
+> > BTW: blkdev_issue_zeroout retries if we immediately find the device doesn't
+> > support zeroout, but it doesn't retry if submit_bio_wait returns -EOPNOTSUPP.
+> > Is this correct behavior?
 > 
-> The peculiarity of btrfs is that, it owns the ability of mananging
-> disks so that it creates a private bdi stored in sb->s_bdi, which is
-> different from %queue->backing_device_info.
-> 
-> So running balance_dirty_pages() during btrfs's buffered writes
-> doesn't take any effect on %queue->backing_device_info->wb, thus it's
-> got into the wb_background bucket all the time.
-> 
-> Haven't measure the performance numbers with a real test, but in
-> theory this problem will let buffered writer spend more time in
-> balance_dirty_pages()'s for(;;) loop.
-> 
-> Chris, Jens, thoughts?
+> I sent a patch for that yesterday, see "[PATCH] block: cope with WRITE
+> SAME failing in blkdev_issue_zeroout()" on linux-block.  It checks for
+> -EREMOTEIO, because that's what I hit, but I wonder if it should check
+> for -EOPNOTSUPP from submit_bio_wait() as well.  Can you think of
+> a case where, given bdev_write_zeroes_sectors() != 0, submit_bio_wait()
+> would fail with -EOPNOTSUPP and we would want to do explicit zeroing?
 
-Sorry for the late reply here... So the issue is that wbt ends up
-looking at the lower level device bdi->wb, and balance_dirty_pages()
-sets ->dirty_sleep on the bdi that btrfs has created for the volume.
-This is pretty much the opposite situation of how we currently
-handle bdi congestion, where users (like btrfs) can provide a
-congested_fn() that iterates the lower level backing devices.
-
-I think the best fix here is to provide some way for the stacking of
-bdi's to be resolvable by the kernel. Either that, or the
-balance_dirty_pages() should not just set wb->dirty_sleep, but rather
-call into a bdi provided function that sets the dirty_sleep on all the
-lower level bdi's. If we do the latter, the problem is similar to
-congested_fn(), in that we have the file system provided bdi and ask the
-fs to iterate constituent devices and set ->dirty_sleep. The former
-might be more difficult, since each lower level bdi could be a member of
-multiple top level bdi's.
-
--- 
-Jens Axboe
+loop block device returns -EOPNOTSUPP before for zeroout. With the second
+patch, it doesn't any more though.
