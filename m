@@ -1,44 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:35902 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752784AbdIFKWs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:22:48 -0400
-Received: by mail-wm0-f54.google.com with SMTP id i145so27745751wmf.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:22:48 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: Add error code for bad write pointer
-Date: Wed,  6 Sep 2017 12:22:38 +0200
-Message-Id: <1504693358-12702-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Fri, 8 Sep 2017 10:05:03 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V2 01/12] block: Fix declaration of blk-mq debugfs
+ functions
+Message-ID: <20170908080503.caywdsvmpxsvmhwa@linux-x5ow.site>
+References: <20170907161640.30465-1-damien.lemoal@wdc.com>
+ <20170907161640.30465-2-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170907161640.30465-2-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Add new error code introduced on the OCSSD spec 2.0 for write pointer
-mismatch on the device side. This indicates to the host that a write on
-a block (chunk) is not respecting the required sequentiality.
+On Fri, Sep 08, 2017 at 01:16:29AM +0900, Damien Le Moal wrote:
+> __blk_mq_debugfs_rq_show() and blk_mq_debugfs_rq_show() are exported
+> symbols but ar eonly declared in the block internal file
+             are only
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- include/linux/lightnvm.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Otherwise this looks good to me,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 7dfa56ebbc6d..81b71c6d5873 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -102,7 +102,8 @@ enum {
- 	/* Status codes */
- 	NVM_RSP_SUCCESS		= 0x0,
- 	NVM_RSP_NOT_CHANGEABLE	= 0x1,
--	NVM_RSP_ERR_FAILWRITE	= 0x40ff,
-+	NVM_RSP_ERR_FAILWRITE	= 0x40ff,	/* Generic write failure */
-+	NVM_RSP_ERR_FAILWP	= 0x42f0,	/* Write pointer failure */
- 	NVM_RSP_ERR_EMPTYPAGE	= 0x42ff,
- 	NVM_RSP_ERR_FAILECC	= 0x4281,
- 	NVM_RSP_ERR_FAILCRC	= 0x4004,
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
