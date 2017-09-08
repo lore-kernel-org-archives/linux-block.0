@@ -1,122 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59790 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751257AbdIPDGa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 23:06:30 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 5/7] blk-mq: move blk_mq_put_driver_tag*() into blk-mq.h
-Date: Sat, 16 Sep 2017 11:03:49 +0800
-Message-Id: <20170916030351.28019-7-ming.lei@redhat.com>
-In-Reply-To: <20170916030351.28019-1-ming.lei@redhat.com>
-References: <20170916030351.28019-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: About btrfs on top of wb_throttle
+To: bo.li.liu@oracle.com, linux-block@vger.kernel.org
+Cc: Chris Mason <clm@fb.com>
+References: <20170830220618.GC17166@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6319b2f5-7eca-5746-e4b0-88f9a45bf311@kernel.dk>
+Date: Fri, 8 Sep 2017 15:41:41 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170830220618.GC17166@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-We need this helper to put the tag for flush rq, since
-we will not share tag in the flush request sequences
-in case of I/O scheduler.
+On 08/30/2017 04:06 PM, Liu Bo wrote:
+> Hi,
+> 
+> While playing with btrfs on top of wb_throttle, an interesting thing
+> is that writeback from btrfs always falls into %rwb->wb_background
+> even if there're no other writers.
+> 
+> The peculiarity of btrfs is that, it owns the ability of mananging
+> disks so that it creates a private bdi stored in sb->s_bdi, which is
+> different from %queue->backing_device_info.
+> 
+> So running balance_dirty_pages() during btrfs's buffered writes
+> doesn't take any effect on %queue->backing_device_info->wb, thus it's
+> got into the wb_background bucket all the time.
+> 
+> Haven't measure the performance numbers with a real test, but in
+> theory this problem will let buffered writer spend more time in
+> balance_dirty_pages()'s for(;;) loop.
+> 
+> Chris, Jens, thoughts?
 
-Also the driver tag need to be released before requeuing.
+Sorry for the late reply here... So the issue is that wbt ends up
+looking at the lower level device bdi->wb, and balance_dirty_pages()
+sets ->dirty_sleep on the bdi that btrfs has created for the volume.
+This is pretty much the opposite situation of how we currently
+handle bdi congestion, where users (like btrfs) can provide a
+congested_fn() that iterates the lower level backing devices.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 32 --------------------------------
- block/blk-mq.h | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+), 32 deletions(-)
+I think the best fix here is to provide some way for the stacking of
+bdi's to be resolvable by the kernel. Either that, or the
+balance_dirty_pages() should not just set wb->dirty_sleep, but rather
+call into a bdi provided function that sets the dirty_sleep on all the
+lower level bdi's. If we do the latter, the problem is similar to
+congested_fn(), in that we have the file system provided bdi and ask the
+fs to iterate constituent devices and set ->dirty_sleep. The former
+might be more difficult, since each lower level bdi could be a member of
+multiple top level bdi's.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 21331e785919..b799d4e22c0b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -920,38 +920,6 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 	return rq->tag != -1;
- }
- 
--static void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
--				    struct request *rq)
--{
--	blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
--	rq->tag = -1;
--
--	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
--		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
--		atomic_dec(&hctx->nr_active);
--	}
--}
--
--static void blk_mq_put_driver_tag_hctx(struct blk_mq_hw_ctx *hctx,
--				       struct request *rq)
--{
--	if (rq->tag == -1 || rq->internal_tag == -1)
--		return;
--
--	__blk_mq_put_driver_tag(hctx, rq);
--}
--
--static void blk_mq_put_driver_tag(struct request *rq)
--{
--	struct blk_mq_hw_ctx *hctx;
--
--	if (rq->tag == -1 || rq->internal_tag == -1)
--		return;
--
--	hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
--	__blk_mq_put_driver_tag(hctx, rq);
--}
--
- /*
-  * If we fail getting a driver tag because all the driver tags are already
-  * assigned and on the dispatch list, BUT the first entry does not have a
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 038bdeb84629..2bef2d0cca7b 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -2,6 +2,7 @@
- #define INT_BLK_MQ_H
- 
- #include "blk-stat.h"
-+#include "blk-mq-tag.h"
- 
- struct blk_mq_tag_set;
- 
-@@ -137,4 +138,36 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
- 			unsigned int inflight[2]);
- 
-+static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
-+					   struct request *rq)
-+{
-+	blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
-+	rq->tag = -1;
-+
-+	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
-+		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
-+		atomic_dec(&hctx->nr_active);
-+	}
-+}
-+
-+static inline void blk_mq_put_driver_tag_hctx(struct blk_mq_hw_ctx *hctx,
-+				       struct request *rq)
-+{
-+	if (rq->tag == -1 || rq->internal_tag == -1)
-+		return;
-+
-+	__blk_mq_put_driver_tag(hctx, rq);
-+}
-+
-+static inline void blk_mq_put_driver_tag(struct request *rq)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+
-+	if (rq->tag == -1 || rq->internal_tag == -1)
-+		return;
-+
-+	hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
-+	__blk_mq_put_driver_tag(hctx, rq);
-+}
-+
- #endif
 -- 
-2.9.5
+Jens Axboe
