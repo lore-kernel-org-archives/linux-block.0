@@ -1,91 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59740 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752907AbdI3Lbt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:31:49 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 4/8] block: move actual bio merge code into __elv_merge
-Date: Sat, 30 Sep 2017 19:26:51 +0800
-Message-Id: <20170930112655.31451-5-ming.lei@redhat.com>
-In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
-References: <20170930112655.31451-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V2] block: sed-opal: Set MBRDone on S3 resume path if TPER
+ is MBREnabled
+To: Scott Bauer <scott.bauer@intel.com>
+Cc: linux-block@vger.kernel.org, hch@infradead.org
+References: <20170901145335.9244-1-scott.bauer@intel.com>
+ <bcc3f33b-9ac1-59e5-09f3-41db81659a4a@intel.com>
+ <20170908193610.b2nlhawecb2wiuy6@sbauer-Z170X-UD5>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2ff49efd-ae62-8670-921a-046ccc9d35c6@kernel.dk>
+Date: Fri, 8 Sep 2017 14:20:21 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170908193610.b2nlhawecb2wiuy6@sbauer-Z170X-UD5>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-So that we can reuse __elv_merge() to merge bio
-into requests from sw queue in the following patches.
+On 09/08/2017 01:36 PM, Scott Bauer wrote:
+> On Tue, Sep 05, 2017 at 04:51:51PM -0600, Jon Derrick wrote:
+> Jens, sorry to bother, can you take this? Or do you have any follow up comments?
+> 
+> RHEL Is starting to pull changes in for 7.5 I want to get this landed so they can
+> pick it up.
 
-No functional change.
+I can pull it in for a pull request later in this merge window.
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/elevator.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
-
-diff --git a/block/elevator.c b/block/elevator.c
-index 824cc3e69ac3..e11c7873fc21 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -409,8 +409,9 @@ void elv_dispatch_add_tail(struct request_queue *q, struct request *rq)
- }
- EXPORT_SYMBOL(elv_dispatch_add_tail);
- 
--enum elv_merge elv_merge(struct request_queue *q, struct request **req,
--		struct bio *bio)
-+static enum elv_merge __elv_merge(struct request_queue *q,
-+		struct request **req, struct bio *bio,
-+		struct hlist_head *hash, struct request *last_merge)
- {
- 	struct elevator_queue *e = q->elevator;
- 	struct request *__rq;
-@@ -427,11 +428,11 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	/*
- 	 * First try one-hit cache.
- 	 */
--	if (q->last_merge && elv_bio_merge_ok(q->last_merge, bio)) {
--		enum elv_merge ret = blk_try_merge(q->last_merge, bio);
-+	if (last_merge && elv_bio_merge_ok(last_merge, bio)) {
-+		enum elv_merge ret = blk_try_merge(last_merge, bio);
- 
- 		if (ret != ELEVATOR_NO_MERGE) {
--			*req = q->last_merge;
-+			*req = last_merge;
- 			return ret;
- 		}
- 	}
-@@ -442,7 +443,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	/*
- 	 * See if our hash lookup can find a potential backmerge.
- 	 */
--	__rq = elv_rqhash_find(q, bio->bi_iter.bi_sector);
-+	__rq = rqhash_find(hash, bio->bi_iter.bi_sector);
- 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
- 		*req = __rq;
- 		return ELEVATOR_BACK_MERGE;
-@@ -456,6 +457,12 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
- 	return ELEVATOR_NO_MERGE;
- }
- 
-+enum elv_merge elv_merge(struct request_queue *q, struct request **req,
-+		struct bio *bio)
-+{
-+	return __elv_merge(q, req, bio, q->elevator->hash, q->last_merge);
-+}
-+
- /*
-  * Attempt to do an insertion back merge. Only check for the case where
-  * we can append 'rq' to an existing request, so we can throw 'rq' away
 -- 
-2.9.5
+Jens Axboe
