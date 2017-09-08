@@ -1,132 +1,138 @@
-Return-Path: <prvs=430e6b2f0=bart.vanassche@wdc.com>
+Return-Path: <prvs=4177119eb=bart.vanassche@wdc.com>
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
 	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v2 3/4] block, scsi: Make SCSI device suspend and resume work reliably
-Date: Thu, 21 Sep 2017 14:22:54 -0700
-Message-Id: <20170921212255.12788-4-bart.vanassche@wdc.com>
-In-Reply-To: <20170921212255.12788-1-bart.vanassche@wdc.com>
-References: <20170921212255.12788-1-bart.vanassche@wdc.com>
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	"Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 2/5] scsi: Change the type of the second last argument of scsi_execute()
+Date: Fri,  8 Sep 2017 16:52:23 -0700
+Message-Id: <20170908235226.26622-3-bart.vanassche@wdc.com>
+In-Reply-To: <20170908235226.26622-1-bart.vanassche@wdc.com>
+References: <20170908235226.26622-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-It is essential during suspend and resume that neither the filesystem
-state nor the filesystem metadata in RAM changes. This is why while
-the hibernation image is being written or restored that SCSI devices
-are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
-and scsi_device_resume(). In the SDEV_QUIESCE state execution of
-non-preempt requests is deferred. This is realized by returning
-BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
-devices. Avoid that a full queue prevents power management requests
-to be submitted by slowing down allocation of non-preempt requests for
-devices in the quiesced state. This patch has been tested by running
-the following commands and by verifying that after resume the fio job
-is still running:
+The second last argument of scsi_execute() is either 0 or RQF_PM.
+Change the type of that argument from req_flags_t into bool and
+update the callers that pass RQF_PM. This patch does not change
+any functionality.
 
-for d in /sys/class/block/sd*[a-z]; do
-  hcil=$(readlink "$d/device")
-  hcil=${hcil#../../../}
-  echo 4 > "$d"
-  echo 1 > "/sys/class/scsi_device/$hcil/device/queue_depth"
-done
-bdev=$(readlink /dev/disk/by-uuid/5217d83f-213e-4b42-b86e-20013325ba6c)
-bdev=${bdev#../../}
-hcil=$(readlink "/sys/block/$bdev/device")
-hcil=${hcil#../../../}
-fio --name="$bdev" --filename="/dev/$bdev" --buffered=0 --bs=512 --rw=randread \
-  --ioengine=psync --numjobs=4 --iodepth=16 --iodepth_batch=1 --thread \
-  --loops=$((2**31)) &
-pid=$!
-sleep 1
-systemctl hibernate
-sleep 10
-kill $pid
-
-Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-References: "I/O hangs after resuming from suspend-to-ram" (https://marc.info/?l=linux-block&m=150340235201348).
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c        | 13 ++++++++++---
- drivers/scsi/scsi_lib.c | 11 ++++++++---
- 2 files changed, 18 insertions(+), 6 deletions(-)
+ drivers/scsi/scsi_lib.c    |  8 ++++----
+ drivers/scsi/sd.c          |  4 ++--
+ drivers/scsi/ufs/ufshcd.c  | 11 ++++++-----
+ include/scsi/scsi_device.h |  2 +-
+ 4 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1ac337712bbd..6a190dd998aa 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1429,11 +1429,18 @@ struct request *blk_get_request(struct request_queue *q, unsigned int op,
- 				gfp_t gfp_mask)
- {
- 	struct request *req;
-+	const bool may_sleep = gfp_mask & __GFP_DIRECT_RECLAIM;
-+
-+	if (unlikely(blk_queue_preempt_only(q) && !(op & REQ_PREEMPT))) {
-+		if (may_sleep)
-+			msleep(100);
-+		else
-+			return ERR_PTR(-EBUSY);
-+	}
- 
- 	if (q->mq_ops) {
--		req = blk_mq_alloc_request(q, op,
--			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
--				0 : BLK_MQ_REQ_NOWAIT);
-+		req = blk_mq_alloc_request(q, op, may_sleep ?
-+					   0 : BLK_MQ_REQ_NOWAIT);
- 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
- 			q->mq_ops->initialize_rq_fn(req);
- 	} else {
 diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 6db8247577a0..e76fd6e89a81 100644
+index f6097b89d5d3..5be515c8c6bd 100644
 --- a/drivers/scsi/scsi_lib.c
 +++ b/drivers/scsi/scsi_lib.c
-@@ -2889,19 +2889,22 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
- int
- scsi_device_quiesce(struct scsi_device *sdev)
+@@ -227,8 +227,8 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
+  * @sshdr:	optional decoded sense header
+  * @timeout:	request timeout in seconds
+  * @retries:	number of times to retry request
+- * @flags:	flags for ->cmd_flags
+- * @rq_flags:	flags for ->rq_flags
++ * @flags:	REQ_* flags for ->cmd_flags
++ * @is_pm_req:	whether or not this is a power management request
+  * @resid:	optional residual length
+  *
+  * Returns the scsi_cmnd result field if a command was executed, or a negative
+@@ -237,7 +237,7 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
+ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 		 int data_direction, void *buffer, unsigned bufflen,
+ 		 unsigned char *sense, struct scsi_sense_hdr *sshdr,
+-		 int timeout, int retries, u64 flags, req_flags_t rq_flags,
++		 int timeout, int retries, u64 flags, bool is_pm_req,
+ 		 int *resid)
  {
-+	struct request_queue *q = sdev->request_queue;
- 	int err;
+ 	struct request *req;
+@@ -260,7 +260,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	rq->retries = retries;
+ 	req->timeout = timeout;
+ 	req->cmd_flags |= flags;
+-	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
++	req->rq_flags |= (is_pm_req ? RQF_PM : 0) | RQF_QUIET | RQF_PREEMPT;
  
- 	mutex_lock(&sdev->state_mutex);
- 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
-+	if (err == 0)
-+		blk_set_preempt_only(q, true);
- 	mutex_unlock(&sdev->state_mutex);
- 
- 	if (err)
- 		return err;
- 
--	scsi_run_queue(sdev->request_queue);
-+	scsi_run_queue(q);
- 	while (atomic_read(&sdev->device_busy)) {
- 		msleep_interruptible(200);
--		scsi_run_queue(sdev->request_queue);
-+		scsi_run_queue(q);
+ 	/*
+ 	 * head injection *required* here otherwise quiesce won't work
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index e2647f2d4430..ad22b16748c6 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1620,7 +1620,7 @@ static int sd_sync_cache(struct scsi_disk *sdkp, struct scsi_sense_hdr *sshdr)
+ 		 * flush everything.
+ 		 */
+ 		res = scsi_execute(sdp, cmd, DMA_NONE, NULL, 0, NULL, sshdr,
+-				timeout, SD_MAX_RETRIES, 0, RQF_PM, NULL);
++				timeout, SD_MAX_RETRIES, 0, true, NULL);
+ 		if (res == 0)
+ 			break;
  	}
- 	return 0;
- }
-@@ -2924,8 +2927,10 @@ void scsi_device_resume(struct scsi_device *sdev)
+@@ -3469,7 +3469,7 @@ static int sd_start_stop_device(struct scsi_disk *sdkp, int start)
+ 		return -ENODEV;
+ 
+ 	res = scsi_execute(sdp, cmd, DMA_NONE, NULL, 0, NULL, &sshdr,
+-			SD_TIMEOUT, SD_MAX_RETRIES, 0, RQF_PM, NULL);
++			SD_TIMEOUT, SD_MAX_RETRIES, 0, true, NULL);
+ 	if (res) {
+ 		sd_print_result(sdkp, "Start/Stop Unit failed", res);
+ 		if (driver_byte(res) & DRIVER_SENSE)
+diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+index 5bc9dc14e075..7798acd91331 100644
+--- a/drivers/scsi/ufs/ufshcd.c
++++ b/drivers/scsi/ufs/ufshcd.c
+@@ -6976,7 +6976,7 @@ ufshcd_send_request_sense(struct ufs_hba *hba, struct scsi_device *sdp)
+ 
+ 	ret = scsi_execute(sdp, cmd, DMA_FROM_DEVICE, buffer,
+ 			UFSHCD_REQ_SENSE_SIZE, NULL, NULL,
+-			msecs_to_jiffies(1000), 3, 0, RQF_PM, NULL);
++			msecs_to_jiffies(1000), 3, 0, true, NULL);
+ 	if (ret)
+ 		pr_err("%s: failed with err %d\n", __func__, ret);
+ 
+@@ -7037,12 +7037,13 @@ static int ufshcd_set_dev_pwr_mode(struct ufs_hba *hba,
+ 	cmd[4] = pwr_mode << 4;
+ 
+ 	/*
+-	 * Current function would be generally called from the power management
+-	 * callbacks hence set the RQF_PM flag so that it doesn't resume the
+-	 * already suspended childs.
++	 * This function is typically called from a power management
++	 * callback. Hence submit the START request as a power management
++	 * request too so that it doesn't resume the already suspended
++	 * children.
  	 */
- 	mutex_lock(&sdev->state_mutex);
- 	if (sdev->sdev_state == SDEV_QUIESCE &&
--	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
-+	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0) {
-+		blk_set_preempt_only(sdev->request_queue, false);
- 		scsi_run_queue(sdev->request_queue);
-+	}
- 	mutex_unlock(&sdev->state_mutex);
- }
- EXPORT_SYMBOL(scsi_device_resume);
+ 	ret = scsi_execute(sdp, cmd, DMA_NONE, NULL, 0, NULL, &sshdr,
+-			START_STOP_TIMEOUT, 0, 0, RQF_PM, NULL);
++			START_STOP_TIMEOUT, 0, 0, true, NULL);
+ 	if (ret) {
+ 		sdev_printk(KERN_WARNING, sdp,
+ 			    "START_STOP failed for power mode: %d, result %x\n",
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 0979a5f3b69a..b23e771cd305 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -414,7 +414,7 @@ extern int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 			int data_direction, void *buffer, unsigned bufflen,
+ 			unsigned char *sense, struct scsi_sense_hdr *sshdr,
+ 			int timeout, int retries, u64 flags,
+-			req_flags_t rq_flags, int *resid);
++			bool is_pm_req, int *resid);
+ static inline int scsi_execute_req(struct scsi_device *sdev,
+ 	const unsigned char *cmd, int data_direction, void *buffer,
+ 	unsigned bufflen, struct scsi_sense_hdr *sshdr, int timeout,
 -- 
 2.14.1
