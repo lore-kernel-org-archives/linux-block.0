@@ -1,12 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35198 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751548AbdIIHV3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Sep 2017 03:21:29 -0400
-Date: Sat, 9 Sep 2017 15:21:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:32354 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756500AbdIHR3F (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2017 13:29:05 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "jthumshirn@suse.de" <jthumshirn@suse.de>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
@@ -17,49 +16,30 @@ Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH V3 7/8] block: allow to allocate req with REQF_PREEMPT
  when queue is preempt frozen
-Message-ID: <20170909072105.GA26081@ming.t460p>
-References: <20170902130840.24609-8-ming.lei@redhat.com>
- <20170902131208.GA10940@ming.t460p>
- <1504498405.10804.10.camel@wdc.com>
- <20170904071653.GD7959@ming.t460p>
- <1504539634.3189.15.camel@wdc.com>
- <20170904160813.GA21757@ming.t460p>
- <1504575610.3360.7.camel@wdc.com>
- <20170905022325.GC24787@ming.t460p>
- <20170908030753.GA5627@ming.t460p>
- <1504891695.1665.5.camel@wdc.com>
+Date: Fri, 8 Sep 2017 17:28:16 +0000
+Message-ID: <1504891695.1665.5.camel@wdc.com>
+References: <20170902130840.24609-1-ming.lei@redhat.com>
+         <20170902130840.24609-8-ming.lei@redhat.com>
+         <20170902131208.GA10940@ming.t460p> <1504498405.10804.10.camel@wdc.com>
+         <20170904071653.GD7959@ming.t460p> <1504539634.3189.15.camel@wdc.com>
+         <20170904160813.GA21757@ming.t460p> <1504575610.3360.7.camel@wdc.com>
+         <20170905022325.GC24787@ming.t460p> <20170908030753.GA5627@ming.t460p>
+In-Reply-To: <20170908030753.GA5627@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1504891695.1665.5.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 08, 2017 at 05:28:16PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-09-08 at 11:08 +0800, Ming Lei wrote:
-> > Looks I replied or clarified all your questions/comments on this
-> > patchset.
-> 
-> No, you have not addressed all my comments, you know that you have not
-> addressed all my comments so you should not have written that you have
-
-I do not know.
-
-> addressed all my comments. This patch series not only introduces ugly
-> changes in the request queue freeze mechanism but it also introduces an
-> unacceptable race condition between blk_get_request() and request queue
-> cleanup.
-
-So what is the race? Could you reply in original thread?
-
-> 
-> BTW, you don't have to spend more time on this patch series. I have
-> implemented an alternative and much cleaner approach to fix SCSI device
-> suspend. I'm currently testing that patch series.
-
-You do not understand the issue at all, it is not only related with
-suspend. Please take a look at scsi_execute(), each request run
-via scsi_execute() need to be dispatched successfully even when
-SCSI device is quiesced.
-
--- 
-Ming
+T24gRnJpLCAyMDE3LTA5LTA4IGF0IDExOjA4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gTG9v
+a3MgSSByZXBsaWVkIG9yIGNsYXJpZmllZCBhbGwgeW91ciBxdWVzdGlvbnMvY29tbWVudHMgb24g
+dGhpcw0KPiBwYXRjaHNldC4NCg0KTm8sIHlvdSBoYXZlIG5vdCBhZGRyZXNzZWQgYWxsIG15IGNv
+bW1lbnRzLCB5b3Uga25vdyB0aGF0IHlvdSBoYXZlIG5vdA0KYWRkcmVzc2VkIGFsbCBteSBjb21t
+ZW50cyBzbyB5b3Ugc2hvdWxkIG5vdCBoYXZlIHdyaXR0ZW4gdGhhdCB5b3UgaGF2ZQ0KYWRkcmVz
+c2VkIGFsbCBteSBjb21tZW50cy4gVGhpcyBwYXRjaCBzZXJpZXMgbm90IG9ubHkgaW50cm9kdWNl
+cyB1Z2x5DQpjaGFuZ2VzIGluIHRoZSByZXF1ZXN0IHF1ZXVlIGZyZWV6ZSBtZWNoYW5pc20gYnV0
+IGl0IGFsc28gaW50cm9kdWNlcyBhbg0KdW5hY2NlcHRhYmxlIHJhY2UgY29uZGl0aW9uIGJldHdl
+ZW4gYmxrX2dldF9yZXF1ZXN0KCkgYW5kIHJlcXVlc3QgcXVldWUNCmNsZWFudXAuDQoNCkJUVywg
+eW91IGRvbid0IGhhdmUgdG8gc3BlbmQgbW9yZSB0aW1lIG9uIHRoaXMgcGF0Y2ggc2VyaWVzLiBJ
+IGhhdmUNCmltcGxlbWVudGVkIGFuIGFsdGVybmF0aXZlIGFuZCBtdWNoIGNsZWFuZXIgYXBwcm9h
+Y2ggdG8gZml4IFNDU0kgZGV2aWNlDQpzdXNwZW5kLiBJJ20gY3VycmVudGx5IHRlc3RpbmcgdGhh
+dCBwYXRjaCBzZXJpZXMuDQoNCkJhcnQu
