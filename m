@@ -1,11 +1,13 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48082 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751548AbdIIHeA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Sep 2017 03:34:00 -0400
-Date: Sat, 9 Sep 2017 15:33:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Omar Sandoval <osandov@osandov.com>
+Received: from mail-pg0-f48.google.com ([74.125.83.48]:37148 "EHLO
+        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757015AbdIHU4b (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Sep 2017 16:56:31 -0400
+Received: by mail-pg0-f48.google.com with SMTP id d8so6622066pgt.4
+        for <linux-block@vger.kernel.org>; Fri, 08 Sep 2017 13:56:31 -0700 (PDT)
+Date: Fri, 8 Sep 2017 13:56:29 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         Bart Van Assche <bart.vanassche@sandisk.com>,
@@ -13,7 +15,7 @@ Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Paolo Valente <paolo.valente@linaro.org>,
         Mel Gorman <mgorman@techsingularity.net>
 Subject: Re: [PATCH V4 01/14] blk-mq-sched: fix scheduler bad performance
-Message-ID: <20170909073340.GB26081@ming.t460p>
+Message-ID: <20170908205629.GD13673@vader.DHCP.thefacebook.com>
 References: <20170902151729.6162-1-ming.lei@redhat.com>
  <20170902151729.6162-2-ming.lei@redhat.com>
  <20170908204832.GB13673@vader.DHCP.thefacebook.com>
@@ -81,7 +83,6 @@ On Fri, Sep 08, 2017 at 01:54:48PM -0700, Omar Sandoval wrote:
 > We want to dispatch from the scheduler if there was nothing on the
 > dispatch list or we were able to dispatch from the dispatch list.
 
-OK, will do it in V5.
-
--- 
-Ming
+By the way, did you experiment with changing blk_mq_dispatch_rq_list()
+to return true IFF _all_ requests were dispatched, instead of _any_
+requests were dispatched?
