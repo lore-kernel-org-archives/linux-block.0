@@ -1,162 +1,176 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57296 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751013AbdIKLMI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2017 07:12:08 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 05/10] block: rename .mq_freeze_wq and .mq_freeze_depth
-Date: Mon, 11 Sep 2017 19:10:16 +0800
-Message-Id: <20170911111021.25810-6-ming.lei@redhat.com>
-In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
-References: <20170911111021.25810-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=4177119eb=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	"Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 3/5] block: Introduce REQ_PM and remove RQF_PM
+Date: Fri,  8 Sep 2017 16:52:24 -0700
+Message-Id: <20170908235226.26622-4-bart.vanassche@wdc.com>
+In-Reply-To: <20170908235226.26622-1-bart.vanassche@wdc.com>
+References: <20170908235226.26622-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Both two are used for legacy and blk-mq, so rename them
-as .freeze_wq and .freeze_depth for avoiding to confuse
-people.
+Tell the block layer at request allocation time whether or not a
+request will be used to change the power management state of a
+block device.
 
-No functional change.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c       | 12 ++++++------
- block/blk-mq.c         | 12 ++++++------
- include/linux/blkdev.h |  4 ++--
- 3 files changed, 14 insertions(+), 14 deletions(-)
+ block/blk-core.c          | 11 +++++++++--
+ block/blk-mq-debugfs.c    |  2 +-
+ block/elevator.c          |  4 ++--
+ drivers/scsi/scsi_lib.c   |  9 +++++----
+ include/linux/blk_types.h |  2 ++
+ include/linux/blkdev.h    |  2 --
+ 6 files changed, 19 insertions(+), 11 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 2347107eeca4..eec5881a9e74 100644
+index d709c0e3a2ac..bb53c6b58e8c 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -630,7 +630,7 @@ void blk_set_queue_dying(struct request_queue *q)
- 	 * We need to ensure that processes currently waiting on
- 	 * the queue are notified as well.
- 	 */
--	wake_up_all(&q->mq_freeze_wq);
-+	wake_up_all(&q->freeze_wq);
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
- 
-@@ -793,14 +793,14 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
- 		/*
- 		 * read pair of barrier in blk_freeze_queue_start(),
- 		 * we need to order reading __PERCPU_REF_DEAD flag of
--		 * .q_usage_counter and reading .mq_freeze_depth or
-+		 * .q_usage_counter and reading .freeze_depth or
- 		 * queue dying flag, otherwise the following wait may
- 		 * never return if the two reads are reordered.
- 		 */
- 		smp_rmb();
- 
--		ret = wait_event_interruptible(q->mq_freeze_wq,
--				!atomic_read(&q->mq_freeze_depth) ||
-+		ret = wait_event_interruptible(q->freeze_wq,
-+				!atomic_read(&q->freeze_depth) ||
- 				blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-@@ -819,7 +819,7 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
- 	struct request_queue *q =
- 		container_of(ref, struct request_queue, q_usage_counter);
- 
--	wake_up_all(&q->mq_freeze_wq);
-+	wake_up_all(&q->freeze_wq);
+@@ -1412,6 +1412,13 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	return rq;
  }
  
- static void blk_rq_timed_out_timer(unsigned long data)
-@@ -891,7 +891,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	q->bypass_depth = 1;
- 	__set_bit(QUEUE_FLAG_BYPASS, &q->queue_flags);
++/**
++ * blk_get_request() - allocate a request
++ * @q: request queue.
++ * @op: bitwise or of operation (REQ_OP_*; see also enum req_opf) and flags
++ *      (REQ_*; see also enum req_flag_bits).
++ * @gfp_mask: request memory allocation flags.
++ */
+ struct request *blk_get_request(struct request_queue *q, unsigned int op,
+ 				gfp_t gfp_mask)
+ {
+@@ -1529,7 +1536,7 @@ EXPORT_SYMBOL_GPL(part_round_stats);
+ #ifdef CONFIG_PM
+ static void blk_pm_put_request(struct request *rq)
+ {
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM) && !--rq->q->nr_pending)
++	if (rq->q->dev && !(rq->cmd_flags & REQ_PM) && !--rq->q->nr_pending)
+ 		pm_runtime_mark_last_busy(rq->q->dev);
+ }
+ #else
+@@ -2460,7 +2467,7 @@ static struct request *blk_pm_peek_request(struct request_queue *q,
+ 					   struct request *rq)
+ {
+ 	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
+-	    (q->rpm_status != RPM_ACTIVE && !(rq->rq_flags & RQF_PM))))
++	    (q->rpm_status != RPM_ACTIVE && !(rq->cmd_flags & REQ_PM))))
+ 		return NULL;
+ 	else
+ 		return rq;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 980e73095643..ea21124b190b 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -266,6 +266,7 @@ static const char *const cmd_flag_name[] = {
+ 	CMD_FLAG_NAME(BACKGROUND),
+ 	CMD_FLAG_NAME(NOUNMAP),
+ 	CMD_FLAG_NAME(NOWAIT),
++	CMD_FLAG_NAME(PM),
+ };
+ #undef CMD_FLAG_NAME
  
--	init_waitqueue_head(&q->mq_freeze_wq);
-+	init_waitqueue_head(&q->freeze_wq);
+@@ -286,7 +287,6 @@ static const char *const rqf_name[] = {
+ 	RQF_NAME(ELVPRIV),
+ 	RQF_NAME(IO_STAT),
+ 	RQF_NAME(ALLOCED),
+-	RQF_NAME(PM),
+ 	RQF_NAME(HASHED),
+ 	RQF_NAME(STATS),
+ 	RQF_NAME(SPECIAL_PAYLOAD),
+diff --git a/block/elevator.c b/block/elevator.c
+index 153926a90901..7898960bed2a 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -574,13 +574,13 @@ void elv_bio_merged(struct request_queue *q, struct request *rq,
+ #ifdef CONFIG_PM
+ static void blk_pm_requeue_request(struct request *rq)
+ {
+-	if (rq->q->dev && !(rq->rq_flags & RQF_PM))
++	if (rq->q->dev && !(rq->cmd_flags & REQ_PM))
+ 		rq->q->nr_pending--;
+ }
+ 
+ static void blk_pm_add_request(struct request_queue *q, struct request *rq)
+ {
+-	if (q->dev && !(rq->rq_flags & RQF_PM) && q->nr_pending++ == 0 &&
++	if (q->dev && !(rq->cmd_flags & REQ_PM) && q->nr_pending++ == 0 &&
+ 	    (q->rpm_status == RPM_SUSPENDED || q->rpm_status == RPM_SUSPENDING))
+ 		pm_request_resume(q->dev);
+ }
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 5be515c8c6bd..64ad70e8447c 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -242,11 +242,12 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ {
+ 	struct request *req;
+ 	struct scsi_request *rq;
++	unsigned int op_and_flags;
+ 	int ret = DRIVER_ERROR << 24;
+ 
+-	req = blk_get_request(sdev->request_queue,
+-			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++	op_and_flags = (data_direction == DMA_TO_DEVICE ? REQ_OP_SCSI_OUT :
++			REQ_OP_SCSI_IN) | (is_pm_req ? REQ_PM : 0);
++	req = blk_get_request(sdev->request_queue, op_and_flags, __GFP_RECLAIM);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -260,7 +261,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	rq->retries = retries;
+ 	req->timeout = timeout;
+ 	req->cmd_flags |= flags;
+-	req->rq_flags |= (is_pm_req ? RQF_PM : 0) | RQF_QUIET | RQF_PREEMPT;
++	req->rq_flags |= RQF_QUIET | RQF_PREEMPT;
  
  	/*
- 	 * Init percpu_ref in atomic mode so that it's faster to shutdown.
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 345943fea998..205ae2d3da14 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -122,7 +122,7 @@ void blk_freeze_queue_start(struct request_queue *q)
- {
- 	int freeze_depth;
+ 	 * head injection *required* here otherwise quiesce won't work
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a2d2aa709cef..fdf4685a5856 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -229,6 +229,7 @@ enum req_flag_bits {
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
  
--	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
-+	freeze_depth = atomic_inc_return(&q->freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
- 		if (q->mq_ops)
-@@ -135,14 +135,14 @@ void blk_freeze_queue_wait(struct request_queue *q)
- {
- 	if (!q->mq_ops)
- 		blk_drain_queue(q);
--	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
-+	wait_event(q->freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_wait);
+ 	__REQ_NOWAIT,           /* Don't wait if request will block */
++	__REQ_PM,		/* Power management request */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
  
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout)
- {
--	return wait_event_timeout(q->mq_freeze_wq,
-+	return wait_event_timeout(q->freeze_wq,
- 					percpu_ref_is_zero(&q->q_usage_counter),
- 					timeout);
- }
-@@ -170,11 +170,11 @@ void blk_unfreeze_queue(struct request_queue *q)
- {
- 	int freeze_depth;
+@@ -248,6 +249,7 @@ enum req_flag_bits {
  
--	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
-+	freeze_depth = atomic_dec_return(&q->freeze_depth);
- 	WARN_ON_ONCE(freeze_depth < 0);
- 	if (!freeze_depth) {
- 		percpu_ref_reinit(&q->q_usage_counter);
--		wake_up_all(&q->mq_freeze_wq);
-+		wake_up_all(&q->freeze_wq);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_unfreeze_queue);
-@@ -2424,7 +2424,7 @@ void blk_mq_free_queue(struct request_queue *q)
- /* Basically redo blk_mq_init_queue with queue frozen */
- static void blk_mq_queue_reinit(struct request_queue *q)
- {
--	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
-+	WARN_ON_ONCE(!atomic_read(&q->freeze_depth));
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
++#define REQ_PM			(1ULL << __REQ_PM)
  
- 	blk_mq_debugfs_unregister_hctxs(q);
- 	blk_mq_sysfs_unregister(q);
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 460294bb0fa5..b8053bcc6b5f 100644
+index 460294bb0fa5..7f9a0743fc09 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -564,7 +564,7 @@ struct request_queue {
- 	struct mutex		sysfs_lock;
- 
- 	int			bypass_depth;
--	atomic_t		mq_freeze_depth;
-+	atomic_t		freeze_depth;
- 
- #if defined(CONFIG_BLK_DEV_BSG)
- 	bsg_job_fn		*bsg_job_fn;
-@@ -576,7 +576,7 @@ struct request_queue {
- 	struct throtl_data *td;
- #endif
- 	struct rcu_head		rcu_head;
--	wait_queue_head_t	mq_freeze_wq;
-+	wait_queue_head_t	freeze_wq;
- 	struct percpu_ref	q_usage_counter;
- 	struct list_head	all_q_node;
- 
+@@ -111,8 +111,6 @@ typedef __u32 __bitwise req_flags_t;
+ #define RQF_IO_STAT		((__force req_flags_t)(1 << 13))
+ /* request came from our alloc pool */
+ #define RQF_ALLOCED		((__force req_flags_t)(1 << 14))
+-/* runtime pm request */
+-#define RQF_PM			((__force req_flags_t)(1 << 15))
+ /* on IO scheduler merge hash */
+ #define RQF_HASHED		((__force req_flags_t)(1 << 16))
+ /* IO stats tracking on */
 -- 
-2.9.5
+2.14.1
