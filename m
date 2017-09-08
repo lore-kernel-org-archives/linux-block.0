@@ -1,49 +1,56 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Sun, 3 Sep 2017 21:46:39 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] blk-mq: fix nr_requests wrong value when modify it from sysfs
-Message-ID: <20170903134634.GA27411@localhost.didichuxing.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 8 Sep 2017 10:54:10 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	lizefan@huawei.com, tglx@linutronix.de, kernel-team@fb.com,
+	axboe@kernel.dk, Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH 3/3] block/loop: make loop cgroup aware
+Message-ID: <20170908175409.GB1774378@devbig577.frc2.facebook.com>
+References: <cover.1504748195.git.shli@fb.com>
+ <83915a4be672d99729029800196008c3b39c7a3a.1504748195.git.shli@fb.com>
+ <20170908144808.GA1774378@devbig577.frc2.facebook.com>
+ <20170908170715.54c536vy77w2biki@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170908170715.54c536vy77w2biki@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-if blk-mq use "none" io scheduler, nr_request get a wrong value when
-input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
-the smaller one min(nr, set->queue_depth), and then q->nr_request get a
-wrong value.
+Hello, Shaohua.
 
-Reproduce:
+On Fri, Sep 08, 2017 at 10:07:15AM -0700, Shaohua Li wrote:
+> > The fact that we're forwarding explicitly in loop still bothers me a
+> > bit.  Can you please elaborate why we don't want to do this
+> > generically through aio?
+> 
+> I think we must forward in loop, because each cmd could come from different
+> cgroup, so we must explicitly forward for each cmd.
+> 
+> The main reason not to do the forward in aio is complexity. We at least have 3
+> different implementations for dio:
+> - __blockdev_direct_IO for ext4 and btrfs
+> - iomap dio for xfs
+> - blockdev dio implementation
+> 
+> Forwarding in dio means hooking the cgroup association for each bio dispatched
+> in the implementations, which is a little messy. I'd like to avoid this if
+> there is no strong reason to do it.
 
-echo none > /sys/block/nvme0n1/queue/ioscheduler
-echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
-cat /sys/block/nvme0n1/queue/nr_requests
-1000000
+I see.  I think the important questions is whether we're failing to
+forward io cgroup membership propagation on some aios?  If we are,
+that is an obvious bug which should be addressed one way or the other,
+and there's a fair chance that we wouldn't need to do anything special
+for loop.
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- block/blk-mq.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Given how simple the loop changes are, we sure can go with loop
+specific changes for now; however, I'm a bit unconvinced that aio
+changes would be that much more complex.  Can you please look into it?
+If it is actually complex, we sure can do it later but I'd much prefer
+to plug the hole as soon as possible.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f84d145..8303e5e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2622,8 +2622,11 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		 * queue depth. This is similar to what the old code would do.
- 		 */
- 		if (!hctx->sched_tags) {
--			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
--							min(nr, set->queue_depth),
-+			if (nr > set->queue_depth) {
-+				nr = set->queue_depth;
-+				pr_warn("reduce nr_request to %u\n", nr);
-+			}
-+			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
- 							false);
- 		} else {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+Thanks.
+
 -- 
-2.9.4
+tejun
