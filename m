@@ -1,33 +1,58 @@
-Return-Path: <SRS0=Wszy=AI=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com,
-	axboe@kernel.dk,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 0/3] block/loop: handle discard/zeroout error
-Date: Wed,  6 Sep 2017 17:13:23 -0700
-Message-Id: <cover.1504742003.git.shli@fb.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: tolerate tracing of NULL bio
+To: Greg Thelen <gthelen@google.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20170908003636.77349-1-gthelen@google.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <99c7c64d-6bd4-a0f2-efc9-84c0fc598504@kernel.dk>
+Date: Fri, 8 Sep 2017 08:25:08 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170908003636.77349-1-gthelen@google.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+On 09/07/2017 06:36 PM, Greg Thelen wrote:
+> __get_request() can call trace_block_getrq() with bio=NULL which causes
+> block_get_rq::TP_fast_assign() to deref a NULL pointer and panic.
+> 
+> Syzkaller fuzzer panics with
+> linux-next (1d53d908b79d7870d89063062584eead4cf83448):
+>   kasan: GPF could be caused by NULL-ptr deref or user memory access
+>   general protection fault: 0000 [#1] SMP KASAN
+>   Modules linked in:
+>   CPU: 0 PID: 2983 Comm: syzkaller401111 Not tainted 4.13.0-rc7-next-20170901+ #13
+>   task: ffff8801cf1da000 task.stack: ffff8801ce440000
+>   RIP: 0010:perf_trace_block_get_rq+0x697/0x970 include/trace/events/block.h:384
+>   RSP: 0018:ffff8801ce4473f0 EFLAGS: 00010246
+>   RAX: ffff8801cf1da000 RBX: 1ffff10039c88e84 RCX: 1ffffd1ffff84d27
+>   RDX: dffffc0000000001 RSI: 1ffff1003b643e7a RDI: ffffe8ffffc26938
+>   RBP: ffff8801ce447530 R08: 1ffff1003b643e6c R09: ffffe8ffffc26964
+>   R10: 0000000000000002 R11: fffff91ffff84d2d R12: ffffe8ffffc1f890
+>   R13: ffffe8ffffc26930 R14: ffffffff85cad9e0 R15: 0000000000000000
+>   FS:  0000000002641880(0000) GS:ffff8801db200000(0000) knlGS:0000000000000000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 000000000043e670 CR3: 00000001d1d7a000 CR4: 00000000001406f0
+>   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>   Call Trace:
+>     trace_block_getrq include/trace/events/block.h:423 [inline]
+>     __get_request block/blk-core.c:1283 [inline]
+>     get_request+0x1518/0x23b0 block/blk-core.c:1355
+>     blk_old_get_request block/blk-core.c:1402 [inline]
+>     blk_get_request+0x1d8/0x3c0 block/blk-core.c:1427
+>     sg_scsi_ioctl+0x117/0x750 block/scsi_ioctl.c:451
+>     sg_ioctl+0x192d/0x2ed0 drivers/scsi/sg.c:1070
+>     vfs_ioctl fs/ioctl.c:45 [inline]
+>     do_vfs_ioctl+0x1b1/0x1530 fs/ioctl.c:685
+>     SYSC_ioctl fs/ioctl.c:700 [inline]
+>     SyS_ioctl+0x8f/0xc0 fs/ioctl.c:691
+>     entry_SYSCALL_64_fastpath+0x1f/0xbe
+> 
+> block_get_rq::TP_fast_assign() has multiple redundant ->dev assignments.
+> Only one of them is NULL tolerant.  Favor the NULL tolerant one.
 
-Fix some problems when setting up loop device with a block device as back file
-and create/mount ext4 in the loop device.
-
-BTW: blkdev_issue_zeroout retries if we immediately find the device doesn't
-support zeroout, but it doesn't retry if submit_bio_wait returns -EOPNOTSUPP.
-Is this correct behavior?
-
-Thanks,
-Shaohua
-
-Shaohua Li (3):
-  block/loop: don't hijack error number
-  block/loop: use FALLOC_FL_ZERO_RANGE for REQ_OP_WRITE_ZEROES
-  block/loop: suppress discard IO error message
-
- drivers/block/loop.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Applied, thanks.
 
 -- 
-2.9.5
+Jens Axboe
