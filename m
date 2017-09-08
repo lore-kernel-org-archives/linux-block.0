@@ -1,26 +1,47 @@
-Return-Path: <martin.petersen@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 8 Sep 2017 09:29:36 +0800
+From: Ming Lei <ming.lei@redhat.com>
 To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] scsi_transport_fc: fix NULL pointer dereference in fc_bsg_job_timeout
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] scsi_transport_fc: fix NULL pointer dereference in
+ fc_bsg_job_timeout
+Message-ID: <20170908012935.GC3802@ming.t460p>
 References: <20170907115436.5069-1-hch@lst.de>
-	<20170907115436.5069-3-hch@lst.de>
-Date: Thu, 14 Sep 2017 20:40:40 -0400
-In-Reply-To: <20170907115436.5069-3-hch@lst.de> (Christoph Hellwig's message
-	of "Thu, 7 Sep 2017 13:54:36 +0200")
-Message-ID: <yq1bmmcssjb.fsf@oracle.com>
+ <20170907115436.5069-3-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170907115436.5069-3-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
+On Thu, Sep 07, 2017 at 01:54:36PM +0200, Christoph Hellwig wrote:
+> bsg-lib now embeddeds the job structure into the request, and req->special
+> can't be used anymore.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Cc: stable@vger.kernel.org
+> ---
+>  drivers/scsi/scsi_transport_fc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+> index 892fbd9800d9..bea06de60827 100644
+> --- a/drivers/scsi/scsi_transport_fc.c
+> +++ b/drivers/scsi/scsi_transport_fc.c
+> @@ -3550,7 +3550,7 @@ fc_vport_sched_delete(struct work_struct *work)
+>  static enum blk_eh_timer_return
+>  fc_bsg_job_timeout(struct request *req)
+>  {
+> -	struct bsg_job *job = (void *) req->special;
+> +	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+>  	struct Scsi_Host *shost = fc_bsg_to_shost(job);
+>  	struct fc_rport *rport = fc_bsg_to_rport(job);
+>  	struct fc_internal *i = to_fc_internal(shost->transportt);
+> -- 
+> 2.11.0
+> 
 
-Christoph,
-
-> bsg-lib now embeddeds the job structure into the request, and
-> req->special can't be used anymore.
-
-Applied to 4.14/scsi-fixes.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Ming
