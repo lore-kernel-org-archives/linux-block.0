@@ -1,105 +1,100 @@
-Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V2 00/12] scsi-mq support for ZBC disks
-Date: Fri,  8 Sep 2017 01:16:28 +0900
-Message-Id: <20170907161640.30465-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:41930 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751992AbdIIHni (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 9 Sep 2017 03:43:38 -0400
+Date: Sat, 9 Sep 2017 15:43:20 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>
+Subject: Re: [PATCH V4 01/14] blk-mq-sched: fix scheduler bad performance
+Message-ID: <20170909074319.GC26081@ming.t460p>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
+ <20170902151729.6162-2-ming.lei@redhat.com>
+ <20170908204832.GB13673@vader.DHCP.thefacebook.com>
+ <20170908205448.GC13673@vader.DHCP.thefacebook.com>
+ <20170908205629.GD13673@vader.DHCP.thefacebook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170908205629.GD13673@vader.DHCP.thefacebook.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series implements support for ZBC disks used through the scsi-mq I/O path.
+On Fri, Sep 08, 2017 at 01:56:29PM -0700, Omar Sandoval wrote:
+> On Fri, Sep 08, 2017 at 01:54:48PM -0700, Omar Sandoval wrote:
+> > On Fri, Sep 08, 2017 at 01:48:32PM -0700, Omar Sandoval wrote:
+> > > On Sat, Sep 02, 2017 at 11:17:16PM +0800, Ming Lei wrote:
+> > > > When hw queue is busy, we shouldn't take requests from
+> > > > scheduler queue any more, otherwise it is difficult to do
+> > > > IO merge.
+> > > > 
+> > > > This patch fixes the awful IO performance on some
+> > > > SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
+> > > > is used by not taking requests if hw queue is busy.
+> > > > 
+> > > > Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+> > > 
+> > > Jens and I did some testing with xfs/297 and couldn't find any issues,
+> > > so
+> > > 
+> > > Reviewed-by: Omar Sandoval <osandov@fb.com>
+> > 
+> > I take it back, the comment below needs to be updated
+> > 
+> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > ---
+> > > >  block/blk-mq-sched.c | 6 +++---
+> > > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> > > > index 4ab69435708c..845e5baf8af1 100644
+> > > > --- a/block/blk-mq-sched.c
+> > > > +++ b/block/blk-mq-sched.c
+> > > > @@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+> > > >  	struct request_queue *q = hctx->queue;
+> > > >  	struct elevator_queue *e = q->elevator;
+> > > >  	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+> > > > -	bool did_work = false;
+> > > > +	bool do_sched_dispatch = true;
+> > > >  	LIST_HEAD(rq_list);
+> > > >  
+> > > >  	/* RCU or SRCU read lock is needed before checking quiesced flag */
+> > > > @@ -125,7 +125,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+> > > >  	 */
+> > > >  	if (!list_empty(&rq_list)) {
+> > > >  		blk_mq_sched_mark_restart_hctx(hctx);
+> > > > -		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
+> > > > +		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+> > > >  	} else if (!has_sched_dispatch) {
+> > > >  		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+> > > >  		blk_mq_dispatch_rq_list(q, &rq_list);
+> > > > @@ -136,7 +136,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+> > > >  	 * on the dispatch list, OR if we did have work but weren't able
+> > > >  	 * to make progress.
+> > > >  	 */
+> > 
+> > This should be updated to say:
+> > 
+> > We want to dispatch from the scheduler if there was nothing on the
+> > dispatch list or we were able to dispatch from the dispatch list.
+> 
+> By the way, did you experiment with changing blk_mq_dispatch_rq_list()
+> to return true IFF _all_ requests were dispatched, instead of _any_
+> requests were dispatched?
 
-The current scsi level support of ZBC disks guarantees write request ordering
-using a per-zone write lock which prevents issuing simultaneously multiple
-write commands to a zone, doing so avoid reordering of sequential writes to
-sequential zones. This method is however ineffective when scsi-mq is used with
-zoned block devices. This is due to the different execution model of blk-mq
-which passes a request to the scsi layer for dispatching after the request has
-been removed from the I/O scheduler queue. That is, when the scsi layer tries
-to lock the target zone of the request, the request may already be out of
-order and zone write locking fails to prevent that.
+I understand that changes nothing, because dispatch may happen
+concurrently, and queue busy may be triggered in any one of the contexts
+and cause rq to be added to ->dispatch.
 
-Various approaches have been tried to solve this problem. All of them had the
-serious disadvantage of cluttering blk-mq code with zoned block device specific
-conditions and processing. As such extensive changes can only transform into
-maintenance nightmares, a radically different solution is proposed here.
-
-This series support implementation is in the form of a new "zoned" I/O
-scheduler based on mq-deadline. Zoned is mostly identical to the mq-deadline
-scheduler. It only differs from mq-deadline from the addition of a per zone
-write locking mechanism similar to that implemented in sd_zbc.c. The zoned
-scheduler zone write locking mechanism is used for the exact same purpose as
-the one in the scsi disk driver: limit writes per zone to one to avoid
-reordering. The locking context however changes and is moved to the
-dispatch_request method of the scheduler, that is, target zones of write
-requests can be locked before the requests are issued. In effect, this results
-in the same behavior as the legacy scsi path. Sequential write ordering is
-preserved.
-
-The zoned scheduler is added as part of the scsi code under driver/scsi. This
-allows access to information on the disk zones maintained within the device
-scsi_disk structure as this information (e.g. zone types) cannot be retreived
-from the context of an I/O scheduler initialization method (init_queue()
-method).
-
-The series patches are as follows:
-- The first 2 patches fix exported symbols declaration to allow compiling an
-  I/O scheduler outside of the block/ directory. No functional changes from
-  these patches.
-- Patches 3 to 7 reorganize and cleanup the scsi ZBC support to facilitate the
-  intorduction of the scheduler.
-- Path 8 is a bug fix
-- Patch 9 is an optimization for the legacy scsi path which avoids zone
-  locking if a write request targets a conventional zone. 
-- Path 10 disables zone write locking for disks accessed through scsi-mq.
-- Patch 11 introduces the new function scsi_disk_from_queue()
-- Patch 12 introduces the zoned blk-mq I/O scheduler.
-
-Comments are as always very much appreciated.
-
-Changes from v1:
-* Addressed Bart's comments for the blk-mq patches (declarations files)
-* Split (former) patch 4 into multiple patches to facilitate review
-* Fixed scsi disk lookup from io scheduler by introducing
-  scsi_disk_from_queue()
-
-Damien Le Moal (12):
-  block: Fix declaration of blk-mq debugfs functions
-  block: Fix declaration of blk-mq scheduler functions
-  scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
-  scsi: sd_zbc: Move zbc disk declarations to sd_zbc.h
-  scsi: sd_zbc: Fix comments and indentation
-  scsi: sd_zbc: Rearrange code
-  scsi: sd_zbc.c: Use well defined macros
-  scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
-  scsi: sd_zbc: Limit zone write locking to sequential zones
-  scsi: sd_zbc: Disable zone write locking with scsi-mq
-  scsi: sd: Introduce scsi_disk_from_queue()
-  scsi: Introduce ZBC disk I/O scheduler
-
- Documentation/block/zoned-iosched.txt |  48 ++
- block/Kconfig.iosched                 |  12 +
- block/blk-mq-debugfs.h                |  14 +-
- block/blk-mq-sched.h                  |  11 +-
- drivers/scsi/Makefile                 |   1 +
- drivers/scsi/sd.c                     |  33 ++
- drivers/scsi/sd.h                     |  54 +-
- drivers/scsi/sd_zbc.c                 | 236 +++++----
- drivers/scsi/sd_zbc.h                 |  91 ++++
- drivers/scsi/zoned_iosched.c          | 939 ++++++++++++++++++++++++++++++++++
- include/linux/blk-mq-debugfs.h        |  23 +
- include/linux/blk-mq-sched.h          |  14 +
- include/scsi/scsi_proto.h             |  45 +-
- 13 files changed, 1354 insertions(+), 167 deletions(-)
- create mode 100644 Documentation/block/zoned-iosched.txt
- create mode 100644 drivers/scsi/sd_zbc.h
- create mode 100644 drivers/scsi/zoned_iosched.c
- create mode 100644 include/linux/blk-mq-debugfs.h
- create mode 100644 include/linux/blk-mq-sched.h
+So even all requests are dispatched successfully from
+blk_mq_dispatch_rq_list(), rq still may be added to ->dispatch
+from other contexts, and you will see the check in patch
+"blk-mq-sched: don't dequeue request until all in ->dispatch are flushed".
 
 -- 
-2.13.5
+Ming
