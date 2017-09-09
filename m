@@ -1,45 +1,33 @@
-Return-Path: <linus971@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f67.google.com ([209.85.214.67]:37606 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750878AbdIITyH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Sep 2017 15:54:07 -0400
+Received: by mail-it0-f67.google.com with SMTP id d6so2495490itc.4
+        for <linux-block@vger.kernel.org>; Sat, 09 Sep 2017 12:54:06 -0700 (PDT)
 MIME-Version: 1.0
-Sender: linus971@gmail.com
-In-Reply-To: <CA+55aFwbmkTkPo5hgnDZ7aSKhUHZeec21wwcxCszZvrTgjaY7g@mail.gmail.com>
-References: <1f069ba0-19bf-a7b3-3a65-78f7f20ddc65@kernel.dk> <CA+55aFwbmkTkPo5hgnDZ7aSKhUHZeec21wwcxCszZvrTgjaY7g@mail.gmail.com>
+In-Reply-To: <1f069ba0-19bf-a7b3-3a65-78f7f20ddc65@kernel.dk>
+References: <1f069ba0-19bf-a7b3-3a65-78f7f20ddc65@kernel.dk>
 From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 9 Sep 2017 13:00:41 -0700
-Message-ID: <CA+55aFxHL=CdZiFTw0R-L2=ESvS6hVUbt5wUA6pEHxCeOB862g@mail.gmail.com>
+Date: Sat, 9 Sep 2017 12:54:05 -0700
+Message-ID: <CA+55aFwbmkTkPo5hgnDZ7aSKhUHZeec21wwcxCszZvrTgjaY7g@mail.gmail.com>
 Subject: Re: [GIT PULL] Followup block pull request for 4.14-rc1
 To: Jens Axboe <axboe@kernel.dk>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Sat, Sep 9, 2017 at 12:54 PM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+On Fri, Sep 8, 2017 at 10:34 AM, Jens Axboe <axboe@kernel.dk> wrote:
 >
-> Other than that, we match.
+> Single merge conflict here, for nvme/rdma. Trivial to fixup, see my
+> for-next branch here:
+>
+> http://git.kernel.dk/cgit/linux-block/log/?h=for-next
 
-Oh, and I almost cried when I saw this nasty thing:
+Your earlier merge for mm/page_io.c is ugly, and mixes up the bi_disk
+thing oddly in the middle of the task struct code.
 
-   ilog2(SZ_4K) - 9
+Other than that, we match.
 
-in that nvme code, but I left it alone.
-
-Why the hell people think "SZ_4K" is somehow more legible than 4096, I
-have no idea. And depending on our ilog2() just doing the right thing
-at build time, instead of just saying "12" with a comment, is just
-odd.
-
-It's not like "ilog2(SZ_4K)" is a particularly good comment.
-
-That code should probably just make it clear that 4096 is the NVME
-page size, and document it as such, rather than picking a random name
-for a random constant.
-
-So something like
-
-   #define NVME_PAGE_SIZE 4096
-   #define NVME_PAGE_SHIFT 12
-
-and then using *those* would actually have documented something,
-rather than these crazy odd random expressions.
-
-            Linus
+              Linus
