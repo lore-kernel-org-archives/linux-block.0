@@ -1,191 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36646 "EHLO mx1.redhat.com"
+Received: from mx1.mpynet.fi ([82.197.21.84]:18865 "EHLO mx1.mpynet.fi"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752660AbdIBPUE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Sep 2017 11:20:04 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 14/14] blk-mq: improve bio merge from blk-mq sw queue
-Date: Sat,  2 Sep 2017 23:17:29 +0800
-Message-Id: <20170902151729.6162-15-ming.lei@redhat.com>
-In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
-References: <20170902151729.6162-1-ming.lei@redhat.com>
+        id S1751511AbdIJTOc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Sep 2017 15:14:32 -0400
+Date: Sun, 10 Sep 2017 22:14:30 +0300
+From: Rakesh Pandit <rakesh@tuxera.com>
+To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
+Subject: Re: [PATCH] lightnvm: prevent bd removal if busy
+Message-ID: <20170910191430.GA7352@hercules.tuxera.com>
+References: <20170907135825.GA44302@dhcp-216.srv.tuxera.com>
+ <d5587325-11b0-a50f-c260-b20f344c0cfc@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <d5587325-11b0-a50f-c260-b20f344c0cfc@lightnvm.io>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch uses hash table to do bio merge from sw queue,
-then we can align to blk-mq scheduler/block legacy's way
-for bio merge.
+On Fri, Sep 08, 2017 at 12:42:47PM +0200, Matias Bj�rling wrote:
+> On 09/07/2017 03:58 PM, Rakesh Pandit wrote:
+> > Removal of virtual block device by "nvm lnvm remove..." undergoing IO
+> > and created by "nvme lnvm create... -t pblk" results in following and
+> > is annoying.
+> > 
+> > 446416.309757] bdi-block not registered
+> > [446416.309773] ------------[ cut here ]------------
+> > [446416.309780] WARNING: CPU: 3 PID: 4319 at fs/fs-writeback.c:2159 __mark_inode_dirty+0x268/0x340
+> > .....
+> > 
+> > This patch solves this by checking bd_openers for each partition
+> > before removal can continue.  Note that this isn't full proof as
+> > device can become busy as soon as it's bd_mutex is unlocked but it
+> > needn't be full proof either.  It does work for general case where
+> > device is mounted and removal can be prevented.
+> > 
+> > Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+[..]
+> > +	while ((part = disk_part_iter_next(&piter))) {
+> 
+> A race condition can occur where disk_part_next tries to pblk (in
+> block/genhd.c), and it in the meantime has been set to NULL. Leading to a
+> kernel crash. Is there a better way to do it?
+> 
+> [root@localhost ~]# nvme lnvm remove -n pblk0
+> [ 5262.338647] BUG: unable to handle kernel NULL pointer dereference at
+> 0000000000000010
+> [ 5262.340769] IP: disk_part_iter_next+0xd3/0xf0
 
-Turns out bio merge via hash table is more efficient than
-simple merge on the last 8 requests in sw queue. On SCSI SRP,
-it is observed ~10% IOPS is increased in sequential IO test
-with this patch.
+Thanks, indeed partition can go away from our feet if we don't lock
+the whole thing from changing and not just individual partition locks.
 
-It is also one step forward to real 'none' scheduler, in which
-way the blk-mq scheduler framework can be more clean.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 49 ++++++++++++-------------------------------------
- block/blk-mq.c       | 28 +++++++++++++++++++++++++---
- 2 files changed, 37 insertions(+), 40 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index afa7d9a258e4..df41cba49866 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -266,50 +266,25 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- }
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
- 
--/*
-- * Reverse check our software queue for entries that we could potentially
-- * merge with. Currently includes a hand-wavy stop count of 8, to not spend
-- * too much time checking for merges.
-- */
--static bool blk_mq_attempt_merge(struct request_queue *q,
-+static bool blk_mq_ctx_try_merge(struct request_queue *q,
- 				 struct blk_mq_ctx *ctx, struct bio *bio)
- {
--	struct request *rq;
--	int checked = 8;
-+	struct request *rq, *free = NULL;
-+	enum elv_merge type;
-+	bool merged;
- 
- 	lockdep_assert_held(&ctx->lock);
- 
--	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
--		bool merged = false;
--
--		if (!checked--)
--			break;
--
--		if (!blk_rq_merge_ok(rq, bio))
--			continue;
-+	type = elv_merge_ctx(q, &rq, bio, ctx);
-+	merged = __blk_mq_try_merge(q, bio, &free, rq, type);
- 
--		switch (blk_try_merge(rq, bio)) {
--		case ELEVATOR_BACK_MERGE:
--			if (blk_mq_sched_allow_merge(q, rq, bio))
--				merged = bio_attempt_back_merge(q, rq, bio);
--			break;
--		case ELEVATOR_FRONT_MERGE:
--			if (blk_mq_sched_allow_merge(q, rq, bio))
--				merged = bio_attempt_front_merge(q, rq, bio);
--			break;
--		case ELEVATOR_DISCARD_MERGE:
--			merged = bio_attempt_discard_merge(q, rq, bio);
--			break;
--		default:
--			continue;
--		}
-+	if (free)
-+		blk_mq_free_request(free);
- 
--		if (merged)
--			ctx->rq_merged++;
--		return merged;
--	}
-+	if (merged)
-+		ctx->rq_merged++;
- 
--	return false;
-+	return merged;
- }
- 
- bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
-@@ -327,7 +302,7 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- 	if (hctx->flags & BLK_MQ_F_SHOULD_MERGE) {
- 		/* default per sw-queue merge */
- 		spin_lock(&ctx->lock);
--		ret = blk_mq_attempt_merge(q, ctx, bio);
-+		ret = blk_mq_ctx_try_merge(q, ctx, bio);
- 		spin_unlock(&ctx->lock);
- 	}
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index fc3d26bbfc1a..d935f15c54da 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -847,6 +847,18 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	blk_queue_exit(q);
- }
- 
-+static void blk_mq_ctx_remove_rq_list(struct blk_mq_ctx *ctx,
-+		struct list_head *head)
-+{
-+	struct request *rq;
-+
-+	lockdep_assert_held(&ctx->lock);
-+
-+	list_for_each_entry(rq, head, queuelist)
-+		rqhash_del(rq);
-+	ctx->last_merge = NULL;
-+}
-+
- struct flush_busy_ctx_data {
- 	struct blk_mq_hw_ctx *hctx;
- 	struct list_head *list;
-@@ -861,6 +873,7 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
- 	sbitmap_clear_bit(sb, bitnr);
- 	spin_lock(&ctx->lock);
- 	list_splice_tail_init(&ctx->rq_list, flush_data->list);
-+	blk_mq_ctx_remove_rq_list(ctx, flush_data->list);
- 	spin_unlock(&ctx->lock);
- 	return true;
- }
-@@ -890,17 +903,23 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *d
- 	struct dispatch_rq_data *dispatch_data = data;
- 	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
- 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
-+	struct request *rq = NULL;
- 
- 	spin_lock(&ctx->lock);
- 	if (unlikely(!list_empty(&ctx->rq_list))) {
--		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
--		list_del_init(&dispatch_data->rq->queuelist);
-+		rq = list_entry_rq(ctx->rq_list.next);
-+		list_del_init(&rq->queuelist);
-+		rqhash_del(rq);
- 		if (list_empty(&ctx->rq_list))
- 			sbitmap_clear_bit(sb, bitnr);
- 	}
-+	if (ctx->last_merge == rq)
-+		ctx->last_merge = NULL;
- 	spin_unlock(&ctx->lock);
- 
--	return !dispatch_data->rq;
-+	dispatch_data->rq = rq;
-+
-+	return !rq;
- }
- 
- struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-@@ -1431,6 +1450,8 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
- 		list_add(&rq->queuelist, &ctx->rq_list);
- 	else
- 		list_add_tail(&rq->queuelist, &ctx->rq_list);
-+
-+	rqhash_add(ctx->hash, rq);
- }
- 
- void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
-@@ -1923,6 +1944,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	spin_lock(&ctx->lock);
- 	if (!list_empty(&ctx->rq_list)) {
- 		list_splice_init(&ctx->rq_list, &tmp);
-+		blk_mq_ctx_remove_rq_list(ctx, &tmp);
- 		blk_mq_hctx_clear_pending(hctx, ctx);
- 	}
- 	spin_unlock(&ctx->lock);
--- 
-2.9.5
+I have given it another go which should avoid taking mutex locks on
+bdev.  Posted V2.
