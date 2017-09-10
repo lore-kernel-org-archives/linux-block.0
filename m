@@ -1,51 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f174.google.com ([209.85.220.174]:34146 "EHLO
-        mail-qk0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751966AbdIAN7T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2017 09:59:19 -0400
-Date: Fri, 1 Sep 2017 06:59:15 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>
-Subject: Re: [PATCH 1/9] percpu-refcount: introduce percpu_ref_is_dead()
-Message-ID: <20170901135915.GD1599492@devbig577.frc2.facebook.com>
-References: <20170831172728.15817-1-ming.lei@redhat.com>
- <20170831172728.15817-2-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] Followup block pull request for 4.14-rc1
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <1f069ba0-19bf-a7b3-3a65-78f7f20ddc65@kernel.dk>
+ <CA+55aFwbmkTkPo5hgnDZ7aSKhUHZeec21wwcxCszZvrTgjaY7g@mail.gmail.com>
+ <CA+55aFxHL=CdZiFTw0R-L2=ESvS6hVUbt5wUA6pEHxCeOB862g@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <27c4a44a-86ae-6a9a-015f-cc96aa0e0b5f@kernel.dk>
+Date: Sat, 9 Sep 2017 22:07:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170831172728.15817-2-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <CA+55aFxHL=CdZiFTw0R-L2=ESvS6hVUbt5wUA6pEHxCeOB862g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hello, Ming.
+On 09/09/2017 02:00 PM, Linus Torvalds wrote:
+> On Sat, Sep 9, 2017 at 12:54 PM, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> Other than that, we match.
+> 
+> Oh, and I almost cried when I saw this nasty thing:
+> 
+>    ilog2(SZ_4K) - 9
+> 
+> in that nvme code, but I left it alone.
+> 
+> Why the hell people think "SZ_4K" is somehow more legible than 4096, I
+> have no idea. And depending on our ilog2() just doing the right thing
+> at build time, instead of just saying "12" with a comment, is just
+> odd.
 
-> +/**
-> + * percpu_ref_is_dead - test whether a percpu refcount is killed
-> + * @ref: percpu_ref to test
-> + *
-> + * Returns %true if @ref is dead
-> + *
-> + * This function is safe to call as long as @ref is between init and exit.
-> + */
-> +static inline bool percpu_ref_is_dead(struct percpu_ref *ref)
-> +{
-> +	unsigned long __percpu *percpu_count;
-> +
-> +	if (__ref_is_percpu(ref, &percpu_count))
-> +		return false;
-> +	return ref->percpu_count_ptr & __PERCPU_REF_DEAD;
-> +}
+Beats me, I hate all of the SZ_ defines. But once they exist, they
+grow users...
 
-Can you please explain why percpu_ref_is_dying() isn't enough for your
-use case?
+> It's not like "ilog2(SZ_4K)" is a particularly good comment.
+> 
+> That code should probably just make it clear that 4096 is the NVME
+> page size, and document it as such, rather than picking a random name
+> for a random constant.
+> 
+> So something like
+> 
+>    #define NVME_PAGE_SIZE 4096
+>    #define NVME_PAGE_SHIFT 12
+> 
+> and then using *those* would actually have documented something,
+> rather than these crazy odd random expressions.
 
-Thanks.
+Totally agree.
 
 -- 
-tejun
+Jens Axboe
