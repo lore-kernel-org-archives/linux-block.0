@@ -1,45 +1,51 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 11 Sep 2017 10:20:56 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>, "neilb@suse.com" <neilb@suse.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"cl@linux.com" <cl@linux.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "neilb@suse.com" <neilb@suse.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "cl@linux.com"
+	<cl@linux.com>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH 1/5] percpu-refcount: Introduce
  percpu_ref_switch_to_atomic_nowait()
-Message-ID: <20170911172056.GG1774378@devbig577.frc2.facebook.com>
+Date: Mon, 11 Sep 2017 16:55:59 +0000
+Message-ID: <1505148959.2802.47.camel@wdc.com>
 References: <20170908235226.26622-1-bart.vanassche@wdc.com>
- <20170908235226.26622-2-bart.vanassche@wdc.com>
- <20170911131331.GE1774378@devbig577.frc2.facebook.com>
- <1505146151.2802.21.camel@wdc.com>
- <20170911163756.GF1774378@devbig577.frc2.facebook.com>
- <1505148959.2802.47.camel@wdc.com>
+	 <20170908235226.26622-2-bart.vanassche@wdc.com>
+	 <20170911131331.GE1774378@devbig577.frc2.facebook.com>
+	 <1505146151.2802.21.camel@wdc.com>
+	 <20170911163756.GF1774378@devbig577.frc2.facebook.com>
+In-Reply-To: <20170911163756.GF1774378@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505148959.2802.47.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hey,
-
-On Mon, Sep 11, 2017 at 04:55:59PM +0000, Bart Van Assche wrote:
-> > Probably but that sounds really hairy.  I'd much prefer if it could be
-> > done through the usual kill / confirm / release and re-init.  That's
-> > not a possibility?
-> 
-> Modifying this patch series such that it uses the confirmation mechanism
-> when switching from per-cpu to atomic mode should be possible. However, the
-> wait_event_lock_irq() call in __percpu_ref_switch_mode() is annoying when
-> calling percpu_ref_kill_and_confirm() from atomic context. How about adding
-> a nowait version of percpu_ref_kill_and_confirm() that returns a boolean
-> indicating whether or not this function succeeded?
-
-Hmm... so if you know that you won't try to switch again while
-switching is in progress, it should be fine.  That can't be
-guaranteed?
-
-Thanks.
-
--- 
-tejun
+T24gTW9uLCAyMDE3LTA5LTExIGF0IDA5OjM3IC0wNzAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
+PiBIZWxsbywNCj4gDQo+IE9uIE1vbiwgU2VwIDExLCAyMDE3IGF0IDA0OjA5OjEyUE0gKzAwMDAs
+IEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBPbiBNb24sIDIwMTctMDktMTEgYXQgMDY6MTMg
+LTA3MDAsIFRlanVuIEhlbyB3cm90ZToNCj4gPiA+IE9uIEZyaSwgU2VwIDA4LCAyMDE3IGF0IDA0
+OjUyOjIyUE0gLTA3MDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiA+ID4gVGhlIGJsay1t
+cSBjb3JlIGtlZXBzIHRyYWNrIG9mIHRoZSBudW1iZXIgb2YgcmVxdWVzdCBxdWV1ZSB1c2Vycw0K
+PiA+ID4gPiB0aHJvdWdoIHEtPnFfdXNhZ2VfY291bnQuIE1ha2UgaXQgcG9zc2libGUgdG8gc3dp
+dGNoIHRoaXMgY291bnRlcg0KPiA+ID4gPiB0byBhdG9taWMgbW9kZSBmcm9tIHRoZSBjb250ZXh0
+IG9mIHRoZSBibG9jayBsYXllciBwb3dlciBtYW5hZ2VtZW50DQo+ID4gPiA+IGNvZGUgYnkgaW50
+cm9kdWNpbmcgcGVyY3B1X3JlZl9zd2l0Y2hfdG9fYXRvbWljX25vd2FpdCgpLg0KPiA+ID4gDQo+
+ID4gPiBEbyB5b3UgZXZlciBoYXZlIHRvIHN3aXRjaCBiYWNrPyAgSWYgc28sIGhvdyBkbyB5b3Ug
+a25vdyB3aGV0aGVyIHRoZQ0KPiA+ID4gcHJldmlvdXMgdHJhbnNpdGlvbiBmaW5pc2hlZD8NCj4g
+PiANCj4gPiBUaGUgd2F5IEkgd291bGQgbGlrZSB0byB1c2UgdGhpcyBmdW5jdGlvbiBpcyB0byBj
+aGVjayBmb3IgY29tcGxldGlvbiBvZiB0aGUNCj4gPiB0cmFuc2l0aW9uIGJ5IGNhbGxpbmcgcGVy
+Y3B1X3JlZl9pc196ZXJvKCkuIFRoYXQgZnVuY3Rpb24gbmFtZWx5IG5vdCBvbmx5DQo+ID4gY2hl
+Y2tzIHRoZSB2YWx1ZSBvZiB0aGUgcmVmY291bnQgYnV0IGFsc28gd2hldGhlciBpdCBpcyBpbiBh
+dG9taWMgbW9kZS4gU2VlDQo+ID4gYWxzbyAiW1BBVENIIDUvNV0gYmxrLW1xOiBJbXBsZW1lbnQg
+cG93ZXIgbWFuYWdlbWVudCBzdXBwb3J0Ig0KPiA+IChodHRwczovL3d3dy5zcGluaWNzLm5ldC9s
+aXN0cy9saW51eC1ibG9jay9tc2cxNzE0My5odG1sKS4gRG8geW91IHRoaW5rIHRoaXMNCj4gPiB3
+aWxsIHdvcms/DQo+IA0KPiBQcm9iYWJseSBidXQgdGhhdCBzb3VuZHMgcmVhbGx5IGhhaXJ5LiAg
+SSdkIG11Y2ggcHJlZmVyIGlmIGl0IGNvdWxkIGJlDQo+IGRvbmUgdGhyb3VnaCB0aGUgdXN1YWwg
+a2lsbCAvIGNvbmZpcm0gLyByZWxlYXNlIGFuZCByZS1pbml0LiAgVGhhdCdzDQo+IG5vdCBhIHBv
+c3NpYmlsaXR5Pw0KDQpIZWxsbyBUZWp1biwNCg0KTW9kaWZ5aW5nIHRoaXMgcGF0Y2ggc2VyaWVz
+IHN1Y2ggdGhhdCBpdCB1c2VzIHRoZSBjb25maXJtYXRpb24gbWVjaGFuaXNtDQp3aGVuIHN3aXRj
+aGluZyBmcm9tIHBlci1jcHUgdG8gYXRvbWljIG1vZGUgc2hvdWxkIGJlIHBvc3NpYmxlLiBIb3dl
+dmVyLCB0aGUNCndhaXRfZXZlbnRfbG9ja19pcnEoKSBjYWxsIGluIF9fcGVyY3B1X3JlZl9zd2l0
+Y2hfbW9kZSgpIGlzIGFubm95aW5nIHdoZW4NCmNhbGxpbmcgcGVyY3B1X3JlZl9raWxsX2FuZF9j
+b25maXJtKCkgZnJvbSBhdG9taWMgY29udGV4dC4gSG93IGFib3V0IGFkZGluZw0KYSBub3dhaXQg
+dmVyc2lvbiBvZiBwZXJjcHVfcmVmX2tpbGxfYW5kX2NvbmZpcm0oKSB0aGF0IHJldHVybnMgYSBi
+b29sZWFuDQppbmRpY2F0aW5nIHdoZXRoZXIgb3Igbm90IHRoaXMgZnVuY3Rpb24gc3VjY2VlZGVk
+Pw0KDQpUaGFua3MsDQoNCkJhcnQu
