@@ -1,83 +1,163 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:44241 "EHLO mx2.mpynet.fi"
+Received: from mx1.redhat.com ([209.132.183.28]:34590 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932110AbdIHMfa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Sep 2017 08:35:30 -0400
-Date: Fri, 8 Sep 2017 15:35:28 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH] lightnvm: prevent target type module removal when in use
-Message-ID: <20170908123527.GA48728@dhcp-216.srv.tuxera.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+        id S1751432AbdIKLMW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Sep 2017 07:12:22 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 06/10] block: pass flags to blk_queue_enter()
+Date: Mon, 11 Sep 2017 19:10:17 +0800
+Message-Id: <20170911111021.25810-7-ming.lei@redhat.com>
+In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
+References: <20170911111021.25810-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If target type module e.g. pblk here is unloaded (rmmod) while module
-is in use (after creating target) system crashes.  We fix this by
-using module API refcnt.
+We need to pass PREEMPT flags to blk_queue_enter()
+for allocating request with RQF_PREEMPT in the
+following patch.
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/core.c      | 4 ++++
- drivers/lightnvm/pblk-init.c | 1 +
- include/linux/lightnvm.h     | 1 +
- 3 files changed, 6 insertions(+)
+ block/blk-core.c       | 10 ++++++----
+ block/blk-mq.c         |  5 +++--
+ block/blk-timeout.c    |  2 +-
+ fs/block_dev.c         |  4 ++--
+ include/linux/blkdev.h |  7 ++++++-
+ 5 files changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index bbea2c8..c39f87d 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -22,6 +22,7 @@
- #include <linux/types.h>
- #include <linux/sem.h>
- #include <linux/bitmap.h>
-+#include <linux/module.h>
- #include <linux/moduleparam.h>
- #include <linux/miscdevice.h>
- #include <linux/lightnvm.h>
-@@ -316,6 +317,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	list_add_tail(&t->list, &dev->targets);
- 	mutex_unlock(&dev->mlock);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index eec5881a9e74..04327a60061e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -779,7 +779,7 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+ }
+ EXPORT_SYMBOL(blk_alloc_queue);
  
-+	__module_get(tt->owner);
+-int blk_queue_enter(struct request_queue *q, bool nowait)
++int blk_queue_enter(struct request_queue *q, unsigned flags)
+ {
+ 	while (true) {
+ 		int ret;
+@@ -787,7 +787,7 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		if (percpu_ref_tryget_live(&q->q_usage_counter))
+ 			return 0;
+ 
+-		if (nowait)
++		if (flags & BLK_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+ 		/*
+@@ -1418,7 +1418,8 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ?
++			BLK_REQ_NOWAIT : 0);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -2225,7 +2226,8 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	do {
+ 		struct request_queue *q = bio->bi_disk->queue;
+ 
+-		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
++		if (likely(blk_queue_enter(q, (bio->bi_opf & REQ_NOWAIT) ?
++						BLK_REQ_NOWAIT : 0) == 0)) {
+ 			struct bio_list lower, same;
+ 
+ 			/* Create a fresh bio_list for all subordinate requests */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 205ae2d3da14..358b2ca33010 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -377,7 +377,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
+ 
+-	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
++	ret = blk_queue_enter(q, (flags & BLK_MQ_REQ_NOWAIT) ?
++			BLK_REQ_NOWAIT : 0);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+@@ -416,7 +417,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	if (hctx_idx >= q->nr_hw_queues)
+ 		return ERR_PTR(-EIO);
+ 
+-	ret = blk_queue_enter(q, true);
++	ret = blk_queue_enter(q, BLK_REQ_NOWAIT);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 17ec83bb0900..e803106a5e5b 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -134,7 +134,7 @@ void blk_timeout_work(struct work_struct *work)
+ 	struct request *rq, *tmp;
+ 	int next_set = 0;
+ 
+-	if (blk_queue_enter(q, true))
++	if (blk_queue_enter(q, BLK_REQ_NOWAIT))
+ 		return;
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index bb715b2fcfb8..44e6502e377e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -674,7 +674,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return result;
+ 
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
+@@ -710,7 +710,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ 
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return -EOPNOTSUPP;
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index b8053bcc6b5f..54450715915b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -857,6 +857,11 @@ enum {
+ 	BLKPREP_INVALID,	/* invalid command, kill, return -EREMOTEIO */
+ };
+ 
++/* passed to blk_queue_enter */
++enum {
++	BLK_REQ_NOWAIT = (1 << 0),
++};
 +
- 	return 0;
- err_sysfs:
- 	if (tt->exit)
-@@ -351,6 +354,7 @@ static void __nvm_remove_target(struct nvm_target *t)
+ extern unsigned long blk_max_low_pfn, blk_max_pfn;
  
- 	nvm_remove_tgt_dev(t->dev, 1);
- 	put_disk(tdisk);
-+	module_put(t->type->owner);
+ /*
+@@ -962,7 +967,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
  
- 	list_del(&t->list);
- 	kfree(t);
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 5fe926b..77d6120 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1059,6 +1059,7 @@ static struct nvm_tgt_type tt_pblk = {
- 
- 	.sysfs_init	= pblk_sysfs_init,
- 	.sysfs_exit	= pblk_sysfs_exit,
-+	.owner		= THIS_MODULE,
- };
- 
- static int __init pblk_module_init(void)
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 81b71c6d..78a22e0 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -461,6 +461,7 @@ struct nvm_tgt_type {
- 
- 	/* For internal use */
- 	struct list_head list;
-+	struct module *owner;
- };
- 
- extern struct nvm_tgt_type *nvm_find_target_type(const char *, int);
+-extern int blk_queue_enter(struct request_queue *q, bool nowait);
++extern int blk_queue_enter(struct request_queue *q, unsigned flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_start_queue(struct request_queue *q);
+ extern void blk_start_queue_async(struct request_queue *q);
 -- 
-2.7.4
+2.9.5
