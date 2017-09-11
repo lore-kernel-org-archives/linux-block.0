@@ -1,296 +1,162 @@
-Return-Path: <BATV+6636317d514c48d079a8+5127+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Benjamin Block <bblock@linux.vnet.ibm.com>,
-	"#4 . 11+" <stable@vger.kernel.org>
-Subject: [PATCH 1/2] bsg-lib: fix kernel panic resulting from missing allocation of reply-buffer
-Date: Wed,  6 Sep 2017 15:44:15 +0200
-Message-Id: <20170906134416.19980-2-hch@lst.de>
-In-Reply-To: <20170906134416.19980-1-hch@lst.de>
-References: <20170906134416.19980-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:57296 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751013AbdIKLMI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Sep 2017 07:12:08 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 05/10] block: rename .mq_freeze_wq and .mq_freeze_depth
+Date: Mon, 11 Sep 2017 19:10:16 +0800
+Message-Id: <20170911111021.25810-6-ming.lei@redhat.com>
+In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
+References: <20170911111021.25810-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Benjamin Block <bblock@linux.vnet.ibm.com>
+Both two are used for legacy and blk-mq, so rename them
+as .freeze_wq and .freeze_depth for avoiding to confuse
+people.
 
-Since we split the scsi_request out of struct request bsg fails to
-provide a reply-buffer for the drivers. This was done via the pointer
-for sense-data, that is not preallocated anymore.
+No functional change.
 
-Failing to allocate/assign it results in illegal dereferences because
-LLDs use this pointer unquestioned.
-
-An example panic on s390x, using the zFCP driver, looks like this (I had
-debugging on, otherwise NULL-pointer dereferences wouldn't even panic on
-s390x):
-
-Unable to handle kernel pointer dereference in virtual kernel address space
-Failing address: 6b6b6b6b6b6b6000 TEID: 6b6b6b6b6b6b6403
-Fault in home space mode while using kernel ASCE.
-AS:0000000001590007 R3:0000000000000024
-Oops: 0038 ilc:2 [#1] PREEMPT SMP DEBUG_PAGEALLOC
-Modules linked in: <Long List>
-CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.12.0-bsg-regression+ #3
-Hardware name: IBM 2964 N96 702 (z/VM 6.4.0)
-task: 0000000065cb0100 task.stack: 0000000065cb4000
-Krnl PSW : 0704e00180000000 000003ff801e4156 (zfcp_fc_ct_els_job_handler+0x16/0x58 [zfcp])
-           R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
-Krnl GPRS: 0000000000000001 000000005fa9d0d0 000000005fa9d078 0000000000e16866
-           000003ff00000290 6b6b6b6b6b6b6b6b 0000000059f78f00 000000000000000f
-           00000000593a0958 00000000593a0958 0000000060d88800 000000005ddd4c38
-           0000000058b50100 07000000659cba08 000003ff801e8556 00000000659cb9a8
-Krnl Code: 000003ff801e4146: e31020500004        lg      %r1,80(%r2)
-           000003ff801e414c: 58402040           l       %r4,64(%r2)
-          #000003ff801e4150: e35020200004       lg      %r5,32(%r2)
-          >000003ff801e4156: 50405004           st      %r4,4(%r5)
-           000003ff801e415a: e54c50080000       mvhi    8(%r5),0
-           000003ff801e4160: e33010280012       lt      %r3,40(%r1)
-           000003ff801e4166: a718fffb           lhi     %r1,-5
-           000003ff801e416a: 1803               lr      %r0,%r3
-Call Trace:
-([<000003ff801e8556>] zfcp_fsf_req_complete+0x726/0x768 [zfcp])
- [<000003ff801ea82a>] zfcp_fsf_reqid_check+0x102/0x180 [zfcp]
- [<000003ff801eb980>] zfcp_qdio_int_resp+0x230/0x278 [zfcp]
- [<00000000009b91b6>] qdio_kick_handler+0x2ae/0x2c8
- [<00000000009b9e3e>] __tiqdio_inbound_processing+0x406/0xc10
- [<00000000001684c2>] tasklet_action+0x15a/0x1d8
- [<0000000000bd28ec>] __do_softirq+0x3ec/0x848
- [<00000000001675a4>] irq_exit+0x74/0xf8
- [<000000000010dd6a>] do_IRQ+0xba/0xf0
- [<0000000000bd19e8>] io_int_handler+0x104/0x2d4
- [<00000000001033b6>] enabled_wait+0xb6/0x188
-([<000000000010339e>] enabled_wait+0x9e/0x188)
- [<000000000010396a>] arch_cpu_idle+0x32/0x50
- [<0000000000bd0112>] default_idle_call+0x52/0x68
- [<00000000001cd0fa>] do_idle+0x102/0x188
- [<00000000001cd41e>] cpu_startup_entry+0x3e/0x48
- [<0000000000118c64>] smp_start_secondary+0x11c/0x130
- [<0000000000bd2016>] restart_int_handler+0x62/0x78
- [<0000000000000000>]           (null)
-INFO: lockdep is turned off.
-Last Breaking-Event-Address:
- [<000003ff801e41d6>] zfcp_fc_ct_job_handler+0x3e/0x48 [zfcp]
-
-Kernel panic - not syncing: Fatal exception in interrupt
-
-This patch moves bsg-lib to allocate and setup struct bsg_job ahead of
-time, including the allocation of a buffer for the reply-data.
-
-This means, struct bsg_job is not allocated separately anymore, but as part
-of struct request allocation - similar to struct scsi_cmd. Reflect this in
-the function names that used to handle creation/destruction of struct
-bsg_job.
-
-Reported-by: Steffen Maier <maier@linux.vnet.ibm.com>
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Benjamin Block <bblock@linux.vnet.ibm.com>
-Fixes: 82ed4db499b8 ("block: split scsi_request out of struct request")
-Cc: <stable@vger.kernel.org> #4.11+
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bsg-lib.c         | 74 +++++++++++++++++++++++++++++--------------------
- include/linux/blkdev.h  |  1 -
- include/linux/bsg-lib.h |  2 ++
- 3 files changed, 46 insertions(+), 31 deletions(-)
+ block/blk-core.c       | 12 ++++++------
+ block/blk-mq.c         | 12 ++++++------
+ include/linux/blkdev.h |  4 ++--
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 4752dbc3dc49..c82408c7cc3c 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -29,26 +29,25 @@
- #include <scsi/scsi_cmnd.h>
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2347107eeca4..eec5881a9e74 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -630,7 +630,7 @@ void blk_set_queue_dying(struct request_queue *q)
+ 	 * We need to ensure that processes currently waiting on
+ 	 * the queue are notified as well.
+ 	 */
+-	wake_up_all(&q->mq_freeze_wq);
++	wake_up_all(&q->freeze_wq);
+ }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
  
- /**
-- * bsg_destroy_job - routine to teardown/delete a bsg job
-+ * bsg_teardown_job - routine to teardown a bsg job
-  * @job: bsg_job that is to be torn down
-  */
--static void bsg_destroy_job(struct kref *kref)
-+static void bsg_teardown_job(struct kref *kref)
- {
- 	struct bsg_job *job = container_of(kref, struct bsg_job, kref);
- 	struct request *rq = job->req;
+@@ -793,14 +793,14 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		/*
+ 		 * read pair of barrier in blk_freeze_queue_start(),
+ 		 * we need to order reading __PERCPU_REF_DEAD flag of
+-		 * .q_usage_counter and reading .mq_freeze_depth or
++		 * .q_usage_counter and reading .freeze_depth or
+ 		 * queue dying flag, otherwise the following wait may
+ 		 * never return if the two reads are reordered.
+ 		 */
+ 		smp_rmb();
  
--	blk_end_request_all(rq, BLK_STS_OK);
--
- 	put_device(job->dev);	/* release reference for the request */
+-		ret = wait_event_interruptible(q->mq_freeze_wq,
+-				!atomic_read(&q->mq_freeze_depth) ||
++		ret = wait_event_interruptible(q->freeze_wq,
++				!atomic_read(&q->freeze_depth) ||
+ 				blk_queue_dying(q));
+ 		if (blk_queue_dying(q))
+ 			return -ENODEV;
+@@ -819,7 +819,7 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
+ 	struct request_queue *q =
+ 		container_of(ref, struct request_queue, q_usage_counter);
  
- 	kfree(job->request_payload.sg_list);
- 	kfree(job->reply_payload.sg_list);
--	kfree(job);
-+
-+	blk_end_request_all(rq, BLK_STS_OK);
+-	wake_up_all(&q->mq_freeze_wq);
++	wake_up_all(&q->freeze_wq);
  }
  
- void bsg_job_put(struct bsg_job *job)
+ static void blk_rq_timed_out_timer(unsigned long data)
+@@ -891,7 +891,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ 	q->bypass_depth = 1;
+ 	__set_bit(QUEUE_FLAG_BYPASS, &q->queue_flags);
+ 
+-	init_waitqueue_head(&q->mq_freeze_wq);
++	init_waitqueue_head(&q->freeze_wq);
+ 
+ 	/*
+ 	 * Init percpu_ref in atomic mode so that it's faster to shutdown.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 345943fea998..205ae2d3da14 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -122,7 +122,7 @@ void blk_freeze_queue_start(struct request_queue *q)
  {
--	kref_put(&job->kref, bsg_destroy_job);
-+	kref_put(&job->kref, bsg_teardown_job);
- }
- EXPORT_SYMBOL_GPL(bsg_job_put);
+ 	int freeze_depth;
  
-@@ -100,7 +99,7 @@ EXPORT_SYMBOL_GPL(bsg_job_done);
-  */
- static void bsg_softirq_done(struct request *rq)
+-	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
++	freeze_depth = atomic_inc_return(&q->freeze_depth);
+ 	if (freeze_depth == 1) {
+ 		percpu_ref_kill(&q->q_usage_counter);
+ 		if (q->mq_ops)
+@@ -135,14 +135,14 @@ void blk_freeze_queue_wait(struct request_queue *q)
  {
--	struct bsg_job *job = rq->special;
-+	struct bsg_job *job = blk_mq_rq_to_pdu(rq);
- 
- 	bsg_job_put(job);
+ 	if (!q->mq_ops)
+ 		blk_drain_queue(q);
+-	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
++	wait_event(q->freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
  }
-@@ -122,33 +121,20 @@ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
- }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_wait);
  
- /**
-- * bsg_create_job - create the bsg_job structure for the bsg request
-+ * bsg_prepare_job - create the bsg_job structure for the bsg request
-  * @dev: device that is being sent the bsg request
-  * @req: BSG request that needs a job structure
-  */
--static int bsg_create_job(struct device *dev, struct request *req)
-+static int bsg_prepare_job(struct device *dev, struct request *req)
+ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+ 				     unsigned long timeout)
  {
- 	struct request *rsp = req->next_rq;
--	struct request_queue *q = req->q;
- 	struct scsi_request *rq = scsi_req(req);
--	struct bsg_job *job;
-+	struct bsg_job *job = blk_mq_rq_to_pdu(req);
- 	int ret;
- 
--	BUG_ON(req->special);
--
--	job = kzalloc(sizeof(struct bsg_job) + q->bsg_job_size, GFP_KERNEL);
--	if (!job)
--		return -ENOMEM;
--
--	req->special = job;
--	job->req = req;
--	if (q->bsg_job_size)
--		job->dd_data = (void *)&job[1];
- 	job->request = rq->cmd;
- 	job->request_len = rq->cmd_len;
--	job->reply = rq->sense;
--	job->reply_len = SCSI_SENSE_BUFFERSIZE;	/* Size of sense buffer
--						 * allocated */
-+
- 	if (req->bio) {
- 		ret = bsg_map_buffer(&job->request_payload, req);
- 		if (ret)
-@@ -187,7 +173,6 @@ static void bsg_request_fn(struct request_queue *q)
- {
- 	struct device *dev = q->queuedata;
- 	struct request *req;
--	struct bsg_job *job;
- 	int ret;
- 
- 	if (!get_device(dev))
-@@ -199,7 +184,7 @@ static void bsg_request_fn(struct request_queue *q)
- 			break;
- 		spin_unlock_irq(q->queue_lock);
- 
--		ret = bsg_create_job(dev, req);
-+		ret = bsg_prepare_job(dev, req);
- 		if (ret) {
- 			scsi_req(req)->result = ret;
- 			blk_end_request_all(req, BLK_STS_OK);
-@@ -207,8 +192,7 @@ static void bsg_request_fn(struct request_queue *q)
- 			continue;
- 		}
- 
--		job = req->special;
--		ret = q->bsg_job_fn(job);
-+		ret = q->bsg_job_fn(blk_mq_rq_to_pdu(req));
- 		spin_lock_irq(q->queue_lock);
- 		if (ret)
- 			break;
-@@ -219,6 +203,35 @@ static void bsg_request_fn(struct request_queue *q)
- 	spin_lock_irq(q->queue_lock);
+-	return wait_event_timeout(q->mq_freeze_wq,
++	return wait_event_timeout(q->freeze_wq,
+ 					percpu_ref_is_zero(&q->q_usage_counter),
+ 					timeout);
  }
+@@ -170,11 +170,11 @@ void blk_unfreeze_queue(struct request_queue *q)
+ {
+ 	int freeze_depth;
  
-+static int bsg_init_rq(struct request_queue *q, struct request *req, gfp_t gfp)
-+{
-+	struct bsg_job *job = blk_mq_rq_to_pdu(req);
-+	struct scsi_request *sreq = &job->sreq;
-+
-+	memset(job, 0, sizeof(*job));
-+
-+	scsi_req_init(sreq);
-+	sreq->sense_len = SCSI_SENSE_BUFFERSIZE;
-+	sreq->sense = kzalloc(sreq->sense_len, gfp);
-+	if (!sreq->sense)
-+		return -ENOMEM;
-+
-+	job->req = req;
-+	job->reply = sreq->sense;
-+	job->reply_len = sreq->sense_len;
-+	job->dd_data = job + 1;
-+
-+	return 0;
-+}
-+
-+static void bsg_exit_rq(struct request_queue *q, struct request *req)
-+{
-+	struct bsg_job *job = blk_mq_rq_to_pdu(req);
-+	struct scsi_request *sreq = &job->sreq;
-+
-+	kfree(sreq->sense);
-+}
-+
- /**
-  * bsg_setup_queue - Create and add the bsg hooks so we can receive requests
-  * @dev: device to attach bsg device to
-@@ -236,7 +249,9 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
- 	q = blk_alloc_queue(GFP_KERNEL);
- 	if (!q)
- 		return ERR_PTR(-ENOMEM);
--	q->cmd_size = sizeof(struct scsi_request);
-+	q->cmd_size = sizeof(struct bsg_job) + dd_job_size;
-+	q->init_rq_fn = bsg_init_rq;
-+	q->exit_rq_fn = bsg_exit_rq;
- 	q->request_fn = bsg_request_fn;
+-	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
++	freeze_depth = atomic_dec_return(&q->freeze_depth);
+ 	WARN_ON_ONCE(freeze_depth < 0);
+ 	if (!freeze_depth) {
+ 		percpu_ref_reinit(&q->q_usage_counter);
+-		wake_up_all(&q->mq_freeze_wq);
++		wake_up_all(&q->freeze_wq);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(blk_unfreeze_queue);
+@@ -2424,7 +2424,7 @@ void blk_mq_free_queue(struct request_queue *q)
+ /* Basically redo blk_mq_init_queue with queue frozen */
+ static void blk_mq_queue_reinit(struct request_queue *q)
+ {
+-	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
++	WARN_ON_ONCE(!atomic_read(&q->freeze_depth));
  
- 	ret = blk_init_allocated_queue(q);
-@@ -244,7 +259,6 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
- 		goto out_cleanup_queue;
- 
- 	q->queuedata = dev;
--	q->bsg_job_size = dd_job_size;
- 	q->bsg_job_fn = job_fn;
- 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
- 	queue_flag_set_unlocked(QUEUE_FLAG_SCSI_PASSTHROUGH, q);
+ 	blk_mq_debugfs_unregister_hctxs(q);
+ 	blk_mq_sysfs_unregister(q);
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 25f6a0cb27d3..2a5d52fa90f5 100644
+index 460294bb0fa5..b8053bcc6b5f 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -568,7 +568,6 @@ struct request_queue {
+@@ -564,7 +564,7 @@ struct request_queue {
+ 	struct mutex		sysfs_lock;
+ 
+ 	int			bypass_depth;
+-	atomic_t		mq_freeze_depth;
++	atomic_t		freeze_depth;
  
  #if defined(CONFIG_BLK_DEV_BSG)
  	bsg_job_fn		*bsg_job_fn;
--	int			bsg_job_size;
- 	struct bsg_class_device bsg_dev;
+@@ -576,7 +576,7 @@ struct request_queue {
+ 	struct throtl_data *td;
  #endif
- 
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index 1062f08e1a55..b1be0233ce35 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -24,6 +24,7 @@
- #define _BLK_BSG_
- 
- #include <linux/blkdev.h>
-+#include <scsi/scsi_request.h>
- 
- struct request;
- struct device;
-@@ -37,6 +38,7 @@ struct bsg_buffer {
- };
- 
- struct bsg_job {
-+	struct scsi_request sreq;
- 	struct device *dev;
- 	struct request *req;
+ 	struct rcu_head		rcu_head;
+-	wait_queue_head_t	mq_freeze_wq;
++	wait_queue_head_t	freeze_wq;
+ 	struct percpu_ref	q_usage_counter;
+ 	struct list_head	all_q_node;
  
 -- 
-2.11.0
+2.9.5
