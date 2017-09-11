@@ -1,69 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:23752 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750820AbdIOHKl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 03:10:41 -0400
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jianchao Wang <jianchao.w.wang@oracle.com>
-Subject: [PATCH] block: move sanity checking ahead of bi_front/back_seg_size updating
-Date: Sat, 16 Sep 2017 07:10:30 +0800
-Message-Id: <1505517030-29287-1-git-send-email-jianchao.w.wang@oracle.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "neilb@suse.com" <neilb@suse.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "cl@linux.com"
+	<cl@linux.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 1/5] percpu-refcount: Introduce
+ percpu_ref_switch_to_atomic_nowait()
+Date: Mon, 11 Sep 2017 17:29:23 +0000
+Message-ID: <1505150962.2802.54.camel@wdc.com>
+References: <20170908235226.26622-1-bart.vanassche@wdc.com>
+	 <20170908235226.26622-2-bart.vanassche@wdc.com>
+	 <20170911131331.GE1774378@devbig577.frc2.facebook.com>
+	 <1505146151.2802.21.camel@wdc.com>
+	 <20170911163756.GF1774378@devbig577.frc2.facebook.com>
+	 <1505148959.2802.47.camel@wdc.com>
+	 <20170911172056.GG1774378@devbig577.frc2.facebook.com>
+In-Reply-To: <20170911172056.GG1774378@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-If the bio_integrity_merge_rq() return false or nr_phys_segments exceeds
-the max_segments, the merging fails, but the bi_front/back_seg_size may
-have been modified. To avoid it, move the sanity checking ahead.
-
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-merge.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 99038830..14b6e37 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -553,6 +553,7 @@ static bool req_no_special_merge(struct request *req)
- static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 				struct request *next)
- {
-+	bool contig;
- 	int total_phys_segments;
- 	unsigned int seg_size =
- 		req->biotail->bi_seg_back_size + next->bio->bi_seg_front_size;
-@@ -575,13 +576,9 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 		return 0;
- 
- 	total_phys_segments = req->nr_phys_segments + next->nr_phys_segments;
--	if (blk_phys_contig_segment(q, req->biotail, next->bio)) {
--		if (req->nr_phys_segments == 1)
--			req->bio->bi_seg_front_size = seg_size;
--		if (next->nr_phys_segments == 1)
--			next->biotail->bi_seg_back_size = seg_size;
-+	contig = blk_phys_contig_segment(q, req->biotail, next->bio);
-+	if (contig)
- 		total_phys_segments--;
--	}
- 
- 	if (total_phys_segments > queue_max_segments(q))
- 		return 0;
-@@ -589,6 +586,13 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 	if (blk_integrity_merge_rq(q, req, next) == false)
- 		return 0;
- 
-+	if (contig) {
-+		if (req->nr_phys_segments == 1)
-+			req->bio->bi_seg_front_size = seg_size;
-+		if (next->nr_phys_segments == 1)
-+			next->biotail->bi_seg_back_size = seg_size;
-+	}
-+
- 	/* Merge is OK... */
- 	req->nr_phys_segments = total_phys_segments;
- 	return 1;
--- 
-2.7.4
+T24gTW9uLCAyMDE3LTA5LTExIGF0IDEwOjIwIC0wNzAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IEht
+bS4uLiBzbyBpZiB5b3Uga25vdyB0aGF0IHlvdSB3b24ndCB0cnkgdG8gc3dpdGNoIGFnYWluIHdo
+aWxlDQo+IHN3aXRjaGluZyBpcyBpbiBwcm9ncmVzcywgaXQgc2hvdWxkIGJlIGZpbmUuICBUaGF0
+IGNhbid0IGJlDQo+IGd1YXJhbnRlZWQ/DQoNCkhlbGxvIFRlanVuLA0KDQpBZnRlciBoYXZpbmcg
+aGFkIGFub3RoZXIgbG9vayBhdCB0aGUgcG93ZXIgbWFuYWdlbWVudCBkb2N1bWVudGF0aW9uIEkg
+c2VlDQpub3cgdGhhdCBwb3dlciBtYW5hZ2VtZW50IGNhbGxiYWNrcyBhcmUgb25seSBjYWxsZWQg
+ZnJvbSBhdG9taWMgY29udGV4dCBpZg0KcG1fcnVudGltZV9pcnFfc2FmZShkZXYpIGlzIGNhbGxl
+ZCBmaXJzdC4gTmVpdGhlciB0aGUgYmxvY2sgbGF5ZXIgY29yZSBub3INCnRoZSBTQ1NJIGNvcmUg
+Y2FsbCB0aGlzIGZ1bmN0aW9uIHNvIEkgd2lsbCB0cnkgdG8gcmV3b3JrIHRoaXMgcGF0Y2ggc2Vy
+aWVzDQp3aXRob3V0IG1vZGlmeWluZyB0aGUgcGVyY3B1LXJlZmNvdW50IGltcGxlbWVudGF0aW9u
+Lg0KDQpUaGFua3MsDQoNCkJhcnQu
