@@ -1,72 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44414 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752660AbdIBPTy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Sep 2017 11:19:54 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 13/14] blk-mq-sched: refactor blk_mq_sched_try_merge()
-Date: Sat,  2 Sep 2017 23:17:28 +0800
-Message-Id: <20170902151729.6162-14-ming.lei@redhat.com>
-In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
-References: <20170902151729.6162-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme fixes for 4.14
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20170911154601.GA32239@infradead.org>
+ <d2176987-a16f-7a83-d891-9d67b141f599@kernel.dk>
+ <20170911161646.GA17516@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <4eeb0e53-e70c-6573-0c79-f925ad30b9d8@kernel.dk>
+Date: Mon, 11 Sep 2017 10:18:30 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170911161646.GA17516@infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces one function __blk_mq_try_merge()
-which will be resued for bio merge to sw queue in
-the following patch.
+On 09/11/2017 10:16 AM, Christoph Hellwig wrote:
+> I've done the trivial rebase and will send you the new PR after it has
+> survived local testing and the build bot.
 
-No functional change.
+Thanks - I pushed out a new for-linus base, so we should be good now.
 
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 1ff6f9bedd1a..afa7d9a258e4 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -228,12 +228,11 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	}
- }
- 
--bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
--			    struct request **merged_request)
-+static bool __blk_mq_try_merge(struct request_queue *q,
-+		struct bio *bio, struct request **merged_request,
-+		struct request *rq, enum elv_merge type)
- {
--	struct request *rq;
--
--	switch (elv_merge(q, &rq, bio)) {
-+	switch (type) {
- 	case ELEVATOR_BACK_MERGE:
- 		if (!blk_mq_sched_allow_merge(q, rq, bio))
- 			return false;
-@@ -256,6 +255,15 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- 		return false;
- 	}
- }
-+
-+bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-+		struct request **merged_request)
-+{
-+	struct request *rq;
-+	enum elv_merge type = elv_merge(q, &rq, bio);
-+
-+	return __blk_mq_try_merge(q, bio, merged_request, rq, type);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
- 
- /*
 -- 
-2.9.5
+Jens Axboe
