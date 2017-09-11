@@ -1,49 +1,30 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 12 Sep 2017 10:17:14 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [PATCH 0/5] Make SCSI device suspend work reliably
-Message-ID: <20170912021707.GA31533@ming.t460p>
-References: <20170908235226.26622-1-bart.vanassche@wdc.com>
- <20170909103859.GA29285@ming.t460p>
- <1505147128.2802.36.camel@wdc.com>
+Date: Mon, 11 Sep 2017 17:31:35 +0000
+Message-ID: <1505151094.2802.56.camel@wdc.com>
+References: <11578315.3oQBsOxjPs@natalenko.name>
+In-Reply-To: <11578315.3oQBsOxjPs@natalenko.name>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505147128.2802.36.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 11, 2017 at 04:25:30PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-09-09 at 18:39 +0800, Ming Lei wrote:
-> > - the issue is not suspend/resume only, it is about SCSI quiesce vs.
-> > RQF_PREEMPT.
-> 
-> The only in-kernel user of the SCSI quiesce/resume functionality next to
-> runtime power management I know of is the SPI transport, namely
-> spi_dv_device(). Nobody has ever reported a hang in spi_dv_device() as far
-> as I know. Since the number of users of the SCSI parallel transport is very
-> small I propose to wait with fixing spi_dv_device() until someone shows that
-> it is possible to trigger that hang. If we have to address a hang in
-> spi_dv_device() I propose to address it in the same way as my patch series
-> addresses power management requests, namely by letting previously submitted
-> requests complete and by making blk_get_request() callers wait until the
-> quiesced SCSI device has been resumed.
-
-As I mentioned in V4 cover letter, Cathy saw this I/O hang issue, and
-she has verified that my revised patchset V3 can fix the issue.
-
-> 
-> > I don't see the issue above addressed by this patchset, so maybe
-> > you are trying to fix another PM specific issue(not reported by
-> > Oleksandr), I am just confused.
-> 
-> That's correct - I'm only trying to address the PM issues. I will mention
-> that explicitly when I repost this patch series.
-
-Unfortunately it isn't enough, and the approach you took is wrong too,
-I will comment it in your patch 4.
-
--- 
-Ming
+T24gU2F0LCAyMDE3LTA5LTA5IGF0IDE2OjM1ICswMjAwLCBPbGVrc2FuZHIgTmF0YWxlbmtvIHdy
+b3RlOg0KPiBTaW5jZSBJIHdhcyBvbmUgb2YgdGhlIHJlcG9ydGVycywgcGxlYXNlIGNvbnNpZGVy
+IGFkZGluZyBtZSB0byBDQyBuZXh0IHRpbWUgYXMgDQo+IEknbSBpbnRlcmVzdGVkIGluIHJlc29s
+dmluZyB0aGlzIGlzc3VlIHByb3Blcmx5IGFuZCB0ZXN0IGVhY2ggcmVsYXRlZCANCj4gcGF0Y2hz
+ZXQuDQoNCkhlbGxvIE9sZWtzYW5kciwNCg0KSSB3aWxsIENDIHlvdSB3aGVuIEkgcmVwb3N0IHRo
+aXMgcGF0Y2ggc2VyaWVzLg0KDQo+IFVuZm9ydHVuYXRlbHksIHlvdXIgcGF0Y2hzZXQgZG9lcyBu
+b3Qgc29sdmUgdGhlIGlzc3VlLiBJL08gaGFuZyBpcyBlYXNpbHkgDQo+IHJlcHJvZHVjaWJsZSB3
+aXRoIFNBVEEgZHJpdmVzLCBSQUlEMTAgYW5kIFFFTVUgZXhhY3RseSBhcyBiZWZvcmUuIFNlZSB0
+aGUgDQo+IHN0YWNrdHJhY2UgYmVsb3csIGl0IGlzIGNhdWdodCBvbiBleGVjdXRpbmcgc3luYyBh
+ZnRlciByZXN1bWluZy4gSGFuZyBhbHNvIG1heSANCj4gaGFwcGVuIG9uIHN1c3BlbmRpbmcgKHNl
+ZSBzZWNvbmQgc3RhY2t0cmFjZSBiZWxvdyBhcyB3ZWxsKS4NCg0KVGhlIHRlc3RzIEkgaGFkIHJ1
+biBzbyBmYXIgd2VyZSB1c2luZyBJREUgYW5kIFNDU0kgZGlza3MgYW5kIHBhc3NlZC4gVGhpcw0K
+bW9ybmluZyBJIHJhbiBhIHRlc3QgZm9yIHRoZSBmaXJzdCB0aW1lIHdpdGggU0FUQSBkaXNrcyBh
+bmQgSSBhbHNvIHJhbiBpbnRvDQphIGhhbmcgZHVyaW5nIHJlc3VtZS4gSSB3aWxsIGFuYWx5emUg
+dGhpcyBmdXJ0aGVyLg0KDQpCYXJ0Lg==
