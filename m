@@ -1,154 +1,133 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:46732 "EHLO
-        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751876AbdINKeR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2017 06:34:17 -0400
-Received: by mail-wm0-f47.google.com with SMTP id i189so10116459wmf.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 03:34:16 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 1/5] lightnvm: pblk: fix min size for page mempool
-Date: Thu, 14 Sep 2017 12:33:43 +0200
-Message-Id: <1505385227-28706-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
-References: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: fix an integer overflow in __blkdev_sectors_to_bio_pages
+To: Mike Snitzer <snitzer@redhat.com>, axboe@kernel.dk,
+ Mikulas Patocka <mpatocka@redhat.com>
+Cc: Damien Le Moal <Damien.LeMoal@wdc.com>, "hch@lst.de" <hch@lst.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "dm-devel@redhat.com" <dm-devel@redhat.com>,
+ "tom.ty89@gmail.com" <tom.ty89@gmail.com>,
+ "gmazyland@gmail.com" <gmazyland@gmail.com>
+References: <CAGnHSEngW1Ugf66V5henR9fMEev0xcJnKVY9MjJb19gy3CkgNA@mail.gmail.com>
+ <20170809133833.GA25681@lst.de>
+ <alpine.LRH.2.02.1708132245190.18210@file01.intranet.prod.int.rdu2.redhat.com>
+ <1502683489.903.1.camel@wdc.com>
+ <alpine.LRH.2.02.1708141926170.24994@file01.intranet.prod.int.rdu2.redhat.com>
+ <20170911145833.GB15556@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a64af29c-e247-6381-fcd9-23720a3a86fa@kernel.dk>
+Date: Mon, 11 Sep 2017 09:47:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170911145833.GB15556@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-pblk uses an internal page mempool for allocating pages on internal
-bios. The main two users of this memory pool are partial reads (reads
-with some sectors in cache and some on media) and padded writes, which
-need to add dummy pages to an existing bio already containing valid
-data (and with a large enough bioset allocated). In both cases, the
-maximum number of pages per bio is defined by the maximum number of
-physical sectors supported by the underlying device.
+On 09/11/2017 08:58 AM, Mike Snitzer wrote:
+> On Mon, Aug 14 2017 at  8:01pm -0400,
+> Mikulas Patocka <mpatocka@redhat.com> wrote:
+> 
+>>
+>>
+>> On Mon, 14 Aug 2017, Damien Le Moal wrote:
+>>
+>>> On Sun, 2017-08-13 at 22:47 -0400, Mikulas Patocka wrote:
+>>>>
+>>>> On Wed, 9 Aug 2017, hch@lst.de wrote:
+>>>>
+>>>>> Does commit 615d22a51c04856efe62af6e1d5b450aaf5cc2c0
+>>>>> "block: Fix __blkdev_issue_zeroout loop" fix the issue for you?
+>>>>>
+>>>>> --
+>>>>> dm-devel mailing list
+>>>>> dm-devel@redhat.com
+>>>>> https://www.redhat.com/mailman/listinfo/dm-devel
+>>>>
+>>>> I think that patch is incorrect. sector_t may be a 32-bit type and 
+>>>> nr_sects << 9 may overflow.
+>>>>
+>>>> static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
+>>>> {
+>>>>        sector_t bytes = (nr_sects << 9) + PAGE_SIZE - 1;
+>>>>
+>>>>        return min(bytes >> PAGE_SHIFT, (sector_t)BIO_MAX_PAGES);
+>>>> }
+>>>>
+>>>> Mikulas
+>>>
+>>> Mikulas,
+>>>
+>>> Does the follwing patch fix the problem ?
+>>>
+>>> From 947b3cf41e759b2b23f684e215e651d0c8037f88 Mon Sep 17 00:00:00 2001
+>>> From: Damien Le Moal <damien.lemoal@wdc.com>
+>>> Date: Mon, 14 Aug 2017 13:01:16 +0900
+>>> Subject: [PATCH] block: Fix __blkdev_sectors_to_bio_pages()
+>>>
+>>> On 32bit systems where sector_t is a 32bits type, the calculation of
+>>> bytes may overflow. Use the u64 type for the local calculation to avoid
+>>> overflows.
+>>>
+>>> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+>>> ---
+>>>  block/blk-lib.c | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/block/blk-lib.c b/block/blk-lib.c
+>>> index 3fe0aec90597..ccf22dba21f0 100644
+>>> --- a/block/blk-lib.c
+>>> +++ b/block/blk-lib.c
+>>> @@ -269,9 +269,9 @@ static int __blkdev_issue_write_zeroes(struct block_device
+>>> *bdev,
+>>>   */
+>>>  static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
+>>>  {
+>>> -	sector_t bytes = (nr_sects << 9) + PAGE_SIZE - 1;
+>>> +	u64 bytes = ((u64)nr_sects << 9) + PAGE_SIZE - 1;
+>>>  
+>>> -	return min(bytes >> PAGE_SHIFT, (sector_t)BIO_MAX_PAGES);
+>>> +	return min(bytes >> PAGE_SHIFT, (u64)BIO_MAX_PAGES);
+>>>  }
+>>>  
+>>
+>> It's OK, but it is not needed to use 64-bit arithmetic here if all we need 
+>> is to shift the value right. Here I submit a simplified patch, using the 
+>> macro DIV_ROUND_UP_SECTOR_T (the macro gets optimized to just an addition 
+>> and right shift).
+>>
+>>
+>>
+>> From: Mikulas Patocka <mpatocka@redhat.com>
+>>
+>> Fix possible integer overflow in __blkdev_sectors_to_bio_pages if sector_t 
+>> is 32-bit.
+>>
+>> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+>> Fixes: 615d22a51c04 ("block: Fix __blkdev_issue_zeroout loop")
+>>
+>> ---
+>>  block/blk-lib.c |    4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> Index: linux-2.6/block/blk-lib.c
+>> ===================================================================
+>> --- linux-2.6.orig/block/blk-lib.c
+>> +++ linux-2.6/block/blk-lib.c
+>> @@ -269,9 +269,9 @@ static int __blkdev_issue_write_zeroes(s
+>>   */
+>>  static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
+>>  {
+>> -	sector_t bytes = (nr_sects << 9) + PAGE_SIZE - 1;
+>> +	sector_t pages = DIV_ROUND_UP_SECTOR_T(nr_sects, PAGE_SIZE / 512);
+>>  
+>> -	return min(bytes >> PAGE_SHIFT, (sector_t)BIO_MAX_PAGES);
+>> +	return min(pages, (sector_t)BIO_MAX_PAGES);
+>>  }
+>>  
+>>  /**
+>>
+> 
+> Jens can you pick this up?
 
-This patch fixes a bad mempool allocation, where the min_nr of elements
-on the pool was fixed (to 16), which is lower than the maximum number
-of sectors supported by NVMe (as of the time for this patch). Instead,
-use the maximum number of allowed sectors reported by the device.
+Yep added, thanks.
 
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c |  6 +++---
- drivers/lightnvm/pblk-init.c | 15 ++++++++-------
- drivers/lightnvm/pblk-read.c |  2 +-
- drivers/lightnvm/pblk.h      |  2 +-
- 4 files changed, 13 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 84bff271abd8..b114b57af0c3 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -194,7 +194,7 @@ void pblk_bio_free_pages(struct pblk *pblk, struct bio *bio, int off,
- 
- 	for (i = off; i < nr_pages + off; i++) {
- 		bv = bio->bi_io_vec[i];
--		mempool_free(bv.bv_page, pblk->page_pool);
-+		mempool_free(bv.bv_page, pblk->page_bio_pool);
- 	}
- }
- 
-@@ -206,14 +206,14 @@ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
- 	int i, ret;
- 
- 	for (i = 0; i < nr_pages; i++) {
--		page = mempool_alloc(pblk->page_pool, flags);
-+		page = mempool_alloc(pblk->page_bio_pool, flags);
- 		if (!page)
- 			goto err;
- 
- 		ret = bio_add_pc_page(q, bio, page, PBLK_EXPOSED_PAGE_SIZE, 0);
- 		if (ret != PBLK_EXPOSED_PAGE_SIZE) {
- 			pr_err("pblk: could not add page to bio\n");
--			mempool_free(page, pblk->page_pool);
-+			mempool_free(page, pblk->page_bio_pool);
- 			goto err;
- 		}
- 	}
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 12c05aebac16..19cb1906a56a 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -132,7 +132,6 @@ static int pblk_rwb_init(struct pblk *pblk)
- }
- 
- /* Minimum pages needed within a lun */
--#define PAGE_POOL_SIZE 16
- #define ADDR_POOL_SIZE 64
- 
- static int pblk_set_ppaf(struct pblk *pblk)
-@@ -247,14 +246,16 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (pblk_init_global_caches(pblk))
- 		return -ENOMEM;
- 
--	pblk->page_pool = mempool_create_page_pool(PAGE_POOL_SIZE, 0);
--	if (!pblk->page_pool)
-+	/* internal bios can be at most the sectors signaled by the device. */
-+	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
-+									0);
-+	if (!pblk->page_bio_pool)
- 		return -ENOMEM;
- 
- 	pblk->line_ws_pool = mempool_create_slab_pool(PBLK_WS_POOL_SIZE,
- 							pblk_blk_ws_cache);
- 	if (!pblk->line_ws_pool)
--		goto free_page_pool;
-+		goto free_page_bio_pool;
- 
- 	pblk->rec_pool = mempool_create_slab_pool(geo->nr_luns, pblk_rec_cache);
- 	if (!pblk->rec_pool)
-@@ -309,8 +310,8 @@ static int pblk_core_init(struct pblk *pblk)
- 	mempool_destroy(pblk->rec_pool);
- free_blk_ws_pool:
- 	mempool_destroy(pblk->line_ws_pool);
--free_page_pool:
--	mempool_destroy(pblk->page_pool);
-+free_page_bio_pool:
-+	mempool_destroy(pblk->page_bio_pool);
- 	return -ENOMEM;
- }
- 
-@@ -322,7 +323,7 @@ static void pblk_core_free(struct pblk *pblk)
- 	if (pblk->bb_wq)
- 		destroy_workqueue(pblk->bb_wq);
- 
--	mempool_destroy(pblk->page_pool);
-+	mempool_destroy(pblk->page_bio_pool);
- 	mempool_destroy(pblk->line_ws_pool);
- 	mempool_destroy(pblk->rec_pool);
- 	mempool_destroy(pblk->g_rq_pool);
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index ee8efb55b330..402c732f0970 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -238,7 +238,7 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 		kunmap_atomic(src_p);
- 		kunmap_atomic(dst_p);
- 
--		mempool_free(src_bv.bv_page, pblk->page_pool);
-+		mempool_free(src_bv.bv_page, pblk->page_bio_pool);
- 
- 		hole = find_next_zero_bit(read_bitmap, nr_secs, hole + 1);
- 	} while (hole < nr_secs);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index a2753f9da830..b2df4e707c36 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -619,7 +619,7 @@ struct pblk {
- 
- 	struct list_head compl_list;
- 
--	mempool_t *page_pool;
-+	mempool_t *page_bio_pool;
- 	mempool_t *line_ws_pool;
- 	mempool_t *rec_pool;
- 	mempool_t *g_rq_pool;
 -- 
-2.7.4
+Jens Axboe
