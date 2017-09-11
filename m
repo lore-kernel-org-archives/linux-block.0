@@ -1,177 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59520 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751022AbdILDlR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2017 23:41:17 -0400
-Date: Tue, 12 Sep 2017 11:40:58 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2001 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750810AbdIKQEl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Sep 2017 12:04:41 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "jthumshirn@suse.de" <jthumshirn@suse.de>,
         "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
         "cavery@redhat.com" <cavery@redhat.com>
 Subject: Re: [PATCH V4 08/10] block: allow to allocate req with RQF_PREEMPT
  when queue is preempt frozen
-Message-ID: <20170912034057.GC31533@ming.t460p>
+Date: Mon, 11 Sep 2017 16:03:55 +0000
+Message-ID: <1505145834.2802.17.camel@wdc.com>
 References: <20170911111021.25810-1-ming.lei@redhat.com>
- <20170911111021.25810-9-ming.lei@redhat.com>
- <1505145834.2802.17.camel@wdc.com>
+         <20170911111021.25810-9-ming.lei@redhat.com>
+In-Reply-To: <20170911111021.25810-9-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505145834.2802.17.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Sep 11, 2017 at 04:03:55PM +0000, Bart Van Assche wrote:
-> On Mon, 2017-09-11 at 19:10 +0800, Ming Lei wrote:
-> > @@ -787,6 +787,35 @@ int blk_queue_enter(struct request_queue *q, unsigned flags)
-> >  		if (percpu_ref_tryget_live(&q->q_usage_counter))
-> >  			return 0;
-> >  
-> > +		/*
-> > +		 * If queue is preempt frozen and caller need to allocate
-> > +		 * request for RQF_PREEMPT, we grab the .q_usage_counter
-> > +		 * unconditionally and return successfully.
-> > +		 *
-> > +		 * There isn't race with queue cleanup because:
-> > +		 *
-> > +		 * 1) it is guaranteed that preempt freeze can't be
-> > +		 * started after queue is set as dying
-> > +		 *
-> > +		 * 2) normal freeze runs exclusively with preempt
-> > +		 * freeze, so even after queue is set as dying
-> > +		 * afterwards, blk_queue_cleanup() won't move on
-> > +		 * until preempt freeze is done
-> > +		 *
-> > +		 * 3) blk_queue_dying() needn't to be checked here
-> > +		 * 	- for legacy path, it will be checked in
-> > +		 * 	__get_request()
-> 
-> For the legacy block layer core, what do you think will happen if the
-> "dying" state is set by another thread after __get_request() has passed the
-> blk_queue_dying() check?
-
-Without this patchset, block core still need to handle the above
-situation, so your question isn't related with this patchset.
-
-Also q->queue_lock is required in both setting dying and checking
-dying in__get_request(). But the lock can be released in
-__get_request(), so it is possible to allocate one request after
-queue is set as dying, and the request can be dispatched to a
-dying queue too for legacy.
-
-> 
-> > +		 * 	- blk-mq depends on driver to handle dying well
-> > +		 * 	because it is normal for queue to be set as dying
-> > +		 * 	just between blk_queue_enter() and allocating new
-> > +		 * 	request.
-> 
-> The above comment is not correct. The block layer core handles the "dying"
-> state. Block drivers other than dm-mpath should not have to query this state
-> directly.
-
-If blk-mq doesn't query dying state, how does it know queue is dying
-and handle the state? Also blk-mq isn't different with legacy wrt.
-depending on driver to handle dying.
-
-> 
-> > +		 */
-> > +		if ((flags & BLK_REQ_PREEMPT) &&
-> > +				blk_queue_is_preempt_frozen(q)) {
-> > +			blk_queue_enter_live(q);
-> > +			return 0;
-> > +		}
-> > +
-> 
-> Sorry but to me it looks like the above code introduces a race condition
-> between blk_queue_cleanup() and blk_get_request() for at least blk-mq.
-> Consider e.g. the following scenario:
-> * A first thread preempt-freezes a request queue.
-> * A second thread calls blk_get_request() with BLK_REQ_PREEMPT set. That
->   results in a call of blk_queue_is_preempt_frozen().
-> * A context switch occurs to the first thread.
-> * The first thread preempt-unfreezes the same request queue and calls
->   blk_queue_cleanup(). That last function changes the request queue state
->   into DYING and waits until all pending requests have finished.
-> * The second thread continues and calls blk_queue_enter_live(), allocates
->   a request and submits it.
-
-OK, looks a race I don't think of, but it can be fixed easily by calling
-blk_queue_enter_live() with holding q->freeze_lock, and it won't
-cause performance issue too since it is in slow path.
-
-For example, we can introduce the following code in blk_queue_enter():
-
-		if ((flags & BLK_REQ_PREEMPT) &&
-				blk_queue_enter_preempt_freeze(q))
-			return 0;
-
-static inline bool blk_queue_enter_preempt_freeze(struct request_queue *q)
-{
-	bool preempt_frozen;
-
-	spin_lock(&q->freeze_lock);
-	preempt_frozen = q->preempt_freezing && !q->preempt_unfreezing;
-	if (preempt_froze)
-		blk_queue_enter_live(q);
-	spin_unlock(&q->freeze_lock);
-
-	return preempt_frozen;
-}
-
-> 
-> In other words, a request gets submitted against a dying queue. This must
-> not happen. See also my explanation of queue shutdown from a few days ago
-
-That is not correct, think about why queue dead is checked in
-__blk_run_queue_uncond() instead of queue dying. We still need to
-submit requests to driver when queue is dying, and driver knows
-how to handle that.
-
-> (https://marc.info/?l=linux-block&m=150449845831789).
-
-> from (https://marc.info/?l=linux-block&m=150449845831789).
->> Do you understand how request queue cleanup works? The algorithm used for
->> request queue cleanup is as follows:
->> * Set the DYING flag. This flag makes all later blk_get_request() calls
->>   fail.
-
-Your description isn't true for both legacy and blk-mq:
-
-For legacy, as you see q->queue_lock can be released in
-__get_request(), at that time, the queue can be setting as dying.
-but the request can be allocated successfully, and be submitted
-to driver. This way has been there for long time.
-
-For blk-mq, follows the way for allocating blk-mq request:
-
-        ret = blk_queue_enter(q, ...);
-        if (ret)
-                return ERR_PTR(ret);
-        rq = blk_mq_get_request(q, ...);
-
-The setting queue dying can just happen between blk_queue_enter()
-and blk_mq_get_request(), so it is usual to see requests sent
-to driver after queue is dying.
-
-We shouldn't worry about that, because either cleanup queue or setting
-dying is triggered by driver, and driver knows that queue is dying
-at that time, and they can handle the request well under this
-situation.
-
->> * Wait until all pending requests have finished.
->> * Set the DEAD flag. For the traditional block layer, this flag causes
->>   blk_run_queue() not to call .request_fn() anymore. For blk-mq it is
->>   guaranteed in another way that .queue_rq() won't be called anymore after
->>   this flag has been set.
-
-That is true, but still not related with this patch.
-
-
--- 
-Ming
+T24gTW9uLCAyMDE3LTA5LTExIGF0IDE5OjEwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQEAg
+LTc4Nyw2ICs3ODcsMzUgQEAgaW50IGJsa19xdWV1ZV9lbnRlcihzdHJ1Y3QgcmVxdWVzdF9xdWV1
+ZSAqcSwgdW5zaWduZWQgZmxhZ3MpDQo+ICAJCWlmIChwZXJjcHVfcmVmX3RyeWdldF9saXZlKCZx
+LT5xX3VzYWdlX2NvdW50ZXIpKQ0KPiAgCQkJcmV0dXJuIDA7DQo+ICANCj4gKwkJLyoNCj4gKwkJ
+ICogSWYgcXVldWUgaXMgcHJlZW1wdCBmcm96ZW4gYW5kIGNhbGxlciBuZWVkIHRvIGFsbG9jYXRl
+DQo+ICsJCSAqIHJlcXVlc3QgZm9yIFJRRl9QUkVFTVBULCB3ZSBncmFiIHRoZSAucV91c2FnZV9j
+b3VudGVyDQo+ICsJCSAqIHVuY29uZGl0aW9uYWxseSBhbmQgcmV0dXJuIHN1Y2Nlc3NmdWxseS4N
+Cj4gKwkJICoNCj4gKwkJICogVGhlcmUgaXNuJ3QgcmFjZSB3aXRoIHF1ZXVlIGNsZWFudXAgYmVj
+YXVzZToNCj4gKwkJICoNCj4gKwkJICogMSkgaXQgaXMgZ3VhcmFudGVlZCB0aGF0IHByZWVtcHQg
+ZnJlZXplIGNhbid0IGJlDQo+ICsJCSAqIHN0YXJ0ZWQgYWZ0ZXIgcXVldWUgaXMgc2V0IGFzIGR5
+aW5nDQo+ICsJCSAqDQo+ICsJCSAqIDIpIG5vcm1hbCBmcmVlemUgcnVucyBleGNsdXNpdmVseSB3
+aXRoIHByZWVtcHQNCj4gKwkJICogZnJlZXplLCBzbyBldmVuIGFmdGVyIHF1ZXVlIGlzIHNldCBh
+cyBkeWluZw0KPiArCQkgKiBhZnRlcndhcmRzLCBibGtfcXVldWVfY2xlYW51cCgpIHdvbid0IG1v
+dmUgb24NCj4gKwkJICogdW50aWwgcHJlZW1wdCBmcmVlemUgaXMgZG9uZQ0KPiArCQkgKg0KPiAr
+CQkgKiAzKSBibGtfcXVldWVfZHlpbmcoKSBuZWVkbid0IHRvIGJlIGNoZWNrZWQgaGVyZQ0KPiAr
+CQkgKiAJLSBmb3IgbGVnYWN5IHBhdGgsIGl0IHdpbGwgYmUgY2hlY2tlZCBpbg0KPiArCQkgKiAJ
+X19nZXRfcmVxdWVzdCgpDQoNCkZvciB0aGUgbGVnYWN5IGJsb2NrIGxheWVyIGNvcmUsIHdoYXQg
+ZG8geW91IHRoaW5rIHdpbGwgaGFwcGVuIGlmIHRoZQ0KImR5aW5nIiBzdGF0ZSBpcyBzZXQgYnkg
+YW5vdGhlciB0aHJlYWQgYWZ0ZXIgX19nZXRfcmVxdWVzdCgpIGhhcyBwYXNzZWQgdGhlDQpibGtf
+cXVldWVfZHlpbmcoKSBjaGVjaz8NCg0KPiArCQkgKiAJLSBibGstbXEgZGVwZW5kcyBvbiBkcml2
+ZXIgdG8gaGFuZGxlIGR5aW5nIHdlbGwNCj4gKwkJICogCWJlY2F1c2UgaXQgaXMgbm9ybWFsIGZv
+ciBxdWV1ZSB0byBiZSBzZXQgYXMgZHlpbmcNCj4gKwkJICogCWp1c3QgYmV0d2VlbiBibGtfcXVl
+dWVfZW50ZXIoKSBhbmQgYWxsb2NhdGluZyBuZXcNCj4gKwkJICogCXJlcXVlc3QuDQoNClRoZSBh
+Ym92ZSBjb21tZW50IGlzIG5vdCBjb3JyZWN0LiBUaGUgYmxvY2sgbGF5ZXIgY29yZSBoYW5kbGVz
+IHRoZSAiZHlpbmciDQpzdGF0ZS4gQmxvY2sgZHJpdmVycyBvdGhlciB0aGFuIGRtLW1wYXRoIHNo
+b3VsZCBub3QgaGF2ZSB0byBxdWVyeSB0aGlzIHN0YXRlDQpkaXJlY3RseS4NCg0KPiArCQkgKi8N
+Cj4gKwkJaWYgKChmbGFncyAmIEJMS19SRVFfUFJFRU1QVCkgJiYNCj4gKwkJCQlibGtfcXVldWVf
+aXNfcHJlZW1wdF9mcm96ZW4ocSkpIHsNCj4gKwkJCWJsa19xdWV1ZV9lbnRlcl9saXZlKHEpOw0K
+PiArCQkJcmV0dXJuIDA7DQo+ICsJCX0NCj4gKw0KDQpTb3JyeSBidXQgdG8gbWUgaXQgbG9va3Mg
+bGlrZSB0aGUgYWJvdmUgY29kZSBpbnRyb2R1Y2VzIGEgcmFjZSBjb25kaXRpb24NCmJldHdlZW4g
+YmxrX3F1ZXVlX2NsZWFudXAoKSBhbmQgYmxrX2dldF9yZXF1ZXN0KCkgZm9yIGF0IGxlYXN0IGJs
+ay1tcS4NCkNvbnNpZGVyIGUuZy4gdGhlIGZvbGxvd2luZyBzY2VuYXJpbzoNCiogQSBmaXJzdCB0
+aHJlYWQgcHJlZW1wdC1mcmVlemVzIGEgcmVxdWVzdCBxdWV1ZS4NCiogQSBzZWNvbmQgdGhyZWFk
+IGNhbGxzIGJsa19nZXRfcmVxdWVzdCgpIHdpdGggQkxLX1JFUV9QUkVFTVBUIHNldC4gVGhhdA0K
+ICByZXN1bHRzIGluIGEgY2FsbCBvZiBibGtfcXVldWVfaXNfcHJlZW1wdF9mcm96ZW4oKS4NCiog
+QSBjb250ZXh0IHN3aXRjaCBvY2N1cnMgdG8gdGhlIGZpcnN0IHRocmVhZC4NCiogVGhlIGZpcnN0
+IHRocmVhZCBwcmVlbXB0LXVuZnJlZXplcyB0aGUgc2FtZSByZXF1ZXN0IHF1ZXVlIGFuZCBjYWxs
+cw0KICBibGtfcXVldWVfY2xlYW51cCgpLiBUaGF0IGxhc3QgZnVuY3Rpb24gY2hhbmdlcyB0aGUg
+cmVxdWVzdCBxdWV1ZSBzdGF0ZQ0KICBpbnRvIERZSU5HIGFuZCB3YWl0cyB1bnRpbCBhbGwgcGVu
+ZGluZyByZXF1ZXN0cyBoYXZlIGZpbmlzaGVkLg0KKiBUaGUgc2Vjb25kIHRocmVhZCBjb250aW51
+ZXMgYW5kIGNhbGxzIGJsa19xdWV1ZV9lbnRlcl9saXZlKCksIGFsbG9jYXRlcw0KICBhIHJlcXVl
+c3QgYW5kIHN1Ym1pdHMgaXQuDQoNCkluIG90aGVyIHdvcmRzLCBhIHJlcXVlc3QgZ2V0cyBzdWJt
+aXR0ZWQgYWdhaW5zdCBhIGR5aW5nIHF1ZXVlLiBUaGlzIG11c3QNCm5vdCBoYXBwZW4uIFNlZSBh
+bHNvIG15IGV4cGxhbmF0aW9uIG9mIHF1ZXVlIHNodXRkb3duIGZyb20gYSBmZXcgZGF5cyBhZ28N
+CihodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MDQ0OTg0NTgzMTc4OSkuDQoN
+CkJhcnQu
