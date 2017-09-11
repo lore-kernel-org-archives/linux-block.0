@@ -1,77 +1,41 @@
-Return-Path: <prvs=4242a8d18=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V3 11/12] scsi: sd_zbc: Disable zone write locking with scsi-mq
-Date: Fri, 15 Sep 2017 19:06:44 +0900
-Message-Id: <20170915100645.17999-12-damien.lemoal@wdc.com>
-In-Reply-To: <20170915100645.17999-1-damien.lemoal@wdc.com>
-References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme fixes for 4.14, take 2
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20170911215512.GA9661@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <fdc40d9b-dd0e-68fb-66a5-5eb35b7ca2c4@kernel.dk>
+Date: Mon, 11 Sep 2017 16:00:52 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170911215512.GA9661@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-In the case of a ZBC disk used with scsi-mq, zone write locking does
-not prevent write reordering in sequential zones. Unlike the legacy
-case, zone locking is done after the command request is removed from
-the scheduler dispatch queue. That is, at the time of zone locking,
-the write command may already be out of order, making locking
-ineffective. Write order guarantees can only be provided by an
-adapted I/O scheduler.
+On 09/11/2017 03:55 PM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> below are a few small fixes for the current merge window:
+> 
+>  - fix string.h compilation failures with the new memcpy_and_pad
+>    helper (Martin Wilck)
+>  - fix incorrect dereference of a PCI data structure in the lightnvm
+>    support code (me)
+>  - HMB fixes (Akinobu Mita and me)
+> 
+> The following changes since commit 09c2c359be546df45be0b158ea1d3cc8ea83c876:
+> 
+>   block: fix integer overflow in __blkdev_sectors_to_bio_pages() (2017-09-11 09:46:49 -0600)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.14
+> 
+> for you to fetch changes up to 1359798f9d4082eb04575efdd19512fbd9c28464:
+> 
+>   string.h: un-fortify memcpy_and_pad (2017-09-11 12:29:41 -0400)
 
-Disable zone write locking in sd_zbc_write_lock_zone() if the disk is
-used with scsi-mq. As the disk zones_wlock bitmap is not necessry,
-do not allocate it.
+LGTM, pulled.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/sd_zbc.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index c32a3a3d9138..de504026f2c0 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -279,7 +279,7 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
- 	sector_t sector = blk_rq_pos(rq);
- 	sector_t zone_sectors = sd_zbc_zone_sectors(sdkp);
--	unsigned int zno = sd_zbc_zone_no(sdkp, sector);
-+	unsigned int zno;
- 
- 	/*
- 	 * Note: Checks of the alignment of the write command on
-@@ -291,6 +291,10 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
- 		return BLKPREP_KILL;
- 
-+	/* No write locking with scsi-mq */
-+	if (q->mq_ops)
-+		return BLKPREP_OK;
-+
- 	/*
- 	 * There is no write constraints on conventional zones. So any write
- 	 * command can be sent. But do not issue more than one write command
-@@ -298,6 +302,7 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	 * due to the unlocking of the request queue in the dispatch path of
- 	 * legacy scsi path, as well as at the HBA level (e.g. AHCI).
- 	 */
-+	zno = sd_zbc_zone_no(sdkp, sector);
- 	if (q->zoned.seq_zones && test_bit(zno, q->zoned.seq_zones))
- 		return BLKPREP_OK;
- 	if (sdkp->zones_wlock && test_and_set_bit(zno, sdkp->zones_wlock))
-@@ -653,7 +658,7 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	if (sdkp->first_scan)
- 		return 0;
- 
--	if (!sdkp->zones_wlock) {
-+	if (!q->mq_ops && !sdkp->zones_wlock) {
- 		sdkp->zones_wlock = sd_zbc_alloc_zone_bitmap(sdkp);
- 		if (!sdkp->zones_wlock)
- 			return -ENOMEM;
 -- 
-2.13.5
+Jens Axboe
