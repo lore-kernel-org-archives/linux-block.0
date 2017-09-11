@@ -1,76 +1,208 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2001 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750810AbdIKQEl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2017 12:04:41 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "jthumshirn@suse.de" <jthumshirn@suse.de>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "cavery@redhat.com" <cavery@redhat.com>
-Subject: Re: [PATCH V4 08/10] block: allow to allocate req with RQF_PREEMPT
- when queue is preempt frozen
-Date: Mon, 11 Sep 2017 16:03:55 +0000
-Message-ID: <1505145834.2802.17.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:35134 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751079AbdIKLMt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Sep 2017 07:12:49 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 08/10] block: allow to allocate req with RQF_PREEMPT when queue is preempt frozen
+Date: Mon, 11 Sep 2017 19:10:19 +0800
+Message-Id: <20170911111021.25810-9-ming.lei@redhat.com>
+In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
 References: <20170911111021.25810-1-ming.lei@redhat.com>
-         <20170911111021.25810-9-ming.lei@redhat.com>
-In-Reply-To: <20170911111021.25810-9-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gTW9uLCAyMDE3LTA5LTExIGF0IDE5OjEwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQEAg
-LTc4Nyw2ICs3ODcsMzUgQEAgaW50IGJsa19xdWV1ZV9lbnRlcihzdHJ1Y3QgcmVxdWVzdF9xdWV1
-ZSAqcSwgdW5zaWduZWQgZmxhZ3MpDQo+ICAJCWlmIChwZXJjcHVfcmVmX3RyeWdldF9saXZlKCZx
-LT5xX3VzYWdlX2NvdW50ZXIpKQ0KPiAgCQkJcmV0dXJuIDA7DQo+ICANCj4gKwkJLyoNCj4gKwkJ
-ICogSWYgcXVldWUgaXMgcHJlZW1wdCBmcm96ZW4gYW5kIGNhbGxlciBuZWVkIHRvIGFsbG9jYXRl
-DQo+ICsJCSAqIHJlcXVlc3QgZm9yIFJRRl9QUkVFTVBULCB3ZSBncmFiIHRoZSAucV91c2FnZV9j
-b3VudGVyDQo+ICsJCSAqIHVuY29uZGl0aW9uYWxseSBhbmQgcmV0dXJuIHN1Y2Nlc3NmdWxseS4N
-Cj4gKwkJICoNCj4gKwkJICogVGhlcmUgaXNuJ3QgcmFjZSB3aXRoIHF1ZXVlIGNsZWFudXAgYmVj
-YXVzZToNCj4gKwkJICoNCj4gKwkJICogMSkgaXQgaXMgZ3VhcmFudGVlZCB0aGF0IHByZWVtcHQg
-ZnJlZXplIGNhbid0IGJlDQo+ICsJCSAqIHN0YXJ0ZWQgYWZ0ZXIgcXVldWUgaXMgc2V0IGFzIGR5
-aW5nDQo+ICsJCSAqDQo+ICsJCSAqIDIpIG5vcm1hbCBmcmVlemUgcnVucyBleGNsdXNpdmVseSB3
-aXRoIHByZWVtcHQNCj4gKwkJICogZnJlZXplLCBzbyBldmVuIGFmdGVyIHF1ZXVlIGlzIHNldCBh
-cyBkeWluZw0KPiArCQkgKiBhZnRlcndhcmRzLCBibGtfcXVldWVfY2xlYW51cCgpIHdvbid0IG1v
-dmUgb24NCj4gKwkJICogdW50aWwgcHJlZW1wdCBmcmVlemUgaXMgZG9uZQ0KPiArCQkgKg0KPiAr
-CQkgKiAzKSBibGtfcXVldWVfZHlpbmcoKSBuZWVkbid0IHRvIGJlIGNoZWNrZWQgaGVyZQ0KPiAr
-CQkgKiAJLSBmb3IgbGVnYWN5IHBhdGgsIGl0IHdpbGwgYmUgY2hlY2tlZCBpbg0KPiArCQkgKiAJ
-X19nZXRfcmVxdWVzdCgpDQoNCkZvciB0aGUgbGVnYWN5IGJsb2NrIGxheWVyIGNvcmUsIHdoYXQg
-ZG8geW91IHRoaW5rIHdpbGwgaGFwcGVuIGlmIHRoZQ0KImR5aW5nIiBzdGF0ZSBpcyBzZXQgYnkg
-YW5vdGhlciB0aHJlYWQgYWZ0ZXIgX19nZXRfcmVxdWVzdCgpIGhhcyBwYXNzZWQgdGhlDQpibGtf
-cXVldWVfZHlpbmcoKSBjaGVjaz8NCg0KPiArCQkgKiAJLSBibGstbXEgZGVwZW5kcyBvbiBkcml2
-ZXIgdG8gaGFuZGxlIGR5aW5nIHdlbGwNCj4gKwkJICogCWJlY2F1c2UgaXQgaXMgbm9ybWFsIGZv
-ciBxdWV1ZSB0byBiZSBzZXQgYXMgZHlpbmcNCj4gKwkJICogCWp1c3QgYmV0d2VlbiBibGtfcXVl
-dWVfZW50ZXIoKSBhbmQgYWxsb2NhdGluZyBuZXcNCj4gKwkJICogCXJlcXVlc3QuDQoNClRoZSBh
-Ym92ZSBjb21tZW50IGlzIG5vdCBjb3JyZWN0LiBUaGUgYmxvY2sgbGF5ZXIgY29yZSBoYW5kbGVz
-IHRoZSAiZHlpbmciDQpzdGF0ZS4gQmxvY2sgZHJpdmVycyBvdGhlciB0aGFuIGRtLW1wYXRoIHNo
-b3VsZCBub3QgaGF2ZSB0byBxdWVyeSB0aGlzIHN0YXRlDQpkaXJlY3RseS4NCg0KPiArCQkgKi8N
-Cj4gKwkJaWYgKChmbGFncyAmIEJMS19SRVFfUFJFRU1QVCkgJiYNCj4gKwkJCQlibGtfcXVldWVf
-aXNfcHJlZW1wdF9mcm96ZW4ocSkpIHsNCj4gKwkJCWJsa19xdWV1ZV9lbnRlcl9saXZlKHEpOw0K
-PiArCQkJcmV0dXJuIDA7DQo+ICsJCX0NCj4gKw0KDQpTb3JyeSBidXQgdG8gbWUgaXQgbG9va3Mg
-bGlrZSB0aGUgYWJvdmUgY29kZSBpbnRyb2R1Y2VzIGEgcmFjZSBjb25kaXRpb24NCmJldHdlZW4g
-YmxrX3F1ZXVlX2NsZWFudXAoKSBhbmQgYmxrX2dldF9yZXF1ZXN0KCkgZm9yIGF0IGxlYXN0IGJs
-ay1tcS4NCkNvbnNpZGVyIGUuZy4gdGhlIGZvbGxvd2luZyBzY2VuYXJpbzoNCiogQSBmaXJzdCB0
-aHJlYWQgcHJlZW1wdC1mcmVlemVzIGEgcmVxdWVzdCBxdWV1ZS4NCiogQSBzZWNvbmQgdGhyZWFk
-IGNhbGxzIGJsa19nZXRfcmVxdWVzdCgpIHdpdGggQkxLX1JFUV9QUkVFTVBUIHNldC4gVGhhdA0K
-ICByZXN1bHRzIGluIGEgY2FsbCBvZiBibGtfcXVldWVfaXNfcHJlZW1wdF9mcm96ZW4oKS4NCiog
-QSBjb250ZXh0IHN3aXRjaCBvY2N1cnMgdG8gdGhlIGZpcnN0IHRocmVhZC4NCiogVGhlIGZpcnN0
-IHRocmVhZCBwcmVlbXB0LXVuZnJlZXplcyB0aGUgc2FtZSByZXF1ZXN0IHF1ZXVlIGFuZCBjYWxs
-cw0KICBibGtfcXVldWVfY2xlYW51cCgpLiBUaGF0IGxhc3QgZnVuY3Rpb24gY2hhbmdlcyB0aGUg
-cmVxdWVzdCBxdWV1ZSBzdGF0ZQ0KICBpbnRvIERZSU5HIGFuZCB3YWl0cyB1bnRpbCBhbGwgcGVu
-ZGluZyByZXF1ZXN0cyBoYXZlIGZpbmlzaGVkLg0KKiBUaGUgc2Vjb25kIHRocmVhZCBjb250aW51
-ZXMgYW5kIGNhbGxzIGJsa19xdWV1ZV9lbnRlcl9saXZlKCksIGFsbG9jYXRlcw0KICBhIHJlcXVl
-c3QgYW5kIHN1Ym1pdHMgaXQuDQoNCkluIG90aGVyIHdvcmRzLCBhIHJlcXVlc3QgZ2V0cyBzdWJt
-aXR0ZWQgYWdhaW5zdCBhIGR5aW5nIHF1ZXVlLiBUaGlzIG11c3QNCm5vdCBoYXBwZW4uIFNlZSBh
-bHNvIG15IGV4cGxhbmF0aW9uIG9mIHF1ZXVlIHNodXRkb3duIGZyb20gYSBmZXcgZGF5cyBhZ28N
-CihodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MDQ0OTg0NTgzMTc4OSkuDQoN
-CkJhcnQu
+REQF_PREEMPT is a bit special because the request is required
+to be dispatched to lld even when SCSI device is quiesced.
+
+So this patch introduces __blk_get_request() to allow block
+layer to allocate request when queue is preempt frozen, since we
+will preempt freeze queue before quiescing SCSI device in the
+following patch for supporting safe SCSI quiescing.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c       | 48 ++++++++++++++++++++++++++++++++++++++----------
+ block/blk-mq.c         |  3 +--
+ include/linux/blk-mq.h |  7 ++++---
+ include/linux/blkdev.h | 17 ++++++++++++++---
+ 4 files changed, 57 insertions(+), 18 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ade9b5484a6e..1c8e264753f0 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -787,6 +787,35 @@ int blk_queue_enter(struct request_queue *q, unsigned flags)
+ 		if (percpu_ref_tryget_live(&q->q_usage_counter))
+ 			return 0;
+ 
++		/*
++		 * If queue is preempt frozen and caller need to allocate
++		 * request for RQF_PREEMPT, we grab the .q_usage_counter
++		 * unconditionally and return successfully.
++		 *
++		 * There isn't race with queue cleanup because:
++		 *
++		 * 1) it is guaranteed that preempt freeze can't be
++		 * started after queue is set as dying
++		 *
++		 * 2) normal freeze runs exclusively with preempt
++		 * freeze, so even after queue is set as dying
++		 * afterwards, blk_queue_cleanup() won't move on
++		 * until preempt freeze is done
++		 *
++		 * 3) blk_queue_dying() needn't to be checked here
++		 * 	- for legacy path, it will be checked in
++		 * 	__get_request()
++		 * 	- blk-mq depends on driver to handle dying well
++		 * 	because it is normal for queue to be set as dying
++		 * 	just between blk_queue_enter() and allocating new
++		 * 	request.
++		 */
++		if ((flags & BLK_REQ_PREEMPT) &&
++				blk_queue_is_preempt_frozen(q)) {
++			blk_queue_enter_live(q);
++			return 0;
++		}
++
+ 		if (flags & BLK_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+@@ -1410,7 +1439,8 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+ }
+ 
+ static struct request *blk_old_get_request(struct request_queue *q,
+-					   unsigned int op, gfp_t gfp_mask)
++					   unsigned int op, gfp_t gfp_mask,
++					   unsigned int flags)
+ {
+ 	struct request *rq;
+ 	int ret = 0;
+@@ -1420,8 +1450,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ?
+-			BLK_REQ_NOWAIT : 0);
++	ret = blk_queue_enter(q, flags & BLK_REQ_BITS_MASK);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -1439,26 +1468,25 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	return rq;
+ }
+ 
+-struct request *blk_get_request(struct request_queue *q, unsigned int op,
+-				gfp_t gfp_mask)
++struct request *__blk_get_request(struct request_queue *q, unsigned int op,
++				  gfp_t gfp_mask, unsigned int flags)
+ {
+ 	struct request *req;
+ 
++	flags |= gfp_mask & __GFP_DIRECT_RECLAIM ? 0 : BLK_REQ_NOWAIT;
+ 	if (q->mq_ops) {
+-		req = blk_mq_alloc_request(q, op,
+-			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
+-				0 : BLK_MQ_REQ_NOWAIT);
++		req = blk_mq_alloc_request(q, op, flags);
+ 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
+ 			q->mq_ops->initialize_rq_fn(req);
+ 	} else {
+-		req = blk_old_get_request(q, op, gfp_mask);
++		req = blk_old_get_request(q, op, gfp_mask, flags);
+ 		if (!IS_ERR(req) && q->initialize_rq_fn)
+ 			q->initialize_rq_fn(req);
+ 	}
+ 
+ 	return req;
+ }
+-EXPORT_SYMBOL(blk_get_request);
++EXPORT_SYMBOL(__blk_get_request);
+ 
+ /**
+  * blk_requeue_request - put a request back on queue
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 096c5f0ea518..720559724f97 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -482,8 +482,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
+ 
+-	ret = blk_queue_enter(q, (flags & BLK_MQ_REQ_NOWAIT) ?
+-			BLK_REQ_NOWAIT : 0);
++	ret = blk_queue_enter(q, flags & BLK_REQ_BITS_MASK);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 54b160bcb6a2..3cb3856f83db 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -197,9 +197,10 @@ void blk_mq_free_request(struct request *rq);
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *);
+ 
+ enum {
+-	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
+-	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
+-	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
++	BLK_MQ_REQ_NOWAIT	= BLK_REQ_NOWAIT, /* return when out of requests */
++	BLK_MQ_REQ_PREEMPT	= BLK_REQ_PREEMPT, /* allocate for RQF_PREEMPT */
++	BLK_MQ_REQ_RESERVED	= (1 << BLK_REQ_MQ_START_BIT), /* allocate from reserved pool */
++	BLK_MQ_REQ_INTERNAL	= (1 << (BLK_REQ_MQ_START_BIT + 1)), /* allocate internal/sched tag */
+ };
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 3c14c9588dcf..99c252bb5361 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -865,7 +865,10 @@ enum {
+ 
+ /* passed to blk_queue_enter */
+ enum {
+-	BLK_REQ_NOWAIT = (1 << 0),
++	BLK_REQ_NOWAIT		= (1 << 0),
++	BLK_REQ_PREEMPT		= (1 << 1),
++	BLK_REQ_MQ_START_BIT	= 2,
++	BLK_REQ_BITS_MASK	= (1U << BLK_REQ_MQ_START_BIT) - 1,
+ };
+ 
+ extern unsigned long blk_max_low_pfn, blk_max_pfn;
+@@ -950,8 +953,9 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
+ extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
+ extern void blk_put_request(struct request *);
+ extern void __blk_put_request(struct request_queue *, struct request *);
+-extern struct request *blk_get_request(struct request_queue *, unsigned int op,
+-				       gfp_t gfp_mask);
++extern struct request *__blk_get_request(struct request_queue *,
++					 unsigned int op, gfp_t gfp_mask,
++					 unsigned int flags);
+ extern void blk_requeue_request(struct request_queue *, struct request *);
+ extern int blk_lld_busy(struct request_queue *q);
+ extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+@@ -1002,6 +1006,13 @@ blk_status_t errno_to_blk_status(int errno);
+ 
+ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
+ 
++static inline struct request *blk_get_request(struct request_queue *q,
++					      unsigned int op,
++					      gfp_t gfp_mask)
++{
++	return __blk_get_request(q, op, gfp_mask, 0);
++}
++
+ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+ {
+ 	return bdev->bd_disk->queue;	/* this is never NULL */
+-- 
+2.9.5
