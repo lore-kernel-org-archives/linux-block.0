@@ -1,65 +1,44 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Cc: bcache@lists.ewheeler.net,
-	Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 08/12] bcache: increase the number of open buckets
-Date: Wed,  6 Sep 2017 14:25:58 +0800
-Message-Id: <20170906062602.50497-9-colyli@suse.de>
-In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
-References: <20170906062602.50497-1-colyli@suse.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 09/10] SCSI: transport_spi: resume a quiesced device
+Date: Mon, 11 Sep 2017 19:10:20 +0800
+Message-Id: <20170911111021.25810-10-ming.lei@redhat.com>
+In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
+References: <20170911111021.25810-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+We have to preempt freeze queue in scsi_device_quiesce(),
+and unfreeze in scsi_device_resume(), so call scsi_device_resume()
+for the device which is quiesced by scsi_device_quiesce().
 
-In currently, we only alloc 6 open buckets for each cache set,
-but in usually, we always attach about 10 or so backend devices for
-each cache set, and the each bcache device are always accessed by
-about 10 or so threads in top application layer. So 6 open buckets
-are too few, It has led to that each of the same thread write data
-to different buckets, which would cause low efficiency write-back,
-and also cause buckets inefficient, and would be Very easy to run
-out of.
-
-I add debug message in bch_open_buckets_alloc() to print alloc bucket
-info, and test with ten bcache devices with a cache set, and each
-bcache device is accessed by ten threads.
-
->From the debug message, we can see that, after the modification, One
-bucket is more likely to assign to the same thread, and the data from
-the same thread are more likely to write the same bucket. Usually the
-same thread always write/read the same backend device, so it is good
-for write-back and also promote the usage efficiency of buckets.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/alloc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/scsi/scsi_transport_spi.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index ca4abe1ccd8d..cacbe2dbd5c3 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -68,6 +68,8 @@
- #include <linux/random.h>
- #include <trace/events/bcache.h>
+diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
+index d0219e36080c..bdecf99b6ab1 100644
+--- a/drivers/scsi/scsi_transport_spi.c
++++ b/drivers/scsi/scsi_transport_spi.c
+@@ -1040,6 +1040,9 @@ spi_dv_device(struct scsi_device *sdev)
  
-+#define MAX_OPEN_BUCKETS 128
+ 	scsi_target_resume(starget);
+ 
++	/* undo what scsi_device_quiesce() did */
++	scsi_device_resume(sdev);
 +
- /* Bucket heap / gen */
+ 	spi_initial_dv(starget) = 1;
  
- uint8_t bch_inc_gen(struct cache *ca, struct bucket *b)
-@@ -671,7 +673,7 @@ int bch_open_buckets_alloc(struct cache_set *c)
- 
- 	spin_lock_init(&c->data_bucket_lock);
- 
--	for (i = 0; i < 6; i++) {
-+	for (i = 0; i < MAX_OPEN_BUCKETS; i++) {
- 		struct open_bucket *b = kzalloc(sizeof(*b), GFP_KERNEL);
- 		if (!b)
- 			return -ENOMEM;
+  out_free:
 -- 
-2.13.5
+2.9.5
