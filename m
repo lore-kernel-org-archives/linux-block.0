@@ -1,70 +1,97 @@
 Return-Path: <ming.lei@redhat.com>
-Date: Wed, 13 Sep 2017 00:25:26 +0800
+Date: Wed, 13 Sep 2017 00:10:47 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	"Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"rafael.j.wysocki@intel.com" <rafael.j.wysocki@intel.com>
 Subject: Re: [PATCH 4/5] block: Make SCSI device suspend work reliably
-Message-ID: <20170912162513.GC21349@ming.t460p>
+Message-ID: <20170912161046.GB21349@ming.t460p>
 References: <20170908235226.26622-1-bart.vanassche@wdc.com>
  <20170908235226.26622-5-bart.vanassche@wdc.com>
+ <20170912022948.GB31533@ming.t460p>
+ <1505231149.2537.18.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170908235226.26622-5-bart.vanassche@wdc.com>
+In-Reply-To: <1505231149.2537.18.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 08, 2017 at 04:52:25PM -0700, Bart Van Assche wrote:
-> Instead of allowing request allocation to succeed for suspended
-> request queues and only to process power management requests, make
-> blk_get_request() wait until the request queue is resumed for
-> requests that are not power management requests.
+On Tue, Sep 12, 2017 at 03:45:50PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-09-12 at 10:29 +0800, Ming Lei wrote:
+> > On Fri, Sep 08, 2017 at 04:52:25PM -0700, Bart Van Assche wrote:
+> > > @@ -1350,6 +1368,16 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+> > >  	lockdep_assert_held(q->queue_lock);
+> > >  	WARN_ON_ONCE(q->mq_ops);
+> > >  
+> > > +	WARN_ON_ONCE((op & REQ_PM) && blk_pm_suspended(q));
+> > > +
+> > > +	/*
+> > > +	 * Wait if the request queue is suspended or in the process of
+> > > +	 * suspending/resuming and the request being allocated will not be
+> > > +	 * used for power management purposes.
+> > > +	 */
+> > > +	if (!(op & REQ_PM) && !blk_wait_until_active(q, !(op & REQ_NOWAIT)))
+> > > +		return ERR_PTR(-EAGAIN);
+> > > +
+> > 
+> > Firstly it is not enough to prevent new allocation only, because
+> > requests pool may have been used up and all the allocated requests
+> > just stay in block queue when SCSI device is put into quiesce.
+> > So you may cause new I/O hang and wait forever here. That is why
+> > I take freeze to do that because freezing queue can prevent new
+> > allocation and drain in-queue requests both.
 > 
-> This patch avoids that resume does not occur if the maximum queue
-> depth is reached when a power management request is submitted.
-> 
-> Note: this patch affects the behavior of scsi_device_quiesce() only
-> if that function is called from inside a power management callback.
-> This patch does not affect the behavior of scsi_device_quiesce()
-> when a call of that function is triggered by writing "quiesce" into
-> /sys/class/scsi_device/*/device/state.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c       | 60 +++++++++++++++++++++++++++-----------------------
->  block/blk.h            | 12 ++++++++++
->  include/linux/blkdev.h |  1 +
->  3 files changed, 45 insertions(+), 28 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index bb53c6b58e8c..cd2700c763ed 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1325,6 +1325,24 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
->  	return ERR_PTR(-ENOMEM);
->  }
->  
-> +#ifdef CONFIG_PM
-> +static bool blk_wait_until_active(struct request_queue *q, bool wait)
-> +	__releases(q->queue_lock)
-> +	__acquires(q->queue_lock)
-> +{
-> +	if (wait)
-> +		wait_event_lock_irq(q->rpm_active_wq,
-> +				    q->rpm_status == RPM_ACTIVE,
-> +				    *q->queue_lock);
-> +	return q->rpm_status == RPM_ACTIVE;
+> Sorry but I disagree. If all tags are allocated and it is attempted to
+> suspend a queue then this patch not only will prevent allocation of new
+> non-PM requests but it will also let these previously submitted non-PM
+> requests finish. See also the blk_peek_request() changes in patch 4/5.
+> Once a previously submitted request finished allocation of the PM request
+> will succeed.
 
-If runtime PM is disabled via /sys/.../power/control, q->rpm_status
-can be always ACTIVE, even during system suspend, then you can't
-prevent any new request allocation at that time.
+You just simply removed blk_pm_peek_request() from blk_peek_request(),
+how does that work on blk-mq?
 
+Also that may not work because SCSI quiesce may just happen between
+request allocation and run queue, then nothing can be dispatched
+to driver.
+
+> 
+> > Secondly, all RQF_PREEMPT(not PM) is blocked here too, that may
+> > cause regression since we usually need/allow RQF_PREEMPT to run
+> > during SCSI quiesce.
+> 
+> Sorry but I disagree with this comment too. Please keep in mind that my patch
+> only affects the SCSI quiesce status if that status has been requested by the
+> power management subsystem. After the power management subsystem has
+> transitioned a SCSI queue into the quiesce state that queue has reached the
+> RPM_SUSPENDED status. No new requests must be submitted against a suspended
+
+No, RPM_SUSPEND only means runtime suspend, you misunderstand it as
+system suspend.
+
+Actually the reported issue is during system suspend/resume, which can
+happen without runtime PM, such as, runtime PM is disabled via sysfs.
+
+> queue. It is easy to see in the legacy block layer that only PM requests and
+> no other RQF_PREEMPT requests are processed once the queue has reached the
+> suspended status:
+> 
+> /*
+>  * Don't process normal requests when queue is suspended
+>  * or in the process of suspending/resuming
+>  */
+> static struct request *blk_pm_peek_request(struct request_queue *q,
+> 					   struct request *rq)
+> {
+> 	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
+> 	    (q->rpm_status != RPM_ACTIVE && !(rq->cmd_flags & REQ_PM))))
+
+As I explained, rpm_status represents runtime PM status, nothing to
+do with system suspend/resume.
+
+So RRF_PREEMPT can be dispatched to driver during system suspend.
 
 -- 
 Ming
