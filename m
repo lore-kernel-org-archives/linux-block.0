@@ -1,67 +1,49 @@
-Return-Path: <prvs=4242a8d18=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V3 06/12] scsi: sd_zbc: Rearrange code
-Date: Fri, 15 Sep 2017 19:06:39 +0900
-Message-Id: <20170915100645.17999-7-damien.lemoal@wdc.com>
-In-Reply-To: <20170915100645.17999-1-damien.lemoal@wdc.com>
-References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 12 Sep 2017 10:17:14 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 0/5] Make SCSI device suspend work reliably
+Message-ID: <20170912021707.GA31533@ming.t460p>
+References: <20170908235226.26622-1-bart.vanassche@wdc.com>
+ <20170909103859.GA29285@ming.t460p>
+ <1505147128.2802.36.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1505147128.2802.36.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Rearrange sd_zbc_setup() to include use_16_for_rw and use_10_for_rw
-assignments and move the calculation of sdkp->zone_shift together
-with the assignment of the verified zone_blocks value in
-sd_zbc_check_zone_size().
+On Mon, Sep 11, 2017 at 04:25:30PM +0000, Bart Van Assche wrote:
+> On Sat, 2017-09-09 at 18:39 +0800, Ming Lei wrote:
+> > - the issue is not suspend/resume only, it is about SCSI quiesce vs.
+> > RQF_PREEMPT.
+> 
+> The only in-kernel user of the SCSI quiesce/resume functionality next to
+> runtime power management I know of is the SPI transport, namely
+> spi_dv_device(). Nobody has ever reported a hang in spi_dv_device() as far
+> as I know. Since the number of users of the SCSI parallel transport is very
+> small I propose to wait with fixing spi_dv_device() until someone shows that
+> it is possible to trigger that hang. If we have to address a hang in
+> spi_dv_device() I propose to address it in the same way as my patch series
+> addresses power management requests, namely by letting previously submitted
+> requests complete and by making blk_get_request() callers wait until the
+> quiesced SCSI device has been resumed.
 
-No functional change is introduced by this patch.
+As I mentioned in V4 cover letter, Cathy saw this I/O hang issue, and
+she has verified that my revised patchset V3 can fix the issue.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/scsi/sd_zbc.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> > I don't see the issue above addressed by this patchset, so maybe
+> > you are trying to fix another PM specific issue(not reported by
+> > Oleksandr), I am just confused.
+> 
+> That's correct - I'm only trying to address the PM issues. I will mention
+> that explicitly when I repost this patch series.
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index fd29717b6eab..081bf5a3b10b 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -532,6 +532,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 	}
- 
- 	sdkp->zone_blocks = zone_blocks;
-+	sdkp->zone_shift = ilog2(zone_blocks);
- 
- 	return 0;
- }
-@@ -539,10 +540,13 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- static int sd_zbc_setup(struct scsi_disk *sdkp)
- {
- 
-+	/* READ16/WRITE16 is mandatory for ZBC disks */
-+	sdkp->device->use_16_for_rw = 1;
-+	sdkp->device->use_10_for_rw = 0;
-+
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->zone_shift = ilog2(sdkp->zone_blocks);
- 	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
- 	if (sdkp->capacity & (sdkp->zone_blocks - 1))
- 		sdkp->nr_zones++;
-@@ -605,10 +609,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 	if (ret)
- 		goto err;
- 
--	/* READ16/WRITE16 is mandatory for ZBC disks */
--	sdkp->device->use_16_for_rw = 1;
--	sdkp->device->use_10_for_rw = 0;
--
- 	return 0;
- 
- err:
+Unfortunately it isn't enough, and the approach you took is wrong too,
+I will comment it in your patch 4.
+
 -- 
-2.13.5
+Ming
