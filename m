@@ -1,162 +1,97 @@
-Return-Path: <longman@redhat.com>
-From: Waiman Long <longman@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Bart Van Assche <Bart.VanAssche@wdc.com>,
-	Waiman Long <longman@redhat.com>
-Subject: [PATCH v5] blktrace: Fix potentail deadlock between delete & sysfs ops
-Date: Sat, 16 Sep 2017 19:37:08 -0700
-Message-Id: <1505615828-6623-1-git-send-email-longman@redhat.com>
+Return-Path: <anish.jhaveri@paviliondata.com>
+Date: Mon, 11 Sep 2017 21:22:54 -0700
+From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
+To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [PATCH 03/10] Failover timeout and time between failover same ns.
+Message-ID: <20170912042254.qbmbojaifl7roxsu@haynes>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Return-Path: anish.jhaveri@paviliondata.com
 List-ID: <linux-block@vger.kernel.org>
 
-The lockdep code had reported the following unsafe locking scenario:
+Module load parameters for failover timeout and timeout between two failover on same target. This will take care of failover not being caused due to link flapping activity. The nvme_mpath_priv data structure does the book keeping of the bio data in case when IO failure happens and bio data needs to be reset to initial state for an IO to new path.
 
-       CPU0                    CPU1
-       ----                    ----
-  lock(s_active#228);
-                               lock(&bdev->bd_mutex/1);
-                               lock(s_active#228);
-  lock(&bdev->bd_mutex);
-
- *** DEADLOCK ***
-
-The deadlock may happen when one task (CPU1) is trying to delete a
-partition in a block device and another task (CPU0) is accessing
-tracing sysfs file (e.g. /sys/block/dm-1/trace/act_mask) in that
-partition.
-
-The s_active isn't an actual lock. It is a reference count (kn->count)
-on the sysfs (kernfs) file. Removal of a sysfs file, however, require
-a wait until all the references are gone. The reference count is
-treated like a rwsem using lockdep instrumentation code.
-
-The fact that a thread is in the sysfs callback method or in the
-ioctl call means there is a reference to the opended sysfs or device
-file. That should prevent the underlying block structure from being
-removed.
-
-Instead of using bd_mutex in the block_device structure, the other
-bd_fsfreeze_mutex mutex in the block_device structure is now overloaded
-to protect against concurrent blktrace data access in the blktrace.c
-file. There is no point in adding one more mutex to the block_device
-structure just for blktrace.
-
-Signed-off-by: Waiman Long <longman@redhat.com>
+Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
 ---
- v5:
-  - Overload the bd_fsfreeze_mutex in block_device structure for
-    blktrace protection.
+ drivers/nvme/host/core.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
- v4:
-  - Use blktrace_mutex in blk_trace_ioctl() as well.
-
- v3:
-  - Use a global blktrace_mutex to serialize sysfs attribute accesses
-    instead of the bd_mutex.
-
- v2:
-  - Use READ_ONCE() and smp_store_mb() to read and write bd_deleting.
-  - Check for signal in the mutex_trylock loops.
-  - Use usleep() instead of schedule() for RT tasks.
-
- include/linux/fs.h      |  2 +-
- kernel/trace/blktrace.c | 26 ++++++++++++++++++++------
- 2 files changed, 21 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 339e737..330b572 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -448,7 +448,7 @@ struct block_device {
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 37046ac..934548a 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -28,6 +28,7 @@
+ #include <linux/t10-pi.h>
+ #include <linux/pm_qos.h>
+ #include <asm/unaligned.h>
++#include <linux/kthread.h>
  
- 	/* The counter of freeze processes */
- 	int			bd_fsfreeze_count;
--	/* Mutex for freeze */
-+	/* Mutex for freeze and blktrace */
- 	struct mutex		bd_fsfreeze_mutex;
- } __randomize_layout;
+ #include "nvme.h"
+ #include "fabrics.h"
+@@ -68,14 +69,63 @@ static bool streams;
+ module_param(streams, bool, 0644);
+ MODULE_PARM_DESC(streams, "turn on support for Streams write directives");
  
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 2a685b4..7cd5d1d 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -648,6 +648,20 @@ int blk_trace_startstop(struct request_queue *q, int start)
- }
- EXPORT_SYMBOL_GPL(blk_trace_startstop);
- 
-+/*
-+ * When reading or writing the blktrace sysfs files, the references to the
-+ * opened sysfs or device files should prevent the underlying block device
-+ * from being removed. So no further delete protection is really needed.
-+ *
-+ * Protection from multiple readers and writers accessing blktrace data
-+ * concurrently is still required. The bd_mutex was used for this purpose.
-+ * That could lead to deadlock with concurrent block device deletion and
-+ * sysfs access. Instead, the block device bd_fsfreeze_mutex is now
-+ * overloaded for blktrace data protection. Like freeze/thaw, blktrace
-+ * functionality is not frequently used. There is no point in adding
-+ * one more mutex to the block_device structure just for blktrace.
-+ */
++unsigned char mpath_io_timeout = 60;
++module_param(mpath_io_timeout, byte, 0644);
++MODULE_PARM_DESC(mpath_io_timeout, "timeout in seconds for multipath IO");
++EXPORT_SYMBOL_GPL(mpath_io_timeout);
 +
- /**
-  * blk_trace_ioctl: - handle the ioctls associated with tracing
-  * @bdev:	the block device
-@@ -665,7 +679,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- 	if (!q)
- 		return -ENXIO;
++unsigned int ns_failover_interval = 60;
++module_param_named(failover_interval, ns_failover_interval, uint, 0644);
++MODULE_PARM_DESC(failover_interval,
++		 "Minimum internval in secs to fallback on same namespace during multipath.");
++EXPORT_SYMBOL_GPL(ns_failover_interval);
++
+ struct workqueue_struct *nvme_wq;
+ EXPORT_SYMBOL_GPL(nvme_wq);
  
--	mutex_lock(&bdev->bd_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_mutex);
++#define NVME_MPATH_NS_AVAIL	0
++#define NVME_NO_MPATH_NS_AVAIL	1
++
++#define NVME_MAX_MPATH_PRIV	4096  /* This number suppport IO depth of 128 for upto 32 Queue per controller.*/
++
++static LIST_HEAD(nvme_mpath_ctrl_list);
+ static LIST_HEAD(nvme_ctrl_list);
+ static DEFINE_SPINLOCK(dev_list_lock);
  
- 	switch (cmd) {
- 	case BLKTRACESETUP:
-@@ -691,7 +705,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- 		break;
- 	}
++static struct task_struct *nvme_mpath_thread;
++static wait_queue_head_t nvme_mpath_kthread_wait;
++static void nvme_mpath_flush_io_work(struct work_struct *work);
++
+ static struct class *nvme_class;
  
--	mutex_unlock(&bdev->bd_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_mutex);
- 	return ret;
- }
- 
-@@ -1727,7 +1741,7 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
- 	if (q == NULL)
- 		goto out_bdput;
- 
--	mutex_lock(&bdev->bd_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_mutex);
- 
- 	if (attr == &dev_attr_enable) {
- 		ret = sprintf(buf, "%u\n", !!q->blk_trace);
-@@ -1746,7 +1760,7 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
- 		ret = sprintf(buf, "%llu\n", q->blk_trace->end_lba);
- 
- out_unlock_bdev:
--	mutex_unlock(&bdev->bd_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_mutex);
- out_bdput:
- 	bdput(bdev);
- out:
-@@ -1788,7 +1802,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 	if (q == NULL)
- 		goto out_bdput;
- 
--	mutex_lock(&bdev->bd_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_mutex);
- 
- 	if (attr == &dev_attr_enable) {
- 		if (value)
-@@ -1814,7 +1828,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 	}
- 
- out_unlock_bdev:
--	mutex_unlock(&bdev->bd_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_mutex);
- out_bdput:
- 	bdput(bdev);
- out:
++struct nvme_mpath_priv {
++	struct nvme_ns *ns;
++	struct nvme_ns *mpath_ns;
++	struct block_device *bi_bdev;
++	unsigned long bi_flags;
++	sector_t bi_sector;
++	unsigned short bi_idx;
++	unsigned short bi_vcnt;
++	unsigned int bi_phys_segments;
++	void  *bi_private;
++	size_t nr_bytes;
++	struct bio *bio;
++	struct bio_vec *bvec;
++	bio_end_io_t *bi_end_io;
++	int nr_retries;
++	unsigned long start_time;
++	struct hd_struct *part;
++};
++
++struct nvme_failover_data {
++	struct nvme_ns *standby_ns;
++	struct nvme_ns *active_ns;
++	struct nvme_ns *mpath_ns;
++	int retries;
++};
++
++
++
+ int nvme_reset_ctrl(struct nvme_ctrl *ctrl)
+ {
+ 	if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_RESETTING))
 -- 
-1.8.3.1
+2.9.3
