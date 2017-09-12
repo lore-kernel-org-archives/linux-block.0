@@ -1,251 +1,375 @@
-Return-Path: <longman@redhat.com>
-From: Waiman Long <longman@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-nilfs@vger.kernel.org,
-	cluster-devel@redhat.com,
-	Bart Van Assche <Bart.VanAssche@wdc.com>,
-	Waiman Long <longman@redhat.com>
-Subject: [PATCH v6 2/2] block_dev: Rename bd_fsfreeze_mutex
-Date: Mon, 18 Sep 2017 14:53:51 -0400
-Message-Id: <1505760831-7747-3-git-send-email-longman@redhat.com>
-In-Reply-To: <1505760831-7747-1-git-send-email-longman@redhat.com>
-References: <1505760831-7747-1-git-send-email-longman@redhat.com>
+Return-Path: <anish.jhaveri@paviliondata.com>
+Date: Mon, 11 Sep 2017 21:25:45 -0700
+From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
+To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [PATCH 05/10] Init multipath head controller.
+Message-ID: <20170912042544.z7iufguhozjimmty@haynes>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Return-Path: anish.jhaveri@paviliondata.com
 List-ID: <linux-block@vger.kernel.org>
 
-As the bd_fsfreeze_mutex is used by the blktrace subsystem as well,
-it is now renamed to bd_fsfreeze_blktrace_mutex to better reflect
-its purpose.
+Initialize the multipath head controller. This multipath head controller is created as soon as we identify a namespace which can be shared. It will be added to global multipath controller list. Memory pool is created to allocate private structure to maintain bio data between head device and child devices. Retrieve block device handle for future communication through generic_make_request function if device is shared.
 
-Signed-off-by: Waiman Long <longman@redhat.com>
+Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
 ---
- fs/block_dev.c          | 14 +++++++-------
- fs/gfs2/ops_fstype.c    |  6 +++---
- fs/nilfs2/super.c       |  6 +++---
- fs/super.c              |  6 +++---
- include/linux/fs.h      |  5 +++--
- kernel/trace/blktrace.c | 14 +++++++-------
- 6 files changed, 26 insertions(+), 25 deletions(-)
+ drivers/nvme/host/core.c | 229 ++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 208 insertions(+), 21 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 93d088f..3dea006 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -504,7 +504,7 @@ struct super_block *freeze_bdev(struct block_device *bdev)
- 	struct super_block *sb;
- 	int error = 0;
- 
--	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	if (++bdev->bd_fsfreeze_count > 1) {
- 		/*
- 		 * We don't even need to grab a reference - the first call
-@@ -514,7 +514,7 @@ struct super_block *freeze_bdev(struct block_device *bdev)
- 		sb = get_super(bdev);
- 		if (sb)
- 			drop_super(sb);
--		mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+		mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 		return sb;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 3839d1c..2987e0a 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -750,6 +750,7 @@ static void nvme_keep_alive_end_io(struct request *rq, blk_status_t status)
+ 		dev_err(ctrl->device,
+ 			"failed nvme_keep_alive_end_io error=%d\n",
+ 				status);
++		schedule_work(&ctrl->failover_work);
+ 		return;
  	}
  
-@@ -528,13 +528,13 @@ struct super_block *freeze_bdev(struct block_device *bdev)
- 	if (error) {
- 		deactivate_super(sb);
- 		bdev->bd_fsfreeze_count--;
--		mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+		mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 		return ERR_PTR(error);
- 	}
- 	deactivate_super(sb);
-  out:
- 	sync_blockdev(bdev);
--	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	return sb;	/* thaw_bdev releases s->s_umount */
+@@ -2435,17 +2436,19 @@ static int nvme_setup_streams_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns)
+ 	return 0;
  }
- EXPORT_SYMBOL(freeze_bdev);
-@@ -550,7 +550,7 @@ int thaw_bdev(struct block_device *bdev, struct super_block *sb)
+ 
+-static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
++static struct nvme_ns *nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
  {
- 	int error = -EINVAL;
+ 	struct nvme_ns *ns;
+ 	struct gendisk *disk;
+ 	struct nvme_id_ns *id;
+ 	char disk_name[DISK_NAME_LEN];
++	char devpath[DISK_NAME_LEN+4];
+ 	int node = dev_to_node(ctrl->dev);
++	static char *_claim_ptr = "I belong to mpath device";
  
--	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	if (!bdev->bd_fsfreeze_count)
- 		goto out;
+ 	ns = kzalloc_node(sizeof(*ns), GFP_KERNEL, node);
+ 	if (!ns)
+-		return;
++		return NULL;
  
-@@ -568,7 +568,7 @@ int thaw_bdev(struct block_device *bdev, struct super_block *sb)
- 	if (error)
- 		bdev->bd_fsfreeze_count++;
- out:
--	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	return error;
- }
- EXPORT_SYMBOL(thaw_bdev);
-@@ -767,7 +767,7 @@ static void init_once(void *foo)
- 	bdev->bd_bdi = &noop_backing_dev_info;
- 	inode_init_once(&ei->vfs_inode);
- 	/* Initialize mutex for freeze. */
--	mutex_init(&bdev->bd_fsfreeze_mutex);
-+	mutex_init(&bdev->bd_fsfreeze_blktrace_mutex);
- }
+ 	ns->instance = ida_simple_get(&ctrl->ns_ida, 1, 0, GFP_KERNEL);
+ 	if (ns->instance < 0)
+@@ -2465,8 +2468,10 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	blk_queue_logical_block_size(ns->queue, 1 << ns->lba_shift);
+ 	nvme_set_queue_limits(ctrl, ns->queue);
+ 	nvme_setup_streams_ns(ctrl, ns);
++	blk_queue_rq_timeout(ns->queue, nvme_io_timeout * HZ);
  
- static void bdev_evict_inode(struct inode *inode)
-diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
-index a3711f5..5664905 100644
---- a/fs/gfs2/ops_fstype.c
-+++ b/fs/gfs2/ops_fstype.c
-@@ -1269,14 +1269,14 @@ static struct dentry *gfs2_mount(struct file_system_type *fs_type, int flags,
- 	 * will protect the lockfs code from trying to start a snapshot
- 	 * while we are mounting
- 	 */
--	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	if (bdev->bd_fsfreeze_count > 0) {
--		mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+		mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 		error = -EBUSY;
- 		goto error_bdev;
- 	}
- 	s = sget(fs_type, test_gfs2_super, set_gfs2_super, flags, bdev);
--	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	error = PTR_ERR(s);
- 	if (IS_ERR(s))
- 		goto error_bdev;
-diff --git a/fs/nilfs2/super.c b/fs/nilfs2/super.c
-index 4fc018d..931b455 100644
---- a/fs/nilfs2/super.c
-+++ b/fs/nilfs2/super.c
-@@ -1306,15 +1306,15 @@ static int nilfs_test_bdev_super(struct super_block *s, void *data)
- 	 * will protect the lockfs code from trying to start a snapshot
- 	 * while we are mounting
- 	 */
--	mutex_lock(&sd.bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&sd.bdev->bd_fsfreeze_blktrace_mutex);
- 	if (sd.bdev->bd_fsfreeze_count > 0) {
--		mutex_unlock(&sd.bdev->bd_fsfreeze_mutex);
-+		mutex_unlock(&sd.bdev->bd_fsfreeze_blktrace_mutex);
- 		err = -EBUSY;
- 		goto failed;
- 	}
- 	s = sget(fs_type, nilfs_test_bdev_super, nilfs_set_bdev_super, flags,
- 		 sd.bdev);
--	mutex_unlock(&sd.bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&sd.bdev->bd_fsfreeze_blktrace_mutex);
- 	if (IS_ERR(s)) {
- 		err = PTR_ERR(s);
- 		goto failed;
-diff --git a/fs/super.c b/fs/super.c
-index 166c4ee..079890f 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1083,15 +1083,15 @@ struct dentry *mount_bdev(struct file_system_type *fs_type,
- 	 * will protect the lockfs code from trying to start a snapshot
- 	 * while we are mounting
- 	 */
--	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	if (bdev->bd_fsfreeze_count > 0) {
--		mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+		mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 		error = -EBUSY;
- 		goto error_bdev;
- 	}
- 	s = sget(fs_type, test_bdev_super, set_bdev_super, flags | SB_NOSEC,
- 		 bdev);
--	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	if (IS_ERR(s))
- 		goto error_s;
+ 	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
++	sprintf(devpath, "/dev/nvme%dn%d", ctrl->instance, ns->instance);
  
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 330b572..16c4297 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -448,8 +448,9 @@ struct block_device {
+ 	if (nvme_revalidate_ns(ns, &id))
+ 		goto out_free_queue;
+@@ -2496,17 +2501,36 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
  
- 	/* The counter of freeze processes */
- 	int			bd_fsfreeze_count;
--	/* Mutex for freeze and blktrace */
--	struct mutex		bd_fsfreeze_mutex;
+ 	kref_get(&ctrl->kref);
+ 
+-	kfree(id);
+-
+ 	device_add_disk(ctrl->device, ns->disk);
+ 	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
+-					&nvme_ns_attr_group))
++					&nvme_ns_attr_group)) {
+ 		pr_warn("%s: failed to create sysfs group for identification\n",
+ 			ns->disk->disk_name);
++		goto out_del_gendisk;
++	}
 +
-+	/* Mutex for both freeze and blktrace */
-+	struct mutex		bd_fsfreeze_blktrace_mutex;
- } __randomize_layout;
- 
- /*
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 7cd5d1d..463a470 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -656,7 +656,7 @@ int blk_trace_startstop(struct request_queue *q, int start)
-  * Protection from multiple readers and writers accessing blktrace data
-  * concurrently is still required. The bd_mutex was used for this purpose.
-  * That could lead to deadlock with concurrent block device deletion and
-- * sysfs access. Instead, the block device bd_fsfreeze_mutex is now
-+ * sysfs access. Instead, the block device bd_fsfreeze_blktrace_mutex is now
-  * overloaded for blktrace data protection. Like freeze/thaw, blktrace
-  * functionality is not frequently used. There is no point in adding
-  * one more mutex to the block_device structure just for blktrace.
-@@ -679,7 +679,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- 	if (!q)
- 		return -ENXIO;
- 
--	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_blktrace_mutex);
- 
- 	switch (cmd) {
- 	case BLKTRACESETUP:
-@@ -705,7 +705,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- 		break;
- 	}
- 
--	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- 	return ret;
+ 	if (ns->ndev && nvme_nvm_register_sysfs(ns))
+ 		pr_warn("%s: failed to register lightnvm sysfs group for identification\n",
+ 			ns->disk->disk_name);
+-	return;
++
++	if (ns->nmic &  0x1) {
++		ns->bdev = blkdev_get_by_path(devpath,
++				 FMODE_READ | FMODE_WRITE | FMODE_EXCL, _claim_ptr);
++		if (IS_ERR(ns->bdev)) {
++			goto out_sysfs_remove_group;
++		}
++	}
++
++	kfree(id);
++
++	return ns;
++ out_sysfs_remove_group:
++	pr_err("%s: failed to get block device handle %p\n",
++			ns->disk->disk_name, ns->bdev);
++	sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
++			&nvme_ns_attr_group);
++ out_del_gendisk:
++	del_gendisk(ns->disk);
+  out_free_id:
+ 	kfree(id);
+  out_free_queue:
+@@ -2515,22 +2539,50 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	ida_simple_remove(&ctrl->ns_ida, ns->instance);
+  out_free_ns:
+ 	kfree(ns);
++	return NULL;
  }
  
-@@ -1741,7 +1741,7 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
- 	if (q == NULL)
- 		goto out_bdput;
+ static void nvme_ns_remove(struct nvme_ns *ns)
+ {
++	struct nvme_ctrl *mpath_ctrl = NULL;
+ 	if (test_and_set_bit(NVME_NS_REMOVING, &ns->flags))
+ 		return;
  
--	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_blktrace_mutex);
- 
- 	if (attr == &dev_attr_enable) {
- 		ret = sprintf(buf, "%u\n", !!q->blk_trace);
-@@ -1760,7 +1760,7 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
- 		ret = sprintf(buf, "%llu\n", q->blk_trace->end_lba);
- 
- out_unlock_bdev:
--	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- out_bdput:
- 	bdput(bdev);
- out:
-@@ -1802,7 +1802,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 	if (q == NULL)
- 		goto out_bdput;
- 
--	mutex_lock(&bdev->bd_fsfreeze_mutex);
-+	mutex_lock(&bdev->bd_fsfreeze_blktrace_mutex);
- 
- 	if (attr == &dev_attr_enable) {
- 		if (value)
-@@ -1828,7 +1828,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+-	if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
+-		if (blk_get_integrity(ns->disk))
+-			blk_integrity_unregister(ns->disk);
+-		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
+-					&nvme_ns_attr_group);
+-		if (ns->ndev)
+-			nvme_nvm_unregister_sysfs(ns);
+-		del_gendisk(ns->disk);
+-		blk_cleanup_queue(ns->queue);
++	if (test_bit(NVME_NS_ROOT, &ns->flags))
++		nvme_mpath_cancel_ios(ns);
++
++	if (ns->active)
++		nvme_trigger_failover(ns->ctrl);
++	if (ns->mpath_ctrl) {
++		mpath_ctrl = ns->mpath_ctrl;
++		if (nvme_del_ns_mpath_ctrl(ns) == NVME_NO_MPATH_NS_AVAIL) {
++			mpath_ctrl = NULL;
++		}
++		if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
++			if (blk_get_integrity(ns->disk))
++				blk_integrity_unregister(ns->disk);
++			sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
++						&nvme_ns_attr_group);
++			if (ns->nmic &  0x1)
++				blkdev_put(ns->bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
++			del_gendisk(ns->disk);
++			blk_cleanup_queue(ns->queue);
++		}
++
++	} else {
++		if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
++			if (blk_get_integrity(ns->disk))
++				blk_integrity_unregister(ns->disk);
++
++			sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
++				&nvme_ns_attr_group);
++			if (ns->ndev)
++				nvme_nvm_unregister_sysfs(ns);
++			if (ns->bdev)
++				blkdev_put(ns->bdev, FMODE_READ | FMODE_WRITE);
++			del_gendisk(ns->disk);
++			blk_cleanup_queue(ns->queue);
++		}
  	}
  
- out_unlock_bdev:
--	mutex_unlock(&bdev->bd_fsfreeze_mutex);
-+	mutex_unlock(&bdev->bd_fsfreeze_blktrace_mutex);
- out_bdput:
- 	bdput(bdev);
- out:
+ 	mutex_lock(&ns->ctrl->namespaces_mutex);
+@@ -2538,6 +2590,20 @@ static void nvme_ns_remove(struct nvme_ns *ns)
+ 	mutex_unlock(&ns->ctrl->namespaces_mutex);
+ 
+ 	nvme_put_ns(ns);
++	if (mpath_ctrl) {
++		mpath_ctrl->cleanup_done = 1;
++	}
++}
++
++void nvme_mpath_ns_remove(struct nvme_ns *ns)
++{
++	struct nvme_ctrl *ctrl = ns->ctrl;
++	nvme_ns_remove(ns);
++	device_destroy(nvme_class, MKDEV(nvme_char_major, ctrl->instance));
++	spin_lock(&dev_list_lock);
++	list_del(&ctrl->node);
++	spin_unlock(&dev_list_lock);
++	nvme_put_ctrl(ctrl);
+ }
+ 
+ static void nvme_validate_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+@@ -2549,8 +2615,12 @@ static void nvme_validate_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 		if (ns->disk && revalidate_disk(ns->disk))
+ 			nvme_ns_remove(ns);
+ 		nvme_put_ns(ns);
+-	} else
+-		nvme_alloc_ns(ctrl, nsid);
++	} else {
++		ns = nvme_alloc_ns(ctrl, nsid);
++		if (ns && (ns->nmic &  0x1)) {
++			nvme_shared_ns(ns);
++		}
++	}
+ }
+ 
+ static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
+@@ -2761,9 +2831,11 @@ static void nvme_release_instance(struct nvme_ctrl *ctrl)
+ 
+ void nvme_stop_ctrl(struct nvme_ctrl *ctrl)
+ {
+-	nvme_stop_keep_alive(ctrl);
+-	flush_work(&ctrl->async_event_work);
+-	flush_work(&ctrl->scan_work);
++	if (!test_bit(NVME_CTRL_MULTIPATH, &ctrl->flags)) {
++		nvme_stop_keep_alive(ctrl);
++		flush_work(&ctrl->async_event_work);
++		flush_work(&ctrl->scan_work);
++	}
+ }
+ EXPORT_SYMBOL_GPL(nvme_stop_ctrl);
+ 
+@@ -2782,11 +2854,19 @@ EXPORT_SYMBOL_GPL(nvme_start_ctrl);
+ 
+ void nvme_uninit_ctrl(struct nvme_ctrl *ctrl)
+ {
++	struct task_struct *tmp = NULL;
+ 	device_destroy(nvme_class, MKDEV(nvme_char_major, ctrl->instance));
+ 
+ 	spin_lock(&dev_list_lock);
+ 	list_del(&ctrl->node);
++	if (list_empty(&nvme_mpath_ctrl_list) && !IS_ERR_OR_NULL(nvme_mpath_thread)) {
++		tmp = nvme_mpath_thread;
++		nvme_mpath_thread = NULL;
++	}
+ 	spin_unlock(&dev_list_lock);
++	if (tmp) {
++		kthread_stop(tmp);
++	}
+ }
+ EXPORT_SYMBOL_GPL(nvme_uninit_ctrl);
+ 
+@@ -2798,7 +2878,15 @@ static void nvme_free_ctrl(struct kref *kref)
+ 	nvme_release_instance(ctrl);
+ 	ida_destroy(&ctrl->ns_ida);
+ 
+-	ctrl->ops->free_ctrl(ctrl);
++	if (test_bit(NVME_CTRL_MULTIPATH, &ctrl->flags)) {
++		if (ctrl->mpath_req_pool) {
++			mempool_destroy(ctrl->mpath_req_pool);
++			kmem_cache_destroy(ctrl->mpath_req_slab);
++		}
++		kfree(ctrl);
++	} else {
++		ctrl->ops->free_ctrl(ctrl);
++	}
+ }
+ 
+ void nvme_put_ctrl(struct nvme_ctrl *ctrl)
+@@ -2825,6 +2913,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ 	ctrl->dev = dev;
+ 	ctrl->ops = ops;
+ 	ctrl->quirks = quirks;
++	INIT_WORK(&ctrl->failover_work, nvme_trigger_failover_work);
+ 	INIT_WORK(&ctrl->scan_work, nvme_scan_work);
+ 	INIT_WORK(&ctrl->async_event_work, nvme_async_event_work);
+ 
+@@ -2863,6 +2952,103 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+ }
+ EXPORT_SYMBOL_GPL(nvme_init_ctrl);
+ 
++struct nvme_ctrl *nvme_init_mpath_ctrl(struct nvme_ctrl *ctrl)
++{
++	struct nvme_ctrl *mpath_ctrl;
++	bool changed;
++	int ret;
++	bool start_thread = false;
++
++	mpath_ctrl = kzalloc(sizeof(*mpath_ctrl), GFP_KERNEL);
++	if (!mpath_ctrl)
++		return ERR_PTR(-ENOMEM);
++
++	set_bit(NVME_CTRL_MULTIPATH, &mpath_ctrl->flags);
++	mpath_ctrl->state = NVME_CTRL_NEW;
++	mpath_ctrl->cleanup_done = 1;
++	spin_lock_init(&mpath_ctrl->lock);
++	INIT_LIST_HEAD(&mpath_ctrl->namespaces);
++	INIT_LIST_HEAD(&mpath_ctrl->mpath_namespace);
++	mutex_init(&mpath_ctrl->namespaces_mutex);
++	kref_init(&mpath_ctrl->kref);
++	mpath_ctrl->dev = ctrl->dev;
++	mpath_ctrl->ops = ctrl->ops;
++
++	ret = nvme_set_instance(mpath_ctrl);
++	if (ret)
++		goto out;
++
++	mpath_ctrl->device = device_create_with_groups(nvme_class, mpath_ctrl->dev,
++		MKDEV(nvme_char_major, mpath_ctrl->instance),
++		mpath_ctrl, nvme_dev_attr_groups,
++		"nvme%d", mpath_ctrl->instance);
++
++	if (IS_ERR(mpath_ctrl->device)) {
++		goto out_release_instance;
++	}
++
++	get_device(mpath_ctrl->device);
++	ida_init(&mpath_ctrl->ns_ida);
++
++	if (list_empty(&nvme_mpath_ctrl_list) && IS_ERR_OR_NULL(nvme_mpath_thread)) {
++		start_thread = true;
++		nvme_mpath_thread = NULL;
++	}
++	spin_lock(&dev_list_lock);
++	list_add_tail(&mpath_ctrl->node, &nvme_mpath_ctrl_list);
++	spin_unlock(&dev_list_lock);
++
++	changed = nvme_change_ctrl_state(mpath_ctrl, NVME_CTRL_LIVE);
++
++	sprintf(mpath_ctrl->mpath_req_cache_name, "mpath_req%d", mpath_ctrl->instance);
++
++	/* allocate a slab cache for priv structure to maintain bio data*/
++	mpath_ctrl->mpath_req_slab = kmem_cache_create(
++		mpath_ctrl->mpath_req_cache_name,
++		 sizeof(struct nvme_mpath_priv),
++		 0, SLAB_HWCACHE_ALIGN, NULL);
++	if (mpath_ctrl->mpath_req_slab == NULL) {
++		dev_err(mpath_ctrl->device,
++			"failed allocating mpath request cache\n");
++		goto out_release_instance;
++	}
++
++	/* allocate a memory pool which uses the slab cache */
++	mpath_ctrl->mpath_req_pool = mempool_create(NVME_MAX_MPATH_PRIV,
++		mempool_alloc_slab,
++		mempool_free_slab,
++		mpath_ctrl->mpath_req_slab);
++	if (mpath_ctrl->mpath_req_pool == NULL) {
++		dev_err(mpath_ctrl->device,
++			"failed allocating mpath request pool\n");
++		goto out_release_req_slab;
++	}
++
++	if (start_thread) {
++		nvme_mpath_thread = kthread_run(nvme_mpath_kthread, NULL, "nvme_mpath");
++	} else
++		wait_event_killable(nvme_mpath_kthread_wait, nvme_mpath_thread);
++
++	if (IS_ERR_OR_NULL(nvme_mpath_thread)) {
++		ret = nvme_mpath_thread ? PTR_ERR(nvme_mpath_thread) : -EINTR;
++		goto out_release_req_pool;
++	}
++	dev_info(mpath_ctrl->device, "multipath request pool allocated\n");
++
++	return mpath_ctrl;
++ out_release_req_pool:
++	mempool_destroy(mpath_ctrl->mpath_req_pool);
++ out_release_req_slab:
++	kmem_cache_destroy(mpath_ctrl->mpath_req_slab);
++	mpath_ctrl->mpath_req_slab = NULL;
++ out_release_instance:
++	nvme_release_instance(mpath_ctrl);
++ out:
++	kfree(mpath_ctrl);
++	return NULL;
++}
++EXPORT_SYMBOL_GPL(nvme_init_mpath_ctrl);
++
+ /**
+  * nvme_kill_queues(): Ends all namespace queues
+  * @ctrl: the dead controller that needs to end
+@@ -2970,6 +3156,7 @@ int __init nvme_core_init(void)
+ {
+ 	int result;
+ 
++	init_waitqueue_head(&nvme_mpath_kthread_wait);
+ 	nvme_wq = alloc_workqueue("nvme-wq",
+ 			WQ_UNBOUND | WQ_MEM_RECLAIM | WQ_SYSFS, 0);
+ 	if (!nvme_wq)
 -- 
-1.8.3.1
+2.9.3
