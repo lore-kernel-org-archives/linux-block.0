@@ -1,64 +1,107 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hare@suse.com"
-	<hare@suse.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"rafael.j.wysocki@intel.com" <rafael.j.wysocki@intel.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:50242 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751022AbdILCaI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Sep 2017 22:30:08 -0400
+Date: Tue, 12 Sep 2017 10:29:49 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
 Subject: Re: [PATCH 4/5] block: Make SCSI device suspend work reliably
-Date: Tue, 12 Sep 2017 15:45:50 +0000
-Message-ID: <1505231149.2537.18.camel@wdc.com>
+Message-ID: <20170912022948.GB31533@ming.t460p>
 References: <20170908235226.26622-1-bart.vanassche@wdc.com>
-	 <20170908235226.26622-5-bart.vanassche@wdc.com>
-	 <20170912022948.GB31533@ming.t460p>
-In-Reply-To: <20170912022948.GB31533@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20170908235226.26622-5-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170908235226.26622-5-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE3LTA5LTEyIGF0IDEwOjI5ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-RnJpLCBTZXAgMDgsIDIwMTcgYXQgMDQ6NTI6MjVQTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IEBAIC0xMzUwLDYgKzEzNjgsMTYgQEAgc3RhdGljIHN0cnVjdCByZXF1ZXN0ICpn
-ZXRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgdW5zaWduZWQgaW50IG9wLA0KPiA+
-ICAJbG9ja2RlcF9hc3NlcnRfaGVsZChxLT5xdWV1ZV9sb2NrKTsNCj4gPiAgCVdBUk5fT05fT05D
-RShxLT5tcV9vcHMpOw0KPiA+ICANCj4gPiArCVdBUk5fT05fT05DRSgob3AgJiBSRVFfUE0pICYm
-IGJsa19wbV9zdXNwZW5kZWQocSkpOw0KPiA+ICsNCj4gPiArCS8qDQo+ID4gKwkgKiBXYWl0IGlm
-IHRoZSByZXF1ZXN0IHF1ZXVlIGlzIHN1c3BlbmRlZCBvciBpbiB0aGUgcHJvY2VzcyBvZg0KPiA+
-ICsJICogc3VzcGVuZGluZy9yZXN1bWluZyBhbmQgdGhlIHJlcXVlc3QgYmVpbmcgYWxsb2NhdGVk
-IHdpbGwgbm90IGJlDQo+ID4gKwkgKiB1c2VkIGZvciBwb3dlciBtYW5hZ2VtZW50IHB1cnBvc2Vz
-Lg0KPiA+ICsJICovDQo+ID4gKwlpZiAoIShvcCAmIFJFUV9QTSkgJiYgIWJsa193YWl0X3VudGls
-X2FjdGl2ZShxLCAhKG9wICYgUkVRX05PV0FJVCkpKQ0KPiA+ICsJCXJldHVybiBFUlJfUFRSKC1F
-QUdBSU4pOw0KPiA+ICsNCj4gDQo+IEZpcnN0bHkgaXQgaXMgbm90IGVub3VnaCB0byBwcmV2ZW50
-IG5ldyBhbGxvY2F0aW9uIG9ubHksIGJlY2F1c2UNCj4gcmVxdWVzdHMgcG9vbCBtYXkgaGF2ZSBi
-ZWVuIHVzZWQgdXAgYW5kIGFsbCB0aGUgYWxsb2NhdGVkIHJlcXVlc3RzDQo+IGp1c3Qgc3RheSBp
-biBibG9jayBxdWV1ZSB3aGVuIFNDU0kgZGV2aWNlIGlzIHB1dCBpbnRvIHF1aWVzY2UuDQo+IFNv
-IHlvdSBtYXkgY2F1c2UgbmV3IEkvTyBoYW5nIGFuZCB3YWl0IGZvcmV2ZXIgaGVyZS4gVGhhdCBp
-cyB3aHkNCj4gSSB0YWtlIGZyZWV6ZSB0byBkbyB0aGF0IGJlY2F1c2UgZnJlZXppbmcgcXVldWUg
-Y2FuIHByZXZlbnQgbmV3DQo+IGFsbG9jYXRpb24gYW5kIGRyYWluIGluLXF1ZXVlIHJlcXVlc3Rz
-IGJvdGguDQoNClNvcnJ5IGJ1dCBJIGRpc2FncmVlLiBJZiBhbGwgdGFncyBhcmUgYWxsb2NhdGVk
-IGFuZCBpdCBpcyBhdHRlbXB0ZWQgdG8NCnN1c3BlbmQgYSBxdWV1ZSB0aGVuIHRoaXMgcGF0Y2gg
-bm90IG9ubHkgd2lsbCBwcmV2ZW50IGFsbG9jYXRpb24gb2YgbmV3DQpub24tUE0gcmVxdWVzdHMg
-YnV0IGl0IHdpbGwgYWxzbyBsZXQgdGhlc2UgcHJldmlvdXNseSBzdWJtaXR0ZWQgbm9uLVBNDQpy
-ZXF1ZXN0cyBmaW5pc2guIFNlZSBhbHNvIHRoZSBibGtfcGVla19yZXF1ZXN0KCkgY2hhbmdlcyBp
-biBwYXRjaCA0LzUuDQpPbmNlIGEgcHJldmlvdXNseSBzdWJtaXR0ZWQgcmVxdWVzdCBmaW5pc2hl
-ZCBhbGxvY2F0aW9uIG9mIHRoZSBQTSByZXF1ZXN0DQp3aWxsIHN1Y2NlZWQuDQoNCj4gU2Vjb25k
-bHksIGFsbCBSUUZfUFJFRU1QVChub3QgUE0pIGlzIGJsb2NrZWQgaGVyZSB0b28sIHRoYXQgbWF5
-DQo+IGNhdXNlIHJlZ3Jlc3Npb24gc2luY2Ugd2UgdXN1YWxseSBuZWVkL2FsbG93IFJRRl9QUkVF
-TVBUIHRvIHJ1bg0KPiBkdXJpbmcgU0NTSSBxdWllc2NlLg0KDQpTb3JyeSBidXQgSSBkaXNhZ3Jl
-ZSB3aXRoIHRoaXMgY29tbWVudCB0b28uIFBsZWFzZSBrZWVwIGluIG1pbmQgdGhhdCBteSBwYXRj
-aA0Kb25seSBhZmZlY3RzIHRoZSBTQ1NJIHF1aWVzY2Ugc3RhdHVzIGlmIHRoYXQgc3RhdHVzIGhh
-cyBiZWVuIHJlcXVlc3RlZCBieSB0aGUNCnBvd2VyIG1hbmFnZW1lbnQgc3Vic3lzdGVtLiBBZnRl
-ciB0aGUgcG93ZXIgbWFuYWdlbWVudCBzdWJzeXN0ZW0gaGFzDQp0cmFuc2l0aW9uZWQgYSBTQ1NJ
-IHF1ZXVlIGludG8gdGhlIHF1aWVzY2Ugc3RhdGUgdGhhdCBxdWV1ZSBoYXMgcmVhY2hlZCB0aGUN
-ClJQTV9TVVNQRU5ERUQgc3RhdHVzLiBObyBuZXcgcmVxdWVzdHMgbXVzdCBiZSBzdWJtaXR0ZWQg
-YWdhaW5zdCBhIHN1c3BlbmRlZA0KcXVldWUuIEl0IGlzIGVhc3kgdG8gc2VlIGluIHRoZSBsZWdh
-Y3kgYmxvY2sgbGF5ZXIgdGhhdCBvbmx5IFBNIHJlcXVlc3RzIGFuZA0Kbm8gb3RoZXIgUlFGX1BS
-RUVNUFQgcmVxdWVzdHMgYXJlIHByb2Nlc3NlZCBvbmNlIHRoZSBxdWV1ZSBoYXMgcmVhY2hlZCB0
-aGUNCnN1c3BlbmRlZCBzdGF0dXM6DQoNCi8qDQogKiBEb24ndCBwcm9jZXNzIG5vcm1hbCByZXF1
-ZXN0cyB3aGVuIHF1ZXVlIGlzIHN1c3BlbmRlZA0KICogb3IgaW4gdGhlIHByb2Nlc3Mgb2Ygc3Vz
-cGVuZGluZy9yZXN1bWluZw0KICovDQpzdGF0aWMgc3RydWN0IHJlcXVlc3QgKmJsa19wbV9wZWVr
-X3JlcXVlc3Qoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsDQoJCQkJCSAgIHN0cnVjdCByZXF1ZXN0
-ICpycSkNCnsNCglpZiAocS0+ZGV2ICYmIChxLT5ycG1fc3RhdHVzID09IFJQTV9TVVNQRU5ERUQg
-fHwNCgkgICAgKHEtPnJwbV9zdGF0dXMgIT0gUlBNX0FDVElWRSAmJiAhKHJxLT5jbWRfZmxhZ3Mg
-JiBSRVFfUE0pKSkpDQoJCXJldHVybiBOVUxMOw0KCWVsc2UNCgkJcmV0dXJuIHJxOw0KfQ0KDQpC
-YXJ0Lg==
+On Fri, Sep 08, 2017 at 04:52:25PM -0700, Bart Van Assche wrote:
+> Instead of allowing request allocation to succeed for suspended
+> request queues and only to process power management requests, make
+> blk_get_request() wait until the request queue is resumed for
+> requests that are not power management requests.
+> 
+> This patch avoids that resume does not occur if the maximum queue
+> depth is reached when a power management request is submitted.
+> 
+> Note: this patch affects the behavior of scsi_device_quiesce() only
+> if that function is called from inside a power management callback.
+> This patch does not affect the behavior of scsi_device_quiesce()
+> when a call of that function is triggered by writing "quiesce" into
+> /sys/class/scsi_device/*/device/state.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c       | 60 +++++++++++++++++++++++++++-----------------------
+>  block/blk.h            | 12 ++++++++++
+>  include/linux/blkdev.h |  1 +
+>  3 files changed, 45 insertions(+), 28 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index bb53c6b58e8c..cd2700c763ed 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1325,6 +1325,24 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+>  	return ERR_PTR(-ENOMEM);
+>  }
+>  
+> +#ifdef CONFIG_PM
+> +static bool blk_wait_until_active(struct request_queue *q, bool wait)
+> +	__releases(q->queue_lock)
+> +	__acquires(q->queue_lock)
+> +{
+> +	if (wait)
+> +		wait_event_lock_irq(q->rpm_active_wq,
+> +				    q->rpm_status == RPM_ACTIVE,
+> +				    *q->queue_lock);
+> +	return q->rpm_status == RPM_ACTIVE;
+> +}
+> +#else
+> +static bool blk_wait_until_active(struct request_queue *q, bool wait)
+> +{
+> +	return true;
+> +}
+> +#endif
+> +
+>  /**
+>   * get_request - get a free request
+>   * @q: request_queue to allocate request from
+> @@ -1350,6 +1368,16 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+>  	lockdep_assert_held(q->queue_lock);
+>  	WARN_ON_ONCE(q->mq_ops);
+>  
+> +	WARN_ON_ONCE((op & REQ_PM) && blk_pm_suspended(q));
+> +
+> +	/*
+> +	 * Wait if the request queue is suspended or in the process of
+> +	 * suspending/resuming and the request being allocated will not be
+> +	 * used for power management purposes.
+> +	 */
+> +	if (!(op & REQ_PM) && !blk_wait_until_active(q, !(op & REQ_NOWAIT)))
+> +		return ERR_PTR(-EAGAIN);
+> +
+
+Firstly it is not enough to prevent new allocation only, because
+requests pool may have been used up and all the allocated requests
+just stay in block queue when SCSI device is put into quiesce.
+So you may cause new I/O hang and wait forever here. That is why
+I take freeze to do that because freezing queue can prevent new
+allocation and drain in-queue requests both.
+
+Secondly, all RQF_PREEMPT(not PM) is blocked here too, that may
+cause regression since we usually need/allow RQF_PREEMPT to run
+during SCSI quiesce.
+
+-- 
+Ming
