@@ -1,164 +1,137 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48771 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751309AbdISDul (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2017 23:50:41 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 05/10] block: rename .mq_freeze_wq and .mq_freeze_depth
-Date: Tue, 19 Sep 2017 11:49:20 +0800
-Message-Id: <20170919034925.9894-6-ming.lei@redhat.com>
-In-Reply-To: <20170919034925.9894-1-ming.lei@redhat.com>
-References: <20170919034925.9894-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <anish.jhaveri@paviliondata.com>
+Date: Mon, 11 Sep 2017 21:35:48 -0700
+From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
+To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [PATCH 07/10] Selection of active namespace.
+Message-ID: <20170912043548.p75lduraz3dhvtwt@haynes>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Return-Path: anish.jhaveri@paviliondata.com
+List-ID: <linux-block@vger.kernel.org>
 
-Both two are used for legacy and blk-mq, so rename them
-as .freeze_wq and .freeze_depth for avoiding to confuse
-people.
+Failover logic iterates over the list of namespaces to figure out which namespace is available to become active. If failover is in progress exit the functionality. If we fail to set new namespace to active state, we will cancel all pending IO's from congestion queue.
 
-No functional change.
-
-Tested-by: Cathy Avery <cavery@redhat.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
 ---
- block/blk-core.c       | 12 ++++++------
- block/blk-mq.c         | 12 ++++++------
- include/linux/blkdev.h |  4 ++--
- 3 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/nvme/host/core.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 97837a5bf838..8889920567d2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -630,7 +630,7 @@ void blk_set_queue_dying(struct request_queue *q)
- 	 * We need to ensure that processes currently waiting on
- 	 * the queue are notified as well.
- 	 */
--	wake_up_all(&q->mq_freeze_wq);
-+	wake_up_all(&q->freeze_wq);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index cefa506..cb2c90f 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2669,6 +2669,111 @@ static void nvme_shared_ns(struct nvme_ns *shared_ns)
+ 	if (ret == shared_ns)
+ 		nvme_add_ns_mpath_ctrl(shared_ns);
  }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
- 
-@@ -793,14 +793,14 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
- 		/*
- 		 * read pair of barrier in blk_freeze_queue_start(),
- 		 * we need to order reading __PERCPU_REF_DEAD flag of
--		 * .q_usage_counter and reading .mq_freeze_depth or
-+		 * .q_usage_counter and reading .freeze_depth or
- 		 * queue dying flag, otherwise the following wait may
- 		 * never return if the two reads are reordered.
- 		 */
- 		smp_rmb();
- 
--		ret = wait_event_interruptible(q->mq_freeze_wq,
--				!atomic_read(&q->mq_freeze_depth) ||
-+		ret = wait_event_interruptible(q->freeze_wq,
-+				!atomic_read(&q->freeze_depth) ||
- 				blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-@@ -819,7 +819,7 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
- 	struct request_queue *q =
- 		container_of(ref, struct request_queue, q_usage_counter);
- 
--	wake_up_all(&q->mq_freeze_wq);
-+	wake_up_all(&q->freeze_wq);
- }
- 
- static void blk_rq_timed_out_timer(unsigned long data)
-@@ -891,7 +891,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	q->bypass_depth = 1;
- 	__set_bit(QUEUE_FLAG_BYPASS, &q->queue_flags);
- 
--	init_waitqueue_head(&q->mq_freeze_wq);
-+	init_waitqueue_head(&q->freeze_wq);
- 
- 	/*
- 	 * Init percpu_ref in atomic mode so that it's faster to shutdown.
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1e9bf2b987a1..988da93d85a4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -122,7 +122,7 @@ void blk_freeze_queue_start(struct request_queue *q)
++
++static void nvme_trigger_failover_work(struct work_struct *work)
++{
++	struct nvme_ctrl *ctrl =
++		container_of(work, struct nvme_ctrl, failover_work);
++
++	pr_debug("Trigger failover on controller nvme%d\n", ctrl->instance);
++
++	nvme_trigger_failover(ctrl);
++}
++
++/*
++ This will only be called in IO Failure scenario
++ or on device removal
++ or on device disconnect.
++*/
++void nvme_trigger_failover(struct nvme_ctrl *ctrl)
++{
++	struct nvme_ns *active_ns = NULL;
++	struct nvme_ns *standby_ns = NULL;
++	struct nvme_ns *ns = NULL, *next;
++	struct nvme_ctrl *mpath_ctrl = NULL;
++	struct nvme_ns *mpath_ns = NULL;
++
++	if (test_bit(NVME_CTRL_MPATH_CHILD, &ctrl->flags)) {
++		list_for_each_entry_safe(ns, next, &ctrl->namespaces, list) {
++			mpath_ctrl = ns->mpath_ctrl;
++			break;
++		}
++	} else {
++		/*We are not part of multipath group.*/
++		return;
++	}
++
++	if (ns && !ns->active) {
++		pr_info("No Failover as nvme%dn%d is not active.\n", ctrl->instance, ns->instance);
++		return;
++	}
++	if (!mpath_ctrl) {
++		pr_info("No namespace with multipath support found.\n");
++		return;
++	}
++
++	/*Find the namespace for above multipath controller.
++	  There is only one namespace per given multipath controller.
++	  We just use same mechanism of list even if we have single
++	  mulipath namespace.*/
++	list_for_each_entry_safe(mpath_ns, next, &mpath_ctrl->mpath_namespace, list) {
++		if (mpath_ns)
++			break;
++	}
++	if (!mpath_ns) {
++		pr_info("No multipath namespace found.\n");
++		return;
++	}
++
++	if (test_and_set_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags))  {
++		return;
++	}
++	/* Iterate through all namespaces related to Multipath controller.
++	   Find a different one from the one in use. This will be the
++	   namespace we will failover to.*/
++	if (test_bit(NVME_NS_ROOT, &mpath_ns->flags)) {
++		mutex_lock(&mpath_ns->ctrl->namespaces_mutex);
++		list_for_each_entry_safe(ns, next, &mpath_ns->ctrl->namespaces, mpathlist) {
++			if (ns) {
++				if (ns->active)
++					active_ns = ns;
++				else
++					standby_ns = ns;
++			}
++			if (active_ns && standby_ns) {
++				if (active_ns == standby_ns) {
++					test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
++					break;
++				}
++				if ((jiffies - standby_ns->start_time) < (ns_failover_interval * HZ)) {
++					pr_debug(" Failed to meet timeout between failover on same volume.\n");
++					test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
++					schedule_delayed_work(&mpath_ctrl->cu_work, HZ);
++					break;
++				}
++				active_ns->mpath_ctrl->cleanup_done = 0;
++				active_ns->active = 0;
++				active_ns->start_time = jiffies;
++				if (nvme_set_ns_active(standby_ns, mpath_ns, NVME_FAILOVER_RETRIES)) {
++					pr_info("Failed to set nvme%dn%d\n active", standby_ns->ctrl->instance, standby_ns->instance);
++					test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
++					schedule_delayed_work(&mpath_ctrl->cu_work, HZ);
++				}
++				break;
++			}
++		}
++
++		if (active_ns && !standby_ns) {
++			test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
++		}
++
++		if (!test_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags)) {
++		}
++		mutex_unlock(&mpath_ns->ctrl->namespaces_mutex);
++	}
++}
++EXPORT_SYMBOL_GPL(nvme_trigger_failover);
++
+ static struct nvme_ns *nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
  {
- 	int freeze_depth;
- 
--	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
-+	freeze_depth = atomic_inc_return(&q->freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
- 		if (q->mq_ops)
-@@ -135,14 +135,14 @@ void blk_freeze_queue_wait(struct request_queue *q)
- {
- 	if (!q->mq_ops)
- 		blk_drain_queue(q);
--	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
-+	wait_event(q->freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_wait);
- 
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout)
- {
--	return wait_event_timeout(q->mq_freeze_wq,
-+	return wait_event_timeout(q->freeze_wq,
- 					percpu_ref_is_zero(&q->q_usage_counter),
- 					timeout);
- }
-@@ -170,11 +170,11 @@ void blk_unfreeze_queue(struct request_queue *q)
- {
- 	int freeze_depth;
- 
--	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
-+	freeze_depth = atomic_dec_return(&q->freeze_depth);
- 	WARN_ON_ONCE(freeze_depth < 0);
- 	if (!freeze_depth) {
- 		percpu_ref_reinit(&q->q_usage_counter);
--		wake_up_all(&q->mq_freeze_wq);
-+		wake_up_all(&q->freeze_wq);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_unfreeze_queue);
-@@ -2440,7 +2440,7 @@ void blk_mq_free_queue(struct request_queue *q)
- /* Basically redo blk_mq_init_queue with queue frozen */
- static void blk_mq_queue_reinit(struct request_queue *q)
- {
--	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
-+	WARN_ON_ONCE(!atomic_read(&q->freeze_depth));
- 
- 	blk_mq_debugfs_unregister_hctxs(q);
- 	blk_mq_sysfs_unregister(q);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 460294bb0fa5..b8053bcc6b5f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -564,7 +564,7 @@ struct request_queue {
- 	struct mutex		sysfs_lock;
- 
- 	int			bypass_depth;
--	atomic_t		mq_freeze_depth;
-+	atomic_t		freeze_depth;
- 
- #if defined(CONFIG_BLK_DEV_BSG)
- 	bsg_job_fn		*bsg_job_fn;
-@@ -576,7 +576,7 @@ struct request_queue {
- 	struct throtl_data *td;
- #endif
- 	struct rcu_head		rcu_head;
--	wait_queue_head_t	mq_freeze_wq;
-+	wait_queue_head_t	freeze_wq;
- 	struct percpu_ref	q_usage_counter;
- 	struct list_head	all_q_node;
- 
+ 	struct nvme_ns *ns;
 -- 
-2.9.5
+2.9.3
