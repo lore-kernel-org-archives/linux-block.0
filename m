@@ -1,97 +1,64 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 13 Sep 2017 00:10:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hare@suse.com"
+	<hare@suse.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
 	"rafael.j.wysocki@intel.com" <rafael.j.wysocki@intel.com>
 Subject: Re: [PATCH 4/5] block: Make SCSI device suspend work reliably
-Message-ID: <20170912161046.GB21349@ming.t460p>
+Date: Tue, 12 Sep 2017 15:45:50 +0000
+Message-ID: <1505231149.2537.18.camel@wdc.com>
 References: <20170908235226.26622-1-bart.vanassche@wdc.com>
- <20170908235226.26622-5-bart.vanassche@wdc.com>
- <20170912022948.GB31533@ming.t460p>
- <1505231149.2537.18.camel@wdc.com>
+	 <20170908235226.26622-5-bart.vanassche@wdc.com>
+	 <20170912022948.GB31533@ming.t460p>
+In-Reply-To: <20170912022948.GB31533@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505231149.2537.18.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 12, 2017 at 03:45:50PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-09-12 at 10:29 +0800, Ming Lei wrote:
-> > On Fri, Sep 08, 2017 at 04:52:25PM -0700, Bart Van Assche wrote:
-> > > @@ -1350,6 +1368,16 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
-> > >  	lockdep_assert_held(q->queue_lock);
-> > >  	WARN_ON_ONCE(q->mq_ops);
-> > >  
-> > > +	WARN_ON_ONCE((op & REQ_PM) && blk_pm_suspended(q));
-> > > +
-> > > +	/*
-> > > +	 * Wait if the request queue is suspended or in the process of
-> > > +	 * suspending/resuming and the request being allocated will not be
-> > > +	 * used for power management purposes.
-> > > +	 */
-> > > +	if (!(op & REQ_PM) && !blk_wait_until_active(q, !(op & REQ_NOWAIT)))
-> > > +		return ERR_PTR(-EAGAIN);
-> > > +
-> > 
-> > Firstly it is not enough to prevent new allocation only, because
-> > requests pool may have been used up and all the allocated requests
-> > just stay in block queue when SCSI device is put into quiesce.
-> > So you may cause new I/O hang and wait forever here. That is why
-> > I take freeze to do that because freezing queue can prevent new
-> > allocation and drain in-queue requests both.
-> 
-> Sorry but I disagree. If all tags are allocated and it is attempted to
-> suspend a queue then this patch not only will prevent allocation of new
-> non-PM requests but it will also let these previously submitted non-PM
-> requests finish. See also the blk_peek_request() changes in patch 4/5.
-> Once a previously submitted request finished allocation of the PM request
-> will succeed.
-
-You just simply removed blk_pm_peek_request() from blk_peek_request(),
-how does that work on blk-mq?
-
-Also that may not work because SCSI quiesce may just happen between
-request allocation and run queue, then nothing can be dispatched
-to driver.
-
-> 
-> > Secondly, all RQF_PREEMPT(not PM) is blocked here too, that may
-> > cause regression since we usually need/allow RQF_PREEMPT to run
-> > during SCSI quiesce.
-> 
-> Sorry but I disagree with this comment too. Please keep in mind that my patch
-> only affects the SCSI quiesce status if that status has been requested by the
-> power management subsystem. After the power management subsystem has
-> transitioned a SCSI queue into the quiesce state that queue has reached the
-> RPM_SUSPENDED status. No new requests must be submitted against a suspended
-
-No, RPM_SUSPEND only means runtime suspend, you misunderstand it as
-system suspend.
-
-Actually the reported issue is during system suspend/resume, which can
-happen without runtime PM, such as, runtime PM is disabled via sysfs.
-
-> queue. It is easy to see in the legacy block layer that only PM requests and
-> no other RQF_PREEMPT requests are processed once the queue has reached the
-> suspended status:
-> 
-> /*
->  * Don't process normal requests when queue is suspended
->  * or in the process of suspending/resuming
->  */
-> static struct request *blk_pm_peek_request(struct request_queue *q,
-> 					   struct request *rq)
-> {
-> 	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
-> 	    (q->rpm_status != RPM_ACTIVE && !(rq->cmd_flags & REQ_PM))))
-
-As I explained, rpm_status represents runtime PM status, nothing to
-do with system suspend/resume.
-
-So RRF_PREEMPT can be dispatched to driver during system suspend.
-
--- 
-Ming
+T24gVHVlLCAyMDE3LTA5LTEyIGF0IDEwOjI5ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+RnJpLCBTZXAgMDgsIDIwMTcgYXQgMDQ6NTI6MjVQTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IEBAIC0xMzUwLDYgKzEzNjgsMTYgQEAgc3RhdGljIHN0cnVjdCByZXF1ZXN0ICpn
+ZXRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgdW5zaWduZWQgaW50IG9wLA0KPiA+
+ICAJbG9ja2RlcF9hc3NlcnRfaGVsZChxLT5xdWV1ZV9sb2NrKTsNCj4gPiAgCVdBUk5fT05fT05D
+RShxLT5tcV9vcHMpOw0KPiA+ICANCj4gPiArCVdBUk5fT05fT05DRSgob3AgJiBSRVFfUE0pICYm
+IGJsa19wbV9zdXNwZW5kZWQocSkpOw0KPiA+ICsNCj4gPiArCS8qDQo+ID4gKwkgKiBXYWl0IGlm
+IHRoZSByZXF1ZXN0IHF1ZXVlIGlzIHN1c3BlbmRlZCBvciBpbiB0aGUgcHJvY2VzcyBvZg0KPiA+
+ICsJICogc3VzcGVuZGluZy9yZXN1bWluZyBhbmQgdGhlIHJlcXVlc3QgYmVpbmcgYWxsb2NhdGVk
+IHdpbGwgbm90IGJlDQo+ID4gKwkgKiB1c2VkIGZvciBwb3dlciBtYW5hZ2VtZW50IHB1cnBvc2Vz
+Lg0KPiA+ICsJICovDQo+ID4gKwlpZiAoIShvcCAmIFJFUV9QTSkgJiYgIWJsa193YWl0X3VudGls
+X2FjdGl2ZShxLCAhKG9wICYgUkVRX05PV0FJVCkpKQ0KPiA+ICsJCXJldHVybiBFUlJfUFRSKC1F
+QUdBSU4pOw0KPiA+ICsNCj4gDQo+IEZpcnN0bHkgaXQgaXMgbm90IGVub3VnaCB0byBwcmV2ZW50
+IG5ldyBhbGxvY2F0aW9uIG9ubHksIGJlY2F1c2UNCj4gcmVxdWVzdHMgcG9vbCBtYXkgaGF2ZSBi
+ZWVuIHVzZWQgdXAgYW5kIGFsbCB0aGUgYWxsb2NhdGVkIHJlcXVlc3RzDQo+IGp1c3Qgc3RheSBp
+biBibG9jayBxdWV1ZSB3aGVuIFNDU0kgZGV2aWNlIGlzIHB1dCBpbnRvIHF1aWVzY2UuDQo+IFNv
+IHlvdSBtYXkgY2F1c2UgbmV3IEkvTyBoYW5nIGFuZCB3YWl0IGZvcmV2ZXIgaGVyZS4gVGhhdCBp
+cyB3aHkNCj4gSSB0YWtlIGZyZWV6ZSB0byBkbyB0aGF0IGJlY2F1c2UgZnJlZXppbmcgcXVldWUg
+Y2FuIHByZXZlbnQgbmV3DQo+IGFsbG9jYXRpb24gYW5kIGRyYWluIGluLXF1ZXVlIHJlcXVlc3Rz
+IGJvdGguDQoNClNvcnJ5IGJ1dCBJIGRpc2FncmVlLiBJZiBhbGwgdGFncyBhcmUgYWxsb2NhdGVk
+IGFuZCBpdCBpcyBhdHRlbXB0ZWQgdG8NCnN1c3BlbmQgYSBxdWV1ZSB0aGVuIHRoaXMgcGF0Y2gg
+bm90IG9ubHkgd2lsbCBwcmV2ZW50IGFsbG9jYXRpb24gb2YgbmV3DQpub24tUE0gcmVxdWVzdHMg
+YnV0IGl0IHdpbGwgYWxzbyBsZXQgdGhlc2UgcHJldmlvdXNseSBzdWJtaXR0ZWQgbm9uLVBNDQpy
+ZXF1ZXN0cyBmaW5pc2guIFNlZSBhbHNvIHRoZSBibGtfcGVla19yZXF1ZXN0KCkgY2hhbmdlcyBp
+biBwYXRjaCA0LzUuDQpPbmNlIGEgcHJldmlvdXNseSBzdWJtaXR0ZWQgcmVxdWVzdCBmaW5pc2hl
+ZCBhbGxvY2F0aW9uIG9mIHRoZSBQTSByZXF1ZXN0DQp3aWxsIHN1Y2NlZWQuDQoNCj4gU2Vjb25k
+bHksIGFsbCBSUUZfUFJFRU1QVChub3QgUE0pIGlzIGJsb2NrZWQgaGVyZSB0b28sIHRoYXQgbWF5
+DQo+IGNhdXNlIHJlZ3Jlc3Npb24gc2luY2Ugd2UgdXN1YWxseSBuZWVkL2FsbG93IFJRRl9QUkVF
+TVBUIHRvIHJ1bg0KPiBkdXJpbmcgU0NTSSBxdWllc2NlLg0KDQpTb3JyeSBidXQgSSBkaXNhZ3Jl
+ZSB3aXRoIHRoaXMgY29tbWVudCB0b28uIFBsZWFzZSBrZWVwIGluIG1pbmQgdGhhdCBteSBwYXRj
+aA0Kb25seSBhZmZlY3RzIHRoZSBTQ1NJIHF1aWVzY2Ugc3RhdHVzIGlmIHRoYXQgc3RhdHVzIGhh
+cyBiZWVuIHJlcXVlc3RlZCBieSB0aGUNCnBvd2VyIG1hbmFnZW1lbnQgc3Vic3lzdGVtLiBBZnRl
+ciB0aGUgcG93ZXIgbWFuYWdlbWVudCBzdWJzeXN0ZW0gaGFzDQp0cmFuc2l0aW9uZWQgYSBTQ1NJ
+IHF1ZXVlIGludG8gdGhlIHF1aWVzY2Ugc3RhdGUgdGhhdCBxdWV1ZSBoYXMgcmVhY2hlZCB0aGUN
+ClJQTV9TVVNQRU5ERUQgc3RhdHVzLiBObyBuZXcgcmVxdWVzdHMgbXVzdCBiZSBzdWJtaXR0ZWQg
+YWdhaW5zdCBhIHN1c3BlbmRlZA0KcXVldWUuIEl0IGlzIGVhc3kgdG8gc2VlIGluIHRoZSBsZWdh
+Y3kgYmxvY2sgbGF5ZXIgdGhhdCBvbmx5IFBNIHJlcXVlc3RzIGFuZA0Kbm8gb3RoZXIgUlFGX1BS
+RUVNUFQgcmVxdWVzdHMgYXJlIHByb2Nlc3NlZCBvbmNlIHRoZSBxdWV1ZSBoYXMgcmVhY2hlZCB0
+aGUNCnN1c3BlbmRlZCBzdGF0dXM6DQoNCi8qDQogKiBEb24ndCBwcm9jZXNzIG5vcm1hbCByZXF1
+ZXN0cyB3aGVuIHF1ZXVlIGlzIHN1c3BlbmRlZA0KICogb3IgaW4gdGhlIHByb2Nlc3Mgb2Ygc3Vz
+cGVuZGluZy9yZXN1bWluZw0KICovDQpzdGF0aWMgc3RydWN0IHJlcXVlc3QgKmJsa19wbV9wZWVr
+X3JlcXVlc3Qoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsDQoJCQkJCSAgIHN0cnVjdCByZXF1ZXN0
+ICpycSkNCnsNCglpZiAocS0+ZGV2ICYmIChxLT5ycG1fc3RhdHVzID09IFJQTV9TVVNQRU5ERUQg
+fHwNCgkgICAgKHEtPnJwbV9zdGF0dXMgIT0gUlBNX0FDVElWRSAmJiAhKHJxLT5jbWRfZmxhZ3Mg
+JiBSRVFfUE0pKSkpDQoJCXJldHVybiBOVUxMOw0KCWVsc2UNCgkJcmV0dXJuIHJxOw0KfQ0KDQpC
+YXJ0Lg==
