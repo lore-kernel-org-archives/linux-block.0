@@ -1,7 +1,8 @@
-Return-Path: <jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: put the driver tag of nxt rq before first one is
  requeued
-To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>,
+ Ming Lei <ming.lei@redhat.com>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <1505236475-9209-1-git-send-email-jianchao.w.wang@oracle.com>
  <20170912102302.GC15792@ming.t460p>
@@ -12,42 +13,38 @@ References: <1505236475-9209-1-git-send-email-jianchao.w.wang@oracle.com>
  <96a21c69-cf79-58a2-2c71-2e440abf9b36@oracle.com>
  <6327de01-0bf4-7e79-59ad-f6489378bfd5@kernel.dk>
  <aebfc622-6d7d-0d07-5a13-8dae06a49bb7@oracle.com>
- <17775b50-1bf2-26d2-c371-2eb349be85d6@kernel.dk>
-From: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <ac37c570-d5c7-052c-f2cd-2b05a1e9e03a@oracle.com>
-Date: Wed, 13 Sep 2017 11:59:19 +0800
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <17775b50-1bf2-26d2-c371-2eb349be85d6@kernel.dk>
+Date: Tue, 12 Sep 2017 21:54:06 -0600
 MIME-Version: 1.0
-In-Reply-To: <17775b50-1bf2-26d2-c371-2eb349be85d6@kernel.dk>
+In-Reply-To: <aebfc622-6d7d-0d07-5a13-8dae06a49bb7@oracle.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
+On 09/12/2017 09:39 PM, jianchao.wang wrote:
+>> Exactly, and especially the readability is the key element here. It's
+>> just not worth it to try and be too clever, especially not for
+>> something like this. When you read the above, you immediately know
+>> what the code does without needing a comment. That's not true for the
+>> other construct.  You both have to read other parts of the function
+>> to figure out what it does, AND read the entire function to ensure it
+>> always does the right thing. Fragile.
+> 
+> Thanks for your comments , jens and ming. I＇m really appreciative of
+> that.  About the fragility, do you mean the possibility that may
+> release the tag of the next rq which has a driver tag itself (maybe a
+> flush) ?
 
+I mean that if you do:
 
-On 09/13/2017 11:54 AM, Jens Axboe wrote:
-> On 09/12/2017 09:39 PM, jianchao.wang wrote:
->>> Exactly, and especially the readability is the key element here. It's
->>> just not worth it to try and be too clever, especially not for
->>> something like this. When you read the above, you immediately know
->>> what the code does without needing a comment. That's not true for the
->>> other construct.  You both have to read other parts of the function
->>> to figure out what it does, AND read the entire function to ensure it
->>> always does the right thing. Fragile.
->>
->> Thanks for your comments , jens and ming. I＇m really appreciative of
->> that.  About the fragility, do you mean the possibility that may
->> release the tag of the next rq which has a driver tag itself (maybe a
->> flush) ?
-> 
-> I mean that if you do:
-> 
-> if (!list_empty(list))
-> 	blk_mq_put_driver_tag(nxt);
-> 
-> it's fragile code in the sense that changes elsewhere in the function
-> are harder to validate and/or can impact the functionality of that
-> simple if and tag put.
-> 
-> The actual release must always be safe, of course.
-> 
+if (!list_empty(list))
+	blk_mq_put_driver_tag(nxt);
 
-Got it, thanks a lot.
+it's fragile code in the sense that changes elsewhere in the function
+are harder to validate and/or can impact the functionality of that
+simple if and tag put.
+
+The actual release must always be safe, of course.
+
+-- 
+Jens Axboe
