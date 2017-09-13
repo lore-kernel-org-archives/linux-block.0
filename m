@@ -1,128 +1,87 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V5 10/14] block: mq-deadline: Add zoned block device data
-Date: Mon, 25 Sep 2017 15:14:50 +0900
-Message-Id: <20170925061454.5533-11-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:35944 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752047AbdIMLrQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Sep 2017 07:47:16 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V8 04/14] mmc: mmc: Enable CQE's
+Date: Wed, 13 Sep 2017 14:40:04 +0300
+Message-Id: <1505302814-19313-5-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce new fields to mq-deadline private data to support zoned block
-devices. The fields are a zone bitmap used to implement zone write
-locking and a spinlock to atomically handle zone write locking with
-other processing.
+Enable or disable CQE when a card is added or removed respectively.
 
-Modify mq-dealine init_queue and exit_queue elevator methods to handle
-initialization and cleanup of the zone write lock bitmap.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/mq-deadline.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 46 insertions(+), 4 deletions(-)
+ drivers/mmc/core/bus.c |  7 +++++++
+ drivers/mmc/core/mmc.c | 12 ++++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index a1cad4331edd..af2eb9b3936e 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -60,6 +60,9 @@ struct deadline_data {
- 
- 	spinlock_t lock;
- 	struct list_head dispatch;
-+
-+	spinlock_t zone_lock;
-+	unsigned long *zones_wlock;
- };
- 
- static inline struct rb_root *
-@@ -300,6 +303,34 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	return rq;
- }
- 
-+static int deadline_init_zones_wlock(struct request_queue *q,
-+				     struct deadline_data *dd)
-+{
-+	/*
-+	 * For regular drives or non-conforming zoned block device,
-+	 * do not use zone write locking.
-+	 */
-+	if (!blk_queue_nr_zones(q))
-+		return 0;
-+
-+	/*
-+	 * Treat host aware drives as regular disks.
-+	 */
-+	if (blk_queue_zoned_model(q) != BLK_ZONED_HM)
-+		return 0;
-+
-+	dd->zones_wlock = kzalloc_node(BITS_TO_LONGS(blk_queue_nr_zones(q))
-+				       * sizeof(unsigned long),
-+				       GFP_KERNEL, q->node);
-+	if (!dd->zones_wlock)
-+		return -ENOMEM;
-+
-+	pr_info("mq-deadline: %s: zones write locking enabled\n",
-+		dev_name(q->backing_dev_info->dev));
-+
-+	return 0;
-+}
-+
- static void dd_exit_queue(struct elevator_queue *e)
+diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
+index 301246513a37..a4b49e25fe96 100644
+--- a/drivers/mmc/core/bus.c
++++ b/drivers/mmc/core/bus.c
+@@ -369,10 +369,17 @@ int mmc_add_card(struct mmc_card *card)
+  */
+ void mmc_remove_card(struct mmc_card *card)
  {
- 	struct deadline_data *dd = e->elevator_data;
-@@ -307,6 +338,7 @@ static void dd_exit_queue(struct elevator_queue *e)
- 	BUG_ON(!list_empty(&dd->fifo_list[READ]));
- 	BUG_ON(!list_empty(&dd->fifo_list[WRITE]));
- 
-+	kfree(dd->zones_wlock);
- 	kfree(dd);
- }
- 
-@@ -317,16 +349,15 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
- {
- 	struct deadline_data *dd;
- 	struct elevator_queue *eq;
-+	int ret = -ENOMEM;
- 
- 	eq = elevator_alloc(q, e);
- 	if (!eq)
- 		return -ENOMEM;
- 
- 	dd = kzalloc_node(sizeof(*dd), GFP_KERNEL, q->node);
--	if (!dd) {
--		kobject_put(&eq->kobj);
--		return -ENOMEM;
--	}
-+	if (!dd)
-+		goto out_put_elv;
- 	eq->elevator_data = dd;
- 
- 	INIT_LIST_HEAD(&dd->fifo_list[READ]);
-@@ -340,9 +371,20 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
- 	dd->fifo_batch = fifo_batch;
- 	spin_lock_init(&dd->lock);
- 	INIT_LIST_HEAD(&dd->dispatch);
-+	spin_lock_init(&dd->zone_lock);
++	struct mmc_host *host = card->host;
 +
-+	ret = deadline_init_zones_wlock(q, dd);
-+	if (ret)
-+		goto out_free_dd;
+ #ifdef CONFIG_DEBUG_FS
+ 	mmc_remove_card_debugfs(card);
+ #endif
  
- 	q->elevator = eq;
- 	return 0;
++	if (host->cqe_enabled) {
++		host->cqe_ops->cqe_disable(host);
++		host->cqe_enabled = false;
++	}
 +
-+out_free_dd:
-+	kfree(dd);
-+out_put_elv:
-+	kobject_put(&eq->kobj);
-+	return ret;
- }
+ 	if (mmc_card_present(card)) {
+ 		if (mmc_host_is_spi(card->host)) {
+ 			pr_info("%s: SPI card removed\n",
+diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
+index 194cf2082e73..0dcbd25126a1 100644
+--- a/drivers/mmc/core/mmc.c
++++ b/drivers/mmc/core/mmc.c
+@@ -1807,6 +1807,18 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
+ 	 */
+ 	card->reenable_cmdq = card->ext_csd.cmdq_en;
  
- static int dd_request_merge(struct request_queue *q, struct request **rq,
++	if (card->ext_csd.cmdq_en && !host->cqe_enabled) {
++		err = host->cqe_ops->cqe_enable(host, card);
++		if (err) {
++			pr_err("%s: Failed to enable CQE, error %d\n",
++				mmc_hostname(host), err);
++		} else {
++			host->cqe_enabled = true;
++			pr_info("%s: Command Queue Engine enabled\n",
++				mmc_hostname(host));
++		}
++	}
++
+ 	if (!oldcard)
+ 		host->card = card;
+ 
 -- 
-2.13.5
+1.9.1
