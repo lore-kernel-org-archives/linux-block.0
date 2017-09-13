@@ -1,41 +1,269 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:34701 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752409AbdIFKUd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:20:33 -0400
-Received: by mail-wm0-f42.google.com with SMTP id 137so26987418wmj.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:20:33 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] block: export symbol for bio_copy_kern
-Date: Wed,  6 Sep 2017 12:20:25 +0200
-Message-Id: <1504693225-11715-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga04.intel.com ([192.55.52.120]:34320 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751415AbdIMLsI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Sep 2017 07:48:08 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V8 14/14] mmc: sdhci-pci: Add CQHCI support for Intel GLK
+Date: Wed, 13 Sep 2017 14:40:14 +0300
+Message-Id: <1505302814-19313-15-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Export symbol for bio_copy_kern so that we can use it in modules.
+Add CQHCI initialization and implement CQHCI operations for Intel GLK.
 
-Reported-by: Andiry Xu <t-jianxu@microsoft.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/mmc/host/Kconfig          |   1 +
+ drivers/mmc/host/sdhci-pci-core.c | 154 +++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 154 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 6745759028da..cface315ace5 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1610,6 +1610,7 @@ struct bio *bio_copy_kern(struct request_queue *q, void *data, unsigned int len,
- 	bio_put(bio);
- 	return ERR_PTR(-ENOMEM);
- }
-+EXPORT_SYMBOL(bio_copy_kern);
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index 6db8e46b4e12..23621c52d2f8 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -81,6 +81,7 @@ config MMC_SDHCI_BIG_ENDIAN_32BIT_BYTE_SWAPPER
+ config MMC_SDHCI_PCI
+ 	tristate "SDHCI support on PCI bus"
+ 	depends on MMC_SDHCI && PCI
++	select MMC_CQHCI
+ 	help
+ 	  This selects the PCI Secure Digital Host Controller Interface.
+ 	  Most controllers found today are PCI devices.
+diff --git a/drivers/mmc/host/sdhci-pci-core.c b/drivers/mmc/host/sdhci-pci-core.c
+index bbaddf18a1b3..e22075f99707 100644
+--- a/drivers/mmc/host/sdhci-pci-core.c
++++ b/drivers/mmc/host/sdhci-pci-core.c
+@@ -30,6 +30,8 @@
+ #include <linux/mmc/sdhci-pci-data.h>
+ #include <linux/acpi.h>
  
- /*
-  * bio_set_pages_dirty() and bio_check_pages_dirty() are support functions
++#include "cqhci.h"
++
+ #include "sdhci.h"
+ #include "sdhci-pci.h"
+ #include "sdhci-pci-o2micro.h"
+@@ -117,6 +119,28 @@ int sdhci_pci_resume_host(struct sdhci_pci_chip *chip)
+ 
+ 	return 0;
+ }
++
++static int sdhci_cqhci_suspend(struct sdhci_pci_chip *chip)
++{
++	int ret;
++
++	ret = cqhci_suspend(chip->slots[0]->host->mmc);
++	if (ret)
++		return ret;
++
++	return sdhci_pci_suspend_host(chip);
++}
++
++static int sdhci_cqhci_resume(struct sdhci_pci_chip *chip)
++{
++	int ret;
++
++	ret = sdhci_pci_resume_host(chip);
++	if (ret)
++		return ret;
++
++	return cqhci_resume(chip->slots[0]->host->mmc);
++}
+ #endif
+ 
+ #ifdef CONFIG_PM
+@@ -167,8 +191,48 @@ static int sdhci_pci_runtime_resume_host(struct sdhci_pci_chip *chip)
+ 
+ 	return 0;
+ }
++
++static int sdhci_cqhci_runtime_suspend(struct sdhci_pci_chip *chip)
++{
++	int ret;
++
++	ret = cqhci_suspend(chip->slots[0]->host->mmc);
++	if (ret)
++		return ret;
++
++	return sdhci_pci_runtime_suspend_host(chip);
++}
++
++static int sdhci_cqhci_runtime_resume(struct sdhci_pci_chip *chip)
++{
++	int ret;
++
++	ret = sdhci_pci_runtime_resume_host(chip);
++	if (ret)
++		return ret;
++
++	return cqhci_resume(chip->slots[0]->host->mmc);
++}
+ #endif
+ 
++static u32 sdhci_cqhci_irq(struct sdhci_host *host, u32 intmask)
++{
++	int cmd_error = 0;
++	int data_error = 0;
++
++	if (!sdhci_cqe_irq(host, intmask, &cmd_error, &data_error))
++		return intmask;
++
++	cqhci_irq(host->mmc, intmask, cmd_error, data_error);
++
++	return 0;
++}
++
++static void sdhci_pci_dumpregs(struct mmc_host *mmc)
++{
++	sdhci_dumpregs(mmc_priv(mmc));
++}
++
+ /*****************************************************************************\
+  *                                                                           *
+  * Hardware specific quirk handling                                          *
+@@ -567,6 +631,17 @@ static void intel_hs400_enhanced_strobe(struct mmc_host *mmc,
+ 	.hw_reset		= sdhci_pci_hw_reset,
+ };
+ 
++static const struct sdhci_ops sdhci_intel_glk_ops = {
++	.set_clock		= sdhci_set_clock,
++	.set_power		= sdhci_intel_set_power,
++	.enable_dma		= sdhci_pci_enable_dma,
++	.set_bus_width		= sdhci_set_bus_width,
++	.reset			= sdhci_reset,
++	.set_uhs_signaling	= sdhci_set_uhs_signaling,
++	.hw_reset		= sdhci_pci_hw_reset,
++	.irq			= sdhci_cqhci_irq,
++};
++
+ static void byt_read_dsm(struct sdhci_pci_slot *slot)
+ {
+ 	struct intel_host *intel_host = sdhci_pci_priv(slot);
+@@ -596,15 +671,83 @@ static int glk_emmc_probe_slot(struct sdhci_pci_slot *slot)
+ {
+ 	int ret = byt_emmc_probe_slot(slot);
+ 
++	slot->host->mmc->caps2 |= MMC_CAP2_CQE;
++
+ 	if (slot->chip->pdev->device != PCI_DEVICE_ID_INTEL_GLK_EMMC) {
+ 		slot->host->mmc->caps2 |= MMC_CAP2_HS400_ES,
+ 		slot->host->mmc_host_ops.hs400_enhanced_strobe =
+ 						intel_hs400_enhanced_strobe;
++		slot->host->mmc->caps2 |= MMC_CAP2_CQE_DCMD;
+ 	}
+ 
+ 	return ret;
+ }
+ 
++static void glk_cqe_enable(struct mmc_host *mmc)
++{
++	struct sdhci_host *host = mmc_priv(mmc);
++	u32 reg;
++
++	/*
++	 * CQE gets stuck if it sees Buffer Read Enable bit set, which can be
++	 * the case after tuning, so ensure the buffer is drained.
++	 */
++	reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
++	while (reg & SDHCI_DATA_AVAILABLE) {
++		sdhci_readl(host, SDHCI_BUFFER);
++		reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
++	}
++
++	sdhci_cqe_enable(mmc);
++}
++
++static const struct cqhci_host_ops glk_cqhci_ops = {
++	.enable		= glk_cqe_enable,
++	.disable	= sdhci_cqe_disable,
++	.dumpregs	= sdhci_pci_dumpregs,
++};
++
++static int glk_emmc_add_host(struct sdhci_pci_slot *slot)
++{
++	struct device *dev = &slot->chip->pdev->dev;
++	struct sdhci_host *host = slot->host;
++	struct cqhci_host *cq_host;
++	bool dma64;
++	int ret;
++
++	ret = sdhci_setup_host(host);
++	if (ret)
++		return ret;
++
++	cq_host = devm_kzalloc(dev, sizeof(*cq_host), GFP_KERNEL);
++	if (!cq_host) {
++		ret = -ENOMEM;
++		goto cleanup;
++	}
++
++	cq_host->mmio = host->ioaddr + 0x200;
++	cq_host->quirks |= CQHCI_QUIRK_SHORT_TXFR_DESC_SZ;
++	cq_host->ops = &glk_cqhci_ops;
++
++	dma64 = host->flags & SDHCI_USE_64_BIT_DMA;
++	if (dma64)
++		cq_host->caps |= CQHCI_TASK_DESC_SZ_128;
++
++	ret = cqhci_init(cq_host, host->mmc, dma64);
++	if (ret)
++		goto cleanup;
++
++	ret = __sdhci_add_host(host);
++	if (ret)
++		goto cleanup;
++
++	return 0;
++
++cleanup:
++	sdhci_cleanup_host(host);
++	return ret;
++}
++
+ #ifdef CONFIG_ACPI
+ static int ni_set_max_freq(struct sdhci_pci_slot *slot)
+ {
+@@ -683,11 +826,20 @@ static int byt_sd_probe_slot(struct sdhci_pci_slot *slot)
+ static const struct sdhci_pci_fixes sdhci_intel_glk_emmc = {
+ 	.allow_runtime_pm	= true,
+ 	.probe_slot		= glk_emmc_probe_slot,
++	.add_host		= glk_emmc_add_host,
++#ifdef CONFIG_PM_SLEEP
++	.suspend		= sdhci_cqhci_suspend,
++	.resume			= sdhci_cqhci_resume,
++#endif
++#ifdef CONFIG_PM
++	.runtime_suspend	= sdhci_cqhci_runtime_suspend,
++	.runtime_resume		= sdhci_cqhci_runtime_resume,
++#endif
+ 	.quirks			= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC,
+ 	.quirks2		= SDHCI_QUIRK2_PRESET_VALUE_BROKEN |
+ 				  SDHCI_QUIRK2_CAPS_BIT63_FOR_HS400 |
+ 				  SDHCI_QUIRK2_STOP_WITH_TC,
+-	.ops			= &sdhci_intel_byt_ops,
++	.ops			= &sdhci_intel_glk_ops,
+ 	.priv_size		= sizeof(struct intel_host),
+ };
+ 
 -- 
-2.7.4
+1.9.1
