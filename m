@@ -1,41 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43996 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750962AbdINGzR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2017 02:55:17 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v8E6t07s115873
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 02:55:17 -0400
-Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2cyj72fg83-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 02:55:16 -0400
-Received: from localhost
-        by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <chandan@linux.vnet.ibm.com>;
-        Thu, 14 Sep 2017 16:55:14 +1000
-From: Chandan Rajendra <chandan@linux.vnet.ibm.com>
-To: Christoph Hellwig <hch@lst.de>
+Received: from verein.lst.de ([213.95.11.211]:57000 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751054AbdIMQzr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Sep 2017 12:55:47 -0400
+Date: Wed, 13 Sep 2017 18:55:46 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Chandan Rajendra <chandan@linux.vnet.ibm.com>
 Cc: Eryu Guan <eguan@redhat.com>, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [BUG] xfs/104 triggered NULL pointer dereference in iomap  based dio
-Date: Thu, 14 Sep 2017 12:25:57 +0530
-In-Reply-To: <20170913165546.GA18388@lst.de>
-References: <20170913105823.GD8034@eguan.usersys.redhat.com> <8010113.2DyTjQuL2r@localhost.localdomain> <20170913165546.GA18388@lst.de>
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [BUG] xfs/104 triggered NULL pointer dereference in iomap
+        based dio
+Message-ID: <20170913165546.GA18388@lst.de>
+References: <20170913105823.GD8034@eguan.usersys.redhat.com> <8010113.2DyTjQuL2r@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-Id: <1565818.oNrvGvf46j@localhost.localdomain>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8010113.2DyTjQuL2r@localhost.localdomain>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wednesday, September 13, 2017 10:25:46 PM IST Christoph Hellwig wrote:
-> Does it work fine if you call sb_init_dio_done_wq unconditionally?
-> 
-> 
-
-Yes, The issue isn't recreated when sb_init_dio_done_wq() is 
-invoked unconditionally.
-
--- 
-chandan
+Does it work fine if you call sb_init_dio_done_wq unconditionally?
