@@ -1,59 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:34109 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751531AbdIUOt3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2017 10:49:29 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: axboe@kernel.de, linux-block@vger.kernel.org
-Subject: [PATCH] block: drop "sending ioctl to a partition" message
-Date: Thu, 21 Sep 2017 16:49:22 +0200
-Message-Id: <1506005362-13429-1-git-send-email-pbonzini@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=422176dc4=damien.lemoal@wdc.com>
+Subject: Re: [PATCH V2 10/12] scsi: sd_zbc: Disable zone write locking with
+ scsi-mq
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <20170907161640.30465-1-damien.lemoal@wdc.com>
+ <20170907161640.30465-11-damien.lemoal@wdc.com>
+ <20170908124329.GA18932@ming.t460p>
+ <8c23a8c8-e945-fd4c-ee6c-da9b097de30b@wdc.com>
+ <20170910051010.GB11628@ming.t460p>
+ <5a10d60d-b18c-0956-59cd-69cb865019df@wdc.com>
+ <20170912092629.GB15792@ming.t460p>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <f1c3b0e2-4943-4be0-a97d-5138bad351cd@wdc.com>
+Date: Wed, 13 Sep 2017 09:13:12 +0900
+MIME-Version: 1.0
+In-Reply-To: <20170912092629.GB15792@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-After the first few months, the message has not led to many bug reports.
-It's been almost five years now, and in practice the main source of
-it seems to be MTIOCGET that someone is using to detect tape devices.
-While we could whitelist it just like CDROM_GET_CAPABILITY, this patch
-just removes the message altogether.
+Ming,
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/scsi_ioctl.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+On 9/12/17 18:26, Ming Lei wrote:
+>>> OK, I suggest to document this guarantee of no write reorder for ZBC
+>>> somewhere, so that people will keep it in mind when trying to change
+>>> the current code.
+>>
+>> Have you looked at the comments in sd_zbc.c ? That is explained there.
+>> Granted, this is a little deep in the stack, but this is after all
+>> dependent on the implementation of scsi_request_fn(). I can add comments
+>> there too if you prefer.
+> 
+> Yeah, I looked at that, but seems it is too coarse.
 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 7440de44dd85..eafcd67e2480 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -707,24 +707,10 @@ int scsi_verify_blk_ioctl(struct block_device *bd, unsigned int cmd)
- 	case SG_SET_RESERVED_SIZE:
- 	case SG_EMULATED_HOST:
- 		return 0;
--	case CDROM_GET_CAPABILITY:
--		/* Keep this until we remove the printk below.  udev sends it
--		 * and we do not want to spam dmesg about it.   CD-ROMs do
--		 * not have partitions, so we get here only for disks.
--		 */
--		return -ENOIOCTLCMD;
- 	default:
--		break;
-+		/* In particular, rule out all resets and host-specific ioctls.  */
-+		return capable(CAP_SYS_RAWIO) ? 0 : -ENOIOCTLCMD;
- 	}
--
--	if (capable(CAP_SYS_RAWIO))
--		return 0;
--
--	/* In particular, rule out all resets and host-specific ioctls.  */
--	printk_ratelimited(KERN_WARNING
--			   "%s: sending ioctl %x to a partition!\n", current->comm, cmd);
--
--	return -ENOIOCTLCMD;
- }
- EXPORT_SYMBOL(scsi_verify_blk_ioctl);
- 
+OK. Will improve that in V3.
+
+>> Zoned disks are recent and all of them support FUA. This means that a
+>> write with FUA will be processed like any other write request (if I read
+>> the code in blk-flush.c correctly). Well, at least for the mq case,
+>> which does a blk_mq_sched_insert_request(), while the direct call to
+> 
+> blk_mq_sched_bypass_insert() can be called for flush requests too,
+> since requests in flush sequence share one driver tag(rq->tag != -1),
+> then the rq can be added to front of hctx->dispatch directly.
+
+For pure flush commands, any order is OK, since these are not actual
+writes. the ZBC/ZAC standards do not modify the behavior of
+flush/synchronize cache commands.
+
+But I will look into more detail at the PREFLUSH/POSTFLUSH mechanic and
+relation to write request ordering to make sure no corner cases are left
+ignored.
+
+Thanks for the comments.
+
+Best regards.
+
 -- 
-1.8.3.1
+Damien Le Moal,
+Western Digital
