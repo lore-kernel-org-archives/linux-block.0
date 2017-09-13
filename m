@@ -1,137 +1,265 @@
-Return-Path: <anish.jhaveri@paviliondata.com>
-Date: Mon, 11 Sep 2017 21:28:56 -0700
-From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
-To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org;, linux-nvme@lists.infradead.org
-Subject: [PATCH 07/10] Selection of active namespace.
-Message-ID: <20170912042856.sb4uevo2bzxkckm6@haynes>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-Path: anish.jhaveri@paviliondata.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:35944 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751829AbdIMLrG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Sep 2017 07:47:06 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V8 02/14] mmc: core: Add support for handling CQE requests
+Date: Wed, 13 Sep 2017 14:40:02 +0300
+Message-Id: <1505302814-19313-3-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Failover logic iterates over the list of namespaces to figure out which namespace is available to become active. If failover is in progress exit the functionality. If we fail to set new namespace to active state, we will cancel all pending IO's from congestion queue.
+Add core support for handling CQE requests, including starting, completing
+and recovering.
 
-Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- drivers/nvme/host/core.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+ drivers/mmc/core/core.c  | 163 +++++++++++++++++++++++++++++++++++++++++++++--
+ drivers/mmc/core/core.h  |   4 ++
+ include/linux/mmc/host.h |   2 +
+ 3 files changed, 164 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index cefa506..cb2c90f 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2669,6 +2669,111 @@ static void nvme_shared_ns(struct nvme_ns *shared_ns)
- 	if (ret == shared_ns)
- 		nvme_add_ns_mpath_ctrl(shared_ns);
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 09fdc467b804..ef2d8aa1e7d2 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -266,7 +266,8 @@ static void __mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
+ 	host->ops->request(host, mrq);
  }
-+
-+static void nvme_trigger_failover_work(struct work_struct *work)
+ 
+-static void mmc_mrq_pr_debug(struct mmc_host *host, struct mmc_request *mrq)
++static void mmc_mrq_pr_debug(struct mmc_host *host, struct mmc_request *mrq,
++			     bool cqe)
+ {
+ 	if (mrq->sbc) {
+ 		pr_debug("<%s: starting CMD%u arg %08x flags %08x>\n",
+@@ -275,9 +276,12 @@ static void mmc_mrq_pr_debug(struct mmc_host *host, struct mmc_request *mrq)
+ 	}
+ 
+ 	if (mrq->cmd) {
+-		pr_debug("%s: starting CMD%u arg %08x flags %08x\n",
+-			 mmc_hostname(host), mrq->cmd->opcode, mrq->cmd->arg,
+-			 mrq->cmd->flags);
++		pr_debug("%s: starting %sCMD%u arg %08x flags %08x\n",
++			 mmc_hostname(host), cqe ? "CQE direct " : "",
++			 mrq->cmd->opcode, mrq->cmd->arg, mrq->cmd->flags);
++	} else if (cqe) {
++		pr_debug("%s: starting CQE transfer for tag %d blkaddr %u\n",
++			 mmc_hostname(host), mrq->tag, mrq->data->blk_addr);
+ 	}
+ 
+ 	if (mrq->data) {
+@@ -342,7 +346,7 @@ static int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
+ 	if (mmc_card_removed(host->card))
+ 		return -ENOMEDIUM;
+ 
+-	mmc_mrq_pr_debug(host, mrq);
++	mmc_mrq_pr_debug(host, mrq, false);
+ 
+ 	WARN_ON(!host->claimed);
+ 
+@@ -482,6 +486,155 @@ void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq)
+ }
+ EXPORT_SYMBOL(mmc_wait_for_req_done);
+ 
++/*
++ * mmc_cqe_start_req - Start a CQE request.
++ * @host: MMC host to start the request
++ * @mrq: request to start
++ *
++ * Start the request, re-tuning if needed and it is possible. Returns an error
++ * code if the request fails to start or -EBUSY if CQE is busy.
++ */
++int mmc_cqe_start_req(struct mmc_host *host, struct mmc_request *mrq)
 +{
-+	struct nvme_ctrl *ctrl =
-+		container_of(work, struct nvme_ctrl, failover_work);
++	int err;
 +
-+	pr_debug("Trigger failover on controller nvme%d\n", ctrl->instance);
++	/*
++	 * CQE cannot process re-tuning commands. Caller must hold retuning
++	 * while CQE is in use.  Re-tuning can happen here only when CQE has no
++	 * active requests i.e. this is the first.  Note, re-tuning will call
++	 * ->cqe_off().
++	 */
++	err = mmc_retune(host);
++	if (err)
++		goto out_err;
 +
-+	nvme_trigger_failover(ctrl);
++	mrq->host = host;
++
++	mmc_mrq_pr_debug(host, mrq, true);
++
++	err = mmc_mrq_prep(host, mrq);
++	if (err)
++		goto out_err;
++
++	err = host->cqe_ops->cqe_request(host, mrq);
++	if (err)
++		goto out_err;
++
++	trace_mmc_request_start(host, mrq);
++
++	return 0;
++
++out_err:
++	if (mrq->cmd) {
++		pr_debug("%s: failed to start CQE direct CMD%u, error %d\n",
++			 mmc_hostname(host), mrq->cmd->opcode, err);
++	} else {
++		pr_debug("%s: failed to start CQE transfer for tag %d, error %d\n",
++			 mmc_hostname(host), mrq->tag, err);
++	}
++	return err;
 +}
++EXPORT_SYMBOL(mmc_cqe_start_req);
++
++/**
++ *	mmc_cqe_request_done - CQE has finished processing an MMC request
++ *	@host: MMC host which completed request
++ *	@mrq: MMC request which completed
++ *
++ *	CQE drivers should call this function when they have completed
++ *	their processing of a request.
++ */
++void mmc_cqe_request_done(struct mmc_host *host, struct mmc_request *mrq)
++{
++	mmc_should_fail_request(host, mrq);
++
++	/* Flag re-tuning needed on CRC errors */
++	if ((mrq->cmd && mrq->cmd->error == -EILSEQ) ||
++	    (mrq->data && mrq->data->error == -EILSEQ))
++		mmc_retune_needed(host);
++
++	trace_mmc_request_done(host, mrq);
++
++	if (mrq->cmd) {
++		pr_debug("%s: CQE req done (direct CMD%u): %d\n",
++			 mmc_hostname(host), mrq->cmd->opcode, mrq->cmd->error);
++	} else {
++		pr_debug("%s: CQE transfer done tag %d\n",
++			 mmc_hostname(host), mrq->tag);
++	}
++
++	if (mrq->data) {
++		pr_debug("%s:     %d bytes transferred: %d\n",
++			 mmc_hostname(host),
++			 mrq->data->bytes_xfered, mrq->data->error);
++	}
++
++	mrq->done(mrq);
++}
++EXPORT_SYMBOL(mmc_cqe_request_done);
++
++/**
++ *	mmc_cqe_post_req - CQE post process of a completed MMC request
++ *	@host: MMC host
++ *	@mrq: MMC request to be processed
++ */
++void mmc_cqe_post_req(struct mmc_host *host, struct mmc_request *mrq)
++{
++	if (host->cqe_ops->cqe_post_req)
++		host->cqe_ops->cqe_post_req(host, mrq);
++}
++EXPORT_SYMBOL(mmc_cqe_post_req);
++
++/* Arbitrary 1 second timeout */
++#define MMC_CQE_RECOVERY_TIMEOUT	1000
 +
 +/*
-+ This will only be called in IO Failure scenario
-+ or on device removal
-+ or on device disconnect.
-+*/
-+void nvme_trigger_failover(struct nvme_ctrl *ctrl)
++ * mmc_cqe_recovery - Recover from CQE errors.
++ * @host: MMC host to recover
++ *
++ * Recovery consists of stopping CQE, stopping eMMC, discarding the queue in
++ * in eMMC, and discarding the queue in CQE. CQE must call
++ * mmc_cqe_request_done() on all requests. An error is returned if the eMMC
++ * fails to discard its queue.
++ */
++int mmc_cqe_recovery(struct mmc_host *host)
 +{
-+	struct nvme_ns *active_ns = NULL;
-+	struct nvme_ns *standby_ns = NULL;
-+	struct nvme_ns *ns = NULL, *next;
-+	struct nvme_ctrl *mpath_ctrl = NULL;
-+	struct nvme_ns *mpath_ns = NULL;
++	struct mmc_command cmd;
++	int err;
 +
-+	if (test_bit(NVME_CTRL_MPATH_CHILD, &ctrl->flags)) {
-+		list_for_each_entry_safe(ns, next, &ctrl->namespaces, list) {
-+			mpath_ctrl = ns->mpath_ctrl;
-+			break;
-+		}
-+	} else {
-+		/*We are not part of multipath group.*/
-+		return;
-+	}
++	mmc_retune_hold_now(host);
 +
-+	if (ns && !ns->active) {
-+		pr_info("No Failover as nvme%dn%d is not active.\n", ctrl->instance, ns->instance);
-+		return;
-+	}
-+	if (!mpath_ctrl) {
-+		pr_info("No namespace with multipath support found.\n");
-+		return;
-+	}
++	/*
++	 * Recovery is expected seldom, if at all, but it reduces performance,
++	 * so make sure it is not completely silent.
++	 */
++	pr_warn("%s: running CQE recovery\n", mmc_hostname(host));
 +
-+	/*Find the namespace for above multipath controller.
-+	  There is only one namespace per given multipath controller.
-+	  We just use same mechanism of list even if we have single
-+	  mulipath namespace.*/
-+	list_for_each_entry_safe(mpath_ns, next, &mpath_ctrl->mpath_namespace, list) {
-+		if (mpath_ns)
-+			break;
-+	}
-+	if (!mpath_ns) {
-+		pr_info("No multipath namespace found.\n");
-+		return;
-+	}
++	host->cqe_ops->cqe_recovery_start(host);
 +
-+	if (test_and_set_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags))  {
-+		return;
-+	}
-+	/* Iterate through all namespaces related to Multipath controller.
-+	   Find a different one from the one in use. This will be the
-+	   namespace we will failover to.*/
-+	if (test_bit(NVME_NS_ROOT, &mpath_ns->flags)) {
-+		mutex_lock(&mpath_ns->ctrl->namespaces_mutex);
-+		list_for_each_entry_safe(ns, next, &mpath_ns->ctrl->namespaces, mpathlist) {
-+			if (ns) {
-+				if (ns->active)
-+					active_ns = ns;
-+				else
-+					standby_ns = ns;
-+			}
-+			if (active_ns && standby_ns) {
-+				if (active_ns == standby_ns) {
-+					test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
-+					break;
-+				}
-+				if ((jiffies - standby_ns->start_time) < (ns_failover_interval * HZ)) {
-+					pr_debug(" Failed to meet timeout between failover on same volume.\n");
-+					test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
-+					schedule_delayed_work(&mpath_ctrl->cu_work, HZ);
-+					break;
-+				}
-+				active_ns->mpath_ctrl->cleanup_done = 0;
-+				active_ns->active = 0;
-+				active_ns->start_time = jiffies;
-+				if (nvme_set_ns_active(standby_ns, mpath_ns, NVME_FAILOVER_RETRIES)) {
-+					pr_info("Failed to set nvme%dn%d\n active", standby_ns->ctrl->instance, standby_ns->instance);
-+					test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
-+					schedule_delayed_work(&mpath_ctrl->cu_work, HZ);
-+				}
-+				break;
-+			}
-+		}
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.opcode       = MMC_STOP_TRANSMISSION,
++	cmd.flags        = MMC_RSP_R1B | MMC_CMD_AC,
++	cmd.flags       &= ~MMC_RSP_CRC; /* Ignore CRC */
++	cmd.busy_timeout = MMC_CQE_RECOVERY_TIMEOUT,
++	mmc_wait_for_cmd(host, &cmd, 0);
 +
-+		if (active_ns && !standby_ns) {
-+			test_and_clear_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags);
-+		}
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.opcode       = MMC_CMDQ_TASK_MGMT;
++	cmd.arg          = 1; /* Discard entire queue */
++	cmd.flags        = MMC_RSP_R1B | MMC_CMD_AC;
++	cmd.flags       &= ~MMC_RSP_CRC; /* Ignore CRC */
++	cmd.busy_timeout = MMC_CQE_RECOVERY_TIMEOUT,
++	err = mmc_wait_for_cmd(host, &cmd, 0);
 +
-+		if (!test_bit(NVME_NS_FO_IN_PROGRESS, &mpath_ns->flags)) {
-+		}
-+		mutex_unlock(&mpath_ns->ctrl->namespaces_mutex);
-+	}
++	host->cqe_ops->cqe_recovery_finish(host);
++
++	mmc_retune_release(host);
++
++	return err;
 +}
-+EXPORT_SYMBOL_GPL(nvme_trigger_failover);
++EXPORT_SYMBOL(mmc_cqe_recovery);
 +
- static struct nvme_ns *nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ /**
+  *	mmc_is_req_done - Determine if a 'cap_cmd_during_tfr' request is done
+  *	@host: MMC host
+diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
+index a294c836a143..e941342ed450 100644
+--- a/drivers/mmc/core/core.h
++++ b/drivers/mmc/core/core.h
+@@ -150,4 +150,8 @@ static inline void mmc_claim_host(struct mmc_host *host)
+ void mmc_ctx_get_card(struct mmc_card *card, struct mmc_ctx *ctx);
+ void mmc_ctx_put_card(struct mmc_card *card, struct mmc_ctx *ctx);
+ 
++int mmc_cqe_start_req(struct mmc_host *host, struct mmc_request *mrq);
++void mmc_cqe_post_req(struct mmc_host *host, struct mmc_request *mrq);
++int mmc_cqe_recovery(struct mmc_host *host);
++
+ #endif
+diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+index 228a493c3b25..54b0463443bd 100644
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -474,6 +474,8 @@ static inline void *mmc_priv(struct mmc_host *host)
+ void mmc_request_done(struct mmc_host *, struct mmc_request *);
+ void mmc_command_done(struct mmc_host *host, struct mmc_request *mrq);
+ 
++void mmc_cqe_request_done(struct mmc_host *host, struct mmc_request *mrq);
++
+ static inline void mmc_signal_sdio_irq(struct mmc_host *host)
  {
- 	struct nvme_ns *ns;
+ 	host->ops->enable_sdio_irq(host, 0);
 -- 
-2.9.3
+1.9.1
