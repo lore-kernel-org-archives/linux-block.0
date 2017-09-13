@@ -1,34 +1,77 @@
-Return-Path: <anish.jhaveri@paviliondata.com>
-Date: Mon, 11 Sep 2017 21:33:02 -0700
-From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
-To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 10/10] Reserved tag for active ns command
-Message-ID: <20170912043302.uikxktbfqjfzwfvn@haynes>
+Return-Path: <shli@kernel.org>
+Date: Wed, 13 Sep 2017 15:30:04 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Tejun Heo <tj@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	lizefan@huawei.com, tglx@linutronix.de, kernel-team@fb.com,
+	axboe@kernel.dk, Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH V2 1/4] kthread: add a mechanism to store cgroup info
+Message-ID: <20170913223004.qevnu4higaxyb74b@kernel.org>
+References: <cover.1505335620.git.shli@fb.com>
+ <802ba16bd896e56bc974780e97157760fde7c273.1505335620.git.shli@fb.com>
+ <20170913213820.GA378890@devbig577.frc2.facebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-Path: anish.jhaveri@paviliondata.com
+In-Reply-To: <20170913213820.GA378890@devbig577.frc2.facebook.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Using reserved tag for setting standby namespace to active using nvme command.
+On Wed, Sep 13, 2017 at 02:38:20PM -0700, Tejun Heo wrote:
+> Hello,
+> 
+> On Wed, Sep 13, 2017 at 02:01:26PM -0700, Shaohua Li wrote:
+> > diff --git a/kernel/kthread.c b/kernel/kthread.c
+> > index 26db528..3107eee 100644
+> > --- a/kernel/kthread.c
+> > +++ b/kernel/kthread.c
+> > @@ -20,7 +20,6 @@
+> >  #include <linux/freezer.h>
+> >  #include <linux/ptrace.h>
+> >  #include <linux/uaccess.h>
+> > -#include <linux/cgroup.h>
+> >  #include <trace/events/sched.h>
+> >  
+> >  static DEFINE_SPINLOCK(kthread_create_lock);
+> > @@ -47,6 +46,7 @@ struct kthread {
+> >  	void *data;
+> >  	struct completion parked;
+> >  	struct completion exited;
+> 
+> maybe #ifdef CONFIG_CGROUPS?
+> 
+> > +	struct cgroup_subsys_state *blkcg_css;
 
-Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
----
- drivers/nvme/host/rdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ah, I thought cgroup_subsys_state is always defined, let me double check.
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index cb6a5f8..d094793 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1550,7 +1550,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl)
- 	memset(&ctrl->admin_tag_set, 0, sizeof(ctrl->admin_tag_set));
- 	ctrl->admin_tag_set.ops = &nvme_rdma_admin_mq_ops;
- 	ctrl->admin_tag_set.queue_depth = NVME_RDMA_AQ_BLKMQ_DEPTH;
--	ctrl->admin_tag_set.reserved_tags = 2; /* connect + keep-alive */
-+	ctrl->admin_tag_set.reserved_tags = 3; /* connect + keep-alive */
- 	ctrl->admin_tag_set.numa_node = NUMA_NO_NODE;
- 	ctrl->admin_tag_set.cmd_size = sizeof(struct nvme_rdma_request) +
- 		SG_CHUNK_SIZE * sizeof(struct scatterlist);
--- 
-2.9.3
+> >  };
+> ...
+> > +void kthread_associate_blkcg(struct cgroup_subsys_state *css)
+> > +{
+> > +	struct kthread *kthread;
+> > +
+> > +	if (!(current->flags & PF_KTHREAD) || !current->set_child_tid)
+> > +		return;
+> > +	kthread = to_kthread(current);
+> > +	if (css) {
+> > +		css_get(css);
+> > +		kthread->blkcg_css = css;
+> > +	} else if (kthread->blkcg_css) {
+> > +		css_put(kthread->blkcg_css);
+> > +		kthread->blkcg_css = NULL;
+> > +	}
+> > +}
+> > +EXPORT_SYMBOL(kthread_associate_blkcg);
+> 
+> Maybe doing sth like the following is less error-prone?
+> 
+> kthread_associate_blkcg(@css)
+> {
+> 	if (current's kthread->blkcg_css)
+> 		put kthread->blkcg_css and set it to NULL;
+> 	if (@css)
+> 		get @css and set kthread->blkcg;
+> }
+
+Sounds good.
+
+Thanks,
+Shaohua
