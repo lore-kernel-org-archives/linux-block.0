@@ -1,62 +1,34 @@
-Return-Path: <i@coly.li>
-Subject: Re: [PATCH 01/19] bcache: Fix leak of bdev reference
-To: Christoph Hellwig <hch@infradead.org>
-Cc: bcache@lists.ewheeler.net, linux-block@vger.kernel.org,
- linux-bcache@vger.kernel.org, axboe@kernel.dk, Jan Kara <jack@suse.cz>
-References: <20170629134510.GA32385@infradead.org>
- <1498855388-16990-1-git-send-email-bcache@lists.ewheeler.net>
- <20170705182447.GA10673@infradead.org>
-From: Coly Li <i@coly.li>
-Message-ID: <e9019647-62b5-1c14-8b2f-66528b972b5c@coly.li>
-Date: Tue, 5 Sep 2017 01:30:04 +0800
+Return-Path: <keith.busch@intel.com>
+Date: Wed, 13 Sep 2017 10:34:43 -0400
+From: Keith Busch <keith.busch@intel.com>
+To: Anish Jhaveri <anish.jhaveri@paviliondata.com>
+Cc: sagi@grimberg.me, hch@lst.de, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 01/10] Initial multipath implementation.
+Message-ID: <20170913143442.GE2832@localhost.localdomain>
+References: <20170912042149.drr5dumro5grm7iu@haynes>
+ <20170912160043.GB2832@localhost.localdomain>
+ <20170913054822.pkykbsvyh36uto5f@haynes>
 MIME-Version: 1.0
-In-Reply-To: <20170705182447.GA10673@infradead.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170913054822.pkykbsvyh36uto5f@haynes>
 List-ID: <linux-block@vger.kernel.org>
 
-On 2017/7/6 上午2:24, Christoph Hellwig wrote:
-> On Fri, Jun 30, 2017 at 01:42:50PM -0700, bcache@lists.ewheeler.net wrote:
->> From: Jan Kara <jack@suse.cz>
->>
->> If blkdev_get_by_path() in register_bcache() fails, we try to lookup the
->> block device using lookup_bdev() to detect which situation we are in to
->> properly report error. However we never drop the reference returned to
->> us from lookup_bdev(). Fix that.
+On Tue, Sep 12, 2017 at 10:48:22PM -0700, Anish Jhaveri wrote:
+> On Tue, Sep 12, 2017 at 12:00:44PM -0400, Keith Busch wrote:
+> > 
+> > I find this patch series confusing to review. You declare these failover
+> > functions in patch 1, use them in patch 2, but they're not defined until
+> > patch 7.
+> Sorry for late reply. 
 > 
-> This look ok, but I think that whole chunk of code should just go
-> away - adding a lookup_bdev and resulting mess just for a slightly
-> different error message is just insane.
+> Idea was to keep header file changes as separate patch. 
+> I will move the function declaration to patch 7 and 
+> rearrange the patch series. If you or anyone else finds 
+> something which could help in browsing the changes, I
+> will try to incorporate next patchset.
 
-Hi Christoph,
-
-When you mentioned "whole chunk of code", do you mean the following
-block of code ?
-
-
-1960         if (IS_ERR(bdev)) {
-========= start of whole chunk of code ============
-1961                 if (bdev == ERR_PTR(-EBUSY)) {
-1962                         bdev = lookup_bdev(strim(path));
-1963                         mutex_lock(&bch_register_lock);
-1964                         if (!IS_ERR(bdev) && bch_is_open(bdev))
-1965                                 err = "device already registered";
-1966                         else
-1967                                 err = "device busy";
-1968                         mutex_unlock(&bch_register_lock);
-1969                         if (!IS_ERR(bdev))
-1970                                 bdput(bdev);
-1971                         if (attr == &ksysfs_register_quiet)
-1972                                 goto out;
-1973                 }
-========= end of whole chunk of code ============
-1974                 goto err;
-1975         }
-
-I don't mind to remove it, just double check I don't misunderstand what
-you meant.
-
-Thanks.
-
-
--- 
-Coly Li
+At the very least, you don't want any patch in the series to depend
+on a future patch just to compile. There are multiple breakages like
+that in your series. For example, patch 5 starts a kthread at function
+nvme_mpath_kthread, but that function doesn't exist until patch 8.
