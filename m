@@ -1,43 +1,56 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Cc: bcache@lists.ewheeler.net,
-	Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH 10/12] bcache: silence static checker warning
-Date: Wed,  6 Sep 2017 14:26:00 +0800
-Message-Id: <20170906062602.50497-11-colyli@suse.de>
-In-Reply-To: <20170906062602.50497-1-colyli@suse.de>
-References: <20170906062602.50497-1-colyli@suse.de>
+Return-Path: <prvs=42330e208=damien.lemoal@wdc.com>
+Subject: Re: [PATCH V2 00/12] scsi-mq support for ZBC disks
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Bart Van Assche <Bart.VanAssche@wdc.com>,
+ Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+References: <20170907161640.30465-1-damien.lemoal@wdc.com>
+ <20170908082040.GA25719@lst.de>
+ <c3305202-43d3-20e3-825a-ae5fff462d54@wdc.com>
+ <20170911122411.GA22255@lst.de>
+ <36d21ce8-543a-39ad-c729-30f9dbd383d0@wdc.com>
+ <20170913201713.GA24926@lst.de>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <f37599b5-0cb8-175c-226c-a22e078c6f6f@wdc.com>
+Date: Thu, 14 Sep 2017 09:04:13 +0900
+MIME-Version: 1.0
+In-Reply-To: <20170913201713.GA24926@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Dan Carpenter <dan.carpenter@oracle.com>
+Christoph,
 
-In olden times, closure_return() used to have a hidden return built in.
-We removed the hidden return but forgot to add a new return here.  If
-"c" were NULL we would oops on the next line, but fortunately "c" is
-never NULL.  Let's just remove the if statement.
+On 9/14/17 05:17, Christoph Hellwig wrote:
+> On Tue, Sep 12, 2017 at 05:38:05PM +0900, Damien Le Moal wrote:
+>> struct blk_zoned {
+>> 	unsigned int nr_zones;
+>> 	unsigned long *seq_zones;
+>> };
+>>
+>> struct request_queue {
+>> 	...
+>> #ifdef CONFIG_BLK_DEV_ZONED
+>> 	struct blk_zoned zoned;
+>> #endif
+>> 	...
+> 
+> Do we even need a new structure for it?  I'd just hang it off
+> the gendisk directly.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-Reviewed-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/super.c | 3 ---
- 1 file changed, 3 deletions(-)
+Using a structure just seemed cleaner to me. But it is indeed not really
+necessary. As for attaching this info to the gendisk, that would indeed
+be equivalent. Having the struct on hand in the request queue just makes
+it easier to write small helpers in blkdev.h to access the info. Hence
+this choice. Should I change it ?
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 253918972335..c5deec621fdd 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1376,9 +1376,6 @@ static void cache_set_flush(struct closure *cl)
- 	struct btree *b;
- 	unsigned i;
- 
--	if (!c)
--		closure_return(cl);
--
- 	bch_cache_accounting_destroy(&c->accounting);
- 
- 	kobject_put(&c->internal);
+I have a V3 under test using the blk_zoned struct in the request queue
+under test. I will post shortly.
+
+> Except for that the idea looks fine to me.
+
+Thanks !
+
 -- 
-2.13.5
+Damien Le Moal,
+Western Digital
