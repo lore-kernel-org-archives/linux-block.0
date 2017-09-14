@@ -1,208 +1,97 @@
-Return-Path: <anish.jhaveri@paviliondata.com>
-Date: Mon, 11 Sep 2017 21:32:05 -0700
-From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
-To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 09/10] Sysfs entries for multipath head
-Message-ID: <20170912043205.rkk2tjs6rmwgwdnu@haynes>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-Path: anish.jhaveri@paviliondata.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:60344 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751370AbdINQnE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Sep 2017 12:43:04 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 4/6] blk-mq: decide how to handle flush rq via RQF_FLUSH_SEQ
+Date: Fri, 15 Sep 2017 00:42:11 +0800
+Message-Id: <20170914164213.17859-5-ming.lei@redhat.com>
+In-Reply-To: <20170914164213.17859-1-ming.lei@redhat.com>
+References: <20170914164213.17859-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Sysfs entries for active path and ioctl redirecting to active namespace when device handle is head namespace.
+Now we always preallocate one driver tag before blk_insert_flush(),
+and flush request will be marked as RQF_FLUSH_SEQ once it is in
+flush machinary.
 
-Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
+So if RQF_FLUSH_SEQ isn't set, we call blk_insert_flush()
+to handle the request, otherwise the flush request is
+dispatched to ->dispatch list directly.
+
+This is a prepare patch for not preallocating driver tag
+on flush rq, and remove the special case.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/core.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 95 insertions(+), 3 deletions(-)
+ block/blk-mq-sched.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 4043c00..82f8e10 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1600,6 +1600,18 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
- 		unsigned int cmd, unsigned long arg)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4ab69435708c..b6399d99438e 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -260,21 +260,22 @@ void blk_mq_sched_request_inserted(struct request *rq)
+ EXPORT_SYMBOL_GPL(blk_mq_sched_request_inserted);
+ 
+ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
++				       bool has_sched,
+ 				       struct request *rq)
  {
- 	struct nvme_ns *ns = bdev->bd_disk->private_data;
-+	struct nvme_ns *mpath_ns = ns;
-+
-+	ns = nvme_get_active_ns_for_mpath_ns(mpath_ns);
-+	if (!ns) {
-+		/* fail IOCTL if no active ns found for mpath */
-+		return -ENOTTY;
-+	}
-+
-+	if (test_bit(NVME_NS_REMOVING, &ns->flags) || (ns->ctrl->state != NVME_CTRL_LIVE)) {
-+		return -ENOTTY;
-+	}
-+
- 
- 	switch (cmd) {
- 	case NVME_IOCTL_ID:
-@@ -1642,7 +1654,8 @@ static void nvme_release(struct gendisk *disk, fmode_t mode)
- {
- 	struct nvme_ns *ns = disk->private_data;
- 
--	module_put(ns->ctrl->ops->module);
-+	if (!test_bit(NVME_NS_ROOT, &ns->flags))
-+		module_put(ns->ctrl->ops->module);
- 	nvme_put_ns(ns);
- }
- 
-@@ -1747,6 +1760,8 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 
- static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
- {
-+	int res = 0;
-+	char *buf;
- 	if (nvme_identify_ns(ns->ctrl, ns->ns_id, id)) {
- 		dev_warn(ns->ctrl->dev, "%s: Identify failure\n", __func__);
- 		return -ENODEV;
-@@ -1770,6 +1785,17 @@ static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
- 				 "%s: Identify Descriptors failed\n", __func__);
+-	if (rq->tag == -1) {
+-		rq->rq_flags |= RQF_SORTED;
+-		return false;
++	/* dispatch flush rq directly */
++	if (rq->rq_flags & RQF_FLUSH_SEQ) {
++		spin_lock(&hctx->lock);
++		list_add(&rq->queuelist, &hctx->dispatch);
++		spin_unlock(&hctx->lock);
++		return true;
  	}
  
-+	/*Retrieve NGUID or UUID from target device as it needs to be persistent across boot.*/
-+	if (!test_bit(NVME_NS_ROOT, &ns->flags)) {
-+		res = nvme_get_mpath_nguid(ns->ctrl, ns->ns_id, &buf);
-+		if (res) {
-+			dev_warn(ns->ctrl->dev, "%s: Failed to get NGUID\n", __func__);
-+		} else {
-+			memcpy(ns->mpath_nguid, buf, NVME_NIDT_NGUID_LEN);
-+			kfree(buf);
-+		}
-+	}
+-	/*
+-	 * If we already have a real request tag, send directly to
+-	 * the dispatch list.
+-	 */
+-	spin_lock(&hctx->lock);
+-	list_add(&rq->queuelist, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
+-	return true;
++	WARN_ON(rq->tag != -1);
++	if (has_sched)
++		rq->rq_flags |= RQF_SORTED;
 +
- 	return 0;
++	return false;
  }
  
-@@ -1779,6 +1805,9 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 	struct nvme_ctrl *ctrl = ns->ctrl;
- 	u16 bs;
+ /**
+@@ -362,12 +363,13 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
  
-+	/*For device to shared,  Bit 0 is set nmic.
-+	We use this to make device part of multipath group.*/
-+	ns->nmic = id->nmic;
- 	/*
- 	 * If identify namespace failed, use default 512 byte block size so
- 	 * block layer can use before failing read/write for 0 capacity.
-@@ -1810,15 +1839,19 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 
- static int nvme_revalidate_disk(struct gendisk *disk)
- {
-+	struct nvme_ns *mpath_ns;
- 	struct nvme_ns *ns = disk->private_data;
- 	struct nvme_id_ns *id = NULL;
- 	int ret;
-+	mpath_ns = ns;
- 
- 	if (test_bit(NVME_NS_DEAD, &ns->flags)) {
- 		set_capacity(disk, 0);
- 		return -ENODEV;
+-	if (rq->tag == -1 && op_is_flush(rq->cmd_flags)) {
++	/* flush rq in flush machinery need to be dispatched directly */
++	if (!(rq->rq_flags & RQF_FLUSH_SEQ) && op_is_flush(rq->cmd_flags)) {
+ 		blk_mq_sched_insert_flush(hctx, rq, can_block);
+ 		return;
  	}
  
-+	ns = nvme_get_ns_for_mpath_ns(mpath_ns);
-+
- 	ret = nvme_revalidate_ns(ns, &id);
- 	if (ret)
- 		return ret;
-@@ -2641,6 +2674,37 @@ static ssize_t eui_show(struct device *dev, struct device_attribute *attr,
- }
- static DEVICE_ATTR(eui, S_IRUGO, eui_show, NULL);
+-	if (e && blk_mq_sched_bypass_insert(hctx, rq))
++	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
+ 		goto run;
  
-+static ssize_t active_show(struct device *dev, struct device_attribute *attr,
-+								char *buf)
-+{
-+	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
-+	int ret = 0;
-+	if (!test_bit(NVME_NS_ROOT, &ns->flags)) {
-+		ret = sprintf(buf, "%d\n", ns->active);
-+	}
-+	return ret;
-+}
-+static DEVICE_ATTR(active, S_IRUGO, active_show, NULL);
-+
-+static ssize_t active_path_show(struct device *dev, struct device_attribute *attr, char *buf)
-+{
-+	struct nvme_ns *mpath_ns = nvme_get_ns_from_dev(dev);
-+	struct nvme_ns *nsa;
-+	int ret = 0;
-+	if (test_bit(NVME_NS_ROOT, &mpath_ns->flags)) {
-+		mutex_lock(&mpath_ns->ctrl->namespaces_mutex);
-+		list_for_each_entry(nsa, &mpath_ns->ctrl->namespaces, mpathlist) {
-+			if (nsa->active) {
-+				ret = sprintf(buf, "nvme%dn%d\n", nsa->ctrl->instance, nsa->instance);
-+				break;
-+			}
-+		}
-+		mutex_unlock(&mpath_ns->ctrl->namespaces_mutex);
-+	}
-+	return ret;
-+}
-+static DEVICE_ATTR(active_path, S_IRUGO, active_path_show, NULL);
-+
- static ssize_t nsid_show(struct device *dev, struct device_attribute *attr,
- 								char *buf)
- {
-@@ -2649,12 +2713,23 @@ static ssize_t nsid_show(struct device *dev, struct device_attribute *attr,
- }
- static DEVICE_ATTR(nsid, S_IRUGO, nsid_show, NULL);
- 
-+static ssize_t mpath_nguid_show(struct device *dev,
-+		struct device_attribute *attr, char *buf)
-+{
-+	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
-+	return sprintf(buf, "%pU\n", ns->mpath_nguid);
-+}
-+static DEVICE_ATTR(mpath_nguid, S_IRUGO, mpath_nguid_show, NULL);
-+
- static struct attribute *nvme_ns_attrs[] = {
- 	&dev_attr_wwid.attr,
- 	&dev_attr_uuid.attr,
- 	&dev_attr_nguid.attr,
- 	&dev_attr_eui.attr,
- 	&dev_attr_nsid.attr,
-+	&dev_attr_active.attr,
-+	&dev_attr_active_path.attr,
-+	&dev_attr_mpath_nguid.attr,
- 	NULL,
- };
- 
-@@ -2714,6 +2789,9 @@ static ssize_t nvme_sysfs_delete(struct device *dev,
- {
- 	struct nvme_ctrl *ctrl = dev_get_drvdata(dev);
- 
-+	if (test_bit(NVME_CTRL_MULTIPATH, &ctrl->flags))
-+		return 0;
-+
- 	if (device_remove_file_self(dev, attr))
- 		ctrl->ops->delete_ctrl(ctrl);
- 	return count;
-@@ -2758,8 +2836,22 @@ static ssize_t nvme_sysfs_show_subsysnqn(struct device *dev,
- 					 char *buf)
- {
- 	struct nvme_ctrl *ctrl = dev_get_drvdata(dev);
--
--	return snprintf(buf, PAGE_SIZE, "%s\n", ctrl->subnqn);
-+	struct nvme_ns *nsa = NULL;
-+	ssize_t ret = 0;
-+	if (test_bit(NVME_CTRL_MULTIPATH, &ctrl->flags)) {
-+		/* mpath ctrl, iterate and send it to nsa->ctrl */
-+		mutex_lock(&ctrl->namespaces_mutex);
-+		list_for_each_entry(nsa, &ctrl->namespaces, mpathlist) {
-+			if (nsa->ctrl && nsa->ctrl->ops) {
-+				ret = snprintf(buf, PAGE_SIZE, "%s\n", nsa->ctrl->subnqn);
-+				break;
-+			}
-+		}
-+		mutex_unlock(&ctrl->namespaces_mutex);
-+	} else {
-+		ret = snprintf(buf, PAGE_SIZE, "%s\n", ctrl->subnqn);
-+	}
-+	return ret;
- }
- static DEVICE_ATTR(subsysnqn, S_IRUGO, nvme_sysfs_show_subsysnqn, NULL);
- 
+ 	if (e && e->type->ops.mq.insert_requests) {
+@@ -405,7 +407,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
+ 		list_for_each_entry_safe(rq, next, list, queuelist) {
+ 			if (WARN_ON_ONCE(rq->tag != -1)) {
+ 				list_del_init(&rq->queuelist);
+-				blk_mq_sched_bypass_insert(hctx, rq);
++				blk_mq_sched_bypass_insert(hctx, true, rq);
+ 			}
+ 		}
+ 	}
 -- 
-2.9.3
+2.9.5
