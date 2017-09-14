@@ -1,23 +1,22 @@
-Return-Path: <prvs=42330e208=damien.lemoal@wdc.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 14 Sep 2017 10:17:57 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Philipp Guendisch <philipp.guendisch@fau.de>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, damien.lemoal@wdc.com, axboe@kernel.dk,
+	viro@zeniv.linux.org.uk, bart.vanassche@sandisk.com,
+	martin.petersen@oracle.com, hare@suse.de, osandov@fb.com,
+	dan.j.williams@intel.com, ming.lei@redhat.com,
+	linux-kernel@i4.cs.fau.de, Mate Horvath <horvatmate@gmail.com>
 Subject: Re: [PATCH] Support for secure erase functionality
-To: Philipp Guendisch <philipp.guendisch@fau.de>, linux-kernel@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- axboe@kernel.dk, viro@zeniv.linux.org.uk, bart.vanassche@sandisk.com,
- martin.petersen@oracle.com, hare@suse.de, osandov@fb.com,
- dan.j.williams@intel.com, ming.lei@redhat.com, linux-kernel@i4.cs.fau.de,
- Mate Horvath <horvatmate@gmail.com>
+Message-ID: <20170914081757.c64qa6pp2zi5hmda@linux-x5ow.site>
 References: <1505317073-22567-1-git-send-email-philipp.guendisch@fau.de>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <2b2d3855-00e9-77d0-7ee4-050c210b718e@wdc.com>
-Date: Thu, 14 Sep 2017 17:46:19 +0900
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <1505317073-22567-1-git-send-email-philipp.guendisch@fau.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Philipp,
-
-On 9/14/17 00:37, Philipp Guendisch wrote:
+On Wed, Sep 13, 2017 at 05:37:53PM +0200, Philipp Guendisch wrote:
 > This patch adds a software based secure erase option to improve data
 > confidentiality. The CONFIG_BLK_DEV_SECURE_ERASE option enables a mount
 > flag called 'sw_secure_erase'. When you mount a volume with this flag,
@@ -26,26 +25,40 @@ On 9/14/17 00:37, Philipp Guendisch wrote:
 > can be used as well but the discard calls will be enabled for this device
 > and suppressed after the write call is made.
 
-Writing once to a sector stored on spinning rust will *not* fully erase
-the previous data. Part of the signal used for storing that data will
-remain on the track (because the disk head is never perfectly aligned on
-the track). With some signal processing work, the old data can be retrieved.
+How can this work with CoW filesystems?
 
-You will need a *lot* of normal writes to make sure nothing remains of
-the old data signal. Granted, even a single write will make it hard to
-get to the old data, but it is possible nevertheless. Hence the standard
-defined SANITIZE with cryptographic erase option to ensure that the old
-data is really dead.
+> 
+> Built against torvalds/linux
 
-I think that a similar problem also exist for SSDs, and it is even worse
-there since writing twice to the same logical sector does not even go to
-the same physical sector. The old data is not even overwritten.
+This should go below the '---' so git am doesn't write it into the changelog.
 
-Writing to erase just makes reading the old data harder, but from a pure
-security perspective, I do not think that works.
 
-Best regards.
+[...]
 
+> +	if (strcmp(fs_type->name, "ext4") != 0 &&
+> +	    strcmp(fs_type->name, "btrfs") != 0 &&
+> +	    strcmp(fs_type->name, "gfs2") != 0 &&
+> +	    strcmp(fs_type->name, "gfs2meta") != 0 &&
+> +	    strcmp(fs_type->name, "xfs") != 0 &&
+> +	    strcmp(fs_type->name, "jfs") != 0) {
+> +		pr_warn("fs: The mounted %s filesystem on drive %s does not generate discards, secure erase won't work",
+> +				fs_type->name, dev_name);
+> +	}
+> +skip:
+> +#endif
+
+Which filesystems commonly used in production are left afterwards?
+
+I'm sorry, but while I get that this sounds like a nice feature for a paper or
+reasearch project, I don't see why it should be used on production systems at
+all.
+
+Byte,
+	Johannes
 -- 
-Damien Le Moal,
-Western Digital
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
