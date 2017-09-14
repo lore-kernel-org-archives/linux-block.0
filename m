@@ -1,178 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49012 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752795AbdI3Lbf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:31:35 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 3/8] block: introduce rqhash helpers
-Date: Sat, 30 Sep 2017 19:26:50 +0800
-Message-Id: <20170930112655.31451-4-ming.lei@redhat.com>
-In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
-References: <20170930112655.31451-1-ming.lei@redhat.com>
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:46721 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751787AbdINKeQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Sep 2017 06:34:16 -0400
+Received: by mail-wm0-f44.google.com with SMTP id i189so10116230wmf.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 03:34:15 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 0/5] lightnvm: pblk: audit mempool usage
+Date: Thu, 14 Sep 2017 12:33:42 +0200
+Message-Id: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We need this helpers for supporting to use hashtable to improve
-bio merge from sw queue in the following patches.
+As suggested by Jens [1], I audited all mempools on pblk.
 
-No functional change.
+This patche series (i) fixes bad mempool allocations that did not
+guarantee forward progress and downsizes the sizes of some overused
+mempools, (ii) removes unnecessary checks, and (iii) eliminates some
+mempools that where introduced in early versions of pblk.
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk.h      | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/elevator.c | 36 +++++++-----------------------------
- 2 files changed, 59 insertions(+), 29 deletions(-)
+[1] https://patchwork.kernel.org/patch/9940973/
 
-diff --git a/block/blk.h b/block/blk.h
-index fcb9775b997d..eb3436d4a73f 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -146,6 +146,58 @@ static inline void blk_clear_rq_complete(struct request *rq)
-  */
- #define ELV_ON_HASH(rq) ((rq)->rq_flags & RQF_HASHED)
- 
-+/*
-+ * Merge hash stuff.
-+ */
-+#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
-+
-+#define bucket(head, key)	&((head)[hash_min((key), ELV_HASH_BITS)])
-+
-+static inline void __rqhash_del(struct request *rq)
-+{
-+	hash_del(&rq->hash);
-+	rq->rq_flags &= ~RQF_HASHED;
-+}
-+
-+static inline void rqhash_del(struct request *rq)
-+{
-+	if (ELV_ON_HASH(rq))
-+		__rqhash_del(rq);
-+}
-+
-+static inline void rqhash_add(struct hlist_head *hash, struct request *rq)
-+{
-+	BUG_ON(ELV_ON_HASH(rq));
-+	hlist_add_head(&rq->hash, bucket(hash, rq_hash_key(rq)));
-+	rq->rq_flags |= RQF_HASHED;
-+}
-+
-+static inline void rqhash_reposition(struct hlist_head *hash, struct request *rq)
-+{
-+	__rqhash_del(rq);
-+	rqhash_add(hash, rq);
-+}
-+
-+static inline struct request *rqhash_find(struct hlist_head *hash, sector_t offset)
-+{
-+	struct hlist_node *next;
-+	struct request *rq = NULL;
-+
-+	hlist_for_each_entry_safe(rq, next, bucket(hash, offset), hash) {
-+		BUG_ON(!ELV_ON_HASH(rq));
-+
-+		if (unlikely(!rq_mergeable(rq))) {
-+			__rqhash_del(rq);
-+			continue;
-+		}
-+
-+		if (rq_hash_key(rq) == offset)
-+			return rq;
-+	}
-+
-+	return NULL;
-+}
-+
- void blk_insert_flush(struct request *rq);
- 
- static inline struct request *__elv_next_request(struct request_queue *q)
-diff --git a/block/elevator.c b/block/elevator.c
-index 153926a90901..824cc3e69ac3 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -47,11 +47,6 @@ static DEFINE_SPINLOCK(elv_list_lock);
- static LIST_HEAD(elv_list);
- 
- /*
-- * Merge hash stuff.
-- */
--#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
--
--/*
-  * Query io scheduler to see if the current process issuing bio may be
-  * merged with rq.
-  */
-@@ -268,14 +263,12 @@ EXPORT_SYMBOL(elevator_exit);
- 
- static inline void __elv_rqhash_del(struct request *rq)
- {
--	hash_del(&rq->hash);
--	rq->rq_flags &= ~RQF_HASHED;
-+	__rqhash_del(rq);
- }
- 
- void elv_rqhash_del(struct request_queue *q, struct request *rq)
- {
--	if (ELV_ON_HASH(rq))
--		__elv_rqhash_del(rq);
-+	rqhash_del(rq);
- }
- EXPORT_SYMBOL_GPL(elv_rqhash_del);
- 
-@@ -283,37 +276,22 @@ void elv_rqhash_add(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	BUG_ON(ELV_ON_HASH(rq));
--	hash_add(e->hash, &rq->hash, rq_hash_key(rq));
--	rq->rq_flags |= RQF_HASHED;
-+	rqhash_add(e->hash, rq);
- }
- EXPORT_SYMBOL_GPL(elv_rqhash_add);
- 
- void elv_rqhash_reposition(struct request_queue *q, struct request *rq)
- {
--	__elv_rqhash_del(rq);
--	elv_rqhash_add(q, rq);
-+	struct elevator_queue *e = q->elevator;
-+
-+	rqhash_reposition(e->hash, rq);
- }
- 
- struct request *elv_rqhash_find(struct request_queue *q, sector_t offset)
- {
- 	struct elevator_queue *e = q->elevator;
--	struct hlist_node *next;
--	struct request *rq;
--
--	hash_for_each_possible_safe(e->hash, rq, next, hash, offset) {
--		BUG_ON(!ELV_ON_HASH(rq));
- 
--		if (unlikely(!rq_mergeable(rq))) {
--			__elv_rqhash_del(rq);
--			continue;
--		}
--
--		if (rq_hash_key(rq) == offset)
--			return rq;
--	}
--
--	return NULL;
-+	return rqhash_find(e->hash, offset);
- }
- 
- /*
+Javier González (5):
+  lightnvm: pblk: fix min size for page mempool
+  lightnvm: pblk: simplify work_queue mempool
+  lightnvm: pblk: decouple read/erase mempools
+  lightnvm: pblk: do not use a mempool for line bitmaps
+  lightnvm: pblk: remove checks on mempool alloc.
+
+ drivers/lightnvm/pblk-core.c     | 61 ++++++++++----------------
+ drivers/lightnvm/pblk-gc.c       | 32 +++++++-------
+ drivers/lightnvm/pblk-init.c     | 94 +++++++++++++++++-----------------------
+ drivers/lightnvm/pblk-read.c     | 10 +----
+ drivers/lightnvm/pblk-recovery.c | 37 ++++------------
+ drivers/lightnvm/pblk-write.c    | 32 ++++----------
+ drivers/lightnvm/pblk.h          | 21 +++++----
+ 7 files changed, 106 insertions(+), 181 deletions(-)
+
 -- 
-2.9.5
+2.7.4
