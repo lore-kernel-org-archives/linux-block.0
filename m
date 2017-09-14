@@ -1,58 +1,107 @@
-Return-Path: <bblock@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 16:56:32 +0200
-From: Benjamin Block <bblock@linux.vnet.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Steffen Maier <maier@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org
-Subject: Is the possible cross-talking between unrelated file-descriptors on
- bsg-device by design?
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <20170919145632.GB28979@bblock-ThinkPad-W530>
+Return-Path: <SRS0=TWoo=AP=fb.com=shli@kernel.org>
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: tj@kernel.org,
+	lizefan@huawei.com,
+	tglx@linutronix.de,
+	kernel-team@fb.com,
+	axboe@kernel.dk,
+	Shaohua Li <shli@fb.com>
+Subject: [PATCH V3 4/4] block/loop: make loop cgroup aware
+Date: Thu, 14 Sep 2017 14:02:07 -0700
+Message-Id: <9ae703688d89cb973ab92641f0da0b1d8a4249aa.1505422351.git.shli@fb.com>
+In-Reply-To: <cover.1505422351.git.shli@fb.com>
+References: <cover.1505422351.git.shli@fb.com>
+In-Reply-To: <cover.1505422351.git.shli@fb.com>
+References: <cover.1505422351.git.shli@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello linux-block,
+From: Shaohua Li <shli@fb.com>
 
-I wrote some tests recently to test patches against bsg.c and bsg-lib.c,
-and while writing those I noticed something strange:
+loop block device handles IO in a separate thread. The actual IO
+dispatched isn't cloned from the IO loop device received, so the
+dispatched IO loses the cgroup context.
 
-When you use the write() and read() call on multiple file-descriptors
-for a single bsg-device (FC or SCSI), it is possible that you get
-cross-talk between those different file-descriptors.
+I'm ignoring buffer IO case now, which is quite complicated.  Making the
+loop thread aware cgroup context doesn't really help. The loop device
+only writes to a single file. In current writeback cgroup
+implementation, the file can only belong to one cgroup.
 
-E.g.: You have two independent processes open a FD on /dev/bsg/fc_host0
-and you send commands via write() in both processes, when they both do
-read() later on - to read the response for the commands they send before
--, it is possible that process A gets the response (Sense-Data,
-FC-Protocol-Data, ...) for a command that process B wrote and vis-a-vis.
+For direct IO case, we could workaround the issue in theory. For
+example, say we assign cgroup1 5M/s BW for loop device and cgroup2
+10M/s. We can create a special cgroup for loop thread and assign at
+least 15M/s for the underlayer disk. In this way, we correctly throttle
+the two cgroups. But this is tricky to setup.
 
-I noticed this because in my tests I 'tag' each command I send with
-write() via a value I write into the usr_ptr field of sg_io_v4. When I
-later user read() to receive responses I check for this tag in a
-hash-table and so can look up the original command. When I used this and
-spawned multiple processes with the same target bsg-device, I got
-responses for commands I don't have tags for in my hash-table, so they
-were written by an other process. This never happend when I only spawn
-one test-process.
+This patch tries to address the issue. We record bio's css in loop
+command. When loop thread is handling the command, we then use the API
+provided in patch 1 to set the css for current task. The bio layer will
+use the css for new IO (from patch 3).
 
-This seems awfully contra-productive.. so much that I don't see any
-point in allowing users to open more than one FD per bsg-device, because
-that would inevitably lead to very hard to debug 'bugs'. And I wonder if
-this is really by design or some regression that happend over time.
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ drivers/block/loop.c | 13 +++++++++++++
+ drivers/block/loop.h |  1 +
+ 2 files changed, 14 insertions(+)
 
-I looked at the code in bsg.c and yes, it seems this is what is coded
-right now. We have a hash-table which manages all 'struct bsg_device's
-who are indexed by device-minors, so one hash-table entry per
-device-node.
-
-So eh, long talk short question, is that intended?
-
-
-
-                                                    Beste Gr��e / Best regards,
-                                                      - Benjamin Block
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 8934e25..37c4da7 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -479,6 +479,8 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
+ {
+ 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
+ 
++	if (cmd->css)
++		css_put(cmd->css);
+ 	cmd->ret = ret > 0 ? 0 : ret;
+ 	lo_rw_aio_do_completion(cmd);
+ }
+@@ -538,6 +540,8 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	cmd->iocb.ki_filp = file;
+ 	cmd->iocb.ki_complete = lo_rw_aio_complete;
+ 	cmd->iocb.ki_flags = IOCB_DIRECT;
++	if (cmd->css)
++		kthread_associate_blkcg(cmd->css);
+ 
+ 	if (rw == WRITE)
+ 		ret = call_write_iter(file, &cmd->iocb, &iter);
+@@ -545,6 +549,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		ret = call_read_iter(file, &cmd->iocb, &iter);
+ 
+ 	lo_rw_aio_do_completion(cmd);
++	kthread_associate_blkcg(NULL);
+ 
+ 	if (ret != -EIOCBQUEUED)
+ 		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
+@@ -1689,6 +1694,14 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		break;
+ 	}
+ 
++	/* always use the first bio's css */
++#ifdef CONFIG_CGROUPS
++	if (cmd->use_aio && cmd->rq->bio && cmd->rq->bio->bi_css) {
++		cmd->css = cmd->rq->bio->bi_css;
++		css_get(cmd->css);
++	} else
++#endif
++		cmd->css = NULL;
+ 	kthread_queue_work(&lo->worker, &cmd->work);
+ 
+ 	return BLK_STS_OK;
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index f68c1d5..d93b669 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -74,6 +74,7 @@ struct loop_cmd {
+ 	long ret;
+ 	struct kiocb iocb;
+ 	struct bio_vec *bvec;
++	struct cgroup_subsys_state *css;
+ };
+ 
+ /* Support for loadable transfer modules */
 -- 
-Linux on z Systems Development         /         IBM Systems & Technology Group
-		  IBM Deutschland Research & Development GmbH 
-Vorsitz. AufsR.: Martina Koederitz     /        Gesch�ftsf�hrung: Dirk Wittkopp
-Sitz der Gesellschaft: B�blingen / Registergericht: AmtsG Stuttgart, HRB 243294
+2.9.5
