@@ -1,187 +1,70 @@
-Return-Path: <prvs=431df6ef2=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v3 2/6] block: Convert RQF_PREEMPT into REQ_PREEMPT
-Date: Fri, 22 Sep 2017 15:14:01 -0700
-Message-Id: <20170922221405.22091-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170922221405.22091-1-bart.vanassche@wdc.com>
-References: <20170922221405.22091-1-bart.vanassche@wdc.com>
+Return-Path: <SRS0=TWoo=AP=fb.com=shli@kernel.org>
+From: Shaohua Li <shli@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: tj@kernel.org,
+	lizefan@huawei.com,
+	tglx@linutronix.de,
+	kernel-team@fb.com,
+	axboe@kernel.dk,
+	Shaohua Li <shli@fb.com>
+Subject: [PATCH V3 3/4] block: make blkcg aware of kthread stored original cgroup info
+Date: Thu, 14 Sep 2017 14:02:06 -0700
+Message-Id: <b01ad425de5d9590b3b3c0fbc3afa736f3f3ee44.1505422351.git.shli@fb.com>
+In-Reply-To: <cover.1505422351.git.shli@fb.com>
+References: <cover.1505422351.git.shli@fb.com>
+In-Reply-To: <cover.1505422351.git.shli@fb.com>
+References: <cover.1505422351.git.shli@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes the
-REQ_PREEMPT flag available to blk_get_request(). A later patch
-will add code to blk_get_request() that checks the REQ_PREEMPT
-flag. Note: the IDE sense_rq request is allocated statically so
-there is no blk_get_request() call that corresponds to this
-request.
+From: Shaohua Li <shli@fb.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+bio_blkcg is the only API to get cgroup info for a bio right now. If
+bio_blkcg finds current task is a kthread and has original blkcg
+associated, it will use the css instead of associating the bio to
+current task. This makes it possible that kthread dispatches bios on
+behalf of other threads.
+
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq-debugfs.c    |  2 +-
- drivers/ide/ide-atapi.c   |  3 +--
- drivers/ide/ide-io.c      |  2 +-
- drivers/ide/ide-pm.c      |  4 ++--
- drivers/scsi/scsi_lib.c   | 11 ++++++-----
- include/linux/blk_types.h |  6 ++++++
- include/linux/blkdev.h    |  3 ---
- 7 files changed, 17 insertions(+), 14 deletions(-)
+ include/linux/blk-cgroup.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 980e73095643..62ac248a4984 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -266,6 +266,7 @@ static const char *const cmd_flag_name[] = {
- 	CMD_FLAG_NAME(BACKGROUND),
- 	CMD_FLAG_NAME(NOUNMAP),
- 	CMD_FLAG_NAME(NOWAIT),
-+	CMD_FLAG_NAME(PREEMPT),
- };
- #undef CMD_FLAG_NAME
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 0cfa8d2..f57e54d 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -19,6 +19,7 @@
+ #include <linux/radix-tree.h>
+ #include <linux/blkdev.h>
+ #include <linux/atomic.h>
++#include <linux/kthread.h>
  
-@@ -279,7 +280,6 @@ static const char *const rqf_name[] = {
- 	RQF_NAME(MIXED_MERGE),
- 	RQF_NAME(MQ_INFLIGHT),
- 	RQF_NAME(DONTPREP),
--	RQF_NAME(PREEMPT),
- 	RQF_NAME(COPY_USER),
- 	RQF_NAME(FAILED),
- 	RQF_NAME(QUIET),
-diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
-index 14d1e7d9a1d6..1258739d5fa1 100644
---- a/drivers/ide/ide-atapi.c
-+++ b/drivers/ide/ide-atapi.c
-@@ -211,9 +211,8 @@ void ide_prep_sense(ide_drive_t *drive, struct request *rq)
- 	}
+ /* percpu_counter batch for blkg_[rw]stats, per-cpu drift doesn't matter */
+ #define BLKG_STAT_CPU_BATCH	(INT_MAX / 2)
+@@ -223,16 +224,16 @@ static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
+ 	return css ? container_of(css, struct blkcg, css) : NULL;
+ }
  
- 	sense_rq->rq_disk = rq->rq_disk;
--	sense_rq->cmd_flags = REQ_OP_DRV_IN;
-+	sense_rq->cmd_flags = REQ_OP_DRV_IN | REQ_PREEMPT;
- 	ide_req(sense_rq)->type = ATA_PRIV_SENSE;
--	sense_rq->rq_flags |= RQF_PREEMPT;
+-static inline struct blkcg *task_blkcg(struct task_struct *tsk)
+-{
+-	return css_to_blkcg(task_css(tsk, io_cgrp_id));
+-}
+-
+ static inline struct blkcg *bio_blkcg(struct bio *bio)
+ {
++	struct cgroup_subsys_state *css;
++
+ 	if (bio && bio->bi_css)
+ 		return css_to_blkcg(bio->bi_css);
+-	return task_blkcg(current);
++	css = kthread_blkcg();
++	if (css)
++		return css_to_blkcg(css);
++	return css_to_blkcg(task_css(current, io_cgrp_id));
+ }
  
- 	req->cmd[0] = GPCMD_REQUEST_SENSE;
- 	req->cmd[4] = cmd_len;
-diff --git a/drivers/ide/ide-io.c b/drivers/ide/ide-io.c
-index 3a234701d92c..06ffccd0fb10 100644
---- a/drivers/ide/ide-io.c
-+++ b/drivers/ide/ide-io.c
-@@ -539,7 +539,7 @@ void do_ide_request(struct request_queue *q)
- 		 */
- 		if ((drive->dev_flags & IDE_DFLAG_BLOCKED) &&
- 		    ata_pm_request(rq) == 0 &&
--		    (rq->rq_flags & RQF_PREEMPT) == 0) {
-+		    (rq->cmd_flags & REQ_PREEMPT) == 0) {
- 			/* there should be no pending command at this point */
- 			ide_unlock_port(hwif);
- 			goto plug_device;
-diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
-index 544f02d673ca..f8d2709dcd56 100644
---- a/drivers/ide/ide-pm.c
-+++ b/drivers/ide/ide-pm.c
-@@ -89,9 +89,9 @@ int generic_ide_resume(struct device *dev)
- 	}
- 
- 	memset(&rqpm, 0, sizeof(rqpm));
--	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN | REQ_PREEMPT,
-+			     __GFP_RECLAIM);
- 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
--	rq->rq_flags |= RQF_PREEMPT;
- 	rq->special = &rqpm;
- 	rqpm.pm_step = IDE_PM_START_RESUME;
- 	rqpm.pm_state = PM_EVENT_ON;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 9cf6a80fe297..62f905b22821 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -253,8 +253,9 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	int ret = DRIVER_ERROR << 24;
- 
- 	req = blk_get_request(sdev->request_queue,
--			data_direction == DMA_TO_DEVICE ?
--			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
-+			      (data_direction == DMA_TO_DEVICE ?
-+			       REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN) | REQ_PREEMPT,
-+			      __GFP_RECLAIM);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
-@@ -268,7 +269,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	rq->retries = retries;
- 	req->timeout = timeout;
- 	req->cmd_flags |= flags;
--	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
-+	req->rq_flags |= rq_flags | RQF_QUIET;
- 
- 	/*
- 	 * head injection *required* here otherwise quiesce won't work
-@@ -1301,7 +1302,7 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
- 			/*
- 			 * If the devices is blocked we defer normal commands.
- 			 */
--			if (!(req->rq_flags & RQF_PREEMPT))
-+			if (!(req->cmd_flags & REQ_PREEMPT))
- 				ret = BLKPREP_DEFER;
- 			break;
- 		default:
-@@ -1310,7 +1311,7 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
- 			 * special commands.  In particular any user initiated
- 			 * command is not allowed.
- 			 */
--			if (!(req->rq_flags & RQF_PREEMPT))
-+			if (!(req->cmd_flags & REQ_PREEMPT))
- 				ret = BLKPREP_KILL;
- 			break;
- 		}
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index a2d2aa709cef..b6b6bf44e462 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -229,6 +229,11 @@ enum req_flag_bits {
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
- 	__REQ_NOWAIT,           /* Don't wait if request will block */
-+	/*
-+	 * set for "ide_preempt" requests and also for requests for which the
-+	 * SCSI "quiesce" state must be ignored.
-+	 */
-+	__REQ_PREEMPT,
- 	__REQ_NR_BITS,		/* stops here */
- };
- 
-@@ -248,6 +253,7 @@ enum req_flag_bits {
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
-+#define REQ_PREEMPT		(1ULL << __REQ_PREEMPT)
- 
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 460294bb0fa5..cd26901a6e25 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -96,9 +96,6 @@ typedef __u32 __bitwise req_flags_t;
- #define RQF_MQ_INFLIGHT		((__force req_flags_t)(1 << 6))
- /* don't call prep for this one */
- #define RQF_DONTPREP		((__force req_flags_t)(1 << 7))
--/* set for "ide_preempt" requests and also for requests for which the SCSI
--   "quiesce" state must be ignored. */
--#define RQF_PREEMPT		((__force req_flags_t)(1 << 8))
- /* contains copies of user pages */
- #define RQF_COPY_USER		((__force req_flags_t)(1 << 9))
- /* vaguely specified driver internal error.  Ignored by the block layer */
+ /**
 -- 
-2.14.1
+2.9.5
