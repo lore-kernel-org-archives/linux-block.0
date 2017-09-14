@@ -1,127 +1,247 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:22804 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750955AbdIAPMQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 11:12:16 -0400
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-block@vger.kernel.org
-Cc: jonathan.derrick@intel.com, david.fugate@intel.com, axboe@fb.com,
-        hch@infradead.org, rafael.antognolli@intel.com,
-        Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH V2] block: sed-opal: Set MBRDone on S3 resume path if TPER is MBREnabled
-Date: Fri,  1 Sep 2017 08:53:35 -0600
-Message-Id: <20170901145335.9244-1-scott.bauer@intel.com>
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:43771 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751876AbdINKeU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Sep 2017 06:34:20 -0400
+Received: by mail-wm0-f52.google.com with SMTP id a137so4907392wma.0
+        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 03:34:19 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 4/5] lightnvm: pblk: do not use a mempool for line bitmaps
+Date: Thu, 14 Sep 2017 12:33:46 +0200
+Message-Id: <1505385227-28706-5-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+References: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Users who are booting off their Opal enabled drives are having
-issues when they have a shadow MBR set up after s3/resume cycle.
-When the Drive has a shadow MBR setup the MBRDone flag is set to
-false upon power loss (S3/S4/S5). When the MBRDone flag is false
-I/O to LBA 0 -> LBA_END_MBR are remapped to the shadow mbr
-of the drive. If the drive contains useful data in the 0 -> end_mbr
-range upon s3 resume the user can never get to that data as the
-drive will keep remapping it to the MBR. To fix this when we unlock
-on S3 resume, we need to tell the drive that we're done with the
-shadow mbr (even though we didnt use it) by setting true to MBRDone.
-This way the drive will stop the remapping and the user can access
-their data.
+pblk holds two sector bitmaps: one to keep track of the mapped sectors
+while the line is active and another one to keep track of the invalid
+sectors. The latter is kept during the whole live of the line, until it
+is recycled. Since we cannot guarantee forward progress for the mempool
+in this case, get rid of the mempool and simply allocate memory through
+kmalloc.
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/opal_proto.h |  1 +
- block/sed-opal.c   | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+ drivers/lightnvm/pblk-core.c     | 26 ++++++++++----------------
+ drivers/lightnvm/pblk-init.c     | 29 ++---------------------------
+ drivers/lightnvm/pblk-recovery.c |  2 +-
+ drivers/lightnvm/pblk-write.c    |  4 +---
+ drivers/lightnvm/pblk.h          |  3 ---
+ 5 files changed, 14 insertions(+), 50 deletions(-)
 
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index f40c9acf8895..e20be8258854 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -46,6 +46,7 @@ enum opal_response_token {
- #define GENERIC_HOST_SESSION_NUM 0x41
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 9e35ec7c1d9f..bb53fe416d4e 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1093,25 +1093,21 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	int blk_in_line = atomic_read(&line->blk_in_line);
  
- #define TPER_SYNC_SUPPORTED 0x01
-+#define MBR_ENABLED_MASK 0x10
+-	line->map_bitmap = mempool_alloc(pblk->line_meta_pool, GFP_ATOMIC);
++	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
+ 	if (!line->map_bitmap)
+ 		return -ENOMEM;
+-	memset(line->map_bitmap, 0, lm->sec_bitmap_len);
  
- #define TINY_ATOM_DATA_MASK 0x3F
- #define TINY_ATOM_SIGNED 0x40
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9b30ae5ab843..9ed51d0c6b1d 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -80,6 +80,7 @@ struct parsed_resp {
- 
- struct opal_dev {
- 	bool supported;
-+	bool mbr_enabled;
- 
- 	void *data;
- 	sec_send_recv *send_recv;
-@@ -283,6 +284,14 @@ static bool check_tper(const void *data)
- 	return true;
- }
- 
-+static bool check_mbrenabled(const void *data)
-+{
-+	const struct d0_locking_features *lfeat = data;
-+	u8 sup_feat = lfeat->supported_features;
-+
-+	return !!(sup_feat & MBR_ENABLED_MASK);
-+}
-+
- static bool check_sum(const void *data)
- {
- 	const struct d0_single_user_mode *sum = data;
-@@ -417,6 +426,7 @@ static int opal_discovery0_end(struct opal_dev *dev)
- 	u32 hlen = be32_to_cpu(hdr->length);
- 
- 	print_buffer(dev->resp, hlen);
-+	dev->mbr_enabled = false;
- 
- 	if (hlen > IO_BUFFER_LENGTH - sizeof(*hdr)) {
- 		pr_debug("Discovery length overflows buffer (%zu+%u)/%u\n",
-@@ -442,6 +452,8 @@ static int opal_discovery0_end(struct opal_dev *dev)
- 			check_geometry(dev, body);
- 			break;
- 		case FC_LOCKING:
-+			dev->mbr_enabled = check_mbrenabled(body->features);
-+			break;
- 		case FC_ENTERPRISE:
- 		case FC_DATASTORE:
- 			/* some ignored properties */
-@@ -2190,6 +2202,21 @@ static int __opal_lock_unlock(struct opal_dev *dev,
- 	return next(dev);
- }
- 
-+static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
-+{
-+	u8 mbr_done_tf = 1;
-+	const struct opal_step mbrdone_step [] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, key },
-+		{ set_mbr_done, &mbr_done_tf },
-+		{ end_opal_session, },
-+		{ NULL, }
-+	};
-+
-+	dev->steps = mbrdone_step;
-+	return next(dev);
-+}
-+
- static int opal_lock_unlock(struct opal_dev *dev,
- 			    struct opal_lock_unlock *lk_unlk)
- {
-@@ -2345,6 +2372,11 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
- 				 suspend->unlk.session.sum);
- 			was_failure = true;
- 		}
-+		if (dev->mbr_enabled) {
-+			ret = __opal_set_mbr_done(dev, &suspend->unlk.session.opal_key);
-+			if (ret)
-+				pr_debug("Failed to set MBR Done in S3 resume\n");
-+		}
+-	/* invalid_bitmap is special since it is used when line is closed. No
+-	 * need to zeroized; it will be initialized using bb info form
+-	 * map_bitmap
+-	 */
+-	line->invalid_bitmap = mempool_alloc(pblk->line_meta_pool, GFP_ATOMIC);
++	/* will be initialized using bb info from map_bitmap */
++	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_ATOMIC);
+ 	if (!line->invalid_bitmap) {
+-		mempool_free(line->map_bitmap, pblk->line_meta_pool);
++		kfree(line->map_bitmap);
+ 		return -ENOMEM;
  	}
- 	mutex_unlock(&dev->dev_lock);
- 	return was_failure;
+ 
+ 	spin_lock(&line->lock);
+ 	if (line->state != PBLK_LINESTATE_FREE) {
+-		mempool_free(line->invalid_bitmap, pblk->line_meta_pool);
+-		mempool_free(line->map_bitmap, pblk->line_meta_pool);
++		kfree(line->map_bitmap);
++		kfree(line->invalid_bitmap);
+ 		spin_unlock(&line->lock);
+ 		WARN(1, "pblk: corrupted line %d, state %d\n",
+ 							line->id, line->state);
+@@ -1163,7 +1159,7 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
+ 
+ void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
+ {
+-	mempool_free(line->map_bitmap, pblk->line_meta_pool);
++	kfree(line->map_bitmap);
+ 	line->map_bitmap = NULL;
+ 	line->smeta = NULL;
+ 	line->emeta = NULL;
+@@ -1438,10 +1434,8 @@ void pblk_line_replace_data(struct pblk *pblk)
+ 
+ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
+ {
+-	if (line->map_bitmap)
+-		mempool_free(line->map_bitmap, pblk->line_meta_pool);
+-	if (line->invalid_bitmap)
+-		mempool_free(line->invalid_bitmap, pblk->line_meta_pool);
++	kfree(line->map_bitmap);
++	kfree(line->invalid_bitmap);
+ 
+ 	*line->vsc = cpu_to_le32(EMPTY_ENTRY);
+ 
+@@ -1582,7 +1576,7 @@ void pblk_line_close(struct pblk *pblk, struct pblk_line *line)
+ 
+ 	list_add_tail(&line->list, move_list);
+ 
+-	mempool_free(line->map_bitmap, pblk->line_meta_pool);
++	kfree(line->map_bitmap);
+ 	line->map_bitmap = NULL;
+ 	line->smeta = NULL;
+ 	line->emeta = NULL;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 5f8a9fd2f29a..df86cf98ef4d 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -21,7 +21,7 @@
+ #include "pblk.h"
+ 
+ static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
+-				*pblk_w_rq_cache, *pblk_line_meta_cache;
++				*pblk_w_rq_cache;
+ static DECLARE_RWSEM(pblk_lock);
+ struct bio_set *pblk_bio_set;
+ 
+@@ -181,8 +181,6 @@ static int pblk_set_ppaf(struct pblk *pblk)
+ 
+ static int pblk_init_global_caches(struct pblk *pblk)
+ {
+-	char cache_name[PBLK_CACHE_NAME_LEN];
+-
+ 	down_write(&pblk_lock);
+ 	pblk_ws_cache = kmem_cache_create("pblk_blk_ws",
+ 				sizeof(struct pblk_line_ws), 0, 0, NULL);
+@@ -217,19 +215,6 @@ static int pblk_init_global_caches(struct pblk *pblk)
+ 		up_write(&pblk_lock);
+ 		return -ENOMEM;
+ 	}
+-
+-	snprintf(cache_name, sizeof(cache_name), "pblk_line_m_%s",
+-							pblk->disk->disk_name);
+-	pblk_line_meta_cache = kmem_cache_create(cache_name,
+-				pblk->lm.sec_bitmap_len, 0, 0, NULL);
+-	if (!pblk_line_meta_cache) {
+-		kmem_cache_destroy(pblk_ws_cache);
+-		kmem_cache_destroy(pblk_rec_cache);
+-		kmem_cache_destroy(pblk_g_rq_cache);
+-		kmem_cache_destroy(pblk_w_rq_cache);
+-		up_write(&pblk_lock);
+-		return -ENOMEM;
+-	}
+ 	up_write(&pblk_lock);
+ 
+ 	return 0;
+@@ -276,16 +261,10 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->w_rq_pool)
+ 		goto free_e_rq_pool;
+ 
+-	pblk->line_meta_pool =
+-			mempool_create_slab_pool(PBLK_META_POOL_SIZE,
+-							pblk_line_meta_cache);
+-	if (!pblk->line_meta_pool)
+-		goto free_w_rq_pool;
+-
+ 	pblk->close_wq = alloc_workqueue("pblk-close-wq",
+ 			WQ_MEM_RECLAIM | WQ_UNBOUND, PBLK_NR_CLOSE_JOBS);
+ 	if (!pblk->close_wq)
+-		goto free_line_meta_pool;
++		goto free_w_rq_pool;
+ 
+ 	pblk->bb_wq = alloc_workqueue("pblk-bb-wq",
+ 			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
+@@ -305,8 +284,6 @@ static int pblk_core_init(struct pblk *pblk)
+ 	destroy_workqueue(pblk->bb_wq);
+ free_close_wq:
+ 	destroy_workqueue(pblk->close_wq);
+-free_line_meta_pool:
+-	mempool_destroy(pblk->line_meta_pool);
+ free_w_rq_pool:
+ 	mempool_destroy(pblk->w_rq_pool);
+ free_e_rq_pool:
+@@ -336,13 +313,11 @@ static void pblk_core_free(struct pblk *pblk)
+ 	mempool_destroy(pblk->r_rq_pool);
+ 	mempool_destroy(pblk->e_rq_pool);
+ 	mempool_destroy(pblk->w_rq_pool);
+-	mempool_destroy(pblk->line_meta_pool);
+ 
+ 	kmem_cache_destroy(pblk_ws_cache);
+ 	kmem_cache_destroy(pblk_rec_cache);
+ 	kmem_cache_destroy(pblk_g_rq_cache);
+ 	kmem_cache_destroy(pblk_w_rq_cache);
+-	kmem_cache_destroy(pblk_line_meta_cache);
+ }
+ 
+ static void pblk_luns_free(struct pblk *pblk)
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index cb556e06673e..10eef9281a27 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -987,7 +987,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 			list_move_tail(&line->list, move_list);
+ 			spin_unlock(&l_mg->gc_lock);
+ 
+-			mempool_free(line->map_bitmap, pblk->line_meta_pool);
++			kfree(line->map_bitmap);
+ 			line->map_bitmap = NULL;
+ 			line->smeta = NULL;
+ 			line->emeta = NULL;
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 81d1f1035fa3..3277cee36784 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -414,8 +414,6 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	if (emeta->mem >= lm->emeta_len[0]) {
+ 		spin_lock(&l_mg->close_lock);
+ 		list_del(&meta_line->list);
+-		WARN(!bitmap_full(meta_line->map_bitmap, lm->sec_per_line),
+-				"pblk: corrupt meta line %d\n", meta_line->id);
+ 		spin_unlock(&l_mg->close_lock);
+ 	}
+ 
+@@ -459,7 +457,7 @@ static int pblk_sched_meta_io(struct pblk *pblk, struct ppa_addr *prev_list,
+ 		return 0;
+ 	}
+ 	meta_line = list_first_entry(&l_mg->emeta_list, struct pblk_line, list);
+-	if (bitmap_full(meta_line->map_bitmap, lm->sec_per_line))
++	if (meta_line->emeta->mem >= lm->emeta_len[0])
+ 		goto retry;
+ 	spin_unlock(&l_mg->close_lock);
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 0120e0ade703..469976a20421 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -40,8 +40,6 @@
+ #define PBLK_MAX_REQ_ADDRS (64)
+ #define PBLK_MAX_REQ_ADDRS_PW (6)
+ 
+-#define PBLK_META_POOL_SIZE (128)
+-
+ #define PBLK_NR_CLOSE_JOBS (4)
+ 
+ #define PBLK_CACHE_NAME_LEN (DISK_NAME_LEN + 16)
+@@ -626,7 +624,6 @@ struct pblk {
+ 	mempool_t *r_rq_pool;
+ 	mempool_t *w_rq_pool;
+ 	mempool_t *e_rq_pool;
+-	mempool_t *line_meta_pool;
+ 
+ 	struct workqueue_struct *close_wq;
+ 	struct workqueue_struct *bb_wq;
 -- 
-2.11.0
+2.7.4
