@@ -1,30 +1,52 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, Damien Le Moal <Damien.LeMoal@wdc.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <Damien.LeMoal@wdc.com>
 Subject: Re: [PATCH V3 06/12] scsi: sd_zbc: Rearrange code
-Date: Sat, 16 Sep 2017 02:40:15 +0000
-Message-ID: <1505529516.3863.3.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
 References: <20170915100645.17999-1-damien.lemoal@wdc.com>
-	 <20170915100645.17999-7-damien.lemoal@wdc.com>
-	 <1505487062.2852.12.camel@wdc.com> <20170915175117.GG8578@lst.de>
-	 <1505509340.2417.18.camel@wdc.com>
-	 <4f51ccc7-1239-9505-564c-ec2c97cc626a@wdc.com>
-In-Reply-To: <4f51ccc7-1239-9505-564c-ec2c97cc626a@wdc.com>
-Content-Type: text/plain; charset="utf-8"
+ <20170915100645.17999-7-damien.lemoal@wdc.com>
+ <1505487062.2852.12.camel@wdc.com> <20170915175117.GG8578@lst.de>
+ <1505509340.2417.18.camel@wdc.com>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+Message-ID: <4f51ccc7-1239-9505-564c-ec2c97cc626a@wdc.com>
+Date: Sat, 16 Sep 2017 07:35:36 +0900
 MIME-Version: 1.0
+In-Reply-To: <1505509340.2417.18.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Return-Path: Damien.LeMoal@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTA5LTE2IGF0IDA3OjM1ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gcncxNiBpcyBtYW5kYXRvcnkgZm9yIFpCQyBkcml2ZXMuIFNvIGl0IGhhcyB0byBiZSBzZXQg
-dG8gdHJ1ZS4gSWYgdGhlDQo+IEhCQSBkb2VzIG5vdCBzdXBwb3J0IHJ3MTYgKHdoeSB3b3VsZCB0
-aGF0IGhhcHBlbiA/KSwgdGhlbiB0aGUgZGlzaw0KPiBzaG91bGQgbm90IGJlIHVzZWQuDQoNCkl0
-J3MgZ29vZCB0aGF0IGFsbCBIQkFzIHN1cHBvcnQgcncxNi4gQnV0IGl0J3Mgbm9udHJpdmlhbCB0
-byBhbmFseXplIHdoZXRoZXINCm9yIG5vdCB1c2VfMVswNl1fZm9yX3J3IGFyZSBzZXQgYmVmb3Jl
-IHRoZXNlIGFyZSB1c2VkIHNvIG1heWJlIHdlIHNob3VsZCB0aGluaw0KYWJvdXQgaG93IHdlIGNh
-biByZXN0cnVjdHVyZSB0aGUgU0NTSSBjb2RlIHN1Y2ggdGhhdCBpdCBiZWNvbWVzIGVhc2llciB0
-byB2ZXJpZnkNCnRoYXQgdXNlXzFbMDZdX2Zvcl9ydyBhcmUgc2V0IGJlZm9yZSB0aGVzZSBhcmUg
-dXNlZC4NCg0KQmFydC4=
+On 9/16/17 06:02, Bart Van Assche wrote:
+> On Fri, 2017-09-15 at 19:51 +0200, hch@lst.de wrote:
+>> On Fri, Sep 15, 2017 at 02:51:03PM +0000, Bart Van Assche wrote:
+>>> On Fri, 2017-09-15 at 19:06 +0900, Damien Le Moal wrote:
+>>>> Rearrange sd_zbc_setup() to include use_16_for_rw and use_10_for_rw
+>>>> assignments and move the calculation of sdkp->zone_shift together
+>>>> with the assignment of the verified zone_blocks value in
+>>>> sd_zbc_check_zone_size().
+>>>
+>>> Both functions are called from inside block_device_operations.revalidate_disk.
+>>> Isn't that too late to set use_1[06]_for_rw? Shouldn't both be set just after
+>>> the slave_alloc callback has been called?
+>>
+>> Hmm.  sd_read_capacity already is called from the same path and seems
+>> to work..
+> 
+> Hello Christoph,
+> 
+> My concern is that if both a SCSI LLD and the ZBC code set use_1[06]_for_rw
+> that these settings may conflict. Should the ZBC code e.g. refuse that the sd
+> driver is attached to a ZBC disk controlled by a SCSI LLD that supports
+> use_10_for_rw but not use_16_for_rw?
+
+rw16 is mandatory for ZBC drives. So it has to be set to true. If the
+HBA does not support rw16 (why would that happen ?), then the disk
+should not be used.
+
+Cheers.
+
+-- 
+Damien Le Moal
+Western Digital Research
