@@ -1,103 +1,216 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.mpynet.fi ([82.197.21.84]:11022 "EHLO mx1.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755053AbdIGOFd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Sep 2017 10:05:33 -0400
-Date: Thu, 7 Sep 2017 16:58:27 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH] lightnvm: prevent bd removal if busy
-Message-ID: <20170907135825.GA44302@dhcp-216.srv.tuxera.com>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:45369 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751542AbdIOMZy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 08:25:54 -0400
+Received: by mail-wm0-f45.google.com with SMTP id g206so7901094wme.0
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:25:53 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 10/11] lightnvm: pblk: refactor rqd alloc/free
+Date: Fri, 15 Sep 2017 14:25:38 +0200
+Message-Id: <1505478339-13089-11-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+References: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Removal of virtual block device by "nvm lnvm remove..." undergoing IO
-and created by "nvme lnvm create... -t pblk" results in following and
-is annoying.
+Refactor the rqd allocation and free functions so that all I/O types can
+use these helper functions.
 
-446416.309757] bdi-block not registered
-[446416.309773] ------------[ cut here ]------------
-[446416.309780] WARNING: CPU: 3 PID: 4319 at fs/fs-writeback.c:2159 __mark_inode_dirty+0x268/0x340
-.....
-
-This patch solves this by checking bd_openers for each partition
-before removal can continue.  Note that this isn't full proof as
-device can become busy as soon as it's bd_mutex is unlocked but it
-needn't be full proof either.  It does work for general case where
-device is mounted and removal can be prevented.
-
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/lightnvm/core.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ drivers/lightnvm/pblk-core.c     | 40 ++++++++++++++++++++++++++++++----------
+ drivers/lightnvm/pblk-read.c     |  2 --
+ drivers/lightnvm/pblk-recovery.c |  2 --
+ drivers/lightnvm/pblk-write.c    |  7 -------
+ drivers/lightnvm/pblk.h          |  4 ++--
+ 5 files changed, 32 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index bbea2c8..cff91c7 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -369,6 +369,10 @@ static void __nvm_remove_target(struct nvm_target *t)
- static int nvm_remove_tgt(struct nvm_dev *dev, struct nvm_ioctl_remove *remove)
- {
- 	struct nvm_target *t;
-+	struct gendisk *tdisk;
-+	struct disk_part_iter piter;
-+	struct hd_struct *part;
-+	int err;
- 
- 	mutex_lock(&dev->mlock);
- 	t = nvm_find_target(dev, remove->tgtname);
-@@ -376,10 +380,48 @@ static int nvm_remove_tgt(struct nvm_dev *dev, struct nvm_ioctl_remove *remove)
- 		mutex_unlock(&dev->mlock);
- 		return 1;
- 	}
-+
-+	/*
-+	 * Lets make sure device is not in use.  Note that this isn't full proof
-+	 * in anyway (as devices can become busy after unlock) but it is useful
-+	 * for preventing removal of devices which are open and undergoing IO.
-+	 */
-+	tdisk = t->disk;
-+	disk_part_iter_init(&piter, tdisk,
-+			DISK_PITER_INCL_EMPTY | DISK_PITER_INCL_PART0 |
-+			DISK_PITER_INCL_EMPTY_PART0);
-+	while ((part = disk_part_iter_next(&piter))) {
-+		struct block_device *bdev;
-+
-+		bdev = bdget(part_devt(part));
-+		if (!bdev) {
-+			err = -ENOMEM;
-+			pr_err("nvm: removal failed, allocating bd failed\n");
-+			goto err_out;
-+		}
-+		mutex_lock(&bdev->bd_mutex);
-+		if (bdev->bd_openers) {
-+			mutex_unlock(&bdev->bd_mutex);
-+			bdput(bdev);
-+			err = -EBUSY;
-+			pr_err("nvm: removal failed, block device busy\n");
-+			goto err_out;
-+		}
-+		mutex_unlock(&bdev->bd_mutex);
-+		bdput(bdev);
-+	}
-+	disk_part_iter_exit(&piter);
-+
- 	__nvm_remove_target(t);
- 	mutex_unlock(&dev->mlock);
- 
- 	return 0;
-+err_out:
-+	disk_part_iter_exit(&piter);
-+	disk_put_part(part);
-+	mutex_unlock(&dev->mlock);
-+
-+	return err;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 1ac54b2bba26..76c3b20dc3d5 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -146,18 +146,26 @@ static void pblk_invalidate_range(struct pblk *pblk, sector_t slba,
+ 	spin_unlock(&pblk->trans_lock);
  }
  
- static int nvm_register_map(struct nvm_dev *dev)
+-struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int rw)
++/* Caller must guarantee that the request is a valid type */
++struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int type)
+ {
+ 	mempool_t *pool;
+ 	struct nvm_rq *rqd;
+ 	int rq_size;
+ 
+-	if (rw == PBLK_WRITE) {
++	switch (type) {
++	case PBLK_WRITE:
++	case PBLK_WRITE_INT:
+ 		pool = pblk->w_rq_pool;
+ 		rq_size = pblk_w_rq_size;
+-	} else {
++		break;
++	case PBLK_READ:
+ 		pool = pblk->r_rq_pool;
+ 		rq_size = pblk_g_rq_size;
++		break;
++	default:
++		pool = pblk->e_rq_pool;
++		rq_size = pblk_g_rq_size;
+ 	}
+ 
+ 	rqd = mempool_alloc(pool, GFP_KERNEL);
+@@ -166,15 +174,30 @@ struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int rw)
+ 	return rqd;
+ }
+ 
+-void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int rw)
++/* Typically used on completion path. Cannot guarantee request consistency */
++void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type)
+ {
++	struct nvm_tgt_dev *dev = pblk->dev;
+ 	mempool_t *pool;
+ 
+-	if (rw == PBLK_WRITE)
++	switch (type) {
++	case PBLK_WRITE:
++		kfree(((struct pblk_c_ctx *)nvm_rq_to_pdu(rqd))->lun_bitmap);
++	case PBLK_WRITE_INT:
+ 		pool = pblk->w_rq_pool;
+-	else
++		break;
++	case PBLK_READ:
+ 		pool = pblk->r_rq_pool;
++		break;
++	case PBLK_ERASE:
++		pool = pblk->e_rq_pool;
++		break;
++	default:
++		pr_err("pblk: trying to free unknown rqd type\n");
++		return;
++	}
+ 
++	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ 	mempool_free(rqd, pool);
+ }
+ 
+@@ -1468,8 +1491,7 @@ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
+ 	struct nvm_rq *rqd;
+ 	int err;
+ 
+-	rqd = mempool_alloc(pblk->e_rq_pool, GFP_KERNEL);
+-	memset(rqd, 0, pblk_g_rq_size);
++	rqd = pblk_alloc_rqd(pblk, PBLK_ERASE);
+ 
+ 	pblk_setup_e_rq(pblk, rqd, ppa);
+ 
+@@ -1747,8 +1769,6 @@ void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 		rlun = &pblk->luns[bit];
+ 		up(&rlun->wr_sem);
+ 	}
+-
+-	kfree(lun_bitmap);
+ }
+ 
+ void pblk_update_map(struct pblk *pblk, sector_t lba, struct ppa_addr ppa)
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 4b1722fbe5a0..d7c90c303540 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -124,8 +124,6 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
+ #endif
+ 
+-	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+-
+ 	bio_put(bio);
+ 	if (r_ctx->private) {
+ 		struct bio *orig_bio = r_ctx->private;
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 848950fbe71c..1869eef1a109 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -329,11 +329,9 @@ static void pblk_end_io_recov(struct nvm_rq *rqd)
+ {
+ 	struct pblk_pad_rq *pad_rq = rqd->private;
+ 	struct pblk *pblk = pad_rq->pblk;
+-	struct nvm_tgt_dev *dev = pblk->dev;
+ 
+ 	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
+ 
+-	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ 	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+ 
+ 	atomic_dec(&pblk->inflight_io);
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 7352b7d55a4d..cec526759547 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -20,7 +20,6 @@
+ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 				    struct pblk_c_ctx *c_ctx)
+ {
+-	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct bio *original_bio;
+ 	unsigned long ret;
+ 	int i;
+@@ -46,8 +45,6 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 
+ 	ret = pblk_rb_sync_advance(&pblk->rwb, c_ctx->nr_valid);
+ 
+-	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+-
+ 	bio_put(rqd->bio);
+ 	pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+ 
+@@ -179,7 +176,6 @@ static void pblk_end_io_write(struct nvm_rq *rqd)
+ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
+ {
+ 	struct pblk *pblk = rqd->private;
+-	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct pblk_g_ctx *m_ctx = nvm_rq_to_pdu(rqd);
+ 	struct pblk_line *line = m_ctx->private;
+ 	struct pblk_emeta *emeta = line->emeta;
+@@ -197,7 +193,6 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
+ 		pblk_gen_run_ws(pblk, line, NULL, pblk_line_close_ws,
+ 						GFP_ATOMIC, pblk->close_wq);
+ 
+-	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ 	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+ 
+ 	atomic_dec(&pblk->inflight_io);
+@@ -422,8 +417,6 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	pblk_dealloc_page(pblk, meta_line, rq_ppas);
+ 	list_add(&meta_line->list, &meta_line->list);
+ 	spin_unlock(&l_mg->close_lock);
+-
+-	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ fail_free_bio:
+ 	bio_put(bio);
+ fail_free_rqd:
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 74422a0d63fa..adae8620e298 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -698,11 +698,11 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf);
+ /*
+  * pblk core
+  */
+-struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int rw);
++struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int type);
++void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type);
+ void pblk_set_sec_per_write(struct pblk *pblk, int sec_per_write);
+ int pblk_setup_w_rec_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			struct pblk_c_ctx *c_ctx);
+-void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int rw);
+ void pblk_wait_for_meta(struct pblk *pblk);
+ struct ppa_addr pblk_get_lba_map(struct pblk *pblk, sector_t lba);
+ void pblk_discard(struct pblk *pblk, struct bio *bio);
 -- 
 2.7.4
