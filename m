@@ -1,62 +1,68 @@
-Return-Path: <prvs=431df6ef2=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v3 6/6] scsi-mq: Reduce suspend latency
-Date: Fri, 22 Sep 2017 15:14:05 -0700
-Message-Id: <20170922221405.22091-7-bart.vanassche@wdc.com>
-In-Reply-To: <20170922221405.22091-1-bart.vanassche@wdc.com>
-References: <20170922221405.22091-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:48265 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751423AbdIOMZp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 08:25:45 -0400
+Received: by mail-wm0-f43.google.com with SMTP id r68so7877308wmg.3
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:25:44 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 01/11] lightnvm: pblk: use constant for GC max inflight
+Date: Fri, 15 Sep 2017 14:25:29 +0200
+Message-Id: <1505478339-13089-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+References: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid that it can take 200 ms too long to wait for requests to
-finish. Note: blk_mq_freeze_queue() uses a wait queue to wait
-for ongoing requests to finish.
+Use a constant to set the maximum number of inflight GC requests
+allowed.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/scsi/scsi_lib.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ drivers/lightnvm/pblk-gc.c | 4 ++--
+ drivers/lightnvm/pblk.h    | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index ca84fd2d93ea..c5e66bb0c94d 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2939,10 +2939,20 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 	if (err)
- 		return err;
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index f163829ecca8..c21b2077432a 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -93,7 +93,7 @@ static int pblk_gc_move_valid_secs(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
  
--	scsi_run_queue(q);
--	while (atomic_read(&sdev->device_busy)) {
--		msleep_interruptible(200);
-+	if (q->mq_ops) {
-+		/*
-+		 * Ensure write order of the PREEMPT_ONLY queue flag and
-+		 * q_usage_counter. See also blk_queue_enter().
-+		 */
-+		smp_wmb();
-+		blk_mq_freeze_queue(q);
-+		blk_mq_unfreeze_queue(q);
-+	} else {
- 		scsi_run_queue(q);
-+		while (atomic_read(&sdev->device_busy)) {
-+			msleep_interruptible(200);
-+			scsi_run_queue(q);
-+		}
- 	}
- 	return 0;
- }
+ retry:
+ 	spin_lock(&gc->w_lock);
+-	if (gc->w_entries >= PBLK_GC_W_QD) {
++	if (gc->w_entries >= PBLK_GC_RQ_QD) {
+ 		spin_unlock(&gc->w_lock);
+ 		pblk_gc_writer_kick(&pblk->gc);
+ 		usleep_range(128, 256);
+@@ -602,7 +602,7 @@ int pblk_gc_init(struct pblk *pblk)
+ 	spin_lock_init(&gc->w_lock);
+ 	spin_lock_init(&gc->r_lock);
+ 
+-	sema_init(&gc->gc_sem, 128);
++	sema_init(&gc->gc_sem, PBLK_GC_RQ_QD);
+ 
+ 	INIT_LIST_HEAD(&gc->w_list);
+ 	INIT_LIST_HEAD(&gc->r_list);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 469976a20421..afd967b55d94 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -815,7 +815,7 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+  * pblk gc
+  */
+ #define PBLK_GC_MAX_READERS 8	/* Max number of outstanding GC reader jobs */
+-#define PBLK_GC_W_QD 128	/* Queue depth for inflight GC write I/Os */
++#define PBLK_GC_RQ_QD 128	/* Queue depth for inflight GC requests */
+ #define PBLK_GC_L_QD 4		/* Queue depth for inflight GC lines */
+ #define PBLK_GC_RSV_LINE 1	/* Reserved lines for GC */
+ 
 -- 
-2.14.1
+2.7.4
