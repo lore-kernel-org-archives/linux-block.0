@@ -1,20 +1,40 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 15 Sep 2017 19:46:20 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
 Subject: Re: [PATCH V3 02/12] block: Fix declaration of blk-mq scheduler
-	functions
-Message-ID: <20170915174620.GC8578@lst.de>
-References: <20170915100645.17999-1-damien.lemoal@wdc.com> <20170915100645.17999-3-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+ functions
+Date: Fri, 15 Sep 2017 14:35:54 +0000
+Message-ID: <1505486153.2852.6.camel@wdc.com>
+References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+	 <20170915100645.17999-3-damien.lemoal@wdc.com>
 In-Reply-To: <20170915100645.17999-3-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Same as for patch 1: this should stay local to block/ - we don't
-want random drivers to grow I/O schedulers.
+T24gRnJpLCAyMDE3LTA5LTE1IGF0IDE5OjA2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gVGhlIGZ1bmN0aW9ucyBibGtfbXFfc2NoZWRfZnJlZV9oY3R4X2RhdGEoKSwgYmxrX21xX3Nj
+aGVkX3RyeV9tZXJnZSgpLA0KPiBibGtfbXFfc2NoZWRfdHJ5X2luc2VydF9tZXJnZSgpIGFuZCBi
+bGtfbXFfc2NoZWRfcmVxdWVzdF9pbnNlcnRlZCgpIGFyZQ0KPiBhbGwgZXhwb3J0ZWQgc3ltYm9s
+cyBidXQgYXJlIGRlY2xhcmVkIG9ubHkgaW50ZXJuYWxseSBpbg0KPiBibG9jay9ibGstbXEtc2No
+ZWQuaC4gTW92ZSB0aGVzZSBkZWNsYXJhdGlvbnMgdG8gdGhlIG5ldyBmaWxlDQo+IGluY2x1ZGUv
+bGludXgvYmxrLW1xLXNjaGVkLmggdG8gbWFrZSB0aGVtIGF2YWlsYWJsZSB0byBibG9jayBzY2hl
+ZHVsZXINCj4gbW9kdWxlcyBpbXBsZW1lbnRlZCBvdXRzaWRlIG9mIHRoZSBibG9jayBkaXJlY3Rv
+cnkuDQoNClNhbWUgY29tbWVudCBoZXJlOiBzaG91bGQgdGhlIHRpdGxlIG9mIHRoaXMgcGF0Y2gg
+cGVyaGFwcyBoYXZlIGJlZW4gIk1vdmUNCmRlY2xhcmF0aW9ucyBvZiAuLi4iPw0KDQo+ICsjaWZu
+ZGVmIEJMS19NUV9TQ0hFRF9IDQo+ICsjZGVmaW5lIEJMS19NUV9TQ0hFRF9IDQo+ICsNCj4gKy8q
+DQo+ICsgKiBTY2hlZHVsZXIgaGVscGVyIGZ1bmN0aW9ucy4NCj4gKyAqLw0KPiArdm9pZCBibGtf
+bXFfc2NoZWRfZnJlZV9oY3R4X2RhdGEoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsDQo+ICsJCQkJ
+IHZvaWQgKCpleGl0KShzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqKSk7DQo+ICt2b2lkIGJsa19tcV9z
+Y2hlZF9yZXF1ZXN0X2luc2VydGVkKHN0cnVjdCByZXF1ZXN0ICpycSk7DQo+ICtib29sIGJsa19t
+cV9zY2hlZF90cnlfbWVyZ2Uoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0cnVjdCBiaW8gKmJp
+bywNCj4gKwkJCSAgICBzdHJ1Y3QgcmVxdWVzdCAqKm1lcmdlZF9yZXF1ZXN0KTsNCj4gK2Jvb2wg
+YmxrX21xX3NjaGVkX3RyeV9pbnNlcnRfbWVyZ2Uoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0
+cnVjdCByZXF1ZXN0ICpycSk7DQo+ICsNCj4gKyNlbmRpZg0KDQpQbGVhc2UgbWFrZSBzdXJlIHRo
+YXQgdGhlIG9yZGVyIG9mICNpbmNsdWRlIGRpcmVjdGl2ZXMgZG9lcyBub3QgYWZmZWN0IHRoZQ0K
+Y29tcGlsYXRpb24gcmVzdWx0LCBlLmcuIGJ5IGFkZGluZyBmb3J3YXJkIGRlY2xhcmF0aW9ucyBm
+b3IgdGhlIHN0cnVjdHVyZXMNCnVzZWQgYXMgYXJndW1lbnRzLg0KDQpUaGFua3MsDQoNCkJhcnQu
