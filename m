@@ -1,40 +1,66 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH V3 07/12] scsi: sd_zbc: Use well defined macros
-To: Damien Le Moal <damien.lemoal@wdc.com>, linux-scsi@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@wdc.com>
+Return-Path: <prvs=4242a8d18=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V3 07/12] scsi: sd_zbc: Use well defined macros
+Date: Fri, 15 Sep 2017 19:06:40 +0900
+Message-Id: <20170915100645.17999-8-damien.lemoal@wdc.com>
+In-Reply-To: <20170915100645.17999-1-damien.lemoal@wdc.com>
 References: <20170915100645.17999-1-damien.lemoal@wdc.com>
- <20170915100645.17999-8-damien.lemoal@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <bb1206b5-73a8-6778-7d1d-c52e93b92fb1@suse.de>
-Date: Fri, 15 Sep 2017 12:45:41 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170915100645.17999-8-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/15/2017 12:06 PM, Damien Le Moal wrote:
-> instead of open coding, use the min() macro to calculate a report zones
-> reply buffer length in sd_zbc_check_zone_size() and the round_up()
-> macro for calculating the number of zones in sd_zbc_setup().
-> 
-> No functional change is introduced by this patch.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  drivers/scsi/sd_zbc.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+instead of open coding, use the min() macro to calculate a report zones
+reply buffer length in sd_zbc_check_zone_size() and the round_up()
+macro for calculating the number of zones in sd_zbc_setup().
 
-Cheers,
+No functional change is introduced by this patch.
 
-Hannes
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/scsi/sd_zbc.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 081bf5a3b10b..37b33adbb2ef 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -430,7 +430,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
+ 	return 0;
+ }
+ 
+-#define SD_ZBC_BUF_SIZE 131072
++#define SD_ZBC_BUF_SIZE 131072U
+ 
+ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ {
+@@ -474,10 +474,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 		/* Parse REPORT ZONES header */
+ 		list_length = get_unaligned_be32(&buf[0]) + 64;
+ 		rec = buf + 64;
+-		if (list_length < SD_ZBC_BUF_SIZE)
+-			buf_len = list_length;
+-		else
+-			buf_len = SD_ZBC_BUF_SIZE;
++		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
+ 
+ 		/* Parse zone descriptors */
+ 		while (rec < buf + buf_len) {
+@@ -547,9 +544,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ 	/* chunk_sectors indicates the zone size */
+ 	blk_queue_chunk_sectors(sdkp->disk->queue,
+ 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
+-	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
+-	if (sdkp->capacity & (sdkp->zone_blocks - 1))
+-		sdkp->nr_zones++;
++	sdkp->nr_zones =
++		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
+ 
+ 	if (!sdkp->zones_wlock) {
+ 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.13.5
