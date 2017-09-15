@@ -1,49 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55762 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751186AbdISDtz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2017 23:49:55 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 01/10] blk-mq: only run hw queues for blk-mq
-Date: Tue, 19 Sep 2017 11:49:16 +0800
-Message-Id: <20170919034925.9894-2-ming.lei@redhat.com>
-In-Reply-To: <20170919034925.9894-1-ming.lei@redhat.com>
-References: <20170919034925.9894-1-ming.lei@redhat.com>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26390 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750871AbdIOVno (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 17:43:44 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: [PATCH 5/5] dm-mpath: improve I/O schedule
+Date: Fri, 15 Sep 2017 21:42:55 +0000
+Message-ID: <1505511774.2705.3.camel@wdc.com>
+References: <20170915164456.9803-1-ming.lei@redhat.com>
+         <20170915164456.9803-6-ming.lei@redhat.com>
+In-Reply-To: <20170915164456.9803-6-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch just makes it explicitely.
-
-Tested-by: Cathy Avery <cavery@redhat.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 98a18609755e..6fd9f86fc86d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
--- 
-2.9.5
+T24gU2F0LCAyMDE3LTA5LTE2IGF0IDAwOjQ0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gK3N0
+YXRpYyB2b2lkIHNhdmVfcGF0aF9xdWV1ZV9kZXB0aChzdHJ1Y3QgcGdwYXRoICpwKQ0KPiArew0K
+PiArCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gYmRldl9nZXRfcXVldWUocC0+cGF0aC5kZXYt
+PmJkZXYpOw0KPiArDQo+ICsJcC0+b2xkX25yX3JlcXVlc3RzID0gcS0+bnJfcmVxdWVzdHM7DQo+
+ICsJcC0+cXVldWVfZGVwdGggPSBxLT5xdWV1ZV9kZXB0aDsNCj4gKw0KPiArCS8qIG9uZSBleHRy
+YSByZXF1ZXN0IGZvciBtYWtpbmcgdGhlIHBpcGVsaW5lIGZ1bGwgKi8NCj4gKwlpZiAocC0+cXVl
+dWVfZGVwdGgpDQo+ICsJCWJsa191cGRhdGVfbnJfcmVxdWVzdHMocSwgcC0+cXVldWVfZGVwdGgg
+KyAxKTsNCj4gK30NCg0KYmxrX21xX2luaXRfYWxsb2NhdGVkX3F1ZXVlKCkgaW5pdGlhbGl6ZXMg
+bnJfcmVxdWVzdHMgdG8gdGhlIHRhZyBzZXQgcXVldWUgZGVwdGguDQpEb2VzIHRoYXQgbWVhbiB0
+aGF0IHRoZSBhYm92ZSBjb2RlIGluY3JlYXNlcyBucl9yZXF1ZXN0cyBieSBvbmU/IElmIHNvLCBk
+b2VzDQp0aGF0IGNoYW5nZSBvbmx5IHJlc3VsdCBpbiBhIHBlcmZvcm1hbmNlIGltcHJvdmVtZW50
+IGZvciB0aGUgcXVldWUgZGVwdGgNCm1lbnRpb25lZCBpbiB0aGUgcGF0aCBkZXNjcmlwdGlvbiAo
+Myk/IFNvcnJ5IGJ1dCBJIGRvdWJ0IHRoYXQgdGhpcyBjaGFuZ2Ugd2lsbA0KeWllbGQgYSBzaWdu
+aWZpY2FudCBpbXByb3ZlbWVudCBmb3IgaGlnaGVyIHF1ZXVlIGRlcHRocy4gRG9lcyB0aGF0IG1l
+YW4gdGhhdA0KdGhpcyBwYXRjaCBjYW4gYmUgbGVmdCBvdXQ/DQoNClRoYW5rcywNCg0KQmFydC4=
