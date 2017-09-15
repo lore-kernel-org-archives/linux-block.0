@@ -1,71 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:35944 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751913AbdIMLrL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2017 07:47:11 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V8 03/14] mmc: mmc: Enable Command Queuing
-Date: Wed, 13 Sep 2017 14:40:03 +0300
-Message-Id: <1505302814-19313-4-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
-References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH V3 11/12] scsi: sd_zbc: Disable zone write locking with
+ scsi-mq
+To: Damien Le Moal <damien.lemoal@wdc.com>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+ <20170915100645.17999-12-damien.lemoal@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <3c67bba5-a866-b947-5014-947f509a0a19@suse.de>
+Date: Fri, 15 Sep 2017 12:52:53 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170915100645.17999-12-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Enable the Command Queue if the host controller supports a command queue
-engine. It is not compatible with Packed Commands, so make a note of that in the
-comment.
+On 09/15/2017 12:06 PM, Damien Le Moal wrote:
+> In the case of a ZBC disk used with scsi-mq, zone write locking does
+> not prevent write reordering in sequential zones. Unlike the legacy
+> case, zone locking is done after the command request is removed from
+> the scheduler dispatch queue. That is, at the time of zone locking,
+> the write command may already be out of order, making locking
+> ineffective. Write order guarantees can only be provided by an
+> adapted I/O scheduler.
+> 
+> Disable zone write locking in sd_zbc_write_lock_zone() if the disk is
+> used with scsi-mq. As the disk zones_wlock bitmap is not necessry,
+> do not allocate it.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  drivers/scsi/sd_zbc.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/mmc.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Cheers,
 
-diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index a7eb623f8daa..194cf2082e73 100644
---- a/drivers/mmc/core/mmc.c
-+++ b/drivers/mmc/core/mmc.c
-@@ -1784,6 +1784,23 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
- 	}
- 
- 	/*
-+	 * Enable Command Queue if supported. Note that Packed Commands cannot
-+	 * be used with Command Queue.
-+	 */
-+	card->ext_csd.cmdq_en = false;
-+	if (card->ext_csd.cmdq_support && host->caps2 & MMC_CAP2_CQE) {
-+		err = mmc_cmdq_enable(card);
-+		if (err && err != -EBADMSG)
-+			goto free_card;
-+		if (err) {
-+			pr_warn("%s: Enabling CMDQ failed\n",
-+				mmc_hostname(card->host));
-+			card->ext_csd.cmdq_support = false;
-+			card->ext_csd.cmdq_depth = 0;
-+			err = 0;
-+		}
-+	}
-+	/*
- 	 * In some cases (e.g. RPMB or mmc_test), the Command Queue must be
- 	 * disabled for a time, so a flag is needed to indicate to re-enable the
- 	 * Command Queue.
+Hannes
 -- 
-1.9.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
