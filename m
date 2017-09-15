@@ -1,97 +1,363 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45952 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751257AbdIPDGW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 23:06:22 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 4/7] blk-mq: decide how to handle flush rq via RQF_FLUSH_SEQ
-Date: Sat, 16 Sep 2017 11:03:48 +0800
-Message-Id: <20170916030351.28019-6-ming.lei@redhat.com>
-In-Reply-To: <20170916030351.28019-1-ming.lei@redhat.com>
-References: <20170916030351.28019-1-ming.lei@redhat.com>
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:46979 "EHLO
+        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751520AbdIOMZx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 08:25:53 -0400
+Received: by mail-wm0-f46.google.com with SMTP id i189so7888489wmf.1
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:25:52 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 09/11] lightnvm: pblk: improve naming for internal req.
+Date: Fri, 15 Sep 2017 14:25:37 +0200
+Message-Id: <1505478339-13089-10-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+References: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now we always preallocate one driver tag before blk_insert_flush(),
-and flush request will be marked as RQF_FLUSH_SEQ once it is in
-flush machinary.
+Each request type sent to the LightNVM subsystem requires different
+metadata. Until now, we have tailored this metadata based on write, read
+and erase commands. However, pblk uses different metadata for internal
+writes that do not hit the write buffer. Instead of abusing the metadata
+for reads, create a new request type - internal write to improve
+code readability.
 
-So if RQF_FLUSH_SEQ isn't set, we call blk_insert_flush()
-to handle the request, otherwise the flush request is
-dispatched to ->dispatch list directly.
+In the process, create internal values for each I/O type instead of
+abusing the READ/WRITE macros, as suggested by Christoph.
 
-This is a prepare patch for not preallocating driver tag
-on flush rq, and remove the special case.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-mq-sched.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 32 ++++++++++++++++----------------
+ drivers/lightnvm/pblk-read.c     |  6 +++---
+ drivers/lightnvm/pblk-recovery.c | 12 ++++++------
+ drivers/lightnvm/pblk-write.c    | 16 ++++++++--------
+ drivers/lightnvm/pblk.h          | 11 ++++++++---
+ 5 files changed, 41 insertions(+), 36 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 4ab69435708c..fa0f33d7efb9 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -260,21 +260,23 @@ void blk_mq_sched_request_inserted(struct request *rq)
- EXPORT_SYMBOL_GPL(blk_mq_sched_request_inserted);
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 55d472beee24..1ac54b2bba26 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -152,7 +152,7 @@ struct nvm_rq *pblk_alloc_rqd(struct pblk *pblk, int rw)
+ 	struct nvm_rq *rqd;
+ 	int rq_size;
  
- static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
-+				       bool has_sched,
- 				       struct request *rq)
+-	if (rw == WRITE) {
++	if (rw == PBLK_WRITE) {
+ 		pool = pblk->w_rq_pool;
+ 		rq_size = pblk_w_rq_size;
+ 	} else {
+@@ -170,7 +170,7 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int rw)
  {
--	if (rq->tag == -1) {
-+	/* dispatch flush rq directly */
-+	if (rq->rq_flags & RQF_FLUSH_SEQ) {
-+		spin_lock(&hctx->lock);
-+		list_add(&rq->queuelist, &hctx->dispatch);
-+		spin_unlock(&hctx->lock);
-+		return true;
-+	}
-+
-+	if (has_sched) {
- 		rq->rq_flags |= RQF_SORTED;
--		return false;
-+		WARN_ON(rq->tag != -1);
- 	}
+ 	mempool_t *pool;
  
--	/*
--	 * If we already have a real request tag, send directly to
--	 * the dispatch list.
--	 */
--	spin_lock(&hctx->lock);
--	list_add(&rq->queuelist, &hctx->dispatch);
--	spin_unlock(&hctx->lock);
--	return true;
-+	return false;
+-	if (rw == WRITE)
++	if (rw == PBLK_WRITE)
+ 		pool = pblk->w_rq_pool;
+ 	else
+ 		pool = pblk->r_rq_pool;
+@@ -567,10 +567,10 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	int ret;
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+-	if (dir == WRITE) {
++	if (dir == PBLK_WRITE) {
+ 		bio_op = REQ_OP_WRITE;
+ 		cmd_op = NVM_OP_PWRITE;
+-	} else if (dir == READ) {
++	} else if (dir == PBLK_READ) {
+ 		bio_op = REQ_OP_READ;
+ 		cmd_op = NVM_OP_PREAD;
+ 	} else
+@@ -610,10 +610,10 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	rqd.end_io = pblk_end_io_sync;
+ 	rqd.private = &wait;
+ 
+-	if (dir == WRITE) {
++	if (dir == PBLK_WRITE) {
+ 		struct pblk_sec_meta *meta_list = rqd.meta_list;
+ 
+-		rqd.flags = pblk_set_progr_mode(pblk, WRITE);
++		rqd.flags = pblk_set_progr_mode(pblk, PBLK_WRITE);
+ 		for (i = 0; i < rqd.nr_ppas; ) {
+ 			spin_lock(&line->lock);
+ 			paddr = __pblk_alloc_page(pblk, line, min);
+@@ -677,7 +677,7 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	reinit_completion(&wait);
+ 
+ 	if (rqd.error) {
+-		if (dir == WRITE)
++		if (dir == PBLK_WRITE)
+ 			pblk_log_write_err(pblk, &rqd);
+ 		else
+ 			pblk_log_read_err(pblk, &rqd);
+@@ -720,12 +720,12 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	int flags;
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+-	if (dir == WRITE) {
++	if (dir == PBLK_WRITE) {
+ 		bio_op = REQ_OP_WRITE;
+ 		cmd_op = NVM_OP_PWRITE;
+-		flags = pblk_set_progr_mode(pblk, WRITE);
++		flags = pblk_set_progr_mode(pblk, PBLK_WRITE);
+ 		lba_list = emeta_to_lbas(pblk, line->emeta->buf);
+-	} else if (dir == READ) {
++	} else if (dir == PBLK_READ) {
+ 		bio_op = REQ_OP_READ;
+ 		cmd_op = NVM_OP_PREAD;
+ 		flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
+@@ -763,7 +763,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 
+ 		rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line->id);
+ 
+-		if (dir == WRITE) {
++		if (dir == PBLK_WRITE) {
+ 			__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+ 
+ 			meta_list[i].lba = lba_list[paddr] = addr_empty;
+@@ -789,7 +789,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	atomic_dec(&pblk->inflight_io);
+ 
+ 	if (rqd.error) {
+-		if (dir == WRITE)
++		if (dir == PBLK_WRITE)
+ 			pblk_log_write_err(pblk, &rqd);
+ 		else
+ 			pblk_log_read_err(pblk, &rqd);
+@@ -805,14 +805,14 @@ int pblk_line_read_smeta(struct pblk *pblk, struct pblk_line *line)
+ {
+ 	u64 bpaddr = pblk_line_smeta_start(pblk, line);
+ 
+-	return pblk_line_submit_smeta_io(pblk, line, bpaddr, READ);
++	return pblk_line_submit_smeta_io(pblk, line, bpaddr, PBLK_READ);
  }
  
- /**
-@@ -362,12 +364,13 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
+ int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
+ 			 void *emeta_buf)
+ {
+ 	return pblk_line_submit_emeta_io(pblk, line, emeta_buf,
+-						line->emeta_ssec, READ);
++						line->emeta_ssec, PBLK_READ);
+ }
  
--	if (rq->tag == -1 && op_is_flush(rq->cmd_flags)) {
-+	/* flush rq in flush machinery need to be dispatched directly */
-+	if (!(rq->rq_flags & RQF_FLUSH_SEQ) && op_is_flush(rq->cmd_flags)) {
- 		blk_mq_sched_insert_flush(hctx, rq, can_block);
- 		return;
+ static void pblk_setup_e_rq(struct pblk *pblk, struct nvm_rq *rqd,
+@@ -821,7 +821,7 @@ static void pblk_setup_e_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	rqd->opcode = NVM_OP_ERASE;
+ 	rqd->ppa_addr = ppa;
+ 	rqd->nr_ppas = 1;
+-	rqd->flags = pblk_set_progr_mode(pblk, ERASE);
++	rqd->flags = pblk_set_progr_mode(pblk, PBLK_ERASE);
+ 	rqd->bio = NULL;
+ }
+ 
+@@ -1043,7 +1043,7 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+ 	line->smeta_ssec = off;
+ 	line->cur_sec = off + lm->smeta_sec;
+ 
+-	if (init && pblk_line_submit_smeta_io(pblk, line, off, WRITE)) {
++	if (init && pblk_line_submit_smeta_io(pblk, line, off, PBLK_WRITE)) {
+ 		pr_debug("pblk: line smeta I/O failed. Retry\n");
+ 		return 1;
+ 	}
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index e7141b1aaded..4b1722fbe5a0 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -142,7 +142,7 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 	atomic_long_sub(rqd->nr_ppas, &pblk->inflight_reads);
+ #endif
+ 
+-	pblk_free_rqd(pblk, rqd, READ);
++	pblk_free_rqd(pblk, rqd, PBLK_READ);
+ 	atomic_dec(&pblk->inflight_io);
+ }
+ 
+@@ -307,7 +307,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 
+ 	bitmap_zero(&read_bitmap, nr_secs);
+ 
+-	rqd = pblk_alloc_rqd(pblk, READ);
++	rqd = pblk_alloc_rqd(pblk, PBLK_READ);
+ 
+ 	rqd->opcode = NVM_OP_PREAD;
+ 	rqd->bio = bio;
+@@ -382,7 +382,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	return NVM_IO_OK;
+ 
+ fail_rqd_free:
+-	pblk_free_rqd(pblk, rqd, READ);
++	pblk_free_rqd(pblk, rqd, PBLK_READ);
+ 	return ret;
+ }
+ 
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index b3950ab862f9..848950fbe71c 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -67,7 +67,7 @@ void pblk_submit_rec(struct work_struct *work)
+ 
+ err:
+ 	bio_put(bio);
+-	pblk_free_rqd(pblk, rqd, WRITE);
++	pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+ }
+ 
+ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+@@ -80,7 +80,7 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 	struct pblk_c_ctx *rec_ctx;
+ 	int nr_entries = c_ctx->nr_valid + c_ctx->nr_padded;
+ 
+-	rec_rqd = pblk_alloc_rqd(pblk, WRITE);
++	rec_rqd = pblk_alloc_rqd(pblk, PBLK_WRITE);
+ 	rec_ctx = nvm_rq_to_pdu(rec_rqd);
+ 
+ 	/* Copy completion bitmap, but exclude the first X completed entries */
+@@ -334,7 +334,7 @@ static void pblk_end_io_recov(struct nvm_rq *rqd)
+ 	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
+ 
+ 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+-	pblk_free_rqd(pblk, rqd, WRITE);
++	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+ 
+ 	atomic_dec(&pblk->inflight_io);
+ 	kref_put(&pad_rq->ref, pblk_recov_complete);
+@@ -404,11 +404,11 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+ 
+-	rqd = pblk_alloc_rqd(pblk, WRITE);
++	rqd = pblk_alloc_rqd(pblk, PBLK_WRITE_INT);
+ 
+ 	rqd->bio = bio;
+ 	rqd->opcode = NVM_OP_PWRITE;
+-	rqd->flags = pblk_set_progr_mode(pblk, WRITE);
++	rqd->flags = pblk_set_progr_mode(pblk, PBLK_WRITE);
+ 	rqd->meta_list = meta_list;
+ 	rqd->nr_ppas = rq_ppas;
+ 	rqd->ppa_list = ppa_list;
+@@ -782,7 +782,7 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
+ 		goto free_meta_list;
  	}
  
--	if (e && blk_mq_sched_bypass_insert(hctx, rq))
-+	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
- 		goto run;
+-	rqd = pblk_alloc_rqd(pblk, READ);
++	rqd = pblk_alloc_rqd(pblk, PBLK_READ);
  
- 	if (e && e->type->ops.mq.insert_requests) {
-@@ -405,7 +408,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 		list_for_each_entry_safe(rq, next, list, queuelist) {
- 			if (WARN_ON_ONCE(rq->tag != -1)) {
- 				list_del_init(&rq->queuelist);
--				blk_mq_sched_bypass_insert(hctx, rq);
-+				blk_mq_sched_bypass_insert(hctx, true, rq);
- 			}
- 		}
- 	}
+ 	p.ppa_list = ppa_list;
+ 	p.meta_list = meta_list;
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index d440dbbe018d..7352b7d55a4d 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -49,7 +49,7 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+ 
+ 	bio_put(rqd->bio);
+-	pblk_free_rqd(pblk, rqd, WRITE);
++	pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+ 
+ 	return ret;
+ }
+@@ -198,7 +198,7 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
+ 						GFP_ATOMIC, pblk->close_wq);
+ 
+ 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+-	pblk_free_rqd(pblk, rqd, READ);
++	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+ 
+ 	atomic_dec(&pblk->inflight_io);
+ }
+@@ -212,7 +212,7 @@ static int pblk_alloc_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	/* Setup write request */
+ 	rqd->opcode = NVM_OP_PWRITE;
+ 	rqd->nr_ppas = nr_secs;
+-	rqd->flags = pblk_set_progr_mode(pblk, WRITE);
++	rqd->flags = pblk_set_progr_mode(pblk, PBLK_WRITE);
+ 	rqd->private = pblk;
+ 	rqd->end_io = end_io;
+ 
+@@ -278,7 +278,7 @@ int pblk_setup_w_rec_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 	pblk_map_rq(pblk, rqd, c_ctx->sentry, lun_bitmap, c_ctx->nr_valid, 0);
+ 
+ 	rqd->ppa_status = (u64)0;
+-	rqd->flags = pblk_set_progr_mode(pblk, WRITE);
++	rqd->flags = pblk_set_progr_mode(pblk, PBLK_WRITE);
+ 
+ 	return ret;
+ }
+@@ -369,7 +369,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	int i, j;
+ 	int ret;
+ 
+-	rqd = pblk_alloc_rqd(pblk, READ);
++	rqd = pblk_alloc_rqd(pblk, PBLK_WRITE_INT);
+ 
+ 	m_ctx = nvm_rq_to_pdu(rqd);
+ 	m_ctx->private = meta_line;
+@@ -427,7 +427,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ fail_free_bio:
+ 	bio_put(bio);
+ fail_free_rqd:
+-	pblk_free_rqd(pblk, rqd, READ);
++	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+ 	return ret;
+ }
+ 
+@@ -551,7 +551,7 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+ 
+-	rqd = pblk_alloc_rqd(pblk, WRITE);
++	rqd = pblk_alloc_rqd(pblk, PBLK_WRITE);
+ 	rqd->bio = bio;
+ 
+ 	if (pblk_rb_read_to_bio(&pblk->rwb, rqd, pos, secs_to_sync,
+@@ -573,7 +573,7 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	pblk_free_write_rqd(pblk, rqd);
+ fail_put_bio:
+ 	bio_put(bio);
+-	pblk_free_rqd(pblk, rqd, WRITE);
++	pblk_free_rqd(pblk, rqd, PBLK_WRITE);
+ 
+ 	return 1;
+ }
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 74fa189a94e1..74422a0d63fa 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -55,12 +55,17 @@
+ 		for ((i) = 0, rlun = &(pblk)->luns[0]; \
+ 			(i) < (pblk)->nr_luns; (i)++, rlun = &(pblk)->luns[(i)])
+ 
+-#define ERASE 2 /* READ = 0, WRITE = 1 */
+-
+ /* Static pool sizes */
+ #define PBLK_GEN_WS_POOL_SIZE (2)
+ 
+ enum {
++	PBLK_READ		= READ,
++	PBLK_WRITE		= WRITE,/* Write from write buffer */
++	PBLK_WRITE_INT,			/* Internal write - no write buffer */
++	PBLK_ERASE,
++};
++
++enum {
+ 	/* IO Types */
+ 	PBLK_IOTYPE_USER	= 1 << 0,
+ 	PBLK_IOTYPE_GC		= 1 << 1,
+@@ -1132,7 +1137,7 @@ static inline int pblk_set_progr_mode(struct pblk *pblk, int type)
+ 
+ 	flags = geo->plane_mode >> 1;
+ 
+-	if (type == WRITE)
++	if (type == PBLK_WRITE)
+ 		flags |= NVM_IO_SCRAMBLE_ENABLE;
+ 
+ 	return flags;
 -- 
-2.9.5
+2.7.4
