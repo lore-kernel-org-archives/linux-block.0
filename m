@@ -1,149 +1,328 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:35286 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751908AbdIXHDI (ORCPT
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:48753 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751278AbdIOMf7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Sep 2017 03:03:08 -0400
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 14/16] block: mq-deadline: Limit write dispatch for zoned block devices
-Date: Sun, 24 Sep 2017 16:02:45 +0900
-Message-Id: <20170924070247.25560-15-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+        Fri, 15 Sep 2017 08:35:59 -0400
+Received: by mail-wm0-f53.google.com with SMTP id r68so7947681wmg.3
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:35:58 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH] lightnvm: pblk: guarantee line integrity on reads
+Date: Fri, 15 Sep 2017 14:35:49 +0200
+Message-Id: <1505478953-16915-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1505478953-16915-1-git-send-email-javier@cnexlabs.com>
+References: <1505478953-16915-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When dispatching writes to a zoned block device, only allow the request
-to be dispatched if its target zone is not locked. If it is, leave the
-request in the scheduler queues and look for another suitable write
-request. If no write can be dispatched, allow reads to be dispatched
-even if the write batch is not done.
+When a line is recycled during garbage collection, reads can still be
+issued to the line. If the line is freed in the middle of this process,
+data corruption might occur.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+This patch guarantees that lines are not freed in the middle of reads
+that target them (lines). Specifically, we use the existing line
+reference to decide when a line is eligible for being freed after the
+recycle process.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/mq-deadline.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 57 insertions(+), 4 deletions(-)
+ drivers/lightnvm/pblk-core.c | 56 ++++++++++++++++++++++++++++++----
+ drivers/lightnvm/pblk-init.c | 14 +++++++--
+ drivers/lightnvm/pblk-read.c | 71 +++++++++++++++++++++++++++++++++-----------
+ drivers/lightnvm/pblk.h      |  2 ++
+ 4 files changed, 118 insertions(+), 25 deletions(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 2de1a36c34f5..8725b4f950c1 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -283,16 +283,44 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 5e6a881e3434..d2587e37034f 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1458,10 +1458,8 @@ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
+ 	line->emeta = NULL;
  }
  
- /*
-+ * Test if a request can be dispatched.
-+ */
-+static inline bool deadline_can_dispatch_request(struct deadline_data *dd,
-+						 struct request *rq)
+-void pblk_line_put(struct kref *ref)
++static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
+ {
+-	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
+-	struct pblk *pblk = line->pblk;
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 
+ 	spin_lock(&line->lock);
+@@ -1479,6 +1477,43 @@ void pblk_line_put(struct kref *ref)
+ 	pblk_rl_free_lines_inc(&pblk->rl, line);
+ }
+ 
++static void pblk_line_put_ws(struct work_struct *work)
 +{
-+	if (!deadline_request_needs_zone_wlock(dd, rq))
-+		return true;
-+	return !deadline_zone_is_wlocked(dd, rq);
++	struct pblk_line_ws *line_put_ws = container_of(work,
++						struct pblk_line_ws, ws);
++	struct pblk *pblk = line_put_ws->pblk;
++	struct pblk_line *line = line_put_ws->line;
++
++	__pblk_line_put(pblk, line);
++	mempool_free(line_put_ws, pblk->gen_ws_pool);
 +}
 +
-+/*
-  * For the specified data direction, return the next request to
-  * dispatch using arrival ordered lists.
-  */
- static struct request *
- deadline_fifo_request(struct deadline_data *dd, int data_dir)
++void pblk_line_put(struct kref *ref)
++{
++	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
++	struct pblk *pblk = line->pblk;
++
++	__pblk_line_put(pblk, line);
++}
++
++void pblk_line_put_wq(struct kref *ref)
++{
++	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
++	struct pblk *pblk = line->pblk;
++	struct pblk_line_ws *line_put_ws;
++
++	line_put_ws = mempool_alloc(pblk->gen_ws_pool, GFP_ATOMIC);
++	if (!line_put_ws)
++		return;
++
++	line_put_ws->pblk = pblk;
++	line_put_ws->line = line;
++	line_put_ws->priv = NULL;
++
++	INIT_WORK(&line_put_ws->ws, pblk_line_put_ws);
++	queue_work(pblk->r_end_wq, &line_put_ws->ws);
++}
++
+ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
  {
-+	struct request *rq;
-+	unsigned long flags;
-+
- 	if (list_empty(&dd->fifo_list[data_dir]))
- 		return NULL;
+ 	struct nvm_rq *rqd;
+@@ -1886,8 +1921,19 @@ void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
+ 	int i;
  
--	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	if (!dd->zones_wlock || data_dir == READ)
-+		return rq_entry_fifo(dd->fifo_list[data_dir].next);
+ 	spin_lock(&pblk->trans_lock);
+-	for (i = 0; i < nr_secs; i++)
+-		ppas[i] = pblk_trans_map_get(pblk, blba + i);
++	for (i = 0; i < nr_secs; i++) {
++		struct ppa_addr ppa;
 +
-+	spin_lock_irqsave(&dd->zone_lock, flags);
++		ppa = ppas[i] = pblk_trans_map_get(pblk, blba + i);
 +
-+	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {
-+		if (deadline_can_dispatch_request(dd, rq))
-+			goto out;
++		/* If the L2P entry maps to a line, the reference is valid */
++		if (!pblk_ppa_empty(ppa) && !pblk_addr_in_cache(ppa)) {
++			int line_id = pblk_dev_ppa_to_line(ppa);
++			struct pblk_line *line = &pblk->lines[line_id];
++
++			kref_get(&line->ref);
++		}
 +	}
-+	rq = NULL;
-+
-+out:
-+	spin_unlock_irqrestore(&dd->zone_lock, flags);
-+
-+	return rq;
+ 	spin_unlock(&pblk->trans_lock);
  }
  
- /*
-@@ -302,7 +330,21 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
- static struct request *
- deadline_next_request(struct deadline_data *dd, int data_dir)
- {
--	return dd->next_rq[data_dir];
-+	struct request *rq = dd->next_rq[data_dir];
-+	unsigned long flags;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index df86cf98ef4d..670e5858611e 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -271,15 +271,22 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->bb_wq)
+ 		goto free_close_wq;
+ 
++	pblk->r_end_wq = alloc_workqueue("pblk-read-end-wq",
++			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
++	if (!pblk->r_end_wq)
++		goto free_bb_wq;
 +
-+	if (!dd->zones_wlock || data_dir == READ)
-+		return rq;
+ 	if (pblk_set_ppaf(pblk))
+-		goto free_bb_wq;
++		goto free_r_end_wq;
+ 
+ 	if (pblk_rwb_init(pblk))
+-		goto free_bb_wq;
++		goto free_r_end_wq;
+ 
+ 	INIT_LIST_HEAD(&pblk->compl_list);
+ 	return 0;
+ 
++free_r_end_wq:
++	destroy_workqueue(pblk->r_end_wq);
+ free_bb_wq:
+ 	destroy_workqueue(pblk->bb_wq);
+ free_close_wq:
+@@ -304,6 +311,9 @@ static void pblk_core_free(struct pblk *pblk)
+ 	if (pblk->close_wq)
+ 		destroy_workqueue(pblk->close_wq);
+ 
++	if (pblk->r_end_wq)
++		destroy_workqueue(pblk->r_end_wq);
 +
-+	spin_lock_irqsave(&dd->zone_lock, flags);
-+	while (rq) {
-+		if (deadline_can_dispatch_request(dd, rq))
-+			break;
-+		rq = deadline_latter_request(rq);
-+	}
-+	spin_unlock_irqrestore(&dd->zone_lock, flags);
-+
-+	return rq;
+ 	if (pblk->bb_wq)
+ 		destroy_workqueue(pblk->bb_wq);
+ 
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index a465d9980df4..402f8eff6a2e 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -130,9 +130,34 @@ static void pblk_read_check(struct pblk *pblk, struct nvm_rq *rqd,
+ 	}
  }
  
- /*
-@@ -344,7 +386,8 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	if (reads) {
- 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
+-static void pblk_end_io_read(struct nvm_rq *rqd)
++static void pblk_read_put_rqd_kref(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct ppa_addr *ppa_list;
++	int i;
++
++	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
++
++	for (i = 0; i < rqd->nr_ppas; i++) {
++		struct ppa_addr ppa = ppa_list[i];
++		struct pblk_line *line;
++
++		line = &pblk->lines[pblk_dev_ppa_to_line(ppa)];
++		kref_put(&line->ref, pblk_line_put_wq);
++	}
++}
++
++static void pblk_end_user_read(struct bio *bio)
++{
++#ifdef CONFIG_NVM_DEBUG
++	WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
++#endif
++	bio_endio(bio);
++	bio_put(bio);
++}
++
++static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
++			       bool put_line)
+ {
+-	struct pblk *pblk = rqd->private;
+ 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+ 	struct bio *bio = rqd->bio;
  
--		if (writes && (dd->starved++ >= dd->writes_starved))
-+		if (deadline_fifo_request(dd, WRITE) &&
-+		    (dd->starved++ >= dd->writes_starved))
- 			goto dispatch_writes;
+@@ -146,15 +171,11 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 	pblk_read_check(pblk, rqd, r_ctx->lba);
  
- 		data_dir = READ;
-@@ -389,6 +432,13 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 		rq = next_rq;
+ 	bio_put(bio);
+-	if (r_ctx->private) {
+-		struct bio *orig_bio = r_ctx->private;
++	if (r_ctx->private)
++		pblk_end_user_read((struct bio *)r_ctx->private);
+ 
+-#ifdef CONFIG_NVM_DEBUG
+-		WARN_ONCE(orig_bio->bi_status, "pblk: corrupted read bio\n");
+-#endif
+-		bio_endio(orig_bio);
+-		bio_put(orig_bio);
+-	}
++	if (put_line)
++		pblk_read_put_rqd_kref(pblk, rqd);
+ 
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(rqd->nr_ppas, &pblk->sync_reads);
+@@ -165,6 +186,13 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 	atomic_dec(&pblk->inflight_io);
+ }
+ 
++static void pblk_end_io_read(struct nvm_rq *rqd)
++{
++	struct pblk *pblk = rqd->private;
++
++	__pblk_end_io_read(pblk, rqd, true);
++}
++
+ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 				      unsigned int bio_init_idx,
+ 				      unsigned long *read_bitmap)
+@@ -233,8 +261,12 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
  	}
  
-+	/*
-+	 * If we only have writes queued and none of them can be dispatched,
-+	 * rq will be NULL.
-+	 */
-+	if (!rq)
-+		return NULL;
+ 	if (unlikely(nr_secs > 1 && nr_holes == 1)) {
++		struct ppa_addr ppa;
 +
- 	dd->batching = 0;
++		ppa = rqd->ppa_addr;
+ 		rqd->ppa_list = ppa_ptr;
+ 		rqd->dma_ppa_list = dma_ppa_list;
++		rqd->ppa_list[0] = ppa;
+ 	}
  
- dispatch_request:
-@@ -566,7 +616,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 
- 	/*
- 	 * This may be a requeue of a request that has locked its
--	 * target zone. If this is the case, release the request zone lock.
-+	 * target zone. If this is the case, release the zone lock.
- 	 */
- 	if (deadline_request_has_zone_wlock(rq))
- 		deadline_wunlock_zone(dd, rq);
-@@ -576,6 +626,9 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 
- 	blk_mq_sched_request_inserted(rq);
- 
-+	if (at_head && deadline_request_needs_zone_wlock(dd, rq))
-+		pr_info("######## Write at head !\n");
+ 	for (i = 0; i < nr_secs; i++) {
+@@ -246,6 +278,11 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	i = 0;
+ 	hole = find_first_zero_bit(read_bitmap, nr_secs);
+ 	do {
++		int line_id = pblk_dev_ppa_to_line(rqd->ppa_list[i]);
++		struct pblk_line *line = &pblk->lines[line_id];
 +
- 	if (at_head || blk_rq_is_passthrough(rq)) {
- 		if (at_head)
- 			list_add(&rq->queuelist, &dd->dispatch);
++		kref_put(&line->ref, pblk_line_put);
++
+ 		meta_list[hole].lba = lba_list_media[i];
+ 
+ 		src_bv = new_bio->bi_io_vec[i++];
+@@ -269,19 +306,17 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	bio_put(new_bio);
+ 
+ 	/* Complete the original bio and associated request */
++	bio_endio(bio);
+ 	rqd->bio = bio;
+ 	rqd->nr_ppas = nr_secs;
+-	rqd->private = pblk;
+ 
+-	bio_endio(bio);
+-	pblk_end_io_read(rqd);
++	__pblk_end_io_read(pblk, rqd, false);
+ 	return NVM_IO_OK;
+ 
+ err:
+ 	/* Free allocated pages in new bio */
+ 	pblk_bio_free_pages(pblk, bio, 0, new_bio->bi_vcnt);
+-	rqd->private = pblk;
+-	pblk_end_io_read(rqd);
++	__pblk_end_io_read(pblk, rqd, false);
+ 	return NVM_IO_ERR;
+ }
+ 
+@@ -314,11 +349,11 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			goto retry;
+ 		}
+ 
++		WARN_ON(test_and_set_bit(0, read_bitmap));
+ 		meta_list[0].lba = cpu_to_le64(lba);
+ 
+-		WARN_ON(test_and_set_bit(0, read_bitmap));
+ #ifdef CONFIG_NVM_DEBUG
+-			atomic_long_inc(&pblk->cache_reads);
++		atomic_long_inc(&pblk->cache_reads);
+ #endif
+ 	} else {
+ 		rqd->ppa_addr = ppa;
+@@ -383,7 +418,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	if (bitmap_full(&read_bitmap, nr_secs)) {
+ 		bio_endio(bio);
+ 		atomic_inc(&pblk->inflight_io);
+-		pblk_end_io_read(rqd);
++		__pblk_end_io_read(pblk, rqd, false);
+ 		return NVM_IO_OK;
+ 	}
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index ac65e778b40d..8e9ae213b707 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -635,6 +635,7 @@ struct pblk {
+ 
+ 	struct workqueue_struct *close_wq;
+ 	struct workqueue_struct *bb_wq;
++	struct workqueue_struct *r_end_wq;
+ 
+ 	struct timer_list wtimer;
+ 
+@@ -740,6 +741,7 @@ int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
+ 			 void *emeta_buf);
+ int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr erase_ppa);
+ void pblk_line_put(struct kref *ref);
++void pblk_line_put_wq(struct kref *ref);
+ struct list_head *pblk_line_gc_list(struct pblk *pblk, struct pblk_line *line);
+ u64 pblk_lookup_page(struct pblk *pblk, struct pblk_line *line);
+ void pblk_dealloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
 -- 
-2.13.5
+2.7.4
