@@ -1,74 +1,110 @@
-Return-Path: <BATV+efe86d5870596b20d79e+5139+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: nvme multipath support V2
-Date: Mon, 18 Sep 2017 16:14:44 -0700
-Message-Id: <20170918231453.27128-1-hch@lst.de>
+Return-Path: <prvs=4242a8d18=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V3 00/12] scsi-mq support for ZBC disks
+Date: Fri, 15 Sep 2017 19:06:33 +0900
+Message-Id: <20170915100645.17999-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+This series implements support for ZBC disks used through the scsi-mq I/O path.
 
-this series adds support for multipathing, that is accessing nvme
-namespaces through multiple controllers to the nvme core driver.
+The current scsi level support of ZBC disks guarantees write request ordering
+using a per-zone write lock which prevents issuing simultaneously multiple
+write commands to a zone, doing so avoid reordering of sequential writes to
+sequential zones. This method is however ineffective when scsi-mq is used with
+zoned block devices. This is due to the different execution model of blk-mq
+which passes a request to the scsi layer for dispatching after the request has
+been removed from the I/O scheduler queue. That is, when the scsi layer tries
+to lock the target zone of the request, the request may already be out of
+order and zone write locking fails to prevent that.
 
-It is a very thin and efficient implementation that relies on
-close cooperation with other bits of the nvme driver, and few small
-and simple block helpers.
+Various approaches have been tried to solve this problem. All of them had the
+serious disadvantage of cluttering blk-mq code with zoned block device specific
+conditions and processing. As such extensive changes can only turn into a
+maintenance nightmares, a radically different solution is proposed here.
 
-Compared to dm-multipath the important differences are how management
-of the paths is done, and how the I/O path works.
+This series proposes implementing scsi-mq support for zoned block devices in
+the form of a new "zoned" I/O scheduler based. The zoned I/O scheduler is
+based on mq-deadline, with most of the code reused with no modification other
+than name changes. Zoned only differs from mq-deadline from the addition of a
+per zone write locking mechanism similar to that implemented in sd_zbc.c. The
+zoned scheduler zone write locking mechanism is used for the exact same purpose
+as the one in the scsi disk driver, that is, to limit writes per zone to at
+most one request to avoid reordering. The locking context however changes from
+that of scsi-mq and is moved to the dispatch_request method of the scheduler.
+Within this context, under a spin lock guaranteeing atomicity against other
+dispatch contexts, target zones of write requests can be locked before write
+requests removal from the scheduler. In effect, this results in the same
+behavior as the legacy scsi path. Sequential write ordering is preserved.
 
-Management of the paths is fully integrated into the nvme driver,
-for each newly found nvme controller we check if there are other
-controllers that refer to the same subsystem, and if so we link them
-up in the nvme driver.  Then for each namespace found we check if
-the namespace id and identifiers match to check if we have multiple
-controllers that refer to the same namespaces.  For now path
-availability is based entirely on the controller status, which at
-least for fabrics will be continuously updated based on the mandatory
-keep alive timer.  Once the Asynchronous Namespace Access (ANA)
-proposal passes in NVMe we will also get per-namespace states in
-addition to that, but for now any details of that remain confidential
-to NVMe members.
+The zoned scheduler is also optimized to not lock conventional zones. To do so,
+the new data structure blk_zoned is added to the request queue structure so
+that the low level scsi code can pass information such as number of zones and
+zone types to the block layer scheduler. This avoids difficulties in accessing
+this information from the I/O scheduler initialization method (init_queue()
+method) context.
 
-The I/O path is very different from the existing multipath drivers,
-which is enabled by the fact that NVMe (unlike SCSI) does not support
-partial completions - a controller will either complete a whole
-command or not, but never only complete parts of it.  Because of that
-there is no need to clone bios or requests - the I/O path simply
-redirects the I/O to a suitable path.  For successful commands
-multipath is not in the completion stack at all.  For failed commands
-we decide if the error could be a path failure, and if yes remove
-the bios from the request structure and requeue them before completing
-the request.  All together this means there is no performance
-degradation compared to normal nvme operation when using the multipath
-device node (at least not until I find a dual ported DRAM backed
-device :))
+The series patches are as follows:
+- The first 2 patches fix exported symbols declaration to allow compiling
+  external I/O schedulers as modules. No functional changes are introduced.
+- Patch 3 introduces the new blk_zoned data structure added to request queues
+- Pathes 4 to 7 reorganize and cleanup the scsi ZBC support
+- Path 8 is a bug fix
+- Path 9 implements the initialization of the blk_zoned structure for zoned
+  block devices
+- Patch 10 is an optimization for the legacy scsi path which avoids zone
+  locking if a write request targets a conventional zone. 
+- Path 11 disables zone write locking for disks accessed through scsi-mq.
+- Patch 12 introduces the new zoned blk-mq I/O scheduler.
 
-There are a couple questions left in the individual patches, comments
-welcome.
+Comments are as always very much appreciated.
 
-Note that this series requires the previous series to remove bi_bdev,
-in doubt use the git tree below for testing.
+Changes from v2:
+* Introduced blk_zoned structure
+* Moved I/O scheduler from drivers/scsi to block 
 
-A git tree is available at:
+Changes from v1:
+* Addressed Bart's comments for the blk-mq patches (declarations files)
+* Split (former) patch 4 into multiple patches to facilitate review
+* Fixed scsi disk lookup from io scheduler by introducing
+  scsi_disk_from_queue()
 
-   git://git.infradead.org/users/hch/block.git nvme-mpath
+Damien Le Moal (12):
+  block: Fix declaration of blk-mq debugfs functions
+  block: Fix declaration of blk-mq scheduler functions
+  block: Add zoned block device information to request queue
+  scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
+  scsi: sd_zbc: Fix comments and indentation
+  scsi: sd_zbc: Rearrange code
+  scsi: sd_zbc: Use well defined macros
+  scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
+  scsi: sd_zbc: Initialize device queue zoned structure
+  scsi: sd_zbc: Limit zone write locking to sequential zones
+  scsi: sd_zbc: Disable zone write locking with scsi-mq
+  block: Introduce zoned I/O scheduler
 
-gitweb:
+ Documentation/block/zoned-iosched.txt |  48 ++
+ block/Kconfig.iosched                 |  12 +
+ block/Makefile                        |   1 +
+ block/blk-mq-debugfs.h                |  14 +-
+ block/blk-mq-sched.h                  |  11 +-
+ block/zoned-iosched.c                 | 925 ++++++++++++++++++++++++++++++++++
+ drivers/scsi/scsi_lib.c               |   5 +-
+ drivers/scsi/sd_zbc.c                 | 267 +++++++---
+ include/linux/blk-mq-debugfs.h        |  23 +
+ include/linux/blk-mq-sched.h          |  14 +
+ include/linux/blkdev.h                |  24 +
+ include/scsi/scsi_proto.h             |  45 +-
+ 12 files changed, 1283 insertions(+), 106 deletions(-)
+ create mode 100644 Documentation/block/zoned-iosched.txt
+ create mode 100644 block/zoned-iosched.c
+ create mode 100644 include/linux/blk-mq-debugfs.h
+ create mode 100644 include/linux/blk-mq-sched.h
 
-   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
-
-Changes since V1:
-  - introduce new nvme_ns_ids structure to clean up identifier handling
-  - generic_make_request_fast is now named direct_make_request and calls
-    generic_make_request_checks
-  - reset bi_disk on resubmission
-  - create sysfs links between the existing nvme namespace block devices and
-    the new share mpath device
-  - temporarily added the timeout patches from James, this should go into
-    nvme-4.14, though
+-- 
+2.13.5
