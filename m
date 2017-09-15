@@ -1,48 +1,34 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 15 Sep 2017 19:48:39 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
 Subject: Re: [PATCH V3 03/12] block: Add zoned block device information to
-	request queue
-Message-ID: <20170915174839.GD8578@lst.de>
-References: <20170915100645.17999-1-damien.lemoal@wdc.com> <20170915100645.17999-4-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+ request queue
+Date: Fri, 15 Sep 2017 14:38:56 +0000
+Message-ID: <1505486334.2852.8.camel@wdc.com>
+References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+	 <20170915100645.17999-4-damien.lemoal@wdc.com>
 In-Reply-To: <20170915100645.17999-4-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-> +struct blk_zoned {
-> +	unsigned int	nr_zones;
-> +	unsigned long	*seq_zones;
-> +};
-> +
->  struct blk_zone_report_hdr {
->  	unsigned int	nr_zones;
->  	u8		padding[60];
-> @@ -492,6 +497,10 @@ struct request_queue {
->  	struct blk_integrity integrity;
->  #endif	/* CONFIG_BLK_DEV_INTEGRITY */
->  
-> +#ifdef CONFIG_BLK_DEV_ZONED
-> +	struct blk_zoned	zoned;
-> +#endif
-
-I'd prefer to just add the two fields direct to struct request_queue
-instead of the container structure.
-
-> +static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-> +{
-> +	return blk_queue_is_zoned(q) ? q->zoned.nr_zones : 0;
-> +}
-
-I don't think this is going to compile without CONFIG_BLK_DEV_ZONED,
-we'd either need two versions of it, or just always add nr_zones to
-the request queue.
-
-With nr_zones always present we could then remove the first check,
-too as it would always be initialized to zero.
+T24gRnJpLCAyMDE3LTA5LTE1IGF0IDE5OjA2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gQEAgLTQ5Miw2ICs0OTcsMTAgQEAgc3RydWN0IHJlcXVlc3RfcXVldWUgew0KPiAgCXN0cnVj
+dCBibGtfaW50ZWdyaXR5IGludGVncml0eTsNCj4gICNlbmRpZgkvKiBDT05GSUdfQkxLX0RFVl9J
+TlRFR1JJVFkgKi8NCj4gIA0KPiArI2lmZGVmIENPTkZJR19CTEtfREVWX1pPTkVEDQo+ICsJc3Ry
+dWN0IGJsa196b25lZAl6b25lZDsNCj4gKyNlbmRpZg0KPiArDQo+ICAjaWZkZWYgQ09ORklHX1BN
+DQo+ICAJc3RydWN0IGRldmljZQkJKmRldjsNCj4gIAlpbnQJCQlycG1fc3RhdHVzOw0KPiBAQCAt
+Nzg1LDYgKzc5NCwxMSBAQCBzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGludCBibGtfcXVldWVfem9u
+ZV9zZWN0b3JzKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxKQ0KPiAgCXJldHVybiBibGtfcXVldWVf
+aXNfem9uZWQocSkgPyBxLT5saW1pdHMuY2h1bmtfc2VjdG9ycyA6IDA7DQo+ICB9DQo+ICANCj4g
+K3N0YXRpYyBpbmxpbmUgdW5zaWduZWQgaW50IGJsa19xdWV1ZV9ucl96b25lcyhzdHJ1Y3QgcmVx
+dWVzdF9xdWV1ZSAqcSkNCj4gK3sNCj4gKwlyZXR1cm4gYmxrX3F1ZXVlX2lzX3pvbmVkKHEpID8g
+cS0+em9uZWQubnJfem9uZXMgOiAwOw0KPiArfQ0KDQpEb2VzIHRoaXMgY29kZSBjb21waWxlIGNv
+cnJlY3RseSBpZiBDT05GSUdfQkxLX0RFVl9aT05FRCBpcyBkaXNhYmxlZD8gU2hvdWxkDQp0aGUg
+ZGVmaW5pdGlvbiBvZiBibGtfcXVldWVfbnJfem9uZXMoKSBwZXJoYXBzIGJlIHN1cnJvdW5kZWQg
+YnkgI2lmZGVmDQpDT05GSUdfQkxLX0RFVl9aT05FRCAvICNlbmRpZj8NCg0KVGhhbmtzLA0KDQpC
+YXJ0Lg==
