@@ -1,65 +1,38 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Subject: [PATCH] blk-throttle: fix possible io stall when doing upgrade
-To: linux-block <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@fb.com>,
- boyu.mt@taobao.com, wenqing.lz@taobao.com, qijiang.qj@alibaba-inc.com
-Message-ID: <5b918e35-7072-ba9a-92cc-726d02777b4f@gmail.com>
-Date: Mon, 25 Sep 2017 18:46:42 +0800
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 15 Sep 2017 08:51:15 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	lizefan@huawei.com, tglx@linutronix.de, kernel-team@fb.com,
+	axboe@kernel.dk, Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH V3 1/4] kthread: add a mechanism to store cgroup info
+Message-ID: <20170915155115.GG378890@devbig577.frc2.facebook.com>
+References: <cover.1505422351.git.shli@fb.com>
+ <9649525546c2a69f22c7ec5a87858affece87160.1505422351.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <9649525546c2a69f22c7ec5a87858affece87160.1505422351.git.shli@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+On Thu, Sep 14, 2017 at 02:02:04PM -0700, Shaohua Li wrote:
+> From: Shaohua Li <shli@fb.com>
+> 
+> kthread usually runs jobs on behalf of other threads. The jobs should be
+> charged to cgroup of original threads. But the jobs run in a kthread,
+> where we lose the cgroup context of original threads. The patch adds a
+> machanism to record cgroup info of original threads in kthread context.
+> Later we can retrieve the cgroup info and attach the cgroup info to jobs.
+> 
+> Since this mechanism is only required by kthread, we store the cgroup
+> info in kthread data instead of generic task_struct.
+> 
+> Signed-off-by: Shaohua Li <shli@fb.com>
 
-Currently it will try to dispatch bio in throtl_upgrade_state. This may
-lead to io stall in the following case.
-Say the hierarchy is like:
-/-test1
-  |-subtest1
-and subtest1 has 32 queued bios now.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-throtl_pending_timer_fn            throtl_upgrade_state
-------------------------------------------------------------------------
-                                   upgrade to max
-                                   throtl_select_dispatch
-                                   throtl_schedule_next_dispatch
-throtl_select_dispatch
-throtl_schedule_next_dispatch
+Thanks.
 
-Since throtl_select_dispatch will move queued bios from subtest1 to
-test1 in throtl_upgrade_state, it will then just do nothing in
-throtl_pending_timer_fn. As a result, queued bios won't be dispatched
-any more if no proper timer scheduled.
-Fix this issue by just scheduling dispatch now and let the dispatch be
-done only in timer.
-
-Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
----
- block/blk-throttle.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0fea76a..29d282f 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1909,13 +1909,11 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
- 		struct throtl_service_queue *sq = &tg->service_queue;
- 
--		tg->disptime = jiffies - 1;
--		throtl_select_dispatch(sq);
--		throtl_schedule_next_dispatch(sq, false);
-+		tg->disptime = jiffies;
-+		throtl_schedule_next_dispatch(sq, true);
- 	}
- 	rcu_read_unlock();
--	throtl_select_dispatch(&td->service_queue);
--	throtl_schedule_next_dispatch(&td->service_queue, false);
-+	throtl_schedule_next_dispatch(&td->service_queue, true);
- 	queue_work(kthrotld_workqueue, &td->dispatch_work);
- }
- 
 -- 
-1.9.4
+tejun
