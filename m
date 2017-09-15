@@ -1,170 +1,105 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jianchao Wang <jianchao.w.wang@oracle.com>
-Subject: [PATCH] block: consider merge of segments when merge bio into rq
-Date: Sat, 16 Sep 2017 07:21:49 +0800
-Message-Id: <1505517709-2478-1-git-send-email-jianchao.w.wang@oracle.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43546 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750865AbdIOQqg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 12:46:36 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 4/5] block: export blk_update_nr_requests
+Date: Sat, 16 Sep 2017 00:44:55 +0800
+Message-Id: <20170915164456.9803-5-ming.lei@redhat.com>
+In-Reply-To: <20170915164456.9803-1-ming.lei@redhat.com>
+References: <20170915164456.9803-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When account the nr_phys_segments during merging bios into rq,
-only consider segments merging in individual bio but not all
-the bios in a rq. This leads to the bigger nr_phys_segments of
-rq than the real one when the segments of bios in rq are
-contiguous and mergeable. The nr_phys_segments of rq will exceed
-max_segmets of q while the sectors of rq maybe far away from
-the max_sectors of q.
+dm-mpath need this API for improving IO scheduling.
 
-Consider the segments merge when account nr_phys_segments of rq
-during merging bio into rq. Promote the merging of small and
-contiguous IO. In addition, it could eliminate the wasting of
-scatterlist structure.
+The IO schedule is actually done on dm-rq(mpath) queue,
+instead of underlying devices.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+If we set q->nr_requests as q->queue_depth on underlying
+devices, we can get the queue's busy feedback by simply
+checking if blk_get_request() returns successfully.
+
+This way will make block layer's I/O schedule more
+effective on dm-rq device.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-merge.c | 98 ++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 64 insertions(+), 34 deletions(-)
+ block/blk-core.c       | 4 +++-
+ block/blk-sysfs.c      | 5 +----
+ block/blk.h            | 2 --
+ include/linux/blkdev.h | 1 +
+ 4 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 14b6e37..b2f54fd 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -472,54 +472,60 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index aebe676225e6..9752aac9821c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1108,7 +1108,8 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	struct request_list *rl;
+ 	int on_thresh, off_thresh;
+ 
+-	WARN_ON_ONCE(q->mq_ops);
++	if (q->mq_ops)
++		return blk_mq_update_nr_requests(q, nr);
+ 
+ 	spin_lock_irq(q->queue_lock);
+ 	q->nr_requests = nr;
+@@ -1145,6 +1146,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	spin_unlock_irq(q->queue_lock);
+ 	return 0;
  }
- EXPORT_SYMBOL(blk_rq_map_sg);
++EXPORT_SYMBOL(blk_update_nr_requests);
  
--static inline int ll_new_hw_segment(struct request_queue *q,
--				    struct request *req,
--				    struct bio *bio)
--{
--	int nr_phys_segs = bio_phys_segments(q, bio);
--
--	if (req->nr_phys_segments + nr_phys_segs > queue_max_segments(q))
--		goto no_merge;
--
--	if (blk_integrity_merge_bio(q, req, bio) == false)
--		goto no_merge;
--
--	/*
--	 * This will form the start of a new hw segment.  Bump both
--	 * counters.
--	 */
--	req->nr_phys_segments += nr_phys_segs;
--	return 1;
--
--no_merge:
--	req_set_nomerge(q, req);
--	return 0;
--}
--
- int ll_back_merge_fn(struct request_queue *q, struct request *req,
- 		     struct bio *bio)
- {
-+	unsigned int seg_size;
-+	int total_nr_phys_segs;
-+	bool contig;
-+
- 	if (req_gap_back_merge(req, bio))
- 		return 0;
- 	if (blk_integrity_rq(req) &&
- 	    integrity_req_gap_back_merge(req, bio))
- 		return 0;
- 	if (blk_rq_sectors(req) + bio_sectors(bio) >
--	    blk_rq_get_max_sectors(req, blk_rq_pos(req))) {
--		req_set_nomerge(q, req);
--		return 0;
--	}
-+	    blk_rq_get_max_sectors(req, blk_rq_pos(req)))
-+		goto no_merge;
-+
- 	if (!bio_flagged(req->biotail, BIO_SEG_VALID))
- 		blk_recount_segments(q, req->biotail);
- 	if (!bio_flagged(bio, BIO_SEG_VALID))
- 		blk_recount_segments(q, bio);
+ /**
+  * __get_request - get a free request
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index b8362c0df51d..2dbef5dbd195 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -77,10 +77,7 @@ queue_requests_store(struct request_queue *q, const char *page, size_t count)
+ 	if (nr < BLKDEV_MIN_RQ)
+ 		nr = BLKDEV_MIN_RQ;
  
--	return ll_new_hw_segment(q, req, bio);
-+	if (blk_integrity_merge_bio(q, req, bio) == false)
-+		goto no_merge;
-+
-+	seg_size = req->biotail->bi_seg_back_size + bio->bi_seg_front_size;
-+	total_nr_phys_segs = req->nr_phys_segments + bio_phys_segments(q, bio);
-+
-+	contig = blk_phys_contig_segment(q, req->biotail, bio);
-+	if (contig)
-+		total_nr_phys_segs--;
-+
-+	if (unlikely(total_nr_phys_segs > queue_max_segments(q)))
-+		goto no_merge;
-+
-+	if (contig) {
-+		if (req->nr_phys_segments == 1)
-+			req->bio->bi_seg_front_size = seg_size;
-+		if (bio->bi_phys_segments == 1)
-+			bio->bi_seg_back_size = seg_size;
-+	}
-+	req->nr_phys_segments = total_nr_phys_segs;
-+	return 1;
-+
-+no_merge:
-+	req_set_nomerge(q, req);
-+	return 0;
+-	if (q->request_fn)
+-		err = blk_update_nr_requests(q, nr);
+-	else
+-		err = blk_mq_update_nr_requests(q, nr);
++	err = blk_update_nr_requests(q, nr);
+ 
+ 	if (err)
+ 		return err;
+diff --git a/block/blk.h b/block/blk.h
+index fa4f232afc18..5bf662da2417 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -308,8 +308,6 @@ static inline int queue_congestion_off_threshold(struct request_queue *q)
+ 	return q->nr_congestion_off;
  }
  
- int ll_front_merge_fn(struct request_queue *q, struct request *req,
- 		      struct bio *bio)
- {
-+	unsigned int seg_size;
-+	int total_nr_phys_segs;
-+	bool contig;
- 
- 	if (req_gap_front_merge(req, bio))
- 		return 0;
-@@ -527,16 +533,40 @@ int ll_front_merge_fn(struct request_queue *q, struct request *req,
- 	    integrity_req_gap_front_merge(req, bio))
- 		return 0;
- 	if (blk_rq_sectors(req) + bio_sectors(bio) >
--	    blk_rq_get_max_sectors(req, bio->bi_iter.bi_sector)) {
--		req_set_nomerge(q, req);
--		return 0;
--	}
-+	    blk_rq_get_max_sectors(req, bio->bi_iter.bi_sector))
-+		goto no_merge;
-+
- 	if (!bio_flagged(bio, BIO_SEG_VALID))
- 		blk_recount_segments(q, bio);
- 	if (!bio_flagged(req->bio, BIO_SEG_VALID))
- 		blk_recount_segments(q, req->bio);
- 
--	return ll_new_hw_segment(q, req, bio);
-+	if (blk_integrity_merge_bio(q, req, bio) == false)
-+		goto no_merge;
-+
-+	seg_size = req->bio->bi_seg_front_size + bio->bi_seg_back_size;
-+	total_nr_phys_segs = req->nr_phys_segments + bio_phys_segments(q, bio);
-+
-+	contig = blk_phys_contig_segment(q, bio, req->bio);
-+	if (contig)
-+		total_nr_phys_segs--;
-+
-+	if (unlikely(total_nr_phys_segs > queue_max_segments(q)))
-+		goto no_merge;
-+
-+	if (contig) {
-+		if (req->nr_phys_segments == 1)
-+			req->biotail->bi_seg_back_size = seg_size;
-+		if (bio->bi_phys_segments == 1)
-+			bio->bi_seg_front_size = seg_size;
-+	}
-+
-+	req->nr_phys_segments = total_nr_phys_segs;
-+	return 1;
-+
-+no_merge:
-+	req_set_nomerge(q, req);
-+	return 0;
- }
+-extern int blk_update_nr_requests(struct request_queue *, unsigned int);
+-
+ /*
+  * Contribute to IO statistics IFF:
+  *
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 460294bb0fa5..226b97142999 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1229,6 +1229,7 @@ struct request_queue *blk_alloc_queue(gfp_t);
+ struct request_queue *blk_alloc_queue_node(gfp_t, int);
+ extern void blk_put_queue(struct request_queue *);
+ extern void blk_set_queue_dying(struct request_queue *);
++extern int blk_update_nr_requests(struct request_queue *, unsigned int);
  
  /*
+  * block layer runtime pm functions
 -- 
-2.7.4
+2.9.5
