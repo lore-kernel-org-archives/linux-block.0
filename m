@@ -1,37 +1,54 @@
-Return-Path: <BATV+21adf70dad931eb5d92e+5128+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] scsi_transport_fc: fix NULL pointer dereference in fc_bsg_job_timeout
-Date: Thu,  7 Sep 2017 13:54:36 +0200
-Message-Id: <20170907115436.5069-3-hch@lst.de>
-In-Reply-To: <20170907115436.5069-1-hch@lst.de>
-References: <20170907115436.5069-1-hch@lst.de>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH V3 12/12] block: Introduce zoned I/O scheduler
+To: Damien Le Moal <damien.lemoal@wdc.com>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+ <20170915100645.17999-13-damien.lemoal@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <3aaebd58-bce1-01ab-7b70-4bbe255faaba@suse.de>
+Date: Fri, 15 Sep 2017 12:55:44 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170915100645.17999-13-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-bsg-lib now embeddeds the job structure into the request, and req->special
-can't be used anymore.
+On 09/15/2017 12:06 PM, Damien Le Moal wrote:
+> The zoned I/O scheduler is mostly identical to mq-deadline and retains
+> the same configuration attributes. The main difference is that the
+> zoned scheduler will ensure that at any time at most one write request
+> per sequential zone is in flight (has been dispatched to the disk) in
+> order to protect against potential sequential write reordering
+> resulting from the concurrent execution of request dispatch by multiple
+> contexts.
+> 
+> This is achieved similarly to the legacy SCSI I/O path by write locking
+> zones when a write requests is issued. Subsequent writes to the same
+> zone have to wait for the completion of the previously issued write
+> before being in turn dispatched to the disk. This ensures that
+> sequential writes are processed in the correct order without needing
+> any modification to the execution model of blk-mq. In addition, this
+> also protects against write reordering at the HBA level (e.g. AHCI).
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> ---
+>  Documentation/block/zoned-iosched.txt |  48 ++
+>  block/Kconfig.iosched                 |  12 +
+>  block/Makefile                        |   1 +
+>  block/zoned-iosched.c                 | 925 ++++++++++++++++++++++++++++++++++
+>  4 files changed, 986 insertions(+)
+>  create mode 100644 Documentation/block/zoned-iosched.txt
+>  create mode 100644 block/zoned-iosched.c
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Cc: stable@vger.kernel.org
----
- drivers/scsi/scsi_transport_fc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
 
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 892fbd9800d9..bea06de60827 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3550,7 +3550,7 @@ fc_vport_sched_delete(struct work_struct *work)
- static enum blk_eh_timer_return
- fc_bsg_job_timeout(struct request *req)
- {
--	struct bsg_job *job = (void *) req->special;
-+	struct bsg_job *job = blk_mq_rq_to_pdu(req);
- 	struct Scsi_Host *shost = fc_bsg_to_shost(job);
- 	struct fc_rport *rport = fc_bsg_to_rport(job);
- 	struct fc_internal *i = to_fc_internal(shost->transportt);
+Hannes
 -- 
-2.11.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
