@@ -1,73 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36732 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S936949AbdIZHhL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2017 03:37:11 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Coly Li <colyli@suse.de>
-Subject: [PATCH] bcache: use llist_for_each_entry_safe() in __closure_wake_up()
-Date: Tue, 26 Sep 2017 15:37:02 +0800
-Message-Id: <20170926073702.71606-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH V3 05/12] scsi: sd_zbc: Fix comments and indentation
+To: Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+ <20170915100645.17999-6-damien.lemoal@wdc.com>
+ <fc5f811e-423a-3cf9-4f96-63acae37264d@suse.de>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+Message-ID: <e1d986ca-80f9-725f-5b51-b788f52c582b@wdc.com>
+Date: Sat, 16 Sep 2017 07:48:44 +0900
+MIME-Version: 1.0
+In-Reply-To: <fc5f811e-423a-3cf9-4f96-63acae37264d@suse.de>
+Content-Type: text/plain; charset=utf-8
+Return-Path: Damien.LeMoal@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-Commit 09b3efec ("bcache: Don't reinvent the wheel but use existing llist
-API") replaces the following while loop by llist_for_each_entry(),
+On 9/15/17 19:44, Hannes Reinecke wrote:
+> On 09/15/2017 12:06 PM, Damien Le Moal wrote:
+>> Fix comments style (do not use documented comment style) and add some
+>> comments to clarify some functions. Also fix some functions signature
+>> indentation and remove a useless blank line in sd_zbc_read_zones().
+>>
+>> No functional change is introduced by this patch.
+>>
+>> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+>> ---
+>>  drivers/scsi/scsi_lib.c |  5 +++-
+>>  drivers/scsi/sd_zbc.c   | 67 ++++++++++++++++++++++++++++++++++++-------------
+>>  2 files changed, 53 insertions(+), 19 deletions(-)
+>>
+> Actually you should've used kernel-doc style to format the comments;
+> just to keep the 0-day bot happy....
 
--
--	while (reverse) {
--		cl = container_of(reverse, struct closure, list);
--		reverse = llist_next(reverse);
--
-+	llist_for_each_entry(cl, reverse, list) {
- 		closure_set_waiting(cl, 0);
- 		closure_sub(cl, CLOSURE_WAITING + 1);
- 	}
+I thought that comments to functions with the kernel-doc format was only
+if you want the function to be documented. That generally includes at
+least all the exported functions.
+In this case, the functions are mostly local to sd_zbc.c... I thought
+the documentation of those was not very useful.
 
-This modification introduces a potential race by iterating a corrupted
-list. Here is how it happens.
+I can revert though. No problem at all.
 
-In the above modification, closure_sub() may wake up a process which is
-waiting on reverse list. If this process decides to wait again by calling
-closure_wait(), its cl->list will be added to another wait list. Then
-when llist_for_each_entry() continues to iterate next node, it will travel
-on another new wait list which is added in closure_wait(), not the
-original reverse list in __closure_wake_up(). It is more probably to
-happen on UP machine because the waked up process may preempt the process
-which wakes up it.
+Thanks !
 
-Use llist_for_each_entry_safe() will fix the issue, the safe version fetch
-next node before waking up a process. Then the copy of next node will make
-sure list iteration stays on original reverse list.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reported-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/closure.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 7d5286b05036..1841d0359bac 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -64,7 +64,7 @@ EXPORT_SYMBOL(closure_put);
- void __closure_wake_up(struct closure_waitlist *wait_list)
- {
- 	struct llist_node *list;
--	struct closure *cl;
-+	struct closure *cl, *t;
- 	struct llist_node *reverse = NULL;
- 
- 	list = llist_del_all(&wait_list->list);
-@@ -73,7 +73,7 @@ void __closure_wake_up(struct closure_waitlist *wait_list)
- 	reverse = llist_reverse_order(list);
- 
- 	/* Then do the wakeups */
--	llist_for_each_entry(cl, reverse, list) {
-+	llist_for_each_entry_safe(cl, t, reverse, list) {
- 		closure_set_waiting(cl, 0);
- 		closure_sub(cl, CLOSURE_WAITING + 1);
- 	}
 -- 
-2.13.5
+Damien Le Moal
+Western Digital Research
