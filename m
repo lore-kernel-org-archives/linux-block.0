@@ -1,285 +1,85 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42994 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751001AbdISDvF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2017 23:51:05 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 07/10] block: introduce preempt version of blk_[freeze|unfreeze]_queue
-Date: Tue, 19 Sep 2017 11:49:22 +0800
-Message-Id: <20170919034925.9894-8-ming.lei@redhat.com>
-In-Reply-To: <20170919034925.9894-1-ming.lei@redhat.com>
-References: <20170919034925.9894-1-ming.lei@redhat.com>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:48298 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751512AbdIOMZu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 08:25:50 -0400
+Received: by mail-wm0-f45.google.com with SMTP id r68so7877992wmg.3
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:25:50 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 07/11] lightnvm: pblk: simplify path on REQ_PREFLUSH
+Date: Fri, 15 Sep 2017 14:25:35 +0200
+Message-Id: <1505478339-13089-8-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+References: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The two APIs are required to allow request allocation of
-RQF_PREEMPT when queue is preempt frozen.
+On REQ_PREFLUSH, directly tag the I/O context flags to signal a flush in
+the write to cache path, instead of finding the correct entry context
+and imposing a memory barrier. This simplifies the code and might
+potentially prevent race conditions when adding functionality to the
+write path.
 
-We have to guarantee that normal freeze and preempt freeze
-are run exclusive. Because for normal freezing, once
-blk_freeze_queue_wait() is returned, no request can enter
-queue any more.
-
-Another issue we should pay attention to is that the race
-of preempt freeze vs. blk_cleanup_queue(), and it is avoided
-by not allowing to preempt freeeze after queue becomes dying,
-otherwise preempt freeeze may hang forever.
-
-Tested-by: Cathy Avery <cavery@redhat.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-core.c       |   2 +
- block/blk-mq.c         | 133 +++++++++++++++++++++++++++++++++++++++++++------
- block/blk.h            |  11 ++++
- include/linux/blk-mq.h |   2 +
- include/linux/blkdev.h |   6 +++
- 5 files changed, 140 insertions(+), 14 deletions(-)
+ drivers/lightnvm/pblk-cache.c | 4 +++-
+ drivers/lightnvm/pblk-rb.c    | 8 +-------
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 16131ea0f3b0..2010f8610203 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -905,6 +905,8 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	if (blkcg_init_queue(q))
- 		goto fail_ref;
+diff --git a/drivers/lightnvm/pblk-cache.c b/drivers/lightnvm/pblk-cache.c
+index 1d6b8e3585f1..0d227ef7d1b9 100644
+--- a/drivers/lightnvm/pblk-cache.c
++++ b/drivers/lightnvm/pblk-cache.c
+@@ -43,8 +43,10 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ 	if (unlikely(!bio_has_data(bio)))
+ 		goto out;
  
-+	spin_lock_init(&q->freeze_lock);
-+
- 	return q;
++	pblk_ppa_set_empty(&w_ctx.ppa);
+ 	w_ctx.flags = flags;
+-	pblk_ppa_set_empty(&w_ctx.ppa);
++	if (bio->bi_opf & REQ_PREFLUSH)
++		w_ctx.flags |= PBLK_FLUSH_ENTRY;
  
- fail_ref:
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0c472f5a9176..940cba14a3ad 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -118,19 +118,6 @@ void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
- 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
- }
- 
--void blk_freeze_queue_start(struct request_queue *q)
--{
--	int freeze_depth;
--
--	freeze_depth = atomic_inc_return(&q->freeze_depth);
--	if (freeze_depth == 1) {
--		percpu_ref_kill(&q->q_usage_counter);
--		if (q->mq_ops)
--			blk_mq_run_hw_queues(q, false);
--	}
--}
--EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
--
- void blk_freeze_queue_wait(struct request_queue *q)
+ 	for (i = 0; i < nr_entries; i++) {
+ 		void *data = bio_data(bio);
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 74c768ce09ef..05e6b2e9221d 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -355,7 +355,6 @@ static int pblk_rb_sync_point_set(struct pblk_rb *rb, struct bio *bio,
  {
- 	if (!q->mq_ops)
-@@ -148,6 +135,69 @@ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait_timeout);
+ 	struct pblk_rb_entry *entry;
+ 	unsigned int subm, sync_point;
+-	int flags;
  
-+static bool queue_freeze_is_over(struct request_queue *q,
-+		bool preempt, bool *queue_dying)
-+{
-+	/*
-+	 * preempt freeze has to be prevented after queue is set as
-+	 * dying, otherwise we may hang forever
-+	 */
-+	if (preempt) {
-+		spin_lock_irq(q->queue_lock);
-+		*queue_dying = !!blk_queue_dying(q);
-+		spin_unlock_irq(q->queue_lock);
-+
-+		return !q->normal_freezing || *queue_dying;
-+	}
-+	return !q->preempt_freezing;
-+}
-+
-+static void __blk_freeze_queue_start(struct request_queue *q, bool preempt)
-+{
-+	int freeze_depth;
-+	bool queue_dying;
-+
-+	/*
-+	 * Make sure normal freeze and preempt freeze are run
-+	 * exclusively, but each kind itself is allowed to be
-+	 * run concurrently, even nested.
-+	 */
-+	spin_lock(&q->freeze_lock);
-+	wait_event_cmd(q->freeze_wq,
-+		       queue_freeze_is_over(q, preempt, &queue_dying),
-+		       spin_unlock(&q->freeze_lock),
-+		       spin_lock(&q->freeze_lock));
-+
-+	if (preempt && queue_dying)
-+		goto unlock;
-+
-+	freeze_depth = atomic_inc_return(&q->freeze_depth);
-+	if (freeze_depth == 1) {
-+		if (preempt) {
-+			q->preempt_freezing = 1;
-+			q->preempt_unfreezing = 0;
-+		} else
-+			q->normal_freezing = 1;
-+		spin_unlock(&q->freeze_lock);
-+
-+		percpu_ref_kill(&q->q_usage_counter);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
-+
-+		/* have to drain I/O here for preempt quiesce */
-+		if (preempt)
-+			blk_freeze_queue_wait(q);
-+	} else
-+ unlock:
-+		spin_unlock(&q->freeze_lock);
-+}
-+
-+void blk_freeze_queue_start(struct request_queue *q)
-+{
-+	__blk_freeze_queue_start(q, false);
-+}
-+EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
-+
- /*
-  * Guarantee no request is in use, so we can change any data structure of
-  * the queue afterward.
-@@ -166,20 +216,75 @@ void blk_freeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue);
+ 	subm = READ_ONCE(rb->subm);
  
--void blk_unfreeze_queue(struct request_queue *q)
-+static void blk_start_unfreeze_queue_preempt(struct request_queue *q)
-+{
-+	/* no new request can be coming after unfreezing */
-+	spin_lock(&q->freeze_lock);
-+	q->preempt_unfreezing = 1;
-+	spin_unlock(&q->freeze_lock);
-+
-+	blk_freeze_queue_wait(q);
-+}
-+
-+static void __blk_unfreeze_queue(struct request_queue *q, bool preempt)
- {
- 	int freeze_depth;
+@@ -369,12 +368,6 @@ static int pblk_rb_sync_point_set(struct pblk_rb *rb, struct bio *bio,
+ 	sync_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
+ 	entry = &rb->entries[sync_point];
  
- 	freeze_depth = atomic_dec_return(&q->freeze_depth);
- 	WARN_ON_ONCE(freeze_depth < 0);
- 	if (!freeze_depth) {
-+		if (preempt)
-+			blk_start_unfreeze_queue_preempt(q);
-+
- 		percpu_ref_reinit(&q->q_usage_counter);
-+
-+		/*
-+		 * clearing the freeze flag so that any pending
-+		 * freeze can move on
-+		 */
-+		spin_lock(&q->freeze_lock);
-+		if (preempt)
-+			q->preempt_freezing = 0;
-+		else
-+			q->normal_freezing = 0;
-+		spin_unlock(&q->freeze_lock);
- 		wake_up_all(&q->freeze_wq);
- 	}
- }
-+
-+void blk_unfreeze_queue(struct request_queue *q)
-+{
-+	__blk_unfreeze_queue(q, false);
-+}
- EXPORT_SYMBOL_GPL(blk_unfreeze_queue);
+-	flags = READ_ONCE(entry->w_ctx.flags);
+-	flags |= PBLK_FLUSH_ENTRY;
+-
+-	/* Release flags on context. Protect from writes */
+-	smp_store_release(&entry->w_ctx.flags, flags);
+-
+ 	/* Protect syncs */
+ 	smp_store_release(&rb->sync_point, sync_point);
  
- /*
-+ * Once this function is returned, only allow to get request
-+ * of RQF_PREEMPT.
-+ */
-+void blk_freeze_queue_preempt(struct request_queue *q)
-+{
-+	/*
-+	 * If queue isn't in preempt_frozen, the queue has
-+	 * to be dying, so do nothing since no I/O can
-+	 * succeed any more.
-+	 */
-+	__blk_freeze_queue_start(q, true);
-+}
-+EXPORT_SYMBOL_GPL(blk_freeze_queue_preempt);
+@@ -454,6 +447,7 @@ static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
+ 
+ 	/* Protect from read count */
+ 	smp_store_release(&rb->mem, mem);
 +
-+void blk_unfreeze_queue_preempt(struct request_queue *q)
-+{
-+	/*
-+	 * If queue isn't in preempt_frozen, the queue should
-+	 * be dying , so do nothing since no I/O can succeed.
-+	 */
-+	if (blk_queue_is_preempt_frozen(q))
-+		__blk_unfreeze_queue(q, true);
-+}
-+EXPORT_SYMBOL_GPL(blk_unfreeze_queue_preempt);
-+
-+/*
-  * FIXME: replace the scsi_internal_device_*block_nowait() calls in the
-  * mpt3sas driver such that this function can be removed.
-  */
-diff --git a/block/blk.h b/block/blk.h
-index 21eed59d96db..243b2e7e5098 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -79,6 +79,17 @@ static inline void blk_queue_enter_live(struct request_queue *q)
- 	percpu_ref_get(&q->q_usage_counter);
+ 	return 1;
  }
  
-+static inline bool blk_queue_is_preempt_frozen(struct request_queue *q)
-+{
-+	bool preempt_frozen;
-+
-+	spin_lock(&q->freeze_lock);
-+	preempt_frozen = q->preempt_freezing && !q->preempt_unfreezing;
-+	spin_unlock(&q->freeze_lock);
-+
-+	return preempt_frozen;
-+}
-+
- #ifdef CONFIG_BLK_DEV_INTEGRITY
- void blk_flush_integrity(void);
- bool __bio_integrity_endio(struct bio *);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 62c3d1f7d12a..54b160bcb6a2 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -255,6 +255,8 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
- void blk_freeze_queue(struct request_queue *q);
- void blk_unfreeze_queue(struct request_queue *q);
-+void blk_freeze_queue_preempt(struct request_queue *q);
-+void blk_unfreeze_queue_preempt(struct request_queue *q);
- void blk_freeze_queue_start(struct request_queue *q);
- void blk_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 54450715915b..3c14c9588dcf 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -566,6 +566,12 @@ struct request_queue {
- 	int			bypass_depth;
- 	atomic_t		freeze_depth;
- 
-+	/* for run normal freeze and preempt freeze exclusive */
-+	spinlock_t		freeze_lock;
-+	unsigned		normal_freezing:1;
-+	unsigned		preempt_freezing:1;
-+	unsigned		preempt_unfreezing:1;
-+
- #if defined(CONFIG_BLK_DEV_BSG)
- 	bsg_job_fn		*bsg_job_fn;
- 	struct bsg_class_device bsg_dev;
 -- 
-2.9.5
+2.7.4
