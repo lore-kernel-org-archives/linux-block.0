@@ -1,80 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47056 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750861AbdIQMkY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Sep 2017 08:40:24 -0400
-Date: Sun, 17 Sep 2017 20:40:01 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:65370 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751316AbdIOR6U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 13:58:20 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "axboe@fb.com" <axboe@fb.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "sagi@grimberg.me" <sagi@grimberg.me>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
         "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH 1/5] block: don't call blk_mq_delay_run_hw_queue() in
- case of BLK_STS_RESOURCE
-Message-ID: <20170917124000.GB6289@ming.t460p>
+Subject: Re: [PATCH 1/5] block: don't call blk_mq_delay_run_hw_queue() in case
+ of BLK_STS_RESOURCE
+Date: Fri, 15 Sep 2017 17:57:31 +0000
+Message-ID: <1505498249.3420.15.camel@wdc.com>
 References: <20170915164456.9803-1-ming.lei@redhat.com>
- <20170915164456.9803-2-ming.lei@redhat.com>
- <1505498249.3420.15.camel@wdc.com>
+         <20170915164456.9803-2-ming.lei@redhat.com>
+In-Reply-To: <20170915164456.9803-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505498249.3420.15.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 15, 2017 at 05:57:31PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-09-16 at 00:44 +0800, Ming Lei wrote:
-> > If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun
-> > the queue in the three situations:
-> > 
-> > 1) if BLK_MQ_S_SCHED_RESTART is set
-> > - queue is rerun after one rq is completed, see blk_mq_sched_restart()
-> > which is run from blk_mq_free_request()
-> > 
-> > 2) BLK_MQ_S_TAG_WAITING is set
-> > - queue is rerun after one tag is freed
-> > 
-> > 3) otherwise
-> > - queue is run immediately in blk_mq_dispatch_rq_list()
-> > 
-> > So calling blk_mq_delay_run_hw_queue() inside .queue_rq() doesn't make
-> > sense because no matter it is called or not, the queue still will be
-> > rerun soon in above three situations, and the busy req can be dispatched
-> > again.
-> 
-> NAK
-> 
-> Block drivers call blk_mq_delay_run_hw_queue() if it is known that the queue
-> has to be rerun later even if no request has completed before the delay has
-> expired. This patch breaks at least the SCSI core and the dm-mpath drivers.
-
-"if no request has completed before the delay has expired" can't be a
-reason to rerun the queue, because the queue can still be busy.
-
-The only reason is that there isn't any requests in-flight and
-queue is still busy, but I'd rather understand what the exact
-situation is, instead of using this kind of workaround. If no
-such situation, we should remove that.
-
-For SCSI, it might be reasonable to run the hw queue after
-a random time when atomic_read(&sdev->device_busy) is zero,
-that means the queue may be busy even when there isn't any
-requests in-flight in this queue. Could you or someone share
-what the case is? Then we can avoid to use this workaround.
-
-For dm-mpath, it might be related with path, but I have to say
-it is still a workaround.
-
-I suggest to understand the root cause, instead of keeping this
-ugly random delay because run hw queue after 100ms may be useless
-in 99.99% times.
-
--- 
-Ming
+T24gU2F0LCAyMDE3LTA5LTE2IGF0IDAwOjQ0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSWYg
+LnF1ZXVlX3JxKCkgcmV0dXJucyBCTEtfU1RTX1JFU09VUkNFLCBibGstbXEgd2lsbCByZXJ1bg0K
+PiB0aGUgcXVldWUgaW4gdGhlIHRocmVlIHNpdHVhdGlvbnM6DQo+IA0KPiAxKSBpZiBCTEtfTVFf
+U19TQ0hFRF9SRVNUQVJUIGlzIHNldA0KPiAtIHF1ZXVlIGlzIHJlcnVuIGFmdGVyIG9uZSBycSBp
+cyBjb21wbGV0ZWQsIHNlZSBibGtfbXFfc2NoZWRfcmVzdGFydCgpDQo+IHdoaWNoIGlzIHJ1biBm
+cm9tIGJsa19tcV9mcmVlX3JlcXVlc3QoKQ0KPiANCj4gMikgQkxLX01RX1NfVEFHX1dBSVRJTkcg
+aXMgc2V0DQo+IC0gcXVldWUgaXMgcmVydW4gYWZ0ZXIgb25lIHRhZyBpcyBmcmVlZA0KPiANCj4g
+Mykgb3RoZXJ3aXNlDQo+IC0gcXVldWUgaXMgcnVuIGltbWVkaWF0ZWx5IGluIGJsa19tcV9kaXNw
+YXRjaF9ycV9saXN0KCkNCj4gDQo+IFNvIGNhbGxpbmcgYmxrX21xX2RlbGF5X3J1bl9od19xdWV1
+ZSgpIGluc2lkZSAucXVldWVfcnEoKSBkb2Vzbid0IG1ha2UNCj4gc2Vuc2UgYmVjYXVzZSBubyBt
+YXR0ZXIgaXQgaXMgY2FsbGVkIG9yIG5vdCwgdGhlIHF1ZXVlIHN0aWxsIHdpbGwgYmUNCj4gcmVy
+dW4gc29vbiBpbiBhYm92ZSB0aHJlZSBzaXR1YXRpb25zLCBhbmQgdGhlIGJ1c3kgcmVxIGNhbiBi
+ZSBkaXNwYXRjaGVkDQo+IGFnYWluLg0KDQpOQUsNCg0KQmxvY2sgZHJpdmVycyBjYWxsIGJsa19t
+cV9kZWxheV9ydW5faHdfcXVldWUoKSBpZiBpdCBpcyBrbm93biB0aGF0IHRoZSBxdWV1ZQ0KaGFz
+IHRvIGJlIHJlcnVuIGxhdGVyIGV2ZW4gaWYgbm8gcmVxdWVzdCBoYXMgY29tcGxldGVkIGJlZm9y
+ZSB0aGUgZGVsYXkgaGFzDQpleHBpcmVkLiBUaGlzIHBhdGNoIGJyZWFrcyBhdCBsZWFzdCB0aGUg
+U0NTSSBjb3JlIGFuZCB0aGUgZG0tbXBhdGggZHJpdmVycy4NCg0KQmFydC4=
