@@ -1,34 +1,91 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V3 01/12] block: Fix declaration of blk-mq debugfs
- functions
-Date: Fri, 15 Sep 2017 14:33:17 +0000
-Message-ID: <1505485996.2852.4.camel@wdc.com>
+Return-Path: <prvs=4242a8d18=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V3 01/12] block: Fix declaration of blk-mq debugfs functions
+Date: Fri, 15 Sep 2017 19:06:34 +0900
+Message-Id: <20170915100645.17999-2-damien.lemoal@wdc.com>
+In-Reply-To: <20170915100645.17999-1-damien.lemoal@wdc.com>
 References: <20170915100645.17999-1-damien.lemoal@wdc.com>
-	 <20170915100645.17999-2-damien.lemoal@wdc.com>
-In-Reply-To: <20170915100645.17999-2-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTA5LTE1IGF0IDE5OjA2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gX19ibGtfbXFfZGVidWdmc19ycV9zaG93KCkgYW5kIGJsa19tcV9kZWJ1Z2ZzX3JxX3Nob3co
-KSBhcmUgZXhwb3J0ZWQNCj4gc3ltYm9scyBidXQgYXIgZW9ubHkgZGVjbGFyZWQgaW4gdGhlIGJs
-b2NrIGludGVybmFsIGZpbGUNCiAgICAgICAgICAgICAgXl5eXl5eXl4NCiAgICAgICAgICAgICAg
-YXJlIG9ubHk/DQo+IGJsb2NrL2Jsay1tcS1kZWJ1Z2ZzLmguIHdoaWNoIGlzIG5vdCBjbGVhbmx5
-IGFjY2Vzc2libGUgdG8gZmlsZXMgb3V0c2lkZQ0KPiBvZiB0aGUgYmxvY2sgZGlyZWN0b3J5Lg0K
-PiBNb3ZlIHRoZSBkZWNsYXJhdGlvbiBvZiB0aGVzZSBmdW5jdGlvbnMgdG8gdGhlIG5ldyBmaWxl
-DQo+IGluY2x1ZGUvbGludXgvYmxrLW1xLWRlYnVnZnMuaCBmaWxlIHRvIG1ha2UgdGhlIGRlY2xh
-cmF0aW9ucyBjbGVhbmx5DQo+IGF2YWlsYWJsZSB0byBvdGhlciBtb2R1bGVzLg0KPiANCj4gV2hp
-bGUgYXQgaXQsIGFsc28gbW92ZSB0aGUgZGVmaW5pdGlvbiBvZiB0aGUgYmxrX21xX2RlYnVnZnNf
-YXR0cg0KPiBzdHJ1Y3R1cmUgdG8gYWxsb3cgc2NoZWR1bGVyIG1vZHVsZXMgb3V0c2lkZSBvZiB0
-aGUgYmxvY2sgZGlyZWN0b3J5IHRvDQo+IGRlZmluZSBkZWJ1Z2ZzIGF0dHJpYnV0ZXMuDQoNClRo
-ZSB0aXRsZSBvZiB0aGlzIHBhdGNoIGlzICJGaXggZGVjbGFyYXRpb24gb2YgLi4uIi4gU2hvdWxk
-IHRoZSB0aXRsZSBwZXJoYXBzDQpoYXZlIGJlZW4gIk1vdmUgZGVjbGFyYXRpb25zIG9mIC4uLiI/
-DQoNCkFueXdheToNCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3Nj
-aGVAd2RjLmNvbT4NCg0K
+__blk_mq_debugfs_rq_show() and blk_mq_debugfs_rq_show() are exported
+symbols but ar eonly declared in the block internal file
+block/blk-mq-debugfs.h. which is not cleanly accessible to files outside
+of the block directory.
+Move the declaration of these functions to the new file
+include/linux/blk-mq-debugfs.h file to make the declarations cleanly
+available to other modules.
+
+While at it, also move the definition of the blk_mq_debugfs_attr
+structure to allow scheduler modules outside of the block directory to
+define debugfs attributes.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-mq-debugfs.h         | 14 +-------------
+ include/linux/blk-mq-debugfs.h | 23 +++++++++++++++++++++++
+ 2 files changed, 24 insertions(+), 13 deletions(-)
+ create mode 100644 include/linux/blk-mq-debugfs.h
+
+diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+index a182e6f97565..4ffeae84b83a 100644
+--- a/block/blk-mq-debugfs.h
++++ b/block/blk-mq-debugfs.h
+@@ -3,19 +3,7 @@
+ 
+ #ifdef CONFIG_BLK_DEBUG_FS
+ 
+-#include <linux/seq_file.h>
+-
+-struct blk_mq_debugfs_attr {
+-	const char *name;
+-	umode_t mode;
+-	int (*show)(void *, struct seq_file *);
+-	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
+-	/* Set either .show or .seq_ops. */
+-	const struct seq_operations *seq_ops;
+-};
+-
+-int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
+-int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
++#include <linux/blk-mq-debugfs.h>
+ 
+ int blk_mq_debugfs_register(struct request_queue *q);
+ void blk_mq_debugfs_unregister(struct request_queue *q);
+diff --git a/include/linux/blk-mq-debugfs.h b/include/linux/blk-mq-debugfs.h
+new file mode 100644
+index 000000000000..211537f61dce
+--- /dev/null
++++ b/include/linux/blk-mq-debugfs.h
+@@ -0,0 +1,23 @@
++#ifndef BLK_MQ_DEBUGFS_H
++#define BLK_MQ_DEBUGFS_H
++
++#ifdef CONFIG_BLK_DEBUG_FS
++
++#include <linux/blkdev.h>
++#include <linux/seq_file.h>
++
++struct blk_mq_debugfs_attr {
++	const char *name;
++	umode_t mode;
++	int (*show)(void *, struct seq_file *);
++	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
++	/* Set either .show or .seq_ops. */
++	const struct seq_operations *seq_ops;
++};
++
++int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
++int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
++
++#endif
++
++#endif
+-- 
+2.13.5
