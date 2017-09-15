@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26390 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750871AbdIOVno (ORCPT
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:43725 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751782AbdIOVHj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 17:43:44 -0400
+        Fri, 15 Sep 2017 17:07:39 -0400
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
 To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "axboe@fb.com" <axboe@fb.com>,
@@ -14,8 +14,8 @@ CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH 5/5] dm-mpath: improve I/O schedule
-Date: Fri, 15 Sep 2017 21:42:55 +0000
-Message-ID: <1505511774.2705.3.camel@wdc.com>
+Date: Fri, 15 Sep 2017 21:06:50 +0000
+Message-ID: <1505509609.2417.20.camel@wdc.com>
 References: <20170915164456.9803-1-ming.lei@redhat.com>
          <20170915164456.9803-6-ming.lei@redhat.com>
 In-Reply-To: <20170915164456.9803-6-ming.lei@redhat.com>
@@ -24,18 +24,8 @@ MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA5LTE2IGF0IDAwOjQ0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gK3N0
-YXRpYyB2b2lkIHNhdmVfcGF0aF9xdWV1ZV9kZXB0aChzdHJ1Y3QgcGdwYXRoICpwKQ0KPiArew0K
-PiArCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gYmRldl9nZXRfcXVldWUocC0+cGF0aC5kZXYt
-PmJkZXYpOw0KPiArDQo+ICsJcC0+b2xkX25yX3JlcXVlc3RzID0gcS0+bnJfcmVxdWVzdHM7DQo+
-ICsJcC0+cXVldWVfZGVwdGggPSBxLT5xdWV1ZV9kZXB0aDsNCj4gKw0KPiArCS8qIG9uZSBleHRy
-YSByZXF1ZXN0IGZvciBtYWtpbmcgdGhlIHBpcGVsaW5lIGZ1bGwgKi8NCj4gKwlpZiAocC0+cXVl
-dWVfZGVwdGgpDQo+ICsJCWJsa191cGRhdGVfbnJfcmVxdWVzdHMocSwgcC0+cXVldWVfZGVwdGgg
-KyAxKTsNCj4gK30NCg0KYmxrX21xX2luaXRfYWxsb2NhdGVkX3F1ZXVlKCkgaW5pdGlhbGl6ZXMg
-bnJfcmVxdWVzdHMgdG8gdGhlIHRhZyBzZXQgcXVldWUgZGVwdGguDQpEb2VzIHRoYXQgbWVhbiB0
-aGF0IHRoZSBhYm92ZSBjb2RlIGluY3JlYXNlcyBucl9yZXF1ZXN0cyBieSBvbmU/IElmIHNvLCBk
-b2VzDQp0aGF0IGNoYW5nZSBvbmx5IHJlc3VsdCBpbiBhIHBlcmZvcm1hbmNlIGltcHJvdmVtZW50
-IGZvciB0aGUgcXVldWUgZGVwdGgNCm1lbnRpb25lZCBpbiB0aGUgcGF0aCBkZXNjcmlwdGlvbiAo
-Myk/IFNvcnJ5IGJ1dCBJIGRvdWJ0IHRoYXQgdGhpcyBjaGFuZ2Ugd2lsbA0KeWllbGQgYSBzaWdu
-aWZpY2FudCBpbXByb3ZlbWVudCBmb3IgaGlnaGVyIHF1ZXVlIGRlcHRocy4gRG9lcyB0aGF0IG1l
-YW4gdGhhdA0KdGhpcyBwYXRjaCBjYW4gYmUgbGVmdCBvdXQ/DQoNClRoYW5rcywNCg0KQmFydC4=
+T24gU2F0LCAyMDE3LTA5LTE2IGF0IDAwOjQ0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gMSkg
+bHBmYy5scGZjX2x1bl9xdWV1ZV9kZXB0aD0zLCBzbyB0aGF0IGl0IGlzIHNhbWUgd2l0aCAuY21k
+X3Blcl9sdW4NCg0KTm9ib2R5IEkga25vdyB1c2VzIHN1Y2ggYSBsb3cgcXVldWUgZGVwdGggZm9y
+IHRoZSBscGZjIGRyaXZlci4gUGxlYXNlIGFsc28NCmluY2x1ZGUgcGVyZm9ybWFuY2UgcmVzdWx0
+cyBmb3IgYSBtb3JlIHJlYWxpc3RpYyBxdWV1ZSBkZXB0aC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
