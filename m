@@ -1,40 +1,79 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V3 02/12] block: Fix declaration of blk-mq scheduler
- functions
-Date: Fri, 15 Sep 2017 14:35:54 +0000
-Message-ID: <1505486153.2852.6.camel@wdc.com>
+Return-Path: <prvs=4242a8d18=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V3 02/12] block: Fix declaration of blk-mq scheduler functions
+Date: Fri, 15 Sep 2017 19:06:35 +0900
+Message-Id: <20170915100645.17999-3-damien.lemoal@wdc.com>
+In-Reply-To: <20170915100645.17999-1-damien.lemoal@wdc.com>
 References: <20170915100645.17999-1-damien.lemoal@wdc.com>
-	 <20170915100645.17999-3-damien.lemoal@wdc.com>
-In-Reply-To: <20170915100645.17999-3-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTA5LTE1IGF0IDE5OjA2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gVGhlIGZ1bmN0aW9ucyBibGtfbXFfc2NoZWRfZnJlZV9oY3R4X2RhdGEoKSwgYmxrX21xX3Nj
-aGVkX3RyeV9tZXJnZSgpLA0KPiBibGtfbXFfc2NoZWRfdHJ5X2luc2VydF9tZXJnZSgpIGFuZCBi
-bGtfbXFfc2NoZWRfcmVxdWVzdF9pbnNlcnRlZCgpIGFyZQ0KPiBhbGwgZXhwb3J0ZWQgc3ltYm9s
-cyBidXQgYXJlIGRlY2xhcmVkIG9ubHkgaW50ZXJuYWxseSBpbg0KPiBibG9jay9ibGstbXEtc2No
-ZWQuaC4gTW92ZSB0aGVzZSBkZWNsYXJhdGlvbnMgdG8gdGhlIG5ldyBmaWxlDQo+IGluY2x1ZGUv
-bGludXgvYmxrLW1xLXNjaGVkLmggdG8gbWFrZSB0aGVtIGF2YWlsYWJsZSB0byBibG9jayBzY2hl
-ZHVsZXINCj4gbW9kdWxlcyBpbXBsZW1lbnRlZCBvdXRzaWRlIG9mIHRoZSBibG9jayBkaXJlY3Rv
-cnkuDQoNClNhbWUgY29tbWVudCBoZXJlOiBzaG91bGQgdGhlIHRpdGxlIG9mIHRoaXMgcGF0Y2gg
-cGVyaGFwcyBoYXZlIGJlZW4gIk1vdmUNCmRlY2xhcmF0aW9ucyBvZiAuLi4iPw0KDQo+ICsjaWZu
-ZGVmIEJMS19NUV9TQ0hFRF9IDQo+ICsjZGVmaW5lIEJMS19NUV9TQ0hFRF9IDQo+ICsNCj4gKy8q
-DQo+ICsgKiBTY2hlZHVsZXIgaGVscGVyIGZ1bmN0aW9ucy4NCj4gKyAqLw0KPiArdm9pZCBibGtf
-bXFfc2NoZWRfZnJlZV9oY3R4X2RhdGEoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsDQo+ICsJCQkJ
-IHZvaWQgKCpleGl0KShzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqKSk7DQo+ICt2b2lkIGJsa19tcV9z
-Y2hlZF9yZXF1ZXN0X2luc2VydGVkKHN0cnVjdCByZXF1ZXN0ICpycSk7DQo+ICtib29sIGJsa19t
-cV9zY2hlZF90cnlfbWVyZ2Uoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0cnVjdCBiaW8gKmJp
-bywNCj4gKwkJCSAgICBzdHJ1Y3QgcmVxdWVzdCAqKm1lcmdlZF9yZXF1ZXN0KTsNCj4gK2Jvb2wg
-YmxrX21xX3NjaGVkX3RyeV9pbnNlcnRfbWVyZ2Uoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0
-cnVjdCByZXF1ZXN0ICpycSk7DQo+ICsNCj4gKyNlbmRpZg0KDQpQbGVhc2UgbWFrZSBzdXJlIHRo
-YXQgdGhlIG9yZGVyIG9mICNpbmNsdWRlIGRpcmVjdGl2ZXMgZG9lcyBub3QgYWZmZWN0IHRoZQ0K
-Y29tcGlsYXRpb24gcmVzdWx0LCBlLmcuIGJ5IGFkZGluZyBmb3J3YXJkIGRlY2xhcmF0aW9ucyBm
-b3IgdGhlIHN0cnVjdHVyZXMNCnVzZWQgYXMgYXJndW1lbnRzLg0KDQpUaGFua3MsDQoNCkJhcnQu
+The functions blk_mq_sched_free_hctx_data(), blk_mq_sched_try_merge(),
+blk_mq_sched_try_insert_merge() and blk_mq_sched_request_inserted() are
+all exported symbols but are declared only internally in
+block/blk-mq-sched.h. Move these declarations to the new file
+include/linux/blk-mq-sched.h to make them available to block scheduler
+modules implemented outside of the block directory.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-mq-sched.h         | 11 +++--------
+ include/linux/blk-mq-sched.h | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+), 8 deletions(-)
+ create mode 100644 include/linux/blk-mq-sched.h
+
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 9267d0b7c197..f48f3c8edcb3 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -1,19 +1,14 @@
+-#ifndef BLK_MQ_SCHED_H
+-#define BLK_MQ_SCHED_H
++#ifndef INT_BLK_MQ_SCHED_H
++#define INT_BLK_MQ_SCHED_H
+ 
+ #include "blk-mq.h"
+ #include "blk-mq-tag.h"
+ 
+-void blk_mq_sched_free_hctx_data(struct request_queue *q,
+-				 void (*exit)(struct blk_mq_hw_ctx *));
++#include <linux/blk-mq-sched.h>
+ 
+ void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio);
+ 
+-void blk_mq_sched_request_inserted(struct request *rq);
+-bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-				struct request **merged_request);
+ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio);
+-bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq);
+ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+diff --git a/include/linux/blk-mq-sched.h b/include/linux/blk-mq-sched.h
+new file mode 100644
+index 000000000000..8ae1992e02c6
+--- /dev/null
++++ b/include/linux/blk-mq-sched.h
+@@ -0,0 +1,14 @@
++#ifndef BLK_MQ_SCHED_H
++#define BLK_MQ_SCHED_H
++
++/*
++ * Scheduler helper functions.
++ */
++void blk_mq_sched_free_hctx_data(struct request_queue *q,
++				 void (*exit)(struct blk_mq_hw_ctx *));
++void blk_mq_sched_request_inserted(struct request *rq);
++bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
++			    struct request **merged_request);
++bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq);
++
++#endif
+-- 
+2.13.5
