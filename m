@@ -1,43 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:20648 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751673AbdIOU5A (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 16:57:00 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "loberman@redhat.com" <loberman@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:50388 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751545AbdIOUKc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 16:10:32 -0400
+Date: Fri, 15 Sep 2017 16:10:24 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: dm-devel@redhat.com, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>
 Subject: Re: [PATCH 5/5] dm-mpath: improve I/O schedule
-Date: Fri, 15 Sep 2017 20:56:12 +0000
-Message-ID: <1505508971.2417.14.camel@wdc.com>
+Message-ID: <20170915201023.GB28136@redhat.com>
 References: <20170915164456.9803-1-ming.lei@redhat.com>
-         <20170915164456.9803-6-ming.lei@redhat.com>
-In-Reply-To: <20170915164456.9803-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <20170915164456.9803-6-ming.lei@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170915164456.9803-6-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTA5LTE2IGF0IDAwOjQ0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgICAgICAgICB8djQuMTMr
-ICAgICAgICAgfHY0LjEzKw0KPiAgICAgICAgICAgfCtzY3NpX21xX3BlcmYgIHwrc2NzaV9tcV9w
-ZXJmK3BhdGNoZXMNCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0N
-Cj4gIElPUFMoSykgIHxNUS1ERUFETElORSAgICB8TVEtREVBRExJTkUNCj4gLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IHJlYWQgICAgICB8ICAgICAgIDMwLjcx
-ICAgfCAgICAgIDM0My45MQ0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQ0KPiByYW5kcmVhZCAgfCAgICAgICAyMi45OCAgIHwgICAgICAgMTcuMTcNCj4gLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IHdyaXRlICAgICB8ICAgICAg
-IDE2LjQ1ICAgfCAgICAgIDM5MC44OA0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0NCj4gcmFuZHdyaXRlIHwgICAgICAgMTYuMjEgICB8ICAgICAgIDE2LjA5DQo+
-IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KDQpXaGF0IGlzIHRoZSBy
-ZWFzb24gZm9yIHRoZSByYW5kb20gSS9PIHBlcmZvcm1hbmNlIHJlZ3Jlc3Npb25zPyBVc2VycyB3
-aG9zZQ0Kd29ya2xvYWQgdHJpZ2dlcnMgYSByYW5kb20gSS9PIHBhdHRlcm4gd2lsbCBiZSByZWFs
-bHkgdW5oYXBweSB3aXRoIGEgMzMlIElPUFMNCnJlZ3Jlc3Npb24gZm9yIHJhbmRvbSByZWFkcy4g
-RG9lcyB0aGF0IHJlZ3Jlc3Npb24gZ2V0IHdvcnNlIGZvciBsb3dlciBsYXRlbmN5DQp0cmFuc3Bv
-cnRzLCBlLmcuIFNSUD8NCg0KQmFydC4=
+On Fri, Sep 15 2017 at 12:44pm -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
+
+> The actual I/O schedule is done in dm-mpath layer, and the
+> underlying I/O schedule is simply bypassed.
+> 
+> This patch sets underlying queue's nr_requests as its queue's
+> queue_depth, then  we can get its queue busy feedback by simply
+> checking if blk_get_request() returns successfully.
+> 
+> In this way, dm-mpath can reports its queue busy to block layer
+> effectively, so I/O scheduling is improved much.
+> 
+> Follows the test results on lpfc*:
+> 
+> - fio(libaio, bs:4k, dio, queue_depth:64, 64 jobs,
+>       over dm-mpath disk)
+> - system(12 cores, dual sockets, mem: 64G)
+> 
+> ---------------------------------------
+>           |v4.13+         |v4.13+
+>           |+scsi_mq_perf  |+scsi_mq_perf+patches
+> -----------------------------------------
+>  IOPS(K)  |MQ-DEADLINE    |MQ-DEADLINE
+> ------------------------------------------
+> read      |       30.71   |      343.91
+> -----------------------------------------
+> randread  |       22.98   |       17.17
+> ------------------------------------------
+> write     |       16.45   |      390.88
+> ------------------------------------------
+> randwrite |       16.21   |       16.09
+> ---------------------------------------
+> 
+> *:
+> 1) lpfc.lpfc_lun_queue_depth=3, so that it is same with .cmd_per_lun
+> 2) scsi_mq_perf means the patchset of 'blk-mq-sched: improve SCSI-MQ performance(V4)'[1]
+> 3) v4.13+: top commit is 46c1e79fee41 Merge branch 'perf-urgent-for-linus'
+> 4) the patchset 'blk-mq-sched: improve SCSI-MQ performance(V4)' focuses
+> on improving on SCSI-MQ, and all the test result in that coverletter was
+> against the raw lpfc/ib(run after 'multipath -F'), instead of dm-mpath.
+> 5) this patchset itself doesn't depend on the scsi_mq_perf patchset[1]
+> 
+> [1] https://marc.info/?t=150436555700002&r=1&w=2
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+
+Very impressive gains Ming!
+
+I'll review in more detail next week but Bart's concerns on patch 1 and
+2 definitely need consideration.
+
+Thanks,
+Mike
