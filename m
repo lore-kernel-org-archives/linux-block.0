@@ -1,45 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:36990 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753267AbdIFKwm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:52:42 -0400
-Received: by mail-wm0-f50.google.com with SMTP id u26so29535421wma.0
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:52:41 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 05/18] lightnvm: pblk: initialize debug stat counter
-Date: Wed,  6 Sep 2017 12:50:58 +0200
-Message-Id: <1504695071-25928-6-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
-References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Fri, 15 Sep 2017 22:01:54 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 0/2] Add wrapper for blkcg policy operatins
+Message-ID: <20170915140154.GA11335@bogon.didichuxing.com>
+References: <cover.1504275001.git.zhangweiping@didichuxing.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1504275001.git.zhangweiping@didichuxing.com>
+Return-Path: zhangweiping@didichuxing.com
+List-ID: <linux-block@vger.kernel.org>
 
-Initialize the stat counter for garbage collected reads.
+On Fri, Sep 01, 2017 at 10:16:45PM +0800, weiping zhang wrote:
+> The first patch is the V2 of [PATCH] blkcg: check pol->cpd_free_fn
+> before free cpd, it fixs a checking before free cpd.
+> 
+> The second patch add some wrappers for struct blkcg_policy->xxx_fn, because not
+> every block cgroup policy implement all operations.
+> 
+> weiping zhang (2):
+>   blkcg: check pol->cpd_free_fn before free cpd
+>   blkcg: add wrappers for struct blkcg_policy operations
+> 
+>  block/blk-cgroup.c         | 57 +++++++++++++++++-------------------
+>  include/linux/blk-cgroup.h | 72 ++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 99 insertions(+), 30 deletions(-)
+> 
+Hello Jens,
 
-Fixes: a4bd217b43268 ("lightnvm: physical block device (pblk) target")
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 1b0f61233c21..8459434edd89 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -944,6 +944,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	atomic_long_set(&pblk->recov_writes, 0);
- 	atomic_long_set(&pblk->recov_writes, 0);
- 	atomic_long_set(&pblk->recov_gc_writes, 0);
-+	atomic_long_set(&pblk->recov_gc_reads, 0);
- #endif
- 
- 	atomic_long_set(&pblk->read_failed, 0);
--- 
-2.7.4
+ping
