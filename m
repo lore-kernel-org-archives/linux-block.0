@@ -1,20 +1,23 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 15 Sep 2017 19:51:40 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
 Subject: Re: [PATCH V3 07/12] scsi: sd_zbc: Use well defined macros
-Message-ID: <20170915175140.GH8578@lst.de>
-References: <20170915100645.17999-1-damien.lemoal@wdc.com> <20170915100645.17999-8-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Date: Fri, 15 Sep 2017 16:27:07 +0000
+Message-ID: <1505492826.3420.6.camel@wdc.com>
+References: <20170915100645.17999-1-damien.lemoal@wdc.com>
+	 <20170915100645.17999-8-damien.lemoal@wdc.com>
 In-Reply-To: <20170915100645.17999-8-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+T24gRnJpLCAyMDE3LTA5LTE1IGF0IDE5OjA2ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gaW5zdGVhZCBvZiBvcGVuIGNvZGluZywgdXNlIHRoZSBtaW4oKSBtYWNybyB0byBjYWxjdWxh
+dGUgYSByZXBvcnQgem9uZXMNCj4gcmVwbHkgYnVmZmVyIGxlbmd0aCBpbiBzZF96YmNfY2hlY2tf
+em9uZV9zaXplKCkgYW5kIHRoZSByb3VuZF91cCgpDQo+IG1hY3JvIGZvciBjYWxjdWxhdGluZyB0
+aGUgbnVtYmVyIG9mIHpvbmVzIGluIHNkX3piY19zZXR1cCgpLg0KDQpSZXZpZXdlZC1ieTogQmFy
+dCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KDQo=
