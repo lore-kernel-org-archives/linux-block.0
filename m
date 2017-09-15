@@ -1,123 +1,156 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57036 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752660AbdIBPSG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Sep 2017 11:18:06 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH V4 02/14] sbitmap: introduce __sbitmap_for_each_set()
-Date: Sat,  2 Sep 2017 23:17:17 +0800
-Message-Id: <20170902151729.6162-3-ming.lei@redhat.com>
-In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
-References: <20170902151729.6162-1-ming.lei@redhat.com>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:48269 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751226AbdIOMZq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 08:25:46 -0400
+Received: by mail-wm0-f54.google.com with SMTP id r68so7877414wmg.3
+        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:25:45 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 02/11] lightnvm: pblk: normalize ppa namings
+Date: Fri, 15 Sep 2017 14:25:30 +0200
+Message-Id: <1505478339-13089-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+References: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We need to iterate ctx starting from any ctx in round robin
-way, so introduce this helper.
+Normalize the way we name ppa variables to improve code readability.
 
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- include/linux/sbitmap.h | 54 ++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 40 insertions(+), 14 deletions(-)
+ drivers/lightnvm/pblk-core.c | 48 +++++++++++++++++++++++---------------------
+ 1 file changed, 25 insertions(+), 23 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index a1904aadbc45..2329b9e1a0e2 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -211,10 +211,14 @@ bool sbitmap_any_bit_set(const struct sbitmap *sb);
-  */
- bool sbitmap_any_bit_clear(const struct sbitmap *sb);
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 3004e9252a11..9e90aeedf926 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1754,7 +1754,7 @@ void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
  
-+#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
-+#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
-+
- typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
- 
- /**
-  * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * @off: Where to start the iteration
-  * @sb: Bitmap to iterate over.
-  * @fn: Callback. Should return true to continue or false to break early.
-  * @data: Pointer to pass to callback.
-@@ -222,35 +226,57 @@ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
-  * This is inline even though it's non-trivial so that the function calls to the
-  * callback will hopefully get optimized away.
-  */
--static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
--					void *data)
-+static inline void __sbitmap_for_each_set(struct sbitmap *sb,
-+					  unsigned int off,
-+					  sb_for_each_fn fn, void *data)
+ void pblk_update_map(struct pblk *pblk, sector_t lba, struct ppa_addr ppa)
  {
--	unsigned int i;
-+	unsigned int index = SB_NR_TO_INDEX(sb, off);
-+	unsigned int nr = SB_NR_TO_BIT(sb, off);
-+	unsigned int scanned = 0;
+-	struct ppa_addr l2p_ppa;
++	struct ppa_addr ppa_l2p;
  
--	for (i = 0; i < sb->map_nr; i++) {
--		struct sbitmap_word *word = &sb->map[i];
--		unsigned int off, nr;
-+	while (1) {
-+		struct sbitmap_word *word = &sb->map[index];
-+		unsigned int depth = min_t(unsigned int, word->depth - nr,
-+					   sb->depth - scanned);
- 
-+		scanned += depth;
- 		if (!word->word)
--			continue;
-+			goto next;
- 
--		nr = 0;
--		off = i << sb->shift;
-+		depth += nr;
-+		off = index << sb->shift;
- 		while (1) {
--			nr = find_next_bit(&word->word, word->depth, nr);
--			if (nr >= word->depth)
-+			nr = find_next_bit(&word->word, depth, nr);
-+			if (nr >= depth)
- 				break;
--
- 			if (!fn(sb, off + nr, data))
- 				return;
- 
- 			nr++;
- 		}
-+ next:
-+		if (scanned >= sb->depth)
-+			break;
-+		nr = 0;
-+		if (++index >= sb->map_nr)
-+			index = 0;
+ 	/* logic error: lba out-of-bounds. Ignore update */
+ 	if (!(lba < pblk->rl.nr_secs)) {
+@@ -1763,10 +1763,10 @@ void pblk_update_map(struct pblk *pblk, sector_t lba, struct ppa_addr ppa)
  	}
+ 
+ 	spin_lock(&pblk->trans_lock);
+-	l2p_ppa = pblk_trans_map_get(pblk, lba);
++	ppa_l2p = pblk_trans_map_get(pblk, lba);
+ 
+-	if (!pblk_addr_in_cache(l2p_ppa) && !pblk_ppa_empty(l2p_ppa))
+-		pblk_map_invalidate(pblk, l2p_ppa);
++	if (!pblk_addr_in_cache(ppa_l2p) && !pblk_ppa_empty(ppa_l2p))
++		pblk_map_invalidate(pblk, ppa_l2p);
+ 
+ 	pblk_trans_map_set(pblk, lba, ppa);
+ 	spin_unlock(&pblk->trans_lock);
+@@ -1783,16 +1783,16 @@ void pblk_update_map_cache(struct pblk *pblk, sector_t lba, struct ppa_addr ppa)
+ 	pblk_update_map(pblk, lba, ppa);
  }
  
--#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
--#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
-+/**
-+ * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * @sb: Bitmap to iterate over.
-+ * @fn: Callback. Should return true to continue or false to break early.
-+ * @data: Pointer to pass to callback.
-+ *
-+ * This is inline even though it's non-trivial so that the function calls to the
-+ * callback will hopefully get optimized away.
-+ */
-+static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
-+					void *data)
-+{
-+	__sbitmap_for_each_set(sb, 0, fn, data);
-+}
+-int pblk_update_map_gc(struct pblk *pblk, sector_t lba, struct ppa_addr ppa,
++int pblk_update_map_gc(struct pblk *pblk, sector_t lba, struct ppa_addr ppa_new,
+ 		       struct pblk_line *gc_line)
+ {
+-	struct ppa_addr l2p_ppa;
++	struct ppa_addr ppa_l2p;
+ 	int ret = 1;
  
- static inline unsigned long *__sbitmap_word(struct sbitmap *sb,
- 					    unsigned int bitnr)
+ #ifdef CONFIG_NVM_DEBUG
+ 	/* Callers must ensure that the ppa points to a cache address */
+-	BUG_ON(!pblk_addr_in_cache(ppa));
+-	BUG_ON(pblk_rb_pos_oob(&pblk->rwb, pblk_addr_to_cacheline(ppa)));
++	BUG_ON(!pblk_addr_in_cache(ppa_new));
++	BUG_ON(pblk_rb_pos_oob(&pblk->rwb, pblk_addr_to_cacheline(ppa_new)));
+ #endif
+ 
+ 	/* logic error: lba out-of-bounds. Ignore update */
+@@ -1802,36 +1802,38 @@ int pblk_update_map_gc(struct pblk *pblk, sector_t lba, struct ppa_addr ppa,
+ 	}
+ 
+ 	spin_lock(&pblk->trans_lock);
+-	l2p_ppa = pblk_trans_map_get(pblk, lba);
++	ppa_l2p = pblk_trans_map_get(pblk, lba);
+ 
+ 	/* Prevent updated entries to be overwritten by GC */
+-	if (pblk_addr_in_cache(l2p_ppa) || pblk_ppa_empty(l2p_ppa) ||
+-				pblk_tgt_ppa_to_line(l2p_ppa) != gc_line->id) {
++	if (pblk_addr_in_cache(ppa_l2p) || pblk_ppa_empty(ppa_l2p) ||
++				pblk_tgt_ppa_to_line(ppa_l2p) != gc_line->id) {
++
+ 		ret = 0;
+ 		goto out;
+ 	}
+ 
+-	pblk_trans_map_set(pblk, lba, ppa);
++	pblk_trans_map_set(pblk, lba, ppa_new);
+ out:
+ 	spin_unlock(&pblk->trans_lock);
+ 	return ret;
+ }
+ 
+-void pblk_update_map_dev(struct pblk *pblk, sector_t lba, struct ppa_addr ppa,
+-			 struct ppa_addr entry_line)
++void pblk_update_map_dev(struct pblk *pblk, sector_t lba,
++			 struct ppa_addr ppa_mapped, struct ppa_addr ppa_cache)
+ {
+-	struct ppa_addr l2p_line;
++	struct ppa_addr ppa_l2p;
+ 
+ #ifdef CONFIG_NVM_DEBUG
+ 	/* Callers must ensure that the ppa points to a device address */
+-	BUG_ON(pblk_addr_in_cache(ppa));
++	BUG_ON(pblk_addr_in_cache(ppa_mapped));
+ #endif
+ 	/* Invalidate and discard padded entries */
+ 	if (lba == ADDR_EMPTY) {
+ #ifdef CONFIG_NVM_DEBUG
+ 		atomic_long_inc(&pblk->padded_wb);
+ #endif
+-		pblk_map_invalidate(pblk, ppa);
++		if (!pblk_ppa_empty(ppa_mapped))
++			pblk_map_invalidate(pblk, ppa_mapped);
+ 		return;
+ 	}
+ 
+@@ -1842,22 +1844,22 @@ void pblk_update_map_dev(struct pblk *pblk, sector_t lba, struct ppa_addr ppa,
+ 	}
+ 
+ 	spin_lock(&pblk->trans_lock);
+-	l2p_line = pblk_trans_map_get(pblk, lba);
++	ppa_l2p = pblk_trans_map_get(pblk, lba);
+ 
+ 	/* Do not update L2P if the cacheline has been updated. In this case,
+ 	 * the mapped ppa must be invalidated
+ 	 */
+-	if (l2p_line.ppa != entry_line.ppa) {
+-		if (!pblk_ppa_empty(ppa))
+-			pblk_map_invalidate(pblk, ppa);
++	if (!pblk_ppa_comp(ppa_l2p, ppa_cache)) {
++		if (!pblk_ppa_empty(ppa_mapped))
++			pblk_map_invalidate(pblk, ppa_mapped);
+ 		goto out;
+ 	}
+ 
+ #ifdef CONFIG_NVM_DEBUG
+-	WARN_ON(!pblk_addr_in_cache(l2p_line) && !pblk_ppa_empty(l2p_line));
++	WARN_ON(!pblk_addr_in_cache(ppa_l2p) && !pblk_ppa_empty(ppa_l2p));
+ #endif
+ 
+-	pblk_trans_map_set(pblk, lba, ppa);
++	pblk_trans_map_set(pblk, lba, ppa_mapped);
+ out:
+ 	spin_unlock(&pblk->trans_lock);
+ }
 -- 
-2.9.5
+2.7.4
