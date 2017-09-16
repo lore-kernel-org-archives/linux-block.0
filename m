@@ -1,16 +1,14 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40682 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:40584 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751257AbdIPDFk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 23:05:40 -0400
+        id S1751257AbdIPDFa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 23:05:30 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
 Subject: [PATCH V2 0/7] blk-mq: don't allocate driver tag beforehand for flush rq
-Date: Sat, 16 Sep 2017 11:03:44 +0800
-Message-Id: <20170916030351.28019-2-ming.lei@redhat.com>
-In-Reply-To: <20170916030351.28019-1-ming.lei@redhat.com>
-References: <20170916030351.28019-1-ming.lei@redhat.com>
+Date: Sat, 16 Sep 2017 11:03:43 +0800
+Message-Id: <20170916030351.28019-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
