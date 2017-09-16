@@ -1,47 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:55708 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752674AbdIRS06 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2017 14:26:58 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v8IIPI8D007765
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2017 11:26:57 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2d2gas932x-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2017 11:26:57 -0700
-From: Dan Melnic <dmm@fb.com>
-To: <josef@toxicpanda.com>, <axboe@fb.com>,
-        <linux-block@vger.kernel.org>, <Kernel-team@fb.com>
-Subject: [PATCH] block/ndb: add WQ_UNBOUND to the knbd-recv workqueue
-Date: Mon, 18 Sep 2017 11:26:55 -0700
-Message-ID: <20170918182655.1943833-1-dmm@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mx1.redhat.com ([209.132.183.28]:36280 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751257AbdIPDGL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 23:06:11 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 3/7] blk-flush: use blk_mq_request_bypass_insert()
+Date: Sat, 16 Sep 2017 11:03:47 +0800
+Message-Id: <20170916030351.28019-5-ming.lei@redhat.com>
+In-Reply-To: <20170916030351.28019-1-ming.lei@redhat.com>
+References: <20170916030351.28019-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add WQ_UNBOUND to the knbd-recv workqueue so we're not bound to asingle CPU
-that is selected at device creation time
+In the following patch, we will use RQF_FLUSH_SEQ
+to decide:
 
-Signed-off-by: Dan Melnic <dmm@fb.com>
+- if the flag isn't set, the flush rq need to be inserted
+via blk_insert_flush()
+- otherwise, the flush rq need to be dispatched directly
+since it is in flush machinery now.
+
+So we use blk_mq_request_bypass_insert() for requsts
+of bypassing flush machinery, like what the legacy did.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/nbd.c | 2 +-
+ block/blk-flush.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 2aa87cb..aa35e6e 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2080,7 +2080,7 @@ static int __init nbd_init(void)
- 	if (nbds_max > 1UL << (MINORBITS - part_shift))
- 		return -EINVAL;
- 	recv_workqueue = alloc_workqueue("knbd-recv",
--					 WQ_MEM_RECLAIM | WQ_HIGHPRI, 0);
-+					 WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 0);
- 	if (!recv_workqueue)
- 		return -ENOMEM;
- 
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 81bd1a843043..a9773d2075ac 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -463,7 +463,7 @@ void blk_insert_flush(struct request *rq)
+ 	if ((policy & REQ_FSEQ_DATA) &&
+ 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
+ 		if (q->mq_ops)
+-			blk_mq_sched_insert_request(rq, false, false, false, false);
++			blk_mq_request_bypass_insert(rq, false);
+ 		else
+ 			list_add_tail(&rq->queuelist, &q->queue_head);
+ 		return;
 -- 
 2.9.5
