@@ -1,142 +1,97 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55494 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:45952 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751013AbdIKLLw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Sep 2017 07:11:52 -0400
+        id S1751257AbdIPDGW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 23:06:22 -0400
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 04/10] blk-mq: rename blk_mq_freeze_queue_wait as blk_freeze_queue_wait
-Date: Mon, 11 Sep 2017 19:10:15 +0800
-Message-Id: <20170911111021.25810-5-ming.lei@redhat.com>
-In-Reply-To: <20170911111021.25810-1-ming.lei@redhat.com>
-References: <20170911111021.25810-1-ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 4/7] blk-mq: decide how to handle flush rq via RQF_FLUSH_SEQ
+Date: Sat, 16 Sep 2017 11:03:48 +0800
+Message-Id: <20170916030351.28019-6-ming.lei@redhat.com>
+In-Reply-To: <20170916030351.28019-1-ming.lei@redhat.com>
+References: <20170916030351.28019-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The only change on legacy is that blk_drain_queue() is run
-from blk_freeze_queue(), which is called in blk_cleanup_queue().
+Now we always preallocate one driver tag before blk_insert_flush(),
+and flush request will be marked as RQF_FLUSH_SEQ once it is in
+flush machinary.
 
-So this patch removes the explicit call of __blk_drain_queue() in
-blk_cleanup_queue().
+So if RQF_FLUSH_SEQ isn't set, we call blk_insert_flush()
+to handle the request, otherwise the flush request is
+dispatched to ->dispatch list directly.
+
+This is a prepare patch for not preallocating driver tag
+on flush rq, and remove the special case.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c         | 17 +++++++++++++++--
- block/blk-mq.c           |  8 +++++---
- block/blk.h              |  1 +
- drivers/nvme/host/core.c |  2 +-
- include/linux/blk-mq.h   |  2 +-
- 5 files changed, 23 insertions(+), 7 deletions(-)
+ block/blk-mq-sched.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 7e436ee04e08..2347107eeca4 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -530,6 +530,21 @@ static void __blk_drain_queue(struct request_queue *q, bool drain_all)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4ab69435708c..fa0f33d7efb9 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -260,21 +260,23 @@ void blk_mq_sched_request_inserted(struct request *rq)
+ EXPORT_SYMBOL_GPL(blk_mq_sched_request_inserted);
+ 
+ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
++				       bool has_sched,
+ 				       struct request *rq)
+ {
+-	if (rq->tag == -1) {
++	/* dispatch flush rq directly */
++	if (rq->rq_flags & RQF_FLUSH_SEQ) {
++		spin_lock(&hctx->lock);
++		list_add(&rq->queuelist, &hctx->dispatch);
++		spin_unlock(&hctx->lock);
++		return true;
++	}
++
++	if (has_sched) {
+ 		rq->rq_flags |= RQF_SORTED;
+-		return false;
++		WARN_ON(rq->tag != -1);
+ 	}
+ 
+-	/*
+-	 * If we already have a real request tag, send directly to
+-	 * the dispatch list.
+-	 */
+-	spin_lock(&hctx->lock);
+-	list_add(&rq->queuelist, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
+-	return true;
++	return false;
  }
  
  /**
-+ * blk_drain_queue - drain requests from request_queue
-+ * @q: queue to drain
-+ *
-+ * Drain requests from @q.  All pending requests are drained.
-+ * The caller is responsible for ensuring that no new requests
-+ * which need to be drained are queued.
-+ */
-+void blk_drain_queue(struct request_queue *q)
-+{
-+	spin_lock_irq(q->queue_lock);
-+	__blk_drain_queue(q, true);
-+	spin_unlock_irq(q->queue_lock);
-+}
-+
-+/**
-  * blk_queue_bypass_start - enter queue bypass mode
-  * @q: queue of interest
-  *
-@@ -659,8 +674,6 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 */
- 	blk_freeze_queue(q);
- 	spin_lock_irq(lock);
--	if (!q->mq_ops)
--		__blk_drain_queue(q, true);
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
+@@ -362,12 +364,13 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index aacf47f15b9a..345943fea998 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -131,11 +131,13 @@ void blk_freeze_queue_start(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+-	if (rq->tag == -1 && op_is_flush(rq->cmd_flags)) {
++	/* flush rq in flush machinery need to be dispatched directly */
++	if (!(rq->rq_flags & RQF_FLUSH_SEQ) && op_is_flush(rq->cmd_flags)) {
+ 		blk_mq_sched_insert_flush(hctx, rq, can_block);
+ 		return;
+ 	}
  
--void blk_mq_freeze_queue_wait(struct request_queue *q)
-+void blk_freeze_queue_wait(struct request_queue *q)
- {
-+	if (!q->mq_ops)
-+		blk_drain_queue(q);
- 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
- }
--EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait);
-+EXPORT_SYMBOL_GPL(blk_freeze_queue_wait);
+-	if (e && blk_mq_sched_bypass_insert(hctx, rq))
++	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
+ 		goto run;
  
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout)
-@@ -160,7 +162,7 @@ void blk_freeze_queue(struct request_queue *q)
- 	 * exported to drivers as the only user for unfreeze is blk_mq.
- 	 */
- 	blk_freeze_queue_start(q);
--	blk_mq_freeze_queue_wait(q);
-+	blk_freeze_queue_wait(q);
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue);
- 
-diff --git a/block/blk.h b/block/blk.h
-index fcb9775b997d..21eed59d96db 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -64,6 +64,7 @@ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
- 			struct bio *bio);
- void blk_queue_bypass_start(struct request_queue *q);
- void blk_queue_bypass_end(struct request_queue *q);
-+void blk_drain_queue(struct request_queue *q);
- void __blk_queue_free_tags(struct request_queue *q);
- void blk_freeze_queue(struct request_queue *q);
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 62808c4536f5..8506f7402a8d 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2904,7 +2904,7 @@ void nvme_wait_freeze(struct nvme_ctrl *ctrl)
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_freeze_queue_wait(ns->queue);
-+		blk_freeze_queue_wait(ns->queue);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_wait_freeze);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 355d74507656..62c3d1f7d12a 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -256,7 +256,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- void blk_freeze_queue(struct request_queue *q);
- void blk_unfreeze_queue(struct request_queue *q);
- void blk_freeze_queue_start(struct request_queue *q);
--void blk_mq_freeze_queue_wait(struct request_queue *q);
-+void blk_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
+ 	if (e && e->type->ops.mq.insert_requests) {
+@@ -405,7 +408,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
+ 		list_for_each_entry_safe(rq, next, list, queuelist) {
+ 			if (WARN_ON_ONCE(rq->tag != -1)) {
+ 				list_del_init(&rq->queuelist);
+-				blk_mq_sched_bypass_insert(hctx, rq);
++				blk_mq_sched_bypass_insert(hctx, true, rq);
+ 			}
+ 		}
+ 	}
 -- 
 2.9.5
