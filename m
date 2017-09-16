@@ -1,196 +1,52 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 07/16] scsi: sd_zbc: Initialize device request queue zoned data
-Date: Sun, 24 Sep 2017 16:02:38 +0900
-Message-Id: <20170924070247.25560-8-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:60028 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751257AbdIPDGv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Sep 2017 23:06:51 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 7/7] blk-mq-sched: warning on inserting a req with driver tag allocated
+Date: Sat, 16 Sep 2017 11:03:51 +0800
+Message-Id: <20170916030351.28019-9-ming.lei@redhat.com>
+In-Reply-To: <20170916030351.28019-1-ming.lei@redhat.com>
+References: <20170916030351.28019-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Initialize the seq_zones bitmap and nr_zones field of the disk request
-queue on disk revalidate. As the seq_zones bitmap allocation is
-identical to the allocation of the zone write lock bitmap, introduce
-the helper sd_zbc_alloc_zone_bitmap(). Using this helper, wait for the
-disk capacity and number of zones to stabilize on the second
-revalidation pass to allocate and initialize the bitmaps.
+In case of IO scheduler, any request shouldn't have a tag
+assigned before dispatching, so add the warning to monitor
+possible bug.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/sd_zbc.c | 130 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 124 insertions(+), 6 deletions(-)
+ block/blk-mq-sched.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 27793b9f54c0..50340c9d265b 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -586,8 +586,110 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 	return 0;
- }
- 
-+/**
-+ * sd_zbc_alloc_zone_bitmap - Allocate a zone bitmap (one bit per zone).
-+ * @sdkp: The disk of the bitmap
-+ */
-+static inline unsigned long *sd_zbc_alloc_zone_bitmap(struct scsi_disk *sdkp)
-+{
-+	struct request_queue *q = sdkp->disk->queue;
-+
-+	return kzalloc_node(BITS_TO_LONGS(sdkp->nr_zones)
-+			    * sizeof(unsigned long),
-+			    GFP_KERNEL, q->node);
-+}
-+
-+/**
-+ * sd_zbc_setup_seq_zones - Initialize the disk request queue zone type bitmap.
-+ * @sdkp: The disk of the bitmap
-+ *
-+ * Allocate a zone bitmap and initialize it by identifying sequential zones.
-+ */
-+static int sd_zbc_setup_seq_zones(struct scsi_disk *sdkp)
-+{
-+	struct request_queue *q = sdkp->disk->queue;
-+	unsigned long *seq_zones;
-+	sector_t block = 0;
-+	unsigned char *buf;
-+	unsigned char *rec;
-+	unsigned int buf_len;
-+	unsigned int list_length;
-+	unsigned int n = 0;
-+	u8 type, cond;
-+	int ret = -ENOMEM;
-+
-+	kfree(q->seq_zones);
-+	q->seq_zones = NULL;
-+
-+	seq_zones = sd_zbc_alloc_zone_bitmap(sdkp);
-+	if (!seq_zones)
-+		return -ENOMEM;
-+
-+	buf = kmalloc(SD_ZBC_BUF_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		goto out;
-+
-+	while (block < sdkp->capacity) {
-+
-+		ret = sd_zbc_report_zones(sdkp, buf, SD_ZBC_BUF_SIZE, block);
-+		if (ret)
-+			goto out;
-+
-+		/*
-+		 * Parse reported zone descriptors to find sequiential zones.
-+		 * Since read-only and offline zones cannot be written, do not
-+		 * mark them as sequential in the bitmap.
-+		 */
-+		list_length = get_unaligned_be32(&buf[0]) + 64;
-+		rec = buf + 64;
-+		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
-+		while (rec < buf + buf_len) {
-+			type = rec[0] & 0x0f;
-+			cond = (rec[1] >> 4) & 0xf;
-+			if (type != ZBC_ZONE_TYPE_CONV &&
-+			    cond != ZBC_ZONE_COND_READONLY &&
-+			    cond != ZBC_ZONE_COND_OFFLINE)
-+				set_bit(n, seq_zones);
-+			block = get_unaligned_be64(&rec[8]) +
-+				get_unaligned_be64(&rec[16]);
-+			rec += 64;
-+			n++;
-+		}
-+
-+	}
-+
-+	if (n != sdkp->nr_zones) {
-+		/* Something was wrong */
-+		ret = -EIO;
-+	}
-+
-+out:
-+	kfree(buf);
-+	if (ret) {
-+		kfree(seq_zones);
-+		return ret;
-+	}
-+
-+	q->seq_zones = seq_zones;
-+
-+	return 0;
-+}
-+
-+static void sd_zbc_cleanup(struct scsi_disk *sdkp)
-+{
-+	struct request_queue *q = sdkp->disk->queue;
-+
-+	kfree(q->seq_zones);
-+	q->seq_zones = NULL;
-+
-+	kfree(sdkp->zones_wlock);
-+	sdkp->zones_wlock = NULL;
-+}
-+
- static int sd_zbc_setup(struct scsi_disk *sdkp)
- {
-+	struct request_queue *q = sdkp->disk->queue;
-+	int ret;
- 
- 	/* READ16/WRITE16 is mandatory for ZBC disks */
- 	sdkp->device->use_16_for_rw = 1;
-@@ -599,14 +701,30 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	sdkp->nr_zones =
- 		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
- 
--	if (!sdkp->zones_wlock) {
--		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
--					    sizeof(unsigned long),
--					    GFP_KERNEL);
-+	/*
-+	 * Wait for the disk capacity to stabilize before
-+	 * initializing zone related information.
-+	 */
-+	if (sdkp->first_scan)
-+		return 0;
-+
-+	if (!sdkp->zones_wlock || q->nr_zones != sdkp->nr_zones) {
-+		kfree(sdkp->zones_wlock);
-+		sdkp->zones_wlock = sd_zbc_alloc_zone_bitmap(sdkp);
- 		if (!sdkp->zones_wlock)
- 			return -ENOMEM;
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index c2ea8c2b896b..b6934a9424ff 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -271,10 +271,8 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
+ 		return true;
  	}
  
-+	if (!q->seq_zones || q->nr_zones != sdkp->nr_zones) {
-+		ret = sd_zbc_setup_seq_zones(sdkp);
-+		if (ret) {
-+			sd_zbc_cleanup(sdkp);
-+			return ret;
-+		}
-+	}
+-	if (has_sched) {
++	if (has_sched)
+ 		rq->rq_flags |= RQF_SORTED;
+-		WARN_ON(rq->tag != -1);
+-	}
+ 
+ 	return false;
+ }
+@@ -355,6 +353,8 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 		goto run;
+ 	}
+ 
++	WARN_ON(e && (rq->tag != -1));
 +
-+	q->nr_zones = sdkp->nr_zones;
-+
- 	return 0;
- }
+ 	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
+ 		goto run;
  
-@@ -661,14 +779,14 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 
- err:
- 	sdkp->capacity = 0;
-+	sd_zbc_cleanup(sdkp);
- 
- 	return ret;
- }
- 
- void sd_zbc_remove(struct scsi_disk *sdkp)
- {
--	kfree(sdkp->zones_wlock);
--	sdkp->zones_wlock = NULL;
-+	sd_zbc_cleanup(sdkp);
- }
- 
- void sd_zbc_print_zones(struct scsi_disk *sdkp)
 -- 
-2.13.5
+2.9.5
