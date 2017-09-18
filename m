@@ -1,61 +1,37 @@
-Return-Path: <keith.busch@intel.com>
-Date: Mon, 18 Sep 2017 18:39:00 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
+	<keith.busch@intel.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [RFC PATCH] blk-mq: Fix lost request during timeout
-Message-ID: <20170918223900.GA4671@localhost.localdomain>
+Date: Mon, 18 Sep 2017 22:07:58 +0000
+Message-ID: <1505772477.12701.6.camel@wdc.com>
 References: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
- <1505772477.12701.6.camel@wdc.com>
+In-Reply-To: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505772477.12701.6.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 18, 2017 at 10:07:58PM +0000, Bart Van Assche wrote:
-> On Mon, 2017-09-18 at 18:03 -0400, Keith Busch wrote:
-> > I think we've always known it's possible to lose a request during timeout
-> > handling, but just accepted that possibility. It seems to be causing
-> > problems, though, leading to unnecessary error escalation and IO failures.
-> > 
-> > The possiblity arises when the block layer marks the request complete
-> > prior to running the timeout handler. If that request happens to complete
-> > while the handler is running, the request will be lost, inevitably
-> > triggering a second timeout.
-> > 
-> > This patch attempts to shorten the window for this race condition by
-> > clearing the started flag when the driver completes a request. The block
-> > layer's timeout handler will then complete the command if it observes
-> > the started flag is no longer set.
-> > 
-> > Note it's possible to lose the command even with this patch. It's just
-> > less likely to happen.
-> 
-> Hello Keith,
-> 
-> Are you sure the root cause of this race condition is in the blk-mq core?
-> I've never observed such behavior in any of my numerous scsi-mq tests (which
-> trigger timeouts). Are you sure the race you observed is not caused by a
-> blk_mq_reinit_tagset() call, a function that is only used by the NVMe driver
-> and not by any other block driver?
-
-Hi Bart,
-
-The nvme driver's use of blk_mq_reinit_tagset only happens during
-controller initialisation, but I'm seeing lost commands well after that
-during normal and stable running.
-
-The timing is pretty narrow to hit, but I'm pretty sure this is what's
-happening. For nvme, this occurs when nvme_timeout() runs concurrently
-with nvme_handle_cqe() for the same struct request. For scsi-mq,
-the same situation may arise if scsi_mq_done() runs concurrently with
-scsi_times_out().
-
-I don't really like the proposed "fix" though since it only makes it
-less likely, but I didn't see a way to close that without introducing
-locks. If someone knows of a better way, that would be awesome.
-
-Thanks,
-Keith
+T24gTW9uLCAyMDE3LTA5LTE4IGF0IDE4OjAzIC0wNDAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
+SSB0aGluayB3ZSd2ZSBhbHdheXMga25vd24gaXQncyBwb3NzaWJsZSB0byBsb3NlIGEgcmVxdWVz
+dCBkdXJpbmcgdGltZW91dA0KPiBoYW5kbGluZywgYnV0IGp1c3QgYWNjZXB0ZWQgdGhhdCBwb3Nz
+aWJpbGl0eS4gSXQgc2VlbXMgdG8gYmUgY2F1c2luZw0KPiBwcm9ibGVtcywgdGhvdWdoLCBsZWFk
+aW5nIHRvIHVubmVjZXNzYXJ5IGVycm9yIGVzY2FsYXRpb24gYW5kIElPIGZhaWx1cmVzLg0KPiAN
+Cj4gVGhlIHBvc3NpYmxpdHkgYXJpc2VzIHdoZW4gdGhlIGJsb2NrIGxheWVyIG1hcmtzIHRoZSBy
+ZXF1ZXN0IGNvbXBsZXRlDQo+IHByaW9yIHRvIHJ1bm5pbmcgdGhlIHRpbWVvdXQgaGFuZGxlci4g
+SWYgdGhhdCByZXF1ZXN0IGhhcHBlbnMgdG8gY29tcGxldGUNCj4gd2hpbGUgdGhlIGhhbmRsZXIg
+aXMgcnVubmluZywgdGhlIHJlcXVlc3Qgd2lsbCBiZSBsb3N0LCBpbmV2aXRhYmx5DQo+IHRyaWdn
+ZXJpbmcgYSBzZWNvbmQgdGltZW91dC4NCj4gDQo+IFRoaXMgcGF0Y2ggYXR0ZW1wdHMgdG8gc2hv
+cnRlbiB0aGUgd2luZG93IGZvciB0aGlzIHJhY2UgY29uZGl0aW9uIGJ5DQo+IGNsZWFyaW5nIHRo
+ZSBzdGFydGVkIGZsYWcgd2hlbiB0aGUgZHJpdmVyIGNvbXBsZXRlcyBhIHJlcXVlc3QuIFRoZSBi
+bG9jaw0KPiBsYXllcidzIHRpbWVvdXQgaGFuZGxlciB3aWxsIHRoZW4gY29tcGxldGUgdGhlIGNv
+bW1hbmQgaWYgaXQgb2JzZXJ2ZXMNCj4gdGhlIHN0YXJ0ZWQgZmxhZyBpcyBubyBsb25nZXIgc2V0
+Lg0KPiANCj4gTm90ZSBpdCdzIHBvc3NpYmxlIHRvIGxvc2UgdGhlIGNvbW1hbmQgZXZlbiB3aXRo
+IHRoaXMgcGF0Y2guIEl0J3MganVzdA0KPiBsZXNzIGxpa2VseSB0byBoYXBwZW4uDQoNCkhlbGxv
+IEtlaXRoLA0KDQpBcmUgeW91IHN1cmUgdGhlIHJvb3QgY2F1c2Ugb2YgdGhpcyByYWNlIGNvbmRp
+dGlvbiBpcyBpbiB0aGUgYmxrLW1xIGNvcmU/DQpJJ3ZlIG5ldmVyIG9ic2VydmVkIHN1Y2ggYmVo
+YXZpb3IgaW4gYW55IG9mIG15IG51bWVyb3VzIHNjc2ktbXEgdGVzdHMgKHdoaWNoDQp0cmlnZ2Vy
+IHRpbWVvdXRzKS4gQXJlIHlvdSBzdXJlIHRoZSByYWNlIHlvdSBvYnNlcnZlZCBpcyBub3QgY2F1
+c2VkIGJ5IGENCmJsa19tcV9yZWluaXRfdGFnc2V0KCkgY2FsbCwgYSBmdW5jdGlvbiB0aGF0IGlz
+IG9ubHkgdXNlZCBieSB0aGUgTlZNZSBkcml2ZXINCmFuZCBub3QgYnkgYW55IG90aGVyIGJsb2Nr
+IGRyaXZlcj8NCg0KQmFydC4=
