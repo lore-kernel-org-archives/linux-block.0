@@ -1,56 +1,70 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
+Return-Path: <BATV+efe86d5870596b20d79e+5139+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
 	linux-nvme@lists.infradead.org,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 3/3] block: remove blk_mq_reinit_tagset
-Date: Wed,  6 Sep 2017 18:30:32 +0300
-Message-Id: <1504711832-28425-4-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1504711832-28425-1-git-send-email-sagi@grimberg.me>
-References: <1504711832-28425-1-git-send-email-sagi@grimberg.me>
+	linux-block@vger.kernel.org
+Subject: [PATCH 5/9] block: add a blk_steal_bios helper
+Date: Mon, 18 Sep 2017 16:14:49 -0700
+Message-Id: <20170918231453.27128-6-hch@lst.de>
+In-Reply-To: <20170918231453.27128-1-hch@lst.de>
+References: <20170918231453.27128-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-No callers left.
+This helpers allows to bounce steal the uncompleted bios from a request so
+that they can be reissued on another path.
 
-Suggested-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- block/blk-mq-tag.c     | 7 -------
- include/linux/blk-mq.h | 2 --
- 2 files changed, 9 deletions(-)
+ block/blk-core.c       | 20 ++++++++++++++++++++
+ include/linux/blkdev.h |  2 ++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index bce1c76fc768..c81b40ecd3f1 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -327,13 +327,6 @@ int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index f02eb346c910..6f3db2c14843 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2724,6 +2724,26 @@ struct request *blk_fetch_request(struct request_queue *q)
  }
- EXPORT_SYMBOL_GPL(blk_mq_tagset_iter);
+ EXPORT_SYMBOL(blk_fetch_request);
  
--int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
--			 int (reinit_request)(void *, struct request *))
--{
--	return blk_mq_tagset_iter(set, set->driver_data, reinit_request);
--}
--EXPORT_SYMBOL_GPL(blk_mq_reinit_tagset);
--
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 		void *priv)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 6bc29f73a9aa..cfd64e500d82 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -261,8 +261,6 @@ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
- int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
- 		int (reinit_request)(void *, struct request *));
--int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
--			 int (reinit_request)(void *, struct request *));
++/*
++ * Steal bios from a request.  The request must not have been partially
++ * completed before.
++ */
++void blk_steal_bios(struct bio_list *list, struct request *rq)
++{
++	if (rq->bio) {
++		if (list->tail)
++			list->tail->bi_next = rq->bio;
++		else
++			list->head = rq->bio;
++		list->tail = rq->biotail;
++	}
++
++	rq->bio = NULL;
++	rq->biotail = NULL;
++	rq->__data_len = 0;
++}
++EXPORT_SYMBOL_GPL(blk_steal_bios);
++
+ /**
+  * blk_update_request - Special helper function for request stacking drivers
+  * @req:      the request being processed
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 86dfeea16d4c..0ca5525ee5ce 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1109,6 +1109,8 @@ extern struct request *blk_peek_request(struct request_queue *q);
+ extern void blk_start_request(struct request *rq);
+ extern struct request *blk_fetch_request(struct request_queue *q);
  
- int blk_mq_map_queues(struct blk_mq_tag_set *set);
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
++void blk_steal_bios(struct bio_list *list, struct request *rq);
++
+ /*
+  * Request completion related functions.
+  *
 -- 
-2.7.4
+2.14.1
