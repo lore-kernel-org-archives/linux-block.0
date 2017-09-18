@@ -1,37 +1,74 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 20 Sep 2017 13:09:59 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+Return-Path: <BATV+efe86d5870596b20d79e+5139+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org
-Subject: Re: nvme multipath support V2
-Message-ID: <20170920110959.hwvujtis6ywnbb5p@linux-x5ow.site>
-References: <20170918231453.27128-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170918231453.27128-1-hch@lst.de>
+Subject: nvme multipath support V2
+Date: Mon, 18 Sep 2017 16:14:44 -0700
+Message-Id: <20170918231453.27128-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Christoph,
+Hi all,
 
-I wanted to test your patches, but I fail to see how I have to set it up.
+this series adds support for multipathing, that is accessing nvme
+namespaces through multiple controllers to the nvme core driver.
 
-I do have a host with two RDMA HCAs connected to the target (Linux), for "normal
-dm-mpath" test I do nvme connect with the host traddr argument for both of the
-HCAs and get two nvme block devices which I can add to multipath.
+It is a very thin and efficient implementation that relies on
+close cooperation with other bits of the nvme driver, and few small
+and simple block helpers.
 
-Using your patchset and doing the sanme double connect trick I get the same
-two block devices of cause.
+Compared to dm-multipath the important differences are how management
+of the paths is done, and how the I/O path works.
 
-How do I connect using both paths?
+Management of the paths is fully integrated into the nvme driver,
+for each newly found nvme controller we check if there are other
+controllers that refer to the same subsystem, and if so we link them
+up in the nvme driver.  Then for each namespace found we check if
+the namespace id and identifiers match to check if we have multiple
+controllers that refer to the same namespaces.  For now path
+availability is based entirely on the controller status, which at
+least for fabrics will be continuously updated based on the mandatory
+keep alive timer.  Once the Asynchronous Namespace Access (ANA)
+proposal passes in NVMe we will also get per-namespace states in
+addition to that, but for now any details of that remain confidential
+to NVMe members.
 
-Thanks,
-	Johannes
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+The I/O path is very different from the existing multipath drivers,
+which is enabled by the fact that NVMe (unlike SCSI) does not support
+partial completions - a controller will either complete a whole
+command or not, but never only complete parts of it.  Because of that
+there is no need to clone bios or requests - the I/O path simply
+redirects the I/O to a suitable path.  For successful commands
+multipath is not in the completion stack at all.  For failed commands
+we decide if the error could be a path failure, and if yes remove
+the bios from the request structure and requeue them before completing
+the request.  All together this means there is no performance
+degradation compared to normal nvme operation when using the multipath
+device node (at least not until I find a dual ported DRAM backed
+device :))
+
+There are a couple questions left in the individual patches, comments
+welcome.
+
+Note that this series requires the previous series to remove bi_bdev,
+in doubt use the git tree below for testing.
+
+A git tree is available at:
+
+   git://git.infradead.org/users/hch/block.git nvme-mpath
+
+gitweb:
+
+   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
+
+Changes since V1:
+  - introduce new nvme_ns_ids structure to clean up identifier handling
+  - generic_make_request_fast is now named direct_make_request and calls
+    generic_make_request_checks
+  - reset bi_disk on resubmission
+  - create sysfs links between the existing nvme namespace block devices and
+    the new share mpath device
+  - temporarily added the timeout patches from James, this should go into
+    nvme-4.14, though
