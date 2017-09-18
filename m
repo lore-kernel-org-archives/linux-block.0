@@ -1,84 +1,55 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
+Return-Path: <BATV+efe86d5870596b20d79e+5139+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
 	linux-nvme@lists.infradead.org,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/3] block: introduce blk_mq_tagset_iter
-Date: Wed,  6 Sep 2017 18:30:30 +0300
-Message-Id: <1504711832-28425-2-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1504711832-28425-1-git-send-email-sagi@grimberg.me>
-References: <1504711832-28425-1-git-send-email-sagi@grimberg.me>
+	linux-block@vger.kernel.org,
+	James Smart <jsmart2021@gmail.com>,
+	James Smart <james.smart@broadcom.com>
+Subject: [PATCH 1/9] nvme: allow timed-out ios to retry
+Date: Mon, 18 Sep 2017 16:14:45 -0700
+Message-Id: <20170918231453.27128-2-hch@lst.de>
+In-Reply-To: <20170918231453.27128-1-hch@lst.de>
+References: <20170918231453.27128-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Iterator helper to apply a function on all the
-tags in a given tagset. export it as it will be used
-outside the block layer later on.
+From: James Smart <jsmart2021@gmail.com>
 
-Suggested-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Currently the nvme_req_needs_retry() applies several checks to see if
+a retry is allowed. On of those is whether the current time has exceeded
+the start time of the io plus the timeout length. This check, if an io
+times out, means there is never a retry allowed for the io. Which means
+applications see the io failure.
+
+Remove this check and allow the io to timeout, like it does on other
+protocols, and retries to be made.
+
+On the FC transport, a frame can be lost for an individual io, and there
+may be no other errors that escalate for the connection/association.
+The io will timeout, which causes the transport to escalate into creating
+a new association, but the io that timed out, due to this retry logic, has
+already failed back to the application and things are hosed.
+
+Signed-off-by: James Smart <james.smart@broadcom.com>
+Reviewed-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-tag.c     | 16 +++++++++++-----
- include/linux/blk-mq.h |  2 ++
- 2 files changed, 13 insertions(+), 5 deletions(-)
+ drivers/nvme/host/core.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 6714507aa6c7..bce1c76fc768 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -298,12 +298,12 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- }
- EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
- 
--int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
--			 int (reinit_request)(void *, struct request *))
-+int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
-+			 int (fn)(void *, struct request *))
- {
- 	int i, j, ret = 0;
- 
--	if (WARN_ON_ONCE(!reinit_request))
-+	if (WARN_ON_ONCE(!fn))
- 		goto out;
- 
- 	for (i = 0; i < set->nr_hw_queues; i++) {
-@@ -316,8 +316,7 @@ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
- 			if (!tags->static_rqs[j])
- 				continue;
- 
--			ret = reinit_request(set->driver_data,
--					     tags->static_rqs[j]);
-+			ret = fn(data, tags->static_rqs[j]);
- 			if (ret)
- 				goto out;
- 		}
-@@ -326,6 +325,13 @@ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
- out:
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(blk_mq_tagset_iter);
-+
-+int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
-+			 int (reinit_request)(void *, struct request *))
-+{
-+	return blk_mq_tagset_iter(set, set->driver_data, reinit_request);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_reinit_tagset);
- 
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 50c6485cb04f..6bc29f73a9aa 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -259,6 +259,8 @@ void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
-+int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
-+		int (reinit_request)(void *, struct request *));
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
- 			 int (reinit_request)(void *, struct request *));
- 
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index d470f031e27f..5589f67d2cd8 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -134,8 +134,6 @@ static inline bool nvme_req_needs_retry(struct request *req)
+ 		return false;
+ 	if (nvme_req(req)->status & NVME_SC_DNR)
+ 		return false;
+-	if (jiffies - req->start_time >= req->timeout)
+-		return false;
+ 	if (nvme_req(req)->retries >= nvme_max_retries)
+ 		return false;
+ 	return true;
 -- 
-2.7.4
+2.14.1
