@@ -1,46 +1,58 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "keith.busch@intel.com" <keith.busch@intel.com>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <keith.busch@intel.com>
+Date: Mon, 18 Sep 2017 19:08:03 -0400
+From: Keith Busch <keith.busch@intel.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [RFC PATCH] blk-mq: Fix lost request during timeout
-Date: Mon, 18 Sep 2017 23:14:38 +0000
-Message-ID: <1505776477.12701.28.camel@wdc.com>
+Message-ID: <20170918230803.GB4671@localhost.localdomain>
 References: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
-	 <1505772477.12701.6.camel@wdc.com>
-	 <20170918223900.GA4671@localhost.localdomain>
-	 <1505775191.12701.20.camel@wdc.com>
-	 <20170918230803.GB4671@localhost.localdomain>
-In-Reply-To: <20170918230803.GB4671@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
+ <1505772477.12701.6.camel@wdc.com>
+ <20170918223900.GA4671@localhost.localdomain>
+ <1505775191.12701.20.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1505775191.12701.20.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTA5LTE4IGF0IDE5OjA4IC0wNDAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
-T24gTW9uLCBTZXAgMTgsIDIwMTcgYXQgMTA6NTM6MTJQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hl
-IHdyb3RlOg0KPiA+IEFyZSB5b3Ugc3VyZSB0aGF0IHNjZW5hcmlvIGNhbiBoYXBwZW4/IFRoZSBi
-bGstbXEgY29yZSBjYWxscyB0ZXN0X2FuZF9zZXRfYml0KCkNCj4gPiBmb3IgdGhlIFJFUV9BVE9N
-X0NPTVBMRVRFIGZsYWcgYmVmb3JlIGFueSBjb21wbGV0aW9uIG9yIHRpbWVvdXQgaGFuZGxlciBp
-cw0KPiA+IGNhbGxlZC4gU2VlIGFsc28gYmxrX21hcmtfcnFfY29tcGxldGUoKS4gVGhpcyBhdm9p
-ZHMgdGhhdCB0aGUgLmNvbXBsZXRlKCkgYW5kDQo+ID4gLnRpbWVvdXQoKSBmdW5jdGlvbnMgcnVu
-IGNvbmN1cnJlbnRseS4NCj4gDQo+IEluZGVlZCB0aGF0IHByZXZlbnRzIC5jb21wbGV0ZSBmcm9t
-IHJ1bm5pbmcgY29uY3VycmVudGx5IHdpdGggdGhlDQo+IHRpbWVvdXQgaGFuZGxlciwgYnV0IHNj
-c2lfbXFfZG9uZSBhbmQgbnZtZV9oYW5kbGVfY3FlIGFyZSBub3QgLmNvbXBsZXRlDQo+IGNhbGxi
-YWNrcy4gVGhlc2UgYXJlIHRoZSBMTEQgZnVuY3Rpb25zIHRoYXQgY2FsbCBibGtfbXFfY29tcGxl
-dGVfcmVxdWVzdA0KPiB3ZWxsIGJlZm9yZSAuY29tcGxldGUuIElmIHRoZSBkcml2ZXIgY2FsbHMg
-YmxrX21xX2NvbXBsZXRlX3JlcXVlc3Qgb24NCj4gYSByZXF1ZXN0IHRoYXQgYmxrLW1xIGlzIHRp
-bWluZyBvdXQsIHRoZSByZXF1ZXN0IGlzIGxvc3QgYmVjYXVzZSBibGstbXENCj4gYWxyZWFkeSBj
-YWxsZWQgYmxrX21hcmtfcnFfY29tcGxldGUuIE5vdGhpbmcgcHJldmVudHMgdGhlc2UgTExEIGZ1
-bmN0aW9ucw0KPiBmcm9tIHJ1bm5pbmcgYXQgdGhlIHNhbWUgdGltZSBhcyB0aGUgdGltZW91dCBo
-YW5kbGVyLg0KDQpDYW4geW91IGV4cGxhaW4gaG93IHlvdSBkZWZpbmUgInJlcXVlc3QgaXMgbG9z
-dCI/IElmIGEgdGltZW91dCBvY2N1cnMgZm9yIGENClNDU0kgcmVxdWVzdCB0aGVuIHNjc2lfdGlt
-ZXNfb3V0KCkgY2FsbHMgc2NzaV9hYm9ydF9jb21tYW5kKCkgKGlmIG5vDQouZWhfdGltZWRfb3V0
-KCkgY2FsbGJhY2sgaGFzIGJlZW4gZGVmaW5lZCBieSB0aGUgTExEKS4gSXQgaXMgdGhlIHJlc3Bv
-bnNpYmlsaXR5DQpvZiB0aGUgU0NTSSBMTEQgdG8gY2FsbCAuc2NzaV9kb25lKCkgYmVmb3JlIGl0
-cyAuZWhfYWJvcnRfaGFuZGxlcigpIHJldHVybnMNClNVQ0NFU1MuIElmIC5laF9hYm9ydF9oYW5k
-bGVyKCkgcmV0dXJucyBhIHZhbHVlIG90aGVyIHRoYW4gU1VDQ0VTUyB0aGVuIHRoZQ0KU0NTSSBj
-b3JlIHdpbGwgZXNjYWxhdGUgdGhlIGVycm9yIGZ1cnRoZXIgdW50aWwgLnNjc2lfZG9uZSgpIGhh
-cyBiZWVuIGNhbGxlZCBmb3INCnRoZSBjb21tYW5kIHRoYXQgdGltZWQgb3V0LiBTZWUgYWxzbyBz
-Y3NpX2Fib3J0X2VoX2NtbmQoKS4gU28gSSB0aGluayB3aGF0IHlvdQ0Kd3JvdGUgaXMgbm90IGNv
-cnJlY3QgZm9yIHRoZSBTQ1NJIGNvcmUgYW5kIGEgcHJvcGVybHkgaW1wbGVtZW50ZWQgU0NTSSBM
-TEQuIA0KDQpCYXJ0Lg==
+On Mon, Sep 18, 2017 at 10:53:12PM +0000, Bart Van Assche wrote:
+> On Mon, 2017-09-18 at 18:39 -0400, Keith Busch wrote:
+> > The nvme driver's use of blk_mq_reinit_tagset only happens during
+> > controller initialisation, but I'm seeing lost commands well after that
+> > during normal and stable running.
+> > 
+> > The timing is pretty narrow to hit, but I'm pretty sure this is what's
+> > happening. For nvme, this occurs when nvme_timeout() runs concurrently
+> > with nvme_handle_cqe() for the same struct request. For scsi-mq,
+> > the same situation may arise if scsi_mq_done() runs concurrently with
+> > scsi_times_out().
+> 
+> Hello Keith,
+> 
+> Are you sure that scenario can happen? The blk-mq core calls test_and_set_bit()
+> for the REQ_ATOM_COMPLETE flag before any completion or timeout handler is
+> called. See also blk_mark_rq_complete(). This avoids that the .complete() and
+> .timeout() functions run concurrently.
+
+Indeed that prevents .complete from running concurrently with the
+timeout handler, but scsi_mq_done and nvme_handle_cqe are not .complete
+callbacks. These are the LLD functions that call blk_mq_complete_request
+well before .complete. If the driver calls blk_mq_complete_request on
+a request that blk-mq is timing out, the request is lost because blk-mq
+already called blk_mark_rq_complete. Nothing prevents these LLD functions
+from running at the same time as the timeout handler.
+ 
+> In case this wouldn't be clear, a block driver must not call
+> blk_mq_end_request() after the timeout handler has finished because that would
+> trigger a use-after-free of a request structure.
+>
+> I noticed that your patch includes changes for blk_mq_start_request(). No
+> timeout or completion handler should be running while blk_mq_start_request() is
+> being executed. If these changes make a difference in your tests then I think
+> that means that there is something wrong with the NVMe driver.
+
+The reason for changing blk_mq_start_request was because of how the
+requeue was clearing STARTED. I had to remove that since it would have
+otherwise been impossible for the blk_mq_rq_timed_out to know if the
+request was requeued vs. completed.
