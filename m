@@ -1,37 +1,108 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "keith.busch@intel.com"
-	<keith.busch@intel.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [RFC PATCH] blk-mq: Fix lost request during timeout
-Date: Mon, 18 Sep 2017 22:07:58 +0000
-Message-ID: <1505772477.12701.6.camel@wdc.com>
-References: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
-In-Reply-To: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>
+Subject: [RFC PATCH] blk-mq: Fix lost request during timeout
+Date: Mon, 18 Sep 2017 18:03:06 -0400
+Message-Id: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTA5LTE4IGF0IDE4OjAzIC0wNDAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
-SSB0aGluayB3ZSd2ZSBhbHdheXMga25vd24gaXQncyBwb3NzaWJsZSB0byBsb3NlIGEgcmVxdWVz
-dCBkdXJpbmcgdGltZW91dA0KPiBoYW5kbGluZywgYnV0IGp1c3QgYWNjZXB0ZWQgdGhhdCBwb3Nz
-aWJpbGl0eS4gSXQgc2VlbXMgdG8gYmUgY2F1c2luZw0KPiBwcm9ibGVtcywgdGhvdWdoLCBsZWFk
-aW5nIHRvIHVubmVjZXNzYXJ5IGVycm9yIGVzY2FsYXRpb24gYW5kIElPIGZhaWx1cmVzLg0KPiAN
-Cj4gVGhlIHBvc3NpYmxpdHkgYXJpc2VzIHdoZW4gdGhlIGJsb2NrIGxheWVyIG1hcmtzIHRoZSBy
-ZXF1ZXN0IGNvbXBsZXRlDQo+IHByaW9yIHRvIHJ1bm5pbmcgdGhlIHRpbWVvdXQgaGFuZGxlci4g
-SWYgdGhhdCByZXF1ZXN0IGhhcHBlbnMgdG8gY29tcGxldGUNCj4gd2hpbGUgdGhlIGhhbmRsZXIg
-aXMgcnVubmluZywgdGhlIHJlcXVlc3Qgd2lsbCBiZSBsb3N0LCBpbmV2aXRhYmx5DQo+IHRyaWdn
-ZXJpbmcgYSBzZWNvbmQgdGltZW91dC4NCj4gDQo+IFRoaXMgcGF0Y2ggYXR0ZW1wdHMgdG8gc2hv
-cnRlbiB0aGUgd2luZG93IGZvciB0aGlzIHJhY2UgY29uZGl0aW9uIGJ5DQo+IGNsZWFyaW5nIHRo
-ZSBzdGFydGVkIGZsYWcgd2hlbiB0aGUgZHJpdmVyIGNvbXBsZXRlcyBhIHJlcXVlc3QuIFRoZSBi
-bG9jaw0KPiBsYXllcidzIHRpbWVvdXQgaGFuZGxlciB3aWxsIHRoZW4gY29tcGxldGUgdGhlIGNv
-bW1hbmQgaWYgaXQgb2JzZXJ2ZXMNCj4gdGhlIHN0YXJ0ZWQgZmxhZyBpcyBubyBsb25nZXIgc2V0
-Lg0KPiANCj4gTm90ZSBpdCdzIHBvc3NpYmxlIHRvIGxvc2UgdGhlIGNvbW1hbmQgZXZlbiB3aXRo
-IHRoaXMgcGF0Y2guIEl0J3MganVzdA0KPiBsZXNzIGxpa2VseSB0byBoYXBwZW4uDQoNCkhlbGxv
-IEtlaXRoLA0KDQpBcmUgeW91IHN1cmUgdGhlIHJvb3QgY2F1c2Ugb2YgdGhpcyByYWNlIGNvbmRp
-dGlvbiBpcyBpbiB0aGUgYmxrLW1xIGNvcmU/DQpJJ3ZlIG5ldmVyIG9ic2VydmVkIHN1Y2ggYmVo
-YXZpb3IgaW4gYW55IG9mIG15IG51bWVyb3VzIHNjc2ktbXEgdGVzdHMgKHdoaWNoDQp0cmlnZ2Vy
-IHRpbWVvdXRzKS4gQXJlIHlvdSBzdXJlIHRoZSByYWNlIHlvdSBvYnNlcnZlZCBpcyBub3QgY2F1
-c2VkIGJ5IGENCmJsa19tcV9yZWluaXRfdGFnc2V0KCkgY2FsbCwgYSBmdW5jdGlvbiB0aGF0IGlz
-IG9ubHkgdXNlZCBieSB0aGUgTlZNZSBkcml2ZXINCmFuZCBub3QgYnkgYW55IG90aGVyIGJsb2Nr
-IGRyaXZlcj8NCg0KQmFydC4=
+I think we've always known it's possible to lose a request during timeout
+handling, but just accepted that possibility. It seems to be causing
+problems, though, leading to unnecessary error escalation and IO failures.
+
+The possiblity arises when the block layer marks the request complete
+prior to running the timeout handler. If that request happens to complete
+while the handler is running, the request will be lost, inevitably
+triggering a second timeout.
+
+This patch attempts to shorten the window for this race condition by
+clearing the started flag when the driver completes a request. The block
+layer's timeout handler will then complete the command if it observes
+the started flag is no longer set.
+
+Note it's possible to lose the command even with this patch. It's just
+less likely to happen.
+
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ block/blk-mq.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 98a1860..37144ef 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -566,6 +566,7 @@ void blk_mq_complete_request(struct request *rq)
+ 
+ 	if (unlikely(blk_should_fake_timeout(q)))
+ 		return;
++	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
+ 	if (!blk_mark_rq_complete(rq))
+ 		__blk_mq_complete_request(rq);
+ }
+@@ -605,19 +606,19 @@ void blk_mq_start_request(struct request *rq)
+ 	 * complete. So be sure to clear complete again when we start
+ 	 * the request, otherwise we'll ignore the completion event.
+ 	 */
+-	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
++	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
+ 		set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
++		if (q->dma_drain_size && blk_rq_bytes(rq)) {
++			/*
++			 * Make sure space for the drain appears.  We know we can do
++			 * this because max_hw_segments has been adjusted to be one
++			 * fewer than the device can handle.
++			 */
++			rq->nr_phys_segments++;
++		}
++	}
+ 	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
+ 		clear_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags);
+-
+-	if (q->dma_drain_size && blk_rq_bytes(rq)) {
+-		/*
+-		 * Make sure space for the drain appears.  We know we can do
+-		 * this because max_hw_segments has been adjusted to be one
+-		 * fewer than the device can handle.
+-		 */
+-		rq->nr_phys_segments++;
+-	}
+ }
+ EXPORT_SYMBOL(blk_mq_start_request);
+ 
+@@ -637,11 +638,6 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 	trace_block_rq_requeue(q, rq);
+ 	wbt_requeue(q->rq_wb, &rq->issue_stat);
+ 	blk_mq_sched_requeue_request(rq);
+-
+-	if (test_and_clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
+-		if (q->dma_drain_size && blk_rq_bytes(rq))
+-			rq->nr_phys_segments--;
+-	}
+ }
+ 
+ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
+@@ -763,10 +759,15 @@ void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 		__blk_mq_complete_request(req);
+ 		break;
+ 	case BLK_EH_RESET_TIMER:
+-		blk_add_timer(req);
+-		blk_clear_rq_complete(req);
+-		break;
++		if (test_bit(REQ_ATOM_STARTED, &req->atomic_flags)) {
++			blk_add_timer(req);
++			blk_clear_rq_complete(req);
++			break;
++		}
++		/* Fall through */
+ 	case BLK_EH_NOT_HANDLED:
++		if (!test_bit(REQ_ATOM_STARTED, &req->atomic_flags))
++			__blk_mq_complete_request(req);
+ 		break;
+ 	default:
+ 		printk(KERN_ERR "block: bad eh return: %d\n", ret);
+-- 
+2.5.5
