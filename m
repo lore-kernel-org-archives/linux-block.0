@@ -1,63 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:61807 "EHLO mx2.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751636AbdIULZm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2017 07:25:42 -0400
-Date: Thu, 21 Sep 2017 14:25:40 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH 1/6] lightnvm: pblk: reuse pblk_gc_should_kick
-Message-ID: <20170921112539.GA28510@dhcp-216.srv.tuxera.com>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:52885 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751390AbdIRT6e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Sep 2017 15:58:34 -0400
+Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
+        by mx0b-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v8IJvGbc023265
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2017 12:58:34 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0b-00082601.pphosted.com with ESMTP id 2d2mqdg0s5-11
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 18 Sep 2017 12:58:33 -0700
+From: Dan Melnic <dmm@fb.com>
+To: <josef@toxicpanda.com>, <axboe@fb.com>,
+        <linux-block@vger.kernel.org>, <Kernel-team@fb.com>
+Subject: [PATCH V2] block/ndb: add WQ_UNBOUND to the knbd-recv workqueue
+Date: Mon, 18 Sep 2017 12:56:17 -0700
+Message-ID: <20170918195617.2411456-1-dmm@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is a trivial change which reuses pblk_gc_should_kick instead of
-repeating it again in pblk_rl_free_lines_inc.
+Add WQ_UNBOUND to the knbd-recv workqueue so we're not bound
+to a single CPU that is selected at device creation time.
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Signed-off-by: Dan Melnic <dmm@fb.com>
 ---
- drivers/lightnvm/pblk-core.c | 1 +
- drivers/lightnvm/pblk-rl.c   | 9 ---------
- 2 files changed, 1 insertion(+), 9 deletions(-)
+ drivers/block/nbd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 64a6a25..a230125 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1478,6 +1478,7 @@ static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- 	spin_unlock(&l_mg->free_lock);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 2aa87cb..ac3c5ecc 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2080,7 +2080,9 @@ static int __init nbd_init(void)
+ 	if (nbds_max > 1UL << (MINORBITS - part_shift))
+ 		return -EINVAL;
+ 	recv_workqueue = alloc_workqueue("knbd-recv",
+-					 WQ_MEM_RECLAIM | WQ_HIGHPRI, 0);
++					 WQ_MEM_RECLAIM | WQ_HIGHPRI |
++					 WQ_UNBOUND,
++					 0);
+ 	if (!recv_workqueue)
+ 		return -ENOMEM;
  
- 	pblk_rl_free_lines_inc(&pblk->rl, line);
-+	pblk_gc_should_kick(pblk);
- }
- 
- static void pblk_line_put_ws(struct work_struct *work)
-diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
-index 596bdec..e7c162a 100644
---- a/drivers/lightnvm/pblk-rl.c
-+++ b/drivers/lightnvm/pblk-rl.c
-@@ -129,18 +129,9 @@ static int pblk_rl_update_rates(struct pblk_rl *rl, unsigned long max)
- 
- void pblk_rl_free_lines_inc(struct pblk_rl *rl, struct pblk_line *line)
- {
--	struct pblk *pblk = container_of(rl, struct pblk, rl);
- 	int blk_in_line = atomic_read(&line->blk_in_line);
--	int ret;
- 
- 	atomic_add(blk_in_line, &rl->free_blocks);
--	/* Rates will not change that often - no need to lock update */
--	ret = pblk_rl_update_rates(rl, rl->rb_budget);
--
--	if (ret == (PBLK_RL_MID | PBLK_RL_LOW))
--		pblk_gc_should_start(pblk);
--	else
--		pblk_gc_should_stop(pblk);
- }
- 
- void pblk_rl_free_lines_dec(struct pblk_rl *rl, struct pblk_line *line)
 -- 
-2.5.0
+2.9.5
