@@ -1,58 +1,40 @@
-Return-Path: <keith.busch@intel.com>
-Date: Mon, 18 Sep 2017 19:08:03 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "keith.busch@intel.com" <keith.busch@intel.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [RFC PATCH] blk-mq: Fix lost request during timeout
-Message-ID: <20170918230803.GB4671@localhost.localdomain>
+Date: Mon, 18 Sep 2017 22:53:12 +0000
+Message-ID: <1505775191.12701.20.camel@wdc.com>
 References: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
- <1505772477.12701.6.camel@wdc.com>
- <20170918223900.GA4671@localhost.localdomain>
- <1505775191.12701.20.camel@wdc.com>
+	 <1505772477.12701.6.camel@wdc.com>
+	 <20170918223900.GA4671@localhost.localdomain>
+In-Reply-To: <20170918223900.GA4671@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505775191.12701.20.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 18, 2017 at 10:53:12PM +0000, Bart Van Assche wrote:
-> On Mon, 2017-09-18 at 18:39 -0400, Keith Busch wrote:
-> > The nvme driver's use of blk_mq_reinit_tagset only happens during
-> > controller initialisation, but I'm seeing lost commands well after that
-> > during normal and stable running.
-> > 
-> > The timing is pretty narrow to hit, but I'm pretty sure this is what's
-> > happening. For nvme, this occurs when nvme_timeout() runs concurrently
-> > with nvme_handle_cqe() for the same struct request. For scsi-mq,
-> > the same situation may arise if scsi_mq_done() runs concurrently with
-> > scsi_times_out().
-> 
-> Hello Keith,
-> 
-> Are you sure that scenario can happen? The blk-mq core calls test_and_set_bit()
-> for the REQ_ATOM_COMPLETE flag before any completion or timeout handler is
-> called. See also blk_mark_rq_complete(). This avoids that the .complete() and
-> .timeout() functions run concurrently.
-
-Indeed that prevents .complete from running concurrently with the
-timeout handler, but scsi_mq_done and nvme_handle_cqe are not .complete
-callbacks. These are the LLD functions that call blk_mq_complete_request
-well before .complete. If the driver calls blk_mq_complete_request on
-a request that blk-mq is timing out, the request is lost because blk-mq
-already called blk_mark_rq_complete. Nothing prevents these LLD functions
-from running at the same time as the timeout handler.
- 
-> In case this wouldn't be clear, a block driver must not call
-> blk_mq_end_request() after the timeout handler has finished because that would
-> trigger a use-after-free of a request structure.
->
-> I noticed that your patch includes changes for blk_mq_start_request(). No
-> timeout or completion handler should be running while blk_mq_start_request() is
-> being executed. If these changes make a difference in your tests then I think
-> that means that there is something wrong with the NVMe driver.
-
-The reason for changing blk_mq_start_request was because of how the
-requeue was clearing STARTED. I had to remove that since it would have
-otherwise been impossible for the blk_mq_rq_timed_out to know if the
-request was requeued vs. completed.
+T24gTW9uLCAyMDE3LTA5LTE4IGF0IDE4OjM5IC0wNDAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
+VGhlIG52bWUgZHJpdmVyJ3MgdXNlIG9mIGJsa19tcV9yZWluaXRfdGFnc2V0IG9ubHkgaGFwcGVu
+cyBkdXJpbmcNCj4gY29udHJvbGxlciBpbml0aWFsaXNhdGlvbiwgYnV0IEknbSBzZWVpbmcgbG9z
+dCBjb21tYW5kcyB3ZWxsIGFmdGVyIHRoYXQNCj4gZHVyaW5nIG5vcm1hbCBhbmQgc3RhYmxlIHJ1
+bm5pbmcuDQo+IA0KPiBUaGUgdGltaW5nIGlzIHByZXR0eSBuYXJyb3cgdG8gaGl0LCBidXQgSSdt
+IHByZXR0eSBzdXJlIHRoaXMgaXMgd2hhdCdzDQo+IGhhcHBlbmluZy4gRm9yIG52bWUsIHRoaXMg
+b2NjdXJzIHdoZW4gbnZtZV90aW1lb3V0KCkgcnVucyBjb25jdXJyZW50bHkNCj4gd2l0aCBudm1l
+X2hhbmRsZV9jcWUoKSBmb3IgdGhlIHNhbWUgc3RydWN0IHJlcXVlc3QuIEZvciBzY3NpLW1xLA0K
+PiB0aGUgc2FtZSBzaXR1YXRpb24gbWF5IGFyaXNlIGlmIHNjc2lfbXFfZG9uZSgpIHJ1bnMgY29u
+Y3VycmVudGx5IHdpdGgNCj4gc2NzaV90aW1lc19vdXQoKS4NCg0KSGVsbG8gS2VpdGgsDQoNCkFy
+ZSB5b3Ugc3VyZSB0aGF0IHNjZW5hcmlvIGNhbiBoYXBwZW4/IFRoZSBibGstbXEgY29yZSBjYWxs
+cyB0ZXN0X2FuZF9zZXRfYml0KCkNCmZvciB0aGUgUkVRX0FUT01fQ09NUExFVEUgZmxhZyBiZWZv
+cmUgYW55IGNvbXBsZXRpb24gb3IgdGltZW91dCBoYW5kbGVyIGlzDQpjYWxsZWQuIFNlZSBhbHNv
+IGJsa19tYXJrX3JxX2NvbXBsZXRlKCkuIFRoaXMgYXZvaWRzIHRoYXQgdGhlIC5jb21wbGV0ZSgp
+IGFuZA0KLnRpbWVvdXQoKSBmdW5jdGlvbnMgcnVuIGNvbmN1cnJlbnRseS4NCg0KSW4gY2FzZSB0
+aGlzIHdvdWxkbid0IGJlIGNsZWFyLCBhIGJsb2NrIGRyaXZlciBtdXN0IG5vdCBjYWxsDQpibGtf
+bXFfZW5kX3JlcXVlc3QoKSBhZnRlciB0aGUgdGltZW91dCBoYW5kbGVyIGhhcyBmaW5pc2hlZCBi
+ZWNhdXNlIHRoYXQgd291bGQNCnRyaWdnZXIgYSB1c2UtYWZ0ZXItZnJlZSBvZiBhIHJlcXVlc3Qg
+c3RydWN0dXJlLg0KDQpJIG5vdGljZWQgdGhhdCB5b3VyIHBhdGNoIGluY2x1ZGVzIGNoYW5nZXMg
+Zm9yIGJsa19tcV9zdGFydF9yZXF1ZXN0KCkuIE5vDQp0aW1lb3V0IG9yIGNvbXBsZXRpb24gaGFu
+ZGxlciBzaG91bGQgYmUgcnVubmluZyB3aGlsZSBibGtfbXFfc3RhcnRfcmVxdWVzdCgpIGlzDQpi
+ZWluZyBleGVjdXRlZC4gSWYgdGhlc2UgY2hhbmdlcyBtYWtlIGEgZGlmZmVyZW5jZSBpbiB5b3Vy
+IHRlc3RzIHRoZW4gSSB0aGluaw0KdGhhdCBtZWFucyB0aGF0IHRoZXJlIGlzIHNvbWV0aGluZyB3
+cm9uZyB3aXRoIHRoZSBOVk1lIGRyaXZlci4NCg0KQmFydC4=
