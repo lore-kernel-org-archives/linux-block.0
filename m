@@ -1,44 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40908 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750865AbdIOQqB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 12:46:01 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Jens Axboe <axboe@fb.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/5] dm-mpath: return DM_MAPIO_REQUEUE in case of rq allocation failure
-Date: Sat, 16 Sep 2017 00:44:53 +0800
-Message-Id: <20170915164456.9803-3-ming.lei@redhat.com>
-In-Reply-To: <20170915164456.9803-1-ming.lei@redhat.com>
-References: <20170915164456.9803-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <SRS0=Zp6A=AU=goodmis.org=rostedt@kernel.org>
+Date: Tue, 19 Sep 2017 17:58:23 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Waiman Long <longman@redhat.com>, Jens Axboe <axboe@kernel.dk>, Ingo
+ Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-nilfs@vger.kernel.org, cluster-devel@redhat.com, Bart Van Assche
+ <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH v6 1/2] blktrace: Fix potentail deadlock between delete
+ & sysfs ops
+Message-ID: <20170919175823.51e3413d@gandalf.local.home>
+In-Reply-To: <20170919204135.GA7411@infradead.org>
+References: <1505760831-7747-1-git-send-email-longman@redhat.com>
+	<1505760831-7747-2-git-send-email-longman@redhat.com>
+	<20170919000155.GA30806@infradead.org>
+	<aaa854ce-3e87-2a71-5f12-08db9bfbe837@redhat.com>
+	<20170919143811.GB15944@infradead.org>
+	<a4934514-092b-f879-a9e7-ae7a2fd4198c@redhat.com>
+	<20170919204135.GA7411@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <linux-block@vger.kernel.org>
 
-blk-mq will rerun queue via RESTART after one request is completion,
-so not necessary to wait random time for requeuing, it should trust
-blk-mq to do it.
+On Tue, 19 Sep 2017 13:41:35 -0700
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-mpath.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Call it blk_trace mutex and move it right next to the blk_trace
+> structure:
+> 
+> ifdef CONFIG_BLK_DEV_IO_TRACE
+>         struct blk_trace        *blk_trace;
+> 	struct mutex		blk_trace_mutex;
+> #endif
+> 
+> which makes it completely obvious to any read what you are protecting
+> with it.
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 96aedaac2c64..f5a1088a6e79 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -505,7 +505,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 			atomic_inc(&m->pg_init_in_progress);
- 			activate_or_offline_path(pgpath);
- 		}
--		return DM_MAPIO_DELAY_REQUEUE;
-+		return DM_MAPIO_REQUEUE;
- 	}
- 	clone->bio = clone->biotail = NULL;
- 	clone->rq_disk = bdev->bd_disk;
--- 
-2.9.5
+As a 1000ft away bystander, this appears to be the most logical
+solution.
+
+-- Steve
