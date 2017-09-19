@@ -1,328 +1,142 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:48753 "EHLO
-        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751278AbdIOMf7 (ORCPT
+Received: from hmm.wantstofly.org ([138.201.34.84]:35518 "EHLO
+        mail.wantstofly.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751057AbdISK2l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 08:35:59 -0400
-Received: by mail-wm0-f53.google.com with SMTP id r68so7947681wmg.3
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:35:58 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+        Tue, 19 Sep 2017 06:28:41 -0400
+Date: Tue, 19 Sep 2017 13:22:49 +0300
+From: Lennert Buytenhek <buytenh@wantstofly.org>
 To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: guarantee line integrity on reads
-Date: Fri, 15 Sep 2017 14:35:49 +0200
-Message-Id: <1505478953-16915-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1505478953-16915-1-git-send-email-javier@cnexlabs.com>
-References: <1505478953-16915-1-git-send-email-javier@cnexlabs.com>
+Subject: blkdiscard apparently failing to fully discard a SATA SSD
+Message-ID: <20170919102249.GN1169@wantstofly.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When a line is recycled during garbage collection, reads can still be
-issued to the line. If the line is freed in the middle of this process,
-data corruption might occur.
+Hello!
 
-This patch guarantees that lines are not freed in the middle of reads
-that target them (lines). Specifically, we use the existing line
-reference to decide when a line is eligible for being freed after the
-recycle process.
+When I use blkdiscard to trim a SATA SSD in its entirety, it seems that
+not all sectors are getting trimmed.  I initially ran into this on a
+Sandisk SDSSDA240G, but I reproduced it on a Samsung 850 EVO M.2 250GB
+and a few other SATA SSDs.  This happens on Fedora kernel
+"4.11.11-300.fc26.x86_64" and a few other Fedora kernels.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c | 56 ++++++++++++++++++++++++++++++----
- drivers/lightnvm/pblk-init.c | 14 +++++++--
- drivers/lightnvm/pblk-read.c | 71 +++++++++++++++++++++++++++++++++-----------
- drivers/lightnvm/pblk.h      |  2 ++
- 4 files changed, 118 insertions(+), 25 deletions(-)
+For this test, I have the following SSD:
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 5e6a881e3434..d2587e37034f 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1458,10 +1458,8 @@ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
- 	line->emeta = NULL;
- }
- 
--void pblk_line_put(struct kref *ref)
-+static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- {
--	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
--	struct pblk *pblk = line->pblk;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 
- 	spin_lock(&line->lock);
-@@ -1479,6 +1477,43 @@ void pblk_line_put(struct kref *ref)
- 	pblk_rl_free_lines_inc(&pblk->rl, line);
- }
- 
-+static void pblk_line_put_ws(struct work_struct *work)
-+{
-+	struct pblk_line_ws *line_put_ws = container_of(work,
-+						struct pblk_line_ws, ws);
-+	struct pblk *pblk = line_put_ws->pblk;
-+	struct pblk_line *line = line_put_ws->line;
-+
-+	__pblk_line_put(pblk, line);
-+	mempool_free(line_put_ws, pblk->gen_ws_pool);
-+}
-+
-+void pblk_line_put(struct kref *ref)
-+{
-+	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
-+	struct pblk *pblk = line->pblk;
-+
-+	__pblk_line_put(pblk, line);
-+}
-+
-+void pblk_line_put_wq(struct kref *ref)
-+{
-+	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
-+	struct pblk *pblk = line->pblk;
-+	struct pblk_line_ws *line_put_ws;
-+
-+	line_put_ws = mempool_alloc(pblk->gen_ws_pool, GFP_ATOMIC);
-+	if (!line_put_ws)
-+		return;
-+
-+	line_put_ws->pblk = pblk;
-+	line_put_ws->line = line;
-+	line_put_ws->priv = NULL;
-+
-+	INIT_WORK(&line_put_ws->ws, pblk_line_put_ws);
-+	queue_work(pblk->r_end_wq, &line_put_ws->ws);
-+}
-+
- int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
- {
- 	struct nvm_rq *rqd;
-@@ -1886,8 +1921,19 @@ void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
- 	int i;
- 
- 	spin_lock(&pblk->trans_lock);
--	for (i = 0; i < nr_secs; i++)
--		ppas[i] = pblk_trans_map_get(pblk, blba + i);
-+	for (i = 0; i < nr_secs; i++) {
-+		struct ppa_addr ppa;
-+
-+		ppa = ppas[i] = pblk_trans_map_get(pblk, blba + i);
-+
-+		/* If the L2P entry maps to a line, the reference is valid */
-+		if (!pblk_ppa_empty(ppa) && !pblk_addr_in_cache(ppa)) {
-+			int line_id = pblk_dev_ppa_to_line(ppa);
-+			struct pblk_line *line = &pblk->lines[line_id];
-+
-+			kref_get(&line->ref);
-+		}
-+	}
- 	spin_unlock(&pblk->trans_lock);
- }
- 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index df86cf98ef4d..670e5858611e 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -271,15 +271,22 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->bb_wq)
- 		goto free_close_wq;
- 
-+	pblk->r_end_wq = alloc_workqueue("pblk-read-end-wq",
-+			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
-+	if (!pblk->r_end_wq)
-+		goto free_bb_wq;
-+
- 	if (pblk_set_ppaf(pblk))
--		goto free_bb_wq;
-+		goto free_r_end_wq;
- 
- 	if (pblk_rwb_init(pblk))
--		goto free_bb_wq;
-+		goto free_r_end_wq;
- 
- 	INIT_LIST_HEAD(&pblk->compl_list);
- 	return 0;
- 
-+free_r_end_wq:
-+	destroy_workqueue(pblk->r_end_wq);
- free_bb_wq:
- 	destroy_workqueue(pblk->bb_wq);
- free_close_wq:
-@@ -304,6 +311,9 @@ static void pblk_core_free(struct pblk *pblk)
- 	if (pblk->close_wq)
- 		destroy_workqueue(pblk->close_wq);
- 
-+	if (pblk->r_end_wq)
-+		destroy_workqueue(pblk->r_end_wq);
-+
- 	if (pblk->bb_wq)
- 		destroy_workqueue(pblk->bb_wq);
- 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index a465d9980df4..402f8eff6a2e 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -130,9 +130,34 @@ static void pblk_read_check(struct pblk *pblk, struct nvm_rq *rqd,
- 	}
- }
- 
--static void pblk_end_io_read(struct nvm_rq *rqd)
-+static void pblk_read_put_rqd_kref(struct pblk *pblk, struct nvm_rq *rqd)
-+{
-+	struct ppa_addr *ppa_list;
-+	int i;
-+
-+	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
-+
-+	for (i = 0; i < rqd->nr_ppas; i++) {
-+		struct ppa_addr ppa = ppa_list[i];
-+		struct pblk_line *line;
-+
-+		line = &pblk->lines[pblk_dev_ppa_to_line(ppa)];
-+		kref_put(&line->ref, pblk_line_put_wq);
-+	}
-+}
-+
-+static void pblk_end_user_read(struct bio *bio)
-+{
-+#ifdef CONFIG_NVM_DEBUG
-+	WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
-+#endif
-+	bio_endio(bio);
-+	bio_put(bio);
-+}
-+
-+static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
-+			       bool put_line)
- {
--	struct pblk *pblk = rqd->private;
- 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
- 	struct bio *bio = rqd->bio;
- 
-@@ -146,15 +171,11 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
- 	pblk_read_check(pblk, rqd, r_ctx->lba);
- 
- 	bio_put(bio);
--	if (r_ctx->private) {
--		struct bio *orig_bio = r_ctx->private;
-+	if (r_ctx->private)
-+		pblk_end_user_read((struct bio *)r_ctx->private);
- 
--#ifdef CONFIG_NVM_DEBUG
--		WARN_ONCE(orig_bio->bi_status, "pblk: corrupted read bio\n");
--#endif
--		bio_endio(orig_bio);
--		bio_put(orig_bio);
--	}
-+	if (put_line)
-+		pblk_read_put_rqd_kref(pblk, rqd);
- 
- #ifdef CONFIG_NVM_DEBUG
- 	atomic_long_add(rqd->nr_ppas, &pblk->sync_reads);
-@@ -165,6 +186,13 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
- 	atomic_dec(&pblk->inflight_io);
- }
- 
-+static void pblk_end_io_read(struct nvm_rq *rqd)
-+{
-+	struct pblk *pblk = rqd->private;
-+
-+	__pblk_end_io_read(pblk, rqd, true);
-+}
-+
- static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 				      unsigned int bio_init_idx,
- 				      unsigned long *read_bitmap)
-@@ -233,8 +261,12 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	}
- 
- 	if (unlikely(nr_secs > 1 && nr_holes == 1)) {
-+		struct ppa_addr ppa;
-+
-+		ppa = rqd->ppa_addr;
- 		rqd->ppa_list = ppa_ptr;
- 		rqd->dma_ppa_list = dma_ppa_list;
-+		rqd->ppa_list[0] = ppa;
- 	}
- 
- 	for (i = 0; i < nr_secs; i++) {
-@@ -246,6 +278,11 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	i = 0;
- 	hole = find_first_zero_bit(read_bitmap, nr_secs);
- 	do {
-+		int line_id = pblk_dev_ppa_to_line(rqd->ppa_list[i]);
-+		struct pblk_line *line = &pblk->lines[line_id];
-+
-+		kref_put(&line->ref, pblk_line_put);
-+
- 		meta_list[hole].lba = lba_list_media[i];
- 
- 		src_bv = new_bio->bi_io_vec[i++];
-@@ -269,19 +306,17 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	bio_put(new_bio);
- 
- 	/* Complete the original bio and associated request */
-+	bio_endio(bio);
- 	rqd->bio = bio;
- 	rqd->nr_ppas = nr_secs;
--	rqd->private = pblk;
- 
--	bio_endio(bio);
--	pblk_end_io_read(rqd);
-+	__pblk_end_io_read(pblk, rqd, false);
- 	return NVM_IO_OK;
- 
- err:
- 	/* Free allocated pages in new bio */
- 	pblk_bio_free_pages(pblk, bio, 0, new_bio->bi_vcnt);
--	rqd->private = pblk;
--	pblk_end_io_read(rqd);
-+	__pblk_end_io_read(pblk, rqd, false);
- 	return NVM_IO_ERR;
- }
- 
-@@ -314,11 +349,11 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 			goto retry;
- 		}
- 
-+		WARN_ON(test_and_set_bit(0, read_bitmap));
- 		meta_list[0].lba = cpu_to_le64(lba);
- 
--		WARN_ON(test_and_set_bit(0, read_bitmap));
- #ifdef CONFIG_NVM_DEBUG
--			atomic_long_inc(&pblk->cache_reads);
-+		atomic_long_inc(&pblk->cache_reads);
- #endif
- 	} else {
- 		rqd->ppa_addr = ppa;
-@@ -383,7 +418,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	if (bitmap_full(&read_bitmap, nr_secs)) {
- 		bio_endio(bio);
- 		atomic_inc(&pblk->inflight_io);
--		pblk_end_io_read(rqd);
-+		__pblk_end_io_read(pblk, rqd, false);
- 		return NVM_IO_OK;
- 	}
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index ac65e778b40d..8e9ae213b707 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -635,6 +635,7 @@ struct pblk {
- 
- 	struct workqueue_struct *close_wq;
- 	struct workqueue_struct *bb_wq;
-+	struct workqueue_struct *r_end_wq;
- 
- 	struct timer_list wtimer;
- 
-@@ -740,6 +741,7 @@ int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
- 			 void *emeta_buf);
- int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr erase_ppa);
- void pblk_line_put(struct kref *ref);
-+void pblk_line_put_wq(struct kref *ref);
- struct list_head *pblk_line_gc_list(struct pblk *pblk, struct pblk_line *line);
- u64 pblk_lookup_page(struct pblk *pblk, struct pblk_line *line);
- void pblk_dealloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
--- 
-2.7.4
+	[root@testbox ~]# smartctl -a /dev/sda
+	smartctl 6.5 2016-05-07 r4318 [x86_64-linux-4.11.11-300.fc26.x86_64] (local build)
+	Copyright (C) 2002-16, Bruce Allen, Christian Franke, www.smartmontools.org
+
+	=== START OF INFORMATION SECTION ===
+	Model Family:     SandForce Driven SSDs
+	Device Model:     SanDisk SDSSDA240G
+	Serial Number:    154307402302
+	LU WWN Device Id: 5 001b44 ef905163e
+	Firmware Version: Z22000RL
+	User Capacity:    240,057,409,536 bytes [240 GB]
+	[...]
+
+Which at the start of the test is completely "empty":
+
+	[root@testbox ~]# cat /dev/sda | od -t x1 -Ax -
+	000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*
+	37e4896000
+	[root@testbox ~]#
+
+I then write a 64 bit byte offset from the start of the disk to every
+64 bit word, which looks as follows:
+
+	[root@testbox ~]# cat /dev/sda | od -Ax -t x1 - | head -5
+	000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08
+	000010 00 00 00 00 00 00 00 10 00 00 00 00 00 00 00 18
+	000020 00 00 00 00 00 00 00 20 00 00 00 00 00 00 00 28
+	000030 00 00 00 00 00 00 00 30 00 00 00 00 00 00 00 38
+	000040 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 48
+	[root@testbox ~]# cat /dev/sda | od -Ax -t x1 - | head -1048576 | tail -5
+	ffffb0 00 00 00 00 00 ff ff b0 00 00 00 00 00 ff ff b8
+	ffffc0 00 00 00 00 00 ff ff c0 00 00 00 00 00 ff ff c8
+	ffffd0 00 00 00 00 00 ff ff d0 00 00 00 00 00 ff ff d8
+	ffffe0 00 00 00 00 00 ff ff e0 00 00 00 00 00 ff ff e8
+	fffff0 00 00 00 00 00 ff ff f0 00 00 00 00 00 ff ff f8
+	[root@testbox ~]#
+
+I then blkdiscard the whole SSD in one go:
+
+	[root@testbox ~]# blkdiscard -v /dev/sda
+	/dev/sda: Discarded 240057409536 bytes from the offset 0
+	[root@testbox ~]#
+
+>From summing iostat kB_wrtn column data during the blkdiscard, it seems
+that all of the sectors on the SSD should have been covered by the trim
+operation, but this doesn't seem to zero all of the sectors -- some of
+them keep their original contents:
+
+	[root@testbox ~]# cat /dev/sda | od -Ax -t x1 - | head -10
+	000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*
+	1fff000 00 00 00 00 01 ff f0 00 00 00 00 00 01 ff f0 08
+	1fff010 00 00 00 00 01 ff f0 10 00 00 00 00 01 ff f0 18
+	1fff020 00 00 00 00 01 ff f0 20 00 00 00 00 01 ff f0 28
+	1fff030 00 00 00 00 01 ff f0 30 00 00 00 00 01 ff f0 38
+	1fff040 00 00 00 00 01 ff f0 40 00 00 00 00 01 ff f0 48
+	1fff050 00 00 00 00 01 ff f0 50 00 00 00 00 01 ff f0 58
+	1fff060 00 00 00 00 01 ff f0 60 00 00 00 00 01 ff f0 68
+	1fff070 00 00 00 00 01 ff f0 70 00 00 00 00 01 ff f0 78
+	[...]
+
+More specifically, there's this pattern:
+
+	[root@testbox ~]# cat /dev/sda | od -Ax -t x1 - | grep -A1 -B2 '^*' | head -20
+	000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*
+	1fff000 00 00 00 00 01 ff f0 00 00 00 00 00 01 ff f0 08
+	--
+	1fffff0 00 00 00 00 01 ff ff f0 00 00 00 00 01 ff ff f8
+	2000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*
+	3fff000 00 00 00 00 03 ff f0 00 00 00 00 00 03 ff f0 08
+	--
+	3fffff0 00 00 00 00 03 ff ff f0 00 00 00 00 03 ff ff f8
+	4000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*
+	5fff000 00 00 00 00 05 ff f0 00 00 00 00 00 05 ff f0 08
+	--
+	5fffff0 00 00 00 00 05 ff ff f0 00 00 00 00 05 ff ff f8
+	6000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*
+	7fff000 00 00 00 00 07 ff f0 00 00 00 00 00 07 ff f0 08
+	--
+	7fffff0 00 00 00 00 07 ff ff f0 00 00 00 00 07 ff ff f8
+	[...]
+
+Even if trimming a sector doesn't guarantee that subsequent reads will
+return zeroes, the weird thing is is that this behavior seems to be
+consistent across different SSD models, down to which specific sectors
+are zeroed and which are not.
+
+If I blkdiscard the whole SSD again, the same pattern remains on the
+disk, but if I blkdiscard it again with an appropriate offset:
+
+	[root@testbox ~]# blkdiscard -v -o 1048576 /dev/sda
+	/dev/sda: Discarded 240056360960 bytes from the offset 1048576
+	[root@testbox ~]#
+
+I then get an SSD that returns zeroes again from every sector:
+
+	[root@testbox ~]# cat /dev/sda | od -t x1 -Ax -
+	000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*
+	37e4896000
+	[root@testbox ~]#
+
+Since the pattern seems to be a consistent untrimmed 4096 bytes every
+32 MiB, I wonder if there is maybe some off-by-one in discard request
+processing somewhere.
+
+Can anyone other than me reproduce this?
+
+
+Cheers,
+Lennert
