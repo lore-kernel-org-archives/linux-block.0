@@ -1,68 +1,49 @@
-Return-Path: <BATV+d2af373be13e0fb4228a+5141+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Wed, 20 Sep 2017 14:29:28 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [GIT PULL] nvme fixes for 4.14-rc2
-Message-ID: <20170920212928.wfzm34jajrpzmmdy@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:55762 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751186AbdISDtz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Sep 2017 23:49:55 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 01/10] blk-mq: only run hw queues for blk-mq
+Date: Tue, 19 Sep 2017 11:49:16 +0800
+Message-Id: <20170919034925.9894-2-ming.lei@redhat.com>
+In-Reply-To: <20170919034925.9894-1-ming.lei@redhat.com>
+References: <20170919034925.9894-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+This patch just makes it explicitely.
 
-a couple nvme fixes for -rc2 are below:
+Tested-by: Cathy Avery <cavery@redhat.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- - fixes for the Fibre Channel host/target to fix spec compliance
- - allow a zero keep alive timeout
- - make the debug printk for broken SGLs work better
- - fix queue zeroing during initialization
-
-The following changes since commit da357321837921f52c386f2123c6718443fbb844:
-
-  bsg-lib: don't free job in bsg_prepare_job (2017-09-14 22:32:03 -0600)
-
-are available in the git repository at:
-
-  ssh://git.infradead.org/srv/git/nvme.git nvme-4.14
-
-for you to fetch changes up to f48b6b902ead0f3a1b5cfb0d157cc022f676de94:
-
-  nvmet: implement valid sqhd values in completions (2017-09-20 10:52:40 -0700)
-
-----------------------------------------------------------------
-Guilherme G. Piccoli (1):
-      nvme-fabrics: Allow 0 as KATO value
-
-James Smart (12):
-      nvme-fc: remove use of FC-specific error codes
-      nvmet-fc: remove use of FC-specific error codes
-      nvmet-fcloop: remove use of FC-specific error codes
-      lpfc: remove use of FC-specific error codes
-      qla2xxx: remove use of FC-specific error codes
-      nvme.h: remove FC transport-specific error values
-      nvme: add transport SGL definitions
-      nvme-fc: use transport-specific sgl format
-      nvmet-fc: fix failing max io queue connections
-      nvme: stop aer posting if controller state not live
-      nvme: allow timed-out ios to retry
-      nvmet: implement valid sqhd values in completions
-
-Keith Busch (2):
-      nvme-pci: initialize queue memory before interrupts
-      nvme-pci: Print invalid SGL only once
-
- drivers/nvme/host/core.c          |  7 +++----
- drivers/nvme/host/fabrics.c       | 18 +++++++++---------
- drivers/nvme/host/fc.c            | 21 +++++++++++----------
- drivers/nvme/host/pci.c           | 34 ++++++++++++++++++++--------------
- drivers/nvme/target/core.c        |  8 ++++----
- drivers/nvme/target/fabrics-cmd.c |  9 +++++++--
- drivers/nvme/target/fc.c          | 15 ++++++---------
- drivers/nvme/target/fcloop.c      |  2 +-
- drivers/nvme/target/nvmet.h       |  1 +
- drivers/scsi/lpfc/lpfc_nvme.c     |  2 +-
- drivers/scsi/qla2xxx/qla_nvme.c   |  2 +-
- include/linux/nvme.h              | 19 ++++++-------------
- 12 files changed, 70 insertions(+), 68 deletions(-)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 98a18609755e..6fd9f86fc86d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+ 	if (freeze_depth == 1) {
+ 		percpu_ref_kill(&q->q_usage_counter);
+-		blk_mq_run_hw_queues(q, false);
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, false);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+-- 
+2.9.5
