@@ -1,33 +1,41 @@
 Return-Path: <Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "keith.busch@intel.com" <keith.busch@intel.com>, "tom.leiming@gmail.com"
-	<tom.leiming@gmail.com>
+To: "keith.busch@intel.com" <keith.busch@intel.com>
 CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
 	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [RFC PATCH] blk-mq: Fix lost request during timeout
-Date: Tue, 19 Sep 2017 15:18:45 +0000
-Message-ID: <1505834324.2671.13.camel@wdc.com>
+Date: Tue, 19 Sep 2017 15:05:32 +0000
+Message-ID: <1505833531.2671.7.camel@wdc.com>
 References: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
 	 <1505772477.12701.6.camel@wdc.com>
 	 <20170918223900.GA4671@localhost.localdomain>
 	 <1505775191.12701.20.camel@wdc.com>
 	 <20170918230803.GB4671@localhost.localdomain>
-	 <CACVXFVO4joG1zzipABWK4bc5Rwo9bDa4by4_mFOTx10nQPAUpQ@mail.gmail.com>
-	 <20170919150721.GA6180@localhost.localdomain>
-In-Reply-To: <20170919150721.GA6180@localhost.localdomain>
+	 <1505776477.12701.28.camel@wdc.com>
+	 <20170919015533.GC4671@localhost.localdomain>
+In-Reply-To: <20170919015533.GC4671@localhost.localdomain>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTA5LTE5IGF0IDExOjA3IC0wNDAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
-VGhlIHByb2JsZW0gaXMgd2hlbiBibGstbXEncyB0aW1lb3V0IGhhbmRsZXIgcHJldmVudHMgdGhl
-IHJlcXVlc3QgZnJvbQ0KPiBjb21wbGV0aW5nLCBhbmQgZG9lc24ndCBsZWF2ZSBhbnkgaW5kaWNh
-dGlvbiB0aGUgZHJpdmVyIHJlcXVlc3RlZCB0bw0KPiBjb21wbGV0ZSBpdC4gV2hvIGlzIHJlc3Bv
-bnNpYmxlIGZvciBjb21wbGV0aW5nIHRoYXQgcmVxdWVzdCBub3c/DQoNCkhlbGxvIEtlaXRoLA0K
-DQpNeSB1bmRlcnN0YW5kaW5nIGlzIHRoYXQgYmxvY2sgZHJpdmVycyBhcmUgcmVzcG9uc2libGUg
-Zm9yIGNvbXBsZXRpbmcgdGltZWQNCm91dCByZXF1ZXN0cyBieSB1c2luZyBvbmUgb2YgdGhlIGZv
-bGxvd2luZyBhcHByb2FjaGVzOg0KKiBCeSByZXR1cm5pbmcgQkxLX0VIX0hBTkRMRUQgb3IgQkxL
-X0VIX1JFU0VUX1RJTUVSIGZyb20gaW5zaWRlIHRoZSB0aW1lb3V0DQogIGhhbmRsZXIuDQoqIEJ5
-IHJldHVybmluZyBCTEtfRUhfTk9UX0hBTkRMRUQgYW5kIGJ5IGNhbGxpbmcgYmxrX21xX2VuZF9y
-ZXF1ZXN0KCkgb3INCiAgX19ibGtfbXFfZW5kX3JlcXVlc3QoKSBmb3IgdGhlIHJlcXVlc3QgdGhh
-dCB0aW1lZCBvdXQuDQoNCkJhcnQuIA==
+T24gTW9uLCAyMDE3LTA5LTE4IGF0IDIxOjU1IC0wNDAwLCBLZWl0aCBCdXNjaCB3cm90ZToNCj4g
+VGhlIG9ubHkgd2F5IHRvIGNvbXBsZXRlIHRoYXQgcmVxdWVzdCBub3cgaXMgaWYgdGhlIHRpbWVv
+dXQNCj4gaGFuZGxlciByZXR1cm5zIEJMS19FSF9IQU5ETEVELCBidXQgdGhlIHNjc2ktbXEgYWJv
+cnQgcGF0aCByZXR1cm5zDQo+IEJMS19FSF9OT1RfSEFORExFRCBvbiBzdWNjZXNzICh2ZXJ5IGZl
+dyBkcml2ZXJzIGFjdHVhbGx5IHJldHVybg0KPiBCTEtfRUhfSEFORExFRCkuDQo+IA0KPiBBZnRl
+ciB0aGUgdGltZW91dCBoYW5kbGVyIHJ1bnMsIGl0J3Mgb25jZSBhZ2FpbiBwb3NzaWJsZSBmb3Ig
+dGhlIGRyaXZlciB0bw0KPiBjb21wbGV0ZSB0aGUgcmVxdWVzdCBpZiBpdCByZXR1cm5lZCBCTEtf
+RUhfUkVTRVRfVElNRVIsIGJ1dCBpZiB0aGUgZHJpdmVyDQo+IGFscmVhZHkgY29tcGxldGVkIHRo
+ZSBjb21tYW5kIGR1cmluZyB0aGUgdGltZW91dCBoYW5kbGVyLCBob3cgaXMgdGhlDQo+IGRyaXZl
+ciBzdXBwb3NlZCB0byBrbm93IGl0IG5lZWRzIHRvIGNvbXBsZXRlIHRoZSByZXF1ZXN0IGEgc2Vj
+b25kIHRpbWU/DQoNCkhlbGxvIEtlaXRoLA0KDQpJZiB5b3UgaGF2ZSBhIGxvb2sgYXQgc2NtZF9l
+aF9hYm9ydF9oYW5kbGVyKCkgdGhlbiB5b3Ugd2lsbCBzZWUgdGhhdCBpdCBlaXRoZXINCmNhbGxz
+IHNjc2lfcXVldWVfaW5zZXJ0KCksIHNjc2lfZmluaXNoX2NvbW1hbmQoKSBvciBzY3NpX2VoX3Nj
+bWRfYWRkKCkuDQpzY3NpX3F1ZXVlX2luc2VydCgpIHJlaW5zZXJ0cyB0aGUgcmVxdWVzdC4gc2Nz
+aV9laF9zY21kX2FkZCgpIHdha2VzIHVwIHRoZQ0KZXJyb3IgaGFuZGxlciB0aHJlYWQgdG8gcGVy
+Zm9ybSBmdXJ0aGVyIGVycm9yIGhhbmRsaW5nIGVzY2FsYXRpb24uDQpzY3NpX2ZpbmlzaF9jb21t
+YW5kKCkgY2FsbHMgc2NzaV9lbmRfcmVxdWVzdCgpLiBUaGF0IGxhc3QgZnVuY3Rpb24gaW4gdHVy
+bg0KY2FsbHMgX19ibGtfbXFfZW5kX3JlcXVlc3QoKS4gX19ibGtfbXFfZW5kX3JlcXVlc3QoKSBk
+b2VzIG5vdCBjaGVjaw0KUkVRX0FUT01fQ09NUExFVEUuIFNvcnJ5IGJ1dCB0aGUgc3VtbWFyeSBp
+cyB0aGF0IEkgZG8gbm90IGFncmVlIHdpdGggeW91DQp0aGF0IHRoZSBTQ1NJIGNvcmUgY2FuIGxv
+c2UgcmVxdWVzdHMuDQoNCkJhcnQu
