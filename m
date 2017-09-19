@@ -1,13 +1,12 @@
 Return-Path: <keith.busch@intel.com>
-Date: Tue, 19 Sep 2017 12:39:29 -0400
+Date: Tue, 19 Sep 2017 12:00:05 -0400
 From: Keith Busch <keith.busch@intel.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
-	"hch@lst.de" <hch@lst.de>,
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@lst.de" <hch@lst.de>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [RFC PATCH] blk-mq: Fix lost request during timeout
-Message-ID: <20170919163929.GC6180@localhost.localdomain>
+Message-ID: <20170919160004.GB6180@localhost.localdomain>
 References: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
  <1505772477.12701.6.camel@wdc.com>
  <20170918223900.GA4671@localhost.localdomain>
@@ -15,38 +14,57 @@ References: <1505772186-4601-1-git-send-email-keith.busch@intel.com>
  <20170918230803.GB4671@localhost.localdomain>
  <CACVXFVO4joG1zzipABWK4bc5Rwo9bDa4by4_mFOTx10nQPAUpQ@mail.gmail.com>
  <20170919150721.GA6180@localhost.localdomain>
- <1505834324.2671.13.camel@wdc.com>
+ <CACVXFVOyAeFEQCVznKCtD_-gMPCi+5+v+-kgscYxgP642QCB7A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1505834324.2671.13.camel@wdc.com>
+In-Reply-To: <CACVXFVOyAeFEQCVznKCtD_-gMPCi+5+v+-kgscYxgP642QCB7A@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 19, 2017 at 03:18:45PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-09-19 at 11:07 -0400, Keith Busch wrote:
+On Tue, Sep 19, 2017 at 11:22:20PM +0800, Ming Lei wrote:
+> On Tue, Sep 19, 2017 at 11:07 PM, Keith Busch <keith.busch@intel.com> wrote:
+> > On Tue, Sep 19, 2017 at 12:16:31PM +0800, Ming Lei wrote:
+> >> On Tue, Sep 19, 2017 at 7:08 AM, Keith Busch <keith.busch@intel.com> wrote:
+> >> >
+> >> > Indeed that prevents .complete from running concurrently with the
+> >> > timeout handler, but scsi_mq_done and nvme_handle_cqe are not .complete
+> >> > callbacks. These are the LLD functions that call blk_mq_complete_request
+> >> > well before .complete. If the driver calls blk_mq_complete_request on
+> >> > a request that blk-mq is timing out, the request is lost because blk-mq
+> >> > already called blk_mark_rq_complete. Nothing prevents these LLD functions
+> >>
+> >> That shouldn't happen because only one blk_mark_rq_complete() can win
+> >> and it is the winner's responsibility to complete the request, so
+> >> there shouldn't
+> >> be request lost. Especially in your case, it is the responsibility of timeout
+> >> to complete the rq really.
+> >
+> > Hm, either I'm explaining this poorly, or I'm missing something that's
+> > obvious to everyone else.
+> >
+> > The driver's IRQ handler has no idea it's racing with the blk-mq timeout
+> > handler, and there's nothing indicating it lost the race. The IRQ handler
+> > just calls blk_mq_complete_request. As far as the driver is concerned,
+> > it has done its part to complete the request at that point.
+> 
+> Both blk_mark_rq_complete() and blk_mq_check_expired() calls
+> blk_mark_rq_complete() to try to complete the req, but only
+> one of them can do that actually, right?
+
+Yes, only one can successfully call that.
+
+The problem I'm asking about is the driver's IRQ handler doesn't know it
+lost the race. Only blk-mq knows that. At the point the driver's timeout
+handler runs, the driver believes it already completed the request.
+ 
 > > The problem is when blk-mq's timeout handler prevents the request from
 > > completing, and doesn't leave any indication the driver requested to
 > > complete it. Who is responsible for completing that request now?
 > 
-> Hello Keith,
-> 
-> My understanding is that block drivers are responsible for completing timed
-> out requests by using one of the following approaches:
-> * By returning BLK_EH_HANDLED or BLK_EH_RESET_TIMER from inside the timeout
->   handler.
+> Who sets ATOM_COMPLETE successfully is responsible for completing
+> the request. In this case it should be timeout handler, and irq handler
+> shouldn't touch the request any more, otherwise use-after-free may
+> happen.
 
-No problem with BLK_EH_HANDLED when timeout handler completes the
-request. That usage at least makes sense.
-
-In NVMe, we use BLK_EH_RESET_TIMER if the driver does an asynchronous
-action to reclaim the request. If the request is returned very soon though
-(before blk-mq clears ATOM_COMPLETE), blk_mq_complete_request will still
-to do nothing.
-
-> * By returning BLK_EH_NOT_HANDLED and by calling blk_mq_end_request() or
->   __blk_mq_end_request() for the request that timed out.
-
-You want to bypass __blk_mq_complete_request? Doesn't that actually do
-important things with queue and scheduler stats? If it's not important,
-then this sounds like the piece I'm looking for, but this also puts a
-burden on the driver to track the state of their requests that blk-mq
-could do for all drivers.
+Blk-mq sets ATOM_COMPLETE well before the driver's timeout handler is
+executed. The IRQ handler doesn't know blk-mq did that, so suggesting
+the IRQ handler can't touch the request doesn't make sense.
