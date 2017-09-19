@@ -1,90 +1,102 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Follow up block fixes for 4.14-rc1
-Message-ID: <fb92792d-5a62-9058-627c-0f9ddd90457f@kernel.dk>
-Date: Wed, 13 Sep 2017 08:12:05 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:51142 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751284AbdISDvj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Sep 2017 23:51:39 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 10/10] SCSI: preempt freeze block queue when SCSI device is put into quiesce
+Date: Tue, 19 Sep 2017 11:49:25 +0800
+Message-Id: <20170919034925.9894-11-ming.lei@redhat.com>
+In-Reply-To: <20170919034925.9894-1-ming.lei@redhat.com>
+References: <20170919034925.9894-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+Simply quiesing SCSI device and waiting for completeion of IO
+dispatched to SCSI queue isn't safe, it is easy to use up
+request pool because all allocated requests before can't
+be dispatched when device is put in QIUESCE. Then no request
+can be allocated for RQF_PREEMPT, and system may hang somewhere,
+such as When sending commands of sync_cache or start_stop during
+system suspend path.
 
-Small collection of fixes that would be nice to have in -rc1. This pull
-request contains:
+Before quiesing SCSI, this patch freezes block queue in preempt
+mode first, so no new normal request can enter queue any more,
+and all pending requests are drained too once blk_freeze_queue_preempt
+is returned. Then RQF_PREEMPT can be allocated successfully duirng
+preempt freeze.
 
-- NVMe pull request form Christoph, mostly with fixes for nvme-pci,
-  host memory buffer in particular.
+Tested-by: Cathy Avery <cavery@redhat.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/scsi_lib.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-- Error handling fixup for cgwb_create(), in case allocation of 'wb'
-  fails. From Christophe JAILLET.
-
-- Ensure that trace_block_getrq() gets the 'dev' in an appropriate
-  fashion, to avoid a potential NULL deref. From Greg Thelen.
-
-- Regression fix for dm-mq with blk-mq, fixing a problem with stacking
-  IO schedulers. From me.
-
-- string.h fixup, fixing an issue with memcpy_and_pad(). This original
-  change came in through an NVMe dependency, which is why I'm including
-  it here. From Martin Wilck.
-
-- Fix potential int overflow in __blkdev_sectors_to_bio_pages(), from
-  Mikulas.
-
-- MBR enable fix for sed-opal, from Scott.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Akinobu Mita (1):
-      nvme-pci: use appropriate initial chunk size for HMB allocation
-
-Christoph Hellwig (4):
-      nvme: fix lightnvm check
-      nvme-pci: fix host memory buffer allocation fallback
-      nvme-pci: propagate (some) errors from host memory buffer setup
-      nvme-pci: implement the HMB entry number and size limitations
-
-Christophe JAILLET (1):
-      mm/backing-dev.c: fix an error handling path in 'cgwb_create()'
-
-Greg Thelen (1):
-      block: tolerate tracing of NULL bio
-
-Jens Axboe (2):
-      Merge branch 'nvme-4.14' of git://git.infradead.org/nvme into for-linus
-      block: directly insert blk-mq request from blk_insert_cloned_request()
-
-Martin Wilck (1):
-      string.h: un-fortify memcpy_and_pad
-
-Mikulas Patocka (1):
-      block: fix integer overflow in __blkdev_sectors_to_bio_pages()
-
-Scott Bauer (1):
-      block: sed-opal: Set MBRDone on S3 resume path if TPER is MBREnabled
-
- block/blk-core.c             |  7 ++++-
- block/blk-lib.c              |  4 +--
- block/blk-mq.c               | 16 ++++++++++
- block/blk-mq.h               |  1 +
- block/opal_proto.h           |  1 +
- block/sed-opal.c             | 32 +++++++++++++++++++
- drivers/nvme/host/core.c     | 11 ++++---
- drivers/nvme/host/lightnvm.c | 26 ----------------
- drivers/nvme/host/nvme.h     | 13 +++++---
- drivers/nvme/host/pci.c      | 74 ++++++++++++++++++++++++++++++--------------
- include/linux/nvme.h         |  4 ++-
- include/linux/string.h       | 15 ++-------
- include/trace/events/block.h |  5 ++-
- mm/backing-dev.c             |  6 ++--
- 14 files changed, 134 insertions(+), 81 deletions(-)
-
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cf6a80fe297..751a956b7b2b 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -252,9 +252,10 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
+ 
+-	req = blk_get_request(sdev->request_queue,
++	req = __blk_get_request(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM,
++			BLK_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -2928,12 +2929,28 @@ scsi_device_quiesce(struct scsi_device *sdev)
+ {
+ 	int err;
+ 
++	/*
++	 * Simply quiesing SCSI device isn't safe, it is easy
++	 * to use up requests because all these allocated requests
++	 * can't be dispatched when device is put in QIUESCE.
++	 * Then no request can be allocated and we may hang
++	 * somewhere, such as system suspend/resume.
++	 *
++	 * So we freeze block queue in preempt mode first, no new
++	 * normal request can enter queue any more, and all pending
++	 * requests are drained once blk_freeze_queue_preempt()
++	 * is returned. Only RQF_PREEMPT is allowed in preempt freeze.
++	 */
++	blk_freeze_queue_preempt(sdev->request_queue);
++
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+ 	mutex_unlock(&sdev->state_mutex);
+ 
+-	if (err)
++	if (err) {
++		blk_unfreeze_queue_preempt(sdev->request_queue);
+ 		return err;
++	}
+ 
+ 	scsi_run_queue(sdev->request_queue);
+ 	while (atomic_read(&sdev->device_busy)) {
+@@ -2964,6 +2981,8 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+ 		scsi_run_queue(sdev->request_queue);
+ 	mutex_unlock(&sdev->state_mutex);
++
++	blk_unfreeze_queue_preempt(sdev->request_queue);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
+ 
 -- 
-Jens Axboe
+2.9.5
