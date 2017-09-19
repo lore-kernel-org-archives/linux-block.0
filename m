@@ -1,56 +1,53 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tom.leiming@gmail.com" <tom.leiming@gmail.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wr0-f179.google.com ([209.85.128.179]:47871 "EHLO
+        mail-wr0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750733AbdISQzj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Sep 2017 12:55:39 -0400
+MIME-Version: 1.0
+In-Reply-To: <1505839754.2671.42.camel@wdc.com>
+References: <20170915164456.9803-1-ming.lei@redhat.com> <20170915164456.9803-2-ming.lei@redhat.com>
+ <1505498249.3420.15.camel@wdc.com> <20170917124000.GB6289@ming.t460p>
+ <1505747894.2685.6.camel@wdc.com> <20170919054308.GA2517@ming.t460p>
+ <1505835394.2671.18.camel@wdc.com> <20170919155603.GB22809@redhat.com>
+ <20170919160401.GC19830@ming.t460p> <1505839754.2671.42.camel@wdc.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 20 Sep 2017 00:55:37 +0800
+Message-ID: <CACVXFVNvGna59hYG+gF7O41tKNURdbb+gm0sW-FGemnJi0RrRg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] block: don't call blk_mq_delay_run_hw_queue() in case
+ of BLK_STS_RESOURCE
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "sagi@grimberg.me" <sagi@grimberg.me>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
         "loberman@redhat.com" <loberman@redhat.com>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [PATCH 1/5] block: don't call blk_mq_delay_run_hw_queue() in case
- of BLK_STS_RESOURCE
-Date: Tue, 19 Sep 2017 18:42:30 +0000
-Message-ID: <1505846549.2671.52.camel@wdc.com>
-References: <20170915164456.9803-1-ming.lei@redhat.com>
-         <20170915164456.9803-2-ming.lei@redhat.com>
-         <1505498249.3420.15.camel@wdc.com> <20170917124000.GB6289@ming.t460p>
-         <1505747894.2685.6.camel@wdc.com> <20170919054308.GA2517@ming.t460p>
-         <1505835394.2671.18.camel@wdc.com> <20170919155603.GB22809@redhat.com>
-         <20170919160401.GC19830@ming.t460p> <1505839754.2671.42.camel@wdc.com>
-         <CACVXFVNvGna59hYG+gF7O41tKNURdbb+gm0sW-FGemnJi0RrRg@mail.gmail.com>
-In-Reply-To: <CACVXFVNvGna59hYG+gF7O41tKNURdbb+gm0sW-FGemnJi0RrRg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDE3LTA5LTIwIGF0IDAwOjU1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-V2VkLCBTZXAgMjAsIDIwMTcgYXQgMTI6NDkgQU0sIEJhcnQgVmFuIEFzc2NoZQ0KPiA8QmFydC5W
-YW5Bc3NjaGVAd2RjLmNvbT4gd3JvdGU6DQo+ID4gT24gV2VkLCAyMDE3LTA5LTIwIGF0IDAwOjA0
-ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gPiA+IFJ1biBxdWV1ZSBhdCBlbmRfaW8gaXMgZGVm
-aW5pdGVseSB3cm9uZywgYmVjYXVzZSBibGstbXEgaGFzIFNDSEVEX1JFU1RBUlQNCj4gPiA+IHRv
-IGRvIHRoYXQgYWxyZWFkeS4NCj4gPiANCj4gPiBTb3JyeSBidXQgSSBkaXNhZ3JlZS4gSWYgU0NI
-RURfUkVTVEFSVCBpcyBzZXQgdGhhdCBjYXVzZXMgdGhlIGJsay1tcSBjb3JlIHRvDQo+ID4gcmVl
-eGFtaW5lIHRoZSBzb2Z0d2FyZSBxdWV1ZXMgYW5kIHRoZSBoY3R4IGRpc3BhdGNoIGxpc3QgYnV0
-IG5vdCB0aGUgcmVxdWV1ZQ0KPiA+IGxpc3QuIElmIGEgYmxvY2sgZHJpdmVyIHJldHVybnMgQkxL
-X1NUU19SRVNPVVJDRSB0aGVuIHJlcXVlc3RzIGVuZCB1cCBvbiB0aGUNCj4gPiByZXF1ZXVlIGxp
-c3QuIEhlbmNlIHRoZSBmb2xsb3dpbmcgY29kZSBpbiBzY3NpX2VuZF9yZXF1ZXN0KCk6DQo+IA0K
-PiBUaGF0IGRvZXNuJ3QgbmVlZCBTQ0hFRF9SRVNUQVJULCBiZWNhdXNlIGl0IGlzIHJlcXVldWUn
-cw0KPiByZXNwb25zaWJpbGl0eSB0byBkbyB0aGF0LA0KPiBzZWUgYmxrX21xX3JlcXVldWVfd29y
-aygpLCB3aGljaCB3aWxsIHJ1biBodyBxdWV1ZSBhdCB0aGUgZW5kIG9mIHRoaXMgZnVuYy4NCg0K
-VGhhdCdzIG5vdCB3aGF0IEkgd2FzIHRyeWluZyB0byBleHBsYWluLiBXaGF0IEkgd2FzIHRyeWlu
-ZyB0byBleHBsYWluIGlzIHRoYXQNCmV2ZXJ5IGJsb2NrIGRyaXZlciB0aGF0IGNhbiBjYXVzZSBh
-IHJlcXVlc3QgdG8gZW5kIHVwIG9uIHRoZSByZXF1ZXVlIGxpc3QgaXMNCnJlc3BvbnNpYmxlIGZv
-ciBraWNraW5nIHRoZSByZXF1ZXVlIGxpc3QgYXQgYSBsYXRlciB0aW1lLiBIZW5jZSB0aGUNCmti
-bG9ja2Rfc2NoZWR1bGVfd29yaygmc2Rldi0+cmVxdWV1ZV93b3JrKSBjYWxsIGluIHRoZSBTQ1NJ
-IGNvcmUgYW5kIHRoZQ0KYmxrX21xX2tpY2tfcmVxdWV1ZV9saXN0KCkgYW5kIGJsa19tcV9kZWxh
-eV9raWNrX3JlcXVldWVfbGlzdCgpIGNhbGxzIGluIHRoZQ0KZG0gY29kZS4gV2hhdCBJIHdvdWxk
-IGxpa2UgdG8gc2VlIGlzIG1lYXN1cmVtZW50IHJlc3VsdHMgZm9yIGRtLW1wYXRoIHdpdGhvdXQN
-CnRoaXMgcGF0Y2ggc2VyaWVzIGFuZCBhIGNhbGwgdG8ga2ljayB0aGUgcmVxdWV1ZSBsaXN0IGFk
-ZGVkIHRvIHRoZSBkbS1tcGF0aA0KZW5kX2lvIGNvZGUuDQoNCkJhcnQu
+On Wed, Sep 20, 2017 at 12:49 AM, Bart Van Assche
+<Bart.VanAssche@wdc.com> wrote:
+> On Wed, 2017-09-20 at 00:04 +0800, Ming Lei wrote:
+>> Run queue at end_io is definitely wrong, because blk-mq has SCHED_RESTART
+>> to do that already.
+>
+> Sorry but I disagree. If SCHED_RESTART is set that causes the blk-mq core to
+> reexamine the software queues and the hctx dispatch list but not the requeue
+> list. If a block driver returns BLK_STS_RESOURCE then requests end up on the
+> requeue list. Hence the following code in scsi_end_request():
+
+That doesn't need SCHED_RESTART, because it is requeue's
+responsibility to do that,
+see blk_mq_requeue_work(), which will run hw queue at the end of this func.
+
+
+-- 
+Ming Lei
