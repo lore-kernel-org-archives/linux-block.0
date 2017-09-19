@@ -1,115 +1,164 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:35945 "EHLO mx2.mpynet.fi"
+Received: from mx1.redhat.com ([209.132.183.28]:48771 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751024AbdITS2h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2017 14:28:37 -0400
-Date: Wed, 20 Sep 2017 21:28:34 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-CC: <mb@lightnvm.io>, <axboe@fb.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@cnexlabs.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias@cnexlabs.com>
-Subject: Re: [PATCH 08/20] lightnvm: pblk: sched. metadata on write thread
-Message-ID: <20170920182834.GA25232@dhcp-216.srv.tuxera.com>
-References: <1498471049-25505-1-git-send-email-javier@cnexlabs.com>
- <1498471049-25505-9-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-In-Reply-To: <1498471049-25505-9-git-send-email-javier@cnexlabs.com>
+        id S1751309AbdISDul (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Sep 2017 23:50:41 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 05/10] block: rename .mq_freeze_wq and .mq_freeze_depth
+Date: Tue, 19 Sep 2017 11:49:20 +0800
+Message-Id: <20170919034925.9894-6-ming.lei@redhat.com>
+In-Reply-To: <20170919034925.9894-1-ming.lei@redhat.com>
+References: <20170919034925.9894-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Javier,
+Both two are used for legacy and blk-mq, so rename them
+as .freeze_wq and .freeze_depth for avoiding to confuse
+people.
 
-one small issue I found for error path while going through changes:
+No functional change.
 
-On Mon, Jun 26, 2017 at 11:57:17AM +0200, Javier Gonz�lez wrote:
-..
-> +static int pblk_lines_alloc_metadata(struct pblk *pblk)
-> +{
-> +	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-> +	struct pblk_line_meta *lm = &pblk->lm;
-> +	int i;
-> +
-> +	/* smeta is always small enough to fit on a kmalloc memory allocation,
-> +	 * emeta depends on the number of LUNs allocated to the pblk instance
-> +	 */
-> +	l_mg->smeta_alloc_type = PBLK_KMALLOC_META;
-> +	for (i = 0; i < PBLK_DATA_LINES; i++) {
-> +		l_mg->sline_meta[i] = kmalloc(lm->smeta_len, GFP_KERNEL);
-> +		if (!l_mg->sline_meta[i])
-> +			goto fail_free_smeta;
+Tested-by: Cathy Avery <cavery@redhat.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c       | 12 ++++++------
+ block/blk-mq.c         | 12 ++++++------
+ include/linux/blkdev.h |  4 ++--
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-For this error path the the goto label at end doesn't free up
-resources correctly.  It needs a
-
-while (--index >= 0)...
-
-logic with appropriate adjustment.
-
-> +	}
-> +
-> +	/* emeta allocates three different buffers for managing metadata with
-> +	 * in-memory and in-media layouts
-> +	 */
-> +	for (i = 0; i < PBLK_DATA_LINES; i++) {
-> +		struct pblk_emeta *emeta;
-> +
-> +		emeta = kmalloc(sizeof(struct pblk_emeta), GFP_KERNEL);
-> +		if (!emeta)
-> +			goto fail_free_emeta;
-> +
-> +		if (lm->emeta_len[0] > KMALLOC_MAX_CACHE_SIZE) {
-> +			l_mg->emeta_alloc_type = PBLK_VMALLOC_META;
-> +
-> +			emeta->buf = vmalloc(lm->emeta_len[0]);
-> +			if (!emeta->buf) {
-> +				kfree(emeta);
-> +				goto fail_free_emeta;
-> +			}
-> +
-> +			emeta->nr_entries = lm->emeta_sec[0];
-> +			l_mg->eline_meta[i] = emeta;
-> +		} else {
-> +			l_mg->emeta_alloc_type = PBLK_KMALLOC_META;
-> +
-> +			emeta->buf = kmalloc(lm->emeta_len[0], GFP_KERNEL);
-> +			if (!emeta->buf) {
-> +				kfree(emeta);
-> +				goto fail_free_emeta;
-> +			}
-> +
-> +			emeta->nr_entries = lm->emeta_sec[0];
-> +			l_mg->eline_meta[i] = emeta;
-> +		}
-> +	}
-> +
-> +	l_mg->vsc_list = kcalloc(l_mg->nr_lines, sizeof(__le32), GFP_KERNEL);
-> +	if (!l_mg->vsc_list)
-> +		goto fail_free_emeta;
-> +
-> +	for (i = 0; i < l_mg->nr_lines; i++)
-> +		l_mg->vsc_list[i] = cpu_to_le32(EMPTY_ENTRY);
-> +
-> +	return 0;
-> +
-> +fail_free_emeta:
-> +	while (--i >= 0) {
-> +		vfree(l_mg->eline_meta[i]->buf);
-
-This would need l_mg->emeta_alloc_type check to decide whether
-allocation was done with kmalloc or vmalloc.
-
-> +		kfree(&l_mg->eline_meta[i]);
-> +	}
-> +
-> +fail_free_smeta:
-> +	for (i = 0; i < PBLK_DATA_LINES; i++)
-> +		pblk_mfree(&l_mg->sline_meta[i], l_mg->smeta_alloc_type);
-> +
-> +	return -ENOMEM;
-> +}
-> +
-
-Thanks,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 97837a5bf838..8889920567d2 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -630,7 +630,7 @@ void blk_set_queue_dying(struct request_queue *q)
+ 	 * We need to ensure that processes currently waiting on
+ 	 * the queue are notified as well.
+ 	 */
+-	wake_up_all(&q->mq_freeze_wq);
++	wake_up_all(&q->freeze_wq);
+ }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
+ 
+@@ -793,14 +793,14 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		/*
+ 		 * read pair of barrier in blk_freeze_queue_start(),
+ 		 * we need to order reading __PERCPU_REF_DEAD flag of
+-		 * .q_usage_counter and reading .mq_freeze_depth or
++		 * .q_usage_counter and reading .freeze_depth or
+ 		 * queue dying flag, otherwise the following wait may
+ 		 * never return if the two reads are reordered.
+ 		 */
+ 		smp_rmb();
+ 
+-		ret = wait_event_interruptible(q->mq_freeze_wq,
+-				!atomic_read(&q->mq_freeze_depth) ||
++		ret = wait_event_interruptible(q->freeze_wq,
++				!atomic_read(&q->freeze_depth) ||
+ 				blk_queue_dying(q));
+ 		if (blk_queue_dying(q))
+ 			return -ENODEV;
+@@ -819,7 +819,7 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
+ 	struct request_queue *q =
+ 		container_of(ref, struct request_queue, q_usage_counter);
+ 
+-	wake_up_all(&q->mq_freeze_wq);
++	wake_up_all(&q->freeze_wq);
+ }
+ 
+ static void blk_rq_timed_out_timer(unsigned long data)
+@@ -891,7 +891,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ 	q->bypass_depth = 1;
+ 	__set_bit(QUEUE_FLAG_BYPASS, &q->queue_flags);
+ 
+-	init_waitqueue_head(&q->mq_freeze_wq);
++	init_waitqueue_head(&q->freeze_wq);
+ 
+ 	/*
+ 	 * Init percpu_ref in atomic mode so that it's faster to shutdown.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1e9bf2b987a1..988da93d85a4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -122,7 +122,7 @@ void blk_freeze_queue_start(struct request_queue *q)
+ {
+ 	int freeze_depth;
+ 
+-	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
++	freeze_depth = atomic_inc_return(&q->freeze_depth);
+ 	if (freeze_depth == 1) {
+ 		percpu_ref_kill(&q->q_usage_counter);
+ 		if (q->mq_ops)
+@@ -135,14 +135,14 @@ void blk_freeze_queue_wait(struct request_queue *q)
+ {
+ 	if (!q->mq_ops)
+ 		blk_drain_queue(q);
+-	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
++	wait_event(q->freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
+ }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_wait);
+ 
+ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+ 				     unsigned long timeout)
+ {
+-	return wait_event_timeout(q->mq_freeze_wq,
++	return wait_event_timeout(q->freeze_wq,
+ 					percpu_ref_is_zero(&q->q_usage_counter),
+ 					timeout);
+ }
+@@ -170,11 +170,11 @@ void blk_unfreeze_queue(struct request_queue *q)
+ {
+ 	int freeze_depth;
+ 
+-	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
++	freeze_depth = atomic_dec_return(&q->freeze_depth);
+ 	WARN_ON_ONCE(freeze_depth < 0);
+ 	if (!freeze_depth) {
+ 		percpu_ref_reinit(&q->q_usage_counter);
+-		wake_up_all(&q->mq_freeze_wq);
++		wake_up_all(&q->freeze_wq);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(blk_unfreeze_queue);
+@@ -2440,7 +2440,7 @@ void blk_mq_free_queue(struct request_queue *q)
+ /* Basically redo blk_mq_init_queue with queue frozen */
+ static void blk_mq_queue_reinit(struct request_queue *q)
+ {
+-	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
++	WARN_ON_ONCE(!atomic_read(&q->freeze_depth));
+ 
+ 	blk_mq_debugfs_unregister_hctxs(q);
+ 	blk_mq_sysfs_unregister(q);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 460294bb0fa5..b8053bcc6b5f 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -564,7 +564,7 @@ struct request_queue {
+ 	struct mutex		sysfs_lock;
+ 
+ 	int			bypass_depth;
+-	atomic_t		mq_freeze_depth;
++	atomic_t		freeze_depth;
+ 
+ #if defined(CONFIG_BLK_DEV_BSG)
+ 	bsg_job_fn		*bsg_job_fn;
+@@ -576,7 +576,7 @@ struct request_queue {
+ 	struct throtl_data *td;
+ #endif
+ 	struct rcu_head		rcu_head;
+-	wait_queue_head_t	mq_freeze_wq;
++	wait_queue_head_t	freeze_wq;
+ 	struct percpu_ref	q_usage_counter;
+ 	struct list_head	all_q_node;
+ 
+-- 
+2.9.5
