@@ -1,59 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f196.google.com ([209.85.216.196]:36324 "EHLO
-        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751779AbdITPkC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Sep 2017 11:40:02 -0400
-Received: by mail-qt0-f196.google.com with SMTP id t46so1968576qtj.3
-        for <linux-block@vger.kernel.org>; Wed, 20 Sep 2017 08:40:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <db997d70-9d0d-fd27-1c7c-7f602499aea4@suse.de>
-References: <20170919222433.24336-1-colyli@suse.de> <CAJ+L6qeLMsCAVsdNkertg2BzwVHcq4ZZ==E8gojo9O2cutWrVQ@mail.gmail.com>
- <db997d70-9d0d-fd27-1c7c-7f602499aea4@suse.de>
-From: Michael Lyle <mlyle@lyle.org>
-Date: Wed, 20 Sep 2017 08:40:00 -0700
-Message-ID: <CAJ+L6qc_U_37Jn=wzcXoLU6dHWHQyRJGTACDtmctAn1Gg08keA@mail.gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:50181 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751781AbdITK2g (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Sep 2017 06:28:36 -0400
 Subject: Re: [PATCHv2] bcache: option for allow stale data on read failure
-To: Coly Li <colyli@suse.de>
+To: Michael Lyle <mlyle@lyle.org>
 Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         Nix <nix@esperi.org.uk>, Kai Krakow <hurikhan77@gmail.com>,
         Eric Wheeler <bcache@lists.ewheeler.net>,
         Junhui Tang <tang.junhui@zte.com.cn>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20170919222433.24336-1-colyli@suse.de>
+ <CAJ+L6qeLMsCAVsdNkertg2BzwVHcq4ZZ==E8gojo9O2cutWrVQ@mail.gmail.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <db997d70-9d0d-fd27-1c7c-7f602499aea4@suse.de>
+Date: Wed, 20 Sep 2017 12:28:29 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAJ+L6qeLMsCAVsdNkertg2BzwVHcq4ZZ==E8gojo9O2cutWrVQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Sep 20, 2017 at 3:28 AM, Coly Li <colyli@suse.de> wrote:
-> Even the read request failed on file system meta data, because finally a
-> stale data will be provided to kernel file system code, it is probably
-> file system won't complain as well.
+On 2017/9/20 上午8:59, Michael Lyle wrote:
+> Coly--
+> 
+> It's an interesting changeset.
 
-The scary case is when filesystem data that points to other filesystem
-data is cached.  E.g. the data structures representing what space is
-free on disk, or a directory, or a database btree.  Some examples:
+Hi Mike,
 
-Free space handling-- if a big file /foo is created, and the active
-free-space datastructures are in cache (and this is likely, because
-actively written places can have their writeback-writes
-cancelled/deferred indefinitely)-- and then later the caching disk
-fails, an old version of this will be read from disk.  Later, an
-effort to write a file /bar allocates the space used by /foo, and
-writes over it.
+Yes it's interesting :-) It fixes a silent database data corruption in
+our product kernel. The most dangerous point is, it happens silent even
+in-data checksum is used, this issue is detected by out-of-data checksum.
 
-Directory entity handling-- if /var/spool/foo is an active directory
-(associated data structures in cache), and has the directory
-/var/spool/foo/bar under it, and then /bar is removed... the backing
-disk will still have a reference to bar.  If the space for bar is then
-used for something else, the kernel may end up reading something very
-different from what it expects for a directory later after a cache
-device failure.
+> I am not positive if it will work in practice-- the most likely
+> objects to be cached are filesystem metadata.  Won't most filesystems
+> fall apart if some of their data structures revert back to an earlier
+> point of time?
 
-Btrees, etc-- the same thing.  If a tree shrinks, old tree entitys can
-end up pointing to other kinds of data.
+For database workload, most of data cached on SSD is data blocks of
+database file which are replied from binlog (for example mysql). File
+system won't complain for such situation, and an early version means all
+transactions information since last update are all lost, in *silence*.
 
-I think this change is harmful-- it is not a good idea to
-automatically, at runtime, decide to start returning data that
-violates the guarantees a block device is supposed to obey about
-ordering and persistence.
+Even the read request failed on file system meta data, because finally a
+stale data will be provided to kernel file system code, it is probably
+file system won't complain as well. Because,
+- file system reports error when I/O failed, if a stale data from
+recovery provided to file system, file system just uses the stale data
+until a worse failure detected by file system code.
+- if file system use a metadata checksum, and the checksum is inside
+metadata block (it is quite common), because the stale data is also
+checksum consistent, file system won't report error as well.
 
-Mike
+So the data corruption happens in application level, even file system
+kernel code still thinks everything is consistent on disk ....
+
+Thanks.
+
+Coly Li
+
+
+> On Tue, Sep 19, 2017 at 3:24 PM, Coly Li <colyli@suse.de> wrote:
+>> When bcache does read I/Os, for example in writeback or writethrough mode,
+>> if a read request on cache device is failed, bcache will try to recovery
+>> the request by reading from cached device. If the data on cached device is
+>> not synced with cache device, then requester will get a stale data.
+>>
+>> For critical storage system like database, providing stale data from
+>> recovery may result an application level data corruption, which is
+>> unacceptible. But for some other situation like multi-media stream cache,
+>> continuous service may be more important and it is acceptible to fetch
+>> a chunk of stale data.
+>>
+>> This patch tries to solve the above conflict by adding a sysfs option
+>>         /sys/block/bcache<idx>/bcache/allow_stale_data_on_failure
+>> which is defaultly cleared (to 0) as disabled. Now people can make choices
+>> for different situations.
+>>
+>> With this patch, for a failed read request in writeback or writethrough
+>> mode, recovery a recoverable read request only happens in one of the
+>> following conditions,
+>>  - dc->has_dirty is zero. It means all data on cache device is synced to
+>>    cached device, the recoveried data is up-to-date.
+>>  - dc->has_dirty is non-zero, and dc->allow_stale_data_on_failure is set
+>>    to 1. It means there is dirty data not synced to cached device yet, but
+>>    option allow_stale_data_on_failure is set, receiving stale data is
+>>    explicitly acceptible for requester.
+>>
+>> For other cache modes in bcache, read request will never hit
+>> cached_dev_read_error(), they don't need this patch.
+>>
+>> Please note, because cache mode can be switched arbitrarily in run time, a
+>> writethrough mode might be switched from a writeback mode. Therefore
+>> checking dc->has_data in writethrough mode still makes sense.
+>>
+>> Changelog:
+>> v2: rename sysfs entry from allow_stale_data_on_failure  to
+>>     allow_stale_data_on_failure, and fix the confusing commit log.
+>> v1: initial patch posted.
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Reported-by: Arne Wolf <awolf@lenovo.com>
+>> Cc: Nix <nix@esperi.org.uk>
+>> Cc: Kai Krakow <hurikhan77@gmail.com>
+>> Cc: Eric Wheeler <bcache@lists.ewheeler.net>
+>> Cc: Junhui Tang <tang.junhui@zte.com.cn>
+>> Cc: stable@vger.kernel.org
+
+[snip]
